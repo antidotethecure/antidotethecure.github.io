@@ -1,0 +1,17 @@
+# Runtime data: your own research output, positions and thresholds.
+# Never commit these to a public repository.
+ANTIDOTE_PREDICTION_OS/antidote.db
+ANTIDOTE_PREDICTION_OS/antidote.db-wal
+ANTIDOTE_PREDICTION_OS/antidote.db-shm
+ANTIDOTE_PREDICTION_OS/CONFIG/config.json
+ANTIDOTE_PREDICTION_OS/LOGS/
+ANTIDOTE_PREDICTION_OS/REPORTS/
+ANTIDOTE_PREDICTION_OS/ALERTS/
+ANTIDOTE_PREDICTION_OS/BACKTESTS/
+ANTIDOTE_PREDICTION_OS/PAPER_TRADING/
+ANTIDOTE_PREDICTION_OS/NEWS/
+__pycache__/
+*.pyc
+
+# Keep the §36 directory skeleton itself under version control.
+!ANTIDOTE_PREDICTION_OS/*/.gitkeep

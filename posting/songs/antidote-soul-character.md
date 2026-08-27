@@ -25,6 +25,25 @@ Use this in place of "a Black man" in all 14 Believe Me treatment prompts.
 | 6 | Range video frame — full body side profile | 771053fd-369d-4777-8f85-b2dd96648b5d |
 | 7 | Range video frame — full body, mid-motion | 8edddb60-a6ad-4793-a7dd-ae7125455587 |
 
+## The Messiah look (Believe Me signature wardrobe)
+
+Requested styling: Jesus-type robe, crown of thorns, blood on the face.
+
+Wardrobe block (append to the body block for sacred scenes):
+
+> wearing a flowing off-white linen messiah robe draped over his shoulders,
+> a crown of thorns on his head, thin trickles of blood running down his
+> forehead and face, gold chain visible at his chest
+
+First concept tests (Soul V2, "Antidote Real", 2026-08-27):
+- job de8436e9-50e3-4a0b-baea-8e9f585f9f19
+- job 88b04d91-7878-4588-af37-32d108314c0f
+
+Suggested use in the treatment: street clothes for Verse 1 (the world
+before), the robe + thorns from the first wing-tear onward (scenes 05-13),
+so the sacrifice look lands exactly when the song starts costing him.
+Update every affected scene prompt with the wardrobe block for consistency.
+
 ## Still needed before retraining (phone photos are fine)
 
 1. Recent solo full-body, front, eyes visible (no sunglasses)

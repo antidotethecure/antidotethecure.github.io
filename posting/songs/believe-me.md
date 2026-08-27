@@ -17,17 +17,17 @@ Antidote is the cure. Believe me.
 
 They doubted it until it happened. Believe it before you see it. 🙏✨
 "Believe Me" — Antidote, out now 🔥
-#Antidote #BelieveMe #Spiritual #Faith #Manifestation #Believe #GodsPlan
-#SpiritualAwakening #NewMusic #fyp #ForYouPage #Trending #Viral
+Antidote BelieveMe Spiritual Faith Manifestation Believe GodsPlan
+SpiritualAwakening NewMusic fyp ForYouPage Trending Viral
 
-## Hashtags / Keywords
+## Keywords / Tags
 
-#Antidote #AntidoteTheCure #BelieveMe #Spiritual #Spirituality
-#SpiritualAwakening #Faith #FaithOverFear #Believe #BelieveInYourself
-#Manifestation #Manifest #GodsPlan #Blessed #Prayer #HigherSelf #Awakening
-#Energy #Vibration #Purpose #Destiny #NewMusic #MusicWithAMessage
-#SpiritualMusic #IndependentArtist #fyp #fypage #ForYouPage #ForYou #Trending
-#TrendingNow #Viral #ViralMusic #Explore #ExplorePage
+Antidote, AntidoteTheCure, BelieveMe, Spiritual, Spirituality,
+SpiritualAwakening, Faith, FaithOverFear, Believe, BelieveInYourself,
+Manifestation, Manifest, GodsPlan, Blessed, Prayer, HigherSelf, Awakening,
+Energy, Vibration, Purpose, Destiny, NewMusic, MusicWithAMessage,
+SpiritualMusic, IndependentArtist, fyp, fypage, ForYouPage, ForYou, Trending,
+TrendingNow, Viral, ViralMusic, Explore, ExplorePage
 
 Plain keywords (for YouTube tags / streaming metadata):
 Antidote, Believe Me, spiritual music, faith, manifestation, believe,

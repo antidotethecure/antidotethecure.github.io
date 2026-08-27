@@ -29,20 +29,26 @@ Use this in place of "a Black man" in all 14 Believe Me treatment prompts.
 
 Requested styling: Jesus-type robe, crown of thorns, blood on the face.
 
-Wardrobe block (append to the body block for sacred scenes):
+Wardrobe block (append to the body block for sacred scenes — NO jewelry,
+losing the chain is the point):
 
-> wearing a flowing off-white linen messiah robe draped over his shoulders,
-> a crown of thorns on his head, thin trickles of blood running down his
-> forehead and face, gold chain visible at his chest
+> wearing a flowing off-white linen messiah robe, a crown of thorns on his
+> head, thin trickles of blood running down his forehead and face, no
+> jewelry
 
 First concept tests (Soul V2, "Antidote Real", 2026-08-27):
 - job de8436e9-50e3-4a0b-baea-8e9f585f9f19
 - job 88b04d91-7878-4588-af37-32d108314c0f
 
-Suggested use in the treatment: street clothes for Verse 1 (the world
-before), the robe + thorns from the first wing-tear onward (scenes 05-13),
-so the sacrifice look lands exactly when the song starts costing him.
-Update every affected scene prompt with the wardrobe block for consistency.
+CONFIRMED ARC (see WARDROBE ARC in believe-me-treatment.md):
+- Scenes 00-07 STREET: cap, heavy gold chain, iced-out watch, designer
+  fit — the materialistic Antidote, lost, searching for love
+- Scene 07 THE SHEDDING: the chain snaps and falls into the pit with the
+  cap and torn jacket as he releases the cords — he loses the chasing
+- Scenes 08-13 ROBE: from "found God in myself" — robe, thorns, blood,
+  nothing on his body he has to hold onto
+
+All 14 scene prompts in believe-me-treatment.md carry the wardrobe.
 
 ## Still needed before retraining (phone photos are fine)
 

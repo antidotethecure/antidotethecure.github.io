@@ -695,6 +695,66 @@
           "title": "ZsFoodboil Review By Antidote ft @Officialcnova #foodreview #antidote #lafoodie"
         }
       ]
+    },
+    "gta6_cheat_code": {
+      "source_trigger": "trig_01LYKMXaRkwnnxhvmJDerwq2",
+      "source_trigger_name": "Antidote TikTok GTA6 x CheatCode (4x Daily)",
+      "platforms": [
+        "tiktok"
+      ],
+      "notes": "Originals rotate via the user's routine 4x/day. Hook variants (song at 0:40, rendered 1080x1920 via vidiq_compose 2026-08-27) were direct-posted/scheduled through the GTA6 trailer-drop window and also uploaded to TikTok drafts. is_aigc=true on variant posts.",
+      "clips": [
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/8f4e59e2-271f-4454-9b7c-de2c2c1cf271.mp4",
+          "title": "Somebody send this to Rockstar 🎮\n\"Cheat Code\" — antidotethefoodie.com #TheRealAntidote #fyp #foryou #foryoupage #trending #GTA6",
+          "variant": "original"
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/cc3c59ca-c76f-4eab-932f-4372ffb63e48.mp4",
+          "title": "The GTA 6 cheat code is real 🎮\nfull song: antidotethefoodie.com #TheRealAntidote #fyp #foryou #foryoupage #trending #GTA6 #ViceCity",
+          "variant": "original"
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/322126ef-1900-4e0f-9602-e1bdfbcd4ba3.mp4",
+          "title": "GTA 6 but it's got a theme song 🌴\n\"Cheat Code\" — antidotethefoodie.com #TheRealAntidote #fyp #foryou #foryoupage #trending #GTA6",
+          "variant": "original"
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/56dd36de-b7b2-41cc-9d6a-6a15ebb164c1.mp4",
+          "title": "GTA 6 x \"Cheat Code\" 🎮\nfull song: antidotethefoodie.com #TheRealAntidote #fyp #foryou #foryoupage #trending #GTA6 #ViceCity #GTA6Edit",
+          "variant": "original"
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/96c36ce8-e6dd-4f6c-b1bb-49a52bcba405.mp4",
+          "title": "Somebody send this to Rockstar 🎮\n\"Cheat Code\" — antidotethefoodie.com #TheRealAntidote #fyp #foryou #foryoupage #trending #GTA6",
+          "variant": "hook_0m40s",
+          "verified": "1080x1920"
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/6764ade3-f843-4371-9783-f4ac2547eace.mp4",
+          "title": "The GTA 6 cheat code is real 🎮\nfull song: antidotethefoodie.com #TheRealAntidote #fyp #foryou #foryoupage #trending #GTA6 #ViceCity",
+          "variant": "hook_0m40s",
+          "verified": "1080x1920"
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/25e69d58-7d70-4c64-a655-280e3277a91b.mp4",
+          "title": "GTA 6 but it's got a theme song 🌴\n\"Cheat Code\" — antidotethefoodie.com #TheRealAntidote #fyp #foryou #foryoupage #trending #GTA6",
+          "variant": "hook_0m40s",
+          "verified": "1080x1920"
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/1e18b0e9-1070-45a3-bf96-da5fda6802e0.mp4",
+          "title": "GTA 6 x \"Cheat Code\" 🎮\nfull song: antidotethefoodie.com #TheRealAntidote #fyp #foryou #foryoupage #trending #GTA6 #ViceCity #GTA6Edit",
+          "variant": "hook_0m40s",
+          "verified": "1080x1920"
+        }
+      ]
     }
+  },
+  "song": {
+    "title": "Cheat Code",
+    "master_wav": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/c2cf51eb-d5c6-4e71-8a72-f5760c1fb14c.wav",
+    "hook_starts_at_seconds": 40,
+    "note": "Hook timestamp confirmed by owner 2026-08-27."
   }
 }

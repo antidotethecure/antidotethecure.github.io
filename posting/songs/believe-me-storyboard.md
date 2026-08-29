@@ -1,4 +1,38 @@
-# Believe Me — Storyboard Stills (generated 2026-08-27)
+# Believe Me — Storyboard
+
+## V2 — APOCALYPSE PASS (ACTIVE — generated 2026-08-29, matches the single cover art)
+
+Energy locked to the "Believe Me" cover (prod. Mike Zombie): the world is
+ending — burning city skyline, giant blood-red moon behind smoke, ember
+rain, white feathers falling — while he tries to help everyone and loses
+his wings feather by feather. Scene 11 is a recreation of the cover shot.
+Wardrobe arc unchanged: street (00-07) → shedding (07) → robe (08-13).
+
+Contact sheet: https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/5b699467-e2f1-4308-83c7-80ca2c43286f.jpg
+
+| Scene | Beat | job_id |
+|---|---|---|
+| 00 | Cold open — rooftop projector | e790e0f4-910f-43ca-b88c-6debd0222750 |
+| 01 | The study, city burning outside | c8b6c383-1de1-43dd-a9f0-c35781770d8d |
+| 02 | Losing every soul | af40d1e6-29aa-463c-b028-97d81731510b |
+| 03 | Wake up — you're the creator | 15ae2139-9941-466c-9dbe-a637183105f3 |
+| 04 | The call across the fire | f00101c0-3eda-4b69-8bb1-4e156a9e943f |
+| 05 | First wing-tear (feathers ignite) | 0f4081f4-e133-4943-a6b4-dacdd97ddd1b |
+| 06 | The pull-down | b050c275-dc28-4cd7-8ab2-f5993c3ed3b9 |
+| 07 | The shedding — chain into the fire | 7122d7c3-b011-4f80-ba90-937e37981103 |
+| 08 | Found God in myself — light vs fire | 989796b2-89f2-4f2b-99e6-f2b6f4664b60 |
+| 09 | Messiah in the Tesla, Compton burns | 2082177d-e97a-4896-9c00-beeb6893a3fa |
+| 10 | The ascension out of the flames | 5a02d205-9229-4c15-8ab9-14230cb85435 |
+| 11 | THE COVER SHOT — lost my mind | 9876d2c8-e628-4601-b1b5-c2b7e516b6ef |
+| 12A | The reveal — they're all him | 7e71c69e-e9c2-4b83-a15c-c07652d90a0a |
+| 12B | Indra's Net over the burning world | 656321f1-8ec2-44bf-8c0d-fcdb020685f9 |
+| 13 | Complete (frozen embers void) | e63fdadb-f443-4b0b-93e1-5ab9ce4b5ff3 |
+
+Video pass note: carry the apocalypse world into every clip — burning
+skyline + blood moon backdrop, ember rain, feathers falling in ALL scenes;
+wings burn at the edges and shed feathers whenever he lifts someone.
+
+## V1 — original pass (superseded, generated 2026-08-27)
 
 15 scene frames, Soul V2 ("Antidote Real" 67148f87-b5ef-4a45-9db7-7782a07d0acd),
 16:9, 2048x1152. Total cost ~1.8 credits.

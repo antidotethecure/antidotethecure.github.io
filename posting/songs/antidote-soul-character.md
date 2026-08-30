@@ -6,10 +6,13 @@ body is not, because the old training set was face-heavy.
 
 ## Body description block (paste into every prompt)
 
-> a big, broad-shouldered Black man with a powerful heavyset build, thick
-> chest and strong tattooed forearms, light brown skin with freckles across
-> his face, chinstrap beard, wearing a fitted black cap and gold chain,
-> standing with grounded confident posture
+> a tall, lean Black man with a trim solid build, tattooed forearms, light
+> brown skin with freckles across his face, chinstrap beard, wearing a
+> fitted black cap and gold chain, standing with grounded confident posture
+
+(Per Antidote 2026-08-29: NEVER use "heavyset", "big", or "broad" in
+prompts — they inflate the body. Always "tall lean", "trim build",
+"slim-fit" clothing. Body must stay consistent across every shot.)
 
 Use this in place of "a Black man" in all 14 Believe Me treatment prompts.
 

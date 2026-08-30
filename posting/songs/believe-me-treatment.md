@@ -70,8 +70,10 @@ Two looks, one transformation. The wardrobe IS the story:
   linen messiah robe, a crown of thorns on his head, thin trickles of blood
   running down his face, no jewelry"*
 
-Body base for every prompt: *"a big, broad-shouldered heavyset Black man
-with light brown skin, freckles across his face, and a chinstrap beard"*
+Body base for every prompt: *"a tall, lean Black man with a trim solid
+build, light brown skin, freckles across his face, and a chinstrap beard"*
+— never "heavyset"/"big"/"broad" (inflates the body); clothing is always
+"slim-fit". Same body words in every prompt = consistent size across shots.
 
 ## RECURRING MOTIFS
 

@@ -1,6 +1,32 @@
 # Believe Me — Storyboard
 
-## V2 — APOCALYPSE PASS (ACTIVE — generated 2026-08-29, matches the single cover art)
+## V3 — LEAN BODY PASS (ACTIVE — generated 2026-08-30)
+
+Same apocalypse world as V2, body corrected per Antidote: tall, lean, trim
+build in every prompt — "heavyset/big/broad" banned (see
+antidote-soul-character.md). Slim-fit wardrobe throughout.
+
+Contact sheet: https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/2f9686dd-5d9f-4032-9f1e-df2729dc0cf9.jpg
+
+| Scene | job_id |
+|---|---|
+| 00 | 5d491503-d6ce-4632-aeab-12e1b829da32 |
+| 01 | 62907398-6d0f-4f2a-9f80-202587baa5ff |
+| 02 | d470b632-12af-4ec5-8bc3-f3d808e3766c |
+| 03 | a701fb27-57e1-4443-afbd-24afb4f5202d |
+| 04 | 1d48c242-74d9-475e-950b-78202bfce4bb |
+| 05 | a48563c1-dc86-463e-86e6-dc03bc0373e0 |
+| 06 | fd336f9e-54f3-43d4-852e-ead8902b8ed6 |
+| 07 | e9d1da4f-8af4-4f8b-8be0-240a17249a9d |
+| 08 | a802718f-6f74-4d88-a74e-088520ce8b64 |
+| 09 | 4be8a130-1380-44eb-b298-f2143f5c9a25 |
+| 10 | d9581305-24e8-43b2-94d4-9ee9782ee155 |
+| 11 | abefcbbc-ff3d-4db3-990a-8279ce1ae88a |
+| 12A | f77eb489-7673-4893-b42d-39b6c725f82a |
+| 12B | 2cdc8cb0-4933-41ba-b782-f109316a5980 |
+| 13 | 2fbb07e8-f7e8-42b6-8f4d-94ae4a60a367 |
+
+## V2 — apocalypse pass (superseded — body ran heavy; generated 2026-08-29, matches the single cover art)
 
 Energy locked to the "Believe Me" cover (prod. Mike Zombie): the world is
 ending — burning city skyline, giant blood-red moon behind smoke, ember

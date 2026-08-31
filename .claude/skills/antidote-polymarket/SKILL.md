@@ -108,12 +108,18 @@ markets (ranking history, backtests).
 
 ## Running it as a recurring alert
 
-To make step 4 recur, schedule a routine (in an environment with Polymarket
-access) that runs `ingest --platform polymarket` then `follow`, every N minutes.
-Alert destinations are configured in `ANTIDOTE_PREDICTION_OS/CONFIG/config.json`
-under `alerts.destinations` — `dashboard`/`log`/`file` work with no credentials;
-email/SMS/Telegram/etc. are declared but inert until the user supplies their own
-authorized credentials. Do not enable a destination the user has not set up.
+Use `scripts/run-follow.sh` — one cycle of ingest → rank → follow. Run it on a
+machine that can reach polymarket.com (and api.telegram.org), and cron it for a
+recurring cadence. Do NOT schedule it as a cloud routine: those fire back into
+the sandbox where Polymarket is blocked, so every run would fail.
+
+**Telegram alerts** are wired up. Set `TELEGRAM_BOT_TOKEN` and
+`TELEGRAM_CHAT_ID` in the environment (never in the repo/config), verify with
+`python3 -m antidote.cli test-alert`, and the runner auto-adds `telegram` to
+`alerts.destinations`. Messages are a compact summary; full detail stays in
+`LOGS/alerts.log`. `dashboard`/`log`/`file` need no credentials; email/SMS/
+Discord/Slack/webhook remain inert until the user supplies credentials. Do not
+enable a destination the user has not set up.
 
 ## Hard limits — do not cross
 

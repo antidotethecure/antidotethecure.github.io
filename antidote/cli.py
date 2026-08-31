@@ -536,6 +536,32 @@ def cmd_follow(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_test_alert(args: argparse.Namespace) -> int:
+    """Send a test message through configured destinations (verify Telegram)."""
+    import os
+    from .alerts import _telegram_send
+    from .provenance import SourceKind
+    from .alerts import Alert, AlertLevel
+
+    have = bool(os.environ.get("TELEGRAM_BOT_TOKEN") and
+                os.environ.get("TELEGRAM_CHAT_ID"))
+    if not have:
+        print("TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not set in the environment.")
+        print("Set them, then re-run. See scripts/run-follow.sh header for setup.")
+        return 1
+    probe = Alert(level=AlertLevel.INFORMATION, kind="test",
+                  market_id="test", signals=[], confidence=0,
+                  source_kind=SourceKind.DERIVED)
+    ok = _telegram_send(probe,
+                        text="ANTIDOTE test alert ✅ Telegram is wired up. "
+                             "Real alerts are research signals only — not "
+                             "recommendations, no profit guaranteed.")
+    print("Telegram test sent." if ok else
+          "Telegram send failed — check token/chat id and network "
+          "(see LOGS/delivery.log).")
+    return 0 if ok else 1
+
+
 def cmd_config(args: argparse.Namespace) -> int:
     config = Config.load()
     if args.set:
@@ -716,6 +742,9 @@ def build_parser() -> argparse.ArgumentParser:
                    help="only surface markets at/above this implied probability "
                         "(0-1). Default 0 = no filter.")
     s.set_defaults(func=cmd_follow)
+
+    sub.add_parser("test-alert", help="send a test Telegram message"
+                   ).set_defaults(func=cmd_test_alert)
 
     s = sub.add_parser("config", help="show or set configuration")
     s.add_argument("--set", action="append", metavar="KEY=VALUE",

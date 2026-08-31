@@ -475,6 +475,67 @@ def cmd_monitor(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_follow(args: argparse.Namespace) -> int:
+    """Watch ranked traders; alert on their qualifying moves + copy-feasibility.
+
+    This is the 'follow top traders' workflow. It is alert-only: it never places
+    a trade. 'Immediately' means the poll interval — there is no per-trade push;
+    a trade is seen on the next ingest cycle.
+    """
+    store, config = _bootstrap(args)
+    ta, metrics, ranker = _analytics(store, config)
+    ranks = _ranks(store)
+    if not ranks:
+        print("No watchlist yet. Run `antidote rank` first to build it, or "
+              "`antidote watch <trader_id...>` to pin traders.")
+        return 1
+
+    detector = Detector(store, config, metrics=metrics, ranks=ranks)
+    since = utcnow() - timedelta(hours=args.hours)
+    signals = [s for s in detector.large_trades(since=since)
+               if s.trader_id in ranks and not s.suppressed]
+    signals.sort(key=lambda s: (ranks.get(s.trader_id, 999), -s.confidence))
+
+    analyzer = CopyAnalyzer(store, config)
+    engine = AlertEngine(store, config)
+    print(f"Watching {len(ranks)} ranked trader(s). "
+          f"{len(signals)} qualifying move(s) in the last {args.hours:g}h.\n")
+
+    emitted = 0
+    for s in signals:
+        row = store.conn.execute("SELECT * FROM trades WHERE id = ?",
+                                 (s.evidence.get("trade_id"),)).fetchone()
+        tm = metrics.get(s.trader_id)
+        assessment = analyzer.assess(
+            row, size_value=args.size, trader_metrics=tm,
+            trader_rank=ranks.get(s.trader_id),
+        ) if row else None
+
+        # Section 33 gate the user asked for: only surface markets whose current
+        # implied probability clears their threshold. Reframed honestly below.
+        prob = s.evidence.get("market_price_now")
+        prob_ok = prob is not None and prob >= args.min_prob
+
+        alert = engine.build([s], kind="large_trade", market_id=s.market_id,
+                             trader_id=s.trader_id)
+        if engine.emit(alert):
+            emitted += 1
+        mk = store.get_market(s.market_id)
+        print(f"#{ranks.get(s.trader_id)} {s.trader_id[-14:]}  "
+              f"{(mk['question'] if mk else s.market_id)[:46]}")
+        print(f"    conf {s.confidence}  prob "
+              f"{'n/a' if prob is None else f'{prob:.0%}'}"
+              f"  {'>= ' + format(args.min_prob, '.0%') + ' OK' if prob_ok else 'below prob floor'}")
+        if assessment:
+            print(f"    copy-check: {assessment.verdict.value}")
+    print(f"\n{emitted} alert(s) emitted (level/confidence gated by config).")
+    print("Reminder: high implied probability = small payout, not 'safe money'. "
+          "A copy-check verdict of 'Potentially replicable' means the mechanics "
+          "still work, not that the trade is good. No position is suggested; "
+          "human decision required.")
+    return 0
+
+
 def cmd_config(args: argparse.Namespace) -> int:
     config = Config.load()
     if args.set:
@@ -646,6 +707,15 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--trades", type=int, default=500)
     s.add_argument("--cycles", type=int, default=0, help="0 = run forever")
     s.set_defaults(func=cmd_monitor)
+
+    s = sub.add_parser("follow", help="watch ranked traders and alert on moves")
+    s.add_argument("--hours", type=float, default=24.0)
+    s.add_argument("--size", type=float, default=1000.0,
+                   help="notional to assess copy-feasibility against")
+    s.add_argument("--min-prob", type=float, default=0.0,
+                   help="only surface markets at/above this implied probability "
+                        "(0-1). Default 0 = no filter.")
+    s.set_defaults(func=cmd_follow)
 
     s = sub.add_parser("config", help="show or set configuration")
     s.add_argument("--set", action="append", metavar="KEY=VALUE",

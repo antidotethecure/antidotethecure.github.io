@@ -1,73 +1,30 @@
-# Antidote Drizzle Bowl — global weekly leaderboard setup
+# Antidote Drizzle Bowl — global weekly leaderboard
 
-Right now the game keeps a weekly top-10 on each player's own device. To make ONE
-board that collects every player's name and score on the website, hook it to a free
-Google Sheet (takes about 5 minutes, no server needed):
+The leaderboard is LIVE. No setup needed — it's already wired into the game.
 
-## 1. Make the sheet
-- Go to https://sheets.new (signed in as antidotethecure@gmail.com)
-- Name it something like `Drizzle Bowl Scores`
+- **Standings page:** https://drizzle-bowl-scores.higgsfield.app
+  (shows This Week's top 10 and the All-Time Clamps, with a PLAY button
+  linking back to the game — share this link anywhere)
+- **Score API:** https://drizzle-bowl-scores.higgsfield.app/api/scores
+  (the game reads and writes here; it's set in `index.html` as `LEADERBOARD_URL`)
 
-## 2. Add the script
-- In the sheet: **Extensions → Apps Script**
-- Delete whatever is in the editor and paste this:
+## How it works
+- When a player finishes a game, they type their name on the in-game keyboard
+  and their score posts to the global board.
+- The in-game WEEKLY LEADERS list shows the real site-wide top 10.
+- Boards reset every Monday; each player's best score per week counts once.
+- Past weeks stay stored, so you can announce a weekly winner anytime.
 
-```javascript
-const SHEET = 'Scores';
-function doGet(e) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sh = ss.getSheetByName(SHEET) || ss.insertSheet(SHEET);
-  const week = String((e.parameter && e.parameter.week) || '');
-  const rows = sh.getLastRow() ? sh.getDataRange().getValues() : [];
-  const out = rows
-    .filter(r => String(r[2]) === week)
-    .map(r => ({ name: String(r[0]).slice(0, 12), score: Number(r[1]) || 0 }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 10);
-  return ContentService.createTextOutput(JSON.stringify(out))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-function doPost(e) {
-  const d = JSON.parse(e.postData.contents);
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sh = ss.getSheetByName(SHEET) || ss.insertSheet(SHEET);
-  const name = String(d.name || '').replace(/[^\w \-\.]/g, '').slice(0, 12);
-  const score = Math.max(0, Math.min(450, parseInt(d.score, 10) || 0));
-  if (name && score > 0) sh.appendRow([name, score, String(d.week || ''), new Date()]);
-  return ContentService.createTextOutput('ok');
-}
-```
+## Anti-junk protections (built into the server)
+- Names are stripped to letters/numbers/spaces, max 12 characters.
+- Scores are capped at 450 (the game's theoretical max range).
+- Malformed submissions are rejected.
 
-- Click the save icon.
+## Managing scores
+The score database lives with the leaderboard service. To remove a bad entry
+or pull a week's results, just ask Claude in a session — it can read the
+database directly and ship a cleanup.
 
-## 3. Deploy it
-- **Deploy → New deployment → type: Web app**
-- *Execute as:* **Me**
-- *Who has access:* **Anyone**
-- Click **Deploy**, approve the permissions, and copy the **Web app URL**
-  (it looks like `https://script.google.com/macros/s/AKf.../exec`).
-
-## 4. Plug it into the game
-- Open `drizzle-bowl/index.html` and find the line near the top:
-
-```javascript
-var LEADERBOARD_URL="";
-```
-
-- Paste the URL between the quotes:
-
-```javascript
-var LEADERBOARD_URL="https://script.google.com/macros/s/AKf.../exec";
-```
-
-- Commit and push. Done — every player's name entry now lands in your sheet, and the
-  in-game WEEKLY LEADERS board shows the real site-wide top 10. The board resets
-  every Monday (scores are stored per week, so past weeks stay in the sheet — you
-  can announce a weekly winner from there).
-
-Notes:
-- Scores are capped at 450 and names at 12 characters server-side, so junk entries
-  can't wreck the board. You can delete any row in the sheet to remove a score.
-- The Google-Sheet board only works on the website (antidotethecure.github.io),
-  not in the Claude artifact preview — the preview page isn't allowed to call
-  outside servers, so there it falls back to the device-local board.
+## Note
+If a player somehow can't reach the leaderboard (offline, blocked network),
+the game quietly falls back to a device-local board so their score still shows.

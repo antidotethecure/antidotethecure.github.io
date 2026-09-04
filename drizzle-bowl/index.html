@@ -1257,8 +1257,8 @@ function pinTexture(food){return bake(256,512,(g,w,h)=>{
 /* ---- static scenery ---- */
 const M=THREE.Mesh;
 function add(mesh){scene.add(mesh);return mesh;}
-const laneMesh=add(new M(new THREE.BoxGeometry(HALF*2,0.04,18.75),new THREE.MeshStandardMaterial({map:woodT,roughness:0.32,metalness:0.05})));
-laneMesh.position.set(0,-0.02,-8.25);
+const laneMesh=add(new M(new THREE.BoxGeometry(HALF*2,0.04,19.25),new THREE.MeshStandardMaterial({map:woodT,roughness:0.32,metalness:0.05})));
+laneMesh.position.set(0,-0.02,-8.49);
 const logoT=new THREE.Texture(A3.logo);if(A3.logo&&A3.logo.complete)logoT.needsUpdate=true;else if(A3.logo)A3.logo.addEventListener('load',()=>{logoT.needsUpdate=true;});
 logoT.colorSpace=THREE.SRGBColorSpace;
 const logoM=add(new M(new THREE.PlaneGeometry(0.7,0.42),new THREE.MeshBasicMaterial({map:logoT,transparent:true,opacity:0.92})));
@@ -1281,7 +1281,7 @@ const gutMat=new THREE.MeshStandardMaterial({color:0x17100e,roughness:0.6,metaln
   const bar=new M(new THREE.BoxGeometry(0.045,0.035,17.2),railMat);bar.position.set(s2*0.95,0.21,-8.6);scene.add(bar);
   for(let pz3=-0.6;pz3>-16.6;pz3-=2.1){const post=new M(new THREE.BoxGeometry(0.028,0.30,0.028),railMat);post.position.set(s2*0.95,0.06,pz3);scene.add(post);}
 });
-const backWall=add(new M(new THREE.PlaneGeometry(4,1.15),new THREE.MeshBasicMaterial({color:0x060404})));backWall.position.set(0,0.16,-17.9);
+const backWall=add(new M(new THREE.PlaneGeometry(4,1.15),new THREE.MeshBasicMaterial({color:0x060404})));backWall.position.set(0,0.16,-18.35);
 const bumper=add(new M(new THREE.BoxGeometry(1.9,0.12,0.08),new THREE.MeshStandardMaterial({color:0xb8322c,emissive:0x5a1712,roughness:0.4})));bumper.position.set(0,0.62,-17.0);
 const maskT=add(new M(new THREE.BoxGeometry(6,0.42,0.1),new THREE.MeshBasicMaterial({color:0x0a0607})));maskT.position.set(0,1.44,-16.98);
 /* ---------- living backdrop: day cycle, real buildings, helicopter, cop car, stars ---------- */
@@ -1479,11 +1479,11 @@ world.addContactMaterial(new CANNON.ContactMaterial(mPin,mLane,{friction:0.055,r
 world.addContactMaterial(new CANNON.ContactMaterial(mPin,mPin,{friction:0.06,restitution:0.62}));
 world.addContactMaterial(new CANNON.ContactMaterial(mPin,mKick,{friction:0.05,restitution:0.72}));
 function sbox(hx,hy,hz,x,y,z,mat){const b=new CANNON.Body({mass:0,material:mat||mLane,shape:new CANNON.Box(new CANNON.Vec3(hx,hy,hz)),position:new CANNON.Vec3(x,y,z)});world.addBody(b);return b;}
-sbox(HALF,0.05,9.35,0,-0.05,-8.25);                     /* lane deck (ends z=-16.95 -> pit) */
+sbox(HALF,0.05,9.60,0,-0.05,-8.50);                     /* lane deck (front 1.10, back -18.10) */
 sbox(0.12,0.02,9.35,-0.80,-0.17,-8.25);sbox(0.12,0.02,9.35,0.80,-0.17,-8.25); /* gutter floors */
 sbox(0.03,0.12,9.35,-0.945,-0.06,-8.25);sbox(0.03,0.12,9.35,0.945,-0.06,-8.25);   /* gutter outer walls */
-sbox(1.3,1.1,0.05,0,0.5,-17.66,mKick); /* rear cushion: pins rebound onto the deck */                        /* pit back wall */
-sbox(1.4,0.05,1.0,0,-0.62,-18.1);                       /* pit floor */
+sbox(1.3,1.1,0.05,0,0.5,-18.06,mKick); /* rear cushion: pins rebound onto the deck */                        /* pit back wall */
+sbox(1.4,0.05,1.0,0,-0.62,-18.5);                       /* pit floor */
 sbox(6,0.05,6,0,-0.85,-14.5);                           /* catch floor: nothing falls out of the world */
 /* ---- pins ---- */
 const pinProfile=[[0,0],[0.038,0],[0.052,0.02],[0.057,0.10],[0.049,0.17],[0.028,0.235],[0.021,0.25],[0.021,0.264],[0.030,0.29],[0.038,0.32],[0.038,0.345],[0.025,0.372],[0.001,0.381]].map(p=>new THREE.Vector2(p[0],p[1]));
@@ -1549,7 +1549,7 @@ function breakTable(t){
 function buildBonus(){
   clearBonus();
   [-1,1].forEach(s2=>{
-    const tx=s2*0.62,tz=-17.30+(Math.random()-0.5)*0.06;
+    const tx=s2*0.62,tz=-17.62+(Math.random()-0.5)*0.06;
     const body=new CANNON.Body({mass:4.0,material:mPin,shape:new CANNON.Box(new CANNON.Vec3(0.30,0.02,0.21)),position:new CANNON.Vec3(tx,0.408,tz)});
     [[-0.26,-0.17],[0.26,-0.17],[-0.26,0.17],[0.26,0.17]].forEach(p=>{
       body.addShape(new CANNON.Box(new CANNON.Vec3(0.02,0.19,0.02)),new CANNON.Vec3(p[0],-0.21,p[1]));});
@@ -1700,7 +1700,7 @@ function mirror(){
     const b=pn.body,a=b.quaternion.vmult(UPV,new CANNON.Vec3());
     const dsp=Math.hypot(b.position.x-(b.__spot?b.__spot.x:0),b.position.z-(b.__spot?b.__spot.z:0));
     const up=b.position.y>-0.05&&Math.abs(b.position.x)<0.70&&b.position.z>-17.55&&(a.y>0.94||(a.y>0.72&&dsp<0.22));
-    out.pins.push({up,gone:b.position.y<-0.32||b.position.z<-17.9,ox:Math.max(-1.3,Math.min(1.3,b.position.x*OLDX)),oy:Math.min(1.22,zToOld(b.position.z)),
+    out.pins.push({up,gone:b.position.y<-0.32||b.position.z<-18.0,ox:Math.max(-1.3,Math.min(1.3,b.position.x*OLDX)),oy:Math.min(1.22,zToOld(b.position.z)),
       rot:Math.atan2(a.x,Math.max(-0.4,a.y)),loft:Math.max(0,b.position.y-0.191)/0.35});
   }
   return out;

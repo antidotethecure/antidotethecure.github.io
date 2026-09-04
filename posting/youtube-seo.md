@@ -72,6 +72,27 @@ vidIQ is the source of truth; run these when credits are available
 Re-run monthly, or whenever a title's angle stops landing. Update the titles in
 `apply_yt_seo.py` and re-run it so the manifest stays the single source of truth.
 
+## Validation log
+
+**2026-09-04 (vidIQ CTR scorer, type=short, channel UCcWrh7PiZOvDUTeHkHIDNHw):**
+scored the 8 most abstract/jargon-heavy titles (the likeliest to underperform).
+All came back strong — no rewrites warranted:
+
+| # | Title (theme) | Score |
+|---|---|---|
+| 25 | I AM Is The Only Power Creating Your Reality | 95 |
+| 15 | The 3D Is Just A Shadow Of Your Imagination | 91 |
+| 5 | Stop Waiting — You Are The Operant Power | 87 |
+| 26 | Persistence In The Assumption Is The Whole Game | 87 |
+| 22 | Feel Grateful Now As If It Already Happened | 86 |
+| 0/2 | Your Imagination Is Creating Your Reality Right Now | 85 |
+| 17 | Dare To Assume The Best and It Must Come To Pass | 83 |
+| 12 | Your Inner Conversations Are Building Your Future | 82 |
+
+Lowest was 82; the set is well-optimized as-is. Rising-keyword and trending-Shorts
+research on the same day returned no manifestation-specific angles (the week's
+rising terms were unrelated viral spikes), so nothing to chase there this cycle.
+
 ## Guardrails
 
 - No fabricated view counts, fake "as seen on", or clickbait the video doesn't

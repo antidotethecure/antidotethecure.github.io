@@ -1473,10 +1473,10 @@ function ambient(dt,gs){
 const world=new CANNON.World({gravity:new CANNON.Vec3(0,-9.82,0)});
 world.allowSleep=true;world.solver.iterations=14;
 const mLane=new CANNON.Material('lane'),mBall=new CANNON.Material('ball'),mPin=new CANNON.Material('pin'),mKick=new CANNON.Material('kick');
-world.addContactMaterial(new CANNON.ContactMaterial(mBall,mLane,{friction:0.05,restitution:0.08}));
+world.addContactMaterial(new CANNON.ContactMaterial(mBall,mLane,{friction:0.042,restitution:0.08}));
 world.addContactMaterial(new CANNON.ContactMaterial(mBall,mPin,{friction:0.38,restitution:0.50}));
-world.addContactMaterial(new CANNON.ContactMaterial(mPin,mLane,{friction:0.055,restitution:0.15}));
-world.addContactMaterial(new CANNON.ContactMaterial(mPin,mPin,{friction:0.06,restitution:0.62}));
+world.addContactMaterial(new CANNON.ContactMaterial(mPin,mLane,{friction:0.032,restitution:0.12}));
+world.addContactMaterial(new CANNON.ContactMaterial(mPin,mPin,{friction:0.045,restitution:0.62}));
 world.addContactMaterial(new CANNON.ContactMaterial(mPin,mKick,{friction:0.05,restitution:0.72}));
 function sbox(hx,hy,hz,x,y,z,mat){const b=new CANNON.Body({mass:0,material:mat||mLane,shape:new CANNON.Box(new CANNON.Vec3(hx,hy,hz)),position:new CANNON.Vec3(x,y,z)});world.addBody(b);return b;}
 sbox(HALF,0.05,9.60,0,-0.05,-8.50);                     /* lane deck (front 1.10, back -18.10) */
@@ -1501,7 +1501,7 @@ function makePin(i,fi){
   const x=l[0]*PDXm+(Math.random()-0.5)*0.012,z=Z_HEAD-l[1]*PDZm+(Math.random()-0.5)*0.008;
   const body=new CANNON.Body({mass:0.85,material:mPin,shape:pinShape,position:new CANNON.Vec3(x,0.1905,z)});
   body.__spot={x:x,z:z};
-  body.allowSleep=true;body.sleepSpeedLimit=0.25;body.sleepTimeLimit=0.45;body.angularDamping=0.04;body.linearDamping=0.012;
+  body.allowSleep=true;body.sleepSpeedLimit=0.16;body.sleepTimeLimit=0.6;body.angularDamping=0.028;body.linearDamping=0.006;
   body.__pin=true;world.addBody(body);
   body.addEventListener('collide',e=>{const nw=performance.now()/1000;const iv=Math.abs(e.contact.getImpactVelocityAlongNormal());
     if(e.body.__pin&&iv>1.2&&nw-lastPinC>0.12){lastPinC=nw;(A3.playCrash&&A3.playCrash(Math.min(0.7,0.2+iv/10),1.05+Math.random()*0.25))||(A3.sfx&&A3.sfx.crash());}});
@@ -1633,7 +1633,7 @@ function throwBall(ox,spin,power,charged){
   ballBody=new CANNON.Body({mass:7.2,material:mBall,shape:new CANNON.Sphere(BR*1.09),position:new CANNON.Vec3(ox*0.76,BR+0.002,0.55)});
   ballBody.velocity.set(wob,0,-v);
   ballBody.angularVelocity.set(-v/BR,-spin*24,0);
-  ballBody.linearDamping=0.006;ballBody.angularDamping=0.012;
+  ballBody.linearDamping=0.004;ballBody.angularDamping=0.010;
   world.addBody(ballBody);
   ballBody.addEventListener('collide',e=>{const nw=performance.now()/1000;
     if(e.body.__laneFood){const f=foods.find(ff=>ff.body===e.body);

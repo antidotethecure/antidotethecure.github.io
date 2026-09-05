@@ -1275,10 +1275,30 @@ const M=THREE.Mesh;
 function add(mesh){scene.add(mesh);return mesh;}
 const laneMesh=add(new M(new THREE.BoxGeometry(HALF*2,0.04,19.25),new THREE.MeshStandardMaterial({map:woodT,roughness:0.32,metalness:0.05})));
 laneMesh.position.set(0,-0.02,-8.49);
-const logoT=new THREE.Texture(A3.logo);if(A3.logo&&A3.logo.complete)logoT.needsUpdate=true;else if(A3.logo)A3.logo.addEventListener('load',()=>{logoT.needsUpdate=true;});
-logoT.colorSpace=THREE.SRGBColorSpace;
-const logoM=add(new M(new THREE.PlaneGeometry(0.7,0.42),new THREE.MeshBasicMaterial({map:logoT,transparent:true,opacity:0.92})));
-logoM.rotation.x=-Math.PI/2;logoM.position.set(0,0.004,-6.8);
+const logoC=document.createElement('canvas');logoC.width=512;logoC.height=896;
+const logoT=new THREE.CanvasTexture(logoC);logoT.colorSpace=THREE.SRGBColorSpace;
+function drawLaneDecal(){
+  const g=logoC.getContext('2d');g.clearRect(0,0,512,896);
+  g.save();g.translate(256,262);
+  g.fillStyle='#10314f';g.beginPath();g.arc(0,0,236,0,7);g.fill();
+  if(A3.logo&&A3.logo.complete&&A3.logo.naturalWidth){
+    g.save();g.beginPath();g.arc(0,0,222,0,7);g.clip();g.drawImage(A3.logo,-222,-222,444,444);g.restore();
+  }else{g.fillStyle='#f2a81d';g.font='900 300px Impact,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('A',0,18);}
+  g.lineWidth=16;g.strokeStyle='#f2a81d';g.beginPath();g.arc(0,0,228,0,7);g.stroke();
+  g.restore();
+  g.textAlign='center';g.textBaseline='middle';
+  g.font='900 92px Impact,sans-serif';
+  g.lineWidth=14;g.strokeStyle='#7c1f1a';g.strokeText('ANTIDOTE',256,600);
+  g.fillStyle='#f2a81d';g.fillText('ANTIDOTE',256,600);
+  g.font='900 62px Impact,sans-serif';
+  g.lineWidth=10;g.strokeStyle='#7c1f1a';g.strokeText('DRIZZLE BOWL',256,700);
+  g.fillStyle='#fbe9c4';g.fillText('DRIZZLE BOWL',256,700);
+  logoT.needsUpdate=true;
+}
+drawLaneDecal();
+if(A3.logo&&!A3.logo.complete)A3.logo.addEventListener('load',drawLaneDecal);
+const logoM=add(new M(new THREE.PlaneGeometry(1.28,2.24),new THREE.MeshBasicMaterial({map:logoT,transparent:true,opacity:0.96})));
+logoM.rotation.x=-Math.PI/2;logoM.position.set(0,0.004,-8.2);
 /* aiming arrows embedded in the boards, classic V pattern */
 {const tri=new THREE.Shape();tri.moveTo(0,0.105);tri.lineTo(-0.052,-0.062);tri.lineTo(0.052,-0.062);tri.closePath();
  const tg=new THREE.ShapeGeometry(tri);
@@ -1373,6 +1393,24 @@ function mkTesla(color){
   return c2;}
 const teslas=[{grp:mkTesla(0xe8e8ec),t:4,cyc:36,park:-3.4,dir:1},{grp:mkTesla(0x1a1c22),t:20,cyc:41,park:3.6,dir:-1}];
 teslas.forEach(tc=>{tc.grp.position.set(-14,1.42,-18.30);amb.add(tc.grp);});
+function starText(msg){
+  const c=document.createElement('canvas');c.width=512;c.height=64;const g=c.getContext('2d');
+  g.font='bold 36px Impact,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.fillText(msg,256,33);
+  const d=g.getImageData(0,0,512,64).data;
+  const c2=document.createElement('canvas');c2.width=512;c2.height=64;const g2=c2.getContext('2d');
+  for(let y=1;y<63;y+=3)for(let x=1;x<511;x+=3){
+    if(d[(y*512+x)*4+3]>110&&Math.random()<0.9){
+      const r=1.3+Math.random()*1.6;
+      const gr=g2.createRadialGradient(x,y,0,x,y,r);
+      gr.addColorStop(0,'rgba(255,255,238,1)');gr.addColorStop(0.5,'rgba(255,244,210,0.7)');gr.addColorStop(1,'rgba(255,244,210,0)');
+      g2.fillStyle=gr;g2.beginPath();g2.arc(x,y,r,0,7);g2.fill();
+    }}
+  return new THREE.CanvasTexture(c2);
+}
+const stMsgs=[starText('FOLLOW @THEREALANTIDOTE'),starText('ANTIDOTETHEFOODIE.COM')];
+const stPlane=new M(new THREE.PlaneGeometry(8.2,1.02),new THREE.MeshBasicMaterial({map:stMsgs[0],transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));
+stPlane.position.set(0,7.0,-22.6);amb.add(stPlane);
+let stT=11,stShow=0,stIdx=0;
 const shoot=new M(new THREE.PlaneGeometry(1.2,0.035),new THREE.MeshBasicMaterial({color:0xfff8e0,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));
 shoot.position.set(0,7,-22.2);shoot.rotation.z=-0.32;amb.add(shoot);
 /* review-cover billboard over the pin deck */
@@ -1466,6 +1504,14 @@ function ambient(dt,gs){
   /* shooting stars at night */
   shootT-=dt;
   if(shootT<0&&day<0.2){shootT=4+Math.random()*8;shoot.userData.life=0.7;shoot.position.set(-9+Math.random()*10,6.8-Math.random()*1.6,-22.2);}
+  /* the stars line up: a shooting star writes the socials across the sky every ~15s at night */
+  stT+=dt;
+  if(stT>15&&day<0.25){stT=0;stIdx=(stIdx+1)%stMsgs.length;stPlane.material.map=stMsgs[stIdx];stShow=6.5;
+    shoot.userData.life=0.8;shoot.position.set(-5.5,7.9,-22.5);}
+  if(stShow>0){stShow-=dt;
+    stPlane.material.opacity=Math.min(1,(6.5-stShow)/0.9)*Math.min(1,stShow/1.1)*0.95*(1-day);
+    stPlane.visible=true;}
+  else stPlane.material.opacity=0;
   if(shoot.userData.life>0){shoot.userData.life-=dt;shoot.position.x+=dt*15;shoot.position.y-=dt*3.6;
     shoot.material.opacity=Math.min(1,shoot.userData.life*2.4)*0.9;}
   else shoot.material.opacity=0;

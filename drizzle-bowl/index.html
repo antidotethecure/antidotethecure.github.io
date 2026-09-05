@@ -1031,12 +1031,45 @@ function drawBall(b){
 /* deterministic freckle scatter (same every frame) */
 var FRECK=(function(){var a=[],seed=7;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647;}
   for(var i=0;i<40;i++){var ang=rnd()*6.283,r=Math.pow(rnd(),0.6);a.push([Math.cos(ang)*r*13.4,Math.sin(ang)*r*13.4+2,0.10+rnd()*0.22]);}return a;})();
+function hatCrown(){
+  ctx.beginPath();
+  ctx.moveTo(-15.2,-126.5);
+  ctx.quadraticCurveTo(-16.4,-140,0,-142.6);
+  ctx.quadraticCurveTo(16.4,-140,15.2,-126.5);
+  ctx.quadraticCurveTo(8,-129.6,0,-129.9);
+  ctx.quadraticCurveTo(-8,-129.6,-15.2,-126.5);
+  ctx.closePath();
+}
 function drawHat(back){
-  /* black fitted cap, gold brim + gold A */
-  ctx.fillStyle='#141012';ctx.beginPath();ctx.ellipse(0,-137,15.5,10,0,Math.PI,0);ctx.fill();ctx.fillRect(-15.5,-137,31,5);
-  ctx.fillStyle='#f2a81d';
-  if(back){ctx.fillRect(-15.5,-133,31,2);ctx.fillStyle='#b8322c';ctx.fillRect(-3,-132,6,3);}
-  else{ctx.beginPath();ctx.ellipse(0,-131,17,4,0,0,Math.PI);ctx.fill();txt('A',0,-139,'bold 10px Impact,"Arial Black",sans-serif','#f2a81d');}
+  if(back){
+    /* pulled down over the back of the head — snug */
+    ctx.fillStyle='#141012';
+    ctx.beginPath();ctx.ellipse(0,-129,15.5,13.6,0,Math.PI,0);ctx.fill();
+    ctx.fillRect(-15.5,-129,31,12.5);
+    ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(0,-142.4);ctx.lineTo(0,-117);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(-9,-140);ctx.quadraticCurveTo(-10.2,-128,-9.5,-117);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(9,-140);ctx.quadraticCurveTo(10.2,-128,9.5,-117);ctx.stroke();
+    /* adjuster strap with the little gap */
+    ctx.fillStyle='#0c0a0e';ctx.fillRect(-6.5,-121.5,13,4.6);
+    ctx.fillStyle='#f2a81d';ctx.fillRect(-2.2,-121.1,4.4,3.8);
+    ctx.fillStyle='#141012';ctx.beginPath();ctx.arc(0,-142.4,2.2,0,7);ctx.fill();
+  }else{
+    /* fitted crown hugging the skull — no gaps anywhere */
+    ctx.fillStyle='#141012';hatCrown();ctx.fill();
+    var hg=ctx.createLinearGradient(-15,0,15,0);
+    hg.addColorStop(0,'rgba(255,255,255,.10)');hg.addColorStop(0.5,'rgba(255,255,255,0)');hg.addColorStop(1,'rgba(0,0,0,.28)');
+    ctx.fillStyle=hg;hatCrown();ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(0,-142.2);ctx.lineTo(0,-130.2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(-8.5,-140.4);ctx.quadraticCurveTo(-9.6,-134,-9,-128.8);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(8.5,-140.4);ctx.quadraticCurveTo(9.6,-134,9,-128.8);ctx.stroke();
+    ctx.fillStyle='#141012';ctx.beginPath();ctx.arc(0,-142.4,2.1,0,7);ctx.fill();
+    /* gold brim, shadowed underside */
+    ctx.fillStyle='#f2a81d';ctx.beginPath();ctx.ellipse(0,-130.0,16.9,4.2,0,0,Math.PI);ctx.fill();
+    ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(0,-129.2,15.9,2.6,0,0,Math.PI);ctx.fill();
+    txt('A',0,-135.6,'bold 11px Impact,"Arial Black",sans-serif','#f2a81d');
+  }
 }
 function drawFace(mood,back){
   var cheer=mood==='cheese',mad=mood==='mad';

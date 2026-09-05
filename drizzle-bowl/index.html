@@ -7,6 +7,53 @@
   #gl{display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#1a1214;z-index:1}
 </style>
 
+<div id="sideboard" hidden>
+  <div class="sb-t">&#127942; WEEKLY LEADERS</div>
+  <div class="sb-sub" id="sb-weeklabel"></div>
+  <ol id="sb-week" class="sb-list"></ol>
+  <div class="sb-t sb-t2">ALL-TIME CLAMPS</div>
+  <ol id="sb-all" class="sb-list"></ol>
+  <a class="sb-link" href="https://drizzle-bowl-scores.higgsfield.app" target="_blank" rel="noopener">Full standings &#8594;</a>
+</div>
+<style>
+#sideboard{position:fixed;left:20px;top:50%;transform:translateY(-50%);width:236px;background:#241a1c;border:2px solid #f2a81d;border-radius:14px;padding:16px 16px 12px;color:#fbe9c4;font-family:Verdana,sans-serif;z-index:40;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+#sideboard .sb-t{color:#f2a81d;font-weight:bold;font-size:14px;letter-spacing:.04em}
+#sideboard .sb-t2{margin-top:14px}
+#sideboard .sb-sub{color:#c9b899;font-size:10px;margin:2px 0 6px}
+#sideboard .sb-list{list-style:none;margin:6px 0 0;padding:0}
+#sideboard .sb-list li{display:flex;justify-content:space-between;font-size:12px;padding:3px 8px;border-radius:5px}
+#sideboard .sb-list li:nth-child(odd){background:rgba(255,255,255,.07)}
+#sideboard .sb-list li:first-child{background:#f2a81d;color:#1a1214;font-weight:bold}
+#sideboard .sb-list li span:last-child{font-family:monospace;font-weight:bold}
+#sideboard .sb-empty{color:#c9b899;font-size:11px;padding:4px 0}
+#sideboard .sb-link{display:block;margin-top:12px;color:#f2a81d;font-size:11px;text-decoration:none}
+@media(max-width:1000px){#sideboard{display:none!important}}
+</style>
+<script>
+(function(){
+  var API="https://drizzle-bowl-scores.higgsfield.app/api/scores";
+  function wk(){var d=new Date();var day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+  function fill(el,rows){el.innerHTML="";
+    if(!rows||!rows.length){var d2=document.createElement("div");d2.className="sb-empty";d2.textContent="No scores yet - be the first!";el.appendChild(d2);return;}
+    rows.slice(0,10).forEach(function(r,i){var li=document.createElement("li");
+      var a=document.createElement("span");a.textContent=(i+1)+". "+String(r.name||"").slice(0,12);
+      var b=document.createElement("span");b.textContent=r.score;
+      li.appendChild(a);li.appendChild(b);el.appendChild(li);});}
+  function refresh(){
+    Promise.all([
+      fetch(API+"?week="+wk()).then(function(r){return r.json();}),
+      fetch(API).then(function(r){return r.json();})
+    ]).then(function(res){
+      fill(document.getElementById("sb-week"),res[0]);
+      fill(document.getElementById("sb-all"),res[1]);
+      document.getElementById("sb-weeklabel").textContent="Week of "+wk()+" - resets Monday";
+      document.getElementById("sideboard").hidden=false;
+    }).catch(function(){});
+  }
+  refresh();setInterval(refresh,45000);
+})();
+</script>
 <canvas id="gl" width="480" height="800"></canvas>
 <canvas id="c" width="480" height="800"></canvas>
 <div id="yt"><div id="ytp"></div></div>

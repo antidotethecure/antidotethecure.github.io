@@ -95,3 +95,28 @@ bun run db:seed
 echo
 echo "CRM ready except Google OAuth. Fill GOOGLE_CLIENT_ID and"
 echo "GOOGLE_CLIENT_SECRET in .env (see toolchain notes), then: bun run dev"
+
+# ---------------------------------------------------------------- Step 6
+say "Step 6: Playwright MCP (browser automation / form filling)"
+# Official Microsoft MCP server, distributed as an npm package — nothing to
+# clone or build. --scope user registers it globally, for every project.
+if ! command -v claude >/dev/null; then
+  echo "claude CLI not found on PATH — install Claude Code first, then re-run."
+else
+  if claude mcp list 2>/dev/null | grep -q '^playwright'; then
+    echo "playwright MCP already registered."
+  else
+    claude mcp add --scope user playwright -- npx @playwright/mcp@latest
+    echo "playwright MCP registered for all projects."
+  fi
+  cat <<'EOF'
+Notes:
+- First use downloads a browser automatically; nothing else to install.
+- Default mode keeps a PERSISTENT profile: log in to a site once during a
+  session and Claude stays logged in for future form fills.
+- To have Claude drive YOUR real Chrome (already signed in to everything),
+  install the "Playwright MCP Bridge" Chrome extension and re-register with:
+    claude mcp remove playwright
+    claude mcp add --scope user playwright -- npx @playwright/mcp@latest --extension
+EOF
+fi

@@ -483,10 +483,10 @@ function update(dt){
     if(g.taunt){g.taunt.t-=dt;if(g.taunt.t<=0)g.taunt=null;}
   }
   if(g.phase==='aim'&&g.xT!=null)g.x+=(g.xT-g.x)*Math.min(1,dt*14);
-  if(g.phase==='spin'){g.spin+=g.spinDir*dt*2.2;if(g.spin>1){g.spin=1;g.spinDir=-1;}if(g.spin<-1){g.spin=-1;g.spinDir=1;}}
-  if(g.phase==='power'){g.power+=g.powerDir*dt*1.5;if(g.power>1){g.power=1;g.powerDir=-1;}if(g.power<0.05){g.power=0.05;g.powerDir=1;}}
+  if(g.phase==='spin'){g.spin+=g.spinDir*dt*3.5;if(g.spin>1){g.spin=1;g.spinDir=-1;}if(g.spin<-1){g.spin=-1;g.spinDir=1;}}
+  if(g.phase==='power'){g.power+=g.powerDir*dt*2.4;if(g.power>1){g.power=1;g.powerDir=-1;}if(g.power<0.05){g.power=0.05;g.powerDir=1;}}
   if(g.phase==='throw'){g.throwT+=dt;if(g.throwT>0.55){g.phase='roll';
-    var chg=Math.abs((g.power||0.5)-0.775)<0.022;
+    var chg=Math.abs((g.power||0.5)-0.775)<0.016;
     if(chg){g.msg='CHARGED UP!';g.msgT=1.4;g.flash=Math.max(g.flash,0.3);sfx.tick();setTimeout(sfx.tick,90);setTimeout(sfx.tick,180);}
     if(USE3D){g.ball={x:g.x,x0:g.x,spin:g.spin,y:0,vx:0,vy:throwSpeed(),rot:0,gutter:false,free:true,hit:false,done:false,rest:false,pit:0,charged:chg};B3D.throwBall(g.x,g.spin,g.power,chg);if(B3D.setFire)B3D.setFire(g.streak>=3);}
     else{var wob=Math.max(0,(g.power||0.5)-0.7)*0.20*(Math.random()<0.5?-1:1)*(0.4+Math.random()*0.6);g.ball={x:g.x,x0:g.x,spin:g.spin,y:0,vx:wob,vy:throwSpeed(),rot:0,gutter:false,free:true,hit:false,done:false};}
@@ -813,6 +813,21 @@ function drawTop(){
   g.pins.forEach(function(p){if(p.gone||!p.up)return;var q=projTop(p.x,p.y);ctx.save();ctx.translate(q.x,q.y+4);ctx.scale(1,-0.55);drawPinBody(p,q.s,true);ctx.restore();});
   ctx.restore();
   var sh=ctx.createLinearGradient(72,0,W-72,0);sh.addColorStop(0,'rgba(255,255,255,0)');sh.addColorStop(0.32,'rgba(255,255,255,.16)');sh.addColorStop(0.4,'rgba(255,255,255,0)');sh.addColorStop(0.62,'rgba(255,255,255,.1)');sh.addColorStop(0.7,'rgba(255,255,255,0)');ctx.fillStyle=sh;ctx.fillRect(72,250,W-144,TOP.h-250);
+  if(USE3D&&window.B3D&&B3D.lastPath&&(g.phase==='spin'||g.phase==='power')){
+    ctx.save();ctx.beginPath();ctx.rect(72,190,W-144,TOP.h-190);ctx.clip();
+    var LP=B3D.lastPath;
+    ctx.fillStyle='#f2a81d';
+    for(var li=0;li<LP.length;li++){if(LP[li][1]<0.45)continue;
+      var q3=projTop(Math.max(-1.3,Math.min(1.3,LP[li][0])),LP[li][1]);
+      ctx.globalAlpha=0.5+0.45*(li/LP.length);ctx.beginPath();ctx.arc(q3.x,q3.y,2.5+4*q3.s,0,7);ctx.fill();}
+    ctx.globalAlpha=1;
+    var pa=LP[LP.length-2],pb2=LP[LP.length-1];
+    if(pa&&pb2){var qa=projTop(pa[0],pa[1]),qb=projTop(pb2[0],pb2[1]);
+      var ang2=Math.atan2(qb.y-qa.y,qb.x-qa.x);
+      ctx.save();ctx.translate(qb.x,qb.y);ctx.rotate(ang2);ctx.fillStyle='#f2a81d';
+      ctx.beginPath();ctx.moveTo(13,0);ctx.lineTo(-5,-7);ctx.lineTo(-5,7);ctx.closePath();ctx.fill();ctx.restore();}
+    ctx.restore();
+  }
   g.splats.forEach(function(s){ctx.globalAlpha=s.a;ctx.fillStyle=s.c;ctx.beginPath();ctx.ellipse(s.x,s.y,s.r*s.rx,s.r*0.55,0,0,7);ctx.fill();ctx.fillStyle='rgba(255,255,255,.25)';ctx.beginPath();ctx.ellipse(s.x-s.r*0.3,s.y-s.r*0.15,s.r*0.4,s.r*0.15,0,0,7);ctx.fill();});
   ctx.globalAlpha=1;
   ctx.fillStyle='#8d8f94';ctx.fillRect(72,TOP.h-10,W-144,10);ctx.fillStyle='#d8dbe0';ctx.fillRect(72,TOP.h-10,W-144,3);
@@ -1798,8 +1813,9 @@ function removeBall(){if(ballBody){world.removeBody(ballBody);ballBody=null;}if(
 function throwBall(ox,spin,power,charged){
   removeBall();
   S.spin=spin;S.charged=!!charged;
-  const wob=Math.max(0,power-0.7)*0.35*(Math.random()<0.5?-1:1)*(0.4+Math.random()*0.6)*(charged?0.25:1);
+  const wob=Math.max(0,power-0.7)*0.52*(Math.random()<0.5?-1:1)*(0.4+Math.random()*0.6)*(charged?0.35:1);
   const v=5.4+power*4.6+(charged?0.55:0);
+  S.flat=Math.abs(spin)<0.18&&power>0.6;S.hooked=Math.abs(spin)>=0.3; /* revs carry, flat deflects */
   ballBody=new CANNON.Body({mass:7.2,material:mBall,shape:new CANNON.Sphere(BR*1.09),position:new CANNON.Vec3(ox*0.76,BR+0.002,0.55)});
   ballBody.velocity.set(wob,0,-v);
   ballBody.angularVelocity.set(-v/BR,-spin*24,0);
@@ -1809,7 +1825,7 @@ function throwBall(ox,spin,power,charged){
     if(e.body.__laneFood){const f=foods.find(ff=>ff.body===e.body);
       if(f&&!f.counted){f.counted=true;bonusEvents.push({pts:f.pts,e:f.e,ox:e.body.position.x*OLDX,oy:zToOld(e.body.position.z)});}}
     else if(e.body.__pin){const iv=Math.abs(e.contact.getImpactVelocityAlongNormal());
-      const pb=e.body,dxp=pb.position.x-ballBody.position.x,ch=S.charged?1.5:1;   /* rev-driven pin action: fan the rack outward */
+      const pb=e.body,dxp=pb.position.x-ballBody.position.x,ch=(S.charged?1.5:1)*(S.flat?0.45:1)*(S.hooked?1.22:1);   /* rev-driven pin action: fan the rack outward */
       pb.wakeUp();
       const rattled=pb.__touched||pb.angularVelocity.length()>0.7||pb.velocity.length()>0.35;
       pb.__touched=true;
@@ -1825,7 +1841,8 @@ function throwBall(ox,spin,power,charged){
         pb.velocity.x+=(dxp>0?1:-1)*0.9;pb.velocity.z-=0.7;
       }
       if(!S.hit){S.hit=true;S.shakeOut=Math.max(S.shakeOut,S.charged?0.2:0.14);lastCrash=nw;
-        {const bp=ballBody.position,shk=S.charged?0.30:0.08; /* first contact rattles the rack; charged shots detonate it */
+        if(S.flat){ballBody.velocity.x+=(Math.random()<0.5?-1:1)*(0.9+Math.random()*0.6);ballBody.velocity.z*=0.6;}
+        {const bp=ballBody.position,shk=(S.charged?0.30:0.08)*(S.flat?0.35:1)*(S.hooked?1.25:1); /* first contact rattles the rack; charged shots detonate it */
           for(const pn2 of pins){if(!pn2||!pn2.alive)continue;const q2=pn2.body.position;
             const ddx=q2.x-bp.x,ddz=q2.z-bp.z,dd=Math.max(0.35,Math.hypot(ddx,ddz));
             pn2.body.wakeUp();pn2.body.velocity.x+=ddx/dd*(shk/dd);pn2.body.velocity.z+=ddz/dd*(shk/dd)-(S.charged?0.18:0.08);
@@ -1919,9 +1936,9 @@ const pathDots=[];
 const pathTip=new M(new THREE.ConeGeometry(0.085,0.22,10),new THREE.MeshBasicMaterial({color:0xf2a81d,transparent:true,opacity:0.95}));
 const pathGrp=new THREE.Group();pathDots.forEach(d=>pathGrp.add(d));pathGrp.add(pathTip);pathGrp.visible=false;scene.add(pathGrp);
 function showPath(ox,spin,power,on){
-  if(!on){pathGrp.visible=false;return;}
+  if(!on){pathGrp.visible=false;window.B3D&&(B3D.lastPath=null);return;}
   /* run the same integrator the live ball uses, so the arrow tells the truth */
-  const charged=Math.abs((power!=null?power:0.5)-0.775)<0.022;
+  const charged=Math.abs((power!=null?power:0.5)-0.775)<0.016;
   let px=ox*0.76,pz=0.55,vx=0,vz=-(5.4+(power!=null?power:0.5)*4.6+(charged?0.55:0));
   const pts=[];
   for(let i=0;i<720;i++){
@@ -1934,7 +1951,7 @@ function showPath(ox,spin,power,on){
       if(vx>0.85)vx=0.85;if(vx<-0.85)vx=-0.85;
     }
     if(i%7===0)pts.push([px,pz]);
-    if(pz<-15.6||Math.abs(px)>0.72)break;
+    if(pz<-16.5||Math.abs(px)>0.72)break;
   }
   if(pts.length<4){pathGrp.visible=false;return;}
   for(let k=0;k<pathDots.length;k++){
@@ -1949,6 +1966,7 @@ function showPath(ox,spin,power,on){
   pathTip.position.set(B2[0],0.03,B2[1]);
   pathTip.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(ax/al,0,az/al));
   pathGrp.visible=true;
+  if(window.B3D)B3D.lastPath=pts.filter((p,i)=>i%2===0).map(p=>[p[0]*OLDX,zToOld(p[1])]);
 }
 function render(gs){
   showPath(gs.x,gs.spin||0,gs.power,gs.phase==='spin'||gs.phase==='power');

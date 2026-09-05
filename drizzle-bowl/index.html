@@ -1880,7 +1880,45 @@ function preview(show,x,spin,power){
 /* ---- camera + render ---- */
 const camP=new THREE.Vector3(0,1.32,1.75),camL=new THREE.Vector3(0,0.15,-10);
 let lastR=0;
+const pathDots=[];
+{const dg=new THREE.CircleGeometry(0.042,12);dg.rotateX(-Math.PI/2);
+ for(let i=0;i<26;i++){const d=new M(dg,new THREE.MeshBasicMaterial({color:0xf2a81d,transparent:true,opacity:0.85,depthWrite:false}));d.visible=false;pathDots.push(d);}}
+const pathTip=new M(new THREE.ConeGeometry(0.085,0.22,10),new THREE.MeshBasicMaterial({color:0xf2a81d,transparent:true,opacity:0.95}));
+const pathGrp=new THREE.Group();pathDots.forEach(d=>pathGrp.add(d));pathGrp.add(pathTip);pathGrp.visible=false;scene.add(pathGrp);
+function showPath(ox,spin,power,on){
+  if(!on){pathGrp.visible=false;return;}
+  /* run the same integrator the live ball uses, so the arrow tells the truth */
+  const charged=Math.abs((power!=null?power:0.5)-0.775)<0.022;
+  let px=ox*0.76,pz=0.55,vx=0,vz=-(5.4+(power!=null?power:0.5)*4.6+(charged?0.55:0));
+  const pts=[];
+  for(let i=0;i<720;i++){
+    px+=vx/60;pz+=vz/60;
+    const frac=Math.min(1,-pz/16);
+    if(frac>0&&frac<1.02){
+      const r=frac<0.35?0:Math.min(1,(frac-0.35)/0.4);
+      const sp=Math.max(2.5,Math.hypot(vx,vz));
+      vx+=spin*1.05*r*r*(6.5/sp)*(1/60);
+      if(vx>0.85)vx=0.85;if(vx<-0.85)vx=-0.85;
+    }
+    if(i%7===0)pts.push([px,pz]);
+    if(pz<-15.6||Math.abs(px)>0.72)break;
+  }
+  if(pts.length<4){pathGrp.visible=false;return;}
+  for(let k=0;k<pathDots.length;k++){
+    const j=Math.floor(k*(pts.length-1)/(pathDots.length-1));
+    const d=pathDots[k];d.visible=true;
+    d.position.set(pts[j][0],0.02,pts[j][1]);
+    const sc2=1.15-0.55*(j/(pts.length-1));d.scale.set(sc2,1,sc2);
+    d.material.opacity=0.9-0.35*(j/(pts.length-1));
+  }
+  const A2=pts[pts.length-2],B2=pts[pts.length-1];
+  const ax=B2[0]-A2[0],az=B2[1]-A2[1],al=Math.hypot(ax,az)||1;
+  pathTip.position.set(B2[0],0.03,B2[1]);
+  pathTip.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(ax/al,0,az/al));
+  pathGrp.visible=true;
+}
 function render(gs){
+  showPath(gs.x,gs.spin||0,gs.power,gs.phase==='spin'||gs.phase==='power');
   const nw=performance.now()/1000;const dt=Math.min(0.05,lastR?nw-lastR:0.016);lastR=nw;
   let tp,tl;
   const rolling=ballBody&&!S.rest&&(gs.phase==='roll'||gs.phase==='settle');

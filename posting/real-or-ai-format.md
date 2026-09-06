@@ -72,6 +72,32 @@ More: https://antidotethefoodie.com
 artificial intelligence, ai challenge, antidote, therealantidote, ai detection,
 real or fake, guessing game
 
+## FOOD EDITION — image round (preferred: cheap, photoreal, rights-clean)
+
+Multi-round slideshow: 5–6 food pairs, each ~13s (AI image ~5s, real image ~5s,
+3s guess + reveal), → ~90s+. The clip labeled REAL must be a genuine real photo
+the creator supplied (never an AI image labeled real).
+
+Per round: creator sends a REAL photo of the food; I generate an AI twin of the
+SAME food so the pair is a close, hard-to-call match (Ken Burns on both stills).
+
+**AI image model:** Higgsfield `nano_banana_pro` (2 credits/image). Base style
+suffix for realism on every prompt:
+`, ultra photorealistic amateur phone photo, natural window light, shallow depth
+of field, realistic grease/sheen and tiny imperfections, candid food-review look,
+slightly messy plate, no text, no watermark`
+
+**Ready prompts (append the base style suffix):**
+- Burger: `a juicy double cheeseburger with melted American cheese, lettuce, tomato, onion on a toasted brioche bun with a few fries on a diner plate`
+- Burrito: `a large California burrito cut in half showing carne asada, cheese, fries and guacamole on foil and a paper plate`
+- Tacos: `three street tacos on corn tortillas with carne asada, onion, cilantro and lime wedges on a paper-lined tray`
+- Wings: `a basket of saucy buffalo chicken wings with ranch dip and celery on butcher paper`
+- Loaded fries: `a tray of loaded fries topped with melted cheese, carne asada, sour cream and green onion`
+- Dessert: `a churro sundae with vanilla ice cream, chocolate drizzle and cinnamon sugar in a bowl`
+
+Match each AI prompt's plating/lighting to the real photo the creator sends so
+the two look like the same setting.
+
 ## What's needed to actually render one
 1. A real clip (attach one, or point me at an Antidote cloudfront clip).
 2. The subject, so the AI clip B is a fair match.

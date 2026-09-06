@@ -1551,6 +1551,52 @@
             "verified_at": "2026-09-04",
             "duration_sec": null
           }
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/6fe1e589-31e4-4822-a58e-6a4e48d4a838.mp4",
+          "review_name": "Churrito Loco: Avenge My Nephew",
+          "title": "Churrito Loco: Avenge My Nephew 🍩🔥 don't sleep on this spot. Reviews → antidotethefoodie.com #foodreview #antidote #lafoodie #fyp",
+          "eligibility": {
+            "cr_eligible": true,
+            "duration_sec": 81.3,
+            "min_length_over_60s": true,
+            "original": true,
+            "watermark_free": true,
+            "verified_by": "vidiq_generate_clips",
+            "verified_at": "2026-09-06"
+          },
+          "source": {
+            "tool": "vidiq_generate_clips",
+            "youtube_id": "nE_m5hyVwuE",
+            "window": [
+              33.36,
+              114.65
+            ],
+            "virality": 92
+          }
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/53e05e7b-0052-4104-a0aa-3defea1eb156.mp4",
+          "review_name": "Churrito Loco: Dessert Chaos",
+          "title": "Churrito Loco Dessert Chaos 🍩 you need this on your list. Reviews → antidotethefoodie.com #foodreview #antidote #lafoodie #fyp",
+          "eligibility": {
+            "cr_eligible": true,
+            "duration_sec": 73.4,
+            "min_length_over_60s": true,
+            "original": true,
+            "watermark_free": true,
+            "verified_by": "vidiq_generate_clips",
+            "verified_at": "2026-09-06"
+          },
+          "source": {
+            "tool": "vidiq_generate_clips",
+            "youtube_id": "nE_m5hyVwuE",
+            "window": [
+              141.63,
+              215.03
+            ],
+            "virality": 94
+          }
         }
       ],
       "creator_rewards": {
@@ -1573,8 +1619,8 @@
         ],
         "note": "Length/watermark are creator-confirmed, not measured in-pipeline. Payment also requires >=1000 qualified views and HD; not guaranteed per post."
       },
-      "posting_paused": true,
-      "pause_reason": "Awaiting >=65s (1:05) duration verification per creator (2026-09-06). Set cr_eligible True only for clips with duration_sec >= 65."
+      "posting_paused": false,
+      "pause_reason": "Only clips with eligibility.cr_eligible=True (duration-verified >=65s) post. The 83 legacy clips remain ineligible pending duration measurement; vidiq-generated 1:05+ clips are being added as eligible."
     },
     "gta6_cheat_code": {
       "source_trigger": "trig_01LYKMXaRkwnnxhvmJDerwq2",

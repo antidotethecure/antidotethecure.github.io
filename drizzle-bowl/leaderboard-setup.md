@@ -17,7 +17,7 @@ The leaderboard is LIVE. No setup needed — it's already wired into the game.
 
 ## Anti-junk protections (built into the server)
 - Names are stripped to letters/numbers/spaces, max 12 characters.
-- Scores are capped at 450 (the game's theoretical max range).
+- Scores are capped at 2000 (the game's theoretical max range).
 - Malformed submissions are rejected.
 
 ## Managing scores

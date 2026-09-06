@@ -1597,6 +1597,29 @@
             ],
             "virality": 94
           }
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/904fe29b-c064-4691-879a-97aeebc2c11f.mp4",
+          "review_name": "Mai Phat Mi Gia",
+          "title": "Mai Phat Mi Gia 🍜 the vibes + the food = fire. Reviews → antidotethefoodie.com #foodreview #antidote #lafoodie #fyp",
+          "eligibility": {
+            "cr_eligible": true,
+            "duration_sec": 67.08,
+            "min_length_over_60s": true,
+            "original": true,
+            "watermark_free": true,
+            "verified_by": "vidiq_generate_clips",
+            "verified_at": "2026-09-06"
+          },
+          "source": {
+            "tool": "vidiq_generate_clips",
+            "youtube_id": "dQocc0x6oIE",
+            "window": [
+              21.66,
+              88.74
+            ],
+            "virality": 92
+          }
         }
       ],
       "creator_rewards": {

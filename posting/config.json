@@ -1561,13 +1561,14 @@
           "review_name": "Churrito Loco: Avenge My Nephew",
           "title": "Churrito Loco: Avenge My Nephew 🍩🔥 don't sleep on this spot. Reviews → antidotethefoodie.com #foodreview #antidote #lafoodie #fyp #foryoupage #foryou",
           "eligibility": {
-            "cr_eligible": true,
+            "cr_eligible": false,
             "duration_sec": 81.3,
             "min_length_over_60s": true,
             "original": true,
             "watermark_free": true,
             "verified_by": "vidiq_generate_clips",
-            "verified_at": "2026-09-06"
+            "verified_at": "2026-09-06",
+            "cr_disabled_reason": "TikTok flagged 'Unoriginal' — reproduced from existing YouTube upload; not rewards-eligible"
           },
           "source": {
             "tool": "vidiq_generate_clips",
@@ -1584,13 +1585,14 @@
           "review_name": "Churrito Loco: Dessert Chaos",
           "title": "Churrito Loco Dessert Chaos 🍩 you need this on your list. Reviews → antidotethefoodie.com #foodreview #antidote #lafoodie #fyp #foryoupage #foryou",
           "eligibility": {
-            "cr_eligible": true,
+            "cr_eligible": false,
             "duration_sec": 73.4,
             "min_length_over_60s": true,
             "original": true,
             "watermark_free": true,
             "verified_by": "vidiq_generate_clips",
-            "verified_at": "2026-09-06"
+            "verified_at": "2026-09-06",
+            "cr_disabled_reason": "TikTok flagged 'Unoriginal' — reproduced from existing YouTube upload; not rewards-eligible"
           },
           "source": {
             "tool": "vidiq_generate_clips",
@@ -1607,13 +1609,14 @@
           "review_name": "Mai Phat Mi Gia",
           "title": "Mai Phat Mi Gia 🍜 the vibes + the food = fire. Reviews → antidotethefoodie.com #foodreview #antidote #lafoodie #fyp #foryoupage #foryou",
           "eligibility": {
-            "cr_eligible": true,
+            "cr_eligible": false,
             "duration_sec": 67.08,
             "min_length_over_60s": true,
             "original": true,
             "watermark_free": true,
             "verified_by": "vidiq_generate_clips",
-            "verified_at": "2026-09-06"
+            "verified_at": "2026-09-06",
+            "cr_disabled_reason": "TikTok flagged 'Unoriginal' — reproduced from existing YouTube upload; not rewards-eligible"
           },
           "source": {
             "tool": "vidiq_generate_clips",
@@ -1646,8 +1649,8 @@
         ],
         "note": "Length/watermark are creator-confirmed, not measured in-pipeline. Payment also requires >=1000 qualified views and HD; not guaranteed per post."
       },
-      "posting_paused": false,
-      "pause_reason": "Only clips with eligibility.cr_eligible=True (duration-verified >=65s) post. The 83 legacy clips remain ineligible pending duration measurement; vidiq-generated 1:05+ clips are being added as eligible."
+      "posting_paused": true,
+      "pause_reason": "HALTED 2026-09-07: TikTok Creator Rewards disqualified 'Churrito Loco: Avenge My Nephew' as 'Unoriginal' (2nd strike; 5 in 30 days = account disqualified). The cr_eligible clips were auto-clipped from Antidote's existing YouTube reviews via vidiq_generate_clips; TikTok treats content reproduced from another source (a prior YouTube upload) as unoriginal for rewards. Do NOT resume until clips are ORIGINAL-to-TikTok (filmed/edited fresh, never previously published elsewhere). Replacing audio does not fix originality."
     },
     "gta6_cheat_code": {
       "source_trigger": "trig_01LYKMXaRkwnnxhvmJDerwq2",

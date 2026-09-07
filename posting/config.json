@@ -1650,7 +1650,7 @@
         "note": "Length/watermark are creator-confirmed, not measured in-pipeline. Payment also requires >=1000 qualified views and HD; not guaranteed per post."
       },
       "posting_paused": true,
-      "pause_reason": "HALTED 2026-09-07: TikTok Creator Rewards disqualified 'Churrito Loco: Avenge My Nephew' as 'Unoriginal' (2nd strike; 5 in 30 days = account disqualified). The cr_eligible clips were auto-clipped from Antidote's existing YouTube reviews via vidiq_generate_clips; TikTok treats content reproduced from another source (a prior YouTube upload) as unoriginal for rewards. Do NOT resume until clips are ORIGINAL-to-TikTok (filmed/edited fresh, never previously published elsewhere). Replacing audio does not fix originality."
+      "pause_reason": "HALTED 2026-09-07: TikTok Creator Rewards disqualified 'Churrito Loco: Avenge My Nephew'. Initial reason 'Unoriginal'; on appeal (denied Sep 7) TikTok restated it as 'Low quality: formats/methods/resources that don't meet quality standards, INCLUDING repeatedly reposting your own work.' Root cause: these clips were auto-cut from Antidote's existing YouTube reviews (a repost of own work) and the re-encoded auto-clips are below TikTok's HD/quality bar. Do NOT resume with YouTube-sourced or re-encoded clips. Qualifying path: content ORIGINAL-to-TikTok (never posted elsewhere) at native HD, not a repost or auto-clip."
     },
     "gta6_cheat_code": {
       "source_trigger": "trig_01LYKMXaRkwnnxhvmJDerwq2",

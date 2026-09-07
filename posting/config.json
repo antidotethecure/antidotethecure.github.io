@@ -381,7 +381,9 @@
         "affirmations",
         "daily manifestation",
         "antidote"
-      ]
+      ],
+      "priority": false,
+      "note": "Deprioritized 2026-09-07: post gta6_youtube first (hottest). Resume Neville YouTube after GTA6 momentum cools."
     },
     "food_review": {
       "source_trigger": "trig_012AxtNFGguCWRFNTXe7d29E",
@@ -1696,6 +1698,62 @@
           "title": "GTA 6 x \"Cheat Code\" 🎮\nfull song: antidotethefoodie.com #TheRealAntidote #fyp #foryou #foryoupage #trending #GTA6 #ViceCity #GTA6Edit",
           "variant": "hook_0m40s",
           "verified": "1080x1920"
+        }
+      ]
+    },
+    "gta6_youtube": {
+      "platforms": [
+        "youtube"
+      ],
+      "priority": true,
+      "note": "HOTTEST right now — post these to YouTube Shorts before neville_youtube. STAGING ONLY: no YouTube upload tool exists in-session; needs the YouTube upload routine/connector re-enabled (rotate OAuth) to actually post. is_aigc/altered-content = true (AI-generated GTA-style footage + Cheat Code music).",
+      "is_aigc": true,
+      "description_template": "{title_plain}\n\nGTA 6 x Antidote — Cheat Code. New drops daily.\nMusic: \"Cheat Code\" by Antidote — antidotethefoodie.com\n\n#GTA6 #gaming #viral #trending #fyp #foryoupage #TheRealAntidote #AntidoteCheatCode #GTA6leaks #GTA6trailer #Shorts",
+      "tags": [
+        "gta6",
+        "gta 6",
+        "gta6 leaks",
+        "gta 6 trailer",
+        "gta6 gameplay",
+        "gaming",
+        "antidote",
+        "therealantidote",
+        "antidote cheat code",
+        "cheat code",
+        "viral",
+        "trending",
+        "fyp"
+      ],
+      "clips": [
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/165c3dd0-bf3b-4562-8ef6-1e831027dd96.mp4",
+          "title": "GTA 6 Hits Different With This Beat 🎮🔥 #Shorts #GTA6 #gaming",
+          "is_aigc": true
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/91f0456c-729c-4e84-8162-b55101cbea1b.mp4",
+          "title": "This GTA 6 Clip Goes Crazy 🎮🔥 #Shorts #GTA6 #viral",
+          "is_aigc": true
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/6ddfe0b4-4e15-4f45-93de-512110c05fb6.mp4",
+          "title": "GTA 6 x Antidote — Cheat Code 🔥 #Shorts #GTA6 #gaming",
+          "is_aigc": true
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/63eb50d0-3420-4ae4-b66e-db89b833cfff.mp4",
+          "title": "New GTA 6 Footage Hits Different 🎮🔥 #Shorts #GTA6 #trending",
+          "is_aigc": true
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/f45af4e7-6935-4888-9d69-e846a6b84b12.mp4",
+          "title": "GTA 6 Leaks + Cheat Code = 🔥 #Shorts #GTA6 #gaming",
+          "is_aigc": true
+        },
+        {
+          "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/688478cc-d463-476f-b697-e8140b98effe.mp4",
+          "title": "Turn It Up — GTA 6 x Cheat Code 🔊🎮 #Shorts #GTA6 #viral",
+          "is_aigc": true
         }
       ]
     }

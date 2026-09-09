@@ -1,0 +1,29 @@
+name: Drizzle Bowl nightly diagnostics
+on:
+  schedule:
+    - cron: '0 3 * * *'   # 8 PM Pacific (PDT)
+  workflow_dispatch:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null
+          npm i playwright@1.47.2 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Run the live smoke test
+        run: |
+          node drizzle-bowl/diagnostics/nightly.js | tee report.txt
+          grep -q '^REPORT ' report.txt || { echo 'no report produced'; exit 1; }
+          node -e "const r=JSON.parse(require('fs').readFileSync('report.txt','utf8').split('\n').find(l=>l.startsWith('REPORT ')).slice(7));console.log(JSON.stringify(r,null,1));if(!r.ok){console.log('PROBLEMS:',r.problems.join(' | '));process.exit(1);}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nightly-report
+          path: report.txt

@@ -1,5 +1,13 @@
 GTA6 × CHEAT CODE — YOUTUBE SHORTS UPLOAD PACK (6 clips)
 Post as YouTube Shorts (vertical). Mark "Altered/AI content = Yes" (AI-generated footage).
+
+QUALITY GATE: VERIFIED 2026-09-16 — all 6 clips probed via ffprobe:
+1080x1920 (vertical 9:16), 30fps, 15.0s each. Passes min_short_side=1080
+and Shorts' <=60s rule. Cleared for upload as-is, no re-render needed.
+(Probed from Higgsfield sandbox; this repo's sandbox cannot reach the CDN.)
+
+UPLOAD PACING: post 1-2 per day, not all 6 at once — spreads algorithmic
+tests across days and keeps "new drops daily" true.
 Same TAGS on all 6:
 gta6, gta 6, gta6 leaks, gta 6 trailer, gta6 gameplay, gaming, antidote, therealantidote, antidote cheat code, cheat code, viral, trending, fyp
 

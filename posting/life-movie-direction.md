@@ -60,6 +60,42 @@ in this project yet — only a one-line sketch. Do not write or dramatize
 this chapter from the sketch. When he tells it, capture it in his words,
 then per his direction: "clean it up but keep it a little street."
 
+
+## CHAPTER: The Inconveniences (EXTRA HIGHLIGHTED per Antidote, Sep 17)
+
+His thesis, in his words: "all of these inconveniences happened for me to
+still be able to triumph." The series should stack these back to back so
+the audience feels the pattern — every vehicle taken, and he triumphed
+anyway:
+
+1. **The dispensary that never came (social equity era, ~2017-2019).**
+   He was positioned as a main social-equity applicant with a major
+   cannabis company and did extensive work bringing in community
+   applicants and researching the applicant pool. The application
+   process was mishandled by a hired submissions team and he missed out
+   on his license — going from "about to own a dispensary" to employee.
+   NOTE FOR EDITOR: capture the full account in Antidote's own voice;
+   because a real company is involved, this chapter REQUIRES legal
+   review and supporting documentation (emails, application records)
+   before any company is named on screen. His voice notes hold the
+   details; do not script this chapter without counsel.
+2. **The food truck vs. COVID.** He used the money he did receive to
+   start a food truck — and COVID was announced THE SAME DAY he opened.
+   (Add to the Coincidences thread — the dark side of the prophet-wise
+   pattern.)
+3. **The dog investment.** The breeding was also his INVESTMENT — his
+   way into the dog game. Sevyn's death (see her chapter) was heartbreak
+   and financial loss in one blow: 10 puppies born, the investment's
+   center gone.
+4. **The trucking business (2023).** Insurance went bad through no fault
+   or accident of his; the truck was stranded in another state with his
+   driver; the costs buried the business and he had to shut it down.
+
+Staging: these four hits land across different years and industries —
+cannabis, food, dogs, logistics — and none of them stopped him. The GTA 5
+revenue plan that finally worked (and Thailand) plays as the triumph the
+whole pattern was building toward. EXTRA HIGHLIGHT this sequence.
+
 ## SERIES THEME SONG (locked by Antidote, Sep 17)
 
 **"Make a Million" by Antidote** — verified on his channel:

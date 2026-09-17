@@ -157,6 +157,47 @@ episode, it shows who he was inside):**
   short, sharp epilogue episode beat: even after the appeal win, the old
   life reached for him one more time before he walked away from it.
 
+
+## EPISODE: Delano, Part 2 — "Voodoo" (told by Antidote, Sep 17)
+
+After the jump, the split eye, and the riot, he was moved to another
+section of Delano. Key beats, kept brief in his telling:
+
+- First placed in a dorm with a difficult cellmate situation (a chubby
+  Blood who made the cell miserable); tension nearly became a fight; the
+  guy's homies got involved and he ended up leaving the cell.
+- Then he linked with **Voodoo** — someone he knew from LA, a known,
+  reputable Do Rock Crip. **Voodoo has since passed away; Antidote okays
+  using his name, and has FOOTAGE with him on his phone** (pull for the
+  film). Voodoo was "like Debo in there" — everybody feared him — and he
+  protected Antidote. They became roommates.
+- There was an incident where Voodoo robbed another inmate and Antidote
+  carried the bag back to their cell. "We was eating good that night."
+- Next morning at breakfast: Voodoo sensed something coming and said get
+  ready; Antidote thought he was paranoid. The robbed man attacked Voodoo
+  from behind with a tray; Voodoo beat him one-on-one; police came with
+  bean bags, everybody on the floor, and took Voodoo away.
+- With Voodoo gone, the others turned on Antidote as the accessible
+  target. He was on the yard alone — socks wrapped over his shoes so he'd
+  be ready if he had to defend himself — playing basketball, doing laps,
+  staying to himself while people talked and watched. He got out of that
+  section before it went further.
+
+**LEGAL FLAG — read before this episode is filmed or published:** unlike
+the closed juvenile case, this chapter includes Antidote describing his
+own role in an in-custody robbery he (presumably) was never charged for.
+A public confession to an uncharged act can carry real legal exposure
+regardless of how long ago it happened. BEFORE this episode is written
+for screen, a lawyer must review exactly what can be said and how (e.g.,
+telling the Voodoo friendship/protection/loss story without the
+self-incriminating element, or confirming any limitation period). Do not
+publish this episode as told until that review happens. The Voodoo
+friendship, protection, his passing, and the footage are safe ground.
+
+**Tone rule:** no glorification. This episode is about protection,
+survival, loyalty, and loss — Voodoo protected him, then was gone, and
+the danger returned instantly. That's the story.
+
 ## WHY THESE EPISODES MATTER (series framing)
 
 Every fight in here is the same story: a man who didn't gangbang, who was

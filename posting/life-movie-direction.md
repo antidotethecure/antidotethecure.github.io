@@ -1,5 +1,38 @@
 # Life Movie — creative direction (locked by Antidote, 2026-09-17)
 
+## SERIES FORMAT (locked by Antidote, Sep 17): the ANTIDOTE universe
+
+Not one movie — **a series, built like 50 Cent's Power universe.** Segments
+and situations become their own self-contained episodes/counterparts, and
+they interlock: the audience doesn't realize the pieces all tie together
+until they do — "some type of crazy movie that just pieced together."
+
+Working season map (each is its own episode; the trailer "The Rewind"
+teases the whole universe):
+1. **The Floor** — childhood, his father, the system, group homes
+2. **Fourteen** — grandmother, the gunshots era, the streets
+3. **County** — the joke, the fight (see life-movie-jail-episodes.md)
+4. **Reception / The Yard / SNY** — the prison saga (same file)
+5. **The Books** — the cell becomes a library (Books playlist)
+6. **Hot Fire (2012)** — Freeway Rick Ross, Tupac in Hollywood, Nipsey,
+   Don King's grandson — the year they saw him
+7. **Carisma** — the friendship, the Vegas prophecy, the step-back
+8. **The West Coast Knew** — the connections, the Kendrick-class timing
+9. **Sevyn** — 2020–2022, the waterfall eyes, Baby Sevyn
+10. **The Wilderness** — the Audi, homelessness, letdowns, living free
+11. **Social equity** — out on appeal (weed), the legal-cannabis lane
+12. **The Boil-Over** — GTA 5, the revenue plan, everybody forced to see it
+13. **Colombia** — the teeth, the Cheat Code video
+14. **Thailand / GTA 6** — the finale the whole universe points at
+
+Threads that run through EVERY episode: the sevens · Tupac · freestyling ·
+the discipline (books/Neville/vocabulary) · "forced to see it."
+
+Practical upside of series format: each episode is independently
+shippable content (YouTube premieres, episode drops build audience over
+months instead of one release), and episodes can be produced as their
+photos/footage become available instead of waiting for everything.
+
 ## The ending (non-negotiable)
 The movie ENDS on this theme:
 

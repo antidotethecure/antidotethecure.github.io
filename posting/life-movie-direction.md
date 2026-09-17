@@ -351,7 +351,12 @@ Channel: TheRealAntidote (UCcWrh7PiZOvDUTeHkHIDNHw), ~3.01K subs, ~1K videos
 - "2pac In Hollywood With Antidote" — youtube.com/watch?v=G-iC60qp0kU
 
 **Freestyle credentials — real receipts on the channel:**
-- "Freeway Rick Ross States that Antidote is..." — watch?v=B151F7XhQSA
+- "Freeway Rick Ross States that Antidote is \"HOT FIRE\"" — watch?v=B151F7XhQSA
+  (published Nov 1, 2012 — Freeway Rick Ross on camera; per Antidote he says
+  "this boy is hot, hot, hot, hot." Description also credits Don King's
+  grandson @TheKingLilLank in the clip — another verified connection.
+  Note: 2012 is the same year as Tupac-in-Hollywood and the Nipsey run-in —
+  the film can play all three as one "the year they saw me" sequence.)
 - "@TheRealAntidote Interview/Freestyle For Dj Carisma" — watch?v=eENbSY0yIPA
 - "Jay Nari Freestyle Antidote" — watch?v=7DrDNaIKHx4
 

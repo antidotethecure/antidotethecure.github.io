@@ -125,11 +125,11 @@ Compton) pending their okay to be named.
   Got out of jail, then went into his **social equity** work (the weed
   charge and the social-equity chapter are cause and effect: the same
   plant that caged him became the legal business lane he pursued).
-- TIMELINE TO CONFIRM with Antidote: he said "I got out of jail in
-  January 2020 in 2017... then I almost went to jail in August 2017."
-  Best reading: released January 2017, almost went back August 2017.
-  Confirm which year the release was (2017 vs 2020) and what the August
-  situation was — that's its own episode if he wants it told.
+- TIMELINE CONFIRMED by Antidote (Sep 17): released **January 2017** on
+  the weed appeal. Went BACK to jail **August 2017** — for a fight — did
+  a couple of weeks, **bailed out ~September 2017, got probation.** A
+  short, sharp epilogue episode beat: even after the appeal win, the old
+  life reached for him one more time before he walked away from it.
 
 ## WHY THESE EPISODES MATTER (series framing)
 

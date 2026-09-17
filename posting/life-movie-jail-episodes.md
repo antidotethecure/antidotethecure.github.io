@@ -198,6 +198,49 @@ friendship, protection, his passing, and the footage are safe ground.
 survival, loyalty, and loss — Voodoo protected him, then was gone, and
 the danger returned instantly. That's the story.
 
+
+## EPISODE: County — "The Slap Box" (summary capture, Sep 17)
+
+- A friend in county — a funny, stockier guy he joked with cell to cell —
+  crossed a line one day with a word that can't pass in jail, even as a
+  joke. Antidote called it: you're my boy, but that can't slide. It was
+  settled the accepted way inside — a one-on-one slap box — and Antidote
+  won it decisively. What followed was respect: for holding his ground,
+  as a man who doesn't gangbang, without letting disrespect slide.
+- (Capture note: full detail lives in Antidote's own telling — for the
+  screen, HIS voice narrating this is the asset. This summary marks the
+  episode's place in the season.)
+
+## EPISODE: Juvenile Hall, 2006 — "Gridiron"
+
+- 2006, juvenile hall. He was cool with everybody — laid back, chilling,
+  staying to himself. Usually celled alone, no roommate. Came out for
+  free time, played handball with the Hispanics, talked to people.
+- One unprovoked incident: a guy spazzed on him for no reason and spit
+  at him. It happened around a movie night — they were watching
+  **Gridiron Gang** — a juvenile-hall movie, released while he was IN
+  juvenile hall (it came out September 2006). He was living the movie
+  they were watching.
+
+## THREAD: The Coincidences ("prophet-wise")
+
+Antidote: "It's a lot of coincidences in my life story that make stuff
+look real prophet-wise." The verified ones so far — the series should
+collect and show these:
+- **Gridiron Gang (2006):** a juvie-hall film released while he sat in
+  juvie hall watching it.
+- **Weed legalized while he sat for weed:** California's Prop 64 passed
+  November 2016 — he was in custody on a weed case at that exact time,
+  and out on appeal by January 2017. The law caught up to him while the
+  cell door was still closed. (This one is historically checkable and
+  should be a title-card fact in the Social Equity episode.)
+- **"Make a Million" (2021)** written before the million-making plan
+  worked; **"Cheat Code" (2017)** — manifestation on record before the
+  manifested life. The songs as prophecies.
+- The sevens (Sevyn, Aug 7, seven loves, DeRozan's Aug 7 birthday).
+- Note his own wording: "prophet-wise" lands as both prophet and profit —
+  the double meaning IS the brand. Consider it for an episode title.
+
 ## WHY THESE EPISODES MATTER (series framing)
 
 Every fight in here is the same story: a man who didn't gangbang, who was

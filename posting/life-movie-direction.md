@@ -41,6 +41,25 @@ The movie ENDS on this theme:
 
 The arc closes forward-looking: GTA 5 grind → pockets got bigger → Thailand → GTA 6 era begins.
 
+## SONG ORIGIN: "Cheat Code" (told by Antidote, Sep 17)
+
+- **"Cheat Code" was made in 2017** — right after he bailed out from the
+  August 2017 arrest. It's where he **first talked about manifestation**
+  on record.
+- That gives the song a six-year arc the series should show: written in
+  2017 fresh out of jail → the music video shot in **Colombia, November
+  2023** → now the soundtrack of the GTA 6 campaign. The song predates
+  everything it ended up scoring. Same pattern as "Make a Million":
+  he wrote the future first.
+
+## PLACEHOLDER: The brother story (2017 — NOT YET TOLD IN FULL)
+
+Antidote referenced a story involving his brother from the same 2017
+period (connected to the August arrest era). He has NOT told it in full
+in this project yet — only a one-line sketch. Do not write or dramatize
+this chapter from the sketch. When he tells it, capture it in his words,
+then per his direction: "clean it up but keep it a little street."
+
 ## SERIES THEME SONG (locked by Antidote, Sep 17)
 
 **"Make a Million" by Antidote** — verified on his channel:

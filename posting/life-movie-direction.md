@@ -59,9 +59,9 @@ Structure (~60–75s):
 4. **Land at the beginning** (earliest childhood photo, hold in silence).
 5. **Smash to black. Title card**, then one line: the movie is coming.
 
-Art direction: dark graphic-novel / noir treatment — high contrast, grain,
-black with one accent color (blood red or money green), ink/spray texture,
-VHS glitch frames during the rewind. Real photos from the 43K library get the
+Art direction — **STYLE LOCKED by Antidote (Sep 17): VHS GLITCH.**
+Dark mixed-media collage: VHS glitch distortion, scan lines, torn photograph
+edges on black, money-green neon accent glow, analog grain. Real photos from the 43K library get the
 dark-art treatment; AI art used only for chapter cards / transitions, never
 to fabricate life events.
 
@@ -130,6 +130,16 @@ telling HIS OWN story is his right either way; just avoid naming or showing
 identifiable third parties — caseworkers, other kids from the group homes —
 without consent, and give the final cut one legal read before public release.
 That's standard for any documentary, not a blocker.)
+
+## PHOTO PULL LIST for the editor (from the 43K library)
+- **The whole litter** — Antidote has pictures of Sevyn's full litter
+  (10 puppies, early 2022) in his album. Find them. Key frame: the litter
+  together, and Baby Sevyn — the one twin who looked exactly like Sevyn.
+- Sevyn's pregnancy documentation (also on IG @lucky_sevyn_, daily posts)
+- Childhood photos with his father (age ~9–10)
+- Earliest childhood photo available (the rewind's landing frame)
+- The 2002 Audi A4 if any photo exists
+- Colombia 2023: teeth trip + Cheat Code video shoot (Nov 2023)
 
 ## Notes for the editor session
 - The ATBS audio file needs to be located on the Mac (or supplied by Antidote)

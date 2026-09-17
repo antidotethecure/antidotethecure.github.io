@@ -227,6 +227,64 @@ explicit consent (she's a minor in that footage). The platonic framing is
 the story, and Carisma herself confirming it on camera is its strongest
 possible telling.
 
+## CHAPTER: The West Coast Knew (told by Antidote, Sep 17)
+
+**Source archive: his second Instagram — @wokedote (W-O-K-E-D-O-T-E)** —
+full of his celebrity connections, people who knew him and were around
+him. (IG is login-walled to automation; Antidote or the editor pulls from
+it directly.) Plus his main footage/videos.
+
+**The claim of this chapter (his telling):** the West Coast knew he
+existed and knew he was about to come through the door. He dropped around
+the time Kendrick Lamar came out (Overly Dedicated 2010 / Section.80 2011 /
+GKMC 2012) — he'd have been of the exact same class as Kendrick. But when
+the Carisma situation died down, the scene supported her side and let him
+get washed — and, as he tells it, others were being prepared for the
+position he was about to take.
+
+**Names he was around / who knew him — verified identities (Sep 17):**
+- **The Game** — Compton, Black Wall Street
+- **Glasses Malone** — Watts/Compton; White Lightnin', ran with The Game,
+  Cash Money's Beach Cruiser ("Certified"); publicly thanked by Kendrick
+  at the 2025 Grammys
+- **Compton AV** — LA; tracks with Snoop, The Game, Too $hort, Kurupt;
+  "Money Dance"
+- **AD (Compton)** — Compton artist (of "Blue 100" era) [verify exact
+  credits with Antidote's receipts]
+- **Compton Menace** — Compton artist, Black Wall Street / Chris Brown
+  affiliation [verify with receipts]
+- **TayF3rd** — Eastside Long Beach; Uncle Snoop's Army; helped ignite the
+  jerk movement
+- **Cold Flamez** — Long Beach ("Miss Me Kiss Me," 2009)
+- **Bugsy (on the beat), Pookie F, Rude, P. Nice** — from his circle; not
+  publicly indexed under these spellings — pull receipts (photos/footage)
+  from @wokedote and the archive to anchor each one.
+
+**Framing rule for the edit:** the *connections* are showable as fact
+(photos/footage from @wokedote). The *"they let me get washed"* part is
+Antidote's perspective on how the scene moved — the film should voice it
+AS his telling (his narration), not as on-screen accusations pinned to
+named individuals. That keeps it powerful and unassailable.
+
+## CHAPTER-CHECK: DeMar DeRozan (Enterprise, 6th–7th grade)
+
+Antidote: he went to elementary with **DeMar DeRozan** — Enterprise
+(Compton), 6th and 7th grade together.
+
+**Cross-reference run (Sep 17, public sources):**
+- DeRozan is Compton born and raised — **born August 7, 1989** — grew up
+  on Aranbe Ave, Compton High School class of 2008, then USC. ✔ City and
+  age cohort line up with Antidote's account.
+- Public bios tie his early childhood to Marian Anderson Elementary
+  (blocks from home) and high school to Compton High; his middle-school
+  years (6th–7th) are NOT publicly documented — so Antidote's Enterprise
+  account is neither confirmed nor contradicted online. It stands as his
+  testimony; a yearbook page or class photo from Enterprise would be the
+  receipt that locks it. (Check the 43K library / family archives.)
+- **NOTE THE DATE: DeMar DeRozan was born on AUGUST 7.** Antidote got
+  Sevyn on August 7. The sevens thread again — the film keeps finding it
+  without looking.
+
 ## THREAD: Spiritual discipline (told by Antidote, Sep 17)
 
 - **Neville Goddard, every single night for over 100 nights straight — and

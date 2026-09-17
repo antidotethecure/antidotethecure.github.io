@@ -61,6 +61,54 @@ Audio: ATBS reversed/warped during the rewind, snapping back to the clean
 "pockets got bigger" bar only at the very start (the peak) — so the trailer
 teases the lyric the full movie ends on.
 
+## CHAPTER: Seven (told by Antidote, 2026-09-17 — use his words)
+
+- Got the Frenchie in **2020, on August 7th**. Her mom's name was "27" —
+  sevens everywhere — so he named her **Seven**. He said she'd have 11 dogs
+  throughout her life.
+- Beginning of **2022**: paid about **$12,000** to breed her with a known
+  fluffy. **Perfect pregnancy** — no sickness, nothing. He documented every
+  single day of it on Instagram (**the Baby Seven Instagram account** —
+  this is REAL SOURCE FOOTAGE for the movie, pull from it).
+- She was given **too much anesthesia** on the table giving birth. The
+  puppies were delivered. **She never woke up.**
+- He sat there looking into her eye — she had a **waterfall emblem in her
+  eye, a little blue waterfall** — staring at it, knowing: *"I'll never be
+  able to see this again. This is the last time."*
+- She was his special dog. Like his little daughter.
+- Out of the 10 puppies, **only one looked exactly like her — her twin.**
+  He kept her and named her **Baby Seven**. He's raised her for four years
+  now. "Technically I've had Seven for six years. Two years of her, four
+  years of her daughter. I'm still raising her, still keeping her close.
+  I basically started reincarnating her."
+
+**Film note:** the waterfall in her eye is a key image. In the rewind this
+chapter sits among the heartbreaks (2022). Baby Seven is the LIVING thread —
+she can appear in the present-day/ending sequence, meaning the rewind ends
+in loss but the forward story carries her on. The "reincarnation" idea can
+mirror the whole movie's theme: what survives comes back.
+
+## CHAPTER: The beginning — my father (told by Antidote, use with care)
+
+- The uploaded pictures with his father: Antidote was around **9 or 10**.
+- That was around the time he ended up going to the **group homes**.
+- He went to school with a **belt mark on his arm** from his father whipping
+  him. He was so scared he **fainted**. Taken to the hospital.
+- At the hospital, his dad walked in with a grim, evil face and said:
+  **"You better tell them you fell down the stairs carrying groceries."**
+  He had to lie to the hospital.
+- Eventually they found out about the abuse, and he was **taken into the
+  system**.
+
+**Film note:** this is the FLOOR of the rewind — the trailer rewinds all the
+way down to here. The childhood photo the rewind lands on can be one of the
+photos with his father: the audience now knows what that photo really holds.
+Hold it in silence, then black. Handle this chapter with restraint — no
+dramatization needed; the facts and the photo carry it.
+
+(Antidote's message cut off at "And that should be—". Ask him to finish the
+thought.)
+
 ## Notes for the editor session
 - The ATBS audio file needs to be located on the Mac (or supplied by Antidote)
   — confirm which cut/master to use before rendering.

@@ -96,6 +96,35 @@ cannabis, food, dogs, logistics — and none of them stopped him. The GTA 5
 revenue plan that finally worked (and Thailand) plays as the triumph the
 whole pattern was building toward. EXTRA HIGHLIGHT this sequence.
 
+
+## STRUCTURAL RULE: Every season carries a loss (Antidote, Sep 17)
+
+His design, in his words: every season has its own sad situation where
+somebody passed away — the loss anchors the season:
+- **Childhood / group homes season:** his grandmother (age 14) — and he
+  also mentioned his brother among those who passed in the early years.
+  (EDITOR: confirm with Antidote — the brother's passing has not been
+  told in full; relates to the separate brother-story placeholder. Get
+  his telling before scripting.)
+- **The homeless season:** no death — the loss is HOME itself: jumping
+  house to house, living here, living there, trying to stay above water.
+- **The jail season:** Voodoo.
+- **The dog season:** Sevyn.
+- Every season also carries a "big situation" that forced a forfeit:
+  COVID (food truck), the insurance (trucking), the applications
+  (dispensary).
+
+## CHAPTER: Crypto (told by Antidote, Sep 17)
+
+- Caught a **big pump in 2020** — jumped out wrong after it.
+- Caught a **big pump in 2024** — jumped out wrong in 2025/2026 after it.
+- Two premature exits cost him thousands. Still holding a little (~$6K
+  cash value now) — "not all the way out yet."
+- TASK (assigned Sep 17): audit his bank statements — total all crypto
+  purchases/spending vs. what remains — to get the real net number for
+  the film. The number, whatever it is, gets shown honestly: this series
+  doesn't fake wins.
+
 ## SERIES THEME SONG (locked by Antidote, Sep 17)
 
 **"Make a Million" by Antidote** — verified on his channel:

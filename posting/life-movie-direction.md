@@ -183,6 +183,12 @@ powerful beat for the film: the sound of a Neville sleep tape playing low
 over dark footage — the same audio he actually fell asleep to 100+ nights.
 
 ## PHOTO PULL LIST for the editor (from the 43K library)
+- **HIGH PRIORITY: the photo of Antidote WITH NIPSEY HUSSLE** (2012, the
+  Roosevelt Hotel run-in — see the Tupac chapter). It exists in his Photos
+  library and on his Instagram. Search the library around 2012 / Hollywood.
+  Backup: the "2pac In Hollywood With Antidote" video (watch?v=G-iC60qp0kU)
+  may contain the Nipsey moment — frame-grab from it if the still is
+  better there.
 - **The whole litter** — Antidote has pictures of Sevyn's full litter
   (10 puppies, early 2022) in his album. Find them. Key frame: the litter
   together, and Baby Sevyn — the one twin who looked exactly like Sevyn.

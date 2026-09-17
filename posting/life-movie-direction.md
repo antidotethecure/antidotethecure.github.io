@@ -148,3 +148,18 @@ That's standard for any documentary, not a blocker.)
   imagery → travel/Thailand imagery → GTA 6 logo/tease as the last frame.
 - This direction applies to the 43K-photo life movie; it pairs with the
   6 key moments already selected.
+
+## VHS-GLITCH CHAPTER CARDS — rendered Sep 17 (9:16, 2K)
+Style locked. Generation CDN URLs (prefix: https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/):
+1. GTA 5 grind (streaming desk) — hf_20260917_205252_85b1f2d8-904f-4990-8306-6b06f33e6c43.png
+2. Blackballed (chained DJ booth) — hf_20260917_205252_b0ff4352-74f2-4665-bbfc-fdda9a52afc7.png
+3. The letdowns (payphone off the hook) — hf_20260917_205252_59d3ed32-8368-49a1-9896-f83b66af2072.png
+4. The Audi (2002 A4, one headlight) — hf_20260917_205252_004a220b-bfb8-4514-9747-a7f3bf0da83f.png
+5. Homelessness (bus bench) — hf_20260917_205252_0ad9b283-c5c5-4748-88e2-ca3e7f6bc813.png
+6. County jail (holding cell) — hf_20260917_205253_61b9dd59-68ed-4d13-a788-a9a5939212b9.png
+7. Prison (wall + razor wire) — hf_20260917_205252_02381bf1-373f-4061-8ed5-f425548bb4a2.png
+8. The fights (taped fists) — hf_20260917_205252_08fdead3-7f5a-45c4-94b8-b6cee1ecd910.png
+9. The heartbreaks (torn photo) — hf_20260917_205447_82e97517-6a87-4611-b4e0-4e9de31d93b8.png
+10. Sevyn (empty collar in spotlight) — hf_20260917_205253_123e554f-f3ba-46e6-9780-17b2fe2c0e0e.png
+11. Grandmother (candle memorial) — hf_20260917_205253_2034a950-3d21-44a5-85a0-9dd4b6efee89.png
+12. The gunshots (police tape, wet street) — hf_20260917_205252_0625337b-47a4-4717-bdd6-7ef03bc3c126.png

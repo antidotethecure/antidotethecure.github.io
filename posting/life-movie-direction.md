@@ -187,6 +187,37 @@ Show, with receipts:
 **Editor pull list additions:** photos/videos with Carisma's daughter and
 her dog — search the Photos library.
 
+**The Vegas car moment (told by Antidote, Sep 17 — the heart of the chapter):**
+Context: her baby's father was staying with her. She was DJing every night,
+running different sets, and needed him home watching the baby so she could
+keep the money coming and the rent going. On a drive to Vegas for an event,
+she told Antidote, roughly:
+
+> "If I didn't have my husband — my baby daddy — and my daughter there,
+> I would let you stay with me. And we could do this like Tupac did.
+> We could blow up out of the house."
+
+He really admired that statement. It told him he had what it takes to be
+who he was destined to be. **Note the echo: "like Tupac did" — Tupac blew
+up living out of someone's house. Tupac keeps threading through this
+story** (the 2012 lookalike chapter, this quote) the way the sevens do.
+Let the film notice it.
+
+**And then the turn (his words, the arc's hinge):** once he saw how the
+industry worked and how everybody was operating, he decided to step back —
+enjoy his life, live free — **"until the moment came that it eventually
+boiled over and everybody was forced to see it."** This is the bridge from
+the Carisma/industry era to everything after: he didn't fail out of the
+industry; he saw it, stepped back on purpose, and made the world see him
+on his own terms later (the streams, the revenue plan). The blackball
+chapter and this choice are two sides of the same door closing.
+
+**Discretion note:** the household context (her partner, the babysitting
+arrangement) is private family detail — it belongs in this file as
+background so the editor understands WHY the moment happened, but on
+screen the quote itself carries everything. Prefer the quote, not her
+family logistics; and this is one more reason to get Carisma's blessing.
+
 **Film + respect note:** DJ Carisma is a real, active industry figure, and
 her daughter appears in some material. Before the public cut: (1) reach out
 to Carisma for her blessing — better yet, ASK HER TO SPEAK IN THE FILM; a

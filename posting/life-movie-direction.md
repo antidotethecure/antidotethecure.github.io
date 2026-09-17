@@ -131,6 +131,37 @@ identifiable third parties — caseworkers, other kids from the group homes —
 without consent, and give the final cut one legal read before public release.
 That's standard for any documentary, not a blocker.)
 
+## CHAPTER: 2012 — Hollywood, Tupac & Nipsey (told by Antidote, Sep 17)
+
+- **2012**: running around Hollywood with a **Tupac lookalike**.
+- Footage EXISTS and is on his own YouTube channel — video called
+  **"Tupac in Hollywood"**. It shows him **freestyling for "Tupac"**,
+  manifesting, hanging around him, taking photos with him.
+- They ran into **Nipsey Hussle at the Roosevelt Hotel in Hollywood** —
+  Nipsey was genuinely shocked, thinking he was seeing the real Tupac.
+- **Film note:** this is a LIGHT in the timeline — hustle, charisma, and
+  manifestation energy in the middle of the struggle years. Nipsey's cameo
+  is real cultural weight; treat it with respect (Nipsey has since passed).
+  Pull the footage from the YouTube channel — real footage, no recreation.
+
+## THREAD: The freestyles
+Lock in as a recurring thread, not one chapter: Antidote was known as the
+**best freestyler off the top of his head** — freestyling runs through the
+whole movie (the Tupac footage shows it live). The trailer can carry a bar
+of freestyle audio under the rewind.
+
+## THREAD: The books (juvie → jail → prison)
+- Read **over 100 books in juvenile hall**, and **hundreds more in jail and
+  prison**, including: *Think and Grow Rich*, *Rich Dad Poor Dad*,
+  *As a Man Thinketh*, *The Science of Getting Rich*, etc.
+- He keeps a **"Books" playlist on his YouTube channel** listing them —
+  editor: pull the full list from there.
+- **Film note:** this is the redemption engine of the whole story — the
+  cell becomes a library, the library becomes the revenue plan. In the
+  rewind, the jail/prison beats can show the books stacking. The titles
+  themselves (wealth/mindset books read behind bars) ARE the foreshadowing
+  of the GTA 5 revenue plan and Thailand.
+
 ## PHOTO PULL LIST for the editor (from the 43K library)
 - **The whole litter** — Antidote has pictures of Sevyn's full litter
   (10 puppies, early 2022) in his album. Find them. Key frame: the litter

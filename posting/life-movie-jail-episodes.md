@@ -9,8 +9,9 @@ pending his okay to be named.
 
 ## EPISODE: County — "The Joke"
 
-- The dorm had a tall, athletic Black dude — mini afro, basketball-build,
-  woke up every day doing push-ups, always working out. Everybody was cool
+- The dorm had a tall, athletic Black dude — YOUNG, mid-to-late 20s (not
+  an OG) — mini afro, basketball-build, woke up every day doing push-ups,
+  always working out. Everybody was cool
   with him. Didn't press the line or act gangster, but said he was a Blood
   from San Bernardino / IE area. He and Antidote became cool.
 - One night they're shooting jokes at each other. Antidote starts getting

@@ -162,6 +162,26 @@ of freestyle audio under the rewind.
   themselves (wealth/mindset books read behind bars) ARE the foreshadowing
   of the GTA 5 revenue plan and Thailand.
 
+## THREAD: Spiritual discipline (told by Antidote, Sep 17)
+
+- **Neville Goddard, every single night for over 100 nights straight — and
+  still to this day.** His Neville Goddard playlist is real and verified:
+  playlist?list=PLeCbq97Ik8EvDVs0Q9otiaeWkpDoZy1CW — **81 videos** (sleep
+  tapes, "act as if," feel-it-real, wealth assumption teachings). This is
+  the nightly practice behind the manifestation thread of the whole story.
+- **He does not use the H word** (the opposite of love). Every time he
+  hears it, sees it, or reads it, **he says SEVEN things he loves.**
+  (Seven. Again. The number runs through his whole life — Sevyn, August
+  7th, seven things he loves. The film should let the audience notice.)
+- Extremely disciplined vocabulary — monitors his thoughts, watches how he
+  moves and thinks. Mental discipline as daily practice, not a phase.
+
+**Film note:** this is the THROUGH-LINE that explains the ending. The books
+in prison → Neville every night → vocabulary discipline → the revenue plan →
+Thailand. The manifestation wasn't luck; it was a nightly regimen. A
+powerful beat for the film: the sound of a Neville sleep tape playing low
+over dark footage — the same audio he actually fell asleep to 100+ nights.
+
 ## PHOTO PULL LIST for the editor (from the 43K library)
 - **The whole litter** — Antidote has pictures of Sevyn's full litter
   (10 puppies, early 2022) in his album. Find them. Key frame: the litter

@@ -4,8 +4,8 @@ Part of the ANTIDOTE series (see life-movie-direction.md → SERIES FORMAT).
 These scenes are Antidote's own testimony. On screen: no real names or
 identifying details of other incarcerated individuals — composite/anonymous
 figures ("a tall athletic dude," "an OG," "his little homie") exactly as he
-tells it. His friend references stay as he gives them (FP / FT Hop Out,
-Compton) pending their okay to be named.
+tells it. His friend reference stays as he gives it (FT Hopout, Compton)
+pending his okay to be named.
 
 ## EPISODE: County — "The Joke"
 

@@ -41,6 +41,19 @@ The movie ENDS on this theme:
 
 The arc closes forward-looking: GTA 5 grind → pockets got bigger → Thailand → GTA 6 era begins.
 
+## SERIES THEME SONG (locked by Antidote, Sep 17)
+
+**"Make a Million" by Antidote** — verified on his channel:
+"Antidote - Make a Million (Lyric Video)(New Music 2021)" —
+youtube.com/watch?v=fjIcZGV0piE
+
+Per Antidote: this song is basically the theme of the whole scenario — the
+whole thing. Use it as the SERIES theme (opening/recurring motif across
+episodes), while "ATBS" remains the CLOSING cue for the finale (below).
+A 2021 song titled "Make a Million," written before the GTA 5 revenue plan
+paid off, is itself proof of the manifestation thread — he called the shot
+on record, then did it. The series can open on that fact.
+
 ## Closing music cue
 Use Antidote's song **"ATBS (Ain't Talkin' About Shit)"** — specifically the
 section with the lyric:

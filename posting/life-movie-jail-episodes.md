@@ -46,7 +46,7 @@ pending his okay to be named.
   he LOST. Assume he's a punk. The win in county makes him look like a
   TARGET everywhere the bus goes. (Cruel irony — carry this in narration.)
 
-## EPISODE: Reception — "The Setup"
+## EPISODE: Reception — "The Setup" (DELANO facility, Kern County)
 
 - On the way in, a guy acts like he's cool with him. At reception, that
   guy sets him up: tells people in the dorm Antidote was talking about
@@ -64,14 +64,39 @@ pending his okay to be named.
   energy and who I am." (SERIES NOTE: he was writing movies in prison,
   and now his life IS the movie. That's the thesis of these episodes.)
 
-## EPISODE: The Riot
+## EPISODE: The Riot (also at Delano reception)
 
 - That dorm ends up in a riot. Police pepper spray everybody. Blacks and
   Mexicans separated. All the Blacks sitting in a cell, handcuffed behind
   their backs, pepper sprayed, sniffing, eyes burning — waiting **45
   minutes to an hour** just to get water in their eyes.
 
-## EPISODE: The Yard — "Laps in the Rain"
+## EPISODE: Fire Camp — "Laps in the Rain" (JAMESTOWN)
+
+LOCATION CORRECTED (Antidote, Sep 17): after Delano reception he was
+transferred to FIRE CAMP in Jamestown. THAT is where the roll-call
+discipline, the laps, the fight, and the jump happened — not reception.
+
+**How he lived at fire camp (his telling — this texture goes IN the
+episode, it shows who he was inside):**
+- He made his money running **football squares and bets** — with Asians
+  and roommates who had money. Charged soups to get in the pool; winner
+  won the pot, he took his cut off the top. Played **poker** too.
+- **The bunk-side kitchen:** ordered bacon off commissary. Built a
+  makeshift skillet out of a broken washing machine frame and a broken
+  hot pot — cooked onions and the leftover burger meat from dinner into
+  **bacon cheeseburgers on the sly by his bunk.** Everybody smelling it
+  after eating their slop, looking over jealous — he had saved, prepared,
+  and was eating something delicious. (SERIES NOTE: this is the food
+  brand's origin story hiding in a prison episode — Antidote The Foodie
+  was cooking gourmet out of a washing machine frame in fire camp.)
+- **The tablet:** bought a digital tablet inside — one of the most
+  expensive things you can have in there. Music and games. Stayed to
+  himself, played his games, listened to **Drake's "Views"** album on
+  repeat. Kept his own world.
+- He was minding his business, hustling clean, eating better than
+  everybody, staying to himself — and THEN the roll-call situation and
+  the fight found him anyway.
 
 - One rainy morning he skips yard roll call (the morning "come see
   everybody" for your city) — him and his bunkie both. Discipline: run

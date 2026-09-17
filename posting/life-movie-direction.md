@@ -162,6 +162,40 @@ of freestyle audio under the rewind.
   themselves (wealth/mindset books read behind bars) ARE the foreshadowing
   of the GTA 5 revenue plan and Thailand.
 
+## CHAPTER: DJ Carisma (told by Antidote, Sep 17)
+
+What this chapter shows: how close Antidote and DJ Carisma were — as REAL
+GOOD FRIENDS. His framing, stated explicitly, must be honored in the edit:
+**no intimacy, nothing sexual, never a relationship — a genuine friendship.**
+She really supported his music and saw him as one of the most talented
+artists that ever lived.
+
+Show, with receipts:
+- She **played his song at clubs**
+- She **had him on her show freestyling**
+- The closeness: **pictures with her daughter, video with her daughter,
+  video with her dog** (these are in his Photos library / archives)
+
+**Verified footage on his channel (Sep 17):**
+- "Antidote & Dj Carisma At the 2010 Vma Awards" — watch?v=d6Eg7YBmv-4
+  (friendship on tape as far back as 2010)
+- "@TheRealAntidote Interview/Freestyle For Dj Carisma" — watch?v=eENbSY0yIPA
+- "Purple At Dj Carisma Cookie Jar Bday Addition" — watch?v=OXTFieTpb48
+- His footage from her Cookie Jar events: Goapele (watch?v=FH8dCSi6kLw),
+  Melody Thornton (watch?v=mHApJu2Xtgg) — he was inside her world, filming.
+
+**Editor pull list additions:** photos/videos with Carisma's daughter and
+her dog — search the Photos library.
+
+**Film + respect note:** DJ Carisma is a real, active industry figure, and
+her daughter appears in some material. Before the public cut: (1) reach out
+to Carisma for her blessing — better yet, ASK HER TO SPEAK IN THE FILM; a
+30-second Carisma talking-head saying what she saw in him is worth more
+than any archival montage; (2) do not show her daughter without Carisma's
+explicit consent (she's a minor in that footage). The platonic framing is
+the story, and Carisma herself confirming it on camera is its strongest
+possible telling.
+
 ## THREAD: Spiritual discipline (told by Antidote, Sep 17)
 
 - **Neville Goddard, every single night for over 100 nights straight — and

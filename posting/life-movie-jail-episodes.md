@@ -194,6 +194,39 @@ self-incriminating element, or confirming any limitation period). Do not
 publish this episode as told until that review happens. The Voodoo
 friendship, protection, his passing, and the footage are safe ground.
 
+
+**The rest of the Voodoo arc (told by Antidote, Sep 17) — carries past
+prison into the present-day episodes:**
+
+- In the cell, Voodoo really supported Antidote's music. He wanted to be
+  his MANAGER. They had it mapped: **"I'm gonna be Tupac and he gonna be
+  Suge Knight."** Plans made on a bunk: when Antidote got out they'd
+  meet up with DJ Carisma, get in the door, holler at her, get cracking,
+  blow up, push the issue. (Tupac AGAIN — the thread finds its way into
+  a prison cell. And note the chapters connecting: Voodoo's plan ran
+  through Carisma — the two chapters are linked.)
+- **2020: Voodoo died** — he had ended up on Skid Row and overdosed by
+  his tent.
+- **The full-circle moment (KEY SCENE of the whole series):** right
+  after Antidote got his FOOD TRUCK, he went to feed the homeless — and
+  Voodoo came up to his truck. Skinnier, out of shape, not the Voodoo he
+  knew. Antidote took care of him, helped him, gave him food. A little
+  while later, he heard Voodoo had passed.
+  The man who protected him inside was fed from his truck outside,
+  near the end. He got to give back to his protector before it was too
+  late — without knowing it was the last time. (Echo the Sevyn chapter:
+  another "last time seeing" he didn't fully know was the last time.)
+- **The living tribute:** Antidote became friends with Voodoo's SISTER.
+  He's taken her on food reviews with him — paying respect to his boy by
+  keeping his family close. "That was my boy. And I just kept it going."
+  (She is a potential voice in the film — with her consent — the two
+  people who loved Voodoo, telling him together.)
+
+This resolves the episode's meaning: protection repaid with care, plans
+that outlived the planner, and the food brand again serving as the
+vehicle of the story — the truck that fed Voodoo, the reviews that now
+carry his sister.
+
 **Tone rule:** no glorification. This episode is about protection,
 survival, loyalty, and loss — Voodoo protected him, then was gone, and
 the danger returned instantly. That's the story.

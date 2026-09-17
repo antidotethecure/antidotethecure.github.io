@@ -29,6 +29,12 @@ Structure (~60–75s):
 2. **The rewind hits** (record-scratch / tape-rewind effect, audio reverses):
    everything starts pulling backward.
 3. **Rewind through the chapters, newest to oldest** — each one gets a beat:
+   - **Colombia, November 2023 — the Cheat Code music video shoot.** Flew
+     back out to Colombia to shoot the video for Cheat Code. This is a
+     come-up beat: passport out, own song, own video.
+   - **Colombia, 2023 — got his teeth done.** The transformation beat — the
+     smile itself is proof of the come-up. (In the rewind this can be a
+     sharp before/after: the new smile glitching back to the old one.)
    - The GTA 5 grind / streams / revenue coming up
    - **Blackballed by the DJ — shut out of the industry.** The music was
      ready and the doors closed anyway. This is the "they tried to stop it"
@@ -47,6 +53,8 @@ Structure (~60–75s):
    - Prison
    - The fights
    - The heartbreaks
+   - **Age 14 — his grandmother passed away.** An early loss, sits deep in
+     the rewind, before the streets chapters.
    - The gunshots
 4. **Land at the beginning** (earliest childhood photo, hold in silence).
 5. **Smash to black. Title card**, then one line: the movie is coming.
@@ -113,8 +121,15 @@ photos with his father: the audience now knows what that photo really holds.
 Hold it in silence, then black. Handle this chapter with restraint — no
 dramatization needed; the facts and the photo carry it.
 
-(Antidote's message cut off at "And that should be—". Ask him to finish the
-thought.)
+**Also in the early years:** his grandmother passed away when he was **14**.
+
+**Legal note (per Antidote, Sep 17):** the juvenile litigation from this
+period is **closed**, so per him the childhood/system chapter can be told in
+the movie without court or lawyer problems. (Practical caution for the edit:
+telling HIS OWN story is his right either way; just avoid naming or showing
+identifiable third parties — caseworkers, other kids from the group homes —
+without consent, and give the final cut one legal read before public release.
+That's standard for any documentary, not a blocker.)
 
 ## Notes for the editor session
 - The ATBS audio file needs to be located on the Mac (or supplied by Antidote)

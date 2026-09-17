@@ -61,14 +61,14 @@ Audio: ATBS reversed/warped during the rewind, snapping back to the clean
 "pockets got bigger" bar only at the very start (the peak) — so the trailer
 teases the lyric the full movie ends on.
 
-## CHAPTER: Seven (told by Antidote, 2026-09-17 — use his words)
+## CHAPTER: Sevyn (told by Antidote, 2026-09-17 — use his words)
 
 - Got the Frenchie in **2020, on August 7th**. Her mom's name was "27" —
-  sevens everywhere — so he named her **Seven**. He said she'd have 11 dogs
+  sevens everywhere — so he named her **Sevyn**. He said she'd have 11 dogs
   throughout her life.
 - Beginning of **2022**: paid about **$12,000** to breed her with a known
   fluffy. **Perfect pregnancy** — no sickness, nothing. He documented every
-  single day of it on Instagram (**the Baby Seven Instagram account** —
+  single day of it on Instagram (**the Instagram accounts — Sevyn's page is @lucky_sevyn_** —
   this is REAL SOURCE FOOTAGE for the movie, pull from it).
 - She was given **too much anesthesia** on the table giving birth. The
   puppies were delivered. **She never woke up.**
@@ -77,13 +77,20 @@ teases the lyric the full movie ends on.
   able to see this again. This is the last time."*
 - She was his special dog. Like his little daughter.
 - Out of the 10 puppies, **only one looked exactly like her — her twin.**
-  He kept her and named her **Baby Seven**. He's raised her for four years
-  now. "Technically I've had Seven for six years. Two years of her, four
+  He kept her and named her **Baby Sevyn**. He's raised her for four years
+  now. "Technically I've had Sevyn for six years. Two years of her, four
   years of her daughter. I'm still raising her, still keeping her close.
   I basically started reincarnating her."
 
+**Reference photos supplied by Antidote (Sep 17), saved in this repo:**
+- `posting/assets/sevyn-2020-face.jpg` — Sevyn as a puppy, 2020
+- `posting/assets/sevyn-eyes-waterfall.jpg` — the eyes close-up (from an IG
+  story captioned "Them eyes one of a kind", @lucky_sevyn_): marbled
+  blue/amber — this IS the waterfall emblem. Use this exact image (or its
+  original from the library) for the eye moment in the film.
+
 **Film note:** the waterfall in her eye is a key image. In the rewind this
-chapter sits among the heartbreaks (2022). Baby Seven is the LIVING thread —
+chapter sits among the heartbreaks (2022). Baby Sevyn is the LIVING thread —
 she can appear in the present-day/ending sequence, meaning the rewind ends
 in loss but the forward story carries her on. The "reincarnation" idea can
 mirror the whole movie's theme: what survives comes back.

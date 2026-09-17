@@ -30,6 +30,18 @@ Structure (~60–75s):
    everything starts pulling backward.
 3. **Rewind through the chapters, newest to oldest** — each one gets a beat:
    - The GTA 5 grind / streams / revenue coming up
+   - **Blackballed by the DJ — shut out of the industry.** The music was
+     ready and the doors closed anyway. This is the "they tried to stop it"
+     beat: closed doors, unanswered messages, the machine turning its back.
+   - **The letdowns** — the people and promises that fell through
+   - **The struggle details** — the small, specific things that tell the
+     truth better than any big statement:
+     - the 2002 Audi A4 that couldn't reverse (TO CONFIRM: Antidote's
+       message cut off at "couldn't re—"; assuming reverse) — a car that
+       could only go forward. In a trailer that runs backward, that's not
+       just a struggle detail, that's THE image. Consider giving it its own
+       held beat.
+     - (add more as Antidote supplies them)
    - Homelessness
    - County jail
    - Prison

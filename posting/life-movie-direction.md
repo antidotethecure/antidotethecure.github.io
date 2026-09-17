@@ -194,3 +194,35 @@ Style locked. Generation CDN URLs (prefix: https://d8j0ntlcm91z4.cloudfront.net/
 10. Sevyn (empty collar in spotlight) — hf_20260917_205253_123e554f-f3ba-46e6-9780-17b2fe2c0e0e.png
 11. Grandmother (candle memorial) — hf_20260917_205253_2034a950-3d21-44a5-85a0-9dd4b6efee89.png
 12. The gunshots (police tape, wet street) — hf_20260917_205252_0625337b-47a4-4717-bdd6-7ef03bc3c126.png
+
+## YOUTUBE SOURCE MAP (verified live on TheRealAntidote channel, Sep 17)
+Channel: TheRealAntidote (UCcWrh7PiZOvDUTeHkHIDNHw), ~3.01K subs, ~1K videos
+
+**The 2012 Tupac chapter — real footage:**
+- "2pac In Hollywood With Antidote" — youtube.com/watch?v=G-iC60qp0kU
+
+**Freestyle credentials — real receipts on the channel:**
+- "Freeway Rick Ross States that Antidote is..." — watch?v=B151F7XhQSA
+- "@TheRealAntidote Interview/Freestyle For Dj Carisma" — watch?v=eENbSY0yIPA
+- "Jay Nari Freestyle Antidote" — watch?v=7DrDNaIKHx4
+
+**Playlists (verified IDs):**
+- Books — playlist?list=PLeCbq97Ik8EtLmZuqaeJFxf493W92t7T7 (46 videos)
+- Urban books — playlist?list=PLeCbq97Ik8EtWmliOTO0XBpjRI1hLPKuB
+- The Struggle PERSONAL LIFE — playlist?list=PLeCbq97Ik8EtAG8CbLGxMDVgc-_GDcfaT
+  (documentary gold: pull from this for the struggle chapters)
+- Also on channel: GTA 5 Stream Moments, GTA 6 Reactions, Crypto made me
+  homeless!, Neville Goddard, Antidote Music, Antidote Interviews, and more.
+
+**Books playlist contents (first ~30 titles, for the prison-library montage):**
+The Game of Life and How to Play It (Florence Scovel Shinn) · Rich Dad Poor
+Dad (Kiyosaki) · The Power of Your Subconscious Mind (Joseph Murphy) · The
+48 Laws of Power (Robert Greene) · As a Man Thinketh (James Allen) · The
+Master Key System (Haanel) · The Science of Getting Rich (Wattles) ·
+Awakened Imagination (Neville Goddard) · The Art of Money-Getting (P.T.
+Barnum) · The Richest Man in Babylon (Clason) · The Way of the Superior Man
+(Deida) · Ten Basic Rules for Better Living (Manly P. Hall) · Your
+Invisible Power · Science of Being (Fersen) · Who Am I? (Ramana Maharshi) ·
+Owning Your Own Shadow · Don't Believe Everything You Think (Nguyen) ·
+Wayne Dyer night meditations · + more (46 total; Think and Grow Rich per
+Antidote was also read inside)

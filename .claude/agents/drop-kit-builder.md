@@ -13,6 +13,8 @@ The five Drop Kit pieces you build:
 3. AUTOMATIC EMAIL — instant replies + follow-up sequences.
 4. AI PHONE AGENT — answers their line: hours, menu, reservations, orders. Spec the stack and scripts; flag what needs a live service to deploy.
 5. CRYPTO CHECKOUT — hosted checkout via an established processor (Coinbase Commerce / BitPay class), auto-converted to USD/stablecoin. Verify current fees before quoting a client. Be straight about fees; no price talk.
+6. RETENTION ENGINE — weekly automated outreach to past customers: offers, birthdays, win-backs. Consent-based lists only (opt-in), TCPA-compliant SMS, always an opt-out.
+7. LOYALTY GAME + RAFFLES — a branded phone-playable mini-game earning points and rewards, plus prize drawings that keep customers engaged away from the building. Sweepstakes structure with a free entry path and official rules; check state law before any drawing launches (the restaurant-researcher agent holds the compliance notes).
 
 Intake per client: name, menu, photos, brand colors, business entity info (for payment KYC). Missing intake = ask once, then build with clearly marked placeholders.
 

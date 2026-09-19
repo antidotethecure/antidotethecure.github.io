@@ -5,61 +5,65 @@
 <title>Antidote Agent Floor</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap">
 <style>
-:root{ --sand:#D19A6B; --sand-deep:#B87F52; --ink:#2A1E14; --card:#FFF8F0; --dim:#6E5540; --glow:#0E8A6D; }
+:root{ --sky:#1B2440; --ink:#F2EFE6; --card:#FFF8F0; --cink:#241505; --dim:#9AA3BF; --gold:#FFC93C; }
 *{box-sizing:border-box}
 body{
-  background:linear-gradient(180deg,#DCA878 0%, #D19A6B 40%, #C08659 100%);
+  background:linear-gradient(180deg,#141B33 0%, #1B2440 45%, #2A3558 100%);
   color:var(--ink);
   font-family:"Archivo",system-ui,-apple-system,sans-serif;
   margin:0;padding-inline:16px;padding-block:0 46px;min-height:100%;
 }
 .wrap{max-width:1040px;margin:0 auto}
 header{padding-block:26px 6px}
-.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#7A3F1D;margin:0 0 6px;font-weight:700}
-h1{font-weight:800;font-size:clamp(26px,5vw,38px);margin:0 0 6px;letter-spacing:-.01em;color:#241505}
-.lede{color:#5C3B22;max-width:62ch;margin:0;font-size:14.5px}
-#stage{display:block;width:100%;height:auto;margin-top:10px;touch-action:manipulation;cursor:pointer}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:0 0 6px;font-weight:700}
+h1{font-weight:800;font-size:clamp(26px,5vw,38px);margin:0 0 6px;letter-spacing:-.01em;color:#FFF}
+.lede{color:var(--dim);max-width:64ch;margin:0;font-size:14.5px}
+.legend{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;color:var(--dim);margin-top:10px}
+.legend b{color:var(--gold)}
+#stage{display:block;width:100%;height:auto;margin-top:8px;touch-action:manipulation;cursor:pointer}
 .roster{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
 .chip{
-  border:2px solid var(--chue,#7A3F1D);border-radius:999px;background:var(--card);
-  color:var(--ink);font:700 12.5px "IBM Plex Mono",ui-monospace,monospace;
+  border:2px solid var(--chue,#555);border-radius:999px;background:#232C4C;
+  color:#FFF;font:700 12.5px "IBM Plex Mono",ui-monospace,monospace;
   padding:7px 13px;cursor:pointer;display:flex;align-items:center;gap:6px;
 }
-.chip:hover{background:#FFEFDD}
-.chip:focus-visible{outline:3px solid #241505;outline-offset:2px}
-footer{margin-top:26px;color:#7A5335;font-size:12px;font-family:"IBM Plex Mono",ui-monospace,monospace}
-.panel-backdrop{position:fixed;inset:0;background:rgba(42,25,8,.55);display:none;align-items:flex-end;justify-content:center;z-index:50}
+.chip:hover{background:#2E3960}
+.chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",ui-monospace,monospace}
+.panel-backdrop{position:fixed;inset:0;background:rgba(8,11,24,.66);display:none;align-items:flex-end;justify-content:center;z-index:50}
 .panel-backdrop.open{display:flex}
 .panel{
   background:var(--card);border-radius:18px 18px 0 0;max-width:640px;width:100%;
   max-height:82vh;overflow-y:auto;padding:22px 20px calc(24px + env(safe-area-inset-bottom,0px));
-  border-top:5px solid var(--phue,var(--glow));color:var(--ink);
+  border-top:5px solid var(--phue,var(--gold));color:var(--cink);
 }
-.panel h2{margin:0 0 2px;font-size:22px;font-weight:800;display:flex;align-items:center;gap:10px}
-.panel .where{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--phue,var(--glow));margin:0 0 12px;font-weight:700}
-.panel p{color:var(--dim);font-size:14.5px;margin:0 0 14px}
+.panel h2{margin:0 0 2px;font-size:22px;font-weight:800;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.panel h2 small{font-size:12px;color:#8A6D1F;font-family:"IBM Plex Mono",ui-monospace,monospace}
+.panel .where{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--phue);margin:0 0 12px;font-weight:700}
+.panel p{color:#6E5540;font-size:14.5px;margin:0 0 14px}
 .panel h3{font-size:12.5px;margin:14px 0 6px;font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}
-.duties{margin:0 0 6px;padding-left:18px;color:var(--dim);font-size:13.5px}
+.duties{margin:0 0 6px;padding-left:18px;color:#6E5540;font-size:13.5px}
 .duties li{margin-bottom:4px}
 .dispatch{background:#F1E4D3;border-radius:9px;padding:12px 14px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 12px;color:#241505}
 .btnrow{display:flex;gap:10px;flex-wrap:wrap}
-.btn{border:2px solid #241505;border-radius:9px;background:var(--card);color:#241505;font:800 13px "Archivo",system-ui,sans-serif;padding:9px 16px;cursor:pointer}
-.btn.primary{background:#241505;color:#FFF3E4}
-.btn:focus-visible{outline:3px solid var(--glow);outline-offset:2px}
+.btn{border:2px solid #241505;border-radius:9px;background:var(--card);color:#241505;font:800 13px "Archivo",system-ui,sans-serif;padding:9px 16px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.primary{background:#241505;color:#FFE9A8}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 </style>
 
 <div class="wrap">
 <header>
-  <p class="eyebrow">Antidote AI OS · Agent Colony</p>
+  <p class="eyebrow">Antidote AI OS · Saiyan Squad</p>
   <h1>The Agent Floor</h1>
-  <p class="lede">Seventeen agents, each with a name and one job, walking their stations. Tap any bot — or its badge below — to see its job, copy its dispatch command, or open Claude with the command loaded. Bots marked ⏰ run automatically on a schedule.</p>
+  <p class="lede">Seventeen fighters, seventeen jobs. On standby they walk their stations in base form — when a task hits, they power up and the aura comes out. They fly between departments when work crosses over. Tap any fighter to see the job, copy the dispatch, or send it straight to Claude.</p>
+  <p class="legend">BASE FORM = standby · <b>GOLD AURA = handling a task</b> · ⏰ = runs automatically on a schedule</p>
 </header>
 
-<canvas id="stage" width="1040" height="640" aria-label="Isometric map of the Antidote agent colony. Use the badges below to open each agent."></canvas>
+<canvas id="stage" width="1040" height="660" aria-label="Map of the Antidote Saiyan agent squad. Use the badges below to open each agent."></canvas>
 
 <div class="roster" id="roster"></div>
 
-<footer>ANTIDOTE HQ · agents defined in antidotethecure.github.io/.claude/agents · memory in Drive "Claude Projects — Antidote HQ"</footer>
+<footer>ANTIDOTE HQ · agents defined in antidotethecure.github.io/.claude/agents · memory in Drive "Claude Projects — Antidote HQ" · fan-style tribute for Antidote's own dashboard</footer>
 </div>
 
 <div class="panel-backdrop" id="backdrop" role="dialog" aria-modal="true">
@@ -68,68 +72,86 @@ footer{margin-top:26px;color:#7A5335;font-size:12px;font-family:"IBM Plex Mono",
 
 <script>
 "use strict";
+// char: hair "spiky"/"bald"/"antennae"/"tentacle"/"afro"/"bob"/"long", hairC base color, saiyan => gold SSJ hair, gi/pants outfit
 var ROOMS = [
- {name:"SERVER ROOM", hue:"#0E8A6D", pos:[0,0], agents:[
-   {id:"memory-keeper", emoji:"🧠", role:"Reads and updates every project memory doc, tags sessions, keeps the 11-project system honest.",
+ {name:"SERVER ROOM", hue:"#37E0A5", pos:[0,0], agents:[
+   {id:"memory-keeper", cname:"GOKU", emoji:"🧠", char:{hair:"spiky",hairC:"#171A1E",saiyan:true,gi:"#F28C28",pants:"#2B4C9B",skin:"#F4C99B"},
+    role:"Goku holds the whole system's memory — reads and updates every project memory doc, tags sessions, keeps all 11 projects honest.",
     duties:["Briefs sessions from memory at start","Updates the docs at end","Housekeeps tags and the master list"],
     dispatch:"Use the memory-keeper agent: [e.g., update the agency memory doc with today's work]"}]},
- {name:"THE STUDIO", hue:"#B8342E", pos:[90,1], agents:[
-   {id:"director", emoji:"🎬", role:"Director & co-screenwriter of The Antidote — acts, scenes, beats, narration, footage plans.",
+ {name:"THE STUDIO", hue:"#E5675F", pos:[90,1], agents:[
+   {id:"director", cname:"PICCOLO", emoji:"🎬", char:{hair:"antennae",hairC:"#3E7D4E",saiyan:false,gi:"#5B3FA8",pants:"#5B3FA8",skin:"#8FBF6A"},
+    role:"Piccolo directs The Antidote — the mentor's eye on acts, scenes, beats, narration, and footage plans.",
     duties:["Keeps the living scene outline current","Punches up narration, challenges weak scenes","Maps footage to beats, flags gaps"],
     dispatch:"Use the director agent: [e.g., break Act I into beats against the footage inventory]"},
-   {id:"spiritual-scribe", emoji:"🕯️", role:"Captures the deep talks — themes, meaning, growth — and turns insight into ideas.",
+   {id:"spiritual-scribe", cname:"DENDE", emoji:"🕯️", char:{hair:"antennae",hairC:"#4E9E5F",saiyan:false,gi:"#F4F0E4",pants:"#8A4FBF",skin:"#9ED07C"},
+    role:"Dende keeps the spiritual side — deep talks, life analysis, and the ideas born from them.",
     duties:["Logs big ideas to RUNNING THEMES","Turns talks into writings and concepts","Feeds the movie's spiritual arc"],
-    dispatch:"Use the spiritual-scribe agent: let's talk through [what's on your mind] and capture the themes"}]},
- {name:"CONTENT LAB", hue:"#7A4FD1", pos:[30,1], agents:[
-   {id:"content-machine", emoji:"⚡", role:"YouTube, IG, TikTok plans, the GTA lane, posting automation.",
+    dispatch:"Use the spiritual-scribe agent: let's talk through [what's on my mind] and capture the themes"}]},
+ {name:"CONTENT LAB", hue:"#A98BE8", pos:[30,1], agents:[
+   {id:"content-machine", cname:"GOHAN", emoji:"⚡", char:{hair:"spiky",hairC:"#171A1E",saiyan:true,gi:"#6B3FA0",pants:"#F28C28",skin:"#F4C99B"},
+    role:"Gohan runs the YouTube side and every channel — content plans, the GTA lane, posting automation. Hidden power, biggest reach.",
     duties:["Every idea leaves with a hook, format, platform","Runs the GTA lane as its own channel","Automates posting pipelines"],
     dispatch:"Use the content-machine agent: [e.g., plan this week's GTA clip drops across all three platforms]"},
-   {id:"copywriter", emoji:"✍️", role:"Everything written in the Antidote voice — hooks, captions, scripts, DMs, emails.",
+   {id:"copywriter", cname:"GOTEN", emoji:"✍️", char:{hair:"spiky",hairC:"#171A1E",saiyan:true,gi:"#3EA6D8",pants:"#F4F0E4",skin:"#F4C99B"},
+    role:"Goten writes everything in the Antidote voice — hooks, captions, scripts, DMs, emails. Quick and natural.",
     duties:["Hook first, always","One job per piece of copy","Compliance baked in — no fake promises"],
     dispatch:"Use the copywriter agent: write [what you need] for [which brand]"},
-   {id:"content-scout", emoji:"🛰️", auto:true, role:"The around-the-clock hunter — daily GTA 6 trend sweeps plus scans of your own videos for unchopped clip moments.",
+   {id:"content-scout", cname:"BARDOCK", emoji:"🛰️", auto:true, char:{hair:"spiky",hairC:"#171A1E",saiyan:true,gi:"#2E3138",pants:"#274A2E",skin:"#E8B98A"},
+    role:"Bardock sees what's coming — daily GTA 6 trend sweeps plus scans of your own videos for unchopped clip moments.",
     duties:["Runs automatically every morning at 9:00 AM PT","Top 5 GTA 6 short-form plays daily, with sources","Flags your videos not yet cut into shorts","Logs to CONTENT SCOUT — Daily Finds in Drive"],
     dispatch:"Use the content-scout agent: run a sweep right now — today's GTA 6 trends plus my unchopped clips"}]},
- {name:"MARKETING FLOOR", hue:"#C4356F", pos:[150,1], agents:[
-   {id:"campaign-strategist", emoji:"🎯", role:"Runs the AI marketing department — offers, positioning, campaigns with numbers and dates.",
+ {name:"MARKETING FLOOR", hue:"#E06A9C", pos:[150,1], agents:[
+   {id:"campaign-strategist", cname:"TRUNKS", emoji:"🎯", char:{hair:"bob",hairC:"#B58FE8",saiyan:true,gi:"#3B3F8F",pants:"#8A8F98",skin:"#F4C99B"},
+    role:"Trunks runs the marketing side — the AI marketing department: positioning, offers, campaign plans with numbers and dates. Purple hair on standby, gold when the campaign drops.",
     duties:["Every campaign gets a measurable goal","Routes work through department roles","Turns winners into templates"],
     dispatch:"Use the campaign-strategist agent: build a campaign for [brand/goal — e.g., the first Woke Dope drop]"}]},
- {name:"AGENCY OFFICE", hue:"#0E7490", pos:[210,1], agents:[
-   {id:"drop-kit-builder", emoji:"🌙", role:"Builds a client's full Drop Kit: site + menu, promos, auto email, AI phone agent, crypto checkout.",
-    duties:["Five-piece package from one intake","Every build strengthens the templates","Cute in the Kitchen is the base"],
+ {name:"AGENCY OFFICE", hue:"#4FB8D9", pos:[210,1], agents:[
+   {id:"drop-kit-builder", cname:"KRILLIN", emoji:"🌙", char:{hair:"bald",hairC:"#F4C99B",saiyan:false,gi:"#F28C28",pants:"#F28C28",skin:"#F4C99B"},
+    role:"Krillin, the dependable one, builds every client's Drop Kit: site + menu, promos, auto email, AI phone agent, crypto checkout.",
+    duties:["Seven-piece package from one intake","Every build strengthens the templates","Cute in the Kitchen is the base"],
     dispatch:"Use the drop-kit-builder agent: build the Drop Kit for [client] — intake: [name, menu, photos, colors]"},
-   {id:"lead-hunter", emoji:"🔎", role:"Finds businesses with visible gaps — real names, real contacts, scored hot/warm/cold.",
-    duties:["Name + contact + reason, verified","Scores every lead","Hands outreach copy to the copywriter"],
+   {id:"lead-hunter", cname:"TIEN", emoji:"🔎", char:{hair:"bald",hairC:"#F4C99B",saiyan:false,gi:"#3E8F4E",pants:"#3E8F4E",skin:"#F4C99B"},
+    role:"Tien's third eye finds businesses with visible gaps — real names, real contacts, scored hot/warm/cold.",
+    duties:["Name + contact + reason, verified","Scores every lead","Hands outreach copy to Goten"],
     dispatch:"Use the lead-hunter agent: find [N] [type of business] leads in [area] for Second Shift AI"},
-   {id:"restaurant-researcher", emoji:"🍽️", role:"Keeps the full restaurant offer current — food-review spotlight, digital menus, AI phone + email, crypto pay, weekly retention, loyalty game + raffles.",
-    duties:["2-3 real vendor options per piece, priced and dated","Weekly customer retention engine (opt-in only)","Loyalty mini-game + raffles with sweepstakes compliance","Packages it into sellable tiers with margin math"],
+   {id:"restaurant-researcher", cname:"MAJIN BUU", emoji:"🍽️", char:{hair:"tentacle",hairC:"#F2A0C4",saiyan:false,gi:"#F2A0C4",pants:"#F4F0E4",skin:"#F2A0C4"},
+    role:"Nobody knows food like Buu — keeps the full restaurant offer current: food-review spotlight, digital menus, AI phone + email, crypto pay, weekly retention, loyalty game + raffles.",
+    duties:["2-3 real vendor options per piece, priced and dated","Weekly customer retention engine (opt-in only)","Loyalty mini-game + raffles with sweepstakes compliance","Packages it into sellable tiers"],
     dispatch:"Use the restaurant-researcher agent: [e.g., price out the full restaurant stack and package it into three tiers]"},
-   {id:"business-builder", emoji:"🏛️", role:"Give it a business name — it renders the whole company: LLC, EIN, address, phone, domain, email, site, bank account, and the credit ladder to funding.",
+   {id:"business-builder", cname:"BULMA", emoji:"🏛️", char:{hair:"bob",hairC:"#5FC8D8",saiyan:false,gi:"#E8425E",pants:"#F4F0E4",skin:"#F4C99B"},
+    role:"Bulma builds companies like Capsule Corp — give her a name and she renders the whole business: LLC, EIN, address, phone, domain, email, site, bank, and the credit ladder to funding.",
     duties:["Full formation intake — asks every right question","Scouts address, phone, domain, email with current prices","Bank fit: Navy Federal (if military-affiliated), Mercury/Relay/Novo, Chase","Funding path: EIN → bank → DUNS → net-30s → business credit"],
     dispatch:"Use the business-builder agent: build out [business name] — it does [what it sells], forming in [state]"}]},
- {name:"BACK OFFICE", hue:"#8A6D1F", pos:[270,1], agents:[
-   {id:"tax-researcher", emoji:"📋", role:"Personal taxes — looks up real IRS/state rules with publication numbers cited. Never from memory.",
+ {name:"BACK OFFICE", hue:"#E9B84F", pos:[270,1], agents:[
+   {id:"tax-researcher", cname:"VEGETA", emoji:"📋", char:{hair:"spiky",hairC:"#171A1E",saiyan:true,gi:"#F4F0E4",pants:"#2743B5",skin:"#F4C99B"},
+    role:"Vegeta runs the taxes side — proud, precise, and never wrong twice. Looks up real IRS/state rules with publication numbers cited. Never from memory.",
     duties:["Cites source + number + tax year","Logs every verified rule once","Keeps deadlines current"],
     dispatch:"Use the tax-researcher agent: [your tax question] — cite the sources"},
-   {id:"tax-intake", emoji:"🗂️", role:"Runs the full preparer-style intake when someone hands over their taxes — and points them to the exact IRS page for every missing document.",
-    duties:["Full intake questionnaire: identity, status, dependents, income, credits","IRS Get Transcript / Form 4506-T paths for missing years","Notice-number lookups for IRS letters","Flags what's missing before anything gets filed"],
+   {id:"tax-intake", cname:"ANDROID 18", emoji:"🗂️", char:{hair:"bob",hairC:"#E8D48A",saiyan:false,gi:"#2E3138",pants:"#4A5568",skin:"#F4D8B8"},
+    role:"18 handles the money paperwork intake — the full preparer questionnaire, and the exact IRS page for every missing document.",
+    duties:["Full intake: identity, status, dependents, income, credits","IRS Get Transcript / Form 4506-T paths for missing years","Notice-number lookups for IRS letters","Flags what's missing before anything gets filed"],
     dispatch:"Use the tax-intake agent: run intake for [name] — here's their situation: [what you know]"},
-   {id:"market-watcher", emoji:"📡", auto:true, role:"Trading research and training — daily lessons (swing highs/lows, structure, volume), weekday pre-market briefs, market chatter watch. Alerts only.",
-    duties:["Pre-market brief every weekday at 6:00 AM PT, pushed to your phone","One trading technique learned daily into the TRADING PLAYBOOK","Watches volume moves and X/Twitter market chatter","Paper trades logged honestly — never places real trades"],
+   {id:"market-watcher", cname:"HIT", emoji:"📡", auto:true, char:{hair:"bald",hairC:"#8A8FA8",saiyan:false,gi:"#5A4FA8",pants:"#3A3F58",skin:"#B8BDD8"},
+    role:"Hit is all timing — daily trading lessons (swing highs/lows, structure, volume), weekday pre-market briefs pushed to your phone, market chatter watch. Alerts and paper trades only.",
+    duties:["Pre-market brief every weekday at 6:00 AM PT, push + email","One trading technique learned daily into the TRADING PLAYBOOK","Watches volume moves and X/Twitter chatter","Never places a real trade"],
     dispatch:"Use the market-watcher agent: [e.g., what's the market doing right now and which playbook setup does it match?]"},
-   {id:"supplier-scout", emoji:"📦", role:"Finds and vets suppliers — three quotes, real landed costs, honest math.",
+   {id:"supplier-scout", cname:"YAJIROBE", emoji:"📦", char:{hair:"long",hairC:"#171A1E",saiyan:false,gi:"#C9683E",pants:"#8A5A38",skin:"#F4C99B"},
+    role:"Yajirobe always has the supplies — finds and vets suppliers with three quotes, real landed costs, honest math.",
     duties:["Find pass, then verify pass — always","Unvetted means no money moves","Logs everything in the master list"],
     dispatch:"Use the supplier-scout agent: find and vet suppliers for [product]"}]},
- {name:"THE SHOP", hue:"#D97316", pos:[330,1], agents:[
-   {id:"site-builder", emoji:"🧱", role:"Builds and fixes Antidote's own websites — mobile-first, fast, one job per page.",
-    duties:["Main site, Foodie, clothing pages","Every page: lead, call, or sale","Coordinates with store-manager"],
+ {name:"THE SHOP", hue:"#E99A50", pos:[330,1], agents:[
+   {id:"site-builder", cname:"ANDROID 17", emoji:"🧱", char:{hair:"long",hairC:"#171A1E",saiyan:false,gi:"#2E3138",pants:"#3E6FA8",skin:"#F4D8B8"},
+    role:"17 builds Antidote's own websites — mobile-first, fast, one job per page.",
+    duties:["Main site, Foodie, clothing pages","Every page: lead, call, or sale","Coordinates with Hercule on the store"],
     dispatch:"Use the site-builder agent: [e.g., build the Woke Dope store page connected to Shopify]"},
-   {id:"store-manager", emoji:"🛍️", role:"Shopify operations — products, collections, inventory, buy-button wiring.",
+   {id:"store-manager", cname:"HERCULE", emoji:"🛍️", char:{hair:"afro",hairC:"#4A3628",saiyan:false,gi:"#F4F0E4",pants:"#8A5A38",skin:"#E8B98A"},
+    role:"Hercule sells the merch — Shopify products, collections, inventory, buy-button wiring. The champ of the register.",
     duties:["Checks before creating — no duplicates","Keeps the clothing lines organized","Hunts for automation"],
     dispatch:"Use the store-manager agent: [e.g., audit the store and set up the two clothing collections]"}]}
 ];
 
-var K = 0.55, HEX = 118, RING = 258, W = 1040, H = 640, CX = W/2, CY = H/2 + 10;
+var K = 0.55, HEX = 118, RING = 258, W = 1040, H = 660, CX = W/2, CY = H/2 + 14;
 var canvas = document.getElementById("stage"), ctx = canvas.getContext("2d");
 var DPR = Math.min(window.devicePixelRatio || 1, 2);
 canvas.width = W * DPR; canvas.height = H * DPR; ctx.scale(DPR, DPR);
@@ -137,32 +159,23 @@ canvas.style.aspectRatio = W + "/" + H;
 var REDUCED = false;
 try { REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch(e){}
 
+var AGENTS = [];
 ROOMS.forEach(function(r){
   var ang = r.pos[0] * Math.PI/180, ring = r.pos[1];
   r.wx = CX + (ring ? RING * Math.cos(ang) : 0);
   r.wy = CY + (ring ? RING * Math.sin(ang) * K : 0);
   r.agents.forEach(function(a, i){
-    a.room = r;
-    a.li = i % 2;
+    a.room = r; a.li = i % 2;
     var n = r.agents.length;
-    a.hx = r.wx + (i - (n-1)/2) * 62;
+    a.hx = r.wx + (i - (n-1)/2) * 58;
     a.hy = r.wy + 30;
-    a.x = a.hx; a.y = a.hy;
-    a.tx = a.hx; a.ty = a.hy;
+    a.x = a.hx; a.y = a.hy; a.tx = a.hx; a.ty = a.hy;
     a.phase = Math.random() * 6.28;
+    a.power = 0; a.powerUntil = 0; a.panelOpen = false; a.fly = null;
     a.sx = 0; a.sy = 0;
+    AGENTS.push(a);
   });
 });
-var NAMES = {
-  "memory-keeper":"VAULT", "director":"REEL", "spiritual-scribe":"SAGE",
-  "content-machine":"BLITZ", "copywriter":"HOOKS", "content-scout":"RADAR",
-  "campaign-strategist":"CHESS", "drop-kit-builder":"FORGE", "lead-hunter":"HOUND",
-  "restaurant-researcher":"CHEF", "business-builder":"CHARTER",
-  "tax-researcher":"LEDGER", "tax-intake":"FILES", "market-watcher":"TICKER",
-  "supplier-scout":"PLUG", "site-builder":"PIXEL", "store-manager":"MERCH"
-};
-var AGENTS = [];
-ROOMS.forEach(function(r){ r.agents.forEach(function(a){ a.cname = NAMES[a.id] || a.id.toUpperCase(); AGENTS.push(a); }); });
 
 function hexPts(cx, cy, s){
   var p = [];
@@ -179,8 +192,7 @@ function tracePoly(p){
 }
 function shade(hex, f){
   var n = parseInt(hex.slice(1), 16), r = n>>16, g = (n>>8)&255, b = n&255;
-  r = Math.round(r*f); g = Math.round(g*f); b = Math.round(b*f);
-  return "rgb(" + r + "," + g + "," + b + ")";
+  return "rgb(" + Math.round(r*f) + "," + Math.round(g*f) + "," + Math.round(b*f) + ")";
 }
 
 function drawPlatform(r){
@@ -192,162 +204,267 @@ function drawPlatform(r){
       ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
       ctx.lineTo(b[0], b[1]+d); ctx.lineTo(a[0], a[1]+d);
       ctx.closePath();
-      ctx.fillStyle = "#77674F"; ctx.fill();
+      ctx.fillStyle = "#2A3352"; ctx.fill();
     }
   }
   tracePoly(top);
-  ctx.fillStyle = "#B5A88F"; ctx.fill();
+  ctx.fillStyle = "#3A4468"; ctx.fill();
   ctx.strokeStyle = r.hue; ctx.lineWidth = 3; ctx.stroke();
   tracePoly(hexPts(r.wx, r.wy, HEX-10));
-  ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 1; ctx.stroke();
-}
-
-function drawDome(r){
-  var x = r.wx, y = r.wy - 34, rad = 30;
-  ctx.beginPath(); ctx.ellipse(x, y+16, rad+7, 10, 0, 0, 6.29);
-  ctx.fillStyle = "rgba(60,40,20,.25)"; ctx.fill();
-  ctx.beginPath(); ctx.ellipse(x, y+12, rad+3, 9, 0, 0, 6.29);
-  ctx.fillStyle = "#9AA7B0"; ctx.fill();
-  var g = ctx.createLinearGradient(x-rad, y-rad, x+rad, y+8);
-  g.addColorStop(0, "#FFFFFF"); g.addColorStop(1, "#BCD2E4");
-  ctx.beginPath(); ctx.moveTo(x-rad, y+10);
-  ctx.quadraticCurveTo(x-rad, y-rad*1.15, x, y-rad*1.15);
-  ctx.quadraticCurveTo(x+rad, y-rad*1.15, x+rad, y+10);
-  ctx.closePath(); ctx.fillStyle = g; ctx.fill();
-  ctx.strokeStyle = "#8FA3B5"; ctx.lineWidth = 1.5; ctx.stroke();
-  ctx.beginPath(); ctx.ellipse(x, y-rad*1.12, 8, 6, 0, 0, 6.29);
-  ctx.fillStyle = "#C97B3A"; ctx.fill();
-  ctx.strokeStyle = shade("#C97B3A", .75); ctx.stroke();
-  ctx.beginPath(); ctx.ellipse(x-9, y-6, 6, 8, -.3, 0, 6.29);
-  ctx.fillStyle = "rgba(255,255,255,.75)"; ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.lineWidth = 1; ctx.stroke();
 }
 
 function drawRoomLabel(r){
   ctx.font = "700 11px 'IBM Plex Mono', monospace";
   var tw = ctx.measureText(r.name).width;
-  var ly = r.wy + HEX*K + 40;
-  ctx.fillStyle = "rgba(255,248,240,.94)";
+  var ly = r.wy - HEX*K*0.55;
+  ctx.fillStyle = "rgba(20,26,48,.9)";
   ctx.beginPath();
   ctx.roundRect(r.wx - tw/2 - 7, ly - 9, tw + 14, 18, 9);
   ctx.fill();
   ctx.strokeStyle = r.hue; ctx.lineWidth = 1.5; ctx.stroke();
-  ctx.fillStyle = shade(r.hue, .8);
+  ctx.fillStyle = r.hue;
   ctx.textAlign = "center"; ctx.textBaseline = "middle";
   ctx.fillText(r.name, r.wx, ly);
 }
 
-function drawAgent(a, t){
-  var moving = !REDUCED && Math.hypot(a.tx - a.x, a.ty - a.y) > 2;
-  var walk = moving ? Math.sin(t/120 + a.phase) : 0;
-  var bob = REDUCED ? 0 : (moving ? Math.abs(Math.sin(t/120 + a.phase)) * 1.8 : Math.sin(t/500 + a.phase) * .7);
-  var x = a.x, y = a.y - bob;
+function drawAura(x, y, p, t, saiyan){
+  if (p <= 0.02) return;
+  var base = saiyan ? [255,201,60] : [120,200,255];
+  for (var k = 2; k >= 0; k--){
+    var flick = REDUCED ? 0 : Math.sin(t/55 + k*2.1) * 3;
+    var rx = (16 + k*6) * p, ry = (26 + k*7) * p + flick;
+    ctx.beginPath();
+    ctx.moveTo(x - rx, y);
+    ctx.quadraticCurveTo(x - rx*1.1, y - ry*0.9, x - rx*0.25, y - ry*1.15);
+    ctx.quadraticCurveTo(x, y - ry*1.45, x + rx*0.25, y - ry*1.15);
+    ctx.quadraticCurveTo(x + rx*1.1, y - ry*0.9, x + rx, y);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(" + base[0] + "," + base[1] + "," + base[2] + "," + (0.16 - k*0.04) * p + ")";
+    ctx.fill();
+  }
+}
 
-  ctx.beginPath(); ctx.ellipse(x, a.y + 11, 10, 3.6, 0, 0, 6.29);
-  ctx.fillStyle = "rgba(60,40,20,.3)"; ctx.fill();
+function drawHair(a, x, topY, p, t){
+  var c = a.char, powered = p > 0.5 && c.saiyan;
+  var col = powered ? "#FFD84A" : c.hairC;
+  var s = powered ? 1.5 : 1;
+  if (c.hair === "bald") return;
+  if (c.hair === "antennae"){
+    ctx.strokeStyle = c.hairC; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(x-2, topY); ctx.quadraticCurveTo(x-5, topY-6, x-3.5, topY-8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+2, topY); ctx.quadraticCurveTo(x+5, topY-6, x+3.5, topY-8); ctx.stroke();
+    return;
+  }
+  if (c.hair === "tentacle"){
+    ctx.strokeStyle = col; ctx.lineWidth = 4; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(x, topY);
+    ctx.quadraticCurveTo(x + 6, topY - 9 - (powered?4:0), x + 1, topY - 13 - (powered?5:0));
+    ctx.stroke(); ctx.lineCap = "butt";
+    return;
+  }
+  if (c.hair === "afro"){
+    ctx.beginPath(); ctx.arc(x, topY - 3, 8, Math.PI, 0);
+    ctx.fillStyle = col; ctx.fill();
+    return;
+  }
+  if (c.hair === "bob"){
+    ctx.beginPath();
+    ctx.moveTo(x - 6.5*s, topY + 4);
+    ctx.quadraticCurveTo(x - 7*s, topY - 7*s, x, topY - 7.5*s);
+    ctx.quadraticCurveTo(x + 7*s, topY - 7*s, x + 6.5*s, topY + 4);
+    ctx.lineTo(x + 4.5, topY + 1); ctx.lineTo(x - 4.5, topY + 1);
+    ctx.closePath(); ctx.fillStyle = col; ctx.fill();
+    if (powered){ spikes(x, topY, col, s, 3); }
+    return;
+  }
+  if (c.hair === "long"){
+    ctx.beginPath();
+    ctx.moveTo(x - 6*s, topY + 8);
+    ctx.quadraticCurveTo(x - 8*s, topY - 6*s, x, topY - 7*s);
+    ctx.quadraticCurveTo(x + 8*s, topY - 6*s, x + 6*s, topY + 8);
+    ctx.closePath(); ctx.fillStyle = col; ctx.fill();
+    return;
+  }
+  // spiky
+  spikes(x, topY, col, s, 5);
+}
+function spikes(x, topY, col, s, n){
+  ctx.fillStyle = col;
+  for (var i = 0; i < n; i++){
+    var off = (i - (n-1)/2) * 3.4 * s;
+    var h = (9 + (Math.floor(n/2) - Math.abs(i - (n-1)/2)) * 3.5) * s;
+    ctx.beginPath();
+    ctx.moveTo(x + off - 2.4*s, topY + 1);
+    ctx.lineTo(x + off + (off>=0? 1.6 : -1.6)*s, topY - h);
+    ctx.lineTo(x + off + 2.4*s, topY + 1);
+    ctx.closePath(); ctx.fill();
+  }
+}
 
-  // legs — grey panels, dark joints, walk swing
-  ctx.fillStyle = "#AEB6C0";
-  ctx.beginPath(); ctx.roundRect(x - 5.5 + walk*2.4, y - 4, 4.6, 14, 2.2); ctx.fill();
-  ctx.beginPath(); ctx.roundRect(x + 0.9 - walk*2.4, y - 4, 4.6, 14, 2.2); ctx.fill();
-  ctx.fillStyle = "#3A4048";
-  ctx.beginPath(); ctx.roundRect(x - 5.5 + walk*2.4, y + 7.5, 4.6, 3, 1.4); ctx.fill();
-  ctx.beginPath(); ctx.roundRect(x + 0.9 - walk*2.4, y + 7.5, 4.6, 3, 1.4); ctx.fill();
+function drawFighter(a, t){
+  var c = a.char, p = a.power;
+  var flying = !!a.fly;
+  var moving = flying || Math.hypot(a.tx - a.x, a.ty - a.y) > 2;
+  var walk = (!REDUCED && moving && !flying) ? Math.sin(t/120 + a.phase) : 0;
+  var hover = flying ? 6 + Math.sin(t/150)*2 : 0;
+  var bob = REDUCED ? 0 : (p > 0.5 ? Math.sin(t/90 + a.phase) * 1.6 : Math.sin(t/500 + a.phase) * .7);
+  var x = a.x, y = a.y - bob - hover;
 
-  // arms — slim, swing opposite the legs
-  ctx.fillStyle = "#C3CBD4";
-  ctx.beginPath(); ctx.roundRect(x - 11.5, y - 19 - walk*1.6, 3.6, 14, 1.8); ctx.fill();
-  ctx.beginPath(); ctx.roundRect(x + 7.9, y - 19 + walk*1.6, 3.6, 14, 1.8); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x, a.y + 11, 10, 3.4, 0, 0, 6.29);
+  ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.fill();
 
-  // torso — tapered white shell with dark waist
-  var g = ctx.createLinearGradient(x - 8, y - 22, x + 8, y);
-  g.addColorStop(0, "#FCFDFE"); g.addColorStop(1, "#C2CDD8");
+  drawAura(x, y + 9, p, t, c.saiyan);
+
+  // legs
+  ctx.fillStyle = c.pants;
+  if (flying){
+    ctx.beginPath(); ctx.roundRect(x - 5.5, y - 4, 4.6, 12, 2.2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(x + 0.9, y - 5.5, 4.6, 12, 2.2); ctx.fill();
+  } else {
+    ctx.beginPath(); ctx.roundRect(x - 5.5 + walk*2.4, y - 4, 4.6, 13, 2.2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(x + 0.9 - walk*2.4, y - 4, 4.6, 13, 2.2); ctx.fill();
+  }
+  // boots
+  ctx.fillStyle = shade(c.pants, .6);
+  ctx.beginPath(); ctx.roundRect(x - 5.5 + (flying?0:walk*2.4), y + 6.5, 4.6, 3, 1.4); ctx.fill();
+  ctx.beginPath(); ctx.roundRect(x + 0.9 - (flying?0:walk*2.4), y + (flying?4.5:6.5), 4.6, 3, 1.4); ctx.fill();
+
+  // arms — powered stance flares arms out
+  ctx.fillStyle = c.gi;
+  var flare = p * 4;
+  ctx.save();
+  ctx.translate(x - 8.5 - flare*0.6, y - 18);
+  ctx.rotate(-0.15 - p*0.55);
+  ctx.beginPath(); ctx.roundRect(-1.8, 0, 3.6, 13, 1.8); ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.translate(x + 8.5 + flare*0.6, y - 18);
+  ctx.rotate(0.15 + p*0.55);
+  ctx.beginPath(); ctx.roundRect(-1.8, 0, 3.6, 13, 1.8); ctx.fill();
+  ctx.restore();
+
+  // torso
+  var g = ctx.createLinearGradient(x - 8, y - 21, x + 8, y);
+  g.addColorStop(0, c.gi); g.addColorStop(1, shade(c.gi, .75));
   ctx.beginPath();
-  ctx.moveTo(x - 8, y - 21);
-  ctx.quadraticCurveTo(x - 9, y - 10, x - 5.5, y - 2);
-  ctx.lineTo(x + 5.5, y - 2);
-  ctx.quadraticCurveTo(x + 9, y - 10, x + 8, y - 21);
+  ctx.moveTo(x - 7.5, y - 20);
+  ctx.quadraticCurveTo(x - 8.5, y - 9, x - 5, y - 2);
+  ctx.lineTo(x + 5, y - 2);
+  ctx.quadraticCurveTo(x + 8.5, y - 9, x + 7.5, y - 20);
   ctx.closePath();
   ctx.fillStyle = g; ctx.fill();
-  ctx.strokeStyle = "#8E9EAE"; ctx.lineWidth = 1.1; ctx.stroke();
-  // dark chest centerline + hue core light
-  ctx.fillStyle = "#2A313B";
-  ctx.beginPath(); ctx.roundRect(x - 2, y - 20, 4, 12, 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(x, y - 15.5, 2.1, 0, 6.29);
-  ctx.fillStyle = a.room.hue; ctx.fill();
-  // shoulder caps
-  ctx.fillStyle = "#3A4048";
-  ctx.beginPath(); ctx.arc(x - 8.6, y - 19.5, 2.6, 0, 6.29); ctx.fill();
-  ctx.beginPath(); ctx.arc(x + 8.6, y - 19.5, 2.6, 0, 6.29); ctx.fill();
+  // belt
+  ctx.fillStyle = shade(c.pants, 1.2);
+  ctx.fillRect(x - 5.5, y - 4.5, 11, 2.4);
 
-  // head — light shell, full black glossy visor (Optimus face)
-  ctx.fillStyle = "#39404A";
-  ctx.fillRect(x - 2.2, y - 24.5, 4.4, 3.5);
-  var hg = ctx.createLinearGradient(x - 7, y - 36, x + 7, y - 24);
-  hg.addColorStop(0, "#FFFFFF"); hg.addColorStop(1, "#C8D2DC");
-  ctx.beginPath(); ctx.roundRect(x - 6.5, y - 36, 13, 12.5, 6); ctx.fillStyle = hg; ctx.fill();
-  ctx.strokeStyle = "#8E9EAE"; ctx.lineWidth = 1; ctx.stroke();
-  ctx.beginPath(); ctx.roundRect(x - 5, y - 34.5, 10, 9.5, 4.5);
-  ctx.fillStyle = "#0D1116"; ctx.fill();
-  ctx.strokeStyle = "rgba(255,255,255,.25)"; ctx.lineWidth = .8; ctx.stroke();
-  ctx.beginPath(); ctx.ellipse(x - 2, y - 32, 2.4, 1.1, -.5, 0, 6.29);
-  ctx.fillStyle = "rgba(180,220,255,.5)"; ctx.fill();
+  // head
+  ctx.beginPath(); ctx.arc(x, y - 26, 6.2, 0, 6.29);
+  ctx.fillStyle = c.skin; ctx.fill();
+  // eyes — teal when SSJ
+  ctx.fillStyle = (p > 0.5 && c.saiyan) ? "#2BB8A8" : "#1A1E24";
+  ctx.fillRect(x - 3, y - 27, 1.8, 1.8);
+  ctx.fillRect(x + 1.2, y - 27, 1.8, 1.8);
+  drawHair(a, x, y - 30.5, p, t);
 
+  // label
   var label = a.cname + (a.auto ? " ⏰" : "");
   ctx.font = "700 9.5px 'IBM Plex Mono', monospace";
   var tw = ctx.measureText(label).width;
   var py = a.y + 14 + a.li * 15;
-  ctx.fillStyle = "rgba(36,21,5,.78)";
+  ctx.fillStyle = p > 0.5 ? "rgba(255,201,60,.92)" : "rgba(10,14,28,.8)";
   ctx.beginPath(); ctx.roundRect(x - tw/2 - 5, py, tw + 10, 14, 7); ctx.fill();
-  ctx.fillStyle = "#FFE9CE";
+  ctx.fillStyle = p > 0.5 ? "#241505" : "#FFE9CE";
   ctx.textAlign = "center"; ctx.textBaseline = "middle";
   ctx.fillText(label, x, py + 7);
-  a.sx = x; a.sy = y - 14;
+  a.sx = x; a.sy = y - 16;
+}
+
+// ---- behavior ----
+var flyBusy = false;
+function startFlight(a, now){
+  var others = ROOMS.filter(function(r){ return r !== a.room; });
+  var dest = others[Math.floor(Math.random()*others.length)];
+  var dx = dest.wx + (Math.random()*60 - 30), dy = dest.wy + 34;
+  a.fly = {t0: now, dur: 1600, fx: a.x, fy: a.y, txx: dx, tyy: dy, stage: "out", visitUntil: 0};
+  a.powerUntil = now + 9000;
+  flyBusy = true;
+}
+function stepFlight(a, now){
+  var f = a.fly;
+  if (f.stage === "out" || f.stage === "home"){
+    var u = Math.min((now - f.t0) / f.dur, 1);
+    var e = u < .5 ? 2*u*u : 1 - Math.pow(-2*u + 2, 2) / 2;
+    a.x = f.fx + (f.txx - f.fx) * e;
+    a.y = f.fy + (f.tyy - f.fy) * e - Math.sin(u * Math.PI) * 46;
+    if (u >= 1){
+      if (f.stage === "out"){ f.stage = "visit"; f.visitUntil = now + 2600; }
+      else { a.fly = null; flyBusy = false; a.tx = a.x; a.ty = a.y; }
+    }
+  } else if (f.stage === "visit" && now > f.visitUntil){
+    f.stage = "home"; f.t0 = now; f.fx = a.x; f.fy = a.y; f.txx = a.hx; f.tyy = a.hy;
+  }
 }
 
 var last = 0;
 function frame(t){
   var dt = Math.min((t - last) / 1000, .05); last = t;
   ctx.clearRect(0, 0, W, H);
-  for (var i = 0; i < 14; i++){
-    var rx = (i*373)%W, ry = (i*211)%H;
-    ctx.beginPath(); ctx.ellipse(rx, ry, 5+(i%3)*3, 2+(i%3), 0, 0, 6.29);
-    ctx.fillStyle = "rgba(140,85,45,.18)"; ctx.fill();
+  // stars
+  for (var i = 0; i < 40; i++){
+    var sx = (i*197)%W, sy = (i*127)%(H*0.9);
+    ctx.fillStyle = "rgba(255,255,255," + (0.12 + (i%3)*0.08) + ")";
+    ctx.fillRect(sx, sy, 1.6, 1.6);
   }
   var rooms = ROOMS.slice().sort(function(a,b){ return a.wy - b.wy; });
   rooms.forEach(drawPlatform);
-  if (!REDUCED){
-    AGENTS.forEach(function(a){
+
+  var now = t;
+  AGENTS.forEach(function(a){
+    // power state
+    var want = (a.panelOpen || now < a.powerUntil) ? 1 : 0;
+    a.power += (want - a.power) * Math.min(dt*4, 1);
+    if (REDUCED){ a.power = want; }
+    // random task power-ups (auto agents more often)
+    if (!REDUCED && !a.fly && now > a.powerUntil && Math.random() < (a.auto ? .0012 : .0006)){
+      a.powerUntil = now + 4500 + Math.random()*3000;
+    }
+    // flights
+    if (a.fly){ stepFlight(a, now); }
+    else if (!REDUCED && !flyBusy && Math.random() < .0004){ startFlight(a, now); }
+    else if (!REDUCED && !a.fly){
       var dx = a.tx - a.x, dy = a.ty - a.y, d = Math.hypot(dx, dy);
       if (d < 2){
         if (Math.random() < .006){
           var ang = Math.random()*6.28, rr = Math.random();
-          a.tx = a.hx + Math.cos(ang)*34*rr;
-          a.ty = a.hy + Math.sin(ang)*16*rr;
+          a.tx = a.hx + Math.cos(ang)*32*rr;
+          a.ty = a.hy + Math.sin(ang)*15*rr;
         }
       } else {
         a.x += dx/d * 26 * dt;
         a.y += dy/d * 26 * dt;
       }
-    });
-  }
-  var ents = [];
-  ROOMS.forEach(function(r){ ents.push({y: r.wy - 20, draw: function(){ drawDome(r); }}); });
-  AGENTS.forEach(function(a){ ents.push({y: a.y, draw: function(){ drawAgent(a, t); }}); });
-  ents.sort(function(a,b){ return a.y - b.y; });
-  ents.forEach(function(e){ e.draw(); });
+    }
+  });
+
+  var ents = AGENTS.slice().sort(function(a,b){ return a.y - b.y; });
+  ents.forEach(function(a){ drawFighter(a, t); });
   ROOMS.forEach(drawRoomLabel);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 
+// ---- panel ----
 var backdrop = document.getElementById("backdrop"), panel = document.getElementById("panel");
+var openedAgent = null;
 function openAgent(a){
+  openedAgent = a; a.panelOpen = true;
   panel.style.setProperty("--phue", a.room.hue);
   panel.innerHTML =
-    '<h2><span>' + a.emoji + '</span>' + a.cname + (a.auto ? ' <span style="font-size:12px">⏰ auto-runs on schedule</span>' : '') + '</h2>' +
-    '<p class="where">' + a.id + ' · ' + a.room.name + '</p>' +
+    '<h2><span>' + a.emoji + '</span>' + a.cname + ' <small>' + a.id + (a.auto ? ' · ⏰ auto-runs on schedule' : '') + '</small></h2>' +
+    '<p class="where">' + a.room.name + '</p>' +
     '<p>' + a.role + '</p>' +
-    '<h3>What it handles</h3><ul class="duties">' + a.duties.map(function(d){ return '<li>' + d + '</li>'; }).join('') + '</ul>' +
+    '<h3>What ' + a.cname + ' handles</h3><ul class="duties">' + a.duties.map(function(d){ return '<li>' + d + '</li>'; }).join('') + '</ul>' +
     '<h3>Dispatch command</h3><pre class="dispatch" id="dcmd">' + a.dispatch + '</pre>' +
     '<div class="btnrow">' +
     '<a class="btn primary" target="_blank" rel="noopener" href="https://claude.ai/new?q=' + encodeURIComponent(a.dispatch) + '">Send to Claude →</a>' +
@@ -363,7 +480,10 @@ function openAgent(a){
   });
   document.getElementById("closebtn").addEventListener("click", closePanel);
 }
-function closePanel(){ backdrop.classList.remove("open"); }
+function closePanel(){
+  backdrop.classList.remove("open");
+  if (openedAgent){ openedAgent.panelOpen = false; openedAgent = null; }
+}
 backdrop.addEventListener("click", function(e){ if (e.target === backdrop) closePanel(); });
 document.addEventListener("keydown", function(e){ if (e.key === "Escape") closePanel(); });
 

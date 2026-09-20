@@ -30,6 +30,57 @@ h1{font-weight:800;font-size:clamp(26px,5vw,38px);margin:0 0 6px;letter-spacing:
 .chip:hover{background:#2E3960}
 .chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",ui-monospace,monospace}
+/* ===== backend system ===== */
+.backend{margin-top:56px}
+.backend h2{font-weight:800;font-size:clamp(22px,4vw,30px);margin:0 0 4px;color:#FFF}
+.backend .sub{color:var(--dim);font-size:14px;margin:0 0 4px;max-width:66ch}
+.backend .tag{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;color:var(--gold);font-weight:700;margin:0 0 18px}
+.begrid{display:grid;grid-template-columns:220px 1fr 220px;gap:14px}
+@media (max-width:900px){.begrid{grid-template-columns:1fr}}
+.becol-h{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;font-weight:700;margin:0 0 10px;
+}
+.becard{
+  background:#232C4C;border:1px solid #35406B;border-radius:10px;
+  padding:10px 12px;margin-bottom:10px;
+}
+.becard b{display:flex;align-items:center;gap:7px;font-size:13px;color:#FFF}
+.becard p{margin:3px 0 0;font-size:11.5px;color:var(--dim);line-height:1.45}
+.becore{
+  background:linear-gradient(135deg,#173B2E,#1B2440);border:1.5px solid #37E0A5;border-radius:12px;
+  padding:14px 16px;margin-bottom:14px;
+}
+.becore b{font-size:15px;color:#7FF2C8;display:block;margin-bottom:4px}
+.becore .checks{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11.5px;color:#B8E8D4;font-family:"IBM Plex Mono",ui-monospace,monospace}
+.balls{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:14px}
+@media (max-width:900px){.balls{grid-template-columns:repeat(2,1fr)}}
+.ball{
+  background:#232C4C;border:1px solid #35406B;border-radius:10px;padding:10px 8px;text-align:center;
+}
+.orb{
+  width:44px;height:44px;border-radius:50%;margin:0 auto 6px;
+  background:radial-gradient(circle at 32% 28%, #FFD98A 0%, #FFB23E 40%, #E8681A 100%);
+  box-shadow:0 0 10px rgba(255,178,62,.45);
+  display:flex;align-items:center;justify-content:center;
+  color:#C62828;font-size:11px;letter-spacing:-1px;line-height:1;
+}
+.ball b{display:block;font-size:11px;color:#FFF;font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.04em;margin-bottom:4px}
+.ball ul{margin:0;padding:0;list-style:none;font-size:10px;color:var(--dim);line-height:1.5}
+.belayer{
+  border-radius:10px;padding:11px 14px;margin-bottom:10px;font-size:12px;color:#E8ECF6;
+  border:1px solid #35406B;background:#1E2745;
+}
+.belayer b{color:var(--gold);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em}
+.belayer span{color:var(--dim);font-size:11.5px}
+.bepower{
+  background:linear-gradient(135deg,#3B2A10,#1B2440);border:1.5px solid var(--gold);border-radius:10px;
+  padding:10px 12px;margin-bottom:10px;text-align:center;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:700;color:var(--gold);font-size:12.5px;
+}
+.bestrip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+@media (max-width:900px){.bestrip{grid-template-columns:repeat(2,1fr)}}
+.bestrip .becard{margin:0}
 .panel-backdrop{position:fixed;inset:0;background:rgba(8,11,24,.66);display:none;align-items:flex-end;justify-content:center;z-index:50}
 .panel-backdrop.open{display:flex}
 .panel{
@@ -62,6 +113,63 @@ footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",
 <canvas id="stage" width="1040" height="660" aria-label="Map of the Antidote Saiyan agent squad. Use the badges below to open each agent."></canvas>
 
 <div class="roster" id="roster"></div>
+
+<section class="backend">
+  <h2>The Backend System</h2>
+  <p class="sub">How Second Shift AI runs a client's whole business — construction companies, agencies, restaurants, multi-location operations. Every process connected, every workflow automated, one intelligent system.</p>
+  <p class="tag">YOU BECOME THE INFRASTRUCTURE THEY RUN ON.</p>
+
+  <div class="begrid">
+    <div>
+      <p class="becol-h" style="color:#4FB8D9">📡 Scouter Signals — everything coming in</p>
+      <div class="becard"><b>💬 Lead Forms</b><p>Website, FB ads, Google, referrals</p></div>
+      <div class="becard"><b>✉️ Email &amp; SMS</b><p>All conversations in one inbox</p></div>
+      <div class="becard"><b>📞 Phone Calls</b><p>Missed calls answered, AI call summaries</p></div>
+      <div class="becard"><b>📅 Appointments</b><p>Bookings, reschedules, reminders</p></div>
+      <div class="becard"><b>📄 Documents</b><p>Plans, contracts, permits, photos</p></div>
+      <div class="becard"><b>💵 Payments</b><p>Invoices, deposits, expenses</p></div>
+    </div>
+
+    <div>
+      <div class="becore">
+        <b>🐉 SHENRON CORE — Claude AI, the brain of the business</b>
+        <div class="checks"><span>✓ understands everything</span><span>✓ makes smart decisions</span><span>✓ automates workflows</span><span>✓ grants the wish: time back</span></div>
+      </div>
+
+      <div class="balls">
+        <div class="ball"><div class="orb">★</div><b>CRM</b><ul><li>Lead tracking</li><li>Client profiles</li><li>Pipeline stages</li><li>Lead scoring</li></ul></div>
+        <div class="ball"><div class="orb">★★</div><b>SCHEDULE</b><ul><li>Job scheduling</li><li>Team calendars</li><li>Auto reminders</li></ul></div>
+        <div class="ball"><div class="orb">★★★</div><b>ESTIMATES</b><ul><li>Create &amp; send</li><li>Approvals</li><li>Convert to job</li></ul></div>
+        <div class="ball"><div class="orb">★★★★</div><b>PROJECTS</b><ul><li>Job management</li><li>Milestones</li><li>Progress tracking</li></ul></div>
+        <div class="ball"><div class="orb">★★★★★</div><b>TASKS</b><ul><li>Assignment</li><li>Priorities</li><li>Deadlines</li></ul></div>
+        <div class="ball"><div class="orb">★★★★★★</div><b>INVOICING</b><ul><li>Auto invoices</li><li>Payment links</li><li>Late reminders</li></ul></div>
+        <div class="ball"><div class="orb">★★★★★★★</div><b>REPORTS</b><ul><li>Sales reports</li><li>Job profit</li><li>Cash flow</li></ul></div>
+      </div>
+
+      <div class="belayer"><b>🏯 CAPSULE VAULT</b> · <span>Centralized smart database — all data connected, always up to date, always accessible.</span></div>
+      <div class="belayer"><b>⚡ INSTANT TRANSMISSION LAYER</b> · <span>Claude triggers actions, sends messages, updates records, assigns tasks, keeps everything moving.</span></div>
+      <div class="belayer"><b>🌀 FUSION CHAMBER</b> · <span>Fuses with the tools they already use: Gmail, Google Calendar, Slack, QuickBooks, Stripe + more.</span></div>
+    </div>
+
+    <div>
+      <p class="becol-h" style="color:var(--gold)">📈 Power Levels — what the client feels</p>
+      <div class="bepower">POWER LEVEL: OVER 9,000</div>
+      <div class="becard"><b>🏆 More Jobs Won</b><p>Automated follow-ups convert more leads</p></div>
+      <div class="becard"><b>⏱️ Time Saved Daily</b><p>The busywork handles itself</p></div>
+      <div class="becard"><b>💰 Faster Payments</b><p>Automated invoicing gets them paid sooner</p></div>
+      <div class="becard"><b>🤝 Team Alignment</b><p>Everyone knows what to do and when</p></div>
+      <div class="becard"><b>📍 Multi-Location Ready</b><p>All locations from one dashboard</p></div>
+      <div class="becard"><b>🚀 Business Growth</b><p>Insights and automation drive real growth</p></div>
+    </div>
+  </div>
+
+  <div class="bestrip">
+    <div class="becard"><b>✅ Fully Automated</b><p>The backend handles itself so they run the business</p></div>
+    <div class="becard"><b>🧠 AI-Powered</b><p>Smarter decisions, less manual work</p></div>
+    <div class="becard"><b>🛡️ Secure &amp; Reliable</b><p>Client data protected, always</p></div>
+    <div class="becard"><b>📶 Built to Scale</b><p>Grows with the business — no limits</p></div>
+  </div>
+</section>
 
 <footer>ANTIDOTE HQ · agents defined in antidotethecure.github.io/.claude/agents · memory in Drive "Claude Projects — Antidote HQ" · fan-style tribute for Antidote's own dashboard</footer>
 </div>

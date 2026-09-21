@@ -21,6 +21,24 @@ h1{font-weight:800;font-size:clamp(26px,5vw,38px);margin:0 0 6px;letter-spacing:
 .legend{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;color:var(--dim);margin-top:10px}
 .legend b{color:var(--gold)}
 #stage{display:block;width:100%;height:auto;margin-top:8px;touch-action:manipulation;cursor:pointer}
+.cmdbar{margin-top:16px;background:#232C4C;border:1.5px solid var(--gold);border-radius:12px;padding:12px 14px}
+.cmdlabel{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 8px}
+#cmdform{display:flex;gap:8px;flex-wrap:wrap}
+#cmdinput{
+  flex:1;min-width:220px;background:#141B33;border:1px solid #35406B;border-radius:8px;
+  color:#FFF;font:500 14px "Archivo",system-ui,sans-serif;padding:10px 12px;
+}
+#cmdinput:focus{outline:2px solid var(--gold);border-color:var(--gold)}
+.cmdgo{
+  background:var(--gold);color:#241505;border:none;border-radius:8px;cursor:pointer;
+  font:800 13px "Archivo",system-ui,sans-serif;padding:10px 18px;
+}
+.cmdgo:focus-visible{outline:3px solid #FFF;outline-offset:2px}
+#cmdresult{margin-top:10px;font-size:13px;color:#E8ECF6}
+#cmdresult .picked{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:700;color:var(--gold)}
+#cmdresult .alt{display:inline-block;margin:6px 6px 0 0;border:1px solid #35406B;border-radius:999px;background:#141B33;color:#C8D0E8;font:700 11px "IBM Plex Mono",ui-monospace,monospace;padding:5px 10px;cursor:pointer}
+#cmdresult .alt:hover{border-color:var(--gold)}
+#cmdresult a.golink{color:#241505;background:var(--gold);border-radius:7px;padding:7px 13px;font:800 12.5px "Archivo",system-ui,sans-serif;text-decoration:none;display:inline-block;margin-top:8px}
 .roster{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
 .chip{
   border:2px solid var(--chue,#555);border-radius:999px;background:#232C4C;
@@ -108,6 +126,15 @@ footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",
   <h1>The Agent Floor</h1>
   <p class="lede">Seventeen fighters, seventeen jobs. On standby they walk their stations in base form — when a task hits, they power up and the aura comes out. They fly between departments when work crosses over. Tap any fighter to see the job, copy the dispatch, or send it straight to Claude.</p>
   <p class="legend">BASE FORM = standby · <b>GOLD AURA = handling a task</b> · ⏰ = runs automatically on a schedule</p>
+
+  <div class="cmdbar">
+    <p class="cmdlabel">⚡ COMMAND BOARD — say it, and the right fighter takes it</p>
+    <form id="cmdform">
+      <input id="cmdinput" type="text" autocomplete="off" placeholder='e.g. "find me 20 restaurant leads in LA" or "why did my views drop?"' aria-label="Command for the agent squad">
+      <button type="submit" class="cmdgo">DISPATCH</button>
+    </form>
+    <div id="cmdresult" hidden></div>
+  </div>
 </header>
 
 <canvas id="stage" width="1040" height="660" aria-label="Map of the Antidote Saiyan agent squad. Use the badges below to open each agent."></canvas>
@@ -605,6 +632,69 @@ canvas.addEventListener("click", function(e){
     if (d < bd){ bd = d; best = a; }
   });
   if (best && bd < 34) openAgent(best);
+});
+
+// ---- command board: route words to the right agent ----
+var TRIGGERS = {
+  "director":["movie","film","documentary","scene","screenplay","narration","footage","edit plan","act "],
+  "spiritual-scribe":["spiritual","meaning","purpose","life lesson","understanding life","deep talk","philosophy","god","soul"],
+  "content-machine":["youtube","views","video idea","channel","upload","post schedule","tiktok","instagram","reel","short","formula","content plan","subscribers","views drop","views up"],
+  "content-scout":["trend","trending","gta 6","gta6","scout","sweep","unchopped","hot content","viral right now","what's hot"],
+  "copywriter":["write","caption","hook","copy","headline","slogan","dm reply","email copy","bio","script for"],
+  "campaign-strategist":["campaign","marketing","promote","promotion","launch","drop","ads","offer","audience"],
+  "drop-kit-builder":["drop kit","client site","client website","build for","menu site","package for","phone agent for","email agent for"],
+  "lead-hunter":["lead","leads","prospects","find businesses","find restaurants","outreach list","who should i pitch"],
+  "restaurant-researcher":["restaurant stack","restaurant offer","loyalty","raffle","retention","digital menu","food review","restaurant tools"],
+  "business-builder":["llc","business name","register","incorporate","ein","form a","start a business","business bank","funding","business credit","company set"],
+  "tax-researcher":["tax rule","deduct","write off","irs code","tax law","tax question","publication"],
+  "tax-intake":["tax intake","w-2","w2","1099","transcript","file taxes","tax documents","taxes for","prior year","tax year"],
+  "market-watcher":["trade","trading","market","stock","polymarket","chart","swing","volume","futures","premarket","ticker","setup"],
+  "supplier-scout":["supplier","wholesale","manufacturer","source","alibaba","vendor","kiosk","product cost","moq"],
+  "site-builder":["my website","my site","landing page","fix the site","foodie page","clothing page","store page","antidotethecure"],
+  "store-manager":["shopify","store","merch","product","inventory","collection","orders","discount code"],
+  "memory-keeper":["memory","remember","update the doc","organize","tag","project doc","where did we leave","status of"]
+};
+function routeCommand(text){
+  var t = " " + text.toLowerCase() + " ";
+  var scores = [];
+  AGENTS.forEach(function(a){
+    var kws = TRIGGERS[a.id] || [], s = 0;
+    kws.forEach(function(k){ if (t.indexOf(k) !== -1) s += (k.indexOf(" ") !== -1 ? 3 : 2); });
+    if (s > 0) scores.push({a:a, s:s});
+  });
+  scores.sort(function(x,y){ return y.s - x.s; });
+  return scores;
+}
+var cmdform = document.getElementById("cmdform"), cmdinput = document.getElementById("cmdinput"), cmdresult = document.getElementById("cmdresult");
+function fireAgent(a, text){
+  a.powerUntil = performance.now() + 8000;
+  var full = "Use the " + a.id + " agent: " + text;
+  var url = "https://claude.ai/new?q=" + encodeURIComponent(full);
+  cmdresult.hidden = false;
+  cmdresult.innerHTML = '🔥 <span class="picked">' + a.cname + '</span> powered up for this. ' +
+    '<a class="golink" target="_blank" rel="noopener" href="' + url + '">Send it to Claude →</a> ' +
+    '<div style="margin-top:6px;color:#9AA3BF;font-size:11.5px">Not the right fighter? Tap one:</div><div id="altrow"></div>';
+  var altrow = document.getElementById("altrow");
+  AGENTS.slice().sort(function(x,y){ return (x===a)-(y===a); }).forEach(function(o){
+    if (o === a) return;
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "alt"; b.textContent = o.cname;
+    b.addEventListener("click", function(){ fireAgent(o, text); });
+    altrow.appendChild(b);
+  });
+  try { window.open(url, "_blank", "noopener"); } catch(e){}
+}
+cmdform.addEventListener("submit", function(e){
+  e.preventDefault();
+  var text = cmdinput.value.trim();
+  if (!text) return;
+  var scores = routeCommand(text);
+  if (scores.length){
+    fireAgent(scores[0].a, text);
+  } else {
+    var vault = AGENTS.filter(function(a){ return a.id === "memory-keeper"; })[0];
+    fireAgent(vault, text + " (route this to whichever agent fits best)");
+  }
 });
 
 var roster = document.getElementById("roster");

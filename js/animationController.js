@@ -69,11 +69,15 @@ var World = (function(){
         img.onload = function(){ a.img = img; };
         img.onerror = function(){ a.img = null; };
         img.src = a.avatar;
-        // optional Super Saiyan form: <name>-ssj.webp swaps in while powered up
-        var simg = new Image();
-        simg.onload = function(){ a.imgSSJ = simg; };
-        simg.onerror = function(){ a.imgSSJ = null; };
-        simg.src = a.avatar.replace(/\.webp$/, "-ssj.webp");
+        // transformation ladder: <name>-ssj.webp … <name>-ssj4.webp
+        // stage of learning drives the form; SSJ4 = final mastery
+        a.forms = [null, null, null, null];
+        ["-ssj", "-ssj2", "-ssj3", "-ssj4"].forEach(function(suf, fi){
+          var simg = new Image();
+          simg.onload = function(){ a.forms[fi] = simg; };
+          simg.onerror = function(){ a.forms[fi] = null; };
+          simg.src = a.avatar.replace(/\.webp$/, suf + ".webp");
+        });
         if (a.face){
           var fimg = new Image();
           fimg.onload = function(){ a.faceImg = fimg; };
@@ -404,12 +408,26 @@ var World = (function(){
 
     drawAura(x, y + 9, p, t, auraColorFor(a));
 
+    var formN = 0;
     if (a.img){
-      // supplied transparent character asset replaces the vector body,
-      // drawn at its true aspect ratio, pixel-crisp;
-      // powered up + an -ssj sprite exists => Super Saiyan form
-      var spr = (p > 0.5 && a.imgSSJ) ? a.imgSSJ : a.img;
-      var ih = (spr === a.imgSSJ) ? 62 : 56;
+      // sprite fighter. Powered up => Super Saiyan ladder:
+      // learning progress picks the stage — SSJ1 start, SSJ4 = final mastery
+      var spr = a.img;
+      if (p > 0.5 && a.forms){
+        var stage = 1;
+        if (a.status === "working" || a.status === "thinking"){
+          stage = Math.min(4, 1 + Math.floor((a.progress || 0) / 25));
+        }
+        for (var fi = stage - 1; fi >= 0; fi--){
+          if (a.forms[fi]){ spr = a.forms[fi]; formN = fi + 1; break; }
+        }
+        if (!formN){
+          for (var fj = stage; fj < 4; fj++){
+            if (a.forms[fj]){ spr = a.forms[fj]; formN = fj + 1; break; }
+          }
+        }
+      }
+      var ih = 56 + formN * 2;
       var iw = ih * (spr.width / spr.height || 0.6);
       var wasSmooth = ctx.imageSmoothingEnabled;
       ctx.imageSmoothingEnabled = false;
@@ -510,6 +528,17 @@ var World = (function(){
     ctx.beginPath(); ctx.arc(0, y - 42, 3.2 * pulse, 0, 6.29);
     ctx.fillStyle = sc; ctx.fill();
     ctx.strokeStyle = "rgba(255,255,255,.5)"; ctx.lineWidth = 0.8; ctx.stroke();
+    // form badge: which Super Saiyan stage of learning they're at
+    if (formN){
+      var ftxt = "SSJ" + formN + (formN === 4 ? " ★" : "");
+      ctx.font = "700 8.5px 'IBM Plex Mono', monospace";
+      var ftw = ctx.measureText(ftxt).width;
+      ctx.fillStyle = "rgba(36,21,5,.85)";
+      ctx.beginPath(); ctx.roundRect(-ftw/2 - 4, y - 58, ftw + 8, 12, 6); ctx.fill();
+      ctx.fillStyle = "#FFD84A";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(ftxt, 0, y - 52);
+    }
 
     // name pill + character emblem badge (the old-sprite identifiers)
     var label = a.name + (a.auto ? " ⏰" : "");
@@ -573,8 +602,15 @@ var World = (function(){
           }
         }
       }
-    } else if (f.stage === "visit" && now > f.visitUntil){
-      f.stage = "home"; f.t0 = now; f.fx = a.x; f.fy = a.y; f.txx = a.hx; f.tyy = a.hy;
+    } else if (f.stage === "visit"){
+      if (f.research){
+        // studying: progress climbs across the visit, driving the SSJ ladder
+        var vp = 1 - Math.max(0, (f.visitUntil - now) / f.visitMs);
+        a.progress = Math.min(100, Math.round(vp * 100));
+      }
+      if (now > f.visitUntil){
+        f.stage = "home"; f.t0 = now; f.fx = a.x; f.fy = a.y; f.txx = a.hx; f.tyy = a.hy;
+      }
     }
   }
 

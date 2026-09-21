@@ -39,6 +39,13 @@ h1{font-weight:800;font-size:clamp(26px,5vw,38px);margin:0 0 6px;letter-spacing:
 #cmdresult .alt{display:inline-block;margin:6px 6px 0 0;border:1px solid #35406B;border-radius:999px;background:#141B33;color:#C8D0E8;font:700 11px "IBM Plex Mono",ui-monospace,monospace;padding:5px 10px;cursor:pointer}
 #cmdresult .alt:hover{border-color:var(--gold)}
 #cmdresult a.golink{color:#241505;background:var(--gold);border-radius:7px;padding:7px 13px;font:800 12.5px "Archivo",system-ui,sans-serif;text-decoration:none;display:inline-block;margin-top:8px}
+#cmdresult button.golink{color:#241505;background:var(--gold);border:none;border-radius:7px;padding:8px 13px;font:800 12.5px "Archivo",system-ui,sans-serif;cursor:pointer;display:inline-block;margin:8px 8px 0 0}
+#cmdreply{
+  margin-top:12px;background:#141B33;border:1px solid #35406B;border-left:4px solid var(--gold);
+  border-radius:8px;padding:12px 14px;font-size:13.5px;line-height:1.6;color:#E8ECF6;
+}
+#cmdreply b{color:var(--gold);font-family:"IBM Plex Mono",ui-monospace,monospace}
+#cmdreply #replytext{white-space:pre-wrap;margin-top:4px}
 .roster{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
 .chip{
   border:2px solid var(--chue,#555);border-radius:999px;background:#232C4C;
@@ -134,6 +141,7 @@ footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",
       <button type="submit" class="cmdgo">DISPATCH</button>
     </form>
     <div id="cmdresult" hidden></div>
+    <div id="cmdreply" hidden></div>
   </div>
 </header>
 
@@ -666,14 +674,43 @@ function routeCommand(text){
   return scores;
 }
 var cmdform = document.getElementById("cmdform"), cmdinput = document.getElementById("cmdinput"), cmdresult = document.getElementById("cmdresult");
+var samplePromise = (window.claude && window.claude.use) ? window.claude.use("sample") : Promise.resolve(null);
+
+function askAgent(a, text){
+  var reply = document.getElementById("cmdreply");
+  reply.hidden = false;
+  reply.innerHTML = '<b>' + a.emoji + ' ' + a.cname + '</b><div id="replytext">…powering up…</div>';
+  a.powerUntil = performance.now() + 25000;
+  samplePromise.then(function(s){
+    var el = document.getElementById("replytext");
+    if (!el) return;
+    if (!s){
+      el.textContent = "In-page answers run on the claude.ai version of this board (the desktop icon opens it). On this copy, use “Open full session” instead.";
+      return;
+    }
+    var prompt = "You are " + a.cname + " (" + a.id + "), one of Antidote's AI agents. Your job: " + a.role +
+      " Key duties: " + a.duties.join("; ") + ". Answer Antidote's request below — in character but genuinely useful, specific, and concise (under 250 words). " +
+      "You have no live tools in this quick reply: if the request needs real data or file work (Drive docs, YouTube stats, web research, builds), give your best immediate take, then say to hit “Open full session” for the real run. Never invent numbers or facts. REQUEST: " + text;
+    s(prompt, {onText: function(ev){ var t = document.getElementById("replytext"); if (t) t.textContent = ev.text; }})
+      .then(function(res){ var t = document.getElementById("replytext"); if (t) t.textContent = res.text; })
+      .catch(function(err){
+        var t = document.getElementById("replytext"); if (!t) return;
+        t.textContent = (err && err.text) ? err.text + "\n\n[cut off — open the full session to finish]"
+          : "Couldn't answer here (" + ((err && err.code) || "error") + "). Use “Open full session”.";
+      });
+  });
+}
+
 function fireAgent(a, text){
   a.powerUntil = performance.now() + 8000;
   var full = "Use the " + a.id + " agent: " + text;
   var url = "https://claude.ai/new?q=" + encodeURIComponent(full);
   cmdresult.hidden = false;
   cmdresult.innerHTML = '🔥 <span class="picked">' + a.cname + '</span> powered up for this. ' +
-    '<a class="golink" target="_blank" rel="noopener" href="' + url + '">Send it to Claude →</a> ' +
+    '<div><button type="button" class="golink" id="askbtn">⚡ Answer right here</button>' +
+    '<a class="golink" target="_blank" rel="noopener" href="' + url + '">Open full session →</a></div>' +
     '<div style="margin-top:6px;color:#9AA3BF;font-size:11.5px">Not the right fighter? Tap one:</div><div id="altrow"></div>';
+  document.getElementById("askbtn").addEventListener("click", function(){ askAgent(a, text); });
   var altrow = document.getElementById("altrow");
   AGENTS.slice().sort(function(x,y){ return (x===a)-(y===a); }).forEach(function(o){
     if (o === a) return;
@@ -682,7 +719,6 @@ function fireAgent(a, text){
     b.addEventListener("click", function(){ fireAgent(o, text); });
     altrow.appendChild(b);
   });
-  try { window.open(url, "_blank", "noopener"); } catch(e){}
 }
 cmdform.addEventListener("submit", function(e){
   e.preventDefault();

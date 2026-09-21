@@ -4,158 +4,80 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Antidote Agent Floor</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap">
-<style>
-:root{ --sky:#1B2440; --ink:#F2EFE6; --card:#FFF8F0; --cink:#241505; --dim:#9AA3BF; --gold:#FFC93C; }
-*{box-sizing:border-box}
-body{
-  background:linear-gradient(180deg,#141B33 0%, #1B2440 45%, #2A3558 100%);
-  color:var(--ink);
-  font-family:"Archivo",system-ui,-apple-system,sans-serif;
-  margin:0;padding-inline:16px;padding-block:0 46px;min-height:100%;
-}
-.wrap{max-width:1040px;margin:0 auto}
-header{padding-block:26px 6px}
-.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:0 0 6px;font-weight:700}
-h1{font-weight:800;font-size:clamp(26px,5vw,38px);margin:0 0 6px;letter-spacing:-.01em;color:#FFF}
-.lede{color:var(--dim);max-width:64ch;margin:0;font-size:14.5px}
-.legend{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;color:var(--dim);margin-top:10px}
-.legend b{color:var(--gold)}
-#stage{display:block;width:100%;height:auto;margin-top:8px;touch-action:manipulation;cursor:pointer}
-.cmdbar{margin-top:16px;background:#232C4C;border:1.5px solid var(--gold);border-radius:12px;padding:12px 14px}
-.cmdlabel{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 8px}
-#cmdform{display:flex;gap:8px;flex-wrap:wrap}
-#cmdinput{
-  flex:1;min-width:220px;background:#141B33;border:1px solid #35406B;border-radius:8px;
-  color:#FFF;font:500 14px "Archivo",system-ui,sans-serif;padding:10px 12px;
-}
-#cmdinput:focus{outline:2px solid var(--gold);border-color:var(--gold)}
-.cmdgo{
-  background:var(--gold);color:#241505;border:none;border-radius:8px;cursor:pointer;
-  font:800 13px "Archivo",system-ui,sans-serif;padding:10px 18px;
-}
-.cmdgo:focus-visible{outline:3px solid #FFF;outline-offset:2px}
-#cmdresult{margin-top:10px;font-size:13px;color:#E8ECF6}
-#cmdresult .picked{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:700;color:var(--gold)}
-#cmdresult .alt{display:inline-block;margin:6px 6px 0 0;border:1px solid #35406B;border-radius:999px;background:#141B33;color:#C8D0E8;font:700 11px "IBM Plex Mono",ui-monospace,monospace;padding:5px 10px;cursor:pointer}
-#cmdresult .alt:hover{border-color:var(--gold)}
-#cmdresult a.golink{color:#241505;background:var(--gold);border-radius:7px;padding:7px 13px;font:800 12.5px "Archivo",system-ui,sans-serif;text-decoration:none;display:inline-block;margin-top:8px}
-#cmdresult button.golink{color:#241505;background:var(--gold);border:none;border-radius:7px;padding:8px 13px;font:800 12.5px "Archivo",system-ui,sans-serif;cursor:pointer;display:inline-block;margin:8px 8px 0 0}
-#cmdreply{
-  margin-top:12px;background:#141B33;border:1px solid #35406B;border-left:4px solid var(--gold);
-  border-radius:8px;padding:12px 14px;font-size:13.5px;line-height:1.6;color:#E8ECF6;
-}
-#cmdreply b{color:var(--gold);font-family:"IBM Plex Mono",ui-monospace,monospace}
-#cmdreply #replytext{white-space:pre-wrap;margin-top:4px}
-.roster{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.chip{
-  border:2px solid var(--chue,#555);border-radius:999px;background:#232C4C;
-  color:#FFF;font:700 12.5px "IBM Plex Mono",ui-monospace,monospace;
-  padding:7px 13px;cursor:pointer;display:flex;align-items:center;gap:6px;
-}
-.chip:hover{background:#2E3960}
-.chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",ui-monospace,monospace}
-/* ===== backend system ===== */
-.backend{margin-top:56px}
-.backend h2{font-weight:800;font-size:clamp(22px,4vw,30px);margin:0 0 4px;color:#FFF}
-.backend .sub{color:var(--dim);font-size:14px;margin:0 0 4px;max-width:66ch}
-.backend .tag{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;color:var(--gold);font-weight:700;margin:0 0 18px}
-.begrid{display:grid;grid-template-columns:220px 1fr 220px;gap:14px}
-@media (max-width:900px){.begrid{grid-template-columns:1fr}}
-.becol-h{
-  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.14em;
-  text-transform:uppercase;font-weight:700;margin:0 0 10px;
-}
-.becard{
-  background:#232C4C;border:1px solid #35406B;border-radius:10px;
-  padding:10px 12px;margin-bottom:10px;
-}
-.becard b{display:flex;align-items:center;gap:7px;font-size:13px;color:#FFF}
-.becard p{margin:3px 0 0;font-size:11.5px;color:var(--dim);line-height:1.45}
-.becore{
-  background:linear-gradient(135deg,#173B2E,#1B2440);border:1.5px solid #37E0A5;border-radius:12px;
-  padding:14px 16px;margin-bottom:14px;
-}
-.becore b{font-size:15px;color:#7FF2C8;display:block;margin-bottom:4px}
-.becore .checks{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11.5px;color:#B8E8D4;font-family:"IBM Plex Mono",ui-monospace,monospace}
-.balls{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:14px}
-@media (max-width:900px){.balls{grid-template-columns:repeat(2,1fr)}}
-.ball{
-  background:#232C4C;border:1px solid #35406B;border-radius:10px;padding:10px 8px;text-align:center;
-}
-.orb{
-  width:44px;height:44px;border-radius:50%;margin:0 auto 6px;
-  background:radial-gradient(circle at 32% 28%, #FFD98A 0%, #FFB23E 40%, #E8681A 100%);
-  box-shadow:0 0 10px rgba(255,178,62,.45);
-  display:flex;align-items:center;justify-content:center;
-  color:#C62828;font-size:11px;letter-spacing:-1px;line-height:1;
-}
-.ball b{display:block;font-size:11px;color:#FFF;font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.04em;margin-bottom:4px}
-.ball ul{margin:0;padding:0;list-style:none;font-size:10px;color:var(--dim);line-height:1.5}
-.belayer{
-  border-radius:10px;padding:11px 14px;margin-bottom:10px;font-size:12px;color:#E8ECF6;
-  border:1px solid #35406B;background:#1E2745;
-}
-.belayer b{color:var(--gold);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em}
-.belayer span{color:var(--dim);font-size:11.5px}
-.bepower{
-  background:linear-gradient(135deg,#3B2A10,#1B2440);border:1.5px solid var(--gold);border-radius:10px;
-  padding:10px 12px;margin-bottom:10px;text-align:center;
-  font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:700;color:var(--gold);font-size:12.5px;
-}
-.bestrip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
-@media (max-width:900px){.bestrip{grid-template-columns:repeat(2,1fr)}}
-.bestrip .becard{margin:0}
-.panel-backdrop{position:fixed;inset:0;background:rgba(8,11,24,.66);display:none;align-items:flex-end;justify-content:center;z-index:50}
-.panel-backdrop.open{display:flex}
-.panel{
-  background:var(--card);border-radius:18px 18px 0 0;max-width:640px;width:100%;
-  max-height:82vh;overflow-y:auto;padding:22px 20px calc(24px + env(safe-area-inset-bottom,0px));
-  border-top:5px solid var(--phue,var(--gold));color:var(--cink);
-}
-.panel h2{margin:0 0 2px;font-size:22px;font-weight:800;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.panel h2 small{font-size:12px;color:#8A6D1F;font-family:"IBM Plex Mono",ui-monospace,monospace}
-.panel .where{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--phue);margin:0 0 12px;font-weight:700}
-.panel p{color:#6E5540;font-size:14.5px;margin:0 0 14px}
-.panel h3{font-size:12.5px;margin:14px 0 6px;font-family:"IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}
-.duties{margin:0 0 6px;padding-left:18px;color:#6E5540;font-size:13.5px}
-.duties li{margin-bottom:4px}
-.dispatch{background:#F1E4D3;border-radius:9px;padding:12px 14px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 12px;color:#241505}
-.btnrow{display:flex;gap:10px;flex-wrap:wrap}
-.btn{border:2px solid #241505;border-radius:9px;background:var(--card);color:#241505;font:800 13px "Archivo",system-ui,sans-serif;padding:9px 16px;cursor:pointer;text-decoration:none;display:inline-block}
-.btn.primary{background:#241505;color:#FFE9A8}
-.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-</style>
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/world.css">
+<link rel="stylesheet" href="css/agents.css">
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/mobile.css">
 
 <div class="wrap">
 <header>
-  <p class="eyebrow">Antidote AI OS · Saiyan Squad</p>
+  <p class="eyebrow">Antidote AI OS · Headquarters</p>
   <h1>The Agent Floor</h1>
-  <p class="lede">Eighteen fighters, eighteen jobs — with the boss himself on the floor. On standby they walk their stations in base form — when a task hits, they power up and the aura comes out. Tap any fighter to see the job, speak or type on the board, and the right one takes it.</p>
-  <p class="legend">BASE FORM = standby · <b>GOLD AURA = handling a task</b> · ⏰ = runs automatically on a schedule</p>
+  <p class="lede">Antidote commands a living AI workforce: eighteen agents across seven departments. Speak or type a mission on the Command Board — it routes through GOKU to the right specialist, the floor lights up, and the result comes back to the Commander. Drag to pan, pinch or use the buttons to zoom.</p>
 
   <div class="cmdbar">
     <p class="cmdlabel">⚡ COMMAND BOARD — say it, and the right fighter takes it</p>
     <form id="cmdform">
-      <input id="cmdinput" type="text" autocomplete="off" placeholder='e.g. "find me 20 restaurant leads in LA" or "why did my views drop?"' aria-label="Command for the agent squad">
-      <button type="button" class="cmdgo" id="micbtn" hidden title="Speak your command">🎤</button>
-      <button type="button" class="cmdgo" id="soundbtn" title="Charge-up sound">🔇</button>
+      <input id="cmdinput" type="text" autocomplete="off" placeholder='e.g. "find me 20 restaurant leads in Los Angeles" — or @GOTEN write me a caption' aria-label="Command for the agent squad">
+      <button type="button" class="cmdgo" id="micbtn" hidden title="Speak your command" aria-label="Speak your command">🎤</button>
+      <button type="button" class="cmdgo" id="soundbtn" title="Charge-up sound" aria-label="Toggle charge-up sound">🔇</button>
       <button type="submit" class="cmdgo">DISPATCH</button>
     </form>
     <div id="cmdresult" hidden></div>
     <div id="cmdreply" hidden></div>
   </div>
+
+  <div class="mission" role="status" aria-label="Mission control counters">
+    <div class="mstat"><b id="st-active">0</b><span>Active agents</span></div>
+    <div class="mstat"><b id="st-running">0</b><span>Missions running</span></div>
+    <div class="mstat"><b id="st-missions">0</b><span>Sim missions today</span></div>
+    <div class="mstat"><b id="st-routed">0</b><span>Commands routed</span></div>
+    <div class="mstat"><b id="st-autos">3 LIVE</b><span>Automations</span></div>
+  </div>
 </header>
 
-<canvas id="stage" width="1040" height="660" aria-label="Map of the Antidote Saiyan agent squad. Use the badges below to open each agent."></canvas>
+<div class="maingrid">
+  <div>
+    <div class="worldbox">
+      <canvas id="stage" width="1180" height="760" aria-label="Isometric map of the Antidote agent headquarters. Use the badges below the map to open each agent."></canvas>
+      <div class="zoomctl">
+        <button id="zin" aria-label="Zoom in">+</button>
+        <button id="zout" aria-label="Zoom out">−</button>
+        <button id="zreset" aria-label="Reset view">⌂</button>
+      </div>
+    </div>
+    <p class="legend">STATUS:
+      <span class="sdot" style="background:#7C8AA6"></span>idle
+      <span class="sdot" style="background:#37D6E0"></span>working
+      <span class="sdot" style="background:#A98BE8"></span>thinking
+      <span class="sdot" style="background:#E9B84F"></span>waiting
+      <span class="sdot" style="background:#37E065"></span>complete
+      <span class="sdot" style="background:#E8863A"></span>delegating
+      <span class="sdot" style="background:#E5504A"></span>error
+      · <b>GOLD AURA = powered up</b> · ⏰ = auto-runs on a schedule
+    </p>
+    <div class="roster" id="roster" aria-label="Agent roster"></div>
+  </div>
 
-<div class="roster" id="roster"></div>
+  <div class="sidecol">
+    <div class="sidebox">
+      <details open>
+        <summary><h3 style="display:inline">📡 Live Activity</h3></summary>
+        <ul id="feedlist"></ul>
+      </details>
+    </div>
+    <div class="sidebox">
+      <h3>📥 Mission Results</h3>
+      <div id="results"><p style="color:var(--dim);font-size:12px;margin:0">Dispatch a command — the routed mission lands here with the real run buttons.</p></div>
+    </div>
+  </div>
+</div>
 
 <section class="backend">
   <h2>The Backend System</h2>
   <p class="sub">How Second Shift AI runs a client's whole business — construction companies, agencies, restaurants, multi-location operations. Every process connected, every workflow automated, one intelligent system.</p>
   <p class="tag">YOU BECOME THE INFRASTRUCTURE THEY RUN ON.</p>
-
   <div class="begrid">
     <div>
       <p class="becol-h" style="color:#4FB8D9">📡 Scouter Signals — everything coming in</p>
@@ -166,13 +88,11 @@ footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",
       <div class="becard"><b>📄 Documents</b><p>Plans, contracts, permits, photos</p></div>
       <div class="becard"><b>💵 Payments</b><p>Invoices, deposits, expenses</p></div>
     </div>
-
     <div>
       <div class="becore">
         <b>🐉 SHENRON CORE — Claude AI, the brain of the business</b>
         <div class="checks"><span>✓ understands everything</span><span>✓ makes smart decisions</span><span>✓ automates workflows</span><span>✓ grants the wish: time back</span></div>
       </div>
-
       <div class="balls">
         <div class="ball"><div class="orb">★</div><b>CRM</b><ul><li>Lead tracking</li><li>Client profiles</li><li>Pipeline stages</li><li>Lead scoring</li></ul></div>
         <div class="ball"><div class="orb">★★</div><b>SCHEDULE</b><ul><li>Job scheduling</li><li>Team calendars</li><li>Auto reminders</li></ul></div>
@@ -182,12 +102,10 @@ footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",
         <div class="ball"><div class="orb">★★★★★★</div><b>INVOICING</b><ul><li>Auto invoices</li><li>Payment links</li><li>Late reminders</li></ul></div>
         <div class="ball"><div class="orb">★★★★★★★</div><b>REPORTS</b><ul><li>Sales reports</li><li>Job profit</li><li>Cash flow</li></ul></div>
       </div>
-
       <div class="belayer"><b>🏯 CAPSULE VAULT</b> · <span>Centralized smart database — all data connected, always up to date, always accessible.</span></div>
       <div class="belayer"><b>⚡ INSTANT TRANSMISSION LAYER</b> · <span>Claude triggers actions, sends messages, updates records, assigns tasks, keeps everything moving.</span></div>
       <div class="belayer"><b>🌀 FUSION CHAMBER</b> · <span>Fuses with the tools they already use: Gmail, Google Calendar, Slack, QuickBooks, Stripe + more.</span></div>
     </div>
-
     <div>
       <p class="becol-h" style="color:var(--gold)">📈 Power Levels — what the client feels</p>
       <div class="bepower">POWER LEVEL: OVER 9,000</div>
@@ -199,7 +117,6 @@ footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",
       <div class="becard"><b>🚀 Business Growth</b><p>Insights and automation drive real growth</p></div>
     </div>
   </div>
-
   <div class="bestrip">
     <div class="becard"><b>✅ Fully Automated</b><p>The backend handles itself so they run the business</p></div>
     <div class="becard"><b>🧠 AI-Powered</b><p>Smarter decisions, less manual work</p></div>
@@ -208,748 +125,17 @@ footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",
   </div>
 </section>
 
-<footer>ANTIDOTE HQ · agents defined in antidotethecure.github.io/.claude/agents · memory in Drive "Claude Projects — Antidote HQ" · fan-style tribute for Antidote's own dashboard</footer>
+<footer>ANTIDOTE HQ · agents in antidotethecure.github.io/.claude/agents · memory in Drive "Claude Projects — Antidote HQ" · drop transparent PNGs in /assets/characters/ to replace any fighter · fan-style tribute for Antidote's own dashboard</footer>
 </div>
 
 <div class="panel-backdrop" id="backdrop" role="dialog" aria-modal="true">
   <div class="panel" id="panel"></div>
 </div>
 
-<script>
-"use strict";
-// char: hair "spiky"/"bald"/"antennae"/"tentacle"/"afro"/"bob"/"long", hairC base color, saiyan => gold SSJ hair, gi/pants outfit
-var ROOMS = [
- {name:"SERVER ROOM", hue:"#37E0A5", pos:[0,0], agents:[
-   {id:"memory-keeper", cname:"GOKU", emoji:"🧠", char:{hair:"goku",hairC:"#171A1E",saiyan:true,gi:"#F28C28",pants:"#F28C28",skin:"#F4C99B",cuff:"#2B4C9B",belt:"#2B4C9B",boot:"#24407E"},
-    role:"Goku holds the whole system's memory — reads and updates every project memory doc, tags sessions, keeps all 11 projects honest.",
-    duties:["Briefs sessions from memory at start","Updates the docs at end","Housekeeps tags and the master list"],
-    dispatch:"Use the memory-keeper agent: [e.g., update the agency memory doc with today's work]"},
-   {id:"antidote-brand", cname:"ANTIDOTE", emoji:"💊", char:{hair:"hat",hairC:"#1E2126",saiyan:true,freckles:true,gi:"#23272E",pants:"#3E5A8A",skin:"#A9703F"},
-    role:"The boss himself. Everything carrying the Antidote name runs through him: the music (tracks, drops, releases), The Antidote movie's marketing and premiere plan, and the real Antidote Instagram.",
-    duties:["Music: tracks, metadata, drops, release plans","The movie's marketing, trailers, premiere strategy","Runs the real Antidote Instagram — nothing posts without his sign-off","Final word on anything carrying the name"],
-    dispatch:"Use the antidote-brand agent: [e.g., plan the drop for my next track and the IG rollout around it]"}]},
- {name:"THE STUDIO", hue:"#E5675F", pos:[90,1], agents:[
-   {id:"director", cname:"PICCOLO", emoji:"🎬", char:{hair:"antennae",turban:true,hairC:"#3E7D4E",saiyan:false,gi:"#5B3FA8",pants:"#5B3FA8",skin:"#8FBF6A",belt:"#B3261E",boot:"#8A6D3F"},
-    role:"Piccolo directs The Antidote — the mentor's eye on acts, scenes, beats, narration, and footage plans.",
-    duties:["Keeps the living scene outline current","Punches up narration, challenges weak scenes","Maps footage to beats, flags gaps"],
-    dispatch:"Use the director agent: [e.g., break Act I into beats against the footage inventory]"},
-   {id:"spiritual-scribe", cname:"DENDE", emoji:"🕯️", char:{hair:"antennae",hairC:"#4E9E5F",saiyan:false,gi:"#F4F0E4",pants:"#8A4FBF",skin:"#9ED07C"},
-    role:"Dende keeps the spiritual side — deep talks, life analysis, and the ideas born from them.",
-    duties:["Logs big ideas to RUNNING THEMES","Turns talks into writings and concepts","Feeds the movie's spiritual arc"],
-    dispatch:"Use the spiritual-scribe agent: let's talk through [what's on my mind] and capture the themes"}]},
- {name:"CONTENT LAB", hue:"#A98BE8", pos:[30,1], agents:[
-   {id:"content-machine", cname:"GOHAN", emoji:"⚡", char:{hair:"gohan",hairC:"#171A1E",saiyan:true,gi:"#6B3FA0",pants:"#F28C28",skin:"#F4C99B"},
-    role:"Gohan runs the YouTube side and every channel — content plans, the GTA lane, posting automation. Hidden power, biggest reach.",
-    duties:["Every idea leaves with a hook, format, platform","Runs the GTA lane as its own channel","Automates posting pipelines"],
-    dispatch:"Use the content-machine agent: [e.g., plan this week's GTA clip drops across all three platforms]"},
-   {id:"copywriter", cname:"GOTEN", emoji:"✍️", char:{hair:"goten",hairC:"#171A1E",saiyan:true,gi:"#3EA6D8",pants:"#F4F0E4",skin:"#F4C99B"},
-    role:"Goten writes everything in the Antidote voice — hooks, captions, scripts, DMs, emails. Quick and natural.",
-    duties:["Hook first, always","One job per piece of copy","Compliance baked in — no fake promises"],
-    dispatch:"Use the copywriter agent: write [what you need] for [which brand]"},
-   {id:"content-scout", cname:"BARDOCK", emoji:"🛰️", auto:true, char:{hair:"bardock",hairC:"#171A1E",saiyan:true,gi:"#2E3138",pants:"#274A2E",skin:"#E8B98A"},
-    role:"Bardock sees what's coming — daily GTA 6 trend sweeps plus scans of your own videos for unchopped clip moments.",
-    duties:["Runs automatically every morning at 9:00 AM PT","Top 5 GTA 6 short-form plays daily, with sources","Flags your videos not yet cut into shorts","Logs to CONTENT SCOUT — Daily Finds in Drive"],
-    dispatch:"Use the content-scout agent: run a sweep right now — today's GTA 6 trends plus my unchopped clips"}]},
- {name:"MARKETING FLOOR", hue:"#E06A9C", pos:[150,1], agents:[
-   {id:"campaign-strategist", cname:"TRUNKS", emoji:"🎯", char:{hair:"bob",hairC:"#C4A6E8",saiyan:true,gi:"#3B3F8F",pants:"#8A8F98",skin:"#F4C99B",boot:"#8A6D3F"},
-    role:"Trunks runs the marketing side — the AI marketing department: positioning, offers, campaign plans with numbers and dates. Purple hair on standby, gold when the campaign drops.",
-    duties:["Every campaign gets a measurable goal","Routes work through department roles","Turns winners into templates"],
-    dispatch:"Use the campaign-strategist agent: build a campaign for [brand/goal — e.g., the first Woke Dope drop]"}]},
- {name:"AGENCY OFFICE", hue:"#4FB8D9", pos:[210,1], agents:[
-   {id:"drop-kit-builder", cname:"KRILLIN", emoji:"🌙", char:{hair:"bald",hairC:"#F4C99B",saiyan:false,gi:"#F28C28",pants:"#F28C28",skin:"#F4C99B"},
-    role:"Krillin, the dependable one, builds every client's Drop Kit: site + menu, promos, auto email, AI phone agent, crypto checkout.",
-    duties:["Seven-piece package from one intake","Every build strengthens the templates","Cute in the Kitchen is the base"],
-    dispatch:"Use the drop-kit-builder agent: build the Drop Kit for [client] — intake: [name, menu, photos, colors]"},
-   {id:"lead-hunter", cname:"TIEN", emoji:"🔎", char:{hair:"bald",hairC:"#F4C99B",saiyan:false,gi:"#3E8F4E",pants:"#3E8F4E",skin:"#F4C99B"},
-    role:"Tien's third eye finds businesses with visible gaps — real names, real contacts, scored hot/warm/cold.",
-    duties:["Name + contact + reason, verified","Scores every lead","Hands outreach copy to Goten"],
-    dispatch:"Use the lead-hunter agent: find [N] [type of business] leads in [area] for Second Shift AI"},
-   {id:"restaurant-researcher", cname:"MAJIN BUU", emoji:"🍽️", char:{hair:"tentacle",hairC:"#F2A0C4",saiyan:false,gi:"#F2A0C4",pants:"#F4F0E4",skin:"#F2A0C4",belt:"#E8C84A"},
-    role:"Nobody knows food like Buu — keeps the full restaurant offer current: food-review spotlight, digital menus, AI phone + email, crypto pay, weekly retention, loyalty game + raffles.",
-    duties:["2-3 real vendor options per piece, priced and dated","Weekly customer retention engine (opt-in only)","Loyalty mini-game + raffles with sweepstakes compliance","Packages it into sellable tiers"],
-    dispatch:"Use the restaurant-researcher agent: [e.g., price out the full restaurant stack and package it into three tiers]"},
-   {id:"business-builder", cname:"BULMA", emoji:"🏛️", char:{hair:"bob",hairC:"#5FC8D8",saiyan:false,gi:"#E8425E",pants:"#F4F0E4",skin:"#F4C99B"},
-    role:"Bulma builds companies like Capsule Corp — give her a name and she renders the whole business: LLC, EIN, address, phone, domain, email, site, bank, and the credit ladder to funding.",
-    duties:["Full formation intake — asks every right question","Scouts address, phone, domain, email with current prices","Bank fit: Navy Federal (if military-affiliated), Mercury/Relay/Novo, Chase","Funding path: EIN → bank → DUNS → net-30s → business credit"],
-    dispatch:"Use the business-builder agent: build out [business name] — it does [what it sells], forming in [state]"}]},
- {name:"BACK OFFICE", hue:"#E9B84F", pos:[270,1], agents:[
-   {id:"tax-researcher", cname:"VEGETA", emoji:"📋", char:{hair:"vegeta",hairC:"#171A1E",saiyan:true,gi:"#F4F0E4",pants:"#2743B5",skin:"#F4C99B",cuff:"#F4F6F8",boot:"#F4F6F8"},
-    role:"Vegeta runs the taxes side — proud, precise, and never wrong twice. Looks up real IRS/state rules with publication numbers cited. Never from memory.",
-    duties:["Cites source + number + tax year","Logs every verified rule once","Keeps deadlines current"],
-    dispatch:"Use the tax-researcher agent: [your tax question] — cite the sources"},
-   {id:"tax-intake", cname:"ANDROID 18", emoji:"🗂️", char:{hair:"bob",part:"side",hairC:"#E8D48A",saiyan:false,gi:"#2E3138",pants:"#4A5568",skin:"#F4D8B8"},
-    role:"18 handles the money paperwork intake — the full preparer questionnaire, and the exact IRS page for every missing document.",
-    duties:["Full intake: identity, status, dependents, income, credits","IRS Get Transcript / Form 4506-T paths for missing years","Notice-number lookups for IRS letters","Flags what's missing before anything gets filed"],
-    dispatch:"Use the tax-intake agent: run intake for [name] — here's their situation: [what you know]"},
-   {id:"market-watcher", cname:"HIT", emoji:"📡", auto:true, char:{hair:"bald",hairC:"#8A8FA8",saiyan:false,gi:"#5A4FA8",pants:"#3A3F58",skin:"#B8BDD8"},
-    role:"Hit is all timing — daily trading lessons (swing highs/lows, structure, volume), weekday pre-market briefs pushed to your phone, market chatter watch. Alerts and paper trades only.",
-    duties:["Pre-market brief every weekday at 6:00 AM PT, push + email","One trading technique learned daily into the TRADING PLAYBOOK","Watches volume moves and X/Twitter chatter","Never places a real trade"],
-    dispatch:"Use the market-watcher agent: [e.g., what's the market doing right now and which playbook setup does it match?]"},
-   {id:"supplier-scout", cname:"YAJIROBE", emoji:"📦", char:{hair:"long",hairC:"#171A1E",saiyan:false,gi:"#C9683E",pants:"#8A5A38",skin:"#F4C99B"},
-    role:"Yajirobe always has the supplies — finds and vets suppliers with three quotes, real landed costs, honest math.",
-    duties:["Find pass, then verify pass — always","Unvetted means no money moves","Logs everything in the master list"],
-    dispatch:"Use the supplier-scout agent: find and vet suppliers for [product]"}]},
- {name:"THE SHOP", hue:"#E99A50", pos:[330,1], agents:[
-   {id:"site-builder", cname:"ANDROID 17", emoji:"🧱", char:{hair:"long",hairC:"#171A1E",saiyan:false,gi:"#2E3138",pants:"#3E6FA8",skin:"#F4D8B8"},
-    role:"17 builds Antidote's own websites — mobile-first, fast, one job per page.",
-    duties:["Main site, Foodie, clothing pages","Every page: lead, call, or sale","Coordinates with Hercule on the store"],
-    dispatch:"Use the site-builder agent: [e.g., build the Woke Dope store page connected to Shopify]"},
-   {id:"store-manager", cname:"HERCULE", emoji:"🛍️", char:{hair:"afro",hairC:"#4A3628",saiyan:false,gi:"#F4F0E4",pants:"#8A5A38",skin:"#E8B98A"},
-    role:"Hercule sells the merch — Shopify products, collections, inventory, buy-button wiring. The champ of the register.",
-    duties:["Checks before creating — no duplicates","Keeps the clothing lines organized","Hunts for automation"],
-    dispatch:"Use the store-manager agent: [e.g., audit the store and set up the two clothing collections]"}]}
-];
-
-var K = 0.55, HEX = 118, RING = 258, W = 1040, H = 660, CX = W/2, CY = H/2 + 14;
-var canvas = document.getElementById("stage"), ctx = canvas.getContext("2d");
-var DPR = Math.min(window.devicePixelRatio || 1, 2);
-canvas.width = W * DPR; canvas.height = H * DPR; ctx.scale(DPR, DPR);
-canvas.style.aspectRatio = W + "/" + H;
-var REDUCED = false;
-try { REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch(e){}
-
-var AGENTS = [];
-ROOMS.forEach(function(r){
-  var ang = r.pos[0] * Math.PI/180, ring = r.pos[1];
-  r.wx = CX + (ring ? RING * Math.cos(ang) : 0);
-  r.wy = CY + (ring ? RING * Math.sin(ang) * K : 0);
-  r.agents.forEach(function(a, i){
-    a.room = r; a.li = i % 2;
-    var n = r.agents.length;
-    a.hx = r.wx + (i - (n-1)/2) * 58;
-    a.hy = r.wy + 30;
-    a.x = a.hx; a.y = a.hy; a.tx = a.hx; a.ty = a.hy;
-    a.phase = Math.random() * 6.28;
-    a.power = 0; a.powerUntil = 0; a.panelOpen = false; a.fly = null;
-    a.sx = 0; a.sy = 0;
-    AGENTS.push(a);
-  });
-});
-
-function hexPts(cx, cy, s){
-  var p = [];
-  for (var i = 0; i < 6; i++){
-    var a = Math.PI/180 * (60*i);
-    p.push([cx + s*Math.cos(a), cy + s*Math.sin(a)*K]);
-  }
-  return p;
-}
-function tracePoly(p){
-  ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]);
-  for (var i = 1; i < p.length; i++) ctx.lineTo(p[i][0], p[i][1]);
-  ctx.closePath();
-}
-function shade(hex, f){
-  var n = parseInt(hex.slice(1), 16), r = n>>16, g = (n>>8)&255, b = n&255;
-  return "rgb(" + Math.round(r*f) + "," + Math.round(g*f) + "," + Math.round(b*f) + ")";
-}
-
-function drawPlatform(r){
-  var top = hexPts(r.wx, r.wy, HEX), d = 22;
-  for (var i = 0; i < 6; i++){
-    var a = top[i], b = top[(i+1)%6];
-    if ((a[1] + b[1]) / 2 >= r.wy){
-      ctx.beginPath();
-      ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
-      ctx.lineTo(b[0], b[1]+d); ctx.lineTo(a[0], a[1]+d);
-      ctx.closePath();
-      ctx.fillStyle = "#2A3352"; ctx.fill();
-    }
-  }
-  tracePoly(top);
-  ctx.fillStyle = "#3A4468"; ctx.fill();
-  ctx.strokeStyle = r.hue; ctx.lineWidth = 3; ctx.stroke();
-  tracePoly(hexPts(r.wx, r.wy, HEX-10));
-  ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.lineWidth = 1; ctx.stroke();
-}
-
-function drawRoomLabel(r){
-  ctx.font = "700 11px 'IBM Plex Mono', monospace";
-  var tw = ctx.measureText(r.name).width;
-  var ly = r.wy - HEX*K*0.55;
-  ctx.fillStyle = "rgba(20,26,48,.9)";
-  ctx.beginPath();
-  ctx.roundRect(r.wx - tw/2 - 7, ly - 9, tw + 14, 18, 9);
-  ctx.fill();
-  ctx.strokeStyle = r.hue; ctx.lineWidth = 1.5; ctx.stroke();
-  ctx.fillStyle = r.hue;
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.fillText(r.name, r.wx, ly);
-}
-
-function drawAura(x, y, p, t, saiyan){
-  if (p <= 0.02) return;
-  var base = saiyan ? [255,201,60] : [120,200,255];
-  for (var k = 2; k >= 0; k--){
-    var flick = REDUCED ? 0 : Math.sin(t/55 + k*2.1) * 3;
-    var rx = (16 + k*6) * p, ry = (26 + k*7) * p + flick;
-    ctx.beginPath();
-    ctx.moveTo(x - rx, y);
-    ctx.quadraticCurveTo(x - rx*1.1, y - ry*0.9, x - rx*0.25, y - ry*1.15);
-    ctx.quadraticCurveTo(x, y - ry*1.45, x + rx*0.25, y - ry*1.15);
-    ctx.quadraticCurveTo(x + rx*1.1, y - ry*0.9, x + rx, y);
-    ctx.closePath();
-    ctx.fillStyle = "rgba(" + base[0] + "," + base[1] + "," + base[2] + "," + (0.16 - k*0.04) * p + ")";
-    ctx.fill();
-  }
-}
-
-// hair anchored to the scalp: a skull cap hugging the head circle, spikes growing FROM the cap edge
-var HR = 6.2; // head radius
-var HAIRSPECS = {
-  goku:   [[152,6],[128,9.5],[104,12.5],[86,10.5],[62,9],[38,6]],
-  goten:  [[150,7],[120,10.5],[92,11.5],[62,8.5],[34,5.5]],
-  gohan:  [[142,7],[114,10.5],[90,12.5],[64,8.5],[40,5.5]],
-  bardock:[[156,6],[132,10],[102,12.5],[76,9.5],[50,8.5],[26,5]],
-  vegeta: [[118,10],[104,14.5],[90,16.5],[76,14.5],[62,10]]
-};
-function scalpCap(x, hy, col, r){
-  ctx.fillStyle = col;
-  ctx.beginPath();
-  ctx.arc(x, hy, (r||HR) + 0.8, Math.PI * 1.03, -0.03);
-  ctx.closePath(); ctx.fill();
-}
-function spikeFan(x, hy, spec, col, powered){
-  scalpCap(x, hy, col);
-  ctx.fillStyle = col;
-  spec.forEach(function(s){
-    var A = s[0] * Math.PI / 180, L = s[1] * (powered ? 1.55 : 1);
-    var b1x = x + Math.cos(A + 0.34) * HR, b1y = hy - Math.sin(A + 0.34) * HR;
-    var b2x = x + Math.cos(A - 0.34) * HR, b2y = hy - Math.sin(A - 0.34) * HR;
-    var tx = x + Math.cos(A) * (HR + L), ty = hy - Math.sin(A) * (HR + L) - (powered ? 1.5 : 0);
-    ctx.beginPath(); ctx.moveTo(b1x, b1y); ctx.lineTo(tx, ty); ctx.lineTo(b2x, b2y); ctx.closePath(); ctx.fill();
-  });
-}
-function drawHair(a, x, hy, p){
-  var c = a.char, powered = p > 0.5 && c.saiyan;
-  var col = powered ? "#FFD84A" : c.hairC;
-  if (c.hair === "bald") return;
-  if (HAIRSPECS[c.hair]){
-    spikeFan(x, hy, HAIRSPECS[c.hair], col, powered);
-    if (c.hair === "goku" || c.hair === "goten"){
-      // signature forehead bangs hanging over the brow
-      ctx.fillStyle = col;
-      ctx.beginPath(); ctx.moveTo(x - 4.6, hy - 4.4); ctx.lineTo(x - 2.6, hy - 0.6); ctx.lineTo(x - 0.8, hy - 4.8); ctx.closePath(); ctx.fill();
-      ctx.beginPath(); ctx.moveTo(x - 0.6, hy - 4.8); ctx.lineTo(x + 1.6, hy - 1.2); ctx.lineTo(x + 3.6, hy - 4.6); ctx.closePath(); ctx.fill();
-    }
-    if (c.hair === "vegeta"){
-      // widow's peak dipping into the forehead
-      ctx.fillStyle = col;
-      ctx.beginPath(); ctx.moveTo(x - 2.6, hy - 4.6); ctx.lineTo(x, hy - 0.8); ctx.lineTo(x + 2.6, hy - 4.6); ctx.closePath(); ctx.fill();
-    }
-    if (c.hair === "bardock"){
-      ctx.fillStyle = "#B3261E";
-      ctx.beginPath(); ctx.roundRect(x - 6.6, hy - 2.8, 13.2, 2.6, 1.3); ctx.fill();
-    }
-    return;
-  }
-  if (c.hair === "antennae"){
-    // namekian: pointed ears + either the white turban (Piccolo) or bare antennae (Dende)
-    if (c.turban){
-      ctx.fillStyle = "#F4F0E4";
-      ctx.beginPath(); ctx.arc(x, hy - 1.2, HR + 1, Math.PI * 1.04, -0.04); ctx.closePath(); ctx.fill();
-      ctx.fillRect(x - HR - 1, hy - 2.6, (HR + 1) * 2, 2.6);
-      ctx.strokeStyle = "#C9C2B2"; ctx.lineWidth = 0.8;
-      ctx.beginPath(); ctx.moveTo(x - 3, hy - 6.8); ctx.quadraticCurveTo(x, hy - 8.4, x + 3, hy - 6.8); ctx.stroke();
-    } else {
-      ctx.strokeStyle = c.hairC; ctx.lineWidth = 1.7; ctx.lineCap = "round";
-      ctx.beginPath(); ctx.moveTo(x - 2, hy - 4.6); ctx.quadraticCurveTo(x - 5.5, hy - 10, x - 3.5, hy - 12); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x + 2, hy - 4.6); ctx.quadraticCurveTo(x + 5.5, hy - 10, x + 3.5, hy - 12); ctx.stroke();
-      ctx.lineCap = "butt";
-    }
-    ctx.fillStyle = c.skin;
-    ctx.beginPath(); ctx.moveTo(x - HR + 0.6, hy - 1.5); ctx.lineTo(x - HR - 2.6, hy + 0.5); ctx.lineTo(x - HR + 0.8, hy + 2); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(x + HR - 0.6, hy - 1.5); ctx.lineTo(x + HR + 2.6, hy + 0.5); ctx.lineTo(x + HR - 0.8, hy + 2); ctx.closePath(); ctx.fill();
-    return;
-  }
-  if (c.hair === "tentacle"){
-    ctx.strokeStyle = col; ctx.lineWidth = 4.2; ctx.lineCap = "round";
-    ctx.beginPath(); ctx.moveTo(x, hy - HR + 1.4);
-    ctx.quadraticCurveTo(x + 6, hy - HR - 7 - (powered?3:0), x + 1, hy - HR - 11 - (powered?4:0));
-    ctx.stroke(); ctx.lineCap = "butt";
-    return;
-  }
-  if (c.hair === "hat"){
-    // fitted cap sitting ON the head: dome hugging the skull, band, forward brim
-    ctx.fillStyle = c.hairC;
-    ctx.beginPath(); ctx.arc(x, hy - 0.4, HR + 0.9, Math.PI * 1.02, -0.02); ctx.closePath(); ctx.fill();
-    ctx.fillRect(x - HR - 0.9, hy - 1.6, (HR + 0.9) * 2, 2.4);
-    ctx.beginPath(); ctx.roundRect(x - HR - 4.6, hy - 0.6, 6.5, 2.2, 1.1);
-    ctx.fillStyle = shade(c.hairC, 1.5); ctx.fill();
-    ctx.beginPath(); ctx.arc(x, hy - 4.6, 1.5, 0, 6.29);
-    ctx.fillStyle = (p > 0.5) ? "#FFD84A" : "#37E0A5"; ctx.fill();
-    return;
-  }
-  if (c.hair === "afro"){
-    ctx.fillStyle = col;
-    ctx.beginPath(); ctx.arc(x, hy - 2, 8.4, Math.PI * 1.12, -0.12); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.arc(x - 6.4, hy - 1, 3.2, 0, 6.29); ctx.fill();
-    ctx.beginPath(); ctx.arc(x + 6.4, hy - 1, 3.2, 0, 6.29); ctx.fill();
-    return;
-  }
-  if (c.hair === "bob"){
-    // bowl bob hugging the head, face window open; center/side part line
-    ctx.fillStyle = col;
-    ctx.beginPath();
-    ctx.moveTo(x - HR - 0.9, hy + 3.6);
-    ctx.lineTo(x - HR - 0.9, hy - 1);
-    ctx.arc(x, hy - 0.2, HR + 0.9, Math.PI, 0);
-    ctx.lineTo(x + HR + 0.9, hy + 3.6);
-    ctx.lineTo(x + HR - 1.4, hy + 3.6);
-    ctx.lineTo(x + HR - 1.4, hy - 1.6);
-    ctx.quadraticCurveTo(x, hy - 4.6, x - HR + 1.4, hy - 1.6);
-    ctx.lineTo(x - HR + 1.4, hy + 3.6);
-    ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = shade(c.hairC, 0.72); ctx.lineWidth = 0.9;
-    var px = c.part === "side" ? x + 2.2 : x;
-    ctx.beginPath(); ctx.moveTo(px, hy - HR + 0.4); ctx.lineTo(px + 0.8, hy - 3.4); ctx.stroke();
-    if (powered){ spikeFan(x, hy, [[118,9],[92,11.5],[66,9]], "#FFD84A", true); }
-    return;
-  }
-  if (c.hair === "long"){
-    ctx.fillStyle = col;
-    ctx.beginPath();
-    ctx.moveTo(x - HR - 1.4, hy + 7);
-    ctx.quadraticCurveTo(x - HR - 2, hy - 3, x - 3, hy - HR - 1);
-    ctx.quadraticCurveTo(x, hy - HR - 1.8, x + 3, hy - HR - 1);
-    ctx.quadraticCurveTo(x + HR + 2, hy - 3, x + HR + 1.4, hy + 7);
-    ctx.lineTo(x + HR - 1.2, hy + 7);
-    ctx.lineTo(x + HR - 1.2, hy - 1.4);
-    ctx.quadraticCurveTo(x, hy - 4.4, x - HR + 1.2, hy - 1.4);
-    ctx.lineTo(x - HR + 1.2, hy + 7);
-    ctx.closePath(); ctx.fill();
-    return;
-  }
-}
-
-function drawFighter(a, t){
-  var c = a.char, p = a.power;
-  var flying = !!a.fly;
-  var moving = flying || Math.hypot(a.tx - a.x, a.ty - a.y) > 2;
-  var walk = (!REDUCED && moving && !flying) ? Math.sin(t/120 + a.phase) : 0;
-  var hover = flying ? 6 + Math.sin(t/150)*2 : 0;
-  var bob = REDUCED ? 0 : (p > 0.5 ? Math.sin(t/90 + a.phase) * 1.6 : Math.sin(t/500 + a.phase) * .7);
-  var x = a.x, y = a.y - bob - hover;
-
-  ctx.beginPath(); ctx.ellipse(x, a.y + 11, 10, 3.4, 0, 0, 6.29);
-  ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.fill();
-
-  drawAura(x, y + 9, p, t, c.saiyan);
-
-  // legs
-  ctx.fillStyle = c.pants;
-  if (flying){
-    ctx.beginPath(); ctx.roundRect(x - 5.5, y - 4, 4.6, 12, 2.2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(x + 0.9, y - 5.5, 4.6, 12, 2.2); ctx.fill();
-  } else {
-    ctx.beginPath(); ctx.roundRect(x - 5.5 + walk*2.4, y - 4, 4.6, 13, 2.2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(x + 0.9 - walk*2.4, y - 4, 4.6, 13, 2.2); ctx.fill();
-  }
-  // boots
-  ctx.fillStyle = c.boot || shade(c.pants, .6);
-  ctx.beginPath(); ctx.roundRect(x - 5.5 + (flying?0:walk*2.4), y + 6.5, 4.6, 3, 1.4); ctx.fill();
-  ctx.beginPath(); ctx.roundRect(x + 0.9 - (flying?0:walk*2.4), y + (flying?4.5:6.5), 4.6, 3, 1.4); ctx.fill();
-
-  // arms — powered stance flares arms out; optional cuffs (Goku's wristbands, Vegeta's gloves)
-  var flare = p * 4;
-  [-1, 1].forEach(function(side){
-    ctx.save();
-    ctx.translate(x + side * (8.5 + flare * 0.6), y - 18);
-    ctx.rotate(side * (0.15 + p * 0.55));
-    ctx.fillStyle = c.gi;
-    ctx.beginPath(); ctx.roundRect(-1.8, 0, 3.6, 13, 1.8); ctx.fill();
-    if (c.cuff){
-      ctx.fillStyle = c.cuff;
-      ctx.beginPath(); ctx.roundRect(-1.9, 9.6, 3.8, 3.4, 1.6); ctx.fill();
-    }
-    ctx.restore();
-  });
-
-  // torso
-  var g = ctx.createLinearGradient(x - 8, y - 21, x + 8, y);
-  g.addColorStop(0, c.gi); g.addColorStop(1, shade(c.gi, .75));
-  ctx.beginPath();
-  ctx.moveTo(x - 7.5, y - 20);
-  ctx.quadraticCurveTo(x - 8.5, y - 9, x - 5, y - 2);
-  ctx.lineTo(x + 5, y - 2);
-  ctx.quadraticCurveTo(x + 8.5, y - 9, x + 7.5, y - 20);
-  ctx.closePath();
-  ctx.fillStyle = g; ctx.fill();
-  // character outfit signatures on the torso
-  if (a.id === "memory-keeper" || a.id === "drop-kit-builder"){
-    // orange gi with the blue/undershirt V collar
-    ctx.strokeStyle = a.id === "memory-keeper" ? "#2B4C9B" : "#F4F0E4"; ctx.lineWidth = 1.6;
-    ctx.beginPath(); ctx.moveTo(x - 4.5, y - 20); ctx.lineTo(x, y - 14.5); ctx.lineTo(x + 4.5, y - 20); ctx.stroke();
-  }
-  if (a.id === "campaign-strategist"){
-    // Trunks: black tank under the jacket
-    ctx.fillStyle = "#1A1E24";
-    ctx.beginPath(); ctx.roundRect(x - 3, y - 20, 6, 15, 2); ctx.fill();
-  }
-  if (a.id === "restaurant-researcher"){
-    // Buu: purple cape shoulders + gold vest edges over the pink
-    ctx.fillStyle = "#6B3FA0";
-    ctx.beginPath(); ctx.roundRect(x - 9.5, y - 22, 19, 4.2, 2); ctx.fill();
-    ctx.fillStyle = "#E8C84A";
-    ctx.fillRect(x - 7, y - 20, 2.6, 13); ctx.fillRect(x + 4.4, y - 20, 2.6, 13);
-  }
-  if (a.id === "tax-researcher"){
-    // Vegeta: gold armor straps over the white chest
-    ctx.fillStyle = "#E8C84A";
-    ctx.fillRect(x - 4.8, y - 20.5, 2.2, 4.6); ctx.fillRect(x + 2.6, y - 20.5, 2.2, 4.6);
-  }
-  if (a.id === "market-watcher"){
-    // Hit: long coat panel lines
-    ctx.strokeStyle = shade(c.gi, 0.7); ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(x - 3.4, y - 19); ctx.lineTo(x - 3.4, y - 3); ctx.moveTo(x + 3.4, y - 19); ctx.lineTo(x + 3.4, y - 3); ctx.stroke();
-  }
-  if (a.id === "director"){
-    // Piccolo: white cape shoulders + red obi belt
-    ctx.fillStyle = "#F4F0E4";
-    ctx.beginPath(); ctx.roundRect(x - 10, y - 22.5, 20, 4.6, 2.2); ctx.fill();
-  }
-  // belt
-  ctx.fillStyle = c.belt || shade(c.pants, 1.2);
-  ctx.fillRect(x - 5.5, y - 4.5, 11, 2.4);
-
-  // head
-  var hy = y - 26;
-  ctx.beginPath(); ctx.arc(x, hy, HR, 0, 6.29);
-  ctx.fillStyle = c.skin; ctx.fill();
-  // eyes — teal when SSJ; heavy angled brows
-  ctx.fillStyle = (p > 0.5 && c.saiyan) ? "#2BB8A8" : "#1A1E24";
-  ctx.fillRect(x - 3, y - 27, 1.8, 1.8);
-  ctx.fillRect(x + 1.2, y - 27, 1.8, 1.8);
-  ctx.strokeStyle = "#1A1E24"; ctx.lineWidth = 0.9;
-  var browTilt = (a.id === "tax-researcher" || p > 0.5) ? 1.1 : 0.4;
-  ctx.beginPath(); ctx.moveTo(x - 3.6, y - 28.2); ctx.lineTo(x - 0.9, y - 28.2 + browTilt); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x + 3.6, y - 28.2); ctx.lineTo(x + 0.9, y - 28.2 + browTilt); ctx.stroke();
-  if (c.freckles){
-    ctx.fillStyle = shade(c.skin, 0.55);
-    ctx.fillRect(x - 4.4, y - 24.6, 1, 1); ctx.fillRect(x - 3, y - 23.8, 1, 1); ctx.fillRect(x - 4.8, y - 23.2, 1, 1);
-    ctx.fillRect(x + 3.4, y - 24.6, 1, 1); ctx.fillRect(x + 2, y - 23.8, 1, 1); ctx.fillRect(x + 3.8, y - 23.2, 1, 1);
-  }
-  if (a.id === "drop-kit-builder"){
-    // Krillin: the six dots
-    ctx.fillStyle = "#8A5A38";
-    [-1.4, 0, 1.4].forEach(function(dy){
-      ctx.fillRect(x - 1.7, hy - 4.6 + dy * 1.4, 0.9, 0.9);
-      ctx.fillRect(x + 0.8, hy - 4.6 + dy * 1.4, 0.9, 0.9);
-    });
-  }
-  if (a.id === "lead-hunter"){
-    // Tien: the third eye
-    ctx.fillStyle = "#1A1E24";
-    ctx.fillRect(x - 0.7, hy - 4.4, 1.4, 2.2);
-  }
-  if (a.id === "store-manager"){
-    // Hercule: the mustache
-    ctx.fillStyle = "#3A2A1C";
-    ctx.fillRect(x - 3.4, hy + 1.6, 2.8, 1.5); ctx.fillRect(x + 0.6, hy + 1.6, 2.8, 1.5);
-  }
-  if (a.id === "site-builder"){
-    // Android 17: orange bandana at the neck
-    ctx.fillStyle = "#E8681A";
-    ctx.beginPath(); ctx.roundRect(x - 5, hy + 6.2, 10, 2.4, 1.2); ctx.fill();
-  }
-  drawHair(a, x, hy, p);
-
-  // label
-  var label = a.cname + (a.auto ? " ⏰" : "");
-  ctx.font = "700 9.5px 'IBM Plex Mono', monospace";
-  var tw = ctx.measureText(label).width;
-  var py = a.y + 14 + a.li * 15;
-  ctx.fillStyle = p > 0.5 ? "rgba(255,201,60,.92)" : "rgba(10,14,28,.8)";
-  ctx.beginPath(); ctx.roundRect(x - tw/2 - 5, py, tw + 10, 14, 7); ctx.fill();
-  ctx.fillStyle = p > 0.5 ? "#241505" : "#FFE9CE";
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.fillText(label, x, py + 7);
-  a.sx = x; a.sy = y - 16;
-}
-
-// ---- behavior ----
-var flyBusy = false;
-function startFlight(a, now){
-  var others = ROOMS.filter(function(r){ return r !== a.room; });
-  var dest = others[Math.floor(Math.random()*others.length)];
-  var dx = dest.wx + (Math.random()*60 - 30), dy = dest.wy + 34;
-  a.fly = {t0: now, dur: 1600, fx: a.x, fy: a.y, txx: dx, tyy: dy, stage: "out", visitUntil: 0};
-  a.powerUntil = now + 9000;
-  flyBusy = true;
-}
-function stepFlight(a, now){
-  var f = a.fly;
-  if (f.stage === "out" || f.stage === "home"){
-    var u = Math.min((now - f.t0) / f.dur, 1);
-    var e = u < .5 ? 2*u*u : 1 - Math.pow(-2*u + 2, 2) / 2;
-    a.x = f.fx + (f.txx - f.fx) * e;
-    a.y = f.fy + (f.tyy - f.fy) * e - Math.sin(u * Math.PI) * 46;
-    if (u >= 1){
-      if (f.stage === "out"){ f.stage = "visit"; f.visitUntil = now + 2600; }
-      else { a.fly = null; flyBusy = false; a.tx = a.x; a.ty = a.y; }
-    }
-  } else if (f.stage === "visit" && now > f.visitUntil){
-    f.stage = "home"; f.t0 = now; f.fx = a.x; f.fy = a.y; f.txx = a.hx; f.tyy = a.hy;
-  }
-}
-
-var last = 0;
-function frame(t){
-  var dt = Math.min((t - last) / 1000, .05); last = t;
-  ctx.clearRect(0, 0, W, H);
-  // stars
-  for (var i = 0; i < 40; i++){
-    var sx = (i*197)%W, sy = (i*127)%(H*0.9);
-    ctx.fillStyle = "rgba(255,255,255," + (0.12 + (i%3)*0.08) + ")";
-    ctx.fillRect(sx, sy, 1.6, 1.6);
-  }
-  var rooms = ROOMS.slice().sort(function(a,b){ return a.wy - b.wy; });
-  rooms.forEach(drawPlatform);
-
-  var now = t;
-  AGENTS.forEach(function(a){
-    // power state
-    var want = (a.panelOpen || now < a.powerUntil) ? 1 : 0;
-    var prevP = a.power;
-    a.power += (want - a.power) * Math.min(dt*4, 1);
-    if (REDUCED){ a.power = want; }
-    if (prevP <= 0.5 && a.power > 0.5) chargeSound();
-    // random task power-ups (auto agents more often)
-    if (!REDUCED && !a.fly && now > a.powerUntil && Math.random() < (a.auto ? .0012 : .0006)){
-      a.powerUntil = now + 4500 + Math.random()*3000;
-    }
-    // flights
-    if (a.fly){ stepFlight(a, now); }
-    else if (!REDUCED && !flyBusy && Math.random() < .0004){ startFlight(a, now); }
-    else if (!REDUCED && !a.fly){
-      var dx = a.tx - a.x, dy = a.ty - a.y, d = Math.hypot(dx, dy);
-      if (d < 2){
-        if (Math.random() < .006){
-          var ang = Math.random()*6.28, rr = Math.random();
-          a.tx = a.hx + Math.cos(ang)*32*rr;
-          a.ty = a.hy + Math.sin(ang)*15*rr;
-        }
-      } else {
-        a.x += dx/d * 26 * dt;
-        a.y += dy/d * 26 * dt;
-      }
-    }
-  });
-
-  var ents = AGENTS.slice().sort(function(a,b){ return a.y - b.y; });
-  ents.forEach(function(a){ drawFighter(a, t); });
-  ROOMS.forEach(drawRoomLabel);
-  requestAnimationFrame(frame);
-}
-requestAnimationFrame(frame);
-
-// ---- panel ----
-var backdrop = document.getElementById("backdrop"), panel = document.getElementById("panel");
-var openedAgent = null;
-function openAgent(a){
-  openedAgent = a; a.panelOpen = true;
-  panel.style.setProperty("--phue", a.room.hue);
-  panel.innerHTML =
-    '<h2><span>' + a.emoji + '</span>' + a.cname + ' <small>' + a.id + (a.auto ? ' · ⏰ auto-runs on schedule' : '') + '</small></h2>' +
-    '<p class="where">' + a.room.name + '</p>' +
-    '<p>' + a.role + '</p>' +
-    '<h3>What ' + a.cname + ' handles</h3><ul class="duties">' + a.duties.map(function(d){ return '<li>' + d + '</li>'; }).join('') + '</ul>' +
-    '<h3>Dispatch command</h3><pre class="dispatch" id="dcmd">' + a.dispatch + '</pre>' +
-    '<div class="btnrow">' +
-    '<a class="btn primary" target="_blank" rel="noopener" href="https://claude.ai/new?q=' + encodeURIComponent(a.dispatch) + '">Send to Claude →</a>' +
-    '<button class="btn" id="copybtn">Copy dispatch</button><button class="btn" id="closebtn">Close</button></div>';
-  backdrop.classList.add("open");
-  document.getElementById("copybtn").addEventListener("click", function(){
-    var b = this;
-    try {
-      navigator.clipboard.writeText(document.getElementById("dcmd").textContent).then(
-        function(){ b.textContent = "Copied!"; setTimeout(function(){ b.textContent = "Copy dispatch"; }, 1800); },
-        function(){ b.textContent = "Select & copy above"; });
-    } catch(e){ b.textContent = "Select & copy above"; }
-  });
-  document.getElementById("closebtn").addEventListener("click", closePanel);
-}
-function closePanel(){
-  backdrop.classList.remove("open");
-  if (openedAgent){ openedAgent.panelOpen = false; openedAgent = null; }
-}
-backdrop.addEventListener("click", function(e){ if (e.target === backdrop) closePanel(); });
-document.addEventListener("keydown", function(e){ if (e.key === "Escape") closePanel(); });
-
-canvas.addEventListener("click", function(e){
-  var rect = canvas.getBoundingClientRect();
-  var mx = (e.clientX - rect.left) * (W / rect.width);
-  var my = (e.clientY - rect.top) * (H / rect.height);
-  var best = null, bd = 1e9;
-  AGENTS.forEach(function(a){
-    var d = Math.hypot(mx - a.sx, my - a.sy);
-    if (d < bd){ bd = d; best = a; }
-  });
-  if (best && bd < 34) openAgent(best);
-});
-
-// ---- command board: route words to the right agent ----
-var TRIGGERS = {
-  "director":["movie","film","documentary","scene","screenplay","narration","footage","edit plan","act "],
-  "spiritual-scribe":["spiritual","meaning","purpose","life lesson","understanding life","deep talk","philosophy","god","soul"],
-  "content-machine":["youtube","views","video idea","channel","upload","post schedule","tiktok","instagram","reel","short","formula","content plan","subscribers","views drop","views up"],
-  "content-scout":["trend","trending","gta 6","gta6","scout","sweep","unchopped","hot content","viral right now","what's hot"],
-  "copywriter":["write","caption","hook","copy","headline","slogan","dm reply","email copy","bio","script for"],
-  "campaign-strategist":["campaign","marketing","promote","promotion","launch","drop","ads","offer","audience"],
-  "drop-kit-builder":["drop kit","client site","client website","build for","menu site","package for","phone agent for","email agent for"],
-  "lead-hunter":["lead","leads","prospects","find businesses","find restaurants","outreach list","who should i pitch"],
-  "restaurant-researcher":["restaurant stack","restaurant offer","loyalty","raffle","retention","digital menu","food review","restaurant tools"],
-  "business-builder":["llc","business name","register","incorporate","ein","form a","start a business","business bank","funding","business credit","company set"],
-  "tax-researcher":["tax rule","deduct","write off","irs code","tax law","tax question","publication"],
-  "tax-intake":["tax intake","w-2","w2","1099","transcript","file taxes","tax documents","taxes for","prior year","tax year"],
-  "market-watcher":["trade","trading","market","stock","polymarket","chart","swing","volume","futures","premarket","ticker","setup"],
-  "supplier-scout":["supplier","wholesale","manufacturer","source","alibaba","vendor","kiosk","product cost","moq"],
-  "site-builder":["my website","my site","landing page","fix the site","foodie page","clothing page","store page","antidotethecure"],
-  "store-manager":["shopify","store","merch","product","inventory","collection","orders","discount code"],
-  "memory-keeper":["memory","remember","update the doc","organize","tag","project doc","where did we leave","status of"],
-  "antidote-brand":["music","song","track","album","drop a song","release","my instagram","the real antidote","antidote ig","premiere","trailer","brand","movie marketing","my page"]
-};
-function routeCommand(text){
-  var t = " " + text.toLowerCase() + " ";
-  var scores = [];
-  AGENTS.forEach(function(a){
-    var kws = TRIGGERS[a.id] || [], s = 0;
-    kws.forEach(function(k){ if (t.indexOf(k) !== -1) s += (k.indexOf(" ") !== -1 ? 3 : 2); });
-    if (s > 0) scores.push({a:a, s:s});
-  });
-  scores.sort(function(x,y){ return y.s - x.s; });
-  return scores;
-}
-var cmdform = document.getElementById("cmdform"), cmdinput = document.getElementById("cmdinput"), cmdresult = document.getElementById("cmdresult");
-var samplePromise = (window.claude && window.claude.use) ? window.claude.use("sample") : Promise.resolve(null);
-
-// ---- charge-up sound (synthesized — no external audio) ----
-var actx = null, soundOn = false, lastCharge = 0;
-var soundbtn = document.getElementById("soundbtn");
-function chargeSound(){
-  if (!soundOn || !actx) return;
-  var now = performance.now();
-  if (now - lastCharge < 1800) return;
-  lastCharge = now;
-  var t0 = actx.currentTime;
-  var o = actx.createOscillator(), g = actx.createGain();
-  o.type = "sawtooth";
-  o.frequency.setValueAtTime(70, t0);
-  o.frequency.exponentialRampToValueAtTime(340, t0 + 0.9);
-  var lfo = actx.createOscillator(), lg = actx.createGain();
-  lfo.frequency.value = 26; lg.gain.value = 16;
-  lfo.connect(lg); lg.connect(o.frequency);
-  g.gain.setValueAtTime(0.0001, t0);
-  g.gain.exponentialRampToValueAtTime(0.1, t0 + 0.18);
-  g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.15);
-  o.connect(g); g.connect(actx.destination);
-  o.start(t0); o.stop(t0 + 1.2); lfo.start(t0); lfo.stop(t0 + 1.2);
-}
-soundbtn.addEventListener("click", function(){
-  soundOn = !soundOn;
-  soundbtn.textContent = soundOn ? "🔊" : "🔇";
-  if (soundOn){
-    try {
-      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
-      if (actx.state === "suspended") actx.resume();
-      lastCharge = 0; chargeSound();
-    } catch(e){ soundOn = false; soundbtn.textContent = "🔇"; }
-  }
-});
-
-// ---- speak-to-the-squad (browser speech recognition) ----
-var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-var micbtn = document.getElementById("micbtn");
-if (SR){
-  micbtn.hidden = false;
-  var listening = false;
-  micbtn.addEventListener("click", function(){
-    if (listening) return;
-    try {
-      var rec = new SR();
-      rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 1;
-      listening = true; micbtn.textContent = "👂";
-      rec.onresult = function(e){
-        var said = e.results[0][0].transcript;
-        document.getElementById("cmdinput").value = said;
-        listening = false; micbtn.textContent = "🎤";
-        var scores = routeCommand(said);
-        if (scores.length) fireAgent(scores[0].a, said);
-        else fireAgent(AGENTS.filter(function(a){ return a.id === "memory-keeper"; })[0], said + " (route this to whichever agent fits best)");
-      };
-      rec.onerror = function(){ listening = false; micbtn.textContent = "🎤"; micbtn.title = "Mic unavailable here — type instead"; };
-      rec.onend = function(){ listening = false; if (micbtn.textContent === "👂") micbtn.textContent = "🎤"; };
-      rec.start();
-    } catch(e){ listening = false; micbtn.textContent = "🎤"; micbtn.title = "Mic unavailable here — type instead"; }
-  });
-}
-
-function askAgent(a, text){
-  var reply = document.getElementById("cmdreply");
-  reply.hidden = false;
-  reply.innerHTML = '<b>' + a.emoji + ' ' + a.cname + '</b><div id="replytext">…powering up…</div>';
-  a.powerUntil = performance.now() + 25000;
-  samplePromise.then(function(s){
-    var el = document.getElementById("replytext");
-    if (!el) return;
-    if (!s){
-      el.textContent = "In-page answers run on the claude.ai version of this board (the desktop icon opens it). On this copy, use “Open full session” instead.";
-      return;
-    }
-    var prompt = "You are " + a.cname + " (" + a.id + "), one of Antidote's AI agents. Your job: " + a.role +
-      " Key duties: " + a.duties.join("; ") + ". Answer Antidote's request below — in character but genuinely useful, specific, and concise (under 250 words). " +
-      "You have no live tools in this quick reply: if the request needs real data or file work (Drive docs, YouTube stats, web research, builds), give your best immediate take, then say to hit “Open full session” for the real run. Never invent numbers or facts. REQUEST: " + text;
-    s(prompt, {onText: function(ev){ var t = document.getElementById("replytext"); if (t) t.textContent = ev.text; }})
-      .then(function(res){ var t = document.getElementById("replytext"); if (t) t.textContent = res.text; })
-      .catch(function(err){
-        var t = document.getElementById("replytext"); if (!t) return;
-        t.textContent = (err && err.text) ? err.text + "\n\n[cut off — open the full session to finish]"
-          : "Couldn't answer here (" + ((err && err.code) || "error") + "). Use “Open full session”.";
-      });
-  });
-}
-
-function fireAgent(a, text){
-  a.powerUntil = performance.now() + 8000;
-  var full = "Use the " + a.id + " agent: " + text;
-  var url = "https://claude.ai/new?q=" + encodeURIComponent(full);
-  cmdresult.hidden = false;
-  cmdresult.innerHTML = '🔥 <span class="picked">' + a.cname + '</span> powered up for this. ' +
-    '<div><button type="button" class="golink" id="askbtn">⚡ Answer right here</button>' +
-    '<a class="golink" target="_blank" rel="noopener" href="' + url + '">Open full session →</a></div>' +
-    '<div style="margin-top:6px;color:#9AA3BF;font-size:11.5px">Not the right fighter? Tap one:</div><div id="altrow"></div>';
-  document.getElementById("askbtn").addEventListener("click", function(){ askAgent(a, text); });
-  var altrow = document.getElementById("altrow");
-  AGENTS.slice().sort(function(x,y){ return (x===a)-(y===a); }).forEach(function(o){
-    if (o === a) return;
-    var b = document.createElement("button");
-    b.type = "button"; b.className = "alt"; b.textContent = o.cname;
-    b.addEventListener("click", function(){ fireAgent(o, text); });
-    altrow.appendChild(b);
-  });
-}
-cmdform.addEventListener("submit", function(e){
-  e.preventDefault();
-  var text = cmdinput.value.trim();
-  if (!text) return;
-  var scores = routeCommand(text);
-  if (scores.length){
-    fireAgent(scores[0].a, text);
-  } else {
-    var vault = AGENTS.filter(function(a){ return a.id === "memory-keeper"; })[0];
-    fireAgent(vault, text + " (route this to whichever agent fits best)");
-  }
-});
-
-var roster = document.getElementById("roster");
-AGENTS.forEach(function(a){
-  var b = document.createElement("button");
-  b.className = "chip";
-  b.style.setProperty("--chue", a.room.hue);
-  b.textContent = a.emoji + " " + a.cname + (a.auto ? " ⏰" : "");
-  b.title = a.id;
-  b.addEventListener("click", function(){ openAgent(a); });
-  roster.appendChild(b);
-});
-</script>
+<script src="js/agents.js"></script>
+<script src="js/taskRouter.js"></script>
+<script src="js/activityFeed.js"></script>
+<script src="js/animationController.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
 </html>

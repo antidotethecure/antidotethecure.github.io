@@ -1,0 +1,14 @@
+/* World canvas container + zoom controls */
+.worldbox{position:relative;background:radial-gradient(ellipse at 50% 30%, #1A2348 0%, #0E1326 70%);border:1px solid var(--edge);border-radius:14px;overflow:hidden}
+#stage{display:block;width:100%;height:auto;touch-action:none;cursor:grab}
+#stage:active{cursor:grabbing}
+.zoomctl{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:6px}
+.zoomctl button{
+  width:40px;height:40px;border-radius:9px;border:1px solid var(--edge);
+  background:rgba(16,22,48,.9);color:#FFF;font:800 16px "Archivo",system-ui,sans-serif;cursor:pointer;
+}
+.zoomctl button:hover{border-color:var(--gold)}
+.zoomctl button:focus-visible{outline:3px solid var(--gold)}
+.legend{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--dim);margin-top:8px}
+.legend b{color:var(--gold)}
+.legend .sdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 3px 0 10px;vertical-align:middle}

@@ -1,0 +1,28 @@
+/* Phone layout: full-width board, stacked panels, drawer-style feed */
+@media (max-width: 900px){
+  .maingrid{grid-template-columns:1fr}
+  .mission{grid-template-columns:repeat(3,1fr)}
+  .sidecol{order:2}
+  .sidebox details summary{cursor:pointer;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;list-style:none}
+  #feedlist{max-height:200px}
+}
+@media (max-width: 520px){
+  body{padding-inline:12px}
+  .mission{grid-template-columns:repeat(3,1fr);gap:6px}
+  .mstat{padding:7px 6px}
+  .mstat b{font-size:16px}
+  .cmdgo{flex:0 0 auto}
+  #cmdinput{min-width:150px}
+  .chip{font-size:11.5px;padding:7px 10px}
+  .backend .begrid{grid-template-columns:1fr}
+}
+
+/* hard guarantee: the page never scrolls sideways (the map pans inside its own canvas) */
+html,body{max-width:100%;overflow-x:hidden}
+.wrap,.maingrid,.sidecol,.sidebox{min-width:0}
+@media (max-width: 520px){
+  .mission{grid-template-columns:repeat(auto-fit,minmax(96px,1fr))}
+  .mstat span{white-space:normal;word-break:break-word}
+  #cmdinput{flex:1 1 100%;min-width:0}
+  #cmdform .cmdgo{flex:1 1 auto}
+}

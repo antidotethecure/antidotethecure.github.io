@@ -254,6 +254,7 @@ var World = (function(){
     "BARDOCK":   { glyph:"S",  bg:"#274A2E" },
     "HIT":       { glyph:"時", bg:"#5A4FA8" },
     "YAJIROBE":  { glyph:"刀", bg:"#8A5A38" },
+    "ROSHI":     { glyph:"仙", bg:"#E8863A" },
     "ANTIDOTE":  { glyph:"A",  bg:"#2E7D5B" }
   };
   var HR = 6.2;
@@ -516,6 +517,13 @@ var World = (function(){
         [-1.4,0,1.4].forEach(function(dy){ ctx.fillRect(x-1.7,hy-4.6+dy*1.4,0.9,0.9); ctx.fillRect(x+0.8,hy-4.6+dy*1.4,0.9,0.9); });
       }
       if (a.name === "TIEN"){ ctx.fillStyle="#1A1E24"; ctx.fillRect(x-0.7,hy-4.4,1.4,2.2); }
+      if (a.name === "ROSHI"){
+        // the hermit: dark sunglasses + white beard
+        ctx.fillStyle = "#1A1E24";
+        ctx.beginPath(); ctx.roundRect(x-4.6,hy-3.4,9.2,2.8,1.2); ctx.fill();
+        ctx.fillStyle = "#F4F0E4";
+        ctx.beginPath(); ctx.roundRect(x-2.8,hy+3.2,5.6,4.4,2.4); ctx.fill();
+      }
       if (a.name === "HERCULE"){ ctx.fillStyle="#3A2A1C"; ctx.fillRect(x-3.4,hy+1.6,2.8,1.5); ctx.fillRect(x+0.6,hy+1.6,2.8,1.5); }
       if (a.name === "ANDROID 17"){ ctx.fillStyle="#E8681A"; ctx.beginPath(); ctx.roundRect(x-5,hy+6.2,10,2.4,1.2); ctx.fill(); }
       if (!a.faceImg) drawHair(a, x, hy, p);

@@ -19,6 +19,7 @@ var TRIGGERS = {
   yajirobe: ["notes","file this","schedule","cleanup","admin","organize files","supplier","wholesale","vendor","source a product","kiosk"],
   bardock:  ["trend","trending","monitor","alert","watch for","competitor watch","opportunity","gta","scout","what's hot","viral right now"],
   hit:      ["trade","trading","market today","stock","polymarket","swing","volume","futures","premarket","chart"],
+  roshi:    ["apartment","condo","thailand","rent","housing","place to live","relocat","move to","gym in","pool","wifi","internet speed","bangkok","phuket","chiang mai"],
   piccolo:  ["content strategy","video concept","creative direction","script the","movie","documentary","scene","screenplay","campaign structure"],
   goku:     ["coordinate","orchestrate","multiple agents","big mission","everything","whole team","plan the steps"],
   antidote: ["music","song","track","album","release","my instagram","the real antidote","premiere","trailer","brand decision","my page"]

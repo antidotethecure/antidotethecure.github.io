@@ -61,7 +61,11 @@ var AGENT_DATA = [
     char:{hair:"long",hairC:"#171A1E",saiyan:false,gi:"#C9683E",pants:"#8A5A38",skin:"#F4C99B"} },
 
   { id:"hit", name:"HIT", emoji:"📡", room:"back", auto:true, support:true,
-    sched:[{h:13,m:0,days:[1,2,3,4,5],dur:20,label:"TICKER pre-market brief + daily trading lesson"}],
+    sched:[{h:13,m:0,days:[1,2,3,4,5],dur:20,label:"TICKER pre-market brief + daily trading lesson"},
+           {h:14,m:0,days:[1,2,3,4,5],dur:12,label:"Interval market sweep"},
+           {h:16,m:0,days:[1,2,3,4,5],dur:12,label:"Interval market sweep"},
+           {h:18,m:0,days:[1,2,3,4,5],dur:12,label:"Interval market sweep"},
+           {h:20,m:0,days:[1,2,3,4,5],dur:12,label:"Interval market sweep"}],
     role:"Markets Watchtower (support) — weekday pre-market briefs, daily trading lessons into the playbook, volume and chatter watch. Alerts and paper trades only.",
     skills:["trading","market","stock","polymarket","swing","volume","premarket"],
     avatar:"assets/characters/hit.webp",

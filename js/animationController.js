@@ -380,9 +380,13 @@ var World = (function(){
     drawAura(x, y + 9, p, t, auraColorFor(a));
 
     if (a.img){
-      // supplied transparent character asset replaces the vector body
-      var iw = 44, ih = 58;
+      // supplied transparent character asset replaces the vector body,
+      // drawn at its true aspect ratio, pixel-crisp
+      var ih = 56, iw = ih * (a.img.width / a.img.height || 0.6);
+      var wasSmooth = ctx.imageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = false;
       ctx.drawImage(a.img, x - iw / 2, y - ih + 9, iw, ih);
+      ctx.imageSmoothingEnabled = wasSmooth;
     } else {
       // legs
       ctx.fillStyle = c.pants;

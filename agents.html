@@ -220,16 +220,16 @@ footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",
 // char: hair "spiky"/"bald"/"antennae"/"tentacle"/"afro"/"bob"/"long", hairC base color, saiyan => gold SSJ hair, gi/pants outfit
 var ROOMS = [
  {name:"SERVER ROOM", hue:"#37E0A5", pos:[0,0], agents:[
-   {id:"memory-keeper", cname:"GOKU", emoji:"🧠", char:{hair:"spiky",hairC:"#171A1E",saiyan:true,gi:"#F28C28",pants:"#2B4C9B",skin:"#F4C99B"},
+   {id:"memory-keeper", cname:"GOKU", emoji:"🧠", char:{hair:"goku",hairC:"#171A1E",saiyan:true,gi:"#F28C28",pants:"#2B4C9B",skin:"#F4C99B",cuff:"#2B4C9B"},
     role:"Goku holds the whole system's memory — reads and updates every project memory doc, tags sessions, keeps all 11 projects honest.",
     duties:["Briefs sessions from memory at start","Updates the docs at end","Housekeeps tags and the master list"],
     dispatch:"Use the memory-keeper agent: [e.g., update the agency memory doc with today's work]"},
-   {id:"antidote-brand", cname:"ANTIDOTE", emoji:"💊", char:{hair:"hat",hairC:"#1E2126",saiyan:true,freckles:true,gi:"#23272E",pants:"#3E5A8A",skin:"#F2D5B8"},
+   {id:"antidote-brand", cname:"ANTIDOTE", emoji:"💊", char:{hair:"hat",hairC:"#1E2126",saiyan:true,freckles:true,gi:"#23272E",pants:"#3E5A8A",skin:"#A9703F"},
     role:"The boss himself. Everything carrying the Antidote name runs through him: the music (tracks, drops, releases), The Antidote movie's marketing and premiere plan, and the real Antidote Instagram.",
     duties:["Music: tracks, metadata, drops, release plans","The movie's marketing, trailers, premiere strategy","Runs the real Antidote Instagram — nothing posts without his sign-off","Final word on anything carrying the name"],
     dispatch:"Use the antidote-brand agent: [e.g., plan the drop for my next track and the IG rollout around it]"}]},
  {name:"THE STUDIO", hue:"#E5675F", pos:[90,1], agents:[
-   {id:"director", cname:"PICCOLO", emoji:"🎬", char:{hair:"antennae",hairC:"#3E7D4E",saiyan:false,gi:"#5B3FA8",pants:"#5B3FA8",skin:"#8FBF6A"},
+   {id:"director", cname:"PICCOLO", emoji:"🎬", char:{hair:"antennae",hairC:"#3E7D4E",saiyan:false,gi:"#5B3FA8",pants:"#5B3FA8",skin:"#8FBF6A",belt:"#B3261E"},
     role:"Piccolo directs The Antidote — the mentor's eye on acts, scenes, beats, narration, and footage plans.",
     duties:["Keeps the living scene outline current","Punches up narration, challenges weak scenes","Maps footage to beats, flags gaps"],
     dispatch:"Use the director agent: [e.g., break Act I into beats against the footage inventory]"},
@@ -238,15 +238,15 @@ var ROOMS = [
     duties:["Logs big ideas to RUNNING THEMES","Turns talks into writings and concepts","Feeds the movie's spiritual arc"],
     dispatch:"Use the spiritual-scribe agent: let's talk through [what's on my mind] and capture the themes"}]},
  {name:"CONTENT LAB", hue:"#A98BE8", pos:[30,1], agents:[
-   {id:"content-machine", cname:"GOHAN", emoji:"⚡", char:{hair:"spiky",hairC:"#171A1E",saiyan:true,gi:"#6B3FA0",pants:"#F28C28",skin:"#F4C99B"},
+   {id:"content-machine", cname:"GOHAN", emoji:"⚡", char:{hair:"gohan",hairC:"#171A1E",saiyan:true,gi:"#6B3FA0",pants:"#F28C28",skin:"#F4C99B"},
     role:"Gohan runs the YouTube side and every channel — content plans, the GTA lane, posting automation. Hidden power, biggest reach.",
     duties:["Every idea leaves with a hook, format, platform","Runs the GTA lane as its own channel","Automates posting pipelines"],
     dispatch:"Use the content-machine agent: [e.g., plan this week's GTA clip drops across all three platforms]"},
-   {id:"copywriter", cname:"GOTEN", emoji:"✍️", char:{hair:"spiky",hairC:"#171A1E",saiyan:true,gi:"#3EA6D8",pants:"#F4F0E4",skin:"#F4C99B"},
+   {id:"copywriter", cname:"GOTEN", emoji:"✍️", char:{hair:"goten",hairC:"#171A1E",saiyan:true,gi:"#3EA6D8",pants:"#F4F0E4",skin:"#F4C99B"},
     role:"Goten writes everything in the Antidote voice — hooks, captions, scripts, DMs, emails. Quick and natural.",
     duties:["Hook first, always","One job per piece of copy","Compliance baked in — no fake promises"],
     dispatch:"Use the copywriter agent: write [what you need] for [which brand]"},
-   {id:"content-scout", cname:"BARDOCK", emoji:"🛰️", auto:true, char:{hair:"spiky",hairC:"#171A1E",saiyan:true,gi:"#2E3138",pants:"#274A2E",skin:"#E8B98A"},
+   {id:"content-scout", cname:"BARDOCK", emoji:"🛰️", auto:true, char:{hair:"bardock",hairC:"#171A1E",saiyan:true,gi:"#2E3138",pants:"#274A2E",skin:"#E8B98A"},
     role:"Bardock sees what's coming — daily GTA 6 trend sweeps plus scans of your own videos for unchopped clip moments.",
     duties:["Runs automatically every morning at 9:00 AM PT","Top 5 GTA 6 short-form plays daily, with sources","Flags your videos not yet cut into shorts","Logs to CONTENT SCOUT — Daily Finds in Drive"],
     dispatch:"Use the content-scout agent: run a sweep right now — today's GTA 6 trends plus my unchopped clips"}]},
@@ -273,11 +273,11 @@ var ROOMS = [
     duties:["Full formation intake — asks every right question","Scouts address, phone, domain, email with current prices","Bank fit: Navy Federal (if military-affiliated), Mercury/Relay/Novo, Chase","Funding path: EIN → bank → DUNS → net-30s → business credit"],
     dispatch:"Use the business-builder agent: build out [business name] — it does [what it sells], forming in [state]"}]},
  {name:"BACK OFFICE", hue:"#E9B84F", pos:[270,1], agents:[
-   {id:"tax-researcher", cname:"VEGETA", emoji:"📋", char:{hair:"spiky",hairC:"#171A1E",saiyan:true,gi:"#F4F0E4",pants:"#2743B5",skin:"#F4C99B"},
+   {id:"tax-researcher", cname:"VEGETA", emoji:"📋", char:{hair:"vegeta",hairC:"#171A1E",saiyan:true,gi:"#F4F0E4",pants:"#2743B5",skin:"#F4C99B",cuff:"#F4F6F8"},
     role:"Vegeta runs the taxes side — proud, precise, and never wrong twice. Looks up real IRS/state rules with publication numbers cited. Never from memory.",
     duties:["Cites source + number + tax year","Logs every verified rule once","Keeps deadlines current"],
     dispatch:"Use the tax-researcher agent: [your tax question] — cite the sources"},
-   {id:"tax-intake", cname:"ANDROID 18", emoji:"🗂️", char:{hair:"bob",hairC:"#E8D48A",saiyan:false,gi:"#2E3138",pants:"#4A5568",skin:"#F4D8B8"},
+   {id:"tax-intake", cname:"ANDROID 18", emoji:"🗂️", char:{hair:"bob",part:"side",hairC:"#E8D48A",saiyan:false,gi:"#2E3138",pants:"#4A5568",skin:"#F4D8B8"},
     role:"18 handles the money paperwork intake — the full preparer questionnaire, and the exact IRS page for every missing document.",
     duties:["Full intake: identity, status, dependents, income, credits","IRS Get Transcript / Form 4506-T paths for missing years","Notice-number lookups for IRS letters","Flags what's missing before anything gets filed"],
     dispatch:"Use the tax-intake agent: run intake for [name] — here's their situation: [what you know]"},
@@ -394,71 +394,117 @@ function drawAura(x, y, p, t, saiyan){
   }
 }
 
-function drawHair(a, x, topY, p, t){
+// hair anchored to the scalp: a skull cap hugging the head circle, spikes growing FROM the cap edge
+var HR = 6.2; // head radius
+var HAIRSPECS = {
+  goku:   [[152,6],[128,9.5],[104,12.5],[86,10.5],[62,9],[38,6]],
+  goten:  [[150,7],[120,10.5],[92,11.5],[62,8.5],[34,5.5]],
+  gohan:  [[142,7],[114,10.5],[90,12.5],[64,8.5],[40,5.5]],
+  bardock:[[156,6],[132,10],[102,12.5],[76,9.5],[50,8.5],[26,5]],
+  vegeta: [[126,8.5],[110,12.5],[95,15],[80,12.5],[62,8.5]]
+};
+function scalpCap(x, hy, col, r){
+  ctx.fillStyle = col;
+  ctx.beginPath();
+  ctx.arc(x, hy, (r||HR) + 0.8, Math.PI * 1.03, -0.03);
+  ctx.closePath(); ctx.fill();
+}
+function spikeFan(x, hy, spec, col, powered){
+  scalpCap(x, hy, col);
+  ctx.fillStyle = col;
+  spec.forEach(function(s){
+    var A = s[0] * Math.PI / 180, L = s[1] * (powered ? 1.55 : 1);
+    var b1x = x + Math.cos(A + 0.34) * HR, b1y = hy - Math.sin(A + 0.34) * HR;
+    var b2x = x + Math.cos(A - 0.34) * HR, b2y = hy - Math.sin(A - 0.34) * HR;
+    var tx = x + Math.cos(A) * (HR + L), ty = hy - Math.sin(A) * (HR + L) - (powered ? 1.5 : 0);
+    ctx.beginPath(); ctx.moveTo(b1x, b1y); ctx.lineTo(tx, ty); ctx.lineTo(b2x, b2y); ctx.closePath(); ctx.fill();
+  });
+}
+function drawHair(a, x, hy, p){
   var c = a.char, powered = p > 0.5 && c.saiyan;
   var col = powered ? "#FFD84A" : c.hairC;
-  var s = powered ? 1.5 : 1;
   if (c.hair === "bald") return;
+  if (HAIRSPECS[c.hair]){
+    spikeFan(x, hy, HAIRSPECS[c.hair], col, powered);
+    if (c.hair === "vegeta"){
+      // widow's peak dipping into the forehead
+      ctx.fillStyle = col;
+      ctx.beginPath(); ctx.moveTo(x - 2.6, hy - 4.6); ctx.lineTo(x, hy - 0.8); ctx.lineTo(x + 2.6, hy - 4.6); ctx.closePath(); ctx.fill();
+    }
+    if (c.hair === "bardock"){
+      ctx.fillStyle = "#B3261E";
+      ctx.beginPath(); ctx.roundRect(x - 6.6, hy - 2.8, 13.2, 2.6, 1.3); ctx.fill();
+    }
+    return;
+  }
   if (c.hair === "antennae"){
-    ctx.strokeStyle = c.hairC; ctx.lineWidth = 1.6;
-    ctx.beginPath(); ctx.moveTo(x-2, topY); ctx.quadraticCurveTo(x-5, topY-6, x-3.5, topY-8); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x+2, topY); ctx.quadraticCurveTo(x+5, topY-6, x+3.5, topY-8); ctx.stroke();
+    // namekian: antennae rooted at the forehead + pointed ears
+    ctx.strokeStyle = c.hairC; ctx.lineWidth = 1.7; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(x - 2, hy - 4.6); ctx.quadraticCurveTo(x - 5.5, hy - 10, x - 3.5, hy - 12); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + 2, hy - 4.6); ctx.quadraticCurveTo(x + 5.5, hy - 10, x + 3.5, hy - 12); ctx.stroke();
+    ctx.lineCap = "butt";
+    ctx.fillStyle = c.skin;
+    ctx.beginPath(); ctx.moveTo(x - HR + 0.6, hy - 1.5); ctx.lineTo(x - HR - 2.6, hy + 0.5); ctx.lineTo(x - HR + 0.8, hy + 2); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x + HR - 0.6, hy - 1.5); ctx.lineTo(x + HR + 2.6, hy + 0.5); ctx.lineTo(x + HR - 0.8, hy + 2); ctx.closePath(); ctx.fill();
     return;
   }
   if (c.hair === "tentacle"){
-    ctx.strokeStyle = col; ctx.lineWidth = 4; ctx.lineCap = "round";
-    ctx.beginPath(); ctx.moveTo(x, topY);
-    ctx.quadraticCurveTo(x + 6, topY - 9 - (powered?4:0), x + 1, topY - 13 - (powered?5:0));
+    ctx.strokeStyle = col; ctx.lineWidth = 4.2; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(x, hy - HR + 1.4);
+    ctx.quadraticCurveTo(x + 6, hy - HR - 7 - (powered?3:0), x + 1, hy - HR - 11 - (powered?4:0));
     ctx.stroke(); ctx.lineCap = "butt";
     return;
   }
   if (c.hair === "hat"){
-    // fitted cap on a bald head: dome + flat brim, gold trim when powered
-    ctx.beginPath(); ctx.arc(x, topY + 1.5, 6.8, Math.PI, 0);
-    ctx.fillStyle = c.hairC; ctx.fill();
-    ctx.fillRect(x - 6.8, topY + 0.5, 13.6, 2.2);
-    ctx.beginPath(); ctx.roundRect(x - 10.5, topY + 1.6, 10, 2.4, 1.2);
-    ctx.fillStyle = shade(c.hairC, 1.35); ctx.fill();
-    ctx.beginPath(); ctx.arc(x, topY - 1.4, 1.5, 0, 6.29);
+    // fitted cap sitting ON the head: dome hugging the skull, band, forward brim
+    ctx.fillStyle = c.hairC;
+    ctx.beginPath(); ctx.arc(x, hy - 0.4, HR + 0.9, Math.PI * 1.02, -0.02); ctx.closePath(); ctx.fill();
+    ctx.fillRect(x - HR - 0.9, hy - 1.6, (HR + 0.9) * 2, 2.4);
+    ctx.beginPath(); ctx.roundRect(x - HR - 4.6, hy - 0.6, 6.5, 2.2, 1.1);
+    ctx.fillStyle = shade(c.hairC, 1.5); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, hy - 4.6, 1.5, 0, 6.29);
     ctx.fillStyle = (p > 0.5) ? "#FFD84A" : "#37E0A5"; ctx.fill();
     return;
   }
   if (c.hair === "afro"){
-    ctx.beginPath(); ctx.arc(x, topY - 3, 8, Math.PI, 0);
-    ctx.fillStyle = col; ctx.fill();
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(x, hy - 2, 8.4, Math.PI * 1.12, -0.12); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.arc(x - 6.4, hy - 1, 3.2, 0, 6.29); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 6.4, hy - 1, 3.2, 0, 6.29); ctx.fill();
     return;
   }
   if (c.hair === "bob"){
+    // bowl bob hugging the head, face window open; center/side part line
+    ctx.fillStyle = col;
     ctx.beginPath();
-    ctx.moveTo(x - 6.5*s, topY + 4);
-    ctx.quadraticCurveTo(x - 7*s, topY - 7*s, x, topY - 7.5*s);
-    ctx.quadraticCurveTo(x + 7*s, topY - 7*s, x + 6.5*s, topY + 4);
-    ctx.lineTo(x + 4.5, topY + 1); ctx.lineTo(x - 4.5, topY + 1);
-    ctx.closePath(); ctx.fillStyle = col; ctx.fill();
-    if (powered){ spikes(x, topY, col, s, 3); }
+    ctx.moveTo(x - HR - 0.9, hy + 3.6);
+    ctx.lineTo(x - HR - 0.9, hy - 1);
+    ctx.arc(x, hy - 0.2, HR + 0.9, Math.PI, 0);
+    ctx.lineTo(x + HR + 0.9, hy + 3.6);
+    ctx.lineTo(x + HR - 1.4, hy + 3.6);
+    ctx.lineTo(x + HR - 1.4, hy - 1.6);
+    ctx.quadraticCurveTo(x, hy - 4.6, x - HR + 1.4, hy - 1.6);
+    ctx.lineTo(x - HR + 1.4, hy + 3.6);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = shade(c.hairC, 0.72); ctx.lineWidth = 0.9;
+    var px = c.part === "side" ? x + 2.2 : x;
+    ctx.beginPath(); ctx.moveTo(px, hy - HR + 0.4); ctx.lineTo(px + 0.8, hy - 3.4); ctx.stroke();
+    if (powered){ spikeFan(x, hy, [[118,9],[92,11.5],[66,9]], "#FFD84A", true); }
     return;
   }
   if (c.hair === "long"){
+    ctx.fillStyle = col;
     ctx.beginPath();
-    ctx.moveTo(x - 6*s, topY + 8);
-    ctx.quadraticCurveTo(x - 8*s, topY - 6*s, x, topY - 7*s);
-    ctx.quadraticCurveTo(x + 8*s, topY - 6*s, x + 6*s, topY + 8);
-    ctx.closePath(); ctx.fillStyle = col; ctx.fill();
-    return;
-  }
-  // spiky
-  spikes(x, topY, col, s, 5);
-}
-function spikes(x, topY, col, s, n){
-  ctx.fillStyle = col;
-  for (var i = 0; i < n; i++){
-    var off = (i - (n-1)/2) * 3.4 * s;
-    var h = (9 + (Math.floor(n/2) - Math.abs(i - (n-1)/2)) * 3.5) * s;
-    ctx.beginPath();
-    ctx.moveTo(x + off - 2.4*s, topY + 1);
-    ctx.lineTo(x + off + (off>=0? 1.6 : -1.6)*s, topY - h);
-    ctx.lineTo(x + off + 2.4*s, topY + 1);
+    ctx.moveTo(x - HR - 1.4, hy + 7);
+    ctx.quadraticCurveTo(x - HR - 2, hy - 3, x - 3, hy - HR - 1);
+    ctx.quadraticCurveTo(x, hy - HR - 1.8, x + 3, hy - HR - 1);
+    ctx.quadraticCurveTo(x + HR + 2, hy - 3, x + HR + 1.4, hy + 7);
+    ctx.lineTo(x + HR - 1.2, hy + 7);
+    ctx.lineTo(x + HR - 1.2, hy - 1.4);
+    ctx.quadraticCurveTo(x, hy - 4.4, x - HR + 1.2, hy - 1.4);
+    ctx.lineTo(x - HR + 1.2, hy + 7);
     ctx.closePath(); ctx.fill();
+    return;
   }
 }
 
@@ -490,19 +536,20 @@ function drawFighter(a, t){
   ctx.beginPath(); ctx.roundRect(x - 5.5 + (flying?0:walk*2.4), y + 6.5, 4.6, 3, 1.4); ctx.fill();
   ctx.beginPath(); ctx.roundRect(x + 0.9 - (flying?0:walk*2.4), y + (flying?4.5:6.5), 4.6, 3, 1.4); ctx.fill();
 
-  // arms — powered stance flares arms out
-  ctx.fillStyle = c.gi;
+  // arms — powered stance flares arms out; optional cuffs (Goku's wristbands, Vegeta's gloves)
   var flare = p * 4;
-  ctx.save();
-  ctx.translate(x - 8.5 - flare*0.6, y - 18);
-  ctx.rotate(-0.15 - p*0.55);
-  ctx.beginPath(); ctx.roundRect(-1.8, 0, 3.6, 13, 1.8); ctx.fill();
-  ctx.restore();
-  ctx.save();
-  ctx.translate(x + 8.5 + flare*0.6, y - 18);
-  ctx.rotate(0.15 + p*0.55);
-  ctx.beginPath(); ctx.roundRect(-1.8, 0, 3.6, 13, 1.8); ctx.fill();
-  ctx.restore();
+  [-1, 1].forEach(function(side){
+    ctx.save();
+    ctx.translate(x + side * (8.5 + flare * 0.6), y - 18);
+    ctx.rotate(side * (0.15 + p * 0.55));
+    ctx.fillStyle = c.gi;
+    ctx.beginPath(); ctx.roundRect(-1.8, 0, 3.6, 13, 1.8); ctx.fill();
+    if (c.cuff){
+      ctx.fillStyle = c.cuff;
+      ctx.beginPath(); ctx.roundRect(-1.9, 9.6, 3.8, 3.4, 1.6); ctx.fill();
+    }
+    ctx.restore();
+  });
 
   // torso
   var g = ctx.createLinearGradient(x - 8, y - 21, x + 8, y);
@@ -514,23 +561,77 @@ function drawFighter(a, t){
   ctx.quadraticCurveTo(x + 8.5, y - 9, x + 7.5, y - 20);
   ctx.closePath();
   ctx.fillStyle = g; ctx.fill();
+  // character outfit signatures on the torso
+  if (a.id === "memory-keeper" || a.id === "drop-kit-builder"){
+    // orange gi with the blue/undershirt V collar
+    ctx.strokeStyle = a.id === "memory-keeper" ? "#2B4C9B" : "#F4F0E4"; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(x - 4.5, y - 20); ctx.lineTo(x, y - 14.5); ctx.lineTo(x + 4.5, y - 20); ctx.stroke();
+  }
+  if (a.id === "campaign-strategist"){
+    // Trunks: black tank under the jacket
+    ctx.fillStyle = "#1A1E24";
+    ctx.beginPath(); ctx.roundRect(x - 3, y - 20, 6, 15, 2); ctx.fill();
+  }
+  if (a.id === "restaurant-researcher"){
+    // Buu: gold vest edges over the pink
+    ctx.fillStyle = "#E8C84A";
+    ctx.fillRect(x - 7, y - 20, 2.6, 13); ctx.fillRect(x + 4.4, y - 20, 2.6, 13);
+  }
+  if (a.id === "market-watcher"){
+    // Hit: long coat panel lines
+    ctx.strokeStyle = shade(c.gi, 0.7); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x - 3.4, y - 19); ctx.lineTo(x - 3.4, y - 3); ctx.moveTo(x + 3.4, y - 19); ctx.lineTo(x + 3.4, y - 3); ctx.stroke();
+  }
+  if (a.id === "director"){
+    // Piccolo: white cape shoulders + red obi belt
+    ctx.fillStyle = "#F4F0E4";
+    ctx.beginPath(); ctx.roundRect(x - 10, y - 22.5, 20, 4.6, 2.2); ctx.fill();
+  }
   // belt
-  ctx.fillStyle = shade(c.pants, 1.2);
+  ctx.fillStyle = c.belt || shade(c.pants, 1.2);
   ctx.fillRect(x - 5.5, y - 4.5, 11, 2.4);
 
   // head
-  ctx.beginPath(); ctx.arc(x, y - 26, 6.2, 0, 6.29);
+  var hy = y - 26;
+  ctx.beginPath(); ctx.arc(x, hy, HR, 0, 6.29);
   ctx.fillStyle = c.skin; ctx.fill();
-  // eyes — teal when SSJ
+  // eyes — teal when SSJ; heavy angled brows
   ctx.fillStyle = (p > 0.5 && c.saiyan) ? "#2BB8A8" : "#1A1E24";
   ctx.fillRect(x - 3, y - 27, 1.8, 1.8);
   ctx.fillRect(x + 1.2, y - 27, 1.8, 1.8);
+  ctx.strokeStyle = "#1A1E24"; ctx.lineWidth = 0.9;
+  var browTilt = (a.id === "tax-researcher" || p > 0.5) ? 1.1 : 0.4;
+  ctx.beginPath(); ctx.moveTo(x - 3.6, y - 28.2); ctx.lineTo(x - 0.9, y - 28.2 + browTilt); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x + 3.6, y - 28.2); ctx.lineTo(x + 0.9, y - 28.2 + browTilt); ctx.stroke();
   if (c.freckles){
-    ctx.fillStyle = "#C98A5E";
+    ctx.fillStyle = shade(c.skin, 0.55);
     ctx.fillRect(x - 4.4, y - 24.6, 1, 1); ctx.fillRect(x - 3, y - 23.8, 1, 1); ctx.fillRect(x - 4.8, y - 23.2, 1, 1);
     ctx.fillRect(x + 3.4, y - 24.6, 1, 1); ctx.fillRect(x + 2, y - 23.8, 1, 1); ctx.fillRect(x + 3.8, y - 23.2, 1, 1);
   }
-  drawHair(a, x, y - 30.5, p, t);
+  if (a.id === "drop-kit-builder"){
+    // Krillin: the six dots
+    ctx.fillStyle = "#8A5A38";
+    [-1.4, 0, 1.4].forEach(function(dy){
+      ctx.fillRect(x - 1.7, hy - 4.6 + dy * 1.4, 0.9, 0.9);
+      ctx.fillRect(x + 0.8, hy - 4.6 + dy * 1.4, 0.9, 0.9);
+    });
+  }
+  if (a.id === "lead-hunter"){
+    // Tien: the third eye
+    ctx.fillStyle = "#1A1E24";
+    ctx.fillRect(x - 0.7, hy - 4.4, 1.4, 2.2);
+  }
+  if (a.id === "store-manager"){
+    // Hercule: the mustache
+    ctx.fillStyle = "#3A2A1C";
+    ctx.fillRect(x - 3.4, hy + 1.6, 2.8, 1.5); ctx.fillRect(x + 0.6, hy + 1.6, 2.8, 1.5);
+  }
+  if (a.id === "site-builder"){
+    // Android 17: orange bandana at the neck
+    ctx.fillStyle = "#E8681A";
+    ctx.beginPath(); ctx.roundRect(x - 5, hy + 6.2, 10, 2.4, 1.2); ctx.fill();
+  }
+  drawHair(a, x, hy, p);
 
   // label
   var label = a.cname + (a.auto ? " ⏰" : "");

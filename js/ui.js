@@ -131,6 +131,25 @@ var UI = (function(){
     return '<span class="dlgport emo" style="width:' + size + 'px;height:' + size + 'px;font-size:' + Math.round(size * 0.52) + 'px">' + a.emoji + '</span>';
   }
 
+  /* ---- next real scheduled window (shown so the stillness reads as honest) ---- */
+  function nextWindowText(a){
+    if (!a.sched || !a.sched.length) return "";
+    var now = new Date(), best = null, bestLabel = "";
+    a.sched.forEach(function(s){
+      for (var dOff = 0; dOff < 8; dOff++){
+        var t = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + dOff, s.h, s.m));
+        if (t <= now) continue;
+        if (s.days && s.days.indexOf(t.getUTCDay()) < 0) continue;
+        if (!best || t < best){ best = t; bestLabel = s.label; }
+        break;
+      }
+    });
+    if (!best) return "";
+    var when = best.toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" });
+    return '<h3>⏰ Next scheduled run</h3><p>' + esc(bestLabel) + ' — ' + when +
+      ' (your time). This fighter only moves when the window is actually live or you dispatch a mission.</p>';
+  }
+
   /* ---- inspector ---- */
   function openAgent(a){
     openedAgent = a; a.panelOpen = true;
@@ -145,6 +164,7 @@ var UI = (function(){
       ' <small>' + a.id + (a.auto ? " · ⏰ auto-runs on schedule" : "") + '</small></h2>' +
       '<p class="where">' + roomName(a.room) + ' · <span class="stx" style="color:' + (STATUS_COLORS[a.status] || "#7C8AA6") + '">' + a.status.toUpperCase() + '</span></p>' +
       '<p>' + esc(a.role) + '</p>' +
+      nextWindowText(a) +
       (a.currentTask ? '<h3>Current task</h3><p>' + esc(a.currentTask) + '</p>' + prog : "") +
       '<h3>Skills</h3><p class="skills">' + a.skills.map(function(s){ return '<span>' + esc(s) + '</span>'; }).join("") + '</p>' +
       '<h3>Recent activity</h3><ul class="hist">' + hist + '</ul>' +

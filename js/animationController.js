@@ -13,7 +13,6 @@ var World = (function(){
   var view = { x: 0, y: 0, s: 1 };
   var rooms = [], agents = [], roomById = {};
   var trails = [];   // {x1,y1,x2,y2,t0,dur,hue}
-  var flyBusy = false;
 
   /* ---------- geometry ---------- */
   function hexPts(cx, cy, s){
@@ -565,19 +564,32 @@ var World = (function(){
     a.sx = a.x; a.sy = a.y - 20 * FS;
   }
 
-  /* ---------- flights (ambient + research trips to The Internet) ---------- */
-  function startFlight(a, now, destRoom, visitMs, research){
-    var dest = destRoom || (function(){
-      var others = rooms.filter(function(r){ return r.id !== a.room && !r.island; });
-      return others[Math.floor(Math.random() * others.length)];
-    })();
+  /* ---------- flights: agents fly to THE INTERNET only when their REAL
+     routine window is live (the actual scheduled automations, UTC).
+     No ambient/fake movement — what you see is what's actually running. */
+  function liveWindow(a){
+    if (!a.sched) return null;
+    var d = new Date();
+    var mins = d.getUTCHours() * 60 + d.getUTCMinutes() + d.getUTCSeconds() / 60;
+    var day = d.getUTCDay();
+    for (var i = 0; i < a.sched.length; i++){
+      var s = a.sched[i];
+      if (s.days && s.days.indexOf(day) < 0) continue;
+      var start = s.h * 60 + s.m, dur = s.dur || 20;
+      if (mins >= start && mins < start + dur){
+        return { label: s.label, frac: (mins - start) / dur,
+                 remainMs: Math.max(1000, (start + dur - mins) * 60000) };
+      }
+    }
+    return null;
+  }
+  function startFlight(a, now, destRoom, visitMs, win){
     a.fly = {
       t0: now, dur: 1600, fx: a.x, fy: a.y,
-      txx: dest.wx + (Math.random() * 60 - 30), tyy: dest.wy + 34,
-      stage: "out", visitUntil: 0, visitMs: visitMs || 2600, research: !!research
+      txx: destRoom.wx + (Math.random() * 60 - 30), tyy: destRoom.wy + 34,
+      stage: "out", visitUntil: 0, visitMs: visitMs || 2600, win: win || null
     };
     a.powerUntil = now + 9000;
-    flyBusy = true;
   }
   function stepFlight(a, now){
     var f = a.fly;
@@ -589,24 +601,24 @@ var World = (function(){
       if (u >= 1){
         if (f.stage === "out"){
           f.stage = "visit"; f.visitUntil = now + f.visitMs;
-          if (f.research){
-            manager.updateStatus(a.id, "thinking", "Researching on The Internet — trends, footage, knowledge");
-            if (window.Feed) Feed.log("<b>" + a.name + "</b> flew to THE INTERNET — researching…", "#37D6E0");
+          if (f.win){
+            manager.updateStatus(a.id, "working", "⏰ " + f.win.label + " — scheduled routine, live right now");
+            if (window.Feed) Feed.log("<b>" + a.name + "</b> is on THE INTERNET — ⏰ " + f.win.label + " (real routine window)", "#37D6E0");
           }
         } else {
-          a.fly = null; flyBusy = false; a.tx = a.x; a.ty = a.y;
-          if (f.research){
+          a.fly = null; a.tx = a.x; a.ty = a.y;
+          if (f.win){
             manager.updateStatus(a.id, "idle", null);
-            a.nextResearch = now + 90000 + Math.random() * 150000;
-            if (window.Feed) Feed.log("<b>" + a.name + "</b> back from THE INTERNET with notes.", "#37D6E0");
+            if (window.Feed) Feed.log("<b>" + a.name + "</b> closed the routine window — back at their desk.", "#37D6E0");
           }
         }
       }
     } else if (f.stage === "visit"){
-      if (f.research){
-        // studying: progress climbs across the visit, driving the SSJ ladder
-        var vp = 1 - Math.max(0, (f.visitUntil - now) / f.visitMs);
-        a.progress = Math.min(100, Math.round(vp * 100));
+      if (f.win){
+        // progress tracks the REAL window clock, driving the SSJ ladder
+        var w = liveWindow(a);
+        if (w){ a.progress = Math.min(100, Math.round(w.frac * 100)); }
+        else { f.visitUntil = 0; } // window over — head home now
       }
       if (now > f.visitUntil){
         f.stage = "home"; f.t0 = now; f.fx = a.x; f.fy = a.y; f.txx = a.hx; f.tyy = a.hy;
@@ -643,21 +655,29 @@ var World = (function(){
       if (REDUCED) a.power = want;
       if (a.prevPower <= 0.5 && a.power > 0.5 && opts.chargeSound) opts.chargeSound();
 
-      if (a.research && !a.nextResearch) a.nextResearch = now + 8000 + Math.random() * 40000;
+      // Movement is truthful: a fighter leaves their desk ONLY when a real
+      // routine window is live (liveWindow) or a user-dispatched mission
+      // sets their status. No ambient wandering, no fake research trips.
+      var win = a.sched ? liveWindow(a) : null;
       if (a.fly){ stepFlight(a, now); }
-      else if (!REDUCED && a.research && !flyBusy && !busy && now > a.nextResearch){
-        startFlight(a, now, roomById.internet, 16000 + Math.random() * 14000, true);
+      else if (win && !busy && !a.winOn){
+        a.winOn = true;
+        if (REDUCED){
+          manager.updateStatus(a.id, "working", "⏰ " + win.label + " — scheduled routine, live right now");
+          if (window.Feed) Feed.log("<b>" + a.name + "</b> — ⏰ " + win.label + " (real routine window)", "#37D6E0");
+        } else {
+          startFlight(a, now, roomById.internet, win.remainMs, win);
+        }
       }
-      else if (!REDUCED && !flyBusy && !busy && Math.random() < 0.0003){ startFlight(a, now); }
-      else if (!REDUCED && !a.fly){
-        var dx = a.tx - a.x, dy = a.ty - a.y, d = Math.hypot(dx, dy);
-        if (d < 2){
-          if (Math.random() < 0.006){
-            var ang = Math.random() * 6.28, rr = Math.random();
-            a.tx = a.hx + Math.cos(ang) * 30 * rr;
-            a.ty = a.hy + Math.sin(ang) * 14 * rr;
-          }
-        } else { a.x += dx/d * 26 * dt; a.y += dy/d * 26 * dt; }
+      else if (!win && a.winOn){
+        a.winOn = false;
+        if (REDUCED && a.status === "working") manager.updateStatus(a.id, "idle", null);
+      }
+      else {
+        if (REDUCED && win && a.winOn) a.progress = Math.min(100, Math.round(win.frac * 100));
+        // drift back to their desk if displaced; otherwise hold the post
+        var dx = a.hx - a.x, dy = a.hy - a.y, d = Math.hypot(dx, dy);
+        if (d > 2){ a.x += dx/d * 26 * dt; a.y += dy/d * 26 * dt; }
       }
     });
 

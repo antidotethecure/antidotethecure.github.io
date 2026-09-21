@@ -61,6 +61,7 @@ var AGENT_DATA = [
     char:{hair:"long",hairC:"#171A1E",saiyan:false,gi:"#C9683E",pants:"#8A5A38",skin:"#F4C99B"} },
 
   { id:"hit", name:"HIT", emoji:"📡", room:"back", auto:true, support:true,
+    sched:[{h:13,m:0,days:[1,2,3,4,5],dur:20,label:"TICKER pre-market brief + daily trading lesson"}],
     role:"Markets Watchtower (support) — weekday pre-market briefs, daily trading lessons into the playbook, volume and chatter watch. Alerts and paper trades only.",
     skills:["trading","market","stock","polymarket","swing","volume","premarket"],
     avatar:"assets/characters/hit.webp",
@@ -90,6 +91,7 @@ var AGENT_DATA = [
     avatar:"assets/characters/trunks.webp",
     memoryUrl:HQ_FOLDER,
     research:true, auto:true,
+    sched:[{h:20,m:0,dur:20,label:"Midday marketing research sweep"}],
     persona:"You are TRUNKS, Antidote's marketing/SEO agent: keyword research, local SEO, Google Business optimization, campaigns tied to measurable goals — a number and a date on everything.",
     char:{hair:"bob",hairC:"#C4A6E8",saiyan:true,gi:"#3B3F8F",pants:"#8A8F98",skin:"#F4C99B",boot:"#8A6D3F"} },
 
@@ -146,7 +148,8 @@ var AGENT_DATA = [
     skills:["research","facts","market intelligence","competitors","analysis","views","youtube","channel"],
     avatar:"assets/characters/gohan.webp",
     memoryUrl:"https://docs.google.com/document/d/1jz2YGoIJTlDJ_KtxcV-68yz_pN3QpGUhV6EFZtlCXCc/edit",
-    research:true,
+    research:true, auto:true,
+    sched:[{h:3,m:0,dur:20,label:"Nightly channel scoreboard — views report"}],
     persona:"You are GOHAN, Antidote's research intelligence agent: deep research, verified facts with sources, market and competitor intelligence. You also run the channel scoreboard — BETTER or WORSE with the numbers, and a dip never goes unexplained.",
     char:{hair:"gohan",hairC:"#171A1E",saiyan:true,gi:"#6B3FA0",pants:"#F28C28",skin:"#F4C99B"} },
 
@@ -164,6 +167,7 @@ var AGENT_DATA = [
     avatar:"assets/characters/bardock.webp",
     memoryUrl:"https://docs.google.com/document/d/1LpZEijmA7g5O2CNmO_g6X3Oveivm4mP-bpPNx4JsOZg/edit",
     research:true,
+    sched:[{h:16,m:0,dur:20,label:"Daily GTA 6 content hunt"}],
     persona:"You are BARDOCK, Antidote's watchtower: trend detection, alerts, competitor and opportunity monitoring — you see it coming. Real sources with links; rumors labeled RUMOR.",
     char:{hair:"bardock",hairC:"#171A1E",saiyan:true,gi:"#2E3138",pants:"#274A2E",skin:"#E8B98A"} }
 ];

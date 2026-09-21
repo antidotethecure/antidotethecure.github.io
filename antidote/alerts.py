@@ -373,11 +373,84 @@ def deliver(destination: str, alert: Alert, rendered: str) -> bool:
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(rendered)
         return True
-    if destination in ("email", "sms", "telegram", "discord", "slack", "webhook"):
+    if destination == "telegram":
+        return _telegram_send(alert)
+    if destination in ("email", "sms", "discord", "slack", "webhook"):
         _log_unconfigured(destination, alert)
         return False
     _log_unconfigured(destination, alert)
     return False
+
+
+def telegram_summary(alert: Alert) -> str:
+    """Compact one-screen Telegram message. Full detail stays in the log."""
+    c = alert.context
+    q = c.get("question") or alert.market_id
+    prob = c.get("market_price_now")
+    lines = [
+        f"ANTIDOTE {alert.level.label}",
+        f"{q[:120]}",
+        "",
+        f"kind: {alert.kind}   confidence: {alert.confidence}/100",
+    ]
+    if alert.trader_id:
+        rank = c.get("trader_rank")
+        lines.append(f"trader: #{rank if rank else '?'} {alert.trader_id[-16:]}")
+    if c.get("value") is not None:
+        lines.append(f"trade: {c.get('side','?')} {c.get('outcome','?')} "
+                     f"${c['value']:,.0f} @ {_fmt(c.get('price'), '.3f')}")
+    if prob is not None:
+        lines.append(f"implied probability: {prob:.0%}")
+    lines.append(f"ACTION: {alert.level.action}")
+    lines.append("")
+    lines.append("Not a recommendation. Run copy-check before acting. "
+                 "Size from your own bankroll rules. Human decision required.")
+    if alert.source_kind in (SourceKind.SYNTHETIC, SourceKind.FIXTURE):
+        lines.append("*** SYNTHETIC TEST DATA — not a real market/trade. ***")
+    return "\n".join(lines)
+
+
+def _telegram_send(alert: Alert, text: str | None = None) -> bool:
+    """Send via the Telegram Bot API. Credentials come from the environment.
+
+    TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set. Never stored in the
+    repo or config. If missing, this logs 'not_configured' and returns False,
+    exactly like any other unconfigured destination.
+    """
+    import os
+    import urllib.parse
+    import urllib.request
+
+    token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        _log_unconfigured("telegram", alert)
+        return False
+
+    body = urllib.parse.urlencode({
+        "chat_id": chat_id,
+        "text": (text if text is not None else telegram_summary(alert))[:4096],
+        "disable_web_page_preview": "true",
+    }).encode()
+    req = urllib.request.Request(
+        f"https://api.telegram.org/bot{token}/sendMessage",
+        data=body, method="POST",
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            ok = 200 <= resp.status < 300
+    except Exception as exc:  # network/credential failure — never crash a scan
+        log_dir = DATA_ROOT / "LOGS"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        with (log_dir / "delivery.log").open("a") as fh:
+            fh.write(json.dumps({
+                "ts": utcnow().isoformat(), "alert_id": alert.id,
+                "destination": "telegram", "status": "error",
+                "detail": str(exc)[:200],
+            }) + "\n")
+        return False
+    return ok
 
 
 def _log_unconfigured(destination: str, alert: Alert) -> None:

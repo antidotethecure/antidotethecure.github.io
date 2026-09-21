@@ -130,12 +130,14 @@ class TestConfigIntegrity(unittest.TestCase):
             self.assertNotIn(marker, blob)
 
     def test_all_manifest_clips_have_urls(self) -> None:
+        """Every clip has an HTTPS URL; manifests only ever grow on purpose."""
         total = 0
         for m in self.cfg["manifests"].values():
             for clip in m["clips"]:
                 self.assertTrue(clip["url"].startswith("https://"))
                 total += 1
-        self.assertEqual(total, 153)
+        # 153 originally captured + 8 GTA6 entries (4 originals + 4 hook variants)
+        self.assertEqual(total, 161)
 
 
 if __name__ == "__main__":

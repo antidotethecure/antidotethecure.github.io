@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Antidote Agent Floor</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/world.css">
+<link rel="stylesheet" href="css/agents.css">
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/mobile.css">
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Antidote AI OS · Headquarters</p>
+  <h1>The Agent Floor</h1>
+  <p class="lede">Antidote commands a living AI workforce: nineteen agents across seven departments. Speak or type a mission on the Command Board — it routes through GOKU to the right specialist, the floor lights up, and the result comes back to the Commander. Drag to pan, pinch or use the buttons to zoom.</p>
+
+  <div class="cmdbar">
+    <p class="cmdlabel">⚡ COMMAND BOARD — say it, and the right fighter takes it</p>
+    <form id="cmdform">
+      <input id="cmdinput" type="text" autocomplete="off" placeholder='e.g. "find me 20 restaurant leads in Los Angeles" — or @GOTEN write me a caption' aria-label="Command for the agent squad">
+      <button type="button" class="cmdgo" id="micbtn" hidden title="Speak your command" aria-label="Speak your command">🎤</button>
+      <button type="button" class="cmdgo" id="soundbtn" title="Charge-up sound" aria-label="Toggle charge-up sound">🔇</button>
+      <button type="submit" class="cmdgo">DISPATCH</button>
+    </form>
+    <div id="micstatus" hidden style="margin-top:8px;font-size:12px;color:#E9B84F;font-family:'IBM Plex Mono',ui-monospace,monospace"></div>
+    <div id="cmdresult" hidden></div>
+    <div id="cmdreply" hidden></div>
+  </div>
+
+  <div class="mission" role="status" aria-label="Mission control counters">
+    <div class="mstat"><b id="st-active">0</b><span>Active agents</span></div>
+    <div class="mstat"><b id="st-running">0</b><span>Missions running</span></div>
+    <div class="mstat"><b id="st-missions">0</b><span>Sim missions today</span></div>
+    <div class="mstat"><b id="st-routed">0</b><span>Commands routed</span></div>
+    <div class="mstat"><b id="st-autos">3 LIVE</b><span>Automations</span></div>
+  </div>
+</header>
+
+<div class="maingrid">
+  <div>
+    <div class="worldbox">
+      <canvas id="stage" width="1180" height="760" aria-label="Isometric map of the Antidote agent headquarters. Use the badges below the map to open each agent."></canvas>
+      <div class="zoomctl">
+        <button id="zin" aria-label="Zoom in">+</button>
+        <button id="zout" aria-label="Zoom out">−</button>
+        <button id="zreset" aria-label="Reset view">⌂</button>
+      </div>
+    </div>
+    <p class="legend">STATUS:
+      <span class="sdot" style="background:#7C8AA6"></span>idle
+      <span class="sdot" style="background:#37D6E0"></span>working
+      <span class="sdot" style="background:#A98BE8"></span>thinking
+      <span class="sdot" style="background:#E9B84F"></span>waiting
+      <span class="sdot" style="background:#37E065"></span>complete
+      <span class="sdot" style="background:#E8863A"></span>delegating
+      <span class="sdot" style="background:#E5504A"></span>error
+      · <b>GOLD AURA = powered up</b> · ⏰ = auto-runs on a schedule
+      · <b>movement is real</b>: fighters fly to THE INTERNET only when their scheduled routine window is actually live, or when you dispatch a mission
+    </p>
+    <div class="roster" id="roster" aria-label="Agent roster"></div>
+  </div>
+
+  <div class="sidecol">
+    <div class="sidebox">
+      <details open>
+        <summary><h3 style="display:inline">📡 Live Activity</h3></summary>
+        <ul id="feedlist"></ul>
+      </details>
+    </div>
+    <div class="sidebox">
+      <h3>📥 Mission Results</h3>
+      <div id="results"><p style="color:var(--dim);font-size:12px;margin:0">Dispatch a command — the routed mission lands here with the real run buttons.</p></div>
+    </div>
+  </div>
+</div>
+
+<section class="backend">
+  <h2>The Backend System</h2>
+  <p class="sub">How Second Shift AI runs a client's whole business — construction companies, agencies, restaurants, multi-location operations. Every process connected, every workflow automated, one intelligent system.</p>
+  <p class="tag">YOU BECOME THE INFRASTRUCTURE THEY RUN ON.</p>
+  <div class="begrid">
+    <div>
+      <p class="becol-h" style="color:#4FB8D9">📡 Scouter Signals — everything coming in</p>
+      <div class="becard"><b>💬 Lead Forms</b><p>Website, FB ads, Google, referrals</p></div>
+      <div class="becard"><b>✉️ Email &amp; SMS</b><p>All conversations in one inbox</p></div>
+      <div class="becard"><b>📞 Phone Calls</b><p>Missed calls answered, AI call summaries</p></div>
+      <div class="becard"><b>📅 Appointments</b><p>Bookings, reschedules, reminders</p></div>
+      <div class="becard"><b>📄 Documents</b><p>Plans, contracts, permits, photos</p></div>
+      <div class="becard"><b>💵 Payments</b><p>Invoices, deposits, expenses</p></div>
+    </div>
+    <div>
+      <div class="becore">
+        <b>🐉 SHENRON CORE — Claude AI, the brain of the business</b>
+        <div class="checks"><span>✓ understands everything</span><span>✓ makes smart decisions</span><span>✓ automates workflows</span><span>✓ grants the wish: time back</span></div>
+      </div>
+      <div class="balls">
+        <div class="ball"><div class="orb">★</div><b>CRM</b><ul><li>Lead tracking</li><li>Client profiles</li><li>Pipeline stages</li><li>Lead scoring</li></ul></div>
+        <div class="ball"><div class="orb">★★</div><b>SCHEDULE</b><ul><li>Job scheduling</li><li>Team calendars</li><li>Auto reminders</li></ul></div>
+        <div class="ball"><div class="orb">★★★</div><b>ESTIMATES</b><ul><li>Create &amp; send</li><li>Approvals</li><li>Convert to job</li></ul></div>
+        <div class="ball"><div class="orb">★★★★</div><b>PROJECTS</b><ul><li>Job management</li><li>Milestones</li><li>Progress tracking</li></ul></div>
+        <div class="ball"><div class="orb">★★★★★</div><b>TASKS</b><ul><li>Assignment</li><li>Priorities</li><li>Deadlines</li></ul></div>
+        <div class="ball"><div class="orb">★★★★★★</div><b>INVOICING</b><ul><li>Auto invoices</li><li>Payment links</li><li>Late reminders</li></ul></div>
+        <div class="ball"><div class="orb">★★★★★★★</div><b>REPORTS</b><ul><li>Sales reports</li><li>Job profit</li><li>Cash flow</li></ul></div>
+      </div>
+      <div class="belayer"><b>🏯 CAPSULE VAULT</b> · <span>Centralized smart database — all data connected, always up to date, always accessible.</span></div>
+      <div class="belayer"><b>⚡ INSTANT TRANSMISSION LAYER</b> · <span>Claude triggers actions, sends messages, updates records, assigns tasks, keeps everything moving.</span></div>
+      <div class="belayer"><b>🌀 FUSION CHAMBER</b> · <span>Fuses with the tools they already use: Gmail, Google Calendar, Slack, QuickBooks, Stripe + more.</span></div>
+    </div>
+    <div>
+      <p class="becol-h" style="color:var(--gold)">📈 Power Levels — what the client feels</p>
+      <div class="bepower">POWER LEVEL: OVER 9,000</div>
+      <div class="becard"><b>🏆 More Jobs Won</b><p>Automated follow-ups convert more leads</p></div>
+      <div class="becard"><b>⏱️ Time Saved Daily</b><p>The busywork handles itself</p></div>
+      <div class="becard"><b>💰 Faster Payments</b><p>Automated invoicing gets them paid sooner</p></div>
+      <div class="becard"><b>🤝 Team Alignment</b><p>Everyone knows what to do and when</p></div>
+      <div class="becard"><b>📍 Multi-Location Ready</b><p>All locations from one dashboard</p></div>
+      <div class="becard"><b>🚀 Business Growth</b><p>Insights and automation drive real growth</p></div>
+    </div>
+  </div>
+  <div class="bestrip">
+    <div class="becard"><b>✅ Fully Automated</b><p>The backend handles itself so they run the business</p></div>
+    <div class="becard"><b>🧠 AI-Powered</b><p>Smarter decisions, less manual work</p></div>
+    <div class="becard"><b>🛡️ Secure &amp; Reliable</b><p>Client data protected, always</p></div>
+    <div class="becard"><b>📶 Built to Scale</b><p>Grows with the business — no limits</p></div>
+  </div>
+</section>
+
+<footer>ANTIDOTE HQ · agents in antidotethecure.github.io/.claude/agents · memory in Drive "Claude Projects — Antidote HQ" · drop transparent PNGs in /assets/characters/ to replace any fighter · fan-style tribute for Antidote's own dashboard</footer>
+</div>
+
+<div class="panel-backdrop" id="backdrop" role="dialog" aria-modal="true">
+  <div class="panel" id="panel"></div>
+</div>
+
+<script src="js/agents.js"></script>
+<script src="js/taskRouter.js"></script>
+<script src="js/activityFeed.js"></script>
+<script src="js/animationController.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</html>

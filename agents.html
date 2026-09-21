@@ -131,13 +131,15 @@ footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",
 <header>
   <p class="eyebrow">Antidote AI OS · Saiyan Squad</p>
   <h1>The Agent Floor</h1>
-  <p class="lede">Seventeen fighters, seventeen jobs. On standby they walk their stations in base form — when a task hits, they power up and the aura comes out. They fly between departments when work crosses over. Tap any fighter to see the job, copy the dispatch, or send it straight to Claude.</p>
+  <p class="lede">Eighteen fighters, eighteen jobs — with the boss himself on the floor. On standby they walk their stations in base form — when a task hits, they power up and the aura comes out. Tap any fighter to see the job, speak or type on the board, and the right one takes it.</p>
   <p class="legend">BASE FORM = standby · <b>GOLD AURA = handling a task</b> · ⏰ = runs automatically on a schedule</p>
 
   <div class="cmdbar">
     <p class="cmdlabel">⚡ COMMAND BOARD — say it, and the right fighter takes it</p>
     <form id="cmdform">
       <input id="cmdinput" type="text" autocomplete="off" placeholder='e.g. "find me 20 restaurant leads in LA" or "why did my views drop?"' aria-label="Command for the agent squad">
+      <button type="button" class="cmdgo" id="micbtn" hidden title="Speak your command">🎤</button>
+      <button type="button" class="cmdgo" id="soundbtn" title="Charge-up sound">🔇</button>
       <button type="submit" class="cmdgo">DISPATCH</button>
     </form>
     <div id="cmdresult" hidden></div>
@@ -221,7 +223,11 @@ var ROOMS = [
    {id:"memory-keeper", cname:"GOKU", emoji:"🧠", char:{hair:"spiky",hairC:"#171A1E",saiyan:true,gi:"#F28C28",pants:"#2B4C9B",skin:"#F4C99B"},
     role:"Goku holds the whole system's memory — reads and updates every project memory doc, tags sessions, keeps all 11 projects honest.",
     duties:["Briefs sessions from memory at start","Updates the docs at end","Housekeeps tags and the master list"],
-    dispatch:"Use the memory-keeper agent: [e.g., update the agency memory doc with today's work]"}]},
+    dispatch:"Use the memory-keeper agent: [e.g., update the agency memory doc with today's work]"},
+   {id:"antidote-brand", cname:"ANTIDOTE", emoji:"💊", char:{hair:"hat",hairC:"#1E2126",saiyan:true,freckles:true,gi:"#23272E",pants:"#3E5A8A",skin:"#F2D5B8"},
+    role:"The boss himself. Everything carrying the Antidote name runs through him: the music (tracks, drops, releases), The Antidote movie's marketing and premiere plan, and the real Antidote Instagram.",
+    duties:["Music: tracks, metadata, drops, release plans","The movie's marketing, trailers, premiere strategy","Runs the real Antidote Instagram — nothing posts without his sign-off","Final word on anything carrying the name"],
+    dispatch:"Use the antidote-brand agent: [e.g., plan the drop for my next track and the IG rollout around it]"}]},
  {name:"THE STUDIO", hue:"#E5675F", pos:[90,1], agents:[
    {id:"director", cname:"PICCOLO", emoji:"🎬", char:{hair:"antennae",hairC:"#3E7D4E",saiyan:false,gi:"#5B3FA8",pants:"#5B3FA8",skin:"#8FBF6A"},
     role:"Piccolo directs The Antidote — the mentor's eye on acts, scenes, beats, narration, and footage plans.",
@@ -406,6 +412,17 @@ function drawHair(a, x, topY, p, t){
     ctx.stroke(); ctx.lineCap = "butt";
     return;
   }
+  if (c.hair === "hat"){
+    // fitted cap on a bald head: dome + flat brim, gold trim when powered
+    ctx.beginPath(); ctx.arc(x, topY + 1.5, 6.8, Math.PI, 0);
+    ctx.fillStyle = c.hairC; ctx.fill();
+    ctx.fillRect(x - 6.8, topY + 0.5, 13.6, 2.2);
+    ctx.beginPath(); ctx.roundRect(x - 10.5, topY + 1.6, 10, 2.4, 1.2);
+    ctx.fillStyle = shade(c.hairC, 1.35); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, topY - 1.4, 1.5, 0, 6.29);
+    ctx.fillStyle = (p > 0.5) ? "#FFD84A" : "#37E0A5"; ctx.fill();
+    return;
+  }
   if (c.hair === "afro"){
     ctx.beginPath(); ctx.arc(x, topY - 3, 8, Math.PI, 0);
     ctx.fillStyle = col; ctx.fill();
@@ -508,6 +525,11 @@ function drawFighter(a, t){
   ctx.fillStyle = (p > 0.5 && c.saiyan) ? "#2BB8A8" : "#1A1E24";
   ctx.fillRect(x - 3, y - 27, 1.8, 1.8);
   ctx.fillRect(x + 1.2, y - 27, 1.8, 1.8);
+  if (c.freckles){
+    ctx.fillStyle = "#C98A5E";
+    ctx.fillRect(x - 4.4, y - 24.6, 1, 1); ctx.fillRect(x - 3, y - 23.8, 1, 1); ctx.fillRect(x - 4.8, y - 23.2, 1, 1);
+    ctx.fillRect(x + 3.4, y - 24.6, 1, 1); ctx.fillRect(x + 2, y - 23.8, 1, 1); ctx.fillRect(x + 3.8, y - 23.2, 1, 1);
+  }
   drawHair(a, x, y - 30.5, p, t);
 
   // label
@@ -566,8 +588,10 @@ function frame(t){
   AGENTS.forEach(function(a){
     // power state
     var want = (a.panelOpen || now < a.powerUntil) ? 1 : 0;
+    var prevP = a.power;
     a.power += (want - a.power) * Math.min(dt*4, 1);
     if (REDUCED){ a.power = want; }
+    if (prevP <= 0.5 && a.power > 0.5) chargeSound();
     // random task power-ups (auto agents more often)
     if (!REDUCED && !a.fly && now > a.powerUntil && Math.random() < (a.auto ? .0012 : .0006)){
       a.powerUntil = now + 4500 + Math.random()*3000;
@@ -660,7 +684,8 @@ var TRIGGERS = {
   "supplier-scout":["supplier","wholesale","manufacturer","source","alibaba","vendor","kiosk","product cost","moq"],
   "site-builder":["my website","my site","landing page","fix the site","foodie page","clothing page","store page","antidotethecure"],
   "store-manager":["shopify","store","merch","product","inventory","collection","orders","discount code"],
-  "memory-keeper":["memory","remember","update the doc","organize","tag","project doc","where did we leave","status of"]
+  "memory-keeper":["memory","remember","update the doc","organize","tag","project doc","where did we leave","status of"],
+  "antidote-brand":["music","song","track","album","drop a song","release","my instagram","the real antidote","antidote ig","premiere","trailer","brand","movie marketing","my page"]
 };
 function routeCommand(text){
   var t = " " + text.toLowerCase() + " ";
@@ -675,6 +700,67 @@ function routeCommand(text){
 }
 var cmdform = document.getElementById("cmdform"), cmdinput = document.getElementById("cmdinput"), cmdresult = document.getElementById("cmdresult");
 var samplePromise = (window.claude && window.claude.use) ? window.claude.use("sample") : Promise.resolve(null);
+
+// ---- charge-up sound (synthesized — no external audio) ----
+var actx = null, soundOn = false, lastCharge = 0;
+var soundbtn = document.getElementById("soundbtn");
+function chargeSound(){
+  if (!soundOn || !actx) return;
+  var now = performance.now();
+  if (now - lastCharge < 1800) return;
+  lastCharge = now;
+  var t0 = actx.currentTime;
+  var o = actx.createOscillator(), g = actx.createGain();
+  o.type = "sawtooth";
+  o.frequency.setValueAtTime(70, t0);
+  o.frequency.exponentialRampToValueAtTime(340, t0 + 0.9);
+  var lfo = actx.createOscillator(), lg = actx.createGain();
+  lfo.frequency.value = 26; lg.gain.value = 16;
+  lfo.connect(lg); lg.connect(o.frequency);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.1, t0 + 0.18);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.15);
+  o.connect(g); g.connect(actx.destination);
+  o.start(t0); o.stop(t0 + 1.2); lfo.start(t0); lfo.stop(t0 + 1.2);
+}
+soundbtn.addEventListener("click", function(){
+  soundOn = !soundOn;
+  soundbtn.textContent = soundOn ? "🔊" : "🔇";
+  if (soundOn){
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === "suspended") actx.resume();
+      lastCharge = 0; chargeSound();
+    } catch(e){ soundOn = false; soundbtn.textContent = "🔇"; }
+  }
+});
+
+// ---- speak-to-the-squad (browser speech recognition) ----
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+var micbtn = document.getElementById("micbtn");
+if (SR){
+  micbtn.hidden = false;
+  var listening = false;
+  micbtn.addEventListener("click", function(){
+    if (listening) return;
+    try {
+      var rec = new SR();
+      rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 1;
+      listening = true; micbtn.textContent = "👂";
+      rec.onresult = function(e){
+        var said = e.results[0][0].transcript;
+        document.getElementById("cmdinput").value = said;
+        listening = false; micbtn.textContent = "🎤";
+        var scores = routeCommand(said);
+        if (scores.length) fireAgent(scores[0].a, said);
+        else fireAgent(AGENTS.filter(function(a){ return a.id === "memory-keeper"; })[0], said + " (route this to whichever agent fits best)");
+      };
+      rec.onerror = function(){ listening = false; micbtn.textContent = "🎤"; micbtn.title = "Mic unavailable here — type instead"; };
+      rec.onend = function(){ listening = false; if (micbtn.textContent === "👂") micbtn.textContent = "🎤"; };
+      rec.start();
+    } catch(e){ listening = false; micbtn.textContent = "🎤"; micbtn.title = "Mic unavailable here — type instead"; }
+  });
+}
 
 function askAgent(a, text){
   var reply = document.getElementById("cmdreply");

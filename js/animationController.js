@@ -69,6 +69,12 @@ var World = (function(){
         img.onload = function(){ a.img = img; };
         img.onerror = function(){ a.img = null; };
         img.src = a.avatar;
+        if (a.face){
+          var fimg = new Image();
+          fimg.onload = function(){ a.faceImg = fimg; };
+          fimg.onerror = function(){ a.faceImg = null; };
+          fimg.src = a.face;
+        }
       });
     });
 
@@ -411,18 +417,29 @@ var World = (function(){
       ctx.fillRect(x-5.5, y-4.5, 11, 2.4);
 
       var hy = y - 26;
-      ctx.beginPath(); ctx.arc(x, hy, HR, 0, 6.29);
-      ctx.fillStyle = c.skin; ctx.fill();
-      ctx.fillStyle = (p > 0.5 && c.saiyan) ? "#2BB8A8" : "#1A1E24";
-      ctx.fillRect(x-3, y-27, 1.8, 1.8); ctx.fillRect(x+1.2, y-27, 1.8, 1.8);
-      ctx.strokeStyle = "#1A1E24"; ctx.lineWidth = 0.9;
-      var browTilt = (a.name === "VEGETA" || p > 0.5) ? 1.1 : 0.4;
-      ctx.beginPath(); ctx.moveTo(x-3.6,y-28.2); ctx.lineTo(x-0.9,y-28.2+browTilt); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x+3.6,y-28.2); ctx.lineTo(x+0.9,y-28.2+browTilt); ctx.stroke();
-      if (c.freckles){
-        ctx.fillStyle = shade(c.skin, 0.55);
-        ctx.fillRect(x-4.4,y-24.6,1,1); ctx.fillRect(x-3,y-23.8,1,1); ctx.fillRect(x-4.8,y-23.2,1,1);
-        ctx.fillRect(x+3.4,y-24.6,1,1); ctx.fillRect(x+2,y-23.8,1,1); ctx.fillRect(x+3.8,y-23.2,1,1);
+      if (a.faceImg){
+        // the Commander's real face, circle-clipped, cap drawn over it
+        var fr = HR + 2;
+        ctx.save();
+        ctx.beginPath(); ctx.arc(x, hy, fr, 0, 6.29); ctx.clip();
+        ctx.drawImage(a.faceImg, x - fr, hy - fr, fr * 2, fr * 2);
+        ctx.restore();
+        ctx.beginPath(); ctx.arc(x, hy, fr, 0, 6.29);
+        ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 1; ctx.stroke();
+      } else {
+        ctx.beginPath(); ctx.arc(x, hy, HR, 0, 6.29);
+        ctx.fillStyle = c.skin; ctx.fill();
+        ctx.fillStyle = (p > 0.5 && c.saiyan) ? "#2BB8A8" : "#1A1E24";
+        ctx.fillRect(x-3, y-27, 1.8, 1.8); ctx.fillRect(x+1.2, y-27, 1.8, 1.8);
+        ctx.strokeStyle = "#1A1E24"; ctx.lineWidth = 0.9;
+        var browTilt = (a.name === "VEGETA" || p > 0.5) ? 1.1 : 0.4;
+        ctx.beginPath(); ctx.moveTo(x-3.6,y-28.2); ctx.lineTo(x-0.9,y-28.2+browTilt); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+3.6,y-28.2); ctx.lineTo(x+0.9,y-28.2+browTilt); ctx.stroke();
+        if (c.freckles){
+          ctx.fillStyle = shade(c.skin, 0.55);
+          ctx.fillRect(x-4.4,y-24.6,1,1); ctx.fillRect(x-3,y-23.8,1,1); ctx.fillRect(x-4.8,y-23.2,1,1);
+          ctx.fillRect(x+3.4,y-24.6,1,1); ctx.fillRect(x+2,y-23.8,1,1); ctx.fillRect(x+3.8,y-23.2,1,1);
+        }
       }
       if (a.name === "KRILLIN"){
         ctx.fillStyle = "#8A5A38";

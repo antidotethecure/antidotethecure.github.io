@@ -104,7 +104,9 @@ var UI = (function(){
     var prog = a.status === "working" || a.status === "thinking"
       ? '<div class="prog"><div class="progbar" style="width:' + (a.progress || 8) + '%"></div></div>' : "";
     panel.innerHTML =
-      '<h2><span>' + a.emoji + '</span>' + a.name +
+      '<h2>' + (a.face
+        ? '<img src="' + a.face + '" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--phue)">'
+        : '<span>' + a.emoji + '</span>') + a.name +
       ' <small>' + a.id + (a.auto ? " · ⏰ auto-runs on schedule" : "") + '</small></h2>' +
       '<p class="where">' + roomName(a.room) + ' · <span class="stx" style="color:' + (STATUS_COLORS[a.status] || "#7C8AA6") + '">' + a.status.toUpperCase() + '</span></p>' +
       '<p>' + esc(a.role) + '</p>' +

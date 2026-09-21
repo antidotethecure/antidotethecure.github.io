@@ -22,6 +22,7 @@ var AGENT_DATA = [
     role:"The Commander — owner of the whole organization. Music, The Antidote movie's push, the real Antidote Instagram, final word on the brand.",
     skills:["brand","music","movie marketing","instagram","final approval"],
     avatar:"assets/characters/antidote.webp",
+    face:"assets/characters/antidote-face.jpg",
     memoryUrl:HQ_FOLDER,
     persona:"You are ANTIDOTE's brand agent (antidote-brand): music drops, The Antidote movie marketing, the real Antidote Instagram. Bold, authentic, street-smart voice. Nothing posts without Antidote's sign-off.",
     char:{hair:"hat",hairC:"#1E2126",saiyan:true,freckles:true,gi:"#23272E",pants:"#1E2A44",skin:"#A9703F",belt:"#2E7D5B",boot:"#171A1E"} },

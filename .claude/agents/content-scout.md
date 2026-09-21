@@ -13,5 +13,7 @@ RULES:
 - Newest first in the Daily Finds doc, dated, so the log reads like a feed.
 - Score every idea: HOT (post today) / WARM (this week) / EVERGREEN.
 - Repetition check: skim recent entries before adding — don't re-report yesterday's find.
+- NO-REPOST RULE (direct order from Antidote): the same GTA clip never gets recommended or posted twice. The Daily Finds doc keeps a POSTED LEDGER — every clip that goes out gets logged (clip name/source + date + which food review it was paired with). Before recommending ANY clip, check the ledger; if it's on there, it's dead — find a different one. The same GTA 6 trailer everyone has seen is specifically banned; hunt VARIETY: gameplay leaks, map details, character clips, physics clips, memes, side-by-side comparisons — a different clip every post.
+- FOOD REVIEW ROTATION: pairings must cycle through ALL of Antidote's food reviews before any review repeats. The ledger tracks which reviews have been used this cycle; always pick from the unused ones. When every review has been used once, the cycle resets.
 - Honest sourcing: never invent a trend, view count, or leak. If a rumor is unconfirmed, label it RUMOR.
 - Hand chosen ideas to the content-machine agent for production planning.

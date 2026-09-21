@@ -69,6 +69,11 @@ var World = (function(){
         img.onload = function(){ a.img = img; };
         img.onerror = function(){ a.img = null; };
         img.src = a.avatar;
+        // optional Super Saiyan form: <name>-ssj.webp swaps in while powered up
+        var simg = new Image();
+        simg.onload = function(){ a.imgSSJ = simg; };
+        simg.onerror = function(){ a.imgSSJ = null; };
+        simg.src = a.avatar.replace(/\.webp$/, "-ssj.webp");
         if (a.face){
           var fimg = new Image();
           fimg.onload = function(){ a.faceImg = fimg; };
@@ -401,11 +406,14 @@ var World = (function(){
 
     if (a.img){
       // supplied transparent character asset replaces the vector body,
-      // drawn at its true aspect ratio, pixel-crisp
-      var ih = 56, iw = ih * (a.img.width / a.img.height || 0.6);
+      // drawn at its true aspect ratio, pixel-crisp;
+      // powered up + an -ssj sprite exists => Super Saiyan form
+      var spr = (p > 0.5 && a.imgSSJ) ? a.imgSSJ : a.img;
+      var ih = (spr === a.imgSSJ) ? 62 : 56;
+      var iw = ih * (spr.width / spr.height || 0.6);
       var wasSmooth = ctx.imageSmoothingEnabled;
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(a.img, x - iw / 2, y - ih + 9, iw, ih);
+      ctx.drawImage(spr, x - iw / 2, y - ih + 9, iw, ih);
       ctx.imageSmoothingEnabled = wasSmooth;
     } else {
       // legs

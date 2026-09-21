@@ -220,7 +220,7 @@ footer{margin-top:26px;color:#7C86A6;font-size:12px;font-family:"IBM Plex Mono",
 // char: hair "spiky"/"bald"/"antennae"/"tentacle"/"afro"/"bob"/"long", hairC base color, saiyan => gold SSJ hair, gi/pants outfit
 var ROOMS = [
  {name:"SERVER ROOM", hue:"#37E0A5", pos:[0,0], agents:[
-   {id:"memory-keeper", cname:"GOKU", emoji:"🧠", char:{hair:"goku",hairC:"#171A1E",saiyan:true,gi:"#F28C28",pants:"#2B4C9B",skin:"#F4C99B",cuff:"#2B4C9B"},
+   {id:"memory-keeper", cname:"GOKU", emoji:"🧠", char:{hair:"goku",hairC:"#171A1E",saiyan:true,gi:"#F28C28",pants:"#F28C28",skin:"#F4C99B",cuff:"#2B4C9B",belt:"#2B4C9B",boot:"#24407E"},
     role:"Goku holds the whole system's memory — reads and updates every project memory doc, tags sessions, keeps all 11 projects honest.",
     duties:["Briefs sessions from memory at start","Updates the docs at end","Housekeeps tags and the master list"],
     dispatch:"Use the memory-keeper agent: [e.g., update the agency memory doc with today's work]"},
@@ -229,7 +229,7 @@ var ROOMS = [
     duties:["Music: tracks, metadata, drops, release plans","The movie's marketing, trailers, premiere strategy","Runs the real Antidote Instagram — nothing posts without his sign-off","Final word on anything carrying the name"],
     dispatch:"Use the antidote-brand agent: [e.g., plan the drop for my next track and the IG rollout around it]"}]},
  {name:"THE STUDIO", hue:"#E5675F", pos:[90,1], agents:[
-   {id:"director", cname:"PICCOLO", emoji:"🎬", char:{hair:"antennae",hairC:"#3E7D4E",saiyan:false,gi:"#5B3FA8",pants:"#5B3FA8",skin:"#8FBF6A",belt:"#B3261E"},
+   {id:"director", cname:"PICCOLO", emoji:"🎬", char:{hair:"antennae",turban:true,hairC:"#3E7D4E",saiyan:false,gi:"#5B3FA8",pants:"#5B3FA8",skin:"#8FBF6A",belt:"#B3261E",boot:"#8A6D3F"},
     role:"Piccolo directs The Antidote — the mentor's eye on acts, scenes, beats, narration, and footage plans.",
     duties:["Keeps the living scene outline current","Punches up narration, challenges weak scenes","Maps footage to beats, flags gaps"],
     dispatch:"Use the director agent: [e.g., break Act I into beats against the footage inventory]"},
@@ -251,7 +251,7 @@ var ROOMS = [
     duties:["Runs automatically every morning at 9:00 AM PT","Top 5 GTA 6 short-form plays daily, with sources","Flags your videos not yet cut into shorts","Logs to CONTENT SCOUT — Daily Finds in Drive"],
     dispatch:"Use the content-scout agent: run a sweep right now — today's GTA 6 trends plus my unchopped clips"}]},
  {name:"MARKETING FLOOR", hue:"#E06A9C", pos:[150,1], agents:[
-   {id:"campaign-strategist", cname:"TRUNKS", emoji:"🎯", char:{hair:"bob",hairC:"#B58FE8",saiyan:true,gi:"#3B3F8F",pants:"#8A8F98",skin:"#F4C99B"},
+   {id:"campaign-strategist", cname:"TRUNKS", emoji:"🎯", char:{hair:"bob",hairC:"#C4A6E8",saiyan:true,gi:"#3B3F8F",pants:"#8A8F98",skin:"#F4C99B",boot:"#8A6D3F"},
     role:"Trunks runs the marketing side — the AI marketing department: positioning, offers, campaign plans with numbers and dates. Purple hair on standby, gold when the campaign drops.",
     duties:["Every campaign gets a measurable goal","Routes work through department roles","Turns winners into templates"],
     dispatch:"Use the campaign-strategist agent: build a campaign for [brand/goal — e.g., the first Woke Dope drop]"}]},
@@ -264,7 +264,7 @@ var ROOMS = [
     role:"Tien's third eye finds businesses with visible gaps — real names, real contacts, scored hot/warm/cold.",
     duties:["Name + contact + reason, verified","Scores every lead","Hands outreach copy to Goten"],
     dispatch:"Use the lead-hunter agent: find [N] [type of business] leads in [area] for Second Shift AI"},
-   {id:"restaurant-researcher", cname:"MAJIN BUU", emoji:"🍽️", char:{hair:"tentacle",hairC:"#F2A0C4",saiyan:false,gi:"#F2A0C4",pants:"#F4F0E4",skin:"#F2A0C4"},
+   {id:"restaurant-researcher", cname:"MAJIN BUU", emoji:"🍽️", char:{hair:"tentacle",hairC:"#F2A0C4",saiyan:false,gi:"#F2A0C4",pants:"#F4F0E4",skin:"#F2A0C4",belt:"#E8C84A"},
     role:"Nobody knows food like Buu — keeps the full restaurant offer current: food-review spotlight, digital menus, AI phone + email, crypto pay, weekly retention, loyalty game + raffles.",
     duties:["2-3 real vendor options per piece, priced and dated","Weekly customer retention engine (opt-in only)","Loyalty mini-game + raffles with sweepstakes compliance","Packages it into sellable tiers"],
     dispatch:"Use the restaurant-researcher agent: [e.g., price out the full restaurant stack and package it into three tiers]"},
@@ -273,7 +273,7 @@ var ROOMS = [
     duties:["Full formation intake — asks every right question","Scouts address, phone, domain, email with current prices","Bank fit: Navy Federal (if military-affiliated), Mercury/Relay/Novo, Chase","Funding path: EIN → bank → DUNS → net-30s → business credit"],
     dispatch:"Use the business-builder agent: build out [business name] — it does [what it sells], forming in [state]"}]},
  {name:"BACK OFFICE", hue:"#E9B84F", pos:[270,1], agents:[
-   {id:"tax-researcher", cname:"VEGETA", emoji:"📋", char:{hair:"vegeta",hairC:"#171A1E",saiyan:true,gi:"#F4F0E4",pants:"#2743B5",skin:"#F4C99B",cuff:"#F4F6F8"},
+   {id:"tax-researcher", cname:"VEGETA", emoji:"📋", char:{hair:"vegeta",hairC:"#171A1E",saiyan:true,gi:"#F4F0E4",pants:"#2743B5",skin:"#F4C99B",cuff:"#F4F6F8",boot:"#F4F6F8"},
     role:"Vegeta runs the taxes side — proud, precise, and never wrong twice. Looks up real IRS/state rules with publication numbers cited. Never from memory.",
     duties:["Cites source + number + tax year","Logs every verified rule once","Keeps deadlines current"],
     dispatch:"Use the tax-researcher agent: [your tax question] — cite the sources"},
@@ -401,7 +401,7 @@ var HAIRSPECS = {
   goten:  [[150,7],[120,10.5],[92,11.5],[62,8.5],[34,5.5]],
   gohan:  [[142,7],[114,10.5],[90,12.5],[64,8.5],[40,5.5]],
   bardock:[[156,6],[132,10],[102,12.5],[76,9.5],[50,8.5],[26,5]],
-  vegeta: [[126,8.5],[110,12.5],[95,15],[80,12.5],[62,8.5]]
+  vegeta: [[118,10],[104,14.5],[90,16.5],[76,14.5],[62,10]]
 };
 function scalpCap(x, hy, col, r){
   ctx.fillStyle = col;
@@ -426,6 +426,12 @@ function drawHair(a, x, hy, p){
   if (c.hair === "bald") return;
   if (HAIRSPECS[c.hair]){
     spikeFan(x, hy, HAIRSPECS[c.hair], col, powered);
+    if (c.hair === "goku" || c.hair === "goten"){
+      // signature forehead bangs hanging over the brow
+      ctx.fillStyle = col;
+      ctx.beginPath(); ctx.moveTo(x - 4.6, hy - 4.4); ctx.lineTo(x - 2.6, hy - 0.6); ctx.lineTo(x - 0.8, hy - 4.8); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x - 0.6, hy - 4.8); ctx.lineTo(x + 1.6, hy - 1.2); ctx.lineTo(x + 3.6, hy - 4.6); ctx.closePath(); ctx.fill();
+    }
     if (c.hair === "vegeta"){
       // widow's peak dipping into the forehead
       ctx.fillStyle = col;
@@ -438,11 +444,19 @@ function drawHair(a, x, hy, p){
     return;
   }
   if (c.hair === "antennae"){
-    // namekian: antennae rooted at the forehead + pointed ears
-    ctx.strokeStyle = c.hairC; ctx.lineWidth = 1.7; ctx.lineCap = "round";
-    ctx.beginPath(); ctx.moveTo(x - 2, hy - 4.6); ctx.quadraticCurveTo(x - 5.5, hy - 10, x - 3.5, hy - 12); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x + 2, hy - 4.6); ctx.quadraticCurveTo(x + 5.5, hy - 10, x + 3.5, hy - 12); ctx.stroke();
-    ctx.lineCap = "butt";
+    // namekian: pointed ears + either the white turban (Piccolo) or bare antennae (Dende)
+    if (c.turban){
+      ctx.fillStyle = "#F4F0E4";
+      ctx.beginPath(); ctx.arc(x, hy - 1.2, HR + 1, Math.PI * 1.04, -0.04); ctx.closePath(); ctx.fill();
+      ctx.fillRect(x - HR - 1, hy - 2.6, (HR + 1) * 2, 2.6);
+      ctx.strokeStyle = "#C9C2B2"; ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(x - 3, hy - 6.8); ctx.quadraticCurveTo(x, hy - 8.4, x + 3, hy - 6.8); ctx.stroke();
+    } else {
+      ctx.strokeStyle = c.hairC; ctx.lineWidth = 1.7; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(x - 2, hy - 4.6); ctx.quadraticCurveTo(x - 5.5, hy - 10, x - 3.5, hy - 12); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x + 2, hy - 4.6); ctx.quadraticCurveTo(x + 5.5, hy - 10, x + 3.5, hy - 12); ctx.stroke();
+      ctx.lineCap = "butt";
+    }
     ctx.fillStyle = c.skin;
     ctx.beginPath(); ctx.moveTo(x - HR + 0.6, hy - 1.5); ctx.lineTo(x - HR - 2.6, hy + 0.5); ctx.lineTo(x - HR + 0.8, hy + 2); ctx.closePath(); ctx.fill();
     ctx.beginPath(); ctx.moveTo(x + HR - 0.6, hy - 1.5); ctx.lineTo(x + HR + 2.6, hy + 0.5); ctx.lineTo(x + HR - 0.8, hy + 2); ctx.closePath(); ctx.fill();
@@ -532,7 +546,7 @@ function drawFighter(a, t){
     ctx.beginPath(); ctx.roundRect(x + 0.9 - walk*2.4, y - 4, 4.6, 13, 2.2); ctx.fill();
   }
   // boots
-  ctx.fillStyle = shade(c.pants, .6);
+  ctx.fillStyle = c.boot || shade(c.pants, .6);
   ctx.beginPath(); ctx.roundRect(x - 5.5 + (flying?0:walk*2.4), y + 6.5, 4.6, 3, 1.4); ctx.fill();
   ctx.beginPath(); ctx.roundRect(x + 0.9 - (flying?0:walk*2.4), y + (flying?4.5:6.5), 4.6, 3, 1.4); ctx.fill();
 
@@ -573,9 +587,16 @@ function drawFighter(a, t){
     ctx.beginPath(); ctx.roundRect(x - 3, y - 20, 6, 15, 2); ctx.fill();
   }
   if (a.id === "restaurant-researcher"){
-    // Buu: gold vest edges over the pink
+    // Buu: purple cape shoulders + gold vest edges over the pink
+    ctx.fillStyle = "#6B3FA0";
+    ctx.beginPath(); ctx.roundRect(x - 9.5, y - 22, 19, 4.2, 2); ctx.fill();
     ctx.fillStyle = "#E8C84A";
     ctx.fillRect(x - 7, y - 20, 2.6, 13); ctx.fillRect(x + 4.4, y - 20, 2.6, 13);
+  }
+  if (a.id === "tax-researcher"){
+    // Vegeta: gold armor straps over the white chest
+    ctx.fillStyle = "#E8C84A";
+    ctx.fillRect(x - 4.8, y - 20.5, 2.2, 4.6); ctx.fillRect(x + 2.6, y - 20.5, 2.2, 4.6);
   }
   if (a.id === "market-watcher"){
     // Hit: long coat panel lines

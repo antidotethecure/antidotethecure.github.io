@@ -207,6 +207,27 @@ var World = (function(){
   }
 
   /* ---------- fighters (vector fallback) ---------- */
+  // character emblems — the classic identifiers, like the old sprite games
+  var EMBLEMS = {
+    "GOKU":      { glyph:"悟", bg:"#E8681A" },
+    "GOHAN":     { glyph:"飯", bg:"#6B3FA0" },
+    "GOTEN":     { glyph:"悟", bg:"#3EA6D8" },
+    "VEGETA":    { glyph:"V",  bg:"#2743B5" },
+    "TRUNKS":    { glyph:"CC", bg:"#F4F0E4", fg:"#B3261E", small:true },
+    "BULMA":     { glyph:"CC", bg:"#F4F0E4", fg:"#B3261E", small:true },
+    "PICCOLO":   { glyph:"魔", bg:"#3E7D4E" },
+    "DENDE":     { glyph:"神", bg:"#4E9E5F" },
+    "KRILLIN":   { glyph:"亀", bg:"#E8681A" },
+    "TIEN":      { glyph:"天", bg:"#3E8F4E" },
+    "MAJIN BUU": { glyph:"M",  bg:"#F2A0C4", fg:"#5B3FA8" },
+    "HERCULE":   { glyph:"★",  bg:"#C9A227" },
+    "ANDROID 17":{ glyph:"RR", bg:"#B3261E", small:true },
+    "ANDROID 18":{ glyph:"RR", bg:"#B3261E", small:true },
+    "BARDOCK":   { glyph:"S",  bg:"#274A2E" },
+    "HIT":       { glyph:"時", bg:"#5A4FA8" },
+    "YAJIROBE":  { glyph:"刀", bg:"#8A5A38" },
+    "ANTIDOTE":  { glyph:"A",  bg:"#2E7D5B" }
+  };
   var HR = 6.2;
   var HAIRSPECS = {
     goku:   [[152,6],[128,9.5],[104,12.5],[86,10.5],[62,9],[38,6]],
@@ -416,16 +437,16 @@ var World = (function(){
       ctx.fillStyle = c.belt || shade(c.pants, 1.2);
       ctx.fillRect(x-5.5, y-4.5, 11, 2.4);
 
-      var hy = y - 26;
+      var hy = y - 27;
       if (a.faceImg){
-        // the Commander's real face, circle-clipped, cap drawn over it
-        var fr = HR + 2;
+        // the Commander's real face — full head, no cap covering it
+        var fr = HR + 3.4;
         ctx.save();
-        ctx.beginPath(); ctx.arc(x, hy, fr, 0, 6.29); ctx.clip();
-        ctx.drawImage(a.faceImg, x - fr, hy - fr, fr * 2, fr * 2);
+        ctx.beginPath(); ctx.arc(x, hy - 1, fr, 0, 6.29); ctx.clip();
+        ctx.drawImage(a.faceImg, x - fr, hy - 1 - fr, fr * 2, fr * 2);
         ctx.restore();
-        ctx.beginPath(); ctx.arc(x, hy, fr, 0, 6.29);
-        ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, hy - 1, fr, 0, 6.29);
+        ctx.strokeStyle = (p > 0.5) ? "#FFD84A" : "#37E0A5"; ctx.lineWidth = 1.4; ctx.stroke();
       } else {
         ctx.beginPath(); ctx.arc(x, hy, HR, 0, 6.29);
         ctx.fillStyle = c.skin; ctx.fill();
@@ -448,7 +469,7 @@ var World = (function(){
       if (a.name === "TIEN"){ ctx.fillStyle="#1A1E24"; ctx.fillRect(x-0.7,hy-4.4,1.4,2.2); }
       if (a.name === "HERCULE"){ ctx.fillStyle="#3A2A1C"; ctx.fillRect(x-3.4,hy+1.6,2.8,1.5); ctx.fillRect(x+0.6,hy+1.6,2.8,1.5); }
       if (a.name === "ANDROID 17"){ ctx.fillStyle="#E8681A"; ctx.beginPath(); ctx.roundRect(x-5,hy+6.2,10,2.4,1.2); ctx.fill(); }
-      drawHair(a, x, hy, p);
+      if (!a.faceImg) drawHair(a, x, hy, p);
     }
 
     // status dot
@@ -458,7 +479,7 @@ var World = (function(){
     ctx.fillStyle = sc; ctx.fill();
     ctx.strokeStyle = "rgba(255,255,255,.5)"; ctx.lineWidth = 0.8; ctx.stroke();
 
-    // name pill
+    // name pill + character emblem badge (the old-sprite identifiers)
     var label = a.name + (a.auto ? " ⏰" : "");
     ctx.font = "700 10px 'IBM Plex Mono', monospace";
     var tw = ctx.measureText(label).width;
@@ -468,6 +489,16 @@ var World = (function(){
     ctx.fillStyle = p > 0.5 ? "#241505" : "#FFE9CE";
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.fillText(label, 0, py + 7.5);
+    var em = EMBLEMS[a.name];
+    if (em){
+      var ex = -tw/2 - 14, ey = py + 7.5;
+      ctx.beginPath(); ctx.arc(ex, ey, 8, 0, 6.29);
+      ctx.fillStyle = em.bg; ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,.5)"; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = em.fg || "#FFF";
+      ctx.font = "700 " + (em.small ? 7 : 9) + "px 'Archivo', sans-serif";
+      ctx.fillText(em.glyph, ex, ey + 0.5);
+    }
     ctx.restore();
 
     a.sx = a.x; a.sy = a.y - 20 * FS;

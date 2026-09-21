@@ -51,6 +51,8 @@ var UI = (function(){
 
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     var micbtn = document.getElementById("micbtn");
+    var micstatus = document.getElementById("micstatus");
+    function micSay(msg){ if (micstatus){ micstatus.hidden = false; micstatus.textContent = msg; } }
     if (SR){
       micbtn.hidden = false;
       var listening = false;
@@ -60,15 +62,35 @@ var UI = (function(){
           var rec = new SR();
           rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 1;
           listening = true; micbtn.textContent = "👂";
+          micSay("Listening… say your command.");
           rec.onresult = function(e){
             cmdinput.value = e.results[0][0].transcript;
             listening = false; micbtn.textContent = "🎤";
+            if (micstatus) micstatus.hidden = true;
             document.getElementById("cmdform").requestSubmit();
           };
-          rec.onerror = function(){ listening = false; micbtn.textContent = "🎤"; micbtn.title = "Mic unavailable here — type instead"; };
+          rec.onerror = function(ev){
+            listening = false; micbtn.textContent = "🎤";
+            var why = ev && ev.error;
+            if (why === "not-allowed" || why === "service-not-allowed"){
+              micSay("Mic is blocked inside this viewer. It works on the website version (agents.html in Chrome/Safari, allow the mic when asked) — here, type your command instead.");
+            } else if (why === "no-speech"){
+              micSay("Didn't catch anything — tap 🎤 and try again.");
+            } else {
+              micSay("Mic unavailable here (" + (why || "error") + ") — type your command instead.");
+            }
+          };
           rec.onend = function(){ listening = false; if (micbtn.textContent === "👂") micbtn.textContent = "🎤"; };
           rec.start();
-        } catch(e){ listening = false; micbtn.textContent = "🎤"; }
+        } catch(e){
+          listening = false; micbtn.textContent = "🎤";
+          micSay("Mic unavailable here — type your command instead.");
+        }
+      });
+    } else {
+      micbtn.hidden = false;
+      micbtn.addEventListener("click", function(){
+        micSay("This browser doesn't support voice input — it works in Chrome and Safari on the website version. Type your command instead.");
       });
     }
 

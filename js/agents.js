@@ -12,7 +12,8 @@ var ROOMS = [
   { id:"marketing",name:"MARKETING FLOOR",hue:"#E06A9C", pos:[150,1] },
   { id:"studio",   name:"CONTENT STUDIO", hue:"#E5675F", pos:[90,1]  },
   { id:"shop",     name:"OPERATIONS SHOP",hue:"#E99A50", pos:[330,1] },
-  { id:"lab",      name:"CONTENT LAB",    hue:"#A98BE8", pos:[30,1]  }
+  { id:"lab",      name:"CONTENT LAB",    hue:"#A98BE8", pos:[30,1]  },
+  { id:"internet", name:"THE INTERNET",   hue:"#37D6E0", pos:[0,1.5], island:true }
 ];
 
 /* Every agent: identity, role, room, avatar slot, skills, dispatch persona,
@@ -88,6 +89,7 @@ var AGENT_DATA = [
     skills:["seo","keywords","local seo","google business","marketing","campaign","backlinks","ads"],
     avatar:"assets/characters/trunks.webp",
     memoryUrl:HQ_FOLDER,
+    research:true, auto:true,
     persona:"You are TRUNKS, Antidote's marketing/SEO agent: keyword research, local SEO, Google Business optimization, campaigns tied to measurable goals — a number and a date on everything.",
     char:{hair:"bob",hairC:"#C4A6E8",saiyan:true,gi:"#3B3F8F",pants:"#8A8F98",skin:"#F4C99B",boot:"#8A6D3F"} },
 
@@ -144,6 +146,7 @@ var AGENT_DATA = [
     skills:["research","facts","market intelligence","competitors","analysis","views","youtube","channel"],
     avatar:"assets/characters/gohan.webp",
     memoryUrl:"https://docs.google.com/document/d/1jz2YGoIJTlDJ_KtxcV-68yz_pN3QpGUhV6EFZtlCXCc/edit",
+    research:true,
     persona:"You are GOHAN, Antidote's research intelligence agent: deep research, verified facts with sources, market and competitor intelligence. You also run the channel scoreboard — BETTER or WORSE with the numbers, and a dip never goes unexplained.",
     char:{hair:"gohan",hairC:"#171A1E",saiyan:true,gi:"#6B3FA0",pants:"#F28C28",skin:"#F4C99B"} },
 
@@ -160,6 +163,7 @@ var AGENT_DATA = [
     skills:["monitoring","trends","alerts","competitors","opportunities","gta","scout","viral now"],
     avatar:"assets/characters/bardock.webp",
     memoryUrl:"https://docs.google.com/document/d/1LpZEijmA7g5O2CNmO_g6X3Oveivm4mP-bpPNx4JsOZg/edit",
+    research:true,
     persona:"You are BARDOCK, Antidote's watchtower: trend detection, alerts, competitor and opportunity monitoring — you see it coming. Real sources with links; rumors labeled RUMOR.",
     char:{hair:"bardock",hairC:"#171A1E",saiyan:true,gi:"#2E3138",pants:"#274A2E",skin:"#E8B98A"} }
 ];

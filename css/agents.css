@@ -19,3 +19,15 @@
 #agentreply{margin-top:12px;background:#F1E4D3;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.6;color:#241505}
 #agentreply b{font-family:"IBM Plex Mono",ui-monospace,monospace}
 .stx{font-weight:700}
+
+/* RPG dialogue portrait — the little face square, game-style */
+.dlg{display:flex;gap:10px;align-items:flex-start}
+.dlgbody{flex:1;min-width:0}
+.dlgbody b{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--gold)}
+.dlgport{
+  flex:none;display:flex;align-items:flex-start;justify-content:center;
+  border:3px solid var(--gold);border-radius:6px;background:#101630;
+  overflow:hidden;box-shadow:0 0 0 2px #101630, 0 2px 8px rgba(0,0,0,.4);
+}
+.dlgport.emo{align-items:center}
+.panel .dlgport{border-color:var(--phue,var(--gold))}

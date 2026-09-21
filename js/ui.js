@@ -116,6 +116,21 @@ var UI = (function(){
     return r ? r.name : roomId;
   }
 
+  /* ---- RPG dialogue portrait: the little face square ---- */
+  function portraitHTML(a, size){
+    size = size || 56;
+    if (a.face){
+      return '<span class="dlgport" style="width:' + size + 'px;height:' + size + 'px">' +
+        '<img src="' + a.face + '" alt="" style="width:100%;height:100%;object-fit:cover"></span>';
+    }
+    if (a.img){
+      // sprite head: show the top of the sprite, pixel-crisp
+      return '<span class="dlgport" style="width:' + size + 'px;height:' + size + 'px">' +
+        '<img src="' + a.avatar + '" alt="" style="width:100%;image-rendering:pixelated;display:block;margin-top:-2px"></span>';
+    }
+    return '<span class="dlgport emo" style="width:' + size + 'px;height:' + size + 'px;font-size:' + Math.round(size * 0.52) + 'px">' + a.emoji + '</span>';
+  }
+
   /* ---- inspector ---- */
   function openAgent(a){
     openedAgent = a; a.panelOpen = true;
@@ -126,9 +141,7 @@ var UI = (function(){
     var prog = a.status === "working" || a.status === "thinking"
       ? '<div class="prog"><div class="progbar" style="width:' + (a.progress || 8) + '%"></div></div>' : "";
     panel.innerHTML =
-      '<h2>' + (a.face
-        ? '<img src="' + a.face + '" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--phue)">'
-        : '<span>' + a.emoji + '</span>') + a.name +
+      '<h2>' + portraitHTML(a, 48) + a.name +
       ' <small>' + a.id + (a.auto ? " · ⏰ auto-runs on schedule" : "") + '</small></h2>' +
       '<p class="where">' + roomName(a.room) + ' · <span class="stx" style="color:' + (STATUS_COLORS[a.status] || "#7C8AA6") + '">' + a.status.toUpperCase() + '</span></p>' +
       '<p>' + esc(a.role) + '</p>' +
@@ -164,7 +177,9 @@ var UI = (function(){
   function askAgent(a, text, mount){
     mount = mount || document.getElementById("cmdreply");
     mount.hidden = false;
-    mount.innerHTML = '<b>' + a.emoji + ' ' + a.name + '</b><div class="replytext">…powering up…</div>';
+    mount.innerHTML =
+      '<div class="dlg">' + portraitHTML(a, 60) +
+      '<div class="dlgbody"><b>' + a.name + '</b><div class="replytext">…powering up…</div></div></div>';
     a.powerUntil = performance.now() + 25000;
     samplePromise.then(function(s){
       var el = mount.querySelector(".replytext");

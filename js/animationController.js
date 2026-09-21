@@ -45,8 +45,8 @@ var World = (function(){
     rooms = ROOMS.map(function(r){
       var ang = r.pos[0] * Math.PI / 180, ring = r.pos[1];
       var o = Object.assign({}, r);
-      o.wx = CX + (ring ? RING * Math.cos(ang) : 0);
-      o.wy = CY + (ring ? RING * Math.sin(ang) * K : 0);
+      o.wx = CX + RING * ring * Math.cos(ang);
+      o.wy = CY + RING * ring * Math.sin(ang) * K;
       roomById[o.id] = o;
       return o;
     });
@@ -183,6 +183,26 @@ var World = (function(){
     ctx.strokeStyle = r.hue; ctx.lineWidth = 3; ctx.stroke();
     tracePoly(hexPts(r.wx, r.wy, HEX - 10));
     ctx.strokeStyle = "rgba(255,255,255,.12)"; ctx.lineWidth = 1; ctx.stroke();
+    if (r.island){
+      // THE INTERNET island: globe with latitude lines + satellite dish
+      var gx = r.wx, gy = r.wy - 12;
+      ctx.beginPath(); ctx.arc(gx, gy, 17, 0, 6.29);
+      ctx.fillStyle = "#123B52"; ctx.fill();
+      ctx.strokeStyle = "#37D6E0"; ctx.lineWidth = 1.6; ctx.stroke();
+      ctx.strokeStyle = "rgba(55,214,224,.6)"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.ellipse(gx, gy, 17, 6.5, 0, 0, 6.29); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(gx, gy, 8, 16.5, 0, 0, 6.29); ctx.stroke();
+      var blink = REDUCED ? 0.7 : 0.4 + 0.4 * Math.abs(Math.sin(t / 500));
+      ctx.beginPath(); ctx.arc(gx, gy - 24, 3, 0, 6.29);
+      ctx.fillStyle = "rgba(55,224,165," + blink + ")"; ctx.fill();
+      ctx.strokeStyle = "#4A5C8F";
+      ctx.beginPath(); ctx.moveTo(gx, gy - 17); ctx.lineTo(gx, gy - 22); ctx.stroke();
+      ctx.font = "700 9px 'IBM Plex Mono', monospace";
+      ctx.fillStyle = "rgba(55,214,224,.8)";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("RESEARCH ZONE", r.wx, r.wy + HEX * K * 0.45);
+      return;
+    }
     // consoles at the back of the room, glowing screens flickering
     [-1, 1].forEach(function(side){
       var dx = r.wx + side * HEX * 0.52, dy = r.wy - HEX * K * 0.42;
@@ -508,11 +528,17 @@ var World = (function(){
     a.sx = a.x; a.sy = a.y - 20 * FS;
   }
 
-  /* ---------- ambient flights ---------- */
-  function startFlight(a, now){
-    var others = rooms.filter(function(r){ return r.id !== a.room; });
-    var dest = others[Math.floor(Math.random() * others.length)];
-    a.fly = { t0: now, dur: 1600, fx: a.x, fy: a.y, txx: dest.wx + (Math.random()*60-30), tyy: dest.wy + 34, stage: "out", visitUntil: 0 };
+  /* ---------- flights (ambient + research trips to The Internet) ---------- */
+  function startFlight(a, now, destRoom, visitMs, research){
+    var dest = destRoom || (function(){
+      var others = rooms.filter(function(r){ return r.id !== a.room && !r.island; });
+      return others[Math.floor(Math.random() * others.length)];
+    })();
+    a.fly = {
+      t0: now, dur: 1600, fx: a.x, fy: a.y,
+      txx: dest.wx + (Math.random() * 60 - 30), tyy: dest.wy + 34,
+      stage: "out", visitUntil: 0, visitMs: visitMs || 2600, research: !!research
+    };
     a.powerUntil = now + 9000;
     flyBusy = true;
   }
@@ -524,8 +550,20 @@ var World = (function(){
       a.x = f.fx + (f.txx - f.fx) * e;
       a.y = f.fy + (f.tyy - f.fy) * e - Math.sin(u * Math.PI) * 50;
       if (u >= 1){
-        if (f.stage === "out"){ f.stage = "visit"; f.visitUntil = now + 2600; }
-        else { a.fly = null; flyBusy = false; a.tx = a.x; a.ty = a.y; }
+        if (f.stage === "out"){
+          f.stage = "visit"; f.visitUntil = now + f.visitMs;
+          if (f.research){
+            manager.updateStatus(a.id, "thinking", "Researching on The Internet — trends, footage, knowledge");
+            if (window.Feed) Feed.log("<b>" + a.name + "</b> flew to THE INTERNET — researching…", "#37D6E0");
+          }
+        } else {
+          a.fly = null; flyBusy = false; a.tx = a.x; a.ty = a.y;
+          if (f.research){
+            manager.updateStatus(a.id, "idle", null);
+            a.nextResearch = now + 90000 + Math.random() * 150000;
+            if (window.Feed) Feed.log("<b>" + a.name + "</b> back from THE INTERNET with notes.", "#37D6E0");
+          }
+        }
       }
     } else if (f.stage === "visit" && now > f.visitUntil){
       f.stage = "home"; f.t0 = now; f.fx = a.x; f.fy = a.y; f.txx = a.hx; f.tyy = a.hy;
@@ -561,7 +599,11 @@ var World = (function(){
       if (REDUCED) a.power = want;
       if (a.prevPower <= 0.5 && a.power > 0.5 && opts.chargeSound) opts.chargeSound();
 
+      if (a.research && !a.nextResearch) a.nextResearch = now + 8000 + Math.random() * 40000;
       if (a.fly){ stepFlight(a, now); }
+      else if (!REDUCED && a.research && !flyBusy && !busy && now > a.nextResearch){
+        startFlight(a, now, roomById.internet, 16000 + Math.random() * 14000, true);
+      }
       else if (!REDUCED && !flyBusy && !busy && Math.random() < 0.0003){ startFlight(a, now); }
       else if (!REDUCED && !a.fly){
         var dx = a.tx - a.x, dy = a.ty - a.y, d = Math.hypot(dx, dy);

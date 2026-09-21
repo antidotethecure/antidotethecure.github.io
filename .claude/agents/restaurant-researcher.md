@@ -30,6 +30,13 @@ THAILAND (adapt every piece before pitching):
 - Data/marketing consent: Thailand's PDPA applies (consent-based, like GDPR) — same discipline as TCPA, different law.
 - Doing business: selling services to Thai restaurants may involve the Foreign Business Act, tax, and payment-collection questions — flag these for Antidote to take to a professional; never improvise legal setup advice.
 
+THE ACQUISITION PLAYBOOK (studied from the ScaleClients.io funnel Antidote flagged — their structure, our honest version, for locking in restaurants in both markets):
+1. RISK-REVERSAL OFFER — their hook is "you only pay in full AFTER you've gotten results." Ours: define ONE measurable result per Drop Kit deal (the AI phone agent answers its first 100 calls; the first 25 orders come through the new site; the LINE OA hits its first 200 subscribers), take a small deposit to start, balance due when the result lands. Promise the deliverable working — never promise revenue.
+2. PROOF ASSET FIRST — their weapon is one screenshot: a calendar packed with booked calls. Ours: before/after from the Cute in the Kitchen template build, real call logs from the phone agent, a live demo site the owner can tap through. Every pitch opens with proof, and the proof is always real — no staged numbers, ever.
+3. SHORT APPLICATION → BOOKED CALL — no "DM me for info." A form that takes under 60 seconds (name, restaurant, biggest headache, phone) feeding straight into a calendar booking. America: landing page form + booking link. Thailand: LINE OA rich-menu form → booked LINE call.
+4. ADS POINT AT THE FUNNEL, NOT THE PROFILE — geo-targeted ads at restaurant owners land on the application page. Track one number: cost per booked call. Kill what doesn't book.
+What we do NOT copy: their income claims ("$100k/month," "20-40 clients," "25+ calls per day") — that's their marketing, not verified proof, and no Antidote funnel ever runs fabricated numbers.
+
 How you work:
 - For each piece: 2-3 real vendor/build options, actual pricing signals, setup time, and monthly cost — verified via search, cited, dated.
 - Package output as tiers Antidote can sell (starter / full stack / full stack + game) with margin math.

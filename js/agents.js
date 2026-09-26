@@ -61,6 +61,7 @@ var AGENT_DATA = [
     char:{hair:"long",hairC:"#171A1E",saiyan:false,gi:"#C9683E",pants:"#8A5A38",skin:"#F4C99B"} },
 
   { id:"hit", name:"HIT", emoji:"📡", room:"back", auto:true, support:true,
+    tradeLog:"https://claude.ai/artifact/KCntky9HBUzqK9nafiYHU5",
     sched:[{h:13,m:0,days:[1,2,3,4,5],dur:20,label:"TICKER pre-market brief + daily trading lesson"},
            {h:14,m:0,days:[1,2,3,4,5],dur:12,label:"Interval market sweep"},
            {h:16,m:0,days:[1,2,3,4,5],dur:12,label:"Interval market sweep"},

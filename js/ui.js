@@ -172,6 +172,7 @@ var UI = (function(){
       '<button class="btn primary" id="btn-assign">Assign task</button>' +
       '<button class="btn" id="btn-msg">Message agent</button>' +
       '<a class="btn" target="_blank" rel="noopener" href="' + a.memoryUrl + '">View memory</a>' +
+      (a.tradeLog ? '<a class="btn" target="_blank" rel="noopener" href="' + a.tradeLog + '">📒 Trade Log</a>' : '') +
       '<a class="btn" target="_blank" rel="noopener" href="https://claude.ai/new?q=' +
         encodeURIComponent(a.persona + " TASK: [describe it]") + '">Full session →</a>' +
       '<button class="btn" id="btn-close">Close</button></div>' +

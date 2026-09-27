@@ -2648,17 +2648,39 @@ const pinE=bake(256,512,(g,w,h)=>{g.fillStyle='#000';g.fillRect(0,0,w,h);g.fillS
 const cityT=bake(512,128,(g,w,h)=>{g.fillStyle='#1a1016';g.fillRect(0,0,w,h);g.fillStyle='#120b0d';
   for(let x=0;x<w;){const bw=20+Math.random()*44,bh=30+Math.random()*80;g.fillRect(x,h-bh,bw,bh);x+=bw+6;}
   g.fillStyle='#f2a81d';for(let i=0;i<70;i++){g.globalAlpha=0.3+Math.random()*0.6;g.fillRect(Math.random()*w,h*0.35+Math.random()*h*0.6,2,2);}g.globalAlpha=1;});
-function pinTexture(food){const t=pinTexture0(food);const g=t.image.getContext('2d');
+/* REAL FOOD ON THE PINS. Each pin carried a 96-pixel emoji glyph, which is what made them read as
+   cartoon. assets/food.png is already in the build -- eight keyed photographs of real plates, used
+   for the props that scatter on the lane -- so the pins use those instead. The sheet is 4x2 and its
+   cell order is burger, pizza, taco, hot dog / fries, donut, shrimp, waffle, which is NOT the order
+   the FOODS list is in, so this maps them by hand rather than by index. Two of the ten -- the salad
+   and the drink -- have no photograph on the sheet, so they keep their emoji rather than wear
+   somebody else's dinner. */
+const FOOD_CELL=[4,1,0,7,-1,3,5,-1,6,2];
+/*              fries,pizza,burger,bread(waffle),salad:none,hotdog,donut,drink:none,sushi(shrimp),taco */
+function pinTexture(food,fi){const t=pinTexture0(food,fi);const g=t.image.getContext('2d');
   /* the LED channel cut into the neck: dark groove, lit floor */
   g.fillStyle='#14100f';g.fillRect(0,158,256,14);g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,156,256,3);g.fillRect(0,171,256,3);g.fillStyle='rgba(255,255,255,.14)';g.fillRect(0,174,256,1);
   t.needsUpdate=true;return t;}
-function pinTexture0(food){return bake(256,512,(g,w,h)=>{
+function pinTexture0(food,fi){return bake(256,512,(g,w,h)=>{
   const gr=g.createLinearGradient(0,0,w,0);gr.addColorStop(0,'#d9c39a');gr.addColorStop(0.35,'#fff6df');gr.addColorStop(0.6,'#fbe9c4');gr.addColorStop(1,'#c9ab7c');
   g.fillStyle=gr;g.fillRect(0,0,w,h);
   g.fillStyle='#b8322c';g.fillRect(0,h*0.325,w,h*0.030);g.fillRect(0,h*0.372,w,h*0.017);
   g.fillStyle='#1a1214';g.beginPath();g.arc(w*0.44,h*0.095,7,0,7);g.arc(w*0.56,h*0.095,7,0,7);g.fill();
   g.strokeStyle='#1a1214';g.lineWidth=5;g.beginPath();g.moveTo(w*0.43,h*0.150);g.quadraticCurveTo(w*0.5,h*0.175,w*0.57,h*0.150);g.stroke();
-  g.font='96px serif';g.textAlign='center';g.textBaseline='middle';g.fillText(food&&food.e||'🍟',w*0.5,h*0.62);
+  const cell=(fi==null||FOOD_CELL[fi]==null)?-1:FOOD_CELL[fi];
+  let drew=false;
+  if(cell>=0&&foodImg){
+    /* the photograph, keyed, dropped onto the pin where the emoji used to sit */
+    const CW=foodImg.width/FOOD_COLS,CH=foodImg.height/FOOD_ROWS;
+    const sx=(cell%FOOD_COLS)*CW,sy=Math.floor(cell/FOOD_COLS)*CH;
+    const box=168,ar=CW/CH;let dw=box,dh=box/ar;
+    if(dh>box){dh=box;dw=box*ar;}
+    try{g.save();
+      g.shadowColor='rgba(0,0,0,.38)';g.shadowBlur=10;g.shadowOffsetY=4;   /* it sits ON the pin, not in it */
+      g.drawImage(foodImg,sx,sy,CW,CH,w*0.5-dw/2,h*0.62-dh/2,dw,dh);
+      g.restore();drew=true;}catch(e){}
+  }
+  if(!drew){g.font='96px serif';g.textAlign='center';g.textBaseline='middle';g.fillText(food&&food.e||'🍟',w*0.5,h*0.62);}
 });}
 /* ---- static scenery ---- */
 const M=THREE.Mesh;
@@ -2982,6 +3004,44 @@ const btvT=new THREE.CanvasTexture(btvC);btvT.colorSpace=THREE.SRGBColorSpace;bt
 const btvFrame=new M(new THREE.BoxGeometry(7.5,4.3,0.16),new THREE.MeshBasicMaterial({color:0x0a0a0c}));btvFrame.position.set(4.6,4.95,-21.7);amb.add(btvFrame);
 const btvGlow=new M(new THREE.PlaneGeometry(9.4,6.0),new THREE.MeshBasicMaterial({color:0x7fb8ff,transparent:true,opacity:0.24,blending:THREE.AdditiveBlending,depthWrite:false}));btvGlow.position.set(4.6,4.95,-21.75);amb.add(btvGlow);
 const btv=new M(new THREE.PlaneGeometry(7.1,3.99),new THREE.MeshBasicMaterial({map:btvT,toneMapped:false}));btv.position.set(4.6,4.95,-21.6);amb.add(btv);
+/* ---------- CHASE LIGHTS around the big screen ----------
+   A marquee border of bulbs on the bezel, with colour running round the frame and a bright wave
+   chasing through it. They are one Points cloud rather than forty little spheres, so the whole
+   border costs a single draw call and the animation is just a colour buffer being rewritten. They
+   are unlit on purpose: bulbs are light sources, so they stay bright when the house goes cosmic. */
+const bulbT=bake(64,64,(g,w,h)=>{const r=g.createRadialGradient(32,32,0,32,32,30);
+  r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(0.35,'rgba(255,255,255,.85)');
+  r.addColorStop(0.7,'rgba(255,255,255,.22)');r.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle=r;g.fillRect(0,0,w,h);});
+const BULB_HX=3.64,BULB_HY=2.07,BULB_GAP=0.42;   /* on the bezel, just outside the 7.1 x 3.99 picture */
+const bulbPos=[];
+{const per=2*(2*BULB_HX+2*BULB_HY),n=Math.max(8,Math.round(per/BULB_GAP)),segW=2*BULB_HX,segH=2*BULB_HY;
+ for(let i=0;i<n;i++){
+   let d=(i/n)*per,x,y;
+   if(d<segW){x=-BULB_HX+d;y=BULB_HY;}                                  /* top, left to right */
+   else if(d<segW+segH){x=BULB_HX;y=BULB_HY-(d-segW);}                  /* right, down */
+   else if(d<2*segW+segH){x=BULB_HX-(d-segW-segH);y=-BULB_HY;}          /* bottom, right to left */
+   else{x=-BULB_HX;y=-BULB_HY+(d-2*segW-segH);}                         /* left, up */
+   bulbPos.push(x,y,0);}}
+const BULB_N=bulbPos.length/3;
+const bulbGeo=new THREE.BufferGeometry();
+bulbGeo.setAttribute('position',new THREE.Float32BufferAttribute(bulbPos,3));
+bulbGeo.setAttribute('color',new THREE.Float32BufferAttribute(new Float32Array(BULB_N*3),3));
+const btvBulbs=new THREE.Points(bulbGeo,new THREE.PointsMaterial({size:0.30,map:bulbT,vertexColors:true,
+  transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true,toneMapped:false}));
+btvBulbs.position.set(4.6,4.95,-21.56);amb.add(btvBulbs);
+const _bulbC=new THREE.Color();
+function btvBulbTick(t){
+  const col=bulbGeo.attributes.color,a=col.array;
+  for(let i=0;i<BULB_N;i++){
+    const u=i/BULB_N;
+    /* one bright wave running round the frame, plus a slow hue drift so it never sits on one colour */
+    const chase=Math.pow(0.5+0.5*Math.sin((u*3-t*0.55)*Math.PI*2),3);
+    _bulbC.setHSL((u*0.55+t*0.06)%1,0.85,0.30+0.55*chase);
+    a[i*3]=_bulbC.r;a[i*3+1]=_bulbC.g;a[i*3+2]=_bulbC.b;
+  }
+  col.needsUpdate=true;
+}
 /* THE BIG SCREEN: food reviews and nothing else. A review preview plays up there when the clip will load,
    and the review artwork carries the screen when it will not. No follow-me promo on the jumbotron. */
 const btvHov=document.createElement('video');btvHov.muted=true;btvHov.playsInline=true;btvHov.setAttribute('playsinline','');btvHov.preload='auto';btvHov.crossOrigin='anonymous';
@@ -3024,9 +3084,22 @@ function drawBTV(t){
     try{btvG.save();btvG.globalAlpha=0.35;btvG.filter='blur(14px) brightness(0.6)';btvG.drawImage(btvHov,0,0,W2,H2);btvG.restore();btvG.drawImage(btvHov,bx,0,boxW,boxH);}catch(e){}
   }else if(covers.length){
     const per=6,idx=Math.floor(t/per)%covers.length,ph2=(t%per)/per,im=covers[idx];label=im.__name||'';
-    const zm=1.02+ph2*0.06,ar=im.naturalWidth/im.naturalHeight;
-    let tw,th;if(ar>W2/H2){th=H2*zm;tw=th*ar;}else{tw=W2*zm;th=tw/ar;}
-    btvG.drawImage(im,W2/2-tw/2-ph2*40,H2/2-th/2+ph2*18,tw,th);
+    const ar=im.naturalWidth/im.naturalHeight;
+    /* THE ARTWORK FITS THE SCREEN NOW. It used to be scaled to COVER the 16:9 frame and then zoomed
+       and panned on top of that. Every review cover is portrait -- 380x570, two by three -- so
+       covering a landscape screen threw away 62% of the picture and showed a zoomed middle band of
+       it, which is what read as stretched. It is CONTAINED instead: the whole cover is on screen,
+       nothing cropped, sitting on a blurred blow-up of itself so the frame is still filled edge to
+       edge. That is exactly the treatment the video already gets a few lines up, so the two match. */
+    const BH=H2-96;                       /* the label bar owns the bottom, same as the video */
+    let th=BH,tw=th*ar;
+    if(tw>W2){tw=W2;th=tw/ar;}
+    const ix=Math.round((W2-tw)/2),iy=Math.round((BH-th)/2);
+    try{btvG.save();btvG.globalAlpha=0.38;btvG.filter='blur(16px) brightness(0.55)';
+      /* the backdrop is the one that covers, so the sides are never dead black */
+      let bw,bh;if(ar>W2/H2){bh=H2;bw=bh*ar;}else{bw=W2;bh=bw/ar;}
+      btvG.drawImage(im,(W2-bw)/2,(H2-bh)/2,bw,bh);btvG.restore();}catch(e){}
+    btvG.drawImage(im,ix,iy,tw,th);
     /* broadcast punch: a touch of contrast + vignette so it reads crisp from the lane */
     btvG.globalCompositeOperation='overlay';btvG.fillStyle='rgba(255,255,255,.14)';btvG.fillRect(0,0,W2,H2);btvG.globalCompositeOperation='source-over';
     const vg=btvG.createRadialGradient(W2/2,H2/2,H2*0.45,W2/2,H2/2,H2*0.95);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.35)');btvG.fillStyle=vg;btvG.fillRect(0,0,W2,H2);
@@ -3053,19 +3126,28 @@ function drawBillboard(t){
   bbG.fillStyle='#0a0607';bbG.fillRect(0,0,1024,232);
   bbG.fillStyle='#b8322c';bbG.fillRect(0,0,1024,9);bbG.fillRect(0,223,1024,9);
   bbG.imageSmoothingEnabled=true;try{bbG.imageSmoothingQuality='high';}catch(e){}
-  const CW=214,step=CW+16,n=Math.max(1,covers.length),off=(t*26)%(step*n);
-  for(let k=-1;k<7;k++){
+  /* The tiles were 208 wide by 194 tall -- landscape -- and every cover is portrait two by three,
+     so a cover fit into one lost 38% of itself off the top and bottom. The frame is cut to the
+     artwork now rather than the artwork to the frame: 129 by 194 is two by three, so a cover drops
+     straight in. More of them fit across the board as a result, which is why the step shrank too. */
+  const BH2=194,BW2=Math.round(BH2*2/3),CW=BW2+6,step=CW+16,n=Math.max(1,covers.length),off=(t*26)%(step*n);
+  /* eight tiles no longer reach the right-hand edge at this narrower step: ten do, with room spare */
+  for(let k=-1;k<9;k++){
     const x=k*step-(off%step),idx=((Math.floor(off/step)+k)%n+n)%n,im=covers[idx];
     bbG.save();bbG.beginPath();
-    if(bbG.roundRect)bbG.roundRect(x+3,19,CW-6,194,10);else bbG.rect(x+3,19,CW-6,194);
+    if(bbG.roundRect)bbG.roundRect(x+3,19,CW-6,BH2,10);else bbG.rect(x+3,19,CW-6,BH2);
     bbG.clip();
-    if(im){const ar=im.naturalWidth/im.naturalHeight,BW=CW-6,BH=194;let tw,th;
-      if(ar>BW/BH){th=BH;tw=th*ar;}else{tw=BW;th=tw/ar;}
+    if(im){const ar=im.naturalWidth/im.naturalHeight,BW=CW-6,BH=BH2;
+      /* CONTAIN, not cover: with the frame cut to two by three this is a near-exact fit for every
+         cover, and the odd one that is not quite two by three gets a hairline bar instead of a crop */
+      bbG.fillStyle='#120c0e';bbG.fillRect(x+3,19,BW,BH);
+      let th=BH,tw=th*ar;
+      if(tw>BW){tw=BW;th=tw/ar;}
       bbG.drawImage(im,x+3+(BW-tw)/2,19+(BH-th)/2,tw,th);}
     else{bbG.fillStyle='#241a16';bbG.fillRect(x+3,19,CW-6,194);}
     bbG.restore();
     bbG.strokeStyle='#f2a81d';bbG.lineWidth=3;bbG.beginPath();
-    if(bbG.roundRect)bbG.roundRect(x+3,19,CW-6,194,10);else bbG.rect(x+3,19,CW-6,194);
+    if(bbG.roundRect)bbG.roundRect(x+3,19,CW-6,BH2,10);else bbG.rect(x+3,19,CW-6,BH2);
     bbG.stroke();
   }
   bbT.needsUpdate=true;
@@ -3200,7 +3282,7 @@ function ambient(dt,gs){
     cop2.position.set(Math.min(rx-1.9,11.5),1.42,-18.30);
     cop2.userData.rl.visible=Math.floor(ambT*9)%2===0;cop2.userData.bl.visible=!cop2.userData.rl.visible;
   }else{runner.visible=false;cop2.visible=false;}
-  drawBillboard(ambT);drawBTV(ambT);
+  drawBillboard(ambT);drawBTV(ambT);btvBulbTick(ambT);
 }
 /* ---- physics world ---- */
 /* ===== REAL BOWLING PHYSICS =====
@@ -3330,7 +3412,7 @@ const pinGeo=new THREE.LatheGeometry(pinProfile,24);
   const pa=pinGeo.attributes.position,ua=pinGeo.attributes.uv;for(let i=0;i<ua.count;i++)ua.setY(i,pa.getY(i)/0.381);ua.needsUpdate=true;}
 pinGeo.rotateY(Math.PI/2);
 const LAYOUT=[[0,0],[-1,1],[1,1],[-2,2],[0,2],[2,2],[-3,3],[-1,3],[1,3],[3,3]];
-const pinMats={};function pinMat(fi){if(!pinMats[fi]){const f=(A3.foods||[])[fi];pinMats[fi]=new THREE.MeshStandardMaterial({map:pinTexture(f),roughness:0.22,metalness:0.05,emissiveMap:pinE,emissive:new THREE.Color(LEDCOLS[ledCol]),emissiveIntensity:2.2});}return pinMats[fi];}
+const pinMats={};function pinMat(fi){if(!pinMats[fi]){const f=(A3.foods||[])[fi];pinMats[fi]=new THREE.MeshStandardMaterial({map:pinTexture(f,fi),roughness:0.22,metalness:0.05,emissiveMap:pinE,emissive:new THREE.Color(LEDCOLS[ledCol]),emissiveIntensity:2.2});}return pinMats[fi];}
 /* compound pin collider: wide base, belly, narrow neck, round head; offsets put the body origin at the real centre of mass */
 /* real USBC pin proportions: the base that touches the deck is only 5.2 cm across (2.6 cm radius) under a 14.6 cm centre of mass,
    so the pin tips over past ~10 degrees of lean; the belly is 11.4 cm at 10 cm up, the neck 4.6 cm, the head 7.4 cm */
@@ -3499,7 +3581,11 @@ function foodLoad(i){
   im.onload=function(){
     foodImg=im;foodTex=new THREE.Texture(im);foodTex.colorSpace=THREE.SRGBColorSpace;foodTex.anisotropy=8;foodTex.needsUpdate=true;
     foodMat=new THREE.MeshStandardMaterial({map:foodTex,alphaTest:0.5,roughness:0.52,metalness:0.03,side:THREE.DoubleSide});
-    foodReady=true;foods.forEach(f=>foodSkin(f.mesh));};
+    foodReady=true;foods.forEach(f=>foodSkin(f.mesh));
+    /* pins built before the photographs arrived are still wearing emoji: re-bake them now */
+    for(const k in pinMats){const fo=(A3.foods||[])[k];
+      const prev=pinMats[k].map;pinMats[k].map=pinTexture(fo,+k);pinMats[k].needsUpdate=true;
+      if(prev&&prev.dispose)prev.dispose();}};
   im.onerror=function(){foodLoad(i+1);};
   im.src=FOOD_SRCS[i];
 }
@@ -5820,7 +5906,7 @@ __shot:function(ox,spin,pw,aim){   /* runs the ghost sim headlessly and reports 
     hookBoards:headX===null?null:+((headX-x0)/0.0254).toFixed(1),
     travelS:headT===null?null:+headT.toFixed(2),profile:prof,
     entryDeg:ang===null?null:+ang.toFixed(2),gutter:gut};},
-__lights:function(){return {cos:+cosT.toFixed(3),hemi:hemi?+hemi.intensity.toFixed(3):null,dl:+dl.intensity.toFixed(3),mid:+midL.intensity.toFixed(2),pin:+pinLight.intensity.toFixed(2),pit:+pitGlow.intensity.toFixed(2),led:+ledLight.intensity.toFixed(2),floor:+cosFloorMat.opacity.toFixed(3),floorVis:cosFloor.visible,bKey:+bKey.intensity.toFixed(3),bFill:+bFill.intensity.toFixed(3),bRim:+bRim.intensity.toFixed(2),bUnder:+bUnder.intensity.toFixed(3),bHemi:+bHemi.intensity.toFixed(3),skyCol:hemi?hemi.color.getHexString():null,rimCol:bRim.color.getHexString(),pinEmis:+(pinMats[Object.keys(pinMats)[0]]?pinMats[Object.keys(pinMats)[0]].emissiveIntensity:0).toFixed(2)};},__truck:function(){if(!truck)return null;let mesh=0,tri=0,lights=0;truck.grp.traverse(o=>{if(o.isMesh){mesh++;const g=o.geometry;if(g&&g.index)tri+=g.index.count/3;else if(g&&g.attributes.position)tri+=g.attributes.position.count/3;}if(o.isLight)lights++;});return {meshes:mesh,triangles:Math.round(tri),lights:lights,gunPos:[+truck.gun.position.x.toFixed(3),+truck.gun.position.y.toFixed(3),+truck.gun.position.z.toFixed(3)]};},__deptPose:function(){if(!dept||!truck)return null;const T=truck.grp;return {t:+dept.t.toFixed(2),x:+T.position.x.toFixed(2),z:+T.position.z.toFixed(2),ry:+T.rotation.y.toFixed(2),wr:+truck.wheels[0].rotation.z.toFixed(1),gz:+truck.gun.position.z.toFixed(3),vis:T.visible};},__parkTruck:function(x,y,z,ry){if(!truck)truck=makeTruck();truck.grp.visible=true;truck.grp.position.set(x,y,z);truck.grp.rotation.y=ry||0;truck.lightR.intensity=6;truck.lightB.intensity=6;truck.headL.intensity=3.2;return true;},__chain:function(){const B=bowler.userData.B;return {pelvY:+B.pelvis.rotation.y.toFixed(4),pelvZ:+B.pelvis.rotation.z.toFixed(4),spineY:+B.spine.rotation.y.toFixed(4),spineX:+B.spine.rotation.x.toFixed(4),shR:+bowler.userData.arms.R.sh.rotation.x.toFixed(4),shRz:+bowler.userData.arms.R.sh.rotation.z.toFixed(4),clothLag:real&&real.cloth?[+real.cloth.U.uClothLag.value.x.toFixed(5),+real.cloth.U.uClothLag.value.y.toFixed(5),+real.cloth.U.uClothLag.value.z.toFixed(5)]:null,clothFlap:real&&real.cloth?+real.cloth.U.uClothFlap.value.toFixed(4):null};},__boneNames:function(){if(!real||!real.root)return null;const out=[];real.root.traverse(o=>{if(o.isBone)out.push(o.name);});return out;},__btv:function(){return {ok:btvHovOk,tag:btvHovTag,miss:btvHovMiss,paused:btvHov.paused,ready:btvHov.readyState,vw:btvHov.videoWidth,err:btvHov.error?btvHov.error.code:null,src:(btvHov.currentSrc||'').split('/').pop()};},__swing:function(u){return keyed(SW_ARM,u);},__swingFol:function(f){return keyed(SW_AFOL,f);},__form:function(){const b=bowler.position;return {
+__lights:function(){return {cos:+cosT.toFixed(3),hemi:hemi?+hemi.intensity.toFixed(3):null,dl:+dl.intensity.toFixed(3),mid:+midL.intensity.toFixed(2),pin:+pinLight.intensity.toFixed(2),pit:+pitGlow.intensity.toFixed(2),led:+ledLight.intensity.toFixed(2),floor:+cosFloorMat.opacity.toFixed(3),floorVis:cosFloor.visible,bKey:+bKey.intensity.toFixed(3),bFill:+bFill.intensity.toFixed(3),bRim:+bRim.intensity.toFixed(2),bUnder:+bUnder.intensity.toFixed(3),bHemi:+bHemi.intensity.toFixed(3),skyCol:hemi?hemi.color.getHexString():null,rimCol:bRim.color.getHexString(),pinEmis:+(pinMats[Object.keys(pinMats)[0]]?pinMats[Object.keys(pinMats)[0]].emissiveIntensity:0).toFixed(2)};},__truck:function(){if(!truck)return null;let mesh=0,tri=0,lights=0;truck.grp.traverse(o=>{if(o.isMesh){mesh++;const g=o.geometry;if(g&&g.index)tri+=g.index.count/3;else if(g&&g.attributes.position)tri+=g.attributes.position.count/3;}if(o.isLight)lights++;});return {meshes:mesh,triangles:Math.round(tri),lights:lights,gunPos:[+truck.gun.position.x.toFixed(3),+truck.gun.position.y.toFixed(3),+truck.gun.position.z.toFixed(3)]};},__deptPose:function(){if(!dept||!truck)return null;const T=truck.grp;return {t:+dept.t.toFixed(2),x:+T.position.x.toFixed(2),z:+T.position.z.toFixed(2),ry:+T.rotation.y.toFixed(2),wr:+truck.wheels[0].rotation.z.toFixed(1),gz:+truck.gun.position.z.toFixed(3),vis:T.visible};},__parkTruck:function(x,y,z,ry){if(!truck)truck=makeTruck();truck.grp.visible=true;truck.grp.position.set(x,y,z);truck.grp.rotation.y=ry||0;truck.lightR.intensity=6;truck.lightB.intensity=6;truck.headL.intensity=3.2;return true;},__pinState:function(){const o=[];for(let i=0;i<10;i++){const pn=pins[i];if(!pn||!pn.alive){o.push({i:i,gone:1});continue;}const b=pn.body,a=b.quaternion.vmult(UPV,new CANNON.Vec3());o.push({i:i,ay:+a.y.toFixed(4),tilt:+(Math.acos(Math.max(-1,Math.min(1,a.y)))*180/Math.PI).toFixed(1),up:(b.position.y>-0.05&&Math.abs(b.position.x)<HALF+0.02&&b.position.z>-17.55&&a.y>0.90)?1:0,y:+b.position.y.toFixed(3),z:+b.position.z.toFixed(2),spd:+b.velocity.length().toFixed(3),asp:+b.angularVelocity.length().toFixed(3),slp:b.sleepState});}return o;},__settled:function(){return settled()?1:0;},__bbPng:function(){return bbC.toDataURL('image/png');},__btvPng:function(){return btvC.toDataURL('image/png');},__pinTexPng:function(fi){const f=(A3.foods||[])[fi];const t=pinTexture(f,fi);return {png:t.image.toDataURL('image/png'),cell:FOOD_CELL[fi],sheet:!!foodImg,emoji:f&&f.e};},__chain:function(){const B=bowler.userData.B;return {pelvY:+B.pelvis.rotation.y.toFixed(4),pelvZ:+B.pelvis.rotation.z.toFixed(4),spineY:+B.spine.rotation.y.toFixed(4),spineX:+B.spine.rotation.x.toFixed(4),shR:+bowler.userData.arms.R.sh.rotation.x.toFixed(4),shRz:+bowler.userData.arms.R.sh.rotation.z.toFixed(4),clothLag:real&&real.cloth?[+real.cloth.U.uClothLag.value.x.toFixed(5),+real.cloth.U.uClothLag.value.y.toFixed(5),+real.cloth.U.uClothLag.value.z.toFixed(5)]:null,clothFlap:real&&real.cloth?+real.cloth.U.uClothFlap.value.toFixed(4):null};},__boneNames:function(){if(!real||!real.root)return null;const out=[];real.root.traverse(o=>{if(o.isBone)out.push(o.name);});return out;},__btv:function(){return {ok:btvHovOk,tag:btvHovTag,miss:btvHovMiss,paused:btvHov.paused,ready:btvHov.readyState,vw:btvHov.videoWidth,err:btvHov.error?btvHov.error.code:null,src:(btvHov.currentSrc||'').split('/').pop()};},__swing:function(u){return keyed(SW_ARM,u);},__swingFol:function(f){return keyed(SW_AFOL,f);},__form:function(){const b=bowler.position;return {
   L:[+(feet.L.x-b.x).toFixed(3),+feet.L.y.toFixed(3),+(feet.L.z-b.z).toFixed(3)],
   R:[+(feet.R.x-b.x).toFixed(3),+feet.R.y.toFixed(3),+(feet.R.z-b.z).toFixed(3)],
   hipY:+b.y.toFixed(3),reach:+LEG.reach.toFixed(3),crouch:+(LEG.crouch||0).toFixed(3),

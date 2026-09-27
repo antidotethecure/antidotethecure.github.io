@@ -1650,7 +1650,7 @@ function finishRoll(){
      which is the throw that most deserves the hose. */
   var dept=wasFire&&!strike;
   var spare=!strike&&fr.length>=2&&fr[fr.length-2]!==10&&fr[fr.length-2]+n===10;
-  if(strike){g.streak++;m=(sfx.roar(),g.streak===6?'ULTIMATE FLAME UNLOCKED!':g.streak>6?('ULTIMATE FLAME! '+g.streak+' IN A ROW!'):g.streak>=3?('ON FIRE! '+g.streak+' IN A ROW!'):'CLAMP!');g.face='cheese';g.faceT=3.2;sfx.strike();sfx.crowd();g.papT=2.4;g.cheer=1.9;g.fx={type:'clamp',t:0};if(g.streak>=3){g.confT=3.2;spawnConfetti();g.crowdTarget=Math.min(34,g.crowdTarget+6);}g.crowd.forEach(function(c){if(c.phone)c.flashT=0.4+Math.random()*0.6;});setTimeout(sfx.chomp,980);setTimeout(sfx.laugh,1320);if(g.streak>=2){setTimeout(sfx.chant,1500);setTimeout(sfx.chant,2150);}}
+  if(strike){g.streak++;m=(sfx.roar(),g.streak===6?'ULTIMATE FLAME UNLOCKED!':g.streak>6?('ULTIMATE FLAME! '+g.streak+' IN A ROW!'):g.streak>=3?('ON FIRE! '+g.streak+' IN A ROW!'):'CLAMP!');g.face='cheese';g.faceT=3.2;sfx.strike();sfx.crowd();g.papT=2.4;g.cheer=1.9;g.fx={type:'clamp',t:0};if(g.streak>=3){g.confT=3.2;spawnConfetti();g.crowdTarget=Math.min(34,g.crowdTarget+6);}g.crowd.forEach(function(c){if(c.phone)c.flashT=0.4+Math.random()*0.6;});setTimeout(sfx.chomp,980);setTimeout(function(){if(USE3D&&window.B3D&&B3D.clampPins)B3D.clampPins();},980);setTimeout(sfx.laugh,1320);if(g.streak>=2){setTimeout(sfx.chant,1500);setTimeout(sfx.chant,2150);}}
   else if(spare){m='DRIZZLE!';sfx.spare();g.cheer=1.6;g.fx={type:'drizzle',t:0};g.crowd.forEach(function(c){if(c.phone&&Math.random()<0.6)c.flashT=0.3+Math.random()*0.5;});setTimeout(sfx.pour,150);setTimeout(sfx.laugh,900);}
   else if(dept){m='\ud83d\ude92 FIRE DEPARTMENT!';g.face='mad';g.faceT=7;sfx.siren();setTimeout(sfx.groan,900);setTimeout(sfx.spray,1750);setTimeout(sfx.steam,2400);setTimeout(sfx.spray,4400);setTimeout(sfx.laugh,5600);setTimeout(sfx.giggle,6100);
     if(USE3D&&B3D.fireDept)B3D.fireDept();else setTimeout(soakLens,5300);}
@@ -1740,153 +1740,38 @@ function drawCover(i,x,y,w,h,tilt,alpha){
 
 /* ---------- strike / spare animations ---------- */
 function easeOut(t){return 1-Math.pow(1-t,3);}
-/* THE CLAMP, seen from the wrong side of the teeth.
-   It used to be two jaws closing sideways across the picture with the mouth drawn in behind them --
-   throat, gums, a tongue -- so you were looking INSIDE somebody's mouth while it shut. This is the
-   bite from where the camera is standing: the teeth come straight at the lens, snap shut ON it, and
-   take a piece of the picture away with them. Nothing behind the teeth is drawn, because from out
-   here you would not see it. */
-
-/* where a jaw's biting edge sits across its arch: the front teeth reach furthest, the back ones
-   fall away, which is what makes it read as an arch coming at you rather than a straight fence */
-function biteArc(u){return 1-u*u;}
-
-/* the line the tooth tips trace, as a path you can close into a shape */
-function biteEdge(cx,by,up,halfW,sc,seg){
-  var n=11,pts=[];
-  for(var k=0;k<n;k++){
-    var u=((k+0.5)/n-0.5)*2;
-    var x=cx+u*halfW;
-    var tipY=by+(up?1:-1)*(16*sc*biteArc(u));
-    pts.push([x,tipY,u]);
-  }
-  return pts;
-}
-
-function biteJaw(cx,by,up,halfW,sc){
-  var pts=biteEdge(cx,by,up,halfW,sc),n=pts.length,tw=(2*halfW/n);
-  /* The gum is a RIDGE behind the tooth roots, nothing more. It used to run 300 px back from the
-     jaw, which at full lunge filled the whole frame dark red and put you right back inside a mouth.
-     It stops just behind the roots now, so the picture the teeth are biting stays visible between
-     and around them -- which is the whole point of seeing this from the lens side. */
-  var gumD=(up?-1:1)*54*sc;
-  ctx.fillStyle='#4a0d12';
-  ctx.beginPath();
-  ctx.moveTo(cx-halfW-tw, by+gumD);
-  ctx.lineTo(cx+halfW+tw, by+gumD);
-  for(var i=n-1;i>=0;i--){var p=pts[i];ctx.lineTo(p[0]+tw/2, p[1]-(up?1:-1)*(10*sc));}
-  ctx.closePath();ctx.fill();
-  /* the lip rolled back off the gum, so the jaw has an edge rather than fading into the dark */
-  ctx.fillStyle='#7a1620';
-  ctx.fillRect(cx-halfW-tw, by+gumD, (halfW+tw)*2, (up?-1:1)*13*sc);
-  /* a wet highlight along the gum line */
-  ctx.strokeStyle='rgba(255,140,150,.35)';ctx.lineWidth=3*sc;
-  ctx.beginPath();
-  for(var j=0;j<n;j++){var q=pts[j];ctx.lineTo(q[0], q[1]-(up?1:-1)*(12*sc));}
-  ctx.stroke();
-  /* the teeth themselves, tips toward the lens */
-  for(var k=0;k<n;k++){
-    var x=pts[k][0],tip=pts[k][1],u=pts[k][2];
-    var canine=Math.abs(Math.abs(u)-0.46)<0.10;
-    var len=sc*(30+14*biteArc(u)+(canine?10:0));
-    var w=tw*(0.72+0.24*biteArc(u));
-    var y0=up?tip-len:tip;
-    var gr=ctx.createLinearGradient(0,up?y0:y0+len,0,up?y0+len:y0);
-    gr.addColorStop(0,'#e8dcc8');gr.addColorStop(0.55,'#fffdf6');gr.addColorStop(1,'#ffffff');
-    ctx.fillStyle=gr;
-    rr(x-w/2,y0,w,len,Math.min(7*sc,w*0.38));ctx.fill();
-    /* the shaded gap between neighbours, and a glint on the front face */
-    ctx.fillStyle='rgba(60,30,20,.22)';ctx.fillRect(x+w/2-1.5*sc,y0+len*0.12,1.8*sc,len*0.7);
-    ctx.fillStyle='rgba(255,255,255,.75)';
-    rr(x-w*0.26,up?y0+len*0.18:y0+len*0.12,w*0.2,len*0.42,2.5*sc);ctx.fill();
-  }
-}
-
-/* the piece the teeth take out: the ground between the two arches, scalloped by the tips that
-   closed on it. Built as a path so it can be filled as a hole, and filled again as the chunk
-   tumbling away. */
-function bitePath(cx,cy,halfW,gap,sc){
-  var up=biteEdge(cx,cy-gap/2,true,halfW,sc),dn=biteEdge(cx,cy+gap/2,false,halfW,sc);
-  ctx.beginPath();
-  ctx.moveTo(up[0][0]-halfW*0.14,up[0][1]);
-  for(var i=0;i<up.length;i++){
-    var p=up[i],w=(2*halfW/up.length)*0.5;
-    ctx.quadraticCurveTo(p[0]-w*0.5,p[1]+9*sc,p[0],p[1]+2*sc);
-    ctx.quadraticCurveTo(p[0]+w*0.5,p[1]+9*sc,p[0]+w,p[1]);
-  }
-  ctx.lineTo(dn[dn.length-1][0]+halfW*0.14,dn[dn.length-1][1]);
-  for(var j=dn.length-1;j>=0;j--){
-    var q=dn[j],w2=(2*halfW/dn.length)*0.5;
-    ctx.quadraticCurveTo(q[0]+w2*0.5,q[1]-9*sc,q[0],q[1]-2*sc);
-    ctx.quadraticCurveTo(q[0]-w2*0.5,q[1]-9*sc,q[0]-w2,q[1]);
-  }
-  ctx.closePath();
-}
-
+/* THE CLAMP. No teeth anywhere any more -- drawing a convincing set in two dimensions was a losing
+   fight, and they were never what the moment is about. Something big passes over the deck, the room
+   goes dark under it, and when the light comes back the tops are off the pins. The eating happens
+   in 3D, on the pins themselves, where it can be watched; all this does is throw the shadow, so it
+   deliberately keeps the middle of the frame clear rather than covering the very thing you want to
+   see happen. */
 function drawClamp(t){
-  var cx=W/2,cy=186;
+  var CH=0.98;                                   /* the shadow lands on the beat of the chomp */
+  var close=t<CH?Math.pow(Math.min(1,t/CH),1.7):Math.max(0,1-(t-CH)/0.42);
+  if(close<=0.002)return;
   ctx.save();ctx.beginPath();ctx.rect(72,0,W-144,TOP.h);ctx.clip();
-
-  /* it comes at the lens: 0 to 0.30 the jaws rush in and grow, they meet at 0.30, and from 0.42
-     they pull back out of frame with the piece they took */
-  var app=Math.min(1,t/0.30),ease=1-Math.pow(1-app,3);
-  var sc=0.55+0.70*ease;                       /* nearer means bigger */
-  var halfW=(W/2-40)*(0.62+0.42*ease);   /* not the full width: the picture has to survive at the edges */
-  var gap=Math.max(6,236*(1-ease));
-  var back=t>0.42?Math.min(1,(t-0.42)/0.62):0; /* withdrawing */
-  var open=236*back*back;
-  var oy=back*back*300;                        /* and lifting away out of shot */
-
-  /* the snap: a hard white frame at the moment they meet */
-  if(t>=0.28&&t<0.36){ctx.fillStyle='rgba(255,255,255,'+(0.55*(1-(t-0.28)/0.08))+')';ctx.fillRect(72,0,W-144,TOP.h);}
-
-  /* THE MISSING PIECE. Once they have closed, the ground they closed on is gone: a hole with a
-     torn, tooth-scalloped rim, and cracks running out of it across what is left of the picture. */
-  if(t>=0.30){
-    var hv=Math.min(1,(t-0.30)/0.10);
-    ctx.save();
-    bitePath(cx,cy,halfW*0.82,Math.max(8,gap),sc);
-    ctx.fillStyle='rgba(6,3,4,'+(0.94*hv)+')';ctx.fill();
-    ctx.strokeStyle='rgba(255,236,190,'+(0.75*hv)+')';ctx.lineWidth=2.5;ctx.stroke();
-    ctx.restore();
-    ctx.strokeStyle='rgba(20,10,12,'+(0.5*hv)+')';ctx.lineWidth=2;
-    for(var c=0;c<9;c++){
-      var ang=c*0.7+1.1,r0=halfW*0.5,r1=r0+70+((c*37)%60);
-      ctx.beginPath();
-      ctx.moveTo(cx+Math.cos(ang)*r0,cy+Math.sin(ang)*r0*0.45);
-      ctx.lineTo(cx+Math.cos(ang+0.06)*r1,cy+Math.sin(ang+0.06)*r1*0.45);
-      ctx.stroke();
-    }
-  }
-
-  /* the chunk itself, tumbling off with the bite */
-  if(t>0.34){
-    var ct=t-0.34;
-    ctx.save();
-    ctx.translate(cx+ct*150,cy+ct*ct*520-ct*130);
-    ctx.rotate(ct*3.1);
-    var csc=Math.max(0.1,1-ct*0.5);
-    ctx.scale(csc,csc);
-    ctx.globalAlpha=Math.max(0,1-ct/0.95);
-    bitePath(0,0,halfW*0.82,Math.max(8,gap),sc);
-    ctx.fillStyle='#2b1a1b';ctx.fill();
-    ctx.strokeStyle='rgba(242,168,29,.9)';ctx.lineWidth=3;ctx.stroke();
-    ctx.restore();
-  }
-
-  /* the jaws, drawn last so they sit in front of the hole they just made */
-  biteJaw(cx,cy-gap/2-open-oy,true,halfW,sc);
-  biteJaw(cx,cy+gap/2+open+oy,false,halfW,sc);
-
-  /* crumbs off the bite */
-  if(t>0.30&&t<0.95){
-    ctx.fillStyle='#fbe9c4';
-    for(var i2=0;i2<16;i2++){
-      var a2=i2*0.41+t*3,r2=(t-0.30)*300;
-      ctx.globalAlpha=Math.max(0,1-(t-0.30)/0.65);
-      ctx.beginPath();ctx.arc(cx+Math.cos(a2)*r2,cy+Math.sin(a2)*r2*0.5,2.5+((i2*7)%3),0,7);ctx.fill();
-    }
-    ctx.globalAlpha=1;
+  /* something crossing the lights: darkness rolling in from above and below, heaviest at the edges
+     so the deck in the middle stays readable */
+  var band=TOP.h*0.46*close;
+  var gTop=ctx.createLinearGradient(0,0,0,band);
+  gTop.addColorStop(0,'rgba(2,1,2,'+(0.94*close)+')');gTop.addColorStop(1,'rgba(2,1,2,0)');
+  ctx.fillStyle=gTop;ctx.fillRect(72,0,W-144,band);
+  var gBot=ctx.createLinearGradient(0,TOP.h,0,TOP.h-band);
+  gBot.addColorStop(0,'rgba(2,1,2,'+(0.94*close)+')');gBot.addColorStop(1,'rgba(2,1,2,0)');
+  ctx.fillStyle=gBot;ctx.fillRect(72,TOP.h-band,W-144,band);
+  /* and a squeeze from the sides, so it reads as something closing rather than a curtain dropping */
+  var side=(W-144)*0.30*close;
+  var gL=ctx.createLinearGradient(72,0,72+side,0);
+  gL.addColorStop(0,'rgba(2,1,2,'+(0.85*close)+')');gL.addColorStop(1,'rgba(2,1,2,0)');
+  ctx.fillStyle=gL;ctx.fillRect(72,0,side,TOP.h);
+  var gR=ctx.createLinearGradient(W-72,0,W-72-side,0);
+  gR.addColorStop(0,'rgba(2,1,2,'+(0.85*close)+')');gR.addColorStop(1,'rgba(2,1,2,0)');
+  ctx.fillStyle=gR;ctx.fillRect(W-72-side,0,side,TOP.h);
+  /* the snap of light as it takes them */
+  if(t>=CH-0.05&&t<CH+0.10){
+    var f=1-Math.abs(t-CH)/0.10;
+    ctx.fillStyle='rgba(255,246,226,'+(0.5*Math.max(0,f))+')';ctx.fillRect(72,0,W-144,TOP.h);
   }
   ctx.restore();
 }
@@ -3534,6 +3419,97 @@ const pinGeo=new THREE.LatheGeometry(pinProfile,24);
 { /* map the texture by height so the LED channel lands exactly on its lit strip */
   const pa=pinGeo.attributes.position,ua=pinGeo.attributes.uv;for(let i=0;i<ua.count;i++)ua.setY(i,pa.getY(i)/0.381);ua.needsUpdate=true;}
 pinGeo.rotateY(Math.PI/2);
+/* ---------- THE CLAMP: the tops get bitten off the pins ----------
+   No teeth anywhere. Something takes the head off every pin and the heads go with it. The pin is a
+   lathe turned from a 2D profile, so the profile can simply be cut in two: everything below the
+   bite line becomes the stub left standing, everything above becomes the piece that leaves. Both
+   halves keep the same texture mapping as the whole pin, so the food and the LED channel still line
+   up on whatever is left.
+   The cut is not a saw cut. The rim of the stub is pulled down by how far round the pin you are --
+   all the way on one side, not at all on the other -- so what is left is the crescent a bite takes
+   out, deepest where it went in. A few smaller ripples on top of that are the marks. */
+const BITE_Y=0.286;
+function biteAmount(th){ return (0.5+0.5*Math.cos(th))*(0.86+0.14*Math.cos(th*4)); }
+function splitPinProfile(cut){
+  var below=[],above=[],rc=0;
+  for(var i=0;i<pinProfile.length;i++){
+    var p=pinProfile[i];
+    if(p.y<cut)below.push(p.clone());
+    else{
+      if(!above.length&&i>0){
+        var q=pinProfile[i-1],t=(cut-q.y)/(p.y-q.y);
+        rc=q.x+(p.x-q.x)*t;
+      }
+      above.push(p.clone());
+    }
+  }
+  below.push(new THREE.Vector2(rc,cut));
+  below.push(new THREE.Vector2(0.0008,cut));            /* close the cut face */
+  above.unshift(new THREE.Vector2(rc,cut));
+  above.unshift(new THREE.Vector2(0.0008,cut));
+  return {below:below,above:above,rc:rc};
+}
+function makePinPiece(prof,scallop){
+  var g=new THREE.LatheGeometry(prof,24);
+  var pa=g.attributes.position,ua=g.attributes.uv;
+  for(var i=0;i<ua.count;i++)ua.setY(i,pa.getY(i)/0.381);   /* same mapping as the whole pin */
+  if(scallop){
+    for(var j=0;j<pa.count;j++){
+      var y=pa.getY(j);
+      if(y>=BITE_Y-0.0015){
+        var x=pa.getX(j),z=pa.getZ(j),r=Math.hypot(x,z);
+        var th=r<1e-4?0:Math.atan2(z,x);
+        var amt=r<1e-4?0.5:biteAmount(th);
+        pa.setY(j,y-0.034*amt);
+      }
+    }
+  }
+  pa.needsUpdate=true;ua.needsUpdate=true;
+  g.computeVertexNormals();
+  g.rotateY(Math.PI/2);
+  return g;
+}
+var _pinSplit=splitPinProfile(BITE_Y);
+const pinStubGeo=makePinPiece(_pinSplit.below,true);
+const pinTopGeo =makePinPiece(_pinSplit.above,false);
+/* the heads that came off, on their way out */
+const bitten=[];
+const _bitP=new THREE.Vector3(),_bitQ=new THREE.Quaternion();
+function clampPins(){
+  var any=false;
+  for(var i=0;i<pins.length;i++){
+    var pn=pins[i];
+    if(!pn||!pn.alive||pn.__bit||!pn.mesh)continue;
+    pn.__bit=true;any=true;
+    pn.mesh.updateWorldMatrix(true,false);
+    pn.mesh.getWorldPosition(_bitP);pn.mesh.getWorldQuaternion(_bitQ);
+    var mat=pn.mat?pn.mat.clone():pn.mesh.material;
+    mat.transparent=true;
+    var top=new M(pinTopGeo,mat);
+    top.position.copy(_bitP);top.quaternion.copy(_bitQ);
+    top.scale.copy(pn.mesh.getWorldScale(new THREE.Vector3()));
+    scene.add(top);
+    bitten.push({m:top,t:0,
+      v:new THREE.Vector3((Math.random()-0.5)*1.5,2.4+Math.random()*1.4,1.1+Math.random()*1.2),
+      w:new THREE.Vector3((Math.random()-0.5)*14,(Math.random()-0.5)*10,(Math.random()-0.5)*14)});
+    pn.mesh.geometry=pinStubGeo;                        /* what is left standing */
+  }
+  return any;
+}
+function biteTick(dt){
+  for(var i=bitten.length-1;i>=0;i--){
+    var b=bitten[i];b.t+=dt;
+    b.v.y-=7.2*dt;
+    b.m.position.addScaledVector(b.v,dt);
+    b.m.rotation.x+=b.w.x*dt;b.m.rotation.y+=b.w.y*dt;b.m.rotation.z+=b.w.z*dt;
+    if(b.t>0.55)b.m.material.opacity=Math.max(0,1-(b.t-0.55)/0.55);
+    if(b.t>1.15){scene.remove(b.m);if(b.m.material.dispose)b.m.material.dispose();bitten.splice(i,1);}
+  }
+}
+function clampReset(){
+  for(var i=0;i<bitten.length;i++){scene.remove(bitten[i].m);if(bitten[i].m.material.dispose)bitten[i].m.material.dispose();}
+  bitten.length=0;
+}
 const LAYOUT=[[0,0],[-1,1],[1,1],[-2,2],[0,2],[2,2],[-3,3],[-1,3],[1,3],[3,3]];
 const pinMats={};function pinMat(fi){if(!pinMats[fi]){const f=(A3.foods||[])[fi];pinMats[fi]=new THREE.MeshStandardMaterial({map:pinTexture(f,fi),roughness:0.22,metalness:0.05,emissiveMap:pinE,emissive:new THREE.Color(LEDCOLS[ledCol]),emissiveIntensity:2.2});}return pinMats[fi];}
 /* compound pin collider: wide base, belly, narrow neck, round head; offsets put the body origin at the real centre of mass */
@@ -3611,6 +3587,7 @@ function tickPuddles(dt){
 }
 function clearPuddles(){puddles.forEach(p=>{scene.remove(p.m);if(p.hl!==p.m)scene.remove(p.hl);});puddles.length=0;drops.forEach(d=>scene.remove(d));drops.length=0;}
 function rack(keep,foodIdx){
+  clampReset();   /* nothing from the last bite is still flying */
   if(keep&&pins.length===10){
     /* second ball: sweep the deadwood, and do not lay a finger on anything still standing */
     for(let i=0;i<10;i++)if(keep.indexOf(i)<0)sweepPin(i);
@@ -6003,7 +5980,7 @@ function render(gs){
     }
     if(pn.ledT>=0&&pn.ledT<0.78)pn.ledT+=dt;
   }
-  applyPinLeds();
+  applyPinLeds();biteTick(dt);
   updateFire(dt,nw);rebTick(dt,nw);fallTick(dt);
   if(!RPL.on&&ballBody&&ballMesh){ballMesh.position.copy(bI);syncQ(ballBody,ballMesh,al);
     if(!S.rest){const wb=Math.sin(nw*11)*0.07*Math.min(1,ballBody.velocity.length()/4);ballMesh.rotateOnWorldAxis(new THREE.Vector3(0,0,1),wb);ballMesh.position.x+=Math.sin(nw*7.3)*0.006;}
@@ -6137,7 +6114,7 @@ __bots:function(){return nlLanes.map(L=>({cx:L.cx,z:+L.bot.position.z.toFixed(3)
   if(real&&real.bones.anL&&real.bones.anR){const v=new THREE.Vector3();
     real.bones.anL.getWorldPosition(v);o.aL=[+v.x.toFixed(4),+v.y.toFixed(4),+v.z.toFixed(4)];
     real.bones.anR.getWorldPosition(v);o.aR=[+v.x.toFixed(4),+v.y.toFixed(4),+v.z.toFixed(4)];}
-  return o;},__arm:function(){const U=bowler.userData;return [+U.arms.R.sh.rotation.x.toFixed(4),+U.arms.R.el.rotation.x.toFixed(4),+U.arms.R.wr.rotation.x.toFixed(4),+U.B.spine.rotation.y.toFixed(4),+U.B.spine.rotation.z.toFixed(4),+bowler.position.z.toFixed(4),U.arms.R.ball.visible?1:0];},rack,throwBall,replay:rplStart,replaying:function(){return RPL.on;},__rpl:function(){return {buf:RPL.buf.length,clip:RPL.clip.length,capt:RPL.capt,on:RPL.on,strike:RPL.strike,forced:RPL.forced,prog:RPL.on?+((RPL.clock-RPL.from)/Math.max(0.001,RPL.to-RPL.from)).toFixed(3):0,hitAt:+(S.hitAt||0).toFixed(2),boomAt:+(S.boomAt||0).toFixed(2),span:+(RPL.clip.length?(RPL.clip[RPL.clip.length-1].t-RPL.clip[0].t):0).toFixed(2)};},setFire:function(v){fireLevel=+v||0;fireOn=fireLevel>0;fireL.color.set(fireLevel>=2?0x6fb4ff:0xff7722);},fireDept:fireDept,soak:function(){soakT=14;},arena:function(v){arena.visible=v!==false;},__cost:function(){const r=renderer.info.render;return {calls:r.calls,tris:r.triangles};},__nlFire:function(i){const L=nlLanes[i|0];nlRack(L);L.t=NL_T.rel;nlThrow(L);return true;},__nlPins:function(i){const L=nlLanes[i|0];return L.pins.map(p=>{const q=p.body.quaternion;return [+(1-2*(q.x*q.x+q.z*q.z)).toFixed(3),+p.body.position.distanceTo(p.home).toFixed(3),p.body.sleepState];});},__arena:function(){return {on:arena.visible,lanes:nlLanes.map(L=>{const down=L.pins.filter(p=>{const q=p.body.quaternion;return (1-2*(q.x*q.x+q.z*q.z))<0.62;}).length;return {x:L.cx,t:+L.t.toFixed(2),thrown:L.thrown,ball:L.ballMesh.visible,bz:+L.ball.position.z.toFixed(2),bx:+L.ball.position.x.toFixed(3),atDeck:L.atDeck,botZ:+L.bot.position.z.toFixed(2),down:down,asleep:L.pins.filter(p=>p.body.sleepState===2).length,moved:L.pins.filter(p=>p.body.position.distanceTo(p.home)>0.03).length};})};},__burning:function(){return burning.map(r=>[r.kind,+r.burn.toFixed(2),+r.fuel.toFixed(1)]);},__dept:function(){return dept?+dept.t.toFixed(2):-1;},__ignite:function(i){const pn=pins[i];if(pn&&pn.alive){const r=recFor(pn.body);if(r)ignite(r);}},__alpha:ialpha,__real:function(){return real?Object.keys(real.bones).filter(k=>real.bones[k]).join(','):null;},__installRig:function(spec){try{installReal(buildRigFromSpec(spec),!!spec.keepProc);return 'ok';}catch(e){return 'ERR '+(e&&e.message);}},__realInfo:function(){if(!real)return null;const o={sc:+real.sc.toFixed(3),ws:+real.ws.toFixed(4),box:real.box,d:{}};for(const k in real.restD)o.d[k]=real.restD[k].toArray().map(v=>+v.toFixed(2));const p=new THREE.Vector3(),p2=new THREE.Vector3(),U=bowler.userData,PB=U.B;o.cmp={};const PM={shL:'elL',elL:'wrL',shR:'elR',elR:'wrR',hpL:'knL',knL:'anL',hpR:'knR',knR:'anR',spine:'chest',neck:'head'};for(const k in PM){const rb=real.bones[k];if(!rb||!PB[k]||!PB[PM[k]])continue;const rc=rb.children.find(x=>x.isBone);if(!rc)continue;rc.getWorldPosition(p);rb.getWorldPosition(p2);const rd=p.sub(p2).normalize().toArray().map(v=>+v.toFixed(2));PB[PM[k]].getWorldPosition(p);PB[k].getWorldPosition(p2);const pd=p.sub(p2).normalize().toArray().map(v=>+v.toFixed(2));o.cmp[k]=[rd,pd];}real.ball.getWorldPosition(p);o.ball=p.toArray().map(v=>+v.toFixed(2));bowler.userData.arms.R.ball.getWorldPosition(p);o.pball=p.toArray().map(v=>+v.toFixed(2));return o;},__bcam:function(v){bCamOv=v||null;},__bowlerH:function(){const a=new THREE.Vector3(0,0,0),b=new THREE.Vector3(0,1.75,0);bowler.localToWorld(a);bowler.localToWorld(b);a.project(bCam);b.project(bCam);return +((b.y-a.y)*VH/2).toFixed(1);},__soak:function(){return +soakT.toFixed(2);},__fp:function(){const c=[0,0,0,0,0];for(const p of fP)if(p.l>0)c[p.k]++;return c;},__tgt:function(){const t=dept&&dept.tgt;return t?(t.rec?'rec':t.ball?'ball':t.spot?'spot':'sweep'):'-';},__tbl:function(){return tables.map(t=>t&&t.grp?[t.grp.visible?1:0,t.dmg||0,t.broken?1:0,+(t.crack?t.crack.mat.opacity:0).toFixed(3),+(t.planks?t.planks[0].rotation.z:0).toFixed(4),+t.grp.position.distanceTo(cam.position).toFixed(2)]:null);},__dbVis:function(){return debris.filter(d=>d&&d.mesh&&d.mesh.visible).length;},__rplSeek:function(p){if(!RPL.on)return -1;RPL.clock=RPL.from+(RPL.to-RPL.from)*Math.max(0,Math.min(0.999,p));return +((RPL.clock-RPL.from)/(RPL.to-RPL.from)).toFixed(3);},__rplFromBuf:function(){RPL.clip=RPL.buf.slice();RPL.capt=true;return RPL.clip.length;},__crack:function(i){const t=tables[i||0];if(t&&!t.broken)crackTable(t,2.0);return t?t.dmg:-1;},__break:function(i){const t=tables[i||0];if(t&&!t.broken)breakTable(t);return debris.length;},__debris:function(){return debris.length;},__reb:function(){return S.reb?1:0;},__camPos:function(){return [+cam.position.x.toFixed(3),+cam.position.y.toFixed(3),+cam.position.z.toFixed(3)];},__shyVis:function(){return (RPL.shy||[]).map(o=>o.visible?1:0);},__ballY:function(){return ballBody?+ballBody.position.y.toFixed(3):null;},__ballX:function(){return ballBody?+ballBody.position.x.toFixed(4):null;},__ghost:function(){return gPts.map(q=>[+q[0].toFixed(4),+q[1].toFixed(3)]);},__ball:function(){return ballBody?[+ballBody.position.z.toFixed(2),+ballBody.velocity.length().toFixed(2),S.done?1:0,S.rest?1:0]:null;},__pinMove:function(){let n=0,mx=0;for(const pn of pins){if(!pn||!pn.alive)continue;const b=pn.body;if(b.sleepState===CANNON.Body.SLEEPING)continue;const v=b.velocity.length()+b.angularVelocity.length()*0.1;if(v>0.05)n++;mx=Math.max(mx,v);}return [n,+mx.toFixed(3)];},__smash:function(){if(foods[0]){foods[0].body.wakeUp();foods[0].body.velocity.set(1.2,2,-0.4);}},edgePx:function(cy){
+  return o;},__arm:function(){const U=bowler.userData;return [+U.arms.R.sh.rotation.x.toFixed(4),+U.arms.R.el.rotation.x.toFixed(4),+U.arms.R.wr.rotation.x.toFixed(4),+U.B.spine.rotation.y.toFixed(4),+U.B.spine.rotation.z.toFixed(4),+bowler.position.z.toFixed(4),U.arms.R.ball.visible?1:0];},rack,throwBall,replay:rplStart,replaying:function(){return RPL.on;},__rpl:function(){return {buf:RPL.buf.length,clip:RPL.clip.length,capt:RPL.capt,on:RPL.on,strike:RPL.strike,forced:RPL.forced,prog:RPL.on?+((RPL.clock-RPL.from)/Math.max(0.001,RPL.to-RPL.from)).toFixed(3):0,hitAt:+(S.hitAt||0).toFixed(2),boomAt:+(S.boomAt||0).toFixed(2),span:+(RPL.clip.length?(RPL.clip[RPL.clip.length-1].t-RPL.clip[0].t):0).toFixed(2)};},setFire:function(v){fireLevel=+v||0;fireOn=fireLevel>0;fireL.color.set(fireLevel>=2?0x6fb4ff:0xff7722);},fireDept:fireDept,clampPins:clampPins,__bitten:function(){return bitten.length;},soak:function(){soakT=14;},arena:function(v){arena.visible=v!==false;},__cost:function(){const r=renderer.info.render;return {calls:r.calls,tris:r.triangles};},__nlFire:function(i){const L=nlLanes[i|0];nlRack(L);L.t=NL_T.rel;nlThrow(L);return true;},__nlPins:function(i){const L=nlLanes[i|0];return L.pins.map(p=>{const q=p.body.quaternion;return [+(1-2*(q.x*q.x+q.z*q.z)).toFixed(3),+p.body.position.distanceTo(p.home).toFixed(3),p.body.sleepState];});},__arena:function(){return {on:arena.visible,lanes:nlLanes.map(L=>{const down=L.pins.filter(p=>{const q=p.body.quaternion;return (1-2*(q.x*q.x+q.z*q.z))<0.62;}).length;return {x:L.cx,t:+L.t.toFixed(2),thrown:L.thrown,ball:L.ballMesh.visible,bz:+L.ball.position.z.toFixed(2),bx:+L.ball.position.x.toFixed(3),atDeck:L.atDeck,botZ:+L.bot.position.z.toFixed(2),down:down,asleep:L.pins.filter(p=>p.body.sleepState===2).length,moved:L.pins.filter(p=>p.body.position.distanceTo(p.home)>0.03).length};})};},__burning:function(){return burning.map(r=>[r.kind,+r.burn.toFixed(2),+r.fuel.toFixed(1)]);},__dept:function(){return dept?+dept.t.toFixed(2):-1;},__ignite:function(i){const pn=pins[i];if(pn&&pn.alive){const r=recFor(pn.body);if(r)ignite(r);}},__alpha:ialpha,__real:function(){return real?Object.keys(real.bones).filter(k=>real.bones[k]).join(','):null;},__installRig:function(spec){try{installReal(buildRigFromSpec(spec),!!spec.keepProc);return 'ok';}catch(e){return 'ERR '+(e&&e.message);}},__realInfo:function(){if(!real)return null;const o={sc:+real.sc.toFixed(3),ws:+real.ws.toFixed(4),box:real.box,d:{}};for(const k in real.restD)o.d[k]=real.restD[k].toArray().map(v=>+v.toFixed(2));const p=new THREE.Vector3(),p2=new THREE.Vector3(),U=bowler.userData,PB=U.B;o.cmp={};const PM={shL:'elL',elL:'wrL',shR:'elR',elR:'wrR',hpL:'knL',knL:'anL',hpR:'knR',knR:'anR',spine:'chest',neck:'head'};for(const k in PM){const rb=real.bones[k];if(!rb||!PB[k]||!PB[PM[k]])continue;const rc=rb.children.find(x=>x.isBone);if(!rc)continue;rc.getWorldPosition(p);rb.getWorldPosition(p2);const rd=p.sub(p2).normalize().toArray().map(v=>+v.toFixed(2));PB[PM[k]].getWorldPosition(p);PB[k].getWorldPosition(p2);const pd=p.sub(p2).normalize().toArray().map(v=>+v.toFixed(2));o.cmp[k]=[rd,pd];}real.ball.getWorldPosition(p);o.ball=p.toArray().map(v=>+v.toFixed(2));bowler.userData.arms.R.ball.getWorldPosition(p);o.pball=p.toArray().map(v=>+v.toFixed(2));return o;},__bcam:function(v){bCamOv=v||null;},__bowlerH:function(){const a=new THREE.Vector3(0,0,0),b=new THREE.Vector3(0,1.75,0);bowler.localToWorld(a);bowler.localToWorld(b);a.project(bCam);b.project(bCam);return +((b.y-a.y)*VH/2).toFixed(1);},__soak:function(){return +soakT.toFixed(2);},__fp:function(){const c=[0,0,0,0,0];for(const p of fP)if(p.l>0)c[p.k]++;return c;},__tgt:function(){const t=dept&&dept.tgt;return t?(t.rec?'rec':t.ball?'ball':t.spot?'spot':'sweep'):'-';},__tbl:function(){return tables.map(t=>t&&t.grp?[t.grp.visible?1:0,t.dmg||0,t.broken?1:0,+(t.crack?t.crack.mat.opacity:0).toFixed(3),+(t.planks?t.planks[0].rotation.z:0).toFixed(4),+t.grp.position.distanceTo(cam.position).toFixed(2)]:null);},__dbVis:function(){return debris.filter(d=>d&&d.mesh&&d.mesh.visible).length;},__rplSeek:function(p){if(!RPL.on)return -1;RPL.clock=RPL.from+(RPL.to-RPL.from)*Math.max(0,Math.min(0.999,p));return +((RPL.clock-RPL.from)/(RPL.to-RPL.from)).toFixed(3);},__rplFromBuf:function(){RPL.clip=RPL.buf.slice();RPL.capt=true;return RPL.clip.length;},__crack:function(i){const t=tables[i||0];if(t&&!t.broken)crackTable(t,2.0);return t?t.dmg:-1;},__break:function(i){const t=tables[i||0];if(t&&!t.broken)breakTable(t);return debris.length;},__debris:function(){return debris.length;},__reb:function(){return S.reb?1:0;},__camPos:function(){return [+cam.position.x.toFixed(3),+cam.position.y.toFixed(3),+cam.position.z.toFixed(3)];},__shyVis:function(){return (RPL.shy||[]).map(o=>o.visible?1:0);},__ballY:function(){return ballBody?+ballBody.position.y.toFixed(3):null;},__ballX:function(){return ballBody?+ballBody.position.x.toFixed(4):null;},__ghost:function(){return gPts.map(q=>[+q[0].toFixed(4),+q[1].toFixed(3)]);},__ball:function(){return ballBody?[+ballBody.position.z.toFixed(2),+ballBody.velocity.length().toFixed(2),S.done?1:0,S.rest?1:0]:null;},__pinMove:function(){let n=0,mx=0;for(const pn of pins){if(!pn||!pn.alive)continue;const b=pn.body;if(b.sleepState===CANNON.Body.SLEEPING)continue;const v=b.velocity.length()+b.angularVelocity.length()*0.1;if(v>0.05)n++;mx=Math.max(mx,v);}return [n,+mx.toFixed(3)];},__smash:function(){if(foods[0]){foods[0].body.wakeUp();foods[0].body.velocity.set(1.2,2,-0.4);}},edgePx:function(cy){
   const ndcY=1-((cy-400)/400)*2;const v=new THREE.Vector3();
   let best=1e9,bz=0.6;
   for(let z=3.3;z>-8;z-=0.12){v.set(0,0.02,z).project(cam);if(v.z<-1||v.z>1)continue;const d=Math.abs(v.y-ndcY);if(d<best){best=d;bz=z;}}

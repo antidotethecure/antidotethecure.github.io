@@ -1740,31 +1740,154 @@ function drawCover(i,x,y,w,h,tilt,alpha){
 
 /* ---------- strike / spare animations ---------- */
 function easeOut(t){return 1-Math.pow(1-t,3);}
-function drawTeeth(y,up,close){ /* one jaw: curved lip, gums, a row of teeth */
-  var L=72,R=W-72,cx=W/2,curve=up?26:-26;
-  /* lip + mouth interior behind it */
-  ctx.fillStyle='#5a0f14';ctx.beginPath();ctx.moveTo(L,up?y-140:y+140);ctx.lineTo(R,up?y-140:y+140);ctx.lineTo(R,y);ctx.quadraticCurveTo(cx,y+curve*1.4,L,y);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#b8322c';ctx.beginPath();ctx.moveTo(L,up?y-26:y+26);ctx.lineTo(R,up?y-26:y+26);ctx.lineTo(R,y-curve*0.2);ctx.quadraticCurveTo(cx,y+curve*1.3,L,y-curve*0.2);ctx.closePath();ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,.18)';ctx.beginPath();ctx.moveTo(L,up?y-26:y+26);ctx.lineTo(R,up?y-26:y+26);ctx.lineTo(R,up?y-18:y+18);ctx.lineTo(L,up?y-18:y+18);ctx.fill();
-  /* tongue in the lower jaw */
-  if(!up){ctx.fillStyle='#d8536a';ctx.beginPath();ctx.ellipse(cx,y+60,90,44,0,Math.PI,0);ctx.fill();ctx.fillStyle='rgba(255,255,255,.25)';ctx.beginPath();ctx.ellipse(cx-25,y+40,30,10,0,0,7);ctx.fill();}
-  /* teeth follow the lip curve */
-  var n=9,tw=(R-L)/n;
-  for(var k=0;k<n;k++){var x=L+k*tw+2,f=(k+0.5)/n,lipY=y+curve*1.3*(1-Math.pow((f-0.5)*2,2));var tall=(k===3||k===5)?30:(k===4?26:22);if(k===0||k===n-1)tall=16;
-    ctx.fillStyle='#fffbf0';if(up)rr(x,lipY-8,tw-4,tall,5);else rr(x,lipY-tall+8,tw-4,tall,5);ctx.fill();
-    ctx.fillStyle='rgba(0,0,0,.1)';ctx.fillRect(x+1,up?lipY+tall-14:lipY-tall+8,tw-6,4);}
+/* THE CLAMP, seen from the wrong side of the teeth.
+   It used to be two jaws closing sideways across the picture with the mouth drawn in behind them --
+   throat, gums, a tongue -- so you were looking INSIDE somebody's mouth while it shut. This is the
+   bite from where the camera is standing: the teeth come straight at the lens, snap shut ON it, and
+   take a piece of the picture away with them. Nothing behind the teeth is drawn, because from out
+   here you would not see it. */
+
+/* where a jaw's biting edge sits across its arch: the front teeth reach furthest, the back ones
+   fall away, which is what makes it read as an arch coming at you rather than a straight fence */
+function biteArc(u){return 1-u*u;}
+
+/* the line the tooth tips trace, as a path you can close into a shape */
+function biteEdge(cx,by,up,halfW,sc,seg){
+  var n=11,pts=[];
+  for(var k=0;k<n;k++){
+    var u=((k+0.5)/n-0.5)*2;
+    var x=cx+u*halfW;
+    var tipY=by+(up?1:-1)*(16*sc*biteArc(u));
+    pts.push([x,tipY,u]);
+  }
+  return pts;
 }
+
+function biteJaw(cx,by,up,halfW,sc){
+  var pts=biteEdge(cx,by,up,halfW,sc),n=pts.length,tw=(2*halfW/n);
+  /* The gum is a RIDGE behind the tooth roots, nothing more. It used to run 300 px back from the
+     jaw, which at full lunge filled the whole frame dark red and put you right back inside a mouth.
+     It stops just behind the roots now, so the picture the teeth are biting stays visible between
+     and around them -- which is the whole point of seeing this from the lens side. */
+  var gumD=(up?-1:1)*54*sc;
+  ctx.fillStyle='#4a0d12';
+  ctx.beginPath();
+  ctx.moveTo(cx-halfW-tw, by+gumD);
+  ctx.lineTo(cx+halfW+tw, by+gumD);
+  for(var i=n-1;i>=0;i--){var p=pts[i];ctx.lineTo(p[0]+tw/2, p[1]-(up?1:-1)*(10*sc));}
+  ctx.closePath();ctx.fill();
+  /* the lip rolled back off the gum, so the jaw has an edge rather than fading into the dark */
+  ctx.fillStyle='#7a1620';
+  ctx.fillRect(cx-halfW-tw, by+gumD, (halfW+tw)*2, (up?-1:1)*13*sc);
+  /* a wet highlight along the gum line */
+  ctx.strokeStyle='rgba(255,140,150,.35)';ctx.lineWidth=3*sc;
+  ctx.beginPath();
+  for(var j=0;j<n;j++){var q=pts[j];ctx.lineTo(q[0], q[1]-(up?1:-1)*(12*sc));}
+  ctx.stroke();
+  /* the teeth themselves, tips toward the lens */
+  for(var k=0;k<n;k++){
+    var x=pts[k][0],tip=pts[k][1],u=pts[k][2];
+    var canine=Math.abs(Math.abs(u)-0.46)<0.10;
+    var len=sc*(30+14*biteArc(u)+(canine?10:0));
+    var w=tw*(0.72+0.24*biteArc(u));
+    var y0=up?tip-len:tip;
+    var gr=ctx.createLinearGradient(0,up?y0:y0+len,0,up?y0+len:y0);
+    gr.addColorStop(0,'#e8dcc8');gr.addColorStop(0.55,'#fffdf6');gr.addColorStop(1,'#ffffff');
+    ctx.fillStyle=gr;
+    rr(x-w/2,y0,w,len,Math.min(7*sc,w*0.38));ctx.fill();
+    /* the shaded gap between neighbours, and a glint on the front face */
+    ctx.fillStyle='rgba(60,30,20,.22)';ctx.fillRect(x+w/2-1.5*sc,y0+len*0.12,1.8*sc,len*0.7);
+    ctx.fillStyle='rgba(255,255,255,.75)';
+    rr(x-w*0.26,up?y0+len*0.18:y0+len*0.12,w*0.2,len*0.42,2.5*sc);ctx.fill();
+  }
+}
+
+/* the piece the teeth take out: the ground between the two arches, scalloped by the tips that
+   closed on it. Built as a path so it can be filled as a hole, and filled again as the chunk
+   tumbling away. */
+function bitePath(cx,cy,halfW,gap,sc){
+  var up=biteEdge(cx,cy-gap/2,true,halfW,sc),dn=biteEdge(cx,cy+gap/2,false,halfW,sc);
+  ctx.beginPath();
+  ctx.moveTo(up[0][0]-halfW*0.14,up[0][1]);
+  for(var i=0;i<up.length;i++){
+    var p=up[i],w=(2*halfW/up.length)*0.5;
+    ctx.quadraticCurveTo(p[0]-w*0.5,p[1]+9*sc,p[0],p[1]+2*sc);
+    ctx.quadraticCurveTo(p[0]+w*0.5,p[1]+9*sc,p[0]+w,p[1]);
+  }
+  ctx.lineTo(dn[dn.length-1][0]+halfW*0.14,dn[dn.length-1][1]);
+  for(var j=dn.length-1;j>=0;j--){
+    var q=dn[j],w2=(2*halfW/dn.length)*0.5;
+    ctx.quadraticCurveTo(q[0]+w2*0.5,q[1]-9*sc,q[0],q[1]-2*sc);
+    ctx.quadraticCurveTo(q[0]-w2*0.5,q[1]-9*sc,q[0]-w2,q[1]);
+  }
+  ctx.closePath();
+}
+
 function drawClamp(t){
-  /* jaws close from above and below the pin deck, hold, then open */
-  var close=t<0.35?easeOut(t/0.35):t<0.8?1:1-easeOut((t-0.8)/0.7);
-  var gap=170*(1-close)+8;
-  var cy=250;
+  var cx=W/2,cy=186;
   ctx.save();ctx.beginPath();ctx.rect(72,0,W-144,TOP.h);ctx.clip();
-  if(close>0.98){ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(72,0,W-144,TOP.h);}
-  drawTeeth(cy-gap/2,true,close);
-  drawTeeth(cy+gap/2,false,close);
-  /* crumbs flying at the bite */
-  if(t>0.3&&t<0.9){ctx.fillStyle='#fbe9c4';for(var i=0;i<14;i++){var a=i*0.45+t*3,r=(t-0.3)*260;ctx.beginPath();ctx.arc(W/2+Math.cos(a)*r,cy+Math.sin(a)*r*0.5,3,0,7);ctx.fill();}}
+
+  /* it comes at the lens: 0 to 0.30 the jaws rush in and grow, they meet at 0.30, and from 0.42
+     they pull back out of frame with the piece they took */
+  var app=Math.min(1,t/0.30),ease=1-Math.pow(1-app,3);
+  var sc=0.55+0.70*ease;                       /* nearer means bigger */
+  var halfW=(W/2-40)*(0.62+0.42*ease);   /* not the full width: the picture has to survive at the edges */
+  var gap=Math.max(6,236*(1-ease));
+  var back=t>0.42?Math.min(1,(t-0.42)/0.62):0; /* withdrawing */
+  var open=236*back*back;
+  var oy=back*back*300;                        /* and lifting away out of shot */
+
+  /* the snap: a hard white frame at the moment they meet */
+  if(t>=0.28&&t<0.36){ctx.fillStyle='rgba(255,255,255,'+(0.55*(1-(t-0.28)/0.08))+')';ctx.fillRect(72,0,W-144,TOP.h);}
+
+  /* THE MISSING PIECE. Once they have closed, the ground they closed on is gone: a hole with a
+     torn, tooth-scalloped rim, and cracks running out of it across what is left of the picture. */
+  if(t>=0.30){
+    var hv=Math.min(1,(t-0.30)/0.10);
+    ctx.save();
+    bitePath(cx,cy,halfW*0.82,Math.max(8,gap),sc);
+    ctx.fillStyle='rgba(6,3,4,'+(0.94*hv)+')';ctx.fill();
+    ctx.strokeStyle='rgba(255,236,190,'+(0.75*hv)+')';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.restore();
+    ctx.strokeStyle='rgba(20,10,12,'+(0.5*hv)+')';ctx.lineWidth=2;
+    for(var c=0;c<9;c++){
+      var ang=c*0.7+1.1,r0=halfW*0.5,r1=r0+70+((c*37)%60);
+      ctx.beginPath();
+      ctx.moveTo(cx+Math.cos(ang)*r0,cy+Math.sin(ang)*r0*0.45);
+      ctx.lineTo(cx+Math.cos(ang+0.06)*r1,cy+Math.sin(ang+0.06)*r1*0.45);
+      ctx.stroke();
+    }
+  }
+
+  /* the chunk itself, tumbling off with the bite */
+  if(t>0.34){
+    var ct=t-0.34;
+    ctx.save();
+    ctx.translate(cx+ct*150,cy+ct*ct*520-ct*130);
+    ctx.rotate(ct*3.1);
+    var csc=Math.max(0.1,1-ct*0.5);
+    ctx.scale(csc,csc);
+    ctx.globalAlpha=Math.max(0,1-ct/0.95);
+    bitePath(0,0,halfW*0.82,Math.max(8,gap),sc);
+    ctx.fillStyle='#2b1a1b';ctx.fill();
+    ctx.strokeStyle='rgba(242,168,29,.9)';ctx.lineWidth=3;ctx.stroke();
+    ctx.restore();
+  }
+
+  /* the jaws, drawn last so they sit in front of the hole they just made */
+  biteJaw(cx,cy-gap/2-open-oy,true,halfW,sc);
+  biteJaw(cx,cy+gap/2+open+oy,false,halfW,sc);
+
+  /* crumbs off the bite */
+  if(t>0.30&&t<0.95){
+    ctx.fillStyle='#fbe9c4';
+    for(var i2=0;i2<16;i2++){
+      var a2=i2*0.41+t*3,r2=(t-0.30)*300;
+      ctx.globalAlpha=Math.max(0,1-(t-0.30)/0.65);
+      ctx.beginPath();ctx.arc(cx+Math.cos(a2)*r2,cy+Math.sin(a2)*r2*0.5,2.5+((i2*7)%3),0,7);ctx.fill();
+    }
+    ctx.globalAlpha=1;
+  }
   ctx.restore();
 }
 function drawDrizzle(t){pourDrizzle(t,W/2,172,318,1);
@@ -3194,9 +3317,9 @@ function ambient(dt,gs){
   ledPatT.offset.y-=ledPatSpeed*dt*(ledPat===3?0.5:1);   /* the light runs down the lane */
   if(ledT>8.5){ledT=0;ledCol=(ledCol+1)%LEDCOLS.length;const c2=LEDCOLS[ledCol];
     ledPat=(ledPat+1)%4;drawLedPattern(ledPat);ledPatSpeed=[0.9,0.35,1.4,0.6][ledPat];
-    ledStrips.forEach(m=>{m.material.color.set(c2);m.material.color.lerp(new THREE.Color(0xffffff),0.35);});ledArrows.forEach(m=>m.material.color.set(c2));ledGlows.forEach(m=>m.material.color.set(c2));pinLeds.forEach(m=>m.material.color.set(c2));Object.keys(pinMats).forEach(k=>pinMats[k].emissive.set(c2));ballMat.emissive.set(c2);ledLight.color.set(c2);}
+    ledStrips.forEach(m=>{m.material.color.set(c2);m.material.color.lerp(new THREE.Color(0xffffff),0.35);});ledArrows.forEach(m=>m.material.color.set(c2));ledGlows.forEach(m=>m.material.color.set(c2));pinLeds.forEach(m=>m.material.color.set(c2));Object.keys(pinMats).forEach(k=>pinMats[k].emissive.set(c2));ledColNow=c2;ballMat.emissive.set(c2);ledLight.color.set(c2);}
   const ledOn=ledT>0.55||Math.random()<0.55;
-  ledStrips.forEach(m=>m.visible=ledOn);ledArrows.forEach(m=>m.visible=ledOn);ledGlows.forEach(m=>m.visible=ledOn);pinLeds.forEach(m=>m.visible=ledOn);{const ei=ledOn?2.2:0.25;Object.keys(pinMats).forEach(k=>pinMats[k].emissiveIntensity=ei);ballMat.emissiveIntensity=ei;}ledLight.intensity=ledOn?8:0.8;
+  ledStrips.forEach(m=>m.visible=ledOn);ledArrows.forEach(m=>m.visible=ledOn);ledGlows.forEach(m=>m.visible=ledOn);pinLeds.forEach(m=>m.visible=ledOn);{const ei=ledOn?2.2:0.25;pinEiBase=ei;Object.keys(pinMats).forEach(k=>pinMats[k].emissiveIntensity=ei);ballMat.emissiveIntensity=ei;}ledLight.intensity=ledOn?8:0.8;
   if(hemi)hemi.intensity=0.62+day*0.55;dl.intensity=0.9+day*0.7;
   starMat.opacity=Math.max(0,1-day*2-dusk)*0.9;
   /* sun arcs through the day, moon through the night */
@@ -3449,12 +3572,16 @@ function makePin(i,fi){
   body.__pin=true;world.addBody(body);
   body.addEventListener('collide',e=>{const nw=performance.now()/1000;const iv=Math.abs(e.contact.getImpactVelocityAlongNormal());
     if(iv>0.9&&nw-lastPinC>0.03){lastPinC=nw;if(A3.pinHit)A3.pinHit(iv,'pin');else if(A3.sfx)A3.sfx.crash();}});
-  const grp=new THREE.Group();const mesh=new M(pinGeo,pinMat(fi));mesh.position.y=-PHYS.pinCY;grp.add(mesh);scene.add(grp);
+  /* its OWN material, not the one shared by every pin carrying this food: a bulb has to be able to
+     go out on one pin without taking the other nine with it. applyPinLeds() below keeps the clones
+     in step with the lane's colour and brightness. */
+  const pmat=pinMat(fi).clone();
+  const grp=new THREE.Group();const mesh=new M(pinGeo,pmat);mesh.position.y=-PHYS.pinCY;grp.add(mesh);scene.add(grp);
   const sh=new M(shadowGeo,shadowMat.clone());scene.add(sh);
   let rg=null;
   { /* soft light haze around the engraved channel, no solid ring */
     rg=new M(new THREE.TorusGeometry(0.0205,0.011,6,28),new THREE.MeshBasicMaterial({color:LEDCOLS[ledCol],transparent:true,opacity:0.16,blending:THREE.AdditiveBlending,depthWrite:false}));rg.rotation.x=Math.PI/2;rg.position.y=0.258-PHYS.pinCY;grp.add(rg);pinLeds.push(rg); }
-  return {body,grp,mesh,shadow:sh,alive:true,fi:fi,wasUp:true,led:rg};
+  return {body,grp,mesh,shadow:sh,alive:true,fi:fi,wasUp:true,led:rg,mat:pmat,ledT:-1,restT:0};
 }
 const SAUCEC=[0xc0392b,0xf2c037,0xf5efd8,0x6b2a1a,0xe05a1e,0x5a3a1c,0xf2a81d,0x7cb342];
 const blobT=bake(128,128,(g,w,h)=>{g.clearRect(0,0,w,h);g.fillStyle='#fff';g.beginPath();
@@ -4249,6 +4376,33 @@ function postStep(){
   if(A3.rumble)A3.rumble((!S.done&&p.y<0.13&&!S.pit)?Math.min(1,v.length()/7):0);
   cullFallen();
 }
+/* How a dying bulb behaves: it does not dim smoothly, it stutters -- a few hard flickers getting
+   shorter and weaker, with the odd bright arc as the contact breaks, and then nothing. Full dark by
+   three quarters of a second. */
+function ledOutF(u){
+  if(u<0)return 1;
+  if(u>=0.78)return 0;
+  const fade=1-u/0.78;
+  const stut=u<0.46?(Math.sin(u*64)>0.05?1:0.10):0.0;
+  const arc=(u<0.30&&Math.sin(u*97)>0.93)?2.4:0;      /* the contact arcing over as it breaks */
+  return Math.max(0,fade*fade*(0.22+0.78*stut)+arc*fade);
+}
+let pinEiBase=2.2,ledColNow=LEDCOLS[0];
+function applyPinLeds(){
+  for(const pn of pins){
+    if(!pn||!pn.alive||!pn.mat)continue;
+    const f=ledOutF(pn.ledT);
+    pn.mat.emissive.set(ledColNow);
+    pn.mat.emissiveIntensity=pinEiBase*f;
+    if(pn.led){
+      pn.led.material.color.set(ledColNow);
+      pn.led.material.opacity=0.16*Math.min(1,f);
+      const pop=f>1.2?1+(f-1)*0.5:1;                   /* the arc flares the haze as it goes */
+      pn.led.scale.setScalar(pop);
+      pn.led.visible=f>0.002;
+    }
+  }
+}
 const upTmp=new CANNON.Vec3();
 function pinStep(){
   const dt=1/PHYS.hz;
@@ -4741,7 +4895,7 @@ function cosmicApply(dt,gs){
      belongs to a lit room and should come back with it */
   for(const m of ledGlows)m.material.opacity=0.55+0.45*c;
   const ei=2.2+3.4*c;
-  for(const k in pinMats)pinMats[k].emissiveIntensity=ei;
+  pinEiBase=ei;for(const k in pinMats)pinMats[k].emissiveIntensity=ei;
   ballMat.emissiveIntensity=ei;
   if(c>0.25){
     for(const m of ledStrips)m.visible=true;
@@ -5835,6 +5989,21 @@ function render(gs){
         const lift=Math.max(0,yv-0.06);f.shadow.scale.setScalar(1+lift*1.8);f.shadow.material.opacity=0.30/(1+lift*5.5);}}}
   for(const p2 of panels){syncPos(p2.body,p2.mesh,al);syncQ(p2.body,p2.mesh,al);p2.mesh.visible=p2.mesh.position.y>-0.5;}
   }
+  /* THE BULB LETS GO. A pin knocked over and come to rest has had its wiring yanked out of the
+     channel: about a second after it settles the light sputters and dies. This deliberately does
+     NOT live in pinStep -- that skips sleeping bodies, and a fallen pin is allowed to sleep after
+     0.9 s, which is the same moment this timer matures. Whichever won the race, the bulb would
+     sometimes never blow. Out here a sleeping pin simply counts as still, which it is. */
+  for(const pn of pins){
+    if(!pn||!pn.alive)continue;
+    if(pn.ledT<0&&pn.down){
+      const b2=pn.body;
+      const sp=(b2.sleepState===CANNON.Body.SLEEPING)?0:(b2.velocity.length()+b2.angularVelocity.length()*0.08);
+      if(sp<0.55){pn.restT+=dt;if(pn.restT>0.9)pn.ledT=0;}else pn.restT=0;
+    }
+    if(pn.ledT>=0&&pn.ledT<0.78)pn.ledT+=dt;
+  }
+  applyPinLeds();
   updateFire(dt,nw);rebTick(dt,nw);fallTick(dt);
   if(!RPL.on&&ballBody&&ballMesh){ballMesh.position.copy(bI);syncQ(ballBody,ballMesh,al);
     if(!S.rest){const wb=Math.sin(nw*11)*0.07*Math.min(1,ballBody.velocity.length()/4);ballMesh.rotateOnWorldAxis(new THREE.Vector3(0,0,1),wb);ballMesh.position.x+=Math.sin(nw*7.3)*0.006;}
@@ -5920,7 +6089,7 @@ __shot:function(ox,spin,pw,aim){   /* runs the ghost sim headlessly and reports 
     hookBoards:headX===null?null:+((headX-x0)/0.0254).toFixed(1),
     travelS:headT===null?null:+headT.toFixed(2),profile:prof,
     entryDeg:ang===null?null:+ang.toFixed(2),gutter:gut};},
-__lights:function(){return {cos:+cosT.toFixed(3),hemi:hemi?+hemi.intensity.toFixed(3):null,dl:+dl.intensity.toFixed(3),mid:+midL.intensity.toFixed(2),pin:+pinLight.intensity.toFixed(2),pit:+pitGlow.intensity.toFixed(2),led:+ledLight.intensity.toFixed(2),floor:+cosFloorMat.opacity.toFixed(3),floorVis:cosFloor.visible,bKey:+bKey.intensity.toFixed(3),bFill:+bFill.intensity.toFixed(3),bRim:+bRim.intensity.toFixed(2),bUnder:+bUnder.intensity.toFixed(3),bHemi:+bHemi.intensity.toFixed(3),skyCol:hemi?hemi.color.getHexString():null,rimCol:bRim.color.getHexString(),pinEmis:+(pinMats[Object.keys(pinMats)[0]]?pinMats[Object.keys(pinMats)[0]].emissiveIntensity:0).toFixed(2)};},__truck:function(){if(!truck)return null;let mesh=0,tri=0,lights=0;truck.grp.traverse(o=>{if(o.isMesh){mesh++;const g=o.geometry;if(g&&g.index)tri+=g.index.count/3;else if(g&&g.attributes.position)tri+=g.attributes.position.count/3;}if(o.isLight)lights++;});return {meshes:mesh,triangles:Math.round(tri),lights:lights,gunPos:[+truck.gun.position.x.toFixed(3),+truck.gun.position.y.toFixed(3),+truck.gun.position.z.toFixed(3)]};},__deptPose:function(){if(!dept||!truck)return null;const T=truck.grp;return {t:+dept.t.toFixed(2),x:+T.position.x.toFixed(2),z:+T.position.z.toFixed(2),ry:+T.rotation.y.toFixed(2),wr:+truck.wheels[0].rotation.z.toFixed(1),gz:+truck.gun.position.z.toFixed(3),vis:T.visible};},__parkTruck:function(x,y,z,ry){if(!truck)truck=makeTruck();truck.grp.visible=true;truck.grp.position.set(x,y,z);truck.grp.rotation.y=ry||0;truck.lightR.intensity=6;truck.lightB.intensity=6;truck.headL.intensity=3.2;return true;},__pinState:function(){const o=[];for(let i=0;i<10;i++){const pn=pins[i];if(!pn||!pn.alive){o.push({i:i,gone:1});continue;}const b=pn.body,a=b.quaternion.vmult(UPV,new CANNON.Vec3());o.push({i:i,ay:+a.y.toFixed(4),tilt:+(Math.acos(Math.max(-1,Math.min(1,a.y)))*180/Math.PI).toFixed(1),up:pinUp(b,a)?1:0,y:+b.position.y.toFixed(3),z:+b.position.z.toFixed(2),spd:+b.velocity.length().toFixed(3),asp:+b.angularVelocity.length().toFixed(3),slp:b.sleepState});}return o;},__settled:function(){return settled()?1:0;},__bbPng:function(){return bbC.toDataURL('image/png');},__btvPng:function(){return btvC.toDataURL('image/png');},__pinTexPng:function(fi){const f=(A3.foods||[])[fi];const t=pinTexture(f,fi);return {png:t.image.toDataURL('image/png'),cell:FOOD_CELL[fi],sheet:!!foodImg,emoji:f&&f.e};},__topple:function(i){const pn=pins[i];if(!pn||!pn.alive)return false;pn.body.wakeUp();pn.body.velocity.set(2.6,0.4,-1.2);pn.body.angularVelocity.set(6,0,10);return true;},__deck:function(){const o=[];for(let i=0;i<10;i++){const pn=pins[i];if(!pn||!pn.alive){o.push({i:i,alive:0});continue;}const b=pn.body,a=b.quaternion.vmult(UPV,new CANNON.Vec3());o.push({i:i,alive:1,x:+b.position.x.toFixed(3),z:+b.position.z.toFixed(3),up:pinUp(b,a)?1:0,homeX:+(LAYOUT[i][0]*PDXm).toFixed(3),homeZ:+(Z_HEAD-LAYOUT[i][1]*PDZm).toFixed(3)});}return o;},__upTest:function(x,y,z,ay){return pinUp({position:{x:x,y:y,z:z}},{y:ay})?1:0;},__chain:function(){const B=bowler.userData.B;return {pelvY:+B.pelvis.rotation.y.toFixed(4),pelvZ:+B.pelvis.rotation.z.toFixed(4),spineY:+B.spine.rotation.y.toFixed(4),spineX:+B.spine.rotation.x.toFixed(4),shR:+bowler.userData.arms.R.sh.rotation.x.toFixed(4),shRz:+bowler.userData.arms.R.sh.rotation.z.toFixed(4),clothLag:real&&real.cloth?[+real.cloth.U.uClothLag.value.x.toFixed(5),+real.cloth.U.uClothLag.value.y.toFixed(5),+real.cloth.U.uClothLag.value.z.toFixed(5)]:null,clothFlap:real&&real.cloth?+real.cloth.U.uClothFlap.value.toFixed(4):null};},__boneNames:function(){if(!real||!real.root)return null;const out=[];real.root.traverse(o=>{if(o.isBone)out.push(o.name);});return out;},__btv:function(){return {ok:btvHovOk,tag:btvHovTag,miss:btvHovMiss,paused:btvHov.paused,ready:btvHov.readyState,vw:btvHov.videoWidth,err:btvHov.error?btvHov.error.code:null,src:(btvHov.currentSrc||'').split('/').pop()};},__swing:function(u){return keyed(SW_ARM,u);},__swingFol:function(f){return keyed(SW_AFOL,f);},__form:function(){const b=bowler.position;return {
+__lights:function(){return {cos:+cosT.toFixed(3),hemi:hemi?+hemi.intensity.toFixed(3):null,dl:+dl.intensity.toFixed(3),mid:+midL.intensity.toFixed(2),pin:+pinLight.intensity.toFixed(2),pit:+pitGlow.intensity.toFixed(2),led:+ledLight.intensity.toFixed(2),floor:+cosFloorMat.opacity.toFixed(3),floorVis:cosFloor.visible,bKey:+bKey.intensity.toFixed(3),bFill:+bFill.intensity.toFixed(3),bRim:+bRim.intensity.toFixed(2),bUnder:+bUnder.intensity.toFixed(3),bHemi:+bHemi.intensity.toFixed(3),skyCol:hemi?hemi.color.getHexString():null,rimCol:bRim.color.getHexString(),pinEmis:+(pinMats[Object.keys(pinMats)[0]]?pinMats[Object.keys(pinMats)[0]].emissiveIntensity:0).toFixed(2)};},__truck:function(){if(!truck)return null;let mesh=0,tri=0,lights=0;truck.grp.traverse(o=>{if(o.isMesh){mesh++;const g=o.geometry;if(g&&g.index)tri+=g.index.count/3;else if(g&&g.attributes.position)tri+=g.attributes.position.count/3;}if(o.isLight)lights++;});return {meshes:mesh,triangles:Math.round(tri),lights:lights,gunPos:[+truck.gun.position.x.toFixed(3),+truck.gun.position.y.toFixed(3),+truck.gun.position.z.toFixed(3)]};},__deptPose:function(){if(!dept||!truck)return null;const T=truck.grp;return {t:+dept.t.toFixed(2),x:+T.position.x.toFixed(2),z:+T.position.z.toFixed(2),ry:+T.rotation.y.toFixed(2),wr:+truck.wheels[0].rotation.z.toFixed(1),gz:+truck.gun.position.z.toFixed(3),vis:T.visible};},__parkTruck:function(x,y,z,ry){if(!truck)truck=makeTruck();truck.grp.visible=true;truck.grp.position.set(x,y,z);truck.grp.rotation.y=ry||0;truck.lightR.intensity=6;truck.lightB.intensity=6;truck.headL.intensity=3.2;return true;},__pinState:function(){const o=[];for(let i=0;i<10;i++){const pn=pins[i];if(!pn||!pn.alive){o.push({i:i,gone:1});continue;}const b=pn.body,a=b.quaternion.vmult(UPV,new CANNON.Vec3());o.push({i:i,ay:+a.y.toFixed(4),tilt:+(Math.acos(Math.max(-1,Math.min(1,a.y)))*180/Math.PI).toFixed(1),up:pinUp(b,a)?1:0,y:+b.position.y.toFixed(3),z:+b.position.z.toFixed(2),spd:+b.velocity.length().toFixed(3),asp:+b.angularVelocity.length().toFixed(3),slp:b.sleepState});}return o;},__settled:function(){return settled()?1:0;},__bbPng:function(){return bbC.toDataURL('image/png');},__btvPng:function(){return btvC.toDataURL('image/png');},__pinTexPng:function(fi){const f=(A3.foods||[])[fi];const t=pinTexture(f,fi);return {png:t.image.toDataURL('image/png'),cell:FOOD_CELL[fi],sheet:!!foodImg,emoji:f&&f.e};},__topple:function(i){const pn=pins[i];if(!pn||!pn.alive)return false;pn.body.wakeUp();pn.body.velocity.set(2.6,0.4,-1.2);pn.body.angularVelocity.set(6,0,10);return true;},__deck:function(){const o=[];for(let i=0;i<10;i++){const pn=pins[i];if(!pn||!pn.alive){o.push({i:i,alive:0});continue;}const b=pn.body,a=b.quaternion.vmult(UPV,new CANNON.Vec3());o.push({i:i,alive:1,x:+b.position.x.toFixed(3),z:+b.position.z.toFixed(3),up:pinUp(b,a)?1:0,homeX:+(LAYOUT[i][0]*PDXm).toFixed(3),homeZ:+(Z_HEAD-LAYOUT[i][1]*PDZm).toFixed(3)});}return o;},__upTest:function(x,y,z,ay){return pinUp({position:{x:x,y:y,z:z}},{y:ay})?1:0;},__markDown:function(i){const pn=pins[i];if(!pn||!pn.alive)return false;pn.down=true;return true;},__pinLed:function(){return pins.map(function(pn,i){return (pn&&pn.alive&&pn.mat)?{i:i,ledT:+pn.ledT.toFixed(2),restT:+pn.restT.toFixed(2),down:!!pn.down,slp:pn.body.sleepState,emis:+pn.mat.emissiveIntensity.toFixed(3),halo:pn.led?+pn.led.material.opacity.toFixed(4):null,vis:pn.led?pn.led.visible:null}:null;});},__blowPin:function(i){const pn=pins[i];if(!pn||!pn.alive)return false;pn.down=true;pn.ledT=0;return true;},__chain:function(){const B=bowler.userData.B;return {pelvY:+B.pelvis.rotation.y.toFixed(4),pelvZ:+B.pelvis.rotation.z.toFixed(4),spineY:+B.spine.rotation.y.toFixed(4),spineX:+B.spine.rotation.x.toFixed(4),shR:+bowler.userData.arms.R.sh.rotation.x.toFixed(4),shRz:+bowler.userData.arms.R.sh.rotation.z.toFixed(4),clothLag:real&&real.cloth?[+real.cloth.U.uClothLag.value.x.toFixed(5),+real.cloth.U.uClothLag.value.y.toFixed(5),+real.cloth.U.uClothLag.value.z.toFixed(5)]:null,clothFlap:real&&real.cloth?+real.cloth.U.uClothFlap.value.toFixed(4):null};},__boneNames:function(){if(!real||!real.root)return null;const out=[];real.root.traverse(o=>{if(o.isBone)out.push(o.name);});return out;},__btv:function(){return {ok:btvHovOk,tag:btvHovTag,miss:btvHovMiss,paused:btvHov.paused,ready:btvHov.readyState,vw:btvHov.videoWidth,err:btvHov.error?btvHov.error.code:null,src:(btvHov.currentSrc||'').split('/').pop()};},__swing:function(u){return keyed(SW_ARM,u);},__swingFol:function(f){return keyed(SW_AFOL,f);},__form:function(){const b=bowler.position;return {
   L:[+(feet.L.x-b.x).toFixed(3),+feet.L.y.toFixed(3),+(feet.L.z-b.z).toFixed(3)],
   R:[+(feet.R.x-b.x).toFixed(3),+feet.R.y.toFixed(3),+(feet.R.z-b.z).toFixed(3)],
   hipY:+b.y.toFixed(3),reach:+LEG.reach.toFixed(3),crouch:+(LEG.crouch||0).toFixed(3),

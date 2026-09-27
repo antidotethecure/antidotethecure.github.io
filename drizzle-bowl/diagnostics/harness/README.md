@@ -20,11 +20,18 @@ pass while exercising none of the real art.
 
 ## pwpins2.js — the scoring gate
 
-Six throws through the real game flow. After each roll is scored, the pins the
-scoreboard believes are standing must equal the pins the physics module believes are
-standing. A disagreement means the score and the deck have drifted apart, which is the
-bug class that re-racks a pin the player watched fall over. It prints `mismatches N`;
-anything but 0 is a failure. It also flags any pin counted standing while leaning more
-than 8 degrees.
+Six throws through the real game flow. After each roll is scored it checks two things:
+
+1. The pins the scoreboard believes are standing must be **the same pins** the physics
+   module believes are standing — not merely the same *number* of them.
+2. No pin counted standing may be off the pin deck.
+
+Check 1 is worded that way for a reason. The gate used to compare counts only, and a
+dead-wood bug walked straight through it: a pin driven forward off the deck and left
+upright out on the lane was still counted as standing, so the two totals agreed
+perfectly while the scoreboard pointed at the wrong pin. Comparing identities is what
+catches a permutation or a mislabelled pin; comparing counts never will.
+
+It prints `mismatches N`; anything but 0 is a failure.
 
 Never pipe this through `tail` — that has truncated the failing line before.

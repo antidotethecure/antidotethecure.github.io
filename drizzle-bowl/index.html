@@ -2584,8 +2584,12 @@ window.__showHalf=showHalftime;
     var chow=flat||!lane||!B3D.__food||B3D.__food();   /* the plates are carved from the atlas on the way in */
     var n=(lane?1:0)+(real?1:0)+(crowd?1:0)+(chow?1:0),secs=(Date.now()-t0)/1000;
     bar.style.width=Math.max(10,Math.min(100,Math.round(n/4*100)))+'%';
-    if(secs>3.5)note.textContent='ALMOST THERE\u2026';
-    if((real&&crowd&&chow)||secs>10){clearInterval(iv);bar.style.width='100%';
+    var pct=window.__glbPct||0;
+    if(!real&&pct>0&&pct<100)note.textContent='LOADING ANTIDOTE\u2026 '+pct+'%';
+    else if(secs>3.5)note.textContent='ALMOST THERE\u2026';
+    /* 10 s was not long enough for a 3.8 MB scan on a phone, and when it ran out the card came down
+       on the stand-in. It waits 24 s now, and gives up early only if the fetch has actually failed. */
+    if((real&&crowd&&chow)||window.__glbFail||secs>24){clearInterval(iv);bar.style.width='100%';
       el.classList.add('off');setTimeout(function(){el.style.display='none';},420);}
   },110);
 })();
@@ -5133,7 +5137,18 @@ function makeBowler(){
   G.userData={B,arms,legs,shadow};
   return G;
 }
-const bowler=makeBowler();const bRoot=new THREE.Group();bRoot.scale.setScalar(BSCALE);bRoot.position.y=0.20;bRoot.add(bowler);bScene.add(bRoot);
+const bowler=makeBowler();
+/* THE STAND-IN STAYS OFF UNTIL IT IS NEEDED. The built-in bowler is a few boxes and cylinders --
+   fine as a last resort, but it has visible gaps at the joints and it is not him. It used to be on
+   screen from the first frame and was only swapped out when the scan finished downloading, and the
+   scan is 3.8 MB: on a phone that is easily longer than the loading card waits, so the first thing
+   the player saw was the cartoon with the disconnected limbs. It is hidden from the start now and
+   only ever revealed if the scan genuinely cannot be fetched. */
+bowler.children.forEach(function(c){if(c!==bowler.userData.shadow)c.visible=false;});
+let procShown=false;
+function showProcBowler(){if(procShown||real)return;procShown=true;
+  bowler.children.forEach(function(c){if(c!==bowler.userData.shadow)c.visible=true;});}
+const bRoot=new THREE.Group();bRoot.scale.setScalar(BSCALE);bRoot.position.y=0.20;bRoot.add(bowler);bScene.add(bRoot);
 /* ---------- THE REAL ANTIDOTE: a rigged, textured 3D scan of him built from his photos (front and back). It loads in the
    background; the procedural bowler stands in until it arrives and then becomes the hidden control rig: every pose,
    walk cycle and swing still runs on the old joints, and each frame the scan's skeleton is aimed to match them. ---------- */
@@ -5274,10 +5289,15 @@ async function loadRealBowler(){
   try{
     const {GLTFLoader}=await import('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js');
     let gltf=null,err=null;
-    for(const u of BOWLER_GLBS){try{gltf=await new GLTFLoader().loadAsync(u);break;}catch(e){err=e;}}
+    /* the loading card would rather say "68%" than sit on a bar that never moves */
+    const onProg=function(ev){if(ev&&ev.lengthComputable&&ev.total)window.__glbPct=Math.round(ev.loaded/ev.total*100);};
+    for(const u of BOWLER_GLBS){try{gltf=await new GLTFLoader().loadAsync(u,onProg);break;}catch(e){err=e;}}
     if(!gltf)throw err||new Error('no source');
-    installReal(gltf.scene,false);console.log('real bowler loaded');
-  }catch(e){console.warn('real bowler unavailable, keeping the built one:',e&&e.message);}
+    installReal(gltf.scene,false);window.__glbPct=100;console.log('real bowler loaded');
+  }catch(e){
+    console.warn('real bowler unavailable, falling back to the built one:',e&&e.message);
+    window.__glbFail=true;showProcBowler();   /* only now: nothing else is coming */
+  }
 }
 function buildRigFromSpec(spec){ /* test rig: the scan's skeleton as sticks, no mesh */
   const root=new THREE.Group(),objs={},mat=new THREE.MeshStandardMaterial({color:0xff3366});
@@ -5649,7 +5669,14 @@ function poseBowler(gs,dt,nw){
           books ask for. At 0.185 he was barely crouching. */
        bob:-Math.abs(Math.sin(P))*0.022*(1-lg)-0.055*pw*(1-lg)-0.27*lg-0.013*load,
        hz:-0.74*sstep(0.02,0.80,u)-0.05*fol,
-       shL:[0.25+0.66*bal,0,-(0.7+0.95*bal)],elL:0.88-0.66*bal,
+       /* THE BALANCE ARM. It used to open to z=-1.65 -- ninety-four degrees, dead horizontal --
+          while the elbow straightened to 0.22, about twelve degrees. A limb held out at a right
+          angle with no bend in it is a pole, not an arm, and that is what made it read as broken.
+          A bowler's balance arm goes out to around sixty-five degrees and KEEPS a bend in it, more
+          like thirty-five, with the shoulder carried a little forward rather than square out to the
+          side. Measured on the rig: the upper arm was ending at [-1.00, 0.08, -0.01], straight out
+          and very slightly up, which is the pose a cricketer holds, not a bowler. */
+       shL:[0.30+0.32*bal,0,-(0.60+0.52*bal)],elL:0.86-0.26*bal,
        shR:[swR,0,0.16+0.065*load],elR:elR,   /* the ball's own weight pulling the arm off his side */
        /* THE RELEASE, in the order it really happens. The hand stays behind the ball the whole way
           down -- turning early is the classic fault and it kills the lift. The thumb comes out
@@ -6066,7 +6093,12 @@ __shot:function(ox,spin,pw,aim){   /* runs the ghost sim headlessly and reports 
     hookBoards:headX===null?null:+((headX-x0)/0.0254).toFixed(1),
     travelS:headT===null?null:+headT.toFixed(2),profile:prof,
     entryDeg:ang===null?null:+ang.toFixed(2),gutter:gut};},
-__lights:function(){return {cos:+cosT.toFixed(3),hemi:hemi?+hemi.intensity.toFixed(3):null,dl:+dl.intensity.toFixed(3),mid:+midL.intensity.toFixed(2),pin:+pinLight.intensity.toFixed(2),pit:+pitGlow.intensity.toFixed(2),led:+ledLight.intensity.toFixed(2),floor:+cosFloorMat.opacity.toFixed(3),floorVis:cosFloor.visible,bKey:+bKey.intensity.toFixed(3),bFill:+bFill.intensity.toFixed(3),bRim:+bRim.intensity.toFixed(2),bUnder:+bUnder.intensity.toFixed(3),bHemi:+bHemi.intensity.toFixed(3),skyCol:hemi?hemi.color.getHexString():null,rimCol:bRim.color.getHexString(),pinEmis:+(pinMats[Object.keys(pinMats)[0]]?pinMats[Object.keys(pinMats)[0]].emissiveIntensity:0).toFixed(2)};},__truck:function(){if(!truck)return null;let mesh=0,tri=0,lights=0;truck.grp.traverse(o=>{if(o.isMesh){mesh++;const g=o.geometry;if(g&&g.index)tri+=g.index.count/3;else if(g&&g.attributes.position)tri+=g.attributes.position.count/3;}if(o.isLight)lights++;});return {meshes:mesh,triangles:Math.round(tri),lights:lights,gunPos:[+truck.gun.position.x.toFixed(3),+truck.gun.position.y.toFixed(3),+truck.gun.position.z.toFixed(3)]};},__deptPose:function(){if(!dept||!truck)return null;const T=truck.grp;return {t:+dept.t.toFixed(2),x:+T.position.x.toFixed(2),z:+T.position.z.toFixed(2),ry:+T.rotation.y.toFixed(2),wr:+truck.wheels[0].rotation.z.toFixed(1),gz:+truck.gun.position.z.toFixed(3),vis:T.visible};},__parkTruck:function(x,y,z,ry){if(!truck)truck=makeTruck();truck.grp.visible=true;truck.grp.position.set(x,y,z);truck.grp.rotation.y=ry||0;truck.lightR.intensity=6;truck.lightB.intensity=6;truck.headL.intensity=3.2;return true;},__pinState:function(){const o=[];for(let i=0;i<10;i++){const pn=pins[i];if(!pn||!pn.alive){o.push({i:i,gone:1});continue;}const b=pn.body,a=b.quaternion.vmult(UPV,new CANNON.Vec3());o.push({i:i,ay:+a.y.toFixed(4),tilt:+(Math.acos(Math.max(-1,Math.min(1,a.y)))*180/Math.PI).toFixed(1),up:pinUp(b,a)?1:0,y:+b.position.y.toFixed(3),z:+b.position.z.toFixed(2),spd:+b.velocity.length().toFixed(3),asp:+b.angularVelocity.length().toFixed(3),slp:b.sleepState});}return o;},__settled:function(){return settled()?1:0;},__bbPng:function(){return bbC.toDataURL('image/png');},__btvPng:function(){return btvC.toDataURL('image/png');},__pinTexPng:function(fi){const f=(A3.foods||[])[fi];const t=pinTexture(f,fi);return {png:t.image.toDataURL('image/png'),cell:FOOD_CELL[fi],sheet:!!foodImg,emoji:f&&f.e};},__topple:function(i){const pn=pins[i];if(!pn||!pn.alive)return false;pn.body.wakeUp();pn.body.velocity.set(2.6,0.4,-1.2);pn.body.angularVelocity.set(6,0,10);return true;},__deck:function(){const o=[];for(let i=0;i<10;i++){const pn=pins[i];if(!pn||!pn.alive){o.push({i:i,alive:0});continue;}const b=pn.body,a=b.quaternion.vmult(UPV,new CANNON.Vec3());o.push({i:i,alive:1,x:+b.position.x.toFixed(3),z:+b.position.z.toFixed(3),up:pinUp(b,a)?1:0,homeX:+(LAYOUT[i][0]*PDXm).toFixed(3),homeZ:+(Z_HEAD-LAYOUT[i][1]*PDZm).toFixed(3)});}return o;},__upTest:function(x,y,z,ay){return pinUp({position:{x:x,y:y,z:z}},{y:ay})?1:0;},__markDown:function(i){const pn=pins[i];if(!pn||!pn.alive)return false;pn.down=true;return true;},__pinLed:function(){return pins.map(function(pn,i){return (pn&&pn.alive&&pn.mat)?{i:i,ledT:+pn.ledT.toFixed(2),restT:+pn.restT.toFixed(2),down:!!pn.down,slp:pn.body.sleepState,emis:+pn.mat.emissiveIntensity.toFixed(3),halo:pn.led?+pn.led.material.opacity.toFixed(4):null,vis:pn.led?pn.led.visible:null}:null;});},__blowPin:function(i){const pn=pins[i];if(!pn||!pn.alive)return false;pn.down=true;pn.ledT=0;return true;},__chain:function(){const B=bowler.userData.B;return {pelvY:+B.pelvis.rotation.y.toFixed(4),pelvZ:+B.pelvis.rotation.z.toFixed(4),spineY:+B.spine.rotation.y.toFixed(4),spineX:+B.spine.rotation.x.toFixed(4),shR:+bowler.userData.arms.R.sh.rotation.x.toFixed(4),shRz:+bowler.userData.arms.R.sh.rotation.z.toFixed(4),clothLag:real&&real.cloth?[+real.cloth.U.uClothLag.value.x.toFixed(5),+real.cloth.U.uClothLag.value.y.toFixed(5),+real.cloth.U.uClothLag.value.z.toFixed(5)]:null,clothFlap:real&&real.cloth?+real.cloth.U.uClothFlap.value.toFixed(4):null};},__boneNames:function(){if(!real||!real.root)return null;const out=[];real.root.traverse(o=>{if(o.isBone)out.push(o.name);});return out;},__btv:function(){return {ok:btvHovOk,tag:btvHovTag,miss:btvHovMiss,paused:btvHov.paused,ready:btvHov.readyState,vw:btvHov.videoWidth,err:btvHov.error?btvHov.error.code:null,src:(btvHov.currentSrc||'').split('/').pop()};},__swing:function(u){return keyed(SW_ARM,u);},__swingFol:function(f){return keyed(SW_AFOL,f);},__form:function(){const b=bowler.position;return {
+__lights:function(){return {cos:+cosT.toFixed(3),hemi:hemi?+hemi.intensity.toFixed(3):null,dl:+dl.intensity.toFixed(3),mid:+midL.intensity.toFixed(2),pin:+pinLight.intensity.toFixed(2),pit:+pitGlow.intensity.toFixed(2),led:+ledLight.intensity.toFixed(2),floor:+cosFloorMat.opacity.toFixed(3),floorVis:cosFloor.visible,bKey:+bKey.intensity.toFixed(3),bFill:+bFill.intensity.toFixed(3),bRim:+bRim.intensity.toFixed(2),bUnder:+bUnder.intensity.toFixed(3),bHemi:+bHemi.intensity.toFixed(3),skyCol:hemi?hemi.color.getHexString():null,rimCol:bRim.color.getHexString(),pinEmis:+(pinMats[Object.keys(pinMats)[0]]?pinMats[Object.keys(pinMats)[0]].emissiveIntensity:0).toFixed(2)};},__truck:function(){if(!truck)return null;let mesh=0,tri=0,lights=0;truck.grp.traverse(o=>{if(o.isMesh){mesh++;const g=o.geometry;if(g&&g.index)tri+=g.index.count/3;else if(g&&g.attributes.position)tri+=g.attributes.position.count/3;}if(o.isLight)lights++;});return {meshes:mesh,triangles:Math.round(tri),lights:lights,gunPos:[+truck.gun.position.x.toFixed(3),+truck.gun.position.y.toFixed(3),+truck.gun.position.z.toFixed(3)]};},__deptPose:function(){if(!dept||!truck)return null;const T=truck.grp;return {t:+dept.t.toFixed(2),x:+T.position.x.toFixed(2),z:+T.position.z.toFixed(2),ry:+T.rotation.y.toFixed(2),wr:+truck.wheels[0].rotation.z.toFixed(1),gz:+truck.gun.position.z.toFixed(3),vis:T.visible};},__parkTruck:function(x,y,z,ry){if(!truck)truck=makeTruck();truck.grp.visible=true;truck.grp.position.set(x,y,z);truck.grp.rotation.y=ry||0;truck.lightR.intensity=6;truck.lightB.intensity=6;truck.headL.intensity=3.2;return true;},__pinState:function(){const o=[];for(let i=0;i<10;i++){const pn=pins[i];if(!pn||!pn.alive){o.push({i:i,gone:1});continue;}const b=pn.body,a=b.quaternion.vmult(UPV,new CANNON.Vec3());o.push({i:i,ay:+a.y.toFixed(4),tilt:+(Math.acos(Math.max(-1,Math.min(1,a.y)))*180/Math.PI).toFixed(1),up:pinUp(b,a)?1:0,y:+b.position.y.toFixed(3),z:+b.position.z.toFixed(2),spd:+b.velocity.length().toFixed(3),asp:+b.angularVelocity.length().toFixed(3),slp:b.sleepState});}return o;},__settled:function(){return settled()?1:0;},__bbPng:function(){return bbC.toDataURL('image/png');},__btvPng:function(){return btvC.toDataURL('image/png');},__pinTexPng:function(fi){const f=(A3.foods||[])[fi];const t=pinTexture(f,fi);return {png:t.image.toDataURL('image/png'),cell:FOOD_CELL[fi],sheet:!!foodImg,emoji:f&&f.e};},__topple:function(i){const pn=pins[i];if(!pn||!pn.alive)return false;pn.body.wakeUp();pn.body.velocity.set(2.6,0.4,-1.2);pn.body.angularVelocity.set(6,0,10);return true;},__deck:function(){const o=[];for(let i=0;i<10;i++){const pn=pins[i];if(!pn||!pn.alive){o.push({i:i,alive:0});continue;}const b=pn.body,a=b.quaternion.vmult(UPV,new CANNON.Vec3());o.push({i:i,alive:1,x:+b.position.x.toFixed(3),z:+b.position.z.toFixed(3),up:pinUp(b,a)?1:0,homeX:+(LAYOUT[i][0]*PDXm).toFixed(3),homeZ:+(Z_HEAD-LAYOUT[i][1]*PDZm).toFixed(3)});}return o;},__upTest:function(x,y,z,ay){return pinUp({position:{x:x,y:y,z:z}},{y:ay})?1:0;},__markDown:function(i){const pn=pins[i];if(!pn||!pn.alive)return false;pn.down=true;return true;},__pinLed:function(){return pins.map(function(pn,i){return (pn&&pn.alive&&pn.mat)?{i:i,ledT:+pn.ledT.toFixed(2),restT:+pn.restT.toFixed(2),down:!!pn.down,slp:pn.body.sleepState,emis:+pn.mat.emissiveIntensity.toFixed(3),halo:pn.led?+pn.led.material.opacity.toFixed(4):null,vis:pn.led?pn.led.visible:null}:null;});},__blowPin:function(i){const pn=pins[i];if(!pn||!pn.alive)return false;pn.down=true;pn.ledT=0;return true;},__armGeom:function(){const out={};const g=(k)=>{const b=real.bones[k];if(!b)return null;const c=b.children.find(x=>x.isBone);if(!c)return null;const p=new THREE.Vector3(),q=new THREE.Vector3();c.getWorldPosition(p);b.getWorldPosition(q);return p.sub(q).normalize();};['L','R'].forEach(s=>{const u=g('sh'+s),f=g('el'+s);if(!u||!f){out[s]=null;return;}const bend=Math.acos(Math.max(-1,Math.min(1,u.dot(f))))*180/Math.PI;const bw=new THREE.Vector3().copy(bowler.worldToLocal(new THREE.Vector3())); out[s]={solvedLeg:!!(bowler.userData.legDir&&bowler.userData.legDir[s]),
+      thigh:(function(){const t=g('hp'+s);return t?[+t.x.toFixed(2),+t.y.toFixed(2),+t.z.toFixed(2)]:null;})(),
+      shin:(function(){const t=g('kn'+s);return t?[+t.x.toFixed(2),+t.y.toFixed(2),+t.z.toFixed(2)]:null;})(),
+      kneeDeg:(function(){const a=g('hp'+s),c=g('kn'+s);if(!a||!c)return null;
+        return +(Math.acos(Math.max(-1,Math.min(1,a.dot(c))))*180/Math.PI).toFixed(1);})(),
+      up:[+u.x.toFixed(2),+u.y.toFixed(2),+u.z.toFixed(2)],fore:[+f.x.toFixed(2),+f.y.toFixed(2),+f.z.toFixed(2)],bendDeg:+bend.toFixed(1),foreZ:+f.z.toFixed(3)};});return out;},__procShown:function(){let n=0;bowler.children.forEach(function(c){if(c!==bowler.userData.shadow&&c.visible)n++;});return n;},__chain:function(){const B=bowler.userData.B;return {pelvY:+B.pelvis.rotation.y.toFixed(4),pelvZ:+B.pelvis.rotation.z.toFixed(4),spineY:+B.spine.rotation.y.toFixed(4),spineX:+B.spine.rotation.x.toFixed(4),shR:+bowler.userData.arms.R.sh.rotation.x.toFixed(4),shRz:+bowler.userData.arms.R.sh.rotation.z.toFixed(4),clothLag:real&&real.cloth?[+real.cloth.U.uClothLag.value.x.toFixed(5),+real.cloth.U.uClothLag.value.y.toFixed(5),+real.cloth.U.uClothLag.value.z.toFixed(5)]:null,clothFlap:real&&real.cloth?+real.cloth.U.uClothFlap.value.toFixed(4):null};},__boneNames:function(){if(!real||!real.root)return null;const out=[];real.root.traverse(o=>{if(o.isBone)out.push(o.name);});return out;},__btv:function(){return {ok:btvHovOk,tag:btvHovTag,miss:btvHovMiss,paused:btvHov.paused,ready:btvHov.readyState,vw:btvHov.videoWidth,err:btvHov.error?btvHov.error.code:null,src:(btvHov.currentSrc||'').split('/').pop()};},__swing:function(u){return keyed(SW_ARM,u);},__swingFol:function(f){return keyed(SW_AFOL,f);},__form:function(){const b=bowler.position;return {
   L:[+(feet.L.x-b.x).toFixed(3),+feet.L.y.toFixed(3),+(feet.L.z-b.z).toFixed(3)],
   R:[+(feet.R.x-b.x).toFixed(3),+feet.R.y.toFixed(3),+(feet.R.z-b.z).toFixed(3)],
   hipY:+b.y.toFixed(3),reach:+LEG.reach.toFixed(3),crouch:+(LEG.crouch||0).toFixed(3),

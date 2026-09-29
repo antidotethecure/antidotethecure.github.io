@@ -120,3 +120,30 @@ Notes:
     claude mcp add --scope user playwright -- npx @playwright/mcp@latest --extension
 EOF
 fi
+
+# ---------------------------------------------------------------- Step 7
+say "Step 7: CapCut editing bridge (Claude builds CapCut drafts)"
+# Unofficial community bridge (no public CapCut API exists): Claude talks to
+# an MCP server, which drives VectCutAPI, which writes CapCut DRAFT projects
+# to disk. You open the draft in the CapCut desktop app to review and export.
+if [ ! -d "$HOME/.vectcut-api" ]; then
+  git clone https://github.com/sun-guannan/VectCutAPI "$HOME/.vectcut-api"
+  (cd "$HOME/.vectcut-api" && pip3 install -r requirements.txt)
+fi
+if [ ! -d "$HOME/.capcut-mcp" ]; then
+  git clone https://github.com/Atx-Guy/capcut-mcp-server "$HOME/.capcut-mcp"
+  (cd "$HOME/.capcut-mcp" && npm install && npm run build)
+fi
+if command -v claude >/dev/null && ! claude mcp list 2>/dev/null | grep -q '^capcut'; then
+  claude mcp add --scope user capcut --env CAPCUT_API_URL=http://localhost:9001 \
+    -- node "$HOME/.capcut-mcp/dist/index.js"
+  echo "capcut MCP registered for all projects."
+fi
+cat <<'EOF'
+To use it, start the backend first in its own terminal tab:
+  cd ~/.vectcut-api && python3 capcut_server.py
+Then in any Claude Code session: "make a CapCut draft from <video>: cut X,
+add captions, add title". The finished draft appears in CapCut desktop's
+projects — you review and hit Export there (export cannot be automated).
+Requires the CapCut desktop app installed.
+EOF

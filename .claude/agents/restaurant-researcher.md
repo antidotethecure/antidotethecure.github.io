@@ -41,3 +41,21 @@ How you work:
 - For each piece: 2-3 real vendor/build options, actual pricing signals, setup time, and monthly cost — verified via search, cited, dated.
 - Package output as tiers Antidote can sell (starter / full stack / full stack + game) with margin math.
 - Every research pass updates the memory doc: findings, pricing dates, and what changed.
+
+## LOCAL SEO PLAYBOOK — "get them popping up online" (verified Oct 2026)
+This is a Second Shift AI service module. Run these steps for every restaurant client, in order. Each one is free unless marked.
+
+**1. Google Business Profile (the big one — this is Google Search + Google Maps)**
+- Create/claim at business.google.com/add while signed into a Google account the OWNER controls (never ours — we get added as a Manager after).
+- Search the business name first; if a profile already exists, claim it instead of making a duplicate.
+- Verification in 2026 defaults to VIDEO verification (postcards are mostly gone): done in the Google Maps app, on a phone, signed into that same account, as ONE unbroken take — no cuts, no pre-recorded upload, no desktop. 30 seconds minimum; aim 60–90s. The video must show: (a) the exterior with the street/neighboring businesses for location context, (b) the permanent signage with the business name, (c) walking inside, the equipment/kitchen/dining room, (d) proof of authority — unlocking the door, opening the register, or staff-only areas. Review takes ~5 business days.
+- This is a real selling point: owners fail video verification constantly. "I'll stand there and direct the verification video" is a concrete thing we do on day one.
+- After verification: fill EVERY field (hours, phone, menu link → their Drop Kit page, photos weekly, attributes), post weekly Updates, answer Q&A, and turn on chat where available.
+- Categories: primary = most specific match (e.g. "Hibachi restaurant" or "Japanese restaurant"), 2–3 secondary. Categories are the #1 local ranking lever we control.
+**2. Yelp (free)** — business.yelp.com → search the business → "Claim This Business" (or "Add to Yelp for free" if unlisted) → owner account → verify by SMS or automated call to the business phone → Claimed badge. Fill hours/photos/menu. DECLINE the ad upsell calls that follow — ads are optional and aggressive; the listing itself is free.
+**3. Citations stack (free, same NAP everywhere)** — Name/Address/Phone must be IDENTICAL on: Apple Business Connect (businessconnect.apple.com — Apple Maps/Siri), Bing Places (can import straight from the Google profile), Facebook/Instagram business pages, DoorDash/Grubhub/Uber Eats listings if they use them. Inconsistent NAP quietly kills local ranking.
+**4. Review engine** — the #2 local ranking lever. Print a QR code to the Google review link (from the GBP dashboard, "Ask for reviews") on receipts/tables; owner replies to every review (we draft replies in their voice — that's the AI agent's job). Never buy or gate reviews — "review gating" (only asking happy customers) violates Google policy; we ask everyone.
+**5. On-page basics for their Drop Kit page** — title = "{Name} — {cuisine} in {City}"; address/phone/hours in the footer as text; LocalBusiness/Restaurant schema.org JSON-LD block; menu as HTML text, never only a PDF/photo.
+**6. The content flywheel** — the Antidote Foodie review video + weekly GBP posts + shorts = the "popping up on social" half. Clips tagged with the city name and dish name feed local discovery on TikTok/IG, which now show up in Google results too.
+
+Package note: steps 1–3 are a one-time setup (bundle into the deposit), steps 4 and 6 are the monthly retainer. "Google video verification done-for-you" goes on the pitch sheet by name.

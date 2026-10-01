@@ -219,18 +219,36 @@ var CONFIG = {
     // pink center fleck so it reads as steak, not rock
     cx.fillStyle="#C97B6B"; cx.fillRect(x-10,y-2,5,3);
   }
+  // rice crisps a shade darker with every dragon hit: white → toasted → dark brown → burnt
+  var RICE=[
+    ["#F5EFE0","#E3D4AE"],   // 0 hits — fresh steamed white
+    ["#DCBB8C","#C09A5E"],   // 1 hit  — toasted light brown
+    ["#9C6B38","#7A4F24"],   // 2 hits — crisped dark brown
+    ["#453022","#2B1D12"]    // 3 hits — burnt. food's cooked.
+  ];
+  var burns=0;
   function drawBowl(x){
-    var by=H-40;
+    var by=H-40, rice=RICE[Math.min(burns,3)];
     // rice mound sitting in the bowl
-    cx.fillStyle="#F5EFE0";
+    cx.fillStyle=rice[0];
     cx.beginPath(); cx.ellipse(x,by-6,40,15,0,Math.PI,0); cx.fill();
     cx.beginPath();
     cx.arc(x-20,by-12,11,0,Math.PI*2); cx.arc(x,by-17,13,0,Math.PI*2);
     cx.arc(x+19,by-11,11,0,Math.PI*2); cx.fill();
     // a few grains + scallion flecks so it reads as fried rice
-    cx.fillStyle="#E3D4AE";
+    cx.fillStyle=rice[1];
     cx.fillRect(x-24,by-16,4,2); cx.fillRect(x-4,by-24,4,2); cx.fillRect(x+16,by-15,4,2);
-    cx.fillStyle="#7FA85A"; cx.fillRect(x-12,by-20,3,3); cx.fillRect(x+8,by-19,3,3);
+    if(burns<2){ cx.fillStyle="#7FA85A"; cx.fillRect(x-12,by-20,3,3); cx.fillRect(x+8,by-19,3,3); }
+    if(burns>=1){ // char flecks grow with each hit
+      cx.fillStyle="#1E140C";
+      cx.fillRect(x-14,by-14,4,3); cx.fillRect(x+10,by-20,4,3);
+      if(burns>=2){ cx.fillRect(x-2,by-12,5,3); cx.fillRect(x-26,by-10,4,3); cx.fillRect(x+20,by-12,4,3); }
+    }
+    if(burns>=1 && running){ // smoke wisps rising off the rice
+      cx.fillStyle="rgba(200,200,200,"+(0.10+0.09*burns)+")";
+      var w1=Math.sin(performance.now()/300)*5;
+      cx.beginPath(); cx.arc(x-10+w1,by-34,5+burns,0,Math.PI*2); cx.arc(x+8-w1,by-46,4+burns,0,Math.PI*2); cx.fill();
+    }
     // the bowl itself — lacquer red with a gold band
     cx.fillStyle="#B4322A";
     cx.beginPath(); cx.ellipse(x,by-4,46,10,0,0,Math.PI*2); cx.fill();
@@ -292,9 +310,13 @@ var CONFIG = {
       cx.beginPath(); cx.moveTo(drg.x-7,drg.y+14); cx.lineTo(drg.x-30,H-24); cx.lineTo(drg.x+30,H-24); cx.lineTo(drg.x+7,drg.y+14); cx.closePath(); cx.fill();
       cx.font="26px serif"; cx.textAlign="center";
       cx.fillText("🔥", drg.x-12+Math.random()*24, H-30-Math.random()*30);
-      if(!drg.burned && Math.abs(bowlX-drg.x)<48){      // plate torched
-        drg.burned=true; score=Math.max(0,score-30); combo=0; flash="#E6483D";
+      if(!drg.burned && Math.abs(bowlX-drg.x)<48){      // plate torched — rice crisps a stage
+        drg.burned=true; burns++; score=Math.max(0,score-30); combo=0; flash="#E6483D";
         $("score").textContent=score;
+        if(burns>=3){ end(true); return; }
+        $("gmsg").innerHTML = burns===1
+          ? "🔥 <b>Rice singed!</b> Light brown. Two more dragon hits and it's burnt."
+          : "🔥🔥 <b>Rice crisped dark brown!</b> ONE more hit and the food is cooked.";
       }
     }
   }
@@ -325,18 +347,25 @@ var CONFIG = {
   function start(){
     running=true; score=0; combo=0; tLeft=CONFIG.game.seconds; drops=[]; last=performance.now(); spawnAcc=0; timerAcc=0; flash=null;
     $("score").textContent=0; $("timer").textContent=tLeft; $("final").hidden=true;
-    drg={x:W/2, dir:1, mode:"patrol", t:0, y:44, burned:false};
-    $("gmsg").innerHTML="Catch the hibachi — dodge 🔥 🍭 🧊 (<b>-20</b>) and the dragon's fire (<b>-30</b>)!";
+    drg={x:W/2, dir:1, mode:"patrol", t:0, y:44, burned:false}; burns=0;
+    $("gmsg").innerHTML="Catch the hibachi — dodge 🔥 🍭 🧊 (<b>-20</b>). <b>3 dragon hits burns the rice</b> and the run is over!";
     requestAnimationFrame(step);
   }
-  function end(){
+  function end(burnt){
     running=false;
     cx.clearRect(0,0,W,H);
+    drawBowl(W/2);                                    // show the bowl's final state — burnt or saved
+    if(burnt){
+      cx.font="bold 24px Archivo,sans-serif"; cx.fillStyle="#E6483D"; cx.textAlign="center";
+      cx.fillText("THE DRAGON COOKED YOUR FOOD", W/2, H/2-10);
+    }
     $("final").hidden=false;
-    $("final").textContent=score+" PTS"+(score>=CONFIG.game.prizeAt?" 🏆":"");
-    $("gmsg").innerHTML = score>=CONFIG.game.prizeAt
-      ? "<b>You made the board!</b> "+CONFIG.game.prizeText+" Tap to run it back."
-      : "<b>"+CONFIG.game.prizeAt+" makes the board.</b> Tap to run it back.";
+    $("final").textContent=score+" PTS"+(!burnt&&score>=CONFIG.game.prizeAt?" 🏆":burnt?" · BURNT":"");
+    $("gmsg").innerHTML = burnt
+      ? "🔥🔥🔥 <b>Burnt!</b> Three dragon hits — the rice is charcoal and the food is cooked. Tap to run it back."
+      : (score>=CONFIG.game.prizeAt
+        ? "<b>You made the board!</b> "+CONFIG.game.prizeText+" Tap to run it back."
+        : "<b>"+CONFIG.game.prizeAt+" makes the board.</b> Tap to run it back.");
     saveBest(score); renderBoard();
   }
   function pointer(e){

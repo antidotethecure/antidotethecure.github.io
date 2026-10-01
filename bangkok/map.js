@@ -315,8 +315,9 @@
     started = true;
     document.getElementById('leaflet').innerHTML = '';
     map = L.map('leaflet', { zoomControl: true }).setView([13.7106, 100.5998], 13); // BTS On Nut
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
+    // CARTO dark tiles: English/international labels (plain OSM tiles label Bangkok in Thai).
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO', subdomains: 'abcd', maxZoom: 19
     }).addTo(map);
     LAYERS.forEach(l => { groups[l.id] = L.layerGroup().addTo(map); });
     const color = id => LAYERS.find(l => l.id === id).color;

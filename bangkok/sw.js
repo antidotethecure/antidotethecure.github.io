@@ -1,5 +1,5 @@
 // Cache the app shell so the page opens at the airport before a SIM is working.
-const CACHE = 'bkk-landing-v22';
+const CACHE = 'bkk-landing-v23';
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'data.js', 'docs.js', 'thai.js', 'scan.js', 'map.js', 'food.js', 'errands.js', 'money.js', 'visatimer.js', 'places.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png'];
 
 self.addEventListener('install', e => {

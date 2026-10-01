@@ -54,3 +54,13 @@ THE CORE SETUP (from the chart studies — "sweep into order block"):
 Kraken specifics: use Kraken's own OHLC for the journal (not another exchange's print); crypto sweeps love weekend/overnight low-liquidity hours; PDH/PDL and the daily open are the cleanest liquidity magnets on BTC.
 
 STATUS NOTE: all TICKER scheduled routines are PAUSED by Antidote's order ("cease all activity"). This knowledge is loaded for when he says resume — until then it changes nothing and trades nothing.
+
+FIBONACCI RETRACEMENT KNOWLEDGE (added 1 Oct 2026, studied + applied live same night):
+- Draw the fib over the most recent IMPULSE LEG on the timeframe you trade (on 15m crypto: the last clear swing, not the whole day). Uptrend: swing low → swing high, buy the pullback into the levels. Downtrend: high → low, bounces stall at the same levels from below.
+- The levels: 23.6% (shallow — strong trend), 38.2%, 50%, 61.8% (the key one), 78.6% (last defense). The "golden pocket" 61.8–65% is where the highest-probability reversals cluster.
+- Fibs alone are lines; they earn an alert only on CONFLUENCE — a fib level sitting on an order block, an FVG, or a prior swept low. Fib + sweep + OB in the same zone is the A-setup.
+- Targets: previous swing (full retrace) first, then the 1.272 and 1.618 extensions of the impulse leg.
+- Stops never AT the fib level — below the structure that makes it matter (the swing low / sweep wick). Move to break-even when the 61.8% retrace of the opposing move is reclaimed.
+- Worked example (1 Oct 2026, XRP/USD 15m): down-leg 1.5436→1.4845; bounce retrace levels 38.2%=1.5071, 50%=1.5141, 61.8%=1.5210; long logged from 1.5041 with stop under the swept low at 1.4820, target the full retrace 1.5430, BE rule at the 61.8%.
+
+SESSION LOG: 1 Oct 2026 — Antidote ordered a bounded 5-hour paper practice session (06:50–11:50 UTC), 15m charts, $1,000 bankroll: his XRP long $450 + TICKER's ETH momentum long $300, managed hourly from Kraken public OHLC, everything journaled in the Trade Log artifact. After the bell: close what's open, post the scoreboard, return to PAUSED. Paper only, as always — no real orders, ever.

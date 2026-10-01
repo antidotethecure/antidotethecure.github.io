@@ -17,7 +17,7 @@ window.PLACES = {
    "can_install_own": null, "net_score": "unknown",
    "net_evidence": "RentHub listing, prices read 1 Oct 2026",
    "photos": [],
-   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets not stated — ask about the Frenchie (10 kg) FIRST, most budget buildings say no"]
+   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets: not a day-1 question — Baby Seven joins later. Ask only if you'd stay long-term"]
   },
   {
    "id": "studio-mochit",
@@ -33,7 +33,7 @@ window.PLACES = {
    "can_install_own": null, "net_score": "unknown",
    "net_evidence": "RentHub listing, prices read 1 Oct 2026",
    "photos": [],
-   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets not stated — ask about the Frenchie (10 kg) FIRST, most budget buildings say no"]
+   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets: not a day-1 question — Baby Seven joins later. Ask only if you'd stay long-term"]
   },
   {
    "id": "krongthong-mochit",
@@ -49,7 +49,7 @@ window.PLACES = {
    "can_install_own": null, "net_score": "unknown",
    "net_evidence": "RentHub listing, prices read 1 Oct 2026",
    "photos": [],
-   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets not stated — ask about the Frenchie (10 kg) FIRST, most budget buildings say no"]
+   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets: not a day-1 question — Baby Seven joins later. Ask only if you'd stay long-term"]
   },
   {
    "id": "smc-place",
@@ -65,7 +65,7 @@ window.PLACES = {
    "can_install_own": null, "net_score": "unknown",
    "net_evidence": "RentHub listing, prices read 1 Oct 2026",
    "photos": [],
-   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets not stated — ask about the Frenchie (10 kg) FIRST, most budget buildings say no"]
+   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets: not a day-1 question — Baby Seven joins later. Ask only if you'd stay long-term"]
   },
   {
    "id": "harmony-lp12",
@@ -81,7 +81,7 @@ window.PLACES = {
    "can_install_own": null, "net_score": "unknown",
    "net_evidence": "RentHub listing, prices read 1 Oct 2026",
    "photos": [],
-   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets not stated — ask about the Frenchie (10 kg) FIRST, most budget buildings say no"]
+   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets: not a day-1 question — Baby Seven joins later. Ask only if you'd stay long-term"]
   },
   {
    "id": "primo-place",
@@ -97,7 +97,7 @@ window.PLACES = {
    "can_install_own": null, "net_score": "unknown",
    "net_evidence": "RentHub listing, prices read 1 Oct 2026",
    "photos": [],
-   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets not stated — ask about the Frenchie (10 kg) FIRST, most budget buildings say no"]
+   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets: not a day-1 question — Baby Seven joins later. Ask only if you'd stay long-term"]
   },
   {
    "id": "koomluang-r99",
@@ -113,7 +113,7 @@ window.PLACES = {
    "can_install_own": null, "net_score": "unknown",
    "net_evidence": "RentHub listing, prices read 1 Oct 2026",
    "photos": [],
-   "flags": ["Cheapest on this map — Thai-style building, manage expectations", "Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets not stated — ask about the Frenchie (10 kg) FIRST"]
+   "flags": ["Cheapest on this map — Thai-style building, manage expectations", "Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets: not a day-1 question — Baby Seven joins later. Ask only if you'd stay long-term"]
   },
   {
    "id": "citihome-bangna",
@@ -129,7 +129,7 @@ window.PLACES = {
    "can_install_own": null, "net_score": "unknown",
    "net_evidence": "RentHub listing, prices read 1 Oct 2026",
    "photos": [],
-   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets not stated — ask about the Frenchie (10 kg) FIRST, most budget buildings say no"]
+   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets: not a day-1 question — Baby Seven joins later. Ask only if you'd stay long-term"]
   },
   {
    "id": "bangna21",
@@ -145,7 +145,7 @@ window.PLACES = {
    "can_install_own": null, "net_score": "unknown",
    "net_evidence": "RentHub listing, prices read 1 Oct 2026",
    "photos": [],
-   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets not stated — ask about the Frenchie (10 kg) FIRST, most budget buildings say no"]
+   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets: not a day-1 question — Baby Seven joins later. Ask only if you'd stay long-term"]
   },
   {
    "id": "wongwianyai-res",
@@ -162,7 +162,7 @@ window.PLACES = {
    "can_install_own": null, "net_score": "unknown",
    "net_evidence": "RentHub listing, prices read 1 Oct 2026",
    "photos": [],
-   "flags": ["Fully furnished per listing", "Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets not stated — ask about the Frenchie (10 kg) FIRST"]
+   "flags": ["Fully furnished per listing", "Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets: not a day-1 question — Baby Seven joins later. Ask only if you'd stay long-term"]
   },
   {
    "id": "cana-mansion",
@@ -178,7 +178,7 @@ window.PLACES = {
    "can_install_own": null, "net_score": "unknown",
    "net_evidence": "RentHub listing, prices read 1 Oct 2026",
    "photos": [],
-   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets not stated — ask about the Frenchie (10 kg) FIRST, most budget buildings say no"]
+   "flags": ["Added 1 Oct 2026 from RentHub — confirm price & availability before viewing", "Pets: not a day-1 question — Baby Seven joins later. Ask only if you'd stay long-term"]
   },
   {
    "id": "vp-tower",

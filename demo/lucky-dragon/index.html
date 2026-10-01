@@ -53,6 +53,14 @@ canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(18
 .gamemsg b{color:var(--ink)}
 .bigscore{text-align:center;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:30px;color:var(--gold);margin:6px 0 2px}
 
+.tiers{display:grid;gap:6px}
+.tiers div{display:flex;justify-content:space-between;gap:10px;background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:9px 12px;font-size:13.5px}
+.tiers b{color:var(--gold);font-family:"IBM Plex Mono",monospace;font-size:12px;white-space:nowrap}
+.board{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:5px}
+.board li{display:flex;gap:10px;align-items:baseline;font-size:14px;padding:7px 12px;border-radius:9px;background:var(--bg);border:1px solid var(--edge)}
+.board li.you{border-color:var(--gold)}
+.board .rk{font-family:"IBM Plex Mono",monospace;color:var(--dim);font-size:12px;width:20px}
+.board .pts{margin-left:auto;font-family:"IBM Plex Mono",monospace;color:var(--gold);font-weight:700}
 .hours{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:14px 16px;font-size:14px}
 .hours div{display:flex;justify-content:space-between;padding:3px 0;font-variant-numeric:tabular-nums}
 .hours span:first-child{color:var(--dim)}
@@ -84,8 +92,21 @@ footer a{color:var(--ink)}
   <p class="gamemsg" id="gmsg"><b>Tap to start.</b> Slide the rice bowl — catch the hibachi, dodge what don't belong in it.</p>
 </div>
 
+<h2>Weekly prize board <span style="color:var(--dim);font-size:10px;letter-spacing:.1em">· SAMPLE</span></h2>
+<div class="gamebox">
+  <div class="tiers" id="tiers"></div>
+  <ol class="board" id="board"></ol>
+  <p class="gamemsg" id="cadence"></p>
+</div>
+
 <h2>Menu <span style="color:var(--dim);font-size:10px;letter-spacing:.1em">· SAMPLE</span></h2>
 <div class="menu" id="menu"></div>
+
+<h2>Find us</h2>
+<div class="hours">
+  <div><span>📍 Location</span><span style="text-align:right;max-width:70%" id="addr"></span></div>
+  <div><span>🚗 Directions</span><span><a id="maplink" href="#" target="_blank" rel="noopener" style="color:var(--gold)">Open in Google Maps</a></span></div>
+</div>
 
 <h2>Hours</h2>
 <div class="hours" id="hours"></div>
@@ -115,8 +136,16 @@ var CONFIG = {
     bad: [{t:"flame",e:"🔥"},{t:"candy",e:"🍭"},{t:"ice",e:"🧊"}],
     seconds: 30,
     prizeAt: 300,
-    prizeText: "300+ pts — when this game is live, that's a free soda or a raffle entry. Owner sets the prize."
+    prizeText: "300+ pts puts you on the weekly board. Owner sets the real prizes.",
+    dragon: true                               // the house dragon dives and torches the plate — dodge it
   },
+  // weekly prize promo — SAMPLE tiers, the owner sets the real ones before launch
+  promo: {
+    tiers: [["🥇 1st place this week","50% OFF next meal"],["🥈 2nd place","20% OFF next meal"],["300+ points","15% OFF next meal"]],
+    cadence: "Board resets every Monday — new winners every week.",
+    sample: [["K. Ramirez",640],["BigMike",520],["J. Lee",410]]
+  },
+  address: "Compton, CA — exact address drops in when the page goes live",
   menu: [
     { section: "Hibachi Grill", items: [
       ["Hibachi Chicken","grilled chicken, fried rice, veggies, house yum-yum","$12.95"],
@@ -148,6 +177,22 @@ var CONFIG = {
       s.items.map(function(it){ return '<div class="item"><span class="nm">'+it[0]+'</span><span class="pr">'+it[2]+'</span><span class="ds">'+it[1]+'</span></div>'; }).join("");
   }).join("");
   $("hours").innerHTML = CONFIG.hours.map(function(h){ return "<div><span>"+h[0]+"</span><span>"+h[1]+"</span></div>"; }).join("");
+  $("addr").textContent = CONFIG.address; $("maplink").href = CONFIG.maps;
+
+  /* ---- weekly prize board (sample names + your local best) ---- */
+  function best(){ try{ return parseInt(localStorage.getItem("ld-best")||"0",10)||0; }catch(e){ return 0; } }
+  function saveBest(s){ try{ if(s>best()) localStorage.setItem("ld-best",String(s)); }catch(e){} }
+  function renderBoard(){
+    $("tiers").innerHTML = CONFIG.promo.tiers.map(function(t){ return "<div><span>"+t[0]+"</span><b>"+t[1]+"</b></div>"; }).join("");
+    var rows = CONFIG.promo.sample.map(function(r){ return {n:r[0]+" · sample", p:r[1], you:false}; });
+    if(best()>0) rows.push({n:"YOU", p:best(), you:true});
+    rows.sort(function(a,b){ return b.p-a.p; });
+    $("board").innerHTML = rows.map(function(r,i){
+      return '<li'+(r.you?' class="you"':'')+'><span class="rk">'+(i+1)+'</span>'+r.n+'<span class="pts">'+r.p+'</span></li>';
+    }).join("");
+    $("cadence").textContent = CONFIG.promo.cadence + " Sample board — the real board and prizes go live with the owner.";
+  }
+  renderBoard();
 
   /* ---- the game: slide the rice bowl, catch what belongs in it ---- */
   var cv=$("game"), cx=cv.getContext("2d"), W=cv.width, H=cv.height;
@@ -217,6 +262,42 @@ var CONFIG = {
     else { e=CONFIG.game.good[(Math.random()*CONFIG.game.good.length)|0]; v="good"; }
     drops.push({x:40+Math.random()*(W-80), y:-30, s:2.2+Math.random()*2.2+((CONFIG.game.seconds-tLeft)/12), e:e, v:v});
   }
+
+  /* ---- the house dragon: patrols the top, dives, torches the plate ---- */
+  var drg={x:W/2, dir:1, mode:"patrol", t:0, y:44, burned:false};
+  function dragonStep(dt){
+    drg.t+=dt;
+    if(drg.mode==="patrol"){
+      drg.x+=drg.dir*0.06*dt; if(drg.x>W-50){drg.dir=-1;} if(drg.x<50){drg.dir=1;}
+      if(drg.t>4200){ drg.mode="aim"; drg.t=0; drg.burned=false; }
+    } else if(drg.mode==="aim"){
+      drg.x+=(bowlX-drg.x)*Math.min(1,dt/180);         // locks onto the bowl — move!
+      drg.y=44+drg.t/14;
+      if(drg.t>850){ drg.mode="fire"; drg.t=0; }
+    } else if(drg.mode==="fire"){
+      if(drg.t>800){ drg.mode="patrol"; drg.t=0; drg.y=44; }
+    }
+  }
+  function dragonDraw(){
+    cx.save(); cx.translate(drg.x,drg.y); cx.scale(drg.dir<0?1:-1,1);
+    cx.font="40px serif"; cx.textAlign="center"; cx.fillText("🐉",0,12); cx.restore();
+    if(drg.mode==="aim"){                               // telegraph: faint heat line
+      cx.strokeStyle="rgba(230,72,61,.35)"; cx.lineWidth=3; cx.setLineDash([6,8]);
+      cx.beginPath(); cx.moveTo(drg.x,drg.y+16); cx.lineTo(drg.x,H-30); cx.stroke(); cx.setLineDash([]);
+    }
+    if(drg.mode==="fire"){                              // the breath — a cone of flame to plate level
+      var g=cx.createLinearGradient(0,drg.y,0,H-24);
+      g.addColorStop(0,"rgba(242,179,68,.95)"); g.addColorStop(.6,"rgba(230,72,61,.9)"); g.addColorStop(1,"rgba(230,72,61,.25)");
+      cx.fillStyle=g;
+      cx.beginPath(); cx.moveTo(drg.x-7,drg.y+14); cx.lineTo(drg.x-30,H-24); cx.lineTo(drg.x+30,H-24); cx.lineTo(drg.x+7,drg.y+14); cx.closePath(); cx.fill();
+      cx.font="26px serif"; cx.textAlign="center";
+      cx.fillText("🔥", drg.x-12+Math.random()*24, H-30-Math.random()*30);
+      if(!drg.burned && Math.abs(bowlX-drg.x)<48){      // plate torched
+        drg.burned=true; score=Math.max(0,score-30); combo=0; flash="#E6483D";
+        $("score").textContent=score;
+      }
+    }
+  }
   function step(ts){
     if(!running) return;
     var dt=Math.min(40, ts-last); last=ts;
@@ -235,6 +316,7 @@ var CONFIG = {
       }
       if(d.y>H+30) drops.splice(i,1);
     }
+    if(CONFIG.game.dragon){ dragonStep(dt); dragonDraw(); }
     if(flash){ cx.strokeStyle=flash; cx.lineWidth=5; cx.strokeRect(2,2,W-4,H-4); flash=null; }
     drawBowl(bowlX);
     requestAnimationFrame(step);
@@ -243,7 +325,8 @@ var CONFIG = {
   function start(){
     running=true; score=0; combo=0; tLeft=CONFIG.game.seconds; drops=[]; last=performance.now(); spawnAcc=0; timerAcc=0; flash=null;
     $("score").textContent=0; $("timer").textContent=tLeft; $("final").hidden=true;
-    $("gmsg").innerHTML="Catch what goes <b>in the bowl</b> — chicken, steak, 🍤, 🥦. Catch 🔥 🍭 🧊 and you <b>lose 20</b>.";
+    drg={x:W/2, dir:1, mode:"patrol", t:0, y:44, burned:false};
+    $("gmsg").innerHTML="Catch the hibachi — dodge 🔥 🍭 🧊 (<b>-20</b>) and the dragon's fire (<b>-30</b>)!";
     requestAnimationFrame(step);
   }
   function end(){
@@ -252,8 +335,9 @@ var CONFIG = {
     $("final").hidden=false;
     $("final").textContent=score+" PTS"+(score>=CONFIG.game.prizeAt?" 🏆":"");
     $("gmsg").innerHTML = score>=CONFIG.game.prizeAt
-      ? "<b>Winner!</b> "+CONFIG.game.prizeText+" Tap to run it back."
-      : "<b>"+CONFIG.game.prizeAt+" wins.</b> Tap to run it back.";
+      ? "<b>You made the board!</b> "+CONFIG.game.prizeText+" Tap to run it back."
+      : "<b>"+CONFIG.game.prizeAt+" makes the board.</b> Tap to run it back.";
+    saveBest(score); renderBoard();
   }
   function pointer(e){
     var r=cv.getBoundingClientRect();

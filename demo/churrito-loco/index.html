@@ -36,7 +36,19 @@ h1{font-weight:900;font-size:clamp(28px,8vw,38px);margin:6px 0 2px;letter-spacin
 .btn.ghost{background:transparent;border:1px solid var(--edge);color:var(--ink)}
 h2{font-weight:900;font-size:15px;margin:30px 0 10px;color:var(--gold);font-family:"IBM Plex Mono",monospace;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
 h2::after{content:"";flex:1;height:1px;background:var(--edge)}
-.menu{display:grid;gap:8px}
+.menu{display:grid;gap:10px}
+/* signature snacks as tilted polaroids taped to the card */
+.snap{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px;display:flex;gap:16px;align-items:center}
+.snap .ph{flex:0 0 132px;background:#FFF8F0;padding:7px 7px 18px;position:relative;box-shadow:0 12px 28px rgba(242,58,94,.38)}
+.snap.l .ph{transform:rotate(-3.5deg)}
+.snap.r{flex-direction:row-reverse}
+.snap.r .ph{transform:rotate(3deg)}
+.snap .ph::before{content:"";position:absolute;top:-9px;left:50%;width:56px;height:17px;background:rgba(247,192,74,.8);transform:translateX(-50%) rotate(-2deg)}
+.snap .ph img{width:100%;height:100px;object-fit:cover;display:block}
+.snap .tx{min-width:0;display:flex;flex-direction:column;gap:3px}
+.snap .nm{font-weight:900;font-size:17px}
+.snap .ds{color:var(--dim);font-size:12.5px}
+.snap .pr{font-family:"IBM Plex Mono",monospace;font-weight:700;color:var(--gold);font-size:16px;margin-top:3px}
 .item{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:12px 15px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
 .item .nm{font-weight:700}
 .item .ds{color:var(--dim);font-size:12.5px;width:100%;order:3;margin-top:2px}
@@ -109,7 +121,7 @@ footer a{color:var(--ink)}
 <footer>
   Built by <b>SECOND SHIFT AI</b> — menus, games, AI phone agents, content & growth, hands-free.<br>
   One evening to build. <a href="https://claude.ai/artifact/7LuVHK9AwWibWpwA3qso7i" target="_blank" rel="noopener">See what else your second shift can do</a> · growth: antidotepromo.com<br>
-  <span style="font-size:11px">Demo page: menu items & prices from the restaurant's public Yelp menu (Sep 2026) and may change — confirm in store. Prize games go live only with the owner, as free-entry promotions with official rules.</span>
+  <span style="font-size:11px">Demo page: menu items & prices from the restaurant's public Yelp menu (Sep 2026) and may change — confirm in store. Prize games go live only with the owner, as free-entry promotions with official rules. Food photos are AI-styled plates matched to the menu — real shots swap in when the page goes live.</span>
 </footer>
 </div>
 
@@ -136,24 +148,24 @@ var CONFIG = {
   address: "2801 Firestone Blvd, South Gate, CA",
   menu: [
     { section: "Churros", items: [
-      ["Filled Churros (2pc)","your choice of filling: strawberry, lechera, Nutella, guava, cheesecake, dulce de leche, raspberry, chocolate","$6.99"],
+      ["Filled Churros (2pc)","your choice of filling: strawberry, lechera, Nutella, guava, cheesecake, dulce de leche, raspberry, chocolate","$6.99","img/churros.jpg"],
       ["Plain Signature Churros (4pc)","rolled in cinnamon sugar","$7.99"],
       ["Churro Bites Filled (10pc)","mini filled churros, your choice of fillings","$9.49"],
       ["Churro Ice Cream Cone","cone made out of churro — ice cream, drizzle & topping","$9.49"]
     ]},
     { section: "Street Corn & Fries", items: [
-      ["Original Corn","whole corn, mayo, cheese, butter, chili powder","$7.49"],
+      ["Original Corn","whole corn, mayo, cheese, butter, chili powder","$7.49","img/elote.jpg"],
       ["Hot Cheetos Corn","whole corn, mayo, butter, hot cheeto crumbs","$7.49"],
       ["Original Elote Fries","fries topped with corn mixed in mayo, cheese & butter","$11.49"],
-      ["XL Chili Cheese Fries","crispy fries, savory chili, cheese, grilled onions","$16.49"]
+      ["XL Chili Cheese Fries","crispy fries, savory chili, cheese, grilled onions","$16.49","img/fries.jpg"]
     ]},
     { section: "Dogs", items: [
       ["Flamin Dog","all-beef dog, bacon, nacho cheese, hot cheeto crumbs","$9.49"],
       ["Churro Dog","all-beef dog wrapped in a churro with nacho cheese","$9.49"]
     ]},
     { section: "Drinks", items: [
-      ["Abuelita Chocolate Horchata Iced Coffee","fresh brewed coffee, chilled, with Abuelita chocolate","$6.49"],
-      ["Watermelon Paleta Energy","watermelon, chamoy & tajín mix with Red Bull","$7.99"],
+      ["Abuelita Chocolate Horchata Iced Coffee","fresh brewed coffee, chilled, with Abuelita chocolate","$6.49","img/choco.jpg"],
+      ["Watermelon Paleta Energy","watermelon, chamoy & tajín mix with Red Bull","$7.99","img/sandia.jpg"],
       ["Jamaica Agua Fresca","hibiscus flavored drink","$5.49"],
       ["Pumpkin Spice Horchata","drizzled, with whipped cream","$8.49"]
     ]}
@@ -170,9 +182,16 @@ var CONFIG = {
   if(CONFIG.phone){ $("callbtn").href="tel:"+CONFIG.phone; } else { $("callbtn").addEventListener("click",function(e){e.preventDefault();var m=$("gmsg");m.innerHTML="<b>Phone hooks up when the page goes live — with the AI agent answering 24/7.</b>";}); }
   $("mapbtn").href=CONFIG.maps; $("maplink").href=CONFIG.maps; $("addr").textContent=CONFIG.address;
 
+  var snapN=0;
   $("menu").innerHTML = CONFIG.menu.map(function(s){
     return '<div style="font-family:IBM Plex Mono,monospace;font-size:11px;letter-spacing:.14em;color:var(--dim);margin:8px 0 2px">'+s.section.toUpperCase()+'</div>'+
-      s.items.map(function(it){ return '<div class="item"><span class="nm">'+it[0]+'</span><span class="pr">'+it[2]+'</span><span class="ds">'+it[1]+'</span></div>'; }).join("");
+      s.items.map(function(it){
+        if(it[3]){ snapN++;
+          return '<div class="snap '+(snapN%2?'l':'r')+'"><div class="ph"><img src="'+it[3]+'" alt="'+it[0]+'" loading="lazy"></div>'+
+            '<div class="tx"><span class="nm">'+it[0]+'</span><span class="ds">'+it[1]+'</span><span class="pr">'+it[2]+'</span></div></div>';
+        }
+        return '<div class="item"><span class="nm">'+it[0]+'</span><span class="pr">'+it[2]+'</span><span class="ds">'+it[1]+'</span></div>';
+      }).join("");
   }).join("");
   $("hours").innerHTML = CONFIG.hours.map(function(h){ return "<div><span>"+h[0]+"</span><span>"+h[1]+"</span></div>"; }).join("");
 

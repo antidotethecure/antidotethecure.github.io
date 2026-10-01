@@ -38,10 +38,18 @@ h1{font-weight:900;font-size:clamp(28px,8vw,38px);margin:6px 0 2px;letter-spacin
 h2{font-weight:900;font-size:15px;margin:30px 0 10px;color:var(--gold);font-family:"IBM Plex Mono",monospace;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
 h2::after{content:"";flex:1;height:1px;background:var(--edge)}
 .menu{display:grid;gap:8px}
-.item{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:12px 15px;display:flex;gap:10px;align-items:baseline}
+.item{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:12px 15px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
 .item .nm{font-weight:700}
 .item .ds{color:var(--dim);font-size:12.5px;width:100%;order:3;margin-top:2px}
 .item .pr{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-weight:700;color:var(--gold);white-space:nowrap}
+/* signature dishes float off the card as lacquer plates */
+.dish{position:relative;background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:18px 16px 18px 136px;min-height:128px;display:flex;flex-direction:column;justify-content:center;gap:3px;margin-left:14px}
+.dish.alt{padding:18px 136px 18px 16px;margin-left:0;margin-right:14px}
+.dish img{position:absolute;left:-14px;top:50%;width:128px;height:128px;border-radius:50%;object-fit:cover;border:3px solid var(--gold);box-shadow:0 12px 30px rgba(230,72,61,.5),0 0 0 7px rgba(242,179,68,.12);transform:translateY(-50%) rotate(-4deg)}
+.dish.alt img{left:auto;right:-14px;transform:translateY(-50%) rotate(4deg)}
+.dish .nm{font-weight:900;font-size:17px}
+.dish .ds{color:var(--dim);font-size:12.5px}
+.dish .pr{font-family:"IBM Plex Mono",monospace;font-weight:700;color:var(--gold);font-size:16px;margin-top:3px}
 
 /* ---- game ---- */
 .gamebox{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px;margin-top:4px}
@@ -114,7 +122,7 @@ footer a{color:var(--ink)}
 <footer>
   Built by <b>SECOND SHIFT AI</b> — menus, games, AI phone agents, content & growth, hands-free.<br>
   One evening to build. <a href="https://claude.ai/artifact/7LuVHK9AwWibWpwA3qso7i" target="_blank" rel="noopener">See what else your second shift can do</a> · growth: antidotepromo.com<br>
-  <span style="font-size:11px">Demo page: menu items & prices are samples, not the restaurant's published prices. Prize games go live only with the owner, as free-entry promotions with official rules.</span>
+  <span style="font-size:11px">Demo page: menu items & prices are samples, not the restaurant's published prices. Prize games go live only with the owner, as free-entry promotions with official rules. Food photos are AI-styled plates matched to the menu — real shots swap in when the page goes live.</span>
 </footer>
 </div>
 
@@ -148,14 +156,14 @@ var CONFIG = {
   address: "Compton, CA — exact address drops in when the page goes live",
   menu: [
     { section: "Hibachi Grill", items: [
-      ["Hibachi Chicken","grilled chicken, fried rice, veggies, house yum-yum","$12.95"],
-      ["Hibachi Steak","sirloin, fried rice, veggies, double yum-yum","$15.95"],
-      ["Hibachi Shrimp","jumbo shrimp, fried rice, veggies","$14.95"],
+      ["Hibachi Chicken","grilled chicken, fried rice, veggies, house yum-yum","$12.95","img/chicken.jpg"],
+      ["Hibachi Steak","sirloin, fried rice, veggies, double yum-yum","$15.95","img/steak.jpg"],
+      ["Hibachi Shrimp","jumbo shrimp, fried rice, veggies","$14.95","img/shrimp.jpg"],
       ["Chicken + Shrimp Combo","the one from the review video","$16.95"]
     ]},
     { section: "Sides & Extras", items: [
       ["Fried Rice (solo)","wok-fired, egg & scallion","$6.50"],
-      ["Noodles","garlic butter hibachi noodles","$6.95"],
+      ["Noodles","garlic butter hibachi noodles","$6.95","img/noodles.jpg"],
       ["Extra Yum-Yum","you know why","$1.00"]
     ]}
   ],
@@ -172,9 +180,16 @@ var CONFIG = {
   $("mapbtn").href=CONFIG.maps;
   function alert_(t){ var m=$("gmsg"); m.innerHTML="<b>"+t+"</b>"; }
 
+  var dishN=0;
   $("menu").innerHTML = CONFIG.menu.map(function(s){
     return '<div style="font-family:IBM Plex Mono,monospace;font-size:11px;letter-spacing:.14em;color:var(--dim);margin:8px 0 2px">'+s.section.toUpperCase()+'</div>'+
-      s.items.map(function(it){ return '<div class="item"><span class="nm">'+it[0]+'</span><span class="pr">'+it[2]+'</span><span class="ds">'+it[1]+'</span></div>'; }).join("");
+      s.items.map(function(it){
+        if(it[3]){ dishN++;
+          return '<div class="dish'+(dishN%2===0?' alt':'')+'"><img src="'+it[3]+'" alt="'+it[0]+'" loading="lazy">'+
+            '<span class="nm">'+it[0]+'</span><span class="ds">'+it[1]+'</span><span class="pr">'+it[2]+'</span></div>';
+        }
+        return '<div class="item"><span class="nm">'+it[0]+'</span><span class="pr">'+it[2]+'</span><span class="ds">'+it[1]+'</span></div>';
+      }).join("");
   }).join("");
   $("hours").innerHTML = CONFIG.hours.map(function(h){ return "<div><span>"+h[0]+"</span><span>"+h[1]+"</span></div>"; }).join("");
   $("addr").textContent = CONFIG.address; $("maplink").href = CONFIG.maps;

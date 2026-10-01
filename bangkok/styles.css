@@ -299,3 +299,7 @@ details summary { cursor: pointer; min-height: 44px; display: flex; align-items:
 .vt-steps li { margin: 8px 0; }
 .vt-settings label { display: block; margin-top: 10px; }
 .vt-date { width: 100%; min-height: var(--tap); font-size: 17px; background: var(--bg-2); color: var(--text); border: 1px solid var(--line); border-radius: 12px; padding: 0 12px; margin-top: 4px; }
+
+/* Paperwork tracker chips */
+li.pw .pw-chip { flex: none; min-width: 108px; text-align: center; cursor: pointer; border: 0; font: inherit; font-size: 12px; padding: 5px 8px; border-radius: 8px; }
+li.pw a { display: inline-block; margin-top: 2px; }

@@ -32,6 +32,18 @@ window.DATA = {
     exemptEnds: '2026-11-03', extendedEnds: '2026-12-03',
     alert: '<strong>Confirmed:</strong> since 15 Sep 2026, US passports get <b>30 days visa-free (tourism only)</b>, not 60. That\'s one 30-day extension at immigration for ฿1,900, so the ceiling is about <b>3 Dec</b>. GTA 6 launches 19 Nov, so the subathon needs that extension.',
     decision: '<strong>Your plan:</strong> start on <b>tourist stays</b> (visa-free, then the extension, then a Tourist Visa) and go for the <b>DTV later</b>, once the money\'s in place. Nothing DTV-related is required right now.',
+    // Paperwork tracker: every filing on one card. Tap the chip to cycle To do → Submitted → Done.
+    // 'status' is the starting state; taps are saved on this phone.
+    paperwork: [
+      { id: 'evisa', title: 'Tourist e-Visa — thaievisa.go.th', status: 'submitted', due: 'Filed ✓ · watch email', link: 'https://www.thaievisa.go.th', note: 'You filed this one. Check email daily — approved before Oct 4 means you enter with 60 days instead of 30. Save/print the approval PDF into the 🪪 Visa slot.' },
+      { id: 'tdac', title: 'TDAC digital arrival card', status: 'todo', due: 'Oct 2–5 (within 72 h of landing)', link: 'https://tdac.immigration.go.th', note: 'Free, ~5 minutes, required at immigration. Leave the departure-flight field blank.' },
+      { id: 'onward', title: 'Onward ticket proof', status: 'todo', due: 'Sat Oct 3', note: 'Rent a 7-day onward reservation (~$21) BKK → Kuala Lumpur dated ~Nov 1. Save it in the 🪪 Other slot.' },
+      { id: 'passport', title: 'Passport: 6+ months valid, blank pages', status: 'todo', due: 'Now — 2 minutes', note: 'Open it and look. If it expires before ~April 2027, stop and say so.' },
+      { id: 'funds', title: 'Funds proof: bank statement + ~฿20,000 cash', status: 'todo', due: 'Before Oct 4', note: 'Immigration can ask for ~$600 equivalent. Tourist Visa later needs a bank statement (crypto doesn\'t count).' },
+      { id: 'tm30', title: 'TM30 residence report', status: 'todo', due: 'Move-in day in Bangkok', note: 'Landlord files it within 24 h — ask for the receipt, you need it for the extension.' },
+      { id: 'ext30', title: '30-day extension (฿1,900)', status: 'todo', due: 'Before Nov 3', note: 'At Chaengwattana immigration. This is what carries you past the GTA 6 launch.' },
+      { id: 'tm47', title: '90-day report (TM47)', status: 'todo', due: 'Only if 90+ days straight', note: 'Not your problem until next year under the tourist plan.' }
+    ],
     checklist: [
       '<b>Onward ticket proof (PAL can refuse one-way passengers at LAX or Manila):</b> on <b>Sat Oct 3</b>, rent a <b>7-day onward reservation (~$21, e.g. BestOnwardTicket)</b> Bangkok → Kuala Lumpur dated ~<b>Nov 1</b> (must be within your 30 days). A 24-hour one is too short, since LAX check-in to Thai immigration is ~24.5h. Save it in the 🪪 <b>Other</b> slot. Or buy a real ~$70–90 AirAsia/VietJet ticket only if you\'ll actually fly it. Carry ~฿20,000 (~$600) in funds. Leave the TDAC departure-flight field blank (it\'s optional).',
       'File the TDAC arrival card (free) between Oct 2 and Oct 5 at <a href="https://tdac.immigration.go.th" target="_blank" rel="noopener">tdac.immigration.go.th</a>',

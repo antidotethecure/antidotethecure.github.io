@@ -269,6 +269,36 @@
     }
     return leafletLoading;
   }
+  // Vector basemap (MapLibre + OpenFreeMap): draws every label with its Latin/English
+  // name first, which raster OSM/Esri tiles don't do for Bangkok's small streets.
+  const MAPLIBRE = [
+    ['https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css', 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js'],
+    ['https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css', 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js']
+  ];
+  const ML_LEAFLET = [
+    [null, 'https://cdn.jsdelivr.net/npm/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js'],
+    [null, 'https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js']
+  ];
+  function tryLoadJs([cssUrl, jsUrl]) {
+    return new Promise((res, rej) => {
+      if (cssUrl) {
+        const css = document.createElement('link');
+        css.rel = 'stylesheet'; css.href = cssUrl;
+        document.head.appendChild(css);
+      }
+      const s = document.createElement('script');
+      const timer = setTimeout(() => rej(new Error('timeout')), 12000);
+      s.src = jsUrl;
+      s.onload = () => { clearTimeout(timer); res(); };
+      s.onerror = () => { clearTimeout(timer); rej(new Error('failed')); };
+      document.head.appendChild(s);
+    });
+  }
+  async function loadVector() {
+    if (!window.maplibregl) await tryLoadJs(MAPLIBRE[0]).catch(() => window.maplibregl ? null : tryLoadJs(MAPLIBRE[1]));
+    if (!window.L.maplibreGL) await tryLoadJs(ML_LEAFLET[0]).catch(() => window.L.maplibreGL ? null : tryLoadJs(ML_LEAFLET[1]));
+    if (!window.maplibregl || !window.L.maplibreGL) throw new Error('vector libs missing');
+  }
   function pin(color) {
     return L.divIcon({ className: '', html: `<span class="pin" style="background:${color}"></span>`, iconSize: [18, 18], iconAnchor: [9, 9] });
   }
@@ -315,10 +345,19 @@
     started = true;
     document.getElementById('leaflet').innerHTML = '';
     map = L.map('leaflet', { zoomControl: true }).setView([13.7106, 100.5998], 13); // BTS On Nut
-    // CARTO dark tiles: English/international labels (plain OSM tiles label Bangkok in Thai).
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO', subdomains: 'abcd', maxZoom: 19
-    }).addTo(map);
+    // English-first labels via OpenFreeMap vector style; fall back to plain OSM tiles
+    // (Thai labels, but a working map) if the vector libraries can't load.
+    try {
+      await loadVector();
+      L.maplibreGL({
+        style: 'https://tiles.openfreemap.org/styles/fiord',
+        attribution: '&copy; OpenStreetMap contributors &copy; OpenFreeMap'
+      }).addTo(map);
+    } catch (e) {
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
+      }).addTo(map);
+    }
     LAYERS.forEach(l => { groups[l.id] = L.layerGroup().addTo(map); });
     const color = id => LAYERS.find(l => l.id === id).color;
     apts.forEach(a => {

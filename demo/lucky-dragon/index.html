@@ -81,7 +81,7 @@ footer a{color:var(--ink)}
   <div class="gamehead"><b id="gametitle"></b><span class="hud"><span id="timer">30</span>s · <span id="score">0</span> pts</span></div>
   <canvas id="game" width="520" height="420"></canvas>
   <p class="bigscore" id="final" hidden></p>
-  <p class="gamemsg" id="gmsg"><b>Tap to start.</b> Slide to move the bowl — catch the good stuff, dodge the flames.</p>
+  <p class="gamemsg" id="gmsg"><b>Tap to start.</b> Slide the rice bowl — catch the hibachi, dodge what don't belong in it.</p>
 </div>
 
 <h2>Menu <span style="color:var(--dim);font-size:10px;letter-spacing:.1em">· SAMPLE</span></h2>
@@ -107,11 +107,12 @@ var CONFIG = {
   phone: "",                                  // fill with the restaurant's real number when live
   maps: "https://www.google.com/maps/search/Lucky+Dragon+Hibachi+Compton+CA",
   game: {
-    title: "🍤 Shrimp Toss",
-    catcher: "🥣",
-    good: ["🍤","🥩","🍗","🥦"],              // +10 each
+    title: "🍤 Hibachi Catch",
+    // good = what belongs in the rice bowl (chicken & steak are drawn as chopped chunks)
+    good: [{t:"chicken"},{t:"steak"},{t:"shrimp",e:"🍤"},{t:"veg",e:"🥦"}],
     star: "⭐",                                // +50, rare
-    bad: "🔥",                                 // −20 and breaks combo
+    // bad = stuff that does NOT go in the bowl — catch one, lose 20
+    bad: [{t:"flame",e:"🔥"},{t:"candy",e:"🍭"},{t:"ice",e:"🧊"}],
     seconds: 30,
     prizeAt: 300,
     prizeText: "300+ pts — when this game is live, that's a free soda or a raffle entry. Owner sets the prize."
@@ -148,21 +149,71 @@ var CONFIG = {
   }).join("");
   $("hours").innerHTML = CONFIG.hours.map(function(h){ return "<div><span>"+h[0]+"</span><span>"+h[1]+"</span></div>"; }).join("");
 
-  /* ---- the game: slide the bowl, catch drops, dodge the bad one ---- */
+  /* ---- the game: slide the rice bowl, catch what belongs in it ---- */
   var cv=$("game"), cx=cv.getContext("2d"), W=cv.width, H=cv.height;
   var running=false, score=0, combo=0, tLeft=CONFIG.game.seconds, drops=[], bowlX=W/2, last=0, spawnAcc=0, timerAcc=0;
 
+  function rr(x,y,w,h,r){ // rounded rect path
+    cx.beginPath();
+    cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r);
+    cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath();
+  }
+  function chunk(x,y,s,fill,edge,sear){ // one chopped cube with a seared top edge
+    rr(x,y,s,s,s*0.22); cx.fillStyle=fill; cx.fill();
+    cx.strokeStyle=edge; cx.lineWidth=1.5; cx.stroke();
+    rr(x,y,s,s*0.34,s*0.22); cx.fillStyle=sear; cx.fill();
+  }
+  function drawChicken(x,y){ // golden-brown square-chopped chicken, grill style
+    chunk(x-16,y-8,15,"#E8A84A","#9C6420","#C07A28");
+    chunk(x+1,y-14,14,"#EDB45C","#9C6420","#C98434");
+    chunk(x-5,y+1,13,"#E2A040","#9C6420","#B8732A");
+  }
+  function drawSteak(x,y){ // dark cooked steak chunks with char on top
+    chunk(x-16,y-10,16,"#8A4A2E","#3E2217","#5C3020");
+    chunk(x+2,y-5,14,"#7C4027","#3E2217","#4E2A1B");
+    // pink center fleck so it reads as steak, not rock
+    cx.fillStyle="#C97B6B"; cx.fillRect(x-10,y-2,5,3);
+  }
+  function drawBowl(x){
+    var by=H-40;
+    // rice mound sitting in the bowl
+    cx.fillStyle="#F5EFE0";
+    cx.beginPath(); cx.ellipse(x,by-6,40,15,0,Math.PI,0); cx.fill();
+    cx.beginPath();
+    cx.arc(x-20,by-12,11,0,Math.PI*2); cx.arc(x,by-17,13,0,Math.PI*2);
+    cx.arc(x+19,by-11,11,0,Math.PI*2); cx.fill();
+    // a few grains + scallion flecks so it reads as fried rice
+    cx.fillStyle="#E3D4AE";
+    cx.fillRect(x-24,by-16,4,2); cx.fillRect(x-4,by-24,4,2); cx.fillRect(x+16,by-15,4,2);
+    cx.fillStyle="#7FA85A"; cx.fillRect(x-12,by-20,3,3); cx.fillRect(x+8,by-19,3,3);
+    // the bowl itself — lacquer red with a gold band
+    cx.fillStyle="#B4322A";
+    cx.beginPath(); cx.ellipse(x,by-4,46,10,0,0,Math.PI*2); cx.fill();
+    cx.beginPath(); cx.ellipse(x,by-2,46,10,0,0,Math.PI); cx.lineTo(x-30,by+26);
+    cx.quadraticCurveTo(x,by+36,x+30,by+26); cx.closePath(); cx.fill();
+    cx.strokeStyle="#F2B344"; cx.lineWidth=2.5;
+    cx.beginPath(); cx.moveTo(x-38,by+14); cx.quadraticCurveTo(x,by+24,x+38,by+14); cx.stroke();
+    // inner rim shadow so the rice sits IN the bowl
+    cx.strokeStyle="#7E1F1A"; cx.lineWidth=2;
+    cx.beginPath(); cx.ellipse(x,by-4,46,10,0,0,Math.PI*2); cx.stroke();
+  }
+  function drawDrop(d){
+    if(d.e.t==="chicken") drawChicken(d.x,d.y);
+    else if(d.e.t==="steak") drawSteak(d.x,d.y);
+    else { cx.font="34px serif"; cx.textAlign="center"; cx.fillText(d.e.e||d.e, d.x, d.y+12); }
+  }
   function drawIdle(){
     cx.clearRect(0,0,W,H);
-    cx.font="64px serif"; cx.textAlign="center";
-    cx.fillText(CONFIG.game.good[0], W/2, H/2-20);
+    drawChicken(W/2-60,H/2-50); drawSteak(W/2+50,H/2-55);
+    cx.font="40px serif"; cx.textAlign="center"; cx.fillText("🍤", W/2-5, H/2-40);
+    drawBowl(W/2);
     cx.font="bold 22px Archivo,sans-serif"; cx.fillStyle="#F7EFE6";
-    cx.fillText("TAP TO PLAY", W/2, H/2+40);
+    cx.fillText("TAP TO PLAY", W/2, H/2+30);
   }
   function spawn(){
     var r=Math.random(), e, v;
-    if(r<0.14){ e=CONFIG.game.bad; v="bad"; }
-    else if(r<0.20){ e=CONFIG.game.star; v="star"; }
+    if(r<0.16){ e=CONFIG.game.bad[(Math.random()*CONFIG.game.bad.length)|0]; v="bad"; }
+    else if(r<0.22){ e=CONFIG.game.star; v="star"; }
     else { e=CONFIG.game.good[(Math.random()*CONFIG.game.good.length)|0]; v="good"; }
     drops.push({x:40+Math.random()*(W-80), y:-30, s:2.2+Math.random()*2.2+((CONFIG.game.seconds-tLeft)/12), e:e, v:v});
   }
@@ -173,26 +224,26 @@ var CONFIG = {
     if(spawnAcc>420){ spawn(); spawnAcc=0; }
     if(timerAcc>1000){ tLeft--; timerAcc=0; $("timer").textContent=tLeft; if(tLeft<=0){ end(); return; } }
     cx.clearRect(0,0,W,H);
-    cx.font="34px serif"; cx.textAlign="center";
     for(var i=drops.length-1;i>=0;i--){
       var d=drops[i]; d.y+=d.s*(dt/16);
-      cx.fillText(d.e, d.x, d.y);
-      if(d.y>H-46 && d.y<H-6 && Math.abs(d.x-bowlX)<44){
-        if(d.v==="bad"){ score=Math.max(0,score-20); combo=0; }
-        else if(d.v==="star"){ score+=50; combo++; }
-        else { score+=10+Math.min(combo,5)*2; combo++; }
+      drawDrop(d);
+      if(d.y>H-70 && d.y<H-26 && Math.abs(d.x-bowlX)<48){
+        if(d.v==="bad"){ score=Math.max(0,score-20); combo=0; flash="#E6483D"; }
+        else if(d.v==="star"){ score+=50; combo++; flash="#F2B344"; }
+        else { score+=10+Math.min(combo,5)*2; combo++; flash=null; }
         drops.splice(i,1); $("score").textContent=score; continue;
       }
       if(d.y>H+30) drops.splice(i,1);
     }
-    cx.font="44px serif";
-    cx.fillText(CONFIG.game.catcher, bowlX, H-14);
+    if(flash){ cx.strokeStyle=flash; cx.lineWidth=5; cx.strokeRect(2,2,W-4,H-4); flash=null; }
+    drawBowl(bowlX);
     requestAnimationFrame(step);
   }
+  var flash=null;
   function start(){
-    running=true; score=0; combo=0; tLeft=CONFIG.game.seconds; drops=[]; last=performance.now(); spawnAcc=0; timerAcc=0;
+    running=true; score=0; combo=0; tLeft=CONFIG.game.seconds; drops=[]; last=performance.now(); spawnAcc=0; timerAcc=0; flash=null;
     $("score").textContent=0; $("timer").textContent=tLeft; $("final").hidden=true;
-    $("gmsg").innerHTML="Slide to move "+CONFIG.game.catcher+" · "+CONFIG.game.bad+" costs you 20";
+    $("gmsg").innerHTML="Catch what goes <b>in the bowl</b> — chicken, steak, 🍤, 🥦. Catch 🔥 🍭 🧊 and you <b>lose 20</b>.";
     requestAnimationFrame(step);
   }
   function end(){

@@ -22,3 +22,35 @@ HARD RULES:
 - Real-time monitoring is bounded: scheduled runs + dispatches, not a live feed. Say so rather than pretending otherwise.
 
 When you finish, update the memory doc and playbook: CURRENT STATUS, today's lesson, and a dated MEMORY LOG entry.
+
+KRAKEN / SMART-MONEY CONCEPTS KNOWLEDGE (added 1 Oct 2026 from Antidote's study material):
+
+This is the lens for reading crypto charts on Kraken (BTC, ETH, SOL and whatever Antidote flags). It's a vocabulary and a setup pattern, NOT a guarantee — every SMC idea still gets logged as a paper alert with entry/stop/target and graded honestly after the fact.
+
+Glossary (the terms Antidote studies with):
+- SL stop loss · TP take profit · BE break even · KZ killzone (the high-volume session windows; for crypto, London 3-6am ET and New York 8:30-11am ET matter most even though crypto trades 24/7)
+- OB order block — the last opposite-direction candle zone before a strong impulsive move; price often returns to it and reacts
+- BB breaker block · MB mitigation block · RB rejection block — failed/retested variants of the OB idea
+- FVG fair value gap — a 3-candle gap price tends to revisit; IFVG — an FVG that flips roles after being broken through
+- BOS break of structure — price takes out the prior swing in the trend direction (continuation signal)
+- CHoCH change of character — first break AGAINST the prior trend (possible reversal signal)
+- VI volume imbalance · LV liquidity void — thin zones that price moves through fast
+- MT mean threshold — the 50% midpoint of an order block; C.E. consequent encroachment — the 50% midpoint of an FVG
+- SMT — smart-money divergence between correlated pairs (e.g. BTC makes a new low, ETH doesn't)
+- LS liquidity sweep · BSL buyside liquidity (resting stops ABOVE equal highs) · SSL sellside liquidity (resting stops BELOW equal lows) — note: Antidote's reference sheet has a typo labeling SSL "equal highs"; SSL means sellside liquidity
+- EQH equal highs · EQL equal lows · PDH/PDL previous day high/low · LRLR low-resistance liquidity run
+- PO3 power of three / AMD — accumulation → manipulation (the fake move that sweeps stops) → distribution (the real move)
+- IRL/ERL internal vs external range liquidity
+- Classic patterns in the sheet: falling wedge, bullish rectangle, bullish pennant, double bottom, inverse head & shoulders
+
+THE CORE SETUP (from the chart studies — "sweep into order block"):
+1. Mark the liquidity: equal lows / an obvious support everyone can see (SSL), and the equal highs above (BSL).
+2. Mark the HTF order block sitting just BELOW those equal lows (for a long; mirror everything for a short).
+3. Wait for the SWEEP: a fast wick that spikes through the lows into the order block — that's the manipulation leg of AMD, stop-hunting late longs and filling smart-money buys.
+4. Confirmation: price snaps back above the swept level and prints a BOS on the lower timeframe.
+5. The alert: entry at/inside the OB or on the BOS retrace, SL below the sweep wick, TP at the BSL above (the untouched equal highs). Risk:reward stated up front; skip anything under ~2R.
+6. If price CLOSES through the OB instead of wicking it, the setup is dead — no "it'll come back." Log the invalidation.
+
+Kraken specifics: use Kraken's own OHLC for the journal (not another exchange's print); crypto sweeps love weekend/overnight low-liquidity hours; PDH/PDL and the daily open are the cleanest liquidity magnets on BTC.
+
+STATUS NOTE: all TICKER scheduled routines are PAUSED by Antidote's order ("cease all activity"). This knowledge is loaded for when he says resume — until then it changes nothing and trades nothing.

@@ -13,14 +13,14 @@
    Menu items & prices pulled from their public Yelp menu.
    ============================================================ */
 :root{
-  --bg:#170B12;          /* dark berry night */
-  --card:#261220;
-  --edge:#4A2440;
-  --ink:#FBF2EC;
-  --dim:#C9A4B4;
-  --accent:#F23A5E;      /* chili pink-red */
-  --gold:#F7C04A;        /* cinnamon sugar */
-  color-scheme:dark;
+  --bg:#FFF8F0;          /* warm churro-shop white */
+  --card:#FFFFFF;
+  --edge:#F0DFC8;
+  --ink:#2B1A0E;
+  --dim:#92755C;
+  --accent:#F57A1A;      /* fried-churro orange */
+  --gold:#1F8A43;        /* lime/elote green */
+  color-scheme:light;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -39,11 +39,11 @@ h2::after{content:"";flex:1;height:1px;background:var(--edge)}
 .menu{display:grid;gap:10px}
 /* signature snacks as tilted polaroids taped to the card */
 .snap{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px;display:flex;gap:16px;align-items:center}
-.snap .ph{flex:0 0 132px;background:#FFF8F0;padding:7px 7px 18px;position:relative;box-shadow:0 12px 28px rgba(242,58,94,.38)}
+.snap .ph{flex:0 0 132px;background:#FFF8F0;padding:7px 7px 18px;position:relative;box-shadow:0 12px 28px rgba(245,122,26,.3)}
 .snap.l .ph{transform:rotate(-3.5deg)}
 .snap.r{flex-direction:row-reverse}
 .snap.r .ph{transform:rotate(3deg)}
-.snap .ph::before{content:"";position:absolute;top:-9px;left:50%;width:56px;height:17px;background:rgba(247,192,74,.8);transform:translateX(-50%) rotate(-2deg)}
+.snap .ph::before{content:"";position:absolute;top:-9px;left:50%;width:56px;height:17px;background:rgba(31,138,67,.75);transform:translateX(-50%) rotate(-2deg)}
 .snap .ph img{width:100%;height:100px;object-fit:cover;display:block}
 .snap .tx{min-width:0;display:flex;flex-direction:column;gap:3px}
 .snap .nm{font-weight:900;font-size:17px}
@@ -57,7 +57,7 @@ h2::after{content:"";flex:1;height:1px;background:var(--edge)}
 .gamehead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .gamehead b{font-size:17px}
 .gamehead .hud{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--gold)}
-canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#1E0D17 0%,#2E1120 100%);touch-action:none;margin-top:10px}
+canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#FFF2E0 0%,#FFE6C7 100%);border:1px solid var(--edge);touch-action:none;margin-top:10px}
 .gamemsg{text-align:center;color:var(--dim);font-size:13px;margin:10px 0 2px}
 .gamemsg b{color:var(--ink)}
 .bigscore{text-align:center;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:30px;color:var(--gold);margin:6px 0 2px}
@@ -307,7 +307,7 @@ var CONFIG = {
     cx.save(); cx.translate(px,py);
     if(glow!==false){                                                  // soft gold glow behind him
       var gl=cx.createRadialGradient(0,-4,4,0,-4,28);
-      gl.addColorStop(0,"rgba(247,192,74,.45)"); gl.addColorStop(1,"rgba(247,192,74,0)");
+      gl.addColorStop(0,"rgba(245,122,26,.4)"); gl.addColorStop(1,"rgba(247,192,74,0)");
       cx.fillStyle=gl; cx.beginPath(); cx.arc(0,-4,28,0,7); cx.fill();
     }
     rr(-9,-22,18,42,9); cx.fillStyle="#D99A3C"; cx.fill();             // churro body
@@ -343,12 +343,12 @@ var CONFIG = {
   function drawTile(c,r,t,blink){
     var px=c*CS+CS/2, py=r*CS+CS/2-(t.off||0), top=r*CS+4-(t.off||0);
     rr(c*CS+4, top, CS-8, CS-8, 14);
-    cx.fillStyle = blink ? "rgba(247,192,74,.45)"
-      : t.k===WILD ? "rgba(247,192,74,.14)"
+    cx.fillStyle = blink ? "rgba(245,122,26,.4)"
+      : t.k===WILD ? "rgba(245,122,26,.14)"
       : t.k===HAZ ? "rgba(230,72,61,.16)"
-      : "rgba(255,255,255,.05)";
+      : "rgba(43,26,14,.05)";
     cx.fill();
-    if(sel && sel.c===c && sel.r===r){ cx.strokeStyle="#F7C04A"; cx.lineWidth=3; cx.stroke(); }
+    if(sel && sel.c===c && sel.r===r){ cx.strokeStyle="#F57A1A"; cx.lineWidth=3; cx.stroke(); }
     DRAW[t.k](px,py);
   }
   function randKind(c,r){            // regulars only, no instant 3-run on fill
@@ -497,7 +497,7 @@ var CONFIG = {
     cx.clearRect(0,0,W,H);
     drawElote(W/2-120,H/2-80); drawFries(W/2,H/2-85); drawSandia(W/2+120,H/2-80);
     drawChurros(W/2-70,H/2+15); drawChurritoMan(W/2+60,H/2+15);
-    cx.font="bold 26px Archivo,sans-serif"; cx.fillStyle="#FBF2EC"; cx.textAlign="center";
+    cx.font="bold 26px Archivo,sans-serif"; cx.fillStyle="#2B1A0E"; cx.textAlign="center";
     cx.fillText("TAP TO PLAY", W/2, H/2+100);
   }
   function start(){

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Second Shift AI — One-Stop Flyer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap">
+<style>
+/* IG portrait flyer 1080x1350 — futuristic robot vibe: black + neon cyan/amber, circuit grid, glow */
+:root{
+  --bg:#05070D; --panel:#0C1119; --line:#10film;
+  --cyan:#2DE2FF; --amber:#FFB01F; --ink:#EAF4FF; --dim:#7E90A8;
+  --grid:rgba(45,226,255,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000}
+.flyer{
+  position:relative; width:1080px; height:1350px; overflow:hidden;
+  background:
+    radial-gradient(1200px 700px at 50% -10%, rgba(45,226,255,.16), transparent 60%),
+    radial-gradient(900px 600px at 110% 115%, rgba(255,176,31,.12), transparent 60%),
+    linear-gradient(180deg,#05070D,#070A12 55%,#04060B);
+  color:var(--ink); font-family:"Rajdhani",system-ui,sans-serif;
+  background-size:cover;
+}
+/* circuit grid */
+.grid{position:absolute;inset:0;background-image:
+  linear-gradient(var(--grid) 1px,transparent 1px),
+  linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:54px 54px; mask:radial-gradient(circle at 50% 42%, #000 55%, transparent 85%);}
+.scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 2px,transparent 2px 5px);pointer-events:none}
+.pad{position:absolute;inset:0;padding:64px 60px;display:flex;flex-direction:column}
+
+/* header */
+.top{display:flex;align-items:center;gap:18px}
+.chip{font-family:"Share Tech Mono",monospace;font-size:17px;letter-spacing:.32em;color:var(--cyan);
+  border:1px solid rgba(45,226,255,.4);border-radius:40px;padding:9px 18px;text-shadow:0 0 12px rgba(45,226,255,.7)}
+.on{margin-left:auto;font-family:"Share Tech Mono",monospace;font-size:15px;color:var(--amber);letter-spacing:.2em;display:flex;align-items:center;gap:8px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:none}
+
+/* robot head mark (SVG) */
+.hero{display:flex;flex-direction:column;align-items:center;margin-top:34px}
+.bot{filter:drop-shadow(0 0 24px rgba(45,226,255,.55))}
+h1{font-family:"Orbitron",sans-serif;font-weight:900;font-size:92px;line-height:.98;text-align:center;margin-top:8px;letter-spacing:-.01em}
+h1 .g{color:var(--cyan);text-shadow:0 0 26px rgba(45,226,255,.75)}
+h1 .a{color:var(--amber);text-shadow:0 0 26px rgba(255,176,31,.7)}
+.sub{font-size:30px;color:var(--dim);text-align:center;margin-top:14px;letter-spacing:.02em;font-weight:600}
+.sub b{color:var(--ink)}
+
+/* lanes grid */
+.lanes{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:40px}
+.lane{background:linear-gradient(160deg,rgba(45,226,255,.07),rgba(12,17,25,.9));
+  border:1px solid rgba(45,226,255,.22);border-radius:18px;padding:20px 20px 18px;position:relative;overflow:hidden}
+.lane::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--cyan),var(--amber))}
+.lane .ic{font-size:34px;line-height:1}
+.lane h3{font-family:"Orbitron",sans-serif;font-weight:700;font-size:23px;margin-top:10px;letter-spacing:.01em}
+.lane p{font-size:19px;color:var(--dim);margin-top:4px;line-height:1.25;font-weight:500}
+.lane.wide{grid-column:1 / -1;display:flex;align-items:center;gap:18px}
+.lane.wide .ic{font-size:40px}
+.lane.wide .tx h3{margin-top:0}
+
+/* footer CTA */
+.foot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.cta .k{font-family:"Share Tech Mono",monospace;color:var(--cyan);font-size:18px;letter-spacing:.2em}
+.cta .big{font-family:"Orbitron",sans-serif;font-weight:800;font-size:40px;margin-top:6px;line-height:1}
+.cta .big .a{color:var(--amber)}
+.handle{text-align:right;font-family:"Share Tech Mono",monospace;font-size:22px;color:var(--ink)}
+.handle .s{color:var(--dim);font-size:16px;display:block;margin-top:4px;letter-spacing:.1em}
+.badge{position:absolute;top:60px;right:56px}
+</style>
+</head>
+<body>
+<div class="flyer" id="flyer">
+  <div class="grid"></div>
+  <div class="scan"></div>
+  <div class="pad">
+
+    <div class="top">
+      <span class="chip">SECOND SHIFT&nbsp;AI</span>
+      <span class="on"><span class="dot"></span>NOW ONBOARDING</span>
+    </div>
+
+    <div class="hero">
+      <h1 style="margin-top:28px">BUILT FOR<br><span class="g">EVERY</span> <span class="a">BUSINESS.</span></h1>
+      <p class="sub">If you have customers, you need a second shift.<br><b>One system runs the digital side while you work.</b></p>
+    </div>
+
+    <div class="lanes" style="margin-top:34px">
+      <div class="lane"><div class="ic">🍔</div><h3>Restaurants &amp; Food Trucks</h3><p>Digital menu, loyalty game, online + crypto orders.</p></div>
+      <div class="lane"><div class="ic">💈</div><h3>Barbershops &amp; Salons</h3><p>24/7 booking agent, rebook reminders, no-show win-back.</p></div>
+      <div class="lane"><div class="ic">🏋️</div><h3>Gyms &amp; Studios</h3><p>Sign-up site, class reminders, member win-back.</p></div>
+      <div class="lane"><div class="ic">🔧</div><h3>Auto &amp; Detailing</h3><p>Quote replies, booking, review engine on autopilot.</p></div>
+      <div class="lane"><div class="ic">🎥</div><h3>Streamers &amp; Creators</h3><p>Clips engine — turn one stream into 15 shorts.</p></div>
+      <div class="lane"><div class="ic">🛍️</div><h3>Retail &amp; Boutiques</h3><p>Store site, crypto checkout, come-back campaigns.</p></div>
+      <div class="lane wide"><div class="ic">✨</div><div class="tx"><h3>...and any local business</h3><p>Nails, cafes, cleaners, tattoo, events — if people find you and pay you, we automate it.</p></div></div>
+    </div>
+
+    <div class="foot">
+      <div class="cta">
+        <div class="k">// YOUR LANE, HANDLED</div>
+        <div class="big">Pick your <span class="a">business.</span></div>
+      </div>
+      <div class="handle">@secondshift.ai
+        <span class="s">DM &ldquo;SHIFT&rdquo; TO START</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

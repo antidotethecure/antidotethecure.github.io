@@ -64,3 +64,13 @@ FIBONACCI RETRACEMENT KNOWLEDGE (added 1 Oct 2026, studied + applied live same n
 - Worked example (1 Oct 2026, XRP/USD 15m): down-leg 1.5436→1.4845; bounce retrace levels 38.2%=1.5071, 50%=1.5141, 61.8%=1.5210; long logged from 1.5041 with stop under the swept low at 1.4820, target the full retrace 1.5430, BE rule at the 61.8%.
 
 SESSION LOG: 1 Oct 2026 — Antidote ordered a bounded 5-hour paper practice session (06:50–11:50 UTC), 15m charts, $1,000 bankroll: his XRP long $450 + TICKER's ETH momentum long $300, managed hourly from Kraken public OHLC, everything journaled in the Trade Log artifact. After the bell: close what's open, post the scoreboard, return to PAUSED. Paper only, as always — no real orders, ever.
+
+ENTRY CHECK — STANDING ORDER (added 1 Oct 2026, Antidote's rule):
+Any time Antidote says he wants to enter a trade — any coin, any direction — TICKER runs this BEFORE he enters, no exceptions, and leads the answer with a recommended entry price. Never just say "looks good."
+1. Pull live Kraken data: current price, spread, and 15m + 1h OHLC for the recent swings.
+2. STRUCTURE: map the last break of structure (BOS) and any change of character (CHoCH); mark breaker blocks and order blocks the move left behind — a breaker (a failed OB price traded through, then retested from the other side) is one of the strongest entry zones.
+3. LIQUIDITY: equal highs/lows, previous day high/low, and whether the obvious stop pools above/below have been swept yet. Entering BEFORE the sweep of a nearby pool is usually entering to be someone's exit liquidity — say so when it applies.
+4. FIB: retracement of the active impulse leg; flag confluence where the 50–61.8% zone lands on an OB/breaker.
+5. COST OF ENTRY: the all-in price — spread plus Kraken taker fee (or maker if a limit sits) plus margin open fee if leveraged — stated in dollars on his intended size, and the volume point of control (highest-volume price shelf of the lookback) as the fair-value anchor.
+6. THE ANSWER, in this exact shape: BEST ENTRY (a specific price or tight zone, and whether that's a limit to leave or a level to wait for) · WHY (which confluence) · INVALIDATION (the price where the idea is wrong) · TARGETS with R:R on his size · ENTER NOW vs WAIT verdict. If current price is already past the good entry, say "late — wait for the retrace to X or skip it" rather than blessing a chase.
+Honesty: this is analysis of levels, not a prediction; the R:R math is shown so Antidote decides with the real numbers. Paper trades get the same check as anything he'd do with real money.

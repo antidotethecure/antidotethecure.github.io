@@ -12,13 +12,13 @@
    of the file) and these tokens. New client = new config + hue.
    ============================================================ */
 :root{
-  --bg:#160B0B;          /* deep lacquer red-black */
-  --card:#241112;
-  --edge:#4A2425;
+  --bg:#0D0404;          /* hibachi-grill black */
+  --card:#1D0B0A;
+  --edge:#4A1F1C;
   --ink:#F7EFE6;
   --dim:#C4A992;
   --accent:#E6483D;      /* dragon red */
-  --gold:#F2B344;        /* hibachi flame gold */
+  --gold:#FFC82E;        /* flame yellow */
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -56,7 +56,7 @@ h2::after{content:"";flex:1;height:1px;background:var(--edge)}
 .gamehead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .gamehead b{font-size:17px}
 .gamehead .hud{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--gold)}
-canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#1C0E0E 0%,#2A1210 100%);touch-action:none;margin-top:10px}
+canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#140707 0%,#241008 100%);touch-action:none;margin-top:10px}
 .gamemsg{text-align:center;color:var(--dim);font-size:13px;margin:10px 0 2px}
 .gamemsg b{color:var(--ink)}
 .bigscore{text-align:center;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:30px;color:var(--gold);margin:6px 0 2px}
@@ -269,7 +269,7 @@ var CONFIG = {
     cx.beginPath(); cx.ellipse(x,by-4,46,10,0,0,Math.PI*2); cx.fill();
     cx.beginPath(); cx.ellipse(x,by-2,46,10,0,0,Math.PI); cx.lineTo(x-30,by+26);
     cx.quadraticCurveTo(x,by+36,x+30,by+26); cx.closePath(); cx.fill();
-    cx.strokeStyle="#F2B344"; cx.lineWidth=2.5;
+    cx.strokeStyle="#FFC82E"; cx.lineWidth=2.5;
     cx.beginPath(); cx.moveTo(x-38,by+14); cx.quadraticCurveTo(x,by+24,x+38,by+14); cx.stroke();
     // inner rim shadow so the rice sits IN the bowl
     cx.strokeStyle="#7E1F1A"; cx.lineWidth=2;
@@ -320,7 +320,7 @@ var CONFIG = {
     }
     if(drg.mode==="fire"){                              // the breath — a cone of flame to plate level
       var g=cx.createLinearGradient(0,drg.y,0,H-24);
-      g.addColorStop(0,"rgba(242,179,68,.95)"); g.addColorStop(.6,"rgba(230,72,61,.9)"); g.addColorStop(1,"rgba(230,72,61,.25)");
+      g.addColorStop(0,"rgba(255,200,46,.95)"); g.addColorStop(.6,"rgba(230,72,61,.9)"); g.addColorStop(1,"rgba(230,72,61,.25)");
       cx.fillStyle=g;
       cx.beginPath(); cx.moveTo(drg.x-7,drg.y+14); cx.lineTo(drg.x-30,H-24); cx.lineTo(drg.x+30,H-24); cx.lineTo(drg.x+7,drg.y+14); cx.closePath(); cx.fill();
       cx.font="26px serif"; cx.textAlign="center";
@@ -347,7 +347,7 @@ var CONFIG = {
       drawDrop(d);
       if(d.y>H-70 && d.y<H-26 && Math.abs(d.x-bowlX)<48){
         if(d.v==="bad"){ score=Math.max(0,score-20); combo=0; flash="#E6483D"; }
-        else if(d.v==="star"){ score+=50; combo++; flash="#F2B344"; }
+        else if(d.v==="star"){ score+=50; combo++; flash="#FFC82E"; }
         else { score+=10+Math.min(combo,5)*2; combo++; flash=null; }
         drops.splice(i,1); $("score").textContent=score; continue;
       }

@@ -17,3 +17,15 @@ RULES:
 - FOOD REVIEW ROTATION: pairings must cycle through ALL of Antidote's food reviews before any review repeats. The ledger tracks which reviews have been used this cycle; always pick from the unused ones. When every review has been used once, the cycle resets.
 - Honest sourcing: never invent a trend, view count, or leak. If a rumor is unconfirmed, label it RUMOR.
 - Hand chosen ideas to the content-machine agent for production planning.
+
+## ALL-PLATFORM VIDEO INTAKE (tested Oct 1, 2026)
+How to "watch" a video from any platform, verified by live tests:
+
+**YouTube** — vidIQ tools (vidiq_video_watch for long-form, vidiq_watch_shortform_content for Shorts, vidiq_video_transcript). Already in use.
+**Instagram Reels + TikTok** — vidiq_watch_shortform_content takes a full public reel/video URL and returns a scene-by-scene walkthrough. Discovery: vidiq_ig_profile_reels (a creator's last 12 reels with stats) and vidiq_instagram_tiktok_outlier_search. COST: 5-10 vidIQ credits per call, and credits were at ZERO on Oct 1 — check balance (vidiq_balance) first; they refresh with the Boost plan cycle.
+**Facebook (and the free fallback for everything)** — the Higgsfield sandbox has open internet + ffmpeg. Verified live: `pip install yt-dlp`, then `yt-dlp <facebook video URL>` downloaded a 12MB public Facebook video anonymously with title/duration/view count. Pipeline: yt-dlp download → ffmpeg frame grabs (compress ≤7KB JPEG contact sheet, base64 out, decode locally, Read to see) + ffmpeg audio extract. yt-dlp also covers IG, TikTok, Twitter/X, and ~1,800 other sites.
+
+**Known limits (be honest about them):**
+- Facebook: works on standard public page videos; some URL formats fail to parse; private/group/login-walled videos are NOT accessible and we don't try to bypass that.
+- Instagram anonymous via yt-dlp: partial metadata only (no view counts); the vidIQ tool is the quality path when credits exist.
+- Never bypass logins, paywalls, or rate limits. Public content only.

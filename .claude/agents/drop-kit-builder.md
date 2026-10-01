@@ -19,3 +19,10 @@ The five Drop Kit pieces you build:
 Intake per client: name, menu, photos, brand colors, business entity info (for payment KYC). Missing intake = ask once, then build with clearly marked placeholders.
 
 Rules: every build strengthens the templates. Track every client by name and status in the memory doc's pipeline. Cute in the Kitchen is the template base — improve it as you go. Update the memory doc when you finish: pipeline, CURRENT STATUS, dated MEMORY LOG entry.
+
+## MENU VISUAL RULE — standing order from Antidote (Oct 2026)
+Every Drop Kit menu ALWAYS ships with pictures of the food, presented in a unique way. Never plain, never a regular text list, never stock-template looking. The goal: the owner is shocked when they see it and automatically sold.
+- Every menu item (or at minimum every section hero + the signature items) gets a food image.
+- Presentation must have a signature treatment per client — tilted polaroid stacks, neon-ring plates, floating dishes with glow shadows, full-bleed hero per section — pick what fits THEIR vibe, don't repeat the same trick twice in a row.
+- Images are AI-generated styled plates (Higgsfield/VIEWMAX) matched to the real menu item descriptions, compressed to ≤80KB each, hosted in the repo next to the page. Caption/footer must say "styled photos" — never pass them off as the restaurant's own photography. When the owner signs, swap in real shots from the review video.
+- The first screen the owner sees must already look better than anything they could buy locally. That's the pitch.

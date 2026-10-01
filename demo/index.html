@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Second Shift AI — Live Demos</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#0B0D12; --card:#151922; --edge:#2A303C; --ink:#F2F4F8; --dim:#9AA6B6;
+  --accent:#F7C04A; --mono:"IBM Plex Mono",ui-monospace,monospace; --sans:"Archivo",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);padding-inline:16px;padding-block:env(safe-area-inset-top,0px) calc(40px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:620px;margin:0 auto}
+header{text-align:center;padding-block:36px 8px}
+.kick{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--accent);text-transform:uppercase;margin:0}
+h1{font-size:clamp(28px,8vw,40px);font-weight:900;margin:8px 0 4px;letter-spacing:-.02em}
+.sub{color:var(--dim);font-size:14px;margin:0 auto;max-width:42ch}
+.grid{display:grid;gap:14px;margin-top:26px}
+.demo{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--edge);border-radius:18px;padding:20px;position:relative;overflow:hidden}
+.demo .strip{position:absolute;inset:0 auto 0 0;width:6px}
+.demo.ld .strip{background:linear-gradient(180deg,#E6483D,#FFC82E)}
+.demo.cl .strip{background:linear-gradient(180deg,#F57A1A,#1F8A43)}
+.demo .em{font-size:40px;line-height:1}
+.demo h2{font-size:22px;font-weight:900;margin:8px 0 2px}
+.demo p{color:var(--dim);font-size:13.5px;margin:0 0 12px}
+.demo .go{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--accent);border:1px solid var(--edge);border-radius:99px;padding:8px 14px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--dim);background:var(--bg);border:1px solid var(--edge);border-radius:6px;padding:3px 8px}
+.how{background:var(--card);border:1px dashed var(--edge);border-radius:16px;padding:18px;margin-top:22px}
+.how h3{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;margin:0 0 10px}
+.how ol{margin:0;padding-left:20px;color:var(--ink);font-size:14px;line-height:1.7}
+.how b{color:var(--accent)}
+footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:26px;line-height:1.7}
+footer b{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="kick">Second Shift AI</p>
+  <h1>Live client demos</h1>
+  <p class="sub">Real menus, real games, built in one evening. Tap a card to open the full page — exactly what the restaurant gets.</p>
+</header>
+
+<div class="grid">
+  <a class="demo ld" href="./lucky-dragon/">
+    <span class="strip"></span>
+    <div class="em">🐉</div>
+    <h2>Lucky Dragon Hibachi</h2>
+    <p>Compton · digital menu with food photos + "Hibachi Catch" dragon game and weekly prize board.</p>
+    <span class="go">OPEN DEMO →</span>
+    <div class="tags"><span class="tag">MENU + PHOTOS</span><span class="tag">CATCH GAME</span><span class="tag">PRIZE BOARD</span></div>
+  </a>
+
+  <a class="demo cl" href="./churrito-loco/">
+    <span class="strip"></span>
+    <div class="em">🌶️</div>
+    <h2>Churrito Loco</h2>
+    <p>South Gate · their real menu with styled photos + "Loco Match" Candy-Crush game with the Churrito Man.</p>
+    <span class="go">OPEN DEMO →</span>
+    <div class="tags"><span class="tag">MENU + PHOTOS</span><span class="tag">MATCH-3 GAME</span><span class="tag">PRIZE BOARD</span></div>
+  </a>
+</div>
+
+<div class="how">
+  <h3>On the call</h3>
+  <ol>
+    <li>Open this page, tap the right demo.</li>
+    <li>Scroll the <b>menu</b> — the food photos sell it before you say a word.</li>
+    <li>Tap the game, play 10 seconds, show the <b>prize board</b>.</li>
+    <li>Say the line: <b>"I built this for you — want the real version with your phone number and your logo?"</b></li>
+  </ol>
+</div>
+
+<footer>
+  Demo pages — menu items, prices & food photos are samples until the owner signs.<br>
+  Games go live only with the owner, as free-entry promotions with official rules.<br>
+  <b>SECOND SHIFT AI</b> · menus · games · AI phone agents · content &amp; growth
+</footer>
+</div>
+</body>
+</html>

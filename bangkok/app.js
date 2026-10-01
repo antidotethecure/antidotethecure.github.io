@@ -91,6 +91,35 @@
   }
 
   // ---------- Visa ----------
+  // Paperwork tracker: tap the status chip to cycle To do → Submitted → Done. Saved on this phone.
+  const PW_STATES = { todo: ['⬜ To do', ''], submitted: ['🟡 Submitted', 'warn'], done: ['✅ Done', 'best'] };
+  const pwState = p => store.get('pw-' + p.id) || p.status || 'todo';
+  function paperwork() {
+    const items = (D.visa.paperwork || []).map(p => {
+      const s = pwState(p);
+      const [label, cls] = PW_STATES[s] || PW_STATES.todo;
+      return `<li class="pw" data-id="${esc(p.id)}">
+        <button type="button" class="tag ${cls} pw-chip">${label}</button>
+        <div><b>${esc(p.title)}</b> <span class="muted small">· ${esc(p.due || '')}</span>
+        ${p.note ? `<p class="muted small" style="margin:2px 0 0">${p.note}</p>` : ''}
+        ${p.link ? `<a class="muted small" href="${esc(p.link)}" target="_blank" rel="noopener">${esc(p.link.replace('https://', ''))}</a>` : ''}</div>
+      </li>`;
+    }).join('');
+    return items ? `<div class="card"><h4>📋 Paperwork tracker — tap the chip when you file one</h4>
+      <ul class="checks" style="list-style:none;padding:0;margin:0;display:grid;gap:10px">${items}</ul></div>` : '';
+  }
+  function wirePaperwork() {
+    const order = ['todo', 'submitted', 'done'];
+    document.querySelectorAll('.pw .pw-chip').forEach(btn => btn.addEventListener('click', () => {
+      const li = btn.closest('.pw');
+      const p = (D.visa.paperwork || []).find(x => x.id === li.dataset.id);
+      const next = order[(order.indexOf(pwState(p)) + 1) % order.length];
+      store.set('pw-' + p.id, next);
+      const [label, cls] = PW_STATES[next];
+      btn.textContent = label;
+      btn.className = 'tag ' + cls + ' pw-chip';
+    }));
+  }
   function visa() {
     const V = D.visa;
     const checklist = V.checklist.map((c, i) => {
@@ -102,6 +131,7 @@
     return `<section id="visa">
       ${head('visa', '🛂 Visa', V.checked)}
       <div class="alert">${V.alert}</div>
+      ${paperwork()}
       <div class="card" id="stay-clock"></div>
       <div class="note">${V.decision}</div>
       <div class="card"><h4>Before you fly (by Oct 4)</h4><ul class="checks">${checklist}</ul></div>
@@ -341,6 +371,7 @@
   wireConverter();
   document.querySelectorAll('ul.checks input').forEach(el =>
     el.addEventListener('change', () => store.set(el.id, el.checked ? '1' : '0')));
+  wirePaperwork();
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});

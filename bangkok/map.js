@@ -42,6 +42,7 @@
       </div>
       <div class="range-ends muted small"><span>$100</span><span id="apt-count"></span><span>$1,000</span></div>
       <div class="row" style="margin-top:6px">
+        <button type="button" class="btn primary" id="apt-under350">🎯 Under $350/mo</button>
         <button type="button" class="btn" data-sort="price">Sort: cheapest</button>
         <button type="button" class="btn" data-sort="month">1-month OK first</button>
         <button type="button" class="btn" data-sort="net">📶 Best internet first</button>
@@ -166,6 +167,14 @@
     updateMarkers();
   }
   ['apt-min', 'apt-max'].forEach(id => document.getElementById(id).addEventListener('input', renderList));
+  // One tap: every place whose cheapest room is $350/mo or less, all across the map.
+  document.getElementById('apt-under350').addEventListener('click', () => {
+    document.getElementById('apt-min').value = 100;
+    document.getElementById('apt-max').value = 350;
+    sortBy = 'price';
+    renderList();
+    document.getElementById('apt-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
   sec.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => { sortBy = b.dataset.sort; renderList(); }));
 
   // ---------- Area search ----------

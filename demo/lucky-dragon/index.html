@@ -137,8 +137,8 @@ var CONFIG = {
   maps: "https://www.google.com/maps/search/Lucky+Dragon+Hibachi+Compton+CA",
   game: {
     title: "🍤 Hibachi Catch",
-    // good = what belongs in the rice bowl (chicken & steak are drawn as chopped chunks)
-    good: [{t:"chicken"},{t:"steak"},{t:"shrimp",e:"🍤"},{t:"veg",e:"🥦"}],
+    // good = what belongs in the rice bowl (all drawn to match the real Lucky Dragon dishes)
+    good: [{t:"chicken"},{t:"steak"},{t:"shrimp"},{t:"veg"},{t:"chowmein"},{t:"rice"}],
     star: "⭐",                                // +50, rare
     // bad = stuff that does NOT go in the bowl — catch one, lose 20
     bad: [{t:"flame",e:"🔥"},{t:"candy",e:"🍭"},{t:"ice",e:"🧊"}],
@@ -218,21 +218,65 @@ var CONFIG = {
     cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r);
     cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath();
   }
-  function chunk(x,y,s,fill,edge,sear){ // one chopped cube with a seared top edge
+  function chunk(x,y,s,fill,edge,sear,pepper){ // chopped cube: body, seared top band, optional black pepper
     rr(x,y,s,s,s*0.22); cx.fillStyle=fill; cx.fill();
     cx.strokeStyle=edge; cx.lineWidth=1.5; cx.stroke();
-    rr(x,y,s,s*0.34,s*0.22); cx.fillStyle=sear; cx.fill();
+    rr(x,y,s,s*0.40,s*0.22); cx.fillStyle=sear; cx.fill();          // seared/griddle top
+    if(pepper){ cx.fillStyle="#2a1d12";                             // deterministic pepper flecks (no flicker)
+      cx.fillRect(x+s*0.32,y+s*0.55,1.4,1.4); cx.fillRect(x+s*0.6,y+s*0.72,1.3,1.3); cx.fillRect(x+s*0.46,y+s*0.42,1.2,1.2); }
   }
-  function drawChicken(x,y){ // golden-brown square-chopped chicken, grill style
-    chunk(x-16,y-8,15,"#E8A84A","#9C6420","#C07A28");
-    chunk(x+1,y-14,14,"#EDB45C","#9C6420","#C98434");
-    chunk(x-5,y+1,13,"#E2A040","#9C6420","#B8732A");
+  function drawChicken(x,y){ // cubed hibachi chicken: ivory-white meat, golden sear, pepper, griddle marks
+    chunk(x-16,y-8,15,"#F1E7D2","#B98A4E","#D9A355",true);
+    chunk(x+1,y-14,14,"#F6EEDC","#B98A4E","#E2B46A",true);
+    chunk(x-5,y+2,13,"#ECE0C8","#B98A4E","#CE9748",true);
+    cx.fillStyle="rgba(92,56,20,.55)"; cx.fillRect(x-9,y-3,6,1.5); cx.fillRect(x+4,y-9,6,1.5); // light char / smoke marks
   }
-  function drawSteak(x,y){ // dark cooked steak chunks with char on top
-    chunk(x-16,y-10,16,"#8A4A2E","#3E2217","#5C3020");
-    chunk(x+2,y-5,14,"#7C4027","#3E2217","#4E2A1B");
-    // pink center fleck so it reads as steak, not rock
-    cx.fillStyle="#C97B6B"; cx.fillRect(x-10,y-2,5,3);
+  function drawSteak(x,y){ // cubed hibachi steak: dark seared crust, pink medium center, pepper
+    chunk(x-16,y-10,16,"#6E3C25","#351d13","#512c1c",true);
+    chunk(x+2,y-5,14,"#633620","#351d13","#49281a",true);
+    chunk(x-6,y+4,12,"#5c3420","#351d13","#45261a",true);
+    cx.fillStyle="#CE8678"; cx.fillRect(x-11,y-3,6,3); cx.fillRect(x+6,y+1,5,3);   // pink medium centers
+    cx.fillStyle="#E0A396"; cx.fillRect(x-10,y-2,4,1.5);
+  }
+  function drawShrimp(x,y){ // one curled hibachi shrimp: coral body, pale flesh, pink tail fan, pepper
+    cx.save(); cx.translate(x,y); cx.lineCap="round";
+    cx.strokeStyle="#F3A48C"; cx.lineWidth=9;                        // body curl
+    cx.beginPath(); cx.arc(0,0,11,Math.PI*0.15,Math.PI*1.65); cx.stroke();
+    cx.strokeStyle="#FBE4DA"; cx.lineWidth=3.5;                      // pale inner flesh
+    cx.beginPath(); cx.arc(0,0,11,Math.PI*0.2,Math.PI*1.55); cx.stroke();
+    cx.strokeStyle="#D96A52"; cx.lineWidth=1.2;                      // segment lines
+    for(var a=0.3;a<1.6;a+=0.3){ cx.beginPath(); cx.moveTo(Math.cos(Math.PI*a)*6,Math.sin(Math.PI*a)*6); cx.lineTo(Math.cos(Math.PI*a)*15,Math.sin(Math.PI*a)*15); cx.stroke(); }
+    var tx=Math.cos(Math.PI*1.65)*11, ty=Math.sin(Math.PI*1.65)*11; // pink tail fan at the open end
+    cx.fillStyle="#E8613F"; cx.beginPath(); cx.moveTo(tx,ty); cx.lineTo(tx+6,ty-6); cx.lineTo(tx+9,ty+1); cx.lineTo(tx+4,ty+6); cx.closePath(); cx.fill();
+    cx.fillStyle="#2a1d12"; cx.fillRect(-2,-8,1.3,1.3); cx.fillRect(5,2,1.3,1.3); cx.fillRect(-6,4,1.2,1.2); // pepper
+    cx.restore();
+  }
+  function drawVeg(x,y){ // hibachi veggie batch: broccoli floret, carrot round, onion chunk
+    cx.fillStyle="#3C7A2E";                                          // broccoli florets
+    cx.beginPath(); cx.arc(x-8,y-6,4,0,7); cx.arc(x-4,y-9,4,0,7); cx.arc(x-11,y-9,3.5,0,7); cx.arc(x-7,y-11,3.5,0,7); cx.fill();
+    cx.fillStyle="#7FAE5F"; cx.fillRect(x-9,y-4,4,5);                // stalk
+    cx.fillStyle="#E8863A"; cx.beginPath(); cx.arc(x+8,y-2,5,0,7); cx.fill();   // carrot round
+    cx.fillStyle="#F2A861"; cx.beginPath(); cx.arc(x+8,y-2,2.3,0,7); cx.fill();
+    cx.fillStyle="#F3EFE6"; rr(x-4,y+3,11,7,2); cx.fill();           // onion chunk
+    cx.strokeStyle="#D9CFBE"; cx.lineWidth=1; cx.beginPath(); cx.moveTo(x+1.5,y+3); cx.lineTo(x+1.5,y+10); cx.stroke();
+    cx.fillStyle="rgba(80,50,20,.5)"; cx.fillRect(x+6,y-4,4,1.3);    // light grill char
+  }
+  function drawChowMein(x,y){ // glossy soy-brown chow mein tangle
+    cx.save(); cx.translate(x,y); cx.lineCap="round";
+    var N=["#8a5a24","#9c6a2c","#7a4e1f"];
+    for(var i=0;i<6;i++){ cx.strokeStyle=N[i%3]; cx.lineWidth=3;
+      var sy=-9+i*3; cx.beginPath(); cx.moveTo(-14,sy); cx.bezierCurveTo(-5,sy-6,5,sy+7,14,sy-2); cx.stroke(); }
+    cx.strokeStyle="rgba(255,225,170,.5)"; cx.lineWidth=1;           // soy-sauce gloss
+    cx.beginPath(); cx.moveTo(-12,-6); cx.bezierCurveTo(-4,-10,6,2,13,-5); cx.stroke();
+    cx.fillStyle="#E7DCC4"; cx.fillRect(-2,2,4,2); cx.restore();     // cabbage bit
+  }
+  function drawRice(x,y){ // golden hibachi fried-rice clump
+    cx.fillStyle="#D8B583";
+    cx.beginPath(); cx.arc(x-5,y,8,0,7); cx.arc(x+5,y-1,8,0,7); cx.arc(x,y+5,7,0,7); cx.fill();
+    cx.fillStyle="#C79A5C";                                          // grain shading
+    for(var i=0;i<7;i++){ var gx=x-9+i*3, gy=y-6+((i*5)%10); cx.save(); cx.translate(gx,gy); cx.rotate(i); cx.fillRect(0,0,4,2); cx.restore(); }
+    cx.fillStyle="#7FA85A"; cx.fillRect(x-3,y-3,3,2); cx.fillRect(x+4,y+2,3,2); // scallion
+    cx.fillStyle="#E8863A"; cx.fillRect(x+1,y+3,2.5,2.5);            // carrot bit
   }
   // rice crisps a shade darker with every dragon hit: white → toasted → dark brown → burnt
   var RICE=[
@@ -276,14 +320,19 @@ var CONFIG = {
     cx.beginPath(); cx.ellipse(x,by-4,46,10,0,0,Math.PI*2); cx.stroke();
   }
   function drawDrop(d){
-    if(d.e.t==="chicken") drawChicken(d.x,d.y);
-    else if(d.e.t==="steak") drawSteak(d.x,d.y);
+    var t=d.e&&d.e.t;
+    if(t==="chicken") drawChicken(d.x,d.y);
+    else if(t==="steak") drawSteak(d.x,d.y);
+    else if(t==="shrimp") drawShrimp(d.x,d.y);
+    else if(t==="veg") drawVeg(d.x,d.y);
+    else if(t==="chowmein") drawChowMein(d.x,d.y);
+    else if(t==="rice") drawRice(d.x,d.y);
     else { cx.font="34px serif"; cx.textAlign="center"; cx.fillText(d.e.e||d.e, d.x, d.y+12); }
   }
   function drawIdle(){
     cx.clearRect(0,0,W,H);
-    drawChicken(W/2-60,H/2-50); drawSteak(W/2+50,H/2-55);
-    cx.font="40px serif"; cx.textAlign="center"; cx.fillText("🍤", W/2-5, H/2-40);
+    drawChicken(W/2-62,H/2-52); drawSteak(W/2+46,H/2-58);
+    drawShrimp(W/2-6,H/2-42); drawVeg(W/2+58,H/2-20);
     drawBowl(W/2);
     cx.font="bold 22px Archivo,sans-serif"; cx.fillStyle="#F7EFE6";
     cx.fillText("TAP TO PLAY", W/2, H/2+30);

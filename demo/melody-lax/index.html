@@ -1,0 +1,995 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<title>Melody Table</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<style>
+  :root{
+    --gold:#d4af37; --gold-hi:#f0d375; --red:#77242e; --red-hi:#a33645;
+    --navy:#0b1220; --navy-2:#141d30; --navy-3:#1a2438;
+    --ink:#f6f1e4; --muted:#9aa3b5; --line:#26314a; --go:#3fbf8f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{background:var(--navy);color:var(--ink);font-family:"Barlow",system-ui,sans-serif;
+    font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden;
+    display:grid;place-items:center}
+  #app{position:relative;width:100%;height:100%;max-width:520px;max-height:940px;overflow:hidden;
+    background:linear-gradient(#0b1220,#131c2e 60%,#1b2438)}
+  .screen{position:absolute;inset:0 0 62px 0;display:none;flex-direction:column;overflow-y:auto;z-index:5}
+  .screen.on{display:flex}
+  .screen.full{inset:0}
+  .pad{padding:18px 18px 26px}
+  h1{font-family:"Anton",Impact,sans-serif;font-weight:400;font-size:clamp(1.9rem,9vw,2.7rem);
+     line-height:.95;text-transform:uppercase}
+  h2{font-family:"Anton",Impact,sans-serif;font-weight:400;text-transform:uppercase;
+     font-size:1.15rem;letter-spacing:.03em}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--gold)}
+  .sub{color:var(--muted);font-size:.9rem}
+  .brandbar{display:flex;align-items:center;gap:9px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+
+  .btn{display:block;width:100%;padding:14px 18px;border:none;border-radius:12px;
+    font-family:"Anton",sans-serif;font-size:1rem;letter-spacing:.05em;text-transform:uppercase;
+    cursor:pointer;color:var(--navy);background:linear-gradient(180deg,var(--gold-hi),var(--gold));
+    box-shadow:0 5px 0 #9c7d1f;transition:transform .08s,box-shadow .08s}
+  .btn:active{transform:translateY(3px);box-shadow:0 2px 0 #9c7d1f}
+  .btn.ghost{background:none;color:var(--ink);border:1px solid var(--line);box-shadow:none;font-size:.86rem}
+  .btn.ghost:active{transform:none;background:var(--navy-2)}
+  .btn[disabled]{opacity:.4;pointer-events:none}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+  /* ---------- tab bar ---------- */
+  #tabbar{position:absolute;bottom:0;left:0;right:0;height:62px;z-index:20;display:flex;
+    background:rgba(11,18,32,.96);border-top:1px solid var(--line);backdrop-filter:blur(8px)}
+  #tabbar button{flex:1;background:none;border:none;color:var(--muted);cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    font-family:"IBM Plex Mono",monospace;font-size:.55rem;letter-spacing:.13em;
+    text-transform:uppercase;position:relative;padding-top:4px}
+  #tabbar button .ic{font-size:19px;line-height:1}
+  #tabbar button.on{color:var(--gold)}
+  #tabbar button.on::before{content:"";position:absolute;top:0;left:26%;right:26%;height:2px;
+    background:var(--gold);border-radius:0 0 3px 3px}
+  .badge{position:absolute;top:2px;right:calc(50% - 22px);min-width:17px;height:17px;padding:0 4px;
+    border-radius:9px;background:var(--red-hi);color:#fff;font-size:.58rem;font-weight:700;
+    display:none;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace}
+  .badge.on{display:flex}
+
+  /* ---------- QR landing ---------- */
+  #s-qr{inset:0;z-index:40}
+  #s-qr.on{display:flex;align-items:center;justify-content:center;text-align:center}
+  .qrcard{background:var(--navy-2);border:1px solid var(--line);border-radius:18px;padding:24px 22px;
+    margin:0 20px;max-width:340px}
+  .qrcard canvas{width:170px;height:170px;background:#fff;border-radius:10px;padding:8px;margin:14px auto 0;display:block}
+  .tablepick{display:flex;gap:7px;margin-top:16px;justify-content:center;flex-wrap:wrap}
+  .tablepick button{width:44px;height:40px;border-radius:9px;background:var(--navy-3);
+    border:1px solid var(--line);color:var(--ink);font-family:"IBM Plex Mono",monospace;
+    font-weight:700;cursor:pointer;font-size:.85rem}
+  .tablepick button.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+
+  /* ---------- menu ---------- */
+  .secthead{font-family:"Anton",sans-serif;text-transform:uppercase;font-size:1rem;letter-spacing:.04em;
+    color:var(--gold);margin:22px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  .mi{display:grid;grid-template-columns:1fr auto auto;gap:11px;align-items:start;padding:11px 0;
+    border-bottom:1px solid rgba(38,49,74,.5)}
+  .mi .nm{font-weight:600;font-size:.95rem;line-height:1.25}
+  .mi .ds{color:var(--muted);font-size:.79rem;line-height:1.35;margin-top:2px}
+  .mi .pr{font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:.86rem;color:var(--gold);
+    white-space:nowrap;padding-top:1px}
+  .add{width:32px;height:32px;border-radius:9px;border:1px solid var(--gold);background:transparent;
+    color:var(--gold);font-size:19px;line-height:1;cursor:pointer;flex:none}
+  .add:active{background:var(--gold);color:var(--navy)}
+  .qty{display:flex;align-items:center;gap:7px}
+  .qty button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);
+    background:var(--navy-2);color:var(--ink);cursor:pointer;font-size:16px;line-height:1}
+  .qty span{font-family:"IBM Plex Mono",monospace;font-weight:700;min-width:14px;text-align:center;font-size:.85rem}
+
+  /* ---------- order ---------- */
+  .line{display:grid;grid-template-columns:1fr auto;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .line .nm{font-weight:600;font-size:.92rem}
+  .line .meta{color:var(--muted);font-size:.78rem;margin-top:2px}
+  .line .amt{font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:.86rem;white-space:nowrap}
+  .totals{margin-top:14px;padding-top:12px;border-top:2px solid var(--line)}
+  .trow{display:flex;justify-content:space-between;padding:5px 0;font-size:.9rem}
+  .trow.big{font-family:"Anton",sans-serif;font-size:1.25rem;text-transform:uppercase;
+    color:var(--gold);padding-top:9px}
+  .trow .v{font-family:"IBM Plex Mono",monospace;font-weight:700}
+  .trow.disc{color:var(--go)}
+  .empty{text-align:center;color:var(--muted);padding:44px 20px;font-size:.9rem}
+
+  /* ---------- rewards ---------- */
+  .starhead{text-align:center;padding:22px 0 6px}
+  .starhead .big{font-family:"Anton",sans-serif;font-size:3rem;color:var(--gold);line-height:1}
+  .tier{display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;padding:12px 13px;
+    border-radius:11px;background:var(--navy-2);border:1px solid var(--line);margin-top:8px}
+  .tier.hit{border-color:var(--gold);background:linear-gradient(90deg,rgba(212,175,55,.15),var(--navy-2))}
+  .tier .pts{font-family:"IBM Plex Mono",monospace;font-size:.7rem;font-weight:700;color:var(--muted);white-space:nowrap}
+  .tier.hit .pts{color:var(--gold)}
+  .tier .nm{font-weight:600;font-size:.92rem;line-height:1.22}
+  .tier .nm small{display:block;color:var(--muted);font-weight:400;font-size:.75rem;margin-top:2px}
+  .tier button{padding:7px 12px;border-radius:8px;border:none;background:var(--gold);color:var(--navy);
+    font-family:"Anton",sans-serif;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+  .tier .lock{font-size:1rem;opacity:.6}
+  .codebox{margin-top:14px;padding:18px;border-radius:14px;text-align:center;
+    background:linear-gradient(180deg,var(--red-hi),var(--red))}
+  .codebox .k{font-family:"IBM Plex Mono",monospace;font-size:1.7rem;font-weight:700;letter-spacing:.15em;color:#fff}
+  .codebox .w{font-size:.73rem;color:rgba(255,255,255,.86);margin-top:6px}
+  .subtabs{display:flex;gap:6px;margin:6px 0 12px}
+  .subtab{flex:1;padding:9px 6px;border-radius:9px;background:var(--navy-2);border:1px solid var(--line);
+    color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.1em;
+    text-transform:uppercase;cursor:pointer;font-weight:600}
+  .subtab.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+  .view{display:none}.view.on{display:block}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .chip{padding:6px 11px;border-radius:99px;background:var(--navy-2);border:1px solid var(--line);
+    color:var(--muted);font-size:.72rem;cursor:pointer;font-weight:600}
+  .chip.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+  .info-card{background:var(--navy-2);border:1px solid var(--line);border-radius:13px;padding:15px;margin-top:11px}
+  .info-card .lab{font-family:"IBM Plex Mono",monospace;font-size:.58rem;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+  .info-card .val{font-size:.98rem;font-weight:600;line-height:1.35}
+  .info-card .val small{display:block;color:var(--muted);font-weight:400;font-size:.8rem;margin-top:3px}
+  .acts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+  .act{padding:14px 8px;border-radius:12px;background:var(--navy-2);border:1px solid var(--line);
+    color:var(--ink);cursor:pointer;text-align:center;text-decoration:none;display:block;
+    font-family:"Anton",sans-serif;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase}
+  .act .ic{display:block;font-size:20px;margin-bottom:5px}
+  .act.gold{background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:var(--navy);border:none}
+  .act:active{transform:translateY(2px)}
+  .push{display:flex;gap:11px;align-items:flex-start;margin-top:11px}
+  .push input{appearance:none;-webkit-appearance:none;flex:none;width:44px;height:26px;border-radius:99px;
+    background:var(--line);position:relative;cursor:pointer;transition:background .2s}
+  .push input:checked{background:var(--gold)}
+  .push input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
+    background:#fff;transition:transform .2s}
+  .push input:checked::after{transform:translateX(18px)}
+  .notif{background:var(--navy-3);border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-top:8px}
+  .notif .t{font-weight:700;font-size:.84rem}
+  .notif .b{color:var(--muted);font-size:.8rem;margin-top:2px}
+  .notif .w{font-family:"IBM Plex Mono",monospace;font-size:.58rem;color:var(--gold);
+    letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+  .lb{display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;padding:10px 12px;
+    border-bottom:1px solid var(--line);font-size:.89rem}
+  .lb .rk{font-family:"IBM Plex Mono",monospace;font-weight:700;color:var(--muted);width:24px}
+  .lb.me{background:rgba(212,175,55,.1);border-radius:8px}
+  .lb .sc{font-family:"IBM Plex Mono",monospace;font-weight:700;color:var(--gold)}
+  .prize{background:linear-gradient(180deg,var(--red-hi),var(--red));border-radius:12px;padding:13px;
+    margin-top:12px;font-size:.85rem}
+  .prize b{display:block;font-family:"Anton",sans-serif;font-size:1rem;text-transform:uppercase;margin-bottom:3px}
+
+  /* ---------- game ---------- */
+  #s-play{padding:0;inset:0 0 62px 0}
+  canvas#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  #hud{position:absolute;top:0;left:0;right:0;z-index:6;padding:12px 15px;display:flex;
+    justify-content:space-between;pointer-events:none;font-family:"IBM Plex Mono",monospace}
+  #hud .score{font-size:1.4rem;font-weight:700;color:var(--gold);text-shadow:0 2px 12px rgba(212,175,55,.55)}
+  #hud .lbl{font-size:.54rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+  #hud .bank{font-size:.78rem;color:var(--muted);margin-top:2px}
+  .lives{display:flex;gap:4px;margin-top:4px;justify-content:flex-end}
+  .life{font-size:14px}.life.gone{opacity:.18}
+  #toast{position:absolute;left:50%;top:80px;transform:translateX(-50%);z-index:7;pointer-events:none;
+    font-family:"Anton",sans-serif;font-size:1.1rem;color:var(--gold);
+    text-shadow:0 2px 14px rgba(0,0,0,.85);opacity:0;white-space:nowrap}
+  #toast.pop{animation:pop 1s ease-out}
+  @keyframes pop{0%{opacity:0;transform:translate(-50%,10px) scale(.9)}
+    20%{opacity:1;transform:translate(-50%,0) scale(1.06)}75%{opacity:1}
+    100%{opacity:0;transform:translate(-50%,-14px)}}
+  #gameover{position:absolute;inset:0;z-index:8;background:rgba(6,10,20,.93);display:none;
+    flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:26px}
+  #gameover.on{display:flex}
+
+  .toastbar{position:absolute;left:16px;right:16px;bottom:74px;z-index:30;background:var(--go);
+    color:#04140e;border-radius:11px;padding:12px 14px;font-weight:600;font-size:.88rem;
+    opacity:0;transform:translateY(10px);transition:opacity .25s,transform .25s;pointer-events:none}
+  .toastbar.on{opacity:1;transform:none}
+  .demo-tag{position:absolute;bottom:66px;left:50%;transform:translateX(-50%);z-index:25;
+    font-family:"IBM Plex Mono",monospace;font-size:.53rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);opacity:.55;pointer-events:none;white-space:nowrap}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="app">
+
+  <!-- QR LANDING -->
+  <div class="screen full on" id="s-qr">
+    <div class="qrcard">
+      <div class="brandbar" style="justify-content:center"><span class="dot"></span>
+        <span class="eyebrow">Melody Bar &amp; Grill</span></div>
+      <h1 style="margin-top:10px">Melody<br>Table</h1>
+      <p class="sub" style="margin-top:9px">Scan the code on your table. See the menu, order without
+        waving anybody down, and play for your next meal.</p>
+      <canvas id="qr"></canvas>
+      <p class="sub" style="font-size:.78rem;margin-top:10px">Or pick your table to start</p>
+      <div class="tablepick" id="tables"></div>
+      <button class="btn" id="enter" style="margin-top:16px" disabled>Pick a table</button>
+    </div>
+  </div>
+
+  <!-- MENU -->
+  <div class="screen" id="s-menu"><div class="pad">
+    <div class="brandbar"><span class="dot"></span><span class="eyebrow" id="tablbl">Table —</span></div>
+    <h2 style="margin-top:10px">The Menu</h2>
+    <p class="sub">Tap the plus to add. Kitchen gets it the second you send.</p>
+    <div id="menu"></div>
+  </div></div>
+
+  <!-- ORDER -->
+  <div class="screen" id="s-order"><div class="pad">
+    <div class="brandbar"><span class="dot"></span><span class="eyebrow" id="tablbl2">Table —</span></div>
+    <h2 style="margin-top:10px">Your Order</h2>
+    <div id="cart"></div>
+    <div id="ordertotals"></div>
+    <button class="btn" id="send" style="margin-top:18px" disabled>Send to kitchen</button>
+    <button class="btn ghost" id="clear" style="margin-top:9px">Clear</button>
+    <div id="sent" style="display:none;margin-top:16px"></div>
+  </div></div>
+
+  <!-- PLAY -->
+  <div class="screen" id="s-play">
+    <canvas id="cv"></canvas>
+    <div id="hud">
+      <div><div class="lbl">This run</div><div class="score" id="score">0</div>
+        <div class="bank" id="bankhud">&#11088; 0</div></div>
+      <div style="text-align:right"><div class="lbl">Fuel</div><div class="lives" id="lives"></div></div>
+    </div>
+    <div id="toast"></div>
+    <div id="gameover">
+      <span class="eyebrow" id="rank-line">Flight complete</span>
+      <div style="font-family:'Anton';font-size:2.9rem;color:var(--gold);line-height:1;margin:8px 0 2px"
+        id="final">0</div>
+      <div style="font-family:'Anton';font-size:1.5rem;color:var(--gold)" id="runstars">+0 &#11088;</div>
+      <p class="sub" id="best" style="margin-top:6px">Star balance: 0</p>
+      <div style="display:flex;gap:9px;margin-top:22px;width:100%;max-width:300px">
+        <button class="btn ghost" id="again">Fly again</button>
+        <button class="btn" id="toRewards">Rewards</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REWARDS -->
+  <div class="screen" id="s-rewards"><div class="pad">
+    <div class="starhead">
+      <div class="eyebrow">Your stars</div>
+      <div class="big" id="starbig">0</div>
+      <p class="sub" id="starnote">400 points = 1 star</p>
+    </div>
+    <div class="subtabs">
+      <button class="subtab on" data-v="v-earn">Rewards</button>
+      <button class="subtab" data-v="v-shop">Discounts</button>
+    </div>
+    <div id="v-earn" class="view on"><div id="tiers"></div></div>
+    <div id="v-shop" class="view">
+      <p class="sub" style="font-size:.85rem;margin-bottom:4px">Everything you can spend stars on.
+        Pick one and it comes straight off your check.</p>
+      <div class="chips" id="chips"></div>
+      <div id="shop"></div>
+    </div>
+    <div id="codewrap" style="display:none"></div>
+    <h2 style="margin-top:26px">This Week</h2>
+    <div class="prize"><b>Weekly champion</b>Top score by Sunday close eats half off their whole meal.
+      Resets Monday.</div>
+    <div id="board" style="margin-top:10px"></div>
+  </div></div>
+
+  <!-- MELODY / INFO -->
+  <div class="screen" id="s-info"><div class="pad">
+    <div class="brandbar"><span class="dot"></span><span class="eyebrow">Melody Bar &amp; Grill</span></div>
+    <h2 style="margin-top:10px">Getting Here</h2>
+
+    <div class="info-card">
+      <div class="lab">Address</div>
+      <div class="val">9132 S Sepulveda Blvd<small>Los Angeles, CA 90045 &#183; Westchester</small></div>
+      <div class="val" id="dist" style="margin-top:9px;color:var(--gold);font-size:.86rem">Tap below for distance</div>
+    </div>
+
+    <div class="acts">
+      <a class="act gold" id="dirbtn" href="https://www.google.com/maps/dir/?api=1&destination=9132+S+Sepulveda+Blvd+Los+Angeles+CA+90045" target="_blank" rel="noopener">
+        <span class="ic">&#129517;</span>Directions</a>
+      <a class="act" href="tel:+13106701994"><span class="ic">&#128222;</span>Call</a>
+    </div>
+    <button class="btn" id="resbtn" style="margin-top:10px">Reserve a table</button>
+    <div id="resform" style="display:none"></div>
+
+    <div class="info-card" style="margin-top:18px">
+      <div class="lab">Hours</div>
+      <div class="val">Happy hour 3&#8211;6 daily<small>Half off burgers Mon 11&#8211;3 &#183; $3 tacos &amp; $6 margaritas Tue
+        &#183; Half off sandwiches Thu 11&#8211;3 &#183; $3 sliders Fri 11&#8211;3</small></div>
+    </div>
+
+    <h2 style="margin-top:24px">Notifications</h2>
+    <div class="info-card">
+      <div class="push">
+        <input type="checkbox" id="pushon">
+        <div><div class="val" style="font-size:.9rem">Push me the good stuff</div>
+          <small style="color:var(--muted);font-size:.8rem">New dishes, specials, discount drops, and when
+            somebody bumps you off the weekly board.</small></div>
+      </div>
+      <div id="pushprev" style="display:none">
+        <div class="notif"><div class="w">Now</div><div class="t">Melody Bar &amp; Grill</div>
+          <div class="b">New on the menu: Lobster Mac &amp; Cheese. First 20 orders get a free app.</div></div>
+        <div class="notif"><div class="w">Tomorrow 11am</div><div class="t">Melody Bar &amp; Grill</div>
+          <div class="b">Half off burgers til 3. You're 9 &#11088; off free fries.</div></div>
+        <div class="notif"><div class="w">Friday 4pm</div><div class="t">Melody Bar &amp; Grill</div>
+          <div class="b">$3 sliders started. Somebody just passed you on the weekly board.</div></div>
+      </div>
+      <p class="sub" style="font-size:.74rem;margin-top:9px">Turn off any time in your phone settings.
+        No charge, no spam.</p>
+    </div>
+  </div></div>
+
+  <div class="toastbar" id="bar"></div>
+  <div class="demo-tag">Demo build &#183; nothing is charged, no texts sent</div>
+
+  <nav id="tabbar">
+    <button data-s="s-menu" class="on"><span class="ic">&#127860;</span>Menu</button>
+    <button data-s="s-order"><span class="ic">&#129379;</span>Order<span class="badge" id="cartbadge">0</span></button>
+    <button data-s="s-play"><span class="ic">&#9992;</span>Play</button>
+    <button data-s="s-rewards"><span class="ic">&#11088;</span>Rewards</button>
+    <button data-s="s-info"><span class="ic">&#128205;</span>Melody</button>
+  </nav>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var MENU = [{"sec": "Starters", "items": [{"n": "Avocado Toast", "p": "$13.00", "d": "Vine ripened avocados on sourdough with micro greens, tomato, olive oil, sea salt, lemon and a pinch of cayenne pepper."}, {"n": "BBQ Rib Grilled Cheese Bites", "p": "$15.00", "d": "Melted jack and cheddar cheese with bbq baby back rib meat on grilled sourdough."}, {"n": "Buttermilk Chicken Strips & Fries", "p": "$16.00", "d": "Chicken breast dipped in buttermilk breading and fried. Served with ranch and bbq dipping sauce."}, {"n": "Chicken Pot Stickers", "p": "$15.00", "d": "Made with free range chicken, cabbage and garlic. Served with honey soy dipping sauce."}, {"n": "Fried Green Beans", "p": "$13.00", "d": "Hand battered green beans served with ranch and spicy aioli."}, {"n": "Fried Shrimp", "p": "$18.25", "d": "Southern spice blend, breaded and fried"}, {"n": "Jalapeno Calamari", "p": "$16.00", "d": "Lemon Pepper breaded squid and jalapeno pieces lightly fried. Served with cocktail sauce & spicy aioli."}, {"n": "Lettuce Wraps", "p": "$16.00", "d": "Seasoned umami chicken, water chestnuts, onions, peanuts and cilantro"}, {"n": "Baby Back Ribs & Fries", "p": "$20.25", "d": "Slow cooked baby back ribs slathered in our house-made bourbon BBQ sauce."}]}, {"sec": "Fries", "items": [{"n": "Gilroy Garlic Fries", "p": "$6.75", "d": "Shoestring fries tossed with sizzling garlic & Italian herbs."}, {"n": "Melody Fries", "p": "$5.75", "d": "Shoestring fries, sea salt & pepper Add Cheese +$2.00"}, {"n": "Onion Strings", "p": "$9.75", "d": "Fried onion strings served with jalape\u00f1o ketchup."}, {"n": "Phat Fries", "p": "$7.75", "d": "Add cheese +$2.00"}, {"n": "Philly Cheese Steak Fries", "p": "$17.25", "d": "Shoestring fries topped with thinly sliced Angus steak, grilled onions, peppers, mushrooms & Swiss cheese."}, {"n": "Sweet Potato Fries", "p": "$7.75", "d": "Served with spicy aioli dipping sauce."}]}, {"sec": "Soups", "items": [{"n": "Black Bean Soup (Bowl)", "p": "$14.00", "d": "Olive oil garlic toast"}, {"n": "Black Bean Soup (Cup)", "p": "$9.75", "d": "Olive oil garlic toast"}, {"n": "French Onion Soup (Bowl)", "p": "$15.00", "d": "Served with grilled cheese dunker."}, {"n": "French Onion Soup (Cup)", "p": "$11.00", "d": "Served with 1/2 grilled cheese dunker."}, {"n": "Tomato Bisque Soup (Bowl)", "p": "$15.00", "d": "Served with grilled cheese dunker."}, {"n": "Tomato Bisque Soup (Cup)", "p": "$11.00", "d": "Served with 1/2 grilled cheese dunker."}]}, {"sec": "Mac & Cheese", "items": [{"n": "Bacon, Cheddar & Jalapeno Mac & Cheese", "p": "$17.25", "d": "Fusili pasta in a creamy cheese blend with caramelized bacon, cheddar cheese & jalapeno."}, {"n": "Chicken Parmesan Mac & Cheese", "p": "$18.25", "d": "Fusili pasta in a creamy cheese blend, with chicken Parmesan in a vodka sauce."}, {"n": "House Mac", "p": "$15.00", "d": "Fusilli pasta in a creamy cheese blend."}, {"n": "Lobster Mac & Cheese", "p": "$21.50", "d": "Fusilli pasta in a creamy cheese blend with lobster and a baked parmesan crust"}, {"n": "Melody Burger Mac & Cheese", "p": "$19.25", "d": "Fusili pasta in a creamy cheese blend with ground beef, caramelized onions, spinach, & Gorgonzola cheese."}, {"n": "Parmesan & Mushroom Mac & Cheese", "p": "$17.25", "d": "Fusili pasta in a cream cheese blend with baked Parmesan and mushroom crust."}]}, {"sec": "Tacos & Burritos", "items": [{"n": "Avocado Tacos", "p": "$13.00", "d": "2 Panco crusted avocado, chimichurri, onion, cilantro, tomato & Cabbage"}, {"n": "Bean & Cheese Burrito", "p": "$14.00", "d": "Black beans and shredded cheese"}, {"n": "Beyond Tacos", "p": "$14.00", "d": "2 tacos, beyond meat, black bean, pico de gallo, & lettuce"}, {"n": "Carnitas Burrito", "p": "$18.25", "d": "Pulled pork, black beans, pico de gallo & shredded cheese"}, {"n": "Carnitas Tacos", "p": "$14.00", "d": "2 slow roasted pork topped with onions, cilantro & lettuce."}, {"n": "Cheese Quesadilla", "p": "$15.00", "d": "Melted mozzarella cheese on a flour tortilla with side of salsa & sour cream Chicken +$3.00 Pulled Pork +$4.25 Steak +$5.25"}, {"n": "Chicken Burrito", "p": "$17.25", "d": "Chopped chicken, black beans, pico de gallo & shredded cheese"}, {"n": "Chicken Tacos", "p": "$13.00", "d": "2 Grilled chicken tacos, onions, cilantro, & lettuce."}, {"n": "Nachos", "p": "$15.00", "d": "Melted cheddar and jack cheese, jalapenos, pico de gallo, & sour cream. + Chicken $4 | + Pulled Pork $5 | + Steak $6"}, {"n": "Salmon Tacos", "p": "$16.00", "d": "2 blackened salmon with onions, cilantro, lettuce, & creme de lemon."}, {"n": "Shrimp Tacos", "p": "$16.00", "d": "2 tacos, cajun spiced shrimp saut\u00e9ed with butter, garlic & onions topped with cabbage, cilantro, sweet honey jalape\u00f1os & spicy aioli"}, {"n": "Steak Burrito", "p": "$18.25", "d": "Chopped steak, black beans, pico de gallo & shredded cheese"}]}];
+  var TAX = 0.095;
+  var STAR_RATE = 400;
+  function starsFor(p){ return Math.floor(p/STAR_RATE); }
+  // Browsable catalog. Everything priced against their real menu.
+  var STAR_TIERS = [
+    {stars:10, name:"Free Melody Fries",        note:"$5.75 on the menu",        off:5.75, tag:"Snack"},
+    {stars:15, name:"$5 off any Mac & Cheese",  note:"Six to choose from",       off:5,    tag:"Food"},
+    {stars:25, name:"10% off your drink",       note:"Any pour, any night",      pct:0.10, tag:"Drink"},
+    {stars:30, name:"Free Gilroy Garlic Fries", note:"$6.75 on the menu",        off:6.75, tag:"Snack"},
+    {stars:40, name:"$8 off Baby Back Ribs",    note:"Ribs & fries, $20.25",     off:8,    tag:"Food"},
+    {stars:60, name:"Free appetizer",           note:"Up to $16 off a starter",  off:16,   tag:"Food"},
+    {stars:80, name:"25% off your food",        note:"Whole check, dine-in",     pct:0.25, tag:"Check"},
+    {stars:120,name:"Half off your whole meal", note:"Everything, cut in half",  pct:0.50, tag:"Check"},
+    {stars:250,name:"Entire meal on the house", note:"You ate free",             pct:1.00, tag:"Check"}
+  ];
+  var FOOD = [
+    {e:"\ud83e\uddc0",n:"Bacon Jalape\u00f1o Mac",p:120},{e:"\ud83c\udf64",n:"Fried Shrimp",p:110},
+    {e:"\ud83c\udf57",n:"Buttermilk Chicken",p:100},{e:"\ud83c\udf79",n:"Margarita",p:90},
+    {e:"\ud83e\udd5f",n:"Pot Stickers",p:80},{e:"\ud83e\uddc5",n:"Onion Strings",p:70},
+    {e:"\ud83c\udf5f",n:"Garlic Fries",p:60},{e:"\ud83c\udf7a",n:"Draft Beer",p:75}
+  ];
+
+  var $=function(i){return document.getElementById(i);};
+  function money(n){ return "$"+n.toFixed(2); }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+  function bar(msg){ var b=$("bar"); b.textContent=msg; b.classList.add("on");
+    clearTimeout(b._t); b._t=setTimeout(function(){b.classList.remove("on");},2200); }
+
+  // ---------------- state ----------------
+  var LS="melody-table";
+  var state=(function(){try{return JSON.parse(localStorage.getItem(LS)||"{}");}catch(e){return{};}})();
+  state.stars=state.stars||0; state.cart=state.cart||{}; state.board=state.board||[];
+  state.me=state.me||"Guest"; state.table=state.table||null; state.applied=state.applied||null;
+  var remote=null;
+  function persist(){ try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}
+    if(remote) remote.set({board:state.board,at:Date.now()}).catch(function(){}); }
+  if(window.claude&&typeof window.claude.use==="function"){
+    window.claude.use("db").then(function(db){ if(!db)return;
+      remote=db.doc("melody/table");
+      remote.onSnapshot(function(s){ var d=s&&(typeof s.data==="function"?s.data():s.data);
+        if(d&&Array.isArray(d.board)){state.board=d.board;renderBoard();} });
+    }).catch(function(){});
+  }
+  function weekKey(){ var d=new Date(),t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+    var day=t.getUTCDay()||7; t.setUTCDate(t.getUTCDate()+4-day);
+    var y=new Date(Date.UTC(t.getUTCFullYear(),0,1));
+    return t.getUTCFullYear()+"-W"+String(Math.ceil((((t-y)/86400000)+1)/7)).padStart(2,"0"); }
+
+  // ---------------- QR landing ----------------
+  try{
+    new QRious({element:$("qr"), value:location.href, size:340, background:"#ffffff",
+      foreground:"#0b1220", level:"M"});
+  }catch(e){ $("qr").style.display="none"; }
+  var tp=$("tables");
+  [1,2,3,4,5,6,7,8,9,10,11,12].forEach(function(n){
+    var b=document.createElement("button"); b.textContent=n;
+    b.addEventListener("click",function(){
+      Array.prototype.forEach.call(tp.children,function(c){c.classList.toggle("on",c===b);});
+      state.table=n; persist();
+      $("enter").disabled=false; $("enter").textContent="Start at table "+n;
+    });
+    tp.appendChild(b);
+  });
+  $("enter").addEventListener("click",function(){
+    $("s-qr").classList.remove("on");
+    $("tablbl").textContent="Table "+state.table;
+    $("tablbl2").textContent="Table "+state.table;
+    go("s-menu");
+  });
+
+  // ---------------- tabs ----------------
+  function go(id){
+    ["s-menu","s-order","s-play","s-rewards","s-info"].forEach(function(s){$(s).classList.toggle("on",s===id);});
+    Array.prototype.forEach.call($("tabbar").children,function(b){b.classList.toggle("on",b.dataset.s===id);});
+    if(id==="s-play"){ if(!running) startGame(); } else { running=false; }
+    if(id==="s-rewards"){ renderRewards(); renderBoard(); }
+    if(id==="s-order"){ renderCart(); }
+    if(id==="s-info"){ renderInfo(); }
+  }
+  Array.prototype.forEach.call($("tabbar").children,function(b){
+    b.addEventListener("click",function(){ go(b.dataset.s); });
+  });
+
+  // ---------------- menu ----------------
+  function renderMenu(){
+    var h="";
+    MENU.forEach(function(sec){
+      h+='<div class="secthead">'+esc(sec.sec)+'</div>';
+      sec.items.forEach(function(it){
+        var q=state.cart[it.n]?state.cart[it.n].q:0;
+        h+='<div class="mi"><div><div class="nm">'+esc(it.n)+'</div>'+
+           (it.d?'<div class="ds">'+esc(it.d)+'</div>':'')+'</div>'+
+           '<div class="pr">'+esc(it.p||"")+'</div>'+
+           (q>0
+             ? '<div class="qty"><button data-m="'+esc(it.n)+'">&#8722;</button><span>'+q+
+               '</span><button data-a="'+esc(it.n)+'">+</button></div>'
+             : '<button class="add" data-a="'+esc(it.n)+'">+</button>')+
+           '</div>';
+      });
+    });
+    $("menu").innerHTML=h;
+  }
+  function priceOf(name){
+    for(var i=0;i<MENU.length;i++) for(var j=0;j<MENU[i].items.length;j++)
+      if(MENU[i].items[j].n===name) return parseFloat((MENU[i].items[j].p||"0").replace(/[^0-9.]/g,""))||0;
+    return 0;
+  }
+  document.addEventListener("click",function(e){
+    var a=e.target.closest("[data-a]"), m=e.target.closest("[data-m]");
+    if(a){ var n=a.dataset.a; state.cart[n]=state.cart[n]||{q:0,p:priceOf(n)};
+      state.cart[n].q++; persist(); renderMenu(); renderBadge(); bar(n+" added"); }
+    if(m){ var n2=m.dataset.m; if(state.cart[n2]){ state.cart[n2].q--;
+      if(state.cart[n2].q<=0) delete state.cart[n2]; persist(); renderMenu(); renderBadge(); } }
+  });
+  function renderBadge(){
+    var n=0; for(var k in state.cart) n+=state.cart[k].q;
+    var b=$("cartbadge"); b.textContent=n; b.classList.toggle("on",n>0);
+    $("send").disabled = n===0;
+  }
+
+  // ---------------- order ----------------
+  function cartTotals(){
+    var sub=0; for(var k in state.cart) sub+=state.cart[k].p*state.cart[k].q;
+    var disc=0, ap=state.applied;
+    if(ap){
+      if(ap.pct) disc=sub*ap.pct;
+      else if(ap.off) disc=Math.min(ap.off,sub);
+    }
+    var taxed=Math.max(0,sub-disc);
+    return {sub:sub,disc:disc,tax:taxed*TAX,total:taxed+taxed*TAX};
+  }
+  function renderCart(){
+    var keys=Object.keys(state.cart);
+    if(!keys.length){
+      $("cart").innerHTML='<div class="empty">Nothing yet. Go pick something off the menu.</div>';
+      $("ordertotals").innerHTML=""; renderBadge(); return;
+    }
+    var h="";
+    keys.forEach(function(k){
+      var c=state.cart[k];
+      h+='<div class="line"><div><div class="nm">'+esc(k)+'</div>'+
+         '<div class="meta">'+c.q+' &#215; '+money(c.p)+'</div></div>'+
+         '<div class="amt">'+money(c.p*c.q)+'</div></div>';
+    });
+    $("cart").innerHTML=h;
+    var t=cartTotals();
+    var th='<div class="totals">'+
+      '<div class="trow"><span>Subtotal</span><span class="v">'+money(t.sub)+'</span></div>';
+    if(t.disc>0) th+='<div class="trow disc"><span>'+esc(state.applied.name)+'</span>'+
+      '<span class="v">&#8722;'+money(t.disc)+'</span></div>';
+    th+='<div class="trow"><span>Tax</span><span class="v">'+money(t.tax)+'</span></div>'+
+      '<div class="trow big"><span>Total</span><span class="v">'+money(t.total)+'</span></div></div>';
+    $("ordertotals").innerHTML=th;
+    renderBadge();
+  }
+  $("clear").addEventListener("click",function(){
+    state.cart={}; state.applied=null; persist(); renderCart(); renderMenu(); renderBadge();
+    $("sent").style.display="none";
+  });
+  $("send").addEventListener("click",function(){
+    var t=cartTotals(), n="ML-"+String(Math.floor(100+Math.random()*900));
+    $("sent").style.display="block";
+    $("sent").innerHTML='<div class="codebox"><div class="k">'+n+'</div>'+
+      '<div class="w">Sent to the kitchen for table '+state.table+' &#183; '+money(t.total)+
+      '<br>In the real build this drops straight onto their ticket printer.</div></div>';
+    bar("Order sent to the kitchen");
+  });
+
+  // ---------------- rewards ----------------
+  function renderRewards(){
+    $("starbig").textContent=state.stars.toLocaleString();
+    $("starnote").textContent=STAR_RATE+" points = 1 star";
+    var h="";
+    STAR_TIERS.forEach(function(t,i){
+      var ok=state.stars>=t.stars, need=t.stars-state.stars;
+      h+='<div class="tier'+(ok?" hit":"")+'"><span class="pts">'+t.stars+' &#11088;</span>'+
+        '<span class="nm">'+esc(t.name)+'<small>'+
+        (ok?esc(t.note):need+" more &#11088; &#183; about "+Math.ceil(need*STAR_RATE/4000)+" more good runs")+
+        '</small></span>'+
+        (ok?'<button data-r="'+i+'">Use it</button>':'<span class="lock">&#128274;</span>')+'</div>';
+    });
+    $("tiers").innerHTML=h;
+  }
+  document.addEventListener("click",function(e){
+    var r=e.target.closest("[data-r]"); if(!r)return;
+    var t=STAR_TIERS[Number(r.dataset.r)];
+    if(state.stars<t.stars)return;
+    state.stars-=t.stars;
+    state.applied={name:t.name,pct:t.pct,off:t.off};
+    persist();
+    var code="MEL-"+String(Math.floor(1000+Math.random()*9000));
+    $("codewrap").style.display="block";
+    $("codewrap").innerHTML='<div class="codebox"><div class="k">'+code+'</div>'+
+      '<div class="w">'+esc(t.name)+' &#183; '+t.stars+' &#11088; redeemed.<br>'+
+      'Applied to your order. Show your server before you close out.</div></div>';
+    renderRewards(); renderShop(); renderCart(); bar(t.name+" applied to your order");
+  });
+  // ---------------- discount catalog ----------------
+  var shopFilter="All";
+  function renderShop(){
+    var tags=["All"].concat(STAR_TIERS.map(function(t){return t.tag;})
+      .filter(function(v,i,a){return a.indexOf(v)===i;}));
+    $("chips").innerHTML=tags.map(function(t){
+      return '<button class="chip'+(t===shopFilter?" on":"")+'" data-c="'+t+'">'+t+'</button>';
+    }).join("");
+    var list=STAR_TIERS.filter(function(t){return shopFilter==="All"||t.tag===shopFilter;});
+    $("shop").innerHTML=list.map(function(t){
+      var i=STAR_TIERS.indexOf(t), ok=state.stars>=t.stars, need=t.stars-state.stars;
+      return '<div class="tier'+(ok?" hit":"")+'"><span class="pts">'+t.stars+' &#11088;</span>'+
+        '<span class="nm">'+esc(t.name)+'<small>'+
+        (ok?esc(t.note):esc(t.note)+" &#183; "+need+" more &#11088;")+'</small></span>'+
+        (ok?'<button data-r="'+i+'">Use it</button>':'<span class="lock">&#128274;</span>')+'</div>';
+    }).join("");
+  }
+  document.addEventListener("click",function(e){
+    var c=e.target.closest("[data-c]"); if(!c)return;
+    shopFilter=c.dataset.c; renderShop();
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".subtab"),function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll(".subtab").forEach(function(x){x.classList.toggle("on",x===b);});
+      document.querySelectorAll(".view").forEach(function(v){v.classList.toggle("on",v.id===b.dataset.v);});
+      if(b.dataset.v==="v-shop") renderShop();
+    });
+  });
+
+  // ---------------- Melody info ----------------
+  // Approximate storefront coords for the distance estimate. Directions use the
+  // address string itself, so turn-by-turn is exact regardless.
+  var MEL={lat:33.9487,lng:-118.3918};
+  function miles(a,b){
+    var R=3958.8, dLat=(b.lat-a.lat)*Math.PI/180, dLng=(b.lng-a.lng)*Math.PI/180;
+    var la1=a.lat*Math.PI/180, la2=b.lat*Math.PI/180;
+    var h=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.sin(dLng/2)*Math.sin(dLng/2)*Math.cos(la1)*Math.cos(la2);
+    return 2*R*Math.asin(Math.sqrt(h));
+  }
+  var askedGeo=false;
+  function renderInfo(){
+    if(askedGeo||!navigator.geolocation) return;
+    askedGeo=true;
+    $("dist").textContent="Checking how far you are\u2026";
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var d=miles({lat:pos.coords.latitude,lng:pos.coords.longitude},MEL);
+      $("dist").textContent = d<0.2 ? "You're here \u2014 welcome in"
+        : "About "+(d<10?d.toFixed(1):Math.round(d))+" miles away";
+    },function(){
+      $("dist").textContent="9132 S Sepulveda Blvd \u00b7 right by LAX";
+    },{timeout:8000,maximumAge:600000});
+  }
+  $("pushon").addEventListener("change",function(e){
+    $("pushprev").style.display=e.target.checked?"block":"none";
+    if(e.target.checked){
+      bar("Notifications on \u2014 this is what they'd look like");
+      if("Notification" in window && Notification.permission==="default"){
+        try{ Notification.requestPermission(); }catch(err){}
+      }
+    }
+  });
+  $("resbtn").addEventListener("click",function(){
+    var f=$("resform");
+    if(f.style.display==="block"){ f.style.display="none"; return; }
+    f.style.display="block";
+    f.innerHTML='<div class="info-card">'+
+      '<div class="lab">Party size</div>'+
+      '<div class="chips" style="margin:6px 0 12px">'+
+        [2,3,4,5,6,8,10].map(function(n,i){
+          return '<button class="chip'+(i===0?" on":"")+'" data-party="'+n+'">'+n+'</button>';}).join("")+
+      '</div>'+
+      '<div class="lab">Time tonight</div>'+
+      '<div class="chips" style="margin:6px 0 12px">'+
+        ["5:30","6:00","6:30","7:00","7:30","8:00","8:30"].map(function(t,i){
+          return '<button class="chip'+(i===3?" on":"")+'" data-time="'+t+'">'+t+'</button>';}).join("")+
+      '</div>'+
+      '<button class="btn" id="resgo">Request it</button></div>';
+  });
+  var resParty=2,resTime="7:00";
+  document.addEventListener("click",function(e){
+    var pb=e.target.closest("[data-party]"), tb=e.target.closest("[data-time]"), g=e.target.closest("#resgo");
+    if(pb){ resParty=Number(pb.dataset.party);
+      document.querySelectorAll("[data-party]").forEach(function(x){x.classList.toggle("on",x===pb);}); }
+    if(tb){ resTime=tb.dataset.time;
+      document.querySelectorAll("[data-time]").forEach(function(x){x.classList.toggle("on",x===tb);}); }
+    if(g){
+      $("resform").innerHTML='<div class="codebox"><div class="k">MEL-R'+
+        String(Math.floor(100+Math.random()*900))+'</div><div class="w">Table for '+resParty+
+        ' at '+resTime+' requested.<br>In the real build this hits their reservation book and texts you back to confirm.</div></div>';
+      bar("Reservation requested for "+resParty+" at "+resTime);
+    }
+  });
+
+  function renderBoard(){
+    var wk=weekKey(), rows=state.board.filter(function(b){return b.week===wk;})
+      .sort(function(a,b){return b.score-a.score;}).slice(0,10);
+    if(!rows.length){ $("board").innerHTML='<p class="sub" style="font-size:.85rem">No scores yet this week. First one on the board is winning.</p>'; return; }
+    $("board").innerHTML=rows.map(function(r,i){
+      return '<div class="lb'+(r.name===state.me?" me":"")+'"><span class="rk">'+
+        (i===0?"\ud83d\udc51":i+1)+'</span><span>'+esc(r.name)+'</span>'+
+        '<span class="sc">'+r.score.toLocaleString()+'</span></div>';
+    }).join("");
+  }
+
+  // ---------------------------------------------------------------- game
+  var cv=$("cv"), ctx=cv.getContext("2d");
+  var W=0,H=0,dpr=Math.min(devicePixelRatio||1,2);
+  function size(){var r=$("app").getBoundingClientRect();
+    W=cv.width=Math.floor(r.width*dpr); H=cv.height=Math.floor(r.height*dpr);}
+  addEventListener("resize",size,{passive:true});
+
+  var plane,items,ufos,rocks,shots,enemyShots,boom,trail,stars;
+  var score,lives,lastRunStars=0,running=false,t0,lastSpawn,lastUfo,lastRock,lastShot,speed,invuln,raf,groundX=0,sky=0;
+
+  function start(){
+    size(); running=true;
+    plane={x:W*0.22,y:H*0.55,tx:W*0.22,ty:H*0.55,r:20*dpr,tilt:0};
+    items=[];ufos=[];rocks=[];shots=[];enemyShots=[];boom=[];trail=[];boards=[];lastBoard=0;
+    score=0;lives=3;lastRunStars=0;invuln=0;speed=3.6*dpr;
+    t0=performance.now();lastSpawn=0;lastUfo=0;lastRock=0;lastShot=0;
+    renderLives(); $("score").textContent="0";
+    $("bankhud").innerHTML="⭐ "+state.stars.toLocaleString()+" &nbsp;·&nbsp; +0 this run";
+    cancelAnimationFrame(raf); raf=requestAnimationFrame(loop);
+  }
+  function renderLives(){
+    var w=$("lives"); w.innerHTML="";
+    for(var i=0;i<3;i++){var s=document.createElement("span");
+      s.className="life"+(i<lives?"":" gone"); s.textContent="⛽"; w.appendChild(s);}
+  }
+  function clampX(x){ return Math.max(plane.r+10*dpr, Math.min(W*0.72, x)); }
+  function clampY(y){ return Math.max(plane.r+8*dpr, Math.min(H-plane.r-46*dpr, y)); }
+  // Thumb drags the plane anywhere: left, right, up, down.
+  function pointerXY(e){
+    var r=cv.getBoundingClientRect();
+    var px=(e.touches?e.touches[0].clientX:e.clientX), py=(e.touches?e.touches[0].clientY:e.clientY);
+    plane.tx=clampX((px-r.left)*dpr);
+    plane.ty=clampY((py-r.top)*dpr);
+  }
+  var dragging=false;
+  cv.addEventListener("pointerdown",function(e){ if(!running)return;
+    e.preventDefault(); dragging=true; pointerXY(e); },{passive:false});
+  cv.addEventListener("pointermove",function(e){ if(!running||!dragging)return;
+    e.preventDefault(); pointerXY(e); },{passive:false});
+  ["pointerup","pointercancel","pointerleave"].forEach(function(ev){
+    cv.addEventListener(ev,function(){ dragging=false; });
+  });
+  // Desktop: all four arrow keys.
+  var keys={};
+  addEventListener("keydown",function(e){
+    if(!running)return;
+    if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.key)>-1){ keys[e.key]=true; e.preventDefault(); }
+  });
+  addEventListener("keyup",function(e){ keys[e.key]=false; });
+  function applyKeys(){
+    var step=9*dpr;
+    if(keys.ArrowUp)    plane.ty=clampY(plane.ty-step);
+    if(keys.ArrowDown)  plane.ty=clampY(plane.ty+step);
+    if(keys.ArrowLeft)  plane.tx=clampX(plane.tx-step);
+    if(keys.ArrowRight) plane.tx=clampX(plane.tx+step);
+  }
+  function toast(m){var el=$("toast");el.textContent=m;
+    el.classList.remove("pop");void el.offsetWidth;el.classList.add("pop");}
+  function explode(x,y,c){
+    for(var i=0;i<14;i++){
+      var a=Math.random()*6.283,v=(1+Math.random()*3.4)*dpr;
+      boom.push({x:x,y:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:(1.5+Math.random()*2.6)*dpr,a:1,c:c});
+    }
+  }
+
+  function loop(now){
+    if(!running)return;
+    var el=now-t0;
+    ctx.clearRect(0,0,W,H);
+    backdrop(now);
+
+    speed=Math.min(3.4*dpr+el/17000*dpr,7.2*dpr);
+
+    // ---- spawning ----
+    var gap=Math.max(620-el/40,380);
+    if(now-lastSpawn>gap){
+      var f=FOOD[(Math.random()*FOOD.length)|0];
+      items.push({x:W+40*dpr,y:50*dpr+Math.random()*(H-150*dpr),r:18*dpr,e:f.e,n:f.n,p:f.p,bob:Math.random()*6});
+      lastSpawn=now;
+    }
+    if(el>6000 && now-lastUfo>Math.max(5200-el/26,2600)){
+      ufos.push({x:W+50*dpr,y:60*dpr+Math.random()*(H*0.6),r:22*dpr,
+        hover:Math.random()*6,fire:now+600+Math.random()*700,hp:1});
+      lastUfo=now;
+    }
+    if(el>10000 && now-lastRock>Math.max(3400-el/30,1500)){
+      rocks.push({x:Math.random()*W*0.85+W*0.25,y:-40*dpr,r:17*dpr,
+        vx:-(0.5+Math.random()*1.1)*dpr,vy:(2.2+Math.random()*1.8)*dpr,spin:0});
+      lastRock=now;
+    }
+    // auto-fire so it stays one-thumb
+    if(now-lastShot>270){ shots.push({x:plane.x+plane.r*1.4,y:plane.y,r:5*dpr}); lastShot=now; }
+
+    // ---- plane ----
+    applyKeys();
+    var dy=(plane.ty-plane.y)*0.18; plane.y+=dy;
+    var dx=(plane.tx-plane.x)*0.16; plane.x+=dx;
+    plane.tilt=Math.max(-0.4,Math.min(0.4,dy*0.02));
+    if(invuln>0)invuln--;
+
+    // ---- player shots ----
+    for(var i=shots.length-1;i>=0;i--){
+      var s=shots[i]; s.x+=13*dpr;
+      if(s.x>W+20*dpr){shots.splice(i,1);continue;}
+      ctx.fillStyle="#f0d375"; ctx.shadowColor="#f0d375"; ctx.shadowBlur=10*dpr;
+      ctx.beginPath();ctx.ellipse(s.x,s.y,s.r*1.7,s.r*0.62,0,0,6.283);ctx.fill();
+      ctx.shadowBlur=0;
+      var hit=false;
+      for(var u=ufos.length-1;u>=0;u--){
+        var uf=ufos[u];
+        if(Math.hypot(s.x-uf.x,s.y-uf.y)<uf.r){
+          explode(uf.x,uf.y,"126,247,200"); ufos.splice(u,1); shots.splice(i,1);
+          score+=250; $("score").textContent=score; toast("+250  UFO down"); hit=true; break;
+        }
+      }
+      if(hit)continue;
+      for(var k=rocks.length-1;k>=0;k--){
+        var rk=rocks[k];
+        if(Math.hypot(s.x-rk.x,s.y-rk.y)<rk.r){
+          explode(rk.x,rk.y,"190,160,120"); rocks.splice(k,1); shots.splice(i,1);
+          score+=60; $("score").textContent=score; break;
+        }
+      }
+    }
+
+    // ---- food ----
+    for(var i2=items.length-1;i2>=0;i2--){
+      var it=items[i2]; it.x-=speed; it.bob+=0.05;
+      var yy=it.y+Math.sin(it.bob)*4*dpr;
+      if(it.x<-50*dpr){items.splice(i2,1);continue;}
+      ctx.save();ctx.shadowColor="rgba(212,175,55,.9)";ctx.shadowBlur=15*dpr;
+      ctx.font=30*dpr+"px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.fillText(it.e,it.x,yy);ctx.restore();
+      if(Math.hypot(it.x-plane.x,yy-plane.y)<it.r+plane.r*0.75){
+        score+=it.p;$("score").textContent=score;toast("+"+it.p+"  "+it.n);items.splice(i2,1);
+      }
+    }
+
+    // ---- UFOs ----
+    for(var u2=ufos.length-1;u2>=0;u2--){
+      var uf2=ufos[u2];
+      uf2.x-=speed*0.55; uf2.hover+=0.05;
+      var uy=uf2.y+Math.sin(uf2.hover)*11*dpr;
+      if(uf2.x<-60*dpr){ufos.splice(u2,1);continue;}
+      drawUfo(uf2.x,uy,uf2.r,now);
+      if(now>uf2.fire && uf2.x<W-30*dpr){
+        var ang=Math.atan2(plane.y-uy,plane.x-uf2.x);
+        enemyShots.push({x:uf2.x,y:uy,vx:Math.cos(ang)*5.2*dpr,vy:Math.sin(ang)*5.2*dpr,r:6*dpr});
+        uf2.fire=now+2300+Math.random()*1500;
+      }
+      if(invuln<=0 && Math.hypot(uf2.x-plane.x,uy-plane.y)<uf2.r+plane.r*0.7){ hurt(uf2.x,uy); }
+    }
+
+    // ---- rocks ----
+    for(var r2=rocks.length-1;r2>=0;r2--){
+      var rk2=rocks[r2];
+      rk2.x+=rk2.vx-speed*0.34; rk2.y+=rk2.vy; rk2.spin+=0.05;
+      if(rk2.y>H+50*dpr||rk2.x<-50*dpr){rocks.splice(r2,1);continue;}
+      ctx.save();ctx.translate(rk2.x,rk2.y);ctx.rotate(rk2.spin);
+      ctx.font=32*dpr+"px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.fillText("🪨",0,0);ctx.restore();
+      if(invuln<=0 && Math.hypot(rk2.x-plane.x,rk2.y-plane.y)<rk2.r+plane.r*0.7){ hurt(rk2.x,rk2.y); }
+    }
+
+    // ---- enemy shots ----
+    for(var e2=enemyShots.length-1;e2>=0;e2--){
+      var es=enemyShots[e2]; es.x+=es.vx; es.y+=es.vy;
+      if(es.x<-30*dpr||es.y<-30*dpr||es.y>H+30*dpr){enemyShots.splice(e2,1);continue;}
+      ctx.fillStyle="#7ef7c8";ctx.shadowColor="#7ef7c8";ctx.shadowBlur=13*dpr;
+      ctx.beginPath();ctx.arc(es.x,es.y,es.r,0,6.283);ctx.fill();ctx.shadowBlur=0;
+      if(invuln<=0 && Math.hypot(es.x-plane.x,es.y-plane.y)<es.r+plane.r*0.66){
+        enemyShots.splice(e2,1); hurt(plane.x,plane.y);
+      }
+    }
+
+    // ---- debris ----
+    for(var b=boom.length-1;b>=0;b--){
+      var bp=boom[b]; bp.x+=bp.vx; bp.y+=bp.vy; bp.vy+=0.08*dpr; bp.a-=0.028;
+      if(bp.a<=0){boom.splice(b,1);continue;}
+      ctx.fillStyle="rgba("+bp.c+","+bp.a.toFixed(2)+")";
+      ctx.beginPath();ctx.arc(bp.x,bp.y,bp.r,0,6.283);ctx.fill();
+    }
+
+    // survival ticks
+    if(Math.floor(el/100)%2===0){score+=1;$("score").textContent=score;}
+    var runStars=starsFor(score);
+    if(runStars!==lastRunStars){
+      lastRunStars=runStars;
+      $("bankhud").innerHTML="⭐ "+state.stars.toLocaleString()+" &nbsp;·&nbsp; +"+runStars+" this run";
+      if(runStars>0) toast("⭐ "+runStars);
+    }
+    drawPlane();
+    raf=requestAnimationFrame(loop);
+  }
+
+  function hurt(x,y){
+    lives--; invuln=110; renderLives(); explode(x,y,"240,120,90");
+    toast(lives>0?"Hit!":"Grounded");
+    if(lives<=0) end();
+  }
+
+  function drawUfo(x,y,r,now){
+    ctx.save();ctx.translate(x,y);
+    var g=ctx.createRadialGradient(0,r*0.5,1,0,r*0.5,r*1.5);
+    g.addColorStop(0,"rgba(126,247,200,.30)");g.addColorStop(1,"rgba(126,247,200,0)");
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,r*0.5,r*1.5,0,6.283);ctx.fill();
+    ctx.fillStyle="#9fb6d4";
+    ctx.beginPath();ctx.ellipse(0,0,r,r*0.36,0,0,6.283);ctx.fill();
+    ctx.fillStyle="#7ef7c8";
+    ctx.beginPath();ctx.ellipse(0,-r*0.24,r*0.5,r*0.36,0,Math.PI,0);ctx.fill();
+    ctx.fillStyle="#2b3f5c";
+    for(var i=0;i<3;i++){
+      var lx=(i-1)*r*0.5, on=Math.floor(now/220+i)%3===0;
+      ctx.fillStyle=on?"#f0d375":"#2b3f5c";
+      ctx.beginPath();ctx.arc(lx,r*0.16,r*0.11,0,6.283);ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawPlane(){
+    var s=plane.r;
+    if(running&&Math.random()<0.75)
+      trail.push({x:plane.x-s*1.5,y:plane.y+(Math.random()-0.5)*s*0.4,r:s*0.3,a:0.32});
+    for(var i=trail.length-1;i>=0;i--){
+      var t=trail[i];t.x-=speed*0.85;t.r*=1.028;t.a-=0.012;
+      if(t.a<=0||t.x<-40*dpr){trail.splice(i,1);continue;}
+      ctx.fillStyle="rgba(226,232,245,"+t.a.toFixed(3)+")";
+      ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,6.283);ctx.fill();
+    }
+    ctx.save();ctx.translate(plane.x,plane.y);ctx.rotate(plane.tilt);
+    if(invuln>0&&Math.floor(invuln/6)%2===0)ctx.globalAlpha=0.4;
+    ctx.fillStyle="#8d6f21";
+    ctx.beginPath();ctx.moveTo(-s*0.05,-s*0.1);ctx.lineTo(-s*0.95,-s*0.78);
+    ctx.lineTo(-s*0.52,-s*0.8);ctx.lineTo(s*0.32,-s*0.06);ctx.closePath();ctx.fill();
+    ctx.fillStyle="#77242e";
+    ctx.beginPath();ctx.moveTo(-s*0.92,-s*0.12);ctx.lineTo(-s*1.3,-s*0.92);
+    ctx.lineTo(-s*0.98,-s*0.92);ctx.lineTo(-s*0.55,-s*0.14);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(-s*0.95,s*0.02);ctx.lineTo(-s*1.34,s*0.34);
+    ctx.lineTo(-s*0.92,s*0.3);ctx.closePath();ctx.fill();
+    var gr=ctx.createLinearGradient(0,-s*0.42,0,s*0.42);
+    gr.addColorStop(0,"#f7e6a8");gr.addColorStop(.5,"#f0d375");gr.addColorStop(1,"#c9a233");
+    ctx.fillStyle=gr;
+    ctx.beginPath();ctx.moveTo(s*1.48,0);
+    ctx.quadraticCurveTo(s*1.3,-s*0.34,s*0.55,-s*0.38);ctx.lineTo(-s*0.95,-s*0.3);
+    ctx.quadraticCurveTo(-s*1.32,-s*0.2,-s*1.32,0);
+    ctx.quadraticCurveTo(-s*1.32,s*0.2,-s*0.95,s*0.3);ctx.lineTo(s*0.55,s*0.38);
+    ctx.quadraticCurveTo(s*1.3,s*0.34,s*1.48,0);ctx.closePath();ctx.fill();
+    ctx.strokeStyle="#77242e";ctx.lineWidth=s*0.11;ctx.lineCap="round";
+    ctx.beginPath();ctx.moveTo(-s*1.05,s*0.06);ctx.lineTo(s*1.1,s*0.02);ctx.stroke();
+    ctx.fillStyle="rgba(11,18,32,.85)";
+    for(var w=0;w<5;w++){ctx.beginPath();ctx.arc(s*(0.72-w*0.36),-s*0.1,s*0.072,0,6.283);ctx.fill();}
+    ctx.fillStyle="#0b1220";
+    ctx.beginPath();ctx.moveTo(s*1.3,-s*0.1);ctx.quadraticCurveTo(s*1.16,-s*0.26,s*0.96,-s*0.24);
+    ctx.lineTo(s*0.98,-s*0.06);ctx.closePath();ctx.fill();
+    ctx.fillStyle="#d4af37";
+    ctx.beginPath();ctx.moveTo(s*0.2,s*0.1);ctx.lineTo(-s*0.72,s*0.96);
+    ctx.lineTo(-s*0.26,s*0.98);ctx.lineTo(s*0.46,s*0.16);ctx.closePath();ctx.fill();
+    ctx.fillStyle="#77242e";
+    ctx.beginPath();ctx.ellipse(-s*0.14,s*0.5,s*0.24,s*0.15,-0.28,0,6.283);ctx.fill();
+    ctx.restore();ctx.globalAlpha=1;
+  }
+
+  var boards=[], lastBoard=0;
+  function drawBillboards(now, base){
+    // A prize board rides past every few seconds so they always know what's up for grabs.
+    if(now-lastBoard > 4200){
+      var t = STAR_TIERS[(Math.random()*STAR_TIERS.length)|0];
+      boards.push({x:W+80*dpr, t:t});
+      lastBoard = now;
+    }
+    for(var i=boards.length-1;i>=0;i--){
+      var b=boards[i]; b.x -= speed*0.42;
+      if(b.x < -260*dpr){ boards.splice(i,1); continue; }
+      var bw=210*dpr, bh=54*dpr, by=base-150*dpr;
+      // posts
+      ctx.fillStyle="rgba(8,13,24,.9)";
+      ctx.fillRect(b.x+22*dpr, by+bh, 6*dpr, 96*dpr);
+      ctx.fillRect(b.x+bw-28*dpr, by+bh, 6*dpr, 96*dpr);
+      // panel
+      ctx.fillStyle="#101a2c";
+      ctx.strokeStyle="rgba(212,175,55,.75)"; ctx.lineWidth=2*dpr;
+      ctx.beginPath(); ctx.roundRect(b.x, by, bw, bh, 6*dpr); ctx.fill(); ctx.stroke();
+      ctx.textAlign="left"; ctx.textBaseline="middle";
+      ctx.fillStyle="#f0d375";
+      ctx.font="700 "+15*dpr+"px 'IBM Plex Mono',monospace";
+      ctx.fillText("⭐ "+b.t.stars, b.x+12*dpr, by+18*dpr);
+      ctx.fillStyle="#f6f1e4";
+      ctx.font="600 "+12*dpr+"px Barlow,sans-serif";
+      var label=b.t.name.length>26 ? b.t.name.slice(0,25)+"…" : b.t.name;
+      ctx.fillText(label, b.x+12*dpr, by+38*dpr);
+    }
+  }
+
+  function backdrop(now){
+    var g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,"#0b1120");g.addColorStop(.5,"#17223a");g.addColorStop(1,"#2a3557");
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    if(!stars){stars=[];for(var i=0;i<48;i++)stars.push({x:Math.random()*W,y:Math.random()*H*0.68,
+      r:(Math.random()*1.3+0.4)*dpr,s:Math.random()*0.6+0.2});}
+    sky=(sky+speed*0.06)%W;
+    ctx.fillStyle="rgba(255,255,255,.55)";
+    stars.forEach(function(st){var x=st.x-sky*st.s;if(x<0)x+=W;
+      ctx.globalAlpha=0.25+Math.abs(Math.sin(now/900+st.x))*0.4;
+      ctx.beginPath();ctx.arc(x,st.y,st.r,0,6.283);ctx.fill();});
+    ctx.globalAlpha=1;
+    var hg=ctx.createLinearGradient(0,H*0.72,0,H);
+    hg.addColorStop(0,"rgba(212,175,55,0)");hg.addColorStop(1,"rgba(212,175,55,.16)");
+    ctx.fillStyle=hg;ctx.fillRect(0,H*0.72,W,H*0.28);
+    groundX=(groundX-speed*0.42)%(W*0.5);
+    for(var pass=0;pass<3;pass++){
+      var ox=groundX+pass*W*0.5, base=H-40*dpr;
+      ctx.fillStyle="rgba(8,13,24,.85)";
+      [[0,26],[34,44],[70,20],[96,58],[130,32],[166,48],[200,24]].forEach(function(b){
+        ctx.fillRect(ox+b[0]*dpr*1.6,base-b[1]*dpr,26*dpr,b[1]*dpr);});
+      ctx.fillRect(ox+236*dpr*1.6,base-96*dpr,9*dpr,96*dpr);
+      ctx.beginPath();ctx.ellipse(ox+236*dpr*1.6+4.5*dpr,base-98*dpr,17*dpr,9*dpr,0,0,6.283);ctx.fill();
+      ctx.fillStyle="rgba(212,175,55,.55)";
+      ctx.beginPath();ctx.arc(ox+236*dpr*1.6+4.5*dpr,base-108*dpr,2.6*dpr,0,6.283);ctx.fill();
+    }
+    drawBillboards(now, H-40*dpr);
+    ctx.fillStyle="rgba(255,255,255,.045)";ctx.fillRect(0,H-40*dpr,W,40*dpr);
+    var rx=(groundX*3.2)%(78*dpr);
+    ctx.fillStyle="rgba(240,211,117,.6)";
+    for(var x2=rx;x2<W;x2+=78*dpr)ctx.fillRect(x2,H-22*dpr,30*dpr,3.5*dpr);
+  }
+
+
+  // ---------------- end of run ----------------
+  function end(){
+    running=false; cancelAnimationFrame(raf);
+    var earned=starsFor(score);
+    state.stars+=earned;
+    var wk=weekKey(), me=state.me;
+    var mine=state.board.filter(function(b){return b.week===wk&&b.name===me;})[0];
+    if(mine){ if(score>mine.score) mine.score=score; }
+    else state.board.push({week:wk,name:me,score:score});
+    state.board=state.board.filter(function(b){return b.week===wk;})
+      .sort(function(a,b){return b.score-a.score;}).slice(0,50);
+    persist();
+    $("final").textContent=score.toLocaleString()+" pts";
+    $("runstars").textContent="+"+earned+" \u2b50";
+    $("best").textContent="Star balance: "+state.stars.toLocaleString()+" \u2b50";
+    var rank=state.board.findIndex(function(b){return b.name===me&&b.score===score;});
+    $("rank-line").textContent = rank===0?"You're #1 this week"
+      : rank>0?"You're #"+(rank+1)+" this week":"Flight complete";
+    $("gameover").classList.add("on");
+  }
+  function startGame(){ $("gameover").classList.remove("on"); start(); }
+  $("again").addEventListener("click",startGame);
+  $("toRewards").addEventListener("click",function(){ $("gameover").classList.remove("on"); go("s-rewards"); });
+
+  renderMenu(); renderBadge(); renderCart(); renderRewards(); renderShop(); renderBoard();
+})();
+</script>
+
+</body></html>

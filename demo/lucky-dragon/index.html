@@ -183,7 +183,7 @@ var CONFIG = {
   game: {
     title: "🍤 Hibachi Catch",
     // good = what belongs in the rice bowl (all drawn to match the real Lucky Dragon dishes)
-    good: [{t:"chicken"},{t:"steak"},{t:"shrimp"},{t:"lobster"},{t:"veg"},{t:"chowmein"},{t:"rice"}],
+    good: [{t:"chicken"},{t:"steak"},{t:"shrimp"},{t:"lobster"},{t:"veg"},{t:"chowmein"},{t:"rice"},{t:"drinkdark"},{t:"drinkyellow"}],
     star: "⭐",                                // +50, rare
     // bad = stuff that does NOT go in the bowl — catch one, lose 20
     bad: [{t:"flame",e:"🔥"},{t:"candy",e:"🍭"},{t:"ice",e:"🧊"}],
@@ -348,6 +348,21 @@ var CONFIG = {
     ["#453022","#2B1D12"]    // 3 hits — burnt. food's cooked.
   ];
   var burns=0;
+  function drawBottle(x,y,liq){                        // house drink: glass bottle + liquid + Lucky Dragon label
+    cx.save(); cx.translate(x,y);
+    cx.fillStyle="#2b2b2b"; rr(-5,-21,10,6,2); cx.fill();                 // cap
+    cx.fillStyle="rgba(150,180,188,.5)"; rr(-4,-16,8,6,2); cx.fill();     // neck
+    cx.fillStyle="rgba(180,200,205,.22)"; rr(-9,-13,18,31,7); cx.fill();  // glass body
+    cx.save(); rr(-8,-7,16,24,6); cx.clip(); cx.fillStyle=liq; cx.fillRect(-9,-7,18,26); cx.restore(); // liquid
+    cx.strokeStyle="rgba(255,255,255,.35)"; cx.lineWidth=1.3; rr(-9,-13,18,31,7); cx.stroke();
+    cx.fillStyle="rgba(255,255,255,.28)"; rr(-6,-10,3,24,2); cx.fill();   // vertical glass shine
+    cx.fillStyle="#fff"; rr(-7,1,14,12,2); cx.fill();                     // white label
+    cx.strokeStyle="#d1382b"; cx.lineWidth=1; rr(-7,1,14,12,2); cx.stroke();
+    cx.font="9px serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText("🐉",0,7); cx.textBaseline="alphabetic";
+    cx.restore();
+  }
+  function drawDrinkDark(x,y){ drawBottle(x,y,"#3a0f16"); }               // dark house tea / punch
+  function drawDrinkYellow(x,y){ drawBottle(x,y,"#E6D24A"); }             // lemonade / pineapple
   function well(wx,wy,ww,wh){                          // one recessed compartment of the tray
     cx.fillStyle="#0b0b0b"; rr(wx,wy,ww,wh,5); cx.fill();
     cx.strokeStyle="rgba(255,255,255,.07)"; cx.lineWidth=1; rr(wx,wy,ww,wh,5); cx.stroke();
@@ -393,6 +408,8 @@ var CONFIG = {
     else if(t==="veg") drawVeg(d.x,d.y);
     else if(t==="chowmein") drawChowMein(d.x,d.y);
     else if(t==="rice") drawRice(d.x,d.y);
+    else if(t==="drinkdark") drawDrinkDark(d.x,d.y);
+    else if(t==="drinkyellow") drawDrinkYellow(d.x,d.y);
     else { cx.font="34px serif"; cx.textAlign="center"; cx.fillText(d.e.e||d.e, d.x, d.y+12); }
   }
   function drawIdle(){

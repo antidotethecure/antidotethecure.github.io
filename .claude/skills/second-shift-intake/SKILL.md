@@ -39,7 +39,16 @@ This matters because where the session runs changes what you can pull:
 
 ---
 
-## The run — six phases
+## The run — phases
+
+### 0. Intake conversation (ask first, then run)
+When Antidote messages you to run a pitch, start by asking — one short message, these first:
+1. **What's the name of the business?**
+2. **What type of business / cuisine is it?** (hibachi, tacos, burritos, pizza, BBQ, coffee,
+   barbershop, car wash, gym, …)
+3. (Optional) **Any link or city?** — Instagram, website, Google Maps.
+As soon as you have the name and type, start the run — don't wait on the optional link.
+The **type/cuisine drives the themed game** (see "Cuisine-themed games" below), so pin it down.
 
 ### 1. Identify & gather
 - Confirm the business name, vertical (restaurant, barbershop, car wash, gym, …), and city.
@@ -97,8 +106,27 @@ Clone the proven template and rebrand it — do NOT rebuild from scratch:
      transparent cutouts.
   5. Wire them into the game via the `SPRITE_FILES` map with the drawn-canvas art kept as
      automatic fallback, so nothing breaks if an image fails to load.
-- Keep the game mechanics (falling food, catcher tray, dragon/mascot hazard, directional
-  smoke, scoring key, burn stages) — just reskin food, tray, mascot, and brand.
+- **3D menu with real item photos:** generate a photoreal image for EACH menu item (the
+  recraft/remove-background pipeline) and show them on the menu cards/plates, not just text.
+  Every headline dish gets its own picture.
+- **Cuisine-themed game (required):** pick the themed mini-game that matches the business type
+  (see "Cuisine-themed games" below) and reskin the proven mechanic to it — themed falling
+  items, themed catcher, themed mascot/hazard, themed scoring key. The game must read as
+  *that cuisine's* game (hibachi → grilled items into a tray; tacos → catch the fillings;
+  burritos → build/stack; pizza → catch toppings; etc.). Build **original** games and art only
+  — never copy a branded or well-known game or character.
+- Keep the engine (falling items, catcher, mascot hazard, directional smoke, scoring key,
+  burn/combo stages) — reskin food, catcher, mascot, and brand to the cuisine.
+
+### 5b. Retention demo (required in every pitch)
+Every build includes a short **"Bring customers back"** section on the demo page that SHOWS the
+win-back system, so the owner sees it, not just hears it:
+- A sample **automated text** ("We miss you — 15% off your next hibachi this week 🔥"),
+- A sample **win-back email** (branded subject + body),
+- The **AI phone agent** line ("answers & takes orders 24/7"),
+- One line each on how it triggers (lapsed customer, birthday, slow day).
+Label it clearly as a demo of the connected system (goes live on signing). No revenue promises —
+show the mechanism, not a number.
 - Watch Higgsfield credits (`balance`); each generation + bg-removal spends them.
 
 ### 6. Deliver
@@ -111,6 +139,23 @@ Clone the proven template and rebrand it — do NOT rebuild from scratch:
   message, the demo link, the offer) — not a menu of options.
 
 ---
+
+## Cuisine-themed games (pick an original one, reskin the engine)
+Match the game to the business type. These are **original** themed games — never clone a
+branded or well-known game/character. Same proven engine (catch / match / stack), new theme:
+- **Hibachi / teppanyaki** → *Hibachi Catch*: grilled chicken/steak/shrimp/veg fall into the
+  takeout tray; dodge the flame; mascot dragon torches the plate.
+- **Tacos / Mexican** → *Taco Catch* or *Loco Match*: catch falling fillings into the shell /
+  match-3 of ingredients; dodge the ghost pepper.
+- **Burritos** → *Burrito Build*: stack the right ingredients as they fall; drop the wrong one and lose.
+- **Pizza** → *Topping Drop*: catch toppings onto the pie; dodge the burnt slice.
+- **Burgers** → *Burger Stack*: stack patty/cheese/veg in order.
+- **BBQ / wings** → *Grill Master*: catch the racks; dodge the flare-up.
+- **Sushi** → *Roll Rush*: catch the fish/rice; dodge the wasabi bomb.
+- **Coffee / dessert** → *Bean Drop* / *Sweet Catch*.
+- **Barbershop** → *Fresh Cut* timing game. **Car wash** → *Suds Rush*. **Gym** → *Rep Counter*.
+- Anything else → invent an original themed catch/match that fits the product.
+Theme the falling items, the catcher, the mascot/hazard, the scoring key, and the colors to the brand.
 
 ## Output format for the breakdown (what Antidote sends the business)
 1. **Snapshot** — who they are, where they are, vertical, verified contact/socials.

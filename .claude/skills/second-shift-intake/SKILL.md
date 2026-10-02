@@ -129,6 +129,16 @@ Label it clearly as a demo of the connected system (goes live on signing). No re
 show the mechanism, not a number.
 - Watch Higgsfield credits (`balance`); each generation + bg-removal spends them.
 
+### 5c. Agreement section (required in every demo)
+Every demo page must include the on-the-spot agreement builder, right before `</body>` and
+after the CONFIG script: `<script src="../contract.js"></script>`.
+It adds a "Draft the agreement" button that reads the page's CONFIG (name, address), pre-fills
+the founding-partner deal ($2,000 setup / $300 mo, 25% off both, discount for 6 months,
+50% at signing, 3-month minimum), lets the owner and Antidote sign on screen, and saves the PDF.
+Nothing is uploaded. `demo/<slug>/#contract` opens it directly. Add a matching
+"DRAFT THE AGREEMENT" button under the client's card in `demo/index.html`.
+The wording mirrors `~/plugin/skills/second-shift-contract/template.html`; change both together.
+
 ### 6. Deliver
 - Put the research + gap report + cost estimate in a **doc** (Claude Docs connector) or a
   markdown file in the repo under the client folder — whichever Antidote wants to send.

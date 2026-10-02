@@ -39,6 +39,7 @@ header{text-align:center;padding-block:14px 10px}
 .sign .rays{position:absolute;inset:0;pointer-events:none;opacity:.32;
   background:repeating-conic-gradient(from 210deg at 16% 6%, rgba(255,205,120,.5) 0deg 3deg, transparent 3deg 12deg)}
 .sign .dragon-emoji{font-size:58px;line-height:1;text-align:center;filter:drop-shadow(0 4px 10px rgba(0,0,0,.6));position:relative;z-index:2}
+.sign .dragon-emoji-img{height:104px;display:block;margin:0 auto 2px;filter:drop-shadow(0 5px 14px rgba(0,0,0,.6));position:relative;z-index:2}
 .sign .titlewrap{position:relative;z-index:2}
 .sign .logo{display:block;max-width:94%;margin:4px auto 2px;filter:drop-shadow(0 6px 16px rgba(0,0,0,.6));position:relative;z-index:3}
 .sign .wave{position:absolute;left:0;right:0;bottom:-2px;height:46px;width:100%;opacity:.9;pointer-events:none}
@@ -120,7 +121,7 @@ footer a{color:var(--ink)}
          onload="var p=document.getElementById('placeholder');if(p)p.style.display='none'"
          onerror="this.remove()">
     <div class="titlewrap" id="placeholder">
-      <div class="dragon-emoji">🐉</div>
+      <img class="dragon-emoji-img" alt="Lucky Dragon" src="https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/hf_20261002_031804_d62d6cf2-b468-476f-a901-5f927b79105f.png" onerror="this.outerHTML='<div class=&quot;dragon-emoji&quot;>🐉</div>'">
       <h1><span class="brandword">Lucky Dragon</span><span class="brandword big">Hibachi</span></h1>
     </div>
     <p class="tag" id="biztag"></p>
@@ -259,6 +260,22 @@ var CONFIG = {
   var cv=$("game"), cx=cv.getContext("2d"), W=cv.width, H=cv.height;
   var running=false, score=0, combo=0, tLeft=CONFIG.game.seconds, drops=[], bowlX=W/2, last=0, spawnAcc=0, timerAcc=0;
   var smoke=[], bowlVX=0, bowlPT=0;                   // smoke particles + bowl swipe velocity (px/ms)
+  // ---- photoreal sprites (generated cutouts); each falls back to drawn art until it loads ----
+  var SPRITE_BASE="https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/";
+  var SPRITE_FILES={
+    chicken:"hf_20261002_031743_25030a14-96cb-49a9-829b-55e1e5f1750b.png",
+    steak:"hf_20261002_031755_235ef5af-6cff-4fb5-825e-80b37b3520b3.png",
+    shrimp:"hf_20261002_031757_00baef18-1d20-487e-a61d-e4e51101bffe.png",
+    lobster:"hf_20261002_031758_a6a00371-7c6b-4669-b7df-adee4a2d442b.png",
+    veg:"hf_20261002_031800_2c7ee5ef-96a3-440b-ae81-be85a12ed946.png",
+    chowmein:"hf_20261002_031801_3f2acbdd-5722-4ced-925c-746173485b5f.png",
+    rice:"hf_20261002_031802_3701bc40-983b-4c5d-8c2c-a372264e8009.png",
+    dragon:"hf_20261002_031805_9126ac53-431c-40de-b80a-0b0f25000074.png",
+    tray:"hf_20261002_031836_4b147d9b-e898-4605-b387-56afa3d67bd3.png"
+  };
+  var SPR={};
+  for(var _k in SPRITE_FILES){ (function(key){ var im=new Image(); im.onload=function(){ SPR[key]=im; }; im.src=SPRITE_BASE+SPRITE_FILES[key]; })(_k); }
+  function sprite(key,x,y,size){ var im=SPR[key]; if(!im) return false; var s=size/Math.max(im.width,im.height); cx.drawImage(im,x-im.width*s/2,y-im.height*s/2,im.width*s,im.height*s); return true; }
 
   function rr(x,y,w,h,r){ // rounded rect path
     cx.beginPath();
@@ -382,6 +399,12 @@ var CONFIG = {
     cx.strokeStyle="rgba(255,255,255,.07)"; cx.lineWidth=1; rr(wx,wy,ww,wh,5); cx.stroke();
   }
   function drawBowl(x){
+    if(SPR.tray){                                     // photoreal tray cutout
+      var im=SPR.tray, w=130, s=w/im.width, h=im.height*s, ty=H-6-h;
+      cx.drawImage(im,x-w/2,ty,w,h);
+      if(burns>0){ cx.save(); cx.globalAlpha=Math.min(0.6,0.2*burns); cx.fillStyle="#140a04"; cx.fillRect(x-w/2,ty,w,h); cx.restore(); } // chars as it burns
+      return;
+    }
     var rice=RICE[Math.min(burns,3)];
     // ---- black 3-compartment takeout tray with depth (matches the real containers) ----
     var pw=122, ph=50, px=x-pw/2, py=H-60, gap=5, wall=11;
@@ -415,13 +438,13 @@ var CONFIG = {
   }
   function drawDrop(d){
     var t=d.e&&d.e.t;
-    if(t==="chicken") drawChicken(d.x,d.y);
-    else if(t==="steak") drawSteak(d.x,d.y);
-    else if(t==="shrimp") drawShrimp(d.x,d.y);
-    else if(t==="lobster") drawLobster(d.x,d.y);
-    else if(t==="veg") drawVeg(d.x,d.y);
-    else if(t==="chowmein") drawChowMein(d.x,d.y);
-    else if(t==="rice") drawRice(d.x,d.y);
+    if(t==="chicken"){ if(!sprite("chicken",d.x,d.y,48)) drawChicken(d.x,d.y); }
+    else if(t==="steak"){ if(!sprite("steak",d.x,d.y,48)) drawSteak(d.x,d.y); }
+    else if(t==="shrimp"){ if(!sprite("shrimp",d.x,d.y,50)) drawShrimp(d.x,d.y); }
+    else if(t==="lobster"){ if(!sprite("lobster",d.x,d.y,52)) drawLobster(d.x,d.y); }
+    else if(t==="veg"){ if(!sprite("veg",d.x,d.y,48)) drawVeg(d.x,d.y); }
+    else if(t==="chowmein"){ if(!sprite("chowmein",d.x,d.y,50)) drawChowMein(d.x,d.y); }
+    else if(t==="rice"){ if(!sprite("rice",d.x,d.y,48)) drawRice(d.x,d.y); }
     else if(t==="drinkdark") drawDrinkDark(d.x,d.y);
     else if(t==="drinkyellow") drawDrinkYellow(d.x,d.y);
     else { cx.font="34px serif"; cx.textAlign="center"; cx.fillText(d.e.e||d.e, d.x, d.y+12); }
@@ -459,7 +482,9 @@ var CONFIG = {
   }
   function dragonDraw(){
     cx.save(); cx.translate(drg.x,drg.y); cx.scale(drg.dir<0?1:-1,1);
-    cx.font="40px serif"; cx.textAlign="center"; cx.fillText("🐉",0,12); cx.restore();
+    if(SPR.dragon){ var im=SPR.dragon, s=60/Math.max(im.width,im.height); cx.drawImage(im,-im.width*s/2,-im.height*s/2,im.width*s,im.height*s); }
+    else { cx.font="40px serif"; cx.textAlign="center"; cx.fillText("🐉",0,12); }
+    cx.restore();
     if(drg.mode==="aim"){                               // telegraph: faint heat line
       cx.strokeStyle="rgba(230,72,61,.35)"; cx.lineWidth=3; cx.setLineDash([6,8]);
       cx.beginPath(); cx.moveTo(drg.x,drg.y+16); cx.lineTo(drg.x,H-30); cx.stroke(); cx.setLineDash([]);

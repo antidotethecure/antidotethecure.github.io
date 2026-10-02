@@ -40,6 +40,7 @@ header{text-align:center;padding-block:14px 10px}
   background:repeating-conic-gradient(from 210deg at 16% 6%, rgba(255,205,120,.5) 0deg 3deg, transparent 3deg 12deg)}
 .sign .dragon-emoji{font-size:58px;line-height:1;text-align:center;filter:drop-shadow(0 4px 10px rgba(0,0,0,.6));position:relative;z-index:2}
 .sign .titlewrap{position:relative;z-index:2}
+.sign .logo{display:block;max-width:94%;margin:4px auto 2px;filter:drop-shadow(0 6px 16px rgba(0,0,0,.6));position:relative;z-index:3}
 .sign .wave{position:absolute;left:0;right:0;bottom:-2px;height:46px;width:100%;opacity:.9;pointer-events:none}
 .sign .leaf{position:absolute;color:#d1382b;opacity:.85;font-size:18px;pointer-events:none}
 h1{font-family:"Cinzel",Georgia,serif;font-weight:900;font-size:clamp(30px,9vw,46px);line-height:.98;margin:2px 0 4px;letter-spacing:.01em;
@@ -113,8 +114,15 @@ footer a{color:var(--ink)}
     <span class="leaf" style="top:14px;right:16px">🍁</span>
     <span class="leaf" style="top:64px;right:40px;font-size:14px">🍁</span>
     <span class="leaf" style="bottom:40px;left:18px;font-size:15px">🍁</span>
-    <div class="dragon-emoji">🐉</div>
-    <div class="titlewrap"><h1><span class="brandword">Lucky Dragon</span><span class="brandword big">Hibachi</span></h1></div>
+    <!-- Drop the restaurant's real logo at img/logo.png (dragon + wordmark together);
+         it replaces the placeholder below automatically. -->
+    <img class="logo" id="logo" src="img/logo.png" alt="Lucky Dragon Hibachi"
+         onload="var p=document.getElementById('placeholder');if(p)p.style.display='none'"
+         onerror="this.remove()">
+    <div class="titlewrap" id="placeholder">
+      <div class="dragon-emoji">🐉</div>
+      <h1><span class="brandword">Lucky Dragon</span><span class="brandword big">Hibachi</span></h1>
+    </div>
     <p class="tag" id="biztag"></p>
     <svg class="wave" viewBox="0 0 560 46" preserveAspectRatio="none" aria-hidden="true">
       <path fill="rgba(42,110,170,.55)" d="M0 30 C60 10 110 46 170 30 C230 14 280 46 340 30 C400 14 460 46 520 30 C545 24 560 30 560 30 L560 46 L0 46 Z"/>
@@ -249,6 +257,7 @@ var CONFIG = {
   /* ---- the game: slide the rice bowl, catch what belongs in it ---- */
   var cv=$("game"), cx=cv.getContext("2d"), W=cv.width, H=cv.height;
   var running=false, score=0, combo=0, tLeft=CONFIG.game.seconds, drops=[], bowlX=W/2, last=0, spawnAcc=0, timerAcc=0;
+  var smoke=[], bowlVX=0, bowlPT=0;                   // smoke particles + bowl swipe velocity (px/ms)
 
   function rr(x,y,w,h,r){ // rounded rect path
     cx.beginPath();
@@ -340,11 +349,7 @@ var CONFIG = {
       cx.fillRect(x-14,by-14,4,3); cx.fillRect(x+10,by-20,4,3);
       if(burns>=2){ cx.fillRect(x-2,by-12,5,3); cx.fillRect(x-26,by-10,4,3); cx.fillRect(x+20,by-12,4,3); }
     }
-    if(burns>=1 && running){ // smoke wisps rising off the rice
-      cx.fillStyle="rgba(200,200,200,"+(0.10+0.09*burns)+")";
-      var w1=Math.sin(performance.now()/300)*5;
-      cx.beginPath(); cx.arc(x-10+w1,by-34,5+burns,0,Math.PI*2); cx.arc(x+8-w1,by-46,4+burns,0,Math.PI*2); cx.fill();
-    }
+    // (smoke now rises as a particle system — see smokeStep/smokeDraw)
     // the bowl itself — lacquer red with a gold band
     cx.fillStyle="#B4322A";
     cx.beginPath(); cx.ellipse(x,by-4,46,10,0,0,Math.PI*2); cx.fill();
@@ -412,7 +417,7 @@ var CONFIG = {
       cx.font="26px serif"; cx.textAlign="center";
       cx.fillText("🔥", drg.x-12+Math.random()*24, H-30-Math.random()*30);
       if(!drg.burned && Math.abs(bowlX-drg.x)<48){      // plate torched — rice crisps a stage
-        drg.burned=true; burns++; score=Math.max(0,score-30); combo=0; flash="#E6483D";
+        drg.burned=true; burns++; score=Math.max(0,score-30); combo=0; flash="#E6483D"; puffEmit(16);
         $("score").textContent=score;
         if(burns>=3){ end(true); return; }
         $("gmsg").innerHTML = burns===1
@@ -421,9 +426,45 @@ var CONFIG = {
       }
     }
   }
+  /* ---- realistic smoke: soft particles that drift the way you swipe ---- */
+  function puffEmit(n){
+    if(smoke.length>95) return;
+    for(var i=0;i<n;i++){
+      smoke.push({
+        x:bowlX+(Math.random()*26-13), y:H-54,
+        vx:bowlVX*0.55 + (Math.random()*0.03-0.015),  // seeded by the bowl's swipe direction
+        vy:-(0.035+Math.random()*0.03),               // rising
+        r:5+Math.random()*4, a:0, amax:0.16+0.09*Math.min(burns,3),
+        life:0, ttl:1100+Math.random()*800, seed:Math.random()*6.28
+      });
+    }
+  }
+  function smokeStep(dt){
+    if(running && burns>=1 && Math.random()<0.6) puffEmit(1+(burns>=2?1:0));
+    for(var i=smoke.length-1;i>=0;i--){
+      var s=smoke[i]; s.life+=dt; var k=s.life/s.ttl;
+      s.x+=(s.vx*dt)+Math.sin(s.seed+s.life/260)*0.25*(dt/16); // gentle turbulence curl
+      s.y+=s.vy*dt;
+      s.vx*=Math.pow(0.96,dt/16);                     // sideways push eases off, smoke straightens as it rises
+      s.r+=0.02*dt;                                   // expands going up
+      s.a = k<0.25 ? s.amax*(k/0.25) : s.amax*(1-(k-0.25)/0.75); // fade in, then out
+      if(s.life>=s.ttl || s.y<-12) smoke.splice(i,1);
+    }
+  }
+  function smokeDraw(){
+    var tone = burns>=3?"84,82,80" : burns>=2?"120,116,110" : "190,188,184";
+    for(var i=0;i<smoke.length;i++){
+      var s=smoke[i]; if(s.a<=0) continue;
+      var g=cx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r);
+      g.addColorStop(0,"rgba("+tone+","+s.a.toFixed(3)+")");
+      g.addColorStop(1,"rgba("+tone+",0)");
+      cx.fillStyle=g; cx.beginPath(); cx.arc(s.x,s.y,s.r,0,6.283); cx.fill();
+    }
+  }
   function step(ts){
     if(!running) return;
     var dt=Math.min(40, ts-last); last=ts;
+    bowlVX*=Math.pow(0.9,dt/16);                      // decay swipe velocity when the finger stops
     spawnAcc+=dt; timerAcc+=dt;
     if(spawnAcc>420){ spawn(); spawnAcc=0; }
     if(timerAcc>1000){ tLeft--; timerAcc=0; $("timer").textContent=tLeft; if(tLeft<=0){ end(); return; } }
@@ -442,11 +483,12 @@ var CONFIG = {
     if(CONFIG.game.dragon){ dragonStep(dt); dragonDraw(); }
     if(flash){ cx.strokeStyle=flash; cx.lineWidth=5; cx.strokeRect(2,2,W-4,H-4); flash=null; }
     drawBowl(bowlX);
+    smokeStep(dt); smokeDraw();                        // smoke rises off the bowl, drifting with the swipe
     requestAnimationFrame(step);
   }
   var flash=null;
   function start(){
-    running=true; score=0; combo=0; tLeft=CONFIG.game.seconds; drops=[]; last=performance.now(); spawnAcc=0; timerAcc=0; flash=null;
+    running=true; score=0; combo=0; tLeft=CONFIG.game.seconds; drops=[]; smoke=[]; bowlVX=0; last=performance.now(); spawnAcc=0; timerAcc=0; flash=null;
     $("score").textContent=0; $("timer").textContent=tLeft; $("final").hidden=true;
     drg={x:W/2, dir:1, mode:"patrol", t:0, y:44, burned:false}; burns=0;
     $("gmsg").innerHTML="Catch the hibachi — dodge 🔥 🍭 🧊 (<b>-20</b>). <b>3 dragon hits burns the rice</b> and the run is over!";
@@ -472,7 +514,10 @@ var CONFIG = {
   function pointer(e){
     var r=cv.getBoundingClientRect();
     var x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
-    bowlX=Math.max(30,Math.min(W-30, x/r.width*W));
+    var nx=Math.max(30,Math.min(W-30, x/r.width*W));
+    var now=performance.now(), dtp=now-bowlPT;
+    if(dtp>0 && dtp<200){ bowlVX=(nx-bowlX)/dtp; }   // swipe velocity drives the smoke sideways
+    bowlPT=now; bowlX=nx;
   }
   cv.addEventListener("pointerdown",function(e){ pointer(e); if(!running) start(); });
   cv.addEventListener("pointermove",pointer);

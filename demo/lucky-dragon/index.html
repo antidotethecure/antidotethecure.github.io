@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Lucky Dragon Hibachi — Menu & Game</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Cinzel:wght@700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
 <style>
 /* ============================================================
    SECOND SHIFT AI — DROP KIT: Digital Menu + Reward Game
@@ -25,18 +26,43 @@
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:"Archivo",system-ui,sans-serif;font-size:16px;line-height:1.5;padding-inline:16px;padding-block:env(safe-area-inset-top,0px) calc(56px + env(safe-area-inset-bottom,0px))}
 .wrap{max-width:560px;margin:0 auto}
-header{text-align:center;padding-block:30px 10px}
+header{text-align:center;padding-block:14px 10px}
 .crest{font-size:46px;line-height:1}
-h1{font-weight:900;font-size:clamp(28px,8vw,38px);margin:6px 0 2px;letter-spacing:-.01em}
-.tag{color:var(--gold);font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;margin:0}
+/* ---- brand sign banner, echoing the storefront ---- */
+.sign{position:relative;overflow:hidden;border-radius:18px;margin-top:10px;padding:20px 16px 18px;
+  background:
+    radial-gradient(85% 55% at 50% 66%, rgba(0,0,0,.5) 0%, rgba(0,0,0,.2) 45%, transparent 72%),
+    radial-gradient(130% 90% at 18% 8%, rgba(255,150,40,.55) 0%, rgba(255,110,30,.18) 32%, transparent 55%),
+    radial-gradient(120% 120% at 88% 98%, rgba(40,110,170,.45) 0%, rgba(20,60,110,.15) 40%, transparent 62%),
+    linear-gradient(180deg,#7d1a16 0%,#4a0f0d 60%,#2a0807 100%);
+  border:2px solid rgba(255,200,46,.55);box-shadow:0 14px 40px rgba(0,0,0,.5),inset 0 0 40px rgba(0,0,0,.35)}
+.sign .rays{position:absolute;inset:0;pointer-events:none;opacity:.32;
+  background:repeating-conic-gradient(from 210deg at 16% 6%, rgba(255,205,120,.5) 0deg 3deg, transparent 3deg 12deg)}
+.sign .dragon-emoji{font-size:58px;line-height:1;text-align:center;filter:drop-shadow(0 4px 10px rgba(0,0,0,.6));position:relative;z-index:2}
+.sign .titlewrap{position:relative;z-index:2}
+.sign .wave{position:absolute;left:0;right:0;bottom:-2px;height:46px;width:100%;opacity:.9;pointer-events:none}
+.sign .leaf{position:absolute;color:#d1382b;opacity:.85;font-size:18px;pointer-events:none}
+h1{font-family:"Cinzel",Georgia,serif;font-weight:900;font-size:clamp(30px,9vw,46px);line-height:.98;margin:2px 0 4px;letter-spacing:.01em;
+  background:linear-gradient(180deg,#fff2c2 0%,#ffd24a 34%,#f2a81e 60%,#c87714 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:1px #6e130f;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.65)) drop-shadow(0 0 14px rgba(255,160,50,.4))}
+.brandword{display:block}
+.brandword.big{font-size:1.28em}
+.tag{color:var(--gold);font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;margin:4px 0 0}
+.handle{display:inline-flex;align-items:center;gap:6px;color:#ffdf8a;font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.1em;text-decoration:none;margin-top:8px}
+.handle b{color:#fff;font-weight:700}
 .demo-ribbon{display:inline-block;margin-top:12px;background:var(--card);border:1px dashed var(--gold);border-radius:99px;padding:5px 14px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--gold);letter-spacing:.08em}
 
 .cta{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
 .btn{background:var(--accent);color:#fff;border:0;border-radius:12px;padding:13px 22px;font-weight:900;font-size:15px;font-family:inherit;text-decoration:none;cursor:pointer}
 .btn.ghost{background:transparent;border:1px solid var(--edge);color:var(--ink)}
 
-h2{font-weight:900;font-size:15px;margin:30px 0 10px;color:var(--gold);font-family:"IBM Plex Mono",monospace;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
-h2::after{content:"";flex:1;height:1px;background:var(--edge)}
+h2{font-weight:900;font-size:19px;margin:30px 0 10px;font-family:"Cinzel",Georgia,serif;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:10px;
+  background:linear-gradient(180deg,#ffe9a8 0%,#ffcf52 55%,#e8971a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:.6px #5c1210}
+h2::before{content:"";width:16px;height:2px;background:var(--accent);flex:0 0 auto}
+h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--accent),transparent)}
 .menu{display:grid;gap:8px}
 .item{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:12px 15px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
 .item .nm{font-weight:700}
@@ -82,10 +108,21 @@ footer a{color:var(--ink)}
 <div class="wrap">
 
 <header>
-  <div class="crest" id="crest"></div>
-  <h1 id="bizname"></h1>
-  <p class="tag" id="biztag"></p>
-  <span class="demo-ribbon">DEMO by Second Shift AI — your real menu loads in minutes</span>
+  <div class="sign">
+    <div class="rays"></div>
+    <span class="leaf" style="top:14px;right:16px">🍁</span>
+    <span class="leaf" style="top:64px;right:40px;font-size:14px">🍁</span>
+    <span class="leaf" style="bottom:40px;left:18px;font-size:15px">🍁</span>
+    <div class="dragon-emoji">🐉</div>
+    <div class="titlewrap"><h1><span class="brandword">Lucky Dragon</span><span class="brandword big">Hibachi</span></h1></div>
+    <p class="tag" id="biztag"></p>
+    <svg class="wave" viewBox="0 0 560 46" preserveAspectRatio="none" aria-hidden="true">
+      <path fill="rgba(42,110,170,.55)" d="M0 30 C60 10 110 46 170 30 C230 14 280 46 340 30 C400 14 460 46 520 30 C545 24 560 30 560 30 L560 46 L0 46 Z"/>
+      <path fill="none" stroke="#eaf4ff" stroke-width="2" opacity=".7" d="M0 30 C60 10 110 46 170 30 C230 14 280 46 340 30 C400 14 460 46 520 30"/>
+    </svg>
+  </div>
+  <a class="handle" href="https://instagram.com/luckydragon360" target="_blank" rel="noopener">📸 <b>@luckydragon360</b></a>
+  <div><span class="demo-ribbon">DEMO by Second Shift AI — your real menu loads in minutes</span></div>
   <div class="cta">
     <a class="btn" id="callbtn" href="#">📞 Call to order</a>
     <a class="btn ghost" id="mapbtn" href="#" target="_blank" rel="noopener">📍 Directions</a>
@@ -133,7 +170,7 @@ var CONFIG = {
   name: "Lucky Dragon Hibachi",
   tagline: "Compton, California",
   crest: "🐉",
-  phone: "",                                  // fill with the restaurant's real number when live
+  phone: "562-564-9200",                      // real number from the storefront banner
   maps: "https://www.google.com/maps/search/Lucky+Dragon+Hibachi+Compton+CA",
   game: {
     title: "🍤 Hibachi Catch",
@@ -174,7 +211,7 @@ var CONFIG = {
 (function(){
   var $=function(id){return document.getElementById(id);};
   document.title = CONFIG.name + " — Menu & Game";
-  $("crest").textContent=CONFIG.crest; $("bizname").textContent=CONFIG.name; $("biztag").textContent=CONFIG.tagline;
+  $("biztag").textContent=CONFIG.tagline;
   $("gametitle").textContent=CONFIG.game.title;
   if(CONFIG.phone){ $("callbtn").href="tel:"+CONFIG.phone; } else { $("callbtn").addEventListener("click",function(e){e.preventDefault();alert_("Phone hooks up when the page goes live — with the AI agent answering 24/7.");}); }
   $("mapbtn").href=CONFIG.maps;

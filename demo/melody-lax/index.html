@@ -1,5 +1,6 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
 <title>Melody Table</title>
+<script src="../lang-th.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
@@ -925,7 +926,7 @@
       ctx.fillText("⭐ "+b.t.stars, b.x+12*dpr, by+18*dpr);
       ctx.fillStyle="#f6f1e4";
       ctx.font="600 "+12*dpr+"px Barlow,sans-serif";
-      var label=b.t.name.length>26 ? b.t.name.slice(0,25)+"…" : b.t.name;
+      var nm=(window.__T||String)(b.t.name); var label=nm.length>26 ? nm.slice(0,25)+"…" : nm;
       ctx.fillText(label, b.x+12*dpr, by+38*dpr);
     }
   }

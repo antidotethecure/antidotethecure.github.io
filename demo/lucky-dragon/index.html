@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Lucky Dragon Hibachi — Menu & Game</title>
+<script src="../lang-th.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Cinzel:wght@700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
 <style>
@@ -510,7 +511,7 @@ var CONFIG = {
     if(!sprite("lobster",W/2+152,H/2-34,74)) drawVeg(W/2+58,H/2-20);
     drawBowl(W/2);
     cx.font="bold 22px Archivo,sans-serif"; cx.fillStyle="#F7EFE6"; cx.textAlign="center";
-    cx.fillText("TAP TO PLAY", W/2, H/2+30);
+    cx.fillText((window.__T||String)("TAP TO PLAY"), W/2, H/2+30);
   }
   function spawn(){
     var r=Math.random(), e, v;
@@ -637,7 +638,7 @@ var CONFIG = {
     drawBowl(W/2);                                    // show the bowl's final state — burnt or saved
     if(burnt){
       cx.font="bold 24px Archivo,sans-serif"; cx.fillStyle="#E6483D"; cx.textAlign="center";
-      cx.fillText("THE DRAGON COOKED YOUR FOOD", W/2, H/2-10);
+      cx.fillText((window.__T||String)("THE DRAGON COOKED YOUR FOOD"), W/2, H/2-10);
     }
     $("final").hidden=false;
     $("final").textContent=score+" PTS"+(!burnt&&score>=CONFIG.game.prizeAt?" 🏆":burnt?" · BURNT":"");

@@ -183,7 +183,7 @@ var CONFIG = {
   game: {
     title: "🍤 Hibachi Catch",
     // good = what belongs in the rice bowl (all drawn to match the real Lucky Dragon dishes)
-    good: [{t:"chicken"},{t:"steak"},{t:"shrimp"},{t:"veg"},{t:"chowmein"},{t:"rice"}],
+    good: [{t:"chicken"},{t:"steak"},{t:"shrimp"},{t:"lobster"},{t:"veg"},{t:"chowmein"},{t:"rice"}],
     star: "⭐",                                // +50, rare
     // bad = stuff that does NOT go in the bowl — catch one, lose 20
     bad: [{t:"flame",e:"🔥"},{t:"candy",e:"🍭"},{t:"ice",e:"🧊"}],
@@ -297,6 +297,22 @@ var CONFIG = {
     cx.fillStyle="#2a1d12"; cx.fillRect(-2,-8,1.3,1.3); cx.fillRect(5,2,1.3,1.3); cx.fillRect(-6,4,1.2,1.2); // pepper
     cx.restore();
   }
+  function drawLobster(x,y){ // hibachi lobster tail: red segmented shell + chopped white meat inside
+    cx.save(); cx.translate(x,y);
+    cx.fillStyle="#C8341C";                                          // tail fan (flukes) at top
+    cx.beginPath(); cx.moveTo(0,-13);
+    cx.lineTo(-11,-23); cx.lineTo(-5,-13); cx.lineTo(-3,-25); cx.lineTo(0,-13);
+    cx.lineTo(3,-25); cx.lineTo(5,-13); cx.lineTo(11,-23); cx.closePath(); cx.fill();
+    cx.fillStyle="#E0462A"; rr(-12,-14,24,27,8); cx.fill();          // shell body
+    cx.fillStyle="#C8341C"; for(var i=0;i<3;i++){ rr(-12,-9+i*8,24,3,2); cx.fill(); } // segment ridges
+    cx.strokeStyle="#9c2514"; cx.lineWidth=1.5; rr(-12,-14,24,27,8); cx.stroke();
+    chunk(-8,-6,9,"#F3ECDC","#D8442A","#F6EEDC",false);              // chopped white lobster meat
+    chunk(1,-9,8,"#F6EEDC","#D8442A","#FBF3E2",false);
+    chunk(-3,1,8,"#EFE4CE","#D8442A","#F3ECDC",false);
+    cx.fillStyle="rgba(216,68,42,.5)"; cx.fillRect(-8,-6,9,1.6); cx.fillRect(1,-9,8,1.6); // red meat edges
+    cx.fillStyle="#2a1d12"; cx.fillRect(-4,-4,1.3,1.3); cx.fillRect(3,-6,1.2,1.2);        // pepper
+    cx.restore();
+  }
   function drawVeg(x,y){ // hibachi veggie batch: broccoli floret, carrot round, onion chunk
     cx.fillStyle="#3C7A2E";                                          // broccoli florets
     cx.beginPath(); cx.arc(x-8,y-6,4,0,7); cx.arc(x-4,y-9,4,0,7); cx.arc(x-11,y-9,3.5,0,7); cx.arc(x-7,y-11,3.5,0,7); cx.fill();
@@ -366,6 +382,7 @@ var CONFIG = {
     if(t==="chicken") drawChicken(d.x,d.y);
     else if(t==="steak") drawSteak(d.x,d.y);
     else if(t==="shrimp") drawShrimp(d.x,d.y);
+    else if(t==="lobster") drawLobster(d.x,d.y);
     else if(t==="veg") drawVeg(d.x,d.y);
     else if(t==="chowmein") drawChowMein(d.x,d.y);
     else if(t==="rice") drawRice(d.x,d.y);

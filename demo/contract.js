@@ -12,8 +12,8 @@
   var PROVIDER = { name: "Anthony Lewis Suggs Jr.", email: "antidotethecure@gmail.com",
                    co: "Antidote Enterprises LLC, doing business as Second Shift AI" };
   var PRESETS = {
-    founding: { label: "Founding partner · 25% off", setup_list: 2000, monthly_list: 300, sd: 25, md: 25, months: 6 },
-    standard: { label: "Standard", setup_list: 2000, monthly_list: 300, sd: 0, md: 0, months: 0 }
+    founding: { label: "Founding partner · 25% off", setup_list: 2000, monthly_list: 350, sd: 25, md: 25, months: 0, minimum: 3, upfront: 50 },
+    standard: { label: "Standard · no minimum", setup_list: 2000, monthly_list: 350, sd: 0, md: 0, months: 0, minimum: 0, upfront: 100 }
   };
   var SCOPE = [
     "A mobile menu page with Client's real menu, prices, hours, call and directions buttons",
@@ -93,7 +93,7 @@
   function preset(name) {
     var p = PRESETS[name];
     F.setup_list.value = p.setup_list; F.monthly_list.value = p.monthly_list;
-    F.sd.value = p.sd; F.md.value = p.md; F.months.value = p.months;
+    F.sd.value = p.sd; F.md.value = p.md; F.months.value = p.months; F.minimum.value = p.minimum; F.upfront.value = p.upfront;
     o.querySelectorAll(".presets button").forEach(function (b) { b.classList.toggle("on", b.dataset.p === name); });
     render();
   }
@@ -112,7 +112,8 @@
     var mAfter = md ? (months ? "The discounted rate of " + money(mn) + " applies to the first " + months + " monthly payments. From month " + (months + 1) + " on, the monthly fee is the regular " + money(ml) + "." : "The discounted rate applies for as long as this Agreement is active.") : "";
     var term = minimum > 0
       ? "This Agreement has a minimum term of " + minimum + " months from the Effective Date. After that it continues month to month, and either party may cancel by giving 30 days' written notice; email counts."
-      : "This Agreement continues month to month. Either party may cancel by giving 30 days' written notice; email counts.";
+      : "This Agreement continues month to month with no minimum term. Either party may cancel by giving 30 days' written notice; email counts.";
+    if (minimum > 0 && (sd || md)) term += " The minimum term is a condition of the founding-partner discount only. Client was offered the regular plan instead: " + money(sl) + " setup paid in full up front and " + money(ml) + " per month, month to month, with no minimum term.";
     var sigBlock = function (who, title, name, tt, email) {
       return '<div><b>' + title + '</b><canvas data-sig="' + who + '"></canvas><button type="button" class="clr" data-clear="' + who + '">Clear signature</button><br>' +
         'Name: ' + name + '<br>Title: ' + tt + '<br>Email: ' + email + '<br>Date: <span data-date="' + who + '"></span></div>';

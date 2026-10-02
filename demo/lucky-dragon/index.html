@@ -81,6 +81,17 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 
 /* ---- game ---- */
 .gamebox{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px;margin-top:4px}
+.keybox{display:flex;flex-direction:column;gap:14px}
+.keyhead{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;font-weight:700;padding:3px 11px;border-radius:99px;align-self:flex-start}
+.keyhead.good{background:rgba(127,168,90,.18);color:#bfe39a;border:1px solid rgba(127,168,90,.5)}
+.keyhead.lucky{background:rgba(255,200,46,.16);color:var(--gold);border:1px solid rgba(255,200,46,.5)}
+.keyhead.bad{background:rgba(230,72,61,.16);color:#ff9a90;border:1px solid rgba(230,72,61,.5)}
+.keyitems{display:flex;flex-wrap:wrap;gap:10px;margin-top:9px}
+.key{display:flex;flex-direction:column;align-items:center;gap:3px;width:60px;text-align:center}
+.key img{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+.key .emo{font-size:30px;line-height:42px;height:42px}
+.key b{font-size:10px;font-weight:700;color:var(--ink);line-height:1.15}
+.keynote{font-size:12px;color:var(--dim);margin:2px 0 0;line-height:1.45}
 .gamehead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .gamehead b{font-size:17px}
 .gamehead .hud{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--gold)}
@@ -143,7 +154,39 @@ footer a{color:var(--ink)}
   <div class="gamehead"><b id="gametitle"></b><span class="hud"><span id="timer">30</span>s · <span id="score">0</span> pts</span></div>
   <canvas id="game" width="520" height="420"></canvas>
   <p class="bigscore" id="final" hidden></p>
-  <p class="gamemsg" id="gmsg"><b>Tap to start.</b> Slide the rice bowl — catch the hibachi, dodge what don't belong in it.</p>
+  <p class="gamemsg" id="gmsg"><b>Tap to start.</b> Slide the tray — catch the hibachi, dodge what don't belong in it.</p>
+</div>
+
+<h2>What to catch</h2>
+<div class="gamebox keybox">
+  <div>
+    <span class="keyhead good">CATCH IT · +10 each</span>
+    <div class="keyitems">
+      <span class="key"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/hf_20261002_031743_25030a14-96cb-49a9-829b-55e1e5f1750b.png" alt=""><b>Chicken</b></span>
+      <span class="key"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/hf_20261002_031755_235ef5af-6cff-4fb5-825e-80b37b3520b3.png" alt=""><b>Steak</b></span>
+      <span class="key"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/hf_20261002_031757_00baef18-1d20-487e-a61d-e4e51101bffe.png" alt=""><b>Shrimp</b></span>
+      <span class="key"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/hf_20261002_031758_a6a00371-7c6b-4669-b7df-adee4a2d442b.png" alt=""><b>Lobster</b></span>
+      <span class="key"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/hf_20261002_031800_2c7ee5ef-96a3-440b-ae81-be85a12ed946.png" alt=""><b>Veggies</b></span>
+      <span class="key"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/hf_20261002_035752_db301158-1f27-4903-b853-f486665eb63a.png" alt=""><b>Chow Mein</b></span>
+      <span class="key"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/hf_20261002_035751_bb85ebbe-4a65-46ac-8dd4-9201276d31de.png" alt=""><b>Fried Rice</b></span>
+      <span class="key"><span class="emo">🥤</span><b>Drinks</b></span>
+    </div>
+  </div>
+  <div>
+    <span class="keyhead lucky">LUCKY · +50</span>
+    <div class="keyitems">
+      <span class="key"><span class="emo">⭐</span><b>Gold Star</b></span>
+    </div>
+  </div>
+  <div>
+    <span class="keyhead bad">DODGE IT · −20</span>
+    <div class="keyitems">
+      <span class="key"><span class="emo">🔥</span><b>Flame</b></span>
+      <span class="key"><span class="emo">🍭</span><b>Candy</b></span>
+      <span class="key"><span class="emo">🧊</span><b>Ice</b></span>
+    </div>
+  </div>
+  <p class="keynote">🐉 The Lucky Dragon dives and torches your tray — <b>3 hits and your food's burnt</b> and the run is over. Dodge the fire!</p>
 </div>
 
 <h2>Weekly prize board <span style="color:var(--dim);font-size:10px;letter-spacing:.1em">· SAMPLE</span></h2>
@@ -268,10 +311,10 @@ var CONFIG = {
     shrimp:"hf_20261002_031757_00baef18-1d20-487e-a61d-e4e51101bffe.png",
     lobster:"hf_20261002_031758_a6a00371-7c6b-4669-b7df-adee4a2d442b.png",
     veg:"hf_20261002_031800_2c7ee5ef-96a3-440b-ae81-be85a12ed946.png",
-    chowmein:"hf_20261002_031801_3f2acbdd-5722-4ced-925c-746173485b5f.png",
-    rice:"hf_20261002_031802_3701bc40-983b-4c5d-8c2c-a372264e8009.png",
+    chowmein:"hf_20261002_035752_db301158-1f27-4903-b853-f486665eb63a.png",
+    rice:"hf_20261002_035751_bb85ebbe-4a65-46ac-8dd4-9201276d31de.png",
     dragon:"hf_20261002_031805_9126ac53-431c-40de-b80a-0b0f25000074.png",
-    tray:"hf_20261002_032635_66d26674-bf66-4958-b868-5a662c26dcf5.png"
+    tray:"hf_20261002_035750_83de28d1-b357-4734-a176-bf2ed375e7da.png"
   };
   var SPR={};
   for(var _k in SPRITE_FILES){ (function(key){ var im=new Image(); im.onload=function(){ SPR[key]=im; }; im.src=SPRITE_BASE+SPRITE_FILES[key]; })(_k); }

@@ -10,6 +10,8 @@
 
   var TH = {
     'TAP TO PLAY': 'แตะเพื่อเล่น',
+    'STORM RUN': 'ฝ่าพายุ', 'STORM OVER': 'พายุสงบแล้ว', 'LIGHTNING!': 'ฟ้าผ่า!',
+    'Classic StormBurger': 'StormBurger คลาสสิก', 'Fries': 'เฟรนช์ฟรายส์', 'Shake': 'มิลค์เชค', 'Spicy Chicken': 'ไก่เผ็ด',
     'THE DRAGON COOKED YOUR FOOD': 'มังกรเผาอาหารของคุณแล้ว!',
     'Free Melody Fries': 'เฟรนช์ฟรายส์ Melody ฟรี',
     '$5 off any Mac & Cheese': 'ลด $5 แมคแอนด์ชีสทุกเมนู',
@@ -40,7 +42,7 @@
     location.reload();
   }
 
-  var KEEP = /(Lucky\s+Dragon(?:\s+Hibachi)?|Churrito\s+Loco|Melody(?:\s+Bar\s*&\s*Grill)?|Melody\s+Table|Hibachi\s+Catch|Loco\s+Match|Second\s+Shift\s+AI|Antidote(?:\s*The\s*Foodie)?|Gilroy)/g;
+  var KEEP = /(Lucky\s+Dragon(?:\s+Hibachi)?|Churrito\s+Loco|Melody(?:\s+Bar\s*&\s*Grill)?|Melody\s+Table|Hibachi\s+Catch|Loco\s+Match|Second\s+Shift\s+AI|Storm\s?Burger|Thunder|Toast|Antidote(?:\s*The\s*Foodie)?|Gilroy)/g;
   function protect() {
     var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: function (n) {
       var p = n.parentElement; if (!p || p.closest('script,style,title,textarea,input,.notranslate,#dl-pill')) return NodeFilter.FILTER_REJECT;

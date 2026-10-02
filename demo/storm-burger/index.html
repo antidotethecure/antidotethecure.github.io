@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>StormBurger — Menu & Game</title>
+<script src="../lang-th.js"></script>
+<meta name="description" content="StormBurger's menu, Storm Run game and weekly prizes. Demo by Second Shift AI.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* Storm night: navy sky, StormBurger blue, orange bolt, electric white-blue lightning. */
+:root{
+  --sky:#070B1E; --sky2:#0E1735; --panel:#121C40; --edge:#25336A;
+  --blue:#2547B8; --bolt:#E8582A; --zap:#BFE6FF; --gold:#FFD23F;
+  --ink:#EEF2FF; --dim:#9AA6CC;
+  --display:"Bebas Neue","Arial Narrow",Impact,sans-serif;
+  --body:"Archivo",system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+body{background:radial-gradient(900px 600px at 50% -10%,#24357a 0,transparent 60%),var(--sky)}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:0 60px}
+a{color:var(--zap)}
+/* hero */
+.hero{position:relative;text-align:center;padding-block:34px 18px;overflow:hidden}
+.hero .logo{display:inline-block;background:#fff;border-radius:18px;padding:12px 18px;box-shadow:0 0 0 3px #ffffff22,0 18px 50px #0009}
+.hero .logo img{display:block;width:min(300px,70vw);height:auto}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,9vw,54px);letter-spacing:.04em;margin:18px 0 2px;line-height:1}
+.hero h1 span{color:var(--bolt)}
+.hero p{margin:4px 0;color:var(--dim)}
+.flash{position:fixed;inset:0;pointer-events:none;background:#dff3ff;opacity:0;z-index:50}
+.btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:15px;border-radius:12px;padding:12px 16px;border:1px solid var(--edge);background:var(--panel);color:var(--ink);cursor:pointer}
+.btn.hot{background:var(--bolt);border-color:var(--bolt);color:#fff;box-shadow:0 8px 24px #e8582a55}
+.pill{display:inline-block;margin-top:12px;font-size:12px;color:var(--dim);border:1px dashed var(--edge);border-radius:999px;padding:6px 12px}
+h2{font-family:var(--display);font-weight:400;font-size:34px;letter-spacing:.05em;margin:34px 0 4px;display:flex;align-items:center;gap:10px}
+h2::before{content:"";width:22px;height:22px;background:var(--bolt);clip-path:polygon(55% 0,10% 58%,45% 58%,30% 100%,90% 38%,55% 38%,75% 0)}
+.sub{color:var(--dim);margin:0 0 12px}
+/* game */
+.gamebox{background:linear-gradient(180deg,#121c40,#0b1230);border:1px solid var(--edge);border-radius:18px;padding:12px;box-shadow:0 20px 60px #0008}
+.hud{display:flex;justify-content:space-between;align-items:center;font-weight:800;padding:2px 4px 10px;gap:8px;flex-wrap:wrap}
+.hud .sc{font-family:var(--display);font-size:30px;color:var(--gold);letter-spacing:.04em;font-weight:400}
+.hud .lv{letter-spacing:2px}
+#game{display:block;width:100%;height:auto;aspect-ratio:400/560;border-radius:12px;background:#05081a;touch-action:none;cursor:pointer}
+.keys{display:flex;justify-content:center;gap:10px;margin-top:10px}
+.keys button{flex:1;max-width:170px;font:800 22px var(--body);background:#1a2656;color:#fff;border:1px solid var(--edge);border-radius:12px;padding:12px 0;cursor:pointer}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px;font-size:13.5px;color:var(--dim)}
+.how div{background:#0b1230;border:1px solid var(--edge);border-radius:10px;padding:8px 10px}
+.how b{color:var(--ink)}
+#over{display:none;text-align:center;padding:14px 0 4px}
+#over.on{display:block}
+#final{font-family:var(--display);font-size:56px;color:var(--gold);line-height:1;letter-spacing:.03em}
+/* prizes */
+.tiers{display:grid;gap:10px}
+.tier{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:12px 14px}
+.tier .pts{font-family:var(--display);font-size:26px;color:var(--gold);min-width:92px;letter-spacing:.03em}
+.tier b{display:block}
+.tier small{color:var(--dim)}
+.tier.top{border-color:var(--bolt);background:linear-gradient(90deg,#3a1a14,#121c40)}
+/* menu */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;padding-right:118px;position:sticky;top:0;background:var(--sky);z-index:5;padding-top:8px}
+.chips a{flex:none;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--edge);border-radius:999px;padding:7px 13px;font-weight:700;font-size:14px}
+.cat{margin-top:22px}
+.cat h3{font-family:var(--display);font-weight:400;font-size:28px;letter-spacing:.05em;margin:0 0 4px;color:var(--zap)}
+.cat .note{color:var(--dim);font-size:13.5px;margin:0 0 10px}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
+.item{position:relative;background:var(--panel);border:1px solid var(--edge);border-radius:16px;overflow:hidden;min-width:0;transition:transform .2s,box-shadow .2s,border-color .2s}
+.item img{display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover}
+.item .tx{padding:10px 12px 12px}
+.item .row{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.item b{font-size:14.5px;line-height:1.25}
+.item .pr{font-family:var(--display);font-size:22px;color:var(--gold);letter-spacing:.03em;white-space:nowrap}
+.item p{margin:4px 0 0;font-size:13px;color:var(--dim)}
+.item.zap{border-color:var(--zap);box-shadow:0 0 0 2px #bfe6ff88,0 0 40px #8fd3ff88;transform:translateY(-2px)}
+.item .glow{position:absolute;inset:0;background:radial-gradient(circle at var(--x,50%) 35%,#e8f6ff 0,#9fd8ff66 18%,transparent 55%);opacity:0;pointer-events:none;mix-blend-mode:screen}
+.item.zap .glow{animation:glow .45s ease-out}
+.item svg.bolt{position:absolute;left:0;top:0;width:100%;height:72%;pointer-events:none;overflow:visible}
+.item svg.bolt polyline{fill:none;stroke:#fff;stroke-width:3;stroke-linejoin:miter;filter:drop-shadow(0 0 6px #9fd8ff) drop-shadow(0 0 14px #5fb6ff)}
+.item svg.bolt .b2{stroke:#9fd8ff;stroke-width:7;opacity:.45}
+.item svg.bolt{animation:strike .42s steps(1) forwards}
+@keyframes strike{0%{opacity:1}20%{opacity:.15}35%{opacity:1}60%{opacity:.4}75%{opacity:1}100%{opacity:0}}
+@keyframes glow{0%{opacity:0}15%{opacity:1}40%{opacity:.3}55%{opacity:.9}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.item svg.bolt,.item.zap .glow{animation:none;display:none}.item{transition:none}}
+.locs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.loc{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:12px 14px;font-size:14px}
+.loc b{font-size:16px}
+footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="flash" id="flash"></div>
+<div class="wrap">
+
+<header class="hero">
+  <div class="logo"><img src="img/logo.png" alt="StormBurger" width="760" height="200"></div>
+  <h1>BURGERS THAT HIT LIKE <span>LIGHTNING</span></h1>
+  <p>Inglewood · Long Beach · Compton coming soon</p>
+  <div class="btns">
+    <a class="btn hot" href="https://order.toasttab.com/online/storm-burger-inglewood" target="_blank" rel="noopener">⚡ Order Inglewood</a>
+    <a class="btn hot" href="https://order.toasttab.com/online/storm-burger-lb" target="_blank" rel="noopener">⚡ Order Long Beach</a>
+    <a class="btn" href="#locations">📍 Directions</a>
+  </div>
+  <span class="pill">Demo by Second Shift AI · built from StormBurger's real menu and prices</span>
+</header>
+
+<h2>Play for prizes</h2>
+<p class="sub">Drive through the storm. Grab coins and StormBurger food. Dodge the lightning and everything the tornado throws at you.</p>
+<div class="gamebox">
+  <div class="hud"><span>Score <span class="sc" id="score">0</span></span><span class="lv" id="lives" aria-label="Lives">⚡⚡⚡</span><span id="time">45s</span></div>
+  <canvas id="game" width="400" height="560" aria-label="Storm Run game. Tap the left or right side to change lanes."></canvas>
+  <div class="keys"><button type="button" id="kl" aria-label="Move left">◀</button><button type="button" id="kr" aria-label="Move right">▶</button></div>
+  <div id="over">
+    <div class="sub" id="rank">Storm over</div>
+    <div id="final">0 pts</div>
+    <div class="btns"><button class="btn hot" type="button" id="again">Drive again</button><a class="btn" href="#tiers">See prizes</a></div>
+  </div>
+  <div class="how">
+    <div><b>🪙 Coins</b> +10</div>
+    <div><b>🍔 🍟 🥤 StormBurger food</b> +30 to +60</div>
+    <div><b>⚡ Lightning lane</b> moves when it glows. Get out!</div>
+    <div><b>🐄 🚗 🏍️ Flying debris</b> −100 and a life</div>
+  </div>
+</div>
+
+<h2 id="tiers">Weekly prize board</h2>
+<p class="sub">Sample prizes. StormBurger picks the real ones and the board resets every Monday.</p>
+<div class="tiers">
+  <div class="tier top"><span class="pts">#1 WEEK</span><div><b>Free Double Classic StormBurger Combo</b><small>Top score by Sunday close</small></div></div>
+  <div class="tier"><span class="pts">2,000</span><div><b>Free Classic StormBurger</b><small>One run over 2,000 points</small></div></div>
+  <div class="tier"><span class="pts">1,500</span><div><b>Free milkshake</b><small>Vanilla, chocolate or mix</small></div></div>
+  <div class="tier"><span class="pts">1,000</span><div><b>Free fries or upgrade to onion rings</b><small>With any order</small></div></div>
+  <div class="tier"><span class="pts">500</span><div><b>Free house sauce</b><small>Storm, Thunder, Ranch… your pick</small></div></div>
+  <div class="tier"><span class="pts">Best</span><div><b id="best">Your best: —</b><small>Saved on this phone</small></div></div>
+</div>
+
+<h2 id="menu">The menu</h2>
+<p class="sub">Hover or tap any item for a strike of lightning. Food photos are AI-generated previews of StormBurger's real menu items.</p>
+<nav class="chips" id="chips" aria-label="Menu sections"></nav>
+<div id="menuhost"></div>
+
+<h2 id="locations">Locations</h2>
+<div class="locs">
+  <div class="loc"><b>Inglewood</b><br>1500 N La Brea Ave, Inglewood, CA 90302<br><small>Sun–Thu 10:30 AM–12 AM · Fri–Sat 10:30 AM–1 AM</small><div class="btns" style="justify-content:flex-start"><a class="btn" href="https://maps.google.com/?q=1500+N+La+Brea+Ave+Inglewood+CA+90302" target="_blank" rel="noopener">📍 Directions</a></div></div>
+  <div class="loc"><b>Long Beach</b><br>5801 Cherry Ave, Long Beach, CA 90805<br><small>Mon–Wed 10:30 AM–10 PM · Thu–Sun 10:30 AM–11 PM</small><div class="btns" style="justify-content:flex-start"><a class="btn" href="https://maps.google.com/?q=5801+Cherry+Ave+Long+Beach+CA+90805" target="_blank" rel="noopener">📍 Directions</a></div></div>
+  <div class="loc"><b>Compton</b> · coming soon<br>336 W Alondra Blvd, Compton, CA 90220</div>
+</div>
+
+<footer>Demo built for StormBurger by Second Shift AI · menu and prices from stormburger.com · prizes are samples · food images are AI-generated previews</footer>
+</div>
+
+<script>
+window.CONFIG={name:"StormBurger",address:"1500 N La Brea Ave, Inglewood, CA 90302"};
+(function(){
+"use strict";
+var $=function(i){return document.getElementById(i);};
+var T=function(s){return (window.__T||String)(s);};
+var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------------- MENU ---------------- */
+var MENU=[
+ {id:"combos",name:"Combos",note:"All combos come with fries and a soft drink. Upgrade fries to onion rings +$2.00, drink to a milkshake +$2.00.",items:[
+  ["Classic StormBurger Combo",11.99,"Classic StormBurger, fries, soft drink","classic"],
+  ["Double Classic StormBurger Combo",14.49,"Double Classic, fries, soft drink","double"],
+  ["Bacon BBQ Burger Combo",13.99,"Bacon BBQ Burger, fries, soft drink","bacon-bbq"],
+  ["Jalapeño Lightning Burger Combo",13.99,"Jalapeño Lightning Burger, fries, soft drink","jalapeno"],
+  ["Kids Combo",11.99,"Kids Burger, fries, soft drink","kids"],
+  ["Chicken Sandwich Combo",12.99,"Chicken Sandwich, fries, soft drink","chicken"],
+  ["Deluxe Chicken Sandwich Combo",13.99,"Deluxe Chicken Sandwich, fries, soft drink","deluxe"],
+  ["Spicy Chicken Sandwich Combo",12.99,"Spicy Chicken Sandwich, fries, soft drink","spicy-chicken"],
+  ["Spicy Deluxe Chicken Sandwich Combo",13.99,"Spicy Deluxe Chicken Sandwich, fries, soft drink","spicy-deluxe"],
+  ["Chicken Strips Combo",12.99,"Chicken Strips, fries, soft drink","strips"]]},
+ {id:"burgers",name:"Burgers",note:"Fresh buns and 4oz all-natural patties.",items:[
+  ["Classic StormBurger",5.99,"Homemade Storm sauce, 4oz all-natural patty, American cheese, pickles, onions, tomato, lettuce","classic"],
+  ["Double Classic StormBurger",8.49,"Two 4oz patties, Storm sauce, American cheese, pickles, onions, tomato, lettuce","double"],
+  ["Bacon BBQ Burger",7.99,"BBQ sauce, 4oz patty, American cheese, bacon, onion straws","bacon-bbq"],
+  ["Jalapeño Lightning Burger",6.99,"Homemade avocado crema, Storm sauce, 4oz patty, Swiss cheese, grilled onions, jalapeños","jalapeno"],
+  ["Kids Burger",5.99,"4oz patty, American cheese","kids"],
+  ["Turkey Burger",6.99,"Two 2oz turkey patties, lettuce, tomato, cheese, onions, pickles, burger sauce","turkey"]]},
+ {id:"chicken",name:"Chicken",note:"Hand-breaded and homemade.",items:[
+  ["Chicken Sandwich",6.99,"Fresh buns, mayo, all-natural hand-breaded chicken, pickles","chicken"],
+  ["Spicy Chicken Sandwich",6.99,"Homemade spicy mayo, Thunder sauce, hand-breaded chicken, pickles","spicy-chicken"],
+  ["Deluxe Chicken Sandwich",7.99,"Mayo, hand-breaded chicken, tomatoes, Swiss cheese, homemade kale slaw","deluxe"],
+  ["Spicy Deluxe Chicken Sandwich",7.99,"Spicy mayo, Thunder sauce, hand-breaded chicken, tomatoes, Swiss cheese, kale slaw","spicy-deluxe"],
+  ["Chicken Strips",6.99,"All-natural, hand-breaded chicken","strips"]]},
+ {id:"sides",name:"Sides",items:[
+  ["French Fries",3.99,"Classic, irresistible fries","fries"],
+  ["Onion Rings",4.99,"Homemade, handcrafted fresh onion rings","onion-rings"]]},
+ {id:"shakes",name:"Shakes",items:[
+  ["Vanilla Shake",4.99,"Creamy, smooth vanilla","vanilla"],
+  ["Chocolate Shake",4.99,"Creamy, bold chocolate","chocolate"],
+  ["Mix Shake",4.99,"Why not both?","mix"]]},
+ {id:"sauces",name:"Sauces",note:"Homemade, $1.00 each.",items:[
+  ["Storm",1.00,"Homemade classic signature burger sauce","sauces"],
+  ["Thunder",1.00,"Sweet and spicy apricot habanero","sauces"],
+  ["BBQ",1.00,"Savory, classic sauce","sauces"],
+  ["Honey Mustard",1.00,"Sweet and tangy","sauces"],
+  ["Spicy Mayo",1.00,"Rich, homemade with punch","sauces"],
+  ["Avocado Crema",1.00,"Creamy, smooth sauce","sauces"],
+  ["Ranch",1.00,"Smooth, creamy, homemade with fresh ingredients","sauces"]]},
+ {id:"drinks",name:"Drinks",note:"Coke, Coke Zero, Barq's, Peach Tea, Fruit Punch, Sprite, Cherry Coke, Fanta Strawberry.",items:[
+  ["Fountain Drink · Regular",2.99,"Any flavor","drinks"],
+  ["Fountain Drink · Large",3.79,"Any flavor","drinks"]]}
+];
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+$("chips").innerHTML=MENU.map(function(c){return '<a href="#cat-'+c.id+'">'+esc(c.name)+'</a>';}).join("");
+$("menuhost").innerHTML=MENU.map(function(c){
+  return '<section class="cat" id="cat-'+c.id+'"><h3>'+esc(c.name)+'</h3>'+(c.note?'<p class="note">'+esc(c.note)+'</p>':'')+
+   '<div class="items">'+c.items.map(function(it){
+     return '<article class="item" tabindex="0"><img loading="lazy" src="img/'+it[3]+'.jpg" alt="'+esc(it[0])+'" width="720" height="720"><span class="glow"></span>'+
+      '<div class="tx"><div class="row"><b>'+esc(it[0])+'</b><span class="pr">$'+it[1].toFixed(2)+'</span></div><p>'+esc(it[2])+'</p></div></article>';
+   }).join("")+'</div></section>';
+}).join("");
+
+/* lightning on hover / tap */
+function boltPoints(w,h){
+  var x=w*(0.25+Math.random()*0.5), y=-10, pts=[[x,y]];
+  while(y<h){ y+=h*(0.08+Math.random()*0.1); x+=(Math.random()-0.5)*w*0.22; pts.push([Math.max(4,Math.min(w-4,x)),Math.min(y,h)]); }
+  return pts;
+}
+var flashEl=$("flash");
+function sky(a){ if(reduce) return; flashEl.style.transition="none"; flashEl.style.opacity=a; requestAnimationFrame(function(){ flashEl.style.transition="opacity .35s"; flashEl.style.opacity=0; }); }
+function zap(card){
+  if(reduce||card._z) return; card._z=1; setTimeout(function(){card._z=0;},650);
+  var w=card.clientWidth, h=card.querySelector("img").clientHeight;
+  var p=boltPoints(w,h), str=p.map(function(q){return q.join(",");}).join(" ");
+  var br=p.slice(2,5).map(function(q,i){return (q[0]+(i+1)*14*(Math.random()<.5?-1:1))+","+(q[1]+18*(i+1));});
+  var svg=document.createElementNS("http://www.w3.org/2000/svg","svg"); svg.setAttribute("class","bolt");
+  svg.setAttribute("viewBox","0 0 "+w+" "+h); svg.style.height=h+"px";
+  svg.innerHTML='<polyline class="b2" points="'+str+'"/><polyline points="'+str+'"/><polyline points="'+p[2].join(",")+" "+br.join(" ")+'" style="stroke-width:1.6"/>';
+  card.style.setProperty("--x",(p[p.length-1][0]/w*100)+"%");
+  card.appendChild(svg); card.classList.add("zap"); sky(0.12);
+  setTimeout(function(){svg.remove(); card.classList.remove("zap");},460);
+}
+document.querySelectorAll(".item").forEach(function(c){
+  c.addEventListener("pointerenter",function(e){ if(e.pointerType==="mouse") zap(c); });
+  c.addEventListener("pointerdown",function(){ zap(c); });
+  c.addEventListener("focus",function(){ zap(c); });
+});
+if(!reduce) setInterval(function(){ if(Math.random()<.35) sky(.07+Math.random()*.08); },5200);
+
+/* ---------------- GAME: Storm Run ---------------- */
+var cv=$("game"), cx=cv.getContext("2d"), W=400, H=560, DPR=Math.min(2,window.devicePixelRatio||1);
+cv.width=W*DPR; cv.height=H*DPR; cx.scale(DPR,DPR);
+var LANES=3, LX=function(i){return W*(0.2+0.3*i);};
+var FOODIMG={}; ["classic","fries","vanilla","spicy-chicken"].forEach(function(k){var im=new Image(); im.src="img/"+k+".jpg"; FOODIMG[k]=im;});
+var FOOD=[{k:"classic",p:60,n:"Classic StormBurger"},{k:"fries",p:30,n:"Fries"},{k:"vanilla",p:40,n:"Shake"},{k:"spicy-chicken",p:50,n:"Spicy Chicken"}];
+var DEBRIS=["🐄","🚗","🏍️"];
+var st; // game state
+function fresh(){ return {running:false,over:false,lane:1,x:LX(1),score:0,lives:3,t:45000,items:[],bolts:[],rain:[],pops:[],speed:3.2,shake:0,inv:0,flash:0,last:0,spawnT:0,boltT:2500,coins:0}; }
+st=fresh();
+for(var i=0;i<90;i++) st.rain.push({x:Math.random()*W,y:Math.random()*H,l:8+Math.random()*14,v:9+Math.random()*7});
+var road=0;
+function hud(){ $("score").textContent=st.score.toLocaleString(); $("lives").textContent="⚡".repeat(Math.max(0,st.lives))+"·".repeat(3-Math.max(0,st.lives)); $("time").textContent=Math.ceil(Math.max(0,st.t)/1000)+"s"; }
+function best(){ try{ var b=+localStorage.getItem("sb-best")||0; $("best").textContent="Your best: "+(b?b.toLocaleString()+" pts":"—"); return b; }catch(e){ return 0; } }
+best();
+function setLane(n){ if(!st.running) return; st.lane=Math.max(0,Math.min(LANES-1,n)); }
+window.__S={get:function(){return st;},setLane:function(n){st.lane=Math.max(0,Math.min(LANES-1,n));},LX:LX};
+function start(){
+  var keep=st.rain; st=fresh(); st.rain=keep; st.running=true; st.last=performance.now();
+  $("over").classList.remove("on"); hud();
+}
+function end(){
+  st.running=false; st.over=true;
+  var b=best(); if(st.score>b){ try{localStorage.setItem("sb-best",st.score);}catch(e){} }
+  best();
+  $("final").textContent=st.score.toLocaleString()+" pts";
+  $("rank").textContent= st.score>=2000?"⚡ Free Classic StormBurger unlocked":st.score>=1500?"🥤 Free shake unlocked":st.score>=1000?"🍟 Free fries unlocked":st.score>=500?"Free sauce unlocked":"Storm over";
+  $("over").classList.add("on");
+}
+function spawn(){
+  var lane=(Math.random()*LANES)|0, r=Math.random();
+  if(r<0.42) st.items.push({type:"coin",lane:lane,x:LX(lane),y:-30,r:13,spin:0});
+  else if(r<0.66){ var f=FOOD[(Math.random()*FOOD.length)|0]; st.items.push({type:"food",f:f,lane:lane,x:LX(lane),y:-40,r:22}); }
+  else { var tl=(Math.random()*LANES)|0; st.items.push({type:"debris",e:DEBRIS[(Math.random()*DEBRIS.length)|0],x:LX(lane),y:-50,tx:LX(tl),r:24,rot:0,vr:(Math.random()-.5)*0.2}); }
+}
+function pop(x,y,txt,col){ st.pops.push({x:x,y:y,txt:txt,col:col,a:1}); }
+function hit(x,y,why){
+  if(st.inv>0) return;
+  st.lives--; st.score=Math.max(0,st.score-100); st.inv=60; st.shake=14; st.flash=0.5;
+  pop(x,y-20,why+" −100","#ff6b5b"); if(navigator.vibrate) try{navigator.vibrate(60);}catch(e){}
+  if(st.lives<=0) end();
+}
+function drawRoad(){
+  var g=cx.createLinearGradient(0,0,0,H); g.addColorStop(0,"#0a1030"); g.addColorStop(1,"#141b3c"); cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  cx.fillStyle="#1b2142"; cx.fillRect(W*0.05,0,W*0.9,H);
+  // wet reflections
+  for(var i=0;i<6;i++){ cx.fillStyle="rgba(120,160,255,.035)"; cx.fillRect(W*0.08+i*W*0.15,0,W*0.05,H); }
+  cx.fillStyle="#E8582A"; cx.fillRect(W*0.05,0,5,H); cx.fillRect(W*0.95-5,0,5,H);
+  cx.fillStyle="rgba(255,255,255,.75)";
+  for(var l=1;l<LANES;l++){ var x=W*(0.05+0.3*l); for(var y=(road%60)-60;y<H;y+=60) cx.fillRect(x-2,y,4,32); }
+}
+function drawCar(x,y){
+  cx.save(); cx.translate(x,y);
+  cx.fillStyle="rgba(0,0,0,.35)"; cx.beginPath(); cx.ellipse(0,32,30,12,0,0,6.283); cx.fill();
+  // headlight beams
+  var bg=cx.createLinearGradient(0,-40,0,-200); bg.addColorStop(0,"rgba(255,240,180,.35)"); bg.addColorStop(1,"rgba(255,240,180,0)");
+  cx.fillStyle=bg; cx.beginPath(); cx.moveTo(-14,-34); cx.lineTo(-44,-200); cx.lineTo(44,-200); cx.lineTo(14,-34); cx.fill();
+  cx.fillStyle="#2547B8"; roundRect(-22,-36,44,72,12); cx.fill();
+  cx.fillStyle="#9fc2ff"; roundRect(-16,-24,32,16,5); cx.fill();
+  cx.fillStyle="#173080"; roundRect(-16,4,32,20,5); cx.fill();
+  cx.fillStyle="#E8582A"; cx.beginPath(); cx.moveTo(4,-6); cx.lineTo(-8,8); cx.lineTo(0,8); cx.lineTo(-4,20); cx.lineTo(9,4); cx.lineTo(1,4); cx.lineTo(6,-6); cx.fill();
+  cx.fillStyle="#fff3c4"; cx.fillRect(-18,-38,8,4); cx.fillRect(10,-38,8,4);
+  cx.fillStyle="#ff4a4a"; cx.fillRect(-18,34,8,3); cx.fillRect(10,34,8,3);
+  cx.restore();
+}
+function roundRect(x,y,w,h,r){ cx.beginPath(); cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r); cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath(); }
+function drawItem(it){
+  if(it.type==="coin"){
+    it.spin+=0.15; var sx=Math.abs(Math.cos(it.spin))*it.r+2;
+    cx.fillStyle="#FFD23F"; cx.strokeStyle="#b8860b"; cx.lineWidth=2; cx.beginPath(); cx.ellipse(it.x,it.y,sx,it.r,0,0,6.283); cx.fill(); cx.stroke();
+    cx.fillStyle="#E8582A"; cx.font="bold 13px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; if(sx>8) cx.fillText("⚡",it.x,it.y+1);
+  } else if(it.type==="food"){
+    var im=FOODIMG[it.f.k];
+    cx.save(); cx.shadowColor="#ffd23f"; cx.shadowBlur=16; cx.beginPath(); cx.arc(it.x,it.y,it.r,0,6.283); cx.fillStyle="#fff"; cx.fill(); cx.restore();
+    cx.save(); cx.beginPath(); cx.arc(it.x,it.y,it.r-2,0,6.283); cx.clip();
+    if(im.complete&&im.naturalWidth) cx.drawImage(im,im.naturalWidth*0.12,im.naturalHeight*0.12,im.naturalWidth*0.76,im.naturalHeight*0.76,it.x-it.r,it.y-it.r,it.r*2,it.r*2);
+    cx.restore();
+  } else {
+    cx.save(); cx.translate(it.x,it.y); cx.rotate(it.rot);
+    cx.shadowColor="rgba(255,90,60,.8)"; cx.shadowBlur=18; cx.font="44px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText(it.e,0,0); cx.restore();
+  }
+}
+function boltPath(x){ var pts=[[x,-10]], y=-10; while(y<H){ y+=30+Math.random()*40; pts.push([x+(Math.random()-.5)*46,y]); } return pts; }
+function drawBolt(b){
+  var lx=LX(b.lane);
+  if(b.phase==="warn"){
+    var a=0.25+0.25*Math.sin(b.age/60);
+    cx.fillStyle="rgba(191,230,255,"+(a*0.4)+")"; cx.fillRect(lx-W*0.15+3,0,W*0.3-6,H);
+    cx.strokeStyle="rgba(191,230,255,"+(0.5+a)+")"; cx.setLineDash([10,8]); cx.lineWidth=2; cx.strokeRect(lx-W*0.15+3,2,W*0.3-6,H-4); cx.setLineDash([]);
+    cx.font="34px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.globalAlpha=0.6+a; cx.fillText("⚡",lx,70); cx.globalAlpha=1;
+  } else if(b.phase==="strike"){
+    var p=b.pts; cx.save(); cx.lineJoin="miter";
+    cx.strokeStyle="rgba(150,210,255,.45)"; cx.lineWidth=14; cx.beginPath(); p.forEach(function(q,i){ i?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1]); }); cx.stroke();
+    cx.strokeStyle="#ffffff"; cx.lineWidth=4; cx.shadowColor="#9fd8ff"; cx.shadowBlur=24; cx.stroke(); cx.restore();
+    cx.fillStyle="rgba(255,255,255,.25)"; cx.beginPath(); cx.arc(p[p.length-1][0],H-40,40+Math.random()*12,0,6.283); cx.fill();
+  }
+}
+function frame(now){
+  requestAnimationFrame(frame);
+  var dt=Math.min(50,now-(st.last||now)); st.last=now; var k=dt/16.67;
+  road+= (st.running?st.speed*2.2:1.2)*k;
+  cx.save();
+  if(st.shake>0){ cx.translate((Math.random()-.5)*st.shake,(Math.random()-.5)*st.shake); st.shake*=0.85; if(st.shake<0.5) st.shake=0; }
+  drawRoad();
+  if(st.running){
+    st.t-=dt; st.speed=Math.min(7.5,3.2+(45000-st.t)/9000);
+    st.spawnT-=dt; if(st.spawnT<=0){ spawn(); st.spawnT=Math.max(330,700-(45000-st.t)/90); }
+    st.boltT-=dt; if(st.boltT<=0){ st.bolts.push({lane:(Math.random()*LANES)|0,phase:"warn",age:0}); st.boltT=Math.max(1400,3200-(45000-st.t)/25); }
+    st.x+= (LX(st.lane)-st.x)*Math.min(1,0.28*k);
+    if(st.inv>0) st.inv-=k;
+    if(Math.floor(now/250)!==Math.floor((now-dt)/250)) st.score+=1;
+  }
+  var py=H-80;
+  // bolts
+  for(var b=st.bolts.length-1;b>=0;b--){ var bo=st.bolts[b]; bo.age+=dt;
+    if(bo.phase==="warn"&&bo.age>950){ bo.phase="strike"; bo.age=0; bo.pts=boltPath(LX(bo.lane)); st.flash=0.6; st.shake=8; if(st.running&&st.lane===bo.lane&&Math.abs(st.x-LX(bo.lane))<40) hit(st.x,py,T("LIGHTNING!")); }
+    else if(bo.phase==="strike"&&bo.age>260){ st.bolts.splice(b,1); continue; }
+    drawBolt(bo); }
+  // items
+  for(var i=st.items.length-1;i>=0;i--){ var it=st.items[i];
+    if(st.running){ it.y+=(it.type==="debris"?st.speed*1.25:st.speed)*k; if(it.type==="debris"){ it.x+=(it.tx-it.x)*0.012*k; it.rot+=it.vr*k; } }
+    if(it.y>H+60){ st.items.splice(i,1); continue; }
+    drawItem(it);
+    if(st.running&&Math.abs(it.x-st.x)<it.r+18&&Math.abs(it.y-py)<it.r+28){
+      if(it.type==="coin"){ st.score+=10; st.coins++; pop(it.x,it.y,"+10","#FFD23F"); }
+      else if(it.type==="food"){ st.score+=it.f.p; pop(it.x,it.y,"+"+it.f.p+" "+T(it.f.n),"#FFD23F"); }
+      else { hit(it.x,it.y,it.e); }
+      st.items.splice(i,1);
+    }
+  }
+  if(st.inv<=0||Math.floor(st.inv/6)%2===0) drawCar(st.x,py);
+  // rain
+  cx.strokeStyle="rgba(170,200,255,.35)"; cx.lineWidth=1.2; cx.beginPath();
+  st.rain.forEach(function(r){ r.y+=r.v*k; r.x-=1.2*k; if(r.y>H){r.y=-20;r.x=Math.random()*W+40;} cx.moveTo(r.x,r.y); cx.lineTo(r.x-3,r.y+r.l); }); cx.stroke();
+  // pops
+  for(var p=st.pops.length-1;p>=0;p--){ var po=st.pops[p]; po.y-=1.2*k; po.a-=0.02*k; if(po.a<=0){st.pops.splice(p,1);continue;}
+    cx.globalAlpha=po.a; cx.fillStyle=po.col; cx.font="bold 18px Archivo,system-ui"; cx.textAlign="center"; cx.fillText(po.txt,po.x,po.y); cx.globalAlpha=1; }
+  // sky flash
+  if(Math.random()<0.004) st.flash=Math.max(st.flash,0.25);
+  if(st.flash>0){ cx.fillStyle="rgba(225,240,255,"+st.flash+")"; cx.fillRect(0,0,W,H); st.flash-=0.05*k; }
+  cx.restore();
+  if(!st.running){
+    cx.fillStyle="rgba(5,8,26,.55)"; cx.fillRect(0,0,W,H);
+    cx.fillStyle="#fff"; cx.font="400 52px 'Bebas Neue',Impact,sans-serif"; cx.textAlign="center"; cx.textBaseline="middle";
+    cx.fillText(st.over?T("STORM OVER"):T("STORM RUN"),W/2,H/2-40);
+    cx.fillStyle="#FFD23F"; cx.font="800 22px Archivo,system-ui"; cx.fillText(T("TAP TO PLAY"),W/2,H/2+12);
+  }
+  if(st.running){ hud(); if(st.t<=0) end(); }
+}
+requestAnimationFrame(frame);
+cv.addEventListener("pointerdown",function(e){
+  e.preventDefault();
+  if(!st.running){ start(); return; }
+  var r=cv.getBoundingClientRect(); setLane(st.lane+((e.clientX-r.left)<r.width/2?-1:1));
+});
+var sx0=null; cv.addEventListener("touchstart",function(e){ sx0=e.touches[0].clientX; },{passive:true});
+$("kl").addEventListener("click",function(){ if(!st.running) start(); else setLane(st.lane-1); });
+$("kr").addEventListener("click",function(){ if(!st.running) start(); else setLane(st.lane+1); });
+addEventListener("keydown",function(e){ if(!st.running) return; if(e.key==="ArrowLeft"){setLane(st.lane-1);e.preventDefault();} if(e.key==="ArrowRight"){setLane(st.lane+1);e.preventDefault();} });
+$("again").addEventListener("click",function(){ start(); $("game").scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
+hud();
+})();
+</script>
+<script src="../contract.js"></script>
+</body>
+</html>

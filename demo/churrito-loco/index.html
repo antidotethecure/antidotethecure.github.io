@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Churrito Loco — Menu & Game</title>
+<script src="../lang-th.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
 <style>
 /* ============================================================
@@ -498,7 +499,7 @@ var CONFIG = {
     drawElote(W/2-120,H/2-80); drawFries(W/2,H/2-85); drawSandia(W/2+120,H/2-80);
     drawChurros(W/2-70,H/2+15); drawChurritoMan(W/2+60,H/2+15);
     cx.font="bold 26px Archivo,sans-serif"; cx.fillStyle="#2B1A0E"; cx.textAlign="center";
-    cx.fillText("TAP TO PLAY", W/2, H/2+100);
+    cx.fillText((window.__T||String)("TAP TO PLAY"), W/2, H/2+100);
   }
   function start(){
     fill(); score=0; chain=0; tLeft=CONFIG.game.seconds; parts=[]; sel=null; timerAcc=0; last=performance.now();

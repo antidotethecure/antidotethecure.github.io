@@ -303,6 +303,7 @@ var CONFIG = {
   var cv=$("game"), cx=cv.getContext("2d"), W=cv.width, H=cv.height;
   var running=false, score=0, combo=0, tLeft=CONFIG.game.seconds, drops=[], bowlX=W/2, last=0, spawnAcc=0, timerAcc=0;
   var smoke=[], bowlVX=0, bowlPT=0;                   // smoke particles + bowl swipe velocity (px/ms)
+  var landed=[];                                       // recently-caught food resting on the tray
   // ---- photoreal sprites (generated cutouts); each falls back to drawn art until it loads ----
   var SPRITE_BASE="https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/";
   var SPRITE_FILES={
@@ -445,6 +446,13 @@ var CONFIG = {
     if(SPR.tray){                                     // photoreal tray cutout
       var im=SPR.tray, w=130, s=w/im.width, h=im.height*s, ty=H-6-h;
       cx.drawImage(im,x-w/2,ty,w,h);
+      var surfY=ty+h*0.40;                             // the food surface of the tray
+      sprite("chicken",x-22,surfY,30); sprite("shrimp",x+24,surfY-3,30); // a couple of pieces always on it
+      var now=performance.now();                       // caught food piles on, then fades
+      for(var li=landed.length-1;li>=0;li--){ var L=landed[li], age=now-L.born;
+        if(age>2600){ landed.splice(li,1); continue; }
+        cx.save(); cx.globalAlpha=age>1800?Math.max(0,1-(age-1800)/800):1;
+        sprite(L.t,x+L.dx,surfY+L.dy,30); cx.restore(); }
       if(burns>0){ cx.save(); cx.globalAlpha=Math.min(0.6,0.2*burns); cx.fillStyle="#140a04"; cx.fillRect(x-w/2,ty,w,h); cx.restore(); } // chars as it burns
       return;
     }
@@ -598,7 +606,9 @@ var CONFIG = {
       if(d.y>H-70 && d.y<H-26 && Math.abs(d.x-bowlX)<48){
         if(d.v==="bad"){ score=Math.max(0,score-20); combo=0; flash="#E6483D"; }
         else if(d.v==="star"){ score+=50; combo++; flash="#FFC82E"; }
-        else { score+=10+Math.min(combo,5)*2; combo++; flash=null; }
+        else { score+=10+Math.min(combo,5)*2; combo++; flash=null;
+          landed.push({t:d.e.t, dx:(Math.random()*74-37), dy:(Math.random()*14-7), born:performance.now()}); // it lands on the tray
+          if(landed.length>5) landed.shift(); }
         drops.splice(i,1); $("score").textContent=score; continue;
       }
       if(d.y>H+30) drops.splice(i,1);
@@ -611,7 +621,7 @@ var CONFIG = {
   }
   var flash=null;
   function start(){
-    running=true; score=0; combo=0; tLeft=CONFIG.game.seconds; drops=[]; smoke=[]; bowlVX=0; last=performance.now(); spawnAcc=0; timerAcc=0; flash=null;
+    running=true; score=0; combo=0; tLeft=CONFIG.game.seconds; drops=[]; smoke=[]; landed=[]; bowlVX=0; last=performance.now(); spawnAcc=0; timerAcc=0; flash=null;
     $("score").textContent=0; $("timer").textContent=tLeft; $("final").hidden=true;
     drg={x:W/2, dir:1, mode:"patrol", t:0, y:44, burned:false}; burns=0;
     $("gmsg").innerHTML="Catch the hibachi — dodge 🔥 🍭 🧊 (<b>-20</b>). <b>3 dragon hits burns the rice</b> and the run is over!";

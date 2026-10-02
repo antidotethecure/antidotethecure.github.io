@@ -285,32 +285,46 @@ var CONFIG = {
     cx.fillStyle="#CE8678"; cx.fillRect(x-11,y-3,6,3); cx.fillRect(x+6,y+1,5,3);   // pink medium centers
     cx.fillStyle="#E0A396"; cx.fillRect(x-10,y-2,4,1.5);
   }
-  function drawShrimp(x,y){ // one curled hibachi shrimp: coral body, pale flesh, pink tail fan, pepper
+  function drawShrimp(x,y){ // one curled hibachi shrimp: plump coral body, belly highlight, tail fan
     cx.save(); cx.translate(x,y); cx.lineCap="round";
-    cx.strokeStyle="#F3A48C"; cx.lineWidth=9;                        // body curl
-    cx.beginPath(); cx.arc(0,0,11,Math.PI*0.15,Math.PI*1.65); cx.stroke();
-    cx.strokeStyle="#FBE4DA"; cx.lineWidth=3.5;                      // pale inner flesh
-    cx.beginPath(); cx.arc(0,0,11,Math.PI*0.2,Math.PI*1.55); cx.stroke();
-    cx.strokeStyle="#D96A52"; cx.lineWidth=1.2;                      // segment lines
-    for(var a=0.3;a<1.6;a+=0.3){ cx.beginPath(); cx.moveTo(Math.cos(Math.PI*a)*6,Math.sin(Math.PI*a)*6); cx.lineTo(Math.cos(Math.PI*a)*15,Math.sin(Math.PI*a)*15); cx.stroke(); }
-    var tx=Math.cos(Math.PI*1.65)*11, ty=Math.sin(Math.PI*1.65)*11; // pink tail fan at the open end
-    cx.fillStyle="#E8613F"; cx.beginPath(); cx.moveTo(tx,ty); cx.lineTo(tx+6,ty-6); cx.lineTo(tx+9,ty+1); cx.lineTo(tx+4,ty+6); cx.closePath(); cx.fill();
-    cx.fillStyle="#2a1d12"; cx.fillRect(-2,-8,1.3,1.3); cx.fillRect(5,2,1.3,1.3); cx.fillRect(-6,4,1.2,1.2); // pepper
+    cx.strokeStyle="#F0906F"; cx.lineWidth=10;                       // plump body curl
+    cx.beginPath(); cx.arc(0,0,11,Math.PI*0.10,Math.PI*1.55); cx.stroke();
+    cx.strokeStyle="#FBD9CB"; cx.lineWidth=4;                        // pale belly highlight
+    cx.beginPath(); cx.arc(0,0,11,Math.PI*0.18,Math.PI*1.48); cx.stroke();
+    cx.strokeStyle="#DD6A4E"; cx.lineWidth=1.5;                      // segment bands
+    for(var a=0.28;a<1.5;a+=0.22){ var c=Math.cos(Math.PI*a),s=Math.sin(Math.PI*a); cx.beginPath(); cx.moveTo(c*6,s*6); cx.lineTo(c*16,s*16); cx.stroke(); }
+    var tx=Math.cos(Math.PI*1.55)*11, ty=Math.sin(Math.PI*1.55)*11; // tail fan (flukes) at the top end
+    cx.fillStyle="#E8613F"; cx.beginPath(); cx.moveTo(tx,ty);
+    cx.lineTo(tx+2,ty-9); cx.lineTo(tx+7,ty-7); cx.lineTo(tx+10,ty); cx.lineTo(tx+6,ty+5); cx.closePath(); cx.fill();
+    cx.strokeStyle="#c94a30"; cx.lineWidth=0.8; cx.stroke();
+    var hx=Math.cos(Math.PI*0.10)*11, hy=Math.sin(Math.PI*0.10)*11; // little leg/head hint at the other end
+    cx.strokeStyle="#DD6A4E"; cx.lineWidth=1; cx.beginPath(); cx.moveTo(hx,hy); cx.lineTo(hx+4,hy+5); cx.stroke();
+    cx.fillStyle="#2a1d12"; cx.fillRect(-2,-7,1.3,1.3); cx.fillRect(6,1,1.2,1.2); cx.fillRect(-6,3,1.1,1.1); // pepper
     cx.restore();
   }
-  function drawLobster(x,y){ // hibachi lobster tail: red segmented shell + chopped white meat inside
+  function drawLobster(x,y){ // split hibachi lobster tail: red shell cradle, fan at back, chopped meat piled in
     cx.save(); cx.translate(x,y);
-    cx.fillStyle="#C8341C";                                          // tail fan (flukes) at top
-    cx.beginPath(); cx.moveTo(0,-13);
-    cx.lineTo(-11,-23); cx.lineTo(-5,-13); cx.lineTo(-3,-25); cx.lineTo(0,-13);
-    cx.lineTo(3,-25); cx.lineTo(5,-13); cx.lineTo(11,-23); cx.closePath(); cx.fill();
-    cx.fillStyle="#E0462A"; rr(-12,-14,24,27,8); cx.fill();          // shell body
-    cx.fillStyle="#C8341C"; for(var i=0;i<3;i++){ rr(-12,-9+i*8,24,3,2); cx.fill(); } // segment ridges
-    cx.strokeStyle="#9c2514"; cx.lineWidth=1.5; rr(-12,-14,24,27,8); cx.stroke();
-    chunk(-8,-6,9,"#E6B063","#9c6420","#C98A3C",true);              // chopped lobster meat, grilled golden
-    chunk(1,-9,8,"#EEBE70","#9c6420","#D49646",true);
-    chunk(-3,1,8,"#DFA852","#9c6420","#C07E2E",true);
-    cx.fillStyle="rgba(58,32,12,.7)"; cx.fillRect(-6,-5,3,2); cx.fillRect(3,-7,3,2); cx.fillRect(-1,2,2.5,2); // grill char
+    // tail fan (flukes) at the back/top
+    cx.fillStyle="#E0462A"; cx.beginPath(); cx.moveTo(0,-9);
+    cx.lineTo(-12,-20); cx.lineTo(-4,-23); cx.lineTo(4,-23); cx.lineTo(12,-20); cx.closePath(); cx.fill();
+    cx.strokeStyle="#9c2514"; cx.lineWidth=1;                        // fluke separations
+    [[-12,-20],[-4,-23],[4,-23],[12,-20]].forEach(function(f){ cx.beginPath(); cx.moveTo(0,-9); cx.lineTo(f[0],f[1]); cx.stroke(); });
+    // red tail-shell cradle that holds the meat
+    cx.fillStyle="#D83A22"; cx.beginPath();
+    cx.moveTo(-14,-9); cx.quadraticCurveTo(0,-15,14,-9);
+    cx.quadraticCurveTo(16,7,0,13); cx.quadraticCurveTo(-16,7,-14,-9); cx.closePath(); cx.fill();
+    cx.strokeStyle="#9c2514"; cx.lineWidth=1.5; cx.stroke();
+    cx.fillStyle="#EC6A49"; cx.beginPath();                          // inner shell lip
+    cx.moveTo(-11,-7); cx.quadraticCurveTo(0,-12,11,-7); cx.quadraticCurveTo(12,5,0,10); cx.quadraticCurveTo(-12,5,-11,-7); cx.closePath(); cx.fill();
+    // chopped golden meat chunks piled inside (clipped to the shell)
+    cx.save();
+    cx.beginPath(); cx.moveTo(-11,-7); cx.quadraticCurveTo(0,-12,11,-7); cx.quadraticCurveTo(12,5,0,10); cx.quadraticCurveTo(-12,5,-11,-7); cx.closePath(); cx.clip();
+    var P=[[-7,-5,7,"#E6B063"],[-1,-7,7,"#EEBE70"],[5,-5,7,"#DFA852"],[-4,0,6,"#E8B86A"],[3,1,6,"#DBA24E"],[0,-2,6,"#F0C274"]];
+    P.forEach(function(p){ rr(p[0]-p[2]/2,p[1]-p[2]/2,p[2],p[2],2); cx.fillStyle=p[3]; cx.fill();
+      cx.strokeStyle="#9c6420"; cx.lineWidth=0.8; cx.stroke(); });
+    cx.fillStyle="rgba(58,32,12,.7)"; cx.fillRect(-5,-4,2.5,1.8); cx.fillRect(2,-6,2.5,1.8); cx.fillRect(-1,2,2,1.8); // char
+    cx.fillStyle="#2a1d12"; cx.fillRect(-3,-2,1.2,1.2); cx.fillRect(4,-3,1.1,1.1); cx.fillRect(0,3,1.1,1.1);         // pepper
+    cx.restore();
     cx.restore();
   }
   function drawVeg(x,y){ // hibachi veggie batch: broccoli floret, carrot round, onion chunk

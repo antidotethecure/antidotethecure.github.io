@@ -318,7 +318,7 @@ var CONFIG = {
     tray:"hf_20261002_040550_b3052e8a-cde1-46ed-8fda-065de7206aea.png"
   };
   var SPR={};
-  for(var _k in SPRITE_FILES){ (function(key){ var im=new Image(); im.onload=function(){ SPR[key]=im; }; im.src=SPRITE_BASE+SPRITE_FILES[key]; })(_k); }
+  for(var _k in SPRITE_FILES){ (function(key){ var im=new Image(); im.onload=function(){ SPR[key]=im; if(!running && $("final").hidden) drawIdle(); }; im.src=SPRITE_BASE+SPRITE_FILES[key]; })(_k); }
   function sprite(key,x,y,size){ var im=SPR[key]; if(!im) return false; var s=size/Math.max(im.width,im.height); cx.drawImage(im,x-im.width*s/2,y-im.height*s/2,im.width*s,im.height*s); return true; }
 
   function rr(x,y,w,h,r){ // rounded rect path
@@ -502,10 +502,14 @@ var CONFIG = {
   }
   function drawIdle(){
     cx.clearRect(0,0,W,H);
-    drawChicken(W/2-62,H/2-52); drawSteak(W/2+46,H/2-58);
-    drawShrimp(W/2-6,H/2-42); drawVeg(W/2+58,H/2-20);
+    // the new photo plates; drawn art only shows for the split second before they load
+    sprite("rice",W/2-152,H/2-34,70);
+    if(!sprite("chicken",W/2-78,H/2-68,72)) drawChicken(W/2-62,H/2-52);
+    if(!sprite("shrimp",W/2,H/2-84,76)) drawShrimp(W/2-6,H/2-42);
+    if(!sprite("steak",W/2+78,H/2-68,72)) drawSteak(W/2+46,H/2-58);
+    if(!sprite("lobster",W/2+152,H/2-34,74)) drawVeg(W/2+58,H/2-20);
     drawBowl(W/2);
-    cx.font="bold 22px Archivo,sans-serif"; cx.fillStyle="#F7EFE6";
+    cx.font="bold 22px Archivo,sans-serif"; cx.fillStyle="#F7EFE6"; cx.textAlign="center";
     cx.fillText("TAP TO PLAY", W/2, H/2+30);
   }
   function spawn(){

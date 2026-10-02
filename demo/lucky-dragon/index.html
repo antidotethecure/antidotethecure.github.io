@@ -204,7 +204,8 @@ var CONFIG = {
       ["Hibachi Chicken","grilled chicken, fried rice, veggies, house yum-yum","$12.95","img/chicken.jpg"],
       ["Hibachi Steak","sirloin, fried rice, veggies, double yum-yum","$15.95","img/steak.jpg"],
       ["Hibachi Shrimp","jumbo shrimp, fried rice, veggies","$14.95","img/shrimp.jpg"],
-      ["Chicken + Shrimp Combo","the one from the review video","$16.95"]
+      ["Chicken + Shrimp Combo","the one from the review video","$16.95"],
+      ["Premium Lobster 🦞","perfectly grilled, served hibachi style — add to any meal & level up","MP"]
     ]},
     { section: "Sides & Extras", items: [
       ["Fried Rice (solo)","wok-fired, egg & scallion","$6.50"],
@@ -306,11 +307,10 @@ var CONFIG = {
     cx.fillStyle="#E0462A"; rr(-12,-14,24,27,8); cx.fill();          // shell body
     cx.fillStyle="#C8341C"; for(var i=0;i<3;i++){ rr(-12,-9+i*8,24,3,2); cx.fill(); } // segment ridges
     cx.strokeStyle="#9c2514"; cx.lineWidth=1.5; rr(-12,-14,24,27,8); cx.stroke();
-    chunk(-8,-6,9,"#F3ECDC","#D8442A","#F6EEDC",false);              // chopped white lobster meat
-    chunk(1,-9,8,"#F6EEDC","#D8442A","#FBF3E2",false);
-    chunk(-3,1,8,"#EFE4CE","#D8442A","#F3ECDC",false);
-    cx.fillStyle="rgba(216,68,42,.5)"; cx.fillRect(-8,-6,9,1.6); cx.fillRect(1,-9,8,1.6); // red meat edges
-    cx.fillStyle="#2a1d12"; cx.fillRect(-4,-4,1.3,1.3); cx.fillRect(3,-6,1.2,1.2);        // pepper
+    chunk(-8,-6,9,"#E6B063","#9c6420","#C98A3C",true);              // chopped lobster meat, grilled golden
+    chunk(1,-9,8,"#EEBE70","#9c6420","#D49646",true);
+    chunk(-3,1,8,"#DFA852","#9c6420","#C07E2E",true);
+    cx.fillStyle="rgba(58,32,12,.7)"; cx.fillRect(-6,-5,3,2); cx.fillRect(3,-7,3,2); cx.fillRect(-1,2,2.5,2); // grill char
     cx.restore();
   }
   function drawVeg(x,y){ // hibachi veggie batch: broccoli floret, carrot round, onion chunk

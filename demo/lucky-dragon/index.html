@@ -349,33 +349,31 @@ var CONFIG = {
   ];
   var burns=0;
   function drawBowl(x){
-    var by=H-40, rice=RICE[Math.min(burns,3)];
-    // rice mound sitting in the bowl
+    var rice=RICE[Math.min(burns,3)];
+    // ---- square black takeout tray (matches the restaurant's real containers) ----
+    var pw=108, ph=40, px=x-pw/2, py=H-50;            // tray box
+    cx.fillStyle="rgba(0,0,0,.35)";                   // soft shadow under the tray
+    rr(px+4,py+ph-4,pw,10,8); cx.fill();
+    cx.fillStyle="#141414";                           // black tray body
+    rr(px,py,pw,ph+10,9); cx.fill();
+    cx.strokeStyle="#333"; cx.lineWidth=2; rr(px,py,pw,ph+10,9); cx.stroke();
+    cx.fillStyle="#0c0c0c";                            // recessed inner well
+    rr(px+7,py+6,pw-14,ph,7); cx.fill();
+    cx.strokeStyle="rgba(255,255,255,.08)"; cx.lineWidth=1.5; // faint top-rim highlight (plastic sheen)
+    rr(px+2,py+2,pw-4,ph+6,8); cx.stroke();
+    // ---- fried rice sitting in the tray ----
+    var cy=py+16;
     cx.fillStyle=rice[0];
-    cx.beginPath(); cx.ellipse(x,by-6,40,15,0,Math.PI,0); cx.fill();
-    cx.beginPath();
-    cx.arc(x-20,by-12,11,0,Math.PI*2); cx.arc(x,by-17,13,0,Math.PI*2);
-    cx.arc(x+19,by-11,11,0,Math.PI*2); cx.fill();
-    // a few grains + scallion flecks so it reads as fried rice
-    cx.fillStyle=rice[1];
-    cx.fillRect(x-24,by-16,4,2); cx.fillRect(x-4,by-24,4,2); cx.fillRect(x+16,by-15,4,2);
-    if(burns<2){ cx.fillStyle="#7FA85A"; cx.fillRect(x-12,by-20,3,3); cx.fillRect(x+8,by-19,3,3); }
-    if(burns>=1){ // char flecks grow with each hit
-      cx.fillStyle="#1E140C";
-      cx.fillRect(x-14,by-14,4,3); cx.fillRect(x+10,by-20,4,3);
-      if(burns>=2){ cx.fillRect(x-2,by-12,5,3); cx.fillRect(x-26,by-10,4,3); cx.fillRect(x+20,by-12,4,3); }
+    cx.beginPath(); cx.ellipse(x,cy+6,42,13,0,0,Math.PI*2); cx.fill();   // rice bed filling the well
+    cx.beginPath(); cx.arc(x-20,cy,10,0,Math.PI*2); cx.arc(x,cy-5,12,0,Math.PI*2); cx.arc(x+19,cy,10,0,Math.PI*2); cx.fill();
+    cx.fillStyle=rice[1];                             // grains
+    cx.fillRect(x-24,cy-2,4,2); cx.fillRect(x-4,cy-10,4,2); cx.fillRect(x+16,cy-1,4,2); cx.fillRect(x+6,cy+4,4,2);
+    if(burns<2){ cx.fillStyle="#7FA85A"; cx.fillRect(x-12,cy-6,3,3); cx.fillRect(x+8,cy-5,3,3); } // scallion
+    if(burns>=1){ cx.fillStyle="#1E140C";             // char flecks grow with each hit
+      cx.fillRect(x-14,cy,4,3); cx.fillRect(x+10,cy-6,4,3);
+      if(burns>=2){ cx.fillRect(x-2,cy+2,5,3); cx.fillRect(x-26,cy+4,4,3); cx.fillRect(x+20,cy+2,4,3); }
     }
-    // (smoke now rises as a particle system — see smokeStep/smokeDraw)
-    // the bowl itself — lacquer red with a gold band
-    cx.fillStyle="#B4322A";
-    cx.beginPath(); cx.ellipse(x,by-4,46,10,0,0,Math.PI*2); cx.fill();
-    cx.beginPath(); cx.ellipse(x,by-2,46,10,0,0,Math.PI); cx.lineTo(x-30,by+26);
-    cx.quadraticCurveTo(x,by+36,x+30,by+26); cx.closePath(); cx.fill();
-    cx.strokeStyle="#FFC82E"; cx.lineWidth=2.5;
-    cx.beginPath(); cx.moveTo(x-38,by+14); cx.quadraticCurveTo(x,by+24,x+38,by+14); cx.stroke();
-    // inner rim shadow so the rice sits IN the bowl
-    cx.strokeStyle="#7E1F1A"; cx.lineWidth=2;
-    cx.beginPath(); cx.ellipse(x,by-4,46,10,0,0,Math.PI*2); cx.stroke();
+    // (smoke rises as a particle system — see smokeStep/smokeDraw)
   }
   function drawDrop(d){
     var t=d.e&&d.e.t;

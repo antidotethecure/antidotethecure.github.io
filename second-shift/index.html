@@ -3,150 +3,246 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Second Shift AI — AI Automation & SEO Marketing</title>
-<meta name="description" content="Second Shift AI automates a local business's entire digital side — digital menu, loyalty game, AI phone & email, local SEO, payments — built fast and done for you.">
+<title>Second Shift AI — Get Your Free Breakdown</title>
+<meta name="description" content="See Second Shift AI's live demos and get a free breakdown of what your business is missing online — website, menu, loyalty game, AI caller, win-back texts and more.">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap">
 <style>
 :root{
-  --bg:#05070d;          /* near-black */
-  --panel:#0b1018;
-  --edge:#16202e;
-  --ink:#eaf2ff;
-  --dim:#8fa3bd;
-  --cyan:#2DE2FF;        /* neon cyan */
-  --amber:#FFB01F;       /* amber */
+  --bg:#04060c; --panel:rgba(12,18,28,.72); --edge:#16283a; --ink:#eaf2ff; --dim:#8fa8c6;
+  --cyan:#2DE2FF; --amber:#FFB01F;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;background:var(--bg);color:var(--ink);
-  font-family:"Rajdhani",system-ui,sans-serif;font-size:17px;line-height:1.5;
-  padding-inline:16px;
-  background-image:
-    radial-gradient(60% 40% at 50% -5%, rgba(45,226,255,.12), transparent 70%),
-    linear-gradient(transparent 95%, rgba(45,226,255,.06) 95%),
-    linear-gradient(90deg, transparent 95%, rgba(45,226,255,.06) 95%);
-  background-size:auto, 34px 34px, 34px 34px;
-}
-.wrap{max-width:720px;margin:0 auto;padding-bottom:60px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Rajdhani",system-ui,sans-serif;
+  font-size:17px;line-height:1.5;padding-inline:16px;overflow-x:hidden}
+#grid{position:fixed;inset:0;z-index:-1;display:block}
+.wrap{max-width:720px;margin:0 auto;padding-bottom:90px;position:relative;z-index:1}
 a{color:var(--cyan);text-decoration:none}
-h1,h2,h3{font-family:"Orbitron",sans-serif;letter-spacing:.02em;line-height:1.1}
+h1,h2,h3{font-family:"Orbitron",sans-serif;letter-spacing:.02em;line-height:1.12}
 
-/* hero */
-header{text-align:center;padding-block:26px 8px}
-.logo{display:block;width:min(360px,82%);margin:0 auto;filter:drop-shadow(0 10px 40px rgba(45,226,255,.25))}
-.tagline{font-family:"Orbitron",sans-serif;font-weight:800;font-size:13px;letter-spacing:.34em;
-  color:var(--cyan);text-transform:uppercase;margin:14px 0 0}
+/* hero — logo merged into the page (feathered edges + glow, dark bg dropped via blend) */
+header{text-align:center;padding-block:24px 6px}
+.logowrap{position:relative;width:min(400px,88%);margin:0 auto}
+.logo{display:block;width:100%;
+  -webkit-mask-image:radial-gradient(ellipse 72% 68% at 50% 46%, #000 52%, rgba(0,0,0,.6) 68%, transparent 82%);
+          mask-image:radial-gradient(ellipse 72% 68% at 50% 46%, #000 52%, rgba(0,0,0,.6) 68%, transparent 82%);
+  mix-blend-mode:screen; filter:drop-shadow(0 0 30px rgba(45,226,255,.35)) contrast(1.05)}
+.tagline{font-family:"Orbitron",sans-serif;font-weight:800;font-size:13px;letter-spacing:.32em;color:var(--cyan);text-transform:uppercase;margin:6px 0 0}
 .sub{color:var(--dim);margin:6px 0 0;font-size:15px;letter-spacing:.06em}
 .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
-.btn{font-family:"Orbitron",sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;
-  padding:13px 20px;border-radius:12px;cursor:pointer;border:1px solid transparent;text-transform:uppercase}
-.btn.solid{background:linear-gradient(180deg,var(--cyan),#1aa8c4);color:#011018}
+.btn{font-family:"Orbitron",sans-serif;font-weight:700;font-size:13px;letter-spacing:.05em;padding:13px 20px;border-radius:12px;cursor:pointer;border:1px solid transparent;text-transform:uppercase}
+.btn.solid{background:linear-gradient(180deg,var(--cyan),#17a7c6);color:#021018}
+.btn.amber{background:linear-gradient(180deg,var(--amber),#d98a00);color:#1a1000}
 .btn.ghost{background:transparent;border-color:var(--edge);color:var(--ink)}
 
-h2{font-size:20px;margin:40px 0 4px;color:var(--ink)}
+h2{font-size:20px;margin:42px 0 4px}
 h2 .mark{color:var(--amber)}
 .lead{color:var(--dim);margin:2px 0 16px}
 
-/* capability grid */
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:14px}
-.card .ic{font-size:22px}
-.card b{display:block;font-family:"Orbitron",sans-serif;font-size:13px;letter-spacing:.02em;margin:6px 0 3px}
-.card span{color:var(--dim);font-size:13.5px}
-
-/* demos */
 .demos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.demo{display:block;background:var(--panel);border:1px solid var(--edge);border-radius:16px;padding:16px;text-align:center}
+.demo{display:block;background:var(--panel);backdrop-filter:blur(4px);border:1px solid var(--edge);border-radius:16px;padding:16px;text-align:center}
 .demo .em{font-size:30px}
-.demo b{display:block;font-family:"Orbitron",sans-serif;font-size:14px;margin:8px 0 2px;color:var(--ink)}
+.demo b{display:block;font-family:"Orbitron",sans-serif;font-size:14px;margin:8px 0 2px}
 .demo span{color:var(--dim);font-size:12.5px}
 .demo .go{display:inline-block;margin-top:9px;color:var(--cyan);font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
 
-/* steps */
-.steps{counter-reset:s;display:grid;gap:10px}
-.step{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:14px 14px 14px 52px;position:relative}
-.step::before{counter-increment:s;content:counter(s);position:absolute;left:14px;top:14px;
-  width:26px;height:26px;border-radius:50%;background:var(--amber);color:#1a1000;
-  font-family:"Orbitron",sans-serif;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
-.step b{font-family:"Orbitron",sans-serif;font-size:13.5px}
-.step span{display:block;color:var(--dim);font-size:13.5px;margin-top:2px}
+/* scan form */
+.scan{background:var(--panel);backdrop-filter:blur(6px);border:1px solid var(--edge);border-radius:18px;padding:18px}
+.scan label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:10px 0 4px;font-weight:700}
+.scan input{width:100%;background:#070c14;border:1px solid var(--edge);border-radius:10px;color:var(--ink);padding:12px 13px;font-family:inherit;font-size:16px}
+.scan input:focus{outline:none;border-color:var(--cyan)}
+.scan .btn{width:100%;margin-top:16px}
+#scanning{display:none;margin-top:16px;text-align:center}
+#scanning .bar{height:6px;border-radius:99px;background:#0a121c;overflow:hidden;margin-top:10px}
+#scanning .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--amber));animation:fill 1.8s ease forwards}
+@keyframes fill{to{width:100%}}
+#result{display:none;margin-top:18px}
+.check{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--edge)}
+.check .x{color:var(--amber);font-weight:900;font-family:"Orbitron",sans-serif;flex:0 0 auto}
+.check b{font-size:15px}
+.check span{display:block;color:var(--dim);font-size:13px}
+.preview{font-size:12px;color:#5f7391;margin-top:12px;line-height:1.5}
 
-/* packages */
-.terms{background:var(--panel);border:1px dashed var(--edge);border-radius:14px;padding:14px;color:var(--dim);font-size:14px}
-.terms b{color:var(--ink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:var(--panel);backdrop-filter:blur(4px);border:1px solid var(--edge);border-radius:14px;padding:14px}
+.card .ic{font-size:22px}
+.card b{display:block;font-family:"Orbitron",sans-serif;font-size:13px;margin:6px 0 3px}
+.card span{color:var(--dim);font-size:13.5px}
 
 footer{margin-top:44px;border-top:1px solid var(--edge);padding-top:18px;color:var(--dim);font-size:13px;text-align:center}
-footer a{font-weight:700}
 .disc{font-size:11.5px;color:#5f7391;margin-top:10px;line-height:1.5}
-@media(max-width:480px){ .grid{grid-template-columns:1fr} }
+
+/* language switcher — bottom right */
+#lang{position:fixed;right:14px;bottom:14px;z-index:5;background:var(--panel);backdrop-filter:blur(6px);
+  border:1px solid var(--edge);border-radius:12px;color:var(--ink);font-family:"Rajdhani",sans-serif;
+  font-size:15px;font-weight:600;padding:9px 12px}
+#lang:focus{outline:none;border-color:var(--cyan)}
+@media(max-width:480px){ .grid2{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
+<canvas id="grid"></canvas>
 <div class="wrap">
 
 <header>
-  <img class="logo" src="img/ssai-logo-animated.gif" alt="Second Shift AI" onerror="this.src='img/ssai-logo.png'">
-  <p class="tagline">Automate · Elevate · Dominate</p>
-  <p class="sub">AI Automation &amp; SEO Marketing · Built for what's next</p>
+  <div class="logowrap">
+    <img class="logo" src="img/ssai-logo-animated.gif" alt="Second Shift AI" onerror="this.src='img/ssai-logo.png'">
+  </div>
+  <p class="tagline" data-i18n="tagline">Automate · Elevate · Dominate</p>
+  <p class="sub" data-i18n="sub">AI Automation &amp; SEO Marketing</p>
   <div class="cta">
-    <a class="btn solid" href="#demos">See live demos</a>
-    <a class="btn ghost" href="#start">Get your demo</a>
+    <a class="btn solid" href="#demos" data-i18n="ctaDemos">See live demos</a>
+    <a class="btn amber" href="#scan" data-i18n="ctaScan">Get your free breakdown</a>
   </div>
 </header>
 
-<h2>Your whole digital side, <span class="mark">done for you</span></h2>
-<p class="lead">One team automates everything a local business needs online — built fast, run for you.</p>
-<div class="grid">
-  <div class="card"><div class="ic">📱</div><b>Digital Menu</b><span>A fast, branded menu people actually use on their phone.</span></div>
-  <div class="card"><div class="ic">🎮</div><b>Loyalty Game</b><span>A branded mini-game with prizes that brings customers back.</span></div>
-  <div class="card"><div class="ic">📞</div><b>AI Phone Agent</b><span>Answers and takes orders 24/7 so no call is missed.</span></div>
-  <div class="card"><div class="ic">✉️</div><b>AI Email Agent</b><span>Replies, follows up, and wins back old customers automatically.</span></div>
-  <div class="card"><div class="ic">🔎</div><b>Local SEO</b><span>Show up first when locals search your category nearby.</span></div>
-  <div class="card"><div class="ic">💳</div><b>Payments</b><span>Card and crypto checkout wired into your site.</span></div>
-  <div class="card"><div class="ic">🎬</div><b>Content &amp; Marketing</b><span>Posts, flyers, and promos in your brand, on a schedule.</span></div>
-  <div class="card"><div class="ic">🔁</div><b>Customer Win-Back</b><span>Automatic weekly nudges that pull regulars back in.</span></div>
-</div>
-
-<h2 id="demos">See it <span class="mark">live</span></h2>
-<p class="lead">Real demos we built — tap and play.</p>
+<h2 id="demos">See it <span class="mark" data-i18n="liveMark">live</span></h2>
+<p class="lead" data-i18n="demosSub">Real demos we built — tap and play.</p>
 <div class="demos">
-  <a class="demo" href="../demo/lucky-dragon/">
-    <div class="em">🐉</div><b>Lucky Dragon Hibachi</b>
-    <span>Digital menu + hibachi catch game</span>
-    <span class="go">Open demo →</span>
-  </a>
-  <a class="demo" href="../demo/churrito-loco/">
-    <div class="em">🌮</div><b>Churrito Loco</b>
-    <span>Digital menu + Loco Match game</span>
-    <span class="go">Open demo →</span>
-  </a>
+  <a class="demo" href="../demo/lucky-dragon/"><div class="em">🐉</div><b>Lucky Dragon Hibachi</b><span data-i18n="d1">Digital menu + hibachi catch game</span><span class="go" data-i18n="open">Open demo →</span></a>
+  <a class="demo" href="../demo/churrito-loco/"><div class="em">🌮</div><b>Churrito Loco</b><span data-i18n="d2">Digital menu + Loco Match game</span><span class="go" data-i18n="open">Open demo →</span></a>
 </div>
 
-<h2 id="start">How it <span class="mark">works</span></h2>
-<p class="lead">From a link to a live demo — fast.</p>
-<div class="steps">
-  <div class="step"><b>Drop your business</b><span>Send your Instagram, website, or just your name — whatever you've got.</span></div>
-  <div class="step"><b>We break it down &amp; build</b><span>We research your online presence, find where you're lacking, scope it, and build a live demo in your brand.</span></div>
-  <div class="step"><b>You go live</b><span>Review it, approve it, and it's running — menu, game, AI agents, and the rest.</span></div>
+<h2 id="scan"><span data-i18n="scanH">Get your free breakdown</span></h2>
+<p class="lead" data-i18n="scanSub">Drop your Instagram and we'll show you what's missing — and what we'd build.</p>
+<div class="scan">
+  <label data-i18n="fName">Business name</label>
+  <input id="f_name" type="text" placeholder="Lucky Dragon Hibachi">
+  <label data-i18n="fType">Type / cuisine</label>
+  <input id="f_type" type="text" placeholder="Hibachi, tacos, pizza…">
+  <label data-i18n="fIg">Instagram handle</label>
+  <input id="f_ig" type="text" placeholder="@yourbusiness">
+  <button class="btn amber" id="scanBtn" data-i18n="fBtn">Run my free scan</button>
+
+  <div id="scanning">
+    <span data-i18n="scanning">Scanning</span> <b id="scanHandle"></b>…
+    <div class="bar"><i></i></div>
+  </div>
+
+  <div id="result">
+    <p class="lead" data-i18n="checkIntro">Here's what we check. Book your free breakdown and we'll confirm exactly which your business is missing:</p>
+    <div class="check"><span class="x">✗</span><div><b data-i18n="wWebsite">Modern mobile website</b><span data-i18n="wWebsiteD">Fast, branded, built to convert.</span></div></div>
+    <div class="check"><span class="x">✗</span><div><b data-i18n="wMenu">Digital menu with photos</b><span data-i18n="wMenuD">Real pictures of every dish.</span></div></div>
+    <div class="check"><span class="x">✗</span><div><b data-i18n="wGame">Loyalty game</b><span data-i18n="wGameD">A game themed to your food that brings people back.</span></div></div>
+    <div class="check"><span class="x">✗</span><div><b data-i18n="wCaller">AI phone agent</b><span data-i18n="wCallerD">Answers and takes orders 24/7.</span></div></div>
+    <div class="check"><span class="x">✗</span><div><b data-i18n="wWinback">Win-back texts &amp; emails</b><span data-i18n="wWinbackD">Automatic messages that pull customers back.</span></div></div>
+    <div class="check"><span class="x">✗</span><div><b data-i18n="wSEO">Google ranking &amp; reviews</b><span data-i18n="wSEOD">Show up first when locals search.</span></div></div>
+    <div class="check"><span class="x">✗</span><div><b data-i18n="wPhotos">Pro food photos</b><span data-i18n="wPhotosD">Studio-grade shots of your menu.</span></div></div>
+    <a class="btn amber" id="bookBtn" href="#" target="_blank" rel="noopener" data-i18n="bookBtn">Claim my full breakdown</a>
+    <p class="preview" data-i18n="preview">Preview only — your full custom breakdown is done by our team after you book. We never show your results publicly.</p>
+  </div>
 </div>
 
-<h2>Simple <span class="mark">terms</span></h2>
-<div class="terms">
-  Packages are <b>custom-scoped</b> to what your business actually needs — monthly, done-for-you.
-  Every engagement starts with a <b>3-month commitment</b> (locked in while we build and run it), then
-  continues month-to-month with cancel-anytime after. Changes beyond your package are quoted by scope first.
-  <br><br><b>Honest promise:</b> we sell capability and speed — never a fake sales or income number.
+<h2 data-i18n="buildH">What we build</h2>
+<div class="grid2">
+  <div class="card"><div class="ic">📱</div><b data-i18n="cMenu">Digital Menu</b><span data-i18n="cMenuD">A fast, branded menu with real photos.</span></div>
+  <div class="card"><div class="ic">🎮</div><b data-i18n="cGame">Loyalty Game</b><span data-i18n="cGameD">Themed to your food, brings people back.</span></div>
+  <div class="card"><div class="ic">📞</div><b data-i18n="cCaller">AI Phone Agent</b><span data-i18n="cCallerD">Answers &amp; takes orders 24/7.</span></div>
+  <div class="card"><div class="ic">✉️</div><b data-i18n="cEmail">AI Email &amp; Texts</b><span data-i18n="cEmailD">Wins back old customers automatically.</span></div>
+  <div class="card"><div class="ic">🔎</div><b data-i18n="cSEO">Local SEO</b><span data-i18n="cSEOD">Rank first when locals search.</span></div>
+  <div class="card"><div class="ic">💳</div><b data-i18n="cPay">Payments</b><span data-i18n="cPayD">Card &amp; crypto checkout.</span></div>
 </div>
 
 <footer>
   <b style="color:var(--ink);font-family:'Orbitron',sans-serif">SECOND SHIFT AI</b><br>
-  Follow: <a href="https://instagram.com/second.shiftai" target="_blank" rel="noopener">@second.shiftai</a>
-  &nbsp;·&nbsp; <a href="#start">Get your demo</a>
-  <p class="disc">Demo food and brand visuals are AI-styled and clearly labeled until a business signs, then swapped for real shots. Prize games run only with the owner, as free-entry promotions with official rules.</p>
+  <span data-i18n="follow">Follow</span>: <a href="https://instagram.com/second.shiftai" target="_blank" rel="noopener">@second.shiftai</a>
+  <p class="disc" data-i18n="disc">Demo food and brand visuals are AI-styled and clearly labeled until a business signs, then swapped for real shots. We sell capability and speed — never a guaranteed sales number. Prize games run only with the owner, as free-entry promotions with official rules.</p>
 </footer>
 
 </div>
+
+<select id="lang" aria-label="Language">
+  <option value="en">English</option>
+  <option value="es">Español</option>
+  <option value="th">ไทย</option>
+  <option value="vi">Tiếng Việt</option>
+  <option value="tl">Filipino</option>
+  <option value="zh">中文</option>
+  <option value="hi">हिन्दी</option>
+</select>
+
+<script>
+"use strict";
+/* ---- contact: set BOOKING_EMAIL to route leads to email; otherwise the button opens Instagram DM ---- */
+var BOOKING_EMAIL = "";               // e.g. "hello@secondshiftai.com"
+var IG_URL = "https://instagram.com/second.shiftai";
+
+/* ---- Tron grid background: perspective floor + light streaks running past glowing nodes ---- */
+(function(){
+  var c=document.getElementById('grid'), x=c.getContext('2d'), W,H,t=0;
+  function size(){ W=c.width=innerWidth; H=c.height=innerHeight; }
+  size(); addEventListener('resize', size);
+  var streaks=[]; for(var i=0;i<18;i++) streaks.push({x:Math.random(),y:Math.random(),v:0.0008+Math.random()*0.0016,len:0.08+Math.random()*0.14});
+  function loop(){
+    t+=1; x.clearRect(0,0,W,H);
+    var cell=46, ox=(t*0.2)%cell, oy=(t*0.35)%cell;
+    x.lineWidth=1;
+    x.strokeStyle="rgba(45,226,255,0.07)";
+    for(var gx=-cell+ox%cell; gx<W; gx+=cell){ x.beginPath(); x.moveTo(gx,0); x.lineTo(gx,H); x.stroke(); }
+    for(var gy=-cell+oy%cell; gy<H; gy+=cell){ x.beginPath(); x.moveTo(0,gy); x.lineTo(W,gy); x.stroke(); }
+    // pulsing nodes
+    for(var k=0;k<22;k++){
+      var nx=((k*131)%Math.ceil(W/cell))*cell + cell/2;
+      var ny=((k*71)%Math.ceil(H/cell))*cell + cell/2;
+      var p=0.5+0.5*Math.sin(t*0.05 + k);
+      x.fillStyle="rgba(45,226,255,"+(0.05+0.18*p)+")";
+      x.fillRect(nx-2,ny-2,4,4);
+    }
+    // vertical light streaks going up/down
+    for(var s=0;s<streaks.length;s++){ var st=streaks[s];
+      st.y-=st.v; if(st.y< -st.len) st.y=1+st.len;
+      var px=st.x*W, y0=st.y*H, y1=(st.y+st.len)*H;
+      var g=x.createLinearGradient(px,y1,px,y0);
+      g.addColorStop(0,"rgba(45,226,255,0)"); g.addColorStop(1,"rgba(45,226,255,0.5)");
+      x.strokeStyle=g; x.lineWidth=2; x.beginPath(); x.moveTo(px,y0); x.lineTo(px,y1); x.stroke();
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ---- i18n ---- */
+var T={
+ en:{tagline:"Automate · Elevate · Dominate",sub:"AI Automation & SEO Marketing",ctaDemos:"See live demos",ctaScan:"Get your free breakdown",liveMark:"live",demosSub:"Real demos we built — tap and play.",d1:"Digital menu + hibachi catch game",d2:"Digital menu + Loco Match game",open:"Open demo →",scanH:"Get your free breakdown",scanSub:"Drop your Instagram and we'll show you what's missing — and what we'd build.",fName:"Business name",fType:"Type / cuisine",fIg:"Instagram handle",fBtn:"Run my free scan",scanning:"Scanning",checkIntro:"Here's what we check. Book your free breakdown and we'll confirm exactly which your business is missing:",wWebsite:"Modern mobile website",wWebsiteD:"Fast, branded, built to convert.",wMenu:"Digital menu with photos",wMenuD:"Real pictures of every dish.",wGame:"Loyalty game",wGameD:"A game themed to your food that brings people back.",wCaller:"AI phone agent",wCallerD:"Answers and takes orders 24/7.",wWinback:"Win-back texts & emails",wWinbackD:"Automatic messages that pull customers back.",wSEO:"Google ranking & reviews",wSEOD:"Show up first when locals search.",wPhotos:"Pro food photos",wPhotosD:"Studio-grade shots of your menu.",bookBtn:"Claim my full breakdown",preview:"Preview only — your full custom breakdown is done by our team after you book. We never show your results publicly.",buildH:"What we build",cMenu:"Digital Menu",cMenuD:"A fast, branded menu with real photos.",cGame:"Loyalty Game",cGameD:"Themed to your food, brings people back.",cCaller:"AI Phone Agent",cCallerD:"Answers & takes orders 24/7.",cEmail:"AI Email & Texts",cEmailD:"Wins back old customers automatically.",cSEO:"Local SEO",cSEOD:"Rank first when locals search.",cPay:"Payments",cPayD:"Card & crypto checkout.",follow:"Follow",disc:"Demo food and brand visuals are AI-styled and clearly labeled until a business signs, then swapped for real shots. We sell capability and speed — never a guaranteed sales number. Prize games run only with the owner, as free-entry promotions with official rules."},
+ es:{tagline:"Automatiza · Eleva · Domina",sub:"Automatización con IA y Marketing SEO",ctaDemos:"Ver demos en vivo",ctaScan:"Obtén tu análisis gratis",liveMark:"en vivo",demosSub:"Demos reales que creamos — toca y juega.",d1:"Menú digital + juego hibachi",d2:"Menú digital + juego Loco Match",open:"Abrir demo →",scanH:"Obtén tu análisis gratis",scanSub:"Pon tu Instagram y te mostramos qué te falta — y qué construiríamos.",fName:"Nombre del negocio",fType:"Tipo / cocina",fIg:"Usuario de Instagram",fBtn:"Hacer mi análisis gratis",scanning:"Analizando",checkIntro:"Esto es lo que revisamos. Reserva tu análisis gratis y confirmamos qué le falta a tu negocio:",wWebsite:"Sitio web móvil moderno",wWebsiteD:"Rápido, con tu marca, hecho para vender.",wMenu:"Menú digital con fotos",wMenuD:"Fotos reales de cada platillo.",wGame:"Juego de lealtad",wGameD:"Un juego con el tema de tu comida que atrae clientes.",wCaller:"Agente telefónico con IA",wCallerD:"Contesta y toma pedidos 24/7.",wWinback:"Mensajes y correos de recuperación",wWinbackD:"Mensajes automáticos que traen de vuelta a los clientes.",wSEO:"Posición en Google y reseñas",wSEOD:"Aparece primero en búsquedas locales.",wPhotos:"Fotos profesionales de comida",wPhotosD:"Fotos de tu menú con calidad de estudio.",bookBtn:"Quiero mi análisis completo",preview:"Solo una vista previa — tu análisis completo lo hace nuestro equipo después de reservar. Nunca mostramos tus resultados en público.",buildH:"Lo que construimos",cMenu:"Menú Digital",cMenuD:"Un menú rápido con tu marca y fotos reales.",cGame:"Juego de Lealtad",cGameD:"Con el tema de tu comida, atrae clientes.",cCaller:"Agente Telefónico IA",cCallerD:"Contesta y toma pedidos 24/7.",cEmail:"Correos y Textos IA",cEmailD:"Recupera clientes automáticamente.",cSEO:"SEO Local",cSEOD:"Aparece primero en búsquedas.",cPay:"Pagos",cPayD:"Pago con tarjeta y cripto.",follow:"Síguenos",disc:"Las imágenes de comida y marca de la demo son estilizadas con IA y están claramente indicadas hasta que el negocio firma; luego se cambian por fotos reales. Vendemos capacidad y rapidez — nunca un número de ventas garantizado. Los juegos con premio se activan solo con el dueño, como promociones de entrada gratuita con reglas oficiales."},
+ th:{tagline:"ทำงานอัตโนมัติ · ยกระดับ · ครองตลาด",sub:"ระบบอัตโนมัติด้วย AI และการตลาด SEO",ctaDemos:"ดูตัวอย่างจริง",ctaScan:"รับการวิเคราะห์ฟรี",liveMark:"จริง",demosSub:"ตัวอย่างจริงที่เราทำ — แตะเพื่อเล่น",d1:"เมนูดิจิทัล + เกมฮิบาจิ",d2:"เมนูดิจิทัล + เกม Loco Match",open:"เปิดตัวอย่าง →",scanH:"รับการวิเคราะห์ฟรี",scanSub:"ใส่อินสตาแกรมของคุณ แล้วเราจะบอกว่าคุณขาดอะไร — และเราจะสร้างอะไรให้",fName:"ชื่อธุรกิจ",fType:"ประเภท / อาหาร",fIg:"บัญชีอินสตาแกรม",fBtn:"เริ่มวิเคราะห์ฟรี",scanning:"กำลังวิเคราะห์",checkIntro:"นี่คือสิ่งที่เราตรวจสอบ จองการวิเคราะห์ฟรีแล้วเราจะยืนยันว่าธุรกิจของคุณขาดอะไรบ้าง:",wWebsite:"เว็บไซต์มือถือทันสมัย",wWebsiteD:"เร็ว มีแบรนด์ ออกแบบให้ขายได้",wMenu:"เมนูดิจิทัลพร้อมรูป",wMenuD:"รูปจริงของทุกเมนู",wGame:"เกมสะสมแต้ม",wGameD:"เกมธีมอาหารของคุณที่ดึงลูกค้ากลับมา",wCaller:"ผู้ช่วยรับสายด้วย AI",wCallerD:"รับสายและรับออเดอร์ตลอด 24 ชม.",wWinback:"ข้อความและอีเมลดึงลูกค้ากลับ",wWinbackD:"ข้อความอัตโนมัติที่ดึงลูกค้ากลับมา",wSEO:"อันดับ Google และรีวิว",wSEOD:"ขึ้นเป็นอันดับแรกเมื่อคนในพื้นที่ค้นหา",wPhotos:"ภาพอาหารมืออาชีพ",wPhotosD:"ภาพเมนูระดับสตูดิโอ",bookBtn:"ขอการวิเคราะห์เต็มรูปแบบ",preview:"เป็นตัวอย่างเท่านั้น — การวิเคราะห์เต็มรูปแบบทีมเราจะทำหลังจากคุณจอง เราไม่เปิดเผยผลของคุณต่อสาธารณะ",buildH:"สิ่งที่เราสร้าง",cMenu:"เมนูดิจิทัล",cMenuD:"เมนูเร็ว มีแบรนด์ พร้อมรูปจริง",cGame:"เกมสะสมแต้ม",cGameD:"ธีมอาหารของคุณ ดึงลูกค้ากลับมา",cCaller:"ผู้ช่วยรับสาย AI",cCallerD:"รับสายและออเดอร์ 24/7",cEmail:"อีเมลและข้อความ AI",cEmailD:"ดึงลูกค้าเก่ากลับมาอัตโนมัติ",cSEO:"SEO ท้องถิ่น",cSEOD:"ขึ้นอันดับแรกเมื่อมีการค้นหา",cPay:"การชำระเงิน",cPayD:"จ่ายด้วยบัตรและคริปโต",follow:"ติดตาม",disc:"ภาพอาหารและแบรนด์ในตัวอย่างสร้างด้วย AI และระบุไว้ชัดเจนจนกว่าธุรกิจจะเซ็นสัญญา แล้วจึงเปลี่ยนเป็นภาพจริง เราขายความสามารถและความเร็ว — ไม่รับประกันตัวเลขยอดขาย เกมชิงรางวัลจะเริ่มเมื่อเจ้าของตกลงเท่านั้น เป็นโปรโมชันเข้าร่วมฟรีพร้อมกติกาอย่างเป็นทางการ"},
+ vi:{tagline:"Tự động · Nâng tầm · Thống lĩnh",sub:"Tự động hóa bằng AI & Marketing SEO",ctaDemos:"Xem demo trực tiếp",ctaScan:"Nhận phân tích miễn phí",liveMark:"trực tiếp",demosSub:"Demo thật chúng tôi đã làm — chạm để chơi.",d1:"Thực đơn số + game hibachi",d2:"Thực đơn số + game Loco Match",open:"Mở demo →",scanH:"Nhận phân tích miễn phí",scanSub:"Nhập Instagram của bạn, chúng tôi sẽ chỉ ra bạn đang thiếu gì — và chúng tôi sẽ xây gì.",fName:"Tên doanh nghiệp",fType:"Loại / ẩm thực",fIg:"Tài khoản Instagram",fBtn:"Chạy phân tích miễn phí",scanning:"Đang phân tích",checkIntro:"Đây là những gì chúng tôi kiểm tra. Đặt lịch phân tích miễn phí và chúng tôi sẽ xác nhận doanh nghiệp bạn đang thiếu gì:",wWebsite:"Website di động hiện đại",wWebsiteD:"Nhanh, có thương hiệu, tối ưu bán hàng.",wMenu:"Thực đơn số có hình",wMenuD:"Hình thật của từng món.",wGame:"Game khách hàng thân thiết",wGameD:"Game theo chủ đề món ăn giúp kéo khách quay lại.",wCaller:"Tổng đài AI",wCallerD:"Trả lời và nhận đơn 24/7.",wWinback:"Tin nhắn & email kéo khách lại",wWinbackD:"Tin nhắn tự động đưa khách quay lại.",wSEO:"Thứ hạng Google & đánh giá",wSEOD:"Hiện đầu tiên khi người địa phương tìm kiếm.",wPhotos:"Ảnh món ăn chuyên nghiệp",wPhotosD:"Ảnh thực đơn chất lượng studio.",bookBtn:"Nhận phân tích đầy đủ",preview:"Chỉ là bản xem trước — phân tích đầy đủ do đội của chúng tôi thực hiện sau khi bạn đặt lịch. Chúng tôi không bao giờ công khai kết quả của bạn.",buildH:"Chúng tôi xây gì",cMenu:"Thực Đơn Số",cMenuD:"Thực đơn nhanh, có thương hiệu, hình thật.",cGame:"Game Thân Thiết",cGameD:"Theo chủ đề món ăn, kéo khách lại.",cCaller:"Tổng Đài AI",cCallerD:"Trả lời & nhận đơn 24/7.",cEmail:"Email & Tin Nhắn AI",cEmailD:"Tự động kéo khách cũ quay lại.",cSEO:"SEO Địa Phương",cSEOD:"Lên đầu khi có người tìm.",cPay:"Thanh Toán",cPayD:"Thẻ & crypto.",follow:"Theo dõi",disc:"Hình ảnh món ăn và thương hiệu trong demo được tạo bằng AI và ghi chú rõ cho đến khi doanh nghiệp ký hợp đồng, sau đó thay bằng ảnh thật. Chúng tôi bán năng lực và tốc độ — không cam kết con số doanh thu. Game trúng thưởng chỉ chạy khi có chủ doanh nghiệp, dưới dạng khuyến mãi tham gia miễn phí với thể lệ chính thức."},
+ tl:{tagline:"I-automate · Itaas · Manguna",sub:"AI Automation at SEO Marketing",ctaDemos:"Tingnan ang live demos",ctaScan:"Kunin ang libreng breakdown",liveMark:"live",demosSub:"Totoong demos na ginawa namin — i-tap at laruin.",d1:"Digital menu + hibachi game",d2:"Digital menu + Loco Match game",open:"Buksan ang demo →",scanH:"Kunin ang libreng breakdown",scanSub:"Ilagay ang iyong Instagram at ipapakita namin kung ano ang kulang — at kung ano ang gagawin namin.",fName:"Pangalan ng negosyo",fType:"Uri / lutuin",fIg:"Instagram handle",fBtn:"Patakbuhin ang libreng scan",scanning:"Sine-scan",checkIntro:"Ito ang sinusuri namin. Mag-book ng libreng breakdown at kukumpirmahin namin kung ano ang kulang sa negosyo mo:",wWebsite:"Modernong mobile website",wWebsiteD:"Mabilis, may brand, para magbenta.",wMenu:"Digital menu na may litrato",wMenuD:"Totoong litrato ng bawat putahe.",wGame:"Loyalty game",wGameD:"Laro na naka-tema sa pagkain mo na nagpapabalik ng customer.",wCaller:"AI phone agent",wCallerD:"Sumasagot at tumatanggap ng order 24/7.",wWinback:"Win-back na text at email",wWinbackD:"Automatikong mensahe na nagpapabalik ng customer.",wSEO:"Google ranking at reviews",wSEOD:"Mauna sa paghahanap ng mga lokal.",wPhotos:"Pro na litrato ng pagkain",wPhotosD:"Studio-grade na kuha ng menu mo.",bookBtn:"Kunin ang buong breakdown",preview:"Preview lamang — ang buong breakdown ay ginagawa ng team namin pagkatapos mong mag-book. Hindi namin ipinapakita sa publiko ang resulta mo.",buildH:"Ano ang ginagawa namin",cMenu:"Digital Menu",cMenuD:"Mabilis na menu, may brand at totoong litrato.",cGame:"Loyalty Game",cGameD:"Naka-tema sa pagkain mo, nagpapabalik ng tao.",cCaller:"AI Phone Agent",cCallerD:"Sumasagot at umoorder 24/7.",cEmail:"AI Email at Text",cEmailD:"Automatikong pinababalik ang dating customer.",cSEO:"Local SEO",cSEOD:"Mauna sa hanap ng mga lokal.",cPay:"Bayad",cPayD:"Card at crypto checkout.",follow:"Sundan",disc:"Ang mga larawan ng pagkain at brand sa demo ay AI-styled at malinaw na nakalabel hanggang pumirma ang negosyo, pagkatapos ay papalitan ng totoong litrato. Nagbebenta kami ng kakayahan at bilis — hindi garantisadong bilang ng benta. Ang mga prize game ay tumatakbo lamang kasama ang may-ari, bilang libreng-entry na promo na may opisyal na mga patakaran."},
+ zh:{tagline:"自动化 · 提升 · 主导",sub:"AI 自动化与 SEO 营销",ctaDemos:"查看现场演示",ctaScan:"获取免费分析",liveMark:"现场",demosSub:"我们做的真实演示 — 点击即玩。",d1:"电子菜单 + 铁板烧接菜游戏",d2:"电子菜单 + Loco Match 游戏",open:"打开演示 →",scanH:"获取免费分析",scanSub:"填入你的 Instagram，我们会告诉你缺少什么，以及我们会做什么。",fName:"商家名称",fType:"类型 / 菜系",fIg:"Instagram 账号",fBtn:"运行免费扫描",scanning:"扫描中",checkIntro:"以下是我们检查的项目。预约免费分析，我们会确认你的商家缺少哪些:",wWebsite:"现代手机网站",wWebsiteD:"快速、有品牌、为成交而建。",wMenu:"带图片的电子菜单",wMenuD:"每道菜的真实照片。",wGame:"会员游戏",wGameD:"以你的美食为主题、让顾客回头的游戏。",wCaller:"AI 电话助手",wCallerD:"全天候接听并下单。",wWinback:"召回短信和邮件",wWinbackD:"自动消息把顾客带回来。",wSEO:"谷歌排名与评价",wSEOD:"本地搜索时排在最前。",wPhotos:"专业美食照片",wPhotosD:"影棚级的菜单照片。",bookBtn:"获取完整分析",preview:"仅为预览 — 完整分析由我们团队在你预约后完成。我们绝不公开你的结果。",buildH:"我们做什么",cMenu:"电子菜单",cMenuD:"快速、有品牌、带真实照片。",cGame:"会员游戏",cGameD:"以你的美食为主题，让顾客回头。",cCaller:"AI 电话助手",cCallerD:"全天候接听并下单。",cEmail:"AI 邮件和短信",cEmailD:"自动召回老顾客。",cSEO:"本地 SEO",cSEOD:"搜索时排在最前。",cPay:"支付",cPayD:"银行卡与加密货币。",follow:"关注",disc:"演示中的美食和品牌图像为 AI 风格并明确标注，直到商家签约后换成真实照片。我们出售能力与速度 — 绝不保证销售数字。奖品游戏仅在店主同意下运行，为免费参与的促销活动并附官方规则。"},
+ hi:{tagline:"ऑटोमेट · ऊपर उठें · दबदबा बनाएं",sub:"AI ऑटोमेशन और SEO मार्केटिंग",ctaDemos:"लाइव डेमो देखें",ctaScan:"मुफ़्त विश्लेषण पाएं",liveMark:"लाइव",demosSub:"हमारे बनाए असली डेमो — छूकर खेलें।",d1:"डिजिटल मेन्यू + हिबाची गेम",d2:"डिजिटल मेन्यू + Loco Match गेम",open:"डेमो खोलें →",scanH:"मुफ़्त विश्लेषण पाएं",scanSub:"अपना Instagram डालें और हम बताएंगे कि क्या कमी है — और हम क्या बनाएंगे।",fName:"व्यवसाय का नाम",fType:"प्रकार / व्यंजन",fIg:"Instagram हैंडल",fBtn:"मुफ़्त स्कैन चलाएं",scanning:"स्कैन हो रहा है",checkIntro:"हम ये जांचते हैं। मुफ़्त विश्लेषण बुक करें और हम पक्का बताएंगे कि आपके व्यवसाय में क्या कमी है:",wWebsite:"आधुनिक मोबाइल वेबसाइट",wWebsiteD:"तेज़, ब्रांडेड, बिक्री के लिए बनी।",wMenu:"फ़ोटो वाला डिजिटल मेन्यू",wMenuD:"हर व्यंजन की असली तस्वीर।",wGame:"लॉयल्टी गेम",wGameD:"आपके खाने पर आधारित गेम जो ग्राहक वापस लाए।",wCaller:"AI फ़ोन एजेंट",wCallerD:"24/7 कॉल उठाता और ऑर्डर लेता है।",wWinback:"वापसी के मैसेज और ईमेल",wWinbackD:"ऑटोमैटिक मैसेज जो ग्राहकों को वापस लाते हैं।",wSEO:"Google रैंकिंग और रिव्यू",wSEOD:"स्थानीय खोज में सबसे पहले दिखें।",wPhotos:"पेशेवर खाने की तस्वीरें",wPhotosD:"स्टूडियो-स्तर की मेन्यू तस्वीरें।",bookBtn:"पूरा विश्लेषण पाएं",preview:"सिर्फ़ झलक — पूरा विश्लेषण बुकिंग के बाद हमारी टीम करती है। हम आपके नतीजे सार्वजनिक नहीं करते।",buildH:"हम क्या बनाते हैं",cMenu:"डिजिटल मेन्यू",cMenuD:"तेज़, ब्रांडेड, असली फ़ोटो के साथ।",cGame:"लॉयल्टी गेम",cGameD:"आपके खाने पर आधारित, ग्राहक वापस लाए।",cCaller:"AI फ़ोन एजेंट",cCallerD:"24/7 कॉल और ऑर्डर।",cEmail:"AI ईमेल और मैसेज",cEmailD:"पुराने ग्राहक अपने-आप वापस।",cSEO:"लोकल SEO",cSEOD:"खोज में सबसे पहले।",cPay:"भुगतान",cPayD:"कार्ड और क्रिप्टो।",follow:"फ़ॉलो करें",disc:"डेमो के खाने और ब्रांड चित्र AI-निर्मित हैं और साइन होने तक साफ़ लेबल रहते हैं, फिर असली तस्वीरों से बदल दिए जाते हैं। हम क्षमता और गति बेचते हैं — बिक्री की कोई गारंटी नहीं। इनाम वाले गेम केवल मालिक के साथ चलते हैं, आधिकारिक नियमों के साथ मुफ़्त-एंट्री प्रोमो के रूप में।"}
+};
+function applyLang(code){
+  var d=T[code]||T.en;
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ var k=el.getAttribute('data-i18n'); if(d[k]!=null) el.textContent=d[k]; });
+  document.documentElement.lang=code;
+  try{ localStorage.setItem('ssai_lang',code); }catch(e){}
+}
+var sel=document.getElementById('lang');
+sel.addEventListener('change', function(){ applyLang(this.value); });
+try{ var saved=localStorage.getItem('ssai_lang'); if(saved){ sel.value=saved; } }catch(e){}
+applyLang(sel.value);
+
+/* ---- scan flow ---- */
+var btn=document.getElementById('scanBtn');
+btn.addEventListener('click', function(){
+  var ig=(document.getElementById('f_ig').value||'').trim();
+  var name=(document.getElementById('f_name').value||'').trim();
+  var type=(document.getElementById('f_type').value||'').trim();
+  document.getElementById('scanHandle').textContent = ig || name || 'your business';
+  document.getElementById('scanning').style.display='block';
+  document.getElementById('result').style.display='none';
+  // book button destination
+  var book=document.getElementById('bookBtn');
+  var msg="Hi Second Shift AI — I want my full breakdown. Business: "+(name||'?')+", Type: "+(type||'?')+", Instagram: "+(ig||'?');
+  if(BOOKING_EMAIL){ book.href="mailto:"+BOOKING_EMAIL+"?subject="+encodeURIComponent("Free breakdown request")+"&body="+encodeURIComponent(msg); }
+  else { book.href=IG_URL; }
+  setTimeout(function(){
+    document.getElementById('scanning').style.display='none';
+    document.getElementById('result').style.display='block';
+    document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
+  }, 2000);
+});
+</script>
 </body>
 </html>

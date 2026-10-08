@@ -5,18 +5,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Second Shift AI — Bring Them Back</title>
 <meta name="description" content="E-rewards, a customer list you own, and automatic outreach that turns first-time guests into regulars. Built for local restaurants by Second Shift AI.">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
 <style>
 :root{
-  --bg:#0B0D12; --card:#151922; --card2:#1B2030; --edge:#2A303C; --ink:#F2F4F8; --dim:#9AA6B6;
-  --accent:#F7C04A; --blue:#1E6BFF; --good:#3DDC97; --bad:#FF6B5E;
+  /* StormBurger-style storm night: navy sky, blue glow, orange bolt, gold numbers */
+  --bg:#070B1E; --card:#121C40; --card2:#1a2656; --edge:#25336A; --ink:#EEF2FF; --dim:#9AA6CC;
+  --accent:#FFD23F; --bolt:#E8582A; --zap:#BFE6FF; --blue:#2547B8; --good:#3DDC97; --bad:#FF6B5E;
+  --display:"Bebas Neue","Arial Narrow",Impact,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,monospace; --sans:"Archivo",system-ui,sans-serif;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
 html{-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;padding-inline:16px;
+body{background:radial-gradient(900px 600px at 50% -10%,#24357a 0,transparent 60%),var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;padding-inline:16px;
   padding-block:env(safe-area-inset-top,0px) calc(40px + env(safe-area-inset-bottom,0px));overflow-x:hidden}
 .wrap{max-width:680px;margin:0 auto}
 a{color:var(--accent)}
@@ -25,25 +27,41 @@ a{color:var(--accent)}
 /* hero */
 header{text-align:center;padding-block:34px 6px}
 .logo{width:76px;height:76px;border-radius:18px;display:block;margin:0 auto 14px}
-h1{font-size:clamp(30px,8.4vw,48px);font-weight:900;margin:10px 0 8px;letter-spacing:-.025em;line-height:1.05}
-h1 em{font-style:normal;color:var(--accent)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,12vw,68px);margin:10px 0 8px;letter-spacing:.03em;line-height:.95}
+h1 em{font-style:normal;color:var(--bolt);text-shadow:0 0 24px #e8582a66}
+.flash{position:fixed;inset:0;pointer-events:none;background:#dff3ff;opacity:0;z-index:50}
 .sub{color:var(--dim);font-size:16px;margin:0 auto;max-width:44ch}
 .for{display:none;font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--ink);background:var(--card);border:1px solid var(--edge);border-radius:99px;padding:6px 14px;margin:0 auto 14px;width:max-content;max-width:100%}
 .for b{color:var(--accent)}
 .cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
 .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border-radius:12px;padding:13px 18px;border:1px solid var(--edge);color:var(--ink)}
-.btn.gold{background:var(--accent);border-color:var(--accent);color:#1a1200}
+.btn.gold{background:var(--bolt);border-color:var(--bolt);color:#fff;box-shadow:0 8px 24px #e8582a55}
 .btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* your-app phone */
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.chips button,.jumps button{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;padding:9px 12px;border-radius:99px;border:1px solid var(--edge);background:var(--card);color:var(--dim);cursor:pointer}
+.chips button[aria-pressed=true]{border-color:var(--bolt);color:#fff;background:var(--bolt)}
+.phone{position:relative;width:300px;height:610px;margin:0 auto;border-radius:46px;padding:12px;background:linear-gradient(145deg,#2a3566,#0a0f24);box-shadow:0 0 0 2px #3a4a8a,0 30px 80px #000c,0 0 60px #2547b855}
+.phone .scr{position:relative;width:276px;height:586px;border-radius:36px;overflow:hidden;background:#000}
+.phone iframe{width:390px;height:828px;border:0;transform:scale(.7077);transform-origin:0 0;display:block}
+.phone .notch{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:92px;height:24px;border-radius:99px;background:#000;z-index:2}
+.phone .lbl{position:absolute;left:0;right:0;bottom:-34px;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
+.jumps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:50px}
+.jumps button{border-radius:12px;padding:10px 4px;color:var(--ink)}
+.jumps button b{display:block;font-size:18px;margin-bottom:2px}
 
 /* stat strip */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:30px}
 .stat{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:14px 10px;text-align:center}
-.stat b{display:block;font-size:24px;font-weight:900;color:var(--accent)}
+.stat b{display:block;font-family:var(--display);font-weight:400;font-size:32px;letter-spacing:.03em;color:var(--accent)}
 .stat span{font-size:12px;color:var(--dim);line-height:1.3;display:block;margin-top:2px}
 
 /* sections */
 section{margin-top:50px}
-h2{font-size:clamp(23px,6vw,30px);font-weight:900;margin:8px 0 6px;letter-spacing:-.015em;line-height:1.12}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(32px,8.5vw,42px);margin:8px 0 6px;letter-spacing:.04em;line-height:1}
+h2::before{content:"";display:inline-block;vertical-align:-2px;margin-right:10px;width:22px;height:22px;background:var(--bolt);clip-path:polygon(55% 0,10% 58%,45% 58%,30% 100%,90% 38%,55% 38%,75% 0)}
+
 .lead{color:var(--dim);margin:0 0 18px;font-size:15.5px}
 
 /* loop */
@@ -58,11 +76,11 @@ h2{font-size:clamp(23px,6vw,30px);font-weight:900;margin:8px 0 6px;letter-spacin
 /* pillars */
 .pillar{background:var(--card);border:1px solid var(--edge);border-radius:18px;padding:20px;margin-top:14px;position:relative;overflow:hidden}
 .pillar .strip{position:absolute;inset:0 auto 0 0;width:6px}
-.p1 .strip{background:linear-gradient(180deg,#F7C04A,#E8582A)}
+.p1 .strip{background:linear-gradient(180deg,#FFD23F,#E8582A)}
 .p2 .strip{background:linear-gradient(180deg,#1E6BFF,#3DDC97)}
 .p3 .strip{background:linear-gradient(180deg,#B04AF7,#1E6BFF)}
 .pillar .tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
-.pillar h3{font-size:21px;font-weight:900;margin:4px 0 4px;line-height:1.15}
+.pillar h3{font-family:var(--display);font-weight:400;font-size:28px;letter-spacing:.03em;margin:4px 0 4px;line-height:1.15}
 .pillar > p{color:var(--dim);font-size:14.5px;margin:0 0 12px}
 ul.ticks{list-style:none;margin:0;padding:0;display:grid;gap:9px}
 ul.ticks li{position:relative;padding-left:26px;font-size:14.5px}
@@ -115,7 +133,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:28px}
 .box span{display:block;font-size:12px;color:var(--dim);line-height:1.3}
 .box b{display:block;font-size:26px;font-weight:900;margin-top:4px;font-variant-numeric:tabular-nums}
 .box.hi{grid-column:1/-1;border-color:rgba(61,220,151,.45);background:rgba(61,220,151,.06)}
-.box.hi b{color:var(--good);font-size:34px}
+.box.hi b{color:var(--good);font-size:44px;font-family:var(--display);font-weight:400;letter-spacing:.03em}
 .bar{height:12px;border-radius:99px;background:var(--bg);border:1px solid var(--edge);margin-top:14px;overflow:hidden;position:relative}
 .bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--accent),var(--good));border-radius:99px;transition:width .25s}
 .barlab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:6px}
@@ -138,11 +156,12 @@ input[type=range]{width:100%;accent-color:var(--accent);height:28px}
 /* pricing */
 .prices{display:grid;gap:12px}
 .price{background:var(--card);border:1px solid var(--edge);border-radius:18px;padding:20px}
-.price.best{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.price.best{border-color:var(--bolt);box-shadow:0 0 0 1px var(--bolt) inset,0 0 40px #e8582a33}
+.price.best .nm{color:var(--bolt)!important}
 .price .nm{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
 .price.best .nm{color:var(--accent)}
 .price .amt{display:flex;gap:18px;flex-wrap:wrap;margin:8px 0 6px}
-.price .amt div b{font-size:28px;font-weight:900;display:block;line-height:1.1}
+.price .amt div b{font-family:var(--display);font-weight:400;font-size:38px;letter-spacing:.03em;display:block;line-height:1.1}
 .price .amt div span{font-size:12px;color:var(--dim)}
 .price s{color:var(--dim);font-size:14px;font-weight:500}
 .price p{margin:0;color:var(--dim);font-size:13.5px}
@@ -173,6 +192,7 @@ footer b{color:var(--accent)}
 <body>
 <div class="wrap">
 
+<div class="flash" id="flash"></div>
 <header>
   <img class="logo" src="../../second-shift/img/ssai-logo.png" alt="Second Shift AI">
   <p class="for" id="for">Prepared for <b id="forName"></b></p>
@@ -189,6 +209,25 @@ footer b{color:var(--accent)}
     <div class="stat"><b>100%</b><span>your customer data, yours to keep</span></div>
   </div>
 </header>
+
+<section>
+  <p class="kick">Your app</p>
+  <h2>This is <span id="yourBiz" style="color:var(--bolt)">your business</span>, in their pocket</h2>
+  <p class="lead">Not a mockup. Tap around: your menu, your game, your rewards, your reviews. Every one is built around the business it's for.</p>
+  <div class="chips" id="chips">
+    <button type="button" data-d="storm-burger" aria-pressed="true">⚡ StormBurger</button>
+    <button type="button" data-d="lucky-dragon" aria-pressed="false">🐉 Lucky Dragon</button>
+    <button type="button" data-d="churrito-loco" aria-pressed="false">🌶️ Churrito Loco</button>
+    <button type="button" data-d="melody-lax" aria-pressed="false">✈️ Melody</button>
+  </div>
+  <div class="phone"><div class="notch"></div><div class="scr"><iframe id="ph" title="Live app preview" src="../storm-burger/" loading="lazy"></iframe></div><div class="lbl" id="phLbl">Live demo · StormBurger</div></div>
+  <div class="jumps" id="jumps">
+    <button type="button" data-j="menu"><b>🍔</b>Your menu</button>
+    <button type="button" data-j="game"><b>🎮</b>Your game</button>
+    <button type="button" data-j="rewards"><b>⭐</b>Rewards</button>
+    <button type="button" data-j="reviews"><b>📍</b>Reviews + map</button>
+  </div>
+</section>
 
 <section>
   <p class="kick">How it works</p>
@@ -436,6 +475,39 @@ footer b{color:var(--accent)}
   $("visits").addEventListener("input", calc);
   $("check").addEventListener("input", calc);
   calc();
+
+  // ---- your-app phone ----
+  var Q = new URLSearchParams(location.search), ph = $("ph"), chips = document.querySelectorAll("#chips button");
+  if (who) $("yourBiz").textContent = who;
+  function pick(d){
+    chips.forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.d === d ? "true" : "false"); if (b.dataset.d === d) $("phLbl").textContent = "Live demo · " + b.textContent.replace(/^\S+\s/, ""); });
+    ph.src = "../" + d + "/";
+  }
+  chips.forEach(function(b){ b.addEventListener("click", function(){ pick(b.dataset.d); }); });
+  if (Q.get("demo") && /^[a-z-]+$/.test(Q.get("demo"))) pick(Q.get("demo"));
+  var J = { menu:[".menu,.items,#s-menu","s-menu"], game:["canvas#game,#s-play canvas","s-play"], rewards:["#board","s-rewards"], reviews:["#ssai-n","s-rewards"] };
+  document.querySelectorAll("#jumps button").forEach(function(b){
+    b.addEventListener("click", function(){
+      try {
+        var w = ph.contentWindow, d = ph.contentDocument, j = J[b.dataset.j];
+        var nav = d.querySelector('button[data-s="' + j[1] + '"]'); if (nav) nav.click();
+        setTimeout(function(){
+          var el = d.querySelector(j[0]); if (!el) return;
+          var sc = el.closest(".screen") || null, top = el.getBoundingClientRect().top - 12;
+          if (sc && sc.scrollHeight > sc.clientHeight) sc.scrollBy({ top: top, behavior: "smooth" });
+          else w.scrollBy({ top: top, behavior: "smooth" });
+        }, nav ? 120 : 0);
+      } catch (x) {}
+    });
+  });
+
+  // ---- storm flash ----
+  var fl = $("flash");
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches && fl.animate) {
+    setInterval(function(){
+      if (Math.random() < .5) fl.animate([{opacity:0},{opacity:.22},{opacity:0},{opacity:.12},{opacity:0}], {duration:520});
+    }, 6000);
+  }
 })();
 </script>
 </body>

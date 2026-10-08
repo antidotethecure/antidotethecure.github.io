@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Second Shift AI — Bring Them Back</title>
+<meta name="description" content="E-rewards, a customer list you own, and automatic outreach that turns first-time guests into regulars. Built for local restaurants by Second Shift AI.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#0B0D12; --card:#151922; --card2:#1B2030; --edge:#2A303C; --ink:#F2F4F8; --dim:#9AA6B6;
+  --accent:#F7C04A; --blue:#1E6BFF; --good:#3DDC97; --bad:#FF6B5E;
+  --mono:"IBM Plex Mono",ui-monospace,monospace; --sans:"Archivo",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;padding-inline:16px;
+  padding-block:env(safe-area-inset-top,0px) calc(40px + env(safe-area-inset-bottom,0px));overflow-x:hidden}
+.wrap{max-width:680px;margin:0 auto}
+a{color:var(--accent)}
+.kick{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--accent);text-transform:uppercase;margin:0}
+
+/* hero */
+header{text-align:center;padding-block:34px 6px}
+.logo{width:76px;height:76px;border-radius:18px;display:block;margin:0 auto 14px}
+h1{font-size:clamp(30px,8.4vw,48px);font-weight:900;margin:10px 0 8px;letter-spacing:-.025em;line-height:1.05}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{color:var(--dim);font-size:16px;margin:0 auto;max-width:44ch}
+.for{display:none;font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--ink);background:var(--card);border:1px solid var(--edge);border-radius:99px;padding:6px 14px;margin:0 auto 14px;width:max-content;max-width:100%}
+.for b{color:var(--accent)}
+.cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border-radius:12px;padding:13px 18px;border:1px solid var(--edge);color:var(--ink)}
+.btn.gold{background:var(--accent);border-color:var(--accent);color:#1a1200}
+.btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* stat strip */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:30px}
+.stat{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:14px 10px;text-align:center}
+.stat b{display:block;font-size:24px;font-weight:900;color:var(--accent)}
+.stat span{font-size:12px;color:var(--dim);line-height:1.3;display:block;margin-top:2px}
+
+/* sections */
+section{margin-top:50px}
+h2{font-size:clamp(23px,6vw,30px);font-weight:900;margin:8px 0 6px;letter-spacing:-.015em;line-height:1.12}
+.lead{color:var(--dim);margin:0 0 18px;font-size:15.5px}
+
+/* loop */
+.loop{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;counter-reset:s}
+.step{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:12px 10px;text-align:center;position:relative}
+.step .em{font-size:26px;line-height:1}
+.step b{display:block;font-size:13.5px;margin-top:6px}
+.step span{display:block;font-size:12px;color:var(--dim);line-height:1.35;margin-top:2px}
+.step::before{counter-increment:s;content:counter(s);position:absolute;top:8px;left:10px;font-family:var(--mono);font-size:10.5px;color:var(--accent)}
+.loopnote{text-align:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--dim);margin:10px 0 0}
+
+/* pillars */
+.pillar{background:var(--card);border:1px solid var(--edge);border-radius:18px;padding:20px;margin-top:14px;position:relative;overflow:hidden}
+.pillar .strip{position:absolute;inset:0 auto 0 0;width:6px}
+.p1 .strip{background:linear-gradient(180deg,#F7C04A,#E8582A)}
+.p2 .strip{background:linear-gradient(180deg,#1E6BFF,#3DDC97)}
+.p3 .strip{background:linear-gradient(180deg,#B04AF7,#1E6BFF)}
+.pillar .tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+.pillar h3{font-size:21px;font-weight:900;margin:4px 0 4px;line-height:1.15}
+.pillar > p{color:var(--dim);font-size:14.5px;margin:0 0 12px}
+ul.ticks{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+ul.ticks li{position:relative;padding-left:26px;font-size:14.5px}
+ul.ticks li::before{content:"";position:absolute;left:2px;top:5px;width:14px;height:14px;border-radius:50%;background:var(--good);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='8'/%3E%3C/svg%3E");}
+ul.ticks li::after{content:"";position:absolute;left:6px;top:8px;width:6px;height:3.5px;border-left:2px solid var(--bg);border-bottom:2px solid var(--bg);transform:rotate(-45deg)}
+ul.ticks li b{color:var(--ink)}
+ul.ticks li span{color:var(--dim)}
+
+/* mock CRM card */
+.crm{background:var(--bg);border:1px solid var(--edge);border-radius:14px;margin-top:16px;overflow:hidden;font-size:13px}
+.crm .hd{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--edge);font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--dim);text-transform:uppercase}
+.crm .row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px 12px;border-bottom:1px solid var(--edge)}
+.crm .row:last-child{border-bottom:0}
+.crm .nm{font-weight:700}
+.crm .meta{grid-column:1/-1;color:var(--dim);font-size:12px}
+.pill{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;border-radius:99px;padding:3px 9px;white-space:nowrap;align-self:start}
+.pill.vip{background:rgba(247,192,74,.15);color:var(--accent)}
+.pill.risk{background:rgba(255,107,94,.15);color:var(--bad)}
+.pill.new{background:rgba(61,220,151,.15);color:var(--good)}
+.pill.bday{background:rgba(176,74,247,.18);color:#D7A6FF}
+
+/* mock messages */
+.msgs{display:grid;gap:10px;margin-top:16px}
+.msg{background:var(--bg);border:1px solid var(--edge);border-radius:14px;padding:12px}
+.msg .when{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent);text-transform:uppercase}
+.msg .bub{background:var(--card2);border-radius:14px 14px 14px 4px;padding:9px 12px;margin-top:7px;font-size:13.5px;max-width:92%}
+
+/* compare */
+.cmp{width:100%;border-collapse:collapse;font-size:14px;background:var(--card);border:1px solid var(--edge);border-radius:16px;overflow:hidden}
+.cmp th,.cmp td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--edge);vertical-align:top}
+.cmp tr:last-child td{border-bottom:0}
+.cmp th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-weight:500}
+.cmp th:last-child{color:var(--accent)}
+.cmp td:first-child{color:var(--dim);font-size:13px;width:32%}
+.cmp td.n{color:var(--dim)}
+.cmp td.y{color:var(--ink);font-weight:700}
+
+/* calculator */
+.calc{background:var(--card);border:1px solid var(--edge);border-radius:18px;padding:20px}
+.ctl{margin-bottom:16px}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;margin-bottom:6px;gap:10px}
+.ctl label output{font-family:var(--mono);font-weight:700;color:var(--accent);font-size:15px}
+input[type=range]{width:100%;accent-color:var(--accent);height:28px}
+.plan{display:flex;gap:8px;margin-bottom:16px}
+.plan button{flex:1;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;padding:10px 6px;border-radius:10px;border:1px solid var(--edge);background:var(--bg);color:var(--dim);cursor:pointer}
+.plan button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);background:rgba(247,192,74,.08)}
+.out{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:var(--bg);border:1px solid var(--edge);border-radius:14px;padding:14px}
+.box span{display:block;font-size:12px;color:var(--dim);line-height:1.3}
+.box b{display:block;font-size:26px;font-weight:900;margin-top:4px;font-variant-numeric:tabular-nums}
+.box.hi{grid-column:1/-1;border-color:rgba(61,220,151,.45);background:rgba(61,220,151,.06)}
+.box.hi b{color:var(--good);font-size:34px}
+.bar{height:12px;border-radius:99px;background:var(--bg);border:1px solid var(--edge);margin-top:14px;overflow:hidden;position:relative}
+.bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--accent),var(--good));border-radius:99px;transition:width .25s}
+.barlab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:6px}
+.fine{color:var(--dim);font-size:12px;margin:12px 0 0}
+
+/* roadmap */
+.road{display:grid;gap:10px}
+.mile{display:grid;grid-template-columns:78px 1fr;gap:12px;background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:14px}
+.mile .wk{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--accent);text-transform:uppercase;line-height:1.3}
+.mile b{display:block;font-size:15px}
+.mile span{color:var(--dim);font-size:13.5px}
+
+/* demos */
+.demos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.demo{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:14px;text-align:center}
+.demo .em{font-size:28px}
+.demo b{display:block;font-size:14.5px;margin:6px 0 2px}
+.demo span{font-size:12px;color:var(--dim)}
+
+/* pricing */
+.prices{display:grid;gap:12px}
+.price{background:var(--card);border:1px solid var(--edge);border-radius:18px;padding:20px}
+.price.best{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.price .nm{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.price.best .nm{color:var(--accent)}
+.price .amt{display:flex;gap:18px;flex-wrap:wrap;margin:8px 0 6px}
+.price .amt div b{font-size:28px;font-weight:900;display:block;line-height:1.1}
+.price .amt div span{font-size:12px;color:var(--dim)}
+.price s{color:var(--dim);font-size:14px;font-weight:500}
+.price p{margin:0;color:var(--dim);font-size:13.5px}
+
+/* faq */
+details{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:14px 16px;margin-top:8px}
+summary{cursor:pointer;font-weight:700;font-size:15px;list-style:none;display:flex;justify-content:space-between;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--accent);font-family:var(--mono);font-size:18px;line-height:1}
+details[open] summary::after{content:"–"}
+details p{color:var(--dim);font-size:14px;margin:10px 0 0}
+
+.final{text-align:center;background:linear-gradient(180deg,var(--card),var(--bg));border:1px solid var(--edge);border-radius:20px;padding:28px 18px}
+footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:28px;line-height:1.7}
+footer b{color:var(--accent)}
+
+@media (max-width:420px){
+  .stats{gap:8px}.stat b{font-size:20px}
+  .loop{grid-template-columns:repeat(2,1fr)}
+  .demos{grid-template-columns:1fr}
+  .cmp td:first-child{width:30%}
+  .mile{grid-template-columns:1fr;gap:4px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <img class="logo" src="../../second-shift/img/ssai-logo.png" alt="Second Shift AI">
+  <p class="for" id="for">Prepared for <b id="forName"></b></p>
+  <p class="kick">Second Shift AI · Rewards + CRM + Outreach</p>
+  <h1>Turn first-time guests into <em>regulars</em>, on autopilot.</h1>
+  <p class="sub">A rewards game on every table, a customer list you actually own, and messages that bring people back on your slow days. You run the kitchen, we run the comeback.</p>
+  <div class="cta">
+    <a class="btn gold" href="#math">See your growth math</a>
+    <a class="btn" href="#demos">Play a live demo</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><b>24/7</b><span>rewards and outreach running without staff</span></div>
+    <div class="stat"><b>1 scan</b><span>QR on the table, no app download</span></div>
+    <div class="stat"><b>100%</b><span>your customer data, yours to keep</span></div>
+  </div>
+</header>
+
+<section>
+  <p class="kick">How it works</p>
+  <h2>The comeback loop</h2>
+  <p class="lead">Every visit feeds the next one. Nothing for your staff to do, punch, or remember.</p>
+  <div class="loop">
+    <div class="step"><div class="em">📱</div><b>Scan</b><span>QR on the table opens your menu + game</span></div>
+    <div class="step"><div class="em">🎮</div><b>Play</b><span>A game themed to your food while they wait</span></div>
+    <div class="step"><div class="em">⭐</div><b>Earn</b><span>Stars for visits, orders and high scores</span></div>
+    <div class="step"><div class="em">📇</div><b>Join</b><span>They sign up to save stars. Now they're on your list</span></div>
+    <div class="step"><div class="em">💬</div><b>Hear from you</b><span>Birthday treats, specials, "we miss you"</span></div>
+    <div class="step"><div class="em">🔁</div><b>Come back</b><span>To cash in stars or defend their leaderboard spot</span></div>
+  </div>
+  <p class="loopnote">↻ AND AGAIN. EVERY VISIT MAKES THE NEXT ONE MORE LIKELY.</p>
+</section>
+
+<section>
+  <p class="kick">What you get</p>
+  <h2>Three systems that work together</h2>
+  <p class="lead">Most places have none of these. Big chains pay for all three separately. You get them built as one, around your menu and your brand.</p>
+
+  <div class="pillar p1">
+    <span class="strip"></span>
+    <span class="tag">01 · E-Rewards</span>
+    <h3>A rewards program people actually want to use</h3>
+    <p>Paper punch cards get lost in wallets. A game with their name on the leaderboard gets opened every visit.</p>
+    <ul class="ticks">
+      <li><b>Custom game made around your food.</b> <span>Your dishes, your colors, your logo. Customers play while they wait for their order.</span></li>
+      <li><b>Stars for every visit and order.</b> <span>Stars turn into the rewards you choose: a free side, money off, a free meal.</span></li>
+      <li><b>Weekly prize board.</b> <span>Top score of the week wins. Resets every week, so people come back to defend their spot.</span></li>
+      <li><b>You set the rewards and the cost.</b> <span>Change prizes anytime: push a high-margin item, clear slow inventory, reward big spenders.</span></li>
+      <li><b>Fun at the table, faster turns.</b> <span>Waiting feels shorter, kids are busy, and nobody's flagging down a server to ask about the menu.</span></li>
+    </ul>
+  </div>
+
+  <div class="pillar p2">
+    <span class="strip"></span>
+    <span class="tag">02 · Customer CRM</span>
+    <h3>Finally know who your customers are</h3>
+    <p>Right now most of your guests walk out and you never see their name. Every sign-up becomes a customer profile you own.</p>
+    <ul class="ticks">
+      <li><b>One customer list, built automatically.</b> <span>Name, phone or email, first visit, last visit, stars, and birthday month, with no typing by your staff.</span></li>
+      <li><b>See your regulars and your VIPs.</b> <span>Who comes in most, who spends most, who just tried you for the first time.</span></li>
+      <li><b>Spot who's slipping away.</b> <span>Flags customers who haven't been back in 30+ days, before they're gone for good.</span></li>
+      <li><b>Know what's working.</b> <span>Sign-ups, return visits and rewards cashed in, in a simple check-in with your numbers.</span></li>
+      <li><b>Your data, not ours.</b> <span>If you ever leave, we hand your full customer list over in a standard file. It's your business asset.</span></li>
+    </ul>
+    <div class="crm" aria-label="Example customer list">
+      <div class="hd"><span>Your customers</span><span>example</span></div>
+      <div class="row"><span class="nm">Maria G.</span><span class="pill vip">VIP · 14 visits</span><span class="meta">Last visit 3 days ago · 420 ⭐ · usually orders the combo</span></div>
+      <div class="row"><span class="nm">Dre W.</span><span class="pill risk">Hasn't been back · 34 days</span><span class="meta">6 visits · 180 ⭐ · win-back message queued</span></div>
+      <div class="row"><span class="nm">Kim T.</span><span class="pill bday">Birthday this month</span><span class="meta">3 visits · 95 ⭐ · birthday reward ready</span></div>
+      <div class="row"><span class="nm">Jordan P.</span><span class="pill new">New · first visit</span><span class="meta">Signed up at table 7 · 25 ⭐ · welcome-back offer set</span></div>
+    </div>
+  </div>
+
+  <div class="pillar p3">
+    <span class="strip"></span>
+    <span class="tag">03 · Customer outreach</span>
+    <h3>Messages that fill seats on slow days</h3>
+    <p>Instagram shows your post to a fraction of your followers. A message to your own list reaches the people who already like your food.</p>
+    <ul class="ticks">
+      <li><b>Automatic win-back.</b> <span>Customers who haven't been in for a while get a "we miss you" offer on their own, with nothing for you to send.</span></li>
+      <li><b>Birthday rewards.</b> <span>A free dessert or side in their birthday month. People rarely celebrate alone, so they bring the table.</span></li>
+      <li><b>One-tap slow-day blasts.</b> <span>Dead Tuesday? Send "double stars tonight" to everyone on your list and watch it pick up.</span></li>
+      <li><b>New item and special launches.</b> <span>Tell your regulars first. They're the ones most likely to come try it.</span></li>
+      <li><b>More 5-star reviews.</b> <span>Happy customers get a nudge to leave a Google review while the meal is still fresh in their mind.</span></li>
+      <li><b>Opt-in and respectful.</b> <span>Customers choose to join and can stop anytime. No spam, no bought lists.</span></li>
+    </ul>
+    <div class="msgs" aria-label="Example messages">
+      <div class="msg"><span class="when">Win-back · day 30</span><div class="bub">Hey Dre, it's been a minute! 👀 Come back this week and get 2× stars on any order. Your spot on the leaderboard misses you.</div></div>
+      <div class="msg"><span class="when">Birthday month</span><div class="bub">Happy birthday Kim! 🎂 Your free dessert is waiting. Show this at the counter any day this month.</div></div>
+      <div class="msg"><span class="when">Slow Tuesday · 3:00 pm</span><div class="bub">Double stars tonight only, 5–9pm. First 20 tables also get a free side. 🔥</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="kick">Why it beats what you have now</p>
+  <h2>Punch card vs. Second Shift</h2>
+  <table class="cmp">
+    <tr><th></th><th>Paper punch card</th><th>Second Shift</th></tr>
+    <tr><td>Know who the customer is</td><td class="n">No</td><td class="y">Name + contact, saved</td></tr>
+    <tr><td>Bring them back</td><td class="n">Hope they remember</td><td class="y">Win-back + birthday messages</td></tr>
+    <tr><td>Fill a slow day</td><td class="n">Post and pray</td><td class="y">One-tap blast to your list</td></tr>
+    <tr><td>Fun at the table</td><td class="n">None</td><td class="y">Custom game + weekly prizes</td></tr>
+    <tr><td>Measure results</td><td class="n">Guess</td><td class="y">Sign-ups, returns, rewards used</td></tr>
+    <tr><td>Fraud / lost cards</td><td class="n">Common</td><td class="y">Stars saved to their profile</td></tr>
+  </table>
+</section>
+
+<section id="math">
+  <p class="kick">Growth potential</p>
+  <h2>Run your own numbers</h2>
+  <p class="lead">Move the sliders to match your restaurant. Start small; this only has to bring back a handful of tables to pay for itself.</p>
+  <div class="calc">
+    <div class="plan" role="group" aria-label="Plan">
+      <button type="button" data-cost="262.5" aria-pressed="true">Founding · $262.50/mo</button>
+      <button type="button" data-cost="350" aria-pressed="false">Standard · $350/mo</button>
+    </div>
+    <div class="ctl">
+      <label for="visits">Extra return visits per week <output id="visitsO"></output></label>
+      <input id="visits" type="range" min="2" max="60" step="1" value="10">
+    </div>
+    <div class="ctl">
+      <label for="check">Average check per visit <output id="checkO"></output></label>
+      <input id="check" type="range" min="10" max="120" step="1" value="35">
+    </div>
+    <div class="out">
+      <div class="box"><span>Extra revenue / month</span><b id="rev">$0</b></div>
+      <div class="box"><span>Extra revenue / year</span><b id="yr">$0</b></div>
+      <div class="box hi"><span>Return on what you pay each month</span><b id="roi">0×</b></div>
+    </div>
+    <div class="bar"><i id="barI"></i></div>
+    <div class="barlab"><span>Monthly cost</span><span id="be"></span></div>
+    <p class="fine">A worked example using your inputs, not a promise of results. Monthly figures use 4.3 weeks. Doesn't count food cost, rewards you give away, or the extra visits from birthday parties, reviews and word of mouth.</p>
+  </div>
+</section>
+
+<section>
+  <p class="kick">What growth looks like</p>
+  <h2>Your first six months</h2>
+  <div class="road">
+    <div class="mile"><span class="wk">Week 1</span><div><b>Live on your tables</b><span>Your menu, your game, QR table tents printed and placed. Staff need zero training.</span></div></div>
+    <div class="mile"><span class="wk">Month 1</span><div><b>Your list starts growing</b><span>Every table that plays is a chance at a new contact. Weekly prize board builds the habit.</span></div></div>
+    <div class="mile"><span class="wk">Month 2–3</span><div><b>Outreach kicks in</b><span>Win-back and birthday messages start firing automatically. First slow-day blasts. You see who your regulars are.</span></div></div>
+    <div class="mile"><span class="wk">Month 6</span><div><b>A real marketing asset</b><span>Hundreds of local customers you can reach anytime, for free. That list keeps working long after any ad would have stopped.</span></div></div>
+  </div>
+</section>
+
+<section id="demos">
+  <p class="kick">See it for real</p>
+  <h2>Play a live demo</h2>
+  <p class="lead">These were built for real LA restaurants. Yours gets the same treatment, themed to your food.</p>
+  <div class="demos">
+    <a class="demo" href="../lucky-dragon/"><div class="em">🐉</div><b>Lucky Dragon Hibachi</b><span>Hibachi Catch game</span></a>
+    <a class="demo" href="../churrito-loco/"><div class="em">🌶️</div><b>Churrito Loco</b><span>Loco Match game</span></a>
+    <a class="demo" href="../melody-lax/"><div class="em">✈️</div><b>Melody Bar &amp; Grill</b><span>Table ordering + star rewards</span></a>
+    <a class="demo" href="../storm-burger/"><div class="em">⚡</div><b>StormBurger</b><span>Storm Run game</span></a>
+  </div>
+</section>
+
+<section>
+  <p class="kick">Pricing</p>
+  <h2>Less than one slow night a month</h2>
+  <div class="prices">
+    <div class="price best">
+      <span class="nm">★ Founding partner · first few spots</span>
+      <div class="amt">
+        <div><b>$1,500 <s>$2,000</s></b><span>one-time setup</span></div>
+        <div><b>$262.50 <s>$350</s></b><span>per month, locked for life</span></div>
+      </div>
+      <p>25% off both, for as long as you stay. 3-month minimum, then month to month. Half the setup at signing.</p>
+    </div>
+    <div class="price">
+      <span class="nm">Standard</span>
+      <div class="amt">
+        <div><b>$2,000</b><span>one-time setup</span></div>
+        <div><b>$350</b><span>per month</span></div>
+      </div>
+      <p>No minimum. Month to month, cancel with 30 days' notice.</p>
+    </div>
+  </div>
+  <ul class="ticks" style="margin-top:16px">
+    <li><b>Included:</b> <span>mobile menu page, custom rewards game, weekly prize board, QR table tents, hosting, updates and support.</span></li>
+    <li><b>You choose and fund the prizes.</b> <span>Promotions run as free-to-enter with official rules; we supply the standard text.</span></li>
+  </ul>
+</section>
+
+<section>
+  <p class="kick">Questions owners ask</p>
+  <h2>Quick answers</h2>
+  <details><summary>Do my customers have to download an app?</summary><p>No. They scan the QR on the table and it opens in their phone's browser. Nothing to install.</p></details>
+  <details><summary>Does my staff have to do anything?</summary><p>No. No punching cards, no typing in phone numbers, no extra steps at the register. Stars, sign-ups and messages all run on their own.</p></details>
+  <details><summary>Who owns the customer list?</summary><p>You do. If you ever cancel, we hand over your customer and player data in a standard file format.</p></details>
+  <details><summary>Will it spam my customers?</summary><p>No. Customers opt in, messages are spaced out and about things they care about (their stars, their birthday, your specials), and they can stop anytime.</p></details>
+  <details><summary>How fast can it go live?</summary><p>Your demo is usually built in an evening. Once you sign and send your menu, it can be on your tables within the week.</p></details>
+</section>
+
+<section class="final">
+  <p class="kick">Ready when you are</p>
+  <h2>Let's build yours</h2>
+  <p class="lead" style="margin-bottom:0">We'll make a free demo with your real menu and a game themed to your food, so you see it before you pay anything.</p>
+  <div class="cta">
+    <a class="btn gold" href="https://instagram.com/second.shiftai" target="_blank" rel="noopener">DM @second.shiftai</a>
+    <a class="btn" href="../../second-shift/">More about us</a>
+  </div>
+</section>
+
+<footer>
+  Figures on this page are illustrative examples, not guaranteed results.<br>
+  Customer names in the examples are made up. Games run as free-entry promotions with official rules.<br>
+  <b>SECOND SHIFT AI</b> · menus · games · rewards · CRM · outreach
+</footer>
+</div>
+
+<script>
+(function(){
+  // Personalize: ?for=Lucky%20Dragon
+  var who = new URLSearchParams(location.search).get("for");
+  if (who) {
+    who = who.slice(0, 60);
+    document.getElementById("forName").textContent = who;
+    document.getElementById("for").style.display = "block";
+    document.title = "Second Shift AI — for " + who;
+  }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var money = function(x){ return "$" + Math.round(x).toLocaleString("en-US"); };
+  var cost = 262.5;
+  var plans = document.querySelectorAll(".plan button");
+  plans.forEach(function(b){
+    b.addEventListener("click", function(){
+      plans.forEach(function(o){ o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
+      cost = parseFloat(b.dataset.cost); calc();
+    });
+  });
+  function calc(){
+    var v = +$("visits").value, c = +$("check").value;
+    var rev = v * c * 4.3;
+    $("visitsO").textContent = v;
+    $("checkO").textContent = "$" + c;
+    $("rev").textContent = money(rev);
+    $("yr").textContent = money(rev * 12);
+    var r = rev / cost;
+    $("roi").textContent = (r < 10 ? r.toFixed(1) : Math.round(r)) + "×";
+    var beVisits = Math.ceil(cost / (c * 4.3));
+    $("be").textContent = "Pays for itself at ~" + beVisits + " return visit" + (beVisits === 1 ? "" : "s") + "/week";
+    $("barI").style.width = Math.min(100, (cost / rev) * 100) + "%";
+  }
+  $("visits").addEventListener("input", calc);
+  $("check").addEventListener("input", calc);
+  calc();
+})();
+</script>
+</body>
+</html>

@@ -91,7 +91,7 @@
   function reset(w, img) { w.classList.remove("m3d-on"); img.style.transform = ""; }
 
   function enhance(img) {
-    if (img.dataset.m3d || /logo/i.test(img.className + img.id + img.src)) return;
+    if (img.dataset.m3d || /logo/i.test(img.className + " " + img.id + " " + (/^data:/.test(img.src) ? "" : img.src))) return;
     img.dataset.m3d = "1";
     var w = document.createElement("span"); w.className = "m3d-w";
     var cs = getComputedStyle(img); w.style.borderRadius = cs.borderRadius;

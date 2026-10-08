@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sample Requests — Second Shift AI</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<style>
+:root{--bg:#070B1E;--card:#121C40;--edge:#25336A;--ink:#EEF2FF;--dim:#9AA6CC;--bolt:#E8582A;--gold:#FFD23F;--good:#3DDC97;--bad:#FF6B5E;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,sans-serif;padding:16px;padding-bottom:60px}
+.wrap{max-width:680px;margin:0 auto}
+h1{font-size:24px;margin:6px 0 2px}.dim{color:var(--dim)}
+.tabs{display:flex;gap:6px;margin:14px 0}
+.tabs button{flex:1;border:1px solid var(--edge);background:var(--card);color:var(--dim);border-radius:10px;padding:9px;font:700 13px system-ui;cursor:pointer}
+.tabs button.on{border-color:var(--gold);color:var(--gold)}
+.row{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:12px 14px;margin-top:8px;cursor:pointer}
+.row b{font-size:16px}.row .st{float:right;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:3px 8px}
+.st.pending{background:#ffd23f22;color:var(--gold)}.st.approved{background:#3ddc9722;color:var(--good)}.st.rejected{background:#ff6b5e22;color:var(--bad)}
+.det{background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:16px;margin-top:12px}
+.ph{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}.ph img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.acts button,.acts a{flex:1;min-width:130px;text-align:center;text-decoration:none;border:0;border-radius:12px;padding:12px;font:800 14px system-ui;cursor:pointer;color:#fff;background:#2547B8}
+.acts .ok{background:#1f9d63}.acts .no{background:#a33}.acts .gold{background:var(--gold);color:#111}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}td{border-top:1px solid var(--edge);padding:6px 4px;vertical-align:top}
+input{width:100%;font:16px system-ui;padding:12px;border-radius:12px;border:1px solid var(--edge);background:var(--card);color:var(--ink)}
+.msg{margin-top:10px;color:var(--gold);min-height:1em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⚡ Sample requests</h1>
+  <div class="dim">Approve a request to unlock their sample app, then send them the link.</div>
+  <div id="keybox" style="display:none;margin-top:16px"><input id="key" type="password" placeholder="Admin key (from ~/tools/intake_watch/admin_key)"><div class="acts"><button id="savekey">Unlock</button></div></div>
+  <div class="tabs" id="tabs"><button data-s="pending" class="on">Pending</button><button data-s="approved">Approved</button><button data-s="rejected">Rejected</button><button data-s="">All</button></div>
+  <div id="det"></div>
+  <div id="list"></div>
+  <div class="msg" id="msg"></div>
+</div>
+<script src="types.js"></script>
+<script>
+(function(){
+  "use strict";
+  var API = window.SSAI_API, T = window.SSAI_TYPES, $ = function(i){ return document.getElementById(i); }, tab = "pending";
+  var e = function(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+  // key arrives once in the link fragment (#k=…), which never reaches any server; keep it on this phone only
+  var h = new URLSearchParams(location.hash.slice(1)), key = h.get("k"), want = h.get("id");
+  try { if (key) localStorage.setItem("ssai_admin_key", key); else key = localStorage.getItem("ssai_admin_key"); } catch (x) {}
+  if (h.get("k")) history.replaceState(null, "", location.pathname + (want ? "#id=" + want : ""));
+  if (!key) { $("keybox").style.display = "block"; }
+  $("savekey").onclick = function(){ key = $("key").value.trim(); try { localStorage.setItem("ssai_admin_key", key); } catch (x) {} $("keybox").style.display = "none"; list(); };
+  function api(q, method){
+    return fetch(API + q, { method: method || "GET", headers: { "x-admin-key": key } }).then(function(r){
+      if (r.status === 403 || r.status === 404 && /list=/.test(q)) { $("keybox").style.display = "block"; throw new Error("Key not accepted"); }
+      return r.json();
+    });
+  }
+  function sampleLink(r){ return location.origin + location.pathname.replace(/start\/admin\.html$/, "try/") + "?id=" + r.id + "&t=" + r.token; }
+  function list(){
+    if (!key) return;
+    api("?list=1" + (tab ? "&status=" + tab : "")).then(function(rows){
+      $("list").innerHTML = rows.length ? rows.map(function(r){
+        var t = T[r.type] || T.other;
+        return '<div class="row" data-id="' + e(r.id) + '"><span class="st ' + e(r.status) + '">' + e(r.status) + '</span><b>' + t.em + ' ' + e(r.name) + '</b><br><span class="dim">' +
+          e(t.label) + (r.city ? ' · ' + e(r.city) : '') + ' · ' + e(r.owner || "") + ' · ' + r.nphotos + ' photos · ' + e(String(r.created_at).slice(5, 16)) + ' UTC</span></div>';
+      }).join("") : '<p class="dim">Nothing here.</p>';
+    }).catch(function(err){ $("msg").textContent = err.message; });
+  }
+  $("tabs").addEventListener("click", function(ev){ var b = ev.target.closest("button"); if (!b) return; tab = b.dataset.s;
+    this.querySelectorAll("button").forEach(function(x){ x.classList.toggle("on", x === b); }); $("det").innerHTML = ""; list(); });
+  $("list").addEventListener("click", function(ev){ var r = ev.target.closest(".row"); if (r) open(r.dataset.id); });
+  function open(id){
+    api("?id=" + encodeURIComponent(id) + "&admin=1").then(function(r){
+      var t = T[r.type] || T.other, link = sampleLink(r), first = (r.owner || "").split(" ")[0] || "there";
+      var text = "Hey " + first + ", it's Antidote from Second Shift AI. Your free sample app for " + r.name + " is ready: " + link;
+      $("det").innerHTML = '<div class="det"><span class="st ' + e(r.status) + '" style="float:right">' + e(r.status) + '</span><h1 style="margin:0">' + t.em + ' ' + e(r.name) + '</h1>' +
+        '<div class="dim">' + e(t.label) + ' · ' + e([r.address, r.city].filter(Boolean).join(", ")) + '</div>' +
+        '<table><tr><td>Owner</td><td>' + e(r.owner) + '</td></tr><tr><td>Phone</td><td>' + (r.phone ? '<a style="color:var(--gold)" href="tel:' + e(r.phone) + '">' + e(r.phone) + '</a>' : '') + '</td></tr>' +
+        '<tr><td>Email</td><td>' + e(r.email) + '</td></tr><tr><td>Instagram</td><td>' + (r.ig ? '<a style="color:var(--gold)" href="https://instagram.com/' + e(r.ig) + '" target="_blank" rel="noopener">@' + e(r.ig) + '</a>' : '') + '</td></tr>' +
+        '<tr><td>Language</td><td>' + e(r.lang) + '</td></tr><tr><td>Note</td><td>' + e(r.note) + '</td></tr></table>' +
+        '<div class="ph">' + (r.photos || []).map(function(p){ return '<img src="' + p + '" alt="">'; }).join("") + '</div>' +
+        '<table>' + (r.items || []).map(function(it){ return '<tr><td>' + e(it.n) + '<br><span class="dim">' + e(it.d) + '</span></td><td style="text-align:right">' + e(it.p) + '</td></tr>'; }).join("") + '</table>' +
+        '<div class="acts"><button class="ok" data-a="approve">✅ Approve</button><button class="no" data-a="reject">✕ Reject</button></div>' +
+        '<div class="acts"><a href="' + link + '" target="_blank" rel="noopener">👀 Preview sample</a><button class="gold" data-copy="1">📋 Copy link</button>' +
+        (r.phone ? '<a href="sms:' + e(r.phone) + '&body=' + encodeURIComponent(text) + '">💬 Text it to them</a>' : '') +
+        (r.email ? '<a href="mailto:' + e(r.email) + '?subject=' + encodeURIComponent("Your sample app for " + r.name) + '&body=' + encodeURIComponent(text) + '">✉️ Email it</a>' : '') + '</div></div>';
+      $("det").onclick = function(ev){
+        var b = ev.target.closest("button"); if (!b) return;
+        if (b.dataset.copy) { navigator.clipboard && navigator.clipboard.writeText(link).then(function(){ $("msg").textContent = "Link copied."; }); return; }
+        if (b.dataset.a) api("?act=" + b.dataset.a + "&id=" + encodeURIComponent(r.id), "POST").then(function(j){
+          $("msg").textContent = j.ok ? (b.dataset.a === "approve" ? "Approved. Their sample is live, so text them the link." : "Rejected.") : "Didn't save, try again.";
+          open(r.id); list();
+        });
+      };
+      $("det").scrollIntoView({ behavior: "smooth" });
+    }).catch(function(err){ $("msg").textContent = err.message; });
+  }
+  list(); if (want) open(want);
+})();
+</script>
+</body>
+</html>

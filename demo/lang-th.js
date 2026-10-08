@@ -4,6 +4,7 @@
    - Page text: Google Translate. Restaurant, game and brand names stay in English.
    - Text drawn inside the games' canvas: window.__T() uses the hand-written dictionaries below.
    - Thai only: "≈ ฿" next to every $ price at today's rate (for visitors from Thailand).
+   - Always-visible bar instead of the pill: <script>window.DEMO_LANG_BAR=true</script> (every language in a row on top).
    Choice is remembered per phone. */
 (function () {
   var KEY = 'demo_lang';
@@ -67,6 +68,10 @@
     '#dl-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:170px;max-height:62vh;overflow:auto;background:#0b1024f5;border:1px solid #ffffff33;border-radius:14px;padding:6px;box-shadow:0 12px 30px #0008}' +
     '#dl-pill.open #dl-menu{display:block}#dl-menu button{display:block;width:100%;text-align:left;border:0;background:transparent;color:#cfd6e6;padding:10px 12px;border-radius:10px;cursor:pointer;font:600 15px/1.2 system-ui,-apple-system,sans-serif}' +
     '#dl-menu button.on{background:#ffd23f;color:#111}' +
+    '#dl-bar{position:fixed;top:0;left:0;right:0;z-index:9998;display:flex;gap:6px;overflow-x:auto;padding:calc(7px + env(safe-area-inset-top,0px)) 10px 7px;background:#070b1ef2;border-bottom:1px solid #25336a;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);scrollbar-width:none}' +
+    '#dl-bar::-webkit-scrollbar{display:none}#dl-bar button{flex:none;border:1px solid #25336a;background:#121c40;color:#dfe6ff;padding:7px 12px;border-radius:999px;cursor:pointer;font:700 13px/1 system-ui,-apple-system,sans-serif;white-space:nowrap}' +
+    '#dl-bar button.on{background:#ffd23f;border-color:#ffd23f;color:#111}#dl-bar .gl{flex:none;align-self:center;font-size:16px;margin-right:2px}' +
+    'body.dl-has-bar{padding-top:calc(46px + env(safe-area-inset-top,0px))!important}' +
     '.dl-fx{opacity:.85;font-size:.8em;font-weight:600;margin-left:4px;white-space:nowrap}';
   var st = document.createElement('style'); st.textContent = css; (document.head || document.documentElement).appendChild(st);
 
@@ -120,7 +125,14 @@
     });
   }
   function build() {
-    var p = document.createElement('div'); p.id = 'dl-pill'; p.className = 'notranslate'; p.setAttribute('translate', 'no');
+    if (window.DEMO_LANG_BAR) {
+      var bar = document.createElement('nav'); bar.id = 'dl-bar'; bar.className = 'notranslate'; bar.setAttribute('translate', 'no'); bar.setAttribute('aria-label', 'Language');
+      bar.innerHTML = '<span class="gl">🌐</span>' + LANGS.map(function (c) { return '<button type="button" data-l="' + c + '"' + (c === lang ? ' class="on"' : '') + '>' + NAMES[c] + '</button>'; }).join('');
+      bar.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b && b.dataset.l !== lang) setLang(b.dataset.l); });
+      document.body.appendChild(bar); document.body.classList.add('dl-has-bar');
+      var on = bar.querySelector('.on'); if (on && on.scrollIntoView) setTimeout(function () { bar.scrollLeft = on.offsetLeft - 60; }, 50);
+    }
+    var p = document.createElement('div'); p.id = 'dl-pill'; if (window.DEMO_LANG_BAR) p.style.display = 'none'; p.className = 'notranslate'; p.setAttribute('translate', 'no');
     p.innerHTML = '<button type="button" class="dl-t" aria-haspopup="true" aria-label="Language">🌐 ' + SHORT[lang] + ' ▾</button><div id="dl-menu" role="menu">' +
       LANGS.map(function (c) { return '<button type="button" role="menuitem" data-l="' + c + '"' + (c === lang ? ' class="on"' : '') + '>' + NAMES[c] + '</button>'; }).join('') + '</div>';
     p.addEventListener('click', function (e) {

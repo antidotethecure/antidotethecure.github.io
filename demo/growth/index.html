@@ -107,8 +107,8 @@ ul.ticks li span{color:var(--dim)}
 .ctl label{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;margin-bottom:6px;gap:10px}
 .ctl label output{font-family:var(--mono);font-weight:700;color:var(--accent);font-size:15px}
 input[type=range]{width:100%;accent-color:var(--accent);height:28px}
-.plan{display:flex;gap:8px;margin-bottom:16px}
-.plan button{flex:1;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;padding:10px 6px;border-radius:10px;border:1px solid var(--edge);background:var(--bg);color:var(--dim);cursor:pointer}
+.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.plan button{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;padding:10px 6px;border-radius:10px;border:1px solid var(--edge);background:var(--bg);color:var(--dim);cursor:pointer}
 .plan button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);background:rgba(247,192,74,.08)}
 .out{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .box{background:var(--bg);border:1px solid var(--edge);border-radius:14px;padding:14px}
@@ -146,6 +146,8 @@ input[type=range]{width:100%;accent-color:var(--accent);height:28px}
 .price .amt div span{font-size:12px;color:var(--dim)}
 .price s{color:var(--dim);font-size:14px;font-weight:500}
 .price p{margin:0;color:var(--dim);font-size:13.5px}
+.price p.tot{margin-top:8px;color:var(--ink);font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+.price p.tot b{color:var(--accent)}
 
 /* faq */
 details{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:14px 16px;margin-top:8px}
@@ -253,7 +255,8 @@ footer b{color:var(--accent)}
       <li><b>Birthday rewards.</b> <span>A free dessert or side in their birthday month. People rarely celebrate alone, so they bring the table.</span></li>
       <li><b>One-tap slow-day blasts.</b> <span>Dead Tuesday? Send "double stars tonight" to everyone on your list and watch it pick up.</span></li>
       <li><b>New item and special launches.</b> <span>Tell your regulars first. They're the ones most likely to come try it.</span></li>
-      <li><b>More 5-star reviews.</b> <span>Happy customers get a nudge to leave a Google review while the meal is still fresh in their mind.</span></li>
+      <li><b>More Google reviews.</b> <span>A one-tap "review us on Google" button right in the game, with your latest reviews on show. Asked while the meal is still fresh.</span></li>
+      <li><b>"You're nearby" alerts.</b> <span>Customers who turn on location see your spot on a map and get a "stop by, you're close" offer when they're within a couple of miles.</span></li>
       <li><b>Opt-in and respectful.</b> <span>Customers choose to join and can stop anytime. No spam, no bought lists.</span></li>
     </ul>
     <div class="msgs" aria-label="Example messages">
@@ -284,8 +287,9 @@ footer b{color:var(--accent)}
   <p class="lead">Move the sliders to match your restaurant. Start small; this only has to bring back a handful of tables to pay for itself.</p>
   <div class="calc">
     <div class="plan" role="group" aria-label="Plan">
-      <button type="button" data-cost="262.5" aria-pressed="true">Founding · $262.50/mo</button>
-      <button type="button" data-cost="350" aria-pressed="false">Standard · $350/mo</button>
+      <button type="button" data-cost="300" aria-pressed="true">Pay in full · $300/mo</button>
+      <button type="button" data-cost="400" aria-pressed="false">Half down · $400/mo</button>
+      <button type="button" data-cost="450" aria-pressed="false">Starter · $450/mo</button>
     </div>
     <div class="ctl">
       <label for="visits">Extra return visits per week <output id="visitsO"></output></label>
@@ -302,7 +306,7 @@ footer b{color:var(--accent)}
     </div>
     <div class="bar"><i id="barI"></i></div>
     <div class="barlab"><span>Monthly cost</span><span id="be"></span></div>
-    <p class="fine">A worked example using your inputs, not a promise of results. Monthly figures use 4.3 weeks. Doesn't count food cost, rewards you give away, or the extra visits from birthday parties, reviews and word of mouth.</p>
+    <p class="fine">Half down and Starter use their first-year monthly; every plan drops to $300/mo after month 12. A worked example using your inputs, not a promise of results. Monthly figures use 4.3 weeks. Doesn't count food cost, rewards you give away, or the extra visits from birthday parties, reviews and word of mouth.</p>
   </div>
 </section>
 
@@ -331,23 +335,35 @@ footer b{color:var(--accent)}
 
 <section>
   <p class="kick">Pricing</p>
-  <h2>Less than one slow night a month</h2>
+  <h2>Pick how you want to start</h2>
+  <p class="lead">Like buying a car: put more down and your monthly is lower. Start with as little as $500. Every plan drops to $300/mo after the first year.</p>
   <div class="prices">
     <div class="price best">
-      <span class="nm">★ Founding partner · first few spots</span>
+      <span class="nm">★ Pay in full · best value</span>
       <div class="amt">
-        <div><b>$1,500 <s>$2,000</s></b><span>one-time setup</span></div>
-        <div><b>$262.50 <s>$350</s></b><span>per month, locked for life</span></div>
+        <div><b>$2,000</b><span>today, one time</span></div>
+        <div><b>$300</b><span>per month from day one</span></div>
       </div>
-      <p>25% off both, for as long as you stay. 3-month minimum, then month to month. Half the setup at signing.</p>
+      <p>No minimum. Month to month, cancel with 30 days' notice. Lowest total cost.</p>
+      <p class="tot">First year total: <b>$5,600</b></p>
     </div>
     <div class="price">
-      <span class="nm">Standard</span>
+      <span class="nm">Half down</span>
       <div class="amt">
-        <div><b>$2,000</b><span>one-time setup</span></div>
-        <div><b>$350</b><span>per month</span></div>
+        <div><b>$1,000</b><span>today</span></div>
+        <div><b>$400</b><span>per month for 12 months, then $300</span></div>
       </div>
-      <p>No minimum. Month to month, cancel with 30 days' notice.</p>
+      <p>12-month minimum, then month to month.</p>
+      <p class="tot">First year total: <b>$5,800</b></p>
+    </div>
+    <div class="price">
+      <span class="nm">Starter · lowest to begin</span>
+      <div class="amt">
+        <div><b>$500</b><span>today</span></div>
+        <div><b>$450</b><span>per month for 12 months, then $300</span></div>
+      </div>
+      <p>12-month minimum, then month to month. Get live now, pay the rest over time.</p>
+      <p class="tot">First year total: <b>$5,900</b></p>
     </div>
   </div>
   <ul class="ticks" style="margin-top:16px">
@@ -396,7 +412,7 @@ footer b{color:var(--accent)}
 
   var $ = function(id){ return document.getElementById(id); };
   var money = function(x){ return "$" + Math.round(x).toLocaleString("en-US"); };
-  var cost = 262.5;
+  var cost = 300;
   var plans = document.querySelectorAll(".plan button");
   plans.forEach(function(b){
     b.addEventListener("click", function(){

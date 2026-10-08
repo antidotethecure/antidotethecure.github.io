@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Your Sample App — Second Shift AI</title>
+<meta name="robots" content="noindex">
+<script>window.DEMO_LANG_BAR = true;</script>
+<script src="../lang-th.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;600;800;900&display=swap">
+<style>
+:root{
+  --bg:#070B1E; --card:#121C40; --edge:#25336A; --ink:#EEF2FF; --dim:#9AA6CC;
+  --bolt:#E8582A; --gold:#FFD23F; --good:#3DDC97;
+  --display:"Bebas Neue","Arial Narrow",Impact,sans-serif; --body:"Archivo",system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(900px 600px at 50% -10%,#24357a 0,transparent 60%),var(--bg);color:var(--ink);font-family:var(--body);line-height:1.45;padding-inline:16px;padding-bottom:calc(50px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:640px;margin:0 auto}
+.ribbon{text-align:center;font-size:12px;letter-spacing:.06em;color:var(--gold);border:1px dashed var(--edge);border-radius:99px;padding:6px 12px;margin:14px auto 0;width:max-content;max-width:100%}
+.hero{position:relative;margin-top:12px;border-radius:22px;overflow:hidden;min-height:260px;display:flex;align-items:flex-end;background:var(--card) center/cover no-repeat;border:1px solid var(--edge)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 25%,#070b1ee6 85%)}
+.hero .in{position:relative;z-index:1;padding:18px}
+.hero .ty{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:800}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(42px,12vw,64px);letter-spacing:.03em;line-height:.95;margin:4px 0}
+.hero p{margin:0;color:#dfe6ff}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;border:1px solid var(--edge);background:var(--card);color:var(--ink);border-radius:12px;padding:11px 14px;font:800 14px var(--body);cursor:pointer}
+.btn.hot{background:var(--bolt);border-color:var(--bolt);color:#fff;box-shadow:0 8px 24px #e8582a55}
+h2{font-family:var(--display);font-weight:400;font-size:34px;letter-spacing:.04em;margin:34px 0 4px;line-height:1}
+h2::before{content:"";display:inline-block;vertical-align:-2px;margin-right:10px;width:22px;height:22px;background:var(--bolt);clip-path:polygon(55% 0,10% 58%,45% 58%,30% 100%,90% 38%,55% 38%,75% 0)}
+.sub{color:var(--dim);margin:0 0 12px}
+/* game */
+.gamebox{background:linear-gradient(180deg,#121c40,#0b1230);border:1px solid var(--edge);border-radius:18px;padding:12px}
+.hud{display:flex;justify-content:space-between;font-weight:800;padding:0 4px 8px}
+.hud b{font-family:var(--display);font-weight:400;font-size:28px;color:var(--gold);letter-spacing:.04em}
+canvas{display:block;width:100%;aspect-ratio:3/4;border-radius:12px;background:#0b1230;touch-action:none}
+.tiers{display:grid;gap:8px;margin-top:12px}
+.tier{display:flex;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:10px 12px;font-size:14px}
+.tier b{font-family:var(--display);font-weight:400;font-size:22px;color:var(--gold);letter-spacing:.03em}
+/* list */
+.menu{display:grid;gap:10px}
+.it{display:grid;grid-template-columns:1fr auto;gap:2px 12px;background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:12px 14px;align-items:start}
+.it.ph{grid-template-columns:96px 1fr auto}
+.it img{width:96px;height:96px;object-fit:cover;border-radius:12px;grid-row:span 2;display:block}
+.it .n{font-weight:800;font-size:16px}
+.it .p{font-family:var(--display);font-size:26px;color:var(--gold);letter-spacing:.03em;line-height:1}
+.it .d{grid-column:1/2;color:var(--dim);font-size:13.5px}
+.it.ph .d{grid-column:2/3}
+.gal{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.gal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;display:block}
+/* states */
+.state{text-align:center;background:var(--card);border:1px solid var(--edge);border-radius:20px;padding:26px 18px;margin-top:30px}
+.state h1{font-family:var(--display);font-weight:400;font-size:44px;letter-spacing:.03em;margin:8px 0}
+.state p{color:var(--dim)}
+.thumbs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:10px}
+.cta{text-align:center;background:linear-gradient(180deg,var(--card),var(--bg));border:1px solid var(--bolt);border-radius:20px;padding:24px 16px;margin-top:34px}
+.cta h2{margin-top:0}
+.cta .acts{justify-content:center}
+footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:26px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="state"><div style="font-size:40px">⚡</div><h1>Loading…</h1></div></div>
+<footer id="foot">Sample built by <b style="color:var(--gold)">Second Shift AI</b> · private preview, not public</footer>
+
+<script src="../start/types.js"></script>
+<script>
+(function(){
+  "use strict";
+  var Q = new URLSearchParams(location.search), id = Q.get("id") || "", tk = Q.get("t") || "", A = document.getElementById("app");
+  var e = function(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+  if (!id || !tk) { A.innerHTML = '<div class="state"><div style="font-size:40px">🔗</div><h1>Link incomplete</h1><p>Open the full link you got after sending your info, or <a href="../start/" style="color:var(--gold)">start here</a>.</p></div>'; return; }
+
+  function load(){
+    fetch(window.SSAI_API + "?id=" + encodeURIComponent(id) + "&t=" + encodeURIComponent(tk)).then(function(r){ return r.json(); }).then(function(d){
+      if (!d.ok) { A.innerHTML = '<div class="state"><div style="font-size:40px">🔍</div><h1>Not found</h1><p>Check the link, or <a href="../start/" style="color:var(--gold)">send your info again</a>.</p></div>'; return; }
+      if (d.status === "rejected") { A.innerHTML = '<div class="state"><div style="font-size:40px">🙏</div><h1>Thanks, ' + e(d.name) + '</h1><p>We couldn\'t build a sample from this one. DM <a style="color:var(--gold)" href="https://instagram.com/second.shiftai">@second.shiftai</a> and we\'ll sort it out.</p></div>'; return; }
+      if (d.status !== "approved") { pending(d); setTimeout(load, 60000); return; }
+      render(d);
+    }).catch(function(){ A.innerHTML = '<div class="state"><h1>Connection hiccup</h1><p>Refresh in a moment.</p></div>'; });
+  }
+
+  function pending(d){
+    var t = window.SSAI_TYPES[d.type] || window.SSAI_TYPES.other;
+    A.innerHTML = '<div class="state"><div style="font-size:44px">🛠️</div><h1>Your sample is being built</h1>' +
+      '<p><b class="notranslate" translate="no" style="color:var(--ink)">' + e(d.name) + '</b> · ' + t.label + '</p>' +
+      '<p>Antidote reviews every request personally. This page updates by itself once it\'s ready, usually the same day.</p>' +
+      '<p style="font-size:13px">We got ' + (d.items || []).length + ' ' + e(t.list.toLowerCase()) + ' items and ' + (d.photos || []).length + ' photos:</p>' +
+      '<div class="thumbs">' + (d.photos || []).map(function(p){ return '<img src="' + p + '" alt="">'; }).join("") + '</div>' +
+      '<div class="acts" style="justify-content:center"><a class="btn" href="../growth/?for=' + encodeURIComponent(d.name) + '">See what you\'ll get →</a></div></div>';
+  }
+
+  function render(d){
+    var t = window.SSAI_TYPES[d.type] || window.SSAI_TYPES.other, P = d.photos || [], items = d.items || [];
+    document.title = d.name + " — Sample App";
+    var where = [d.address, d.city].filter(Boolean).join(", ");
+    var dir = where ? "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(d.name + " " + where) : "";
+    // cover = first photo, dishes = the rest (assigned to the first items)
+    var dishes = P.slice(1);
+    A.innerHTML =
+      '<div class="ribbon">✨ Sample built for <span class="notranslate" translate="no">' + e(d.name) + '</span> by Second Shift AI</div>' +
+      '<div class="hero" style="background-image:url(\'' + (P[0] || "") + '\')"><div class="in"><div class="ty">' + t.em + ' ' + e(t.label) + '</div>' +
+      '<h1 class="notranslate" translate="no">' + e(d.name) + '</h1><p>' + e(d.city || t.tagline) + '</p>' +
+      '<div class="acts">' + (dir ? '<a class="btn hot" href="' + dir + '" target="_blank" rel="noopener">📍 Directions</a>' : '') +
+      '<a class="btn" href="#play">🎮 Play & win</a><a class="btn" href="#list">' + t.em + ' ' + e(t.list) + '</a>' +
+      (d.ig ? '<a class="btn" href="https://instagram.com/' + encodeURIComponent(d.ig) + '" target="_blank" rel="noopener">📸 @' + e(d.ig) + '</a>' : '') + '</div></div></div>' +
+
+      '<h2 id="play">Play for prizes</h2><p class="sub">Catch the good stuff, dodge the bombs. Top score of the week wins. 20 seconds.</p>' +
+      '<div class="gamebox"><div class="hud"><span>Score <b id="sc">0</b></span><span><b id="tm">20</b>s</span></div><canvas id="cv" width="360" height="480"></canvas>' +
+      '<div class="tiers"><div class="tier"><span>🥇 Top score this week</span><b>FREE ' + e((t.item || "item").toUpperCase()) + '</b></div><div class="tier"><span>300+ points</span><b>15% OFF</b></div><div class="tier"><span>Every game</span><b>+ STARS</b></div></div>' +
+      '<p class="sub" style="font-size:12px;margin-top:8px">Sample prizes. You pick the real ones.</p></div>' +
+
+      '<h2 id="list">' + e(t.list) + '</h2><div class="menu">' + (items.length ? items.map(function(it, i){
+        var img = dishes[i];
+        return '<div class="it' + (img ? ' ph' : '') + '">' + (img ? '<img src="' + img + '" alt="' + e(it.n) + '">' : '') +
+          '<span class="n notranslate" translate="no">' + e(it.n) + '</span><span class="p">' + e(it.p) + '</span>' + (it.d ? '<span class="d">' + e(it.d) + '</span>' : '') + '</div>';
+      }).join("") : '<p class="sub">Your ' + e(t.list.toLowerCase()) + ' goes here.</p>') + '</div>' +
+      (dishes.length > items.length ? '<div class="gal menu">' + dishes.slice(items.length).map(function(p){ return '<img src="' + p + '" alt="' + e(d.name) + '">'; }).join("") + '</div>' : '') +
+
+      '<div class="cta"><h2>Make it real</h2><p class="sub">This sample is yours to keep looking at. The full version adds your rewards program, your customer list, automatic win-back texts and more, built around <span class="notranslate" translate="no">' + e(d.name) + '</span>.</p>' +
+      '<div class="acts"><a class="btn hot" href="../growth/?for=' + encodeURIComponent(d.name) + '">See plans & what you get →</a><a class="btn" href="https://instagram.com/second.shiftai" target="_blank" rel="noopener">DM @second.shiftai</a></div></div>';
+    game(t, P);
+    if (where) geocode(d, where);
+  }
+
+  function geocode(d, where){
+    fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(where)).then(function(r){ return r.json(); }).then(function(g){
+      if (!g || !g[0]) return;
+      window.NEARBY = { name: d.name, pin: (window.SSAI_TYPES[d.type] || {}).em || "📍", spots: [{ label: d.city || "", lat: +g[0].lat, lng: +g[0].lon, q: where }] };
+      var s = document.createElement("script"); s.src = "../nearby.js"; document.body.appendChild(s);
+    }).catch(function(){});
+  }
+
+  // tiny catch game: their photos + their type's emojis fall, bombs cost points
+  function game(t, P){
+    var cv = document.getElementById("cv"), x = cv.getContext("2d"), W = cv.width, H = cv.height;
+    var pics = P.map(function(src){ var i = new Image(); i.src = src; return i; });
+    var st = null, px = W / 2, tm = 0;
+    function idle(msg){
+      x.clearRect(0, 0, W, H); x.fillStyle = "#EEF2FF"; x.textAlign = "center";
+      x.font = "900 26px Archivo, sans-serif"; x.fillText(msg || (window.__T || String)("TAP TO PLAY"), W / 2, H / 2);
+      x.font = "40px serif"; x.fillText(t.game.slice(0, 4).join(" "), W / 2, H / 2 - 50);
+    }
+    function start(){
+      st = { s: 0, end: performance.now() + 20000, items: [], next: 0 }; loop();
+    }
+    function spawn(now){
+      var bomb = Math.random() < .18, usePic = !bomb && pics.length && Math.random() < .45;
+      st.items.push({ x: 24 + Math.random() * (W - 48), y: -30, v: 2.2 + Math.random() * 2 + (now - st.end + 20000) / 9000, bomb: bomb,
+        pic: usePic ? pics[(Math.random() * pics.length) | 0] : null, em: bomb ? "💣" : t.game[(Math.random() * t.game.length) | 0], r: 24 });
+    }
+    function loop(){
+      var now = performance.now(), left = Math.max(0, st.end - now);
+      document.getElementById("tm").textContent = Math.ceil(left / 1000);
+      if (now > st.next) { spawn(now); st.next = now + 420; }
+      x.clearRect(0, 0, W, H);
+      st.items.forEach(function(it){
+        it.y += it.v;
+        if (it.pic && it.pic.complete) { x.save(); x.beginPath(); x.arc(it.x, it.y, it.r, 0, 7); x.clip(); x.drawImage(it.pic, it.x - it.r, it.y - it.r, it.r * 2, it.r * 2); x.restore();
+          x.strokeStyle = "#FFD23F"; x.lineWidth = 3; x.beginPath(); x.arc(it.x, it.y, it.r, 0, 7); x.stroke(); }
+        else { x.font = "38px serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(it.em, it.x, it.y); }
+        if (!it.hit && it.y > H - 70 && it.y < H - 20 && Math.abs(it.x - px) < 46) { it.hit = true; st.s = Math.max(0, st.s + (it.bomb ? -40 : it.pic ? 25 : 10)); }
+      });
+      st.items = st.items.filter(function(it){ return !it.hit && it.y < H + 40; });
+      x.fillStyle = "#E8582A"; x.beginPath(); x.roundRect ? x.roundRect(px - 46, H - 40, 92, 18, 9) : x.rect(px - 46, H - 40, 92, 18); x.fill();
+      document.getElementById("sc").textContent = st.s;
+      if (left > 0) requestAnimationFrame(loop);
+      else { idle("Score " + st.s + " · tap to play again"); st = null; }
+    }
+    function move(clientX){ var r = cv.getBoundingClientRect(); px = Math.max(46, Math.min(W - 46, (clientX - r.left) / r.width * W)); }
+    cv.addEventListener("pointerdown", function(ev){ move(ev.clientX); if (!st) start(); });
+    cv.addEventListener("pointermove", function(ev){ move(ev.clientX); });
+    idle();
+  }
+
+  load();
+})();
+</script>
+<script src="../menu3d.js"></script>
+</body>
+</html>

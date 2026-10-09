@@ -457,6 +457,7 @@ var CONFIG = {
     if(m.list.length){ sel=null; chain=0; startClear(m); }
     else { t=grid[a.r][a.c].k; grid[a.r][a.c].k=grid[b.r][b.c].k; grid[b.r][b.c].k=t; sel=null; }
   }
+  window.__CL={get:function(){return {grid:grid,state:state,score:score};},trySwap:function(a,b){trySwap(a,b);},start:function(){start();},COLS:COLS,ROWS:ROWS,HAZ:HAZ};
   function draw(){
     cx.clearRect(0,0,W,H);
     var mset={}; if(state==="clear") matched.forEach(function(m){ mset[m.r+","+m.c]=1; });

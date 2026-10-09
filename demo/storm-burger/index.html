@@ -130,10 +130,10 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <p class="sub">Sample prizes. StormBurger picks the real ones and the board resets every Monday.</p>
 <div class="tiers">
   <div class="tier top"><span class="pts">#1 WEEK</span><div><b>Free Double Classic StormBurger Combo</b><small>Top score by Sunday close</small></div></div>
-  <div class="tier"><span class="pts">2,000</span><div><b>Free Classic StormBurger</b><small>One run over 2,000 points</small></div></div>
-  <div class="tier"><span class="pts">1,500</span><div><b>Free milkshake</b><small>Vanilla, chocolate or mix</small></div></div>
-  <div class="tier"><span class="pts">1,000</span><div><b>Free fries or upgrade to onion rings</b><small>With any order</small></div></div>
-  <div class="tier"><span class="pts">500</span><div><b>Free house sauce</b><small>Storm, Thunder, Ranch… your pick</small></div></div>
+  <div class="tier"><span class="pts">1,000</span><div><b>Free Classic StormBurger</b><small>One run over 1,000 points (our test players averaged 728)</small></div></div>
+  <div class="tier"><span class="pts">800</span><div><b>Free milkshake</b><small>Vanilla, chocolate or mix</small></div></div>
+  <div class="tier"><span class="pts">600</span><div><b>Free fries or upgrade to onion rings</b><small>With any order</small></div></div>
+  <div class="tier"><span class="pts">400</span><div><b>Free house sauce</b><small>Storm, Thunder, Ranch… your pick</small></div></div>
   <div class="tier"><span class="pts">Best</span><div><b id="best">Your best: —</b><small>Saved on this phone</small></div></div>
 </div>
 
@@ -271,8 +271,8 @@ function end(){
   var b=best(); if(st.score>b){ try{localStorage.setItem("sb-best",st.score);}catch(e){} }
   best();
   $("final").textContent=st.score.toLocaleString()+" pts";
-  $("rank").textContent= st.score>=2000?"⚡ Free Classic StormBurger unlocked":st.score>=1500?"🥤 Free shake unlocked":st.score>=1000?"🍟 Free fries unlocked":st.score>=500?"Free sauce unlocked":"Storm over";
-  var prize=st.score>=2000?"a Free Classic StormBurger":st.score>=1500?"a Free shake":st.score>=1000?"Free fries":st.score>=500?"Free sauce":"";
+  $("rank").textContent= st.score>=1000?"⚡ Free Classic StormBurger unlocked":st.score>=800?"🥤 Free shake unlocked":st.score>=600?"🍟 Free fries unlocked":st.score>=400?"Free sauce unlocked":"Storm over";
+  var prize=st.score>=1000?"a Free Classic StormBurger":st.score>=800?"a Free shake":st.score>=600?"Free fries":st.score>=400?"Free sauce":"";
   var won=$("won"); won.style.display="none";
   if(prize&&window.SSAI_WIN){ var w=window.SSAI_WIN(prize.replace(/^a /,""));
     won.innerHTML="🏆 You won "+prize+"!<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#FFD23F;letter-spacing:.1em\">"+w.prize.c+"</span><br><span style=\"font-weight:600;font-size:13px;color:#C9D2EE\">"+(w.saved?"Saved to your rewards. Show it at StormBurger to redeem.":"Join StormBurger Rewards below to save it.")+"</span>";

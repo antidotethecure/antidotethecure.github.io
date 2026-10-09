@@ -548,19 +548,37 @@ hud();
 <script>window.NEARBY={name:"StormBurger",pin:"⚡",spots:[{label:"Inglewood",lat:33.981203,lng:-118.358312,q:"1500 N La Brea Ave, Inglewood, CA 90302"},{label:"Long Beach",lat:33.860251,lng:-118.168688,q:"5801 Cherry Ave, Long Beach, CA 90805"}],offer:"Show this at the counter for double stars on today's order."};</script>
 <script src="../nearby.js"></script>
 <script src="../menu3d.js"></script>
-<script>window.BUILDER={mode:"stack",accent:"burger",name:"StormBurger",img:"img/build/",fire:"img/game/flame.webp",mount:"#menu",
-  base:2.74,baseName:"Brioche bun + Storm sauce",start:["bun_bottom"],top:"bun_top",fireLabel:"Grill it",fireBusy:"Grilling at 400°",
-  lines:["Looking good.","Now that's a StormBurger.","Stack it up.","Chef's kiss.","That's a real one."],
-  layers:{bun_bottom:{w:.8,ar:.625,top:.5},bun_top:{w:.8,ar:.614,sink:.42}},
-  parts:[
-    {id:"patty",name:"Beef patty",price:2.5,max:3,w:.76,ar:.616,top:.42,sink:.18,group:"Patties"},
-    {id:"cheese",name:"American",price:.75,max:2,w:.8,ar:.466,top:.3,sink:.25,group:"Cheese & extras"},
+<script>window.BUILDER={mode:"stack",name:"StormBurger",img:"img/build/",fire:"img/game/flame.webp",mount:"#menu",fireLabel:"Grill it",fireBusy:"Grilling at 400°",
+  layers:{bun_bottom:{w:.8,ar:.537,top:.55},bun_top:{w:.8,ar:.554,sink:.14}},
+  variants:[
+  {tab:"🍔 Smash burger",accent:"burger",hash:"build",base:2.74,baseName:"Brioche bun + Storm sauce",start:["bun_bottom"],top:"bun_top",
+   lines:["Looking good.","Now that's a StormBurger.","Smash it.","Chef's kiss.","That's a real one."],
+   stackOrder:["pickles","onion","tomato","lettuce","patty","cheese","swiss","bacon","jalapeno","onion_straws"],
+   parts:[
+    {id:"patty",name:"Smash patty",price:2.5,max:3,w:.82,ar:.375,top:.62,sink:.25,group:"Patties · 4oz all-natural"},
+    {id:"cheese",name:"American",price:.75,max:3,w:.84,ar:.466,top:.38,sink:.42,group:"Cheese & extras"},
+    {id:"swiss",name:"Swiss",price:.75,max:2,w:.72,ar:.577,top:.35,sink:.4,group:"Cheese & extras"},
     {id:"bacon",name:"Bacon",price:2,max:2,w:.78,ar:.407,top:.4,sink:.2,group:"Cheese & extras"},
     {id:"jalapeno",name:"Jalapeños",price:1,max:1,w:.72,ar:.373,top:.4,sink:.2,group:"Cheese & extras"},
-    {id:"lettuce",name:"Lettuce",price:0,max:1,w:.84,ar:.509,top:.32,sink:.25,group:"Fresh"},
+    {id:"onion_straws",name:"Onion straws",price:0,max:1,w:.74,ar:.621,top:.5,sink:.35,group:"Cheese & extras"},
+    {id:"lettuce",name:"Lettuce",price:0,max:1,w:.78,ar:.589,top:.45,sink:.35,group:"Fresh"},
     {id:"tomato",name:"Tomato",price:0,max:2,w:.72,ar:.654,top:.36,sink:.22,group:"Fresh"},
-    {id:"onion",name:"Onion",price:0,max:1,w:.74,ar:.473,top:.32,sink:.22,group:"Fresh"},
-    {id:"pickles",name:"Pickles",price:0,max:2,w:.72,ar:.286,top:.45,sink:.15,group:"Fresh"}]};</script>
+    {id:"onion",name:"Onion",price:0,max:1,w:.74,ar:.361,top:.45,sink:.3,group:"Fresh"},
+    {id:"pickles",name:"Pickles",price:0,max:2,w:.74,ar:.463,top:.35,sink:.3,group:"Fresh"}]},
+  {tab:"🐔 Chicken sandwich",accent:"chicken sandwich",hash:"build-chicken",base:2,baseName:"Brioche bun + mayo",start:["bun_bottom"],top:"bun_top",
+   need:"Chicken · hand-breaded",needLine:"Start with a hand-breaded chicken fillet.",
+   lines:["Crispy.","Hand-breaded, homemade.","That crunch though.","Chef's kiss.","That's a real one."],
+   stackOrder:["pickles_crinkle","chicken","chicken_spicy","cheese","swiss","tomato","slaw","bacon","jalapeno"],
+   parts:[
+    {id:"chicken",name:"Crispy fillet",price:4.99,max:2,w:.86,ar:.545,top:.55,sink:.3,group:"Chicken · hand-breaded"},
+    {id:"chicken_spicy",name:"Spicy (Thunder)",price:4.99,max:2,w:.86,ar:.602,top:.55,sink:.3,group:"Chicken · hand-breaded"},
+    {id:"swiss",name:"Swiss",price:.5,max:2,w:.72,ar:.577,top:.35,sink:.4,group:"Deluxe it"},
+    {id:"slaw",name:"Kale slaw",price:.5,max:1,w:.78,ar:.598,top:.45,sink:.35,group:"Deluxe it"},
+    {id:"tomato",name:"Tomato",price:0,max:2,w:.72,ar:.654,top:.36,sink:.22,group:"Deluxe it"},
+    {id:"pickles_crinkle",name:"Pickles",price:0,max:2,w:.72,ar:.286,top:.45,sink:.15,group:"Deluxe it"},
+    {id:"cheese",name:"American",price:.75,max:2,w:.8,ar:.466,top:.3,sink:.25,group:"Extras"},
+    {id:"bacon",name:"Bacon",price:2,max:2,w:.78,ar:.407,top:.4,sink:.2,group:"Extras"},
+    {id:"jalapeno",name:"Jalapeños",price:1,max:1,w:.72,ar:.373,top:.4,sink:.2,group:"Extras"}]}]};</script>
 <script src="../builder.js"></script>
 <script src="../gamelock.js"></script>
 </body>

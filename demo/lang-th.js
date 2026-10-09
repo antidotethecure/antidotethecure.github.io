@@ -37,7 +37,7 @@
   };
   // canvas text in the other languages (names stay English)
   var D = {
-    es: { 'TAP TO PLAY': 'TOCA PARA JUGAR', 'STORM OVER': 'PASÓ LA TORMENTA', 'LIGHTNING!': '¡RAYO!', 'Fries': 'Papas fritas', 'Shake': 'Malteada', 'Spicy Chicken': 'Pollo picante',
+    es: { 'TAP TO PLAY': 'TOCA PARA JUGAR', 'STORM OVER': 'PASÓ LA TORMENTA', 'LIGHTNING!': '¡RAYO!', 'TOTALED!': '¡DESTROZADO!', 'The storm took your ride': 'La tormenta se llevó tu carro', '🔥 Engine on fire!': '🔥 ¡Motor en llamas!', '💥 Windows cracked!': '💥 ¡Vidrios rotos!', 'Fries': 'Papas fritas', 'Shake': 'Malteada', 'Spicy Chicken': 'Pollo picante',
       'THE DRAGON COOKED YOUR FOOD': '¡EL DRAGÓN QUEMÓ TU COMIDA!', 'Free appetizer': 'Entrada gratis', '25% off your food': '25% de descuento en tu comida', '10% off your drink': '10% de descuento en tu bebida',
       'Half off your whole meal': 'Mitad de precio en toda tu comida', 'Entire meal on the house': 'Toda la comida invita la casa' },
     'zh-CN': { 'TAP TO PLAY': '点击开始', 'STORM OVER': '风暴结束', 'LIGHTNING!': '闪电！', 'Fries': '薯条', 'Shake': '奶昔', 'Spicy Chicken': '香辣鸡',

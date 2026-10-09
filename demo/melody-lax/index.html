@@ -153,7 +153,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 </header>
 
 <h2 id="play"><small>Play for prizes</small>Fly the Melody approach</h2>
-<p class="sub">Take off from LAX, fly over Melody, In-N-Out, SoFi, Crypto.com Arena, the Hollywood sign and the Santa Monica Pier, then land back at LAX. Grab the food, dodge UFOs, fighter jets, lightning and kamikaze planes. Drag anywhere on the game to steer.</p>
+<p class="sub">Take off from LAX, fly over Melody, In-N-Out, SoFi, Crypto.com Arena, the Hollywood sign, Venice Beach and Nalu Vida on the Venice Pier, and the Santa Monica Pier, then land back at LAX. Grab the food, dodge UFOs, fighter jets, lightning and kamikaze planes. Drag anywhere on the game to steer.</p>
 <div class="gamebox">
   <div class="hud">
     <span>Score <span class="sc" id="score">0</span></span>
@@ -435,7 +435,7 @@ cv.width=W*DPR; cv.height=H*DPR; cx.scale(DPR,DPR);
 function img(src){ var i=new Image(); i.src=src; return i; }
 function ready(i){ return i&&i.complete&&i.naturalWidth; }
 var S={plane:img("img/game/plane.webp"),ufo:img("img/game/ufo.webp"),jet:img("img/game/jet.webp"),kami:img("img/game/plane.webp"),
-  theme:img("img/game/theme.webp"),sofi:img("img/game/sofi.webp"),crypto:img("img/game/crypto.webp"),hollywood:img("img/game/hollywood.webp"),pier:img("img/game/pier.webp"),mar0:img("img/game/marshal0.webp"),mar1:img("img/game/marshal1.webp"),mar2:img("img/game/marshal2.webp"),cone:img("img/game/cone.webp"),innout:img("img/game/innout.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
+  theme:img("img/game/theme.webp"),sofi:img("img/game/sofi.webp"),crypto:img("img/game/crypto.webp"),hollywood:img("img/game/hollywood.webp"),pier:img("img/game/pier.webp"),venice:img("img/game/venice.webp"),vsign:img("img/game/vsign.webp"),mar0:img("img/game/marshal0.webp"),mar1:img("img/game/marshal1.webp"),mar2:img("img/game/marshal2.webp"),cone:img("img/game/cone.webp"),innout:img("img/game/innout.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
 // pickups: Melody's real food + bar life. e = emoji fallback while the photo loads
 var PICK=[{k:"p_mac",n:"Mac & Cheese",p:80,e:"🧀",w:58},{k:"p_wings",n:"Lemon Pepper Wings",p:70,e:"🍗",w:60},{k:"p_toast",n:"French Toast",p:60,e:"🍞",w:58},
   {k:"p_omelette",n:"Philly Omelette",p:60,e:"🍳",w:60},{k:"p_marg",n:"Mango Marg",p:50,e:"🍹",w:40},{k:"p_bottle",n:"Bottle service",p:40,e:"🍾",w:34},{k:"p_shots",n:"Round of shots",p:40,e:"🥃",w:46}];
@@ -456,10 +456,11 @@ var RUN=0;
 function start(){ var keep=G.clouds, posted=G.posted; G=fresh(); G.clouds=keep; G.posted=posted; G.runId=++RUN; G.running=true; G.last=performance.now(); seedGround(); $("over").classList.remove("on"); hud(); }
 
 /* ---- the ground: Westchester at night, LAX runways and the landmarks rolling under you ---- */
-var SEQ=["city","theme","city","melody","innout","city","sofi","city","crypto","city","hollywood","city","pier","city","melody","innout"];
-var LBL={theme:"LAX Theme Building",melody:"★ MELODY BAR & GRILL ★",innout:"In-N-Out Burger",sofi:"SoFi Stadium",crypto:"Crypto.com Arena",hollywood:"Hollywood Sign",pier:"Santa Monica Pier"};
+var SEQ=["city","theme","city","melody","innout","city","sofi","city","crypto","city","hollywood","city","coast","venice","vsign","coast","pier","coast","city","melody","innout"];
+var COAST={coast:1,venice:1,vsign:1,pier:1};
+var LBL={venice:"★ NALU VIDA · VENICE PIER ★",vsign:"Venice Beach",theme:"LAX Theme Building",melody:"★ MELODY BAR & GRILL ★",innout:"In-N-Out Burger",sofi:"SoFi Stadium",crypto:"Crypto.com Arena",hollywood:"Hollywood Sign",pier:"Santa Monica Pier"};
 function seedGround(){ G.ground=[]; G.gy=H+100; G.seq=0; G.ground.push({k:"runway",y:G.gy-520,h:520,side:1}); G.gy-=520; while(G.gy>-400) addSeg(); }
-function addSeg(){ var k=G.landing&&!G.rwyQueued?(G.rwyQueued=1,"runway"):SEQ[G.seq++%SEQ.length], h=k==="runway"?520:k==="city"?260:k==="hollywood"?240:300; G.gy-=h; G.ground.push({k:k,y:G.gy,h:h,side:Math.random()<.5?-1:1}); }
+function addSeg(){ var k=G.landing&&!G.rwyQueued?(G.rwyQueued=1,"runway"):SEQ[G.seq++%SEQ.length], h=k==="runway"?520:k==="city"?260:k==="hollywood"?240:k==="coast"?200:300; G.gy-=h; G.ground.push({k:k,y:G.gy,h:h,side:Math.random()<.5?-1:1}); }
 function drawGround(dy){
   cx.fillStyle="#0c1220"; cx.fillRect(0,0,W,H);
   for(var i=G.ground.length-1;i>=0;i--){ var g=G.ground[i]; g.y+=dy; if(g.y>H+40){ G.ground.splice(i,1); continue; } }
@@ -471,11 +472,19 @@ function drawGround(dy){
   for(var x=40;x<W;x+=110){ cx.beginPath(); cx.moveTo(x,0); cx.lineTo(x,H); cx.stroke(); }
   for(y=off-80;y<H+80;y+=80) for(x=40;x<W;x+=110){ cx.fillStyle="rgba(255,190,90,.55)"; cx.beginPath(); cx.arc(x+6,y+6,1.6,0,6.283); cx.fill(); }
   for(y=off-80;y<H+80;y+=80) for(x=55;x<W;x+=110){ cx.fillStyle="#141c2e"; cx.fillRect(x,y+10,80,58); cx.fillStyle="rgba(255,214,140,.10)"; cx.fillRect(x+8,y+18,16,10); cx.fillRect(x+50,y+40,14,10); }
+  // Venice / Santa Monica coastline: the Pacific on the left with rolling whitecaps, a strip of sand, then the boardwalk
+  var tW=performance.now();
+  G.ground.forEach(function(g){ if(!COAST[g.k]) return; var sx=W*0.46, top=g.y-2, hh=g.h+4;
+    var og=cx.createLinearGradient(0,0,sx,0); og.addColorStop(0,"#06243f"); og.addColorStop(.75,"#0b4b6e"); og.addColorStop(1,"#1a7a8f"); cx.fillStyle=og; cx.fillRect(0,top,sx,hh);
+    cx.fillStyle="#d9c08e"; cx.fillRect(sx,top,W*0.1,hh); cx.fillStyle="rgba(120,90,50,.25)"; cx.fillRect(sx+W*0.1-6,top,6,hh);
+    cx.strokeStyle="rgba(235,248,255,.55)"; cx.lineWidth=2;
+    for(var wv=0;wv<5;wv++){ var wx=sx-8-wv*26-((tW/40+wv*13)%26); cx.beginPath(); for(var yy=top;yy<top+hh;yy+=8){ var xx=wx+Math.sin((yy+tW/12+wv*40)/22)*4; yy===top?cx.moveTo(xx,yy):cx.lineTo(xx,yy); } cx.globalAlpha=.25+.15*wv/5; cx.stroke(); }
+    cx.globalAlpha=1; cx.fillStyle="rgba(255,255,255,.6)"; for(var f=top;f<top+hh;f+=14){ cx.fillRect(sx-3+Math.sin((f+tW/9)/15)*2,f,3,7); } });
   G.ground.forEach(function(g){
     if(g.k==="runway") drawRunway(g);
-    else if(g.k!=="city"){ var im=S[g.k]; if(ready(im)){ var w=g.k==="melody"?250:g.k==="hollywood"?300:g.k==="sofi"?270:230, h=w*im.naturalHeight/im.naturalWidth, x=W/2+g.side*70-w/2;
+    else if(g.k!=="city"&&g.k!=="coast"){ var im=S[g.k]; if(ready(im)){ var w=g.k==="melody"?250:g.k==="hollywood"?300:g.k==="sofi"?270:230, h=w*im.naturalHeight/im.naturalWidth, x=(g.k==="venice"||g.k==="pier")?W*0.32-w/2:g.k==="vsign"?W*0.74-w/2:W/2+g.side*70-w/2;
       cx.save(); cx.globalAlpha=.95; cx.drawImage(im,x,g.y+(g.h-h)/2,w,h); cx.restore();
-      if(LBL[g.k]){ cx.font="800 13px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.8)"; cx.strokeText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); cx.fillStyle=g.k==="melody"?"#f0d375":"#e8eefc"; cx.fillText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); } } }
+      if(LBL[g.k]){ cx.font="800 13px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.8)"; cx.strokeText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); cx.fillStyle=(g.k==="melody"||g.k==="venice")?"#f0d375":"#e8eefc"; cx.fillText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); } } }
   });
 }
 // LAX-style runway: worn asphalt, real markings, edge/threshold/end lights, approach-light "rabbit", PAPI, a taxiway, and ground crew waving wands

@@ -173,7 +173,13 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:26px;line-
       x.fillStyle = "#E8582A"; x.beginPath(); x.roundRect ? x.roundRect(px - 46, H - 40, 92, 18, 9) : x.rect(px - 46, H - 40, 92, 18); x.fill();
       document.getElementById("sc").textContent = st.s;
       if (left > 0) requestAnimationFrame(loop);
-      else { idle("Score " + st.s + " · tap to play again"); st = null; }
+      else {
+        if (st.s >= 150 && window.SSAI_WIN) { // a win at home becomes a prize code they redeem in store
+          var w = window.SSAI_WIN("A free treat"); idle("🏆 You won a free treat!");
+          x.font = "900 30px ui-monospace, Menlo, monospace"; x.fillStyle = "#FFD23F"; x.fillText(w.prize.c, W / 2, H / 2 + 46);
+          x.font = "700 15px Archivo, sans-serif"; x.fillStyle = "#C9D2EE"; x.fillText(w.saved ? "Saved to your rewards. Show it in store." : "Join below to save it.", W / 2, H / 2 + 80);
+        } else idle("Score " + st.s + " · tap to play again");
+        st = null; }
     }
     function move(clientX){ var r = cv.getBoundingClientRect(); px = Math.max(46, Math.min(W - 46, (clientX - r.left) / r.width * W)); }
     cv.addEventListener("pointerdown", function(ev){ move(ev.clientX); if (!st) start(); });

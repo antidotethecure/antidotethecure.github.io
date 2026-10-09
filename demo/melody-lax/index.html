@@ -153,7 +153,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 </header>
 
 <h2 id="play"><small>Play for prizes</small>Fly the Melody approach</h2>
-<p class="sub">Fly over LAX, In-N-Out and Melody. Grab the food, dodge UFOs, fighter jets, lightning and kamikaze planes. Drag anywhere on the game to steer.</p>
+<p class="sub">Take off from LAX, fly over Melody, In-N-Out, SoFi, Crypto.com Arena, the Hollywood sign and the Santa Monica Pier, then land back at LAX. Grab the food, dodge UFOs, fighter jets, lightning and kamikaze planes. Drag anywhere on the game to steer.</p>
 <div class="gamebox">
   <div class="hud">
     <span>Score <span class="sc" id="score">0</span></span>
@@ -435,7 +435,7 @@ cv.width=W*DPR; cv.height=H*DPR; cx.scale(DPR,DPR);
 function img(src){ var i=new Image(); i.src=src; return i; }
 function ready(i){ return i&&i.complete&&i.naturalWidth; }
 var S={plane:img("img/game/plane.webp"),ufo:img("img/game/ufo.webp"),jet:img("img/game/jet.webp"),kami:img("img/game/plane.webp"),
-  theme:img("img/game/theme.webp"),mar0:img("img/game/marshal0.webp"),mar1:img("img/game/marshal1.webp"),mar2:img("img/game/marshal2.webp"),cone:img("img/game/cone.webp"),innout:img("img/game/innout.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
+  theme:img("img/game/theme.webp"),sofi:img("img/game/sofi.webp"),crypto:img("img/game/crypto.webp"),hollywood:img("img/game/hollywood.webp"),pier:img("img/game/pier.webp"),mar0:img("img/game/marshal0.webp"),mar1:img("img/game/marshal1.webp"),mar2:img("img/game/marshal2.webp"),cone:img("img/game/cone.webp"),innout:img("img/game/innout.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
 // pickups: Melody's real food + bar life. e = emoji fallback while the photo loads
 var PICK=[{k:"p_mac",n:"Mac & Cheese",p:80,e:"🧀",w:58},{k:"p_wings",n:"Lemon Pepper Wings",p:70,e:"🍗",w:60},{k:"p_toast",n:"French Toast",p:60,e:"🍞",w:58},
   {k:"p_omelette",n:"Philly Omelette",p:60,e:"🍳",w:60},{k:"p_marg",n:"Mango Marg",p:50,e:"🍹",w:40},{k:"p_bottle",n:"Bottle service",p:40,e:"🍾",w:34},{k:"p_shots",n:"Round of shots",p:40,e:"🥃",w:46}];
@@ -449,16 +449,17 @@ function fresh(){ return {running:false,over:false,x:W/2,y:H-110,tx:W/2,ty:H-110
   spawnT:600,ufoT:7000,jetT:13000,boltT:9000,kamiT:16000,shotT:0,inv:0,mult:1,multT:0,shake:0,flash:0,red:0,dying:0,scroll:0,ground:[],gy:0,warn:[]}; }
 G=fresh();
 for(var c=0;c<6;c++) G.clouds.push({x:Math.random()*W,y:Math.random()*H,s:120+Math.random()*120,v:2+Math.random()*1.5});
-function hud(){ $("score").textContent=G.score.toLocaleString(); $("time").textContent=Math.ceil(Math.max(0,G.t)/1000)+"s";
+function hud(){ $("score").textContent=G.score.toLocaleString(); $("time").textContent=G.landing?(G.touched?"🛬":"Landing"):Math.ceil(Math.max(0,G.t-8000)/1000)+"s";
   var hp=Math.max(0,Math.round(G.hp)), b=$("hpbar"); b.style.width=hp+"%"; b.className=hp>66?"":hp>33?"mid":"low"; $("hpn").textContent=hp+"%"; }
 function best(){ try{ return +localStorage.getItem("melody-best")||0; }catch(e){ return 0; } }
 var RUN=0;
 function start(){ var keep=G.clouds, posted=G.posted; G=fresh(); G.clouds=keep; G.posted=posted; G.runId=++RUN; G.running=true; G.last=performance.now(); seedGround(); $("over").classList.remove("on"); hud(); }
 
 /* ---- the ground: Westchester at night, LAX runways and the landmarks rolling under you ---- */
-var SEQ=["melody","city","innout","runway","theme","city","runway","city"];
-function seedGround(){ G.ground=[]; G.gy=H; G.seq=0; while(G.gy>-400) addSeg(); }
-function addSeg(){ var k=SEQ[G.seq++%SEQ.length], h=k==="runway"?520:k==="city"?260:300; G.gy-=h; G.ground.push({k:k,y:G.gy,h:h,side:Math.random()<.5?-1:1}); }
+var SEQ=["city","theme","city","melody","innout","city","sofi","city","crypto","city","hollywood","city","pier","city","melody","innout"];
+var LBL={theme:"LAX Theme Building",melody:"★ MELODY BAR & GRILL ★",innout:"In-N-Out Burger",sofi:"SoFi Stadium",crypto:"Crypto.com Arena",hollywood:"Hollywood Sign",pier:"Santa Monica Pier"};
+function seedGround(){ G.ground=[]; G.gy=H+100; G.seq=0; G.ground.push({k:"runway",y:G.gy-520,h:520,side:1}); G.gy-=520; while(G.gy>-400) addSeg(); }
+function addSeg(){ var k=G.landing&&!G.rwyQueued?(G.rwyQueued=1,"runway"):SEQ[G.seq++%SEQ.length], h=k==="runway"?520:k==="city"?260:k==="hollywood"?240:300; G.gy-=h; G.ground.push({k:k,y:G.gy,h:h,side:Math.random()<.5?-1:1}); }
 function drawGround(dy){
   cx.fillStyle="#0c1220"; cx.fillRect(0,0,W,H);
   for(var i=G.ground.length-1;i>=0;i--){ var g=G.ground[i]; g.y+=dy; if(g.y>H+40){ G.ground.splice(i,1); continue; } }
@@ -472,9 +473,9 @@ function drawGround(dy){
   for(y=off-80;y<H+80;y+=80) for(x=55;x<W;x+=110){ cx.fillStyle="#141c2e"; cx.fillRect(x,y+10,80,58); cx.fillStyle="rgba(255,214,140,.10)"; cx.fillRect(x+8,y+18,16,10); cx.fillRect(x+50,y+40,14,10); }
   G.ground.forEach(function(g){
     if(g.k==="runway") drawRunway(g);
-    else if(g.k!=="city"){ var im=S[g.k]; if(ready(im)){ var w=g.k==="melody"?250:230, h=w*im.naturalHeight/im.naturalWidth, x=W/2+g.side*70-w/2;
+    else if(g.k!=="city"){ var im=S[g.k]; if(ready(im)){ var w=g.k==="melody"?250:g.k==="hollywood"?300:g.k==="sofi"?270:230, h=w*im.naturalHeight/im.naturalWidth, x=W/2+g.side*70-w/2;
       cx.save(); cx.globalAlpha=.95; cx.drawImage(im,x,g.y+(g.h-h)/2,w,h); cx.restore();
-      if(g.k==="melody"){ cx.font="800 13px Barlow,system-ui"; cx.fillStyle="#f0d375"; cx.textAlign="center"; cx.fillText("★ MELODY BAR & GRILL ★",x+w/2,g.y+(g.h-h)/2+h+14); } } }
+      if(LBL[g.k]){ cx.font="800 13px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.8)"; cx.strokeText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); cx.fillStyle=g.k==="melody"?"#f0d375":"#e8eefc"; cx.fillText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); } } }
   });
 }
 // LAX-style runway: worn asphalt, real markings, edge/threshold/end lights, approach-light "rabbit", PAPI, a taxiway, and ground crew waving wands
@@ -575,10 +576,10 @@ function drawFx(k){
 function sprite(im,x,y,w,rot,flipY,emoji){
   if(ready(im)){ var h=w*im.naturalHeight/im.naturalWidth; cx.save(); cx.translate(x,y); if(rot) cx.rotate(rot); if(flipY) cx.scale(1,-1); cx.drawImage(im,-w/2,-h/2,w,h); cx.restore(); return h; }
   if(emoji){ cx.font=(w*0.8|0)+"px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText(emoji,x,y); } return w; }
-function drawPlane(x,y,roll,scale){
-  var im=S.plane, w=PLANE_W*(scale||1);
+function drawPlane(x,y,roll,scale,alt){
+  if(alt==null) alt=1; var im=S.plane, w=PLANE_W*(scale||1)*(0.74+0.26*alt);
   if(ready(im)){ if(!PSH) PSH=shadowOf(im,.45); var h=w*im.naturalHeight/im.naturalWidth;
-    cx.save(); cx.translate(x+26,y+34); cx.scale(Math.max(.72,1-Math.abs(roll)*.5)*.7,.7); cx.drawImage(PSH,-w/2,-h/2,w,h); cx.restore();
+    cx.save(); cx.translate(x+3+23*alt,y+4+30*alt); cx.scale(Math.max(.72,1-Math.abs(roll)*.5)*.7,.7); cx.drawImage(PSH,-w/2,-h/2,w,h); cx.restore();
     cx.save(); cx.translate(x,y); cx.rotate(roll*0.35); cx.scale(Math.max(.72,1-Math.abs(roll)*.5),1); cx.drawImage(im,-w/2,-h/2,w,h);
     var bl=(performance.now()/500|0)%2; cx.fillStyle=bl?"#ff3b3b":"#3bff6b"; cx.beginPath(); cx.arc(-w*.47,h*.06,2.2,0,6.283); cx.fill(); cx.fillStyle=bl?"#3bff6b":"#ff3b3b"; cx.beginPath(); cx.arc(w*.47,h*.06,2.2,0,6.283); cx.fill();
     cx.restore(); }
@@ -602,21 +603,34 @@ function boltPath(x){ var pts=[[x,-10]], y=-10; while(y<H){ y+=30+Math.random()*
 function frame(now){
   requestAnimationFrame(frame);
   var dt=Math.min(50,now-(G.last||now)); G.last=now; var k=dt/16.67, run=G.running&&!G.dying;
-  var spd=run?2.4+Math.min(2.2,G.el/22000):1.2; G.scroll+=spd*k;
+  var TO=4500, LAND=8000, takeoff=run&&G.el<TO, landing=run&&G.t<=LAND;
+  var spd=run?2.4+Math.min(2.2,G.el/22000):(G.over&&!G.landed?1.2:0); // parked on the runway before the first flight and after landing
+  if(takeoff){ spd=0.5+2.2*Math.pow(G.el/TO,1.4); G.alt=Math.max(0,Math.min(1,(G.el-1300)/2800)); }
+  else if(run&&!landing) G.alt=1;
+  if(landing){ if(!G.landing){ G.landing=1; G.inv=1e9; G.warn=[]; G.bolts=[]; G.ens.forEach(function(e){ e.fleeing=1; });
+      G.ground.forEach(function(g){ if(g.y+g.h<-20&&g.k!=="runway") g.k="city"; }); G.seq=1; } // coming home: plain city, then LAX
+    var rw=null; G.ground.forEach(function(g){ if(g.k==="runway"&&G.landing&&g.y<G.y&&g.y+g.h-34>G.y) rw=g; });
+    if(rw){ G.alt=Math.max(0,(G.alt==null?1:G.alt)-dt/1700); }
+    if(G.alt<=0){ G.roll=(G.roll==null?1:G.roll)*Math.pow(0.975,k); if(!G.touched){ G.touched=1; G.shake=6; pop(G.x,G.y-40,T("Touchdown!"),"#7ef7c8"); buzz(40); } }
+    spd=Math.min(spd,2.6)*(G.roll==null?1:G.roll); }
+  G.scroll+=spd*k;
   cx.save(); if(G.shake>0){ cx.translate((Math.random()-.5)*G.shake,(Math.random()-.5)*G.shake); G.shake*=.86; if(G.shake<.5) G.shake=0; }
   if(!G.ground.length) seedGround();
   drawGround(spd*k);
   if(run){
     G.t-=dt; G.el+=dt;
+    if(!takeoff&&!landing){
     G.spawnT-=dt; if(G.spawnT<=0){ spawnPick(); G.spawnT=Math.max(420,820-G.el/80); }
     G.ufoT-=dt; if(G.ufoT<=0){ spawnUfo(); G.ufoT=Math.max(4200,8000-G.el/20); }
     G.jetT-=dt; if(G.jetT<=0){ spawnJet(); G.jetT=Math.max(5200,9500-G.el/18); }
     G.boltT-=dt; if(G.boltT<=0){ spawnBolt(); G.boltT=Math.max(3800,7000-G.el/25); }
     G.kamiT-=dt; if(G.kamiT<=0){ spawnKami(); G.kamiT=14000+Math.random()*6000; }
+    }
+    if(takeoff||landing){ G.tx=W/2; G.ty=landing?H*0.64:H-110; }
     var ox=G.x; G.x+=(G.tx-G.x)*Math.min(1,.22*k); G.y+=(G.ty-G.y)*Math.min(1,.22*k); G.vx=(G.x-ox)/Math.max(.5,k);
     if(G.inv>0) G.inv-=k; if(G.multT>0){ G.multT-=dt; if(G.multT<=0) G.mult=1; }
     if(Math.floor(now/250)!==Math.floor((now-dt)/250)) G.score+=G.mult;
-    G.shotT-=dt; if(G.shotT<=0){ G.shots.push({x:G.x-22,y:G.y-20},{x:G.x+22,y:G.y-20}); G.shotT=260; }
+    G.shotT-=dt; if(G.shotT<=0&&!takeoff&&!landing){ G.shots.push({x:G.x-22,y:G.y-20},{x:G.x+22,y:G.y-20}); G.shotT=260; }
   }
   // lightning
   for(var b=G.bolts.length-1;b>=0;b--){ var bo=G.bolts[b]; bo.age+=dt;
@@ -645,6 +659,7 @@ function frame(now){
   for(var e=G.ens.length-1;e>=0;e--){ var en=G.ens[e];
     if(run){ if(en.t==="ufo"){ en.ph+=.03*k; en.y+=1.1*k; en.x+=Math.sin(en.ph)*1.6*k; en.fire-=dt; if(en.fire<=0&&en.y>20){ var ang=Math.atan2(G.y-en.y,G.x-en.x); G.eshots.push({x:en.x,y:en.y+12,vx:Math.cos(ang)*3.6,vy:Math.sin(ang)*3.6,c:"#7ef7c8",r:6}); en.fire=1700+Math.random()*900; } }
       else if(en.t==="jet"){ en.y+=7.5*k; if(!en.fired&&en.y>60){ en.fired=1; G.eshots.push({x:en.x-14,y:en.y+30,vx:0,vy:9,c:"#ff5a3c",r:4,missile:1},{x:en.x+14,y:en.y+30,vx:0,vy:9,c:"#ff5a3c",r:4,missile:1}); } }
+      else if(en.fleeing){ en.x+=(en.x<W/2?-6:6)*k; en.y-=1*k; }
       else if(en.t==="kami"){ en.y+=5.2*k; en.x+=en.vx*k; if(Math.random()<.5) G.fx.push({k:"s",x:en.x+(Math.random()-.5)*30,y:en.y-40,vx:0,vy:-1,s:4,g:.25,a:.25,rot:0}); } }
     if(en.y>H+120||en.x<-120||en.x>W+120){ G.ens.splice(e,1); continue; }
     if(en.t==="ufo"){ var gg=cx.createRadialGradient(en.x,en.y+16,2,en.x,en.y+16,60); gg.addColorStop(0,"rgba(126,247,200,.35)"); gg.addColorStop(1,"rgba(126,247,200,0)"); cx.fillStyle=gg; cx.beginPath(); cx.arc(en.x,en.y+16,60,0,6.283); cx.fill(); sprite(S.ufo,en.x,en.y,en.w,0,false,"🛸"); }
@@ -674,26 +689,27 @@ function frame(now){
     if(run&&G.hp<67) emit(G.x+(G.hp<34?18:-18),G.y+8,G.hp<34);
     if(run&&G.hp<34) emit(G.x-18,G.y+8,false);
     drawFx(k);
-    if(G.inv<=0||Math.floor(G.inv/6)%2===0) drawPlane(G.x,G.y,Math.max(-1,Math.min(1,G.vx*.12)),1);
+    if(G.inv<=0||G.landing||Math.floor(G.inv/6)%2===0) drawPlane(G.x,G.y,Math.max(-1,Math.min(1,G.vx*.12)),1,G.alt==null?(G.running?1:0):G.alt);
   }
   drawClouds(spd*k);
   for(var pI=G.pops.length-1;pI>=0;pI--){ var po=G.pops[pI]; po.y-=1.1*k; po.a-=.02*k; if(po.a<=0){ G.pops.splice(pI,1); continue; } cx.globalAlpha=po.a; cx.fillStyle=po.col; cx.font="800 17px Barlow,system-ui"; cx.textAlign="center"; cx.fillText(po.txt,po.x,po.y); cx.globalAlpha=1; }
+  if(takeoff||(landing&&!G.touched)){ var msg=takeoff?(G.el<1500?T("Cleared for takeoff · Runway 25L"):T("Wheels up! Grab the food")):T("Melody tower: cleared to land 25L"); cx.save(); cx.font="900 17px Barlow,system-ui"; cx.textAlign="center"; var tw=cx.measureText(msg).width+28; cx.fillStyle="rgba(8,13,26,.82)"; roundRect(W/2-tw/2,64,tw,34,17); cx.fill(); cx.fillStyle="#f0d375"; cx.textBaseline="middle"; cx.fillText(msg,W/2,81); cx.restore(); }
   if(G.mult>1&&run){ cx.fillStyle="rgba(228,107,131,.9)"; cx.font="900 16px Barlow,system-ui"; cx.textAlign="left"; cx.fillText("🎤 2× "+Math.ceil(G.multT/1000)+"s",10,24); }
   if(G.red>0){ var rg=cx.createRadialGradient(W/2,H/2,H*.3,W/2,H/2,H*.75); rg.addColorStop(0,"rgba(255,0,0,0)"); rg.addColorStop(1,"rgba(255,0,0,"+(.55*G.red*(.6+.4*Math.sin(now/60)))+")"); cx.fillStyle=rg; cx.fillRect(0,0,W,H); G.red-=.012*k; }
   if(G.flash>0){ cx.fillStyle="rgba(225,240,255,"+G.flash+")"; cx.fillRect(0,0,W,H); G.flash-=.05*k; }
   cx.restore();
   if(!G.running){ cx.fillStyle="rgba(5,8,26,.55)"; cx.fillRect(0,0,W,H); cx.textAlign="center"; cx.textBaseline="middle";
-    cx.fillStyle="#efe4c9"; cx.font="italic 900 40px 'Playfair Display',Georgia,serif"; cx.fillText(G.over?T("Flight over"):T("Melody Approach"),W/2,H/2-46);
+    cx.fillStyle="#efe4c9"; cx.font="italic 900 40px 'Playfair Display',Georgia,serif"; cx.fillText(G.over?(G.landed?T("Landed at LAX"):T("Flight over")):T("Melody Approach"),W/2,H/2-46);
     cx.fillStyle="#f0d375"; cx.font="800 22px Barlow,system-ui"; cx.fillText(T("TAP TO FLY"),W/2,H/2+4);
-    cx.fillStyle="#c9d2ee"; cx.font="600 14px Barlow,system-ui"; cx.fillText(T("Drag anywhere to steer · 60 seconds"),W/2,H/2+34); }
-  if(G.running){ hud(); if(G.t<=0&&!G.dying) end(); }
+    cx.fillStyle="#c9d2ee"; cx.font="600 14px Barlow,system-ui"; cx.fillText(T("Take off from LAX · fly over LA · land back home"),W/2,H/2+34); }
+  if(G.running){ hud(); if(!G.dying&&((G.touched&&G.roll<0.06)||G.t<-9000)) end(); }
 }
 function end(){
-  G.running=false; G.over=true; hud();
+  G.running=false; G.over=true; G.landed=!!G.touched; hud();
   var b=best(); if(G.score>b){ try{ localStorage.setItem("melody-best",G.score); }catch(e){} }
   $("final").textContent=G.score.toLocaleString()+" pts";
-  var prize=G.score>=7500?"a Free appetizer":G.score>=6800?"Free Gilroy Garlic Fries":G.score>=5500?"Free Melody Fries":G.score>=4000?"$3 off any drink":"";
-  $("rank").textContent=prize?"🏆 You won "+prize.replace(/^a /,"a "):"Best: "+Math.max(b,G.score).toLocaleString()+" pts · 4,000 wins a prize";
+  var prize=G.score>=6400?"a Free appetizer":G.score>=5800?"Free Gilroy Garlic Fries":G.score>=4700?"Free Melody Fries":G.score>=3400?"$3 off any drink":"";
+  $("rank").textContent=prize?"🏆 You won "+prize.replace(/^a /,"a "):"Best: "+Math.max(b,G.score).toLocaleString()+" pts · 3,400 wins a prize";
   var won=$("won"); won.style.display="none";
   if(prize&&window.SSAI_WIN){ var r=window.SSAI_WIN(prize.replace(/^a /,""));
     if(r.blocked){ won.innerHTML="🏆 You'd win "+esc(prize)+" — but you already have <b>"+esc(r.prize.t)+"</b> waiting (code "+r.prize.c+").<br><span style=\"font-weight:600;font-size:13px;color:#c9d2ee\">Use it by "+esc(r.until)+", then your next win saves. One reward at a time.</span>"; won.style.display="block"; } else
@@ -748,7 +764,7 @@ $("points").innerHTML='<div class="ptsh">Grab these</div><div class="pts">'+PICK
   row('<span class="e">🪙</span>',"Melody coin","+10")+row(ic(MIC),"Karaoke mic","2× · 6s")+row('<span class="e">➕</span>',"Health kit (rare)","+25%")+'</div>'+
   '<div class="ptsh">Shoot these down</div><div class="pts">'+row('<span class="e">🛸</span>',"UFO (2 hits)","+150")+row('<span class="e">🛩️</span>',"Fighter jet","+200")+row('<span class="e">✈️</span>',"Kamikaze plane (4 hits)","+300")+'</div>'+
   '<div class="ptsh">Dodge these · each hit takes ⅓ of your health</div><div class="pts">'+row('<span class="e">⚡</span>',"Lightning","−⅓",1)+row('<span class="e">🚀</span>',"Missiles & UFO zaps","−⅓",1)+row('<span class="e">💥</span>',"Crashing into anything","−⅓",1)+row('<span class="e">🔴</span>',"Red flash + buzz = plane coming","dodge!",1)+'</div>'+
-  '<div class="ptsh">Prizes</div><div class="pts">'+row('<span class="e">🥤</span>',"$3 off any drink","4,000")+row('<span class="e">🍟</span>',"Free Melody Fries","5,500")+row('<span class="e">🧄</span>',"Free Gilroy Garlic Fries","6,800")+row('<span class="e">🍤</span>',"Free appetizer","7,500")+'</div>';
+  '<div class="ptsh">Prizes</div><div class="pts">'+row('<span class="e">🥤</span>',"$3 off any drink","3,400")+row('<span class="e">🍟</span>',"Free Melody Fries","4,700")+row('<span class="e">🧄</span>',"Free Gilroy Garlic Fries","5,800")+row('<span class="e">🍤</span>',"Free appetizer","6,400")+'</div>';
 })();
 </script>
 <script>window.CRM_CFG={name:"Melody Bar & Grill",offer:"Free Melody Fries on your next visit",mount:"#rwhost",tiers:[[250,"Free Melody Fries"],[500,"Free house margarita"],[800,"Free Lobster Mac & Cheese"],[1300,"Free appetizer platter"]],referral:{gift:"Free Melody Fries"}};</script>

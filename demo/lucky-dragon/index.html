@@ -649,6 +649,7 @@ var CONFIG = {
         : "<b>"+CONFIG.game.prizeAt+" makes the board.</b> Tap to run it back.");
     saveBest(score); renderBoard();
   }
+  window.__LD={get:function(){return {running:running,score:score,drops:drops,bowlX:bowlX,W:W,H:H};},set:function(x){bowlX=Math.max(30,Math.min(W-30,x));},start:function(){start();}};
   function pointer(e){
     var r=cv.getBoundingClientRect();
     var x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;

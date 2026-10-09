@@ -688,6 +688,7 @@ $("bpost").addEventListener("click",function(){
       if(!r.blocked) setTimeout(function(){ alertBox("👑 You were last week's #1! Half off your meal — code "+r.prize.c+", good for 3 days."); },1500); } }).catch(function(){}); })();
 function alertBox(t){ var d=document.createElement("div"); d.className="ok"; d.style.cssText="position:fixed;left:12px;right:12px;top:12px;z-index:80;max-width:520px;margin:0 auto;background:#0b1220;box-shadow:0 10px 40px #000a"; d.innerHTML='<b>'+esc(t)+'</b>'; document.body.appendChild(d); setTimeout(function(){ d.remove(); },7000); }
 
+window.__MG={get:function(){return G;},start:function(){start();},W:W,H:H};
 requestAnimationFrame(frame);
 // steer: drag anywhere; the plane follows your finger's movement, not its position, so your thumb never covers it
 var drag=null;

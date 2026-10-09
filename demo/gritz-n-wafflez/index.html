@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Gritz N Wafflez — Menu & Game</title>
+<script src="../lang-th.js"></script>
+<meta name="description" content="Gritz N Wafflez menu, Waffle Run game for while you wait, and weekly prizes. Demo by Second Shift AI.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FBF4E4">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Yellowtail&family=DM+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* Texas Flava · Southern Hospitality: cream paper, mustard gold, deep purple + navy. */
+:root{
+  --cream:#FBF4E4; --cream2:#F4E8CC; --card:#FFFDF7; --edge:#E6D6AE;
+  --gold:#D9A21B; --gold2:#F2C14E; --purple:#3B1F5C; --navy:#1E1B3A; --red:#B8322A;
+  --ink:#2A1E36; --dim:#6E5F72;
+  --serif:"Playfair Display",Georgia,serif;
+  --script:"Yellowtail","Brush Script MT",cursive;
+  --body:"DM Sans",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+body{background:radial-gradient(800px 500px at 50% -8%,#fff8e6 0,transparent 60%),var(--cream)}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:0 60px}
+a{color:var(--purple)}
+/* hero */
+.hero{text-align:center;padding-block:34px 18px}
+.mark{display:inline-block;padding:18px 26px 16px;border:2px solid var(--gold);border-radius:22px;background:var(--card);box-shadow:0 0 0 6px var(--cream),0 0 0 7px var(--edge),0 18px 40px #3b1f5c22}
+.mark .nm{font-family:var(--serif);font-weight:900;font-size:clamp(36px,11vw,56px);line-height:.95;color:var(--purple);letter-spacing:.01em}
+.mark .nm i{font-style:italic;color:var(--gold);font-weight:700;font-size:.7em;padding:0 .08em}
+.mark .tag{font-family:var(--script);font-size:clamp(22px,6vw,28px);color:var(--gold);margin-top:6px;line-height:1}
+.mark .tag span{color:var(--navy)}
+.hero h1{font-family:var(--serif);font-weight:700;font-size:clamp(22px,6vw,30px);margin:20px 0 2px;line-height:1.15;color:var(--navy)}
+.hero p{margin:4px 0;color:var(--dim)}
+.btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:15px;border-radius:12px;padding:12px 16px;border:1px solid var(--edge);background:var(--card);color:var(--ink);cursor:pointer;font-family:var(--body)}
+.btn.hot{background:var(--purple);border-color:var(--purple);color:#fff;box-shadow:0 8px 22px #3b1f5c44}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+.wo{display:inline-block;margin:10px 0 2px!important;font-size:13px;font-weight:800;letter-spacing:.04em;color:var(--purple)!important;background:#fbe9b8;border:1px solid var(--gold);border-radius:999px;padding:5px 12px}
+.pill{display:inline-block;margin-top:12px;font-size:12px;color:var(--dim);border:1px dashed var(--edge);border-radius:999px;padding:6px 12px}
+h2{font-family:var(--serif);font-weight:900;font-size:30px;margin:36px 0 4px;display:flex;align-items:center;gap:10px;color:var(--purple)}
+h2::before{content:"";flex:none;width:20px;height:20px;border-radius:5px;background:repeating-linear-gradient(0deg,var(--gold) 0 4px,var(--gold2) 4px 7px),var(--gold);box-shadow:inset 0 0 0 2px #b7860f}
+.sub{color:var(--dim);margin:0 0 12px}
+/* game */
+.gamebox{background:linear-gradient(180deg,var(--purple),var(--navy));border-radius:18px;padding:12px;box-shadow:0 20px 50px #1e1b3a44;color:#fff}
+.hud{display:flex;justify-content:space-between;align-items:center;font-weight:800;padding:2px 4px 10px;gap:8px;flex-wrap:wrap}
+.hud .sc{font-family:var(--serif);font-size:28px;color:var(--gold2);font-weight:900}
+.hud .lv{letter-spacing:2px}
+#game{display:block;width:100%;height:auto;aspect-ratio:400/560;border-radius:12px;background:#2b1a40;touch-action:none;cursor:pointer}
+.keys{display:flex;justify-content:center;gap:10px;margin-top:10px}
+.keys button{flex:1;max-width:170px;font:800 22px var(--body);background:#ffffff1a;color:#fff;border:1px solid #ffffff33;border-radius:12px;padding:12px 0;cursor:pointer}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px;font-size:13.5px;color:#d9cfe6}
+.how div{background:#ffffff12;border:1px solid #ffffff22;border-radius:10px;padding:8px 10px}
+.how b{color:#fff}
+#over{display:none;text-align:center;padding:14px 0 4px}
+#over.on{display:block}
+#over .sub{color:#e8dcf5}
+#final{font-family:var(--serif);font-weight:900;font-size:50px;color:var(--gold2);line-height:1}
+/* prizes */
+.tiers{display:grid;gap:10px}
+.tier{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:12px 14px}
+.tier .pts{font-family:var(--serif);font-weight:900;font-size:22px;color:var(--gold);min-width:92px}
+.tier b{display:block}
+.tier small{color:var(--dim)}
+.tier.top{border-color:var(--gold);background:linear-gradient(90deg,#fbe9b8,var(--card))}
+/* menu */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;padding-right:118px;position:sticky;top:0;background:var(--cream);z-index:5;padding-top:8px}
+.chips a{flex:none;text-decoration:none;color:var(--purple);background:var(--card);border:1px solid var(--edge);border-radius:999px;padding:7px 13px;font-weight:800;font-size:14px}
+.cat{margin-top:24px}
+.cat h3{font-family:var(--serif);font-weight:900;font-size:25px;margin:0 0 4px;color:var(--navy)}
+.cat .note{color:var(--dim);font-size:13.5px;margin:0 0 10px}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
+.item{position:relative;background:var(--card);border:1px solid var(--edge);border-radius:16px;overflow:hidden;min-width:0;transition:transform .2s,box-shadow .2s;box-shadow:0 6px 18px #3b1f5c12}
+.item img{display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover}
+.item .tx{padding:10px 12px 12px}
+.item b{font-size:14.5px;line-height:1.25;color:var(--navy)}
+.item p{margin:4px 0 0;font-size:13px;color:var(--dim)}
+.item .sig{position:absolute;top:8px;left:8px;background:var(--gold);color:var(--navy);font:800 11px var(--body);letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:4px 9px;z-index:2}
+.list{display:flex;flex-wrap:wrap;gap:8px}
+.list span{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:8px 12px;font-weight:600;font-size:14px}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.box{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:12px 14px;font-size:14.5px}
+.box b{font-size:16px;color:var(--navy)}
+.box.k{background:var(--purple);color:#fff;border-color:var(--purple)}
+.box.k b{color:var(--gold2)}
+footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-height:1.6}
+@media (prefers-reduced-motion:reduce){.item{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="mark" role="img" aria-label="Gritz N Wafflez">
+    <div class="nm">Gritz <i>N</i> Wafflez</div>
+    <div class="tag">Texas Flava <span>·</span> Southern Hospitality</div>
+  </div>
+  <h1>Southern comfort on Wilshire, served with love</h1>
+  <p class="wo">Woman-owned business</p>
+  <p>3183 Wilshire Blvd, Koreatown · Los Angeles</p>
+  <div class="btns">
+    <a class="btn hot" href="https://order.toasttab.com/online/gritz-n-wafflez-koreatown-3183-wilshire-boulevard" target="_blank" rel="noopener">🧇 Order online</a>
+    <a class="btn gold" href="#play">🎮 Play while you wait</a>
+    <a class="btn" href="tel:+12135664837">📞 Call</a>
+    <a class="btn" href="#visit">📍 Directions</a>
+  </div>
+  <span class="pill">Demo by Second Shift AI · built from Gritz N Wafflez's real menu</span>
+</header>
+
+<h2 id="play">Play while you wait</h2>
+<p class="sub">Your table's almost ready. Roll the waffle cart down the dining room, catch the plates and the coins, and dodge the syrup spills and flying hot sauce.</p>
+<div class="gamebox">
+  <div class="hud"><span>Score <span class="sc" id="score">0</span></span><span class="lv" id="lives" aria-label="Lives">🧇🧇🧇</span><span id="time">45s</span></div>
+  <canvas id="game" width="400" height="560" aria-label="Waffle Run game. Tap the left or right side to change lanes."></canvas>
+  <div class="keys"><button type="button" id="kl" aria-label="Move left">◀</button><button type="button" id="kr" aria-label="Move right">▶</button></div>
+  <div id="over">
+    <div class="sub" id="rank">Order up</div>
+    <div id="final">0 pts</div>
+    <div id="won" style="display:none;margin:8px auto 4px;max-width:300px;background:#F2C14E22;border:2px dashed #F2C14E;border-radius:14px;padding:10px;color:#fff;font-weight:800;font-size:15px"></div>
+    <div class="btns"><button class="btn gold" type="button" id="again">Roll again</button><a class="btn" href="#tiers">See prizes</a></div>
+  </div>
+  <div class="how">
+    <div><b>🪙 Coins</b> +10</div>
+    <div><b>🧇 🍗 🥣 Gritz N Wafflez plates</b> +30 to +60</div>
+    <div><b>🔥 Hot grease lane</b> glows before it flares. Move!</div>
+    <div><b>🍯 🌶️ Syrup spills &amp; hot sauce</b> −100 and a waffle</div>
+  </div>
+</div>
+
+<h2 id="tiers">Weekly prize board</h2>
+<p class="sub">Sample prizes. Jurni picks the real ones and the board resets every Monday.</p>
+<div class="tiers">
+  <div class="tier top"><span class="pts">#1 WEEK</span><div><b>Free Wingz N' Wafflez + a karaoke shoutout</b><small>Top score by Sunday close, crowned at GNW Karaoke Wednesday</small></div></div>
+  <div class="tier"><span class="pts">2,000</span><div><b>Free Original Collard Green Dip</b><small>One run over 2,000 points</small></div></div>
+  <div class="tier"><span class="pts">1,500</span><div><b>Free Fried Cheese Gritz</b><small>With any plate</small></div></div>
+  <div class="tier"><span class="pts">1,000</span><div><b>Free side of Smackin' Mac</b><small>With any order</small></div></div>
+  <div class="tier"><span class="pts">500</span><div><b>Free Kiki Palmer</b><small>Lemonade + tea, on the house</small></div></div>
+  <div class="tier"><span class="pts">Best</span><div><b id="best">Your best: —</b><small>Saved on this phone</small></div></div>
+</div>
+
+<h2 id="menu">The menu</h2>
+<p class="sub">From gritznwafflez.com. Food photos are AI-generated previews of the real dishes. Prices are on the online order page.</p>
+<nav class="chips" id="chips" aria-label="Menu sections"></nav>
+<div id="menuhost"></div>
+
+<h2 id="visit">Come through</h2>
+<div class="info">
+  <div class="box"><b>Gritz N Wafflez</b><br><small style="color:var(--purple);font-weight:800">A woman-owned business</small><br>3183 Wilshire Blvd, Suite 185<br>Los Angeles, CA 90010<br><a href="tel:+12135664837">(213) 566-4837</a><div class="btns" style="justify-content:flex-start"><a class="btn hot" href="https://maps.google.com/?q=Gritz+N+Wafflez+3183+Wilshire+Blvd+Los+Angeles+CA+90010" target="_blank" rel="noopener">📍 Directions</a></div></div>
+  <div class="box"><b>Hours</b><br>Mon–Fri · 9 AM – 3 PM<br>Sat–Sun · 9 AM – 4 PM<br><small style="color:var(--dim)">🚗 First 15 minutes of valet are complimentary</small></div>
+  <div class="box k"><b>🎤 GNW Karaoke</b><br>Every Wednesday · 6 – 10 PM<br><small>Grab the mic, grab a plate.</small></div>
+</div>
+
+<footer>Demo built for Gritz N Wafflez by Second Shift AI · menu from gritznwafflez.com · prizes are samples · food images are AI-generated previews · not the official Gritz N Wafflez logo</footer>
+</div>
+
+<script>
+window.CONFIG={name:"Gritz N Wafflez",address:"3183 Wilshire Blvd, Los Angeles, CA 90010"};
+(function(){
+"use strict";
+var $=function(i){return document.getElementById(i);};
+var T=function(s){return (window.__T||String)(s);};
+var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------------- MENU (real items from gritznwafflez.com/menu; prices not published there) ---------------- */
+var MENU=[
+ {id:"start",name:"Let's Get Started",items:[
+  ["Original Collard Green Dip","Like artichoke dip but better. Creamy cheese goodness mixed with al dente collard greens, served with homemade tortilla chips.","collard-dip","Signature"],
+  ["Fried Green Tomatoes","Crispy outside, tender inside. Served with a side of our signature sauce.","green-tomatoes"],
+  ["Celestial Eggs","Deviled eggs, fried. Topped with Mama Zula's creole seasoning. A crowd favorite.","celestial-eggs"],
+  ["Spicy Fried Pickles","Zesty pickles in a crunchy batter. Tangy, spicy, just the right heat.","fried-pickles"],
+  ["Fried Cheese Gritz","Classic gritz loaded with cheese, fried golden and crispy.","cheese-gritz-bites"]]},
+ {id:"gritz",name:"N' Gritz",note:"Served with your choice of our signature gritz and sauce.",items:[
+  ["Shrimp N' Gritz","Six jumbo shrimp, sautéed or Mama Zula's fried.","shrimp-gritz"],
+  ["Tenderz N' Gritz","Fresh tenderz hand-battered in Mama Zula's chicken fry.","tenderz-gritz"],
+  ["Catfish N' Gritz","Flaky, crispy catfish fillet in Mama Zula's fish fry.","catfish-gritz"],
+  ["Wingz N' Gritz","Three marinated jumbo wingz, deep-fried to perfection.",null]]},
+ {id:"wafflez",name:"N' Wafflez",note:"Pick any waffle from Just Wafflez below.",items:[
+  ["Wingz N' Wafflez","Three jumbo wingz battered in Mama Zula's chicken fry.","wingz-wafflez","Fan fave"],
+  ["Tenderz N' Wafflez","Fresh tenderz, hand-battered and deep-fried.","tenderz-wafflez"],
+  ["Catfish N' Wafflez","Flaky fried catfish in Mama Zula's Fish Fry.","catfish-wafflez"],
+  ["Shrimp N' Wafflez","Mama Zula's fried or sautéed shrimp.",null]]},
+ {id:"breakfast",name:"Break Your Fast",note:"Add to the Quesadilla or Scramble: Bacon $3 · Tenderz $6 · Catfish $7 · Shrimp $7.",items:[
+  ["BET+ Breakfast Plate","Crispy bacon, eggs, thick-cut Texas toast and a side of creamy, buttery gritz.","bet-plate"],
+  ["Da Baddest Chick Sandwich","Fried chicken tenderz, crispy bacon, an egg and melted cheese on buttery Texas toast.","baddest-chick"],
+  ["French Toast Sandwich/Plate","Thick French toast with crispy bacon and eggs. Stacked or separate.","french-toast"],
+  ["BET Breakfast Plate","Bacon, eggs your way, golden buttery Texas toast.",null],
+  ["Waffle Sandwich/Plate","Our signature waffle with eggs and bacon.",null],
+  ["Cinnatoast Sandwich/Plate","Crunchy cinnamon toast with bacon and eggs.",null],
+  ["Breakfast Quesadilla","Breakfast potatoes, eggs and melted cheeses in a crispy tortilla.",null],
+  ["Breakfast Scramble","Three eggs with cheddar, breakfast potatoes and collard greens.",null]]},
+ {id:"toasty",name:"Feelin' Toasty???",items:[
+  ["Crunchy Cinnamon Toast","Texas toast in cinnamon sugar, toasted crunchy, with syrup. Add Mixed Berriez or Peach Cobbler.","cinna-toast"],
+  ["Classic French Toast","Thick slices in a cinnamon egg batter, griddled golden.",null]]},
+ {id:"just-wafflez",name:"Just Wafflez",list:["Peach Cobbler","Mixed Berry","Sweet Vanilla Bean","Cinnamon Roll","Chocolate Chip","Cheddar Herb","Bacon Cheddar"],photo:["Peach Cobbler Waffle","Warm spiced peaches on our signature waffle.","peach-waffle"]},
+ {id:"baskets",name:"Basketz, Platez N' Sammiez",note:"Basket comes with one side, plate with two.",list:["Tender Basket/Plate","Shrimp Basket/Plate","Wing Basket/Plate","Catfish Basket/Plate"]},
+ {id:"just-gritz",name:"Just Gritz",list:["Plain Gritz","Cheese Gritz","Sweet Gritz","Fried Cheese Gritz","Fried Sweet Gritz"]},
+ {id:"sidez",name:"Sidez",list:["Smackin' Mac","Collard Greens","Who Made The Potato Salad","Homestyle Potatoes","French Friez"]},
+ {id:"drinks",name:"Don't Be Thirsty",list:["Kiki Palmer (lemonade/tea)","Fresh Squeezed OJ","Fresh Squeezed Lemonade","Iced Tea (sweet/unsweet)","Hot Coffee (reg, van, carm)","Iced Coffee (reg, van, carm)","Coke Product"]}
+];
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+function card(it){
+  return '<article class="item" tabindex="0">'+(it[3]?'<span class="sig">'+esc(it[3])+'</span>':'')+'<img loading="lazy" src="img/'+it[2]+'.jpg" alt="'+esc(it[0])+'" width="720" height="720">'+
+   '<div class="tx"><b>'+esc(it[0])+'</b><p>'+esc(it[1])+'</p></div></article>';
+}
+$("chips").innerHTML=MENU.map(function(c){return '<a href="#cat-'+c.id+'">'+esc(c.name)+'</a>';}).join("");
+$("menuhost").innerHTML=MENU.map(function(c){
+  var h='<section class="cat" id="cat-'+c.id+'"><h3>'+esc(c.name)+'</h3>'+(c.note?'<p class="note">'+esc(c.note)+'</p>':'');
+  if(c.items){
+    var withImg=c.items.filter(function(i){return i[2];}), noImg=c.items.filter(function(i){return !i[2];});
+    h+='<div class="items">'+withImg.map(card).join("")+'</div>';
+    if(noImg.length) h+='<div class="list" style="margin-top:10px">'+noImg.map(function(i){return '<span title="'+esc(i[1])+'">'+esc(i[0])+'</span>';}).join("")+'</div>';
+  }
+  if(c.photo) h+='<div class="items" style="margin-bottom:10px">'+card(c.photo)+'</div>';
+  if(c.list) h+='<div class="list">'+c.list.map(function(n){return '<span>'+esc(n)+'</span>';}).join("")+'</div>';
+  return h+'</section>';
+}).join("");
+
+/* ---------------- GAME: Waffle Run (StormBurger engine, re-themed) ---------------- */
+var cv=$("game"), cx=cv.getContext("2d"), W=400, H=560, DPR=Math.min(2,window.devicePixelRatio||1);
+cv.width=W*DPR; cv.height=H*DPR; cx.scale(DPR,DPR);
+var LANES=3, LX=function(i){return W*(0.2+0.3*i);};
+var SPR={}; ["waffle","grits","chicken","dip","oj","syrup","hotsauce","flame","smoke"].forEach(function(k){var im=new Image(); im.src="img/game/"+k+".webp"; SPR[k]=im;});
+function ready(im){ return im&&im.complete&&im.naturalWidth; }
+var FOOD=[{k:"waffle",p:60,n:"Waffle",w:62},{k:"chicken",p:50,n:"Wingz",w:60},{k:"grits",p:40,n:"Gritz",w:58},{k:"dip",p:50,n:"Collard Dip",w:60},{k:"oj",p:30,n:"Fresh OJ",w:30}];
+var DEBRIS=[{k:"hotsauce",w:26,r:24,why:"🌶️ HOT SAUCE!"},{k:"syrup",w:96,r:28,why:"🍯 SYRUP SPILL!",floor:1}];
+var st;
+function fresh(){ return {running:false,over:false,lane:1,x:LX(1),score:0,lives:3,t:45000,items:[],bolts:[],pops:[],speed:3.2,shake:0,inv:0,flash:0,last:0,spawnT:0,boltT:2500,coins:0,dmg:0,flames:[],smoke:[],cracks:[],dying:0,spin:0,rot:0,kick:0,skids:[],rear:null}; }
+st=fresh();
+var road=0;
+function hud(){ $("score").textContent=st.score.toLocaleString(); $("lives").textContent="🧇".repeat(Math.max(0,st.lives))+"·".repeat(3-Math.max(0,st.lives)); $("time").textContent=Math.ceil(Math.max(0,st.t)/1000)+"s"; }
+function best(){ try{ var b=+localStorage.getItem("gnw-best")||0; $("best").textContent="Your best: "+(b?b.toLocaleString()+" pts":"—"); return b; }catch(e){ return 0; } }
+best();
+function setLane(n){ if(!st.running||st.dying) return; st.lane=Math.max(0,Math.min(LANES-1,n)); }
+window.__S={get:function(){return st;},setLane:function(n){st.lane=Math.max(0,Math.min(LANES-1,n));},LX:LX};
+function start(){ st=fresh(); st.running=true; st.last=performance.now(); $("over").classList.remove("on"); hud(); }
+function end(){
+  st.running=false; st.over=true;
+  var b=best(); if(st.score>b){ try{localStorage.setItem("gnw-best",st.score);}catch(e){} }
+  best();
+  $("final").textContent=st.score.toLocaleString()+" pts";
+  $("rank").textContent= st.score>=2000?"🥬 Free Collard Green Dip unlocked":st.score>=1500?"🧀 Free Fried Cheese Gritz unlocked":st.score>=1000?"🧀 Free Smackin' Mac unlocked":st.score>=500?"🍋 Free Kiki Palmer unlocked":"Order up! Try again while you wait";
+  var prize=st.score>=2000?"a Free Original Collard Green Dip":st.score>=1500?"Free Fried Cheese Gritz":st.score>=1000?"a Free side of Smackin' Mac":st.score>=500?"a Free Kiki Palmer":"";
+  var won=$("won"); won.style.display="none";
+  if(prize&&window.SSAI_WIN){ var w=window.SSAI_WIN(prize.replace(/^a /,""));
+    won.innerHTML="🏆 You won "+prize+"!<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#F2C14E;letter-spacing:.1em\">"+w.prize.c+"</span><br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">"+(w.saved?"Saved to your rewards. Show your server to redeem.":"Join Gritz N Wafflez Rewards below to save it.")+"</span>";
+    won.style.display="block"; }
+  $("over").classList.add("on");
+}
+function spawn(){
+  var lane=(Math.random()*LANES)|0, r=Math.random();
+  if(r<0.42) st.items.push({type:"coin",lane:lane,x:LX(lane),y:-30,r:15,spin:Math.random()*6});
+  else if(r<0.66){ var f=FOOD[(Math.random()*FOOD.length)|0]; st.items.push({type:"food",f:f,lane:lane,x:LX(lane),y:-40,r:26}); }
+  else { var d=DEBRIS[Math.random()<.55?0:1], tl=d.floor?lane:(Math.random()*LANES)|0;
+    st.items.push({type:"debris",d:d,x:LX(lane),y:-70,tx:LX(tl),r:d.r,rot:d.floor?Math.random()*6.28:(Math.random()-.5)*.8,vr:d.floor?0:(Math.random()<.5?-1:1)*(0.08+Math.random()*0.08),ph:Math.random()*6}); }
+}
+function pop(x,y,txt,col){ st.pops.push({x:x,y:y,txt:txt,col:col,a:1}); }
+function hit(x,y,why,slip){
+  if(st.inv>0||st.dying) return;
+  st.lives--; st.dmg++; st.score=Math.max(0,st.score-100); st.inv=60; st.shake=14; st.flash=0.45;
+  if(slip) st.kick=(Math.random()<.5?-1:1)*0.9; // syrup: the cart fishtails
+  pop(x,y-20,why+" −100","#ff6b5b"); if(navigator.vibrate) try{navigator.vibrate(st.lives<=0?[90,60,200]:60);}catch(e){}
+  var py=H-80;
+  if(st.dmg===1) pop(st.x,py-70,T("🔥 Waffle iron on fire!"),"#ffb347");
+  if(st.dmg===2){ st.cracks=crackSet(); pop(st.x,py-70,T("💥 Sneeze guard cracked!"),"#ff6b5b"); }
+  if(st.lives<=0){ st.dying=performance.now(); st.inv=1e9; st.shake=22; st.flash=0.8; st.dx=st.x; st.items=[]; st.bolts=[]; }
+}
+function crackSet(){
+  function web(cx0,cy0,w,h){ var L=[]; for(var a=0;a<7;a++){ var ang=a/7*6.283+Math.random()*.5, x=cx0, y=cy0, seg=[[x,y]];
+      for(var j=0;j<3;j++){ x+=Math.cos(ang+(Math.random()-.5)*.6)*(w/5); y+=Math.sin(ang+(Math.random()-.5)*.6)*(h/4); seg.push([Math.max(-w/2,Math.min(w/2,x)),Math.max(cy0-h,Math.min(cy0+h,y))]); } L.push(seg); }
+    return L; }
+  return web(-6+(Math.random()-.5)*6,-30,34,6).concat(web(7+(Math.random()-.5)*6,-29,34,6));
+}
+function emitSmoke(x,y,heavy){
+  for(var i=0;i<(heavy?2:1);i++) if(Math.random()<(heavy?.8:.6)) st.smoke.push({x:x+(Math.random()-.5)*14,y:y+(Math.random()-.5)*6,vx:(Math.random()-.5)*0.9,vy:1.1+Math.random()*1.1,s:6+Math.random()*6,g:heavy?0.55:0.42,a:heavy?.6:.48,rot:Math.random()*6.28,vr:(Math.random()-.5)*0.05,fire:0});
+  if(Math.random()<(heavy?.6:.3)) st.smoke.push({x:x+(Math.random()-.5)*22,y:y,vx:(Math.random()-.5)*2.4,vy:-0.4+Math.random()*2.6,s:1.6,g:0,a:1,fire:2});
+}
+function tireSmoke(x,y){ st.smoke.push({x:x,y:y,vx:(Math.random()-.5)*0.8,vy:1+Math.random(),s:6+Math.random()*4,g:0.55,a:.35,fire:3}); }
+function drawSmoke(k){
+  var i,p,sm=SPR.smoke;
+  for(i=st.smoke.length-1;i>=0;i--){ p=st.smoke[i];
+    p.x+=p.vx*k; p.y+=p.vy*k*(st.running?1:0.5); p.s+=p.g*k; p.a-=(p.fire===2?0.03:p.fire===3?0.012:0.008)*k; if(p.rot!=null) p.rot+=(p.vr||0)*k;
+    if(p.a<=0||p.s<=0.5||p.y>H+60) st.smoke.splice(i,1); }
+  for(i=0;i<st.smoke.length;i++){ p=st.smoke[i]; if(p.fire===2) continue;
+    cx.globalAlpha=Math.min(1,p.a);
+    if(p.fire===3){ var tg=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.s); tg.addColorStop(0,"rgba(255,250,240,.9)"); tg.addColorStop(1,"rgba(255,250,240,0)"); cx.fillStyle=tg; cx.beginPath(); cx.arc(p.x,p.y,p.s,0,6.283); cx.fill(); }
+    else if(ready(sm)){ cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot); cx.drawImage(sm,-p.s,-p.s,p.s*2,p.s*2); cx.restore(); }
+  }
+  cx.globalCompositeOperation="lighter";
+  for(i=0;i<st.smoke.length;i++){ p=st.smoke[i]; if(p.fire===2){ cx.globalAlpha=p.a; cx.fillStyle="#ffcf6a"; cx.fillRect(p.x,p.y,p.s,p.s); } }
+  cx.globalCompositeOperation="source-over"; cx.globalAlpha=1;
+}
+function drawFlames(d){
+  var F=st.flames||(st.flames=[]), fl=SPR.flame, i, f;
+  for(i=0;i<d+(st.dying?1:0);i++) F.push({ox:(Math.random()-.5)*(d>1?32:20),oy:-10+Math.random()*4,s:(d>1?8:6)+Math.random()*(d>1?6:4),a:1,vy:0.5+Math.random()*0.7,rot:(Math.random()-.5)*0.35,fl:Math.random()<.5});
+  if(!ready(fl)) { F.length=0; return; }
+  cx.globalCompositeOperation="lighter";
+  for(i=F.length-1;i>=0;i--){ f=F[i]; f.oy+=f.vy; f.a-=0.09; f.s*=0.985; if(f.a<=0){ F.splice(i,1); continue; }
+    var h=f.s*2.6, w=h*fl.naturalWidth/fl.naturalHeight; cx.globalAlpha=f.a*0.9;
+    cx.save(); cx.translate(f.ox,f.oy); cx.rotate(Math.PI+f.rot); if(f.fl) cx.scale(-1,1); cx.drawImage(fl,-w/2,-h*0.9,w,h); cx.restore(); }
+  cx.globalCompositeOperation="source-over"; cx.globalAlpha=1;
+}
+function drawDamage(now){ // inside drawCart's transform (front = up). Fire comes off the waffle iron.
+  var d=st.dmg; if(!d) return;
+  cx.globalCompositeOperation="lighter"; var fg=0.35+0.2*Math.sin(now/45)+Math.random()*0.15;
+  var gw=cx.createRadialGradient(0,-6,0,0,-6,d>1?46:32); gw.addColorStop(0,"rgba(255,150,40,"+fg+")"); gw.addColorStop(1,"rgba(255,80,20,0)");
+  cx.fillStyle=gw; cx.beginPath(); cx.arc(0,-6,d>1?46:32,0,6.283); cx.fill(); cx.globalCompositeOperation="source-over";
+  drawFlames(d);
+  if(d>1){ // cracked glass sneeze guard at the front of the cart
+    cx.strokeStyle="rgba(255,255,255,.95)"; cx.lineWidth=0.9;
+    st.cracks.forEach(function(seg){ cx.beginPath(); seg.forEach(function(q,j){ j?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1]); }); cx.stroke(); });
+  }
+}
+function skid(py,k){
+  var c=Math.cos(st.rot), s=Math.sin(st.rot), scroll=st.speed*2.2*k;
+  var cur=[-22,22].map(function(ox){ return {x:st.x+ox*c-40*s, y:py+ox*s+40*c}; });
+  if(st.rear){ st.rear.forEach(function(r){ r.y+=scroll; });
+    if(Math.abs(st.rot)>0.07){ var a=Math.min(0.6,Math.abs(st.rot)*1.5);
+      for(var i=0;i<2;i++){ st.skids.push({x1:st.rear[i].x,y1:st.rear[i].y,x2:cur[i].x,y2:cur[i].y,a:a}); if(Math.random()<0.3) tireSmoke(cur[i].x,cur[i].y); } } }
+  st.rear=cur;
+}
+function drawSkids(k){
+  var scroll=st.running&&!st.dying?st.speed*2.2*k:0; cx.lineCap="round"; cx.lineWidth=4;
+  for(var i=st.skids.length-1;i>=0;i--){ var m=st.skids[i]; m.y1+=scroll; m.y2+=scroll; m.a-=0.0035*k;
+    if(m.a<=0||m.y1>H+10){ st.skids.splice(i,1); continue; }
+    cx.strokeStyle="rgba(60,30,10,"+m.a+")"; cx.beginPath(); cx.moveTo(m.x1,m.y1); cx.lineTo(m.x2,m.y2); cx.stroke(); }
+  cx.lineCap="butt";
+}
+function drawFloor(){ // diner dining room: cream + purple checker floor scrolling under the cart
+  var T2=50, off=road%(T2*2);
+  cx.fillStyle="#F4E8CC"; cx.fillRect(0,0,W,H);
+  cx.fillStyle="#d8c9e6";
+  for(var y=off-T2*2;y<H;y+=T2) for(var x=W*0.05;x<W*0.95;x+=T2){ if((Math.round((y-off)/T2)+Math.round((x-W*0.05)/T2))%2===0) cx.fillRect(x,y,T2,T2); }
+  // booths along the walls
+  cx.fillStyle="#3B1F5C"; cx.fillRect(0,0,W*0.05,H); cx.fillRect(W*0.95,0,W*0.05,H);
+  cx.fillStyle="#D9A21B"; cx.fillRect(W*0.05,0,4,H); cx.fillRect(W*0.95-4,0,4,H);
+  cx.fillStyle="rgba(217,162,27,.85)";
+  for(var l=1;l<LANES;l++){ var lx=W*(0.05+0.3*l); for(var yy=(road%60)-60;yy<H;yy+=60){ cx.beginPath(); cx.arc(lx,yy+14,3.2,0,6.283); cx.fill(); } }
+}
+function roundRect(x,y,w,h,r){ cx.beginPath(); cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r); cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath(); }
+function drawCart(x,y,rot,sc,now){ // top-down serving cart with a waffle iron on top, front = up
+  cx.save(); cx.translate(x,y); if(rot) cx.rotate(rot); if(sc&&sc!==1) cx.scale(sc,sc);
+  cx.fillStyle="rgba(40,20,60,.28)"; cx.beginPath(); cx.ellipse(4,6,32,54,0,0,6.283); cx.fill();
+  cx.fillStyle="#141018"; [[-30,-44],[24,-44],[-30,34],[24,34]].forEach(function(w){ roundRect(w[0],w[1],6,12,3); cx.fill(); }); // casters
+  var bg=cx.createLinearGradient(-26,0,26,0); bg.addColorStop(0,"#2a1442"); bg.addColorStop(.5,"#5a3290"); bg.addColorStop(1,"#2a1442");
+  cx.fillStyle=bg; roundRect(-26,-50,52,100,9); cx.fill();
+  cx.strokeStyle="#D9A21B"; cx.lineWidth=3; roundRect(-24,-48,48,96,8); cx.stroke();
+  // glass sneeze guard at the front
+  var gg=cx.createLinearGradient(0,-46,0,-26); gg.addColorStop(0,"rgba(220,240,255,.9)"); gg.addColorStop(1,"rgba(160,200,235,.6)");
+  cx.fillStyle=gg; roundRect(-19,-44,38,14,4); cx.fill();
+  cx.fillStyle="rgba(255,255,255,.6)"; cx.fillRect(-14,-42,8,3);
+  // waffle iron: round, black, with a golden waffle grid showing
+  cx.fillStyle="#1a1a1e"; cx.beginPath(); cx.arc(0,-6,18,0,6.283); cx.fill();
+  cx.fillStyle="#E1A33A"; cx.beginPath(); cx.arc(0,-6,14,0,6.283); cx.fill();
+  cx.save(); cx.beginPath(); cx.arc(0,-6,14,0,6.283); cx.clip(); cx.strokeStyle="#a86d14"; cx.lineWidth=1.6;
+  for(var g=-14;g<=14;g+=5){ cx.beginPath(); cx.moveTo(g,-20); cx.lineTo(g,8); cx.moveTo(-14,-6+g); cx.lineTo(14,-6+g); cx.stroke(); } cx.restore();
+  cx.fillStyle="#0e0e10"; cx.fillRect(16,-8,14,4); // iron handle
+  // plates stacked at the back + a syrup bottle
+  cx.fillStyle="#111"; cx.beginPath(); cx.arc(-10,28,9,0,6.283); cx.arc(10,28,9,0,6.283); cx.fill();
+  cx.fillStyle="#fff"; cx.beginPath(); cx.arc(-10,28,4,0,6.283); cx.arc(10,28,4,0,6.283); cx.fill();
+  cx.fillStyle="#b46a12"; cx.beginPath(); cx.arc(0,42,4,0,6.283); cx.fill();
+  drawDamage(now);
+  cx.restore();
+}
+function drawCoin(it,now){
+  it.spin+=0.11; var c=Math.cos(it.spin), sx=Math.max(1.5,Math.abs(c)*it.r), ed=Math.abs(Math.sin(it.spin))*it.r*0.28, sgn=c>=0?1:-1, r=it.r;
+  cx.save(); cx.translate(it.x,it.y);
+  var gl=cx.createRadialGradient(0,0,2,0,0,r*2.1); gl.addColorStop(0,"rgba(255,214,70,.45)"); gl.addColorStop(1,"rgba(255,214,70,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(0,0,r*2.1,0,6.283); cx.fill();
+  cx.fillStyle="#8a5a06"; cx.beginPath(); cx.ellipse(-sgn*ed/2,0,sx,r,0,0,6.283); cx.fill(); cx.fillRect(-ed/2,-r,ed,r*2);
+  var fg=cx.createLinearGradient(-sx,-r,sx,r); fg.addColorStop(0,"#fff7c2"); fg.addColorStop(.35,"#ffd23f"); fg.addColorStop(.7,"#c88a0c"); fg.addColorStop(1,"#ffe38a");
+  cx.fillStyle=fg; cx.beginPath(); cx.ellipse(sgn*ed/2,0,sx,r,0,0,6.283); cx.fill();
+  cx.strokeStyle="rgba(140,90,5,.9)"; cx.lineWidth=1.5; cx.beginPath(); cx.ellipse(sgn*ed/2,0,sx*0.78,r*0.78,0,0,6.283); cx.stroke();
+  if(sx>5){ cx.save(); cx.translate(sgn*ed/2,0); cx.scale(sx/r,1); cx.strokeStyle="#b46f05"; cx.lineWidth=1.4; // tiny embossed waffle grid
+    for(var g=-5;g<=5;g+=5){ cx.beginPath(); cx.moveTo(g,-7); cx.lineTo(g,7); cx.moveTo(-7,g); cx.lineTo(7,g); cx.stroke(); }
+    cx.fillStyle="rgba(255,255,255,.55)"; cx.beginPath(); cx.ellipse(-r*0.35,-r*0.4,r*0.18,r*0.4,-0.6,0,6.283); cx.fill(); cx.restore(); }
+  cx.restore();
+}
+function drawItem(it,now){
+  if(it.type==="coin") return drawCoin(it,now);
+  if(it.type==="food"){
+    var im=SPR[it.f.k], bob=Math.sin(now/260+it.x)*3, w=it.f.w;
+    var gl=cx.createRadialGradient(it.x,it.y,4,it.x,it.y,w*0.75); gl.addColorStop(0,"rgba(255,230,140,.6)"); gl.addColorStop(1,"rgba(255,230,140,0)");
+    cx.fillStyle=gl; cx.beginPath(); cx.arc(it.x,it.y,w*0.75,0,6.283); cx.fill();
+    cx.fillStyle="rgba(40,20,60,.22)"; cx.beginPath(); cx.ellipse(it.x+4,it.y+w*0.42,w*0.4,6,0,0,6.283); cx.fill();
+    if(ready(im)){ var h=w*im.naturalHeight/im.naturalWidth; cx.save(); cx.translate(it.x,it.y+bob); cx.rotate(Math.sin(now/400+it.x)*0.06); cx.drawImage(im,-w/2,-h/2,w,h); cx.restore(); }
+    return;
+  }
+  var d=it.d, sp=SPR[d.k];
+  if(d.floor){ if(ready(sp)){ var pw=d.w, ph=pw*sp.naturalHeight/sp.naturalWidth; cx.save(); cx.translate(it.x,it.y); cx.rotate(it.rot); cx.drawImage(sp,-pw/2,-ph/2,pw,ph); cx.restore(); } return; }
+  var hgt=0.75+0.25*Math.sin(now/300+it.ph);
+  cx.fillStyle="rgba(40,20,60,.25)"; cx.beginPath(); cx.ellipse(it.x+14*hgt,it.y+30*hgt,18,7,0,0,6.283); cx.fill();
+  if(ready(sp)){ var dw=d.w*(0.92+0.08*hgt), dh=dw*sp.naturalHeight/sp.naturalWidth; cx.save(); cx.translate(it.x,it.y); cx.rotate(it.rot); cx.drawImage(sp,-dw/2,-dh/2,dw,dh); cx.restore(); }
+}
+function drawFlare(b,now){ // hot grease lane: glows as a warning, then a column of fire
+  var lx=LX(b.lane);
+  if(b.phase==="warn"){
+    var a=0.25+0.25*Math.sin(b.age/60);
+    cx.fillStyle="rgba(255,120,30,"+(a*0.35)+")"; cx.fillRect(lx-W*0.15+3,0,W*0.3-6,H);
+    cx.strokeStyle="rgba(220,80,20,"+(0.5+a)+")"; cx.setLineDash([10,8]); cx.lineWidth=2; cx.strokeRect(lx-W*0.15+3,2,W*0.3-6,H-4); cx.setLineDash([]);
+    cx.font="34px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.globalAlpha=0.6+a; cx.fillText("🔥",lx,70); cx.globalAlpha=1;
+  } else if(b.phase==="strike"){
+    var fl=SPR.flame; cx.fillStyle="rgba(255,140,40,.25)"; cx.fillRect(lx-W*0.15+3,0,W*0.3-6,H);
+    if(ready(fl)){ cx.globalCompositeOperation="lighter";
+      for(var y=H;y>-40;y-=46){ var h=70+Math.random()*30, w=h*fl.naturalWidth/fl.naturalHeight*1.4; cx.globalAlpha=0.85; cx.drawImage(fl,lx-w/2+(Math.random()-.5)*16,y-h,w,h); }
+      cx.globalCompositeOperation="source-over"; cx.globalAlpha=1; }
+  }
+}
+function frame(now){
+  requestAnimationFrame(frame);
+  var dt=Math.min(50,now-(st.last||now)); st.last=now; var k=dt/16.67;
+  road+=(st.running?st.speed*2.2:1.2)*k;
+  cx.save();
+  if(st.shake>0){ cx.translate((Math.random()-.5)*st.shake,(Math.random()-.5)*st.shake); st.shake*=0.85; if(st.shake<0.5) st.shake=0; }
+  drawFloor();
+  drawSkids(k);
+  if(st.running&&!st.dying){
+    st.t-=dt; st.speed=Math.min(7.5,3.2+(45000-st.t)/9000);
+    st.spawnT-=dt; if(st.spawnT<=0){ spawn(); st.spawnT=Math.max(330,700-(45000-st.t)/90); }
+    st.boltT-=dt; if(st.boltT<=0){ st.bolts.push({lane:(Math.random()*LANES)|0,phase:"warn",age:0}); st.boltT=Math.max(1400,3200-(45000-st.t)/25); }
+    var dxl=LX(st.lane)-st.x; st.x+=dxl*Math.min(1,0.2*k);
+    st.kick*=Math.pow(0.93,k);
+    st.rot+=(Math.max(-0.5,Math.min(0.5,dxl*0.012))+st.kick*Math.sin(now/70)-st.rot)*Math.min(1,0.32*k);
+    if(st.inv>0) st.inv-=k;
+    if(Math.floor(now/250)!==Math.floor((now-dt)/250)) st.score+=1;
+  }
+  var py=H-80;
+  for(var b=st.bolts.length-1;b>=0;b--){ var bo=st.bolts[b]; bo.age+=dt;
+    if(bo.phase==="warn"&&bo.age>950){ bo.phase="strike"; bo.age=0; st.flash=0.35; st.shake=8; if(st.running&&st.lane===bo.lane&&Math.abs(st.x-LX(bo.lane))<40) hit(st.x,py,T("HOT GREASE!")); }
+    else if(bo.phase==="strike"&&bo.age>320){ st.bolts.splice(b,1); continue; }
+    drawFlare(bo,now); }
+  for(var i=st.items.length-1;i>=0;i--){ var it=st.items[i];
+    if(st.running){ var fly=it.type==="debris"&&!it.d.floor; it.y+=(fly?st.speed*1.25:st.speed)*k; if(fly){ it.x+=(it.tx-it.x)*0.012*k; it.rot+=it.vr*k; } }
+    if(it.y>H+60){ st.items.splice(i,1); continue; }
+    drawItem(it,now);
+    if(st.running&&Math.abs(it.x-st.x)<it.r+18&&Math.abs(it.y-py)<it.r+28){
+      if(it.type==="coin"){ st.score+=10; st.coins++; pop(it.x,it.y,"+10","#b8860b"); }
+      else if(it.type==="food"){ st.score+=it.f.p; pop(it.x,it.y,"+"+it.f.p+" "+T(it.f.n),"#6b2fa8"); }
+      else { hit(it.x,it.y,T(it.d.why),it.d.floor); if(st.dying) break; }
+      st.items.splice(i,1);
+    }
+  }
+  if(st.dying){ // wiped out: the cart spins on spilled syrup and slides off the floor
+    var dt2=(now-st.dying)/1000;
+    st.spin+=(dt2<0.9?0.34:0.22)*k;
+    var slide=dt2<0.9?0:Math.pow((dt2-0.9)/1.3,1.7), cyy=py+slide*(H*0.5), cxx=st.dx+(dt2<0.9?Math.sin(dt2*9)*14:(st.dx<W/2?1:-1)*slide*W*0.9);
+    var sp=SPR.syrup; if(ready(sp)){ var pw=Math.min(220,60+dt2*160); cx.globalAlpha=0.9; cx.drawImage(sp,st.dx-pw/2,py-pw*0.45,pw,pw*sp.naturalHeight/sp.naturalWidth); cx.globalAlpha=1; }
+    drawSmoke(k); emitSmoke(cxx,cyy-10,true);
+    drawCart(cxx,cyy,st.spin,1,now);
+    var ta=Math.min(1,dt2/0.35); cx.save(); cx.globalAlpha=ta; cx.translate(W/2,H*0.36); cx.scale(0.8+ta*0.2,0.8+ta*0.2);
+    cx.font="900 54px 'Playfair Display',Georgia,serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.lineWidth=6; cx.strokeStyle="#fff"; cx.strokeText(T("SPILLED!"),0,0); cx.fillStyle="#B8322A"; cx.fillText(T("SPILLED!"),0,0);
+    cx.font="800 18px 'DM Sans',system-ui"; cx.fillStyle="#3B1F5C"; cx.fillText(T("Clean up on aisle waffle"),0,40); cx.restore();
+    if(dt2>2.6){ st.dying=0; end(); }
+  } else {
+    if(st.running) skid(py,k);
+    if(st.dmg&&st.running) emitSmoke(st.x+Math.sin(st.rot)*6,py-6,st.dmg>1);
+    drawSmoke(k);
+    if((st.inv<=0||Math.floor(st.inv/6)%2===0)&&!(st.over&&st.dmg>=3)) drawCart(st.x,py,st.rot,1,now);
+  }
+  for(var p=st.pops.length-1;p>=0;p--){ var po=st.pops[p]; po.y-=1.2*k; po.a-=0.02*k; if(po.a<=0){st.pops.splice(p,1);continue;}
+    cx.globalAlpha=po.a; cx.fillStyle=po.col; cx.font="800 18px 'DM Sans',system-ui"; cx.textAlign="center"; cx.lineWidth=4; cx.strokeStyle="rgba(255,255,255,.85)"; cx.strokeText(po.txt,po.x,po.y); cx.fillText(po.txt,po.x,po.y); cx.globalAlpha=1; }
+  if(st.flash>0){ cx.fillStyle="rgba(255,200,120,"+st.flash+")"; cx.fillRect(0,0,W,H); st.flash-=0.05*k; }
+  cx.restore();
+  if(!st.running&&!st.dying){
+    cx.fillStyle="rgba(30,27,58,.62)"; cx.fillRect(0,0,W,H);
+    cx.fillStyle="#fff"; cx.font="900 50px 'Playfair Display',Georgia,serif"; cx.textAlign="center"; cx.textBaseline="middle";
+    cx.fillText(st.over?T("ORDER UP!"):T("Waffle Run"),W/2,H/2-40);
+    cx.fillStyle="#F2C14E"; cx.font="800 22px 'DM Sans',system-ui"; cx.fillText(T("TAP TO PLAY"),W/2,H/2+12);
+    cx.fillStyle="#e8dcf5"; cx.font="600 15px 'DM Sans',system-ui"; cx.fillText(T("45 seconds · tap left or right"),W/2,H/2+44);
+  }
+  if(st.running){ hud(); if(st.t<=0&&!st.dying) end(); }
+}
+requestAnimationFrame(frame);
+cv.addEventListener("pointerdown",function(e){
+  e.preventDefault();
+  if(!st.running){ if(!st.dying) start(); return; }
+  var r=cv.getBoundingClientRect(); setLane(st.lane+((e.clientX-r.left)<r.width/2?-1:1));
+});
+$("kl").addEventListener("click",function(){ if(!st.running) start(); else setLane(st.lane-1); });
+$("kr").addEventListener("click",function(){ if(!st.running) start(); else setLane(st.lane+1); });
+addEventListener("keydown",function(e){ if(!st.running) return; if(e.key==="ArrowLeft"){setLane(st.lane-1);e.preventDefault();} if(e.key==="ArrowRight"){setLane(st.lane+1);e.preventDefault();} });
+$("again").addEventListener("click",function(){ start(); $("game").scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
+hud();
+})();
+</script>
+<script>window.CRM_CFG={name:"Gritz N Wafflez",offer:"A free Kiki Palmer with your next N' Wafflez plate",tiers:[[250,"Free Kiki Palmer"],[450,"Free side of Smackin' Mac"],[700,"Free Original Collard Green Dip"],[1100,"Free N' Wafflez plate"]],referral:{gift:"Free Original Collard Green Dip"}};</script>
+<script src="../crm.js"></script>
+<script>window.NEARBY={name:"Gritz N Wafflez",pin:"🧇",spots:[{label:"Koreatown · Wilshire",lat:34.0617,lng:-118.2967,q:"3183 Wilshire Blvd, Los Angeles, CA 90010"}],offer:"Show this to your server for double points on today's order."};</script>
+<script src="../nearby.js"></script>
+<script src="../menu3d.js"></script>
+<script src="../gamelock.js"></script>
+</body>
+</html>

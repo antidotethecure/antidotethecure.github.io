@@ -24,6 +24,10 @@
   var REF = { join: 50, first: 100, every: 20, goal: 3, gift: TIERS[0][1] };
   for (var rk in (C.referral || {})) REF[rk] = C.referral[rk];
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var MONTHS_L = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  // birthday: full date so the treat lands on the real day; staff check a photo ID with the same date before giving it out
+  function bdayStr(r) { return r.bday >= 0 ? MONTHS_L[r.bday] + (r.bdd ? " " + r.bdd : "") : ""; }
+  function isBday(r) { var t = new Date(); return r.bday === t.getMonth() && (!r.bdd || r.bdd === t.getDate()); }
 
   var css = [
     ".crm-card{all:initial;display:block;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#EEF2FF;background:#121C40;border:1px solid #25336A;border-radius:20px;padding:18px 16px;margin:22px auto;max-width:640px;box-sizing:border-box;line-height:1.45;text-align:left}",
@@ -34,6 +38,10 @@
     ".crm-card label{display:block;font-size:12.5px;font-weight:700;color:#9AA6CC;margin:10px 0 4px}",
     ".crm-card input,.crm-card select{width:100%;font-size:16px;color:#EEF2FF;background:#070B1E;border:1px solid #25336A;border-radius:12px;padding:11px}",
     ".crm-card .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}",
+    ".crm-card .three{display:grid;grid-template-columns:1.3fr 1fr 1.1fr;gap:8px}",
+    ".crm-idnote{font-size:12px;color:#9AA6CC;margin:6px 0 2px;line-height:1.4}",
+    ".crm-bday{background:#b04af71f;border:1px solid #b04af766;border-radius:16px;padding:14px;margin-top:12px}.crm-bday h4{margin:0 0 4px;color:#D7A6FF}",
+    ".crm-win.bd{border-color:#D7A6FF;margin-top:12px}",
     ".crm-card .ok{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:#C9D2EE;margin-top:12px;font-weight:500}",
     ".crm-card .ok input{width:20px;height:20px;flex:none;accent-color:#E8582A;margin-top:1px;padding:0}",
     ".crm-card .go{display:block;width:100%;margin-top:12px;border:0;border-radius:14px;padding:14px;font-size:16px;font-weight:900;color:#fff;background:#E8582A;box-shadow:0 8px 24px #e8582a55;cursor:pointer}",
@@ -118,7 +126,7 @@
     if (r.visits >= 10) t.push(["t-vip", "VIP"]);
     if (now - r.last >= 30 * DAY && !r.you) t.push(["t-risk", "Hasn't been back"]);
     if (now - r.joined <= 7 * DAY && !r.you) t.push(["t-new", "New"]);
-    if (r.bday === mo) t.push(["t-bday", "🎂 Birthday month"]);
+    if (r.bday === mo) t.push(["t-bday", isBday(r) && r.bdd ? "🎂 Birthday today" : "🎂 Birthday month"]);
     if ((r.nfr || (r.friends && r.friends.length)) >= 2) t.push(["t-vip", "🤝 Top referrer"]);
     if (r.refByName) t.push(["t-new", "Referred by " + r.refByName]);
     return t;
@@ -168,6 +176,8 @@
       join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards</span><h3>Hey ' + first + '! 👋</h3>' +
         ((me.wins || []).length ? '<div class="crm-win" style="border-color:#3DDC97"><div style="font-size:30px">🏆</div><b>You won ' + e(me.wins[0].t) + '!</b><div class="code">' + e(me.wins[0].c) + '</div><small>Come back to ' + e(NAME) + ' and show this code to redeem it.</small></div><div style="height:10px"></div>' : '') +
         '<div class="crm-win"><div style="font-size:30px">🎁</div><b>' + e(me.offer || OFFER) + '</b><div class="code">' + e(me.code) + '</div><small>Your welcome reward. Show this at the counter.</small></div>' +
+        (me.bday >= 0 ? (isBday(me) || me.bdemo ? '<div class="crm-win bd"><div style="font-size:30px">🎂</div><b>Happy birthday, ' + first + '! Your free birthday treat is unlocked</b><div class="code">' + e(me.bcode || "BDAY") + '</div><small>Show this code with a photo ID that says ' + e(bdayStr(me)) + '. Good for 7 days.</small></div>'
+          : '<div class="crm-bday"><h4>🎂 Birthday treat · ' + e(bdayStr(me)) + '</h4><div style="font-size:13px;color:#C9D2EE">It unlocks on your birthday and we\'ll text you a reminder that morning. To claim it, bring a photo ID that matches this date.</div><button type="button" class="crm-demo" data-a="bday">▶ Demo: it\'s my birthday</button></div>') : '') +
         // points + scan to earn
         '<div class="crm-box"><div class="crm-pts"><div><div class="k" style="font-size:10px">Your points</div><div class="n">' + pts.toLocaleString() + '<small>pts</small></div></div>' +
           '<button type="button" class="crm-scan" data-a="scan">📲 Scan to earn</button></div>' +
@@ -210,6 +220,7 @@
           var t = TIERS[+b.dataset.redeem]; if (m.stars < t[0]) return;
           addPts(m, -t[0], "🎟️ Redeemed: " + t[1]); m.redeem = { t: t[1], c: "R-" + code4(4) }; put(m); drawJoin(); drawOwn(); toast("🎟️ " + t[1] + " is ready. Show your code."); return;
         }
+        if (a === "bday") { m.bdemo = true; m.bcode = "BDAY-" + code4(4); m.ledger = m.ledger || []; m.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎂 Birthday treat unlocked (text sent)" }); put(m); drawJoin(); toast("💬 Text sent: Happy birthday " + m.name.split(" ")[0] + "! Your treat is waiting 🎂"); return; }
         if (a === "scan") { if (qr.style.display === "block") qr.style.display = "none"; else showQR(); return; }
         if (a === "ring") {
           var amt = Math.round((12 + Math.random() * 26) * 100) / 100, got = Math.round(amt * PER);
@@ -252,7 +263,10 @@
       '<form autocomplete="on" novalidate><label>First name</label><input name="name" maxlength="40" autocomplete="given-name">' +
       '<div class="two"><div><label>Phone</label><input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(310) 555-0123"></div>' +
       '<div><label>or Email</label><input name="email" type="email" maxlength="120" autocomplete="email"></div></div>' +
-      '<label>Birthday month (for your birthday treat)</label><select name="bday"><option value="">Choose…</option>' + MONTHS.map(function (m, i) { return '<option value="' + i + '">' + m + '</option>'; }).join("") + '</select>' +
+      '<label>Birthday (for your free birthday treat)</label><div class="three"><select name="bday" aria-label="Birth month"><option value="">Month</option>' + MONTHS_L.map(function (m, i) { return '<option value="' + i + '">' + m + '</option>'; }).join("") + '</select>' +
+        '<select name="bdd" aria-label="Birth day"><option value="">Day</option>' + Array.apply(null, Array(31)).map(function (x, i) { return '<option>' + (i + 1) + '</option>'; }).join("") + '</select>' +
+        '<select name="bdy" aria-label="Birth year"><option value="">Year</option>' + Array.apply(null, Array(88)).map(function (x, i) { var y = new Date().getFullYear() - 13 - i; return '<option>' + y + '</option>'; }).join("") + '</select></div>' +
+      '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat. We\'ll text you a reminder on the day.</div>' +
       '<label>Friend\'s referral code (optional)</label><input name="ref" maxlength="16" autocapitalize="characters" value="' + e(INVITE) + '" placeholder="e.g. MARIA-21">' +
       '<label class="ok"><input type="checkbox" name="ok"> <span>Text / email me rewards and specials from ' + e(NAME) + '. Msg & data rates may apply. Reply STOP anytime.</span></label>' +
       '<button class="go" type="submit">🎁 Get my reward</button><div class="err"></div></form>' +
@@ -263,9 +277,11 @@
       var f = this, er = f.querySelector(".err"), v = function (n) { return f[n].value.trim(); };
       if (!v("name")) { er.textContent = "Add your first name."; return; }
       if (!/\d{7,}/.test(v("phone").replace(/\D/g, "")) && !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v("email"))) { er.textContent = "Add a phone number or an email so we can send your reward."; return; }
+      if ((v("bday") !== "" || v("bdd") || v("bdy")) && !(v("bday") !== "" && v("bdd") && v("bdy"))) { er.textContent = "Add your full birthday (month, day and year) or leave it blank."; return; }
+      if (v("bday") !== "" && new Date(+v("bdy"), +v("bday"), +v("bdd")).getMonth() !== +v("bday")) { er.textContent = "That birthday isn't a real date. Check the day."; return; }
       if (!f.ok.checked) { er.textContent = "Tick the box so we can send you your reward."; return; }
       var rc = v("ref").toUpperCase(), byName = rc ? refOwner(rc) : "";
-      var r = { id: code4(8), name: v("name"), phone: v("phone"), email: v("email"), bday: v("bday") === "" ? -1 : +v("bday"), visits: 1, stars: 0, last: Date.now(), joined: Date.now(), code: code(), offer: OFFER,
+      var r = { id: code4(8), name: v("name"), phone: v("phone"), email: v("email"), bday: v("bday") === "" ? -1 : +v("bday"), bdd: +v("bdd") || 0, bdy: +v("bdy") || 0, visits: 1, stars: 0, last: Date.now(), joined: Date.now(), code: code(), offer: OFFER,
         ref: refCode(v("name")), refBy: rc, refByName: rc ? (byName || "code " + rc) : "", friends: [], ledger: [] };
       addPts(r, 100, "🎉 Welcome to " + NAME + " Rewards");
       if (rc) addPts(r, REF.join, "🤝 Joined with " + (byName ? byName.split(" ")[0] + "'s" : "a friend's") + " code");
@@ -319,7 +335,7 @@
     };
     var DEF = { all: "Hey {first}! Double stars at " + NAME + " this week only 🔥", new: "Welcome to the club, {first}! Your next visit earns 2× stars.",
       vip: "{first}, you're one of our VIPs 👑 Next one's on us this week.", risk: "Hey {first}, we miss you! 👀 Come back this week for 2× stars.",
-      bday: "Happy birthday {first}! 🎂 Your free treat is waiting all month." };
+      bday: "Happy birthday {first}! 🎂 Your free treat is waiting. Show your code + a photo ID at the counter." };
     function preview() {
       var who = pick.filter(function (r) { return r.phone || r.email; }), first = who[0] ? who[0].name.split(" ")[0] : "there";
       cmp.querySelector(".crm-bub").textContent = ta.value.replace(/\{first\}/g, first);
@@ -329,8 +345,8 @@
     own.querySelector('[data-a="text"]').onclick = function () { cmp.style.display = "block"; ta.value = DEF[seg] || DEF.all; preview(); ta.focus(); };
     own.querySelector('[data-a="csv"]').onclick = function () {
       var q = function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; };
-      var csv = ["name,phone,email,visits,points,last_visit,joined,birthday_month,referral_code,referred_by,friends_referred"].concat(all().map(function (r) {
-        return [r.name, r.phone, r.email, r.visits, r.stars, new Date(r.last).toISOString().slice(0, 10), new Date(r.joined).toISOString().slice(0, 10), r.bday >= 0 ? MONTHS[r.bday] : "", r.ref || "", r.refByName || "", r.nfr || (r.friends ? r.friends.length : "")].map(q).join(",");
+      var csv = ["name,phone,email,visits,points,last_visit,joined,birthday,referral_code,referred_by,friends_referred"].concat(all().map(function (r) {
+        return [r.name, r.phone, r.email, r.visits, r.stars, new Date(r.last).toISOString().slice(0, 10), new Date(r.joined).toISOString().slice(0, 10), r.bday >= 0 ? (r.bdy ? r.bdy + "-" + ("0" + (r.bday + 1)).slice(-2) + "-" + ("0" + r.bdd).slice(-2) : MONTHS[r.bday]) : "", r.ref || "", r.refByName || "", r.nfr || (r.friends ? r.friends.length : "")].map(q).join(",");
       })).join("\n");
       var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = SLUG + "-customers.csv"; document.body.appendChild(a); a.click(); a.remove();
     };

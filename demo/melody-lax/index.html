@@ -435,7 +435,7 @@ cv.width=W*DPR; cv.height=H*DPR; cx.scale(DPR,DPR);
 function img(src){ var i=new Image(); i.src=src; return i; }
 function ready(i){ return i&&i.complete&&i.naturalWidth; }
 var S={plane:img("img/game/plane.webp"),ufo:img("img/game/ufo.webp"),jet:img("img/game/jet.webp"),kami:img("img/game/plane.webp"),
-  theme:img("img/game/theme.webp"),innout:img("img/game/innout.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
+  theme:img("img/game/theme.webp"),mar0:img("img/game/marshal0.webp"),mar1:img("img/game/marshal1.webp"),mar2:img("img/game/marshal2.webp"),cone:img("img/game/cone.webp"),innout:img("img/game/innout.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
 // pickups: Melody's real food + bar life. e = emoji fallback while the photo loads
 var PICK=[{k:"p_mac",n:"Mac & Cheese",p:80,e:"🧀",w:58},{k:"p_wings",n:"Lemon Pepper Wings",p:70,e:"🍗",w:60},{k:"p_toast",n:"French Toast",p:60,e:"🍞",w:58},
   {k:"p_omelette",n:"Philly Omelette",p:60,e:"🍳",w:60},{k:"p_marg",n:"Mango Marg",p:50,e:"🍹",w:40},{k:"p_bottle",n:"Bottle service",p:40,e:"🍾",w:34},{k:"p_shots",n:"Round of shots",p:40,e:"🥃",w:46}];
@@ -477,16 +477,56 @@ function drawGround(dy){
       if(g.k==="melody"){ cx.font="800 13px Barlow,system-ui"; cx.fillStyle="#f0d375"; cx.textAlign="center"; cx.fillText("★ MELODY BAR & GRILL ★",x+w/2,g.y+(g.h-h)/2+h+14); } } }
   });
 }
+// LAX-style runway: worn asphalt, real markings, edge/threshold/end lights, approach-light "rabbit", PAPI, a taxiway, and ground crew waving wands
+var RWT=null;
+function runwayTex(w,h){ // asphalt with grain, patching and rubber build-up in the touchdown zone, made once
+  var c=document.createElement("canvas"); c.width=w*2; c.height=h*2; var x=c.getContext("2d"); x.scale(2,2);
+  x.fillStyle="#30343c"; x.fillRect(0,0,w,h);
+  for(var i=0;i<2600;i++){ var g=40+Math.random()*30|0; x.fillStyle="rgba("+g+","+(g+3)+","+(g+8)+","+(0.25+Math.random()*0.4)+")"; x.fillRect(Math.random()*w,Math.random()*h,1+Math.random()*1.6,1+Math.random()*1.6); }
+  for(i=0;i<9;i++){ x.fillStyle="rgba(20,22,26,"+(0.18+Math.random()*0.15)+")"; x.fillRect(Math.random()*w*0.8,Math.random()*h,20+Math.random()*60,8+Math.random()*30); }
+  for(i=0;i<70;i++){ var yy=h-170+Math.random()*120, xx=w/2+(Math.random()<.5?-1:1)*(12+Math.random()*34); x.strokeStyle="rgba(10,10,12,"+(0.15+Math.random()*0.25)+")"; x.lineWidth=2+Math.random()*3; x.beginPath(); x.moveTo(xx,yy); x.lineTo(xx+(Math.random()-.5)*6,yy-30-Math.random()*60); x.stroke(); }
+  return c; }
 function drawRunway(g){
-  var x=W*0.22, w=W*0.56, y=g.y, h=g.h;
-  cx.fillStyle="#2b2f37"; cx.fillRect(x,y,w,h);
-  cx.fillStyle="#3a3f49"; for(var k=0;k<h;k+=26) cx.fillRect(x+4,y+k,w-8,1);
-  cx.fillStyle="#e9e9e9"; for(k=12;k<h-30;k+=48) cx.fillRect(W/2-2.5,y+k,5,26);
-  for(k=0;k<6;k++){ cx.fillRect(x+12+k*9,y+h-46,5,36); cx.fillRect(x+w-17-k*9,y+h-46,5,36); }
-  cx.font="900 34px Anton,Impact,sans-serif"; cx.textAlign="center"; cx.fillText("25L",W/2,y+h-60);
-  for(k=0;k<h;k+=30){ cx.fillStyle="rgba(255,255,255,.85)"; cx.beginPath(); cx.arc(x-3,y+k,2,0,6.283); cx.arc(x+w+3,y+k,2,0,6.283); cx.fill(); }
-  var blink=(performance.now()/90|0)%10; for(k=0;k<7;k++){ cx.fillStyle=k===blink%7?"#fff":"rgba(255,230,140,.8)"; cx.beginPath(); cx.arc(W/2,y+h+16+k*14,k===blink%7?4:2.4,0,6.283); cx.fill(); }
-  cx.fillStyle="rgba(80,170,255,.75)"; for(k=0;k<h;k+=60){ cx.beginPath(); cx.arc(x-26,y+k,2,0,6.283); cx.arc(x+w+26,y+k,2,0,6.283); cx.fill(); }
+  var x=W*0.2, w=W*0.6, y=g.y, h=g.h, t=performance.now();
+  // shoulders, grass and the parallel taxiway
+  cx.fillStyle="#1d2a1c"; cx.fillRect(x-30,y-40,w+60,h+150);
+  cx.fillStyle="#3a3d42"; cx.fillRect(x-8,y,8,h); cx.fillRect(x+w,y,8,h);
+  var tx=W*0.9; cx.fillStyle="#2c3036"; cx.fillRect(tx-14,y-40,28,h+120); cx.fillRect(x+w,y+h*0.42,tx-(x+w),24);
+  cx.strokeStyle="#e8c21a"; cx.lineWidth=2; cx.setLineDash([]); cx.beginPath(); cx.moveTo(tx,y-40); cx.lineTo(tx,y+h+80); cx.moveTo(x+w+4,y+h*0.42+12); cx.lineTo(tx,y+h*0.42+12); cx.stroke();
+  for(var k=-40;k<h+80;k+=34){ var tw=0.6+0.4*Math.sin(t/300+k); cx.fillStyle="rgba(70,140,255,"+(0.55+0.35*tw)+")"; cx.beginPath(); cx.arc(tx-16,y+k,2,0,6.283); cx.arc(tx+16,y+k,2,0,6.283); cx.fill(); }
+  // asphalt
+  if(!RWT) RWT=runwayTex(w,h); cx.drawImage(RWT,x,y,w,h);
+  cx.fillStyle="#f2f2f2";
+  cx.fillRect(x+3,y,2.5,h); cx.fillRect(x+w-5.5,y,2.5,h);                                   // edge lines
+  for(k=70;k<h-110;k+=44) cx.fillRect(W/2-2,y+k,4,24);                                          // centerline
+  var th=y+h-34; for(k=0;k<4;k++){ cx.fillRect(x+10+k*12,th-30,7,30); cx.fillRect(x+w-17-k*12,th-30,7,30); } // threshold "piano keys"
+  cx.fillRect(x+6,th+4,w-12,3);
+  cx.save(); cx.font="400 40px Anton,Impact,sans-serif"; cx.textAlign="center"; cx.fillText("25",W/2,th-44); cx.font="400 26px Anton,Impact,sans-serif"; cx.fillText("L",W/2,th-96); cx.restore();
+  cx.fillRect(x+24,th-170,14,40); cx.fillRect(x+w-38,th-170,14,40);                             // aiming point blocks
+  [[th-120,3],[th-210,2],[th-250,2],[th-300,1]].forEach(function(z){ for(var i=0;i<z[1];i++){ cx.fillRect(x+44+i*7,z[0],4,18); cx.fillRect(x+w-48-i*7,z[0],4,18); } }); // touchdown zone bars
+  // edge lights twinkle, green threshold, red far end
+  for(k=6;k<h;k+=26){ var a=0.7+0.3*Math.sin(t/180+k*0.7); cx.fillStyle="rgba(255,250,235,"+a+")"; cx.shadowColor="#fff6d8"; cx.shadowBlur=8; cx.beginPath(); cx.arc(x-2,y+k,1.9,0,6.283); cx.arc(x+w+2,y+k,1.9,0,6.283); cx.fill(); }
+  for(k=0;k<9;k++){ cx.fillStyle="#3dff7a"; cx.shadowColor="#3dff7a"; cx.beginPath(); cx.arc(x+6+k*(w-12)/8,th+10,2.2,0,6.283); cx.fill(); }
+  for(k=0;k<9;k++){ cx.fillStyle="#ff3b30"; cx.shadowColor="#ff3b30"; cx.beginPath(); cx.arc(x+6+k*(w-12)/8,y+4,2.2,0,6.283); cx.fill(); }
+  // PAPI: two white, two red = on the glide path
+  for(k=0;k<4;k++){ var c2=k<2?"#ffffff":"#ff2d2d"; cx.fillStyle=c2; cx.shadowColor=c2; cx.beginPath(); cx.arc(x-18-k*8,th-150,2.6,0,6.283); cx.fill(); }
+  // approach lights below the threshold with the sequenced strobe "rabbit" racing toward the runway
+  var rab=Math.floor(t/70)%14;
+  for(k=0;k<12;k++){ var yy=th+28+k*14; cx.fillStyle="rgba(255,236,170,.85)"; cx.shadowColor="#ffe9a8"; cx.shadowBlur=6;
+    for(var j=-2;j<=2;j++){ cx.beginPath(); cx.arc(W/2+j*6,yy,1.6,0,6.283); cx.fill(); }
+    if(k===4||k===8){ for(j=-6;j<=6;j++){ cx.beginPath(); cx.arc(W/2+j*7,yy,1.5,0,6.283); cx.fill(); } }
+    if(11-k===rab){ cx.fillStyle="#fff"; cx.shadowColor="#bfe6ff"; cx.shadowBlur=22; cx.beginPath(); cx.arc(W/2,yy,5,0,6.283); cx.fill(); } }
+  cx.shadowBlur=0;
+  // ground crew by the taxiway and the hold short line, every couple of hundred feet
+  if(!g.crew){ g.crew=[]; for(var n=0;n<3;n++) g.crew.push({x:n%2?tx+30:x-26,y:80+n*(h-120)/2+Math.random()*30,ph:Math.random()*3,flip:Math.random()<.5}); }
+  g.crew.forEach(function(m){
+    var cn=S.cone; if(ready(cn)){ var cw=13; cx.drawImage(cn,m.x-24,y+m.y+16,cw,cw*cn.naturalHeight/cn.naturalWidth); cx.drawImage(cn,m.x+12,y+m.y+20,cw,cw*cn.naturalHeight/cn.naturalWidth); }
+    var f=Math.floor(t/420+m.ph)%4, pose=[0,1,0,2][f], im=S["mar"+pose];
+    if(ready(im)){ var base=54, mh=base*(pose===0?1.2:1), mw=mh*im.naturalWidth/im.naturalHeight; cx.save(); cx.translate(m.x,y+m.y); if(m.flip) cx.scale(-1,1);
+      cx.fillStyle="rgba(0,0,0,.35)"; cx.beginPath(); cx.ellipse(4,base*0.5,base*0.3,4,0,0,6.283); cx.fill();
+      cx.drawImage(im,-mw/2,base*0.5-mh,mw,mh); cx.restore();
+      cx.globalCompositeOperation="lighter"; var gl=cx.createRadialGradient(m.x,y+m.y-mh*0.3,0,m.x,y+m.y-mh*0.3,26); gl.addColorStop(0,"rgba(255,120,30,.35)"); gl.addColorStop(1,"rgba(255,120,30,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(m.x,y+m.y-mh*0.3,26,0,6.283); cx.fill(); cx.globalCompositeOperation="source-over"; }
+  });
 }
 function drawClouds(dy){ var sm=S.smoke; if(!ready(sm)) return;
   G.clouds.forEach(function(c){ c.y+=dy*c.v*0.55; if(c.y>H+c.s){ c.y=-c.s-Math.random()*200; c.x=Math.random()*W; }

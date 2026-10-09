@@ -669,6 +669,21 @@ var CONFIG = {
 <script>window.NEARBY={name:"Lucky Dragon Hibachi",pin:"🐉",approx:true,spots:[{label:"Compton",lat:33.8958,lng:-118.2201,q:"Compton CA"}],offer:"Show this at the counter for double stars on today's order."};</script>
 <script src="../nearby.js"></script>
 <script src="../menu3d.js"></script>
+<script>window.BUILDER={mode:"plate",accent:"hibachi plate",name:"Lucky Dragon",img:"img/build/",fire:"img/build/flame.webp",mount:"#menu",
+  base:0,baseName:"Plate",fireLabel:"Fire it on the grill",fireBusy:"Searing on the teppanyaki",baseLine:"Base is down. Now pile on the protein.",
+  lines:["Looking good.","That's a real hibachi plate.","Chef approved.","Okay, big plate energy.","Now we're cooking."],
+  parts:[
+    {id:"rice",name:"Fried rice",price:6.5,group:"Base",layout:[[0,0,.66,"rice"]]},
+    {id:"noodles",name:"Chow mein",price:6.95,group:"Base",layout:[[0,0,.66,"noodles"]]},
+    {id:"half",thumb:"rice",name:"Half & half",price:7.5,group:"Base",layout:[[-.15,.02,.5,"rice"],[.15,-.02,.5,"noodles"]]},
+    {id:"chicken",name:"Chicken",price:6.45,max:2,group:"Protein"},
+    {id:"steak",name:"Steak",price:9.45,max:2,group:"Protein"},
+    {id:"shrimp",name:"Shrimp",price:8.45,max:2,group:"Protein"},
+    {id:"salmon",name:"Salmon",price:9.95,max:1,w:.22,group:"Protein"},
+    {id:"scallops",name:"Scallops",price:10.95,max:1,w:.28,group:"Protein"},
+    {id:"veggies",name:"Hibachi veggies",price:0,max:1,group:"Extras",at:[-.26,-.22,.32]},
+    {id:"yumyum",name:"Yum-yum",price:1,max:2,w:.2,group:"Extras",at:[.36,.36,.2]}]};</script>
+<script src="../builder.js"></script>
 <script src="../gamelock.js"></script>
 </body>
 </html>

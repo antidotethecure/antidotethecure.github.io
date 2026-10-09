@@ -150,6 +150,12 @@
     else { try { localStorage.setItem(PEND, JSON.stringify(w)); } catch (x) {} }
     drawJoin(); return { prize: w, saved: !!m };
   };
+  // an order placed in the app (builder.js) earns points like a register order
+  window.SSAI_EARN = function (amount, why) {
+    var m = mine()[0], pts = Math.round(amount * PER);
+    if (m) { addPts(m, pts, why + " · $" + amount.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); }
+    return { pts: pts, saved: !!m };
+  };
   function pending() { try { return JSON.parse(localStorage.getItem(PEND) || "null"); } catch (x) { return null; } }
 
   function drawJoin(keepQR) {

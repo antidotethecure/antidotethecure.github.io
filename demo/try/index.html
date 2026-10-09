@@ -106,13 +106,15 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:26px;line-
       '<div class="hero" style="background-image:url(\'' + (P[0] || "") + '\')"><div class="in"><div class="ty">' + t.em + ' ' + e(t.label) + '</div>' +
       '<h1 class="notranslate" translate="no">' + e(d.name) + '</h1><p>' + e(d.city || t.tagline) + '</p>' +
       '<div class="acts">' + (dir ? '<a class="btn hot" href="' + dir + '" target="_blank" rel="noopener">📍 Directions</a>' : '') +
-      '<a class="btn" href="#play">🎮 Play & win</a><a class="btn" href="#list">' + t.em + ' ' + e(t.list) + '</a>' +
+      '<a class="btn" href="#crm-join">🎁 Get a reward</a><a class="btn" href="#play">🎮 Play & win</a><a class="btn" href="#list">' + t.em + ' ' + e(t.list) + '</a>' +
       (d.ig ? '<a class="btn" href="https://instagram.com/' + encodeURIComponent(d.ig) + '" target="_blank" rel="noopener">📸 @' + e(d.ig) + '</a>' : '') + '</div></div></div>' +
 
       '<h2 id="play">Play for prizes</h2><p class="sub">Catch the good stuff, dodge the bombs. Top score of the week wins. 20 seconds.</p>' +
       '<div class="gamebox"><div class="hud"><span>Score <b id="sc">0</b></span><span><b id="tm">20</b>s</span></div><canvas id="cv" width="360" height="480"></canvas>' +
       '<div class="tiers"><div class="tier"><span>🥇 Top score this week</span><b>FREE ' + e((t.item || "item").toUpperCase()) + '</b></div><div class="tier"><span>300+ points</span><b>15% OFF</b></div><div class="tier"><span>Every game</span><b>+ STARS</b></div></div>' +
       '<p class="sub" style="font-size:12px;margin-top:8px">Sample prizes. You pick the real ones.</p></div>' +
+
+      '<div id="crm-slot"></div>' +
 
       '<h2 id="list">' + e(t.list) + '</h2><div class="menu">' + (items.length ? items.map(function(it, i){
         var img = dishes[i];
@@ -124,6 +126,8 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:26px;line-
       '<div class="cta"><h2>Make it real</h2><p class="sub">This sample is yours to keep looking at. The full version adds your rewards program, your customer list, automatic win-back texts and more, built around <span class="notranslate" translate="no">' + e(d.name) + '</span>.</p>' +
       '<div class="acts"><a class="btn hot" href="../growth/?for=' + encodeURIComponent(d.name) + '">See plans & what you get →</a><a class="btn" href="https://instagram.com/second.shiftai" target="_blank" rel="noopener">DM @second.shiftai</a></div></div>';
     game(t, P);
+    window.CRM_CFG = { name: d.name, offer: t.welcome || "10% off your next visit", mount: "#crm-slot" };
+    var cs = document.createElement("script"); cs.src = "../crm.js"; document.body.appendChild(cs);
     if (where) geocode(d, where);
   }
 

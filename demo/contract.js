@@ -12,18 +12,20 @@
   var PROVIDER = { name: "Anthony Lewis Suggs Jr.", email: "antidotethecure@gmail.com",
                    co: "Antidote Enterprises LLC, doing business as Second Shift AI" };
   var PRESETS = {
-    // Car-style plans: less down = higher monthly for the first 12 months, then everyone drops to $300.
-    full:     { label: "Pay in full · $2,000 down", setup_list: 2000, monthly_list: 300, sd: 0, md: 0, months: 0, minimum: 0, upfront: 100, intro: 0, intro_months: 0 },
-    half:     { label: "Half down · $1,000", plan: "Half down", setup_list: 1000, monthly_list: 300, sd: 0, md: 0, months: 0, minimum: 12, upfront: 100, intro: 400, intro_months: 12 },
-    starter:  { label: "Starter · $500 down", plan: "Starter", setup_list: 500, monthly_list: 300, sd: 0, md: 0, months: 0, minimum: 12, upfront: 100, intro: 450, intro_months: 12 },
-    founding: { label: "Founding · 25% off", setup_list: 2000, monthly_list: 300, sd: 25, md: 25, months: 0, minimum: 3, upfront: 50, intro: 0, intro_months: 0 }
+    // Pricing v4 (2026-10-09). Full package: car-style plans, less down = higher monthly for 12 months, then $400.
+    full:     { label: "Full · $2,500 down", plan: "Full", setup_list: 2500, monthly_list: 400, sd: 0, md: 0, months: 0, minimum: 0, upfront: 100, intro: 0, intro_months: 0 },
+    half:     { label: "Full · half down $1,250", plan: "Full, half down", setup_list: 1250, monthly_list: 400, sd: 0, md: 0, months: 0, minimum: 12, upfront: 100, intro: 525, intro_months: 12 },
+    starter:  { label: "Full · starter $500", plan: "Full, starter", setup_list: 500, monthly_list: 400, sd: 0, md: 0, months: 0, minimum: 12, upfront: 100, intro: 600, intro_months: 12 },
+    core:     { label: "Core · $2,000 + $300", plan: "Core", setup_list: 2000, monthly_list: 300, sd: 0, md: 0, months: 0, minimum: 0, upfront: 100, intro: 0, intro_months: 0 },
+    founding: { label: "Founding · Full at Core price", plan: "Full (founding)", setup_list: 2500, monthly_list: 400, sd: 20, md: 25, months: 0, minimum: 3, upfront: 50, intro: 0, intro_months: 0 }
   };
   var SCOPE = [
     "A mobile menu page with Client's real menu, prices, hours, call and directions buttons",
     "A custom reward game themed to Client's food, reachable from a QR code on every table",
     "A weekly prize board with Client-chosen prizes, reset every week",
     "QR table tents for Client's tables (one print run included)",
-    "Hosting, security updates, menu and price updates on request, and support"
+    "Hosting, security updates, menu and price updates on request, and support",
+    "Full package only: customer referral program, scan-to-earn points at the register, nearby-customer alerts, and text campaigns to opted-in customers (up to 2,000 texts per month)"
   ];
 
   var css = [
@@ -130,7 +132,7 @@
     D.innerHTML =
       '<h1>SERVICES AGREEMENT</h1><p class="s">Second Shift AI · Agreement no. SSAI-' + ymd + '-' + e(slug.slice(0, 12).toUpperCase()) + '</p>' +
       '<p>This Services Agreement (the "Agreement") is between <b>' + PROVIDER.co + '</b> ("Provider"), and <b>' + party + '</b> ("Client"), located at ' + (e(v("address")) || "the address on file") + '. It takes effect on the date of the last signature below (the "Effective Date").</p>' +
-      '<h2>1. Services</h2><p>Provider will build, host and maintain the following for Client:</p><ul>' + SCOPE.map(function (s) { return "<li>" + s + "</li>"; }).join("") + '</ul>' +
+      '<h2>1. Services</h2><p>Provider will build, host and maintain the following for Client:</p><ul>' + SCOPE.filter(function (s) { return planName !== "Core" || s.indexOf("Full package only: ") !== 0; }).map(function (s) { return "<li>" + s.replace("Full package only: ", "") + "</li>"; }).join("") + '</ul>' +
       '<p>"Go-Live" means the day the Client\'s page and game are published and the table QR codes point to them. Provider will ask Client to approve the build before Go-Live. Changes outside this list are quoted and billed separately.</p>' +
       '<h2>2. Fees</h2><table class="f"><tr><th>Item</th><th>Regular price</th><th>Client\'s price</th></tr>' +
       '<tr><td>Setup (one time)</td><td>' + money(intro ? full.setup_list : sl) + '</td><td><b>' + money(sn) + '</b>' + (intro ? '<br><span class="sm">smaller setup under the ' + e(planName || "payment") + ' plan; offset by the plan monthly fee</span>' : "") + (sd ? '<br><span class="sm">' + sd + '% founding-partner discount</span>' : "") + '</td></tr>' +

@@ -22,6 +22,15 @@
   var PER = C.perDollar || 10;
   var TIERS = C.tiers || [[250, "Free side"], [500, "Free drink"], [800, "Free entrée"], [1200, "Free meal"]];
   var REF = { join: 50, first: 100, every: 20, goal: 3, gift: TIERS[0][1] };
+  // visit levels: the more visits in a calendar month, the higher the level (bigger perk + points multiplier).
+  // The numbers are samples; each restaurant sets its own in CRM_CFG.levels: [{visits, name, perk, mult}]
+  var LEVELS = C.levels || [{ visits: 1, name: "Member", perk: "Member points", mult: 1 }, { visits: 3, name: "Regular", perk: "10% off one item", mult: 1.25 },
+    { visits: 6, name: "VIP", perk: "20% off your order", mult: 1.5 }, { visits: 10, name: "Legend", perk: "40% off your order", mult: 2 }];
+  function monthVisits(m) { var d = new Date(), k = d.getFullYear() * 12 + d.getMonth(); return (m.vlog || []).filter(function (t) { var x = new Date(t); return x.getFullYear() * 12 + x.getMonth() === k; }).length; }
+  function levelOf(m) { var v = monthVisits(m), L = LEVELS[0]; LEVELS.forEach(function (l) { if (v >= l.visits) L = l; }); return L; }
+  function nextLevel(m) { var v = monthVisits(m); return LEVELS.filter(function (l) { return l.visits > v; })[0] || null; }
+  // one visit per day counts; points earned on that visit get the level's multiplier
+  function visit(m, pts) { var now = Date.now(), last = (m.vlog || [])[0]; if (!last || new Date(last).toDateString() !== new Date(now).toDateString()) (m.vlog = m.vlog || []).unshift(now); m.vlog = m.vlog.slice(0, 60); return Math.round(pts * levelOf(m).mult); }
   for (var rk in (C.referral || {})) REF[rk] = C.referral[rk];
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   var MONTHS_L = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -168,7 +177,7 @@
   // an order placed in the app (builder.js) earns points like a register order
   window.SSAI_EARN = function (amount, why) {
     var m = mine()[0], pts = Math.round(amount * PER);
-    if (m) { addPts(m, pts, why + " · $" + amount.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); }
+    if (m) { pts = visit(m, amount * PER); addPts(m, pts, why + " · $" + amount.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); }
     return { pts: pts, saved: !!m };
   };
   function pending() { try { return JSON.parse(localStorage.getItem(PEND) || "null"); } catch (x) { return null; } }
@@ -185,6 +194,12 @@
         '<div class="crm-win"><div style="font-size:30px">🎁</div><b>' + e(me.offer || OFFER) + '</b><div class="code">' + e(me.code) + '</div><small>Your welcome reward. Show this at the counter.</small></div>' +
         (me.bday >= 0 ? (isBday(me) || me.bdemo ? '<div class="crm-win bd"><div style="font-size:30px">🎂</div><b>Happy birthday, ' + first + '! Your free birthday treat is unlocked</b><div class="code">' + e(me.bcode || "BDAY") + '</div><small>Show this code with a photo ID that says ' + e(bdayStr(me)) + '. Good for 7 days.</small></div>'
           : '<div class="crm-bday"><h4>🎂 Birthday treat · ' + e(bdayStr(me)) + '</h4><div style="font-size:13px;color:#C9D2EE">It unlocks on your birthday and we\'ll text you a reminder that morning. To claim it, bring a photo ID that matches this date.</div><button type="button" class="crm-demo" data-a="bday">▶ Demo: it\'s my birthday</button></div>') : '') +
+        // visit level this month
+        (function () { var v = monthVisits(me), L = levelOf(me), N = nextLevel(me);
+          return '<div class="crm-box"><h4>📅 Your level this month: <span style="color:#FFD23F">' + e(L.name) + '</span></h4>' +
+            '<div style="display:flex;gap:6px;margin:6px 0 8px">' + LEVELS.map(function (l) { var on = v >= l.visits; return '<div style="flex:1;text-align:center;padding:7px 2px;border-radius:10px;border:1px solid ' + (on ? '#FFD23F' : '#2A303C') + ';background:' + (on ? '#FFD23F22' : 'transparent') + ';font-size:11.5px"><b style="display:block;font-size:13px">' + e(l.name) + '</b>' + l.visits + '+ visits<br><span style="color:#9AA6CC">' + e(l.perk) + (l.mult > 1 ? ' · ' + l.mult + '× pts' : '') + '</span></div>'; }).join("") + '</div>' +
+            '<p style="margin:0;font-size:13px">' + v + ' visit' + (v === 1 ? '' : 's') + ' this month' + (N ? ' · <b>' + (N.visits - v) + ' more</b> to reach ' + e(N.name) + ' (' + e(N.perk) + ')' : ' · top level reached 🔥') + '. Resets on the 1st. One visit counts per day.</p>' +
+            '<p class="crm-fine" style="margin-top:6px">Sample perks: ' + e(NAME) + ' sets the real ones.</p></div>'; })() +
         // points + scan to earn
         '<div class="crm-box"><div class="crm-pts"><div><div class="k" style="font-size:10px">Your points</div><div class="n">' + pts.toLocaleString() + '<small>pts</small></div></div>' +
           '<button type="button" class="crm-scan" data-a="scan">📲 Scan to earn</button></div>' +
@@ -230,7 +245,7 @@
         if (a === "bday") { m.bdemo = true; m.bcode = "BDAY-" + code4(4); m.ledger = m.ledger || []; m.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎂 Birthday treat unlocked (text sent)" }); put(m); drawJoin(); toast("💬 Text sent: Happy birthday " + m.name.split(" ")[0] + "! Your treat is waiting 🎂"); return; }
         if (a === "scan") { if (qr.style.display === "block") qr.style.display = "none"; else showQR(); return; }
         if (a === "ring") {
-          var amt = Math.round((12 + Math.random() * 26) * 100) / 100, got = Math.round(amt * PER);
+          var amt = Math.round((12 + Math.random() * 26) * 100) / 100, got = visit(m, amt * PER);
           addPts(m, got, "🧾 In-store order $" + amt.toFixed(2) + " · code " + regCode(m)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m);
           drawJoin(true); drawOwn(); toast("+" + got + " points · $" + amt.toFixed(2) + " order"); return;
         }
@@ -339,7 +354,7 @@
       var c4 = own.querySelector('[data-r="code"]').value.trim(), amt = parseFloat(own.querySelector('[data-r="amt"]').value.replace(/[^0-9.]/g, "")), msg = own.querySelector('[data-r="msg"]'), m = mine()[0];
       if (!/^\d{4}$/.test(c4) || !(amt > 0)) { msg.style.color = "#FF6B5E"; msg.textContent = "Enter the 4-digit code and the order total."; return; }
       if (!m || regCode(m) !== c4) { msg.style.color = "#FF6B5E"; msg.textContent = "No customer has that code right now. Codes change every 5 minutes."; return; }
-      var got = Math.round(amt * PER); addPts(m, got, "🧾 Register order $" + amt.toFixed(2) + " · code " + c4); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m);
+      var got = visit(m, amt * PER); addPts(m, got, "🧾 Register order $" + amt.toFixed(2) + " · code " + c4); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m);
       drawJoin(); drawOwn(); toast("+" + got + " points added to " + m.name.split(" ")[0]);
     };
     own.querySelector('[data-a="redeem"]').onclick = function () {

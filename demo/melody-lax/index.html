@@ -1,1073 +1,673 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
-<title>Melody Table</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Melody Bar &amp; Grill — Menu, Drinks &amp; Game</title>
 <script src="../lang-th.js"></script>
+<meta name="description" content="Melody Bar & Grill by LAX: drinks, food, order from your table or the bar, and fly the Melody approach for prizes.">
+<meta name="theme-color" content="#0b1220">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Barlow:wght@400;500;600;700;800&family=Anton&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --gold:#d4af37; --gold-hi:#f0d375; --red:#77242e; --red-hi:#a33645;
-    --navy:#0b1220; --navy-2:#141d30; --navy-3:#1a2438;
-    --ink:#f6f1e4; --muted:#9aa3b5; --line:#26314a; --go:#3fbf8f;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%}
-  body{background:var(--navy);color:var(--ink);font-family:"Barlow",system-ui,sans-serif;
-    font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden;
-    display:grid;place-items:center}
-  #app{position:relative;width:100%;height:100%;max-width:520px;max-height:940px;overflow:hidden;
-    background:linear-gradient(#0b1220,#131c2e 60%,#1b2438)}
-  .screen{position:absolute;inset:0 0 62px 0;display:none;flex-direction:column;overflow-y:auto;z-index:5}
-  .screen.on{display:flex}
-  .screen.full{inset:0}
-  .pad{padding:18px 18px 26px}
-  h1{font-family:"Anton",Impact,sans-serif;font-weight:400;font-size:clamp(1.9rem,9vw,2.7rem);
-     line-height:.95;text-transform:uppercase}
-  h2{font-family:"Anton",Impact,sans-serif;font-weight:400;text-transform:uppercase;
-     font-size:1.15rem;letter-spacing:.03em}
-  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.24em;
-    text-transform:uppercase;color:var(--gold)}
-  .sub{color:var(--muted);font-size:.9rem}
-  .brandbar{display:flex;align-items:center;gap:9px}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
-
-  .btn{display:block;width:100%;padding:14px 18px;border:none;border-radius:12px;
-    font-family:"Anton",sans-serif;font-size:1rem;letter-spacing:.05em;text-transform:uppercase;
-    cursor:pointer;color:var(--navy);background:linear-gradient(180deg,var(--gold-hi),var(--gold));
-    box-shadow:0 5px 0 #9c7d1f;transition:transform .08s,box-shadow .08s}
-  .btn:active{transform:translateY(3px);box-shadow:0 2px 0 #9c7d1f}
-  .btn.ghost{background:none;color:var(--ink);border:1px solid var(--line);box-shadow:none;font-size:.86rem}
-  .btn.ghost:active{transform:none;background:var(--navy-2)}
-  .btn[disabled]{opacity:.4;pointer-events:none}
-  button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-
-  /* ---------- tab bar ---------- */
-  #tabbar{position:absolute;bottom:0;left:0;right:0;height:62px;z-index:20;display:flex;
-    background:rgba(11,18,32,.96);border-top:1px solid var(--line);backdrop-filter:blur(8px)}
-  #tabbar button{flex:1;background:none;border:none;color:var(--muted);cursor:pointer;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-    font-family:"IBM Plex Mono",monospace;font-size:.55rem;letter-spacing:.13em;
-    text-transform:uppercase;position:relative;padding-top:4px}
-  #tabbar button .ic{font-size:19px;line-height:1}
-  #tabbar button.on{color:var(--gold)}
-  #tabbar button.on::before{content:"";position:absolute;top:0;left:26%;right:26%;height:2px;
-    background:var(--gold);border-radius:0 0 3px 3px}
-  .badge{position:absolute;top:2px;right:calc(50% - 22px);min-width:17px;height:17px;padding:0 4px;
-    border-radius:9px;background:var(--red-hi);color:#fff;font-size:.58rem;font-weight:700;
-    display:none;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace}
-  .badge.on{display:flex}
-
-  /* ---------- QR landing ---------- */
-  #s-qr{inset:0;z-index:40}
-  #s-qr.on{display:flex;align-items:center;justify-content:center;text-align:center}
-  .qrcard{background:var(--navy-2);border:1px solid var(--line);border-radius:18px;padding:24px 22px;
-    margin:0 20px;max-width:340px}
-  .qrcard canvas{width:170px;height:170px;background:#fff;border-radius:10px;padding:8px;margin:14px auto 0;display:block}
-  .tablepick{display:flex;gap:7px;margin-top:16px;justify-content:center;flex-wrap:wrap}
-  .tablepick button{width:44px;height:40px;border-radius:9px;background:var(--navy-3);
-    border:1px solid var(--line);color:var(--ink);font-family:"IBM Plex Mono",monospace;
-    font-weight:700;cursor:pointer;font-size:.85rem}
-  .tablepick button.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
-
-  /* ---------- menu ---------- */
-  .secthead{font-family:"Anton",sans-serif;text-transform:uppercase;font-size:1rem;letter-spacing:.04em;
-    color:var(--gold);margin:22px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
-  .mi{display:grid;grid-template-columns:1fr auto auto;gap:11px;align-items:start;padding:11px 0;
-    border-bottom:1px solid rgba(38,49,74,.5)}
-  .mi .nm{font-weight:600;font-size:.95rem;line-height:1.25}
-  .mi .ds{color:var(--muted);font-size:.79rem;line-height:1.35;margin-top:2px}
-  .mi .pr{font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:.86rem;color:var(--gold);
-    white-space:nowrap;padding-top:1px}
-  .add{width:32px;height:32px;border-radius:9px;border:1px solid var(--gold);background:transparent;
-    color:var(--gold);font-size:19px;line-height:1;cursor:pointer;flex:none}
-  .add:active{background:var(--gold);color:var(--navy)}
-  .qty{display:flex;align-items:center;gap:7px}
-  .qty button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);
-    background:var(--navy-2);color:var(--ink);cursor:pointer;font-size:16px;line-height:1}
-  .qty span{font-family:"IBM Plex Mono",monospace;font-weight:700;min-width:14px;text-align:center;font-size:.85rem}
-
-  /* ---------- order ---------- */
-  .line{display:grid;grid-template-columns:1fr auto;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
-  .line .nm{font-weight:600;font-size:.92rem}
-  .line .meta{color:var(--muted);font-size:.78rem;margin-top:2px}
-  .line .amt{font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:.86rem;white-space:nowrap}
-  .totals{margin-top:14px;padding-top:12px;border-top:2px solid var(--line)}
-  .trow{display:flex;justify-content:space-between;padding:5px 0;font-size:.9rem}
-  .trow.big{font-family:"Anton",sans-serif;font-size:1.25rem;text-transform:uppercase;
-    color:var(--gold);padding-top:9px}
-  .trow .v{font-family:"IBM Plex Mono",monospace;font-weight:700}
-  .trow.disc{color:var(--go)}
-  .empty{text-align:center;color:var(--muted);padding:44px 20px;font-size:.9rem}
-
-  /* ---------- rewards ---------- */
-  .starhead{text-align:center;padding:22px 0 6px}
-  .starhead .big{font-family:"Anton",sans-serif;font-size:3rem;color:var(--gold);line-height:1}
-  .tier{display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;padding:12px 13px;
-    border-radius:11px;background:var(--navy-2);border:1px solid var(--line);margin-top:8px}
-  .tier.hit{border-color:var(--gold);background:linear-gradient(90deg,rgba(212,175,55,.15),var(--navy-2))}
-  .tier .pts{font-family:"IBM Plex Mono",monospace;font-size:.7rem;font-weight:700;color:var(--muted);white-space:nowrap}
-  .tier.hit .pts{color:var(--gold)}
-  .tier .nm{font-weight:600;font-size:.92rem;line-height:1.22}
-  .tier .nm small{display:block;color:var(--muted);font-weight:400;font-size:.75rem;margin-top:2px}
-  .tier button{padding:7px 12px;border-radius:8px;border:none;background:var(--gold);color:var(--navy);
-    font-family:"Anton",sans-serif;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
-  .tier .lock{font-size:1rem;opacity:.6}
-  .codebox{margin-top:14px;padding:18px;border-radius:14px;text-align:center;
-    background:linear-gradient(180deg,var(--red-hi),var(--red))}
-  .codebox .k{font-family:"IBM Plex Mono",monospace;font-size:1.7rem;font-weight:700;letter-spacing:.15em;color:#fff}
-  .codebox .w{font-size:.73rem;color:rgba(255,255,255,.86);margin-top:6px}
-  .subtabs{display:flex;gap:6px;margin:6px 0 12px}
-  .subtab{flex:1;padding:9px 6px;border-radius:9px;background:var(--navy-2);border:1px solid var(--line);
-    color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.1em;
-    text-transform:uppercase;cursor:pointer;font-weight:600}
-  .subtab.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
-  .view{display:none}.view.on{display:block}
-  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-  .chip{padding:6px 11px;border-radius:99px;background:var(--navy-2);border:1px solid var(--line);
-    color:var(--muted);font-size:.72rem;cursor:pointer;font-weight:600}
-  .chip.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
-  .info-card{background:var(--navy-2);border:1px solid var(--line);border-radius:13px;padding:15px;margin-top:11px}
-  .info-card .lab{font-family:"IBM Plex Mono",monospace;font-size:.58rem;letter-spacing:.16em;
-    text-transform:uppercase;color:var(--gold);margin-bottom:5px}
-  .info-card .val{font-size:.98rem;font-weight:600;line-height:1.35}
-  .info-card .val small{display:block;color:var(--muted);font-weight:400;font-size:.8rem;margin-top:3px}
-  .acts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
-  .act{padding:14px 8px;border-radius:12px;background:var(--navy-2);border:1px solid var(--line);
-    color:var(--ink);cursor:pointer;text-align:center;text-decoration:none;display:block;
-    font-family:"Anton",sans-serif;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase}
-  .act .ic{display:block;font-size:20px;margin-bottom:5px}
-  .act.gold{background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:var(--navy);border:none}
-  .act:active{transform:translateY(2px)}
-  .push{display:flex;gap:11px;align-items:flex-start;margin-top:11px}
-  .push input{appearance:none;-webkit-appearance:none;flex:none;width:44px;height:26px;border-radius:99px;
-    background:var(--line);position:relative;cursor:pointer;transition:background .2s}
-  .push input:checked{background:var(--gold)}
-  .push input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
-    background:#fff;transition:transform .2s}
-  .push input:checked::after{transform:translateX(18px)}
-  .notif{background:var(--navy-3);border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-top:8px}
-  .notif .t{font-weight:700;font-size:.84rem}
-  .notif .b{color:var(--muted);font-size:.8rem;margin-top:2px}
-  .notif .w{font-family:"IBM Plex Mono",monospace;font-size:.58rem;color:var(--gold);
-    letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
-  .lb{display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;padding:10px 12px;
-    border-bottom:1px solid var(--line);font-size:.89rem}
-  .lb .rk{font-family:"IBM Plex Mono",monospace;font-weight:700;color:var(--muted);width:24px}
-  .lb.me{background:rgba(212,175,55,.1);border-radius:8px}
-  .lb .sc{font-family:"IBM Plex Mono",monospace;font-weight:700;color:var(--gold)}
-  .prize{background:linear-gradient(180deg,var(--red-hi),var(--red));border-radius:12px;padding:13px;
-    margin-top:12px;font-size:.85rem}
-  .prize b{display:block;font-family:"Anton",sans-serif;font-size:1rem;text-transform:uppercase;margin-bottom:3px}
-
-  /* ---------- game ---------- */
-  #s-play{padding:0;inset:0 0 62px 0}
-  canvas#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
-  #hud{position:absolute;top:0;left:0;right:0;z-index:6;padding:12px 15px;display:flex;
-    justify-content:space-between;pointer-events:none;font-family:"IBM Plex Mono",monospace}
-  #hud .score{font-size:1.4rem;font-weight:700;color:var(--gold);text-shadow:0 2px 12px rgba(212,175,55,.55)}
-  #hud .lbl{font-size:.54rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
-  #hud .bank{font-size:.78rem;color:var(--muted);margin-top:2px}
-  .lives{display:flex;gap:4px;margin-top:4px;justify-content:flex-end}
-  .life{font-size:14px}.life.gone{opacity:.18}
-  #toast{position:absolute;left:50%;top:80px;transform:translateX(-50%);z-index:7;pointer-events:none;
-    font-family:"Anton",sans-serif;font-size:1.1rem;color:var(--gold);
-    text-shadow:0 2px 14px rgba(0,0,0,.85);opacity:0;white-space:nowrap}
-  #toast.pop{animation:pop 1s ease-out}
-  @keyframes pop{0%{opacity:0;transform:translate(-50%,10px) scale(.9)}
-    20%{opacity:1;transform:translate(-50%,0) scale(1.06)}75%{opacity:1}
-    100%{opacity:0;transform:translate(-50%,-14px)}}
-  #gameover{position:absolute;inset:0;z-index:8;background:rgba(6,10,20,.93);display:none;
-    flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:26px}
-  #gameover.on{display:flex}
-
-  .toastbar{position:absolute;left:16px;right:16px;bottom:74px;z-index:30;background:var(--go);
-    color:#04140e;border-radius:11px;padding:12px 14px;font-weight:600;font-size:.88rem;
-    opacity:0;transform:translateY(10px);transition:opacity .25s,transform .25s;pointer-events:none}
-  .toastbar.on{opacity:1;transform:none}
-  .demo-tag{position:absolute;bottom:66px;left:50%;transform:translateX(-50%);z-index:25;
-    font-family:"IBM Plex Mono",monospace;font-size:.53rem;letter-spacing:.14em;
-    text-transform:uppercase;color:var(--muted);opacity:.55;pointer-events:none;white-space:nowrap}
-  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* Melody night: navy sky, gold, burgundy sign, pink awning, cream script logo */
+:root{
+  --sky:#0b1220; --sky2:#121b30; --panel:#141e34; --edge:#27324d;
+  --gold:#d4af37; --gold2:#f0d375; --wine:#77242e; --wine2:#a33645; --pink:#e46b83; --cream:#efe4c9;
+  --ink:#f6f1e4; --dim:#9aa3b5; --go:#3fbf8f;
+  --display:"Playfair Display",Georgia,serif; --body:"Barlow",system-ui,-apple-system,sans-serif; --punch:"Anton",Impact,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{overflow-x:clip;margin:0;background:var(--sky);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body{background:radial-gradient(900px 520px at 50% -8%,#2a2445 0,transparent 62%),var(--sky);padding-bottom:84px}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px}
+a{color:var(--gold2)}
+/* hero */
+.hero{text-align:center;padding:30px 0 10px;position:relative}
+.hero .logo{width:min(250px,64vw);height:auto;filter:drop-shadow(0 6px 24px #000a)}
+.hero .tag{font-family:var(--display);font-style:italic;font-weight:700;font-size:clamp(20px,5.4vw,26px);margin:10px 0 2px;color:var(--cream)}
+.hero p{margin:2px 0;color:var(--dim);font-size:14.5px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-weight:800;font-size:14.5px;border-radius:12px;padding:11px 14px;border:1px solid var(--edge);background:var(--panel);color:var(--ink);cursor:pointer;font-family:var(--body)}
+.btn.hot{background:linear-gradient(180deg,var(--gold2),var(--gold));border-color:var(--gold);color:#1a1405;box-shadow:0 8px 24px #d4af3744}
+.btn.wine{background:var(--wine2);border-color:var(--wine2);color:#fff}
+h2{font-family:var(--display);font-weight:900;font-size:30px;margin:34px 0 4px;letter-spacing:.01em}
+h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.sub{color:var(--dim);margin:0 0 12px;font-size:15px}
+/* game */
+.gamebox{background:linear-gradient(180deg,#141e34,#0b1220);border:1px solid var(--edge);border-radius:18px;padding:12px;box-shadow:0 20px 60px #0008}
+.hud{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:2px 2px 10px;font-weight:800}
+.hud .sc{font-family:var(--punch);font-size:28px;color:var(--gold2);letter-spacing:.03em;font-weight:400}
+.hp{flex:1;max-width:170px;min-width:0}
+.hp .lbl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between}
+.hp .bar{position:relative;height:12px;border-radius:7px;background:#0a0f1c;border:1px solid var(--edge);overflow:hidden;margin-top:3px}
+.hp .bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#3fbf8f,#9be15d);transition:width .25s,background .25s}
+.hp .bar i.mid{background:linear-gradient(90deg,#f0b429,#f0d375)}.hp .bar i.low{background:linear-gradient(90deg,#d64545,#ff7a59)}
+.hp .bar b{position:absolute;top:0;bottom:0;width:2px;background:#0b1220}
+#cv{display:block;width:100%;height:auto;aspect-ratio:400/600;border-radius:12px;background:#05081a;touch-action:none;cursor:pointer}
+#over{display:none;text-align:center;padding:14px 0 4px}#over.on{display:block}
+#final{font-family:var(--punch);font-size:52px;color:var(--gold2);line-height:1}
+#won{display:none;margin:10px auto 4px;max-width:320px;background:#3fbf8f22;border:2px dashed #3fbf8f;border-radius:14px;padding:10px;font-weight:800}
+.pts{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:12px}
+.pts div{min-width:0;display:flex;align-items:center;gap:8px;background:#0b1220;border:1px solid var(--edge);border-radius:10px;padding:7px 9px;font-size:13px;color:var(--dim)}
+.pts img{width:34px;height:34px;object-fit:contain;flex:none}.pts .e{width:34px;text-align:center;font-size:22px;flex:none}
+.pts b{color:var(--ink);display:block;font-size:13px;line-height:1.2;overflow-wrap:anywhere}.pts span{min-width:0}.pts .v{margin-left:auto;font-family:var(--punch);color:var(--gold2);font-size:17px;white-space:nowrap}
+.pts .bad .v{color:#ff7a59}
+.ptsh{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:14px 2px 0}
+/* seat */
+.seat{background:var(--panel);border:1px solid var(--edge);border-radius:18px;padding:14px}
+.seat .big{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.seat .big button{border:1px solid var(--edge);background:#0b1220;color:var(--ink);border-radius:14px;padding:12px 6px;font:800 14px var(--body);cursor:pointer}
+.seat .big button span{display:block;font-size:24px;margin-bottom:2px}
+.seat .tbls{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+.seat .tbls button{border:1px solid var(--edge);background:#0b1220;color:var(--ink);border-radius:10px;padding:9px 0;font:800 15px var(--body);cursor:pointer}
+.seat button.on{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;border-color:var(--gold)}
+.seat .now{margin-top:10px;font-size:14px;color:var(--dim)}.seat .now b{color:var(--gold2)}
+/* menu */
+.chips{display:flex;gap:7px;overflow-x:auto;padding:8px 0 8px;position:sticky;top:0;background:var(--sky);z-index:6;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips a{flex:none;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--edge);border-radius:999px;padding:7px 13px;font-weight:700;font-size:14px}
+.cat{margin-top:20px;scroll-margin-top:56px}
+.cat h3{font-family:var(--display);font-weight:900;font-size:24px;margin:0 0 8px;color:var(--cream)}
+.cat .note{color:var(--dim);font-size:13.5px;margin:-4px 0 10px}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
+.item{position:relative;background:var(--panel);border:1px solid var(--edge);border-radius:16px;overflow:hidden;min-width:0;display:flex;flex-direction:column}
+.media{position:relative;aspect-ratio:1/1;overflow:hidden;background:#0a0f1c}
+.media img,.media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.media video{opacity:0;transition:opacity .2s}.media.playing video{opacity:1}
+.item .tx{padding:9px 11px 11px;display:flex;flex-direction:column;flex:1}
+.item .row{display:flex;justify-content:space-between;gap:6px;align-items:baseline}
+.item b{font-size:14.5px;line-height:1.22}
+.item .pr{font-family:var(--punch);font-size:19px;color:var(--gold2);white-space:nowrap}
+.item p{margin:4px 0 8px;font-size:12.5px;color:var(--dim);line-height:1.35;flex:1}
+.add{display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--gold);background:transparent;color:var(--gold2);border-radius:10px;padding:8px;font:800 14px var(--body);cursor:pointer;width:100%}
+.add:active{background:var(--gold);color:#1a1405}
+.qty{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--gold);border-radius:10px;overflow:hidden}
+.qty button{border:0;background:var(--gold);color:#1a1405;font:900 18px var(--body);width:38px;height:36px;cursor:pointer}
+.qty span{font-weight:800}
+/* steam + pour effects */
+.steam{position:absolute;inset:0;pointer-events:none;opacity:0}
+.steam i{position:absolute;bottom:18%;width:34%;height:70%;border-radius:50%;background:radial-gradient(closest-side,#ffffff88,#ffffff00);filter:blur(10px);opacity:0}
+.media.hot .steam{opacity:1}
+.media.hot .steam i{animation:steam 2.6s ease-out forwards}
+.steam i:nth-child(1){left:12%;animation-delay:0s!important}.steam i:nth-child(2){left:36%;animation-delay:.35s!important}.steam i:nth-child(3){left:58%;animation-delay:.7s!important}
+@keyframes steam{0%{opacity:0;transform:translateY(30%) scale(.6)}25%{opacity:.85}100%{opacity:0;transform:translateY(-55%) scale(1.25) rotate(8deg)}}
+.herbs{position:absolute;inset:0;pointer-events:none}
+.herbs i{position:absolute;top:-6%;width:6px;height:4px;border-radius:2px;background:#3f8f3a;opacity:0;animation:herb 1.2s cubic-bezier(.4,.1,.6,1) forwards}
+@keyframes herb{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:.9;transform:translateY(var(--d,60%)) rotate(240deg)}}
+.drink .media img.full{clip-path:inset(0 0 0 0)}
+.drink .media.pouring img.full{animation:fill 1.9s cubic-bezier(.3,.1,.3,1) forwards}
+.drink .media .stream{position:absolute;left:var(--sx,52%);top:-4%;width:7px;height:0;border-radius:4px;background:linear-gradient(180deg,#fff8,var(--pc,#f2a33a));opacity:0;filter:blur(.4px)}
+.drink .media.pouring .stream{animation:stream 1.9s ease-out forwards}
+@keyframes fill{0%{clip-path:inset(100% 0 0 0);filter:saturate(.6)}100%{clip-path:inset(0 0 0 0);filter:none}}
+@keyframes stream{0%{opacity:0;height:0}10%{opacity:.95;height:58%}80%{opacity:.95;height:58%}100%{opacity:0;height:58%}}
+.drink .media .empty{filter:brightness(.55) saturate(.4)}
+.media .poured{position:absolute;left:8px;top:8px;background:#0b1220cc;border:1px solid var(--gold);color:var(--gold2);border-radius:999px;padding:3px 9px;font-size:11.5px;font-weight:800;opacity:0;transition:opacity .3s}
+.media.done .poured{opacity:1}
+/* order bar + sheet */
+#obar{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#0b122000,#0b1220 30%);display:none}
+#obar.on{display:block}
+#obar button{width:100%;max-width:696px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;border:0;border-radius:16px;padding:14px 16px;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;font:800 15.5px var(--body);box-shadow:0 10px 30px #000a;cursor:pointer}
+#obar .n{background:#1a1405;color:var(--gold2);border-radius:999px;padding:2px 9px;font-size:13px}
+#sheet{position:fixed;inset:0;z-index:60;background:#000b;display:none;align-items:flex-end;justify-content:center}
+#sheet.on{display:flex}
+#sheet .in{width:100%;max-width:720px;max-height:86vh;overflow:auto;background:var(--sky2);border:1px solid var(--edge);border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+.ln{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:15px}
+.ln .m{color:var(--dim);font-size:13px}
+.tot{display:flex;justify-content:space-between;padding:6px 0;font-size:15px}.tot.big{font-family:var(--punch);font-size:24px;color:var(--gold2)}
+.ok{background:#3fbf8f22;border:2px solid var(--go);border-radius:16px;padding:14px;text-align:center;margin-top:12px}
+.flyimg{position:fixed;z-index:70;width:64px;height:64px;border-radius:14px;object-fit:cover;pointer-events:none;box-shadow:0 10px 30px #000a;transition:transform .7s cubic-bezier(.5,-0.3,.7,1),opacity .7s}
+#obar.bump button{animation:bump .4s}
+@keyframes bump{40%{transform:scale(1.05)}}
+.check{width:74px;height:74px;margin:0 auto 6px;border-radius:50%;background:var(--go);display:grid;place-items:center;animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.check svg{width:40px;height:40px;stroke:#fff;stroke-width:5;fill:none;stroke-dasharray:60;stroke-dashoffset:60;animation:draw .5s .25s forwards}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}@keyframes draw{to{stroke-dashoffset:0}}
+.ok .code{font-family:var(--punch);font-size:34px;letter-spacing:.06em;color:#fff}
+/* flyover */
+#fly{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:30;overflow:hidden}
+#fly img{position:absolute;width:min(560px,120vw);height:auto;filter:drop-shadow(0 18px 18px #0006);will-change:transform}
+#fly .shadow{position:absolute;width:min(380px,90vw);height:60px;border-radius:50%;background:radial-gradient(closest-side,#0008,#0000);will-change:transform}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:16px;padding:14px;font-size:14.5px}
+.card b{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-height:1.6;padding-bottom:20px}
+@media (prefers-reduced-motion:reduce){.media.hot .steam i,.drink .media.pouring img.full,.drink .media.pouring .stream{animation:none}#fly{display:none}}
 </style>
+</head>
+<body>
+<div id="fly" aria-hidden="true"></div>
+<div class="wrap">
 
-<div id="app">
-
-  <!-- QR LANDING -->
-  <div class="screen full on" id="s-qr">
-    <div class="qrcard">
-      <div class="brandbar" style="justify-content:center"><span class="dot"></span>
-        <span class="eyebrow">Melody Bar &amp; Grill</span></div>
-      <h1 style="margin-top:10px">Melody<br>Table</h1>
-      <p class="sub" style="margin-top:9px">Scan the code on your table. See the menu, order without
-        waving anybody down, and play for your next meal.</p>
-      <canvas id="qr"></canvas>
-      <p class="sub" style="font-size:.78rem;margin-top:10px">Or pick your table to start</p>
-      <div class="tablepick" id="tables"></div>
-      <button class="btn" id="enter" style="margin-top:16px" disabled>Pick a table</button>
-    </div>
+<header class="hero">
+  <img class="logo" src="img/logo.png" alt="Melody Bar &amp; Grill" width="305" height="145">
+  <div class="tag" id="greet">The closest bar to LAX</div>
+  <p>9132 S Sepulveda Blvd · Westchester · since 1952</p>
+  <div class="btns">
+    <a class="btn hot" href="#play">✈️ Play &amp; win</a>
+    <a class="btn" href="#seat">🪑 Order</a>
+    <a class="btn" href="#drinks">🍸 Drinks</a>
+    <a class="btn" href="#food">🍽️ Food</a>
   </div>
+</header>
 
-  <!-- MENU -->
-  <div class="screen" id="s-menu"><div class="pad">
-    <div class="brandbar"><span class="dot"></span><span class="eyebrow" id="tablbl">Table —</span></div>
-    <h2 style="margin-top:10px">The Menu</h2>
-    <p class="sub">Tap the plus to add. Kitchen gets it the second you send.</p>
-    <div id="menu"></div>
-  </div></div>
-
-  <!-- ORDER -->
-  <div class="screen" id="s-order"><div class="pad">
-    <div class="brandbar"><span class="dot"></span><span class="eyebrow" id="tablbl2">Table —</span></div>
-    <h2 style="margin-top:10px">Your Order</h2>
-    <div id="cart"></div>
-    <div id="ordertotals"></div>
-    <button class="btn" id="send" style="margin-top:18px" disabled>Send to kitchen</button>
-    <button class="btn ghost" id="clear" style="margin-top:9px">Clear</button>
-    <div id="sent" style="display:none;margin-top:16px"></div>
-  </div></div>
-
-  <!-- PLAY -->
-  <div class="screen" id="s-play">
-    <canvas id="cv"></canvas>
-    <div id="hud">
-      <div><div class="lbl">This run</div><div class="score" id="score">0</div>
-        <div class="bank" id="bankhud">&#11088; 0</div></div>
-      <div style="text-align:right"><div class="lbl">Fuel</div><div class="lives" id="lives"></div></div>
-    </div>
-    <div id="toast"></div>
-    <div id="gameover">
-      <span class="eyebrow" id="rank-line">Flight complete</span>
-      <div style="font-family:'Anton';font-size:2.9rem;color:var(--gold);line-height:1;margin:8px 0 2px"
-        id="final">0</div>
-      <div style="font-family:'Anton';font-size:1.5rem;color:var(--gold)" id="runstars">+0 &#11088;</div>
-      <p class="sub" id="best" style="margin-top:6px">Star balance: 0</p>
-      <div style="display:flex;gap:9px;margin-top:22px;width:100%;max-width:300px">
-        <button class="btn ghost" id="again">Fly again</button>
-        <button class="btn" id="toRewards">Rewards</button>
-      </div>
-    </div>
+<h2 id="play"><small>Play for prizes</small>Fly the Melody approach</h2>
+<p class="sub">Fly over LAX, In-N-Out and Melody. Grab the food, dodge UFOs, fighter jets, lightning and kamikaze planes. Drag anywhere on the game to steer.</p>
+<div class="gamebox">
+  <div class="hud">
+    <span>Score <span class="sc" id="score">0</span></span>
+    <div class="hp"><div class="lbl"><span>Health</span><span id="hpn">100%</span></div><div class="bar"><i id="hpbar" style="width:100%"></i><b style="left:33.3%"></b><b style="left:66.6%"></b></div></div>
+    <span id="time">60s</span>
   </div>
-
-  <!-- REWARDS -->
-  <div class="screen" id="s-rewards"><div class="pad">
-    <div class="starhead">
-      <div class="eyebrow">Your stars</div>
-      <div class="big" id="starbig">0</div>
-      <p class="sub" id="starnote">400 points = 1 star</p>
-    </div>
-    <div class="subtabs">
-      <button class="subtab on" data-v="v-earn">Rewards</button>
-      <button class="subtab" data-v="v-shop">Discounts</button>
-    </div>
-    <div id="v-earn" class="view on"><div id="tiers"></div></div>
-    <div id="v-shop" class="view">
-      <p class="sub" style="font-size:.85rem;margin-bottom:4px">Everything you can spend stars on.
-        Pick one and it comes straight off your check.</p>
-      <div class="chips" id="chips"></div>
-      <div id="shop"></div>
-    </div>
-    <div id="codewrap" style="display:none"></div>
-    <h2 style="margin-top:26px">This Week</h2>
-    <div class="prize"><b>Weekly champion</b>Top score by Sunday close eats half off their whole meal.
-      Resets Monday.</div>
-    <div id="board" style="margin-top:10px"></div>
-  </div></div>
-
-  <!-- MELODY / INFO -->
-  <div class="screen" id="s-info"><div class="pad">
-    <div class="brandbar"><span class="dot"></span><span class="eyebrow">Melody Bar &amp; Grill</span></div>
-    <h2 style="margin-top:10px">Getting Here</h2>
-
-    <div class="info-card">
-      <div class="lab">Address</div>
-      <div class="val">9132 S Sepulveda Blvd<small>Los Angeles, CA 90045 &#183; Westchester</small></div>
-      <div class="val" id="dist" style="margin-top:9px;color:var(--gold);font-size:.86rem">Tap below for distance</div>
-    </div>
-
-    <div class="acts">
-      <a class="act gold" id="dirbtn" href="https://www.google.com/maps/dir/?api=1&destination=9132+S+Sepulveda+Blvd+Los+Angeles+CA+90045" target="_blank" rel="noopener">
-        <span class="ic">&#129517;</span>Directions</a>
-      <a class="act" href="tel:+13106701994"><span class="ic">&#128222;</span>Call</a>
-    </div>
-    <button class="btn" id="resbtn" style="margin-top:10px">Reserve a table</button>
-    <div id="resform" style="display:none"></div>
-
-    <div class="info-card" style="margin-top:18px">
-      <div class="lab">Hours</div>
-      <div class="val">Happy hour 3&#8211;6 daily<small>Half off burgers Mon 11&#8211;3 &#183; $3 tacos &amp; $6 margaritas Tue
-        &#183; Half off sandwiches Thu 11&#8211;3 &#183; $3 sliders Fri 11&#8211;3</small></div>
-    </div>
-
-    <h2 style="margin-top:24px">Notifications</h2>
-    <div class="info-card">
-      <div class="push">
-        <input type="checkbox" id="pushon">
-        <div><div class="val" style="font-size:.9rem">Push me the good stuff</div>
-          <small style="color:var(--muted);font-size:.8rem">New dishes, specials, discount drops, and when
-            somebody bumps you off the weekly board.</small></div>
-      </div>
-      <div id="pushprev" style="display:none">
-        <div class="notif"><div class="w">Now</div><div class="t">Melody Bar &amp; Grill</div>
-          <div class="b">New on the menu: Lobster Mac &amp; Cheese. First 20 orders get a free app.</div></div>
-        <div class="notif"><div class="w">Tomorrow 11am</div><div class="t">Melody Bar &amp; Grill</div>
-          <div class="b">Half off burgers til 3. You're 9 &#11088; off free fries.</div></div>
-        <div class="notif"><div class="w">Friday 4pm</div><div class="t">Melody Bar &amp; Grill</div>
-          <div class="b">$3 sliders started. Somebody just passed you on the weekly board.</div></div>
-      </div>
-      <p class="sub" style="font-size:.74rem;margin-top:9px">Turn off any time in your phone settings.
-        No charge, no spam.</p>
-    </div>
-  </div></div>
-
-  <div class="toastbar" id="bar"></div>
-  <div class="demo-tag">Demo build &#183; nothing is charged, no texts sent</div>
-
-  <nav id="tabbar">
-    <button data-s="s-menu" class="on"><span class="ic">&#127860;</span>Menu</button>
-    <button data-s="s-order"><span class="ic">&#129379;</span>Order<span class="badge" id="cartbadge">0</span></button>
-    <button data-s="s-play"><span class="ic">&#9992;</span>Play</button>
-    <button data-s="s-rewards"><span class="ic">&#11088;</span>Rewards</button>
-    <button data-s="s-info"><span class="ic">&#128205;</span>Melody</button>
-  </nav>
+  <canvas id="cv" width="400" height="600" aria-label="Melody flight game. Drag anywhere to steer the plane."></canvas>
+  <div id="over">
+    <div class="sub" id="rank">Flight complete</div>
+    <div id="final">0 pts</div>
+    <div id="won"></div>
+    <div class="btns"><button class="btn hot" type="button" id="again">✈️ Fly again</button><a class="btn" href="#points">Point values</a></div>
+  </div>
+  <div id="points"></div>
 </div>
 
+<h2 id="seat"><small>Order from your phone</small>Where are you sitting?</h2>
+<p class="sub">Pick your spot and your order goes to the right place. Scanned a table code? It's already picked.</p>
+<div class="seat">
+  <div class="big">
+    <button type="button" data-seat="bar"><span>🍸</span>I'm at the bar</button>
+    <button type="button" data-seat="patio"><span>🌴</span>Patio</button>
+    <button type="button" data-seat="togo"><span>🥡</span>To go</button>
+  </div>
+  <div class="tbls" id="tbls"></div>
+  <div class="now" id="seatnow">Not picked yet.</div>
+</div>
+
+<h2 id="drinks"><small>Tap a drink to pour it</small>Drinks</h2>
+<p class="sub">Happy hour 3–6 daily · $6 margaritas on Tuesdays.</p>
+<div id="drinkhost"></div>
+
+<h2 id="food"><small>Fresh from the kitchen</small>Food</h2>
+<nav class="chips" id="chips" aria-label="Menu sections"></nav>
+<div id="menu"></div>
+<div id="foodhost"></div>
+
+<h2 id="rewards"><small>Melody Rewards</small>Points, prizes &amp; perks</h2>
+<div id="rwhost"></div>
+
+<h2 id="visit"><small>Come through</small>Visit Melody</h2>
+<div class="info">
+  <div class="card"><b>Address</b>9132 S Sepulveda Blvd<br>Los Angeles, CA 90045<div class="btns" style="justify-content:flex-start"><a class="btn hot" href="https://www.google.com/maps/dir/?api=1&amp;destination=9132+S+Sepulveda+Blvd+Los+Angeles+CA+90045" target="_blank" rel="noopener">📍 Directions</a><a class="btn" href="tel:+13106701994">📞 Call</a></div></div>
+  <div class="card"><b>Happy hour &amp; specials</b>Happy hour 3–6 daily<br>Mon: half off burgers 11–3<br>Tue: $3 tacos &amp; $6 margaritas<br>Thu: half off sandwiches 11–3<br>Fri: $3 sliders 11–3</div>
+  <div class="card"><b>Every week</b>Karaoke · live bands · DJs · trivia · every game on the TVs</div>
+</div>
+
+<footer>Melody Bar &amp; Grill · app by Second Shift AI · food prices from Melody's menu · drink prices and menu photos are previews until Melody signs off</footer>
+</div>
+
+<div id="obar"><button type="button" id="obtn"><span><span class="n" id="ocount">0</span> &nbsp;<span id="oseat">Review order</span></span><span id="ototal">$0.00</span></button></div>
+<div id="sheet" role="dialog" aria-modal="true" aria-label="Your order"><div class="in" id="sheetin"></div></div>
+
+<script>window.MELODY_CLIPS={"lobster-mac":"img/clips/lobster-mac.mp4","wings":"img/clips/wings.mp4"};</script>
 <script>
+window.CONFIG={name:"Melody Bar & Grill",address:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"};
 (function(){
-  "use strict";
-  var MENU = [{"sec": "Starters", "items": [{"n": "Avocado Toast", "p": "$13.00", "d": "Vine ripened avocados on sourdough with micro greens, tomato, olive oil, sea salt, lemon and a pinch of cayenne pepper."}, {"n": "BBQ Rib Grilled Cheese Bites", "p": "$15.00", "d": "Melted jack and cheddar cheese with bbq baby back rib meat on grilled sourdough."}, {"n": "Buttermilk Chicken Strips & Fries", "p": "$16.00", "d": "Chicken breast dipped in buttermilk breading and fried. Served with ranch and bbq dipping sauce."}, {"n": "Chicken Pot Stickers", "p": "$15.00", "d": "Made with free range chicken, cabbage and garlic. Served with honey soy dipping sauce."}, {"n": "Fried Green Beans", "p": "$13.00", "d": "Hand battered green beans served with ranch and spicy aioli."}, {"n": "Fried Shrimp", "p": "$18.25", "d": "Southern spice blend, breaded and fried"}, {"n": "Jalapeno Calamari", "p": "$16.00", "d": "Lemon Pepper breaded squid and jalapeno pieces lightly fried. Served with cocktail sauce & spicy aioli."}, {"n": "Lettuce Wraps", "p": "$16.00", "d": "Seasoned umami chicken, water chestnuts, onions, peanuts and cilantro"}, {"n": "Baby Back Ribs & Fries", "p": "$20.25", "d": "Slow cooked baby back ribs slathered in our house-made bourbon BBQ sauce."}]}, {"sec": "Fries", "items": [{"n": "Gilroy Garlic Fries", "p": "$6.75", "d": "Shoestring fries tossed with sizzling garlic & Italian herbs."}, {"n": "Melody Fries", "p": "$5.75", "d": "Shoestring fries, sea salt & pepper Add Cheese +$2.00"}, {"n": "Onion Strings", "p": "$9.75", "d": "Fried onion strings served with jalape\u00f1o ketchup."}, {"n": "Phat Fries", "p": "$7.75", "d": "Add cheese +$2.00"}, {"n": "Philly Cheese Steak Fries", "p": "$17.25", "d": "Shoestring fries topped with thinly sliced Angus steak, grilled onions, peppers, mushrooms & Swiss cheese."}, {"n": "Sweet Potato Fries", "p": "$7.75", "d": "Served with spicy aioli dipping sauce."}]}, {"sec": "Soups", "items": [{"n": "Black Bean Soup (Bowl)", "p": "$14.00", "d": "Olive oil garlic toast"}, {"n": "Black Bean Soup (Cup)", "p": "$9.75", "d": "Olive oil garlic toast"}, {"n": "French Onion Soup (Bowl)", "p": "$15.00", "d": "Served with grilled cheese dunker."}, {"n": "French Onion Soup (Cup)", "p": "$11.00", "d": "Served with 1/2 grilled cheese dunker."}, {"n": "Tomato Bisque Soup (Bowl)", "p": "$15.00", "d": "Served with grilled cheese dunker."}, {"n": "Tomato Bisque Soup (Cup)", "p": "$11.00", "d": "Served with 1/2 grilled cheese dunker."}]}, {"sec": "Mac & Cheese", "items": [{"n": "Bacon, Cheddar & Jalapeno Mac & Cheese", "p": "$17.25", "d": "Fusili pasta in a creamy cheese blend with caramelized bacon, cheddar cheese & jalapeno."}, {"n": "Chicken Parmesan Mac & Cheese", "p": "$18.25", "d": "Fusili pasta in a creamy cheese blend, with chicken Parmesan in a vodka sauce."}, {"n": "House Mac", "p": "$15.00", "d": "Fusilli pasta in a creamy cheese blend."}, {"n": "Lobster Mac & Cheese", "p": "$21.50", "d": "Fusilli pasta in a creamy cheese blend with lobster and a baked parmesan crust"}, {"n": "Melody Burger Mac & Cheese", "p": "$19.25", "d": "Fusili pasta in a creamy cheese blend with ground beef, caramelized onions, spinach, & Gorgonzola cheese."}, {"n": "Parmesan & Mushroom Mac & Cheese", "p": "$17.25", "d": "Fusili pasta in a cream cheese blend with baked Parmesan and mushroom crust."}]}, {"sec": "Tacos & Burritos", "items": [{"n": "Avocado Tacos", "p": "$13.00", "d": "2 Panco crusted avocado, chimichurri, onion, cilantro, tomato & Cabbage"}, {"n": "Bean & Cheese Burrito", "p": "$14.00", "d": "Black beans and shredded cheese"}, {"n": "Beyond Tacos", "p": "$14.00", "d": "2 tacos, beyond meat, black bean, pico de gallo, & lettuce"}, {"n": "Carnitas Burrito", "p": "$18.25", "d": "Pulled pork, black beans, pico de gallo & shredded cheese"}, {"n": "Carnitas Tacos", "p": "$14.00", "d": "2 slow roasted pork topped with onions, cilantro & lettuce."}, {"n": "Cheese Quesadilla", "p": "$15.00", "d": "Melted mozzarella cheese on a flour tortilla with side of salsa & sour cream Chicken +$3.00 Pulled Pork +$4.25 Steak +$5.25"}, {"n": "Chicken Burrito", "p": "$17.25", "d": "Chopped chicken, black beans, pico de gallo & shredded cheese"}, {"n": "Chicken Tacos", "p": "$13.00", "d": "2 Grilled chicken tacos, onions, cilantro, & lettuce."}, {"n": "Nachos", "p": "$15.00", "d": "Melted cheddar and jack cheese, jalapenos, pico de gallo, & sour cream. + Chicken $4 | + Pulled Pork $5 | + Steak $6"}, {"n": "Salmon Tacos", "p": "$16.00", "d": "2 blackened salmon with onions, cilantro, lettuce, & creme de lemon."}, {"n": "Shrimp Tacos", "p": "$16.00", "d": "2 tacos, cajun spiced shrimp saut\u00e9ed with butter, garlic & onions topped with cabbage, cilantro, sweet honey jalape\u00f1os & spicy aioli"}, {"n": "Steak Burrito", "p": "$18.25", "d": "Chopped steak, black beans, pico de gallo & shredded cheese"}]}];
-  var TAX = 0.095;
-  var STAR_RATE = 400;
-  function starsFor(p){ return Math.floor(p/STAR_RATE); }
-  // Browsable catalog. Everything priced against their real menu.
-  var STAR_TIERS = [
-    {stars:10, name:"Free Melody Fries",        note:"$5.75 on the menu",        off:5.75, tag:"Snack"},
-    {stars:15, name:"$5 off any Mac & Cheese",  note:"Six to choose from",       off:5,    tag:"Food"},
-    {stars:25, name:"10% off your drink",       note:"Any pour, any night",      pct:0.10, tag:"Drink"},
-    {stars:30, name:"Free Gilroy Garlic Fries", note:"$6.75 on the menu",        off:6.75, tag:"Snack"},
-    {stars:40, name:"$8 off Baby Back Ribs",    note:"Ribs & fries, $20.25",     off:8,    tag:"Food"},
-    {stars:60, name:"Free appetizer",           note:"Up to $16 off a starter",  off:16,   tag:"Food"},
-    {stars:80, name:"25% off your food",        note:"Whole check, dine-in",     pct:0.25, tag:"Check"},
-    {stars:120,name:"Half off your whole meal", note:"Everything, cut in half",  pct:0.50, tag:"Check"},
-    {stars:250,name:"Entire meal on the house", note:"You ate free",             pct:1.00, tag:"Check"}
-  ];
-  var FOOD = [
-    {e:"\ud83e\uddc0",n:"Bacon Jalape\u00f1o Mac",p:120},{e:"\ud83c\udf64",n:"Fried Shrimp",p:110},
-    {e:"\ud83c\udf57",n:"Buttermilk Chicken",p:100},{e:"\ud83c\udf79",n:"Margarita",p:90},
-    {e:"\ud83e\udd5f",n:"Pot Stickers",p:80},{e:"\ud83e\uddc5",n:"Onion Strings",p:70},
-    {e:"\ud83c\udf5f",n:"Garlic Fries",p:60},{e:"\ud83c\udf7a",n:"Draft Beer",p:75}
-  ];
+"use strict";
+var $=function(i){return document.getElementById(i);};
+var T=function(s){return (window.__T||String)(s);};
+var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+function money(n){return "$"+n.toFixed(2);}
+function buzz(p){ if(navigator.vibrate) try{navigator.vibrate(p);}catch(e){} }
 
-  var $=function(i){return document.getElementById(i);};
-  function money(n){ return "$"+n.toFixed(2); }
-  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){
-    return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
-  function bar(msg){ var b=$("bar"); b.textContent=msg; b.classList.add("on");
-    clearTimeout(b._t); b._t=setTimeout(function(){b.classList.remove("on");},2200); }
+/* ---------------- DATA (food prices from melodylax.com; drinks are sample prices) ---------------- */
+// [name, price, description, image key, effect]  effect: steam | herbs (parsley + steam) | none
+var FOOD=[
+ {id:"starters",name:"Starters",items:[
+  ["Lemon Pepper Wings",16.00,"Crispy wings dusted in lemon pepper. Ranch or buffalo on the side.","wings","herbs"],
+  ["Avocado Toast",13.00,"Vine ripened avocados on sourdough with micro greens, tomato, olive oil, sea salt, lemon and a pinch of cayenne pepper.","avocado-toast","none"],
+  ["BBQ Rib Grilled Cheese Bites",15.00,"Melted jack and cheddar cheese with bbq baby back rib meat on grilled sourdough.","rib-grilled-cheese","steam"],
+  ["Buttermilk Chicken Strips & Fries",16.00,"Chicken breast dipped in buttermilk breading and fried. Served with ranch and bbq dipping sauce.","chicken-strips","steam"],
+  ["Chicken Pot Stickers",15.00,"Made with free range chicken, cabbage and garlic. Served with honey soy dipping sauce.","potstickers","steam"],
+  ["Fried Green Beans",13.00,"Hand battered green beans served with ranch and spicy aioli.","green-beans","steam"],
+  ["Fried Shrimp",18.25,"Southern spice blend, breaded and fried.","fried-shrimp","herbs"],
+  ["Jalapeno Calamari",16.00,"Lemon pepper breaded squid and jalapeno pieces lightly fried. Cocktail sauce & spicy aioli.","calamari","herbs"],
+  ["Lettuce Wraps",16.00,"Seasoned umami chicken, water chestnuts, onions, peanuts and cilantro.","lettuce-wraps","none"],
+  ["Baby Back Ribs & Fries",20.25,"Slow cooked baby back ribs slathered in our house-made bourbon BBQ sauce.","ribs","steam"]]},
+ {id:"mac",name:"Mac & Cheese",note:"Fusilli in a creamy cheese blend, baked to order.",items:[
+  ["Lobster Mac & Cheese",21.50,"Fusilli in a creamy cheese blend with lobster and a baked parmesan crust.","lobster-mac","herbs"],
+  ["Melody Burger Mac & Cheese",19.25,"Ground beef, caramelized onions, spinach & gorgonzola.","burger-mac","herbs"],
+  ["Bacon, Cheddar & Jalapeno Mac & Cheese",17.25,"Caramelized bacon, cheddar cheese & jalapeno.","bacon-mac","steam"],
+  ["Chicken Parmesan Mac & Cheese",18.25,"Chicken parmesan in a vodka sauce.","chicken-parm-mac","herbs"],
+  ["Parmesan & Mushroom Mac & Cheese",17.25,"Baked parmesan and mushroom crust.","mushroom-mac","herbs"],
+  ["House Mac",15.00,"Fusilli pasta in a creamy cheese blend.","house-mac","steam"]]},
+ {id:"fries",name:"Fries",items:[
+  ["Gilroy Garlic Fries",6.75,"Shoestring fries tossed with sizzling garlic & Italian herbs.","garlic-fries","herbs"],
+  ["Melody Fries",5.75,"Shoestring fries, sea salt & pepper. Add cheese +$2.00","melody-fries","steam"],
+  ["Onion Strings",9.75,"Fried onion strings served with jalapeño ketchup.","onion-strings","steam"],
+  ["Phat Fries",7.75,"Add cheese +$2.00","phat-fries","steam"],
+  ["Philly Cheese Steak Fries",17.25,"Shoestring fries topped with thinly sliced Angus steak, grilled onions, peppers, mushrooms & Swiss cheese.","philly-fries","steam"],
+  ["Sweet Potato Fries",7.75,"Served with spicy aioli dipping sauce.","sweet-potato-fries","steam"]]},
+ {id:"soups",name:"Soups",items:[
+  ["French Onion Soup (Bowl)",15.00,"Served with grilled cheese dunker.","french-onion","steam"],
+  ["French Onion Soup (Cup)",11.00,"Served with 1/2 grilled cheese dunker.","french-onion","steam"],
+  ["Tomato Bisque Soup (Bowl)",15.00,"Served with grilled cheese dunker.","tomato-bisque","steam"],
+  ["Tomato Bisque Soup (Cup)",11.00,"Served with 1/2 grilled cheese dunker.","tomato-bisque","steam"],
+  ["Black Bean Soup (Bowl)",14.00,"Olive oil garlic toast.","black-bean-soup","steam"],
+  ["Black Bean Soup (Cup)",9.75,"Olive oil garlic toast.","black-bean-soup","steam"]]},
+ {id:"tacos",name:"Tacos & Burritos",note:"Tuesdays: $3 tacos.",items:[
+  ["Shrimp Tacos",16.00,"2 tacos, cajun spiced shrimp sautéed with butter, garlic & onions, cabbage, cilantro, sweet honey jalapeños & spicy aioli.","shrimp-tacos","herbs"],
+  ["Salmon Tacos",16.00,"2 blackened salmon with onions, cilantro, lettuce, & creme de lemon.","salmon-tacos","herbs"],
+  ["Carnitas Tacos",14.00,"2 slow roasted pork topped with onions, cilantro & lettuce.","carnitas-tacos","herbs"],
+  ["Chicken Tacos",13.00,"2 grilled chicken tacos, onions, cilantro, & lettuce.","chicken-tacos","herbs"],
+  ["Avocado Tacos",13.00,"2 panko crusted avocado, chimichurri, onion, cilantro, tomato & cabbage.","avocado-tacos","herbs"],
+  ["Beyond Tacos",14.00,"2 tacos, beyond meat, black bean, pico de gallo, & lettuce.","beyond-tacos","herbs"],
+  ["Nachos",15.00,"Melted cheddar and jack, jalapenos, pico de gallo, & sour cream. + Chicken $4 · Pulled Pork $5 · Steak $6","nachos","steam"],
+  ["Cheese Quesadilla",15.00,"Melted mozzarella on a flour tortilla, salsa & sour cream.","quesadilla","steam"],
+  ["Carnitas Burrito",18.25,"Pulled pork, black beans, pico de gallo & shredded cheese.","carnitas-burrito","steam"],
+  ["Steak Burrito",18.25,"Chopped steak, black beans, pico de gallo & shredded cheese.","steak-burrito","steam"],
+  ["Chicken Burrito",17.25,"Chopped chicken, black beans, pico de gallo & shredded cheese.","chicken-burrito","steam"],
+  ["Bean & Cheese Burrito",14.00,"Black beans and shredded cheese.","bean-burrito","steam"]]}
+];
+// drinks: [name, price, description, image key, pour color]
+var DRINKS=[
+ ["Mango Margarita",12,"Fresh mango, tequila, lime, chili-lime rim. A Melody favorite.","mango-marg","#f6a21a"],
+ ["House Margarita",12,"Tequila, fresh lime, salted rim. $6 on Tuesdays.","margarita","#d9e88a"],
+ ["Paloma",12,"Tequila, grapefruit, lime, salt rim.","paloma","#f7a0a0"],
+ ["Old Fashioned",14,"Bourbon, bitters, orange peel, big rock.","old-fashioned","#b5651d"],
+ ["Moscow Mule",13,"Vodka, ginger beer, lime, copper mug.","moscow-mule","#e8d9a0"],
+ ["Espresso Martini",15,"Vodka, espresso, coffee liqueur.","espresso-martini","#3b2414"],
+ ["Long Island",14,"Five spirits, cola, lemon.","long-island","#a0612a"],
+ ["Michelada",10,"Cold beer, lime, spice, tajin rim.","michelada","#c2401f"],
+ ["Draft Beer",8,"Ask what's on tap tonight.","draft-beer","#e9b83a"],
+ ["Mimosa",10,"Bubbles and fresh orange juice.","mimosa","#ffb347"],
+ ["Round of Shots",10,"Pick your tequila or whiskey. Per shot.","shots","#e0c27a"],
+ ["Bucket of Beers (5)",30,"Five ice-cold bottles for the table.","beer-bucket","#e9b83a"]];
+var CLIPS=window.MELODY_CLIPS||{};   // {imageKey: "img/clips/key.mp4"} — real pour / steam clips when they exist
 
-  // ---------------- state ----------------
-  var LS="melody-table";
-  var state=(function(){try{return JSON.parse(localStorage.getItem(LS)||"{}");}catch(e){return{};}})();
-  state.stars=state.stars||0; state.cart=state.cart||{}; state.board=state.board||[];
-  state.me=state.me||"Guest"; state.table=state.table||null; state.applied=state.applied||null;
-  var remote=null;
-  function persist(){ try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}
-    if(remote) remote.set({board:state.board,at:Date.now()}).catch(function(){}); }
-  if(window.claude&&typeof window.claude.use==="function"){
-    window.claude.use("db").then(function(db){ if(!db)return;
-      remote=db.doc("melody/table");
-      remote.onSnapshot(function(s){ var d=s&&(typeof s.data==="function"?s.data():s.data);
-        if(d&&Array.isArray(d.board)){state.board=d.board;renderBoard();} });
-    }).catch(function(){});
+/* ---------------- seat ---------------- */
+var SEAT_KEY="melody-seat", seat=null;
+try{ seat=JSON.parse(localStorage.getItem(SEAT_KEY)||"null"); }catch(e){}
+(function(){ var q=new URLSearchParams(location.search), t=q.get("table")||q.get("t"), s=q.get("seat");
+  if(t&&/^\d{1,2}$/.test(t)) seat={type:"table",n:+t}; else if(s&&/^(bar|patio|togo)$/.test(s)) seat={type:s}; })();
+$("tbls").innerHTML=Array.apply(null,Array(20)).map(function(x,i){return '<button type="button" data-table="'+(i+1)+'">'+(i+1)+'</button>';}).join("");
+function seatLabel(){ if(!seat) return ""; return seat.type==="table"?"Table "+seat.n:seat.type==="bar"?"At the bar":seat.type==="patio"?"Patio":"To go"; }
+function drawSeat(){
+  document.querySelectorAll("[data-seat],[data-table]").forEach(function(b){ b.classList.toggle("on", !!seat && (b.dataset.seat===seat.type || (seat.type==="table"&&+b.dataset.table===seat.n))); });
+  $("seatnow").innerHTML = seat ? "You're set: <b>"+esc(seatLabel())+"</b>. "+(seat.type==="togo"?"We'll text you when it's ready.":seat.type==="bar"?"Your bartender gets it the second you send.":"Your server brings it right to you.") : "Not picked yet. Tap your table number, the bar, the patio or to go.";
+  try{ localStorage.setItem(SEAT_KEY,JSON.stringify(seat)); }catch(e){}
+  drawBar();
+}
+document.querySelector(".seat").addEventListener("click",function(e){
+  var b=e.target.closest("button"); if(!b) return;
+  seat=b.dataset.table?{type:"table",n:+b.dataset.table}:{type:b.dataset.seat}; buzz(10); drawSeat();
+});
+
+/* ---------------- cards ---------------- */
+var cart={}; try{ cart=JSON.parse(localStorage.getItem("melody-cart")||"{}"); }catch(e){}
+function card(it,drink){
+  var key=it[3], q=cart[it[0]]?cart[it[0]].q:0, clip=CLIPS[key];
+  var media=drink
+    ? '<div class="media" data-pc="'+it[4]+'"><img class="empty" loading="lazy" src="img/menu/'+key+(clip?'-empty':'')+'.jpg" alt="" onerror="this.style.display=\'none\'"><img class="full" loading="lazy" src="img/menu/'+key+'.jpg" alt="'+esc(it[0])+'" style="clip-path:inset(100% 0 0 0)">'+(clip?'<video muted playsinline preload="none" src="'+clip+'"></video>':'')+'<span class="stream"></span><span class="poured">Poured 🍸</span></div>'
+    : '<div class="media" data-fx="'+it[4]+'"><img loading="lazy" src="img/menu/'+key+'.jpg" alt="'+esc(it[0])+'" width="720" height="720">'+(clip?'<video muted playsinline preload="none" src="'+clip+'"></video>':'')+'<span class="steam"><i></i><i></i><i></i></span><span class="herbs"></span></div>';
+  return '<article class="item'+(drink?' drink':'')+'" data-name="'+esc(it[0])+'">'+media+
+    '<div class="tx"><div class="row"><b>'+esc(it[0])+'</b><span class="pr">$'+it[1].toFixed(2)+'</span></div><p>'+esc(it[2])+'</p>'+ctl(it[0],q)+'</div></article>';
+}
+function ctl(name,q){ return q?'<div class="qty"><button type="button" data-m="'+esc(name)+'" aria-label="Remove one">−</button><span>'+q+' in order</span><button type="button" data-a="'+esc(name)+'" aria-label="Add one">+</button></div>':'<button type="button" class="add" data-a="'+esc(name)+'">+ Add</button>'; }
+$("drinkhost").innerHTML='<div class="items">'+DRINKS.map(function(d){return card(d,true);}).join("")+'</div>';
+$("chips").innerHTML=FOOD.map(function(c){return '<a href="#cat-'+c.id+'">'+esc(c.name)+'</a>';}).join("")+'<a href="#build">Build your mac</a>';
+$("foodhost").innerHTML=FOOD.map(function(c){
+  return '<section class="cat" id="cat-'+c.id+'"><h3>'+esc(c.name)+'</h3>'+(c.note?'<p class="note">'+esc(c.note)+'</p>':'')+'<div class="items">'+c.items.map(function(it){return card(it,false);}).join("")+'</div></section>';
+}).join("");
+var PRICE={}; FOOD.forEach(function(c){c.items.forEach(function(it){PRICE[it[0]]=it[1];});}); DRINKS.forEach(function(d){PRICE[d[0]]=d[1];});
+
+/* pour a drink: real pour clip if we have one, otherwise the glass fills from the bottom with a stream from above */
+function pour(m){
+  if(m._busy) return; m._busy=1; m.classList.remove("done");
+  var v=m.querySelector("video");
+  if(v&&!reduce){ m.classList.add("playing"); v.currentTime=0; var p=v.play(); if(p&&p.catch) p.catch(function(){ m.classList.remove("playing"); fallback(); });
+    v.onended=function(){ m.querySelector(".full").style.clipPath="inset(0 0 0 0)"; m.classList.remove("playing"); m.classList.add("done"); m._busy=0; }; return; }
+  fallback();
+  function fallback(){ var f=m.querySelector(".full"); f.style.clipPath=""; m.style.setProperty("--pc",m.dataset.pc); m.style.setProperty("--sx",(44+Math.random()*12)+"%");
+    m.classList.remove("pouring"); void m.offsetWidth; m.classList.add("pouring");
+    setTimeout(function(){ f.style.clipPath="inset(0 0 0 0)"; m.classList.remove("pouring"); m.classList.add("done"); m._busy=0; }, reduce?50:1950); }
+}
+/* serve a dish: steam, a shower of parsley on the ones that get it, or the real clip */
+function serve(m){
+  var v=m.querySelector("video");
+  if(v&&!reduce){ m.classList.add("playing"); v.currentTime=0; var p=v.play(); if(p&&p.catch) p.catch(function(){ m.classList.remove("playing"); }); v.onended=function(){ /* stay on the garnished last frame */ }; return; }
+  m.classList.remove("hot"); void m.offsetWidth; m.classList.add("hot");
+  if(m.dataset.fx==="herbs"){ var h=m.querySelector(".herbs"); h.innerHTML=""; for(var i=0;i<26;i++){ var e=document.createElement("i"); e.style.left=(18+Math.random()*64)+"%"; e.style.setProperty("--d",(380+Math.random()*120)+"%"); e.style.animationDelay=(Math.random()*0.5)+"s"; e.style.background=Math.random()<.5?"#2f7d32":"#4c9a3f"; h.appendChild(e);} }
+  clearTimeout(m._t); m._t=setTimeout(function(){ m.classList.remove("hot"); },2700);
+}
+document.addEventListener("click",function(e){
+  var a=e.target.closest("[data-a]"), r=e.target.closest("[data-m]"), med=e.target.closest(".item .media");
+  if(a){ var n=a.dataset.a; cart[n]=cart[n]||{q:0,p:PRICE[n]}; cart[n].q++; saveCart(); buzz(12);
+    var art=a.closest(".item"); if(art){ var mm=art.querySelector(".media"); art.classList.contains("drink")?pour(mm):serve(mm); setTimeout(function(){ flyToBar(mm.querySelector("img.full")||mm.querySelector("img")); },art.classList.contains("drink")?900:150); } }
+  else if(r){ var n2=r.dataset.m; if(cart[n2]){ cart[n2].q--; if(cart[n2].q<=0) delete cart[n2]; saveCart(); } }
+  else if(med){ var it=med.closest(".item"); it.classList.contains("drink")?pour(med):serve(med); }
+});
+function saveCart(){ try{ localStorage.setItem("melody-cart",JSON.stringify(cart)); }catch(e){}
+  document.querySelectorAll(".item").forEach(function(c){ var n=c.dataset.name, q=cart[n]?cart[n].q:0, box=c.querySelector(".tx"), old=box.querySelector(".add,.qty"); var w=document.createElement("div"); w.innerHTML=ctl(n,q); old.replaceWith(w.firstChild); });
+  drawBar(); }
+function totals(){ var s=0,n=0; for(var k in cart){ s+=cart[k].p*cart[k].q; n+=cart[k].q; } var tax=s*0.095; return {sub:s,tax:tax,total:s+tax,n:n}; }
+function drawBar(){ var t=totals(); $("obar").classList.toggle("on",t.n>0); $("ocount").textContent=t.n; $("ototal").textContent=money(t.total); $("oseat").textContent=seat?seatLabel()+" · review order":"Review order"; }
+$("obtn").addEventListener("click",openSheet);
+function openSheet(){
+  var t=totals(), h='<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-family:var(--display);font-size:24px">Your order</h3><button class="btn" type="button" data-x>Close</button></div>';
+  h+='<div class="sub" style="margin:6px 0 4px">'+(seat?'Going to <b style="color:var(--gold2)">'+esc(seatLabel())+'</b>':'<b style="color:#ff7a59">Pick where you\'re sitting first.</b>')+'</div>';
+  for(var k in cart) h+='<div class="ln"><span>'+esc(k)+'<br><span class="m">'+cart[k].q+' × '+money(cart[k].p)+'</span></span><b>'+money(cart[k].p*cart[k].q)+'</b></div>';
+  h+='<div style="margin-top:8px"><div class="tot"><span>Subtotal</span><span>'+money(t.sub)+'</span></div><div class="tot"><span>Tax</span><span>'+money(t.tax)+'</span></div><div class="tot big"><span>Total</span><span>'+money(t.total)+'</span></div></div>';
+  h+=seat?'<button class="btn hot" type="button" data-send style="width:100%;justify-content:center;margin-top:12px;font-size:16px">Send my order</button>':'<button class="btn hot" type="button" data-pick style="width:100%;justify-content:center;margin-top:12px">🪑 Pick my seat</button>';
+  h+='<p class="sub" style="font-size:12px;margin-top:10px">Pay your server or bartender like normal. Members earn 10 points per $1.</p>';
+  $("sheetin").innerHTML=h; $("sheet").classList.add("on");
+}
+$("sheet").addEventListener("click",function(e){
+  if(e.target===$("sheet")||e.target.closest("[data-x]")){ $("sheet").classList.remove("on"); return; }
+  if(e.target.closest("[data-pick]")){ $("sheet").classList.remove("on"); $("seat").scrollIntoView({behavior:"smooth"}); return; }
+  if(e.target.closest("[data-send]")){
+    var t=totals(), num="M-"+(100+((Math.random()*900)|0)), earn=window.SSAI_EARN?window.SSAI_EARN(t.sub,"🍸 Order "+num+" · "+seatLabel()):null;
+    $("sheetin").innerHTML='<div class="ok"><div class="check"><svg viewBox="0 0 40 40"><path d="M9 21l8 8 15-17"/></svg></div><b>Order received</b><div class="code">'+num+'</div><div class="sub" style="margin:4px 0 0">'+esc(seatLabel())+' · '+money(t.total)+'</div>'+
+      (earn?'<div style="color:var(--gold2);font-weight:800;margin-top:6px">'+(earn.saved?'+'+earn.pts+' rewards points':'Join Melody Rewards below to earn +'+earn.pts+' points')+'</div>':'')+
+      '<p class="sub" style="font-size:12px;margin-top:8px">Preview build: live, this prints on Melody\'s ticket printer and pings your server.</p></div><button class="btn" type="button" data-x style="width:100%;justify-content:center;margin-top:10px">Done</button>';
+    cart={}; saveCart(); buzz([20,40,20]);
   }
-  function weekKey(){ var d=new Date(),t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
-    var day=t.getUTCDay()||7; t.setUTCDate(t.getUTCDate()+4-day);
-    var y=new Date(Date.UTC(t.getUTCFullYear(),0,1));
-    return t.getUTCFullYear()+"-W"+String(Math.ceil((((t-y)/86400000)+1)/7)).padStart(2,"0"); }
+});
+drawSeat(); saveCart();
+(function(){ var h=new Date().getHours(); $("greet").textContent=(h<12?"Good morning.":h<17?"Good afternoon.":"Good evening.")+" What sounds good?"; })();
+function flyToBar(fromImg){ if(reduce||!fromImg) return; var r=fromImg.getBoundingClientRect(), f=document.createElement("img"); f.src=fromImg.currentSrc||fromImg.src; f.className="flyimg";
+  f.style.left=(r.left+r.width/2-32)+"px"; f.style.top=(r.top+r.height/2-32)+"px"; document.body.appendChild(f);
+  var b=$("obtn").getBoundingClientRect(), tx=(b.left+40)-(r.left+r.width/2), ty=(b.top+b.height/2)-(r.top+r.height/2);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ f.style.transform="translate("+tx+"px,"+ty+"px) scale(.35)"; f.style.opacity=".3"; }); });
+  setTimeout(function(){ f.remove(); var o=$("obar"); o.classList.remove("bump"); void o.offsetWidth; o.classList.add("bump"); },720); }
 
-  // ---------------- QR landing ----------------
-  try{
-    new QRious({element:$("qr"), value:location.href, size:340, background:"#ffffff",
-      foreground:"#0b1220", level:"M"});
-  }catch(e){ $("qr").style.display="none"; }
-  var tp=$("tables");
-  [1,2,3,4,5,6,7,8,9,10,11,12].forEach(function(n){
-    var b=document.createElement("button"); b.textContent=n;
-    b.addEventListener("click",function(){
-      Array.prototype.forEach.call(tp.children,function(c){c.classList.toggle("on",c===b);});
-      state.table=n; persist();
-      $("enter").disabled=false; $("enter").textContent="Start at table "+n;
-    });
-    tp.appendChild(b);
+/* ---------------- Melody flyover: a jet on final approach crosses the screen every ~20s ---------------- */
+var FLY=new Image(); FLY.src="img/game/flyover.webp";
+function flyover(){
+  if(reduce||document.hidden||G.running||!FLY.complete||!FLY.naturalWidth) return;
+  var box=$("fly"), im=FLY.cloneNode(), sh=document.createElement("div"); sh.className="shadow";
+  box.appendChild(sh); box.appendChild(im);
+  var vw=innerWidth, vh=innerHeight, w=Math.min(560,vw*1.2), y0=vh*(0.06+Math.random()*0.12), dir=Math.random()<.5?1:-1;
+    var dur=5200, t0=performance.now();
+  (function step(now){ var p=Math.min(1,(now-t0)/dur), e=p, x=dir>0?-w+(vw+w*1.4)*e:vw+w*0.4-(vw+w*1.4)*e, s=0.72+0.38*p, y=y0+vh*0.05*p;
+    im.style.transform="translate("+x+"px,"+y+"px) scale("+(dir>0?-s:s)+","+s+") rotate(-3deg)";
+    sh.style.transform="translate("+(x+w*0.12)+"px,"+(y+vh*0.55)+"px) scale("+s+")"; sh.style.opacity=(0.5*Math.sin(p*Math.PI)).toFixed(2);
+    if(p<1) requestAnimationFrame(step); else { im.remove(); sh.remove(); } })(t0);
+}
+setTimeout(flyover,4000); setInterval(flyover,20000);
+
+/* ======================= GAME: Melody Approach ======================= */
+var cv=$("cv"), cx=cv.getContext("2d"), W=400, H=600, DPR=Math.min(2,window.devicePixelRatio||1);
+cv.width=W*DPR; cv.height=H*DPR; cx.scale(DPR,DPR);
+function img(src){ var i=new Image(); i.src=src; return i; }
+function ready(i){ return i&&i.complete&&i.naturalWidth; }
+var S={plane:img("img/game/plane.webp"),ufo:img("img/game/ufo.webp"),jet:img("img/game/jet.webp"),kami:img("img/game/plane.webp"),
+  theme:img("img/game/theme.webp"),innout:img("img/game/innout.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
+// pickups: Melody's real food + bar life. e = emoji fallback while the photo loads
+var PICK=[{k:"p_mac",n:"Mac & Cheese",p:80,e:"🧀",w:58},{k:"p_wings",n:"Lemon Pepper Wings",p:70,e:"🍗",w:60},{k:"p_toast",n:"French Toast",p:60,e:"🍞",w:58},
+  {k:"p_omelette",n:"Philly Omelette",p:60,e:"🍳",w:60},{k:"p_marg",n:"Mango Marg",p:50,e:"🍹",w:40},{k:"p_bottle",n:"Bottle service",p:40,e:"🍾",w:34},{k:"p_shots",n:"Round of shots",p:40,e:"🥃",w:46}];
+PICK.forEach(function(p){ p.im=img("img/game/"+p.k+".webp"); });
+var MIC={k:"p_mic",n:"Karaoke mic",e:"🎤",w:36}; MIC.im=img("img/game/p_mic.webp");
+var PLANE_W=86;
+var G={running:false,over:false};
+function shadowOf(im,a){ var c=document.createElement("canvas"), w=im.naturalWidth, h=im.naturalHeight; c.width=w; c.height=h; var x=c.getContext("2d"); x.drawImage(im,0,0); x.globalCompositeOperation="source-in"; x.fillStyle="rgba(0,0,0,"+a+")"; x.fillRect(0,0,w,h); return c; }
+var PSH=null;
+function fresh(){ return {running:false,over:false,x:W/2,y:H-110,tx:W/2,ty:H-110,vx:0,hp:100,score:0,t:60000,el:0,items:[],ens:[],shots:[],eshots:[],bolts:[],pops:[],fx:[],clouds:[],heals:0,lastHeal:0,
+  spawnT:600,ufoT:7000,jetT:13000,boltT:9000,kamiT:16000,shotT:0,inv:0,mult:1,multT:0,shake:0,flash:0,red:0,dying:0,scroll:0,ground:[],gy:0,warn:[]}; }
+G=fresh();
+for(var c=0;c<6;c++) G.clouds.push({x:Math.random()*W,y:Math.random()*H,s:120+Math.random()*120,v:2+Math.random()*1.5});
+function hud(){ $("score").textContent=G.score.toLocaleString(); $("time").textContent=Math.ceil(Math.max(0,G.t)/1000)+"s";
+  var hp=Math.max(0,Math.round(G.hp)), b=$("hpbar"); b.style.width=hp+"%"; b.className=hp>66?"":hp>33?"mid":"low"; $("hpn").textContent=hp+"%"; }
+function best(){ try{ return +localStorage.getItem("melody-best")||0; }catch(e){ return 0; } }
+function start(){ var keep=G.clouds; G=fresh(); G.clouds=keep; G.running=true; G.last=performance.now(); seedGround(); $("over").classList.remove("on"); hud(); }
+
+/* ---- the ground: Westchester at night, LAX runways and the landmarks rolling under you ---- */
+var SEQ=["melody","city","innout","runway","theme","city","runway","city"];
+function seedGround(){ G.ground=[]; G.gy=H; G.seq=0; while(G.gy>-400) addSeg(); }
+function addSeg(){ var k=SEQ[G.seq++%SEQ.length], h=k==="runway"?520:k==="city"?260:300; G.gy-=h; G.ground.push({k:k,y:G.gy,h:h,side:Math.random()<.5?-1:1}); }
+function drawGround(dy){
+  cx.fillStyle="#0c1220"; cx.fillRect(0,0,W,H);
+  for(var i=G.ground.length-1;i>=0;i--){ var g=G.ground[i]; g.y+=dy; if(g.y>H+40){ G.ground.splice(i,1); continue; } }
+  while(G.ground.length&&G.ground[G.ground.length-1].y>-420) { G.gy=G.ground[G.ground.length-1].y; addSeg(); }
+  // street grid with warm streetlights everywhere
+  var off=(G.scroll%80);
+  cx.strokeStyle="#1b2438"; cx.lineWidth=10;
+  for(var y=off-80;y<H+80;y+=80){ cx.beginPath(); cx.moveTo(0,y); cx.lineTo(W,y); cx.stroke(); }
+  for(var x=40;x<W;x+=110){ cx.beginPath(); cx.moveTo(x,0); cx.lineTo(x,H); cx.stroke(); }
+  for(y=off-80;y<H+80;y+=80) for(x=40;x<W;x+=110){ cx.fillStyle="rgba(255,190,90,.55)"; cx.beginPath(); cx.arc(x+6,y+6,1.6,0,6.283); cx.fill(); }
+  for(y=off-80;y<H+80;y+=80) for(x=55;x<W;x+=110){ cx.fillStyle="#141c2e"; cx.fillRect(x,y+10,80,58); cx.fillStyle="rgba(255,214,140,.10)"; cx.fillRect(x+8,y+18,16,10); cx.fillRect(x+50,y+40,14,10); }
+  G.ground.forEach(function(g){
+    if(g.k==="runway") drawRunway(g);
+    else if(g.k!=="city"){ var im=S[g.k]; if(ready(im)){ var w=g.k==="melody"?250:230, h=w*im.naturalHeight/im.naturalWidth, x=W/2+g.side*70-w/2;
+      cx.save(); cx.globalAlpha=.95; cx.drawImage(im,x,g.y+(g.h-h)/2,w,h); cx.restore();
+      if(g.k==="melody"){ cx.font="800 13px Barlow,system-ui"; cx.fillStyle="#f0d375"; cx.textAlign="center"; cx.fillText("★ MELODY BAR & GRILL ★",x+w/2,g.y+(g.h-h)/2+h+14); } } }
   });
-  $("enter").addEventListener("click",function(){
-    $("s-qr").classList.remove("on");
-    $("tablbl").textContent="Table "+state.table;
-    $("tablbl2").textContent="Table "+state.table;
-    go("s-menu");
-  });
+}
+function drawRunway(g){
+  var x=W*0.22, w=W*0.56, y=g.y, h=g.h;
+  cx.fillStyle="#2b2f37"; cx.fillRect(x,y,w,h);
+  cx.fillStyle="#3a3f49"; for(var k=0;k<h;k+=26) cx.fillRect(x+4,y+k,w-8,1);
+  cx.fillStyle="#e9e9e9"; for(k=12;k<h-30;k+=48) cx.fillRect(W/2-2.5,y+k,5,26);
+  for(k=0;k<6;k++){ cx.fillRect(x+12+k*9,y+h-46,5,36); cx.fillRect(x+w-17-k*9,y+h-46,5,36); }
+  cx.font="900 34px Anton,Impact,sans-serif"; cx.textAlign="center"; cx.fillText("25L",W/2,y+h-60);
+  for(k=0;k<h;k+=30){ cx.fillStyle="rgba(255,255,255,.85)"; cx.beginPath(); cx.arc(x-3,y+k,2,0,6.283); cx.arc(x+w+3,y+k,2,0,6.283); cx.fill(); }
+  var blink=(performance.now()/90|0)%10; for(k=0;k<7;k++){ cx.fillStyle=k===blink%7?"#fff":"rgba(255,230,140,.8)"; cx.beginPath(); cx.arc(W/2,y+h+16+k*14,k===blink%7?4:2.4,0,6.283); cx.fill(); }
+  cx.fillStyle="rgba(80,170,255,.75)"; for(k=0;k<h;k+=60){ cx.beginPath(); cx.arc(x-26,y+k,2,0,6.283); cx.arc(x+w+26,y+k,2,0,6.283); cx.fill(); }
+}
+function drawClouds(dy){ var sm=S.smoke; if(!ready(sm)) return;
+  G.clouds.forEach(function(c){ c.y+=dy*c.v*0.55; if(c.y>H+c.s){ c.y=-c.s-Math.random()*200; c.x=Math.random()*W; }
+    cx.globalAlpha=.16; cx.drawImage(sm,c.x-c.s,c.y-c.s*0.6,c.s*2,c.s*1.2); }); cx.globalAlpha=1; }
 
-  // ---------------- tabs ----------------
-  function go(id){
-    ["s-menu","s-order","s-play","s-rewards","s-info"].forEach(function(s){$(s).classList.toggle("on",s===id);});
-    Array.prototype.forEach.call($("tabbar").children,function(b){b.classList.toggle("on",b.dataset.s===id);});
-    if(id==="s-play"){ if(!running) startGame(); } else { running=false; }
-    if(id==="s-rewards"){ renderRewards(); renderBoard(); }
-    if(id==="s-order"){ renderCart(); }
-    if(id==="s-info"){ renderInfo(); }
+/* ---- spawning ---- */
+function spawnPick(){
+  var r=Math.random(), x=40+Math.random()*(W-80);
+  if(r<0.38) G.items.push({t:"coin",x:x,y:-30,r:14,spin:Math.random()*6});
+  else if(r<0.94) { var p=PICK[(Math.random()*PICK.length)|0]; G.items.push({t:"food",p:p,x:x,y:-40,r:24,rot:(Math.random()-.5)*.5,vr:(Math.random()-.5)*.03}); }
+  else G.items.push({t:"mic",x:x,y:-40,r:20,rot:0,vr:.04});
+  // health kits: rare, only when hurt, at most two a flight
+  if(G.hp<100&&G.heals<2&&G.el-G.lastHeal>12000&&G.el>9000&&Math.random()<0.12){ G.heals++; G.lastHeal=G.el; G.items.push({t:"heal",x:40+Math.random()*(W-80),y:-40,r:20}); }
+}
+function spawnUfo(){ G.ens.push({t:"ufo",x:60+Math.random()*(W-120),y:-50,r:28,hp:2,ph:Math.random()*6,fire:900+Math.random()*700,w:84}); }
+function spawnJet(){ var x=50+Math.random()*(W-100); G.warn.push({x:x,t:900,k:"jet"}); setTimeout(function(){ if(G.running&&!G.dying) G.ens.push({t:"jet",x:x,y:-70,r:24,hp:1,w:70,fired:0}); },900); }
+function spawnKami(){ // an airliner coming head-on, aimed at where you are: red flash + buzz first
+  var x=Math.max(60,Math.min(W-60,G.x+(Math.random()-.5)*60)); G.red=1; G.warn.push({x:x,t:1100,k:"kami"}); buzz([60,60,60,60,120]);
+  setTimeout(function(){ if(G.running&&!G.dying){ G.ens.push({t:"kami",x:x,y:-110,r:34,hp:4,w:120,vx:(G.x-x)/140}); } },1100); }
+function spawnBolt(){ var x=40+Math.random()*(W-80); if(Math.random()<.5) x=Math.max(40,Math.min(W-40,G.x)); G.bolts.push({x:x,ph:"warn",age:0}); }
+function pop(x,y,txt,col){ G.pops.push({x:x,y:y,txt:txt,col:col,a:1}); }
+
+/* ---- damage ---- */
+function hurt(x,y,why){
+  if(G.inv>0||G.dying) return;
+  G.hp-=100/3+0.01; G.inv=70; G.shake=14; G.flash=.4; pop(x,y-10,why,"#ff7a59"); buzz(G.hp<=0?[90,60,220]:70);
+  if(G.hp<=0){ G.hp=0; G.dying=performance.now(); G.dx=G.x; G.dyy=G.y; G.inv=1e9; G.shake=24; G.ens=[]; G.eshots=[]; G.bolts=[]; }
+}
+function emit(x,y,heavy){
+  if(Math.random()<(heavy?.9:.55)) G.fx.push({k:"s",x:x,y:y,vx:(Math.random()-.5)*.6,vy:1.4+Math.random(),s:6+Math.random()*5,g:.5,a:heavy?.6:.42,rot:Math.random()*6});
+  if(Math.random()<(heavy?.8:.5)) G.fx.push({k:"f",x:x+(Math.random()-.5)*8,y:y,vx:(Math.random()-.5)*.6,vy:1.2+Math.random(),s:7+Math.random()*5,g:-.05,a:.95,rot:(Math.random()-.5)*.4});
+}
+function boom(x,y,n){ for(var i=0;i<(n||18);i++){ var a=Math.random()*6.283,v=1+Math.random()*4; G.fx.push({k:"e",x:x,y:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,s:2+Math.random()*3,g:0,a:1}); }
+  for(i=0;i<6;i++) G.fx.push({k:"f",x:x+(Math.random()-.5)*20,y:y+(Math.random()-.5)*20,vx:(Math.random()-.5)*2,vy:(Math.random()-.5)*2,s:12+Math.random()*10,g:.2,a:1,rot:Math.random()*6}); }
+function drawFx(k){
+  for(var i=G.fx.length-1;i>=0;i--){ var p=G.fx[i]; p.x+=p.vx*k; p.y+=p.vy*k; p.s+=p.g*k; p.a-=(p.k==="f"?.045:p.k==="e"?.03:.012)*k; if(p.a<=0||p.s<=.5) G.fx.splice(i,1); }
+  G.fx.forEach(function(p){ if(p.k!=="s") return; cx.globalAlpha=Math.min(1,p.a); if(ready(S.smoke)){ cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot); cx.drawImage(S.smoke,-p.s,-p.s,p.s*2,p.s*2); cx.restore(); } });
+  cx.globalCompositeOperation="lighter";
+  G.fx.forEach(function(p){ cx.globalAlpha=Math.max(0,Math.min(1,p.a));
+    if(p.k==="f"&&ready(S.flame)){ var h=p.s*2.4, w=h*S.flame.naturalWidth/S.flame.naturalHeight; cx.save(); cx.translate(p.x,p.y); cx.rotate(Math.PI+p.rot); cx.drawImage(S.flame,-w/2,-h*.9,w,h); cx.restore(); }
+    else if(p.k==="e"){ cx.fillStyle="#ffcf6a"; cx.fillRect(p.x,p.y,p.s,p.s); } });
+  cx.globalCompositeOperation="source-over"; cx.globalAlpha=1;
+}
+
+/* ---- drawing ---- */
+function sprite(im,x,y,w,rot,flipY,emoji){
+  if(ready(im)){ var h=w*im.naturalHeight/im.naturalWidth; cx.save(); cx.translate(x,y); if(rot) cx.rotate(rot); if(flipY) cx.scale(1,-1); cx.drawImage(im,-w/2,-h/2,w,h); cx.restore(); return h; }
+  if(emoji){ cx.font=(w*0.8|0)+"px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText(emoji,x,y); } return w; }
+function drawPlane(x,y,roll,scale){
+  var im=S.plane, w=PLANE_W*(scale||1);
+  if(ready(im)){ if(!PSH) PSH=shadowOf(im,.45); var h=w*im.naturalHeight/im.naturalWidth;
+    cx.save(); cx.translate(x+26,y+34); cx.scale(Math.max(.72,1-Math.abs(roll)*.5)*.7,.7); cx.drawImage(PSH,-w/2,-h/2,w,h); cx.restore();
+    cx.save(); cx.translate(x,y); cx.rotate(roll*0.35); cx.scale(Math.max(.72,1-Math.abs(roll)*.5),1); cx.drawImage(im,-w/2,-h/2,w,h);
+    var bl=(performance.now()/500|0)%2; cx.fillStyle=bl?"#ff3b3b":"#3bff6b"; cx.beginPath(); cx.arc(-w*.47,h*.06,2.2,0,6.283); cx.fill(); cx.fillStyle=bl?"#3bff6b":"#ff3b3b"; cx.beginPath(); cx.arc(w*.47,h*.06,2.2,0,6.283); cx.fill();
+    cx.restore(); }
+  else { cx.font="56px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText("✈️",x,y); }
+}
+function drawCoin(it,now){ it.spin+=.11; var c=Math.cos(it.spin), sx=Math.max(1.5,Math.abs(c)*it.r), r=it.r;
+  cx.save(); cx.translate(it.x,it.y); var gl=cx.createRadialGradient(0,0,2,0,0,r*2); gl.addColorStop(0,"rgba(255,214,70,.45)"); gl.addColorStop(1,"rgba(255,214,70,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(0,0,r*2,0,6.283); cx.fill();
+  var fg=cx.createLinearGradient(-sx,-r,sx,r); fg.addColorStop(0,"#fff7c2"); fg.addColorStop(.4,"#ffd23f"); fg.addColorStop(.75,"#c88a0c"); fg.addColorStop(1,"#ffe38a");
+  cx.fillStyle="#8a5a06"; cx.beginPath(); cx.ellipse(1.5,0,sx,r,0,0,6.283); cx.fill(); cx.fillStyle=fg; cx.beginPath(); cx.ellipse(0,0,sx,r,0,0,6.283); cx.fill();
+  if(sx>6){ cx.fillStyle="#9b6a06"; cx.font="900 "+(r*1.1|0)+"px 'Playfair Display',Georgia,serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.save(); cx.scale(sx/r,1); cx.fillText("M",0,1); cx.restore(); }
+  cx.restore(); }
+function drawHeal(it,now){ var p=1+.08*Math.sin(now/150); cx.save(); cx.translate(it.x,it.y); cx.scale(p,p);
+  var g=cx.createRadialGradient(0,0,4,0,0,34); g.addColorStop(0,"rgba(80,255,150,.55)"); g.addColorStop(1,"rgba(80,255,150,0)"); cx.fillStyle=g; cx.beginPath(); cx.arc(0,0,34,0,6.283); cx.fill();
+  cx.fillStyle="#f4f7f5"; roundRect(-17,-15,34,30,7); cx.fill(); cx.strokeStyle="#2fae6a"; cx.lineWidth=2; cx.stroke();
+  cx.fillStyle="#26b864"; cx.fillRect(-4,-10,8,20); cx.fillRect(-10,-4,20,8);
+  cx.font="800 11px Barlow,system-ui"; cx.fillStyle="#9dffc8"; cx.textAlign="center"; cx.fillText("+25%",0,30); cx.restore(); }
+function roundRect(x,y,w,h,r){ cx.beginPath(); cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r); cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath(); }
+function boltPath(x){ var pts=[[x,-10]], y=-10; while(y<H){ y+=30+Math.random()*40; pts.push([x+(Math.random()-.5)*44,y]); } return pts; }
+
+/* ---- main loop ---- */
+function frame(now){
+  requestAnimationFrame(frame);
+  var dt=Math.min(50,now-(G.last||now)); G.last=now; var k=dt/16.67, run=G.running&&!G.dying;
+  var spd=run?2.4+Math.min(2.2,G.el/22000):1.2; G.scroll+=spd*k;
+  cx.save(); if(G.shake>0){ cx.translate((Math.random()-.5)*G.shake,(Math.random()-.5)*G.shake); G.shake*=.86; if(G.shake<.5) G.shake=0; }
+  if(!G.ground.length) seedGround();
+  drawGround(spd*k);
+  if(run){
+    G.t-=dt; G.el+=dt;
+    G.spawnT-=dt; if(G.spawnT<=0){ spawnPick(); G.spawnT=Math.max(420,820-G.el/80); }
+    G.ufoT-=dt; if(G.ufoT<=0){ spawnUfo(); G.ufoT=Math.max(4200,8000-G.el/20); }
+    G.jetT-=dt; if(G.jetT<=0){ spawnJet(); G.jetT=Math.max(5200,9500-G.el/18); }
+    G.boltT-=dt; if(G.boltT<=0){ spawnBolt(); G.boltT=Math.max(3800,7000-G.el/25); }
+    G.kamiT-=dt; if(G.kamiT<=0){ spawnKami(); G.kamiT=14000+Math.random()*6000; }
+    var ox=G.x; G.x+=(G.tx-G.x)*Math.min(1,.22*k); G.y+=(G.ty-G.y)*Math.min(1,.22*k); G.vx=(G.x-ox)/Math.max(.5,k);
+    if(G.inv>0) G.inv-=k; if(G.multT>0){ G.multT-=dt; if(G.multT<=0) G.mult=1; }
+    if(Math.floor(now/250)!==Math.floor((now-dt)/250)) G.score+=G.mult;
+    G.shotT-=dt; if(G.shotT<=0){ G.shots.push({x:G.x-22,y:G.y-20},{x:G.x+22,y:G.y-20}); G.shotT=260; }
   }
-  Array.prototype.forEach.call($("tabbar").children,function(b){
-    b.addEventListener("click",function(){ go(b.dataset.s); });
-  });
-
-  // ---------------- menu ----------------
-  function renderMenu(){
-    var h="";
-    MENU.forEach(function(sec){
-      h+='<div class="secthead">'+esc(sec.sec)+'</div>';
-      sec.items.forEach(function(it){
-        var q=state.cart[it.n]?state.cart[it.n].q:0;
-        h+='<div class="mi"><div><div class="nm">'+esc(it.n)+'</div>'+
-           (it.d?'<div class="ds">'+esc(it.d)+'</div>':'')+'</div>'+
-           '<div class="pr">'+esc(it.p||"")+'</div>'+
-           (q>0
-             ? '<div class="qty"><button data-m="'+esc(it.n)+'">&#8722;</button><span>'+q+
-               '</span><button data-a="'+esc(it.n)+'">+</button></div>'
-             : '<button class="add" data-a="'+esc(it.n)+'">+</button>')+
-           '</div>';
-      });
-    });
-    $("menu").innerHTML=h;
+  // lightning
+  for(var b=G.bolts.length-1;b>=0;b--){ var bo=G.bolts[b]; bo.age+=dt;
+    if(bo.ph==="warn"){ var a=.25+.25*Math.sin(bo.age/60); cx.fillStyle="rgba(191,230,255,"+(a*.35)+")"; cx.fillRect(bo.x-34,0,68,H); cx.strokeStyle="rgba(191,230,255,"+(.5+a)+")"; cx.setLineDash([10,8]); cx.lineWidth=2; cx.strokeRect(bo.x-34,2,68,H-4); cx.setLineDash([]);
+      cx.font="30px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText("⚡",bo.x,40);
+      if(bo.age>1000){ bo.ph="strike"; bo.age=0; bo.pts=boltPath(bo.x); G.flash=.5; G.shake=8; if(run&&Math.abs(G.x-bo.x)<46) hurt(G.x,G.y,T("⚡ LIGHTNING!")); } }
+    else { if(bo.age>260){ G.bolts.splice(b,1); continue; } var p=bo.pts; cx.save(); cx.strokeStyle="rgba(150,210,255,.45)"; cx.lineWidth=14; cx.beginPath(); p.forEach(function(q,i){ i?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1]); }); cx.stroke(); cx.strokeStyle="#fff"; cx.lineWidth=4; cx.shadowColor="#9fd8ff"; cx.shadowBlur=22; cx.stroke(); cx.restore(); } }
+  // pickups
+  for(var i=G.items.length-1;i>=0;i--){ var it=G.items[i]; if(run){ it.y+=spd*1.15*k; if(it.rot!=null) it.rot+=(it.vr||0)*k; }
+    if(it.y>H+60){ G.items.splice(i,1); continue; }
+    if(it.t==="coin") drawCoin(it,now);
+    else if(it.t==="heal") drawHeal(it,now);
+    else { var P=it.t==="mic"?MIC:it.p, bob=Math.sin(now/260+it.x)*3; var gl=cx.createRadialGradient(it.x,it.y,4,it.x,it.y,P.w*.8); gl.addColorStop(0,it.t==="mic"?"rgba(228,107,131,.55)":"rgba(240,211,117,.45)"); gl.addColorStop(1,"rgba(0,0,0,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(it.x,it.y,P.w*.8,0,6.283); cx.fill(); sprite(P.im,it.x,it.y+bob,P.w,it.rot,false,P.e); }
+    if(run&&Math.abs(it.x-G.x)<it.r+26&&Math.abs(it.y-G.y)<it.r+28){
+      if(it.t==="coin"){ G.score+=10*G.mult; pop(it.x,it.y,"+"+10*G.mult,"#f0d375"); }
+      else if(it.t==="heal"){ var before=G.hp; G.hp=Math.min(100,G.hp+25); pop(it.x,it.y,"+"+Math.round(G.hp-before)+"% health","#7dffb5"); buzz(30); }
+      else if(it.t==="mic"){ G.mult=2; G.multT=6000; pop(it.x,it.y,T("🎤 Karaoke! 2× points"),"#ff9db0"); buzz([20,30,20]); }
+      else { G.score+=it.p.p*G.mult; pop(it.x,it.y,"+"+it.p.p*G.mult+" "+T(it.p.n),"#f0d375"); }
+      G.items.splice(i,1); } }
+  // warnings for jets and kamikaze planes
+  for(var w=G.warn.length-1;w>=0;w--){ var wn=G.warn[w]; wn.t-=dt; if(wn.t<=0){ G.warn.splice(w,1); continue; } var fl=(now/120|0)%2;
+    cx.fillStyle=wn.k==="kami"?(fl?"rgba(255,40,40,.95)":"rgba(255,200,200,.95)"):(fl?"rgba(255,180,60,.9)":"rgba(255,240,200,.9)");
+    cx.beginPath(); cx.moveTo(wn.x,46); cx.lineTo(wn.x-16,18); cx.lineTo(wn.x+16,18); cx.closePath(); cx.fill();
+    cx.font="900 13px Barlow,system-ui"; cx.textAlign="center"; cx.fillText(wn.k==="kami"?T("INCOMING PLANE!"):T("JET!"),wn.x,62); }
+  // enemies
+  for(var e=G.ens.length-1;e>=0;e--){ var en=G.ens[e];
+    if(run){ if(en.t==="ufo"){ en.ph+=.03*k; en.y+=1.1*k; en.x+=Math.sin(en.ph)*1.6*k; en.fire-=dt; if(en.fire<=0&&en.y>20){ var ang=Math.atan2(G.y-en.y,G.x-en.x); G.eshots.push({x:en.x,y:en.y+12,vx:Math.cos(ang)*3.6,vy:Math.sin(ang)*3.6,c:"#7ef7c8",r:6}); en.fire=1700+Math.random()*900; } }
+      else if(en.t==="jet"){ en.y+=7.5*k; if(!en.fired&&en.y>60){ en.fired=1; G.eshots.push({x:en.x-14,y:en.y+30,vx:0,vy:9,c:"#ff5a3c",r:4,missile:1},{x:en.x+14,y:en.y+30,vx:0,vy:9,c:"#ff5a3c",r:4,missile:1}); } }
+      else if(en.t==="kami"){ en.y+=5.2*k; en.x+=en.vx*k; if(Math.random()<.5) G.fx.push({k:"s",x:en.x+(Math.random()-.5)*30,y:en.y-40,vx:0,vy:-1,s:4,g:.25,a:.25,rot:0}); } }
+    if(en.y>H+120||en.x<-120||en.x>W+120){ G.ens.splice(e,1); continue; }
+    if(en.t==="ufo"){ var gg=cx.createRadialGradient(en.x,en.y+16,2,en.x,en.y+16,60); gg.addColorStop(0,"rgba(126,247,200,.35)"); gg.addColorStop(1,"rgba(126,247,200,0)"); cx.fillStyle=gg; cx.beginPath(); cx.arc(en.x,en.y+16,60,0,6.283); cx.fill(); sprite(S.ufo,en.x,en.y,en.w,0,false,"🛸"); }
+    else if(en.t==="jet") sprite(S.jet,en.x,en.y,en.w,0,false,"🛩️");
+    else { // head-on airliner: nose down, landing lights blazing
+      cx.save(); cx.globalCompositeOperation="lighter"; var lg=cx.createRadialGradient(en.x,en.y+50,2,en.x,en.y+50,90); lg.addColorStop(0,"rgba(255,250,220,.55)"); lg.addColorStop(1,"rgba(255,250,220,0)"); cx.fillStyle=lg; cx.beginPath(); cx.arc(en.x,en.y+50,90,0,6.283); cx.fill(); cx.restore();
+      sprite(S.kami,en.x,en.y,en.w,Math.PI,false,"✈️"); }
+    if(run&&Math.abs(en.x-G.x)<en.r+22&&Math.abs(en.y-G.y)<en.r+26){ hurt(en.x,en.y,en.t==="kami"?T("💥 Mid-air hit!"):en.t==="ufo"?T("🛸 Abducted!"):T("💥 Jet hit!")); boom(en.x,en.y,24); G.ens.splice(e,1); } }
+  // your shots
+  cx.fillStyle="#f0d375";
+  for(var s=G.shots.length-1;s>=0;s--){ var sh=G.shots[s]; sh.y-=11*k; if(sh.y<-10){ G.shots.splice(s,1); continue; }
+    cx.fillRect(sh.x-1.5,sh.y,3,12);
+    for(var e2=G.ens.length-1;e2>=0;e2--){ var en2=G.ens[e2]; if(Math.abs(sh.x-en2.x)<en2.r&&Math.abs(sh.y-en2.y)<en2.r){ en2.hp--; G.shots.splice(s,1);
+      if(en2.hp<=0){ var pts=en2.t==="ufo"?150:en2.t==="jet"?200:300; G.score+=pts*G.mult; pop(en2.x,en2.y,"+"+pts*G.mult+(en2.t==="ufo"?" UFO down":en2.t==="jet"?" Jet down":" Plane turned away"),"#7ef7c8"); boom(en2.x,en2.y,22); G.ens.splice(e2,1); }
+      break; } } }
+  // enemy fire
+  for(var q=G.eshots.length-1;q>=0;q--){ var es=G.eshots[q]; if(run){ es.x+=es.vx*k; es.y+=es.vy*k; } if(es.y>H+20||es.y<-20||es.x<-20||es.x>W+20){ G.eshots.splice(q,1); continue; }
+    cx.save(); cx.shadowColor=es.c; cx.shadowBlur=12; cx.fillStyle=es.c; if(es.missile){ cx.fillRect(es.x-2,es.y-12,4,14); cx.fillStyle="rgba(255,200,120,.8)"; cx.fillRect(es.x-1.5,es.y-22,3,10); } else { cx.beginPath(); cx.arc(es.x,es.y,es.r,0,6.283); cx.fill(); } cx.restore();
+    if(run&&Math.abs(es.x-G.x)<20&&Math.abs(es.y-G.y)<24){ G.eshots.splice(q,1); hurt(G.x,G.y,es.missile?T("🚀 Missile hit!"):T("🛸 Zapped!")); } }
+  // the plane
+  if(G.dying){ var d=(now-G.dying)/1000, sc=Math.max(.25,1-d*.35);
+    if(d<2.2){ emit(G.dx,G.dyy,true); emit(G.dx,G.dyy,true); G.dx+=Math.sin(d*6)*1.2; G.dyy+=1.2; drawFx(k); cx.save(); cx.translate(G.dx,G.dyy); cx.rotate(d*2.4); cx.translate(-G.dx,-G.dyy); drawPlane(G.dx,G.dyy,0,sc); cx.restore(); }
+    else { if(!G.boomed){ G.boomed=1; boom(G.dx,G.dyy,40); G.shake=20; G.flash=.8; } drawFx(k); }
+    var ta=Math.min(1,d/.35); cx.save(); cx.globalAlpha=ta; cx.translate(W/2,H*.38); cx.font="400 60px Anton,Impact,sans-serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.lineWidth=6; cx.strokeStyle="#111"; cx.strokeText(T("MAYDAY!"),0,0); cx.fillStyle="#ff4a3a"; cx.fillText(T("MAYDAY!"),0,0); cx.font="800 17px Barlow,system-ui"; cx.fillStyle="#f0d375"; cx.fillText(T("Going down by LAX"),0,40); cx.restore();
+    if(d>3.1){ G.dying=0; end(); } }
+  else {
+    if(run&&G.hp<67) emit(G.x+(G.hp<34?18:-18),G.y+8,G.hp<34);
+    if(run&&G.hp<34) emit(G.x-18,G.y+8,false);
+    drawFx(k);
+    if(G.inv<=0||Math.floor(G.inv/6)%2===0) drawPlane(G.x,G.y,Math.max(-1,Math.min(1,G.vx*.12)),1);
   }
-  function priceOf(name){
-    for(var i=0;i<MENU.length;i++) for(var j=0;j<MENU[i].items.length;j++)
-      if(MENU[i].items[j].n===name) return parseFloat((MENU[i].items[j].p||"0").replace(/[^0-9.]/g,""))||0;
-    return 0;
-  }
-  document.addEventListener("click",function(e){
-    var a=e.target.closest("[data-a]"), m=e.target.closest("[data-m]");
-    if(a){ var n=a.dataset.a; state.cart[n]=state.cart[n]||{q:0,p:priceOf(n)};
-      state.cart[n].q++; persist(); renderMenu(); renderBadge(); bar(n+" added"); }
-    if(m){ var n2=m.dataset.m; if(state.cart[n2]){ state.cart[n2].q--;
-      if(state.cart[n2].q<=0) delete state.cart[n2]; persist(); renderMenu(); renderBadge(); } }
-  });
-  function renderBadge(){
-    var n=0; for(var k in state.cart) n+=state.cart[k].q;
-    var b=$("cartbadge"); b.textContent=n; b.classList.toggle("on",n>0);
-    $("send").disabled = n===0;
-  }
+  drawClouds(spd*k);
+  for(var pI=G.pops.length-1;pI>=0;pI--){ var po=G.pops[pI]; po.y-=1.1*k; po.a-=.02*k; if(po.a<=0){ G.pops.splice(pI,1); continue; } cx.globalAlpha=po.a; cx.fillStyle=po.col; cx.font="800 17px Barlow,system-ui"; cx.textAlign="center"; cx.fillText(po.txt,po.x,po.y); cx.globalAlpha=1; }
+  if(G.mult>1&&run){ cx.fillStyle="rgba(228,107,131,.9)"; cx.font="900 16px Barlow,system-ui"; cx.textAlign="left"; cx.fillText("🎤 2× "+Math.ceil(G.multT/1000)+"s",10,24); }
+  if(G.red>0){ var rg=cx.createRadialGradient(W/2,H/2,H*.3,W/2,H/2,H*.75); rg.addColorStop(0,"rgba(255,0,0,0)"); rg.addColorStop(1,"rgba(255,0,0,"+(.55*G.red*(.6+.4*Math.sin(now/60)))+")"); cx.fillStyle=rg; cx.fillRect(0,0,W,H); G.red-=.012*k; }
+  if(G.flash>0){ cx.fillStyle="rgba(225,240,255,"+G.flash+")"; cx.fillRect(0,0,W,H); G.flash-=.05*k; }
+  cx.restore();
+  if(!G.running){ cx.fillStyle="rgba(5,8,26,.55)"; cx.fillRect(0,0,W,H); cx.textAlign="center"; cx.textBaseline="middle";
+    cx.fillStyle="#efe4c9"; cx.font="italic 900 40px 'Playfair Display',Georgia,serif"; cx.fillText(G.over?T("Flight over"):T("Melody Approach"),W/2,H/2-46);
+    cx.fillStyle="#f0d375"; cx.font="800 22px Barlow,system-ui"; cx.fillText(T("TAP TO FLY"),W/2,H/2+4);
+    cx.fillStyle="#c9d2ee"; cx.font="600 14px Barlow,system-ui"; cx.fillText(T("Drag anywhere to steer · 60 seconds"),W/2,H/2+34); }
+  if(G.running){ hud(); if(G.t<=0&&!G.dying) end(); }
+}
+function end(){
+  G.running=false; G.over=true; hud();
+  var b=best(); if(G.score>b){ try{ localStorage.setItem("melody-best",G.score); }catch(e){} }
+  $("final").textContent=G.score.toLocaleString()+" pts";
+  var prize=G.score>=3000?"a Free appetizer":G.score>=2200?"Free Gilroy Garlic Fries":G.score>=1500?"Free Melody Fries":G.score>=800?"$3 off any drink":"";
+  $("rank").textContent=prize?"🏆 You won "+prize.replace(/^a /,"a "):"Best: "+Math.max(b,G.score).toLocaleString()+" pts · 800 wins a prize";
+  var won=$("won"); won.style.display="none";
+  if(prize&&window.SSAI_WIN){ var r=window.SSAI_WIN(prize.replace(/^a /,""));
+    won.innerHTML="🏆 You won "+esc(prize)+"!<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#f0d375;letter-spacing:.1em\">"+r.prize.c+"</span><br><span style=\"font-weight:600;font-size:13px;color:#c9d2ee\">"+(r.saved?"Saved to your Melody Rewards. Show it to your server.":"Join Melody Rewards below to save it.")+"</span>"; won.style.display="block"; }
+  $("over").classList.add("on");
+}
+requestAnimationFrame(frame);
+// steer: drag anywhere; the plane follows your finger's movement, not its position, so your thumb never covers it
+var drag=null;
+cv.addEventListener("pointerdown",function(e){ e.preventDefault(); if(!G.running){ start(); return; }
+  var r=cv.getBoundingClientRect(); drag={id:e.pointerId,px:e.clientX,py:e.clientY,sx:G.tx,sy:G.ty,k:W/r.width}; try{ cv.setPointerCapture(e.pointerId); }catch(x){} });
+cv.addEventListener("pointermove",function(e){ if(!drag||!G.running) return; e.preventDefault();
+  G.tx=Math.max(30,Math.min(W-30,drag.sx+(e.clientX-drag.px)*drag.k*1.25)); G.ty=Math.max(H*.32,Math.min(H-50,drag.sy+(e.clientY-drag.py)*drag.k*1.25)); });
+["pointerup","pointercancel"].forEach(function(t){ cv.addEventListener(t,function(){ drag=null; }); });
+addEventListener("keydown",function(e){ if(!G.running) return; var m={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[e.key]; if(!m) return; e.preventDefault(); G.tx=Math.max(30,Math.min(W-30,G.tx+m[0])); G.ty=Math.max(H*.32,Math.min(H-50,G.ty+m[1])); });
+$("again").addEventListener("click",function(){ start(); cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
+hud();
 
-  // ---------------- order ----------------
-  function cartTotals(){
-    var sub=0; for(var k in state.cart) sub+=state.cart[k].p*state.cart[k].q;
-    var disc=0, ap=state.applied;
-    if(ap){
-      if(ap.pct) disc=sub*ap.pct;
-      else if(ap.off) disc=Math.min(ap.off,sub);
-    }
-    var taxed=Math.max(0,sub-disc);
-    return {sub:sub,disc:disc,tax:taxed*TAX,total:taxed+taxed*TAX};
-  }
-  function renderCart(){
-    var keys=Object.keys(state.cart);
-    if(!keys.length){
-      $("cart").innerHTML='<div class="empty">Nothing yet. Go pick something off the menu.</div>';
-      $("ordertotals").innerHTML=""; renderBadge(); return;
-    }
-    var h="";
-    keys.forEach(function(k){
-      var c=state.cart[k];
-      h+='<div class="line"><div><div class="nm">'+esc(k)+'</div>'+
-         '<div class="meta">'+c.q+' &#215; '+money(c.p)+'</div></div>'+
-         '<div class="amt">'+money(c.p*c.q)+'</div></div>';
-    });
-    $("cart").innerHTML=h;
-    var t=cartTotals();
-    var th='<div class="totals">'+
-      '<div class="trow"><span>Subtotal</span><span class="v">'+money(t.sub)+'</span></div>';
-    if(t.disc>0) th+='<div class="trow disc"><span>'+esc(state.applied.name)+'</span>'+
-      '<span class="v">&#8722;'+money(t.disc)+'</span></div>';
-    th+='<div class="trow"><span>Tax</span><span class="v">'+money(t.tax)+'</span></div>'+
-      '<div class="trow big"><span>Total</span><span class="v">'+money(t.total)+'</span></div></div>';
-    $("ordertotals").innerHTML=th;
-    renderBadge();
-  }
-  $("clear").addEventListener("click",function(){
-    state.cart={}; state.applied=null; persist(); renderCart(); renderMenu(); renderBadge();
-    $("sent").style.display="none";
-  });
-  $("send").addEventListener("click",function(){
-    var t=cartTotals(), n="ML-"+String(Math.floor(100+Math.random()*900));
-    $("sent").style.display="block";
-    $("sent").innerHTML='<div class="codebox"><div class="k">'+n+'</div>'+
-      '<div class="w">Sent to the kitchen for table '+state.table+' &#183; '+money(t.total)+
-      '<br>In the real build this drops straight onto their ticket printer.</div></div>';
-    bar("Order sent to the kitchen");
-  });
-
-  // ---------------- rewards ----------------
-  function renderRewards(){
-    $("starbig").textContent=state.stars.toLocaleString();
-    $("starnote").textContent=STAR_RATE+" points = 1 star";
-    var h="";
-    STAR_TIERS.forEach(function(t,i){
-      var ok=state.stars>=t.stars, need=t.stars-state.stars;
-      h+='<div class="tier'+(ok?" hit":"")+'"><span class="pts">'+t.stars+' &#11088;</span>'+
-        '<span class="nm">'+esc(t.name)+'<small>'+
-        (ok?esc(t.note):need+" more &#11088; &#183; about "+Math.ceil(need*STAR_RATE/4000)+" more good runs")+
-        '</small></span>'+
-        (ok?'<button data-r="'+i+'">Use it</button>':'<span class="lock">&#128274;</span>')+'</div>';
-    });
-    $("tiers").innerHTML=h;
-  }
-  document.addEventListener("click",function(e){
-    var r=e.target.closest("[data-r]"); if(!r)return;
-    var t=STAR_TIERS[Number(r.dataset.r)];
-    if(state.stars<t.stars)return;
-    state.stars-=t.stars;
-    state.applied={name:t.name,pct:t.pct,off:t.off};
-    persist();
-    var code="MEL-"+String(Math.floor(1000+Math.random()*9000));
-    $("codewrap").style.display="block";
-    $("codewrap").innerHTML='<div class="codebox"><div class="k">'+code+'</div>'+
-      '<div class="w">'+esc(t.name)+' &#183; '+t.stars+' &#11088; redeemed.<br>'+
-      'Applied to your order. Show your server before you close out.</div></div>';
-    renderRewards(); renderShop(); renderCart(); bar(t.name+" applied to your order");
-  });
-  // ---------------- discount catalog ----------------
-  var shopFilter="All";
-  function renderShop(){
-    var tags=["All"].concat(STAR_TIERS.map(function(t){return t.tag;})
-      .filter(function(v,i,a){return a.indexOf(v)===i;}));
-    $("chips").innerHTML=tags.map(function(t){
-      return '<button class="chip'+(t===shopFilter?" on":"")+'" data-c="'+t+'">'+t+'</button>';
-    }).join("");
-    var list=STAR_TIERS.filter(function(t){return shopFilter==="All"||t.tag===shopFilter;});
-    $("shop").innerHTML=list.map(function(t){
-      var i=STAR_TIERS.indexOf(t), ok=state.stars>=t.stars, need=t.stars-state.stars;
-      return '<div class="tier'+(ok?" hit":"")+'"><span class="pts">'+t.stars+' &#11088;</span>'+
-        '<span class="nm">'+esc(t.name)+'<small>'+
-        (ok?esc(t.note):esc(t.note)+" &#183; "+need+" more &#11088;")+'</small></span>'+
-        (ok?'<button data-r="'+i+'">Use it</button>':'<span class="lock">&#128274;</span>')+'</div>';
-    }).join("");
-  }
-  document.addEventListener("click",function(e){
-    var c=e.target.closest("[data-c]"); if(!c)return;
-    shopFilter=c.dataset.c; renderShop();
-  });
-  Array.prototype.forEach.call(document.querySelectorAll(".subtab"),function(b){
-    b.addEventListener("click",function(){
-      document.querySelectorAll(".subtab").forEach(function(x){x.classList.toggle("on",x===b);});
-      document.querySelectorAll(".view").forEach(function(v){v.classList.toggle("on",v.id===b.dataset.v);});
-      if(b.dataset.v==="v-shop") renderShop();
-    });
-  });
-
-  // ---------------- Melody info ----------------
-  // Approximate storefront coords for the distance estimate. Directions use the
-  // address string itself, so turn-by-turn is exact regardless.
-  var MEL={lat:33.9487,lng:-118.3918};
-  function miles(a,b){
-    var R=3958.8, dLat=(b.lat-a.lat)*Math.PI/180, dLng=(b.lng-a.lng)*Math.PI/180;
-    var la1=a.lat*Math.PI/180, la2=b.lat*Math.PI/180;
-    var h=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.sin(dLng/2)*Math.sin(dLng/2)*Math.cos(la1)*Math.cos(la2);
-    return 2*R*Math.asin(Math.sqrt(h));
-  }
-  var askedGeo=false;
-  function renderInfo(){
-    if(askedGeo||!navigator.geolocation) return;
-    askedGeo=true;
-    $("dist").textContent="Checking how far you are\u2026";
-    navigator.geolocation.getCurrentPosition(function(pos){
-      var d=miles({lat:pos.coords.latitude,lng:pos.coords.longitude},MEL);
-      $("dist").textContent = d<0.2 ? "You're here \u2014 welcome in"
-        : "About "+(d<10?d.toFixed(1):Math.round(d))+" miles away";
-    },function(){
-      $("dist").textContent="9132 S Sepulveda Blvd \u00b7 right by LAX";
-    },{timeout:8000,maximumAge:600000});
-  }
-  $("pushon").addEventListener("change",function(e){
-    $("pushprev").style.display=e.target.checked?"block":"none";
-    if(e.target.checked){
-      bar("Notifications on \u2014 this is what they'd look like");
-      if("Notification" in window && Notification.permission==="default"){
-        try{ Notification.requestPermission(); }catch(err){}
-      }
-    }
-  });
-  $("resbtn").addEventListener("click",function(){
-    var f=$("resform");
-    if(f.style.display==="block"){ f.style.display="none"; return; }
-    f.style.display="block";
-    f.innerHTML='<div class="info-card">'+
-      '<div class="lab">Party size</div>'+
-      '<div class="chips" style="margin:6px 0 12px">'+
-        [2,3,4,5,6,8,10].map(function(n,i){
-          return '<button class="chip'+(i===0?" on":"")+'" data-party="'+n+'">'+n+'</button>';}).join("")+
-      '</div>'+
-      '<div class="lab">Time tonight</div>'+
-      '<div class="chips" style="margin:6px 0 12px">'+
-        ["5:30","6:00","6:30","7:00","7:30","8:00","8:30"].map(function(t,i){
-          return '<button class="chip'+(i===3?" on":"")+'" data-time="'+t+'">'+t+'</button>';}).join("")+
-      '</div>'+
-      '<button class="btn" id="resgo">Request it</button></div>';
-  });
-  var resParty=2,resTime="7:00";
-  document.addEventListener("click",function(e){
-    var pb=e.target.closest("[data-party]"), tb=e.target.closest("[data-time]"), g=e.target.closest("#resgo");
-    if(pb){ resParty=Number(pb.dataset.party);
-      document.querySelectorAll("[data-party]").forEach(function(x){x.classList.toggle("on",x===pb);}); }
-    if(tb){ resTime=tb.dataset.time;
-      document.querySelectorAll("[data-time]").forEach(function(x){x.classList.toggle("on",x===tb);}); }
-    if(g){
-      $("resform").innerHTML='<div class="codebox"><div class="k">MEL-R'+
-        String(Math.floor(100+Math.random()*900))+'</div><div class="w">Table for '+resParty+
-        ' at '+resTime+' requested.<br>In the real build this hits their reservation book and texts you back to confirm.</div></div>';
-      bar("Reservation requested for "+resParty+" at "+resTime);
-    }
-  });
-
-  function renderBoard(){
-    var wk=weekKey(), rows=state.board.filter(function(b){return b.week===wk;})
-      .sort(function(a,b){return b.score-a.score;}).slice(0,10);
-    if(!rows.length){ $("board").innerHTML='<p class="sub" style="font-size:.85rem">No scores yet this week. First one on the board is winning.</p>'; return; }
-    $("board").innerHTML=rows.map(function(r,i){
-      return '<div class="lb'+(r.name===state.me?" me":"")+'"><span class="rk">'+
-        (i===0?"\ud83d\udc51":i+1)+'</span><span>'+esc(r.name)+'</span>'+
-        '<span class="sc">'+r.score.toLocaleString()+'</span></div>';
-    }).join("");
-  }
-
-  // ---------------------------------------------------------------- game
-  var cv=$("cv"), ctx=cv.getContext("2d");
-  var W=0,H=0,dpr=Math.min(devicePixelRatio||1,2);
-  function size(){var r=$("app").getBoundingClientRect();
-    W=cv.width=Math.floor(r.width*dpr); H=cv.height=Math.floor(r.height*dpr);}
-  addEventListener("resize",size,{passive:true});
-
-  var plane,items,ufos,rocks,shots,enemyShots,boom,trail,stars,fire=[];
-  var score,lives,lastRunStars=0,running=false,t0,lastSpawn,lastUfo,lastRock,lastShot,speed,invuln,raf,groundX=0,sky=0;
-
-  function start(){
-    size(); running=true;
-    plane={x:W*0.22,y:H*0.55,tx:W*0.22,ty:H*0.55,r:20*dpr,tilt:0,dmg:0,spots:[],dying:0,vy:0,gone:0};fire=[];
-    items=[];ufos=[];rocks=[];shots=[];enemyShots=[];boom=[];trail=[];boards=[];lastBoard=0;
-    score=0;lives=3;lastRunStars=0;invuln=0;speed=3.6*dpr;
-    t0=performance.now();lastSpawn=0;lastUfo=0;lastRock=0;lastShot=0;
-    renderLives(); $("score").textContent="0";
-    $("bankhud").innerHTML="⭐ "+state.stars.toLocaleString()+" &nbsp;·&nbsp; +0 this run";
-    cancelAnimationFrame(raf); raf=requestAnimationFrame(loop);
-  }
-  function renderLives(){
-    var w=$("lives"); w.innerHTML="";
-    for(var i=0;i<3;i++){var s=document.createElement("span");
-      s.className="life"+(i<lives?"":" gone"); s.textContent="⛽"; w.appendChild(s);}
-  }
-  function clampX(x){ return Math.max(plane.r+10*dpr, Math.min(W*0.72, x)); }
-  function clampY(y){ return Math.max(plane.r+8*dpr, Math.min(H-plane.r-46*dpr, y)); }
-  // Thumb drags the plane anywhere: left, right, up, down.
-  function pointerXY(e){
-    var r=cv.getBoundingClientRect();
-    var px=(e.touches?e.touches[0].clientX:e.clientX), py=(e.touches?e.touches[0].clientY:e.clientY);
-    plane.tx=clampX((px-r.left)*dpr);
-    plane.ty=clampY((py-r.top)*dpr);
-  }
-  var dragging=false;
-  cv.addEventListener("pointerdown",function(e){ if(!running)return;
-    e.preventDefault(); dragging=true; pointerXY(e); },{passive:false});
-  cv.addEventListener("pointermove",function(e){ if(!running||!dragging)return;
-    e.preventDefault(); pointerXY(e); },{passive:false});
-  ["pointerup","pointercancel","pointerleave"].forEach(function(ev){
-    cv.addEventListener(ev,function(){ dragging=false; });
-  });
-  // Desktop: all four arrow keys.
-  var keys={};
-  addEventListener("keydown",function(e){
-    if(!running)return;
-    if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.key)>-1){ keys[e.key]=true; e.preventDefault(); }
-  });
-  addEventListener("keyup",function(e){ keys[e.key]=false; });
-  function applyKeys(){
-    var step=9*dpr;
-    if(keys.ArrowUp)    plane.ty=clampY(plane.ty-step);
-    if(keys.ArrowDown)  plane.ty=clampY(plane.ty+step);
-    if(keys.ArrowLeft)  plane.tx=clampX(plane.tx-step);
-    if(keys.ArrowRight) plane.tx=clampX(plane.tx+step);
-  }
-  function toast(m){var el=$("toast");el.textContent=m;
-    el.classList.remove("pop");void el.offsetWidth;el.classList.add("pop");}
-  function explode(x,y,c){
-    for(var i=0;i<14;i++){
-      var a=Math.random()*6.283,v=(1+Math.random()*3.4)*dpr;
-      boom.push({x:x,y:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:(1.5+Math.random()*2.6)*dpr,a:1,c:c});
-    }
-  }
-
-  function loop(now){
-    if(!running)return;
-    var el=now-t0;
-    ctx.clearRect(0,0,W,H);
-    backdrop(now);
-
-    speed=Math.min(3.4*dpr+el/17000*dpr,7.2*dpr);
-
-    // ---- spawning ----
-    var gap=Math.max(620-el/40,380);
-    if(now-lastSpawn>gap){
-      var f=FOOD[(Math.random()*FOOD.length)|0];
-      items.push({x:W+40*dpr,y:50*dpr+Math.random()*(H-150*dpr),r:18*dpr,e:f.e,n:f.n,p:f.p,bob:Math.random()*6});
-      lastSpawn=now;
-    }
-    if(el>6000 && now-lastUfo>Math.max(5200-el/26,2600)){
-      ufos.push({x:W+50*dpr,y:60*dpr+Math.random()*(H*0.6),r:22*dpr,
-        hover:Math.random()*6,fire:now+600+Math.random()*700,hp:1});
-      lastUfo=now;
-    }
-    if(el>10000 && now-lastRock>Math.max(3400-el/30,1500)){
-      rocks.push({x:Math.random()*W*0.85+W*0.25,y:-40*dpr,r:17*dpr,
-        vx:-(0.5+Math.random()*1.1)*dpr,vy:(2.2+Math.random()*1.8)*dpr,spin:0});
-      lastRock=now;
-    }
-    // auto-fire so it stays one-thumb
-    if(!plane.dying && now-lastShot>270){ shots.push({x:plane.x+plane.r*1.4,y:plane.y,r:5*dpr}); lastShot=now; }
-
-    // ---- plane ----
-    if(plane.dying){
-      // going down in flames: nose drops, spins toward the ground, explodes on impact
-      if(!plane.gone){
-        // timed fall (same on 60Hz and 120Hz phones): small pop up, then nose-first into the ground over ~2s
-        var ft=(now-plane.dying)/1000, FT=2.0, gy=H*0.84, v0=-H*0.12;
-        var g=2*((gy-plane.y0)-v0*FT)/(FT*FT);
-        plane.y=plane.y0+v0*ft+0.5*g*ft*ft; plane.x=plane.x0+W*0.12*ft;
-        plane.tilt=Math.min(1.35,-0.25+ft*0.85);
-        if(ft>=FT){
-          plane.gone=now;
-          explode(plane.x,plane.y,"255,190,60");explode(plane.x,plane.y,"240,90,40");explode(plane.x,plane.y,"90,90,90");
-          for(var q=0;q<26;q++) fire.push({x:plane.x,y:plane.y,vx:(Math.random()-0.5)*7*dpr,vy:-(1+Math.random()*4)*dpr,r:(6+Math.random()*10)*dpr,life:1});
-        }
-      } else if(now-plane.gone>900){ end(); return; }
-    } else {
-    applyKeys();
-    var dy=(plane.ty-plane.y)*0.18; plane.y+=dy;
-    var dx=(plane.tx-plane.x)*0.16; plane.x+=dx;
-    plane.tilt=Math.max(-0.4,Math.min(0.4,dy*0.02));
-    }
-    if(invuln>0)invuln--;
-
-    // ---- player shots ----
-    for(var i=shots.length-1;i>=0;i--){
-      var s=shots[i]; s.x+=13*dpr;
-      if(s.x>W+20*dpr){shots.splice(i,1);continue;}
-      ctx.fillStyle="#f0d375"; ctx.shadowColor="#f0d375"; ctx.shadowBlur=10*dpr;
-      ctx.beginPath();ctx.ellipse(s.x,s.y,s.r*1.7,s.r*0.62,0,0,6.283);ctx.fill();
-      ctx.shadowBlur=0;
-      var hit=false;
-      for(var u=ufos.length-1;u>=0;u--){
-        var uf=ufos[u];
-        if(Math.hypot(s.x-uf.x,s.y-uf.y)<uf.r){
-          explode(uf.x,uf.y,"126,247,200"); ufos.splice(u,1); shots.splice(i,1);
-          score+=250; $("score").textContent=score; toast("+250  UFO down"); hit=true; break;
-        }
-      }
-      if(hit)continue;
-      for(var k=rocks.length-1;k>=0;k--){
-        var rk=rocks[k];
-        if(Math.hypot(s.x-rk.x,s.y-rk.y)<rk.r){
-          explode(rk.x,rk.y,"190,160,120"); rocks.splice(k,1); shots.splice(i,1);
-          score+=60; $("score").textContent=score; break;
-        }
-      }
-    }
-
-    // ---- food ----
-    for(var i2=items.length-1;i2>=0;i2--){
-      var it=items[i2]; it.x-=speed; it.bob+=0.05;
-      var yy=it.y+Math.sin(it.bob)*4*dpr;
-      if(it.x<-50*dpr){items.splice(i2,1);continue;}
-      ctx.save();ctx.shadowColor="rgba(212,175,55,.9)";ctx.shadowBlur=15*dpr;
-      ctx.font=30*dpr+"px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";
-      ctx.fillText(it.e,it.x,yy);ctx.restore();
-      if(Math.hypot(it.x-plane.x,yy-plane.y)<it.r+plane.r*0.75){
-        score+=it.p;$("score").textContent=score;toast("+"+it.p+"  "+it.n);items.splice(i2,1);
-      }
-    }
-
-    // ---- UFOs ----
-    for(var u2=ufos.length-1;u2>=0;u2--){
-      var uf2=ufos[u2];
-      uf2.x-=speed*0.55; uf2.hover+=0.05;
-      var uy=uf2.y+Math.sin(uf2.hover)*11*dpr;
-      if(uf2.x<-60*dpr){ufos.splice(u2,1);continue;}
-      drawUfo(uf2.x,uy,uf2.r,now);
-      if(now>uf2.fire && uf2.x<W-30*dpr){
-        var ang=Math.atan2(plane.y-uy,plane.x-uf2.x);
-        enemyShots.push({x:uf2.x,y:uy,vx:Math.cos(ang)*5.2*dpr,vy:Math.sin(ang)*5.2*dpr,r:6*dpr});
-        uf2.fire=now+2300+Math.random()*1500;
-      }
-      if(invuln<=0 && Math.hypot(uf2.x-plane.x,uy-plane.y)<uf2.r+plane.r*0.7){ hurt(uf2.x,uy); }
-    }
-
-    // ---- rocks ----
-    for(var r2=rocks.length-1;r2>=0;r2--){
-      var rk2=rocks[r2];
-      rk2.x+=rk2.vx-speed*0.34; rk2.y+=rk2.vy; rk2.spin+=0.05;
-      if(rk2.y>H+50*dpr||rk2.x<-50*dpr){rocks.splice(r2,1);continue;}
-      ctx.save();ctx.translate(rk2.x,rk2.y);ctx.rotate(rk2.spin);
-      ctx.font=32*dpr+"px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";
-      ctx.fillText("🪨",0,0);ctx.restore();
-      if(invuln<=0 && Math.hypot(rk2.x-plane.x,rk2.y-plane.y)<rk2.r+plane.r*0.7){ hurt(rk2.x,rk2.y); }
-    }
-
-    // ---- enemy shots ----
-    for(var e2=enemyShots.length-1;e2>=0;e2--){
-      var es=enemyShots[e2]; es.x+=es.vx; es.y+=es.vy;
-      if(es.x<-30*dpr||es.y<-30*dpr||es.y>H+30*dpr){enemyShots.splice(e2,1);continue;}
-      ctx.fillStyle="#7ef7c8";ctx.shadowColor="#7ef7c8";ctx.shadowBlur=13*dpr;
-      ctx.beginPath();ctx.arc(es.x,es.y,es.r,0,6.283);ctx.fill();ctx.shadowBlur=0;
-      if(invuln<=0 && Math.hypot(es.x-plane.x,es.y-plane.y)<es.r+plane.r*0.66){
-        enemyShots.splice(e2,1); hurt(plane.x,plane.y);
-      }
-    }
-
-    // ---- debris ----
-    for(var b=boom.length-1;b>=0;b--){
-      var bp=boom[b]; bp.x+=bp.vx; bp.y+=bp.vy; bp.vy+=0.08*dpr; bp.a-=0.028;
-      if(bp.a<=0){boom.splice(b,1);continue;}
-      ctx.fillStyle="rgba("+bp.c+","+bp.a.toFixed(2)+")";
-      ctx.beginPath();ctx.arc(bp.x,bp.y,bp.r,0,6.283);ctx.fill();
-    }
-
-    // survival ticks
-    if(Math.floor(el/100)%2===0){score+=1;$("score").textContent=score;}
-    var runStars=starsFor(score);
-    if(runStars!==lastRunStars){
-      lastRunStars=runStars;
-      $("bankhud").innerHTML="⭐ "+state.stars.toLocaleString()+" &nbsp;·&nbsp; +"+runStars+" this run";
-      if(runStars>0) toast("⭐ "+runStars);
-    }
-    drawPlane();
-    raf=requestAnimationFrame(loop);
-  }
-
-  // where the plane catches fire, in plane-size units: engine under the wing, tail, then the nose
-  var FIRE_SPOTS=[{x:-0.15,y:0.5},{x:-1.05,y:-0.35},{x:0.75,y:-0.05},{x:-0.45,y:-0.05}];
-  function hurt(x,y){
-    lives--; invuln=110; renderLives(); explode(x,y,"240,120,90");
-    plane.dmg=Math.min(3,plane.dmg+1);
-    plane.spots.push(FIRE_SPOTS[plane.dmg-1]);
-    if(lives<=0){
-      plane.spots.push(FIRE_SPOTS[3]);
-      plane.dying=performance.now(); plane.y0=plane.y; plane.x0=plane.x; invuln=1e9;
-      toast("💥 Going down!");
-    } else toast(plane.dmg===1?"🔥 Engine on fire!":"🔥🔥 Fire's spreading!");
-  }
-
-  // flames + smoke coming off the plane; more spots and bigger flames with every hit
-  function burn(now){
-    if(plane.dmg>0 && !plane.gone){
-      var s=plane.r, c=Math.cos(plane.tilt), sn=Math.sin(plane.tilt), heat=plane.dmg+(plane.dying?2:0);
-      plane.spots.forEach(function(p){
-        var n=heat>=4?4:heat>=2?3:2;
-        for(var k=0;k<n;k++){
-          var lx=p.x*s, ly=p.y*s;
-          fire.push({x:plane.x+c*lx-sn*ly, y:plane.y+sn*lx+c*ly,
-            vx:-(speed*0.55+Math.random()*1.6*dpr), vy:-(0.4+Math.random()*1.3)*dpr,
-            r:(3.5+Math.random()*4)*dpr*(0.9+heat*0.3), life:1});
-        }
-      });
-    }
-    for(var i=fire.length-1;i>=0;i--){
-      var f=fire[i]; f.x+=f.vx; f.y+=f.vy; f.vy-=0.02*dpr; f.r*=1.03; f.life-=0.022;
-      if(f.life<=0){fire.splice(i,1);continue;}
-      var col;
-      if(f.life>0.7) col="255,"+Math.round(170+85*(f.life-0.7)/0.3)+",60,"+(0.9*f.life).toFixed(2);
-      else if(f.life>0.42) col="245,"+Math.round(70+100*(f.life-0.42)/0.28)+",30,"+(0.8*f.life).toFixed(2);
-      else col="55,55,60,"+(0.55*f.life).toFixed(2);
-      ctx.fillStyle="rgba("+col+")";
-      ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,6.283);ctx.fill();
-    }
-  }
-  function flames(now){
-    // flickering flame tongues stuck to the plane at each burning spot (drawn in plane space)
-    var s=plane.r, heat=plane.dmg+(plane.dying?2:0);
-    ctx.save();
-    plane.spots.forEach(function(p,j){
-      for(var k=0;k<3;k++){
-        var fl=0.75+0.25*Math.sin(now/45+j*2+k*1.7), len=s*(0.7+heat*0.3)*fl, wd=s*(0.24+heat*0.06);
-        var g=ctx.createRadialGradient(p.x*s,p.y*s,0,p.x*s-len*0.4,p.y*s-len*0.3,len);
-        g.addColorStop(0,"rgba(255,240,150,.95)");g.addColorStop(.3,"rgba(255,140,20,.92)");g.addColorStop(.7,"rgba(225,45,15,.75)");g.addColorStop(1,"rgba(160,20,10,0)");
-        ctx.fillStyle=g;
-        ctx.beginPath();ctx.ellipse(p.x*s-len*0.45,p.y*s-len*0.12-k*wd*0.4,len*0.75,wd*(1-k*0.2),-0.35-k*0.12,0,6.283);ctx.fill();
-      }
-    });
-    ctx.restore();
-  }
-
-  function drawUfo(x,y,r,now){
-    ctx.save();ctx.translate(x,y);
-    var g=ctx.createRadialGradient(0,r*0.5,1,0,r*0.5,r*1.5);
-    g.addColorStop(0,"rgba(126,247,200,.30)");g.addColorStop(1,"rgba(126,247,200,0)");
-    ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,r*0.5,r*1.5,0,6.283);ctx.fill();
-    ctx.fillStyle="#9fb6d4";
-    ctx.beginPath();ctx.ellipse(0,0,r,r*0.36,0,0,6.283);ctx.fill();
-    ctx.fillStyle="#7ef7c8";
-    ctx.beginPath();ctx.ellipse(0,-r*0.24,r*0.5,r*0.36,0,Math.PI,0);ctx.fill();
-    ctx.fillStyle="#2b3f5c";
-    for(var i=0;i<3;i++){
-      var lx=(i-1)*r*0.5, on=Math.floor(now/220+i)%3===0;
-      ctx.fillStyle=on?"#f0d375":"#2b3f5c";
-      ctx.beginPath();ctx.arc(lx,r*0.16,r*0.11,0,6.283);ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  function drawPlane(){
-    var s=plane.r;
-    if(running&&Math.random()<0.75)
-      trail.push({x:plane.x-s*1.5,y:plane.y+(Math.random()-0.5)*s*0.4,r:s*0.3,a:0.32});
-    for(var i=trail.length-1;i>=0;i--){
-      var t=trail[i];t.x-=speed*0.85;t.r*=1.028;t.a-=0.012;
-      if(t.a<=0||t.x<-40*dpr){trail.splice(i,1);continue;}
-      ctx.fillStyle="rgba(226,232,245,"+t.a.toFixed(3)+")";
-      ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,6.283);ctx.fill();
-    }
-    burn(performance.now());
-    if(plane.gone) return;
-    ctx.save();ctx.translate(plane.x,plane.y);ctx.rotate(plane.tilt);
-    if(!plane.dying&&invuln>0&&Math.floor(invuln/6)%2===0)ctx.globalAlpha=0.4;
-    ctx.fillStyle="#8d6f21";
-    ctx.beginPath();ctx.moveTo(-s*0.05,-s*0.1);ctx.lineTo(-s*0.95,-s*0.78);
-    ctx.lineTo(-s*0.52,-s*0.8);ctx.lineTo(s*0.32,-s*0.06);ctx.closePath();ctx.fill();
-    ctx.fillStyle="#77242e";
-    ctx.beginPath();ctx.moveTo(-s*0.92,-s*0.12);ctx.lineTo(-s*1.3,-s*0.92);
-    ctx.lineTo(-s*0.98,-s*0.92);ctx.lineTo(-s*0.55,-s*0.14);ctx.closePath();ctx.fill();
-    ctx.beginPath();ctx.moveTo(-s*0.95,s*0.02);ctx.lineTo(-s*1.34,s*0.34);
-    ctx.lineTo(-s*0.92,s*0.3);ctx.closePath();ctx.fill();
-    var gr=ctx.createLinearGradient(0,-s*0.42,0,s*0.42);
-    gr.addColorStop(0,"#f7e6a8");gr.addColorStop(.5,"#f0d375");gr.addColorStop(1,"#c9a233");
-    ctx.fillStyle=gr;
-    ctx.beginPath();ctx.moveTo(s*1.48,0);
-    ctx.quadraticCurveTo(s*1.3,-s*0.34,s*0.55,-s*0.38);ctx.lineTo(-s*0.95,-s*0.3);
-    ctx.quadraticCurveTo(-s*1.32,-s*0.2,-s*1.32,0);
-    ctx.quadraticCurveTo(-s*1.32,s*0.2,-s*0.95,s*0.3);ctx.lineTo(s*0.55,s*0.38);
-    ctx.quadraticCurveTo(s*1.3,s*0.34,s*1.48,0);ctx.closePath();ctx.fill();
-    ctx.strokeStyle="#77242e";ctx.lineWidth=s*0.11;ctx.lineCap="round";
-    ctx.beginPath();ctx.moveTo(-s*1.05,s*0.06);ctx.lineTo(s*1.1,s*0.02);ctx.stroke();
-    ctx.fillStyle="rgba(11,18,32,.85)";
-    for(var w=0;w<5;w++){ctx.beginPath();ctx.arc(s*(0.72-w*0.36),-s*0.1,s*0.072,0,6.283);ctx.fill();}
-    ctx.fillStyle="#0b1220";
-    ctx.beginPath();ctx.moveTo(s*1.3,-s*0.1);ctx.quadraticCurveTo(s*1.16,-s*0.26,s*0.96,-s*0.24);
-    ctx.lineTo(s*0.98,-s*0.06);ctx.closePath();ctx.fill();
-    ctx.fillStyle="#d4af37";
-    ctx.beginPath();ctx.moveTo(s*0.2,s*0.1);ctx.lineTo(-s*0.72,s*0.96);
-    ctx.lineTo(-s*0.26,s*0.98);ctx.lineTo(s*0.46,s*0.16);ctx.closePath();ctx.fill();
-    ctx.fillStyle="#77242e";
-    ctx.beginPath();ctx.ellipse(-s*0.14,s*0.5,s*0.24,s*0.15,-0.28,0,6.283);ctx.fill();
-    if(plane.dmg>0){
-      // scorch marks spread across the body with each hit
-      ctx.fillStyle="rgba(20,12,8,"+(0.22*plane.dmg+(plane.dying?0.2:0)).toFixed(2)+")";
-      plane.spots.forEach(function(p){ctx.beginPath();ctx.ellipse(p.x*s*0.9,p.y*s*0.6,s*(0.32+plane.dmg*0.08),s*0.2,0,0,6.283);ctx.fill();});
-      flames(performance.now());
-    }
-    ctx.restore();ctx.globalAlpha=1;
-  }
-
-  var boards=[], lastBoard=0;
-  function drawBillboards(now, base){
-    // A prize board rides past every few seconds so they always know what's up for grabs.
-    if(now-lastBoard > 4200){
-      var t = STAR_TIERS[(Math.random()*STAR_TIERS.length)|0];
-      boards.push({x:W+80*dpr, t:t});
-      lastBoard = now;
-    }
-    for(var i=boards.length-1;i>=0;i--){
-      var b=boards[i]; b.x -= speed*0.42;
-      if(b.x < -260*dpr){ boards.splice(i,1); continue; }
-      var bw=210*dpr, bh=54*dpr, by=base-150*dpr;
-      // posts
-      ctx.fillStyle="rgba(8,13,24,.9)";
-      ctx.fillRect(b.x+22*dpr, by+bh, 6*dpr, 96*dpr);
-      ctx.fillRect(b.x+bw-28*dpr, by+bh, 6*dpr, 96*dpr);
-      // panel
-      ctx.fillStyle="#101a2c";
-      ctx.strokeStyle="rgba(212,175,55,.75)"; ctx.lineWidth=2*dpr;
-      ctx.beginPath(); ctx.roundRect(b.x, by, bw, bh, 6*dpr); ctx.fill(); ctx.stroke();
-      ctx.textAlign="left"; ctx.textBaseline="middle";
-      ctx.fillStyle="#f0d375";
-      ctx.font="700 "+15*dpr+"px 'IBM Plex Mono',monospace";
-      ctx.fillText("⭐ "+b.t.stars, b.x+12*dpr, by+18*dpr);
-      ctx.fillStyle="#f6f1e4";
-      ctx.font="600 "+12*dpr+"px Barlow,sans-serif";
-      var nm=(window.__T||String)(b.t.name); var label=nm.length>26 ? nm.slice(0,25)+"…" : nm;
-      ctx.fillText(label, b.x+12*dpr, by+38*dpr);
-    }
-  }
-
-  function backdrop(now){
-    var g=ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,"#0b1120");g.addColorStop(.5,"#17223a");g.addColorStop(1,"#2a3557");
-    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-    if(!stars){stars=[];for(var i=0;i<48;i++)stars.push({x:Math.random()*W,y:Math.random()*H*0.68,
-      r:(Math.random()*1.3+0.4)*dpr,s:Math.random()*0.6+0.2});}
-    sky=(sky+speed*0.06)%W;
-    ctx.fillStyle="rgba(255,255,255,.55)";
-    stars.forEach(function(st){var x=st.x-sky*st.s;if(x<0)x+=W;
-      ctx.globalAlpha=0.25+Math.abs(Math.sin(now/900+st.x))*0.4;
-      ctx.beginPath();ctx.arc(x,st.y,st.r,0,6.283);ctx.fill();});
-    ctx.globalAlpha=1;
-    var hg=ctx.createLinearGradient(0,H*0.72,0,H);
-    hg.addColorStop(0,"rgba(212,175,55,0)");hg.addColorStop(1,"rgba(212,175,55,.16)");
-    ctx.fillStyle=hg;ctx.fillRect(0,H*0.72,W,H*0.28);
-    groundX=(groundX-speed*0.42)%(W*0.5);
-    for(var pass=0;pass<3;pass++){
-      var ox=groundX+pass*W*0.5, base=H-40*dpr;
-      ctx.fillStyle="rgba(8,13,24,.85)";
-      [[0,26],[34,44],[70,20],[96,58],[130,32],[166,48],[200,24]].forEach(function(b){
-        ctx.fillRect(ox+b[0]*dpr*1.6,base-b[1]*dpr,26*dpr,b[1]*dpr);});
-      ctx.fillRect(ox+236*dpr*1.6,base-96*dpr,9*dpr,96*dpr);
-      ctx.beginPath();ctx.ellipse(ox+236*dpr*1.6+4.5*dpr,base-98*dpr,17*dpr,9*dpr,0,0,6.283);ctx.fill();
-      ctx.fillStyle="rgba(212,175,55,.55)";
-      ctx.beginPath();ctx.arc(ox+236*dpr*1.6+4.5*dpr,base-108*dpr,2.6*dpr,0,6.283);ctx.fill();
-    }
-    drawBillboards(now, H-40*dpr);
-    ctx.fillStyle="rgba(255,255,255,.045)";ctx.fillRect(0,H-40*dpr,W,40*dpr);
-    var rx=(groundX*3.2)%(78*dpr);
-    ctx.fillStyle="rgba(240,211,117,.6)";
-    for(var x2=rx;x2<W;x2+=78*dpr)ctx.fillRect(x2,H-22*dpr,30*dpr,3.5*dpr);
-  }
-
-
-  // ---------------- end of run ----------------
-  function end(){
-    running=false; cancelAnimationFrame(raf);
-    var earned=starsFor(score);
-    state.stars+=earned;
-    var wk=weekKey(), me=state.me;
-    var mine=state.board.filter(function(b){return b.week===wk&&b.name===me;})[0];
-    if(mine){ if(score>mine.score) mine.score=score; }
-    else state.board.push({week:wk,name:me,score:score});
-    state.board=state.board.filter(function(b){return b.week===wk;})
-      .sort(function(a,b){return b.score-a.score;}).slice(0,50);
-    persist();
-    $("final").textContent=score.toLocaleString()+" pts";
-    $("runstars").textContent="+"+earned+" \u2b50";
-    $("best").textContent="Star balance: "+state.stars.toLocaleString()+" \u2b50";
-    var rank=state.board.findIndex(function(b){return b.name===me&&b.score===score;});
-    $("rank-line").textContent = rank===0?"You're #1 this week"
-      : rank>0?"You're #"+(rank+1)+" this week":"Flight complete";
-    $("gameover").classList.add("on");
-  }
-  function startGame(){ $("gameover").classList.remove("on"); start(); }
-  $("again").addEventListener("click",startGame);
-  $("toRewards").addEventListener("click",function(){ $("gameover").classList.remove("on"); go("s-rewards"); });
-
-  renderMenu(); renderBadge(); renderCart(); renderRewards(); renderShop(); renderBoard();
+/* ---- point values table ---- */
+function row(icon,name,val,bad){ return '<div'+(bad?' class="bad"':'')+'>'+icon+'<span><b>'+esc(name)+'</b></span><span class="v">'+val+'</span></div>'; }
+function ic(p){ return '<img src="img/game/'+p.k+'.webp" alt="" onerror="this.outerHTML=\'<span class=e>'+p.e+'</span>\'">'; }
+$("points").innerHTML='<div class="ptsh">Grab these</div><div class="pts">'+PICK.map(function(p){return row(ic(p),p.n,"+"+p.p);}).join("")+
+  row('<span class="e">🪙</span>',"Melody coin","+10")+row(ic(MIC),"Karaoke mic","2× · 6s")+row('<span class="e">➕</span>',"Health kit (rare)","+25%")+'</div>'+
+  '<div class="ptsh">Shoot these down</div><div class="pts">'+row('<span class="e">🛸</span>',"UFO (2 hits)","+150")+row('<span class="e">🛩️</span>',"Fighter jet","+200")+row('<span class="e">✈️</span>',"Kamikaze plane (4 hits)","+300")+'</div>'+
+  '<div class="ptsh">Dodge these</div><div class="pts">'+row('<span class="e">⚡</span>',"Lightning","−⅓ health",1)+row('<span class="e">🚀</span>',"Missiles &amp; UFO zaps","−⅓ health",1)+row('<span class="e">💥</span>',"Crashing into anything","−⅓ health",1)+row('<span class="e">🔴</span>',"Red flash + buzz","plane incoming",1)+'</div>'+
+  '<div class="ptsh">Prizes</div><div class="pts">'+row('<span class="e">🥤</span>',"$3 off any drink","800")+row('<span class="e">🍟</span>',"Free Melody Fries","1,500")+row('<span class="e">🧄</span>',"Free Gilroy Garlic Fries","2,200")+row('<span class="e">🍤</span>',"Free appetizer","3,000")+'</div>';
 })();
 </script>
-
-<script>window.CRM_CFG={name:"Melody Bar & Grill",offer:"Free Melody Fries on your next visit",mount:"#s-rewards .pad",tiers:[[250,"Free Melody Fries"],[500,"Free drink"],[800,"Free burger"],[1300,"Free appetizer platter"]],referral:{gift:"Free Melody Fries"}};</script>
+<script>window.CRM_CFG={name:"Melody Bar & Grill",offer:"Free Melody Fries on your next visit",mount:"#rwhost",tiers:[[250,"Free Melody Fries"],[500,"Free house margarita"],[800,"Free Lobster Mac & Cheese"],[1300,"Free appetizer platter"]],referral:{gift:"Free Melody Fries"}};</script>
 <script src="../crm.js"></script>
-<script>window.NEARBY={name:"Melody Bar & Grill",pin:"✈️",mount:"#s-rewards .pad",spots:[{label:"Westchester",lat:33.9487,lng:-118.3918,q:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"}],offer:"Happy hour is 3–6. Show this for double stars today."};</script>
+<script>window.NEARBY={name:"Melody Bar & Grill",pin:"✈️",mount:"#rwhost",spots:[{label:"Westchester",lat:33.9487,lng:-118.3918,q:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"}],offer:"Happy hour is 3–6. Show this for double points today."};</script>
 <script src="../nearby.js"></script>
+<script src="../menu3d.js"></script>
+<script>window.BUILDER={mode:"plate",accent:"mac & cheese",name:"Melody",img:"img/build/",fire:"img/game/flame.webp",mount:"#rewards",
+  base:0,fireLabel:"Bake it",fireBusy:"Baking the crust",baseLine:"Creamy fusilli's in. Load it up.",
+  lines:["That's cheesy.","Oh that's a Melody mac.","Load it up.","Chef's kiss.","Now we're talking."],
+  spots:[[0,-.18,.3],[.18,.1,.28],[-.18,.12,.28],[.05,.26,.26],[-.22,-.1,.26],[.24,-.14,.26],[0,.02,.28]],
+  parts:[
+    {id:"mac_base",name:"House mac",price:15,group:"Base",layout:[[0,0,.74,"mac_base"]]},
+    {id:"lobster",name:"Lobster",price:6.5,max:2,group:"Add-ins"},
+    {id:"bacon",name:"Bacon",price:1.25,max:2,group:"Add-ins"},
+    {id:"jalapeno",name:"Jalapeño",price:1,max:1,group:"Add-ins"},
+    {id:"chicken_parm",name:"Chicken parm",price:3.25,max:2,group:"Add-ins"},
+    {id:"beef",name:"Ground beef",price:3.25,max:2,group:"Add-ins"},
+    {id:"mushroom",name:"Mushrooms",price:1.25,max:1,group:"Add-ins"},
+    {id:"onions",name:"Caramelized onion",price:.5,max:1,group:"Toppings"},
+    {id:"spinach",name:"Spinach",price:.25,max:1,group:"Toppings"},
+    {id:"gorgonzola",name:"Gorgonzola",price:.25,max:1,group:"Toppings"},
+    {id:"parmesan",name:"Parmesan crust",price:1,max:1,group:"Toppings"},
+    {id:"parsley",name:"Parsley",price:0,max:1,group:"Toppings"}]};</script>
+<script src="../builder.js"></script>
 <script src="../gamelock.js"></script>
-</body></html>
+</body>
+</html>

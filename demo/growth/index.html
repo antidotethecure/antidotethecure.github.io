@@ -326,9 +326,9 @@ footer b{color:var(--accent)}
   <p class="lead">Move the sliders to match your restaurant. Start small; this only has to bring back a handful of tables to pay for itself.</p>
   <div class="calc">
     <div class="plan" role="group" aria-label="Plan">
-      <button type="button" data-cost="300" aria-pressed="true">Pay in full · $300/mo</button>
-      <button type="button" data-cost="400" aria-pressed="false">Half down · $400/mo</button>
-      <button type="button" data-cost="450" aria-pressed="false">Starter · $450/mo</button>
+      <button type="button" data-cost="400" aria-pressed="true">Full · $400/mo</button>
+      <button type="button" data-cost="600" aria-pressed="false">Full Starter · $600/mo</button>
+      <button type="button" data-cost="300" aria-pressed="false">Core · $300/mo</button>
     </div>
     <div class="ctl">
       <label for="visits">Extra return visits per week <output id="visitsO"></output></label>
@@ -345,7 +345,7 @@ footer b{color:var(--accent)}
     </div>
     <div class="bar"><i id="barI"></i></div>
     <div class="barlab"><span>Monthly cost</span><span id="be"></span></div>
-    <p class="fine">Half down and Starter use their first-year monthly; every plan drops to $300/mo after month 12. A worked example using your inputs, not a promise of results. Monthly figures use 4.3 weeks. Doesn't count food cost, rewards you give away, or the extra visits from birthday parties, reviews and word of mouth.</p>
+    <p class="fine">Full Starter uses its first-year monthly; it drops to $400/mo after month 12. A worked example using your inputs, not a promise of results. Monthly figures use 4.3 weeks. Doesn't count food cost, rewards you give away, or the extra visits from birthday parties, reviews and word of mouth.</p>
   </div>
 </section>
 
@@ -374,39 +374,64 @@ footer b{color:var(--accent)}
 
 <section>
   <p class="kick">Pricing</p>
+  <h2>Two packages</h2>
+  <p class="lead">Big-name restaurant apps run about $500 a month and don't come with your own game or a referral program. Ours start at $300.</p>
+  <div class="prices">
+    <div class="price">
+      <span class="nm">Core</span>
+      <div class="amt">
+        <div><b>$2,000</b><span>setup, one time</span></div>
+        <div><b>$300</b><span>per month</span></div>
+      </div>
+      <p>Your branded app and game, points and rewards, sign-ups and your customer list, Google review prompt, menu in 12 languages, 3D menu, hosting and support.</p>
+    </div>
+    <div class="price best">
+      <span class="nm">★ Full · recommended</span>
+      <div class="amt">
+        <div><b>$2,500</b><span>setup, one time</span></div>
+        <div><b>$400</b><span>per month</span></div>
+      </div>
+      <p>Everything in Core, plus <b>referrals</b> (customers earn every time a friend orders), <b>scan to earn</b> at the register, <b>"you're nearby"</b> alerts, and <b>text blasts</b> to your list (up to about 2,000 texts a month).</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="kick">Full package</p>
   <h2>Pick how you want to start</h2>
-  <p class="lead">Like buying a car: put more down and your monthly is lower. Start with as little as $500. Every plan drops to $300/mo after the first year.</p>
+  <p class="lead">Like buying a car: put more down and your monthly is lower. Start with as little as $500. Every plan drops to $400/mo after the first year.</p>
   <div class="prices">
     <div class="price best">
       <span class="nm">★ Pay in full · best value</span>
       <div class="amt">
-        <div><b>$2,000</b><span>today, one time</span></div>
-        <div><b>$300</b><span>per month from day one</span></div>
+        <div><b>$2,500</b><span>today, one time</span></div>
+        <div><b>$400</b><span>per month from day one</span></div>
       </div>
       <p>No minimum. Month to month, cancel with 30 days' notice. Lowest total cost.</p>
-      <p class="tot">First year total: <b>$5,600</b></p>
+      <p class="tot">First year total: <b>$7,300</b></p>
     </div>
     <div class="price">
       <span class="nm">Half down</span>
       <div class="amt">
-        <div><b>$1,000</b><span>today</span></div>
-        <div><b>$400</b><span>per month for 12 months, then $300</span></div>
+        <div><b>$1,250</b><span>today</span></div>
+        <div><b>$525</b><span>per month for 12 months, then $400</span></div>
       </div>
       <p>12-month minimum, then month to month.</p>
-      <p class="tot">First year total: <b>$5,800</b></p>
+      <p class="tot">First year total: <b>$7,550</b></p>
     </div>
     <div class="price">
       <span class="nm">Starter · lowest to begin</span>
       <div class="amt">
         <div><b>$500</b><span>today</span></div>
-        <div><b>$450</b><span>per month for 12 months, then $300</span></div>
+        <div><b>$600</b><span>per month for 12 months, then $400</span></div>
       </div>
       <p>12-month minimum, then month to month. Get live now, pay the rest over time.</p>
-      <p class="tot">First year total: <b>$5,900</b></p>
+      <p class="tot">First year total: <b>$7,700</b></p>
     </div>
   </div>
   <ul class="ticks" style="margin-top:16px">
-    <li><b>Included:</b> <span>mobile menu page, custom rewards game, weekly prize board, QR table tents, hosting, updates and support.</span></li>
+    <li><b>Founding restaurants:</b> <span>the first few restaurants get the Full package at the Core price, $2,000 + $300/mo, in exchange for a testimonial.</span></li>
+    <li><b>Included:</b> <span>your custom app and game, weekly prize board, QR table tents, hosting, updates and support.</span></li>
     <li><b>You choose and fund the prizes.</b> <span>Promotions run as free-to-enter with official rules; we supply the standard text.</span></li>
   </ul>
 </section>

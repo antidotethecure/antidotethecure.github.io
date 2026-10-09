@@ -142,6 +142,16 @@
   var FRIENDS = ["Jasmine", "Carlos", "Devon", "Mia", "Andre", "Lily", "Marco", "Keisha", "Tran", "Gabby"];
   function shareLink(m) { return location.origin + location.pathname + "?ref=" + encodeURIComponent(m.ref) + "#crm-join"; }
 
+  // a game calls SSAI_WIN("Free fries") when a player wins: the prize lands in their wallet with a code to redeem in store
+  var PEND = KEY + "_prize";
+  window.SSAI_WIN = function (prize) {
+    var w = { t: prize, c: "WIN-" + code4(4), ts: Date.now() }, m = mine()[0];
+    if (m) { (m.wins = m.wins || []).unshift(w); m.wins = m.wins.slice(0, 5); (m.ledger = m.ledger || []).unshift({ ts: w.ts, pts: 0, t: "🏆 Won " + prize + " in the game" }); put(m); }
+    else { try { localStorage.setItem(PEND, JSON.stringify(w)); } catch (x) {} }
+    drawJoin(); return { prize: w, saved: !!m };
+  };
+  function pending() { try { return JSON.parse(localStorage.getItem(PEND) || "null"); } catch (x) { return null; } }
+
   function drawJoin(keepQR) {
     var me = mine()[0];
     if (me) {
@@ -150,6 +160,7 @@
       var refPts = (me.ledger || []).filter(function (l) { return l.ref; }).reduce(function (a, l) { return a + l.pts; }, 0);
       var first = e(me.name.split(" ")[0]);
       join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards</span><h3>Hey ' + first + '! 👋</h3>' +
+        ((me.wins || []).length ? '<div class="crm-win" style="border-color:#3DDC97"><div style="font-size:30px">🏆</div><b>You won ' + e(me.wins[0].t) + '!</b><div class="code">' + e(me.wins[0].c) + '</div><small>Come back to ' + e(NAME) + ' and show this code to redeem it.</small></div><div style="height:10px"></div>' : '') +
         '<div class="crm-win"><div style="font-size:30px">🎁</div><b>' + e(me.offer || OFFER) + '</b><div class="code">' + e(me.code) + '</div><small>Your welcome reward. Show this at the counter.</small></div>' +
         // points + scan to earn
         '<div class="crm-box"><div class="crm-pts"><div><div class="k" style="font-size:10px">Your points</div><div class="n">' + pts.toLocaleString() + '<small>pts</small></div></div>' +
@@ -226,8 +237,9 @@
       };
       return;
     }
-    var inviter = INVITE ? (refOwner(INVITE) || "A friend") : "";
+    var inviter = INVITE ? (refOwner(INVITE) || "A friend") : "", pw = pending();
     join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards · free</span>' +
+      (pw ? '<div class="crm-invited" style="border-color:#FFD23F;background:#FFD23F22;color:#FFE9A3">🏆 You won <b>' + e(pw.t) + '</b> in the game! Join below to save it, then show it at ' + e(NAME) + ' to redeem.</div>' : '') +
       (INVITE ? '<div class="crm-invited">🤝 ' + e(inviter) + ' invited you! Join with code <b>' + e(INVITE) + '</b> and you get <b>+' + REF.join + ' bonus points</b>.</div>' : '') +
       '<div class="crm-gift"><b>🎁</b><span>Join now and get <u>' + e(OFFER) + '</u> instantly</span></div>' +
       '<h3>Unlock your reward</h3><p>Plus ' + PER + ' points for every $1, a birthday treat, and your own code to invite friends. Takes 10 seconds.</p>' +
@@ -251,6 +263,7 @@
         ref: refCode(v("name")), refBy: rc, refByName: rc ? (byName || "code " + rc) : "", friends: [], ledger: [] };
       addPts(r, 100, "🎉 Welcome to " + NAME + " Rewards");
       if (rc) addPts(r, REF.join, "🤝 Joined with " + (byName ? byName.split(" ")[0] + "'s" : "a friend's") + " code");
+      var pz = pending(); if (pz) { r.wins = [pz]; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "🏆 Won " + pz.t + " in the game" }); try { localStorage.removeItem(PEND); } catch (x) {} }
       var list = mine(); list.unshift(r); save(list.slice(0, 5));
       drawJoin(); drawOwn("all", true);
     };

@@ -4,7 +4,14 @@
      <script src="../crm.js"></script>
    DEMO MODE: what a visitor types is saved only on their own phone (localStorage) and shown in the owner
    list next to sample customers, so the flow can be shown without collecting anyone's real data.
-   Live, the same form writes to the business's own customer database, which they own and can export. */
+   Live, the same form writes to the business's own customer database, which they own and can export.
+   Points work like the big chains' apps (McDonald's style): members earn points per $1 by showing a QR / 4-digit
+   code to the cashier or bartender, or by typing the code from a receipt, then trade points for rewards.
+   Referrals: every member gets a code; a friend who joins with it earns them points, and they keep earning
+   every time that friend orders. Optional per-business config:
+     CRM_CFG.tiers = [[250,"Free fries"],[500,"Free shake"],...]      (points → reward)
+     CRM_CFG.perDollar = 10                                              (points per $1)
+     CRM_CFG.referral = {join:50, first:100, every:20, goal:3, gift:"Free fries"} */
 (function () {
   "use strict";
   var C = window.CRM_CFG || {};
@@ -12,6 +19,10 @@
   var OFFER = C.offer || "10% off your next visit";
   var SLUG = NAME.toLowerCase().replace(/[^a-z0-9]+/g, "-"), KEY = "ssai_crm_" + SLUG;
   var e = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  var PER = C.perDollar || 10;
+  var TIERS = C.tiers || [[250, "Free side"], [500, "Free drink"], [800, "Free entrée"], [1200, "Free meal"]];
+  var REF = { join: 50, first: 100, every: 20, goal: 3, gift: TIERS[0][1] };
+  for (var rk in (C.referral || {})) REF[rk] = C.referral[rk];
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   var css = [
@@ -56,6 +67,28 @@
     ".crm-compose textarea{width:100%;min-height:74px;font-size:15px;color:#EEF2FF;background:#121C40;border:1px solid #25336A;border-radius:10px;padding:10px;resize:vertical}",
     ".crm-bub{background:#1a2656;border-radius:14px 14px 14px 4px;padding:9px 12px;margin-top:8px;font-size:13.5px}",
     ".crm-fine{font-size:11.5px;color:#7F8AAA;margin-top:10px}",
+    ".crm-box{background:#070B1E;border:1px solid #25336A;border-radius:16px;padding:14px;margin-top:12px}",
+    ".crm-box h4{margin:2px 0 8px;font-size:16px;font-weight:900;color:#EEF2FF}",
+    ".crm-pts{display:flex;align-items:center;justify-content:space-between;gap:10px}",
+    ".crm-pts .n{font:900 40px/1 system-ui;color:#FFD23F}.crm-pts .n small{font-size:14px;color:#9AA6CC;font-weight:700;margin-left:4px}",
+    ".crm-scan{border:0;border-radius:14px;padding:13px 16px;font-size:15px;font-weight:900;color:#070B1E;background:#FFD23F;cursor:pointer;white-space:nowrap}",
+    ".crm-qr{display:none;text-align:center;margin-top:12px;background:#fff;color:#111;border-radius:16px;padding:14px;animation:crmPop .35s}",
+    ".crm-qr .qr{width:176px;height:176px;margin:0 auto}.crm-qr .qr img,.crm-qr .qr svg{width:100%;height:100%}",
+    ".crm-qr .d4{font:900 38px ui-monospace,Menlo,monospace;letter-spacing:.3em;margin:8px 0 0;color:#111}",
+    ".crm-qr small{display:block;color:#555;font-size:12.5px;margin-top:4px}",
+    ".crm-demo{display:block;width:100%;margin-top:8px;border:1px dashed #3DDC97;background:transparent;color:#3DDC97;border-radius:12px;padding:10px;font-size:13.5px;font-weight:800;cursor:pointer}",
+    ".crm-demo:disabled{opacity:.4;cursor:default}",
+    ".crm-tier{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:9px 0;border-top:1px solid #25336A;font-size:14px}",
+    ".crm-tier:first-of-type{border-top:0}.crm-tier .bar{grid-column:1/3;height:6px;border-radius:9px;background:#1a2656;overflow:hidden}.crm-tier .bar i{display:block;height:100%;background:linear-gradient(90deg,#E8582A,#FFD23F)}",
+    ".crm-tier button{border:0;border-radius:10px;padding:8px 12px;font-weight:900;font-size:13px;background:#E8582A;color:#fff;cursor:pointer}.crm-tier button:disabled{background:#1a2656;color:#7F8AAA;cursor:default}",
+    ".crm-rcode{display:flex;gap:8px;margin-top:8px}.crm-rcode input{flex:1}.crm-rcode button{border:0;border-radius:12px;padding:0 14px;font-weight:900;background:#2547B8;color:#fff;cursor:pointer}",
+    ".crm-refcode{font:900 26px ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#FFD23F;text-align:center;background:#121C40;border:2px dashed #FFD23F;border-radius:14px;padding:10px;margin:6px 0 10px}",
+    ".crm-rules{margin:0 0 10px;padding:0;list-style:none;font-size:13.5px;color:#C9D2EE}.crm-rules li{padding:5px 0;display:flex;gap:8px;justify-content:space-between}.crm-rules b{color:#3DDC97;white-space:nowrap}",
+    ".crm-goal{height:10px;border-radius:9px;background:#1a2656;overflow:hidden;margin:4px 0 4px}.crm-goal i{display:block;height:100%;background:#3DDC97}",
+    ".crm-feed{max-height:220px;overflow:auto;font-size:13px}.crm-feed div{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid #1a2656;color:#C9D2EE}.crm-feed b{white-space:nowrap}.crm-feed .plus{color:#3DDC97}.crm-feed .minus{color:#FF8F85}",
+    ".crm-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99999;background:#3DDC97;color:#0b2a1c;font:900 15px system-ui;padding:12px 18px;border-radius:99px;box-shadow:0 10px 30px #0008;animation:crmPop .35s;max-width:92vw;text-align:center}",
+    ".crm-invited{background:#3DDC9722;border:1px solid #3DDC97;color:#C9F5E3;border-radius:14px;padding:10px 12px;margin-bottom:10px;font-size:14px;font-weight:700}",
+    ".crm-lead{margin-top:12px}.crm-lead div{display:grid;grid-template-columns:22px 1fr auto;gap:8px;padding:8px 0;border-top:1px solid #25336A;font-size:13px;align-items:center}.crm-lead .r{color:#FFD23F;font-weight:900}",
     "@media (max-width:400px){.crm-stats{grid-template-columns:repeat(2,1fr)}}"
   ].join("");
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
@@ -69,7 +102,12 @@
     ["Tony N.", "(310) •••-3349", "", 8, 240, 41, 230, 11], ["Hye-jin L.", "", "hyejin•••@naver.com", 5, 150, 9, 70, 6],
     ["Arman S.", "(818) •••-2045", "arman•••@gmail.com", 9, 270, 15, 120, 0], ["Brianna C.", "(323) •••-6678", "", 4, 110, 2, 3, 2],
     ["Marcus J.", "(310) •••-8801", "mj•••@outlook.com", 17, 610, 4, 300, 10], ["Sofia M.", "(562) •••-4410", "sofia•••@gmail.com", 1, 25, 38, 38, 7]
-  ].map(function (r) { return { name: r[0], phone: r[1], email: r[2], visits: r[3], stars: r[4], last: now - r[5] * DAY, joined: now - r[6] * DAY, bday: r[7], sample: true }; });
+  ].map(function (r) { return { name: r[0], phone: r[1], email: r[2], visits: r[3], stars: r[4] * 2, last: now - r[5] * DAY, joined: now - r[6] * DAY, bday: r[7], sample: true }; });
+  // made-up referral history: who brought in whom
+  var REFS = { "Marcus J.": ["MARCUS-88", 6, 19], "Maria G.": ["MARIA-21", 4, 11], "Luis R.": ["LUIS-60", 2, 5], "Tony N.": ["TONY-49", 1, 1] };
+  var BY = { "Jordan P.": "Marcus J.", "Brianna C.": "Marcus J.", "Sofia M.": "Maria G.", "Aisha K.": "Luis R." };
+  SAMPLE.forEach(function (r) { var x = REFS[r.name]; if (x) { r.ref = x[0]; r.nfr = x[1]; r.nfo = x[2]; } if (BY[r.name]) r.refByName = BY[r.name]; });
+  function refOwner(code) { code = String(code || "").toUpperCase().trim(); for (var i = 0; i < SAMPLE.length; i++) if (SAMPLE[i].ref === code) return SAMPLE[i].name; return ""; }
 
   function mine() { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (x) { return []; } }
   function save(list) { try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (x) {} }
@@ -81,6 +119,8 @@
     if (now - r.last >= 30 * DAY && !r.you) t.push(["t-risk", "Hasn't been back"]);
     if (now - r.joined <= 7 * DAY && !r.you) t.push(["t-new", "New"]);
     if (r.bday === mo) t.push(["t-bday", "🎂 Birthday month"]);
+    if ((r.nfr || (r.friends && r.friends.length)) >= 2) t.push(["t-vip", "🤝 Top referrer"]);
+    if (r.refByName) t.push(["t-new", "Referred by " + r.refByName]);
     return t;
   }
   function ago(ts) { var d = Math.floor((now - ts) / DAY); return d <= 0 ? "today" : d === 1 ? "yesterday" : d + " days ago"; }
@@ -91,34 +131,126 @@
   // ---- owner card ----
   var own = document.createElement("section"); own.className = "crm-card crm-own"; own.id = "crm-owner";
 
-  function drawJoin() {
+  function code4(len) { var a = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", x = ""; for (var i = 0; i < (len || 3); i++) x += a[(Math.random() * a.length) | 0]; return x; }
+  function refCode(first) { return (first.replace(/[^A-Za-z]/g, "").slice(0, 6).toUpperCase() || "FRIEND") + "-" + code4(3); }
+  // the 4-digit "give this to the cashier" code changes every 5 minutes, like the big chains' apps
+  function regCode(m) { var w = Math.floor(Date.now() / 3e5), h = 7; String(m.id + ":" + w).split("").forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) % 1000003; }); return String(h % 10000).padStart(4, "0"); }
+  function put(m) { var l = mine(); l[0] = m; save(l); }
+  function addPts(m, n, why) { m.stars = Math.max(0, (m.stars || 0) + n); (m.ledger = m.ledger || []).unshift({ ts: Date.now(), pts: n, t: why }); m.ledger = m.ledger.slice(0, 40); }
+  function toast(t) { var d = document.createElement("div"); d.className = "crm-toast"; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2600); }
+  var qs = new URLSearchParams(location.search), INVITE = (qs.get("ref") || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 16);
+  var FRIENDS = ["Jasmine", "Carlos", "Devon", "Mia", "Andre", "Lily", "Marco", "Keisha", "Tran", "Gabby"];
+  function shareLink(m) { return location.origin + location.pathname + "?ref=" + encodeURIComponent(m.ref) + "#crm-join"; }
+
+  function drawJoin(keepQR) {
     var me = mine()[0];
     if (me) {
-      join.innerHTML = '<span class="k">' + e(NAME) + ' Club</span><h3>You\'re in, ' + e(me.name.split(" ")[0]) + '! 🎉</h3>' +
-        '<div class="crm-win"><div style="font-size:34px">🎁</div><b>' + e(me.offer || OFFER) + '</b><div class="code">' + e(me.code) + '</div>' +
-        '<small>Show this at the counter. It\'s saved on this phone.</small></div>' +
-        '<p style="margin-top:12px">You\'ll also earn stars every visit and get a treat in your birthday month.</p>' +
-        '<button type="button" class="go" style="background:#1a2656;box-shadow:none" id="crm-see">👀 See what the owner sees ↓</button>';
-      join.querySelector("#crm-see").onclick = function () { own.scrollIntoView({ behavior: "smooth", block: "start" }); };
+      if (!me.id) { me.id = code4(8); me.ref = me.ref || refCode(me.name); me.friends = me.friends || []; me.ledger = me.ledger || []; put(me); }
+      var pts = me.stars || 0, fr = me.friends || [], fo = fr.reduce(function (a, f) { return a + f.orders; }, 0);
+      var refPts = (me.ledger || []).filter(function (l) { return l.ref; }).reduce(function (a, l) { return a + l.pts; }, 0);
+      var first = e(me.name.split(" ")[0]);
+      join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards</span><h3>Hey ' + first + '! 👋</h3>' +
+        '<div class="crm-win"><div style="font-size:30px">🎁</div><b>' + e(me.offer || OFFER) + '</b><div class="code">' + e(me.code) + '</div><small>Your welcome reward. Show this at the counter.</small></div>' +
+        // points + scan to earn
+        '<div class="crm-box"><div class="crm-pts"><div><div class="k" style="font-size:10px">Your points</div><div class="n">' + pts.toLocaleString() + '<small>pts</small></div></div>' +
+          '<button type="button" class="crm-scan" data-a="scan">📲 Scan to earn</button></div>' +
+          '<div class="crm-qr"><div class="qr"></div><div class="d4">' + regCode(me) + '</div><small>Show this to the cashier or bartender, or scan it at the register.<br>They ring you up and your points land here. Code refreshes every 5 min.</small></div>' +
+          '<p style="margin:10px 0 0;font-size:13px">Earn <b style="color:#FFD23F">' + PER + ' points for every $1</b> you spend in store or in the app.</p>' +
+          '<button type="button" class="crm-demo" data-a="ring">▶ Demo: the cashier rings you up</button>' +
+          '<div class="crm-rcode"><input placeholder="Got a receipt? Type its code" maxlength="20"><button type="button" data-a="receipt">Add</button></div></div>' +
+        // rewards
+        '<div class="crm-box"><h4>🏆 Use your points</h4>' + TIERS.map(function (t, i) {
+          return '<div class="crm-tier"><span><b>' + t[0].toLocaleString() + '</b> pts · ' + e(t[1]) + '</span><button type="button" data-redeem="' + i + '"' + (pts >= t[0] ? '' : ' disabled') + '>' + (pts >= t[0] ? 'Redeem' : (t[0] - pts).toLocaleString() + ' to go') + '</button>' +
+            '<span class="bar"><i style="width:' + Math.min(100, pts / t[0] * 100) + '%"></i></span></div>'; }).join("") +
+          (me.redeem ? '<div class="crm-win" style="margin-top:10px"><b>' + e(me.redeem.t) + '</b><div class="code">' + e(me.redeem.c) + '</div><small>Show this code when you order. One reward per order.</small></div>' : '') + '</div>' +
+        // referrals
+        '<div class="crm-box" id="crm-ref"><h4>🤝 Invite friends, earn forever</h4><div class="crm-refcode">' + e(me.ref) + '</div>' +
+          '<div class="crm-acts" style="margin-top:0"><button type="button" class="hot" data-a="text">💬 Text a friend</button><button type="button" data-a="copy">📋 Copy invite link</button></div>' +
+          '<ul class="crm-rules" style="margin-top:12px"><li><span>👋 A friend joins with your code</span><b>+' + REF.join + ' pts</b></li><li><span>🛒 Their first order</span><b>+' + REF.first + ' pts</b></li>' +
+          '<li><span>🔁 Every order after that, for as long as they\'re a customer</span><b>+' + REF.every + ' pts</b></li><li><span>🎁 ' + REF.goal + ' friends join</span><b>' + e(REF.gift) + '</b></li></ul>' +
+          '<div style="font-size:13px;color:#9AA6CC">' + Math.min(fr.length, REF.goal) + ' of ' + REF.goal + ' friends toward ' + e(REF.gift) + (fr.length >= REF.goal ? ' ✅' : '') + '</div><div class="crm-goal"><i style="width:' + Math.min(100, fr.length / REF.goal * 100) + '%"></i></div>' +
+          '<div class="crm-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:4px"><div><b>' + fr.length + '</b>friends</div><div><b>' + fo + '</b>their orders</div><div><b>' + refPts.toLocaleString() + '</b>pts earned</div></div>' +
+          '<button type="button" class="crm-demo" data-a="friend">▶ Demo: a friend joins with your code</button>' +
+          '<button type="button" class="crm-demo" data-a="forder"' + (fr.length ? '' : ' disabled') + '>▶ Demo: your friend places an order</button></div>' +
+        // activity
+        '<div class="crm-box"><h4>📜 Points activity</h4><div class="crm-feed">' + ((me.ledger || []).map(function (l) {
+          return '<div><span>' + e(l.t) + '</span><b class="' + (l.pts >= 0 ? 'plus' : 'minus') + '">' + (l.pts >= 0 ? '+' : '') + l.pts.toLocaleString() + '</b></div>'; }).join("") || '<div><span>Nothing yet. Scan at the register to start earning.</span></div>') + '</div></div>' +
+        '<button type="button" class="go" style="background:#1a2656;box-shadow:none" data-a="owner">👀 See what the owner sees ↓</button>' +
+        '<p class="crm-fine">Demo: points and friends here are saved on this phone only. Live, they\'re in the business\'s database, so they follow the customer to any phone.</p>';
+      var qr = join.querySelector(".crm-qr");
+      function showQR() {
+        qr.style.display = "block";
+        var box = qr.querySelector(".qr"), data = "SSAI:" + SLUG + ":" + me.id;
+        function paint() { try { var q = window.qrcode(0, "M"); q.addData(data); q.make(); box.innerHTML = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch (x) { box.innerHTML = ""; } }
+        if (window.qrcode) paint();
+        else { var sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"; sc.onload = paint; document.head.appendChild(sc); }
+      }
+      if (keepQR) showQR();
+      join.onclick = function (ev) {
+        var b = ev.target.closest("button"); if (!b) return;
+        var a = b.dataset.a, m = mine()[0];
+        if (b.dataset.redeem != null) {
+          var t = TIERS[+b.dataset.redeem]; if (m.stars < t[0]) return;
+          addPts(m, -t[0], "🎟️ Redeemed: " + t[1]); m.redeem = { t: t[1], c: "R-" + code4(4) }; put(m); drawJoin(); drawOwn(); toast("🎟️ " + t[1] + " is ready. Show your code."); return;
+        }
+        if (a === "scan") { if (qr.style.display === "block") qr.style.display = "none"; else showQR(); return; }
+        if (a === "ring") {
+          var amt = Math.round((12 + Math.random() * 26) * 100) / 100, got = Math.round(amt * PER);
+          addPts(m, got, "🧾 In-store order $" + amt.toFixed(2) + " · code " + regCode(m)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m);
+          drawJoin(true); drawOwn(); toast("+" + got + " points · $" + amt.toFixed(2) + " order"); return;
+        }
+        if (a === "receipt") {
+          var inp = join.querySelector(".crm-rcode input"), v = inp.value.trim().toUpperCase();
+          if (v.length < 6) { inp.placeholder = "Receipt codes are 6+ characters"; inp.value = ""; return; }
+          if ((m.receipts = m.receipts || []).indexOf(v) >= 0) { toast("That receipt was already added"); return; }
+          m.receipts.push(v); var ra = Math.round((9 + Math.random() * 22) * 100) / 100, rg = Math.round(ra * PER);
+          addPts(m, rg, "🧾 Receipt " + v + " · $" + ra.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); toast("+" + rg + " points from your receipt"); return;
+        }
+        if (a === "text") { location.href = "sms:?&body=" + encodeURIComponent("Join " + NAME + " Rewards with my code " + m.ref + " and we both get " + REF.join + " points 🎁 " + shareLink(m)); return; }
+        if (a === "copy") { var L = shareLink(m); (navigator.clipboard ? navigator.clipboard.writeText(L) : Promise.reject()).then(function () { toast("Invite link copied"); }, function () { prompt("Copy your invite link:", L); }); return; }
+        if (a === "friend") {
+          var used = m.friends.map(function (f) { return f.name; }), pool = FRIENDS.filter(function (n) { return used.indexOf(n) < 0; }), nm = pool.length ? pool[(Math.random() * pool.length) | 0] : "Friend " + (used.length + 1);
+          m.friends.unshift({ name: nm, ts: Date.now(), orders: 0 });
+          addPts(m, REF.join, "👋 " + nm + " joined with your code"); m.ledger[0].ref = 1;
+          if (m.friends.length === REF.goal) { m.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎁 " + REF.goal + " friends joined: " + REF.gift + " unlocked", ref: 1 }); toast("🎁 " + REF.gift + " unlocked!"); }
+          else toast("+" + REF.join + " points · " + nm + " joined");
+          put(m); drawJoin(); drawOwn(); return;
+        }
+        if (a === "forder") {
+          if (!m.friends.length) return;
+          var f = m.friends[(Math.random() * m.friends.length) | 0], firstOrder = f.orders === 0, p2 = firstOrder ? REF.first : REF.every; f.orders++;
+          addPts(m, p2, (firstOrder ? "🛒 " + f.name + "'s first order" : "🔁 " + f.name + " ordered again")); m.ledger[0].ref = 1; put(m);
+          drawJoin(); drawOwn(); toast("+" + p2 + " points · " + f.name + " ordered"); return;
+        }
+        if (a === "owner") own.scrollIntoView({ behavior: "smooth", block: "start" });
+      };
       return;
     }
-    join.innerHTML = '<span class="k">' + e(NAME) + ' Club · free</span>' +
+    var inviter = INVITE ? (refOwner(INVITE) || "A friend") : "";
+    join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards · free</span>' +
+      (INVITE ? '<div class="crm-invited">🤝 ' + e(inviter) + ' invited you! Join with code <b>' + e(INVITE) + '</b> and you get <b>+' + REF.join + ' bonus points</b>.</div>' : '') +
       '<div class="crm-gift"><b>🎁</b><span>Join now and get <u>' + e(OFFER) + '</u> instantly</span></div>' +
-      '<h3>Unlock your reward</h3><p>Plus stars every visit and a birthday treat. Takes 10 seconds.</p>' +
+      '<h3>Unlock your reward</h3><p>Plus ' + PER + ' points for every $1, a birthday treat, and your own code to invite friends. Takes 10 seconds.</p>' +
       '<form autocomplete="on" novalidate><label>First name</label><input name="name" maxlength="40" autocomplete="given-name">' +
       '<div class="two"><div><label>Phone</label><input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(310) 555-0123"></div>' +
       '<div><label>or Email</label><input name="email" type="email" maxlength="120" autocomplete="email"></div></div>' +
       '<label>Birthday month (for your birthday treat)</label><select name="bday"><option value="">Choose…</option>' + MONTHS.map(function (m, i) { return '<option value="' + i + '">' + m + '</option>'; }).join("") + '</select>' +
+      '<label>Friend\'s referral code (optional)</label><input name="ref" maxlength="16" autocapitalize="characters" value="' + e(INVITE) + '" placeholder="e.g. MARIA-21">' +
       '<label class="ok"><input type="checkbox" name="ok"> <span>Text / email me rewards and specials from ' + e(NAME) + '. Msg & data rates may apply. Reply STOP anytime.</span></label>' +
       '<button class="go" type="submit">🎁 Get my reward</button><div class="err"></div></form>' +
       '<p class="crm-fine">Demo: what you type stays on this phone only.</p>';
+    join.onclick = null;
     join.querySelector("form").onsubmit = function (ev) {
       ev.preventDefault();
       var f = this, er = f.querySelector(".err"), v = function (n) { return f[n].value.trim(); };
       if (!v("name")) { er.textContent = "Add your first name."; return; }
       if (!/\d{7,}/.test(v("phone").replace(/\D/g, "")) && !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v("email"))) { er.textContent = "Add a phone number or an email so we can send your reward."; return; }
       if (!f.ok.checked) { er.textContent = "Tick the box so we can send you your reward."; return; }
-      var r = { name: v("name"), phone: v("phone"), email: v("email"), bday: v("bday") === "" ? -1 : +v("bday"), visits: 1, stars: 25, last: Date.now(), joined: Date.now(), code: code(), offer: OFFER };
+      var rc = v("ref").toUpperCase(), byName = rc ? refOwner(rc) : "";
+      var r = { id: code4(8), name: v("name"), phone: v("phone"), email: v("email"), bday: v("bday") === "" ? -1 : +v("bday"), visits: 1, stars: 0, last: Date.now(), joined: Date.now(), code: code(), offer: OFFER,
+        ref: refCode(v("name")), refBy: rc, refByName: rc ? (byName || "code " + rc) : "", friends: [], ledger: [] };
+      addPts(r, 100, "🎉 Welcome to " + NAME + " Rewards");
+      if (rc) addPts(r, REF.join, "🤝 Joined with " + (byName ? byName.split(" ")[0] + "'s" : "a friend's") + " code");
       var list = mine(); list.unshift(r); save(list.slice(0, 5));
       drawJoin(); drawOwn("all", true);
     };
@@ -144,13 +276,28 @@
       '<div class="crm-list">' + pick.map(function (r, i) {
         return '<div class="crm-row' + (r.you ? ' you' : '') + '"><span class="crm-av" style="background:' + COLORS[i % COLORS.length] + '">' + e(r.name.charAt(0)) + '</span>' +
           '<span class="nm">' + e(r.name) + tags(r).map(function (t) { return '<span class="crm-tag ' + t[0] + '">' + t[1] + '</span>'; }).join("") + '</span>' +
-          '<span class="st">' + r.stars + ' ⭐</span><span class="ct">' + e([r.phone, r.email].filter(Boolean).join(" · ") || "—") + ' · ' + r.visits + ' visit' + (r.visits === 1 ? '' : 's') + ' · last ' + ago(r.last) + '</span></div>';
+          '<span class="st">' + (r.stars || 0).toLocaleString() + ' pts</span><span class="ct">' + e([r.phone, r.email].filter(Boolean).join(" · ") || "—") + ' · ' + r.visits + ' visit' + (r.visits === 1 ? '' : 's') + ' · last ' + ago(r.last) + '</span></div>';
       }).join("") + '</div>' +
       '<div class="crm-acts"><button type="button" class="hot" data-a="text">💬 Text this group</button><button type="button" data-a="csv">⬇️ Export list</button></div>' +
       '<div class="crm-compose"><textarea></textarea><div class="crm-bub"></div><p class="crm-fine" style="margin-bottom:0"></p></div>' +
+      '<div class="crm-box"><h4>🧾 Register: add points by code</h4><p style="margin:0 0 8px;font-size:13px">Your cashier or bartender types the customer\'s 4-digit code and the total. Points post to their phone instantly.</p>' +
+        '<div class="two"><input data-r="code" inputmode="numeric" maxlength="4" placeholder="4-digit code"><input data-r="amt" inputmode="decimal" placeholder="Total $"></div>' +
+        '<button type="button" class="go" style="margin-top:8px;background:#2547B8;box-shadow:none" data-a="reg">Add points</button><div class="err" data-r="msg" style="color:#3DDC97"></div>' +
+        (mine()[0] ? '<p class="crm-fine" style="margin:4px 0 0">Demo tip: tap "Scan to earn" above to see your code, then enter it here.</p>' : '') + '</div>' +
+      '<div class="crm-box crm-lead"><h4>🤝 Top referrers</h4><p style="margin:0;font-size:13px">Customers bringing you new customers. They earn +' + REF.join + ' when a friend joins and +' + REF.every + ' every time that friend orders.</p>' +
+        rows.filter(function (r) { return r.nfr || (r.friends && r.friends.length); }).map(function (r) { return { n: r.name, f: r.nfr || r.friends.length, o: r.nfo != null ? r.nfo : r.friends.reduce(function (a, x) { return a + x.orders; }, 0), you: r.you }; })
+          .sort(function (a, b) { return b.f - a.f || b.o - a.o; }).slice(0, 6).map(function (x, i) {
+            return '<div><span class="r">' + (i + 1) + '</span><span><b>' + e(x.n) + '</b>' + (x.you ? ' <span class="crm-tag t-you">YOU</span>' : '') + '<br><span style="color:#9AA6CC">' + x.f + ' friend' + (x.f === 1 ? '' : 's') + ' joined · ' + x.o + ' orders from them</span></span><b style="color:#3DDC97">+' + (x.f * REF.join + Math.min(x.o, x.f) * REF.first + Math.max(0, x.o - x.f) * REF.every).toLocaleString() + '</b></div>'; }).join("") + '</div>' +
       '<p class="crm-fine">Sample customers (made up) plus anyone who joins on this phone. Live, this list fills from real signups at your tables, and texts go only to people who opted in.</p>';
     own.querySelectorAll(".crm-seg button").forEach(function (b) { b.onclick = function () { drawOwn(b.dataset.s); }; });
     var cmp = own.querySelector(".crm-compose"), ta = cmp.querySelector("textarea");
+    own.querySelector('[data-a="reg"]').onclick = function () {
+      var c4 = own.querySelector('[data-r="code"]').value.trim(), amt = parseFloat(own.querySelector('[data-r="amt"]').value.replace(/[^0-9.]/g, "")), msg = own.querySelector('[data-r="msg"]'), m = mine()[0];
+      if (!/^\d{4}$/.test(c4) || !(amt > 0)) { msg.style.color = "#FF6B5E"; msg.textContent = "Enter the 4-digit code and the order total."; return; }
+      if (!m || regCode(m) !== c4) { msg.style.color = "#FF6B5E"; msg.textContent = "No customer has that code right now. Codes change every 5 minutes."; return; }
+      var got = Math.round(amt * PER); addPts(m, got, "🧾 Register order $" + amt.toFixed(2) + " · code " + c4); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m);
+      drawJoin(); drawOwn(); toast("+" + got + " points added to " + m.name.split(" ")[0]);
+    };
     var DEF = { all: "Hey {first}! Double stars at " + NAME + " this week only 🔥", new: "Welcome to the club, {first}! Your next visit earns 2× stars.",
       vip: "{first}, you're one of our VIPs 👑 Next one's on us this week.", risk: "Hey {first}, we miss you! 👀 Come back this week for 2× stars.",
       bday: "Happy birthday {first}! 🎂 Your free treat is waiting all month." };
@@ -163,8 +310,8 @@
     own.querySelector('[data-a="text"]').onclick = function () { cmp.style.display = "block"; ta.value = DEF[seg] || DEF.all; preview(); ta.focus(); };
     own.querySelector('[data-a="csv"]').onclick = function () {
       var q = function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; };
-      var csv = ["name,phone,email,visits,stars,last_visit,joined,birthday_month"].concat(all().map(function (r) {
-        return [r.name, r.phone, r.email, r.visits, r.stars, new Date(r.last).toISOString().slice(0, 10), new Date(r.joined).toISOString().slice(0, 10), r.bday >= 0 ? MONTHS[r.bday] : ""].map(q).join(",");
+      var csv = ["name,phone,email,visits,points,last_visit,joined,birthday_month,referral_code,referred_by,friends_referred"].concat(all().map(function (r) {
+        return [r.name, r.phone, r.email, r.visits, r.stars, new Date(r.last).toISOString().slice(0, 10), new Date(r.joined).toISOString().slice(0, 10), r.bday >= 0 ? MONTHS[r.bday] : "", r.ref || "", r.refByName || "", r.nfr || (r.friends ? r.friends.length : "")].map(q).join(",");
       })).join("\n");
       var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = SLUG + "-customers.csv"; document.body.appendChild(a); a.click(); a.remove();
     };

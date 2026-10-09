@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Second Shift AI — Owner Business Setup</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;600;800;900&display=swap">
+<style>
+:root{--bg:#070B1E;--card:#121C40;--edge:#25336A;--ink:#EEF2FF;--dim:#9AA6CC;--bolt:#E8582A;--gold:#FFD23F;--good:#3DDC97;
+  --display:"Bebas Neue","Arial Narrow",Impact,sans-serif;--body:"Archivo",system-ui,-apple-system,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:radial-gradient(900px 600px at 50% -10%,#24357a 0,transparent 60%),var(--bg);color:var(--ink);font:15.5px/1.5 var(--body);padding:0 16px calc(60px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:680px;margin:0 auto}
+header{padding-top:26px}
+.k{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:800}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,11vw,58px);letter-spacing:.03em;line-height:.95;margin:6px 0 8px}
+h1 span{color:var(--bolt)}
+.sub{color:var(--dim);margin:0}
+.prog{position:sticky;top:0;z-index:5;background:#070b1ef0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:12px 0;margin-top:14px;border-bottom:1px solid var(--edge)}
+.bar{height:12px;border-radius:99px;background:var(--card);border:1px solid var(--edge);overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--good));transition:width .3s}
+.prog small{display:flex;justify-content:space-between;color:var(--dim);margin-top:6px;font-size:12.5px}
+.rec{background:#e8582a1a;border:1px solid var(--bolt);border-radius:16px;padding:14px 16px;margin-top:16px}
+.rec b{color:var(--gold)}
+h2{font-family:var(--display);font-weight:400;font-size:32px;letter-spacing:.04em;margin:30px 0 6px;line-height:1}
+h2::before{content:"";display:inline-block;vertical-align:-2px;margin-right:10px;width:20px;height:20px;background:var(--bolt);clip-path:polygon(55% 0,10% 58%,45% 58%,30% 100%,90% 38%,55% 38%,75% 0)}
+details{background:var(--card);border:1px solid var(--edge);border-radius:16px;margin-top:10px;overflow:hidden}
+details[open]{border-color:#3a4a8a}
+summary{list-style:none;display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:14px;cursor:pointer}
+summary::-webkit-details-marker{display:none}
+summary input{width:24px;height:24px;accent-color:var(--good);margin:0}
+summary .t{font-weight:800;font-size:15.5px}summary .t small{display:block;font-weight:500;color:var(--dim);font-size:12.5px;margin-top:1px}
+summary .c{font-size:12px;font-weight:800;color:var(--gold);text-align:right;white-space:nowrap}
+details.done summary .t{text-decoration:line-through;text-decoration-color:#3ddc9799;color:var(--dim)}
+.body{padding:0 16px 16px 52px;color:#dfe6ff;font-size:14.5px}
+.body ol,.body ul{padding-left:18px;margin:8px 0}.body li{margin:5px 0}
+.body a.go{display:inline-flex;align-items:center;gap:6px;margin:8px 8px 0 0;text-decoration:none;background:var(--bolt);color:#fff;border-radius:10px;padding:9px 12px;font-weight:800;font-size:13.5px}
+.body a.go.alt{background:#2547B8}
+.note{color:var(--dim);font-size:13px;border-left:3px solid var(--gold);padding-left:10px;margin-top:10px}
+.cmp{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0}.cmp td,.cmp th{border-top:1px solid var(--edge);padding:7px 6px;text-align:left;vertical-align:top}.cmp th{color:var(--dim);font-weight:600}
+footer{color:var(--dim);font-size:12px;margin-top:28px;line-height:1.6}
+@media (max-width:420px){.body{padding-left:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="k" href="../../" style="text-decoration:none">← Second Shift AI · demos</a>
+  <h1>Make it <span>official</span></h1>
+  <p class="sub">Every step to lock down Second Shift AI: the name, the business, the trademark, the phone number, the money. Tap a step to open it, tick it off when it's done. Your progress saves on this phone.</p>
+</header>
+
+<div class="prog"><div class="bar"><i id="barI"></i></div><small><span id="cnt">0 of 0 done</span><a href="#" id="reset" style="color:var(--dim)">reset</a></small></div>
+
+<div class="rec"><b>Fastest path (recommended):</b> register <b>"Second Shift AI"</b> as a DBA (fictitious business name) under <b>Antidote Enterprises LLC</b>, which you already own. Your contracts already say "Antidote Enterprises LLC, doing business as Second Shift AI", so this makes them match on paper. About $26 plus a newspaper notice, done in a few weeks. Make it its own LLC later if it outgrows that.</div>
+
+<div id="steps"></div>
+
+<footer>Fees and rules are the latest we found (Oct 2026) and can change. Check the official link in each step before you pay. This is a checklist, not legal or tax advice; a California business lawyer or accountant can confirm anything you're unsure about.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var S = [
+    { h: "1 · Pick the setup" },
+    { id: "structure", t: "Decide: DBA under your LLC, or a new LLC", s: "5 minutes", c: "free",
+      b: '<table class="cmp"><tr><th></th><th>DBA under Antidote Enterprises LLC</th><th>New "Second Shift AI LLC"</th></tr>' +
+         '<tr><td>Cost to start</td><td>~$26 + ~$30–80 newspaper</td><td>$70 + $20, plus $800/yr state tax</td></tr>' +
+         '<tr><td>Time</td><td>1 day to file, 4 weeks of notices</td><td>Same week online</td></tr>' +
+         '<tr><td>Liability</td><td>Shared with the box-truck business</td><td>Kept separate</td></tr>' +
+         '<tr><td>Matches contracts now?</td><td>Yes</td><td>Need to update the wording</td></tr></table>' +
+         '<div class="note">Start with the DBA. If Second Shift starts bringing in steady money, form its own LLC and move the contracts over.</div>' },
+    { id: "namecheck", t: "Check the name is free", s: "15 minutes", c: "free",
+      b: '<ol><li>California business search: make sure no other company uses "Second Shift AI".</li><li>USPTO trademark search for <b>SECOND SHIFT</b>. There\'s an old woodworking-software mark and a pending beauty/medical filing; nothing for AI or software found so far.</li><li>Grab the matching domain (step 9) and keep <b>@second.shiftai</b> on Instagram.</li></ol>' +
+         '<a class="go" href="https://bizfileonline.sos.ca.gov/search/business" target="_blank" rel="noopener">CA business search</a><a class="go alt" href="https://tmsearch.uspto.gov/" target="_blank" rel="noopener">USPTO search</a>' },
+
+    { h: "2 · The business name" },
+    { id: "dba", t: "File the DBA (fictitious business name)", s: "1 hour + 4 weeks", c: "~$26",
+      b: '<ol><li>Go to the LA County Registrar-Recorder\'s fictitious business name page. Registrant = <b>Antidote Enterprises LLC</b> (have its CA Secretary of State file number ready).</li><li>Business name: <b>Second Shift AI</b>. Fee is about $26 for one name and one registrant, +$5 each extra; online adds a small service fee.</li><li>Include the notarized Affidavit of Identity the county requires.</li><li>File within 40 days of starting business under the name.</li></ol>' +
+         '<a class="go" href="https://lavote.gov/home/county-clerk/fictitious-business-names" target="_blank" rel="noopener">LA County FBN page</a><a class="go alt" href="https://lavote.gov/home/county-clerk/fictitious-business-names/frequently-asked-questions" target="_blank" rel="noopener">FBN FAQ</a>' },
+    { id: "publish", t: "Publish the notice in a newspaper", s: "4 weeks", c: "~$30–80",
+      b: '<ol><li>Within 30 days of filing, run the statement once a week for 4 weeks in an adjudicated LA County newspaper. Many small papers do it for you for a flat fee.</li><li>The paper files the proof of publication (affidavit) with the county. Keep a copy.</li><li>It\'s good for 5 years. Put a renewal reminder on your calendar.</li></ol>' },
+    { id: "llc", t: "Later, optional: its own LLC", s: "1 hour", c: "$70 + $20 + $800/yr",
+      b: '<ol><li>File Articles of Organization (LLC-1) on bizfile Online: $70.</li><li>Statement of Information (LLC-12) within 90 days: $20, then every 2 years.</li><li>$800 California franchise tax every year, including the first, due by the 15th day of the 4th month.</li><li>Get its own EIN (step 5) and bank account, and switch the contract wording.</li></ol>' +
+         '<a class="go" href="https://bizfileonline.sos.ca.gov/" target="_blank" rel="noopener">bizfile Online</a>' },
+
+    { h: "3 · The trademark" },
+    { id: "tm-ready", t: "Get ready to file", s: "30 minutes", c: "free",
+      b: '<ol><li>Owner of the mark = <b>Antidote Enterprises LLC</b> (a DBA can\'t own a trademark; the LLC behind it does).</li><li>What to register: the words <b>SECOND SHIFT AI</b> first (covers any logo style). The logo can be a second filing later.</li><li>Categories: <b>42</b> (software as a service / app building) and <b>35</b> (marketing, customer loyalty and rewards programs). That\'s 2 × $350.</li><li>Specimen: a screenshot of your site showing "Second Shift AI" next to the services and a way to sign up (the growth page works).</li><li>Make a USPTO.gov account and finish ID verification first; it can take a day.</li><li>Start using ™ after the name now. ® only after it registers.</li></ol>' +
+         '<a class="go" href="https://account.uspto.gov/" target="_blank" rel="noopener">USPTO account</a><a class="go alt" href="../../growth/" target="_blank" rel="noopener">Specimen page</a>' },
+    { id: "tm-clear", t: "Clearance search (worth it)", s: "1 week", c: "~$300–1,500",
+      b: '<p>There are existing "SECOND SHIFT" marks in other fields. A trademark attorney\'s clearance search tells you if yours can register before you spend the filing fees. Many do a flat-fee search + filing package.</p>' },
+    { id: "tm-file", t: "File on USPTO Trademark Center", s: "1 hour", c: "$350 per category",
+      b: '<ol><li>Trademark Center → new application → word mark <b>SECOND SHIFT AI</b>.</li><li>Pick the goods/services wording from the USPTO\'s ID Manual. Typing your own adds $200 per category.</li><li>Basis: "in use" (you\'re already selling) with your specimen and first-use dates, or "intent to use".</li><li>Pay $350 × 2 = $700 for classes 42 + 35. Save the serial number.</li></ol>' +
+         '<a class="go" href="https://www.uspto.gov/trademarks/apply" target="_blank" rel="noopener">Apply at USPTO</a><a class="go alt" href="https://idm-tmng.uspto.gov/id-master-list-public.html" target="_blank" rel="noopener">ID Manual</a>' },
+    { id: "tm-watch", t: "Answer letters + keep it alive", s: "12–18 months", c: "varies",
+      b: '<ol><li>An examiner reviews it in several months. If you get an "office action", you usually have 3 months to answer.</li><li>After it\'s published, others get 30 days to object, then it registers.</li><li>Keep it: file the Section 8 declaration between years 5 and 6, and renew every 10 years.</li><li>Watch for scam letters asking for "registry fees". Real ones come from @uspto.gov.</li></ol>' },
+
+    { h: "4 · Phone, email, web" },
+    { id: "phone", t: "Get a business phone number", s: "15 minutes", c: "free–$20/mo",
+      b: '<table class="cmp"><tr><th>Option</th><th>Good for</th><th>About</th></tr>' +
+         '<tr><td>Google Voice</td><td>A free second number on your iPhone</td><td>free / ~$10 with Workspace</td></tr>' +
+         '<tr><td>Quo (OpenPhone)</td><td>Business calls + texts, Damani can share it</td><td>~$15–20/mo</td></tr>' +
+         '<tr><td>Twilio</td><td>Automatic win-back / "you\'re nearby" texts to customers</td><td>pay per text + registration</td></tr></table>' +
+         '<div class="note">Start with one number on your phone. Before sending automated texts to customers, register it for business texting (A2P 10DLC) or carriers block it.</div>' +
+         '<a class="go" href="https://voice.google.com/" target="_blank" rel="noopener">Google Voice</a><a class="go alt" href="https://www.quo.com/" target="_blank" rel="noopener">Quo</a>' },
+    { id: "domain", t: "Domain + business email", s: "30 minutes", c: "~$10–80/yr + ~$7/mo",
+      b: '<ol><li>Buy the domain (e.g. secondshift.ai or secondshiftai.com) in your Porkbun account.</li><li>Google Workspace for hello@ / antidote@ that domain.</li><li>Point the domain at the site so prospects see your name in the link.</li></ol><a class="go" href="https://porkbun.com/" target="_blank" rel="noopener">Porkbun</a><a class="go alt" href="https://workspace.google.com/" target="_blank" rel="noopener">Google Workspace</a>' },
+    { id: "google", t: "Google Business Profile", s: "20 minutes", c: "free",
+      b: '<p>A "Second Shift AI" profile (service-area business, hide home address) gets you found and lets clients leave you reviews.</p><a class="go" href="https://business.google.com/" target="_blank" rel="noopener">Google Business</a>' },
+
+    { h: "5 · Money" },
+    { id: "ein", t: "EIN (tax ID)", s: "15 minutes", c: "free",
+      b: '<p>Antidote Enterprises LLC already has one, so for the DBA path you\'re done. Only a <b>new</b> LLC needs its own; get it free on IRS.gov, never from a paid site.</p><a class="go" href="https://www.irs.gov/businesses/small-businesses-self-employed/apply-for-an-employer-identification-number-ein-online" target="_blank" rel="noopener">IRS EIN</a>' },
+    { id: "bank", t: "Separate bank account", s: "1 hour", c: "usually free",
+      b: '<ol><li>Open "Antidote Enterprises LLC dba Second Shift AI" (bring the DBA certificate + publication proof, LLC papers, EIN, your ID).</li><li>Every setup fee and monthly payment goes here, nowhere else. That keeps taxes clean and protects the LLC.</li></ol>' },
+    { id: "stripe", t: "Stripe for setup fees + monthly billing", s: "45 minutes", c: "2.9% + 30¢",
+      b: '<ol><li>Create products: Pay in full ($2,000 + $300/mo), Half down ($1,000 + $400/mo × 12, then $300), Starter ($500 + $450/mo × 12, then $300).</li><li>Payment links you can text right after they sign.</li><li>Payouts to the Second Shift bank account.</li></ol><a class="go" href="https://dashboard.stripe.com/register" target="_blank" rel="noopener">Stripe</a>' },
+    { id: "license", t: "City business license", s: "30 minutes", c: "often $0 to start",
+      b: '<p>If you run it from the City of Los Angeles, register for a Business Tax Registration Certificate within 30 days of starting. Small businesses under the revenue limit can file for the small-business exemption (you still have to file to get it). Outside LA, check your own city.</p><a class="go" href="https://finance.lacity.gov/tax-education/business-tax-registration-certificate" target="_blank" rel="noopener">LA City BTRC</a>' },
+
+    { h: "6 · Protect it" },
+    { id: "contract", t: "Lawyer review of the agreement", s: "1–2 weeks", c: "varies",
+      b: '<p>Have a California business lawyer read the services agreement (the "Draft the agreement" button), especially the payment plans, minimum terms and the data section. Update the template with their changes.</p><a class="go" href="../../lucky-dragon/#contract" target="_blank" rel="noopener">Open the agreement</a>' },
+    { id: "insure", t: "Business insurance", s: "30 minutes", c: "~$30–80/mo",
+      b: '<p>General liability + professional (tech errors & omissions) covers you if a client says the app or a promotion cost them money. Quote online and add the DBA name.</p>' },
+    { id: "taxes", t: "Tax setup", s: "1 hour", c: "varies",
+      b: '<p>Ask your tax preparer how to report Second Shift income under the LLC, whether the printed QR table tents change anything for sales tax, and what to set aside each month.</p>' }
+  ];
+  var KEY = "ssai_setup_done", done = {};
+  try { done = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (x) {}
+  var box = document.getElementById("steps"), html = "", total = 0;
+  S.forEach(function(s){
+    if (s.h) { html += "<h2>" + s.h + "</h2>"; return; }
+    total++;
+    html += '<details id="' + s.id + '"' + (done[s.id] ? ' class="done"' : '') + '><summary><input type="checkbox" data-id="' + s.id + '"' + (done[s.id] ? " checked" : "") + ' aria-label="Done">' +
+      '<span class="t">' + s.t + '<small>⏱ ' + s.s + '</small></span><span class="c">' + s.c + '</span></summary><div class="body">' + s.b + '</div></details>';
+  });
+  box.innerHTML = html;
+  function prog(){
+    var n = Object.keys(done).filter(function(k){ return done[k]; }).length;
+    document.getElementById("cnt").textContent = n + " of " + total + " done";
+    document.getElementById("barI").style.width = (n / total * 100) + "%";
+  }
+  box.addEventListener("click", function(e){ if (!e.target.matches("summary input")) return; var d = e.target.closest("details"), was = d.open; setTimeout(function(){ d.open = was; }, 0); });
+  box.addEventListener("change", function(e){
+    var c = e.target; if (!c.dataset.id) return;
+    done[c.dataset.id] = c.checked; c.closest("details").classList.toggle("done", c.checked);
+    try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (x) {}
+    prog();
+  });
+  document.getElementById("reset").onclick = function(e){ e.preventDefault(); done = {}; try { localStorage.removeItem(KEY); } catch (x) {} location.reload(); };
+  try { var el = location.hash && document.querySelector(location.hash); if (el && el.tagName === "DETAILS") el.open = true; } catch (x) {}
+  prog();
+})();
+</script>
+</body>
+</html>

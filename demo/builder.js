@@ -9,8 +9,8 @@
    plate: a top-down plate; parts with group "Base" are pick-one, the rest land in the next free spot (x, y, w as fractions). */
 (function () {
   "use strict";
-  var C = window.BUILDER; if (!C) return;
-  var IMG = C.img || "img/build/", EXT = C.ext || ".webp";
+  var C0 = window.BUILDER; if (!C0) return;
+  var IMG = C0.img || "img/build/", EXT = C0.ext || ".webp";
   var e = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var money = function (n) { return "$" + n.toFixed(2); };
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -38,6 +38,9 @@
     ".bld .chip .ph img{width:86%;height:86%;object-fit:contain;pointer-events:none}",
     ".bld .chip.on .ph{border-color:#FF7A3D;box-shadow:0 0 0 3px #ff7a3d33}.bld .chip:active .ph{transform:scale(.92)}",
     ".bld .chip.off{opacity:.35}",
+    ".bld .tabs{display:flex;gap:6px;margin:12px 0 0;background:#070B1E;border:1px solid #25336A;border-radius:999px;padding:4px}",
+    ".bld .tabs button{flex:1;border:0;border-radius:999px;padding:9px 6px;font:800 13.5px system-ui;color:#C9D2EE;background:none;cursor:pointer;transition:background .2s,color .2s}",
+    ".bld .tabs button.on{background:linear-gradient(90deg,#E8582A,#FF7A3D);color:#fff;box-shadow:0 4px 14px #e8582a55}",
     ".bld .chip b{font-size:11.5px;font-weight:700;text-align:center;line-height:1.15}.bld .chip small{font-size:10.5px;color:#9AA6CC}",
     ".bld .chip .n{position:absolute;top:-2px;right:6px;min-width:20px;height:20px;border-radius:10px;background:#FF7A3D;color:#fff;font:900 11px/20px system-ui;text-align:center;padding:0 5px}",
     ".bld .chip .m{position:absolute;top:40px;left:2px;width:22px;height:22px;border-radius:50%;background:#070B1E;border:1px solid #9AA6CC;color:#fff;font:900 14px/18px system-ui}",
@@ -68,11 +71,18 @@
   ].join("");
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 
+  // variants: one builder, several items (burger / chicken sandwich); each variant overrides the base config
+  var VARS = C0.variants, cur = null;
+  function cfg(vi) { if (!VARS) return C0; var o = {}, k; for (k in C0) o[k] = C0[k]; for (k in VARS[vi]) o[k] = VARS[vi][k]; return o; }
+  function build(vi) {
+  var C = cfg(vi);
+
   var P = {}; C.parts.forEach(function (p) { P[p.id] = p; });
   var groups = []; C.parts.forEach(function (p) { var g = p.group || "Add"; if (groups.indexOf(g) < 0) groups.push(g); });
   var counts = {}, layers = [], fired = false;
   var el = document.createElement("section"); el.className = "bld"; el.id = "build";
   el.innerHTML = '<div class="hd"><div><span class="k">Order · build it yourself</span><h3>Build your <i>' + e(C.accent) + '</i></h3></div></div>' +
+    (VARS ? '<div class="tabs" role="tablist">' + VARS.map(function (v, i) { return '<button type="button" role="tab" data-v="' + i + '"' + (i === vi ? ' class="on" aria-selected="true"' : '') + '>' + e(v.tab || v.accent) + '</button>'; }).join("") + '</div>' : '') +
     '<div class="stage"><div class="glow"></div>' + (C.mode === "plate" ? '<div class="plate"><img class="pl" src="' + IMG + 'plate' + EXT + '" alt=""></div>' : '<div class="stack"></div>') +
     '<div class="flames"><div class="hot"></div></div><div class="busy"></div></div>' +
     '<div class="hint"></div>' +
@@ -103,7 +113,7 @@
   function rebuildStack() {
     stack.innerHTML = ""; layers = [];
     (C.start || []).forEach(function (id) { addLayer(id); });
-    C.parts.forEach(function (p) { for (var n = 0; n < (counts[p.id] || 0); n++) addLayer(p.id); });
+    (C.stackOrder ? C.stackOrder.map(function (id) { return P[id]; }) : C.parts).forEach(function (p) { for (var n = 0; n < (counts[p.id] || 0); n++) addLayer(p.id); });
   }
 
   // ---- plate (hibachi) ----
@@ -148,14 +158,16 @@
       if (n > 1 || (n && P[id].group !== "Base")) { if (!b) { b = document.createElement("span"); b.className = "n"; c.appendChild(b); } b.textContent = n; } else if (b) b.remove();
       if (n && P[id].group !== "Base") { if (!m) { m = document.createElement("span"); m.className = "m"; m.textContent = "−"; m.setAttribute("role", "button"); m.setAttribute("aria-label", "Remove one " + P[id].name); c.appendChild(m); } } else if (m) m.remove();
     });
-    var any = Object.keys(counts).some(function (k) { return counts[k]; }), needBase = C.mode === "plate" && !C.parts.some(function (q) { return q.group === "Base" && counts[q.id]; });
-    fireB.disabled = !any || needBase;
-    if (p) say(p.group === "Base" ? (C.baseLine || "Base is down. Now the good stuff.") : LINES[(Math.random() * LINES.length) | 0] + (fireB.disabled ? "" : " Fire it when it looks right."));
-    else if (!any) say(C.mode === "plate" ? "Tap or drag your base onto the plate first." : "Tap or drag anything onto your " + C.accent + ".");
+    var any = Object.keys(counts).some(function (k) { return counts[k]; }), needBase = C.mode === "plate" && !C.parts.some(function (q) { return q.group === "Base" && counts[q.id]; }),
+      needG = C.need && !C.parts.some(function (q) { return q.group === C.need && counts[q.id]; });
+    fireB.disabled = !any || needBase || !!needG;
+    if (p) say(p.group === "Base" ? (C.baseLine || "Base is down. Now the good stuff.") : needG ? (C.needLine || "Pick your " + C.need.toLowerCase() + " first.") : LINES[(Math.random() * LINES.length) | 0] + (fireB.disabled ? "" : " Fire it when it looks right."));
+    else if (!any || needG) say(C.mode === "plate" ? "Tap or drag your base onto the plate first." : C.needLine || "Tap or drag anything onto your " + C.accent + ".");
   }
 
   // ---- tap + drag ----
   var drag = null;
+  el.addEventListener("click", function (ev) { var t = ev.target.closest(".tabs button"); if (t && +t.dataset.v !== vi) build(+t.dataset.v); });
   el.addEventListener("pointerdown", function (ev) {
     var m = ev.target.closest(".m"); if (m) { ev.preventDefault(); sub(m.parentNode.dataset.id); return; }
     var c = ev.target.closest(".chip"); if (!c || fired) return;
@@ -199,7 +211,13 @@
   });
 
   var mount = C.mount && document.querySelector(C.mount);
-  if (mount && mount.parentNode) mount.parentNode.insertBefore(el, mount); else document.body.appendChild(el);
+  if (cur && cur.parentNode) cur.parentNode.replaceChild(el, cur);
+  else if (mount && mount.parentNode) mount.parentNode.insertBefore(el, mount); else document.body.appendChild(el);
+  cur = el;
   if (C.mode === "plate") drawPlate(); else rebuildStack();
   refresh();
+  }
+  var h = (location.hash || "").slice(1), v0 = 0;
+  if (VARS) VARS.forEach(function (v, i) { if (v.hash && v.hash === h) v0 = i; });
+  build(v0);
 })();

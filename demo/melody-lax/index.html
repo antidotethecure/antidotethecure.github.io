@@ -652,8 +652,8 @@ function end(){
   G.running=false; G.over=true; hud();
   var b=best(); if(G.score>b){ try{ localStorage.setItem("melody-best",G.score); }catch(e){} }
   $("final").textContent=G.score.toLocaleString()+" pts";
-  var prize=G.score>=3000?"a Free appetizer":G.score>=2200?"Free Gilroy Garlic Fries":G.score>=1500?"Free Melody Fries":G.score>=800?"$3 off any drink":"";
-  $("rank").textContent=prize?"🏆 You won "+prize.replace(/^a /,"a "):"Best: "+Math.max(b,G.score).toLocaleString()+" pts · 800 wins a prize";
+  var prize=G.score>=7500?"a Free appetizer":G.score>=6800?"Free Gilroy Garlic Fries":G.score>=5500?"Free Melody Fries":G.score>=4000?"$3 off any drink":"";
+  $("rank").textContent=prize?"🏆 You won "+prize.replace(/^a /,"a "):"Best: "+Math.max(b,G.score).toLocaleString()+" pts · 4,000 wins a prize";
   var won=$("won"); won.style.display="none";
   if(prize&&window.SSAI_WIN){ var r=window.SSAI_WIN(prize.replace(/^a /,""));
     if(r.blocked){ won.innerHTML="🏆 You'd win "+esc(prize)+" — but you already have <b>"+esc(r.prize.t)+"</b> waiting (code "+r.prize.c+").<br><span style=\"font-weight:600;font-size:13px;color:#c9d2ee\">Use it by "+esc(r.until)+", then your next win saves. One reward at a time.</span>"; won.style.display="block"; } else
@@ -708,7 +708,7 @@ $("points").innerHTML='<div class="ptsh">Grab these</div><div class="pts">'+PICK
   row('<span class="e">🪙</span>',"Melody coin","+10")+row(ic(MIC),"Karaoke mic","2× · 6s")+row('<span class="e">➕</span>',"Health kit (rare)","+25%")+'</div>'+
   '<div class="ptsh">Shoot these down</div><div class="pts">'+row('<span class="e">🛸</span>',"UFO (2 hits)","+150")+row('<span class="e">🛩️</span>',"Fighter jet","+200")+row('<span class="e">✈️</span>',"Kamikaze plane (4 hits)","+300")+'</div>'+
   '<div class="ptsh">Dodge these · each hit takes ⅓ of your health</div><div class="pts">'+row('<span class="e">⚡</span>',"Lightning","−⅓",1)+row('<span class="e">🚀</span>',"Missiles & UFO zaps","−⅓",1)+row('<span class="e">💥</span>',"Crashing into anything","−⅓",1)+row('<span class="e">🔴</span>',"Red flash + buzz = plane coming","dodge!",1)+'</div>'+
-  '<div class="ptsh">Prizes</div><div class="pts">'+row('<span class="e">🥤</span>',"$3 off any drink","800")+row('<span class="e">🍟</span>',"Free Melody Fries","1,500")+row('<span class="e">🧄</span>',"Free Gilroy Garlic Fries","2,200")+row('<span class="e">🍤</span>',"Free appetizer","3,000")+'</div>';
+  '<div class="ptsh">Prizes</div><div class="pts">'+row('<span class="e">🥤</span>',"$3 off any drink","4,000")+row('<span class="e">🍟</span>',"Free Melody Fries","5,500")+row('<span class="e">🧄</span>',"Free Gilroy Garlic Fries","6,800")+row('<span class="e">🍤</span>',"Free appetizer","7,500")+'</div>';
 })();
 </script>
 <script>window.CRM_CFG={name:"Melody Bar & Grill",offer:"Free Melody Fries on your next visit",mount:"#rwhost",tiers:[[250,"Free Melody Fries"],[500,"Free house margarita"],[800,"Free Lobster Mac & Cheese"],[1300,"Free appetizer platter"]],referral:{gift:"Free Melody Fries"}};</script>

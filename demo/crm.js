@@ -156,6 +156,8 @@
   function addPts(m, n, why) { m.stars = Math.max(0, (m.stars || 0) + n); (m.ledger = m.ledger || []).unshift({ ts: Date.now(), pts: n, t: why }); m.ledger = m.ledger.slice(0, 40); }
   function toast(t) { var d = document.createElement("div"); d.className = "crm-toast"; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2600); }
   var qs = new URLSearchParams(location.search), INVITE = (qs.get("ref") || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 16);
+  // missed-call text-back: the auto-text after an unanswered or after-hours call links here with ?missed=1
+  var MISSED = qs.get("missed") === "1" || qs.get("src") === "call", MC = C.missed || { offer: "10% off your order", days: 7 };
   var FRIENDS = ["Jasmine", "Carlos", "Devon", "Mia", "Andre", "Lily", "Marco", "Keisha", "Tran", "Gabby"];
   function shareLink(m) { return location.origin + location.pathname + "?ref=" + encodeURIComponent(m.ref) + "#crm-join"; }
 
@@ -163,9 +165,9 @@
   var PEND = KEY + "_prize";
   // rules: a prize expires 3 days after it is won, a guest holds ONE unused prize at a time (no stacking), one reward per visit
   var WIN_TTL = 3 * 864e5;
-  function liveWin(w) { return w && !w.used && Date.now() - w.ts < WIN_TTL ? w : null; }
+  function liveWin(w) { return w && !w.used && Date.now() - w.ts < (w.ttl || WIN_TTL) ? w : null; }
   function activeWin(m) { return m ? (m.wins || []).filter(liveWin)[0] || null : liveWin(pending()); }
-  function until(w) { return new Date(w.ts + WIN_TTL).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); }
+  function until(w) { return new Date(w.ts + (w.ttl || WIN_TTL)).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); }
   window.SSAI_WIN = function (prize) {
     var w = { t: prize, c: "WIN-" + code4(4), ts: Date.now() }, m = mine()[0], held = activeWin(m);
     if (held) return { prize: held, saved: !!m, blocked: true, until: until(held) };
@@ -190,7 +192,7 @@
       var refPts = (me.ledger || []).filter(function (l) { return l.ref; }).reduce(function (a, l) { return a + l.pts; }, 0);
       var first = e(me.name.split(" ")[0]);
       join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards</span><h3>Hey ' + first + '! 👋</h3>' +
-        (activeWin(me) ? '<div class="crm-win" style="border-color:#3DDC97"><div style="font-size:30px">🏆</div><b>You won ' + e(activeWin(me).t) + '!</b><div class="code">' + e(activeWin(me).c) + '</div><small>Show this code at ' + e(NAME) + ' to redeem it. Use by <b>' + e(until(activeWin(me))) + '</b>. One reward per visit; win again after you use this one.</small></div><div style="height:10px"></div>' : '') +
+        (activeWin(me) ? '<div class="crm-win" style="border-color:#3DDC97"><div style="font-size:30px">' + (activeWin(me).k === "missed" ? '📞' : '🏆') + '</div><b>' + (activeWin(me).k === "missed" ? 'Sorry we missed your call! Here\'s ' + e(activeWin(me).t) : 'You won ' + e(activeWin(me).t) + '!') + '</b><div class="code">' + e(activeWin(me).c) + '</div><small>Show this code at ' + e(NAME) + ' to redeem it. Use by <b>' + e(until(activeWin(me))) + '</b>. One reward per visit; win again after you use this one.</small></div><div style="height:10px"></div>' : '') +
         '<div class="crm-win"><div style="font-size:30px">🎁</div><b>' + e(me.offer || OFFER) + '</b><div class="code">' + e(me.code) + '</div><small>Your welcome reward. Show this at the counter.</small></div>' +
         (me.bday >= 0 ? (isBday(me) || me.bdemo ? '<div class="crm-win bd"><div style="font-size:30px">🎂</div><b>Happy birthday, ' + first + '! Your free birthday treat is unlocked</b><div class="code">' + e(me.bcode || "BDAY") + '</div><small>Show this code with a photo ID that says ' + e(bdayStr(me)) + '. Good for 7 days.</small></div>'
           : '<div class="crm-bday"><h4>🎂 Birthday treat · ' + e(bdayStr(me)) + '</h4><div style="font-size:13px;color:#C9D2EE">It unlocks on your birthday and we\'ll text you a reminder that morning. To claim it, bring a photo ID that matches this date.</div><button type="button" class="crm-demo" data-a="bday">▶ Demo: it\'s my birthday</button></div>') : '') +
@@ -279,6 +281,7 @@
     var inviter = INVITE ? (refOwner(INVITE) || "A friend") : "", pw = pending();
     join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards · free</span>' +
       (pw ? '<div class="crm-invited" style="border-color:#FFD23F;background:#FFD23F22;color:#FFE9A3">🏆 You won <b>' + e(pw.t) + '</b> in the game! Join below to save it, then show it at ' + e(NAME) + ' to redeem.</div>' : '') +
+      (MISSED ? '<div class="crm-invited" style="border-color:#7FB3FF;background:#7FB3FF22;color:#DCE8FF">📞 Sorry we missed your call! Join below with your name and phone or email and get <b>' + e(MC.offer) + '</b> on your next visit. Just show your code at the counter.</div>' : '') +
       (INVITE ? '<div class="crm-invited">🤝 ' + e(inviter) + ' invited you! Join with code <b>' + e(INVITE) + '</b> and you get <b>+' + REF.join + ' bonus points</b>.</div>' : '') +
       '<div class="crm-gift"><b>🎁</b><span>Join now and get <u>' + e(OFFER) + '</u> instantly</span></div>' +
       '<h3>Unlock your reward</h3><p>Plus ' + PER + ' points for every $1, a birthday treat, and your own code to invite friends. Takes 10 seconds.</p>' +
@@ -308,6 +311,7 @@
       addPts(r, 100, "🎉 Welcome to " + NAME + " Rewards");
       if (rc) addPts(r, REF.join, "🤝 Joined with " + (byName ? byName.split(" ")[0] + "'s" : "a friend's") + " code");
       var pz = pending(); if (pz) { r.wins = [pz]; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "🏆 Won " + pz.t + " in the game" }); try { localStorage.removeItem(PEND); } catch (x) {} }
+      else if (MISSED) { r.wins = [{ t: MC.offer, c: "CALL-" + code4(4), ts: Date.now(), ttl: (MC.days || 7) * 864e5, k: "missed" }]; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "📞 Sorry we missed your call: " + MC.offer }); r.src = "missed call"; }
       var list = mine(); list.unshift(r); save(list.slice(0, 5));
       drawJoin(); drawOwn("all", true);
     };
@@ -364,7 +368,7 @@
       if (m) { (m.wins || []).forEach(function (w) { if (w.c === c) { hit = w; kind = "win"; } }); if (!hit && m.redeem && m.redeem.c === c) { hit = m.redeem; kind = "pts"; } if (!hit && m.bcode === c) { hit = { c: c, t: "Birthday treat", ts: Date.now() }; kind = "bday"; } }
       if (!hit) return bad("No reward with that code. Check the letters, or it may belong to another phone (live: every code is looked up in your database).");
       if (hit.used || (m.bused && kind === "bday")) return bad("Already used on " + new Date(hit.used || m.bused).toLocaleString() + ". Each code works once.");
-      if (kind === "win" && Date.now() - hit.ts >= WIN_TTL) return bad("Expired " + until(hit) + ". Prizes are good for 3 days.");
+      if (kind === "win" && Date.now() - hit.ts >= (hit.ttl || WIN_TTL)) return bad("Expired " + until(hit) + ".");
       if (m.lastRedeem && Date.now() - m.lastRedeem < 4 * 36e5) return bad("This guest already used a reward this visit. One reward per visit.");
       if (kind === "bday") m.bused = Date.now(); else hit.used = Date.now();
       m.lastRedeem = Date.now(); (m.ledger = m.ledger || []).unshift({ ts: Date.now(), pts: 0, t: "✅ Redeemed " + hit.t + " · " + c }); put(m);

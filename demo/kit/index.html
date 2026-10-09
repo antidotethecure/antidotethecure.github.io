@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pitch Kit — Second Shift AI</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;600;800;900&family=IBM+Plex+Mono:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070B1E;--card:#121C40;--card2:#1a2656;--edge:#25336A;--ink:#EEF2FF;--dim:#9AA6CC;--accent:#FFD23F;--bolt:#E8582A;--good:#3DDC97;
+  --display:"Bebas Neue","Arial Narrow",Impact,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"Archivo",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15.5px/1.5 var(--sans);overflow-x:clip}
+.wrap{max-width:900px;margin:0 auto;padding:0 14px 90px}
+a{color:var(--accent)}
+.top{position:sticky;top:0;z-index:20;background:#070B1Ef2;backdrop-filter:blur(8px);border-bottom:1px solid var(--edge);margin:0 -14px;padding:8px 14px}
+.top b{font:400 24px var(--display);letter-spacing:.05em}.top b span{color:var(--bolt)}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-top:6px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tabs a{flex:none;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--edge);border-radius:99px;padding:6px 12px;font-weight:800;font-size:13.5px}
+h2{font:400 34px/1 var(--display);letter-spacing:.04em;margin:30px 0 6px;scroll-margin-top:96px}
+.sub{color:var(--dim);margin:0 0 12px;font-size:14.5px}
+.fill{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:12px;margin-top:12px}
+.fill label{font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.fill input,.fill select{width:100%;margin-top:4px;padding:10px;border-radius:10px;border:1px solid var(--edge);background:#0b1230;color:var(--ink);font:600 15px var(--sans)}
+.card{background:linear-gradient(180deg,var(--card),#0d1533);border:1px solid var(--edge);border-radius:16px;padding:14px;margin-top:10px}
+.card .hd{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.card .hd b{font-size:16px}.card .hd small{display:block;color:var(--dim);font-weight:600;font-size:12.5px}
+.txt{white-space:pre-wrap;background:#0b1230;border:1px solid var(--edge);border-radius:12px;padding:12px;margin-top:10px;font-size:14.5px;color:#dfe5ff}
+.cp{flex:none;border:0;border-radius:10px;padding:9px 13px;font:900 13.5px var(--sans);cursor:pointer;background:var(--accent);color:#1a1405}
+.cp.done{background:var(--good);color:#04140e}
+.btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-weight:900;font-size:13.5px;border-radius:10px;padding:8px 12px;border:1px solid var(--edge);background:var(--card2);color:var(--ink);cursor:pointer}
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.tier{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px}
+.tier.star{border-color:var(--bolt);box-shadow:0 0 0 2px #e8582a44}
+.tier .nm{font:400 26px var(--display);letter-spacing:.04em}.tier .mo{font:400 38px/1 var(--display);color:var(--accent)}.tier .mo small{font:700 13px var(--sans);color:var(--dim)}
+.tier p{color:var(--dim);font-size:13.5px;margin:6px 0 10px}
+details.q{background:var(--card);border:1px solid var(--edge);border-radius:14px;margin-top:8px}
+details.q summary{cursor:pointer;padding:12px 14px;font-weight:800;list-style:none;display:flex;justify-content:space-between;gap:10px}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary::after{content:"+";color:var(--accent);font-size:20px;line-height:1}
+details.q[open] summary::after{content:"−"}
+details.q .a{padding:0 14px 14px}
+.tag{font:700 10px var(--mono);letter-spacing:.12em;color:var(--good);border:1px solid #3DDC9766;border-radius:99px;padding:2px 7px;margin-left:6px;vertical-align:middle}
+.links{display:grid;gap:8px;margin-top:10px}
+.lk{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:10px 12px}
+.lk .ic{font-size:24px;flex:none}.lk .t{flex:1;min-width:0}.lk .t b{display:block}.lk .t small{color:var(--dim);font-size:12.5px;display:block;overflow-wrap:anywhere}
+.lk .act{display:flex;gap:6px;flex:none}
+.grp{font:700 12px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:20px 0 6px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--good);color:#04140e;font-weight:900;padding:10px 16px;border-radius:99px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
+.toast.on{opacity:1}
+@media (max-width:480px){.lk{flex-wrap:wrap}.lk .act{width:100%}.lk .act .btn,.lk .act .cp{flex:1;justify-content:center}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><b>Pitch <span>Kit</span> · Second Shift AI</b>
+  <div class="tabs"><a href="#fill">✏️ Fill in</a><a href="#messages">💬 Messages</a><a href="#tiers">💲 Packages</a><a href="#faq">❓ Answers</a><a href="#demos">🎮 Live demos</a><a href="#resources">📎 Resources</a></div>
+</div>
+
+<h2 id="fill">Who are you pitching?</h2>
+<p class="sub">Type it once. Every message and answer below fills in by itself. Saved on this phone.</p>
+<div class="fill">
+  <div><label>Restaurant name</label><input id="f_rest" placeholder="Gritz N Wafflez"></div>
+  <div><label>Owner first name</label><input id="f_owner" placeholder="Jurni"></div>
+  <div><label>Their sample app link (if built)</label><input id="f_link" placeholder="https://antidotethecure.github.io/demo/..."></div>
+  <div><label>Their POS</label><select id="f_pos"><option>Toast</option><option>Square</option><option>Clover</option><option>another register</option></select></div>
+  <div><label>Package to pitch</label><select id="f_pkg"><option value="full">Full Show</option><option value="rewards">Rewards</option><option value="menu">Menu</option><option value="everything">Everything</option></select></div>
+</div>
+
+<h2 id="messages">Copy-paste messages</h2>
+<p class="sub">Tap Copy, paste into Instagram, text or email.</p>
+<div id="msghost"></div>
+
+<h2 id="tiers">Packages</h2>
+<p class="sub">Full breakdown with every tool and price: <a href="../everything/" target="_blank" rel="noopener">the Everything page</a>.</p>
+<div class="tiers" id="tierhost"></div>
+<div class="card"><div class="hd"><div><b>Payment plans</b><small>Full Show shown. Same idea for every package.</small></div><button class="cp" data-copy="plans">Copy</button></div><div class="txt" id="plans"></div></div>
+
+<h2 id="faq">Answers to what owners ask</h2>
+<p class="sub">Tap a question, then Copy the answer.</p>
+<div id="faqhost"></div>
+
+<h2 id="demos">Live demos</h2>
+<p class="sub">Everything here is live and playable on a phone. <b>Copy link</b> = just the link. <b>💬 Send</b> = a ready message with the link and the owner's name.</p>
+<div id="demohost"></div>
+
+<h2 id="resources">Resources</h2>
+<div id="reshost"></div>
+</div>
+<div class="toast" id="toast">Copied ✓</div>
+<script>
+(function(){
+"use strict";
+var $=function(i){return document.getElementById(i);};
+var BASE="https://antidotethecure.github.io/demo/";
+var F={rest:"",owner:"",link:"",pos:"Toast",pkg:"full"};
+try{ F=Object.assign(F,JSON.parse(localStorage.getItem("ssai-kit")||"{}")); }catch(e){}
+["rest","owner","link","pos","pkg"].forEach(function(k){ var el=$("f_"+k); el.value=F[k]||el.value; el.addEventListener("input",function(){ F[k]=el.value; try{localStorage.setItem("ssai-kit",JSON.stringify(F));}catch(e){} render(); }); });
+var PK={menu:{n:"Menu",set:750,mo:99,d:"QR menu with real-looking photos, order from the table, 12 languages, Google reviews + map, QR table tents."},
+  rewards:{n:"Rewards",set:2000,mo:300,d:"Everything in Menu + your own game and weekly leaderboard, points, scan to earn at the register, visit levels, birthday club, your customer list."},
+  full:{n:"Full Show",set:2500,mo:400,d:"Everything in Rewards + referrals, text blasts to your list, special deals, build-your-meal and the motion menu (drinks pour, food steams).",star:1},
+  everything:{n:"Everything",set:3500,mo:600,d:"The Full Show + an AI agent that answers your phone 24/7, AI email + win-back campaigns, and a promo video ad."}};
+function v(){ var r=F.rest||"[Restaurant]", o=F.owner||"[Name]", l=F.link||BASE+"setup/", p=PK[F.pkg]||PK.full, pos=F.pos||"Toast"; return {r:r,o:o,l:l,p:p,pos:pos}; }
+var MSGS=[
+ ["Instagram DM · first touch","Cold or warm, short and friendly",function(x){ return "Hey "+x.o+"! Love what you're doing at "+x.r+" 🔥 I build restaurants their own app: guests scan a QR, see your menu with real-looking photos, play a game made from your food while they wait, and earn rewards that bring them back. No download.\n\nI made one for "+x.r+" so you can see it on your phone: "+x.l+"\n\nWant me to walk you through it? Takes 5 minutes."; }],
+ ["Text message","After you've met or talked",function(x){ return "Hey "+x.o+", it's Antidote from Second Shift AI. Here's the "+x.r+" app I built for you, open it on your phone and play the game: "+x.l+"\nIt works with your "+x.pos+", no new hardware. When's a good time this week to go over it?"; }],
+ ["Email","Subject + body",function(x){ return "Subject: Your "+x.r+" app is ready to try\n\nHi "+x.o+",\n\nI built a sample app for "+x.r+": "+x.l+"\n\nOpen it on your phone. Guests would scan a QR at the table and get:\n• Your menu with photos, ordering from their seat\n• A game built around your food, with real prizes they come back to redeem\n• Points, scan-to-earn at the register, birthday treats, referral codes\n• Texts from you: specials, \"we miss you\", birthday rewards, all automatic\n\nIt works alongside your "+x.pos+" with no new hardware. Every guest who signs up goes into a customer list that you own.\n\nI'd recommend the "+x.p.n+" package: $"+x.p.set.toLocaleString()+" setup and $"+x.p.mo+"/month, with payment plans from $500 down.\n\nWant 10 minutes this week to walk through it?\n\nAntidote\nSecond Shift AI"; }],
+ ["Follow-up (2–3 days later)","Nudge without being pushy",function(x){ return "Hey "+x.o+"! Did you get a chance to play the "+x.r+" game? 😄 "+x.l+"\nHappy to change anything (prizes, colors, the game) before you decide. I'm keeping founding-restaurant pricing open for a few more spots."; }],
+ ["Close · ready to sign","Send when they say yes",function(x){ return "Let's do it 🙌 Here's how we get "+x.r+" live:\n1. I send the agreement to sign (DocuSign, 2 minutes).\n2. You pick: pay in full, half down, or $500 to start.\n3. Send me your menu, logo, prizes you want to give, and your hours.\n4. I set up your "+x.pos+" discount buttons with you (15 minutes) and print your table QR codes.\n5. You're live in about a week. Texting goes live once the carriers approve your number (usually 1–3 weeks)."; }],
+ ["Package one-liner","Drop into any message",function(x){ return x.r+" on the "+x.p.n+" package: $"+x.p.set.toLocaleString()+" setup + $"+x.p.mo+"/month. "+x.p.d; }]];
+var FAQ=[
+ ["Do my customers have to download an app?","No. They scan a QR code at the table (or tap a link) and it opens right in their phone's browser. They can add it to their home screen like an app, but they never have to visit an app store."],
+ ["How does it work with Toast?",function(x){ return "You keep Toast exactly as it is. We set up a few discount buttons in Toast with you once (about 15 minutes), like \"App – Free Side\" or \"App – Weekly Champion\". When a guest shows a reward code, your server taps that button and types the code in the reason field, so it's tracked in Toast's reports. Points: the guest shows a 4-digit code, staff enter it with the check total, and points land on their phone. Later we can apply to Toast's partner program for a direct connection so points and rewards apply automatically (Toast decides the timing)."; }],
+ ["How does it work with Square?","Same as Toast on day one: we add discounts in your Square Dashboard (Items → Discounts), staff tap the matching discount and note the code. Square also has open developer tools, so a direct connection (points posting from real sales, rewards applying themselves) is something we can build without waiting on an approval program."],
+ ["How does it work with Clover or another POS?","Any POS that lets you make a discount works on day one: staff apply the matching discount and note the code. Clover has an app marketplace and developer tools for a direct connection later. If you don't use a POS, staff just mark the code used in the app."],
+ ["Do I need new hardware?","No. Your staff use the phone or tablet they already have for the staff screen. Guests use their own phones. We print the QR table tents for you."],
+ ["How do reward codes work? Can people cheat?","Every reward gets its own code tied to one guest. Codes expire 3 days after they're won, a guest can only hold one unused game prize at a time (no stacking), and it's one reward per visit. Staff mark a code used and it can never be used again. Birthday treats need a photo ID with that date."],
+ ["Who makes the discount codes?","The app makes them automatically. Nobody on your team writes codes. You decide what each reward is worth (free side, 10% off, half off for the weekly champion) and we can change it the same day."],
+ ["Who owns the customer list?","You do. Every signup (name, phone, email, birthday) is yours. Export it as a spreadsheet anytime, and you keep it if you ever leave."],
+ ["How do the text messages work?","Guests opt in when they join. Then the system sends texts automatically: welcome reward, birthday treat, weekly specials, \"we miss you\" after 30 days, prize-expiring reminders, weekly champion. You can also text your whole list or one group in one tap. About 2,000 texts a month are included. We register your number with the carriers (required by law), which usually takes 1–3 weeks."],
+ ["How does the AI phone agent work?","Your restaurant gets a local number, or we forward your current line to it when you're busy or closed. A natural AI voice answers 24/7 in your restaurant's name, answers hours, menu, prices, specials, parking and catering questions, texts the caller your app link, takes reservation requests and messages, and transfers to you when they ask for a person. Every call is logged with a summary. It's in the Everything package or an add-on."],
+ ["What does the AI email do?","It drafts replies to your inbox (catering, events, holiday hours) for you to approve or auto-send, and it sends win-back emails to guests who haven't been back in 30 days, birthday emails, and your weekly specials. Unsubscribe is built in."],
+ ["How long until we're live?","Your sample app: about 48 hours. Live after you sign: about a week. Texting goes live once the carriers approve your number (usually 1–3 weeks); everything else works right away."],
+ ["What do you need from me?","Your menu and prices, logo, a few photos if you have them (we can generate photos from your menu), the prizes you want to offer, your hours, and which POS you use. That's it."],
+ ["Who pays for the prizes?","You choose and fund the prizes, so you control the cost. Most owners pick low-cost, high-margin items like a side, a drink or a dessert. Prize games run as free-to-enter promotions with official rules, and we supply the standard text."],
+ ["Can I change things later?","Yes, anytime: prizes, prices, menu items, specials, colors, the game. Most changes go live the same day, included in your monthly."],
+ ["What if I want to cancel?","Pay in full is month to month with 30 days' notice. The payment plans have a 12-month minimum, then month to month. Your customer list is yours either way."],
+ ["Does it get us Google reviews?","There's a one-tap \"review us on Google\" button. We never trade points or prizes for reviews, because Google bans that and can remove your listing."],
+ ["What's the cost again?",function(x){ return "Menu $750 + $99/mo · Rewards $2,000 + $300/mo · Full Show $2,500 + $400/mo · Everything (with AI phone + email) $3,500 + $600/mo. Payment plans start at $500 down. For "+x.r+" I'd recommend "+x.p.n+": $"+x.p.set.toLocaleString()+" setup + $"+x.p.mo+"/mo."; }]];
+var DEMOS=[
+ ["Full package · paying client",[
+  ["✈️","Melody Bar & Grill","Full app: flight game, drinks that pour, table ordering, Just Landed deal, leaderboard","melody-lax/"],
+  ["🎮","Melody · the game","Fly over LAX, dodge UFOs and kamikaze planes","melody-lax/#play"],
+  ["🍸","Melody · drinks that pour","Tap a drink and watch it pour","melody-lax/#drinks"],
+  ["🛬","Melody · Just Landed deal","Boarding-pass discount by traveler type","melody-lax/#landed"]]],
+ ["Games · send any one on its own",[
+  ["🛩️","Melody Approach (flight game)","Fly over LAX, grab Melody's food, dodge UFOs, jets, lightning","melody-lax/#play","g"],
+  ["🍳","Order Up! (Gritz N Wafflez)","Build each guest's real dish before they walk out","gritz-n-wafflez/#play","g"],
+  ["⚡","Storm Run (StormBurger)","Drive the food truck through the storm","storm-burger/#game","g"],
+  ["🐉","Hibachi Catch (Lucky Dragon)","Catch the hibachi, dodge the dragon's fire","lucky-dragon/#game","g"],
+  ["🌶️","Loco Match (Churrito Loco)","Candy-Crush style match-3 with the Churrito Man","churrito-loco/#game","g"],
+  ["🍔","Build your burger","Stack a smash burger or chicken sandwich","storm-burger/#build","g"],
+  ["🧀","Build your mac & cheese","Load up Melody's mac","melody-lax/#build","g"],
+  ["🍤","Build your hibachi plate","Rice or noodles, then the proteins","lucky-dragon/#build","g"],
+  ["🦐","Seafood catch game (sample app)","Mariscos sample built from an intake form","try/?id=p3g22upf&t=xtruvv6a4ryrvbs6x8kt","g"],
+  ["🔥","Korean BBQ catch game (sample app)","Seoul Fire K-BBQ sample","try/?id=shkanfdd&t=m7kqd45c9jwhepnhm3cs","g"]]],
+ ["Samples",[
+  ["🧇","Gritz N Wafflez","Woman-owned · Order Up! game: build real dishes, moods, reputation","gritz-n-wafflez/"],
+  ["🍳","Gritz N Wafflez · Order Up! game","Customers order real menu items","gritz-n-wafflez/#play"],
+  ["⚡","StormBurger","Storm Run driving game, build-your-burger, rewards","storm-burger/"],
+  ["🍔","StormBurger · build your burger","Smash burger or chicken sandwich","storm-burger/#build"],
+  ["🐉","Lucky Dragon","Hibachi Catch game + build your hibachi plate","lucky-dragon/"],
+  ["🌶️","Churrito Loco","Loco Match puzzle game","churrito-loco/"]]],
+ ["Sales pages",[
+  ["💲","Everything you get + prices","Every tool, packages, autopilot texts, AI phone","everything/"],
+  ["📱","All demos in one place + free sample","Tap any app, swipe a live one","setup/"],
+  ["📈","Growth pitch + payment plans","Comeback loop, calculator, packages","growth/"],
+  ["📝","Free sample request form","Owner fills in their info and photos","start/"]]]];
+var RES=[
+ ["📄","Toast explainer (Gritz N Wafflez PDF)","kit/toast-explainer-gnw.pdf"],
+ ["🔲","Melody QR codes (main card)","kit/melody-qr-main.png"],
+ ["🪧","Melody table QR codes 1–20 (print)","kit/melody-table-qr.pdf"]];
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+function render(){
+  var x=v();
+  $("msghost").innerHTML=MSGS.map(function(m,i){ return '<div class="card"><div class="hd"><div><b>'+esc(m[0])+'</b><small>'+esc(m[1])+'</small></div><button class="cp" data-copy="m'+i+'">Copy</button></div><div class="txt" id="m'+i+'">'+esc(m[2](x))+'</div></div>'; }).join("");
+  $("tierhost").innerHTML=["menu","rewards","full","everything"].map(function(k){ var p=PK[k], t=x.r+" · "+p.n+": $"+p.set.toLocaleString()+" setup + $"+p.mo+"/month. "+p.d;
+    return '<div class="tier'+(p.star?' star':'')+'"><div class="nm">'+p.n+(p.star?' <span class="tag">MOST POPULAR</span>':'')+'</div><div class="mo">$'+p.mo+'<small>/mo</small></div><div style="color:var(--dim);font-size:13.5px">$'+p.set.toLocaleString()+' setup</div><p>'+esc(p.d)+'</p><div class="txt" id="t'+k+'" style="display:none">'+esc(t)+'</div><button class="cp" data-copy="t'+k+'">Copy</button></div>'; }).join("");
+  $("plans").textContent="Pay in full: $2,500 today, $400/month, month to month.\nHalf down: $1,250 today, $525/month for 12 months, then $400.\nStarter: $500 today, $600/month for 12 months, then $400.";
+  $("faqhost").innerHTML=FAQ.map(function(q,i){ var a=typeof q[1]==="function"?q[1](x):q[1]; return '<details class="q"><summary>'+esc(q[0])+'</summary><div class="a"><div class="txt" id="q'+i+'">'+esc(a)+'</div><div style="margin-top:8px"><button class="cp" data-copy="q'+i+'">Copy answer</button></div></div></details>'; }).join("");
+  $("demohost").innerHTML=(x.link&&F.link?'<div class="grp">This restaurant</div><div class="links">'+lk("⭐",x.r+" sample","Their own app",F.link,true)+'</div>':'')+DEMOS.map(function(g){ return '<div class="grp">'+esc(g[0])+'</div><div class="links">'+g[1].map(function(d){ return lk(d[0],d[1],d[2],BASE+d[3],d[4]); }).join("")+'</div>'; }).join("");
+  $("reshost").innerHTML='<div class="links">'+RES.map(function(r){ return lk(r[0],r[1],"",BASE+r[2]); }).join("")+'</div>';
+}
+var LKN=0;
+function lk(ic,t,sub,url,game){ var id="u"+(LKN++), x=v(), who=F.owner||"there";
+  var msg=game?"Hey "+who+"! Here's one of the games we build for restaurants: "+t.replace(/ \(.*\)$/,"")+". Play it on your phone: "+url+"\nPicture it with "+(F.rest||"your")+(F.rest?"'s":"")+" food and your prizes. Want me to build yours?"
+    :"Hey "+who+"! Take a look at this on your phone: "+t+" — "+url;
+  return '<div class="lk"><div class="ic">'+ic+'</div><div class="t"><b>'+esc(t)+'</b><small>'+esc(sub||url)+'</small><span id="'+id+'" style="display:none">'+esc(url)+'</span><span id="'+id+'m" style="display:none">'+esc(msg)+'</span></div><div class="act"><a class="btn" href="'+esc(url)+'" target="_blank" rel="noopener">Open ↗</a><button class="cp" data-copy="'+id+'">Copy link</button><button class="cp" style="background:#E8582A;color:#fff" data-copy="'+id+'m">💬 Send</button></div></div>'; }
+document.addEventListener("click",function(e){ var b=e.target.closest("[data-copy]"); if(!b) return; var el=$(b.dataset.copy), t=el.textContent;
+  function ok(){ b.classList.add("done"); var o=b.textContent; b.textContent="Copied ✓"; var ts=$("toast"); ts.classList.add("on"); setTimeout(function(){ b.classList.remove("done"); b.textContent=o; ts.classList.remove("on"); },1300); }
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok,function(){ fallback(t); ok(); }); else { fallback(t); ok(); } });
+function fallback(t){ var ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy");}catch(e){} ta.remove(); }
+render();
+})();
+</script>
+</body>
+</html>

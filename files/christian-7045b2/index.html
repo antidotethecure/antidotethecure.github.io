@@ -29,7 +29,7 @@ p.s{color:var(--dim);margin:0 0 12px}
 
 <h2>Links</h2>
 <div class="links">
-<a href="https://antidotethecure.github.io/launch/christian/">★ Launch checklist (start here)<small>Deals, menu prices, registers, launch week, for both restaurants</small></a>
+<a href="https://antidotethecure.github.io/onboarding/christian/">★ Christian's onboarding (start here)<small>Deals, menu prices, registers, launch week, for both restaurants</small></a>
 <a href="https://antidotethecure.github.io/demo/melody-lax/">Melody app<small>Menu, rewards, flight game</small></a>
 <a href="https://antidotethecure.github.io/demo/nalu-vida/">Nalu Vida app<small>Menu, rewards, surf game</small></a>
 <a href="https://antidotethecure.github.io/melody/setup/">Melody setup page<small>Deals, weekly giveaway, prizes, menu</small></a>
@@ -48,10 +48,10 @@ p.s{color:var(--dim);margin:0 0 12px}
 </main><div class="toast" id="toast"></div>
 <script>
 var FILES={
- melody:[["Square sticker","melody/Melody_QR_Sticker_Square",["png","pdf"],"png"],["Round sticker","melody/Melody_QR_Sticker_Round",["png","pdf"],"png"],["Logo QR","melody/Melody_QR_Logo_Only",["png"],"png"],["Window poster 24×36","melody/Melody_Window_Poster_24x36",["jpg","pdf"],"jpg",1]],
- nalu:[["Surfboard sticker","nalu/NaluVida_QR_Surfboard_Sticker",["png","pdf"],"png"],["Round sticker","nalu/NaluVida_QR_Round_Sticker",["png","pdf"],"png"],["Logo QR","nalu/NaluVida_QR_Logo_Only",["png"],"png"],["Window poster 24×36","nalu/NaluVida_Window_Poster_24x36",["jpg","pdf"],"jpg",1]],
+ melody:[["Square sticker","melody/Melody_QR_Sticker_Square",["png","pdf"],"png"],["Round sticker","melody/Melody_QR_Sticker_Round",["png","pdf"],"png"],["Logo QR","melody/Melody_QR_Logo_Only",["png"],"png"],["Window poster 24×36","melody/Melody_Window_Poster_24x36",["jpg","pdf"],"jpg",1],["Table numbers 1–40 (4×6)","melody/Melody_Table_Cards",["pdf"],"pdf",1,"melody/Melody_Table_Cards_1-40"]],
+ nalu:[["Surfboard sticker","nalu/NaluVida_QR_Surfboard_Sticker",["png","pdf"],"png"],["Round sticker","nalu/NaluVida_QR_Round_Sticker",["png","pdf"],"png"],["Logo QR","nalu/NaluVida_QR_Logo_Only",["png"],"png"],["Window poster 24×36","nalu/NaluVida_Window_Poster_24x36",["jpg","pdf"],"jpg",1],["Table numbers 1–40 (4×6)","nalu/NaluVida_Table_Cards",["pdf"],"pdf",1,"nalu/NaluVida_Table_Cards_1-40"]],
  video:[["Melody game ad","video/melody-game-ad.mp4"],["Ride the Nalu gameplay","video/nalu-ride-the-nalu.mp4"]]};
-var MSG="Hey Christian! Everything for Melody and Nalu Vida is in one place now:\n\n★ Your launch checklist (one link for both): https://antidotethecure.github.io/launch/christian/\n\nIt shows where each restaurant is at (Melody 80%, Nalu Vida 72%) and the last few things we need from you:\n1) pick your deals, discounts & weekly giveaway\n2) check the menu prices (tap ✓ or fix each one, or \"Everything checks out\")\n3) approve the menu\n4) tell us your register (Toast, Square…)\n5) a few launch-week questions\nThen tap \"Send everything to Antidote\" at the bottom. Almost all taps, about 15 minutes.\n\nYour QR stickers, window posters and game videos: "+location.href.split("#")[0];
+var MSG="Hey Christian! Everything for Melody and Nalu Vida is in one place now:\n\n★ Your onboarding (one link for both): https://antidotethecure.github.io/onboarding/christian/\n\nIt shows where each restaurant is at (Melody 80%, Nalu Vida 72%) and the last few things we need from you:\n1) pick your deals, discounts & weekly giveaway\n2) check the menu prices (tap ✓ or fix each one, or \"Everything checks out\")\n3) approve the menu\n4) tell us your register (Toast, Square…)\n5) a few launch-week questions\nThen tap \"Send everything to Antidote\" at the bottom. Almost all taps, about 15 minutes.\n\nYour QR stickers, window posters and game videos: "+location.href.split("#")[0];
 function toast(t){ var e=document.getElementById("toast"); e.textContent=t; e.classList.add("on"); setTimeout(function(){ e.classList.remove("on"); },1800); }
 function e(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
 function share(url,name){
@@ -64,7 +64,7 @@ function share(url,name){
 ["melody","nalu"].forEach(function(k){ document.getElementById(k).innerHTML=FILES[k].map(function(f){
   var main=f[1]+"."+f[3], thumb=f[1]+".thumb."+(f[4]?"jpg":"png"), name=f[1].split("/")[1];
   return '<div class="f"><div class="im"><img loading="lazy" src="'+thumb+'" alt=""></div><b>'+e(f[0])+'</b><small>'+f[2].map(function(x){ return x.toUpperCase(); }).join(" + ")+'</small>'+
-    f[2].map(function(x){ return '<div class="act"><a href="'+f[1]+"."+x+'" download>⬇ '+x.toUpperCase()+'</a><button type="button" data-u="'+f[1]+"."+x+'" data-n="'+name+"."+x+'">Share</button></div>'; }).join("")+'</div>'; }).join(""); });
+    f[2].map(function(x){ var fb=f[5]||f[1], fn=fb.split("/")[1]; return '<div class="act"><a href="'+fb+"."+x+'" download>⬇ '+x.toUpperCase()+'</a><button type="button" data-u="'+fb+"."+x+'" data-n="'+fn+"."+x+'">Share</button></div>'; }).join("")+'</div>'; }).join(""); });
 document.getElementById("video").innerHTML=FILES.video.map(function(v){ var n=v[1].split("/")[1];
   return '<div class="f"><video src="'+v[1]+'" controls playsinline preload="metadata"></video><b>'+e(v[0])+'</b><div class="act"><a href="'+v[1]+'" download>⬇ Save</a><button type="button" data-u="'+v[1]+'" data-n="'+n+'">Share</button></div></div>'; }).join("");
 document.addEventListener("click",function(ev){ var b=ev.target.closest("button[data-u]"); if(b) share(b.dataset.u,b.dataset.n); });

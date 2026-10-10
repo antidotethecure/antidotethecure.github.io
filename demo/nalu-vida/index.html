@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0a2540">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script>window.NALU_PRIZES=[[9500,"$3 off any drink"],[14000,"Free Jungle Fries"],[20000,"Free Coconut Shrimp"],[28000,"Free Signature Taco plate"]];</script>
+<script>window.NALU_PRIZES=[[9500,"$3 off any drink"],[18000,"Free Jungle Fries"],[32000,"Free Coconut Shrimp"],[55000,"Free Signature Taco plate"]];</script>
 <style>
 /* Nalu Vida: Venice sunset (orange to yellow), ocean stripes (navy to cyan), white slab letters, coral trim, sand */
 :root{
@@ -278,10 +278,22 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <div class="wave" aria-hidden="true"></div>
 <section id="play">
 <h2><small>Play for prizes</small>Ride the Nalu</h2>
-<p class="sub">Surf the Venice Pier loop, dodge sharks and eels, grab the tiki rafts, win free food &amp; drinks.</p>
+<p class="sub">5 levels on the Venice Pier loop: dodge sharks and eels, grab the tiki rafts, harpoon the boss sharks, win free food &amp; drinks.</p>
 <div id="nalu-game"></div>
 </section>
 <script src="game.js"></script>
+<script>window.GAME_MENU={id:"nalu-vida",name:"Ride the Nalu",by:"Nalu Vida",tagline:"5 levels on the Venice Pier. Harpoon the boss sharks, ride in for free food.",
+ logo:"img/logo.png",hero:["img/game/surfer_f.webp","img/game/shark.webp","img/game/raft_taco.webp","img/game/surfer_m.webp"],
+ theme:{bg:"#06182e",bg2:"#0b3b5e",card:"#0f3354",edge:"#1d4f78",accent:"#ff7a3d",accent2:"#ffd23f",label:"#ffd23f",ink:"#f4fbff",dim:"#a9c8de",btnInk:"#3a1600",soft:"rgba(127,227,242,.10)",track:"rgba(255,255,255,.22)",good:"#3ddc97",bad:"#ff6b6b",display:"'Alfa Slab One',Georgia,serif",body:"system-ui,-apple-system,sans-serif"},
+ mount:"#nalu-game .nv-wrap",hide:"#nv-start",start:function(){ window.__NV.pick(); },vibrate:true,
+ how:{goal:"Surf the Venice Pier loop through 5 levels (about a minute each). Beat Big Manō at the end of level 3 and the giant Manō Nui at the end of level 5, then ride in to Nalu Vida for your prize.",time:"About 5–6 minutes for all 5 levels · 5 hearts",
+  steps:[["👆","Drag left and right to steer"],["🌊","Ride over a swell, then tap (or hit JUMP) to launch: clear the pier, do flips, fly over sharks"],[null,"Grab food rafts, boat tosses and helicopter drink drops. 4 in a row = ×2, 8 = ×3 and it keeps climbing","img/game/raft_taco.webp"],[null,"Catch floating 🔱 harpoons (lifeguards on jet skis and the crew boat toss them too), then tap FIRE to hit sharks","img/game/lifeguard_m.webp"],[null,"Boss sharks flash a red line before they charge: dodge sideways, and line them up with rocks or the pier so they crash","img/game/shark.webp"],["⚠️","From level 2: rocks, and CLOSEOUT waves. Steer to the open part of the wave"],["🔴","Manō Nui also dives under you (red circle = move!) and tail-slaps waves at you"]]},
+ points:[{group:"Grab these",items:[{img:"img/game/raft_taco.webp",name:"Island Tacos raft",pts:"+100"},{img:"img/game/raft_mimosa.webp",name:"Mimosa raft",pts:"+120"},{img:"img/game/raft_fries.webp",name:"Jungle Fries raft",pts:"+120"},{img:"img/game/raft_burger.webp",name:"Smash-N-Stack raft",pts:"+150"},{img:"img/game/raft_shrimp.webp",name:"Coconut Shrimp raft",pts:"+150"},{img:"img/game/raft_oysters.webp",name:"$2 Oysters raft",pts:"+200"},{img:"img/game/drop.webp",name:"Helicopter drink drop",pts:"+250"},{icon:"🌟",name:"Golden Poke Bowl",note:"Rare",pts:"+500",gold:true},{img:"img/game/fish_parrot.webp",name:"Parrotfish / Mahi-mahi",note:"Grab it while it's jumping",pts:"+300"},{img:"img/game/fish_gold.webp",name:"Golden Dorado",note:"Rare",pts:"+800",gold:true},{img:"img/game/buoy.webp",name:"Lifeguard rescue can",pts:"+1 ❤️"}]},
+  {group:"Tricks",items:[{icon:"🔄",name:"Flip (perfect-timed jump)",pts:"+750"},{icon:"🏄",name:"Pier jump",pts:"+500"},{icon:"🌊",name:"Air off a swell",pts:"+150"},{icon:"😮",name:"Close call",note:"Shark, eel or jelly",pts:"+50"},{icon:"↩️",name:"Round the end of the pier",pts:"+300 × multiplier"},{icon:"🏁",name:"Finish a lap",pts:"+1,000 × lap"},{icon:"⭐",name:"Clear a level",pts:"+1,500 × level"}]},
+  {group:"Harpoons & bosses",items:[{icon:"🔱",name:"Harpoon pickup",note:"Up to 9 at a time",pts:"+3 🔱"},{img:"img/game/shark.webp",name:"Harpoon a shark off",note:"2 hits (3 from level 4)",pts:"+300"},{icon:"🎯",name:"Harpoon or crash a boss",note:"Harpoon −5 HP, rocks −14/−16, pier −10/−12",pts:"+20 × damage"},{img:"img/game/shark.webp",name:"Beat Big Manō",note:"Level 3 boss · 60 HP",pts:"+5,000",gold:true},{img:"img/game/shark.webp",name:"Beat Manō Nui",note:"Final boss · 170 HP",pts:"+15,000",gold:true}]},
+  {group:"Dodge these",items:[{img:"img/game/shark.webp",name:"Shark bite / boss chomp",pts:"−❤️",bad:true},{img:"img/game/eel.webp",name:"Electric eel zap",pts:"−❤️",bad:true},{img:"img/game/jelly.webp",name:"Jellyfish sting",pts:"−❤️",bad:true},{icon:"🪵",name:"Hit the pier",note:"Without a wave jump",pts:"−❤️ −200",bad:true},{icon:"🪨",name:"Rocks",pts:"−❤️",bad:true},{icon:"🌊",name:"Closeout / tail-slap wave",pts:"−❤️",bad:true},{img:"img/game/boat.webp",name:"Boat wake",pts:"−❤️",bad:true}]}],
+ prizes:{champion:"#1 on the weekly board wins half off their meal",tiers:[["9,500","$3 off any drink","Reach level 2","🥤"],["18,000","Free Jungle Fries","About level 3","img/game/raft_fries.webp"],["32,000","Free Coconut Shrimp","Beat Big Manō","img/game/raft_shrimp.webp"],["55,000","Free Signature Taco plate","Beat Manō Nui","img/game/raft_taco.webp"]],note:"Every prize is good for 3 days · one reward per visit."}};</script>
+<script src="../gamemenu.js"></script>
 <div class="prizes" id="prizes"></div>
 
 <div id="champs" data-game="naluvida" style="max-width:430px;margin:12px auto"></div><script src="../champs.js"></script>

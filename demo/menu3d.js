@@ -82,7 +82,7 @@
     var go = function () { var q = b3wait; b3wait = null; q.forEach(function (f) { f(); }); };
     var add = function (src, next) { var sc = document.createElement("script"); sc.src = src; sc.onload = next; sc.onerror = go; document.head.appendChild(sc); };
     add("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js", function () {
-      var rest = function () { add(HERE + "burger3d.js", function () { window.BURGER3D.preload(SK.models, go); }); };
+      var rest = function () { add(HERE + "burger3d.js", go); };
       if (SK.models) add("https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js", rest); else rest();
     });
     setTimeout(function () { if (b3wait) go(); }, 12000);
@@ -94,8 +94,14 @@
       bstk.style.display = "none";
       return need3d(function () {
         if (startStack.tok !== token || !O.classList.contains("on")) return;
-        B3 = window.BURGER3D && window.BURGER3D.mount(stage, ids, SK.img || "", SK.models);
-        if (B3) { SB = { ids: ids, b3: true, raf: 0 }; O.querySelector(".steam").style.opacity = 0; } else { SK.real3d = false; startStack(ids); }
+        // only fetch the scanned pieces this dish actually uses (chicken also covers spicy chicken + strips)
+        var need = {}; ids.forEach(function (id) { var k = SK.models && (SK.models[id] ? id : /chicken_spicy|strip/.test(id) && SK.models.chicken ? "chicken" : null); if (k) need[k] = SK.models[k]; });
+        var mount = function () {
+          if (startStack.tok !== token || !O.classList.contains("on")) return;
+          B3 = window.BURGER3D && window.BURGER3D.mount(stage, ids, SK.img || "", SK.models);
+          if (B3) { SB = { ids: ids, b3: true, raf: 0 }; O.querySelector(".steam").style.opacity = 0; } else { SK.real3d = false; startStack(ids); }
+        };
+        if (window.BURGER3D && window.BURGER3D.preload) window.BURGER3D.preload(need, mount); else mount();
       });
     }
     var S = stage.clientWidth, W = S * 1.02, L = [], y = 0, sh = document.createElement("div"); sh.className = "bsh"; bstk.appendChild(sh);

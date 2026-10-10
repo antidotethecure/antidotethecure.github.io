@@ -8,7 +8,7 @@
   "use strict";
   var mount = document.getElementById("nalu-game"); if (!mount) return;
   var W = 400, H = 640, HC = H / 2, LEAD = H * 0.22, LEG = 6200, PIER_X = 200, PIER_W = 38, END_R = 74, END_Y = LEG + 150;
-  var PRIZES = window.NALU_PRIZES || [[2500, "$3 off any drink"], [4000, "Free Jungle Fries"], [5500, "Free Coconut Shrimp"], [7000, "Free Signature Taco plate"]];
+  var PRIZES = window.NALU_PRIZES || [[9500, "$3 off any drink"], [14000, "Free Jungle Fries"], [20000, "Free Coconut Shrimp"], [28000, "Free Signature Taco plate"]];
   var BAPI = "https://drizzle-bowl-scores.higgsfield.app/api/game-scores", BGAME = "naluvida";
 
   /* ---------- DOM ---------- */
@@ -27,8 +27,8 @@
     ".nv-btn{margin-top:10px;padding:12px 20px;border:0;border-radius:999px;background:linear-gradient(90deg,#ff7a3d,#ffd23f);color:#3a1600;font:900 16px system-ui;cursor:pointer}" +
     ".nv-how{font-size:12.5px;opacity:.9;max-width:320px}.nv-win{margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(61,220,151,.16);border:1px solid #3ddc97;font-weight:800}" +
     ".nv-board{width:100%;max-width:330px;margin-top:8px;font-size:13px;text-align:left}.nv-board ol{margin:6px 0;padding-left:22px;max-height:118px;overflow:auto}.nv-board input{width:100%;margin:4px 0;padding:9px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.25);color:#fff;font:600 14px system-ui}" +
-    ".nv-toast{position:absolute;left:12px;right:12px;bottom:26px;display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:14px;background:rgba(6,24,46,.82);color:#fff;font:800 14px system-ui;transform:translateY(140%);transition:transform .35s;pointer-events:none}" +
-    ".nv-toast.on{transform:none}.nv-toast img{width:54px;height:54px;object-fit:contain;flex:none}";
+    ".nv-toast{position:absolute;left:12px;right:12px;bottom:26px;display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:14px;background:rgba(6,24,46,.82);color:#fff;font:800 14px system-ui;transform:translateY(140%);opacity:0;visibility:hidden;transition:transform .35s,opacity .35s,visibility .35s;pointer-events:none}" +
+    ".nv-toast.on{transform:none;opacity:1;visibility:visible}.nv-toast img{width:54px;height:54px;object-fit:contain;flex:none}";
   document.head.appendChild(css);
   mount.innerHTML =
     '<div class="nv-wrap gamebox" data-game>' +

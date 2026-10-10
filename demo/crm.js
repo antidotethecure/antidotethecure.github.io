@@ -176,6 +176,54 @@
     else { try { localStorage.setItem(PEND, JSON.stringify(w)); } catch (x) {} }
     drawJoin(); return { prize: w, saved: !!m };
   };
+  // daily lucky draw: every signed-up member gets ONE draw a day (LA date) when they open the app.
+  // CRM_CFG.draw = { odds: 15, prizes: ["Free Mac & Cheese", ...] } → about 1 in 15 draws wins; the prize is good for 3 days.
+  // Same wallet rules as game prizes: no stacking (no draw while a prize is waiting), one reward per visit.
+  function dailyDraw() {
+    var D = C.draw; if (!D || !D.odds || !(D.prizes || []).length) return;
+    var m = mine()[0]; if (!m || m.sample) return;
+    var day = new Date().toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" });
+    if (m.drawDay === day || activeWin(m) || document.querySelector(".crm-draw")) return;
+    var won = Math.random() < 1 / D.odds, prize = D.prizes[(Math.random() * D.prizes.length) | 0];
+    var ov = document.createElement("div"); ov.className = "crm-draw";
+    ov.innerHTML = '<div class="crm-draw-card"><div class="crm-draw-h">🎟️ Your daily lucky draw</div><div class="crm-draw-s">' + e(NAME) + ' picks a winner every day. Tap to scratch.</div>' +
+      '<button type="button" class="crm-draw-t" aria-label="Scratch your ticket"><span>SCRATCH</span></button><div class="crm-draw-r"></div><button type="button" class="crm-draw-x">Close</button></div>';
+    document.body.appendChild(ov);
+    var t = ov.querySelector(".crm-draw-t"), r = ov.querySelector(".crm-draw-r");
+    ov.querySelector(".crm-draw-x").onclick = function () { ov.remove(); };
+    t.onclick = function () {
+      if (t.disabled) return; t.disabled = true; t.classList.add("go");
+      m = mine()[0]; m.drawDay = day;
+      setTimeout(function () {
+        if (won) {
+          var w = { t: prize, c: "LUCKY-" + code4(4), ts: Date.now(), k: "draw" }; w.until = until(w);
+          (m.wins = m.wins || []).unshift(w); m.wins = m.wins.slice(0, 5); (m.ledger = m.ledger || []).unshift({ ts: w.ts, pts: 0, t: "🎟️ Won the daily lucky draw: " + prize }); put(m);
+          t.innerHTML = "<span>🎉 WINNER</span>"; t.classList.add("win");
+          r.innerHTML = "You won <b>" + e(prize) + "</b>!<div class='crm-draw-c'>" + w.c + "</div>Show this code at " + e(NAME) + " · good until " + e(w.until) + " (3 days)";
+          try { navigator.vibrate && navigator.vibrate([30, 40, 60]); } catch (x) {}
+          drawJoin();
+        } else {
+          put(m); t.innerHTML = "<span>Not today</span>";
+          r.innerHTML = "No win today, but you get a new draw every day you open the app. Come back tomorrow 🍀";
+        }
+      }, 900);
+    };
+  }
+  (function () {
+    var st = document.createElement("style");
+    st.textContent = ".crm-draw{position:fixed;inset:0;z-index:2147482000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,10,20,.66);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}" +
+      ".crm-draw-card{width:100%;max-width:340px;padding:18px 16px 14px;border-radius:20px;background:linear-gradient(160deg,#151d33,#0b1220);border:1px solid rgba(255,210,63,.45);color:#fff;text-align:center;font:600 14px/1.45 system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.6)}" +
+      ".crm-draw-h{font:900 20px/1.2 system-ui,sans-serif;margin-bottom:4px}.crm-draw-s{opacity:.85;font-size:13px;margin-bottom:12px}" +
+      ".crm-draw-t{width:100%;height:110px;border:0;border-radius:14px;cursor:pointer;color:#3a2a00;font:900 26px system-ui;letter-spacing:.12em;background:repeating-linear-gradient(45deg,#d9b44a 0 10px,#e9c95e 10px 20px);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25)}" +
+      ".crm-draw-t.go{animation:crmshake .9s}.crm-draw-t.win{background:radial-gradient(circle,#ffe58a,#ffb02e);color:#3a1600}" +
+      "@keyframes crmshake{0%,100%{transform:none}20%{transform:rotate(-3deg) scale(1.03)}40%{transform:rotate(3deg)}60%{transform:rotate(-2deg) scale(.98)}80%{transform:rotate(2deg)}}" +
+      ".crm-draw-r{min-height:22px;margin:12px 0 8px}.crm-draw-c{margin:8px auto;font:900 22px ui-monospace,Menlo,monospace;letter-spacing:.12em;color:#ffd23f}" +
+      ".crm-draw-x{border:0;background:none;color:#c9d2ee;font:700 14px system-ui;text-decoration:underline;cursor:pointer}";
+    document.head.appendChild(st);
+    setTimeout(dailyDraw, 1600);
+  })();
+  window.SSAI_DRAW = function () { try { var m = mine()[0]; if (m) { delete m.drawDay; put(m); } } catch (x) {} dailyDraw(); };   // test hook
+
   // an order placed in the app (builder.js) earns points like a register order
   window.SSAI_EARN = function (amount, why) {
     var m = mine()[0], pts = Math.round(amount * PER);

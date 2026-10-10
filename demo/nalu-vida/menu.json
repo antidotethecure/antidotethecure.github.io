@@ -1,0 +1,426 @@
+{
+"food": [
+[
+"Shareables",
+"oysters",
+"Oysters on the Half Shell",
+"MP",
+"fresh oysters on crushed ice on a round metal tray with lemon wedges and mignonette"
+],
+[
+"Shareables",
+"tuna-rice",
+"Spicy Tuna Crispy Rice",
+"22",
+"golden crispy rice squares topped with spicy tuna, jalapeño slices and eel sauce on a long slate plate"
+],
+[
+"Shareables",
+"coconut-shrimp",
+"Coconut Shrimp",
+"21",
+"golden coconut-crusted shrimp with sweet chili dipping sauce"
+],
+[
+"Shareables",
+"bang-bang-shrimp",
+"Bang Bang Shrimp",
+"18",
+"crispy shrimp tossed in creamy spicy bang bang sauce with scallions"
+],
+[
+"Shareables",
+"jungle-fries",
+"Jungle Fries",
+"12",
+"crispy fries smothered in pineapple bacon jam with herbs"
+],
+[
+"Shareables",
+"chips-guac",
+"Chips, Salsa & Guac",
+"14",
+"tortilla chips with a bowl of chunky guacamole and red salsa"
+],
+[
+"Shareables",
+"wings",
+"Wings",
+"17",
+"8 glossy chicken wings in sesame soy ginger glaze with sesame seeds and scallions"
+],
+[
+"Shareables",
+"tostadas",
+"Tostadas de la Tierra",
+"18",
+"three crispy tostadas piled with kalua pulled pork, slaw and avocado crema"
+],
+[
+"Shareables",
+"pork-sliders",
+"12-Hr Smoked Pork Sliders",
+"19",
+"two smoked pulled pork sliders on brioche buns with slaw"
+],
+[
+"Shareables",
+"calamari",
+"Calamari",
+"15",
+"golden fried calamari rings with lemon and aioli"
+],
+[
+"Shareables",
+"tiki-ribs",
+"Sticky Tiki Ribs",
+"18",
+"three sticky glazed pork ribs with pineapple and sesame"
+],
+[
+"Signature Island Tacos",
+"taco-shrimp",
+"Tamarind Glazed Gulf Shrimp Tacos",
+"18",
+"two tacos with tamarind-glazed grilled shrimp, mango slaw and cilantro"
+],
+[
+"Signature Island Tacos",
+"taco-salmon",
+"Blackened Salmon Tacos",
+"21",
+"two tacos with blackened salmon, avocado and pickled onion"
+],
+[
+"Signature Island Tacos",
+"taco-chorizo",
+"Vegan Chorizo Tacos",
+"19",
+"two tacos with vegan chorizo, avocado and pico de gallo"
+],
+[
+"Signature Island Tacos",
+"taco-chicken",
+"Baja Blaze Chicken Tacos",
+"17",
+"two tacos with spicy grilled chicken, chipotle crema and slaw"
+],
+[
+"Signature Island Tacos",
+"taco-fish",
+"Beer Battered Fish Tacos",
+"20",
+"two tacos with golden beer-battered cod, cabbage slaw and lime crema"
+],
+[
+"Breakwater Bites",
+"poke-bowl",
+"Poke Bowl",
+"24",
+"ahi poke bowl with rice, avocado, edamame, cucumber, seaweed and sesame"
+],
+[
+"Breakwater Bites",
+"vegan-burger",
+"Vegan Burger",
+"22",
+"plant-based burger with lettuce, tomato and avocado with fries"
+],
+[
+"Breakwater Bites",
+"smoke-wave",
+"BBQ Smoke Wave",
+"22",
+"vegan BBQ sandwich piled high with smoky barbecue jackfruit and slaw"
+],
+[
+"Breakwater Bites",
+"smash-burger",
+"Smash-N-Stack Burger",
+"18",
+"double smash burger with melted American cheese, pickles and special sauce with fries"
+],
+[
+"Breakwater Bites",
+"chipotle-chicken",
+"Chipotle Chicken Sandwich",
+"20",
+"crispy chipotle chicken sandwich with slaw and pickles with fries"
+],
+[
+"Breakwater Bites",
+"cheesesteak",
+"Cheesesteak",
+"16",
+"cheesesteak on a hoagie roll with melted provolone, peppers and onions"
+],
+[
+"Breakwater Bites",
+"veggie-burrito",
+"Veggie Burrito",
+"19",
+"grilled veggie burrito cut in half showing beans, rice and peppers"
+],
+[
+"Entrées",
+"salmon",
+"Blackened Salmon",
+"32",
+"blackened salmon fillet over rice with grilled vegetables and lemon"
+],
+[
+"Entrées",
+"scampi-skewers",
+"Shrimp Scampi Skewers",
+"31",
+"grilled shrimp skewers glistening with garlic butter over rice"
+],
+[
+"Entrées",
+"seared-ahi",
+"Chili-Kissed Sesame Seared Ahi",
+"32",
+"sliced sesame-crusted seared ahi tuna, rare center, with greens"
+],
+[
+"Entrées",
+"adobo-chicken",
+"Adobo Grilled Chicken",
+"29",
+"adobo grilled chicken with gallo pinto rice and beans"
+],
+[
+"Entrées",
+"milanese",
+"Crispy Chicken Milanese",
+"30",
+"golden crispy chicken milanese cutlet with arugula and lemon"
+],
+[
+"Entrées",
+"steak-fries",
+"Steak & Fries",
+"33",
+"sliced grilled steak with chimichurri and fries"
+],
+[
+"Entrées",
+"fish-chips",
+"Fish N' Chips",
+"24",
+"beer-battered fish and chips with tartar sauce and lemon in a paper-lined basket"
+],
+[
+"Entrées",
+"tiki-ribs-full",
+"Tiki Ribs",
+"31",
+"a half rack of sticky glazed tiki ribs with pineapple and fries"
+],
+[
+"Pizza & Flatbreads",
+"pizza-margherita",
+"Margherita",
+"15",
+"margherita flatbread with fresh mozzarella, basil and tomato"
+],
+[
+"Pizza & Flatbreads",
+"pizza-pepperoni",
+"Pepperoni",
+"16",
+"pepperoni flatbread with crispy cupped pepperoni"
+],
+[
+"Pizza & Flatbreads",
+"pizza-elote",
+"Elote",
+"17",
+"elote flatbread with charred corn, cotija, chili and lime"
+],
+[
+"Pizza & Flatbreads",
+"pizza-innout",
+"In-N-Out Style",
+"17",
+"In-N-Out style flatbread with seasoned beef, melted cheese, grilled onions, pickles, spread and fresh arugula"
+],
+[
+"Pizza & Flatbreads",
+"pizza-bbq",
+"BBQ Chicken",
+"17",
+"BBQ chicken flatbread with red onion and cilantro"
+],
+[
+"Pasta",
+"pasta",
+"Build-Your-Own Pasta",
+"18",
+"rigatoni in creamy alfredo with grilled shrimp and parmesan"
+],
+[
+"Soup & Salad",
+"citrus-bomb",
+"Citrus Bomb Salad",
+"15",
+"bright citrus salad with orange segments, greens, avocado and seeds"
+],
+[
+"Soup & Salad",
+"caesar",
+"South American Caesar",
+"18",
+"caesar salad with crisp romaine, parmesan and toasted croutons"
+],
+[
+"Soup & Salad",
+"sesame-salad",
+"Sesame Chicken Salad",
+"21",
+"sesame chicken salad with crunchy wontons, cabbage and mandarin"
+],
+[
+"Brunch (until 4 PM)",
+"huevos",
+"Huevos con Gallo Pinto",
+"19",
+"fried eggs over gallo pinto rice and beans with plantains and avocado"
+],
+[
+"Brunch (until 4 PM)",
+"avo-toast",
+"Avocado Toast",
+"14",
+"smashed avocado toast with chili flakes, radish and microgreens"
+],
+[
+"Brunch (until 4 PM)",
+"french-toast",
+"French Toast",
+"18",
+"thick french toast with berries, whipped cream and syrup being drizzled"
+],
+[
+"Brunch (until 4 PM)",
+"breakfast-burrito",
+"Breakfast Burrito",
+"18",
+"breakfast burrito cut open with eggs, potatoes, cheese and salsa"
+],
+[
+"Brunch (until 4 PM)",
+"steak-eggs",
+"Steak & Eggs",
+"29",
+"grilled steak with sunny-side-up eggs and potatoes"
+],
+[
+"Brunch (until 4 PM)",
+"breakfast-burger",
+"Breakfast Burger",
+"15",
+"burger topped with a fried egg, bacon and cheese"
+]
+],
+"drinks": [
+[
+"Cocktails",
+"nalu-marg",
+"Nalu Margarita",
+"17",
+"a mango margarita on the rocks with a salted rim and lime wheel"
+],
+[
+"Cocktails",
+"makai",
+"Makai",
+"17",
+"a bright blue ocean-colored tropical cocktail with pineapple garnish"
+],
+[
+"Cocktails",
+"cocoa-rasta",
+"Frozen Cocoa De Rasta",
+"18",
+"a frozen chocolate coconut blended cocktail in a tall glass with whipped cream"
+],
+[
+"Cocktails",
+"blackberry-luau",
+"Frozen Blackberry Luau",
+"18",
+"a frozen purple blackberry blended cocktail with fresh blackberries"
+],
+[
+"Cocktails",
+"pura-vida",
+"Pura Vida",
+"18",
+"a pink strawberry lavender mezcal cocktail with coconut and a lavender sprig"
+],
+[
+"Cocktails",
+"sayulita",
+"Lost in Sayulita",
+"19",
+"a tropical tequila cocktail in a rocks glass with chili rim and grapefruit"
+],
+[
+"Cocktails",
+"sunset-sour",
+"Sunset Sour",
+"20",
+"a layered sunset-colored whiskey sour with orange to red gradient and foam"
+],
+[
+"Cocktails",
+"old-fashioned",
+"Barrel-Aged Old Fashioned",
+"19",
+"an old fashioned with a big clear ice cube and orange peel"
+],
+[
+"Cocktails",
+"pau-hana",
+"Pau Hana Punch",
+"18",
+"a tiki rum punch in a tiki mug with pineapple and an umbrella"
+],
+[
+"Mocktails",
+"wish-you-were-here",
+"Wish You Were Here",
+"15",
+"a sparkling tropical passion fruit mocktail with mint"
+],
+[
+"Mocktails",
+"lime-coconut",
+"Put the Lime in the Coconut",
+"15",
+"a creamy lime coconut mocktail served in a halved coconut shell"
+],
+[
+"Brunch",
+"mimosas",
+"Bottomless Mimosas",
+"24",
+"a pitcher of mimosa and two champagne flutes of mimosa with orange slices"
+],
+[
+"Beer",
+"blonde-ale",
+"Nalu Vida Blonde Ale",
+"9.50",
+"a tall pint of golden blonde ale with a foamy head"
+],
+[
+"Coffee",
+"coco-cold-brew",
+"Coco Cold Brew",
+"11",
+"a coconut cold brew coffee over ice with coconut cream swirl"
+]
+]
+}

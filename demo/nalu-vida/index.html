@@ -199,12 +199,22 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 .arrive .bubble.r::after{left:auto;right:18px;border-color:#ffb36b;box-shadow:3px 3px 6px rgba(255,106,43,.6)}
 @keyframes nvled{0%,100%{opacity:1}47%{opacity:1}48%{opacity:.55}49%{opacity:1}83%{opacity:1}84%{opacity:.7}85%{opacity:1}}
 /* living scene layers */
-.arrive .neon{position:absolute;z-index:1;left:70%;top:13%;width:30%;height:17%;border-radius:40%;pointer-events:none;mix-blend-mode:screen;
+.arrive .neon{position:absolute;z-index:1;left:80%;top:14%;width:20%;height:15%;border-radius:40%;pointer-events:none;mix-blend-mode:screen;
   background:radial-gradient(ellipse at 55% 60%,rgba(80,160,255,.55),rgba(46,196,230,.25) 40%,transparent 70%),radial-gradient(ellipse at 40% 25%,rgba(255,120,40,.45),transparent 55%);animation:nvflick 5.5s infinite}
-.arrive .neondim{position:absolute;z-index:1;left:70%;top:13%;width:30%;height:17%;pointer-events:none;background:rgba(8,20,40,.55);border-radius:30%;filter:blur(6px);opacity:0;animation:nvdim 7s infinite}
+.arrive .neondim{position:absolute;z-index:1;left:80%;top:14%;width:20%;height:15%;pointer-events:none;background:rgba(8,20,40,.55);border-radius:30%;filter:blur(6px);opacity:0;animation:nvdim 7s infinite}
 @keyframes nvflick{0%,100%{opacity:.9}8%{opacity:1}9%{opacity:.35}10%{opacity:1}11%{opacity:.5}12%{opacity:1}55%{opacity:.85}56%{opacity:.3}57%{opacity:.95}80%{opacity:1}}
 @keyframes nvdim{0%,61%,66%,100%{opacity:0}62%{opacity:.8}63%{opacity:.1}64%{opacity:.7}}
 .arrive .fx{position:absolute;z-index:1;pointer-events:none;will-change:transform,opacity;height:auto}
+.arrive .plate{position:absolute;z-index:2;pointer-events:none;perspective:700px;opacity:0}
+.arrive .plate.in{animation:nvplate 4.6s cubic-bezier(.2,.8,.2,1) forwards}
+.arrive .plate .p3{position:relative;transform-style:preserve-3d;animation:nvspin 4.6s ease-in-out}
+.arrive .plate img{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 8px rgba(0,0,0,.35)) saturate(1.08) contrast(1.04)}
+.arrive .plate .shd{position:absolute;left:8%;right:8%;bottom:-4%;height:22%;border-radius:50%;background:radial-gradient(ellipse at 50% 50%,rgba(20,8,0,.55),rgba(20,8,0,0) 70%);filter:blur(3px);transform:translateZ(-1px)}
+.arrive .plate .sheen{position:absolute;inset:0;-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.55) 45%,rgba(255,240,200,.15) 55%,transparent 70%);background-size:250% 100%;mix-blend-mode:screen;animation:nvsheen 4.6s ease-in-out}
+@keyframes nvplate{0%{opacity:0;transform:translateY(-28px) scale(.82)}14%{opacity:1;transform:translateY(4px) scale(1.03)}20%{transform:translateY(0) scale(1)}84%{opacity:1;transform:none}100%{opacity:0;transform:scale(.95) translateY(3px)}}
+@keyframes nvspin{0%{transform:rotateX(14deg) rotateY(-16deg)}50%{transform:rotateX(10deg) rotateY(8deg)}100%{transform:rotateX(14deg) rotateY(-4deg)}}
+@keyframes nvsheen{0%,25%{background-position:120% 0}70%,100%{background-position:-60% 0}}
 .arrive .dish{height:auto;position:absolute;z-index:2;pointer-events:none;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45));transform-origin:50% 100%;opacity:0}
 .arrive .dish.in{animation:nvdish 4.2s ease forwards}
 @keyframes nvdish{0%{opacity:0;transform:translateY(14px) scale(.6)}12%{opacity:1;transform:translateY(-6px) scale(1.06)}18%{transform:translateY(0) scale(1)}82%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.92) translateY(4px)}}
@@ -221,10 +231,10 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
   <img class="bg" src="img/hero.jpg" alt="Nalu Vida at the foot of the Venice Pier at sunset: surfers with boards on the sand to the left, the glowing restaurant entrance to the right" fetchpriority="high">
   <h1><small>Venice Pier · Tropical Bites · Craft Cocktails</small>Welcome to Nalu Vida 🌴</h1>
   <div class="neon" aria-hidden="true"></div><div class="neondim" aria-hidden="true"></div>
-  <span class="bubble" style="left:9%;top:33%">Come ride with us! 🌊</span>
-  <span class="bubble r" style="right:2%;top:37%">Your table's ready 🍹</span>
-  <img class="dish" id="dishA" alt="" style="left:52%;top:55%;width:16%">
-  <img class="dish" id="dishB" alt="" style="left:80%;top:62%;width:20%">
+  <span class="bubble" style="left:20%;top:38%">Come ride with us! 🌊</span>
+  <span class="bubble r" style="right:2%;top:34%">Your table's ready 🍹</span>
+  <div class="plate" id="plateA" style="left:63%;top:58%;width:31%"><div class="p3"><i class="shd"></i><img alt=""><i class="sheen"></i></div></div>
+  <div class="plate" id="plateB" style="left:80%;top:60%;width:21%"><div class="p3"><i class="shd"></i><img alt=""><i class="sheen"></i></div></div>
   <a class="go l" href="#play" id="arrive-play">🏄 Grab a board<small>Ride the Nalu · win free food</small></a>
   <a class="go r" href="#food">🍽️ Head inside<small>Order from your table</small></a>
 </section>
@@ -1045,15 +1055,25 @@ $("evsub").textContent="Week of "+MON[new Date(monday).getUTCMonth()]+" "+new Da
     var x0=l2r?-12:105, x1=l2r?105:-12; anim(g,[{transform:"translate("+x0*3.9+"px,0) scaleX("+(l2r?1:-1)+")"},{transform:"translate("+((x0+x1)/2)*3.9+"px,"+(Math.random()*30-15)+"px) scaleX("+(l2r?1:-1)+")"},{transform:"translate("+x1*3.9+"px,"+(Math.random()*20-10)+"px) scaleX("+(l2r?1:-1)+")"}],9000+Math.random()*5000); }
   function jetski(){ var j=el("img/scene/jetski.webp"); j.style.cssText="top:46%;width:11%;left:0"; var W=A.clientWidth;
     anim(j,[{transform:"translate("+W*.5+"px,0)"},{transform:"translate("+W*.26+"px,2px)",offset:.5},{transform:"translate("+(-W*.15)+"px,-1px)"}],6500); }
-  var dishes=["smash-burger","wings","tostadas","tuna-rice","coconut-shrimp","oysters","smash-burger","jungle-fries"], di=0, slot=0;
-  function dish(){ var e=document.getElementById(slot?"dishB":"dishA"); slot=1-slot; e.classList.remove("in"); void e.offsetWidth; e.src="img/scene/"+dishes[di++%dishes.length]+".webp"; e.classList.add("in");
-    var r=e.getBoundingClientRect(), b=A.getBoundingClientRect();
-    if(/burger|wings|shrimp/.test(e.src)) for(var q=0;q<4;q++){ (function(q){ var st=document.createElement("i"); st.className="fx"; st.style.cssText="left:"+((r.left-b.left)+r.width*(.3+q*.13))+"px;top:"+((r.top-b.top)+r.height*.15)+"px;width:"+(r.width*.16)+"px;height:"+(r.width*.4)+"px;border-radius:50%;background:radial-gradient(ellipse at 50% 70%,rgba(255,255,255,.55),rgba(255,255,255,0) 70%);filter:blur(4px)";
-      A.appendChild(st); anim(st,[{transform:"translate(0,10px) scale(.6)",opacity:0},{opacity:.85,offset:.3},{transform:"translate("+(q%2?8:-8)+"px,-50px) scale(1.4)",opacity:0}],2200+q*300); })(q); }
-    for(var k=0;k<6;k++){ var s=document.createElement("i"); s.className="spark"; s.style.left=((r.left-b.left)+r.width*(.2+Math.random()*.6))+"px"; s.style.top=((r.top-b.top)+r.height*(.2+Math.random()*.4))+"px";
+  var dishes=["smash-burger","wings","tostadas","tuna-rice","coconut-shrimp","oysters","jungle-fries"], di=0, round=0;
+  function plate(id,src,left,top,width){ var e=document.getElementById(id); if(!e) return null; e.classList.remove("in"); void e.offsetWidth;
+    e.style.left=left+"%"; e.style.top=top+"%"; e.style.width=width+"%"; var url="img/scene/"+src+".webp";
+    e.querySelector("img").src=url; var sh=e.querySelector(".sheen"); sh.style.webkitMaskImage=sh.style.maskImage="url("+url+")";
+    e.classList.add("in"); return e; }
+  function sparkle(e){ var r=e.getBoundingClientRect(), b=A.getBoundingClientRect();
+    for(var k=0;k<7;k++){ var s=document.createElement("i"); s.className="spark"; s.style.left=((r.left-b.left)+r.width*(.15+Math.random()*.7))+"px"; s.style.top=((r.top-b.top)+r.height*(.1+Math.random()*.4))+"px";
       s.style.setProperty("--dx",(Math.random()*40-20)+"px"); s.style.setProperty("--dy",(-10-Math.random()*25)+"px"); A.appendChild(s); setTimeout(function(x){ return function(){ x.remove(); }; }(s),950); } }
+  function steam(e){ var r=e.getBoundingClientRect(), b=A.getBoundingClientRect();
+    for(var q=0;q<4;q++){ (function(q){ var st=document.createElement("i"); st.className="fx"; st.style.cssText="left:"+((r.left-b.left)+r.width*(.3+q*.13))+"px;top:"+((r.top-b.top)+r.height*.05)+"px;width:"+(r.width*.16)+"px;height:"+(r.width*.4)+"px;border-radius:50%;background:radial-gradient(ellipse at 50% 70%,rgba(255,255,255,.55),rgba(255,255,255,0) 70%);filter:blur(4px)";
+      A.appendChild(st); anim(st,[{transform:"translate(0,10px) scale(.6)",opacity:0},{opacity:.85,offset:.3},{transform:"translate("+(q%2?8:-8)+"px,-50px) scale(1.4)",opacity:0}],2400+q*300); })(q); } }
+  function dish(){
+    round++;
+    if(round%3===0){ var d1=dishes[di++%dishes.length], d2=dishes[di++%dishes.length];       // a spread: two plates side by side
+      var a=plate("plateA",d1,59,60,23), b=plate("plateB",d2,79,61,21); a&&sparkle(a); b&&sparkle(b); if(/burger|wings|shrimp/.test(d1)) steam(a); }
+    else { var d=dishes[di++%dishes.length]; var e=plate("plateA",d,64,57,30); document.getElementById("plateB").classList.remove("in"); sparkle(e); if(/burger|wings|shrimp/.test(d)) steam(e); }
+  }
   var on=true; new IntersectionObserver(function(e){ on=e[0].isIntersecting; }).observe(A);
-  setTimeout(dish,900); setInterval(function(){ if(on) dish(); },2600);
+  setTimeout(dish,900); setInterval(function(){ if(on) dish(); },4800);
   setInterval(function(){ if(on&&Math.random()<.55) dolphin(); },3800);
   setInterval(function(){ if(on) gull(); },3300); gull();
   setInterval(function(){ if(on&&Math.random()<.5) jetski(); },9000); setTimeout(jetski,2500);

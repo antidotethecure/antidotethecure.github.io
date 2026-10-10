@@ -112,6 +112,11 @@
    "$2 off"
   ]
  },
+ "drawPrizes": [
+  "Free extra Yum-Yum",
+  "Free fried rice",
+  "Free noodles"
+ ],
  "game": {
   "name": "Hibachi Catch",
   "prizes": [

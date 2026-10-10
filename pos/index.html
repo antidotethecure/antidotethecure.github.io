@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Register Setup Guide · Second Shift AI</title>
+<meta name="description" content="Step-by-step: connect your Second Shift AI rewards app to Toast, Square, Clover, SpotOn, Lightspeed, Revel, any other POS, or a cash register.">
+<meta name="theme-color" content="#060b16">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%A7%BE%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&display=swap">
+<style>
+:root{
+  --bg:#060b16; --navy:#0a1428; --card:#0d1a33; --card2:#10203f; --edge:#1d3058; --ink:#eaf2ff; --dim:#9fb2cf;
+  --blue:#3b82f6; --cyan:#2DE2FF; --ok:#34d399; --okbg:rgba(52,211,153,.12); --warn:#fbbf24; --warnbg:rgba(251,191,36,.1);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);background-image:radial-gradient(1200px 500px at 50% -200px,#12305f 0%,transparent 70%);background-repeat:no-repeat;
+  color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 64px}
+a{color:var(--cyan)}
+h1,h2,h3{line-height:1.2;margin:0}
+.brand{font-family:"Orbitron",system-ui,sans-serif;font-weight:800;letter-spacing:.24em;font-size:12px;color:var(--cyan);text-transform:uppercase}
+header{padding:28px 0 8px;text-align:center}
+header h1{font-size:28px;font-weight:800;margin:10px 0 6px}
+.lede{color:var(--dim);margin:0 auto;max-width:560px}
+.for{display:inline-block;margin:12px 0 0;padding:6px 14px;border-radius:999px;background:var(--card2);border:1px solid var(--edge);font-weight:700;font-size:14px}
+.for[hidden]{display:none}
+
+.flow{list-style:none;padding:0;margin:22px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.flow li{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:12px 10px;text-align:center;font-size:13.5px;color:var(--dim)}
+.flow b{display:block;color:var(--ink);font-size:14.5px;margin-top:4px}
+.flow .em{font-size:24px}
+
+.sectitle{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:28px 0 10px}
+.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:600px){.tabs{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tab{appearance:none;border:1px solid var(--edge);background:var(--card);color:var(--ink);border-radius:14px;padding:14px 10px;font:700 16px/1.2 inherit;cursor:pointer;text-align:center;min-height:56px}
+.tab small{display:block;font-weight:500;font-size:12px;color:var(--dim);margin-top:3px}
+.tab[aria-selected="true"]{background:linear-gradient(180deg,#1d4ed8,#1e3a8a);border-color:var(--blue);box-shadow:0 0 0 2px rgba(59,130,246,.35)}
+.tab[aria-selected="true"] small{color:#c7dbff}
+.tab:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+
+details.help{margin:12px 0 0;background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:0 14px}
+details.help summary{cursor:pointer;padding:13px 0;font-weight:700;list-style:none}
+details.help summary::-webkit-details-marker{display:none}
+details.help summary::after{content:"＋";float:right;color:var(--dim)}
+details.help[open] summary::after{content:"－"}
+.help ul{margin:0 0 14px;padding-left:18px}.help li{margin:6px 0}
+
+.empty{margin:18px 0 0;padding:18px;border:1px dashed var(--edge);border-radius:14px;color:var(--dim);text-align:center}
+.panel{margin-top:18px}
+.panel h2{font-size:22px;font-weight:800;margin:0 0 4px}
+.panel .intro{color:var(--dim);margin:0 0 14px}
+
+.av{border-radius:18px;border:1px solid var(--edge);background:var(--navy);padding:16px;margin:14px 0;min-width:0}
+.av.a{border-color:rgba(52,211,153,.45)}
+.av.b{border-color:rgba(59,130,246,.55)}
+.avhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:6px}
+.pill{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:4px 10px}
+.a .pill{background:var(--okbg);color:var(--ok)}
+.b .pill{background:rgba(59,130,246,.16);color:#93c5fd}
+.av h3{font-size:19px;font-weight:800;width:100%}
+.av h4{font-size:15px;margin:18px 0 8px;color:var(--cyan);font-weight:800}
+.av p{margin:6px 0}
+
+ol.steps{counter-reset:s;list-style:none;margin:0;padding:0}
+ol.steps>li{counter-increment:s;position:relative;padding:10px 0 10px 44px;border-top:1px solid var(--edge)}
+ol.steps>li:first-child{border-top:0}
+ol.steps>li::before{content:counter(s);position:absolute;left:0;top:9px;width:30px;height:30px;border-radius:50%;background:var(--card2);border:1px solid var(--blue);display:grid;place-items:center;font-weight:800;font-size:14px}
+.path{font-weight:700;color:#fff;background:var(--card2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px;overflow-wrap:anywhere}
+ul.sub{margin:6px 0 0;padding-left:18px;color:var(--dim)}ul.sub li{margin:3px 0}
+
+.btns{display:grid;gap:8px;margin:8px 0 0}
+.btnrow{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:10px 12px;min-width:0}
+.btnrow .nm{font-weight:800;overflow-wrap:anywhere}
+.btnrow .nm::before{content:"🔘 ";}
+.btnrow .set{color:var(--dim);font-size:14px;margin-top:2px}
+
+.note{background:var(--warnbg);border:1px solid rgba(251,191,36,.35);border-radius:12px;padding:10px 12px;font-size:14.5px;color:#fde9b5;margin:12px 0 0}
+.good{background:var(--okbg);border:1px solid rgba(52,211,153,.35);border-radius:12px;padding:10px 12px;font-size:14.5px;color:#c9f7e3;margin:12px 0 0}
+.facts{display:grid;gap:8px;margin-top:6px}
+.fact{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:10px 12px}
+.fact b{display:block;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--dim);margin-bottom:2px}
+.printbtn{appearance:none;border:0;border-radius:12px;background:var(--ok);color:#03241a;font:800 16px inherit;padding:14px 16px;width:100%;cursor:pointer;margin-top:14px}
+.sources{margin:14px 0 0;font-size:12.5px;color:var(--dim)}
+.sources b{display:block;margin-bottom:4px}
+.sources ol{margin:0;padding-left:18px}.sources li{margin:3px 0;overflow-wrap:anywhere}
+.sources a{color:#9cc3ff}
+.textme{margin:26px 0 0;text-align:center;padding:16px;border-radius:16px;background:var(--card);border:1px solid var(--edge)}
+.textme b{display:block;font-size:17px}
+footer{margin-top:22px;text-align:center;color:var(--dim);font-size:12.5px}
+
+/* printable staff cheat sheet: hidden on screen, the only thing printed */
+#cheat{display:none}
+@media print{
+  @page{margin:12mm}
+  body{background:#fff!important;color:#000}
+  .wrap>*:not(#cheat){display:none!important}
+  #cheat{display:block;color:#000;font:12.5pt/1.4 -apple-system,system-ui,sans-serif}
+  #cheat h1{font-size:20pt;margin:0 0 2pt}
+  #cheat .ch-sub{font-size:11pt;color:#333;margin:0 0 10pt}
+  #cheat h2{font-size:13pt;margin:12pt 0 4pt;border-bottom:1.5pt solid #000;padding-bottom:2pt}
+  #cheat ol{margin:0;padding-left:16pt}#cheat li{margin:3pt 0}
+  #cheat table{width:100%;border-collapse:collapse;margin-top:4pt}
+  #cheat th,#cheat td{border:1pt solid #000;padding:5pt 6pt;text-align:left;vertical-align:top;font-size:11.5pt}
+  #cheat th{background:#eee}
+  #cheat .big{font-weight:800}
+  #cheat .foot{margin-top:12pt;font-size:10pt;color:#333}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand">Second Shift AI</div>
+  <h1>Connect rewards to your register</h1>
+  <p class="lede">Your guests get reward codes in the app. Your staff take them off at the register. Pick your system below and follow the steps.</p>
+  <p class="for" id="for" hidden></p>
+</header>
+
+<ol class="flow" aria-label="How a reward gets used">
+  <li><span class="em" aria-hidden="true">📱</span><b>Guest shows code</b>On their phone, in the app</li>
+  <li><span class="em" aria-hidden="true">🔘</span><b>Staff tap a button</b>One discount button in your POS</li>
+  <li><span class="em" aria-hidden="true">🧾</span><b>Code goes on the ticket</b>So it shows in your reports</li>
+</ol>
+
+<div class="sectitle" id="pickLabel">What do you ring up on?</div>
+<div class="tabs" role="tablist" aria-labelledby="pickLabel" id="tabs"></div>
+
+<details class="help" id="which">
+  <summary>Which one do I have?</summary>
+  <ul>
+    <li><b>Look at the card reader or screen.</b> The brand name or logo is almost always printed on it: <b>Toast</b> (orange-red, "toast" in lowercase), <b>Square</b> (a white square-in-a-square), <b>Clover</b> (green four-leaf mark, "clover"), <b>SpotOn</b>, <b>Lightspeed</b> (a flame), <b>Revel</b> (usually an iPad on a stand).</li>
+    <li><b>Look at the bottom of a printed receipt.</b> Most say "Powered by…" or show the company's name or web address.</li>
+    <li><b>Look at your bank deposits.</b> Card sales are usually deposited under the name of the company that runs your POS.</li>
+    <li><b>Ask whoever opens the store.</b> Whatever app they log into at the start of a shift is your POS.</li>
+    <li>Still not sure? Pick <b>Something else</b>. Those steps work on almost any system.</li>
+  </ul>
+</details>
+
+<div id="empty" class="empty">Tap your system above to see the step-by-step.</div>
+<section id="panel" class="panel" role="tabpanel" aria-live="polite" hidden></section>
+
+<div class="textme"><b>Need help? Text Antidote.</b>Send a photo of your screen and he'll walk you through it, or set it up with you.</div>
+<footer>Second Shift AI · Menu names come from each company's own help pages as of October 2026. If a screen looks a little different, the steps still apply. The names just move around.</footer>
+
+<section id="cheat" aria-hidden="true"></section>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* Five discount buttons every restaurant makes once. Each POS entry says how to build them there. */
+var NAMES={free:"App reward – free item",pct:"App reward – % off",amt:"App reward – $ off",champ:"Weekly champion – half off",bday:"Birthday treat"};
+
+var POS=[
+{id:"toast",name:"Toast",tag:"Toast Web",
+ intro:"You keep Toast exactly as it is. You add five discount buttons in Toast Web once, and your staff use them like any other discount.",
+ setup:[
+  "On a computer, sign in to <b>Toast Web</b> (toasttab.com, log in).",
+  "Go to <span class='path'>Finance › Related › Settings › Discounts &amp; promo codes</span>.<ul class='sub'><li>On some accounts it's under <span class='path'>Payments › Comps and promos › Discounts and promo codes</span>.</li></ul>",
+  "Select <b>+ Add a Discount</b>. Type the name exactly as shown below. The name is what staff see on the POS and on the receipt.",
+  "Set <b>Discount type</b> and <b>Applies to</b> for each button as listed below. <b>Open $ Off</b> and <b>Open % Off</b> let staff type the amount, so one button covers any value.",
+  "Under <b>Advanced Settings</b>, leave <b>Allow with other discounts</b> off. That keeps it to one reward per check.",
+  "Save, then <b>publish</b> so the buttons reach your POS devices.",
+  "Make sure the staff who'll redeem rewards have the <b>Discounts</b> permission (Toast's 3.1 Discounts permission) on their job.",
+  "Repeat steps 3 to 6 for all five buttons."],
+ buttons:{free:"Discount type: % Off, 100%. Applies to: Any item.",pct:"Discount type: Open % Off. Applies to: Entire check.",amt:"Discount type: Open $ Off. Applies to: Entire check.",champ:"Discount type: % Off, 50%. Applies to: Entire check.",bday:"Discount type: Open $ Off. Applies to: Any item."},
+ redeem:["Ring up the order as usual.","For a free item or birthday treat, tap that item on the check first.","Tap <b>Discounts</b> and pick the <b>App reward</b> button that matches. Type the amount if it asks.","If Toast asks for a reason or note, type the guest's code (for example WIN-YZGJ)."],
+ tap:"Select the item (for item rewards) › Discounts › pick the App reward button › type the amount if asked.",
+ note:"If Toast asks for a reason, type the code. If it doesn't, write the code on the merchant copy.",
+ b:{
+  what:"Toast connects outside apps through its <b>Partner Integrations</b> program. When it's connected, a Toast sale posts points to the guest's app by itself, and app rewards can be applied to the check without anyone typing a code.",
+  route:"Second Shift has to be accepted as a Toast integration partner first. That means applying and passing Toast's certification. Once we're approved, you add us in <span class='path'>Integrations › Integration management › Browse &amp; purchase integrations</span> in Toast Web.",
+  owner:"The Toast login with the <b>8.4 Manage integrations</b> permission, to click <b>Add</b>. Toast includes partner integrations in its <b>Restaurant Management suites</b> (Essentials or Pro), so you may need one of those.",
+  time:"Adding us takes a few minutes once we're listed, and Toast says some features can take up to half a day to switch on. The partner approval before that is on Toast's schedule, and it can take months. Avenue A covers you the whole time.",
+  honest:"A full Toast connection needs Toast's approval, and we can't speed that up. Second Shift handles the application, the build and the testing. You'll just click Add when it's ready."},
+ sources:[["Toast: Create an Open Discount","https://support.toasttab.com/en/article/Open-Discounts?lang=en_US"],["Toast: Get Started With Discounts","https://support.toasttab.com/en/article/Basic-Discount-Configuration"],["Toast: Set Up Toast Partner Integrations","https://support.toasttab.com/en/article/Set-Up-Toast-Partner-Integrations"],["Toast developer guide: Partner integration overview","https://doc.toasttab.com/doc/devguide/apiPartnerIntegrationOverview.html"]]},
+
+{id:"square",name:"Square",tag:"Square Dashboard",
+ intro:"You add five discounts in your Square Dashboard once. They show up in Square POS on every device at your location.",
+ setup:[
+  "On a computer, sign in to your <b>Square Dashboard</b>.",
+  "Go to <span class='path'>Items &amp; services › Items › Discounts</span>.<ul class='sub'><li>Depending on your account, the first menu may be called <b>Items &amp; menus</b> or <b>Items &amp; inventory</b>.</li></ul>",
+  "Click <b>Create a discount</b>. Type the name exactly as shown below.",
+  "Pick the <b>amount type</b> for each button as listed below. <b>Variable percentage</b> and <b>Variable amount</b> let staff enter the value at checkout, so one button covers any value.",
+  "Choose your location(s) and click <b>Save</b>.",
+  "Repeat for all five buttons.",
+  "You can also do this on the iPad or phone: <span class='path'>≡ More › Items › Discounts › Create discount</span>."],
+ buttons:{free:"Amount type: Percentage, 100%. Apply it to the item.",pct:"Amount type: Variable percentage.",amt:"Amount type: Variable amount. It comes off the whole sale.",champ:"Amount type: Percentage, 50%.",bday:"Amount type: Variable amount. It comes off the whole sale."},
+ redeem:["Ring up the order as usual.","For a free item, tap that item in the cart and add the <b>App reward – free item</b> discount to it.","For everything else, add the matching <b>App reward</b> discount to the sale and type the % or $ when Square asks.","Add the guest's code as a note on the sale if your setup allows notes."],
+ tap:"Tap the item (free item) or the sale › Discounts › pick the App reward button › type the value if asked.",
+ note:"Add the code as a note on the sale. If you can't, write it on the merchant copy.",
+ extra:"Square limit: a <b>dollar</b> amount you type at checkout comes off the whole sale, not one item. That's why the free-item button is a 100% discount.",
+ b:{
+  what:"Square lets you connect outside apps with a secure sign-in. When it's connected, a Square sale posts points to the guest's app by itself, and app rewards can be matched to the sale without staff typing a code.",
+  route:"Square's <b>OAuth</b> connection: you click a <b>Connect Square</b> link from us, sign in to Square yourself, review exactly what we're asking to see (for example items, orders and customers), and tap <b>Allow</b>. Apps listed in the <b>Square App Marketplace</b> use the same sign-in.",
+  owner:"Your Square owner login, to tap Allow. You never give us your password. You can disconnect us from your Square account any time.",
+  time:"The sign-in takes about 2 minutes. Square doesn't make us wait for a partner approval to connect to your own account, so it's mostly our build and test time, usually a week or two.",
+  honest:"Square is the easiest system to fully connect. Second Shift builds and tests everything. You just tap Allow."},
+ sources:[["Square: Create and manage discounts","https://squareup.com/help/us/en/article/3955-create-and-manage-discounts"],["Square Developer: OAuth overview","https://developer.squareup.com/docs/oauth-api/overview"],["Square Developer: OAuth best practices (seller can view and revoke the connection)","https://developer.squareup.com/docs/oauth-api/best-practices"]]},
+
+{id:"clover",name:"Clover",tag:"Clover Dashboard",
+ intro:"Clover's saved discounts have a set value, so you save a few presets and use Clover's custom discount for anything else. Staff still just tap a button.",
+ setup:[
+  "On a computer, log in to your <b>Clover Dashboard</b>.",
+  "From the left, select <span class='path'>Items › Discounts</span>.<ul class='sub'><li>On a Clover device you can open the <b>Discounts</b> app and tap <b>＋</b> in the lower right instead.</li></ul>",
+  "Select <b>Add discount</b>. Type the name as shown below and enter the percentage or dollar amount.",
+  "Tap <b>Save</b>. It's added to your list of presets.",
+  "Repeat for all five buttons.",
+  "When a guest's reward is a value you didn't save (say 15% off instead of 10%), staff use Clover's <b>custom discount</b> in the Register app and type the value."],
+ buttons:{free:"Percentage: 100%. Staff apply it to the one item.",pct:"Percentage: your WELCOME code's value (for example 10%). Use a custom % for other values.",amt:"Amount: your FRIEND code's value (for example $5). Use a custom $ for other values.",champ:"Percentage: 50%.",bday:"Percentage: 100%. Staff apply it to the birthday treat item."},
+ redeem:["Ring up the order in the <b>Register</b> app.","For a free item or birthday treat, tap that line item first, then choose the discount.","For an order-wide reward, add the discount to the whole order.","If the value doesn't match a preset, choose a <b>custom</b> % or $ discount and type the value.","Write the guest's code in the order note if you use notes, or on the merchant copy."],
+ tap:"Register app › tap the item (item rewards) or the order › Discount › pick the App reward preset, or a custom % / $.",
+ note:"Put the code in the order note. If you can't, write it on the merchant copy.",
+ b:{
+  what:"Clover connects outside apps through the <b>Clover App Market</b>. When it's connected, Clover sales post points to the guest's app by themselves, and app rewards can be applied without typing.",
+  route:"Second Shift publishes an app on the Clover App Market. Clover reviews every app (a functional review and a legal review of what data it asks for) before it's listed. Then you install it from your Clover Dashboard.",
+  owner:"Your Clover owner login, to install the app and approve the permissions it asks for.",
+  time:"Installing takes a couple of minutes. Clover's app review comes first and runs on Clover's schedule, usually a few weeks.",
+  honest:"A full Clover connection needs Clover's approval of our app. Second Shift handles the build and the review. Avenue A works in the meantime."},
+ sources:[["Clover: Set up discounts in the Discounts app","https://www.clover.com/en-US/help/set-up-discounts-in-Discounts-app"],["Clover: Apply discounts (Register app; custom or preset, item or order)","https://www.clover.com/en-US/help/apply-discounts"],["Clover Developer: Understand the app approval process","https://docs.clover.com/docs/developer-app-approval"]]},
+
+{id:"spoton",name:"SpotOn",tag:"SpotOn Back of House",
+ intro:"You add five discounts in SpotOn's Back of House (BOH) once. SpotOn's \"Popup\" types ask staff for the value, so one button covers any amount.",
+ setup:[
+  "Sign in to SpotOn's <b>Back of House</b> (BOH).",
+  "Tap the <b>Discounts</b> icon, then the <b>New Item (+)</b> icon.",
+  "In <b>General Information</b>, type the name exactly as shown below.",
+  "Choose the <b>Discount Type</b> for each button as listed below. <b>Popup Percent Off</b> and <b>Popup Amount Off</b> ask staff to type the value.",
+  "Tick <b>Can Only Be Used Once Per Order</b>. Under Availability, tick <b>Enabled</b>. Tick <b>Prompt For Note</b> if you want staff to attach a reason every time.",
+  "Pick the <b>Order Types</b> it works on and the <b>Users</b> allowed to apply it.",
+  "Save, then repeat for all five buttons."],
+ buttons:{free:"Discount Type: Percent Off, 100. Staff apply it to the one item.",pct:"Discount Type: Popup Percent Off.",amt:"Discount Type: Popup Amount Off.",champ:"Discount Type: Percent Off, 50.",bday:"Discount Type: Popup Amount Off. Staff apply it to the treat item."},
+ redeem:["Ring up the order as usual.","Select the item (for a free item or birthday treat) or the whole check.","Open <b>Discounts</b>, pick the <b>App reward</b> button and type the value when it pops up.","If it asks for a reason, choose it, and write the guest's code on the merchant copy."],
+ tap:"Select the item or check › Discounts › pick the App reward button › type the value when it pops up.",
+ note:"Write the code on the merchant copy. If you turned on Prompt For Note, pick the reason too.",
+ extra:"SpotOn's help pages mention that applying discounts on a <b>handheld</b> can be limited to managers. Check the Users list in step 6.",
+ b:{
+  what:"SpotOn connects outside software through its <b>Integration Partner Program</b>. When it's connected, SpotOn sales post points to the guest's app by themselves.",
+  route:"Second Shift applies to SpotOn's Integration Partner Program and builds the connection with SpotOn's developer tools. SpotOn suggests talking to your SpotOn rep about any integration you want.",
+  owner:"Tell your SpotOn rep you want Second Shift connected. SpotOn says that if you opted out of its Core Bundle, there's a small monthly fee to use third-party integrations.",
+  time:"SpotOn decides the timing of partner approval. Plan on several weeks or more, and keep using Avenue A until then.",
+  honest:"A full SpotOn connection needs SpotOn's approval. Second Shift handles the technical side. You just tell your rep yes."},
+ sources:[["SpotOn: Discounts | SpotOn Restaurant BOH","https://spotonteam.atlassian.net/wiki/x/HgCIa"],["SpotOn: Discounts – Create & Edit (BOH tutorial video)","https://spotonteam.atlassian.net/wiki/spaces/SK/pages/1962213637/Discounts+-+Create+Edit+BOH+Tutorial+Videos"],["SpotOn: Applying & Removing Discounts (handheld)","https://spotonteam.atlassian.net/wiki/x/r4LKkg"],["SpotOn: Integrations and Integration Partner Program","https://www.spoton.com/integrations"]]},
+
+{id:"lightspeed",name:"Lightspeed",tag:"Restaurant (K-Series) Back Office",
+ intro:"For Lightspeed Restaurant (K-Series). You add five discounts in the Back Office once. With <b>Custom Discount</b> turned on, staff can type the value, so one button covers any amount.",
+ setup:[
+  "Log in to the Lightspeed <b>Back Office</b>.",
+  "From the menu, select <span class='path'>Payment › Discounts</span>.",
+  "Click <b>Add discount</b>. Type the name as shown below. Lightspeed allows up to 25 characters, so the champion button is shortened.",
+  "Turn on <b>Custom Discount</b> for the % off, $ off and birthday buttons, so staff can type the value.",
+  "Choose <b>Percentage</b> or <b>Amount</b> and a default value, as listed below.",
+  "Optional: put all five in a <b>Discount group</b> called <b>App rewards</b>, so they sit together on the POS. Under <b>Advanced settings</b>, turn on <b>Show on order ticket</b>.",
+  "Click <b>Save</b>. Repeat for all five buttons.",
+  "Sync your POS devices so the new buttons show up."],
+ buttons:{free:"Percentage, 100%. Staff apply it to the one item.",pct:"Percentage, Custom Discount on (default 10%).",amt:"Amount, Custom Discount on (default $5).",champ:"Name it Weekly champ – half off (25-character limit). Percentage, 50%.",bday:"Amount, Custom Discount on. Staff apply it to the treat item."},
+ names:{champ:"Weekly champ – half off"},
+ redeem:["Ring up the order as usual.","Use the item or order action menu, open <b>App rewards</b> and pick the matching discount.","Change the value if it's a custom one.","Write the guest's code on the merchant copy."],
+ tap:"Item or order actions › App rewards › pick the button › change the value if needed.",
+ note:"Write the code on the merchant copy.",
+ extra:"Lightspeed doesn't let you delete a discount from the Back Office, so check each name before you save.",
+ b:{
+  what:"Lightspeed connects outside apps through its API, which is open to approved partners. When it's connected, Lightspeed sales post points to the guest's app by themselves.",
+  route:"Second Shift applies to Lightspeed's partner program for the Restaurant product. Lightspeed gives a test connection first, then a live one once they're satisfied. Lightspeed says it opens API access by request so it can support each partner.",
+  owner:"Your OK to connect, and possibly a quick call or email to your Lightspeed account manager to approve it.",
+  time:"Lightspeed sets the pace for partner approval, usually several weeks. Your part takes minutes.",
+  honest:"A full Lightspeed connection needs Lightspeed's approval. Second Shift handles the application and the build."},
+ sources:[["Lightspeed K-Series: Adding discounts","https://k-series-support.lightspeedhq.com/hc/articles/1260804657089-Adding-discounts"],["Lightspeed: Restaurant API (access by request)","https://www.lightspeedhq.com/au/pos/restaurant/api/"],["Codat: Lightspeed K partner and credential setup (third party)","https://docs.codat.io/integrations/commerce/lightspeed-k/commerce-lightspeed-k-setup"]]},
+
+{id:"revel",name:"Revel",tag:"Revel Management Console",
+ intro:"You add five discounts in the Revel Management Console once. A <b>Variable Discount</b> lets staff type the value, so one button covers any amount.",
+ setup:[
+  "Log in to the Revel <b>Management Console</b>.",
+  "In the left menu, open <span class='path'>Products › Discounts</span>.",
+  "Click <b>Add New Discount</b> and type the name as shown below.",
+  "Set <b>Discount Function</b> to <b>Standard</b> and choose the <b>Discount Type</b> (Amount or Percentage) as listed below.",
+  "Check <b>Variable Discount</b> on the % off, $ off and birthday buttons so staff can type the value.",
+  "Turn on item-level use for the free item and birthday buttons. Make sure the discount is active and shows on the iPad POS.",
+  "Save. Repeat for all five buttons.",
+  "On a POS iPad, check that the buttons appear (add them to your POS grid for one-tap access) and run a test order."],
+ buttons:{free:"Type: Percentage, 100. Item level.",pct:"Type: Percentage. Variable Discount checked.",amt:"Type: Amount. Variable Discount checked.",champ:"Type: Percentage, 50.",bday:"Type: Amount. Variable Discount checked. Item level."},
+ redeem:["Ring up the order as usual.","Select the item (free item or birthday treat) or the whole order.","Tap <b>Discount</b>, pick the <b>App reward</b> button and type the value if asked.","Write the guest's code on the merchant copy."],
+ tap:"Select the item or order › Discount › pick the App reward button › type the value if asked.",
+ note:"Write the code on the merchant copy.",
+ extra:"Revel's own setup articles are behind its login, so these steps come from published guides by Revel integration partners. If a label looks different, Revel support can point you to it in a minute.",
+ b:{
+  what:"Revel connects outside apps through its <b>Open API</b> and <b>Partner Connect</b>. When it's connected, Revel sales post points to the guest's app by themselves.",
+  route:"Revel doesn't hand out API keys on its own. You ask Revel to connect Second Shift through <b>Partner Connect</b>, and Revel turns it on for your stores.",
+  owner:"An email or call to Revel (or your Revel rep) saying you authorize Second Shift. Include your Revel URL and your establishment numbers. If you don't already have Partner Connect, Revel sends an order form, and it comes with a monthly Revel fee.",
+  time:"Integration partners report 2 to 3 business days if you already have Partner Connect, and 3 to 5 if you don't.",
+  honest:"A full Revel connection needs Revel to switch it on, and Revel charges for Partner Connect. Second Shift does the technical setup once Revel connects us."},
+ sources:[["Deliverect: Revel – create discounts (Variable Discount, third party)","https://help.deliverect.com/en/articles/7979249-revel-create-discounts"],["Open Dining: Setting up a Revel discount (third party)","https://support.opendining.net/article/770-setting-up-a-revel-discount-for-o-d"],["Revel: Open API integrations","https://revelsystems.com/why-revel/open-api-integrations/"],["OpenEye: Revel Partner Connect steps and timing (third party)","https://answers.openeye.net/Configure/Integrations/Point-of-Sale/Revel/Revel_Integration_Instructions"]]},
+
+{id:"other",name:"Something else",tag:"Any POS",
+ intro:"Almost every POS can make a discount button. These steps work on Heartland, TouchBistro, Aloha, Micros, Shift4/SkyTab, PAR, Lavu and most others.",
+ setup:[
+  "Log in to your POS's <b>back office</b> or <b>dashboard</b> (usually on a computer).",
+  "Look for <b>Discounts</b>. It's often under <b>Menu</b>, <b>Items</b>, <b>Products</b>, <b>Payments</b> or <b>Settings</b>.",
+  "Add a new discount and type the name exactly as shown below.",
+  "For the type, look for a word like <b>Open</b>, <b>Variable</b>, <b>Custom</b>, <b>Popup</b>, <b>Prompted</b> or <b>Manual</b>. That's the one that lets staff type the value.",
+  "If your POS only has fixed discounts, save one per value you use most (for example 10% off and $5 off) and name them like \"App reward – 10% off\".",
+  "Allow it on items and on the whole check if there's a choice. Save, and make sure it's turned on for your registers.",
+  "Run one test order and void it."],
+ buttons:{free:"100% off, on one item.",pct:"Open / variable percentage off.",amt:"Open / variable dollar amount off.",champ:"50% off the check.",bday:"Open / variable dollar amount, on the treat item."},
+ redeem:["Ring up the order as usual.","Select the item (free item or birthday treat) or the whole check.","Apply the matching <b>App reward</b> discount and type the value if asked.","Type the guest's code in the note or reason if your POS allows it. If not, write it on the merchant copy."],
+ tap:"Select the item or check › Discounts › pick the App reward button › type the value if asked.",
+ note:"Type the code in the note or reason if your POS allows it. If not, write it on the merchant copy.",
+ b:{
+  what:"A direct connection means sales post points to the guest's app by themselves and rewards apply without typing. Whether that's possible depends on your POS company.",
+  route:"Ask your POS rep three questions: <b>1)</b> Do you have an <b>app marketplace</b> or <b>partner integrations</b>? <b>2)</b> Is there an <b>open API</b> for loyalty partners? <b>3)</b> Is there an extra fee to connect one? Send the answers to Antidote.",
+  owner:"Your OK, and sometimes an approval inside your POS account.",
+  time:"It depends on the POS company. Some take days, some take months, and some don't allow it at all.",
+  honest:"Not every POS allows outside connections. If yours doesn't, Avenue A keeps working for good, with nothing to maintain."},
+ sources:[]},
+
+{id:"none",name:"No POS / cash",tag:"Cash register or paper",
+ intro:"No problem. Rewards work fine with a cash register or paper tickets. You just keep a simple log so the numbers add up.",
+ setup:[
+  "Print the staff cheat sheet below and the <b>reward log</b> that comes with it. Keep both by the register.",
+  "Decide who can give rewards (everyone, or a manager only).",
+  "Keep a pen by the log. That's the whole setup."],
+ buttons:null,
+ redeem:["Check the code on the guest's phone.","Ring up the full price, then take the reward off by hand: write <b>APP REWARD</b> and the amount on the ticket.","Free item: ring it at $0 or write it on the ticket as comped.","Write one line in the reward log: date, code, what they got, $ value, your initials."],
+ tap:"Write APP REWARD and the amount on the ticket, then one line in the reward log.",
+ note:"One line in the reward log for every code: date, code, reward, $ value, initials.",
+ log:true,
+ b:{
+  what:"There's no register to connect, so the app keeps its own record of every reward it gives out. Your paper log is the other half, and you can compare them any time.",
+  route:"If you get a POS later, come back and pick it here. Square has a free plan for restaurants and is the easiest to fully connect.",
+  owner:"Nothing right now.",
+  time:"Nothing to wait for.",
+  honest:"You don't need a POS to run rewards. It just makes reporting automatic later."},
+ sources:[["Square: Create and manage discounts (if you move to Square later)","https://squareup.com/help/us/en/article/3955-create-and-manage-discounts"]]}
+];
+
+var ORDER=["free","pct","amt","champ","bday"];
+var CODES=[
+ ["Free item","WIN-YZGJ, LUCKY-AB12 (daily lucky draw), PLAYWIN and other free-item prizes","free"],
+ ["% off","WELCOME10 (new guests) and other % rewards","pct"],
+ ["$ off","FRIEND5 (referred by a friend) and other $ rewards","amt"],
+ ["Weekly #1","Weekly champion on the leaderboard","champ"],
+ ["Birthday","BDAY (check their photo ID)","bday"]
+];
+
+var qs=new URLSearchParams(location.search);
+var R=(qs.get("r")||"").trim().slice(0,60);
+var forEl=document.getElementById("for");
+if(R){ forEl.textContent="Setup for "+R; forEl.hidden=false; document.title=R+" · Register Setup Guide"; }
+
+function el(t,c,html){ var e=document.createElement(t); if(c) e.className=c; if(html!=null) e.innerHTML=html; return e; }
+function txt(t,c,s){ var e=document.createElement(t); if(c) e.className=c; e.textContent=s; return e; }
+function nm(p,k){ return (p.names&&p.names[k])||NAMES[k]; }
+
+var tabs=document.getElementById("tabs"), panel=document.getElementById("panel"), empty=document.getElementById("empty"), cheat=document.getElementById("cheat");
+POS.forEach(function(p){
+  var b=el("button","tab"); b.type="button"; b.id="tab-"+p.id; b.setAttribute("role","tab"); b.setAttribute("aria-selected","false"); b.setAttribute("aria-controls","panel");
+  b.appendChild(document.createTextNode(p.name)); b.appendChild(txt("small",null,p.tag));
+  b.onclick=function(){ show(p.id,true); };
+  tabs.appendChild(b);
+});
+tabs.addEventListener("keydown",function(e){
+  if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return;
+  var list=[].slice.call(tabs.children), i=list.indexOf(document.activeElement); if(i<0) return;
+  var n=list[(i+(e.key==="ArrowRight"?1:list.length-1))%list.length]; n.focus(); n.click(); e.preventDefault();
+});
+
+function avenueA(p){
+  var a=el("div","av a");
+  var hd=el("div","avhead"); hd.appendChild(txt("span","pill","Avenue A · Works today · about 10 minutes")); hd.appendChild(txt("h3",null,"Discount buttons in "+p.name)); a.appendChild(hd);
+  a.appendChild(el("p",null,"Guests' rewards come from unique codes the app makes. Staff check the code and tap a discount button. Nothing to install."));
+  a.appendChild(txt("h4",null,p.buttons?"1. Make the buttons (one time)":"1. Get set up (one time)"));
+  var ol=el("ol","steps"); p.setup.forEach(function(s){ ol.appendChild(el("li",null,s)); }); a.appendChild(ol);
+  if(p.buttons){
+    a.appendChild(txt("h4",null,"The five buttons to make"));
+    var bx=el("div","btns");
+    ORDER.forEach(function(k){ var r=el("div","btnrow"); r.appendChild(txt("div","nm",nm(p,k))); r.appendChild(txt("div","set",p.buttons[k])); bx.appendChild(r); });
+    a.appendChild(bx);
+  }
+  if(p.extra) a.appendChild(el("p","note",p.extra));
+  a.appendChild(txt("h4",null,"2. How staff redeem a code at the register"));
+  var ol2=el("ol","steps");
+  ol2.appendChild(el("li",null,"<b>Check the code on the guest's phone</b>, inside their app. It shows their reward and when it expires. One reward per visit, and no screenshots of someone else's code."));
+  p.redeem.forEach(function(s){ ol2.appendChild(el("li",null,s)); });
+  a.appendChild(ol2);
+  a.appendChild(el("p","good","<b>Which button?</b> The app screen says what the reward is. Game prizes (WIN-…), daily lucky draw wins (LUCKY-…), PLAYWIN and other free-item rewards use <b>free item</b>. WELCOME10 uses <b>% off</b>. FRIEND5 uses <b>$ off</b>. BDAY uses <b>Birthday treat</b>. Restaurant codes like MELODY-AB12 work the same way: match the reward on screen."));
+  a.appendChild(el("p",null,"<b>Points:</b> if you use points, the guest shows their 4-digit code, staff enter it with the check total, and the points land on their phone."));
+  var pb=txt("button","printbtn","🖨️ Print the staff cheat sheet"); pb.type="button"; pb.onclick=function(){ window.print(); }; a.appendChild(pb);
+  return a;
+}
+function avenueB(p){
+  var b=el("div","av b"), x=p.b;
+  var hd=el("div","avhead"); hd.appendChild(txt("span","pill","Avenue B · When you're ready")); hd.appendChild(txt("h3",null,p.id==="none"?"Full connection (later)":"Full connection with "+p.name)); b.appendChild(hd);
+  var f=el("div","facts");
+  [["What it means",x.what],["How it connects",x.route],["What you approve or provide",x.owner],["How long it takes",x.time]].forEach(function(r){ var d=el("div","fact"); d.appendChild(txt("b",null,r[0])); d.appendChild(el("div",null,r[1])); f.appendChild(d); });
+  b.appendChild(f);
+  b.appendChild(el("p","note","<b>Straight answer:</b> "+x.honest));
+  if(p.id!=="none") b.appendChild(el("p",null,"Antidote and Second Shift handle all the technical work. You never have to touch code, and Avenue A keeps working the whole time."));
+  return b;
+}
+function sources(p){
+  if(!p.sources.length) return null;
+  var s=el("div","sources"); s.appendChild(txt("b",null,"Sources"));
+  var ol=el("ol");
+  p.sources.forEach(function(src){ var li=el("li"), a=txt("a",null,src[0]); a.href=src[1]; a.target="_blank"; a.rel="noopener"; li.appendChild(a); ol.appendChild(li); });
+  s.appendChild(ol); return s;
+}
+function buildCheat(p){
+  cheat.innerHTML="";
+  cheat.appendChild(txt("h1",null,"App rewards at the register"));
+  cheat.appendChild(txt("p","ch-sub",(R?R+" · ":"")+(p.id==="none"?"Cash register / paper":p.name)+" · Staff cheat sheet"));
+  cheat.appendChild(txt("h2",null,"Every time"));
+  var ol=el("ol");
+  ["Look at the code ON THE GUEST'S PHONE, in their app. Check the reward and that it hasn't expired.","One reward per visit. No screenshots of someone else's code.",p.tap,p.note,"Not sure? Don't guess. Ask a manager."].forEach(function(s){ ol.appendChild(txt("li",null,s)); });
+  cheat.appendChild(ol);
+  cheat.appendChild(txt("h2",null,"Which button?"));
+  var t=el("table"), tr=el("tr"); ["Reward on the app","Example codes",p.buttons?"Tap this button":"What to do"].forEach(function(h){ tr.appendChild(txt("th",null,h)); }); t.appendChild(tr);
+  CODES.forEach(function(c){
+    var r=el("tr"); r.appendChild(txt("td","big",c[0])); r.appendChild(txt("td",null,c[1]));
+    var what=p.buttons?nm(p,c[2]):({free:"Ring at $0 / write COMP",pct:"Take the % off, write APP REWARD",amt:"Take the $ off, write APP REWARD",champ:"Half off the check, write APP REWARD",bday:"Treat at $0 / write COMP"})[c[2]];
+    r.appendChild(txt("td","big",what)); t.appendChild(r);
+  });
+  cheat.appendChild(t);
+  cheat.appendChild(txt("p",null,"Codes like MELODY-AB12 or WIN-YZGJ: the app screen says what the reward is. Match it to the row above."));
+  if(p.log){
+    cheat.appendChild(txt("h2",null,"Reward log"));
+    var lt=el("table"), hr=el("tr"); ["Date","Code","Reward","$ value","Initials"].forEach(function(h){ hr.appendChild(txt("th",null,h)); }); lt.appendChild(hr);
+    for(var i=0;i<12;i++){ var rr=el("tr"); for(var j=0;j<5;j++) rr.appendChild(el("td",null,"&nbsp;")); lt.appendChild(rr); }
+    cheat.appendChild(lt);
+  }
+  cheat.appendChild(txt("p","foot","Questions? Text Antidote (Second Shift AI)."));
+}
+function show(id,push){
+  var p=POS.filter(function(x){ return x.id===id; })[0]; if(!p) return;
+  [].forEach.call(tabs.children,function(b){ b.setAttribute("aria-selected",String(b.id==="tab-"+id)); b.tabIndex=b.id==="tab-"+id?0:-1; });
+  panel.innerHTML=""; panel.hidden=false; empty.hidden=true; panel.setAttribute("aria-labelledby","tab-"+id);
+  panel.appendChild(txt("h2",null,p.id==="none"?"No POS / cash register":p.name+" setup"));
+  panel.appendChild(el("p","intro",p.intro));
+  panel.appendChild(avenueA(p));
+  panel.appendChild(avenueB(p));
+  var s=sources(p); if(s) panel.appendChild(s);
+  buildCheat(p);
+  if(push){
+    qs.set("pos",id); try{ history.replaceState(null,"","?"+qs.toString()); }catch(e){}
+    panel.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+}
+var start=(qs.get("pos")||"").toLowerCase();
+if(start==="no-pos"||start==="cash") start="none";
+if(start==="something-else"||start==="else") start="other";
+if(start) show(start,false);
+window.__POS_IDS=POS.map(function(p){ return p.id; });
+})();
+</script>
+</body>
+</html>

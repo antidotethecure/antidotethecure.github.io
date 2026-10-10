@@ -32,6 +32,7 @@ comment at the top. Edit the config or `template.html`, never the output.
 | `happyHour` | Text such as `"3–6 PM"`. Leave it out and the double-points question asks about slow hours instead. |
 | `drawDays` | Choices for the giveaway draw day. The first one is the default. |
 | `rewards` | Restaurant-item choices: `welcome, points[4], t1..t4, stars, referIn, referFriend, bday, missed, winback, playwin`. **The first option is the pre-selected default.** |
+| `drawPrizes` | Signature-item choices for the daily lucky draw (members). The first 3 are pre-selected; "Free soft drink / mocktail" and "$5 off" are added automatically. Without it, free items from `t1`, `playwin` and `stars` are used. |
 | `game` | `name`, `prizes: [[score, [options]]]` (or `prizesFrom: {file, var}` plus `alts` to read live thresholds such as `window.NALU_PRIZES`), `champ`, optional `second`. |
 | `special` | Optional deal block: `{title, qs: [[key, label, [options]]]}`. Examples are Melody's "Just Landed" deal and the Nalu ↔ Melody sister perk. |
 | `specials`, `specialsTitle` | `[[key, label]]`. Each one is answered Yes / Changed / Stopped. |
@@ -47,8 +48,8 @@ Weekly giveaway (with the estimate card and the California free-entry line), wel
 stars, points per $1, 10-star reward, 4-tier ladder, referral (inviter and friend), happy-hour double points,
 3 monthly visit levels, birthday treat and window, missed-call offer and days, win-back text, game
 prizes and weekly #1, optional special deal, rules (expiry, one per visit, stacking), weekly specials,
-phone-host questions, promo codes (WELCOME{n}, FRIEND{n}, BDAY, PLAYWIN; each has a toggle and value chips),
-menu on/off and prices, and go live. "Send to Antidote" shares a plain-text summary through
+phone-host questions, daily lucky draw (odds, prizes; 3-day redeem window), promo codes (WELCOME{n}, FRIEND{n}, BDAY, PLAYWIN; each has a toggle and value chips),
+your register (POS) with a link to the `/pos/` step-by-step guide, menu on/off and prices, and go live. "Send to Antidote" shares a plain-text summary through
 `navigator.share`, or falls back to `sms:`.
 
 ## Adding a restaurant

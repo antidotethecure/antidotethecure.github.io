@@ -119,6 +119,12 @@
    "$5 off"
   ]
  },
+ "drawPrizes": [
+  "Free Jungle Fries",
+  "Free mocktail (Wish You Were Here)",
+  "Free French Toast brunch",
+  "Free Chips, Salsa & Guac"
+ ],
  "game": {
   "name": "Ride the Nalu",
   "prizesFrom": {

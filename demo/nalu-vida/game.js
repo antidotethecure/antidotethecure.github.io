@@ -39,7 +39,7 @@
     '<div class="nv-ov" id="nv-start"><h3>Ride the Nalu</h3><p>Surf the Venice Pier loop. Grab the food, dodge the bites, and win free food &amp; drinks at Nalu Vida.</p>' +
     '<div class="nv-pick"><button type="button" data-s="f"><img src="img/game/surfer_f.webp" alt="" onerror="this.outerHTML=\'<div class=ph style=font-size:64px;line-height:96px>🏄‍♀️</div>\'">She rides</button>' +
     '<button type="button" data-s="m"><img src="img/game/surfer_m.webp" alt="" onerror="this.outerHTML=\'<div class=ph style=font-size:64px;line-height:96px>🏄‍♂️</div>\'">He rides</button></div>' +
-    '<p class="nv-how">Drag to steer · <b>Tap to jump</b> (clear the pier, fly over sharks) · Grab food rafts, boat hand-offs and helicopter drops · 4 in a row = ×2, 8 = ×3, and it keeps going · Dodge sharks, eels &amp; jellyfish · Shoot the pier for a bonus · Tap the banner plane 👀</p><p class="nv-how" id="nv-best"></p></div>' +
+    '<p class="nv-how">Drag to steer · <b>Catch a wave, then tap to jump</b> over the pier (hit the pier without a wave: −1 ❤️, −200) · 5 hearts · Grab food rafts, boat hand-offs and helicopter drops · 4 in a row = ×2, 8 = ×3, and it keeps going · Dodge sharks, eels &amp; jellyfish · Shoot the pier for a bonus · Tap the banner plane 👀</p><p class="nv-how" id="nv-best"></p></div>' +
     '<div class="nv-ov" id="nv-end" style="display:none"></div>' +
     "</div>";
   var wrap = mount.firstChild, gl_c = document.getElementById("nv-water"), cv = document.getElementById("cv"), cx = cv.getContext("2d");
@@ -48,7 +48,7 @@
   /* ---------- images ---------- */
   var IM = {};
   ["surfer_m", "surfer_f", "shark", "eel", "jelly", "gull", "boat", "heli", "plane", "raft_taco", "raft_burger", "raft_oysters", "raft_mimosa", "raft_shrimp",
-    "drop", "buoy", "shore", "pier", "pierend", "lifeguard_f", "lifeguard_m", "staff", "palm", "storefront"].forEach(function (k) { var i = new Image(); i.decoding = "async"; i.src = "img/game/" + k + ".webp"; IM[k] = i; });
+    "drop", "buoy", "shore", "pier", "pierend", "lifeguard_f", "lifeguard_m", "staff", "palm", "storefront", "wave", "splash"].forEach(function (k) { var i = new Image(); i.decoding = "async"; i.src = "img/game/" + k + ".webp"; IM[k] = i; });
   function ok(i) { return i && i.complete && i.naturalWidth > 0; }
   function spr(k, x, y, w, rot, alpha) {
     var i = IM[k]; if (!ok(i)) return false; var h = w * i.naturalHeight / i.naturalWidth;
@@ -56,7 +56,7 @@
   }
 
   /* ---------- sizing ---------- */
-  var DPR = Math.min(2, window.devicePixelRatio || 1), WDPR = Math.min(1.25, DPR);
+  var DPR = Math.min(2, window.devicePixelRatio || 1), WDPR = 1;
   function size() { cv.width = W * DPR; cv.height = H * DPR; gl_c.width = Math.round(W * WDPR); gl_c.height = Math.round(H * WDPR); }
   size();
 
@@ -68,7 +68,7 @@
       var vs = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
       var fs = [
         "#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif",
-        "uniform vec2 R;uniform float T,S,SH,K;",
+        "uniform vec2 R,C;uniform float T,S,SH,K,Z;",
         "float h1(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}",
         "float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h1(i),h1(i+vec2(1,0)),f.x),mix(h1(i+vec2(0,1)),h1(i+1.),f.x),f.y);}",
         "float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<4;i++){s+=a*n2(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}",
@@ -77,7 +77,7 @@
         "h+=(fbm(q*6.+vec2(T*.15,T*.35))-.5)*.5;h+=(n2(q*38.-vec2(T*.9,T*.4))-.5)*.12;return h;}",
         // tileable caustic pattern (classic iterative trick)
         "float caus(vec2 uv){vec2 p=mod(uv*6.28318,6.28318)-250.,i=p;float c=1.,inten=.005;for(int n=0;n<4;n++){float t=T*.45*(1.-(3.5/float(n+1)));i=p+vec2(cos(t-i.x)+sin(t+i.y),sin(t-i.y)+cos(t+i.x));c+=1./length(vec2(p.x/(sin(i.x+t)/inten),p.y/(cos(i.y+t)/inten)));}c/=4.;c=1.17-pow(c,1.4);return pow(abs(c),8.);}",
-        "void main(){vec2 p=gl_FragCoord.xy/R*vec2(400.,640.);p.y=640.-p.y;vec2 q=vec2(p.x,p.y-S)/400.;",
+        "void main(){vec2 p=gl_FragCoord.xy/R*vec2(400.,640.);p.y=640.-p.y;p=C+(p-C)/Z;vec2 q=vec2(p.x,p.y-S)/400.;",
         "float e=.0025,h=hgt(q);vec3 n=normalize(vec3(-(hgt(q+vec2(e,0))-h)/e*.06,-(hgt(q+vec2(0,e))-h)/e*.06,1.));",
         "float d=SH-p.y;float dep=clamp(d/340.,0.,1.);float m=dep*dep*14.+h*.25;",                       // water depth in 'meters'
         "vec3 V=normalize(vec3(0.,-.38*(1.-p.y/640.)-.05,1.));",                                           // camera tilts toward the horizon at the top
@@ -101,12 +101,12 @@
       var pr = g.createProgram(); g.attachShader(pr, sh(g.VERTEX_SHADER, vs)); g.attachShader(pr, sh(g.FRAGMENT_SHADER, fs)); g.linkProgram(pr); g.useProgram(pr);
       var b = g.createBuffer(); g.bindBuffer(g.ARRAY_BUFFER, b); g.bufferData(g.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), g.STATIC_DRAW);
       var a = g.getAttribLocation(pr, "a"); g.enableVertexAttribArray(a); g.vertexAttribPointer(a, 2, g.FLOAT, false, 0, 0);
-      ["R", "T", "S", "SH", "K"].forEach(function (k) { U[k] = g.getUniformLocation(pr, k); }); GL = g;
+      ["R", "T", "S", "SH", "K", "C", "Z"].forEach(function (k) { U[k] = g.getUniformLocation(pr, k); }); GL = g;
     } catch (e) { GL = null; }
   })();
   function water(t, p) {
     var sy0 = HC + p; // screen y of the waterline (world y = 0)
-    if (GL) { GL.viewport(0, 0, gl_c.width, gl_c.height); GL.uniform2f(U.R, gl_c.width, gl_c.height); GL.uniform1f(U.T, t); GL.uniform1f(U.S, -p); GL.uniform1f(U.SH, sy0); GL.uniform1f(U.K, G.hurt > 0 ? 1.15 : 1); GL.drawArrays(GL.TRIANGLE_STRIP, 0, 4); return; }
+    if (GL) { GL.viewport(0, 0, gl_c.width, gl_c.height); GL.uniform2f(U.R, gl_c.width, gl_c.height); GL.uniform1f(U.T, t); GL.uniform1f(U.S, -p); GL.uniform1f(U.SH, sy0); GL.uniform1f(U.K, G.hurt > 0 ? 1.15 : 1); GL.uniform2f(U.C, CAM.x, CAM.y); GL.uniform1f(U.Z, ZOOM); GL.drawArrays(GL.TRIANGLE_STRIP, 0, 4); return; }
     var gr = cx.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, "#0b3b5e"); gr.addColorStop(1, "#1aa3b0"); cx.fillStyle = gr; cx.fillRect(0, 0, W, H);
   }
 
@@ -176,12 +176,15 @@
   $("nv-best").textContent = G.best ? "Your best: " + G.best.toLocaleString() : "";
   function buzz(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} }
   var sy = function (yw) { return HC - (yw - G.cam); };
+  var ZOOM = 1.35, CAM = { x: 200, y: 400 };   // the 2D layer and the water shader both zoom around the surfer
+  function camUpdate() { var tx = G.x, ty = sy(G.yw); CAM.x += (tx - CAM.x) * .12; CAM.y += (ty - CAM.y) * .2; }
+  function toWorld(px, py) { return { x: CAM.x + (px - CAM.x) / ZOOM, y: CAM.y + (py - CAM.y) / ZOOM }; }
 
   function reset() {
-    G.score = 0; G.lap = 1; G.dir = 1; G.phase = "ride"; G.hearts = 3; G.streak = 0; G.mult = 1; G.hurt = 0; G.inv = 1.2; G.shake = 0;
+    G.score = 0; G.lap = 1; G.dir = 1; G.phase = "ride"; G.hearts = 5; G.streak = 0; G.mult = 1; G.hurt = 0; G.inv = 1.2; G.shake = 0;
     G.x = 120; G.yw = END_Y - 420; G.vx = 0; G.ang = Math.PI; G.dir = -1; G.lead = -LEAD; G.cam = G.yw + G.lead; G.phase = "intro"; G.introT = 0; G.ents = []; G.fx = []; G.wake = []; G.turn = null; G.underPier = 0;
     G.spawn = { food: 1.2, haz: 2.5, boat: 9, heli: 16, plane: 26, buoy: 40, swell: 3 }; G.runId++; G.posted = 0; G.planeTapped = 0; G.lastGain = G.t;
-    G.pierSide = G.x < PIER_X ? -1 : 1; G.staffToss = 2.2; G.jump = 0; G.jumpDur = 0; G.jcd = 0; G.hint = 4;
+    G.pierSide = G.x < PIER_X ? -1 : 1; G.staffToss = 2.2; G.jump = 0; G.jumpDur = 0; G.jcd = 0; G.hint = 6; G.wave = 0;
   }
   function speed() { return (150 + 22 * (G.lap - 1)) * (G.phase === "ride" ? 1 : 0); }
 
@@ -239,7 +242,7 @@
     if (G.phase === "shore") return shoreStep(dt);
     var v = speed();
     G.yw += G.dir * v * dt;
-    if (G.hint > 0) G.hint -= dt; if (G.jcd > 0) G.jcd -= dt;
+    if (G.hint > 0) G.hint -= dt; if (G.jcd > 0) G.jcd -= dt; if (G.wave > 0) G.wave -= dt;
     if (G.jump > 0) { G.jump -= dt; if (G.jump <= 0) { G.jump = 0; land(); } }
     // steering
     G.x += G.vx * dt; G.vx *= Math.pow(0.0009, dt); G.x = Math.max(16, Math.min(W - 16, G.x));
@@ -250,9 +253,11 @@
     // wake
     if (Math.random() < 0.9) G.wake.push({ x: G.x + rnd(-4, 4), yw: G.yw - G.dir * 18, t: 0, s: rnd(3, 6) });
     // pier: pilings every 80 world px, shooting the pier = crossing under without touching one
-    var under = G.jump <= 0 && Math.abs(G.x - PIER_X) < PIER_W / 2 - 4 && G.yw > -40 && G.yw < END_Y - END_R;
-    if (under) { var ph = ((G.yw % 80) + 80) % 80; if (ph < 9 || ph > 71) hurt("Pier piling!"); G.underPier = 1; }
-    else if (G.jump <= 0) { var side = G.x < PIER_X ? -1 : 1; if (G.underPier && side !== G.pierSide && G.inv <= 0) { gain(400, G.x, sy(G.yw) - 30, "SHOT THE PIER!"); buzz(25); } G.underPier = 0; G.pierSide = side; }
+    var onPier = G.yw > -40 && G.yw < END_Y - END_R, bigAir = G.jump > 0 && G.jumpDur > .6;
+    if (onPier && !bigAir && Math.abs(G.x - PIER_X) < PIER_W / 2 + 12) {          // ran into the pier
+      var back = G.pierSide || (G.x < PIER_X ? -1 : 1); G.x = PIER_X + back * (PIER_W / 2 + 16); G.vx = back * 260;
+      if (G.inv <= 0) { G.score = Math.max(0, G.score - 200); hurt("Hit the pier! −200"); G.fx.push({ k: "wsplash", x: G.x, y: sy(G.yw), t: 0 }); }
+    } else if (G.jump <= 0) G.pierSide = G.x < PIER_X ? -1 : 1;
     // spawns
     var S = G.spawn, lv = G.lap, nearEnd = G.dir > 0 ? G.yw > LEG - 500 : G.yw < 500;
     S.food -= dt; S.haz -= dt; S.boat -= dt; S.heli -= dt; S.plane -= dt; S.buoy -= dt; S.swell -= dt;
@@ -262,7 +267,7 @@
       if (S.boat <= 0) { boat(); S.boat = rnd(11, 16); }
       if (S.heli <= 0) { heli(); S.heli = rnd(18, 26); }
       if (S.buoy <= 0 && G.hearts < 4) { add({ t: "buoy", x: laneX(), yw: ahead(H * 0.75), r: 16 }); S.buoy = rnd(35, 50); }
-      if (S.swell <= 0) { swell(); S.swell = rnd(3.5, 6); }
+      if (S.swell <= 0) { swell(); S.swell = rnd(2.2, 3.6); }
     }
     if (S.plane <= 0) { plane(); S.plane = rnd(40, 55); }
     if (Math.random() < dt * 0.35 && G.gulls.length < 5) gull();
@@ -288,12 +293,12 @@
         var d = Math.hypot(e.x - G.x, (e.yw - G.yw)), hitR = e.r + 14;
         if (e.t === "food" && d < hitR + 6) { gain(e.pts, e.x, sy(e.yw), e.gold ? "GOLDEN!" : ""); buzz(10); G.fx.push({ k: "ring", x: e.x, y: sy(e.yw), t: 0 }); G.ents.splice(i, 1); continue; }
         if (e.t === "drop" && e.air <= 0.25 && d < hitR + 8) { gain(e.pts, e.x, sy(e.yw), "DRINK DROP!"); buzz(12); G.ents.splice(i, 1); continue; }
-        if (e.t === "buoy" && d < hitR + 6) { G.hearts = Math.min(5, G.hearts + 1); pop(e.x, sy(e.yw), "+1 ❤️ Lifeguard save!", "#ff9db0", 1); toast("lifeguard_f", "Rescue can! +1 heart"); G.ents.splice(i, 1); continue; }
+        if (e.t === "buoy" && d < hitR + 6) { G.hearts = Math.min(6, G.hearts + 1); pop(e.x, sy(e.yw), "+1 ❤️ Lifeguard save!", "#ff9db0", 1); toast("lifeguard_f", "Rescue can! +1 heart"); G.ents.splice(i, 1); continue; }
         var danger = e.t === "jelly" || (e.t === "eel" && e.zap) || (e.t === "shark" && e.st === "lunge") || e.t === "boat";
         if (danger && d < hitR) { hurt(e.t === "shark" ? "SHARK BITE!" : e.t === "eel" ? "⚡ ZAPPED!" : e.t === "jelly" ? "Jellyfish sting!" : "Boat wake!"); if (e.t === "shark") e.st = "gone"; continue; }
         if ((e.t === "jelly" || e.t === "eel" || e.t === "shark") && !e.nm && d < hitR + 26 && d >= hitR && (e.t !== "shark" || e.st === "lunge")) { e.nm = 1; gain(50, G.x, py - 40, "close one!"); }
       }
-      if (e.t === "swell" && !e.hit && Math.abs(e.yw - G.yw) < 10) { e.hit = 1; jump(false); if (Math.abs(G.vx) > 120) { gain(150, G.x, py - 36, "AIR!"); G.fx.push({ k: "spray", x: G.x, y: py, t: 0 }); } }
+      if (e.t === "swell" && !e.hit && Math.abs(e.yw - G.yw) < 10) { e.hit = 1; G.wave = 2.0; jump(false); sfx("splash"); G.fx.push({ k: "wsplash", x: G.x, y: sy(G.yw), t: 0 }); pop(G.x, sy(G.yw) - 54, "WAVE! TAP TO JUMP", "#7fe3f2"); if (Math.abs(G.vx) > 120) { gain(150, G.x, py - 36, "AIR!"); G.fx.push({ k: "spray", x: G.x, y: py, t: 0 }); } }
       ey = e.scr ? e.y : sy(e.yw);
       if (e.t === "plane" ? (e.x < -360 || e.x > W + 360) : (ey < -260 || ey > H + 260 || e.x < -120 || e.x > W + 120)) G.ents.splice(i, 1);
     }
@@ -325,6 +330,8 @@
   // tap to launch off a wave: airborne you clear the pier and fly over sharks, eels and jellies
   function jump(big) {
     if (!G.running || G.phase !== "ride" || G.jump > 0 || (big && G.jcd > 0)) return;
+    if (big && !(G.wave > 0)) { G.jumpDur = .3; G.jump = .3; G.jumpFrom = G.x < PIER_X ? -1 : 1; pop(G.x, sy(G.yw) - 50, "Catch a wave to jump!", "#cfe8ff"); return; }
+    if (big) G.wave = 0;
     G.jumpDur = big ? 0.82 : 0.38; G.jump = G.jumpDur; if (big) { G.jcd = 1.0; sfx("air"); buzz(12); }
     G.jumpFrom = G.x < PIER_X ? -1 : 1; G.fx.push({ k: "spray", x: G.x, y: sy(G.yw), t: 0 });
   }
@@ -381,14 +388,15 @@
 
   /* ---------- drawing ---------- */
   function draw() {
+    camUpdate();
     water(G.t, G.cam);
     cx.setTransform(DPR, 0, 0, DPR, 0, 0); cx.clearRect(0, 0, W, H);
+    cx.translate(CAM.x, CAM.y); cx.scale(ZOOM, ZOOM); cx.translate(-CAM.x, -CAM.y);
     if (!GL) water(G.t, G.cam);
     if (G.shake > 0.5) cx.translate(rnd(-G.shake, G.shake), rnd(-G.shake, G.shake));
     drawShore();
     // swells
-    G.ents.forEach(function (e) { if (e.t !== "swell") return; var y = sy(e.yw); cx.save(); cx.globalAlpha = .55; cx.strokeStyle = "#f4fbff"; cx.lineWidth = 3; cx.beginPath();
-      for (var x = -10; x <= W + 10; x += 10) { var yy = y + Math.sin(x * .035 + G.t * 2) * 6; x === -10 ? cx.moveTo(x, yy) : cx.lineTo(x, yy); } cx.stroke(); cx.restore(); });
+    G.ents.forEach(function (e) { if (e.t !== "swell") return; drawWave(e); });
     // wake
     G.wake.forEach(function (w) { cx.globalAlpha = (1 - w.t / 1.1) * .7; cx.fillStyle = "#fff"; cx.beginPath(); cx.arc(w.x, sy(w.yw), w.s * (1 + w.t), 0, 7); cx.fill(); }); cx.globalAlpha = 1;
     // water-level things under the pier deck
@@ -396,6 +404,7 @@
     // player (drawn before the deck so the deck covers you when you shoot the pier)
     drawSurfer();
     drawPier();
+    if (G.jump > 0 && G.jumpDur > .6) drawSurfer();   // airborne over the deck: draw the surfer above the pier
     G.ents.forEach(function (e) { if (e.t === "toss") drawEnt(e); });
     // sky layer: gull shadows, gulls, heli, plane
     G.gulls.forEach(function (g) { var flap = Math.sin(g.f * 9) * .15; cx.globalAlpha = .18; cx.fillStyle = "#001018"; cx.beginPath(); cx.ellipse(g.x + 26, g.y + 34, 14, 5, 0, 0, 7); cx.fill(); cx.globalAlpha = 1;
@@ -405,10 +414,11 @@
     G.fx.forEach(function (f) {
       if (f.k === "txt") { var a = 1 - f.t / 1.1; cx.globalAlpha = Math.max(0, a); cx.font = (f.big ? "900 24px" : "800 15px") + " 'Alfa Slab One',Georgia,serif"; cx.textAlign = "center"; cx.lineWidth = 4; cx.strokeStyle = "rgba(0,20,40,.7)"; cx.strokeText(f.txt, f.x, f.y - f.t * 40); cx.fillStyle = f.col; cx.fillText(f.txt, f.x, f.y - f.t * 40); cx.globalAlpha = 1; }
       else if (f.k === "ring") { cx.strokeStyle = "rgba(255,210,63," + (1 - f.t / .6) + ")"; cx.lineWidth = 3; cx.beginPath(); cx.arc(f.x, f.y, 14 + f.t * 70, 0, 7); cx.stroke(); }
+      else if (f.k === "wsplash") { var a2 = Math.max(0, 1 - f.t / .6), s2 = 70 + f.t * 120; if (ok(IM.splash)) spr("splash", f.x, f.y - 6, s2, 0, a2); }
       else if (f.k === "splash") { for (var q2 = 0; q2 < 18; q2++) { var an = q2 / 18 * 6.283, rr2 = f.t * 120; cx.fillStyle = "rgba(255,255,255," + (1 - f.t / .6) + ")"; cx.beginPath(); cx.arc(f.x + Math.cos(an) * rr2, f.y + Math.sin(an) * rr2 * .6, 4 - f.t * 4, 0, 7); cx.fill(); } cx.strokeStyle = "rgba(255,255,255," + (1 - f.t / .6) + ")"; cx.lineWidth = 3; cx.beginPath(); cx.ellipse(f.x, f.y, f.t * 90, f.t * 54, 0, 0, 7); cx.stroke(); }
       else if (f.k === "spray") { for (var k = 0; k < 10; k++) { cx.fillStyle = "rgba(255,255,255," + (1 - f.t / .6) + ")"; cx.beginPath(); cx.arc(f.x + Math.cos(k) * f.t * 80, f.y + Math.sin(k * 2) * f.t * 50, 3, 0, 7); cx.fill(); } }
     });
-    if (G.hint > 0 && G.phase === "ride") { cx.globalAlpha = Math.min(1, G.hint) * (.6 + .4 * Math.sin(G.t * 6)); label("👆 Tap to jump · drag to steer", W / 2, H - 40, "#fff"); cx.globalAlpha = 1; }
+    if (G.hint > 0 && G.phase === "ride") { cx.save(); cx.setTransform(DPR, 0, 0, DPR, 0, 0); cx.globalAlpha = Math.min(1, G.hint) * (.6 + .4 * Math.sin(G.t * 6)); label("🌊 Catch a wave, then tap to jump the pier", W / 2, H - 40, "#fff"); cx.restore(); }
     if (G.hurt > 0) { cx.fillStyle = "rgba(255,40,60," + G.hurt * .9 + ")"; cx.fillRect(-20, -20, W + 40, H + 40); }
     if ((G.phase === "shore" || G.phase === "finale") && ok(IM.storefront)) {
       var k = Math.min(1, (G.phase === "shore" ? G.shoreT : G.finT) / .5), cw = W - 40, ch = cw * IM.storefront.naturalHeight / IM.storefront.naturalWidth, yy = 64 - (1 - k) * (ch + 80);
@@ -416,6 +426,21 @@
       label(G.phase === "shore" ? "★ Welcome back to Nalu Vida ★" : "★ The Nalu Vida crew pulled you in ★", W / 2, yy + ch + 18, "#ffd23f");
     }
     hud();
+  }
+  // a rolling wave with real depth: dark trough behind, sunlit face, breaking white crest (photo art) and spray
+  function drawWave(e) {
+    var y = sy(e.yw), up = G.dir > 0 ? 1 : -1, sw = Math.sin(G.t * 1.6 + e.yw * .01) * 4;
+    var tr = cx.createLinearGradient(0, y - up * 46, 0, y + up * 6); tr.addColorStop(0, "rgba(2,30,55,0)"); tr.addColorStop(.75, "rgba(2,30,55,.42)"); tr.addColorStop(1, "rgba(2,30,55,0)");
+    cx.fillStyle = tr; cx.fillRect(-60, Math.min(y - up * 46, y + up * 6), W + 120, 52);                                   // trough shadow in front of the wave
+    var fc = cx.createLinearGradient(0, y + up * 4, 0, y + up * 34); fc.addColorStop(0, "rgba(120,235,235,.55)"); fc.addColorStop(1, "rgba(20,120,160,0)");
+    cx.fillStyle = fc; cx.fillRect(-60, Math.min(y + up * 4, y + up * 34), W + 120, 30);                                  // light passing through the face
+    if (ok(IM.wave)) { var wh = 74, ww = wh * IM.wave.naturalWidth / IM.wave.naturalHeight, off = ((G.t * 18 + e.yw) % ww + ww) % ww;
+      cx.save(); if (up < 0) { cx.translate(0, y * 2); cx.scale(1, -1); }
+      for (var x0 = -off - ww; x0 < W + ww; x0 += ww * .92) cx.drawImage(IM.wave, x0, y - wh * .55 + sw, ww, wh);
+      cx.restore(); }
+    else { cx.strokeStyle = "rgba(255,255,255,.8)"; cx.lineWidth = 6; cx.beginPath(); for (var x = -10; x <= W + 10; x += 10) { var yy = y + Math.sin(x * .035 + G.t * 2) * 6; x === -10 ? cx.moveTo(x, yy) : cx.lineTo(x, yy); } cx.stroke(); }
+    for (var k = 0; k < 5; k++) { var sx = (k * 97 + G.t * 60 + e.yw) % (W + 40) - 20, ph = (G.t * 2.2 + k) % 1;             // spray kicking off the lip
+      cx.fillStyle = "rgba(255,255,255," + (.7 * (1 - ph)) + ")"; cx.beginPath(); cx.arc(sx + ph * 10, y - up * (10 + ph * 26), 1.5 + ph * 2.5, 0, 7); cx.fill(); }
   }
   function drawShore() {
     var y0 = sy(0); if (y0 < -40) return;   // waterline on screen
@@ -474,7 +499,15 @@
     var bob = Math.sin(G.t * 2.3 + G.yw * .018) * 2.5, tilt = Math.sin(G.t * 1.7 + G.yw * .011) * .07;
     cx.fillStyle = "rgba(0,20,35," + (.25 - air * .1) + ")"; cx.beginPath(); cx.ellipse(x + 6 + air * 26, y + 8 + air * 34, 12 * (1 - air * .25), 30 * (1 - air * .25), G.ang, 0, 7); cx.fill();
     y = y + bob - air * 34;
-    if (!spr(G.surfer === "m" ? "surfer_m" : "surfer_f", x, y, 64 * (1 + air * .42), G.ang + tilt + air * .25 * (G.vx > 0 ? 1 : -1))) {
+    if (G.wave > 0) { var wr = 40 + Math.sin(G.t * 12) * 4; cx.strokeStyle = "rgba(127,227,242," + Math.min(1, G.wave) + ")"; cx.lineWidth = 3; cx.beginPath(); cx.arc(x, y, wr, 0, 7); cx.stroke();
+      cx.strokeStyle = "rgba(255,255,255," + Math.min(.6, G.wave * .5) + ")"; cx.lineWidth = 1.5; cx.beginPath(); cx.arc(x, y, wr + 6, 0, 7); cx.stroke(); }
+    var sun = cx.createRadialGradient(x, y, 4, x, y, 46); sun.addColorStop(0, "rgba(255,240,200,.30)"); sun.addColorStop(1, "rgba(255,240,200,0)"); cx.fillStyle = sun; cx.beginPath(); cx.arc(x, y, 46, 0, 7); cx.fill();
+    var lean = Math.max(-.55, Math.min(.55, G.vx / 380)), shift = lean * 6;                       // weight shifts into the turn
+    cx.save(); cx.filter = "brightness(1.2) contrast(1.08) saturate(1.12)";
+    var drew = (function () { var i = IM[G.surfer === "m" ? "surfer_m" : "surfer_f"]; if (!ok(i)) return false; var w = 56 * (1 + air * .42), h = w * i.naturalHeight / i.naturalWidth;
+      cx.translate(x + shift, y); cx.rotate(G.ang + tilt * .6 + air * .25 * (G.vx > 0 ? 1 : -1)); cx.transform(1, 0, -lean * .35, 1, 0, 0); cx.scale(1 - Math.abs(lean) * .1, 1); cx.drawImage(i, -w / 2, -h / 2, w, h); return true; })();
+    cx.restore();
+    if (!drew) {
       cx.save(); cx.translate(x, y); cx.rotate(G.ang); var gr = cx.createLinearGradient(0, -30, 0, 30); gr.addColorStop(0, "#ffb02e"); gr.addColorStop(.5, "#ffd23f"); gr.addColorStop(.5, "#2f8fd8"); gr.addColorStop(1, "#173d8f");
       cx.fillStyle = gr; cx.beginPath(); cx.ellipse(0, 0, 10, 30, 0, 0, 7); cx.fill(); cx.fillStyle = G.surfer === "m" ? "#7a4a2a" : "#b5735a"; cx.beginPath(); cx.arc(0, -2, 7, 0, 7); cx.fill(); cx.restore();
     }
@@ -550,7 +583,7 @@
   function rotor(x, y, r, a, top) { if (top) rotorFX(cx, x, y, r, G.t, 1); }
   var lastHud = "";
   function hud() {
-    var s = Math.floor(G.score).toLocaleString(), m = "×" + G.mult + (G.streak >= 3 ? " · " + G.streak + " streak 🔥" : ""), hs = "❤️".repeat(Math.max(0, G.hearts)) + "🤍".repeat(Math.max(0, 3 - G.hearts)),
+    var s = Math.floor(G.score).toLocaleString(), m = "×" + G.mult + (G.streak >= 3 ? " · " + G.streak + " streak 🔥" : ""), hs = "❤️".repeat(Math.max(0, G.hearts)) + "🤍".repeat(Math.max(0, 5 - G.hearts)),
       leg = G.phase === "turn" ? "Rounding the pier!" : G.phase === "shore" ? "Nalu Vida pit stop" : G.dir > 0 ? "Out to the end of the pier" : "Back to Nalu Vida", key = s + m + hs + leg + G.lap;
     if (key === lastHud) return; lastHud = key;
     $("nv-score").textContent = s; $("nv-mult").textContent = m; $("nv-hearts").textContent = hs; $("nv-leg").textContent = leg; $("nv-lap").textContent = "Lap " + G.lap;
@@ -624,13 +657,13 @@
   var drag = null;
   function local(e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height }; }
   cv.addEventListener("pointerdown", function (e) {
-    e.preventDefault(); var p = local(e);
+    e.preventDefault(); var p0 = local(e), p = toWorld(p0.x, p0.y);
     var pl = G.ents.filter(function (x) { return x.t === "plane" && x.hit; })[0];
     if (pl && p.x > pl.hit.x && p.x < pl.hit.x + pl.hit.w && p.y > pl.hit.y && p.y < pl.hit.y + pl.hit.h) { melodyEgg(); return; }
     if (!G.running) return;
     drag = { id: e.pointerId, x: p.x, x0: p.x, t0: performance.now(), moved: 0 }; try { cv.setPointerCapture(e.pointerId); } catch (x) {}
   });
-  cv.addEventListener("pointermove", function (e) { if (!drag || e.pointerId !== drag.id) return; var p = local(e), dx = p.x - drag.x; drag.x = p.x; drag.moved += Math.abs(dx); G.x += dx * 1.15; G.vx = dx * 60; });
+  cv.addEventListener("pointermove", function (e) { if (!drag || e.pointerId !== drag.id) return; var p = local(e), dx = p.x - drag.x; drag.x = p.x; drag.moved += Math.abs(dx); G.x += dx * 1.15 / ZOOM * 1.2; G.vx = dx * 60; });
   cv.addEventListener("pointerup", function () { if (drag && drag.moved < 10 && performance.now() - drag.t0 < 280) jump(true); drag = null; });
   cv.addEventListener("pointercancel", function () { drag = null; });
   var keys = {};

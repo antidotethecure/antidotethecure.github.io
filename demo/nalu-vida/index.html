@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nalu Vida — Menu, Drinks &amp; Surf Game</title>
+<script src="../lang-th.js"></script>
+<meta name="description" content="Nalu Vida at the foot of the Venice Pier: tropical bites, craft cocktails, order from your seat, surf the Nalu for prizes.">
+<meta name="theme-color" content="#0a2540">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>window.NALU_PRIZES=[[2500,"$3 off any drink"],[4000,"Free Jungle Fries"],[5500,"Free Coconut Shrimp"],[7000,"Free Signature Taco plate"]];</script>
+<style>
+/* Nalu Vida: Venice sunset (orange to yellow), ocean stripes (navy to cyan), white slab letters, coral trim, sand */
+:root{
+  --deep:#08203a; --ocean:#0b2e52; --panel:#0f3760; --edge:#1f5283;
+  --blue:#1673c4; --cyan:#2ec4e6; --aqua:#7fe3f2;
+  --sun1:#ff6a2b; --sun2:#ff9a2e; --sun3:#ffd23f; --coral:#ff7b8a; --sand:#f3e2c3; --sand2:#e8cfa2;
+  --ink:#fdf8ef; --dim:#a9c3dc; --go:#3fd69b;
+  --display:"Alfa Slab One",Rockwell,Georgia,serif; --body:"Rubik",system-ui,-apple-system,sans-serif;
+  --sunset:linear-gradient(180deg,var(--sun3),var(--sun2) 55%,var(--sun1));
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{overflow-x:clip;margin:0;background:var(--deep);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body{background:
+  radial-gradient(900px 480px at 50% -10%,#ff8a3d33 0,transparent 60%),
+  repeating-linear-gradient(-28deg,#ffffff05 0 18px,transparent 18px 46px),
+  var(--deep);padding-bottom:84px}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px}
+a{color:var(--aqua)}
+/* wave divider */
+.wave{height:18px;margin:30px -16px 0;background:
+  radial-gradient(14px 10px at 14px 0,transparent 9px,var(--cyan) 10px 11px,transparent 12px) 0 0/28px 18px repeat-x;opacity:.55}
+/* hero */
+.hero{text-align:center;padding:26px 0 6px}
+.logo{width:min(220px,58vw);height:auto;display:block;margin:0 auto;filter:drop-shadow(0 10px 26px #0009)}
+.tag{font-weight:700;font-size:13.5px;letter-spacing:.06em;margin:14px auto 2px;color:var(--sand);max-width:340px}
+.tag i{color:var(--sun2);font-style:normal;padding:0 2px}
+.hero p{margin:4px 0;color:var(--dim);font-size:14px}
+#openline{display:inline-block;margin-top:8px;padding:5px 11px;border-radius:999px;background:#ffffff10;border:1px solid var(--edge);font-size:13px;font-weight:700}
+#openline .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--go);margin-right:6px;vertical-align:1px}
+#openline.closed .dot{background:var(--coral)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-weight:800;font-size:14.5px;border-radius:12px;padding:11px 14px;border:1px solid var(--edge);background:var(--panel);color:var(--ink);cursor:pointer;font-family:var(--body)}
+.btn.hot{background:var(--sunset);border-color:var(--sun2);color:#3a1600;box-shadow:0 8px 24px #ff8a3d44}
+.btn.sea{background:linear-gradient(180deg,var(--cyan),var(--blue));border-color:var(--cyan);color:#fff}
+.btn.coral{background:var(--coral);border-color:var(--coral);color:#3a0b12}
+h2{font-family:var(--display);font-weight:400;font-size:30px;line-height:1.1;margin:30px 0 6px;letter-spacing:.01em}
+h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--sun2);margin-bottom:4px}
+.sub{color:var(--dim);margin:0 0 12px;font-size:15px}
+/* game */
+#play{scroll-margin-top:10px}
+#nalu-game{min-height:40px}
+.prizes{background:var(--panel);border:1px solid var(--edge);border-radius:18px;padding:14px;margin-top:12px}
+.prizes .row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed #ffffff22;font-weight:600;font-size:15px}
+.prizes .row:last-of-type{border-bottom:0}
+.prizes .pt{flex:none;min-width:74px;font-family:var(--display);color:var(--sun3);font-size:18px}
+.prizes .champ{margin-top:8px;padding:10px 12px;border-radius:12px;background:linear-gradient(90deg,#ff9a2e26,#2ec4e61f);border:1px solid #ff9a2e66;font-weight:700;font-size:14.5px}
+.prizes .note{margin:8px 0 0;color:var(--dim);font-size:13px}
+/* seat */
+.box{background:var(--panel);border:1px solid var(--edge);border-radius:18px;padding:14px}
+.zones{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.zones button{border:1px solid var(--edge);background:var(--deep);color:var(--ink);border-radius:14px;padding:12px 6px;font:700 14.5px var(--body);cursor:pointer}
+.zones button span{display:block;font-size:24px;margin-bottom:2px}
+.tbls{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+.tbls[hidden]{display:none}
+.tbls button{border:1px solid var(--edge);background:var(--deep);color:var(--ink);border-radius:10px;padding:9px 0;font:700 15px var(--body);cursor:pointer}
+.box button.on{background:var(--sunset);color:#3a1600;border-color:var(--sun2)}
+.now{margin-top:10px;font-size:14px;color:var(--dim)}.now b{color:var(--sun3)}
+/* today */
+.today{position:relative;overflow:hidden;border-radius:20px;padding:16px;background:linear-gradient(160deg,#ff6a2b,#ff9a2e 45%,#ffd23f);color:#2a1000}
+.today::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-40px;height:80px;background:repeating-linear-gradient(-24deg,#0b2e52 0 12px,#1673c4 12px 22px,#2ec4e6 22px 28px);transform:rotate(-4deg);opacity:.9}
+.today .k{font-size:11.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;opacity:.8}
+.today h3{font-family:var(--display);font-weight:400;font-size:27px;line-height:1.1;margin:4px 0 6px}
+.today p{margin:0 0 6px;font-weight:600;font-size:15px;position:relative;z-index:1}
+.today .sp{padding-bottom:46px;position:relative;z-index:1}
+.hh{margin-top:10px;display:grid;gap:10px}
+.hh .stat{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
+.hh .stat i{width:12px;height:12px;border-radius:50%;background:var(--coral);flex:none}
+.hh .stat.on i{background:var(--go);box-shadow:0 0 0 0 #3fd69b88;animation:ping 1.6s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 10px #3fd69b00}100%{box-shadow:0 0 0 0 #3fd69b00}}
+.hh ul{margin:6px 0 0;padding-left:18px;color:var(--dim);font-size:14px}
+.hh ul b{color:var(--ink)}
+.week{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px}
+.week div{background:var(--deep);border:1px solid var(--edge);border-radius:12px;padding:9px 10px;font-size:13px;color:var(--dim)}
+.week div b{display:block;color:var(--ink);font-size:13.5px}
+.week div.is{border-color:var(--sun2);box-shadow:inset 0 0 0 1px var(--sun2)}
+/* menu */
+.chips{display:flex;gap:7px;overflow-x:auto;padding:8px 0;position:sticky;top:0;background:var(--deep);z-index:6;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.chips::-webkit-scrollbar{display:none}
+.chips a{flex:none;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--edge);border-radius:999px;padding:7px 13px;font-weight:700;font-size:14px}
+.cat{margin-top:20px;scroll-margin-top:56px}
+.cat h3{font-family:var(--display);font-weight:400;font-size:23px;margin:0 0 8px;color:var(--sand)}
+.cat .note{color:var(--dim);font-size:13.5px;margin:-4px 0 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
+.item{position:relative;background:var(--panel);border:1px solid var(--edge);border-radius:16px;overflow:hidden;min-width:0;display:flex;flex-direction:column}
+.media{position:relative;aspect-ratio:1/1;overflow:hidden;cursor:zoom-in;background:linear-gradient(180deg,#ffd23f 0,#ff9a2e 42%,#ff6a2b 52%,#0b2e52 52.5%,#1673c4 75%,#2ec4e6);display:grid;place-items:center}
+.media .ph{font-size:46px;filter:drop-shadow(0 4px 8px #0006);transform:translateY(-4%)}
+.media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .35s}
+.media img.ok{opacity:1}
+.media .a21{position:absolute;left:8px;top:8px;background:#08203acc;border:1px solid var(--coral);color:var(--coral);border-radius:999px;padding:2px 8px;font-size:11px;font-weight:800;z-index:2}
+.item .tx{padding:9px 11px 11px;display:flex;flex-direction:column;flex:1}
+.item .row{display:flex;justify-content:space-between;gap:6px;align-items:baseline}
+.item b{font-size:14.5px;line-height:1.22;overflow-wrap:anywhere}
+.item .pr{font-family:var(--display);font-size:17px;color:var(--sun3);white-space:nowrap}
+.item p{margin:4px 0 8px;font-size:12.5px;color:var(--dim);line-height:1.35;flex:1}
+.add{display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--sun2);background:transparent;color:var(--sun3);border-radius:10px;padding:8px;font:800 14px var(--body);cursor:pointer;width:100%}
+.add:active{background:var(--sun2);color:#3a1600}
+.qty{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--sun2);border-radius:10px;overflow:hidden}
+.qty button{border:0;background:var(--sun2);color:#3a1600;font:900 18px var(--body);width:38px;height:36px;cursor:pointer}
+.qty span{font-weight:700;font-size:13.5px}
+/* add effects: drinks fill up, food steams */
+.drink .media.pouring img.ok{animation:fill 1.4s cubic-bezier(.3,.1,.3,1)}
+@keyframes fill{0%{clip-path:inset(100% 0 0 0)}100%{clip-path:inset(0 0 0 0)}}
+.steam{position:absolute;inset:0;pointer-events:none;opacity:0;z-index:2}
+.steam i{position:absolute;bottom:18%;width:34%;height:70%;border-radius:50%;background:radial-gradient(closest-side,#ffffff88,#ffffff00);filter:blur(10px);opacity:0}
+.media.hot .steam{opacity:1}
+.media.hot .steam i{animation:steam 2.4s ease-out forwards}
+.steam i:nth-child(1){left:12%}.steam i:nth-child(2){left:36%;animation-delay:.35s!important}.steam i:nth-child(3){left:58%;animation-delay:.7s!important}
+@keyframes steam{0%{opacity:0;transform:translateY(30%) scale(.6)}25%{opacity:.85}100%{opacity:0;transform:translateY(-55%) scale(1.25) rotate(8deg)}}
+/* zoom */
+#zoom{position:fixed;inset:0;z-index:80;background:#020b16e6;display:none;align-items:center;justify-content:center;padding:16px}
+#zoom.on{display:flex}
+#zoom .in{width:100%;max-width:440px;background:var(--ocean);border:1px solid var(--edge);border-radius:22px;overflow:hidden;animation:zin .25s cubic-bezier(.2,1.2,.4,1)}
+@keyframes zin{from{transform:scale(.9);opacity:0}}
+#zoom .media{cursor:default}
+#zoom .tx{padding:14px 16px 16px}
+#zoom h3{font-family:var(--display);font-weight:400;font-size:24px;margin:0 0 4px;line-height:1.15}
+#zoom .zp{font-family:var(--display);color:var(--sun3);font-size:20px}
+#zoom p{color:var(--dim);margin:6px 0 12px}
+#zoom .x{position:absolute;right:10px;top:10px;z-index:3;width:38px;height:38px;border-radius:50%;border:0;background:#08203acc;color:#fff;font-size:20px;cursor:pointer}
+/* order bar + sheet */
+#obar{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#08203a00,#08203a 30%);display:none}
+#obar.on{display:block}
+#obar button{width:100%;max-width:696px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;border:0;border-radius:16px;padding:14px 16px;background:var(--sunset);color:#3a1600;font:800 15.5px var(--body);box-shadow:0 10px 30px #000a;cursor:pointer}
+#obar .n{background:#3a1600;color:var(--sun3);border-radius:999px;padding:2px 9px;font-size:13px}
+#obar.bump button{animation:bump .4s}
+@keyframes bump{40%{transform:scale(1.05)}}
+#sheet{position:fixed;inset:0;z-index:60;background:#000b;display:none;align-items:flex-end;justify-content:center}
+#sheet.on{display:flex}
+#sheet .in{width:100%;max-width:720px;max-height:86vh;overflow:auto;background:var(--ocean);border:1px solid var(--edge);border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+.ln{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:15px}
+.ln .m{color:var(--dim);font-size:13px}
+.tot{display:flex;justify-content:space-between;padding:6px 0;font-size:15px}.tot.big{font-family:var(--display);font-size:22px;color:var(--sun3)}
+.ok{background:#3fd69b22;border:2px solid var(--go);border-radius:16px;padding:14px;text-align:center;margin-top:12px}
+.ok .code{font-family:var(--display);font-size:30px;letter-spacing:.06em;color:#fff}
+.check{width:74px;height:74px;margin:0 auto 6px;border-radius:50%;background:var(--go);display:grid;place-items:center;animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.check svg{width:40px;height:40px;stroke:#fff;stroke-width:5;fill:none;stroke-dasharray:60;stroke-dashoffset:60;animation:draw .5s .25s forwards}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}@keyframes draw{to{stroke-dashoffset:0}}
+.flyimg{position:fixed;z-index:70;width:64px;height:64px;border-radius:14px;object-fit:cover;pointer-events:none;box-shadow:0 10px 30px #000a;transition:transform .7s cubic-bezier(.5,-0.3,.7,1),opacity .7s}
+/* events */
+.events{display:grid;gap:8px}
+.ev{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:11px 12px}
+.ev .d{flex:none;width:52px;text-align:center;border-radius:10px;background:var(--deep);border:1px solid var(--edge);padding:5px 0;line-height:1.1}
+.ev .d b{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--sun2)}
+.ev .d span{font-family:var(--display);font-size:20px}
+.ev.is{border-color:var(--sun2)}.ev.is .d{background:var(--sunset);color:#3a1600;border-color:var(--sun2)}.ev.is .d b{color:#3a1600}
+.ev ul{margin:0;padding:0;list-style:none;font-size:14.5px;font-weight:600}
+.ev li+li{margin-top:3px}
+.ev li small{color:var(--dim);font-weight:500}
+.ev .off{color:var(--dim);font-weight:500}
+/* cross promo */
+.promo{display:flex;gap:14px;align-items:center;text-decoration:none;color:var(--ink);background:linear-gradient(135deg,#1b1530,#2a1f3d);border:1px solid #d4af3766;border-radius:18px;padding:14px}
+.promo .ic{flex:none;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:28px;background:radial-gradient(circle at 50% 35%,#f0d375,#d4af37);box-shadow:0 6px 18px #0007}
+.promo small{display:block;font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#f0d375}
+.promo b{display:block;font-family:var(--display);font-weight:400;font-size:20px;line-height:1.15;margin:2px 0 3px}
+.promo span{font-size:14px;color:#d8cfe8}
+.promo em{font-style:normal;color:#f0d375;font-weight:800;white-space:nowrap}
+/* visit */
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:16px;padding:14px;font-size:14.5px;min-width:0}
+.card>b{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--sun2);margin-bottom:4px}
+.card .btns{justify-content:flex-start}
+.hours{width:100%;border-collapse:collapse;font-size:14.5px}
+.hours td{padding:5px 0;border-bottom:1px solid #ffffff14}
+.hours td:last-child{text-align:right}
+.hours tr.is td{color:var(--sun3);font-weight:800}
+footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-height:1.6;padding-bottom:20px}
+@media (prefers-reduced-motion:reduce){.media.hot .steam i,.drink .media.pouring img.ok,.hh .stat.on i{animation:none}}
+
+/* arrival scene: the real storefront — head inside to order, or turn left and grab a board */
+.arrive{position:relative;margin:0 -16px 6px;aspect-ratio:4/5;max-height:88vh;overflow:hidden;background:#2a1a10}
+.arrive img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+.arrive::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,32,58,.55) 0%,rgba(8,32,58,0) 22%,rgba(8,32,58,0) 62%,rgba(8,32,58,.75) 100%);pointer-events:none}
+.arrive h1{position:absolute;left:16px;right:16px;top:14px;z-index:2;margin:0;font:400 clamp(22px,6.4vw,34px)/1.1 var(--display);color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.6)}
+.arrive h1 small{display:block;font:600 13px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--sun3);margin-bottom:4px}
+.arrive .go{position:absolute;z-index:3;bottom:16px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;max-width:47%;padding:11px 13px;border-radius:16px;text-decoration:none;color:#fff;
+  background:rgba(8,32,58,.62);border:1px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 10px 28px rgba(0,0,0,.4);font:800 15px/1.15 var(--body)}
+.arrive .go small{font:600 12px/1.25 var(--body);opacity:.9}
+.arrive .go.l{left:12px}.arrive .go.r{right:12px;align-items:flex-end;text-align:right;background:rgba(255,106,43,.78)}
+.arrive .go:active{transform:scale(.97)}
+.arrive .wave{position:absolute;z-index:2;font-size:26px;animation:nvwave 1.4s ease-in-out infinite;transform-origin:70% 80%}
+@keyframes nvwave{0%,100%{transform:rotate(0)}30%{transform:rotate(18deg)}60%{transform:rotate(-10deg)}}
+.arrive .bubble{position:absolute;z-index:2;padding:6px 9px;border-radius:12px;background:#fff;color:#08203a;font:800 12.5px var(--body);box-shadow:0 6px 16px rgba(0,0,0,.35);animation:nvpop 3.2s ease-in-out infinite}
+.arrive .bubble::after{content:"";position:absolute;bottom:-6px;left:16px;border:6px solid transparent;border-top-color:#fff;border-bottom:0}
+.arrive .bubble.r::after{left:auto;right:16px}
+@keyframes nvpop{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@media (prefers-reduced-motion:reduce){.arrive .wave,.arrive .bubble{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section class="arrive" aria-label="Welcome to Nalu Vida">
+  <img src="img/hero.jpg" alt="Nalu Vida at the foot of the Venice Pier at sunset: surfers with boards on the sand to the left, the glowing restaurant entrance to the right" fetchpriority="high">
+  <h1><small>Venice Pier · Tropical Bites · Craft Cocktails</small>Welcome to Nalu Vida 🌴</h1>
+  <span class="bubble" style="left:16%;top:47%">Come ride with us! 🌊</span>
+  <span class="bubble r" style="right:5%;top:52%">Table's ready! 🍹</span>
+  <a class="go l" href="#play" id="arrive-play">🏄 Grab a board<small>Ride the Nalu · win free food</small></a>
+  <a class="go r" href="#food">🍽️ Head inside<small>Order from your table</small></a>
+</section>
+<header class="hero">
+  <svg class="logo" viewBox="0 0 200 200" role="img" aria-label="Nalu Vida">
+    <defs>
+      <clipPath id="lc"><circle cx="100" cy="100" r="92"/></clipPath>
+      <linearGradient id="lsky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ff5a2a"/><stop offset=".45" stop-color="#ff8f2e"/><stop offset="1" stop-color="#ffd23f"/>
+      </linearGradient>
+      <pattern id="lsea" width="26" height="26" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)">
+        <rect width="26" height="26" fill="#0b2e52"/>
+        <rect y="0" width="26" height="9" fill="#1673c4"/>
+        <rect y="9" width="26" height="5" fill="#2ec4e6"/>
+        <rect y="14" width="26" height="3" fill="#ffffff" opacity=".85"/>
+      </pattern>
+    </defs>
+    <circle cx="100" cy="100" r="98" fill="#ff7b8a"/>
+    <circle cx="100" cy="100" r="94" fill="#fff"/>
+    <g clip-path="url(#lc)">
+      <rect x="0" y="0" width="200" height="200" fill="url(#lsky)"/>
+      <circle cx="100" cy="112" r="38" fill="#fff3b0" opacity=".9"/>
+      <path d="M0 108 L200 84 L200 200 L0 200Z" fill="url(#lsea)"/>
+    </g>
+    <g font-family="'Alfa Slab One',Rockwell,Georgia,serif" text-anchor="middle" fill="#fff" stroke="#0b2e52" stroke-width="5" paint-order="stroke" stroke-linejoin="round">
+      <text x="100" y="94" font-size="50" letter-spacing="1">nalu</text>
+      <text x="100" y="148" font-size="50" letter-spacing="1">vida</text>
+    </g>
+  </svg>
+  <div class="tag">Venice Pier <i>·</i> Tropical Bites <i>·</i> Craft Cocktails <i>·</i> Good Vibes</div>
+  <p>1 Washington Blvd · Venice · at the foot of the pier</p>
+  <span id="openline"><span class="dot"></span><span id="opentx">Open today</span></span>
+  <div class="btns">
+    <a class="btn hot" href="#play">🏄 Play &amp; win</a>
+    <a class="btn" href="#drinks">🍹 Menu</a>
+    <a class="btn" href="#rewards">⭐ Rewards</a>
+    <a class="btn sea" href="https://resy.com/cities/los-angeles-ca/venues/nalu-vida" target="_blank" rel="noopener">📅 Book on Resy</a>
+  </div>
+</header>
+
+<div class="wave" aria-hidden="true"></div>
+<section id="play">
+<h2><small>Play for prizes</small>Ride the Nalu</h2>
+<p class="sub">Surf the Venice Pier loop, dodge sharks and eels, grab the tiki rafts, win free food &amp; drinks.</p>
+<div id="nalu-game"></div>
+</section>
+<script src="game.js"></script>
+<div class="prizes" id="prizes"></div>
+
+<h2 id="seat"><small>Order from your phone</small>Where are you sitting?</h2>
+<p class="sub">Pick your spot and your order goes to the right place. Scanned a table code? It's already picked.</p>
+<div class="box" id="seatbox">
+  <div class="zones">
+    <button type="button" data-zone="patio"><span>🌴</span>Patio</button>
+    <button type="button" data-zone="bar"><span>🍹</span>Bar</button>
+    <button type="button" data-zone="dining"><span>🍽️</span>Dining room</button>
+    <button type="button" data-zone="rooftop"><span>🌅</span>Rooftop</button>
+  </div>
+  <div class="tbls" id="tbls" hidden></div>
+  <div class="now" id="seatnow">Not picked yet.</div>
+</div>
+
+<h2 id="today"><small>Today at Nalu Vida</small><span id="todayh">Today's special</span></h2>
+<div class="today"><div class="sp" id="special"></div></div>
+<div class="box hh" style="margin-top:10px">
+  <div><div class="stat" id="hhstat"><i></i><span id="hhtx">Happy hour</span></div>
+  <div class="now" style="margin-top:4px">Happy hour Mon–Fri 3–6 PM and 10 PM–close · dine-in only</div></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:4px 14px">
+    <ul><li><b>$10</b> house margarita, wells, house red &amp; white, Prosecco</li><li><b>$2 off</b> drafts</li></ul>
+    <ul><li>Smash-N-Stack <b>$15</b> · Vegan Burger <b>$16</b></li><li>Spicy Tuna Crispy Rice <b>$16</b> · Tostadas <b>$14</b></li><li>Hula Wings (6) <b>$14</b> · South American Caesar <b>$15</b></li><li>Buffalo Chicken Strips <b>$10</b> · Fries <b>$5</b> · Sweet Potato Fries <b>$6</b></li></ul>
+  </div>
+</div>
+<div class="week" id="specweek"></div>
+
+<h2 id="drinks"><small>Tap a photo to zoom</small>Drinks</h2>
+<p class="sub">Brunch daily until 4 PM with $24 bottomless mimosas (60 min).</p>
+<div id="drinkhost"></div>
+
+<h2 id="food"><small>Tropical bites from the kitchen</small>Food</h2>
+<div id="foodwrap"><nav class="chips" id="chips" aria-label="Menu sections"></nav>
+<div id="foodhost"></div></div>
+<p class="sub" style="font-size:13px;margin-top:14px">MP = market price, ask your server. 20% gratuity is added for parties of 6 or more.</p>
+
+<h2 id="events"><small>Live at the pier</small>Events this week</h2>
+<p class="sub" id="evsub">Music, trivia, salsa and every game on the TVs.</p>
+<div class="events" id="evhost"></div>
+
+<h2 id="rewards"><small>Nalu Vida Rewards</small>Points, prizes &amp; perks</h2>
+<div id="rwhost"></div>
+
+<h2 id="sister"><small>Also from the owners</small>Melody Bar &amp; Grill by LAX</h2>
+<a class="promo" href="../melody-lax/">
+  <div class="ic">✈️</div>
+  <div><small>Sister spot · Westchester</small><b>Melody Bar &amp; Grill</b><span>Show your Nalu Vida rewards at Melody for <em>$3 off any drink</em>. <u>See Melody →</u></span></div>
+</a>
+
+<h2 id="visit"><small>Come through</small>Visit Nalu Vida</h2>
+<div class="info">
+  <div class="card"><b>Address</b>1 Washington Blvd<br>Venice, CA 90292<br><span class="now" style="display:block;margin-top:4px">At the foot of the Venice Pier. Heated patio steps from the sand.</span>
+    <div class="btns"><a class="btn hot" href="https://www.google.com/maps/dir/?api=1&amp;destination=1+Washington+Blvd+Venice+CA+90292" target="_blank" rel="noopener">📍 Directions</a><a class="btn" href="tel:+13104370060">📞 (310) 437-0060</a></div></div>
+  <div class="card"><b>Parking</b>Public beach lot right next to the pier, plus street parking.</div>
+  <div class="card"><b>Hours</b><table class="hours" id="hours"></table><div class="now" style="margin-top:6px">Brunch daily until 4 PM</div></div>
+  <div class="card"><b>Reservations</b>Book your table on Resy.<div class="btns"><a class="btn sea" href="https://resy.com/cities/los-angeles-ca/venues/nalu-vida" target="_blank" rel="noopener">📅 Book on Resy</a></div></div>
+  <div class="card"><b>Private events</b>Parties of 10 to 100 people. Come see the space: the tour is free and so is your drink.<div class="btns"><a class="btn coral" href="mailto:info@naluvida.com?subject=Private%20event%20at%20Nalu%20Vida">✉️ Plan an event</a></div><div class="now">20% gratuity on parties of 6+.</div></div>
+  <div class="card"><b>Say hi</b><a href="mailto:info@naluvida.com">info@naluvida.com</a><br><a href="https://www.instagram.com/naluvidavenice/" target="_blank" rel="noopener">@naluvidavenice</a> on Instagram</div>
+</div>
+
+<footer>Nalu Vida · 1 Washington Blvd, Venice · app by Second Shift AI · prices from Nalu Vida's menu · menu photos are previews until Nalu Vida signs off</footer>
+</div>
+
+<div id="obar"><button type="button" id="obtn"><span><span class="n" id="ocount">0</span> &nbsp;<span id="oseat">Review order</span></span><span id="ototal">$0.00</span></button></div>
+<div id="sheet" role="dialog" aria-modal="true" aria-label="Your order"><div class="in" id="sheetin"></div></div>
+<div id="zoom" role="dialog" aria-modal="true" aria-label="Menu item"><div class="in" style="position:relative" id="zoomin"></div></div>
+
+<script>window.NALU_MENU={
+"food": [
+[
+"Shareables",
+"oysters",
+"Oysters on the Half Shell",
+"MP",
+"fresh oysters on crushed ice on a round metal tray with lemon wedges and mignonette"
+],
+[
+"Shareables",
+"tuna-rice",
+"Spicy Tuna Crispy Rice",
+"22",
+"golden crispy rice squares topped with spicy tuna, jalapeño slices and eel sauce on a long slate plate"
+],
+[
+"Shareables",
+"coconut-shrimp",
+"Coconut Shrimp",
+"21",
+"golden coconut-crusted shrimp with sweet chili dipping sauce"
+],
+[
+"Shareables",
+"bang-bang-shrimp",
+"Bang Bang Shrimp",
+"18",
+"crispy shrimp tossed in creamy spicy bang bang sauce with scallions"
+],
+[
+"Shareables",
+"jungle-fries",
+"Jungle Fries",
+"12",
+"crispy fries smothered in pineapple bacon jam with herbs"
+],
+[
+"Shareables",
+"chips-guac",
+"Chips, Salsa & Guac",
+"14",
+"tortilla chips with a bowl of chunky guacamole and red salsa"
+],
+[
+"Shareables",
+"wings",
+"Wings",
+"17",
+"8 glossy chicken wings in sesame soy ginger glaze with sesame seeds and scallions"
+],
+[
+"Shareables",
+"tostadas",
+"Tostadas de la Tierra",
+"18",
+"three crispy tostadas piled with kalua pulled pork, slaw and avocado crema"
+],
+[
+"Shareables",
+"pork-sliders",
+"12-Hr Smoked Pork Sliders",
+"19",
+"two smoked pulled pork sliders on brioche buns with slaw"
+],
+[
+"Shareables",
+"calamari",
+"Calamari",
+"15",
+"golden fried calamari rings with lemon and aioli"
+],
+[
+"Shareables",
+"tiki-ribs",
+"Sticky Tiki Ribs",
+"18",
+"three sticky glazed pork ribs with pineapple and sesame"
+],
+[
+"Signature Island Tacos",
+"taco-shrimp",
+"Tamarind Glazed Gulf Shrimp Tacos",
+"18",
+"two tacos with tamarind-glazed grilled shrimp, mango slaw and cilantro"
+],
+[
+"Signature Island Tacos",
+"taco-salmon",
+"Blackened Salmon Tacos",
+"21",
+"two tacos with blackened salmon, avocado and pickled onion"
+],
+[
+"Signature Island Tacos",
+"taco-chorizo",
+"Vegan Chorizo Tacos",
+"19",
+"two tacos with vegan chorizo, avocado and pico de gallo"
+],
+[
+"Signature Island Tacos",
+"taco-chicken",
+"Baja Blaze Chicken Tacos",
+"17",
+"two tacos with spicy grilled chicken, chipotle crema and slaw"
+],
+[
+"Signature Island Tacos",
+"taco-fish",
+"Beer Battered Fish Tacos",
+"20",
+"two tacos with golden beer-battered cod, cabbage slaw and lime crema"
+],
+[
+"Breakwater Bites",
+"poke-bowl",
+"Poke Bowl",
+"24",
+"ahi poke bowl with rice, avocado, edamame, cucumber, seaweed and sesame"
+],
+[
+"Breakwater Bites",
+"vegan-burger",
+"Vegan Burger",
+"22",
+"plant-based burger with lettuce, tomato and avocado with fries"
+],
+[
+"Breakwater Bites",
+"smoke-wave",
+"BBQ Smoke Wave",
+"22",
+"vegan BBQ sandwich piled high with smoky barbecue jackfruit and slaw"
+],
+[
+"Breakwater Bites",
+"smash-burger",
+"Smash-N-Stack Burger",
+"18",
+"double smash burger with melted American cheese, pickles and special sauce with fries"
+],
+[
+"Breakwater Bites",
+"chipotle-chicken",
+"Chipotle Chicken Sandwich",
+"20",
+"crispy chipotle chicken sandwich with slaw and pickles with fries"
+],
+[
+"Breakwater Bites",
+"cheesesteak",
+"Cheesesteak",
+"16",
+"cheesesteak on a hoagie roll with melted provolone, peppers and onions"
+],
+[
+"Breakwater Bites",
+"veggie-burrito",
+"Veggie Burrito",
+"19",
+"grilled veggie burrito cut in half showing beans, rice and peppers"
+],
+[
+"Entrées",
+"salmon",
+"Blackened Salmon",
+"32",
+"blackened salmon fillet over rice with grilled vegetables and lemon"
+],
+[
+"Entrées",
+"scampi-skewers",
+"Shrimp Scampi Skewers",
+"31",
+"grilled shrimp skewers glistening with garlic butter over rice"
+],
+[
+"Entrées",
+"seared-ahi",
+"Chili-Kissed Sesame Seared Ahi",
+"32",
+"sliced sesame-crusted seared ahi tuna, rare center, with greens"
+],
+[
+"Entrées",
+"adobo-chicken",
+"Adobo Grilled Chicken",
+"29",
+"adobo grilled chicken with gallo pinto rice and beans"
+],
+[
+"Entrées",
+"milanese",
+"Crispy Chicken Milanese",
+"30",
+"golden crispy chicken milanese cutlet with arugula and lemon"
+],
+[
+"Entrées",
+"steak-fries",
+"Steak & Fries",
+"33",
+"sliced grilled steak with chimichurri and fries"
+],
+[
+"Entrées",
+"fish-chips",
+"Fish N' Chips",
+"24",
+"beer-battered fish and chips with tartar sauce and lemon in a paper-lined basket"
+],
+[
+"Entrées",
+"tiki-ribs-full",
+"Tiki Ribs",
+"31",
+"a half rack of sticky glazed tiki ribs with pineapple and fries"
+],
+[
+"Pizza & Flatbreads",
+"pizza-margherita",
+"Margherita",
+"15",
+"margherita flatbread with fresh mozzarella, basil and tomato"
+],
+[
+"Pizza & Flatbreads",
+"pizza-pepperoni",
+"Pepperoni",
+"16",
+"pepperoni flatbread with crispy cupped pepperoni"
+],
+[
+"Pizza & Flatbreads",
+"pizza-elote",
+"Elote",
+"17",
+"elote flatbread with charred corn, cotija, chili and lime"
+],
+[
+"Pizza & Flatbreads",
+"pizza-innout",
+"In-N-Out Style",
+"17",
+"In-N-Out style flatbread with seasoned beef, melted cheese, grilled onions, pickles, spread and fresh arugula"
+],
+[
+"Pizza & Flatbreads",
+"pizza-bbq",
+"BBQ Chicken",
+"17",
+"BBQ chicken flatbread with red onion and cilantro"
+],
+[
+"Pasta",
+"pasta",
+"Build-Your-Own Pasta",
+"18",
+"rigatoni in creamy alfredo with grilled shrimp and parmesan"
+],
+[
+"Soup & Salad",
+"citrus-bomb",
+"Citrus Bomb Salad",
+"15",
+"bright citrus salad with orange segments, greens, avocado and seeds"
+],
+[
+"Soup & Salad",
+"caesar",
+"South American Caesar",
+"18",
+"caesar salad with crisp romaine, parmesan and toasted croutons"
+],
+[
+"Soup & Salad",
+"sesame-salad",
+"Sesame Chicken Salad",
+"21",
+"sesame chicken salad with crunchy wontons, cabbage and mandarin"
+],
+[
+"Brunch (until 4 PM)",
+"huevos",
+"Huevos con Gallo Pinto",
+"19",
+"fried eggs over gallo pinto rice and beans with plantains and avocado"
+],
+[
+"Brunch (until 4 PM)",
+"avo-toast",
+"Avocado Toast",
+"14",
+"smashed avocado toast with chili flakes, radish and microgreens"
+],
+[
+"Brunch (until 4 PM)",
+"french-toast",
+"French Toast",
+"18",
+"thick french toast with berries, whipped cream and syrup being drizzled"
+],
+[
+"Brunch (until 4 PM)",
+"breakfast-burrito",
+"Breakfast Burrito",
+"18",
+"breakfast burrito cut open with eggs, potatoes, cheese and salsa"
+],
+[
+"Brunch (until 4 PM)",
+"steak-eggs",
+"Steak & Eggs",
+"29",
+"grilled steak with sunny-side-up eggs and potatoes"
+],
+[
+"Brunch (until 4 PM)",
+"breakfast-burger",
+"Breakfast Burger",
+"15",
+"burger topped with a fried egg, bacon and cheese"
+]
+],
+"drinks": [
+[
+"Cocktails",
+"nalu-marg",
+"Nalu Margarita",
+"17",
+"a mango margarita on the rocks with a salted rim and lime wheel"
+],
+[
+"Cocktails",
+"makai",
+"Makai",
+"17",
+"a bright blue ocean-colored tropical cocktail with pineapple garnish"
+],
+[
+"Cocktails",
+"cocoa-rasta",
+"Frozen Cocoa De Rasta",
+"18",
+"a frozen chocolate coconut blended cocktail in a tall glass with whipped cream"
+],
+[
+"Cocktails",
+"blackberry-luau",
+"Frozen Blackberry Luau",
+"18",
+"a frozen purple blackberry blended cocktail with fresh blackberries"
+],
+[
+"Cocktails",
+"pura-vida",
+"Pura Vida",
+"18",
+"a pink strawberry lavender mezcal cocktail with coconut and a lavender sprig"
+],
+[
+"Cocktails",
+"sayulita",
+"Lost in Sayulita",
+"19",
+"a tropical tequila cocktail in a rocks glass with chili rim and grapefruit"
+],
+[
+"Cocktails",
+"sunset-sour",
+"Sunset Sour",
+"20",
+"a layered sunset-colored whiskey sour with orange to red gradient and foam"
+],
+[
+"Cocktails",
+"old-fashioned",
+"Barrel-Aged Old Fashioned",
+"19",
+"an old fashioned with a big clear ice cube and orange peel"
+],
+[
+"Cocktails",
+"pau-hana",
+"Pau Hana Punch",
+"18",
+"a tiki rum punch in a tiki mug with pineapple and an umbrella"
+],
+[
+"Mocktails",
+"wish-you-were-here",
+"Wish You Were Here",
+"15",
+"a sparkling tropical passion fruit mocktail with mint"
+],
+[
+"Mocktails",
+"lime-coconut",
+"Put the Lime in the Coconut",
+"15",
+"a creamy lime coconut mocktail served in a halved coconut shell"
+],
+[
+"Brunch",
+"mimosas",
+"Bottomless Mimosas",
+"24",
+"a pitcher of mimosa and two champagne flutes of mimosa with orange slices"
+],
+[
+"Beer",
+"blonde-ale",
+"Nalu Vida Blonde Ale",
+"9.50",
+"a tall pint of golden blonde ale with a foamy head"
+],
+[
+"Coffee",
+"coco-cold-brew",
+"Coco Cold Brew",
+"11",
+"a coconut cold brew coffee over ice with coconut cream swirl"
+]
+]
+};</script>
+<script>
+window.CONFIG={name:"Nalu Vida",address:"1 Washington Blvd, Venice, CA 90292"};
+(function(){
+"use strict";
+var $=function(i){return document.getElementById(i);};
+var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+function money(n){return "$"+n.toFixed(2);}
+function buzz(p){ if(navigator.vibrate) try{navigator.vibrate(p);}catch(e){} }
+function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
+
+/* ---------------- prizes (shared with game.js via window.NALU_PRIZES) ---------------- */
+var PRIZE_IC=["🥤","🍟","🍤","🌮"];
+$("prizes").innerHTML='<b style="font-family:var(--display);font-weight:400;font-size:19px">Score it, eat it</b>'+
+  (window.NALU_PRIZES||[]).map(function(p,i){return '<div class="row"><span class="pt">'+p[0].toLocaleString("en-US")+'</span><span>'+(PRIZE_IC[i]||"🎁")+' '+esc(p[1])+'</span></div>';}).join("")+
+  '<div class="champ">🏆 Weekly champion gets <b>half off their meal</b>.</div>'+
+  '<p class="note">Every prize is good for 3 days · one reward per visit.</p>';
+
+/* ---------------- menu data (menu.json rows: [category, slug, name, price, description]) ---------------- */
+var M=window.NALU_MENU;
+var BLURB={
+ "oysters":"Fresh oysters on the half shell over ice, with lemon and mignonette.",
+ "tuna-rice":"Golden crispy rice topped with spicy tuna, jalapeño and eel sauce.",
+ "coconut-shrimp":"Coconut-crusted shrimp, fried golden, with sweet chili for dipping.",
+ "bang-bang-shrimp":"Crispy shrimp tossed in creamy, spicy bang bang sauce.",
+ "jungle-fries":"Crispy fries smothered in pineapple bacon jam and fresh herbs.",
+ "chips-guac":"Tortilla chips with chunky guacamole and red salsa.",
+ "wings":"Eight wings in a sticky sesame soy ginger glaze.",
+ "tostadas":"Crispy tostadas piled with kalua pork, slaw and avocado crema.",
+ "pork-sliders":"Pork smoked for 12 hours, on brioche with slaw.",
+ "calamari":"Golden fried calamari with lemon and aioli.",
+ "tiki-ribs":"Sticky glazed pork ribs with pineapple and sesame.",
+ "taco-shrimp":"Tamarind-glazed grilled shrimp, mango slaw and cilantro.",
+ "taco-salmon":"Blackened salmon, avocado and pickled onion.",
+ "taco-chorizo":"Plant-based chorizo with avocado and pico de gallo.",
+ "taco-chicken":"Spicy grilled chicken, chipotle crema and slaw.",
+ "taco-fish":"Beer-battered fish, cabbage slaw and lime crema.",
+ "poke-bowl":"Ahi poke over rice with avocado, edamame, cucumber and seaweed.",
+ "vegan-burger":"Plant-based patty with lettuce, tomato and avocado, plus fries.",
+ "smoke-wave":"Vegan BBQ sandwich piled high with smoky barbecue jackfruit and slaw.",
+ "smash-burger":"Double smash patties, American cheese, pickles and special sauce, plus fries.",
+ "chipotle-chicken":"Crispy chipotle chicken with slaw and pickles, plus fries.",
+ "cheesesteak":"Hoagie loaded with steak, melted provolone, peppers and onions.",
+ "veggie-burrito":"Grilled veggies, beans, rice and peppers, wrapped up big.",
+ "salmon":"Blackened salmon over rice with grilled vegetables and lemon.",
+ "scampi-skewers":"Grilled shrimp skewers in garlic butter over rice.",
+ "seared-ahi":"Sesame-crusted ahi seared rare with a little chili heat, over greens.",
+ "adobo-chicken":"Adobo grilled chicken with gallo pinto rice and beans.",
+ "milanese":"Crispy golden chicken cutlet with arugula and lemon.",
+ "steak-fries":"Sliced grilled steak with chimichurri and fries.",
+ "fish-chips":"Beer-battered fish and fries with tartar sauce and lemon.",
+ "tiki-ribs-full":"A half rack of sticky tiki ribs with pineapple and fries.",
+ "pizza-margherita":"Fresh mozzarella, basil and tomato.",
+ "pizza-pepperoni":"Crispy cupped pepperoni over melty cheese.",
+ "pizza-elote":"Charred corn, cotija, chili and lime.",
+ "pizza-innout":"Seasoned beef, melted cheese, grilled onions, pickles and spread, topped with arugula.",
+ "pizza-bbq":"BBQ chicken with red onion and cilantro.",
+ "pasta":"Build it your way, like rigatoni alfredo with grilled shrimp.",
+ "citrus-bomb":"Orange segments, greens, avocado and seeds. Bright and fresh.",
+ "caesar":"Crisp romaine, parmesan and toasted croutons.",
+ "sesame-salad":"Sesame chicken with crunchy wontons, cabbage and mandarin.",
+ "huevos":"Fried eggs over gallo pinto with plantains and avocado.",
+ "avo-toast":"Smashed avocado with chili flakes, radish and microgreens.",
+ "french-toast":"Thick French toast with berries, whipped cream and syrup.",
+ "breakfast-burrito":"Eggs, potatoes, cheese and salsa in one big burrito.",
+ "steak-eggs":"Grilled steak, sunny-side-up eggs and potatoes.",
+ "breakfast-burger":"A burger topped with a fried egg, bacon and cheese.",
+ "nalu-marg":"Mango margarita on the rocks with a salted rim.",
+ "makai":"An ocean-blue tropical cocktail with pineapple.",
+ "cocoa-rasta":"Frozen chocolate and coconut, blended and crowned with whipped cream.",
+ "blackberry-luau":"Frozen blackberry blend with fresh berries.",
+ "pura-vida":"Strawberry, lavender and coconut with mezcal.",
+ "sayulita":"Tropical tequila and grapefruit with a chili rim.",
+ "sunset-sour":"A whiskey sour layered like a Venice sunset, topped with foam.",
+ "old-fashioned":"Barrel-aged, over one big clear cube with orange peel.",
+ "pau-hana":"Tiki rum punch with pineapple and an umbrella.",
+ "wish-you-were-here":"Sparkling passion fruit and mint. Zero proof.",
+ "lime-coconut":"Creamy lime and coconut, served in a coconut shell. Zero proof.",
+ "mimosas":"Bottomless for 60 minutes, during brunch until 4 PM.",
+ "blonde-ale":"The house blonde ale: crisp, golden, cold.",
+ "coco-cold-brew":"Cold brew over ice with a coconut cream swirl."
+};
+var CAT_IC={"Shareables":"🍤","Signature Island Tacos":"🌮","Breakwater Bites":"🍔","Entrées":"🐟","Pizza & Flatbreads":"🍕","Pasta":"🍝","Soup & Salad":"🥗","Brunch (until 4 PM)":"🍳","Cocktails":"🍹","Mocktails":"🥥","Brunch":"🥂","Beer":"🍺","Coffee":"☕"};
+var CAT_NOTE={"Signature Island Tacos":"Taco Tuesday: 50% off signature tacos all day.","Brunch (until 4 PM)":"Served daily until 4 PM.","Mocktails":"No alcohol, all vibes.","Shareables":"Wednesdays: $2 oysters (min 6) while they last."};
+var ADULT={"Cocktails":1,"Brunch":1,"Beer":1};
+var ITEMS={}, CART_KEY="nalu-cart";
+function group(rows){ var out=[],by={}; rows.forEach(function(r){ if(!by[r[0]]){ by[r[0]]={name:r[0],id:"cat-"+slug(r[0]),items:[]}; out.push(by[r[0]]); } by[r[0]].items.push(r); }); return out; }
+function priceNum(p){ return p==="MP"?null:parseFloat(p); }
+function priceTx(p){ if(p==="MP") return "MP"; var n=parseFloat(p); return "$"+(n%1?n.toFixed(2):n); }
+
+var cart={}; try{ cart=JSON.parse(localStorage.getItem(CART_KEY)||"{}")||{}; }catch(e){}
+function media(r,drink,big){
+  var ic=CAT_IC[r[0]]||"🌊";
+  return '<div class="media"'+(big?'':' data-zoom="'+r[1]+'"')+' role="button" aria-label="Zoom '+esc(r[2])+'"><span class="ph" aria-hidden="true">'+ic+'</span>'+
+    '<img loading="lazy" src="img/menu/'+r[1]+'.jpg" alt="'+esc(r[2])+'" width="720" height="720" onload="this.classList.add(\'ok\')" onerror="this.remove()">'+
+    (drink&&ADULT[r[0]]?'<span class="a21">21+</span>':'')+(drink?'':'<span class="steam"><i></i><i></i><i></i></span>')+'</div>';
+}
+function blurb(r){ if(BLURB[r[1]]) return BLURB[r[1]]; var d=String(r[4]||"").replace(/^(a|an)\s+/i,""); return d?d.charAt(0).toUpperCase()+d.slice(1)+".":""; }
+function card(r,drink){
+  ITEMS[r[1]]={r:r,drink:drink};
+  var q=cart[r[1]]?cart[r[1]].q:0;
+  return '<article class="item'+(drink?' drink':'')+'" data-id="'+r[1]+'">'+media(r,drink)+
+    '<div class="tx"><div class="row"><b>'+esc(r[2])+'</b><span class="pr">'+priceTx(r[3])+'</span></div><p>'+esc(blurb(r))+'</p>'+ctl(r[1],q)+'</div></article>';
+}
+function ctl(id,q){ return q?'<div class="qty"><button type="button" data-m="'+id+'" aria-label="Remove one">−</button><span>'+q+' in order</span><button type="button" data-a="'+id+'" aria-label="Add one">+</button></div>':'<button type="button" class="add" data-a="'+id+'">+ Add</button>'; }
+function section(c,drink){ return '<section class="cat" id="'+c.id+'"><h3>'+(CAT_IC[c.name]||"")+' '+esc(c.name)+'</h3>'+(CAT_NOTE[c.name]?'<p class="note">'+esc(CAT_NOTE[c.name])+'</p>':'')+'<div class="grid">'+c.items.map(function(r){return card(r,drink);}).join("")+'</div></section>'; }
+var DG=group(M.drinks), FG=group(M.food);
+$("drinkhost").innerHTML=DG.map(function(c){return section(c,true);}).join("");
+$("chips").innerHTML=FG.map(function(c){return '<a href="#'+c.id+'">'+esc(c.name.replace(" (until 4 PM)",""))+'</a>';}).join("");
+$("foodhost").innerHTML=FG.map(function(c){return section(c,false);}).join("");
+
+/* ---------------- seat ---------------- */
+var SEAT_KEY="nalu-seat", seat=null, ZN={patio:"Patio",bar:"Bar",dining:"Dining room",rooftop:"Rooftop"};
+try{ seat=JSON.parse(localStorage.getItem(SEAT_KEY)||"null"); if(seat&&!ZN[seat.zone]) seat=null; }catch(e){}
+(function(){ var q=new URLSearchParams(location.search), z=q.get("seat")||q.get("zone"), t=q.get("table")||q.get("t");
+  if(z&&ZN[z]) seat={zone:z,n:(t&&/^\d{1,2}$/.test(t)&&z!=="bar")?+t:null}; })();
+$("tbls").innerHTML=Array.apply(null,Array(20)).map(function(x,i){return '<button type="button" data-table="'+(i+1)+'">'+(i+1)+'</button>';}).join("");
+function seatLabel(){ if(!seat) return ""; return ZN[seat.zone]+(seat.n?" · Table "+seat.n:""); }
+function drawSeat(){
+  document.querySelectorAll("[data-zone]").forEach(function(b){ b.classList.toggle("on",!!seat&&b.dataset.zone===seat.zone); });
+  document.querySelectorAll("[data-table]").forEach(function(b){ b.classList.toggle("on",!!seat&&seat.n===+b.dataset.table); });
+  $("tbls").hidden=!seat||seat.zone==="bar";
+  $("seatnow").innerHTML=seat?"You're set: <b>"+esc(seatLabel())+"</b>. "+(seat.zone==="bar"?"Your bartender gets it the second you send.":seat.n?"Your server brings it right to you.":"Tap your table number so your server finds you."):"Not picked yet. Tap the patio, the bar, the dining room or the rooftop.";
+  try{ localStorage.setItem(SEAT_KEY,JSON.stringify(seat)); }catch(e){}
+  drawBar();
+}
+$("seatbox").addEventListener("click",function(e){
+  var b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.zone) seat={zone:b.dataset.zone,n:null};
+  else if(b.dataset.table&&seat) seat.n=+b.dataset.table;
+  buzz(10); drawSeat();
+});
+
+/* ---------------- cart ---------------- */
+function addFx(art){
+  var m=art&&art.querySelector(".media"); if(!m||reduce) return;
+  if(art.classList.contains("drink")){ m.classList.remove("pouring"); void m.offsetWidth; m.classList.add("pouring"); setTimeout(function(){m.classList.remove("pouring");},1450); }
+  else { m.classList.remove("hot"); void m.offsetWidth; m.classList.add("hot"); clearTimeout(m._t); m._t=setTimeout(function(){m.classList.remove("hot");},2500); }
+  var img=m.querySelector("img.ok"); if(img) setTimeout(function(){ flyToBar(img); },art.classList.contains("drink")?700:150);
+}
+function add(id){ var it=ITEMS[id]; if(!it) return; cart[id]=cart[id]||{q:0,p:priceNum(it.r[3]),n:it.r[2]}; cart[id].q++; saveCart(); buzz(12); }
+document.addEventListener("click",function(e){
+  var a=e.target.closest("[data-a]"), r=e.target.closest("[data-m]"), z=e.target.closest("[data-zoom]");
+  if(a){ add(a.dataset.a); var art=document.querySelector('.item[data-id="'+a.dataset.a+'"]'); if(!a.closest("#zoom")) addFx(art); else { $("zoom").classList.remove("on"); addFx(art); } }
+  else if(r){ var id=r.dataset.m; if(cart[id]){ cart[id].q--; if(cart[id].q<=0) delete cart[id]; saveCart(); } }
+  else if(z){ openZoom(z.dataset.zoom); }
+});
+function openZoom(id){
+  var it=ITEMS[id]; if(!it) return; var r=it.r;
+  $("zoomin").innerHTML='<button class="x" type="button" data-zx aria-label="Close">×</button>'+media(r,it.drink,true)+
+    '<div class="tx"><div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><h3>'+esc(r[2])+'</h3><span class="zp">'+priceTx(r[3])+'</span></div>'+
+    '<div class="now" style="margin:0">'+esc(r[0])+(it.drink&&ADULT[r[0]]?' · 21+':'')+'</div><p>'+esc(blurb(r))+'</p>'+
+    '<button type="button" class="btn hot" data-a="'+id+'" style="width:100%;justify-content:center">+ Add to order</button></div>';
+  $("zoom").classList.add("on");
+}
+$("zoom").addEventListener("click",function(e){ if(e.target===$("zoom")||e.target.closest("[data-zx]")) $("zoom").classList.remove("on"); });
+document.addEventListener("keydown",function(e){ if(e.key==="Escape"){ $("zoom").classList.remove("on"); $("sheet").classList.remove("on"); } });
+function saveCart(){ try{ localStorage.setItem(CART_KEY,JSON.stringify(cart)); }catch(e){}
+  document.querySelectorAll(".item").forEach(function(c){ var id=c.dataset.id, q=cart[id]?cart[id].q:0, old=c.querySelector(".tx .add,.tx .qty"); var w=document.createElement("div"); w.innerHTML=ctl(id,q); old.replaceWith(w.firstChild); });
+  drawBar(); }
+var TAX=0.0975;
+function totals(){ var s=0,n=0,mp=0; for(var k in cart){ if(cart[k].p==null) mp+=cart[k].q; else s+=cart[k].p*cart[k].q; n+=cart[k].q; } var tax=s*TAX; return {sub:s,tax:tax,total:s+tax,n:n,mp:mp}; }
+function drawBar(){ var t=totals(); $("obar").classList.toggle("on",t.n>0); $("ocount").textContent=t.n; $("ototal").textContent=money(t.total)+(t.mp?" + MP":""); $("oseat").textContent=seat?seatLabel()+" · review":"Review order"; }
+function flyToBar(fromImg){ if(reduce||!fromImg) return; var r=fromImg.getBoundingClientRect(), f=document.createElement("img"); f.src=fromImg.currentSrc||fromImg.src; f.className="flyimg";
+  f.style.left=(r.left+r.width/2-32)+"px"; f.style.top=(r.top+r.height/2-32)+"px"; document.body.appendChild(f);
+  var b=$("obtn").getBoundingClientRect(), tx=(b.left+40)-(r.left+r.width/2), ty=(b.top+b.height/2)-(r.top+r.height/2);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ f.style.transform="translate("+tx+"px,"+ty+"px) scale(.35)"; f.style.opacity=".3"; }); });
+  setTimeout(function(){ f.remove(); var o=$("obar"); o.classList.remove("bump"); void o.offsetWidth; o.classList.add("bump"); },720); }
+$("obtn").addEventListener("click",openSheet);
+function openSheet(){
+  var t=totals(), h='<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-family:var(--display);font-weight:400;font-size:24px">Your order</h3><button class="btn" type="button" data-x>Close</button></div>';
+  h+='<div class="sub" style="margin:6px 0 4px">'+(seat?'Going to <b style="color:var(--sun3)">'+esc(seatLabel())+'</b>':'<b style="color:var(--coral)">Pick where you\'re sitting first.</b>')+'</div>';
+  for(var k in cart) h+='<div class="ln"><span>'+esc(cart[k].n)+'<br><span class="m">'+cart[k].q+' × '+(cart[k].p==null?"market price":money(cart[k].p))+'</span></span><b>'+(cart[k].p==null?"MP":money(cart[k].p*cart[k].q))+'</b></div>';
+  h+='<div style="margin-top:8px"><div class="tot"><span>Subtotal</span><span>'+money(t.sub)+'</span></div><div class="tot"><span>Tax</span><span>'+money(t.tax)+'</span></div><div class="tot big"><span>Total</span><span>'+money(t.total)+'</span></div>'+(t.mp?'<div class="now" style="margin:0">Plus market-price items, your server will confirm.</div>':'')+'</div>';
+  h+=seat?'<button class="btn hot" type="button" data-send style="width:100%;justify-content:center;margin-top:12px;font-size:16px">Send my order</button>':'<button class="btn hot" type="button" data-pick style="width:100%;justify-content:center;margin-top:12px">🪑 Pick my seat</button>';
+  h+='<p class="sub" style="font-size:12px;margin-top:10px">Pay your server or bartender like normal. Members earn 10 points per $1. 20% gratuity on parties of 6+.</p>';
+  $("sheetin").innerHTML=h; $("sheet").classList.add("on");
+}
+$("sheet").addEventListener("click",function(e){
+  if(e.target===$("sheet")||e.target.closest("[data-x]")){ $("sheet").classList.remove("on"); return; }
+  if(e.target.closest("[data-pick]")){ $("sheet").classList.remove("on"); $("seat").scrollIntoView({behavior:"smooth"}); return; }
+  if(e.target.closest("[data-send]")){
+    var t=totals(), num="NV-"+(100+((Math.random()*900)|0)), earn=window.SSAI_EARN?window.SSAI_EARN(t.sub,"🌊 Order "+num+" · "+seatLabel()):null;
+    $("sheetin").innerHTML='<div class="ok"><div class="check"><svg viewBox="0 0 40 40"><path d="M9 21l8 8 15-17"/></svg></div><b>Order received</b><div class="code">'+num+'</div><div class="sub" style="margin:4px 0 0">'+esc(seatLabel())+' · '+money(t.total)+(t.mp?' + MP':'')+'</div>'+
+      (earn?'<div style="color:var(--sun3);font-weight:800;margin-top:6px">'+(earn.saved?'+'+earn.pts+' rewards points':'Join Nalu Vida Rewards below to earn +'+earn.pts+' points')+'</div>':'')+
+      '<p class="sub" style="font-size:12px;margin-top:8px">Preview build: live, this prints on Nalu Vida\'s ticket printer and pings your server.</p></div><button class="btn" type="button" data-x style="width:100%;justify-content:center;margin-top:10px">Done</button>';
+    cart={}; saveCart(); buzz([20,40,20]);
+  }
+});
+drawSeat(); saveCart();
+
+/* ---------------- LA time: today's special, happy hour, open status, events ---------------- */
+var DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], DS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+// open hours per day, in hours from that day's midnight (26 = 2 AM next day)
+var OPEN={0:[9,24],1:[11,24],2:[11,24],3:[11,24],4:[11,24],5:[10,26],6:[9,26]};
+function la(){
+  var p={}; new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",hourCycle:"h23",weekday:"short"}).formatToParts(new Date()).forEach(function(x){p[x.type]=x.value;});
+  var h=+p.hour%24, t=h+(+p.minute)/60, dow=DS.indexOf(p.weekday), y=+p.year, mo=+p.month, d=+p.day;
+  // after midnight but before 3 AM still counts as the night before (Fri/Sat run to 2 AM)
+  var bd=dow, bt=t, base=Date.UTC(y,mo-1,d);
+  if(t<3){ bd=(dow+6)%7; bt=t+24; base-=864e5; }
+  return {dow:bd,t:bt,base:base};
+}
+function hr(x){ x=x%24; var h=Math.floor(x), m=Math.round((x-h)*60), ap=h<12?"AM":"PM", h12=h%12||12; return h12+(m?":"+String(m).padStart(2,"0"):"")+" "+ap; }
+var L=la(), o=OPEN[L.dow], isOpen=L.t>=o[0]&&L.t<o[1];
+$("openline").classList.toggle("closed",!isOpen);
+$("opentx").textContent=isOpen?"Open now · until "+(o[1]===24?"midnight":hr(o[1])):(L.t<o[0]?"Opens today at "+hr(o[0]):"Closed now · opens "+DAYS[(L.dow+1)%7]+" at "+hr(OPEN[(L.dow+1)%7][0]));
+
+// specials by day of week
+var SPEC={
+ 1:{h:"Burger Mondays",l:["$9 burgers + $5 draft beer special, 5 PM to close"],e:"🍔"},
+ 2:{h:"Taco Tuesday",l:["50% off signature tacos, all day","$10 house margaritas"],e:"🌮"},
+ 3:{h:"Shuckin' Good Wednesday",l:["$2 oysters (min 6), while supplies last"],e:"🦪"},
+ 0:{h:"NFL Sunday",l:["Every NFL game on the TVs","Bottomless mimosas"],e:"🏈"}
+};
+var BRUNCH="Brunch until 4 PM with $24 bottomless mimosas (60 min)";
+var s=SPEC[L.dow];
+$("todayh").textContent=DAYS[L.dow]+" at the pier";
+$("special").innerHTML=s?'<div class="k">Today\'s special · '+DAYS[L.dow]+'</div><h3>'+s.e+' '+esc(s.h)+'</h3>'+s.l.map(function(x){return '<p>'+esc(x)+'</p>';}).join("")+'<p style="opacity:.85">Plus: '+esc(BRUNCH)+'</p>'
+  :'<div class="k">Today\'s special · '+DAYS[L.dow]+'</div><h3>🥂 Bottomless brunch</h3><p>'+esc(BRUNCH)+'</p>'+(L.dow===4?'<p>Tonight: live jazz 6–9 PM + Thursday Night Football</p>':L.dow===5?'<p>Tonight: karaoke 9 PM to close</p>':'<p>Heated patio steps from the sand</p>');
+$("specweek").innerHTML=[1,2,3,0].map(function(d){var x=SPEC[d];return '<div'+(d===L.dow?' class="is"':'')+'><b>'+x.e+' '+DS[d]+' · '+esc(x.h)+'</b>'+esc(x.l.join(" · "))+'</div>';}).join("")+'<div'+(SPEC[L.dow]?'':' class="is"')+'><b>🥂 Every day · Brunch</b>Until 4 PM · $24 bottomless mimosas (60 min)</div>';
+
+// happy hour: Mon–Fri 3–6 PM and 10 PM–close, dine-in
+function hhLine(){
+  var wk=L.dow>=1&&L.dow<=5, t=L.t, close=OPEN[L.dow][1];
+  if(wk&&t>=15&&t<18) return [1,"Happy hour is ON until 6 PM"];
+  if(wk&&t>=22&&t<close) return [1,"Happy hour is ON until close ("+(close===24?"midnight":hr(close))+")"];
+  if(wk&&t<15) return [0,"Happy hour starts today at 3 PM"];
+  if(wk&&t>=18&&t<22) return [0,"Happy hour is back tonight at 10 PM"];
+  var nd=(L.dow+1)%7; while(nd===0||nd===6) nd=(nd+1)%7;
+  return [0,"Next happy hour: "+(nd===(L.dow+1)%7?"tomorrow":DAYS[nd])+" at 3 PM"];
+}
+var hh=hhLine(); $("hhstat").classList.toggle("on",!!hh[0]); $("hhtx").textContent=hh[1];
+
+// hours table
+var HRS=[[1,"Mon–Thu","11 AM–12 AM",[1,2,3,4]],[5,"Fri","10 AM–2 AM",[5]],[6,"Sat","9 AM–2 AM",[6]],[0,"Sun","9 AM–12 AM",[0]]];
+$("hours").innerHTML=HRS.map(function(h){return '<tr'+(h[3].indexOf(L.dow)>-1?' class="is"':'')+'><td>'+h[1]+'</td><td>'+h[2]+'</td></tr>';}).join("");
+
+// events this week (Mon–Sun); 2nd/4th Wednesday salsa, 2nd Saturday block party, 4th Saturday blues
+var monday=L.base-((L.dow+6)%7)*864e5, MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var evs=[];
+for(var i=0;i<7;i++){
+  var dt=new Date(monday+i*864e5), dw=dt.getUTCDay(), dn=dt.getUTCDate(), nth=Math.ceil(dn/7), list=[];
+  if(dw===1){ list.push(["🧠 Trivia","7–9 PM"]); list.push(["🏈 Monday Night Football",""]); }
+  if(dw===2) list.push(["🎸 Acoustic Tuesday","8–11 PM"]);
+  if(dw===3) list.push(nth===2||nth===4?["💃 Salsa night with an instructor","8–11:30 PM"]:["💃 Salsa night","2nd & 4th Wednesdays · not this week",1]);
+  if(dw===4){ list.push(["🎷 Live jazz","6–9 PM"]); list.push(["🏈 Thursday Night Football",""]); }
+  if(dw===5) list.push(["🎤 Karaoke","9 PM–close"]);
+  if(dw===6){ if(nth===2) list.push(["🎉 Block Party","2nd Saturday"]); if(nth===4) list.push(["🎺 Live blues","3–6 PM"]); if(nth!==2&&nth!==4) list.push(["🎉 Block Party (2nd Sat) · 🎺 Blues (4th Sat)","not this week",1]); }
+  if(dw===0) list.push(["🏈 NFL Sunday","every game on the TVs"]);
+  evs.push('<div class="ev'+(dw===L.dow?' is':'')+'"><div class="d"><b>'+DS[dw]+'</b><span>'+dn+'</span></div><ul>'+list.map(function(x){return '<li'+(x[2]?' class="off"':'')+'>'+x[0]+(x[1]?' <small>· '+x[1]+'</small>':'')+'</li>';}).join("")+'</ul></div>');
+}
+$("evhost").innerHTML=evs.join("");
+var sun=new Date(monday+6*864e5);
+$("evsub").textContent="Week of "+MON[new Date(monday).getUTCMonth()]+" "+new Date(monday).getUTCDate()+"–"+MON[sun.getUTCMonth()]+" "+sun.getUTCDate()+". Music, trivia, salsa and the game on every TV.";
+})();
+</script>
+<script>window.CRM_CFG={name:"Nalu Vida",offer:"Free Jungle Fries on your next visit",mount:"#rwhost",tiers:[[250,"Free Jungle Fries"],[500,"Half off any cocktail"],[800,"Free Coconut Shrimp"],[1300,"Free Signature Taco plate"]],referral:{gift:"Free Jungle Fries"}};</script>
+<script src="../crm.js"></script>
+<script>window.NEARBY={name:"Nalu Vida",pin:"🏄",mount:"#rwhost",spots:[{label:"Venice Pier",lat:33.9779,lng:-118.4669,q:"1 Washington Blvd, Venice, CA 90292"}],offer:"Happy hour Mon–Fri 3–6 PM and 10 PM–close, dine-in."};</script>
+<script src="../nearby.js"></script>
+<script src="../gamelock.js"></script>
+<script>document.getElementById("arrive-play").addEventListener("click",function(){setTimeout(function(){var b=document.querySelector(".nv-pick button");if(b)b.animate&&b.animate([{transform:"scale(1)"},{transform:"scale(1.08)"},{transform:"scale(1)"}],{duration:600,iterations:2});},700);});</script>
+</body>
+</html>

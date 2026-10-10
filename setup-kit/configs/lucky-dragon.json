@@ -1,0 +1,154 @@
+{
+ "slug": "lucky-dragon",
+ "name": "Lucky Dragon Hibachi",
+ "short": "Lucky Dragon",
+ "owner": "there",
+ "brand": {
+  "fonts": "https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Cinzel:wght@700;900&display=swap",
+  "display": "\"Cinzel\",Georgia,serif",
+  "body": "\"Archivo\",system-ui,-apple-system,sans-serif",
+  "h1w": "900",
+  "h2w": "900",
+  "bg": "#0D0404",
+  "page": "radial-gradient(700px 420px at 30% -8%,rgba(255,150,40,.22) 0,transparent 60%),#0D0404",
+  "card": "#1D0B0A",
+  "edge": "#4A1F1C",
+  "ink": "#F7EFE6",
+  "dim": "#C4A992",
+  "accent": "#FFC82E",
+  "accentInk": "#3a0a06",
+  "chip": "#2a100e",
+  "tgOff": "#4A1F1C",
+  "ok": "#3ddc97",
+  "h1": "#FFC82E",
+  "h2": "#FFC82E",
+  "noteBg": "#2a0f0c",
+  "noteEdge": "#E6483D",
+  "noteInk": "#ffd9b0",
+  "barBg": "rgba(13,4,4,.94)",
+  "extraCss": ".ldsign{position:relative;border-radius:16px;padding:14px 12px 12px;background:radial-gradient(130% 90% at 18% 8%,rgba(255,150,40,.5) 0,transparent 55%),radial-gradient(120% 120% at 88% 98%,rgba(40,110,170,.4) 0,transparent 62%),linear-gradient(180deg,#7d1a16,#4a0f0d 60%,#2a0807);border:2px solid rgba(255,200,46,.55)}.ldsign img{height:84px;width:auto;margin:0 auto}.ldsign .emo{font-size:52px;line-height:1}.ldword{font:900 32px/1 Cinzel,Georgia,serif;background:linear-gradient(180deg,#fff2c2,#ffd24a 34%,#f2a81e 60%,#c87714);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1px #6e130f;margin-top:4px}"
+ },
+ "logo": {
+  "html": "<div class=\"ldsign\" role=\"img\" aria-label=\"Lucky Dragon Hibachi\"><img alt=\"\" src=\"https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/hf_20261002_031804_d62d6cf2-b468-476f-a901-5f927b79105f.png\" onerror=\"this.outerHTML='&lt;div class=&quot;emo&quot;&gt;🐉&lt;/div&gt;'\"><div class=\"ldword\">Lucky Dragon<br>Hibachi</div></div>"
+ },
+ "alcohol": false,
+ "avgCheck": 20,
+ "giveawayDefault": "$100",
+ "drawDays": [
+  "Sunday night",
+  "Monday",
+  "Friday before dinner"
+ ],
+ "rewards": {
+  "welcome": [
+   "Free Extra Yum-Yum + 10% off",
+   "Free Extra Yum-Yum",
+   "$3 off",
+   "10% off the order"
+  ],
+  "points": [
+   250,
+   500,
+   800,
+   1300
+  ],
+  "t1": [
+   "Free extra Yum-Yum",
+   "Free drink",
+   "$2 off"
+  ],
+  "t2": [
+   "Free fried rice",
+   "Free noodles",
+   "$5 off"
+  ],
+  "t3": [
+   "Free Hibachi Chicken plate",
+   "Free hibachi plate (any)",
+   "$12 off"
+  ],
+  "t4": [
+   "Dinner for two",
+   "Free Chicken + Shrimp Combo",
+   "$25 off"
+  ],
+  "stars": [
+   "Free Hibachi Chicken plate",
+   "Free fried rice",
+   "$10 off"
+  ],
+  "referIn": [
+   "Free fried rice",
+   "+100 bonus points when their friend visits",
+   "$3 off",
+   "Nothing"
+  ],
+  "referFriend": [
+   "Free extra Yum-Yum",
+   "+50 bonus points when they join",
+   "$3 off",
+   "Nothing"
+  ],
+  "bday": [
+   "Free Hibachi Chicken plate",
+   "Free noodles",
+   "Free fried rice",
+   "20% off the order"
+  ],
+  "missed": [
+   "10% off",
+   "Free extra Yum-Yum",
+   "Free fried rice"
+  ],
+  "winback": [
+   "Free fried rice",
+   "10% off",
+   "$3 off",
+   "Don't send"
+  ],
+  "playwin": [
+   "Free extra Yum-Yum",
+   "15% off next meal",
+   "$2 off"
+  ]
+ },
+ "game": {
+  "name": "Hibachi Catch",
+  "prizes": [
+   [
+    650,
+    [
+     "15% off next meal",
+     "Free extra Yum-Yum",
+     "Free fried rice"
+    ]
+   ]
+  ],
+  "champ": [
+   "50% off next meal",
+   "Free hibachi plate",
+   "Dinner for two"
+  ],
+  "second": [
+   "20% off next meal",
+   "Free noodles",
+   "Free fried rice"
+  ]
+ },
+ "specials": [
+  [
+   "s_hours",
+   "Hours: Mon–Thu 11–9, Fri–Sat 11–10, Sun 12–8"
+  ]
+ ],
+ "specialsTitle": "From your demo page: still right?",
+ "drinksTitle": "Drinks in the app",
+ "menu": {
+  "type": "js",
+  "file": "demo/lucky-dragon/index.html",
+  "var": "CONFIG",
+  "key": "menu",
+  "drinkSections": []
+ },
+ "menuNote": "The menu below is our sample from your storefront. Please fix the prices and switch off anything you don't sell."
+}

@@ -42,6 +42,29 @@ h2{font:var(--h2w,800) 19px/1.2 var(--display);margin:26px 0 8px;color:var(--h2)
 .tl .dot{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:var(--card);border:2px solid var(--accent);position:relative;z-index:1}
 .golink{display:block;margin-top:10px;padding:13px 14px;border-radius:12px;background:var(--accentBg,var(--accent));color:var(--accentInk);font:800 15px var(--body);text-align:center;text-decoration:none}
 .tl b{display:block;font-size:14.5px}.tl span{display:block;color:var(--dim);font-size:13px;margin-top:1px}
+.chip{min-height:44px}
+/* fill-in answers: suggested value + "keep" tap, or type your own number */
+.sug{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:13.5px;color:var(--dim);flex-wrap:wrap}
+.sug b{color:var(--ink)}
+.keep{flex:none;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--edge);background:var(--chip);color:var(--ink);font:700 14px var(--body);cursor:pointer}
+.keep.on{background:var(--accentBg,var(--accent));color:var(--accentInk);border-color:var(--accent)}
+.seg{display:flex;flex-wrap:wrap;gap:3px;margin-top:10px;background:var(--chip);border:1px solid var(--edge);border-radius:12px;padding:3px}
+.seg button{flex:1 1 auto;min-height:44px;padding:0 8px;border:0;border-radius:9px;background:transparent;color:var(--ink);font:700 14px var(--body);cursor:pointer}
+.seg button.on{background:var(--accentBg,var(--accent));color:var(--accentInk)}
+.amt{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.box{display:flex;align-items:center;gap:4px;height:50px;border:1.5px solid var(--edge);border-radius:12px;background:var(--bg);padding:0 12px;flex:0 1 140px;min-width:0;cursor:text}
+.box.wide{flex:1 1 100%}.box.sm{flex:0 0 112px;height:44px}
+.box:focus-within{border-color:var(--accent)}
+.box input{border:0;background:transparent;color:var(--ink);font:800 20px var(--body);width:100%;min-width:0;outline:none;padding:0;-webkit-appearance:none;appearance:none}
+.box.wide input{font-size:17px;font-weight:700}.box.sm input{font-size:18px}
+.box input::placeholder{color:var(--dim);opacity:.55}
+.box .pre,.box .suf{font-weight:800;font-size:18px;color:var(--dim);flex:none}
+.unit{font-weight:700;font-size:15px;color:var(--dim)}
+.amt .chips{margin-top:0;flex:1 1 100%}
+.ans{margin-top:8px;font-size:13.5px;color:var(--dim)}.ans b{color:var(--ok)}
+.warn{margin-top:8px}
+.thr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:700;font-size:15px}
+.addrow{display:flex;gap:8px;margin-top:8px}.addrow button{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--accent);background:transparent;color:var(--ink);font:700 14px var(--body);cursor:pointer}
 {{EXTRACSS}}
 </style></head><body><main>
 <header class="hero">{{LOGO}}
@@ -64,6 +87,8 @@ var CA_ALC="California rules don't allow free alcohol as a reward. Drink discoun
 var YN=["Yes","No"], SPEC=["Yes","Changed","Stopped"];
 function L(a,d){ return {o:a,d:d==null?0:d}; }          // option list + default index (-1 = no default)
 function first(a){ return L(a,0); }
+function F(kind,o){ o=o||{}; o.kind=kind; return o; }                 // fill-in spec: reward | pct | usd | num
+function TH(key,d,pre,unit){ return {key:key,d:d,pre:pre,unit:unit}; } // editable threshold (points cost / game score)
 var STARS="Stars per visit (10 stars = reward)", PTS="Points per $ spent";
 var hhLabel=CFG.happyHour?"Double points during happy hour ("+CFG.happyHour+")?":"Double points during your slowest hours (e.g. weekdays 2–5 PM)?";
 var ownerOpts=(CFG.ownerNames&&CFG.ownerNames.length?CFG.ownerNames:[CFG.owner&&CFG.owner!=="there"?CFG.owner:"The owner"]).concat(["Manager on duty","Everyone"]);
@@ -71,7 +96,7 @@ var ownerOpts=(CFG.ownerNames&&CFG.ownerNames.length?CFG.ownerNames:[CFG.owner&&
 // [key, question, options{o,d}, hint, showIf(S)]
 var Q=[
  ["Weekly giveaway (gets people in the door)",[
-  ["gw","Weekly giveaway prize",L(["No giveaway","$50","$100","$200","$250","$500"],["No giveaway","$50","$100","$200","$250","$500"].indexOf(CFG.giveawayDefault||"$200")),CA_FREE],
+  ["gw","Weekly giveaway prize",L([CFG.giveawayDefault||"$200","No giveaway"],0),CA_FREE,null,F("usd",{bare:true,none:"No giveaway"})],
   ["gwtype","Prize is paid as",first([SHORT+" gift card","Food & drink credit","Cash"]),null,gwOn],
   ["gwearn","How guests earn entries",L(["1 per visit","1 per visit + 1 per game played","1 per visit + 1 per $25 spent","All of these + 3 for referring a friend"],3),"Plus one free entry a week with no purchase needed.",gwOn],
   ["gwday","Winner drawn",first(CFG.drawDays||["Sunday night","Monday","Friday before the rush"]),null,gwOn],
@@ -80,24 +105,24 @@ var Q=[
  ["Deals & rewards",[
   ["welcome","Welcome gift for joining "+SHORT+" Rewards",first(R.welcome)],
   ["sys","Points or stars?",first([PTS,STARS,"Both"]),"Points reward bigger spenders. Stars reward every visit, big or small."],
-  ["ppd","Points earned per $1 spent",L(["5 pts","10 pts","20 pts"],1),null,function(S){return v("sys")!==STARS;}],
+  ["ppd","Points earned per $1 spent",L(["10 pts"],0),null,function(S){return v("sys")!==STARS;},F("num",{unit:"pts",fmt:" pts"})],
   ["stars","Reward at 10 stars (1 star per visit)",first(R.stars),null,function(S){return v("sys")!==PTS;}],
-  ["t1","Reward at "+n(R.points[0])+" points",first(R.t1),null,ptsOn],
-  ["t2","Reward at "+n(R.points[1])+" points",first(R.t2),CFG.alcohol?CA_ALC:null,ptsOn],
-  ["t3","Reward at "+n(R.points[2])+" points",first(R.t3),null,ptsOn],
-  ["t4","Reward at "+n(R.points[3])+" points",first(R.t4),null,ptsOn],
+  ["t1","Reward at "+n(R.points[0])+" points",first(R.t1),null,ptsOn,F("reward",{thr:TH("pts:t1",R.points[0],"Reward at","points")})],
+  ["t2","Reward at "+n(R.points[1])+" points",first(R.t2),CFG.alcohol?CA_ALC:null,ptsOn,F("reward",{thr:TH("pts:t2",R.points[1],"Reward at","points")})],
+  ["t3","Reward at "+n(R.points[2])+" points",first(R.t3),null,ptsOn,F("reward",{thr:TH("pts:t3",R.points[2],"Reward at","points")})],
+  ["t4","Reward at "+n(R.points[3])+" points",first(R.t4),null,ptsOn,F("reward",{thr:TH("pts:t4",R.points[3],"Reward at","points")})],
   ["refin","Inviting a friend: the person who invites gets",first(R.referIn)],
   ["reffr","Inviting a friend: the friend gets",first(R.referFriend)],
   ["hh",hhLabel,first(YN)],
-  ["lv1","Regular level (3 visits in a month)",L(["5% off one item","10% off one item","15% off one item"],1)],
-  ["lv2","VIP level (6 visits in a month)",L(["15% off the order","20% off the order","25% off the order"],1)],
-  ["lv3","Legend level (10 visits in a month)",L(["25% off the order","30% off the order","40% off the order"],1)],
+  ["lv1","Regular level (3 visits in a month)",L(["10% off one item"],0),null,null,F("pct",{scope:"one item"})],
+  ["lv2","VIP level (6 visits in a month)",L(["20% off the order"],0),null,null,F("pct",{scope:"the order"})],
+  ["lv3","Legend level (10 visits in a month)",L(["30% off the order"],0),null,null,F("pct",{scope:"the order"})],
   ["bday","Birthday treat (checked with ID)",first(R.bday)],
   ["bdaywin","Birthday treat good for",L(["The birthday only","Birthday week","Birthday month"],1)],
   ["missed","Missed-call text-back offer",first(R.missed)],
   ["missedd","Missed-call offer good for",first(["7 days","14 days"])],
   ["winback","\"We miss you\" text after 30 days away",first(R.winback)]]],
- [G.name+" prizes",G.prizes.map(function(p,i){ return ["g"+(i+1),"Score "+n(p[0]),first(p[1])]; })
+ [G.name+" prizes",G.prizes.map(function(p,i){ return ["g"+(i+1),"Score "+n(p[0]),first(p[1]),null,null,F("reward",{thr:TH("score:g"+(i+1),p[0],"If they score","or more, they get")})]; })
    .concat([["champ","Weekly #1 on the leaderboard",first(G.champ)]])
    .concat(G.second?[["second","Weekly #2 on the leaderboard",first(G.second)]]:[])]
 ];
@@ -118,8 +143,8 @@ Q.push(["Questions callers ask the AI phone host",(CFG.phone||[]).map(function(p
 
 // promo codes: [id, code pattern ({n} = number in the value), what it does, value options]
 var CODES=[
- ["welcome","WELCOME{n}","Off the first order for new guests",["10% off","15% off","20% off"]],
- ["friend","FRIEND{n}","Off when a friend referred them",["$5 off","$3 off","$10 off"]],
+ ["welcome","WELCOME{n}","Off the first order for new guests",["10% off"],F("pct",{scope:""})],
+ ["friend","FRIEND{n}","Off when a friend referred them",["$5 off"],F("usd",{scope:""})],
  ["bday","BDAY","Birthday treat (with photo ID)",R.bday],
  ["playwin","PLAYWIN","Prize for playing "+G.name,R.playwin]
 ];
@@ -138,10 +163,127 @@ function ptsOn(){ return v("sys")!==STARS; }
 
 $("ttl").textContent=SHORT+" · App Setup";
 $("intro").innerHTML="";
-$("intro").appendChild(document.createTextNode("Hi "+OWNER+"! Everything is filled in with what we'd recommend for "+SHORT+". Just tap to change anything. No typing. When you're done, hit "));
+$("intro").appendChild(document.createTextNode("Hi "+OWNER+"! Everything is filled in with what we'd recommend for "+SHORT+". For every deal or prize, tap ✓ Keep suggested, or type your own number (like 15 for 15%). When you're done, hit "));
 $("intro").appendChild(h("b",null,"Send to Antidote")); $("intro").appendChild(document.createTextNode(" at the bottom."));
 document.title=SHORT+" Owner Setup";
 
+// ---------- fill-in answers: every discount / prize is a number (or item) the owner types ----------
+var TYPES={pct:"% off",usd:"$ off",item:"Free item",pts:"Bonus pts"};
+var NONE_RE=/^(nothing|none|no perk|don't send|no giveaway)$/i;
+var REWARD_RE=/(\d+(\.\d+)?%\s*off|^half off|^\$\d+(\.\d+)?\s*off|^free\s|bonus points)/i;
+var ALC_RE=/\b(margaritas?|beers?|cocktails?|wines?|mimosas?|shots?|martinis?|mules?|palomas?|old fashioned|long islands?|micheladas?|sangrias?|tequila|vodka|whiske?y|bourbon|rum|drafts?|ipa|lager|champagne|prosecco|sake|soju|seltzers?|mezcal|gin|alcohol|alcoholic|booze|pitchers?|bucket|drinks?|bottles?)\b/i;
+var SAFE_RE=/mocktail|soft drink|non-?alcoholic|no alcohol|zero.?proof|soda|lemonade|juice|coffee|\btea\b|off/i;
+var CA_ITEM="Free alcohol can't be a reward in California — try a % off instead.";
+function isAlc(t){ return !!CFG.alcohol&&ALC_RE.test(t)&&!SAFE_RE.test(t); }
+function isReward(opts){ return (opts||[]).some(function(o){ return REWARD_RE.test(o); }); }
+function parseR(s){ s=String(s==null?"":s).trim(); var m;
+  if((m=s.match(/^(\d+(?:\.\d+)?)\s*%\s*off\b\s*(.*)$/i))) return {t:"pct",n:m[1],x:m[2]};
+  if((m=s.match(/^half off\b\s*(.*)$/i))) return {t:"pct",n:"50",x:m[1]};
+  if((m=s.match(/^\$(\d+(?:\.\d+)?)\s*off\b\s*(.*)$/i))) return {t:"usd",n:m[1],x:m[2]};
+  if((m=s.match(/^\+?(\d+)\s*bonus points\b\s*(.*)$/i))) return {t:"pts",n:m[1],x:m[2]};
+  if((m=s.match(/^free\s+(.*)$/i))) return {t:"item",x:m[1]};
+  return {t:"item",x:s,raw:true}; }
+function numOk(t,x){ var f=parseFloat(x); return x!==""&&isFinite(f)&&f>0&&(t!=="pct"||f<=100); }
+function clean(x){ return String(parseFloat(x)); }
+var FREE_PICKS=(function(){ var all=[]; Object.keys(R).forEach(function(k){ if(Array.isArray(R[k])) all=all.concat(R[k]); });
+  all=all.concat(CFG.drawPrizes||[]); G.prizes.forEach(function(p){ all=all.concat(p[1]); });
+  return all.filter(function(o){ return typeof o==="string"&&/^free\s/i.test(o); }).map(function(o){ return o.replace(/^free\s+/i,""); })
+    .filter(function(o,i,a){ return a.indexOf(o)===i&&o.length<=26&&!isAlc(o); }); })();
+var DL=document.createElement("datalist"); DL.id="menu-items";
+(CFG.menu.food||[]).forEach(function(g){ g.items.forEach(function(i){ var o=document.createElement("option"); o.value=i[0]; DL.appendChild(o); }); });
+document.body.appendChild(DL);
+
+// spec: {kind, scope?, bare?, none?, unit?, fmt?}; get()/set(v|null) read/write the stored string; sug = suggested string
+function fillIn(card,spec,sug,opts,get,set){
+  var kind=spec.kind, types, noneLabel=spec.none||null; opts=opts||[];
+  opts.forEach(function(o){ if(NONE_RE.test(o)) noneLabel=noneLabel||o; });
+  if(kind==="reward"){ types=["pct","usd","item"]; if(opts.some(function(o){ return /bonus points/i.test(o); })) types.unshift("pts"); }
+  else types=[kind];
+  var scopes={pct:[],usd:[],pts:[]};
+  opts.concat(sug!=null?[sug]:[]).forEach(function(o){ var p=parseR(o); if(scopes[p.t]&&scopes[p.t].indexOf(p.x)<0) scopes[p.t].push(p.x); });
+  var picks=opts.map(parseR).filter(function(p){ return p.t==="item"&&!p.raw; }).map(function(p){ return p.x; })
+    .concat(FREE_PICKS).filter(function(o,i,a){ return a.indexOf(o)===i&&!isAlc(o); }).slice(0,6);
+  var st={};
+  function cur(){ var x=get(); return x==null?sug:x; }
+  function load(){ var x=cur();
+    if(x!=null&&noneLabel&&x===noneLabel){ st={t:"none"}; return; }
+    if(kind==="reward"){ st=parseR(x); if(types.indexOf(st.t)<0) st={t:"item",x:String(x),raw:true}; }
+    else { var m=String(x==null?"":x).match(/\d+(\.\d+)?/); st={t:kind,n:m?m[0]:""}; } }
+  function defScope(t){ var p=parseR(sug); if(p.t===t) return p.x; if(t==="pts") return (scopes.pts[0]||"");
+    return (scopes[t]&&scopes[t][0])||((p.t==="pct"||p.t==="usd")&&p.x)||"the order"; }
+  function phNum(t){ var p=parseR(sug); if(kind!=="reward"){ var m=String(sug||"").match(/\d+(\.\d+)?/); return m?m[0]:""; }
+    if(p.t===t) return p.n; var o=opts.map(parseR).filter(function(q){ return q.t===t; })[0]; return o?o.n:({pct:"10",usd:"5",pts:"100"})[t]; }
+  function compose(){ var t=st.t;
+    if(t==="none") return noneLabel;
+    if(t==="item"){ var x=(st.x||"").trim(); if(!x) return null; return /^(free|half|cash|\$|\d|\+)/i.test(x)?x:"Free "+x; }
+    if(!numOk(t,st.n)) return null; var nn=clean(st.n);
+    if(t==="num") return nn+(spec.fmt||"");
+    if(t==="pts") return "+"+nn+" bonus points"+(st.x?" "+st.x:"");
+    if(spec.bare) return "$"+nn;
+    var sc=spec.scope!=null?spec.scope:st.x;
+    return (t==="pct"?nn+"%":"$"+nn)+" off"+(sc?" "+sc:""); }
+  if(sug!=null){
+    var sugRow=h("div","sug"), sugTx=h("span"); sugTx.appendChild(document.createTextNode("Suggested: ")); sugTx.appendChild(h("b",null,sug));
+    var keep=h("button","keep","✓ Keep suggested"); keep.type="button";
+    keep.onclick=function(){ set(sug); load(); draw(true); };
+    sugRow.appendChild(sugTx); sugRow.appendChild(keep); card.appendChild(sugRow);
+  }
+  var segT=types.concat(noneLabel?["none"]:[]), segB={};
+  if(segT.length>1){ var seg=h("div","seg"); seg.setAttribute("role","group"); seg.setAttribute("aria-label","Reward type");
+    segT.forEach(function(t){ var b=h("button",null,t==="none"?noneLabel:TYPES[t]||"Amount"); b.type="button"; b.onclick=function(){ switchTo(t); }; seg.appendChild(b); segB[t]=b; });
+    card.appendChild(seg); }
+  var amt=h("div","amt"), warn=h("div","note warn hide",CA_ITEM), ans=h("div","ans");
+  card.appendChild(amt); card.appendChild(warn); card.appendChild(ans);
+  var inp=null;
+  function commit(){ set(compose()); draw(false); }
+  function switchTo(t){ if(st.t===t) return;
+    st=t==="item"?{t:"item",x:""}:{t:t,n:"",x:defScope(t)};
+    if(t==="none") commit(); draw(true); if(inp&&t!=="none") try{ inp.focus(); }catch(e){} }
+  function buildAmt(){ amt.innerHTML=""; inp=null; var t=st.t;
+    if(t==="none"){ amt.appendChild(h("div","hint","No reward for this one.")); return; }
+    var box=h("label","box"+(t==="item"?" wide":"")); inp=h("input"); inp.type="text"; inp.autocomplete="off"; inp.setAttribute("enterkeyhint","done");
+    if(t==="item"){ inp.value=st.x||""; inp.placeholder="Type an item, e.g. "+(picks[0]||"appetizer"); inp.setAttribute("list","menu-items"); inp.setAttribute("aria-label","Free item");
+      box.appendChild(inp); amt.appendChild(box);
+      inp.oninput=function(){ st.x=inp.value; st.raw=false; commit(); };
+      if(picks.length){ var ch=h("div","chips"); picks.forEach(function(nm){ var b=h("button","chip",nm); b.type="button";
+        b.onclick=function(){ inp.value=nm; st.x=nm; st.raw=false; commit(); }; ch.appendChild(b); }); amt.appendChild(ch); }
+      return; }
+    inp.inputMode=t==="pct"||t==="usd"?"decimal":"numeric"; inp.value=st.n||""; inp.placeholder=phNum(t); inp.setAttribute("aria-label",TYPES[t]||spec.unit||"Amount");
+    if(t==="usd") box.appendChild(h("span","pre","$")); box.appendChild(inp);
+    if(t==="pct") box.appendChild(h("span","suf","%"));
+    if(t==="num") box.appendChild(h("span","suf",spec.unit||""));
+    amt.appendChild(box);
+    inp.oninput=function(){ st.n=inp.value.replace(/[^\d.]/g,""); commit(); };
+    if(t==="pts") amt.appendChild(h("span","unit","bonus points"+(st.x?" "+st.x:"")));
+    if((t==="pct"||t==="usd")&&!spec.bare){
+      if(spec.scope!=null) amt.appendChild(h("span","unit","off"+(spec.scope?" "+spec.scope:"")));
+      else { var list=scopes[t].concat(["the order","one item"]).concat(CFG.alcohol?["one drink"]:[]).concat(st.x?[st.x]:[])
+          .filter(function(o,i,a){ return o&&a.indexOf(o)===i; });
+        if(!st.x) st.x=list[0];
+        var sc=h("div","chips"); list.forEach(function(o){ var b=h("button","chip"+(o===st.x?" on":""),"off "+o); b.type="button";
+          b.onclick=function(){ [].forEach.call(sc.children,function(x){ x.classList.remove("on"); }); b.classList.add("on"); st.x=o; if(numOk(t,st.n)) commit(); }; sc.appendChild(b); });
+        amt.appendChild(sc); } } }
+  function draw(rebuild){
+    Object.keys(segB).forEach(function(t){ segB[t].classList.toggle("on",st.t===t); });
+    if(keep) keep.classList.toggle("on",get()==null||get()===sug);
+    if(rebuild) buildAmt();
+    warn.classList.toggle("hide",!(st.t==="item"&&isAlc(st.x||"")));
+    var saved=get(), typed=compose(); ans.innerHTML="";
+    if(st.t==="pct"&&st.n!==""&&!numOk("pct",st.n)){ ans.textContent="Use a number from 1 to 100."; return; }
+    if(saved==null&&sug==null){ if(typed==null&&inp&&inp.value) ans.textContent="Finish typing to add it."; return; }
+    ans.appendChild(document.createTextNode(saved!=null&&saved!==sug?"Your answer: ":"Using: "));
+    ans.appendChild(h("b",null,(saved!=null?saved:sug)||"(no answer)"));
+    if(typed==null&&inp&&inp.value) ans.appendChild(document.createTextNode(" (finish typing to save)")); }
+  load(); draw(true);
+}
+function thrRow(q){ var t=q[5].thr, row=h("div","thr"), box=h("label","box sm"), inp=h("input");
+  inp.type="text"; inp.inputMode="numeric"; inp.autocomplete="off"; inp.placeholder=String(t.d); inp.setAttribute("aria-label",t.pre+" (number)");
+  inp.value=S[t.key]!=null?S[t.key]:String(t.d); box.appendChild(inp);
+  row.appendChild(h("span",null,t.pre)); row.appendChild(box); row.appendChild(h("span",null,t.unit));
+  inp.oninput=function(){ var x=inp.value.replace(/\D/g,""); if(x&&+x>0) S[t.key]=+x; else delete S[t.key]; save(); };
+  return row; }
+function thrVal(q){ var t=q[5]&&q[5].thr; return t?(S[t.key]!=null?S[t.key]:t.d):null; }
+function lab(q){ var t=q[5]&&q[5].thr; return t?t.pre+" "+n(thrVal(q))+" "+t.unit:q[1]; }
 var app=$("app"), cardOf={};
 function timeline(){
   var ol=h("ol","tl"); ol.setAttribute("aria-label","Weekly leaderboard timeline");
@@ -164,20 +306,27 @@ Q.forEach(function(sec){
   if(sec===Q[1]&&CFG.alcohol) app.appendChild(h("p","note",CA_ALC));
   if(sec[0]===LB) app.appendChild(timeline());
   sec[1].forEach(function(q){
-    var c=h("div","card"); c.dataset.key=q[0]; c.appendChild(h("div","q",q[1])); if(q[3]) c.appendChild(h("div","hint",q[3]));
-    var opts=q[2].o.concat(q[2].d<0?["Not sure"]:[]);
-    c.appendChild(chipRow(q[0],opts,v(q[0]),function(o){ S[q[0]]=o; save(); refresh(); }));
+    if(!q[5]&&q[2].d>=0&&isReward(q[2].o)) q[5]=F("reward");                    // any prize/discount question becomes a fill-in
+    var c=h("div","card"); c.dataset.key=q[0];
+    if(q[5]&&q[5].thr) c.appendChild(thrRow(q)); else c.appendChild(h("div","q",q[1]));
+    if(q[3]) c.appendChild(h("div","hint",q[3]));
+    if(q[5]) fillIn(c,q[5],def(q),q[2].o,function(){ return S[q[0]]!=null?S[q[0]]:null; },function(x){ if(x==null) delete S[q[0]]; else S[q[0]]=x; save(); refresh(); });
+    else { var opts=q[2].o.concat(q[2].d<0?["Not sure"]:[]);
+      c.appendChild(chipRow(q[0],opts,v(q[0]),function(o){ S[q[0]]=o; save(); refresh(); })); }
     cardOf[q[0]]=c; app.appendChild(c);
   });
 });
 
 // giveaway potential: illustrative estimates, shown live under the prize choice
-var E={"No giveaway":[0,0,0],"$50":[45,15,10],"$100":[95,30,22],"$200":[190,55,40],"$250":[230,65,48],"$500":[420,110,85]};
+var E=[[0,0,0,0],[50,45,15,10],[100,95,30,22],[200,190,55,40],[250,230,65,48],[500,420,110,85]];   // [prize, entries, sign-ups, return visits]
+function estFor(a){ if(!(a>0)) return [0,0,0]; for(var i=1;i<E.length;i++){ if(a<=E[i][0]){ var lo=E[i-1],hi=E[i],f=(a-lo[0])/(hi[0]-lo[0]);
+  return [1,2,3].map(function(j){ return Math.round(lo[j]+(hi[j]-lo[j])*f); }); } }
+  var top=E[E.length-1], s=Math.sqrt(a/top[0]); return [1,2,3].map(function(j){ return Math.round(top[j]*s); }); }
 var est=h("div","note"); est.id="estimate"; est.style.marginTop="10px"; cardOf.gw.appendChild(est);
-function drawEst(){ var g=v("gw"), e=E[g]||[0,0,0], amt=+(String(g).replace(/\D/g,""))||0, chk=CFG.avgCheck||25;
+function drawEst(){ var g=v("gw"), amt=g==="No giveaway"?0:(+(String(g).replace(/[^\d.]/g,""))||0), e=estFor(amt), chk=CFG.avgCheck||25;
   if(!amt){ est.innerHTML="No weekly giveaway. Rewards and the game still run."; return; }
   var rev=e[2]*chk*4, cost=amt*4;
-  est.innerHTML="<b>What a "+g+" weekly giveaway could do (estimate)</b><br>≈ "+e[0]+" entries a week · ≈ "+e[1]+" new sign-ups a week · ≈ "+e[2]+" extra return visits a week<br>"+
+  est.innerHTML="<b>What a $"+n(amt)+" weekly giveaway could do (estimate)</b><br>≈ "+e[0]+" entries a week · ≈ "+e[1]+" new sign-ups a week · ≈ "+e[2]+" extra return visits a week<br>"+
     "A month: you give away <b>$"+n(cost)+"</b>, guests spend about <b>$"+n(rev)+"</b> on those extra visits (at ~$"+chk+" a check)"+
     "<br><span style='opacity:.8'>Bigger prize = more people playing, signing up and coming back. These are estimates, not promises. "+CA_FREE+"</span>"; }
 
@@ -187,6 +336,7 @@ var DRAW_OPTS=(CFG.drawPrizes&&CFG.drawPrizes.length?CFG.drawPrizes:[].concat(R.
   .concat(["Free soft drink / mocktail","$5 off"]).filter(function(x,i,a){ return a.indexOf(x)===i; });
 function drawOdds(){ return S.drawOdds||DRAW_ODDS[1]; }
 function drawPrizes(){ return Array.isArray(S.drawPrizes)?S.drawPrizes:DRAW_OPTS.slice(0,3); }
+function drawAll(){ return DRAW_OPTS.concat(Array.isArray(S.drawCustom)?S.drawCustom:[]).concat(drawPrizes()).filter(function(x,i,a){ return a.indexOf(x)===i; }); }
 app.appendChild(h("h2",null,"Daily lucky draw (members)"));
 app.appendChild(h("p","sub","Every signed-up member gets one free draw a day when they open the app. Winners get a free item that's good for 3 days."));
 var dq=h("div","card"); dq.appendChild(h("div","q","How often should someone win?"));
@@ -194,9 +344,16 @@ dq.appendChild(chipRow("drawOdds",DRAW_ODDS,drawOdds(),function(o){ S.drawOdds=o
 app.appendChild(dq);
 var dp=h("div","card"); dp.appendChild(h("div","q","Lucky draw prizes")); dp.appendChild(h("div","hint","Tap to pick as many as you like. Each winner gets one of these at random."));
 var dpc=h("div","chips"); dp.appendChild(dpc);
-DRAW_OPTS.forEach(function(o){ var b=h("button","chip",o); b.type="button";
+function drawChips(){ dpc.innerHTML=""; drawAll().forEach(function(o){ var b=h("button","chip",o); b.type="button";
   b.onclick=function(){ var cur=drawPrizes().slice(), i=cur.indexOf(o); if(i<0) cur.push(o); else cur.splice(i,1); S.drawPrizes=cur; save(); drawRefresh(); };
-  dpc.appendChild(b); });
+  dpc.appendChild(b); }); }
+drawChips();
+var dadd=h("div"); dadd.appendChild(h("div","q","Add your own prize")); dadd.style.marginTop="14px";
+var pend=null; fillIn(dadd,F("reward"),null,["$5 off","10% off the order"].concat(DRAW_OPTS),function(){ return pend; },function(x){ pend=x; });
+var dab=h("div","addrow"), dabtn=h("button",null,"+ Add to lucky draw prizes"); dabtn.type="button"; dab.appendChild(dabtn); dadd.appendChild(dab);
+dabtn.onclick=function(){ if(!pend) return; var cu=Array.isArray(S.drawCustom)?S.drawCustom.slice():[]; if(cu.indexOf(pend)<0&&DRAW_OPTS.indexOf(pend)<0) cu.push(pend); S.drawCustom=cu;
+  var cur=drawPrizes().slice(); if(cur.indexOf(pend)<0) cur.push(pend); S.drawPrizes=cur; save(); drawChips(); drawRefresh(); };
+dp.appendChild(dadd);
 if(CFG.alcohol) dp.appendChild(h("div","hint","Bar drinks as prizes are non-alcoholic (mocktail or soft drink) under California rules."));
 app.appendChild(dp);
 var dn=h("p","note","Winners have to redeem within 3 days. That's fixed, so prizes don't pile up."); app.appendChild(dn);
@@ -207,7 +364,7 @@ drawRefresh();
 
 // promo codes
 app.appendChild(h("h2",null,"Promo codes to launch with"));
-app.appendChild(h("p","sub","Turn on the codes you want. Tap a value to change what each one gives."));
+app.appendChild(h("p","sub","Turn on the codes you want. Keep the suggested value or type your own."));
 function codeName(c,val){ var m=String(val||"").match(/\d+/); return c[1].replace("{n}",m?m[0]:""); }
 function codeState(c){ var s=S["code:"+c[0]]; return s&&typeof s==="object"?s:{on:true,v:c[3][0]}; }
 CODES.forEach(function(c){
@@ -216,7 +373,7 @@ CODES.forEach(function(c){
   var tg=h("button","tg"); tg.type="button"; tg.setAttribute("aria-label","Use code "+c[1]); r.appendChild(tg); card.appendChild(r);
   function draw(){ nm.textContent=codeName(c,st.v); tg.classList.toggle("on",st.on); card.classList.toggle("off",!st.on); }
   tg.onclick=function(){ st.on=!st.on; S["code:"+c[0]]=st; save(); draw(); };
-  card.appendChild(chipRow("code:"+c[0],c[3],st.v,function(o){ st.v=o; S["code:"+c[0]]=st; save(); draw(); }));
+  fillIn(card,c[4]||F("reward"),c[3][0],c[3],function(){ return st.v===c[3][0]?null:st.v; },function(x){ st.v=x==null?c[3][0]:x; S["code:"+c[0]]=st; save(); draw(); });
   draw(); app.appendChild(card);
 });
 if(CFG.alcohol) app.appendChild(h("p","hint","Codes can take money off drinks, but can't give a free alcoholic drink (California)."));
@@ -279,8 +436,8 @@ window.SETUP_SUMMARY = function () { return summary(); };   // lets the owner's 
 function summary(){
   var out=[CFG.name.toUpperCase()+" SETUP (from "+(OWNER==="there"?"the owner":OWNER)+")"];
   Q.forEach(function(sec){ out.push("\n"+sec[0].toUpperCase()); sec[1].forEach(function(q){
-    if(q[4]&&!q[4](S)){ out.push("• "+q[1]+": (skipped)"); return; }
-    var x=v(q[0]); out.push("• "+q[1]+": "+(x==null?"(no answer)":x)); });
+    if(q[4]&&!q[4](S)){ out.push("• "+lab(q)+": (skipped)"); return; }
+    var x=v(q[0]); out.push("• "+lab(q)+": "+(x==null?"(no answer)":x)); });
     if(sec===Q[0]) out.push("• Free entry with no purchase: included (California law)"); });
   var dOdds=drawOdds(); out.push("\nDAILY LUCKY DRAW (MEMBERS)"); out.push("• How often someone wins: "+dOdds);
   if(dOdds!=="Off"){ var dpz=drawPrizes(); out.push("• Prizes: "+(dpz.length?dpz.join(", "):"(none picked)")); out.push("• Winners redeem within: 3 days"); }

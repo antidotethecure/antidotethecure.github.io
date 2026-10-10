@@ -1,6 +1,6 @@
 # Owner setup kit
 
-One tap-only owner setup form, branded per restaurant. Every page asks the same
+One tap-first owner setup form, branded per restaurant. Every page asks the same
 questions with the same logic. Only the config changes.
 
 ```
@@ -51,6 +51,17 @@ prizes and weekly #1, optional special deal, rules (expiry, one per visit, stack
 phone-host questions, daily lucky draw (odds, prizes; 3-day redeem window), promo codes (WELCOME{n}, FRIEND{n}, BDAY, PLAYWIN; each has a toggle and value chips),
 your register (POS) with a link to the `/pos/` step-by-step guide, menu on/off and prices, and go live. "Send to Antidote" shares a plain-text summary through
 `navigator.share`, or falls back to `sms:`.
+
+## Fill-in answers (discounts, prizes, numbers)
+Every discount or prize question is a fill-in, not a chip list: the config's first option shows as
+"Suggested: …" with a ✓ Keep suggested button, and the owner can type his own number instead.
+Any question whose options look like rewards (`N% off`, `$N off`, `Half off`, `Free …`, `bonus points`)
+becomes one automatically, including `special.qs`. Reward questions get a "% off · $ off · Free item"
+toggle (plus "Bonus pts" when an option has bonus points, and "Nothing"/"Don't send"/"No perk" when one is
+listed). Fixed fill-ins: giveaway ($), points per $1, visit levels (%), WELCOME (%) and FRIEND ($) codes.
+Points-tier costs and game score lines are editable too (`pts:t1`, `score:g1` in storage). Answers are
+still saved as plain strings ("25% off one drink"), so old chip answers keep working. A typed free item
+that looks alcoholic shows the California note (it doesn't block).
 
 ## Adding a restaurant
 1. Copy the config closest to it into `configs/<slug>.json`.

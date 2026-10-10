@@ -82,8 +82,10 @@ def build(owner_slug):
     names_html = "<b>" + "</b> and <b>".join(names) + "</b>" if len(names) <= 2 else "<b>" + "</b>, <b>".join(names[:-1]) + "</b> and <b>" + names[-1] + "</b>"
     t = (HERE / "launch_template.html").read_text()
     b0 = rest[0]["brand"]   # the page dresses in the (first) restaurant's colors
-    theme = ":root{" + ";".join(f"--{k}:{v}" for k, v in (("bg", b0.get("bg")), ("page", b0.get("page")), ("card", b0.get("card")), ("edge", b0.get("edge")), ("ink", b0.get("ink")),
-              ("dim", b0.get("dim")), ("gold", b0.get("accent"))) if v) + "}" + (f"html,body{{font-family:{b0['body']}}}h1,h2{{font-family:{b0['display']}}}" if b0.get("body") and b0.get("display") else "")
+    tv = dict((k, v) for k, v in (("bg", b0.get("bg")), ("page", b0.get("page")), ("card", b0.get("card")), ("edge", b0.get("edge")), ("ink", b0.get("ink")),
+              ("dim", b0.get("dim")), ("gold", b0.get("accent"))) if v)
+    tv.update(o.get("theme") or {})   # owner override, e.g. a dark version of a light brand so text stays readable
+    theme = ":root{" + ";".join(f"--{k}:{v}" for k, v in tv.items()) + "}" + (f"html,body{{font-family:{b0['body']}}}h1,h2{{font-family:{b0['display']}}}" if b0.get("body") and b0.get("display") else "")
     fonts = b0.get("fonts")
     logos = "".join(f'<img class="rl" src="../../{r["logo"]}" alt="{r["name"]}">' for r in rest if r.get("logo")) or "".join(f'<b>{r["name"]}</b>' for r in rest)
     amb = []

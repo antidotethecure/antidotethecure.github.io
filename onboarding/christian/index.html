@@ -12,21 +12,21 @@ main{position:relative;z-index:2;max-width:640px;margin:auto;padding:18px 16px 1
 @media (prefers-reduced-motion:reduce){#amb{display:none}}
 h1{font-size:26px;margin:4px 0}h2{font-size:19px;margin:28px 0 8px}.sub{color:var(--dim);margin:0 0 12px}
 .step{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px;margin:10px 0}
-.num{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:900;background:#1d2b4f;color:var(--blue)}
+.num{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:900;background:var(--soft,#1d2b4f);color:var(--blue)}
 .step.done .num{background:var(--ok);color:#06231a}.step.done .num::after{content:"✓"}.step.done .num span{display:none}
 .step h3{margin:0 0 2px;font-size:16.5px}.step p{margin:2px 0 8px;color:var(--dim);font-size:14px}
 .go{display:inline-block;padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:800;color:#fff;margin:2px 6px 2px 0}
 .go.rest{color:#fff}.go.pos{background:#1e6fe0}
 .q{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:12px;margin:8px 0}.q b{display:block;margin-bottom:6px;font-size:15px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1px solid var(--edge);background:#1a2644;color:var(--ink);padding:8px 11px;border-radius:999px;font:600 14px Rubik,system-ui;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1px solid var(--edge);background:var(--soft,#1a2644);color:var(--ink);padding:8px 11px;border-radius:999px;font:600 14px Rubik,system-ui;cursor:pointer}
 .chip.on{background:var(--gold);border-color:var(--gold);color:#241a00}
-.q input{width:100%;padding:11px;border-radius:10px;border:1px solid var(--edge);background:#0e1730;color:var(--ink);font:500 15px Rubik,system-ui}
+.q input{width:100%;padding:11px;border-radius:10px;border:1px solid var(--edge);background:var(--field,#0e1730);color:var(--ink);font:500 15px Rubik,system-ui}
 .tag{display:inline-block;font-size:12px;font-weight:800;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
 .tag{background:rgba(255,255,255,.12);color:#fff}
-.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(11,18,32,.96);border-top:1px solid var(--edge);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--barbg,rgba(11,18,32,.96));border-top:1px solid var(--edge);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
 .bar button{width:100%;max-width:640px;display:block;margin:auto;padding:15px;border:0;border-radius:14px;background:var(--gold);color:#241a00;font:900 17px Rubik,system-ui;cursor:pointer}
 .prog{max-width:640px;margin:0 auto 8px;color:var(--dim);font-size:13px;text-align:center}
-.note{background:#1a2440;border:1px solid #2e4677;border-radius:12px;padding:10px 12px;font-size:13.5px;color:#cfe0ff}
+.note{background:var(--note,#1a2440);border:1px solid var(--noteEdge,#2e4677);border-radius:12px;padding:10px 12px;font-size:13.5px;color:var(--noteInk,#cfe0ff)}
 .where{display:grid;gap:14px;margin:6px 0 18px}.wc{background:var(--card,#111827);border:1px solid var(--edge,#253049);border-radius:18px;padding:16px}
 .wc .hd{display:flex;align-items:center;gap:14px}.ring{--p:0;width:74px;height:74px;flex:none;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--gold,#f5c400) calc(var(--p)*1%),rgba(255,255,255,.1) 0)}
 .ring b{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--card,#111827);font-size:19px}.wc h3{margin:0;font-size:19px}.wc .s{color:var(--dim,#9aa6b6);font-size:13px;margin-top:3px}

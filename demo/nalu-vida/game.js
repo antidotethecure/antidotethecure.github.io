@@ -692,8 +692,10 @@
     if (sc > G.best) { G.best = sc; try { localStorage.setItem("nalu-best", sc); } catch (e) {} }
     var prize = ""; PRIZES.forEach(function (p) { if (sc >= p[0]) prize = p[1]; });
     var win = "";
-    if (prize && window.SSAI_WIN) { var r = window.SSAI_WIN(prize); win = r.blocked ? "🏆 You'd win " + esc(prize) + ", but you already have <b>" + esc(r.prize.t) + "</b> waiting (code " + r.prize.c + ")." : "🏆 You won <b>" + esc(prize) + "</b>!<br><span style='font:900 20px ui-monospace,Menlo,monospace;letter-spacing:.1em;color:#ffd23f'>" + r.prize.c + "</span><br><span style='font-weight:600;font-size:12.5px'>Show this at Nalu Vida · good for 3 days</span>"; }
-    else if (prize) win = "🏆 You won <b>" + esc(prize) + "</b>! Join Nalu Vida Rewards below to save it.";
+    var member = window.SSAI_GATE && SSAI_GATE.member ? SSAI_GATE.member() : null;
+    function claimHtml(r) { return r.blocked ? "🏆 You'd win " + esc(prize) + ", but you already have <b>" + esc(r.prize.t) + "</b> waiting (code " + r.prize.c + ")." : "🏆 You won <b>" + esc(prize) + "</b>!<br><span style='font:900 20px ui-monospace,Menlo,monospace;letter-spacing:.1em;color:#ffd23f'>" + r.prize.c + "</span><br><span style='font-weight:600;font-size:12.5px'>Show this at Nalu Vida · good for 3 days</span>"; }
+    if (prize && window.SSAI_WIN && member) win = claimHtml(window.SSAI_WIN(prize));
+    else if (prize) win = "🏆 You won <b>" + esc(prize) + "</b>!<br><button class='nv-btn' id='nv-save' type='button' style='margin-top:8px'>Save my prize</button><br><span style='font-weight:600;font-size:12px;opacity:.85'>Add your name and phone or email to get your code</span>";
     var next = PRIZES.filter(function (p) { return p[0] > sc; })[0];
     var sv = {}; try { sv = JSON.parse(localStorage.getItem("nalu-board") || "{}"); } catch (e) {}
     $("nv-end").innerHTML = (ok(IM.storefront) ? "<img src='" + IM.storefront.src + "' alt='Nalu Vida' style='width:100%;max-width:330px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.4);margin-bottom:8px'>" : "") + "<h3>You made it to Nalu Vida! 🌴</h3><p style='font:900 30px system-ui;margin:4px 0'>" + sc.toLocaleString() + "</p><p>Lap " + G.lap + " · best " + G.best.toLocaleString() + "</p>" +
@@ -712,7 +714,8 @@
     $("nv-end").appendChild(fly);
     $("nv-again").onclick = function () { start(); };
     $("nv-order").onclick = function () { $("nv-end").style.display = "none"; var t = document.getElementById("seat") || document.getElementById("food"); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); };
-    $("nv-post").onclick = post; loadBoard();
+    $("nv-post").onclick = function () { if (window.SSAI_GATE) SSAI_GATE("score", function (m) { if (m && !$("nv-n").value) $("nv-n").value = (m.name || "").split(" ")[0]; post(); }); else post(); }; loadBoard();
+    var sv2 = $("nv-save"); if (sv2) sv2.onclick = function () { SSAI_GATE("prize", function (m) { var r = window.SSAI_WIN(prize); sv2.parentNode.innerHTML = claimHtml(r); if (m && !$("nv-n").value) $("nv-n").value = (m.name || "").split(" ")[0]; }); };
   }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function wkey(off) { var d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7) - 7 * (off || 0)); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }

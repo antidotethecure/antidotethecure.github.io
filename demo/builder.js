@@ -10,6 +10,7 @@
 (function () {
   "use strict";
   var C0 = window.BUILDER; if (!C0) return;
+  if (!window.STACKFX && !document.querySelector("script[data-sfx]")) { var fx = document.createElement("script"); fx.src = ((document.currentScript || {}).src || "").replace(/[^\/]*$/, "") + "stackfx.js"; fx.dataset.sfx = "1"; document.head.appendChild(fx); }
   var IMG = C0.img || "img/build/", EXT = C0.ext || ".webp";
   var e = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var money = function (n) { return "$" + n.toFixed(2); };
@@ -24,7 +25,7 @@
     ".bld .stage{position:relative;height:340px;margin:8px 0 4px;touch-action:none}",
     ".bld .stage .glow{position:absolute;left:50%;bottom:14px;width:70%;height:34px;transform:translateX(-50%);background:radial-gradient(closest-side,#0008,#0000)}",
     ".bld .stack{position:absolute;left:0;right:0;bottom:0;top:0;transform-origin:50% 100%;transition:transform .35s}",
-    ".bld .ly{position:absolute;left:50%;transform:translate(-50%,0);transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .25s;pointer-events:none;filter:drop-shadow(0 6px 6px #0006)}",
+    ".bld .ly{position:absolute;left:50%;transform:translate(-50%,0);transition:transform .42s cubic-bezier(.55,0,1,.55),opacity .15s;pointer-events:none;filter:drop-shadow(0 6px 6px #0006)}.bld .ly>img{display:block;width:100%;height:100%}",
     ".bld .ly.in{transform:translate(-50%,-420px);opacity:0}",
     ".bld .plate{position:absolute;left:50%;top:50%;width:300px;height:300px;transform:translate(-50%,-50%)}",
     ".bld .plate>img.pl{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 14px 18px #000a)}",
@@ -102,18 +103,41 @@
   // each layer's image sits so its bottom edge lands on the top surface of the layer below:
   // ar = image height / width, top = how far up its own image the next layer rests (fraction of its height)
   function stackY() { var l = layers[layers.length - 1]; return l ? l.b + l.ih * l.top : 18; }
-  function addLayer(id, isTop) {
+  // a new layer falls from above (delay = ms before it drops; null = placed still). On landing STACKFX
+  // (stackfx.js) gives it the rag-doll settle, the layers underneath react, meat steams, cheese melts, veg gets water beads.
+  function addLayer(id, isTop, delay) {
     var p = P[id] || (C.layers || {})[id] || {}, im = new Image(), W = Math.min(sw(), 380), w = (p.w || .8) * W, ih = w * (p.ar || .5), b = stackY() - (p.sink || 0) * ih;
-    im.src = IMG + id + EXT; im.className = "ly" + (reduce ? "" : " in"); im.style.width = w + "px"; im.style.bottom = b + "px"; im.style.zIndex = layers.length + 1;
-    stack.appendChild(im); layers.push({ id: id, el: im, b: b, ih: ih, top: p.top == null ? .5 : p.top });
-    requestAnimationFrame(function () { requestAnimationFrame(function () { im.classList.remove("in"); }); });
+    var still = delay == null || reduce, FX = window.STACKFX, box = FX ? FX.wrap(im) : im, ly = document.createElement("div");
+    im.src = IMG + id + EXT; im.alt = ""; ly.className = "ly" + (still ? "" : " in"); ly.style.width = w + "px"; ly.style.height = ih + "px"; ly.style.bottom = b + "px"; ly.style.zIndex = layers.length + 1;
+    ly.appendChild(box); stack.appendChild(ly);
+    var below = layers.slice().reverse().map(function (l) { return l.box; }).filter(function (x) { return x && x.classList.contains("sfx"); });
+    layers.push({ id: id, el: ly, box: box, b: b, ih: ih, top: p.top == null ? .5 : p.top });
+    if (still) { if (FX && FX.settle) FX.settle(box, id); }
+    else setTimeout(function () {
+      requestAnimationFrame(function () { ly.classList.remove("in"); setTimeout(function () { if (window.STACKFX && box.classList.contains("sfx")) STACKFX.land(box, id, below); }, 400); });
+    }, delay || 0);
     fitStack();
   }
   function fitStack() { var tb = (C.layers || {})[C.top] || {}, need = stackY() + (tb.ar || .6) * (tb.w || .8) * Math.min(sw(), 380) * .8, room = stage.clientHeight; stack.style.transform = need > room ? "scale(" + Math.max(.55, room / need) + ")" : ""; }
-  function rebuildStack() {
+  function order() {
+    var ids = (C.start || []).slice();
+    (C.stackOrder ? C.stackOrder.map(function (id) { return P[id]; }).filter(Boolean) : C.parts).forEach(function (p) { for (var n = 0; n < (counts[p.id] || 0); n++) ids.push(p.id); });
+    // every slice of cheese goes straight onto a patty / fillet so it melts on the meat (double = meat, cheese, meat, cheese)
+    var isMeat = function (id) { return /patty|chicken|steak|turkey/.test(id); }, isCheese = function (id) { return /cheese|swiss|cheddar|pepperjack/.test(id); };
+    var cheese = ids.filter(isCheese), rest = ids.filter(function (id) { return !isCheese(id); }), out = [], meats = rest.filter(isMeat).length, seenM = 0;
+    if (!meats) return ids;
+    rest.forEach(function (id) { out.push(id); if (isMeat(id)) { seenM++; var take = seenM === meats ? cheese.length : Math.min(1, cheese.length); out.push.apply(out, cheese.splice(0, take)); } });
+    return out;
+  }
+  // rebuild in stackOrder (cheese always lands right on the meat, never on the lettuce). Layers from index
+  // `from` up fall again in sequence so a new slice drops into its real spot and the top of the stack lands back on it.
+  function rebuildStack(from) {
     stack.innerHTML = ""; layers = [];
-    (C.start || []).forEach(function (id) { addLayer(id); });
-    (C.stackOrder ? C.stackOrder.map(function (id) { return P[id]; }) : C.parts).forEach(function (p) { for (var n = 0; n < (counts[p.id] || 0); n++) addLayer(p.id); });
+    order().forEach(function (id, i) { addLayer(id, false, from == null || i < from ? null : (i - from) * 170); });
+  }
+  function placeNew(id) {
+    var ids = order(), at = ids.lastIndexOf(id), same = layers.length === ids.length - 1 && layers.every(function (l, i) { return l.id === ids[i]; });
+    if (same && at === ids.length - 1) addLayer(id, false, 0); else rebuildStack(at < 0 ? null : at);
   }
 
   // ---- plate (hibachi) ----
@@ -137,7 +161,7 @@
     if (fired) return; var p = P[id];
     if (p.group === "Base" && C.mode === "plate") { C.parts.forEach(function (q) { if (q.group === "Base" && q.id !== id) { counts[q.id] = 0; } }); seen = {}; counts[id] = 1; }
     else { if ((counts[id] || 0) >= (p.max || 1)) { say("That's the max on " + p.name.toLowerCase() + "."); return; } counts[id] = (counts[id] || 0) + 1; }
-    if (C.mode === "plate") drawPlate(); else addLayer(id);
+    if (C.mode === "plate") drawPlate(); else placeNew(id);
     if (p.price) { var d = document.createElement("span"); d.className = "dlt"; d.textContent = "+" + money(p.price); el.querySelector(".bar").appendChild(d); setTimeout(function () { d.remove(); }, 900); }
     if (navigator.vibrate) try { navigator.vibrate(12); } catch (x) {}
     refresh(p);
@@ -188,7 +212,7 @@
   // ---- fire it -> order ----
   fireB.addEventListener("click", function () {
     if (fired) return; fired = true; el.classList.add("firing"); fireB.disabled = true;
-    if (C.mode !== "plate" && C.top) setTimeout(function () { addLayer(C.top, true); }, 350);
+    if (C.mode !== "plate" && C.top) setTimeout(function () { addLayer(C.top, true, 0); }, 350);
     var busy = el.querySelector(".busy"), t0 = Date.now(), msg = C.fireBusy || "Firing it up";
     (function tick() { var s = 3 - Math.floor((Date.now() - t0) / 800); busy.textContent = s > 0 ? msg + "… " + s : "Done 🔥"; if (s > 0) setTimeout(tick, 120); })();
     setTimeout(function () { el.classList.remove("firing"); showDone(); }, reduce ? 300 : 2600);

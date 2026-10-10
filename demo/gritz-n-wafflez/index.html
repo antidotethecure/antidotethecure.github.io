@@ -147,6 +147,17 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 .bins button img{width:34px!important;height:34px!important}
 .bins button{font-size:9.5px!important;padding:3px 1px 4px!important;border-radius:11px!important}
 #hearts{color:#F2C14E;letter-spacing:1px}
+/* Antidote's review on the kitchen TV (reviewegg.js) */
+.re-tv{position:absolute;left:0;top:0;z-index:12;width:66px;padding:3px 3px 2px;border:0;border-radius:8px;background:linear-gradient(180deg,#2b2b33,#111116);box-shadow:0 6px 14px #0006,inset 0 0 0 1px #ffffff22;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transform-origin:50% 0;animation:tvOn .5s cubic-bezier(.34,1.5,.64,1)}
+.re-tv::before{content:"";position:absolute;left:50%;top:-7px;width:2px;height:8px;background:#555;transform:translateX(-50%)}
+.re-tv .scr{position:relative;display:block;aspect-ratio:16/9;border-radius:4px;overflow:hidden;background:#000}
+.re-tv .scr img{display:block;width:100%;height:100%;object-fit:cover;animation:tvFlick 2.2s steps(1) infinite}
+.re-tv .scr i{position:absolute;left:50%;top:50%;width:18px;height:13px;margin:-6.5px 0 0 -9px;border-radius:4px;background:#e3262f}
+.re-tv .scr i::after{content:"";position:absolute;left:7px;top:3px;border-left:6px solid #fff;border-top:3.5px solid transparent;border-bottom:3.5px solid transparent}
+.re-tv b{display:block;font:900 8.5px/1.3 var(--body);letter-spacing:.06em;color:#ffd23f;text-align:center}
+.re-tv:active{transform:scale(.94)}.re-tv.off{transition:opacity .4s,transform .4s;opacity:0;transform:scaleY(.05)}
+@keyframes tvOn{0%{opacity:0;transform:scaleY(.05)}60%{opacity:1}100%{transform:none}}
+@keyframes tvFlick{0%,100%{filter:none}48%{filter:brightness(1.6) contrast(1.2)}50%{filter:none}}
 .tick .mods{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:2px}.tick .mods span{font:900 8.5px var(--body);border-radius:5px;padding:1px 4px}.tick .mods .ad{background:#3fbf6f22;color:#1d7a44}.tick .mods .no{background:#e0473a22;color:#b8322a;text-decoration:none}
 </style>
 </head>
@@ -230,6 +241,8 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <footer>Demo built for Gritz N Wafflez by SousShift AI · menu from gritznwafflez.com · prizes are samples · food images are AI-generated previews · not the official Gritz N Wafflez logo</footer>
 </div>
 
+<script>window.REVIEW_EGG={vid:"vAu9h7ItMzE",restaurant:"Gritz N Wafflez",short:"GRITZ N WAFFLEZ",bonus:250,img:"img/review/cover.webp",find:"The kitchen TV flickers on once a shift. Tap it for points and a tip"};</script>
+<script src="../reviewegg.js"></script>
 <script>
 window.CONFIG={name:"Gritz N Wafflez",address:"3183 Wilshire Blvd, Los Angeles, CA 90010"};
 (function(){
@@ -343,7 +356,20 @@ function start(){
   og={running:true,score:0,t:LEN,rep:4,combo:0,plate:[],seats:[null,null,null],nextT:300,served:0,tips:0,last:performance.now(),wrong:0,walk:0,lost:0};
   seatsEl.forEach(function(el){ el.className="seat"; el.innerHTML=""; });
   drawPlate(); $("startov").classList.add("off"); $("over").classList.remove("on"); hud();
+  tvOff(true); if(window.ReviewEgg) ReviewEgg.reset(20,40);   // Antidote's review on the kitchen TV: once a shift, 20-40 s in
 }
+/* ---- Easter egg: the kitchen TV plays Antidote's Gritz N Wafflez review. Tap it: +250 and a $5 tip ---- */
+var tv=null;
+function tvOn(){
+  if(!window.ReviewEgg||tv) return;
+  tv=document.createElement("button"); tv.type="button"; tv.className="re-tv"; tv.setAttribute("aria-label","Kitchen TV: Antidote's review. Tap for a bonus");
+  tv.innerHTML='<span class="scr"><img src="'+ReviewEgg.cover.src+'" alt=""><i></i></span><b>📺 ANTIDOTE</b>';
+  tv.addEventListener("click",function(e){ e.preventDefault(); e.stopPropagation(); if(!og.running||!tv) return;
+    var b=ReviewEgg.collect(); og.score+=b; og.tips+=5; popAt(tv,"+"+b+" 📺","#f2c14e"); var t0=tv; setTimeout(function(){ popAt(t0,"💵 $5 tip!","#7dffb5"); },250);
+    flash("📺 Antidote reviewed us! +"+b,"#f2c14e"); buzz([20,40,20]); hud(); tvOff(); });
+  $("ou").querySelector(".pass").appendChild(tv); og.tvT=12000;
+}
+function tvOff(now){ if(!tv) return; var t=tv; tv=null; if(now){ t.remove(); return; } t.classList.add("off"); setTimeout(function(){ t.remove(); },450); }
 function pickOrder(){
   var e=1-og.t/LEN, lv=e<0.25?0:e<0.6?1:2, pool=DISHES.filter(function(d){ return d.lv<=lv; });
   if(lv===2&&Math.random()<.5) pool=DISHES.filter(function(d){ return d.lv>=1; });
@@ -445,13 +471,15 @@ function tick(now){
     if(bar){ bar.style.width=(f*100)+"%"; bar.style.background=f>0.5?"#3fbf6f":f>0.25?"#f0b429":"#e0473a"; }
     setMood(i,f>0.5?0:f>0.25?1:2); el.classList.toggle("mad",f<0.25);
     if(c.left<=0){ og.walk++; og.combo=0; og.lost+=10*c.order.length; og.score=Math.max(0,og.score-50); rep(-0.6); leave(i,"😤"); flash("😤 Walked out! −50 · ★ down","#ff8a7a"); buzz(120); } });
+  if(window.ReviewEgg&&ReviewEgg.due(LEN-og.t)) tvOn();
+  if(tv&&(og.tvT-=dt)<=0) tvOff();
   hud();
   if(og.t<=0) end();
 }
 requestAnimationFrame(tick);
 
 function end(){
-  og.running=false; hud();
+  og.running=false; hud(); tvOff(true);
   var b=best(); if(og.score>b){ try{localStorage.setItem("gnw-best",Math.round(og.score));}catch(e){} } best();
   $("final").textContent=Math.round(og.score).toLocaleString()+" pts";
   $("stats").textContent=og.served+" orders served · $"+og.tips+" in tips · "+og.rep.toFixed(1)+"★ rating"+(og.walk?" · "+og.walk+" walked out ($"+og.lost+" lost)":"");
@@ -468,10 +496,11 @@ function end(){
     if(w.saved||!window.SSAI_GATE) showWin();
     else { won.innerHTML=(w.blocked?"🏆 You'd win "+prize+", but you already have <b>"+w.prize.t+"</b> waiting.":"🏆 You won "+prize+"!")+"<br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">Save it to your Gritz N Wafflez Rewards to get your code.</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display="block";
       $("wsave").onclick=function(){ window.SSAI_GATE("prize",showWin); }; } }
+  if(window.ReviewEgg) ReviewEgg.endCard($("over"),$("over").querySelector(".btns"));
   $("startov").classList.remove("off"); $("startov").querySelector("b").textContent="Kitchen's closed"; $("startov").querySelector("span").textContent="Tap to run it back";
   $("over").classList.add("on");
 }
-window.__OG={get:function(){return og;},ITEMS:ITEMS,DISHES:DISHES,start:start};
+window.__OG={get:function(){return og;},ITEMS:ITEMS,DISHES:DISHES,start:start,tv:function(){ return tv; }};
 $("startov").addEventListener("click",start);
 $("again").addEventListener("click",function(){ start(); $("og").scrollIntoView({block:"start",behavior:reduce?"auto":"smooth"}); });
 hud();

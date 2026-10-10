@@ -208,6 +208,7 @@
     var h = "";
     if (p === "points") {
       (C.points || []).forEach(function (g) { h += '<p class="gm-g">' + esc(T(g.group)) + "</p>" + (g.items || []).map(row).join(""); });
+      if (W.ReviewEgg && W.ReviewEgg.menuHTML) { try { h += W.ReviewEgg.menuHTML(row); } catch (e) {} }   // reviewegg.js: "📺 Antidote's review" secret + watch card
       var pr = C.prizes;
       if (pr) {
         h += '<p class="gm-g">' + esc(T("Prizes")) + "</p>";

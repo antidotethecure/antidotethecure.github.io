@@ -153,6 +153,8 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <footer>Demo built for StormBurger by SousShift AI · menu and prices from stormburger.com · prizes are samples · food images are AI-generated previews</footer>
 </div>
 
+<script>window.REVIEW_EGG={vid:"xZG8xJRGy9U",restaurant:"StormBurger",short:"STORMBURGER",bonus:500,img:"img/review/cover.webp",find:"A roadside billboard rolls by once a run. Drive through its golden ▶ token"};</script>
+<script src="../reviewegg.js"></script>
 <script>
 window.CONFIG={name:"StormBurger",address:"1500 N La Brea Ave, Inglewood, CA 90302"};
 (function(){
@@ -265,6 +267,7 @@ function setLane(n){ if(!st.running||st.dying) return; st.lane=Math.max(0,Math.m
 window.__S={get:function(){return st;},setLane:function(n){st.lane=Math.max(0,Math.min(LANES-1,n));},LX:LX,start:function(){start();}};
 function start(){
   var keep=st.rain; st=fresh(); st.rain=keep; st.running=true; st.last=performance.now();
+  if(window.ReviewEgg) ReviewEgg.reset(18,30); // Antidote's review billboard: once a run, 18-30 s in
   $("over").classList.remove("on"); hud();
 }
 function end(){
@@ -284,6 +287,7 @@ function end(){
     if(w.saved||!window.SSAI_GATE) showWin();
     else { won.innerHTML=(w.blocked?"🏆 You'd win "+prize+", but you already have <b>"+w.prize.t+"</b> waiting.":"🏆 You won "+prize+"!")+"<br><span style=\"font-weight:600;font-size:13px;color:#C9D2EE\">Save it to your StormBurger Rewards to get your code.</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display="block";
       $("wsave").onclick=function(){ window.SSAI_GATE("prize",showWin); }; } }
+  if(window.ReviewEgg) ReviewEgg.endCard($("over"),$("over").querySelector(".btns"));
   $("over").classList.add("on");
 }
 function spawn(){
@@ -436,7 +440,20 @@ function drawCoin(it,now){ // thick spinning gold coin with an embossed bolt and
   var tw=(Math.sin(now/120+it.x)+1)/2; if(tw>0.6){ var q=(tw-0.6)*2.5*7; cx.fillStyle="#fff"; cx.beginPath(); cx.moveTo(r*0.6,-r*0.9-q); cx.lineTo(r*0.6+1.6,-r*0.9-1.6); cx.lineTo(r*0.6+q,-r*0.9); cx.lineTo(r*0.6+1.6,-r*0.9+1.6); cx.lineTo(r*0.6,-r*0.9+q); cx.lineTo(r*0.6-1.6,-r*0.9+1.6); cx.lineTo(r*0.6-q,-r*0.9); cx.lineTo(r*0.6-1.6,-r*0.9-1.6); cx.closePath(); cx.fill(); }
   cx.restore();
 }
+function drawEgg(it,now){ // Antidote's review: an overhead billboard with the cover, and a golden ▶ token on the road under it
+  var RE=window.ReviewEgg; if(!RE) return;
+  var sx=Math.max(70,Math.min(W-70,it.x)), sy=it.y-92;
+  cx.fillStyle="rgba(0,0,0,.35)"; cx.fillRect(sx-46,sy+30,5,40); cx.fillRect(sx+45,sy+30,5,40); // post shadows
+  cx.fillStyle="#6b7389"; cx.fillRect(sx-50,sy+26,5,44); cx.fillRect(sx+45,sy+26,5,44);
+  RE.drawSign(cx,sx,sy,104,{glow:.5+.3*Math.sin(now/180)});
+  var p=1+.1*Math.sin(now/140), r=it.r*p;
+  var gl=cx.createRadialGradient(it.x,it.y,3,it.x,it.y,r*2.3); gl.addColorStop(0,"rgba(255,214,70,.75)"); gl.addColorStop(1,"rgba(255,214,70,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(it.x,it.y,r*2.3,0,6.283); cx.fill();
+  var fg=cx.createLinearGradient(it.x-r,it.y-r,it.x+r,it.y+r); fg.addColorStop(0,"#fff7c2"); fg.addColorStop(.45,"#ffd23f"); fg.addColorStop(1,"#c88a0c");
+  cx.fillStyle=fg; cx.beginPath(); cx.arc(it.x,it.y,r,0,6.283); cx.fill(); cx.strokeStyle="#8a5a06"; cx.lineWidth=2; cx.stroke();
+  cx.fillStyle="#e3262f"; cx.beginPath(); cx.moveTo(it.x-r*.32,it.y-r*.45); cx.lineTo(it.x+r*.5,it.y); cx.lineTo(it.x-r*.32,it.y+r*.45); cx.closePath(); cx.fill();
+}
 function drawItem(it,now){
+  if(it.type==="egg") return drawEgg(it,now);
   if(it.type==="coin") return drawCoin(it,now);
   if(it.type==="food"){
     var im=SPR[it.f.k], bob=Math.sin(now/260+it.x)*3, w=it.f.w;
@@ -476,6 +493,7 @@ function frame(now){
   if(st.running&&!st.dying){
     st.t-=dt; st.speed=Math.min(7.5,3.2+(45000-st.t)/9000);
     st.spawnT-=dt; if(st.spawnT<=0){ spawn(); st.spawnT=Math.max(330,700-(45000-st.t)/90); }
+    if(window.ReviewEgg&&ReviewEgg.due(45000-st.t)){ var el=(Math.random()*LANES)|0; st.items.push({type:"egg",lane:el,x:LX(el),y:-40,r:20}); }
     st.boltT-=dt; if(st.boltT<=0){ st.bolts.push({lane:(Math.random()*LANES)|0,phase:"warn",age:0}); st.boltT=Math.max(1400,3200-(45000-st.t)/25); }
     var dxl=LX(st.lane)-st.x; st.x+=dxl*Math.min(1,0.2*k);
     st.rot+=(Math.max(-0.5,Math.min(0.5,dxl*0.012))-st.rot)*Math.min(1,0.32*k); // nose swings into the lane change
@@ -494,7 +512,8 @@ function frame(now){
     if(it.y>H+60){ st.items.splice(i,1); continue; }
     drawItem(it,now);
     if(st.running&&Math.abs(it.x-st.x)<it.r+18&&Math.abs(it.y-py)<it.r+28){
-      if(it.type==="coin"){ st.score+=10; st.coins++; pop(it.x,it.y,"+10","#FFD23F"); }
+      if(it.type==="egg"){ var eb=ReviewEgg.collect(); st.score+=eb; pop(it.x,it.y-20,"+"+eb+" 📺 "+T("Antidote's review"),"#FFD23F"); }
+      else if(it.type==="coin"){ st.score+=10; st.coins++; pop(it.x,it.y,"+10","#FFD23F"); }
       else if(it.type==="food"){ st.score+=it.f.p; pop(it.x,it.y,"+"+it.f.p+" "+T(it.f.n),"#FFD23F"); }
       else { hit(it.x,it.y,T(it.d.why)); if(st.dying) break; }
       st.items.splice(i,1);

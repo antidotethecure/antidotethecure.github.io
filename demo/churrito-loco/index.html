@@ -127,6 +127,8 @@ footer a{color:var(--ink)}
 </footer>
 </div>
 
+<script>window.REVIEW_EGG={vid:"jGsuQlDKTEs",restaurant:"Churrito Loco",short:"CHURRITO LOCO",bonus:300,img:"img/review/cover.webp",find:"A golden Antidote tile shows up once a run. Make a match right next to it"};</script>
+<script src="../reviewegg.js"></script>
 <script>
 "use strict";
 /* ================= CONFIG — the only block that changes per client ================= */
@@ -217,6 +219,7 @@ var CONFIG = {
   var COLS=7, ROWS=7, CS=70, W=COLS*CS, H=ROWS*CS;
   var KINDS=5;        // 0 elote · 1 chili cheese fries · 2 filled churros · 3 Abuelita choco · 4 watermelon paleta
   var WILD=5, HAZ=6;  // 5 Churrito Man (close him off: +150) · 6 Grilled Serrano (swipe it: -25, burns out alone)
+  var EGG=7;          // 7 golden Antidote tile (his review of Churrito Loco): match next to it for the review bonus
   var grid=[], state="idle", score=0, tLeft=CONFIG.game.seconds, sel=null, down=null;
   var flashT=0, matched=[], mBonus=0, mWilds=0, parts=[], timerAcc=0, last=0, chain=0;
 
@@ -340,7 +343,13 @@ var CONFIG = {
     cx.fillStyle="#F2D23C"; cx.beginPath(); cx.arc(11,-18,2.4,0,7); cx.fill();
     cx.restore();
   }
-  var DRAW=[drawElote,drawFries,drawChurros,drawChoco,drawSandia,drawChurritoMan,drawSerrano];
+  function drawAntidote(px,py){       // golden tile: the cover of Antidote's Churrito Loco review
+    var RE=window.ReviewEgg; if(!RE) return;
+    RE.drawSign(cx,px,py-5,52,{label:false,glow:.5+.4*Math.sin(performance.now()/170)});
+    cx.font="900 10px Archivo,system-ui,sans-serif"; cx.textAlign="center"; cx.textBaseline="middle";
+    cx.lineWidth=3; cx.strokeStyle="#2B1A0E"; cx.strokeText("ANTIDOTE",px,py+23); cx.fillStyle="#FFD23F"; cx.fillText("ANTIDOTE",px,py+23); cx.textBaseline="alphabetic";
+  }
+  var DRAW=[drawElote,drawFries,drawChurros,drawChoco,drawSandia,drawChurritoMan,drawSerrano,drawAntidote];
 
   function drawTile(c,r,t,blink){
     var px=c*CS+CS/2, py=r*CS+CS/2-(t.off||0), top=r*CS+4-(t.off||0);
@@ -348,6 +357,7 @@ var CONFIG = {
     cx.fillStyle = blink ? "rgba(245,122,26,.4)"
       : t.k===WILD ? "rgba(245,122,26,.14)"
       : t.k===HAZ ? "rgba(230,72,61,.16)"
+      : t.k===EGG ? "rgba(255,200,46,.55)"
       : "rgba(43,26,14,.05)";
     cx.fill();
     if(sel && sel.c===c && sel.r===r){ cx.strokeStyle="#F57A1A"; cx.lineWidth=3; cx.stroke(); }
@@ -387,9 +397,10 @@ var CONFIG = {
         else { if(k1<KINDS && run2.length>=3) mark(run2,run2.length);
                if(r2<ROWS){ k1=grid[r2][c2].k; run2=[r2+","+c2]; } }
       } }
-    var wilds=0;
+    var wilds=0, eggs=0;
     if(Object.keys(hit).length){     // close off the Churrito Man: any wild touching a match clears too
       for(var r3=0;r3<ROWS;r3++) for(var c3=0;c3<COLS;c3++){
+        if(grid[r3][c3].k===EGG && (hit[(r3-1)+","+c3]||hit[(r3+1)+","+c3]||hit[r3+","+(c3-1)]||hit[r3+","+(c3+1)])){ hit[r3+","+c3]=1; eggs++; continue; }
         if(grid[r3][c3].k===WILD){
           if(hit[(r3-1)+","+c3]||hit[(r3+1)+","+c3]||hit[r3+","+(c3-1)]||hit[r3+","+(c3+1)]){
             hit[r3+","+c3]=1; wilds++;
@@ -398,16 +409,17 @@ var CONFIG = {
       }
     }
     var list=Object.keys(hit).map(function(s){ var p=s.split(","); return {r:+p[0], c:+p[1]}; });
-    return {list:list, bonus:bonus, wilds:wilds};
+    return {list:list, bonus:bonus, wilds:wilds, eggs:eggs};
   }
   function spawnParts(c,r,k){
     var px=c*CS+CS/2, py=r*CS+CS/2, cols;
-    if(k===2||k===WILD) cols=["#D99A3C","#9C6420","#F3D9A4","#E85C8A"];      // churro cinnamon + filling
+    if(k===EGG) cols=["#FFD23F","#FFF3B0","#E3262F","#0B2A6B"];               // gold confetti for Antidote's tile
+    else if(k===2||k===WILD) cols=["#D99A3C","#9C6420","#F3D9A4","#E85C8A"];      // churro cinnamon + filling
     else if(k===1) cols=["#F7A623","#6E2518","#F2D23C"];                      // chili + cheese
     else if(k===0) cols=["#FBF6EA","#F2C83C","#C0392B"];                      // mayo + corn + chile
     else if(k===3) cols=["#5C3420","#FFF6E8","#8A5A2E"];                      // choco + cream
     else cols=["#E8485C","#8A1E12","#E8923C"];                                // sandía + chamoy
-    var n = k===WILD ? 14 : 7;
+    var n = k===WILD||k===EGG ? 14 : 7;
     for(var i=0;i<n;i++){
       parts.push({x:px+(Math.random()*40-20), y:py+(Math.random()*20-10),
         vy:0.4+Math.random()*1.4, vx:(Math.random()-0.5)*0.8,
@@ -418,8 +430,10 @@ var CONFIG = {
   function startClear(m){
     matched=m.list; mBonus=m.bonus; mWilds=m.wilds; state="clear"; flashT=0; chain++;
     var pts = m.list.length*10 + m.bonus + m.wilds*150 + (chain-1)*15;
+    if(m.eggs>0 && window.ReviewEgg) pts+=ReviewEgg.collect();
     score+=pts; $("score").textContent=score;
-    if(m.wilds>0) $("gmsg").innerHTML="⭐ <b>You closed off the Churrito Man! +150</b>";
+    if(m.eggs>0 && window.ReviewEgg) $("gmsg").innerHTML="📺 <b>You matched Antidote's tile! +"+ReviewEgg.bonus+"</b> He reviewed Churrito Loco. Link after your run.";
+    else if(m.wilds>0) $("gmsg").innerHTML="⭐ <b>You closed off the Churrito Man! +150</b>";
     else if(m.bonus>=100) $("gmsg").innerHTML="🔥 <b>5-IN-A-ROW! +100 bonus</b>";
     else if(m.bonus>=40) $("gmsg").innerHTML="<b>4-in-a-row! +40 bonus</b>";
   }
@@ -458,7 +472,7 @@ var CONFIG = {
     if(m.list.length){ sel=null; chain=0; startClear(m); }
     else { t=grid[a.r][a.c].k; grid[a.r][a.c].k=grid[b.r][b.c].k; grid[b.r][b.c].k=t; sel=null; }
   }
-  window.__CL={get:function(){return {grid:grid,state:state,score:score};},trySwap:function(a,b){trySwap(a,b);},start:function(){start();},COLS:COLS,ROWS:ROWS,HAZ:HAZ,
+  window.__CL={get:function(){return {grid:grid,state:state,score:score};},trySwap:function(a,b){trySwap(a,b);},start:function(){start();},end:function(){ if(state!=="idle"&&state!=="over") end(); },COLS:COLS,ROWS:ROWS,HAZ:HAZ,
     icon:function(k){ var o=cx, c=document.createElement("canvas"); c.width=c.height=CS*2; cx=c.getContext("2d"); cx.scale(2,2); try{ DRAW[k](CS/2,CS/2+2); }finally{ cx=o; } return c.toDataURL(); }}; // start-menu art: the real tile drawings
   function draw(){
     cx.clearRect(0,0,W,H);
@@ -488,6 +502,10 @@ var CONFIG = {
         }
       }
     }
+    if(state==="play" && window.ReviewEgg && ReviewEgg.due((CONFIG.game.seconds-tLeft)*1000+timerAcc)){   // the golden Antidote tile replaces a regular snack
+      var cand=[]; for(var r1=0;r1<ROWS;r1++) for(var c1=0;c1<COLS;c1++) if(grid[r1][c1].k<KINDS) cand.push([r1,c1]);
+      if(cand.length){ var pc=cand[(Math.random()*cand.length)|0]; grid[pc[0]][pc[1]].k=EGG; spawnParts(pc[1],pc[0],EGG); $("gmsg").innerHTML="✨ <b>A golden Antidote tile!</b> Make a match right next to it for +"+ReviewEgg.bonus+"."; }
+    }
     if(state==="clear"){ flashT+=dt; if(flashT>260) doClear(); }
     if(state==="fall"){
       for(var r=0;r<ROWS;r++) for(var c=0;c<COLS;c++){ var t=grid[r][c]; if(t.off>0) t.off=Math.max(0, t.off - 0.55*dt); }
@@ -508,6 +526,7 @@ var CONFIG = {
     fill(); score=0; chain=0; tLeft=CONFIG.game.seconds; parts=[]; sel=null; timerAcc=0; last=performance.now();
     $("score").textContent=0; $("timer").textContent=tLeft; $("final").hidden=true;
     $("gmsg").innerHTML="Match 3+ · 4-row <b>+40</b> · 5-row <b>+100</b> · close off the Churrito Man <b>+150</b> · don't touch the Serrano 🌶️ <b>(-25)</b>";
+    if(window.ReviewEgg){ ReviewEgg.reset(20,40); var rc=cv.parentNode.querySelector(".re-card"); if(rc) rc.remove(); }   // Antidote's golden tile: once a run, 20-40 s in
     state="play"; requestAnimationFrame(loop);
   }
   function end(){
@@ -519,6 +538,7 @@ var CONFIG = {
       ? "<b>You made the board!</b> "+CONFIG.game.prizeText+" Tap to run it back."
       : "<b>"+CONFIG.game.prizeAt+" makes the board.</b> Tap to run it back.";
     saveBest(score); renderBoard();
+    if(window.ReviewEgg) ReviewEgg.endCard(cv.parentNode,null);
   }
   function cellAt(e){
     var rct=cv.getBoundingClientRect();

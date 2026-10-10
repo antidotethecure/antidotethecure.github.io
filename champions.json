@@ -1,0 +1,67 @@
+{
+  "updated": "2026-10-09T21:21:08-07:00",
+  "week": "2026-09-28",
+  "closes": "Sunday 11:00 PM (Los Angeles)",
+  "games": {
+    "melody": {
+      "game": "melody",
+      "gameName": "Melody Flight",
+      "restaurant": "Melody Bar & Grill",
+      "slug": "melody-lax",
+      "week": "2026-09-28",
+      "top3": [],
+      "prize": {
+        "first": "Half off your meal",
+        "second_third": "Free signature item"
+      }
+    },
+    "storm-burger": {
+      "game": "storm-burger",
+      "gameName": "Storm Run",
+      "restaurant": "StormBurger",
+      "slug": "storm-burger",
+      "week": "2026-09-28",
+      "top3": [],
+      "prize": {
+        "first": "Half off your meal",
+        "second_third": "Free signature item"
+      }
+    },
+    "gritz-n-wafflez": {
+      "game": "gritz-n-wafflez",
+      "gameName": "Order Up!",
+      "restaurant": "Gritz N Wafflez",
+      "slug": "gritz-n-wafflez",
+      "week": "2026-09-28",
+      "top3": [],
+      "prize": {
+        "first": "Half off your meal",
+        "second_third": "Free signature item"
+      }
+    },
+    "churrito-loco": {
+      "game": "churrito-loco",
+      "gameName": "Loco Match",
+      "restaurant": "Churrito Loco",
+      "slug": "churrito-loco",
+      "week": "2026-09-28",
+      "top3": [],
+      "prize": {
+        "first": "Half off your meal",
+        "second_third": "Free signature item"
+      }
+    },
+    "lucky-dragon": {
+      "game": "lucky-dragon",
+      "gameName": "Hibachi Catch",
+      "restaurant": "Lucky Dragon Hibachi",
+      "slug": "lucky-dragon",
+      "week": "2026-09-28",
+      "top3": [],
+      "prize": {
+        "first": "Half off your meal",
+        "second_third": "Free signature item"
+      }
+    }
+  }
+}

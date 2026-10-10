@@ -1,0 +1,154 @@
+{
+ "slug": "churrito-loco",
+ "name": "Churrito Loco",
+ "short": "Churrito Loco",
+ "owner": "there",
+ "brand": {
+  "fonts": "https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@500;700&display=swap",
+  "display": "\"Archivo\",system-ui,sans-serif",
+  "body": "\"Archivo\",system-ui,-apple-system,sans-serif",
+  "h1w": "900",
+  "h2w": "900",
+  "bg": "#FFF8F0",
+  "card": "#FFFFFF",
+  "edge": "#F0DFC8",
+  "ink": "#2B1A0E",
+  "dim": "#92755C",
+  "accent": "#F57A1A",
+  "accentInk": "#ffffff",
+  "chip": "#FFF2E0",
+  "tgOff": "#e3cfb2",
+  "ok": "#1F8A43",
+  "h1": "#2B1A0E",
+  "h2": "#1F8A43",
+  "noteBg": "#FFE6C7",
+  "noteEdge": "#F57A1A",
+  "noteInk": "#5a2e08",
+  "barBg": "rgba(255,248,240,.94)",
+  "extraCss": "h2{font-family:\"IBM Plex Mono\",monospace;font-size:14px;letter-spacing:.14em;text-transform:uppercase}.crest{font-size:52px;line-height:1}.cl{font:900 34px/1 Archivo,system-ui,sans-serif;color:#F57A1A;letter-spacing:-.01em;margin-top:4px}.cl small{display:block;font:700 11px 'IBM Plex Mono',monospace;letter-spacing:.18em;color:#1F8A43;margin-top:6px}"
+ },
+ "logo": {
+  "html": "<div class=\"crest\" aria-hidden=\"true\">🌶️</div><div class=\"cl\" role=\"img\" aria-label=\"Churrito Loco\">CHURRITO LOCO<small>SOUTH GATE · CHURROS LOCOS &amp; STREET SNACKS</small></div>"
+ },
+ "alcohol": false,
+ "avgCheck": 14,
+ "giveawayDefault": "$100",
+ "drawDays": [
+  "Sunday night",
+  "Monday",
+  "Friday after school"
+ ],
+ "rewards": {
+  "welcome": [
+   "Free churro",
+   "Free Jamaica Agua Fresca",
+   "$2 off",
+   "10% off the order"
+  ],
+  "points": [
+   200,
+   400,
+   700,
+   1100
+  ],
+  "t1": [
+   "Free churro",
+   "Free Jamaica Agua Fresca",
+   "$2 off"
+  ],
+  "t2": [
+   "Free Abuelita Chocolate Horchata Iced Coffee",
+   "Free Original Corn",
+   "$4 off"
+  ],
+  "t3": [
+   "Free Churro Ice Cream Cone",
+   "Free Original Elote Fries",
+   "$7 off"
+  ],
+  "t4": [
+   "Churros for the table (Churro Bites, 10pc)",
+   "Free XL Chili Cheese Fries",
+   "$12 off"
+  ],
+  "stars": [
+   "Free Churro Ice Cream Cone",
+   "Free Filled Churros (2pc)",
+   "$7 off"
+  ],
+  "referIn": [
+   "Free churro",
+   "+100 bonus points when their friend visits",
+   "$2 off",
+   "Nothing"
+  ],
+  "referFriend": [
+   "Free churro",
+   "+50 bonus points when they join",
+   "$2 off",
+   "Nothing"
+  ],
+  "bday": [
+   "Free Churro Ice Cream Cone",
+   "Free Filled Churros (2pc)",
+   "Free Churro Bites (10pc)",
+   "20% off the order"
+  ],
+  "missed": [
+   "10% off",
+   "Free churro",
+   "Free Jamaica Agua Fresca"
+  ],
+  "winback": [
+   "Free churro",
+   "10% off",
+   "$2 off",
+   "Don't send"
+  ],
+  "playwin": [
+   "Free churro",
+   "15% off",
+   "$2 off"
+  ]
+ },
+ "game": {
+  "name": "Loco Match",
+  "prizes": [
+   [
+    4150,
+    [
+     "15% off next order",
+     "Free churro",
+     "Free Original Corn"
+    ]
+   ]
+  ],
+  "champ": [
+   "50% off next order",
+   "Free Churro Bites (10pc)",
+   "Free XL Chili Cheese Fries"
+  ],
+  "second": [
+   "20% off next order",
+   "Free Filled Churros (2pc)",
+   "Free Jamaica Agua Fresca"
+  ]
+ },
+ "specials": [
+  [
+   "s_hours",
+   "Hours: Mon–Thu 12–10 PM, Fri–Sat 12–11 PM, Sun 12–10 PM"
+  ]
+ ],
+ "specialsTitle": "From your Yelp page: still right?",
+ "drinksTitle": "Drinks in the app",
+ "menu": {
+  "type": "js",
+  "file": "demo/churrito-loco/index.html",
+  "var": "CONFIG",
+  "key": "menu",
+  "drinkSections": [
+   "Drinks"
+  ]
+ }
+}

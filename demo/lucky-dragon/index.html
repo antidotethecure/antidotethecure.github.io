@@ -217,6 +217,8 @@ footer a{color:var(--ink)}
 </footer>
 </div>
 
+<script>window.REVIEW_EGG={vid:"ZBqEoDMO_jU",restaurant:"Lucky Dragon Hibachi",short:"LUCKY DRAGON",kind:"clip",bonus:300,img:"img/review/cover.webp",find:"A paper lantern drifts down once a run. Catch it on your tray"};</script>
+<script src="../reviewegg.js"></script>
 <script>
 "use strict";
 /* ================= CONFIG — the only block that changes per client ================= */
@@ -489,7 +491,20 @@ var CONFIG = {
     cx.restore();
     // (smoke rises as a particle system — see smokeStep/smokeDraw)
   }
+  function drawLantern(d){                             // Antidote's clip: a paper lantern floats the cover down
+    var RE=window.ReviewEgg; if(!RE) return; var sw=Math.sin(d.y/38)*0.12;
+    cx.save(); cx.translate(d.x,d.y); cx.rotate(sw);
+    cx.strokeStyle="rgba(255,200,46,.8)"; cx.lineWidth=1.5; cx.beginPath(); cx.moveTo(-30,-44); cx.lineTo(0,-62); cx.lineTo(30,-44); cx.stroke();
+    var g=cx.createRadialGradient(0,-74,3,0,-74,26); g.addColorStop(0,"#ffcf5a"); g.addColorStop(.5,"#e6483d"); g.addColorStop(1,"#8f1d14");
+    cx.fillStyle="rgba(255,190,60,.25)"; cx.beginPath(); cx.arc(0,-74,34,0,6.283); cx.fill();
+    cx.fillStyle=g; cx.beginPath(); cx.ellipse(0,-74,19,16,0,0,6.283); cx.fill();
+    cx.strokeStyle="rgba(120,20,10,.6)"; cx.lineWidth=1; for(var k=-12;k<=12;k+=6){ cx.beginPath(); cx.ellipse(0,-74,Math.abs(k)+.5,16,0,0,6.283); cx.stroke(); }
+    cx.fillStyle="#FFC82E"; cx.fillRect(-8,-92,16,4); cx.fillRect(-8,-60,16,4); cx.fillRect(-1,-56,2,6);
+    RE.drawSign(cx,0,-10,84,{glow:.6+.3*Math.sin(performance.now()/160)});
+    cx.restore();
+  }
   function drawDrop(d){
+    if(d.v==="egg") return drawLantern(d);
     var t=d.e&&d.e.t;
     if(t==="chicken"){ if(!sprite("chicken",d.x,d.y,48)) drawChicken(d.x,d.y); }
     else if(t==="steak"){ if(!sprite("steak",d.x,d.y,48)) drawSteak(d.x,d.y); }
@@ -604,6 +619,7 @@ var CONFIG = {
     bowlVX*=Math.pow(0.9,dt/16);                      // decay swipe velocity when the finger stops
     spawnAcc+=dt; timerAcc+=dt;
     if(spawnAcc>420){ spawn(); spawnAcc=0; }
+    if(window.ReviewEgg&&ReviewEgg.due((CONFIG.game.seconds-tLeft)*1000+timerAcc)) drops.push({x:70+Math.random()*(W-140), y:-50, s:1.6, e:{t:"egg"}, v:"egg"});
     if(timerAcc>1000){ tLeft--; timerAcc=0; $("timer").textContent=tLeft; if(tLeft<=0){ end(); return; } }
     cx.clearRect(0,0,W,H);
     for(var i=drops.length-1;i>=0;i--){
@@ -612,6 +628,7 @@ var CONFIG = {
       if(d.y>H-70 && d.y<H-26 && Math.abs(d.x-bowlX)<48){
         if(d.v==="bad"){ score=Math.max(0,score-20); combo=0; flash="#E6483D"; }
         else if(d.v==="star"){ score+=50; combo++; flash="#FFC82E"; }
+        else if(d.v==="egg"){ score+=ReviewEgg.collect(); combo++; flash="#FFC82E"; $("gmsg").innerHTML="📺 <b>You caught Antidote's lantern! +"+ReviewEgg.bonus+"</b> Antidote The Foodie ate here. Link after your run."; }
         else { score+=10+Math.min(combo,5)*2; combo++; flash=null;
           landed.push({t:d.e.t, dx:(Math.random()*74-37), dy:(Math.random()*14-7), born:performance.now()}); // it lands on the tray
           if(landed.length>5) landed.shift(); }
@@ -631,6 +648,7 @@ var CONFIG = {
     $("score").textContent=0; $("timer").textContent=tLeft; $("final").hidden=true;
     drg={x:W/2, dir:1, mode:"patrol", t:0, y:44, burned:false}; burns=0;
     $("gmsg").innerHTML="Catch the hibachi — dodge 🔥 🍭 🧊 (<b>-20</b>). <b>3 dragon hits burns the rice</b> and the run is over!";
+    if(window.ReviewEgg){ ReviewEgg.reset(12,20); var rc=cv.parentNode.querySelector(".re-card"); if(rc) rc.remove(); }   // Antidote's lantern: once a run, 12-20 s in
     requestAnimationFrame(step);
   }
   function end(burnt){
@@ -649,8 +667,9 @@ var CONFIG = {
         ? "<b>You made the board!</b> "+CONFIG.game.prizeText+" Tap to run it back."
         : "<b>"+CONFIG.game.prizeAt+" makes the board.</b> Tap to run it back.");
     saveBest(score); renderBoard();
+    if(window.ReviewEgg) ReviewEgg.endCard(cv.parentNode,null);
   }
-  window.__LD={get:function(){return {running:running,score:score,drops:drops,bowlX:bowlX,W:W,H:H};},set:function(x){bowlX=Math.max(30,Math.min(W-30,x));},start:function(){start();}};
+  window.__LD={get:function(){return {running:running,score:score,drops:drops,bowlX:bowlX,W:W,H:H};},set:function(x){bowlX=Math.max(30,Math.min(W-30,x));},start:function(){start();},end:function(){ if(running) end(); }};
   function pointer(e){
     var r=cv.getBoundingClientRect();
     var x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;

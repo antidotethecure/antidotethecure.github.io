@@ -248,6 +248,8 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <div id="obar"><button type="button" id="obtn"><span><span class="n" id="ocount">0</span> &nbsp;<span id="oseat">Review order</span></span><span id="ototal">$0.00</span></button></div>
 <div id="sheet" role="dialog" aria-modal="true" aria-label="Your order"><div class="in" id="sheetin"></div></div>
 
+<script>window.REVIEW_EGG={vid:"AhJGIPsywm0",restaurant:"Melody Bar & Grill",short:"MELODY",bonus:500,img:"img/review/cover.webp",find:"A blimp tows Antidote's billboard across the sky once a flight. Fly through it or shoot it"};</script>
+<script src="../reviewegg.js"></script>
 <script>window.MELODY_CLIPS={"bacon-mac":"img/clips/bacon-mac.mp4","burger-mac":"img/clips/burger-mac.mp4","espresso-martini":"img/clips/espresso-martini.mp4","house-mac":"img/clips/house-mac.mp4","lobster-mac":"img/clips/lobster-mac.mp4","mango-marg":"img/clips/mango-marg.mp4","margarita":"img/clips/margarita.mp4","moscow-mule":"img/clips/moscow-mule.mp4","nachos":"img/clips/nachos.mp4","old-fashioned":"img/clips/old-fashioned.mp4","paloma":"img/clips/paloma.mp4","philly-fries":"img/clips/philly-fries.mp4","ribs":"img/clips/ribs.mp4","wings":"img/clips/wings.mp4"};</script>
 <script>
 window.CONFIG={name:"Melody Bar & Grill",address:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"};
@@ -492,6 +494,7 @@ function hud(){ $("score").textContent=G.score.toLocaleString(); $("time").textC
 function best(){ try{ return +localStorage.getItem("melody-best")||0; }catch(e){ return 0; } }
 var RUN=0;
 function start(){ var keep=G.clouds, posted=G.posted; G=fresh(); G.clouds=keep; G.posted=posted; G.runId=++RUN; G.running=true; G.last=performance.now(); seedGround(); $("over").classList.remove("on");
+  if(window.ReviewEgg) ReviewEgg.reset(24,40);   // Antidote's review blimp: once a flight, 24-40 s after the takeoff roll
   if(DBG.lvl||DBG.wpn!=null||DBG.boss||DBG.god) applyDbg(); hud(); }
 // testing hooks (?lvl=1-5, ?wpn=0-4, ?boss=1, ?god=1 or window.MELODY_DEBUG). Any of them marks the flight as practice: no prizes, no board.
 function applyDbg(){ G.debug=1; if(DBG.god) G.god=1; var lv=Math.max(1,Math.min(5,DBG.lvl||1)); if(lv>1){ G.lvl=lv; G.el=6000; G.alt=1; levelTimers(); G.crateT=CRATE_AT[lv-1]; }
@@ -678,6 +681,19 @@ function drawCoin(it,now){ it.spin+=.11; var c=Math.cos(it.spin), sx=Math.max(1.
   cx.fillStyle="#8a5a06"; cx.beginPath(); cx.ellipse(1.5,0,sx,r,0,0,6.283); cx.fill(); cx.fillStyle=fg; cx.beginPath(); cx.ellipse(0,0,sx,r,0,0,6.283); cx.fill();
   if(sx>6){ cx.fillStyle="#9b6a06"; cx.font="900 "+(r*1.1|0)+"px 'Playfair Display',Georgia,serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.save(); cx.scale(sx/r,1); cx.fillText("M",0,1); cx.restore(); }
   cx.restore(); }
+function drawEggBlimp(it,now){ // Antidote's review: a little blimp towing a billboard with the cover
+  var RE=window.ReviewEgg; if(!RE) return; var x=it.x, y=it.y, by=y-62, sw=Math.sin(now/600)*.05;
+  cx.save(); cx.translate(x,by); cx.rotate(sw);
+  cx.fillStyle="rgba(0,0,0,.25)"; cx.beginPath(); cx.ellipse(26,40,44,13,0,0,6.283); cx.fill();                                 // shadow
+  var bg=cx.createLinearGradient(0,-17,0,17); bg.addColorStop(0,"#5b8cff"); bg.addColorStop(.5,"#1f4fd1"); bg.addColorStop(1,"#0b2a6b");
+  cx.fillStyle=bg; cx.beginPath(); cx.ellipse(0,0,46,17,0,0,6.283); cx.fill();
+  cx.fillStyle="#e3262f"; cx.beginPath(); cx.moveTo(-40,-4); cx.lineTo(-56,-14); cx.lineTo(-52,0); cx.lineTo(-56,14); cx.lineTo(-40,4); cx.closePath(); cx.fill();   // fins
+  cx.fillStyle="#ffd23f"; cx.fillRect(-9,14,18,6);                                                                               // gondola
+  cx.font="900 11px Anton,Impact,sans-serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillStyle="#ffd23f"; cx.fillText("ANTIDOTE",2,0.5);
+  cx.restore();
+  cx.strokeStyle="rgba(240,211,117,.75)"; cx.lineWidth=1.2; cx.beginPath(); cx.moveTo(x-6,by+18); cx.lineTo(x-50,y-30); cx.moveTo(x+6,by+18); cx.lineTo(x+50,y-30); cx.stroke();
+  RE.drawSign(cx,x,y,104,{glow:.55+.3*Math.sin(now/170)});
+}
 function drawHeal(it,now){ var p=1+.08*Math.sin(now/150); cx.save(); cx.translate(it.x,it.y); cx.scale(p,p);
   var g=cx.createRadialGradient(0,0,4,0,0,34); g.addColorStop(0,"rgba(80,255,150,.55)"); g.addColorStop(1,"rgba(80,255,150,0)"); cx.fillStyle=g; cx.beginPath(); cx.arc(0,0,34,0,6.283); cx.fill();
   cx.fillStyle="#f4f7f5"; roundRect(-17,-15,34,30,7); cx.fill(); cx.strokeStyle="#2fae6a"; cx.lineWidth=2; cx.stroke();
@@ -948,6 +964,7 @@ function frame(now){
     G.boltT-=dt; if(G.boltT<=0){ spawnBolt(); G.boltT=Math.max(3800,7000-G.lel/25)*pc; }
     G.kamiT-=dt; if(G.kamiT<=0){ spawnKami(); G.kamiT=(14000+Math.random()*6000)*pc; }
     G.copT-=dt; if(G.copT<=0){ spawnCop(); if(G.lvl>=4) setTimeout(spawnCop,1600); G.copT=(18000+Math.random()*8000)*pc; }
+    if(window.ReviewEgg&&!G.home&&ReviewEgg.due(G.el)) { var ex0=G.x<W/2?W*.62+Math.random()*W*.2:W*.18+Math.random()*W*.2; G.items.push({t:"egg",x:ex0,y:-70,r:40,ph:0,x0:ex0,hp:14}); }
     G.crateT-=dt; if(G.crateT<=0&&G.crates<2&&!G.gotCrate){ G.crates++; G.crateT=1e9; G.items.push({t:"crate",x:60+Math.random()*(W-120),y:-60,r:26,sw:Math.random()*6}); }
     } }
     if(takeoff||landing){ G.tx=W/2; G.ty=landing?H*0.64:H-110; }
@@ -963,14 +980,18 @@ function frame(now){
       if(bo.age>1000){ bo.ph="strike"; bo.age=0; bo.pts=boltPath(bo.x); G.flash=.5; G.shake=8; if(run&&Math.abs(G.x-bo.x)<46) hurt(G.x,G.y,T("⚡ LIGHTNING!")); } }
     else { if(bo.age>260){ G.bolts.splice(b,1); continue; } var p=bo.pts; cx.save(); cx.strokeStyle="rgba(150,210,255,.45)"; cx.lineWidth=14; cx.beginPath(); p.forEach(function(q,i){ i?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1]); }); cx.stroke(); cx.strokeStyle="#fff"; cx.lineWidth=4; cx.shadowColor="#9fd8ff"; cx.shadowBlur=22; cx.stroke(); cx.restore(); } }
   // pickups
-  for(var i=G.items.length-1;i>=0;i--){ var it=G.items[i]; if(run){ it.y+=spd*(it.t==="crate"?.8:1.15)*k; if(it.rot!=null) it.rot+=(it.vr||0)*k; }
-    if(it.y>H+60){ if(it.t==="crate"&&!G.gotCrate) G.crateT=9000; G.items.splice(i,1); continue; }
+  for(var i=G.items.length-1;i>=0;i--){ var it=G.items[i]; if(run){ it.y+=spd*(it.t==="crate"?.8:it.t==="egg"?.6:1.15)*k; if(it.rot!=null) it.rot+=(it.vr||0)*k; if(it.t==="egg"){ it.ph+=.012*k; it.x=it.x0+Math.sin(it.ph)*Math.min(it.x0-55,W-55-it.x0); } }
+    if(it.y>H+(it.t==="egg"?130:60)){ if(it.t==="crate"&&!G.gotCrate) G.crateT=9000; G.items.splice(i,1); continue; }
     if(it.t==="crate") drawCrate(it,now);
+    else if(it.t==="egg"){ drawEggBlimp(it,now);
+      if(run&&it.y>90){ var shotIt=0; for(var si=G.shots.length-1;si>=0;si--){ var shh=G.shots[si]; if(Math.abs(shh.x-it.x)<56&&Math.abs(shh.y-it.y)<38){ G.shots.splice(si,1); if(--it.hp<=0) shotIt=1; else G.fx.push({k:"r",x:shh.x,y:shh.y,s:4,g:1.2,a:.8,vx:0,vy:0}); break; } }   // shoot the billboard (14 hits)
+        if(shotIt){ var eb0=ReviewEgg.collect(); G.score+=eb0; pop(it.x,it.y-10,"+"+eb0+" 📺 "+T("Antidote's review"),"#ffd23f"); SND.play("upgrade"); boom(it.x,it.y,10); G.items.splice(i,1); continue; } } }
     else if(it.t==="coin") drawCoin(it,now);
     else if(it.t==="heal") drawHeal(it,now);
     else { var P=it.t==="mic"?MIC:it.p, bob=Math.sin(now/260+it.x)*3; var gl=cx.createRadialGradient(it.x,it.y,4,it.x,it.y,P.w*.8); gl.addColorStop(0,it.t==="mic"?"rgba(228,107,131,.55)":"rgba(240,211,117,.45)"); gl.addColorStop(1,"rgba(0,0,0,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(it.x,it.y,P.w*.8,0,6.283); cx.fill(); sprite(P.im,it.x,it.y+bob,P.w,it.rot,false,P.e); }
     if(run&&Math.abs(it.x-G.x)<it.r+26&&Math.abs(it.y-G.y)<it.r+28){
-      if(it.t==="crate"){ G.gotCrate=1; SND.play("crate"); if(G.wpn<4) upgrade(); else { G.score+=750*G.mult; pop(it.x,it.y,"+"+750*G.mult+" "+T("Max power!"),"#ffd23f"); } }
+      if(it.t==="egg"){ var eb=ReviewEgg.collect(); G.score+=eb; pop(it.x,it.y-10,"+"+eb+" 📺 "+T("Antidote's review"),"#ffd23f"); SND.play("upgrade"); buzz([20,40,20]); }
+      else if(it.t==="crate"){ G.gotCrate=1; SND.play("crate"); if(G.wpn<4) upgrade(); else { G.score+=750*G.mult; pop(it.x,it.y,"+"+750*G.mult+" "+T("Max power!"),"#ffd23f"); } }
       else if(it.t==="coin"){ SND.play("pickup"); G.score+=10*G.mult; pop(it.x,it.y,"+"+10*G.mult,"#f0d375"); }
       else if(it.t==="heal"){ SND.play("crate"); var before=G.hp; G.hp=Math.min(100,G.hp+25); pop(it.x,it.y,"+"+Math.round(G.hp-before)+"% health","#7dffb5"); buzz(30); }
       else if(it.t==="mic"){ G.mult=2; G.multT=6000; pop(it.x,it.y,T("🎤 Karaoke! 2× points"),"#ff9db0"); buzz([20,30,20]); }
@@ -1089,6 +1110,7 @@ function end(){
     if(r.saved||!window.SSAI_GATE) showWin();
     else { won.innerHTML=(r.blocked?"🏆 You'd win "+esc(prize)+" — but you already have <b>"+esc(r.prize.t)+"</b> waiting.":"🏆 You won "+esc(prize)+"!")+"<br><span style=\"font-weight:600;font-size:13px;color:#c9d2ee\">Save it to your Melody Rewards to get your code.</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display="block";
       $("wsave").onclick=function(){ window.SSAI_GATE("prize",showWin); }; } }
+  if(window.ReviewEgg) ReviewEgg.endCard($("over"),$("post"));
   $("over").classList.add("on");
 }
 /* ---- weekly leaderboard (shared with the bowling site's score service, its own board) ---- */
@@ -1126,7 +1148,7 @@ function postScore(){
       if(!r.blocked) setTimeout(function(){ alertBox("👑 You were last week's #1! Half off your meal — code "+r.prize.c+", good for 3 days."); },1500); } }).catch(function(){}); })();
 function alertBox(t){ var d=document.createElement("div"); d.className="ok"; d.style.cssText="position:fixed;left:12px;right:12px;top:12px;z-index:80;max-width:520px;margin:0 auto;background:#0b1220;box-shadow:0 10px 40px #000a"; d.innerHTML='<b>'+esc(t)+'</b>'; document.body.appendChild(d); setTimeout(function(){ d.remove(); },7000); }
 
-window.__MG={get:function(){return G;},start:function(){start();},W:W,H:H};
+window.__MG={get:function(){return G;},start:function(){start();},end:function(){ if(G.running) end(); },W:W,H:H};
 window.MELODY_START=function(){ SND.unlock(); if(!G.running) start(); try{ cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); }catch(e){} };   // the shared start menu's PLAY
 window.MELODY_PRIZE=PRIZE;
 requestAnimationFrame(frame);

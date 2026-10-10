@@ -50,7 +50,8 @@
     ".nv-how{font-size:12.5px;opacity:.9;max-width:320px}.nv-win{margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(61,220,151,.16);border:1px solid #3ddc97;font-weight:800}" +
     ".nv-board{width:100%;max-width:330px;margin-top:8px;font-size:13px;text-align:left}.nv-board ol{margin:6px 0;padding-left:22px;max-height:118px;overflow:auto}.nv-board input{width:100%;margin:4px 0;padding:9px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.25);color:#fff;font:600 14px system-ui}" +
     ".nv-toast{position:absolute;left:12px;right:12px;bottom:26px;display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:14px;background:rgba(6,24,46,.82);color:#fff;font:800 14px system-ui;transform:translateY(140%);opacity:0;visibility:hidden;transition:transform .35s,opacity .35s,visibility .35s;pointer-events:none}" +
-    ".nv-toast.on{transform:none;opacity:1;visibility:visible}.nv-toast img{width:54px;height:54px;object-fit:contain;flex:none}";
+    ".nv-toast.on{transform:none;opacity:1;visibility:visible}.nv-toast img{width:54px;height:54px;object-fit:contain;flex:none}" +
+    "#nv-end{justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}#nv-end>:first-child{margin-top:auto}#nv-end>.nv-board{margin-bottom:auto}";
   document.head.appendChild(css);
   mount.innerHTML =
     '<div class="nv-wrap gamebox" data-game>' +
@@ -64,7 +65,7 @@
     '<div class="nv-pick"><button type="button" data-s="f"><img src="img/game/surfer_f.webp" alt="" onerror="this.outerHTML=\'<div class=ph style=font-size:64px;line-height:96px>🏄‍♀️</div>\'">She rides</button>' +
     '<button type="button" data-s="m"><img src="img/game/surfer_m.webp" alt="" onerror="this.outerHTML=\'<div class=ph style=font-size:64px;line-height:96px>🏄‍♂️</div>\'">He rides</button></div>' +
     '<p class="nv-how">Drag to steer · <b>Catch a wave, then tap to jump</b> over the pier (hit the pier without a wave: −1 ❤️, −200) · 5 hearts · Grab food rafts, boat hand-offs and helicopter drops · 4 in a row = ×2, 8 = ×3, and it keeps going · Dodge sharks, eels &amp; jellyfish · Shoot the pier for a bonus · <b>5 levels</b> · Catch 🔱 harpoons and fire them at sharks · Lure the boss sharks into the rocks · Tap the banner plane 👀</p><p class="nv-how" id="nv-best"></p></div>' +
-    '<div class="nv-ov" id="nv-end" style="display:none"></div>' +
+    '<div class="nv-ov" id="nv-end" data-scroll-ok style="display:none"></div>' +
     "</div>";
   var wrap = mount.firstChild, gl_c = document.getElementById("nv-water"), cv = document.getElementById("cv"), cx = cv.getContext("2d");
   var $ = function (id) { return document.getElementById(id); };
@@ -233,6 +234,7 @@
     G.pierSide = G.x < PIER_X ? -1 : 1; G.staffToss = 2.2; G.jump = 0; G.jumpDur = 0; G.jcd = 0; G.hint = 6; G.wave = 0;
     G.level = DBG_LVL; G.lvT = DBG_BOSS && LV[G.level].boss ? LV[G.level].dur - 3 : 0; G.ammo = G.level > 1 ? 3 : 0; G.fcd = 0; G.harps = []; G.blobs = []; G.boss = null; G.bossBeat = 0;
     G.banner = null; G.conf = []; G.wo = 0; G.won = 0; G.winT = 0; G.finaleMsg = ""; G.spawn.harp = G.level > 1 ? 6 : 14; G.spawn.rock = 5; G.spawn.ski = 9; G.harpHint = 0;
+    G.eggT = 0; if (window.ReviewEgg) ReviewEgg.reset(20, 40);   // Antidote's review billboard buoy: once a run, 20-40 s of riding in
   }
   function L() { return LV[G.level] || LV[5]; }
   function speed() { return (150 + 22 * (G.lap - 1)) * L().spd * (G.boss ? .8 : 1) * (G.phase === "ride" || G.phase === "victory" ? 1 : 0); }
@@ -325,7 +327,7 @@
     if (G.phase === "turn") return turnStep(dt);
     if (G.phase === "shore") return shoreStep(dt);
     var v = speed();
-    G.yw += G.dir * v * dt;
+    G.yw += G.dir * v * dt; G.eggT += dt;
     if (G.boss) { if (G.dir > 0 ? G.yw > END_Y - 1100 : G.yw < 1100) wrapWorld(-G.dir * 2400); }   // boss fights never run out of pier
     else { G.lvT += dt; var P = L(); if (G.lvT >= P.dur) { if (P.boss && !G.bossBeat) bossStart(P.boss); else if (!P.boss) levelUp(); } }
     if (SURF && AC) { var nearP = G.yw > 0 && G.yw < END_Y ? Math.max(0, 1 - Math.abs(G.x - PIER_X) / 170) : 0; SURF.gain.setTargetAtTime(.15 + .14 * nearP, AC.currentTime, .3); }   // surf is louder under the pier
@@ -361,6 +363,7 @@
       if (S.harp <= 0) { harpPick(laneX(), ahead(H * 0.75)); S.harp = G.boss ? rnd(5, 7) : rnd(P2.harp[0], P2.harp[1]); }
       if (S.rock <= 0 && (P2.rock || G.boss)) { rocks(); S.rock = G.boss ? rnd(2.4, 3.4) : rnd(P2.rock[0], P2.rock[1]); }
       if (S.ski <= 0 && (G.boss || G.level >= 3)) { ski(); S.ski = G.boss ? rnd(8, 11) : rnd(22, 30); }
+      if (!G.boss && window.ReviewEgg && ReviewEgg.due(G.eggT * 1000)) add({ t: "rsign", x: Math.max(70, Math.min(W - 70, laneX())), yw: ahead(H * 0.75), r: 30, bob: Math.random() * 6 });
     }
     if (S.plane <= 0) { plane(); S.plane = rnd(40, 55); }
     if (Math.random() < dt * 0.35 && G.gulls.length < 5) gull();
@@ -395,6 +398,7 @@
         if (e.t === "harpoon" && d < hitR + 8) { var first = !G.harpHint; G.ammo = Math.min(9, G.ammo + 3); G.harpHint = 1; pop(e.x, sy(e.yw) - 10, "+3 HARPOONS 🔱", "#ffb15e", 1); sfx("grab"); buzz(15); G.fx.push({ k: "ring", x: e.x, y: sy(e.yw), t: 0 });
           if (first) toast("lifeguard_m", "Harpoons! Tap 🔱 FIRE to hit sharks"); G.ents.splice(i, 1); continue; }
         if (e.t === "rock") { if (d < e.r + 12 && G.jump <= .06) { var sd = G.x >= e.x ? 1 : -1; G.x = e.x + sd * (e.r + 14); G.vx = sd * 280; if (G.inv <= 0) { hurt("Hit the rocks!"); G.fx.push({ k: "wsplash", x: G.x, y: py, t: 0 }); } } continue; }
+        if (e.t === "rsign" && d < e.r + 24) { var eb = ReviewEgg.collect(); G.score += eb; pop(e.x, sy(e.yw) - 40, "+" + eb + " 📺 ANTIDOTE'S REVIEW", "#ffd23f", 1); sfx("egg"); buzz([20, 40, 20]); G.fx.push({ k: "ring", x: e.x, y: sy(e.yw), t: 0 }); G.fx.push({ k: "wsplash", x: e.x, y: sy(e.yw), t: 0 }); G.ents.splice(i, 1); continue; }
         if (e.t === "buoy" && d < hitR + 6) { G.hearts = Math.min(6, G.hearts + 1); pop(e.x, sy(e.yw), "+1 ❤️ Lifeguard save!", "#ff9db0", 1); toast("lifeguard_f", "Rescue can! +1 heart"); G.ents.splice(i, 1); continue; }
         var danger = e.t === "jelly" || (e.t === "eel" && e.zap) || (e.t === "shark" && e.st === "lunge") || e.t === "boat";
         if (danger && d < hitR) { hurt(e.t === "shark" ? "SHARK BITE!" : e.t === "eel" ? "⚡ ZAPPED!" : e.t === "jelly" ? "Jellyfish sting!" : "Boat wake!"); if (e.t === "shark") e.st = "gone"; continue; }
@@ -838,6 +842,7 @@
       if (e.k === "fish_gold") { cx.save(); cx.globalCompositeOperation = "lighter"; var gg = cx.createRadialGradient(x, y - hgt, 2, x, y - hgt, 40); gg.addColorStop(0, "rgba(255,215,90,.6)"); gg.addColorStop(1, "rgba(255,215,90,0)"); cx.fillStyle = gg; cx.beginPath(); cx.arc(x, y - hgt, 40, 0, 7); cx.fill(); cx.restore(); }
       spr(e.k, x, y - hgt, 54 + a * 10, rot); return; }
     if (e.t === "rock") { drawRock(e, x, y); return; }
+    if (e.t === "rsign") { drawRSign(e, x, y); return; }
     if (e.t === "harpoon") { drawHarpPick(e, x, y); return; }
     if (e.t === "ski") { drawSki(e, x, y); return; }
     if (e.t === "food") {
@@ -898,6 +903,17 @@
       if (!drew) { cx.fillStyle = "#fff"; cx.beginPath(); cx.ellipse(x, y, 22, 6, 0, 0, 7); cx.fill(); cx.fillRect(x - 4, y - 20, 8, 40); }
       e.hit = { x: Math.min(left, x - 30), y: by - 14, w: bw + 100, h: bh + 28 };
     }
+  }
+  // Antidote's review: a floating billboard buoy (red/white float, pole, the cover in a gold frame)
+  function drawRSign(e, x, y) {
+    if (!window.ReviewEgg) return; var b = Math.sin(G.t * 2.4 + e.bob) * 2.5, tilt = Math.sin(G.t * 1.7 + e.bob) * .05;
+    cx.fillStyle = "rgba(0,20,35,.25)"; cx.beginPath(); cx.ellipse(x + 6, y + 8, 30, 12, 0, 0, 7); cx.fill();
+    cx.strokeStyle = "rgba(255,255,255," + (.35 + .2 * Math.sin(G.t * 5)) + ")"; cx.lineWidth = 2; cx.beginPath(); cx.ellipse(x, y + 2, 30 + Math.sin(G.t * 3) * 3, 11, 0, 0, 7); cx.stroke();
+    cx.fillStyle = "#e3262f"; cx.beginPath(); cx.ellipse(x, y + b, 22, 9, 0, 0, 7); cx.fill(); cx.fillStyle = "#fff"; cx.fillRect(x - 6, y + b - 9, 12, 18);
+    cx.save(); cx.translate(x, y + b); cx.rotate(tilt);
+    cx.fillStyle = "#c9d0e2"; cx.fillRect(-2, -40, 4, 40);
+    ReviewEgg.drawSign(cx, 0, -60, 88, { glow: .55 + .3 * Math.sin(G.t * 6) });
+    cx.restore();
   }
   /* ---------- new art: rocks, harpoons, jet ski, boss sharks, banners (all canvas-drawn or tinted from existing sprites) ---------- */
   var TINT = {};
@@ -1085,13 +1101,14 @@
     else if (prize) win = "🏆 You won <b>" + esc(prize) + "</b>!<br><button class='nv-btn' id='nv-save' type='button' style='margin-top:8px'>Save my prize</button><br><span style='font-weight:600;font-size:12px;opacity:.85'>Add your name and phone or email to get your code</span>";
     var next = PRIZES.filter(function (p) { return p[0] > sc; })[0];
     var sv = {}; try { sv = JSON.parse(localStorage.getItem("nalu-board") || "{}"); } catch (e) {}
-    $("nv-end").innerHTML = (ok(IM.storefront) ? "<img src='" + IM.storefront.src + "' alt='Nalu Vida' style='width:100%;max-width:330px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.4);margin-bottom:8px'>" : "") + (G.won ? "<h3>You beat Manō Nui! 🏆</h3>" : "<h3>You made it to Nalu Vida! 🌴</h3>") + "<p style='font:900 30px system-ui;margin:4px 0'>" + sc.toLocaleString() + "</p><p>" + (G.won ? "All 5 levels cleared" : "Level " + G.level + "/5") + " · best " + G.best.toLocaleString() + "</p>" +
+    $("nv-end").innerHTML = (ok(IM.storefront) ? "<img src='" + IM.storefront.src + "' alt='Nalu Vida' style='width:100%;max-width:330px;" + (window.ReviewEgg ? "max-height:110px;object-fit:cover;" : "") + "border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.4);margin-bottom:8px'>" : "") + (G.won ? "<h3>You beat Manō Nui! 🏆</h3>" : "<h3>You made it to Nalu Vida! 🌴</h3>") + "<p style='font:900 30px system-ui;margin:4px 0'>" + sc.toLocaleString() + "</p><p>" + (G.won ? "All 5 levels cleared" : "Level " + G.level + "/5") + " · best " + G.best.toLocaleString() + "</p>" +
       (win ? "<div class='nv-win'>" + win + "</div>" : next ? "<p>" + (next[0] - sc).toLocaleString() + " more points wins <b>" + esc(next[1]) + "</b></p>" : "") +
       "<button class='nv-btn' id='nv-order' type='button' style='font-size:18px;padding:14px 24px'>🍽️ Head inside &amp; order</button><br>" +
       "<button class='nv-btn' id='nv-again' type='button' style='background:#fff'>🏄 Ride again</button>" +
       "<div class='nv-board'><b>This week's top riders</b> <span id='nv-wk' style='opacity:.7'></span><ol id='nv-list'><li>Loading…</li></ol>" +
       "<input id='nv-n' maxlength='16' placeholder='Name for the board' value='" + esc(sv.n || "") + "'><input id='nv-ig' maxlength='31' placeholder='@instagram (optional)' value='" + (sv.ig ? "@" + esc(sv.ig) : "") + "'>" +
       "<button class='nv-btn' id='nv-post' type='button' style='width:100%;margin-top:6px'>Post my score</button><div id='nv-msg' style='margin-top:6px;font-size:12.5px'></div><div style='font-size:12px;opacity:.8;margin-top:4px'>#1 at the end of the week wins half off their meal.</div></div>";
+    if (window.ReviewEgg) ReviewEgg.endCard($("nv-end"), $("nv-order"));
     $("nv-end").style.display = "flex";
     var fly = document.createElement("button"); fly.type = "button"; fly.className = "nv-fly"; fly.setAttribute("aria-label", "Fly to Melody Bar and Grill");
     fly.innerHTML = "<img src='img/game/plane.webp' alt=''><span>✈ Fly to Melody Bar &amp; Grill · LAX — tap for a deal</span>";
@@ -1162,7 +1179,7 @@
       ["raft_oysters", "$2 Oysters raft", "+200"], ["drop", "Helicopter drink drop", "+250"], ["boat", "Nalu Vida crew boat toss", "+100–200"], ["", "🌟 Golden Poke Bowl (rare)", "+500"],
       ["", "🏄 Shoot the pier (under it, clean)", "+400"], ["", "🌊 Catch air off a swell", "+150"], ["", "😮 Close call with a shark/eel/jelly", "+50"], ["", "🔄 Round the end of the pier", "+300"],
       ["", "🏁 Finish a lap at Nalu Vida", "+1,000 × lap"], ["", "⭐ Clear a level (5 levels)", "+1,500 × level"], ["", "🔱 Harpoon a shark off", "+300"],
-      ["", "🦈 Harpoon / crash a boss", "+20 × damage"], ["shark", "Beat Big Manō (level 3)", "+5,000"], ["shark", "Beat Manō Nui (final boss)", "+15,000"], ["", "🪨 Rocks / closeout wave", "−❤️", 1], ["plane", "Tap the Melody banner plane", "+500 + a Melody deal"], ["buoy", "Lifeguard rescue can", "+1 ❤️"],
+      ["", "🦈 Harpoon / crash a boss", "+20 × damage"], ["shark", "Beat Big Manō (level 3)", "+5,000"], ["shark", "Beat Manō Nui (final boss)", "+15,000"], ["", "🪨 Rocks / closeout wave", "−❤️", 1], ["plane", "Tap the Melody banner plane", "+500 + a Melody deal"], ["", "📺 Ride through Antidote's review billboard (secret)", "+500"], ["buoy", "Lifeguard rescue can", "+1 ❤️"],
       ["shark", "Shark bite", "−❤️", 1], ["eel", "Electric eel zap", "−❤️", 1], ["jelly", "Jellyfish sting", "−❤️", 1], ["", "🪵 Pier piling / boat wake", "−❤️", 1]];
     var st = document.createElement("style");
     st.textContent = ".nv-pts{max-width:430px;margin:14px auto 0;color:inherit}.nv-pts h4{margin:0 0 4px;font:900 18px 'Alfa Slab One',Georgia,serif}.nv-pts p{margin:0 0 8px;font-size:13px;opacity:.85}" +
@@ -1175,7 +1192,7 @@
     mount.appendChild(box);
   })();
 
-  window.__NV = { get: function () { return G; }, start: start, W: W, H: H, PIER_X: PIER_X, fire: fire, boss: function (k) { bossStart(k || 5); }, levelUp: function () { levelUp(); },
+  window.__NV = { get: function () { return G; }, start: start, end: function () { if (G.running) showEnd(); }, W: W, H: H, PIER_X: PIER_X, fire: fire, boss: function (k) { bossStart(k || 5); }, levelUp: function () { levelUp(); },
     // the start menu's PLAY: show the surfer pick (character select) instead of the old full start screen
     pick: function () { var o = $("nv-start"); o.classList.add("nv-pickonly"); o.querySelector("h3").textContent = "Pick your surfer"; o.style.display = "flex"; } };
   requestAnimationFrame(frame);

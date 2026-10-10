@@ -76,6 +76,7 @@ def build(owner_slug):
     for r in rest: r.pop("brand", None)
     t = (t.replace("__RESTAURANTS__", json.dumps(rest)).replace("__OWNER__", html.escape(o["owner"])).replace("__LAUNCH_NAMES__", names_html)
           .replace("__KEY__", f"{owner_slug}-launch-v1").replace("__CONTACTS__", json.dumps(o.get("contacts", [])))
+          .replace("__AIPHONE__", json.dumps({"price": 99, "included": 750, "over": 0.15, "levels": [["Missed + after-hours calls", 5], ["Missed calls + busy rushes", 15], ["Every call, all day", 40]], **(o.get("aiPhone") or {})}))
           .replace("__THEME__", theme).replace("__LOGOS__", logos).replace("__AMBIENT__", json.dumps(amb)))
     if fonts: t = t.replace("</title>", f'</title><link href="{fonts}" rel="stylesheet">', 1)
     dst = ROOT / "launch" / owner_slug / "index.html"; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_text(t)

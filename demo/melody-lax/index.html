@@ -338,7 +338,7 @@ function drawSeat(){
   try{ localStorage.setItem(SEAT_KEY,JSON.stringify(seat)); }catch(e){}
   drawBar();
 }
-document.querySelector(".seat").addEventListener("click",function(e){
+$("tbls").closest(".seat").addEventListener("click",function(e){   // the seat box (not the game's #post box, which also has class "seat")
   var b=e.target.closest("button"); if(!b) return;
   seat=b.dataset.table?{type:"table",n:+b.dataset.table}:{type:b.dataset.seat}; buzz(10); drawSeat();
 });
@@ -382,6 +382,7 @@ function serve(m){
 }
 document.addEventListener("click",function(e){
   var a=e.target.closest("[data-a]"), r=e.target.closest("[data-m]"), med=e.target.closest(".item .media");
+  if(a&&PRICE[a.dataset.a]==null) a=null;   // only menu items: rewards-card buttons also use data-a
   if(a){ var n=a.dataset.a; cart[n]=cart[n]||{q:0,p:PRICE[n]}; cart[n].q++; saveCart(); buzz(12);
     var art=a.closest(".item"); if(art){ var mm=art.querySelector(".media"); art.classList.contains("drink")?pour(mm):serve(mm); setTimeout(function(){ flyToBar(mm.querySelector("img.full")||mm.querySelector("img")); },art.classList.contains("drink")?900:150); } }
   else if(r){ var n2=r.dataset.m; if(cart[n2]){ cart[n2].q--; if(cart[n2].q<=0) delete cart[n2]; saveCart(); } }
@@ -390,6 +391,9 @@ document.addEventListener("click",function(e){
 function saveCart(){ try{ localStorage.setItem("melody-cart",JSON.stringify(cart)); }catch(e){}
   document.querySelectorAll(".item").forEach(function(c){ var n=c.dataset.name, q=cart[n]?cart[n].q:0, box=c.querySelector(".tx"), old=box.querySelector(".add,.qty"); var w=document.createElement("div"); w.innerHTML=ctl(n,q); old.replaceWith(w.firstChild); });
   drawBar(); }
+// drinks (DRINKS array) earn bar points, everything else (FOOD sections, build-your-mac) earns kitchen points
+var IS_DRINK={}; DRINKS.forEach(function(d){ IS_DRINK[d[0]]=1; });
+function splitTotals(){ var f=0,b=0; for(var k in cart){ var x=cart[k].p*cart[k].q; if(IS_DRINK[k]) b+=x; else f+=x; } return {food:Math.round(f*100)/100,bar:Math.round(b*100)/100}; }
 function totals(){ var s=0,n=0; for(var k in cart){ s+=cart[k].p*cart[k].q; n+=cart[k].q; } var tax=s*0.095; return {sub:s,tax:tax,total:s+tax,n:n}; }
 function drawBar(){ var t=totals(); $("obar").classList.toggle("on",t.n>0); $("ocount").textContent=t.n; $("ototal").textContent=money(t.total); $("oseat").textContent=seat?seatLabel()+" · review order":"Review order"; }
 $("obtn").addEventListener("click",openSheet);
@@ -399,16 +403,16 @@ function openSheet(){
   for(var k in cart) h+='<div class="ln"><span>'+esc(k)+'<br><span class="m">'+cart[k].q+' × '+money(cart[k].p)+'</span></span><b>'+money(cart[k].p*cart[k].q)+'</b></div>';
   h+='<div style="margin-top:8px"><div class="tot"><span>Subtotal</span><span>'+money(t.sub)+'</span></div><div class="tot"><span>Tax</span><span>'+money(t.tax)+'</span></div><div class="tot big"><span>Total</span><span>'+money(t.total)+'</span></div></div>';
   h+=seat?'<button class="btn hot" type="button" data-send style="width:100%;justify-content:center;margin-top:12px;font-size:16px">Send my order</button>':'<button class="btn hot" type="button" data-pick style="width:100%;justify-content:center;margin-top:12px">🪑 Pick my seat</button>';
-  h+='<p class="sub" style="font-size:12px;margin-top:10px">Pay your server or bartender like normal. Members earn 10 points per $1.</p>';
+  h+='<p class="sub" style="font-size:12px;margin-top:10px">Pay your server or bartender like normal. Members earn 10 🍸 bar pts per $1 on drinks + 10 🍔 kitchen pts per $1 on food.</p>';
   $("sheetin").innerHTML=h; $("sheet").classList.add("on");
 }
 $("sheet").addEventListener("click",function(e){
   if(e.target===$("sheet")||e.target.closest("[data-x]")){ $("sheet").classList.remove("on"); return; }
   if(e.target.closest("[data-pick]")){ $("sheet").classList.remove("on"); $("seat").scrollIntoView({behavior:"smooth"}); return; }
   if(e.target.closest("[data-send]")){ (window.SSAI_GATE||function(r,cb){ cb(); })("order",function(){ // contact info is asked here, at the end of the order (members skip it)
-    var t=totals(), num="M-"+(100+((Math.random()*900)|0)), earn=window.SSAI_EARN?window.SSAI_EARN(t.sub,"🍸 Order "+num+" · "+seatLabel()):null;
+    var t=totals(), num="M-"+(100+((Math.random()*900)|0)), earn=window.SSAI_EARN?window.SSAI_EARN(t.sub,"🍸 Order "+num+" · "+seatLabel(),splitTotals()):null;
     $("sheetin").innerHTML='<div class="ok"><div class="check"><svg viewBox="0 0 40 40"><path d="M9 21l8 8 15-17"/></svg></div><b>Order received</b><div class="code">'+num+'</div><div class="sub" style="margin:4px 0 0">'+esc(seatLabel())+' · '+money(t.total)+'</div>'+
-      (earn?'<div style="color:var(--gold2);font-weight:800;margin-top:6px">'+(earn.saved?'+'+earn.pts+' rewards points':'Join Melody Rewards below to earn +'+earn.pts+' points')+'</div>':'')+
+      (earn?'<div style="color:var(--gold2);font-weight:800;margin-top:6px">'+(earn.saved?(earn.msg||'+'+earn.pts+' rewards points'):'Join Melody Rewards below to earn '+(earn.msg||'+'+earn.pts+' points'))+'</div>':'')+
       '<p class="sub" style="font-size:12px;margin-top:8px">Preview build: live, this prints on Melody\'s ticket printer and pings your server.</p></div><button class="btn" type="button" data-x style="width:100%;justify-content:center;margin-top:10px">Done</button>';
     cart={}; saveCart(); buzz([20,40,20]);
   }); }
@@ -1188,7 +1192,10 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
   note:"Every prize is good for 3 days · one reward per visit."}};
 })();</script>
 <script src="../gamemenu.js"></script>
-<script>window.CRM_CFG={draw:{odds:15,prizes:["Free House Mac & Cheese","Free mocktail or soft drink at the bar","Free French Toast breakfast","Free Melody Fries"]},name:"Melody Bar & Grill",offer:"Free Melody Fries on your next visit",mount:"#rwhost",tiers:[[250,"Free Melody Fries"],[500,"Free house margarita"],[800,"Free Lobster Mac & Cheese"],[1300,"Free appetizer platter"]],referral:{gift:"Free Melody Fries"},earn:{checkin:25,firstOrder:50,birthday:100,review:{pts:75,platform:"app"},referral:{join:75,friend:25,friendGift:"Free soft drink or mocktail",first:50,every:10}}};</script>
+<script>window.CRM_CFG={draw:{odds:15,prizes:["Free House Mac & Cheese","Free mocktail or soft drink at the bar","Free French Toast breakfast","Free Melody Fries"]},name:"Melody Bar & Grill",offer:"Free Melody Fries on your next visit",mount:"#rwhost",tiers:[[250,"Free Melody Fries"],[500,"Free House Mac"],[800,"Free Lobster Mac & Cheese"],[1300,"Free appetizer platter"]],
+  /* two balances that never mix: bar points (drinks only) and kitchen points (food only). California ABC: bar rewards are drink discounts or free non-alcoholic items, never free alcohol. */
+  wallets:{split:true,bonusTo:"food",bar:{label:"Bar",icon:"🍸",perDollar:10,tiers:[[250,"$3 off any drink"],[500,"Half off any cocktail"],[800,"Free mocktail or soda + $3 off a drink"],[1300,"$10 off a bar tab of $30+"]]},
+    food:{label:"Kitchen",icon:"🍔",perDollar:10,tiers:[[250,"Free Melody Fries"],[500,"Free House Mac"],[800,"Free Lobster Mac & Cheese"],[1300,"Free appetizer platter"]]}},referral:{gift:"Free Melody Fries"},earn:{checkin:25,firstOrder:50,birthday:100,review:{pts:75,platform:"app"},referral:{join:75,friend:25,friendGift:"Free soft drink or mocktail",first:50,every:10}}};</script>
 <script src="../crm.js"></script>
 <script>window.NEARBY={name:"Melody Bar & Grill",pin:"✈️",mount:"#rwhost",spots:[{label:"Westchester",lat:33.9487,lng:-118.3918,q:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"}],offer:"Happy hour is 3–6. Show this for double points today."};</script>
 <script src="../nearby.js"></script>

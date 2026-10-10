@@ -117,6 +117,83 @@
       "$5 off"
     ]
   },
+  "wallets": {
+    "bonusTo": "food",
+    "bar": {
+      "perDollar": 10,
+      "tiers": [
+        [
+          250,
+          [
+            "$3 off any drink",
+            "$2 off any drink",
+            "Free soda or iced tea"
+          ]
+        ],
+        [
+          500,
+          [
+            "Half off any cocktail",
+            "$5 off any drink",
+            "25% off one drink"
+          ]
+        ],
+        [
+          800,
+          [
+            "Free mocktail or soda + $3 off a drink",
+            "Free mocktail",
+            "$6 off any drink"
+          ]
+        ],
+        [
+          1300,
+          [
+            "$10 off a bar tab of $30+",
+            "Half off a Bucket of Beers (5)",
+            "$8 off any drink"
+          ]
+        ]
+      ]
+    },
+    "food": {
+      "perDollar": 10,
+      "tiers": [
+        [
+          250,
+          [
+            "Free Melody Fries",
+            "Free Gilroy Garlic Fries",
+            "$5 off the food"
+          ]
+        ],
+        [
+          500,
+          [
+            "Free House Mac",
+            "Free appetizer",
+            "$10 off the food"
+          ]
+        ],
+        [
+          800,
+          [
+            "Free Lobster Mac & Cheese",
+            "Free any Mac & Cheese",
+            "$15 off the food"
+          ]
+        ],
+        [
+          1300,
+          [
+            "Free appetizer platter",
+            "Free entrée",
+            "$25 off the food"
+          ]
+        ]
+      ]
+    }
+  },
   "drawPrizes": [
     "Free House Mac & Cheese",
     "Free bar drink (mocktail or soft drink, no alcohol)",

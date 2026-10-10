@@ -14,11 +14,11 @@ window.BURGER3D = window.BURGER3D || (function () {
     tomato: [.1, .15, .5, .55], bun_top: [.15, .1, .85, .6], pickles: [.55, .3, .85, .7], pickles_crinkle: [.3, .2, .7, .8], bacon: [.1, .2, .9, .5],
     chicken: [.15, .2, .85, .7], chicken_spicy: [.15, .2, .85, .7], slaw: [.15, .2, .85, .8], onion_straws: [.1, .15, .9, .85] };
   // how tall each layer sits in the stack (bun radius = 1)
-  var H = { bun_bottom: .42, patty: .2, cheese: .03, swiss: .03, lettuce: .11, tomato: .09, onion: .05, pickles: .045, pickles_crinkle: .045,
-    bacon: .07, jalapeno: .05, onion_straws: .14, chicken: .3, chicken_spicy: .3, slaw: .14, bun_top: 0,
+  var H = { bun_bottom: .42, patty: .24, cheese: .03, swiss: .03, lettuce: .11, tomato: .09, onion: .05, pickles: .045, pickles_crinkle: .045,
+    bacon: .07, jalapeno: .05, tray: .05, fries: .22, strip: .12, onion_straws: .14, chicken: .3, chicken_spicy: .3, slaw: .14, bun_top: 0,
     turkey: .17, onion_grilled: .06, sauce_storm: .015, sauce_bbq: .015, sauce_crema: .015, sauce_mayo: .015, sauce_spicy_mayo: .015, sauce_thunder: .015 };
   // sauces: colour + how glossy/thick
-  var SAUCE = { sauce_storm: [0xf08a5a, .9], sauce_bbq: [0x5a1c0c, 1], sauce_crema: [0x9cc46a, .8], sauce_mayo: [0xf6efd8, .8], sauce_spicy_mayo: [0xf09a6a, .85], sauce_thunder: [0xe8661e, 1] };
+  var SAUCE = { sauce_storm: [0xd9653a, .9], sauce_bbq: [0x4a160a, 1], sauce_crema: [0x7fa64a, .8], sauce_mayo: [0xe8dcb8, .8], sauce_spicy_mayo: [0xd8582e, .85], sauce_thunder: [0xc8460e, 1] };
   var WT = { patty: 1, chicken: 1, chicken_spicy: 1, bun_top: .8, bun_bottom: .8, cheese: .35, swiss: .35, lettuce: .3, tomato: .5, onion: .3, pickles: .3, pickles_crinkle: .3, bacon: .45, jalapeno: .3, onion_straws: .3, slaw: .45, turkey: .9, onion_grilled: .3 };
 
   function webgl() { try { var c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl"))); } catch (e) { return false; } }
@@ -36,7 +36,7 @@ window.BURGER3D = window.BURGER3D || (function () {
     var W = el.clientWidth || 320, HH = el.clientHeight || W, RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
     var R = new T.WebGLRenderer({ antialias: true, alpha: true });
     R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); R.setSize(W, HH); R.outputEncoding = T.sRGBEncoding;
-    R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.0;
+    R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = .92;
     R.domElement.style.cssText = "position:absolute;inset:0;width:100%;height:100%;touch-action:none"; el.appendChild(R.domElement);
     var scene = new T.Scene(), cam = new T.PerspectiveCamera(32, W / HH, .1, 60);
     scene.add(new T.HemisphereLight(0xfff1dc, 0x1a1c28, .9));
@@ -44,6 +44,13 @@ window.BURGER3D = window.BURGER3D || (function () {
     var rim = new T.DirectionalLight(0x9fc0ff, .9); rim.position.set(-4, 2.5, -4); scene.add(rim);
     var warm = new T.PointLight(0xffc890, .35, 12); warm.position.set(2.5, 1, 3); scene.add(warm);
     var G = new T.Group(); scene.add(G);
+    // soft-box studio reflections: what makes glaze, grease and melted cheese read as wet and real
+    try {
+      var es = new T.Scene(), pm = new T.PMREMGenerator(R), box = function (c, w, h, x, y, z) { var q = new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshBasicMaterial({ color: c, side: T.DoubleSide })); q.position.set(x, y, z); q.lookAt(0, 0, 0); es.add(q); };
+      es.background = new T.Color(0x14161c);
+      box(0xffffff, 6, 3, 0, 6, 3); box(0xfff0dc, 3, 5, 6, 2, 2); box(0xb8ccff, 3, 4, -6, 1.5, -3); box(0xffd2a0, 8, 1.2, 0, -1, 6);
+      scene.environment = pm.fromScene(es, .02).texture; pm.dispose();
+    } catch (e) {}
 
     // soft contact shadow
     var sc = document.createElement("canvas"); sc.width = sc.height = 128; var sx = sc.getContext("2d"), gr = sx.createRadialGradient(64, 64, 4, 64, 64, 64);
@@ -70,7 +77,7 @@ window.BURGER3D = window.BURGER3D || (function () {
     function brioche() {
       if (texCache.brioche) return texCache.brioche;
       var c = document.createElement("canvas"); c.width = 256; c.height = 256; var x = c.getContext("2d"), g = x.createLinearGradient(0, 0, 0, 256);
-      g.addColorStop(0, "#8a4514"); g.addColorStop(.55, "#a9581c"); g.addColorStop(.8, "#c8792c"); g.addColorStop(.93, "#e3b066"); g.addColorStop(1, "#f0cf92");
+      g.addColorStop(0, "#7a3a10"); g.addColorStop(.35, "#94481a"); g.addColorStop(.6, "#b0621f"); g.addColorStop(.74, "#c98236"); g.addColorStop(.82, "#e6bb78"); g.addColorStop(.9, "#f3d9a6"); g.addColorStop(1, "#e9c88c");
       x.fillStyle = g; x.fillRect(0, 0, 256, 256);
       for (var i = 0; i < 1400; i++) { var yy = Math.random() * 230; x.fillStyle = "rgba(" + (Math.random() < .5 ? "60,25,5," : "255,210,150,") + (Math.random() * .07) + ")"; x.fillRect(Math.random() * 256, yy, 1 + Math.random() * 3, 1 + Math.random() * 2); }
       var t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; return (texCache.brioche = t);
@@ -92,9 +99,15 @@ window.BURGER3D = window.BURGER3D || (function () {
     }
     function dripMesh(mat, w) { // a hanging drip: tapered strand with a heavy bead at the end; scale.y = length
       var d = new T.Group(), body = new T.Mesh(new T.CylinderGeometry(w, w * .75, 1, 12, 1, true), mat); body.position.y = -.5; d.add(body);
-      var bead = new T.Mesh(new T.SphereGeometry(w * 1.25, 14, 10), mat); d.add(bead); d.userData = { body: body, bead: bead }; return d;
+      var bead = new T.Mesh(new T.SphereGeometry(w * 1.05, 14, 10), mat); d.add(bead); d.scale.x = .55; /* flattened against the patty side (local x points outward) */ d.userData = { body: body, bead: bead }; return d;
     }
-    function setDrip(d, len) { d.userData.body.scale.y = Math.max(.001, len); d.userData.body.position.y = -len / 2; d.userData.bead.position.y = -len; d.userData.bead.scale.y = 1 + len * 1.5; d.visible = len > .005; }
+    function setDrip(d, len) { d.userData.body.scale.y = Math.max(.001, len); d.userData.body.position.y = -len / 2; d.userData.bead.position.y = -len; d.userData.bead.scale.y = 1 + len * 2.2; d.visible = len > .005; }
+    function crumb() { // fine dough pores + baked blisters for the bun's bump map
+      if (texCache.crumb) return texCache.crumb;
+      var c = document.createElement("canvas"); c.width = c.height = 256; var x = c.getContext("2d"); x.fillStyle = "#808080"; x.fillRect(0, 0, 256, 256);
+      for (var i = 0; i < 2600; i++) { x.fillStyle = Math.random() < .5 ? "rgba(0,0,0,.18)" : "rgba(255,255,255,.18)"; x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, .5 + Math.random() * 1.6, 0, 6.283); x.fill(); }
+      var t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(6, 3); return (texCache.crumb = t);
+    }
     function lathe(pts, mat) { return new T.Mesh(new T.LatheGeometry(pts.map(function (p) { return new T.Vector2(p[0], p[1]); }), 72), mat); }
     function bumpy(geo, amt, freq) { // deterministic noise so shared edges don't crack
       var p = geo.attributes.position, v = new T.Vector3();
@@ -109,11 +122,21 @@ window.BURGER3D = window.BURGER3D || (function () {
     }
 
     function fromModel(id) {
-      var src = models && models[id] && GLB[models[id]]; if (!src) return null;
-      var g = new T.Group(), m = src.clone(true), box = new T.Box3().setFromObject(m), sz = box.getSize(new T.Vector3()), k = 2.06 / Math.max(sz.x, sz.z);
-      m.scale.setScalar(k); m.position.set(-(box.min.x + sz.x / 2) * k, -box.min.y * k, -(box.min.z + sz.z / 2) * k);
-      m.traverse(function (o) { if (o.material) { [].concat(o.material).forEach(function (mt) { if (mt.map) mt.map.encoding = T.sRGBEncoding; mt.needsUpdate = true; }); } });
-      g.add(m); g.userData.h = sz.y * k; return g;
+      var mid = models && (models[id] ? id : id === "chicken_spicy" || id === "strip" ? "chicken" : null), src = mid && GLB[models[mid]]; if (!src) return null;
+      // scanned pieces: scale to how wide that ingredient sits on a 4" bun, cap how tall a slice/topping can stand
+      var WD = { bun_top: 2.06, bun_bottom: 2.06, patty: 2.0, turkey: 1.95, chicken: 2.3, chicken_spicy: 2.3, lettuce: 2.25, tomato: 1.9, bacon: 2.15, onion_straws: 1.95,
+        pickles: 1.6, pickles_crinkle: 1.6, onion: 1.7, jalapeno: 1.6, slaw: 2.05, strips: 2.6, fries: 2.4 };
+      var CAP = { patty: .32, turkey: .28, chicken: .42, chicken_spicy: .42, lettuce: .32, tomato: .2, bacon: .16, onion_straws: .32, pickles: .12, pickles_crinkle: .12, onion: .12, jalapeno: .12, slaw: .3 };
+      var g = new T.Group(), m = src.clone(true), box = new T.Box3().setFromObject(m), sz = box.getSize(new T.Vector3()), k = (WD[id] || 2) / Math.max(sz.x, sz.z), ky = k;
+      if (CAP[id] && sz.y * k > CAP[id]) ky = CAP[id] / sz.y;
+      var MINH = { chicken: .3, chicken_spicy: .3, bacon: .07 }; if (MINH[id] && sz.y * ky < MINH[id]) ky = MINH[id] / sz.y; // flat scans get real thickness
+      m.scale.set(k, ky, k); m.position.set(-(box.min.x + sz.x / 2) * k, -box.min.y * ky, -(box.min.z + sz.z / 2) * k);
+      m.traverse(function (o) { if (o.isMesh) { o.material = [].concat(o.material).map(function (mt) { return mt.clone(); }); if (o.material.length === 1) o.material = o.material[0]; } });
+      m.traverse(function (o) { if (o.material) { [].concat(o.material).forEach(function (mt) { if (mt.map) mt.map.encoding = T.sRGBEncoding; if (mt.emissiveMap) mt.emissiveMap.encoding = T.sRGBEncoding;
+        mt.metalness = 0; if (mt.emissive) { mt.emissive.setRGB(0, 0, 0); mt.emissiveMap = null; } if (id === "bun_top") { mt.roughness = .55; mt.envMapIntensity = 1.2; } if (/patty|turkey/.test(id)) mt.roughness = .7; mt.needsUpdate = true; }); } });
+      if (id === "chicken_spicy") m.traverse(function (o) { if (o.isMesh) [].concat(o.material).forEach(function (mt) { mt.color = new T.Color(0xff8a6a).convertSRGBToLinear(); }); });
+      if (id === "strip") { var s2 = 1.15 / Math.max(sz.x, sz.z); m.scale.set(s2 * 1.25, s2 * .9, s2 * .42); m.position.set(-(box.min.x + sz.x / 2) * s2 * 1.25, -box.min.y * s2 * .9, -(box.min.z + sz.z / 2) * s2 * .42); ky = s2 * .9; }
+      g.add(m); g.userData.h = sz.y * ky; g.userData.scanned = true; return g;
     }
     function make(id) {
       var g = fromModel(id), m; if (g) return g; g = new T.Group();
@@ -121,33 +144,47 @@ window.BURGER3D = window.BURGER3D || (function () {
         g.add(lathe([[0, 0], [.86, 0], [.97, .05], [1.02, .15], [1.03, .28], [1, .37], [.95, .42], [0, .42]], phys({ map: wrapT(tex(id, "bun_side")), color: 0xffffff, roughness: .55, clearcoat: .3 })));
         m = new T.Mesh(new T.CircleGeometry(.95, 64), std({ map: tex(id), roughness: .55 })); m.rotation.x = -Math.PI / 2; m.position.y = .422; g.add(m);
       } else if (id === "bun_top") {
-        g.add(lathe([[.001, .73], [.32, .71], [.62, .64], [.85, .5], [.98, .32], [1.03, .16], [1.02, .06], [.95, 0], [0, 0]].reverse(), phys({ map: brioche(), color: 0xffffff, roughness: .4, clearcoat: .75, clearcoatRoughness: .3 })));
+        g.add(lathe([[.001, .66], [.3, .655], [.55, .62], [.75, .55], [.89, .45], [.98, .33], [1.03, .2], [1.04, .1], [1.02, .03], [.96, 0], [0, 0]].reverse(), phys({ map: brioche(), bumpMap: crumb(), bumpScale: .006, color: 0xffffff, roughness: .45, clearcoat: .6, clearcoatRoughness: .35 })));
         m = new T.Mesh(new T.CircleGeometry(.95, 64), std({ color: 0xf2dcae, roughness: .9 })); m.rotation.x = Math.PI / 2; m.position.y = .002; g.add(m);
       } else if (id === "patty") {
-        var pm = std({ map: wrapT(tex(id)), color: 0xd8c0b4, roughness: .82 });
-        pm.bumpMap = pm.map; pm.bumpScale = .03;
-        m = new T.Mesh(bumpy(new T.CylinderGeometry(1, 1, .2, 72, 3), .05, 6), pm); m.position.y = .1; g.add(m);
+        // smash patty: real seared-crust photo on top, darker crispy lace on the edge, a wet juicy sheen
+        var top = phys({ map: tex(id), bumpMap: tex(id), bumpScale: .05, color: 0xffffff, roughness: .55, clearcoat: .45, clearcoatRoughness: .35, envMapIntensity: .6 });
+        var side = phys({ map: wrapT(tex(id)), bumpMap: wrapT(tex(id)), bumpScale: .06, color: 0x8a6658, roughness: .6, clearcoat: .3 });
+        m = new T.Mesh(bumpy(new T.CylinderGeometry(1.02, 1.04, .24, 96, 4), .07, 7), [side, top, top]); m.position.y = .12; g.add(m);
       } else if (id === "turkey") {
         var tm = std({ map: wrapT(tex("patty")), color: 0xffe2cc, roughness: .8 }); tm.bumpMap = tm.map; tm.bumpScale = .03;
         m = new T.Mesh(bumpy(new T.CylinderGeometry(.98, .98, .17, 72, 3), .05, 7), tm); m.position.y = .085; g.add(m);
       } else if (SAUCE[id]) {
-        var sc3 = SAUCE[id], sgeo = new T.CircleGeometry(.92, 72); sgeo.rotateX(-Math.PI / 2); var spp = sgeo.attributes.position;
+        var sc3 = SAUCE[id], sgeo = new T.CircleGeometry(.78, 72); sgeo.rotateX(-Math.PI / 2); var spp = sgeo.attributes.position;
         for (var si2 = 0; si2 < spp.count; si2++) { var vx = spp.getX(si2), vz = spp.getZ(si2), aa = Math.atan2(vz, vx), q2 = 1 + .1 * Math.sin(aa * 6) + .05 * Math.sin(aa * 13); spp.setX(si2, vx * q2); spp.setZ(si2, vz * q2); spp.setY(si2, .006 * Math.sin(vx * 9) * Math.cos(vz * 7)); }
         sgeo.computeVertexNormals();
-        var smat = phys({ color: sc3[0], roughness: .12, clearcoat: sc3[1], clearcoatRoughness: .08 });
+        var smat = phys({ color: sc3[0], roughness: .15, clearcoat: sc3[1], clearcoatRoughness: .06, envMapIntensity: .5 });
         m = new T.Mesh(sgeo, smat); m.position.y = .008; g.add(m);
-        for (var sd = 0; sd < 4; sd++) { var d3 = dripMesh(smat, .03), a3 = Math.random() * 6.283; d3.position.set(Math.cos(a3) * .98, .005, Math.sin(a3) * .98); setDrip(d3, .06 + Math.random() * .1); g.add(d3); }
+        for (var sd = 0; sd < 4; sd++) { var d3 = dripMesh(smat, .03), a3 = Math.random() * 6.283; d3.position.set(Math.cos(a3) * .86, .005, Math.sin(a3) * .86); setDrip(d3, .06 + Math.random() * .1); g.add(d3); }
       } else if (id === "chicken" || id === "chicken_spicy") {
         m = new T.Mesh(bumpy(new T.CylinderGeometry(1.02, .98, .3, 72, 4), .09, 4), std({ map: tex(id), color: id === "chicken_spicy" ? 0xffb0a0 : 0xffe0c0, roughness: .78 }));
         m.scale.set(1.12, 1, .95); m.position.y = .15; g.add(m);
       } else if (id === "cheese" || id === "swiss") {
         var sw = id === "swiss", ct = cheeseTex(sw), geo = new T.PlaneGeometry(1.8, 1.8, 48, 48); geo.rotateX(-Math.PI / 2);
-        var cm = phys({ map: ct, bumpMap: ct, bumpScale: .012, color: 0xffffff, roughness: .22, clearcoat: 1, clearcoatRoughness: .12, side: T.DoubleSide });
-        m = new T.Mesh(geo, cm); m.rotation.y = Math.random() * .6; m.position.y = .015; g.add(m);
+        var cm = phys({ map: ct, bumpMap: ct, bumpScale: .012, color: sw ? 0xf2d27a : 0xffb84a, roughness: .32, clearcoat: .6, clearcoatRoughness: .18, envMapIntensity: .3, side: T.DoubleSide });
+        m = new T.Mesh(geo, cm); m.rotation.y = Math.random() * .6; m.position.y = .022; g.add(m);
+        var under = new T.Mesh(geo, phys({ color: sw ? 0xd9c27a : 0xd98410, roughness: .3, clearcoat: .8, side: T.DoubleSide })); under.rotation.y = m.rotation.y; under.position.y = .006; g.add(under);
         var dm = phys({ color: sw ? 0xf1dc96 : 0xf6a41e, roughness: .18, clearcoat: 1, clearcoatRoughness: .1 }), dr = [];
-        for (var di = 0; di < 9; di++) { var dd = dripMesh(dm, .035 + Math.random() * .035), da = di / 9 * 6.283 + Math.random() * .4; dd.position.set(Math.cos(da) * 1.08, .01, Math.sin(da) * 1.08);
-          dd.userData.max = .12 + Math.random() * .3; dd.userData.lag = Math.random() * .5; setDrip(dd, 0); g.add(dd); dr.push(dd); }
+        for (var di = 0; di < 4; di++) { var dd = dripMesh(dm, .018 + Math.random() * .014), da = di / 9 * 6.283 + Math.random() * .4; dd.position.set(Math.cos(da) * 1.08, .01, Math.sin(da) * 1.08);
+          dd.rotation.y = -da; dd.userData.max = .12 + Math.random() * .3; dd.userData.lag = Math.random() * .5; setDrip(dd, 0); g.add(dd); dr.push(dd); }
         g.userData.cheese = { mesh: m, base: geo.attributes.position.array.slice(), melt: 0, drips: dr, seed: Math.random() * 6 };
+      } else if (id === "tray") { // red-and-white checkered paper boat
+        var tc = document.createElement("canvas"); tc.width = tc.height = 128; var tx = tc.getContext("2d");
+        for (var cy = 0; cy < 8; cy++) for (var cx = 0; cx < 8; cx++) { tx.fillStyle = (cx + cy) % 2 ? "#c8202a" : "#f6f1e6"; tx.fillRect(cx * 16, cy * 16, 16, 16); }
+        var tt = new T.CanvasTexture(tc); tt.encoding = T.sRGBEncoding; tt.wrapS = tt.wrapT = T.RepeatWrapping; tt.repeat.set(3, 1);
+        var tm2 = std({ map: tt, roughness: .85, side: T.DoubleSide });
+        m = new T.Mesh(new T.BoxGeometry(2.6, .05, 1.7), tm2); m.position.y = .025; g.add(m);
+        [[0, .2, .85, 2.6, .4, .05], [0, .2, -.85, 2.6, .4, .05], [1.3, .2, 0, .05, .4, 1.7], [-1.3, .2, 0, .05, .4, 1.7]].forEach(function (w) { var wm = new T.Mesh(new T.BoxGeometry(w[3], w[4], w[5]), tm2); wm.position.set(w[0], w[1], w[2]); wm.rotation.z = w[0] ? (w[0] > 0 ? -.25 : .25) : 0; wm.rotation.x = w[2] ? (w[2] > 0 ? .25 : -.25) : 0; g.add(wm); });
+      } else if (id === "fries") {
+        var fm2 = phys({ color: 0xe39a2c, roughness: .5, clearcoat: .35, envMapIntensity: .5 }), fe = std({ color: 0xa8641c, roughness: .6 });
+        for (var fi = 0; fi < 46; fi++) { var fl2 = .7 + Math.random() * .7, f3 = new T.Mesh(new T.BoxGeometry(.085, .085, fl2), [fm2, fm2, fm2, fm2, fe, fe]);
+          f3.position.set((Math.random() - .5) * 1.7, .06 + Math.random() * .22, (Math.random() - .5) * .95); f3.rotation.set((Math.random() - .5) * .5, Math.random() * 3.14, (Math.random() - .5) * .4); g.add(f3); }
+        var salt = std({ color: 0xffffff, roughness: .3 }); for (var sl = 0; sl < 60; sl++) { var sm = new T.Mesh(new T.BoxGeometry(.012, .012, .012), salt); sm.position.set((Math.random() - .5) * 2, .2 + Math.random() * .15, (Math.random() - .5) * 1.2); g.add(sm); }
       } else if (id === "lettuce" || id === "slaw") {
         for (var k = 0; k < 2; k++) {
           var lg = new T.RingGeometry(.02, id === "slaw" ? 1.0 : 1.16, 96, 8); lg.rotateX(-Math.PI / 2);
@@ -204,7 +241,9 @@ window.BURGER3D = window.BURGER3D || (function () {
       layers.forEach(function (l) { G.remove(l.g); }); layers = []; built = false;
       var y = 0;
       list.forEach(function (id, i) {
-        var g = make(id), L = { id: id, g: g, rest: y, h: id === "bun_bottom" && g.userData.h ? g.userData.h * .93 : id === "patty" && g.userData.h ? g.userData.h * .9 : H[id] == null ? .08 : H[id], y: y + FALLH, v: 0, t: i * STEP + .25, on: false, sq: 0, sqv: 0, rx: 0, rz: 0, rxv: 0, rzv: 0 };
+        var g = make(id); if (id === "strip") { var si3 = list.slice(0, i).filter(function (q) { return q === "strip"; }).length; g.position.set((si3 - 1) * .55, 0, si3 % 2 ? .18 : -.15); g.rotation.y = (si3 - 1) * .35; y += si3 ? .05 : 0; }
+        var L = { id: id, g: g, rest: y, h: g.userData.h ? g.userData.h * (id === "bun_bottom" ? .93 : /patty|turkey|chicken/.test(id) ? .85 : .6) : H[id] == null ? .08 : H[id], y: y + FALLH, v: 0, t: i * STEP + .25, on: false, sq: 0, sqv: 0, rx: 0, rz: 0, rxv: 0, rzv: 0 };
+        if (id === "strip") L.h = 0; // strips lie side by side on the fries, not stacked
         g.visible = false; G.add(g); layers.push(L); y += L.h;
       });
       var top = y + .75; cam.position.set(0, top * .5 + 2.1, 4.6 + top * 1.05); cam.lookAt(0, top * .42, 0);
@@ -213,7 +252,7 @@ window.BURGER3D = window.BURGER3D || (function () {
     }
     function land(i) {
       var L = layers[i], w = WT[L.id] || .4;
-      L.sqv += 3.6 * w; L.rxv += (Math.random() - .5) * 5 * (1.2 - w * .5); L.rzv += (Math.random() - .5) * 5 * (1.2 - w * .5);
+      L.sqv += 4.6 * w; L.rxv += (Math.random() - .5) * 5 * (1.2 - w * .5); L.rzv += (Math.random() - .5) * 5 * (1.2 - w * .5);
       for (var j = i - 1, f = 1; j >= 0 && f > .1; j--, f *= .55) { layers[j].sqv += 2.6 * w * f; layers[j].rxv += (Math.random() - .5) * 1.2 * f; layers[j].rzv += (Math.random() - .5) * 1.2 * f; }
       if (L.g.userData.flap) L.g.userData.flap.amp = 1;
     }
@@ -233,11 +272,13 @@ window.BURGER3D = window.BURGER3D || (function () {
         L.g.position.y = L.y; L.g.scale.set(1 + s * .45, 1 - s, 1 + s * .45); L.g.rotation.x = L.rx; L.g.rotation.z = L.rz;
         lift += L.h * s;
         var ch = L.g.userData.cheese;
-        if (ch && L.on) { ch.melt = Math.min(1, ch.melt + dt / 3); var p = ch.mesh.geometry.attributes.position, bs = ch.base, e = ch.melt * ch.melt * (3 - 2 * ch.melt);
+        if (ch && L.on) { ch.sit = (ch.sit || 0) + dt; if (ch.sit > .6) ch.melt = Math.min(1, ch.melt + dt / 6); var p = ch.mesh.geometry.attributes.position, bs = ch.base, e = ch.melt * ch.melt * (3 - 2 * ch.melt);
           for (var k = 0; k < p.count; k++) { var x = bs[k * 3], z = bs[k * 3 + 2], r = Math.hypot(x, z), an = Math.atan2(z, x);
             // the square softens into a puddle: corners pull in and slump over the patty edge, the middle sags into the meat
             var edge = 1.02 + .08 * Math.sin(an * 5 + ch.seed) + .05 * Math.sin(an * 11 + ch.seed * 2), rr = r * (1 - e * .1 * Math.max(0, r - .8)), o = Math.max(0, rr - edge);
-            var sag = Math.min(.24, o * 1.3 + o * o * 2) * (1 + .3 * Math.sin(an * 7 + ch.seed)), f2 = r > 0 ? rr / r : 1;
+            var tongue = Math.pow(Math.max(0, Math.sin(an * 3 + ch.seed)), 8) + .7 * Math.pow(Math.max(0, Math.sin(an * 5 + ch.seed * 1.7)), 10);
+            var sag = Math.min(.2 + tongue * .26, o * (1.3 + tongue * 2.2) + o * o * 2) * (1 + .2 * Math.sin(an * 7 + ch.seed)), f2 = r > 0 ? rr / r : 1;
+            if (o > 0) f2 *= 1 - e * Math.min(.06, o * .25) * (1 + tongue); // hanging cheese hugs the meat
             p.setXYZ(k, x * f2, -e * sag + e * .006 * Math.sin(x * 14 + t * 2) * Math.cos(z * 12) - (rr < edge ? e * .01 * (1 - rr) : 0), z * f2); }
           p.needsUpdate = true; ch.mesh.geometry.computeVertexNormals();
           ch.drips.forEach(function (d) { var u = Math.max(0, (ch.melt - .25 - d.userData.lag * .4) / .75); setDrip(d, d.userData.max * u * u * (1 + .04 * Math.sin(t * 3 + d.userData.max * 20))); }); }

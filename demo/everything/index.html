@@ -95,6 +95,23 @@ footer{margin-top:30px;color:var(--dim);font-size:12.5px;text-align:center}
 .counts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
 .counts div{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:12px;text-align:center}
 .counts b{display:block;font:400 30px var(--display);color:var(--accent)}.counts span{font-size:11.5px;line-height:1.25;color:var(--dim);display:block}
+/* value compare */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.vs>div{border-radius:20px;padding:18px;border:1px solid var(--edge);min-width:0}
+.vs .them{background:#1a1324}.vs .us{background:linear-gradient(180deg,#123826,var(--card));border-color:#3DDC9799;box-shadow:0 0 0 2px #3DDC9733}
+.vs .lb{font:700 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.vs .big{font:400 clamp(34px,8vw,52px)/1 var(--display);margin:6px 0 2px}.vs .them .big{color:#ff8a8a;text-decoration:line-through;text-decoration-thickness:3px}
+.vs .us .big{color:var(--good)}.vs .sm{font-size:14px;color:var(--dim)}.vs .sm b{color:var(--ink)}
+.bars{margin-top:16px;display:grid;gap:10px}
+.bar .t{display:flex;justify-content:space-between;gap:10px;font-size:14px;font-weight:700}.bar .t span{font:700 13px var(--mono);color:var(--accent);white-space:nowrap}
+.bar .f{height:16px;border-radius:9px;background:#0b1230;border:1px solid var(--edge);overflow:hidden;margin-top:5px}
+.bar .f i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#b8324a,#ff8a8a)}.bar.ours .f i{background:linear-gradient(90deg,#1f9e6a,var(--good))}
+.save-big{margin-top:16px;text-align:center;background:var(--card2);border:1px dashed var(--good);border-radius:18px;padding:16px}
+.save-big b{display:block;font:400 clamp(30px,7vw,46px)/1 var(--display);color:var(--good)}
+.why{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:14px}
+.why div{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px;font-size:14.5px;color:var(--dim)}.why b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
+.mx td.c{font:700 13px var(--mono);color:#ff8a8a;white-space:nowrap}
+@media(max-width:560px){.vs{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -104,7 +121,7 @@ footer{margin-top:30px;color:var(--dim);font-size:12.5px;text-align:center}
   <div class="k">Second Shift AI · for restaurants</div>
   <h1>Everything your restaurant <span>gets</span></h1>
   <p class="lead">One scan and your guests are in. No app to download. Your menu, your own game, rewards that bring people back, your customer list, and an AI that answers your phone and your email. Here is every tool, what it does, and what it costs on its own or bundled.</p>
-  <div class="btns"><a class="btn hot" href="../setup/">⚡ Get my free sample</a><a class="btn" href="#autopilot">💬 What it sends</a><a class="btn" href="#packages">💲 See packages</a><a class="btn" href="../melody-lax/">✈️ See a live one</a></div>
+  <div class="btns"><a class="btn hot" href="../setup/">⚡ Get my free sample</a><a class="btn" href="#autopilot">💬 What it sends</a><a class="btn" href="#packages">💲 See packages</a><a class="btn" href="#value">🤯 vs. hiring a developer</a><a class="btn" href="../melody-lax/">✈️ See a live one</a></div>
   <div class="strip"><span>📲 No download, just scan</span><span>🎮 A game built on your food</span><span>🎁 Rewards + scan to earn</span><span>📇 You own the customer list</span><span>☎️ AI answers your phone</span><span>✉️ Win-back email</span></div>
 </header>
 
@@ -114,6 +131,29 @@ footer{margin-top:30px;color:var(--dim);font-size:12.5px;text-align:center}
 <p class="lead">Prices are what each tool costs on its own. Packages below bundle them for much less.</p>
 <div id="toolhost"></div>
 <div class="total" id="total"></div>
+
+<h2 id="value">What this costs anywhere else</h2>
+<p class="lead">Everything in your app is custom software. Here's what it would cost to hire a developer or agency to build it from scratch, next to what you pay.</p>
+<div class="vs">
+  <div class="them"><div class="lb">Hire a developer / agency</div><div class="big">$60k–$150k</div><div class="sm">to build, <b>3–5 months</b> of waiting<br>+ <b>$1,500–$4,000/mo</b> to host, text, and maintain it</div></div>
+  <div class="us"><div class="lb">Second Shift AI · Everything</div><div class="big">$3,500</div><div class="sm">setup, <b>live in about a week</b><br>+ <b>$600/mo</b> with hosting, updates, support, texts and AI included</div></div>
+</div>
+<div class="bars">
+  <div class="bar"><div class="t">Agency, first year (high end)<span>$198,000</span></div><div class="f"><i style="width:100%"></i></div></div>
+  <div class="bar"><div class="t">Agency, first year (low end)<span>$78,000</span></div><div class="f"><i style="width:39.4%"></i></div></div>
+  <div class="bar ours"><div class="t">Second Shift Everything, first year<span>$10,700</span></div><div class="f"><i style="width:5.4%"></i></div></div>
+  <div class="bar ours"><div class="t">Second Shift Rewards, first year<span>$5,600</span></div><div class="f"><i style="width:2.8%"></i></div></div>
+</div>
+<div class="save-big"><b>Save $67,000+ in year one</b>The same features for about 1/7 of the low-end agency price, and less than 1/18 of the high end.</div>
+<h3 style="font:400 26px var(--display);letter-spacing:.04em;margin:26px 0 0">Where an agency's price comes from</h3>
+<div class="scroll"><table class="mx" style="min-width:0"><thead><tr><th>What gets built</th><th>Typical cost</th></tr></thead><tbody><tr><td>Design, branding + mobile layout</td><td class="c">$4k–8k</td></tr><tr><td>Menu, photos + table ordering</td><td class="c">$8k–15k</td></tr><tr><td>A custom game built on your food</td><td class="c">$15k–30k</td></tr><tr><td>Game art (characters, scenes, landmarks)</td><td class="c">$3k–8k</td></tr><tr><td>Food photos + motion menu (pours, steam)</td><td class="c">$3k–7k</td></tr><tr><td>Rewards: points, levels, birthdays, codes, staff screen</td><td class="c">$10k–20k</td></tr><tr><td>Weekly leaderboard + champion prizes</td><td class="c">$4k–8k</td></tr><tr><td>Automatic texts + missed-call text-back</td><td class="c">$4k–8k</td></tr><tr><td>AI phone agent</td><td class="c">$5k–12k</td></tr><tr><td>AI email + win-back</td><td class="c">$4k–8k</td></tr><tr><td>12 languages, map, 3D menu, special deals</td><td class="c">$3k–6k</td></tr><tr><td>Testing + project management</td><td class="c">$5k–10k</td></tr><tr><td>Launch promo video</td><td class="c">$2k–10k</td></tr><tr><td><b>Total to build</b></td><td class="c" style="color:var(--accent)">$60k–$150k</td></tr></tbody></table></div>
+<h3 style="font:400 26px var(--display);letter-spacing:.04em;margin:26px 0 0">So why is it this low?</h3>
+<div class="why">
+  <div><b>⚙️ The engine is already built</b>The game engine, rewards, leaderboard, texting and AI are done. We customize them with your food, your logo and your prizes instead of starting from zero.</div>
+  <div><b>🏁 Founding-restaurant pricing</b>The first restaurants in each area lock in this price. It goes up as more spots fill.</div>
+  <div><b>📈 Pays for itself</b>A few extra visits a week from rewards, birthdays and missed-call texts covers the monthly cost. Everything after that is profit.</div>
+</div>
+<p class="note">Agency estimates use typical US developer rates ($100–175/hour, about 500–850 hours) plus photography, art and video. They're industry estimates, not quotes.</p>
 
 <h2 id="packages">Packages</h2>
 <p class="lead">Start small and upgrade any time. Every package includes hosting, updates, support and printed QR table tents.</p>

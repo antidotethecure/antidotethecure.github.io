@@ -6,7 +6,7 @@
 
 owners/<owner-slug>.json: {"owner": "Christian", "contacts": ["Sami"], "restaurants": ["melody-lax", "nalu-vida"],
                            "tags": {"melody-lax": "LAX"}}   # restaurant slugs = setup-kit/configs/<slug>.json
-Writes /launch/<owner-slug>/index.html. Each restaurant needs its setup page built first (build.py)."""
+Writes /onboarding/<owner-slug>/index.html ("<Owner>'s onboarding") plus redirects at /launch/<owner-slug>/ and /launch/<alias>/ for older links. Each restaurant needs its setup page built first (build.py)."""
 import json, sys, html, re, subprocess
 from pathlib import Path
 HERE = Path(__file__).resolve().parent; ROOT = HERE.parent
@@ -96,8 +96,13 @@ def build(owner_slug):
           .replace("__AIAGENTS__", json.dumps(agents(o)))
           .replace("__THEME__", theme).replace("__LOGOS__", logos).replace("__AMBIENT__", json.dumps(amb)))
     if fonts: t = t.replace("</title>", f'</title><link href="{fonts}" rel="stylesheet">', 1)
-    dst = ROOT / "launch" / owner_slug / "index.html"; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_text(t)
-    print(f"{owner_slug:12s} -> /launch/{owner_slug}/  ({', '.join(r['short'] for r in rest)})")
+    dst = ROOT / "onboarding" / owner_slug / "index.html"; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_text(t)
+    go = f"/onboarding/{owner_slug}/"
+    redirect = f"""<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>{html.escape(o['owner'])}'s Onboarding</title>
+<meta http-equiv="refresh" content="0;url={go}"><script>location.replace("{go}"+location.search+location.hash)</script><a href="{go}">Open {html.escape(o['owner'])}'s onboarding</a>"""
+    for old in [owner_slug] + o.get("aliases", []):
+        r = ROOT / "launch" / old / "index.html"; r.parent.mkdir(parents=True, exist_ok=True); r.write_text(redirect)
+    print(f"{owner_slug:12s} -> {go}  ({', '.join(r['short'] for r in rest)})")
 
 if __name__ == "__main__":
     args = sys.argv[1:]

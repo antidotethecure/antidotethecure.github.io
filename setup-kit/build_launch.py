@@ -7,20 +7,60 @@
 owners/<owner-slug>.json: {"owner": "Christian", "contacts": ["Sami"], "restaurants": ["melody-lax", "nalu-vida"],
                            "tags": {"melody-lax": "LAX"}}   # restaurant slugs = setup-kit/configs/<slug>.json
 Writes /launch/<owner-slug>/index.html. Each restaurant needs its setup page built first (build.py)."""
-import json, sys, html
+import json, sys, html, re, subprocess
 from pathlib import Path
 HERE = Path(__file__).resolve().parent; ROOT = HERE.parent
+ONBOARD = Path.home() / "command-center/clients/onboarding/onboard.py"
+
+def status():
+    """readiness per restaurant from the onboarding tracker (our build checks + owner sign-offs); {} if unavailable"""
+    try: return json.loads(subprocess.run([sys.executable, str(ONBOARD), "json"], capture_output=True, text=True, timeout=120).stdout)
+    except Exception: return {}
+
+def price(it):   # first field that looks like a price ("12", 11.99, "$9", "MP")
+    for v in it[1:]:
+        if isinstance(v, (int, float)) or re.fullmatch(r"\$?\d+(\.\d\d?)?|MP", str(v).strip()): return str(v)
+    return ""
+
+def menu(demo):
+    """[[category, name, price], ...] from the demo app: menu.json, or the MENU / FOOD + DRINKS arrays in its page"""
+    d = ROOT / "demo" / demo
+    if (d / "menu.json").exists():
+        m = json.loads((d / "menu.json").read_text())
+        return [[r[0], r[2], str(r[3])] for k in m for r in m[k]]
+    src = (d / "index.html").read_text() if (d / "index.html").exists() else ""
+    js = []
+    for var in ("MENU", "FOOD", "DRINKS"):
+        mm = re.search(r"(?:var\s+)?\b" + var + r"\s*=\s*\[", src)
+        if not mm: continue
+        i, depth = mm.end() - 1, 0
+        for j in range(i, len(src)):
+            depth += {"[": 1, "]": -1}.get(src[j], 0)
+            if depth == 0: js.append(f"out.{var}={src[i:j + 1]};"); break
+    if not js: return []
+    try:
+        r = subprocess.run(["node", "-e", "var vm=require('vm'),out={};vm.runInNewContext(" + json.dumps("".join(js)) + ",{out:out});console.log(JSON.stringify(out))"],
+                           capture_output=True, text=True, timeout=20)
+        o = json.loads(r.stdout)
+    except Exception: return []
+    rows = []
+    for var in ("MENU", "FOOD"):
+        for c in o.get(var, []):
+            for it in c.get("items", []): rows.append([c.get("name", ""), str(it[0]), price(it)])
+    for it in o.get("DRINKS", []): rows.append(["Drinks", str(it[0]), price(it)])
+    return rows
 
 def build(owner_slug):
     o = json.loads((HERE / "owners" / f"{owner_slug}.json").read_text())
-    rest = []
+    rest = []; st = status()
     for slug in o["restaurants"]:
         c = json.loads((HERE / "configs" / f"{slug}.json").read_text()); b = c.get("brand", {})
         out = c.get("out", f"/{slug}/setup/").strip("/") + "/"
         rest.append({"key": slug.replace("-", "_"), "name": html.escape(c["name"]), "short": html.escape(c.get("short") or c["name"]), "tag": (o.get("tags") or {}).get(slug, ""),
                      "setup": out, "color": b.get("badgeBg") or b.get("accent") or "#1e6fe0", "ink": b.get("badgeInk") or b.get("accentInk") or "#fff",
                      "storageKey": c.get("storageKey") or f"{slug}-setup-v1",
-                     "logo": c.get("launchLogo") or (c.get("logo") or {}).get("img"), "ambient": c.get("ambient", []), "brand": b})
+                     "logo": c.get("launchLogo") or (c.get("logo") or {}).get("img"), "ambient": c.get("ambient", []), "brand": b,
+                     "status": st.get(slug), "menu": menu(c.get("demo") or slug)})
     names = [r["name"] for r in rest]
     names_html = "<b>" + "</b> and <b>".join(names) + "</b>" if len(names) <= 2 else "<b>" + "</b>, <b>".join(names[:-1]) + "</b> and <b>" + names[-1] + "</b>"
     t = (HERE / "launch_template.html").read_text()

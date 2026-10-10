@@ -27,11 +27,27 @@ h1{font-size:26px;margin:4px 0}h2{font-size:19px;margin:28px 0 8px}.sub{color:va
 .bar button{width:100%;max-width:640px;display:block;margin:auto;padding:15px;border:0;border-radius:14px;background:var(--gold);color:#241a00;font:900 17px Rubik,system-ui;cursor:pointer}
 .prog{max-width:640px;margin:0 auto 8px;color:var(--dim);font-size:13px;text-align:center}
 .note{background:#1a2440;border:1px solid #2e4677;border-radius:12px;padding:10px 12px;font-size:13.5px;color:#cfe0ff}
+.where{display:grid;gap:14px;margin:6px 0 18px}.wc{background:var(--card,#111827);border:1px solid var(--edge,#253049);border-radius:18px;padding:16px}
+.wc .hd{display:flex;align-items:center;gap:14px}.ring{--p:0;width:74px;height:74px;flex:none;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--gold,#f5c400) calc(var(--p)*1%),rgba(255,255,255,.1) 0)}
+.ring b{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--card,#111827);font-size:19px}.wc h3{margin:0;font-size:19px}.wc .s{color:var(--dim,#9aa6b6);font-size:13px;margin-top:3px}
+.tl{list-style:none;margin:12px 0 0;padding:0}.tl li{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid rgba(255,255,255,.07);font-size:15px}
+.tl li .ck{width:26px;height:26px;flex:none;border-radius:8px;border:2px solid var(--edge,#3a4560);display:grid;place-items:center;font-size:15px}.tl li.ok .ck{background:#2fbf71;border-color:#2fbf71;color:#fff}
+.tl li.ok .t{color:var(--dim,#9aa6b6);text-decoration:line-through}.tl li .t{flex:1}.tl li button,.tl li a.b{flex:none;border:0;border-radius:99px;padding:9px 13px;font:700 13px inherit;background:var(--gold,#f5c400);color:#111;text-decoration:none;cursor:pointer;min-height:40px}
+details.built{margin-top:10px}details.built summary{cursor:pointer;color:var(--dim,#9aa6b6);font-size:13px;padding:6px 0}details.built li{font-size:13px;padding:5px 0;color:var(--dim,#9aa6b6)}
+.mr{display:none;margin-top:10px;border-top:1px solid rgba(255,255,255,.1);padding-top:10px}.mr.on{display:block}.mr h4{margin:14px 0 6px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim,#9aa6b6)}
+.mi{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px;flex-wrap:wrap}.mi .n{flex:1;min-width:0}.mi .p{font-weight:800;min-width:52px;text-align:right}
+.mi button{border:1px solid var(--edge,#3a4560);background:transparent;color:inherit;border-radius:10px;width:40px;min-height:40px;padding:0;font-size:15px;cursor:pointer}.mi.ok{opacity:.55}.mi.ok .okb{background:#2fbf71;border-color:#2fbf71;color:#fff}
+.mi.fx .p{text-decoration:line-through;opacity:.6}.mi input{width:100%;margin-left:0;min-height:38px;border-radius:10px;border:1px solid var(--edge,#3a4560);background:rgba(255,255,255,.06);color:inherit;padding:0 8px;font-size:15px}
+.mi.rm{opacity:.45}.mi.rm .n{text-decoration:line-through}.allok{width:100%;margin:8px 0 4px;border:0;border-radius:14px;padding:14px;font:800 16px inherit;background:#2fbf71;color:#fff;cursor:pointer}
 </style></head><body><div id="amb" aria-hidden="true"></div><main>
 <div class="top"><img class="ss" src="../../assets/ssai-lockup.jpg" alt="Second Shift AI"><span class="x">×</span><img class="rl" src="../../demo/melody-lax/img/logo.png" alt="Melody Bar &amp; Grill"><img class="rl" src="../../demo/nalu-vida/img/logo.png" alt="Nalu Vida"></div>
 <h1>Hi Christian 👋</h1>
 <p class="sub">This is everything we need to launch <b>Melody Bar &amp; Grill</b> and <b>Nalu Vida</b>, all in one place. Almost everything is a tap, no typing. Your answers save on this phone, so you can stop and come back anytime. When you're done, hit <b>Send everything to Antidote</b> at the bottom.</p>
 <p class="note">Nothing goes live until you've approved it. After you send, we put your choices in, print the QR codes, and your guests can start playing and earning the same day.</p>
+
+<h2>Where we're at</h2>
+<p class="note">We've built almost everything. The last part is you: check the boxes below and your app is ready to go live.</p>
+<div class="where" id="where"></div>
 
 <h2>1 · Your deals, giveaways &amp; prizes</h2>
 <div id="steps"></div>
@@ -47,7 +63,7 @@ h1{font-size:26px;margin:4px 0}h2{font-size:19px;margin:28px 0 8px}.sub{color:va
 </main>
 <div class="bar"><div class="prog" id="prog2"></div><button id="send" type="button">✅ Send everything to Antidote</button></div>
 <script>
-var REST=[{"key": "melody_lax", "name": "Melody Bar &amp; Grill", "short": "Melody", "tag": "LAX", "setup": "melody/setup/", "color": "#b3263a", "ink": "#fbf1de", "storageKey": "melody-setup-v2", "logo": "demo/melody-lax/img/logo.png", "ambient": ["plane"]}, {"key": "nalu_vida", "name": "Nalu Vida", "short": "Nalu Vida", "tag": "Venice Pier", "setup": "nalu-vida/setup/", "color": "#ff9a2e", "ink": "#3a1600", "storageKey": "nalu-vida-setup-v1", "logo": "demo/nalu-vida/img/logo.png", "ambient": ["surf"]}], OWNER="Christian", AMB=["plane", "surf"];
+var REST=[{"key": "melody_lax", "name": "Melody Bar &amp; Grill", "short": "Melody", "tag": "LAX", "setup": "melody/setup/", "color": "#b3263a", "ink": "#fbf1de", "storageKey": "melody-setup-v2", "logo": "demo/melody-lax/img/logo.png", "ambient": ["plane"], "status": {"name": "Melody Bar & Grill", "paid": true, "overall": 80, "build": 100, "built": [["App page live", true], ["Game in the app", true], ["Menu photos", true], ["Owner setup page", true], ["Owner launch page", true], ["QR print kit", true], ["QR short link", true], ["AI phone host", true], ["Desktop folder", true], ["Billing entry", true], ["Drive folder + customer sheet", true]], "owner": [["deals", "Pick deals, discounts & weekly giveaway", false], ["prices", "Check every menu price", false], ["menu_ok", "Approve the menu (photos + descriptions)", false], ["pos", "Pick the register (Toast, Square\u2026)", false], ["launch", "Answer the launch-week questions", false]]}, "menu": [["Starters", "Lemon Pepper Wings", "16"], ["Starters", "Avocado Toast", "13"], ["Starters", "BBQ Rib Grilled Cheese Bites", "15"], ["Starters", "Buttermilk Chicken Strips & Fries", "16"], ["Starters", "Chicken Pot Stickers", "15"], ["Starters", "Fried Green Beans", "13"], ["Starters", "Fried Shrimp", "18.25"], ["Starters", "Jalapeno Calamari", "16"], ["Starters", "Lettuce Wraps", "16"], ["Starters", "Baby Back Ribs & Fries", "20.25"], ["Mac & Cheese", "Lobster Mac & Cheese", "21.5"], ["Mac & Cheese", "Melody Burger Mac & Cheese", "19.25"], ["Mac & Cheese", "Bacon, Cheddar & Jalapeno Mac & Cheese", "17.25"], ["Mac & Cheese", "Chicken Parmesan Mac & Cheese", "18.25"], ["Mac & Cheese", "Parmesan & Mushroom Mac & Cheese", "17.25"], ["Mac & Cheese", "House Mac", "15"], ["Fries", "Gilroy Garlic Fries", "6.75"], ["Fries", "Melody Fries", "5.75"], ["Fries", "Onion Strings", "9.75"], ["Fries", "Phat Fries", "7.75"], ["Fries", "Philly Cheese Steak Fries", "17.25"], ["Fries", "Sweet Potato Fries", "7.75"], ["Soups", "French Onion Soup (Bowl)", "15"], ["Soups", "French Onion Soup (Cup)", "11"], ["Soups", "Tomato Bisque Soup (Bowl)", "15"], ["Soups", "Tomato Bisque Soup (Cup)", "11"], ["Soups", "Black Bean Soup (Bowl)", "14"], ["Soups", "Black Bean Soup (Cup)", "9.75"], ["Tacos & Burritos", "Shrimp Tacos", "16"], ["Tacos & Burritos", "Salmon Tacos", "16"], ["Tacos & Burritos", "Carnitas Tacos", "14"], ["Tacos & Burritos", "Chicken Tacos", "13"], ["Tacos & Burritos", "Avocado Tacos", "13"], ["Tacos & Burritos", "Beyond Tacos", "14"], ["Tacos & Burritos", "Nachos", "15"], ["Tacos & Burritos", "Cheese Quesadilla", "15"], ["Tacos & Burritos", "Carnitas Burrito", "18.25"], ["Tacos & Burritos", "Steak Burrito", "18.25"], ["Tacos & Burritos", "Chicken Burrito", "17.25"], ["Tacos & Burritos", "Bean & Cheese Burrito", "14"], ["Drinks", "Mango Margarita", "12"], ["Drinks", "House Margarita", "12"], ["Drinks", "Paloma", "12"], ["Drinks", "Old Fashioned", "14"], ["Drinks", "Moscow Mule", "13"], ["Drinks", "Espresso Martini", "15"], ["Drinks", "Long Island", "14"], ["Drinks", "Michelada", "10"], ["Drinks", "Draft Beer", "8"], ["Drinks", "Mimosa", "10"], ["Drinks", "Round of Shots", "10"], ["Drinks", "Bucket of Beers (5)", "30"]]}, {"key": "nalu_vida", "name": "Nalu Vida", "short": "Nalu Vida", "tag": "Venice Pier", "setup": "nalu-vida/setup/", "color": "#ff9a2e", "ink": "#3a1600", "storageKey": "nalu-vida-setup-v1", "logo": "demo/nalu-vida/img/logo.png", "ambient": ["surf"], "status": {"name": "Nalu Vida", "paid": true, "overall": 72, "build": 90, "built": [["App page live", true], ["Game in the app", true], ["Menu photos", false], ["Owner setup page", true], ["Owner launch page", true], ["QR print kit", true], ["QR short link", true], ["AI phone host", true], ["Desktop folder", true], ["Billing entry", true], ["Drive folder + customer sheet", true]], "owner": [["deals", "Pick deals, discounts & weekly giveaway", false], ["prices", "Check every menu price", false], ["menu_ok", "Approve the menu (photos + descriptions)", false], ["pos", "Pick the register (Toast, Square\u2026)", false], ["launch", "Answer the launch-week questions", false]]}, "menu": [["Shareables", "Oysters on the Half Shell", "MP"], ["Shareables", "Spicy Tuna Crispy Rice", "22"], ["Shareables", "Coconut Shrimp", "21"], ["Shareables", "Bang Bang Shrimp", "18"], ["Shareables", "Jungle Fries", "12"], ["Shareables", "Chips, Salsa & Guac", "14"], ["Shareables", "Wings", "17"], ["Shareables", "Tostadas de la Tierra", "18"], ["Shareables", "12-Hr Smoked Pork Sliders", "19"], ["Shareables", "Calamari", "15"], ["Shareables", "Sticky Tiki Ribs", "18"], ["Signature Island Tacos", "Tamarind Glazed Gulf Shrimp Tacos", "18"], ["Signature Island Tacos", "Blackened Salmon Tacos", "21"], ["Signature Island Tacos", "Vegan Chorizo Tacos", "19"], ["Signature Island Tacos", "Baja Blaze Chicken Tacos", "17"], ["Signature Island Tacos", "Beer Battered Fish Tacos", "20"], ["Breakwater Bites", "Poke Bowl", "24"], ["Breakwater Bites", "Vegan Burger", "22"], ["Breakwater Bites", "BBQ Smoke Wave", "22"], ["Breakwater Bites", "Smash-N-Stack Burger", "18"], ["Breakwater Bites", "Chipotle Chicken Sandwich", "20"], ["Breakwater Bites", "Cheesesteak", "16"], ["Breakwater Bites", "Veggie Burrito", "19"], ["Entr\u00e9es", "Blackened Salmon", "32"], ["Entr\u00e9es", "Shrimp Scampi Skewers", "31"], ["Entr\u00e9es", "Chili-Kissed Sesame Seared Ahi", "32"], ["Entr\u00e9es", "Adobo Grilled Chicken", "29"], ["Entr\u00e9es", "Crispy Chicken Milanese", "30"], ["Entr\u00e9es", "Steak & Fries", "33"], ["Entr\u00e9es", "Fish N' Chips", "24"], ["Entr\u00e9es", "Tiki Ribs", "31"], ["Pizza & Flatbreads", "Margherita", "15"], ["Pizza & Flatbreads", "Pepperoni", "16"], ["Pizza & Flatbreads", "Elote", "17"], ["Pizza & Flatbreads", "In-N-Out Style", "17"], ["Pizza & Flatbreads", "BBQ Chicken", "17"], ["Pasta", "Build-Your-Own Pasta", "18"], ["Soup & Salad", "Citrus Bomb Salad", "15"], ["Soup & Salad", "South American Caesar", "18"], ["Soup & Salad", "Sesame Chicken Salad", "21"], ["Brunch (until 4 PM)", "Huevos con Gallo Pinto", "19"], ["Brunch (until 4 PM)", "Avocado Toast", "14"], ["Brunch (until 4 PM)", "French Toast", "18"], ["Brunch (until 4 PM)", "Breakfast Burrito", "18"], ["Brunch (until 4 PM)", "Steak & Eggs", "29"], ["Brunch (until 4 PM)", "Breakfast Burger", "15"], ["Cocktails", "Nalu Margarita", "17"], ["Cocktails", "Makai", "17"], ["Cocktails", "Frozen Cocoa De Rasta", "18"], ["Cocktails", "Frozen Blackberry Luau", "18"], ["Cocktails", "Pura Vida", "18"], ["Cocktails", "Lost in Sayulita", "19"], ["Cocktails", "Sunset Sour", "20"], ["Cocktails", "Barrel-Aged Old Fashioned", "19"], ["Cocktails", "Pau Hana Punch", "18"], ["Mocktails", "Wish You Were Here", "15"], ["Mocktails", "Put the Lime in the Coconut", "15"], ["Brunch", "Bottomless Mimosas", "24"], ["Beer", "Nalu Vida Blonde Ale", "9.50"], ["Coffee", "Coco Cold Brew", "11"]]}], OWNER="Christian", AMB=["plane", "surf"];
 /* each restaurant's signature motion drifts past now and then: Melody's plane, Nalu Vida's surf, StormBurger's storm… */
 (function(){ var A=document.getElementById("amb"); if(!A||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   function el(html,css){ var d=document.createElement("div"); d.className="a"; d.innerHTML=html; d.style.cssText=css; A.appendChild(d); return d; }
@@ -112,11 +128,61 @@ var em=h("div","q"); em.appendChild(h("b",null,"Your Google email (so we can sha
 var inp=h("input"); inp.type="email"; inp.placeholder="name@gmail.com"; inp.value=S.gmail||""; inp.oninput=function(){ S.gmail=inp.value.trim(); save(); }; em.appendChild(inp); L.appendChild(em);
 q(L,"ready","Anything else before we launch?",["All good, let's go","Call me first","I have questions"]);
 
+/* Where we're at: our build (80%) + the owner's five sign-offs (20%). Menu prices are checked item by item. */
+var OT=[["deals","Pick your deals, discounts &amp; weekly giveaway"],["prices","Check every menu price"],["menu_ok","Approve the menu (photos + descriptions)"],["pos","Pick your register (Toast, Square…)"],["launch","Answer the launch-week questions"]];
+function launchDone(){ return ["date","ig","msghow","fwd","staff","assets","ready"].every(function(k){ return S[k]; }); }
+function mrev(r){ return S["mp_"+r.key]||(S["mp_"+r.key]={}); }
+function ownerDone(r){ var st=(r.status&&r.status.owner)||[], srv={}; st.forEach(function(t){ srv[t[0]]=t[2]; }); var m=mrev(r), n=(r.menu||[]).length, seen=Object.keys(m).length, saved=false;
+  try{ saved=!!localStorage.getItem(r.storageKey); }catch(e){}
+  return { deals:srv.deals||saved, prices:srv.prices||(n>0&&seen>=n)||!!S["allok_"+r.key], menu_ok:srv.menu_ok||!!S["mok_"+r.key], pos:srv.pos||!!S["pos_"+r.key], launch:srv.launch||launchDone() }; }
+function pct(r){ var o=ownerDone(r), done=OT.filter(function(t){ return o[t[0]]; }).length, b=r.status?r.status.build:100; return Math.round(b*.8+done/OT.length*20); }
+var W=document.getElementById("where"), RING={};
+REST.forEach(function(r){ var c=h("div","wc"); c.style.borderColor=r.color+"88";
+  var st=r.status, built=st?st.built.filter(function(x){ return x[1]; }).length:0;
+  c.innerHTML='<div class="hd"><div class="ring"><b></b></div><div><h3>'+r.name+'</h3><div class="s"></div></div></div><ul class="tl"></ul>'+
+    (st?'<details class="built"><summary>✅ What we&#39;ve already built ('+built+' of '+st.built.length+')</summary><ul class="tl">'+st.built.map(function(x){ return '<li class="'+(x[1]?"ok":"")+'"><span class="ck">'+(x[1]?"✓":"…")+'</span><span>'+x[0]+(x[1]?"":" — we&#39;re finishing this")+'</span></li>'; }).join("")+'</ul></details>':'')+
+    '<div class="mr"></div>';
+  W.appendChild(c); RING[r.key]=c;
+  var mr=c.querySelector(".mr"); buildReview(r,mr);
+  draw(r); });
+function draw(r){ var c=RING[r.key]; if(!c) return; var p=pct(r), o=ownerDone(r), left=OT.filter(function(t){ return !o[t[0]]; }).length;
+  c.querySelector(".ring").style.setProperty("--p",p); c.querySelector(".ring b").textContent=p+"%";
+  c.querySelector(".s").textContent=left?left+" thing"+(left>1?"s":"")+" left for you":"All set on your side 🎉 We'll take it live.";
+  var ul=c.querySelector(".tl"); ul.innerHTML="";
+  OT.forEach(function(t){ var li=h("li",o[t[0]]?"ok":""), act="";
+    if(t[0]==="deals") act='<a class="b" href="../../'+r.setup+'">Open</a>';
+    else if(t[0]==="prices"){ var m=mrev(r), n=(r.menu||[]).length; act='<button type="button" data-a="rev">'+(n?Object.keys(m).length+"/"+n:"Review")+'</button>'; }
+    else if(t[0]==="menu_ok") act='<button type="button" data-a="mok">'+(o.menu_ok?"Undo":"Looks right ✓")+'</button>';
+    else act='<button type="button" data-a="'+t[0]+'">Go</button>';
+    li.innerHTML='<span class="ck">'+(o[t[0]]?"✓":"")+'</span><span class="t">'+t[1]+'</span>'+act; ul.appendChild(li); });
+  ul.onclick=function(e){ var b=e.target.closest("button"); if(!b) return; var a=b.dataset.a;
+    if(a==="rev"){ c.querySelector(".mr").classList.toggle("on"); }
+    else if(a==="mok"){ S["mok_"+r.key]=!S["mok_"+r.key]; save(); }
+    else document.getElementById(a==="pos"?"pos":"launch").scrollIntoView({behavior:"smooth"}); };
+}
+function buildReview(r,box){ var M=r.menu||[]; if(!M.length){ box.innerHTML='<p class="s">We&#39;ll go over this menu with you in person.</p>'; return; }
+  var m=mrev(r), last=null, html='<p class="s">Tap ✓ if the price is right, ✏️ to fix it, or 🚫 if you don&#39;t sell it anymore.</p><button class="allok" type="button">✅ Everything checks out</button>';
+  M.forEach(function(it,i){ if(it[0]!==last){ html+='<h4>'+it[0]+'</h4>'; last=it[0]; }
+    html+='<div class="mi" data-i="'+i+'"><span class="n">'+it[1]+'</span><span class="p">'+(it[2]?(/^\d/.test(it[2])?"$":"")+it[2]:"—")+'</span><button class="okb" type="button" data-a="ok" aria-label="Price is right">✓</button><button type="button" data-a="fx" aria-label="Fix price">✏️</button><button type="button" data-a="rm" aria-label="No longer sold">🚫</button></div>'; });
+  box.innerHTML=html;
+  function paint(){ [].forEach.call(box.querySelectorAll(".mi"),function(row){ var v=m[row.dataset.i]; row.className="mi"+(v==="ok"?" ok":v==="rm"?" rm":v&&v.price!=null?" fx":"");
+      var inp=row.querySelector("input"); if(v&&v.price!=null){ if(!inp){ inp=h("input"); inp.inputMode="decimal"; inp.placeholder="New $"; inp.oninput=function(){ m[row.dataset.i]={price:inp.value.trim()}; save(); }; row.appendChild(inp); } inp.value=v.price; } else if(inp) inp.remove(); }); draw(r); }
+  box.onclick=function(e){ var b=e.target.closest("button"); if(!b) return;
+    if(b.classList.contains("allok")){ M.forEach(function(_,i){ if(!m[i]) m[i]="ok"; }); S["allok_"+r.key]=true; S["mok_"+r.key]=true; save(); paint(); return; }
+    var i=b.closest(".mi").dataset.i, a=b.dataset.a;
+    if(a==="ok") m[i]=m[i]==="ok"?undefined:"ok"; else if(a==="rm") m[i]=m[i]==="rm"?undefined:"rm"; else m[i]=(m[i]&&m[i].price!=null)?undefined:{price:""};
+    if(m[i]===undefined) delete m[i]; save(); paint(); if(a==="fx"){ var x=b.closest(".mi").querySelector("input"); if(x) x.focus(); } };
+  paint();
+}
+function menuSummary(r){ var M=r.menu||[], m=mrev(r), out=["MENU CHECK — "+r.short+": "+Object.keys(m).length+" of "+M.length+" items checked"+(S["allok_"+r.key]?" (tapped “Everything checks out”)":"")+(S["mok_"+r.key]?" · menu approved":" · menu NOT approved yet")];
+  M.forEach(function(it,i){ var v=m[i]; if(v==="rm") out.push("• REMOVE: "+it[1]); else if(v&&v.price!=null) out.push("• PRICE FIX: "+it[1]+" "+(it[2]||"—")+" → "+(v.price||"(blank)")); }); return out.join("\n"); }
+
 function setupDone(path,cb){ var f=document.createElement("iframe"); f.style.display="none"; f.src=path; document.body.appendChild(f);
   f.onload=function(){ var t=""; try{ t=f.contentWindow.SETUP_SUMMARY(); }catch(e){ t="(couldn't read this page's answers)"; } var ls=0; try{ ls=Object.keys(f.contentWindow.localStorage).filter(function(k){ return /setup/.test(k); }).length; }catch(e){} cb(t); setTimeout(function(){ f.remove(); },50); }; }
 function progress(){
   var keys=[].concat.apply([],REST.map(function(r){ return ["pos_"+r.key,"posway_"+r.key,"tables_"+r.key]; })).concat(["date","ig","msghow","fwd","staff","assets","ready"]), n=keys.filter(function(k){ return S[k]; }).length;
   var t=n+" of "+keys.length+" launch questions answered"; document.getElementById("prog").textContent=t; document.getElementById("prog2").textContent=t;
+  if(typeof draw==="function") REST.forEach(function(r){ draw(r); });
 }
 // tick a step once that restaurant's setup page has saved answers on this phone
 try{ REST.forEach(function(r){ if(localStorage.getItem(r.storageKey)) document.getElementById("st-"+r.key).classList.add("done"); }); }catch(e){}
@@ -130,6 +196,7 @@ document.getElementById("send").onclick=function(){
     out.push("","LAUNCH WEEK");
     var rows=[["date","Go live"]].concat(REST.map(function(r){ return ["tables_"+r.key,r.short+" tables"]; })).concat([["print","Print"],["ig","IG bio links"],["msgs","Messages go to"],["msghow","Message by"],["fwd","Call forwarding"],["staff","Staff walkthrough"],["assets","Logos & prices"],["gmail","Google email"],["ready","Before launch"]]);
     rows.forEach(function(p){ var v=S[p[0]]; out.push("• "+p[1]+": "+(Array.isArray(v)?v.join(", "):(v||"(no answer)"))); });
+    out.push(""); REST.forEach(function(r){ out.push(menuSummary(r),""); });
     sums.forEach(function(t){ out.push("","==================","",t); });
     var txt=out.join("\n"); btn.textContent="✅ Send everything to Antidote";
     if(navigator.share){ navigator.share({title:"Launch checklist",text:txt}).catch(function(){}); } else { location.href="sms:&body="+encodeURIComponent(txt); }

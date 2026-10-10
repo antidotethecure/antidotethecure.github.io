@@ -66,6 +66,11 @@ section{margin-top:54px}
 .sh{text-align:center;margin-bottom:20px}
 .sh h2{font-size:clamp(22px,5vw,30px)}
 
+/* highlight reel */
+.reel{display:grid;place-items:center}
+.reel video{width:min(360px,100%);aspect-ratio:9/16;height:auto;border-radius:22px;border:1px solid var(--edge);background:#0b1430;box-shadow:0 18px 50px rgba(0,0,0,.45),0 0 40px var(--glow)}
+.reel p{color:var(--dim);font-size:14px;margin:12px 0 0;text-align:center}
+
 /* client cards */
 .clients{display:grid;gap:22px}
 .client{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);border-radius:22px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45)}
@@ -150,9 +155,24 @@ footer a{color:var(--silver)}
   <div class="cta">
     <a class="btn primary" href="https://ig.me/m/therealantidote" target="_blank" rel="noopener">Book a free demo</a>
     <a class="btn ghost" href="#clients">See our clients ↓</a>
+    <a class="btn ghost" href="#reel">▶ Watch the reel</a>
   </div>
   <p class="mini">DM <a href="https://ig.me/m/therealantidote" target="_blank" rel="noopener">@therealantidote</a> on Instagram or email <a href="mailto:secondshiftai@gmail.com?subject=SousShift%20AI%20demo">secondshiftai@gmail.com</a></p>
 </header>
+
+<section id="reel">
+  <div class="sh">
+    <p class="kick">65 seconds</p>
+    <h2 class="chrome">Watch the reel</h2>
+    <p class="lead">All three apps in one minute, then try them yourself below.</p>
+  </div>
+  <div class="reel">
+    <video controls playsinline preload="none" poster="img/reel-poster.jpg" width="1080" height="1920">
+      <source src="video/sousshift-highlight-reel.mp4" type="video/mp4">
+    </video>
+    <p>Melody Bar &amp; Grill · Nalu Vida · Gritz N Wafflez</p>
+  </div>
+</section>
 
 <section id="clients">
   <div class="sh">

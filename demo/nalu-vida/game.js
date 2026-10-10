@@ -19,6 +19,9 @@
     ".nv-hud{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;padding:10px 12px;pointer-events:none;font:800 14px/1.1 system-ui,sans-serif;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.55)}" +
     ".nv-score{font:900 26px/1 'Alfa Slab One',Georgia,serif;letter-spacing:.5px}.nv-mult{display:inline-block;margin-top:5px;padding:4px 9px;border-radius:999px;background:linear-gradient(90deg,#ff9d2e,#ffd23f);color:#3a1600;font-weight:900;text-shadow:none;transform-origin:left center}" +
     ".nv-hearts{text-align:right;font-size:18px;letter-spacing:2px}.nv-leg{margin-top:6px;font-size:11.5px;opacity:.95}" +
+    "#nv-jump{position:absolute;right:12px;bottom:26px;width:78px;height:78px;border-radius:50%;border:3px solid rgba(255,255,255,.55);background:rgba(6,24,46,.55);color:#fff;font:900 15px system-ui;letter-spacing:.06em;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:none;z-index:3}" +
+    "#nv-jump.on{display:block}#nv-jump.ready{background:radial-gradient(circle,#7fe3f2,#1673c4);border-color:#fff;box-shadow:0 0 0 0 rgba(127,227,242,.8);animation:nvj .8s infinite}#nv-jump:active{transform:scale(.94)}" +
+    "@keyframes nvj{0%{box-shadow:0 0 0 0 rgba(127,227,242,.8)}100%{box-shadow:0 0 0 18px rgba(127,227,242,0)}}" +
     ".nv-bar{position:absolute;left:12px;right:12px;bottom:10px;height:5px;border-radius:9px;background:rgba(255,255,255,.25);pointer-events:none}.nv-bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#ffd23f,#ff7a3d)}" +
     ".nv-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px;background:linear-gradient(180deg,rgba(6,24,46,.55),rgba(6,24,46,.88));color:#fff;font:600 14px/1.45 system-ui,sans-serif}" +
     ".nv-ov h3{margin:0 0 4px;font:900 34px/1 'Alfa Slab One',Georgia,serif;letter-spacing:.5px;text-shadow:0 3px 0 #ff7a3d}.nv-ov p{margin:6px 0;max-width:330px}" +
@@ -35,6 +38,7 @@
     '<canvas id="nv-water"></canvas><canvas id="cv" data-game></canvas>' +
     '<div class="nv-hud"><div><div class="nv-score" id="nv-score">0</div><span class="nv-mult" id="nv-mult">×1</span><div class="nv-leg" id="nv-leg"></div></div><div><div class="nv-hearts" id="nv-hearts"></div><div class="nv-leg" id="nv-lap"></div><button type="button" id="nv-mute" aria-label="Sound on or off" style="pointer-events:auto;margin-top:6px;float:right;border:0;border-radius:999px;padding:5px 9px;background:rgba(6,24,46,.55);color:#fff;font-size:15px;cursor:pointer">🔊</button></div></div>' +
     '<div class="nv-bar"><i id="nv-prog" style="width:0"></i></div>' +
+    '<button type="button" id="nv-jump" aria-label="Jump">JUMP</button>' +
     '<div class="nv-toast" id="nv-toast"><img id="nv-toast-img" alt=""><span id="nv-toast-t"></span></div>' +
     '<div class="nv-ov" id="nv-start"><h3>Ride the Nalu</h3><p>Surf the Venice Pier loop. Grab the food, dodge the bites, and win free food &amp; drinks at Nalu Vida.</p>' +
     '<div class="nv-pick"><button type="button" data-s="f"><img src="img/game/surfer_f.webp" alt="" onerror="this.outerHTML=\'<div class=ph style=font-size:64px;line-height:96px>🏄‍♀️</div>\'">She rides</button>' +
@@ -323,7 +327,7 @@
   // game over: the crew pulls you back to the sand in front of Nalu Vida
   function finaleStep(dt) {
     G.finT += dt; var k = Math.min(1, G.finT / 2.4), e = k * k * (3 - 2 * k);
-    G.yw = G.finFrom + (90 - G.finFrom) * e; G.x += (300 - G.x) * Math.min(1, dt * 1.5); G.ang = Math.PI;
+    G.yw = G.finFrom + (-36 - G.finFrom) * e; G.x += (322 - G.x) * Math.min(1, dt * 1.5); G.ang = Math.PI;
     G.cam = G.yw - LEAD * .3; tickEnts(dt);
     if (k >= 1 && !G.finDone) { G.finDone = 1; showEnd(); }
   }
@@ -425,7 +429,7 @@
       cx.save(); cx.shadowColor = "rgba(0,0,0,.45)"; cx.shadowBlur = 18; cx.beginPath(); if (cx.roundRect) cx.roundRect(20, yy, cw, ch, 14); else cx.rect(20, yy, cw, ch); cx.clip(); cx.drawImage(IM.storefront, 20, yy, cw, ch); cx.restore();
       label(G.phase === "shore" ? "★ Welcome back to Nalu Vida ★" : "★ The Nalu Vida crew pulled you in ★", W / 2, yy + ch + 18, "#ffd23f");
     }
-    hud();
+    hud(); jumpBtn();
   }
   // a rolling wave with real depth: dark trough behind, sunlit face, breaking white crest (photo art) and spray
   function drawWave(e) {
@@ -492,7 +496,7 @@
     if (G.phase === "intro") {
       var bx = x - 70, by = y - 30; spr("boat", bx, by + Math.sin(G.t * 2) * 2, 120, Math.PI * .9);
       var f = Math.min(1, G.introT / 1.15), jx = bx + (x - bx) * f, jy = by + (y - by) * f - Math.sin(f * Math.PI) * 70, sc = 1 + Math.sin(f * Math.PI) * .35;
-      if (f < 1) { cx.fillStyle = "rgba(0,20,35,.25)"; cx.beginPath(); cx.ellipse(jx + 10, by + (y - by) * f + 10, 12, 26, 0, 0, 7); cx.fill(); spr(G.surfer === "m" ? "surfer_m" : "surfer_f", jx, jy, 64 * sc, Math.PI + f * .6); return; }
+      if (f < 1) { cx.fillStyle = "rgba(0,20,35,.25)"; cx.beginPath(); cx.ellipse(jx + 10, by + (y - by) * f + 10, 12, 26, 0, 0, 7); cx.fill(); spr(G.surfer === "m" ? "surfer_m" : "surfer_f", jx, jy, 64 * sc, f * .6); return; }
     }
     if (blink) return;
     var air = G.jump > 0 ? Math.sin(Math.PI * (1 - G.jump / G.jumpDur)) * (G.jumpDur > .6 ? 1 : .45) : 0;
@@ -505,7 +509,7 @@
     var lean = Math.max(-.55, Math.min(.55, G.vx / 380)), shift = lean * 6;                       // weight shifts into the turn
     cx.save(); cx.filter = "brightness(1.2) contrast(1.08) saturate(1.12)";
     var drew = (function () { var i = IM[G.surfer === "m" ? "surfer_m" : "surfer_f"]; if (!ok(i)) return false; var w = 56 * (1 + air * .42), h = w * i.naturalHeight / i.naturalWidth;
-      cx.translate(x + shift, y); cx.rotate(G.ang + tilt * .6 + air * .25 * (G.vx > 0 ? 1 : -1)); cx.transform(1, 0, -lean * .35, 1, 0, 0); cx.scale(1 - Math.abs(lean) * .1, 1); cx.drawImage(i, -w / 2, -h / 2, w, h); return true; })();
+      cx.translate(x + shift, y); cx.rotate(G.ang + Math.PI + tilt * .6 + air * .25 * (G.vx > 0 ? 1 : -1)); cx.transform(1, 0, -lean * .35, 1, 0, 0); cx.scale(1 - Math.abs(lean) * .1, 1); cx.drawImage(i, -w / 2, -h / 2, w, h); return true; })();
     cx.restore();
     if (!drew) {
       cx.save(); cx.translate(x, y); cx.rotate(G.ang); var gr = cx.createLinearGradient(0, -30, 0, 30); gr.addColorStop(0, "#ffb02e"); gr.addColorStop(.5, "#ffd23f"); gr.addColorStop(.5, "#2f8fd8"); gr.addColorStop(1, "#173d8f");
@@ -581,7 +585,9 @@
     c.globalAlpha=1; c.fillStyle="#2b2e35"; c.beginPath(); c.arc(0,0,r*.09,0,6.283); c.fill(); c.fillStyle="rgba(255,255,255,.35)"; c.beginPath(); c.arc(-r*.03,-r*.03,r*.035,0,6.283); c.fill();
     c.restore(); }
   function rotor(x, y, r, a, top) { if (top) rotorFX(cx, x, y, r, G.t, 1); }
-  var lastHud = "";
+  var lastHud = "", lastJ = "";
+  function jumpBtn() { var b = $("nv-jump"); if (!b) return; var on = G.running && G.phase === "ride", rd = on && G.wave > 0, k = on + "" + rd;
+    if (k === lastJ) return; lastJ = k; b.classList.toggle("on", on); b.classList.toggle("ready", rd); b.textContent = rd ? "JUMP 🌊" : "JUMP"; }
   function hud() {
     var s = Math.floor(G.score).toLocaleString(), m = "×" + G.mult + (G.streak >= 3 ? " · " + G.streak + " streak 🔥" : ""), hs = "❤️".repeat(Math.max(0, G.hearts)) + "🤍".repeat(Math.max(0, 5 - G.hearts)),
       leg = G.phase === "turn" ? "Rounding the pier!" : G.phase === "shore" ? "Nalu Vida pit stop" : G.dir > 0 ? "Out to the end of the pier" : "Back to Nalu Vida", key = s + m + hs + leg + G.lap;
@@ -613,14 +619,16 @@
     else if (prize) win = "🏆 You won <b>" + esc(prize) + "</b>! Join Nalu Vida Rewards below to save it.";
     var next = PRIZES.filter(function (p) { return p[0] > sc; })[0];
     var sv = {}; try { sv = JSON.parse(localStorage.getItem("nalu-board") || "{}"); } catch (e) {}
-    $("nv-end").innerHTML = (ok(IM.storefront) ? "<img src='" + IM.storefront.src + "' alt='Nalu Vida' style='width:100%;max-width:330px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.4);margin-bottom:8px'>" : "") + "<h3>Washed up at Nalu Vida!</h3><p style='font:900 30px system-ui;margin:4px 0'>" + sc.toLocaleString() + "</p><p>Lap " + G.lap + " · best " + G.best.toLocaleString() + "</p>" +
+    $("nv-end").innerHTML = (ok(IM.storefront) ? "<img src='" + IM.storefront.src + "' alt='Nalu Vida' style='width:100%;max-width:330px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.4);margin-bottom:8px'>" : "") + "<h3>You made it to Nalu Vida! 🌴</h3><p style='font:900 30px system-ui;margin:4px 0'>" + sc.toLocaleString() + "</p><p>Lap " + G.lap + " · best " + G.best.toLocaleString() + "</p>" +
       (win ? "<div class='nv-win'>" + win + "</div>" : next ? "<p>" + (next[0] - sc).toLocaleString() + " more points wins <b>" + esc(next[1]) + "</b></p>" : "") +
-      "<button class='nv-btn' id='nv-again' type='button'>🏄 Ride again</button>" +
+      "<button class='nv-btn' id='nv-order' type='button' style='font-size:18px;padding:14px 24px'>🍽️ Head inside &amp; order</button><br>" +
+      "<button class='nv-btn' id='nv-again' type='button' style='background:#fff'>🏄 Ride again</button>" +
       "<div class='nv-board'><b>This week's top riders</b> <span id='nv-wk' style='opacity:.7'></span><ol id='nv-list'><li>Loading…</li></ol>" +
       "<input id='nv-n' maxlength='16' placeholder='Name for the board' value='" + esc(sv.n || "") + "'><input id='nv-ig' maxlength='31' placeholder='@instagram (optional)' value='" + (sv.ig ? "@" + esc(sv.ig) : "") + "'>" +
       "<button class='nv-btn' id='nv-post' type='button' style='width:100%;margin-top:6px'>Post my score</button><div id='nv-msg' style='margin-top:6px;font-size:12.5px'></div><div style='font-size:12px;opacity:.8;margin-top:4px'>#1 at the end of the week wins half off their meal.</div></div>";
     $("nv-end").style.display = "flex";
     $("nv-again").onclick = function () { start(); };
+    $("nv-order").onclick = function () { $("nv-end").style.display = "none"; var t = document.getElementById("seat") || document.getElementById("food"); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); };
     $("nv-post").onclick = post; loadBoard();
   }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -670,6 +678,7 @@
   window.addEventListener("keydown", function (e) { if (!G.running) return; if (e.key === " " || e.key === "ArrowUp") { jump(true); e.preventDefault(); return; } if (e.key === "ArrowLeft" || e.key === "ArrowRight") { keys[e.key] = 1; e.preventDefault(); } });
   window.addEventListener("keyup", function (e) { keys[e.key] = 0; });
   setInterval(function () { if (keys.ArrowLeft) G.vx = Math.max(-380, G.vx - 90); if (keys.ArrowRight) G.vx = Math.min(380, G.vx + 90); }, 50);
+  $("nv-jump").addEventListener("pointerdown", function (e) { e.preventDefault(); e.stopPropagation(); jump(true); buzz(8); });
   $("nv-mute").onclick = function () { audio(); setMute(!MUTED); }; setMute(MUTED);
   [].forEach.call(wrap.querySelectorAll(".nv-pick button"), function (b) { b.onclick = function () { start(b.getAttribute("data-s")); }; });
 

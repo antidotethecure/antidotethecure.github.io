@@ -555,13 +555,25 @@ hud();
 <script src="../crm.js"></script>
 <script>window.NEARBY={name:"StormBurger",pin:"⚡",spots:[{label:"Inglewood",lat:33.981203,lng:-118.358312,q:"1500 N La Brea Ave, Inglewood, CA 90302"},{label:"Long Beach",lat:33.860251,lng:-118.168688,q:"5801 Cherry Ave, Long Beach, CA 90805"}],offer:"Show this at the counter for double stars on today's order."};</script>
 <script src="../nearby.js"></script>
+<script>window.MENU3D={stack:{img:"img/build/",recipes:{
+ "Classic StormBurger":["bun_bottom","sauce_storm","patty","cheese","pickles","onion","tomato","lettuce","bun_top"],
+ "Double Classic StormBurger":["bun_bottom","sauce_storm","patty","cheese","patty","cheese","pickles","onion","tomato","lettuce","bun_top"],
+ "Bacon BBQ Burger":["bun_bottom","sauce_bbq","patty","cheese","bacon","onion_straws","bun_top"],
+ "Jalapeño Lightning Burger":["bun_bottom","sauce_crema","patty","swiss","onion_grilled","jalapeno","sauce_storm","bun_top"],
+ "Kids Burger":["bun_bottom","patty","cheese","bun_top"],
+ "Kids Combo":["bun_bottom","patty","cheese","bun_top"],
+ "Turkey Burger":["bun_bottom","sauce_storm","turkey","cheese","turkey","pickles","onion","tomato","lettuce","bun_top"],
+ "Chicken Sandwich":["bun_bottom","sauce_mayo","pickles_crinkle","chicken","bun_top"],
+ "Spicy Chicken Sandwich":["bun_bottom","sauce_spicy_mayo","pickles_crinkle","chicken_spicy","sauce_thunder","bun_top"],
+ "Deluxe Chicken Sandwich":["bun_bottom","sauce_mayo","chicken","swiss","tomato","slaw","bun_top"],
+ "Spicy Deluxe Chicken Sandwich":["bun_bottom","sauce_spicy_mayo","chicken_spicy","sauce_thunder","swiss","tomato","slaw","bun_top"]}}};</script>
 <script src="../menu3d.js"></script>
 <script>window.BUILDER={mode:"stack",name:"StormBurger",img:"img/build/",fire:"img/game/flame.webp",mount:"#menu",fireLabel:"Grill it",fireBusy:"Grilling at 400°",
   layers:{bun_bottom:{w:.8,ar:.537,top:.55},bun_top:{w:.8,ar:.554,sink:.14}},
   variants:[
   {tab:"🍔 Smash burger",accent:"burger",hash:"build",base:2.74,baseName:"Brioche bun + Storm sauce",start:["bun_bottom"],top:"bun_top",
    lines:["Looking good.","Now that's a StormBurger.","Smash it.","Chef's kiss.","That's a real one."],
-   stackOrder:["pickles","onion","tomato","lettuce","patty","cheese","swiss","bacon","jalapeno","onion_straws"],
+   stackOrder:["patty","cheese","swiss","bacon","lettuce","tomato","onion","pickles","jalapeno","onion_straws"],
    parts:[
     {id:"patty",name:"Smash patty",price:2.5,max:3,w:.82,ar:.375,top:.62,sink:.25,group:"Patties · 4oz all-natural"},
     {id:"cheese",name:"American",price:.75,max:3,w:.84,ar:.466,top:.38,sink:.42,group:"Cheese & extras"},

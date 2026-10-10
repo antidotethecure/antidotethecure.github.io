@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive"><title>Pitch Builder · Second Shift AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070B1E;--card:#121C40;--edge:#25336A;--ink:#EEF2FF;--dim:#A3AED3;--gold:#FFD23F;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Archivo",system-ui,sans-serif;overflow-x:clip}
+.w{max-width:720px;margin:0 auto;padding:18px 16px 40px}
+h1{font:400 clamp(40px,11vw,64px)/1 "Bebas Neue",Impact,sans-serif;margin:8px 0}
+p{color:var(--dim)}code{background:var(--card);padding:2px 6px;border-radius:6px;color:var(--gold);overflow-wrap:anywhere}
+input{width:100%;font:16px inherit;padding:12px 14px;border-radius:12px;border:1px solid var(--edge);background:var(--card);color:var(--ink)}
+a.it{display:flex;justify-content:space-between;gap:10px;align-items:center;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:12px 14px;margin:8px 0}
+a.it b{display:block;overflow-wrap:anywhere}a.it small{color:var(--dim)}a.it span{color:var(--gold);font-weight:900;flex:none}
+.box{background:var(--card);border-radius:14px;padding:12px 14px;margin:14px 0;font-size:14.5px}
+</style></head><body><div class="w">
+<img src="../assets/ssai-lockup.jpg" alt="Second Shift AI" style="height:34px;border-radius:8px">
+<h1>Pitch pages</h1>
+<p>Every personalized pitch page made by the Pitch Builder. Tap one to open it, then share the link.</p>
+<div class="box">New pitch: on Telegram text Jasmin <code>pitch @handle</code> (add <code>es</code>, <code>th</code>, <code>ko</code>… for a language), or on the laptop run <code>python3 ~/command-center/second-shift-ai/pitch/pitch.py @handle</code>. Nothing is ever sent to the business automatically.</div>
+<input id="q" type="search" placeholder="Search pitches" aria-label="Search pitches">
+<div id="list"><p>Loading…</p></div>
+</div>
+<script>
+var L=[],LN={en:"EN",es:"ES",th:"TH",ko:"KO",zh:"ZH",vi:"VI",tl:"TL",hy:"HY"};
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+function draw(){var q=document.getElementById("q").value.toLowerCase();
+ var h=L.filter(function(x){return !q||(x.title+" "+(x.area||"")+" "+(x.type||"")).toLowerCase().indexOf(q)>=0;}).map(function(x){
+  return '<a class="it" href="'+esc(x.slug)+'/"><div><b>'+esc(x.title)+'</b><small>'+esc([x.type,x.area,x.date].filter(Boolean).join(" · "))+'</small></div><span>'+esc(LN[x.lang]||"EN")+' →</span></a>';}).join("");
+ document.getElementById("list").innerHTML=h||"<p>No pitches yet.</p>";}
+document.getElementById("q").addEventListener("input",draw);
+fetch("pitches.json?v="+Date.now()).then(function(r){return r.json();}).then(function(j){L=j;draw();}).catch(function(){document.getElementById("list").innerHTML="<p>Couldn't load the list.</p>";});
+</script></body></html>

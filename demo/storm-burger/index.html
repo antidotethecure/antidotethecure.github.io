@@ -276,8 +276,14 @@ function end(){
   var prize=st.score>=1000?"a Free Classic StormBurger":st.score>=800?"a Free shake":st.score>=600?"Free fries":st.score>=400?"Free sauce":"";
   var won=$("won"); won.style.display="none";
   if(prize&&window.SSAI_WIN){ var w=window.SSAI_WIN(prize.replace(/^a /,""));
-    won.innerHTML="🏆 You won "+prize+"!<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#FFD23F;letter-spacing:.1em\">"+w.prize.c+"</span><br><span style=\"font-weight:600;font-size:13px;color:#C9D2EE\">"+(w.saved?"Saved to your rewards. Show it at StormBurger to redeem.":"Join StormBurger Rewards below to save it.")+"</span>";
-    won.style.display="block"; }
+    var showWin=function(){
+      if(w.blocked) won.innerHTML="🏆 You'd win "+prize+", but you already have <b>"+w.prize.t+"</b> waiting (code "+w.prize.c+").<br><span style=\"font-weight:600;font-size:13px;color:#C9D2EE\">Use it by "+w.until+", then your next win saves. One reward at a time.</span>"; else
+      won.innerHTML="🏆 You won "+prize+"!<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#FFD23F;letter-spacing:.1em\">"+w.prize.c+"</span><br><span style=\"font-weight:600;font-size:13px;color:#C9D2EE\">"+(w.saved||window.SSAI_GATE?"Saved to your rewards. Show it at StormBurger to redeem.":"Join StormBurger Rewards below to save it.")+"</span>";
+      won.style.display="block"; };
+    // the prize is held on this phone; guests add a phone or email at "Save my prize" to get the code (members skip it)
+    if(w.saved||!window.SSAI_GATE) showWin();
+    else { won.innerHTML=(w.blocked?"🏆 You'd win "+prize+", but you already have <b>"+w.prize.t+"</b> waiting.":"🏆 You won "+prize+"!")+"<br><span style=\"font-weight:600;font-size:13px;color:#C9D2EE\">Save it to your StormBurger Rewards to get your code.</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display="block";
+      $("wsave").onclick=function(){ window.SSAI_GATE("prize",showWin); }; } }
   $("over").classList.add("on");
 }
 function spawn(){

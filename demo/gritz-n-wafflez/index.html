@@ -460,9 +460,14 @@ function end(){
   $("rank").textContent=prize?"🏆 You won "+prize:"Kitchen's closed! Try again while you wait";
   var won=$("won"); won.style.display="none";
   if(prize&&window.SSAI_WIN){ var w=window.SSAI_WIN(prize.replace(/^a /,""));
+    var showWin=function(){
     if(w.blocked) won.innerHTML="🏆 You'd win "+prize+", but you already have <b>"+w.prize.t+"</b> waiting (code "+w.prize.c+").<br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">Use it by "+w.until+", then your next win saves. One reward at a time.</span>";
-    else won.innerHTML="🏆 You won "+prize+"!<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#F2C14E;letter-spacing:.1em\">"+w.prize.c+"</span><br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">"+(w.saved?"Saved to your rewards. Show your server to redeem. Good for 3 days.":"Join Gritz N Wafflez Rewards below to save it.")+"</span>";
-    won.style.display="block"; }
+    else won.innerHTML="🏆 You won "+prize+"!<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#F2C14E;letter-spacing:.1em\">"+w.prize.c+"</span><br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">"+(w.saved||window.SSAI_GATE?"Saved to your rewards. Show your server to redeem. Good for 3 days.":"Join Gritz N Wafflez Rewards below to save it.")+"</span>";
+    won.style.display="block"; };
+    // the prize is held on this phone; guests add a phone or email at "Save my prize" to get the code (members skip it)
+    if(w.saved||!window.SSAI_GATE) showWin();
+    else { won.innerHTML=(w.blocked?"🏆 You'd win "+prize+", but you already have <b>"+w.prize.t+"</b> waiting.":"🏆 You won "+prize+"!")+"<br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">Save it to your Gritz N Wafflez Rewards to get your code.</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display="block";
+      $("wsave").onclick=function(){ window.SSAI_GATE("prize",showWin); }; } }
   $("startov").classList.remove("off"); $("startov").querySelector("b").textContent="Kitchen's closed"; $("startov").querySelector("span").textContent="Tap to run it back";
   $("over").classList.add("on");
 }

@@ -397,13 +397,13 @@ function openSheet(){
 $("sheet").addEventListener("click",function(e){
   if(e.target===$("sheet")||e.target.closest("[data-x]")){ $("sheet").classList.remove("on"); return; }
   if(e.target.closest("[data-pick]")){ $("sheet").classList.remove("on"); $("seat").scrollIntoView({behavior:"smooth"}); return; }
-  if(e.target.closest("[data-send]")){
+  if(e.target.closest("[data-send]")){ (window.SSAI_GATE||function(r,cb){ cb(); })("order",function(){ // contact info is asked here, at the end of the order (members skip it)
     var t=totals(), num="M-"+(100+((Math.random()*900)|0)), earn=window.SSAI_EARN?window.SSAI_EARN(t.sub,"🍸 Order "+num+" · "+seatLabel()):null;
     $("sheetin").innerHTML='<div class="ok"><div class="check"><svg viewBox="0 0 40 40"><path d="M9 21l8 8 15-17"/></svg></div><b>Order received</b><div class="code">'+num+'</div><div class="sub" style="margin:4px 0 0">'+esc(seatLabel())+' · '+money(t.total)+'</div>'+
       (earn?'<div style="color:var(--gold2);font-weight:800;margin-top:6px">'+(earn.saved?'+'+earn.pts+' rewards points':'Join Melody Rewards below to earn +'+earn.pts+' points')+'</div>':'')+
       '<p class="sub" style="font-size:12px;margin-top:8px">Preview build: live, this prints on Melody\'s ticket printer and pings your server.</p></div><button class="btn" type="button" data-x style="width:100%;justify-content:center;margin-top:10px">Done</button>';
     cart={}; saveCart(); buzz([20,40,20]);
-  }
+  }); }
 });
 drawSeat(); saveCart();
 /* Just Landed: boarding pass (LAX arrival, last 24h) + ID; regulars must be Rewards members */
@@ -783,8 +783,13 @@ function end(){
   $("rank").textContent=prize?"🏆 You won "+prize.replace(/^a /,"a "):"Best: "+Math.max(b,G.score).toLocaleString()+" pts · 3,400 wins a prize";
   var won=$("won"); won.style.display="none";
   if(prize&&window.SSAI_WIN){ var r=window.SSAI_WIN(prize.replace(/^a /,""));
-    if(r.blocked){ won.innerHTML="🏆 You'd win "+esc(prize)+" — but you already have <b>"+esc(r.prize.t)+"</b> waiting (code "+r.prize.c+").<br><span style=\"font-weight:600;font-size:13px;color:#c9d2ee\">Use it by "+esc(r.until)+", then your next win saves. One reward at a time.</span>"; won.style.display="block"; } else
-    won.innerHTML="🏆 You won "+esc(prize)+"!<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#f0d375;letter-spacing:.1em\">"+r.prize.c+"</span><br><span style=\"font-weight:600;font-size:13px;color:#c9d2ee\">"+(r.saved?"Saved to your Melody Rewards. Show it to your server.":"Join Melody Rewards below to save it.")+"</span>"; won.style.display="block"; }
+    var showWin=function(){
+      if(r.blocked) won.innerHTML="🏆 You'd win "+esc(prize)+" — but you already have <b>"+esc(r.prize.t)+"</b> waiting (code "+r.prize.c+").<br><span style=\"font-weight:600;font-size:13px;color:#c9d2ee\">Use it by "+esc(r.until)+", then your next win saves. One reward at a time.</span>"; else
+      won.innerHTML="🏆 You won "+esc(prize)+"!<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#f0d375;letter-spacing:.1em\">"+r.prize.c+"</span><br><span style=\"font-weight:600;font-size:13px;color:#c9d2ee\">"+(r.saved||window.SSAI_GATE?"Saved to your Melody Rewards. Show it to your server.":"Join Melody Rewards below to save it.")+"</span>"; won.style.display="block"; };
+    // the prize is held on this phone; guests add a phone or email at "Save my prize" to get the code (members skip it)
+    if(r.saved||!window.SSAI_GATE) showWin();
+    else { won.innerHTML=(r.blocked?"🏆 You'd win "+esc(prize)+" — but you already have <b>"+esc(r.prize.t)+"</b> waiting.":"🏆 You won "+esc(prize)+"!")+"<br><span style=\"font-weight:600;font-size:13px;color:#c9d2ee\">Save it to your Melody Rewards to get your code.</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display="block";
+      $("wsave").onclick=function(){ window.SSAI_GATE("prize",showWin); }; } }
   $("over").classList.add("on");
 }
 /* ---- weekly leaderboard (shared with the bowling site's score service, its own board) ---- */
@@ -796,6 +801,12 @@ function loadBoard(){ $("bweek").textContent="Week of "+wkey(); fetch(BAPI+"?gam
 loadBoard(); setInterval(loadBoard,60000);
 try{ var sv=JSON.parse(localStorage.getItem("melody-board")||"{}"); if(sv.n) $("bn").value=sv.n; if(sv.ig) $("big").value="@"+sv.ig; }catch(e){}
 $("bpost").addEventListener("click",function(){
+  if(!G.score){ $("bmsg").textContent="Fly a round first."; return; }
+  if(G.posted===G.runId){ $("bmsg").textContent="This flight is already on the board."; return; }
+  // posting a score needs a phone or email on file (members skip straight to posting)
+  (window.SSAI_GATE||function(r,cb){ cb(); })("score",function(m){ if(m&&!$("bn").value.trim()) $("bn").value=m.name.split(" ")[0]; postScore(); });
+});
+function postScore(){
   var n=$("bn").value.trim().replace(/[^\w .\-]/g,"").slice(0,16), ig=$("big").value.trim().replace(/^@/,"").replace(/[^A-Za-z0-9._]/g,"").slice(0,30);
   if(!n){ $("bmsg").textContent="Add a name for the board."; return; }
   if(!G.score){ $("bmsg").textContent="Fly a round first."; return; }
@@ -806,7 +817,7 @@ $("bpost").addEventListener("click",function(){
     G.posted=G.runId; try{ localStorage.setItem("melody-board",JSON.stringify({n:n,ig:ig})); }catch(e){}
     $("bmsg").innerHTML="✅ You're on the board! "+(ig?"People can follow <b>@"+esc(ig)+"</b>.":""); loadBoard(); buzz(20);
   }).catch(function(){ $("bmsg").textContent="No connection. Try again in a sec."; });
-});
+}
 // last week's #1 on this phone gets the weekly prize, once, good for 3 days
 (function(){ var sv={}; try{ sv=JSON.parse(localStorage.getItem("melody-board")||"{}"); }catch(e){}
   if(!sv.n) return; var lw=wkey(1), k="melody-champ-"+lw; try{ if(localStorage.getItem(k)) return; }catch(e){}

@@ -957,13 +957,13 @@ function openSheet(){
 $("sheet").addEventListener("click",function(e){
   if(e.target===$("sheet")||e.target.closest("[data-x]")){ $("sheet").classList.remove("on"); return; }
   if(e.target.closest("[data-pick]")){ $("sheet").classList.remove("on"); $("seat").scrollIntoView({behavior:"smooth"}); return; }
-  if(e.target.closest("[data-send]")){
+  if(e.target.closest("[data-send]")){ (window.SSAI_GATE||function(r,cb){ cb(); })("order",function(){ // contact info is asked here, at the end of the order (members skip it)
     var t=totals(), num="NV-"+(100+((Math.random()*900)|0)), earn=window.SSAI_EARN?window.SSAI_EARN(t.sub,"🌊 Order "+num+" · "+seatLabel()):null;
     $("sheetin").innerHTML='<div class="ok"><div class="check"><svg viewBox="0 0 40 40"><path d="M9 21l8 8 15-17"/></svg></div><b>Order received</b><div class="code">'+num+'</div><div class="sub" style="margin:4px 0 0">'+esc(seatLabel())+' · '+money(t.total)+(t.mp?' + MP':'')+'</div>'+
       (earn?'<div style="color:var(--sun3);font-weight:800;margin-top:6px">'+(earn.saved?'+'+earn.pts+' rewards points':'Join Nalu Vida Rewards below to earn +'+earn.pts+' points')+'</div>':'')+
       '<p class="sub" style="font-size:12px;margin-top:8px">Preview build: live, this prints on Nalu Vida\'s ticket printer and pings your server.</p></div><button class="btn" type="button" data-x style="width:100%;justify-content:center;margin-top:10px">Done</button>';
     cart={}; saveCart(); buzz([20,40,20]);
-  }
+  }); }
 });
 drawSeat(); saveCart();
 

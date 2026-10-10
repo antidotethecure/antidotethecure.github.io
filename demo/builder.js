@@ -203,11 +203,15 @@
   done.addEventListener("click", function (ev) {
     var b = ev.target.closest("button"); if (!b) return;
     if (b.dataset.a === "again") { counts = {}; fired = false; seen = {}; done.style.display = "none"; if (C.mode === "plate") drawPlate(); else rebuildStack(); refresh(); stage.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
+    if (b.dataset.a !== "order") return;
+    // contact info is asked here, at the end of the order (members go straight through)
+    (window.SSAI_GATE || function (r, cb) { cb(); })("order", function () {
     var t = price(), num = "#" + String.fromCharCode(65 + ((Math.random() * 26) | 0)) + (100 + ((Math.random() * 900) | 0)), earn = window.SSAI_EARN ? window.SSAI_EARN(t, "🍽️ Built " + C.accent + " order " + num) : null;
     done.innerHTML = '<h4>🎉 Order ' + num + ' placed</h4><div class="ln"><span>Pay at pickup</span><span>' + money(t) + '</span></div><div class="ln"><span>Ready in about</span><span>12 min</span></div>' +
       (earn ? '<div class="ln" style="color:#FFD23F"><span>' + (earn.saved ? "Rewards points earned" : "Join rewards to earn") + '</span><span>+' + earn.pts + ' pts</span></div>' : '') +
       '<div class="acts"><button type="button" data-a="again">Build another</button><button type="button" class="go" data-a="pts">See my rewards</button></div><p style="font-size:11.5px;color:#7F8AAA;margin:10px 0 0">Demo order: nothing is charged or sent. Live, it goes straight to ' + e(C.name || "the kitchen") + '.</p>';
     var pt = done.querySelector('[data-a="pts"]'); pt.onclick = function () { var j = document.getElementById("crm-join"); if (j) j.scrollIntoView({ behavior: "smooth" }); };
+    });
   });
 
   var mount = C.mount && document.querySelector(C.mount);

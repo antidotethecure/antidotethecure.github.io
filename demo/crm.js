@@ -11,13 +11,19 @@
    every time that friend orders. Optional per-business config:
      CRM_CFG.tiers = [[250,"Free fries"],[500,"Free shake"],...]      (points → reward)
      CRM_CFG.perDollar = 10                                              (points per $1)
-     CRM_CFG.referral = {join:50, first:100, every:20, goal:3, gift:"Free fries"} */
+     CRM_CFG.referral = {join:50, first:100, every:20, goal:3, gift:"Free fries"}
+   Contact info is asked only when it's needed: SSAI_GATE("order" | "prize" | "score", cb) wraps sending an order,
+   saving a game prize and posting a score. Members go straight through; everyone else fills a short sheet first.
+   Nothing pops up on load asking for contact info; the join card stays as an optional "join anytime". */
 (function () {
   "use strict";
   var C = window.CRM_CFG || {};
   var NAME = C.name || (window.NEARBY && window.NEARBY.name) || document.title.split(" — ")[0];
   var OFFER = C.offer || "10% off your next visit";
   var SLUG = NAME.toLowerCase().replace(/[^a-z0-9]+/g, "-"), KEY = "ssai_crm_" + SLUG;
+  // contact gate: guests only give their info when they order or save a game prize / score (see gate() below).
+  // Exposed right away so game and order code can call it: SSAI_GATE("order" | "prize" | "score", function (member) { ... })
+  window.SSAI_GATE = gate;
   var e = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var PER = C.perDollar || 10;
   var TIERS = C.tiers || [[250, "Free side"], [500, "Free drink"], [800, "Free entrée"], [1200, "Free meal"]];
@@ -51,8 +57,8 @@
     ".crm-idnote{font-size:12px;color:#9AA6CC;margin:6px 0 2px;line-height:1.4}",
     ".crm-bday{background:#b04af71f;border:1px solid #b04af766;border-radius:16px;padding:14px;margin-top:12px}.crm-bday h4{margin:0 0 4px;color:#D7A6FF}",
     ".crm-win.bd{border-color:#D7A6FF;margin-top:12px}",
-    ".crm-card .ok{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:#C9D2EE;margin-top:12px;font-weight:500}",
-    ".crm-card .ok input{width:20px;height:20px;flex:none;accent-color:#E8582A;margin-top:1px;padding:0}",
+    ".crm-card .crm-optin{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:#C9D2EE;margin-top:12px;font-weight:500}",
+    ".crm-card .crm-optin input{width:20px;height:20px;flex:none;accent-color:#E8582A;margin-top:1px;padding:0}",
     ".crm-card .go{display:block;width:100%;margin-top:12px;border:0;border-radius:14px;padding:14px;font-size:16px;font-weight:900;color:#fff;background:#E8582A;box-shadow:0 8px 24px #e8582a55;cursor:pointer}",
     ".crm-card .err{color:#FF6B5E;font-size:13px;min-height:1em;margin-top:8px}",
     ".crm-gift{display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,#E8582A,#FFD23F);color:#1a0d00;border-radius:16px;padding:12px 14px;margin-bottom:12px;font-weight:800;font-size:15px}",
@@ -106,6 +112,14 @@
     ".crm-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99999;background:#3DDC97;color:#0b2a1c;font:900 15px system-ui;padding:12px 18px;border-radius:99px;box-shadow:0 10px 30px #0008;animation:crmPop .35s;max-width:92vw;text-align:center}",
     ".crm-invited{background:#3DDC9722;border:1px solid #3DDC97;color:#C9F5E3;border-radius:14px;padding:10px 12px;margin-bottom:10px;font-size:14px;font-weight:700}",
     ".crm-lead{margin-top:12px}.crm-lead div{display:grid;grid-template-columns:22px 1fr auto;gap:8px;padding:8px 0;border-top:1px solid #25336A;font-size:13px;align-items:center}.crm-lead .r{color:#FFD23F;font-weight:900}",
+    // contact gate sheet (order / prize / score)
+    ".crm-gate{position:fixed;left:0;right:0;top:0;bottom:0;z-index:2147483600;display:flex;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));background:rgba(5,10,20,.72);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-sizing:border-box}",
+    ".crm-gate .crm-card{margin:auto;width:100%;max-width:420px;box-shadow:0 24px 70px #000b;animation:crmPop .3s cubic-bezier(.2,1.2,.4,1)}",
+    ".crm-gate .crm-card h3{font-size:22px}.crm-gate .crm-gift{font-size:14px;padding:10px 12px}.crm-gate .crm-gift b{font-size:24px}",
+    ".crm-gbd{margin-top:12px;border:1px solid #25336A;border-radius:12px;padding:0 12px;background:#0b1430}",
+    ".crm-gbd summary{cursor:pointer;padding:11px 0;font-size:14px;font-weight:700;color:#D7A6FF;list-style:none}.crm-gbd summary::-webkit-details-marker{display:none}",
+    ".crm-gbd summary:after{content:'+';float:right;font-weight:900;color:#9AA6CC}.crm-gbd[open] summary:after{content:'–'}.crm-gbd[open]{padding-bottom:10px}",
+    ".crm-gx{display:block;margin:10px auto 0;border:0;background:none;color:#9AA6CC;font-size:14px;font-weight:700;text-decoration:underline;cursor:pointer;padding:6px 12px}",
     "@media (max-width:400px){.crm-stats{grid-template-columns:repeat(2,1fr)}}"
   ].join("");
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
@@ -327,7 +341,7 @@
       return;
     }
     var inviter = INVITE ? (refOwner(INVITE) || "A friend") : "", pw = pending();
-    join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards · free</span>' +
+    join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards · free · join anytime</span>' +
       (pw ? '<div class="crm-invited" style="border-color:#FFD23F;background:#FFD23F22;color:#FFE9A3">🏆 You won <b>' + e(pw.t) + '</b> in the game! Join below to save it, then show it at ' + e(NAME) + ' to redeem.</div>' : '') +
       (MISSED ? '<div class="crm-invited" style="border-color:#7FB3FF;background:#7FB3FF22;color:#DCE8FF">📞 Sorry we missed your call! Join below with your name and phone or email and get <b>' + e(MC.offer) + '</b> on your next visit. Just show your code at the counter.</div>' : '') +
       (INVITE ? '<div class="crm-invited">🤝 ' + e(inviter) + ' invited you! Join with code <b>' + e(INVITE) + '</b> and you get <b>+' + REF.join + ' bonus points</b>.</div>' : '') +
@@ -341,19 +355,29 @@
         '<select name="bdy" aria-label="Birth year"><option value="">Year</option>' + Array.apply(null, Array(88)).map(function (x, i) { var y = new Date().getFullYear() - 13 - i; return '<option>' + y + '</option>'; }).join("") + '</select></div>' +
       '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat. We\'ll text you a reminder on the day.</div>' +
       '<label>Friend\'s referral code (optional)</label><input name="ref" maxlength="16" autocapitalize="characters" value="' + e(INVITE) + '" placeholder="e.g. MARIA-21">' +
-      '<label class="ok"><input type="checkbox" name="ok"> <span>Text / email me rewards and specials from ' + e(NAME) + '. Msg & data rates may apply. Reply STOP anytime.</span></label>' +
+      '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Text / email me rewards and specials from ' + e(NAME) + '. Msg & data rates may apply. Reply STOP anytime.</span></label>' +
       '<button class="go" type="submit">🎁 Get my reward</button><div class="err"></div></form>' +
       '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + '</p>';
     join.onclick = null;
     join.querySelector("form").onsubmit = function (ev) {
       ev.preventDefault();
-      var f = this, er = f.querySelector(".err"), v = function (n) { return f[n].value.trim(); };
-      if (!v("name")) { er.textContent = "Add your first name."; return; }
-      if (!/\d{7,}/.test(v("phone").replace(/\D/g, "")) && !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v("email"))) { er.textContent = "Add a phone number or an email so we can send your reward."; return; }
-      if ((v("bday") !== "" || v("bdd") || v("bdy")) && !(v("bday") !== "" && v("bdd") && v("bdy"))) { er.textContent = "Add your full birthday (month, day and year) or leave it blank."; return; }
-      if (v("bday") !== "" && new Date(+v("bdy"), +v("bday"), +v("bdd")).getMonth() !== +v("bday")) { er.textContent = "That birthday isn't a real date. Check the day."; return; }
-      if (!f.ok.checked) { er.textContent = "Tick the box so we can send you your reward."; return; }
-      var rc = v("ref").toUpperCase(), byName = rc ? refOwner(rc) : "";
+      var res = createMember(this);
+      if (res.err) { this.querySelector(".err").textContent = res.err; return; }
+      drawJoin(); drawOwn("all", true);
+    };
+  }
+
+  // ---- one sign-up path: the join card and the contact gate both create members here ----
+  // f is a <form> with name, phone, email, ok (checkbox) and optional bday/bdd/bdy/ref fields.
+  // Returns { err: "message" } or { member: r }. A form with no ref field uses the ?ref= invite code.
+  function createMember(f) {
+    var v = function (n) { var el = f.elements[n]; if (!el) return n === "ref" ? INVITE : ""; return el.type === "checkbox" ? (el.checked ? "1" : "") : el.value.trim(); };
+    if (!v("name")) return { err: "Add your first name." };
+    if (!/\d{7,}/.test(v("phone").replace(/\D/g, "")) && !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v("email"))) return { err: "Add a phone number or an email so we can send your reward." };
+    if ((v("bday") !== "" || v("bdd") || v("bdy")) && !(v("bday") !== "" && v("bdd") && v("bdy"))) return { err: "Add your full birthday (month, day and year) or leave it blank." };
+    if (v("bday") !== "" && new Date(+v("bdy"), +v("bday"), +v("bdd")).getMonth() !== +v("bday")) return { err: "That birthday isn't a real date. Check the day." };
+    if (!v("ok")) return { err: "Tick the box so we can send you your reward." };
+    var rc = v("ref").toUpperCase(), byName = rc ? refOwner(rc) : "";
       var r = { id: code4(8), name: v("name"), phone: v("phone"), email: v("email"), bday: v("bday") === "" ? -1 : +v("bday"), bdd: +v("bdd") || 0, bdy: +v("bdy") || 0, visits: 1, stars: 0, last: Date.now(), joined: Date.now(), code: code(), offer: OFFER,
         ref: refCode(v("name")), refBy: rc, refByName: rc ? (byName || "code " + rc) : "", friends: [], ledger: [] };
       addPts(r, 100, "🎉 Welcome to " + NAME + " Rewards");
@@ -365,9 +389,65 @@
       if (C.sheet) try { fetch(C.sheet, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({
         name: r.name, phone: r.phone, email: r.email, bday: r.bday >= 0 ? (r.bday + 1) + "/" + r.bdd + "/" + r.bdy : "",
         src: r.src || qs.get("s") || qs.get("src") || (rc ? "referral " + rc : "app"), code: r.code, prize: (r.wins && r.wins[0] && r.wins[0].t) || "", prizeCode: (r.wins && r.wins[0] && r.wins[0].c) || "", ref: r.ref }) }); } catch (x) {}
-      drawJoin(); drawOwn("all", true);
-    };
+    return { member: r };
   }
+
+  // ---- contact gate ----
+  // SSAI_GATE(reason, cb): reason "order" | "prize" | "score". A member on this phone → cb(member) right away.
+  // Otherwise a short sign-up sheet opens (name, phone or email, opt-in, optional birthday); on submit the member is
+  // created through createMember() (welcome points, referral, Google Sheet, any pending game prize), then cb(member).
+  // "Not now" closes it without calling cb. Returns true when cb already ran.
+  var GATE_TXT = {
+    order: ["Finish your order", "Add your name and a phone or email so " + NAME + " can reach you about this order.", "Send my order"],
+    prize: ["Save your prize & score", "Add your name and a phone or email to save your prize to your " + NAME + " Rewards. Your code shows right after.", "🎁 Save my prize"],
+    score: ["Save your prize & score", "Add your name and a phone or email to put your score on the weekly board. If you win, that's how we reach you.", "🏆 Post my score"]
+  };
+  var gateEl = null;
+  function gate(reason, cb) {
+    var m = mine()[0];
+    if (m) { if (cb) cb(m); return true; }
+    if (gateEl) gateEl.close();
+    var T = GATE_TXT[reason] || GATE_TXT.order, rid = "crm-g" + code4(4);
+    var ov = document.createElement("div"); ov.className = "crm-gate"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", rid); ov.setAttribute("data-scroll-ok", "");
+    ov.innerHTML = '<section class="crm-card"><span class="k">' + e(NAME) + ' Rewards · free</span><h3 id="' + rid + '">' + e(T[0]) + '</h3><p>' + e(T[1]) + '</p>' +
+      '<div class="crm-gift"><b>🎁</b><span>You also get <u>' + e(OFFER) + '</u> + 100 points</span></div>' +
+      (INVITE ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: +' + REF.join + ' bonus points.</div>' : '') +
+      '<form autocomplete="on" novalidate><label>First name</label><input name="name" maxlength="40" autocomplete="given-name" enterkeyhint="next">' +
+      '<div class="two"><div><label>Phone</label><input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(310) 555-0123"></div>' +
+      '<div><label>or Email</label><input name="email" type="email" maxlength="120" autocomplete="email" autocapitalize="none"></div></div>' +
+      '<details class="crm-gbd"><summary>🎂 Add birthday for a free treat</summary><div class="three"><select name="bday" aria-label="Birth month"><option value="">Month</option>' + MONTHS_L.map(function (x, i) { return '<option value="' + i + '">' + x + '</option>'; }).join("") + '</select>' +
+        '<select name="bdd" aria-label="Birth day"><option value="">Day</option>' + Array.apply(null, Array(31)).map(function (x, i) { return '<option>' + (i + 1) + '</option>'; }).join("") + '</select>' +
+        '<select name="bdy" aria-label="Birth year"><option value="">Year</option>' + Array.apply(null, Array(88)).map(function (x, i) { return '<option>' + (new Date().getFullYear() - 13 - i) + '</option>'; }).join("") + '</select></div>' +
+        '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat.</div></details>' +
+      '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Text / email me rewards and specials from ' + e(NAME) + '. Msg & data rates may apply. Reply STOP anytime.</span></label>' +
+      '<button class="go" type="submit">' + e(T[2]) + '</button><div class="err" role="alert"></div>' +
+      '<button type="button" class="crm-gx">Not now</button></form>' +
+      '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + '</p></section>';
+    var html = document.documentElement, prevOv = html.style.overflow, vv = window.visualViewport;
+    function fit() { if (vv) { ov.style.height = vv.height + "px"; ov.style.top = vv.offsetTop + "px"; } }
+    function key(ev) { if (ev.key === "Escape") close(); }
+    function close() {
+      if (!ov.parentNode) return; ov.remove(); gateEl = null; html.style.overflow = prevOv;
+      document.removeEventListener("keydown", key); if (vv) { vv.removeEventListener("resize", fit); vv.removeEventListener("scroll", fit); }
+    }
+    ov.close = close; gateEl = ov;
+    var f = ov.querySelector("form");
+    ov.querySelector(".crm-gx").onclick = close;
+    ov.addEventListener("click", function (ev) { if (ev.target === ov) close(); });
+    f.onsubmit = function (ev) {
+      ev.preventDefault();
+      var res = createMember(f);
+      if (res.err) { f.querySelector(".err").textContent = res.err; return; }
+      close(); drawJoin(); drawOwn("all");
+      toast("🎉 You're in, " + res.member.name.split(" ")[0] + "! +100 points");
+      if (cb) cb(res.member);
+    };
+    document.body.appendChild(ov); html.style.overflow = "hidden";
+    document.addEventListener("keydown", key); if (vv) { vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); fit(); }
+    setTimeout(function () { try { f.elements.name.focus({ preventScroll: true }); } catch (x) { f.elements.name.focus(); } }, 60);
+    return false;
+  }
+  gate.member = function () { return mine()[0] || null; };
 
   var seg = "all";
   function drawOwn(s, flash) {

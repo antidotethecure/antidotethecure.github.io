@@ -949,6 +949,8 @@ function saveCart(){ try{ localStorage.setItem(CART_KEY,JSON.stringify(cart)); }
   document.querySelectorAll(".item").forEach(function(c){ var id=c.dataset.id, q=cart[id]?cart[id].q:0, old=c.querySelector(".tx .add,.tx .qty"); var w=document.createElement("div"); w.innerHTML=ctl(id,q); old.replaceWith(w.firstChild); });
   drawBar(); }
 var TAX=0.0975;
+// menu.json "drinks" items (cocktails, mocktails, beer, coffee) earn bar points; "food" items earn kitchen points. MP items have no $ yet.
+function splitTotals(){ var f=0,b=0; for(var k in cart){ if(cart[k].p==null) continue; var x=cart[k].p*cart[k].q; if(ITEMS[k]&&ITEMS[k].drink) b+=x; else f+=x; } return {food:Math.round(f*100)/100,bar:Math.round(b*100)/100}; }
 function totals(){ var s=0,n=0,mp=0; for(var k in cart){ if(cart[k].p==null) mp+=cart[k].q; else s+=cart[k].p*cart[k].q; n+=cart[k].q; } var tax=s*TAX; return {sub:s,tax:tax,total:s+tax,n:n,mp:mp}; }
 function drawBar(){ var t=totals(); $("obar").classList.toggle("on",t.n>0); $("ocount").textContent=t.n; $("ototal").textContent=money(t.total)+(t.mp?" + MP":""); $("oseat").textContent=seat?seatLabel()+" · review":"Review order"; }
 function flyToBar(fromImg){ if(reduce||!fromImg) return; var r=fromImg.getBoundingClientRect(), f=document.createElement("img"); f.src=fromImg.currentSrc||fromImg.src; f.className="flyimg";
@@ -963,16 +965,16 @@ function openSheet(){
   for(var k in cart) h+='<div class="ln"><span>'+esc(cart[k].n)+'<br><span class="m">'+cart[k].q+' × '+(cart[k].p==null?"market price":money(cart[k].p))+'</span></span><b>'+(cart[k].p==null?"MP":money(cart[k].p*cart[k].q))+'</b></div>';
   h+='<div style="margin-top:8px"><div class="tot"><span>Subtotal</span><span>'+money(t.sub)+'</span></div><div class="tot"><span>Tax</span><span>'+money(t.tax)+'</span></div><div class="tot big"><span>Total</span><span>'+money(t.total)+'</span></div>'+(t.mp?'<div class="now" style="margin:0">Plus market-price items, your server will confirm.</div>':'')+'</div>';
   h+=seat?'<button class="btn hot" type="button" data-send style="width:100%;justify-content:center;margin-top:12px;font-size:16px">Send my order</button>':'<button class="btn hot" type="button" data-pick style="width:100%;justify-content:center;margin-top:12px">🪑 Pick my seat</button>';
-  h+='<p class="sub" style="font-size:12px;margin-top:10px">Pay your server or bartender like normal. Members earn 10 points per $1. 20% gratuity on parties of 6+.</p>';
+  h+='<p class="sub" style="font-size:12px;margin-top:10px">Pay your server or bartender like normal. Members earn 10 🍸 bar pts per $1 on drinks + 10 🍔 kitchen pts per $1 on food. 20% gratuity on parties of 6+.</p>';
   $("sheetin").innerHTML=h; $("sheet").classList.add("on");
 }
 $("sheet").addEventListener("click",function(e){
   if(e.target===$("sheet")||e.target.closest("[data-x]")){ $("sheet").classList.remove("on"); return; }
   if(e.target.closest("[data-pick]")){ $("sheet").classList.remove("on"); $("seat").scrollIntoView({behavior:"smooth"}); return; }
   if(e.target.closest("[data-send]")){ (window.SSAI_GATE||function(r,cb){ cb(); })("order",function(){ // contact info is asked here, at the end of the order (members skip it)
-    var t=totals(), num="NV-"+(100+((Math.random()*900)|0)), earn=window.SSAI_EARN?window.SSAI_EARN(t.sub,"🌊 Order "+num+" · "+seatLabel()):null;
+    var t=totals(), num="NV-"+(100+((Math.random()*900)|0)), earn=window.SSAI_EARN?window.SSAI_EARN(t.sub,"🌊 Order "+num+" · "+seatLabel(),splitTotals()):null;
     $("sheetin").innerHTML='<div class="ok"><div class="check"><svg viewBox="0 0 40 40"><path d="M9 21l8 8 15-17"/></svg></div><b>Order received</b><div class="code">'+num+'</div><div class="sub" style="margin:4px 0 0">'+esc(seatLabel())+' · '+money(t.total)+(t.mp?' + MP':'')+'</div>'+
-      (earn?'<div style="color:var(--sun3);font-weight:800;margin-top:6px">'+(earn.saved?'+'+earn.pts+' rewards points':'Join Nalu Vida Rewards below to earn +'+earn.pts+' points')+'</div>':'')+
+      (earn?'<div style="color:var(--sun3);font-weight:800;margin-top:6px">'+(earn.saved?(earn.msg||'+'+earn.pts+' rewards points'):'Join Nalu Vida Rewards below to earn '+(earn.msg||'+'+earn.pts+' points'))+'</div>':'')+
       '<p class="sub" style="font-size:12px;margin-top:8px">Preview build: live, this prints on Nalu Vida\'s ticket printer and pings your server.</p></div><button class="btn" type="button" data-x style="width:100%;justify-content:center;margin-top:10px">Done</button>';
     cart={}; saveCart(); buzz([20,40,20]);
   }); }
@@ -1045,7 +1047,10 @@ var sun=new Date(monday+6*864e5);
 $("evsub").textContent="Week of "+MON[new Date(monday).getUTCMonth()]+" "+new Date(monday).getUTCDate()+"–"+MON[sun.getUTCMonth()]+" "+sun.getUTCDate()+". Music, trivia, salsa and the game on every TV.";
 })();
 </script>
-<script>window.CRM_CFG={draw:{odds:15,prizes:["Free Jungle Fries","Free mocktail (Wish You Were Here)","Free French Toast brunch","Free Chips, Salsa & Guac"]},name:"Nalu Vida",offer:"Free Jungle Fries on your next visit",mount:"#rwhost",tiers:[[250,"Free Jungle Fries"],[500,"Half off any cocktail"],[800,"Free Coconut Shrimp"],[1300,"Free Signature Taco plate"]],referral:{gift:"Free Jungle Fries"},earn:{checkin:25,firstOrder:50,birthday:100,review:{pts:75,platform:"app"},instagram:{pts:25,url:"https://www.instagram.com/naluvidavenice/"},referral:{join:75,friend:25,friendGift:"Free Chips, Salsa & Guac",first:50,every:10}}};</script>
+<script>window.CRM_CFG={draw:{odds:15,prizes:["Free Jungle Fries","Free mocktail (Wish You Were Here)","Free French Toast brunch","Free Chips, Salsa & Guac"]},name:"Nalu Vida",offer:"Free Jungle Fries on your next visit",mount:"#rwhost",tiers:[[250,"Free Jungle Fries"],[500,"Free Chips, Salsa & Guac"],[800,"Free Coconut Shrimp"],[1300,"Free Signature Taco plate"]],
+  /* two balances that never mix: bar points (drinks only) and kitchen points (food only). California ABC: bar rewards are drink discounts or free non-alcoholic items, never free alcohol. */
+  wallets:{split:true,bonusTo:"food",bar:{label:"Bar",icon:"🍸",perDollar:10,tiers:[[250,"$3 off any drink"],[500,"Half off any cocktail"],[800,"Free mocktail (Wish You Were Here or Put the Lime in the Coconut)"],[1300,"$10 off a bar tab of $30+"]]},
+    food:{label:"Kitchen",icon:"🍔",perDollar:10,tiers:[[250,"Free Jungle Fries"],[500,"Free Chips, Salsa & Guac"],[800,"Free Coconut Shrimp"],[1300,"Free Signature Taco plate"]]}},referral:{gift:"Free Jungle Fries"},earn:{checkin:25,firstOrder:50,birthday:100,review:{pts:75,platform:"app"},instagram:{pts:25,url:"https://www.instagram.com/naluvidavenice/"},referral:{join:75,friend:25,friendGift:"Free Chips, Salsa & Guac",first:50,every:10}}};</script>
 <script src="../crm.js"></script>
 <script>window.NEARBY={name:"Nalu Vida",pin:"🏄",mount:"#rwhost",spots:[{label:"Venice Pier",lat:33.9779,lng:-118.4669,q:"1 Washington Blvd, Venice, CA 90292"}],offer:"Happy hour Mon–Fri 3–6 PM and 10 PM–close, dine-in."};</script>
 <script src="../nearby.js"></script>

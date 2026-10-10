@@ -118,6 +118,12 @@
    "$2 off"
   ]
  },
+ "drawPrizes": [
+  "Free fries",
+  "Free house sauce",
+  "Free onion rings",
+  "Free shake"
+ ],
  "game": {
   "name": "Storm Run",
   "prizes": [

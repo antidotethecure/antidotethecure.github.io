@@ -59,6 +59,7 @@ h2{font:var(--h2w,800) 19px/1.2 var(--display);margin:26px 0 8px;color:var(--h2)
 .tl::before{content:"";position:absolute;left:17px;top:18px;bottom:18px;width:2px;background:var(--edge)}
 .tl li{position:relative;display:flex;gap:12px;align-items:flex-start;padding:7px 0}
 .tl .dot{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:var(--card);border:2px solid var(--accent);position:relative;z-index:1}
+.golink{display:block;margin-top:10px;padding:13px 14px;border-radius:12px;background:var(--accentBg,var(--accent));color:var(--accentInk);font:800 15px var(--body);text-align:center;text-decoration:none}
 .tl b{display:block;font-size:14.5px}.tl span{display:block;color:var(--dim);font-size:13px;margin-top:1px}
 h2{font-family:"IBM Plex Mono",monospace;font-size:14px;letter-spacing:.14em;text-transform:uppercase}.crest{font-size:52px;line-height:1}.cl{font:900 34px/1 Archivo,system-ui,sans-serif;color:#F57A1A;letter-spacing:-.01em;margin-top:4px}.cl small{display:block;font:700 11px 'IBM Plex Mono',monospace;letter-spacing:.18em;color:#1F8A43;margin-top:6px}
 </style></head><body><main>
@@ -72,7 +73,7 @@ h2{font-family:"IBM Plex Mono",monospace;font-size:14px;letter-spacing:.14em;tex
 </main>
 <div class="bar"><button id="send" type="button">✅ Send to Antidote</button></div>
 <script>
-var CFG={"slug":"churrito-loco","name":"Churrito Loco","short":"Churrito Loco","owner":"there","alcohol":false,"avgCheck":14,"giveawayDefault":"$100","drawDays":["Sunday night","Monday","Friday after school"],"rewards":{"welcome":["Free churro","Free Jamaica Agua Fresca","$2 off","10% off the order"],"points":[200,400,700,1100],"t1":["Free churro","Free Jamaica Agua Fresca","$2 off"],"t2":["Free Abuelita Chocolate Horchata Iced Coffee","Free Original Corn","$4 off"],"t3":["Free Churro Ice Cream Cone","Free Original Elote Fries","$7 off"],"t4":["Churros for the table (Churro Bites, 10pc)","Free XL Chili Cheese Fries","$12 off"],"stars":["Free Churro Ice Cream Cone","Free Filled Churros (2pc)","$7 off"],"referIn":["Free churro","+100 bonus points when their friend visits","$2 off","Nothing"],"referFriend":["Free churro","+50 bonus points when they join","$2 off","Nothing"],"bday":["Free Churro Ice Cream Cone","Free Filled Churros (2pc)","Free Churro Bites (10pc)","20% off the order"],"missed":["10% off","Free churro","Free Jamaica Agua Fresca"],"winback":["Free churro","10% off","$2 off","Don't send"],"playwin":["Free churro","15% off","$2 off"]},"game":{"name":"Loco Match","prizes":[[4150,["15% off next order","Free churro","Free Original Corn"]]],"champ":["50% off next order","Free Churro Bites (10pc)","Free XL Chili Cheese Fries"],"second":["20% off next order","Free Filled Churros (2pc)","Free Jamaica Agua Fresca"]},"specials":[["s_hours","Hours: Mon–Thu 12–10 PM, Fri–Sat 12–11 PM, Sun 12–10 PM"]],"specialsTitle":"From your Yelp page: still right?","drinksTitle":"Drinks in the app","menu":{"drinks":[{"name":"Drinks","items":[["Abuelita Chocolate Horchata Iced Coffee",6.49,null,false],["Watermelon Paleta Energy",7.99,null,false],["Jamaica Agua Fresca",5.49,null,false],["Pumpkin Spice Horchata",8.49,null,false]]}],"food":[{"name":"Churros","items":[["Filled Churros (2pc)",6.99,null,false],["Plain Signature Churros (4pc)",7.99,null,false],["Churro Bites Filled (10pc)",9.49,null,false],["Churro Ice Cream Cone",9.49,null,false]]},{"name":"Street Corn & Fries","items":[["Original Corn",7.49,null,false],["Hot Cheetos Corn",7.49,null,false],["Original Elote Fries",11.49,null,false],["XL Chili Cheese Fries",16.49,null,false]]},{"name":"Dogs","items":[["Flamin Dog",9.49,null,false],["Churro Dog",9.49,null,false]]}]},"phone":[["k","What time does the kitchen stop taking orders?",["Same as closing","15 min before close","30 min before close"]],["resv","Reservations?",["Walk-ins only","Call us","Big groups only, call"]],["cater","Catering or big party orders?",["Yes, call a day ahead","Yes, call 3 days ahead","No catering"]],["deliv","Delivery?",["DoorDash / Uber Eats","Our own online ordering","Pickup only"]],["park","Parking?",["Free lot","Street parking","Paid lot nearby"]],["dogs","Dogs?",["OK on the patio","Service animals only"]]]};
+var CFG={"slug":"churrito-loco","name":"Churrito Loco","short":"Churrito Loco","owner":"there","alcohol":false,"avgCheck":14,"giveawayDefault":"$100","drawDays":["Sunday night","Monday","Friday after school"],"rewards":{"welcome":["Free churro","Free Jamaica Agua Fresca","$2 off","10% off the order"],"points":[200,400,700,1100],"t1":["Free churro","Free Jamaica Agua Fresca","$2 off"],"t2":["Free Abuelita Chocolate Horchata Iced Coffee","Free Original Corn","$4 off"],"t3":["Free Churro Ice Cream Cone","Free Original Elote Fries","$7 off"],"t4":["Churros for the table (Churro Bites, 10pc)","Free XL Chili Cheese Fries","$12 off"],"stars":["Free Churro Ice Cream Cone","Free Filled Churros (2pc)","$7 off"],"referIn":["Free churro","+100 bonus points when their friend visits","$2 off","Nothing"],"referFriend":["Free churro","+50 bonus points when they join","$2 off","Nothing"],"bday":["Free Churro Ice Cream Cone","Free Filled Churros (2pc)","Free Churro Bites (10pc)","20% off the order"],"missed":["10% off","Free churro","Free Jamaica Agua Fresca"],"winback":["Free churro","10% off","$2 off","Don't send"],"playwin":["Free churro","15% off","$2 off"]},"drawPrizes":["Free churro","Free Jamaica Agua Fresca","Free Original Corn","Free Filled Churros (2pc)"],"game":{"name":"Loco Match","prizes":[[4150,["15% off next order","Free churro","Free Original Corn"]]],"champ":["50% off next order","Free Churro Bites (10pc)","Free XL Chili Cheese Fries"],"second":["20% off next order","Free Filled Churros (2pc)","Free Jamaica Agua Fresca"]},"specials":[["s_hours","Hours: Mon–Thu 12–10 PM, Fri–Sat 12–11 PM, Sun 12–10 PM"]],"specialsTitle":"From your Yelp page: still right?","drinksTitle":"Drinks in the app","menu":{"drinks":[{"name":"Drinks","items":[["Abuelita Chocolate Horchata Iced Coffee",6.49,null,false],["Watermelon Paleta Energy",7.99,null,false],["Jamaica Agua Fresca",5.49,null,false],["Pumpkin Spice Horchata",8.49,null,false]]}],"food":[{"name":"Churros","items":[["Filled Churros (2pc)",6.99,null,false],["Plain Signature Churros (4pc)",7.99,null,false],["Churro Bites Filled (10pc)",9.49,null,false],["Churro Ice Cream Cone",9.49,null,false]]},{"name":"Street Corn & Fries","items":[["Original Corn",7.49,null,false],["Hot Cheetos Corn",7.49,null,false],["Original Elote Fries",11.49,null,false],["XL Chili Cheese Fries",16.49,null,false]]},{"name":"Dogs","items":[["Flamin Dog",9.49,null,false],["Churro Dog",9.49,null,false]]}]},"phone":[["k","What time does the kitchen stop taking orders?",["Same as closing","15 min before close","30 min before close"]],["resv","Reservations?",["Walk-ins only","Call us","Big groups only, call"]],["cater","Catering or big party orders?",["Yes, call a day ahead","Yes, call 3 days ahead","No catering"]],["deliv","Delivery?",["DoorDash / Uber Eats","Our own online ordering","Pickup only"]],["park","Parking?",["Free lot","Street parking","Paid lot nearby"]],["dogs","Dogs?",["OK on the patio","Service animals only"]]]};
 (function(){
 "use strict";
 /* ============ generic setup logic: identical for every restaurant, only CFG changes ============ */
@@ -199,6 +200,30 @@ function drawEst(){ var g=v("gw"), e=E[g]||[0,0,0], amt=+(String(g).replace(/\D/
     "A month: you give away <b>$"+n(cost)+"</b>, guests spend about <b>$"+n(rev)+"</b> on those extra visits (at ~$"+chk+" a check)"+
     "<br><span style='opacity:.8'>Bigger prize = more people playing, signing up and coming back. These are estimates, not promises. "+CA_FREE+"</span>"; }
 
+// daily lucky draw (members): odds + multi-select prizes; redeem window is fixed at 3 days
+var DRAW_ODDS=["Rarely (1 in 30)","Sometimes (1 in 15, recommended)","Often (1 in 8)","Off"];
+var DRAW_OPTS=(CFG.drawPrizes&&CFG.drawPrizes.length?CFG.drawPrizes:[].concat(R.t1||[],R.playwin||[],R.stars||[]).filter(function(x,i,a){ return /^Free /.test(x)&&a.indexOf(x)===i; }).slice(0,4))
+  .concat(["Free soft drink / mocktail","$5 off"]).filter(function(x,i,a){ return a.indexOf(x)===i; });
+function drawOdds(){ return S.drawOdds||DRAW_ODDS[1]; }
+function drawPrizes(){ return Array.isArray(S.drawPrizes)?S.drawPrizes:DRAW_OPTS.slice(0,3); }
+app.appendChild(h("h2",null,"Daily lucky draw (members)"));
+app.appendChild(h("p","sub","Every signed-up member gets one free draw a day when they open the app. Winners get a free item that's good for 3 days."));
+var dq=h("div","card"); dq.appendChild(h("div","q","How often should someone win?"));
+dq.appendChild(chipRow("drawOdds",DRAW_ODDS,drawOdds(),function(o){ S.drawOdds=o; save(); drawRefresh(); }));
+app.appendChild(dq);
+var dp=h("div","card"); dp.appendChild(h("div","q","Lucky draw prizes")); dp.appendChild(h("div","hint","Tap to pick as many as you like. Each winner gets one of these at random."));
+var dpc=h("div","chips"); dp.appendChild(dpc);
+DRAW_OPTS.forEach(function(o){ var b=h("button","chip",o); b.type="button";
+  b.onclick=function(){ var cur=drawPrizes().slice(), i=cur.indexOf(o); if(i<0) cur.push(o); else cur.splice(i,1); S.drawPrizes=cur; save(); drawRefresh(); };
+  dpc.appendChild(b); });
+if(CFG.alcohol) dp.appendChild(h("div","hint","Bar drinks as prizes are non-alcoholic (mocktail or soft drink) under California rules."));
+app.appendChild(dp);
+var dn=h("p","note","Winners have to redeem within 3 days. That's fixed, so prizes don't pile up."); app.appendChild(dn);
+function drawRefresh(){ var off=drawOdds()==="Off", cur=drawPrizes();
+  dp.classList.toggle("hide",off); dn.classList.toggle("hide",off);
+  [].forEach.call(dpc.children,function(b){ b.classList.toggle("on",cur.indexOf(b.textContent)>=0); }); }
+drawRefresh();
+
 // promo codes
 app.appendChild(h("h2",null,"Promo codes to launch with"));
 app.appendChild(h("p","sub","Turn on the codes you want. Tap a value to change what each one gives."));
@@ -214,6 +239,24 @@ CODES.forEach(function(c){
   draw(); app.appendChild(card);
 });
 if(CFG.alcohol) app.appendChild(h("p","hint","Codes can take money off drinks, but can't give a free alcoholic drink (California)."));
+
+// your register (POS): which system + how to start, with a deep link to the step-by-step guide
+var POSES=[["toast","Toast"],["square","Square"],["clover","Clover"],["spoton","SpotOn"],["lightspeed","Lightspeed"],["revel","Revel"],["other","Something else"],["none","No POS"]];
+var POS_START=["Discount buttons now (Avenue A)","Full connection (Avenue B)","Not sure, walk me through it"];
+app.appendChild(h("h2",null,"Your register (POS)"));
+app.appendChild(h("p","sub","So staff can take app rewards off at the register. Tap what you use. Nothing changes until we set it up together."));
+var pq=h("div","card"); pq.appendChild(h("div","q","What do you ring up on?"));
+var posLink=h("a","golink hide"); posLink.target="_blank"; posLink.rel="noopener";
+function posName(){ var m=POSES.filter(function(x){ return x[0]===S.pos; })[0]; return m?m[1]:null; }
+function posDraw(){ var nm=posName(); if(!nm){ posLink.classList.add("hide"); return; }
+  posLink.textContent="Open the step-by-step for "+nm+" →";
+  posLink.href="/pos/?pos="+encodeURIComponent(S.pos)+"&r="+encodeURIComponent(SHORT); posLink.classList.remove("hide"); }
+pq.appendChild(chipRow("pos",POSES.map(function(x){ return x[1]; }),posName(),function(o){ S.pos=POSES.filter(function(x){ return x[1]===o; })[0][0]; save(); posDraw(); }));
+pq.appendChild(posLink); app.appendChild(pq); posDraw();
+var ps=h("div","card"); ps.appendChild(h("div","q","How do you want to start?"));
+ps.appendChild(h("div","hint","Avenue A works today: a few discount buttons in your POS, about 10 minutes. Avenue B connects the app to your POS directly, so points post by themselves."));
+ps.appendChild(chipRow("posStart",POS_START,S.posStart||null,function(o){ S.posStart=o; save(); }));
+app.appendChild(ps);
 
 // menu: on/off + prices
 function itemRow(key,name,price,web,mp){
@@ -257,8 +300,11 @@ function summary(){
     if(q[4]&&!q[4](S)){ out.push("• "+q[1]+": (skipped)"); return; }
     var x=v(q[0]); out.push("• "+q[1]+": "+(x==null?"(no answer)":x)); });
     if(sec===Q[0]) out.push("• Free entry with no purchase: included (California law)"); });
+  var dOdds=drawOdds(); out.push("\nDAILY LUCKY DRAW (MEMBERS)"); out.push("• How often someone wins: "+dOdds);
+  if(dOdds!=="Off"){ var dpz=drawPrizes(); out.push("• Prizes: "+(dpz.length?dpz.join(", "):"(none picked)")); out.push("• Winners redeem within: 3 days"); }
   out.push("\nPROMO CODES"); CODES.forEach(function(c){ var st=codeState(c); out.push("• "+codeName(c,st.v)+" – "+c[2]+": "+(st.on?"ON, "+st.v:"OFF")); });
   var ch=[]; eachItem(function(key,i){ var s=S[key]; if(s&&(!s.on||(typeof i[1]==="number"&&s.p!==i[1]))) ch.push("• "+i[0]+": "+(s.on?(typeof i[1]==="number"?money(s.p):"keep"):"REMOVE")); });
+  out.push("\nYOUR REGISTER (POS)"); out.push("• What you ring up on: "+(posName()||"(no answer)")); out.push("• How you want to start: "+(S.posStart||"(no answer)"));
   out.push("\nMENU CHANGES"); out.push(ch.length?ch.join("\n"):"• No changes");
   out.push("\nGo live: "+(S.approved||"(no answer)"));
   return out.join("\n");

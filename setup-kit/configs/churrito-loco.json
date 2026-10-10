@@ -111,6 +111,12 @@
    "$2 off"
   ]
  },
+ "drawPrizes": [
+  "Free churro",
+  "Free Jamaica Agua Fresca",
+  "Free Original Corn",
+  "Free Filled Churros (2pc)"
+ ],
  "game": {
   "name": "Loco Match",
   "prizes": [

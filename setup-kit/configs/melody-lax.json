@@ -117,6 +117,12 @@
    "$5 off"
   ]
  },
+ "drawPrizes": [
+  "Free House Mac & Cheese",
+  "Free bar drink (mocktail or soft drink, no alcohol)",
+  "Free French Toast breakfast",
+  "Free Melody Fries"
+ ],
  "game": {
   "name": "Flight game",
   "prizes": [

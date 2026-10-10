@@ -1,248 +1,251 @@
 {
- "slug": "gritz-n-wafflez",
- "name": "Gritz N Wafflez",
- "short": "Gritz N Wafflez",
- "owner": "Jurni",
- "badge": "Woman-owned business",
- "brand": {
-  "fonts": "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Yellowtail&family=DM+Sans:wght@400;600;800&display=swap",
-  "display": "\"Playfair Display\",Georgia,serif",
-  "body": "\"DM Sans\",system-ui,-apple-system,sans-serif",
-  "h1w": "900",
-  "h2w": "900",
-  "bg": "#FBF4E4",
-  "page": "radial-gradient(800px 500px at 50% -8%,#fff8e6 0,transparent 60%),#FBF4E4",
-  "card": "#FFFDF7",
-  "edge": "#E6D6AE",
-  "ink": "#2A1E36",
-  "dim": "#6E5F72",
-  "accent": "#3B1F5C",
-  "accentInk": "#ffffff",
-  "chip": "#F4E8CC",
-  "tgOff": "#d8c9a3",
-  "ok": "#1d9a55",
-  "h1": "#1E1B3A",
-  "h2": "#3B1F5C",
-  "noteBg": "#fbe9b8",
-  "noteEdge": "#D9A21B",
-  "noteInk": "#3B1F5C",
-  "barBg": "rgba(251,244,228,.94)",
-  "badgeBg": "#fbe9b8",
-  "badgeInk": "#3B1F5C",
-  "extraCss": ".badge{border:1px solid #D9A21B}.gnw{display:inline-block;padding:14px 22px 12px;border:2px solid #D9A21B;border-radius:20px;background:#FFFDF7;box-shadow:0 0 0 5px #FBF4E4,0 0 0 6px #E6D6AE,0 14px 32px #3b1f5c22}.gnw .nm{font:900 clamp(30px,10vw,44px)/.95 \"Playfair Display\",Georgia,serif;color:#3B1F5C}.gnw .nm i{font-style:italic;color:#D9A21B;font-weight:700;font-size:.7em}.gnw .gtag{font:400 22px/1 Yellowtail,cursive;color:#D9A21B;margin-top:6px}.gnw .gtag span{color:#1E1B3A}"
- },
- "logo": {
-  "html": "<div class=\"gnw\" role=\"img\" aria-label=\"Gritz N Wafflez\"><div class=\"nm\">Gritz <i>N</i> Wafflez</div><div class=\"gtag\">Texas Flava <span>·</span> Southern Hospitality</div></div>"
- },
- "alcohol": false,
- "avgCheck": 25,
- "giveawayDefault": "$100",
- "drawDays": [
-  "Sunday after close",
-  "Monday",
-  "Wednesday at karaoke"
- ],
- "rewards": {
-  "welcome": [
-   "Free Kiki Palmer",
-   "Free Fried Cheese Gritz",
-   "$5 off",
-   "10% off the order"
+  "slug": "gritz-n-wafflez",
+  "name": "Gritz N Wafflez",
+  "short": "Gritz N Wafflez",
+  "owner": "Jurni",
+  "badge": "Woman-owned business",
+  "brand": {
+    "fonts": "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Yellowtail&family=DM+Sans:wght@400;600;800&display=swap",
+    "display": "\"Playfair Display\",Georgia,serif",
+    "body": "\"DM Sans\",system-ui,-apple-system,sans-serif",
+    "h1w": "900",
+    "h2w": "900",
+    "bg": "#FBF4E4",
+    "page": "radial-gradient(800px 500px at 50% -8%,#fff8e6 0,transparent 60%),#FBF4E4",
+    "card": "#FFFDF7",
+    "edge": "#E6D6AE",
+    "ink": "#2A1E36",
+    "dim": "#6E5F72",
+    "accent": "#3B1F5C",
+    "accentInk": "#ffffff",
+    "chip": "#F4E8CC",
+    "tgOff": "#d8c9a3",
+    "ok": "#1d9a55",
+    "h1": "#1E1B3A",
+    "h2": "#3B1F5C",
+    "noteBg": "#fbe9b8",
+    "noteEdge": "#D9A21B",
+    "noteInk": "#3B1F5C",
+    "barBg": "rgba(251,244,228,.94)",
+    "badgeBg": "#fbe9b8",
+    "badgeInk": "#3B1F5C",
+    "extraCss": ".badge{border:1px solid #D9A21B}.gnw{display:inline-block;padding:14px 22px 12px;border:2px solid #D9A21B;border-radius:20px;background:#FFFDF7;box-shadow:0 0 0 5px #FBF4E4,0 0 0 6px #E6D6AE,0 14px 32px #3b1f5c22}.gnw .nm{font:900 clamp(30px,10vw,44px)/.95 \"Playfair Display\",Georgia,serif;color:#3B1F5C}.gnw .nm i{font-style:italic;color:#D9A21B;font-weight:700;font-size:.7em}.gnw .gtag{font:400 22px/1 Yellowtail,cursive;color:#D9A21B;margin-top:6px}.gnw .gtag span{color:#1E1B3A}"
+  },
+  "logo": {
+    "html": "<div class=\"gnw\" role=\"img\" aria-label=\"Gritz N Wafflez\"><div class=\"nm\">Gritz <i>N</i> Wafflez</div><div class=\"gtag\">Texas Flava <span>·</span> Southern Hospitality</div></div>"
+  },
+  "alcohol": false,
+  "avgCheck": 25,
+  "giveawayDefault": "$100",
+  "drawDays": [
+    "Sunday after close",
+    "Monday",
+    "Wednesday at karaoke"
   ],
-  "points": [
-   250,
-   450,
-   700,
-   1100
-  ],
-  "t1": [
-   "Free Kiki Palmer",
-   "Free side of Smackin' Mac",
-   "$3 off"
-  ],
-  "t2": [
-   "Free side of Smackin' Mac",
-   "Free Fried Cheese Gritz",
-   "$5 off"
-  ],
-  "t3": [
-   "Free Original Collard Green Dip",
-   "Free Celestial Eggs",
-   "$8 off"
-  ],
-  "t4": [
-   "Free N' Wafflez plate",
-   "Free N' Gritz plate",
-   "$15 off"
-  ],
-  "stars": [
-   "Free N' Wafflez plate",
-   "Free Original Collard Green Dip",
-   "$10 off"
-  ],
-  "referIn": [
-   "Free Original Collard Green Dip",
-   "+100 bonus points when their friend visits",
-   "$5 off",
-   "Nothing"
-  ],
-  "referFriend": [
-   "Free Kiki Palmer",
-   "+50 bonus points when they join",
-   "$5 off",
-   "Nothing"
-  ],
-  "bday": [
-   "Free Peach Cobbler Waffle",
-   "Free Original Collard Green Dip",
-   "Free N' Wafflez plate",
-   "20% off the order"
-  ],
-  "missed": [
-   "10% off",
-   "Free Kiki Palmer",
-   "Free Fried Cheese Gritz"
-  ],
-  "winback": [
-   "Free Kiki Palmer",
-   "10% off",
-   "$5 off",
-   "Don't send"
-  ],
-  "playwin": [
-   "Free Kiki Palmer",
-   "Free Fried Cheese Gritz",
-   "$3 off"
-  ]
- },
- "drawPrizes": [
-  "Free Kiki Palmer",
-  "Free side of Smackin' Mac",
-  "Free Fried Cheese Gritz",
-  "Free Classic French Toast"
- ],
- "game": {
-  "name": "Order Up!",
-  "prizes": [
-   [
-    2500,
-    [
-     "Free Kiki Palmer",
-     "Free Fresh Squeezed Lemonade",
-     "$2 off"
+  "rewards": {
+    "welcome": [
+      "Free Kiki Palmer",
+      "Free Fried Cheese Gritz",
+      "$5 off",
+      "10% off the order"
+    ],
+    "points": [
+      250,
+      450,
+      700,
+      1100
+    ],
+    "t1": [
+      "Free Kiki Palmer",
+      "Free side of Smackin' Mac",
+      "$3 off"
+    ],
+    "t2": [
+      "Free side of Smackin' Mac",
+      "Free Fried Cheese Gritz",
+      "$5 off"
+    ],
+    "t3": [
+      "Free Original Collard Green Dip",
+      "Free Celestial Eggs",
+      "$8 off"
+    ],
+    "t4": [
+      "Free N' Wafflez plate",
+      "Free N' Gritz plate",
+      "$15 off"
+    ],
+    "stars": [
+      "Free N' Wafflez plate",
+      "Free Original Collard Green Dip",
+      "$10 off"
+    ],
+    "referIn": [
+      "Free Original Collard Green Dip",
+      "+100 bonus points when their friend visits",
+      "$5 off",
+      "Nothing"
+    ],
+    "referFriend": [
+      "Free Kiki Palmer",
+      "+50 bonus points when they join",
+      "$5 off",
+      "Nothing"
+    ],
+    "bday": [
+      "Free Peach Cobbler Waffle",
+      "Free Original Collard Green Dip",
+      "Free N' Wafflez plate",
+      "20% off the order"
+    ],
+    "missed": [
+      "10% off",
+      "Free Kiki Palmer",
+      "Free Fried Cheese Gritz"
+    ],
+    "winback": [
+      "Free Kiki Palmer",
+      "10% off",
+      "$5 off",
+      "Don't send"
+    ],
+    "playwin": [
+      "Free Kiki Palmer",
+      "Free Fried Cheese Gritz",
+      "$3 off"
     ]
-   ],
-   [
-    3800,
-    [
-     "Free side of Smackin' Mac",
-     "Free Collard Greens",
-     "$3 off"
+  },
+  "drawPrizes": [
+    "Free Kiki Palmer",
+    "Free side of Smackin' Mac",
+    "Free Fried Cheese Gritz",
+    "Free Classic French Toast"
+  ],
+  "game": {
+    "name": "Order Up!",
+    "prizes": [
+      [
+        2500,
+        [
+          "Free Kiki Palmer",
+          "Free Fresh Squeezed Lemonade",
+          "$2 off"
+        ]
+      ],
+      [
+        3800,
+        [
+          "Free side of Smackin' Mac",
+          "Free Collard Greens",
+          "$3 off"
+        ]
+      ],
+      [
+        4800,
+        [
+          "Free Fried Cheese Gritz",
+          "Free Fried Green Tomatoes",
+          "$5 off"
+        ]
+      ],
+      [
+        5400,
+        [
+          "Free Original Collard Green Dip",
+          "Free Celestial Eggs",
+          "$8 off"
+        ]
+      ]
+    ],
+    "champ": [
+      "Free Wingz N' Wafflez + a karaoke shoutout",
+      "Free N' Wafflez plate",
+      "$20 off"
     ]
-   ],
-   [
-    4800,
+  },
+  "specialsTitle": "What's on at Gritz N Wafflez: still the same?",
+  "specials": [
     [
-     "Free Fried Cheese Gritz",
-     "Free Fried Green Tomatoes",
-     "$5 off"
-    ]
-   ],
-   [
-    5400,
+      "s_kara",
+      "GNW Karaoke every Wednesday 6–10 PM"
+    ],
     [
-     "Free Original Collard Green Dip",
-     "Free Celestial Eggs",
-     "$8 off"
+      "s_hours",
+      "Open daily 9 AM–3 PM"
+    ],
+    [
+      "s_valet",
+      "First 15 minutes of valet free"
     ]
-   ]
   ],
-  "champ": [
-   "Free Wingz N' Wafflez + a karaoke shoutout",
-   "Free N' Wafflez plate",
-   "$20 off"
+  "phone": [
+    [
+      "k",
+      "Last order taken at?",
+      [
+        "2:30 PM",
+        "2:45 PM",
+        "3 PM"
+      ]
+    ],
+    [
+      "resv",
+      "Reservations?",
+      [
+        "Walk-ins only",
+        "Call us",
+        "Big groups only, call"
+      ]
+    ],
+    [
+      "wait",
+      "Weekend wait time to tell callers?",
+      [
+        "Under 15 min",
+        "15–30 min",
+        "30–45 min",
+        "Varies, just come"
+      ]
+    ],
+    [
+      "cater",
+      "Catering or big party orders?",
+      [
+        "Yes, call a day ahead",
+        "Yes, call 3 days ahead",
+        "No catering"
+      ]
+    ],
+    [
+      "deliv",
+      "Delivery?",
+      [
+        "DoorDash / Uber Eats",
+        "Toast online ordering, pickup",
+        "Both"
+      ]
+    ],
+    [
+      "kara",
+      "Karaoke night: food served too?",
+      [
+        "Yes, full menu",
+        "Limited menu",
+        "Drinks & snacks only"
+      ]
+    ]
+  ],
+  "drinksTitle": "Drinks in the app",
+  "menu": {
+    "type": "js",
+    "file": "demo/gritz-n-wafflez/index.html",
+    "var": "MENU",
+    "drinkSections": [
+      "Don't Be Thirsty"
+    ]
+  },
+  "menuNote": "Your website doesn't list prices, so Antidote will get them from you or your online order page. Switch off anything you don't serve anymore.",
+  "ambient": [
+    "steam"
   ]
- },
- "specialsTitle": "What's on at Gritz N Wafflez: still the same?",
- "specials": [
-  [
-   "s_kara",
-   "GNW Karaoke every Wednesday 6–10 PM"
-  ],
-  [
-   "s_hours",
-   "Open daily 9 AM–3 PM"
-  ],
-  [
-   "s_valet",
-   "First 15 minutes of valet free"
-  ]
- ],
- "phone": [
-  [
-   "k",
-   "Last order taken at?",
-   [
-    "2:30 PM",
-    "2:45 PM",
-    "3 PM"
-   ]
-  ],
-  [
-   "resv",
-   "Reservations?",
-   [
-    "Walk-ins only",
-    "Call us",
-    "Big groups only, call"
-   ]
-  ],
-  [
-   "wait",
-   "Weekend wait time to tell callers?",
-   [
-    "Under 15 min",
-    "15–30 min",
-    "30–45 min",
-    "Varies, just come"
-   ]
-  ],
-  [
-   "cater",
-   "Catering or big party orders?",
-   [
-    "Yes, call a day ahead",
-    "Yes, call 3 days ahead",
-    "No catering"
-   ]
-  ],
-  [
-   "deliv",
-   "Delivery?",
-   [
-    "DoorDash / Uber Eats",
-    "Toast online ordering, pickup",
-    "Both"
-   ]
-  ],
-  [
-   "kara",
-   "Karaoke night: food served too?",
-   [
-    "Yes, full menu",
-    "Limited menu",
-    "Drinks & snacks only"
-   ]
-  ]
- ],
- "drinksTitle": "Drinks in the app",
- "menu": {
-  "type": "js",
-  "file": "demo/gritz-n-wafflez/index.html",
-  "var": "MENU",
-  "drinkSections": [
-   "Don't Be Thirsty"
-  ]
- },
- "menuNote": "Your website doesn't list prices, so Antidote will get them from you or your online order page. Switch off anything you don't serve anymore."
 }

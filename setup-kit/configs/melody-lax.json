@@ -1,553 +1,556 @@
 {
- "slug": "melody-lax",
- "out": "melody/setup",
- "name": "Melody Bar & Grill",
- "short": "Melody",
- "owner": "Christian",
- "ownerNames": [
-  "Christian",
-  "Sami"
- ],
- "storageKey": "melody-setup-v2",
- "brand": {
-  "fonts": "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Barlow:wght@400;600;700;800&display=swap",
-  "display": "\"Playfair Display\",Georgia,serif",
-  "body": "\"Barlow\",system-ui,-apple-system,sans-serif",
-  "bg": "#120a10",
-  "page": "radial-gradient(700px 420px at 50% -6%,#3a1424 0,transparent 62%),#120a10",
-  "card": "#1e1018",
-  "edge": "#3a1c28",
-  "ink": "#fbf1de",
-  "dim": "#c9b8a6",
-  "accent": "#e6c25a",
-  "accentInk": "#2a0610",
-  "chip": "#2a1520",
-  "tgOff": "#4a2a35",
-  "h1": "#fbf1de",
-  "h2": "#e6c25a",
-  "noteBg": "#2b1a0a",
-  "noteEdge": "#6b4b14",
-  "noteInk": "#f3dfb5",
-  "barBg": "rgba(18,10,16,.96)",
-  "badgeBg": "#b3263a",
-  "badgeInk": "#fbf1de"
- },
- "logo": {
-  "img": "demo/melody-lax/img/logo.png"
- },
- "alcohol": true,
- "avgCheck": 35,
- "happyHour": "3–6 PM",
- "giveawayDefault": "$200",
- "drawDays": [
-  "Sunday night",
-  "Monday",
-  "Friday before happy hour"
- ],
- "rewards": {
-  "welcome": [
-   "Free Melody Fries",
-   "Free Gilroy Garlic Fries",
-   "$5 off",
-   "10% off the order"
+  "slug": "melody-lax",
+  "out": "melody/setup",
+  "name": "Melody Bar & Grill",
+  "short": "Melody",
+  "owner": "Christian",
+  "ownerNames": [
+    "Christian",
+    "Sami"
   ],
-  "points": [
-   250,
-   500,
-   800,
-   1300
+  "storageKey": "melody-setup-v2",
+  "brand": {
+    "fonts": "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Barlow:wght@400;600;700;800&display=swap",
+    "display": "\"Playfair Display\",Georgia,serif",
+    "body": "\"Barlow\",system-ui,-apple-system,sans-serif",
+    "bg": "#120a10",
+    "page": "radial-gradient(700px 420px at 50% -6%,#3a1424 0,transparent 62%),#120a10",
+    "card": "#1e1018",
+    "edge": "#3a1c28",
+    "ink": "#fbf1de",
+    "dim": "#c9b8a6",
+    "accent": "#e6c25a",
+    "accentInk": "#2a0610",
+    "chip": "#2a1520",
+    "tgOff": "#4a2a35",
+    "h1": "#fbf1de",
+    "h2": "#e6c25a",
+    "noteBg": "#2b1a0a",
+    "noteEdge": "#6b4b14",
+    "noteInk": "#f3dfb5",
+    "barBg": "rgba(18,10,16,.96)",
+    "badgeBg": "#b3263a",
+    "badgeInk": "#fbf1de"
+  },
+  "logo": {
+    "img": "demo/melody-lax/img/logo.png"
+  },
+  "alcohol": true,
+  "avgCheck": 35,
+  "happyHour": "3–6 PM",
+  "giveawayDefault": "$200",
+  "drawDays": [
+    "Sunday night",
+    "Monday",
+    "Friday before happy hour"
   ],
-  "t1": [
-   "Free Melody Fries",
-   "Free Gilroy Garlic Fries",
-   "$5 off"
+  "rewards": {
+    "welcome": [
+      "Free Melody Fries",
+      "Free Gilroy Garlic Fries",
+      "$5 off",
+      "10% off the order"
+    ],
+    "points": [
+      250,
+      500,
+      800,
+      1300
+    ],
+    "t1": [
+      "Free Melody Fries",
+      "Free Gilroy Garlic Fries",
+      "$5 off"
+    ],
+    "t2": [
+      "Free appetizer",
+      "$10 off",
+      "Half off a cocktail"
+    ],
+    "t3": [
+      "Free Lobster Mac & Cheese",
+      "Free any Mac & Cheese",
+      "$15 off"
+    ],
+    "t4": [
+      "Free appetizer platter",
+      "Free entrée",
+      "$25 off"
+    ],
+    "stars": [
+      "Free appetizer",
+      "Free Lobster Mac & Cheese",
+      "$15 off"
+    ],
+    "referIn": [
+      "+100 bonus points when their friend visits",
+      "Free Melody Fries",
+      "$5 off",
+      "Nothing"
+    ],
+    "referFriend": [
+      "+50 bonus points when they join",
+      "Free Melody Fries",
+      "$5 off",
+      "Nothing"
+    ],
+    "bday": [
+      "Free appetizer",
+      "Free dessert",
+      "Free entrée up to $20",
+      "20% off the order"
+    ],
+    "missed": [
+      "10% off",
+      "15% off",
+      "Free Melody Fries"
+    ],
+    "winback": [
+      "Free Melody Fries",
+      "10% off",
+      "$5 off",
+      "Don't send"
+    ],
+    "playwin": [
+      "Free Melody Fries",
+      "$3 off any drink",
+      "$5 off"
+    ]
+  },
+  "drawPrizes": [
+    "Free House Mac & Cheese",
+    "Free bar drink (mocktail or soft drink, no alcohol)",
+    "Free French Toast breakfast",
+    "Free Melody Fries"
   ],
-  "t2": [
-   "Free appetizer",
-   "$10 off",
-   "Half off a cocktail"
+  "game": {
+    "name": "Flight game",
+    "prizes": [
+      [
+        3400,
+        [
+          "$3 off any drink",
+          "Free Melody Fries",
+          "$5 off"
+        ]
+      ],
+      [
+        4700,
+        [
+          "Free Melody Fries",
+          "Free Gilroy Garlic Fries",
+          "$5 off"
+        ]
+      ],
+      [
+        5800,
+        [
+          "Free Gilroy Garlic Fries",
+          "Free appetizer",
+          "$10 off"
+        ]
+      ],
+      [
+        6400,
+        [
+          "Free appetizer",
+          "Free Mac & Cheese",
+          "$15 off"
+        ]
+      ]
+    ],
+    "champ": [
+      "Half off their meal",
+      "Free entrée",
+      "$25 off"
+    ]
+  },
+  "special": {
+    "title": "\"Just Landed\" LAX deal (boarding pass, last 24 hrs)",
+    "qs": [
+      [
+        "jl1",
+        "Melody regular coming home",
+        [
+          "50% off one drink",
+          "25% off one drink",
+          "Free appetizer"
+        ]
+      ],
+      [
+        "jl2",
+        "LA local coming home",
+        [
+          "25% off one drink",
+          "15% off one drink"
+        ]
+      ],
+      [
+        "jl3",
+        "Visitor to LA",
+        [
+          "10% off one drink",
+          "15% off one drink"
+        ]
+      ],
+      [
+        "crew",
+        "LAX crew 10% off with badge: show it in the app?",
+        [
+          "Yes",
+          "No"
+        ]
+      ]
+    ]
+  },
+  "specialsTitle": "Weekly specials (from melodylax.com): still running?",
+  "specials": [
+    [
+      "s_mon",
+      "Monday: half-off burgers 11–3"
+    ],
+    [
+      "s_tue",
+      "Taco Tuesday: $3 tacos + $8 margaritas"
+    ],
+    [
+      "s_wed",
+      "Wednesday: happy hour lunch 11–3 + karaoke 10 PM"
+    ],
+    [
+      "s_thu",
+      "Thursday: half-off sandwiches & wraps 11–3"
+    ],
+    [
+      "s_fri",
+      "Friday: $3 sliders 11–3 + DJ"
+    ],
+    [
+      "s_wkd",
+      "Weekend brunch 9–3"
+    ],
+    [
+      "s_hh",
+      "Happy hour daily 3–6: $8 wells, $1 off drafts"
+    ],
+    [
+      "s_nfl",
+      "NFL games, no cover"
+    ]
   ],
-  "t3": [
-   "Free Lobster Mac & Cheese",
-   "Free any Mac & Cheese",
-   "$15 off"
+  "phone": [
+    [
+      "k",
+      "What time does the kitchen close?",
+      [
+        "10 PM",
+        "11 PM",
+        "12 AM",
+        "1 AM",
+        "Same as the bar"
+      ]
+    ],
+    [
+      "dress",
+      "Dress code?",
+      [
+        "None, casual",
+        "Smart casual at night",
+        "No athletic wear at night"
+      ]
+    ],
+    [
+      "age",
+      "21+ after a certain time?",
+      [
+        "No, all ages",
+        "21+ after 9 PM",
+        "21+ after 10 PM",
+        "21+ after 11 PM"
+      ]
+    ],
+    [
+      "cover",
+      "Cover charge on DJ nights?",
+      [
+        "Never",
+        "Only special events",
+        "$10",
+        "$20"
+      ]
+    ],
+    [
+      "dogs",
+      "Dogs?",
+      [
+        "OK on the patio",
+        "Service animals only"
+      ]
+    ],
+    [
+      "resv",
+      "Reservations?",
+      [
+        "Call us",
+        "Walk-ins only",
+        "Big groups only, call"
+      ]
+    ]
   ],
-  "t4": [
-   "Free appetizer platter",
-   "Free entrée",
-   "$25 off"
-  ],
-  "stars": [
-   "Free appetizer",
-   "Free Lobster Mac & Cheese",
-   "$15 off"
-  ],
-  "referIn": [
-   "+100 bonus points when their friend visits",
-   "Free Melody Fries",
-   "$5 off",
-   "Nothing"
-  ],
-  "referFriend": [
-   "+50 bonus points when they join",
-   "Free Melody Fries",
-   "$5 off",
-   "Nothing"
-  ],
-  "bday": [
-   "Free appetizer",
-   "Free dessert",
-   "Free entrée up to $20",
-   "20% off the order"
-  ],
-  "missed": [
-   "10% off",
-   "15% off",
-   "Free Melody Fries"
-  ],
-  "winback": [
-   "Free Melody Fries",
-   "10% off",
-   "$5 off",
-   "Don't send"
-  ],
-  "playwin": [
-   "Free Melody Fries",
-   "$3 off any drink",
-   "$5 off"
+  "drinksTitle": "Drinks in the app (prices are samples, please fix)",
+  "menu": {
+    "type": "inline",
+    "drinkSections": [
+      "Drinks"
+    ],
+    "sections": [
+      {
+        "name": "Drinks",
+        "items": [
+          [
+            "Mango Margarita",
+            12,
+            15.5
+          ],
+          [
+            "House Margarita",
+            12,
+            15.5
+          ],
+          [
+            "Paloma",
+            12,
+            15.5
+          ],
+          [
+            "Old Fashioned",
+            14
+          ],
+          [
+            "Moscow Mule",
+            13
+          ],
+          [
+            "Espresso Martini",
+            15,
+            17.75
+          ],
+          [
+            "Long Island",
+            14
+          ],
+          [
+            "Michelada",
+            10
+          ],
+          [
+            "Draft Beer",
+            8,
+            8.25
+          ],
+          [
+            "Mimosa",
+            10,
+            8.25
+          ],
+          [
+            "Round of Shots",
+            10
+          ],
+          [
+            "Bucket of Beers (5)",
+            30
+          ]
+        ]
+      },
+      {
+        "name": "Starters",
+        "items": [
+          [
+            "Lemon Pepper Wings",
+            16
+          ],
+          [
+            "Avocado Toast",
+            13
+          ],
+          [
+            "BBQ Rib Grilled Cheese Bites",
+            15
+          ],
+          [
+            "Buttermilk Chicken Strips & Fries",
+            16
+          ],
+          [
+            "Chicken Pot Stickers",
+            15
+          ],
+          [
+            "Fried Green Beans",
+            13
+          ],
+          [
+            "Fried Shrimp",
+            18.25
+          ],
+          [
+            "Jalapeno Calamari",
+            16
+          ],
+          [
+            "Lettuce Wraps",
+            16
+          ],
+          [
+            "Baby Back Ribs & Fries",
+            20.25
+          ]
+        ]
+      },
+      {
+        "name": "Mac & Cheese",
+        "items": [
+          [
+            "Lobster Mac & Cheese",
+            21.5
+          ],
+          [
+            "Melody Burger Mac & Cheese",
+            19.25
+          ],
+          [
+            "Bacon, Cheddar & Jalapeno Mac & Cheese",
+            17.25
+          ],
+          [
+            "Chicken Parmesan Mac & Cheese",
+            18.25
+          ],
+          [
+            "Parmesan & Mushroom Mac & Cheese",
+            17.25
+          ],
+          [
+            "House Mac",
+            15
+          ]
+        ]
+      },
+      {
+        "name": "Fries",
+        "items": [
+          [
+            "Gilroy Garlic Fries",
+            6.75
+          ],
+          [
+            "Melody Fries",
+            5.75
+          ],
+          [
+            "Onion Strings",
+            9.75
+          ],
+          [
+            "Phat Fries",
+            7.75
+          ],
+          [
+            "Philly Cheese Steak Fries",
+            17.25
+          ],
+          [
+            "Sweet Potato Fries",
+            7.75
+          ]
+        ]
+      },
+      {
+        "name": "Soups",
+        "items": [
+          [
+            "French Onion Soup (Bowl)",
+            15
+          ],
+          [
+            "French Onion Soup (Cup)",
+            11
+          ],
+          [
+            "Tomato Bisque Soup (Bowl)",
+            15
+          ],
+          [
+            "Tomato Bisque Soup (Cup)",
+            11
+          ],
+          [
+            "Black Bean Soup (Bowl)",
+            14
+          ],
+          [
+            "Black Bean Soup (Cup)",
+            9.75
+          ]
+        ]
+      },
+      {
+        "name": "Tacos & Burritos",
+        "items": [
+          [
+            "Shrimp Tacos",
+            16
+          ],
+          [
+            "Salmon Tacos",
+            16
+          ],
+          [
+            "Carnitas Tacos",
+            14
+          ],
+          [
+            "Chicken Tacos",
+            13
+          ],
+          [
+            "Avocado Tacos",
+            13
+          ],
+          [
+            "Beyond Tacos",
+            14
+          ],
+          [
+            "Nachos",
+            15
+          ],
+          [
+            "Cheese Quesadilla",
+            15
+          ],
+          [
+            "Carnitas Burrito",
+            18.25
+          ],
+          [
+            "Steak Burrito",
+            18.25
+          ],
+          [
+            "Chicken Burrito",
+            17.25
+          ],
+          [
+            "Bean & Cheese Burrito",
+            14
+          ]
+        ]
+      }
+    ]
+  },
+  "ambient": [
+    "plane"
   ]
- },
- "drawPrizes": [
-  "Free House Mac & Cheese",
-  "Free bar drink (mocktail or soft drink, no alcohol)",
-  "Free French Toast breakfast",
-  "Free Melody Fries"
- ],
- "game": {
-  "name": "Flight game",
-  "prizes": [
-   [
-    3400,
-    [
-     "$3 off any drink",
-     "Free Melody Fries",
-     "$5 off"
-    ]
-   ],
-   [
-    4700,
-    [
-     "Free Melody Fries",
-     "Free Gilroy Garlic Fries",
-     "$5 off"
-    ]
-   ],
-   [
-    5800,
-    [
-     "Free Gilroy Garlic Fries",
-     "Free appetizer",
-     "$10 off"
-    ]
-   ],
-   [
-    6400,
-    [
-     "Free appetizer",
-     "Free Mac & Cheese",
-     "$15 off"
-    ]
-   ]
-  ],
-  "champ": [
-   "Half off their meal",
-   "Free entrée",
-   "$25 off"
-  ]
- },
- "special": {
-  "title": "\"Just Landed\" LAX deal (boarding pass, last 24 hrs)",
-  "qs": [
-   [
-    "jl1",
-    "Melody regular coming home",
-    [
-     "50% off one drink",
-     "25% off one drink",
-     "Free appetizer"
-    ]
-   ],
-   [
-    "jl2",
-    "LA local coming home",
-    [
-     "25% off one drink",
-     "15% off one drink"
-    ]
-   ],
-   [
-    "jl3",
-    "Visitor to LA",
-    [
-     "10% off one drink",
-     "15% off one drink"
-    ]
-   ],
-   [
-    "crew",
-    "LAX crew 10% off with badge: show it in the app?",
-    [
-     "Yes",
-     "No"
-    ]
-   ]
-  ]
- },
- "specialsTitle": "Weekly specials (from melodylax.com): still running?",
- "specials": [
-  [
-   "s_mon",
-   "Monday: half-off burgers 11–3"
-  ],
-  [
-   "s_tue",
-   "Taco Tuesday: $3 tacos + $8 margaritas"
-  ],
-  [
-   "s_wed",
-   "Wednesday: happy hour lunch 11–3 + karaoke 10 PM"
-  ],
-  [
-   "s_thu",
-   "Thursday: half-off sandwiches & wraps 11–3"
-  ],
-  [
-   "s_fri",
-   "Friday: $3 sliders 11–3 + DJ"
-  ],
-  [
-   "s_wkd",
-   "Weekend brunch 9–3"
-  ],
-  [
-   "s_hh",
-   "Happy hour daily 3–6: $8 wells, $1 off drafts"
-  ],
-  [
-   "s_nfl",
-   "NFL games, no cover"
-  ]
- ],
- "phone": [
-  [
-   "k",
-   "What time does the kitchen close?",
-   [
-    "10 PM",
-    "11 PM",
-    "12 AM",
-    "1 AM",
-    "Same as the bar"
-   ]
-  ],
-  [
-   "dress",
-   "Dress code?",
-   [
-    "None, casual",
-    "Smart casual at night",
-    "No athletic wear at night"
-   ]
-  ],
-  [
-   "age",
-   "21+ after a certain time?",
-   [
-    "No, all ages",
-    "21+ after 9 PM",
-    "21+ after 10 PM",
-    "21+ after 11 PM"
-   ]
-  ],
-  [
-   "cover",
-   "Cover charge on DJ nights?",
-   [
-    "Never",
-    "Only special events",
-    "$10",
-    "$20"
-   ]
-  ],
-  [
-   "dogs",
-   "Dogs?",
-   [
-    "OK on the patio",
-    "Service animals only"
-   ]
-  ],
-  [
-   "resv",
-   "Reservations?",
-   [
-    "Call us",
-    "Walk-ins only",
-    "Big groups only, call"
-   ]
-  ]
- ],
- "drinksTitle": "Drinks in the app (prices are samples, please fix)",
- "menu": {
-  "type": "inline",
-  "drinkSections": [
-   "Drinks"
-  ],
-  "sections": [
-   {
-    "name": "Drinks",
-    "items": [
-     [
-      "Mango Margarita",
-      12,
-      15.5
-     ],
-     [
-      "House Margarita",
-      12,
-      15.5
-     ],
-     [
-      "Paloma",
-      12,
-      15.5
-     ],
-     [
-      "Old Fashioned",
-      14
-     ],
-     [
-      "Moscow Mule",
-      13
-     ],
-     [
-      "Espresso Martini",
-      15,
-      17.75
-     ],
-     [
-      "Long Island",
-      14
-     ],
-     [
-      "Michelada",
-      10
-     ],
-     [
-      "Draft Beer",
-      8,
-      8.25
-     ],
-     [
-      "Mimosa",
-      10,
-      8.25
-     ],
-     [
-      "Round of Shots",
-      10
-     ],
-     [
-      "Bucket of Beers (5)",
-      30
-     ]
-    ]
-   },
-   {
-    "name": "Starters",
-    "items": [
-     [
-      "Lemon Pepper Wings",
-      16
-     ],
-     [
-      "Avocado Toast",
-      13
-     ],
-     [
-      "BBQ Rib Grilled Cheese Bites",
-      15
-     ],
-     [
-      "Buttermilk Chicken Strips & Fries",
-      16
-     ],
-     [
-      "Chicken Pot Stickers",
-      15
-     ],
-     [
-      "Fried Green Beans",
-      13
-     ],
-     [
-      "Fried Shrimp",
-      18.25
-     ],
-     [
-      "Jalapeno Calamari",
-      16
-     ],
-     [
-      "Lettuce Wraps",
-      16
-     ],
-     [
-      "Baby Back Ribs & Fries",
-      20.25
-     ]
-    ]
-   },
-   {
-    "name": "Mac & Cheese",
-    "items": [
-     [
-      "Lobster Mac & Cheese",
-      21.5
-     ],
-     [
-      "Melody Burger Mac & Cheese",
-      19.25
-     ],
-     [
-      "Bacon, Cheddar & Jalapeno Mac & Cheese",
-      17.25
-     ],
-     [
-      "Chicken Parmesan Mac & Cheese",
-      18.25
-     ],
-     [
-      "Parmesan & Mushroom Mac & Cheese",
-      17.25
-     ],
-     [
-      "House Mac",
-      15
-     ]
-    ]
-   },
-   {
-    "name": "Fries",
-    "items": [
-     [
-      "Gilroy Garlic Fries",
-      6.75
-     ],
-     [
-      "Melody Fries",
-      5.75
-     ],
-     [
-      "Onion Strings",
-      9.75
-     ],
-     [
-      "Phat Fries",
-      7.75
-     ],
-     [
-      "Philly Cheese Steak Fries",
-      17.25
-     ],
-     [
-      "Sweet Potato Fries",
-      7.75
-     ]
-    ]
-   },
-   {
-    "name": "Soups",
-    "items": [
-     [
-      "French Onion Soup (Bowl)",
-      15
-     ],
-     [
-      "French Onion Soup (Cup)",
-      11
-     ],
-     [
-      "Tomato Bisque Soup (Bowl)",
-      15
-     ],
-     [
-      "Tomato Bisque Soup (Cup)",
-      11
-     ],
-     [
-      "Black Bean Soup (Bowl)",
-      14
-     ],
-     [
-      "Black Bean Soup (Cup)",
-      9.75
-     ]
-    ]
-   },
-   {
-    "name": "Tacos & Burritos",
-    "items": [
-     [
-      "Shrimp Tacos",
-      16
-     ],
-     [
-      "Salmon Tacos",
-      16
-     ],
-     [
-      "Carnitas Tacos",
-      14
-     ],
-     [
-      "Chicken Tacos",
-      13
-     ],
-     [
-      "Avocado Tacos",
-      13
-     ],
-     [
-      "Beyond Tacos",
-      14
-     ],
-     [
-      "Nachos",
-      15
-     ],
-     [
-      "Cheese Quesadilla",
-      15
-     ],
-     [
-      "Carnitas Burrito",
-      18.25
-     ],
-     [
-      "Steak Burrito",
-      18.25
-     ],
-     [
-      "Chicken Burrito",
-      17.25
-     ],
-     [
-      "Bean & Cheese Burrito",
-      14
-     ]
-    ]
-   }
-  ]
- }
 }

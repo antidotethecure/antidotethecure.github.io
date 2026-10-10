@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><title>Christian's Files</title>
+<style>
+:root{--bg:#07102a;--card:#0f1b3f;--edge:#22305e;--ink:#f2f5ff;--dim:#9aa6c6;--gold:#f5c400;--blue:#1e6fe0;--green:#2fbf71}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,system-ui,Segoe UI,Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:18px 16px 60px}
+.top img{height:54px;border-radius:8px}h1{font-size:28px;margin:14px 0 4px}h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:28px 0 10px}
+p.s{color:var(--dim);margin:0 0 12px}
+.big{display:block;width:100%;border:0;border-radius:16px;padding:16px 18px;margin:10px 0;font-weight:800;font-size:17px;font-family:inherit;text-align:left;cursor:pointer;text-decoration:none;color:#111;background:var(--gold)}
+.big small{display:block;font-weight:500;font-size:13px;opacity:.8;margin-top:2px}.big.b{background:var(--blue);color:#fff}.big.g{background:var(--green);color:#fff}
+.links a{display:block;background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:13px 15px;margin:8px 0;color:var(--ink);text-decoration:none;font-weight:700}
+.links a small{display:block;color:var(--dim);font-weight:500;font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f{background:var(--card);border:1px solid var(--edge);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.f .im{aspect-ratio:1;background:#fff;display:grid;place-items:center}.f .im img{max-width:100%;max-height:100%;display:block}
+.f .im.dark{background:#111}.f video{width:100%;aspect-ratio:9/16;background:#000;display:block}
+.f b{font-size:14px;padding:10px 10px 2px}.f small{color:var(--dim);font-size:12px;padding:0 10px 8px}
+.f .act{display:flex;gap:6px;padding:0 8px 10px;margin-top:auto}.f .act a,.f .act button{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-weight:700;font-size:14px;font-family:inherit;display:grid;place-items:center;text-decoration:none;cursor:pointer}
+.f .act button{background:var(--blue);border-color:var(--blue)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#fff;color:#111;padding:10px 16px;border-radius:99px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.on{opacity:1}
+</style></head><body><main>
+<div class="top"><img src="../../assets/ssai-lockup.jpg" alt="Second Shift AI"></div>
+<h1>Melody + Nalu Vida files</h1>
+<p class="s">Everything for Christian in one place: links, QR stickers, window posters and game videos. Tap <b>Share</b> on any file to send it by text, email or AirDrop.</p>
+
+<button class="big" id="shareAll" type="button">📤 Send this page to Christian<small>He gets every file and link with one tap</small></button>
+<button class="big g" id="copyMsg" type="button">📋 Copy the text message<small>Explains the last 5 steps, with the links</small></button>
+
+<h2>Links</h2>
+<div class="links">
+<a href="https://antidotethecure.github.io/launch/christian/">★ Launch checklist (start here)<small>Deals, menu prices, registers, launch week, for both restaurants</small></a>
+<a href="https://antidotethecure.github.io/demo/melody-lax/">Melody app<small>Menu, rewards, flight game</small></a>
+<a href="https://antidotethecure.github.io/demo/nalu-vida/">Nalu Vida app<small>Menu, rewards, surf game</small></a>
+<a href="https://antidotethecure.github.io/melody/setup/">Melody setup page<small>Deals, weekly giveaway, prizes, menu</small></a>
+<a href="https://antidotethecure.github.io/nalu-vida/setup/">Nalu Vida setup page<small>Deals, weekly giveaway, prizes, menu</small></a>
+<a href="https://elevenlabs.io/app/talk-to?agent_id=agent_5901m4hna2vbe5ws1z93nwvcyes5">Talk to Kira<small>Melody's AI phone host</small></a>
+<a href="https://elevenlabs.io/app/talk-to?agent_id=agent_9401m4hna57pf22vd5qa93js8rw4">Talk to Kai<small>Nalu Vida's AI phone host</small></a>
+<a href="christian-links.pdf">All links as a PDF<small>Tappable buttons, phone-sized</small></a>
+</div>
+
+<h2>Melody: QR codes &amp; poster</h2><div class="grid" id="melody"></div>
+<h2>Nalu Vida: QR codes &amp; poster</h2><div class="grid" id="nalu"></div>
+<h2>Videos</h2><div class="grid" id="video"></div>
+<p class="s" style="margin-top:24px">PNG and JPG files are for phones and screens. PDF files are print-ready for the print shop.</p>
+</main><div class="toast" id="toast"></div>
+<script>
+var FILES={
+ melody:[["Square sticker","melody/Melody_QR_Sticker_Square",["png","pdf"],"png"],["Round sticker","melody/Melody_QR_Sticker_Round",["png","pdf"],"png"],["Logo QR","melody/Melody_QR_Logo_Only",["png"],"png"],["Window poster 24×36","melody/Melody_Window_Poster_24x36",["jpg","pdf"],"jpg",1]],
+ nalu:[["Surfboard sticker","nalu/NaluVida_QR_Surfboard_Sticker",["png","pdf"],"png"],["Round sticker","nalu/NaluVida_QR_Round_Sticker",["png","pdf"],"png"],["Logo QR","nalu/NaluVida_QR_Logo_Only",["png"],"png"],["Window poster 24×36","nalu/NaluVida_Window_Poster_24x36",["jpg","pdf"],"jpg",1]],
+ video:[["Melody game ad","video/melody-game-ad.mp4"],["Ride the Nalu gameplay","video/nalu-ride-the-nalu.mp4"]]};
+var MSG="Hey Christian! Everything for Melody and Nalu Vida is in one place now:\n\n★ Your launch checklist (one link for both): https://antidotethecure.github.io/launch/christian/\n\nIt shows where each restaurant is at (Melody 80%, Nalu Vida 72%) and the last few things we need from you:\n1) pick your deals, discounts & weekly giveaway\n2) check the menu prices (tap ✓ or fix each one, or \"Everything checks out\")\n3) approve the menu\n4) tell us your register (Toast, Square…)\n5) a few launch-week questions\nThen tap \"Send everything to Antidote\" at the bottom. Almost all taps, about 15 minutes.\n\nYour QR stickers, window posters and game videos: "+location.href.split("#")[0];
+function toast(t){ var e=document.getElementById("toast"); e.textContent=t; e.classList.add("on"); setTimeout(function(){ e.classList.remove("on"); },1800); }
+function e(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function share(url,name){
+  fetch(url).then(function(r){ return r.blob(); }).then(function(b){
+    var f=new File([b],name,{type:b.type});
+    if(navigator.canShare&&navigator.canShare({files:[f]})) return navigator.share({files:[f],title:name});
+    if(navigator.share) return navigator.share({title:name,url:new URL(url,location.href).href});
+    location.href=url; }).catch(function(err){ if(!err||err.name!=="AbortError") location.href=url; });
+}
+["melody","nalu"].forEach(function(k){ document.getElementById(k).innerHTML=FILES[k].map(function(f){
+  var main=f[1]+"."+f[3], thumb=f[1]+".thumb."+(f[4]?"jpg":"png"), name=f[1].split("/")[1];
+  return '<div class="f"><div class="im"><img loading="lazy" src="'+thumb+'" alt=""></div><b>'+e(f[0])+'</b><small>'+f[2].map(function(x){ return x.toUpperCase(); }).join(" + ")+'</small>'+
+    f[2].map(function(x){ return '<div class="act"><a href="'+f[1]+"."+x+'" download>⬇ '+x.toUpperCase()+'</a><button type="button" data-u="'+f[1]+"."+x+'" data-n="'+name+"."+x+'">Share</button></div>'; }).join("")+'</div>'; }).join(""); });
+document.getElementById("video").innerHTML=FILES.video.map(function(v){ var n=v[1].split("/")[1];
+  return '<div class="f"><video src="'+v[1]+'" controls playsinline preload="metadata"></video><b>'+e(v[0])+'</b><div class="act"><a href="'+v[1]+'" download>⬇ Save</a><button type="button" data-u="'+v[1]+'" data-n="'+n+'">Share</button></div></div>'; }).join("");
+document.addEventListener("click",function(ev){ var b=ev.target.closest("button[data-u]"); if(b) share(b.dataset.u,b.dataset.n); });
+document.getElementById("shareAll").onclick=function(){ var u=location.href.split("#")[0];
+  if(navigator.share) navigator.share({title:"Melody + Nalu Vida files",text:MSG}).catch(function(){}); else location.href="sms:&body="+encodeURIComponent(MSG); };
+document.getElementById("copyMsg").onclick=function(){ (navigator.clipboard?navigator.clipboard.writeText(MSG):Promise.reject()).then(function(){ toast("Copied — paste it in your text to Christian"); },function(){ prompt("Copy this:",MSG); }); };
+</script></body></html>

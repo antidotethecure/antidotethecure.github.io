@@ -16,6 +16,8 @@
   var SEL = ".menu img, .items img, .dish img";
   var css = [
     ".m3d-w{position:relative;display:block;perspective:700px;-webkit-tap-highlight-color:transparent}",
+    // pages whose photo box positions the <img> absolutely (Melody .media) need the wrapper to fill that box too
+    ".media>.m3d-w{position:absolute;inset:0;height:100%}",
     ".m3d-w>img{transition:transform .25s ease-out,box-shadow .25s;transform-style:preserve-3d;will-change:transform}",
     ".m3d-w.m3d-on>img{transition:transform .06s linear,box-shadow .25s;box-shadow:0 18px 30px rgba(0,0,0,.35)}",
     ".m3d-w .m3d-sh{position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:radial-gradient(circle at var(--x,50%) var(--y,30%),rgba(255,255,255,.35),transparent 55%);opacity:0;transition:opacity .25s;mix-blend-mode:soft-light}",

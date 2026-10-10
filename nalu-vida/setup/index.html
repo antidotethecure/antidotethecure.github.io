@@ -320,6 +320,7 @@ last.appendChild(chipRow("approved",["Yes, put it live","Show me a preview first
 app.appendChild(last);
 refresh();
 
+window.SETUP_SUMMARY = function () { return summary(); };   // lets the owner's launch checklist (/launch/…) collect these answers
 function summary(){
   var out=[CFG.name.toUpperCase()+" SETUP (from "+(OWNER==="there"?"the owner":OWNER)+")"];
   Q.forEach(function(sec){ out.push("\n"+sec[0].toUpperCase()); sec[1].forEach(function(q){

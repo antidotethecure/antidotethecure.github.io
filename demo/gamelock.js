@@ -6,12 +6,20 @@
       "Lock screen", which locks it again. Free mode stays until they lock again.
    Game areas: canvas#game, canvas#cv, canvas[data-game], [data-game], .gamebox.
    While locked, scrollable panels/modals (or anything with [data-scroll-ok]) still scroll inside themselves.
+   Also loads gamepause.js (Pause button for every game).
    Touch only: a mouse never locks the page. Pill position: window.GAMELOCK_POS = "top-left" | "top-right" |
    "bottom-left" | "bottom-right" (default "bottom-left"), set before this script. */
 (function () {
   "use strict";
   if (window.__ssaiGameLock) return;
   window.__ssaiGameLock = 1;
+  // Every game also gets a Pause button (gamepause.js, served next to this file).
+  var me = document.currentScript;
+  if (me && me.src && !window.__ssaiGamePause) {
+    var gp = document.createElement("script");
+    gp.src = me.src.replace(/gamelock\.js(\?.*)?$/, "gamepause.js");
+    document.head.appendChild(gp);
+  }
   var CANVAS = "canvas#game, canvas#cv, canvas[data-game]";
   var AREA = CANVAS + ", [data-game], .gamebox";
   var POS = (window.GAMELOCK_POS || "bottom-left").split("-");

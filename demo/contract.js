@@ -9,7 +9,7 @@
   var CFG = window.CONFIG || {};
   var BIZ = CFG.name || document.title.split(" — ")[0] || "Client";
   var ADDR = (CFG.address && !/drops in|exact address/i.test(CFG.address)) ? CFG.address : "";
-  var PROVIDER = { name: "Anthony Lewis Suggs Jr.", email: "antidotethecure@gmail.com",
+  var PROVIDER = { name: "Anthony Louis Suggs Jr.", email: "antidotethecure@gmail.com",
                    co: "Antidote Enterprises LLC, doing business as Second Shift AI" };
   var PRESETS = {
     // Pricing v4 (2026-10-09). Full package: car-style plans, less down = higher monthly for 12 months, then $400.

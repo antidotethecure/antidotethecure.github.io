@@ -181,7 +181,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 
 /* arrival scene: the real storefront — head inside to order, or turn left and grab a board */
 .arrive{position:relative;margin:0 -16px 6px;aspect-ratio:4/5;max-height:88vh;overflow:hidden;background:#2a1a10}
-.arrive img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+.arrive img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
 .arrive::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,32,58,.55) 0%,rgba(8,32,58,0) 22%,rgba(8,32,58,0) 62%,rgba(8,32,58,.75) 100%);pointer-events:none}
 .arrive h1{position:absolute;left:16px;right:16px;top:14px;z-index:2;margin:0;font:400 clamp(22px,6.4vw,34px)/1.1 var(--display);color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.6)}
 .arrive h1 small{display:block;font:600 13px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--sun3);margin-bottom:4px}
@@ -192,9 +192,24 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 .arrive .go:active{transform:scale(.97)}
 .arrive .wave{position:absolute;z-index:2;font-size:26px;animation:nvwave 1.4s ease-in-out infinite;transform-origin:70% 80%}
 @keyframes nvwave{0%,100%{transform:rotate(0)}30%{transform:rotate(18deg)}60%{transform:rotate(-10deg)}}
-.arrive .bubble{position:absolute;z-index:2;padding:6px 9px;border-radius:12px;background:#fff;color:#08203a;font:800 12.5px var(--body);box-shadow:0 6px 16px rgba(0,0,0,.35);animation:nvpop 3.2s ease-in-out infinite}
-.arrive .bubble::after{content:"";position:absolute;bottom:-6px;left:16px;border:6px solid transparent;border-top-color:#fff;border-bottom:0}
-.arrive .bubble.r::after{left:auto;right:16px}
+.arrive .bubble{position:absolute;z-index:2;padding:4px 10px;border-radius:999px;background:rgba(8,32,58,.18);border:1.5px solid #7fe3f2;color:#fff;font:700 12px var(--body);letter-spacing:.02em;
+  text-shadow:0 0 6px #2ec4e6,0 0 12px #2ec4e6;box-shadow:0 0 8px rgba(46,196,230,.85),0 0 18px rgba(46,196,230,.45),inset 0 0 8px rgba(46,196,230,.35);animation:nvpop 3.2s ease-in-out infinite,nvled 2.6s steps(1) infinite}
+.arrive .bubble::after{content:"";position:absolute;bottom:-7px;left:18px;width:10px;height:10px;border-right:1.5px solid #7fe3f2;border-bottom:1.5px solid #7fe3f2;transform:rotate(45deg) skew(8deg,8deg);background:transparent;box-shadow:3px 3px 6px rgba(46,196,230,.6)}
+.arrive .bubble.r{border-color:#ffb36b;text-shadow:0 0 6px #ff6a2b,0 0 12px #ff6a2b;box-shadow:0 0 8px rgba(255,106,43,.9),0 0 18px rgba(255,106,43,.45),inset 0 0 8px rgba(255,106,43,.35)}
+.arrive .bubble.r::after{left:auto;right:18px;border-color:#ffb36b;box-shadow:3px 3px 6px rgba(255,106,43,.6)}
+@keyframes nvled{0%,100%{opacity:1}47%{opacity:1}48%{opacity:.55}49%{opacity:1}83%{opacity:1}84%{opacity:.7}85%{opacity:1}}
+/* living scene layers */
+.arrive .neon{position:absolute;z-index:1;left:70%;top:13%;width:30%;height:17%;border-radius:40%;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(ellipse at 55% 60%,rgba(80,160,255,.55),rgba(46,196,230,.25) 40%,transparent 70%),radial-gradient(ellipse at 40% 25%,rgba(255,120,40,.45),transparent 55%);animation:nvflick 5.5s infinite}
+.arrive .neondim{position:absolute;z-index:1;left:70%;top:13%;width:30%;height:17%;pointer-events:none;background:rgba(8,20,40,.55);border-radius:30%;filter:blur(6px);opacity:0;animation:nvdim 7s infinite}
+@keyframes nvflick{0%,100%{opacity:.9}8%{opacity:1}9%{opacity:.35}10%{opacity:1}11%{opacity:.5}12%{opacity:1}55%{opacity:.85}56%{opacity:.3}57%{opacity:.95}80%{opacity:1}}
+@keyframes nvdim{0%,61%,66%,100%{opacity:0}62%{opacity:.8}63%{opacity:.1}64%{opacity:.7}}
+.arrive .fx{position:absolute;z-index:1;pointer-events:none;will-change:transform,opacity;height:auto}
+.arrive .dish{height:auto;position:absolute;z-index:2;pointer-events:none;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45));transform-origin:50% 100%;opacity:0}
+.arrive .dish.in{animation:nvdish 4.2s ease forwards}
+@keyframes nvdish{0%{opacity:0;transform:translateY(14px) scale(.6)}12%{opacity:1;transform:translateY(-6px) scale(1.06)}18%{transform:translateY(0) scale(1)}82%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.92) translateY(4px)}}
+.arrive .spark{position:absolute;z-index:3;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 10px 4px #ffd23f;pointer-events:none;animation:nvspark .9s ease-out forwards}
+@keyframes nvspark{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.4)}}
 @keyframes nvpop{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @media (prefers-reduced-motion:reduce){.arrive .wave,.arrive .bubble{animation:none}}
 </style>
@@ -203,10 +218,13 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <div class="wrap">
 
 <section class="arrive" aria-label="Welcome to Nalu Vida">
-  <img src="img/hero.jpg" alt="Nalu Vida at the foot of the Venice Pier at sunset: surfers with boards on the sand to the left, the glowing restaurant entrance to the right" fetchpriority="high">
+  <img class="bg" src="img/hero.jpg" alt="Nalu Vida at the foot of the Venice Pier at sunset: surfers with boards on the sand to the left, the glowing restaurant entrance to the right" fetchpriority="high">
   <h1><small>Venice Pier · Tropical Bites · Craft Cocktails</small>Welcome to Nalu Vida 🌴</h1>
-  <span class="bubble" style="left:16%;top:47%">Come ride with us! 🌊</span>
-  <span class="bubble r" style="right:5%;top:52%">Table's ready! 🍹</span>
+  <div class="neon" aria-hidden="true"></div><div class="neondim" aria-hidden="true"></div>
+  <span class="bubble" style="left:9%;top:33%">Come ride with us! 🌊</span>
+  <span class="bubble r" style="right:2%;top:37%">Your table's ready 🍹</span>
+  <img class="dish" id="dishA" alt="" style="left:52%;top:55%;width:16%">
+  <img class="dish" id="dishB" alt="" style="left:80%;top:62%;width:20%">
   <a class="go l" href="#play" id="arrive-play">🏄 Grab a board<small>Ride the Nalu · win free food</small></a>
   <a class="go r" href="#food">🍽️ Head inside<small>Order from your table</small></a>
 </section>
@@ -256,6 +274,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <script src="game.js"></script>
 <div class="prizes" id="prizes"></div>
 
+<div id="champs" data-game="naluvida" style="max-width:430px;margin:12px auto"></div><script src="../champs.js"></script>
 <h2 id="seat"><small>Order from your phone</small>Where are you sitting?</h2>
 <p class="sub">Pick your spot and your order goes to the right place. Scanned a table code? It's already picked.</p>
 <div class="box" id="seatbox">
@@ -1010,5 +1029,35 @@ $("evsub").textContent="Week of "+MON[new Date(monday).getUTCMonth()]+" "+new Da
 <script src="../nearby.js"></script>
 <script src="../gamelock.js"></script>
 <script>document.getElementById("arrive-play").addEventListener("click",function(){setTimeout(function(){var b=document.querySelector(".nv-pick button");if(b)b.animate&&b.animate([{transform:"scale(1)"},{transform:"scale(1.08)"},{transform:"scale(1)"}],{duration:600,iterations:2});},700);});</script>
+<script>
+/* living arrival scene: dolphins, gulls, a passing jet ski, and dishes appearing on the patio tables */
+(function(){
+  var A=document.querySelector(".arrive"); if(!A) return;
+  var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches; if(reduce) return;
+  function el(src,cls){ var i=new Image(); i.src=src; i.className="fx"+(cls?" "+cls:""); i.alt=""; A.appendChild(i); return i; }
+  function anim(e,frames,ms,done){ var a=e.animate(frames,{duration:ms,easing:"linear",fill:"forwards"}); a.onfinish=function(){ e.remove(); done&&done(); }; }
+  function dolphin(){ var d=el("img/scene/dolphin.webp"); var x=3+Math.random()*30, w=9+Math.random()*4; d.style.cssText="left:"+x+"%;top:52%;width:"+w+"%";
+    var flip=Math.random()<.5?-1:1; anim(d,[{transform:"translate(0,40%) rotate("+(-35*flip)+"deg) scaleX("+flip+")",opacity:0},{offset:.12,opacity:1},{transform:"translate("+(60*flip)+"%,-55%) rotate(0deg) scaleX("+flip+")",offset:.5},{transform:"translate("+(120*flip)+"%,45%) rotate("+(40*flip)+"deg) scaleX("+flip+")",opacity:1,offset:.92},{opacity:0}],1500,function(){ splash(x+w*.5+8*flip,57); });
+    setTimeout(function(){ splash(x+w*.3,56); },120); }
+  function splash(x,y){ for(var k=0;k<7;k++){ var s=document.createElement("i"); s.className="fx"; s.style.cssText="left:"+x+"%;top:"+y+"%;width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.9)"; A.appendChild(s);
+      anim(s,[{transform:"translate(0,0)",opacity:1},{transform:"translate("+(Math.random()*30-15)+"px,"+(-10-Math.random()*22)+"px)",opacity:.9,offset:.5},{transform:"translate("+(Math.random()*40-20)+"px,8px)",opacity:0}],700); } }
+  function gull(){ var g=el("img/scene/gull_side.webp"), y=6+Math.random()*26, w=5+Math.random()*4, l2r=Math.random()<.5; g.style.cssText="top:"+y+"%;width:"+w+"%;left:0";
+    var x0=l2r?-12:105, x1=l2r?105:-12; anim(g,[{transform:"translate("+x0*3.9+"px,0) scaleX("+(l2r?1:-1)+")"},{transform:"translate("+((x0+x1)/2)*3.9+"px,"+(Math.random()*30-15)+"px) scaleX("+(l2r?1:-1)+")"},{transform:"translate("+x1*3.9+"px,"+(Math.random()*20-10)+"px) scaleX("+(l2r?1:-1)+")"}],9000+Math.random()*5000); }
+  function jetski(){ var j=el("img/scene/jetski.webp"); j.style.cssText="top:46%;width:11%;left:0"; var W=A.clientWidth;
+    anim(j,[{transform:"translate("+W*.5+"px,0)"},{transform:"translate("+W*.26+"px,2px)",offset:.5},{transform:"translate("+(-W*.15)+"px,-1px)"}],6500); }
+  var dishes=["smash-burger","wings","tostadas","tuna-rice","coconut-shrimp","oysters","smash-burger","jungle-fries"], di=0, slot=0;
+  function dish(){ var e=document.getElementById(slot?"dishB":"dishA"); slot=1-slot; e.classList.remove("in"); void e.offsetWidth; e.src="img/scene/"+dishes[di++%dishes.length]+".webp"; e.classList.add("in");
+    var r=e.getBoundingClientRect(), b=A.getBoundingClientRect();
+    if(/burger|wings|shrimp/.test(e.src)) for(var q=0;q<4;q++){ (function(q){ var st=document.createElement("i"); st.className="fx"; st.style.cssText="left:"+((r.left-b.left)+r.width*(.3+q*.13))+"px;top:"+((r.top-b.top)+r.height*.15)+"px;width:"+(r.width*.16)+"px;height:"+(r.width*.4)+"px;border-radius:50%;background:radial-gradient(ellipse at 50% 70%,rgba(255,255,255,.55),rgba(255,255,255,0) 70%);filter:blur(4px)";
+      A.appendChild(st); anim(st,[{transform:"translate(0,10px) scale(.6)",opacity:0},{opacity:.85,offset:.3},{transform:"translate("+(q%2?8:-8)+"px,-50px) scale(1.4)",opacity:0}],2200+q*300); })(q); }
+    for(var k=0;k<6;k++){ var s=document.createElement("i"); s.className="spark"; s.style.left=((r.left-b.left)+r.width*(.2+Math.random()*.6))+"px"; s.style.top=((r.top-b.top)+r.height*(.2+Math.random()*.4))+"px";
+      s.style.setProperty("--dx",(Math.random()*40-20)+"px"); s.style.setProperty("--dy",(-10-Math.random()*25)+"px"); A.appendChild(s); setTimeout(function(x){ return function(){ x.remove(); }; }(s),950); } }
+  var on=true; new IntersectionObserver(function(e){ on=e[0].isIntersecting; }).observe(A);
+  setTimeout(dish,900); setInterval(function(){ if(on) dish(); },2600);
+  setInterval(function(){ if(on&&Math.random()<.55) dolphin(); },3800);
+  setInterval(function(){ if(on) gull(); },3300); gull();
+  setInterval(function(){ if(on&&Math.random()<.5) jetski(); },9000); setTimeout(jetski,2500);
+})();
+</script>
 </body>
 </html>

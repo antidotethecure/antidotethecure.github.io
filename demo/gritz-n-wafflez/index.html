@@ -471,7 +471,7 @@ function end(){
   $("startov").classList.remove("off"); $("startov").querySelector("b").textContent="Kitchen's closed"; $("startov").querySelector("span").textContent="Tap to run it back";
   $("over").classList.add("on");
 }
-window.__OG={get:function(){return og;},ITEMS:ITEMS};
+window.__OG={get:function(){return og;},ITEMS:ITEMS,DISHES:DISHES,start:start};
 $("startov").addEventListener("click",start);
 $("again").addEventListener("click",function(){ start(); $("og").scrollIntoView({block:"start",behavior:reduce?"auto":"smooth"}); });
 hud();
@@ -482,6 +482,19 @@ hud();
 <script>window.NEARBY={name:"Gritz N Wafflez",pin:"🧇",spots:[{label:"Koreatown · Wilshire",lat:34.0617,lng:-118.2967,q:"3183 Wilshire Blvd, Los Angeles, CA 90010"}],offer:"Show this to your server for double points on today's order."};</script>
 <script src="../nearby.js"></script>
 <script src="../menu3d.js"></script>
+<script>(function(){ var G="img/game/", D=(window.__OG&&window.__OG.DISHES)||[], I=(window.__OG&&window.__OG.ITEMS)||{};
+var dish=function(n){ for(var i=0;i<D.length;i++) if(D[i].n===n){ var d=D[i]; return {img:"img/"+d.ph+".jpg",name:d.n,note:d.r.map(function(k){return I[k]?I[k].n:k;}).join(" + "),pts:"+"+(40*d.r.length)}; } return null; };
+window.GAME_MENU={id:"gritz-n-wafflez",name:"Order Up!",by:"Gritz N Wafflez",tagline:"Build the plate right. Ring the bell. 75 seconds on the line.",
+ hero:[G+"waffle.webp",G+"chicken.webp",G+"kiki.webp",G+"grits.webp"],
+ theme:{bg:"#1E1B3A",bg2:"#3B1F5C",card:"rgba(255,255,255,.1)",edge:"rgba(255,255,255,.2)",accent:"#D9A21B",accent2:"#F2C14E",ink:"#FFFFFF",dim:"#E8DCF5",btnInk:"#1E1B3A",display:"'Playfair Display',Georgia,serif",body:"'DM Sans',system-ui,sans-serif"},
+ mount:"#ou",hide:"#startov",start:function(){ window.__OG.start(); },vibrate:true,
+ how:{goal:"Serve as many guests as you can in 75 seconds. Build each plate exactly how they ordered it, fast.",time:"75 seconds · up to 3 guests at a time",
+  steps:[["🧾","Read the ticket over each guest: the dish, its items, plus any + extras or NO leave-offs"],[null,"Tap ingredients on the line to put them on the plate",G+"waffle.webp"],["↩️","Tap an item again to take it off · 🗑️ Start over clears the plate"],["🛎️","Ring Serve it. The plate goes to whoever ordered exactly that"],["⏳","Each guest's bar runs down. Let it run out and they walk out"],["⭐","Fast service raises your stars, and more stars bring guests in faster"]]},
+ points:[{group:"Every order",items:[{img:G+"waffle.webp",name:"Each item on the order",note:"Waffle, wingz, gritz, syrup, drinks… every ingredient they asked for",pts:"+40 each"},{icon:"➕",name:"Special requests",note:"Each + extra or NO leave-off you get right",pts:"+20 each"},{icon:"⚡",name:"Speed bonus",note:"Scales with how much time the guest had left",pts:"up to +120"},{icon:"💵",name:"Tips",note:"Fast serves get a tip on top",pts:"+10 to +50"},{icon:"🔥",name:"Combo",note:"Perfect orders in a row: ×1.25, ×1.5, ×1.75, up to ×2 on item + speed points",pts:"up to ×2",gold:true}]},
+  {group:"Dishes on the line (item points)",items:["Wingz N' Wafflez","Shrimp N' Gritz","Peach Cobbler Waffle","BET+ Breakfast Plate","Da Baddest Chick Sandwich"].map(dish).filter(Boolean)},
+  {group:"Mistakes",items:[{icon:"❌",name:"Wrong plate",note:"Nobody ordered that. Combo resets",pts:"−20",bad:true},{icon:"🚫",name:"Added a NO item",note:"They said no cheese! Combo resets, guest gets mad",pts:"−60",bad:true},{icon:"😤",name:"Walk-out",note:"Waited too long. Stars drop and the line slows",pts:"−50",bad:true}]}],
+ prizes:{champion:"Free Wingz N' Wafflez + a karaoke shoutout for the top score by Sunday close",tiers:[["5,400","Free Original Collard Green Dip","One shift over 5,400 points",G+"dip.webp"],["4,800","Free Fried Cheese Gritz","With any plate",G+"fgritz.webp"],["3,800","Free side of Smackin' Mac","With any order",G+"mac.webp"],["2,500","Free Kiki Palmer","Lemonade + tea, on the house",G+"kiki.webp"]],note:"Sample prizes. Jurni picks the real ones and the board resets every Monday."}}; })();</script>
+<script src="../gamemenu.js"></script>
 <script src="../gamelock.js"></script>
 </body>
 </html>

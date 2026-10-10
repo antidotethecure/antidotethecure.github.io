@@ -458,7 +458,8 @@ var CONFIG = {
     if(m.list.length){ sel=null; chain=0; startClear(m); }
     else { t=grid[a.r][a.c].k; grid[a.r][a.c].k=grid[b.r][b.c].k; grid[b.r][b.c].k=t; sel=null; }
   }
-  window.__CL={get:function(){return {grid:grid,state:state,score:score};},trySwap:function(a,b){trySwap(a,b);},start:function(){start();},COLS:COLS,ROWS:ROWS,HAZ:HAZ};
+  window.__CL={get:function(){return {grid:grid,state:state,score:score};},trySwap:function(a,b){trySwap(a,b);},start:function(){start();},COLS:COLS,ROWS:ROWS,HAZ:HAZ,
+    icon:function(k){ var o=cx, c=document.createElement("canvas"); c.width=c.height=CS*2; cx=c.getContext("2d"); cx.scale(2,2); try{ DRAW[k](CS/2,CS/2+2); }finally{ cx=o; } return c.toDataURL(); }}; // start-menu art: the real tile drawings
   function draw(){
     cx.clearRect(0,0,W,H);
     var mset={}; if(state==="clear") matched.forEach(function(m){ mset[m.r+","+m.c]=1; });
@@ -558,6 +559,18 @@ var CONFIG = {
 <script>window.NEARBY={name:"Churrito Loco",pin:"🌶️",spots:[{label:"South Gate",lat:33.955939,lng:-118.222585,q:"2801 Firestone Blvd, South Gate, CA"}],offer:"Show this at the counter for double stars on today's churros."};</script>
 <script src="../nearby.js"></script>
 <script src="../menu3d.js"></script>
+<script>(function(){ var ic=function(k){ return function(){ return window.__CL.icon(k); }; };
+window.GAME_MENU={id:"churrito-loco",name:"Loco Match",by:"Churrito Loco",tagline:"Match the snacks. 90 seconds on the clock.",
+ hero:[ic(0),ic(2),ic(5),ic(3),ic(1)],
+ theme:{bg:"#FFF8F0",bg2:"#FFE9CF",card:"#FFFFFF",edge:"#F0DFC8",accent:"#F57A1A",accent2:"#FFB347",label:"#C2560A",ink:"#2B1A0E",dim:"#7A5E46",btnInk:"#2B1A0E",soft:"rgba(43,26,14,.06)",track:"rgba(43,26,14,.18)",good:"#1F8A43",bad:"#C0392B",display:"Archivo,system-ui,sans-serif",body:"Archivo,system-ui,sans-serif"},
+ mount:document.getElementById("game").closest(".gamebox"),start:function(){ window.__CL.start(); },
+ how:{goal:"Score as many points as you can in 90 seconds by lining up 3 or more of the same snack.",time:"90 seconds on the clock",
+  steps:[["👆","Tap a snack, then tap the one next to it to swap them"],["👉","Or swipe a snack toward its neighbor"],["🔁","Swaps only stick if they make a match"],["⭐","Make a match right next to the Churrito Man to clear him for a big bonus"],["🌶️","Leave the grilled Serrano alone. It burns out by itself"]]},
+ points:[{group:"Match 3+ of these",items:[{img:ic(0),name:"Elote",pts:"+10 each"},{img:ic(1),name:"XL Chili Cheese Fries",pts:"+10 each"},{img:ic(2),name:"Filled Churros",pts:"+10 each"},{img:ic(3),name:"Abuelita Choco Horchata",pts:"+10 each"},{img:ic(4),name:"Sandía drink",pts:"+10 each"}]},
+  {group:"Bonuses",items:[{icon:"4️⃣",name:"4 in a row",pts:"+40"},{icon:"5️⃣",name:"5 in a row",pts:"+100"},{img:ic(5),name:"Churrito Man",note:"Make a match touching him to clear him",pts:"+150",gold:true},{icon:"🔗",name:"Chain reaction",note:"Falling snacks that match again: +15, +30, +45… per step",pts:"+15 per step"}]},
+  {group:"Watch out",items:[{img:ic(6),name:"Grilled Serrano",note:"Swiping it burns you. It burns out on its own",pts:"−25",bad:true}]}],
+ prizes:{champion:"1st place this week: 50% OFF your next order",tiers:[["2nd","20% OFF next order","2nd place on the weekly board","🥈"],["4,150+","15% OFF next order","Puts you on the weekly board (test players averaged 3,913)","🏆"]],note:"Sample prizes. The owner sets the real ones and the board resets every Monday."}}; })();</script>
+<script src="../gamemenu.js"></script>
 <script src="../gamelock.js"></script>
 </body>
 </html>

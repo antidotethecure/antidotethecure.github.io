@@ -262,7 +262,7 @@ function hud(){ $("score").textContent=st.score.toLocaleString(); $("lives").tex
 function best(){ try{ var b=+localStorage.getItem("sb-best")||0; $("best").textContent="Your best: "+(b?b.toLocaleString()+" pts":"—"); return b; }catch(e){ return 0; } }
 best();
 function setLane(n){ if(!st.running||st.dying) return; st.lane=Math.max(0,Math.min(LANES-1,n)); }
-window.__S={get:function(){return st;},setLane:function(n){st.lane=Math.max(0,Math.min(LANES-1,n));},LX:LX};
+window.__S={get:function(){return st;},setLane:function(n){st.lane=Math.max(0,Math.min(LANES-1,n));},LX:LX,start:function(){start();}};
 function start(){
   var keep=st.rain; st=fresh(); st.rain=keep; st.running=true; st.last=performance.now();
   $("over").classList.remove("on"); hud();
@@ -602,6 +602,16 @@ hud();
     {id:"bacon",name:"Bacon",price:2,max:2,w:.78,ar:.407,top:.4,sink:.2,group:"Extras"},
     {id:"jalapeno",name:"Jalapeños",price:1,max:1,w:.72,ar:.373,top:.4,sink:.2,group:"Extras"}]}]};</script>
 <script src="../builder.js"></script>
+<script>window.GAME_MENU={id:"storm-burger",name:"Storm Run",by:"StormBurger",tagline:"Drive the food truck through the storm. 45 seconds, 3 lives.",
+ hero:["img/game/fries.webp","img/game/burger.webp","img/game/shake.webp","img/game/chicken.webp"],
+ theme:{bg:"#070B1E",bg2:"#121C40",card:"#1a2656",edge:"#25336A",accent:"#E8582A",accent2:"#FFD23F",ink:"#EEF2FF",dim:"#9AA6CC",btnInk:"#141a33",display:"'Bebas Neue','Arial Narrow',Impact,sans-serif",body:"Archivo,system-ui,sans-serif"},
+ mount:"#game",start:function(){ window.__S.start(); },vibrate:true,
+ how:{goal:"Stay on the road for 45 seconds and rack up points: grab coins and StormBurger food, dodge everything the storm throws at you.",time:"45 seconds · 3 lives · 3 hits and the truck is totaled",
+  steps:[["👆","Tap the left or right side of the road to change lanes"],["◀▶","Or use the ◀ ▶ buttons under the game (arrow keys on a computer)"],["⚡","A lane that glows is about to get hit by lightning. Get out of it!"],["🐄","Flying cows and stop signs drift across lanes. Dodge them"],["🔥","Each hit sets the truck on fire and costs a life"]]},
+ points:[{group:"Grab these",items:[{img:"img/game/burger.webp",name:"Classic StormBurger",pts:"+60"},{img:"img/game/chicken.webp",name:"Spicy Chicken",pts:"+50"},{img:"img/game/shake.webp",name:"Shake",pts:"+40"},{img:"img/game/fries.webp",name:"Fries",pts:"+30"},{img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='17' fill='%23ffd23f' stroke='%238a5a06' stroke-width='3'/%3E%3Cpath d='M23 9l-9 12h6l-3 10 9-12h-6z' fill='%23b46f05'/%3E%3C/svg%3E",name:"Coin",note:"Spinning gold coins",pts:"+10"},{icon:"🛣️",name:"Staying alive",note:"+1 every quarter second you're on the road",pts:"+4/sec"}]},
+  {group:"Dodge these",items:[{img:"img/game/cow.webp",name:"Flying cow",note:"Costs a life",pts:"−100",bad:true},{img:"img/game/stop.webp",name:"Stop sign",note:"Costs a life",pts:"−100",bad:true},{icon:"⚡",name:"Lightning strike",note:"Costs a life. Watch for the glowing lane",pts:"−100",bad:true}]}],
+ prizes:{champion:"Free Double Classic StormBurger Combo for the top score by Sunday close",tiers:[["1,000","Free Classic StormBurger","One run over 1,000 points","img/game/burger.webp"],["800","Free milkshake","Vanilla, chocolate or mix","img/game/shake.webp"],["600","Free fries or onion rings","With any order","img/game/fries.webp"],["400","Free house sauce","Storm, Thunder, Ranch… your pick","🥫"]],note:"Sample prizes. StormBurger picks the real ones and the board resets every Monday."}};</script>
+<script src="../gamemenu.js"></script>
 <script src="../gamelock.js"></script>
 </body>
 </html>

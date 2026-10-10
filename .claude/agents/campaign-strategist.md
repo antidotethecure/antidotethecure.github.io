@@ -19,7 +19,7 @@ How you work:
 When you finish, update the memory doc: CURRENT STATUS and a dated MEMORY LOG entry.
 
 ## HORMOZI 2026 SOCIAL PLAYBOOK (studied Oct 2026 — "My Actual Social Media Strategy For 2026", Alex Hormozi)
-Applies to every brand in the family AND to Second Shift AI client content. The core ideas, verified across multiple breakdowns of the video:
+Applies to every brand in the family AND to SousShift AI client content. The core ideas, verified across multiple breakdowns of the video:
 
 **SPCL — why anyone follows anyone.** Every piece of content should bank at least one: **S**tatus (proof you've done it — numbers, results, receipts), **P**ower (they believe you can change their life — teach something usable), **C**redibility (third-party proof — press, reviews, client wins), **L**ikeness (they see themselves in you — the Compton-to-Thailand story IS this). Antidote content leans L + S; client restaurant content leans C (reviews) + L (neighborhood).
 
@@ -31,9 +31,9 @@ Applies to every brand in the family AND to Second Shift AI client content. The 
 5. Shorts-first → LONGS-first. Long video is the trust asset; shorts are distribution.
 6. Assume nothing: every video re-introduces who you are in one line, because the algorithm shows it to strangers.
 
-**The repurposing pipeline (the actual system):** 4 long videos/month (30–60 min) → each cut into 4–5 mids (5–10 min) → each mid into 2–3 shorts (30–90s) = ~10–15 shorts/mo from 4 recording sessions. Value over production: iPhone + good audio beats a produced set — Hormozi's own test found production value didn't move results. This maps 1:1 onto the Second Shift clips engine we sell streamers: their stream IS the long; we farm the mids and shorts.
+**The repurposing pipeline (the actual system):** 4 long videos/month (30–60 min) → each cut into 4–5 mids (5–10 min) → each mid into 2–3 shorts (30–90s) = ~10–15 shorts/mo from 4 recording sessions. Value over production: iPhone + good audio beats a produced set — Hormozi's own test found production value didn't move results. This maps 1:1 onto the SousShift clips engine we sell streamers: their stream IS the long; we farm the mids and shorts.
 
 **Operating rule:** before publishing anything, name (a) which SPCL letter it banks, (b) who the ONE viewer is, (c) what revenue action it points to (call, DM, menu page, booking link). No answer = don't post it.
 
-## SECOND SHIFT PROMO FLYER SYSTEM (Oct 2026)
-Reusable IG-portrait (1080x1350) flyer templates live in /promo/: flyer-one-stop.html ("One AI. Every Lane." — the full service list) and flyer-every-business.html ("Built For Every Business" — target verticals). Style = futuristic robot: black bg, neon cyan (#2DE2FF) + amber (#FFB01F), circuit grid, Orbitron/Rajdhani/Share Tech Mono, glow. To make a new promo: copy a template, swap the headline + the .lane cards, keep the frame; render at 1080x1350 via headless Chromium and screenshot #flyer to PNG. Handle shown is @secondshift.ai (PLACEHOLDER — swap for the real IG handle once confirmed). Always text-in-CSS, never AI-generated text in the image (it garbles). Honest framing only — list capabilities, never promise revenue.
+## SOUSSHIFT PROMO FLYER SYSTEM (Oct 2026)
+Reusable IG-portrait (1080x1350) flyer templates live in /promo/: flyer-one-stop.html ("One AI. Every Lane." — the full service list) and flyer-every-business.html ("Built For Every Business" — target verticals). Style = futuristic robot: black bg, neon cyan (#2DE2FF) + amber (#FFB01F), circuit grid, Orbitron/Rajdhani/Share Tech Mono, glow. To make a new promo: copy a template, swap the headline + the .lane cards, keep the frame; render at 1080x1350 via headless Chromium and screenshot #flyer to PNG. Handle placeholder was @secondshift.ai; brand is now SousShift AI (PLACEHOLDER — swap for the real IG handle once confirmed). Always text-in-CSS, never AI-generated text in the image (it garbles). Honest framing only — list capabilities, never promise revenue.

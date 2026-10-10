@@ -1,4 +1,4 @@
-/* Second Shift AI — universal game PAUSE. Loaded by gamelock.js (or include it on its own: <script src="gamepause.js"></script>).
+/* SousShift AI — universal game PAUSE. Loaded by gamelock.js (or include it on its own: <script src="gamepause.js"></script>).
    Once someone plays (touch/click in a game area) a "⏸ Pause" button shows while that game is on screen.
    Pausing freezes the whole game without touching the game's code:
      - requestAnimationFrame callbacks are held, and performance.now() / rAF timestamps stop advancing,

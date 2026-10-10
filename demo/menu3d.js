@@ -1,4 +1,4 @@
-/* Second Shift AI — 3D menu for every demo page. Include once: <script src="../menu3d.js"></script>
+/* SousShift AI — 3D menu for every demo page. Include once: <script src="../menu3d.js"></script>
    - Every menu photo tilts in 3D as you move over it (finger or mouse), with a light sheen.
    - The "3D" badge opens Plate View: the dish drops onto a spinning plate with steam, a 3-second loop.
      Drag to spin it yourself.

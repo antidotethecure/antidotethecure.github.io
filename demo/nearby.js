@@ -1,4 +1,4 @@
-/* Second Shift AI — Google reviews + "you're nearby" map for every demo page.
+/* SousShift AI — Google reviews + "you're nearby" map for every demo page.
    Include after the page's CONFIG:
      <script>window.NEARBY={name:"…", spots:[{label:"…", lat:…, lng:…, q:"street address"}], placeId:"", mapsKey:"", offer:"…"};</script>
      <script src="../nearby.js"></script>

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Register Setup Guide · Second Shift AI</title>
-<meta name="description" content="Step-by-step: connect your Second Shift AI rewards app to Toast, Square, Clover, SpotOn, Lightspeed, Revel, any other POS, or a cash register.">
+<title>Register Setup Guide · SousShift AI</title>
+<meta name="description" content="Step-by-step: connect your SousShift AI rewards app to Toast, Square, Clover, SpotOn, Lightspeed, Revel, any other POS, or a cash register.">
 <meta name="theme-color" content="#060b16">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%A7%BE%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -114,7 +114,7 @@ footer{margin-top:22px;text-align:center;color:var(--dim);font-size:12.5px}
 <body>
 <div class="wrap">
 <header>
-  <div class="brand">Second Shift AI</div>
+  <div class="brand">SousShift AI</div>
   <h1>Connect rewards to your register</h1>
   <p class="lede">Your guests get reward codes in the app. Your staff take them off at the register. Pick your system below and follow the steps.</p>
   <p class="for" id="for" hidden></p>
@@ -144,7 +144,7 @@ footer{margin-top:22px;text-align:center;color:var(--dim);font-size:12.5px}
 <section id="panel" class="panel" role="tabpanel" aria-live="polite" hidden></section>
 
 <div class="textme"><b>Need help? Text Antidote.</b>Send a photo of your screen and he'll walk you through it, or set it up with you.</div>
-<footer>Second Shift AI · Menu names come from each company's own help pages as of October 2026. If a screen looks a little different, the steps still apply. The names just move around.</footer>
+<footer>SousShift AI · Menu names come from each company's own help pages as of October 2026. If a screen looks a little different, the steps still apply. The names just move around.</footer>
 
 <section id="cheat" aria-hidden="true"></section>
 </div>
@@ -173,10 +173,10 @@ var POS=[
  note:"If Toast asks for a reason, type the code. If it doesn't, write the code on the merchant copy.",
  b:{
   what:"Toast connects outside apps through its <b>Partner Integrations</b> program. When it's connected, a Toast sale posts points to the guest's app by itself, and app rewards can be applied to the check without anyone typing a code.",
-  route:"Second Shift has to be accepted as a Toast integration partner first. That means applying and passing Toast's certification. Once we're approved, you add us in <span class='path'>Integrations › Integration management › Browse &amp; purchase integrations</span> in Toast Web.",
+  route:"SousShift has to be accepted as a Toast integration partner first. That means applying and passing Toast's certification. Once we're approved, you add us in <span class='path'>Integrations › Integration management › Browse &amp; purchase integrations</span> in Toast Web.",
   owner:"The Toast login with the <b>8.4 Manage integrations</b> permission, to click <b>Add</b>. Toast includes partner integrations in its <b>Restaurant Management suites</b> (Essentials or Pro), so you may need one of those.",
   time:"Adding us takes a few minutes once we're listed, and Toast says some features can take up to half a day to switch on. The partner approval before that is on Toast's schedule, and it can take months. Avenue A covers you the whole time.",
-  honest:"A full Toast connection needs Toast's approval, and we can't speed that up. Second Shift handles the application, the build and the testing. You'll just click Add when it's ready."},
+  honest:"A full Toast connection needs Toast's approval, and we can't speed that up. SousShift handles the application, the build and the testing. You'll just click Add when it's ready."},
  sources:[["Toast: Create an Open Discount","https://support.toasttab.com/en/article/Open-Discounts?lang=en_US"],["Toast: Get Started With Discounts","https://support.toasttab.com/en/article/Basic-Discount-Configuration"],["Toast: Set Up Toast Partner Integrations","https://support.toasttab.com/en/article/Set-Up-Toast-Partner-Integrations"],["Toast developer guide: Partner integration overview","https://doc.toasttab.com/doc/devguide/apiPartnerIntegrationOverview.html"]]},
 
 {id:"square",name:"Square",tag:"Square Dashboard",
@@ -199,7 +199,7 @@ var POS=[
   route:"Square's <b>OAuth</b> connection: you click a <b>Connect Square</b> link from us, sign in to Square yourself, review exactly what we're asking to see (for example items, orders and customers), and tap <b>Allow</b>. Apps listed in the <b>Square App Marketplace</b> use the same sign-in.",
   owner:"Your Square owner login, to tap Allow. You never give us your password. You can disconnect us from your Square account any time.",
   time:"The sign-in takes about 2 minutes. Square doesn't make us wait for a partner approval to connect to your own account, so it's mostly our build and test time, usually a week or two.",
-  honest:"Square is the easiest system to fully connect. Second Shift builds and tests everything. You just tap Allow."},
+  honest:"Square is the easiest system to fully connect. SousShift builds and tests everything. You just tap Allow."},
  sources:[["Square: Create and manage discounts","https://squareup.com/help/us/en/article/3955-create-and-manage-discounts"],["Square Developer: OAuth overview","https://developer.squareup.com/docs/oauth-api/overview"],["Square Developer: OAuth best practices (seller can view and revoke the connection)","https://developer.squareup.com/docs/oauth-api/best-practices"]]},
 
 {id:"clover",name:"Clover",tag:"Clover Dashboard",
@@ -217,10 +217,10 @@ var POS=[
  note:"Put the code in the order note. If you can't, write it on the merchant copy.",
  b:{
   what:"Clover connects outside apps through the <b>Clover App Market</b>. When it's connected, Clover sales post points to the guest's app by themselves, and app rewards can be applied without typing.",
-  route:"Second Shift publishes an app on the Clover App Market. Clover reviews every app (a functional review and a legal review of what data it asks for) before it's listed. Then you install it from your Clover Dashboard.",
+  route:"SousShift publishes an app on the Clover App Market. Clover reviews every app (a functional review and a legal review of what data it asks for) before it's listed. Then you install it from your Clover Dashboard.",
   owner:"Your Clover owner login, to install the app and approve the permissions it asks for.",
   time:"Installing takes a couple of minutes. Clover's app review comes first and runs on Clover's schedule, usually a few weeks.",
-  honest:"A full Clover connection needs Clover's approval of our app. Second Shift handles the build and the review. Avenue A works in the meantime."},
+  honest:"A full Clover connection needs Clover's approval of our app. SousShift handles the build and the review. Avenue A works in the meantime."},
  sources:[["Clover: Set up discounts in the Discounts app","https://www.clover.com/en-US/help/set-up-discounts-in-Discounts-app"],["Clover: Apply discounts (Register app; custom or preset, item or order)","https://www.clover.com/en-US/help/apply-discounts"],["Clover Developer: Understand the app approval process","https://docs.clover.com/docs/developer-app-approval"]]},
 
 {id:"spoton",name:"SpotOn",tag:"SpotOn Back of House",
@@ -240,10 +240,10 @@ var POS=[
  extra:"SpotOn's help pages mention that applying discounts on a <b>handheld</b> can be limited to managers. Check the Users list in step 6.",
  b:{
   what:"SpotOn connects outside software through its <b>Integration Partner Program</b>. When it's connected, SpotOn sales post points to the guest's app by themselves.",
-  route:"Second Shift applies to SpotOn's Integration Partner Program and builds the connection with SpotOn's developer tools. SpotOn suggests talking to your SpotOn rep about any integration you want.",
-  owner:"Tell your SpotOn rep you want Second Shift connected. SpotOn says that if you opted out of its Core Bundle, there's a small monthly fee to use third-party integrations.",
+  route:"SousShift applies to SpotOn's Integration Partner Program and builds the connection with SpotOn's developer tools. SpotOn suggests talking to your SpotOn rep about any integration you want.",
+  owner:"Tell your SpotOn rep you want SousShift connected. SpotOn says that if you opted out of its Core Bundle, there's a small monthly fee to use third-party integrations.",
   time:"SpotOn decides the timing of partner approval. Plan on several weeks or more, and keep using Avenue A until then.",
-  honest:"A full SpotOn connection needs SpotOn's approval. Second Shift handles the technical side. You just tell your rep yes."},
+  honest:"A full SpotOn connection needs SpotOn's approval. SousShift handles the technical side. You just tell your rep yes."},
  sources:[["SpotOn: Discounts | SpotOn Restaurant BOH","https://spotonteam.atlassian.net/wiki/x/HgCIa"],["SpotOn: Discounts – Create & Edit (BOH tutorial video)","https://spotonteam.atlassian.net/wiki/spaces/SK/pages/1962213637/Discounts+-+Create+Edit+BOH+Tutorial+Videos"],["SpotOn: Applying & Removing Discounts (handheld)","https://spotonteam.atlassian.net/wiki/x/r4LKkg"],["SpotOn: Integrations and Integration Partner Program","https://www.spoton.com/integrations"]]},
 
 {id:"lightspeed",name:"Lightspeed",tag:"Restaurant (K-Series) Back Office",
@@ -265,10 +265,10 @@ var POS=[
  extra:"Lightspeed doesn't let you delete a discount from the Back Office, so check each name before you save.",
  b:{
   what:"Lightspeed connects outside apps through its API, which is open to approved partners. When it's connected, Lightspeed sales post points to the guest's app by themselves.",
-  route:"Second Shift applies to Lightspeed's partner program for the Restaurant product. Lightspeed gives a test connection first, then a live one once they're satisfied. Lightspeed says it opens API access by request so it can support each partner.",
+  route:"SousShift applies to Lightspeed's partner program for the Restaurant product. Lightspeed gives a test connection first, then a live one once they're satisfied. Lightspeed says it opens API access by request so it can support each partner.",
   owner:"Your OK to connect, and possibly a quick call or email to your Lightspeed account manager to approve it.",
   time:"Lightspeed sets the pace for partner approval, usually several weeks. Your part takes minutes.",
-  honest:"A full Lightspeed connection needs Lightspeed's approval. Second Shift handles the application and the build."},
+  honest:"A full Lightspeed connection needs Lightspeed's approval. SousShift handles the application and the build."},
  sources:[["Lightspeed K-Series: Adding discounts","https://k-series-support.lightspeedhq.com/hc/articles/1260804657089-Adding-discounts"],["Lightspeed: Restaurant API (access by request)","https://www.lightspeedhq.com/au/pos/restaurant/api/"],["Codat: Lightspeed K partner and credential setup (third party)","https://docs.codat.io/integrations/commerce/lightspeed-k/commerce-lightspeed-k-setup"]]},
 
 {id:"revel",name:"Revel",tag:"Revel Management Console",
@@ -289,10 +289,10 @@ var POS=[
  extra:"Revel's own setup articles are behind its login, so these steps come from published guides by Revel integration partners. If a label looks different, Revel support can point you to it in a minute.",
  b:{
   what:"Revel connects outside apps through its <b>Open API</b> and <b>Partner Connect</b>. When it's connected, Revel sales post points to the guest's app by themselves.",
-  route:"Revel doesn't hand out API keys on its own. You ask Revel to connect Second Shift through <b>Partner Connect</b>, and Revel turns it on for your stores.",
-  owner:"An email or call to Revel (or your Revel rep) saying you authorize Second Shift. Include your Revel URL and your establishment numbers. If you don't already have Partner Connect, Revel sends an order form, and it comes with a monthly Revel fee.",
+  route:"Revel doesn't hand out API keys on its own. You ask Revel to connect SousShift through <b>Partner Connect</b>, and Revel turns it on for your stores.",
+  owner:"An email or call to Revel (or your Revel rep) saying you authorize SousShift. Include your Revel URL and your establishment numbers. If you don't already have Partner Connect, Revel sends an order form, and it comes with a monthly Revel fee.",
   time:"Integration partners report 2 to 3 business days if you already have Partner Connect, and 3 to 5 if you don't.",
-  honest:"A full Revel connection needs Revel to switch it on, and Revel charges for Partner Connect. Second Shift does the technical setup once Revel connects us."},
+  honest:"A full Revel connection needs Revel to switch it on, and Revel charges for Partner Connect. SousShift does the technical setup once Revel connects us."},
  sources:[["Deliverect: Revel – create discounts (Variable Discount, third party)","https://help.deliverect.com/en/articles/7979249-revel-create-discounts"],["Open Dining: Setting up a Revel discount (third party)","https://support.opendining.net/article/770-setting-up-a-revel-discount-for-o-d"],["Revel: Open API integrations","https://revelsystems.com/why-revel/open-api-integrations/"],["OpenEye: Revel Partner Connect steps and timing (third party)","https://answers.openeye.net/Configure/Integrations/Point-of-Sale/Revel/Revel_Integration_Instructions"]]},
 
 {id:"other",name:"Something else",tag:"Any POS",
@@ -398,7 +398,7 @@ function avenueB(p){
   [["What it means",x.what],["How it connects",x.route],["What you approve or provide",x.owner],["How long it takes",x.time]].forEach(function(r){ var d=el("div","fact"); d.appendChild(txt("b",null,r[0])); d.appendChild(el("div",null,r[1])); f.appendChild(d); });
   b.appendChild(f);
   b.appendChild(el("p","note","<b>Straight answer:</b> "+x.honest));
-  if(p.id!=="none") b.appendChild(el("p",null,"Antidote and Second Shift handle all the technical work. You never have to touch code, and Avenue A keeps working the whole time."));
+  if(p.id!=="none") b.appendChild(el("p",null,"Antidote and SousShift handle all the technical work. You never have to touch code, and Avenue A keeps working the whole time."));
   return b;
 }
 function sources(p){
@@ -431,7 +431,7 @@ function buildCheat(p){
     for(var i=0;i<12;i++){ var rr=el("tr"); for(var j=0;j<5;j++) rr.appendChild(el("td",null,"&nbsp;")); lt.appendChild(rr); }
     cheat.appendChild(lt);
   }
-  cheat.appendChild(txt("p","foot","Questions? Text Antidote (Second Shift AI)."));
+  cheat.appendChild(txt("p","foot","Questions? Text Antidote (SousShift AI)."));
 }
 function show(id,push){
   var p=POS.filter(function(x){ return x.id===id; })[0]; if(!p) return;

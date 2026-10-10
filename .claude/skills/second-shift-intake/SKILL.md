@@ -1,10 +1,10 @@
 ---
 name: second-shift-intake
-description: Second Shift AI's client-intake engine. Given a business — a name plus any link (Instagram, TikTok, YouTube, Facebook, website, Google Maps) — run the full play we ran on Lucky Dragon Hibachi and Churrito Loco: research the business and its online presence, find where it's lacking, break down a rough cost/scope estimate, and build a live branded Drop Kit demo (digital menu + loyalty catch-game + branding). Use whenever Antidote drops a business link and says "run it," "break it down," "do a demo," or "cost it out."
+description: SousShift AI's client-intake engine. Given a business — a name plus any link (Instagram, TikTok, YouTube, Facebook, website, Google Maps) — run the full play we ran on Lucky Dragon Hibachi and Churrito Loco: research the business and its online presence, find where it's lacking, break down a rough cost/scope estimate, and build a live branded Drop Kit demo (digital menu + loyalty catch-game + branding). Use whenever Antidote drops a business link and says "run it," "break it down," "do a demo," or "cost it out."
 tools: All tools
 ---
 
-# Second Shift AI — Client Intake & Build Engine
+# SousShift AI — Client Intake & Build Engine
 
 This is the repeatable version of the build we did live for **Lucky Dragon Hibachi**
 and **Churrito Loco**. Antidote drops a business (a name + any link). You run the
@@ -77,13 +77,13 @@ no payments beyond cash.
 
 ### 4. Rough cost & scope estimate
 Map the gaps to a Drop Kit package and give an **honest range**, itemized. Baseline
-Second Shift capabilities to scope from: digital menu site, branded loyalty catch-game,
+SousShift capabilities to scope from: digital menu site, branded loyalty catch-game,
 demo/landing page, AI phone agent, AI email agent, local-SEO cleanup, review generation,
 weekly customer win-back, crypto + card payments, content/marketing.
 - Present as: **what's included**, **monthly package price range**, **one-time setup (if any)**,
   and **third-party pass-throughs** (domain, SMS, payment processing, AI/media credits).
 - Tie it to the standard terms: **3-month lock-in, cancel only after, modifications are an
-  added charge by scope** (see the Second Shift service agreement doc).
+  added charge by scope** (see the SousShift service agreement doc).
 - Never attach a revenue promise to the price.
 
 ### 5. Build the live demo (the Drop Kit)

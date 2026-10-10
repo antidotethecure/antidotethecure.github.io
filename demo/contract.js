@@ -1,4 +1,4 @@
-/* Second Shift AI — on-the-spot agreement builder for every demo page.
+/* SousShift AI — on-the-spot agreement builder for every demo page.
    Include once per demo: <script src="../contract.js"></script> (after the CONFIG script).
    Reads the page's CONFIG (name, address) and drafts the services agreement live in the
    browser. Signing pads + Save as PDF. Nothing is uploaded or stored anywhere; the draft
@@ -10,7 +10,7 @@
   var BIZ = CFG.name || document.title.split(" — ")[0] || "Client";
   var ADDR = (CFG.address && !/drops in|exact address/i.test(CFG.address)) ? CFG.address : "";
   var PROVIDER = { name: "Anthony Louis Suggs Jr.", email: "antidotethecure@gmail.com",
-                   co: "Antidote Enterprises LLC, doing business as Second Shift AI" };
+                   co: "Antidote Enterprises LLC, doing business as SousShift AI" };
   var PRESETS = {
     // Pricing v4 (2026-10-09). Full package: car-style plans, less down = higher monthly for 12 months, then $400.
     full:     { label: "Full · $2,500 down", plan: "Full", setup_list: 2500, monthly_list: 400, sd: 0, md: 0, months: 0, minimum: 0, upfront: 100, intro: 0, intro_months: 0 },
@@ -70,7 +70,7 @@
 
   /* ---------- launcher on the demo page ---------- */
   var k = document.createElement("div"); k.id = "ssai-k";
-  k.innerHTML = '<button class="go" type="button">📄 Ready to go live? Draft the agreement</button><small>Second Shift AI · drafted on this device, nothing is sent until you choose</small>';
+  k.innerHTML = '<button class="go" type="button">📄 Ready to go live? Draft the agreement</button><small>SousShift AI · drafted on this device, nothing is sent until you choose</small>';
   var foot = document.querySelector("footer");
   (foot && foot.parentNode ? foot.parentNode.insertBefore(k, foot) : document.body.appendChild(k));
 
@@ -130,7 +130,7 @@
         'Name: ' + name + '<br>Title: ' + tt + '<br>Email: ' + email + '<br>Date: <span data-date="' + who + '"></span></div>';
     };
     D.innerHTML =
-      '<h1>SERVICES AGREEMENT</h1><p class="s">Second Shift AI · Agreement no. SSAI-' + ymd + '-' + e(slug.slice(0, 12).toUpperCase()) + '</p>' +
+      '<h1>SERVICES AGREEMENT</h1><p class="s">SousShift AI · Agreement no. SSAI-' + ymd + '-' + e(slug.slice(0, 12).toUpperCase()) + '</p>' +
       '<p>This Services Agreement (the "Agreement") is between <b>' + PROVIDER.co + '</b> ("Provider"), and <b>' + party + '</b> ("Client"), located at ' + (e(v("address")) || "the address on file") + '. It takes effect on the date of the last signature below (the "Effective Date").</p>' +
       '<h2>1. Services</h2><p>Provider will build, host and maintain the following for Client:</p><ul>' + SCOPE.filter(function (s) { return planName !== "Core" || s.indexOf("Full package only: ") !== 0; }).map(function (s) { return "<li>" + s.replace("Full package only: ", "") + "</li>"; }).join("") + '</ul>' +
       '<p>"Go-Live" means the day the Client\'s page and game are published and the table QR codes point to them. Provider will ask Client to approve the build before Go-Live. Changes outside this list are quoted and billed separately.</p>' +
@@ -149,7 +149,7 @@
       '<h2>9. Special terms</h2><p>' + (e(v("special")) || "None.") + '</p>' +
       '<h2>10. General</h2><p>California law governs this Agreement. It is the whole agreement between the parties on this subject, and any change must be in writing signed by both. Electronic signatures are valid and binding.</p>' +
       '<div class="sigs">' + sigBlock("client", "CLIENT: " + e(BIZ), e(v("owner_name")) || "&nbsp;", e(v("owner_title")) || "Owner", e(v("owner_email")) || "&nbsp;") +
-      sigBlock("provider", "PROVIDER: Antidote Enterprises LLC dba Second Shift AI", PROVIDER.name, "Owner", PROVIDER.email) + '</div>' +
+      sigBlock("provider", "PROVIDER: Antidote Enterprises LLC dba SousShift AI", PROVIDER.name, "Owner", PROVIDER.email) + '</div>' +
       '<p class="sm">Prepared ' + today.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) + '.</p>';
     S.innerHTML = "Setup <b>" + money(sn) + "</b>" + (sd ? " (was " + money(sl) + ")" : "") + " · " + up + "% today = <b>" + money(sn * up / 100) + "</b><br>" +
       "Monthly <b>" + (intro ? money(intro) + "</b> × " + introM + ", then <b>" + money(mn) + "</b>" : money(mn) + "</b>") + (md && months ? " × " + months + ", then " + money(ml) : "") + (minimum ? " · " + minimum + "-month minimum" : "");
@@ -182,7 +182,7 @@
   o.querySelector(".x").onclick = function () { o.classList.remove("on"); document.body.style.overflow = ""; if (location.hash === "#contract") history.replaceState(null, "", location.pathname + location.search); };
   o.querySelector(".pdf").onclick = function () {
     if (!v("owner_email")) { alert("Add the owner's email first."); return; }
-    var t = document.title; document.title = BIZ + " - Second Shift AI Agreement";
+    var t = document.title; document.title = BIZ + " - SousShift AI Agreement";
     window.print(); document.title = t;
   };
   function open() { o.classList.add("on"); document.body.style.overflow = "hidden"; render(); }

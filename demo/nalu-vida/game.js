@@ -22,6 +22,9 @@
     "#nv-jump{position:absolute;right:12px;bottom:26px;width:78px;height:78px;border-radius:50%;border:3px solid rgba(255,255,255,.55);background:rgba(6,24,46,.55);color:#fff;font:900 15px system-ui;letter-spacing:.06em;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:none;z-index:3}" +
     "#nv-jump.on{display:block}#nv-jump.ready{background:radial-gradient(circle,#7fe3f2,#1673c4);border-color:#fff;box-shadow:0 0 0 0 rgba(127,227,242,.8);animation:nvj .8s infinite}#nv-jump:active{transform:scale(.94)}" +
     "@keyframes nvj{0%{box-shadow:0 0 0 0 rgba(127,227,242,.8)}100%{box-shadow:0 0 0 18px rgba(127,227,242,0)}}" +
+    ".nv-fly{position:absolute;top:8px;left:0;display:flex;align-items:center;gap:0;border:0;background:none;padding:0;cursor:pointer;animation:nvfly 9s linear infinite;z-index:6}" +
+    ".nv-fly img{width:58px;transform:rotate(-90deg);filter:drop-shadow(0 6px 6px rgba(0,0,0,.4))}.nv-fly span{order:-1;margin-right:-4px;padding:7px 12px;background:repeating-linear-gradient(90deg,#b3263a 0 14px,#c22d43 14px 28px);color:#fbf1de;font:900 12px system-ui;white-space:nowrap;border-radius:3px;box-shadow:0 4px 10px rgba(0,0,0,.35)}" +
+    "@keyframes nvfly{0%{transform:translateX(110%)}100%{transform:translateX(-160%)}}" +
     ".nv-bar{position:absolute;left:12px;right:12px;bottom:10px;height:5px;border-radius:9px;background:rgba(255,255,255,.25);pointer-events:none}.nv-bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#ffd23f,#ff7a3d)}" +
     ".nv-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px;background:linear-gradient(180deg,rgba(6,24,46,.55),rgba(6,24,46,.88));color:#fff;font:600 14px/1.45 system-ui,sans-serif}" +
     ".nv-ov h3{margin:0 0 4px;font:900 34px/1 'Alfa Slab One',Georgia,serif;letter-spacing:.5px;text-shadow:0 3px 0 #ff7a3d}.nv-ov p{margin:6px 0;max-width:330px}" +
@@ -496,7 +499,7 @@
     if (G.phase === "intro") {
       var bx = x - 70, by = y - 30; spr("boat", bx, by + Math.sin(G.t * 2) * 2, 120, Math.PI * .9);
       var f = Math.min(1, G.introT / 1.15), jx = bx + (x - bx) * f, jy = by + (y - by) * f - Math.sin(f * Math.PI) * 70, sc = 1 + Math.sin(f * Math.PI) * .35;
-      if (f < 1) { cx.fillStyle = "rgba(0,20,35,.25)"; cx.beginPath(); cx.ellipse(jx + 10, by + (y - by) * f + 10, 12, 26, 0, 0, 7); cx.fill(); spr(G.surfer === "m" ? "surfer_m" : "surfer_f", jx, jy, 64 * sc, f * .6); return; }
+      if (f < 1) { cx.fillStyle = "rgba(0,20,35,.25)"; cx.beginPath(); cx.ellipse(jx + 10, by + (y - by) * f + 10, 12, 26, 0, 0, 7); cx.fill(); spr(G.surfer === "m" ? "surfer_m" : "surfer_f", jx, jy, 64 * sc, (G.surfer === "m" ? 0 : Math.PI) + f * .6); return; }
     }
     if (blink) return;
     var air = G.jump > 0 ? Math.sin(Math.PI * (1 - G.jump / G.jumpDur)) * (G.jumpDur > .6 ? 1 : .45) : 0;
@@ -509,7 +512,7 @@
     var lean = Math.max(-.55, Math.min(.55, G.vx / 380)), shift = lean * 6;                       // weight shifts into the turn
     cx.save(); cx.filter = "brightness(1.2) contrast(1.08) saturate(1.12)";
     var drew = (function () { var i = IM[G.surfer === "m" ? "surfer_m" : "surfer_f"]; if (!ok(i)) return false; var w = 56 * (1 + air * .42), h = w * i.naturalHeight / i.naturalWidth;
-      cx.translate(x + shift, y); cx.rotate(G.ang + Math.PI + tilt * .6 + air * .25 * (G.vx > 0 ? 1 : -1)); cx.transform(1, 0, -lean * .35, 1, 0, 0); cx.scale(1 - Math.abs(lean) * .1, 1); cx.drawImage(i, -w / 2, -h / 2, w, h); return true; })();
+      cx.translate(x + shift, y); cx.rotate(G.ang + (G.surfer === "m" ? Math.PI : 0) + tilt * .6 + air * .25 * (G.vx > 0 ? 1 : -1)); cx.transform(1, 0, -lean * .35, 1, 0, 0); cx.scale(1 - Math.abs(lean) * .1, 1); cx.drawImage(i, -w / 2, -h / 2, w, h); return true; })();
     cx.restore();
     if (!drew) {
       cx.save(); cx.translate(x, y); cx.rotate(G.ang); var gr = cx.createLinearGradient(0, -30, 0, 30); gr.addColorStop(0, "#ffb02e"); gr.addColorStop(.5, "#ffd23f"); gr.addColorStop(.5, "#2f8fd8"); gr.addColorStop(1, "#173d8f");
@@ -627,6 +630,12 @@
       "<input id='nv-n' maxlength='16' placeholder='Name for the board' value='" + esc(sv.n || "") + "'><input id='nv-ig' maxlength='31' placeholder='@instagram (optional)' value='" + (sv.ig ? "@" + esc(sv.ig) : "") + "'>" +
       "<button class='nv-btn' id='nv-post' type='button' style='width:100%;margin-top:6px'>Post my score</button><div id='nv-msg' style='margin-top:6px;font-size:12.5px'></div><div style='font-size:12px;opacity:.8;margin-top:4px'>#1 at the end of the week wins half off their meal.</div></div>";
     $("nv-end").style.display = "flex";
+    var fly = document.createElement("button"); fly.type = "button"; fly.className = "nv-fly"; fly.setAttribute("aria-label", "Fly to Melody Bar and Grill");
+    fly.innerHTML = "<img src='img/game/plane.webp' alt=''><span>✈ Fly to Melody Bar &amp; Grill · LAX — tap for a deal</span>";
+    fly.onclick = function () { var code; try { code = localStorage.getItem("nalu-melody-egg-" + new Date().toDateString()); } catch (e) {}
+      if (!code) { code = "MELODY-" + Math.random().toString(36).slice(2, 6).toUpperCase(); try { localStorage.setItem("nalu-melody-egg-" + new Date().toDateString(), code); } catch (e) {} }
+      location.href = "../melody-lax/?from=nalu&deal=" + encodeURIComponent(code) + "#play"; };
+    $("nv-end").appendChild(fly);
     $("nv-again").onclick = function () { start(); };
     $("nv-order").onclick = function () { $("nv-end").style.display = "none"; var t = document.getElementById("seat") || document.getElementById("food"); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); };
     $("nv-post").onclick = post; loadBoard();

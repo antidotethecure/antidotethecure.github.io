@@ -183,6 +183,15 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 </div>
 <div id="champs" data-game="melody" data-me="melody-board"></div><script src="../champs.js"></script>
 
+<div class="sister" style="max-width:520px;margin:14px auto;padding:12px 14px;border-radius:16px;display:flex;gap:12px;align-items:center;background:linear-gradient(120deg,#08203a,#0f3760);border:1px solid #1f5283;color:#fdf8ef">
+  <img src="../nalu-vida/img/logo.png" alt="Nalu Vida" style="width:58px;height:58px;flex:none">
+  <div style="font-size:14px;line-height:1.35"><b>Sister spot: Nalu Vida, Venice Pier 🌴</b><br>Ride the Nalu: surf the pier, win free food. Show your Melody rewards there for a perk.
+  <br><a href="../nalu-vida/?from=melody#play" style="display:inline-block;margin-top:6px;padding:7px 12px;border-radius:999px;background:#ff9a2e;color:#2b1200;font-weight:800;text-decoration:none">🏄 Surf over to Nalu Vida</a></div></div>
+<div id="fromnalu" style="display:none"></div>
+<script>(function(){ var q=new URLSearchParams(location.search); if(q.get("from")!=="nalu") return; var c=(q.get("deal")||"").replace(/[^A-Z0-9-]/gi,"").slice(0,16);
+  var d=document.createElement("div"); d.style.cssText="position:fixed;left:12px;right:12px;top:12px;z-index:90;max-width:520px;margin:0 auto;padding:12px 14px;border-radius:14px;background:#0b1220;border:1px solid #f0d375;color:#fbf1de;box-shadow:0 10px 40px #000a;font:600 14px/1.4 system-ui";
+  d.innerHTML="✈️ <b>Welcome from Nalu Vida!</b> Show this at Melody for <b>$3 off any drink</b>"+(c?"<div style='font:900 20px ui-monospace,Menlo,monospace;color:#f0d375;letter-spacing:.1em;margin-top:4px'>"+c+"</div>":"")+"<div style='font-size:12px;opacity:.8'>9132 S Sepulveda Blvd · good for 3 days · tap to close</div>";
+  d.onclick=function(){ d.remove(); }; document.body.appendChild(d); })();</script>
 <h2 id="seat"><small>Order from your phone</small>Where are you sitting?</h2>
 <p class="sub">Pick your spot and your order goes to the right place. Scanned a table code? It's already picked.</p>
 <div class="seat">

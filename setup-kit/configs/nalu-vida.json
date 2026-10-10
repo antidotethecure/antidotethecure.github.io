@@ -1,333 +1,337 @@
 {
- "slug": "nalu-vida",
- "out": "nalu-vida/setup",
- "name": "Nalu Vida",
- "short": "Nalu Vida",
- "owner": "Christian",
- "ownerNames": [
-  "Christian",
-  "Sami"
- ],
- "brand": {
-  "fonts": "https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Rubik:wght@400;600;700;800&display=swap",
-  "display": "\"Alfa Slab One\",Rockwell,Georgia,serif",
-  "body": "\"Rubik\",system-ui,-apple-system,sans-serif",
-  "h1w": "400",
-  "h2w": "400",
-  "bg": "#08203a",
-  "page": "radial-gradient(800px 420px at 50% -8%,#ff8a3d40 0,transparent 60%),repeating-linear-gradient(-28deg,#ffffff05 0 18px,transparent 18px 46px),#08203a",
-  "card": "#0f3760",
-  "edge": "#1f5283",
-  "ink": "#fdf8ef",
-  "dim": "#a9c3dc",
-  "accent": "#ff9a2e",
-  "accentBg": "linear-gradient(180deg,#ffd23f,#ff9a2e 55%,#ff6a2b)",
-  "accentInk": "#3a1600",
-  "chip": "#0b2e52",
-  "tgOff": "#1f5283",
-  "ok": "#2ec4e6",
-  "h1": "#fdf8ef",
-  "h2": "#ffd23f",
-  "noteBg": "#0b2e52",
-  "noteEdge": "#2ec4e6",
-  "noteInk": "#dff7fc",
-  "barBg": "rgba(8,32,58,.94)",
-  "extraCss": "h1{text-shadow:0 3px 0 #0b2e52}.chip.on{text-shadow:none}"
- },
- "logo": {
-  "svgFrom": "demo/nalu-vida/index.html"
- },
- "alcohol": true,
- "avgCheck": 45,
- "happyHour": "Mon–Fri 3–6 PM & 10 PM–close",
- "giveawayDefault": "$200",
- "drawDays": [
-  "Sunday night",
-  "Monday",
-  "Friday before happy hour"
- ],
- "rewards": {
-  "welcome": [
-   "Free Jungle Fries",
-   "$5 off",
-   "10% off the order",
-   "$3 off a Nalu Margarita"
+  "slug": "nalu-vida",
+  "out": "nalu-vida/setup",
+  "name": "Nalu Vida",
+  "short": "Nalu Vida",
+  "owner": "Christian",
+  "ownerNames": [
+    "Christian",
+    "Sami"
   ],
-  "points": [
-   250,
-   500,
-   800,
-   1300
-  ],
-  "t1": [
-   "Free Jungle Fries",
-   "$5 off",
-   "Free Chips, Salsa & Guac"
-  ],
-  "t2": [
-   "Half off a Nalu Margarita",
-   "Free Calamari",
-   "$10 off"
-  ],
-  "t3": [
-   "Free Coconut Shrimp",
-   "Free Bang Bang Shrimp",
-   "$15 off"
-  ],
-  "t4": [
-   "Free Signature Taco plate",
-   "Free entrée",
-   "$25 off"
-  ],
-  "stars": [
-   "Free Coconut Shrimp",
-   "Free Jungle Fries",
-   "$15 off"
-  ],
-  "referIn": [
-   "Free Jungle Fries",
-   "+100 bonus points when their friend visits",
-   "$5 off",
-   "Nothing"
-  ],
-  "referFriend": [
-   "Free Jungle Fries",
-   "+50 bonus points when they join",
-   "$5 off",
-   "Nothing"
-  ],
-  "bday": [
-   "Free Coconut Shrimp",
-   "Free dessert",
-   "Free entrée up to $20",
-   "20% off the order"
-  ],
-  "missed": [
-   "10% off",
-   "15% off",
-   "Free Jungle Fries"
-  ],
-  "winback": [
-   "Free Jungle Fries",
-   "10% off",
-   "$5 off",
-   "Don't send"
-  ],
-  "playwin": [
-   "Free Jungle Fries",
-   "$3 off any drink",
-   "$5 off"
-  ]
- },
- "drawPrizes": [
-  "Free Jungle Fries",
-  "Free mocktail (Wish You Were Here)",
-  "Free French Toast brunch",
-  "Free Chips, Salsa & Guac"
- ],
- "game": {
-  "name": "Ride the Nalu",
-  "prizesFrom": {
-   "file": "demo/nalu-vida/index.html",
-   "var": "window.NALU_PRIZES"
+  "brand": {
+    "fonts": "https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Rubik:wght@400;600;700;800&display=swap",
+    "display": "\"Alfa Slab One\",Rockwell,Georgia,serif",
+    "body": "\"Rubik\",system-ui,-apple-system,sans-serif",
+    "h1w": "400",
+    "h2w": "400",
+    "bg": "#08203a",
+    "page": "radial-gradient(800px 420px at 50% -8%,#ff8a3d40 0,transparent 60%),repeating-linear-gradient(-28deg,#ffffff05 0 18px,transparent 18px 46px),#08203a",
+    "card": "#0f3760",
+    "edge": "#1f5283",
+    "ink": "#fdf8ef",
+    "dim": "#a9c3dc",
+    "accent": "#ff9a2e",
+    "accentBg": "linear-gradient(180deg,#ffd23f,#ff9a2e 55%,#ff6a2b)",
+    "accentInk": "#3a1600",
+    "chip": "#0b2e52",
+    "tgOff": "#1f5283",
+    "ok": "#2ec4e6",
+    "h1": "#fdf8ef",
+    "h2": "#ffd23f",
+    "noteBg": "#0b2e52",
+    "noteEdge": "#2ec4e6",
+    "noteInk": "#dff7fc",
+    "barBg": "rgba(8,32,58,.94)",
+    "extraCss": "h1{text-shadow:0 3px 0 #0b2e52}.chip.on{text-shadow:none}"
   },
-  "alts": [
-   [
+  "logo": {
+    "svgFrom": "demo/nalu-vida/index.html"
+  },
+  "alcohol": true,
+  "avgCheck": 45,
+  "happyHour": "Mon–Fri 3–6 PM & 10 PM–close",
+  "giveawayDefault": "$200",
+  "drawDays": [
+    "Sunday night",
+    "Monday",
+    "Friday before happy hour"
+  ],
+  "rewards": {
+    "welcome": [
+      "Free Jungle Fries",
+      "$5 off",
+      "10% off the order",
+      "$3 off a Nalu Margarita"
+    ],
+    "points": [
+      250,
+      500,
+      800,
+      1300
+    ],
+    "t1": [
+      "Free Jungle Fries",
+      "$5 off",
+      "Free Chips, Salsa & Guac"
+    ],
+    "t2": [
+      "Half off a Nalu Margarita",
+      "Free Calamari",
+      "$10 off"
+    ],
+    "t3": [
+      "Free Coconut Shrimp",
+      "Free Bang Bang Shrimp",
+      "$15 off"
+    ],
+    "t4": [
+      "Free Signature Taco plate",
+      "Free entrée",
+      "$25 off"
+    ],
+    "stars": [
+      "Free Coconut Shrimp",
+      "Free Jungle Fries",
+      "$15 off"
+    ],
+    "referIn": [
+      "Free Jungle Fries",
+      "+100 bonus points when their friend visits",
+      "$5 off",
+      "Nothing"
+    ],
+    "referFriend": [
+      "Free Jungle Fries",
+      "+50 bonus points when they join",
+      "$5 off",
+      "Nothing"
+    ],
+    "bday": [
+      "Free Coconut Shrimp",
+      "Free dessert",
+      "Free entrée up to $20",
+      "20% off the order"
+    ],
+    "missed": [
+      "10% off",
+      "15% off",
+      "Free Jungle Fries"
+    ],
+    "winback": [
+      "Free Jungle Fries",
+      "10% off",
+      "$5 off",
+      "Don't send"
+    ],
+    "playwin": [
+      "Free Jungle Fries",
+      "$3 off any drink",
+      "$5 off"
+    ]
+  },
+  "drawPrizes": [
     "Free Jungle Fries",
-    "$3 off"
-   ],
-   [
-    "$3 off any drink",
-    "Free Chips, Salsa & Guac",
-    "$5 off"
-   ],
-   [
-    "Free Jungle Fries",
-    "Free Bang Bang Shrimp",
-    "$10 off"
-   ],
-   [
-    "Free Coconut Shrimp",
-    "Free entrée",
-    "$15 off"
-   ]
+    "Free mocktail (Wish You Were Here)",
+    "Free French Toast brunch",
+    "Free Chips, Salsa & Guac"
   ],
-  "champ": [
-   "Half off their meal",
-   "Free Signature Taco plate",
-   "$25 off"
-  ]
- },
- "special": {
-  "title": "Sister-spot perk: Nalu Vida ↔ Melody",
-  "qs": [
-   [
-    "sis1",
-    "Nalu Vida members get at Melody",
-    [
-     "$3 off any drink",
-     "$5 off the order",
-     "10% off the order",
-     "No perk"
+  "game": {
+    "name": "Ride the Nalu",
+    "prizesFrom": {
+      "file": "demo/nalu-vida/index.html",
+      "var": "window.NALU_PRIZES"
+    },
+    "alts": [
+      [
+        "Free Jungle Fries",
+        "$3 off"
+      ],
+      [
+        "$3 off any drink",
+        "Free Chips, Salsa & Guac",
+        "$5 off"
+      ],
+      [
+        "Free Jungle Fries",
+        "Free Bang Bang Shrimp",
+        "$10 off"
+      ],
+      [
+        "Free Coconut Shrimp",
+        "Free entrée",
+        "$15 off"
+      ]
+    ],
+    "champ": [
+      "Half off their meal",
+      "Free Signature Taco plate",
+      "$25 off"
     ]
-   ],
-   [
-    "sis2",
-    "Melody members get at Nalu Vida",
-    [
-     "$3 off any drink",
-     "$5 off the order",
-     "10% off the order",
-     "No perk"
+  },
+  "special": {
+    "title": "Sister-spot perk: Nalu Vida ↔ Melody",
+    "qs": [
+      [
+        "sis1",
+        "Nalu Vida members get at Melody",
+        [
+          "$3 off any drink",
+          "$5 off the order",
+          "10% off the order",
+          "No perk"
+        ]
+      ],
+      [
+        "sis2",
+        "Melody members get at Nalu Vida",
+        [
+          "$3 off any drink",
+          "$5 off the order",
+          "10% off the order",
+          "No perk"
+        ]
+      ],
+      [
+        "sis3",
+        "One shared points balance for both spots?",
+        [
+          "No, separate",
+          "Yes, shared"
+        ]
+      ],
+      [
+        "sis4",
+        "Show the Melody card in the Nalu Vida app?",
+        [
+          "Yes",
+          "No"
+        ]
+      ]
     ]
-   ],
-   [
-    "sis3",
-    "One shared points balance for both spots?",
+  },
+  "specialsTitle": "Weekly specials & events: still running?",
+  "specials": [
     [
-     "No, separate",
-     "Yes, shared"
-    ]
-   ],
-   [
-    "sis4",
-    "Show the Melody card in the Nalu Vida app?",
+      "s_mon",
+      "Burger Mondays: $9 burgers + $5 draft beer, 5 PM–close"
+    ],
     [
-     "Yes",
-     "No"
+      "s_tue",
+      "Taco Tuesday: 50% off signature tacos + $10 house margaritas"
+    ],
+    [
+      "s_wed",
+      "Shuckin' Good Wednesday: $2 oysters (min 6)"
+    ],
+    [
+      "s_sun",
+      "NFL Sunday: every game on the TVs + bottomless mimosas"
+    ],
+    [
+      "s_brunch",
+      "Brunch daily until 4 PM: $24 bottomless mimosas (60 min)"
+    ],
+    [
+      "s_hh",
+      "Happy hour Mon–Fri 3–6 PM & 10 PM–close, dine-in"
+    ],
+    [
+      "s_trivia",
+      "Monday trivia 7–9 PM"
+    ],
+    [
+      "s_acou",
+      "Acoustic Tuesday 8–11 PM"
+    ],
+    [
+      "s_salsa",
+      "Salsa night, 2nd & 4th Wednesdays 8–11:30 PM"
+    ],
+    [
+      "s_jazz",
+      "Thursday live jazz 6–9 PM"
+    ],
+    [
+      "s_kara",
+      "Friday karaoke 9 PM–close"
+    ],
+    [
+      "s_block",
+      "Block Party 2nd Saturday · live blues 4th Saturday 3–6 PM"
     ]
-   ]
-  ]
- },
- "specialsTitle": "Weekly specials & events: still running?",
- "specials": [
-  [
-   "s_mon",
-   "Burger Mondays: $9 burgers + $5 draft beer, 5 PM–close"
   ],
-  [
-   "s_tue",
-   "Taco Tuesday: 50% off signature tacos + $10 house margaritas"
+  "phone": [
+    [
+      "k",
+      "What time does the kitchen close?",
+      [
+        "10 PM",
+        "11 PM",
+        "12 AM",
+        "Same as the bar"
+      ]
+    ],
+    [
+      "dress",
+      "Dress code?",
+      [
+        "None, beach casual",
+        "Smart casual at night",
+        "No swimwear inside"
+      ]
+    ],
+    [
+      "age",
+      "21+ after a certain time?",
+      [
+        "No, all ages",
+        "21+ after 9 PM",
+        "21+ after 10 PM",
+        "21+ after 11 PM"
+      ]
+    ],
+    [
+      "cover",
+      "Cover charge on event nights?",
+      [
+        "Never",
+        "Only special events",
+        "$10",
+        "$20"
+      ]
+    ],
+    [
+      "dogs",
+      "Dogs?",
+      [
+        "OK on the patio",
+        "Service animals only"
+      ]
+    ],
+    [
+      "resv",
+      "Reservations?",
+      [
+        "Call us",
+        "Walk-ins only",
+        "Big groups only, call"
+      ]
+    ],
+    [
+      "park",
+      "Parking?",
+      [
+        "Venice Pier paid lots",
+        "Street parking",
+        "We validate"
+      ]
+    ],
+    [
+      "bigp",
+      "Parties of 6+?",
+      [
+        "20% gratuity added",
+        "No auto gratuity"
+      ]
+    ]
   ],
-  [
-   "s_wed",
-   "Shuckin' Good Wednesday: $2 oysters (min 6)"
+  "drinksTitle": "Drinks in the app",
+  "menu": {
+    "type": "rows-json",
+    "file": "demo/nalu-vida/menu.json"
+  },
+  "ambient": [
+    "surf"
   ],
-  [
-   "s_sun",
-   "NFL Sunday: every game on the TVs + bottomless mimosas"
-  ],
-  [
-   "s_brunch",
-   "Brunch daily until 4 PM: $24 bottomless mimosas (60 min)"
-  ],
-  [
-   "s_hh",
-   "Happy hour Mon–Fri 3–6 PM & 10 PM–close, dine-in"
-  ],
-  [
-   "s_trivia",
-   "Monday trivia 7–9 PM"
-  ],
-  [
-   "s_acou",
-   "Acoustic Tuesday 8–11 PM"
-  ],
-  [
-   "s_salsa",
-   "Salsa night, 2nd & 4th Wednesdays 8–11:30 PM"
-  ],
-  [
-   "s_jazz",
-   "Thursday live jazz 6–9 PM"
-  ],
-  [
-   "s_kara",
-   "Friday karaoke 9 PM–close"
-  ],
-  [
-   "s_block",
-   "Block Party 2nd Saturday · live blues 4th Saturday 3–6 PM"
-  ]
- ],
- "phone": [
-  [
-   "k",
-   "What time does the kitchen close?",
-   [
-    "10 PM",
-    "11 PM",
-    "12 AM",
-    "Same as the bar"
-   ]
-  ],
-  [
-   "dress",
-   "Dress code?",
-   [
-    "None, beach casual",
-    "Smart casual at night",
-    "No swimwear inside"
-   ]
-  ],
-  [
-   "age",
-   "21+ after a certain time?",
-   [
-    "No, all ages",
-    "21+ after 9 PM",
-    "21+ after 10 PM",
-    "21+ after 11 PM"
-   ]
-  ],
-  [
-   "cover",
-   "Cover charge on event nights?",
-   [
-    "Never",
-    "Only special events",
-    "$10",
-    "$20"
-   ]
-  ],
-  [
-   "dogs",
-   "Dogs?",
-   [
-    "OK on the patio",
-    "Service animals only"
-   ]
-  ],
-  [
-   "resv",
-   "Reservations?",
-   [
-    "Call us",
-    "Walk-ins only",
-    "Big groups only, call"
-   ]
-  ],
-  [
-   "park",
-   "Parking?",
-   [
-    "Venice Pier paid lots",
-    "Street parking",
-    "We validate"
-   ]
-  ],
-  [
-   "bigp",
-   "Parties of 6+?",
-   [
-    "20% gratuity added",
-    "No auto gratuity"
-   ]
-  ]
- ],
- "drinksTitle": "Drinks in the app",
- "menu": {
-  "type": "rows-json",
-  "file": "demo/nalu-vida/menu.json"
- }
+  "launchLogo": "demo/nalu-vida/img/logo.png"
 }

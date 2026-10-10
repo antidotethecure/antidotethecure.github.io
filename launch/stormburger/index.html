@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Launch Checklist</title><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Barlow:wght@400;600;700;800&display=swap" rel="stylesheet"><meta name="robots" content="noindex">
+<title>Launch Checklist</title><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;600;800&display=swap" rel="stylesheet"><meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0b1220;--card:#121c33;--edge:#24345c;--ink:#f5f7ff;--dim:#aab6d6;--blue:#4da3ff;--gold:#ffd23f;--ok:#3ddc97}
-:root{--bg:#120a10;--page:radial-gradient(700px 420px at 50% -6%,#3a1424 0,transparent 62%),#120a10;--card:#1e1018;--edge:#3a1c28;--ink:#fbf1de;--dim:#c9b8a6;--gold:#e6c25a}html,body{font-family:"Barlow",system-ui,-apple-system,sans-serif}h1,h2{font-family:"Playfair Display",Georgia,serif}
+:root{--bg:#070B1E;--page:radial-gradient(900px 600px at 50% -10%,#24357a 0,transparent 60%),#070B1E;--card:#121C40;--edge:#25336A;--ink:#EEF2FF;--dim:#9AA6CC;--gold:#E8582A}html,body{font-family:"Archivo",system-ui,-apple-system,sans-serif}h1,h2{font-family:"Bebas Neue","Arial Narrow",Impact,sans-serif}
 *{box-sizing:border-box}html,body{margin:0;background:var(--page,var(--bg));color:var(--ink);font:16px/1.45 Rubik,system-ui,sans-serif}
 main{position:relative;z-index:2;max-width:640px;margin:auto;padding:18px 16px 130px}
 .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px}.top .ss{height:44px;width:auto;border-radius:8px;box-shadow:0 0 18px rgba(77,163,255,.45)}.top .x{color:var(--dim);font-weight:700}.top .rl{height:52px;width:auto;max-width:150px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
@@ -28,9 +28,9 @@ h1{font-size:26px;margin:4px 0}h2{font-size:19px;margin:28px 0 8px}.sub{color:va
 .prog{max-width:640px;margin:0 auto 8px;color:var(--dim);font-size:13px;text-align:center}
 .note{background:#1a2440;border:1px solid #2e4677;border-radius:12px;padding:10px 12px;font-size:13.5px;color:#cfe0ff}
 </style></head><body><div id="amb" aria-hidden="true"></div><main>
-<div class="top"><img class="ss" src="../../assets/ssai-lockup.jpg" alt="Second Shift AI"><span class="x">×</span><img class="rl" src="../../demo/melody-lax/img/logo.png" alt="Melody Bar &amp; Grill"><img class="rl" src="../../demo/nalu-vida/img/logo.png" alt="Nalu Vida"></div>
-<h1>Hi Christian 👋</h1>
-<p class="sub">This is everything we need to launch <b>Melody Bar &amp; Grill</b> and <b>Nalu Vida</b>, all in one place. Almost everything is a tap, no typing. Your answers save on this phone, so you can stop and come back anytime. When you're done, hit <b>Send everything to Antidote</b> at the bottom.</p>
+<div class="top"><img class="ss" src="../../assets/ssai-lockup.jpg" alt="Second Shift AI"><span class="x">×</span><img class="rl" src="../../demo/storm-burger/img/logo.png" alt="StormBurger"></div>
+<h1>Hi there 👋</h1>
+<p class="sub">This is everything we need to launch <b>StormBurger</b>, all in one place. Almost everything is a tap, no typing. Your answers save on this phone, so you can stop and come back anytime. When you're done, hit <b>Send everything to Antidote</b> at the bottom.</p>
 <p class="note">Nothing goes live until you've approved it. After you send, we put your choices in, print the QR codes, and your guests can start playing and earning the same day.</p>
 
 <h2>1 · Your deals, giveaways &amp; prizes</h2>
@@ -47,7 +47,7 @@ h1{font-size:26px;margin:4px 0}h2{font-size:19px;margin:28px 0 8px}.sub{color:va
 </main>
 <div class="bar"><div class="prog" id="prog2"></div><button id="send" type="button">✅ Send everything to Antidote</button></div>
 <script>
-var REST=[{"key": "melody_lax", "name": "Melody Bar &amp; Grill", "short": "Melody", "tag": "LAX", "setup": "melody/setup/", "color": "#b3263a", "ink": "#fbf1de", "storageKey": "melody-setup-v2", "logo": "demo/melody-lax/img/logo.png", "ambient": ["plane"]}, {"key": "nalu_vida", "name": "Nalu Vida", "short": "Nalu Vida", "tag": "Venice Pier", "setup": "nalu-vida/setup/", "color": "#ff9a2e", "ink": "#3a1600", "storageKey": "nalu-vida-setup-v1", "logo": "demo/nalu-vida/img/logo.png", "ambient": ["surf"]}], OWNER="Christian", AMB=["plane", "surf"];
+var REST=[{"key": "storm_burger", "name": "StormBurger", "short": "StormBurger", "tag": "", "setup": "storm-burger/setup/", "color": "#E8582A", "ink": "#ffffff", "storageKey": "storm-burger-setup-v1", "logo": "demo/storm-burger/img/logo.png", "ambient": ["storm"]}], OWNER="there", AMB=["storm"];
 /* each restaurant's signature motion drifts past now and then: Melody's plane, Nalu Vida's surf, StormBurger's storm… */
 (function(){ var A=document.getElementById("amb"); if(!A||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   function el(html,css){ var d=document.createElement("div"); d.className="a"; d.innerHTML=html; d.style.cssText=css; A.appendChild(d); return d; }
@@ -74,7 +74,7 @@ var REST=[{"key": "melody_lax", "name": "Melody Bar &amp; Grill", "short": "Melo
   var st=document.createElement("style"); st.textContent="@keyframes spin{to{transform:rotate(360deg)}}"; document.head.appendChild(st);
   var i=0; function tick(){ FX[list[i++%list.length]](); setTimeout(tick,(list.indexOf("storm")>=0?7000:9000)+Math.random()*6000); } setTimeout(tick,1500);
 })();
-var K="christian-launch-v1", S={}; try{ S=JSON.parse(localStorage.getItem(K)||"{}"); }catch(e){}
+var K="stormburger-launch-v1", S={}; try{ S=JSON.parse(localStorage.getItem(K)||"{}"); }catch(e){}
 function save(){ try{ localStorage.setItem(K,JSON.stringify(S)); }catch(e){} progress(); }
 function h(t,c,x){ var e=document.createElement(t); if(c) e.className=c; if(x!=null) e.innerHTML=x; return e; }
 function chips(box,key,opts,multi){
@@ -103,11 +103,11 @@ q(L,"date","When should we go live?",["This coming Monday","Wednesday","Friday",
 REST.forEach(function(r){ q(L,"tables_"+r.key,"How many tables at "+r.short+" (incl. patio, for table QR stickers)?",["Under 15","15–25","25–40","40+"]); });
 q(L,"print","What should we print?",["Table stickers","Window posters","Bar & register stickers","Menu inserts"],"Pick all that apply. We bring them.",true);
 q(L,"ig","OK to put the app link in your Instagram bio"+(REST.length>1?"s":"")+"?",REST.length>1?["Yes, all","Ask me first"].concat(REST.map(function(r){ return r.short+" only"; })):["Yes","Ask me first"],"Guests tap it to get the menu, the game and rewards. No download.");
-q(L,"msgs","Who gets guest phone messages and new sign-up alerts?",[OWNER].concat(["Sami"]).concat(["Manager on duty","All of us"]),null,true);
+q(L,"msgs","Who gets guest phone messages and new sign-up alerts?",[OWNER].concat([]).concat(["Manager on duty","All of us"]),null,true);
 q(L,"msghow","How should those arrive?",["Text","Email","Both"]);
 q(L,"fwd","Call forwarding: send missed and after-hours calls to the AI host?",REST.length>1?["Yes, all","Not yet"].concat(REST.map(function(r){ return r.short+" only"; })):["Yes","Not yet"]);
 q(L,"staff","When can staff do a 10-minute walkthrough on redeeming codes?",["Before opening","Between lunch and dinner","After close","Send a video instead"]);
-q(L,"assets","Logo files and real prices",["I'll text them to Antidote","Use what's on the website"].concat(["Sami"].map(function(c){ return "Have "+c+" send them"; })));
+q(L,"assets","Logo files and real prices",["I'll text them to Antidote","Use what's on the website"].concat([].map(function(c){ return "Have "+c+" send them"; })));
 var em=h("div","q"); em.appendChild(h("b",null,"Your Google email (so we can share your customer sign-up sheets)"));
 var inp=h("input"); inp.type="email"; inp.placeholder="name@gmail.com"; inp.value=S.gmail||""; inp.oninput=function(){ S.gmail=inp.value.trim(); save(); }; em.appendChild(inp); L.appendChild(em);
 q(L,"ready","Anything else before we launch?",["All good, let's go","Call me first","I have questions"]);

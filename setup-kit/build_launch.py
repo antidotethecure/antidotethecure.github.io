@@ -50,6 +50,23 @@ def menu(demo):
     for it in o.get("DRINKS", []): rows.append(["Drinks", str(it[0]), price(it)])
     return rows
 
+AGENTS = {   # AI add-on pricing shown to owners; override per owner with "aiAgents": {"call": {...}, "text": {...}}
+    "call": {"name": "AI call agent", "price": 99, "included": 750, "unit": "minutes", "over": 0.15, "about": "about 17 calls a day",
+             "does": "Answers your phone when nobody can, 24/7: hours, menu, specials, parking, the app. It takes messages and texts you the caller's name and number. It never takes payments or confirms reservations.",
+             "parts": [["AI voice, up to 750 minutes (ElevenLabs, 8¢ a minute)", 60], ["The AI brain that understands callers", 7],
+                       ["Phone number + incoming call minutes (Twilio)", 8], ["Setup on your menu + specials, weekly call reviews, updates", 24]]},
+    "text": {"name": "AI text agent", "price": 49, "included": 1000, "unit": "texts", "over": 0.03, "about": "replies and automatic texts combined",
+             "does": "Texts guests back 24/7 (hours, menu, specials, the app), sends a text when a call is missed, and sends the reward, raffle, winner, birthday and come-back texts you approve.",
+             "parts": [["Up to 1,000 texts (carrier + Twilio, about 1.5¢ each)", 15], ["The AI that writes the replies", 4],
+                       ["Text number + carrier registration (required to text customers)", 6], ["Setup, message templates, monitoring, updates", 24]]},
+    "compare": "A part-time host just to answer phones costs about $2,500+ a month. Answering services charge about $1–2 per minute."}
+
+def agents(o):
+    a = json.loads(json.dumps(AGENTS)); ov = o.get("aiAgents") or {}
+    for k in ("call", "text"): a[k].update(ov.get(k) or {})
+    if "compare" in ov: a["compare"] = ov["compare"]
+    return a
+
 def build(owner_slug):
     o = json.loads((HERE / "owners" / f"{owner_slug}.json").read_text())
     rest = []; st = status()
@@ -76,7 +93,7 @@ def build(owner_slug):
     for r in rest: r.pop("brand", None)
     t = (t.replace("__RESTAURANTS__", json.dumps(rest)).replace("__OWNER__", html.escape(o["owner"])).replace("__LAUNCH_NAMES__", names_html)
           .replace("__KEY__", f"{owner_slug}-launch-v1").replace("__CONTACTS__", json.dumps(o.get("contacts", [])))
-          .replace("__AIPHONE__", json.dumps({"price": 99, "included": 750, "over": 0.15, "levels": [["Missed + after-hours calls", 5], ["Missed calls + busy rushes", 15], ["Every call, all day", 40]], **(o.get("aiPhone") or {})}))
+          .replace("__AIAGENTS__", json.dumps(agents(o)))
           .replace("__THEME__", theme).replace("__LOGOS__", logos).replace("__AMBIENT__", json.dumps(amb)))
     if fonts: t = t.replace("</title>", f'</title><link href="{fonts}" rel="stylesheet">', 1)
     dst = ROOT / "launch" / owner_slug / "index.html"; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_text(t)

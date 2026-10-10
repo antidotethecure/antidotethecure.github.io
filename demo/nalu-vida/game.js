@@ -509,9 +509,8 @@
       // downwash: rings and spray pushed out across the water under it
       for (var dw = 0; dw < 3; dw++) { var rr = ((G.t * 1.6 + dw / 3) % 1); cx.strokeStyle = "rgba(255,255,255," + (.45 * (1 - rr)) + ")"; cx.lineWidth = 2; cx.beginPath(); cx.ellipse(x + 48, y + 88, 20 + rr * 70, 12 + rr * 40, 0, 0, 7); cx.stroke(); }
       cx.fillStyle = "rgba(0,20,35,.22)"; cx.save(); cx.translate(x + 48, y + 88); cx.rotate(e.vx > 0 ? Math.PI / 2 : -Math.PI / 2); cx.beginPath(); cx.ellipse(0, 0, 13, 40, 0, 0, 7); cx.fill(); cx.restore();
-      rotor(x + (e.vx > 0 ? -1 : 1) * 4, y, 60, G.t * 38, false);
-      if (!spr("heli", x, y, 112, e.vx > 0 ? Math.PI / 2 : -Math.PI / 2)) { cx.fillStyle = "#e9eef2"; cx.beginPath(); cx.ellipse(x, y, 34, 14, 0, 0, 7); cx.fill(); }
-      rotor(x + (e.vx > 0 ? -1 : 1) * 4, y, 60, G.t * 38, true);
+      if (!spr("heli", x, y, 34, e.vx > 0 ? Math.PI / 2 : -Math.PI / 2)) { cx.fillStyle = "#e9eef2"; cx.beginPath(); cx.ellipse(x, y, 34, 14, 0, 0, 7); cx.fill(); }
+      rotor(x + (e.vx > 0 ? 1 : -1) * 23.9, y + (e.vx > 0 ? -0.34 : 0.34), 64, G.t * 38, true);   // measured hub (49%, 35%) of the 34x159 body, rotated with it
     } else if (e.t === "drop") {
       var k2 = Math.max(0, e.air) / 1.4;
       cx.fillStyle = "rgba(0,20,35," + (.35 - k2 * .2) + ")"; cx.beginPath(); cx.ellipse(x, y, 18 - k2 * 8, 7 - k2 * 3, 0, 0, 7); cx.fill();
@@ -537,12 +536,18 @@
     }
   }
   // spinning blades: a soft motion-blur disc plus two blades with trailing ghosts
-  function rotor(x, y, r, a, top) {
-    cx.save(); cx.translate(x, y);
-    if (!top) { var gr = cx.createRadialGradient(0, 0, r * .15, 0, 0, r); gr.addColorStop(0, "rgba(30,30,30,.10)"); gr.addColorStop(.85, "rgba(30,30,30,.16)"); gr.addColorStop(1, "rgba(30,30,30,0)"); cx.fillStyle = gr; cx.beginPath(); cx.arc(0, 0, r, 0, 7); cx.fill(); cx.restore(); return; }
-    for (var g = 0; g < 4; g++) { cx.save(); cx.rotate(a - g * .09); cx.fillStyle = "rgba(25,25,25," + (.55 - g * .13) + ")"; cx.fillRect(-r, -2.2, r * 2, 4.4); cx.rotate(Math.PI / 2); cx.fillRect(-r, -2.2, r * 2, 4.4); cx.restore(); }
-    cx.fillStyle = "#333"; cx.beginPath(); cx.arc(0, 0, 5, 0, 7); cx.fill(); cx.restore();
-  }
+  function rotorFX(c,x,y,r,t,dir){ // fast rotor illusion: streaky blur disc + 4 tapered blades turning slowly with motion-blur trails
+    dir=dir||1; var a=t*2.6*dir;
+    c.save(); c.translate(x,y);
+    if(c.createConicGradient){ var cg=c.createConicGradient(a*3.1,0,0); for(var i=0;i<=12;i++) cg.addColorStop(i/12,i%2?"rgba(25,25,30,.20)":"rgba(25,25,30,.07)"); c.fillStyle=cg; }
+    else c.fillStyle="rgba(25,25,30,.13)";
+    c.beginPath(); c.arc(0,0,r,0,6.283); c.fill();
+    c.strokeStyle="rgba(255,255,255,.10)"; c.lineWidth=1; c.beginPath(); c.arc(0,0,r*.98,0,6.283); c.stroke();
+    for(var b=0;b<4;b++) for(var g=0;g<6;g++){ var ang=a+b*Math.PI/2-g*.07*dir; c.save(); c.rotate(ang); c.globalAlpha=g?(.30-g*.045):.85;
+      c.fillStyle=g?"#5c6370":"#7d8592"; c.beginPath(); c.moveTo(0,-2.6); c.lineTo(r*.96,-1.6); c.lineTo(r,0); c.lineTo(r*.96,1.6); c.lineTo(0,2.6); c.closePath(); c.fill(); if(!g){ c.strokeStyle="rgba(255,255,255,.45)"; c.lineWidth=.8; c.beginPath(); c.moveTo(r*.15,-2.2); c.lineTo(r*.95,-1.3); c.stroke(); } c.restore(); }
+    c.globalAlpha=1; c.fillStyle="#2b2e35"; c.beginPath(); c.arc(0,0,r*.09,0,6.283); c.fill(); c.fillStyle="rgba(255,255,255,.35)"; c.beginPath(); c.arc(-r*.03,-r*.03,r*.035,0,6.283); c.fill();
+    c.restore(); }
+  function rotor(x, y, r, a, top) { if (top) rotorFX(cx, x, y, r, G.t, 1); }
   var lastHud = "";
   function hud() {
     var s = Math.floor(G.score).toLocaleString(), m = "×" + G.mult + (G.streak >= 3 ? " · " + G.streak + " streak 🔥" : ""), hs = "❤️".repeat(Math.max(0, G.hearts)) + "🤍".repeat(Math.max(0, 3 - G.hearts)),

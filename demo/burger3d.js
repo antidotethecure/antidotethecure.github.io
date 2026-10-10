@@ -1,4 +1,4 @@
-/* Second Shift AI — real 3D burger build (WebGL, three.js r128). Used by menu3d.js for MENU3D.stack dishes.
+/* SousShift AI — real 3D burger build (WebGL, three.js r128). Used by menu3d.js for MENU3D.stack dishes.
    BURGER3D.mount(el, ids, imgBase, models) → { destroy(), replay(), drag(dx) } or null when WebGL isn't available.
    models (optional) = { bun_top: "img/3d/bun_top.glb", ... }: real scanned meshes (photo-textured GLB) used instead of the
    built-in shapes; each is scaled to the bun's width and sat on the stack. Needs THREE.GLTFLoader (menu3d.js loads it).

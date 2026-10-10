@@ -1,4 +1,4 @@
-/* Second Shift AI — food physics for stacked dishes. Loaded automatically by builder.js and menu3d.js.
+/* SousShift AI — food physics for stacked dishes. Loaded automatically by builder.js and menu3d.js.
    STACKFX.wrap(img)                → a .sfx box around the layer image (effects live inside it)
    STACKFX.land(box, id, below)     → call when a layer lands. box = its .sfx, below = the .sfx boxes under it, nearest first.
    - every layer lands like a rag doll: it squashes, tips and settles, and the layers underneath give and jiggle

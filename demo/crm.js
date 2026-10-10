@@ -1,4 +1,4 @@
-/* Second Shift AI — "Join the club" signup + the owner's customer list, for every demo page.
+/* SousShift AI — "Join the club" signup + the owner's customer list, for every demo page.
    Include once (before nearby.js so it sits above the map):
      <script>window.CRM_CFG={name:"StormBurger", offer:"Free fries with your next burger", mount:"#optional-selector"};</script>
      <script src="../crm.js"></script>

@@ -1,4 +1,4 @@
-/* Second Shift AI — business types shared by the intake (/demo/start/) and the sample app (/demo/try/).
+/* SousShift AI — business types shared by the intake (/demo/start/) and the sample app (/demo/try/).
    Add a type here and it shows up in both. Keep the keys in sync with TYPES in the site's /api/intake. */
 window.SSAI_API = "https://drizzle-bowl-scores.higgsfield.app/api/intake";
 window.SSAI_TYPES = {

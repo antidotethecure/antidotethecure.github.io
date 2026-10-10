@@ -1,4 +1,4 @@
-/* Second Shift AI — START MENU for any restaurant mini game. Include after the game's script:
+/* SousShift AI — START MENU for any restaurant mini game. Include after the game's script:
      <script>window.GAME_MENU={ ...config... };</script><script src="../gamemenu.js"></script>
    Before play a themed start screen covers the game: ▶ PLAY · 🎵 MUSIC (only if the game has music) · ⚙️ SETTINGS ·
    ❓ HOW TO PLAY · 🏆 POINTS & PRIZES. Panels open as a bottom sheet. During play a small 🎵 button (bottom corner,

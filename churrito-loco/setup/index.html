@@ -103,6 +103,7 @@ var CFG={"slug":"churrito-loco","name":"Churrito Loco","short":"Churrito Loco","
 var R=CFG.rewards, G=CFG.game, SHORT=CFG.short||CFG.name, OWNER=CFG.owner||"there";
 var CA_FREE="Free entry with no purchase is always included (California law).";
 var CA_ALC="California rules don't allow free alcohol as a reward. Drink discounts are OK.";
+var CA_BAR="Bar rewards: drink discounts ($ off, % off) or free non-alcoholic drinks (mocktail, soda). Never free alcohol (California ABC).";
 var YN=["Yes","No"], SPEC=["Yes","Changed","Stopped"];
 function L(a,d){ return {o:a,d:d==null?0:d}; }          // option list + default index (-1 = no default)
 function first(a){ return L(a,0); }
@@ -124,12 +125,12 @@ var Q=[
  ["Deals & rewards",[
   ["welcome","Welcome gift for joining "+SHORT+" Rewards",first(R.welcome)],
   ["sys","Points or stars?",first([PTS,STARS,"Both"]),"Points reward bigger spenders. Stars reward every visit, big or small."],
-  ["ppd","Points earned per $1 spent",L(["10 pts"],0),null,function(S){return v("sys")!==STARS;},F("num",{unit:"pts",fmt:" pts"})],
+  ["ppd","Points earned per $1 spent",L(["10 pts"],0),null,oneBal,F("num",{unit:"pts",fmt:" pts"})],
   ["stars","Reward at 10 stars (1 star per visit)",first(R.stars),null,function(S){return v("sys")!==PTS;}],
-  ["t1","Reward at "+n(R.points[0])+" points",first(R.t1),null,ptsOn,F("reward",{thr:TH("pts:t1",R.points[0],"Reward at","points")})],
-  ["t2","Reward at "+n(R.points[1])+" points",first(R.t2),CFG.alcohol?CA_ALC:null,ptsOn,F("reward",{thr:TH("pts:t2",R.points[1],"Reward at","points")})],
-  ["t3","Reward at "+n(R.points[2])+" points",first(R.t3),null,ptsOn,F("reward",{thr:TH("pts:t3",R.points[2],"Reward at","points")})],
-  ["t4","Reward at "+n(R.points[3])+" points",first(R.t4),null,ptsOn,F("reward",{thr:TH("pts:t4",R.points[3],"Reward at","points")})],
+  ["t1","Reward at "+n(R.points[0])+" points",first(R.t1),null,oneBal,F("reward",{thr:TH("pts:t1",R.points[0],"Reward at","points")})],
+  ["t2","Reward at "+n(R.points[1])+" points",first(R.t2),CFG.alcohol?CA_ALC:null,oneBal,F("reward",{thr:TH("pts:t2",R.points[1],"Reward at","points")})],
+  ["t3","Reward at "+n(R.points[2])+" points",first(R.t3),null,oneBal,F("reward",{thr:TH("pts:t3",R.points[2],"Reward at","points")})],
+  ["t4","Reward at "+n(R.points[3])+" points",first(R.t4),null,oneBal,F("reward",{thr:TH("pts:t4",R.points[3],"Reward at","points")})],
   ["refin","Inviting a friend: the person who invites gets",first(R.referIn)],
   ["reffr","Inviting a friend: the friend gets",first(R.referFriend)],
   ["hh",hhLabel,first(YN)],
@@ -145,6 +146,20 @@ var Q=[
    .concat([["champ","Weekly #1 on the leaderboard",first(G.champ)]])
    .concat(G.second?[["second","Weekly #2 on the leaderboard",first(G.second)]]:[])]
 ];
+// bar points vs kitchen points (configs with "wallets"): two balances that never mix. Bar points come only from drinks and
+// buy only bar rewards; kitchen points come only from food and buy only food rewards. Matches CRM_CFG.wallets in demo/crm.js.
+var WT="Bar points vs kitchen points", WCF=CFG.wallets;
+if(WCF){
+  var wt=function(side,list,key,icon,lbl){ return (list||[]).map(function(t,i){ return [key+(i+1),icon+" "+lbl+" reward at "+n(t[0])+" "+lbl.toLowerCase()+" points",first(t[1]),side==="bar"&&i===0&&CFG.alcohol?CA_BAR:null,wOn,
+    F("reward",{thr:TH("wpts:"+key+(i+1),t[0],icon+" "+lbl+" reward at",lbl.toLowerCase()+" points")})]; }); };
+  Q.splice(2,0,[WT,[
+    ["wsplit","Keep bar points and kitchen points separate?",first(["Yes, two balances (bar + kitchen)","No, one balance for everything"]),"Bar points only come from drinks and only buy bar rewards. Kitchen points only come from food and only buy food rewards. Nobody can earn on food and spend at the bar, or the other way around.",ptsOn],
+    ["wppd_bar","🍸 Bar points earned per $1 spent on drinks",L([(WCF.bar&&WCF.bar.perDollar||10)+" pts"],0),null,wOn,F("num",{unit:"pts",fmt:" pts"})],
+    ["wppd_food","🍔 Kitchen points earned per $1 spent on food",L([(WCF.food&&WCF.food.perDollar||10)+" pts"],0),null,wOn,F("num",{unit:"pts",fmt:" pts"})]]
+    .concat(wt("bar",WCF.bar&&WCF.bar.tiers,"wb","🍸","Bar"))
+    .concat(wt("food",WCF.food&&WCF.food.tiers,"wk","🍔","Kitchen"))
+    .concat([["wbonus","Bonus points (check-in, first order, feedback, referral, birthday, Instagram) go to",first(WCF.bonusTo==="bar"?["🍸 Bar points","🍔 Kitchen points"]:["🍔 Kitchen points","🍸 Bar points"]),"When a referred friend orders, the inviter's points go to the side the friend bought from (food → kitchen, drinks → bar).",wOn]])]);
+}
 if(CFG.special) Q.push([CFG.special.title,CFG.special.qs.map(function(q){ return [q[0],q[1],first(q[2]),q[3]||null]; })]);
 var LB="How the weekly leaderboard plays out";
 Q.push([LB,[
@@ -179,6 +194,8 @@ function def(q){ return q[2].d>=0?q[2].o[q[2].d]:null; }
 function v(k){ var q=QMAP[k]; return S[k]!=null?S[k]:(q?def(q):null); }
 function gwOn(){ return v("gw")!=="No giveaway"; }
 function ptsOn(){ return v("sys")!==STARS; }
+function wOn(){ return !!CFG.wallets&&ptsOn()&&/^Yes/.test(v("wsplit")||""); }   // split bar / kitchen points
+function oneBal(){ return ptsOn()&&!wOn(); }                                     // single points balance (no split)
 
 $("ttl").textContent=SHORT+" · App Setup";
 $("intro").innerHTML="";
@@ -323,6 +340,7 @@ function refresh(){ Q.forEach(function(sec){ sec[1].forEach(function(q){ if(q[4]
 Q.forEach(function(sec){
   app.appendChild(h("h2",null,sec[0]));
   if(sec===Q[1]&&CFG.alcohol) app.appendChild(h("p","note",CA_ALC));
+  if(sec[0]===WT) app.appendChild(h("p","sub","Two separate balances for "+SHORT+": 🍸 bar points from drinks, 🍔 kitchen points from food. Each one only buys its own rewards. Keep the suggested numbers or type your own."));
   if(sec[0]===LB) app.appendChild(timeline());
   sec[1].forEach(function(q){
     if(!q[5]&&q[2].d>=0&&isReward(q[2].o)) q[5]=F("reward");                    // any prize/discount question becomes a fill-in
@@ -455,7 +473,7 @@ window.SETUP_SUMMARY = function () { return summary(); };   // lets the owner's 
 function summary(){
   var out=[CFG.name.toUpperCase()+" SETUP (from "+(OWNER==="there"?"the owner":OWNER)+")"];
   Q.forEach(function(sec){ out.push("\n"+sec[0].toUpperCase()); sec[1].forEach(function(q){
-    if(q[4]&&!q[4](S)){ out.push("• "+lab(q)+": (skipped)"); return; }
+    if(q[4]&&!q[4](S)){ out.push("• "+lab(q)+": "+(q[4]===oneBal&&wOn()?"(using bar + kitchen points instead)":"(skipped)")); return; }
     var x=v(q[0]); out.push("• "+lab(q)+": "+(x==null?"(no answer)":x)); });
     if(sec===Q[0]) out.push("• Free entry with no purchase: included (California law)"); });
   var dOdds=drawOdds(); out.push("\nDAILY LUCKY DRAW (MEMBERS)"); out.push("• How often someone wins: "+dOdds);

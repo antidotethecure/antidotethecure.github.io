@@ -1,4 +1,4 @@
-/* Second Shift AI — "Build your meal" ordering. Tap or drag real food onto the burger / plate, watch the price tick
+/* SousShift AI — "Build your meal" ordering. Tap or drag real food onto the burger / plate, watch the price tick
    up, fire it on the grill, place the order (and earn rewards points if the guest is a member).
      <script>window.BUILDER = { mode: "stack" | "plate", accent: "burger", img: "img/build/", fire: "img/game/flame.webp",
        base: 2.74, baseName: "Bun + Storm sauce", start: ["bun_bottom"], top: "bun_top", name: "StormBurger",

@@ -1,4 +1,4 @@
-/* Second Shift AI — "Where to print" guide for QR stickers + window posters (Los Angeles).
+/* SousShift AI — "Where to print" guide for QR stickers + window posters (Los Angeles).
    Include on any page with <div id="printspots"></div> and <script src="…/assets/printspots.js"></script>.
    Shops researched Oct 2026 — always call ahead to confirm same-day on your size + material. */
 (function () {

@@ -79,7 +79,7 @@ var AGENT_DATA = [
     skills:["leads","prospects","restaurants","outreach","contact discovery","drop kit","client website"],
     avatar:"assets/characters/krillin.webp",
     memoryUrl:HQ_FOLDER,
-    persona:"You are KRILLIN, Antidote's lead generation agent for Second Shift AI. A lead is NAME + verified CONTACT + the specific gap you spotted, scored hot/warm/cold. You also build client Drop Kits (site + menus, promos, auto email, AI phone agent, crypto checkout).",
+    persona:"You are KRILLIN, Antidote's lead generation agent for SousShift AI. A lead is NAME + verified CONTACT + the specific gap you spotted, scored hot/warm/cold. You also build client Drop Kits (site + menus, promos, auto email, AI phone agent, crypto checkout).",
     char:{hair:"bald",hairC:"#F4C99B",saiyan:false,gi:"#F28C28",pants:"#F28C28",skin:"#F4C99B"} },
 
   { id:"hercule", name:"HERCULE", emoji:"🏆", room:"agency",

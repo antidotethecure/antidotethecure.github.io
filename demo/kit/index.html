@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Pitch Kit — Second Shift AI</title>
+<title>Pitch Kit — SousShift AI</title>
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;600;800;900&family=IBM+Plex+Mono:wght@600;700&display=swap" rel="stylesheet">
@@ -54,7 +54,7 @@ details.q .a{padding:0 14px 14px}
 </head>
 <body>
 <div class="wrap">
-<div class="top"><b>Pitch <span>Kit</span> · Second Shift AI</b>
+<div class="top"><b>Pitch <span>Kit</span> · SousShift AI</b>
   <div class="tabs"><a href="#fill">✏️ Fill in</a><a href="#messages">💬 Messages</a><a href="#tiers">💲 Packages</a><a href="#faq">❓ Answers</a><a href="#demos">🎮 Live demos</a><a href="#resources">📎 Resources</a></div>
 </div>
 
@@ -104,8 +104,8 @@ var PK={menu:{n:"Menu",set:750,mo:99,d:"QR menu with real-looking photos, order 
 function v(){ var r=F.rest||"[Restaurant]", o=F.owner||"[Name]", l=F.link||BASE+"setup/", p=PK[F.pkg]||PK.full, pos=F.pos||"Toast"; return {r:r,o:o,l:l,p:p,pos:pos}; }
 var MSGS=[
  ["Instagram DM · first touch","Cold or warm, short and friendly",function(x){ return "Hey "+x.o+"! Love what you're doing at "+x.r+" 🔥 I build restaurants their own app: guests scan a QR, see your menu with real-looking photos, play a game made from your food while they wait, and earn rewards that bring them back. No download.\n\nI made one for "+x.r+" so you can see it on your phone: "+x.l+"\n\nWant me to walk you through it? Takes 5 minutes."; }],
- ["Text message","After you've met or talked",function(x){ return "Hey "+x.o+", it's Antidote from Second Shift AI. Here's the "+x.r+" app I built for you, open it on your phone and play the game: "+x.l+"\nIt works with your "+x.pos+", no new hardware. When's a good time this week to go over it?"; }],
- ["Email","Subject + body",function(x){ return "Subject: Your "+x.r+" app is ready to try\n\nHi "+x.o+",\n\nI built a sample app for "+x.r+": "+x.l+"\n\nOpen it on your phone. Guests would scan a QR at the table and get:\n• Your menu with photos, ordering from their seat\n• A game built around your food, with real prizes they come back to redeem\n• Points, scan-to-earn at the register, birthday treats, referral codes\n• Texts from you: specials, \"we miss you\", birthday rewards, all automatic\n\nIt works alongside your "+x.pos+" with no new hardware. Every guest who signs up goes into a customer list that you own.\n\nI'd recommend the "+x.p.n+" package: $"+x.p.set.toLocaleString()+" setup and $"+x.p.mo+"/month, with payment plans from $500 down.\n\nWant 10 minutes this week to walk through it?\n\nAntidote\nSecond Shift AI"; }],
+ ["Text message","After you've met or talked",function(x){ return "Hey "+x.o+", it's Antidote from SousShift AI. Here's the "+x.r+" app I built for you, open it on your phone and play the game: "+x.l+"\nIt works with your "+x.pos+", no new hardware. When's a good time this week to go over it?"; }],
+ ["Email","Subject + body",function(x){ return "Subject: Your "+x.r+" app is ready to try\n\nHi "+x.o+",\n\nI built a sample app for "+x.r+": "+x.l+"\n\nOpen it on your phone. Guests would scan a QR at the table and get:\n• Your menu with photos, ordering from their seat\n• A game built around your food, with real prizes they come back to redeem\n• Points, scan-to-earn at the register, birthday treats, referral codes\n• Texts from you: specials, \"we miss you\", birthday rewards, all automatic\n\nIt works alongside your "+x.pos+" with no new hardware. Every guest who signs up goes into a customer list that you own.\n\nI'd recommend the "+x.p.n+" package: $"+x.p.set.toLocaleString()+" setup and $"+x.p.mo+"/month, with payment plans from $500 down.\n\nWant 10 minutes this week to walk through it?\n\nAntidote\nSousShift AI"; }],
  ["Follow-up (2–3 days later)","Nudge without being pushy",function(x){ return "Hey "+x.o+"! Did you get a chance to play the "+x.r+" game? 😄 "+x.l+"\nHappy to change anything (prizes, colors, the game) before you decide. I'm keeping founding-restaurant pricing open for a few more spots."; }],
  ["Close · ready to sign","Send when they say yes",function(x){ return "Let's do it 🙌 Here's how we get "+x.r+" live:\n1. I send the agreement to sign (DocuSign, 2 minutes).\n2. You pick: pay in full, half down, or $500 to start.\n3. Send me your menu, logo, prizes you want to give, and your hours.\n4. I set up your "+x.pos+" discount buttons with you (15 minutes) and print your table QR codes.\n5. You're live in about a week. Texting goes live once the carriers approve your number (usually 1–3 weeks)."; }],
  ["Value pitch · price objection","When they ask \"why that much?\" or need the big picture",function(x){ return "Real talk "+x.o+": everything in the "+x.r+" app is custom software. If you hired a developer or agency to build it (the game, rewards, leaderboard, automatic texts, AI phone, AI email), you're looking at $60,000 to $150,000 and 3 to 5 months, plus $1,500 to $4,000 a month to keep it running.\n\nI already built the engine, so I just customize it for you: "+x.p.n+" is $"+x.p.set.toLocaleString()+" setup + $"+x.p.mo+"/month, live in about a week. That's founding-restaurant pricing, and it goes up as spots fill.\n\nSide by side: "+BASE+"everything/#value"; }],

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Sample Requests — Second Shift AI</title>
+<title>Sample Requests — SousShift AI</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
 <style>
@@ -73,7 +73,7 @@ input{width:100%;font:16px system-ui;padding:12px;border-radius:12px;border:1px 
   function open(id){
     api("?id=" + encodeURIComponent(id) + "&admin=1").then(function(r){
       var t = T[r.type] || T.other, link = sampleLink(r), first = (r.owner || "").split(" ")[0] || "there";
-      var text = "Hey " + first + ", it's Antidote from Second Shift AI. Your free sample app for " + r.name + " is ready: " + link;
+      var text = "Hey " + first + ", it's Antidote from SousShift AI. Your free sample app for " + r.name + " is ready: " + link;
       $("det").innerHTML = '<div class="det"><span class="st ' + e(r.status) + '" style="float:right">' + e(r.status) + '</span><h1 style="margin:0">' + t.em + ' ' + e(r.name) + '</h1>' +
         '<div class="dim">' + e(t.label) + ' · ' + e([r.address, r.city].filter(Boolean).join(", ")) + '</div>' +
         '<table><tr><td>Owner</td><td>' + e(r.owner) + '</td></tr><tr><td>Phone</td><td>' + (r.phone ? '<a style="color:var(--gold)" href="tel:' + e(r.phone) + '">' + e(r.phone) + '</a>' : '') + '</td></tr>' +

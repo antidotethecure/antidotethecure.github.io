@@ -1,4 +1,4 @@
-/* Second Shift AI — game screen lock. Include once on any page with a game: <script src="../gamelock.js"></script>
+/* SousShift AI — game screen lock. Include once on any page with a game: <script src="../gamelock.js"></script>
    1) A finger on a game canvas never scrolls, bounces or zooms the page (always on).
    2) The first touch anywhere in a game area LOCKS THE WHOLE SCREEN: nothing on the page scrolls, bounces,
       zooms or pull-to-refreshes, so grabbing the phone or missing a button never slides it around.

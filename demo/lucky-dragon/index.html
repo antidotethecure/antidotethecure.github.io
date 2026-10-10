@@ -686,6 +686,19 @@ var CONFIG = {
     {id:"veggies",name:"Hibachi veggies",price:0,max:1,group:"Extras",at:[-.26,-.22,.32]},
     {id:"yumyum",name:"Yum-yum",price:1,max:2,w:.2,group:"Extras",at:[.36,.36,.2]}]};</script>
 <script src="../builder.js"></script>
+<script>(function(){ var B="https://d8j0ntlcm91z4.cloudfront.net/user_3HWG0IWRMvn26mXcv9NkAaLko5Y/hf_20261002_", S={chicken:B+"031743_25030a14-96cb-49a9-829b-55e1e5f1750b.png",steak:B+"031755_235ef5af-6cff-4fb5-825e-80b37b3520b3.png",shrimp:B+"031757_00baef18-1d20-487e-a61d-e4e51101bffe.png",lobster:B+"031758_a6a00371-7c6b-4669-b7df-adee4a2d442b.png",veg:B+"031800_2c7ee5ef-96a3-440b-ae81-be85a12ed946.png",chowmein:B+"035752_db301158-1f27-4903-b853-f486665eb63a.png",rice:B+"035751_bb85ebbe-4a65-46ac-8dd4-9201276d31de.png",dragon:B+"031805_9126ac53-431c-40de-b80a-0b0f25000074.png"};
+var good=function(k,n){ return {img:S[k],name:n,pts:"+10",note:"+ streak bonus"}; };
+window.GAME_MENU={id:"lucky-dragon",name:"Hibachi Catch",by:"Lucky Dragon Hibachi",tagline:"Catch the hibachi. Dodge the dragon.",
+ hero:[S.shrimp,S.chicken,S.dragon,S.steak,S.lobster],
+ theme:{bg:"#0D0404",bg2:"#241008",card:"#1D0B0A",edge:"#4A1F1C",accent:"#E6483D",accent2:"#FFC82E",ink:"#F7EFE6",dim:"#C4A992",btnInk:"#2a0805",display:"Cinzel,Georgia,serif",body:"Archivo,system-ui,sans-serif"},
+ mount:document.getElementById("game").closest(".gamebox"),start:function(){ window.__LD.start(); },
+ how:{goal:"Catch as much hibachi as you can on your tray in 30 seconds without letting the dragon burn your food.",time:"30 seconds · 3 dragon hits and the food is burnt",
+  steps:[["👆","Slide your finger across the game to move the tray"],[null,"Catch chicken, steak, shrimp, lobster, veggies, noodles, rice and drinks",S.shrimp],["🔥","Dodge flames, candy and ice. They don't belong in hibachi"],[null,"The dragon locks on (dashed red line), then breathes fire. Move!",S.dragon],["🔗","Catch in a row without a miss to grow your streak bonus"]]},
+ points:[{group:"Catch these",items:[good("chicken","Chicken"),good("steak","Steak"),good("shrimp","Shrimp"),good("lobster","Lobster"),good("veg","Veggies"),good("chowmein","Chow Mein"),good("rice","Fried Rice"),{icon:"🥤",name:"Drinks",pts:"+10",note:"+ streak bonus"}]},
+  {group:"Bonuses",items:[{icon:"⭐",name:"Gold star",note:"Rare. Keeps your streak going",pts:"+50",gold:true},{icon:"🔗",name:"Streak bonus",note:"+2 per catch in a row, up to +10 extra (5+ streak = +20 a catch)",pts:"up to +10"}]},
+  {group:"Dodge these",items:[{icon:"🔥",name:"Flame",note:"Resets your streak",pts:"−20",bad:true},{icon:"🍭",name:"Candy",note:"Resets your streak",pts:"−20",bad:true},{icon:"🧊",name:"Ice",note:"Resets your streak",pts:"−20",bad:true},{img:S.dragon,name:"Dragon fire",note:"Resets your streak. 3 hits burns the food and ends the run",pts:"−30",bad:true}]}],
+ prizes:{champion:"1st place this week: 50% OFF your next meal",tiers:[["2nd","20% OFF next meal","2nd place on the weekly board","🥈"],["650+","15% OFF next meal","Puts you on the weekly board","🏆"]],note:"Sample prizes. The owner sets the real ones and the board resets every Monday."}}; })();</script>
+<script src="../gamemenu.js"></script>
 <script src="../gamelock.js"></script>
 </body>
 </html>

@@ -86,7 +86,7 @@
     ".ssai-pauseov{position:fixed;inset:0;z-index:2147483002;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;" +
     "background:rgba(6,8,16,.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff;text-align:center;touch-action:none;" +
     "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}" +
-    ".ssai-pauseov.on{display:flex}.ssai-pauseov h2{margin:0;font-size:44px;font-weight:900;letter-spacing:6px;text-shadow:0 4px 18px rgba(0,0,0,.6)}" +
+    ".ssai-pauseov.on{display:flex}.ssai-pauseov h2::before{content:none}.ssai-pauseov h2{margin:0;color:#fff;font-size:44px;font-weight:900;letter-spacing:6px;text-shadow:0 4px 18px rgba(0,0,0,.6)}" +
     ".ssai-pauseov button{font:800 20px/1 inherit;font-family:inherit;padding:16px 38px;border-radius:999px;border:0;background:#fff;color:#111;cursor:pointer;" +
     "box-shadow:0 8px 26px rgba(0,0,0,.45);display:inline-flex;align-items:center;gap:10px}" +
     ".ssai-pauseov button b{display:inline-block;width:0;height:0;border-left:15px solid currentColor;border-top:9px solid transparent;border-bottom:9px solid transparent}" +

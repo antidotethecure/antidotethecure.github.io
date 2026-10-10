@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><title>Jurni's Files</title>
+<style>
+:root{--bg:#2a1442;--card:#3B1F5C;--edge:#5a3a82;--ink:#FBF4E4;--dim:#d9c9e6;--gold:#F2C14E;--blue:#D9A21B;--green:#2fbf71}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,system-ui,Segoe UI,Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:18px 16px 60px}
+.top img{height:54px;border-radius:8px}h1{font-size:28px;margin:14px 0 4px}h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:28px 0 10px}
+p.s{color:var(--dim);margin:0 0 12px}
+.wm{display:block;width:100%;max-width:420px;margin:14px 0 0;border-radius:18px}.big{display:block;width:100%;border:0;border-radius:16px;padding:16px 18px;margin:10px 0;font-weight:800;font-size:17px;font-family:inherit;text-align:left;cursor:pointer;text-decoration:none;color:#111;background:var(--gold)}
+.big small{display:block;font-weight:500;font-size:13px;opacity:.8;margin-top:2px}.big.b{background:var(--blue);color:#fff}.big.g{background:var(--green);color:#fff}
+.links a{display:block;background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:13px 15px;margin:8px 0;color:var(--ink);text-decoration:none;font-weight:700}
+.links a small{display:block;color:var(--dim);font-weight:500;font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f{background:var(--card);border:1px solid var(--edge);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.f .im{aspect-ratio:1;background:#fff;display:grid;place-items:center}.f .im img{max-width:100%;max-height:100%;display:block}
+.f .im.dark{background:#111}.f video{width:100%;aspect-ratio:9/16;background:#000;display:block}
+.f b{font-size:14px;padding:10px 10px 2px}.f small{color:var(--dim);font-size:12px;padding:0 10px 8px}
+.f .act{display:flex;gap:6px;padding:0 8px 10px;margin-top:auto}.f .act a,.f .act button{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-weight:700;font-size:14px;font-family:inherit;display:grid;place-items:center;text-decoration:none;cursor:pointer}
+.f .act button{background:var(--blue);border-color:var(--blue);color:#2a1442}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#fff;color:#111;padding:10px 16px;border-radius:99px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}.toast.on{opacity:1}
+</style></head><body><main>
+<div class="top"><img src="../../assets/ssai-lockup.jpg" alt="Second Shift AI"></div>
+<img class="wm" src="wordmark.png" alt="Gritz N Wafflez">
+<h1>Gritz N Wafflez files</h1>
+<p class="s">Everything for Jurni in one place: links, QR stickers, the window poster, table cards and guides. Tap <b>Share</b> on any file to send it by text, email or AirDrop.</p>
+
+<button class="big" id="shareAll" type="button">📤 Send this page to Jurni<small>She gets every file and link with one tap</small></button>
+<button class="big g" id="copyMsg" type="button">📋 Copy the text message<small>Explains the 4 steps, with the links</small></button>
+
+<h2>Links</h2>
+<div class="links">
+<a href="https://antidotethecure.github.io/onboarding/jurni/">★ Jurni's onboarding (start here)<small>Deals, register, launch week, AI add-on: one link</small></a>
+<a href="https://antidotethecure.github.io/demo/gritz-n-wafflez/">Gritz N Wafflez app<small>Menu, rewards, Order Up! game</small></a>
+<a href="https://antidotethecure.github.io/demo/gritz-n-wafflez/#play">Play Order Up!<small>The game your guests play while they wait</small></a>
+<a href="https://antidotethecure.github.io/gritz-n-wafflez/setup/">Setup page<small>Deals, weekly giveaway, prizes, menu</small></a>
+<a href="https://antidotethecure.github.io/pos/?r=Gritz%20N%20Wafflez">Register setup<small>Toast, Square, Clover… step by step</small></a>
+<a href="https://antidotethecure.github.io/gritz/kit/">Print kit<small>QR stickers, window poster, table cards + where to print</small></a>
+<a href="jurni-links.pdf">All links as a PDF<small>Tappable buttons, phone-sized</small></a>
+<a href="Gritz_N_Wafflez_App_and_Toast.pdf">Your app + Toast: how it works (PDF)<small>Reward codes at the register, one-time Toast setup</small></a>
+<a href="ai-agents-add-on.pdf">AI agents: optional add-on (PDF)<small>Call agent $99 · text agent $49 a month, and what each fee pays for</small></a>
+</div>
+
+<h2>QR codes, poster &amp; table cards</h2><div class="grid" id="gritz"></div>
+<h2>Guides</h2><div class="grid" id="docs"></div>
+<p class="s" style="margin-top:24px">PNG and JPG files are for phones and screens. PDF files are print-ready for the print shop.</p>
+<div id="printspots"></div><script src="../../assets/printspots.js"></script>
+</main><div class="toast" id="toast"></div>
+<script>
+var FILES={
+ gritz:[["Square sticker 3×3","gritz/Gritz_QR_Sticker_Square",["png","pdf"],"png"],["Round sticker 3 in","gritz/Gritz_QR_Sticker_Round",["png","pdf"],"png"],["Logo QR","gritz/Gritz_QR_Logo_Only",["png"],"png"],["Window poster 24×36","gritz/Gritz_Window_Poster_24x36",["jpg","pdf"],"jpg",1],["Table numbers 1–40 (4×6)","gritz/Gritz_Table_Cards",["pdf"],"pdf",1,"gritz/Gritz_Table_Cards_1-40"]],
+ docs:[["App + Toast: how it works","Gritz_N_Wafflez_App_and_Toast.pdf"],["AI agents add-on","ai-agents-add-on.pdf"],["All links","jurni-links.pdf"]]};
+var MSG="Hey Jurni! Everything for Gritz N Wafflez is in one place now:\n\n★ Your onboarding (one link): https://antidotethecure.github.io/onboarding/jurni/\n\nIt shows where we're at and the few things we need from you:\n1) pick your deals, giveaways & prizes\n2) tell us your register (Toast, Square…)\n3) a few launch-week questions\n4) the AI phone + text agents, if you want them (optional)\nThen tap \"Send everything to Antidote\" at the bottom. Almost all taps, about 15 minutes.\n\nYour QR stickers, window poster and table cards: "+location.href.split("#")[0];
+function toast(t){ var e=document.getElementById("toast"); e.textContent=t; e.classList.add("on"); setTimeout(function(){ e.classList.remove("on"); },1800); }
+function e(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function share(url,name){
+  fetch(url).then(function(r){ return r.blob(); }).then(function(b){
+    var f=new File([b],name,{type:b.type});
+    if(navigator.canShare&&navigator.canShare({files:[f]})) return navigator.share({files:[f],title:name});
+    if(navigator.share) return navigator.share({title:name,url:new URL(url,location.href).href});
+    location.href=url; }).catch(function(err){ if(!err||err.name!=="AbortError") location.href=url; });
+}
+document.getElementById("gritz").innerHTML=FILES.gritz.map(function(f){
+  var thumb=f[1]+".thumb."+(f[4]?"jpg":"png");
+  return '<div class="f"><div class="im"><img loading="lazy" src="'+thumb+'" alt=""></div><b>'+e(f[0])+'</b><small>'+f[2].map(function(x){ return x.toUpperCase(); }).join(" + ")+'</small>'+
+    f[2].map(function(x){ var fb=f[5]||f[1], fn=fb.split("/")[1]; return '<div class="act"><a href="'+fb+"."+x+'" download>⬇ '+x.toUpperCase()+'</a><button type="button" data-u="'+fb+"."+x+'" data-n="'+fn+"."+x+'">Share</button></div>'; }).join("")+'</div>'; }).join("");
+document.getElementById("docs").innerHTML=FILES.docs.map(function(v){
+  return '<div class="f"><div class="im dark" style="aspect-ratio:auto;padding:22px 10px;font-size:40px">📄</div><b>'+e(v[0])+'</b><small>PDF</small><div class="act"><a href="'+v[1]+'" download>⬇ PDF</a><button type="button" data-u="'+v[1]+'" data-n="'+v[1]+'">Share</button></div></div>'; }).join("");
+document.addEventListener("click",function(ev){ var b=ev.target.closest("button[data-u]"); if(b) share(b.dataset.u,b.dataset.n); });
+document.getElementById("shareAll").onclick=function(){
+  if(navigator.share) navigator.share({title:"Gritz N Wafflez files",text:MSG}).catch(function(){}); else location.href="sms:&body="+encodeURIComponent(MSG); };
+document.getElementById("copyMsg").onclick=function(){ (navigator.clipboard?navigator.clipboard.writeText(MSG):Promise.reject()).then(function(){ toast("Copied — paste it in your text to Jurni"); },function(){ prompt("Copy this:",MSG); }); };
+</script></body></html>

@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gritz N Wafflez</title>
+<meta name="robots" content="noindex">
+<script>
+// Printed Gritz QR codes (stickers, window poster, table cards) point here so the app can move without reprinting.
+// Everything in the query (?s=<source>, ?t=<table>, ?seat=) is passed through to the app.
+var q=location.search?location.search.slice(1)+"&":"";
+location.replace("../demo/gritz-n-wafflez/?"+q+"src=qr");
+</script>
+<meta http-equiv="refresh" content="1;url=../demo/gritz-n-wafflez/?src=qr">
+<style>body{margin:0;background:#FBF4E4;color:#3B1F5C;font:700 16px system-ui;display:grid;place-items:center;height:100vh}</style>
+</head><body><a style="color:#3B1F5C" href="../demo/gritz-n-wafflez/?src=qr">Opening Gritz N Wafflez…</a></body></html>

@@ -58,6 +58,10 @@ details.built{margin-top:10px}details.built summary{cursor:pointer;color:var(--d
 
 <h2>3 · Launch week</h2>
 <div id="launch"></div>
+<h2>4 · Your AI phone host</h2>
+<p class="note">An AI host answers your phone when nobody can: hours, menu, specials, parking, the app. It takes messages and texts you the caller's name and number. It never takes payments or confirms reservations. Try it with the links in your files.</p>
+<div id="aiphone"></div>
+<div id="printspots"></div><script src="../../assets/printspots.js"></script>
 
 <p class="prog" id="prog"></p>
 </main>
@@ -177,6 +181,16 @@ function buildReview(r,box){ var M=r.menu||[]; if(!M.length){ box.innerHTML='<p 
 function menuSummary(r){ var M=r.menu||[], m=mrev(r), out=["MENU CHECK — "+r.short+": "+Object.keys(m).length+" of "+M.length+" items checked"+(S["allok_"+r.key]?" (tapped “Everything checks out”)":"")+(S["mok_"+r.key]?" · menu approved":" · menu NOT approved yet")];
   M.forEach(function(it,i){ var v=m[i]; if(v==="rm") out.push("• REMOVE: "+it[1]); else if(v&&v.price!=null) out.push("• PRICE FIX: "+it[1]+" "+(it[2]||"—")+" → "+(v.price||"(blank)")); }); return out.join("\n"); }
 
+/* AI phone host add-on: owner picks per restaurant; price comes from setup-kit/owners/<owner>.json "aiPhone" */
+var AI=__AIPHONE__, aiBox=document.getElementById("aiphone");
+(function(){ if(!aiBox) return;
+  var t=h("div","q"); t.innerHTML='<b>What it costs</b><div style="color:var(--dim);font-size:14px;margin-top:4px">$'+AI.price+'/month per restaurant, includes up to '+AI.included.toLocaleString()+' minutes of calls (about '+Math.round(AI.included/1.5/30)+' calls a day). Extra minutes are $'+AI.over.toFixed(2)+' each. Cancel anytime.</div>'+
+    '<table style="width:100%;margin-top:10px;border-collapse:collapse;font-size:14px"><tr style="color:var(--dim)"><td>How you use it</td><td>Calls/day</td><td style="text-align:right">Per month</td></tr>'+
+    AI.levels.map(function(l){ var m=Math.round(l[1]*1.5*30), c=AI.price+Math.max(0,m-AI.included)*AI.over; return '<tr style="border-top:1px solid rgba(255,255,255,.08)"><td style="padding:7px 0">'+l[0]+'</td><td>~'+l[1]+'</td><td style="text-align:right"><b>$'+Math.round(c)+'</b></td></tr>'; }).join("")+'</table>';
+  aiBox.appendChild(t);
+  REST.forEach(function(r){ q(aiBox,"ai_"+r.key,"Add the AI phone host at "+r.short+"?",["Yes, missed + after-hours calls","Yes, answer every call","Not now","Let's talk about it"],"You can change this anytime."); });
+})();
+
 function setupDone(path,cb){ var f=document.createElement("iframe"); f.style.display="none"; f.src=path; document.body.appendChild(f);
   f.onload=function(){ var t=""; try{ t=f.contentWindow.SETUP_SUMMARY(); }catch(e){ t="(couldn't read this page's answers)"; } var ls=0; try{ ls=Object.keys(f.contentWindow.localStorage).filter(function(k){ return /setup/.test(k); }).length; }catch(e){} cb(t); setTimeout(function(){ f.remove(); },50); }; }
 function progress(){
@@ -196,6 +210,7 @@ document.getElementById("send").onclick=function(){
     out.push("","LAUNCH WEEK");
     var rows=[["date","Go live"]].concat(REST.map(function(r){ return ["tables_"+r.key,r.short+" tables"]; })).concat([["print","Print"],["ig","IG bio links"],["msgs","Messages go to"],["msghow","Message by"],["fwd","Call forwarding"],["staff","Staff walkthrough"],["assets","Logos & prices"],["gmail","Google email"],["ready","Before launch"]]);
     rows.forEach(function(p){ var v=S[p[0]]; out.push("• "+p[1]+": "+(Array.isArray(v)?v.join(", "):(v||"(no answer)"))); });
+    out.push("","AI PHONE HOST ($"+AI.price+"/mo per restaurant, "+AI.included+" min incl., $"+AI.over.toFixed(2)+"/min after)"); REST.forEach(function(r){ out.push("• "+r.short+": "+(S["ai_"+r.key]||"(no answer)")); });
     out.push(""); REST.forEach(function(r){ out.push(menuSummary(r),""); });
     sums.forEach(function(t){ out.push("","==================","",t); });
     var txt=out.join("\n"); btn.textContent="✅ Send everything to Antidote";

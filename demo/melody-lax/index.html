@@ -457,37 +457,43 @@ var RUN=0;
 function start(){ var keep=G.clouds, posted=G.posted; G=fresh(); G.clouds=keep; G.posted=posted; G.runId=++RUN; G.running=true; G.last=performance.now(); seedGround(); $("over").classList.remove("on"); hud(); }
 
 /* ---- the ground: Westchester at night, LAX runways and the landmarks rolling under you ---- */
-var SEQ=["city","theme","city","melody","innout","city","sofi","city","crypto","city","hollywood","city","coast","venice","vsign","coast","pier","coast","city","melody","innout"];
+var SEQ=["city","theme","city","melody","innout","city","sofi","city","crypto","hills","hollywood","hills","coast","venice","coast","pier","city","melody","innout"];
 var COAST={coast:1,venice:1,vsign:1,pier:1};
 var LBL={venice:"★ NALU VIDA · VENICE PIER ★",vsign:"Venice Beach",theme:"LAX Theme Building",melody:"★ MELODY BAR & GRILL ★",innout:"In-N-Out Burger",sofi:"SoFi Stadium",crypto:"Crypto.com Arena",hollywood:"Hollywood Sign",pier:"Santa Monica Pier"};
-function seedGround(){ G.ground=[]; G.gy=H+100; G.seq=0; G.ground.push({k:"runway",y:G.gy-520,h:520,side:1}); G.gy-=520; while(G.gy>-400) addSeg(); }
-function addSeg(){ var k=G.landing&&!G.rwyQueued?(G.rwyQueued=1,"runway"):SEQ[G.seq++%SEQ.length], h=k==="runway"?520:k==="city"?260:k==="hollywood"?240:k==="coast"?200:300; G.gy-=h; G.ground.push({k:k,y:G.gy,h:h,side:Math.random()<.5?-1:1}); }
+function seedGround(){ G.ground=[]; G.gy=H+100; G.seq=0; G.ground.push({k:"runway",t:"city1",y:G.gy-520,h:520,side:1}); G.gy-=520; while(G.gy>-400) addSeg(); }
+// photoreal aerial ground (dusk): every segment is a full-width aerial tile; landmark sprites sit on top of a city tile
+var TILE_OF={city:["city1","city2"],theme:["city2"],melody:["city1"],innout:["city2"],sofi:["city1"],crypto:["city2"],hills:["hills"],hollywood:["hollywood"],coast:["venicecoast"],venice:["nalu"],pier:["smpier"]};
+var TILES={}, TILE_FEATHER=56;
+["city1","city2","hills","hollywood","venicecoast","nalu","smpier"].forEach(function(k){ var i=img("img/game/ground/"+k+".jpg"); i.onload=function(){ // pre-render once: the tile's own bottom edge fades out over the tile below
+  var w=W*2, h=Math.round(w*i.naturalHeight/i.naturalWidth), F=TILE_FEATHER*2, c=document.createElement("canvas"); c.width=w; c.height=h; var x=c.getContext("2d"); x.drawImage(i,0,0,w,h);
+  x.globalCompositeOperation="destination-out"; var gr=x.createLinearGradient(0,h-F,0,h); gr.addColorStop(0,"rgba(0,0,0,0)"); gr.addColorStop(1,"rgba(0,0,0,1)"); x.fillStyle=gr; x.fillRect(0,h-F,w,F);
+  TILES[k]={c:c,h:(h-F)/2}; }; });   // tiles are spaced by their height minus the fade, so the fade overlaps the tile below
+var tileN=0; window.__TILES=TILES;
+function addSeg(){ var k=G.landing&&!G.rwyQueued?(G.rwyQueued=1,"runway"):SEQ[G.seq++%SEQ.length];
+  if(k==="runway"){ G.gy-=520; G.ground.push({k:k,t:"city2",y:G.gy,h:520,side:1}); return; }
+  var opts=TILE_OF[k]||["city1"], t=opts[(tileN++)%opts.length], h=TILES[t]?TILES[t].h:600; G.gy-=h; G.ground.push({k:k,t:t,y:G.gy,h:h,side:Math.random()<.5?-1:1}); }
 function drawGround(dy){
   cx.fillStyle="#0c1220"; cx.fillRect(0,0,W,H);
   for(var i=G.ground.length-1;i>=0;i--){ var g=G.ground[i]; g.y+=dy; if(g.y>H+40){ G.ground.splice(i,1); continue; } }
   while(G.ground.length&&G.ground[G.ground.length-1].y>-420) { G.gy=G.ground[G.ground.length-1].y; addSeg(); }
-  // street grid with warm streetlights everywhere
-  var off=(G.scroll%80);
-  cx.strokeStyle="#1b2438"; cx.lineWidth=10;
-  for(var y=off-80;y<H+80;y+=80){ cx.beginPath(); cx.moveTo(0,y); cx.lineTo(W,y); cx.stroke(); }
-  for(var x=40;x<W;x+=110){ cx.beginPath(); cx.moveTo(x,0); cx.lineTo(x,H); cx.stroke(); }
-  for(y=off-80;y<H+80;y+=80) for(x=40;x<W;x+=110){ cx.fillStyle="rgba(255,190,90,.55)"; cx.beginPath(); cx.arc(x+6,y+6,1.6,0,6.283); cx.fill(); }
-  for(y=off-80;y<H+80;y+=80) for(x=55;x<W;x+=110){ cx.fillStyle="#141c2e"; cx.fillRect(x,y+10,80,58); cx.fillStyle="rgba(255,214,140,.10)"; cx.fillRect(x+8,y+18,16,10); cx.fillRect(x+50,y+40,14,10); }
-  // Venice / Santa Monica coastline: the Pacific on the left with rolling whitecaps, a strip of sand, then the boardwalk
+  // aerial tiles, bottom to top so each upper tile's soft edge lays over the one below
   var tW=performance.now();
-  G.ground.forEach(function(g){ if(!COAST[g.k]) return; var sx=W*0.46, top=g.y-2, hh=g.h+4;
-    var og=cx.createLinearGradient(0,0,sx,0); og.addColorStop(0,"#06243f"); og.addColorStop(.75,"#0b4b6e"); og.addColorStop(1,"#1a7a8f"); cx.fillStyle=og; cx.fillRect(0,top,sx,hh);
-    cx.fillStyle="#d9c08e"; cx.fillRect(sx,top,W*0.1,hh); cx.fillStyle="rgba(120,90,50,.25)"; cx.fillRect(sx+W*0.1-6,top,6,hh);
-    cx.strokeStyle="rgba(235,248,255,.55)"; cx.lineWidth=2;
-    for(var wv=0;wv<5;wv++){ var wx=sx-8-wv*26-((tW/40+wv*13)%26); cx.beginPath(); for(var yy=top;yy<top+hh;yy+=8){ var xx=wx+Math.sin((yy+tW/12+wv*40)/22)*4; yy===top?cx.moveTo(xx,yy):cx.lineTo(xx,yy); } cx.globalAlpha=.25+.15*wv/5; cx.stroke(); }
-    cx.globalAlpha=1; cx.fillStyle="rgba(255,255,255,.6)"; for(var f=top;f<top+hh;f+=14){ cx.fillRect(sx-3+Math.sin((f+tW/9)/15)*2,f,3,7); } });
+  G.ground.forEach(function(g){ var T=TILES[g.t]; if(!T) return; cx.drawImage(T.c,0,g.y,W,T.c.height/2); });
+  // Nalu Vida's LED glow pulses on the lit Venice tile
+  G.ground.forEach(function(g){ if(g.t!=="nalu") return; var gx=W*.74, gy=g.y+g.h*.12, p=.55+.45*Math.sin(tW/260)*Math.sin(tW/610);
+    var gr=cx.createRadialGradient(gx,gy,4,gx,gy,70); gr.addColorStop(0,"rgba(255,170,90,"+(.45*p)+")"); gr.addColorStop(.5,"rgba(80,170,255,"+(.25*p)+")"); gr.addColorStop(1,"rgba(80,170,255,0)");
+    cx.save(); cx.globalCompositeOperation="lighter"; cx.fillStyle=gr; cx.fillRect(gx-80,gy-80,160,160); cx.restore(); });
   G.ground.forEach(function(g){
     if(g.k==="runway") drawRunway(g);
-    else if(g.k!=="city"&&g.k!=="coast"){ var im=S[g.k]; if(ready(im)){ var w=g.k==="melody"?250:g.k==="hollywood"?300:g.k==="sofi"?270:230, h=w*im.naturalHeight/im.naturalWidth, x=(g.k==="venice"||g.k==="pier")?W*0.32-w/2:g.k==="vsign"?W*0.74-w/2:W/2+g.side*70-w/2;
+    else if(g.k==="hollywood"||g.k==="venice"||g.k==="pier"||g.k==="coast"){ var L2={hollywood:["Hollywood Sign",.52,.66],venice:["★ NALU VIDA · VENICE PIER ★",.62,.36],pier:["Santa Monica Pier",.32,.56],coast:["Venice Beach",.7,.5]}[g.k];
+      cx.font="800 13px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.85)"; cx.strokeText(L2[0],W*L2[1],g.y+g.h*L2[2]); cx.fillStyle=g.k==="venice"?"#f0d375":"#e8eefc"; cx.fillText(L2[0],W*L2[1],g.y+g.h*L2[2]); }
+    else if(g.k!=="city"&&g.k!=="hills"){ var im=S[g.k]; if(ready(im)){ var w=g.k==="melody"?250:g.k==="hollywood"?300:g.k==="sofi"?270:230, h=w*im.naturalHeight/im.naturalWidth, x=(g.k==="venice"||g.k==="pier")?W*0.32-w/2:g.k==="vsign"?W*0.74-w/2:W/2+g.side*70-w/2;
       cx.save(); cx.globalAlpha=.95; cx.drawImage(im,x,g.y+(g.h-h)/2,w,h); cx.restore();
       if(LBL[g.k]){ cx.font="800 13px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.8)"; cx.strokeText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); cx.fillStyle=(g.k==="melody"||g.k==="venice")?"#f0d375":"#e8eefc"; cx.fillText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); } } }
   });
 }
+function groundDepth(){ var hz=cx.createLinearGradient(0,0,0,H*.45); hz.addColorStop(0,"rgba(16,26,52,.55)"); hz.addColorStop(1,"rgba(16,26,52,0)"); cx.fillStyle=hz; cx.fillRect(0,0,W,H*.45);
+  var vg=cx.createRadialGradient(W/2,H*.62,H*.3,W/2,H*.62,H*.85); vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,"rgba(0,0,0,.35)"); cx.fillStyle=vg; cx.fillRect(0,0,W,H); }
 // LAX-style runway: worn asphalt, real markings, edge/threshold/end lights, approach-light "rabbit", PAPI, a taxiway, and ground crew waving wands
 var RWT=null;
 function runwayTex(w,h){ // asphalt with grain, patching and rubber build-up in the touchdown zone, made once
@@ -626,7 +632,7 @@ function frame(now){
   G.scroll+=spd*k;
   cx.save(); if(G.shake>0){ cx.translate((Math.random()-.5)*G.shake,(Math.random()-.5)*G.shake); G.shake*=.86; if(G.shake<.5) G.shake=0; }
   if(!G.ground.length) seedGround();
-  drawGround(spd*k);
+  drawGround(spd*k); groundDepth();
   if(run){
     G.t-=dt; G.el+=dt;
     if(!takeoff&&!landing){

@@ -12,6 +12,10 @@
      CRM_CFG.tiers = [[250,"Free fries"],[500,"Free shake"],...]      (points → reward)
      CRM_CFG.perDollar = 10                                              (points per $1)
      CRM_CFG.referral = {join:50, first:100, every:20, goal:3, gift:"Free fries"}
+   Ways to earn (CRM_CFG.earn, see the EARN block for every key): QR check-in bonus once a day, first-order bonus, in-app
+   feedback bonus (any rating; never for Google/Yelp reviews), Instagram follow, birthday bonus, referral (friend joins →
+   points, friend gets REF.friendGift, referrer earns on every order that friend places). A "How to earn" sheet opens once
+   when a guest first reaches the rewards card (not on load) and once right after joining; "Ways to earn" reopens it.
    Contact info is asked only when it's needed: SSAI_GATE("order" | "prize" | "score", cb) wraps sending an order,
    saving a game prize and posting a score. Members go straight through; everyone else fills a short sheet first.
    Nothing pops up on load asking for contact info; the join card stays as an optional "join anytime". */
@@ -36,8 +40,46 @@
   function levelOf(m) { var v = monthVisits(m), L = LEVELS[0]; LEVELS.forEach(function (l) { if (v >= l.visits) L = l; }); return L; }
   function nextLevel(m) { var v = monthVisits(m); return LEVELS.filter(function (l) { return l.visits > v; })[0] || null; }
   // one visit per day counts; points earned on that visit get the level's multiplier
-  function visit(m, pts) { var now = Date.now(), last = (m.vlog || [])[0]; if (!last || new Date(last).toDateString() !== new Date(now).toDateString()) (m.vlog = m.vlog || []).unshift(now); m.vlog = m.vlog.slice(0, 60); return Math.round(pts * levelOf(m).mult); }
+  // a new day's visit also pays the check-in bonus, and the member's very first order pays the first-order bonus
+  function visit(m, pts) {
+    var now = Date.now(), last = (m.vlog || [])[0]; lastBonus = 0;
+    if (!last || new Date(last).toDateString() !== new Date(now).toDateString()) { (m.vlog = m.vlog || []).unshift(now); if (EARN.checkin) { addPts(m, EARN.checkin, "📲 Showed your QR · visit bonus"); tag(m, "checkin_bonus"); lastBonus += EARN.checkin; } }
+    lastBonus += earnOnce(m, "first_order", EARN.firstOrder, "🥇 First order bonus");
+    m.vlog = m.vlog.slice(0, 60); return Math.round(pts * levelOf(m).mult);
+  }
   for (var rk in (C.referral || {})) REF[rk] = C.referral[rk];
+  // ---- ways to earn: every guest always has a next thing to do for points ----
+  // CRM_CFG.earn overrides any of these per restaurant (sample defaults). The "How to earn" sheet puts each one next to
+  // the first reward (TIERS[0]) so a guest reads "Fries = 1,000 pts · feedback = +250 · refer a friend = +150".
+  // Bonuses land in the ledger with k: checkin_bonus, first_order_bonus, review_bonus, ig_bonus, birthday_bonus,
+  // referral_join, referral_order, so the owner view and CSV can count them.
+  //   checkin:    pts once per day when staff scan the member's QR / 4-digit code (rides visit() above)
+  //   firstOrder: one-time bonus on the member's first order (QR/code at the register or an in-app order)
+  //   review:     {pts, platform: "app" | "google" | "yelp", url}. Once per member. platform "app" (default) pays for
+  //               honest in-app feedback at ANY star rating: the rating never changes the points. Afterwards a Google /
+  //               Yelp link (url, or a Google Maps search for the business) is offered to EVERYONE with no points attached.
+  //               COMPLIANCE: Google's review policy prohibits offering incentives for Google reviews (reviews get removed,
+  //               the listing can be flagged); Yelp prohibits asking for or rewarding reviews; the FTC rule on reviews
+  //               (16 CFR 465) bans rewards conditioned on positive sentiment. Showing the Google link only to happy raters
+  //               is "review gating", which Google also bans, so the link shows the same for 1 star or 5.
+  //               An owner who sets platform "google"/"yelp" anyway pays for the act of reviewing (honor system), still
+  //               never tied to the rating, but that alone can get their reviews removed. Keep "app" unless told otherwise.
+  //   instagram:  {pts, url}: follow once, honor system. Hidden when no url is set (never guess a handle).
+  //   birthday:   pts on the birthday itself (on top of the birthday treat), once a year
+  //   referral:   merged into REF: join = referrer's pts per friend who joins, friend = pts the friend gets for joining,
+  //               friendGift = what the friend gets free with their first order, first = referrer's pts on that friend's
+  //               first order, every = referrer's pts EVERY time that friend orders after that. friendGift is never alcohol
+  //               (California ABC: no free alcoholic drinks as a promotion).
+  var EARN = { checkin: 50, firstOrder: 100, birthday: 100, review: { pts: 250, platform: "app", url: "" }, instagram: { pts: 50, url: "" }, referral: {} };
+  (function (x) { for (var k in x) { var a = EARN[k], b = x[k]; if (a && b && typeof a === "object" && typeof b === "object") { for (var j in b) a[j] = b[j]; } else EARN[k] = b; } })(C.earn || {});
+  if (!(C.referral && C.referral.join)) REF.join = 150;
+  if (REF.friend == null) REF.friend = 50;
+  if (!REF.friendGift) REF.friendGift = "Free soft drink";
+  for (rk in EARN.referral) REF[rk] = EARN.referral[rk];
+  function reviewUrl() { var N = window.NEARBY, sp = N && N.spots && N.spots[0]; return EARN.review.url || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(NAME + (sp && sp.q ? " " + sp.q : "")); }
+  var lastBonus = 0;   // bonus pts added by the last visit() call, for the toast
+  function earnOnce(m, key, pts, why) { m.earned = m.earned || {}; if (m.earned[key] || !pts) return 0; m.earned[key] = Date.now(); addPts(m, pts, why); tag(m, key.replace(/_\d+$/, "") + "_bonus"); return pts; }
+  function tag(m, k) { m.ledger[0].k = k; (m.ec = m.ec || {})[k] = (m.ec[k] || 0) + 1; }
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   var MONTHS_L = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   // birthday: full date so the treat lands on the real day; staff check a photo ID with the same date before giving it out
@@ -120,6 +162,16 @@
     ".crm-gbd summary{cursor:pointer;padding:11px 0;font-size:14px;font-weight:700;color:#D7A6FF;list-style:none}.crm-gbd summary::-webkit-details-marker{display:none}",
     ".crm-gbd summary:after{content:'+';float:right;font-weight:900;color:#9AA6CC}.crm-gbd[open] summary:after{content:'–'}.crm-gbd[open]{padding-bottom:10px}",
     ".crm-gx{display:block;margin:10px auto 0;border:0;background:none;color:#9AA6CC;font-size:14px;font-weight:700;text-decoration:underline;cursor:pointer;padding:6px 12px}",
+    // ways-to-earn sheet + link
+    ".crm-elink{display:block;width:100%;margin-top:8px;border:0;background:none;color:#FFD23F;font-size:14px;font-weight:800;text-align:left;padding:6px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}",
+    ".crm-egoal{display:flex;justify-content:space-between;align-items:center;gap:10px;background:linear-gradient(135deg,#E8582A,#FFD23F);color:#1a0d00;border-radius:14px;padding:10px 14px;margin:6px 0 10px;font-weight:800;font-size:15px}.crm-egoal b{font-size:20px;white-space:nowrap}",
+    ".crm-er{display:grid;grid-template-columns:30px 1fr auto;gap:2px 10px;align-items:start;padding:10px 0;border-top:1px solid #25336A}",
+    ".crm-er .ic{font-size:22px;line-height:1.2}.crm-er .tx b{display:block;font-size:14.5px;color:#EEF2FF}.crm-er .tx small{display:block;font-size:12.5px;color:#9AA6CC;line-height:1.35;margin-top:2px}",
+    ".crm-er .pp{font:900 15px system-ui;color:#3DDC97;white-space:nowrap}.crm-er.done .pp{color:#9AA6CC;font-size:12.5px}",
+    ".crm-er .bt{grid-column:2/4}.crm-er .bt button{margin-top:6px;border:1px solid #25336A;background:#1a2656;color:#EEF2FF;border-radius:11px;padding:9px 12px;font-size:13.5px;font-weight:800;cursor:pointer}.crm-er .bt button.hot{background:#FFD23F;border-color:#FFD23F;color:#070B1E}",
+    ".crm-fbk:not(:empty){background:#070B1E;border:1px solid #25336A;border-radius:14px;padding:12px;margin-top:10px}.crm-fbk h4{margin:0 0 8px;font-size:15px}",
+    ".crm-fbk textarea{width:100%;min-height:70px;font-size:16px;color:#EEF2FF;background:#121C40;border:1px solid #25336A;border-radius:10px;padding:10px;margin-top:8px;resize:vertical}",
+    ".crm-stars{display:flex;gap:6px}.crm-stars button{flex:1;border:1px solid #25336A;background:#121C40;color:#3A4675;border-radius:10px;font-size:24px;padding:4px 0;cursor:pointer}.crm-stars button.on{color:#FFD23F;border-color:#FFD23F}",
     "@media (max-width:400px){.crm-stats{grid-template-columns:repeat(2,1fr)}}"
   ].join("");
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
@@ -250,12 +302,14 @@
     var me = mine()[0];
     if (me) {
       if (!me.id) { me.id = code4(8); me.ref = me.ref || refCode(me.name); me.friends = me.friends || []; me.ledger = me.ledger || []; put(me); }
+      if (me.bday >= 0 && isBday(me) && earnOnce(me, "birthday_" + new Date().getFullYear(), EARN.birthday, "🎂 Birthday bonus")) put(me);
       var pts = me.stars || 0, fr = me.friends || [], fo = fr.reduce(function (a, f) { return a + f.orders; }, 0);
       var refPts = (me.ledger || []).filter(function (l) { return l.ref; }).reduce(function (a, l) { return a + l.pts; }, 0);
       var first = e(me.name.split(" ")[0]);
       join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards</span><h3>Hey ' + first + '! 👋</h3>' +
         (activeWin(me) ? '<div class="crm-win" style="border-color:#3DDC97"><div style="font-size:30px">' + (activeWin(me).k === "missed" ? '📞' : '🏆') + '</div><b>' + (activeWin(me).k === "missed" ? 'Sorry we missed your call! Here\'s ' + e(activeWin(me).t) : 'You won ' + e(activeWin(me).t) + '!') + '</b><div class="code">' + e(activeWin(me).c) + '</div><small>Show this code at ' + e(NAME) + ' to redeem it. Use by <b>' + e(until(activeWin(me))) + '</b>. One reward per visit; win again after you use this one.</small></div><div style="height:10px"></div>' : '') +
         '<div class="crm-win"><div style="font-size:30px">🎁</div><b>' + e(me.offer || OFFER) + '</b><div class="code">' + e(me.code) + '</div><small>Your welcome reward. Show this at the counter.</small></div>' +
+        (me.fgift && !me.fgift.used ? '<div class="crm-win" style="margin-top:10px;border-color:#3DDC97"><div style="font-size:30px">🤝</div><b>Friend gift: ' + e(me.fgift.t) + '</b><div class="code">' + e(me.fgift.c) + '</div><small>Because a friend invited you. Show this code with your first order.</small></div>' : '') +
         (me.bday >= 0 ? (isBday(me) || me.bdemo ? '<div class="crm-win bd"><div style="font-size:30px">🎂</div><b>Happy birthday, ' + first + '! Your free birthday treat is unlocked</b><div class="code">' + e(me.bcode || "BDAY") + '</div><small>Show this code with a photo ID that says ' + e(bdayStr(me)) + '. Good for 7 days.</small></div>'
           : '<div class="crm-bday"><h4>🎂 Birthday treat · ' + e(bdayStr(me)) + '</h4><div style="font-size:13px;color:#C9D2EE">It unlocks on your birthday and we\'ll text you a reminder that morning. To claim it, bring a photo ID that matches this date.</div><button type="button" class="crm-demo" data-a="bday">▶ Demo: it\'s my birthday</button></div>') : '') +
         // visit level this month
@@ -269,6 +323,7 @@
           '<button type="button" class="crm-scan" data-a="scan">📲 Scan to earn</button></div>' +
           '<div class="crm-qr"><div class="qr"></div><div class="d4">' + regCode(me) + '</div><small>Show this to the cashier or bartender, or scan it at the register.<br>They ring you up and your points land here. Code refreshes every 5 min.</small></div>' +
           '<p style="margin:10px 0 0;font-size:13px">Earn <b style="color:#FFD23F">' + PER + ' points for every $1</b> you spend in store or in the app.</p>' +
+          '<button type="button" class="crm-elink" data-a="earn">✨ Ways to earn points →</button>' +
           '<button type="button" class="crm-demo" data-a="ring">▶ Demo: the cashier rings you up</button>' +
           '<div class="crm-rcode"><input placeholder="Got a receipt? Type its code" maxlength="20"><button type="button" data-a="receipt">Add</button></div></div>' +
         // rewards
@@ -279,8 +334,8 @@
         // referrals
         '<div class="crm-box" id="crm-ref"><h4>🤝 Invite friends, earn forever</h4><div class="crm-refcode">' + e(me.ref) + '</div>' +
           '<div class="crm-acts" style="margin-top:0"><button type="button" class="hot" data-a="text">💬 Text a friend</button><button type="button" data-a="copy">📋 Copy invite link</button></div>' +
-          '<ul class="crm-rules" style="margin-top:12px"><li><span>👋 A friend joins with your code</span><b>+' + REF.join + ' pts</b></li><li><span>🛒 Their first order</span><b>+' + REF.first + ' pts</b></li>' +
-          '<li><span>🔁 Every order after that, for as long as they\'re a customer</span><b>+' + REF.every + ' pts</b></li><li><span>🎁 ' + REF.goal + ' friends join</span><b>' + e(REF.gift) + '</b></li></ul>' +
+          '<ul class="crm-rules" style="margin-top:12px"><li><span>👋 A friend joins with your code</span><b>+' + REF.join + ' pts</b></li><li><span>🎁 Your friend gets ' + e(REF.friendGift) + ' with their first order</span><b>+' + REF.friend + ' pts</b></li><li><span>🛒 Their first order</span><b>+' + REF.first + ' pts</b></li>' +
+          '<li><span>🔁 You earn when they spend: every order they place after that, for as long as they\'re a customer</span><b>+' + REF.every + ' pts</b></li><li><span>🎁 ' + REF.goal + ' friends join</span><b>' + e(REF.gift) + '</b></li></ul>' +
           '<div style="font-size:13px;color:#9AA6CC">' + Math.min(fr.length, REF.goal) + ' of ' + REF.goal + ' friends toward ' + e(REF.gift) + (fr.length >= REF.goal ? ' ✅' : '') + '</div><div class="crm-goal"><i style="width:' + Math.min(100, fr.length / REF.goal * 100) + '%"></i></div>' +
           '<div class="crm-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:4px"><div><b>' + fr.length + '</b>friends</div><div><b>' + fo + '</b>their orders</div><div><b>' + refPts.toLocaleString() + '</b>pts earned</div></div>' +
           '<button type="button" class="crm-demo" data-a="friend">▶ Demo: a friend joins with your code</button>' +
@@ -306,12 +361,12 @@
           var t = TIERS[+b.dataset.redeem]; if (m.stars < t[0]) return;
           addPts(m, -t[0], "🎟️ Redeemed: " + t[1]); m.redeem = { t: t[1], c: "R-" + code4(4) }; put(m); drawJoin(); drawOwn(); toast("🎟️ " + t[1] + " is ready. Show your code."); return;
         }
-        if (a === "bday") { m.bdemo = true; m.bcode = "BDAY-" + code4(4); m.ledger = m.ledger || []; m.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎂 Birthday treat unlocked (text sent)" }); put(m); drawJoin(); toast("💬 Text sent: Happy birthday " + m.name.split(" ")[0] + "! Your treat is waiting 🎂"); return; }
+        if (a === "bday") { m.bdemo = true; m.bcode = "BDAY-" + code4(4); m.ledger = m.ledger || []; m.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎂 Birthday treat unlocked (text sent)" }); earnOnce(m, "birthday_" + new Date().getFullYear(), EARN.birthday, "🎂 Birthday bonus"); put(m); drawJoin(); toast("💬 Text sent: Happy birthday " + m.name.split(" ")[0] + "! Your treat is waiting 🎂"); return; }
         if (a === "scan") { if (qr.style.display === "block") qr.style.display = "none"; else showQR(); return; }
         if (a === "ring") {
           var amt = Math.round((12 + Math.random() * 26) * 100) / 100, got = visit(m, amt * PER);
           addPts(m, got, "🧾 In-store order $" + amt.toFixed(2) + " · code " + regCode(m)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m);
-          drawJoin(true); drawOwn(); toast("+" + got + " points · $" + amt.toFixed(2) + " order"); return;
+          drawJoin(true); drawOwn(); toast("+" + got + " points · $" + amt.toFixed(2) + " order" + (lastBonus ? " · +" + lastBonus + " bonus" : "")); return;
         }
         if (a === "receipt") {
           var inp = join.querySelector(".crm-rcode input"), v = inp.value.trim().toUpperCase();
@@ -320,12 +375,12 @@
           m.receipts.push(v); var ra = Math.round((9 + Math.random() * 22) * 100) / 100, rg = Math.round(ra * PER);
           addPts(m, rg, "🧾 Receipt " + v + " · $" + ra.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); toast("+" + rg + " points from your receipt"); return;
         }
-        if (a === "text") { location.href = "sms:?&body=" + encodeURIComponent("Join " + NAME + " Rewards with my code " + m.ref + " and we both get " + REF.join + " points 🎁 " + shareLink(m)); return; }
+        if (a === "text") { location.href = "sms:?&body=" + encodeURIComponent(inviteMsg(m)); return; }
         if (a === "copy") { var L = shareLink(m); (navigator.clipboard ? navigator.clipboard.writeText(L) : Promise.reject()).then(function () { toast("Invite link copied"); }, function () { prompt("Copy your invite link:", L); }); return; }
         if (a === "friend") {
           var used = m.friends.map(function (f) { return f.name; }), pool = FRIENDS.filter(function (n) { return used.indexOf(n) < 0; }), nm = pool.length ? pool[(Math.random() * pool.length) | 0] : "Friend " + (used.length + 1);
           m.friends.unshift({ name: nm, ts: Date.now(), orders: 0 });
-          addPts(m, REF.join, "👋 " + nm + " joined with your code"); m.ledger[0].ref = 1;
+          addPts(m, REF.join, "👋 " + nm + " joined with your code"); m.ledger[0].ref = 1; tag(m, "referral_join");
           if (m.friends.length === REF.goal) { m.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎁 " + REF.goal + " friends joined: " + REF.gift + " unlocked", ref: 1 }); toast("🎁 " + REF.gift + " unlocked!"); }
           else toast("+" + REF.join + " points · " + nm + " joined");
           put(m); drawJoin(); drawOwn(); return;
@@ -333,9 +388,10 @@
         if (a === "forder") {
           if (!m.friends.length) return;
           var f = m.friends[(Math.random() * m.friends.length) | 0], firstOrder = f.orders === 0, p2 = firstOrder ? REF.first : REF.every; f.orders++;
-          addPts(m, p2, (firstOrder ? "🛒 " + f.name + "'s first order" : "🔁 " + f.name + " ordered again")); m.ledger[0].ref = 1; put(m);
+          addPts(m, p2, (firstOrder ? "🛒 " + f.name + "'s first order" : "🔁 " + f.name + " ordered again")); m.ledger[0].ref = 1; tag(m, "referral_order"); put(m);
           drawJoin(); drawOwn(); toast("+" + p2 + " points · " + f.name + " ordered"); return;
         }
+        if (a === "earn") { openEarn(); return; }
         if (a === "owner") own.scrollIntoView({ behavior: "smooth", block: "start" });
       };
       return;
@@ -344,9 +400,10 @@
     join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards · free · join anytime</span>' +
       (pw ? '<div class="crm-invited" style="border-color:#FFD23F;background:#FFD23F22;color:#FFE9A3">🏆 You won <b>' + e(pw.t) + '</b> in the game! Join below to save it, then show it at ' + e(NAME) + ' to redeem.</div>' : '') +
       (MISSED ? '<div class="crm-invited" style="border-color:#7FB3FF;background:#7FB3FF22;color:#DCE8FF">📞 Sorry we missed your call! Join below with your name and phone or email and get <b>' + e(MC.offer) + '</b> on your next visit. Just show your code at the counter.</div>' : '') +
-      (INVITE ? '<div class="crm-invited">🤝 ' + e(inviter) + ' invited you! Join with code <b>' + e(INVITE) + '</b> and you get <b>+' + REF.join + ' bonus points</b>.</div>' : '') +
+      (INVITE ? '<div class="crm-invited">🤝 ' + e(inviter) + ' invited you! Join with code <b>' + e(INVITE) + '</b> and you get <b>' + e(REF.friendGift) + '</b> with your first order + <b>' + REF.friend + ' bonus points</b>.</div>' : '') +
       '<div class="crm-gift"><b>🎁</b><span>Join now and get <u>' + e(OFFER) + '</u> instantly</span></div>' +
       '<h3>Unlock your reward</h3><p>Plus ' + PER + ' points for every $1, a birthday treat, and your own code to invite friends. Takes 10 seconds.</p>' +
+      '<button type="button" class="crm-elink" data-a="earn" style="margin:-4px 0 4px">✨ See every way to earn →</button>' +
       '<form autocomplete="on" novalidate><label>First name</label><input name="name" maxlength="40" autocomplete="given-name">' +
       '<div class="two"><div><label>Phone</label><input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(310) 555-0123"></div>' +
       '<div><label>or Email</label><input name="email" type="email" maxlength="120" autocomplete="email"></div></div>' +
@@ -358,12 +415,13 @@
       '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Text / email me rewards and specials from ' + e(NAME) + '. Msg & data rates may apply. Reply STOP anytime.</span></label>' +
       '<button class="go" type="submit">🎁 Get my reward</button><div class="err"></div></form>' +
       '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + '</p>';
-    join.onclick = null;
+    join.onclick = function (ev) { var b = ev.target.closest("[data-a=earn]"); if (b) openEarn(); };
     join.querySelector("form").onsubmit = function (ev) {
       ev.preventDefault();
       var res = createMember(this);
       if (res.err) { this.querySelector(".err").textContent = res.err; return; }
       drawJoin(); drawOwn("all", true);
+      if (earnSeen() !== "m") setTimeout(function () { openEarn(); }, 700);   // the member version, once, right after joining
     };
   }
 
@@ -381,7 +439,8 @@
       var r = { id: code4(8), name: v("name"), phone: v("phone"), email: v("email"), bday: v("bday") === "" ? -1 : +v("bday"), bdd: +v("bdd") || 0, bdy: +v("bdy") || 0, visits: 1, stars: 0, last: Date.now(), joined: Date.now(), code: code(), offer: OFFER,
         ref: refCode(v("name")), refBy: rc, refByName: rc ? (byName || "code " + rc) : "", friends: [], ledger: [] };
       addPts(r, 100, "🎉 Welcome to " + NAME + " Rewards");
-      if (rc) addPts(r, REF.join, "🤝 Joined with " + (byName ? byName.split(" ")[0] + "'s" : "a friend's") + " code");
+      if (rc) { addPts(r, REF.friend, "🤝 Joined with " + (byName ? byName.split(" ")[0] + "'s" : "a friend's") + " code"); tag(r, "referred_bonus");
+        r.fgift = { t: REF.friendGift + " with your first order", c: "FRIEND-" + code4(4), ts: Date.now() }; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎁 Friend gift: " + r.fgift.t }); }
       var pz = pending(); if (pz) { r.wins = [pz]; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "🏆 Won " + pz.t + " in the game" }); try { localStorage.removeItem(PEND); } catch (x) {} }
       else if (MISSED) { r.wins = [{ t: MC.offer, c: "CALL-" + code4(4), ts: Date.now(), ttl: (MC.days || 7) * 864e5, k: "missed" }]; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "📞 Sorry we missed your call: " + MC.offer }); r.src = "missed call"; }
       var list = mine(); list.unshift(r); save(list.slice(0, 5));
@@ -411,7 +470,7 @@
     var ov = document.createElement("div"); ov.className = "crm-gate"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", rid); ov.setAttribute("data-scroll-ok", "");
     ov.innerHTML = '<section class="crm-card"><span class="k">' + e(NAME) + ' Rewards · free</span><h3 id="' + rid + '">' + e(T[0]) + '</h3><p>' + e(T[1]) + '</p>' +
       '<div class="crm-gift"><b>🎁</b><span>You also get <u>' + e(OFFER) + '</u> + 100 points</span></div>' +
-      (INVITE ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: +' + REF.join + ' bonus points.</div>' : '') +
+      (INVITE ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: ' + e(REF.friendGift) + ' with your first order + ' + REF.friend + ' bonus points.</div>' : '') +
       '<form autocomplete="on" novalidate><label>First name</label><input name="name" maxlength="40" autocomplete="given-name" enterkeyhint="next">' +
       '<div class="two"><div><label>Phone</label><input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(310) 555-0123"></div>' +
       '<div><label>or Email</label><input name="email" type="email" maxlength="120" autocomplete="email" autocapitalize="none"></div></div>' +
@@ -449,6 +508,120 @@
   }
   gate.member = function () { return mine()[0] || null; };
 
+  // ---- owner: earn activity (bonus counts per kind; sample customers get made-up counts) ----
+  var EK = [["checkin_bonus", "📲 QR check-ins"], ["first_order_bonus", "🥇 First-order bonuses"], ["review_bonus", "⭐ In-app feedback"], ["ig_bonus", "📸 Instagram follows"],
+    ["birthday_bonus", "🎂 Birthday bonuses"], ["referral_join", "🤝 Friends referred"], ["referral_order", "🔁 Orders from referred friends"]];
+  function earnCounts(r, i) {
+    if (!r.sample) return r.ec || {};
+    return { checkin_bonus: r.visits, first_order_bonus: 1, review_bonus: i % 3 === 2 ? 0 : 1, ig_bonus: i % 2, birthday_bonus: r.bday === mo && i % 2 ? 1 : 0, referral_join: r.nfr || 0, referral_order: r.nfo || 0 };
+  }
+  function earnBox(rows) {
+    var tot = {}, pts = { checkin_bonus: EARN.checkin, first_order_bonus: EARN.firstOrder, review_bonus: EARN.review.pts, ig_bonus: EARN.instagram.pts, birthday_bonus: EARN.birthday, referral_join: REF.join, referral_order: REF.every };
+    rows.forEach(function (r, i) { var c = earnCounts(r, i); for (var k in c) tot[k] = (tot[k] || 0) + c[k]; });
+    var fbs = rows.filter(function (r) { return r.fb; });
+    return '<div class="crm-box crm-lead"><h4>✨ Ways-to-earn activity</h4><p style="margin:0;font-size:13px">What your bonus points are buying you. Each one is in the customer\'s ledger and the CSV export.</p>' +
+      EK.filter(function (k) { return k[0] !== "ig_bonus" || EARN.instagram.url; }).map(function (k) { return '<div><span class="r">' + (tot[k[0]] || 0) + '</span><span>' + k[1] + '</span><b style="color:#3DDC97">' + (pts[k[0]] ? '+' + pts[k[0]] + ' each' : '') + '</b></div>'; }).join("") +
+      fbs.map(function (r) { return '<div><span class="r">' + r.fb.s + '★</span><span><b>' + e(r.name) + '</b> · in-app feedback<br><span style="color:#9AA6CC">' + e(r.fb.t || "(no comment)") + '</span></span><b style="color:#3DDC97">+' + EARN.review.pts + '</b></div>'; }).join("") +
+      '<p class="crm-fine" style="margin:8px 0 0">Feedback points never depend on the rating, and no points are offered for Google or Yelp reviews (both platforms ban it).</p></div>';
+  }
+
+  // ---- "How to earn" sheet ----
+  // Opens by itself once: the first time a guest has the rewards card on screen after scrolling or tapping (never on page
+  // load), and once more right after they join (the member version, with working buttons). "Ways to earn" reopens it.
+  var EFLAG = KEY + "_earn_seen", earnEl = null;
+  function earnSeen() { try { return localStorage.getItem(EFLAG) || ""; } catch (x) { return "m"; } }
+  function earnMark(v) { try { localStorage.setItem(EFLAG, v); } catch (x) {} }
+  function inviteMsg(m) { return "Join " + NAME + " Rewards with my code " + m.ref + ": you get " + REF.friendGift + " with your first order + " + REF.friend + " points 🎁 " + shareLink(m); }
+  function copyRef(m) { var L = shareLink(m); (navigator.clipboard ? navigator.clipboard.writeText(L) : Promise.reject()).then(function () { toast("Referral link copied"); }, function () { prompt("Copy your referral link:", L); }); }
+  function openEarn() {
+    if (earnEl || document.querySelector(".crm-gate,.crm-draw")) return false;
+    var m = mine()[0], T0 = TIERS[0], R = EARN.review, IG = EARN.instagram, app = (R.platform || "app") === "app", ed = (m && m.earned) || {}, yr = new Date().getFullYear();
+    earnMark(m ? "m" : "g");
+    function B(a, label, hot) { return '<button type="button" data-e="' + a + '"' + (hot ? ' class="hot"' : '') + '>' + label + '</button>'; }
+    function row(ic, t, p, sub, btn, done) { return '<div class="crm-er' + (done ? ' done' : '') + '"><span class="ic">' + ic + '</span><span class="tx"><b>' + t + '</b><small>' + sub + '</small></span><span class="pp">' + (done ? '✓ Earned' : p) + '</span>' + (btn && !done ? '<span class="bt">' + btn + '</span>' : '') + '</div>'; }
+    var rows = row("📲", "Show your QR every visit", "+" + EARN.checkin, "+" + EARN.checkin + " once a day when staff scan your code, plus " + PER + " pts for every $1 you spend.", m ? B("qr", "📲 Show my QR", 1) : "") +
+      (EARN.firstOrder ? row("🥇", "Your first order", "+" + EARN.firstOrder, "One-time bonus on top of your order points.", "", ed.first_order) : "") +
+      (R.pts ? row("⭐", app ? "Tell us how we did" : "Leave a review", "+" + R.pts, app ? "Honest feedback in the app. Any star rating counts the same: your rating never changes your points. Once per member." : "Once per member, honor system. Your rating never changes your points.", m ? B("review", app ? "⭐ Leave feedback" : "⭐ Leave a review") : "", ed.review) : "") +
+      row("🤝", "Refer a friend", "+" + REF.join, "Per friend who joins. They get " + e(REF.friendGift) + " with their first order + " + REF.friend + " pts. You get +" + REF.first + " on their first order, then +" + REF.every + " every time they order.", m ? B("ref", "📋 Copy my referral link") : "") +
+      (IG.pts && IG.url ? row("📸", "Follow us on Instagram", "+" + IG.pts, "Once, honor system.", m ? B("ig", "📸 Follow") : "", ed.ig) : "") +
+      (EARN.birthday ? row("🎂", "Your birthday", "+" + EARN.birthday, "Bonus points on your birthday, plus your birthday treat (bring a photo ID with the date).",m && !(m.bday >= 0) ? B("bday", "🎂 Add my birthday") : "", ed["birthday_" + yr]) : "") +
+      (C.draw ? row("🎟️", "Daily lucky draw", "Free food", "Open the app once a day for a scratch ticket.", "") : "");
+    var ov = document.createElement("div"); ov.className = "crm-gate crm-earn"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-label", "How to earn points"); ov.setAttribute("data-scroll-ok", "");
+    ov.innerHTML = '<section class="crm-card"><span class="k">' + e(NAME) + ' Rewards</span><h3>How to earn points</h3>' +
+      '<div class="crm-egoal"><span>' + e(T0[1]) + '</span><b>' + T0[0].toLocaleString() + ' pts</b></div>' +
+      '<p style="margin:0 0 6px">' + (m ? 'You have <b style="color:#FFD23F">' + (m.stars || 0).toLocaleString() + ' pts</b>. ' : '') + 'Here\'s every way to get there:</p>' + rows +
+      '<div class="crm-fbk"></div>' +
+      (m ? '<button type="button" class="go" data-e="x">Got it</button>' : '<button type="button" class="go" data-e="join">🎁 Join free to start earning</button><button type="button" class="crm-gx" data-e="x">Not now</button>') +
+      '<p class="crm-fine">Sample numbers: ' + e(NAME) + ' sets the real ones.' + (m ? ' Reopen this anytime from "Ways to earn" in your rewards card.' : '') + '</p></section>';
+    var html = document.documentElement, prevOv = html.style.overflow, fb = ov.querySelector(".crm-fbk");
+    function key(ev) { if (ev.key === "Escape") close(); }
+    function close() { if (!ov.parentNode) return; ov.remove(); earnEl = null; html.style.overflow = prevOv; document.removeEventListener("keydown", key); }
+    function done(t) { m = mine()[0]; drawJoin(); drawOwn(); toast(t); }
+    ov.addEventListener("click", function (ev) {
+      if (ev.target === ov) return close();
+      var b = ev.target.closest("[data-e],[data-s]"); if (!b) return;
+      var a = b.getAttribute("data-e"); m = mine()[0];
+      if (b.hasAttribute("data-s")) { fb.querySelectorAll("[data-s]").forEach(function (x) { x.classList.toggle("on", +x.getAttribute("data-s") <= +b.getAttribute("data-s")); }); fb.setAttribute("data-v", b.getAttribute("data-s")); return; }
+      if (a === "x") return close();
+      if (a === "join") { close(); var f = join.querySelector("form"); join.scrollIntoView({ behavior: "smooth", block: "start" }); if (f) setTimeout(function () { try { f.elements.name.focus({ preventScroll: true }); } catch (x) {} }, 500); return; }
+      if (!m) return;
+      if (a === "qr") { close(); drawJoin(true); var q = join.querySelector(".crm-qr"); if (q) q.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
+      if (a === "ref") return copyRef(m);
+      if (a === "ig") { try { window.open(IG.url, "_blank", "noopener"); } catch (x) {} if (earnOnce(m, "ig", IG.pts, "📸 Followed on Instagram")) { put(m); done("+" + IG.pts + " points · thanks for the follow!"); b.closest(".crm-er").className = "crm-er done"; b.parentNode.remove(); } return; }
+      if (a === "bday") {
+        fb.innerHTML = '<h4>🎂 Your birthday</h4><div class="two"><select data-b="m" aria-label="Birth month"><option value="">Month</option>' + MONTHS_L.map(function (x, i) { return '<option value="' + i + '">' + x + '</option>'; }).join("") + '</select>' +
+          '<select data-b="d" aria-label="Birth day"><option value="">Day</option>' + Array.apply(null, Array(31)).map(function (x, i) { return '<option>' + (i + 1) + '</option>'; }).join("") + '</select></div>' +
+          '<div class="crm-idnote">🪪 Bring a photo ID that matches this date to claim your treat.</div><button type="button" class="go" data-e="bsave">Save birthday</button><div class="err"></div>';
+        fb.scrollIntoView({ behavior: "smooth", block: "nearest" }); return;
+      }
+      if (a === "bsave") {
+        var bm = fb.querySelector("[data-b=m]").value, bd = +fb.querySelector("[data-b=d]").value;
+        if (bm === "" || !bd || new Date(2000, +bm, bd).getMonth() !== +bm) { fb.querySelector(".err").textContent = "Pick a real month and day."; return; }
+        m.bday = +bm; m.bdd = bd; put(m); fb.innerHTML = '<p style="color:#3DDC97;margin:0">🎂 Saved: ' + e(bdayStr(m)) + '. Your bonus lands on the day.</p>'; done("🎂 Birthday saved"); return;
+      }
+      if (a === "review") {
+        if (!app) {
+          // owner chose platform "google"/"yelp": points for the act of reviewing, never for the rating. See the EARN comment:
+          // Google and Yelp both prohibit incentivized reviews, so this can get the listing's reviews removed.
+          try { window.open(reviewUrl(), "_blank", "noopener"); } catch (x) {}
+          fb.innerHTML = '<p style="margin:0 0 8px">Thanks! Say whatever you honestly think. When you\'re done, tap below.</p><button type="button" class="go" data-e="rdone">I left my review</button>'; return;
+        }
+        fb.innerHTML = '<h4>⭐ How was ' + e(NAME) + '?</h4><div class="crm-stars">' + [1, 2, 3, 4, 5].map(function (n) { return '<button type="button" data-s="' + n + '" aria-label="' + n + ' star' + (n > 1 ? 's' : '') + '">★</button>'; }).join("") + '</div>' +
+          '<textarea maxlength="500" placeholder="What did you have? What should we fix or keep? (optional)"></textarea>' +
+          '<div class="crm-idnote">Any rating earns the same +' + R.pts + ' pts. We read every one.</div><button type="button" class="go" data-e="rsend">Send feedback</button><div class="err"></div>';
+        fb.scrollIntoView({ behavior: "smooth", block: "nearest" }); return;
+      }
+      if (a === "rsend" || a === "rdone") {
+        var sv = +fb.getAttribute("data-v") || 0;
+        if (a === "rsend" && !sv) { fb.querySelector(".err").textContent = "Tap a star rating (any rating earns the same points)."; return; }
+        // points are granted BEFORE and REGARDLESS of the rating value: never branch on sv here
+        var got = earnOnce(m, "review", R.pts, app ? "⭐ Left feedback in the app" : "⭐ Left a review");
+        if (a === "rsend") m.fb = { s: sv, t: fb.querySelector("textarea").value.trim().slice(0, 500), ts: Date.now() };
+        put(m);
+        // the public-review link is shown to everyone, with no points attached and no matter the rating (no review gating)
+        fb.innerHTML = '<p style="color:#3DDC97;margin:0 0 6px;font-weight:800">Thank you! ' + (got ? '+' + got + ' points added.' : '') + '</p>' +
+          (app ? '<p style="margin:0;font-size:13px">If you liked it, you can also share it on Google. Totally optional, and there are no points for it. <a href="' + e(reviewUrl()) + '" target="_blank" rel="noopener" style="color:#7FB3FF;font-weight:800">Open Google →</a></p>' : '');
+        var er = ov.querySelector('[data-e="review"]'); if (er) { er.closest(".crm-er").className = "crm-er done"; er.parentNode.remove(); }
+        done(got ? "+" + got + " points · thanks for the feedback!" : "Thanks for the feedback!"); return;
+      }
+    });
+    document.body.appendChild(ov); html.style.overflow = "hidden"; earnEl = ov; document.addEventListener("keydown", key);
+    return true;
+  }
+  window.SSAI_EARN_MENU = openEarn;
+  // auto-open once when the rewards card is on screen after the guest has scrolled or tapped (never on page load)
+  (function () {
+    var inView = false, moved = false, t = 0;
+    function tryAuto() {
+      if (!inView || !moved) return; var s = earnSeen(), m = mine()[0];
+      if (s === "m" || (s === "g" && !m)) return;
+      clearTimeout(t); t = setTimeout(function () { if (inView) openEarn(); }, 900);
+    }
+    function mv() { moved = true; tryAuto(); }
+    window.addEventListener("scroll", mv, { passive: true }); window.addEventListener("pointerdown", mv, { passive: true });
+    if ("IntersectionObserver" in window) new IntersectionObserver(function (en) { inView = en[0].isIntersecting; tryAuto(); }, { threshold: 0.25 }).observe(join);
+  })();
+
   var seg = "all";
   function drawOwn(s, flash) {
     seg = s || seg;
@@ -476,13 +649,14 @@
       '<div class="crm-box"><h4>🧾 Register: add points by code</h4><p style="margin:0 0 8px;font-size:13px">Your cashier or bartender types the customer\'s 4-digit code and the total. Points post to their phone instantly.</p>' +
         '<div class="two"><input data-r="code" inputmode="numeric" maxlength="4" placeholder="4-digit code"><input data-r="amt" inputmode="decimal" placeholder="Total $"></div>' +
         '<button type="button" class="go" style="margin-top:8px;background:#2547B8;box-shadow:none" data-a="reg">Add points</button><div class="err" data-r="msg" style="color:#3DDC97"></div>' +
-        '<h4 style="margin:16px 0 6px">🎟️ Redeem a reward code</h4><p style="margin:0 0 8px;font-size:13px">Guest shows a WIN-, R- or BDAY- code. Apply the matching discount in your POS (Toast, Square…), then mark it used here so it can never be used again. One reward per visit.</p>' +
+        '<h4 style="margin:16px 0 6px">🎟️ Redeem a reward code</h4><p style="margin:0 0 8px;font-size:13px">Guest shows a WIN-, R-, FRIEND- or BDAY- code. Apply the matching discount in your POS (Toast, Square…), then mark it used here so it can never be used again. One reward per visit.</p>' +
         '<input data-r="rcode" placeholder="e.g. WIN-7K3P" maxlength="12" autocapitalize="characters" style="width:100%"><button type="button" class="go" style="margin-top:8px;background:#77242e;box-shadow:none" data-a="redeem">Mark used</button><div class="err" data-r="rmsg"></div>' +
         (mine()[0] ? '<p class="crm-fine" style="margin:4px 0 0">Demo tip: tap "Scan to earn" above to see your code, then enter it here.</p>' : '') + '</div>' +
       '<div class="crm-box crm-lead"><h4>🤝 Top referrers</h4><p style="margin:0;font-size:13px">Customers bringing you new customers. They earn +' + REF.join + ' when a friend joins and +' + REF.every + ' every time that friend orders.</p>' +
         rows.filter(function (r) { return r.nfr || (r.friends && r.friends.length); }).map(function (r) { return { n: r.name, f: r.nfr || r.friends.length, o: r.nfo != null ? r.nfo : r.friends.reduce(function (a, x) { return a + x.orders; }, 0), you: r.you }; })
           .sort(function (a, b) { return b.f - a.f || b.o - a.o; }).slice(0, 6).map(function (x, i) {
             return '<div><span class="r">' + (i + 1) + '</span><span><b>' + e(x.n) + '</b>' + (x.you ? ' <span class="crm-tag t-you">YOU</span>' : '') + '<br><span style="color:#9AA6CC">' + x.f + ' friend' + (x.f === 1 ? '' : 's') + ' joined · ' + x.o + ' orders from them</span></span><b style="color:#3DDC97">+' + (x.f * REF.join + Math.min(x.o, x.f) * REF.first + Math.max(0, x.o - x.f) * REF.every).toLocaleString() + '</b></div>'; }).join("") + '</div>' +
+      earnBox(rows) +
       '<p class="crm-fine">Sample customers (made up) plus anyone who joins on this phone. Live, this list fills from real signups at your tables, and texts go only to people who opted in.</p>';
     own.querySelectorAll(".crm-seg button").forEach(function (b) { b.onclick = function () { drawOwn(b.dataset.s); }; });
     var cmp = own.querySelector(".crm-compose"), ta = cmp.querySelector("textarea");
@@ -491,13 +665,13 @@
       if (!/^\d{4}$/.test(c4) || !(amt > 0)) { msg.style.color = "#FF6B5E"; msg.textContent = "Enter the 4-digit code and the order total."; return; }
       if (!m || regCode(m) !== c4) { msg.style.color = "#FF6B5E"; msg.textContent = "No customer has that code right now. Codes change every 5 minutes."; return; }
       var got = visit(m, amt * PER); addPts(m, got, "🧾 Register order $" + amt.toFixed(2) + " · code " + c4); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m);
-      drawJoin(); drawOwn(); toast("+" + got + " points added to " + m.name.split(" ")[0]);
+      drawJoin(); drawOwn(); toast("+" + got + " points added to " + m.name.split(" ")[0] + (lastBonus ? " · +" + lastBonus + " visit bonus" : ""));
     };
     own.querySelector('[data-a="redeem"]').onclick = function () {
       var c = own.querySelector('[data-r="rcode"]').value.trim().toUpperCase(), msg = own.querySelector('[data-r="rmsg"]'), m = mine()[0], hit = null, kind = "";
       var bad = function (t) { msg.style.color = "#FF6B5E"; msg.textContent = t; };
       if (!c) return bad("Type the code from the guest's phone.");
-      if (m) { (m.wins || []).forEach(function (w) { if (w.c === c) { hit = w; kind = "win"; } }); if (!hit && m.redeem && m.redeem.c === c) { hit = m.redeem; kind = "pts"; } if (!hit && m.bcode === c) { hit = { c: c, t: "Birthday treat", ts: Date.now() }; kind = "bday"; } }
+      if (m) { (m.wins || []).forEach(function (w) { if (w.c === c) { hit = w; kind = "win"; } }); if (!hit && m.redeem && m.redeem.c === c) { hit = m.redeem; kind = "pts"; } if (!hit && m.fgift && m.fgift.c === c) { hit = m.fgift; kind = "gift"; } if (!hit && m.bcode === c) { hit = { c: c, t: "Birthday treat", ts: Date.now() }; kind = "bday"; } }
       if (!hit) return bad("No reward with that code. Check the letters, or it may belong to another phone (live: every code is looked up in your database).");
       if (hit.used || (m.bused && kind === "bday")) return bad("Already used on " + new Date(hit.used || m.bused).toLocaleString() + ". Each code works once.");
       if (kind === "win" && Date.now() - hit.ts >= (hit.ttl || WIN_TTL)) return bad("Expired " + until(hit) + ".");
@@ -518,8 +692,9 @@
     own.querySelector('[data-a="text"]').onclick = function () { cmp.style.display = "block"; ta.value = DEF[seg] || DEF.all; preview(); ta.focus(); };
     own.querySelector('[data-a="csv"]').onclick = function () {
       var q = function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; };
-      var csv = ["name,phone,email,visits,points,last_visit,joined,birthday,referral_code,referred_by,friends_referred"].concat(all().map(function (r) {
-        return [r.name, r.phone, r.email, r.visits, r.stars, new Date(r.last).toISOString().slice(0, 10), new Date(r.joined).toISOString().slice(0, 10), r.bday >= 0 ? (r.bdy ? r.bdy + "-" + ("0" + (r.bday + 1)).slice(-2) + "-" + ("0" + r.bdd).slice(-2) : MONTHS[r.bday]) : "", r.ref || "", r.refByName || "", r.nfr || (r.friends ? r.friends.length : "")].map(q).join(",");
+      var csv = ["name,phone,email,visits,points,last_visit,joined,birthday,referral_code,referred_by,friends_referred," + EK.map(function (k) { return k[0]; }).join(",") + ",feedback_stars,feedback"].concat(all().map(function (r, i) {
+        var ec = earnCounts(r, i);
+        return [r.name, r.phone, r.email, r.visits, r.stars, new Date(r.last).toISOString().slice(0, 10), new Date(r.joined).toISOString().slice(0, 10), r.bday >= 0 ? (r.bdy ? r.bdy + "-" + ("0" + (r.bday + 1)).slice(-2) + "-" + ("0" + r.bdd).slice(-2) : MONTHS[r.bday]) : "", r.ref || "", r.refByName || "", r.nfr || (r.friends ? r.friends.length : "")].concat(EK.map(function (k) { return ec[k[0]] || 0; }), [r.fb ? r.fb.s : "", r.fb ? r.fb.t : ""]).map(q).join(",");
       })).join("\n");
       var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = SLUG + "-customers.csv"; document.body.appendChild(a); a.click(); a.remove();
     };

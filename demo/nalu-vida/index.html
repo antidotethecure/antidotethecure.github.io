@@ -211,6 +211,17 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 @keyframes nvflick{0%,100%{opacity:.9}8%{opacity:1}9%{opacity:.35}10%{opacity:1}11%{opacity:.5}12%{opacity:1}55%{opacity:.85}56%{opacity:.3}57%{opacity:.95}80%{opacity:1}}
 @keyframes nvdim{0%,61%,66%,100%{opacity:0}62%{opacity:.8}63%{opacity:.1}64%{opacity:.7}}
 .arrive .fx{position:absolute;z-index:1;pointer-events:none;will-change:transform,opacity;height:auto}
+.arrive .fx.drop{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.95);margin:-1.5px 0 0 -1.5px;box-shadow:0 0 2px rgba(255,255,255,.7)}
+.arrive .fx.plume{transform-origin:50% 100%;border-radius:50% 50% 40% 40%;background:radial-gradient(ellipse at 50% 80%,rgba(255,255,255,.95),rgba(235,248,255,.55) 45%,rgba(255,255,255,0) 72%)}
+.arrive .fx.ring{border-radius:50%;border:2px solid rgba(255,255,255,.9);background:radial-gradient(ellipse,rgba(255,255,255,.45),rgba(255,255,255,0) 70%);box-sizing:border-box}
+.arrive .ski .sk{position:relative}
+.arrive .ski img{display:block;width:100%;height:auto;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+.arrive .ski .wake{position:absolute;right:80%;bottom:6%;width:110%;height:20%;border-radius:50%;filter:blur(1px);transform-origin:100% 50%;
+  background:linear-gradient(270deg,rgba(255,255,255,.8),rgba(255,255,255,.3) 45%,rgba(255,255,255,0));animation:nvwake .45s ease-in-out infinite alternate}
+@keyframes nvwake{from{opacity:.6;transform:scaleY(.75)}to{opacity:1;transform:scaleY(1.15)}}
+.arrive .gull{opacity:0}
+.arrive .gull svg{display:block;width:100%;height:auto;overflow:visible;fill:none;stroke:rgba(48,26,28,.9);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform-origin:50% 65%;animation:nvflap 3s ease-in-out infinite}
+@keyframes nvflap{0%{transform:scaleY(1)}8%{transform:scaleY(-.35)}16%{transform:scaleY(1)}24%{transform:scaleY(-.35)}32%{transform:scaleY(1)}42%,100%{transform:scaleY(.8)}}
 .arrive .plate{position:absolute;z-index:2;pointer-events:none;perspective:700px;opacity:0}
 .arrive .plate.in{animation:nvplate 4.6s cubic-bezier(.2,.8,.2,1) forwards}
 .arrive .plate .p3{position:relative;transform-style:preserve-3d;animation:nvspin 4.6s ease-in-out}
@@ -1094,21 +1105,51 @@ $("evsub").textContent="Week of "+MON[new Date(monday).getUTCMonth()]+" "+new Da
 <script src="../gamelock.js"></script>
 <script>document.getElementById("arrive-play").addEventListener("click",function(){setTimeout(function(){var b=document.querySelector(".nv-pick button");if(b)b.animate&&b.animate([{transform:"scale(1)"},{transform:"scale(1.08)"},{transform:"scale(1)"}],{duration:600,iterations:2});},700);});</script>
 <script>
-/* living arrival scene: dolphins, gulls, a passing jet ski, and dishes appearing on the patio tables */
+/* living arrival scene: a dolphin in the water, distant gulls in the sky, a jet ski on the far water, and dishes appearing on the patio tables */
 (function(){
   var A=document.querySelector(".arrive"); if(!A) return;
   var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches; if(reduce) return;
   function el(src,cls){ var i=new Image(); i.src=src; i.className="fx"+(cls?" "+cls:""); i.alt=""; A.appendChild(i); return i; }
   function anim(e,frames,ms,done){ var a=e.animate(frames,{duration:ms,easing:"linear",fill:"forwards"}); a.onfinish=function(){ e.remove(); done&&done(); }; }
-  function dolphin(){ var d=el("img/scene/dolphin.webp"); var x=3+Math.random()*30, w=9+Math.random()*4; d.style.cssText="left:"+x+"%;top:52%;width:"+w+"%";
-    var flip=Math.random()<.5?-1:1; anim(d,[{transform:"translate(0,40%) rotate("+(-35*flip)+"deg) scaleX("+flip+")",opacity:0},{offset:.12,opacity:1},{transform:"translate("+(60*flip)+"%,-55%) rotate(0deg) scaleX("+flip+")",offset:.5},{transform:"translate("+(120*flip)+"%,45%) rotate("+(40*flip)+"deg) scaleX("+flip+")",opacity:1,offset:.92},{opacity:0}],1500,function(){ splash(x+w*.5+8*flip,57); });
-    setTimeout(function(){ splash(x+w*.3,56); },120); }
-  function splash(x,y){ for(var k=0;k<7;k++){ var s=document.createElement("i"); s.className="fx"; s.style.cssText="left:"+x+"%;top:"+y+"%;width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.9)"; A.appendChild(s);
-      anim(s,[{transform:"translate(0,0)",opacity:1},{transform:"translate("+(Math.random()*30-15)+"px,"+(-10-Math.random()*22)+"px)",opacity:.9,offset:.5},{transform:"translate("+(Math.random()*40-20)+"px,8px)",opacity:0}],700); } }
-  function gull(){ var g=el("img/scene/gull_side.webp"), y=6+Math.random()*26, w=5+Math.random()*4, l2r=Math.random()<.5; g.style.cssText="top:"+y+"%;width:"+w+"%;left:0";
-    var x0=l2r?-12:105, x1=l2r?105:-12; anim(g,[{transform:"translate("+x0*3.9+"px,0) scaleX("+(l2r?1:-1)+")"},{transform:"translate("+((x0+x1)/2)*3.9+"px,"+(Math.random()*30-15)+"px) scaleX("+(l2r?1:-1)+")"},{transform:"translate("+x1*3.9+"px,"+(Math.random()*20-10)+"px) scaleX("+(l2r?1:-1)+")"}],9000+Math.random()*5000); }
-  function jetski(){ var j=el("img/scene/jetski.webp"); j.style.cssText="top:46%;width:11%;left:0"; var W=A.clientWidth;
-    anim(j,[{transform:"translate("+W*.5+"px,0)"},{transform:"translate("+W*.26+"px,2px)",offset:.5},{transform:"translate("+(-W*.15)+"px,-1px)"}],6500); }
+  /* hero.jpg landmarks as fractions of the image (1200x1500), mapped through object-fit:cover so they hold at any width:
+     WATER = open ocean below the horizon (44.8%) and above the wet-sand shoreline (54.5%), left of the patio post (44%);
+     SKY = open sunset sky left of the palms and the storefront (which starts at ~55%). */
+  var IMG=A.querySelector("img.bg"), WATER={x0:.03,x1:.44,y0:.448,y1:.545}, SKY={x0:.14,x1:.44,y0:.07,y1:.30};
+  window.NV_SCENE={water:WATER,sky:SKY};
+  function frame(){ var cw=A.clientWidth, ch=A.clientHeight, iw=IMG&&IMG.naturalWidth||1200, ih=IMG&&IMG.naturalHeight||1500, k=Math.max(cw/iw,ch/ih), dw=iw*k, dh=ih*k;
+    return {w:dw, x:function(f){ return (cw-dw)/2+f*dw; }, y:function(f){ return (ch-dh)/2+f*dh; }}; }
+  function rnd(a,b){ return a+Math.random()*(b-a); }
+  function splash(x,y,sz){ var ring=document.createElement("i"); ring.className="fx ring"; ring.style.cssText="left:"+(x-sz)+"px;top:"+(y-sz*.25)+"px;width:"+(sz*2)+"px;height:"+(sz*.5)+"px";
+    A.appendChild(ring); anim(ring,[{transform:"scale(.2)",opacity:.9},{transform:"scale(1)",opacity:0}],950);
+    var pl=document.createElement("i"); pl.className="fx plume"; pl.style.cssText="left:"+(x-sz*.45)+"px;top:"+(y-sz*1.1)+"px;width:"+(sz*.9)+"px;height:"+(sz*1.2)+"px";
+    A.appendChild(pl); anim(pl,[{transform:"scaleY(.15)",opacity:0},{transform:"scaleY(1)",opacity:.95,offset:.3},{transform:"scaleY(.6) translateY(20%)",opacity:0}],800);
+    for(var k=0;k<8;k++){ var s=document.createElement("i"); s.className="fx drop"; s.style.cssText="left:"+x+"px;top:"+y+"px"; A.appendChild(s);
+      anim(s,[{transform:"translate(0,0)",opacity:1},{transform:"translate("+rnd(-.6,.6)*sz+"px,"+(-sz*rnd(.5,1.1))+"px)",opacity:.9,offset:.45},{transform:"translate("+rnd(-.9,.9)*sz+"px,0)",opacity:0}],900); } }
+  /* dolphin: a small distant leap in the open water behind the surfers (its whole box stays inside WATER), splash out and splash in */
+  function dolphin(){ var F=frame(), w=F.w*.042, h=w*480/520, r=.5*Math.hypot(w,h), hz=F.y(WATER.y0);
+    var s0=Math.max(F.y(.485),hz+r+6), s1=Math.min(F.y(.50),F.y(WATER.y1)-r), sy=rnd(s0,Math.max(s0,s1)), H=Math.max(4,sy-hz-r-1), D=w*2.2;
+    var dir=Math.random()<.5?1:-1, lo=Math.max(F.x(.12),F.x(WATER.x0)+r), hi=Math.min(F.x(.32),F.x(WATER.x1)-r);
+    var sx=dir>0?rnd(lo,hi-D):rnd(lo+D,hi), f=dir>0?-1:1;   // the sprite faces left; mirror it when it leaps right
+    var d=el("img/scene/dolphin.webp","dolphin"); d.style.cssText="left:0;top:0;width:"+w+"px";
+    var fr=[], N=10; for(var i=0;i<=N;i++){ var t=i/N, x=sx+dir*D*t-w/2, y=sy-4*H*t*(1-t)-h/2, rot=(50-55*t)*f;
+      fr.push({offset:t,transform:"translate("+x.toFixed(1)+"px,"+y.toFixed(1)+"px) rotate("+rot.toFixed(1)+"deg) scaleX("+f+")",opacity:t<.05||t>.95?0:1}); }
+    splash(sx,sy,w); anim(d,fr,1500,function(){ splash(sx+dir*D,sy,w); }); }
+  /* distant gulls: tiny silhouettes high in the open sky only, never over the storefront; flap a few beats, then glide */
+  function gull(){ if(A.querySelectorAll(".gull").length>1) return;
+    var F=frame(), w=F.w*rnd(.022,.034), y=F.y(rnd(SKY.y0,SKY.y1)), xa=F.x(SKY.x0), xb=F.x(SKY.x1)-w*1.2, l2r=Math.random()<.5, x0=l2r?xa:xb, x1=l2r?xb:xa;
+    var g=document.createElement("div"); g.className="fx gull"; g.style.cssText="left:0;top:0;width:"+w+"px";
+    g.innerHTML='<svg viewBox="0 0 24 10" aria-hidden="true"><path d="M1 6.5Q6.5 1.2 12 6.5Q17.5 1.2 23 6.5"/></svg>';
+    g.firstChild.style.animationDuration=rnd(2.6,3.8)+"s"; g.firstChild.style.animationDelay=(-Math.random()*3)+"s"; A.appendChild(g);
+    var dy=rnd(-1,1)*F.w*.02; anim(g,[{transform:"translate("+x0+"px,"+y+"px)",opacity:0},{opacity:.55,offset:.15},{transform:"translate("+(x0+x1)/2+"px,"+(y+dy)+"px)",opacity:.55,offset:.5},{opacity:.55,offset:.85},{transform:"translate("+x1+"px,"+(y-dy*.5)+"px)",opacity:0}],rnd(13000,19000)); }
+  /* jet ski: rides in from the left on the far water, turns around short of the surfers and heads back out; the sprite faces
+     right, so it is mirrored whenever it moves left, and its wake always trails behind the hull */
+  function jetski(){ if(A.querySelector(".ski")) return;
+    var F=frame(), w=F.w*.085, h=w*252/520, yb=F.y(.488)-h, xt=F.x(rnd(.20,.30))-w, x0=-w*1.9, u=w*.5;
+    var j=document.createElement("div"); j.className="fx ski"; j.style.cssText="left:0;top:0;width:"+w+"px";
+    j.innerHTML='<div class="sk"><i class="wake"></i><img src="img/scene/jetski.webp" alt=""></div>'; A.appendChild(j);
+    function at(x,y){ return "translate("+x.toFixed(1)+"px,"+y.toFixed(1)+"px)"; }
+    anim(j,[{transform:at(x0,yb)},{transform:at(xt-u,yb-1),offset:.32},{transform:at(xt,yb-2),offset:.42},{transform:at(xt,yb-2),offset:.52},{transform:at(xt-u,yb-1),offset:.62},{transform:at(x0,yb)}],9000);
+    j.firstChild.animate([{transform:"scaleX(1)"},{transform:"scaleX(1)",offset:.42},{transform:"scaleX(-1)",offset:.52},{transform:"scaleX(-1)"}],{duration:9000,fill:"forwards"}); }
   var dishes=["smash-burger","wings","tostadas","tuna-rice","coconut-shrimp","oysters","jungle-fries"], di=0, round=0;
   function plate(id,src,left,top,width){ var e=document.getElementById(id); if(!e) return null; e.classList.remove("in"); void e.offsetWidth;
     e.style.left=left+"%"; e.style.top=top+"%"; e.style.width=width+"%"; var url="img/scene/"+src+".webp";
@@ -1129,8 +1170,8 @@ $("evsub").textContent="Week of "+MON[new Date(monday).getUTCMonth()]+" "+new Da
   var on=true; new IntersectionObserver(function(e){ on=e[0].isIntersecting; }).observe(A);
   setTimeout(dish,900); setInterval(function(){ if(on) dish(); },4800);
   setInterval(function(){ if(on&&Math.random()<.55) dolphin(); },3800);
-  setInterval(function(){ if(on) gull(); },3300); gull();
-  setInterval(function(){ if(on&&Math.random()<.5) jetski(); },9000); setTimeout(jetski,2500);
+  setInterval(function(){ if(on&&Math.random()<.6) gull(); },6000); setTimeout(gull,1200);
+  setInterval(function(){ if(on&&Math.random()<.6) jetski(); },11000); setTimeout(jetski,2500);
 })();
 </script>
 <script>/* visitors arriving from Melody's banner plane get a hello (kept clear of the language pill) */

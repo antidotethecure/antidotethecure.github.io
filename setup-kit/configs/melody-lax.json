@@ -629,5 +629,18 @@
   },
   "ambient": [
     "plane"
-  ]
+  ],
+  "impact": {
+    "crowd": 200,
+    "nights": 4,
+    "daily": 60,
+    "days": 22,
+    "join": 20,
+    "back": 15,
+    "fee": 300,
+    "feeNote": "Covers both Melody and Nalu Vida.",
+    "event": "Burlesque this Friday, tickets going fast",
+    "setup": 1500,
+    "setupNote": "one setup for both restaurants"
+  }
 }

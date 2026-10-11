@@ -410,5 +410,17 @@
   "ambient": [
     "surf"
   ],
-  "launchLogo": "demo/nalu-vida/img/logo.png"
+  "launchLogo": "demo/nalu-vida/img/logo.png",
+  "impact": {
+    "crowd": 180,
+    "nights": 4,
+    "daily": 70,
+    "days": 22,
+    "join": 20,
+    "back": 15,
+    "fee": 300,
+    "feeNote": "Covers both Melody and Nalu Vida.",
+    "setup": 1500,
+    "setupNote": "one setup for both restaurants"
+  }
 }

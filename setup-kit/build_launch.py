@@ -67,6 +67,13 @@ def agents(o):
     if "compare" in ov: a["compare"] = ov["compare"]
     return a
 
+def value_card(owner_slug, o):
+    """'What all of this would cost elsewhere' card -> /value/?o=<owner>. Only for owners listed in value/value-data.js ("value": true in owners/<slug>.json)."""
+    if not o.get("value"): return ""
+    return (f'<div class="step" style="border-color:var(--gold)"><div class="num" style="background:var(--gold);color:#241a00">$</div><div>'
+            f'<h3>💡 What all of this would cost elsewhere</h3><p>Every tool in your package, what other companies charge for it on its own, and your price next to it.</p>'
+            f'<a class="go" style="background:var(--gold);color:#241a00" href="../../value/?o={owner_slug}">See the comparison →</a></div></div>\n')
+
 def build(owner_slug):
     o = json.loads((HERE / "owners" / f"{owner_slug}.json").read_text())
     rest = []; st = status()
@@ -95,7 +102,7 @@ def build(owner_slug):
     for r in rest: r.pop("brand", None)
     t = (t.replace("__RESTAURANTS__", json.dumps(rest)).replace("__OWNER__", html.escape(o["owner"])).replace("__LAUNCH_NAMES__", names_html)
           .replace("__KEY__", f"{owner_slug}-launch-v1").replace("__CONTACTS__", json.dumps(o.get("contacts", [])))
-          .replace("__AIAGENTS__", json.dumps(agents(o)))
+          .replace("__AIAGENTS__", json.dumps(agents(o))).replace("__VALUECARD__", value_card(owner_slug, o))
           .replace("__THEME__", theme).replace("__LOGOS__", logos).replace("__AMBIENT__", json.dumps(amb)))
     if fonts: t = t.replace("</title>", f'</title><link href="{fonts}" rel="stylesheet">', 1)
     dst = ROOT / "onboarding" / owner_slug / "index.html"; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_text(t)

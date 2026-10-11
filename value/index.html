@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Everything you get with SousShift AI</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="What every SousShift AI tool would cost from separate vendors, next to your SousShift price.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#060b1c;--card:#0f1934;--card2:#15224a;--edge:#24345c;--ink:#f5f7ff;--dim:#a9b5d6;--blue:#4da3ff;--gold:#ffd23f;--ok:#3ddc97;--bolt:#e8582a;
+  --display:"Bebas Neue","Arial Narrow",Impact,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Rubik,system-ui,sans-serif;overflow-x:clip}
+body{background:radial-gradient(800px 520px at 50% -8%,#173a86 0,transparent 62%),var(--bg)}
+main{max-width:640px;margin:0 auto;padding:18px 16px 60px}
+a{color:var(--blue)}
+.top{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+.top img{height:54px;width:auto;border-radius:10px;box-shadow:0 0 22px rgba(77,163,255,.45)}
+.top .who{margin-left:auto;text-align:right;font-size:12.5px;color:var(--dim);line-height:1.3}
+.top .who b{display:block;color:var(--ink);font-size:14px}
+.k{font:800 12px Rubik,system-ui;letter-spacing:.16em;text-transform:uppercase;color:var(--blue)}
+h1{font:400 clamp(40px,11vw,60px)/.95 var(--display);letter-spacing:.02em;margin:6px 0 10px}
+h1 span{color:var(--gold)}
+h2{font:400 32px/1 var(--display);letter-spacing:.03em;margin:30px 0 6px}
+.lead{color:var(--dim);margin:0 0 6px}
+.note{background:#12204a;border:1px solid #2e4677;border-radius:12px;padding:10px 12px;font-size:13.5px;color:#cfe0ff;margin:10px 0}
+.grp{font:800 12px Rubik,system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:22px 0 8px}
+.b{background:linear-gradient(180deg,var(--card),#0b142b);border:1px solid var(--edge);border-radius:16px;padding:13px 14px;margin:9px 0}
+.b .hd{display:flex;gap:10px;align-items:flex-start}
+.b .ic{font-size:24px;line-height:1.1;flex:none;width:30px;text-align:center}
+.b h3{margin:0;font-size:16.5px;line-height:1.25}
+.b p{margin:3px 0 0;color:var(--dim);font-size:14px}
+.b .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;padding-top:9px;border-top:1px dashed var(--edge);font-size:13.5px}
+.b .el{color:var(--dim);min-width:0}.b .el b{color:var(--gold);white-space:nowrap}
+.inc{flex:none;background:rgba(61,220,151,.14);color:var(--ok);border:1px solid rgba(61,220,151,.4);border-radius:99px;padding:4px 10px;font-weight:800;font-size:13px;white-space:nowrap}
+.b.opt{border-style:dashed;background:transparent}
+.opt .inc{background:rgba(255,210,63,.12);color:var(--gold);border-color:rgba(255,210,63,.4)}
+.vs{display:grid;gap:10px;margin-top:12px}
+.side{border-radius:18px;padding:16px;border:1px solid var(--edge)}
+.side.them{background:#1a1424;border-color:#4a2f3c}
+.side.us{background:linear-gradient(135deg,#1e4fd0,#122a6e);border-color:#4d7fff;box-shadow:0 14px 40px rgba(30,79,208,.35)}
+.side .t{font:800 12px Rubik,system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.side.us .t{color:#cfe0ff}
+.side .big{font:400 44px/1 var(--display);letter-spacing:.02em;margin:6px 0 2px}
+.side.them .big{color:#ff9a7a}.side.us .big{color:var(--gold)}
+.side .sm{font-size:14.5px;color:var(--ink)}
+.side ul{margin:8px 0 0;padding-left:18px;font-size:14px;color:var(--dim)}.side.us ul{color:#dfe9ff}
+.yr{display:grid;grid-template-columns:1fr auto;gap:6px 12px;background:var(--card2);border:1px solid var(--edge);border-radius:14px;padding:12px 14px;margin-top:12px;font-size:14.5px}
+.yr b{text-align:right;white-space:nowrap}.yr .s{color:var(--ok)}
+.fine{color:var(--dim);font-size:12.5px;margin-top:22px}
+.fine ol{padding-left:20px;margin:6px 0}.fine li{margin:4px 0;overflow-wrap:anywhere}
+.back{display:inline-block;margin-top:18px;font-weight:800;text-decoration:none;background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:11px 14px;color:var(--ink)}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><img src="../assets/ssai-lockup.jpg" alt="SousShift AI"><div class="who" id="who"></div></div>
+<div class="k" id="kick">SousShift AI · your package</div>
+<h1>Everything you get with <span>SousShift AI</span></h1>
+<p class="lead" id="lead"></p>
+
+<div id="list"></div>
+
+<h2>Piece by piece vs. SousShift</h2>
+<div class="vs" id="vs"></div>
+<div class="yr" id="yr"></div>
+<p class="note" id="perf"></p>
+
+<div class="fine">
+  <b>Typical published pricing as of Oct 2026; your actual costs may vary.</b> We used the low-to-middle published plan for each tool, not the most expensive one. Where a vendor only quotes on request, the number is a typical range from public sources and is marked "est." These are other companies' prices for similar tools, not quotes, and they change. Your SousShift price is from your agreement. Results from any marketing tool, ours included, are not guaranteed.
+  <ol id="src"></ol>
+</div>
+<a class="back" id="back" href="#">← Back to your onboarding</a>
+</main>
+<script src="value-data.js"></script>
+<script src="value.js"></script>
+</body>
+</html>

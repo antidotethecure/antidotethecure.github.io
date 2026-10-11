@@ -262,8 +262,9 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <div id="obar"><button type="button" id="obtn"><span><span class="n" id="ocount">0</span> &nbsp;<span id="oseat">Review order</span></span><span id="ototal">$0.00</span></button></div>
 <div id="sheet" role="dialog" aria-modal="true" aria-label="Your order"><div class="in" id="sheetin"></div></div>
 
-<script>window.REVIEW_EGG={vid:"AhJGIPsywm0",restaurant:"Melody Bar & Grill",short:"MELODY",bonus:500,img:"img/review/cover.webp",find:"A blimp tows Antidote's billboard across the sky once a flight. Fly through it or shoot it"};</script>
+<script>window.REVIEW_EGG={vid:"AhJGIPsywm0",restaurant:"Melody Bar & Grill",short:"MELODY",bonus:500,img:"img/review/cover.webp",find:"Catch 7 Antidote Drizzle emblems to unlock the review plane, then shoot it down"};</script>
 <script src="../reviewegg.js"></script>
+<script src="../halftime.js"></script>
 <script>window.MELODY_CLIPS={"bacon-mac":"img/clips/bacon-mac.mp4","burger-mac":"img/clips/burger-mac.mp4","espresso-martini":"img/clips/espresso-martini.mp4","house-mac":"img/clips/house-mac.mp4","lobster-mac":"img/clips/lobster-mac.mp4","mango-marg":"img/clips/mango-marg.mp4","margarita":"img/clips/margarita.mp4","moscow-mule":"img/clips/moscow-mule.mp4","nachos":"img/clips/nachos.mp4","old-fashioned":"img/clips/old-fashioned.mp4","paloma":"img/clips/paloma.mp4","philly-fries":"img/clips/philly-fries.mp4","ribs":"img/clips/ribs.mp4","wings":"img/clips/wings.mp4"};</script>
 <script>
 window.CONFIG={name:"Melody Bar & Grill",address:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"};
@@ -527,7 +528,8 @@ function shadowOf(im,a){ var c=document.createElement("canvas"), w=im.naturalWid
 var PSH=null;
 function fresh(){ return {running:false,over:false,x:W/2,y:H-110,tx:W/2,ty:H-110,vx:0,hp:100,score:0,t:60000,el:0,items:[],ens:[],shots:[],eshots:[],bolts:[],pops:[],fx:[],clouds:[],heals:0,lastHeal:0,
   spawnT:600,ufoT:7000,jetT:13000,boltT:9000,kamiT:16000,copT:19000,copN:0,shotT:0,inv:0,mult:1,multT:0,shake:0,flash:0,red:0,dying:0,scroll:0,ground:[],gy:0,warn:[],
-  lvl:1,lel:0,wpn:0,gotCrate:0,crates:0,crateT:CRATE_AT[0],boss:null,bossDie:null,banner:null,upT:0,mfl:0,home:0,won:0,god:0,debug:0}; }
+  lvl:1,lel:0,wpn:0,gotCrate:0,crates:0,crateT:CRATE_AT[0],boss:null,bossDie:null,banner:null,upT:0,mfl:0,home:0,won:0,god:0,debug:0,
+  half:0,dz:0,dzT:9000,rp:null,rpT:0,rpPasses:0,rpDone:0,rpDie:null}; }
 G=fresh();
 for(var c=0;c<6;c++) G.clouds.push({x:Math.random()*W,y:Math.random()*H,s:120+Math.random()*120,v:2+Math.random()*1.5});
 var HK="";
@@ -538,7 +540,9 @@ function hud(){ $("score").textContent=G.score.toLocaleString(); $("time").textC
 function best(){ try{ return +localStorage.getItem("melody-best")||0; }catch(e){ return 0; } }
 var RUN=0;
 function start(){ if(RA){ RA.clear(); pickT=-1e9; radio("Tower to Captain: you're cleared for takeoff!",{tone:"info",ms:2200}); } var keep=G.clouds, posted=G.posted; G=fresh(); G.clouds=keep; G.posted=posted; G.runId=++RUN; G.running=true; G.last=performance.now(); seedGround(); $("over").classList.remove("on");
-  if(window.ReviewEgg) ReviewEgg.reset(24,40);   // Antidote's review blimp: once a flight, 24-40 s after the takeoff roll
+  if(window.ReviewEgg) ReviewEgg.reset(24,40);   // Antidote's review quest: catch DRIZ_N drizzle emblems → his review plane → shoot it down
+  if(window.Halftime) Halftime.reset();           // halftime: his Melody review reel, once a flight, at a level-up after ~90 s
+  var etl=window.ReviewEgg?ReviewEgg.testLevel:0; if(etl===1) G.dz=DRIZ_N-1; if(etl===2){ G.dz=DRIZ_N; G.rpT=4800; }
   if(DBG.lvl||DBG.wpn!=null||DBG.boss||DBG.god) applyDbg(); hud(); }
 // testing hooks (?lvl=1-5, ?wpn=0-4, ?boss=1, ?god=1 or window.MELODY_DEBUG). Any of them marks the flight as practice: no prizes, no board.
 function applyDbg(){ G.debug=1; if(DBG.god) G.god=1; var lv=Math.max(1,Math.min(5,DBG.lvl||1)); if(lv>1){ G.lvl=lv; G.el=6000; G.alt=1; levelTimers(); G.crateT=CRATE_AT[lv-1]; }
@@ -725,24 +729,113 @@ function drawCoin(it,now){ it.spin+=.11; var c=Math.cos(it.spin), sx=Math.max(1.
   cx.fillStyle="#8a5a06"; cx.beginPath(); cx.ellipse(1.5,0,sx,r,0,0,6.283); cx.fill(); cx.fillStyle=fg; cx.beginPath(); cx.ellipse(0,0,sx,r,0,0,6.283); cx.fill();
   if(sx>6){ cx.fillStyle="#9b6a06"; cx.font="900 "+(r*1.1|0)+"px 'Playfair Display',Georgia,serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.save(); cx.scale(sx/r,1); cx.fillText("M",0,1); cx.restore(); }
   cx.restore(); }
-function drawEggBlimp(it,now){ // Antidote's review: a little blimp towing a billboard with the cover
-  var RE=window.ReviewEgg; if(!RE) return; var x=it.x, y=it.y, by=y-62, sw=Math.sin(now/600)*.05;
-  cx.save(); cx.translate(x,by); cx.rotate(sw);
-  cx.fillStyle="rgba(0,0,0,.25)"; cx.beginPath(); cx.ellipse(26,40,44,13,0,0,6.283); cx.fill();                                 // shadow
-  var bg=cx.createLinearGradient(0,-17,0,17); bg.addColorStop(0,"#5b8cff"); bg.addColorStop(.5,"#1f4fd1"); bg.addColorStop(1,"#0b2a6b");
-  cx.fillStyle=bg; cx.beginPath(); cx.ellipse(0,0,46,17,0,0,6.283); cx.fill();
-  cx.fillStyle="#e3262f"; cx.beginPath(); cx.moveTo(-40,-4); cx.lineTo(-56,-14); cx.lineTo(-52,0); cx.lineTo(-56,14); cx.lineTo(-40,4); cx.closePath(); cx.fill();   // fins
-  cx.fillStyle="#ffd23f"; cx.fillRect(-9,14,18,6);                                                                               // gondola
-  cx.font="900 11px Anton,Impact,sans-serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillStyle="#ffd23f"; cx.fillText("ANTIDOTE",2,0.5);
+/* ---- ANTIDOTE'S REVIEW QUEST: catch DRIZ_N "Antidote Drizzle" emblems → his banner plane flies in towing the Melody review →
+   shoot it down (~10 hits) → bonus + the review unlocks (preview clip on the end screen). It never shoots and never hurts you. ---- */
+var DRIZ_N=Math.max(5,Math.min(10,+(window.MELODY_DRIZZLE||7)||7));   // his "5 or 10" range, default 7
+var DRIZ_GAP=8200;                       // ms between emblems (+0-2 s): a decent pilot has all 7 in ~60-90 s of flying
+var RP_HITS=10;
+var DRIZ_IM=img("../review/antidote-foodie.webp");
+// an emblem only goes where grabbing it can't force a hit: away from lightning columns, warnings, low enemies and bombs
+function spawnDriz(){ if(G.boss||G.bossDie||G.won||G.home||G.red>.05||(G.banner&&G.banner.t<1800)) return false;
+  var best=null, bs=-1;
+  for(var n=0;n<12;n++){ var x=60+Math.random()*(W-120), d=1e9;
+    G.bolts.forEach(function(b){ d=Math.min(d,Math.abs(b.x-x)-34); });
+    G.warn.forEach(function(w){ d=Math.min(d,Math.abs(w.x-x)-(w.k==="sj"?52:30)); });
+    G.ens.forEach(function(e){ if(e.y<330) d=Math.min(d,Math.abs(e.x-x)-(e.r||30)); });
+    G.eshots.forEach(function(e){ if(e.y<H*.7) d=Math.min(d,Math.abs(e.x-x)-12); });
+    G.items.forEach(function(it){ if(it.y<120&&it.t!=="coin"&&it.t!=="food") d=Math.min(d,Math.abs(it.x-x)-30); });
+    if(d>bs){ bs=d; best=x; } }
+  if(bs<46) return false;
+  G.items.push({t:"driz",x:best,x0:best,y:-34,r:22,ph:Math.random()*6,spin:Math.random()*6}); return true; }
+function drawDriz(it,now){ it.spin+=.07; var c=Math.cos(it.spin), sx=Math.max(.12,Math.abs(c)), R=22, pu=.5+.5*Math.sin(now/180);
+  cx.save(); cx.translate(it.x,it.y);
+  var gl=cx.createRadialGradient(0,0,3,0,0,R*2.3); gl.addColorStop(0,"rgba(255,210,63,"+(.55+.25*pu)+")"); gl.addColorStop(.55,"rgba(225,6,0,.28)"); gl.addColorStop(1,"rgba(225,6,0,0)");
+  cx.fillStyle=gl; cx.beginPath(); cx.arc(0,0,R*2.3,0,6.283); cx.fill();
+  cx.scale(sx,1);
+  cx.fillStyle="#7a0000"; cx.beginPath(); cx.arc(1.5,1.5,R,0,6.283); cx.fill();
+  var fg=cx.createLinearGradient(-R,-R,R,R); fg.addColorStop(0,"#ffe27a"); fg.addColorStop(.5,"#d9a21b"); fg.addColorStop(1,"#ffd23f"); cx.fillStyle=fg; cx.beginPath(); cx.arc(0,0,R,0,6.283); cx.fill();
+  cx.fillStyle=c>0?"#e10600":"#b80000"; cx.beginPath(); cx.arc(0,0,R-3.5,0,6.283); cx.fill();
+  if(ready(DRIZ_IM)){ var h=R*1.75, w=h*DRIZ_IM.naturalWidth/DRIZ_IM.naturalHeight; cx.save(); cx.beginPath(); cx.arc(0,0,R-3.5,0,6.283); cx.clip(); cx.drawImage(DRIZ_IM,-w/2,-h/2+1,w,h); cx.restore(); }
+  else { cx.font="900 18px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText("🍯",0,1); }
   cx.restore();
-  cx.strokeStyle="rgba(240,211,117,.75)"; cx.lineWidth=1.2; cx.beginPath(); cx.moveTo(x-6,by+18); cx.lineTo(x-50,y-30); cx.moveTo(x+6,by+18); cx.lineTo(x+50,y-30); cx.stroke();
-  RE.drawSign(cx,x,y,104,{glow:.55+.3*Math.sin(now/170)});
+  if((now/90|0)%7===0){ cx.save(); cx.globalCompositeOperation="lighter"; cx.fillStyle="rgba(255,255,220,.9)"; var a=Math.random()*6.283; cx.beginPath(); cx.arc(it.x+Math.cos(a)*R*1.2,it.y+Math.sin(a)*R*1.2,1.8,0,6.283); cx.fill(); cx.restore(); } }
+function catchDriz(it){ G.dz++; SND.play("chime",G.dz); buzz(18); G.score+=50*G.mult;
+  for(var i=0;i<16;i++){ var a=Math.random()*6.283, v=1.2+Math.random()*3; G.fx.push({k:"e",x:it.x,y:it.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,s:2+Math.random()*2.5,g:0,a:1}); }
+  G.fx.push({k:"r",x:it.x,y:it.y,vx:0,vy:0,s:8,g:2.2,a:.9});
+  pop(it.x,it.y-12,"🍯 "+G.dz+"/"+DRIZ_N+" "+T("Antidote Drizzle"),"#ffd23f");
+  if(G.dz>=DRIZ_N){ G.rpT=2600; if(window.ReviewEgg) ReviewEgg.toast("🛩️ "+T("Review unlocked — shoot down the banner plane!"),T("Antidote's Melody review is inbound"));
+    radio("Antidote's banner plane inbound. Take it down, Captain!",{tone:"warn",ms:3200}); } }
+function drawDrizHud(now){ if(!G.running||G.dz<=0||G.rpDone) return; var t="🍯 "+Math.min(G.dz,DRIZ_N)+"/"+DRIZ_N, full=G.dz>=DRIZ_N;
+  cx.save(); cx.font="900 14px Barlow,system-ui"; var w=cx.measureText(t).width+18, x=W-8-w, y=50;
+  cx.fillStyle="rgba(8,13,26,.82)"; roundRect(x,y,w,24,12); cx.fill(); cx.strokeStyle=full?(((now/200|0)%2)?"#ffd23f":"#e10600"):"rgba(255,210,63,.6)"; cx.lineWidth=1.5; cx.stroke();
+  cx.fillStyle="#ffd23f"; cx.textAlign="left"; cx.textBaseline="middle"; cx.fillText(t,x+9,y+12.5); cx.restore(); }
+/* the review plane: slow, drifts side to side across the upper sky, tows his review banner; 10 hits brings it down */
+function rpSpawn(){ var d=G.rpPasses%2?-1:1; G.rp={x:d>0?-150:W+150,y:118,d:d,t:0,hp:RP_HITS,hit:0,cool:0,tears:[],flick:0,leave:0}; SND.play("flyby"); }
+function rpTick(dt,k,takeoff,landing){
+  if(!window.ReviewEgg||G.rpDone) return;
+  if(!G.rp&&!G.rpDie&&G.dz>=DRIZ_N&&G.rpPasses<2&&G.rpT>0){ G.rpT-=dt;
+    if(G.rpT<=0){ if(G.boss||G.bossDie||G.won||G.home||takeoff||landing) G.rpT=1500; else rpSpawn(); } }   // a boss fight first: the plane waits
+  var p=G.rp; if(!p) return;
+  p.t+=dt; if(p.cool>0) p.cool-=dt; if(p.hit>0) p.hit-=dt; if(p.flick>0) p.flick-=dt;
+  if(G.boss&&!p.leave) p.leave=1;                                    // a boss shows up: it clears the sky and comes back later
+  if(!p.cruise&&(p.d>0?p.x>=250:p.x<=W-250)) p.cruise=1;               // flies in briskly until it and its banner are on screen
+  var v=(p.leave?3.2:p.cruise?.34:2.6)*k;                              // then a slow pass (~15 s) drifting side to side
+  p.x+=p.d*v; p.y=118+Math.sin(p.t/1300)*26; p.sway=Math.sin(p.t/1700)*40;
+  var px=p.x+p.sway;
+  if(p.hp<RP_HITS*.7&&Math.random()<.5*k) emit(px-p.d*30,p.y+2,p.hp<RP_HITS*.35);
+  // hits: anything you fire that touches the plane or its banner; ~10 hits, one every 0.17 s at most
+  for(var s2=G.shots.length-1;s2>=0;s2--){ var sh=G.shots[s2], onPlane=Math.abs(sh.x-px)<44&&Math.abs(sh.y-p.y)<24, bx=px-p.d*128, onBan=Math.abs(sh.x-bx)<66&&Math.abs(sh.y-p.y)<46;
+    if(!onPlane&&!onBan) continue; G.shots.splice(s2,1);
+    if(p.cool>0){ if(Math.random()<.4) G.fx.push({k:"e",x:sh.x,y:sh.y,vx:(Math.random()-.5)*3,vy:Math.random()*2-1,s:2,g:0,a:.8}); continue; }
+    p.cool=170; p.hp--; p.hit=160; p.flick=220; G.fx.push({k:"r",x:sh.x,y:sh.y,vx:0,vy:0,s:5,g:1.4,a:.85}); SND.play("boom",6);
+    if(onBan||Math.random()<.5) p.tears.push({u:Math.random(),dv:.25+Math.random()*.5,s:.6+Math.random()*.6});
+    if(p.hp<=0){ rpDown(p,px); return; } }
+  if((p.d>0&&p.x>W+170)||(p.d<0&&p.x<-170)){ var forced=p.leave; G.rp=null; if(!forced) G.rpPasses++;
+    if(G.rpPasses<2){ G.rpT=forced?4000:20000+Math.random()*8000; radio("Banner plane got away. It'll swing back around!",{tone:"info",ms:2400}); } }
 }
-function drawHeal(it,now){ var p=1+.08*Math.sin(now/150); cx.save(); cx.translate(it.x,it.y); cx.scale(p,p);
-  var g=cx.createRadialGradient(0,0,4,0,0,34); g.addColorStop(0,"rgba(80,255,150,.55)"); g.addColorStop(1,"rgba(80,255,150,0)"); cx.fillStyle=g; cx.beginPath(); cx.arc(0,0,34,0,6.283); cx.fill();
-  cx.fillStyle="#f4f7f5"; roundRect(-17,-15,34,30,7); cx.fill(); cx.strokeStyle="#2fae6a"; cx.lineWidth=2; cx.stroke();
-  cx.fillStyle="#26b864"; cx.fillRect(-4,-10,8,20); cx.fillRect(-10,-4,20,8);
-  cx.font="800 11px Barlow,system-ui"; cx.fillStyle="#9dffc8"; cx.textAlign="center"; cx.fillText("+25%",0,30); cx.restore(); }
+function rpBanner(c,bx,by,p,alpha,rot){ // his review cover, FULL and uncropped, on a towed banner with @therealantidote
+  c.save(); c.translate(bx,by); if(rot) c.rotate(rot); if(alpha!=null) c.globalAlpha=alpha;
+  var fl=p.flick>0&&((p.flick/40|0)%2), wv=Math.sin(performance.now()/160)*2;
+  c.fillStyle="rgba(0,0,0,.25)"; c.fillRect(-62+5,-40+7,124,86);
+  ReviewEgg.drawSign(c,0,wv*.3,116,{label:false,glow:fl?.9:.25});
+  c.fillStyle="#0b2a6b"; c.fillRect(-62,33+wv*.3,124,16); c.fillStyle="#ffd23f"; c.font="400 12px Anton,Impact,sans-serif"; c.textAlign="center"; c.textBaseline="middle"; c.fillText("@THEREALANTIDOTE",0,41.5+wv*.3);
+  // tears: dark rips in the banner where it got hit
+  c.fillStyle="rgba(10,6,4,.92)"; p.tears.forEach(function(t){ var x=-58+t.u*116, y=48+wv*.3, h=12+t.dv*40*t.s; c.beginPath(); c.moveTo(x-5*t.s,y); c.lineTo(x+1,y-h); c.lineTo(x+5*t.s,y); c.closePath(); c.fill(); });
+  if(fl){ c.globalCompositeOperation="lighter"; c.fillStyle="rgba(255,255,255,.25)"; c.fillRect(-62,-40,124,90); }
+  c.restore(); }
+function rpPlane(c,x,y,d,p,rot,sc){ var im=S.plane, w=72*(sc||1);
+  c.save(); c.translate(x,y); c.rotate((d>0?Math.PI/2:-Math.PI/2)+(rot||0));
+  if(ready(im)){ var h=w*im.naturalHeight/im.naturalWidth; c.drawImage(im,-w/2,-h/2,w,h); if(p&&p.hit>0){ c.globalCompositeOperation="lighter"; c.globalAlpha=p.hit/220; c.drawImage(im,-w/2,-h/2,w,h); } }
+  else { c.font="44px system-ui"; c.textAlign="center"; c.textBaseline="middle"; c.fillText("✈️",0,0); }
+  c.restore(); }
+function rpDraw(now,dt,k){
+  var p=G.rp;
+  if(p){ var px=p.x+(p.sway||0), bx=px-p.d*128, by=p.y+4;
+    cx.strokeStyle="rgba(240,240,240,.75)"; cx.lineWidth=1.2; cx.beginPath(); cx.moveTo(px-p.d*30,p.y); cx.lineTo(bx+p.d*62,by-30); cx.moveTo(px-p.d*30,p.y); cx.lineTo(bx+p.d*62,by+40); cx.stroke();
+    rpBanner(cx,bx,by,p);
+    rpPlane(cx,px,p.y,p.d,p,Math.sin(p.t/700)*.06);
+    navLights(px-24,px+24,p.y+3,3,2);
+    // HP bar over it
+    var bw=84, x0=px-bw/2, y0=p.y-44; cx.fillStyle="rgba(8,13,26,.85)"; roundRect(x0-2,y0-2,bw+4,10,5); cx.fill();
+    for(var i=0;i<RP_HITS;i++){ cx.fillStyle=i<p.hp?(p.hp>RP_HITS*.5?"#ffd23f":p.hp>RP_HITS*.25?"#ff9a2e":"#ff3b3b"):"rgba(255,255,255,.12)"; cx.fillRect(x0+i*(bw/RP_HITS)+.5,y0,bw/RP_HITS-1,6); }
+    cx.font="900 10px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(0,0,0,.75)"; var lb=T("ANTIDOTE'S REVIEW PLANE"); cx.strokeText(lb,px,y0-7); cx.fillStyle="#fff"; cx.fillText(lb,px,y0-7);
+    if(p.t<2600){ cx.font="900 14px Barlow,system-ui"; var tx2=T("SHOOT IT DOWN!"); cx.strokeText(tx2,W/2,p.y+78); cx.fillStyle=(now/140|0)%2?"#ffd23f":"#ff6b6b"; cx.fillText(tx2,W/2,p.y+78); } }
+  var D=G.rpDie; if(!D) return;
+  D.t+=dt;
+  // the banner tears loose and flutters down
+  D.bvy+=.02*k; D.by+=D.bvy*k; D.bx+=Math.sin(D.t/260)*1.4*k; D.br=Math.sin(D.t/330)*.5;
+  if(D.by<H+120) rpBanner(cx,D.bx,D.by,D.p,Math.max(0,1-D.t/5200),D.br);
+  // the plane spirals in, trailing smoke, then blows up
+  if(!D.boomed){ D.vy+=.045*k; D.y+=D.vy*k; D.x+=D.vx*k; D.rot+=.12*k; D.sc=Math.max(.45,D.sc-.004*k);
+    emit(D.x,D.y,true); if(Math.random()<.18*k) boom(D.x+(Math.random()-.5)*30,D.y+(Math.random()-.5)*20,6);
+    rpPlane(cx,D.x,D.y,D.d,null,D.rot,D.sc);
+    if(D.y>H*.78||D.t>2600){ D.boomed=1; boom(D.x,D.y,46); boom(D.x-26,D.y+12,24); boom(D.x+24,D.y-10,24);
+      G.fx.push({k:"r",x:D.x,y:D.y,vx:0,vy:0,s:16,g:6,a:1}); G.flash=.7; G.shake=20; SND.play("bigboom"); buzz([80,40,160]); } }
+  else if(D.t<4200&&Math.random()<.6*k) emit(D.x+(Math.random()-.5)*24,D.y,true);
+  if(D.t>5600) G.rpDie=null; }
+function rpDown(p,px){ G.rp=null; G.rpDone=1; G.rpDie={t:0,p:p,x:px,y:p.y,vx:p.d*1.1,vy:-.6,rot:0,sc:1,d:p.d,bx:px-p.d*128,by:p.y+4,bvy:.2,br:0};
+  var eb=window.ReviewEgg?ReviewEgg.collect():0; G.score+=eb; pop(px,p.y-20,"+"+eb+" 📺 "+T("Review unlocked!"),"#ffd23f");
+  SND.play("upgrade"); G.shake=10; radio("Banner plane down! Antidote's review is all yours, Captain.",{tone:"win",ms:3200}); }
 function roundRect(x,y,w,h,r){ cx.beginPath(); cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r); cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath(); }
 function boltPath(x){ var pts=[[x,-10]], y=-10; while(y<H){ y+=30+Math.random()*40; pts.push([x+(Math.random()-.5)*44,y]); } return pts; }
 
@@ -797,6 +890,7 @@ var SND=(function(){
     hurt:function(){ tone("sine",140,40,.3,.25); hiss(.22,700,80,.2); },
     pickup:function(){ tone("sine",1200,1900,.07,.035); },
     crate:function(){ tone("triangle",392,392,.1,.06); tone("triangle",587,587,.18,.06,.09); },
+    chime:function(n){ var b=[784,988,1175,1568][(n||0)%4]; tone("sine",b,b,.18,.07); tone("sine",b*1.5,b*1.5,.3,.05,.07); tone("triangle",b*2,b*2,.4,.025,.14); },
     pop:function(){ popSnd(); }
   };
   return {
@@ -864,8 +958,12 @@ function levelTimers(){ var p=L().pace; G.spawnT=600; G.ufoT=2600; G.jetT=6500*p
 function levelEnd(){ G.t=0; if((G.lvl===3||G.lvl===5)&&!G.boss&&!G.bossDie){ spawnBoss(G.lvl===3?"gunship":"superjet"); return; } nextLevel(); }
 function nextLevel(){ var bonus=500*G.lvl, up=""; G.score+=bonus; if(!G.gotCrate&&G.wpn<4){ upgrade(1); up=T(WPN[G.wpn].n)+" "+T("unlocked"); }
   G.lvl++; G.t=60000; G.lel=0; G.heals=0; G.gotCrate=0; G.crates=0; G.crateT=CRATE_AT[G.lvl-1]; levelTimers();
-  G.ens.forEach(function(e){ e.fleeing=1; }); G.banner={t:0,txt:T("LEVEL")+" "+G.lvl,sub:T(L().sub),up:up,bonus:bonus}; SND.play("level"); buzz([30,40,30]);
-  radio(CLEAR_LINES[G.lvl-2]||("Level "+(G.lvl-1)+" complete. Nice flying, Captain!"),{tone:"win",ms:3000}); }
+  G.ens.forEach(function(e){ e.fleeing=1; });
+  var lv=G.lvl, rid=G.runId, go=function(){ if(G.runId!==rid) return; G.banner={t:0,txt:T("LEVEL")+" "+lv,sub:T(L().sub),up:up,bonus:bonus}; SND.play("level"); buzz([30,40,30]);
+    radio(CLEAR_LINES[lv-2]||("Level "+(lv-1)+" complete. Nice flying, Captain!"),{tone:"win",ms:3000}); };
+  // HALFTIME: Antidote's Melody review reel between levels (after level 2, 3 or 4 once ~90 s are flown). The whole game freezes until it's over.
+  if(window.Halftime&&Halftime.levelUp(lv,function(){ G.half=0; G.last=performance.now(); go(); },G.el)){ G.half=1; drag=null; return; }
+  go(); }
 function victory(){ G.won=1; var bonus=5000+Math.round(G.hp)*20; G.score+=bonus; G.inv=1e9; G.eshots=[]; G.warn=[]; G.ens.forEach(function(e){ e.fleeing=1; });
   G.banner={t:0,txt:T("VICTORY!"),sub:T("You shot down the Super Jet"),up:"+"+bonus.toLocaleString()+" "+T("bonus · heading home"),win:1}; SND.play("victory"); buzz([40,40,40,40,200]); radio("Bogey down! Bring her home to LAX, Captain.",{tone:"win"}); }
 function drawBanner(dt){ var b=G.banner; if(!b) return; b.t+=dt; var D=b.win?3600:2600; if(b.t>D){ G.banner=null; return; }
@@ -987,6 +1085,7 @@ function drawBossBar(){ var b=G.boss; if(!b) return; var x=40, w=W-88, y=8, h=13
 /* ---- main loop ---- */
 function frame(now){
   requestAnimationFrame(frame);
+  if(G.half){ G.last=now; return; }   // halftime: the whole flight is frozen on its last frame until the break ends
   var dt=Math.max(0,Math.min(50,now-(G.last||now))); G.last=now; var k=dt/16.67, run=G.running&&!G.dying;
   var TO=4500, LAND=8000, takeoff=run&&G.el<TO, landing=run&&G.home&&G.t<=LAND;
   var spd=run?2.4+Math.min(2.2,G.el/22000):(G.over&&!G.landed?1.2:0); // parked on the runway before the first flight and after landing
@@ -1014,7 +1113,7 @@ function frame(now){
     G.boltT-=dt; if(G.boltT<=0){ spawnBolt(); G.boltT=Math.max(3800,7000-G.lel/25)*pc; }
     G.kamiT-=dt; if(G.kamiT<=0){ spawnKami(); G.kamiT=(14000+Math.random()*6000)*pc; }
     G.copT-=dt; if(G.copT<=0){ spawnCop(); if(G.lvl>=4) setTimeout(spawnCop,1600); G.copT=(18000+Math.random()*8000)*pc; }
-    if(window.ReviewEgg&&!G.home&&ReviewEgg.due(G.el)) { var ex0=G.x<W/2?W*.62+Math.random()*W*.2:W*.18+Math.random()*W*.2; G.items.push({t:"egg",x:ex0,y:-70,r:40,ph:0,x0:ex0,hp:14}); }
+    if(window.ReviewEgg&&!G.home&&G.dz<DRIZ_N){ G.dzT-=dt; if(G.dzT<=0) G.dzT=spawnDriz()?DRIZ_GAP+Math.random()*2000:1500; }
     G.crateT-=dt; if(G.crateT<=0&&G.crates<2&&!G.gotCrate){ G.crates++; G.crateT=1e9; G.items.push({t:"crate",x:60+Math.random()*(W-120),y:-60,r:26,sw:Math.random()*6}); }
     } }
     if(takeoff||landing){ G.tx=W/2; G.ty=landing?H*0.64:H-110; }
@@ -1022,6 +1121,7 @@ function frame(now){
     if(G.inv>0) G.inv-=k; if(G.multT>0){ G.multT-=dt; if(G.multT<=0) G.mult=1; }
     if(Math.floor(now/250)!==Math.floor((now-dt)/250)) G.score+=G.mult;
     G.shotT-=dt; if(G.mfl>0) G.mfl-=dt; if(G.shotT<=0&&!takeoff&&!landing&&!G.home&&!G.won) fire();
+    rpTick(dt,k,takeoff,landing);
   }
   // lightning
   for(var b=G.bolts.length-1;b>=0;b--){ var bo=G.bolts[b]; bo.age+=dt;
@@ -1030,18 +1130,16 @@ function frame(now){
       if(bo.age>1000){ bo.ph="strike"; bo.age=0; bo.pts=boltPath(bo.x); G.flash=.5; G.shake=8; if(run&&Math.abs(G.x-bo.x)<46) hurt(G.x,G.y,T("⚡ LIGHTNING!")); } }
     else { if(bo.age>260){ G.bolts.splice(b,1); continue; } var p=bo.pts; cx.save(); cx.strokeStyle="rgba(150,210,255,.45)"; cx.lineWidth=14; cx.beginPath(); p.forEach(function(q,i){ i?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1]); }); cx.stroke(); cx.strokeStyle="#fff"; cx.lineWidth=4; cx.shadowColor="#9fd8ff"; cx.shadowBlur=22; cx.stroke(); cx.restore(); } }
   // pickups
-  for(var i=G.items.length-1;i>=0;i--){ var it=G.items[i]; if(run){ it.y+=spd*(it.t==="crate"?.8:it.t==="egg"?.6:1.15)*k; if(it.rot!=null) it.rot+=(it.vr||0)*k; if(it.t==="egg"){ it.ph+=.012*k; it.x=it.x0+Math.sin(it.ph)*Math.min(it.x0-55,W-55-it.x0); } }
-    if(it.y>H+(it.t==="egg"?130:60)){ if(it.t==="crate"&&!G.gotCrate) G.crateT=9000; G.items.splice(i,1); continue; }
+  for(var i=G.items.length-1;i>=0;i--){ var it=G.items[i]; if(run){ it.y+=spd*(it.t==="crate"?.8:it.t==="driz"?.95:1.15)*k; if(it.rot!=null) it.rot+=(it.vr||0)*k; if(it.t==="driz"){ it.ph+=.03*k; it.x=it.x0+Math.sin(it.ph)*14; } }
+    if(it.y>H+60){ if(it.t==="crate"&&!G.gotCrate) G.crateT=9000; G.items.splice(i,1); continue; }
     if(it.t==="crate") drawCrate(it,now);
-    else if(it.t==="egg"){ drawEggBlimp(it,now);
-      if(run&&it.y>90){ var shotIt=0; for(var si=G.shots.length-1;si>=0;si--){ var shh=G.shots[si]; if(Math.abs(shh.x-it.x)<56&&Math.abs(shh.y-it.y)<38){ G.shots.splice(si,1); if(--it.hp<=0) shotIt=1; else G.fx.push({k:"r",x:shh.x,y:shh.y,s:4,g:1.2,a:.8,vx:0,vy:0}); break; } }   // shoot the billboard (14 hits)
-        if(shotIt){ var eb0=ReviewEgg.collect(); G.score+=eb0; pop(it.x,it.y-10,"+"+eb0+" 📺 "+T("Antidote's review"),"#ffd23f"); SND.play("upgrade"); boom(it.x,it.y,10); G.items.splice(i,1); continue; } } }
+    else if(it.t==="driz") drawDriz(it,now);
     else if(it.t==="coin") drawCoin(it,now);
     else if(it.t==="heal") drawHeal(it,now);
     else { var P=it.t==="mic"?MIC:it.p, bob=Math.sin(now/260+it.x)*3; var gl=cx.createRadialGradient(it.x,it.y,4,it.x,it.y,P.w*.8); gl.addColorStop(0,it.t==="mic"?"rgba(228,107,131,.55)":"rgba(240,211,117,.45)"); gl.addColorStop(1,"rgba(0,0,0,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(it.x,it.y,P.w*.8,0,6.283); cx.fill(); sprite(P.im,it.x,it.y+bob,P.w,it.rot,false,P.e); }
     if(run&&Math.abs(it.x-G.x)<it.r+26&&Math.abs(it.y-G.y)<it.r+28){
       if((it.t==="crate"||it.t==="heal"||it.t==="mic")&&performance.now()-pickT>20000){ pickT=performance.now(); radio(it.t==="crate"?"Nice pickup! Weapons upgraded.":it.t==="heal"?"Nice pickup! Patching you up.":"Nice pickup! Double points, sing it!",{tone:"info",ms:2200}); }
-      if(it.t==="egg"){ var eb=ReviewEgg.collect(); G.score+=eb; pop(it.x,it.y-10,"+"+eb+" 📺 "+T("Antidote's review"),"#ffd23f"); SND.play("upgrade"); buzz([20,40,20]); }
+      if(it.t==="driz") catchDriz(it);
       else if(it.t==="crate"){ G.gotCrate=1; SND.play("crate"); if(G.wpn<4) upgrade(); else { G.score+=750*G.mult; pop(it.x,it.y,"+"+750*G.mult+" "+T("Max power!"),"#ffd23f"); } }
       else if(it.t==="coin"){ SND.play("pickup"); G.score+=10*G.mult; pop(it.x,it.y,"+"+10*G.mult,"#f0d375"); }
       else if(it.t==="heal"){ SND.play("crate"); var before=G.hp; G.hp=Math.min(100,G.hp+25); pop(it.x,it.y,"+"+Math.round(G.hp-before)+"% health","#7dffb5"); buzz(30); }
@@ -1096,6 +1194,7 @@ function frame(now){
     if(en.mhp>2&&en.hp<en.mhp){ var hbw=40, hby=en.y-(en.t==="cop"?COP_LEN*.5+6:en.r+14); cx.fillStyle="rgba(0,0,0,.6)"; cx.fillRect(en.x-hbw/2-1,hby-1,hbw+2,6); cx.fillStyle=en.hp/en.mhp>.5?"#7ef7c8":"#ffb03b"; cx.fillRect(en.x-hbw/2,hby,hbw*Math.max(0,en.hp/en.mhp),4); }
     if(run&&Math.abs(en.x-G.x)<en.r+22&&Math.abs(en.y-G.y)<en.r+26){ hurt(en.x,en.y,en.t==="kami"?T("💥 Mid-air hit!"):en.t==="ufo"?T("🛸 Abducted!"):en.t==="cop"?T("🚁 Rammed the chopper!"):T("💥 Jet hit!")); boom(en.x,en.y,24); G.ens.splice(e,1); } }
   SND.rotor(run?rv:0);
+  rpDraw(now,dt,k);
   if(G.bossDie) bossDieStep(dt,k);
   // your shots: each gun tier has its own look; red beams pierce
   cx.save(); cx.globalCompositeOperation="lighter";
@@ -1131,7 +1230,7 @@ function frame(now){
   }
   drawClouds(spd*k);
   for(var pI=G.pops.length-1;pI>=0;pI--){ var po=G.pops[pI]; po.y-=1.1*k; po.a-=.02*k; if(po.a<=0){ G.pops.splice(pI,1); continue; } cx.globalAlpha=po.a; cx.fillStyle=po.col; cx.font="800 17px Barlow,system-ui"; cx.textAlign="center"; cx.fillText(po.txt,po.x,po.y); cx.globalAlpha=1; }
-  drawBossBar(); drawUpgrade(dt); drawBanner(dt);
+  drawBossBar(); drawUpgrade(dt); drawBanner(dt); drawDrizHud(now);
   if(takeoff||(landing&&!G.touched)){ var msg=takeoff?(G.el<1500?T("Cleared for takeoff · Runway 25L"):T("Wheels up! Grab the food")):T("Melody tower: cleared to land 25L"); cx.save(); cx.font="900 17px Barlow,system-ui"; cx.textAlign="center"; var tw=cx.measureText(msg).width+28; cx.fillStyle="rgba(8,13,26,.82)"; roundRect(W/2-tw/2,64,tw,34,17); cx.fill(); cx.fillStyle="#f0d375"; cx.textBaseline="middle"; cx.fillText(msg,W/2,81); cx.restore(); }
   if(G.mult>1&&run){ cx.fillStyle="rgba(228,107,131,.9)"; cx.font="900 16px Barlow,system-ui"; cx.textAlign="left"; cx.fillText("🎤 2× "+Math.ceil(G.multT/1000)+"s",10,G.boss?44:24); }
   if(G.red>0){ var rg=cx.createRadialGradient(W/2,H/2,H*.3,W/2,H/2,H*.75); rg.addColorStop(0,"rgba(255,0,0,0)"); rg.addColorStop(1,"rgba(255,0,0,"+(.55*G.red*(.6+.4*Math.sin(now/60)))+")"); cx.fillStyle=rg; cx.fillRect(0,0,W,H); G.red-=.012*k; }
@@ -1222,9 +1321,9 @@ hud();
 function row(icon,name,val,bad){ return '<div'+(bad?' class="bad"':'')+'>'+icon+'<span><b>'+esc(name)+'</b></span><span class="v">'+val+'</span></div>'; }
 function ic(p){ return '<img src="img/game/'+p.k+'.webp" alt="" onerror="this.outerHTML=\'<span class=e>'+p.e+'</span>\'">'; }
 $("points").innerHTML='<div class="ptsh">Grab these</div><div class="pts">'+PICK.map(function(p){return row(ic(p),p.n,"+"+p.p);}).join("")+
-  row('<span class="e">🪙</span>',"Melody coin","+10")+row(ic(MIC),"Karaoke mic","2× · 6s")+row('<span class="e">➕</span>',"Health kit (rare)","+25%")+'</div>'+
+  row('<span class="e">🪙</span>',"Melody coin","+10")+row(ic(MIC),"Karaoke mic","2× · 6s")+row('<span class="e">➕</span>',"Health kit (rare)","+25%")+row('<img src="../review/antidote-foodie.webp" alt="">',"Antidote Drizzle emblem (catch "+DRIZ_N+")","+50")+'</div>'+
   '<div class="ptsh">Shoot these down</div><div class="pts">'+row('<span class="e">🛸</span>',"UFO (tougher each level)","+150")+row('<span class="e">🛩️</span>',"Fighter jet","+200")+row('<span class="e">✈️</span>',"Kamikaze plane","+300")+row('<span class="e">🚁</span>',"LAPD chopper","+500")+
-  row('<span class="e">🪖</span>',"Gunship · L3 boss","+3k")+row('<span class="e">🛩️</span>',"Super Jet · L5 boss","+5k")+'</div>'+
+  row('<span class="e">🪖</span>',"Gunship · L3 boss","+3k")+row('<span class="e">🛩️</span>',"Super Jet · L5 boss","+5k")+row('<span class="e">📺</span>',"Antidote's review plane (~10 hits)","+500")+'</div>'+
   '<div class="ptsh">Levels & guns</div><div class="pts">'+row('<span class="e">⏱️</span>',"Clear a level (500 × level)","+500")+row('<span class="e">🪂</span>',"Weapon crate: next gun","⚡")+
   WPN.map(function(w,i){ return row('<span class="e" style="color:'+w.c+'">'+["•","≡","●","⫼","▮"][i]+'</span>',(i+1)+". "+w.n,["start","crate","crate","crate","max"][i]); }).join("")+row('<span class="e">🏆</span>',"Beat the jet (+ health bonus)","+5k")+'</div>'+
   '<div class="ptsh">Dodge these · each hit takes ⅓ of your health</div><div class="pts">'+row('<span class="e">⚡</span>',"Lightning","−⅓",1)+row('<span class="e">🚀</span>',"Missiles & UFO zaps","−⅓",1)+row('<span class="e">💥</span>',"Crashing into anything","−⅓",1)+row('<span class="e">🔴</span>',"Red flash + buzz = plane coming","dodge!",1)+'</div>'+
@@ -1244,17 +1343,21 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
    ["⬆️","Every level the UFOs, jets and LAPD choppers take more hits, move faster and come more often"],
    ["🪖","Level 3 boss: an Army gunship with a gunner in each door. Keep moving"],
    ["🛩️","Level 5 boss: the Super Jet. It dives and drops bombs, sweeps across with missiles, then turns around SLOWLY. Shoot it while it turns (full damage)"],
-   ["🔴","Red flash + buzz = a plane is coming at you. Dodge!"],["➕","Health kits are rare: +25% each, up to 2 per level"]]},
+   ["🔴","Red flash + buzz = a plane is coming at you. Dodge!"],["➕","Health kits are rare: +25% each, up to 2 per level"],
+   ["🍯","Secret quest: catch 7 spinning Antidote Drizzle emblems. That calls in Antidote's banner plane towing his Melody review. It never shoots back: get behind it and hit it about 10 times to bring it down and unlock the review"],
+   ["📺","Halftime: once a flight, between levels, a 20-second reel of Antidote The Foodie's Melody review plays. Skip it any time"]]},
  points:[
   {group:"Grab these",items:[{img:g+"p_mac.webp",name:"Mac & Cheese",pts:"+80"},{img:g+"p_wings.webp",name:"Lemon Pepper Wings",pts:"+70"},{img:g+"p_toast.webp",name:"French Toast",pts:"+60"},{img:g+"p_omelette.webp",name:"Philly Omelette",pts:"+60"},
    {img:g+"p_marg.webp",name:"Mango Marg",pts:"+50"},{img:g+"p_bottle.webp",name:"Bottle service",pts:"+40"},{img:g+"p_shots.webp",name:"Round of shots",pts:"+40"},{icon:"🪙",name:"Melody coin",pts:"+10"},
-   {img:g+"p_mic.webp",name:"Karaoke mic",note:"Double points for 6 seconds",pts:"2×"},{icon:"➕",name:"Health kit (rare)",pts:"+25%"},{icon:"🪂",name:"Weapon crate",note:"Next gun tier. Already maxed out: +750",pts:"⚡",gold:true}]},
+   {img:g+"p_mic.webp",name:"Karaoke mic",note:"Double points for 6 seconds",pts:"2×"},{icon:"➕",name:"Health kit (rare)",pts:"+25%"},{icon:"🪂",name:"Weapon crate",note:"Next gun tier. Already maxed out: +750",pts:"⚡",gold:true},
+   {img:"../review/antidote-foodie.webp",name:"Antidote Drizzle emblem",note:"Catch 7 to call in Antidote's review plane",pts:"+50",gold:true}]},
   {group:"Shoot these down",items:[{img:g+"ufo.webp",name:"UFO",note:"2 hits on level 1 → 16 on level 5. Fires spreads from level 3",pts:"+150"},{img:g+"jet.webp",name:"Fighter jet",note:"Fast, fires 2 missiles",pts:"+200"},
    {img:g+"plane.webp",name:"Kamikaze plane",note:"Aimed right at you",pts:"+300"},{img:g+"lapd_blue.webp",name:"LAPD chopper",note:"SWAT gunner fires 5-round bursts. Faster each level, in pairs from level 4",pts:"+500"},
    {icon:"🪖",name:"BOSS: Army gunship",note:"End of level 3 · two door gunners, rockets when it's hurt",pts:"+3,000",gold:true},
    {icon:"🛩️",name:"FINAL BOSS: Super Jet",note:"End of level 5 · bombs, missile runs, homing missiles when enraged",pts:"+5,000",gold:true},
    {icon:"🏆",name:"Beat the Super Jet",note:"Victory bonus + 20 per % health left, then land at LAX",pts:"+5,000",gold:true},
-   {icon:"⏱️",name:"Clear a level",note:"Kill points also grow 25% per level",pts:"+500 × level"}]},
+   {icon:"⏱️",name:"Clear a level",note:"Kill points also grow 25% per level",pts:"+500 × level"},
+   {icon:"📺",name:"Antidote's review plane",note:"After 7 emblems · ~10 hits · never shoots back · unlocks his Melody review",pts:"+500",gold:true}]},
   {group:"Your guns",items:[{icon:"•",name:"1. Twin guns",note:"Start · 2 rounds, 1 dmg, ~4 volleys/s",pts:"7.7/s"},{icon:"≡",name:"2. Laser",note:"Fast green bolts · 1.5 dmg, 5 volleys/s",pts:"15/s"},
    {icon:"●",name:"3. Power gun",note:"Heavy orange slugs · 3 dmg each",pts:"21/s"},{icon:"⫼",name:"4. Blue beams",note:"Automatic: 3 beams, 10 volleys/s",pts:"42/s"},
    {icon:"▮",name:"5. Red beams",note:"Most powerful: 3 thick beams that pierce",pts:"70/s",gold:true}]},

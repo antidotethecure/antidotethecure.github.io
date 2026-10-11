@@ -245,7 +245,8 @@
     G.pierSide = G.x < PIER_X ? -1 : 1; G.staffToss = 2.2; G.jump = 0; G.jumpDur = 0; G.jcd = 0; G.hint = 6; G.wave = 0;
     G.level = DBG_LVL; G.lvT = DBG_BOSS && LV[G.level].boss ? LV[G.level].dur - 3 : 0; G.ammo = G.level > 1 ? 3 : 0; G.fcd = 0; G.harps = []; G.blobs = []; G.boss = null; G.bossBeat = 0;
     G.banner = null; G.conf = []; G.wo = 0; G.won = 0; G.winT = 0; G.finaleMsg = ""; G.spawn.harp = G.level > 1 ? 6 : 14; G.spawn.rock = 5; G.spawn.ski = 9; G.harpHint = 0;
-    G.eggT = 0; if (window.ReviewEgg) ReviewEgg.reset(20, 40);   // Antidote's review billboard buoy: once a run, 20-40 s of riding in
+    G.eggT = 0; if (window.ReviewEgg) ReviewEgg.reset(20, 40);
+    if (window.Halftime) Halftime.reset();   // halftime: Antidote's Nalu Vida review reel, once a run, at a level-up after ~90 s   // Antidote's review billboard buoy: once a run, 20-40 s of riding in
   }
   function L() { return LV[G.level] || LV[5]; }
   function speed() { return (150 + 22 * (G.lap - 1)) * L().spd * (G.boss ? .8 : 1) * (G.phase === "ride" || G.phase === "victory" ? 1 : 0); }
@@ -523,8 +524,12 @@
   function clearNear() { G.ents = G.ents.filter(function (e) { return !((e.t === "shark" || e.t === "eel" || e.t === "jelly") && Math.abs(e.yw - G.yw) < 320); }); }
   function levelUp() {
     var bonus = 1500 * G.level; G.score += bonus; G.bossBeat = 0; var done = G.level; G.level = Math.min(5, G.level + 1); G.lvT = 0; G.inv = Math.max(G.inv, 1.6); clearNear();
-    banner("LEVEL " + G.level, L().sub, "LEVEL " + done + " CLEAR · +" + bonus.toLocaleString()); sfx("level"); buzz([30, 40, 30]);
-    radio(done === 4 ? "Level 4 clear! Last set, ride it home." : "Level " + done + " clear! Nice ride, keep it going.", { tone: "win" });
+    var lv = G.level, rid = G.runId, go = function () { if (G.runId !== rid || G.over) return;
+      banner("LEVEL " + lv, LV[lv].sub, "LEVEL " + done + " CLEAR · +" + bonus.toLocaleString()); sfx("level"); buzz([30, 40, 30]);
+      radio(done === 4 ? "Level 4 clear! Last set, ride it home." : "Level " + done + " clear! Nice ride, keep it going.", { tone: "win" }); };
+    // HALFTIME between levels (after level 2, 3 or 4 once ~90 s are ridden): everything freezes until the break is over
+    if (window.Halftime && Halftime.levelUp(lv, function () { if (G.runId !== rid || G.over) return; G.running = true; last = 0; drag = null; musicSync(); go(); })) { G.running = false; drag = null; }
+    else go();
     if (G.level >= 2 && G.ammo < 3) { G.ammo = 3; pop(G.x, sy(G.yw) - 60, "+3 HARPOONS 🔱", "#ffb15e"); }
     G.spawn.harp = Math.min(G.spawn.harp, 6); G.spawn.rock = 3;
   }

@@ -219,6 +219,8 @@ footer a{color:var(--ink)}
 
 <script>window.REVIEW_EGG={vid:"ZBqEoDMO_jU",restaurant:"Lucky Dragon Hibachi",short:"LUCKY DRAGON",kind:"clip",bonus:300,img:"img/review/cover.webp",find:"A paper lantern drifts down once a run. Catch it on your tray"};</script>
 <script src="../reviewegg.js"></script>
+<script>window.HALFTIME={min:85,max:95};</script>
+<script src="../halftime.js"></script>
 <script>
 "use strict";
 /* ================= CONFIG — the only block that changes per client ================= */
@@ -643,7 +645,10 @@ var CONFIG = {
     requestAnimationFrame(step);
   }
   var flash=null;
+  var htPlayed=0;   // ms of play across this visit's runs (halftime)
   function start(){
+  // HALFTIME: no levels here, so the break plays between runs: the first new run after ~90 s of total play opens with Antidote's review reel
+    if(window.Halftime&&Halftime.tick(htPlayed,null,start)) return;
     running=true; score=0; combo=0; tLeft=CONFIG.game.seconds; drops=[]; smoke=[]; landed=[]; bowlVX=0; last=performance.now(); spawnAcc=0; timerAcc=0; flash=null;
     $("score").textContent=0; $("timer").textContent=tLeft; $("final").hidden=true;
     drg={x:W/2, dir:1, mode:"patrol", t:0, y:44, burned:false}; burns=0;
@@ -652,6 +657,7 @@ var CONFIG = {
     requestAnimationFrame(step);
   }
   function end(burnt){
+    if(running) htPlayed+=Math.max(0,(CONFIG.game.seconds-tLeft)*1000+timerAcc);
     running=false;
     cx.clearRect(0,0,W,H);
     drawBowl(W/2);                                    // show the bowl's final state — burnt or saved

@@ -3,7 +3,14 @@
    Reads the page's CONFIG (name, address) and drafts the services agreement live in the
    browser. Signing pads + Save as PDF. Nothing is uploaded or stored anywhere; the draft
    only lives on this device until the page is closed.
-   Wording mirrors ~/plugin/skills/second-shift-contract/template.html. Change both together. */
+   Wording mirrors ~/plugin/skills/second-shift-contract/template.html. Change both together.
+   Three clauses are ON by default for every new agreement (2026-10-10), each with its own switch in the form:
+     2A Performance share: pct% (10) of ALL App-Attributed Sales in a calendar month they exceed threshold ($3,000);
+        food + non-alcoholic only, no tax, tips or alcohol. Tracked by demo/crm.js ("Ring up a member" + "App sales").
+     3A 90-day results check: cancel with 30 days' notice if under N (12) tracked return visits a month by day 90.
+     5A Customer data: full access while paying, complete export within 10 days of termination, no collection after.
+   CONFIG.locations = ["Melody Bar and Grill", "Nalu Vida"] (2+ names) makes the threshold apply per restaurant.
+   Draft wording: not legal advice; have a California business attorney review it. */
 (function () {
   "use strict";
   var CFG = window.CONFIG || {};
@@ -46,6 +53,7 @@
     "#ssai-o label{display:block;font:700 11px Arial;letter-spacing:.05em;text-transform:uppercase;color:#445;margin:10px 0 3px}",
     "#ssai-o input,#ssai-o textarea,#ssai-o select{width:100%;box-sizing:border-box;font:15px Arial;padding:9px 10px;border:1px solid #c7cfdc;border-radius:9px;background:#fff;color:#111}",
     "#ssai-o .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}",
+    "#ssai-o label.ck{display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font:700 14px Arial;color:#111}#ssai-o label.ck input{width:18px;height:18px;flex:none;margin:0}",
     "#ssai-o .presets{display:flex;gap:6px;flex-wrap:wrap}#ssai-o .presets button{flex:1;font:700 12px Arial;border:1px solid #1E6BFF;background:#fff;color:#1E6BFF;border-radius:9px;padding:8px;cursor:pointer}",
     "#ssai-o .presets button.on{background:#1E6BFF;color:#fff}",
     "#ssai-o .sum{margin-top:12px;background:#0B2A6F;color:#fff;border-radius:10px;padding:10px 12px;font-size:13px}",
@@ -60,7 +68,7 @@
     "#ssai-doc canvas{width:100%;height:110px;border:1px dashed #8a96aa;border-radius:8px;touch-action:none;background:#fbfcff;display:block}",
     "#ssai-doc .clr{font:700 11px Arial;border:0;background:none;color:#1E6BFF;cursor:pointer;padding:3px 0}",
     "#ssai-doc .sm{font-size:9pt;color:#444}",
-    "@media print{body>*:not(#ssai-o){display:none!important}#ssai-o{position:static;display:block!important;background:#fff;overflow:visible}#ssai-o .bar,#ssai-o form,#ssai-doc .clr{display:none!important}#ssai-o .wrap{display:block;padding:0}#ssai-doc{box-shadow:none;padding:0}#ssai-doc canvas{border:0;border-bottom:1px solid #111;border-radius:0;background:none}}"
+    "@media print{html:not(.crm-printing) body>*:not(#ssai-o){display:none!important}html:not(.crm-printing) #ssai-o{position:static;display:block!important;background:#fff;overflow:visible}#ssai-o .bar,#ssai-o form,#ssai-doc .clr{display:none!important}#ssai-o .wrap{display:block;padding:0}#ssai-doc{box-shadow:none;padding:0}#ssai-doc canvas{border:0;border-bottom:1px solid #111;border-radius:0;background:none}}"
   ].join("\n");
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 
@@ -89,6 +97,12 @@
     '<div class="row"><div><label>Discount months</label><input name="months" type="number" min="0" title="0 = for as long as the agreement runs"></div><div><label>Minimum term (months)</label><input name="minimum" type="number" min="0" value="3"></div></div>' +
     '<div class="row"><div><label>Plan monthly $ (first months)</label><input name="intro" type="number" min="0" title="0 = no plan rate; regular monthly from day one"></div><div><label>Plan months</label><input name="intro_months" type="number" min="0"></div></div>' +
     '<label>Setup paid at signing %</label><input name="upfront" type="number" min="0" max="100" value="50">' +
+    '<label>Clauses (on by default)</label>' +
+    '<label class="ck"><input type="checkbox" name="ps" checked> 2A Performance share</label>' +
+    '<div class="row"><div><label>Share %</label><input name="ps_pct" type="number" min="0" max="100" value="10"></div><div><label>Over $ / month</label><input name="ps_th" type="number" min="0" value="3000"></div></div>' +
+    '<label class="ck"><input type="checkbox" name="rc" checked> 3A 90-day results check</label>' +
+    '<label>Return visits a month needed</label><input name="rc_n" type="number" min="0" value="12">' +
+    '<label class="ck"><input type="checkbox" name="cd" checked> 5A Customer data</label>' +
     '<label>Special terms</label><textarea name="special" rows="3" placeholder="Anything you agreed that is not above"></textarea>' +
     '<div class="sum" id="ssai-sum"></div>' +
     '</form><div id="ssai-doc"></div></div>';
@@ -107,6 +121,30 @@
   function v(n) { return F[n].value.trim(); }
   function num(n) { var x = parseFloat(F[n].value); return isFinite(x) ? x : 0; }
 
+  function andList(xs) { return xs.length === 1 ? xs[0] : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1]; }
+  // Sections 2A / 3A / 5A + the fee-table row. Same wording as clauses() in make_contract.py.
+  function clauses() {
+    var ps = F.ps.checked, rc = F.rc.checked, cd = F.cd.checked, th = money(num("ps_th")), pct = num("ps_pct") + "%", n = Math.round(num("rc_n"));
+    var locs = (CFG.locations || []).filter(Boolean), many = locs.length > 1, c = { row: "", s2a: "", s3a: "", s5a: "",
+      cancel: "If Client cancels, Provider will hand over Client's customer and player data in a standard file format." };
+    if (ps) {
+      c.row = '<tr><td>Performance share</td><td>None</td><td><b>' + pct + ' of App-Attributed Sales</b><br><span class="sm">only in a month they exceed ' + th + (many ? ' at a restaurant' : '') + '; food and non-alcoholic only; see Section 2A</span></td></tr>';
+      c.s2a = '<h2>2A. Performance share</h2><p>In addition to the monthly fee, in any calendar month in which App-Attributed Sales exceed ' + th + ', Client will pay Provider ' + pct + ' of that month\'s App-Attributed Sales. The ' + pct + ' applies to all of that month\'s App-Attributed Sales, not only the amount above ' + th + '. In a month where App-Attributed Sales are ' + th + ' or less, no performance share is owed.' +
+        (many ? ' The ' + th + ' threshold applies separately to each restaurant covered by this Agreement (' + e(andList(locs)) + '). Each restaurant\'s App-Attributed Sales are measured and tested on their own, the performance share is owed only for a restaurant whose own App-Attributed Sales exceed ' + th + ' that month, and sales from different restaurants are never combined.' : '') + '</p>' +
+        '<p>"App-Attributed Sales" means sales to customers who join, engage with or come back through the App: (a) orders placed through the App, and (b) purchases at Client\'s register where the customer is identified through the App, because the customer shows their member QR code or code, staff enter the member\'s phone number, or the customer redeems an App reward, promo code or points. App-Attributed Sales count food and non-alcoholic beverage sales only. They exclude sales tax, tips and gratuities, and all alcoholic beverages. Client\'s other sales are never included.</p>' +
+        '<p>Provider will send Client a statement by the 5th day of each month for the month before, listing each App-Attributed sale (date, receipt number, member, how the member was identified, and the amount counted). Client may dispute a statement in writing within 10 days of receiving it, and the parties will reconcile the disputed items against Client\'s register (POS) reports in good faith. Payment is due within 15 days of the statement date; a disputed amount is due within 15 days after it is resolved.</p>';
+    }
+    if (rc) c.s3a = '<h2>3A. 90-day results check</h2><p>If, by day 90 after Go-Live, the App is not bringing back at least ' + n + ' tracked return visits a month' + (ps && many ? ' across the restaurants covered by this Agreement' : '') + ', Client may cancel the monthly plan by giving 30 days\' written notice (email counts), even during a minimum term. A "tracked return visit" is a visit by a customer identified through the App (an App order, the member\'s QR code or code, the member\'s phone number, or an App reward or promo code) on a later day than that customer\'s first visit. The count comes from the App\'s records for the most recent full calendar month, which Client can see in its owner view. Fees already paid, including the setup fee, are not refunded.</p>';
+    if (cd) {
+      c.cancel = "If Client cancels, Client's customer data is handled as described in Section 5A.";
+      c.s5a = '<h2>5A. Customer data</h2><p><b>While Client is paying.</b> While Client is paying for the service, Client has full access to all customer information collected through the App, including names, phone numbers, email addresses, visit and points history, and the export (CSV) of that list.</p>' +
+        '<p><b>If the service ends.</b> If Client stops paying or cancels, Client keeps a complete export of every customer collected through the App up to the date the service ends (the "Termination Date"). Provider will deliver that export to Client within 10 days after the Termination Date.</p>' +
+        '<p><b>After the Termination Date.</b> From the Termination Date on, the App stops collecting customers for Client, and Provider has no obligation to collect, store or provide customer information for Client after that date.</p>' +
+        '<p><b>Provider\'s use.</b> Provider will not sell Client\'s customer list or use it for any other business. After delivering the export, Provider will delete the data, or archive it only where the law requires.</p>' +
+        '<p><b>Privacy.</b> Client is responsible for using the customer list in line with the consent each customer gave, including text and email opt-ins and opt-outs (for example, a customer who replies STOP).</p>';
+    }
+    return c;
+  }
   function render() {
     var sl = num("setup_list"), ml = num("monthly_list"), sd = num("sd"), md = num("md"), months = Math.round(num("months"));
     var minimum = Math.round(num("minimum")), up = Math.min(100, Math.max(0, num("upfront")));
@@ -125,6 +163,7 @@
       : "This Agreement continues month to month with no minimum term. Either party may cancel by giving 30 days' written notice; email counts.";
     if (intro) term += " Client chose the " + (planName ? planName + " " : "") + "payment plan, which takes a smaller setup payment in exchange for a higher monthly fee during the first " + introM + " months; the minimum term is a condition of that plan. Client was also offered the Pay-in-full plan: " + money(full.setup_list) + " setup paid at signing and " + money(full.monthly_list) + " per month, month to month, with no minimum term.";
     else if (minimum > 0 && (sd || md)) term += " The minimum term is a condition of the founding-partner discount only. Client was offered the regular plan instead: " + money(sl) + " setup paid in full up front and " + money(ml) + " per month, month to month, with no minimum term.";
+    var CL = clauses();
     var sigBlock = function (who, title, name, tt, email) {
       return '<div><b>' + title + '</b><canvas data-sig="' + who + '"></canvas><button type="button" class="clr" data-clear="' + who + '">Clear signature</button><br>' +
         'Name: ' + name + '<br>Title: ' + tt + '<br>Email: ' + email + '<br>Date: <span data-date="' + who + '"></span></div>';
@@ -136,13 +175,13 @@
       '<p>"Go-Live" means the day the Client\'s page and game are published and the table QR codes point to them. Provider will ask Client to approve the build before Go-Live. Changes outside this list are quoted and billed separately.</p>' +
       '<h2>2. Fees</h2><table class="f"><tr><th>Item</th><th>Regular price</th><th>Client\'s price</th></tr>' +
       '<tr><td>Setup (one time)</td><td>' + money(intro ? full.setup_list : sl) + '</td><td><b>' + money(sn) + '</b>' + (intro ? '<br><span class="sm">smaller setup under the ' + e(planName || "payment") + ' plan; offset by the plan monthly fee</span>' : "") + (sd ? '<br><span class="sm">' + sd + '% founding-partner discount</span>' : "") + '</td></tr>' +
-      '<tr><td>Monthly service</td><td>' + money(ml) + ' / month</td><td><b>' + (intro ? money(intro) + ' / month</b><br><span class="sm">months 1–' + introM + ', then <b>' + money(mn) + ' / month</b></span>' : money(mn) + ' / month</b>') + (mNote ? '<br><span class="sm">' + mNote + '</span>' : "") + '</td></tr></table>' +
+      '<tr><td>Monthly service</td><td>' + money(ml) + ' / month</td><td><b>' + (intro ? money(intro) + ' / month</b><br><span class="sm">months 1–' + introM + ', then <b>' + money(mn) + ' / month</b></span>' : money(mn) + ' / month</b>') + (mNote ? '<br><span class="sm">' + mNote + '</span>' : "") + '</td></tr>' + CL.row + '</table>' +
       '<p><b>Setup payment:</b> ' + pay + '</p>' +
       '<p><b>Monthly payment:</b> The monthly fee starts on the Effective Date (the day this Agreement is signed) and is billed each month in advance on that date. ' + mAfter + '</p>' +
-      '<p>If a payment is more than 15 days late, Provider may pause the service until it is paid. Prices do not include any third-party costs Client chooses to add (for example printing beyond the included QR table tents, paid advertising, or prizes).</p>' +
-      '<h2>3. Term and cancellation</h2><p>' + term + ' The setup fee is non-refundable once Provider has delivered the build for Client\'s review. If Client cancels, Provider will hand over Client\'s customer and player data in a standard file format.</p>' +
+      '<p>If a payment is more than 15 days late, Provider may pause the service until it is paid. Prices do not include any third-party costs Client chooses to add (for example printing beyond the included QR table tents, paid advertising, or prizes).</p>' + CL.s2a +
+      '<h2>3. Term and cancellation</h2><p>' + term + ' The setup fee is non-refundable once Provider has delivered the build for Client\'s review. ' + CL.cancel + '</p>' + CL.s3a +
       '<h2>4. Client responsibilities</h2><ul><li>Provide accurate menu items, prices, hours and photos, and tell Provider about changes.</li><li>Choose, fund and honor any prizes, discounts or rewards published in the game. Provider does not pay for prizes.</li><li>Run any prize promotion as a free-to-enter promotion with official rules, and follow the laws that apply to Client\'s business and promotions. Provider will supply standard official-rules text for Client to approve.</li></ul>' +
-      '<h2>5. Ownership and data</h2><p>Client owns its business name, logo, menu content, photos it provides, and its customer data. Provider owns the software, game code and design system, and gives Client the right to use them for as long as this Agreement is active. Provider will not sell Client\'s customer data.</p>' +
+      '<h2>5. Ownership and data</h2><p>Client owns its business name, logo, menu content, photos it provides, and its customer data. Provider owns the software, game code and design system, and gives Client the right to use them for as long as this Agreement is active. Provider will not sell Client\'s customer data.</p>' + CL.s5a +
       '<h2>6. No guaranteed results</h2><p>Provider builds and runs the system but does not promise any specific number of customers, visits or sales.</p>' +
       '<h2>7. Limits on liability</h2><p>Neither party is liable for indirect or lost-profit damages. Provider\'s total liability under this Agreement is limited to the fees Client paid in the three months before the claim.</p>' +
       '<h2>8. Confidentiality</h2><p>Each party will keep the other\'s non-public business information confidential and use it only for this Agreement.</p>' +
@@ -152,7 +191,9 @@
       sigBlock("provider", "PROVIDER: Antidote Enterprises LLC dba SousShift AI", PROVIDER.name, "Owner", PROVIDER.email) + '</div>' +
       '<p class="sm">Prepared ' + today.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) + '.</p>';
     S.innerHTML = "Setup <b>" + money(sn) + "</b>" + (sd ? " (was " + money(sl) + ")" : "") + " · " + up + "% today = <b>" + money(sn * up / 100) + "</b><br>" +
-      "Monthly <b>" + (intro ? money(intro) + "</b> × " + introM + ", then <b>" + money(mn) + "</b>" : money(mn) + "</b>") + (md && months ? " × " + months + ", then " + money(ml) : "") + (minimum ? " · " + minimum + "-month minimum" : "");
+      "Monthly <b>" + (intro ? money(intro) + "</b> × " + introM + ", then <b>" + money(mn) + "</b>" : money(mn) + "</b>") + (md && months ? " × " + months + ", then " + money(ml) : "") + (minimum ? " · " + minimum + "-month minimum" : "") +
+      (F.ps.checked ? "<br>Performance share <b>" + num("ps_pct") + "%</b> of app sales in a month over <b>" + money(num("ps_th")) + "</b>" : "") +
+      (F.rc.checked ? " · 90-day check (" + Math.round(num("rc_n")) + " returns/mo)" : "") + (F.cd.checked ? " · customer-data clause" : "");
     D.querySelectorAll("canvas[data-sig]").forEach(pad);
   }
 

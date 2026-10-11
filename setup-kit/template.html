@@ -644,7 +644,7 @@ function draw(){
     (setup?"<p>💵 Your one-time "+usd(setup)+" setup is earned back "+(pay?"in about <b>"+pay+" month"+(pay>1?"s":"")+"</b> at these numbers":"<b>after the first year</b> at these numbers, so try your real numbers")+". After that, the app keeps paying you every month.</p>":"");
   safe.innerHTML="<b>🛡️ Your safety net</b><ul><li><b>You'll see it, not take our word for it.</b> Every guest who joins, every return visit and every reward used shows up in your owner view.</li>"+
     (I.resultsCheck!==false?"<li><b>90-day results check.</b> If the app isn't bringing back at least "+n(need)+" tracked return visits a month by day 90, you can stop the monthly plan with 30 days' notice.</li>":"")+
-    "<li><b>Your customer list is yours.</b> Every name, phone and email stays with "+SHORT+" no matter what.</li><li><b>Keep doing what you do.</b> Great food and good service bring them in the first time; the app is what brings them back.</li></ul>";
+    "<li><b>Your customer list is yours.</b> Everyone who joins while you're on the plan is yours to keep, with a full export if you ever stop.</li><li><b>Keep doing what you do.</b> Great food and good service bring them in the first time; the app is what brings them back.</li></ul>";
   var L6=months[5].list, show=L6*0.05;
   blast.innerHTML="<b>📲 One text to your list</b><br>By month 6 you can text about <b>"+n(L6)+"</b> people straight to their phone"+(I.event?" (\""+I.event+"\")":"")+". If just 5% show up, that's <b>"+n(show)+" guests ≈ "+usd(show*spend)+"</b> from one message. No ad spend, no hoping they see the post.";
 }

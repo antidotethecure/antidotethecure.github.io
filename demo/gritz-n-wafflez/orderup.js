@@ -557,7 +557,7 @@
     og = { running: true, sim: og.sim, demo: demo, level: demo ? 2 : 1, score: 0, usd: 0, now: 0, streak: 0, best: 0, served: 0, tipsUsd: 0, perfect: 0, hotDeliv: 0, walkTotal: 0, trips: [], timers: [], tables: [], pass: [], plate: [], bk: newBk(), tvT: 0 };
     resetLevelState();
     $("startov").classList.add("off"); $("over").classList.remove("on"); tvOff(true); closePoster(true);
-    if (!demo) { if (W.ReviewEgg) W.ReviewEgg.reset(20, 40); flash("Level 1 · 90 seconds", "#F2C14E"); startMusic(); }
+    if (!demo) { if (W.ReviewEgg) W.ReviewEgg.reset(20, 40); if (W.Halftime) W.Halftime.reset(); flash("Level 1 · 90 seconds", "#F2C14E"); startMusic(); }
     hud();
   }
 
@@ -980,11 +980,13 @@
     var go = function () { dn.remove(); b.classList.remove("on"); og.level = L + 1; og.pause = false; resetLevelState(); flash("Level " + og.level + " · 90 seconds", "#F2C14E"); startMusic(); tutStart(); };
     var firstCook = !stationsFor(L).length && stationsFor(L + 1).length;   // the story beat: a cook clocks out
     var moreCook = stationsFor(L).length === 1 && stationsFor(L + 1).length > 1;   // L5 adult: irons + skillet join
-    if (og.sim) go(); else setTimeout(function () {
+    var next = function () {   // after the (optional) halftime: the L4 story beat + instructions, then the level
       if (firstCook) { b.classList.remove("on"); og.pause = true; cookLeft(function () { howCook("fry", go); }); }
       else if (moreCook) { b.classList.remove("on"); og.pause = true; howCook("full", go); }
       else go();
-    }, 3600);
+    };
+    // halftime.js (Antidote's review reel) takes over at most once per run (L2→5 after ~90–120 s); og.pause stays true until go()
+    if (og.sim) go(); else setTimeout(function () { if (!(W.Halftime && W.Halftime.levelUp(L + 1, next))) next(); }, 3600);
     hud();
   }
   function nextTease(L) { return (L === 2 ? "toppings, drinks, baskets and NO-requests · plates cool faster" : L === 3 ? "breakfast plates, sides, families" : L === 4 ? "starters, loaded combos, the church group" : "prep requests: sautéed shrimp, sunny-side eggs, extra crispy, extra hot") + " · guests come in faster"; }

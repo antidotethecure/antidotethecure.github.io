@@ -11,9 +11,11 @@
       60 s speed window) and the adult prize thresholds.
    🧒 KID (12 & under): a slow ramp (KID_PACE: ~2 minutes of patience and a party every ~18 s at level 1, food cooks 35%
       slower and stays warm 50% longer, getting faster every level until level 5), a speed window scaled to each
-      level's patience, its own prize thresholds (GNW_PRIZES_KID) and its own best score. Kids never type a phone or
-      email: they can play without an account, and saving points or prizes asks a parent/guardian (18+) to sign up
-      with THEIR details (crm.js gate reasons "kidplay" / "kidprize").
+      level's patience, its own kid-sized prizes (GNW_PRIZES_KID) and its own best score. Kid mode only unlocks through a PARENT /
+      GUARDIAN account signed in on this phone (crm.js SSAI_TOKENS.kidUnlock, gate "kidunlock"): kid play, the kid best
+      score and kid prizes go to the parent's account, and the child never types anything (an optional nickname stays
+      on this phone only, never sent). Leaving Kid mode, switching Adult → Kid and signing out need a parent check
+      (last 4 digits of the parent's phone; live: a server-verified text code).
    SCORING (fine-grained so ties are rare): Orders (30 per item, 20 per special request) + Speed (continuous, from the
    moment the party sits, to 0.1 s, plus a tier bonus) + Quality (continuous per cooked item, max at perfect doneness)
    + Streak multiplier (consecutive perfect, fast plates) + Group bonus (whole table served within 10 s) + Tips (speed,
@@ -187,6 +189,19 @@
   // who's playing: "kid" | "adult" | "" (not picked yet). Stored on this phone only; no age is ever asked or stored.
   var MODE = (function () { try { return localStorage.getItem("gnw-mode") || ""; } catch (e) { return ""; } })();
   function setMode(m) { MODE = m === "kid" ? "kid" : "adult"; try { localStorage.setItem("gnw-mode", MODE); } catch (e) {} hud(); best(); }
+  function menuRefresh() { try { if (W.GameMenu && W.GameMenu.refresh) W.GameMenu.refresh(); } catch (e) {} }
+  // the start menu's picker calls this: Kid needs a signed-in parent; leaving Kid (and Adult → Kid) needs the parent check
+  function requestMode(v) {
+    var TK = W.SSAI_TOKENS; v = v === "kid" ? "kid" : "adult";
+    if (v === MODE) return;
+    if (!TK || !TK.kidUnlock) { setMode(v); menuRefresh(); return; }
+    if (v === "kid") { TK.kidUnlock(function () { setMode("kid"); menuRefresh(); }, MODE === "adult"); return; }
+    if (MODE === "kid") { TK.parentCheck("Leave Kid mode", function () { setMode("adult"); menuRefresh(); }); return; }
+    setMode("adult"); menuRefresh();
+  }
+  // a kid mode left on a phone with no parent account (signed out elsewhere) falls back to "not picked"
+  if (MODE === "kid") setTimeout(function () { var TK = W.SSAI_TOKENS; if (TK && TK.isParent && !TK.isParent()) { MODE = ""; try { localStorage.removeItem("gnw-mode"); } catch (e) {} hud(); menuRefresh(); } }, 0);
+  function kidNick() { try { return (localStorage.getItem("gnw-kid-nick") || "").slice(0, 16); } catch (e) { return ""; } }
   function modeBadge() { return MODE === "kid" ? "🧒 Kid" : "🧑 Adult"; }
   var LEVEL_MS = 90000, MAX_WALK = 3;
 
@@ -850,23 +865,31 @@
     if (!og.running) return;
     og.running = false; stopMusic(); tvOff(true); hud();
     var b = best(); if (og.score > b) { try { localStorage.setItem(bestKey(), Math.round(og.score)); } catch (e) {} } best();
+    if (MODE === "kid" && W.SSAI_TOKENS && W.SSAI_TOKENS.kidBest) W.SSAI_TOKENS.kidBest(og.score);   // kid best lives on the parent's account
     var B = og.bk, rows = [["⚡ Speed", B.speed], ["✨ Quality", B.quality], ["🧾 Orders", B.orders], ["💵 Tips", B.tips], ["🔥 Streaks", B.streak], ["👥 Whole tables", B.group], ["🏆 Level bonus", B.level], ["📺 Bonus", B.bonus], ["❌ Mistakes", B.penalty]];
     $("final").textContent = Math.round(og.score).toLocaleString() + " pts";
     $("stats").textContent = modeBadge() + " mode · reached level " + og.level + " · " + og.served + " plates · $" + og.tipsUsd.toFixed(2) + " in tips · " + og.perfect + " perfect cooks · best streak " + og.best;
     $("brk").innerHTML = rows.filter(function (r) { return r[1]; }).map(function (r) { return "<span>" + r[0] + "</span><b" + (r[1] < 0 ? ' class="neg"' : "") + ">" + (r[1] > 0 ? "+" : "") + r[1].toLocaleString() + "</b>"; }).join("");
     var s = og.score, P = (MODE === "kid" && W.GNW_PRIZES_KID) || W.GNW_PRIZES || [[15000, "a Free Original Collard Green Dip"], [10000, "Free Fried Cheese Gritz"], [6500, "a Free side of Smackin' Mac"], [3500, "a Free Kiki Palmer"]], prize = "";
     for (var i = 0; i < P.length; i++) if (s >= P[i][0]) { prize = P[i][1]; break; }
-    $("rank").textContent = prize ? "🏆 You won " + prize : (why === "walk" ? "3 walk-outs: kitchen's closed!" : "Kitchen's closed!") + " Try again while you wait";
+    var nk = MODE === "kid" ? kidNick() : "";
+    $("rank").textContent = (nk ? "Great cooking, " + nk + "! " : "") + (prize ? "🏆 You won " + prize : (why === "walk" ? "3 walk-outs: kitchen's closed!" : "Kitchen's closed!") + " Try again while you wait");
+    ["nickbox", "nicknote"].forEach(function (id) { var x = $(id); if (x) x.remove(); });
+    if (MODE === "kid") $("brk").insertAdjacentHTML("afterend", '<div id="nickbox" style="max-width:290px;margin:4px auto;display:flex;gap:6px"><input id="nick" maxlength="16" placeholder="Nickname (optional)" value="' + esc(nk) + '" aria-label="Nickname for the score screen, saved on this phone only" style="flex:1;min-width:0;font:700 15px var(--body);padding:9px 10px;border-radius:10px;border:1px solid #ffffff44;background:#ffffff14;color:#fff"><button type="button" class="btn" id="nicksave" style="padding:9px 12px">Save</button></div><p id="nicknote" style="margin:0 auto 6px;max-width:290px;font-size:11.5px;color:#E8DCF5">Nickname stays on this phone only. Never sent anywhere.</p>');
+    var nb = $("nicksave"); if (nb) nb.onclick = function () { try { localStorage.setItem("gnw-kid-nick", $("nick").value.trim().slice(0, 16)); } catch (e) {} nb.textContent = "Saved ✓"; };
     var won = $("won"); won.style.display = "none";
     if (prize && W.SSAI_WIN) {
-      var w = W.SSAI_WIN(prize.replace(/^a /, ""));
+      // Kid mode: kid-sized prizes, KID- code + "🧒 KID PRIZE" tag + the at-the-table rule (crm.js SSAI_KID_RULE)
+      var kidP = MODE === "kid", KR = W.SSAI_KID_RULE || "Kid prize — redeemable with the young player at the table, one per kid per visit.";
+      var kidH = kidP ? "<br><span style=\"display:inline-block;margin:6px 0 2px;background:#F2C14E;color:#1E1B3A;font:900 12px var(--body);border-radius:99px;padding:3px 10px\">🧒 KID PRIZE</span><br><span style=\"font-weight:700;font-size:12.5px;color:#FFE9A3\">" + KR + "</span>" : "";
+      var w = W.SSAI_WIN(prize.replace(/^an? /, ""), kidP ? { kid: true } : null);
       var showWin = function () {
         if (w.blocked) won.innerHTML = "🏆 You'd win " + prize + ", but you already have <b>" + w.prize.t + "</b> waiting (code " + w.prize.c + ").<br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">Use it by " + w.until + ", then your next win saves. One reward at a time.</span>";
-        else won.innerHTML = "🏆 You won " + prize + "!<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#F2C14E;letter-spacing:.1em\">" + w.prize.c + "</span><br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">" + (w.saved || W.SSAI_GATE ? "Saved to your rewards. Show your server to redeem. Good for 3 days." : "Join Gritz N Wafflez Rewards below to save it.") + "</span>";
+        else won.innerHTML = "🏆 You won " + prize + "!" + kidH + "<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#F2C14E;letter-spacing:.1em\">" + w.prize.c + "</span><br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">" + (w.saved || W.SSAI_GATE ? (MODE === "kid" ? "Saved to the parent's rewards account. Show your server with the young player at the table. Good for 3 days." : "Saved to your rewards. Show your server to redeem. Good for 3 days.") : "Join Gritz N Wafflez Rewards below to save it.") + "</span>";
         won.style.display = "block";
       };
       if (w.saved || !W.SSAI_GATE) showWin();
-      else { won.innerHTML = (w.blocked ? "🏆 You'd win " + prize + ", but you already have <b>" + w.prize.t + "</b> waiting." : "🏆 You won " + prize + "!") + "<br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">" + (MODE === "kid" ? "Ask a parent or guardian to save it to their Gritz N Wafflez Rewards." : "Save it to your Gritz N Wafflez Rewards to get your code.") + "</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display = "block";
+      else { won.innerHTML = (w.blocked ? "🏆 You'd win " + prize + ", but you already have <b>" + w.prize.t + "</b> waiting." : "🏆 You won " + prize + "!") + kidH + "<br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">" + (MODE === "kid" ? "A parent or guardian saves it to their Gritz N Wafflez Rewards." : "Save it to your Gritz N Wafflez Rewards to get your code.") + "</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display = "block";
         $("wsave").onclick = function () { W.SSAI_GATE(MODE === "kid" ? "kidprize" : "prize", showWin); }; }
     }
     if (W.ReviewEgg && !og.sim) W.ReviewEgg.endCard($("over"), $("over").querySelector(".btns"));
@@ -889,7 +912,7 @@
 
   /* ================= API (start menu, tests, bot) ================= */
   W.__OG = {
-    get: function () { return og; }, start: start, mode: function () { return MODE; }, setMode: setMode, lvParams: lvParams, ITEMS: ITEMS, DISHES: DISHES, SERVERS: SERVERS, GUESTS: GU, theme: TH_ID, hair: HAIR,
+    get: function () { return og; }, start: start, mode: function () { return MODE; }, setMode: setMode, requestMode: requestMode, resetMode: function () { MODE = ""; try { localStorage.removeItem("gnw-mode"); } catch (e) {} hud(); best(); menuRefresh(); }, lvParams: lvParams, ITEMS: ITEMS, DISHES: DISHES, SERVERS: SERVERS, GUESTS: GU, theme: TH_ID, hair: HAIR,
     sim: function (on) { og.sim = !!on; }, step: function (ms) { var n = Math.ceil(ms / 50); for (var i = 0; i < n && og.running; i++) step(50); },
     render: render, drop: drop, pull: pull, pour: pour, stir: stir, scoop: scoop, fromTray: fromTray, bin: toggleBin, serve: serve, clear: clearPlate,
     levelUp: function () { og.lt = 1; }, jurniPop: function (k) { return jurniPop(k, true); }, end: end, quality: quality, U: U,

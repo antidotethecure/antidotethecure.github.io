@@ -8,7 +8,7 @@
    and the 3D shape.
    Modes: ?render=2d (old renderer) · ?render=3d (force 3D) · default = MELODY_3D_DEFAULT below (auto: falls back to 2D if
    WebGL is missing or the frame rate stays under ~40 fps for 5 s). */
-const MELODY_3D_DEFAULT = false;
+const MELODY_3D_DEFAULT = true;   // on by default (2026-10-11); auto-falls back to 2D if the phone stays under ~40 fps
 const M = window.__M3;
 const Q = new URLSearchParams(location.search);
 const REQ = (Q.get("render") || "").toLowerCase();

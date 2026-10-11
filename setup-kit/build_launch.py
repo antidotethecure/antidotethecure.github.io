@@ -50,20 +50,32 @@ def menu(demo):
     for it in o.get("DRINKS", []): rows.append(["Drinks", str(it[0]), price(it)])
     return rows
 
-AGENTS = {   # AI add-on pricing shown to owners; override per owner with "aiAgents": {"call": {...}, "text": {...}}
-    "call": {"name": "AI call agent", "price": 99, "included": 750, "unit": "minutes", "over": 0.15, "about": "about 17 calls a day",
-             "does": "Answers your phone when nobody can, 24/7: hours, menu, specials, parking, the app. It takes messages and texts you the caller's name and number. It never takes payments or confirms reservations.",
-             "parts": [["AI voice, up to 750 minutes (ElevenLabs, 8¢ a minute)", 60], ["The AI brain that understands callers", 7],
-                       ["Phone number + incoming call minutes (Twilio)", 8], ["Setup on your menu + specials, weekly call reviews, updates", 24]]},
-    "text": {"name": "AI text agent", "price": 49, "included": 1000, "unit": "texts", "over": 0.03, "about": "replies and automatic texts combined",
-             "does": "Texts guests back 24/7 (hours, menu, specials, the app), sends a text when a call is missed, and sends the reward, raffle, winner, birthday and come-back texts you approve.",
-             "parts": [["Up to 1,000 texts (carrier + Twilio, about 1.5¢ each)", 15], ["The AI that writes the replies", 4],
-                       ["Text number + carrier registration (required to text customers)", 6], ["Setup, message templates, monitoring, updates", 24]]},
-    "compare": "A part-time host just to answer phones costs about $2,500+ a month. Answering services charge about $1–2 per minute."}
+AGENTS = {   # AI add-on tiers shown to owners (Antidote, 2026-10-11), per location per month. Public page: /agents/.
+    # Override per owner with "aiAgents": {"text": {...}, "voice": {...}, "compare": "..."}. Keep in sync with agents/index.html + value/value-data.js.
+    "page": "../../agents/",
+    "tiers": [
+        {"key": "text", "name": "AI Text Assistant", "short": "Text", "price": 75,
+         "does": "Customers text your number and an AI texts back 24/7: hours, location and parking, menu, prices and specials, the app and rewards link, catering and party inquiries, FAQs. It collects reservation requests and sends them to your staff, and hands anything it can't answer to you or your manager. Missed-call text-back: if a call isn't answered, the caller gets a text so they can keep going by text.",
+         "limits": "1,000 texts a month included, plenty for most restaurants. Then $0.03 a text.",
+         "parts": [["Up to 1,000 texts (carrier + Twilio, about 1.5¢ each)", 15], ["The AI that writes the replies", 6],
+                   ["Text number + carrier registration (A2P 10DLC, required to text customers)", 6], ["Missed-call text-back + hand-off to you or your manager", 8],
+                   ["Setup on your menu, specials + FAQs, monitoring, updates", 40]]},
+        # OPTIONAL MIDDLE TIER: NOT APPROVED by Antidote, keep commented out so it never renders.
+        # {"key": "greet", "name": "Smart Greeting + Text", "short": "Greeting + Text", "price": None,   # price TBD
+        #  "does": "A recorded open/closed greeting, a text-me-the-menu option and press 1 for staff, plus the AI Text Assistant.",
+        #  "limits": "TBD", "parts": []},
+        {"key": "voice", "name": "AI Voice Host + Text Assistant", "short": "Voice + Text", "price": 150, "flag": "Most popular · Everything",
+         "does": "A natural AI voice answers your phone 24/7 or only after hours: it answers questions, takes reservation requests, transfers to staff when needed, and texts links (menu, app, directions) during the call. Includes everything in the AI Text Assistant.",
+         "limits": "750 call minutes plus 1,000 texts a month included, plenty for most restaurants. Then $0.15 a minute and $0.03 a text.",
+         "parts": [["AI voice, up to 750 minutes (ElevenLabs, about 8¢ a minute)", 60], ["The AI brain that understands callers", 7],
+                   ["Phone number + incoming call minutes (Twilio)", 8], ["Texting: up to 1,000 texts, AI replies, carrier registration", 27],
+                   ["Setup on your menu + specials, weekly call reviews, updates", 48]]},
+    ],
+    "compare": "Elsewhere (typical published pricing, Oct 2026): AI phone answering like Loman or Slang.ai runs about $199–$399 a month, an AI texting agent like Dialzara about $69, and missed-call text-back like Quo $15–$19. A part-time host just to answer phones costs about $2,500+ a month."}
 
 def agents(o):
     a = json.loads(json.dumps(AGENTS)); ov = o.get("aiAgents") or {}
-    for k in ("call", "text"): a[k].update(ov.get(k) or {})
+    for t in a["tiers"]: t.update(ov.get(t["key"]) or {})
     if "compare" in ov: a["compare"] = ov["compare"]
     return a
 

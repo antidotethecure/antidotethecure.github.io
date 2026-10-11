@@ -33,8 +33,8 @@
    HOLIDAY BLAST: with demo/specials.js on the page, the owner view gets a "Holiday blast" composer per active special
    (or the next one coming up): pre-written SMS, opted-in audience count, send date/time, preview, "Queue for approval".
    DEMO: nothing is ever sent; the queue lives on this phone. LIVE: a queued blast goes to the owner to approve and then
-   out through the SousShift AI text agent (Twilio), which enforces consent, STOP and quiet hours. Holiday blasts are part
-   of the AI text agent add-on ($49/mo). */
+   out through the SousShift AI Text Assistant (Twilio), which enforces consent, STOP and quiet hours. Holiday blasts are part
+   of the AI Text Assistant add-on ($75/mo; also in Voice + Text $150/mo, see /agents/). */
 (function () {
   "use strict";
   var C = window.CRM_CFG || {};
@@ -1098,7 +1098,7 @@
 
   // ---- owner: Holiday blast (needs demo/specials.js). See TEXTING / CONSENT at the top for the rules it follows. ----
   // Marketing texts need prior express written consent ("Text me deals"), honor STOP, and only go out 8 AM–9 PM local.
-  // Part of the AI text agent add-on ($49/mo). DEMO: "Queue for approval" only saves to this phone; nothing is sent.
+  // Part of the AI Text Assistant add-on ($75/mo; also in Voice + Text $150/mo). DEMO: "Queue for approval" only saves to this phone; nothing is sent.
   // LIVE: the queued blast goes to the owner for approval, then the SousShift text agent sends it through Twilio.
   var BQ = "ssai_blastq_" + SLUG;
   function blastQ() { try { return JSON.parse(localStorage.getItem(BQ) || "[]"); } catch (x) { return []; } }
@@ -1125,7 +1125,7 @@
           '<button type="button" class="go" data-a="queue">' + (queued ? '✅ Queued · update' : '📨 Queue for approval') + '</button><div class="err" data-b="err"></div>' +
           (queued ? '<div class="q">Queued for ' + e(queued.when) + ' to ' + queued.n + ' opted-in members. Waiting for your approval. (Demo: nothing is sent.)</div>' : '') + '</div>';
       }).join("") +
-      '<p class="crm-fine" style="margin-bottom:0">Rules built in: texts only go to people who gave written consent (the "Text me deals" box), every text says who it\'s from and how to opt out, STOP replies are removed automatically, and nothing sends outside 8 AM–9 PM. Demo: nothing is ever sent. Live: approved blasts go out through your SousShift AI text agent (add-on, $49/mo).</p>';
+      '<p class="crm-fine" style="margin-bottom:0">Rules built in: texts only go to people who gave written consent (the "Text me deals" box), every text says who it\'s from and how to opt out, STOP replies are removed automatically, and nothing sends outside 8 AM–9 PM. Demo: nothing is ever sent. Live: approved blasts go out through your SousShift AI Text Assistant (add-on, $75/mo, also in Voice + Text).</p>';
     box.querySelectorAll(".crm-bl").forEach(function (el) {
       var ta = el.querySelector("textarea"), bub = el.querySelector(".crm-bub"), sg = el.querySelector('[data-b="seg"]'), err = el.querySelector('[data-b="err"]');
       function pv() { bub.textContent = ta.value; var n = segs(ta.value); sg.textContent = Array.from(ta.value).length + " characters · " + n + " text segment" + (n === 1 ? "" : "s") + " per person" + (/[^\x00-\x7F]/.test(ta.value) ? " (emoji count as 70 characters a segment)" : "") + "."; }

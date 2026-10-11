@@ -366,17 +366,17 @@
     ".din .wm i{font-style:italic;color:#c9a44c}",
     ".din .mb{position:absolute;right:61px;top:23px;width:74px;z-index:2;background:#1c1c1e;border:2px solid #c99b62;border-radius:3px;padding:3px 4px;font:800 5.6px/1.25 var(--body);color:#f4efe2;box-shadow:0 3px 6px #0006;padding:2px 4px}",
     ".din .mb b{display:inline;color:#F2C14E;font-size:6px;letter-spacing:.06em;margin-right:2px}",
-    // Antidote's review poster, plastered on the wall: thin black frame + gold line, white mat, the WHOLE 16:9 cover
+    // Antidote's review poster, plastered on the wall: thin black frame + gold line, white mat, the WHOLE 2:3 poster photo (img/review/poster.webp, uncropped)
     // (sized exactly, object-fit contain: never cropped), caption on a strip BELOW the picture, a small ▶ badge in the corner,
     // a soft drop shadow onto the mural, a glossy sheen and the room's light, tilted with the receding wall
-    ".din .poster{position:absolute;left:34px;top:22px;width:64px;z-index:4;border:0;padding:0;background:none;cursor:pointer;transform:perspective(320px) rotateY(-8deg);transform-origin:100% 50%;touch-action:manipulation;-webkit-tap-highlight-color:transparent}",
+    ".din .poster{position:absolute;left:30px;top:10px;width:46px;z-index:4;border:0;padding:0;background:none;cursor:pointer;transform:perspective(320px) rotateY(-8deg);transform-origin:100% 50%;touch-action:manipulation;-webkit-tap-highlight-color:transparent}",
     ".din .poster .fr{display:block;padding:1.5px;background:linear-gradient(135deg,#2a2a2e,#0b0b0d 45%,#26262a);border-radius:1.5px;box-shadow:3px 4px 5px #0008,6px 9px 12px #0004,inset 0 0 0 .5px #c9a44c}",
     ".din .poster .mt{position:relative;display:block;padding:2.5px 2.5px 0;background:linear-gradient(180deg,#fbf8f1,#ece6d8);box-shadow:inset 0 0 0 .5px #c9a44c}",
-    ".din .poster img{display:block;width:56px;height:auto;aspect-ratio:16/9;object-fit:contain;background:#05122e;box-shadow:0 0 0 .5px #0006}",
-    ".din .poster .cap{display:block;margin:1px -2.5px 0;padding:1.2px 0 1.3px;background:#0b2a6b;text-align:center;white-space:nowrap;font:900 4px/1 var(--body);letter-spacing:-.02em;color:#FFD23F;overflow:hidden}",
+    ".din .poster img{display:block;width:40px;height:auto;aspect-ratio:2/3;object-fit:contain;background:#05122e;box-shadow:0 0 0 .5px #0006}",
+    ".din .poster .cap{display:block;margin:1px -2.5px 0;padding:1.2px 0 1.3px;background:#0b2a6b;text-align:center;white-space:nowrap;font:900 3.3px/1 var(--body);letter-spacing:-.02em;color:#FFD23F;overflow:hidden}",
     ".din .poster .cap>span{display:inline-block;transform:scaleX(.8);transform-origin:50% 50%;margin:0 -12%}",
     ".din .poster .cap em{font-style:normal;color:#dbe6ff;font-weight:700}",
-    ".din .poster .pl{position:absolute;right:3.5px;top:26.5px;width:7px;height:5px;border-radius:1.5px;background:#e3262f;box-shadow:0 .5px 1px #0008}",
+    ".din .poster .pl{position:absolute;right:3.5px;top:55px;width:7px;height:5px;border-radius:1.5px;background:#e3262f;box-shadow:0 .5px 1px #0008}",
     ".din .poster .pl:after{content:'';position:absolute;left:2.6px;top:1.2px;border-left:2.4px solid #fff;border-top:1.3px solid transparent;border-bottom:1.3px solid transparent}",
     ".din .poster .gl{position:absolute;inset:0;pointer-events:none;background:linear-gradient(118deg,#ffffff00 20%,#ffffff40 34%,#ffffff00 46%),linear-gradient(180deg,#fff3d61f,#0000 40%,#00000022)}",
     ".din .poster.glint:before{content:'';position:absolute;inset:0;background:linear-gradient(110deg,#0000 30%,#fff9 50%,#0000 70%) -100% 0/250% 100%;animation:glint 1.2s ease-in-out 2;pointer-events:none}@keyframes glint{to{background-position:150% 0}}",
@@ -585,7 +585,7 @@
     '<div class="host" aria-hidden="true"><b>PLEASE WAIT<br>TO BE SEATED</b></div>' +
     '<div class="wm">Gritz <i>N</i> Wafflez</div>' +
     '<div class="mb"><b>TODAY</b>Peach Cobbler Waffle<br>🎤 GNW Karaoke Wed 6–10</div>' +
-    '<button type="button" class="poster" id="poster" aria-label="Antidote\'s food review: watch on YouTube"><span class="fr"><span class="mt"><img src="' + esc(REVIEW.img || "img/review/cover.webp") + '" alt=""><i class="pl"></i><span class="cap"><span>@therealantidote <em>· watch my review</em></span></span></span></span><i class="gl"></i></button>' +
+    '<button type="button" class="poster" id="poster" aria-label="Antidote\'s food review: watch on YouTube"><span class="fr"><span class="mt"><img src="img/review/poster.webp" alt="Antidote eating at Gritz N Wafflez"><i class="pl"></i><span class="cap"><span>@therealantidote <em>· my review</em></span></span></span></span><i class="gl"></i></button>' +
     (TH.fx ? '<div class="fxl ' + TH.kind + '">' + TH.fx.concat(TH.fx).map(function (f, i) {
       var s = TH.kind === "float" ? "top:" + (8 + (i * 23) % 70) + "%;left:-20px;animation-duration:" + (14 + (i * 5) % 9) + "s;animation-delay:-" + (i * 2.7) + "s;font-size:" + (12 + (i * 3) % 7) + "px"
         : TH.kind === "burst" ? "top:" + (6 + (i * 29) % 40) + "%;left:" + (8 + (i * 37) % 84) + "%;animation-duration:2.4s;animation-delay:-" + (i * 0.6) + "s;font-size:20px"
@@ -599,7 +599,7 @@
     '<div class="line"><div class="bld"><div class="plt" id="plate" title="Tap an item on the plate to take it off"><div class="st" id="stack"></div><div class="cupz" id="cupz"></div><div class="dn" id="dn"></div></div>' +
     '<div class="nm" id="pname"></div><div class="acts"><button type="button" class="sv2" id="serve">🛎️ Serve</button><div class="ud"><button type="button" id="undo">↩️ Undo</button><button type="button" id="trash">🗑️ Clear</button></div></div></div>' +
     '<div class="stn" id="stn"></div><div class="grid" id="grid"></div><div class="kmsg fl2" id="oflash" role="status" aria-live="polite"></div><div class="kmsg js" id="jsay" aria-live="polite"></div></div>' +
-    '<div class="pcard" id="pcard" role="dialog" aria-label="Antidote\'s review"><div class="c"><img src="' + esc(REVIEW.img || "img/review/cover.webp") + '" alt="Antidote\'s Gritz N Wafflez review"><h4>@therealantidote</h4><p>My Gritz N Wafflez food review</p><p id="pfound" class="pf" hidden></p><a href="' + esc(RVURL) + '" target="_blank" rel="noopener">▶ Watch on YouTube</a><button type="button" id="pback">Back to the game</button></div></div>' +
+    '<div class="pcard" id="pcard" role="dialog" aria-label="Antidote\'s review"><div class="c"><img src="img/review/poster.webp" style="aspect-ratio:2/3;object-fit:contain;max-height:46vh;width:auto;margin:0 auto;display:block" alt="Antidote\'s Gritz N Wafflez review"><h4>@therealantidote</h4><p>My Gritz N Wafflez food review</p><p id="pfound" class="pf" hidden></p><a href="' + esc(RVURL) + '" target="_blank" rel="noopener">▶ Watch on YouTube</a><button type="button" id="pback">Back to the game</button></div></div>' +
     '<div class="startov2" id="startov"><b>Order Up!</b><span>Tap to open the kitchen</span><small>Build it · serve it hot · deliver it fast</small></div>';
   if (TH.banner) { var wo = D.querySelector(".hero .wo"); if (wo) { var bn = D.createElement("p"); bn.className = "thb"; bn.textContent = TH.banner; wo.parentNode.insertBefore(bn, wo.nextSibling); } D.documentElement.classList.add("th-" + TH_ID); }
   var din = $("din");

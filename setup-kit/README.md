@@ -33,7 +33,7 @@ comment at the top. Edit the config or `template.html`, never the output.
 | `drawDays` | Choices for the giveaway draw day. The first one is the default. |
 | `rewards` | Restaurant-item choices: `welcome, points[4], t1..t4, stars, referIn, referFriend, bday, missed, winback, playwin`. **The first option is the pre-selected default.** |
 | `drawPrizes` | Signature-item choices for the daily lucky draw (members). The first 3 are pre-selected; "Free soft drink / mocktail" and "$5 off" are added automatically. Without it, free items from `t1`, `playwin` and `stars` are used. |
-| `game` | `name`, `prizes: [[score, [options]]]` (or `prizesFrom: {file, var}` plus `alts` to read live thresholds such as `window.NALU_PRIZES`), `champ`, optional `second`. |
+| `game` | `name`, `prizes: [[score, [options]]]`, optional `kidPrizes: [[score, [options]]]` (Kid mode: kid-sized items, own fill-in rows, each tagged "Kid prize — redeemable with the young player at the table, one per kid per visit.") (or `prizesFrom: {file, var}` plus `alts` to read live thresholds such as `window.NALU_PRIZES`), `champ`, optional `second`. |
 | `special` | Optional deal block: `{title, qs: [[key, label, [options]]]}`. Examples are Melody's "Just Landed" deal and the Nalu ↔ Melody sister perk. |
 | `specials`, `specialsTitle` | `[[key, label]]`. Each one is answered Yes / Changed / Stopped. |
 | `phone` | `[[key, question, [options]]]`. These have no default, and "Not sure" is added. Leave it out to get the generic quick-serve set. |

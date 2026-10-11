@@ -319,8 +319,14 @@
   function liveWin(w) { return w && !w.used && Date.now() - w.ts < (w.ttl || WIN_TTL) ? w : null; }
   function activeWin(m) { return m ? (m.wins || []).filter(liveWin)[0] || null : liveWin(pending()); }
   function until(w) { return new Date(w.ts + (w.ttl || WIN_TTL)).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); }
-  window.SSAI_WIN = function (prize) {
+  // SSAI_WIN(prize, {kid:true}) = a game's Kid-mode prize: KID-xxxx code, a "🧒 KID PRIZE" tag on the voucher and the rule
+  // KID_RULE everywhere staff see it. Kid prizes are small kid items and are honored only with the young player there.
+  var KID_RULE = "Kid prize — redeemable with the young player at the table, one per kid per visit.";
+  window.SSAI_KID_RULE = KID_RULE;
+  function kidTag(w) { return w && w.kid ? '<div style="display:inline-block;margin:4px 0 2px;background:#FFD23F;color:#1a0d00;font:900 12px system-ui;letter-spacing:.06em;border-radius:99px;padding:3px 10px">🧒 KID PRIZE</div>' : ''; }
+  window.SSAI_WIN = function (prize, opt) {
     var w = { t: prize, c: "WIN-" + code4(4), ts: Date.now() }, m = mine()[0], held = activeWin(m);
+    if (opt && opt.kid) { w.kid = 1; w.c = "KID-" + code4(4); }
     if (held) return { prize: held, saved: !!m, blocked: true, until: until(held) };
     w.until = until(w);
     if (m) { (m.wins = m.wins || []).unshift(w); m.wins = m.wins.slice(0, 5); (m.ledger = m.ledger || []).unshift({ ts: w.ts, pts: 0, t: "🏆 Won " + prize + " in the game" }); put(m); }
@@ -425,7 +431,7 @@
       var refPts = (me.ledger || []).filter(function (l) { return l.ref; }).reduce(function (a, l) { return a + l.pts; }, 0);
       var first = e(me.name.split(" ")[0]);
       join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards</span><h3>Hey ' + first + '! 👋</h3>' +
-        (activeWin(me) ? '<div class="crm-win" style="border-color:#3DDC97"><div style="font-size:30px">' + (activeWin(me).k === "missed" ? '📞' : '🏆') + '</div><b>' + (activeWin(me).k === "missed" ? 'Sorry we missed your call! Here\'s ' + e(activeWin(me).t) : 'You won ' + e(activeWin(me).t) + '!') + '</b><div class="code">' + e(activeWin(me).c) + '</div><small>Show this code at ' + e(NAME) + ' to redeem it. Use by <b>' + e(until(activeWin(me))) + '</b>. One reward per visit; win again after you use this one.</small></div><div style="height:10px"></div>' : '') +
+        (activeWin(me) ? '<div class="crm-win" style="border-color:#3DDC97"><div style="font-size:30px">' + (activeWin(me).k === "missed" ? '📞' : '🏆') + '</div><b>' + (activeWin(me).k === "missed" ? 'Sorry we missed your call! Here\'s ' + e(activeWin(me).t) : 'You won ' + e(activeWin(me).t) + '!') + '</b>' + kidTag(activeWin(me)) + '<div class="code">' + e(activeWin(me).c) + '</div><small>' + (activeWin(me).kid ? '<b>' + e(KID_RULE) + '</b> ' : '') + 'Show this code at ' + e(NAME) + ' to redeem it. Use by <b>' + e(until(activeWin(me))) + '</b>. One reward per visit; win again after you use this one.</small></div><div style="height:10px"></div>' : '') +
         '<div class="crm-win"><div style="font-size:30px">🎁</div><b>' + e(me.offer || OFFER) + '</b><div class="code">' + e(me.code) + '</div><small>Your welcome reward. Show this at the counter.</small></div>' +
         (me.fgift && !me.fgift.used ? '<div class="crm-win" style="margin-top:10px;border-color:#3DDC97"><div style="font-size:30px">🤝</div><b>Friend gift: ' + e(me.fgift.t) + '</b><div class="code">' + e(me.fgift.c) + '</div><small>Because a friend invited you. Show this code with your first order.</small></div>' : '') +
         (me.bday >= 0 ? (isBday(me) || me.bdemo ? '<div class="crm-win bd"><div style="font-size:30px">🎂</div><b>Happy birthday, ' + first + '! Your free birthday treat is unlocked</b><div class="code">' + e(me.bcode || "BDAY") + '</div><small>Show this code with a photo ID that says ' + e(bdayStr(me)) + '. Good for 7 days.</small></div>'
@@ -481,6 +487,7 @@
         '<div class="crm-box"><h4>📜 Points activity</h4><div class="crm-feed">' + ((me.ledger || []).map(function (l) {
           return '<div><span>' + (WAL && W[l.w] ? '<i class="crm-wt">' + wname(l.w) + '</i>' : '') + e(l.t) + '</span><b class="' + (l.pts >= 0 ? 'plus' : 'minus') + '">' + (l.pts >= 0 ? '+' : '') + l.pts.toLocaleString() + '</b></div>'; }).join("") || '<div><span>Nothing yet. Scan at the register to start earning.</span></div>') + '</div></div>' +
         '<button type="button" class="go" style="background:#1a2656;box-shadow:none" data-a="owner">👀 See what the owner sees ↓</button>' +
+        (TC ? '<button type="button" class="crm-gx" data-a="signout">🚪 Sign out of this phone' + (me.guardian ? ' (parent check)' : '') + '</button>' : '') +
         '<p class="crm-fine">Demo: points and friends here are saved on this phone only. Live, they\'re in the business\'s database, so they follow the customer to any phone.</p>';
       var qr = join.querySelector(".crm-qr");
       function showQR() {
@@ -549,6 +556,7 @@
           drawJoin(); drawOwn(); toast("+" + p2 + (fw ? " " + wname(fw) : "") + " points · " + f.name + " ordered" + fwt); return;
         }
         if (a === "spin") { openSpin(); return; }
+        if (a === "signout") { signOut(); return; }
         if (a === "tokfree") { if (freeReq(m)) { put(m); drawJoin(); drawOwn(); refreshMenu(); toast("+" + TOK.freeDaily + " free tokens"); } return; }
         if (a === "tokcode") { var tr = redeemCode(m, join.querySelector("[data-tk=code]").value); if (tr.err) { toast(tr.err); return; } drawJoin(); drawOwn(); refreshMenu(); toast("+" + tr.n + " tokens added"); return; }
         if (a === "play") {
@@ -634,13 +642,15 @@
   };
   var gateEl = null;
   function gate(reason, cb) {
-    // KIDS' PRIVACY (COPPA): in a game's Kid mode we never ask the child for contact info. Reasons "kidplay" / "kidprize"
-    // word the sheet for a parent or guardian, require the "I'm the parent/guardian (18+)" box, and the phone + email
-    // typed are the grown-up's; points, tokens and prizes live in the grown-up's account. No birthday is asked here and
-    // no child's name is stored. (Draft: attorney review before launch.)
-    var kidg = reason === "kidplay" || reason === "kidprize";
+    // KIDS' PRIVACY (COPPA): Kid mode only unlocks through a PARENT/GUARDIAN account on this phone. Reasons "kidunlock" /
+    // "kidprize" word the sheet for the parent, require the "I'm the parent/guardian (18+) and this is my own phone and
+    // email" box, and mark the account m.guardian. The account and every contact detail belong to the parent; the child
+    // never types anything (an optional nickname stays on the phone only, see orderup.js). Kid play, the kid best score
+    // and kid prizes all go to the parent's account. No birthday is asked here. (Draft: attorney review before launch.)
+    // LIVE: the server verifies the parent's phone with a text code before Kid mode unlocks (like the device binding).
+    var kidg = reason === "kidunlock" || reason === "kidprize";
     var m = mine()[0], both = reason === "play" || reason === "spin" || kidg;   // game + spin accounts need phone AND email
-    if (m && (!both || hasBoth(m))) { if (cb) cb(m); return true; }
+    if (m && (!both || hasBoth(m)) && (!kidg || m.guardian)) { if (cb) cb(m); return true; }
     if (gateEl) gateEl.close();
     var T = GATE_TXT[reason] || GATE_TXT.order, rid = "crm-g" + code4(4), pre = function (k) { return m && m[k] ? ' value="' + e(m[k]) + '"' : ''; };
     if (m && !kidg) T = [T[0], "Add your " + (okPhone(m.phone) ? "email" : okEmail(m.email) ? "phone number" : "phone number and email") + " to finish your free account. It's tied to this phone.", T[2]];
@@ -733,8 +743,8 @@
   var SPIN = C.spin && (C.spin.prizes || []).length ? C.spin : null;
   function spinPrizes() { return SPIN.prizes.map(function (p) { return p.tok && !ON && p.alt ? Object.assign({ w: p.w }, p.alt) : p; }).filter(function (p) { return !p.tok || ON; }); }
   GATE_TXT.play = ["Play " + (C.game || "the game"), "Free member account: your name, phone AND email. It's tied to this phone so your points, prizes" + (ON ? " and tokens" : "") + " stay yours.", "🎮 Save & play"];
-  GATE_TXT.kidplay = ["Ask a parent or guardian", "Kids don't sign up. A parent or guardian (18+) adds THEIR name, phone and email; points, tokens and prizes are saved to their account.", "✅ Save & play"];
-  GATE_TXT.kidprize = ["Ask a parent or guardian to save this prize", "Kids don't sign up. A parent or guardian (18+) adds THEIR name, phone and email, and the prize is saved to their account.", "🎁 Save to the grown-up's account"];
+  GATE_TXT.kidunlock = ["Kid mode is for families", "A parent or guardian signs in first. Use YOUR name, phone and email: your child's points, kid best score and kid prizes are saved to your account, and your child never types anything.", "✅ Unlock Kid mode"];
+  GATE_TXT.kidprize = ["Parent or guardian: save this kid prize", "Kid prizes are saved to the parent or guardian's account. Use YOUR name, phone and email.", "🎁 Save to my account"];
   GATE_TXT.spin = ["Your free daily spin", "Free member account: your name, phone AND email. One free spin per member per day. No purchase necessary.", "🎡 Save & spin"];
   function devId() { var k = KEY + "_dev", v = ""; try { v = localStorage.getItem(k); if (!v) { v = "D" + code4(10); localStorage.setItem(k, v); } } catch (x) { v = "D-nostore"; } return v; }
   function okPhone(p) { return /\d{7,}/.test(String(p || "").replace(/\D/g, "")); }
@@ -770,9 +780,8 @@
   }
   // the game's PLAY button calls this. Phase 1: members play free. Phase 2: costs playCost tokens.
   function playGate(go, kid) {
-    // Kid mode, Phase 1: kids play free with NO account and nothing typed in; saving a prize asks a grown-up (kidprize).
-    if (kid && !ON) { var km = mine()[0]; if (km) { km.plays = (km.plays || 0) + 1; put(km); drawOwn(); } go(); return true; }
-    return gate(kid ? "kidplay" : "play", function () {
+    // Kid mode plays on the signed-in parent's account (gate "kidunlock" passes straight through once it exists)
+    return gate(kid ? "kidunlock" : "play", function () {
       var m = mine()[0]; if (!m) return;
       bind(m); weekly(m);
       if (!bound(m)) { put(m); toast("This account is bound to another phone."); return; }
@@ -879,6 +888,44 @@
       };
     });
   }
+  // ---- parent / guardian helpers (Kid mode) ----
+  function isParent(m) { return !!m && hasBoth(m) && !!m.guardian; }
+  // Light parent check: the last 4 digits of the parent's phone, asked when leaving Kid mode, when switching Adult → Kid
+  // and when signing out, so a kid can't change modes or the account alone. LIVE: a text code to the parent's phone
+  // (server-verified) replaces this; the last-4 check only keeps honest kids honest.
+  var pcFails = 0, pcLockUntil = 0;
+  function parentCheck(why, cb, cancel) {
+    var m = mine()[0]; if (!m || !okPhone(m.phone)) { cb(); return; }
+    if (document.querySelector(".pc-ov")) return;
+    var last4 = String(m.phone).replace(/\D/g, "").slice(-4);
+    var ov = sheet("pc-ov", '<span class="k">Parent check</span><h3>🔒 ' + e(why) + '</h3><p>Grown-ups only: enter the <b>last 4 digits</b> of the parent\'s phone number.</p>' +
+      '<input data-t="pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" aria-label="Last 4 digits of the parent\'s phone" style="font:900 28px ui-monospace,Menlo,monospace;letter-spacing:.4em;text-align:center">' +
+      '<button type="button" class="go" data-t="ok">Confirm</button><div class="err" data-t="msg" role="alert"></div><button type="button" class="crm-gx" data-t="no">Cancel</button>' +
+      '<p class="crm-fine">Live, the parent gets a text code instead.</p>');
+    var inp = ov.querySelector("[data-t=pin]"), msg = ov.querySelector("[data-t=msg]");
+    setTimeout(function () { try { inp.focus(); } catch (x) {} }, 60);
+    ov.addEventListener("click", function (ev) {
+      var b = ev.target.closest && ev.target.closest("[data-t]"); if (!b) return; var a = b.getAttribute("data-t");
+      if (a === "no" || a === "x") { ov.close(); if (cancel) cancel(); return; }
+      if (a !== "ok") return;
+      if (Date.now() < pcLockUntil) { msg.textContent = "Too many tries. Wait a minute."; return; }
+      if (inp.value.trim() === last4) { pcFails = 0; ov.close(); cb(); return; }
+      if (++pcFails >= 5) { pcFails = 0; pcLockUntil = Date.now() + 60000; }
+      msg.textContent = "That doesn't match the parent's phone."; inp.value = "";
+    });
+  }
+  function signOut() {
+    parentCheck("Sign out of this phone", function () {
+      save([]); try { localStorage.removeItem(PEND); localStorage.removeItem("gnw-mode"); } catch (x) {}
+      try { if (window.__OG && window.__OG.resetMode) window.__OG.resetMode(); } catch (x) {}
+      drawJoin(); drawOwn(); refreshMenu(); toast("Signed out of this phone");
+    });
+  }
+  function kidUnlock(cb, fromAdult) {
+    var m = mine()[0];
+    if (isParent(m)) { if (fromAdult) parentCheck("Switch to Kid mode", cb); else cb(); return; }
+    gate("kidunlock", function () { var mm = mine()[0]; if (mm) { mm.guardian = mm.guardian || Date.now(); bind(mm); put(mm); } drawJoin(); refreshMenu(); cb(); });
+  }
   function tokOf(r, i) {   // sample customers get made-up token history; real members their own counters
     if (!r.sample) { var c = r.tc || {}; return { tok: r.tok || 0, purchase: c.purchase || 0, weekly: c.weekly || 0, free: c.free || 0, bonus: c.bonus || 0, spent: c.spent || 0, plays: r.plays || 0, spins: r.spins || 0 }; }
     var wk = 10 * Math.max(1, Math.min(8, Math.ceil((now - r.joined) / (7 * DAY)))), pu = r.visits * 18, fr = (i % 3) * 10, bo = (i % 4) * 5, all_ = wk + pu + fr + bo, tok = all_ % 10 + (i % 2) * 10;
@@ -892,6 +939,8 @@
     canPlay: function () { var m = this.member(); return !!m && hasBoth(m) && (!ON || (m.tok || 0) >= TOK.playCost); },
     spinReady: function () { return spinReady(mine()[0]) || (!!SPIN && !mine()[0]); },
     play: function (go, opt) { if (!TC) { go(); return; } playGate(go, !!(opt && opt.kid)); },
+    isParent: function () { return isParent(mine()[0]); }, kidUnlock: kidUnlock, parentCheck: parentCheck, signOut: signOut,
+    kidBest: function (score) { var m = mine()[0]; if (!isParent(m)) return 0; if (score > (m.kidBest || 0)) { m.kidBest = Math.round(score); (m.ledger = m.ledger || []).unshift({ ts: Date.now(), pts: 0, t: "🧒 New kid best in " + (C.game || "the game") + ": " + m.kidBest.toLocaleString() }); put(m); drawJoin(); } return m.kidBest || 0; },
     openSpin: openSpin, openTokens: function () { if (ON) tokSheet(); }, issueCode: function (a) { return ON ? issueCode(a) : null; },
     redeem: function (c) { var m = mine()[0]; var r = m ? redeemCode(m, c) : { err: "no member" }; if (!r.err) { drawJoin(); drawOwn(); refreshMenu(); } return r; },
     // start-menu pieces (gamemenu.js): status line, play label, panel rows
@@ -899,8 +948,7 @@
     locked: function () { var m = mine()[0]; return ON && !!m && (m.tok || 0) < TOK.playCost; },
     statusHTML: function (kid) {
       var m = this.member();
-      if (kid && !ON) return "🧒 Kids play free · a grown-up saves prizes";
-      if (kid && !m) return "🧒 Tokens are on a grown-up's account";
+      if (kid) return isParent(m) ? "🧒 Kid mode · playing on " + e(String(m.name || "").split(" ")[0]) + "'s account" + (ON ? " · 🪙 " + (m.tok || 0) : "") : "🔒 Kid mode needs a parent or guardian signed in";
       if (!ON) return m && hasBoth(m) ? "✅ Free to play for members" : "🎮 Free to play · free member account (phone + email)";
       if (!m) return "🪙 Free account → " + TOK.weeklyFree + " free tokens every week";
       var b = m.tok || 0; return "🪙 <b>" + b + "</b> token" + (b === 1 ? "" : "s") + (b < TOK.playCost ? " · 🔒 need " + TOK.playCost + " to play" : " · a play costs " + TOK.playCost);
@@ -1127,7 +1175,7 @@
           '<p class="crm-fine" style="margin:6px 0 0">Food $ earns ' + wname("food") + ' points, drinks $ earn ' + wname("bar") + ' points. Two separate balances.</p>'
           : '<div class="two"><input data-r="code" inputmode="numeric" maxlength="4" placeholder="4-digit code"><input data-r="amt" inputmode="decimal" placeholder="Total $"></div>') +
         '<button type="button" class="go" style="margin-top:8px;background:#2547B8;box-shadow:none" data-a="reg">Add points</button><div class="err" data-r="msg" style="color:#3DDC97"></div>' +
-        '<h4 style="margin:16px 0 6px">🎟️ Redeem a reward code</h4><p style="margin:0 0 8px;font-size:13px">Guest shows a WIN-, ' + (WAL ? 'BAR- (drink reward), FOOD- (kitchen reward)' : 'R-') + ', FRIEND- or BDAY- code. Apply the matching discount in your POS (Toast, Square…), then mark it used here so it can never be used again. One reward per visit.</p>' +
+        '<h4 style="margin:16px 0 6px">🎟️ Redeem a reward code</h4><p style="margin:0 0 8px;font-size:13px">Guest shows a WIN-, KID- (🧒 kid prize: only with the young player at the table, one per kid per visit), ' + (WAL ? 'BAR- (drink reward), FOOD- (kitchen reward)' : 'R-') + ', FRIEND- or BDAY- code. Apply the matching discount in your POS (Toast, Square…), then mark it used here so it can never be used again. One reward per visit.</p>' +
         '<input data-r="rcode" placeholder="e.g. WIN-7K3P" maxlength="12" autocapitalize="characters" style="width:100%"><button type="button" class="go" style="margin-top:8px;background:#77242e;box-shadow:none" data-a="redeem">Mark used</button><div class="err" data-r="rmsg"></div>' +
         (mine()[0] ? '<p class="crm-fine" style="margin:4px 0 0">Demo tip: tap "Scan to earn" above to see your code, then enter it here.</p>' : '') + '</div>' +
       '<div class="crm-box crm-lead"><h4>🤝 Top referrers</h4><p style="margin:0;font-size:13px">Customers bringing you new customers. They earn +' + REF.join + ' when a friend joins and +' + REF.every + ' every time that friend orders.</p>' +
@@ -1179,10 +1227,11 @@
       if (!hit) return bad("No reward with that code. Check the letters, or it may belong to another phone (live: every code is looked up in your database).");
       if (hit.used || (m.bused && kind === "bday")) return bad("Already used on " + new Date(hit.used || m.bused).toLocaleString() + ". Each code works once.");
       if (kind === "win" && Date.now() - hit.ts >= (hit.ttl || WIN_TTL)) return bad("Expired " + until(hit) + ".");
-      if (m.lastRedeem && Date.now() - m.lastRedeem < 4 * 36e5) return bad("This guest already used a reward this visit. One reward per visit.");
+      // kid prizes follow their own rule (one per kid per visit, kid at the table), so a parent's reward doesn't block them
+      if (!hit.kid && m.lastRedeem && Date.now() - m.lastRedeem < 4 * 36e5) return bad("This guest already used a reward this visit. One reward per visit.");
       if (kind === "bday") m.bused = Date.now(); else hit.used = Date.now();
-      m.lastRedeem = Date.now(); (m.ledger = m.ledger || []).unshift({ ts: Date.now(), pts: 0, t: "✅ Redeemed " + hit.t + " · " + c }); put(m);
-      msg.style.color = "#3DDC97"; msg.textContent = "✅ " + (hit.w && W[hit.w] ? wname(hit.w) + " reward: " : "") + hit.t + " redeemed. Apply the matching discount in your POS" + (hit.w === "bar" ? " on the drinks." : hit.w === "food" ? " on the food." : "."); drawJoin(); toast("✅ " + c + " used");
+      if (!hit.kid) m.lastRedeem = Date.now(); (m.ledger = m.ledger || []).unshift({ ts: Date.now(), pts: 0, t: "✅ Redeemed " + hit.t + " · " + c }); put(m);
+      msg.style.color = "#3DDC97"; msg.textContent = "✅ " + (hit.kid ? "🧒 KID PRIZE: " : "") + (hit.w && W[hit.w] ? wname(hit.w) + " reward: " : "") + hit.t + " redeemed." + (hit.kid ? " " + KID_RULE : "") + " Apply the matching discount in your POS" + (hit.w === "bar" ? " on the drinks." : hit.w === "food" ? " on the food." : "."); drawJoin(); toast("✅ " + c + " used");
     };
     var DEF = { all: "Hey {first}! Double stars at " + NAME + " this week only 🔥", new: "Welcome to the club, {first}! Your next visit earns 2× stars.",
       vip: "{first}, you're one of our VIPs 👑 Next one's on us this week.", risk: "Hey {first}, we miss you! 👀 Come back this week for 2× stars.",

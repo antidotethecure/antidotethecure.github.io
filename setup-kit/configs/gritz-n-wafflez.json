@@ -161,6 +161,40 @@
       "Free Wingz N' Wafflez + a karaoke shoutout",
       "Free N' Wafflez plate",
       "$20 off"
+    ],
+    "kidPrizes": [
+      [
+        3000,
+        [
+          "Free Fresh Squeezed OJ",
+          "Free Kiki Palmer",
+          "Free Fresh Squeezed Lemonade"
+        ]
+      ],
+      [
+        3500,
+        [
+          "Free side of French Friez",
+          "Free side of Homestyle Potatoes",
+          "Free side of Collard Greens"
+        ]
+      ],
+      [
+        4250,
+        [
+          "Free Sweet Gritz",
+          "Free Cheese Gritz",
+          "Free Plain Gritz"
+        ]
+      ],
+      [
+        4500,
+        [
+          "Free Chocolate Chip Waffle",
+          "Free Cinnamon Roll Waffle",
+          "Free Sweet Vanilla Bean Waffle"
+        ]
+      ]
     ]
   },
   "specialsTitle": "What's on at Gritz N Wafflez: still the same?",

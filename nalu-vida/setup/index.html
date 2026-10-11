@@ -172,6 +172,10 @@ var Q=[
    .concat([["champ","Weekly #1 on the leaderboard",first(G.champ)]])
    .concat(G.second?[["second","Weekly #2 on the leaderboard",first(G.second)]]:[])]
 ];
+// Kid mode prizes (configs with game.kidPrizes): kid-sized items, owner-editable like the adult ones, never alcohol.
+// Every kid prize carries KID_RULE (shown on the voucher staff see, the prize board, the rules page and here).
+var KID_RULE="Kid prize — redeemable with the young player at the table, one per kid per visit.";
+if(G.kidPrizes) Q.push(["🧒 "+G.name+" Kid mode prizes (12 & under)",G.kidPrizes.map(function(p,i){ return ["k"+(i+1),"🧒 Kid score "+n(p[0]),first(p[1]),KID_RULE,null,F("reward",{thr:TH("score:k"+(i+1),p[0],"If a kid scores","or more, they get")})]; })]);
 // bar points vs kitchen points (configs with "wallets"): two balances that never mix. Bar points come only from drinks and
 // buy only bar rewards; kitchen points come only from food and buy only food rewards. Matches CRM_CFG.wallets in demo/crm.js.
 var WT="Bar points vs kitchen points", WCF=CFG.wallets;
@@ -248,7 +252,7 @@ function parseR(s){ s=String(s==null?"":s).trim(); var m;
 function numOk(t,x){ var f=parseFloat(x); return x!==""&&isFinite(f)&&f>0&&(t!=="pct"||f<=100); }
 function clean(x){ return String(parseFloat(x)); }
 var FREE_PICKS=(function(){ var all=[]; Object.keys(R).forEach(function(k){ if(Array.isArray(R[k])) all=all.concat(R[k]); });
-  all=all.concat(CFG.drawPrizes||[]); G.prizes.forEach(function(p){ all=all.concat(p[1]); });
+  all=all.concat(CFG.drawPrizes||[]); G.prizes.forEach(function(p){ all=all.concat(p[1]); }); (G.kidPrizes||[]).forEach(function(p){ all=all.concat(p[1]); });
   return all.filter(function(o){ return typeof o==="string"&&/^free\s/i.test(o); }).map(function(o){ return o.replace(/^free\s+/i,""); })
     .filter(function(o,i,a){ return a.indexOf(o)===i&&o.length<=26&&!isAlc(o); }); })();
 var DL=document.createElement("datalist"); DL.id="menu-items";

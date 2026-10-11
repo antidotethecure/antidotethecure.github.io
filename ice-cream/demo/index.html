@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Paletas El Sol: Truck Alerts</title>
+<meta name="description" content="Demo: get a ring with an ice-cream-truck jingle when Paletas El Sol is on your street. Points, rewards and the menu. Sample truck by SousShift AI.">
+<meta name="theme-color" content="#03060e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="El Sol">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="../ice.css">
+<style>
+body{padding-bottom:30px}
+.top .logo{width:40px;height:40px;border-radius:12px;background:radial-gradient(circle at 50% 40%,#ffd166 0 38%,#ff9a3c 39% 100%);display:grid;place-items:center;font-size:22px;flex:none}
+.tag{font:800 10px "Rajdhani",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#2a1a00;background:var(--gold);border-radius:99px;padding:1px 7px;margin-left:4px;vertical-align:2px}
+
+/* hero / live status */
+.live{margin-top:14px;text-align:center}
+.live .st{font-family:"Orbitron",sans-serif;font-weight:900;font-size:clamp(22px,6.6vw,30px);line-height:1.15;margin:4px 0}
+.live .st em{font-style:normal;color:var(--gold)}
+.live .sub{color:var(--dim);font-size:15px}
+.pulse{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--good)}
+.pulse::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(52,211,153,.7);animation:pl 1.6s infinite}
+@keyframes pl{to{box-shadow:0 0 0 12px rgba(52,211,153,0)}}
+#test{width:100%;min-height:64px;font-size:16px;margin-top:12px}
+
+/* map */
+.map{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--edge);background:#0b1733;margin-top:12px}
+.map svg{display:block;width:100%;height:auto}
+.mapctl{display:flex;gap:8px;margin-top:10px}
+.mapctl .btn{flex:1;min-height:44px;font-size:11.5px;padding:10px}
+
+/* forms */
+.fld{display:block;margin:10px 0}
+.fld span{display:block;font-weight:700;font-size:15px;margin-bottom:4px}
+.fld input,.fld select{width:100%;min-height:48px;border-radius:12px;border:1px solid var(--edge);background:#081330;color:var(--ink);font:600 17px "Rajdhani",sans-serif;padding:8px 12px}
+.ok{color:var(--good);font-weight:700}
+.why{display:flex;gap:10px;background:rgba(63,169,255,.08);border:1px solid rgba(63,169,255,.35);border-radius:14px;padding:10px 12px;font-size:14.5px;color:var(--silver);margin:10px 0}
+.why i{font-style:normal;font-size:20px}
+
+/* points */
+.pts{display:flex;align-items:baseline;gap:8px}
+.pts b{font-family:"Orbitron",sans-serif;font-size:44px;color:var(--gold);line-height:1}
+.bar{height:12px;border-radius:99px;background:#13244d;overflow:hidden;margin:10px 0 4px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--pink));transition:width .5s}
+.rwl{margin-top:12px;display:grid;gap:8px}
+.rwi{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;border:1px solid var(--edge);background:rgba(255,255,255,.03)}
+.rwi .e{font-size:26px}
+.rwi div{flex:1;line-height:1.2}
+.rwi div small{display:block;color:var(--dim);font-weight:700}
+.rwi button{min-height:42px;padding:8px 12px;font-size:11px}
+.code{font-family:"Orbitron",sans-serif;font-size:20px;letter-spacing:.12em;background:#fff;color:#0b1630;border-radius:12px;padding:10px;text-align:center;margin-top:10px}
+
+/* menu */
+.menu{display:grid;gap:8px}
+.mi{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--edge)}
+.mi .e{font-size:30px;flex:none;width:40px;text-align:center}
+.mi div{flex:1;line-height:1.25}
+.mi b{font-size:17px}
+.mi small{display:block;color:var(--dim);font-size:14px}
+.mi .p{font-family:"Orbitron",sans-serif;font-size:15px;color:var(--gold);white-space:nowrap}
+
+/* switch */
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--edge);font-weight:700}
+.sw:first-of-type{border-top:0}
+.sw input{width:52px;height:30px;accent-color:var(--blue)}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;min-height:44px;border-radius:12px;border:1px solid var(--edge);background:rgba(255,255,255,.03);color:var(--ink);font:700 15px "Rajdhani",sans-serif}
+.seg button[aria-pressed=true]{background:var(--blue);border-color:var(--blue)}
+
+/* ringing overlay */
+#ringer{position:fixed;left:0;right:0;top:0;z-index:100;padding:calc(10px + env(safe-area-inset-top)) 12px 0;transform:translateY(-130%);transition:transform .35s cubic-bezier(.2,.9,.3,1.2);pointer-events:none}
+#ringer.show{transform:none;pointer-events:auto}
+#ringer .ring{max-width:520px;margin:0 auto;flex-wrap:wrap}
+#ringer .ring>div:nth-child(2){flex:1;min-width:0}
+#ringer .acts{flex-basis:100%;display:flex;gap:8px;margin-top:8px}
+#ringer .acts button{flex:1;min-height:46px;border-radius:12px;border:0;font:800 15px "Rajdhani",sans-serif;cursor:pointer}
+#ringer .go{background:#1f5fe0;color:#fff}
+#ringer .no{background:#dfe5f2;color:#24324f}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,140%);background:#0f1f45;border:1px solid var(--edge);color:var(--ink);padding:12px 16px;border-radius:14px;font-weight:700;z-index:90;transition:transform .3s;max-width:calc(100% - 32px);text-align:center}
+#toast.show{transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <div class="logo" aria-hidden="true">🍦</div>
+  <b>Paletas El Sol<small><span data-t="topSub">Truck alerts</span> <span class="tag">demo</span></small></b>
+  <span class="sp"></span>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true">EN</button><button data-lang="es" aria-pressed="false">ES</button></div>
+</div></div>
+
+<main class="wrap">
+  <section class="live" aria-live="polite">
+    <span class="pulse" data-t="onRoute">On route now</span>
+    <div class="st" id="status">Truck is <em>0.9 mi</em> away · 12 min</div>
+    <div class="sub" id="substatus" data-t="subStatus">We'll ring your phone when it's close.</div>
+    <button class="btn gold" id="test" type="button" data-t="testBtn">🔔 Test the alert</button>
+  </section>
+
+  <div class="map" aria-label="Map showing the truck coming toward your street">
+    <svg viewBox="0 0 360 240" id="mapsvg">
+      <rect width="360" height="240" fill="#0b1733"/>
+      <g fill="#10224a">
+        <rect x="12" y="12" width="84" height="56" rx="6"/><rect x="112" y="12" width="84" height="56" rx="6"/><rect x="212" y="12" width="84" height="56" rx="6"/><rect x="312" y="12" width="40" height="56" rx="6"/>
+        <rect x="12" y="92" width="84" height="56" rx="6"/><rect x="112" y="92" width="84" height="56" rx="6"/><rect x="212" y="92" width="84" height="56" rx="6"/><rect x="312" y="92" width="40" height="56" rx="6"/>
+        <rect x="12" y="172" width="84" height="56" rx="6"/><rect x="112" y="172" width="84" height="56" rx="6"/><rect x="212" y="172" width="84" height="56" rx="6"/><rect x="312" y="172" width="40" height="56" rx="6"/>
+      </g>
+      <rect x="236" y="104" width="44" height="34" rx="6" fill="#163a2a"/><text x="258" y="126" text-anchor="middle" font-size="14">🌳</text>
+      <g stroke="#1f3a72" stroke-width="10" stroke-linecap="round" fill="none">
+        <path d="M0 80H360M0 160H360M104 0V240M204 0V240M304 0V240"/>
+      </g>
+      <circle id="zone" cx="154" cy="160" r="60" fill="rgba(255,209,102,.07)" stroke="rgba(255,209,102,.45)" stroke-dasharray="4 5"/>
+      <path id="route" d="M-10 80 H104 V160 H360" fill="none" stroke="rgba(63,169,255,.55)" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round"/>
+      <g id="home" transform="translate(154 160)">
+        <circle r="13" fill="#2f7bff" opacity=".25"/><circle r="7" fill="#3fa9ff" stroke="#fff" stroke-width="2"/>
+      </g>
+      <text x="154" y="186" text-anchor="middle" font-family="Rajdhani,Arial" font-weight="700" font-size="12" fill="#c9d3e6" id="youLbl" data-t="you">You</text>
+      <g id="truck"><circle r="15" fill="#ffd166"/><text y="6" text-anchor="middle" font-size="17">🚚</text></g>
+    </svg>
+  </div>
+  <div class="mapctl">
+    <button class="btn ghost" id="replay" type="button" data-t="replay">↺ Replay the route</button>
+    <button class="btn ghost" id="faster" type="button" data-t="faster">⏩ Bring it closer</button>
+  </div>
+
+  <section class="s" id="join">
+    <header><p class="kick" data-t="joinKick">Step 1</p><h2 class="chrome" data-t="joinH">Join in 10 seconds</h2></header>
+    <div class="card" id="joinCard">
+      <form id="joinForm" autocomplete="off">
+        <label class="fld"><span data-t="nameL">Your first name</span><input id="name" maxlength="30" data-t-ph="namePh" placeholder="Maria"></label>
+        <button class="btn primary" type="submit" style="width:100%" data-t="joinBtn">Join + get 10 free points</button>
+        <p class="note" data-t="joinNote">Demo only: nothing is sent anywhere. It stays on this phone.</p>
+      </form>
+      <div id="joined" hidden><p class="ok" id="hello"></p></div>
+    </div>
+
+    <div class="card">
+      <p class="kick" data-t="locKick">Step 2</p>
+      <h3 data-t="locH">Let us know your street</h3>
+      <div class="why"><i aria-hidden="true">📍</i><span data-t="locWhy">We only use your location to know <b>which street to ring</b> when the truck is close. We don't follow you around, and you can turn it off any time.</span></div>
+      <div class="row">
+        <button class="btn primary" id="locBtn" type="button" data-t="locBtn">📍 Allow location</button>
+        <button class="btn ghost" id="typeBtn" type="button" data-t="typeBtn">⌨️ Type my street</button>
+      </div>
+      <label class="fld" id="streetFld" hidden><span data-t="streetL">Your street and city</span><input id="street" maxlength="60" data-t-ph="streetPh" placeholder="Maple Ave, Santa Ana"></label>
+      <p class="note" id="locMsg" aria-live="polite"></p>
+    </div>
+
+    <div class="card">
+      <p class="kick" data-t="iosKick">Step 3 · iPhone</p>
+      <h3 data-t="iosH">Turn on alerts</h3>
+      <p class="note" data-t="iosP">On iPhone, tap <b>Share</b> (the square with the arrow) → <b>Add to Home Screen</b> → open it from your Home Screen and allow notifications. That's Apple's rule for alerts. On Android, just tap "Allow" when it asks.</p>
+    </div>
+  </section>
+
+  <section class="s" id="points">
+    <header><p class="kick" data-t="ptsKick">Your points</p><h2 class="chrome" data-t="ptsH">Points + rewards</h2></header>
+    <div class="card">
+      <div class="pts"><b id="ptsN">0</b><span data-t="ptsL">points</span></div>
+      <div class="bar"><i id="ptsBar"></i></div>
+      <p class="note" id="ptsNext"></p>
+      <button class="btn gold" id="buy" type="button" style="width:100%" data-t="buyBtn">🧾 Pretend I bought something (+10)</button>
+      <p class="note" data-t="buyNote">For real, the driver scans your code at the window.</p>
+      <div class="rwl" id="rwl"></div>
+      <div id="codeBox" hidden><p class="note" data-t="codeL" style="margin:10px 0 0">Show this to the driver:</p><div class="code" id="code"></div></div>
+    </div>
+  </section>
+
+  <section class="s" id="menu">
+    <header><p class="kick" data-t="menuKick">Menu</p><h2 class="chrome" data-t="menuH">What's on the truck</h2><p class="lead" data-t="menuLead">Sample prices. The real truck sets its own.</p></header>
+    <div class="menu" id="menuList"></div>
+  </section>
+
+  <section class="s" id="settings">
+    <header><p class="kick" data-t="setKick">Settings</p><h2 class="chrome" data-t="setH">Your alerts, your rules</h2></header>
+    <div class="card">
+      <p style="margin:0 0 6px;font-weight:700" data-t="distL">Ring me when the truck is within</p>
+      <div class="seg" id="dist">
+        <button type="button" data-d="0.15">0.15 mi</button><button type="button" data-d="0.25">0.25 mi</button><button type="button" data-d="0.5">0.5 mi</button>
+      </div>
+      <label class="sw" style="margin-top:10px"><span data-t="swAlerts">Alerts on</span><input type="checkbox" id="alertsOn" checked></label>
+      <label class="sw"><span data-t="swSound">Play the jingle</span><input type="checkbox" id="soundOn" checked></label>
+      <label class="sw"><span data-t="swQuiet">Quiet after 8 PM</span><input type="checkbox" id="quietOn" checked></label>
+      <button class="btn ghost" id="reset" type="button" style="width:100%;margin-top:10px" data-t="resetBtn">Leave + delete my info</button>
+      <p class="note" data-t="privacy">Your info is never sold. One alert per truck visit. Turn it off any time.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="f wrap">
+  <span data-t="foot">"Paletas El Sol" is a made-up sample truck. Demo by SousShift AI.</span><br>
+  <a href="../" data-t="footLink">For truck owners: get this for your truck →</a>
+</footer>
+
+<div id="ringer" role="alertdialog" aria-live="assertive" aria-hidden="true">
+  <div class="ring on">
+    <div class="ic">🍦</div>
+    <div><small data-t="nApp">Paletas El Sol · now</small><b data-t="nTitle">The truck is on your street!</b><span id="nBody"></span></div>
+    <div class="acts"><button class="go" id="coming" type="button" data-t="coming">🏃 I'm coming!</button><button class="no" id="silence" type="button" data-t="silence">Silence</button></div>
+  </div>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+window.T = {
+en: {
+  _title: "Paletas El Sol: Truck Alerts", you: "You",
+  topSub: "Truck alerts", onRoute: "On route now",
+  status: "Truck is <em>{d} mi</em> away · {m} min", statusHere: "The truck is <em>on your street!</em>", statusGone: "The truck passed. Next round soon.",
+  subStatus: "We'll ring your phone when it's close.",
+  testBtn: "🔔 Test the alert", replay: "↺ Replay the route", faster: "⏩ Bring it closer",
+  joinKick: "Step 1", joinH: "Join in 10 seconds", nameL: "Your first name", namePh: "Maria",
+  joinBtn: "Join + get 10 free points", joinNote: "Demo only: nothing is sent anywhere. It stays on this phone.",
+  hello: "Welcome, {n}! You got 10 free points. 🎉", helloAnon: "Welcome! You got 10 free points. 🎉",
+  locKick: "Step 2", locH: "Let us know your street",
+  locWhy: "We only use your location to know <b>which street to ring</b> when the truck is close. We don't follow you around, and you can turn it off any time.",
+  locBtn: "📍 Allow location", typeBtn: "⌨️ Type my street", streetL: "Your street and city", streetPh: "Maple Ave, Santa Ana",
+  locAsking: "Your phone will ask. Tap \"Allow\".", locOk: "✅ Got it. Your street is saved (in this demo it stays on your phone).",
+  locNo: "No problem. The demo uses a sample street. You can type yours instead.", locNA: "This browser can't share location. Type your street instead.",
+  streetOk: "✅ Saved: {s}",
+  iosKick: "Step 3 · iPhone", iosH: "Turn on alerts",
+  iosP: "On iPhone, tap <b>Share</b> (the square with the arrow) → <b>Add to Home Screen</b> → open it from your Home Screen and allow notifications. That's Apple's rule for alerts. On Android, just tap \"Allow\" when it asks.",
+  ptsKick: "Your points", ptsH: "Points + rewards", ptsL: "points",
+  ptsNext: "{n} more points to {r}", ptsAll: "You can get every reward. Nice!",
+  buyBtn: "🧾 Pretend I bought something (+10)", buyNote: "For real, the driver scans your code at the window.",
+  redeem: "Use", need: "{n} pts", codeL: "Show this to the driver:",
+  r1: "50¢ off", r2: "$1 off", r3: "Free chili cheese Fritos", r4: "Free paleta",
+  toastBuy: "+10 points! 🍦", toastJoin: "Join first (Step 1) to collect points.", toastRedeem: "Reward ready. Show the code to the driver.",
+  menuKick: "Menu", menuH: "What's on the truck", menuLead: "Sample prices. The real truck sets its own.",
+  m1: "Paletas", m1s: "Strawberry, mango con chile, lime, coconut",
+  m2: "Ice cream bars", m2s: "Cookies & cream, strawberry shortcake, chocolate",
+  m3: "Raspados", m3s: "Shaved ice: tamarind, mango, strawberry",
+  m4: "Chili cheese Fritos", m4s: "Fritos, warm chili and nacho cheese",
+  m5: "Elote en vaso", m5s: "Corn in a cup with mayo, cheese, chile and lime",
+  m6: "Elote on the cob", m6s: "Same toppings, on a stick",
+  setKick: "Settings", setH: "Your alerts, your rules", distL: "Ring me when the truck is within",
+  swAlerts: "Alerts on", swSound: "Play the jingle", swQuiet: "Quiet after 8 PM",
+  resetBtn: "Leave + delete my info", resetDone: "Done. Your info was deleted from this phone.",
+  privacy: "Your info is never sold. One alert per truck visit. Turn it off any time.",
+  nApp: "Paletas El Sol · now", nTitle: "The truck is on your street!", nBody: "{d} mi away, about {m} min. Walk out now 🎶",
+  coming: "🏃 I'm coming!", silence: "Silence", toastComing: "The driver can see 1 person is on the way. 🙌",
+  alertsOff: "Alerts are off in Settings, so the real app wouldn't ring.",
+  foot: "\"Paletas El Sol\" is a made-up sample truck. Demo by SousShift AI.",
+  footLink: "For truck owners: get this for your truck →"
+},
+es: {
+  _title: "Paletas El Sol: Alertas del Troque", you: "Tú",
+  topSub: "Alertas del troque", onRoute: "En ruta ahorita",
+  status: "El troque está a <em>{d} mi</em> · {m} min", statusHere: "¡El troque está <em>en tu calle!</em>", statusGone: "Ya pasó el troque. Pronto vuelve.",
+  subStatus: "Te sonamos el celular cuando esté cerca.",
+  testBtn: "🔔 Probar la alerta", replay: "↺ Repetir la ruta", faster: "⏩ Acercar el troque",
+  joinKick: "Paso 1", joinH: "Únete en 10 segundos", nameL: "Tu nombre", namePh: "María",
+  joinBtn: "Unirme + 10 puntos gratis", joinNote: "Solo es demo: no se manda nada a ningún lado. Se queda en este celular.",
+  hello: "¡Bienvenido(a), {n}! Ya tienes 10 puntos gratis. 🎉", helloAnon: "¡Bienvenido(a)! Ya tienes 10 puntos gratis. 🎉",
+  locKick: "Paso 2", locH: "Dinos cuál es tu calle",
+  locWhy: "Solo usamos tu ubicación para saber <b>en qué calle sonarte</b> cuando el troque esté cerca. No te andamos siguiendo, y lo puedes apagar cuando quieras.",
+  locBtn: "📍 Permitir ubicación", typeBtn: "⌨️ Escribir mi calle", streetL: "Tu calle y ciudad", streetPh: "Maple Ave, Santa Ana",
+  locAsking: "Tu celular te va a preguntar. Toca \"Permitir\".", locOk: "✅ Listo. Ya quedó guardada tu calle (en este demo se queda en tu celular).",
+  locNo: "No hay problema. El demo usa una calle de muestra. También puedes escribir la tuya.", locNA: "Este navegador no puede compartir la ubicación. Escribe tu calle.",
+  streetOk: "✅ Guardado: {s}",
+  iosKick: "Paso 3 · iPhone", iosH: "Activa las alertas",
+  iosP: "En iPhone, toca <b>Compartir</b> (el cuadrito con la flecha) → <b>Agregar a pantalla de inicio</b> → ábrela desde tu pantalla de inicio y permite las notificaciones. Es regla de Apple para las alertas. En Android, nomás toca \"Permitir\" cuando te pregunte.",
+  ptsKick: "Tus puntos", ptsH: "Puntos + premios", ptsL: "puntos",
+  ptsNext: "Te faltan {n} puntos para {r}", ptsAll: "Ya te alcanza para todos los premios. ¡Bien!",
+  buyBtn: "🧾 Hacer como que compré algo (+10)", buyNote: "En la vida real, el chofer escanea tu código en la ventanilla.",
+  redeem: "Usar", need: "{n} pts", codeL: "Enséñale esto al chofer:",
+  r1: "50¢ de descuento", r2: "$1 de descuento", r3: "Fritos con chili y queso gratis", r4: "Paleta gratis",
+  toastBuy: "¡+10 puntos! 🍦", toastJoin: "Primero únete (Paso 1) para juntar puntos.", toastRedeem: "Premio listo. Enséñale el código al chofer.",
+  menuKick: "Menú", menuH: "Lo que trae el troque", menuLead: "Precios de muestra. Cada troque pone los suyos.",
+  m1: "Paletas", m1s: "Fresa, mango con chile, limón, coco",
+  m2: "Paletas de helado", m2s: "Galleta con crema, fresa, chocolate",
+  m3: "Raspados", m3s: "Tamarindo, mango, fresa",
+  m4: "Fritos con chili y queso", m4s: "Fritos con chili calientito y queso nacho",
+  m5: "Elote en vaso", m5s: "Con mayonesa, queso, chile y limón",
+  m6: "Elote entero", m6s: "Los mismos toppings, en palito",
+  setKick: "Ajustes", setH: "Tus alertas, tus reglas", distL: "Suéname cuando el troque esté a menos de",
+  swAlerts: "Alertas prendidas", swSound: "Tocar la melodía", swQuiet: "Silencio después de las 8 PM",
+  resetBtn: "Salirme + borrar mis datos", resetDone: "Listo. Se borraron tus datos de este celular.",
+  privacy: "Nunca vendemos tus datos. Una alerta por cada pasada del troque. Apágalo cuando quieras.",
+  nApp: "Paletas El Sol · ahora", nTitle: "¡El troque está en tu calle!", nBody: "A {d} mi, como {m} min. Sal ahorita 🎶",
+  coming: "🏃 ¡Ya voy!", silence: "Silenciar", toastComing: "El chofer ve que 1 persona va en camino. 🙌",
+  alertsOff: "Las alertas están apagadas en Ajustes, así que la app de verdad no sonaría.",
+  foot: "\"Paletas El Sol\" es un troque de muestra inventado. Demo de SousShift AI.",
+  footLink: "Para dueños de troques: tenlo en tu troque →"
+}};
+</script>
+<script src="../lang.js"></script>
+<script src="../jingle.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = "ssai:ice:demo";
+  var S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "" };
+  try { var saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved) for (var k in saved) S[k] = saved[k]; } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  var t = function (k) { return ICE.t(k); };
+  var fmt = function (s, o) { return s.replace(/\{(\w+)\}/g, function (_, k) { return o[k]; }); };
+  var dec = function (n) { return n.toLocaleString(ICE.lang === "es" ? "es-US" : "en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); };
+
+  /* ---------- toast ---------- */
+  var toastT;
+  function toast(msg) { var el = $("toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(function () { el.classList.remove("show"); }, 2600); }
+
+  /* ---------- ring ---------- */
+  var ringT, lastD = 0.2, lastM = 3;
+  function ring(d, m, manual) {
+    if (!S.alerts && !manual) return;
+    if (!S.alerts && manual) toast(t("alertsOff"));
+    lastD = d; lastM = m;
+    $("nBody").textContent = fmt(t("nBody"), { d: dec(d), m: m });
+    var r = $("ringer"); r.classList.add("show"); r.setAttribute("aria-hidden", "false");
+    if (navigator.vibrate) try { navigator.vibrate([400, 200, 400, 200, 400]); } catch (e) {}
+    if (S.sound) Jingle.play(2).then(hide); else { clearTimeout(ringT); ringT = setTimeout(hide, 6000); }
+  }
+  function hide() { Jingle.stop(); clearTimeout(ringT); var r = $("ringer"); r.classList.remove("show"); r.setAttribute("aria-hidden", "true"); if (navigator.vibrate) try { navigator.vibrate(0); } catch (e) {} }
+  $("test").addEventListener("click", function () { unlocked = true; ring(0.2, 3, true); });
+  $("silence").addEventListener("click", hide);
+  $("coming").addEventListener("click", function () { hide(); toast(t("toastComing")); });
+
+  /* ---------- map + truck ---------- */
+  var route = $("route"), truck = $("truck"), LEN = route.getTotalLength();
+  var HOME = { x: 154, y: 160 };
+  var homeAt = (function () { var best = 0, bd = 1e9; for (var s = 0; s <= LEN; s += 1) { var p = route.getPointAtLength(s), dd = Math.hypot(p.x - HOME.x, p.y - HOME.y); if (dd < bd) { bd = dd; best = s; } } return best; })();
+  var MI_PER_PX = 0.9 / homeAt;        // start of route is 0.9 mi (by road) from home
+  var MPH_MIN = 0.075;                  // ~0.075 mi per minute with stops (≈4.5 mph): 0.3 mi ≈ 4 min
+  var pos = 0, speed = LEN / 60, rung = false, unlocked = false, lastTs = 0, statusKey = "";
+  function zoneR() { return S.dist / MI_PER_PX; }
+  function frame(ts) {
+    var dt = lastTs ? Math.min(0.1, (ts - lastTs) / 1000) : 0; lastTs = ts;
+    pos += speed * dt;
+    if (pos > LEN + 40) { pos = 0; rung = false; speed = LEN / 60; }
+    var p = route.getPointAtLength(Math.min(pos, LEN));
+    truck.setAttribute("transform", "translate(" + p.x.toFixed(1) + " " + p.y.toFixed(1) + ")");
+    var left = (homeAt - pos) * MI_PER_PX;
+    var st;
+    if (left > 0.04) {
+      var mins = Math.max(1, Math.round(left / MPH_MIN));
+      st = fmt(t("status"), { d: dec(left), m: mins });
+      if (!rung && left <= S.dist) { rung = true; if (unlocked) ring(left, mins); else toast(fmt(t("nBody"), { d: dec(left), m: mins })); }
+    } else if (left > -0.12) st = t("statusHere");
+    else st = t("statusGone");
+    if (st !== statusKey) { $("status").innerHTML = st; statusKey = st; }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  $("replay").addEventListener("click", function () { unlocked = true; pos = 0; rung = false; speed = LEN / 60; });
+  $("faster").addEventListener("click", function () { unlocked = true; var target = homeAt - (S.dist + 0.06) / MI_PER_PX; if (pos < target) { pos = target; rung = false; } speed = LEN / 30; });
+  document.addEventListener("pointerdown", function () { unlocked = true; }, { once: true });
+
+  /* ---------- join ---------- */
+  function showJoin() {
+    $("joinForm").hidden = S.joined; $("joined").hidden = !S.joined;
+    if (S.joined) $("hello").textContent = S.name ? fmt(t("hello"), { n: S.name }) : t("helloAnon");
+  }
+  $("joinForm").addEventListener("submit", function (e) {
+    e.preventDefault(); S.name = $("name").value.trim().slice(0, 30); if (!S.joined) { S.joined = true; S.pts += 10; } save(); showJoin(); renderPts(); toast(t("toastBuy"));
+  });
+
+  /* ---------- location ---------- */
+  $("locBtn").addEventListener("click", function () {
+    var m = $("locMsg");
+    if (!navigator.geolocation) { m.textContent = t("locNA"); $("streetFld").hidden = false; return; }
+    m.textContent = t("locAsking");
+    navigator.geolocation.getCurrentPosition(function () { m.textContent = t("locOk"); S.street = "gps"; save(); },
+      function () { m.textContent = t("locNo"); }, { timeout: 12000, maximumAge: 600000 });
+  });
+  $("typeBtn").addEventListener("click", function () { $("streetFld").hidden = false; $("street").focus(); });
+  $("street").addEventListener("change", function () { var v = this.value.trim(); if (v) { S.street = v; save(); $("locMsg").textContent = fmt(t("streetOk"), { s: v }); } });
+
+  /* ---------- points ---------- */
+  var REW = [{ k: "r1", c: 30, e: "🪙" }, { k: "r2", c: 50, e: "💵" }, { k: "r3", c: 80, e: "🌶️" }, { k: "r4", c: 100, e: "🍓" }];
+  function renderPts() {
+    $("ptsN").textContent = S.pts;
+    var next = REW.filter(function (r) { return r.c > S.pts; })[0];
+    $("ptsBar").style.width = Math.min(100, S.pts / (next ? next.c : S.pts || 1) * 100) + "%";
+    $("ptsNext").textContent = next ? fmt(t("ptsNext"), { n: next.c - S.pts, r: t(next.k) }) : t("ptsAll");
+    var box = $("rwl"); box.innerHTML = "";
+    REW.forEach(function (r) {
+      var row = document.createElement("div"); row.className = "rwi";
+      var ok = S.pts >= r.c;
+      row.innerHTML = '<span class="e" aria-hidden="true">' + r.e + '</span><div><b></b><small></small></div><button type="button" class="btn ' + (ok ? "primary" : "ghost off") + '"></button>';
+      row.querySelector("b").textContent = t(r.k);
+      row.querySelector("small").textContent = fmt(t("need"), { n: r.c });
+      var b = row.querySelector("button"); b.textContent = t("redeem"); b.disabled = !ok;
+      b.addEventListener("click", function () {
+        if (S.pts < r.c) return; S.pts -= r.c; save(); renderPts();
+        $("codeBox").hidden = false; $("code").textContent = "SOL-" + String(Math.floor(1000 + Math.random() * 9000)) + " · " + t(r.k);
+        toast(t("toastRedeem"));
+      });
+      box.appendChild(row);
+    });
+  }
+  $("buy").addEventListener("click", function () {
+    if (!S.joined) { toast(t("toastJoin")); location.hash = "join"; return; }
+    S.pts += 10; save(); renderPts(); toast(t("toastBuy"));
+  });
+
+  /* ---------- menu ---------- */
+  var MENU = [["🍓", "m1", 2.5], ["🍫", "m2", 3], ["🍧", "m3", 4], ["🌶️", "m4", 5], ["🌽", "m5", 5], ["🌽", "m6", 4.5]];
+  function renderMenu() {
+    var box = $("menuList"); box.innerHTML = "";
+    MENU.forEach(function (m) {
+      var d = document.createElement("div"); d.className = "mi";
+      d.innerHTML = '<span class="e" aria-hidden="true">' + m[0] + '</span><div><b></b><small></small></div><span class="p"></span>';
+      d.querySelector("b").textContent = t(m[1]); d.querySelector("small").textContent = t(m[1] + "s");
+      d.querySelector(".p").textContent = "$" + m[2].toFixed(2);
+      box.appendChild(d);
+    });
+  }
+
+  /* ---------- settings ---------- */
+  function renderSet() {
+    [].forEach.call($("dist").children, function (b) { b.setAttribute("aria-pressed", +b.getAttribute("data-d") === S.dist ? "true" : "false"); });
+    $("alertsOn").checked = S.alerts; $("soundOn").checked = S.sound; $("quietOn").checked = S.quiet;
+    $("zone").setAttribute("r", zoneR().toFixed(1));
+  }
+  $("dist").addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b) return; S.dist = +b.getAttribute("data-d"); save(); renderSet(); });
+  $("alertsOn").addEventListener("change", function () { S.alerts = this.checked; save(); });
+  $("soundOn").addEventListener("change", function () { S.sound = this.checked; save(); });
+  $("quietOn").addEventListener("change", function () { S.quiet = this.checked; save(); });
+  $("reset").addEventListener("click", function () {
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "" };
+    $("name").value = ""; $("street").value = ""; $("locMsg").textContent = ""; $("codeBox").hidden = true;
+    showJoin(); renderPts(); renderSet(); toast(t("resetDone"));
+  });
+
+  ICE.on(function () { showJoin(); renderPts(); renderMenu(); statusKey = ""; if ($("ringer").classList.contains("show")) $("nBody").textContent = fmt(t("nBody"), { d: dec(lastD), m: lastM }); });
+  showJoin(); renderPts(); renderMenu(); renderSet();
+})();
+</script>
+</body>
+</html>

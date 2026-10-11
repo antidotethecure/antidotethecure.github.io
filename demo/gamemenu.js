@@ -17,6 +17,10 @@
      vibrate:true                   the game buzzes the phone → a Vibration switch (wraps navigator.vibrate)
      difficulty:{options:[["easy","Easy"],["hard","Hard"]], get:function(){}, set:function(v){}}  only if the game has it
      music:false                    force "no music" even if GAME_AUDIO says otherwise
+     tokens:true                    game access through crm.js (CRM_CFG.tokens / CRM_CFG.spin, window.SSAI_TOKENS): PLAY goes
+                                    through the member-account check (Phase 1: free for members) or costs tokens (Phase 2);
+                                    the start screen shows the status / token balance, a 🎡 free daily spin button and, in
+                                    Phase 2, 🪙 Get tokens; How to play / Points panels list the token + spin rules.
    Audio convention (games that have sound expose it; the menu wires to it):
      window.GAME_AUDIO={ music:function(on){}, sfx:function(on){}, state:function(){ return {hasMusic:true,hasSfx:true,music:true,sfx:true}; } }
      music(false) must silence ONLY the music (gain 0 / pause the <audio>), never suspend the shared AudioContext.
@@ -33,6 +37,8 @@
   var S = { music: true, sfx: true, vib: true, diff: null };
   try { var sv = JSON.parse(localStorage.getItem(KEY) || "null"); if (sv) for (var k in sv) S[k] = sv[k]; } catch (e) {}
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+  function TK() { return (C.tokens && W.SSAI_TOKENS) || null; }
 
   /* ---------- audio ---------- */
   function A() { return C.audio || W.GAME_AUDIO || null; }
@@ -111,6 +117,8 @@
     ".gm-prow{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:340px;padding:0 12px}.gm-prow button{min-height:44px;padding:10px 14px!important;font:700 14px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif!important;" +
     "background:rgba(255,255,255,.14)!important;color:#fff!important;border:1px solid rgba(255,255,255,.25)!important;box-shadow:none!important;border-radius:999px}" +
     "html.gm-up .ssai-pausebtn{display:none!important}" +
+    ".gm-tok{margin:0;font:700 13.5px/1.3 var(--gm-body);color:var(--gm-ink);background:var(--gm-soft);border:1px solid var(--gm-edge);border-radius:999px;padding:7px 14px;max-width:310px}.gm-tok b{color:var(--gm-label);font-size:16px}" +
+    ".gm-play.lock{filter:grayscale(.55) brightness(.85);animation:none}" +
     "@media (prefers-reduced-motion:reduce){.gm-hero img,.gm-play{animation:none}}";
   D.head.appendChild(st);
 
@@ -127,8 +135,12 @@
     if (C.by) h += '<p class="gm-by notranslate">' + esc(C.by) + "</p>";
     h += '<div class="gm-t notranslate" role="heading" aria-level="2">' + esc(C.name || "Play") + "</div>";
     if (C.tagline) h += '<p class="gm-tag">' + esc(T(C.tagline)) + "</p>";
-    h += '<button type="button" class="gm-play" data-gm="play"><b></b>' + esc(T("PLAY")) + "</button>";
+    var tk = TK();
+    if (tk) { try { h += '<p class="gm-tok" aria-live="polite">' + tk.statusHTML() + "</p>"; } catch (e) {} }
+    h += '<button type="button" class="gm-play' + (tk && tk.locked() ? " lock" : "") + '" data-gm="play"><b></b>' + esc(T(tk ? tk.playLabel() : "PLAY")) + "</button>";
     var bs = [];
+    if (tk && tk.spin) bs.push('<button type="button" class="gm-b" data-gm="spin"><i>🎡</i>' + esc(T(tk.spinReady() ? "Free daily spin" : "Spun today ✓")) + "</button>");
+    if (tk && tk.on) bs.push('<button type="button" class="gm-b" data-gm="tokens"><i>🪙</i>' + esc(T("Get tokens")) + "</button>");
     if (hasMusic()) bs.push('<button type="button" class="gm-b" data-gm="music" aria-pressed="' + !!S.music + '"><i>' + (S.music ? "🎵" : "🔇") + "</i>" + esc(T(S.music ? "Music on" : "Music off")) + "</button>");
     bs.push('<button type="button" class="gm-b" data-gm="settings"><i>⚙️</i>' + esc(T("Settings")) + "</button>");
     bs.push('<button type="button" class="gm-b" data-gm="how"><i>❓</i>' + esc(T("How to play")) + "</button>");
@@ -166,12 +178,18 @@
     if (a === "play") play();
     else if (a === "music") setMusic(!S.music);
     else if (a === "pclose") closeSheet();
+    else if (a === "spin") { closeSheet(); if (TK()) TK().openSpin(); }
+    else if (a === "tokens") { closeSheet(); if (TK()) TK().openTokens(); }
     else if (a === "sw") toggle(b.getAttribute("data-k"));
     else if (a === "diff") { S.diff = b.getAttribute("data-v"); save(); try { C.difficulty.set(S.diff); } catch (x) {} panel("settings"); }
     else panel(a);
   }
   function play() {
     closeSheet();
+    var tk = TK(); if (tk) { tk.play(go); return; }   // account check (Phase 1) / token cost (Phase 2) first
+    go();
+  }
+  function go() {
     ov.classList.add("off"); opened = false; D.documentElement.classList.remove("gm-up");
     setTimeout(function () { if (!opened) ov.classList.add("gone"); }, 260);
     started = true; applyAudio();
@@ -208,7 +226,8 @@
     var h = "";
     if (p === "points") {
       (C.points || []).forEach(function (g) { h += '<p class="gm-g">' + esc(T(g.group)) + "</p>" + (g.items || []).map(row).join(""); });
-      if (W.ReviewEgg && W.ReviewEgg.menuHTML) { try { h += W.ReviewEgg.menuHTML(row); } catch (e) {} }   // reviewegg.js: "📺 Antidote's review" secret + watch card
+      if (W.ReviewEgg && W.ReviewEgg.menuHTML) { try { h += W.ReviewEgg.menuHTML(row); } catch (e) {} }
+      if (TK()) { try { h += TK().menuHTML(row, "points"); } catch (e) {} }   // reviewegg.js: "📺 Antidote's review" secret + watch card
       var pr = C.prizes;
       if (pr) {
         h += '<p class="gm-g">' + esc(T("Prizes")) + "</p>";
@@ -221,6 +240,7 @@
       if (hw.goal) h += '<div class="gm-goal">🎯 <b>' + esc(T("Goal")) + ":</b> " + esc(T(hw.goal)) + "</div>";
       if (hw.steps && hw.steps.length) h += '<p class="gm-g">' + esc(T("Controls & rules")) + "</p>" + hw.steps.map(function (s) { return row({ icon: s[0], img: s[2], name: s[1] }); }).join("");
       if (hw.time) h += row({ icon: "⏱️", name: hw.time });
+      if (TK()) { try { h += TK().menuHTML(row, "how"); } catch (e) {} }
       h += '<p class="gm-note">' + esc(T("Pause anytime with the ⏸ Pause button in the corner.")) + "</p>";
     } else if (p === "settings") {
       h += '<p class="gm-g">' + esc(T("Sound")) + "</p>";
@@ -288,5 +308,6 @@
 
   function init() { applyAudio(); build(); watchPause(); }
   if (D.readyState === "loading") D.addEventListener("DOMContentLoaded", init); else init();
-  W.GameMenu = { open: open, close: close, panel: panel, play: function () { if (ov) play(); }, get settings() { return S; } };
+  function refresh() { if (ov && opened) ov.innerHTML = menuHTML(); if (sheet && sheet.classList.contains("on")) panel(sheet.getAttribute("data-p")); }
+  W.GameMenu = { open: open, close: close, panel: panel, refresh: refresh, play: function () { if (ov) play(); }, get settings() { return S; } };
 })();

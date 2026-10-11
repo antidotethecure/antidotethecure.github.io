@@ -1073,21 +1073,23 @@
   function suit(m) { return m ? "#2f6fb5" : "#13858c"; }
   /* the realistic run-out / paddle-out surfer: img/game/paddler_m|f.webp is one strip of 8 equal, registered cells,
      the same person (and board) as surfer_m|f, seen from overhead, head up the cell:
-     0-2 running with the board under the arm, 3 wading, 4 left-arm stroke, 5 arms out, 6 right-arm stroke, 7 duck-dive.
+     0-3 running TOWARD the camera (front view: the run back to Nalu Vida, down the screen), 4 left-arm stroke, 5 arms out,
+     6 right-arm stroke, 7 duck-dive (prone, head up with the neck showing), 8-11 running AWAY (back view: down the sand into the
+     water, up the screen; 11 doubles as the wading step). Facing always follows the direction of travel.
      Damage (red tint, bruises, bandages) is baked onto a copy of the strip per hit level, like hurtImg. */
   var PK = .32;   // strip px → game px: the prone board comes out the same length as the riding surfer's board
-  var PAD_RUN = [0, 1, 2, 1], PAD_STROKE = [4, 5, 6, 5];
+  var PAD_N = 12, PAD_RUN = [0, 1, 2, 1], PAD_UP = [8, 9, 11, 9], PAD_STROKE = [4, 5, 6, 5];
   function padStrip(lvl) {
     var k = G.surfer === "m" ? "paddler_m" : "paddler_f", i = IM[k]; if (!ok(i)) return null;
     if (lvl <= 0) return i; var key = k + lvl; if (DMG[key]) return DMG[key];
-    var w = i.naturalWidth, h = i.naturalHeight, cw = w / 8, c = document.createElement("canvas"); c.width = w; c.height = h; var x = c.getContext("2d"); x.drawImage(i, 0, 0);
+    var w = i.naturalWidth, h = i.naturalHeight, cw = w / PAD_N, c = document.createElement("canvas"); c.width = w; c.height = h; var x = c.getContext("2d"); x.drawImage(i, 0, 0);
     x.globalCompositeOperation = "source-atop"; x.fillStyle = "rgba(235,60,60," + (lvl * .1) + ")"; x.fillRect(0, 0, w, h);
-    for (var f = 0; f < 8; f++) marks(x, cw * .62, h * .5, lvl, f * cw + cw * .19, h * (f < 4 ? .08 : .12));   // on the back / shoulders of each pose
+    for (var f = 0; f < PAD_N; f++) marks(x, cw * .62, h * .5, lvl, f * cw + cw * .19, h * (f < 4 || f > 7 ? .08 : .12));   // on the back / shoulders of each pose
     DMG[key] = c; return c;
   }
   // one cell of the strip, centred on (x, y), rotated (rot 0 = head up the screen); false if the art isn't loaded yet
   function padFrame(f, x, y, rot, sc, alpha) {
-    var im = padStrip(G.dmg); if (!im) return false; var n = IM[G.surfer === "m" ? "paddler_m" : "paddler_f"], cw = n.naturalWidth / 8, ch = n.naturalHeight, w = cw * PK * sc, h = ch * PK * sc;
+    var im = padStrip(G.dmg); if (!im) return false; var n = IM[G.surfer === "m" ? "paddler_m" : "paddler_f"], cw = n.naturalWidth / PAD_N, ch = n.naturalHeight, w = cw * PK * sc, h = ch * PK * sc;
     cx.save(); cx.translate(x, y); cx.rotate(rot); if (alpha != null) cx.globalAlpha = alpha;
     cx.fillStyle = "rgba(0,20,35,.22)"; cx.beginPath(); cx.ellipse(5, 6, w * .32, h * .44, 0, 0, 7); cx.fill();   // soft shadow, like the riding surfer's
     cx.filter = "brightness(1.2) contrast(1.08) saturate(1.12)";   // the riding sprite's grade, so the two read as the same person
@@ -1095,8 +1097,10 @@
   }
   function animF(seq, fps) { return REDUCE ? seq[1] : seq[Math.floor(G.t * fps) % seq.length]; }
   // running on the sand with the board under his/her arm (top-down, head toward rot = 0 → up the screen)
+  // rot = heading (0 = up the screen, PI = down, plus a lean toward any sideways drift)
   function runner(x, y, rot) {
-    if (padFrame(animF(PAD_RUN, 9), x, y - (REDUCE ? 0 : Math.abs(Math.sin(G.t * 14)) * 1.5), rot, .92)) return;
+    var down = Math.cos(rot) < 0;   // heading down the screen: the front-view frames, which already face down
+    if (padFrame(animF(down ? PAD_RUN : PAD_UP, 9), x, y - (REDUCE ? 0 : Math.abs(Math.sin(G.t * 14)) * 1.5), down ? rot - Math.PI : rot, .92)) return;
     var t = G.t * 11, s1 = Math.sin(t), m = G.surfer === "m", sk = skinCol();
     cx.save(); cx.translate(x, y - Math.abs(s1) * 2); cx.rotate(rot); cx.scale(1.3, 1.3);
     cx.fillStyle = "rgba(60,40,20,.25)"; cx.beginPath(); cx.ellipse(4, 8, 12, 15, 0, 0, 7); cx.fill();
@@ -1117,7 +1121,7 @@
     sink = Math.max(sink || 0, duck);
     if (G.phase === "swim" && G.yw < 70 && !sink) {   // wading in: the first few steps into the shallows, board still under the arm
       var by = y + (REDUCE ? 0 : Math.sin(G.t * 7) * 1.2);
-      if (padFrame(REDUCE ? 3 : [3, 1][Math.floor(G.t * 4) % 2], x, by, rot, .92)) {
+      if (padFrame(REDUCE ? 11 : [11, 9][Math.floor(G.t * 4) % 2], x, by, rot, .92)) {
         cx.save(); cx.translate(x, by); cx.rotate(rot);   // the water line over the legs + a ring of foam
         var wl = 21 - Math.min(1, Math.max(0, G.yw) / 70) * 15, wg = cx.createLinearGradient(0, wl - 6, 0, wl + 10);   // the water line climbs as it gets deeper
         wg.addColorStop(0, "rgba(22,112,136,0)"); wg.addColorStop(1, "rgba(22,112,136,.72)");
@@ -1233,8 +1237,8 @@
   }
   function drawSurfer() {
     var x = G.x, y = sy(G.yw), blink = G.inv > 0 && Math.floor(G.t * 12) % 2 && G.phase !== "death";
-    if (G.phase === "sand") { runner(x, y, 0); return; }
-    if (G.phase === "beach") { if (G.beachT < 2.3) runner(x, y, Math.PI); return; }
+    if (G.phase === "sand") { runner(x, y, Math.max(-.5, Math.min(.5, Math.atan2(G.vx, 240)))); return; }
+    if (G.phase === "beach") { if (G.beachT < 2.3) runner(x, y, Math.PI - Math.max(-.6, Math.min(.6, Math.atan2(SHORE_X + 8 - G.bx0, G.by0 + 215)))); return; }
     if (G.phase === "cut" || G.phase === "cut0") return;
     var sink = 0;
     if (G.phase === "death") { var dt0 = G.deathT;

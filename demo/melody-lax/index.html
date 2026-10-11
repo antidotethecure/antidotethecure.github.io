@@ -265,7 +265,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <div id="instafeed"></div>
 <script>window.INSTA_FEED={"handle":"melodylax","posts":["https://www.instagram.com/reel/DeSEiI5Rrlj/","https://www.instagram.com/reel/DeKcmQAPukY/","https://www.instagram.com/reel/DeIXlEsP8-s/","https://www.instagram.com/reel/DeBGSrkE4qe/","https://www.instagram.com/reel/Dd_2K6FA-t2/","https://www.instagram.com/reel/Dd-c43QT44B/"],"theme":{"card":"var(--panel)","ink":"var(--ink)","accent":"var(--wine2)","edge":"var(--edge)"}}; /* posts = snapshot 2026-10-10; live:{provider:"behold",id:"..."} turns on auto-updating, see ../instafeed.js */</script>
 <script src="../instafeed.js" defer></script>
-<footer>Melody Bar &amp; Grill · app by SousShift AI · food prices from Melody's menu · drink prices and menu photos are previews until Melody signs off</footer>
+<footer><a href="rules.html">Game &amp; daily spin official rules (draft)</a><br>Melody Bar &amp; Grill · app by SousShift AI · food prices from Melody's menu · drink prices and menu photos are previews until Melody signs off</footer>
 </div>
 
 <div id="obar"><button type="button" id="obtn"><span><span class="n" id="ocount">0</span> &nbsp;<span id="oseat">Review order</span></span><span id="ototal">$0.00</span></button></div>
@@ -1314,7 +1314,8 @@ window.MELODY_PRIZE=PRIZE;
 requestAnimationFrame(frame);
 // steer: drag anywhere; the plane follows your finger's movement, not its position, so your thumb never covers it
 var drag=null;
-cv.addEventListener("pointerdown",function(e){ e.preventDefault(); SND.unlock(); if(!G.running){ start(); return; }
+function replay(){ var t=window.SSAI_TOKENS; if(t&&t.account) t.play(function(){ start(); }); else start(); }   // replays go through the member gate / token cost too (crm.js)
+cv.addEventListener("pointerdown",function(e){ e.preventDefault(); SND.unlock(); if(!G.running){ replay(); return; }
   var r=cv.getBoundingClientRect(); drag={id:e.pointerId,px:e.clientX,py:e.clientY,sx:G.tx,sy:G.ty,k:W/r.width}; try{ cv.setPointerCapture(e.pointerId); }catch(x){} });
 cv.addEventListener("pointermove",function(e){ if(!drag||!G.running) return; e.preventDefault();
   G.tx=Math.max(30,Math.min(W-30,drag.sx+(e.clientX-drag.px)*drag.k*1.25)); G.ty=Math.max(H*.32,Math.min(H-50,drag.sy+(e.clientY-drag.py)*drag.k*1.25)); });
@@ -1323,7 +1324,7 @@ cv.addEventListener("pointermove",function(e){ if(!drag||!G.running) return; e.p
 $("sndb").addEventListener("click",function(){ SND.unlock(); SND.set("sound",!SND.state().sound); });
 syncBtns();
 addEventListener("keydown",function(e){ if(!G.running) return; var m={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[e.key]; if(!m) return; e.preventDefault(); G.tx=Math.max(30,Math.min(W-30,G.tx+m[0])); G.ty=Math.max(H*.32,Math.min(H-50,G.ty+m[1])); });
-$("again").addEventListener("click",function(){ start(); cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
+$("again").addEventListener("click",function(){ replay(); cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
 hud();
 
 /* ---- point values table ---- */
@@ -1344,6 +1345,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
  hero:[g+"p_mac.webp",g+"plane.webp",g+"p_marg.webp",g+"p_wings.webp"],
  theme:{bg:"#0b1220",bg2:"#1c2547",card:"#141e34",edge:"#27324d",accent:"#d4af37",accent2:"#f0d375",label:"#f0d375",ink:"#f6f1e4",dim:"#9aa3b5",btnInk:"#1a1206",soft:"rgba(255,255,255,.06)",track:"#27324d",good:"#3fbf8f",bad:"#ff7a59",
   display:"Anton,Impact,'Arial Narrow',sans-serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
+ tokens:true,spinBadge:true,
  mount:"#cv",start:function(){ window.MELODY_START(); },vibrate:true,
  how:{goal:"Survive 5 levels of 60 seconds each. Grab Melody's food for points, catch the weapon crates to upgrade your gun, shoot down the Army gunship at the end of level 3 and the Super Jet at the end of level 5, then land back at LAX.",
   time:"5 levels × 60 seconds + 2 boss fights · 3 hits and you go down",
@@ -1378,10 +1380,17 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
   note:"Every prize is good for 3 days · one reward per visit."}};
 })();</script>
 <script src="../gamemenu.js"></script><script src="../a2hs.js"></script>
-<script>window.CRM_CFG={draw:{odds:15,prizes:["Free House Mac & Cheese","Free mocktail or soft drink at the bar","Free French Toast breakfast","Free Melody Fries"]},name:"Melody Bar & Grill",offer:"Free Melody Fries on your next visit",mount:"#rwhost",tiers:[[250,"Free Melody Fries"],[500,"Free House Mac"],[800,"Free Lobster Mac & Cheese"],[1300,"Free appetizer platter"]],
+<script>window.CRM_CFG={name:"Melody Bar & Grill",offer:"Free Melody Fries on your next visit",mount:"#rwhost",tiers:[[250,"Free Melody Fries"],[500,"Free House Mac"],[800,"Free Lobster Mac & Cheese"],[1300,"Free appetizer platter"]],
   /* two balances that never mix: bar points (drinks only) and kitchen points (food only). California ABC: bar rewards are drink discounts or free non-alcoholic items, never free alcohol. */
   wallets:{split:true,bonusTo:"food",bar:{label:"Bar",icon:"🍸",perDollar:10,tiers:[[250,"$3 off any drink"],[500,"Half off any cocktail"],[800,"Free mocktail or soda + $3 off a drink"],[1300,"$10 off a bar tab of $30+"]]},
-    food:{label:"Kitchen",icon:"🍔",perDollar:10,tiers:[[250,"Free Melody Fries"],[500,"Free House Mac"],[800,"Free Lobster Mac & Cheese"],[1300,"Free appetizer platter"]]}},referral:{gift:"Free Melody Fries"},earn:{checkin:25,firstOrder:50,birthday:100,review:{pts:75,platform:"app"},referral:{join:75,friend:25,friendGift:"Free soft drink or mocktail",first:50,every:10}}};</script>
+    food:{label:"Kitchen",icon:"🍔",perDollar:10,tiers:[[250,"Free Melody Fries"],[500,"Free House Mac"],[800,"Free Lobster Mac & Cheese"],[1300,"Free appetizer platter"]]}},referral:{gift:"Free Melody Fries"},earn:{checkin:25,firstOrder:50,birthday:100,review:{pts:75,platform:"app"},referral:{join:75,friend:25,friendGift:"Free soft drink or mocktail",first:50,every:10}},
+ // Melody Approach access. PHASE 1 (live default): free to play for members (name + phone + email, one account per phone).
+ // PHASE 2 (built, off): enabled:true → a play costs 10 tokens; tokens come with food purchases (1 per $1, food and non-alcoholic only, never alcohol), +10 free every week and
+ // +10 free on request once a day (no purchase necessary). ?tokens=1 previews Phase 2. Legal notes: see crm.js TOKENS block.
+ game:"Melody Approach",tokens:{enabled:false,perDollar:1,perOrder:0,playCost:10,weeklyFree:10,freeDaily:10,noAlc:true},
+ // FREE daily spin: one per member per day (LA time), never sold, never costs tokens. Odds = w / 100 and must match rules.html. Never alcohol.
+ spin:{rules:"rules.html",hub:"✈️",colors:["#d4af37","#77242e","#f0d375","#141e34","#efe4c9","#a33645"],prizes:[{t:"+50 kitchen pts",pts:50,w:30},{t:"+100 kitchen pts",pts:100,w:20},{t:"+5 tokens",tok:5,alt:{t:"+75 kitchen pts",pts:75},w:15},
+  {t:"$2 off any food",code:true,w:15},{t:"Free Melody Fries",code:true,w:8},{t:"Free mocktail or soda",code:true,w:7},{t:"10% off food",code:true,w:5}]}};</script>
 <script src="../crm.js"></script>
 <script>window.NEARBY={name:"Melody Bar & Grill",pin:"✈️",mount:"#rwhost",spots:[{label:"Westchester",lat:33.9487,lng:-118.3918,q:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"}],offer:"Happy hour is 3–6. Show this for double points today."};</script>
 <script src="../nearby.js"></script>

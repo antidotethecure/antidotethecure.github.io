@@ -387,14 +387,14 @@
   window.SSAI_EARN = function (amount, why, split) {
     if (WAL) {
       var sm = mine()[0], f = split ? +split.food || 0 : +amount || 0, bb = split ? +split.bar || 0 : 0, r;
-      if (sm) { var sb0 = seenBefore(sm); r = purchase(sm, f, bb, why); logAppOrder(sm, f, bb, why, sb0); r.tok = tokBuy(sm, f + bb, why + " · $" + (f + bb).toFixed(2)); put(sm); drawJoin(); drawOwn(); }
+      if (sm) { var sb0 = seenBefore(sm); r = purchase(sm, f, bb, why); logAppOrder(sm, f, bb, why, sb0); r.tok = tokBuy(sm, f, why + " · food $" + f.toFixed(2)); /* tokens: food only, never on drinks / alcohol */ put(sm); drawJoin(); drawOwn(); }
       else { r = { food: Math.round(f * W.food.per), bar: Math.round(bb * W.bar.per), split: true }; logAppOrder(null, f, bb, why); }
       r.pts = r.food + r.bar; r.saved = !!sm; r.msg = splitMsg(r); return r;
     }
     var m = mine()[0], pts = Math.round(amount * PER), tk = 0;
     var af = split ? +split.food || 0 : +amount || 0, ab = split ? +split.bar || 0 : 0;   // bar side of an app order = alcohol (excluded)
     logAppOrder(m || null, af, ab, why, m ? seenBefore(m) : false);
-    if (m) { pts = visit(m, amount * PER); addPts(m, pts, why + " · $" + amount.toFixed(2)); tk = tokBuy(m, amount, why + " · $" + amount.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); }
+    if (m) { pts = visit(m, amount * PER); addPts(m, pts, why + " · $" + amount.toFixed(2)); tk = tokBuy(m, af, why + " · $" + af.toFixed(2)); /* tokens: food & non-alc only */ m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); }
     return { pts: pts, saved: !!m, tok: tk };
   };
   function pending() { try { return JSON.parse(localStorage.getItem(PEND) || "null"); } catch (x) { return null; } }
@@ -517,7 +517,7 @@
         if (a === "bday") { m.bdemo = true; m.bcode = "BDAY-" + code4(4); m.ledger = m.ledger || []; m.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎂 Birthday treat unlocked (text sent)" }); earnOnce(m, "birthday_" + new Date().getFullYear(), EARN.birthday, "🎂 Birthday bonus"); put(m); drawJoin(); toast("💬 Text sent: Happy birthday " + m.name.split(" ")[0] + "! Your treat is waiting 🎂"); return; }
         if (a === "scan") { if (qr.style.display === "block") qr.style.display = "none"; else showQR(); return; }
         if (a === "ring" && WAL) {   // the cashier rings up food and drinks separately
-          var rf = Math.round((10 + Math.random() * 22) * 100) / 100, rb = Math.round((6 + Math.random() * 18) * 100) / 100, rr = purchase(m, rf, rb, "🧾 In-store order · code " + regCode(m)), rt = tokBuy(m, rf + rb, "In-store order $" + (rf + rb).toFixed(2));
+          var rf = Math.round((10 + Math.random() * 22) * 100) / 100, rb = Math.round((6 + Math.random() * 18) * 100) / 100, rr = purchase(m, rf, rb, "🧾 In-store order · code " + regCode(m)), rt = tokBuy(m, rf, "In-store order · food $" + rf.toFixed(2)); /* tokens: food only */
           put(m); drawJoin(true); drawOwn(); refreshMenu(); toast(splitMsg(rr) + (lastBonus ? " · +" + lastBonus + " bonus" : "") + tokMsg(rt)); return;
         }
         if (a === "ring") {
@@ -533,7 +533,7 @@
           if (WAL) {   // the receipt code carries the food and bar subtotals separately
             var xf = Math.round((8 + Math.random() * 18) * 100) / 100, xb = Math.random() < 0.6 ? Math.round((6 + Math.random() * 14) * 100) / 100 : 0, xr = { food: Math.round(xf * W.food.per), bar: Math.round(xb * W.bar.per) };
             addPts(m, xr.food, "🧾 Receipt " + v + " · food $" + xf.toFixed(2), "food"); if (xb) addPts(m, xr.bar, "🧾 Receipt " + v + " · drinks $" + xb.toFixed(2), "bar");
-            var xt = tokBuy(m, xf + xb, "Receipt " + v + " · $" + (xf + xb).toFixed(2));
+            var xt = tokBuy(m, xf, "Receipt " + v + " · food $" + xf.toFixed(2)); /* tokens: food only */
             m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); refreshMenu(); toast(splitMsg(xr) + " from your receipt" + tokMsg(xt)); return;
           }
           var ra = Math.round((9 + Math.random() * 22) * 100) / 100, rg = Math.round(ra * PER);
@@ -830,7 +830,7 @@
       '<ul class="crm-rules" style="margin-top:10px">' +
       '<li><span>🎁 Every week, free (auto-added on your first visit each week)</span><b>+' + TOK.weeklyFree + '</b></li>' +
       '<li><span>🙋 Free tokens on request, once a day. No purchase necessary</span><b>+' + TOK.freeDaily + '</b></li>' +
-      '<li><span>🧾 Comes with food you buy: ' + (TOK.perDollar ? TOK.perDollar + ' per $1' : '') + (TOK.perOrder ? (TOK.perDollar ? ' + ' : '') + TOK.perOrder + ' per order' : '') + ' (staff ring-up, receipt or staff code, app order)</span><b>🧾</b></li>' +
+      '<li><span>🧾 Comes with food you buy: ' + (TOK.perDollar ? TOK.perDollar + ' per $1' : '') + (TOK.perOrder ? (TOK.perDollar ? ' + ' : '') + TOK.perOrder + ' per order' : '') + ' (staff ring-up, receipt or staff code, app order)' + (TOK.noAlc ? '. Food and non-alcoholic drinks only, never alcohol' : '') + '</span><b>🧾</b></li>' +
       (SPIN ? '<li><span>🎡 Daily spin: always free, can win tokens</span><b>Free</b></li>' : '') + '</ul>' +
       '<div class="tok-btns"><button type="button" class="hot" data-t="free"' + (!m || freeUsed ? ' disabled' : '') + '>' + (freeUsed ? '🙋 Free tokens used today' : '🙋 Get ' + TOK.freeDaily + ' free tokens') + '</button>' +
       (SPIN ? '<button type="button" data-t="spin">🎡 Daily spin</button>' : '<button type="button" data-t="x">Close</button>') + '</div>' +
@@ -853,18 +853,19 @@
   }
   // ---- FREE DAILY SPIN: one per member per day (LA date). Never costs tokens, never needs a purchase, never for sale. ----
   function spinReady(m) { return !!(SPIN && m && m.spinDay !== laDay()); }
+  function darkHex(c) { var h = String(c).replace("#", ""); if (h.length === 3) h = h.replace(/./g, "$&$&"); var n = parseInt(h, 16); if (!(n >= 0)) return false; return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 < 140; }
   function pickSpin(P) { var tot = P.reduce(function (a, p) { return a + (p.w || 1); }, 0), r = Math.random() * tot; for (var i = 0; i < P.length; i++) { r -= P[i].w || 1; if (r < 0) return i; } return P.length - 1; }
   function openSpin() {
     if (!SPIN || document.querySelector(".spin-ov")) return;
     return gate("spin", function () {
       var m = mine()[0]; bind(m); weekly(m); put(m);
-      var P = spinPrizes(), N = P.length, seg = 360 / N, tot = P.reduce(function (a, p) { return a + (p.w || 1); }, 0), COL = ["#FFD23F", "#3B1F5C", "#F2C14E", "#1E1B3A", "#FFE9A3", "#B8322A"];
+      var P = spinPrizes(), N = P.length, seg = 360 / N, tot = P.reduce(function (a, p) { return a + (p.w || 1); }, 0), COL = SPIN.colors || ["#FFD23F", "#3B1F5C", "#F2C14E", "#1E1B3A", "#FFE9A3", "#B8322A"];   // CRM_CFG.spin.colors / .hub = the restaurant's own wheel
       var grad = P.map(function (p, i) { return COL[i % COL.length] + " " + (i * seg) + "deg " + ((i + 1) * seg) + "deg"; }).join(",");
       var ready = spinReady(m);
       var ov = sheet("spin-ov", '<span class="k">' + e(NAME) + ' · free daily spin</span><h3>🎡 Spin the wheel</h3><p style="margin:0">One free spin per member per day. Every slice wins something.</p>' +
         '<div class="spin-w"><div class="pin"></div><div class="wh" style="background:conic-gradient(' + grad + ')">' + P.map(function (p, i) {
-          var c = COL[i % COL.length], dk = c === "#3B1F5C" || c === "#1E1B3A" || c === "#B8322A";
-          return '<span class="' + (dk ? 'dk' : '') + '" style="transform:rotate(' + ((i + 0.5) * seg - 90) + 'deg)">' + e(p.t) + '</span>'; }).join("") + '</div><div class="hub">🧇</div></div>' +
+          var c = COL[i % COL.length], dk = darkHex(c);
+          return '<span class="' + (dk ? 'dk' : '') + '" style="transform:rotate(' + ((i + 0.5) * seg - 90) + 'deg)">' + e(p.t) + '</span>'; }).join("") + '</div><div class="hub">' + e(SPIN.hub || "🧇") + '</div></div>' +
         '<div class="spin-r" aria-live="polite">' + (ready ? '' : 'You already spun today. Come back tomorrow for another free spin!') + '</div>' +
         '<button type="button" class="go" data-t="go"' + (ready ? '' : ' disabled style="opacity:.5"') + '>' + (ready ? '🎡 Spin (free)' : 'Next free spin tomorrow') + '</button>' +
         '<button type="button" class="crm-gx" data-t="x">Close</button>' +
@@ -963,8 +964,8 @@
         if (ON) h += G("Tokens") + row({ icon: "🎮", name: "One play", note: "Tokens come with food you buy, and there's always a free way", pts: TOK.playCost + " 🪙", gold: true }) +
           row({ icon: "🎁", name: "Weekly free tokens", note: "Every member, every week, added automatically", pts: "+" + TOK.weeklyFree }) +
           row({ icon: "🙋", name: "Free tokens on request", note: "Once a day, no purchase necessary", pts: "+" + TOK.freeDaily }) +
-          row({ icon: "🧾", name: "Buy food", note: (TOK.perDollar ? TOK.perDollar + " token per $1" : "") + (TOK.perOrder ? " + " + TOK.perOrder + " per order" : "") + ": staff ring-up, receipt / staff code or app order", pts: "+" + (TOK.perDollar || TOK.perOrder) + (TOK.perDollar ? "/$1" : "") });
-        else if (TC) h += G("Free to play") + row({ icon: "🎮", name: "Order Up! is free for members", note: "Free account with phone + email, tied to this phone. Points and prizes save to it", pts: "Free", gold: true });
+          row({ icon: "🧾", name: "Buy food", note: (TOK.perDollar ? TOK.perDollar + " token per $1" : "") + (TOK.perOrder ? " + " + TOK.perOrder + " per order" : "") + ": staff ring-up, receipt / staff code or app order" + (TOK.noAlc ? ". Never on alcohol" : ""), pts: "+" + (TOK.perDollar || TOK.perOrder) + (TOK.perDollar ? "/$1" : "") });
+        else if (TC) h += G("Free to play") + row({ icon: "🎮", name: (C.game || "The game") + " is free for members", note: "Free account with phone + email, tied to this phone. Points and prizes save to it", pts: "Free", gold: true });
         if (SPIN) h += G("Daily spin") + row({ icon: "🎡", name: "Free daily spin", note: "One per member per day. Wins " + (ON ? "tokens, " : "") + "points or food discounts. No purchase necessary", pts: "Free", gold: true });
       } else if (p === "how") {
         if (TC) h += G(ON ? "Tokens" : "Who can play") + (ON ? row({ icon: "🪙", name: "Each play costs " + TOK.playCost + " tokens", note: "+" + TOK.weeklyFree + " free every week, +" + TOK.freeDaily + " free on request once a day, and more with food you buy" }) :
@@ -1249,7 +1250,7 @@
     if (!r.sample) {   // this phone's member: points post like any register order (the alcohol $ earn bar points with split wallets)
       if (WAL) { var wr = purchase(r, food, alc, "🧾 Check #" + rc); pts = splitMsg(wr); }
       else { var got = visit(r, sub * PER); addPts(r, got, "🧾 Check #" + rc + " · $" + sub.toFixed(2)); r.visits = (r.visits || 0) + 1; r.last = Date.now(); pts = "+" + got + " pts"; }
-      var tk = tokBuy(r, sub, "Check #" + rc + " $" + sub.toFixed(2)); pts += tokMsg(tk); put(r);
+      var tk = tokBuy(r, food, "Check #" + rc + " food & non-alc $" + food.toFixed(2)); /* tokens never on the alcohol $ */ pts += tokMsg(tk); put(r);
     }
     var ev = logSale({ mid: midOf(r), member: r.name, receipt: rc, food: food, alcohol: alc, total: tot, how: f.how, staff: staff, seen: seen });
     drawJoin(); drawOwn(); refreshMenu();
@@ -1388,8 +1389,8 @@
           '<p style="margin:0;font-size:13px">' + (ON ? 'Phase 2: a play costs ' + TOK.playCost + ' tokens. Tokens come with food purchases (' + TOK.perDollar + ' per $1), +' + TOK.weeklyFree + ' free weekly, +' + TOK.freeDaily + ' free on request daily. Never sold.' : 'Phase 1: free to play for members (phone + email, one account per phone). Tokens are built and switched off.') + '</p>' +
           L(T_.plays, '🎮 Plays') + (SPIN ? L(T_.spins, '🎡 Free daily spins') : '') +
           (ON ? L(T_.tok, '🪙 Tokens held now') + L(T_.purchase, '🧾 Tokens with purchases') + L(T_.weekly, '🎁 Weekly free tokens') + L(T_.free, '🙋 Free tokens on request') + L(T_.bonus, '🎡 Tokens won on the spin') + L(T_.spent, '🎮 Tokens spent on plays') +
-            '<h4 style="margin:14px 0 6px">🧾 Give tokens with an order</h4><p style="margin:0 0 8px;font-size:13px">Type the order total, hand the guest the code (or print it on the receipt). One use, into the account bound to their phone.</p>' +
-            '<div class="crm-rcode"><input data-r="tamt" inputmode="decimal" placeholder="Order total $"><button type="button" data-a="tissue">Make code</button></div><div class="err" data-r="tmsg" style="color:#3DDC97"></div>' : '') +
+            '<h4 style="margin:14px 0 6px">🧾 Give tokens with an order</h4><p style="margin:0 0 8px;font-size:13px">Type the food &amp; non-alcoholic total (no alcohol, tax or tip), hand the guest the code (or print it on the receipt). One use, into the account bound to their phone.</p>' +
+            '<div class="crm-rcode"><input data-r="tamt" inputmode="decimal" placeholder="Food & non-alc $"><button type="button" data-a="tissue">Make code</button></div><div class="err" data-r="tmsg" style="color:#3DDC97"></div>' : '') +
           '<p class="crm-fine" style="margin:8px 0 0">Every play, spin' + (ON ? ' and token move (with purchases, weekly, free request, spin, spent)' : '') + ' is in the CSV export.</p></div>';
       })() : '') +
       earnBox(rows) +
@@ -1398,8 +1399,8 @@
     var ti = own.querySelector('[data-a="tissue"]');
     if (ti) ti.onclick = function () {
       var am = parseFloat(own.querySelector('[data-r="tamt"]').value.replace(/[^0-9.]/g, "")), tm = own.querySelector('[data-r="tmsg"]');
-      if (!(am > 0)) { tm.style.color = "#FF6B5E"; tm.textContent = "Enter the order total."; return; }
-      var c = issueCode(am); tm.style.color = "#3DDC97"; tm.innerHTML = 'Code <b style="font:900 18px ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#FFD23F" data-r="tcode">' + c.c + '</b> = ' + c.n + ' tokens ($' + am.toFixed(2) + ' order). Single use.';
+      if (!(am > 0)) { tm.style.color = "#FF6B5E"; tm.textContent = "Enter the food & non-alcoholic total."; return; }
+      var c = issueCode(am); tm.style.color = "#3DDC97"; tm.innerHTML = 'Code <b style="font:900 18px ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#FFD23F" data-r="tcode">' + c.c + '</b> = ' + c.n + ' tokens ($' + am.toFixed(2) + ' food & non-alc). Single use.';
     };
     var cmp = own.querySelector(".crm-compose"), ta = cmp.querySelector("textarea");
     own.querySelector('[data-a="reg"]').onclick = ringUp;

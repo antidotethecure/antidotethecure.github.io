@@ -220,7 +220,7 @@ footer a{color:var(--ink)}
 <div id="instafeed"></div>
 <script>window.INSTA_FEED={"handle":"luckydragon360","posts":["https://www.instagram.com/reel/DeVb9dhvGM8/","https://www.instagram.com/reel/DeVFcXHyp_x/","https://www.instagram.com/p/DeStezij9j1/","https://www.instagram.com/p/DeStAYXvuWc/","https://www.instagram.com/p/DeStAaYPOfI/","https://www.instagram.com/reel/DeSh0wxywWj/","https://www.instagram.com/p/DeSCt3thR7G/","https://www.instagram.com/reel/DeP2KV_S0cW/"],"theme":{"card":"var(--card)","ink":"var(--ink)","accent":"var(--accent)","edge":"var(--edge)"}}; /* posts = snapshot 2026-10-10; live:{provider:"behold",id:"..."} turns on auto-updating, see ../instafeed.js */</script>
 <script src="../instafeed.js" defer></script>
-<footer>
+<footer><a href="rules.html">Game &amp; daily spin official rules (draft)</a><br>
   Built by <b>SOUSSHIFT AI</b> — menus, games, AI phone agents, content & growth, hands-free.<br>
   One evening to build. <a href="https://claude.ai/artifact/7LuVHK9AwWibWpwA3qso7i" target="_blank" rel="noopener">See what else SousShift AI can do</a> · growth: antidotepromo.com<br>
   <span style="font-size:11px">Demo page: menu items & prices are samples, not the restaurant's published prices. Prize games go live only with the owner, as free-entry promotions with official rules. Food photos are AI-styled plates matched to the menu — real shots swap in when the page goes live.</span>
@@ -694,14 +694,22 @@ var CONFIG = {
     if(dtp>0 && dtp<200){ bowlVX=(nx-bowlX)/dtp; }   // swipe velocity drives the smoke sideways
     bowlPT=now; bowlX=nx;
   }
-  cv.addEventListener("pointerdown",function(e){ pointer(e); if(!running) start(); });
+  function replay(){ var t=window.SSAI_TOKENS; if(t&&t.account) t.play(function(){ start(); }); else start(); }   // replays go through the member gate / token cost too (crm.js)
+  cv.addEventListener("pointerdown",function(e){ pointer(e); if(!running) replay(); });
   cv.addEventListener("pointermove",pointer);
   cv.addEventListener("touchmove",function(e){ e.preventDefault(); pointer(e); },{passive:false});
   drawIdle();
 })();
 </script>
 <script src="../contract.js"></script>
-<script>window.CRM_CFG={name:"Lucky Dragon Hibachi",offer:"Free Extra Yum-Yum + 10% off your next plate",tiers:[[250,"Free extra Yum-Yum"],[500,"Free fried rice"],[800,"Free hibachi plate"],[1300,"Dinner for two"]],referral:{gift:"Free fried rice"}};</script>
+<script>window.CRM_CFG={name:"Lucky Dragon Hibachi",offer:"Free Extra Yum-Yum + 10% off your next plate",tiers:[[250,"Free extra Yum-Yum"],[500,"Free fried rice"],[800,"Free hibachi plate"],[1300,"Dinner for two"]],referral:{gift:"Free fried rice"},
+ // Hibachi Catch access. PHASE 1 (live default): free to play for members (name + phone + email, one account per phone).
+ // PHASE 2 (built, off): enabled:true → a play costs 10 tokens; tokens come with food purchases (1 per $1), +10 free every week and
+ // +10 free on request once a day (no purchase necessary). ?tokens=1 previews Phase 2. Legal notes: see crm.js TOKENS block.
+ game:"Hibachi Catch",tokens:{enabled:false,perDollar:1,perOrder:0,playCost:10,weeklyFree:10,freeDaily:10},
+ // FREE daily spin: one per member per day (LA time), never sold, never costs tokens. Odds = w / 100 and must match rules.html. Never alcohol.
+ spin:{rules:"rules.html",hub:"🐉",colors:["#FFC82E","#E6483D","#F7EFE6","#4A1F1C","#FFE08A","#8E1E16"],prizes:[{t:"+50 points",pts:50,w:30},{t:"+100 points",pts:100,w:20},{t:"+5 tokens",tok:5,alt:{t:"+75 points",pts:75},w:15},
+  {t:"$2 off a hibachi plate",code:true,w:15},{t:"Free extra Yum-Yum",code:true,w:8},{t:"Free fried rice",code:true,w:7},{t:"10% off order",code:true,w:5}]}};</script>
 <script src="../crm.js"></script>
 <script>window.NEARBY={name:"Lucky Dragon Hibachi",pin:"🐉",approx:true,spots:[{label:"Compton",lat:33.8958,lng:-118.2201,q:"Compton CA"}],offer:"Show this at the counter for double stars on today's order."};</script>
 <script src="../nearby.js"></script>
@@ -726,6 +734,7 @@ var good=function(k,n){ return {img:S[k],name:n,pts:"+10",note:"+ streak bonus"}
 window.GAME_MENU={id:"lucky-dragon",name:"Hibachi Catch",by:"Lucky Dragon Hibachi",tagline:"Catch the hibachi. Dodge the dragon.",
  hero:[S.shrimp,S.chicken,S.dragon,S.steak,S.lobster],
  theme:{bg:"#0D0404",bg2:"#241008",card:"#1D0B0A",edge:"#4A1F1C",accent:"#E6483D",accent2:"#FFC82E",ink:"#F7EFE6",dim:"#C4A992",btnInk:"#2a0805",display:"Cinzel,Georgia,serif",body:"Archivo,system-ui,sans-serif"},
+ tokens:true,spinBadge:true,
  mount:document.getElementById("game").closest(".gamebox"),start:function(){ window.__LD.start(); },
  how:{goal:"Catch as much hibachi as you can on your tray in 30 seconds without letting the dragon burn your food.",time:"30 seconds · 3 dragon hits and the food is burnt",
   steps:[["👆","Slide your finger across the game to move the tray"],[null,"Catch chicken, steak, shrimp, lobster, veggies, noodles, rice and drinks",S.shrimp],["🔥","Dodge flames, candy and ice. They don't belong in hibachi"],[null,"The dragon locks on (dashed red line), then breathes fire. Move!",S.dragon],["🔗","Catch in a row without a miss to grow your streak bonus"]]},

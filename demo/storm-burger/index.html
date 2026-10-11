@@ -160,7 +160,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <div id="instafeed"></div>
 <script>window.INSTA_FEED={"handle":"stormburger","posts":["https://www.instagram.com/reel/DeVByYVyqQI/","https://www.instagram.com/reel/DeSbirKgJGG/","https://www.instagram.com/reel/DeSR7JGBOJs/","https://www.instagram.com/reel/DeQOl37JSX0/","https://www.instagram.com/p/DeNlZUAme8z/","https://www.instagram.com/p/DeNlVFzGYCR/","https://www.instagram.com/p/DeNlVE2mV8J/","https://www.instagram.com/p/DeNlVKMGVCy/","https://www.instagram.com/p/DeNlVFfGUPX/"],"theme":{"card":"var(--panel)","ink":"var(--ink)","accent":"var(--bolt)","edge":"var(--edge)"}}; /* posts = snapshot 2026-10-10; live:{provider:"behold",id:"..."} turns on auto-updating, see ../instafeed.js */</script>
 <script src="../instafeed.js" defer></script>
-<footer>Demo built for StormBurger by SousShift AI · menu and prices from stormburger.com · prizes are samples · food images are AI-generated previews</footer>
+<footer><a href="rules.html">Game &amp; daily spin official rules (draft)</a><br>Demo built for StormBurger by SousShift AI · menu and prices from stormburger.com · prizes are samples · food images are AI-generated previews</footer>
 </div>
 
 <script>window.REVIEW_EGG={vid:"xZG8xJRGy9U",restaurant:"StormBurger",short:"STORMBURGER",bonus:500,img:"img/review/cover.webp",find:"A roadside billboard rolls by once a run. Drive through its golden ▶ token"};</script>
@@ -571,22 +571,30 @@ function frame(now){
   if(st.running){ hud(); if(st.t<=0&&!st.dying) end(); }
 }
 requestAnimationFrame(frame);
+function replay(){ var t=window.SSAI_TOKENS; if(t&&t.account) t.play(function(){ start(); }); else start(); }   // replays go through the member gate / token cost too (crm.js)
 cv.addEventListener("pointerdown",function(e){
   e.preventDefault();
-  if(!st.running){ start(); return; }
+  if(!st.running){ replay(); return; }
   var r=cv.getBoundingClientRect(); setLane(st.lane+((e.clientX-r.left)<r.width/2?-1:1));
 });
 var sx0=null; cv.addEventListener("touchstart",function(e){ sx0=e.touches[0].clientX; },{passive:true});
-$("kl").addEventListener("click",function(){ if(!st.running) start(); else setLane(st.lane-1); });
-$("kr").addEventListener("click",function(){ if(!st.running) start(); else setLane(st.lane+1); });
+$("kl").addEventListener("click",function(){ if(!st.running) replay(); else setLane(st.lane-1); });
+$("kr").addEventListener("click",function(){ if(!st.running) replay(); else setLane(st.lane+1); });
 addEventListener("keydown",function(e){ if(!st.running) return; if(e.key==="ArrowLeft"){setLane(st.lane-1);e.preventDefault();} if(e.key==="ArrowRight"){setLane(st.lane+1);e.preventDefault();} });
-$("again").addEventListener("click",function(){ start(); $("game").scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
+$("again").addEventListener("click",function(){ replay(); $("game").scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
 hud();
 })();
 </script>
 <script src="fx.js"></script>
 <script src="../contract.js"></script>
-<script>window.CRM_CFG={name:"StormBurger",offer:"Free fries with your next burger",perDollar:20,tiers:[[1000,"Free fries"],[1800,"Free shake"],[3000,"Free Classic StormBurger"],[4500,"Free combo"]],referral:{gift:"Free Classic StormBurger"},earn:{checkin:50,firstOrder:100,birthday:200,review:{pts:250,platform:"app"},referral:{join:150,friend:50,friendGift:"Free fries",first:100,every:25}}};</script>
+<script>window.CRM_CFG={name:"StormBurger",offer:"Free fries with your next burger",perDollar:20,tiers:[[1000,"Free fries"],[1800,"Free shake"],[3000,"Free Classic StormBurger"],[4500,"Free combo"]],referral:{gift:"Free Classic StormBurger"},earn:{checkin:50,firstOrder:100,birthday:200,review:{pts:250,platform:"app"},referral:{join:150,friend:50,friendGift:"Free fries",first:100,every:25}},
+ // Storm Run access. PHASE 1 (live default): free to play for members (name + phone + email, one account per phone).
+ // PHASE 2 (built, off): enabled:true → a play costs 10 tokens; tokens come with food purchases (1 per $1), +10 free every week and
+ // +10 free on request once a day (no purchase necessary). ?tokens=1 previews Phase 2. Legal notes: see crm.js TOKENS block.
+ game:"Storm Run",tokens:{enabled:false,perDollar:1,perOrder:0,playCost:10,weeklyFree:10,freeDaily:10},
+ // FREE daily spin: one per member per day (LA time), never sold, never costs tokens. Odds = w / 100 and must match rules.html. Never alcohol.
+ spin:{rules:"rules.html",hub:"⚡",colors:["#FFD23F","#2547B8","#BFE6FF","#E8582A","#EEF2FF","#121C40"],prizes:[{t:"+100 points",pts:100,w:30},{t:"+200 points",pts:200,w:20},{t:"+5 tokens",tok:5,alt:{t:"+150 points",pts:150},w:15},
+  {t:"Free house sauce",code:true,w:15},{t:"$2 off any burger",code:true,w:8},{t:"Free fries",code:true,w:7},{t:"10% off order",code:true,w:5}]}};</script>
 <script src="../crm.js"></script>
 <script>window.NEARBY={name:"StormBurger",pin:"⚡",spots:[{label:"Inglewood",lat:33.981203,lng:-118.358312,q:"1500 N La Brea Ave, Inglewood, CA 90302"},{label:"Long Beach",lat:33.860251,lng:-118.168688,q:"5801 Cherry Ave, Long Beach, CA 90805"}],offer:"Show this at the counter for double stars on today's order."};</script>
 <script src="../nearby.js"></script>
@@ -640,6 +648,7 @@ hud();
 <script>window.GAME_MENU={id:"storm-burger",name:"Storm Run",by:"StormBurger",tagline:"Drive the food truck through the storm. 45 seconds, 3 lives.",
  hero:["img/game/fries.webp","img/game/burger.webp","img/game/shake.webp","img/game/chicken.webp"],
  theme:{bg:"#070B1E",bg2:"#121C40",card:"#1a2656",edge:"#25336A",accent:"#E8582A",accent2:"#FFD23F",ink:"#EEF2FF",dim:"#9AA6CC",btnInk:"#141a33",display:"'Bebas Neue','Arial Narrow',Impact,sans-serif",body:"Archivo,system-ui,sans-serif"},
+ tokens:true,spinBadge:true,
  mount:"#game",start:function(){ window.__S.start(); },vibrate:true,
  how:{goal:"Stay on the road for 45 seconds and rack up points: grab coins and StormBurger food, dodge everything the storm throws at you.",time:"45 seconds · 3 lives · 3 hits and the truck is totaled",
   steps:[["👆","Tap the left or right side of the road to change lanes"],["◀▶","Or use the ◀ ▶ buttons under the game (arrow keys on a computer)"],["⚡","A lane that glows is about to get hit by lightning. Get out of it!"],["🐄","Flying cows and stop signs drift across lanes. Dodge them"],["🔥","Each hit sets the truck on fire and costs a life"]]},

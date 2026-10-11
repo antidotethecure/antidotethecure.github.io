@@ -8,7 +8,8 @@
      <script src="../reviewegg.js"></script>
    Game side: ReviewEgg.reset() at the start of a run · ReviewEgg.due(elapsedMs) → true once when it's time to spawn ·
    ReviewEgg.collect() → bonus points (once per run) · ReviewEgg.drawSign(ctx,x,y,w) draws the billboard on a canvas ·
-   ReviewEgg.endCard(host, beforeEl) puts the card on the end screen. Test: add ?egg=1 to spawn it ~2.5 s into a run
+   ReviewEgg.endCard(host, beforeEl) puts the card on the end screen. Optional REVIEW_EGG.toast:false → collect() pops no toast
+   (for games that show the bonus themselves and want nothing over the play field). Test: add ?egg=1 to spawn it ~2.5 s into a run
    (ReviewEgg.testLevel is the ?egg= number, for games with their own test steps).
    The cover always shows UNCROPPED (contain, full 16:9 frame) on the billboard, toast, end card and Points panel.
    Caught it this run → the end screen plays a 5–10 s preview of the review's money shot (REVIEW_EGG.preview, default
@@ -171,7 +172,7 @@
     if (S.found) return 0; S.found = true;
     try { localStorage.setItem(KEY, "1"); } catch (e) {}
     try { navigator.vibrate && navigator.vibrate([20, 40, 20, 40, 60]); } catch (e) {}
-    toast("📺 " + T(CLIP ? "Antidote's clip!" : "Antidote's review!") + " +" + BONUS, T("Watch it after your run"));
+    if (C.toast !== false) toast("📺 " + T(CLIP ? "Antidote's clip!" : "Antidote's review!") + " +" + BONUS, T("Watch it after your run"));   // opt-out: REVIEW_EGG.toast:false (Gritz: the game shows it in its own card)
     return BONUS;
   }
 

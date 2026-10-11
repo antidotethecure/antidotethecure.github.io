@@ -1,29 +1,30 @@
-/* Order Up! — Gritz N Wafflez kitchen + dining room game (SousShift AI demo).
-   KITCHEN: real cooking stations. Fryer (catfish, tenderz, wingz, shrimp), waffle irons, skillet (eggs, bacon), gritz pot.
-   Every cooked item tracks DONENESS d = time cooking / its cook time: 0 raw → 1 perfect → 2 charred. Pull it out and it
-   lands in the warming tray with its doneness frozen; the tray keeps it fresh for a while, then it goes cold.
-   DINING ROOM: 5 tables (2-tops and 4-tops). Parties of 1–4 sit down, every guest orders their own plate, the table shares
-   one patience bar. Build a plate from tray items + toppings, ring Serve, and a server walks it to the table.
-   LEVELS: 90 s each. Survive with fewer than 3 walk-outs to pass; each level adds stations, dishes, special requests,
-   bigger parties, faster arrivals and less patience.
-   MODES (picked on the start menu, "Who's playing?", remembered on this phone; never an age or birthdate):
-   🧑 ADULT: the original fast pacing (ADULT_PACE: 58 s patience at level 1, a party every ~12 s, normal cook times,
-      60 s speed window) and the adult prize thresholds.
-   🧒 KID (12 & under): a slow ramp (KID_PACE: ~2 minutes of patience and a party every ~18 s at level 1, food cooks 35%
-      slower and stays warm 50% longer, getting faster every level until level 5), a speed window scaled to each
-      level's patience, its own kid-sized prizes (GNW_PRIZES_KID) and its own best score. Kid mode only unlocks through a PARENT /
-      GUARDIAN account signed in on this phone (crm.js SSAI_TOKENS.kidUnlock, gate "kidunlock"): kid play, the kid best
-      score and kid prizes go to the parent's account, and the child never types anything (an optional nickname stays
-      on this phone only, never sent). Leaving Kid mode, switching Adult → Kid and signing out need a parent check
-      (last 4 digits of the parent's phone; live: a server-verified text code).
-   SCORING (fine-grained so ties are rare): Orders (30 per item, 20 per special request) + Speed (continuous, from the
-   moment the party sits, to 0.1 s, plus a tier bonus) + Quality (continuous per cooked item, max at perfect doneness)
-   + Streak multiplier (consecutive perfect, fast plates) + Group bonus (whole table served within 10 s) + Tips (speed,
-   quality, mood and the guest's personality) + Level bonus − penalties. The end screen shows the breakdown.
-   Jurni (the owner) delivers big orders ("Owner's special!"), pops up when a table gets impatient or a big tip lands,
-   and dances when you clear a level. Her mohawk color changes daily; seasonal themes by LA date
-   (?theme=halloween|thanksgiving|christmas|newyear|valentine|stpat|july4|none, ?hair=blue|lime|purple|turquoise|pink|rainbow|gold).
-   Test/bot API: window.__OG (sim mode + step(ms) + action functions). */
+/* Order Up! — Gritz N Wafflez (SousShift AI demo). You work the KITCHEN line; through the pass window you see the DINING
+   ROOM (styled after the real Gritz room: geometric mural wall, dark wood ceiling band with can lights, navy banquette,
+   white tables on gold legs, cognac chairs, glass entrance door, black plates).
+   TWO STAGES, NO COOKING: everything on the line is already made.
+     1) BUILD: tap food tiles (bases / proteins / sides / toppings / drinks) to build the plate, then 🛎️ Serve. The meal
+        lands HOT and steaming on the pass (up to 4 plates wait there).
+     2) DELIVER: tap the plate on the pass, then tap the guest's table. A server (or Jurni) walks it out.
+   Plates cool on the pass: hot 🔥 → warm → cooling → cold ❄️. Colder plates pay less and tip less (cold = no tip).
+   Speed (from the moment the party sits, to 0.1 s) is the biggest score driver; then heat (to 1%), accuracy (no undo),
+   right table first try, tips, streaks, whole-table bonus and level bonus. $ earned is tracked in the HUD (sample
+   prices, game only); the SCORE drives prizes.
+   LEVELS: 90 s each, pass with fewer than 3 walk-outs. L1 = 1–2 item plates, slow cooling, no requests. L2–3 = bigger
+   plates, faster cooling, "NO cheese"-style requests. L4 = STORY BEAT: "one of the cooks just clocked out" → the FRYER
+   opens (catfish / tenderz / wingz / shrimp must be dropped in and pulled at the right doneness: raw → golden →
+   perfect ✨ → brown → burnt), plus bigger parties and combos. L5+ = the whole kitchen: WAFFLE IRONS (pour, open on
+   green) and SKILLET (eggs, bacon, sautéed shrimp) too, plus prep requests on the ticket (sautéed shrimp, sunny-side
+   eggs, extra-crispy bacon, syrup on the side, "extra hot"). Everything else stays tap-ready. A pulled item goes straight
+   onto the plate. Kid mode: L4 stays tap-only; L5 adds only the fryer, with slower cook times (×1.35).
+   MODES (start menu "Who's playing?"): 🧑 Adult = ADULT pace; 🧒 Kid = KID_PACE (slower patience/arrivals, gentler
+   cooling, fewer prep requests), kid-sized prizes, only through a signed-in parent account (crm.js).
+   Jurni (the owner) walks the floor, delivers some plates, checks on tables, holds the door and thanks parties on the
+   way out (big tippers get her $-eyes), and dances on level-up. Her mohawk color changes daily; seasonal themes by LA
+   date layer over the room (?theme=halloween|thanksgiving|christmas|newyear|valentine|stpat|july4|none, ?hair=…).
+   Antidote's food-review banner hangs on the dining-room wall (tap: pause + Watch on YouTube). The kitchen-TV bonus
+   (reviewegg.js) still shows up once a shift.
+   Start menu attract mode: __OG.attract(true) runs the real engine as a silent demo behind the menu.
+   Test/bot API: window.__OG (sim mode + step(ms) + tap/serve/pick/table actions). */
 (function () {
   "use strict";
   var D = document, W = window, $ = function (i) { return D.getElementById(i); };
@@ -123,68 +124,86 @@
     state: function () { return { hasMusic: true, hasSfx: true, music: AU.music, sfx: AU.sfx }; }
   };
 
-  /* ================= MENU DATA ================= */
-  // st: cooking station · T: ms to perfect · fresh: ms it stays good in the warming tray
+  /* ================= MENU DATA (real Gritz N Wafflez items from gritznwafflez.com/menu; $ are SAMPLE game prices) ================= */
+  var IG = GI + "items/";
+  // row = grid row; kind = where it sits on the plate; lv = level the tile unlocks; usd = sample game price
   var ITEMS = {
-    waffle: { n: "Waffle", img: "waffle_plain", kind: "base", st: "iron", T: 6000, fresh: 22000 },
-    gritz: { n: "Gritz", img: "grits", kind: "side", st: "pot" },
-    catfish: { n: "Catfish", img: "catfish", kind: "protein", st: "fry", T: 7000, fresh: 28000 },
-    tenderz: { n: "Tenderz", img: "tenderz", kind: "protein", st: "fry", T: 6000, fresh: 28000 },
-    chicken: { n: "Wingz", img: "chicken", kind: "protein", st: "fry", T: 8000, fresh: 30000 },
-    shrimp: { n: "Shrimp", img: "shrimp", kind: "protein", st: "fry", T: 4500, fresh: 24000 },
-    egg: { n: "Eggs", img: "egg", kind: "protein", st: "skil", T: 3500, fresh: 18000 },
-    bacon: { n: "Bacon", img: "bacon", kind: "protein", st: "skil", T: 5000, fresh: 30000 },
-    ftoast: { n: "French toast", img: "ftoast", kind: "base" }, ttoast: { n: "Texas toast", img: "ttoast", kind: "base" },
-    fgritz: { n: "Fried Cheese Gritz", img: "fgritz", kind: "side" }, mac: { n: "Smackin' Mac", img: "mac", kind: "side" }, dip: { n: "Collard Dip", img: "dip", kind: "side" },
-    cheese: { n: "Cheese", img: "cheese", kind: "top" }, butter: { n: "Butter", img: "butter", kind: "top" }, syrup: { n: "Syrup", img: "drizzle", kind: "top" },
-    berriez: { n: "Berriez", img: "berriez", kind: "top" }, peach: { n: "Peach cobbler", img: "peach", kind: "top" }, whip: { n: "Whipped cream", img: "whip", kind: "top" },
-    sauce: { n: "Signature Sauce", img: "sauce", kind: "cup" }, hot: { n: "Hot sauce", img: "hotsauce", kind: "cup" },
-    kiki: { n: "Kiki Palmer", img: "kiki", kind: "drink" }, oj: { n: "Fresh OJ", img: "oj", kind: "drink" }
+    waffle: { n: "Waffle", img: GI + "waffle_plain.webp", row: "base", kind: "base", lv: 1, usd: 6 },
+    gritz: { n: "Gritz", img: GI + "grits.webp", row: "base", kind: "side", lv: 1, usd: 4 },
+    ftoast: { n: "French toast", img: GI + "ftoast.webp", row: "base", kind: "base", lv: 2, usd: 6 },
+    ttoast: { n: "Texas toast", img: GI + "ttoast.webp", row: "base", kind: "base", lv: 3, usd: 3 },
+    cinna: { n: "Cinnamon toast", img: IG + "cinna.webp", row: "base", kind: "base", lv: 3, usd: 6 },
+    chicken: { n: "Wingz", img: GI + "chicken.webp", row: "protein", kind: "protein", lv: 1, usd: 8 },
+    tenderz: { n: "Tenderz", img: GI + "tenderz.webp", row: "protein", kind: "protein", lv: 1, usd: 8 },
+    catfish: { n: "Catfish", img: GI + "catfish.webp", row: "protein", kind: "protein", lv: 1, usd: 9 },
+    shrimp: { n: "Fried shrimp", img: GI + "shrimp.webp", row: "protein", kind: "protein", lv: 2, usd: 9 },
+    bacon: { n: "Bacon", img: GI + "bacon.webp", row: "protein", kind: "protein", lv: 3, usd: 4 },
+    egg: { n: "Scrambled eggs", img: GI + "egg.webp", row: "protein", kind: "protein", lv: 3, usd: 3 },
+    friez: { n: "French Friez", img: IG + "friez.webp", row: "side", kind: "side", lv: 2, usd: 4 },
+    mac: { n: "Smackin' Mac", img: GI + "mac.webp", row: "side", kind: "side", lv: 3, usd: 4 },
+    collards: { n: "Collard Greens", img: IG + "collards.webp", row: "side", kind: "side", lv: 3, usd: 4 },
+    potatoes: { n: "Homestyle Potatoes", img: IG + "potatoes.webp", row: "side", kind: "side", lv: 4, usd: 4 },
+    fgritz: { n: "Fried Cheese Gritz", img: GI + "fgritz.webp", row: "side", kind: "side", lv: 4, usd: 7 },
+    dip: { n: "Collard Dip", img: GI + "dip.webp", row: "side", kind: "side", lv: 4, usd: 9 },
+    tomatoes: { n: "Fried Green Tomatoes", img: IG + "tomatoes.webp", row: "side", kind: "side", lv: 4, usd: 8 },
+    pickles: { n: "Spicy Fried Pickles", img: IG + "pickles.webp", row: "side", kind: "side", lv: 4, usd: 7 },
+    celestial: { n: "Celestial Eggs", img: IG + "celestial.webp", row: "side", kind: "side", lv: 4, usd: 8 },
+    syrup: { n: "Syrup", img: GI + "drizzle.webp", row: "top", kind: "top", lv: 2, usd: 0.5 },
+    butter: { n: "Butter", img: GI + "butter.webp", row: "top", kind: "top", lv: 2, usd: 0.5 },
+    peach: { n: "Peach cobbler", img: GI + "peach.webp", row: "top", kind: "top", lv: 2, usd: 2 },
+    cheese: { n: "Cheese", img: GI + "cheese.webp", row: "top", kind: "top", lv: 2, usd: 1 },
+    sauce: { n: "Signature Sauce", img: GI + "sauce.webp", row: "top", kind: "cup", lv: 2, usd: 0.5 },
+    hot: { n: "Hot sauce", img: GI + "hotsauce.webp", row: "top", kind: "cup", lv: 2, usd: 0.5 },
+    berriez: { n: "Berriez", img: GI + "berriez.webp", row: "top", kind: "top", lv: 3, usd: 2 },
+    whip: { n: "Whipped cream", img: GI + "whip.webp", row: "top", kind: "top", lv: 3, usd: 1 },
+    kiki: { n: "Kiki Palmer", img: GI + "kiki.webp", row: "drink", kind: "drink", lv: 2, usd: 4 },
+    oj: { n: "Fresh OJ", img: GI + "oj.webp", row: "drink", kind: "drink", lv: 2, usd: 5 },
+    lemonade: { n: "Lemonade", img: IG + "lemonade.webp", row: "drink", kind: "drink", lv: 3, usd: 4 },
+    tea: { n: "Iced Tea", img: IG + "tea.webp", row: "drink", kind: "drink", lv: 3, usd: 3 },
+    coffee: { n: "Hot Coffee", img: IG + "coffee.webp", row: "drink", kind: "drink", lv: 4, usd: 3 },
+    // L5+ prep variants: the ticket asks, you tap the variant tile INSTEAD of the regular one (no cooking involved)
+    shrimp_s: { n: "Sautéed shrimp", img: IG + "shrimp_s.webp", row: "protein", kind: "protein", lv: 5, usd: 9, of: "shrimp", prep: "Sautéed, not fried" },
+    egg_sun: { n: "Sunny-side eggs", img: IG + "egg_sun.webp", row: "protein", kind: "protein", lv: 5, usd: 3, of: "egg", prep: "Eggs sunny-side up" },
+    bacon_x: { n: "Extra-crispy bacon", img: GI + "bacon.webp", fx: "crisp", row: "protein", kind: "protein", lv: 5, usd: 4, of: "bacon", prep: "Bacon extra crispy" },
+    syrup_side: { n: "Syrup on the side", img: IG + "syrup_side.webp", row: "top", kind: "cup", lv: 5, usd: 0.5, of: "syrup", prep: "Syrup on the side" }
   };
+  var ROWS = [["base", "Bases", "🧇"], ["protein", "Proteins", "🍗"], ["side", "Sides & starters", "🥗"], ["top", "Toppings & sauces", "🍯"], ["drink", "Drinks", "🥤"]];
+  // real Gritz combos (gritznwafflez.com/menu); ph = the menu photo when there is one
   var DISHES = [
-    { n: "Wingz N' Wafflez", r: ["waffle", "chicken", "syrup"], ph: "wingz-wafflez", lv: 1 },
-    { n: "Tenderz N' Wafflez", r: ["waffle", "tenderz", "syrup"], ph: "tenderz-wafflez", lv: 1 },
-    { n: "Catfish N' Wafflez", r: ["waffle", "catfish"], ph: "catfish-wafflez", lv: 1 },
-    { n: "Catfish N' Gritz", r: ["gritz", "catfish"], ph: "catfish-gritz", lv: 1 },
+    { n: "Just Wafflez", r: ["waffle"], lv: 1 }, { n: "Just Gritz", r: ["gritz"], lv: 1 },
+    { n: "Catfish N' Wafflez", r: ["waffle", "catfish"], ph: "catfish-wafflez", lv: 1 }, { n: "Tenderz N' Wafflez", r: ["waffle", "tenderz"], ph: "tenderz-wafflez", lv: 1 },
+    { n: "Wingz N' Gritz", r: ["gritz", "chicken"], ph: "wingz-gritz", lv: 1 }, { n: "Catfish N' Gritz", r: ["gritz", "catfish"], ph: "catfish-gritz", lv: 1 },
     { n: "Tenderz N' Gritz", r: ["gritz", "tenderz"], ph: "tenderz-gritz", lv: 1 },
-    { n: "Shrimp N' Gritz", r: ["gritz", "shrimp"], ph: "shrimp-gritz", lv: 2 },
-    { n: "Shrimp N' Wafflez", r: ["waffle", "shrimp"], ph: "shrimp-wafflez", lv: 2 },
-    { n: "Wingz N' Gritz", r: ["gritz", "chicken"], ph: "wingz-gritz", lv: 2 },
-    { n: "Peach Cobbler Waffle", r: ["waffle", "peach", "butter"], ph: "peach-waffle", lv: 2 },
-    { n: "Waffle Plate", r: ["waffle", "egg", "bacon"], ph: "waffle-plate", lv: 3 },
-    { n: "BET Breakfast Plate", r: ["bacon", "egg", "ttoast"], ph: "bet-plate", lv: 3 },
-    { n: "French Toast Plate", r: ["ftoast", "bacon", "egg"], ph: "french-toast", lv: 3 },
-    { n: "Classic French Toast", r: ["ftoast", "butter", "syrup"], ph: "classic-ftoast", lv: 3 },
-    { n: "Loaded French Toast", r: ["ftoast", "berriez", "whip", "syrup"], ph: "loaded-ftoast", lv: 4 },
-    { n: "BET+ Breakfast Plate", r: ["bacon", "egg", "ttoast", "gritz"], ph: "bet-plate", lv: 4 },
-    { n: "Da Baddest Chick Sandwich", r: ["ttoast", "tenderz", "bacon", "egg", "cheese"], ph: "baddest-chick", lv: 4 },
-    { n: "Fried Cheese Gritz", r: ["fgritz"], ph: "cheese-gritz-bites", lv: 4 },
-    { n: "Original Collard Green Dip", r: ["dip"], ph: "collard-dip", lv: 4 }
+    { n: "Wingz N' Wafflez", r: ["waffle", "chicken", "syrup"], ph: "wingz-wafflez", lv: 2 }, { n: "Shrimp N' Gritz", r: ["gritz", "shrimp"], ph: "shrimp-gritz", lv: 2 },
+    { n: "Shrimp N' Wafflez", r: ["waffle", "shrimp"], ph: "shrimp-wafflez", lv: 2 }, { n: "Peach Cobbler Waffle", r: ["waffle", "peach", "butter"], ph: "peach-waffle", lv: 2 },
+    { n: "Classic French Toast", r: ["ftoast", "butter", "syrup"], ph: "classic-ftoast", lv: 2 }, { n: "Tender Basket", r: ["tenderz", "friez"], lv: 2 },
+    { n: "Wing Basket", r: ["chicken", "friez"], lv: 2 }, { n: "Catfish Basket", r: ["catfish", "friez"], lv: 2 },
+    { n: "Waffle Plate", r: ["waffle", "egg", "bacon"], ph: "waffle-plate", lv: 3 }, { n: "BET Breakfast Plate", r: ["bacon", "egg", "ttoast"], ph: "bet-plate", lv: 3 },
+    { n: "French Toast Plate", r: ["ftoast", "bacon", "egg"], ph: "french-toast", lv: 3 }, { n: "Crunchy Cinnamon Toast", r: ["cinna", "syrup"], ph: "cinna-toast", lv: 3 },
+    { n: "Mixed Berry Waffle", r: ["waffle", "berriez"], lv: 3 }, { n: "Wing Plate", r: ["chicken", "mac", "collards"], lv: 3 }, { n: "Tender Plate", r: ["tenderz", "mac", "friez"], lv: 3 },
+    { n: "Loaded French Toast", r: ["ftoast", "berriez", "whip", "syrup"], ph: "loaded-ftoast", lv: 4 }, { n: "BET+ Breakfast Plate", r: ["bacon", "egg", "ttoast", "gritz"], ph: "bet-plate", lv: 4 },
+    { n: "Da Baddest Chick Sandwich", r: ["ttoast", "tenderz", "bacon", "egg", "cheese"], ph: "baddest-chick", lv: 4 }, { n: "Breakfast Scramble", r: ["egg", "cheese", "potatoes", "collards"], lv: 4 },
+    { n: "Catfish Plate", r: ["catfish", "mac", "collards"], lv: 4 }, { n: "Shrimp Plate", r: ["shrimp", "potatoes", "friez"], lv: 4 },
+    { n: "Fried Green Tomatoes", r: ["tomatoes", "sauce"], ph: "green-tomatoes", lv: 4 }, { n: "Spicy Fried Pickles", r: ["pickles"], ph: "fried-pickles", lv: 4 },
+    { n: "Celestial Eggs", r: ["celestial"], ph: "celestial-eggs", lv: 4 }, { n: "Original Collard Green Dip", r: ["dip"], ph: "collard-dip", lv: 4 },
+    { n: "Fried Cheese Gritz", r: ["fgritz"], ph: "cheese-gritz-bites", lv: 4 }, { n: "Cinnatoast + Peach Cobbler", r: ["cinna", "peach", "syrup"], ph: "cinna-toast", lv: 4 }
   ];
-  // what each level unlocks (cumulative)
-  var UNLOCK = {
-    1: { fry: ["catfish", "tenderz", "chicken"], baskets: 2, irons: 1, skil: [], bins: ["syrup", "butter", "kiki"], mods: 0, drink: 0.12 },
-    2: { fry: ["catfish", "tenderz", "chicken", "shrimp"], baskets: 2, irons: 2, skil: [], bins: ["syrup", "butter", "peach", "cheese", "sauce", "hot", "kiki", "oj"], mods: 0.3, drink: 0.25 },
-    3: { fry: ["catfish", "tenderz", "chicken", "shrimp"], baskets: 3, irons: 2, skil: ["egg", "bacon"], bins: ["syrup", "butter", "peach", "cheese", "sauce", "hot", "ttoast", "ftoast", "kiki", "oj"], mods: 0.35, drink: 0.3 },
-    4: { fry: ["catfish", "tenderz", "chicken", "shrimp"], baskets: 3, irons: 2, skil: ["egg", "bacon"], bins: ["syrup", "butter", "peach", "cheese", "berriez", "whip", "sauce", "hot", "ttoast", "ftoast", "fgritz", "dip", "kiki", "oj"], mods: 0.45, drink: 0.35 }
+  function dishImg(d) { if (d.ph) return "img/" + d.ph + ".jpg"; var p = d.r.filter(function (k) { return ITEMS[k].row === "protein"; })[0] || d.r[0]; return ITEMS[p].img; }
+  function unlocked(L) { return Object.keys(ITEMS).filter(function (k) { return ITEMS[k].lv <= L; }); }
+  // Per-level pacing: relaxed L1–2, tightening to L5. pat = base patience (s) per table (+extra s per extra guest);
+  // arrive = s between parties (±1.5 s); cool = s for a plate on the pass to go from 🔥 to ❄️ (the 🔥 "hot" band is the
+  // first quarter: ~22 s at adult L1, ~27 s at kid L1). Adult can be quicker than Kid, but its L1 never feels rushed.
+  // cook (L4+ adult, L5 kid) = cook-time multiplier for the stations (kids ×1.35).
+  var ADULT_PACE = {
+    1: { pat: 75, arrive: 14, cool: 88 }, 2: { pat: 62, arrive: 12, cool: 72 }, 3: { pat: 50, arrive: 10, cool: 56 }, 4: { pat: 46, arrive: 9, cool: 48 }, 5: { pat: 40, arrive: 8, cool: 40 }
   };
-  function U(L) { return UNLOCK[Math.min(4, L)]; }
-  // KID mode per-level pacing. pat = base patience (s) for a table, plus `extra` s per extra guest; arrive = s between
-  // parties (±1.5 s); cook = cook-time multiplier (bigger = slower = easier to hit perfect); fresh = warming-tray multiplier.
   var KID_PACE = {
-    1: { pat: 120, arrive: 18, cook: 1.35, fresh: 1.5 },
-    2: { pat: 95, arrive: 14, cook: 1.15, fresh: 1.25 },
-    3: { pat: 75, arrive: 11, cook: 1, fresh: 1 },
-    4: { pat: 55, arrive: 8, cook: 1, fresh: 1 },
-    5: { pat: 40, arrive: 6, cook: 1, fresh: 1 }
+    1: { pat: 120, arrive: 18, cool: 110 }, 2: { pat: 95, arrive: 14, cool: 90 }, 3: { pat: 75, arrive: 11, cool: 70 }, 4: { pat: 55, arrive: 8, cool: 56 }, 5: { pat: 50, arrive: 8, cool: 50 }
   };
   function lvParams(L) {
-    if (MODE !== "kid") {   // ADULT: the original fast pacing, unchanged (60 s speed window = 10/15/20/30 s tiers)
-      return { arrive: Math.max(4, 12 - 1.9 * (L - 1)), pat: Math.max(20, 58 - 8 * (L - 1)), extra: 10, cook: 1, fresh: 1, win: 60 };
-    }
-    var p = KID_PACE[Math.min(5, L)], over = Math.max(0, L - 5);   // past level 5: a little tighter each level
-    var pat = Math.max(28, p.pat - 3 * over);
-    return { pat: pat, arrive: Math.max(4.5, p.arrive - 0.3 * over), extra: 10, cook: p.cook, fresh: p.fresh, win: pat * 0.55 };
+    var kid = MODE === "kid", p = (kid ? KID_PACE : ADULT_PACE)[Math.min(5, L)], over = Math.max(0, L - 5);   // past L5: a little tighter each level
+    var pat = Math.max(kid ? 30 : 24, p.pat - 3 * over);
+    return { pat: pat, arrive: Math.max(kid ? 5 : 4.5, p.arrive - 0.3 * over), extra: 10, win: pat * 0.6, cool: Math.max(kid ? 30 : 24, p.cool - 2 * over), cook: kid ? 1.35 : 1 };
   }
   // who's playing: "kid" | "adult" | "" (not picked yet). Stored on this phone only; no age is ever asked or stored.
   var MODE = (function () { try { return localStorage.getItem("gnw-mode") || ""; } catch (e) { return ""; } })();
@@ -199,11 +218,10 @@
     if (MODE === "kid") { TK.parentCheck("Leave Kid mode", function () { setMode("adult"); menuRefresh(); }); return; }
     setMode("adult"); menuRefresh();
   }
-  // a kid mode left on a phone with no parent account (signed out elsewhere) falls back to "not picked"
   if (MODE === "kid") setTimeout(function () { var TK = W.SSAI_TOKENS; if (TK && TK.isParent && !TK.isParent()) { MODE = ""; try { localStorage.removeItem("gnw-mode"); } catch (e) {} hud(); menuRefresh(); } }, 0);
   function kidNick() { try { return (localStorage.getItem("gnw-kid-nick") || "").slice(0, 16); } catch (e) { return ""; } }
   function modeBadge() { return MODE === "kid" ? "🧒 Kid" : "🧑 Adult"; }
-  var LEVEL_MS = 90000, MAX_WALK = 3;
+  var LEVEL_MS = 90000, MAX_WALK = 3, PASS_CAP = 4;
 
   /* ================= GUESTS (60 sprites, img/game/guests/<id>.webp) ================= */
   var GU = {};
@@ -245,16 +263,28 @@
   }
   var PER = { chill: ["😌", "Easygoing"], generous: ["💛", "Big tipper"], picky: ["🧐", "Picky: wants it perfect"], hurry: ["⏱️", "In a hurry"] };
   function makeOrder(L, kid) {
-    var u = U(L), pool = DISHES.filter(function (d) { return d.lv <= Math.min(4, L); });
-    if (kid) pool = pool.filter(function (d) { return d.r.length <= 3 && d.lv <= 2; });
-    var d = pick(pool), o = { dish: d, r: d.r.slice(), add: [], no: [] };
-    var prot = o.r.some(function (k) { return ITEMS[k].st === "fry"; });
-    if (!kid && prot && u.bins.indexOf("sauce") >= 0 && Math.random() < u.mods) { var x = Math.random() < 0.6 ? "sauce" : "hot"; o.r.push(x); o.add.push(x); }
-    if (!kid && o.r.indexOf("gritz") >= 0 && o.r.indexOf("cheese") < 0 && u.bins.indexOf("cheese") >= 0 && Math.random() < u.mods * 0.7) { o.r.push("cheese"); o.add.push("cheese"); }
+    var pool = DISHES.filter(function (d) { return d.lv <= Math.min(4, L); });
+    if (kid) pool = pool.filter(function (d) { return d.lv <= 2; });
+    var d = pick(pool), o = { dish: d, r: d.r.slice(), add: [], no: [], prep: [], hot: false };
+    var noP = L <= 1 ? 0 : L === 2 ? 0.25 : L === 3 ? 0.35 : 0.4, addP = L >= 4 ? 0.35 : 0, prepP = L >= 5 ? (MODE === "kid" ? 0.15 : 0.45) : 0;
+    if (kid || MODE === "kid") { noP *= 0.5; addP *= 0.5; }
+    // + extras (L4+): sauce on fried food, cheese on gritz
+    var fried = o.r.some(function (k) { return ["chicken", "tenderz", "catfish", "shrimp"].indexOf(k) >= 0; });
+    if (fried && Math.random() < addP) { var x = Math.random() < 0.6 ? "sauce" : "hot"; if (o.r.indexOf(x) < 0) { o.r.push(x); o.add.push(x); } }
+    else if (o.r.indexOf("gritz") >= 0 && o.r.indexOf("cheese") < 0 && Math.random() < addP) { o.r.push("cheese"); o.add.push("cheese"); }
+    // NO requests (L2+): leave off a topping that normally comes on the dish
     var opt = o.r.filter(function (k) { return ["syrup", "butter", "cheese", "whip", "berriez"].indexOf(k) >= 0 && o.add.indexOf(k) < 0; });
-    if (!kid && opt.length && Math.random() < u.mods) { var nk = pick(opt); o.r.splice(o.r.indexOf(nk), 1); o.no.push(nk); }
-    if (!kid && !o.no.length && o.r.indexOf("gritz") >= 0 && o.r.indexOf("cheese") < 0 && Math.random() < u.mods * 0.4) o.no.push("cheese");
-    if (o.r.length < 6 && Math.random() < (kid ? 0.5 : u.drink)) { var dk = kid || u.bins.indexOf("oj") < 0 ? "kiki" : pick(["kiki", "oj"]); o.r.push(dk); o.drink = dk; }
+    if (opt.length && Math.random() < noP) { var nk = pick(opt); o.r.splice(o.r.indexOf(nk), 1); o.no.push(nk); }
+    else if (L >= 3 && o.r.indexOf("gritz") >= 0 && o.r.indexOf("cheese") < 0 && Math.random() < noP * 0.5) o.no.push("cheese");
+    // prep requests (L5+): tap the variant tile instead of the regular one, or "extra hot" (must arrive 🔥)
+    if (Math.random() < prepP) {
+      var sw = Object.keys(ITEMS).filter(function (k) { return ITEMS[k].of && o.r.indexOf(ITEMS[k].of) >= 0; });
+      if (sw.length && Math.random() < 0.75) { var v = pick(sw), base = ITEMS[v].of; o.r[o.r.indexOf(base)] = v; o.prep.push(ITEMS[v].prep); }
+      else { o.hot = true; o.prep.push("Extra hot · fresh off the line 🔥"); }
+    }
+    var dp = L <= 1 ? 0 : kid ? 0.5 : 0.3, drinks = unlocked(L).filter(function (k) { return ITEMS[k].row === "drink" && !(kid && k === "coffee"); });
+    if (drinks.length && o.r.length < 6 && Math.random() < dp) { var dk = pick(drinks); o.r.push(dk); o.drink = dk; }
+    o.usd = o.r.reduce(function (a, k) { return a + ITEMS[k].usd; }, 0);
     return o;
   }
 
@@ -279,179 +309,322 @@
 
   /* ================= CSS ================= */
   var css = [
-    ".ou2{position:relative;border-radius:14px;overflow:hidden;background:#f6efe0;padding:6px;user-select:none;-webkit-user-select:none;touch-action:manipulation;color:var(--ink)}",
+    ".ou2{position:relative;border-radius:14px;overflow:hidden;background:#cfd3d8;padding:0;user-select:none;-webkit-user-select:none;touch-action:manipulation;color:var(--ink)}",
     ".ou2 *{box-sizing:border-box}",
-    // dining room
-    ".din{position:relative;height:152px;border-radius:12px;overflow:hidden;background:repeating-linear-gradient(90deg,#c8955c 0 22px,#bd8a52 22px 44px);box-shadow:inset 0 0 0 2px #8a5a2c55}",
-    ".din:before{content:'';position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 0,#fff3d688,transparent 70%);pointer-events:none}",
-    ".din .door{position:absolute;left:0;top:44%;width:16px;height:46px;border-radius:0 6px 6px 0;background:#5a3a26;box-shadow:inset -3px 0 0 #3b2414}",
-    ".din .passw{position:absolute;left:53%;bottom:0;transform:translateX(-50%);width:58px;height:12px;border-radius:8px 8px 0 0;background:#3B1F5C;color:#F2C14E;font:900 8px/12px var(--body);text-align:center;letter-spacing:.12em}",
-    ".tb{position:absolute;transform:translate(-50%,-62%);width:var(--w);height:74px;pointer-events:none}",
-    ".tb .gs{position:absolute;left:0;right:0;bottom:24px;height:40px;display:flex;justify-content:center;gap:0}",
-    ".tb .gq{position:relative;width:26px;height:40px;overflow:visible;transition:transform .5s cubic-bezier(.34,1.4,.64,1),opacity .4s;transform:translateY(14px);opacity:0}",
-    ".tb .gq.in{transform:none;opacity:1}.tb .gq.out{transform:translateX(-70px);opacity:0;transition:transform .9s ease-in,opacity .9s}",
-    ".tb .gq .im{position:absolute;left:-4px;right:-4px;top:0;height:40px;overflow:hidden}.tb .gq img.p{width:100%;height:auto;display:block}",
+    // ---- dining room (seen through the pass window) ----
+    ".din{position:relative;height:164px;overflow:hidden;background:#38393c;contain:layout paint}",
+    ".din .ceil{position:absolute;left:0;right:0;top:0;height:13px;background:linear-gradient(180deg,#2a1d14,#4a3324 70%,#3a281c);box-shadow:0 2px 3px #0006;z-index:2}",
+    ".din .soffit{position:absolute;left:0;right:0;top:13px;height:9px;background:#f4f2ee;z-index:1}",
+    ".din .can{position:absolute;top:16px;width:7px;height:3px;border-radius:50%;background:#fffef6;box-shadow:0 0 6px 2px #fff8d8;z-index:2}",
+    ".din .mural{position:absolute;left:0;right:0;top:22px;height:64px;z-index:0}",
+    ".din .wl{position:absolute;left:0;right:0;top:22px;height:64px;background:linear-gradient(180deg,#0000 60%,#0003);z-index:1;pointer-events:none}",
+    ".din .banq{position:absolute;left:24px;right:58px;top:80px;height:26px;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#34508c,#26396a 60%,#1f2f58);box-shadow:inset 0 2px 0 #ffffff22,0 3px 4px #0005;z-index:1}",
+    ".din .banq:after{content:'';position:absolute;inset:4px 6px 8px;background:repeating-linear-gradient(90deg,#0000 0 22px,#ffffff14 22px 23px)}",
+    ".din .floor{position:absolute;left:0;right:0;top:104px;bottom:0;background:linear-gradient(180deg,#2c2d30,#3c3d41);z-index:0}",
+    ".din .bar{position:absolute;right:0;top:22px;bottom:0;width:58px;background:#e3b23c;z-index:1;box-shadow:inset 3px 0 0 #2d3f73}",
+    ".din .bar .sh{position:absolute;left:6px;right:5px;height:3px;background:#c99b62;box-shadow:0 1px 0 #8a6436}",
+    ".din .bar .gl{position:absolute;left:8px;right:8px;top:10px;height:42px;border:2px solid #c99b62;background:linear-gradient(135deg,#ffffff55,#ffffff11);border-radius:2px}",
+    ".din .bar .cnt{position:absolute;left:0;right:0;bottom:0;height:46px;background:#24315c;border-top:5px solid #d9b98a}",
+    ".din .bar .dome{position:absolute;left:14px;bottom:47px;width:26px;height:16px;border-radius:13px 13px 2px 2px;background:radial-gradient(circle at 30% 30%,#ffffffcc,#ffffff33 60%);border:1px solid #ffffff99}",
+    ".din .bar .dome i{position:absolute;left:5px;right:5px;bottom:1px;height:7px;border-radius:3px;background:#6b3b25}",
+    // glass entrance door (left)
+    ".din .door2{position:absolute;left:0;top:30px;width:24px;height:132px;background:#f7f7f5;z-index:2;box-shadow:2px 0 4px #0005}",
+    ".din .door2 .gls{position:absolute;inset:6px 3px 4px 3px;background:linear-gradient(90deg,#dfe8ef,#f6f8fa);transform-origin:0 50%;transition:transform .45s ease;border:1px solid #b9c3cb}",
+    ".din .door2 .gls:after{content:'';position:absolute;inset:2px;background:repeating-linear-gradient(90deg,#ffffffd0 0 3px,#e9edf0 3px 5px);opacity:.85}",
+    ".din .door2.open .gls{transform:perspective(160px) rotateY(68deg)}",
+    ".din .door2 b{position:absolute;left:1px;right:1px;top:-1px;font:900 5px/7px var(--body);color:#1f2f58;text-align:center;letter-spacing:.02em}",
+    // wall branding: wordmark, menu board, Antidote's review banner
+    ".din .wm{position:absolute;left:50%;top:24px;transform:translateX(-50%);z-index:2;background:#ffffffee;border-radius:3px;padding:2px 7px;font:900 9px/1.1 var(--serif);color:#1f2f58;letter-spacing:.04em;box-shadow:0 2px 4px #0004;white-space:nowrap}",
+    ".din .wm i{font-style:italic;color:#c9a44c}",
+    ".din .mb{position:absolute;right:62px;top:30px;width:58px;z-index:2;background:#1c1c1e;border:2px solid #c99b62;border-radius:3px;padding:3px 4px;font:800 6.5px/1.25 var(--body);color:#f4efe2;box-shadow:0 3px 6px #0006}",
+    ".din .mb b{display:block;color:#F2C14E;font-size:7px;letter-spacing:.06em}",
+    ".din .poster{position:absolute;left:29px;top:24px;width:54px;z-index:4;border:0;padding:3px 3px 4px;background:#1d4ed8;border-radius:3px;cursor:pointer;transform:perspective(300px) rotateY(9deg);transform-origin:0 50%;box-shadow:4px 5px 8px #0007,inset 0 0 0 1px #9cc0ff;touch-action:manipulation;-webkit-tap-highlight-color:transparent}",
+    ".din .poster img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:1px}",
+    ".din .poster b{display:block;margin-top:2px;font:900 7px/1 var(--body);color:#FFD23F;text-align:left;white-space:nowrap;overflow:hidden}",
+    ".din .poster small{display:block;font:700 5.5px/1.1 var(--body);color:#dbe6ff;text-align:left}",
+    ".din .poster .pl{position:absolute;left:50%;top:13px;width:14px;height:10px;margin-left:-7px;border-radius:3px;background:#e3262f;box-shadow:0 1px 3px #0008}",
+    ".din .poster .pl:after{content:'';position:absolute;left:5px;top:2.5px;border-left:5px solid #fff;border-top:2.5px solid transparent;border-bottom:2.5px solid transparent}",
+    ".din .poster.glint:before{content:'';position:absolute;inset:0;background:linear-gradient(110deg,#0000 30%,#fff9 50%,#0000 70%) -100% 0/250% 100%;animation:glint 1.2s ease-in-out 2;pointer-events:none}@keyframes glint{to{background-position:150% 0}}",
+    // tables: white top on gold legs; guests SEATED (lower body hidden behind the table edge)
+    ".tb{position:absolute;transform:translate(-50%,-100%);width:var(--w);height:58px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}",
+    ".tb .gs{position:absolute;left:0;right:0;bottom:12px;height:40px;display:flex;justify-content:center;gap:0;pointer-events:none}",
+    ".tb .gq{position:relative;width:24px;height:40px;overflow:visible;transition:transform .5s cubic-bezier(.34,1.4,.64,1),opacity .4s;transform:translateY(10px);opacity:0}",
+    ".tb .gq.in{transform:none;opacity:1}.tb .gq.out{transform:translateX(-90px);opacity:0;transition:transform 1.1s ease-in,opacity 1.1s}",
+    ".tb .gq .im{position:absolute;left:-5px;right:-5px;top:0;height:40px;overflow:hidden}.tb .gq img.p{width:100%;height:auto;display:block}",
+    ".tb .gq .ch{position:absolute;left:-2px;right:-2px;top:14px;height:22px;border-radius:9px 9px 3px 3px;background:linear-gradient(180deg,#b5763f,#8a5228);z-index:-1}",
     ".tb .gq.imp .im{animation:gTap .5s ease-in-out infinite}.tb .gq.mad .im{animation:gTap .25s ease-in-out infinite;filter:drop-shadow(0 0 4px #e0473a)}",
     "@keyframes gTap{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}",
-    ".tb .gq .md{position:absolute;right:-6px;top:-4px;font-size:14px;line-height:1;filter:drop-shadow(0 1px 1px #0006);z-index:3}",
+    ".tb .gq .md{position:absolute;right:-7px;top:-3px;font-size:13px;line-height:1;filter:drop-shadow(0 1px 1px #0006);z-index:3}",
     ".tb .gq.mad .md{animation:steam .8s ease-out infinite}@keyframes steam{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-8px);opacity:.3}}",
-    ".tb .gq .ok{position:absolute;left:-3px;top:-3px;width:14px;height:14px;border-radius:50%;background:#3fbf6f;color:#fff;font:900 9px/14px var(--body);text-align:center;z-index:3;display:none}.tb .gq.got .ok{display:block}",
-    ".tb .tt{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);height:20px;border-radius:12px;background:linear-gradient(180deg,#fffdf7,#e9dcc0);box-shadow:0 4px 0 #8a5a2c,0 8px 10px #0003;z-index:2;display:flex;align-items:center;justify-content:center;gap:2px}",
-    ".tb.c2 .tt{width:48px}.tb.c4 .tt{width:96px}",
-    ".tb .tt img{width:15px;height:15px;border-radius:50%;object-fit:cover;border:1.5px solid #fff;box-shadow:0 1px 2px #0005}",
-    ".tb .tn{position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);font:900 9px var(--body);color:#fff;background:#3B1F5C;border-radius:99px;padding:1px 6px;z-index:3}",
-    ".tb .pb{position:absolute;left:50%;bottom:3px;transform:translateX(-50%);width:44px;height:4px;border-radius:3px;background:#0003;overflow:hidden;z-index:3;display:none}.tb.wait .pb{display:block}.tb .pb i{display:block;height:100%;background:#3fbf6f}",
-    ".tb .dirt{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-size:16px;z-index:3;display:none}.tb.dirty .dirt{display:block}",
+    ".tb .gq .ok{position:absolute;left:-4px;top:-3px;width:13px;height:13px;border-radius:50%;background:#3fbf6f;color:#fff;font:900 8px/13px var(--body);text-align:center;z-index:3;display:none}.tb .gq.got .ok{display:block}",
+    ".tb .tt{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);height:12px;border-radius:2px;background:linear-gradient(180deg,#fbfaf8,#e4e1dc);box-shadow:0 2px 0 #c9c4bb,0 4px 6px #0005;z-index:2;display:flex;align-items:center;justify-content:center;gap:3px}",
+    ".tb .tt:before,.tb .tt:after{content:'';position:absolute;top:13px;width:2px;height:7px;background:linear-gradient(#e2c37a,#a9853a)}.tb .tt:before{left:5px}.tb .tt:after{right:5px}",
+    ".tb.c2 .tt{width:50px}.tb.c4 .tt{width:98px}",
+    ".tb .tt img{width:14px;height:14px;border-radius:50%;object-fit:cover;border:2px solid #111;box-shadow:0 1px 2px #0006;margin-top:-6px}",
+    ".tb .tn{position:absolute;left:-4px;bottom:16px;font:900 8px var(--body);color:#fff;background:#3B1F5C;border-radius:99px;padding:1px 5px;z-index:4}",
+    ".tb .pb{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:40px;height:3px;border-radius:3px;background:#0005;overflow:hidden;z-index:3;display:none}.tb.wait .pb{display:block}.tb .pb i{display:block;height:100%;background:#3fbf6f}",
+    ".tb .dirt{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);font-size:13px;z-index:3;display:none}.tb.dirty .dirt{display:block}",
     ".tb .flash{position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(#fff,#fff0 70%);opacity:0;z-index:4;pointer-events:none}.tb .flash.on{animation:camf .6s ease-out}",
     "@keyframes camf{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(1.4)}}",
-    ".srv{position:absolute;left:0;top:0;width:30px;height:48px;z-index:6;pointer-events:none;will-change:transform}",
-    ".srv .sv{width:100%;height:100%;animation:bob .32s ease-in-out infinite alternate}.srv.idle .sv{animation:none}",
+    ".din.aim .tb.wait{outline:2px dashed #FFD23F;outline-offset:2px;border-radius:8px;animation:aim 1s ease-in-out infinite}@keyframes aim{50%{outline-color:#fff}}",
+    ".tb.r1{z-index:3}.tb.r2{z-index:6}",
+    // servers + Jurni on the floor
+    ".srv{position:absolute;left:0;top:0;width:26px;height:42px;z-index:5;pointer-events:none;will-change:transform}",
+    ".srv .sv{width:100%;height:100%;animation:bob .32s ease-in-out infinite alternate}",
     "@keyframes bob{from{transform:translateY(0) rotate(-3deg)}to{transform:translateY(-3px) rotate(3deg)}}",
-    ".srv .cp{position:absolute;left:-6px;top:6px;width:24px;height:24px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 2px 4px #0006}",
-    ".srv.j{width:46px;height:78px}.srv.j .jw{display:block;width:100%;height:100%;animation:bob .34s ease-in-out infinite alternate}",
-    ".srv .sp{position:absolute;left:50%;top:-14px;transform:translateX(-50%);white-space:nowrap;font:900 9px var(--body);color:#3B1F5C;background:#F2C14E;border-radius:99px;padding:2px 6px;box-shadow:0 2px 6px #0004}",
+    ".srv .cp{position:absolute;left:-7px;top:6px;width:20px;height:20px;border-radius:50%;object-fit:cover;border:2px solid #111;box-shadow:0 2px 4px #0006}",
+    ".jfl{position:absolute;left:0;top:0;width:40px;height:68px;z-index:5;pointer-events:none;will-change:transform}",
+    ".jfl .jw{display:block;width:100%;height:100%}.jfl.walk .jw{animation:jsway .36s ease-in-out infinite alternate}@keyframes jsway{from{transform:translateY(0) rotate(-1.5deg)}to{transform:translateY(-2px) rotate(1.5deg)}}",
+    ".jfl .bb{position:absolute;bottom:62px;left:50%;transform:translateX(-30%);white-space:nowrap;background:#fff;color:#3B1F5C;border-radius:12px 12px 12px 3px;padding:4px 7px;font:900 9.5px/1.1 var(--body);box-shadow:0 3px 8px #0005;z-index:7}",
+    ".jfl .sp{position:absolute;left:50%;top:-14px;transform:translateX(-50%);white-space:nowrap;font:900 8px var(--body);color:#3B1F5C;background:#F2C14E;border-radius:99px;padding:2px 5px}",
+    ".jfl .crisp{filter:sepia(.4) brightness(.8)}",
     ".jw{position:relative;display:inline-block}.jw img{display:block;width:100%;height:100%;object-fit:contain;object-position:bottom}.jw .hat{position:absolute;height:auto;pointer-events:none}",
-    // Jurni pop-up (stays in the dining room: never over the kitchen stations)
-    ".jpop{position:absolute;right:-130px;bottom:2px;width:80px;height:140px;z-index:9;pointer-events:none;transition:right .45s cubic-bezier(.34,1.4,.64,1)}",
-    ".jpop.on{right:2px;animation:jb .5s .4s}.jpop:not(.on) .bb{display:none}.jpop .jw{width:100%;height:100%}@keyframes jb{0%,100%{transform:none}40%{transform:translateY(-8px)}}",
-    ".jpop .bb{position:absolute;right:84px;top:10px;width:116px;background:#fff;color:#3B1F5C;border-radius:14px 14px 4px 14px;padding:6px 8px;font:900 11px/1.2 var(--body);box-shadow:0 4px 12px #0004}",
     // level up / banner
     ".lvb{position:absolute;inset:0;z-index:20;display:none;align-items:flex-start;justify-content:center;background:radial-gradient(#3b1f5c99,#1e1b3acc);pointer-events:none}.lvb.on{display:flex}",
     ".lvb h3{margin:14px 0 0;font:900 italic 34px var(--serif);color:#F2C14E;text-shadow:0 3px 0 #000a;animation:lvIn .6s cubic-bezier(.34,1.6,.64,1)}",
     ".lvb p{position:absolute;top:54px;padding:0 10px;left:0;right:0;text-align:center;margin:0;font:800 12px var(--body);color:#fff}",
     "@keyframes lvIn{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}",
-    ".dance{position:absolute;left:50%;top:70%;width:58px;height:96px;transform:translate(-50%,-50%);z-index:13}",
+    ".dance{position:absolute;left:50%;top:72%;width:54px;height:92px;transform:translate(-50%,-50%);z-index:13}",
     ".dance .jw{width:100%;height:100%}.dance.go .jw{animation:spin 1.1s cubic-bezier(.4,1.5,.6,1) 2}",
     "@keyframes spin{0%{transform:rotateY(0) translateY(0)}25%{transform:rotateY(180deg) translateY(-14px) scale(1.05,.95)}50%{transform:rotateY(360deg) translateY(0) scale(.95,1.05)}75%{transform:rotateY(360deg) translateY(-10px)}100%{transform:rotateY(360deg) translateY(0)}}",
     ".dance .tray{position:absolute;left:-26px;top:38%;display:flex;gap:2px}.dance .tray img{width:20px;height:auto}",
     ".spk{position:absolute;font-size:16px;z-index:14;pointer-events:none;animation:spk 1.2s ease-out forwards}@keyframes spk{0%{transform:scale(.2);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.2);opacity:0}}",
-    // theme effects
-    ".fxl{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden}",
+    // theme effects (layer over the real room)
+    ".fxl{position:absolute;inset:0;pointer-events:none;z-index:8;overflow:hidden}",
     ".fxl i{position:absolute;font-style:normal;opacity:.75;animation-iteration-count:infinite;animation-timing-function:linear}",
     ".fxl.float i{animation-name:fxFloat}.fxl.fall i,.fxl.snow i{animation-name:fxFall}.fxl.snow i{color:#fff;text-shadow:0 0 4px #9cf}.fxl.burst i{animation-name:fxBurst;animation-timing-function:ease-out}",
     "@keyframes fxFloat{0%{transform:translate(-30px,0)}50%{transform:translate(20px,-14px)}100%{transform:translate(380px,6px)}}",
     "@keyframes fxFall{0%{transform:translate(0,-30px) rotate(0)}100%{transform:translate(30px,240px) rotate(300deg)}}",
     "@keyframes fxBurst{0%{transform:scale(.2);opacity:0}20%{opacity:1}100%{transform:scale(1.6);opacity:0}}",
-    ".decor{position:absolute;right:6px;top:4px;z-index:2;font-size:15px;letter-spacing:2px;pointer-events:none}",
-    ".lights{position:absolute;left:0;right:0;top:0;height:10px;z-index:2;background:radial-gradient(circle,#ff4d4d 2.5px,transparent 3px) 0 2px/18px 10px,radial-gradient(circle,#3fd16f 2.5px,transparent 3px) 9px 4px/18px 10px;animation:tw 1s steps(2) infinite;pointer-events:none}@keyframes tw{50%{filter:brightness(1.6)}}",
-    ".ou2.th-halloween .din{background:repeating-linear-gradient(90deg,#7a4a8c 0 22px,#6d3f80 22px 44px)}.ou2.th-halloween .din:before{background:radial-gradient(120% 70% at 50% 0,#ff9a3c55,transparent 70%)}",
-    ".ou2.th-christmas .din{background:repeating-linear-gradient(90deg,#c8955c 0 22px,#bd8a52 22px 44px)}.ou2.th-christmas .din:before{background:linear-gradient(#ffffff55,transparent 40%)}",
-    ".ou2.th-thanksgiving .din:before{background:radial-gradient(120% 70% at 50% 0,#ff8c3a55,transparent 70%)}",
-    // rail (tickets)
-    ".rail{display:flex;gap:5px;overflow-x:auto;padding:7px 2px 3px;margin:0;min-height:66px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.rail::-webkit-scrollbar{display:none}",
-    ".rail .none{color:#6E5F72;font:700 12px var(--body);padding:16px 8px}",
-    ".tk{flex:none;width:104px;background:#fff;border:2px solid #3fbf6f;border-radius:12px;padding:4px 5px 5px;box-shadow:0 3px 8px #1e1b3a22;position:relative}",
+    ".decor{position:absolute;right:62px;top:68px;z-index:4;font-size:12px;letter-spacing:1px;pointer-events:none}",
+    ".lights{position:absolute;left:0;right:0;top:12px;height:10px;z-index:3;background:radial-gradient(circle,#ff4d4d 2.5px,transparent 3px) 0 2px/18px 10px,radial-gradient(circle,#3fd16f 2.5px,transparent 3px) 9px 4px/18px 10px;animation:tw 1s steps(2) infinite;pointer-events:none}@keyframes tw{50%{filter:brightness(1.6)}}",
+    ".ou2.th-halloween .din .wl{background:linear-gradient(180deg,#ff8a2a22,#5a2a7a55)}.ou2.th-christmas .din .wl{background:linear-gradient(180deg,#ffffff22,#2f8f4e22)}.ou2.th-thanksgiving .din .wl{background:linear-gradient(180deg,#ff8c3a22,#7a3a1a33)}",
+    // ---- kitchen (player side): stainless pass shelf, ticket rail, line + tile floor ----
+    ".pass{position:relative;height:46px;background:linear-gradient(180deg,#e9ecef,#b8bec5 55%,#9aa1a9);border-top:3px solid #6e757d;box-shadow:inset 0 -2px 0 #0002;display:flex;align-items:center;gap:4px;padding:3px 6px 4px}",
+    ".pass .lbl{position:absolute;left:6px;top:1px;font:900 7.5px var(--body);letter-spacing:.14em;color:#4a5058}",
+    ".ps{position:relative;flex:1;height:44px;border:0;border-radius:10px;background:#0000;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;padding:0}",
+    ".ps .bp{position:absolute;left:50%;top:4px;width:36px;height:36px;margin-left:-18px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#3a3a3a,#0d0d0d 70%);box-shadow:0 3px 5px #0007;overflow:hidden}",
+    ".ps .bp img{position:absolute;inset:4px;width:28px;height:28px;border-radius:50%;object-fit:cover}",
+    ".ps .stm{position:absolute;left:50%;top:-4px;width:18px;height:22px;margin-left:-9px;border-radius:50%;background:radial-gradient(#fffe,#fff0 70%);animation:stm2 1.3s ease-out infinite;pointer-events:none}.ps .stm.b{margin-left:-2px;animation-delay:.6s;width:14px}",
+    "@keyframes stm2{0%{transform:translateY(10px) scale(.5);opacity:0}30%{opacity:var(--so,.9)}100%{transform:translateY(-14px) scale(1.4);opacity:0}}",
+    ".ps .ht{position:absolute;left:8px;right:8px;bottom:0;height:4px;border-radius:3px;background:#0003;overflow:hidden}.ps .ht i{display:block;height:100%}",
+    ".ps .hi{position:absolute;right:2px;top:0;font-size:11px}",
+    ".ps.sel{background:#FFD23F55;box-shadow:0 0 0 3px #FFD23F}",
+    ".ps.cold .bp{filter:saturate(.6) hue-rotate(10deg) brightness(.9);box-shadow:0 0 0 2px #8fd0ff,0 3px 5px #0007}",
+    ".ps:empty:after{content:'';position:absolute;left:50%;top:6px;width:32px;height:32px;margin-left:-16px;border-radius:50%;border:2px dashed #8a9199}",
+    ".rail{display:flex;gap:4px;overflow-x:auto;padding:8px 5px 3px;margin:0;min-height:60px;max-height:86px;align-items:flex-start;background:linear-gradient(180deg,#8e959d,#c8ccd1);border-top:2px solid #6e757d;scrollbar-width:none;-webkit-overflow-scrolling:touch}.rail::-webkit-scrollbar{display:none}",
+    ".rail .none{color:#2a2f36;font:700 11.5px var(--body);padding:14px 6px}",
+    ".tk{flex:none;width:104px;background:#fffdf7;border:2px solid #3fbf6f;border-radius:4px 4px 10px 10px;padding:4px 5px 5px;box-shadow:0 3px 6px #0003;position:relative}",
+    ".tk:before{content:'';position:absolute;left:44%;top:-7px;width:12px;height:6px;border-radius:2px;background:#5b6168}",
     ".tk.warn{border-color:#f0b429}.tk.bad{border-color:#e0473a;animation:wob2 .5s infinite}@keyframes wob2{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}",
-    ".tk .h{display:flex;align-items:center;gap:4px}.tk .h img{width:22px;height:22px;border-radius:50%;object-fit:cover;flex:none;border:2px solid #F2C14E}",
-    ".tk .h b{font:800 9.5px/1.1 var(--body);color:#3B1F5C}.tk .t{position:absolute;right:4px;top:-8px;background:#3B1F5C;color:#fff;font:900 9px var(--body);border-radius:99px;padding:1px 6px}",
-    ".tk .its{display:flex;flex-wrap:wrap;gap:1px;margin-top:2px}.tk .its img{width:17px;height:17px;object-fit:contain}",
-    ".tk .mods{display:flex;flex-wrap:wrap;gap:2px;margin-top:1px}.tk .mods span{font:900 8px var(--body);border-radius:5px;padding:1px 3px}.tk .mods .ad{background:#3fbf6f22;color:#1d7a44}.tk .mods .no{background:#e0473a22;color:#b8322a}",
+    ".tk .h{display:flex;align-items:center;gap:4px}.tk .h img{width:22px;height:22px;border-radius:50%;object-fit:cover;flex:none;border:2px solid #111}",
+    ".tk .h b{font:800 9px/1.1 var(--body);color:#3B1F5C;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.tk .t{position:absolute;right:4px;top:-8px;background:#3B1F5C;color:#fff;font:900 9px var(--body);border-radius:99px;padding:1px 6px}",
+    ".tk .its{display:flex;flex-wrap:nowrap;gap:1px;margin-top:2px;overflow:hidden}.tk .its img{width:15px;height:15px;flex:none;object-fit:contain}.tk .its img.crisp{filter:sepia(.4) brightness(.8)}",
+    ".tk .mods{display:flex;flex-wrap:nowrap;overflow:hidden;gap:2px;margin-top:1px}.tk .mods span{font:900 8px var(--body);border-radius:5px;padding:1px 3px}.tk .mods .ad{background:#3fbf6f22;color:#1d7a44}.tk .mods .no{background:#e0473a22;color:#b8322a}",
+    ".tk .prep{margin-top:2px;font:900 7.5px/1.15 var(--body);color:#1a0d00;background:#FFD23F;border-radius:4px;padding:1px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
     ".tk .pr{font-size:10px;position:absolute;left:4px;top:-8px}",
-    // kitchen
-    ".kit{display:grid;grid-template-columns:1fr 1fr;gap:5px}",
-    ".pn{position:relative;background:#2b1a40;border-radius:12px;padding:3px 4px 4px;color:#fff;min-width:0}",
-    ".pn .ph{font:900 9px/11px var(--body);letter-spacing:.08em;color:#F2C14E;text-transform:uppercase;display:flex;justify-content:space-between}",
-    ".pn .lk{position:absolute;inset:0;border-radius:12px;background:#1e1b3ad9;display:grid;place-items:center;font:900 12px var(--body);color:#F2C14E;text-align:center;z-index:3}",
-    ".slots{display:flex;justify-content:center;gap:5px;margin-top:2px}",
-    ".sl{position:relative;width:46px;height:46px;border-radius:50%;border:0;padding:0;cursor:pointer;background:conic-gradient(var(--c,#999) calc(var(--p,0)*1turn),#ffffff22 0);-webkit-tap-highlight-color:transparent;touch-action:manipulation}",
-    ".sl:active{transform:scale(.93)}.sl .in{position:absolute;inset:4px;border-radius:50%;background:#1a1028;display:grid;place-items:center;overflow:visible}",
-    ".sl.fry .in{background:radial-gradient(#c98a1e,#7a4a0c)}.sl.fry .in:after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,#fff6 1.5px,transparent 2px) 0 0/9px 9px;animation:oil .5s linear infinite;opacity:0}.sl.fry.on .in:after{opacity:1}",
-    "@keyframes oil{to{background-position:0 -9px}}",
-    ".sl.iron{border-radius:12px}.sl.iron .in{border-radius:9px;background:repeating-linear-gradient(0deg,#3a3a44 0 6px,#2a2a33 6px 8px),#333}",
-    ".sl.skil .in{background:radial-gradient(#444,#111)}",
-    ".sl img{width:32px;height:32px;object-fit:contain;transition:filter .3s}.sl .lb{position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);font:900 8px var(--body);background:#000a;color:#fff;border-radius:99px;padding:1px 5px;white-space:nowrap;z-index:2}",
-    ".sl .lt{position:absolute;right:2px;top:2px;width:9px;height:9px;border-radius:50%;background:#e0473a;box-shadow:0 0 6px #e0473a;z-index:2}.sl .lt.g{background:#3fe07a;box-shadow:0 0 8px #3fe07a}",
-    ".sl .stm{position:absolute;left:50%;top:-8px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:radial-gradient(#fffd,#fff0 70%);animation:stm 1.4s ease-out infinite;pointer-events:none;z-index:2}",
-    "@keyframes stm{0%{transform:translateY(8px) scale(.5);opacity:0}30%{opacity:.9}100%{transform:translateY(-18px) scale(1.5);opacity:0}}",
-    ".sl .smk{position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(#555c,#5550 70%);animation:stm 1s ease-out infinite;pointer-events:none}",
-    ".drops{display:flex;justify-content:center;gap:3px;margin-top:4px}.drops button{width:35px;height:32px;border-radius:10px;border:1px solid #ffffff33;background:#ffffff14;padding:1px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}",
-    ".drops button img{width:22px;height:22px;object-fit:contain;display:block;margin:0 auto}.drops button span{display:block;font:800 7px/1 var(--body);color:#E8DCF5}.drops button:active{transform:scale(.92)}",
-    ".pot{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:2px}",
-    ".pot .sl{background:conic-gradient(var(--c,#3fbf6f) calc(var(--p,1)*1turn),#ffffff22 0)}.pot .sl .in{background:radial-gradient(#fff8e0,#e8d79a)}",
-    ".pot .st{width:46px;height:46px;border-radius:12px;border:1px solid #ffffff33;background:#ffffff14;color:#fff;font:900 11px/1.1 var(--body);cursor:pointer;touch-action:manipulation}",
-    // pass: plate + warming tray
-    ".pass2{display:grid;grid-template-columns:98px 1fr 82px;gap:5px;margin-top:5px;align-items:stretch}",
-    ".plt{position:relative;width:98px;height:98px;cursor:pointer}.plt .pl{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 8px #0004)}",
-    ".plt .st img{position:absolute;height:auto;object-fit:contain;filter:drop-shadow(0 3px 4px #0004);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}",
-    ".plt .dn{position:absolute;left:0;right:0;bottom:-4px;display:flex;flex-wrap:wrap;justify-content:center;gap:2px;z-index:20}.plt .dn span{font:900 8px var(--body);border-radius:99px;padding:1px 5px;color:#fff;box-shadow:0 1px 3px #0005}",
-    ".plt .cupz{position:absolute;right:-6px;top:-2px;display:flex;flex-direction:column;gap:2px;z-index:15}.plt .cupz img{width:22px;height:auto;max-height:44px;object-fit:contain}",
-    ".tray{background:linear-gradient(180deg,#9aa0a8,#6d737c);border-radius:12px;padding:5px;box-shadow:inset 0 2px 0 #fff5}",
-    ".tray .ph{font:900 9px var(--body);letter-spacing:.08em;color:#fff;text-transform:uppercase;display:flex;justify-content:space-between}",
-    ".tray .ts{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:2px}",
-    ".ti{position:relative;height:38px;border-radius:9px;border:0;background:#ffffff33;padding:0;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}",
-    ".ti img{width:30px;height:30px;object-fit:contain;display:block;margin:1px auto 0}.ti .fr{position:absolute;left:3px;right:3px;bottom:2px;height:3px;border-radius:2px;background:#0003;overflow:hidden}.ti .fr i{display:block;height:100%;background:#3fbf6f}",
-    ".ti .dl{position:absolute;right:1px;top:1px;width:9px;height:9px;border-radius:50%;border:1px solid #fff}.ti:empty{background:#ffffff1a}.ti.cold{animation:wob2 .4s infinite}",
-    ".bins2{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin-top:5px}",
-    ".bins2 button{position:relative;background:#fff;border:2px solid #e6d6ae;border-radius:10px;padding:2px 1px 3px;cursor:pointer;display:flex;flex-direction:column;align-items:center;font:800 7.5px/1.05 var(--body);color:var(--purple);text-align:center;min-height:42px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;overflow:hidden}",
-    ".bins2 button img{width:26px;height:26px;object-fit:contain;pointer-events:none}.bins2 button.on{border-color:var(--gold);background:#fff4d2}.bins2 button:active{transform:scale(.92)}",
-    ".acts2{display:grid;grid-template-rows:1fr auto;gap:5px}.acts2 button{border:0;border-radius:14px;padding:6px 4px;font:900 15px/1.1 var(--body);cursor:pointer;touch-action:manipulation}.acts2 .tr{font-size:11px}",
-    ".acts2 .tr{background:#fff;color:var(--purple);border:2px solid #e6d6ae}.acts2 .sv2{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a1e36;box-shadow:0 5px 0 #a27512}.acts2 .sv2:active{transform:translateY(3px);box-shadow:0 2px 0 #a27512}",
-    ".fl2{position:absolute;left:0;right:0;top:60px;display:grid;place-items:center;font:900 20px var(--body);color:#fff;text-shadow:0 2px 10px #000c;pointer-events:none;opacity:0;text-align:center;z-index:11}.fl2.on{animation:fl 1.1s ease-out}",
-    ".pop2{position:absolute;font:900 14px var(--body);color:#f2c14e;text-shadow:0 2px 6px #000b;pointer-events:none;animation:up 1.2s ease-out forwards;z-index:15;white-space:nowrap}",
+    ".line{background:repeating-linear-gradient(0deg,#0000 0 21px,#9aa0a733 21px 22px),repeating-linear-gradient(90deg,#d8dbde 0 21px,#9aa0a733 21px 22px);padding:5px 6px 6px}",
+    ".bld{display:grid;grid-template-columns:66px minmax(0,1fr) 92px;gap:6px;align-items:center}",
+    ".plt{position:relative;width:66px;height:66px;cursor:pointer;border-radius:50%;background:radial-gradient(circle at 40% 35%,#3c3c3c,#101010 68%,#000 71%,#0000 72%)}",
+    ".plt .st img{position:absolute;height:auto;object-fit:contain;filter:drop-shadow(0 3px 4px #0006);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}",
+    ".plt .cupz{position:absolute;right:-8px;top:-4px;display:flex;flex-direction:column;gap:2px;z-index:15}.plt .cupz img{width:20px;height:auto;max-height:40px;object-fit:contain}",
+    ".bld .nm{font:800 10px/1.2 var(--body);color:#2a2f36}.bld .nm b{display:block;font-size:11.5px;color:#3B1F5C}",
+    ".bld .acts{display:grid;gap:4px}.bld .acts button{border:0;border-radius:12px;padding:5px 4px;font:900 13px/1.1 var(--body);cursor:pointer;touch-action:manipulation;min-height:30px}",
+    ".bld .sv2{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a1e36;box-shadow:0 4px 0 #a27512;min-height:38px!important;font-size:14px!important}.bld .sv2:active{transform:translateY(3px);box-shadow:0 1px 0 #a27512}",
+    ".bld .ud{display:grid;grid-template-columns:1fr 1fr;gap:4px}.bld .ud button{background:#fff;color:#3B1F5C;border:2px solid #c3c8ce;font-size:10px!important;padding:4px 2px!important;min-width:0}",
+    ".grid{margin-top:4px}.grow{display:flex;gap:3px;align-items:center;margin-top:3px}.grow>span{flex:none;width:16px;font-size:13px;text-align:center;line-height:1}",
+    ".grow .cells{flex:1;display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;min-width:0}.grow .cells::-webkit-scrollbar{display:none}",
+    ".grow .cells>button{flex:0 0 calc((100% - 21px)/8)}",
+    ".grow button{position:relative;background:#fff;border:2px solid #c3c8ce;border-radius:10px;padding:1px 1px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;font:800 7px/1.05 var(--body);color:#3B1F5C;text-align:center;height:42px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;overflow:hidden}",
+    ".grow button span.l{display:block;margin-top:-1px;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.grow button img{width:25px;height:24px;flex:none;object-fit:contain;pointer-events:none}.grow button img.crisp{filter:sepia(.4) brightness(.8)}.grow button.on{border-color:var(--gold);background:#fff4d2}.grow button:active{transform:scale(.92)}",
+    ".grow button.pv{border-color:#FFD23F;background:#fffbe6}.grow button .nw{position:absolute;right:1px;top:1px;background:#e3262f;color:#fff;font:900 6.5px/1 var(--body);border-radius:4px;padding:2px 3px}",
+    ".fl2{position:absolute;left:0;right:0;top:70px;display:grid;place-items:center;font:900 19px var(--body);color:#fff;text-shadow:0 2px 10px #000c;pointer-events:none;opacity:0;text-align:center;z-index:11;padding:0 8px}.fl2.on{animation:fl 1.1s ease-out}",
+    ".pop2{position:absolute;font:900 13px var(--body);color:#f2c14e;text-shadow:0 2px 6px #000b;pointer-events:none;animation:up 1.4s ease-out forwards;z-index:15;white-space:nowrap}",
     ".startov2{position:absolute;inset:0;background:#2b1a40e6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#fff;cursor:pointer;text-align:center;z-index:30;padding:20px}",
     ".startov2 b{font:900 italic 40px var(--serif);color:var(--gold2)}.startov2 span{font:800 18px var(--body)}.startov2.off{display:none}",
+    // cooking stations (L4+ adult / L5 kid)
+    ".stn{display:none;gap:3px;margin-top:4px;padding:3px;border-radius:12px;background:linear-gradient(180deg,#4b4f55,#2e3136);box-shadow:inset 0 1px 0 #ffffff33}.stn.on{display:flex;flex-wrap:nowrap;justify-content:center}",
+    ".stn .sg{position:relative;display:flex;align-items:center;gap:3px;padding:11px 3px 4px;border-radius:9px;background:#00000033}",
+    ".stn .sg>b{position:absolute;left:4px;top:1px;font:900 7.5px var(--body);letter-spacing:.08em;color:#F2C14E;text-transform:uppercase;white-space:nowrap}",
+    ".stn .sg.tut{box-shadow:0 0 0 3px #FFD23F;animation:aim 1s ease-in-out infinite}",
+    ".sl{position:relative;width:38px;height:38px;border-radius:50%;border:0;padding:0;cursor:pointer;background:conic-gradient(var(--c,#999) calc(var(--p,0)*1turn),#ffffff22 0);-webkit-tap-highlight-color:transparent;touch-action:manipulation}",
+    ".sl:active{transform:scale(.93)}.sl .in{position:absolute;inset:4px;border-radius:50%;background:#1a1028;display:grid;place-items:center;overflow:visible}",
+    ".sl.fry .in{background:radial-gradient(#c98a1e,#7a4a0c)}.sl.fry .in:after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,#fff6 1.5px,transparent 2px) 0 0/8px 8px;animation:oil .5s linear infinite;opacity:0}.sl.fry.on .in:after{opacity:1}",
+    "@keyframes oil{to{background-position:0 -8px}}",
+    ".sl.iron{border-radius:10px}.sl.iron .in{border-radius:8px;background:repeating-linear-gradient(0deg,#3a3a44 0 5px,#2a2a33 5px 7px),#333}",
+    ".sl.skil .in{background:radial-gradient(#444,#111)}",
+    ".sl img{width:24px;height:24px;object-fit:contain}.sl .lb{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);font:900 7px var(--body);background:#000b;color:#fff;border-radius:99px;padding:1px 4px;white-space:nowrap;z-index:2}",
+    ".sl .lt{position:absolute;right:1px;top:1px;width:8px;height:8px;border-radius:50%;background:#e0473a;box-shadow:0 0 6px #e0473a;z-index:2}.sl .lt.g{background:#3fe07a;box-shadow:0 0 8px #3fe07a}",
+    ".sl .stm{position:absolute;left:50%;top:-8px;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:radial-gradient(#fffd,#fff0 70%);animation:stm2 1.4s ease-out infinite;pointer-events:none;z-index:2}",
+    ".sl .smk{position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(#555c,#5550 70%);animation:stm2 1s ease-out infinite;pointer-events:none}",
+    ".grow button .ck{position:absolute;left:1px;top:1px;font-size:9px;line-height:1}",
+    ".plt .dn{position:absolute;left:-6px;right:-6px;bottom:-6px;display:flex;flex-wrap:wrap;justify-content:center;gap:2px;z-index:20}.plt .dn span{font:900 7.5px var(--body);border-radius:99px;padding:1px 4px;color:#fff;box-shadow:0 1px 3px #0005}",
+    ".shortp{display:none;position:absolute;left:50%;top:1px;transform:translateX(-50%);z-index:9;font:900 9px/1 var(--body);color:#1E1B3A;background:#F2C14E;border-radius:99px;padding:2px 8px;white-space:nowrap;box-shadow:0 2px 6px #0006;pointer-events:none}",
+    ".cut{position:absolute;inset:0;z-index:22;display:none;background:#0b1020aa}.cut.on{display:block}",
+    ".cut .jj{position:absolute;left:8px;bottom:4px;width:62px;height:104px}.cut .bb{position:absolute;left:72px;top:14px;right:10px;background:#fff;color:#3B1F5C;border-radius:14px 14px 14px 4px;padding:8px 10px;font:900 13px/1.25 var(--body);box-shadow:0 6px 16px #0007}",
+    ".cut .ck2{position:absolute;bottom:8px;width:30px;height:48px;transition:transform 2.4s linear}.cut .ck2 .sv{width:100%;height:100%;animation:bob .3s ease-in-out infinite alternate}",
+    ".cut .ck2 i{position:absolute;left:-14px;top:-14px;font-style:normal;font-size:16px}",
+    ".cut .hatc{position:absolute;left:8px;top:-9px;width:14px;height:10px;border-radius:6px 6px 2px 2px;background:#fff;box-shadow:0 0 0 1px #ccc}",
+    // "How to cook 🍳" screens (before the first fryer level and before L5's irons + skillet); game paused until 👍
+    ".howc{position:absolute;inset:0;z-index:45;display:none;overflow-y:auto;background:linear-gradient(180deg,#1E1B3A,#3B1F5C);color:#fff;padding:10px 12px 14px}.howc.on{display:block}",
+    ".howc h3{margin:0 0 2px;font:900 21px/1.1 var(--serif);color:#F2C14E}.howc .sub{margin:0 0 8px;color:#E8DCF5;font-size:13px}",
+    ".howc ol{list-style:none;margin:0;padding:0}.howc li{display:flex;gap:8px;align-items:center;background:#ffffff12;border:1px solid #ffffff22;border-radius:12px;padding:5px 8px;margin:5px 0;font:700 12.5px/1.25 var(--body)}",
+    ".howc li .ill{flex:none;width:58px;height:46px;display:flex;align-items:center;justify-content:center;gap:2px}.howc li .n{flex:none;width:20px;height:20px;border-radius:50%;background:#F2C14E;color:#1E1B3A;font:900 12px/20px var(--body);text-align:center}",
+    ".howc .mini{position:relative;width:38px;height:38px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*1turn),#ffffff22 0)}.howc .mini span{position:absolute;inset:4px;border-radius:50%;background:radial-gradient(#c98a1e,#7a4a0c);display:grid;place-items:center}.howc .mini img{width:24px;height:24px;object-fit:contain}",
+    ".howc .mini.iron,.howc .mini.iron span{border-radius:9px}.howc .mini.iron span{background:#2a2a33}.howc .mini.skil span{background:radial-gradient(#444,#111)}",
+    ".howc .leg{margin:10px 0 4px;height:14px;border-radius:8px;background:linear-gradient(90deg,#9aa0a8 0 22%,#f3d58a 22% 36%,#f2b84a 36% 46%,#3fbf6f 46% 60%,#b5651d 60% 80%,#3a2a20 80%)}",
+    ".howc .legl{display:flex;justify-content:space-between;font:800 10px var(--body);color:#E8DCF5}",
+    ".howc .warn{margin:10px 0 0;font:800 13px var(--body);color:#FFD23F;text-align:center}",
+    ".howc .ok{display:block;width:100%;margin-top:8px;position:sticky;bottom:0;border:0;border-radius:16px;padding:15px;font:900 18px var(--body);color:#1E1B3A;background:linear-gradient(180deg,var(--gold2),var(--gold));box-shadow:0 5px 0 #a27512;cursor:pointer}",
+    ".pcard{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:#0b1020cc;padding:16px}.pcard.on{display:flex}",
+    ".pcard .c{width:100%;max-width:300px;background:#0f1a3d;border:4px solid #1d4ed8;border-radius:16px;padding:12px;color:#fff;text-align:center;box-shadow:0 18px 40px #000a}",
+    ".pcard img{width:100%;border-radius:8px;display:block}.pcard h4{margin:8px 0 2px;font:900 20px var(--body);color:#FFD23F}.pcard p{margin:0 0 10px;font:700 13px var(--body);color:#dbe6ff}",
+    ".pcard a,.pcard button{display:block;width:100%;margin-top:6px;border:0;border-radius:12px;padding:12px;font:900 15px var(--body);text-decoration:none;cursor:pointer}",
+    ".pcard a{background:#e3262f;color:#fff}.pcard button{background:#fff;color:#0f1a3d}",
     ".brk{display:grid;grid-template-columns:1fr auto;gap:2px 12px;max-width:290px;margin:8px auto 4px;font:700 13.5px var(--body);color:#E8DCF5;text-align:left}.brk b{color:#F2C14E;text-align:right}.brk .neg{color:#ff8a7a}",
     "html.th-halloween .mark{box-shadow:0 0 0 6px var(--cream),0 0 0 7px #e0782a,0 18px 40px #6a2c9a33}html.th-christmas .mark{box-shadow:0 0 0 6px var(--cream),0 0 0 7px #2f8f4e,0 18px 40px #b8322a33}",
     ".thb{display:inline-block;margin:8px 0 0!important;font:800 13px var(--body);color:#2A1E36!important;background:#fff;border:1px dashed var(--gold);border-radius:999px;padding:5px 12px}",
-    "@media (prefers-reduced-motion:reduce){.fxl,.lights{display:none}.srv .sv,.srv.j .jw,.tb .gq .im,.dance .jw{animation:none!important}}"
+    "@media (prefers-reduced-motion:reduce){.fxl,.lights{display:none}.srv .sv,.jfl .jw,.tb .gq .im,.dance .jw,.ps .stm,.din.aim .tb.wait{animation:none!important}.din .door2 .gls{transition:none}}"
   ].join("");
   var stEl = D.createElement("style"); stEl.textContent = css; D.head.appendChild(stEl);
 
-  /* ================= DOM ================= */
-  var TABLES = [{ id: 1, cap: 2, x: 0.17, y: 0.36 }, { id: 2, cap: 4, x: 0.5, y: 0.34 }, { id: 3, cap: 2, x: 0.84, y: 0.36 }, { id: 4, cap: 4, x: 0.27, y: 0.8 }, { id: 5, cap: 2, x: 0.79, y: 0.8 }];
+  /* ================= SCENE ================= */
+  // the geometric mural (inline SVG, drawn once): squares with half-circles in mustard / slate / navy / gold foil
+  function muralSVG() {
+    var C = { m: "#e3b23c", s: "#6c706b", n: "#3e5a8f", g: "url(#gf)" }, bg = ["#f3efe6", "#d6d8d6", "#e9e5dc"], sq = 32, cols = 12, rows = 2, h = "";
+    var pat = "gsnmgsnmmgsngnsmgmsnmgns";   // fixed, so the wall looks the same every visit
+    for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+      var x = c * sq, y = r * sq, k = pat[(r * cols + c) % pat.length], up = (r + c) % 2 === 0;
+      h += '<rect x="' + x + '" y="' + y + '" width="' + sq + '" height="' + sq + '" fill="' + bg[(r * 5 + c) % 3] + '"/>';
+      h += up ? '<path d="M' + x + ' ' + y + ' h' + sq + ' v' + (sq * 0.35) + ' a' + sq / 2 + ' ' + sq * 0.65 + ' 0 0 1 -' + sq + ' 0z" fill="' + C[k] + '"/>'
+        : '<path d="M' + x + ' ' + (y + sq) + ' h' + sq + ' v-' + (sq * 0.35) + ' a' + sq / 2 + ' ' + sq * 0.65 + ' 0 0 0 -' + sq + ' 0z" fill="' + C[k] + '"/>';
+    }
+    var streaks = ""; for (var i = 0; i < 16; i++) streaks += '<rect x="' + (i * 2.5) + '" y="0" width="' + (0.6 + (i * 7) % 3 * 0.5) + '" height="40" fill="' + (i % 3 ? "#f1d98f" : "#9c7a33") + '" opacity="' + (0.35 + (i * 13) % 5 * 0.1) + '"/>';
+    return '<svg class="mural" viewBox="0 0 384 64" preserveAspectRatio="xMinYMid slice" aria-hidden="true"><defs><pattern id="gf" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#c9a44c"/>' + streaks + '</pattern></defs>' + h + '</svg>';
+  }
+  var TABLES = [
+    { id: 1, cap: 2, x: 0.29, y: 0.68, row: 1 }, { id: 2, cap: 4, x: 0.5, y: 0.68, row: 1 }, { id: 3, cap: 2, x: 0.74, y: 0.68, row: 1 },
+    { id: 4, cap: 4, x: 0.32, y: 0.985, row: 2 }, { id: 5, cap: 2, x: 0.66, y: 0.985, row: 2 }
+  ];
   var ou = $("ou"); ou.className = "ou2" + (TH_ID ? " th-" + TH_ID : "");
-  ou.innerHTML = '<div class="din" id="din"><div class="door"></div><div class="passw">PASS</div>' +
+  var REVIEW = W.REVIEW_EGG || {}, RVURL = (W.ReviewEgg && W.ReviewEgg.url) || (REVIEW.vid ? "https://www.youtube.com/watch?v=" + REVIEW.vid : "https://www.youtube.com/@therealantidote");
+  ou.innerHTML = '<div class="din" id="din"><div class="floor"></div>' + muralSVG() + '<div class="wl"></div><div class="ceil"></div><div class="soffit"></div>' +
+    [0.12, 0.34, 0.56, 0.78].map(function (x) { return '<i class="can" style="left:' + x * 100 + '%"></i>'; }).join("") +
+    '<div class="banq"></div>' +
+    '<div class="bar"><span class="sh" style="top:8px"></span><span class="gl"></span><span class="sh" style="top:56px"></span><span class="dome"><i></i></span><span class="cnt"></span></div>' +
+    '<div class="door2" id="door"><b>GRITZ N WAFFLEZ</b><span class="gls"></span></div>' +
+    '<div class="wm">Gritz <i>N</i> Wafflez</div>' +
+    '<div class="mb"><b>TODAY</b>Peach Cobbler Waffle · GNW Karaoke Wed 6–10</div>' +
+    '<button type="button" class="poster" id="poster" aria-label="Antidote\'s food review: watch on YouTube"><img src="' + esc(REVIEW.img || "img/review/cover.webp") + '" alt=""><i class="pl"></i><b>@therealantidote</b><small>watch my review</small></button>' +
     (TH.fx ? '<div class="fxl ' + TH.kind + '">' + TH.fx.concat(TH.fx).map(function (f, i) {
-      var s = TH.kind === "float" ? "top:" + (8 + (i * 23) % 70) + "%;left:-20px;animation-duration:" + (14 + (i * 5) % 9) + "s;animation-delay:-" + (i * 2.7) + "s;font-size:" + (14 + (i * 3) % 8) + "px"
-        : TH.kind === "burst" ? "top:" + (6 + (i * 29) % 40) + "%;left:" + (8 + (i * 37) % 84) + "%;animation-duration:2.4s;animation-delay:-" + (i * 0.6) + "s;font-size:22px"
-          : "left:" + ((i * 41) % 100) + "%;top:-20px;animation-duration:" + (7 + (i * 3) % 6) + "s;animation-delay:-" + (i * 1.3) + "s;font-size:" + (10 + (i * 3) % 8) + "px";
+      var s = TH.kind === "float" ? "top:" + (8 + (i * 23) % 70) + "%;left:-20px;animation-duration:" + (14 + (i * 5) % 9) + "s;animation-delay:-" + (i * 2.7) + "s;font-size:" + (12 + (i * 3) % 7) + "px"
+        : TH.kind === "burst" ? "top:" + (6 + (i * 29) % 40) + "%;left:" + (8 + (i * 37) % 84) + "%;animation-duration:2.4s;animation-delay:-" + (i * 0.6) + "s;font-size:20px"
+          : "left:" + ((i * 41) % 100) + "%;top:-20px;animation-duration:" + (7 + (i * 3) % 6) + "s;animation-delay:-" + (i * 1.3) + "s;font-size:" + (9 + (i * 3) % 7) + "px";
       return '<i style="' + s + '">' + f + "</i>"; }).join("") + "</div>" : "") +
     (TH.lights ? '<div class="lights"></div>' : "") + (TH.decor ? '<div class="decor">' + TH.decor.join("") + "</div>" : "") +
-    TABLES.map(function (t) { return '<div class="tb c' + t.cap + '" id="tb' + t.id + '" style="left:' + t.x * 100 + '%;top:' + t.y * 100 + '%;--w:' + (t.cap === 4 ? 120 : 64) + 'px"><div class="gs"></div><div class="tt"></div><div class="pb"><i></i></div><div class="dirt">🍽️</div><span class="tn">' + t.id + '</span><div class="flash"></div></div>'; }).join("") +
-    '<div class="jpop" id="jpop"></div><div class="lvb" id="lvb"><h3></h3><p></p></div></div>' +
+    TABLES.map(function (t) { return '<div class="tb c' + t.cap + ' r' + t.row + '" id="tb' + t.id + '" data-tb="' + t.id + '" style="left:' + t.x * 100 + '%;top:' + t.y * 100 + '%;--w:' + (t.cap === 4 ? 112 : 60) + 'px" role="button" aria-label="Table ' + t.id + '"><div class="gs"></div><div class="tt"></div><div class="pb"><i></i></div><div class="dirt">🍽️</div><span class="tn">' + t.id + '</span><div class="flash"></div></div>'; }).join("") +
+    '<div class="jfl" id="jfl"></div><div class="lvb" id="lvb"><h3></h3><p></p></div><div class="cut" id="cut"></div><div class="shortp" id="shortp">🔥 Kitchen\'s short-staffed</div></div>' + '<div class="howc" id="howc" role="dialog" aria-label="How to cook"></div>' +
+    '<div class="pass" id="pass"><span class="lbl">PASS</span></div>' +
     '<div class="rail" id="rail"></div>' +
-    '<div class="kit">' +
-    '<div class="pn" id="pfry"><div class="ph"><span>🍗 Fryer</span><span id="fryh"></span></div><div class="slots" id="fry"></div><div class="drops" id="fryd"></div></div>' +
-    '<div class="pn" id="piron"><div class="ph"><span>🧇 Waffle irons</span></div><div class="slots" id="iron"></div><div class="drops" style="font:700 9px/1.2 var(--body);color:#E8DCF5;align-items:center;height:32px;text-align:center">Tap to pour · open on 🟢</div></div>' +
-    '<div class="pn" id="pskil"><div class="ph"><span>🍳 Skillet</span></div><div class="slots" id="skil"></div><div class="drops" id="skild"></div></div>' +
-    '<div class="pn" id="ppot"><div class="ph"><span>🥣 Gritz pot</span></div><div class="pot"><button type="button" class="sl" id="scoop" aria-label="Scoop gritz"><span class="in"><img src="' + GI + 'grits.webp" alt=""></span><span class="lb">Scoop</span></button><button type="button" class="st" id="stir">🥄<br>Stir</button></div></div>' +
-    '</div>' +
-    '<div class="pass2"><div class="plt" id="plate" title="Tap an item on the plate to take it off"><img class="pl" src="' + GI + 'plate.webp" alt=""><div class="st" id="stack"></div><div class="cupz" id="cupz"></div><div class="dn" id="dn"></div></div>' +
-    '<div class="tray"><div class="ph"><span>🔥 Warming tray</span><span id="trh"></span></div><div class="ts" id="tray"></div></div>' +
-    '<div class="acts2"><button type="button" class="sv2" id="serve">🛎️<br>Serve it</button><button type="button" class="tr" id="trash">🗑️ Clear plate</button></div></div>' +
-    '<div class="bins2" id="bins"></div>' +
+    '<div class="line"><div class="bld"><div class="plt" id="plate" title="Tap an item on the plate to take it off"><div class="st" id="stack"></div><div class="cupz" id="cupz"></div><div class="dn" id="dn"></div></div>' +
+    '<div class="nm" id="pname"></div><div class="acts"><button type="button" class="sv2" id="serve">🛎️ Serve</button><div class="ud"><button type="button" id="undo">↩️ Undo</button><button type="button" id="trash">🗑️ Clear</button></div></div></div>' +
+    '<div class="stn" id="stn"></div><div class="grid" id="grid"></div></div>' +
     '<div class="fl2" id="oflash"></div>' +
-    '<div class="startov2" id="startov"><b>Order Up!</b><span>Tap to open the kitchen</span><small>90-second levels · cook it right · serve every table</small></div>';
+    '<div class="pcard" id="pcard" role="dialog" aria-label="Antidote\'s review"><div class="c"><img src="' + esc(REVIEW.img || "img/review/cover.webp") + '" alt="Antidote\'s Gritz N Wafflez review"><h4>@therealantidote</h4><p>My Gritz N Wafflez food review</p><a href="' + esc(RVURL) + '" target="_blank" rel="noopener">▶ Watch on YouTube</a><button type="button" id="pback">Back to the game</button></div></div>' +
+    '<div class="startov2" id="startov"><b>Order Up!</b><span>Tap to open the kitchen</span><small>Build it · serve it hot · deliver it fast</small></div>';
   if (TH.banner) { var wo = D.querySelector(".hero .wo"); if (wo) { var bn = D.createElement("p"); bn.className = "thb"; bn.textContent = TH.banner; wo.parentNode.insertBefore(bn, wo.nextSibling); } D.documentElement.classList.add("th-" + TH_ID); }
   var din = $("din");
+  function dsz() { return { w: din.clientWidth || 322, h: din.clientHeight || 196 }; }
 
   /* ================= STATE ================= */
-  var og = { running: false, sim: false, tables: [], level: 1, bk: {} };
-  function newBk() { return { orders: 0, speed: 0, quality: 0, tips: 0, streak: 0, group: 0, level: 0, bonus: 0, penalty: 0 }; }
-  function addPts(cat, n) { og.bk[cat] = (og.bk[cat] || 0) + n; og.score = Math.max(0, og.score + n); }
+  var og = { running: false, sim: false, tables: [], level: 1, bk: {}, pass: [], plate: [], trips: [], timers: [], now: 0 };
+  function newBk() { return { speed: 0, heat: 0, quality: 0, orders: 0, accuracy: 0, money: 0, tips: 0, streak: 0, group: 0, level: 0, bonus: 0, penalty: 0 }; }
+  function addPts(cat, n) { if (og.demo) return; og.bk[cat] = (og.bk[cat] || 0) + n; og.score = Math.max(0, og.score + n); }
   function later(ms, fn) { og.timers.push({ at: og.now + ms, fn: fn }); }
-
   function resetLevelState() {
-    var u = U(og.level); og.pace = lvParams(og.level);
-    og.fry = []; for (var i = 0; i < u.baskets; i++) og.fry.push(null);
-    og.iron = []; for (i = 0; i < u.irons; i++) og.iron.push(null);
-    og.skil = [null, null]; og.pot = { stir: 1 };
-    og.tray = []; og.plate = [];
+    og.pace = lvParams(og.level);
+    var prev = og.level > 1 ? unlocked(og.level - 1) : [];
+    og.fresh = unlocked(og.level).filter(function (k) { return prev.indexOf(k) < 0 && og.level > 1; });   // NEW badges
+    og.pass = []; og.sel = -1; og.plate = []; og.clean = true; og.pq = {}; initStations();
     og.tables = TABLES.map(function (t) { return { def: t, id: t.id, cap: t.cap, state: "free", guests: [] }; });
-    og.trips.forEach(function (tr) { tr.el.remove(); }); og.trips = [];
+    og.trips.forEach(function (tr) { if (tr.el !== J.el) tr.el.remove(); }); og.trips = [];
     og.lt = LEVEL_MS; og.walk = 0; og.nextArr = 1500; og.timers = []; og.popAt = -99999; og.warned = {};
-    TABLES.forEach(function (t) { var el = $("tb" + t.id); el.className = "tb c" + t.cap; el.querySelector(".gs").innerHTML = ""; el.querySelector(".tt").innerHTML = ""; });
-    buildStations(); drawTray(); drawPlate(); drawRail(); hud();
+    TABLES.forEach(function (t) { var el = $("tb" + t.id); el.className = "tb c" + t.cap + " r" + t.row; el.querySelector(".gs").innerHTML = ""; el.querySelector(".tt").innerHTML = ""; });
+    jReset(); buildGrid(); drawPass(); drawPlate(); drawRail(); hud();
   }
   function start() {
-    og = { running: true, sim: og.sim, level: 1, score: 0, now: 0, streak: 0, best: 0, served: 0, tipsUsd: 0, perfect: 0, burnt: 0, walkTotal: 0, trips: [], timers: [], tables: [], bk: newBk(), run: 0, tvT: 0 };
+    var demo = !!og.demoNext;
+    og = { running: true, sim: og.sim, demo: demo, level: demo ? 2 : 1, score: 0, usd: 0, now: 0, streak: 0, best: 0, served: 0, tipsUsd: 0, perfect: 0, hotDeliv: 0, walkTotal: 0, trips: [], timers: [], tables: [], pass: [], plate: [], bk: newBk(), tvT: 0 };
     resetLevelState();
-    $("startov").classList.add("off"); $("over").classList.remove("on"); tvOff(true);
-    if (W.ReviewEgg) W.ReviewEgg.reset(20, 40);
-    flash("Level 1 · 90 seconds", "#F2C14E"); startMusic(); hud();
+    $("startov").classList.add("off"); $("over").classList.remove("on"); tvOff(true); closePoster(true);
+    if (!demo) { if (W.ReviewEgg) W.ReviewEgg.reset(20, 40); if (W.Halftime) W.Halftime.reset(); flash("Level 1 · 90 seconds", "#F2C14E"); startMusic(); }
+    hud();
   }
 
-  /* ================= STATIONS ================= */
+  /* ================= FOOD GRID + PLATE (stage 1) ================= */
+  function tileHTML(k) {
+    var it = ITEMS[k], nw = (og.fresh || []).indexOf(k) >= 0, ck = cookAt(k);
+    return '<button type="button" data-k="' + k + '"' + (it.prep ? ' class="pv" title="' + esc(it.prep) + '"' : "") + '><img src="' + it.img + '" alt=""' + (it.fx === "crisp" ? ' class="crisp"' : "") + ">" + '<span class="l">' + esc(T(it.n)) + "</span>" + (nw ? '<i class="nw">NEW</i>' : "") + (ck ? '<i class="ck">' + STN[ck].ic + "</i>" : "") + "</button>";
+  }
+  function buildGrid() {
+    var ks = unlocked(og.level || 1);
+    $("grid").innerHTML = ROWS.map(function (r) {
+      var row = ks.filter(function (k) { return ITEMS[k].row === r[0]; });
+      return row.length ? '<div class="grow"><span title="' + esc(T(r[1])) + '" aria-label="' + esc(T(r[1])) + '">' + r[2] + '</span><div class="cells">' + row.map(tileHTML).join("") + "</div></div>" : "";
+    }).join("");
+    drawPlate();
+  }
+  function tap(k) {
+    if (!og.running || og.pause || og.hold || !ITEMS[k]) return false;
+    tutDone();
+    var i = og.plate.indexOf(k);
+    if (i >= 0) { og.plate.splice(i, 1); delete og.pq[k]; og.clean = false; drawPlate(); buzz(8); return true; }   // tap again = take it off
+    if (cookAt(k)) return drop(k);   // L4+: this one has to be cooked first
+    if (og.plate.length >= 6) { flash("Plate's full!"); return false; }
+    og.plate.push(k); sfx("pop"); buzz(10);
+    var nb = $("grid").querySelector('[data-k="' + k + '"] .nw'); if (nb) { nb.remove(); og.fresh = og.fresh.filter(function (x) { return x !== k; }); }
+    drawPlate(k); return true;
+  }
+  function undo() { if (!og.running || !og.plate.length) return; var k = og.plate.pop(); delete og.pq[k]; og.clean = false; drawPlate(); buzz(8); }
+  function clearPlate() { if (!og.running) return; if (og.plate.length) og.clean = false; og.plate = []; og.pq = {}; drawPlate(); }
+  function drawPlate(newKey) {
+    var st = $("stack"), cups = $("cupz"); st.innerHTML = ""; cups.innerHTML = "";
+    var keys = og.plate, of = function (kind) { return keys.filter(function (k) { return ITEMS[k].kind === kind; }); }, bases = of("base"), prots = of("protein"), sides = of("side"), tops = of("top");
+    var S = 190, BASE2 = [[12, 62, 96], [96, 40, 96]], PROT = bases.length ? [[70, 30, 90], [20, 62, 82], [60, 78, 78]] : [[46, 40, 100], [16, 72, 84], [84, 82, 80]], SIDE = [[118, 108, 70], [2, 108, 70], [64, 124, 64]];
+    var TOP = { butter: [66, 62, 40], cheese: [52, 46, 80], syrup: [38, 40, 112], berriez: [60, 30, 70], peach: [40, 56, 74], whip: [78, 48, 52] };
+    keys.forEach(function (k) {
+      var it = ITEMS[k], im = D.createElement("img"); im.src = it.img; im.alt = ""; im.dataset.k = k; if (it.fx === "crisp") im.className = "crisp"; if (og.pq[k]) im.style.filter = dfil(og.pq[k].d);
+      if (it.kind === "drink") { cups.appendChild(im); return; }
+      var pos, z = 3;
+      if (it.kind === "base") { pos = bases.length > 1 ? BASE2[Math.min(1, bases.indexOf(k))] : [30, 36, 130]; z = 1; }
+      else if (it.kind === "protein") { pos = PROT[Math.min(2, prots.indexOf(k))]; z = 3 + prots.indexOf(k); }
+      else if (it.kind === "side") { pos = SIDE[Math.min(2, sides.indexOf(k))]; z = 2; }
+      else if (it.kind === "cup") { pos = k === "hot" ? [0, 26, 30] : [142, 30, 46]; z = 10; }
+      else { pos = TOP[k] || [60, 60, 60]; z = k === "syrup" ? 9 : 6 + tops.indexOf(k); }
+      im.style.left = pos[0] / S * 100 + "%"; im.style.top = pos[1] / S * 100 + "%"; im.style.width = pos[2] / S * 100 + "%"; im.style.zIndex = z;
+      if (k === newKey && !RM) { im.style.transform = "translateY(-40px) scale(1.15)"; requestAnimationFrame(function () { requestAnimationFrame(function () { im.style.transform = ""; }); }); }
+      st.appendChild(im);
+    });
+    $("dn").innerHTML = keys.filter(function (k) { return og.pq[k]; }).map(function (k) { return '<span style="background:' + dcol(og.pq[k].d) + '">' + esc(ITEMS[k].n) + " · " + dlab(og.pq[k].d) + "</span>"; }).join("");
+    var m = matchOpen(keys);
+    $("pname").innerHTML = keys.length ? (m ? "<b>" + esc(T(m.g.order.dish.n)) + "</b>for table " + m.tb.id + (og.clean ? " ✨" : "") : "<b>" + keys.length + " item" + (keys.length > 1 ? "s" : "") + "</b>keep building…") : "<b>Tap food to build</b>then 🛎️ Serve";
+    D.querySelectorAll("#grid button").forEach(function (b) { b.classList.toggle("on", keys.indexOf(b.dataset.k) >= 0); });
+  }
+
+  /* ================= COOKING (L4+ adult: fryer; L5+ adult: + waffle irons + skillet; kid L5+: fryer only) ================= */
+  var STN = { fry: { n: "Fryer", ic: "🍗", cls: "fry" }, iron: { n: "Waffle irons", ic: "🧇", cls: "iron" }, skil: { n: "Skillet", ic: "🍳", cls: "skil" } };
+  var COOK = { chicken: ["fry", 8000], tenderz: ["fry", 6000], catfish: ["fry", 7000], shrimp: ["fry", 4500], waffle: ["iron", 6000],
+    egg: ["skil", 3500], bacon: ["skil", 5000], shrimp_s: ["skil", 4000], egg_sun: ["skil", 3500], bacon_x: ["skil", 6500] };
+  function stationsFor(L) { return MODE === "kid" ? (L >= 5 ? ["fry"] : []) : (L >= 5 ? ["fry", "iron", "skil"] : L >= 4 ? ["fry"] : []); }
+  function cookAt(k) { var c = COOK[k]; return c && og.act && og.act.indexOf(c[0]) >= 0 ? c[0] : ""; }
+  function initStations() {
+    og.act = stationsFor(og.level); og.st = {};
+    og.act.forEach(function (s) { og.st[s] = []; var n = s === "fry" ? (og.level >= 5 && MODE !== "kid" ? 3 : 2) : 2; for (var i = 0; i < n; i++) og.st[s].push(null); });
+    var el = $("stn"); el.classList.toggle("on", og.act.length > 0);
+    el.innerHTML = og.act.map(function (s) { return '<div class="sg" data-sg="' + s + '"><b>' + STN[s].ic + " " + T(STN[s].n) + "</b>" + og.st[s].map(function (x, i) { return '<button type="button" class="sl ' + STN[s].cls + '" data-st="' + s + '" data-i="' + i + '" aria-label="' + STN[s].n + " " + (i + 1) + '"><span class="in"></span></button>'; }).join("") + "</div>"; }).join("");
+    var sh = $("short"); if (sh) sh.hidden = !og.act.length || og.demo; var sp = $("shortp"); if (sp) sp.style.display = og.act.length && !og.demo ? "block" : "none";
+    drawStations(true);
+  }
   function dcol(d) { return d < 0.7 ? "#9aa0a8" : d < 0.88 ? "#f3d58a" : d < 0.96 ? "#f2b84a" : d <= 1.12 ? "#3fbf6f" : d < 1.45 ? "#b5651d" : "#3a2a20"; }
   function dlab(d) { return d < 0.7 ? "raw" : d < 0.88 ? "pale" : d < 0.96 ? "golden" : d <= 1.12 ? "perfect ✨" : d < 1.45 ? "brown" : "burnt"; }
   function dfil(d) {
@@ -461,137 +634,100 @@
     return "brightness(" + Math.max(0.3, 1 - (d - 1.12) * 0.85).toFixed(2) + ") sepia(" + Math.min(0.7, (d - 1.12) * 0.9).toFixed(2) + ")";
   }
   function quality(d) { return clamp(1 - Math.pow(Math.abs(d - 1.04) / 0.55, 1.6), 0, 1); }
-  function perfectD(d) { return d >= 0.96 && d <= 1.12; }
-  function buildStations() {
-    var u = U(og.level);
-    $("fry").innerHTML = og.fry.map(function (x, i) { return '<button type="button" class="sl fry" data-st="fry" data-i="' + i + '" aria-label="Fry basket ' + (i + 1) + '"><span class="in"></span></button>'; }).join("");
-    $("fryd").innerHTML = u.fry.map(function (k) { return '<button type="button" data-drop="fry" data-k="' + k + '"><img src="' + GI + ITEMS[k].img + '.webp" alt=""><span>' + T(ITEMS[k].n) + "</span></button>"; }).join("");
-    $("iron").innerHTML = og.iron.map(function (x, i) { return '<button type="button" class="sl iron" data-st="iron" data-i="' + i + '" aria-label="Waffle iron ' + (i + 1) + '"><span class="in"></span></button>'; }).join("");
-    $("skil").innerHTML = og.skil.map(function (x, i) { return '<button type="button" class="sl skil" data-st="skil" data-i="' + i + '" aria-label="Skillet ' + (i + 1) + '"><span class="in"></span></button>'; }).join("");
-    $("skild").innerHTML = u.skil.map(function (k) { return '<button type="button" data-drop="skil" data-k="' + k + '"><img src="' + GI + ITEMS[k].img + '.webp" alt=""><span>' + T(ITEMS[k].n) + "</span></button>"; }).join("");
-    var lk = $("pskil").querySelector(".lk"); if (lk) lk.remove();
-    if (!u.skil.length) { var l = D.createElement("div"); l.className = "lk"; l.textContent = "🔒 Level 3"; $("pskil").appendChild(l); }
-    $("bins").innerHTML = u.bins.map(function (k) { return '<button type="button" data-k="' + k + '"><img src="' + GI + ITEMS[k].img + '.webp" alt="">' + T(ITEMS[k].n) + "</button>"; }).join("");
-    $("fryh").textContent = og.fry.length + " baskets";
-    drawStations(true);
+  function drop(k) {
+    var s = cookAt(k), i = og.st[s].indexOf(null);
+    if (i < 0) { flash(STN[s].n + " is full!"); return false; }
+    og.st[s][i] = { k: k, el: 0, T: COOK[k][1] * (og.pace.cook || 1) }; sfx(s === "iron" ? "pour" : "drop"); if (s === "fry") setTimeout(function () { sfx("sizzle"); }, 120);
+    drawStations(); return true;
   }
-  function slotHTML(s) { // s: {k, el(ms), T}
-    if (!s) return "";
-    var d = s.el / s.T, it = ITEMS[s.k];
-    return '<img src="' + GI + it.img + '.webp" alt="" style="filter:' + dfil(d) + '">' + (d >= 2 ? '<span class="smk"></span>' : '<span class="stm"></span>') + '<span class="lb">' + dlab(d) + "</span>";
+  function pull(s, i) {
+    if (!og.running || og.pause || og.hold) return false;
+    tutDone();
+    var c = og.st[s] && og.st[s][i]; if (!c) return false;
+    var d = c.el / c.T, el = $("stn").querySelector('[data-st="' + s + '"][data-i="' + i + '"]');
+    if (d < 0.7) { og.st[s][i] = null; addPts("penalty", -30); popAt(el, "Undercooked! −30", "#ff8a7a"); flash("❌ Too early: undercooked", "#ff8a7a"); sfx("bad"); drawStations(true); hud(); return "raw"; }
+    if (og.plate.indexOf(c.k) >= 0) { flash("The plate already has " + ITEMS[c.k].n.toLowerCase() + ": serve it first"); return false; }
+    if (og.plate.length >= 6) { flash("Plate's full!"); return false; }
+    og.st[s][i] = null; og.plate.push(c.k); og.pq[c.k] = { d: d, q: quality(d), perfect: d >= 0.96 && d <= 1.12 };
+    popAt(el, og.pq[c.k].perfect ? "Perfect ✨" : dlab(d), og.pq[c.k].perfect ? "#7dffb5" : d > 1.12 ? "#ffb27a" : "#fff");
+    sfx(og.pq[c.k].perfect ? "ding" : "pop"); drawStations(true); drawPlate(c.k); return og.pq[c.k];
+  }
+  function cookStep(dt) {
+    if (!og.act || !og.act.length) return;
+    og.act.forEach(function (s) { og.st[s].forEach(function (c, i) { if (!c) return; var d0 = c.el / c.T; c.el += dt; var d = c.el / c.T;
+      if (s === "iron" && d0 < 0.96 && d >= 0.96) sfx("beep");
+      if (d >= 2) { og.st[s][i] = null; addPts("penalty", -15); popAt($("stn").querySelector('[data-st="' + s + '"][data-i="' + i + '"]'), "Charred! −15", "#ff8a7a"); sfx("smoke"); drawStations(true); } }); });
   }
   function drawStations(all) {
-    ["fry", "iron", "skil"].forEach(function (st) {
-      var els = $(st).children;
-      og[st].forEach(function (s, i) {
-        var b = els[i]; if (!b) return; var inn = b.firstChild, d = s ? s.el / s.T : 0;
-        b.style.setProperty("--p", s ? Math.min(1, d / 1.6).toFixed(3) : 0); b.style.setProperty("--c", s ? dcol(d) : "#999");
-        b.classList.toggle("on", !!s);
-        var sig = s ? s.k + ":" + dlab(d) : "";
+    if (!og.act || !og.act.length || og.sim) return;
+    og.act.forEach(function (s) {
+      og.st[s].forEach(function (c, i) {
+        var b = $("stn").querySelector('[data-st="' + s + '"][data-i="' + i + '"]'); if (!b) return; var inn = b.firstChild, d = c ? c.el / c.T : 0;
+        b.style.setProperty("--p", c ? Math.min(1, d / 1.6).toFixed(3) : 0); b.style.setProperty("--c", c ? dcol(d) : "#999"); b.classList.toggle("on", !!c);
+        var sig = c ? c.k + ":" + dlab(d) : "";
         if (all || b.dataset.sig !== sig) {
           b.dataset.sig = sig;
-          if (st === "iron") inn.innerHTML = s ? '<img src="' + GI + 'waffle_plain.webp" alt="" style="filter:' + dfil(d) + ';opacity:' + (d < 0.96 ? 0.35 : 1) + '"><span class="lt' + (d >= 0.96 && d < 1.45 ? " g" : "") + '"></span><span class="stm"></span><span class="lb">' + (d < 0.96 ? "cooking" : dlab(d)) + "</span>" : '<span style="font:800 9px var(--body);color:#ccc">pour</span>';
-          else inn.innerHTML = s ? slotHTML(s) : '<span style="font:800 9px var(--body);color:#ffffff88">empty</span>';
-        } else if (s) { var im = inn.querySelector("img"); if (im) im.style.filter = dfil(d); }
+          if (!c) inn.innerHTML = '<span style="font:800 8px var(--body);color:#ffffff88">' + (s === "iron" ? "pour" : "empty") + "</span>";
+          else if (s === "iron") inn.innerHTML = '<img src="' + ITEMS.waffle.img + '" alt="" style="filter:' + dfil(d) + ";opacity:" + (d < 0.96 ? 0.35 : 1) + '"><span class="lt' + (d >= 0.96 && d < 1.45 ? " g" : "") + '"></span><span class="stm"></span><span class="lb">' + (d < 0.96 ? "cooking" : dlab(d)) + "</span>";
+          else inn.innerHTML = '<img src="' + ITEMS[c.k].img + '" alt="" style="filter:' + dfil(d) + '">' + (d >= 2 ? '<span class="smk"></span>' : '<span class="stm"></span>') + '<span class="lb">' + dlab(d) + "</span>";
+        } else if (c) { var im = inn.querySelector("img"); if (im && s !== "iron") im.style.filter = dfil(d); }
       });
     });
-    var sc = $("scoop"); sc.style.setProperty("--p", og.pot ? og.pot.stir.toFixed(3) : 1); sc.style.setProperty("--c", og.pot && og.pot.stir < 0.3 ? "#e0473a" : og.pot && og.pot.stir < 0.6 ? "#f0b429" : "#3fbf6f");
   }
-  function drop(st, k) {
-    if (!og.running || og.pause) return false;
-    var u = U(og.level); if (st === "fry" && u.fry.indexOf(k) < 0) return false; if (st === "skil" && u.skil.indexOf(k) < 0) return false;
-    var i = og[st].indexOf(null); if (i < 0) { flash(st === "fry" ? "Fryer's full!" : "Skillet's full!"); return false; }
-    og[st][i] = { k: k, el: 0, T: ITEMS[k].T * og.pace.cook }; sfx("drop"); setTimeout(function () { sfx("sizzle"); }, 120); drawStations(); return true;
+  // one-tap tutorial highlight the first time a station shows up (fryer at L4; irons + skillet at L5)
+  function tutStart() {
+    if (og.sim || og.demo || !og.act || !og.act.length) return;
+    var key = "gnw-tut-" + (og.act.length > 1 ? "full" : "fry"); try { if (localStorage.getItem(key)) return; localStorage.setItem(key, "1"); } catch (e) {}
+    var sgs = $("stn").querySelectorAll(og.act.length > 1 ? '.sg[data-sg="iron"],.sg[data-sg="skil"]' : '.sg[data-sg="fry"]');
+    sgs.forEach(function (x) { x.classList.add("tut"); }); og.tut = true;
+    flash(og.act.length > 1 ? "🧇 Tap Waffle to pour · 🍳 eggs & bacon on the skillet · pull on ✨ green" : "🍗 Tap Catfish / Wingz / Tenderz to drop them in the fryer · pull on ✨ green", "#FFD23F");
   }
-  function pour(i) { if (og.iron[i]) return false; og.iron[i] = { k: "waffle", el: 0, T: ITEMS.waffle.T * og.pace.cook }; sfx("pour"); drawStations(); return true; }
-  function pull(st, i) {
-    if (!og.running || og.pause) return false;
-    var s = og[st][i]; if (!s) { if (st === "iron") return pour(i); return false; }
-    var d = s.el / s.T, el = $(st).children[i];
-    if (d < 0.7) { og[st][i] = null; addPts("penalty", -30); popAt(el, "Undercooked! −30", "#ff8a7a"); flash("❌ Too early: undercooked", "#ff8a7a"); sfx("bad"); drawStations(); hud(); return "raw"; }
-    if (og.tray.length >= 6) { flash("Warming tray is full!"); return false; }
-    og[st][i] = null;
-    var q = quality(d), it = { k: s.k, d: d, q: q, perfect: perfectD(d), fresh: ITEMS[s.k].fresh * og.pace.fresh, max: ITEMS[s.k].fresh * og.pace.fresh };
-    og.tray.push(it); if (it.perfect) { og.perfect++; popAt(el, "Perfect ✨", "#7dffb5"); } else popAt(el, dlab(d), d > 1.12 ? "#ffb27a" : "#fff");
-    if (d >= 1.45) og.burnt++;
-    sfx(it.perfect ? "ding" : "pop"); drawStations(); drawTray(); return it;
+  function tutDone() { if (!og.tut) return; og.tut = false; $("stn").querySelectorAll(".tut").forEach(function (x) { x.classList.remove("tut"); }); }
+  // "How to cook 🍳": required before the first fryer level (adult L4 / kid L5) and before adult L5 (irons + skillet).
+  // Shown every run (quick to tap through); re-openable from How to play. The game waits until 👍.
+  function howCook(kind, done) {
+    var c = $("howc"), mini = function (cls, img, col, pr) { return '<span class="mini ' + cls + '" style="--c:' + col + ';--p:' + pr + '"><span><img src="' + img + '" alt=""></span></span>'; };
+    var fish = ITEMS.catfish.img, waf = ITEMS.waffle.img, egg = ITEMS.egg.img, bac = ITEMS.bacon.img;
+    var steps = kind === "full" ? [
+      [mini("iron", waf, "#9aa0a8", 0.3), "Tap <b>Waffle</b>: batter pours into a waffle iron."],
+      [mini("iron", waf, "#3fbf6f", 0.7) + '<span style="width:9px;height:9px;border-radius:50%;background:#3fe07a;box-shadow:0 0 8px #3fe07a"></span>', "Tap the iron to <b>open it when the light turns 🟢</b>."],
+      [mini("skil", egg, "#f2b84a", 0.55) + mini("skil", bac, "#3fbf6f", 0.7), "<b>Eggs, bacon & sautéed shrimp</b> go on the skillet: tap the item, then tap the pan on ✨ perfect."],
+      ['<span style="font-size:28px">🍽️🛎️</span>', "Everything you pull lands on the plate. Add the rest from the grid, then <b>Serve</b> as usual."]]
+      : [
+      [mini("", fish, "#9aa0a8", 0.15), "Tap <b>Catfish, Wingz, Tenderz or Shrimp</b> on the grid: it drops into a fryer basket."],
+      [mini("", fish, "#f2b84a", 0.5) + mini("", fish, "#3fbf6f", 0.68), "Watch the color & ring: <b>raw → golden → ✨ perfect (green) → burnt</b>."],
+      [mini("", fish, "#3fbf6f", 0.68) + '<span style="font-size:20px">👆</span>', "Tap the basket on <b>✨ perfect</b> to pull it: it goes <b>straight onto your plate</b>."],
+      ['<span style="font-size:28px">🍽️🛎️</span>', "Add the rest from the grid, then <b>Serve</b> and deliver as usual."]];
+    c.innerHTML = '<h3>' + (kind === "full" ? "How to cook 🍳 · irons & skillet" : "How to cook 🍳 · the fryer") + '</h3><p class="sub">' + (kind === "full" ? "Level 5: the whole kitchen." : "A cook left: you're on the fryer now.") + "</p><ol>" +
+      steps.map(function (st, i) { return '<li><span class="n">' + (i + 1) + '</span><span class="ill">' + st[0] + "</span><span>" + st[1] + "</span></li>"; }).join("") + "</ol>" +
+      '<div class="leg"></div><div class="legl"><span>raw</span><span>pale</span><span>golden</span><span>✨ perfect</span><span>brown</span><span>burnt</span></div>' +
+      '<p class="warn">Pull too early = undercooked, too late = burnt — both cost you.</p><button type="button" class="ok" id="howok">👍 Okay, I understand</button>';
+    c.classList.add("on"); if (og.running) og.hold = true; c.scrollTop = 0;
+    $("howok").onclick = function () { c.classList.remove("on"); c.innerHTML = ""; og.hold = false; last = 0; if (done) done(); };
+    try { $("howok").focus({ preventScroll: true }); } catch (e) {}
   }
-  function stir() { if (!og.running || og.pause) return; og.pot.stir = 1; sfx("stir"); drawStations(); }
-  function scoop() {
-    if (!og.running || og.pause) return false;
-    if (og.pot.stir < 0.15) { flash("Stir the gritz first! 🥄"); sfx("bad"); return false; }
-    if (has2("gritz")) { flash("Already has gritz"); return false; }
-    if (og.plate.length >= 7) { flash("Plate's full!"); return false; }
-    og.plate.push({ k: "gritz", q: 0.55 + 0.45 * og.pot.stir, pot: true }); sfx("pop"); drawPlate("gritz"); return true;
-  }
-  function has2(k) { return og.plate.some(function (p) { return p.k === k; }); }
-
-  /* ================= TRAY + PLATE ================= */
-  function drawTray() {
-    var h = ""; for (var i = 0; i < 6; i++) { var it = og.tray[i];
-      h += '<button type="button" class="ti' + (it && it.fresh < 5000 ? " cold" : "") + '" data-ti="' + i + '"' + (it ? ' aria-label="' + ITEMS[it.k].n + " " + dlab(it.d) + '"' : "") + ">" +
-        (it ? '<img src="' + GI + ITEMS[it.k].img + '.webp" alt="" style="filter:' + dfil(it.d) + '"><span class="dl" style="background:' + dcol(it.d) + '"></span><span class="fr"><i style="width:' + (it.fresh / it.max * 100) + '%;background:' + (it.fresh / it.max > 0.4 ? "#3fbf6f" : it.fresh / it.max > 0.2 ? "#f0b429" : "#e0473a") + '"></i></span>' : "") + "</button>"; }
-    $("tray").innerHTML = h; $("trh").textContent = og.tray.length + "/6";
-  }
-  function trayFresh() { var bars = $("tray").querySelectorAll(".fr i"); og.tray.forEach(function (it, i) { var b = bars[i]; if (!b) return; var f = it.fresh / it.max; b.style.width = (f * 100) + "%"; b.style.background = f > 0.4 ? "#3fbf6f" : f > 0.2 ? "#f0b429" : "#e0473a"; }); }
-  function fromTray(i) {
-    if (!og.running || og.pause) return false; var it = og.tray[i]; if (!it) return false;
-    if (has2(it.k)) { flash("Already on the plate"); return false; }
-    if (og.plate.length >= 7) { flash("Plate's full!"); return false; }
-    og.tray.splice(i, 1); og.plate.push({ k: it.k, d: it.d, q: it.q, perfect: it.perfect, fresh: it.fresh, max: it.max, cooked: true }); sfx("pop"); drawTray(); drawPlate(it.k); return true;
-  }
-  function toggleBin(k) {
-    if (!og.running || og.pause) return false;
-    var i = -1; og.plate.forEach(function (p, j) { if (p.k === k) i = j; });
-    if (i >= 0) { og.plate.splice(i, 1); drawPlate(); return true; }
-    if (og.plate.length >= 7) { flash("Plate's full!"); return false; }
-    og.plate.push({ k: k }); sfx("pop"); drawPlate(k); return true;
-  }
-  function takeOff(k) {   // tap an item on the plate: cooked items go back to the tray
-    var i = -1; og.plate.forEach(function (p, j) { if (p.k === k) i = j; }); if (i < 0) return;
-    var p = og.plate.splice(i, 1)[0];
-    if (p.cooked && og.tray.length < 6) og.tray.push({ k: p.k, d: p.d, q: p.q, perfect: p.perfect, fresh: p.fresh, max: p.max });
-    drawTray(); drawPlate();
-  }
-  function clearPlate() { if (!og.running) return; og.plate.slice().forEach(function (p) { if (p.cooked) takeOff(p.k); }); og.plate = []; drawPlate(); }
-  function drawPlate(newKey) {
-    var st = $("stack"), cups = $("cupz"); st.innerHTML = ""; cups.innerHTML = "";
-    var keys = og.plate.map(function (p) { return p.k; });
-    var of = function (kind) { return keys.filter(function (k) { return ITEMS[k].kind === kind; }); }, bases = of("base"), prots = of("protein"), sides = of("side"), tops = of("top");
-    var S = 190, BASE2 = [[12, 62, 96], [96, 40, 96]], PROT = bases.length ? [[70, 30, 90], [20, 62, 82], [60, 78, 78]] : [[46, 40, 100], [16, 72, 84], [84, 82, 80]], SIDE = [[118, 108, 70], [2, 108, 70], [64, 124, 64]];
-    var TOP = { butter: [66, 62, 40], cheese: [52, 46, 80], syrup: [38, 40, 112], berriez: [60, 30, 70], peach: [40, 56, 74], whip: [78, 48, 52] };
-    og.plate.forEach(function (p) {
-      var k = p.k, it = ITEMS[k], im = D.createElement("img"); im.src = GI + it.img + ".webp"; im.alt = ""; im.dataset.k = k;
-      if (p.d != null) im.style.filter = dfil(p.d);
-      if (it.kind === "drink") { cups.appendChild(im); return; }
-      var pos, z = 3;
-      if (it.kind === "base") { pos = bases.length > 1 ? BASE2[Math.min(1, bases.indexOf(k))] : [30, 36, 130]; z = 1; }
-      else if (it.kind === "protein") { pos = PROT[Math.min(2, prots.indexOf(k))]; z = 3 + prots.indexOf(k); }
-      else if (it.kind === "side") { pos = SIDE[Math.min(2, sides.indexOf(k))]; z = 2; }
-      else if (it.kind === "cup") { pos = k === "sauce" ? [142, 30, 46] : [0, 26, 30]; z = 10; }
-      else { pos = TOP[k] || [60, 60, 60]; z = k === "syrup" ? 9 : 6 + tops.indexOf(k); }
-      im.style.left = pos[0] / S * 100 + "%"; im.style.top = pos[1] / S * 100 + "%"; im.style.width = pos[2] / S * 100 + "%"; im.style.zIndex = z;
-      if (k === newKey && !RM) { im.style.transform = "translateY(-50px) scale(1.15)"; requestAnimationFrame(function () { requestAnimationFrame(function () { im.style.transform = ""; }); }); }
-      st.appendChild(im);
-    });
-    $("dn").innerHTML = og.plate.filter(function (p) { return p.cooked; }).map(function (p) { return '<span style="background:' + dcol(p.d) + '">' + esc(ITEMS[p.k].n) + " · " + dlab(p.d) + "</span>"; }).join("");
-    D.querySelectorAll("#bins button").forEach(function (b) { b.classList.toggle("on", keys.indexOf(b.dataset.k) >= 0); });
+  // the story beat before the first cooking level
+  function cookLeft(done) {
+    var c = $("cut"), s = dsz();
+    c.innerHTML = '<span class="jj">' + jurniHTML("impatient") + '</span><div class="bb">One of the cooks just clocked out and left! 😩 You gotta help in the back!</div>' +
+      '<div class="ck2" style="transform:translate(' + (s.w * 0.55) + 'px,0)">' + serverSVG({ skin: "#a0673d", hair: "#1d120c", style: "short", shirt: "#f2f2f2" }) + '<span class="hatc"></span><i>👋</i></div>';
+    c.classList.add("on"); sfx("boo");
+    var ck = c.querySelector(".ck2");
+    requestAnimationFrame(function () { requestAnimationFrame(function () { ck.style.transform = "translate(10px,0) scaleX(-1)"; }); });
+    setTimeout(function () { doorOpen(900); }, 1700);
+    setTimeout(function () { c.classList.remove("on"); c.innerHTML = ""; done(); }, 3400);
   }
 
   /* ================= DINING ROOM ================= */
   function seat(tb, party) {
     var L = og.level, p = lvParams(L);
     tb.state = "wait"; tb.seatedAt = og.now; tb.first = 0; tb.delivered = 0; tb.vip = party.vip; tb.kind = party.kind;
-    tb.guests = party.ids.map(function (id) {
-      var kid = has(id, "kid"), per = personality(id, party.vip);
-      return { id: id, kid: kid, per: per, order: makeOrder(L, kid), done: false, arrived: false };
-    });
+    tb.guests = party.ids.map(function (id) { var kid = has(id, "kid"), per = personality(id, party.vip); return { id: id, kid: kid, per: per, order: makeOrder(L, kid), done: false, arrived: false }; });
     var hurry = tb.guests.some(function (g) { return g.per === "hurry"; }), elder = tb.guests.every(function (g) { return has(g.id, "elder"); });
     tb.patMax = (p.pat + p.extra * (tb.guests.length - 1)) * (hurry ? 0.85 : 1) * (elder ? 1.1 : 1) * 1000; tb.pat = tb.patMax;
-    var el = $("tb" + tb.id);
-    el.className = "tb c" + tb.cap + " wait";
-    el.querySelector(".gs").innerHTML = tb.guests.map(function (g, i) {
-      return '<div class="gq" data-g="' + i + '"><div class="im"><img class="p" src="' + GI + "guests/" + g.id + '.webp" alt=""></div><span class="md">📱</span><span class="ok">✓</span></div>'; }).join("");
+    var el = $("tb" + tb.id), chairs = tb.def.row === 2;
+    el.className = "tb c" + tb.cap + " r" + tb.def.row + " wait";
+    el.querySelector(".gs").innerHTML = tb.guests.map(function (g, i) { return '<div class="gq" data-g="' + i + '">' + (chairs ? '<span class="ch"></span>' : "") + '<div class="im"><img class="p" src="' + GI + "guests/" + g.id + '.webp" alt=""></div><span class="md">📱</span><span class="ok">✓</span></div>'; }).join("");
     el.querySelector(".tt").innerHTML = "";
     if (!og.sim) requestAnimationFrame(function () { requestAnimationFrame(function () { el.querySelectorAll(".gq").forEach(function (q, i) { setTimeout(function () { q.classList.add("in"); }, i * 120); }); }); });
     else el.querySelectorAll(".gq").forEach(function (q) { q.classList.add("in"); });
@@ -599,16 +735,14 @@
   }
   function arrivals() {
     var free = og.tables.filter(function (t) { return t.state === "free"; }); if (!free.length) { og.nextArr = 1500; return; }
-    var maxCap = Math.max.apply(null, free.map(function (t) { return t.cap; }));
-    var party = makeParty(og.level, maxCap), n = party.ids.length;
+    var maxCap = Math.max.apply(null, free.map(function (t) { return t.cap; })), party = makeParty(og.level, maxCap), n = party.ids.length;
     var fit = free.filter(function (t) { return t.cap >= n; }).sort(function (a, b) { return a.cap - b.cap || Math.random() - 0.5; });
     if (!fit.length) { og.nextArr = 1500; return; }
-    seat(fit[0], party);
-    var p = lvParams(og.level); og.nextArr = (p.arrive + rnd(-1.5, 1.5)) * 1000;
+    seat(fit[0], party); var p = lvParams(og.level); og.nextArr = (p.arrive + rnd(-1.5, 1.5)) * 1000;
   }
   function moodOf(tb, g) {
     if (g.photo && og.now < g.photo) return "📸";
-    if (g.done) return tb.state === "eat" ? "😋" : g.arrived ? (g.burnt ? "😖" : "😋") : "🍽️";
+    if (g.done) return g.arrived ? (g.cold ? "🥶" : "😋") : "🍽️";
     var f = tb.pat / tb.patMax; return f > 0.6 ? "📱" : f > 0.35 ? (g.per === "hurry" ? "⏱️" : "😐") : "💢";
   }
   function drawTables() {
@@ -624,230 +758,350 @@
       });
     });
   }
+  function needs() {   // open orders that still need a plate (not delivered, and no matching plate already waiting on the pass)
+    var out = [], onPass = og.pass.map(function (p) { return p.keys.slice().sort().join(); });
+    og.tables.forEach(function (tb) { if (tb.state !== "wait") return; tb.guests.forEach(function (g, gi) { if (g.done) return;
+      var k = g.order.r.slice().sort().join(), j = onPass.indexOf(k); if (j >= 0) { onPass.splice(j, 1); return; } out.push({ tb: tb, g: g, gi: gi, f: tb.pat / tb.patMax }); }); });
+    return out.sort(function (a, b) { return a.f - b.f; });
+  }
   function drawRail() {
     var cards = [];
     og.tables.forEach(function (tb) { if (tb.state !== "wait") return; tb.guests.forEach(function (g, gi) { if (!g.done) cards.push({ tb: tb, g: g, gi: gi, f: tb.pat / tb.patMax }); }); });
     cards.sort(function (a, b) { return a.f - b.f; });
     $("rail").innerHTML = cards.length ? cards.map(function (c) {
       var o = c.g.order;
-      return '<div class="tk' + (c.f < 0.35 ? " bad" : c.f < 0.6 ? " warn" : "") + '" data-t="' + c.tb.id + '"><span class="pr" title="' + PER[c.g.per][1] + '">' + PER[c.g.per][0] + '</span><span class="t">T' + c.tb.id + '</span><div class="h"><img src="img/' + o.dish.ph + '.jpg" alt=""><b>' + esc(T(o.dish.n)) + (o.drink ? ' <span style="color:#B8322A">+ ' + esc(T(ITEMS[o.drink].n)) + "</span>" : "") + "</b></div>" +
-        '<div class="its">' + o.r.map(function (k) { return '<img src="' + GI + ITEMS[k].img + '.webp" alt="' + esc(ITEMS[k].n) + '" title="' + esc(ITEMS[k].n) + '">'; }).join("") + "</div>" +
-        ((o.add.length || o.no.length) ? '<div class="mods">' + o.add.map(function (k) { return '<span class="ad">+ ' + esc(T(ITEMS[k].n)) + "</span>"; }).join("") + o.no.map(function (k) { return '<span class="no">NO ' + esc(T(ITEMS[k].n)) + "</span>"; }).join("") + "</div>" : "") + "</div>";
-    }).join("") : '<div class="none">' + (og.running ? "No open tickets. Cook ahead: keep a waffle and some fish going 🔥" : "Tickets show up here") + "</div>";
+      return '<div class="tk' + (c.f < 0.35 ? " bad" : c.f < 0.6 ? " warn" : "") + '" data-t="' + c.tb.id + '"><span class="pr" title="' + PER[c.g.per][1] + '">' + PER[c.g.per][0] + '</span><span class="t">T' + c.tb.id + '</span><div class="h"><img src="' + dishImg(o.dish) + '" alt=""><b>' + esc(T(o.dish.n)) + (o.drink ? ' <span style="color:#B8322A">+ ' + esc(T(ITEMS[o.drink].n)) + "</span>" : "") + "</b></div>" +
+        '<div class="its">' + o.r.map(function (k) { return '<img src="' + ITEMS[k].img + '" alt="' + esc(ITEMS[k].n) + '" title="' + esc(ITEMS[k].n) + '"' + (ITEMS[k].fx === "crisp" ? ' class="crisp"' : "") + ">"; }).join("") + "</div>" +
+        ((o.add.length || o.no.length) ? '<div class="mods">' + o.add.map(function (k) { return '<span class="ad">+ ' + esc(T(ITEMS[k].n)) + "</span>"; }).join("") + o.no.map(function (k) { return '<span class="no">NO ' + esc(T(ITEMS[k].n)) + "</span>"; }).join("") + "</div>" : "") +
+        o.prep.map(function (t) { return '<div class="prep">⚠️ ' + esc(T(t)) + "</div>"; }).join("") + "</div>";
+    }).join("") : '<div class="none">' + (og.running ? "No open tickets right now. Guests are on their way!" : "Tickets clip on here") + "</div>";
   }
-  function railPatience() { var els = $("rail").querySelectorAll(".tk"); els.forEach(function (el) { var tb = og.tables[+el.dataset.t - 1]; if (!tb || tb.state !== "wait") return; var f = tb.pat / tb.patMax; el.classList.toggle("bad", f < 0.35); el.classList.toggle("warn", f >= 0.35 && f < 0.6); }); }
+  function railPatience() { $("rail").querySelectorAll(".tk").forEach(function (el) { var tb = og.tables[+el.dataset.t - 1]; if (!tb || tb.state !== "wait") return; var f = tb.pat / tb.patMax; el.classList.toggle("bad", f < 0.35); el.classList.toggle("warn", f >= 0.35 && f < 0.6); }); }
   function walkout(tb) {
     og.walk++; og.walkTotal++; og.streak = 0; addPts("penalty", -50);
     var el = $("tb" + tb.id); el.querySelectorAll(".gq").forEach(function (q) { q.querySelector(".md").textContent = "😤"; q.classList.add("out"); });
     popAt(el, "Walked out! −50", "#ff8a7a"); flash("😤 Table " + tb.id + " walked out! (" + og.walk + " of " + MAX_WALK + ")", "#ff8a7a"); sfx("bad"); buzz(120);
-    tb.state = "gone"; later(900, function () { clearTable(tb); });
+    doorOpen(1300); jPose("impatient", 1500);   // they leave through the door; Jurni is NOT happy about it (no thank-you)
+    tb.state = "gone"; later(1100, function () { clearTable(tb); });
+    og.pass.forEach(function (p) { if (p.for === tb.id) p.for = 0; });
     drawRail(); hud();
-    if (og.walk >= MAX_WALK) later(1000, function () { end("walk"); });
+    if (og.walk >= MAX_WALK && !og.demo) later(1000, function () { end("walk"); });
   }
-  function clearTable(tb) { var el = $("tb" + tb.id); el.className = "tb c" + tb.cap; el.querySelector(".gs").innerHTML = ""; el.querySelector(".tt").innerHTML = ""; tb.state = "free"; tb.guests = []; }
+  function clearTable(tb) { var el = $("tb" + tb.id); el.className = "tb c" + tb.cap + " r" + tb.def.row; el.querySelector(".gs").innerHTML = ""; el.querySelector(".tt").innerHTML = ""; tb.state = "free"; tb.guests = []; }
 
-  /* ================= SERVING + SCORE ================= */
+  /* ================= SERVE (stage 1 → pass) + DELIVER (stage 2) ================= */
   function same(a, b) { return a.length === b.length && a.slice().sort().join() === b.slice().sort().join(); }
+  function matchOpen(keys) { if (!keys.length) return null; var n = needs(); for (var i = 0; i < n.length; i++) if (same(n[i].g.order.r, keys)) return n[i]; return null; }
   function serve() {
-    if (!og.running || og.pause) return false;
+    if (!og.running || og.pause || og.hold) return false;
     if (!og.plate.length) { flash("Build a plate first"); return false; }
-    var keys = og.plate.map(function (p) { return p.k; }), hit = null;
-    og.tables.forEach(function (tb) { if (tb.state !== "wait") return; tb.guests.forEach(function (g, gi) { if (!g.done && same(g.order.r, keys) && (!hit || tb.pat / tb.patMax < hit.tb.pat / hit.tb.patMax)) hit = { tb: tb, g: g, gi: gi }; }); });
-    if (!hit) {
+    if (og.pass.length >= PASS_CAP) { flash("The pass is full: deliver a plate first!"); sfx("bad"); return false; }
+    var keys = og.plate.slice(), m = matchOpen(keys);
+    if (!m) {
       var said = null;
       og.tables.forEach(function (tb) { if (tb.state !== "wait" || said) return; tb.guests.forEach(function (g) { if (g.done || said) return; g.order.no.forEach(function (nk) { if (keys.indexOf(nk) >= 0 && same(g.order.r, keys.filter(function (k) { return k !== nk; }))) said = { tb: tb, nk: nk }; }); }); });
       og.streak = 0;
-      if (said) { addPts("penalty", -60); said.tb.pat = Math.max(500, said.tb.pat - said.tb.patMax * 0.15); flash("❌ They said NO " + ITEMS[said.nk].n.toLowerCase() + "! −60", "#ff8a7a"); popAt($("tb" + said.tb.id), "−60", "#ff8a7a"); }
-      else { addPts("penalty", -20); flash("❌ Nobody ordered that −20", "#ff8a7a"); }
+      if (said) { addPts("penalty", -60); flash("❌ They said NO " + ITEMS[said.nk].n.toLowerCase() + "! −60", "#ff8a7a"); }
+      else {
+        var near = needs().filter(function (x) { return x.g.order.prep.length && same(x.g.order.r.map(function (k) { return ITEMS[k].of || k; }), keys.map(function (k) { return ITEMS[k].of || k; })); })[0];
+        addPts("penalty", -20); flash(near ? "❌ Check the ticket: " + near.g.order.prep[0] + " −20" : "❌ Nobody ordered that −20", "#ff8a7a");
+      }
       sfx("bad"); buzz([40, 40, 40]); hud(); return false;
     }
-    var r = deliver(hit.tb, hit.gi); og.plate = []; drawPlate(); sfx("bell"); buzz([15, 30, 15]); hud(); return r;
+    og.pass.push({ keys: keys, dish: m.g.order.dish, heat: 1, clean: og.clean, tries: 0, born: og.now, pq: og.pq, id: ++og.pid || (og.pid = 1) });
+    og.plate = []; og.clean = true; og.pq = {}; drawPlate(); drawPass(); drawRail(); sfx("bell"); buzz([15, 30, 15]);
+    if (og.sel < 0) pickPass(og.pass.length - 1);
+    return true;
   }
-  function deliver(tb, gi) {
-    var g = tb.guests[gi], o = g.order, t = Math.round((og.now - tb.seatedAt) / 100) / 10;
-    var items = 30 * o.r.length + 20 * (o.add.length + o.no.length);
-    var w = og.pace.win, speed = Math.round(100 * Math.pow(Math.max(0, 1 - t / w), 1.3)) + (t <= w / 6 ? 50 : t <= w / 4 ? 35 : t <= w / 3 ? 20 : t <= w / 2 ? 8 : 0);
-    g.win = w;
-    var qp = 0, qs = [], allPerf = true;
-    og.plate.forEach(function (p) {
-      if (p.pot) { qp += Math.round(20 * p.q); qs.push(p.q); return; }
-      if (!p.cooked) return;
-      var qf = p.q * (0.75 + 0.25 * (p.fresh / p.max)); qs.push(qf);
-      qp += Math.round(40 * qf) + (p.perfect ? 15 : 0); if (qf < 0.8) allPerf = false; if (p.d >= 1.45) g.burnt = true;
-    });
-    g.q = qs.length ? qs.reduce(function (a, b) { return a + b; }, 0) / qs.length : 1;
-    if (allPerf && t <= w / 3) og.streak++; else og.streak = 0;
-    og.best = Math.max(og.best, og.streak);
-    var mult = 1 + Math.min(og.streak, 5) * 0.2, stk = Math.round((items + speed + qp) * (mult - 1));
-    addPts("orders", items); addPts("speed", speed); addPts("quality", qp); if (stk) addPts("streak", stk);
-    g.done = true; g.t = t; g.mood = tb.pat / tb.patMax; og.served++;
-    tb.delivered++; if (!tb.first) tb.first = og.now;
-    tb.pat = Math.min(tb.patMax, tb.pat + 6000);
-    var el = $("tb" + tb.id), total = items + speed + qp + stk;
-    popAt(el, "+" + total + " · " + t.toFixed(1) + "s", "#f2c14e");
-    if (og.streak >= 2) setTimeout(function () { popAt(el, "🔥 Streak ×" + mult.toFixed(1), "#ffb27a"); }, 300);
-    flash(allPerf && qs.length ? "✨ Cooked perfect!" : g.burnt ? "😖 A little burnt…" : t <= 15 ? "🔥 Lightning fast!" : "✅ Order up!", g.burnt ? "#ffb27a" : "#F2C14E");
-    var allDone = tb.guests.every(function (x) { return x.done; });
-    var owner = (tb.guests.length >= 3 || og.streak >= 3 || tb.vip) && !og.trips.some(function (tr) { return tr.srv.owner; });
-    sendServer(tb, gi, o.dish.ph, owner);
-    if (allDone) {
-      tb.state = "eat";
-      if (tb.guests.length >= 2 && og.now - tb.first <= 10000) { var gb = 30 * tb.guests.length; addPts("group", gb); setTimeout(function () { popAt(el, "👥 Whole table! +" + gb, "#7dffb5"); }, 500); }
+  function heatInfo(h) { return h >= 0.75 ? ["🔥", "hot", "#ff7a1a"] : h >= 0.5 ? ["♨️", "warm", "#f2b84a"] : h >= 0.25 ? ["🌡️", "cooling", "#9cc7e8"] : ["❄️", "cold", "#5aa9e6"]; }
+  function drawPass() {
+    var h = '<span class="lbl">PASS</span>';
+    for (var i = 0; i < PASS_CAP; i++) {
+      var p = og.pass[i];
+      h += '<button type="button" class="ps' + (p && i === og.sel ? " sel" : "") + (p && p.heat < 0.25 ? " cold" : "") + '" data-ps="' + i + '"' + (p ? ' aria-label="' + esc(p.dish.n) + ", " + heatInfo(p.heat)[1] + '"' : ' aria-label="Empty spot on the pass"') + ">" +
+        (p ? '<span class="stm" style="--so:' + p.heat.toFixed(2) + '"></span><span class="stm b" style="--so:' + p.heat.toFixed(2) + '"></span><span class="bp"><img src="' + dishImg(p.dish) + '" alt=""></span><span class="hi">' + heatInfo(p.heat)[0] + '</span><span class="ht"><i style="width:' + (p.heat * 100) + "%;background:" + heatInfo(p.heat)[2] + '"></i></span>' : "") + "</button>";
     }
-    drawRail(); return { t: t, items: items, speed: speed, quality: qp, streak: stk };
+    $("pass").innerHTML = h;
+    din.classList.toggle("aim", og.sel >= 0 && !!og.pass[og.sel]);
+  }
+  function passHeat() {
+    $("pass").querySelectorAll(".ps").forEach(function (b, i) { var p = og.pass[i]; if (!p) return; var hi = heatInfo(p.heat), bar = b.querySelector(".ht i");
+      if (bar) { bar.style.width = (p.heat * 100) + "%"; bar.style.background = hi[2]; }
+      b.querySelectorAll(".stm").forEach(function (s) { s.style.setProperty("--so", p.heat.toFixed(2)); });
+      var ic = b.querySelector(".hi"); if (ic && ic.textContent !== hi[0]) ic.textContent = hi[0]; b.classList.toggle("cold", p.heat < 0.25); });
+  }
+  function pickPass(i) { if (!og.running || og.hold) return false; if (!og.pass[i]) return false; og.sel = og.sel === i ? -1 : i; sfx("pop"); drawPass(); return true; }
+  function tapTable(id) {
+    if (!og.running || og.pause || og.hold) return false;
+    if (og.sel < 0 || !og.pass[og.sel]) { flash("Tap a plate on the pass first, then its table"); return false; }
+    var p = og.pass[og.sel], tb = og.tables[id - 1]; if (!tb) return false;
+    var gi = -1; if (tb.state === "wait") tb.guests.forEach(function (g, i) { if (gi < 0 && !g.done && same(g.order.r, p.keys)) gi = i; });
+    if (gi < 0) {   // wrong table: the plate comes back colder, small penalty
+      p.tries++; p.heat = Math.max(0, p.heat - 0.15); og.streak = 0; addPts("penalty", -15);
+      popAt($("tb" + id), "Wrong table! −15", "#ff8a7a"); flash("❌ Not their order: table " + id, "#ff8a7a"); sfx("bad"); buzz([40, 40]);
+      og.sel = -1; drawPass(); hud(); return false;
+    }
+    og.pass.splice(og.sel, 1); og.sel = -1; drawPass();
+    var r = deliver(tb, gi, p); hud(); return r;
+  }
+  function deliver(tb, gi, p) {
+    var g = tb.guests[gi], o = g.order, t = Math.round((og.now - tb.seatedAt) / 100) / 10, h = Math.round(p.heat * 100) / 100, w = og.pace.win;
+    var items = 30 * o.r.length + 20 * (o.add.length + o.no.length) + 25 * o.prep.length;
+    // SPEED is the main score driver: continuous to 0.1 s from seating, plus a tier bonus
+    var speed = Math.round(210 * Math.pow(Math.max(0, 1 - t / w), 1.3)) + (t <= w / 6 ? 90 : t <= w / 4 ? 60 : t <= w / 3 ? 35 : t <= w / 2 ? 12 : 0);
+    var heatPts = Math.round(80 * h), acc = p.clean ? 40 : 0, rightFirst = p.tries === 0, hotOK = !o.hot || h >= 0.75;
+    var qp = 0, cookOK = true, burnt = false, perfCooks = 0;   // only items that went through a station (L4+ adult / L5 kid)
+    Object.keys(p.pq || {}).forEach(function (k) { var c = p.pq[k]; qp += Math.round(40 * c.q) + (c.perfect ? 15 : 0); if (c.q < 0.8) cookOK = false; if (c.d >= 1.45) burnt = true; if (c.perfect) perfCooks++; });
+    if (qp) addPts("quality", qp);
+    var perfect = p.clean && rightFirst && h >= 0.75 && hotOK && cookOK;
+    if (perfect && t <= w / 3) og.streak++; else og.streak = 0;
+    og.best = Math.max(og.best, og.streak); if (perfect) og.perfect++; if (h >= 0.75) og.hotDeliv++;
+    var mult = 1 + Math.min(og.streak, 5) * 0.2, base = items + speed + heatPts + acc, stk = Math.round(base * (mult - 1));
+    // money: the order pays less the colder it lands; tips by speed, mood, heat and personality (cold = no tip)
+    var pay = Math.round(o.usd * (0.55 + 0.45 * h) * 100) / 100, sF = Math.max(0, 1 - t / (w * 0.75)), mood = tb.pat / tb.patMax, tip = 0;
+    if (h >= 0.25 && hotOK) {
+      var pct = 0.06 + 0.12 * sF + 0.06 * mood + 0.06 * h, pw = { chill: 1, generous: 1.5, picky: p.clean ? 1.15 : 0.4, hurry: sF > 0.5 ? 1.3 : 0.6 }[g.per] || 1;
+      tip = o.usd * pct * pw + (perfect ? 3 : 0) + 0.75 * perfCooks; if (burnt) tip *= g.per === "picky" ? 0 : 0.35;
+      tip *= 0.92 + Math.random() * 0.16; tip = Math.round(tip * 4) / 4;
+    }
+    var moneyPts = Math.round(pay * 4), tipPts = Math.round(tip * 10);
+    addPts("orders", items); addPts("speed", speed); addPts("heat", heatPts); if (acc) addPts("accuracy", acc); addPts("money", moneyPts); if (tipPts) addPts("tips", tipPts); if (stk) addPts("streak", stk);
+    if (!og.demo) { og.usd += pay + tip; og.tipsUsd += tip; }
+    g.done = true; g.t = t; g.cold = h < 0.25 || burnt; g.tip = tip; g.mood = mood; og.served++;
+    tb.delivered++; if (!tb.first) tb.first = og.now; tb.pat = Math.min(tb.patMax, tb.pat + (h < 0.25 ? 2000 : 6000));
+    var el = $("tb" + tb.id), hi = heatInfo(h);
+    popAt(el, "$" + pay.toFixed(2) + (tip ? " + $" + tip.toFixed(2) + " tip " + hi[0] : " · no tip " + hi[0]), tip ? "#7dffb5" : "#9cd3ff");
+    setTimeout(function () { popAt(el, "+" + (base + stk + moneyPts + tipPts) + " · " + t.toFixed(1) + "s", "#f2c14e"); }, 350);
+    if (og.streak >= 2) setTimeout(function () { popAt(el, "🔥 Streak ×" + mult.toFixed(1), "#ffb27a"); }, 700);
+    flash(perfect ? "✨ Perfect: hot + right + fast!" : h < 0.25 ? "❄️ Cold plate: no tip" : (!hotOK ? "🥵 They wanted it extra hot!" : t <= w / 4 ? "🔥 Lightning fast!" : "✅ Order up!"), perfect ? "#F2C14E" : h < 0.25 ? "#9cd3ff" : "#fff");
+    if (tb.guests.every(function (x) { return x.done; })) {
+      tb.state = "eat";
+      if (tb.guests.length >= 2 && og.now - tb.first <= 10000) { var gb = 30 * tb.guests.length; addPts("group", gb); setTimeout(function () { popAt(el, "👥 Whole table! +" + gb, "#7dffb5"); }, 900); }
+    }
+    var owner = !J.task && !og.sim && !RM && (tb.guests.length >= 3 || tb.vip || og.streak >= 3 || Math.random() < 0.35);
+    if (owner) jDeliver(tb, gi, p.dish); else sendServer(tb, gi, p.dish);
+    drawRail();
+    return { t: t, heat: h, pay: pay, tip: tip, items: items, speed: speed, quality: qp, perfect: perfect };
   }
   var srvI = 0;
-  function sendServer(tb, gi, ph, owner) {
-    var srv = owner ? SERVERS[0] : SERVERS[1 + (srvI++ % (SERVERS.length - 1))];
-    var el = D.createElement("div"); el.className = "srv" + (srv.owner ? " j" : "");
-    el.innerHTML = (srv.owner ? jurniHTML("a") + '<span class="sp">Owner\'s special! ✨</span>' : serverSVG(srv.look) + '<img class="cp" src="img/' + ph + '.jpg" alt="">');
-    din.appendChild(el);
-    var w = din.clientWidth || 334, h = din.clientHeight || 214, from = { x: w / 2, y: h - 10 }, to = { x: tb.def.x * w + (gi - (tb.guests.length - 1) / 2) * 26, y: tb.def.y * h + 30 };
-    var trip = { el: el, srv: srv, from: from, to: to, t: 0, dur: 1100, back: false, onArrive: function () { arrive(tb, gi, ph); } };
+  function sendServer(tb, gi, dish) {
+    var srv = SERVERS[1 + (srvI++ % (SERVERS.length - 1))], el = D.createElement("div"); el.className = "srv";
+    el.innerHTML = serverSVG(srv.look) + '<img class="cp" src="' + dishImg(dish) + '" alt="">'; din.appendChild(el);
+    var s = dsz(), to = { x: tb.def.x * s.w + (gi - (tb.guests.length - 1) / 2) * 24, y: tb.def.y * s.h - 10 };
+    var trip = { el: el, srv: srv, from: { x: s.w * 0.52, y: s.h + 30 }, to: to, t: 0, dur: 1100, back: false, onArrive: function () { arrive(tb, gi, dish); } };
     og.trips.push(trip); placeTrip(trip);
   }
   function busTable(tb) {
     var srv = SERVERS[1 + (srvI++ % (SERVERS.length - 1))], el = D.createElement("div"); el.className = "srv"; el.innerHTML = serverSVG(srv.look); din.appendChild(el);
-    var w = din.clientWidth || 334, h = din.clientHeight || 214;
-    var trip = { el: el, srv: srv, from: { x: w / 2, y: h - 10 }, to: { x: tb.def.x * w, y: tb.def.y * h + 30 }, t: 0, dur: 1000, back: false, onArrive: function () { el.innerHTML = serverSVG(srv.look) + '<span class="cp" style="display:grid;place-items:center;background:#fff;font-size:13px">🍽️</span>'; clearTable(tb); } };
+    var s = dsz(), trip = { el: el, srv: srv, from: { x: s.w * 0.52, y: s.h + 30 }, to: { x: tb.def.x * s.w, y: tb.def.y * s.h - 10 }, t: 0, dur: 1000, back: false, onArrive: function () { clearTable(tb); } };
     og.trips.push(trip); placeTrip(trip);
   }
-  function placeTrip(tr) { var f = Math.min(1, tr.t / tr.dur), a = tr.back ? tr.to : tr.from, b = tr.back ? tr.from : tr.to; var x = a.x + (b.x - a.x) * f, y = a.y + (b.y - a.y) * f; var ww = tr.el.offsetWidth || 30, hh = tr.el.offsetHeight || 48; tr.el.style.transform = "translate(" + (x - ww / 2) + "px," + (y - hh) + "px)" + ((b.x < a.x) ? " scaleX(-1)" : ""); }
-  function arrive(tb, gi, ph) {
+  function placeTrip(tr) { if (og.sim) return; var f = Math.min(1, tr.t / tr.dur), a = tr.back ? tr.to : tr.from, b = tr.back ? tr.from : tr.to; var x = a.x + (b.x - a.x) * f, y = a.y + (b.y - a.y) * f; tr.el.style.transform = "translate(" + (x - 13) + "px," + (y - 42) + "px)" + ((b.x < a.x) ? " scaleX(-1)" : ""); }
+  function arrive(tb, gi, dish) {
     var g = tb.guests[gi]; if (!g || tb.state === "free" || tb.state === "gone") return;
     g.arrived = true; var el = $("tb" + tb.id);
-    var tt = el.querySelector(".tt"); tt.insertAdjacentHTML("beforeend", '<img src="img/' + ph + '.jpg" alt="">');
-    if (!g.burnt && Math.random() < 0.4) { var fl = el.querySelector(".flash"); fl.classList.remove("on"); void fl.offsetWidth; fl.classList.add("on"); var q = el.querySelectorAll(".gq")[gi]; if (q) { var md = q.querySelector(".md"); md.textContent = "📸"; g.photo = og.now + 1200; } sfx("flash"); }
-    if (tb.state === "eat" && tb.guests.every(function (x) { return x.arrived; })) later(3500, function () { leave(tb); });
-  }
-  function tipFor(g) {
-    var sF = Math.max(0, 1 - g.t / ((g.win || 60) * 0.75)), qF = g.q, mF = g.mood || 0;
-    var w = { chill: [4, 4, 2, 1], generous: [5, 5, 3, 1.5], picky: [2, 7, 2, 0.9], hurry: [7, 2, 2, 1] }[g.per] || [4, 4, 2, 1];
-    var tip = (2 + w[0] * sF + w[1] * qF + w[2] * mF) * w[3];
-    if (g.burnt) tip *= g.per === "picky" ? 0 : 0.35;
-    tip *= 0.9 + Math.random() * 0.2; return Math.round(tip * 4) / 4;
+    el.querySelector(".tt").insertAdjacentHTML("beforeend", '<img src="' + dishImg(dish) + '" alt="">');
+    if (!g.cold && Math.random() < 0.4) { var fl = el.querySelector(".flash"); fl.classList.remove("on"); void fl.offsetWidth; fl.classList.add("on"); g.photo = og.now + 1200; sfx("flash"); }
+    if (tb.state === "eat" && tb.guests.every(function (x) { return x.arrived; })) later(3200, function () { leave(tb); });
   }
   function leave(tb) {
     if (tb.state !== "eat") return;
-    var el = $("tb" + tb.id), sum = 0;
-    tb.guests.forEach(function (g) { sum += tipFor(g); });
-    sum = Math.round(sum * 100) / 100; var pts = Math.round(sum * 10);
-    addPts("tips", pts); og.tipsUsd += sum;
+    var el = $("tb" + tb.id), tips = tb.guests.reduce(function (a, g) { return a + (g.tip || 0); }, 0);
     el.querySelectorAll(".gq").forEach(function (q) { q.querySelector(".md").textContent = "👋"; q.classList.add("out"); });
-    if (sum > 0) { popAt(el, "💵 $" + sum.toFixed(2) + " tip +" + pts, "#7dffb5"); sfx("ding"); if (sum >= 4) jurniPop("tip"); }
-    else popAt(el, "No tip 😕", "#ffb27a");
-    tb.state = "dirty"; el.className = "tb c" + tb.cap + " dirty";
-    later(900, function () { el.querySelector(".gs").innerHTML = ""; });
-    later(1400, function () { busTable(tb); });
+    jGoodbye(tips);
+    tb.state = "dirty"; el.className = "tb c" + tb.cap + " r" + tb.def.row + " dirty";
+    later(1100, function () { el.querySelector(".gs").innerHTML = ""; });
+    later(1500, function () { busTable(tb); });
     hud();
   }
 
-  /* ================= JURNI POP-UPS (rate-limited; dining room only) ================= */
-  var BUBBLES = ["Thank you! 💛", "Appreciate you! 💛", "Thanks for coming! 💛"];
-  function jurniPop(kind, force) {
-    if (og.sim) return false;
-    var now = og.now || 0; if (!force && now - og.popAt < 12000) return false; og.popAt = now;
-    var jp = $("jpop"), pose = kind === "tip" ? "tip" : "impatient";
-    jp.innerHTML = jurniHTML(pose) + (kind === "tip" ? '<div class="bb">' + pick(BUBBLES) + "</div>" : '<div class="bb">' + pick(["You're taking too long! 😤", "Table's waiting, baby!", "Let's GO, kitchen! 👀"]) + "</div>");
-    jp.classList.remove("on"); void jp.offsetWidth; jp.classList.add("on");
-    clearTimeout(jp._t); jp._t = setTimeout(function () { jp.classList.remove("on"); }, 2400);
-    if (kind === "tip") sfx("ding"); else if (TH_ID === "halloween") sfx("boo");
-    return true;
+  /* ================= JURNI ON THE FLOOR (pointer-events: none; never blocks taps) ================= */
+  var J = { el: $("jfl"), x: 150, y: 160, task: null, pose: "walkA", face: 1, until: 0, over: null, overUntil: 0, frameT: 0, idleAt: 0 };
+  var JPOSES = { a: 1, impatient: 1, tip: 1, walkA: 1, walkB: 1, carry: 1, door: 1 };
+  HAT.walkA = [27, -5, 30]; HAT.walkB = [31, -5, 28]; HAT.carry = [20, -5, 32]; HAT.door = [18, -5, 32];
+  function jSet(pose, bubble) {
+    if (og.sim || !J.el) return;
+    if (pose !== J.pose || bubble !== J.bubble) { J.pose = pose; J.bubble = bubble; J.el.innerHTML = jurniHTML(pose) + (bubble ? '<span class="bb">' + esc(bubble) + "</span>" : ""); }
+  }
+  function jPlace() { if (og.sim || !J.el) return; J.el.style.transform = "translate(" + (J.x - 20) + "px," + (J.y - 68) + "px)" + (J.face < 0 ? " scaleX(-1)" : ""); var bb = J.el.querySelector(".bb"); if (bb) bb.style.transform = "translateX(-30%)" + (J.face < 0 ? " scaleX(-1)" : ""); }
+  function jReset() { var s = dsz(); J.x = s.w * 0.45; J.y = s.h - 22; J.task = null; J.over = null; J.face = 1; J.idleAt = og.now + 2500; jSet("walkA"); jPlace(); }
+  function jGo(x, y, mode, cb) { J.task = { x: x, y: y, mode: mode || "walk", cb: cb }; if (RM || og.sim) { J.x = x; J.y = y; var t = J.task; J.task = null; jPlace(); if (t.cb) t.cb(); } }
+  function jPose(p, ms, bubble) { J.over = p; J.overB = bubble || ""; J.overUntil = og.now + ms; jSet(p, J.overB); }
+  function jDeliver(tb, gi, dish) {   // Jurni carries this one: logic arrives on a fixed timer so the score never waits on animation
+    var s = dsz(), tx = tb.def.x * s.w + (gi - (tb.guests.length - 1) / 2) * 24, ty = tb.def.y * s.h - 6;
+    J.x = s.w * 0.52; J.y = s.h - 6;   // she grabs it from the pass window
+    J.carrying = true; jGo(tx, ty, "carry", function () { J.carrying = false; jPose("tip", 900, pick(["Enjoy! 💛", "Hot & fresh!", "Owner's special ✨"])); });
+    later(1300, function () { arrive(tb, gi, dish); });
+  }
+  function jGoodbye(tips) {
+    var s = dsz(), big = tips >= 6;
+    doorOpen(2200);
+    if (J.task && J.carrying) return;
+    jGo(30, s.h * 0.86, "walk", function () { J.face = 1; jPose(big ? "tip" : "door", 1800, tips > 0 ? pick(["Thank you! Come back soon 💛", "Appreciate y'all! 💛", "Thanks for coming! 💛"]) : "Have a good one!"); });
+  }
+  var doorT = 0;
+  function doorOpen(ms) { var d = $("door"); if (!d || og.sim) return; d.classList.add("open"); clearTimeout(doorT); doorT = setTimeout(function () { d.classList.remove("open"); }, ms || 1500); }
+  function jStep(dt) {
+    if (og.sim) return;
+    if (J.over && og.now > J.overUntil) { J.over = null; }
+    if (J.task) {
+      var dx = J.task.x - J.x, dy = J.task.y - J.y, d = Math.sqrt(dx * dx + dy * dy), v = (J.task.mode === "carry" ? 120 : 75) * dt / 1000;
+      if (Math.abs(dx) > 1) J.face = dx > 0 ? 1 : -1;
+      if (d <= v) { J.x = J.task.x; J.y = J.task.y; var t = J.task; J.task = null; J.idleAt = og.now + 3000 + Math.random() * 3000; if (t.cb) t.cb(); }
+      else { J.x += dx / d * v; J.y += dy / d * v; J.frameT += dt; }
+      if (!J.over) jSet(J.task && J.task.mode === "carry" ? "carry" : (Math.floor(J.frameT / 190) % 2 ? "walkB" : "walkA"));
+      J.el.classList.add("walk");
+    } else {
+      J.el.classList.remove("walk");
+      if (!J.over) jSet("walkA");
+      if (og.now > J.idleAt && og.running) {   // idle: check on a table, wave at a happy one
+        var s = dsz(), cand = og.tables.filter(function (tb) { return tb.state === "wait" || tb.state === "eat"; });
+        if (cand.length) { var tb = pick(cand), happy = tb.state === "eat" || tb.pat / tb.patMax > 0.6;
+          jGo(Math.max(36, Math.min(s.w - 70, tb.def.x * s.w + (Math.random() < 0.5 ? -40 : 40))), Math.min(s.h - 8, tb.def.y * s.h + 14), "walk", function () {
+            J.face = tb.def.x * s.w > J.x ? 1 : -1; if (happy) jPose("door", 1100, pick(["Y'all good? 💛", "Enjoy!", "👋"])); }); }
+        else { J.idleAt = og.now + 2500; jGo(40 + Math.random() * (s.w - 120), s.h - 20 - Math.random() * 10, "walk"); }
+      }
+    }
+    if (J.over) jSet(J.over, J.overB);
+    jPlace();
   }
 
   /* ================= LEVELS ================= */
   function levelUp() {
-    tvOff(true); $("jpop").classList.remove("on");
+    tvOff(true);
     var L = og.level, bonus = 150 * L + 75 * (MAX_WALK - og.walk);
     addPts("level", bonus); og.pause = true; stopMusic(); sfx("level");
     var b = $("lvb"); b.querySelector("h3").textContent = "LEVEL " + (L + 1);
     b.querySelector("p").textContent = "Level " + L + " cleared! +" + bonus + " · next: " + nextTease(L + 1);
     b.classList.add("on");
-    // Jurni brings out a tray of Kiki Palmers, sets them down, then spins + happy dance
     var dn = D.createElement("div"); dn.className = "dance"; dn.innerHTML = jurniHTML("a") + '<span class="tray"><img src="' + GI + 'kiki.webp" alt=""><img src="' + GI + 'kiki.webp" alt=""></span>'; b.appendChild(dn);
     setTimeout(function () { var tr = dn.querySelector(".tray"); if (tr) { tr.style.transition = "transform .4s"; tr.style.transform = "translate(-20px,46px)"; } }, 700);
     setTimeout(function () { dn.innerHTML = jurniHTML("tip") + '<span class="tray" style="transform:translate(-20px,46px)"><img src="' + GI + 'kiki.webp" alt=""><img src="' + GI + 'kiki.webp" alt=""></span>'; dn.classList.add("go"); sparkles(dn, 12); }, 1100);
-    var go = function () { dn.remove(); b.classList.remove("on"); og.level = L + 1; og.pause = false; resetLevelState(); flash("Level " + og.level + " · 90 seconds", "#F2C14E"); startMusic(); };
-    if (og.sim) go(); else setTimeout(go, 3600);
+    var go = function () { dn.remove(); b.classList.remove("on"); og.level = L + 1; og.pause = false; resetLevelState(); flash("Level " + og.level + " · 90 seconds", "#F2C14E"); startMusic(); tutStart(); };
+    var firstCook = !stationsFor(L).length && stationsFor(L + 1).length;   // the story beat: a cook clocks out
+    var moreCook = stationsFor(L).length === 1 && stationsFor(L + 1).length > 1;   // L5 adult: irons + skillet join
+    var next = function () {   // after the (optional) halftime: the L4 story beat + instructions, then the level
+      if (firstCook) { b.classList.remove("on"); og.pause = true; cookLeft(function () { howCook("fry", go); }); }
+      else if (moreCook) { b.classList.remove("on"); og.pause = true; howCook("full", go); }
+      else go();
+    };
+    // halftime.js (Antidote's review reel) takes over at most once per run (L2→5 after ~90–120 s); og.pause stays true until go()
+    if (og.sim) go(); else setTimeout(function () { if (!(W.Halftime && W.Halftime.levelUp(L + 1, next))) next(); }, 3600);
     hud();
   }
-  function nextTease(L) { return (L === 2 ? "shrimp, 2nd waffle iron, special requests, friends & moms with kids" : L === 3 ? "the skillet (eggs + bacon), 3rd fry basket, families" : L === 4 ? "loaded plates, the church group, bigger parties" : "VIP picky eaters") + " · guests get a little less patient and come in faster"; }
+  function nextTease(L) { return (L === 2 ? "toppings, drinks, baskets and NO-requests · plates cool faster" : L === 3 ? "breakfast plates, sides, families" : L === 4 ? "starters, loaded combos, the church group" : "prep requests: sautéed shrimp, sunny-side eggs, extra crispy, extra hot") + " · guests come in faster"; }
   function sparkles(host, n) { for (var i = 0; i < n; i++) { var s = D.createElement("span"); s.className = "spk"; s.textContent = pick(["✨", "⭐", "💛", "✨"]); s.style.left = "50%"; s.style.top = "40%"; s.style.setProperty("--dx", rnd(-80, 80) + "px"); s.style.setProperty("--dy", rnd(-70, 50) + "px"); s.style.animationDelay = (i * 0.06) + "s"; host.appendChild(s); setTimeout(function (x) { return function () { x.remove(); }; }(s), 1800); } }
 
   /* ================= LOOP ================= */
   function step(dt) {
-    if (!og.running) return;
-    // server walks
+    if (!og.running || og.hold) return;
     og.trips = og.trips.filter(function (tr) {
       tr.t += dt;
-      if (!tr.back && tr.t >= tr.dur) { tr.back = true; tr.t = 0; try { tr.onArrive(); } catch (e) {} if (!tr.srv.owner) { var cp = tr.el.querySelector(".cp"); if (cp && cp.tagName === "IMG") cp.remove(); } }
+      if (!tr.back && tr.t >= tr.dur) { tr.back = true; tr.t = 0; try { tr.onArrive(); } catch (e) {} var cp = tr.el.querySelector(".cp"); if (cp) cp.remove(); }
       if (tr.back && tr.t >= tr.dur) { tr.el.remove(); return false; }
       placeTrip(tr); return true;
     });
     var due = og.timers.filter(function (x) { return x.at <= og.now + dt; }); og.timers = og.timers.filter(function (x) { return x.at > og.now + dt; });
     og.now += dt;
     due.forEach(function (x) { try { x.fn(); } catch (e) { if (W.console) console.error(e); } });
+    jStep(dt);
     if (og.pause || !og.running) return;
     og.lt -= dt;
-    // cooking
-    ["fry", "iron", "skil"].forEach(function (st) { og[st].forEach(function (s, i) { if (!s) return; var d0 = s.el / s.T; s.el += dt; var d = s.el / s.T;
-      if (st === "iron" && d0 < 0.96 && d >= 0.96) sfx("beep");
-      if (d >= 2) { og[st][i] = null; addPts("penalty", -15); og.burnt++; popAt($(st).children[i], "Charred! −15", "#ff8a7a"); sfx("smoke"); } }); });
-    og.pot.stir = Math.max(0, og.pot.stir - dt / 24000);
-    // tray freshness
-    var cold = 0; og.tray = og.tray.filter(function (it) { it.fresh -= dt; if (it.fresh <= 0) { cold++; return false; } return true; });
-    og.plate.forEach(function (p) { if (p.cooked) p.fresh = Math.max(0, p.fresh - dt * 0.5); });
-    if (cold) { addPts("penalty", -10 * cold); flash("🥶 Went cold in the tray −" + 10 * cold, "#9cd3ff"); drawTray(); }
-    // guests
+    var cool = og.pace.cool * 1000; og.pass.forEach(function (p) { p.heat = Math.max(0, p.heat - dt / cool); });
+    cookStep(dt);
     og.nextArr -= dt; if (og.nextArr <= 0 && og.lt > 6000) arrivals();
     og.tables.forEach(function (tb) {
       if (tb.state !== "wait") return;
       tb.pat -= dt;
-      if (tb.pat / tb.patMax < 0.3 && !og.warned[tb.id + ":" + tb.seatedAt]) { og.warned[tb.id + ":" + tb.seatedAt] = 1; jurniPop("impatient"); }
+      if (og.demo && tb.pat < 3000) tb.pat = tb.patMax * 0.5;   // attract mode never ends
+      if (tb.pat / tb.patMax < 0.3 && !og.warned[tb.id + ":" + tb.seatedAt]) { og.warned[tb.id + ":" + tb.seatedAt] = 1; jWarn(tb); }
       if (tb.pat <= 0) walkout(tb);
     });
-    if (W.ReviewEgg && W.ReviewEgg.due && W.ReviewEgg.due(LEVEL_MS - og.lt)) tvOn();
+    if (!og.demo && W.ReviewEgg && W.ReviewEgg.due && W.ReviewEgg.due(LEVEL_MS - og.lt)) tvOn();
     if (tv && (og.tvT -= dt) <= 0) tvOff();
-    if (og.running && og.lt <= 0 && og.walk < MAX_WALK) levelUp();
+    if (og.demo) { demoBot(dt); if (og.lt < 8000) og.lt = LEVEL_MS; }
+    else if (og.running && og.lt <= 0 && og.walk < MAX_WALK) levelUp();
+  }
+  function jWarn(tb) {   // a table is getting impatient: Jurni heads over with her impatient face (rate-limited)
+    if (og.sim || og.now - og.popAt < 9000 || J.carrying) return; og.popAt = og.now;
+    var s = dsz(); jGo(Math.max(36, Math.min(s.w - 70, tb.def.x * s.w + 34)), Math.min(s.h - 8, tb.def.y * s.h + 14), "walk", function () { J.face = -1; jPose("impatient", 1500, pick(["Table " + tb.id + " is waiting! 😤", "Let's GO, kitchen! 👀"])); });
+    if (TH_ID === "halloween") sfx("boo");
   }
   var last = 0, frame = 0;
   function tick(now) {
     requestAnimationFrame(tick);
     var dt = last ? Math.min(100, now - last) : 16; last = now;
-    if (!og.running || og.sim) return;
+    if (!og.running || og.sim || D.hidden) return;
     step(dt); render();
   }
-  function render() {
-    frame++;
-    drawStations(); drawTables(); if (frame % 6 === 0) { trayFresh(); railPatience(); } hud();
-  }
+  function render() { frame++; drawTables(); if (og.act && og.act.length) drawStations(); if (frame % 4 === 0) passHeat(); if (frame % 6 === 0) railPatience(); hud(); }
   requestAnimationFrame(tick);
 
-  /* ================= HUD / FX ================= */
-  function buzz(p) { if (navigator.vibrate && !og.sim) try { navigator.vibrate(p); } catch (e) {} }
-  function mult() { return 1 + Math.min(og.streak || 0, 5) * 0.2; }
-  function hud() {
-    $("score").textContent = Math.round(og.score || 0).toLocaleString();
-    var s = Math.ceil(Math.max(0, og.lt == null ? LEVEL_MS : og.lt) / 1000); $("time").textContent = Math.floor(s / 60) + ":" + ("0" + s % 60).slice(-2);
-    $("lvl").textContent = "Level " + (og.level || 1); var mb = $("mode"); if (mb) mb.textContent = MODE ? modeBadge() : "";
-    var w = og.walk || 0, wx = ""; for (var i = 0; i < MAX_WALK; i++) wx += i < w ? "❌" : "⭕"; $("walk").textContent = wx; $("walk").setAttribute("aria-label", w + " of " + MAX_WALK + " walk-outs");
-    $("combo").textContent = "×" + mult().toFixed(1).replace(/\.0$/, "");
+  /* ================= ATTRACT MODE (silent demo behind the start menu) ================= */
+  var demoT = 0;
+  function demoBot(dt) {   // plays like a calm human: build → serve → deliver
+    demoT -= dt; if (demoT > 0) return; demoT = 650 + Math.random() * 400;
+    if (og.pass.length && (og.sel >= 0 || Math.random() < 0.7)) {
+      if (og.sel < 0) { pickPass(0); return; }
+      var p = og.pass[og.sel], t = null; og.tables.forEach(function (tb) { if (!t && tb.state === "wait" && tb.guests.some(function (g) { return !g.done && same(g.order.r, p.keys); })) t = tb; });
+      if (t) tapTable(t.id); else { og.pass.splice(og.sel, 1); og.sel = -1; drawPass(); } return;
+    }
+    var n = needs()[0]; if (!n) return;
+    var need = n.g.order.r, miss = need.filter(function (k) { return og.plate.indexOf(k) < 0; });
+    if (og.plate.some(function (k) { return need.indexOf(k) < 0; })) { og.plate = []; drawPlate(); return; }
+    if (miss.length) tap(miss[0]); else serve();
   }
-  function flash(t, col) { if (og.sim) return; var f = $("oflash"); f.textContent = t; f.style.color = col || "#fff"; f.classList.remove("on"); void f.offsetWidth; f.classList.add("on"); }
-  function popAt(el, t, col) {
-    if (og.sim || !el) return; var r = el.getBoundingClientRect(), o = ou.getBoundingClientRect(), p = D.createElement("div"); p.className = "pop2"; p.textContent = t; p.style.color = col || "#f2c14e";
-    p.style.left = Math.max(2, Math.min(o.width - 120, r.left - o.left + r.width / 2 - 50)) + "px"; p.style.top = (r.top - o.top) + "px"; ou.appendChild(p); setTimeout(function () { p.remove(); }, 1200);
+  function attract(on) {
+    if (on) {
+      if (og.running && !og.demo) return;
+      og.demoNext = true; start(); og.demoNext = false;
+      if (RM) {   // reduced motion: a still frame, not a running demo
+        og.tables.forEach(function (tb, i) { if (i < 4) seat(tb, makeParty(2, tb.cap)); });
+        og.pass = [{ keys: ["waffle", "chicken"], dish: DISHES[2], heat: 1, clean: true, tries: 0 }, { keys: ["gritz", "catfish"], dish: DISHES[5], heat: 0.8, clean: true, tries: 0 }];
+        drawPass(); render(); og.running = false;
+      } else { og.tables.slice(0, 3).forEach(function (tb) { seat(tb, makeParty(2, tb.cap)); }); }
+    } else if (og.demo) {
+      og.running = false; og.demo = false;
+      og.trips.forEach(function (tr) { tr.el.remove(); }); og.trips = [];
+      TABLES.forEach(function (t) { var el = $("tb" + t.id); el.className = "tb c" + t.cap + " r" + t.row; el.querySelector(".gs").innerHTML = ""; el.querySelector(".tt").innerHTML = ""; });
+      og.pass = []; og.plate = []; drawPass(); drawPlate(); drawRail(); hud();
+    }
   }
 
-  /* ---- Antidote's review on the kitchen TV (reviewegg.js): once a shift, in the dining room ---- */
+  /* ================= HUD / FX ================= */
+  function buzz(p) { if (navigator.vibrate && !og.sim && !og.demo) try { navigator.vibrate(p); } catch (e) {} }
+  function mult() { return 1 + Math.min(og.streak || 0, 5) * 0.2; }
+  function hud() {
+    var dm = og.demo;
+    $("score").textContent = dm ? "0" : Math.round(og.score || 0).toLocaleString(); var us = $("usd"); if (us) us.textContent = "$" + (dm ? 0 : og.usd || 0).toFixed(2);
+    var s = Math.ceil(Math.max(0, og.lt == null || dm ? LEVEL_MS : og.lt) / 1000); $("time").textContent = Math.floor(s / 60) + ":" + ("0" + s % 60).slice(-2);
+    $("lvl").textContent = "Level " + (dm ? 1 : og.level || 1); var mb = $("mode"); if (mb) mb.textContent = MODE ? modeBadge() : "";
+    var w = dm ? 0 : og.walk || 0, wx = ""; for (var i = 0; i < MAX_WALK; i++) wx += i < w ? "❌" : "⭕"; $("walk").textContent = wx; $("walk").setAttribute("aria-label", w + " of " + MAX_WALK + " walk-outs");
+    $("combo").textContent = "×" + (dm ? "1" : mult().toFixed(1).replace(/\.0$/, ""));
+  }
+  function sfxOK() { return !og.demo; }
+  function flash(t, col) { if (og.sim || og.demo) return; var f = $("oflash"); f.textContent = t; f.style.color = col || "#fff"; f.style.fontSize = t.length > 38 ? "14px" : ""; f.classList.remove("on"); void f.offsetWidth; f.classList.add("on"); }
+  function popAt(el, t, col) {
+    if (og.sim || og.demo || !el) return; var r = el.getBoundingClientRect(), o = ou.getBoundingClientRect(), p = D.createElement("div"); p.className = "pop2"; p.textContent = t; p.style.color = col || "#f2c14e";
+    p.style.left = Math.max(2, Math.min(o.width - 150, r.left - o.left + r.width / 2 - 60)) + "px"; p.style.top = (r.top - o.top) + "px"; ou.appendChild(p); setTimeout(function () { p.remove(); }, 1400);
+  }
+
+  /* ---- Antidote's review: the banner on the wall (always there) + the kitchen-TV bonus once a shift ---- */
+  function openPoster() {
+    if (og.demo) return;
+    var c = $("pcard"); c.classList.add("on"); if (og.running) og.hold = true;   // freezes the game (step + taps) until Back
+    try { c.querySelector("#pback").focus({ preventScroll: true }); } catch (e) {}
+  }
+  function closePoster(quiet) { var c = $("pcard"); if (!c) return; c.classList.remove("on"); og.hold = false; last = 0; }
   var tv = null;
   function tvOn() {
     if (!W.ReviewEgg || tv || og.sim) return;
-    tv = D.createElement("button"); tv.type = "button"; tv.className = "re-tv"; tv.style.left = "20px"; tv.style.top = "6px"; tv.setAttribute("aria-label", "Kitchen TV: Antidote's review. Tap for a bonus");
+    tv = D.createElement("button"); tv.type = "button"; tv.className = "re-tv"; tv.style.left = "112px"; tv.style.top = "40px"; tv.setAttribute("aria-label", "Kitchen TV: Antidote's review. Tap for a bonus");
     tv.innerHTML = '<span class="scr"><img src="' + W.ReviewEgg.cover.src + '" alt=""><i></i></span><b>📺 ANTIDOTE</b>';
     tv.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); if (!og.running || !tv) return;
-      var b = W.ReviewEgg.collect(); addPts("bonus", b); og.tipsUsd += 5; popAt(tv, "+" + b + " 📺", "#f2c14e"); flash("📺 Antidote reviewed us! +" + b, "#f2c14e"); buzz([20, 40, 20]); hud(); tvOff(); });
+      var b = W.ReviewEgg.collect(); addPts("bonus", b); popAt(tv, "+" + b + " 📺", "#f2c14e"); flash("📺 Antidote reviewed us! +" + b, "#f2c14e"); buzz([20, 40, 20]); hud(); tvOff(); });
     din.appendChild(tv); og.tvT = 12000;
+    var ps = $("poster"); ps.classList.remove("glint"); void ps.offsetWidth; ps.classList.add("glint");   // the banner glints when the TV egg shows up
   }
   function tvOff(now) { if (!tv) return; var t = tv; tv = null; if (now) { t.remove(); return; } t.classList.add("off"); setTimeout(function () { t.remove(); }, 450); }
 
@@ -862,35 +1116,34 @@
   }
   best();
   function end(why) {
-    if (!og.running) return;
+    if (!og.running || og.demo) return;
     og.running = false; stopMusic(); tvOff(true); hud();
     var b = best(); if (og.score > b) { try { localStorage.setItem(bestKey(), Math.round(og.score)); } catch (e) {} } best();
     if (MODE === "kid" && W.SSAI_TOKENS && W.SSAI_TOKENS.kidBest) W.SSAI_TOKENS.kidBest(og.score);   // kid best lives on the parent's account
-    var B = og.bk, rows = [["⚡ Speed", B.speed], ["✨ Quality", B.quality], ["🧾 Orders", B.orders], ["💵 Tips", B.tips], ["🔥 Streaks", B.streak], ["👥 Whole tables", B.group], ["🏆 Level bonus", B.level], ["📺 Bonus", B.bonus], ["❌ Mistakes", B.penalty]];
+    var B = og.bk, rows = [["⚡ Speed", B.speed], ["🔥 Heat", B.heat], ["🍳 Cooking", B.quality], ["🧾 Orders", B.orders], ["✨ Accuracy", B.accuracy], ["💵 Pay", B.money], ["💸 Tips", B.tips], ["🔥 Streaks", B.streak], ["👥 Whole tables", B.group], ["🏆 Level bonus", B.level], ["📺 Bonus", B.bonus], ["❌ Mistakes", B.penalty]];
     $("final").textContent = Math.round(og.score).toLocaleString() + " pts";
-    $("stats").textContent = modeBadge() + " mode · reached level " + og.level + " · " + og.served + " plates · $" + og.tipsUsd.toFixed(2) + " in tips · " + og.perfect + " perfect cooks · best streak " + og.best;
+    $("stats").textContent = modeBadge() + " mode · reached level " + og.level + " · " + og.served + " plates · $" + og.usd.toFixed(2) + " earned ($" + og.tipsUsd.toFixed(2) + " tips) · " + og.hotDeliv + " served 🔥 hot · " + og.perfect + " perfect · best streak " + og.best;
     $("brk").innerHTML = rows.filter(function (r) { return r[1]; }).map(function (r) { return "<span>" + r[0] + "</span><b" + (r[1] < 0 ? ' class="neg"' : "") + ">" + (r[1] > 0 ? "+" : "") + r[1].toLocaleString() + "</b>"; }).join("");
-    var s = og.score, P = (MODE === "kid" && W.GNW_PRIZES_KID) || W.GNW_PRIZES || [[15000, "a Free Original Collard Green Dip"], [10000, "Free Fried Cheese Gritz"], [6500, "a Free side of Smackin' Mac"], [3500, "a Free Kiki Palmer"]], prize = "";
+    var s = og.score, P = (MODE === "kid" && W.GNW_PRIZES_KID) || W.GNW_PRIZES || [], prize = "";
     for (var i = 0; i < P.length; i++) if (s >= P[i][0]) { prize = P[i][1]; break; }
     var nk = MODE === "kid" ? kidNick() : "";
-    $("rank").textContent = (nk ? "Great cooking, " + nk + "! " : "") + (prize ? "🏆 You won " + prize : (why === "walk" ? "3 walk-outs: kitchen's closed!" : "Kitchen's closed!") + " Try again while you wait");
+    $("rank").textContent = (nk ? "Great job, " + nk + "! " : "") + (prize ? "🏆 You won " + prize : (why === "walk" ? "3 walk-outs: kitchen's closed!" : "Kitchen's closed!") + " Try again while you wait");
     ["nickbox", "nicknote"].forEach(function (id) { var x = $(id); if (x) x.remove(); });
     if (MODE === "kid") $("brk").insertAdjacentHTML("afterend", '<div id="nickbox" style="max-width:290px;margin:4px auto;display:flex;gap:6px"><input id="nick" maxlength="16" placeholder="Nickname (optional)" value="' + esc(nk) + '" aria-label="Nickname for the score screen, saved on this phone only" style="flex:1;min-width:0;font:700 15px var(--body);padding:9px 10px;border-radius:10px;border:1px solid #ffffff44;background:#ffffff14;color:#fff"><button type="button" class="btn" id="nicksave" style="padding:9px 12px">Save</button></div><p id="nicknote" style="margin:0 auto 6px;max-width:290px;font-size:11.5px;color:#E8DCF5">Nickname stays on this phone only. Never sent anywhere.</p>');
     var nb = $("nicksave"); if (nb) nb.onclick = function () { try { localStorage.setItem("gnw-kid-nick", $("nick").value.trim().slice(0, 16)); } catch (e) {} nb.textContent = "Saved ✓"; };
     var won = $("won"); won.style.display = "none";
     if (prize && W.SSAI_WIN) {
-      // Kid mode: kid-sized prizes, KID- code + "🧒 KID PRIZE" tag + the at-the-table rule (crm.js SSAI_KID_RULE)
       var kidP = MODE === "kid", KR = W.SSAI_KID_RULE || "Kid prize — redeemable with the young player at the table, one per kid per visit.";
       var kidH = kidP ? "<br><span style=\"display:inline-block;margin:6px 0 2px;background:#F2C14E;color:#1E1B3A;font:900 12px var(--body);border-radius:99px;padding:3px 10px\">🧒 KID PRIZE</span><br><span style=\"font-weight:700;font-size:12.5px;color:#FFE9A3\">" + KR + "</span>" : "";
       var w = W.SSAI_WIN(prize.replace(/^an? /, ""), kidP ? { kid: true } : null);
       var showWin = function () {
         if (w.blocked) won.innerHTML = "🏆 You'd win " + prize + ", but you already have <b>" + w.prize.t + "</b> waiting (code " + w.prize.c + ").<br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">Use it by " + w.until + ", then your next win saves. One reward at a time.</span>";
-        else won.innerHTML = "🏆 You won " + prize + "!" + kidH + "<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#F2C14E;letter-spacing:.1em\">" + w.prize.c + "</span><br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">" + (w.saved || W.SSAI_GATE ? (MODE === "kid" ? "Saved to the parent's rewards account. Show your server with the young player at the table. Good for 3 days." : "Saved to your rewards. Show your server to redeem. Good for 3 days.") : "Join Gritz N Wafflez Rewards below to save it.") + "</span>";
+        else won.innerHTML = "🏆 You won " + prize + "!" + kidH + "<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#F2C14E;letter-spacing:.1em\">" + w.prize.c + "</span><br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">" + (w.saved || W.SSAI_GATE ? (kidP ? "Saved to the parent's rewards account. Show your server with the young player at the table. Good for 3 days." : "Saved to your rewards. Show your server to redeem. Good for 3 days.") : "Join Gritz N Wafflez Rewards below to save it.") + "</span>";
         won.style.display = "block";
       };
       if (w.saved || !W.SSAI_GATE) showWin();
-      else { won.innerHTML = (w.blocked ? "🏆 You'd win " + prize + ", but you already have <b>" + w.prize.t + "</b> waiting." : "🏆 You won " + prize + "!") + kidH + "<br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">" + (MODE === "kid" ? "A parent or guardian saves it to their Gritz N Wafflez Rewards." : "Save it to your Gritz N Wafflez Rewards to get your code.") + "</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display = "block";
-        $("wsave").onclick = function () { W.SSAI_GATE(MODE === "kid" ? "kidprize" : "prize", showWin); }; }
+      else { won.innerHTML = (w.blocked ? "🏆 You'd win " + prize + ", but you already have <b>" + w.prize.t + "</b> waiting." : "🏆 You won " + prize + "!") + kidH + "<br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">" + (kidP ? "A parent or guardian saves it to their Gritz N Wafflez Rewards." : "Save it to your Gritz N Wafflez Rewards to get your code.") + "</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display = "block";
+        $("wsave").onclick = function () { W.SSAI_GATE(kidP ? "kidprize" : "prize", showWin); }; }
     }
     if (W.ReviewEgg && !og.sim) W.ReviewEgg.endCard($("over"), $("over").querySelector(".btns"));
     $("over").classList.add("on");
@@ -899,25 +1152,28 @@
 
   /* ================= INPUT ================= */
   ou.addEventListener("click", function (e) {
-    var b = e.target.closest && e.target.closest("button,[data-k],.plt img"); if (!b || !ou.contains(b)) return;
-    if (b.dataset.drop) return drop(b.dataset.drop, b.dataset.k);
+    var t = e.target; if (!t.closest) return;
+    if (t.closest("#poster")) { e.preventDefault(); return openPoster(); }
+    if (t.closest("#pback")) { return closePoster(); }
+    if (og.demo) return;
+    var b = t.closest("button,[data-tb],.plt img,.cupz img"); if (!b || !ou.contains(b)) return;
+    if (b.dataset.ps != null) return pickPass(+b.dataset.ps);
     if (b.dataset.st) return pull(b.dataset.st, +b.dataset.i);
-    if (b.dataset.ti != null) return fromTray(+b.dataset.ti);
-    if (b.closest("#bins")) return toggleBin(b.dataset.k);
-    if (b.tagName === "IMG" && b.dataset.k) return takeOff(b.dataset.k);
-    if (b.id === "stir") return stir(); if (b.id === "scoop") return scoop();
-    if (b.id === "trash") return clearPlate(); if (b.id === "serve") return serve();
+    if (b.dataset.tb) return tapTable(+b.dataset.tb);
+    if (b.closest("#grid") && b.dataset.k) return tap(b.dataset.k);
+    if (b.tagName === "IMG" && b.dataset.k) return tap(b.dataset.k);
+    if (b.id === "undo") return undo(); if (b.id === "trash") return clearPlate(); if (b.id === "serve") return serve();
   });
-  $("cupz").addEventListener("click", function (e) { var im = e.target.closest("img"); if (im && im.dataset.k) takeOff(im.dataset.k); });
 
   /* ================= API (start menu, tests, bot) ================= */
   W.__OG = {
-    get: function () { return og; }, start: start, mode: function () { return MODE; }, setMode: setMode, requestMode: requestMode, resetMode: function () { MODE = ""; try { localStorage.removeItem("gnw-mode"); } catch (e) {} hud(); best(); menuRefresh(); }, lvParams: lvParams, ITEMS: ITEMS, DISHES: DISHES, SERVERS: SERVERS, GUESTS: GU, theme: TH_ID, hair: HAIR,
+    get: function () { return og; }, start: function () { attract(false); start(); }, attract: attract, mode: function () { return MODE; }, setMode: setMode, requestMode: requestMode,
+    resetMode: function () { MODE = ""; try { localStorage.removeItem("gnw-mode"); } catch (e) {} hud(); best(); menuRefresh(); }, lvParams: lvParams, ITEMS: ITEMS, DISHES: DISHES, SERVERS: SERVERS, GUESTS: GU, theme: TH_ID, hair: HAIR,
     sim: function (on) { og.sim = !!on; }, step: function (ms) { var n = Math.ceil(ms / 50); for (var i = 0; i < n && og.running; i++) step(50); },
-    render: render, drop: drop, pull: pull, pour: pour, stir: stir, scoop: scoop, fromTray: fromTray, bin: toggleBin, serve: serve, clear: clearPlate,
-    levelUp: function () { og.lt = 1; }, jurniPop: function (k) { return jurniPop(k, true); }, end: end, quality: quality, U: U,
+    render: render, tap: tap, undo: undo, clear: clearPlate, serve: serve, pick: pickPass, table: tapTable, needs: needs, unlocked: unlocked, pull: pull, cookAt: cookAt, stationsFor: stationsFor, COOK: COOK, quality: quality, cookLeft: cookLeft, howCook: function (k, cb) { howCook(k === "full" ? "full" : "fry", cb); },
+    levelUp: function () { og.lt = 1; }, jPose: function (p, ms, b) { jPose(p, ms || 1500, b); }, jGoodbye: jGoodbye, jDeliverTest: function (id) { var tb = og.tables[id - 1]; jDeliver(tb, 0, DISHES[2]); }, end: end, openPoster: openPoster,
     seatTest: function (ids, tableId) { var tb = og.tables[tableId - 1]; seat(tb, { ids: ids, kind: "test" }); }
   };
   $("startov").addEventListener("click", function () { if (W.GameMenu) W.GameMenu.open(); else start(); });
-  drawRail(); hud();
+  drawPass(); drawRail(); buildGrid(); hud(); jReset();
 })();

@@ -25,6 +25,11 @@
             get:function(){ return "kid"|"adult"|"" }, set:function(v){}}
                                     two big buttons above PLAY; PLAY waits until one is picked (the game remembers it).
                                     With tokens:true the pick is passed on (kid mode never asks the child for contact info).
+     spinBadge:true                 (opt-in, needs tokens:true + CRM_CFG.spin) the 🎡 Free daily spin button gleams, shows a red
+                                    "1" badge (also on Points & prizes) and its wheel spins every few seconds while a spin is
+                                    available; once used it shows "next spin in 5h 12m".
+     preview:function(on){}         (opt-in) live "attract mode": the menu card turns see-through over the game area and the
+                                    game runs a silent demo behind it. Called with true when the menu opens, false on PLAY.
    Audio convention (games that have sound expose it; the menu wires to it):
      window.GAME_AUDIO={ music:function(on){}, sfx:function(on){}, state:function(){ return {hasMusic:true,hasSfx:true,music:true,sfx:true}; } }
      music(false) must silence ONLY the music (gain 0 / pause the <audio>), never suspend the shared AudioContext.
@@ -123,6 +128,16 @@
     "html.gm-up .ssai-pausebtn{display:none!important}" +
     ".gm-tok{margin:0;font:700 13.5px/1.3 var(--gm-body);color:var(--gm-ink);background:var(--gm-soft);border:1px solid var(--gm-edge);border-radius:999px;padding:7px 14px;max-width:310px}.gm-tok b{color:var(--gm-label);font-size:16px}" +
     ".gm-play.lock{filter:grayscale(.55) brightness(.85);animation:none}" +
+    // opt-in: daily-spin gleam + badge, live preview behind the menu
+    ".gm-b.gm-spin{position:relative;overflow:hidden}.gm-b.gm-spin.rdy{box-shadow:0 0 0 2px var(--gm-acc2),0 0 18px color-mix(in srgb,var(--gm-acc2) 55%,transparent)}" +
+    ".gm-b.gm-spin.rdy:after{content:'';position:absolute;top:0;bottom:0;left:-60%;width:45%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-18deg);animation:gmGleam 3.6s ease-in-out infinite}" +
+    "@keyframes gmGleam{0%,55%{left:-60%}85%,100%{left:130%}}" +
+    ".gm-b.gm-spin.rdy i{display:inline-block;animation:gmWheel 5s cubic-bezier(.2,.9,.3,1) infinite}@keyframes gmWheel{0%{transform:rotate(0)}14%{transform:rotate(560deg)}17%{transform:rotate(530deg)}20%{transform:rotate(545deg)}22%,100%{transform:rotate(540deg)}}" +
+    ".gm-nb{position:absolute;right:6px;top:4px;min-width:18px;height:18px;border-radius:9px;background:#e3262f;color:#fff;font:900 11px/18px var(--gm-body);text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4);padding:0 4px}" +
+    ".gm-b small.gm-cd{display:block;font:700 10px/1.1 var(--gm-body);color:var(--gm-dim)}" +
+    ".gm-ov.gm-pv{background:linear-gradient(180deg,rgba(14,17,32,.42),rgba(14,17,32,.62));-webkit-backdrop-filter:blur(1.5px);backdrop-filter:blur(1.5px)}" +
+    ".gm-ov.gm-pv>*{position:relative;z-index:1}.gm-ov.gm-pv:before{content:'';position:absolute;left:6%;right:6%;top:28%;bottom:4%;border-radius:24px;background:radial-gradient(ellipse at 50% 55%,rgba(10,12,24,.82),rgba(10,12,24,.35) 70%,transparent);z-index:0;pointer-events:none}" +
+    ".gm-ov.gm-pv .gm-t,.gm-ov.gm-pv .gm-by{text-shadow:0 2px 10px #000,0 0 2px #000}" +
     ".gm-who{width:min(300px,100%)}.gm-who p{margin:0 0 5px;font:800 12px/1 var(--gm-body);letter-spacing:.14em;text-transform:uppercase;color:var(--gm-label)}" +
     ".gm-wb{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gm-wb button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:62px;padding:6px;border-radius:16px;border:2px solid var(--gm-edge);background:var(--gm-card);color:var(--gm-ink);font:900 17px/1.1 var(--gm-body);cursor:pointer;touch-action:manipulation}" +
     ".gm-wb button i{font-style:normal;font-size:24px;line-height:1}.gm-wb button small{font:700 11px/1.2 var(--gm-body);color:var(--gm-dim)}.gm-wb button[aria-pressed=true]{border-color:var(--gm-acc2);background:color-mix(in srgb,var(--gm-acc) 30%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--gm-acc2) 40%,transparent)}" +
@@ -150,12 +165,14 @@
     if (tk) { try { h += '<p class="gm-tok" aria-live="polite">' + tk.statusHTML(cur === "kid") + "</p>"; } catch (e) {} }
     h += '<button type="button" class="gm-play' + (tk && tk.locked() ? " lock" : "") + '" data-gm="play"><b></b>' + esc(T(tk ? tk.playLabel() : "PLAY")) + "</button>";
     var bs = [];
-    if (tk && tk.spin) bs.push('<button type="button" class="gm-b" data-gm="spin"><i>🎡</i>' + esc(T(tk.spinReady() ? "Free daily spin" : "Spun today ✓")) + "</button>");
+    var sr = !!(tk && tk.spin && tk.spinReady()), badge = C.spinBadge && sr;
+    if (tk && tk.spin) bs.push(C.spinBadge ? '<button type="button" class="gm-b gm-spin' + (sr ? " rdy" : "") + '" data-gm="spin"><i>🎡</i><span>' + esc(T(sr ? "Free daily spin" : "Spun today ✓")) + (sr ? "" : '<small class="gm-cd">' + esc(T("next spin in")) + " " + cd() + "</small>") + "</span>" + (sr ? '<b class="gm-nb" aria-label="1 spin available">1</b>' : "") + "</button>"
+      : '<button type="button" class="gm-b" data-gm="spin"><i>🎡</i>' + esc(T(sr ? "Free daily spin" : "Spun today ✓")) + "</button>");
     if (tk && tk.on) bs.push('<button type="button" class="gm-b" data-gm="tokens"><i>🪙</i>' + esc(T("Get tokens")) + "</button>");
     if (hasMusic()) bs.push('<button type="button" class="gm-b" data-gm="music" aria-pressed="' + !!S.music + '"><i>' + (S.music ? "🎵" : "🔇") + "</i>" + esc(T(S.music ? "Music on" : "Music off")) + "</button>");
     bs.push('<button type="button" class="gm-b" data-gm="settings"><i>⚙️</i>' + esc(T("Settings")) + "</button>");
     bs.push('<button type="button" class="gm-b" data-gm="how"><i>❓</i>' + esc(T("How to play")) + "</button>");
-    bs.push('<button type="button" class="gm-b" data-gm="points"><i>🏆</i>' + esc(T("Points & prizes")) + "</button>");
+    bs.push('<button type="button" class="gm-b' + (badge ? " gm-spin" : "") + '" data-gm="points"><i>🏆</i>' + esc(T("Points & prizes")) + (badge ? '<b class="gm-nb" aria-label="1 free spin waiting">1</b>' : "") + "</button>");
     if (bs.length % 2) bs[bs.length - 1] = bs[bs.length - 1].replace('class="gm-b"', 'class="gm-b wide"');
     return h + '<div class="gm-grid">' + bs.join("") + "</div>";
   }
@@ -172,7 +189,9 @@
     box = q(C.box) || (mount.closest && mount.closest(".gamebox")) || mount.parentNode;
     if (getComputedStyle(box).position === "static") box.style.position = "relative";
     ov = el("div", "gm-ov"); ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", (C.name || "Game") + " start menu");
-    ov.innerHTML = menuHTML(); if (C.modes) ov.classList.add("hasmodes"); box.appendChild(ov);
+    ov.innerHTML = menuHTML(); if (C.modes) ov.classList.add("hasmodes"); if (C.preview) ov.classList.add("gm-pv"); box.appendChild(ov);
+    preview(true);
+    if (C.spinBadge) setInterval(function () { if (opened && ov && ov.querySelector(".gm-cd")) ov.innerHTML = menuHTML(); }, 30000);
     ov.addEventListener("click", onBtn);
     place();
     if (W.ResizeObserver) new ResizeObserver(place).observe(box); W.addEventListener("resize", place);
@@ -189,6 +208,7 @@
     if (a === "play") play();
     else if (a === "music") setMusic(!S.music);
     else if (a === "pclose") closeSheet();
+    else if (a === "howlink") { closeSheet(); try { C.how.links[+b.getAttribute("data-v")][1](); } catch (x) {} }
     else if (a === "mode") { try { C.modes.set(b.getAttribute("data-v")); } catch (x) {} if (ov && opened) ov.innerHTML = menuHTML(); }
     else if (a === "spin") { closeSheet(); if (TK()) TK().openSpin(); }
     else if (a === "tokens") { closeSheet(); if (TK()) TK().openTokens(); }
@@ -196,6 +216,9 @@
     else if (a === "diff") { S.diff = b.getAttribute("data-v"); save(); try { C.difficulty.set(S.diff); } catch (x) {} panel("settings"); }
     else panel(a);
   }
+  // opt-in live preview: the real game runs a silent demo behind the see-through menu
+  function preview(on) { if (!C.preview) return; try { C.preview(!!on); } catch (x) { if (W.console) console.error(x); } }
+  function cd() { var tk = TK(), ms = tk && tk.nextSpinMs ? tk.nextSpinMs() : 0, m = Math.max(1, Math.round(ms / 60000)); return (m >= 60 ? Math.floor(m / 60) + "h " : "") + (m % 60) + "m"; }
   function play() {
     closeSheet();
     var M = C.modes, cur = "";
@@ -210,8 +233,8 @@
     try { C.start && C.start(); } catch (x) { if (W.console) console.error(x); }
     showM();
   }
-  function open() { if (!ov) return; hideOld(true); ov.innerHTML = menuHTML(); ov.classList.remove("gone"); void ov.offsetWidth; ov.classList.remove("off"); opened = true; D.documentElement.classList.add("gm-up"); place(); showM(); }
-  function close() { if (!ov) return; ov.classList.add("off", "gone"); opened = false; D.documentElement.classList.remove("gm-up"); }
+  function open() { if (!ov) return; hideOld(true); preview(true); ov.innerHTML = menuHTML(); ov.classList.remove("gone"); void ov.offsetWidth; ov.classList.remove("off"); opened = true; D.documentElement.classList.add("gm-up"); place(); showM(); }
+  function close() { if (!ov) return; preview(false); ov.classList.add("off", "gone"); opened = false; D.documentElement.classList.remove("gm-up"); }
 
   /* ---------- settings ---------- */
   function setMusic(on) {
@@ -254,6 +277,8 @@
       if (hw.goal) h += '<div class="gm-goal">🎯 <b>' + esc(T("Goal")) + ":</b> " + esc(T(hw.goal)) + "</div>";
       if (hw.steps && hw.steps.length) h += '<p class="gm-g">' + esc(T("Controls & rules")) + "</p>" + hw.steps.map(function (s) { return row({ icon: s[0], img: s[2], name: s[1] }); }).join("");
       if (hw.time) h += row({ icon: "⏱️", name: hw.time });
+      // optional replay links, e.g. how:{links:[["🍳 How to cook: the fryer", fn], …]}
+      if (hw.links && hw.links.length) h += '<p class="gm-g">' + esc(T("Replay a lesson")) + "</p>" + hw.links.map(function (l, i) { return '<button type="button" class="gm-sw" data-gm="howlink" data-v="' + i + '"><span>' + esc(T(l[0])) + "</span></button>"; }).join("");
       if (TK()) { try { h += TK().menuHTML(row, "how"); } catch (e) {} }
       h += '<p class="gm-note">' + esc(T("Pause anytime with the ⏸ Pause button in the corner.")) + "</p>";
     } else if (p === "settings") {

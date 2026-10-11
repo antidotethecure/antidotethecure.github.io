@@ -87,12 +87,13 @@ window.VALUE = {
       one: "We set it all up with you, host it, update menu and prices on request, and answer when you call.",
       tool: "web freelancer maintenance plan", unit: "mo", low: 50, typ: 100, perLocation: true, est: true, src: ["maint"] },
     /* ---- optional, NOT included, NOT in totals ---- */
-    { group: "Optional extras (not included, cost extra)", ic: "☎️", name: "AI phone host", optional: true, ours: "$99/mo per location",
-      one: "Answers your phone 24/7 when nobody can: hours, menu, specials. Takes messages and texts you.",
-      tool: "Slang.ai or Loman", unit: "mo", low: 199, typ: 399, est: true, src: ["loman", "slang"] },
-    { group: "Optional extras (not included, cost extra)", ic: "🤖", name: "AI text agent", optional: true, ours: "$49/mo per location",
-      one: "Texts guests back 24/7 and sends the reward and come-back texts you approve.",
-      tool: "Dialzara SMS Agent at ~1,000 messages", unit: "mo", low: 69, typ: 69, src: ["dialz"] }
+    /* AI agent tiers (Antidote, 2026-10-11): Tier 1 Text $75, Tier 2 Voice + Text $150. Details + FAQ at /agents/. */
+    { group: "Optional extras (not included, cost extra)", ic: "💬", name: "Tier 1: AI Text Assistant", optional: true, ours: "$75/mo per location",
+      one: "Guests text your number and an AI texts back 24/7: hours, menu, specials, reservation requests, catering, the app. Missed calls get an automatic text back, and anything it can't answer goes to you.",
+      tool: "Dialzara SMS Agent (~1,000 messages) + Quo missed-call text-back", unit: "mo", low: 84, typ: 88, src: ["dialz", "quo"] },
+    { group: "Optional extras (not included, cost extra)", ic: "☎️", name: "Tier 2: AI Voice Host + Text Assistant", optional: true, ours: "$150/mo per location (texting included)",
+      one: "A natural AI voice answers your phone 24/7 or after hours, takes reservation requests, transfers to staff and texts links during the call. Includes everything in Tier 1.",
+      tool: "Slang.ai or Loman phone AI + Dialzara texting + Quo text-back", unit: "mo", low: 283, typ: 487, est: true, src: ["loman", "slang", "dialz", "quo"] }
   ],
   owners: {
     christian: { who: "Christian", places: "Melody · Nalu Vida", locations: 2, setup: 1500, monthly: 300, back: "../onboarding/christian/",

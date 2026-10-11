@@ -62,7 +62,7 @@ details.built{margin-top:10px}details.built summary{cursor:pointer;color:var(--d
 <div id="launch"></div>
 <div class="step" style="border-color:var(--gold)"><div class="num" style="background:var(--gold);color:#241a00">$</div><div><h3>💡 What all of this would cost elsewhere</h3><p>Every tool in your package, what other companies charge for it on its own, and your price next to it.</p><a class="go" style="background:var(--gold);color:#241a00" href="../../value/?o=christian">See the comparison →</a></div></div>
 <h2>4 · AI agents (optional add-on)</h2>
-<p class="note"><b>Everything else is already in your package:</b> the app, the 4K menu, the game, rewards and referrals, QR stickers and posters, your setup and updates. The two AI agents below are optional and have their own monthly fee, because they use phone lines and AI minutes every month. You choose per restaurant, and you can turn them on or off anytime.</p>
+<p class="note"><b>Everything else is already in your package:</b> the app, the 4K menu, the game, rewards and referrals, QR stickers and posters, your setup and updates. The AI agents below are optional and have their own monthly fee, because they use phone lines, texts and AI minutes every month. There are two tiers: the <b>AI Text Assistant</b> ($75/mo) and the <b>AI Voice Host + Text Assistant</b> ($150/mo, everything). You pick per restaurant, and you can change or turn it off anytime. <a href="../../agents/" style="color:var(--gold);font-weight:800">See the AI tiers, FAQ and live demos &rarr;</a></p>
 <div id="aiphone"></div>
 <div id="printspots"></div><script src="../../assets/printspots.js"></script>
 
@@ -187,26 +187,37 @@ function buildReview(r,box){ var M=r.menu||[]; if(!M.length){ box.innerHTML='<p 
 function menuSummary(r){ var M=r.menu||[], m=mrev(r), out=["MENU CHECK — "+r.short+": "+Object.keys(m).length+" of "+M.length+" items checked"+(S["allok_"+r.key]?" (tapped “Everything checks out”)":"")+(S["mok_"+r.key]?" · menu approved":" · menu NOT approved yet")];
   M.forEach(function(it,i){ var v=m[i]; if(v==="rm") out.push("• REMOVE: "+it[1]); else if(v&&v.price!=null) out.push("• PRICE FIX: "+it[1]+" "+(it[2]||"—")+" → "+(v.price||"(blank)")); }); return out.join("\n"); }
 
-/* AI agents add-on (calls + texts): owner picks per restaurant; prices from setup-kit/owners/<owner>.json "aiAgents" */
-var AG={"call": {"name": "AI call agent", "price": 99, "included": 750, "unit": "minutes", "over": 0.15, "about": "about 17 calls a day", "does": "Answers your phone when nobody can, 24/7: hours, menu, specials, parking, the app. It takes messages and texts you the caller's name and number. It never takes payments or confirms reservations.", "parts": [["AI voice, up to 750 minutes (ElevenLabs, 8\u00a2 a minute)", 60], ["The AI brain that understands callers", 7], ["Phone number + incoming call minutes (Twilio)", 8], ["Setup on your menu + specials, weekly call reviews, updates", 24]]}, "text": {"name": "AI text agent", "price": 49, "included": 1000, "unit": "texts", "over": 0.03, "about": "replies and automatic texts combined", "does": "Texts guests back 24/7 (hours, menu, specials, the app), sends a text when a call is missed, and sends the reward, raffle, winner, birthday and come-back texts you approve.", "parts": [["Up to 1,000 texts (carrier + Twilio, about 1.5\u00a2 each)", 15], ["The AI that writes the replies", 4], ["Text number + carrier registration (required to text customers)", 6], ["Setup, message templates, monitoring, updates", 24]]}, "compare": "A part-time host just to answer phones costs about $2,500+ a month. Answering services charge about $1\u20132 per minute."}, aiBox=document.getElementById("aiphone");
-function agentCost(){ var t=0; REST.forEach(function(r){ var c=S["ai_"+r.key]||"", x=S["txt_"+r.key]||""; if(/^Yes/.test(c)) t+=AG.call.price; if(/^Yes/.test(x)) t+=AG.text.price; }); return t; }
+/* AI agents add-on: one choice per restaurant (None / Text / Voice + Text); tiers + prices from setup-kit/build_launch.py AGENTS (owner override "aiAgents") */
+var AG={"page": "../../agents/", "tiers": [{"key": "text", "name": "AI Text Assistant", "short": "Text", "price": 75, "does": "Customers text your number and an AI texts back 24/7: hours, location and parking, menu, prices and specials, the app and rewards link, catering and party inquiries, FAQs. It collects reservation requests and sends them to your staff, and hands anything it can't answer to you or your manager. Missed-call text-back: if a call isn't answered, the caller gets a text so they can keep going by text.", "limits": "1,000 texts a month included, plenty for most restaurants. Then $0.03 a text.", "parts": [["Up to 1,000 texts (carrier + Twilio, about 1.5\u00a2 each)", 15], ["The AI that writes the replies", 6], ["Text number + carrier registration (A2P 10DLC, required to text customers)", 6], ["Missed-call text-back + hand-off to you or your manager", 8], ["Setup on your menu, specials + FAQs, monitoring, updates", 40]]}, {"key": "voice", "name": "AI Voice Host + Text Assistant", "short": "Voice + Text", "price": 150, "flag": "Most popular \u00b7 Everything", "does": "A natural AI voice answers your phone 24/7 or only after hours: it answers questions, takes reservation requests, transfers to staff when needed, and texts links (menu, app, directions) during the call. Includes everything in the AI Text Assistant.", "limits": "750 call minutes plus 1,000 texts a month included, plenty for most restaurants. Then $0.15 a minute and $0.03 a text.", "parts": [["AI voice, up to 750 minutes (ElevenLabs, about 8\u00a2 a minute)", 60], ["The AI brain that understands callers", 7], ["Phone number + incoming call minutes (Twilio)", 8], ["Texting: up to 1,000 texts, AI replies, carrier registration", 27], ["Setup on your menu + specials, weekly call reviews, updates", 48]]}], "compare": "Elsewhere (typical published pricing, Oct 2026): AI phone answering like Loman or Slang.ai runs about $199\u2013$399 a month, an AI texting agent like Dialzara about $69, and missed-call text-back like Quo $15\u2013$19. A part-time host just to answer phones costs about $2,500+ a month."}, aiBox=document.getElementById("aiphone");
+function tierOpt(t){ return t.short+" · $"+t.price+"/mo"; }
+var AG_NONE="None", AG_TALK="Let's talk about it";
+function tierBy(k){ return AG.tiers.filter(function(t){ return t.key===k; })[0]||null; }
+function agentTier(r){ var v=S["agent_"+r.key]; return AG.tiers.filter(function(t){ return v===tierOpt(t); })[0]||null; }
+function agentCost(){ var t=0; REST.forEach(function(r){ var x=agentTier(r); if(x) t+=x.price; }); return t; }
 (function(){ if(!aiBox) return;
-  function card(a,icon){ var d=h("div","q"), sum=a.parts.reduce(function(t,p){ return t+p[1]; },0);
-    d.innerHTML='<b>'+icon+' '+a.name+' · $'+a.price+'/month per restaurant</b><div style="color:var(--dim);font-size:14px;margin:4px 0 8px">'+a.does+'</div>'+
-      '<div style="font-size:14px">Includes up to <strong>'+a.included.toLocaleString()+' '+a.unit+'</strong> a month'+(a.about?' ('+a.about+')':'')+'. Extra '+a.unit+' are $'+a.over.toFixed(2)+' each.</div>'+
+  // carry over answers given on the old two-toggle version of this page (call agent / text agent)
+  var moved=false; REST.forEach(function(r){ if(S["agent_"+r.key]) return; var c=S["ai_"+r.key]||"", x=S["txt_"+r.key]||"", v=tierBy("voice"), tx=tierBy("text");
+    if(/^Yes/.test(c)&&v){ S["agent_"+r.key]=tierOpt(v); moved=true; } else if(/^Yes/.test(x)&&tx){ S["agent_"+r.key]=tierOpt(tx); moved=true; } });
+  if(moved){ try{ localStorage.setItem(K,JSON.stringify(S)); }catch(e){} }
+  function card(a,i){ var d=h("div","q"), sum=a.parts.reduce(function(t,p){ return t+p[1]; },0);
+    d.innerHTML='<b>'+(i?'📞💬':'💬')+' Tier '+(i+1)+': '+a.name+' · $'+a.price+'/month per restaurant'+(a.flag?' <span class="tag" style="background:var(--gold);color:#241a00">'+a.flag+'</span>':'')+'</b><div style="color:var(--dim);font-size:14px;margin:4px 0 8px">'+a.does+'</div>'+
+      '<div style="font-size:14px">'+a.limits+'</div>'+
       '<details style="margin-top:8px"><summary style="cursor:pointer;color:var(--gold);font-weight:700">What the $'+a.price+' pays for</summary><table style="width:100%;margin-top:8px;border-collapse:collapse;font-size:14px">'+
       a.parts.map(function(p){ return '<tr style="border-top:1px solid rgba(255,255,255,.08)"><td style="padding:7px 0">'+p[0]+'</td><td style="text-align:right;white-space:nowrap">~$'+p[1]+'</td></tr>'; }).join("")+
       '<tr style="border-top:2px solid rgba(255,255,255,.2)"><td style="padding:7px 0"><b>Per restaurant, per month</b></td><td style="text-align:right"><b>$'+sum+'</b></td></tr></table></details>';
     aiBox.appendChild(d); }
-  card(AG.call,"📞"); card(AG.text,"💬");
+  AG.tiers.forEach(card);
   if(AG.compare){ var cmp=h("div","q"); cmp.innerHTML='<b>For comparison</b><div style="color:var(--dim);font-size:14px;margin-top:4px">'+AG.compare+'</div>'; aiBox.appendChild(cmp); }
   REST.forEach(function(r){
-    q(aiBox,"ai_"+r.key,"📞 AI call agent at "+r.short+"? ($"+AG.call.price+"/mo)",["Yes, missed + after-hours calls","Yes, answer every call","Not now","Let's talk about it"]);
-    q(aiBox,"txt_"+r.key,"💬 AI text agent at "+r.short+"? ($"+AG.text.price+"/mo)",["Yes","Not now","Let's talk about it"]); });
+    var d=q(aiBox,"agent_"+r.key,"🤖 AI agents at "+r.short+"?",[AG_NONE].concat(AG.tiers.map(tierOpt)).concat([AG_TALK]),"One choice per restaurant. Voice + Text includes everything in Text.");
+    var w=h("div"); w.style.marginTop="10px"; d.appendChild(w);
+    q(w,"agenthours_"+r.key,"When should the voice host answer at "+r.short+"?",["Every call, 24/7","After hours + missed calls"]);
+    function show(){ var t=agentTier(r); w.style.display=(t&&t.key==="voice")?"block":"none"; } d.onpick=show; show(); });
   var tot=h("div","q"); tot.id="agtot"; aiBox.appendChild(tot);
 })();
 function drawAgents(){ var e=document.getElementById("agtot"); if(!e) return; var t=agentCost();
-  e.innerHTML='<b>Your AI add-ons: '+(t?'$'+t+'/month':'none picked')+'</b><div style="color:var(--dim);font-size:14px;margin-top:4px">'+(t?'On top of your package. Everything else stays included.':'Your package covers everything else. You can add the agents later.')+'</div>'; }
+  var lines=REST.map(function(r){ var x=agentTier(r); return x?r.short+": "+x.short+" $"+x.price:""; }).filter(Boolean);
+  e.innerHTML='<b>Your AI add-ons: '+(t?'$'+t+'/month':'none picked')+'</b><div style="color:var(--dim);font-size:14px;margin-top:4px">'+(t?(REST.length>1?lines.join(" · ")+". ":"")+'On top of your package. Everything else stays included.':'Your package covers everything else. You can add the agents later.')+'</div>'; }
 drawAgents();
 
 function setupDone(path,cb){ var f=document.createElement("iframe"); f.style.display="none"; f.src=path; document.body.appendChild(f);
@@ -229,7 +240,7 @@ document.getElementById("send").onclick=function(){
     out.push("","LAUNCH WEEK");
     var rows=[["date","Go live"]].concat(REST.map(function(r){ return ["tables_"+r.key,r.short+" tables"]; })).concat([["print","Print"],["ig","IG bio links"],["msgs","Messages go to"],["msghow","Message by"],["fwd","Call forwarding"],["staff","Staff walkthrough"],["assets","Logos & prices"],["gmail","Google email"],["ready","Before launch"]]);
     rows.forEach(function(p){ var v=S[p[0]]; out.push("• "+p[1]+": "+(Array.isArray(v)?v.join(", "):(v||"(no answer)"))); });
-    out.push("","AI AGENTS (add-on: calls $"+AG.call.price+"/mo, texts $"+AG.text.price+"/mo per restaurant) → total $"+agentCost()+"/mo"); REST.forEach(function(r){ out.push("• "+r.short+": calls — "+(S["ai_"+r.key]||"(no answer)")+" · texts — "+(S["txt_"+r.key]||"(no answer)")); });
+    out.push("","AI AGENTS (add-on per restaurant: "+AG.tiers.map(function(t){ return t.name+" $"+t.price+"/mo"; }).join(", ")+") → total $"+agentCost()+"/mo"); REST.forEach(function(r){ var x=agentTier(r); out.push("• "+r.short+": "+(S["agent_"+r.key]||"(no answer)")+(x&&x.key==="voice"?" · answers: "+(S["agenthours_"+r.key]||"(no answer)"):"")); });
     out.push(""); REST.forEach(function(r){ out.push(menuSummary(r),""); });
     sums.forEach(function(t){ out.push("","==================","",t); });
     var txt=out.join("\n"); btn.textContent="✅ Send everything to Antidote";

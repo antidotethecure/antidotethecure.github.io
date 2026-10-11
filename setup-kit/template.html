@@ -429,7 +429,7 @@ if(CFG.alcohol) app.appendChild(h("p","hint","Codes can take money off drinks, b
 // window.SPECIALS (demo/specials.js, pulled in by build.py as CFG.holidays). Saved as S["hol:<id>"].
 // "Text it to my customers?": marketing texts only go to members who tapped "Text me deals" at sign-up (prior express
 // written consent, TCPA), every text ends with "Reply STOP to opt out", and nothing sends outside 8 AM–9 PM local.
-// Texting is part of the AI text agent add-on ($49/mo); the owner approves every blast (demo/crm.js "Holiday blast").
+// Texting is part of the AI Text Assistant add-on ($75/mo; also in Voice + Text $150/mo, see /agents/); the owner approves every blast (demo/crm.js "Holiday blast").
 var HOL_N={halloween:["🎃","Halloween"],thanksgiving:["🦃","Thanksgiving"],christmas:["🎄","Christmas"],newyear:["🎆","New Year's"],valentines:["💘","Valentine's Day"],
   stpatricks:["☘️","St. Patrick's Day"],cinco:["🪅","Cinco de Mayo"],july4:["🇺🇸","Fourth of July"],custom:["⭐","Your own special"]};
 var HTODAY=(function(){ try{ var p={}; new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).forEach(function(x){ p[x.type]=x.value; });
@@ -477,7 +477,7 @@ if(HOLS.length){
     dates.appendChild(ds); dates.appendChild(h("span","unit","to")); dates.appendChild(de); field("Runs",dates);
     var tw=h("div"), sendRow=h("div","amt"), sendBox=dateBox(st.send,"Send date",function(v_){ st.send=v_; put(); }); sendRow.appendChild(h("span","unit","Send on")); sendRow.appendChild(sendBox);
     tw.appendChild(chipRow(key+":text",YN,st.text,function(o){ st.text=o; if(o==="Yes"&&!st.send) st.send=st.start; put(); drawT(); })); tw.appendChild(sendRow);
-    field("Text it to my customers?",tw,"Goes only to customers who tapped \"Text me deals\" when they signed up. Sent between 8 AM and 9 PM, and anyone can reply STOP. You approve it before it goes out. Part of the AI text agent add-on ($49/mo).");
+    field("Text it to my customers?",tw,"Goes only to customers who tapped \"Text me deals\" when they signed up. Sent between 8 AM and 9 PM, and anyone can reply STOP. You approve it before it goes out. Part of the AI Text Assistant add-on ($75/mo, also included in Voice + Text).");
     function drawT(){ sendRow.classList.toggle("hide",st.text!=="Yes"); }
     function drawW(){ when.textContent=st.start&&st.end?hFmt(st.start)+" – "+hFmt(st.end):"Pick your dates"; }
     function drawOn(){ tg.classList.toggle("on",!!st.on); body.classList.toggle("hide",!st.on); card.classList.toggle("off",false); }

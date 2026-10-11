@@ -369,14 +369,14 @@
     // Antidote's review poster, plastered on the wall: thin black frame + gold line, white mat, the WHOLE 2:3 poster photo (img/review/poster.webp, uncropped)
     // (sized exactly, object-fit contain: never cropped), caption on a strip BELOW the picture, a small ▶ badge in the corner,
     // a soft drop shadow onto the mural, a glossy sheen and the room's light, tilted with the receding wall
-    ".din .poster{position:absolute;left:30px;top:10px;width:46px;z-index:4;border:0;padding:0;background:none;cursor:pointer;transform:perspective(320px) rotateY(-8deg);transform-origin:100% 50%;touch-action:manipulation;-webkit-tap-highlight-color:transparent}",
+    ".din .poster{position:absolute;left:30px;top:6px;width:43px;z-index:4;border:0;padding:0;background:none;cursor:pointer;transform:perspective(320px) rotateY(-8deg);transform-origin:100% 50%;touch-action:manipulation;-webkit-tap-highlight-color:transparent}",
     ".din .poster .fr{display:block;padding:1.5px;background:linear-gradient(135deg,#2a2a2e,#0b0b0d 45%,#26262a);border-radius:1.5px;box-shadow:3px 4px 5px #0008,6px 9px 12px #0004,inset 0 0 0 .5px #c9a44c}",
     ".din .poster .mt{position:relative;display:block;padding:2.5px 2.5px 0;background:linear-gradient(180deg,#fbf8f1,#ece6d8);box-shadow:inset 0 0 0 .5px #c9a44c}",
-    ".din .poster img{display:block;width:40px;height:auto;aspect-ratio:2/3;object-fit:contain;background:#05122e;box-shadow:0 0 0 .5px #0006}",
+    ".din .poster img{display:block;width:37px;height:auto;aspect-ratio:2/3;object-fit:contain;background:#05122e;box-shadow:0 0 0 .5px #0006}",
     ".din .poster .cap{display:block;margin:1px -2.5px 0;padding:1.2px 0 1.3px;background:#0b2a6b;text-align:center;white-space:nowrap;font:900 3.3px/1 var(--body);letter-spacing:-.02em;color:#FFD23F;overflow:hidden}",
     ".din .poster .cap>span{display:inline-block;transform:scaleX(.8);transform-origin:50% 50%;margin:0 -12%}",
     ".din .poster .cap em{font-style:normal;color:#dbe6ff;font-weight:700}",
-    ".din .poster .pl{position:absolute;right:3.5px;top:55px;width:7px;height:5px;border-radius:1.5px;background:#e3262f;box-shadow:0 .5px 1px #0008}",
+    ".din .poster .pl{position:absolute;right:3.5px;top:50px;width:7px;height:5px;border-radius:1.5px;background:#e3262f;box-shadow:0 .5px 1px #0008}",
     ".din .poster .pl:after{content:'';position:absolute;left:2.6px;top:1.2px;border-left:2.4px solid #fff;border-top:1.3px solid transparent;border-bottom:1.3px solid transparent}",
     ".din .poster .gl{position:absolute;inset:0;pointer-events:none;background:linear-gradient(118deg,#ffffff00 20%,#ffffff40 34%,#ffffff00 46%),linear-gradient(180deg,#fff3d61f,#0000 40%,#00000022)}",
     ".din .poster.glint:before{content:'';position:absolute;inset:0;background:linear-gradient(110deg,#0000 30%,#fff9 50%,#0000 70%) -100% 0/250% 100%;animation:glint 1.2s ease-in-out 2;pointer-events:none}@keyframes glint{to{background-position:150% 0}}",

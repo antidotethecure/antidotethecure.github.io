@@ -128,48 +128,48 @@
 
   /* ================= MENU DATA (real Gritz N Wafflez items from gritznwafflez.com/menu; $ are SAMPLE game prices) ================= */
   var IG = GI + "items/";
-  // row = grid row; kind = where it sits on the plate; lv = level the tile unlocks; usd = sample game price
+  // row = grid group; s = tile label when it differs from n (always shown in full); kind = where it sits on the plate; lv = level the tile unlocks; usd = sample game price
   var ITEMS = {
     waffle: { n: "Waffle", img: GI + "waffle_plain.webp", row: "base", kind: "base", lv: 1, usd: 6 },
     gritz: { n: "Gritz", img: GI + "grits.webp", row: "base", kind: "side", lv: 1, usd: 4 },
-    ftoast: { n: "French toast", img: GI + "ftoast.webp", row: "base", kind: "base", lv: 2, usd: 6 },
-    ttoast: { n: "Texas toast", img: GI + "ttoast.webp", row: "base", kind: "base", lv: 3, usd: 3 },
-    cinna: { n: "Cinnamon toast", img: IG + "cinna.webp", row: "base", kind: "base", lv: 3, usd: 6 },
+    ftoast: { n: "French toast", s: "French Toast", img: GI + "ftoast.webp", row: "base", kind: "base", lv: 2, usd: 6 },
+    ttoast: { n: "Texas toast", s: "Texas Toast", img: GI + "ttoast.webp", row: "base", kind: "base", lv: 3, usd: 3 },
+    cinna: { n: "Cinnamon toast", s: "Cinnamon Toast", img: IG + "cinna.webp", row: "base", kind: "base", lv: 3, usd: 6 },
     chicken: { n: "Wingz", img: GI + "chicken.webp", row: "protein", kind: "protein", lv: 1, usd: 8 },
     tenderz: { n: "Tenderz", img: GI + "tenderz.webp", row: "protein", kind: "protein", lv: 1, usd: 8 },
     catfish: { n: "Catfish", img: GI + "catfish.webp", row: "protein", kind: "protein", lv: 1, usd: 9 },
-    shrimp: { n: "Fried shrimp", img: GI + "shrimp.webp", row: "protein", kind: "protein", lv: 2, usd: 9 },
+    shrimp: { n: "Fried shrimp", s: "Fried Shrimp", img: GI + "shrimp.webp", row: "protein", kind: "protein", lv: 2, usd: 9 },
     bacon: { n: "Bacon", img: GI + "bacon.webp", row: "protein", kind: "protein", lv: 3, usd: 4 },
-    egg: { n: "Scrambled eggs", img: GI + "egg.webp", row: "protein", kind: "protein", lv: 3, usd: 3 },
+    egg: { n: "Scrambled eggs", s: "Scrambled Eggs", img: IG + "egg_scr.webp", row: "protein", kind: "protein", lv: 3, usd: 3 },
     friez: { n: "French Friez", img: IG + "friez.webp", row: "side", kind: "side", lv: 2, usd: 4 },
     mac: { n: "Smackin' Mac", img: GI + "mac.webp", row: "side", kind: "side", lv: 3, usd: 4 },
     collards: { n: "Collard Greens", img: IG + "collards.webp", row: "side", kind: "side", lv: 3, usd: 4 },
-    potatoes: { n: "Homestyle Potatoes", img: IG + "potatoes.webp", row: "side", kind: "side", lv: 4, usd: 4 },
+    potatoes: { n: "Homestyle Potatoes", s: "Homestyle Potatoes", img: IG + "potatoes.webp", row: "side", kind: "side", lv: 4, usd: 4 },
     fgritz: { n: "Fried Cheese Gritz", img: GI + "fgritz.webp", row: "side", kind: "side", lv: 4, usd: 7 },
     dip: { n: "Collard Dip", img: GI + "dip.webp", row: "side", kind: "side", lv: 4, usd: 9 },
-    tomatoes: { n: "Fried Green Tomatoes", img: IG + "tomatoes.webp", row: "side", kind: "side", lv: 4, usd: 8 },
-    pickles: { n: "Spicy Fried Pickles", img: IG + "pickles.webp", row: "side", kind: "side", lv: 4, usd: 7 },
+    tomatoes: { n: "Fried Green Tomatoes", s: "Fried Green Tomatoes", img: IG + "tomatoes.webp", row: "side", kind: "side", lv: 4, usd: 8 },
+    pickles: { n: "Spicy Fried Pickles", s: "Fried Pickles", img: IG + "pickles.webp", row: "side", kind: "side", lv: 4, usd: 7 },
     celestial: { n: "Celestial Eggs", img: IG + "celestial.webp", row: "side", kind: "side", lv: 4, usd: 8 },
     syrup: { n: "Syrup", img: GI + "drizzle.webp", row: "top", kind: "top", lv: 2, usd: 0.5 },
     butter: { n: "Butter", img: GI + "butter.webp", row: "top", kind: "top", lv: 2, usd: 0.5 },
-    peach: { n: "Peach cobbler", img: GI + "peach.webp", row: "top", kind: "top", lv: 2, usd: 2 },
+    peach: { n: "Peach cobbler", s: "Peach Cobbler", img: GI + "peach.webp", row: "top", kind: "top", lv: 2, usd: 2 },
     cheese: { n: "Cheese", img: GI + "cheese.webp", row: "top", kind: "top", lv: 2, usd: 1 },
-    sauce: { n: "Signature Sauce", img: GI + "sauce.webp", row: "top", kind: "cup", lv: 2, usd: 0.5 },
-    hot: { n: "Hot sauce", img: GI + "hotsauce.webp", row: "top", kind: "cup", lv: 2, usd: 0.5 },
+    sauce: { n: "Signature Sauce", s: "Signature Sauce", img: GI + "sauce.webp", row: "top", kind: "cup", lv: 2, usd: 0.5 },
+    hot: { n: "Hot sauce", s: "Hot Sauce", img: GI + "hotsauce.webp", row: "top", kind: "cup", lv: 2, usd: 0.5 },
     berriez: { n: "Berriez", img: GI + "berriez.webp", row: "top", kind: "top", lv: 3, usd: 2 },
-    whip: { n: "Whipped cream", img: GI + "whip.webp", row: "top", kind: "top", lv: 3, usd: 1 },
+    whip: { n: "Whipped cream", s: "Whipped Cream", img: GI + "whip.webp", row: "top", kind: "top", lv: 3, usd: 1 },
     kiki: { n: "Kiki Palmer", img: GI + "kiki.webp", row: "drink", kind: "drink", lv: 2, usd: 4 },
     oj: { n: "Fresh OJ", img: GI + "oj.webp", row: "drink", kind: "drink", lv: 2, usd: 5 },
     lemonade: { n: "Lemonade", img: IG + "lemonade.webp", row: "drink", kind: "drink", lv: 3, usd: 4 },
     tea: { n: "Iced Tea", img: IG + "tea.webp", row: "drink", kind: "drink", lv: 3, usd: 3 },
     coffee: { n: "Hot Coffee", img: IG + "coffee.webp", row: "drink", kind: "drink", lv: 4, usd: 3 },
     // L5+ prep variants: the ticket asks, you tap the variant tile INSTEAD of the regular one (no cooking involved)
-    shrimp_s: { n: "Sautéed shrimp", img: IG + "shrimp_s.webp", row: "protein", kind: "protein", lv: 5, usd: 9, of: "shrimp", prep: "Sautéed, not fried" },
-    egg_sun: { n: "Sunny-side eggs", img: IG + "egg_sun.webp", row: "protein", kind: "protein", lv: 5, usd: 3, of: "egg", prep: "Eggs sunny-side up" },
-    bacon_x: { n: "Extra-crispy bacon", img: GI + "bacon.webp", fx: "crisp", row: "protein", kind: "protein", lv: 5, usd: 4, of: "bacon", prep: "Bacon extra crispy" },
-    syrup_side: { n: "Syrup on the side", img: IG + "syrup_side.webp", row: "top", kind: "cup", lv: 5, usd: 0.5, of: "syrup", prep: "Syrup on the side" }
+    shrimp_s: { n: "Sautéed shrimp", s: "Sautéed Shrimp", img: IG + "shrimp_s.webp", row: "protein", kind: "protein", lv: 5, usd: 9, of: "shrimp", prep: "Sautéed, not fried" },
+    egg_sun: { n: "Sunny-side eggs", s: "Sunny-Side Eggs", img: IG + "egg_sun.webp", row: "protein", kind: "protein", lv: 5, usd: 3, of: "egg", prep: "Eggs sunny-side up" },
+    bacon_x: { n: "Extra-crispy bacon", s: "Extra-Crispy Bacon", img: GI + "bacon.webp", fx: "crisp", row: "protein", kind: "protein", lv: 5, usd: 4, of: "bacon", prep: "Bacon extra crispy" },
+    syrup_side: { n: "Syrup on the side", s: "Syrup on Side", img: IG + "syrup_side.webp", row: "top", kind: "cup", lv: 5, usd: 0.5, of: "syrup", prep: "Syrup on the side" }
   };
-  var ROWS = [["base", "Bases", "🧇"], ["protein", "Proteins", "🍗"], ["side", "Sides & starters", "🥗"], ["top", "Toppings & sauces", "🍯"], ["drink", "Drinks", "🥤"]];
+  var ROWS = [["base", "Bases", "🧇"], ["protein", "Proteins", "🍗"], ["side", "Sides", "🥗"], ["top", "Toppings & sauces", "🍯"], ["drink", "Drinks", "🥤"]];
   // real Gritz combos (gritznwafflez.com/menu); ph = the menu photo when there is one
   var DISHES = [
     { n: "Just Wafflez", r: ["waffle"], lv: 1 }, { n: "Just Gritz", r: ["gritz"], lv: 1 },
@@ -524,12 +524,28 @@
     ".bld .acts{display:grid;gap:4px}.bld .acts button{border:0;border-radius:12px;padding:5px 4px;font:900 13px/1.1 var(--body);cursor:pointer;touch-action:manipulation;min-height:30px}",
     ".bld .sv2{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a1e36;box-shadow:0 4px 0 #a27512;min-height:38px!important;font-size:14px!important}.bld .sv2:active{transform:translateY(3px);box-shadow:0 1px 0 #a27512}",
     ".bld .ud{display:grid;grid-template-columns:1fr 1fr;gap:4px}.bld .ud button{background:#fff;color:#3B1F5C;border:2px solid #c3c8ce;font-size:10px!important;padding:4px 2px!important;min-width:0}",
-    ".grid{margin-top:4px}.grow{display:flex;gap:3px;align-items:center;margin-top:3px}.grow>span{flex:none;width:16px;font-size:13px;text-align:center;line-height:1}",
-    ".grow .cells{flex:1;display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;min-width:0}.grow .cells::-webkit-scrollbar{display:none}",
-    ".grow .cells>button{flex:0 0 calc((100% - 21px)/8)}.grow .cells>.gsep{flex:none;align-self:center;font-style:normal;font-size:11px;padding:0 1px;opacity:.8}",
-    ".grow button{position:relative;background:#fff;border:2px solid #c3c8ce;border-radius:10px;padding:1px 1px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;font:800 7px/1.05 var(--body);color:#3B1F5C;text-align:center;height:42px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;overflow:hidden}",
-    ".grow button span.l{display:block;margin-top:-1px;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.grow button img{width:25px;height:24px;flex:none;object-fit:contain;pointer-events:none}.grow button img.crisp{filter:sepia(.4) brightness(.8)}.grow button.on{border-color:var(--gold);background:#fff4d2}.grow button:active{transform:scale(.92)}",
-    ".grow button.pv{border-color:#FFD23F;background:#fffbe6}.grow button .nw{position:absolute;right:1px;top:1px;background:#e3262f;color:#fff;font:900 6.5px/1 var(--body);border-radius:4px;padding:2px 3px}",
+    // food grid: every tile on screen at once, wrapping to the width (7 across on a 390 px phone), grouped by a small tab + tint
+    ".grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(45px,1fr));gap:9px 3px;margin-top:10px}",
+    ".grid button{position:relative;min-width:0;background:#fff;border:2px solid #c3c8ce;border-radius:10px;padding:2px 1px 1px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;font:800 7.5px/1.04 var(--body);color:#3B1F5C;text-align:center;height:52px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:box-shadow .25s}",
+    ".grid button img{width:31px;height:28px;flex:none;object-fit:contain;pointer-events:none}.grid button img.crisp{filter:sepia(.4) brightness(.8)}",
+    ".grid button span.l{display:block;width:100%;margin-top:1px;overflow:hidden;max-height:2.1em;overflow-wrap:normal;word-break:normal;hyphens:none;letter-spacing:-.15px}",
+    ".grid button.g-base{background:#fff8e8}.grid button.g-protein{background:#fff1ec}.grid button.g-side{background:#f1f9ec}.grid button.g-top{background:#fdf3ff}.grid button.g-drink{background:#ecf6ff}",
+    ".grid button .sec{position:absolute;left:-2px;top:-10px;z-index:3;font:900 7px/1 var(--body);font-style:normal;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;color:#fff;background:#3B1F5C;border-radius:5px 5px 5px 0;padding:1.5px 4px 1.5px 3px;pointer-events:none;box-shadow:0 1px 2px #0005}",
+    ".grid button .sec.rt{left:auto;right:-2px;border-radius:5px 5px 0 5px}.grid button span.l.sm{font-size:6.6px;letter-spacing:-.25px}.grid button span.l.xs{font-size:6px;letter-spacing:-.3px}",
+    ".grid button.on{border-color:var(--gold);background:#fff4d2}.grid button:active{transform:scale(.92)}",
+    ".grid button.pv{border-style:dashed;border-color:#b98a00}.grid button .nw{position:absolute;right:1px;top:1px;background:#e3262f;color:#fff;font:900 6.5px/1 var(--body);font-style:normal;border-radius:4px;padding:2px 3px}",
+    // finding hint: the tiles the selected / most urgent ticket still needs glow softly (tap a ticket to point it there)
+    ".grid button.hint{border-color:#f2b705;box-shadow:0 0 0 1.5px #FFD23F,0 0 9px 1px #FFD23Fcc}.grid button.hint.on{box-shadow:none}",
+    "@media (prefers-reduced-motion:no-preference){.grid button.hint{animation:hglow 1.8s ease-in-out infinite}}@keyframes hglow{50%{box-shadow:0 0 0 1.5px #FFD23F,0 0 4px 0 #FFD23F88}}",
+    ".tk{cursor:pointer}.tk.tsel{box-shadow:0 0 0 2px #FFD23F,0 3px 6px #0003}",
+    // the round full-screen + music buttons live at the end of the HUD row (never over the grid or Serve/Undo/Clear)
+    "#og .hud .hbt{display:flex;gap:4px;flex:none;align-items:center}#og .hud .hbt:empty{display:none}",
+    "#og .hud .hbt>button{position:static!important;inset:auto!important;width:28px!important;height:28px!important;font-size:13px!important;box-shadow:none!important;margin:0!important;flex:none}",
+    "#og .hud .hbt>button:not(.on){display:none!important}",
+    "@media (max-width:440px){#og .hud .slb{display:none}#og .hud{gap:3px!important}}",
+    // full screen: the box keeps a strip at the bottom for the 🔒 Lock screen + ⏸ Pause pills, so they never cover tiles
+    "#og.ssai-fsbox{padding-bottom:58px!important}",
+    ".ssai-fstip{bottom:auto!important;top:calc(56px + env(safe-area-inset-top,0px))!important;right:calc(10px + env(safe-area-inset-right,0px))!important}",
     ".pop2{position:absolute;font:900 13px var(--body);color:#f2c14e;text-shadow:0 2px 6px #000b;pointer-events:none;animation:up 1.4s ease-out forwards;z-index:15;white-space:nowrap}",
     ".startov2{position:absolute;inset:0;background:#2b1a40e6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#fff;cursor:pointer;text-align:center;z-index:30;padding:20px}",
     ".startov2 b{font:900 italic 40px var(--serif);color:var(--gold2)}.startov2 span{font:800 18px var(--body)}.startov2.off{display:none}",
@@ -548,7 +564,7 @@
     ".sl .lt{position:absolute;right:1px;top:1px;width:8px;height:8px;border-radius:50%;background:#e0473a;box-shadow:0 0 6px #e0473a;z-index:2}.sl .lt.g{background:#3fe07a;box-shadow:0 0 8px #3fe07a}",
     ".sl .stm{position:absolute;left:50%;top:-8px;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:radial-gradient(#fffd,#fff0 70%);animation:stm2 1.4s ease-out infinite;pointer-events:none;z-index:2}",
     ".sl .smk{position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(#555c,#5550 70%);animation:stm2 1s ease-out infinite;pointer-events:none}",
-    ".grow button .ck{position:absolute;left:1px;top:1px;font-size:9px;line-height:1}",
+    ".grid button .ck{position:absolute;left:1px;top:1px;font-size:9px;font-style:normal;line-height:1}",
     ".plt .dn{position:absolute;left:-6px;right:-6px;bottom:-6px;display:flex;flex-wrap:wrap;justify-content:center;gap:2px;z-index:20}.plt .dn span{font:900 7.5px var(--body);border-radius:99px;padding:1px 4px;color:#fff;box-shadow:0 1px 3px #0005}",
     ".shortp{display:none;position:absolute;left:50%;top:1px;transform:translateX(-50%);z-index:9;font:900 9px/1 var(--body);color:#1E1B3A;background:#F2C14E;border-radius:99px;padding:2px 8px;white-space:nowrap;box-shadow:0 2px 6px #0006;pointer-events:none}",
     ".cut{position:absolute;inset:0;z-index:22;display:none;background:#0b1020aa}.cut.on{display:block}",
@@ -691,22 +707,53 @@
   }
 
   /* ================= FOOD GRID + PLATE (stage 1) ================= */
-  function tileHTML(k) {
+  // the tile's label, always in full (2 lines max): a translation when there is one, else the short tile name
+  function tileLabel(it) { var t = T(it.n); return t !== it.n ? t : (it.s || it.n); }
+  function tileHTML(k, sec) {
     var it = ITEMS[k], nw = (og.fresh || []).indexOf(k) >= 0, ck = cookAt(k);
-    return '<button type="button" data-k="' + k + '"' + (it.prep ? ' class="pv" title="' + esc(it.prep) + '"' : "") + '><img src="' + it.img + '" alt=""' + (it.fx === "crisp" ? ' class="crisp"' : "") + ">" + '<span class="l">' + esc(T(it.n)) + "</span>" + (nw ? '<i class="nw">NEW</i>' : "") + (ck ? '<i class="ck">' + STN[ck].ic + "</i>" : "") + "</button>";
+    return '<button type="button" data-k="' + k + '" class="g-' + it.row + (it.prep ? " pv" : "") + (sec ? " s1" : "") + '"' + (it.prep ? ' title="' + esc(it.prep) + '"' : "") + ' aria-label="' + esc(tileLabel(it)) + '">' +
+      (sec ? '<i class="sec" aria-hidden="true">' + sec[2] + " " + esc(T(sec[1])) + "</i>" : "") +
+      '<img src="' + it.img + '" alt=""' + (it.fx === "crisp" ? ' class="crisp"' : "") + ">" + '<span class="l" aria-hidden="true">' + esc(tileLabel(it)) + "</span>" + (nw ? '<i class="nw">NEW</i>' : "") + (ck ? '<i class="ck">' + STN[ck].ic + "</i>" : "") + "</button>";
   }
+  // Every unlocked tile is on screen at once (no sideways scrolling, at every level): one wrapping grid sized to the
+  // width, grouped Bases · Proteins · Sides · Toppings & sauces · Drinks (a small tab over each group's first tile + a tint).
   function buildGrid() {
-    var ks = unlocked(og.level || 1), R = {}; ROWS.forEach(function (r) { R[r[0]] = r; });
-    // up to L3 one row per group; from L4 (more items + the stations) groups share 3 sideways-scrolling rows
-    var layout = (og.level || 1) >= 4 ? [["base", "protein"], ["side"], ["top", "drink"]] : ROWS.map(function (r) { return [r[0]]; });
-    $("grid").innerHTML = layout.map(function (groups) {
-      var cells = "", label = [];
-      groups.forEach(function (gk, gi) { var row = ks.filter(function (k) { return ITEMS[k].row === gk; }); if (!row.length) return; label.push(R[gk]);
-        if (gi && cells) cells += '<i class="gsep" aria-hidden="true">' + R[gk][2] + "</i>"; cells += row.map(tileHTML).join(""); });
-      return cells ? '<div class="grow"><span title="' + esc(label.map(function (r) { return T(r[1]); }).join(" · ")) + '" aria-label="' + esc(label.map(function (r) { return T(r[1]); }).join(" · ")) + '">' + label[0][2] + '</span><div class="cells">' + cells + "</div></div>" : "";
-    }).join("");
-    drawPlate();
+    var ks = unlocked(og.level || 1), h = "";
+    ROWS.forEach(function (r) { ks.filter(function (k) { return ITEMS[k].row === r[0]; }).forEach(function (k, i) { h += tileHTML(k, i ? null : r); }); });
+    $("grid").innerHTML = h;
+    drawPlate(); fitGrid();
   }
+  // after layout: a long name that needs a 3rd line gets a slightly smaller font (never "…"), and a group tab that would
+  // stick out past the grid's right edge hangs from the tile's right side instead
+  function fitGrid() {
+    var g = $("grid"); if (!g || !g.offsetWidth) return;
+    var gr = g.getBoundingClientRect().right;
+    g.querySelectorAll("button").forEach(function (b) {
+      var l = b.querySelector(".l"); l.classList.remove("sm", "xs");
+      if (l.scrollHeight > l.clientHeight + 1 || l.scrollWidth > l.clientWidth + 1) { l.classList.add("sm"); if (l.scrollHeight > l.clientHeight + 1 || l.scrollWidth > l.clientWidth + 1) l.classList.add("xs"); }
+      var s = b.querySelector(".sec"); if (s) { s.classList.remove("rt"); if (s.getBoundingClientRect().right > gr + 1) s.classList.add("rt"); }
+    });
+  }
+  W.addEventListener("resize", function () { setTimeout(fitGrid, 60); });
+  // Finding hint (not an auto-build): the tiles the selected ticket (tap a ticket) or else the most urgent open ticket
+  // still needs get a soft glow. Items already on the plate drop the glow.
+  function hintTicket() {
+    var n = needs(); if (!n.length) return null;
+    var by = {}; n.forEach(function (x) { by[x.tb.id + ":" + x.gi] = x; });
+    if (og.tkSel && by[og.tkSel]) return by[og.tkSel];
+    // else the first ticket on the rail (left = the one waiting longest / most urgent) that still needs a plate
+    var els = $("rail").querySelectorAll(".tk");
+    for (var i = 0; i < els.length; i++) { var x = by[els[i].dataset.t + ":" + els[i].dataset.g]; if (x) return x; }
+    return n[0];
+  }
+  function hint() {
+    var g = $("grid"); if (!g || og.sim) return;
+    var t = og.running && !og.demo ? hintTicket() : null, want = {}, key = t ? t.tb.id + ":" + t.gi : "";
+    if (t) t.g.order.r.forEach(function (k) { if ((og.plate || []).indexOf(k) < 0) want[k] = 1; });
+    g.querySelectorAll("button").forEach(function (b) { b.classList.toggle("hint", !!want[b.dataset.k]); });
+    $("rail").querySelectorAll(".tk").forEach(function (el) { el.classList.toggle("tsel", el.dataset.t + ":" + el.dataset.g === key); });
+  }
+  function selTicket(el) { var k = el.dataset.t + ":" + el.dataset.g; og.tkSel = og.tkSel === k ? null : k; buzz(8); hint(); }
   function tap(k) {
     if (!og.running || og.pause || og.hold || !ITEMS[k]) return false;
     tutDone();
@@ -742,6 +789,7 @@
     var m = matchOpen(keys);
     $("pname").innerHTML = keys.length ? (m ? "<b>" + esc(T(m.g.order.dish.n)) + "</b>for table " + m.tb.id + (og.clean ? " ✨" : "") : "<b>" + keys.length + " item" + (keys.length > 1 ? "s" : "") + "</b>keep building…") : "<b>Tap food to build</b>then 🛎️ Serve";
     D.querySelectorAll("#grid button").forEach(function (b) { b.classList.toggle("on", keys.indexOf(b.dataset.k) >= 0); });
+    hint();
   }
 
   /* ================= COOKING (L4+ adult: fryer; L5+ adult: + waffle irons + skillet; kid L5+: fryer only) ================= */
@@ -1049,11 +1097,12 @@
     cards.sort(function (a, b) { return a.f - b.f; });
     $("rail").innerHTML = cards.length ? cards.map(function (c) {
       var o = c.g.order;
-      return '<div class="tk' + (c.f < 0.35 ? " bad" : c.f < 0.6 ? " warn" : "") + '" data-t="' + c.tb.id + '"><span class="pr" title="' + PER[c.g.per][1] + '">' + PER[c.g.per][0] + '</span><span class="t">T' + c.tb.id + '</span><div class="h"><img src="' + dishImg(o.dish) + '" alt=""><b>' + esc(T(o.dish.n)) + (o.drink ? ' <span style="color:#B8322A">+ ' + esc(T(ITEMS[o.drink].n)) + "</span>" : "") + "</b></div>" +
+      return '<div class="tk' + (c.f < 0.35 ? " bad" : c.f < 0.6 ? " warn" : "") + '" data-t="' + c.tb.id + '" data-g="' + c.gi + '"><span class="pr" title="' + PER[c.g.per][1] + '">' + PER[c.g.per][0] + '</span><span class="t">T' + c.tb.id + '</span><div class="h"><img src="' + dishImg(o.dish) + '" alt=""><b>' + esc(T(o.dish.n)) + (o.drink ? ' <span style="color:#B8322A">+ ' + esc(T(ITEMS[o.drink].n)) + "</span>" : "") + "</b></div>" +
         '<div class="its">' + o.r.map(function (k) { return '<img src="' + ITEMS[k].img + '" alt="' + esc(ITEMS[k].n) + '" title="' + esc(ITEMS[k].n) + '"' + (ITEMS[k].fx === "crisp" ? ' class="crisp"' : "") + ">"; }).join("") + "</div>" +
         ((o.add.length || o.no.length) ? '<div class="mods">' + o.add.map(function (k) { return '<span class="ad">+ ' + esc(T(ITEMS[k].n)) + "</span>"; }).join("") + o.no.map(function (k) { return '<span class="no">NO ' + esc(T(ITEMS[k].n)) + "</span>"; }).join("") + "</div>" : "") +
         o.prep.map(function (t) { return '<div class="prep">⚠️ ' + esc(T(t)) + "</div>"; }).join("") + "</div>";
     }).join("") : '<div class="none">' + (og.running ? "No open tickets right now. Guests are on their way!" : "Tickets clip on here") + "</div>";
+    hint();
   }
   function railPatience() { $("rail").querySelectorAll(".tk").forEach(function (el) { var tb = og.tables[+el.dataset.t - 1]; if (!tb || tb.state !== "wait") return; var f = tb.pat / tb.patMax; el.classList.toggle("bad", f < 0.35); el.classList.toggle("warn", f >= 0.35 && f < 0.6); }); }
   function walkout(tb) {
@@ -1104,6 +1153,7 @@
     }
     $("pass").innerHTML = h;
     din.classList.toggle("aim", og.sel >= 0 && !!og.pass[og.sel]);
+    hint();
   }
   function passHeat() {
     $("pass").querySelectorAll(".ps").forEach(function (b, i) { var p = og.pass[i]; if (!p) return; var hi = heatInfo(p.heat), bar = b.querySelector(".ht i");
@@ -1556,6 +1606,7 @@
     if (t.closest("#poster")) { e.preventDefault(); return openPoster(); }
     if (t.closest("#pback")) { return closePoster(); }
     if (og.demo) return;
+    var tk = t.closest(".tk"); if (tk && ou.contains(tk)) return selTicket(tk);
     var b = t.closest("button,[data-tb],.plt img,.cupz img"); if (!b || !ou.contains(b)) return;
     if (b.dataset.ps != null) return pickPass(+b.dataset.ps);
     if (b.dataset.st) return pull(b.dataset.st, +b.dataset.i);
@@ -1579,5 +1630,14 @@
     seatTest: function (ids, tableId) { var tb = og.tables[tableId - 1]; seat(tb, { ids: ids, kind: "test" }); }
   };
   $("startov").addEventListener("click", function () { if (W.GameMenu) W.GameMenu.open(); else start(); });
+  // The round ⛶/✕ (fullscreen.js) and 🎵/🔇 (gamemenu.js) buttons float at the screen's bottom-right corner, which on a
+  // phone in full screen lands on the food grid. Gritz only: park them in a slot at the end of the HUD row instead
+  // (shared files untouched; they keep their own show/hide + click logic).
+  (function hudButtons() {
+    var hd = D.querySelector("#og .hud"); if (!hd) return;
+    var slot = D.createElement("span"); slot.className = "hbt"; slot.id = "hbt"; hd.appendChild(slot);
+    var adopt = function () { [".ssai-fsbtn", ".gm-mbtn"].forEach(function (q) { var b = D.querySelector(q); if (b && b.parentNode !== slot) slot.appendChild(b); }); };
+    adopt(); if (W.MutationObserver) new MutationObserver(adopt).observe(D.body, { childList: true });
+  })();
   drawPass(); drawRail(); buildGrid(); hud(); jReset();
 })();

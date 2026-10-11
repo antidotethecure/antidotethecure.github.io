@@ -1,0 +1,69 @@
+{
+ "restaurant": "nalu-vida",
+ "outro": "outro.mp4",
+ "clips": [
+  {
+   "file": "c01.mp4",
+   "poster": "c01.jpg",
+   "start": 6.8,
+   "end": 13.6,
+   "label": "Venice Beach arrival"
+  },
+  {
+   "file": "c02.mp4",
+   "poster": "c02.jpg",
+   "start": 81.2,
+   "end": 87.9,
+   "label": "In-N-Out style flatbread"
+  },
+  {
+   "file": "c03.mp4",
+   "poster": "c03.jpg",
+   "start": 100.0,
+   "end": 107.0,
+   "label": "smash & stack burger reveal"
+  },
+  {
+   "file": "c04.mp4",
+   "poster": "c04.jpg",
+   "start": 111.2,
+   "end": 118.4,
+   "label": "cheese pull \"like Spiderman\""
+  },
+  {
+   "file": "c05.mp4",
+   "poster": "c05.jpg",
+   "start": 131.0,
+   "end": 138.3,
+   "label": "best cheese pull ever"
+  },
+  {
+   "file": "c06.mp4",
+   "poster": "c06.jpg",
+   "start": 143.5,
+   "end": 150.5,
+   "label": "cheese-string bite"
+  },
+  {
+   "file": "c07.mp4",
+   "poster": "c07.jpg",
+   "start": 150.5,
+   "end": 157.5,
+   "label": "cheese pull to the mouth"
+  },
+  {
+   "file": "c08.mp4",
+   "poster": "c08.jpg",
+   "start": 159.6,
+   "end": 166.6,
+   "label": "Christian (owner) serves up"
+  },
+  {
+   "file": "c09.mp4",
+   "poster": "c09.jpg",
+   "start": 167.6,
+   "end": 174.0,
+   "label": "bang bang shrimp + onion rings"
+  }
+ ]
+}

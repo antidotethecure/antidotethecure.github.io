@@ -1,0 +1,104 @@
+{
+ "restaurant": "gritz-n-wafflez",
+ "outro": "outro.mp4",
+ "clips": [
+  {
+   "file": "c01.mp4",
+   "poster": "c01.jpg",
+   "start": 2.6,
+   "end": 9.4,
+   "label": "best brunch in LA"
+  },
+  {
+   "file": "c02.mp4",
+   "poster": "c02.jpg",
+   "start": 9.4,
+   "end": 15.95,
+   "label": "Texas flavor, southern hospitality"
+  },
+  {
+   "file": "c03.mp4",
+   "poster": "c03.jpg",
+   "start": 19.4,
+   "end": 26.4,
+   "label": "the brunch spread"
+  },
+  {
+   "file": "c04.mp4",
+   "poster": "c04.jpg",
+   "start": 26.4,
+   "end": 33.4,
+   "label": "celestial eggs + fried cheese gritz"
+  },
+  {
+   "file": "c05.mp4",
+   "poster": "c05.jpg",
+   "start": 40.3,
+   "end": 46.8,
+   "label": "catfish + gritz n shrimp"
+  },
+  {
+   "file": "c06.mp4",
+   "poster": "c06.jpg",
+   "start": 46.8,
+   "end": 53.5,
+   "label": "creole seasoning + french toast"
+  },
+  {
+   "file": "c07.mp4",
+   "poster": "c07.jpg",
+   "start": 59.6,
+   "end": 66.4,
+   "label": "wingz n wafflez"
+  },
+  {
+   "file": "c08.mp4",
+   "poster": "c08.jpg",
+   "start": 66.4,
+   "end": 73.4,
+   "label": "whole catfish + a fork"
+  },
+  {
+   "file": "c09.mp4",
+   "poster": "c09.jpg",
+   "start": 73.4,
+   "end": 80.4,
+   "label": "first bite"
+  },
+  {
+   "file": "c10.mp4",
+   "poster": "c10.jpg",
+   "start": 80.4,
+   "end": 87.4,
+   "label": "CLAMP face"
+  },
+  {
+   "file": "c11.mp4",
+   "poster": "c11.jpg",
+   "start": 87.4,
+   "end": 94.4,
+   "label": "chicken + waffle hype"
+  },
+  {
+   "file": "c12.mp4",
+   "poster": "c12.jpg",
+   "start": 146.9,
+   "end": 153.6,
+   "label": "wow, come on"
+  },
+  {
+   "file": "c13.mp4",
+   "poster": "c13.jpg",
+   "start": 156.1,
+   "end": 162.6,
+   "label": "no joking, extra"
+  },
+  {
+   "file": "c14.mp4",
+   "poster": "c14.jpg",
+   "start": 164.5,
+   "end": 171.5,
+   "label": "berry french toast"
+  }
+ ]
+}

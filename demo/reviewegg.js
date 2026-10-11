@@ -12,8 +12,9 @@
    (for games that show the bonus themselves and want nothing over the play field). Test: add ?egg=1 to spawn it ~2.5 s into a run
    (ReviewEgg.testLevel is the ?egg= number, for games with their own test steps).
    The cover always shows UNCROPPED (contain, full 16:9 frame) on the billboard, toast, end card and Points panel.
-   Caught it this run → the end screen plays a 5–10 s preview of the review's money shot (REVIEW_EGG.preview, default
-   img/review/preview.mp4 + preview.jpg poster): muted autoplay, TAP FOR SOUND, plays twice, then a big red
+   Caught it this run → the end screen plays a ~7 s clip of the review, dealt from the same pool + per-device deck as the
+   halftime (img/review/clips/clips.json, REVIEW_EGG.clips to override), so it's a different part of the review each time;
+   no pool → REVIEW_EGG.preview (default img/review/preview.mp4 + preview.jpg poster). Muted autoplay, TAP FOR SOUND, plays twice, then a big red
    "▶ Watch it now" to the full review and @therealantidote. Not caught → the small card + a hint to catch it next run. */
 (function () {
   "use strict";
@@ -25,6 +26,36 @@
   var TL = (location.search.match(/[?&]egg=(\d+)/) || [])[1], TEST = TL === "1", TEST_LEVEL = TL ? +TL : 0;
   var PREVIEW = C.preview || "img/review/preview.mp4", PREVIEW_POSTER = C.previewPoster || PREVIEW.replace(/\.mp4$/, ".jpg");
   var URL_ = "https://www.youtube.com/watch?v=" + encodeURIComponent(C.vid);
+  var CLIPS = C.clips || "img/review/clips/", DECK_KEY = "rv-deck:" + C.vid;
+  /* the clip deck (same code + key as halftime.js): nothing repeats on this device until the whole pool has played */
+  var memDeck = {};
+  function deal(key, n, k) {
+    var st = null; try { st = JSON.parse(localStorage.getItem(key)); } catch (e) {} if (!st) st = memDeck[key];
+    if (!st || st.n !== n || !Array.isArray(st.q)) st = { n: n, q: [], last: -1 };
+    var out = [];
+    while (out.length < Math.min(k, n)) {
+      if (!st.q.length) {
+        var q = []; for (var i = 0; i < n; i++) q.push(i);
+        for (var j = n - 1; j > 0; j--) { var r = Math.floor(Math.random() * (j + 1)), t = q[j]; q[j] = q[r]; q[r] = t; }
+        q.sort(function (x, y) { return (out.indexOf(x) >= 0 || x === st.last) - (out.indexOf(y) >= 0 || y === st.last); });
+        st.q = q;
+      }
+      var c = st.q.shift(); if (out.indexOf(c) < 0) out.push(c); st.last = c;
+    }
+    memDeck[key] = st; try { localStorage.setItem(key, JSON.stringify(st)); } catch (e) {}
+    return out;
+  }
+  var pool = null, poolReq = false;   // clips.json, fetched only once the review has been found
+  function loadPool() {
+    if (poolReq || !W.fetch) return; poolReq = true;
+    W.fetch(CLIPS + "clips.json", { cache: "no-cache" }).then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) { if (j && j.clips && j.clips.length) pool = j; }, function () { poolReq = false; });
+  }
+  function pickPreview() {   // → {src, poster, fallback}
+    if (!pool) return { src: PREVIEW, poster: PREVIEW_POSTER };
+    var c = pool.clips[deal(DECK_KEY, pool.clips.length, 1)[0]];
+    return { src: CLIPS + c.file, poster: CLIPS + (c.poster || c.file.replace(/\.mp4$/, ".jpg")), fallback: PREVIEW, label: c.label };
+  }
   var BONUS = C.bonus || 500, SHORT = C.short || C.restaurant.toUpperCase(), CLIP = C.kind === "clip";
   var me = D.currentScript, base = me && me.src ? me.src.replace(/reviewegg\.js(\?.*)?$/, "") : "../";
   var LOGO_SRC = base + "review/antidote-foodie.webp";
@@ -92,8 +123,9 @@
     return '<div class="re-card">' + linkHTML(found) + (hint ? '<p class="re-hint">🔒 ' + esc(T("Catch the hidden review next run to unlock the preview")) + "</p>" : "") + "</div>";
   }
   function previewHTML() {
+    var pv = pickPreview(); S.preview = pv.src;
     return '<div class="re-card"><div class="re-prev"><span class="re-k">📺 ' + esc(T(CLIP ? "You found Antidote's clip" : "You found Antidote's review")) + " · +" + BONUS + "</span>" +
-      '<div class="re-vb"><video muted playsinline webkit-playsinline autoplay preload="auto" poster="' + esc(PREVIEW_POSTER) + '" src="' + esc(PREVIEW) + '"></video>' +
+      '<div class="re-vb"><video muted playsinline webkit-playsinline autoplay preload="auto" poster="' + esc(pv.poster) + '" src="' + esc(pv.src) + '"' + (pv.fallback ? ' data-fb="' + esc(pv.fallback) + '"' : "") + "></video>" +
       '<button type="button" class="re-snd">🔊 ' + esc(T("TAP FOR SOUND")) + "</button></div>" +
       '<a class="re-watch" href="' + URL_ + '" target="_blank" rel="noopener">&#9654; ' + esc(T("Watch it now")) + "</a>" +
       '<span class="re-handle">@therealantidote</span></div></div>';
@@ -105,7 +137,10 @@
     v.muted = true; v.defaultMuted = true;
     function go(muted) { v.muted = muted; var p = v.play(); if (p && p.catch) p.catch(function () { if (!muted) { v.muted = true; snd.hidden = false; v.play().catch(function () {}); } }); }
     v.addEventListener("ended", function () { if (plays < 2) { plays++; try { v.currentTime = 0; } catch (e) {} go(v.muted); } else snd.hidden = true; });   // loops once
-    v.addEventListener("error", function () { var vb = root.querySelector(".re-vb"); if (vb) vb.innerHTML = '<span class="re-th" style="height:100%;aspect-ratio:auto"><img src="' + esc(cover.src) + '" alt=""></span>'; });
+    v.addEventListener("error", function () {
+      var fb = v.getAttribute("data-fb");   // a pool clip that won't load → the single preview.mp4, then the cover
+      if (fb) { v.removeAttribute("data-fb"); v.poster = PREVIEW_POSTER; v.src = fb; try { v.load(); } catch (e) {} go(v.muted); return; }
+      var vb = root.querySelector(".re-vb"); if (vb) vb.innerHTML = '<span class="re-th" style="height:100%;aspect-ratio:auto"><img src="' + esc(cover.src) + '" alt=""></span>'; });
     snd.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); snd.hidden = true; if (v.ended || (plays >= 2 && v.paused)) { plays = 1; try { v.currentTime = 0; } catch (x) {} } go(false); });
     v.addEventListener("click", function (e) { e.stopPropagation(); if (v.paused) { snd.hidden = true; if (v.ended) { plays = 1; try { v.currentTime = 0; } catch (x) {} } go(false); } });
     go(true);
@@ -169,7 +204,7 @@
   function due(elapsedMs) { if (S.spawned || S.found || !S.at) return false; if (elapsedMs >= S.at) { S.spawned = true; return true; } return false; }
   function missed() { S.spawned = true; }   // it scrolled away: no second chance this run
   function collect() {
-    if (S.found) return 0; S.found = true;
+    if (S.found) return 0; S.found = true; loadPool();
     try { localStorage.setItem(KEY, "1"); } catch (e) {}
     try { navigator.vibrate && navigator.vibrate([20, 40, 20, 40, 60]); } catch (e) {}
     if (C.toast !== false) toast("📺 " + T(CLIP ? "Antidote's clip!" : "Antidote's review!") + " +" + BONUS, T("Watch it after your run"));   // opt-out: REVIEW_EGG.toast:false (Gritz: the game shows it in its own card)
@@ -178,5 +213,5 @@
 
   W.ReviewEgg = { cfg: C, url: URL_, bonus: BONUS, test: TEST, testLevel: TEST_LEVEL, preview: PREVIEW, previewHTML: previewHTML, cover: cover, logo: logo, ready: ready,
     reset: reset, due: due, missed: missed, collect: collect, toast: toast, drawSign: drawSign, cardHTML: cardHTML, endCard: endCard, menuHTML: menuHTML,
-    get found() { return S.found; }, get spawned() { return S.spawned; } };
+    get found() { return S.found; }, get spawned() { return S.spawned; }, get previewSrc() { return S.preview || null; } };
 })();

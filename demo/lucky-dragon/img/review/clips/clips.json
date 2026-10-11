@@ -1,0 +1,55 @@
+{
+ "restaurant": "lucky-dragon",
+ "outro": "outro.mp4",
+ "clips": [
+  {
+   "file": "c01.mp4",
+   "poster": "c01.jpg",
+   "start": 1.0,
+   "end": 8.0,
+   "label": "hibachi plates"
+  },
+  {
+   "file": "c02.mp4",
+   "poster": "c02.jpg",
+   "start": 14.0,
+   "end": 20.9,
+   "label": "oh captain CLAMP"
+  },
+  {
+   "file": "c03.mp4",
+   "poster": "c03.jpg",
+   "start": 20.9,
+   "end": 27.1,
+   "label": "CLAMP!! reaction"
+  },
+  {
+   "file": "c04.mp4",
+   "poster": "c04.jpg",
+   "start": 42.7,
+   "end": 48.5,
+   "label": "on the griddle in Compton"
+  },
+  {
+   "file": "c05.mp4",
+   "poster": "c05.jpg",
+   "start": 90.2,
+   "end": 97.1,
+   "label": "the Antidote Drizzle"
+  },
+  {
+   "file": "c06.mp4",
+   "poster": "c06.jpg",
+   "start": 99.0,
+   "end": 105.4,
+   "label": "hibachi shrimp off the grill"
+  },
+  {
+   "file": "c07.mp4",
+   "poster": "c07.jpg",
+   "start": 105.4,
+   "end": 112.4,
+   "label": "woo-wee!"
+  }
+ ]
+}

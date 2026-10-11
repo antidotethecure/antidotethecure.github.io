@@ -22,7 +22,19 @@
    SPLIT WALLETS (opt-in, for spots with a bar + a kitchen): CRM_CFG.wallets = { split:true, bar:{label, icon, perDollar, tiers},
    food:{label, icon, perDollar, tiers}, bonusTo:"food" } gives every member TWO balances that never mix: bar points are earned
    only on drinks and buy only bar rewards; kitchen points are earned only on food and buy only food rewards. See the WALLETS
-   block below. Without wallets.split everything works exactly as the single balance always has. */
+   block below. Without wallets.split everything works exactly as the single balance always has.
+   TEXTING / CONSENT (TCPA): the sign-up has two separate boxes. "ok" (required) = send MY rewards (points, prize and birthday
+   codes): transactional. "sms" (optional, UNCHECKED by default) = "📲 Text me deals": prior express written consent to get
+   recurring MARKETING texts. Marketing texts (holiday blasts, "we miss you", promos) go ONLY to members with sms consent
+   and a phone number, never to anyone who replied STOP (r.stop). Each member keeps r.smsAt (when) and r.smsSrc (where) as
+   the consent record, and the CSV export carries them. Every marketing text names the restaurant and ends with
+   "Reply STOP to opt out"; STOP/HELP replies are honored automatically by the text agent. Quiet hours: marketing texts only
+   go out 8 AM–9 PM in the restaurant's local time (LA). Consent is never a condition of buying anything.
+   HOLIDAY BLAST: with demo/specials.js on the page, the owner view gets a "Holiday blast" composer per active special
+   (or the next one coming up): pre-written SMS, opted-in audience count, send date/time, preview, "Queue for approval".
+   DEMO: nothing is ever sent; the queue lives on this phone. LIVE: a queued blast goes to the owner to approve and then
+   out through the SousShift AI text agent (Twilio), which enforces consent, STOP and quiet hours. Holiday blasts are part
+   of the AI text agent add-on ($49/mo). */
 (function () {
   "use strict";
   var C = window.CRM_CFG || {};
@@ -157,7 +169,7 @@
     ".crm-row .nm{font-weight:800;font-size:14px;color:#EEF2FF}.crm-row .ct{color:#9AA6CC;font-size:12px;grid-column:2/4;overflow-wrap:anywhere}",
     ".crm-row .st{font-size:12px;color:#FFD23F;font-weight:800;text-align:right;white-space:nowrap}",
     ".crm-tag{display:inline-block;font-size:10.5px;font-weight:800;border-radius:99px;padding:2px 7px;margin-left:4px;vertical-align:1px}",
-    ".t-vip{background:#ffd23f26;color:#FFD23F}.t-risk{background:#ff6b5e26;color:#FF8F85}.t-new{background:#3ddc9726;color:#3DDC97}.t-bday{background:#b04af733;color:#D7A6FF}.t-you{background:#E8582A;color:#fff}",
+    ".t-vip{background:#ffd23f26;color:#FFD23F}.t-risk{background:#ff6b5e26;color:#FF8F85}.t-new{background:#3ddc9726;color:#3DDC97}.t-bday{background:#b04af733;color:#D7A6FF}.t-you{background:#E8582A;color:#fff}.t-sms{background:#7fb3ff26;color:#9CC4FF}",
     ".crm-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}",
     ".crm-acts button{border:1px solid #25336A;background:#1a2656;color:#EEF2FF;border-radius:12px;padding:11px;font-size:13.5px;font-weight:800;cursor:pointer}",
     ".crm-acts button.hot{background:#3DDC97;border-color:#3DDC97;color:#0b2a1c}",
@@ -166,6 +178,13 @@
     ".crm-bub{background:#1a2656;border-radius:14px 14px 14px 4px;padding:9px 12px;margin-top:8px;font-size:13.5px}",
     ".crm-fine{font-size:11.5px;color:#7F8AAA;margin-top:10px}",
     ".crm-box{background:#070B1E;border:1px solid #25336A;border-radius:16px;padding:14px;margin-top:12px}",
+    ".crm-card .crm-sms{background:#7fb3ff14;border:1px solid #7fb3ff40;border-radius:12px;padding:10px}.crm-card .crm-sms b{color:#EEF2FF}",
+    ".crm-blast h4{margin:0 0 4px}.crm-bl{border-radius:14px;padding:12px;margin-top:10px;border:1px solid #25336A;background:#0b1230}",
+    ".crm-bl .hd{display:flex;gap:8px;align-items:center;font-weight:900;font-size:14.5px;color:#EEF2FF}.crm-bl .hd .em{font-size:22px}",
+    ".crm-bl textarea{width:100%;min-height:84px;font-size:15px;color:#EEF2FF;background:#121C40;border:1px solid #25336A;border-radius:10px;padding:10px;resize:vertical;margin-top:8px}",
+    ".crm-bl .two>*{min-width:0;max-width:100%}.crm-bl .two input{font-size:15px;padding:9px;min-width:0;-webkit-appearance:none;appearance:none}.crm-bl .go{margin-top:10px;padding:12px;font-size:15px;background:#2547B8;box-shadow:none}",
+    ".crm-bl .aud{font-size:12.5px;color:#C9D2EE;margin:8px 0 0}.crm-bl .aud b{color:#3DDC97}",
+    ".crm-bl .q{font-size:12.5px;color:#3DDC97;margin-top:8px}",
     ".crm-box h4{margin:2px 0 8px;font-size:16px;font-weight:900;color:#EEF2FF}",
     ".crm-pts{display:flex;align-items:center;justify-content:space-between;gap:10px}",
     ".crm-pts .n{font:900 40px/1 system-ui;color:#FFD23F}.crm-pts .n small{font-size:14px;color:#9AA6CC;font-weight:700;margin-left:4px}",
@@ -232,6 +251,9 @@
   var BY = { "Jordan P.": "Marcus J.", "Brianna C.": "Marcus J.", "Sofia M.": "Maria G.", "Aisha K.": "Luis R." };
   SAMPLE.forEach(function (r, i) { var x = REFS[r.name]; if (x) { r.ref = x[0]; r.nfr = x[1]; r.nfo = x[2]; } if (BY[r.name]) r.refByName = BY[r.name];
     if (WAL) { var b = Math.round(r.stars * [0.3, 0.45, 0.2, 0.55][i % 4] / 10) * 10; r.w = { bar: b, food: r.stars - b }; } });
+  // made-up text consent: who tapped "Text me deals" (sms) and who later replied STOP (stop). Kim + Hye-jin have no phone.
+  var SMSOK = { "Maria G.": 40, "Dre W.": 150, "Luis R.": 180, "Tony N.": 200, "Arman S.": 110, "Marcus J.": 290, "Sofia M.": 30 };
+  SAMPLE.forEach(function (r) { if (SMSOK[r.name]) { r.sms = true; r.smsAt = now - SMSOK[r.name] * DAY; r.smsSrc = "sign-up form (sample)"; } if (r.name === "Sofia M.") r.stop = now - 9 * DAY; });
   function refOwner(code) { code = String(code || "").toUpperCase().trim(); for (var i = 0; i < SAMPLE.length; i++) if (SAMPLE[i].ref === code) return SAMPLE[i].name; return ""; }
 
   function mine() { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (x) { return []; } }
@@ -246,8 +268,13 @@
     if (r.bday === mo) t.push(["t-bday", isBday(r) && r.bdd ? "🎂 Birthday today" : "🎂 Birthday month"]);
     if ((r.nfr || (r.friends && r.friends.length)) >= 2) t.push(["t-vip", "🤝 Top referrer"]);
     if (r.refByName) t.push(["t-new", "Referred by " + r.refByName]);
+    if (r.stop) t.push(["t-risk", "Texted STOP"]); else if (r.sms) t.push(["t-sms", "📲 Deals by text"]);
     return t;
   }
+  // ---- marketing-text consent (TCPA): separate, optional, unchecked by default. See TEXTING / CONSENT above. ----
+  var SMS_TEXT = "Text me deals: I agree to get recurring marketing texts (holiday specials, offers) from " + NAME + " at the number above, sent by an automated system. Consent isn't required to buy anything. Up to 4 msgs/mo. Msg & data rates may apply. Reply STOP to opt out, HELP for help.";
+  function smsBox() { return '<label class="crm-optin crm-sms"><input type="checkbox" name="sms"> <span><b>📲 Text me deals</b> (optional). ' + e(SMS_TEXT.replace(/^Text me deals: /, "")) + '</span></label>'; }
+  function canText(r) { return !!(r && r.sms && !r.stop && /\d{7,}|•••/.test(String(r.phone || "").replace(/[^\d•]/g, ""))); }
   function ago(ts) { var d = Math.floor((now - ts) / DAY); return d <= 0 ? "today" : d === 1 ? "yesterday" : d + " days ago"; }
   function code() { var a = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", s = ""; for (var i = 0; i < 4; i++) s += a[(Math.random() * a.length) | 0]; return (NAME.replace(/[^A-Za-z]/g, "").slice(0, 5).toUpperCase() || "CLUB") + "-" + s; }
 
@@ -550,7 +577,7 @@
         '<select name="bdy" aria-label="Birth year"><option value="">Year</option>' + Array.apply(null, Array(88)).map(function (x, i) { var y = new Date().getFullYear() - 13 - i; return '<option>' + y + '</option>'; }).join("") + '</select></div>' +
       '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat. We\'ll text you a reminder on the day.</div>' +
       '<label>Friend\'s referral code (optional)</label><input name="ref" maxlength="16" autocapitalize="characters" value="' + e(INVITE) + '" placeholder="e.g. MARIA-21">' +
-      '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Text / email me rewards and specials from ' + e(NAME) + '. Msg & data rates may apply. Reply STOP anytime.</span></label>' +
+      '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Send my rewards (points, prize and birthday codes) from ' + e(NAME) + ' to me by text or email. Msg & data rates may apply. Reply STOP anytime.</span></label>' + smsBox() +
       '<button class="go" type="submit">🎁 Get my reward</button><div class="err"></div></form>' +
       '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + '</p>';
     join.onclick = function (ev) { var b = ev.target.closest("[data-a=earn]"); if (b) openEarn(); };
@@ -577,6 +604,8 @@
     var rc = v("ref").toUpperCase(), byName = rc ? refOwner(rc) : "";
       var r = { id: code4(8), name: v("name"), phone: v("phone"), email: v("email"), bday: v("bday") === "" ? -1 : +v("bday"), bdd: +v("bdd") || 0, bdy: +v("bdy") || 0, visits: 1, stars: 0, last: Date.now(), joined: Date.now(), code: code(), offer: OFFER,
         ref: refCode(v("name")), refBy: rc, refByName: rc ? (byName || "code " + rc) : "", friends: [], ledger: [] };
+      // marketing texts need their own consent + a phone number; keep when and where it was given (the consent record)
+      if (v("sms") && /\d{7,}/.test(v("phone").replace(/\D/g, ""))) { r.sms = true; r.smsAt = Date.now(); r.smsSrc = "sign-up form: " + location.pathname; }
       addPts(r, 100, "🎉 Welcome to " + NAME + " Rewards");
       if (rc) { addPts(r, REF.friend, "🤝 Joined with " + (byName ? byName.split(" ")[0] + "'s" : "a friend's") + " code"); tag(r, "referred_bonus");
         r.fgift = { t: REF.friendGift + " with your first order", c: "FRIEND-" + code4(4), ts: Date.now() }; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎁 Friend gift: " + r.fgift.t }); }
@@ -588,7 +617,8 @@
       // live restaurants: send the sign-up to the owner's Google Sheet (Apps Script web app in CRM_CFG.sheet)
       if (C.sheet) try { fetch(C.sheet, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({
         name: r.name, phone: r.phone, email: r.email, bday: r.bday >= 0 ? (r.bday + 1) + "/" + r.bdd + "/" + r.bdy : "",
-        src: r.src || qs.get("s") || qs.get("src") || (rc ? "referral " + rc : "app"), code: r.code, prize: (r.wins && r.wins[0] && r.wins[0].t) || "", prizeCode: (r.wins && r.wins[0] && r.wins[0].c) || "", ref: r.ref }) }); } catch (x) {}
+        src: r.src || qs.get("s") || qs.get("src") || (rc ? "referral " + rc : "app"), code: r.code, prize: (r.wins && r.wins[0] && r.wins[0].t) || "", prizeCode: (r.wins && r.wins[0] && r.wins[0].c) || "", ref: r.ref,
+        smsConsent: r.sms ? "yes" : "no", smsConsentAt: r.sms ? new Date(r.smsAt).toISOString() : "", smsConsentText: r.sms ? SMS_TEXT : "" }) }); } catch (x) {}
     return { member: r };
   }
 
@@ -621,7 +651,7 @@
         '<select name="bdd" aria-label="Birth day"><option value="">Day</option>' + Array.apply(null, Array(31)).map(function (x, i) { return '<option>' + (i + 1) + '</option>'; }).join("") + '</select>' +
         '<select name="bdy" aria-label="Birth year"><option value="">Year</option>' + Array.apply(null, Array(88)).map(function (x, i) { return '<option>' + (new Date().getFullYear() - 13 - i) + '</option>'; }).join("") + '</select></div>' +
         '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat.</div></details>') +
-      '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Text / email me rewards and specials from ' + e(NAME) + '. Msg & data rates may apply. Reply STOP anytime.</span></label>' +
+      '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Send my rewards (points, prize and birthday codes) from ' + e(NAME) + ' to me by text or email. Msg & data rates may apply. Reply STOP anytime.</span></label>' + smsBox() +
       '<button class="go" type="submit">' + e(T[2]) + '</button><div class="err" role="alert"></div>' +
       '<button type="button" class="crm-gx">Not now</button></form>' +
       '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + '</p></section>';
@@ -999,6 +1029,58 @@
     if ("IntersectionObserver" in window) new IntersectionObserver(function (en) { inView = en[0].isIntersecting; tryAuto(); }, { threshold: 0.25 }).observe(join);
   })();
 
+  // ---- owner: Holiday blast (needs demo/specials.js). See TEXTING / CONSENT at the top for the rules it follows. ----
+  // Marketing texts need prior express written consent ("Text me deals"), honor STOP, and only go out 8 AM–9 PM local.
+  // Part of the AI text agent add-on ($49/mo). DEMO: "Queue for approval" only saves to this phone; nothing is sent.
+  // LIVE: the queued blast goes to the owner for approval, then the SousShift text agent sends it through Twilio.
+  var BQ = "ssai_blastq_" + SLUG;
+  function blastQ() { try { return JSON.parse(localStorage.getItem(BQ) || "[]"); } catch (x) { return []; } }
+  function segs(t) { var uni = /[^\x00-\x7F]/.test(t), n = Array.from(t).length; return uni ? (n <= 70 ? 1 : Math.ceil(n / 67)) : (n <= 160 ? 1 : Math.ceil(n / 153)); }
+  function drawBlast() {
+    var box = own.querySelector("#crm-blast"), SP = window.SSAI_SPECIALS; if (!box) return;
+    if (!SP || !SP.list.length) { box.style.display = "none"; return; }
+    box.style.display = "";
+    var on = SP.active(), list = on.length ? on : SP.upcoming(1), rows = all(), ok = rows.filter(canText);
+    var noConsent = rows.filter(function (r) { return !r.sms; }).length, stopped = rows.filter(function (r) { return r.stop; }).length;
+    var q = blastQ();
+    box.innerHTML = '<h4>🎉 Holiday blast</h4><p style="margin:0;font-size:13px">' + (on.length ? 'Text your members about what\'s on now.' : 'No holiday special is running today. Get the next one ready.') +
+      ' Only members who tapped <b>📲 Text me deals</b> get it. You approve every send.</p>' +
+      list.map(function (sp) {
+        var T = SP.theme(sp), isOn = on.indexOf(sp) >= 0, hol = sp.holiday === "custom" ? "Special" : T.n;
+        var msg = T.e + " " + hol + " at " + NAME + ": " + sp.title + (sp.price ? " (" + sp.price + ")" : "") + (sp.code ? ", code " + sp.code : "") + " — " + SP.link(sp) + ". Reply STOP to opt out";
+        var dt = isOn ? SP.todayISO() : SP.nextStart(sp), queued = q.filter(function (x) { return x.id === sp.id; })[0];
+        return '<div class="crm-bl" data-id="' + e(sp.id) + '"><div class="hd"><span class="em">' + T.e + '</span><span>' + e(hol + " · " + sp.title) + '</span>' +
+          '<span class="crm-tag ' + (isOn ? 't-new">ON NOW' : 't-vip">STARTS ' + e(SP.fmt(sp.start).toUpperCase())) + '</span></div>' +
+          '<textarea aria-label="Text message">' + e(msg) + '</textarea><div class="crm-bub"></div>' +
+          '<div class="two" style="margin-top:8px"><input type="date" data-b="date" aria-label="Send date" value="' + dt + '"><input type="time" data-b="time" aria-label="Send time" value="11:00" min="08:00" max="21:00"></div>' +
+          '<p class="aud" data-b="aud" data-n="' + ok.length + '">Goes to <b>' + ok.length + '</b> member' + (ok.length === 1 ? '' : 's') + ' who opted in to texts. Skipped: ' + noConsent + ' without text consent' + (stopped ? ', ' + stopped + ' who replied STOP' : '') + '.</p>' +
+          '<p class="crm-fine" data-b="seg" style="margin:4px 0 0"></p>' +
+          '<button type="button" class="go" data-a="queue">' + (queued ? '✅ Queued · update' : '📨 Queue for approval') + '</button><div class="err" data-b="err"></div>' +
+          (queued ? '<div class="q">Queued for ' + e(queued.when) + ' to ' + queued.n + ' opted-in members. Waiting for your approval. (Demo: nothing is sent.)</div>' : '') + '</div>';
+      }).join("") +
+      '<p class="crm-fine" style="margin-bottom:0">Rules built in: texts only go to people who gave written consent (the "Text me deals" box), every text says who it\'s from and how to opt out, STOP replies are removed automatically, and nothing sends outside 8 AM–9 PM. Demo: nothing is ever sent. Live: approved blasts go out through your SousShift AI text agent (add-on, $49/mo).</p>';
+    box.querySelectorAll(".crm-bl").forEach(function (el) {
+      var ta = el.querySelector("textarea"), bub = el.querySelector(".crm-bub"), sg = el.querySelector('[data-b="seg"]'), err = el.querySelector('[data-b="err"]');
+      function pv() { bub.textContent = ta.value; var n = segs(ta.value); sg.textContent = Array.from(ta.value).length + " characters · " + n + " text segment" + (n === 1 ? "" : "s") + " per person" + (/[^\x00-\x7F]/.test(ta.value) ? " (emoji count as 70 characters a segment)" : "") + "."; }
+      ta.oninput = pv; pv();
+      el.querySelector('[data-a="queue"]').onclick = function () {
+        var t = ta.value.trim(), d = el.querySelector('[data-b="date"]').value, tm = el.querySelector('[data-b="time"]').value, hh = +tm.slice(0, 2), mm = +tm.slice(3, 5);
+        err.style.color = "#FF6B5E";
+        if (!/reply stop/i.test(t)) { err.textContent = "Keep \"Reply STOP to opt out\" in the text. It's required for marketing texts."; return; }
+        if (t.toLowerCase().indexOf(NAME.toLowerCase()) < 0) { err.textContent = "Keep " + NAME + "'s name in the text so people know who it's from."; return; }
+        if (!d || !tm) { err.textContent = "Pick a send date and time."; return; }
+        if (hh < 8 || hh > 21 || (hh === 21 && mm > 0)) { err.textContent = "Quiet hours: marketing texts only go out 8 AM–9 PM (restaurant time). Pick a time in that window."; return; }
+        if (!ok.length) { err.textContent = "Nobody has opted in to texts yet."; return; }
+        var when = new Date(d + "T" + tm).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+        var list2 = blastQ().filter(function (x) { return x.id !== el.dataset.id; });
+        list2.push({ id: el.dataset.id, msg: t, when: when, date: d, time: tm, n: ok.length, ts: Date.now(), status: "awaiting owner approval" });
+        try { localStorage.setItem(BQ, JSON.stringify(list2)); } catch (x) {}
+        drawBlast(); toast("📨 Queued for your approval · demo: nothing is sent");
+      };
+    });
+  }
+  document.addEventListener("ssai-specials", function () { drawBlast(); });
+
   var seg = "all";
   function drawOwn(s, flash) {
     seg = s || seg;
@@ -1024,6 +1106,7 @@
       }).join("") + '</div>' +
       '<div class="crm-acts"><button type="button" class="hot" data-a="text">💬 Text this group</button><button type="button" data-a="csv">⬇️ Export list</button></div>' +
       '<div class="crm-compose"><textarea></textarea><div class="crm-bub"></div><p class="crm-fine" style="margin-bottom:0"></p></div>' +
+      '<div class="crm-box crm-blast" id="crm-blast"></div>' +
       '<div class="crm-box"><h4>🧾 Register: add points by code</h4><p style="margin:0 0 8px;font-size:13px">Your cashier or bartender types the customer\'s 4-digit code and the total. Points post to their phone instantly.</p>' +
         (WAL ? '<input data-r="code" inputmode="numeric" maxlength="4" placeholder="4-digit code" style="width:100%">' +
           '<div class="two" style="margin-top:8px"><input data-r="food" inputmode="decimal" placeholder="' + W.food.icon + ' Food $"><input data-r="bar" inputmode="decimal" placeholder="' + W.bar.icon + ' Bar $"></div>' +
@@ -1091,20 +1174,21 @@
       vip: "{first}, you're one of our VIPs 👑 Next one's on us this week.", risk: "Hey {first}, we miss you! 👀 Come back this week for 2× stars.",
       bday: "Happy birthday {first}! 🎂 Your free treat is waiting. Show your code + a photo ID at the counter." };
     function preview() {
-      var who = pick.filter(function (r) { return r.phone || r.email; }), first = who[0] ? who[0].name.split(" ")[0] : "there";
+      var who = pick.filter(canText), first = who[0] ? who[0].name.split(" ")[0] : "there";
       cmp.querySelector(".crm-bub").textContent = ta.value.replace(/\{first\}/g, first);
-      cmp.querySelector(".crm-fine").textContent = "Would go to " + who.length + " customer" + (who.length === 1 ? "" : "s") + " in this group. Demo: nothing is sent.";
+      cmp.querySelector(".crm-fine").textContent = "Would go to " + who.length + " customer" + (who.length === 1 ? "" : "s") + " in this group who tapped \"Text me deals\" (" + (pick.length - who.length) + " without text consent are skipped). Demo: nothing is sent.";
     }
     ta.oninput = preview;
     own.querySelector('[data-a="text"]').onclick = function () { cmp.style.display = "block"; ta.value = DEF[seg] || DEF.all; preview(); ta.focus(); };
     own.querySelector('[data-a="csv"]').onclick = function () {
       var q = function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; };
-      var csv = ["name,phone,email,visits,points," + (WAL ? "bar_points,kitchen_points," : "") + "last_visit,joined,birthday,referral_code,referred_by,friends_referred," + EK.map(function (k) { return k[0]; }).join(",") + ",feedback_stars,feedback" + (TC || SPIN ? ",plays,daily_spins,tokens,tokens_with_purchases,tokens_weekly_free,tokens_free_request,tokens_spin_bonus,tokens_spent,device_bound" : "")].concat(all().map(function (r, i) {
+      var csv = ["name,phone,email,visits,points," + (WAL ? "bar_points,kitchen_points," : "") + "last_visit,joined,birthday,referral_code,referred_by,friends_referred," + EK.map(function (k) { return k[0]; }).join(",") + ",feedback_stars,feedback" + (TC || SPIN ? ",plays,daily_spins,tokens,tokens_with_purchases,tokens_weekly_free,tokens_free_request,tokens_spin_bonus,tokens_spent,device_bound" : "") + ",text_deals_consent,consent_at,consent_source,opted_out_stop"].concat(all().map(function (r, i) {
         var ec = earnCounts(r, i), tt = tokOf(r, i);
-        return [r.name, r.phone, r.email, r.visits, r.stars].concat(WAL ? [walOf(r).bar || 0, walOf(r).food || 0] : [], [new Date(r.last).toISOString().slice(0, 10), new Date(r.joined).toISOString().slice(0, 10), r.bday >= 0 ? (r.bdy ? r.bdy + "-" + ("0" + (r.bday + 1)).slice(-2) + "-" + ("0" + r.bdd).slice(-2) : MONTHS[r.bday]) : "", r.ref || "", r.refByName || "", r.nfr || (r.friends ? r.friends.length : "")]).concat(EK.map(function (k) { return ec[k[0]] || 0; }), [r.fb ? r.fb.s : "", r.fb ? r.fb.t : ""], TC || SPIN ? [tt.plays, tt.spins, tt.tok, tt.purchase, tt.weekly, tt.free, tt.bonus, tt.spent, r.sample ? "" : (r.dev ? "yes" : "no")] : []).map(q).join(",");
+        return [r.name, r.phone, r.email, r.visits, r.stars].concat(WAL ? [walOf(r).bar || 0, walOf(r).food || 0] : [], [new Date(r.last).toISOString().slice(0, 10), new Date(r.joined).toISOString().slice(0, 10), r.bday >= 0 ? (r.bdy ? r.bdy + "-" + ("0" + (r.bday + 1)).slice(-2) + "-" + ("0" + r.bdd).slice(-2) : MONTHS[r.bday]) : "", r.ref || "", r.refByName || "", r.nfr || (r.friends ? r.friends.length : "")]).concat(EK.map(function (k) { return ec[k[0]] || 0; }), [r.fb ? r.fb.s : "", r.fb ? r.fb.t : ""], TC || SPIN ? [tt.plays, tt.spins, tt.tok, tt.purchase, tt.weekly, tt.free, tt.bonus, tt.spent, r.sample ? "" : (r.dev ? "yes" : "no")] : [], [r.sms ? "yes" : "no", r.smsAt ? new Date(r.smsAt).toISOString() : "", r.smsSrc || "", r.stop ? new Date(r.stop).toISOString().slice(0, 10) : ""]).map(q).join(",");
       })).join("\n");
       var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = SLUG + "-customers.csv"; document.body.appendChild(a); a.click(); a.remove();
     };
+    drawBlast();
     if (flash) setTimeout(function () { var y = own.querySelector(".crm-row.you"); if (y) y.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, 80);
   }
 

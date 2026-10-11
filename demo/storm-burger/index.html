@@ -632,5 +632,17 @@ hud();
  prizes:{champion:"Free Double Classic StormBurger Combo for the top score by Sunday close",tiers:[["1,000","Free Classic StormBurger","One run over 1,000 points","img/game/burger.webp"],["800","Free milkshake","Vanilla, chocolate or mix","img/game/shake.webp"],["600","Free fries or onion rings","With any order","img/game/fries.webp"],["400","Free house sauce","Storm, Thunder, Ranch… your pick","🥫"]],note:"Sample prizes. StormBurger picks the real ones and the board resets every Monday."}};</script>
 <script src="../gamemenu.js"></script>
 <script src="../gamelock.js"></script>
+<script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
+window.SPECIALS=[
+ {id:"halloween",holiday:"halloween",title:"Thunder Night Combo",desc:"Jalapeño Lightning Burger Combo with Thunder sauce on the side. Spooky-spicy.",item:"Jalapeño Lightning Burger Combo",start:"10-20",end:"10-31",code:"BOO"},
+ {id:"thanksgiving",holiday:"thanksgiving",title:"Gobble Burger",desc:"Turkey Burger + Onion Rings, the Thanksgiving-week burger.",item:"Turkey Burger",start:"11-20",end:"11-28"},
+ {id:"christmas",holiday:"christmas",title:"Holiday Shake Stack",desc:"Double Classic StormBurger with a Mix Shake (vanilla + chocolate).",item:"Double Classic StormBurger",start:"12-15",end:"12-25"},
+ {id:"newyear",holiday:"newyear",title:"New Year BBQ Combo",desc:"Bacon BBQ Burger Combo to kick off the year.",item:"Bacon BBQ Burger Combo",start:"12-29",end:"01-01"},
+ {id:"valentines",holiday:"valentines",title:"Burgers for Two",desc:"Two Classic StormBurgers + one Chocolate Shake with two straws.",item:"Classic StormBurger",start:"02-07",end:"02-14"},
+ {id:"stpatricks",holiday:"stpatricks",title:"Lucky Strips Combo",desc:"Chicken Strips Combo with Honey Mustard and Avocado Crema.",item:"Chicken Strips Combo",start:"03-14",end:"03-17"},
+ {id:"cinco",holiday:"cinco",title:"Cinco Spicy Combo",desc:"Spicy Chicken Sandwich Combo with Avocado Crema for dipping.",item:"Spicy Chicken Sandwich Combo",start:"05-01",end:"05-05"},
+ {id:"july4",holiday:"july4",title:"Fourth of July Classic",desc:"Classic StormBurger Combo + a Vanilla Shake, all-American.",item:"Classic StormBurger Combo",start:"07-01",end:"07-04"}
+];</script>
+<script src="../specials.js"></script>
 </body>
 </html>

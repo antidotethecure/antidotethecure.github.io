@@ -142,6 +142,18 @@
     });
     document.addEventListener('click', function (e) { if (!p.contains(e.target)) p.classList.remove('open'); });
     document.body.appendChild(p);
+    // tuck the pill away while a game canvas is under it (it covered the in-game scoreboard)
+    (function () {
+      var hid = false, tick = 0;
+      function under() {
+        var r = p.getBoundingClientRect(), y = r.top + r.height / 2, x = r.left + r.width / 2, cs = document.querySelectorAll('canvas');
+        for (var i = 0; i < cs.length; i++) { var c = cs[i].getBoundingClientRect(); if (c.width > 200 && c.height > 200 && y >= c.top && y <= c.bottom && x >= c.left && x <= c.right) return true; }
+        return false;
+      }
+      function check() { tick = 0; var u = under(); if (u === hid) return; hid = u; p.style.transition = 'opacity .25s'; p.style.opacity = u ? '0' : ''; p.style.pointerEvents = u ? 'none' : ''; if (u) p.classList.remove('open'); }
+      function soon() { if (!tick) tick = requestAnimationFrame(check); }
+      addEventListener('scroll', soon, { passive: true }); addEventListener('resize', soon); setInterval(check, 1000); check();
+    })();
     if (lang === 'en') return;
     document.documentElement.lang = lang;
     fixPhrases(); protect(); setTimeout(protect, 1200);

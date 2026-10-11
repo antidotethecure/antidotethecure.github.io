@@ -387,11 +387,13 @@
   window.SSAI_EARN = function (amount, why, split) {
     if (WAL) {
       var sm = mine()[0], f = split ? +split.food || 0 : +amount || 0, bb = split ? +split.bar || 0 : 0, r;
-      if (sm) { r = purchase(sm, f, bb, why); r.tok = tokBuy(sm, f + bb, why + " · $" + (f + bb).toFixed(2)); put(sm); drawJoin(); drawOwn(); }
-      else r = { food: Math.round(f * W.food.per), bar: Math.round(bb * W.bar.per), split: true };
+      if (sm) { var sb0 = seenBefore(sm); r = purchase(sm, f, bb, why); logAppOrder(sm, f, bb, why, sb0); r.tok = tokBuy(sm, f + bb, why + " · $" + (f + bb).toFixed(2)); put(sm); drawJoin(); drawOwn(); }
+      else { r = { food: Math.round(f * W.food.per), bar: Math.round(bb * W.bar.per), split: true }; logAppOrder(null, f, bb, why); }
       r.pts = r.food + r.bar; r.saved = !!sm; r.msg = splitMsg(r); return r;
     }
     var m = mine()[0], pts = Math.round(amount * PER), tk = 0;
+    var af = split ? +split.food || 0 : +amount || 0, ab = split ? +split.bar || 0 : 0;   // bar side of an app order = alcohol (excluded)
+    logAppOrder(m || null, af, ab, why, m ? seenBefore(m) : false);
     if (m) { pts = visit(m, amount * PER); addPts(m, pts, why + " · $" + amount.toFixed(2)); tk = tokBuy(m, amount, why + " · $" + amount.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); }
     return { pts: pts, saved: !!m, tok: tk };
   };
@@ -1145,6 +1147,197 @@
   }
   document.addEventListener("ssai-specials", function () { drawBlast(); });
 
+  // ======================= APP-ATTRIBUTED SALES (the proof behind the performance share) =======================
+  // WHAT COUNTS. A sale is "app-attributed" only when the app brought it in or identified the buyer at checkout:
+  //   how "app"    an order placed through the app (SSAI_EARN from the in-app order flow)
+  //   how "qr"     staff ring up a member who shows their member QR / 4-digit register code
+  //   how "phone"  staff find the member by the phone number on their account
+  //   how "code"   the guest redeems an app reward, promo, prize, referral or welcome code at checkout
+  // Never the restaurant's overall sales. BASE = food + non-alcoholic sales only. Tax, tips and ALCOHOL are excluded
+  // (California ABC: an unlicensed party must not share in alcohol revenue). Staff type the check subtotal before tax and
+  // tip plus the alcohol on that check; food & non-alc = subtotal − alcohol. The receipt total is kept for reconciliation.
+  // App orders: with split wallets everything on the bar side counts as alcohol (excluded), so the base is never overstated.
+  // EACH SALE LOGS: ts, restaurant, member id + name, receipt #, food & non-alc $, alcohol $ (excluded), receipt total,
+  // how identified, staff initials, and visit "first" | "return". A RETURN = the member had already been in on an earlier
+  // day (an earlier attributed sale, an earlier app visit, or joined on an earlier day). Same-day repeats keep that day's type.
+  // PERFORMANCE SHARE (CRM_CFG.perfShare = {threshold:3000, pct:10, returns:12}; billed ONLY when the signed agreement has it):
+  // in a calendar month (LA time) where app-attributed food & non-alc sales EXCEED the threshold, the share is pct% of ALL
+  // of that month's app-attributed food & non-alc sales (not only the part above it), on top of the monthly fee. Statement
+  // by the 5th of the next month; the client may dispute within 10 days (reconciled against register reports); payment is
+  // due 15 days after the statement. returns = the 90-day results check (tracked return visits a month).
+  // STORAGE: localStorage on this device (KEY_sales) AND a POST of every sale to CRM_CFG.sheet when set (Apps Script web
+  // app, "AppSales" tab; see ~/command-center/clients/melody-lax/signup-sheet/Code.gs). NOT LEGALLY PROVABLE YET:
+  // localStorage is one device and can be cleared or edited. Numbers to bill on need the server-side log (the deployed
+  // Sheet at minimum, ideally a server database) or a POS integration (Toast / Square / Clover) that ties each member to
+  // the real check. Until then every statement is an estimate to reconcile against the register's own reports.
+  var PS = { threshold: 3000, pct: 10, returns: 12 }; (function (x) { for (var k in x) PS[k] = x[k]; })(C.perfShare || {});
+  var SK = KEY + "_sales", HOW = { app: "🛒 App order", qr: "📲 Member QR / code", phone: "📞 Member phone", code: "🎟️ App reward / promo code" };
+  function sales() { try { return JSON.parse(localStorage.getItem(SK) || "[]"); } catch (x) { return []; } }
+  function salesSave(l) { try { localStorage.setItem(SK, JSON.stringify(l)); } catch (x) {} }
+  function laYMD(t) { return new Date(t).toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); }   // YYYY-MM-DD in LA
+  function r2(x) { return Math.round((+x || 0) * 100) / 100; }
+  function usd(x) { return "$" + (+x || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function ymLabel(ym) { return MONTHS_L[+ym.slice(5, 7) - 1] + " " + ym.slice(0, 4); }
+  function midOf(r) { return r.sample ? "sample-" + r.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "") : r.id; }
+  // first visit or return, decided BEFORE the sale is added (and before visit() writes today into the member's vlog)
+  function seenBefore(r) {
+    var today = laYMD(Date.now()), mid = midOf(r);
+    if (sales().some(function (x) { return x.mid === mid && x.day < today; })) return true;
+    if (r.sample) return (r.visits || 0) > 1;
+    return (r.vlog || []).some(function (t) { return laYMD(t) < today; }) || (r.joined && laYMD(r.joined) < today);
+  }
+  function logSale(s) {
+    var l = sales(), day = laYMD(s.ts || Date.now());
+    var same = l.filter(function (x) { return x.mid === s.mid && x.day === day; })[0];
+    var ev = { id: "AS-" + code4(6), ts: s.ts || Date.now(), day: day, ym: day.slice(0, 7), restaurant: NAME, mid: s.mid, member: s.member || "",
+      receipt: s.receipt, food: r2(s.food), alcohol: r2(s.alcohol), total: r2(s.total), how: s.how, staff: s.staff || "", visit: same ? same.visit : (s.seen ? "return" : "first"), src: s.src || "staff" };
+    l.unshift(ev); salesSave(l);
+    if (C.sheet) try { fetch(C.sheet, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ type: "appsale",
+      saleId: ev.id, ts: new Date(ev.ts).toISOString(), restaurant: ev.restaurant, memberId: ev.mid, member: ev.member, receipt: ev.receipt, foodNonAlc: ev.food,
+      alcoholExcluded: ev.alcohol, receiptTotal: ev.total, how: ev.how, staff: ev.staff, visit: ev.visit, source: ev.src }) }); } catch (x) {}
+    return ev;
+  }
+  function dupReceipt(rc) { rc = String(rc).trim().toUpperCase(); return sales().filter(function (x) { return String(x.receipt).toUpperCase() === rc; })[0] || null; }
+  // in-app orders call this (from SSAI_EARN). Guests who order without joining are still app orders: mid "guest".
+  function logAppOrder(m, food, bar, why, seen) {
+    var mm = String(why || "").match(/#?[A-Z]{1,3}-\d{2,5}|#[A-Z]\d{3}/), rc = "APP " + (mm ? mm[0].replace(/^#/, "") : code4(5));
+    if (dupReceipt(rc)) rc += "-" + code4(3);
+    return logSale({ mid: m ? m.id : "guest", member: m ? m.name : "Guest (app order)", receipt: rc, food: food, alcohol: bar, total: food + bar, how: "app", src: "app", seen: !!seen });
+  }
+  // find the member behind what staff typed: a scanned QR (SSAI:slug:id), the 4-digit register code, a phone number,
+  // or any app code (welcome, reward, prize, lucky draw, friend gift, birthday, referral). Demo: this phone's member +
+  // the sample customers. LIVE: the lookup runs against the restaurant's member database.
+  function findMember(raw) {
+    var v = String(raw || "").trim(), up = v.toUpperCase().replace(/\s+/g, ""), d = v.replace(/\D/g, ""), m = mine()[0];
+    if (!v) return { err: "Scan the member's QR or type their app code, phone or reward code." };
+    if (/^SSAI:/i.test(v)) { var id = v.split(":").pop(); return m && m.id === id ? { r: m, how: "qr" } : { err: "That member QR isn't on this phone (live: every QR is looked up in your member list)." }; }
+    if (/^\d{4}$/.test(v) && m && regCode(m) === v) return { r: m, how: "qr" };
+    if (/^[\d\s()+.\-]+$/.test(v) && d.length >= 4) {
+      var hits = all().filter(function (r) { var p = String(r.phone || "").replace(/\D/g, ""); return p.length >= 4 && p.slice(-4) === d.slice(-4) && (r.sample || d.length < 10 || p.slice(-10) === d.slice(-10)); });
+      if (hits.length === 1) return { r: hits[0], how: "phone" };
+      if (hits.length > 1) return { err: "More than one member has a phone ending in " + d.slice(-4) + ". Type the full number." };
+      return { err: /^\d{4}$/.test(v) ? "No member has that 4-digit code right now (codes change every 5 minutes) or a phone ending in " + v + "." : "No member with that phone number." };
+    }
+    if (m) {
+      var codes = [m.code, m.ref, m.bcode, m.redeem && m.redeem.c, m.fgift && m.fgift.c].concat((m.wins || []).map(function (w) { return w.c; }), m.rdm ? WK.map(function (k) { return m.rdm[k] && m.rdm[k].c; }) : []);
+      if (codes.some(function (c) { return c && String(c).toUpperCase() === up; })) return { r: m, how: "code" };
+    }
+    var s = SAMPLE.filter(function (r) { return r.ref && r.ref === up; })[0];
+    if (s) return { r: s, how: "code" };
+    return { err: "No member or app code matches \"" + v + "\". Check the letters (live: looked up in your member list)." };
+  }
+  function moneyIn(k) { var el = own.querySelector('[data-r="' + k + '"]'); var x = parseFloat(String(el ? el.value : "").replace(/[^0-9.]/g, "")); return isFinite(x) ? x : NaN; }
+  function ringCalc() {
+    var sub = moneyIn("sub"), alc = moneyIn("alc"), el = own.querySelector('[data-r="calc"]'); if (!el) return;
+    if (!(sub > 0)) { el.textContent = "Counted for the app: food & non-alc = subtotal − alcohol. Tax and tip never count."; return; }
+    alc = alc > 0 ? alc : 0;
+    el.innerHTML = alc > sub ? '<span style="color:#FF8F85">Alcohol can\'t be more than the subtotal.</span>' : 'Counted for the app: <b style="color:#3DDC97">' + usd(sub - alc) + ' food & non-alc</b>' + (alc ? ' · ' + usd(alc) + ' alcohol excluded' : '') + ' · tax & tip excluded';
+  }
+  function ringUp() {
+    var msg = own.querySelector('[data-r="msg"]'), bad = function (t) { msg.style.color = "#FF6B5E"; msg.textContent = t; };
+    var who = own.querySelector('[data-r="who"]').value, rc = own.querySelector('[data-r="rcpt"]').value.trim(), staff = own.querySelector('[data-r="staff"]').value.trim().toUpperCase();
+    var sub = moneyIn("sub"), alc = moneyIn("alc"), tot = moneyIn("tot"); alc = alc > 0 ? alc : 0;
+    var f = findMember(who); if (f.err) return bad(f.err);
+    if (!rc) return bad("Type the check / receipt number from the register.");
+    if (!/^[A-Z]{1,4}$/.test(staff)) return bad("Add your initials (1–4 letters).");
+    if (!(sub > 0)) return bad("Type the check subtotal before tax and tip.");
+    if (!(tot > 0)) return bad("Type the receipt total (with tax and tip).");
+    if (alc > sub) return bad("Alcohol can't be more than the subtotal.");
+    if (sub > tot + 0.005) return bad("The subtotal can't be more than the receipt total. Subtotal is before tax and tip.");
+    var dup = dupReceipt(rc); if (dup) return bad("Check #" + rc + " is already logged (" + new Date(dup.ts).toLocaleString() + "). Each check counts once.");
+    var r = f.r, food = r2(sub - alc), seen = seenBefore(r), pts = "";
+    if (!r.sample) {   // this phone's member: points post like any register order (the alcohol $ earn bar points with split wallets)
+      if (WAL) { var wr = purchase(r, food, alc, "🧾 Check #" + rc); pts = splitMsg(wr); }
+      else { var got = visit(r, sub * PER); addPts(r, got, "🧾 Check #" + rc + " · $" + sub.toFixed(2)); r.visits = (r.visits || 0) + 1; r.last = Date.now(); pts = "+" + got + " pts"; }
+      var tk = tokBuy(r, sub, "Check #" + rc + " $" + sub.toFixed(2)); pts += tokMsg(tk); put(r);
+    }
+    var ev = logSale({ mid: midOf(r), member: r.name, receipt: rc, food: food, alcohol: alc, total: tot, how: f.how, staff: staff, seen: seen });
+    drawJoin(); drawOwn(); refreshMenu();
+    var m2 = own.querySelector('[data-r="msg"]'); m2.style.color = "#3DDC97";
+    m2.textContent = "✅ Check #" + rc + " logged for " + r.name + " · " + usd(food) + " food & non-alc" + (alc ? " (" + usd(alc) + " alcohol excluded)" : "") + " · " + (ev.visit === "return" ? "🔁 return visit" : "🆕 first visit") + (pts ? " · " + pts : "");
+    toast("🧾 " + usd(food) + " app sale · " + r.name.split(" ")[0]);
+  }
+  function monthStats(ym) {
+    var l = sales().filter(function (x) { return x.ym === ym; }), sum = function (a, k) { return r2(a.reduce(function (s, x) { return s + (+x[k] || 0); }, 0)); };
+    var ret = l.filter(function (x) { return x.visit === "return"; }), fst = l.filter(function (x) { return x.visit !== "return"; });
+    var vis = {}, rv = {}; l.forEach(function (x) { vis[x.mid + "|" + x.day] = 1; if (x.visit === "return") rv[x.mid + "|" + x.day] = 1; });
+    var food = sum(l, "food"), over = food > PS.threshold;
+    return { ym: ym, rows: l, n: l.length, food: food, alcohol: sum(l, "alcohol"), total: sum(l, "total"), retFood: sum(ret, "food"), fstFood: sum(fst, "food"), retN: ret.length, fstN: fst.length,
+      visits: Object.keys(vis).length, retVisits: Object.keys(rv).length, members: Object.keys(l.reduce(function (o, x) { o[x.mid] = 1; return o; }, {})).length,
+      appN: l.filter(function (x) { return x.how === "app"; }).length, over: over, share: over ? r2(food * PS.pct / 100) : 0 };
+  }
+  function salesBox() {
+    var ym = laYMD(Date.now()).slice(0, 7), S = monthStats(ym), pct = Math.min(100, S.food / PS.threshold * 100);
+    var yms = sales().map(function (x) { return x.ym; }).concat([ym]).filter(function (x, i, a) { return a.indexOf(x) === i; }).sort().reverse();
+    return '<div class="crm-box crm-as" id="crm-appsales"><h4>📈 App sales · ' + ymLabel(ym) + '</h4>' +
+      '<p style="margin:0 0 8px;font-size:13px">Sales the app brought in: app orders, plus checks where staff identified a member by QR, phone or an app code. Food & non-alc only: no tax, tips or alcohol. Never your overall sales.</p>' +
+      '<div class="crm-as-big">' + usd(S.food) + '<small> of ' + usd(PS.threshold).replace(".00", "") + '</small></div>' +
+      '<div class="crm-goal" style="height:12px"><i style="width:' + pct + '%;background:' + (S.over ? 'linear-gradient(90deg,#3DDC97,#FFD23F)' : '#3DDC97') + '"></i></div>' +
+      '<p style="margin:2px 0 10px;font-size:12.5px">' + (S.over ? '✅ Past ' + usd(PS.threshold).replace(".00", "") + ' this month.' : usd(r2(PS.threshold - S.food)) + ' to go to ' + usd(PS.threshold).replace(".00", "") + '.') + '</p>' +
+      '<div class="crm-stats" style="grid-template-columns:repeat(2,1fr)"><div><b>' + usd(S.retFood) + '</b>🔁 returning members (' + S.retN + ')</div><div><b>' + usd(S.fstFood) + '</b>🆕 first visits (' + S.fstN + ')</div>' +
+      '<div><b>' + S.visits + '</b>member visits · ' + S.members + ' members</div><div><b>' + S.retVisits + '</b>return visits (' + PS.returns + '/mo check)</div></div>' +
+      '<div class="crm-as-share"><span>Performance share estimate</span><b>' + (S.over ? usd(S.share) : '$0.00') + '</b></div>' +
+      '<p class="crm-fine" style="margin:4px 0 0">Only if your agreement includes it: in a month where app sales pass ' + usd(PS.threshold).replace(".00", "") + ', it\'s ' + PS.pct + '% of that month\'s app sales (' + PS.pct + '% × ' + usd(S.food) + '), on top of the monthly fee. Alcohol excluded this month: ' + usd(S.alcohol) + '.</p>' +
+      '<div class="crm-feed" style="max-height:170px;margin-top:8px">' + (S.rows.slice(0, 12).map(function (x) { return '<div><span>' + e(x.day.slice(5)) + ' · #' + e(x.receipt) + ' · ' + e(x.member) + '<br><span style="color:#9AA6CC">' + e(HOW[x.how] || x.how) + ' · ' + (x.visit === "return" ? "🔁 return" : "🆕 first") + (x.staff ? ' · ' + e(x.staff) : '') + '</span></span><b class="plus">' + usd(x.food) + '</b></div>'; }).join("") || '<div><span>No app sales yet this month. Ring up a member above.</span></div>') + '</div>' +
+      '<div class="crm-acts"><button type="button" data-a="scsv">⬇️ Sales CSV</button><button type="button" class="hot" data-a="stmt">🧾 Statement</button></div>' +
+      '<label style="margin-top:8px">Statement month</label><select data-r="sym">' + yms.map(function (x) { return '<option value="' + x + '">' + ymLabel(x) + (x === ym ? ' (so far)' : '') + '</option>'; }).join("") + '</select>' +
+      '<p class="crm-fine" style="margin:8px 0 0">Demo: this log lives on this phone' + (C.sheet ? ' and is copied to your Google Sheet' : '') + '. To bill on it, the numbers need the server log or a register (POS) link, and every statement is checked against your register reports.</p></div>';
+  }
+  function salesCSV() {
+    var q = function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; };
+    var head = "sale_id,timestamp,date,month,restaurant,member_id,member,receipt,how_identified,visit,food_nonalc,alcohol_excluded,receipt_total,staff,source";
+    return [head].concat(sales().slice().reverse().map(function (x) { return [x.id, new Date(x.ts).toISOString(), x.day, x.ym, x.restaurant, x.mid, x.member, x.receipt, x.how, x.visit, x.food.toFixed(2), x.alcohol.toFixed(2), x.total.toFixed(2), x.staff, x.src].map(q).join(","); })).join("\n");
+  }
+  function addDays(ymd, n) { var p = ymd.split("-"), d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2] + n)); return d.toISOString().slice(0, 10); }
+  function longDate(ymd) { var p = ymd.split("-"); return MONTHS_L[+p[1] - 1] + " " + (+p[2]) + ", " + p[0]; }
+  function statementHTML(ym) {
+    var S = monthStats(ym), y = +ym.slice(0, 4), mo2 = +ym.slice(5, 7), nx = mo2 === 12 ? (y + 1) + "-01" : y + "-" + ("0" + (mo2 + 1)).slice(-2), sd = nx + "-05";
+    var open = laYMD(Date.now()).slice(0, 7) <= ym;
+    return '<div class="st-hd"><div><b>SousShift AI</b><br>Performance Share Statement</div><div style="text-align:right">' + e(NAME) + '<br>' + ymLabel(ym) + '</div></div>' +
+      (open ? '<p class="st-warn">PREVIEW: ' + ymLabel(ym) + ' is not over yet. The final statement is issued by ' + longDate(sd) + '.</p>' : '') +
+      '<table class="st-t"><tr><td>Statement date</td><td>' + longDate(sd) + '</td></tr><tr><td>Period</td><td>' + longDate(ym + "-01") + ' – ' + longDate(addDays(nx + "-01", -1)) + ' (Los Angeles time)</td></tr>' +
+      '<tr><td>App-attributed sales (food & non-alcoholic)</td><td><b>' + usd(S.food) + '</b> · ' + S.n + ' sale' + (S.n === 1 ? '' : 's') + '</td></tr>' +
+      '<tr><td>Returning members / first visits</td><td>' + usd(S.retFood) + ' / ' + usd(S.fstFood) + '</td></tr><tr><td>Member visits / return visits</td><td>' + S.visits + ' / ' + S.retVisits + '</td></tr>' +
+      '<tr><td>Alcohol on those checks (excluded)</td><td>' + usd(S.alcohol) + '</td></tr>' +
+      '<tr><td>Threshold check</td><td>' + (S.over ? 'Met: ' + usd(S.food) + ' is over ' + usd(PS.threshold) : 'Not met: ' + usd(S.food) + ' is not over ' + usd(PS.threshold) + '. No share is due.') + '</td></tr>' +
+      '<tr class="st-tot"><td>Performance share (' + PS.pct + '% of ' + usd(S.food) + ')</td><td>' + usd(S.share) + '</td></tr>' +
+      '<tr><td>Dispute window</td><td>Until ' + longDate(addDays(sd, 10)) + ' (10 days). Reconciled against Client\'s register reports.</td></tr>' +
+      '<tr><td>Payment due</td><td>' + (S.share ? longDate(addDays(sd, 15)) + ' (15 days after the statement)' : 'Nothing due') + '</td></tr></table>' +
+      '<h4>Line items</h4><div class="st-sc"><table class="st-li"><tr><th>Date</th><th>Check #</th><th>Member</th><th>How identified</th><th>Visit</th><th>Food & non-alc</th><th>Alcohol (excl.)</th></tr>' +
+      (S.rows.slice().reverse().map(function (x) { return '<tr><td>' + e(x.day) + '</td><td>' + e(x.receipt) + '</td><td>' + e(x.member) + '</td><td>' + e((HOW[x.how] || x.how).replace(/^\S+ /, "")) + '</td><td>' + (x.visit === "return" ? "Return" : "First") + '</td><td>' + usd(x.food) + '</td><td>' + usd(x.alcohol) + '</td></tr>'; }).join("") || '<tr><td colspan="7">No app-attributed sales this month.</td></tr>') +
+      '<tr class="st-tot"><td colspan="5">Total</td><td>' + usd(S.food) + '</td><td>' + usd(S.alcohol) + '</td></tr></table></div>' +
+      '<p class="st-fn">Base: food and non-alcoholic sales from app orders and from checks where the member was identified through the app (member QR or code, phone, or an app reward / promo code). Tax, tips and alcohol are excluded; the restaurant\'s overall sales never count. ' +
+      'Source: the app\'s sales log. Figures are reconciled against Client\'s register reports before payment. Draft for attorney review; not legal advice.</p>';
+  }
+  function openStatement(ym) {
+    var ov = document.createElement("div"); ov.className = "crm-stmt"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
+    ov.innerHTML = '<div class="st-bar"><b>Statement · ' + ymLabel(ym) + '</b><button type="button" data-s="print">Save / Print PDF</button><button type="button" data-s="x">Close</button></div><div class="st-doc">' + statementHTML(ym) + '</div>';
+    var html_ = document.documentElement, prev = html_.style.overflow;
+    function close() { ov.remove(); html_.style.overflow = prev; html_.classList.remove("crm-printing"); }
+    ov.querySelector('[data-s="x"]').onclick = close;
+    ov.querySelector('[data-s="print"]').onclick = function () { var t = document.title; html_.classList.add("crm-printing"); document.title = NAME + " - Performance Share " + ym; window.print(); document.title = t; html_.classList.remove("crm-printing"); };
+    document.body.appendChild(ov); html_.style.overflow = "hidden";
+    return ov;
+  }
+  (function () {
+    var s = document.createElement("style");
+    s.textContent = ".crm-as-big{font:900 30px/1.1 system-ui;color:#EEF2FF;margin:4px 0}.crm-as-big small{font-size:14px;color:#9AA6CC;font-weight:700}" +
+      ".crm-as-share{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#070B1E;border:1px solid #3DDC97;border-radius:12px;padding:10px 12px;font-size:13.5px;color:#C9D2EE;font-weight:700}.crm-as-share b{font:900 20px system-ui;color:#3DDC97}" +
+      ".crm-own .crm-as .crm-stats div{font-size:11.5px}.crm-own .crm-as .crm-stats b{font-size:17px}" +
+      ".crm-stmt{position:fixed;inset:0;z-index:2147483000;background:#eef1f6;color:#111;overflow:auto;font:14px/1.45 Arial,Helvetica,sans-serif}" +
+      ".crm-stmt .st-bar{position:sticky;top:0;display:flex;gap:8px;align-items:center;padding:10px 12px;background:#0B2A6F;color:#fff}.crm-stmt .st-bar b{flex:1;font-size:14px;min-width:0}" +
+      ".crm-stmt .st-bar button{font:700 13px Arial;border:0;border-radius:9px;padding:9px 11px;cursor:pointer;background:#FFD60A;color:#111}.crm-stmt .st-bar button[data-s=x]{background:#ffffff22;color:#fff}" +
+      ".crm-stmt .st-doc{background:#fff;max-width:820px;margin:14px auto;padding:24px 18px;border-radius:6px;box-sizing:border-box;width:calc(100% - 20px)}" +
+      ".crm-stmt .st-hd{display:flex;justify-content:space-between;gap:10px;border-bottom:3px solid #0b1a4a;padding-bottom:10px;margin-bottom:12px;font-size:15px}.crm-stmt .st-hd b{font-size:18px}" +
+      ".crm-stmt table{display:table;border-collapse:collapse;width:100%;font-size:13px}.crm-stmt tr{display:table-row}.crm-stmt td,.crm-stmt th{display:table-cell}.crm-stmt td,.crm-stmt th{border:1px solid #c3c9d6;padding:6px 7px;text-align:left;vertical-align:top}.crm-stmt th{background:#eef2f8}" +
+      ".crm-stmt .st-t td:first-child{width:46%;color:#333}.crm-stmt tr.st-tot td{font-weight:800;background:#f6f8fc}.crm-stmt .st-sc{overflow-x:auto}.crm-stmt .st-li{min-width:600px}" +
+      ".crm-stmt h4{margin:16px 0 6px}.crm-stmt .st-fn{font-size:11.5px;color:#444;margin-top:12px}.crm-stmt .st-warn{background:#fff6d6;border:1px solid #e5c95a;border-radius:8px;padding:8px 10px;font-size:13px}" +
+      "@media print{html.crm-printing body>*:not(.crm-stmt){display:none!important}html.crm-printing .crm-stmt{position:static;overflow:visible;background:#fff}html.crm-printing .crm-stmt .st-bar{display:none}html.crm-printing .crm-stmt .st-doc{margin:0;max-width:none;width:auto}html.crm-printing .crm-stmt .st-li{min-width:0}}";
+    document.head.appendChild(s);
+  })();
+  // test / demo hook: SSAI_SALES.list(), .stats("2026-10"), .statement("2026-10"), .csv()
+  window.SSAI_SALES = { list: sales, stats: monthStats, statement: function (ym) { return openStatement(ym || laYMD(Date.now()).slice(0, 7)); }, csv: salesCSV, config: PS };
+
   var seg = "all";
   function drawOwn(s, flash) {
     seg = s || seg;
@@ -1171,15 +1364,18 @@
       '<div class="crm-acts"><button type="button" class="hot" data-a="text">💬 Text this group</button><button type="button" data-a="csv">⬇️ Export list</button></div>' +
       '<div class="crm-compose"><textarea></textarea><div class="crm-bub"></div><p class="crm-fine" style="margin-bottom:0"></p></div>' +
       '<div class="crm-box crm-blast" id="crm-blast"></div>' +
-      '<div class="crm-box"><h4>🧾 Register: add points by code</h4><p style="margin:0 0 8px;font-size:13px">Your cashier or bartender types the customer\'s 4-digit code and the total. Points post to their phone instantly.</p>' +
-        (WAL ? '<input data-r="code" inputmode="numeric" maxlength="4" placeholder="4-digit code" style="width:100%">' +
-          '<div class="two" style="margin-top:8px"><input data-r="food" inputmode="decimal" placeholder="' + W.food.icon + ' Food $"><input data-r="bar" inputmode="decimal" placeholder="' + W.bar.icon + ' Bar $"></div>' +
-          '<p class="crm-fine" style="margin:6px 0 0">Food $ earns ' + wname("food") + ' points, drinks $ earn ' + wname("bar") + ' points. Two separate balances.</p>'
-          : '<div class="two"><input data-r="code" inputmode="numeric" maxlength="4" placeholder="4-digit code"><input data-r="amt" inputmode="decimal" placeholder="Total $"></div>') +
-        '<button type="button" class="go" style="margin-top:8px;background:#2547B8;box-shadow:none" data-a="reg">Add points</button><div class="err" data-r="msg" style="color:#3DDC97"></div>' +
+      '<div class="crm-box" id="crm-ring"><h4>🧾 Ring up a member</h4><p style="margin:0 0 8px;font-size:13px">Your cashier or bartender finds the member, types the check numbers and taps Log. Points post to their phone, and the check is logged as an app sale.</p>' +
+        '<label>Member: scanned QR, 4-digit app code, phone, or reward / promo code</label><input data-r="who" maxlength="40" autocapitalize="characters" placeholder="e.g. 4821 · (310) 555-0123 · WIN-7K3P">' +
+        '<div class="two"><div><label>Check / receipt #</label><input data-r="rcpt" maxlength="24" autocapitalize="characters" placeholder="e.g. 1042"></div><div><label>Staff initials</label><input data-r="staff" maxlength="4" autocapitalize="characters" placeholder="e.g. JD"></div></div>' +
+        '<div class="two"><div><label>Subtotal (before tax &amp; tip) $</label><input data-r="sub" inputmode="decimal" placeholder="0.00"></div><div><label>Alcohol on this check $</label><input data-r="alc" inputmode="decimal" placeholder="0.00"></div></div>' +
+        '<label>Receipt total (with tax &amp; tip) $</label><input data-r="tot" inputmode="decimal" placeholder="0.00">' +
+        '<p class="crm-fine" data-r="calc" style="margin:6px 0 0"></p>' +
+        (WAL ? '<p class="crm-fine" style="margin:4px 0 0">Points: food &amp; non-alc $ earn ' + wname("food") + ' points, alcohol $ earn ' + wname("bar") + ' points. Two separate balances.</p>' : '') +
+        '<button type="button" class="go" style="margin-top:8px;background:#2547B8;box-shadow:none" data-a="reg">Log sale + add points</button><div class="err" data-r="msg" style="color:#3DDC97"></div>' +
         '<h4 style="margin:16px 0 6px">🎟️ Redeem a reward code</h4><p style="margin:0 0 8px;font-size:13px">Guest shows a WIN-, KID- (🧒 kid prize: only with the young player at the table, one per kid per visit), ' + (WAL ? 'BAR- (drink reward), FOOD- (kitchen reward)' : 'R-') + ', FRIEND- or BDAY- code. Apply the matching discount in your POS (Toast, Square…), then mark it used here so it can never be used again. One reward per visit.</p>' +
         '<input data-r="rcode" placeholder="e.g. WIN-7K3P" maxlength="12" autocapitalize="characters" style="width:100%"><button type="button" class="go" style="margin-top:8px;background:#77242e;box-shadow:none" data-a="redeem">Mark used</button><div class="err" data-r="rmsg"></div>' +
         (mine()[0] ? '<p class="crm-fine" style="margin:4px 0 0">Demo tip: tap "Scan to earn" above to see your code, then enter it here.</p>' : '') + '</div>' +
+      salesBox() +
       '<div class="crm-box crm-lead"><h4>🤝 Top referrers</h4><p style="margin:0;font-size:13px">Customers bringing you new customers. They earn +' + REF.join + ' when a friend joins and +' + REF.every + ' every time that friend orders.</p>' +
         rows.filter(function (r) { return r.nfr || (r.friends && r.friends.length); }).map(function (r) { return { n: r.name, f: r.nfr || r.friends.length, o: r.nfo != null ? r.nfo : r.friends.reduce(function (a, x) { return a + x.orders; }, 0), you: r.you }; })
           .sort(function (a, b) { return b.f - a.f || b.o - a.o; }).slice(0, 6).map(function (x, i) {
@@ -1206,21 +1402,12 @@
       var c = issueCode(am); tm.style.color = "#3DDC97"; tm.innerHTML = 'Code <b style="font:900 18px ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#FFD23F" data-r="tcode">' + c.c + '</b> = ' + c.n + ' tokens ($' + am.toFixed(2) + ' order). Single use.';
     };
     var cmp = own.querySelector(".crm-compose"), ta = cmp.querySelector("textarea");
-    own.querySelector('[data-a="reg"]').onclick = function () {
-      if (WAL) {
-        var wc = own.querySelector('[data-r="code"]').value.trim(), num = function (k) { var x = parseFloat(own.querySelector('[data-r="' + k + '"]').value.replace(/[^0-9.]/g, "")); return x > 0 ? x : 0; };
-        var wf = num("food"), wb = num("bar"), wmsg = own.querySelector('[data-r="msg"]'), wm = mine()[0];
-        if (!/^\d{4}$/.test(wc) || !(wf + wb > 0)) { wmsg.style.color = "#FF6B5E"; wmsg.textContent = "Enter the 4-digit code and the food and/or bar amount."; return; }
-        if (!wm || regCode(wm) !== wc) { wmsg.style.color = "#FF6B5E"; wmsg.textContent = "No customer has that code right now. Codes change every 5 minutes."; return; }
-        var wr = purchase(wm, wf, wb, "🧾 Register order · code " + wc), wt = tokBuy(wm, wf + wb, "Register order $" + (wf + wb).toFixed(2)); put(wm);
-        drawJoin(); drawOwn(); refreshMenu(); toast(splitMsg(wr) + " added to " + wm.name.split(" ")[0] + (lastBonus ? " · +" + lastBonus + " visit bonus" : "") + tokMsg(wt)); return;
-      }
-      var c4 = own.querySelector('[data-r="code"]').value.trim(), amt = parseFloat(own.querySelector('[data-r="amt"]').value.replace(/[^0-9.]/g, "")), msg = own.querySelector('[data-r="msg"]'), m = mine()[0];
-      if (!/^\d{4}$/.test(c4) || !(amt > 0)) { msg.style.color = "#FF6B5E"; msg.textContent = "Enter the 4-digit code and the order total."; return; }
-      if (!m || regCode(m) !== c4) { msg.style.color = "#FF6B5E"; msg.textContent = "No customer has that code right now. Codes change every 5 minutes."; return; }
-      var got = visit(m, amt * PER); addPts(m, got, "🧾 Register order $" + amt.toFixed(2) + " · code " + c4); var gk = tokBuy(m, amt, "Register order $" + amt.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m);
-      drawJoin(); drawOwn(); refreshMenu(); toast("+" + got + " points added to " + m.name.split(" ")[0] + (lastBonus ? " · +" + lastBonus + " visit bonus" : "") + tokMsg(gk));
+    own.querySelector('[data-a="reg"]').onclick = ringUp;
+    ["sub", "alc"].forEach(function (k) { own.querySelector('[data-r="' + k + '"]').oninput = ringCalc; }); ringCalc();
+    own.querySelector('[data-a="scsv"]').onclick = function () {
+      var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([salesCSV()], { type: "text/csv" })); a.download = SLUG + "-app-sales.csv"; document.body.appendChild(a); a.click(); a.remove();
     };
+    own.querySelector('[data-a="stmt"]').onclick = function () { openStatement(own.querySelector('[data-r="sym"]').value); };
     own.querySelector('[data-a="redeem"]').onclick = function () {
       var c = own.querySelector('[data-r="rcode"]').value.trim().toUpperCase(), msg = own.querySelector('[data-r="rmsg"]'), m = mine()[0], hit = null, kind = "";
       var bad = function (t) { msg.style.color = "#FF6B5E"; msg.textContent = t; };

@@ -238,7 +238,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
   <div class="box k"><b>🎤 GNW Karaoke</b><br>Every Wednesday · 6 – 10 PM<br><small>Grab the mic, grab a plate.</small></div>
 </div>
 
-<footer>Demo built for Gritz N Wafflez by SousShift AI · menu from gritznwafflez.com · prizes are samples · food images are AI-generated previews · not the official Gritz N Wafflez logo</footer>
+<footer><a href="rules.html">Game & daily spin official rules (draft)</a><br>Demo built for Gritz N Wafflez by SousShift AI · menu from gritznwafflez.com · prizes are samples · food images are AI-generated previews · not the official Gritz N Wafflez logo</footer>
 </div>
 
 <script>window.REVIEW_EGG={vid:"vAu9h7ItMzE",restaurant:"Gritz N Wafflez",short:"GRITZ N WAFFLEZ",bonus:250,img:"img/review/cover.webp",find:"The kitchen TV flickers on once a shift. Tap it for points and a tip"};</script>
@@ -501,12 +501,20 @@ function end(){
   $("over").classList.add("on");
 }
 window.__OG={get:function(){return og;},ITEMS:ITEMS,DISHES:DISHES,start:start,tv:function(){ return tv; }};
-$("startov").addEventListener("click",start);
-$("again").addEventListener("click",function(){ start(); $("og").scrollIntoView({block:"start",behavior:reduce?"auto":"smooth"}); });
+// every new shift goes through the start menu's PLAY (member check / tokens in crm.js), never straight to start()
+$("startov").addEventListener("click",function(){ if(window.GameMenu) window.GameMenu.open(); else start(); });
+$("again").addEventListener("click",function(){ $("og").scrollIntoView({block:"start",behavior:reduce?"auto":"smooth"}); if(window.GameMenu) window.GameMenu.open(); else start(); });
 hud();
 })();
 </script>
-<script>window.CRM_CFG={name:"Gritz N Wafflez",offer:"A free Kiki Palmer with your next N' Wafflez plate",tiers:[[250,"Free Kiki Palmer"],[450,"Free side of Smackin' Mac"],[700,"Free Original Collard Green Dip"],[1100,"Free N' Wafflez plate"]],referral:{gift:"Free Original Collard Green Dip"}};</script>
+<script>window.CRM_CFG={name:"Gritz N Wafflez",offer:"A free Kiki Palmer with your next N' Wafflez plate",tiers:[[250,"Free Kiki Palmer"],[450,"Free side of Smackin' Mac"],[700,"Free Original Collard Green Dip"],[1100,"Free N' Wafflez plate"]],referral:{gift:"Free Original Collard Green Dip"},
+ // Order Up! access. PHASE 1 (live default): free to play for members (phone + email, one account per phone).
+ // PHASE 2 (built, off): enabled:true → a play costs 10 tokens; tokens come with food purchases, +10 free every week and
+ // +10 free on request once a day (no purchase necessary). ?tokens=1 previews Phase 2. Legal notes: see crm.js TOKENS block.
+ game:"Order Up!",tokens:{enabled:false,perDollar:1,perOrder:0,playCost:10,weeklyFree:10,freeDaily:10},
+ // FREE daily spin: one per member per day, never sold, never costs tokens. Odds = w / 100 and must match rules.html.
+ spin:{rules:"rules.html",prizes:[{t:"+50 points",pts:50,w:30},{t:"+100 points",pts:100,w:20},{t:"+5 tokens",tok:5,alt:{t:"+75 points",pts:75},w:15},
+  {t:"$2 off a plate",code:true,w:15},{t:"Free Kiki Palmer",code:true,w:8},{t:"Free Mac side",code:true,w:7},{t:"10% off order",code:true,w:5}]}};</script>
 <script src="../crm.js"></script>
 <script>window.NEARBY={name:"Gritz N Wafflez",pin:"🧇",spots:[{label:"Koreatown · Wilshire",lat:34.0617,lng:-118.2967,q:"3183 Wilshire Blvd, Los Angeles, CA 90010"}],offer:"Show this to your server for double points on today's order."};</script>
 <script src="../nearby.js"></script>
@@ -516,7 +524,7 @@ var dish=function(n){ for(var i=0;i<D.length;i++) if(D[i].n===n){ var d=D[i]; re
 window.GAME_MENU={id:"gritz-n-wafflez",name:"Order Up!",by:"Gritz N Wafflez",tagline:"Build the plate right. Ring the bell. 75 seconds on the line.",
  hero:[G+"waffle.webp",G+"chicken.webp",G+"kiki.webp",G+"grits.webp"],
  theme:{bg:"#1E1B3A",bg2:"#3B1F5C",card:"rgba(255,255,255,.1)",edge:"rgba(255,255,255,.2)",accent:"#D9A21B",accent2:"#F2C14E",ink:"#FFFFFF",dim:"#E8DCF5",btnInk:"#1E1B3A",display:"'Playfair Display',Georgia,serif",body:"'DM Sans',system-ui,sans-serif"},
- mount:"#ou",hide:"#startov",start:function(){ window.__OG.start(); },vibrate:true,
+ mount:"#ou",hide:"#startov",start:function(){ window.__OG.start(); },vibrate:true,tokens:true,
  how:{goal:"Serve as many guests as you can in 75 seconds. Build each plate exactly how they ordered it, fast.",time:"75 seconds · up to 3 guests at a time",
   steps:[["🧾","Read the ticket over each guest: the dish, its items, plus any + extras or NO leave-offs"],[null,"Tap ingredients on the line to put them on the plate",G+"waffle.webp"],["↩️","Tap an item again to take it off · 🗑️ Start over clears the plate"],["🛎️","Ring Serve it. The plate goes to whoever ordered exactly that"],["⏳","Each guest's bar runs down. Let it run out and they walk out"],["⭐","Fast service raises your stars, and more stars bring guests in faster"]]},
  points:[{group:"Every order",items:[{img:G+"waffle.webp",name:"Each item on the order",note:"Waffle, wingz, gritz, syrup, drinks… every ingredient they asked for",pts:"+40 each"},{icon:"➕",name:"Special requests",note:"Each + extra or NO leave-off you get right",pts:"+20 each"},{icon:"⚡",name:"Speed bonus",note:"Scales with how much time the guest had left",pts:"up to +120"},{icon:"💵",name:"Tips",note:"Fast serves get a tip on top",pts:"+10 to +50"},{icon:"🔥",name:"Combo",note:"Perfect orders in a row: ×1.25, ×1.5, ×1.75, up to ×2 on item + speed points",pts:"up to ×2",gold:true}]},
@@ -525,5 +533,10 @@ window.GAME_MENU={id:"gritz-n-wafflez",name:"Order Up!",by:"Gritz N Wafflez",tag
  prizes:{champion:"Free Wingz N' Wafflez + a karaoke shoutout for the top score by Sunday close",tiers:[["5,400","Free Original Collard Green Dip","One shift over 5,400 points",G+"dip.webp"],["4,800","Free Fried Cheese Gritz","With any plate",G+"fgritz.webp"],["3,800","Free side of Smackin' Mac","With any order",G+"mac.webp"],["2,500","Free Kiki Palmer","Lemonade + tea, on the house",G+"kiki.webp"]],note:"Sample prizes. Jurni picks the real ones and the board resets every Monday."}}; })();</script>
 <script src="../gamemenu.js"></script>
 <script src="../gamelock.js"></script>
+<script>window.FLYBY={every:[15,25],first:6,busy:function(){ var o=window.__OG&&window.__OG.get(); return !!(o&&o.running); },items:[
+ {img:"img/fly/fly-catfish-wafflez.webp",name:"Catfish N' Wafflez",to:"img/catfish-wafflez.jpg"},{img:"img/fly/fly-wingz-wafflez.webp",name:"Wingz N' Wafflez",to:"img/wingz-wafflez.jpg"},
+ {img:"img/fly/fly-peach-waffle.webp",name:"Peach Cobbler Waffle",to:"img/peach-waffle.jpg"},{img:"img/fly/fly-shrimp-gritz.webp",name:"Shrimp N' Gritz",to:"img/shrimp-gritz.jpg"},
+ {img:"img/fly/fly-tenderz-wafflez.webp",name:"Tenderz N' Wafflez",to:"img/tenderz-wafflez.jpg"},{img:"img/fly/fly-catfish-gritz.webp",name:"Catfish N' Gritz",to:"img/catfish-gritz.jpg"}]};</script>
+<script src="../flyby.js"></script>
 </body>
 </html>

@@ -354,13 +354,13 @@
   window.SSAI_EARN = function (amount, why, split) {
     if (WAL) {
       var sm = mine()[0], f = split ? +split.food || 0 : +amount || 0, bb = split ? +split.bar || 0 : 0, r;
-      if (sm) { r = purchase(sm, f, bb, why); put(sm); drawJoin(); drawOwn(); }
+      if (sm) { r = purchase(sm, f, bb, why); r.tok = tokBuy(sm, f + bb, why + " · $" + (f + bb).toFixed(2)); put(sm); drawJoin(); drawOwn(); }
       else r = { food: Math.round(f * W.food.per), bar: Math.round(bb * W.bar.per), split: true };
       r.pts = r.food + r.bar; r.saved = !!sm; r.msg = splitMsg(r); return r;
     }
-    var m = mine()[0], pts = Math.round(amount * PER);
-    if (m) { pts = visit(m, amount * PER); addPts(m, pts, why + " · $" + amount.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); }
-    return { pts: pts, saved: !!m };
+    var m = mine()[0], pts = Math.round(amount * PER), tk = 0;
+    if (m) { pts = visit(m, amount * PER); addPts(m, pts, why + " · $" + amount.toFixed(2)); tk = tokBuy(m, amount, why + " · $" + amount.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); }
+    return { pts: pts, saved: !!m, tok: tk };
   };
   function pending() { try { return JSON.parse(localStorage.getItem(PEND) || "null"); } catch (x) { return null; } }
 
@@ -392,6 +392,7 @@
     if (me) {
       if (!me.id) { me.id = code4(8); me.ref = me.ref || refCode(me.name); me.friends = me.friends || []; me.ledger = me.ledger || []; put(me); }
       if (migrate(me)) put(me);
+      if (weekly(me)) put(me);
       if (me.bday >= 0 && isBday(me) && earnOnce(me, "birthday_" + new Date().getFullYear(), EARN.birthday, "🎂 Birthday bonus")) put(me);
       var pts = me.stars || 0, fr = me.friends || [], fo = fr.reduce(function (a, f) { return a + f.orders; }, 0);
       var refPts = (me.ledger || []).filter(function (l) { return l.ref; }).reduce(function (a, l) { return a + l.pts; }, 0);
@@ -418,6 +419,22 @@
           '<button type="button" class="crm-elink" data-a="earn">✨ Ways to earn points →</button>' +
           '<button type="button" class="crm-demo" data-a="ring">▶ Demo: the cashier rings you up</button>' +
           '<div class="crm-rcode"><input placeholder="Got a receipt? Type its code" maxlength="20"><button type="button" data-a="receipt">Add</button></div></div>' +
+        // game access / tokens / free daily spin (CRM_CFG.tokens, CRM_CFG.spin)
+        (TC || SPIN ? (function () {
+          var g = e(C.game || "the game"), sp = SPIN ? '<button type="button" data-a="spin"' + (spinReady(me) ? ' class="hot"' : '') + '>' + (spinReady(me) ? '🎡 Free daily spin' : '🎡 Spun today ✓') + '</button>' : '';
+          if (!ON) return '<div class="crm-box" id="crm-tok"><h4>🎮 ' + g + (SPIN ? ' & daily spin' : '') + '</h4>' +
+            (TC ? '<p style="margin:0;font-size:13.5px">' + g + ' is <b style="color:#3DDC97">free to play</b> for members' + (hasBoth(me) ? '. Your account is bound to this phone.' : ': add your phone + email once.') + ' Win points and prizes every shift.</p>' : '') +
+            '<div class="crm-acts tok-btns">' + (TC ? '<button type="button" data-a="play">🎮 Play now</button>' : '') + sp + '</div>' +
+            (SPIN ? '<p class="crm-fine">Daily spin: one free spin per member per day. No purchase necessary. <a href="' + e(rulesUrl()) + '" target="_blank" rel="noopener" style="color:#7FB3FF">Official rules</a></p>' : '') + '</div>';
+          var b = me.tok || 0, fu = me.freeDay === laDay();
+          return '<div class="crm-box" id="crm-tok"><h4>🪙 ' + g + ' tokens</h4><div class="tok-bal"><div><b>' + b + '</b> <small>tokens</small></div><div style="text-align:right"><small>One play</small><br><b style="font-size:22px">' + TOK.playCost + '</b></div></div>' +
+            '<p style="margin:0;font-size:13px">+' + TOK.weeklyFree + ' free every week · +' + TOK.freeDaily + ' free on request once a day · ' + TOK.perDollar + ' per $1 with food you buy. Never sold on their own; no cash value.</p>' +
+            '<div class="crm-acts tok-btns"><button type="button" data-a="play"' + (b >= TOK.playCost ? ' class="hot"' : '') + '>' + (b >= TOK.playCost ? '🎮 Play (' + TOK.playCost + ' 🪙)' : '🔒 Need ' + TOK.playCost + ' to play') + '</button>' +
+            '<button type="button" data-a="tokfree"' + (fu ? ' disabled' : '') + '>' + (fu ? '🙋 Free tokens used today' : '🙋 ' + TOK.freeDaily + ' free tokens') + '</button>' + (sp ? sp.replace('<button', '<button style="grid-column:1/-1"') : '') + '</div>' +
+            '<div class="crm-rcode"><input data-tk="code" placeholder="Token code from staff / receipt" maxlength="12" autocapitalize="characters"><button type="button" data-a="tokcode">Add</button></div>' +
+            '<div class="crm-feed" style="max-height:150px;margin-top:8px">' + ((me.tl || []).slice(0, 8).map(function (l) { return '<div><span>' + e(l.t) + '</span><b class="' + (l.n >= 0 ? 'plus' : 'minus') + '">' + (l.n >= 0 ? '+' : '') + l.n + ' 🪙</b></div>'; }).join("") || '<div><span>No tokens yet.</span></div>') + '</div>' +
+            '<p class="crm-fine">No purchase necessary: the weekly and daily free tokens always cover a play. Tokens only work in the account bound to this phone. <a href="' + e(rulesUrl()) + '" target="_blank" rel="noopener" style="color:#7FB3FF">Official rules</a></p></div>';
+        })() : '') +
         // rewards
         (WAL ? '<div class="crm-box"><h4>🏆 Use your points</h4>' + walTiers(me, "bar") + walTiers(me, "food") + '</div>' :
         '<div class="crm-box"><h4>🏆 Use your points</h4>' + TIERS.map(function (t, i) {
@@ -464,13 +481,13 @@
         if (a === "bday") { m.bdemo = true; m.bcode = "BDAY-" + code4(4); m.ledger = m.ledger || []; m.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎂 Birthday treat unlocked (text sent)" }); earnOnce(m, "birthday_" + new Date().getFullYear(), EARN.birthday, "🎂 Birthday bonus"); put(m); drawJoin(); toast("💬 Text sent: Happy birthday " + m.name.split(" ")[0] + "! Your treat is waiting 🎂"); return; }
         if (a === "scan") { if (qr.style.display === "block") qr.style.display = "none"; else showQR(); return; }
         if (a === "ring" && WAL) {   // the cashier rings up food and drinks separately
-          var rf = Math.round((10 + Math.random() * 22) * 100) / 100, rb = Math.round((6 + Math.random() * 18) * 100) / 100, rr = purchase(m, rf, rb, "🧾 In-store order · code " + regCode(m));
-          put(m); drawJoin(true); drawOwn(); toast(splitMsg(rr) + (lastBonus ? " · +" + lastBonus + " bonus" : "")); return;
+          var rf = Math.round((10 + Math.random() * 22) * 100) / 100, rb = Math.round((6 + Math.random() * 18) * 100) / 100, rr = purchase(m, rf, rb, "🧾 In-store order · code " + regCode(m)), rt = tokBuy(m, rf + rb, "In-store order $" + (rf + rb).toFixed(2));
+          put(m); drawJoin(true); drawOwn(); refreshMenu(); toast(splitMsg(rr) + (lastBonus ? " · +" + lastBonus + " bonus" : "") + tokMsg(rt)); return;
         }
         if (a === "ring") {
           var amt = Math.round((12 + Math.random() * 26) * 100) / 100, got = visit(m, amt * PER);
-          addPts(m, got, "🧾 In-store order $" + amt.toFixed(2) + " · code " + regCode(m)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m);
-          drawJoin(true); drawOwn(); toast("+" + got + " points · $" + amt.toFixed(2) + " order" + (lastBonus ? " · +" + lastBonus + " bonus" : "")); return;
+          addPts(m, got, "🧾 In-store order $" + amt.toFixed(2) + " · code " + regCode(m)); var gt = tokBuy(m, amt, "In-store order $" + amt.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m);
+          drawJoin(true); drawOwn(); refreshMenu(); toast("+" + got + " points · $" + amt.toFixed(2) + " order" + (lastBonus ? " · +" + lastBonus + " bonus" : "") + tokMsg(gt)); return;
         }
         if (a === "receipt") {
           var inp = join.querySelector(".crm-rcode input"), v = inp.value.trim().toUpperCase();
@@ -480,10 +497,11 @@
           if (WAL) {   // the receipt code carries the food and bar subtotals separately
             var xf = Math.round((8 + Math.random() * 18) * 100) / 100, xb = Math.random() < 0.6 ? Math.round((6 + Math.random() * 14) * 100) / 100 : 0, xr = { food: Math.round(xf * W.food.per), bar: Math.round(xb * W.bar.per) };
             addPts(m, xr.food, "🧾 Receipt " + v + " · food $" + xf.toFixed(2), "food"); if (xb) addPts(m, xr.bar, "🧾 Receipt " + v + " · drinks $" + xb.toFixed(2), "bar");
-            m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); toast(splitMsg(xr) + " from your receipt"); return;
+            var xt = tokBuy(m, xf + xb, "Receipt " + v + " · $" + (xf + xb).toFixed(2));
+            m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); refreshMenu(); toast(splitMsg(xr) + " from your receipt" + tokMsg(xt)); return;
           }
           var ra = Math.round((9 + Math.random() * 22) * 100) / 100, rg = Math.round(ra * PER);
-          addPts(m, rg, "🧾 Receipt " + v + " · $" + ra.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); toast("+" + rg + " points from your receipt"); return;
+          addPts(m, rg, "🧾 Receipt " + v + " · $" + ra.toFixed(2)); var rtk = tokBuy(m, ra, "Receipt " + v + " · $" + ra.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m); drawJoin(); drawOwn(); refreshMenu(); toast("+" + rg + " points from your receipt" + tokMsg(rtk)); return;
         }
         if (a === "text") { location.href = "sms:?&body=" + encodeURIComponent(inviteMsg(m)); return; }
         if (a === "copy") { var L = shareLink(m); (navigator.clipboard ? navigator.clipboard.writeText(L) : Promise.reject()).then(function () { toast("Invite link copied"); }, function () { prompt("Copy your invite link:", L); }); return; }
@@ -502,6 +520,14 @@
           var fw = WAL ? (Math.random() < 0.5 ? "bar" : "food") : null, fwt = fw ? (fw === "bar" ? " (drinks)" : " (food)") : "";
           addPts(m, p2, (firstOrder ? "🛒 " + f.name + "'s first order" : "🔁 " + f.name + " ordered again") + fwt, fw); m.ledger[0].ref = 1; tag(m, "referral_order"); put(m);
           drawJoin(); drawOwn(); toast("+" + p2 + (fw ? " " + wname(fw) : "") + " points · " + f.name + " ordered" + fwt); return;
+        }
+        if (a === "spin") { openSpin(); return; }
+        if (a === "tokfree") { if (freeReq(m)) { put(m); drawJoin(); drawOwn(); refreshMenu(); toast("+" + TOK.freeDaily + " free tokens"); } return; }
+        if (a === "tokcode") { var tr = redeemCode(m, join.querySelector("[data-tk=code]").value); if (tr.err) { toast(tr.err); return; } drawJoin(); drawOwn(); refreshMenu(); toast("+" + tr.n + " tokens added"); return; }
+        if (a === "play") {
+          var gb = document.getElementById(C.gameAnchor || "og") || document.querySelector(".gamebox");
+          if (gb) gb.scrollIntoView({ behavior: "smooth", block: "start" });
+          if (window.GameMenu) setTimeout(function () { window.GameMenu.open(); }, 400); return;
         }
         if (a === "earn") { openEarn(); return; }
         if (a === "owner") own.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -540,9 +566,10 @@
   // ---- one sign-up path: the join card and the contact gate both create members here ----
   // f is a <form> with name, phone, email, ok (checkbox) and optional bday/bdd/bdy/ref fields.
   // Returns { err: "message" } or { member: r }. A form with no ref field uses the ?ref= invite code.
-  function createMember(f) {
+  function createMember(f, both) {
     var v = function (n) { var el = f.elements[n]; if (!el) return n === "ref" ? INVITE : ""; return el.type === "checkbox" ? (el.checked ? "1" : "") : el.value.trim(); };
     if (!v("name")) return { err: "Add your first name." };
+    if (both && !(okPhone(v("phone")) && okEmail(v("email")))) return { err: "Add your phone number AND email: your free account is tied to them." };
     if (!/\d{7,}/.test(v("phone").replace(/\D/g, "")) && !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v("email"))) return { err: "Add a phone number or an email so we can send your reward." };
     if ((v("bday") !== "" || v("bdd") || v("bdy")) && !(v("bday") !== "" && v("bdd") && v("bdy"))) return { err: "Add your full birthday (month, day and year) or leave it blank." };
     if (v("bday") !== "" && new Date(+v("bdy"), +v("bday"), +v("bdd")).getMonth() !== +v("bday")) return { err: "That birthday isn't a real date. Check the day." };
@@ -555,7 +582,9 @@
         r.fgift = { t: REF.friendGift + " with your first order", c: "FRIEND-" + code4(4), ts: Date.now() }; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎁 Friend gift: " + r.fgift.t }); }
       var pz = pending(); if (pz) { r.wins = [pz]; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "🏆 Won " + pz.t + " in the game" }); try { localStorage.removeItem(PEND); } catch (x) {} }
       else if (MISSED) { r.wins = [{ t: MC.offer, c: "CALL-" + code4(4), ts: Date.now(), ttl: (MC.days || 7) * 864e5, k: "missed" }]; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "📞 Sorry we missed your call: " + MC.offer }); r.src = "missed call"; }
-      var list = mine(); list.unshift(r); save(list.slice(0, 5));
+      // game accounts (CRM_CFG.tokens): ONE member per device, bound to it (live: server-side + SMS verification)
+      if (TC) { r.dev = devId(); r.bound = Date.now(); }
+      var list = mine(); list.unshift(r); save(TC ? [r] : list.slice(0, 5));
       // live restaurants: send the sign-up to the owner's Google Sheet (Apps Script web app in CRM_CFG.sheet)
       if (C.sheet) try { fetch(C.sheet, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({
         name: r.name, phone: r.phone, email: r.email, bday: r.bday >= 0 ? (r.bday + 1) + "/" + r.bdd + "/" + r.bdy : "",
@@ -575,21 +604,23 @@
   };
   var gateEl = null;
   function gate(reason, cb) {
-    var m = mine()[0];
-    if (m) { if (cb) cb(m); return true; }
+    var m = mine()[0], both = reason === "play" || reason === "spin";   // game + spin accounts need phone AND email
+    if (m && (!both || hasBoth(m))) { if (cb) cb(m); return true; }
     if (gateEl) gateEl.close();
-    var T = GATE_TXT[reason] || GATE_TXT.order, rid = "crm-g" + code4(4);
+    var T = GATE_TXT[reason] || GATE_TXT.order, rid = "crm-g" + code4(4), pre = function (k) { return m && m[k] ? ' value="' + e(m[k]) + '"' : ''; };
+    if (m) T = [T[0], "Add your " + (okPhone(m.phone) ? "email" : okEmail(m.email) ? "phone number" : "phone number and email") + " to finish your free account. It's tied to this phone.", T[2]];
     var ov = document.createElement("div"); ov.className = "crm-gate"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", rid); ov.setAttribute("data-scroll-ok", "");
     ov.innerHTML = '<section class="crm-card"><span class="k">' + e(NAME) + ' Rewards · free</span><h3 id="' + rid + '">' + e(T[0]) + '</h3><p>' + e(T[1]) + '</p>' +
-      '<div class="crm-gift"><b>🎁</b><span>You also get <u>' + e(OFFER) + '</u> + 100 ' + (WAL ? W[BONUS].label.toLowerCase() + ' ' : '') + 'points</span></div>' +
-      (INVITE ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: ' + e(REF.friendGift) + ' with your first order + ' + REF.friend + ' bonus points.</div>' : '') +
-      '<form autocomplete="on" novalidate><label>First name</label><input name="name" maxlength="40" autocomplete="given-name" enterkeyhint="next">' +
-      '<div class="two"><div><label>Phone</label><input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(310) 555-0123"></div>' +
-      '<div><label>or Email</label><input name="email" type="email" maxlength="120" autocomplete="email" autocapitalize="none"></div></div>' +
-      '<details class="crm-gbd"><summary>🎂 Add birthday for a free treat</summary><div class="three"><select name="bday" aria-label="Birth month"><option value="">Month</option>' + MONTHS_L.map(function (x, i) { return '<option value="' + i + '">' + x + '</option>'; }).join("") + '</select>' +
+      (m ? '' : '<div class="crm-gift"><b>🎁</b><span>You also get <u>' + e(OFFER) + '</u> + 100 ' + (WAL ? W[BONUS].label.toLowerCase() + ' ' : '') + 'points' + (both && ON ? ' + ' + TOK.weeklyFree + ' free tokens a week' : '') + '</span></div>') +
+      (INVITE && !m ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: ' + e(REF.friendGift) + ' with your first order + ' + REF.friend + ' bonus points.</div>' : '') +
+      '<form autocomplete="on" novalidate><label>First name</label><input name="name" maxlength="40" autocomplete="given-name" enterkeyhint="next"' + pre("name") + '>' +
+      '<div class="two"><div><label>Phone</label><input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(310) 555-0123"' + pre("phone") + '></div>' +
+      '<div><label>' + (both ? 'Email' : 'or Email') + '</label><input name="email" type="email" maxlength="120" autocomplete="email" autocapitalize="none"' + pre("email") + '></div></div>' +
+      (both ? '<div class="crm-idnote">📱 One account per phone. Live, we text you a code to confirm the number.</div>' : '') +
+      (m ? '' : '<details class="crm-gbd"><summary>🎂 Add birthday for a free treat</summary><div class="three"><select name="bday" aria-label="Birth month"><option value="">Month</option>' + MONTHS_L.map(function (x, i) { return '<option value="' + i + '">' + x + '</option>'; }).join("") + '</select>' +
         '<select name="bdd" aria-label="Birth day"><option value="">Day</option>' + Array.apply(null, Array(31)).map(function (x, i) { return '<option>' + (i + 1) + '</option>'; }).join("") + '</select>' +
         '<select name="bdy" aria-label="Birth year"><option value="">Year</option>' + Array.apply(null, Array(88)).map(function (x, i) { return '<option>' + (new Date().getFullYear() - 13 - i) + '</option>'; }).join("") + '</select></div>' +
-        '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat.</div></details>' +
+        '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat.</div></details>') +
       '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Text / email me rewards and specials from ' + e(NAME) + '. Msg & data rates may apply. Reply STOP anytime.</span></label>' +
       '<button class="go" type="submit">' + e(T[2]) + '</button><div class="err" role="alert"></div>' +
       '<button type="button" class="crm-gx">Not now</button></form>' +
@@ -607,7 +638,14 @@
     ov.addEventListener("click", function (ev) { if (ev.target === ov) close(); });
     f.onsubmit = function (ev) {
       ev.preventDefault();
-      var res = createMember(f);
+      if (m) {   // existing member finishing a game account: add the missing phone / email, bind to this phone
+        var ph = f.elements.phone.value.trim(), em = f.elements.email.value.trim();
+        if (!okPhone(ph) || !okEmail(em)) { f.querySelector(".err").textContent = "Add your phone number AND email."; return; }
+        if (!f.elements.ok.checked) { f.querySelector(".err").textContent = "Tick the box so we can send you your rewards."; return; }
+        m.phone = ph; m.email = em; if (f.elements.name.value.trim()) m.name = f.elements.name.value.trim(); bind(m); put(m);
+        close(); drawJoin(); drawOwn(); if (cb) cb(m); return;
+      }
+      var res = createMember(f, both);
       if (res.err) { f.querySelector(".err").textContent = res.err; return; }
       close(); drawJoin(); drawOwn("all");
       toast("🎉 You're in, " + res.member.name.split(" ")[0] + "! +100 points");
@@ -619,6 +657,230 @@
     return false;
   }
   gate.member = function () { return mine()[0] || null; };
+
+  // ======================= GAME ACCESS · TOKENS · FREE DAILY SPIN (opt-in: CRM_CFG.tokens / CRM_CFG.spin) =======================
+  // LEGAL STRUCTURE (California). Draft for the restaurant's attorney to review before launch; this is not legal advice.
+  // An illegal lottery (Penal Code 319) needs all three of PRIZE + CHANCE + CONSIDERATION (paying or buying to take part).
+  // Take any one away and it is not a lottery. So:
+  //  • The game (Order Up!) is a game of SKILL: the score comes only from how fast and accurately the player builds the
+  //    orders, and prizes are fixed score thresholds / top score of the week. Nothing in the game is a random prize draw.
+  //  • The DAILY SPIN is CHANCE + PRIZE, so it must NEVER have consideration: it is FREE, one spin per member per day,
+  //    never costs tokens, never needs a purchase and can never be bought. (A spin "you can purchase in store" would be
+  //    prize + chance + consideration = an illegal lottery, so it is deliberately not built.) Prizes are food discounts,
+  //    points or tokens; never cash, never alcohol (Bus. & Prof. Code 25600: no alcohol as a free prize).
+  //  • TOKENS (PHASE 2, off by default) are a loyalty bonus that comes WITH food purchases (staff ring-up, receipt / staff
+  //    code, in-app order). They are never sold on their own, have no cash value and are never redeemable for cash or
+  //    prizes. There is always an equally good FREE way to get them ("AMOE", alternative method of entry, the "no purchase
+  //    necessary" route): weeklyFree tokens every week (default 10 = one free play) and freeDaily tokens on request once a
+  //    day (default 10 = one free play a day), no purchase necessary.
+  //  • PHASE 1 (live default, tokens.enabled:false): the game is FREE to play for members. Same account rules, same points
+  //    and prizes, same free daily spin; no token lock. ?tokens=1 turns PHASE 2 on for demo testing (?tokens=0 forces off).
+  //  • ACCOUNTS: playing needs a member account with phone AND email, one member per device, bound to that device.
+  //    DEMO: a random device id in localStorage + one member stored per phone. LIVE this is enforced SERVER-SIDE: an SMS
+  //    code verifies the phone, the server binds the account to a device token, refuses a second account for the same
+  //    phone / email / device, and validates token codes (single use, credited only to the account they were redeemed
+  //    into). Nothing here is trusted for real money or prizes until the server checks it.
+  //  Official rules draft (eligibility, no purchase necessary, free tokens, prizes, spin odds, skill scoring, sponsor):
+  //  CRM_CFG.spin.rules (default "rules.html" next to the page).
+  // CRM_CFG.tokens = {enabled:false, perDollar:1, perOrder:0, playCost:10, weeklyFree:10, freeDaily:10}
+  // CRM_CFG.spin   = {prizes:[{t:"+50 points", pts:50, w:30}, {t:"+5 tokens", tok:5, alt:{t:"+50 points",pts:50}, w:10},
+  //                   {t:"$2 off any plate", code:true, w:10}, …], rules:"rules.html"}   w = weight (odds = w / total)
+  var TC = C.tokens || null, TOK = null, ON = false;
+  if (TC) {
+    TOK = { enabled: false, perDollar: 1, perOrder: 0, playCost: 10, weeklyFree: 10, freeDaily: 10 };
+    for (var tk in TC) TOK[tk] = TC[tk];
+    var tq = qs.get("tokens"); if (tq === "1") TOK.enabled = true; else if (tq === "0") TOK.enabled = false;
+    ON = !!TOK.enabled;
+  }
+  var SPIN = C.spin && (C.spin.prizes || []).length ? C.spin : null;
+  function spinPrizes() { return SPIN.prizes.map(function (p) { return p.tok && !ON && p.alt ? Object.assign({ w: p.w }, p.alt) : p; }).filter(function (p) { return !p.tok || ON; }); }
+  GATE_TXT.play = ["Play " + (C.game || "the game"), "Free member account: your name, phone AND email. It's tied to this phone so your points, prizes" + (ON ? " and tokens" : "") + " stay yours.", "🎮 Save & play"];
+  GATE_TXT.spin = ["Your free daily spin", "Free member account: your name, phone AND email. One free spin per member per day. No purchase necessary.", "🎡 Save & spin"];
+  function devId() { var k = KEY + "_dev", v = ""; try { v = localStorage.getItem(k); if (!v) { v = "D" + code4(10); localStorage.setItem(k, v); } } catch (x) { v = "D-nostore"; } return v; }
+  function okPhone(p) { return /\d{7,}/.test(String(p || "").replace(/\D/g, "")); }
+  function okEmail(s) { return /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(String(s || "")); }
+  function hasBoth(m) { return !!m && okPhone(m.phone) && okEmail(m.email); }
+  function bound(m) { return !!m && m.dev === devId(); }
+  function bind(m) { if (m.dev) return; m.dev = devId(); m.bound = Date.now(); (m.ledger = m.ledger || []).unshift({ ts: Date.now(), pts: 0, t: "📱 Account bound to this phone" }); }
+  function laDay(t) { return new Date(t || Date.now()).toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" }); }
+  function weekKey() { var d = new Date(laDay()); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return d.toDateString(); }   // that week's Monday (LA)
+  function tokAdd(m, n, why, k) {
+    m.tok = Math.max(0, (m.tok || 0) + n); (m.tl = m.tl || []).unshift({ ts: Date.now(), n: n, t: why, k: k }); m.tl = m.tl.slice(0, 40);
+    (m.tc = m.tc || {})[k] = (m.tc[k] || 0) + Math.abs(n);
+  }
+  // weekly free tokens: auto-credited the first time the member opens the app in a new week (Mon–Sun, LA time)
+  function weekly(m) { if (!ON || !m || !bound(m)) return 0; var wk = weekKey(); if (m.tweek === wk) return 0; m.tweek = wk; tokAdd(m, TOK.weeklyFree, "🎁 Weekly free tokens", "weekly"); return TOK.weeklyFree; }
+  // tokens that come WITH a food purchase (never sold on their own)
+  function tokBuy(m, amount, why) { if (!ON || !m || !bound(m) || !(amount > 0)) return 0; var n = Math.floor(amount * TOK.perDollar) + (TOK.perOrder || 0); if (n > 0) tokAdd(m, n, "🧾 " + why, "purchase"); return n; }
+  function tokMsg(n) { return n ? " · +" + n + " 🪙" : ""; }
+  function freeReq(m) { if (!ON || !m) return 0; var d = laDay(); if (m.freeDay === d) return 0; m.freeDay = d; tokAdd(m, TOK.freeDaily, "🙋 Free tokens on request · no purchase necessary", "free"); return TOK.freeDaily; }
+  function refreshMenu() { try { if (window.GameMenu && window.GameMenu.refresh) window.GameMenu.refresh(); } catch (x) {} }
+  // staff / receipt token codes: the register prints one with the order (live: generated + checked by the server)
+  var TCK = KEY + "_tcodes";
+  function tcodes() { try { return JSON.parse(localStorage.getItem(TCK) || "[]"); } catch (x) { return []; } }
+  function tcSave(l) { try { localStorage.setItem(TCK, JSON.stringify(l.slice(0, 60))); } catch (x) {} }
+  function issueCode(amount) { var n = Math.max(1, Math.floor(amount * TOK.perDollar) + (TOK.perOrder || 0)), c = { c: "TOK-" + code4(5), n: n, amt: amount, ts: Date.now() }, l = tcodes(); l.unshift(c); tcSave(l); return c; }
+  function redeemCode(m, raw) {
+    var v = String(raw || "").toUpperCase().replace(/\s+/g, ""), l = tcodes(), hit = l.filter(function (x) { return x.c === v; })[0];
+    if (!ON) return { err: "Tokens aren't switched on yet." };
+    if (!hit) return { err: "No token code like that. Check the letters: codes come on your receipt or from staff." };
+    if (hit.used) return { err: "That code was already used on " + new Date(hit.used).toLocaleString() + "." };
+    if (!bound(m)) return { err: "Token codes only go into the account bound to this phone." };
+    hit.used = Date.now(); hit.by = m.id; tcSave(l); tokAdd(m, hit.n, "🧾 Code " + v + " · $" + hit.amt.toFixed(2) + " order", "purchase"); put(m); return { n: hit.n };
+  }
+  // the game's PLAY button calls this. Phase 1: members play free. Phase 2: costs playCost tokens.
+  function playGate(go) {
+    return gate("play", function () {
+      var m = mine()[0]; if (!m) return;
+      bind(m); weekly(m);
+      if (!bound(m)) { put(m); toast("This account is bound to another phone."); return; }
+      if (ON) {
+        if ((m.tok || 0) < TOK.playCost) { put(m); drawJoin(); drawOwn(); refreshMenu(); tokSheet(); return; }
+        tokAdd(m, -TOK.playCost, "🎮 Played " + (C.game || "the game"), "spent");
+      }
+      m.plays = (m.plays || 0) + 1; put(m); drawJoin(); drawOwn(); refreshMenu();
+      if (ON) toast("−" + TOK.playCost + " tokens · " + m.tok + " left");
+      go();
+    });
+  }
+  var tokCss = document.createElement("style");
+  tokCss.textContent = ".tok-ov .crm-card{max-width:420px}.tok-bal{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#070B1E;border:1px solid #25336A;border-radius:14px;padding:10px 14px;margin:8px 0}" +
+    ".tok-bal b{font:900 34px/1 system-ui;color:#FFD23F}.tok-bal small{color:#9AA6CC;font-size:12.5px}.tok-lock{color:#FF8F85;font-weight:800;font-size:13.5px}" +
+    ".crm-card .tok-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.crm-card .tok-btns button{border:1px solid #25336A;background:#1a2656;color:#EEF2FF;border-radius:12px;padding:11px 8px;font-size:13.5px;font-weight:800;cursor:pointer}" +
+    ".crm-card .tok-btns button.hot{background:#FFD23F;border-color:#FFD23F;color:#070B1E}.crm-card .tok-btns button:disabled{opacity:.45;cursor:default}" +
+    ".spin-w{position:relative;width:min(270px,72vw);aspect-ratio:1;margin:12px auto 6px}.spin-w .wh{position:absolute;inset:0;border-radius:50%;border:6px solid #FFD23F;box-shadow:0 10px 30px #0008,inset 0 0 0 2px #0004;transition:transform 4.2s cubic-bezier(.12,.75,.12,1)}" +
+    ".spin-w .wh span{position:absolute;left:50%;top:50%;width:47%;transform-origin:0 50%;text-align:right;padding-right:8px;padding-left:30px;margin-top:-.6em;font:900 11px/1.2 system-ui;color:#1a0d00;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
+    ".spin-w .wh span.dk{color:#fff}.spin-w .pin{position:absolute;left:50%;top:-10px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid #E8582A;filter:drop-shadow(0 3px 3px #0008);z-index:2}" +
+    ".spin-w .hub{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;border-radius:50%;background:radial-gradient(#fff3c4,#FFD23F);border:3px solid #fff;display:grid;place-items:center;font-size:24px;z-index:2}" +
+    ".spin-r{text-align:center;min-height:24px;font-weight:800;margin:6px 0}.spin-odds{font-size:12px;color:#9AA6CC;margin-top:8px}.spin-odds summary{cursor:pointer;font-weight:800;color:#C9D2EE}.spin-odds li{display:flex;justify-content:space-between;gap:8px;padding:2px 0}" +
+    "@media (prefers-reduced-motion:reduce){.spin-w .wh{transition:none}}";
+  document.head.appendChild(tokCss);
+  function sheet(cls, html) {
+    var ov = document.createElement("div"); ov.className = "crm-gate " + cls; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("data-scroll-ok", "");
+    ov.innerHTML = '<section class="crm-card">' + html + '</section>';
+    var html_ = document.documentElement, prev = html_.style.overflow;
+    function key(ev) { if (ev.key === "Escape") close(); }
+    function close() { if (!ov.parentNode) return; ov.remove(); html_.style.overflow = prev; document.removeEventListener("keydown", key); refreshMenu(); }
+    ov.close = close; ov.addEventListener("click", function (ev) { if (ev.target === ov || (ev.target.closest && ev.target.closest("[data-t=x]"))) close(); });
+    document.body.appendChild(ov); html_.style.overflow = "hidden"; document.addEventListener("keydown", key);
+    return ov;
+  }
+  function rulesUrl() { return (SPIN && SPIN.rules) || (TC && TC.rules) || "rules.html"; }
+  // "How to get tokens" sheet (Phase 2): balance, every free way, code box
+  function tokSheet() {
+    if (!ON || document.querySelector(".tok-ov")) return;
+    var m = mine()[0]; if (m && weekly(m)) put(m);
+    var bal = m ? m.tok || 0 : 0, cost = TOK.playCost, freeUsed = m && m.freeDay === laDay();
+    var ov = sheet("tok-ov", '<span class="k">' + e(NAME) + ' · ' + e(C.game || "Game") + ' tokens</span><h3>🪙 Tokens to play</h3>' +
+      '<div class="tok-bal"><div><b>' + bal + '</b> <small>tokens</small></div><div style="text-align:right"><small>One play costs</small><br><b style="font-size:22px">' + cost + '</b></div></div>' +
+      (bal < cost ? '<div class="tok-lock">🔒 You need ' + (cost - bal) + ' more token' + (cost - bal === 1 ? '' : 's') + ' to play.</div>' : '<div style="color:#3DDC97;font-weight:800">✅ You have enough to play.</div>') +
+      '<ul class="crm-rules" style="margin-top:10px">' +
+      '<li><span>🎁 Every week, free (auto-added on your first visit each week)</span><b>+' + TOK.weeklyFree + '</b></li>' +
+      '<li><span>🙋 Free tokens on request, once a day. No purchase necessary</span><b>+' + TOK.freeDaily + '</b></li>' +
+      '<li><span>🧾 Comes with food you buy: ' + (TOK.perDollar ? TOK.perDollar + ' per $1' : '') + (TOK.perOrder ? (TOK.perDollar ? ' + ' : '') + TOK.perOrder + ' per order' : '') + ' (staff ring-up, receipt or staff code, app order)</span><b>🧾</b></li>' +
+      (SPIN ? '<li><span>🎡 Daily spin: always free, can win tokens</span><b>Free</b></li>' : '') + '</ul>' +
+      '<div class="tok-btns"><button type="button" class="hot" data-t="free"' + (!m || freeUsed ? ' disabled' : '') + '>' + (freeUsed ? '🙋 Free tokens used today' : '🙋 Get ' + TOK.freeDaily + ' free tokens') + '</button>' +
+      (SPIN ? '<button type="button" data-t="spin">🎡 Daily spin</button>' : '<button type="button" data-t="x">Close</button>') + '</div>' +
+      '<div class="crm-rcode" style="margin-top:10px"><input data-t="code" placeholder="Token code (TOK-…)" maxlength="12" autocapitalize="characters"><button type="button" data-t="redeem">Add</button></div><div class="err" data-t="msg"></div>' +
+      (m ? '' : '<button type="button" class="go" data-t="join">Create my free account</button>') +
+      '<button type="button" class="crm-gx" data-t="x">Close</button>' +
+      '<p class="crm-fine">Tokens have no cash value, are never sold on their own, and only work in the account bound to this phone. No purchase necessary: the free weekly tokens and the free daily request always cover a play. <a href="' + e(rulesUrl()) + '" target="_blank" rel="noopener" style="color:#7FB3FF">Official rules</a></p>');
+    ov.addEventListener("click", function (ev) {
+      var b = ev.target.closest && ev.target.closest("[data-t]"); if (!b) return; var a = b.getAttribute("data-t"), mm = mine()[0], msg = ov.querySelector("[data-t=msg]");
+      if (a === "free") { if (mm && freeReq(mm)) { put(mm); drawJoin(); drawOwn(); toast("+" + TOK.freeDaily + " free tokens"); ov.close(); tokSheet(); } return; }
+      if (a === "spin") { ov.close(); openSpin(); return; }
+      if (a === "join") { ov.close(); gate("play", function () { tokSheet(); }); return; }
+      if (a === "redeem") {
+        if (!mm) { msg.textContent = "Create your free account first."; return; }
+        var r = redeemCode(mm, ov.querySelector("[data-t=code]").value);
+        if (r.err) { msg.style.color = "#FF6B5E"; msg.textContent = r.err; return; }
+        drawJoin(); drawOwn(); toast("+" + r.n + " tokens added"); ov.close(); tokSheet(); return;
+      }
+    });
+  }
+  // ---- FREE DAILY SPIN: one per member per day (LA date). Never costs tokens, never needs a purchase, never for sale. ----
+  function spinReady(m) { return !!(SPIN && m && m.spinDay !== laDay()); }
+  function pickSpin(P) { var tot = P.reduce(function (a, p) { return a + (p.w || 1); }, 0), r = Math.random() * tot; for (var i = 0; i < P.length; i++) { r -= P[i].w || 1; if (r < 0) return i; } return P.length - 1; }
+  function openSpin() {
+    if (!SPIN || document.querySelector(".spin-ov")) return;
+    return gate("spin", function () {
+      var m = mine()[0]; bind(m); weekly(m); put(m);
+      var P = spinPrizes(), N = P.length, seg = 360 / N, tot = P.reduce(function (a, p) { return a + (p.w || 1); }, 0), COL = ["#FFD23F", "#3B1F5C", "#F2C14E", "#1E1B3A", "#FFE9A3", "#B8322A"];
+      var grad = P.map(function (p, i) { return COL[i % COL.length] + " " + (i * seg) + "deg " + ((i + 1) * seg) + "deg"; }).join(",");
+      var ready = spinReady(m);
+      var ov = sheet("spin-ov", '<span class="k">' + e(NAME) + ' · free daily spin</span><h3>🎡 Spin the wheel</h3><p style="margin:0">One free spin per member per day. Every slice wins something.</p>' +
+        '<div class="spin-w"><div class="pin"></div><div class="wh" style="background:conic-gradient(' + grad + ')">' + P.map(function (p, i) {
+          var c = COL[i % COL.length], dk = c === "#3B1F5C" || c === "#1E1B3A" || c === "#B8322A";
+          return '<span class="' + (dk ? 'dk' : '') + '" style="transform:rotate(' + ((i + 0.5) * seg - 90) + 'deg)">' + e(p.t) + '</span>'; }).join("") + '</div><div class="hub">🧇</div></div>' +
+        '<div class="spin-r" aria-live="polite">' + (ready ? '' : 'You already spun today. Come back tomorrow for another free spin!') + '</div>' +
+        '<button type="button" class="go" data-t="go"' + (ready ? '' : ' disabled style="opacity:.5"') + '>' + (ready ? '🎡 Spin (free)' : 'Next free spin tomorrow') + '</button>' +
+        '<button type="button" class="crm-gx" data-t="x">Close</button>' +
+        '<details class="spin-odds"><summary>Odds & prizes</summary><ul style="list-style:none;padding:0;margin:6px 0 0">' + P.map(function (p) { return '<li><span>' + e(p.t) + '</span><b>' + Math.round((p.w || 1) / tot * 1000) / 10 + '%</b></li>'; }).join("") + '</ul></details>' +
+        '<p class="crm-fine"><b>No purchase necessary.</b> Free: one spin per member per day; spins are never sold and never cost tokens. Prizes are food discounts, points' + (ON ? ' or tokens' : '') + '; no cash value, no alcohol. Discount codes are good for 3 days. <a href="' + e(rulesUrl()) + '" target="_blank" rel="noopener" style="color:#7FB3FF">Official rules</a></p>');
+      var wh = ov.querySelector(".wh"), res = ov.querySelector(".spin-r"), btn = ov.querySelector("[data-t=go]");
+      btn.onclick = function () {
+        var mm = mine()[0]; if (!spinReady(mm) || btn.disabled) return; btn.disabled = true; btn.style.opacity = ".5";
+        var i = pickSpin(P), p = P[i]; mm.spinDay = laDay(); mm.spins = (mm.spins || 0) + 1;
+        // award first, then animate: closing the sheet mid-spin can't lose (or re-roll) the prize
+        var line = "🎡 Daily spin: " + p.t, code = "";
+        if (p.pts) { addPts(mm, p.pts, line); tag(mm, "spin_bonus"); }
+        else if (p.tok && ON) tokAdd(mm, p.tok, line, "bonus");
+        else if (p.code) { code = "SPIN-" + code4(4); var w = { t: p.t, c: code, ts: Date.now(), k: "spin" }; w.until = until(w); (mm.wins = mm.wins || []).unshift(w); mm.wins = mm.wins.slice(0, 5); mm.ledger.unshift({ ts: w.ts, pts: 0, t: line }); }
+        put(mm);
+        var rot = 360 * 6 - (i + 0.5) * seg + (Math.random() - 0.5) * seg * 0.6;
+        wh.style.transform = "rotate(" + rot + "deg)";
+        setTimeout(function () {
+          res.innerHTML = '🎉 You won <b>' + e(p.t) + '</b>!' + (code ? '<div class="crm-win" style="margin-top:8px"><div class="code">' + code + '</div><small>Show this at ' + e(NAME) + '. Good for 3 days.</small></div>' : '') + '<div style="font-weight:600;font-size:13px;color:#9AA6CC;margin-top:4px">Next free spin tomorrow.</div>';
+          btn.textContent = "Next free spin tomorrow"; drawJoin(); drawOwn(); refreshMenu();
+          try { navigator.vibrate && navigator.vibrate([30, 40, 60]); } catch (x) {}
+        }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 50 : 4300);
+      };
+    });
+  }
+  function tokOf(r, i) {   // sample customers get made-up token history; real members their own counters
+    if (!r.sample) { var c = r.tc || {}; return { tok: r.tok || 0, purchase: c.purchase || 0, weekly: c.weekly || 0, free: c.free || 0, bonus: c.bonus || 0, spent: c.spent || 0, plays: r.plays || 0, spins: r.spins || 0 }; }
+    var wk = 10 * Math.max(1, Math.min(8, Math.ceil((now - r.joined) / (7 * DAY)))), pu = r.visits * 18, fr = (i % 3) * 10, bo = (i % 4) * 5, all_ = wk + pu + fr + bo, tok = all_ % 10 + (i % 2) * 10;
+    if (tok > all_) tok = all_ % 10;
+    return { tok: tok, purchase: pu, weekly: wk, free: fr, bonus: bo, spent: all_ - tok, plays: (all_ - tok) / 10, spins: r.visits * 2 + (i % 5) };
+  }
+  window.SSAI_TOKENS = TC || SPIN ? {
+    on: ON, cfg: TOK, spin: !!SPIN, account: !!TC, rules: rulesUrl,
+    member: function () { var m = mine()[0]; if (m && weekly(m)) put(m); return m || null; },
+    balance: function () { var m = this.member(); return m ? m.tok || 0 : 0; },
+    canPlay: function () { var m = this.member(); return !!m && hasBoth(m) && (!ON || (m.tok || 0) >= TOK.playCost); },
+    spinReady: function () { return spinReady(mine()[0]) || (!!SPIN && !mine()[0]); },
+    play: function (go) { if (!TC) { go(); return; } playGate(go); },
+    openSpin: openSpin, openTokens: function () { if (ON) tokSheet(); }, issueCode: function (a) { return ON ? issueCode(a) : null; },
+    redeem: function (c) { var m = mine()[0]; var r = m ? redeemCode(m, c) : { err: "no member" }; if (!r.err) { drawJoin(); drawOwn(); refreshMenu(); } return r; },
+    // start-menu pieces (gamemenu.js): status line, play label, panel rows
+    playLabel: function () { return ON ? "PLAY · " + TOK.playCost + " 🪙" : "PLAY"; },
+    locked: function () { var m = mine()[0]; return ON && !!m && (m.tok || 0) < TOK.playCost; },
+    statusHTML: function () {
+      var m = this.member();
+      if (!ON) return m && hasBoth(m) ? "✅ Free to play for members" : "🎮 Free to play · free member account (phone + email)";
+      if (!m) return "🪙 Free account → " + TOK.weeklyFree + " free tokens every week";
+      var b = m.tok || 0; return "🪙 <b>" + b + "</b> token" + (b === 1 ? "" : "s") + (b < TOK.playCost ? " · 🔒 need " + TOK.playCost + " to play" : " · a play costs " + TOK.playCost);
+    },
+    menuHTML: function (row, p) {
+      var h = "", G = function (t) { return '<p class="gm-g">' + e(t) + "</p>"; };
+      if (p === "points") {
+        if (ON) h += G("Tokens") + row({ icon: "🎮", name: "One play", note: "Tokens come with food you buy, and there's always a free way", pts: TOK.playCost + " 🪙", gold: true }) +
+          row({ icon: "🎁", name: "Weekly free tokens", note: "Every member, every week, added automatically", pts: "+" + TOK.weeklyFree }) +
+          row({ icon: "🙋", name: "Free tokens on request", note: "Once a day, no purchase necessary", pts: "+" + TOK.freeDaily }) +
+          row({ icon: "🧾", name: "Buy food", note: (TOK.perDollar ? TOK.perDollar + " token per $1" : "") + (TOK.perOrder ? " + " + TOK.perOrder + " per order" : "") + ": staff ring-up, receipt / staff code or app order", pts: "+" + (TOK.perDollar || TOK.perOrder) + (TOK.perDollar ? "/$1" : "") });
+        else if (TC) h += G("Free to play") + row({ icon: "🎮", name: "Order Up! is free for members", note: "Free account with phone + email, tied to this phone. Points and prizes save to it", pts: "Free", gold: true });
+        if (SPIN) h += G("Daily spin") + row({ icon: "🎡", name: "Free daily spin", note: "One per member per day. Wins " + (ON ? "tokens, " : "") + "points or food discounts. No purchase necessary", pts: "Free", gold: true });
+      } else if (p === "how") {
+        if (TC) h += G(ON ? "Tokens" : "Who can play") + (ON ? row({ icon: "🪙", name: "Each play costs " + TOK.playCost + " tokens", note: "+" + TOK.weeklyFree + " free every week, +" + TOK.freeDaily + " free on request once a day, and more with food you buy" }) :
+          row({ icon: "🎮", name: "Free to play for members", note: "Make a free account with your phone + email once. It stays bound to this phone" }));
+        if (SPIN) h += row({ icon: "🎡", name: "Free daily spin", note: "Tap 🎡 on the start screen once a day. Always free" });
+      }
+      return h;
+    },
+    // test hooks
+    simWeek: function () { var m = mine()[0]; if (!m) return 0; m.tweek = "old"; var n = weekly(m); put(m); drawJoin(); drawOwn(); refreshMenu(); return n; },
+    simDay: function () { var m = mine()[0]; if (!m) return; delete m.spinDay; delete m.freeDay; put(m); drawJoin(); refreshMenu(); }
+  } : null;
 
   // ---- owner: earn activity (bonus counts per kind; sample customers get made-up counts) ----
   var EK = [["checkin_bonus", "📲 QR check-ins"], ["first_order_bonus", "🥇 First-order bonuses"], ["review_bonus", "⭐ In-app feedback"], ["ig_bonus", "📸 Instagram follows"],
@@ -758,7 +1020,7 @@
       '<div class="crm-list">' + pick.map(function (r, i) {
         return '<div class="crm-row' + (r.you ? ' you' : '') + '"><span class="crm-av" style="background:' + COLORS[i % COLORS.length] + '">' + e(r.name.charAt(0)) + '</span>' +
           '<span class="nm">' + e(r.name) + tags(r).map(function (t) { return '<span class="crm-tag ' + t[0] + '">' + t[1] + '</span>'; }).join("") + '</span>' +
-          '<span class="st">' + (WAL ? WK.map(function (k) { return W[k].icon + ' ' + (walOf(r)[k] || 0).toLocaleString(); }).join(' · ') : (r.stars || 0).toLocaleString()) + ' pts</span><span class="ct">' + e([r.phone, r.email].filter(Boolean).join(" · ") || "—") + ' · ' + r.visits + ' visit' + (r.visits === 1 ? '' : 's') + ' · last ' + ago(r.last) + '</span></div>';
+          '<span class="st">' + (WAL ? WK.map(function (k) { return W[k].icon + ' ' + (walOf(r)[k] || 0).toLocaleString(); }).join(' · ') : (r.stars || 0).toLocaleString()) + ' pts' + (ON ? '<br>🪙 ' + tokOf(r, i).tok : '') + '</span><span class="ct">' + e([r.phone, r.email].filter(Boolean).join(" · ") || "—") + ' · ' + r.visits + ' visit' + (r.visits === 1 ? '' : 's') + ' · last ' + ago(r.last) + '</span></div>';
       }).join("") + '</div>' +
       '<div class="crm-acts"><button type="button" class="hot" data-a="text">💬 Text this group</button><button type="button" data-a="csv">⬇️ Export list</button></div>' +
       '<div class="crm-compose"><textarea></textarea><div class="crm-bub"></div><p class="crm-fine" style="margin-bottom:0"></p></div>' +
@@ -775,9 +1037,27 @@
         rows.filter(function (r) { return r.nfr || (r.friends && r.friends.length); }).map(function (r) { return { n: r.name, f: r.nfr || r.friends.length, o: r.nfo != null ? r.nfo : r.friends.reduce(function (a, x) { return a + x.orders; }, 0), you: r.you }; })
           .sort(function (a, b) { return b.f - a.f || b.o - a.o; }).slice(0, 6).map(function (x, i) {
             return '<div><span class="r">' + (i + 1) + '</span><span><b>' + e(x.n) + '</b>' + (x.you ? ' <span class="crm-tag t-you">YOU</span>' : '') + '<br><span style="color:#9AA6CC">' + x.f + ' friend' + (x.f === 1 ? '' : 's') + ' joined · ' + x.o + ' orders from them</span></span><b style="color:#3DDC97">+' + (x.f * REF.join + Math.min(x.o, x.f) * REF.first + Math.max(0, x.o - x.f) * REF.every).toLocaleString() + '</b></div>'; }).join("") + '</div>' +
+      (TC || SPIN ? (function () {
+        var T_ = { tok: 0, purchase: 0, weekly: 0, free: 0, bonus: 0, spent: 0, plays: 0, spins: 0 };
+        rows.forEach(function (r, i) { var t = tokOf(r, i); for (var k in T_) T_[k] += t[k] || 0; });
+        var L = function (n, t, x) { return '<div><span class="r">' + n.toLocaleString() + '</span><span>' + t + '</span><b style="color:#3DDC97">' + (x || '') + '</b></div>'; };
+        return '<div class="crm-box crm-lead" id="crm-otok"><h4>🎮 ' + e(C.game || "Game") + (ON ? ' tokens' : '') + (SPIN ? ' & daily spin' : '') + '</h4>' +
+          '<p style="margin:0;font-size:13px">' + (ON ? 'Phase 2: a play costs ' + TOK.playCost + ' tokens. Tokens come with food purchases (' + TOK.perDollar + ' per $1), +' + TOK.weeklyFree + ' free weekly, +' + TOK.freeDaily + ' free on request daily. Never sold.' : 'Phase 1: free to play for members (phone + email, one account per phone). Tokens are built and switched off.') + '</p>' +
+          L(T_.plays, '🎮 Plays') + (SPIN ? L(T_.spins, '🎡 Free daily spins') : '') +
+          (ON ? L(T_.tok, '🪙 Tokens held now') + L(T_.purchase, '🧾 Tokens with purchases') + L(T_.weekly, '🎁 Weekly free tokens') + L(T_.free, '🙋 Free tokens on request') + L(T_.bonus, '🎡 Tokens won on the spin') + L(T_.spent, '🎮 Tokens spent on plays') +
+            '<h4 style="margin:14px 0 6px">🧾 Give tokens with an order</h4><p style="margin:0 0 8px;font-size:13px">Type the order total, hand the guest the code (or print it on the receipt). One use, into the account bound to their phone.</p>' +
+            '<div class="crm-rcode"><input data-r="tamt" inputmode="decimal" placeholder="Order total $"><button type="button" data-a="tissue">Make code</button></div><div class="err" data-r="tmsg" style="color:#3DDC97"></div>' : '') +
+          '<p class="crm-fine" style="margin:8px 0 0">Every play, spin' + (ON ? ' and token move (with purchases, weekly, free request, spin, spent)' : '') + ' is in the CSV export.</p></div>';
+      })() : '') +
       earnBox(rows) +
       '<p class="crm-fine">Sample customers (made up) plus anyone who joins on this phone. Live, this list fills from real signups at your tables, and texts go only to people who opted in.</p>';
     own.querySelectorAll(".crm-seg button").forEach(function (b) { b.onclick = function () { drawOwn(b.dataset.s); }; });
+    var ti = own.querySelector('[data-a="tissue"]');
+    if (ti) ti.onclick = function () {
+      var am = parseFloat(own.querySelector('[data-r="tamt"]').value.replace(/[^0-9.]/g, "")), tm = own.querySelector('[data-r="tmsg"]');
+      if (!(am > 0)) { tm.style.color = "#FF6B5E"; tm.textContent = "Enter the order total."; return; }
+      var c = issueCode(am); tm.style.color = "#3DDC97"; tm.innerHTML = 'Code <b style="font:900 18px ui-monospace,Menlo,monospace;letter-spacing:.08em;color:#FFD23F" data-r="tcode">' + c.c + '</b> = ' + c.n + ' tokens ($' + am.toFixed(2) + ' order). Single use.';
+    };
     var cmp = own.querySelector(".crm-compose"), ta = cmp.querySelector("textarea");
     own.querySelector('[data-a="reg"]').onclick = function () {
       if (WAL) {
@@ -785,14 +1065,14 @@
         var wf = num("food"), wb = num("bar"), wmsg = own.querySelector('[data-r="msg"]'), wm = mine()[0];
         if (!/^\d{4}$/.test(wc) || !(wf + wb > 0)) { wmsg.style.color = "#FF6B5E"; wmsg.textContent = "Enter the 4-digit code and the food and/or bar amount."; return; }
         if (!wm || regCode(wm) !== wc) { wmsg.style.color = "#FF6B5E"; wmsg.textContent = "No customer has that code right now. Codes change every 5 minutes."; return; }
-        var wr = purchase(wm, wf, wb, "🧾 Register order · code " + wc); put(wm);
-        drawJoin(); drawOwn(); toast(splitMsg(wr) + " added to " + wm.name.split(" ")[0] + (lastBonus ? " · +" + lastBonus + " visit bonus" : "")); return;
+        var wr = purchase(wm, wf, wb, "🧾 Register order · code " + wc), wt = tokBuy(wm, wf + wb, "Register order $" + (wf + wb).toFixed(2)); put(wm);
+        drawJoin(); drawOwn(); refreshMenu(); toast(splitMsg(wr) + " added to " + wm.name.split(" ")[0] + (lastBonus ? " · +" + lastBonus + " visit bonus" : "") + tokMsg(wt)); return;
       }
       var c4 = own.querySelector('[data-r="code"]').value.trim(), amt = parseFloat(own.querySelector('[data-r="amt"]').value.replace(/[^0-9.]/g, "")), msg = own.querySelector('[data-r="msg"]'), m = mine()[0];
       if (!/^\d{4}$/.test(c4) || !(amt > 0)) { msg.style.color = "#FF6B5E"; msg.textContent = "Enter the 4-digit code and the order total."; return; }
       if (!m || regCode(m) !== c4) { msg.style.color = "#FF6B5E"; msg.textContent = "No customer has that code right now. Codes change every 5 minutes."; return; }
-      var got = visit(m, amt * PER); addPts(m, got, "🧾 Register order $" + amt.toFixed(2) + " · code " + c4); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m);
-      drawJoin(); drawOwn(); toast("+" + got + " points added to " + m.name.split(" ")[0] + (lastBonus ? " · +" + lastBonus + " visit bonus" : ""));
+      var got = visit(m, amt * PER); addPts(m, got, "🧾 Register order $" + amt.toFixed(2) + " · code " + c4); var gk = tokBuy(m, amt, "Register order $" + amt.toFixed(2)); m.visits = (m.visits || 0) + 1; m.last = Date.now(); put(m);
+      drawJoin(); drawOwn(); refreshMenu(); toast("+" + got + " points added to " + m.name.split(" ")[0] + (lastBonus ? " · +" + lastBonus + " visit bonus" : "") + tokMsg(gk));
     };
     own.querySelector('[data-a="redeem"]').onclick = function () {
       var c = own.querySelector('[data-r="rcode"]').value.trim().toUpperCase(), msg = own.querySelector('[data-r="rmsg"]'), m = mine()[0], hit = null, kind = "";
@@ -819,9 +1099,9 @@
     own.querySelector('[data-a="text"]').onclick = function () { cmp.style.display = "block"; ta.value = DEF[seg] || DEF.all; preview(); ta.focus(); };
     own.querySelector('[data-a="csv"]').onclick = function () {
       var q = function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; };
-      var csv = ["name,phone,email,visits,points," + (WAL ? "bar_points,kitchen_points," : "") + "last_visit,joined,birthday,referral_code,referred_by,friends_referred," + EK.map(function (k) { return k[0]; }).join(",") + ",feedback_stars,feedback"].concat(all().map(function (r, i) {
-        var ec = earnCounts(r, i);
-        return [r.name, r.phone, r.email, r.visits, r.stars].concat(WAL ? [walOf(r).bar || 0, walOf(r).food || 0] : [], [new Date(r.last).toISOString().slice(0, 10), new Date(r.joined).toISOString().slice(0, 10), r.bday >= 0 ? (r.bdy ? r.bdy + "-" + ("0" + (r.bday + 1)).slice(-2) + "-" + ("0" + r.bdd).slice(-2) : MONTHS[r.bday]) : "", r.ref || "", r.refByName || "", r.nfr || (r.friends ? r.friends.length : "")]).concat(EK.map(function (k) { return ec[k[0]] || 0; }), [r.fb ? r.fb.s : "", r.fb ? r.fb.t : ""]).map(q).join(",");
+      var csv = ["name,phone,email,visits,points," + (WAL ? "bar_points,kitchen_points," : "") + "last_visit,joined,birthday,referral_code,referred_by,friends_referred," + EK.map(function (k) { return k[0]; }).join(",") + ",feedback_stars,feedback" + (TC || SPIN ? ",plays,daily_spins,tokens,tokens_with_purchases,tokens_weekly_free,tokens_free_request,tokens_spin_bonus,tokens_spent,device_bound" : "")].concat(all().map(function (r, i) {
+        var ec = earnCounts(r, i), tt = tokOf(r, i);
+        return [r.name, r.phone, r.email, r.visits, r.stars].concat(WAL ? [walOf(r).bar || 0, walOf(r).food || 0] : [], [new Date(r.last).toISOString().slice(0, 10), new Date(r.joined).toISOString().slice(0, 10), r.bday >= 0 ? (r.bdy ? r.bdy + "-" + ("0" + (r.bday + 1)).slice(-2) + "-" + ("0" + r.bdd).slice(-2) : MONTHS[r.bday]) : "", r.ref || "", r.refByName || "", r.nfr || (r.friends ? r.friends.length : "")]).concat(EK.map(function (k) { return ec[k[0]] || 0; }), [r.fb ? r.fb.s : "", r.fb ? r.fb.t : ""], TC || SPIN ? [tt.plays, tt.spins, tt.tok, tt.purchase, tt.weekly, tt.free, tt.bonus, tt.spent, r.sample ? "" : (r.dev ? "yes" : "no")] : []).map(q).join(",");
       })).join("\n");
       var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = SLUG + "-customers.csv"; document.body.appendChild(a); a.click(); a.remove();
     };

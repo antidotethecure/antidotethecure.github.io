@@ -12,7 +12,7 @@
 <title>Melody Bar &amp; Grill — Menu, Drinks &amp; Game</title>
 <script src="../lang-th.js"></script>
 <script src="../radio-avatar.js"></script>
-<meta name="description" content="Melody Bar & Grill by LAX: drinks, food, order from your table or the bar, and fly the Melody approach for prizes.">
+<meta name="description" content="Melody Bar & Grill by LAX: drinks and food menu, rewards, the Just Landed deal, and the Melody flight game for prizes.">
 <meta name="theme-color" content="#0b1220">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Barlow:wght@400;500;600;700;800&family=Anton&display=swap" rel="stylesheet">
@@ -158,6 +158,13 @@ h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;le
 footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-height:1.6;padding-bottom:20px}
 @media (prefers-reduced-motion:reduce){.media.hot .steam i,.drink .media.pouring img.full,.drink .media.pouring .stream{animation:none}#fly,#tow{display:none}}
 </style>
+<style id="menu-only">
+/* MENU-ONLY MODE (Christian, 2026-10-11): no ordering or paying in the app. Guests browse the menu, play, earn rewards,
+   use Just Landed and leave reviews; they order and pay with their server, and staff ring up points at checkout.
+   To turn ordering back on, delete this <style> block and the #menuonly note below. */
+a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,.qty{display:none!important}
+.menuonly{margin:6px 0 12px;padding:10px 12px;border-radius:12px;border:1px dashed var(--gold);color:var(--gold2);font-weight:700;font-size:14px;text-align:center}
+</style>
 </head>
 <body>
 <div id="fly" aria-hidden="true"></div>
@@ -237,6 +244,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
   <div class="now" id="landout">Pick one. One drink per guest, show it before you order.</div>
 </div>
 
+<div class="menuonly" id="menuonly">📋 Browse the menu here. Order and pay with your server, and you still earn points on every check.</div>
 <h2 id="drinks"><small>Tap a drink to pour it</small>Drinks</h2>
 <p class="sub">Happy hour 3–6 daily · $6 margaritas on Tuesdays.</p>
 <div id="drinkhost"></div>

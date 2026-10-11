@@ -296,11 +296,27 @@
   /* ================= SERVERS (data-driven; "jurni" is the owner slot) ================= */
   var SERVERS = [
     { id: "jurni", name: "Jurni (owner)", owner: true },
-    { id: "dee", name: "Dee", look: { skin: "#8d5524", hair: "#1d120c", style: "bun", shirt: "#3B1F5C" } },
-    { id: "marco", name: "Marco", look: { skin: "#c68642", hair: "#2b1a10", style: "short", shirt: "#1E1B3A" } },
-    { id: "kim", name: "Kim", look: { skin: "#f1c27d", hair: "#111", style: "bob", shirt: "#B8322A" } },
-    { id: "tay", name: "Tay", look: { skin: "#5c3a21", hair: "#0d0805", style: "curly", shirt: "#D9A21B" } }
+    // 3D (Pixar-style) staff in black Gritz tees + aprons: img/game/servers/<sp>-{walkA,walkB,carry,back}.webp (300 px tall,
+    // full body). look = the code-drawn fallback, only used if a sprite fails to load.
+    { id: "dee", name: "Dee", sp: "s1", look: { skin: "#8d5524", hair: "#1d120c", style: "bun", shirt: "#111" } },
+    { id: "marco", name: "Marco", sp: "s2", look: { skin: "#c68642", hair: "#2b1a10", style: "short", shirt: "#111" } },
+    { id: "kim", name: "Kim", sp: "s3", look: { skin: "#f1c27d", hair: "#111", style: "bob", shirt: "#111" } }
   ];
+  var SVI = GI + "servers/", SFR = ["walkA", "walkB", "carry", "back"];
+  SERVERS.forEach(function (sv) { if (sv.sp) SFR.forEach(function (f) { var i = new Image(); i.decoding = "async"; i.src = SVI + sv.sp + "-" + f + ".webp"; }); });   // preload: frame swaps never flicker
+  // server figure: all four frames stacked (only visibility toggles while walking, so no image swap ever flickers); the real
+  // dish photo sits on the carry frame's plate (plate centre ≈ 60% across, 33% down that frame)
+  function serverHTML(sv, dish) {
+    var f = function (k) { return SVI + sv.sp + "-" + k + ".webp"; }, fb = esc(JSON.stringify(sv.look));
+    return '<span class="fig" data-fb="' + fb + '"><span class="fr kw"><img class="k" src="' + f("carry") + '" alt="">' + (dish ? '<img class="cp" src="' + dishImg(dish) + '" alt="">' : "") + "</span>" +
+      '<img class="fr a" src="' + f("walkA") + '" alt=""><img class="fr b" src="' + f("walkB") + '" alt=""><img class="fr r" src="' + f("back") + '" alt=""></span>';
+  }
+  function serverEl(sv, dish) {
+    var el = D.createElement("div"); el.className = "srv " + (dish ? "m-carry" : "m-walk"); el.innerHTML = serverHTML(sv, dish);
+    var bad = false; [].forEach.call(el.querySelectorAll(".fig img:not(.cp)"), function (im) { im.addEventListener("error", function () {   // fallback: code-drawn server
+      if (bad) return; bad = true; el.classList.add("svg"); el.innerHTML = serverSVG(sv.look) + (dish ? '<img class="cp" src="' + dishImg(dish) + '" alt="">' : ""); }); });
+    din.appendChild(el); return el;
+  }
   function serverSVG(L) {
     var hair = { bun: '<circle cx="20" cy="5" r="5" fill="' + L.hair + '"/><path d="M10 13 Q20 2 30 13 L30 10 Q20 0 10 10Z" fill="' + L.hair + '"/>',
       short: '<path d="M10 13 Q20 1 30 13 Q30 6 20 5 Q10 6 10 13Z" fill="' + L.hair + '"/>',
@@ -412,8 +428,13 @@
     // servers + Jurni on the floor
     ".srv{position:absolute;left:0;top:0;width:44px;height:71px;z-index:5;pointer-events:none;will-change:transform;transform-origin:22px 71px}",
     ".srv .sv{width:100%;height:100%;animation:bob .32s ease-in-out infinite alternate}",
+    ".srv .fig{position:absolute;inset:0;transform-origin:50% 100%;animation:wkb .3s ease-in-out infinite alternate}",
+    ".srv .fr{position:absolute;bottom:0;left:50%;height:100%;width:auto;transform:translateX(-50%);visibility:hidden}",
+    ".srv .kw{display:block}.srv .kw .k{display:block;height:100%;width:auto}",
+    ".srv.m-carry .kw,.srv.m-walk:not(.ph) .a,.srv.m-walk.ph .b,.srv.m-back:not(.ph) .r,.srv.m-back.ph .b{visibility:visible}",
+    ".srv .kw .cp{position:absolute;left:60%;top:33%;width:44%;height:auto;aspect-ratio:1;transform:translate(-50%,-66%);border-radius:50%;object-fit:cover;border:1.5px solid #111;box-shadow:0 1px 2px #0006;visibility:inherit}",
     "@keyframes bob{from{transform:translateY(0) rotate(-3deg)}to{transform:translateY(-3px) rotate(3deg)}}",
-    ".srv .cp{position:absolute;left:-9px;top:12px;width:26px;height:26px;border-radius:50%;object-fit:cover;border:2px solid #111;box-shadow:0 2px 4px #0006}",
+    ".srv.svg .cp{position:absolute;left:-9px;top:12px;width:26px;height:26px;border-radius:50%;object-fit:cover;border:2px solid #111;box-shadow:0 2px 4px #0006}",
     ".jfl{position:absolute;left:0;top:0;width:46px;height:76px;z-index:5;pointer-events:none;will-change:transform;transform-origin:23px 76px;transition:opacity .3s}.jfl.ink{opacity:0}",
     ".jfl.push .jw{transform:rotate(8deg) translateX(1px);transform-origin:50% 100%;transition:transform .25s}",
     ".jfl.dz .jw{animation:jdz .55s ease-in-out 4;transform-origin:50% 100%}@keyframes jdz{0%,100%{transform:none}25%{transform:translateY(-5px) rotate(-7deg)}50%{transform:rotateY(180deg) translateY(0)}75%{transform:rotateY(180deg) translateY(-5px) rotate(7deg)}}",
@@ -427,7 +448,7 @@
     // sitting down / standing up: ease between full standing size and the seated size (squash toward the seat) in ~0.4 s
     ".wk .sz{display:flex;justify-content:center;align-items:flex-end;width:100%;height:100%;transform-origin:50% 100%;transition:transform .42s cubic-bezier(.4,0,.3,1),opacity .42s}",
     ".wk.sit .sz{transform:scale(.9,.56)}.wk.gone .sz{opacity:0}.wk.fl .sz{transform:scaleX(-1)}.wk.fl.sit .sz{transform:scale(-.9,.56)}",
-    ".wk.q .tg{top:auto;bottom:3px;left:-6px;transform:none}.wk.ox .tg,.wk.ox .ph2,.wk.ox .rx{display:none}",   // in line: the party-size tag sits by their legs, off the poster
+    ".wk .tg.qt,.wk.q .tg{top:auto;bottom:44%;left:-8px;transform:none}.wk.ox .tg,.wk.ox .ph2,.wk.ox .rx{display:none}",   // in line: the party-size tag sits by their legs, off the poster
     ".wk.mv img{animation:wkb .3s ease-in-out infinite alternate}@keyframes wkb{from{transform:translateY(0) rotate(-2.5deg)}to{transform:translateY(-2px) rotate(2.5deg)}}",
     ".wk.q img{animation:wkq 2.4s ease-in-out infinite}@keyframes wkq{50%{transform:translateY(-.6px) rotate(-1deg)}}",
     ".wk.fd{transition:opacity .35s}.wk.fd.hid{opacity:0}",
@@ -559,7 +580,7 @@
     ".brk{display:grid;grid-template-columns:1fr auto;gap:2px 12px;max-width:290px;margin:8px auto 4px;font:700 13.5px var(--body);color:#E8DCF5;text-align:left}.brk b{color:#F2C14E;text-align:right}.brk .neg{color:#ff8a7a}",
     "html.th-halloween .mark{box-shadow:0 0 0 6px var(--cream),0 0 0 7px #e0782a,0 18px 40px #6a2c9a33}html.th-christmas .mark{box-shadow:0 0 0 6px var(--cream),0 0 0 7px #2f8f4e,0 18px 40px #b8322a33}",
     ".thb{display:inline-block;margin:8px 0 0!important;font:800 13px var(--body);color:#2A1E36!important;background:#fff;border:1px dashed var(--gold);border-radius:999px;padding:5px 12px}",
-    "@media (prefers-reduced-motion:reduce){.lights{display:none}.hw,.lan,.lan .gw{animation:none!important}.srv .sv,.jfl .jw,.tb .gq .im,.dance .jw,.ps .stm,.din.aim .tb.wait{animation:none!important}.din .door2 .gls{transition:none}}"
+    "@media (prefers-reduced-motion:reduce){.lights{display:none}.hw,.lan,.lan .gw{animation:none!important}.srv .sv,.srv .fig,.jfl .jw,.tb .gq .im,.dance .jw,.ps .stm,.din.aim .tb.wait{animation:none!important}.din .door2 .gls{transition:none}}"
   ].join("");
   var stEl = D.createElement("style"); stEl.textContent = css; D.head.appendChild(stEl);
 
@@ -874,7 +895,7 @@
   // walker: {x,y,pts:[{x,y}],v px/s,delay ms,cb}
   function walker(id, x, y, pts, o) {
     o = o || {}; var w = { id: id, el: wkEl(id, o.cls), x: x, y: y, pts: pts.slice(), v: o.v || 95, delay: o.delay || 0, cb: o.cb, face: 1, z: o.z };
-    if (o.tag) w.el.insertAdjacentHTML("beforeend", '<span class="tg' + (o.mad ? " mad" : "") + '">' + esc(o.tag) + "</span>");
+    if (o.tag) w.el.insertAdjacentHTML("beforeend", '<span class="tg' + (o.mad ? " mad" : "") + (o.qtag ? " qt" : "") + '">' + esc(o.tag) + "</span>");
     if (o.togo) w.el.insertAdjacentHTML("beforeend", '<span class="tgo">🥡</span>');
     if (o.phone) w.el.insertAdjacentHTML("beforeend", '<span class="ph2">📱</span>');
     if (RM && pts.length) {   // reduced motion: a short fade at the destination instead of walking
@@ -935,7 +956,7 @@
     var q = { party: party, wk: [], until: og.now + (MODE === "kid" ? 40000 : 30000) }, sp = lineSpot(og.queue.length), d = doorPt();
     og.queue.push(q); doorOpen(1400);
     party.ids.slice(0, 1).forEach(function (id, j) {   // one person holds the party's place (tag = party size); bigger people need the room
-      var o = outPt(); q.wk.push(walker(id, o.x, o.y, [d].concat(route(d, { x: sp.x + j * 7, y: sp.y - j * 2 })), { delay: j * 250, tag: j === 0 ? "⏳ " + party.ids.length : "", phone: Math.random() < 0.6, z: 4,
+      var o = outPt(); q.wk.push(walker(id, o.x, o.y, [d].concat(route(d, { x: sp.x + j * 7, y: sp.y - j * 2 })), { delay: j * 250, tag: j === 0 ? "⏳ " + party.ids.length : "", qtag: true, phone: Math.random() < 0.6, z: 4,
         cb: function (w) { w.el.classList.add("q"); } }));
     });
   }
@@ -1140,13 +1161,12 @@
   }
   var srvI = 0;
   function sendServer(tb, gi, dish) {
-    var srv = SERVERS[1 + (srvI++ % (SERVERS.length - 1))], el = D.createElement("div"); el.className = "srv";
-    el.innerHTML = serverSVG(srv.look) + '<img class="cp" src="' + dishImg(dish) + '" alt="">'; din.appendChild(el);
+    var srv = SERVERS[1 + (srvI++ % (SERVERS.length - 1))], el = serverEl(srv, dish);
     var trip = { el: el, srv: srv, path: tripPath(edgeSpot(tb, seatPt(tb, gi, tb.guests.length).x)), t: 0, dur: 1100, back: false, onArrive: function () { arrive(tb, gi, dish); } };
     og.trips.push(trip); placeTrip(trip);
   }
   function busTable(tb) {
-    var srv = SERVERS[1 + (srvI++ % (SERVERS.length - 1))], el = D.createElement("div"); el.className = "srv"; el.innerHTML = serverSVG(srv.look); din.appendChild(el);
+    var srv = SERVERS[1 + (srvI++ % (SERVERS.length - 1))], el = serverEl(srv, null);
     var s = dsz(), trip = { el: el, srv: srv, path: tripPath(edgeSpot(tb, tb.def.x * s.w)), t: 0, dur: 1000, back: false, onArrive: function () { clearTable(tb); } };
     og.trips.push(trip); placeTrip(trip);
   }
@@ -1157,6 +1177,7 @@
     if (og.sim) return; var P = tr.path, f = Math.min(1, tr.t / tr.dur), d = (tr.back ? 1 - f : f) * P.L, i = 1;
     while (i < P.length - 1 && P[i].d < d) i++;
     var a = P[i - 1], b = P[i], u = b.d > a.d ? Math.min(1, Math.max(0, (d - a.d) / (b.d - a.d))) : 1, x = a.x + (b.x - a.x) * u, y = a.y + (b.y - a.y) * u, face = (tr.back ? a.x - b.x : b.x - a.x) < 0 ? -1 : 1, k = depth(y);
+    var ph = Math.floor(d / 11) % 2 === 1; if (ph !== !!tr.ph) { tr.ph = ph; tr.el.classList.toggle("ph", ph); }
     tr.x = x; tr.y = y; tr.el.style.transform = "translate(" + (x - 22).toFixed(1) + "px," + (y - 71).toFixed(1) + "px) scale(" + (face * k).toFixed(3) + "," + k.toFixed(3) + ")"; tr.el.style.zIndex = zAt(y);
   }
   function arrive(tb, gi, dish) {
@@ -1355,7 +1376,7 @@
     if (!og.running || og.hold) return;
     og.trips = og.trips.filter(function (tr) {
       tr.t += dt;
-      if (!tr.back && tr.t >= tr.dur) { tr.back = true; tr.t = 0; try { tr.onArrive(); } catch (e) {} var cp = tr.el.querySelector(".cp"); if (cp) cp.remove(); }
+      if (!tr.back && tr.t >= tr.dur) { tr.back = true; tr.t = 0; try { tr.onArrive(); } catch (e) {} var cp = tr.el.querySelector(".cp"); if (cp) cp.remove(); tr.el.classList.remove("m-carry", "m-walk"); tr.el.classList.add("m-back"); }
       if (tr.back && tr.t >= tr.dur) { tr.el.remove(); return false; }
       placeTrip(tr); return true;
     });

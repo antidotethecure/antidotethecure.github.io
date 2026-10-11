@@ -17,6 +17,7 @@
      vibrate:true                   the game buzzes the phone → a Vibration switch (wraps navigator.vibrate)
      difficulty:{options:[["easy","Easy"],["hard","Hard"]], get:function(){}, set:function(v){}}  only if the game has it
      music:false                    force "no music" even if GAME_AUDIO says otherwise
+     switches:[{label:"Cartoon red",icon:"🩸",note:"…",get:function(){},set:function(on){}}]   extra on/off rows in Settings
      tokens:true                    game access through crm.js (CRM_CFG.tokens / CRM_CFG.spin, window.SSAI_TOKENS): PLAY goes
                                     through the member-account check (Phase 1: free for members) or costs tokens (Phase 2);
                                     the start screen shows the status / token balance, a 🎡 free daily spin button and, in
@@ -213,6 +214,7 @@
     else if (a === "spin") { closeSheet(); if (TK()) TK().openSpin(); }
     else if (a === "tokens") { closeSheet(); if (TK()) TK().openTokens(); }
     else if (a === "sw") toggle(b.getAttribute("data-k"));
+    else if (a === "xsw") { var xs = (C.switches || [])[+b.getAttribute("data-i")]; if (xs) { try { xs.set(!xs.get()); } catch (x) {} panel("settings"); } }
     else if (a === "diff") { S.diff = b.getAttribute("data-v"); save(); try { C.difficulty.set(S.diff); } catch (x) {} panel("settings"); }
     else panel(a);
   }
@@ -290,6 +292,11 @@
         var cur = S.diff; try { cur = C.difficulty.get ? C.difficulty.get() : cur; } catch (e) {}
         h += '<p class="gm-g">' + esc(T("Difficulty")) + '</p><div class="gm-seg">' + C.difficulty.options.map(function (o) {
           return '<button type="button" data-gm="diff" data-v="' + esc(o[0]) + '" aria-pressed="' + (String(cur) === String(o[0])) + '">' + esc(T(o[1])) + "</button>"; }).join("") + "</div>";
+      }
+      if (C.switches && C.switches.length) {   // game-specific on/off switches (e.g. Nalu Vida's "Cartoon red")
+        h += '<p class="gm-g">' + esc(T("Display")) + "</p>";
+        C.switches.forEach(function (x, i) { var on = false; try { on = !!x.get(); } catch (e) {}
+          h += sw("", x.label, x.icon || "⚙️", on).replace('data-gm="sw" data-k=""', 'data-gm="xsw" data-i="' + i + '"') + (x.note ? '<p class="gm-note">' + esc(T(x.note)) + "</p>" : ""); });
       }
       h += '<p class="gm-note">' + esc(T("Saved on this phone.")) + "</p>";
     }

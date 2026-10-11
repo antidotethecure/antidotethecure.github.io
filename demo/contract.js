@@ -103,6 +103,7 @@
     '<label class="ck"><input type="checkbox" name="rc" checked> 3A 90-day results check</label>' +
     '<label>Return visits a month needed</label><input name="rc_n" type="number" min="0" value="12">' +
     '<label class="ck"><input type="checkbox" name="cd" checked> 5A Customer data</label>' +
+    '<label class="ck"><input type="checkbox" name="dx" checked> Founding discount expires if setup not paid in 3 business days (−$100/day to regular)</label>' +
     '<label>Special terms</label><textarea name="special" rows="3" placeholder="Anything you agreed that is not above"></textarea>' +
     '<div class="sum" id="ssai-sum"></div>' +
     '</form><div id="ssai-doc"></div></div>';
@@ -145,6 +146,17 @@
     }
     return c;
   }
+  // Founding discount + prompt payment (Section 2 paragraph + fee-table footnote). Same wording as discount_expiry() in
+  // make_contract.py. Framed as an expiring discount, not a late fee (Cal. Civ. Code 1671). Nothing when there is no discount.
+  function discountExpiry(list, net) {
+    var cap = Math.round((list - net) * 100) / 100, g = 3, per = 100;
+    if (!F.dx.checked || !(cap > 0)) return { note: "", sec: "" };
+    var days = Math.ceil(cap / per);
+    return {
+      note: '<br><span class="sm">Discount holds for ' + g + ' business days after signing; then &minus;' + money(per) + '/day until regular price (' + money(list) + ')</span>',
+      sec: '<p><b>Founding discount and prompt payment.</b> The discounted setup price in Section 2 (' + money(net) + ', regular price ' + money(list) + ') is offered on the condition that Client pays the setup fee (or the part of it due at signing) within three (3) business days after signing this Agreement, Client having already been shown a working sample of its app. If that payment is not received by then, the discount is reduced by ' + money(per) + ' for each additional calendar day until it is paid, and the setup fee moves back toward the regular price of ' + money(list) + ' shown in Section 2. The ' + money(cap) + ' discount is fully used up after ' + days + ' such day' + (days !== 1 ? 's' : '') + '; once the setup fee reaches the regular price, it does not increase further. Amounts already paid are credited toward the setup fee. This is the reduction of a discount, not a late fee or penalty.</p>'
+    };
+  }
   function render() {
     var sl = num("setup_list"), ml = num("monthly_list"), sd = num("sd"), md = num("md"), months = Math.round(num("months"));
     var minimum = Math.round(num("minimum")), up = Math.min(100, Math.max(0, num("upfront")));
@@ -163,7 +175,7 @@
       : "This Agreement continues month to month with no minimum term. Either party may cancel by giving 30 days' written notice; email counts.";
     if (intro) term += " Client chose the " + (planName ? planName + " " : "") + "payment plan, which takes a smaller setup payment in exchange for a higher monthly fee during the first " + introM + " months; the minimum term is a condition of that plan. Client was also offered the Pay-in-full plan: " + money(full.setup_list) + " setup paid at signing and " + money(full.monthly_list) + " per month, month to month, with no minimum term.";
     else if (minimum > 0 && (sd || md)) term += " The minimum term is a condition of the founding-partner discount only. Client was offered the regular plan instead: " + money(sl) + " setup paid in full up front and " + money(ml) + " per month, month to month, with no minimum term.";
-    var CL = clauses();
+    var CL = clauses(), DX = discountExpiry(sl, intro ? sl : sn);
     var sigBlock = function (who, title, name, tt, email) {
       return '<div><b>' + title + '</b><canvas data-sig="' + who + '"></canvas><button type="button" class="clr" data-clear="' + who + '">Clear signature</button><br>' +
         'Name: ' + name + '<br>Title: ' + tt + '<br>Email: ' + email + '<br>Date: <span data-date="' + who + '"></span></div>';
@@ -174,9 +186,9 @@
       '<h2>1. Services</h2><p>Provider will build, host and maintain the following for Client:</p><ul>' + SCOPE.filter(function (s) { return planName !== "Core" || s.indexOf("Full package only: ") !== 0; }).map(function (s) { return "<li>" + s.replace("Full package only: ", "") + "</li>"; }).join("") + '</ul>' +
       '<p>"Go-Live" means the day the Client\'s page and game are published and the table QR codes point to them. Provider will ask Client to approve the build before Go-Live. Changes outside this list are quoted and billed separately.</p>' +
       '<h2>2. Fees</h2><table class="f"><tr><th>Item</th><th>Regular price</th><th>Client\'s price</th></tr>' +
-      '<tr><td>Setup (one time)</td><td>' + money(intro ? full.setup_list : sl) + '</td><td><b>' + money(sn) + '</b>' + (intro ? '<br><span class="sm">smaller setup under the ' + e(planName || "payment") + ' plan; offset by the plan monthly fee</span>' : "") + (sd ? '<br><span class="sm">' + sd + '% founding-partner discount</span>' : "") + '</td></tr>' +
+      '<tr><td>Setup (one time)</td><td>' + money(intro ? full.setup_list : sl) + '</td><td><b>' + money(sn) + '</b>' + (intro ? '<br><span class="sm">smaller setup under the ' + e(planName || "payment") + ' plan; offset by the plan monthly fee</span>' : "") + (sd ? '<br><span class="sm">' + sd + '% founding-partner discount</span>' : "") + DX.note + '</td></tr>' +
       '<tr><td>Monthly service</td><td>' + money(ml) + ' / month</td><td><b>' + (intro ? money(intro) + ' / month</b><br><span class="sm">months 1–' + introM + ', then <b>' + money(mn) + ' / month</b></span>' : money(mn) + ' / month</b>') + (mNote ? '<br><span class="sm">' + mNote + '</span>' : "") + '</td></tr>' + CL.row + '</table>' +
-      '<p><b>Setup payment:</b> ' + pay + '</p>' +
+      '<p><b>Setup payment:</b> ' + pay + '</p>' + DX.sec +
       '<p><b>Monthly payment:</b> The monthly fee starts on the Effective Date (the day this Agreement is signed) and is billed each month in advance on that date. ' + mAfter + '</p>' +
       '<p>If a payment is more than 15 days late, Provider may pause the service until it is paid. Prices do not include any third-party costs Client chooses to add (for example printing beyond the included QR table tents, paid advertising, or prizes).</p>' + CL.s2a +
       '<h2>3. Term and cancellation</h2><p>' + term + ' The setup fee is non-refundable once Provider has delivered the build for Client\'s review. ' + CL.cancel + '</p>' + CL.s3a +
@@ -193,7 +205,7 @@
     S.innerHTML = "Setup <b>" + money(sn) + "</b>" + (sd ? " (was " + money(sl) + ")" : "") + " · " + up + "% today = <b>" + money(sn * up / 100) + "</b><br>" +
       "Monthly <b>" + (intro ? money(intro) + "</b> × " + introM + ", then <b>" + money(mn) + "</b>" : money(mn) + "</b>") + (md && months ? " × " + months + ", then " + money(ml) : "") + (minimum ? " · " + minimum + "-month minimum" : "") +
       (F.ps.checked ? "<br>Performance share <b>" + num("ps_pct") + "%</b> of app sales in a month over <b>" + money(num("ps_th")) + "</b>" : "") +
-      (F.rc.checked ? " · 90-day check (" + Math.round(num("rc_n")) + " returns/mo)" : "") + (F.cd.checked ? " · customer-data clause" : "");
+      (F.rc.checked ? " · 90-day check (" + Math.round(num("rc_n")) + " returns/mo)" : "") + (F.cd.checked ? " · customer-data clause" : "") + (DX.sec ? " · discount expires after 3 business days unpaid" : "");
     D.querySelectorAll("canvas[data-sig]").forEach(pad);
   }
 

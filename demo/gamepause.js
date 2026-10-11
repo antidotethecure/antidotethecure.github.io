@@ -92,7 +92,8 @@
     ".ssai-pauseov button b{display:inline-block;width:0;height:0;border-left:15px solid currentColor;border-top:9px solid transparent;border-bottom:9px solid transparent}" +
     ".ssai-pauseov p{margin:0;font-size:13px;opacity:.7}" +
     "html.ssai-paused *,html.ssai-paused *::before,html.ssai-paused *::after{animation-play-state:paused!important}" +
-    "html.ssai-paused .ssai-pauseov,html.ssai-paused .ssai-pauseov *{animation-play-state:running!important}";
+    "html.ssai-paused .ssai-pauseov,html.ssai-paused .ssai-pauseov *{animation-play-state:running!important}" +
+    ".ssai-pauseov .ssai-restart{margin-top:12px;background:transparent!important;border:2px solid rgba(255,255,255,.7)!important;color:#fff!important}";
   document.head.appendChild(st);
 
   function build() {
@@ -103,13 +104,30 @@
     btn.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); pause(); });
     ov = document.createElement("div");
     ov.className = "ssai-pauseov"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "Game paused");
-    ov.innerHTML = "<h2>PAUSED</h2><button type=\"button\"><b></b>Resume</button><p>Tap anywhere to keep playing</p>";
-    ov.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); resume(); });
+    ov.innerHTML = "<h2>PAUSED</h2><button type=\"button\"><b></b>Resume</button>" +
+      (canRestart() ? "<button type=\"button\" class=\"ssai-restart\">\u21BB Restart</button>" : "") +
+      "<p>Tap anywhere to keep playing</p>";
+    ov.addEventListener("click", function (e) {
+      e.preventDefault(); e.stopPropagation();
+      if (e.target.closest && e.target.closest(".ssai-restart")) { restart(); return; }
+      resume();
+    });
     ["pointerdown", "pointerup", "touchstart", "touchend", "mousedown", "mouseup"].forEach(function (ev) {
       ov.addEventListener(ev, function (e) { e.stopPropagation(); }, { passive: true });
     });
     document.body.appendChild(btn); document.body.appendChild(ov);
   }
+
+  /* Restart: resume, then start a fresh run the same way PLAY does (member gate / tokens included).
+     Order of preference: window.GAMEPAUSE_RESTART(), the shared start menu (GameMenu.play), GAME_MENU.start. */
+  function restartFn() {
+    if (typeof W.GAMEPAUSE_RESTART === "function") return W.GAMEPAUSE_RESTART;
+    if (W.GameMenu && typeof W.GameMenu.play === "function") return function () { W.GameMenu.play(); };
+    if (W.GAME_MENU && typeof W.GAME_MENU.start === "function") return W.GAME_MENU.start;
+    return null;
+  }
+  function canRestart() { return !!restartFn(); }
+  function restart() { var f = restartFn(); resume(); if (f) sT(function () { try { f(); } catch (x) { if (W.console) console.error(x); } }, 30); }
 
   function pause() {
     if (paused) return;

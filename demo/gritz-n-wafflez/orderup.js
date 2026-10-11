@@ -403,17 +403,18 @@
     ".din.aim .tb.wait{outline:2px dashed #FFD23F;outline-offset:2px;border-radius:8px;animation:aim 1s ease-in-out infinite}@keyframes aim{50%{outline-color:#fff}}",
     ".tb.r1{z-index:3}.tb.r2{z-index:6}",
     // servers + Jurni on the floor
-    ".srv{position:absolute;left:0;top:0;width:26px;height:42px;z-index:5;pointer-events:none;will-change:transform}",
+    ".srv{position:absolute;left:0;top:0;width:26px;height:42px;z-index:5;pointer-events:none;will-change:transform;transform-origin:13px 42px}",
     ".srv .sv{width:100%;height:100%;animation:bob .32s ease-in-out infinite alternate}",
     "@keyframes bob{from{transform:translateY(0) rotate(-3deg)}to{transform:translateY(-3px) rotate(3deg)}}",
     ".srv .cp{position:absolute;left:-7px;top:6px;width:20px;height:20px;border-radius:50%;object-fit:cover;border:2px solid #111;box-shadow:0 2px 4px #0006}",
-    ".jfl{position:absolute;left:0;top:0;width:40px;height:68px;z-index:5;pointer-events:none;will-change:transform}",
+    ".jfl{position:absolute;left:0;top:0;width:40px;height:68px;z-index:5;pointer-events:none;will-change:transform;transform-origin:20px 68px;transition:opacity .3s}.jfl.ink{opacity:0}",
+    ".jfl.dz .jw{animation:jdz .55s ease-in-out 4;transform-origin:50% 100%}@keyframes jdz{0%,100%{transform:none}25%{transform:translateY(-5px) rotate(-7deg)}50%{transform:rotateY(180deg) translateY(0)}75%{transform:rotateY(180deg) translateY(-5px) rotate(7deg)}}",
     ".jfl .jw{display:block;width:100%;height:100%}.jfl.walk .jw{animation:jsway .36s ease-in-out infinite alternate}@keyframes jsway{from{transform:translateY(0) rotate(-1.5deg)}to{transform:translateY(-2px) rotate(1.5deg)}}",
     // soft floor shadows so people stand IN the room (static radial gradients, no filters)
     ".srv:before,.jfl:before,.wk:before{content:'';position:absolute;left:12%;right:12%;bottom:-3px;height:7px;border-radius:50%;background:radial-gradient(closest-side,#000a,#0000)}",
     ".jfl:before{left:18%;right:18%;bottom:-2px}",
     // guests on foot (walking in, waiting in line, walking out): pointer-events none, transform-only movement
-    ".wk{position:absolute;left:0;top:0;width:19px;height:41px;z-index:5;pointer-events:none;will-change:transform}",
+    ".wk{position:absolute;left:0;top:0;width:19px;height:41px;z-index:5;pointer-events:none;will-change:transform;transform-origin:9.5px 41px}",
     ".wk img{display:block;width:100%;height:100%;object-fit:contain;object-position:bottom}",
     ".wk.mv img{animation:wkb .3s ease-in-out infinite alternate}@keyframes wkb{from{transform:translateY(0) rotate(-2.5deg)}to{transform:translateY(-2px) rotate(2.5deg)}}",
     ".wk.q img{animation:wkq 2.4s ease-in-out infinite}@keyframes wkq{50%{transform:translateY(-.6px) rotate(-1deg)}}",
@@ -624,7 +625,7 @@
     og.fresh = unlocked(og.level).filter(function (k) { return prev.indexOf(k) < 0 && og.level > 1; });   // NEW badges
     og.pass = []; og.sel = -1; og.plate = []; og.clean = true; og.pq = {}; initStations();
     og.tables = TABLES.map(function (t) { return { def: t, id: t.id, cap: t.cap, state: "free", guests: [] }; });
-    og.trips.forEach(function (tr) { if (tr.el !== J.el) tr.el.remove(); }); og.trips = [];
+    og.trips.forEach(function (tr) { if (tr.el !== J.el) tr.el.remove(); }); og.trips = []; [].forEach.call(din.querySelectorAll(".srv"), function (e) { e.remove(); });   // a restart mid-trip left servers behind
     og.lt = LEVEL_MS; og.walk = 0; og.nextArr = 1500; og.timers = []; og.popAt = -99999; og.warned = {}; wkClear();
     TABLES.forEach(function (t) { var el = $("tb" + t.id); el.className = "tb c" + t.cap + " r" + t.row; el.querySelector(".gs").innerHTML = ""; el.querySelector(".tt").innerHTML = ""; });
     jReset(); buildGrid(); drawPass(); drawPlate(); drawRail(); hud();
@@ -837,7 +838,7 @@
   /* ================= GUESTS ON FOOT (visual only: pointer-events none, transform-only, never blocks a tap) ================= */
   var WK = [], QMAX = 3;
   function wkEl(id, cls) { var el = D.createElement("div"); el.className = "wk " + (cls || ""); el.innerHTML = '<img src="' + GI + "guests/" + id + '.webp" alt="">'; din.appendChild(el); return el; }
-  function wkPlace(w) { w.el.style.transform = "translate(" + (w.x - 9.5).toFixed(1) + "px," + (w.y - 41).toFixed(1) + "px)" + (w.face < 0 ? " scaleX(-1)" : ""); w.el.style.zIndex = w.z || 5; }
+  function wkPlace(w) { var k = depth(w.y); w.el.style.transform = "translate(" + (w.x - 9.5).toFixed(1) + "px," + (w.y - 41).toFixed(1) + "px) scale(" + (w.face < 0 ? -k : k).toFixed(3) + "," + k.toFixed(3) + ")"; w.el.style.zIndex = zAt(w.y); }
   // walker: {x,y,pts:[{x,y}],v px/s,delay ms,cb}
   function walker(id, x, y, pts, o) {
     o = o || {}; var w = { id: id, el: wkEl(id, o.cls), x: x, y: y, pts: pts.slice(), v: o.v || 95, delay: o.delay || 0, cb: o.cb, face: 1, z: o.z };
@@ -874,17 +875,13 @@
   function doorPt() { return { x: 15, y: dsz().h - 5 }; }
   function aisleY() { return Math.round(dsz().h * 0.75); }
   function seatPt(tb, i, n) { var s = dsz(); return { x: tb.def.x * s.w + (i - (n - 1) / 2) * 24, y: tb.def.y * s.h - (tb.def.row === 2 ? 9 : 5) }; }
-  function pathTo(tb, i, n, from) {   // door/line → the aisle → their chair (row 2 is right at the front, no aisle needed)
-    var e = seatPt(tb, i, n), a = aisleY(); from = from || doorPt();
-    return tb.def.row === 1 ? [{ x: 54, y: Math.min(from.y, a + 6) }, { x: e.x, y: a }, e] : [{ x: Math.min(e.x, 62), y: e.y + 4 }, e];
-  }
-  function pathOut(pt, row) { var a = aisleY(), d = doorPt(); return row === 1 ? [{ x: pt.x, y: a }, { x: 54, y: a + 6 }, d] : [{ x: pt.x, y: pt.y + 3 }, d]; }
+  function pathTo(tb, i, n, from) { return route(from || doorPt(), aislePt(seatPt(tb, i, n).x)); }   // door/line → around the furniture → the aisle by their seat, then they sit
   function walkTime(pts, x, y, v) { var t = 0; pts.forEach(function (q) { t += Math.sqrt((q.x - x) * (q.x - x) + (q.y - y) * (q.y - y)); x = q.x; y = q.y; }); return t / v * 1000; }
   // a party walks to its table (from the door, or from its spot in line), then sits: seat() starts the patience clock
   function walkIn(party, tb, q) {
     tb.state = "coming"; tb.comingIds = party.ids.slice();
     var n = party.ids.length, left = n, lvl = og.level, d = doorPt();
-    if (!q) doorOpen(1600);
+    if (!q) { doorOpen(1600); if (!J.task && J.mode === "door" && !J.inK) { J.face = 1; jPose("door", 1300, pick(["Welcome to Gritz! 💛", "Hey hey, come on in! 💛", "Welcome in! 💛"])); } }
     party.ids.forEach(function (id, i) {
       var qw = q && q.wk[i] && !q.wk[i].dead ? q.wk[i] : null, st = qw ? { x: qw.x, y: qw.y } : (q ? { x: lineSpot(0).x, y: lineSpot(0).y } : d);
       if (qw) wkGone(qw);
@@ -901,12 +898,12 @@
     var q = { party: party, wk: [], until: og.now + (MODE === "kid" ? 40000 : 30000) }, sp = lineSpot(og.queue.length), d = doorPt();
     og.queue.push(q); doorOpen(1400);
     party.ids.slice(0, 2).forEach(function (id, j) {
-      q.wk.push(walker(id, d.x, d.y, [{ x: sp.x + j * 7, y: sp.y - j * 2 }], { delay: j * 250, tag: j === 0 ? "⏳ " + party.ids.length : "", phone: j === 1 || Math.random() < 0.5, z: 4,
+      q.wk.push(walker(id, d.x, d.y, route(d, { x: sp.x + j * 7, y: sp.y - j * 2 }), { delay: j * 250, tag: j === 0 ? "⏳ " + party.ids.length : "", phone: j === 1 || Math.random() < 0.5, z: 4,
         cb: function (w) { w.el.classList.add("q"); } }));
     });
   }
   function layoutLine() {   // everyone in line shuffles up a spot
-    (og.queue || []).forEach(function (q, k) { var sp = lineSpot(k); q.wk.forEach(function (w, j) { if (w.dead) return; wkMove(w, [{ x: sp.x + j * 7, y: sp.y - j * 2 }], { cb: function (x) { x.el.classList.add("q"); } }); }); });
+    (og.queue || []).forEach(function (q, k) { var sp = lineSpot(k); q.wk.forEach(function (w, j) { if (w.dead) return; wkMove(w, route(w, { x: sp.x + j * 7, y: sp.y - j * 2 }), { cb: function (x) { x.el.classList.add("q"); } }); }); });
   }
   function lineStep() {   // a party that waits too long gives up and leaves (flavor only: NOT a walk-out, no penalty, no pacing change)
     if (!og.queue || !og.queue.length) return;
@@ -918,7 +915,7 @@
     });
     gone.forEach(function (q) {
       og.queue.splice(og.queue.indexOf(q), 1); og.lost = (og.lost || 0) + 1;
-      q.wk.forEach(function (w, j) { if (!w.dead) wkMove(w, [doorPt()], { v: 120, delay: j * 200, cb: wkGone }); });
+      q.wk.forEach(function (w, j) { if (!w.dead) wkMove(w, route(w, doorPt()), { v: 120, delay: j * 200, cb: wkGone }); });
       doorOpen(1700);
     });
     if (gone.length) layoutLine();
@@ -927,7 +924,7 @@
   function walkOut(tb, mad) {
     var el = $("tb" + tb.id), n = tb.guests.length, longest = 0;
     tb.guests.forEach(function (g, i) {
-      var st = seatPt(tb, i, n), pts = pathOut(st, tb.def.row), v = mad ? 125 : 90, delay = i * (mad ? 120 : 260);
+      var st = aislePt(seatPt(tb, i, n).x), pts = route(st, doorPt()), v = mad ? 125 : 90, delay = i * (mad ? 120 : 260);   // they stand up into the aisle
       longest = Math.max(longest, delay + walkTime(pts, st.x, st.y, v));
       walker(g.id, st.x, st.y, pts, { v: v, delay: delay, tag: i === 0 ? (mad ? "😤" : "😋") : "", mad: mad, togo: !mad && Math.random() < 0.45, cb: wkGone });
     });
@@ -1083,19 +1080,26 @@
   function sendServer(tb, gi, dish) {
     var srv = SERVERS[1 + (srvI++ % (SERVERS.length - 1))], el = D.createElement("div"); el.className = "srv";
     el.innerHTML = serverSVG(srv.look) + '<img class="cp" src="' + dishImg(dish) + '" alt="">'; din.appendChild(el);
-    var s = dsz(), to = { x: tb.def.x * s.w + (gi - (tb.guests.length - 1) / 2) * 24, y: tb.def.y * s.h - 10 };
-    var trip = { el: el, srv: srv, from: { x: s.w * 0.52, y: s.h + 30 }, to: to, t: 0, dur: 1100, back: false, onArrive: function () { arrive(tb, gi, dish); } };
+    var trip = { el: el, srv: srv, path: tripPath(edgeSpot(tb, seatPt(tb, gi, tb.guests.length).x)), t: 0, dur: 1100, back: false, onArrive: function () { arrive(tb, gi, dish); } };
     og.trips.push(trip); placeTrip(trip);
   }
   function busTable(tb) {
     var srv = SERVERS[1 + (srvI++ % (SERVERS.length - 1))], el = D.createElement("div"); el.className = "srv"; el.innerHTML = serverSVG(srv.look); din.appendChild(el);
-    var s = dsz(), trip = { el: el, srv: srv, from: { x: s.w * 0.52, y: s.h + 30 }, to: { x: tb.def.x * s.w, y: tb.def.y * s.h - 10 }, t: 0, dur: 1000, back: false, onArrive: function () { clearTable(tb); } };
+    var s = dsz(), trip = { el: el, srv: srv, path: tripPath(edgeSpot(tb, tb.def.x * s.w)), t: 0, dur: 1000, back: false, onArrive: function () { clearTable(tb); } };
     og.trips.push(trip); placeTrip(trip);
   }
-  function placeTrip(tr) { if (og.sim) return; var f = Math.min(1, tr.t / tr.dur), a = tr.back ? tr.to : tr.from, b = tr.back ? tr.from : tr.to; var x = a.x + (b.x - a.x) * f, y = a.y + (b.y - a.y) * f; tr.el.style.transform = "translate(" + (x - 13) + "px," + (y - 42) + "px)" + ((b.x < a.x) ? " scaleX(-1)" : ""); }
+  // trip path: from below the pass, up through the kitchen door (gap 1), then around the furniture to the table edge.
+  // Same fixed durations as before (the food lands on a timer), only the drawn route changed.
+  function tripPath(to) { var k = navNodes().K, pts = [{ x: k.x, y: k.y + 40 }, k].concat(route(k, to)), L = 0; pts.forEach(function (q, i) { q.d = i ? L += Math.hypot(q.x - pts[i - 1].x, q.y - pts[i - 1].y) : 0; }); pts.L = L || 1; return pts; }
+  function placeTrip(tr) {
+    if (og.sim) return; var P = tr.path, f = Math.min(1, tr.t / tr.dur), d = (tr.back ? 1 - f : f) * P.L, i = 1;
+    while (i < P.length - 1 && P[i].d < d) i++;
+    var a = P[i - 1], b = P[i], u = b.d > a.d ? Math.min(1, Math.max(0, (d - a.d) / (b.d - a.d))) : 1, x = a.x + (b.x - a.x) * u, y = a.y + (b.y - a.y) * u, face = (tr.back ? a.x - b.x : b.x - a.x) < 0 ? -1 : 1, k = depth(y);
+    tr.x = x; tr.y = y; tr.el.style.transform = "translate(" + (x - 13).toFixed(1) + "px," + (y - 42).toFixed(1) + "px) scale(" + (face * k).toFixed(3) + "," + k.toFixed(3) + ")"; tr.el.style.zIndex = zAt(y);
+  }
   function arrive(tb, gi, dish) {
     var g = tb.guests[gi]; if (!g || tb.state === "free" || tb.state === "gone") return;
-    g.arrived = true; var el = $("tb" + tb.id);
+    g.arrived = true; tb.fedAt = og.now; var el = $("tb" + tb.id);
     el.querySelector(".tt").insertAdjacentHTML("beforeend", '<img src="' + dishImg(dish) + '" alt="">');
     if (!g.cold && Math.random() < 0.4) { var fl = el.querySelector(".flash"); fl.classList.remove("on"); void fl.offsetWidth; fl.classList.add("on"); g.photo = og.now + 1200; sfx("flash"); }
     if (tb.state === "eat" && tb.guests.every(function (x) { return x.arrived; })) later(3200, function () { leave(tb); });
@@ -1124,48 +1128,129 @@
     if (pose !== J.pose) { J.pose = pose; J.el.innerHTML = jurniHTML(pose); }
     if (bubble !== J.bubble) { J.bubble = bubble; if (bubble) jSay(bubble, pose); }
   }
-  function jPlace() { if (og.sim || !J.el) return; J.el.style.transform = "translate(" + (J.x - 20) + "px," + (J.y - 68) + "px)" + (J.face < 0 ? " scaleX(-1)" : ""); }
-  function jReset() { var s = dsz(); J.x = s.w * 0.45; J.y = s.h - 22; J.task = null; J.over = null; J.face = 1; J.idleAt = og.now + 2500; jSet("walkA"); jPlace(); }
-  function jGo(x, y, mode, cb) { J.task = { x: x, y: y, mode: mode || "walk", cb: cb }; if (RM || og.sim) { J.x = x; J.y = y; var t = J.task; J.task = null; jPlace(); if (t.cb) t.cb(); } }
+  function jPlace() {
+    if (og.sim || !J.el) return; var k = depth(J.y);
+    J.el.style.transform = "translate(" + (J.x - 20).toFixed(1) + "px," + (J.y - 68).toFixed(1) + "px) scale(" + (J.face < 0 ? -k : k).toFixed(3) + "," + k.toFixed(3) + ")"; J.el.style.zIndex = zAt(J.y);
+  }
+  function jReset() { var d = doorSpots()[0]; J.x = d.x; J.y = d.y; J.task = null; J.over = null; J.face = 1; J.inK = false; J.mode = "door"; J.idleAt = og.now + 2500; if (J.el) J.el.classList.remove("ink", "dz"); jSet("walkA"); jPlace(); }
+  function jOutOfKitchen() { if (J.inK) { J.inK = false; if (J.el) J.el.classList.remove("ink"); } }
+  // RM: she stays near the door and only swaps poses (no walking); sim: no visuals at all
+  function jGo(x, y, mode, cb) {
+    jOutOfKitchen(); if (J.el) J.el.classList.remove("dz");
+    if (RM || og.sim) { J.task = null; if (cb) cb(); return; }
+    J.task = { pts: route({ x: J.x, y: J.y }, { x: x, y: y }), mode: mode || "walk", cb: cb };
+  }
   function jPose(p, ms, bubble) { J.over = p; J.overB = bubble || ""; J.overUntil = og.now + ms; jSet(p, J.overB); }
   function jDeliver(tb, gi, dish) {   // Jurni carries this one: logic arrives on a fixed timer so the score never waits on animation
-    var s = dsz(), tx = tb.def.x * s.w + (gi - (tb.guests.length - 1) / 2) * 24, ty = tb.def.y * s.h - 6;
-    J.x = s.w * 0.52; J.y = s.h - 6;   // she grabs it from the pass window
-    J.carrying = true; jGo(tx, ty, "carry", function () { J.carrying = false; jPose("tip", 900, pick(["Enjoy! 💛", "Hot & fresh!", "Owner's special ✨"])); });
+    var sp = edgeSpot(tb, seatPt(tb, gi, tb.guests.length).x), k = navNodes().K;
+    if (!RM) { J.x = k.x; J.y = k.y; }   // she comes out of the kitchen door with the plate
+    J.carrying = true; J.mode = "deliver"; jGo(sp.x, sp.y, "carry", function () { J.carrying = false; J.face = faceTo(tb); jPose("tip", 900, pick(["Enjoy! 💛", "Hot & fresh!", "Owner's special ✨"])); jRest(2500); });
     later(1300, function () { arrive(tb, gi, dish); });
   }
-  function jGoodbye(tips) {
-    var s = dsz(), big = tips >= 6;
+  function jGoodbye(tips) {   // she always walks the finished party out and holds the door
+    var big = tips >= 6, d = doorSpots()[0];
     doorOpen(2200);
     if (J.task && J.carrying) return;
-    jGo(30, s.h * 0.86, "walk", function () { J.face = 1; jPose(big ? "tip" : "door", 1800, tips > 0 ? pick(["Thank you! Come back soon 💛", "Appreciate y'all! 💛", "Thanks for coming! 💛"]) : "Have a good one!"); });
+    J.mode = "door"; jGo(d.x, d.y, "walk", function () { J.face = 1; jPose(big ? "tip" : "door", 1800, tips > 0 ? pick(["Thank you! Come back soon 💛", "Appreciate y'all! 💛", "Thanks for coming! 💛"]) : "Have a good one!"); jRest(3000); });
   }
   var doorT = 0;
   function doorOpen(ms) { var d = $("door"); if (!d || og.sim) return; d.classList.add("open"); din.classList.add("dopen"); clearTimeout(doorT); doorT = setTimeout(function () { d.classList.remove("open"); din.classList.remove("dopen"); }, ms || 1500); }
+  function jRest(ms) { J.idleAt = og.now + ms + Math.random() * 1500; }
+  function faceTo(tb) { return tb.def.x * dsz().w >= J.x ? 1 : -1; }
+  // her routine (state machine): check on tables (favoring just-fed / getting-impatient ones), dance when it's calm,
+  // pop into the kitchen and back, otherwise hang by the door + host stand greeting people
+  function jNext() {
+    var cand = og.tables.filter(function (tb) { return tb.state === "wait" || tb.state === "eat"; });
+    if (RM) { jPose(pick(["door", "a", "tip"]), 1400); jRest(3500); return; }
+    var hot = cand.filter(function (tb) { return (tb.fedAt && og.now - tb.fedAt < 7000 && tb.state === "eat") || (tb.state === "wait" && tb.pat / tb.patMax < 0.6); });
+    var calm = !og.tables.some(function (tb) { return tb.state === "wait" && tb.pat / tb.patMax < 0.5; }), r = Math.random();
+    if ((hot.length && r < 0.55) || (cand.length && r < 0.3)) return jCheck(pick(hot.length ? hot : cand));
+    if (calm && r < 0.48 && og.now - (J.dancedAt || -99999) > 12000) return jDance();
+    if (r < 0.66) return jKitchen();
+    jDoorIdle();
+  }
+  function jCheck(tb) {
+    var sp = checkSpot(tb), happy = tb.state === "eat" || tb.pat / tb.patMax > 0.6; J.mode = "check";
+    jGo(sp.x, sp.y, "walk", function () { J.face = faceTo(tb); jPose(happy ? "door" : "impatient", 1300, happy ? pick(["Everything good? 💛", "Y'all good? 💛", "Enjoy! 💛", "👋"]) : pick(["Food's coming! 👀", "Almost ready! 🔥"])); jRest(2600); });
+  }
+  function jDance() {
+    var sp = danceSpot(); J.mode = "dance"; J.dancedAt = og.now;
+    jGo(sp.x, sp.y, "walk", function () { J.face = 1; jPose("tip", 2300); if (J.el) { J.el.classList.remove("dz"); void J.el.offsetWidth; J.el.classList.add("dz"); } later(2300, function () { if (J.el) J.el.classList.remove("dz"); }); jRest(2600); });
+  }
+  function jKitchen() {   // steps through the kitchen door at the pass, then comes back out
+    var k = navNodes().K; J.mode = "kitchen";
+    jGo(k.x, k.y, "walk", function () { J.inK = true; if (J.el) J.el.classList.add("ink"); var back = 1800 + Math.random() * 1800; J.idleAt = og.now + back + 99999;
+      later(back, function () { if (!J.inK) return; jOutOfKitchen(); jRest(300); }); });
+  }
+  function jDoorIdle() {
+    var sp = pick(doorSpots()); J.mode = "door";
+    jGo(sp.x, sp.y, "walk", function () { J.face = 1; jPose("door", 1200); jRest(3500); });
+  }
   function jStep(dt) {
     if (og.sim) return;
     if (J.over && og.now > J.overUntil) { J.over = null; }
     if (J.task) {
-      var dx = J.task.x - J.x, dy = J.task.y - J.y, d = Math.sqrt(dx * dx + dy * dy), v = (J.task.mode === "carry" ? 120 : 75) * dt / 1000;
-      if (Math.abs(dx) > 1) J.face = dx > 0 ? 1 : -1;
-      if (d <= v) { J.x = J.task.x; J.y = J.task.y; var t = J.task; J.task = null; J.idleAt = og.now + 3000 + Math.random() * 3000; if (t.cb) t.cb(); }
-      else { J.x += dx / d * v; J.y += dy / d * v; J.frameT += dt; }
-      if (!J.over) jSet(J.task && J.task.mode === "carry" ? "carry" : (Math.floor(J.frameT / 190) % 2 ? "walkB" : "walkA"));
-      J.el.classList.add("walk");
-    } else {
-      J.el.classList.remove("walk");
-      if (!J.over) jSet("walkA");
-      if (og.now > J.idleAt && og.running) {   // idle: check on a table, wave at a happy one
-        var s = dsz(), cand = og.tables.filter(function (tb) { return tb.state === "wait" || tb.state === "eat"; });
-        if (cand.length) { var tb = pick(cand), happy = tb.state === "eat" || tb.pat / tb.patMax > 0.6;
-          jGo(Math.max(36, Math.min(s.w - 70, tb.def.x * s.w + (Math.random() < 0.5 ? -40 : 40))), Math.min(s.h - 8, tb.def.y * s.h + 14), "walk", function () {
-            J.face = tb.def.x * s.w > J.x ? 1 : -1; if (happy) jPose("door", 1100, pick(["Y'all good? 💛", "Enjoy!", "👋"])); }); }
-        else { J.idleAt = og.now + 2500; jGo(40 + Math.random() * (s.w - 120), s.h - 20 - Math.random() * 10, "walk"); }
+      var t = J.task.pts[0];
+      if (!t) { var c = J.task; J.task = null; if (c.cb) c.cb(); }
+      else {
+        var dx = t.x - J.x, dy = t.y - J.y, d = Math.sqrt(dx * dx + dy * dy), v = (J.task.mode === "carry" ? 150 : 75) * dt / 1000;
+        if (Math.abs(dx) > 1) J.face = dx > 0 ? 1 : -1;
+        if (d <= v) { J.x = t.x; J.y = t.y; J.task.pts.shift(); if (!J.task.pts.length) { var tk = J.task; J.task = null; J.idleAt = og.now + 3000 + Math.random() * 3000; if (tk.cb) tk.cb(); } }
+        else { J.x += dx / d * v; J.y += dy / d * v; J.frameT += dt; }
       }
+      if (J.task && !J.over) jSet(J.task.mode === "carry" ? "carry" : (Math.floor(J.frameT / 190) % 2 ? "walkB" : "walkA"));
+      if (J.el) J.el.classList.toggle("walk", !!J.task);
+    } else {
+      if (J.el) J.el.classList.remove("walk");
+      if (!J.over) jSet("walkA");
+      if (og.now > J.idleAt && og.running && !J.inK) jNext();
     }
     if (J.over) jSet(J.over, J.overB);
     jPlace();
   }
+
+  /* ================= FLOOR NAVMESH: feet stay on the floor plane; routes go AROUND furniture =================
+     Walkable floor: the aisle between the back row and the front row, the door + host-stand strip on the left, the
+     gaps between the front-row tables (gap 1 = the kitchen door at the pass edge), never on a table, the banquette or
+     the bar. Waypoint graph + line-of-sight edges + Dijkstra, computed only when someone starts a walk. */
+  var NAV_AY = 131;   // aisle feet line: in front of the back row, just behind the front-row guests (they hide her legs)
+  function tRect(t) { var s = dsz(), hw = (t.cap === 4 ? 112 : 60) / 2, cx = t.x * s.w, by = t.y * s.h; return { l: cx - hw, r: cx + hw, t: by - 23, b: by + 3 }; }
+  function furniture() {   // feet must never be inside these (also the test's rects)
+    var s = dsz(), out = TABLES.map(function (t) { var r = tRect(t); r.k = "table" + t.id; return r; });
+    out.push({ l: 32, r: s.w - 58, t: 79, b: 107, k: "banquette" }, { l: s.w - 58, r: s.w, t: 22, b: s.h + 50, k: "bar" });
+    return out;
+  }
+  function obstacles() { var s = dsz(), o = furniture(); o.push({ l: 30, r: 49, t: s.h - 24, b: s.h + 50, k: "host" }); return o; }
+  function navNodes() {
+    var s = dsz(), R = TABLES.map(tRect), g1 = (R[3].r + R[4].l) / 2, g2 = Math.min((R[4].r + s.w - 58) / 2, s.w - 63), gy = Math.round((R[3].t + R[3].b) / 2);
+    return { DOOR: { x: 20, y: s.h - 8 }, DUP: { x: 22, y: 129 }, LA: { x: 57, y: NAV_AY }, LB: { x: Math.min(61, R[3].l - 9), y: gy }, A1: { x: g1, y: NAV_AY }, A2: { x: g2, y: NAV_AY }, G1: { x: g1, y: gy }, K: { x: g1, y: s.h - 1 }, G2: { x: g2, y: gy } };
+  }
+  function blocked(x, y, O) { for (var i = 0; i < O.length; i++) { var r = O[i]; if (x > r.l - 2 && x < r.r + 2 && y > r.t - 2 && y < r.b + 2) return true; } return false; }
+  function los(a, b, O) { var d = Math.hypot(b.x - a.x, b.y - a.y), n = Math.max(1, Math.ceil(d / 2)); for (var i = 1; i < n; i++) { var u = i / n; if (blocked(a.x + (b.x - a.x) * u, a.y + (b.y - a.y) * u, O)) return false; } return true; }
+  function route(from, to) {
+    from = { x: from.x, y: from.y }; to = { x: to.x, y: to.y }; var O = obstacles();
+    if (los(from, to, O)) return [to];
+    var N = navNodes(), P = [from, to], i, j; Object.keys(N).forEach(function (k) { P.push(N[k]); });
+    var n = P.length, dist = [], prev = [], done = [];
+    for (i = 0; i < n; i++) { dist[i] = Infinity; prev[i] = -1; } dist[0] = 0;
+    for (var it = 0; it < n; it++) {
+      var u = -1; for (i = 0; i < n; i++) if (!done[i] && (u < 0 || dist[i] < dist[u])) u = i;
+      if (u < 0 || dist[u] === Infinity) break; done[u] = 1; if (u === 1) break;
+      for (j = 0; j < n; j++) if (!done[j] && j !== u) { var w = Math.hypot(P[j].x - P[u].x, P[j].y - P[u].y); if (dist[u] + w < dist[j] && los(P[u], P[j], O)) { dist[j] = dist[u] + w; prev[j] = u; } }
+    }
+    if (prev[1] < 0) return [to];   // (never on a valid floor spot) fall back to a direct walk
+    var out = []; for (i = 1; i > 0; i = prev[i]) out.unshift({ x: P[i].x, y: P[i].y }); return out;
+  }
+  // depth: further back = a little smaller; z-order by feet (aisle = between the rows; door strip, gaps + pass edge = in front)
+  function depth(y) { var h = dsz().h; return 0.82 + 0.18 * clamp((y - (NAV_AY - 6)) / (h - NAV_AY + 6), 0, 1); }
+  function zAt(y) { return y < NAV_AY + 10 ? 5 : 7; }
+  function aislePt(x) { var N = navNodes(); return { x: clamp(x, N.LA.x, N.A2.x), y: NAV_AY }; }
+  function sideSpots(tb) { var N = navNodes(); return tb.id === 4 ? [N.LB, N.G1] : tb.id === 5 ? [N.G1, N.G2] : null; }
+  function nearest(list, x) { return list.slice().sort(function (a, b) { return Math.abs(a.x - x) - Math.abs(b.x - x); })[0]; }
+  function edgeSpot(tb, x) { var sd = sideSpots(tb); return sd ? nearest(sd, x) : aislePt(x); }   // where a plate is handed over, from the floor side
+  function checkSpot(tb) { var sd = sideSpots(tb), s = dsz(), hw = (tb.cap === 4 ? 112 : 60) / 2; return sd ? pick(sd) : aislePt(tb.def.x * s.w + (Math.random() < 0.5 ? -1 : 1) * hw * 0.55); }
+  function danceSpot() { var N = navNodes(); return Math.random() < 0.7 ? aislePt(N.LA.x + 30 + Math.random() * (N.A2.x - N.LA.x - 50)) : N.G1; }
+  function doorSpots() { var N = navNodes(); return [{ x: 22, y: dsz().h - 10 }, N.DUP, { x: 24, y: 142 }, N.LA, N.LB]; }
 
   /* ================= LEVELS ================= */
   function levelUp() {
@@ -1222,7 +1307,7 @@
   }
   function jWarn(tb) {   // a table is getting impatient: Jurni heads over with her impatient face (rate-limited)
     if (og.sim || og.now - og.popAt < 9000 || J.carrying) return; og.popAt = og.now;
-    var s = dsz(); jGo(Math.max(36, Math.min(s.w - 70, tb.def.x * s.w + 34)), Math.min(s.h - 8, tb.def.y * s.h + 14), "walk", function () { J.face = -1; jPose("impatient", 1500, pick(["Table " + tb.id + " is waiting! 😤", "Let's GO, kitchen! 👀"])); });
+    var sp = checkSpot(tb); J.mode = "check"; jGo(sp.x, sp.y, "walk", function () { J.face = faceTo(tb); jPose("impatient", 1500, pick(["Table " + tb.id + " is waiting! 😤", "Let's GO, kitchen! 👀"])); jRest(2500); });
     if (TH_ID === "halloween") sfx("boo");
   }
   var last = 0, frame = 0;
@@ -1387,6 +1472,9 @@
     sim: function (on) { og.sim = !!on; }, step: function (ms) { var n = Math.ceil(ms / 50); for (var i = 0; i < n && og.running; i++) step(50); },
     render: render, tap: tap, undo: undo, clear: clearPlate, serve: serve, pick: pickPass, table: tapTable, needs: needs, unlocked: unlocked, pull: pull, cookAt: cookAt, stationsFor: stationsFor, COOK: COOK, quality: quality, cookLeft: cookLeft, howCook: function (k, cb) { howCook(k === "full" ? "full" : "fry", cb); },
     levelUp: function () { og.lt = 1; }, jPose: function (p, ms, b) { jPose(p, ms || 1500, b); }, jGoodbye: jGoodbye, jDeliverTest: function (id) { var tb = og.tables[id - 1]; jDeliver(tb, 0, DISHES[2]); }, end: end, openPoster: openPoster,
+    jurni: function () { return { x: J.x, y: J.y, inK: !!J.inK, mode: J.mode, task: !!J.task }; }, furniture: furniture, route: route, navNodes: navNodes,
+    people: function () { return [{ k: "jurni", x: J.x, y: J.y, hid: !!J.inK }].concat(og.trips.filter(function (t) { return t.x != null && t.y <= dsz().h; }).map(function (t) { return { k: "server", x: t.x, y: t.y }; }), WK.filter(function (w) { return !w.dead; }).map(function (w) { return { k: "guest", x: w.x, y: w.y }; })); },
+    jCheck: function (id) { jCheck(og.tables[id - 1]); }, jDance: function () { jDance(); }, jKitchen: function () { jKitchen(); }, jDoor: function () { jDoorIdle(); },
     seatTest: function (ids, tableId) { var tb = og.tables[tableId - 1]; seat(tb, { ids: ids, kind: "test" }); }
   };
   $("startov").addEventListener("click", function () { if (W.GameMenu) W.GameMenu.open(); else start(); });

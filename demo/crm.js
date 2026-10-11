@@ -634,20 +634,26 @@
   };
   var gateEl = null;
   function gate(reason, cb) {
-    var m = mine()[0], both = reason === "play" || reason === "spin";   // game + spin accounts need phone AND email
+    // KIDS' PRIVACY (COPPA): in a game's Kid mode we never ask the child for contact info. Reasons "kidplay" / "kidprize"
+    // word the sheet for a parent or guardian, require the "I'm the parent/guardian (18+)" box, and the phone + email
+    // typed are the grown-up's; points, tokens and prizes live in the grown-up's account. No birthday is asked here and
+    // no child's name is stored. (Draft: attorney review before launch.)
+    var kidg = reason === "kidplay" || reason === "kidprize";
+    var m = mine()[0], both = reason === "play" || reason === "spin" || kidg;   // game + spin accounts need phone AND email
     if (m && (!both || hasBoth(m))) { if (cb) cb(m); return true; }
     if (gateEl) gateEl.close();
     var T = GATE_TXT[reason] || GATE_TXT.order, rid = "crm-g" + code4(4), pre = function (k) { return m && m[k] ? ' value="' + e(m[k]) + '"' : ''; };
-    if (m) T = [T[0], "Add your " + (okPhone(m.phone) ? "email" : okEmail(m.email) ? "phone number" : "phone number and email") + " to finish your free account. It's tied to this phone.", T[2]];
+    if (m && !kidg) T = [T[0], "Add your " + (okPhone(m.phone) ? "email" : okEmail(m.email) ? "phone number" : "phone number and email") + " to finish your free account. It's tied to this phone.", T[2]];
     var ov = document.createElement("div"); ov.className = "crm-gate"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", rid); ov.setAttribute("data-scroll-ok", "");
     ov.innerHTML = '<section class="crm-card"><span class="k">' + e(NAME) + ' Rewards · free</span><h3 id="' + rid + '">' + e(T[0]) + '</h3><p>' + e(T[1]) + '</p>' +
       (m ? '' : '<div class="crm-gift"><b>🎁</b><span>You also get <u>' + e(OFFER) + '</u> + 100 ' + (WAL ? W[BONUS].label.toLowerCase() + ' ' : '') + 'points' + (both && ON ? ' + ' + TOK.weeklyFree + ' free tokens a week' : '') + '</span></div>') +
       (INVITE && !m ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: ' + e(REF.friendGift) + ' with your first order + ' + REF.friend + ' bonus points.</div>' : '') +
-      '<form autocomplete="on" novalidate><label>First name</label><input name="name" maxlength="40" autocomplete="given-name" enterkeyhint="next"' + pre("name") + '>' +
+      '<form autocomplete="on" novalidate>' + (kidg ? '<div class="crm-invited" style="border-color:#FFD23F;background:#FFD23F22;color:#FFE9A3">🧒 Kids: hand the phone to a parent or guardian for this part.</div>' : '') + '<label>' + (kidg ? "Parent or guardian's first name" : "First name") + '</label><input name="name" maxlength="40" autocomplete="given-name" enterkeyhint="next"' + pre("name") + '>' +
       '<div class="two"><div><label>Phone</label><input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(310) 555-0123"' + pre("phone") + '></div>' +
       '<div><label>' + (both ? 'Email' : 'or Email') + '</label><input name="email" type="email" maxlength="120" autocomplete="email" autocapitalize="none"' + pre("email") + '></div></div>' +
       (both ? '<div class="crm-idnote">📱 One account per phone. Live, we text you a code to confirm the number.</div>' : '') +
-      (m ? '' : '<details class="crm-gbd"><summary>🎂 Add birthday for a free treat</summary><div class="three"><select name="bday" aria-label="Birth month"><option value="">Month</option>' + MONTHS_L.map(function (x, i) { return '<option value="' + i + '">' + x + '</option>'; }).join("") + '</select>' +
+      (kidg ? '<label class="crm-optin"><input type="checkbox" name="guardian"> <span><b>I\'m the parent or guardian (18+)</b> and this is my own phone and email. My child\'s points and prizes are saved to my account.</span></label>' : '') +
+      (m || kidg ? '' : '<details class="crm-gbd"><summary>🎂 Add birthday for a free treat</summary><div class="three"><select name="bday" aria-label="Birth month"><option value="">Month</option>' + MONTHS_L.map(function (x, i) { return '<option value="' + i + '">' + x + '</option>'; }).join("") + '</select>' +
         '<select name="bdd" aria-label="Birth day"><option value="">Day</option>' + Array.apply(null, Array(31)).map(function (x, i) { return '<option>' + (i + 1) + '</option>'; }).join("") + '</select>' +
         '<select name="bdy" aria-label="Birth year"><option value="">Year</option>' + Array.apply(null, Array(88)).map(function (x, i) { return '<option>' + (new Date().getFullYear() - 13 - i) + '</option>'; }).join("") + '</select></div>' +
         '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat.</div></details>') +
@@ -668,15 +674,17 @@
     ov.addEventListener("click", function (ev) { if (ev.target === ov) close(); });
     f.onsubmit = function (ev) {
       ev.preventDefault();
+      if (kidg && !(f.elements.guardian && f.elements.guardian.checked)) { f.querySelector(".err").textContent = "A parent or guardian (18+) needs to tick the box."; return; }
       if (m) {   // existing member finishing a game account: add the missing phone / email, bind to this phone
         var ph = f.elements.phone.value.trim(), em = f.elements.email.value.trim();
         if (!okPhone(ph) || !okEmail(em)) { f.querySelector(".err").textContent = "Add your phone number AND email."; return; }
         if (!f.elements.ok.checked) { f.querySelector(".err").textContent = "Tick the box so we can send you your rewards."; return; }
-        m.phone = ph; m.email = em; if (f.elements.name.value.trim()) m.name = f.elements.name.value.trim(); bind(m); put(m);
+        m.phone = ph; m.email = em; if (f.elements.name.value.trim()) m.name = f.elements.name.value.trim(); if (kidg) m.guardian = Date.now(); bind(m); put(m);
         close(); drawJoin(); drawOwn(); if (cb) cb(m); return;
       }
       var res = createMember(f, both);
       if (res.err) { f.querySelector(".err").textContent = res.err; return; }
+      if (kidg) { res.member.guardian = Date.now(); res.member.src = "kid mode (guardian)"; var gl = mine(); gl[0] = res.member; save(gl); }
       close(); drawJoin(); drawOwn("all");
       toast("🎉 You're in, " + res.member.name.split(" ")[0] + "! +100 points");
       if (cb) cb(res.member);
@@ -725,6 +733,8 @@
   var SPIN = C.spin && (C.spin.prizes || []).length ? C.spin : null;
   function spinPrizes() { return SPIN.prizes.map(function (p) { return p.tok && !ON && p.alt ? Object.assign({ w: p.w }, p.alt) : p; }).filter(function (p) { return !p.tok || ON; }); }
   GATE_TXT.play = ["Play " + (C.game || "the game"), "Free member account: your name, phone AND email. It's tied to this phone so your points, prizes" + (ON ? " and tokens" : "") + " stay yours.", "🎮 Save & play"];
+  GATE_TXT.kidplay = ["Ask a parent or guardian", "Kids don't sign up. A parent or guardian (18+) adds THEIR name, phone and email; points, tokens and prizes are saved to their account.", "✅ Save & play"];
+  GATE_TXT.kidprize = ["Ask a parent or guardian to save this prize", "Kids don't sign up. A parent or guardian (18+) adds THEIR name, phone and email, and the prize is saved to their account.", "🎁 Save to the grown-up's account"];
   GATE_TXT.spin = ["Your free daily spin", "Free member account: your name, phone AND email. One free spin per member per day. No purchase necessary.", "🎡 Save & spin"];
   function devId() { var k = KEY + "_dev", v = ""; try { v = localStorage.getItem(k); if (!v) { v = "D" + code4(10); localStorage.setItem(k, v); } } catch (x) { v = "D-nostore"; } return v; }
   function okPhone(p) { return /\d{7,}/.test(String(p || "").replace(/\D/g, "")); }
@@ -759,8 +769,10 @@
     hit.used = Date.now(); hit.by = m.id; tcSave(l); tokAdd(m, hit.n, "🧾 Code " + v + " · $" + hit.amt.toFixed(2) + " order", "purchase"); put(m); return { n: hit.n };
   }
   // the game's PLAY button calls this. Phase 1: members play free. Phase 2: costs playCost tokens.
-  function playGate(go) {
-    return gate("play", function () {
+  function playGate(go, kid) {
+    // Kid mode, Phase 1: kids play free with NO account and nothing typed in; saving a prize asks a grown-up (kidprize).
+    if (kid && !ON) { var km = mine()[0]; if (km) { km.plays = (km.plays || 0) + 1; put(km); drawOwn(); } go(); return true; }
+    return gate(kid ? "kidplay" : "play", function () {
       var m = mine()[0]; if (!m) return;
       bind(m); weekly(m);
       if (!bound(m)) { put(m); toast("This account is bound to another phone."); return; }
@@ -879,14 +891,16 @@
     balance: function () { var m = this.member(); return m ? m.tok || 0 : 0; },
     canPlay: function () { var m = this.member(); return !!m && hasBoth(m) && (!ON || (m.tok || 0) >= TOK.playCost); },
     spinReady: function () { return spinReady(mine()[0]) || (!!SPIN && !mine()[0]); },
-    play: function (go) { if (!TC) { go(); return; } playGate(go); },
+    play: function (go, opt) { if (!TC) { go(); return; } playGate(go, !!(opt && opt.kid)); },
     openSpin: openSpin, openTokens: function () { if (ON) tokSheet(); }, issueCode: function (a) { return ON ? issueCode(a) : null; },
     redeem: function (c) { var m = mine()[0]; var r = m ? redeemCode(m, c) : { err: "no member" }; if (!r.err) { drawJoin(); drawOwn(); refreshMenu(); } return r; },
     // start-menu pieces (gamemenu.js): status line, play label, panel rows
     playLabel: function () { return ON ? "PLAY · " + TOK.playCost + " 🪙" : "PLAY"; },
     locked: function () { var m = mine()[0]; return ON && !!m && (m.tok || 0) < TOK.playCost; },
-    statusHTML: function () {
+    statusHTML: function (kid) {
       var m = this.member();
+      if (kid && !ON) return "🧒 Kids play free · a grown-up saves prizes";
+      if (kid && !m) return "🧒 Tokens are on a grown-up's account";
       if (!ON) return m && hasBoth(m) ? "✅ Free to play for members" : "🎮 Free to play · free member account (phone + email)";
       if (!m) return "🪙 Free account → " + TOK.weeklyFree + " free tokens every week";
       var b = m.tok || 0; return "🪙 <b>" + b + "</b> token" + (b === 1 ? "" : "s") + (b < TOK.playCost ? " · 🔒 need " + TOK.playCost + " to play" : " · a play costs " + TOK.playCost);

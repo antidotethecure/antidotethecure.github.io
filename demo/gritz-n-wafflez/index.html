@@ -93,6 +93,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 @keyframes fl{0%{opacity:0;transform:scale(.6)}20%{opacity:1;transform:scale(1.08)}80%{opacity:1}100%{opacity:0;transform:translateY(-30px)}}
 @keyframes up{to{transform:translateY(-60px);opacity:0}}
 #walk{letter-spacing:0;font-size:13px}
+.mb{display:inline-block;vertical-align:4px;font:800 10.5px var(--body);color:var(--navy);background:var(--gold2);border-radius:99px;padding:2px 7px}.mb:empty{display:none}
 /* Antidote's review on the kitchen TV (reviewegg.js) */
 .re-tv{position:absolute;left:0;top:0;z-index:12;width:66px;padding:3px 3px 2px;border:0;border-radius:8px;background:linear-gradient(180deg,#2b2b33,#111116);box-shadow:0 6px 14px #0006,inset 0 0 0 1px #ffffff22;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transform-origin:50% 0;animation:tvOn .5s cubic-bezier(.34,1.5,.64,1)}
 .re-tv::before{content:"";position:absolute;left:50%;top:-7px;width:2px;height:8px;background:#555;transform:translateX(-50%)}
@@ -127,9 +128,9 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 </header>
 
 <h2 id="play">Order Up! Play while you wait</h2>
-<p class="sub">You run the kitchen at Gritz N Wafflez. Guests sit down, every one orders their own plate. Fry the catfish, press the waffles, stir the gritz, pull everything at the perfect moment, build the plate and ring the bell. Faster and better cooked = more points and bigger tips. Each level is 90 seconds: let 3 tables walk out and the kitchen closes.</p>
+<p class="sub">You run the kitchen at Gritz N Wafflez. Guests sit down, every one orders their own plate. Fry the catfish, press the waffles, stir the gritz, pull everything at the perfect moment, build the plate and ring the bell. Faster and better cooked = more points and bigger tips. Each level is 90 seconds: let 3 tables walk out and the kitchen closes. Pick 🧒 Kid (12 & under, slower timers, kid prize scores) or 🧑 Adult (regular speed).</p>
 <div class="gamebox" id="og">
-  <div class="hud"><span>Score <span class="sc" id="score">0</span></span><span class="lv" id="lvl">Level 1</span><span class="lv" id="walk" aria-label="Walk-outs">⭕⭕⭕</span><span class="lv" id="combo">×1</span><span id="time">1:30</span></div>
+  <div class="hud"><span>Score <span class="sc" id="score">0</span> <span id="mode" class="mb"></span></span><span class="lv" id="lvl">Level 1</span><span class="lv" id="walk" aria-label="Walk-outs">⭕⭕⭕</span><span class="lv" id="combo">×1</span><span id="time">1:30</span></div>
   <div id="ou"></div>
   <div id="over">
     <div class="sub" id="rank">Order up</div>
@@ -144,7 +145,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
     <div><b>🍳 Skillet</b> eggs + bacon (level 3)</div><div><b>🥣 Gritz</b> keep it stirred, tap to scoop</div>
     <div><b>⏱️ Doneness</b> raw → pale → golden → <b>perfect ✨</b> → brown → burnt. Too early = undercooked −30</div>
     <div><b>🔥 Warming tray</b> cook ahead; items stay fresh a while, then go cold −10</div>
-    <div><b>⚡ Speed</b> points drop every 0.1 s from the moment a table sits down</div>
+    <div><b>⚡ Speed</b> points drop every 0.1 s from the moment a table sits down (🧒 Kid mode: gentler clock)</div>
     <div><b>💵 Tips</b> fast + perfectly cooked + happy guests tip more. Burnt food = tiny tips</div>
     <div><b>🔥 Streak</b> perfect, fast plates in a row: up to ×2</div><div><b>👥 Whole table</b> serve a party within 10 s: bonus</div>
     <div><b>❌ Walk-outs</b> 3 tables walk out and the kitchen closes</div><div><b>👆 Tip</b> tap an item on the plate to send it back to the tray</div>
@@ -152,13 +153,13 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 </div>
 
 <h2 id="tiers">Weekly prize board</h2>
-<p class="sub">Sample prizes. Jurni picks the real ones and the board resets every Monday.</p>
+<p class="sub">Sample prizes. Jurni picks the real ones and the board resets every Monday. 🧑 Adult and 🧒 Kid mode have their own scores to beat (and their own weekly board).</p>
 <div class="tiers">
   <div class="tier top"><span class="pts">#1 WEEK</span><div><b>Free Wingz N' Wafflez + a karaoke shoutout</b><small>Top score by Sunday close, crowned at GNW Karaoke Wednesday</small></div></div>
-  <div class="tier"><span class="pts">15,000</span><div><b>Free Original Collard Green Dip</b><small>One run over 15,000 points</small></div></div>
-  <div class="tier"><span class="pts">10,000</span><div><b>Free Fried Cheese Gritz</b><small>With any plate</small></div></div>
-  <div class="tier"><span class="pts">6,500</span><div><b>Free side of Smackin' Mac</b><small>With any order</small></div></div>
-  <div class="tier"><span class="pts">3,500</span><div><b>Free Kiki Palmer</b><small>Lemonade + tea, on the house</small></div></div>
+  <div class="tier"><span class="pts">15,000<small style="display:block;font:800 12px var(--body);color:var(--dim)">🧒 4,500</small></span><div><b>Free Original Collard Green Dip</b><small>🧑 Adult 15,000 · 🧒 Kid 4,500</small></div></div>
+  <div class="tier"><span class="pts">10,000<small style="display:block;font:800 12px var(--body);color:var(--dim)">🧒 4,250</small></span><div><b>Free Fried Cheese Gritz</b><small>With any plate</small></div></div>
+  <div class="tier"><span class="pts">6,500<small style="display:block;font:800 12px var(--body);color:var(--dim)">🧒 3,500</small></span><div><b>Free side of Smackin' Mac</b><small>With any order</small></div></div>
+  <div class="tier"><span class="pts">3,500<small style="display:block;font:800 12px var(--body);color:var(--dim)">🧒 3,000</small></span><div><b>Free Kiki Palmer</b><small>Lemonade + tea, on the house</small></div></div>
   <div class="tier"><span class="pts">Best</span><div><b id="best">Your best: —</b><small>Saved on this phone</small></div></div>
 </div>
 <div id="champs" data-game="gritz-n-wafflez"></div><script src="../champs.js"></script>
@@ -259,12 +260,14 @@ $("menuhost").innerHTML=MENU.map(function(c){
 <script src="../nearby.js"></script>
 <script src="../menu3d.js"></script>
 <script>(function(){ var G="img/game/", HAIR=(window.__OG&&window.__OG.hair)||"fri";
+window.GNW_PRIZES_KID=[[4500,"a Free Original Collard Green Dip"],[4250,"Free Fried Cheese Gritz"],[3500,"a Free side of Smackin' Mac"],[3000,"a Free Kiki Palmer"]];   // 🧒 Kid mode (bot-calibrated, see report)
 window.GNW_PRIZES=[[15000,"a Free Original Collard Green Dip"],[10000,"Free Fried Cheese Gritz"],[6500,"a Free side of Smackin' Mac"],[3500,"a Free Kiki Palmer"]];
 window.GAME_MENU={id:"gritz-n-wafflez",name:"Order Up!",by:"Gritz N Wafflez",tagline:"Fry it, press it, stir it, plate it. 90-second levels. Keep every table happy.",
  hero:[G+"jurni/a-"+HAIR+".webp",G+"waffle.webp",G+"catfish.webp",G+"kiki.webp"],
  theme:{bg:"#1E1B3A",bg2:"#3B1F5C",card:"rgba(255,255,255,.1)",edge:"rgba(255,255,255,.2)",accent:"#D9A21B",accent2:"#F2C14E",ink:"#FFFFFF",dim:"#E8DCF5",btnInk:"#1E1B3A",display:"'Playfair Display',Georgia,serif",body:"'DM Sans',system-ui,sans-serif"},
  mount:"#ou",hide:"#startov",start:function(){ window.__OG.start(); },vibrate:true,tokens:true,
- how:{goal:"Each level is 90 seconds. Keep the dining room fed: cook every part of each guest's plate, pull it at the perfect moment, plate it and ring Serve. Pass the level with fewer than 3 tables walking out.",time:"90 seconds a level · levels get busier",
+ modes:{title:"Who's playing?",options:[["kid","🧒","Kid","12 & under · slower timers"],["adult","🧑","Adult","Regular speed"]],get:function(){ return window.__OG.mode(); },set:function(v){ window.__OG.setMode(v); }},
+ how:{goal:"Each level is 90 seconds. Keep the dining room fed: cook every part of each guest's plate, pull it at the perfect moment, plate it and ring Serve. Pass the level with fewer than 3 tables walking out. Pick who's playing first: 🧒 Kid mode starts nice and slow (guests wait about 2 minutes, food cooks slower) and speeds up each level to level 5; 🧑 Adult mode is full speed from the start.",time:"90 seconds a level · 🧒 Kid: slow start · 🧑 Adult: regular speed",
   steps:[["🧾","Tickets slide in above the kitchen: table number, the dish, every item, + extras and NO leave-offs. Reddest ticket = most impatient table"],
    [null,"FRYER: tap catfish, tenderz, wingz or shrimp to drop it in a basket. The ring fills raw → golden → green = PERFECT ✨. Tap the basket to pull it",G+"catfish.webp"],
    [null,"WAFFLE IRON: tap an empty iron to pour batter. Open it when the light turns green",G+"waffle_plain.webp"],
@@ -275,17 +278,17 @@ window.GAME_MENU={id:"gritz-n-wafflez",name:"Order Up!",by:"Gritz N Wafflez",tag
    ["👥","Parties of 2–4 share one patience bar. The table leaves happy (and tips) when every plate has landed"],
    ["❌","3 walk-outs and the kitchen closes. Too early out of the fryer = undercooked"]]},
  points:[{group:"Every plate",items:[
-   {icon:"⚡",name:"Speed",note:"Counted to 0.1 s from the moment the table sits down. Under 10 s is the top tier; points drop every tenth of a second",pts:"up to +150",gold:true},
+   {icon:"⚡",name:"Speed",note:"Counted to 0.1 s from the moment the table sits down; points drop every tenth of a second. 🧑 Adult: under 10 s is the top tier. 🧒 Kid: the clock is scaled to each level's slower pace",pts:"up to +150",gold:true},
    {icon:"✨",name:"Doneness",note:"Each fried / pressed / skillet item: perfect = +55, golden or a little brown = less, burnt = almost nothing",pts:"up to +55 each"},
    {img:G+"waffle.webp",name:"Each item on the order",note:"Waffle, fish, gritz, syrup, drinks… everything they asked for",pts:"+30 each"},
    {icon:"➕",name:"Special requests",note:"Each + extra or NO leave-off you get right",pts:"+20 each"},
-   {icon:"🔥",name:"Perfect streak",note:"Perfectly cooked plates served within 20 s in a row: ×1.2, ×1.4 … up to ×2",pts:"up to ×2",gold:true}]},
+   {icon:"🔥",name:"Perfect streak",note:"Perfectly cooked, fast plates in a row: ×1.2, ×1.4 … up to ×2",pts:"up to ×2",gold:true}]},
   {group:"Every table",items:[
    {icon:"💵",name:"Tips",note:"Faster, better cooked and happier guests tip more. Big tippers 💛 tip extra, picky eaters 🧐 care most about doneness, guests in a hurry ⏱️ about speed. Burnt food = tiny tip",pts:"$ × 10 pts"},
    {icon:"👥",name:"Whole table",note:"Every plate at a table served within 10 s of each other",pts:"+30 a guest"},
    {icon:"🏆",name:"Level cleared",note:"150 × level, plus 75 for every walk-out you avoided",pts:"+225 and up",gold:true}]},
   {group:"Mistakes",items:[{icon:"🥶",name:"Undercooked",note:"Pulled out of the fryer, iron or skillet too early",pts:"−30",bad:true},{icon:"🔥",name:"Charred",note:"Left in way too long",pts:"−15",bad:true},{icon:"🧊",name:"Went cold",note:"Sat in the warming tray too long",pts:"−10",bad:true},{icon:"❌",name:"Wrong plate",note:"Nobody ordered that. Streak resets",pts:"−20",bad:true},{icon:"🚫",name:"Added a NO item",note:"They said no cheese!",pts:"−60",bad:true},{icon:"😤",name:"Walk-out",note:"A table waited too long. 3 and the kitchen closes",pts:"−50",bad:true}]}],
- prizes:{champion:"Free Wingz N' Wafflez + a karaoke shoutout for the top score by Sunday close",tiers:[["15,000","Free Original Collard Green Dip","One run over 15,000 points",G+"dip.webp"],["10,000","Free Fried Cheese Gritz","With any plate",G+"fgritz.webp"],["6,500","Free side of Smackin' Mac","With any order",G+"mac.webp"],["3,500","Free Kiki Palmer","Lemonade + tea, on the house",G+"kiki.webp"]],note:"Sample prizes. Jurni picks the real ones and the board resets every Monday."}}; })();</script>
+ prizes:{champion:"Free Wingz N' Wafflez + a karaoke shoutout for the top score by Sunday close",tiers:[["🧑 15,000 · 🧒 4,500","Free Original Collard Green Dip","One run over the score for your mode",G+"dip.webp"],["🧑 10,000 · 🧒 4,250","Free Fried Cheese Gritz","With any plate",G+"fgritz.webp"],["🧑 6,500 · 🧒 3,500","Free side of Smackin' Mac","With any order",G+"mac.webp"],["🧑 3,500 · 🧒 3,000","Free Kiki Palmer","Lemonade + tea, on the house",G+"kiki.webp"]],note:"🧑 Adult and 🧒 Kid mode each have their own scores to beat and their own best score; kid prizes are saved to a parent or guardian's account. Sample prizes. Jurni picks the real ones and the board resets every Monday."}}; })();</script>
 <script src="../gamemenu.js"></script>
 <script src="../gamelock.js"></script>
 <script>window.FLYBY={every:[15,25],first:6,busy:function(){ var o=window.__OG&&window.__OG.get(); return !!(o&&o.running); },items:[

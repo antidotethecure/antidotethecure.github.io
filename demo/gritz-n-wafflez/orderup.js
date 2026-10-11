@@ -6,6 +6,14 @@
    one patience bar. Build a plate from tray items + toppings, ring Serve, and a server walks it to the table.
    LEVELS: 90 s each. Survive with fewer than 3 walk-outs to pass; each level adds stations, dishes, special requests,
    bigger parties, faster arrivals and less patience.
+   MODES (picked on the start menu, "Who's playing?", remembered on this phone; never an age or birthdate):
+   🧑 ADULT: the original fast pacing (ADULT_PACE: 58 s patience at level 1, a party every ~12 s, normal cook times,
+      60 s speed window) and the adult prize thresholds.
+   🧒 KID (12 & under): a slow ramp (KID_PACE: ~2 minutes of patience and a party every ~18 s at level 1, food cooks 35%
+      slower and stays warm 50% longer, getting faster every level until level 5), a speed window scaled to each
+      level's patience, its own prize thresholds (GNW_PRIZES_KID) and its own best score. Kids never type a phone or
+      email: they can play without an account, and saving points or prizes asks a parent/guardian (18+) to sign up
+      with THEIR details (crm.js gate reasons "kidplay" / "kidprize").
    SCORING (fine-grained so ties are rare): Orders (30 per item, 20 per special request) + Speed (continuous, from the
    moment the party sits, to 0.1 s, plus a tier bonus) + Quality (continuous per cooked item, max at perfect doneness)
    + Streak multiplier (consecutive perfect, fast plates) + Group bonus (whole table served within 10 s) + Tips (speed,
@@ -159,9 +167,27 @@
     4: { fry: ["catfish", "tenderz", "chicken", "shrimp"], baskets: 3, irons: 2, skil: ["egg", "bacon"], bins: ["syrup", "butter", "peach", "cheese", "berriez", "whip", "sauce", "hot", "ttoast", "ftoast", "fgritz", "dip", "kiki", "oj"], mods: 0.45, drink: 0.35 }
   };
   function U(L) { return UNLOCK[Math.min(4, L)]; }
-  function lvParams(L) {   // difficulty ramp
-    return { arrive: Math.max(4, 12 - 1.9 * (L - 1)), pat: Math.max(20, 58 - 8 * (L - 1)), extra: 10 };
+  // KID mode per-level pacing. pat = base patience (s) for a table, plus `extra` s per extra guest; arrive = s between
+  // parties (±1.5 s); cook = cook-time multiplier (bigger = slower = easier to hit perfect); fresh = warming-tray multiplier.
+  var KID_PACE = {
+    1: { pat: 120, arrive: 18, cook: 1.35, fresh: 1.5 },
+    2: { pat: 95, arrive: 14, cook: 1.15, fresh: 1.25 },
+    3: { pat: 75, arrive: 11, cook: 1, fresh: 1 },
+    4: { pat: 55, arrive: 8, cook: 1, fresh: 1 },
+    5: { pat: 40, arrive: 6, cook: 1, fresh: 1 }
+  };
+  function lvParams(L) {
+    if (MODE !== "kid") {   // ADULT: the original fast pacing, unchanged (60 s speed window = 10/15/20/30 s tiers)
+      return { arrive: Math.max(4, 12 - 1.9 * (L - 1)), pat: Math.max(20, 58 - 8 * (L - 1)), extra: 10, cook: 1, fresh: 1, win: 60 };
+    }
+    var p = KID_PACE[Math.min(5, L)], over = Math.max(0, L - 5);   // past level 5: a little tighter each level
+    var pat = Math.max(28, p.pat - 3 * over);
+    return { pat: pat, arrive: Math.max(4.5, p.arrive - 0.3 * over), extra: 10, cook: p.cook, fresh: p.fresh, win: pat * 0.55 };
   }
+  // who's playing: "kid" | "adult" | "" (not picked yet). Stored on this phone only; no age is ever asked or stored.
+  var MODE = (function () { try { return localStorage.getItem("gnw-mode") || ""; } catch (e) { return ""; } })();
+  function setMode(m) { MODE = m === "kid" ? "kid" : "adult"; try { localStorage.setItem("gnw-mode", MODE); } catch (e) {} hud(); best(); }
+  function modeBadge() { return MODE === "kid" ? "🧒 Kid" : "🧑 Adult"; }
   var LEVEL_MS = 90000, MAX_WALK = 3;
 
   /* ================= GUESTS (60 sprites, img/game/guests/<id>.webp) ================= */
@@ -391,7 +417,7 @@
   function later(ms, fn) { og.timers.push({ at: og.now + ms, fn: fn }); }
 
   function resetLevelState() {
-    var u = U(og.level);
+    var u = U(og.level); og.pace = lvParams(og.level);
     og.fry = []; for (var i = 0; i < u.baskets; i++) og.fry.push(null);
     og.iron = []; for (i = 0; i < u.irons; i++) og.iron.push(null);
     og.skil = [null, null]; og.pot = { stir: 1 };
@@ -460,9 +486,9 @@
     if (!og.running || og.pause) return false;
     var u = U(og.level); if (st === "fry" && u.fry.indexOf(k) < 0) return false; if (st === "skil" && u.skil.indexOf(k) < 0) return false;
     var i = og[st].indexOf(null); if (i < 0) { flash(st === "fry" ? "Fryer's full!" : "Skillet's full!"); return false; }
-    og[st][i] = { k: k, el: 0, T: ITEMS[k].T }; sfx("drop"); setTimeout(function () { sfx("sizzle"); }, 120); drawStations(); return true;
+    og[st][i] = { k: k, el: 0, T: ITEMS[k].T * og.pace.cook }; sfx("drop"); setTimeout(function () { sfx("sizzle"); }, 120); drawStations(); return true;
   }
-  function pour(i) { if (og.iron[i]) return false; og.iron[i] = { k: "waffle", el: 0, T: ITEMS.waffle.T }; sfx("pour"); drawStations(); return true; }
+  function pour(i) { if (og.iron[i]) return false; og.iron[i] = { k: "waffle", el: 0, T: ITEMS.waffle.T * og.pace.cook }; sfx("pour"); drawStations(); return true; }
   function pull(st, i) {
     if (!og.running || og.pause) return false;
     var s = og[st][i]; if (!s) { if (st === "iron") return pour(i); return false; }
@@ -470,7 +496,7 @@
     if (d < 0.7) { og[st][i] = null; addPts("penalty", -30); popAt(el, "Undercooked! −30", "#ff8a7a"); flash("❌ Too early: undercooked", "#ff8a7a"); sfx("bad"); drawStations(); hud(); return "raw"; }
     if (og.tray.length >= 6) { flash("Warming tray is full!"); return false; }
     og[st][i] = null;
-    var q = quality(d), it = { k: s.k, d: d, q: q, perfect: perfectD(d), fresh: ITEMS[s.k].fresh, max: ITEMS[s.k].fresh };
+    var q = quality(d), it = { k: s.k, d: d, q: q, perfect: perfectD(d), fresh: ITEMS[s.k].fresh * og.pace.fresh, max: ITEMS[s.k].fresh * og.pace.fresh };
     og.tray.push(it); if (it.perfect) { og.perfect++; popAt(el, "Perfect ✨", "#7dffb5"); } else popAt(el, dlab(d), d > 1.12 ? "#ffb27a" : "#fff");
     if (d >= 1.45) og.burnt++;
     sfx(it.perfect ? "ding" : "pop"); drawStations(); drawTray(); return it;
@@ -625,7 +651,8 @@
   function deliver(tb, gi) {
     var g = tb.guests[gi], o = g.order, t = Math.round((og.now - tb.seatedAt) / 100) / 10;
     var items = 30 * o.r.length + 20 * (o.add.length + o.no.length);
-    var speed = Math.round(100 * Math.pow(Math.max(0, 1 - t / 60), 1.3)) + (t <= 10 ? 50 : t <= 15 ? 35 : t <= 20 ? 20 : t <= 30 ? 8 : 0);
+    var w = og.pace.win, speed = Math.round(100 * Math.pow(Math.max(0, 1 - t / w), 1.3)) + (t <= w / 6 ? 50 : t <= w / 4 ? 35 : t <= w / 3 ? 20 : t <= w / 2 ? 8 : 0);
+    g.win = w;
     var qp = 0, qs = [], allPerf = true;
     og.plate.forEach(function (p) {
       if (p.pot) { qp += Math.round(20 * p.q); qs.push(p.q); return; }
@@ -634,7 +661,7 @@
       qp += Math.round(40 * qf) + (p.perfect ? 15 : 0); if (qf < 0.8) allPerf = false; if (p.d >= 1.45) g.burnt = true;
     });
     g.q = qs.length ? qs.reduce(function (a, b) { return a + b; }, 0) / qs.length : 1;
-    if (allPerf && t <= 20) og.streak++; else og.streak = 0;
+    if (allPerf && t <= w / 3) og.streak++; else og.streak = 0;
     og.best = Math.max(og.best, og.streak);
     var mult = 1 + Math.min(og.streak, 5) * 0.2, stk = Math.round((items + speed + qp) * (mult - 1));
     addPts("orders", items); addPts("speed", speed); addPts("quality", qp); if (stk) addPts("streak", stk);
@@ -679,7 +706,7 @@
     if (tb.state === "eat" && tb.guests.every(function (x) { return x.arrived; })) later(3500, function () { leave(tb); });
   }
   function tipFor(g) {
-    var sF = Math.max(0, 1 - g.t / 45), qF = g.q, mF = g.mood || 0;
+    var sF = Math.max(0, 1 - g.t / ((g.win || 60) * 0.75)), qF = g.q, mF = g.mood || 0;
     var w = { chill: [4, 4, 2, 1], generous: [5, 5, 3, 1.5], picky: [2, 7, 2, 0.9], hurry: [7, 2, 2, 1] }[g.per] || [4, 4, 2, 1];
     var tip = (2 + w[0] * sF + w[1] * qF + w[2] * mF) * w[3];
     if (g.burnt) tip *= g.per === "picky" ? 0 : 0.35;
@@ -729,7 +756,7 @@
     if (og.sim) go(); else setTimeout(go, 3600);
     hud();
   }
-  function nextTease(L) { return L === 2 ? "shrimp, 2nd waffle iron, special requests, friends & moms with kids" : L === 3 ? "the skillet (eggs + bacon), 3rd fry basket, families" : L === 4 ? "loaded plates, the church group, bigger parties" : "faster guests, less patience, VIP picky eaters"; }
+  function nextTease(L) { return (L === 2 ? "shrimp, 2nd waffle iron, special requests, friends & moms with kids" : L === 3 ? "the skillet (eggs + bacon), 3rd fry basket, families" : L === 4 ? "loaded plates, the church group, bigger parties" : "VIP picky eaters") + " · guests get a little less patient and come in faster"; }
   function sparkles(host, n) { for (var i = 0; i < n; i++) { var s = D.createElement("span"); s.className = "spk"; s.textContent = pick(["✨", "⭐", "💛", "✨"]); s.style.left = "50%"; s.style.top = "40%"; s.style.setProperty("--dx", rnd(-80, 80) + "px"); s.style.setProperty("--dy", rnd(-70, 50) + "px"); s.style.animationDelay = (i * 0.06) + "s"; host.appendChild(s); setTimeout(function (x) { return function () { x.remove(); }; }(s), 1800); } }
 
   /* ================= LOOP ================= */
@@ -787,7 +814,7 @@
   function hud() {
     $("score").textContent = Math.round(og.score || 0).toLocaleString();
     var s = Math.ceil(Math.max(0, og.lt == null ? LEVEL_MS : og.lt) / 1000); $("time").textContent = Math.floor(s / 60) + ":" + ("0" + s % 60).slice(-2);
-    $("lvl").textContent = "Level " + (og.level || 1);
+    $("lvl").textContent = "Level " + (og.level || 1); var mb = $("mode"); if (mb) mb.textContent = MODE ? modeBadge() : "";
     var w = og.walk || 0, wx = ""; for (var i = 0; i < MAX_WALK; i++) wx += i < w ? "❌" : "⭕"; $("walk").textContent = wx; $("walk").setAttribute("aria-label", w + " of " + MAX_WALK + " walk-outs");
     $("combo").textContent = "×" + mult().toFixed(1).replace(/\.0$/, "");
   }
@@ -810,17 +837,24 @@
   function tvOff(now) { if (!tv) return; var t = tv; tv = null; if (now) { t.remove(); return; } t.classList.add("off"); setTimeout(function () { t.remove(); }, 450); }
 
   /* ================= END ================= */
-  function best() { try { var b = +localStorage.getItem("gnw-best2") || 0; var el = $("best"); if (el) el.textContent = "Your best: " + (b ? b.toLocaleString() + " pts" : "—"); return b; } catch (e) { return 0; } }
+  function bestKey(m) { return (m || MODE) === "kid" ? "gnw-best-kid" : "gnw-best2"; }
+  function best() {
+    try {
+      var a = +localStorage.getItem("gnw-best2") || 0, k = +localStorage.getItem("gnw-best-kid") || 0, el = $("best");
+      if (el) el.textContent = "Your best: 🧑 " + (a ? a.toLocaleString() : "—") + " · 🧒 " + (k ? k.toLocaleString() : "—");
+      return MODE === "kid" ? k : a;
+    } catch (e) { return 0; }
+  }
   best();
   function end(why) {
     if (!og.running) return;
     og.running = false; stopMusic(); tvOff(true); hud();
-    var b = best(); if (og.score > b) { try { localStorage.setItem("gnw-best2", Math.round(og.score)); } catch (e) {} } best();
+    var b = best(); if (og.score > b) { try { localStorage.setItem(bestKey(), Math.round(og.score)); } catch (e) {} } best();
     var B = og.bk, rows = [["⚡ Speed", B.speed], ["✨ Quality", B.quality], ["🧾 Orders", B.orders], ["💵 Tips", B.tips], ["🔥 Streaks", B.streak], ["👥 Whole tables", B.group], ["🏆 Level bonus", B.level], ["📺 Bonus", B.bonus], ["❌ Mistakes", B.penalty]];
     $("final").textContent = Math.round(og.score).toLocaleString() + " pts";
-    $("stats").textContent = "Reached level " + og.level + " · " + og.served + " plates · $" + og.tipsUsd.toFixed(2) + " in tips · " + og.perfect + " perfect cooks · best streak " + og.best;
+    $("stats").textContent = modeBadge() + " mode · reached level " + og.level + " · " + og.served + " plates · $" + og.tipsUsd.toFixed(2) + " in tips · " + og.perfect + " perfect cooks · best streak " + og.best;
     $("brk").innerHTML = rows.filter(function (r) { return r[1]; }).map(function (r) { return "<span>" + r[0] + "</span><b" + (r[1] < 0 ? ' class="neg"' : "") + ">" + (r[1] > 0 ? "+" : "") + r[1].toLocaleString() + "</b>"; }).join("");
-    var s = og.score, P = W.GNW_PRIZES || [[15000, "a Free Original Collard Green Dip"], [10000, "Free Fried Cheese Gritz"], [6500, "a Free side of Smackin' Mac"], [3500, "a Free Kiki Palmer"]], prize = "";
+    var s = og.score, P = (MODE === "kid" && W.GNW_PRIZES_KID) || W.GNW_PRIZES || [[15000, "a Free Original Collard Green Dip"], [10000, "Free Fried Cheese Gritz"], [6500, "a Free side of Smackin' Mac"], [3500, "a Free Kiki Palmer"]], prize = "";
     for (var i = 0; i < P.length; i++) if (s >= P[i][0]) { prize = P[i][1]; break; }
     $("rank").textContent = prize ? "🏆 You won " + prize : (why === "walk" ? "3 walk-outs: kitchen's closed!" : "Kitchen's closed!") + " Try again while you wait";
     var won = $("won"); won.style.display = "none";
@@ -832,8 +866,8 @@
         won.style.display = "block";
       };
       if (w.saved || !W.SSAI_GATE) showWin();
-      else { won.innerHTML = (w.blocked ? "🏆 You'd win " + prize + ", but you already have <b>" + w.prize.t + "</b> waiting." : "🏆 You won " + prize + "!") + "<br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">Save it to your Gritz N Wafflez Rewards to get your code.</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display = "block";
-        $("wsave").onclick = function () { W.SSAI_GATE("prize", showWin); }; }
+      else { won.innerHTML = (w.blocked ? "🏆 You'd win " + prize + ", but you already have <b>" + w.prize.t + "</b> waiting." : "🏆 You won " + prize + "!") + "<br><span style=\"font-weight:600;font-size:13px;color:#e8dcf5\">" + (MODE === "kid" ? "Ask a parent or guardian to save it to their Gritz N Wafflez Rewards." : "Save it to your Gritz N Wafflez Rewards to get your code.") + "</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display = "block";
+        $("wsave").onclick = function () { W.SSAI_GATE(MODE === "kid" ? "kidprize" : "prize", showWin); }; }
     }
     if (W.ReviewEgg && !og.sim) W.ReviewEgg.endCard($("over"), $("over").querySelector(".btns"));
     $("over").classList.add("on");
@@ -855,7 +889,7 @@
 
   /* ================= API (start menu, tests, bot) ================= */
   W.__OG = {
-    get: function () { return og; }, start: start, ITEMS: ITEMS, DISHES: DISHES, SERVERS: SERVERS, GUESTS: GU, theme: TH_ID, hair: HAIR,
+    get: function () { return og; }, start: start, mode: function () { return MODE; }, setMode: setMode, lvParams: lvParams, ITEMS: ITEMS, DISHES: DISHES, SERVERS: SERVERS, GUESTS: GU, theme: TH_ID, hair: HAIR,
     sim: function (on) { og.sim = !!on; }, step: function (ms) { var n = Math.ceil(ms / 50); for (var i = 0; i < n && og.running; i++) step(50); },
     render: render, drop: drop, pull: pull, pour: pour, stir: stir, scoop: scoop, fromTray: fromTray, bin: toggleBin, serve: serve, clear: clearPlate,
     levelUp: function () { og.lt = 1; }, jurniPop: function (k) { return jurniPop(k, true); }, end: end, quality: quality, U: U,

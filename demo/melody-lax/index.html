@@ -71,7 +71,7 @@ h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;le
 .seat button.on{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;border-color:var(--gold)}
 .seat .now{margin-top:10px;font-size:14px;color:var(--dim)}.seat .now b{color:var(--gold2)}
 /* menu */
-.chips{display:flex;gap:7px;overflow-x:auto;padding:8px 0 8px;position:sticky;top:0;background:var(--sky);z-index:6;scrollbar-width:none}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:8px 0 8px;border-right:86px solid var(--sky);position:sticky;top:0;background:var(--sky);z-index:6;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .chips a{flex:none;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--edge);border-radius:999px;padding:7px 13px;font-weight:700;font-size:14px}
 .cat{margin-top:20px;scroll-margin-top:56px}
@@ -133,12 +133,23 @@ h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;le
 /* flyover */
 #fly{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:30;overflow:hidden}
 #fly img{position:absolute;width:min(560px,120vw);height:auto;filter:drop-shadow(0 18px 18px #0006);will-change:transform}
+/* Nalu Vida cross-promo: the flyover tows a banner when the guest reaches the bottom of the page */
+#tow{position:fixed;left:0;top:0;z-index:31;display:flex;align-items:flex-start;will-change:transform;pointer-events:none}
+#tow.rt{flex-direction:row-reverse}
+#tow .rope{width:38px;height:2px;margin-top:22px;background:linear-gradient(90deg,#efe4c9cc,#efe4c977);flex:none}
+#tow a{pointer-events:auto;position:relative;display:block;text-decoration:none;color:#0b2a3a;flex:none;transform-origin:0 50%;animation:flut 1.1s ease-in-out infinite;-webkit-tap-highlight-color:transparent}
+#tow.rt a{transform-origin:100% 50%}
+#tow .flag{display:block;padding:6px 26px 7px 12px;background:linear-gradient(180deg,#fff8e6,#ffe7a8);border:1px solid #d4af37;clip-path:polygon(0 0,100% 0,calc(100% - 14px) 50%,100% 100%,0 100%);font:800 11px/1.15 Barlow,system-ui,sans-serif;letter-spacing:.02em;white-space:nowrap;box-shadow:0 6px 14px #0005}
+#tow .flag b{display:block;font:400 16px/1.1 Anton,Impact,sans-serif;letter-spacing:.04em;color:#0e6f8f}
+#tow svg{position:absolute;left:30px;top:100%;width:84px;height:40px;overflow:visible;transform-origin:42px 0;animation:swing 1.6s ease-in-out infinite}
+@keyframes flut{0%,100%{transform:skewY(0) rotate(0)}30%{transform:skewY(1.6deg) rotate(.6deg)}65%{transform:skewY(-1.2deg) rotate(-.5deg)}}
+@keyframes swing{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
 #fly .shadow{position:absolute;width:min(380px,90vw);height:60px;border-radius:50%;background:radial-gradient(closest-side,#0008,#0000);will-change:transform}
 .info{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 .card{background:var(--panel);border:1px solid var(--edge);border-radius:16px;padding:14px;font-size:14.5px}
 .card b{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
 footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-height:1.6;padding-bottom:20px}
-@media (prefers-reduced-motion:reduce){.media.hot .steam i,.drink .media.pouring img.full,.drink .media.pouring .stream{animation:none}#fly{display:none}}
+@media (prefers-reduced-motion:reduce){.media.hot .steam i,.drink .media.pouring img.full,.drink .media.pouring .stream{animation:none}#fly,#tow{display:none}}
 </style>
 </head>
 <body>
@@ -191,13 +202,9 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 </div>
 <div id="champs" data-game="melody" data-me="melody-board"></div><script src="../champs.js"></script>
 
-<div class="sister" style="max-width:520px;margin:14px auto;padding:12px 14px;border-radius:16px;display:flex;gap:12px;align-items:center;background:linear-gradient(120deg,#08203a,#0f3760);border:1px solid #1f5283;color:#fdf8ef">
-  <img src="../nalu-vida/img/logo.png" alt="Nalu Vida" style="width:58px;height:58px;flex:none">
-  <div style="font-size:14px;line-height:1.35"><b>Sister spot: Nalu Vida, Venice Pier 🌴</b><br>Ride the Nalu: surf the pier, win free food. Show your Melody rewards there for a perk.
-  <br><a href="../nalu-vida/?from=melody#play" style="display:inline-block;margin-top:6px;padding:7px 12px;border-radius:999px;background:#ff9a2e;color:#2b1200;font-weight:800;text-decoration:none">🏄 Surf over to Nalu Vida</a></div></div>
 <div id="fromnalu" style="display:none"></div>
 <script>(function(){ var q=new URLSearchParams(location.search); if(q.get("from")!=="nalu") return; var c=(q.get("deal")||"").replace(/[^A-Z0-9-]/gi,"").slice(0,16);
-  var d=document.createElement("div"); d.style.cssText="position:fixed;left:12px;right:12px;top:12px;z-index:90;max-width:520px;margin:0 auto;padding:12px 14px;border-radius:14px;background:#0b1220;border:1px solid #f0d375;color:#fbf1de;box-shadow:0 10px 40px #000a;font:600 14px/1.4 system-ui";
+  var d=document.createElement("div"); d.style.cssText="position:fixed;left:12px;right:12px;top:calc(56px + env(safe-area-inset-top,0px));z-index:90;max-width:520px;margin:0 auto;padding:12px 14px;border-radius:14px;background:#0b1220;border:1px solid #f0d375;color:#fbf1de;box-shadow:0 10px 40px #000a;font:600 14px/1.4 system-ui";
   d.innerHTML="✈️ <b>Welcome from Nalu Vida!</b> Show this at Melody for <b>$3 off any drink</b>"+(c?"<div style='font:900 20px ui-monospace,Menlo,monospace;color:#f0d375;letter-spacing:.1em;margin-top:4px'>"+c+"</div>":"")+"<div style='font-size:12px;opacity:.8'>9132 S Sepulveda Blvd · good for 3 days · tap to close</div>";
   d.onclick=function(){ d.remove(); }; document.body.appendChild(d); })();</script>
 <h2 id="seat"><small>Order from your phone</small>Where are you sitting?</h2>
@@ -241,6 +248,12 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
   <div class="card"><b>Happy hour &amp; specials</b>Happy hour 3–6 daily<br>Mon: half off burgers 11–3<br>Tue: $3 tacos &amp; $6 margaritas<br>Thu: half off sandwiches 11–3<br>Fri: $3 sliders 11–3</div>
   <div class="card"><b>Every week</b>Karaoke · live bands · DJs · trivia · every game on the TVs</div>
 </div>
+
+<!-- Nalu Vida cross-promo lives down here: Melody first, the sister spot only once they have seen the whole app -->
+<div class="sister" style="max-width:520px;margin:22px auto 0;padding:12px 14px;border-radius:16px;display:flex;gap:12px;align-items:center;background:linear-gradient(120deg,#08203a,#0f3760);border:1px solid #1f5283;color:#fdf8ef">
+  <img src="../nalu-vida/img/logo.png" alt="Nalu Vida" style="width:58px;height:58px;flex:none">
+  <div style="font-size:14px;line-height:1.35"><b>Sister spot: Nalu Vida, Venice Pier 🌴</b><br>Ride the Nalu: surf the pier, win free food. Show your Melody rewards there for a perk.
+  <br><a href="../nalu-vida/?from=melody#play" style="display:inline-block;margin-top:6px;padding:7px 12px;border-radius:999px;background:#ff9a2e;color:#2b1200;font-weight:800;text-decoration:none">🏄 Surf over to Nalu Vida</a></div></div>
 
 <footer>Melody Bar &amp; Grill · app by SousShift AI · food prices from Melody's menu · drink prices and menu photos are previews until Melody signs off</footer>
 </div>
@@ -440,18 +453,48 @@ function flyToBar(fromImg){ if(reduce||!fromImg) return; var r=fromImg.getBoundi
 
 /* ---------------- Melody flyover: a jet on final approach crosses the screen every ~20s ---------------- */
 var FLY=new Image(); FLY.src="img/game/flyover.webp";
-function flyover(){
-  if(reduce||document.hidden||G.running||!FLY.complete||!FLY.naturalWidth) return;
+var flying=0;
+function flyover(promo){
+  if(reduce||document.hidden||G.running||flying||!FLY.complete||!FLY.naturalWidth) return false;
+  flying=1;
   var box=$("fly"), im=FLY.cloneNode(), sh=document.createElement("div"); sh.className="shadow";
   box.appendChild(sh); box.appendChild(im);
   var vw=innerWidth, vh=innerHeight, w=Math.min(560,vw*1.2), y0=vh*(0.06+Math.random()*0.12), dir=Math.random()<.5?1:-1;
-    var dur=5200, t0=performance.now();
-  (function step(now){ var p=Math.min(1,(now-t0)/dur), e=p, x=dir>0?-w+(vw+w*1.4)*e:vw+w*0.4-(vw+w*1.4)*e, s=0.72+0.38*p, y=y0+vh*0.05*p;
+  var tow=null, tw=0, extra=0, dur=5200;
+  if(promo){ // banner rides behind the tail; slower pass so it can be read and tapped
+    tow=document.createElement("div"); tow.id="tow"; if(dir>0) tow.className="rt";
+    tow.innerHTML='<i class="rope"></i><a href="../nalu-vida/?from=melody" aria-label="Take a flight to Venice Beach: open Nalu Vida"><span class="flag">✈ Take a flight to Venice Beach<b>→ NALU VIDA 🏄</b></span>'+
+      '<svg viewBox="0 0 84 40" aria-hidden="true"><path d="M30 0 L22 16 M54 0 L62 16" stroke="#efe4c9" stroke-width="1.2" fill="none"/>'+
+      '<g transform="rotate(-6 42 24)"><ellipse cx="42" cy="24" rx="40" ry="8.5" fill="#ffd34d" stroke="#0b2a3a" stroke-width="1.4"/><path d="M4 24 Q42 19 80 24" stroke="#e8505b" stroke-width="2.4" fill="none"/><path d="M8 26 Q42 30 76 26" stroke="#1aa3c4" stroke-width="1.6" fill="none"/><path d="M74 28 l6 7 l-9 -3z" fill="#0b2a3a"/></g></svg></a>';
+    document.body.appendChild(tow); tw=tow.offsetWidth; extra=tw+40; dur=10500;
+  }
+  var t0=performance.now(), th=w*320/900;
+  (function step(now){ var p=Math.min(1,(now-t0)/dur), e=p, run=vw+w*1.4+extra, x=dir>0?-w-extra+run*e:vw+w*0.4-run*e, s=0.72+0.38*p, y=y0+vh*0.05*p;
     im.style.transform="translate("+x+"px,"+y+"px) scale("+(dir>0?-s:s)+","+s+") rotate(-3deg)";
     sh.style.transform="translate("+(x+w*0.12)+"px,"+(y+vh*0.55)+"px) scale("+s+")"; sh.style.opacity=(0.5*Math.sin(p*Math.PI)).toFixed(2);
-    if(p<1) requestAnimationFrame(step); else { im.remove(); sh.remove(); } })(t0);
+    if(tow){ // tail cone sits ~47% of the width right of centre in the (left-facing) art, a little below centre
+      var tx=x+w/2+(dir>0?-1:1)*w*0.47*s, ty=y+th/2+th*0.1*s-22;
+      tow.style.transform="translate("+(dir>0?tx-tw:tx)+"px,"+ty+"px)"; }
+    if(p<1) requestAnimationFrame(step); else { im.remove(); sh.remove(); if(tow) tow.remove(); flying=0; } })(t0);
+  return true;
 }
 setTimeout(flyover,4000); setInterval(flyover,20000);
+
+/* the Nalu Vida banner flight only happens once the guest has scrolled down to the bottom of the page; at most twice a visit */
+var promoN=0, promoLast=-1e9, promoT=0;
+try{ promoN=+sessionStorage.getItem("melodyNaluTow")||0; }catch(e){}
+function nearBottom(){ var d=document.documentElement, max=d.scrollHeight-innerHeight; if(max<=0) return false;
+  var f=document.querySelector("footer"), fr=f&&f.getBoundingClientRect();
+  return scrollY/max>=0.8||(fr&&fr.top<innerHeight); }
+function tryPromo(){
+  if(promoT||promoN>=2||document.readyState!=="complete"||scrollY<400||!nearBottom()||performance.now()-promoLast<45000) return;
+  promoT=setTimeout(function go(){
+    if(!nearBottom()){ promoT=0; return; }
+    if(!flyover(true)){ promoT=setTimeout(go,1500); return; }
+    promoT=0; promoN++; promoLast=performance.now(); try{ sessionStorage.setItem("melodyNaluTow",promoN); }catch(e){}
+  },2500);
+}
+addEventListener("scroll",tryPromo,{passive:true}); addEventListener("load",tryPromo);
 
 /* ======================= GAME: Melody Approach ======================= */
 var cv=$("cv"), cx=cv.getContext("2d"), W=400, H=600, DPR=Math.min(2,window.devicePixelRatio||1);

@@ -373,7 +373,7 @@
     ".din .door2.open .gls{transform:perspective(150px) rotateY(72deg)}",
     ".din .spill{position:absolute;left:18px;bottom:0;width:120px;height:62px;z-index:1;pointer-events:none;opacity:0;transition:opacity .35s;background:radial-gradient(ellipse at 0 100%,#fff6dcdd,#fff1c855 42%,#0000 72%)}.din.dopen .spill{opacity:1}",
     // host stand + "Please wait to be seated" sign by the door
-    ".din .host{position:absolute;left:32px;bottom:1px;width:15px;height:21px;z-index:5;pointer-events:none;border-radius:2px 2px 1px 1px;background:linear-gradient(90deg,#3a2414,#6d4527 45%,#4a2e1a);box-shadow:inset 0 2px 0 #d9a21b,2px 3px 4px #0007}",
+    ".din .host{position:absolute;left:100px;bottom:1px;width:15px;height:21px;z-index:5;pointer-events:none;border-radius:2px 2px 1px 1px;background:linear-gradient(90deg,#3a2414,#6d4527 45%,#4a2e1a);box-shadow:inset 0 2px 0 #d9a21b,2px 3px 4px #0007}",
     ".din .host:after{content:'';position:absolute;left:-2px;right:-2px;bottom:-3px;height:5px;background:radial-gradient(closest-side,#0009,#0000)}",
     ".din .host b{position:absolute;left:50%;bottom:22px;width:22px;margin-left:-11px;padding:1px 0;background:#fffdf6;border:1px solid #c9a44c;border-radius:1px;font:900 3.3px/3.6px var(--body);color:#1f2f58;text-align:center;box-shadow:0 1px 2px #0006}",
     ".din .host b:after{content:'';position:absolute;left:50%;top:100%;width:1px;height:3px;background:#c9a44c}",
@@ -399,7 +399,7 @@
     // tables: white top on gold legs; guests SEATED (lower body hidden behind the table edge)
     ".tb{position:absolute;transform:translate(-50%,-100%);width:var(--w);height:58px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}",
     ".tb .gs{position:absolute;left:0;right:0;bottom:3px;height:40px;display:flex;justify-content:center;gap:0;pointer-events:none}",
-    ".tb .gq{position:relative;width:24px;height:40px;overflow:visible;transition:transform .5s cubic-bezier(.34,1.4,.64,1),opacity .4s;transform:translateY(10px);opacity:0}",
+    ".tb .gq{position:relative;width:20px;height:40px;overflow:visible;transition:transform .5s cubic-bezier(.34,1.4,.64,1),opacity .4s;transform:translateY(10px);opacity:0}",
     ".tb .gq.in{transform:none;opacity:1}.tb .gq.out{transform:translateX(-90px);opacity:0;transition:transform 1.1s ease-in,opacity 1.1s}",
     ".tb .gq .im{position:absolute;left:-5px;right:-5px;top:0;height:40px;overflow:hidden}.tb .gq img.p{width:100%;height:auto;display:block}",
     ".tb .gq .ch{position:absolute;left:-2px;right:-2px;top:12px;height:30px;border-radius:9px 9px 3px 3px;z-index:-1;background:radial-gradient(ellipse 70% 45% at 38% 22%,#e3a466,#0000),linear-gradient(90deg,#6e3b1b,#a8642f 22%,#b9743b 50%,#8e5126 80%,#5f3216);box-shadow:inset 0 1px 1px #f6c99288,inset 0 -5px 5px #0006,0 2px 3px #0007}",
@@ -416,7 +416,8 @@
     ".tb .tt:before,.tb .tt:after{content:'';position:absolute;top:16px;width:2.5px;height:8px;border-radius:0 0 1px 1px;background:linear-gradient(90deg,#6e5018,#f6e3a1 45%,#c19a45 70%,#7a5a1c)}.tb .tt:before{left:5px}.tb .tt:after{right:5px}",
     ".tb .cs{position:absolute;left:4%;right:4%;bottom:-3px;height:9px;border-radius:50%;background:radial-gradient(closest-side,#000b,#0000);z-index:0;pointer-events:none}",
     ".tb .gq:after{content:'';position:absolute;left:-2px;right:-2px;bottom:-4px;height:6px;border-radius:50%;background:radial-gradient(closest-side,#0008,#0000);z-index:-2}",
-    ".tb.c2 .tt{width:50px}.tb.c4 .tt{width:98px}",
+    ".tb.c2 .tt{width:44px}.tb.c4 .tt{width:80px}",
+    ".tb.r2 .tt{height:11px}.tb.r2 .tt:before,.tb.r2 .tt:after{top:11px}.tb.r2 .tn{bottom:13px}",   // front row: slim top at the bottom edge
     ".tb .tt img{width:14px;height:14px;border-radius:50%;object-fit:cover;border:2px solid #111;box-shadow:0 1px 2px #0006;margin-top:-6px}",
     ".tb .tn{position:absolute;left:-4px;bottom:16px;font:900 8px var(--body);color:#fff;background:#3B1F5C;border-radius:99px;padding:1px 5px;z-index:4}",
     ".tb .pb{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:40px;height:3px;border-radius:3px;background:#0005;overflow:hidden;z-index:3;display:none}.tb.wait .pb{display:block}.tb .pb i{display:block;height:100%;background:#3fbf6f}",
@@ -614,9 +615,10 @@
     var streaks = ""; for (var i = 0; i < 16; i++) streaks += '<rect x="' + (i * 2.5) + '" y="0" width="' + (0.6 + (i * 7) % 3 * 0.5) + '" height="40" fill="' + (i % 3 ? "#f1d98f" : "#9c7a33") + '" opacity="' + (0.35 + (i * 13) % 5 * 0.1) + '"/>';
     return '<svg class="mural" viewBox="0 0 384 64" preserveAspectRatio="xMinYMid slice" aria-hidden="true"><defs><pattern id="gf" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#c9a44c"/>' + streaks + '</pattern></defs>' + h + '</svg>';
   }
+  function TW(cap) { return cap === 4 ? 84 : 48; }   // table widths (4-top / 2-top)
   var TABLES = [
-    { id: 1, cap: 2, x: 0.29, y: 0.68, row: 1 }, { id: 2, cap: 4, x: 0.5, y: 0.68, row: 1 }, { id: 3, cap: 2, x: 0.74, y: 0.68, row: 1 },
-    { id: 4, cap: 4, x: 0.385, y: 0.985, row: 2 }, { id: 5, cap: 2, x: 0.7, y: 0.985, row: 2 }
+    { id: 1, cap: 2, x: 0.425, y: 0.68, row: 1 }, { id: 2, cap: 4, x: 0.602, y: 0.68, row: 1 }, { id: 3, cap: 2, x: 0.754, y: 0.68, row: 1 },
+    { id: 4, cap: 4, x: 0.494, y: 1.04, row: 2 }, { id: 5, cap: 2, x: 0.719, y: 1.04, row: 2 }
   ];
   var ou = $("ou"); ou.className = "ou2" + (TH_ID ? " th-" + TH_ID : "");
   var REVIEW = W.REVIEW_EGG || {}, RVURL = (W.ReviewEgg && W.ReviewEgg.url) || (REVIEW.vid ? "https://www.youtube.com/watch?v=" + REVIEW.vid : "https://www.youtube.com/@therealantidote");
@@ -631,7 +633,7 @@
     '<button type="button" class="poster" id="poster" aria-label="Antidote\'s food review: watch on YouTube"><span class="fr"><span class="mt"><img src="img/review/poster.webp" alt="Antidote eating at Gritz N Wafflez"><i class="pl"></i><span class="cap"><span>@therealantidote <em>· my review</em></span></span></span></span><i class="gl"></i></button>' +
     (TH_ID === "halloween" ? hallowDecor() : "") +
     (TH.lights ? '<div class="lights"></div>' : "") + (TH.decor ? '<div class="decor">' + TH.decor.join("") + "</div>" : "") +
-    TABLES.map(function (t) { return '<div class="tb c' + t.cap + ' r' + t.row + '" id="tb' + t.id + '" data-tb="' + t.id + '" style="left:' + t.x * 100 + '%;top:' + t.y * 100 + '%;--w:' + (t.cap === 4 ? 112 : 60) + 'px" role="button" aria-label="Table ' + t.id + '"><i class="cs"></i><div class="gs"></div><div class="tt"></div><div class="pb"><i></i></div><div class="dirt">🍽️</div><span class="tn">' + t.id + '</span><div class="flash"></div></div>'; }).join("") +
+    TABLES.map(function (t) { return '<div class="tb c' + t.cap + ' r' + t.row + '" id="tb' + t.id + '" data-tb="' + t.id + '" style="left:' + t.x * 100 + '%;top:' + t.y * 100 + '%;--w:' + TW(t.cap) + 'px" role="button" aria-label="Table ' + t.id + '"><i class="cs"></i><div class="gs"></div><div class="tt"></div><div class="pb"><i></i></div><div class="dirt">🍽️</div><span class="tn">' + t.id + '</span><div class="flash"></div></div>'; }).join("") +
     '<div class="jfl" id="jfl"></div><div class="vig"></div><div class="lvb" id="lvb"><h3></h3><p></p></div><div class="cut" id="cut"></div><div class="shortp" id="shortp">🔥 Kitchen\'s short-staffed</div></div>' + '<div class="howc" id="howc" role="dialog" aria-label="How to cook"></div>' +
     '<div class="pass" id="pass"><span class="lbl">PASS</span></div>' +
     '<div class="rail" id="rail"></div>' +
@@ -916,7 +918,9 @@
       if (w.fade != null) { w.fade -= dt; if (w.fade <= 0) { w.fade = null; var c = w.cb; w.cb = null; if (c) c(w); } return; }
       if (!w.pts.length) return;
       if (w.delay > 0) { w.delay -= dt; return; }
-      var t = w.pts[0], dx = t.x - w.x, dy = t.y - w.y, d = Math.sqrt(dx * dx + dy * dy), v = w.v * dt / 1000;
+      var t = w.pts[0];
+      if (((w.x < 0 && t.x >= 0) || (w.x > 32 && t.x <= 32)) && WK.some(function (o) { return o !== w && !o.dead && o.x > -4 && o.x < 32 && (o.pts.length || o.fade != null); })) return;   // doorway busy: wait
+      var dx = t.x - w.x, dy = t.y - w.y, d = Math.sqrt(dx * dx + dy * dy), v = w.v * dt / 1000;
       if (Math.abs(dx) > 0.5) w.face = dx > 0 ? 1 : -1;
       if (d <= v) { w.x = t.x; w.y = t.y; w.pts.shift(); } else { w.x += dx / d * v; w.y += dy / d * v; }
       if (!w.pts.length) { w.el.classList.remove("mv"); var cb = w.cb; w.cb = null; if (cb) cb(w); }
@@ -925,10 +929,11 @@
     WK = WK.filter(function (w) { return !w.dead; });
   }
   function wkClear() { WK.forEach(function (w) { if (w.el) w.el.remove(); }); WK = []; og.queue = []; (og.tables || []).forEach(function (t) { t.comingIds = null; }); }
-  function doorPt() { return { x: 15, y: dsz().h - 5 }; }
-  function outPt() { return { x: -16, y: dsz().h - 6 }; }   // the sidewalk, just outside the doorway (clipped by the room)
+  // guests use the upper lane through the doorway (y = aisle), so they pass BEHIND Jurni holding the door at the front, never through her
+  function doorPt() { return { x: 14, y: NAV_AY }; }
+  function outPt() { return { x: -28, y: NAV_AY }; }   // the sidewalk, just outside the doorway (fully clipped by the room)
   function aisleY() { return Math.round(dsz().h * 0.75); }
-  function seatPt(tb, i, n) { var s = dsz(); return { x: tb.def.x * s.w + (i - (n - 1) / 2) * 24, y: tb.def.y * s.h - (tb.def.row === 2 ? 9 : 5) }; }
+  function seatPt(tb, i, n) { var s = dsz(); return { x: tb.def.x * s.w + (i - (n - 1) / 2) * 20, y: tb.def.y * s.h - (tb.def.row === 2 ? 9 : 5) }; }
   function pathTo(tb, i, n, from) { return route(from || doorPt(), aislePt(seatPt(tb, i, n).x)); }   // door/line → around the furniture → the aisle by their seat, then they sit
   function walkTime(pts, x, y, v) { var t = 0; pts.forEach(function (q) { t += Math.sqrt((q.x - x) * (q.x - x) + (q.y - y) * (q.y - y)); x = q.x; y = q.y; }); return t / v * 1000; }
   // a party walks to its table (from the door, or from its spot in line), then sits: seat() starts the patience clock
@@ -948,7 +953,7 @@
     if (q) q.wk.forEach(function (w) { if (!w.dead) wkGone(w); });
   }
   // two places by the host stand; a third party waits just outside the door (the line spills onto the sidewalk) and walks in when it moves up
-  function lineSpot(k) { var h = dsz().h; return [{ x: 63, y: h - 2 }, { x: 52, y: h - 14 }][k] || outPt(); }
+  function lineSpot(k) { var h = dsz().h; return [{ x: 82, y: h - 3 }, { x: 68, y: h - 18 }][k] || outPt(); }   // beside the host stand, clear of Jurni at the door
   function joinLine() {   // every table is taken: a new party lines up by the host stand (max 3 parties, one per arrival interval)
     og.queue = og.queue || []; if (og.queue.length >= QMAX || og.now < (og.qNextAt || 0) || og.lt <= 6000) return;
     var p = lvParams(og.level), party = makeParty(og.level, 4); if (!party.ids.length) return;
@@ -1308,16 +1313,16 @@
      gaps between the front-row tables (gap 1 = the kitchen door at the pass edge), never on a table, the banquette or
      the bar. Waypoint graph + line-of-sight edges + Dijkstra, computed only when someone starts a walk. */
   var NAV_AY = 131;   // aisle feet line: in front of the back row, just behind the front-row guests (they hide her legs)
-  function tRect(t) { var s = dsz(), hw = (t.cap === 4 ? 112 : 60) / 2, cx = t.x * s.w, by = t.y * s.h; return { l: cx - hw, r: cx + hw, t: by - 23, b: by + 3 }; }
+  function tRect(t) { var s = dsz(), hw = TW(t.cap) / 2, cx = t.x * s.w, by = t.y * s.h; return { l: cx - hw, r: cx + hw, t: by - 23, b: by + 3 }; }
   function furniture() {   // feet must never be inside these (also the test's rects)
     var s = dsz(), out = TABLES.map(function (t) { var r = tRect(t); r.k = "table" + t.id; return r; });
     out.push({ l: 32, r: s.w - 58, t: 79, b: 107, k: "banquette" }, { l: s.w - 58, r: s.w, t: 22, b: s.h + 50, k: "bar" });
     return out;
   }
-  function obstacles() { var s = dsz(), o = furniture(); o.push({ l: 30, r: 49, t: s.h - 24, b: s.h + 50, k: "host" }); return o; }
+  function obstacles() { var s = dsz(), o = furniture(); o.push({ l: 98, r: 117, t: s.h - 24, b: s.h + 50, k: "host" }); return o; }
   function navNodes() {
     var s = dsz(), R = TABLES.map(tRect), g1 = (R[3].r + R[4].l) / 2, g2 = Math.min((R[4].r + s.w - 58) / 2, s.w - 63), gy = Math.round((R[3].t + R[3].b) / 2);
-    return { DOOR: { x: 20, y: s.h - 8 }, DUP: { x: 22, y: 129 }, LA: { x: 57, y: NAV_AY }, LB: { x: Math.min(61, R[3].l - 9), y: gy }, A1: { x: g1, y: NAV_AY }, A2: { x: g2, y: NAV_AY }, G1: { x: g1, y: gy }, K: { x: g1, y: s.h - 1 }, G2: { x: g2, y: gy } };
+    return { DOOR: { x: 34, y: s.h - 8 }, DUP: { x: 30, y: NAV_AY + 8 }, LA: { x: 52, y: NAV_AY }, LB: { x: 56, y: s.h - 10 }, A1: { x: g1, y: NAV_AY }, A2: { x: g2, y: NAV_AY }, G1: { x: g1, y: gy }, K: { x: g1, y: s.h - 1 }, G2: { x: g2, y: gy } };
   }
   function blocked(x, y, O) { for (var i = 0; i < O.length; i++) { var r = O[i]; if (x > r.l - 2 && x < r.r + 2 && y > r.t - 2 && y < r.b + 2) return true; } return false; }
   function los(a, b, O) { var d = Math.hypot(b.x - a.x, b.y - a.y), n = Math.max(1, Math.ceil(d / 2)); for (var i = 1; i < n; i++) { var u = i / n; if (blocked(a.x + (b.x - a.x) * u, a.y + (b.y - a.y) * u, O)) return false; } return true; }
@@ -1339,12 +1344,13 @@
   function depth(y) { var h = dsz().h; return 0.82 + 0.18 * clamp((y - (NAV_AY - 6)) / (h - NAV_AY + 6), 0, 1); }
   function zAt(y) { return y < NAV_AY + 10 ? 5 : 7; }
   function aislePt(x) { var N = navNodes(); return { x: clamp(x, N.LA.x, N.A2.x), y: NAV_AY }; }
-  function sideSpots(tb) { var N = navNodes(); return tb.id === 4 ? [N.LB, N.G1] : tb.id === 5 ? [N.G1, N.G2] : null; }
+  // front row sits on the bottom edge: plates go in / checks happen from the aisle behind them, or from the gaps beside them
+  function sideSpots(tb) { var N = navNodes(), s = dsz(), x = tb.def.x * s.w, hw = TW(tb.cap) / 2; return tb.id === 4 ? [aislePt(x - hw * 0.5), aislePt(x + hw * 0.5), N.G1] : tb.id === 5 ? [aislePt(x), N.G1, N.G2] : null; }
   function nearest(list, x) { return list.slice().sort(function (a, b) { return Math.abs(a.x - x) - Math.abs(b.x - x); })[0]; }
   function edgeSpot(tb, x) { var sd = sideSpots(tb); return sd ? nearest(sd, x) : aislePt(x); }   // where a plate is handed over, from the floor side
-  function checkSpot(tb) { var sd = sideSpots(tb), s = dsz(), hw = (tb.cap === 4 ? 112 : 60) / 2; return sd ? pick(sd) : aislePt(tb.def.x * s.w + (Math.random() < 0.5 ? -1 : 1) * hw * 0.55); }
+  function checkSpot(tb) { var sd = sideSpots(tb), s = dsz(), hw = TW(tb.cap) / 2; return sd ? pick(sd) : aislePt(tb.def.x * s.w + (Math.random() < 0.5 ? -1 : 1) * hw * 0.55); }
   function danceSpot() { var N = navNodes(); return Math.random() < 0.7 ? aislePt(N.LA.x + 30 + Math.random() * (N.A2.x - N.LA.x - 50)) : N.G1; }
-  function doorSpots() { var N = navNodes(); return [{ x: 22, y: dsz().h - 10 }, N.DUP, { x: 24, y: 142 }, N.LA, N.LB]; }
+  function doorSpots() { var h = dsz().h; return [{ x: 34, y: h - 8 }, { x: 30, y: h - 22 }]; }   // by the door, never on the line or host-stand spots
 
   /* ================= LEVELS ================= */
   function levelUp() {

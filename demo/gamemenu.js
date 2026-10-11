@@ -21,6 +21,10 @@
                                     through the member-account check (Phase 1: free for members) or costs tokens (Phase 2);
                                     the start screen shows the status / token balance, a 🎡 free daily spin button and, in
                                     Phase 2, 🪙 Get tokens; How to play / Points panels list the token + spin rules.
+     modes:{title:"Who's playing?", options:[["kid","🧒","Kid","12 & under · slower timers"],["adult","🧑","Adult","Regular speed"]],
+            get:function(){ return "kid"|"adult"|"" }, set:function(v){}}
+                                    two big buttons above PLAY; PLAY waits until one is picked (the game remembers it).
+                                    With tokens:true the pick is passed on (kid mode never asks the child for contact info).
    Audio convention (games that have sound expose it; the menu wires to it):
      window.GAME_AUDIO={ music:function(on){}, sfx:function(on){}, state:function(){ return {hasMusic:true,hasSfx:true,music:true,sfx:true}; } }
      music(false) must silence ONLY the music (gain 0 / pause the <audio>), never suspend the shared AudioContext.
@@ -119,6 +123,11 @@
     "html.gm-up .ssai-pausebtn{display:none!important}" +
     ".gm-tok{margin:0;font:700 13.5px/1.3 var(--gm-body);color:var(--gm-ink);background:var(--gm-soft);border:1px solid var(--gm-edge);border-radius:999px;padding:7px 14px;max-width:310px}.gm-tok b{color:var(--gm-label);font-size:16px}" +
     ".gm-play.lock{filter:grayscale(.55) brightness(.85);animation:none}" +
+    ".gm-who{width:min(300px,100%)}.gm-who p{margin:0 0 5px;font:800 12px/1 var(--gm-body);letter-spacing:.14em;text-transform:uppercase;color:var(--gm-label)}" +
+    ".gm-wb{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gm-wb button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:62px;padding:6px;border-radius:16px;border:2px solid var(--gm-edge);background:var(--gm-card);color:var(--gm-ink);font:900 17px/1.1 var(--gm-body);cursor:pointer;touch-action:manipulation}" +
+    ".gm-wb button i{font-style:normal;font-size:24px;line-height:1}.gm-wb button small{font:700 11px/1.2 var(--gm-body);color:var(--gm-dim)}.gm-wb button[aria-pressed=true]{border-color:var(--gm-acc2);background:color-mix(in srgb,var(--gm-acc) 30%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--gm-acc2) 40%,transparent)}" +
+    ".gm-who.need{animation:gmShake .45s}@keyframes gmShake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}" +
+    ".gm-ov.hasmodes .gm-tag{display:none}.gm-ov.hasmodes .gm-hero{height:46px}.gm-ov.hasmodes .gm-hero img{height:42px}" +
     "@media (prefers-reduced-motion:reduce){.gm-hero img,.gm-play{animation:none}}";
   D.head.appendChild(st);
 
@@ -135,8 +144,10 @@
     if (C.by) h += '<p class="gm-by notranslate">' + esc(C.by) + "</p>";
     h += '<div class="gm-t notranslate" role="heading" aria-level="2">' + esc(C.name || "Play") + "</div>";
     if (C.tagline) h += '<p class="gm-tag">' + esc(T(C.tagline)) + "</p>";
-    var tk = TK();
-    if (tk) { try { h += '<p class="gm-tok" aria-live="polite">' + tk.statusHTML() + "</p>"; } catch (e) {} }
+    var tk = TK(), M = C.modes, cur = M ? (function () { try { return M.get() || ""; } catch (e) { return ""; } })() : "";
+    if (M) h += '<div class="gm-who" role="group" aria-label="' + esc(T(M.title || "Who's playing?")) + '"><p>' + esc(T(M.title || "Who's playing?")) + '</p><div class="gm-wb">' +
+      M.options.map(function (o) { return '<button type="button" data-gm="mode" data-v="' + esc(o[0]) + '" aria-pressed="' + (cur === o[0]) + '"><i>' + o[1] + "</i>" + esc(T(o[2])) + "<small>" + esc(T(o[3])) + "</small></button>"; }).join("") + "</div></div>";
+    if (tk) { try { h += '<p class="gm-tok" aria-live="polite">' + tk.statusHTML(cur === "kid") + "</p>"; } catch (e) {} }
     h += '<button type="button" class="gm-play' + (tk && tk.locked() ? " lock" : "") + '" data-gm="play"><b></b>' + esc(T(tk ? tk.playLabel() : "PLAY")) + "</button>";
     var bs = [];
     if (tk && tk.spin) bs.push('<button type="button" class="gm-b" data-gm="spin"><i>🎡</i>' + esc(T(tk.spinReady() ? "Free daily spin" : "Spun today ✓")) + "</button>");
@@ -161,7 +172,7 @@
     box = q(C.box) || (mount.closest && mount.closest(".gamebox")) || mount.parentNode;
     if (getComputedStyle(box).position === "static") box.style.position = "relative";
     ov = el("div", "gm-ov"); ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", (C.name || "Game") + " start menu");
-    ov.innerHTML = menuHTML(); box.appendChild(ov);
+    ov.innerHTML = menuHTML(); if (C.modes) ov.classList.add("hasmodes"); box.appendChild(ov);
     ov.addEventListener("click", onBtn);
     place();
     if (W.ResizeObserver) new ResizeObserver(place).observe(box); W.addEventListener("resize", place);
@@ -178,6 +189,7 @@
     if (a === "play") play();
     else if (a === "music") setMusic(!S.music);
     else if (a === "pclose") closeSheet();
+    else if (a === "mode") { try { C.modes.set(b.getAttribute("data-v")); } catch (x) {} if (ov && opened) ov.innerHTML = menuHTML(); }
     else if (a === "spin") { closeSheet(); if (TK()) TK().openSpin(); }
     else if (a === "tokens") { closeSheet(); if (TK()) TK().openTokens(); }
     else if (a === "sw") toggle(b.getAttribute("data-k"));
@@ -186,7 +198,9 @@
   }
   function play() {
     closeSheet();
-    var tk = TK(); if (tk) { tk.play(go); return; }   // account check (Phase 1) / token cost (Phase 2) first
+    var M = C.modes, cur = "";
+    if (M) { try { cur = M.get() || ""; } catch (x) {} if (!cur) { var w = ov.querySelector(".gm-who"); if (w) { w.classList.remove("need"); void w.offsetWidth; w.classList.add("need"); } return; } }
+    var tk = TK(); if (tk) { tk.play(go, { kid: cur === "kid" }); return; }   // account check (Phase 1) / token cost (Phase 2) first
     go();
   }
   function go() {

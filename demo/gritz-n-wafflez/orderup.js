@@ -362,16 +362,23 @@
     ".din .host b{position:absolute;left:50%;bottom:22px;width:22px;margin-left:-11px;padding:1px 0;background:#fffdf6;border:1px solid #c9a44c;border-radius:1px;font:900 3.3px/3.6px var(--body);color:#1f2f58;text-align:center;box-shadow:0 1px 2px #0006}",
     ".din .host b:after{content:'';position:absolute;left:50%;top:100%;width:1px;height:3px;background:#c9a44c}",
     // wall branding: wordmark, menu board, Antidote's review banner
-    ".din .wm{position:absolute;left:42%;top:24px;transform:translateX(-50%);z-index:2;background:#ffffffee;border-radius:3px;padding:2px 7px;font:900 9px/1.1 var(--serif);color:#1f2f58;letter-spacing:.04em;box-shadow:0 2px 4px #0004;white-space:nowrap}",
+    ".din .wm{position:absolute;left:46%;top:24px;transform:translateX(-50%);z-index:2;background:#ffffffee;border-radius:3px;padding:2px 7px;font:900 9px/1.1 var(--serif);color:#1f2f58;letter-spacing:.04em;box-shadow:0 2px 4px #0004;white-space:nowrap}",
     ".din .wm i{font-style:italic;color:#c9a44c}",
     ".din .mb{position:absolute;right:61px;top:23px;width:74px;z-index:2;background:#1c1c1e;border:2px solid #c99b62;border-radius:3px;padding:3px 4px;font:800 5.6px/1.25 var(--body);color:#f4efe2;box-shadow:0 3px 6px #0006;padding:2px 4px}",
     ".din .mb b{display:inline;color:#F2C14E;font-size:6px;letter-spacing:.06em;margin-right:2px}",
-    ".din .poster{position:absolute;left:37px;top:26px;width:54px;z-index:4;border:0;padding:3px 3px 4px;background:#1d4ed8;border-radius:3px;cursor:pointer;transform:perspective(300px) rotateY(9deg);transform-origin:0 50%;box-shadow:4px 5px 8px #0007,inset 0 0 0 1px #9cc0ff;touch-action:manipulation;-webkit-tap-highlight-color:transparent}",
-    ".din .poster img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:1px}",
-    ".din .poster b{display:block;margin-top:2px;font:900 5.6px/1 var(--body);letter-spacing:-.15px;color:#FFD23F;text-align:left;white-space:nowrap}",
-    ".din .poster small{display:block;font:700 5px/1.15 var(--body);color:#dbe6ff;text-align:left;white-space:nowrap}",
-    ".din .poster .pl{position:absolute;left:50%;top:13px;width:14px;height:10px;margin-left:-7px;border-radius:3px;background:#e3262f;box-shadow:0 1px 3px #0008}",
-    ".din .poster .pl:after{content:'';position:absolute;left:5px;top:2.5px;border-left:5px solid #fff;border-top:2.5px solid transparent;border-bottom:2.5px solid transparent}",
+    // Antidote's review poster, plastered on the wall: thin black frame + gold line, white mat, the WHOLE 16:9 cover
+    // (sized exactly, object-fit contain: never cropped), caption on a strip BELOW the picture, a small ▶ badge in the corner,
+    // a soft drop shadow onto the mural, a glossy sheen and the room's light, tilted with the receding wall
+    ".din .poster{position:absolute;left:34px;top:22px;width:64px;z-index:4;border:0;padding:0;background:none;cursor:pointer;transform:perspective(320px) rotateY(-8deg);transform-origin:100% 50%;touch-action:manipulation;-webkit-tap-highlight-color:transparent}",
+    ".din .poster .fr{display:block;padding:1.5px;background:linear-gradient(135deg,#2a2a2e,#0b0b0d 45%,#26262a);border-radius:1.5px;box-shadow:3px 4px 5px #0008,6px 9px 12px #0004,inset 0 0 0 .5px #c9a44c}",
+    ".din .poster .mt{position:relative;display:block;padding:2.5px 2.5px 0;background:linear-gradient(180deg,#fbf8f1,#ece6d8);box-shadow:inset 0 0 0 .5px #c9a44c}",
+    ".din .poster img{display:block;width:56px;height:auto;aspect-ratio:16/9;object-fit:contain;background:#05122e;box-shadow:0 0 0 .5px #0006}",
+    ".din .poster .cap{display:block;margin:1px -2.5px 0;padding:1.2px 0 1.3px;background:#0b2a6b;text-align:center;white-space:nowrap;font:900 4px/1 var(--body);letter-spacing:-.02em;color:#FFD23F;overflow:hidden}",
+    ".din .poster .cap>span{display:inline-block;transform:scaleX(.8);transform-origin:50% 50%;margin:0 -12%}",
+    ".din .poster .cap em{font-style:normal;color:#dbe6ff;font-weight:700}",
+    ".din .poster .pl{position:absolute;right:3.5px;top:26.5px;width:7px;height:5px;border-radius:1.5px;background:#e3262f;box-shadow:0 .5px 1px #0008}",
+    ".din .poster .pl:after{content:'';position:absolute;left:2.6px;top:1.2px;border-left:2.4px solid #fff;border-top:1.3px solid transparent;border-bottom:1.3px solid transparent}",
+    ".din .poster .gl{position:absolute;inset:0;pointer-events:none;background:linear-gradient(118deg,#ffffff00 20%,#ffffff40 34%,#ffffff00 46%),linear-gradient(180deg,#fff3d61f,#0000 40%,#00000022)}",
     ".din .poster.glint:before{content:'';position:absolute;inset:0;background:linear-gradient(110deg,#0000 30%,#fff9 50%,#0000 70%) -100% 0/250% 100%;animation:glint 1.2s ease-in-out 2;pointer-events:none}@keyframes glint{to{background-position:150% 0}}",
     // tables: white top on gold legs; guests SEATED (lower body hidden behind the table edge)
     ".tb{position:absolute;transform:translate(-50%,-100%);width:var(--w);height:58px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}",
@@ -423,6 +430,9 @@
     ".wk .tg.mad{background:#ffd9d4;color:#8a1c12}",
     ".wk .ph2{position:absolute;right:-2px;top:13px;font-size:7px;line-height:1}",
     ".wk .tgo{position:absolute;left:-5px;top:20px;font-size:9px;line-height:1}",
+    ".wk .rx{position:absolute;left:50%;top:-15px;transform:translateX(-50%);font-size:10px;line-height:1;background:#fff;border-radius:99px;padding:1.5px 3px;box-shadow:0 1px 3px #0006}",
+    ".wk .pu{position:absolute;left:-4px;top:2px;font-size:9px;line-height:1;transform:rotate(-20deg)}",
+    ".wk.clap img{animation:clp .22s ease-in-out 6 alternate}@keyframes clp{to{transform:translateY(-2px) scale(1.03,.97)}}",
     // kitchen message slot (over the plate-name column, never over the dining floor): flash messages + Jurni's lines
     ".line{position:relative}",
     ".kmsg{position:absolute;left:78px;right:102px;top:6px;min-height:58px;display:grid;place-items:center;text-align:center;pointer-events:none;z-index:11;border-radius:12px;padding:4px 7px;opacity:0}",
@@ -575,7 +585,7 @@
     '<div class="host" aria-hidden="true"><b>PLEASE WAIT<br>TO BE SEATED</b></div>' +
     '<div class="wm">Gritz <i>N</i> Wafflez</div>' +
     '<div class="mb"><b>TODAY</b>Peach Cobbler Waffle<br>🎤 GNW Karaoke Wed 6–10</div>' +
-    '<button type="button" class="poster" id="poster" aria-label="Antidote\'s food review: watch on YouTube"><img src="' + esc(REVIEW.img || "img/review/cover.webp") + '" alt=""><i class="pl"></i><b>@therealantidote</b><small>watch my review</small></button>' +
+    '<button type="button" class="poster" id="poster" aria-label="Antidote\'s food review: watch on YouTube"><span class="fr"><span class="mt"><img src="' + esc(REVIEW.img || "img/review/cover.webp") + '" alt=""><i class="pl"></i><span class="cap"><span>@therealantidote <em>· watch my review</em></span></span></span></span><i class="gl"></i></button>' +
     (TH.fx ? '<div class="fxl ' + TH.kind + '">' + TH.fx.concat(TH.fx).map(function (f, i) {
       var s = TH.kind === "float" ? "top:" + (8 + (i * 23) % 70) + "%;left:-20px;animation-duration:" + (14 + (i * 5) % 9) + "s;animation-delay:-" + (i * 2.7) + "s;font-size:" + (12 + (i * 3) % 7) + "px"
         : TH.kind === "burst" ? "top:" + (6 + (i * 29) % 40) + "%;left:" + (8 + (i * 37) % 84) + "%;animation-duration:2.4s;animation-delay:-" + (i * 0.6) + "s;font-size:20px"
@@ -902,11 +912,35 @@
         cb: function (w) { w.el.classList.add("q"); } }));
     });
   }
-  function layoutLine() {   // everyone in line shuffles up a spot
-    (og.queue || []).forEach(function (q, k) { var sp = lineSpot(k); q.wk.forEach(function (w, j) { if (w.dead) return; wkMove(w, route(w, { x: sp.x + j * 7, y: sp.y - j * 2 }), { cb: function (x) { x.el.classList.add("q"); } }); }); });
+  function layoutLine() {   // everyone in line shuffles up a spot (a poster-watcher comes back to the new spot when done)
+    (og.queue || []).forEach(function (q, k) { var sp = lineSpot(k); q.wk.forEach(function (w, j) { if (w.dead || w.watching) return; wkMove(w, route(w, { x: sp.x + j * 7, y: sp.y - j * 2 }), { cb: function (x) { x.el.classList.add("q"); } }); }); });
+  }
+  // Every 15–25 s while people wait, ONE guest in line steps out, walks the floor to the aisle end right under Antidote's
+  // poster, points up + laughs 😂, claps 👏, then walks back to their spot. They keep their place in the queue; if their table
+  // frees up meanwhile, walkIn() starts them from wherever they are. Reduced motion: just a 👏 bubble in place.
+  function posterSpot() { var N = navNodes(); return { x: N.LA.x + 20, y: NAV_AY }; }   // right under the poster, clear of the line spots
+  function rxSet(w, emo, hand) { if (!w || w.dead) return; var o = w.el.querySelector(".rx"), h = w.el.querySelector(".pu"); if (o) o.remove(); if (h) h.remove(); if (emo) w.el.insertAdjacentHTML("beforeend", '<span class="rx">' + emo + "</span>"); if (hand) w.el.insertAdjacentHTML("beforeend", '<span class="pu">👆</span>'); }
+  function posterWatch() {
+    var cand = []; (og.queue || []).forEach(function (q) { q.wk.forEach(function (w) { if (!w.dead && !w.pts.length && w.fade == null) cand.push({ q: q, w: w }); }); });
+    if (!cand.length) return false;
+    var c = pick(cand), w = c.w, q = c.q; og.pw = w; w.watching = true;
+    var back = function () {
+      rxSet(w, "", false); w.el.classList.remove("clap"); if (w.dead) { og.pw = null; return; }
+      var k = og.queue.indexOf(q), j = q.wk.indexOf(w); if (k < 0 || j < 0) { w.watching = false; og.pw = null; return; }
+      var sp = lineSpot(k); wkMove(w, route(w, { x: sp.x + j * 7, y: sp.y - j * 2 }), { cb: function (x) { x.watching = false; x.el.classList.add("q"); og.pw = null; } });
+    };
+    if (RM) { rxSet(w, "👏", false); later(1600, function () { rxSet(w, "", false); w.watching = false; og.pw = null; }); return true; }
+    wkMove(w, route(w, posterSpot()), { cb: function () {
+      if (w.dead) { og.pw = null; return; } w.face = -1; wkPlace(w); rxSet(w, "😂", true);
+      later(1500, function () { if (w.dead || !w.watching) { og.pw = null; return; } rxSet(w, "👏", false); w.el.classList.add("clap"); });
+      later(2900, function () { if (w.dead || !w.watching) { og.pw = null; return; } back(); });
+    } });
+    return true;
   }
   function lineStep() {   // a party that waits too long gives up and leaves (flavor only: NOT a walk-out, no penalty, no pacing change)
-    if (!og.queue || !og.queue.length) return;
+    if (!og.queue || !og.queue.length) { og.pwNext = 0; return; }
+    if (!og.pwNext) og.pwNext = og.now + 15000 + Math.random() * 10000;
+    if ((!og.pw || og.pw.dead) && og.now >= og.pwNext) { og.pw = null; if (posterWatch()) og.pwNext = og.now + 15000 + Math.random() * 10000; else og.pwNext = og.now + 2000; }
     var gone = [];
     og.queue.forEach(function (q) {
       var left = q.until - og.now, tg = q.wk[0] && q.wk[0].el.querySelector(".tg");
@@ -915,7 +949,7 @@
     });
     gone.forEach(function (q) {
       og.queue.splice(og.queue.indexOf(q), 1); og.lost = (og.lost || 0) + 1;
-      q.wk.forEach(function (w, j) { if (!w.dead) wkMove(w, route(w, doorPt()), { v: 120, delay: j * 200, cb: wkGone }); });
+      q.wk.forEach(function (w, j) { if (!w.dead) { if (w.watching) { w.watching = false; og.pw = null; rxSet(w, "", false); w.el.classList.remove("clap"); } wkMove(w, route(w, doorPt()), { v: 120, delay: j * 200, cb: wkGone }); } });
       doorOpen(1700);
     });
     if (gone.length) layoutLine();
@@ -1175,7 +1209,7 @@
   }
   function jDance() {
     var sp = danceSpot(); J.mode = "dance"; J.dancedAt = og.now;
-    jGo(sp.x, sp.y, "walk", function () { J.face = 1; jPose("tip", 2300); if (J.el) { J.el.classList.remove("dz"); void J.el.offsetWidth; J.el.classList.add("dz"); } later(2300, function () { if (J.el) J.el.classList.remove("dz"); }); jRest(2600); });
+    jGo(sp.x, sp.y, "walk", function () { J.face = 1; ["door", "walkA", "door", "walkB", "door", "walkA", "door", "walkB"].forEach(function (f, i) { later(i * 280, function () { if (J.mode === "dance" && !J.task) jPose(f, 320); }); }); if (J.el) { J.el.classList.remove("dz"); void J.el.offsetWidth; J.el.classList.add("dz"); } later(2300, function () { if (J.el) J.el.classList.remove("dz"); }); jRest(2600); });
   }
   function jKitchen() {   // steps through the kitchen door at the pass, then comes back out
     var k = navNodes().K; J.mode = "kitchen";
@@ -1474,7 +1508,7 @@
     levelUp: function () { og.lt = 1; }, jPose: function (p, ms, b) { jPose(p, ms || 1500, b); }, jGoodbye: jGoodbye, jDeliverTest: function (id) { var tb = og.tables[id - 1]; jDeliver(tb, 0, DISHES[2]); }, end: end, openPoster: openPoster,
     jurni: function () { return { x: J.x, y: J.y, inK: !!J.inK, mode: J.mode, task: !!J.task }; }, furniture: furniture, route: route, navNodes: navNodes,
     people: function () { return [{ k: "jurni", x: J.x, y: J.y, hid: !!J.inK }].concat(og.trips.filter(function (t) { return t.x != null && t.y <= dsz().h; }).map(function (t) { return { k: "server", x: t.x, y: t.y }; }), WK.filter(function (w) { return !w.dead; }).map(function (w) { return { k: "guest", x: w.x, y: w.y }; })); },
-    jCheck: function (id) { jCheck(og.tables[id - 1]); }, jDance: function () { jDance(); }, jKitchen: function () { jKitchen(); }, jDoor: function () { jDoorIdle(); },
+    jCheck: function (id) { jCheck(og.tables[id - 1]); }, posterWatchNow: function () { og.pwNext = og.now; og.pw = null; }, pw: function () { return og.pw ? { x: og.pw.x, y: og.pw.y, rx: (og.pw.el.querySelector(".rx") || {}).textContent || "" } : null; }, jDance: function () { jDance(); }, jKitchen: function () { jKitchen(); }, jDoor: function () { jDoorIdle(); },
     seatTest: function (ids, tableId) { var tb = og.tables[tableId - 1]; seat(tb, { ids: ids, kind: "test" }); }
   };
   $("startov").addEventListener("click", function () { if (W.GameMenu) W.GameMenu.open(); else start(); });

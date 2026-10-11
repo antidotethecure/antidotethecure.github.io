@@ -87,6 +87,30 @@ h2{font:var(--h2w,800) 19px/1.2 var(--display);margin:26px 0 8px;color:var(--h2)
 .warn{margin-top:8px}
 .thr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:700;font-size:15px}
 .addrow{display:flex;gap:8px;margin-top:8px}.addrow button{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--accent);background:transparent;color:var(--ink);font:700 14px var(--body);cursor:pointer}
+
+/* ===== "What the app does for you" impact calculator (CFG.impact) ===== */
+#impact .card{padding:14px}
+.imp-in{display:grid;grid-template-columns:1fr;gap:10px;margin-top:6px}
+.imp-f label{display:flex;justify-content:space-between;gap:8px;font-weight:700;font-size:14.5px}
+.imp-f label b{color:var(--accent);white-space:nowrap}
+.imp-f .hint{margin-top:0}
+.imp-f input[type=range]{width:100%;margin:6px 0 0;accent-color:var(--accent);height:30px}
+.imp-out{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.imp-s{background:var(--chip);border:1px solid var(--edge);border-radius:12px;padding:10px;min-width:0}
+.imp-s b{display:block;font:900 22px/1.1 var(--display);color:var(--ink)}
+.imp-s span{display:block;font-size:12.5px;color:var(--dim);margin-top:3px}
+.imp-s.big{grid-column:1/-1;background:var(--accentBg,var(--accent));border-color:var(--accent)}
+.imp-s.big b,.imp-s.big span{color:var(--accentInk)}.imp-s.big b{font-size:30px}
+.imp-bars{position:relative;display:flex;align-items:flex-end;gap:4px;height:120px;margin-top:12px;padding:0 2px;border-bottom:1px solid var(--edge)}
+.imp-bars i{flex:1;opacity:.92;background:var(--accent);border-radius:4px 4px 0 0;min-height:2px;position:relative}
+.imp-bars i.fee{background:transparent}
+.imp-axis{display:flex;gap:4px;font-size:10.5px;color:var(--dim);margin-top:3px}.imp-axis span{flex:1;text-align:center}
+.imp-lg{font-size:12.5px;color:var(--dim);margin-top:6px}
+.imp-blast{margin-top:12px}
+.imp-be{margin-top:14px;border:2px solid var(--accent);border-radius:14px;padding:12px 14px;background:var(--chip)}
+.imp-be b.n{display:block;font:900 26px/1.1 var(--display);color:var(--accent)}
+.imp-be p{margin:4px 0 0;font-size:14px}
+.imp-safe{margin-top:12px}.imp-safe ul{margin:6px 0 0;padding-left:18px}.imp-safe li{margin:5px 0;font-size:14px}
 .badge{border:1px solid #D9A21B}.gnw{display:inline-block;padding:14px 22px 12px;border:2px solid #D9A21B;border-radius:20px;background:#FFFDF7;box-shadow:0 0 0 5px #FBF4E4,0 0 0 6px #E6D6AE,0 14px 32px #3b1f5c22}.gnw .nm{font:900 clamp(30px,10vw,44px)/.95 "Playfair Display",Georgia,serif;color:#3B1F5C}.gnw .nm i{font-style:italic;color:#D9A21B;font-weight:700;font-size:.7em}.gnw .gtag{font:400 22px/1 Yellowtail,cursive;color:#D9A21B;margin-top:6px}.gnw .gtag span{color:#1E1B3A}
 </style></head><body><main>
 <header class="hero"><div class="logo"><div class="gnw" role="img" aria-label="Gritz N Wafflez"><div class="nm">Gritz <i>N</i> Wafflez</div><div class="gtag">Texas Flava <span>·</span> Southern Hospitality</div></div></div>
@@ -94,12 +118,13 @@ h2{font:var(--h2w,800) 19px/1.2 var(--display);margin:26px 0 8px;color:var(--h2)
 </header>
 <p class="sub" id="intro"></p>
 <p class="note">Your taps save on this phone, so you can stop and come back anytime.</p>
+<section id="impact"></section>
 <div id="app"></div>
 <p class="prog" id="saved"></p>
 </main>
 <div class="bar"><button id="send" type="button">✅ Send to Antidote</button></div>
 <script>
-var CFG={"slug":"gritz-n-wafflez","name":"Gritz N Wafflez","short":"Gritz N Wafflez","owner":"Jurni","badge":"Woman-owned business","alcohol":false,"avgCheck":25,"giveawayDefault":"$100","drawDays":["Sunday after close","Monday","Wednesday at karaoke"],"rewards":{"welcome":["Free Kiki Palmer","Free Fried Cheese Gritz","$5 off","10% off the order"],"points":[250,450,700,1100],"t1":["Free Kiki Palmer","Free side of Smackin' Mac","$3 off"],"t2":["Free side of Smackin' Mac","Free Fried Cheese Gritz","$5 off"],"t3":["Free Original Collard Green Dip","Free Celestial Eggs","$8 off"],"t4":["Free N' Wafflez plate","Free N' Gritz plate","$15 off"],"stars":["Free N' Wafflez plate","Free Original Collard Green Dip","$10 off"],"referIn":["Free Original Collard Green Dip","+100 bonus points when their friend visits","$5 off","Nothing"],"referFriend":["Free Kiki Palmer","+50 bonus points when they join","$5 off","Nothing"],"bday":["Free Peach Cobbler Waffle","Free Original Collard Green Dip","Free N' Wafflez plate","20% off the order"],"missed":["10% off","Free Kiki Palmer","Free Fried Cheese Gritz"],"winback":["Free Kiki Palmer","10% off","$5 off","Don't send"],"playwin":["Free Kiki Palmer","Free Fried Cheese Gritz","$3 off"]},"drawPrizes":["Free Kiki Palmer","Free side of Smackin' Mac","Free Fried Cheese Gritz","Free Classic French Toast"],"game":{"name":"Order Up!","prizes":[[13500,["Free Kiki Palmer","Free Fresh Squeezed Lemonade","$2 off"]],[22000,["Free side of Smackin' Mac","Free Collard Greens","$3 off"]],[32000,["Free Fried Cheese Gritz","Free Fried Green Tomatoes","$5 off"]],[46500,["Free Original Collard Green Dip","Free Celestial Eggs","$8 off"]]],"champ":["Free Wingz N' Wafflez + a karaoke shoutout","Free N' Wafflez plate","$20 off"],"kidPrizes":[[9500,["Free Fresh Squeezed OJ","Free Kiki Palmer","Free Fresh Squeezed Lemonade"]],[11000,["Free side of French Friez","Free side of Homestyle Potatoes","Free side of Collard Greens"]],[12750,["Free Sweet Gritz","Free Cheese Gritz","Free Plain Gritz"]],[13250,["Free Chocolate Chip Waffle","Free Cinnamon Roll Waffle","Free Sweet Vanilla Bean Waffle"]]]},"specialsTitle":"What's on at Gritz N Wafflez: still the same?","specials":[["s_kara","GNW Karaoke every Wednesday 6–10 PM"],["s_hours","Open daily 9 AM–3 PM"],["s_valet","First 15 minutes of valet free"]],"phone":[["k","Last order taken at?",["2:30 PM","2:45 PM","3 PM"]],["resv","Reservations?",["Walk-ins only","Call us","Big groups only, call"]],["wait","Weekend wait time to tell callers?",["Under 15 min","15–30 min","30–45 min","Varies, just come"]],["cater","Catering or big party orders?",["Yes, call a day ahead","Yes, call 3 days ahead","No catering"]],["deliv","Delivery?",["DoorDash / Uber Eats","Toast online ordering, pickup","Both"]],["kara","Karaoke night: food served too?",["Yes, full menu","Limited menu","Drinks & snacks only"]]],"drinksTitle":"Drinks in the app","menu":{"drinks":[{"name":"Don't Be Thirsty","items":[["Kiki Palmer (lemonade/tea)",null,null,false],["Fresh Squeezed OJ",null,null,false],["Fresh Squeezed Lemonade",null,null,false],["Iced Tea (sweet/unsweet)",null,null,false],["Hot Coffee (reg, van, carm)",null,null,false],["Iced Coffee (reg, van, carm)",null,null,false],["Coke Product",null,null,false]]}],"food":[{"name":"Let's Get Started","items":[["Original Collard Green Dip",null,null,false],["Fried Green Tomatoes",null,null,false],["Celestial Eggs",null,null,false],["Spicy Fried Pickles",null,null,false],["Fried Cheese Gritz",null,null,false]]},{"name":"N' Gritz","items":[["Shrimp N' Gritz",null,null,false],["Tenderz N' Gritz",null,null,false],["Catfish N' Gritz",null,null,false],["Wingz N' Gritz",null,null,false]]},{"name":"N' Wafflez","items":[["Wingz N' Wafflez",null,null,false],["Tenderz N' Wafflez",null,null,false],["Catfish N' Wafflez",null,null,false],["Shrimp N' Wafflez",null,null,false]]},{"name":"Break Your Fast","items":[["BET+ Breakfast Plate",null,null,false],["Da Baddest Chick Sandwich",null,null,false],["French Toast Sandwich/Plate",null,null,false],["BET Breakfast Plate",null,null,false],["Waffle Sandwich/Plate",null,null,false],["Cinnatoast Sandwich/Plate",null,null,false],["Breakfast Quesadilla",null,null,false],["Breakfast Scramble",null,null,false]]},{"name":"Feelin' Toasty???","items":[["Crunchy Cinnamon Toast",null,null,false],["Classic French Toast",null,null,false]]},{"name":"Just Wafflez","items":[["Peach Cobbler Waffle",null,null,false],["Peach Cobbler",null,null,false],["Mixed Berry",null,null,false],["Sweet Vanilla Bean",null,null,false],["Cinnamon Roll",null,null,false],["Chocolate Chip",null,null,false],["Cheddar Herb",null,null,false],["Bacon Cheddar",null,null,false]]},{"name":"Basketz, Platez N' Sammiez","items":[["Tender Basket/Plate",null,null,false],["Shrimp Basket/Plate",null,null,false],["Wing Basket/Plate",null,null,false],["Catfish Basket/Plate",null,null,false]]},{"name":"Just Gritz","items":[["Plain Gritz",null,null,false],["Cheese Gritz",null,null,false],["Sweet Gritz",null,null,false],["Fried Cheese Gritz",null,null,false],["Fried Sweet Gritz",null,null,false]]},{"name":"Sidez","items":[["Smackin' Mac",null,null,false],["Collard Greens",null,null,false],["Who Made The Potato Salad",null,null,false],["Homestyle Potatoes",null,null,false],["French Friez",null,null,false]]}]},"menuNote":"Your website doesn't list prices, so Antidote will get them from you or your online order page. Switch off anything you don't serve anymore.","ambient":["steam"],"holidays":[{"id":"halloween","holiday":"halloween","title":"Spooky Sweet Waffle","desc":"Chocolate Chip waffle + Fried Sweet Gritz, a treat with no tricks.","item":"Chocolate Chip","start":"10-20","end":"10-31","code":"BOO"},{"id":"thanksgiving","holiday":"thanksgiving","title":"Thanksgiving Soul Plate","desc":"Catfish N' Gritz with Collard Greens and Smackin' Mac.","item":"Catfish N' Gritz","start":"11-20","end":"11-28"},{"id":"christmas","holiday":"christmas","title":"Holiday Cobbler Waffle","desc":"Peach Cobbler Waffle with a Hot Coffee (reg, van or carm).","item":"Peach Cobbler Waffle","start":"12-15","end":"12-25"},{"id":"newyear","holiday":"newyear","title":"New Year's Luck Plate","desc":"Shrimp N' Gritz with Collard Greens for a lucky new year.","item":"Shrimp N' Gritz","start":"12-29","end":"01-01"},{"id":"valentines","holiday":"valentines","title":"Sweetheart Wafflez for Two","desc":"Wingz N' Wafflez + a Mixed Berry waffle to share.","item":"Wingz N' Wafflez","start":"02-07","end":"02-14"},{"id":"stpatricks","holiday":"stpatricks","title":"Lucky Green Start","desc":"Original Collard Green Dip + Fried Green Tomatoes.","item":"Original Collard Green Dip","start":"03-14","end":"03-17"},{"id":"cinco","holiday":"cinco","title":"Brunch Fiesta","desc":"Breakfast Quesadilla with Homestyle Potatoes and a Kiki Palmer.","item":"Breakfast Quesadilla","start":"05-01","end":"05-05"},{"id":"july4","holiday":"july4","title":"Red, White & Blue Waffle","desc":"Mixed Berry waffle with a Fresh Squeezed Lemonade.","item":"Mixed Berry","start":"07-01","end":"07-04"}]};
+var CFG={"slug":"gritz-n-wafflez","name":"Gritz N Wafflez","short":"Gritz N Wafflez","owner":"Jurni","badge":"Woman-owned business","alcohol":false,"avgCheck":25,"giveawayDefault":"$100","drawDays":["Sunday after close","Monday","Wednesday at karaoke"],"rewards":{"welcome":["Free Kiki Palmer","Free Fried Cheese Gritz","$5 off","10% off the order"],"points":[250,450,700,1100],"t1":["Free Kiki Palmer","Free side of Smackin' Mac","$3 off"],"t2":["Free side of Smackin' Mac","Free Fried Cheese Gritz","$5 off"],"t3":["Free Original Collard Green Dip","Free Celestial Eggs","$8 off"],"t4":["Free N' Wafflez plate","Free N' Gritz plate","$15 off"],"stars":["Free N' Wafflez plate","Free Original Collard Green Dip","$10 off"],"referIn":["Free Original Collard Green Dip","+100 bonus points when their friend visits","$5 off","Nothing"],"referFriend":["Free Kiki Palmer","+50 bonus points when they join","$5 off","Nothing"],"bday":["Free Peach Cobbler Waffle","Free Original Collard Green Dip","Free N' Wafflez plate","20% off the order"],"missed":["10% off","Free Kiki Palmer","Free Fried Cheese Gritz"],"winback":["Free Kiki Palmer","10% off","$5 off","Don't send"],"playwin":["Free Kiki Palmer","Free Fried Cheese Gritz","$3 off"]},"drawPrizes":["Free Kiki Palmer","Free side of Smackin' Mac","Free Fried Cheese Gritz","Free Classic French Toast"],"game":{"name":"Order Up!","prizes":[[13500,["Free Kiki Palmer","Free Fresh Squeezed Lemonade","$2 off"]],[22000,["Free side of Smackin' Mac","Free Collard Greens","$3 off"]],[32000,["Free Fried Cheese Gritz","Free Fried Green Tomatoes","$5 off"]],[46500,["Free Original Collard Green Dip","Free Celestial Eggs","$8 off"]]],"champ":["Free Wingz N' Wafflez + a karaoke shoutout","Free N' Wafflez plate","$20 off"],"kidPrizes":[[9500,["Free Fresh Squeezed OJ","Free Kiki Palmer","Free Fresh Squeezed Lemonade"]],[11000,["Free side of French Friez","Free side of Homestyle Potatoes","Free side of Collard Greens"]],[12750,["Free Sweet Gritz","Free Cheese Gritz","Free Plain Gritz"]],[13250,["Free Chocolate Chip Waffle","Free Cinnamon Roll Waffle","Free Sweet Vanilla Bean Waffle"]]]},"specialsTitle":"What's on at Gritz N Wafflez: still the same?","specials":[["s_kara","GNW Karaoke every Wednesday 6–10 PM"],["s_hours","Open daily 9 AM–3 PM"],["s_valet","First 15 minutes of valet free"]],"phone":[["k","Last order taken at?",["2:30 PM","2:45 PM","3 PM"]],["resv","Reservations?",["Walk-ins only","Call us","Big groups only, call"]],["wait","Weekend wait time to tell callers?",["Under 15 min","15–30 min","30–45 min","Varies, just come"]],["cater","Catering or big party orders?",["Yes, call a day ahead","Yes, call 3 days ahead","No catering"]],["deliv","Delivery?",["DoorDash / Uber Eats","Toast online ordering, pickup","Both"]],["kara","Karaoke night: food served too?",["Yes, full menu","Limited menu","Drinks & snacks only"]]],"drinksTitle":"Drinks in the app","menu":{"drinks":[{"name":"Don't Be Thirsty","items":[["Kiki Palmer (lemonade/tea)",null,null,false],["Fresh Squeezed OJ",null,null,false],["Fresh Squeezed Lemonade",null,null,false],["Iced Tea (sweet/unsweet)",null,null,false],["Hot Coffee (reg, van, carm)",null,null,false],["Iced Coffee (reg, van, carm)",null,null,false],["Coke Product",null,null,false]]}],"food":[{"name":"Let's Get Started","items":[["Original Collard Green Dip",null,null,false],["Fried Green Tomatoes",null,null,false],["Celestial Eggs",null,null,false],["Spicy Fried Pickles",null,null,false],["Fried Cheese Gritz",null,null,false]]},{"name":"N' Gritz","items":[["Shrimp N' Gritz",null,null,false],["Tenderz N' Gritz",null,null,false],["Catfish N' Gritz",null,null,false],["Wingz N' Gritz",null,null,false]]},{"name":"N' Wafflez","items":[["Wingz N' Wafflez",null,null,false],["Tenderz N' Wafflez",null,null,false],["Catfish N' Wafflez",null,null,false],["Shrimp N' Wafflez",null,null,false]]},{"name":"Break Your Fast","items":[["BET+ Breakfast Plate",null,null,false],["Da Baddest Chick Sandwich",null,null,false],["French Toast Sandwich/Plate",null,null,false],["BET Breakfast Plate",null,null,false],["Waffle Sandwich/Plate",null,null,false],["Cinnatoast Sandwich/Plate",null,null,false],["Breakfast Quesadilla",null,null,false],["Breakfast Scramble",null,null,false]]},{"name":"Feelin' Toasty???","items":[["Crunchy Cinnamon Toast",null,null,false],["Classic French Toast",null,null,false]]},{"name":"Just Wafflez","items":[["Peach Cobbler Waffle",null,null,false],["Peach Cobbler",null,null,false],["Mixed Berry",null,null,false],["Sweet Vanilla Bean",null,null,false],["Cinnamon Roll",null,null,false],["Chocolate Chip",null,null,false],["Cheddar Herb",null,null,false],["Bacon Cheddar",null,null,false]]},{"name":"Basketz, Platez N' Sammiez","items":[["Tender Basket/Plate",null,null,false],["Shrimp Basket/Plate",null,null,false],["Wing Basket/Plate",null,null,false],["Catfish Basket/Plate",null,null,false]]},{"name":"Just Gritz","items":[["Plain Gritz",null,null,false],["Cheese Gritz",null,null,false],["Sweet Gritz",null,null,false],["Fried Cheese Gritz",null,null,false],["Fried Sweet Gritz",null,null,false]]},{"name":"Sidez","items":[["Smackin' Mac",null,null,false],["Collard Greens",null,null,false],["Who Made The Potato Salad",null,null,false],["Homestyle Potatoes",null,null,false],["French Friez",null,null,false]]}]},"menuNote":"Your website doesn't list prices, so Antidote will get them from you or your online order page. Switch off anything you don't serve anymore.","ambient":["steam"],"impact":{"crowd":150,"nights":6,"daily":50,"days":18,"join":20,"back":15,"fee":300,"setup":2000},"holidays":[{"id":"halloween","holiday":"halloween","title":"Spooky Sweet Waffle","desc":"Chocolate Chip waffle + Fried Sweet Gritz, a treat with no tricks.","item":"Chocolate Chip","start":"10-20","end":"10-31","code":"BOO"},{"id":"thanksgiving","holiday":"thanksgiving","title":"Thanksgiving Soul Plate","desc":"Catfish N' Gritz with Collard Greens and Smackin' Mac.","item":"Catfish N' Gritz","start":"11-20","end":"11-28"},{"id":"christmas","holiday":"christmas","title":"Holiday Cobbler Waffle","desc":"Peach Cobbler Waffle with a Hot Coffee (reg, van or carm).","item":"Peach Cobbler Waffle","start":"12-15","end":"12-25"},{"id":"newyear","holiday":"newyear","title":"New Year's Luck Plate","desc":"Shrimp N' Gritz with Collard Greens for a lucky new year.","item":"Shrimp N' Gritz","start":"12-29","end":"01-01"},{"id":"valentines","holiday":"valentines","title":"Sweetheart Wafflez for Two","desc":"Wingz N' Wafflez + a Mixed Berry waffle to share.","item":"Wingz N' Wafflez","start":"02-07","end":"02-14"},{"id":"stpatricks","holiday":"stpatricks","title":"Lucky Green Start","desc":"Original Collard Green Dip + Fried Green Tomatoes.","item":"Original Collard Green Dip","start":"03-14","end":"03-17"},{"id":"cinco","holiday":"cinco","title":"Brunch Fiesta","desc":"Breakfast Quesadilla with Homestyle Potatoes and a Kiki Palmer.","item":"Breakfast Quesadilla","start":"05-01","end":"05-05"},{"id":"july4","holiday":"july4","title":"Red, White & Blue Waffle","desc":"Mixed Berry waffle with a Fresh Squeezed Lemonade.","item":"Mixed Berry","start":"07-01","end":"07-04"}]};
 (function(){
 "use strict";
 /* ============ generic setup logic: identical for every restaurant, only CFG changes ============ */
@@ -558,6 +583,7 @@ function summary(){
   var ch=[]; eachItem(function(key,i){ var s=S[key]; if(s&&(!s.on||(typeof i[1]==="number"&&s.p!==i[1]))) ch.push("• "+i[0]+": "+(s.on?(typeof i[1]==="number"?money(s.p):"keep"):"REMOVE")); });
   out.push("\nYOUR REGISTER (POS)"); out.push("• What you ring up on: "+(posName()||"(no answer)")); out.push("• How you want to start: "+(S.posStart||"(no answer)"));
   out.push("\nMENU CHANGES"); out.push(ch.length?ch.join("\n"):"• No changes");
+  if(window.IMPACT_SUMMARY) out.push("\n"+window.IMPACT_SUMMARY());
   out.push("\nGo live: "+(S.approved||"(no answer)"));
   return out.join("\n");
 }
@@ -567,5 +593,84 @@ $("send").onclick=function(){
   if(navigator.share){ navigator.share({title:SHORT+" setup",text:t}).catch(function(){}); }
   else { location.href="sms:&body="+encodeURIComponent(t); }
 };
+})();
+</script>
+<script>
+/* "What the app does for you" — owner-facing impact estimate. Every number is a slider the owner can move.
+   Model (kept conservative on purpose):
+   - guests/month = busy-night crowd × busy nights + everyday guests × other open days
+   - new members/month = guests × join rate × 70% (30% are repeat guests already on the list)
+   - extra visits/month = members who joined in the LAST 3 MONTHS × come-back rate (older members aren't counted)
+   - extra sales = extra visits × average spend · one text blast = list × 5% who show up × average spend */
+(function(){
+"use strict";
+var C=window.CFG||{}, I=C.impact; var box=document.getElementById("impact"); if(!I||!box) return;
+var SHORT=C.short||C.name, OWNER=C.owner&&C.owner!=="there"?C.owner:"";
+var K=(C.storageKey||C.slug)+"-impact";
+var D={crowd:I.crowd||150,nights:I.nights||4,daily:I.daily||80,days:I.days||22,join:I.join||25,back:I.back||20,spend:C.avgCheck||25,fee:I.fee||300};
+var S={}; try{ S=JSON.parse(localStorage.getItem(K)||"{}")||{}; }catch(e){}
+function val(k){ return S[k]!=null?S[k]:D[k]; }
+function h(t,c,x){ var e=document.createElement(t); if(c) e.className=c; if(x!=null) e.textContent=x; return e; }
+function n(x){ return Math.round(x).toLocaleString("en-US"); }
+function usd(x){ return "$"+n(x); }
+var F=[
+ ["crowd","Guests on a busy night (inside + patio)",20,800,10,"",""],
+ ["nights","Busy nights a month",0,16,1,"",""],
+ ["daily","Guests on a regular day",0,600,10,"",""],
+ ["days","Other days open a month",0,30,1,"",""],
+ ["join","Guests who scan the table QR and join",5,60,1,"","%"],
+ ["back","Members who come back one extra time a month",5,50,1,"","%"],
+ ["spend","Average spend per guest",5,150,1,"$",""],
+ ["fee","Your monthly plan",0,1000,25,"$",""]];
+box.appendChild(h("h2",null,"📈 What the app does for "+SHORT));
+var intro=h("p","sub"); intro.innerHTML=(OWNER?OWNER+", right":"Right")+" now every guest walks out and there's no way to bring them back. The app turns each one who scans into <b>your</b> customer: on your list, earning points, getting your texts. Move the sliders to match "+SHORT+"; the numbers update live.";
+box.appendChild(intro);
+var card=h("div","card"); box.appendChild(card);
+var inWrap=h("div","imp-in"); card.appendChild(inWrap);
+var lbl={};
+F.forEach(function(f){ var w=h("div","imp-f"), l=h("label"), t=h("span",null,f[1]), b=h("b"); l.appendChild(t); l.appendChild(b); w.appendChild(l);
+  var r=document.createElement("input"); r.type="range"; r.min=f[2]; r.max=f[3]; r.step=f[4]; r.value=val(f[0]); r.setAttribute("aria-label",f[1]);
+  r.oninput=function(){ S[f[0]]=+r.value; try{ localStorage.setItem(K,JSON.stringify(S)); }catch(e){} draw(); };
+  w.appendChild(r); if(f[0]==="fee"&&I.feeNote) w.appendChild(h("div","hint",I.feeNote)); inWrap.appendChild(w); lbl[f[0]]={b:b,f:f}; });
+var be=h("div","imp-be"); card.appendChild(be);
+var out=h("div","imp-out"); card.appendChild(out);
+var chartT=h("div","q"); chartT.style.marginTop="14px"; chartT.textContent="Extra sales each month, first year"; card.appendChild(chartT);
+var bars=h("div","imp-bars"), axis=h("div","imp-axis"); card.appendChild(bars); card.appendChild(axis);
+var lg=h("div","imp-lg"); card.appendChild(lg);
+var blast=h("div","note imp-blast"); card.appendChild(blast);
+var safe=h("div","note imp-safe"); card.appendChild(safe);
+card.appendChild(h("p","hint","Estimates, not a promise. They only count guests who come back because of the app (texts, points, prizes, the game), and only from people who joined in the last 3 months. Real results show up in your owner view as people join."));
+function stat(big,v,s){ var e=h("div","imp-s"+(big?" big":"")); e.appendChild(h("b",null,v)); e.appendChild(h("span",null,s)); out.appendChild(e); }
+function draw(){
+  F.forEach(function(f){ var x=val(f[0]); lbl[f[0]].b.textContent=f[5]+n(x)+f[6]; });
+  var guests=val("crowd")*val("nights")+val("daily")*val("days");
+  var newM=guests*val("join")/100*0.7, back=val("back")/100, spend=val("spend"), fee=val("fee");
+  var months=[], list=0; for(var m=1;m<=12;m++){ list+=newM; var recent=Math.min(m,3)*newM; months.push({list:list,visits:recent*back,sales:recent*back*spend}); }
+  var m1=months[0], m3=months[2], yr=months.reduce(function(a,x){ return a+x.sales; },0);
+  out.innerHTML="";
+  stat(true,usd(m3.sales)+"/mo","extra sales once it's rolling (month 3 on) · "+(fee?(m3.sales/fee).toFixed(1)+"× your "+usd(fee)+" plan":"")+"");
+  stat(false,n(newM),"new members on your list every month");
+  stat(false,n(m3.visits),"extra visits a month (month 3 on)");
+  stat(false,usd(m1.sales),"extra sales in month 1");
+  stat(false,usd(yr),"extra sales in the first year");
+  stat(false,n(months[5].list),"people you can text by month 6");
+  stat(false,n(months[11].list),"people you can text by month 12");
+  var mx=Math.max.apply(null,months.map(function(x){ return x.sales; }).concat([fee]))||1;
+  bars.innerHTML=""; axis.innerHTML="";
+  months.forEach(function(x,i){ var b=h("i"); b.style.height=(x.sales/mx*100)+"%"; b.title="Month "+(i+1)+": "+usd(x.sales); bars.appendChild(b); axis.appendChild(h("span",null,String(i+1))); });
+  var fp=Math.max(1.5,fee/mx*100); bars.style.backgroundImage="linear-gradient(to top,transparent calc("+fp+"% - 2px),#e3262f calc("+fp+"% - 2px),#e3262f "+fp+"%,transparent "+fp+"%)";
+  lg.textContent="Bars = extra sales per month · red line = what you pay ("+usd(fee)+"/mo)";
+  var need=spend?Math.ceil(fee/spend):0, wk=need/4.33, setup=I.setup||0;
+  var cum=0, pay=0; for(var q=0;q<12;q++){ cum+=months[q].sales-fee; if(!pay&&setup&&cum>=setup) pay=q+1; }
+  be.innerHTML="<b class='n'>Break-even: "+n(need)+" extra visits a month</b><p>At "+usd(spend)+" a visit, the app pays for its "+usd(fee)+"/mo with just <b>"+n(need)+" guests a month who come back because of it, about "+(wk<1.5?"1":n(wk))+" a week</b>."+(guests?" That's "+(need/guests*100<1?"under 1":(need/guests*100).toFixed(1))+"% of the ~"+n(guests)+" guests you already serve each month.":"")+" Everything past that is extra money in your pocket.</p>"+
+    (setup?"<p>💵 Your one-time "+usd(setup)+" setup is earned back "+(pay?"in about <b>"+pay+" month"+(pay>1?"s":"")+"</b> at these numbers":"<b>after the first year</b> at these numbers, so try your real numbers")+". After that, the app keeps paying you every month.</p>":"");
+  safe.innerHTML="<b>🛡️ Your safety net</b><ul><li><b>You'll see it, not take our word for it.</b> Every guest who joins, every return visit and every reward used shows up in your owner view.</li>"+
+    (I.resultsCheck!==false?"<li><b>90-day results check.</b> If the app isn't bringing back at least "+n(need)+" tracked return visits a month by day 90, you can stop the monthly plan with 30 days' notice.</li>":"")+
+    "<li><b>Your customer list is yours.</b> Every name, phone and email stays with "+SHORT+" no matter what.</li><li><b>Keep doing what you do.</b> Great food and good service bring them in the first time; the app is what brings them back.</li></ul>";
+  var L6=months[5].list, show=L6*0.05;
+  blast.innerHTML="<b>📲 One text to your list</b><br>By month 6 you can text about <b>"+n(L6)+"</b> people straight to their phone"+(I.event?" (\""+I.event+"\")":"")+". If just 5% show up, that's <b>"+n(show)+" guests ≈ "+usd(show*spend)+"</b> from one message. No ad spend, no hoping they see the post.";
+}
+draw();
+window.IMPACT_SUMMARY=function(){ var g=val("crowd")*val("nights")+val("daily")*val("days"), nm=g*val("join")/100*0.7, s=nm*3*val("back")/100*val("spend"); return "IMPACT ESTIMATE: ~"+n(nm)+" new members/mo · ~"+usd(s)+"/mo extra sales from month 3 · plan "+usd(val("fee"))+"/mo · break-even "+n(Math.ceil(val("fee")/val("spend")))+" extra visits/mo"; };
 })();
 </script></body></html>

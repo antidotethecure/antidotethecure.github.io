@@ -281,5 +281,15 @@
   "menuNote": "Your website doesn't list prices, so Antidote will get them from you or your online order page. Switch off anything you don't serve anymore.",
   "ambient": [
     "steam"
-  ]
+  ],
+  "impact": {
+    "crowd": 150,
+    "nights": 6,
+    "daily": 50,
+    "days": 18,
+    "join": 20,
+    "back": 15,
+    "fee": 300,
+    "setup": 2000
+  }
 }

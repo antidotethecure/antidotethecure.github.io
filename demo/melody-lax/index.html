@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Melody Bar &amp; Grill — Menu, Drinks &amp; Game</title>
 <script src="../lang-th.js"></script>
+<script src="../radio-avatar.js"></script>
 <meta name="description" content="Melody Bar & Grill by LAX: drinks, food, order from your table or the bar, and fly the Melody approach for prizes.">
 <meta name="theme-color" content="#0b1220">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -536,7 +537,7 @@ function hud(){ $("score").textContent=G.score.toLocaleString(); $("time").textC
     $("lvl").innerHTML=esc(T("Level"))+" <b>"+G.lvl+"</b> "+esc(T("of"))+" 5"; $("wpn").innerHTML='<b style="color:'+w.c+'">'+esc(T(w.n))+'</b><span class="pips" aria-label="weapon tier '+(G.wpn+1)+' of 5">'+p+'</span>'; } }
 function best(){ try{ return +localStorage.getItem("melody-best")||0; }catch(e){ return 0; } }
 var RUN=0;
-function start(){ var keep=G.clouds, posted=G.posted; G=fresh(); G.clouds=keep; G.posted=posted; G.runId=++RUN; G.running=true; G.last=performance.now(); seedGround(); $("over").classList.remove("on");
+function start(){ if(RA){ RA.clear(); pickT=-1e9; radio("Tower to Captain: you're cleared for takeoff!",{tone:"info",ms:2200}); } var keep=G.clouds, posted=G.posted; G=fresh(); G.clouds=keep; G.posted=posted; G.runId=++RUN; G.running=true; G.last=performance.now(); seedGround(); $("over").classList.remove("on");
   if(window.ReviewEgg) ReviewEgg.reset(24,40);   // Antidote's review blimp: once a flight, 24-40 s after the takeoff roll
   if(DBG.lvl||DBG.wpn!=null||DBG.boss||DBG.god) applyDbg(); hud(); }
 // testing hooks (?lvl=1-5, ?wpn=0-4, ?boss=1, ?god=1 or window.MELODY_DEBUG). Any of them marks the flight as practice: no prizes, no board.
@@ -679,7 +680,7 @@ function pop(x,y,txt,col){ G.pops.push({x:x,y:y,txt:txt,col:col,a:1}); }
 function hurt(x,y,why){
   if(G.inv>0||G.dying||G.god) return;
   SND.play("hurt"); G.hp-=100/3+0.01; G.inv=70; G.shake=14; G.flash=.4; pop(x,y-10,why,"#ff7a59"); buzz(G.hp<=0?[90,60,220]:70);
-  if(G.hp<=0){ G.hp=0; G.dying=performance.now(); G.dx=G.x; G.dyy=G.y; G.inv=1e9; G.shake=24; G.ens=[]; G.eshots=[]; G.bolts=[]; G.boss=null; G.bossDie=null; G.banner=null; SND.play("bigboom"); }
+  if(G.hp<=0){ G.hp=0; G.dying=performance.now(); G.dx=G.x; G.dyy=G.y; G.inv=1e9; G.shake=24; G.ens=[]; G.eshots=[]; G.bolts=[]; G.boss=null; G.bossDie=null; G.banner=null; SND.play("bigboom"); radio("Mayday! Come grab a bite and try again.",{tone:"warn",ms:3400}); }
 }
 function emit(x,y,heavy){
   if(Math.random()<(heavy?.9:.55)) G.fx.push({k:"s",x:x,y:y,vx:(Math.random()-.5)*.6,vy:1.4+Math.random(),s:6+Math.random()*5,g:.5,a:heavy?.6:.42,rot:Math.random()*6});
@@ -810,6 +811,11 @@ var SND=(function(){
     state:function(){ return {hasMusic:true,hasSfx:true,sound:st.sound,music:st.music,sfx:st.sfx,unlocked:!!(ctx&&ctx.state==="running")}; }
   };
 })();
+/* ---- the tower: the owner talks to you on the radio (../radio-avatar.js). Lines only, never touches scoring ---- */
+var RA=window.RadioAvatar, pickT=-1e9;
+if(RA) RA.mount({host:document.querySelector(".cvwrap"),base:"img/game/",who:"captain",top:"28px",left:"6px",right:"48px",sound:function(){ return SND.out(); }});
+function radio(t,o){ if(!RA) return; o=o||{}; o.who="captain"; RA.say(t,o); }
+var CLEAR_LINES=["Nice flying! You're cleared to land at Melody Bar & Grill ✈️","Runway's clear, Captain. Level 2 complete!","Gunship down! Level 3 complete. Outstanding, Captain!","Level 4 complete. One more leg, then home to Melody!"];
 window.GAME_AUDIO={music:function(on){ SND.set("music",on!==false); }, sfx:function(on){ SND.set("sfx",on!==false); }, sound:function(on){ SND.set("sound",on!==false); }, state:function(){ return SND.state(); }};
 function syncBtns(){ var s=SND.state(), a=$("sndb"), m=$("musb"); if(a){ a.textContent=s.sound?"🔊":"🔇"; a.classList.toggle("off",!s.sound); a.setAttribute("aria-label",s.sound?"Mute all sound":"Turn sound on"); a.setAttribute("aria-pressed",s.sound?"false":"true"); }
   if(m){ m.classList.toggle("off",!s.music); m.setAttribute("aria-label",s.music?"Turn music off":"Turn music on"); m.setAttribute("aria-pressed",s.music?"true":"false"); } }
@@ -858,9 +864,10 @@ function levelTimers(){ var p=L().pace; G.spawnT=600; G.ufoT=2600; G.jetT=6500*p
 function levelEnd(){ G.t=0; if((G.lvl===3||G.lvl===5)&&!G.boss&&!G.bossDie){ spawnBoss(G.lvl===3?"gunship":"superjet"); return; } nextLevel(); }
 function nextLevel(){ var bonus=500*G.lvl, up=""; G.score+=bonus; if(!G.gotCrate&&G.wpn<4){ upgrade(1); up=T(WPN[G.wpn].n)+" "+T("unlocked"); }
   G.lvl++; G.t=60000; G.lel=0; G.heals=0; G.gotCrate=0; G.crates=0; G.crateT=CRATE_AT[G.lvl-1]; levelTimers();
-  G.ens.forEach(function(e){ e.fleeing=1; }); G.banner={t:0,txt:T("LEVEL")+" "+G.lvl,sub:T(L().sub),up:up,bonus:bonus}; SND.play("level"); buzz([30,40,30]); }
+  G.ens.forEach(function(e){ e.fleeing=1; }); G.banner={t:0,txt:T("LEVEL")+" "+G.lvl,sub:T(L().sub),up:up,bonus:bonus}; SND.play("level"); buzz([30,40,30]);
+  radio(CLEAR_LINES[G.lvl-2]||("Level "+(G.lvl-1)+" complete. Nice flying, Captain!"),{tone:"win",ms:3000}); }
 function victory(){ G.won=1; var bonus=5000+Math.round(G.hp)*20; G.score+=bonus; G.inv=1e9; G.eshots=[]; G.warn=[]; G.ens.forEach(function(e){ e.fleeing=1; });
-  G.banner={t:0,txt:T("VICTORY!"),sub:T("You shot down the Super Jet"),up:"+"+bonus.toLocaleString()+" "+T("bonus · heading home"),win:1}; SND.play("victory"); buzz([40,40,40,40,200]); }
+  G.banner={t:0,txt:T("VICTORY!"),sub:T("You shot down the Super Jet"),up:"+"+bonus.toLocaleString()+" "+T("bonus · heading home"),win:1}; SND.play("victory"); buzz([40,40,40,40,200]); radio("Bogey down! Bring her home to LAX, Captain.",{tone:"win"}); }
 function drawBanner(dt){ var b=G.banner; if(!b) return; b.t+=dt; var D=b.win?3600:2600; if(b.t>D){ G.banner=null; return; }
   var a=Math.max(0,Math.min(1,b.t/220,(D-b.t)/420)), s=1+Math.max(0,.45-b.t/500);
   cx.save(); cx.globalAlpha=a; cx.translate(W/2,H*.34); cx.textAlign="center"; cx.textBaseline="middle";
@@ -902,7 +909,7 @@ function superjetIm(){ if(BIM.j) return BIM.j; var im=S.jet; if(!ready(im)) retu
   x.globalCompositeOperation="destination-in"; x.drawImage(im,0,0); x.globalCompositeOperation="source-atop";
   x.fillStyle="rgba(220,25,35,.6)"; x.fillRect(0,0,w*.12,h); x.fillRect(w*.88,0,w*.12,h); x.fillRect(0,0,w,h*.12);   // red wingtips + tail fins
   x.globalCompositeOperation="source-over"; BIM.j=c; BIM.js=shadowOf(c,.4); return c; }
-function spawnBoss(kind){ G.ens.forEach(function(e){ e.fleeing=1; }); G.red=.8; buzz([60,60,60,60,160]); SND.play("alarm");
+function spawnBoss(kind){ G.ens.forEach(function(e){ e.fleeing=1; }); G.red=.8; buzz([60,60,60,60,160]); SND.play("alarm"); radio("Bogey at 12 o'clock! Big one inbound!",{tone:"warn",ms:3000});
   G.banner={t:0,txt:kind==="gunship"?T("BOSS!"):T("FINAL BOSS!"),sub:kind==="gunship"?T("Army gunship · two door gunners"):T("The Super Jet · shoot it while it turns"),boss:1};
   var b=kind==="gunship"?{t:"gunship",boss:1,x:W/2,y:-170,hp:620,mhp:620,r:60,rw:46,rh:84,hoverY:150,ph:0,guns:[{f:1800,n:0,fl:0},{f:2700,n:0,fl:0}],rockT:3000,name:T("ARMY GUNSHIP")}
     :{t:"superjet",boss:1,x:W/2,y:-170,hp:1400,mhp:1400,r:60,rw:52,rh:72,a:0,st:"arrive",stT:-1200,fireT:1600,tx:W/2,name:T("SUPER JET")};
@@ -1033,6 +1040,7 @@ function frame(now){
     else if(it.t==="heal") drawHeal(it,now);
     else { var P=it.t==="mic"?MIC:it.p, bob=Math.sin(now/260+it.x)*3; var gl=cx.createRadialGradient(it.x,it.y,4,it.x,it.y,P.w*.8); gl.addColorStop(0,it.t==="mic"?"rgba(228,107,131,.55)":"rgba(240,211,117,.45)"); gl.addColorStop(1,"rgba(0,0,0,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(it.x,it.y,P.w*.8,0,6.283); cx.fill(); sprite(P.im,it.x,it.y+bob,P.w,it.rot,false,P.e); }
     if(run&&Math.abs(it.x-G.x)<it.r+26&&Math.abs(it.y-G.y)<it.r+28){
+      if((it.t==="crate"||it.t==="heal"||it.t==="mic")&&performance.now()-pickT>20000){ pickT=performance.now(); radio(it.t==="crate"?"Nice pickup! Weapons upgraded.":it.t==="heal"?"Nice pickup! Patching you up.":"Nice pickup! Double points, sing it!",{tone:"info",ms:2200}); }
       if(it.t==="egg"){ var eb=ReviewEgg.collect(); G.score+=eb; pop(it.x,it.y-10,"+"+eb+" 📺 "+T("Antidote's review"),"#ffd23f"); SND.play("upgrade"); buzz([20,40,20]); }
       else if(it.t==="crate"){ G.gotCrate=1; SND.play("crate"); if(G.wpn<4) upgrade(); else { G.score+=750*G.mult; pop(it.x,it.y,"+"+750*G.mult+" "+T("Max power!"),"#ffd23f"); } }
       else if(it.t==="coin"){ SND.play("pickup"); G.score+=10*G.mult; pop(it.x,it.y,"+"+10*G.mult,"#f0d375"); }
@@ -1138,6 +1146,7 @@ function frame(now){
 var PRIZE=[[7500,"$3 off any drink"],[15000,"Free Melody Fries"],[25000,"Free Gilroy Garlic Fries"],[40000,"a Free appetizer"]];   // ~a good level 1 · into level 3 · past the gunship · into level 5 (or beat the jet)
 function end(){
   G.running=false; G.over=true; G.landed=!!G.touched; hud();
+  if(G.won) radio("Smooth landing! Welcome to Melody Bar & Grill.",{tone:"win",ms:3600});
   var b=best(); if(G.score>b){ try{ localStorage.setItem("melody-best",G.score); }catch(e){} }
   $("final").textContent=G.score.toLocaleString()+" pts";
   // prizes, recalibrated for the 5-level game: beating the Super Jet always wins the top prize

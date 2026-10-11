@@ -68,6 +68,17 @@
     '<div class="nv-ov" id="nv-end" data-scroll-ok style="display:none"></div>' +
     "</div>";
   var wrap = mount.firstChild, gl_c = document.getElementById("nv-water"), cv = document.getElementById("cv"), cx = cv.getContext("2d");
+  /* ---------- the lifeguard on the radio (../radio-avatar.js): spoken warnings only, never touches scoring ---------- */
+  var RA = window.RadioAvatar, raSeen = {}, raLast = {}, RA_GAP = 12000;
+  if (RA) RA.mount({ host: wrap, base: "img/game/", who: "guard", top: "92px", left: "8px", right: "8px",
+    sound: function () { return AC && FX && !MUTED && SFX_ON && AC.state === "running" ? FX : null; },
+    // the surfer on screen (the 2D layer zooms around the camera), in wrap pixels: the lifeguard fades while you ride under him
+    avoid: function () { if (!G.running) return null; var k = wrap.clientWidth / W; return { x: (CAM.x + (G.x - CAM.x) * ZOOM) * k, y: (CAM.y + (sy(G.yw) - CAM.y) * ZOOM) * k, r: 34 * ZOOM * k }; } });
+  function radio(t, o) { if (!RA) return; o = o || {}; o.who = "guard"; RA.say(t, o); }
+  // one warning per kind every ~12 s; the first time each kind shows up in a run always gets called out
+  function radioOnce(kind, t, o) { if (!RA) return; var now = performance.now(), first = !raSeen[kind];
+    if (!first && now - (raLast[kind] || 0) < RA_GAP) return; raSeen[kind] = 1; raLast[kind] = now; o = o || {}; if (first) o.pri = (o.tone === "info" ? 0 : 1) + .5; radio(t, o); }
+  function radioReset() { raSeen = {}; raLast = {}; if (RA) RA.clear(); }
   var $ = function (id) { return document.getElementById(id); };
 
   /* ---------- images ---------- */
@@ -249,14 +260,14 @@
   function food(x, yw, extra) { var f = pick(FOOD); if (Math.random() < 0.06) f = ["raft_burger", "Golden Poke Bowl", 500, 1]; return add(Object.assign({ t: "food", k: f[0], name: f[1], pts: f[2], gold: f[3], x: x, yw: yw, r: 22, bob: Math.random() * 6 }, extra || {})); }
   function hazard() {
     var lv = G.lap, P = L(), r = Math.random(), x = laneX(), y = ahead(H * 0.75), sh = G.boss ? 0 : P.shark;
-    if (r < sh) { add({ t: "shark", x: x, yw: y, r: 20, st: "fin", vx: 0, vy: 0, lunge: 0, hp: G.level >= 4 ? 3 : 2 });
+    if (r < sh) { add({ t: "shark", x: x, yw: y, r: 20, st: "fin", vx: 0, vy: 0, lunge: 0, hp: G.level >= 4 ? 3 : 2 }); radioOnce("shark", "🦈 Warning — shark incoming!", { tone: "warn" });
       if (Math.random() < P.pack) add({ t: "shark", x: x < W / 2 ? x + rnd(90, 140) : x - rnd(90, 140), yw: y + G.dir * rnd(60, 120), r: 20, st: "fin", vx: 0, vy: 0, lunge: 0, hp: 2 }); }
-    else if (r < sh + (1 - sh) * .45) add({ t: "eel", x: Math.random() < .5 ? -40 : W + 40, yw: y, r: 18, ph: Math.random() * 6, sp: (P.eel + 15 * (lv - 1)) * (Math.random() < .5 ? 1 : -1), base: y });
-    else add({ t: "jelly", x: x, yw: y, r: 17, ph: Math.random() * 6 });
+    else if (r < sh + (1 - sh) * .45 && (radioOnce("eel", "Eels in the water, stay sharp!", { tone: "warn" }), 1)) add({ t: "eel", x: Math.random() < .5 ? -40 : W + 40, yw: y, r: 18, ph: Math.random() * 6, sp: (P.eel + 15 * (lv - 1)) * (Math.random() < .5 ? 1 : -1), base: y });
+    else { add({ t: "jelly", x: x, yw: y, r: 17, ph: Math.random() * 6 }); radioOnce("jelly", "Jellyfish ahead!", { tone: "warn" }); }
     if (Math.random() < 0.12 * (lv - 1) + P.jel) add({ t: "jelly", x: laneX(), yw: y + G.dir * 90, r: 17, ph: 0 });
   }
-  function boat() { var fromL = Math.random() < .5; add({ t: "boat", x: fromL ? -70 : W + 70, yw: ahead(H * 0.42), vx: fromL ? 95 : -95, r: 34, toss: 0.6 }); }
-  function heli() { var fromL = Math.random() < .5; add({ t: "heli", x: fromL ? -60 : W + 60, yw: ahead(H * 0.3), vx: fromL ? 110 : -110, drops: 3, dt: 0.7, sky: 1 }); }
+  function boat() { radioOnce("help", "Help's on the way! Grab the boat toss.", { tone: "info" }); var fromL = Math.random() < .5; add({ t: "boat", x: fromL ? -70 : W + 70, yw: ahead(H * 0.42), vx: fromL ? 95 : -95, r: 34, toss: 0.6 }); }
+  function heli() { radioOnce("help", "Help's on the way! Chopper drop incoming.", { tone: "info" }); var fromL = Math.random() < .5; add({ t: "heli", x: fromL ? -60 : W + 60, yw: ahead(H * 0.3), vx: fromL ? 110 : -110, drops: 3, dt: 0.7, sky: 1 }); }
   function plane() { var fromR = Math.random() < .5; add({ t: "plane", x: fromR ? W + 60 : -330, y: rnd(70, 150), vx: fromR ? -70 : 70, sky: 1, scr: 1 }); }
   // from level 2 some swells are bigger and close out: a breaking whitewater section you must steer around (or be airborne over)
   function swell() { var e = add({ t: "swell", yw: ahead(H * 0.8), x: W / 2, r: 0, hit: 0 });
@@ -289,7 +300,8 @@
   function milestone(m) {
     var el = $("nv-mult"); el.animate && el.animate([{ transform: "scale(1.6)" }, { transform: "scale(1)" }], { duration: 380 });
     pop(W / 2, H * 0.38, "STREAK ×" + m + "!", "#ffd23f", 1); buzz(30); sfx("streak");
-    if (m === 2 || m % 2 === 1) toast(Math.random() < .5 ? "lifeguard_f" : "lifeguard_m", pick(["Nice ride! ×" + m, "You're on fire! ×" + m, "Keep it going! ×" + m, "Lifeguards are watching 👀 ×" + m]));
+    if (RA) { if (m === 2 || m % 2 === 1) radio(pick(["Nice ride! ×" + m, "You're on fire! ×" + m, "Keep it going! ×" + m]), { tone: "info", ms: 2200 }); }
+    else if (m === 2 || m % 2 === 1) toast(Math.random() < .5 ? "lifeguard_f" : "lifeguard_m", pick(["Nice ride! ×" + m, "You're on fire! ×" + m, "Keep it going! ×" + m, "Lifeguards are watching 👀 ×" + m]));
   }
   var tt = 0;
   function toast(img, t) { var e = $("nv-toast"), i = $("nv-toast-img"); if (ok(IM[img])) { i.src = IM[img].src; i.style.display = ""; } else i.style.display = "none"; $("nv-toast-t").textContent = t; e.classList.add("on"); clearTimeout(tt); tt = setTimeout(function () { e.classList.remove("on"); }, 1800); }
@@ -305,6 +317,7 @@
   function die(cause) {
     G.boss = null; G.blobs = []; G.harps = []; G.phase = "death"; G.deathT = 0; G.deathCause = cause; G.deathX = G.x; G.deathYw = G.yw; G.jump = 0; G.wipe = 0;
     G.shake = cause === "eel" ? 18 : 12; buzz(cause === "eel" ? [80, 40, 80, 40, 200] : [140, 60, 220]); sfx("over");
+    radio("Out of the water! Come grab a bite and try again.", { tone: "warn", ms: 3400, pri: 2 });
     if (cause === "shark") add({ t: "shark", x: G.x - 70, yw: G.yw + G.dir * 50, r: 0, st: "lunge", vx: 260, vy: -G.dir * 120, lunge: 0, dead: 1 });
     G.finaleMsg = cause === "shark" ? "🦈 The lifeguards pulled you out" : cause === "eel" ? "⚡ The lifeguards revived you" : "🌊 The Nalu Vida crew pulled you in";
   }
@@ -428,7 +441,7 @@
     G.cam += (G.yw + G.lead - G.cam) * Math.min(1, dt * 4);
     if (G.introT > 1.15 && !G.splashed) { G.splashed = 1; G.fx.push({ k: "splash", x: G.x, y: sy(G.yw), t: 0 }); sfx("splash"); buzz(25); }
     tickEnts(dt);
-    if (f >= 1) { G.phase = "ride"; G.inv = 1; G.spawn.food = 0.4; G.spawn.haz = 1.6; banner("LEVEL " + G.level, L().sub, G.level > 1 ? "TEST START" : "RIDE IN TO NALU VIDA"); sfx("level"); }
+    if (f >= 1) { G.phase = "ride"; G.inv = 1; G.spawn.food = 0.4; G.spawn.haz = 1.6; banner("LEVEL " + G.level, L().sub, G.level > 1 ? "TEST START" : "RIDE IN TO NALU VIDA"); sfx("level"); radio("Lifeguard on duty. Ride safe out there!", { tone: "info", ms: 2200 }); }
   }
   // game over: the crew pulls you back to the sand in front of Nalu Vida
   function finaleStep(dt) {
@@ -511,6 +524,7 @@
   function levelUp() {
     var bonus = 1500 * G.level; G.score += bonus; G.bossBeat = 0; var done = G.level; G.level = Math.min(5, G.level + 1); G.lvT = 0; G.inv = Math.max(G.inv, 1.6); clearNear();
     banner("LEVEL " + G.level, L().sub, "LEVEL " + done + " CLEAR · +" + bonus.toLocaleString()); sfx("level"); buzz([30, 40, 30]);
+    radio(done === 4 ? "Level 4 clear! Last set, ride it home." : "Level " + done + " clear! Nice ride, keep it going.", { tone: "win" });
     if (G.level >= 2 && G.ammo < 3) { G.ammo = 3; pop(G.x, sy(G.yw) - 60, "+3 HARPOONS 🔱", "#ffb15e"); }
     G.spawn.harp = Math.min(G.spawn.harp, 6); G.spawn.rock = 3;
   }
@@ -519,7 +533,7 @@
     G.boss = { kind: kind, B: B, name: B.name, size: B.size, hp: B.hp, max: B.hp, st: "enter", t: 0, x: W / 2, f: 560, vx: 0, vf: 0, ang: Math.PI, sub: 1, fl: 0, ph: Math.random() * 6, dur: 2, br: 0, side0: 0, wakeT: 0 };
     G.ents = G.ents.filter(function (e) { return e.t !== "shark"; }); clearNear();
     banner("⚠ " + B.name + " ⚠", kind === 5 ? "Harpoon it · crash it into rocks & the pier" : "Dodge the charge · lure it into the rocks", kind === 5 ? "FINAL BOSS" : "BOSS SHARK", "#ff6b6b", 3);
-    sfx("roar"); buzz([80, 60, 160]); G.shake = 10;
+    sfx("roar"); buzz([80, 60, 160]); G.shake = 10; radio(kind === 5 ? "Big one coming — Manō Nui!" : "Big one coming — Big Manō!", { tone: "warn", ms: 3000, pri: 2 });
     if (G.ammo < 3) tossTo(G.x < W / 2 ? W + 20 : -20, G.yw, Math.max(40, Math.min(W - 40, G.x)), ahead(150), "ski", "harpoon");
     toast("lifeguard_f", kind === 5 ? "That's MANŌ NUI! 🔱 Harpoons + rocks!" : "Big shark! Fire 🔱 and lure it into rocks!");
     rock(rockSpot(), ahead(320), 28); G.spawn.rock = 2.5; G.spawn.harp = 4; G.spawn.ski = 6;
@@ -597,8 +611,8 @@
     var b = G.boss, B = b.B; G.boss = null; G.blobs = []; G.score += B.bonus; G.bossBeat = 1; G.inv = 2;
     pop(W / 2, H * .3, "+" + B.bonus.toLocaleString() + " " + B.name + " DOWN!", "#ffd23f", 1);
     confetti(70);
-    if (b.kind === 5) { G.won = 1; G.phase = "victory"; G.winT = 0; sfx("win"); banner("YOU BEAT " + B.name + "!", "Champion of the Nalu · ride in for your feast 🌴", "🏆 FINAL BOSS DOWN", "#ffd23f", 3.2); G.finaleMsg = "🏆 Champion of the Nalu"; }
-    else { sfx("win"); toast("lifeguard_m", B.name + " swam off with a headache 😵 Nice!"); var rid = G.runId; setTimeout(function () { if (G.running && G.runId === rid && G.phase !== "finale" && G.phase !== "death") levelUp(); }, 1400); }
+    if (b.kind === 5) { G.won = 1; G.phase = "victory"; G.winT = 0; sfx("win"); banner("YOU BEAT " + B.name + "!", "Champion of the Nalu · ride in for your feast 🌴", "🏆 FINAL BOSS DOWN", "#ffd23f", 3.2); G.finaleMsg = "🏆 Champion of the Nalu"; radio("You beat Manō Nui! Come eat, champ.", { tone: "win", ms: 3400 }); }
+    else { sfx("win"); toast("lifeguard_m", B.name + " swam off with a headache 😵 Nice!"); radio("Big Manō is gone! Water's safe… for now.", { tone: "win" }); var rid = G.runId; setTimeout(function () { if (G.running && G.runId === rid && G.phase !== "finale" && G.phase !== "death") levelUp(); }, 1400); }
   }
   function victoryStep(dt) {
     G.winT += dt; G.yw += G.dir * speed() * .5 * dt; G.cam += (G.yw + G.lead - G.cam) * Math.min(1, dt * 3); tickEnts(dt);
@@ -1086,7 +1100,7 @@
   }
 
   /* ---------- start / end ---------- */
-  function start(s) { audio(); if (AC && AC.state === "suspended") AC.resume(); G.surfer = s || G.surfer; G.splashed = 0; reset(); G.running = true; G.over = false; $("nv-start").style.display = "none"; $("nv-end").style.display = "none"; musicSync(); }
+  function start(s) { radioReset(); audio(); if (AC && AC.state === "suspended") AC.resume(); G.surfer = s || G.surfer; G.splashed = 0; reset(); G.running = true; G.over = false; $("nv-start").style.display = "none"; $("nv-end").style.display = "none"; musicSync(); }
   function end() {
     G.phase = "finale"; G.finT = 0; G.finFrom = G.yw; G.finDone = 0; G.ents = G.ents.filter(function (e) { return e.sky; }); sfx("over");
   }
@@ -1192,7 +1206,7 @@
     mount.appendChild(box);
   })();
 
-  window.__NV = { get: function () { return G; }, start: start, end: function () { if (G.running) showEnd(); }, W: W, H: H, PIER_X: PIER_X, fire: fire, boss: function (k) { bossStart(k || 5); }, levelUp: function () { levelUp(); },
+  window.__NV = { radio: function (t, o) { radio(t, o); }, get: function () { return G; }, start: start, end: function () { if (G.running) showEnd(); }, W: W, H: H, PIER_X: PIER_X, fire: fire, boss: function (k) { bossStart(k || 5); }, levelUp: function () { levelUp(); },
     // the start menu's PLAY: show the surfer pick (character select) instead of the old full start screen
     pick: function () { var o = $("nv-start"); o.classList.add("nv-pickonly"); o.querySelector("h3").textContent = "Pick your surfer"; o.style.display = "flex"; } };
   requestAnimationFrame(frame);

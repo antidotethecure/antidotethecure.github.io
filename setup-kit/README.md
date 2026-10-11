@@ -39,6 +39,7 @@ comment at the top. Edit the config or `template.html`, never the output.
 | `phone` | `[[key, question, [options]]]`. These have no default, and "Not sure" is added. Leave it out to get the generic quick-serve set. |
 | `menu` | `{"type": "inline", sections}`, `{"type": "rows-json", file}` (Nalu's `menu.json`: `[category, slug, name, price, desc]`), or `{"type": "js", file, var, key?}` (a JS literal inside a demo page, evaluated with node). `drinkSections` lists which sections count as drinks. |
 | `menuNote`, `drinksTitle` | Optional text above the menu. |
+| `holidaysFrom` | Optional. Page whose `window.SPECIALS` (demo/specials.js) fills the Holiday specials section. Default `demo/<slug>/index.html`. |
 
 Prices: a number gets the ± stepper. `"MP"` shows "Market price" with no stepper. A
 missing price shows "Price not on file yet" with no stepper (all of Gritz's prices are missing).
@@ -49,6 +50,8 @@ stars, points per $1, 10-star reward, 4-tier ladder, referral (inviter and frien
 3 monthly visit levels, birthday treat and window, missed-call offer and days, win-back text, game
 prizes and weekly #1, optional special deal, rules (expiry, one per visit, stacking), weekly specials,
 phone-host questions, daily lucky draw (odds, prizes; 3-day redeem window), promo codes (WELCOME{n}, FRIEND{n}, BDAY, PLAYWIN; each has a toggle and value chips),
+holiday specials (one card per holiday, soonest first: on/off, name, menu item, menu price / set price / % off / $ off,
+start and end dates, and "Text it to my customers?" with a send date; texts only reach members who tapped "Text me deals"),
 your register (POS) with a link to the `/pos/` step-by-step guide, menu on/off and prices, and go live. "Send to Antidote" shares a plain-text summary through
 `navigator.share`, or falls back to `sms:`.
 

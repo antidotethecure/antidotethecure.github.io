@@ -1153,5 +1153,18 @@ $("evsub").textContent="Week of "+MON[new Date(monday).getUTCMonth()]+" "+new Da
   }
   addEventListener("scroll",check,{passive:true}); addEventListener("load",check);
 })();</script>
+<script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
+window.SPECIALS_CFG={before:"#drinks"};
+window.SPECIALS=[
+ {id:"halloween",holiday:"halloween",title:"Shark Bite Night",desc:"Bang Bang Shrimp + Jungle Fries, the scariest bites on the pier.",item:"Bang Bang Shrimp",start:"10-20",end:"10-31",code:"BOO"},
+ {id:"thanksgiving",holiday:"thanksgiving",title:"Pier-side Harvest Plate",desc:"Adobo Grilled Chicken with Chips, Salsa & Guac to start.",item:"Adobo Grilled Chicken",start:"11-20",end:"11-28"},
+ {id:"christmas",holiday:"christmas",title:"Island Holiday Platter",desc:"Coconut Shrimp + Sticky Tiki Ribs to share with your crew.",item:"Coconut Shrimp",start:"12-15",end:"12-25"},
+ {id:"newyear",holiday:"newyear",title:"New Year's Day Brunch",desc:"Steak & Eggs, plus 20% off Bottomless Mimosas (21+, 60 min, with ID).",item:"Steak & Eggs",start:"12-29",end:"01-01"},
+ {id:"valentines",holiday:"valentines",title:"Sunset for Two",desc:"Blackened Salmon + Spicy Tuna Crispy Rice to share, and 20% off the Sunset Sour (21+).",item:"Blackened Salmon",start:"02-07",end:"02-14"},
+ {id:"stpatricks",holiday:"stpatricks",title:"Lucky Fish Tacos",desc:"Beer Battered Fish Tacos + 20% off Nalu Vida Blonde Ale (21+).",item:"Beer Battered Fish Tacos",start:"03-14",end:"03-17"},
+ {id:"cinco",holiday:"cinco",title:"Cinco on the Pier",desc:"Baja Blaze Chicken Tacos + Tostadas de la Tierra, and 20% off Nalu Margaritas (21+).",item:"Baja Blaze Chicken Tacos",start:"05-01",end:"05-05"},
+ {id:"july4",holiday:"july4",title:"Fourth on the Pier",desc:"Smash-N-Stack Burger + Jungle Fries, then fireworks over the water.",item:"Smash-N-Stack Burger",start:"07-01",end:"07-04"}
+];</script>
+<script src="../specials.js"></script>
 </body>
 </html>

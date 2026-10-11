@@ -719,5 +719,17 @@ window.GAME_MENU={id:"lucky-dragon",name:"Hibachi Catch",by:"Lucky Dragon Hibach
  prizes:{champion:"1st place this week: 50% OFF your next meal",tiers:[["2nd","20% OFF next meal","2nd place on the weekly board","🥈"],["650+","15% OFF next meal","Puts you on the weekly board","🏆"]],note:"Sample prizes. The owner sets the real ones and the board resets every Monday."}}; })();</script>
 <script src="../gamemenu.js"></script>
 <script src="../gamelock.js"></script>
+<script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
+window.SPECIALS=[
+ {id:"halloween",holiday:"halloween",title:"Dragon Fire Night",desc:"Hibachi Steak with Extra Yum-Yum, straight off the flames.",item:"Hibachi Steak",start:"10-20",end:"10-31",code:"BOO"},
+ {id:"thanksgiving",holiday:"thanksgiving",title:"Family Hibachi Feast",desc:"Chicken + Shrimp Combo with Fried Rice (solo) and Noodles for the table.",item:"Chicken + Shrimp Combo",start:"11-20",end:"11-28"},
+ {id:"christmas",holiday:"christmas",title:"Holiday Lobster Hibachi",desc:"Premium Lobster on the hibachi (market price) with Fried Rice.",item:"Premium Lobster",start:"12-15",end:"12-25"},
+ {id:"newyear",holiday:"newyear",title:"Long-Life Noodles",desc:"Hibachi Chicken + Noodles: long noodles for a long, lucky year.",item:"Noodles",start:"12-29",end:"01-01"},
+ {id:"valentines",holiday:"valentines",title:"Hibachi for Two",desc:"Hibachi Steak + Hibachi Shrimp to share, extra Yum-Yum on the side.",item:"Hibachi Shrimp",start:"02-07",end:"02-14"},
+ {id:"stpatricks",holiday:"stpatricks",title:"Lucky Dragon Day",desc:"Hibachi Chicken with Extra Yum-Yum. Feeling lucky?",item:"Hibachi Chicken",start:"03-14",end:"03-17"},
+ {id:"cinco",holiday:"cinco",title:"Cinco Hibachi Shrimp",desc:"Hibachi Shrimp + Fried Rice (solo), fiesta-style.",item:"Fried Rice",start:"05-01",end:"05-05"},
+ {id:"july4",holiday:"july4",title:"Fourth of July Grill",desc:"Chicken + Shrimp Combo + Noodles, grilled for the fireworks.",item:"Chicken + Shrimp Combo",start:"07-01",end:"07-04"}
+];</script>
+<script src="../specials.js"></script>
 </body>
 </html>

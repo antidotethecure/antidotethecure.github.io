@@ -208,6 +208,11 @@ def build(slug):
     page["game"].pop("alts", None)
     if "phone" not in cfg:
         page["phone"] = DEFAULT_PHONE
+    # holiday specials: the demo app's window.SPECIALS (demo/specials.js) are the suggested answers
+    hol_src = cfg.get("holidaysFrom", f"demo/{slug}/index.html")
+    page["holidays"] = []
+    if os.path.exists(os.path.join(ROOT, hol_src)) and "window.SPECIALS=" in open(os.path.join(ROOT, hol_src), encoding="utf-8").read():
+        page["holidays"] = js_literal(hol_src, "window.SPECIALS")
 
     css = []
     for k, v in brand.items():

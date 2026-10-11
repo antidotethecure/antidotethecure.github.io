@@ -40,13 +40,13 @@
   /* ================= THEME + JURNI'S HAIR ================= */
   function laDate() { var s = new Date().toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" }).split("/"); return { m: +s[0], d: +s[1], y: +s[2], wd: new Date(+s[2], +s[0] - 1, +s[1]).getDay() }; }
   var THEMES = {
-    halloween: { hair: "halloween", fx: ["👻", "👻", "🦇", "👻", "🍬"], kind: "float", decor: ["🎃", "🕯️", "🎃", "🕯️"], music: "spooky", banner: "🎃 Happy Halloween from Gritz N Wafflez" },
-    thanksgiving: { hair: "thanksgiving", fx: ["🍂", "🍁", "🍂", "🍁"], kind: "fall", decor: ["🌽", "🥧", "🍂"], music: "default", banner: "🍂 Happy Thanksgiving from Gritz N Wafflez" },
-    christmas: { hair: "christmas", fx: ["❄", "❅", "❆", "❄", "❅"], kind: "snow", decor: ["🎄", "🎁", "🎄"], music: "jingle", hat: true, lights: true, banner: "🎄 Merry Christmas from Gritz N Wafflez" },
-    newyear: { hair: "newyear", fx: ["✨", "🎊", "✨", "🎉"], kind: "fall", decor: ["🎉", "✨", "🎊"], music: "default", banner: "🎉 Happy New Year from Gritz N Wafflez" },
-    valentine: { hair: "valentine", fx: ["💕", "❤️", "💗", "💕"], kind: "float", decor: ["🌹", "💝", "🌹"], music: "default", banner: "💝 Happy Valentine's Day from Gritz N Wafflez" },
-    stpat: { hair: "stpat", fx: ["☘️", "🍀", "☘️"], kind: "fall", decor: ["🍀", "🌈", "🍀"], music: "default", banner: "🍀 Happy St. Patrick's Day" },
-    july4: { hair: "july4", fx: ["🎆", "🎇", "🎆"], kind: "burst", decor: ["🇺🇸", "🎆", "🇺🇸"], music: "default", banner: "🎆 Happy 4th of July from Gritz N Wafflez" }
+    halloween: { hair: "halloween", decor: ["🎃", "🕯️", "🎃", "🕯️"], music: "spooky", banner: "🎃 Happy Halloween from Gritz N Wafflez" },
+    thanksgiving: { hair: "thanksgiving", decor: ["🌽", "🥧", "🍂"], music: "default", banner: "🍂 Happy Thanksgiving from Gritz N Wafflez" },
+    christmas: { hair: "christmas", decor: ["🎄", "🎁", "🎄"], music: "jingle", hat: true, lights: true, banner: "🎄 Merry Christmas from Gritz N Wafflez" },
+    newyear: { hair: "newyear", decor: ["🎉", "✨", "🎊"], music: "default", banner: "🎉 Happy New Year from Gritz N Wafflez" },
+    valentine: { hair: "valentine", decor: ["🌹", "💝", "🌹"], music: "default", banner: "💝 Happy Valentine's Day from Gritz N Wafflez" },
+    stpat: { hair: "stpat", decor: ["🍀", "🌈", "🍀"], music: "default", banner: "🍀 Happy St. Patrick's Day" },
+    july4: { hair: "july4", decor: ["🇺🇸", "🎆", "🇺🇸"], music: "default", banner: "🎆 Happy 4th of July from Gritz N Wafflez" }
   };
   function themeId() {
     var q = (QS.get("theme") || "").toLowerCase(); if (q) return THEMES[q] ? q : "";
@@ -410,19 +410,24 @@
     ".din.aim .tb.wait{outline:2px dashed #FFD23F;outline-offset:2px;border-radius:8px;animation:aim 1s ease-in-out infinite}@keyframes aim{50%{outline-color:#fff}}",
     ".tb.r1{z-index:3}.tb.r2{z-index:6}",
     // servers + Jurni on the floor
-    ".srv{position:absolute;left:0;top:0;width:26px;height:42px;z-index:5;pointer-events:none;will-change:transform;transform-origin:13px 42px}",
+    ".srv{position:absolute;left:0;top:0;width:44px;height:71px;z-index:5;pointer-events:none;will-change:transform;transform-origin:22px 71px}",
     ".srv .sv{width:100%;height:100%;animation:bob .32s ease-in-out infinite alternate}",
     "@keyframes bob{from{transform:translateY(0) rotate(-3deg)}to{transform:translateY(-3px) rotate(3deg)}}",
-    ".srv .cp{position:absolute;left:-7px;top:6px;width:20px;height:20px;border-radius:50%;object-fit:cover;border:2px solid #111;box-shadow:0 2px 4px #0006}",
-    ".jfl{position:absolute;left:0;top:0;width:40px;height:68px;z-index:5;pointer-events:none;will-change:transform;transform-origin:20px 68px;transition:opacity .3s}.jfl.ink{opacity:0}",
+    ".srv .cp{position:absolute;left:-9px;top:12px;width:26px;height:26px;border-radius:50%;object-fit:cover;border:2px solid #111;box-shadow:0 2px 4px #0006}",
+    ".jfl{position:absolute;left:0;top:0;width:46px;height:76px;z-index:5;pointer-events:none;will-change:transform;transform-origin:23px 76px;transition:opacity .3s}.jfl.ink{opacity:0}",
+    ".jfl.push .jw{transform:rotate(8deg) translateX(1px);transform-origin:50% 100%;transition:transform .25s}",
     ".jfl.dz .jw{animation:jdz .55s ease-in-out 4;transform-origin:50% 100%}@keyframes jdz{0%,100%{transform:none}25%{transform:translateY(-5px) rotate(-7deg)}50%{transform:rotateY(180deg) translateY(0)}75%{transform:rotateY(180deg) translateY(-5px) rotate(7deg)}}",
     ".jfl .jw{display:block;width:100%;height:100%}.jfl.walk .jw{animation:jsway .36s ease-in-out infinite alternate}@keyframes jsway{from{transform:translateY(0) rotate(-1.5deg)}to{transform:translateY(-2px) rotate(1.5deg)}}",
     // soft floor shadows so people stand IN the room (static radial gradients, no filters)
     ".srv:before,.jfl:before,.wk:before{content:'';position:absolute;left:12%;right:12%;bottom:-3px;height:7px;border-radius:50%;background:radial-gradient(closest-side,#000a,#0000)}",
     ".jfl:before{left:18%;right:18%;bottom:-2px}",
     // guests on foot (walking in, waiting in line, walking out): pointer-events none, transform-only movement
-    ".wk{position:absolute;left:0;top:0;width:19px;height:41px;z-index:5;pointer-events:none;will-change:transform;transform-origin:9.5px 41px}",
-    ".wk img{display:block;width:100%;height:100%;object-fit:contain;object-position:bottom}",
+    ".wk{position:absolute;left:0;top:0;width:40px;height:72px;z-index:5;pointer-events:none;will-change:transform;transform-origin:20px 72px;display:flex;justify-content:center;align-items:flex-end}",
+    ".wk img{display:block;height:100%;width:auto;flex:none;transform-origin:50% 100%;transition:opacity .35s}",
+    // sitting down / standing up: ease between full standing size and the seated size (squash toward the seat) in ~0.4 s
+    ".wk .sz{display:flex;justify-content:center;align-items:flex-end;width:100%;height:100%;transform-origin:50% 100%;transition:transform .42s cubic-bezier(.4,0,.3,1),opacity .42s}",
+    ".wk.sit .sz{transform:scale(.9,.56)}.wk.gone .sz{opacity:0}.wk.fl .sz{transform:scaleX(-1)}.wk.fl.sit .sz{transform:scale(-.9,.56)}",
+    ".wk.q .tg{top:auto;bottom:3px;left:-6px;transform:none}.wk.ox .tg,.wk.ox .ph2,.wk.ox .rx{display:none}",   // in line: the party-size tag sits by their legs, off the poster
     ".wk.mv img{animation:wkb .3s ease-in-out infinite alternate}@keyframes wkb{from{transform:translateY(0) rotate(-2.5deg)}to{transform:translateY(-2px) rotate(2.5deg)}}",
     ".wk.q img{animation:wkq 2.4s ease-in-out infinite}@keyframes wkq{50%{transform:translateY(-.6px) rotate(-1deg)}}",
     ".wk.fd{transition:opacity .35s}.wk.fd.hid{opacity:0}",
@@ -452,15 +457,16 @@
     "@keyframes spin{0%{transform:rotateY(0) translateY(0)}25%{transform:rotateY(180deg) translateY(-14px) scale(1.05,.95)}50%{transform:rotateY(360deg) translateY(0) scale(.95,1.05)}75%{transform:rotateY(360deg) translateY(-10px)}100%{transform:rotateY(360deg) translateY(0)}}",
     ".dance .tray{position:absolute;left:-26px;top:38%;display:flex;gap:2px}.dance .tray img{width:20px;height:auto}",
     ".spk{position:absolute;font-size:16px;z-index:14;pointer-events:none;animation:spk 1.2s ease-out forwards}@keyframes spk{0%{transform:scale(.2);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.2);opacity:0}}",
-    // theme effects (layer over the real room)
-    ".fxl{position:absolute;left:0;right:0;top:0;height:86px;pointer-events:none;z-index:2;overflow:hidden}",   // theme fx stay on the wall, never over the floor
-    "",
-    ".fxl i{position:absolute;font-style:normal;opacity:.75;animation-iteration-count:infinite;animation-timing-function:linear}",
-    ".fxl.float i{animation-name:fxFloat}.fxl.fall i,.fxl.snow i{animation-name:fxFall}.fxl.snow i{color:#fff;text-shadow:0 0 4px #9cf}.fxl.burst i{animation-name:fxBurst;animation-timing-function:ease-out}",
-    "@keyframes fxFloat{0%{transform:translate(-30px,0)}50%{transform:translate(20px,-14px)}100%{transform:translate(380px,6px)}}",
-    "@keyframes fxFall{0%{transform:translate(0,-30px) rotate(0)}100%{transform:translate(30px,240px) rotate(300deg)}}",
-    "@keyframes fxBurst{0%{transform:scale(.2);opacity:0}20%{opacity:1}100%{transform:scale(1.6);opacity:0}}",
     ".decor{position:absolute;right:62px;top:66px;z-index:2;font-size:12px;letter-spacing:1px;pointer-events:none}",
+    // Halloween ceiling decor: twisted orange/black crepe streamers + hanging noodle ribbons under the ceiling band (gentle
+    // sway), and jack-o'-lantern lanterns with a warm flicker (opacity only). Static/ambient; nothing flies over the floor.
+    ".hw{position:absolute;left:0;right:0;top:11px;height:18px;z-index:3;pointer-events:none;transform-origin:50% 0;animation:hsway 5s ease-in-out infinite alternate}@keyframes hsway{from{transform:skewX(-1.2deg)}to{transform:skewX(1.2deg)}}",
+    ".hw svg{display:block;width:100%;height:100%;overflow:visible}",
+    ".lan{position:absolute;top:8px;width:11px;z-index:3;pointer-events:none;transform-origin:50% 0;animation:lsw 3.4s ease-in-out infinite alternate}@keyframes lsw{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}",
+    ".lan:before{content:'';display:block;margin:0 auto;width:1px;height:3px;background:#2b1a0e}",
+    ".lan svg{display:block;width:11px;height:9px}",
+    ".lan .gw{position:absolute;left:-4px;right:-4px;top:1px;height:17px;border-radius:50%;background:radial-gradient(closest-side,#ffb54a88,#ff8a1a33 55%,#0000);animation:flk 1.9s steps(1) infinite}",
+    "@keyframes flk{0%{opacity:.85}12%{opacity:.55}20%{opacity:1}43%{opacity:.7}51%{opacity:.95}70%{opacity:.6}82%{opacity:1}}",
     ".lights{position:absolute;left:0;right:0;top:12px;height:10px;z-index:3;background:radial-gradient(circle,#ff4d4d 2.5px,transparent 3px) 0 2px/18px 10px,radial-gradient(circle,#3fd16f 2.5px,transparent 3px) 9px 4px/18px 10px;animation:tw 1s steps(2) infinite;pointer-events:none}@keyframes tw{50%{filter:brightness(1.6)}}",
     ".ou2.th-halloween .din .wl{background:linear-gradient(180deg,#ff8a2a22,#5a2a7a55)}.ou2.th-christmas .din .wl{background:linear-gradient(180deg,#ffffff22,#2f8f4e22)}.ou2.th-thanksgiving .din .wl{background:linear-gradient(180deg,#ff8c3a22,#7a3a1a33)}",
     // ---- kitchen (player side): stainless pass shelf, ticket rail, line + tile floor ----
@@ -553,12 +559,28 @@
     ".brk{display:grid;grid-template-columns:1fr auto;gap:2px 12px;max-width:290px;margin:8px auto 4px;font:700 13.5px var(--body);color:#E8DCF5;text-align:left}.brk b{color:#F2C14E;text-align:right}.brk .neg{color:#ff8a7a}",
     "html.th-halloween .mark{box-shadow:0 0 0 6px var(--cream),0 0 0 7px #e0782a,0 18px 40px #6a2c9a33}html.th-christmas .mark{box-shadow:0 0 0 6px var(--cream),0 0 0 7px #2f8f4e,0 18px 40px #b8322a33}",
     ".thb{display:inline-block;margin:8px 0 0!important;font:800 13px var(--body);color:#2A1E36!important;background:#fff;border:1px dashed var(--gold);border-radius:999px;padding:5px 12px}",
-    "@media (prefers-reduced-motion:reduce){.fxl,.lights{display:none}.srv .sv,.jfl .jw,.tb .gq .im,.dance .jw,.ps .stm,.din.aim .tb.wait{animation:none!important}.din .door2 .gls{transition:none}}"
+    "@media (prefers-reduced-motion:reduce){.lights{display:none}.hw,.lan,.lan .gw{animation:none!important}.srv .sv,.jfl .jw,.tb .gq .im,.dance .jw,.ps .stm,.din.aim .tb.wait{animation:none!important}.din .door2 .gls{transition:none}}"
   ].join("");
   var stEl = D.createElement("style"); stEl.textContent = css; D.head.appendChild(stEl);
 
   /* ================= SCENE ================= */
   // the geometric mural (inline SVG, drawn once): squares with half-circles in mustard / slate / navy / gold foil
+  function hallowDecor() {
+    // 3 swag garlands (twisted: an orange and a black dashed stroke on the same curve) + noodle ribbons hanging from the pins
+    var W = 400, sw = function (y0, dip, per, off) { var d = "M" + (-off) + " " + y0; for (var x = -off; x < W; x += per) d += " Q" + (x + per / 2) + " " + (y0 + dip) + " " + (x + per) + " " + y0; return d; };
+    var g = function (d, w) { return '<path d="' + d + '" fill="none" stroke="#ff7a12" stroke-width="' + w + '" stroke-dasharray="2.6 2.6"/><path d="' + d + '" fill="none" stroke="#151012" stroke-width="' + w + '" stroke-dasharray="2.6 2.6" stroke-dashoffset="2.6"/>'; };
+    var rib = ""; for (var i = 0; i < 9; i++) { var x = 14 + i * 46, c = i % 2 ? "#151012" : "#ff7a12"; rib += '<path d="M' + x + ' 2 q2 3 0 6 q-2 3 0 6" fill="none" stroke="' + c + '" stroke-width="1.3" opacity=".9"/>'; }
+    var svg = '<div class="hw" aria-hidden="true"><svg viewBox="0 0 ' + W + ' 18" preserveAspectRatio="none">' + g(sw(1, 7, 46, 0), 2) + g(sw(1.5, 5, 34, 11), 1.6) + rib + "</svg></div>";
+    var faces = [   // 5 different jack-o'-lantern faces (glowing cut-outs)
+      'M6 7l2-2 2 2zM12 7l2-2 2 2zM6 11q5 4 10 0q-5 2-10 0z',
+      'M6 6h3v2h-3zM13 6h3v2h-3zM6 10l2 2 2-2 2 2 2-2 2 2v1h-10z',
+      'M6 8l2-3 2 3zM12 8l2-3 2 3zM7 11h8l-1 2h-6z',
+      'M6.5 7a1.4 1.4 0 1 0 .1 0zM15.5 7a1.4 1.4 0 1 0 .1 0zM7 11q4 3 8 0l-1 1.5h-6z',
+      'M6 6l3 2h-3zM16 6l-3 2h3zM6 10.5l1.5 1.5 1.5-1.5 1.5 1.5 1.5-1.5 1.5 1.5 1.5-1.5 1 1.5q-5 2-10 0z'];
+    var xs = [27.5, 42, 56, 72, 90], lan = xs.map(function (x, i) {
+      return '<div class="lan" style="left:' + x + '%;animation-delay:-' + (i * 0.9) + 's" aria-hidden="true"><i class="gw" style="animation-delay:-' + (i * 0.37) + 's"></i><svg viewBox="0 0 22 18"><ellipse cx="11" cy="10" rx="10" ry="7.5" fill="#e8741a"/><path d="M4 10q0-6 4-7M18 10q0-6-4-7M11 3v14" stroke="#b9530c" stroke-width=".8" fill="none" opacity=".7"/><rect x="10" y="0.5" width="2" height="3" rx="1" fill="#3a5a1c"/><path d="' + faces[i % faces.length] + '" fill="#ffd36a"/></svg></div>'; }).join("");
+    return svg + lan;
+  }
   function muralSVG() {
     var C = { m: "#e3b23c", s: "#6c706b", n: "#3e5a8f", g: "url(#gf)" }, bg = ["#f3efe6", "#d6d8d6", "#e9e5dc"], sq = 32, cols = 12, rows = 2, h = "";
     var pat = "gsnmgsnmmgsngnsmgmsnmgns";   // fixed, so the wall looks the same every visit
@@ -586,11 +608,7 @@
     '<div class="wm">Gritz <i>N</i> Wafflez</div>' +
     '<div class="mb"><b>TODAY</b>Peach Cobbler Waffle<br>🎤 GNW Karaoke Wed 6–10</div>' +
     '<button type="button" class="poster" id="poster" aria-label="Antidote\'s food review: watch on YouTube"><span class="fr"><span class="mt"><img src="img/review/poster.webp" alt="Antidote eating at Gritz N Wafflez"><i class="pl"></i><span class="cap"><span>@therealantidote <em>· my review</em></span></span></span></span><i class="gl"></i></button>' +
-    (TH.fx ? '<div class="fxl ' + TH.kind + '">' + TH.fx.concat(TH.fx).map(function (f, i) {
-      var s = TH.kind === "float" ? "top:" + (8 + (i * 23) % 70) + "%;left:-20px;animation-duration:" + (14 + (i * 5) % 9) + "s;animation-delay:-" + (i * 2.7) + "s;font-size:" + (12 + (i * 3) % 7) + "px"
-        : TH.kind === "burst" ? "top:" + (6 + (i * 29) % 40) + "%;left:" + (8 + (i * 37) % 84) + "%;animation-duration:2.4s;animation-delay:-" + (i * 0.6) + "s;font-size:20px"
-          : "left:" + ((i * 41) % 100) + "%;top:-20px;animation-duration:" + (7 + (i * 3) % 6) + "s;animation-delay:-" + (i * 1.3) + "s;font-size:" + (9 + (i * 3) % 7) + "px";
-      return '<i style="' + s + '">' + f + "</i>"; }).join("") + "</div>" : "") +
+    (TH_ID === "halloween" ? hallowDecor() : "") +
     (TH.lights ? '<div class="lights"></div>' : "") + (TH.decor ? '<div class="decor">' + TH.decor.join("") + "</div>" : "") +
     TABLES.map(function (t) { return '<div class="tb c' + t.cap + ' r' + t.row + '" id="tb' + t.id + '" data-tb="' + t.id + '" style="left:' + t.x * 100 + '%;top:' + t.y * 100 + '%;--w:' + (t.cap === 4 ? 112 : 60) + 'px" role="button" aria-label="Table ' + t.id + '"><i class="cs"></i><div class="gs"></div><div class="tt"></div><div class="pb"><i></i></div><div class="dirt">🍽️</div><span class="tn">' + t.id + '</span><div class="flash"></div></div>'; }).join("") +
     '<div class="jfl" id="jfl"></div><div class="vig"></div><div class="lvb" id="lvb"><h3></h3><p></p></div><div class="cut" id="cut"></div><div class="shortp" id="shortp">🔥 Kitchen\'s short-staffed</div></div>' + '<div class="howc" id="howc" role="dialog" aria-label="How to cook"></div>' +
@@ -847,8 +865,12 @@
 
   /* ================= GUESTS ON FOOT (visual only: pointer-events none, transform-only, never blocks a tap) ================= */
   var WK = [], QMAX = 3;
-  function wkEl(id, cls) { var el = D.createElement("div"); el.className = "wk " + (cls || ""); el.innerHTML = '<img src="' + GI + "guests/" + id + '.webp" alt="">'; din.appendChild(el); return el; }
-  function wkPlace(w) { var k = depth(w.y); w.el.style.transform = "translate(" + (w.x - 9.5).toFixed(1) + "px," + (w.y - 41).toFixed(1) + "px) scale(" + (w.face < 0 ? -k : k).toFixed(3) + "," + k.toFixed(3) + ")"; w.el.style.zIndex = zAt(w.y); }
+  // standing height (px at the front of the room): adults ≈95% of Jurni's 76 px, teens ≈88%, kids ≈68%. All guest
+  // sprites are full-body standing cut-outs (300 px tall, figure edge to edge), so height alone sets the size; no stretching.
+  var JH = 76;
+  function guestH(id) { return Math.round(JH * (has(id, "kid") ? 0.68 : has(id, "teen") ? 0.88 : 0.95)); }
+  function wkEl(id, cls) { var el = D.createElement("div"), h = guestH(id); el.className = "wk " + (cls || ""); el.style.height = h + "px"; el.style.transformOrigin = "20px " + h + "px"; el.innerHTML = '<span class="sz"><img src="' + GI + "guests/" + id + '.webp" alt=""></span>'; din.appendChild(el); return el; }
+  function wkPlace(w) { var k = depth(w.y), h = w.h || (w.h = guestH(w.id)); w.el.style.transform = "translate(" + (w.x - 20).toFixed(1) + "px," + (w.y - h).toFixed(1) + "px) scale(" + k.toFixed(3) + ")"; w.el.style.zIndex = zAt(w.y); if ((w.face < 0) !== !!w.fl) { w.fl = w.face < 0; w.el.classList.toggle("fl", w.fl); } if ((w.x < 4) !== !!w.ox) { w.ox = w.x < 4; w.el.classList.toggle("ox", w.ox); } }   // outside the door: no floating tags at the edge   // only the figure flips, tags stay readable
   // walker: {x,y,pts:[{x,y}],v px/s,delay ms,cb}
   function walker(id, x, y, pts, o) {
     o = o || {}; var w = { id: id, el: wkEl(id, o.cls), x: x, y: y, pts: pts.slice(), v: o.v || 95, delay: o.delay || 0, cb: o.cb, face: 1, z: o.z };
@@ -883,6 +905,7 @@
   }
   function wkClear() { WK.forEach(function (w) { if (w.el) w.el.remove(); }); WK = []; og.queue = []; (og.tables || []).forEach(function (t) { t.comingIds = null; }); }
   function doorPt() { return { x: 15, y: dsz().h - 5 }; }
+  function outPt() { return { x: -16, y: dsz().h - 6 }; }   // the sidewalk, just outside the doorway (clipped by the room)
   function aisleY() { return Math.round(dsz().h * 0.75); }
   function seatPt(tb, i, n) { var s = dsz(); return { x: tb.def.x * s.w + (i - (n - 1) / 2) * 24, y: tb.def.y * s.h - (tb.def.row === 2 ? 9 : 5) }; }
   function pathTo(tb, i, n, from) { return route(from || doorPt(), aislePt(seatPt(tb, i, n).x)); }   // door/line → around the furniture → the aisle by their seat, then they sit
@@ -893,22 +916,26 @@
     var n = party.ids.length, left = n, lvl = og.level, d = doorPt();
     if (!q) { doorOpen(1600); if (!J.task && J.mode === "door" && !J.inK) { J.face = 1; jPose("door", 1300, pick(["Welcome to Gritz! 💛", "Hey hey, come on in! 💛", "Welcome in! 💛"])); } }
     party.ids.forEach(function (id, i) {
-      var qw = q && q.wk[i] && !q.wk[i].dead ? q.wk[i] : null, st = qw ? { x: qw.x, y: qw.y } : (q ? { x: lineSpot(0).x, y: lineSpot(0).y } : d);
+      var qw = q && q.wk[i] && !q.wk[i].dead ? q.wk[i] : null, o = outPt(), st = qw ? { x: qw.x, y: qw.y } : o;   // the rest of a waiting party was outside
       if (qw) wkGone(qw);
-      walker(id, st.x, st.y, pathTo(tb, i, n, st), { delay: i * 300, cb: function (w) {
-        wkGone(w); if (--left === 0 && og.level === lvl && tb.state === "coming") { tb.comingIds = null; tb.state = "free"; seat(tb, party); } } });
+      walker(id, st.x, st.y, (qw ? [] : [d]).concat(pathTo(tb, i, n, qw ? st : d)), { delay: i * 300, cb: function (w) {
+        w.el.classList.remove("mv", "q"); w.el.classList.add("sit");   // sits down (~0.4 s), stays as a ghost until the whole party is down
+        if (--left === 0) later(RM ? 0 : 420, function () { WK.forEach(function (x) { if (x.party === party && !x.dead) { x.dead = true; x.el.classList.add("gone"); var e = x.el; setTimeout(function () { e.remove(); }, 450); } });   // crossfade into the seated rendering
+          if (og.level === lvl && tb.state === "coming") { tb.comingIds = null; tb.state = "free"; seat(tb, party); } }); } });
+      WK[WK.length - 1].party = party;
     });
     if (q) q.wk.forEach(function (w) { if (!w.dead) wkGone(w); });
   }
-  function lineSpot(k) { var h = dsz().h; return { x: 63 - (k % 2) * 12, y: h - 3 - k * 15 }; }
+  // two places by the host stand; a third party waits just outside the door (the line spills onto the sidewalk) and walks in when it moves up
+  function lineSpot(k) { var h = dsz().h; return [{ x: 63, y: h - 2 }, { x: 52, y: h - 14 }][k] || outPt(); }
   function joinLine() {   // every table is taken: a new party lines up by the host stand (max 3 parties, one per arrival interval)
     og.queue = og.queue || []; if (og.queue.length >= QMAX || og.now < (og.qNextAt || 0) || og.lt <= 6000) return;
     var p = lvParams(og.level), party = makeParty(og.level, 4); if (!party.ids.length) return;
     og.qNextAt = og.now + p.arrive * 1000;
     var q = { party: party, wk: [], until: og.now + (MODE === "kid" ? 40000 : 30000) }, sp = lineSpot(og.queue.length), d = doorPt();
     og.queue.push(q); doorOpen(1400);
-    party.ids.slice(0, 2).forEach(function (id, j) {
-      q.wk.push(walker(id, d.x, d.y, route(d, { x: sp.x + j * 7, y: sp.y - j * 2 }), { delay: j * 250, tag: j === 0 ? "⏳ " + party.ids.length : "", phone: j === 1 || Math.random() < 0.5, z: 4,
+    party.ids.slice(0, 1).forEach(function (id, j) {   // one person holds the party's place (tag = party size); bigger people need the room
+      var o = outPt(); q.wk.push(walker(id, o.x, o.y, [d].concat(route(d, { x: sp.x + j * 7, y: sp.y - j * 2 })), { delay: j * 250, tag: j === 0 ? "⏳ " + party.ids.length : "", phone: Math.random() < 0.6, z: 4,
         cb: function (w) { w.el.classList.add("q"); } }));
     });
   }
@@ -918,10 +945,10 @@
   // Every 15–25 s while people wait, ONE guest in line steps out, walks the floor to the aisle end right under Antidote's
   // poster, points up + laughs 😂, claps 👏, then walks back to their spot. They keep their place in the queue; if their table
   // frees up meanwhile, walkIn() starts them from wherever they are. Reduced motion: just a 👏 bubble in place.
-  function posterSpot() { var N = navNodes(); return { x: N.LA.x + 20, y: NAV_AY }; }   // right under the poster, clear of the line spots
+  function posterSpot() { var N = navNodes(); return { x: N.LA.x + 34, y: NAV_AY }; }   // right under the poster, clear of the line spots
   function rxSet(w, emo, hand) { if (!w || w.dead) return; var o = w.el.querySelector(".rx"), h = w.el.querySelector(".pu"); if (o) o.remove(); if (h) h.remove(); if (emo) w.el.insertAdjacentHTML("beforeend", '<span class="rx">' + emo + "</span>"); if (hand) w.el.insertAdjacentHTML("beforeend", '<span class="pu">👆</span>'); }
   function posterWatch() {
-    var cand = []; (og.queue || []).forEach(function (q) { q.wk.forEach(function (w) { if (!w.dead && !w.pts.length && w.fade == null) cand.push({ q: q, w: w }); }); });
+    var cand = []; (og.queue || []).forEach(function (q) { q.wk.forEach(function (w) { if (!w.dead && !w.pts.length && w.fade == null && w.x > 0) cand.push({ q: q, w: w }); }); });
     if (!cand.length) return false;
     var c = pick(cand), w = c.w, q = c.q; og.pw = w; w.watching = true;
     var back = function () {
@@ -949,7 +976,7 @@
     });
     gone.forEach(function (q) {
       og.queue.splice(og.queue.indexOf(q), 1); og.lost = (og.lost || 0) + 1;
-      q.wk.forEach(function (w, j) { if (!w.dead) { if (w.watching) { w.watching = false; og.pw = null; rxSet(w, "", false); w.el.classList.remove("clap"); } wkMove(w, route(w, doorPt()), { v: 120, delay: j * 200, cb: wkGone }); } });
+      q.wk.forEach(function (w, j) { if (!w.dead) { if (w.watching) { w.watching = false; og.pw = null; rxSet(w, "", false); w.el.classList.remove("clap"); } wkMove(w, route(w, doorPt()).concat([outPt()]), { v: 120, delay: j * 200, cb: wkGone }); } });
       doorOpen(1700);
     });
     if (gone.length) layoutLine();
@@ -958,9 +985,10 @@
   function walkOut(tb, mad) {
     var el = $("tb" + tb.id), n = tb.guests.length, longest = 0;
     tb.guests.forEach(function (g, i) {
-      var st = aislePt(seatPt(tb, i, n).x), pts = route(st, doorPt()), v = mad ? 125 : 90, delay = i * (mad ? 120 : 260);   // they stand up into the aisle
+      var st = aislePt(seatPt(tb, i, n).x), pts = route(st, doorPt()).concat([outPt()]), v = mad ? 125 : 90, delay = i * (mad ? 120 : 260);   // they stand up into the aisle
       longest = Math.max(longest, delay + walkTime(pts, st.x, st.y, v));
-      walker(g.id, st.x, st.y, pts, { v: v, delay: delay, tag: i === 0 ? (mad ? "😤" : "😋") : "", mad: mad, togo: !mad && Math.random() < 0.45, cb: wkGone });
+      var w = walker(g.id, st.x, st.y, pts, { v: v, delay: delay + (RM ? 0 : 420), tag: i === 0 ? (mad ? "😤" : "😋") : "", mad: mad, togo: !mad && Math.random() < 0.45, cb: wkGone });
+      if (!RM) { w.el.classList.add("sit"); w.el.classList.remove("mv"); requestAnimationFrame(function () { requestAnimationFrame(function () { w.el.classList.remove("sit"); w.el.classList.add("mv"); }); }); }   // stands up
     });
     el.querySelector(".gs").innerHTML = "";
     if (RM) doorOpen(900); else later(Math.max(0, longest - 1100), function () { doorOpen(1500); });
@@ -1129,7 +1157,7 @@
     if (og.sim) return; var P = tr.path, f = Math.min(1, tr.t / tr.dur), d = (tr.back ? 1 - f : f) * P.L, i = 1;
     while (i < P.length - 1 && P[i].d < d) i++;
     var a = P[i - 1], b = P[i], u = b.d > a.d ? Math.min(1, Math.max(0, (d - a.d) / (b.d - a.d))) : 1, x = a.x + (b.x - a.x) * u, y = a.y + (b.y - a.y) * u, face = (tr.back ? a.x - b.x : b.x - a.x) < 0 ? -1 : 1, k = depth(y);
-    tr.x = x; tr.y = y; tr.el.style.transform = "translate(" + (x - 13).toFixed(1) + "px," + (y - 42).toFixed(1) + "px) scale(" + (face * k).toFixed(3) + "," + k.toFixed(3) + ")"; tr.el.style.zIndex = zAt(y);
+    tr.x = x; tr.y = y; tr.el.style.transform = "translate(" + (x - 22).toFixed(1) + "px," + (y - 71).toFixed(1) + "px) scale(" + (face * k).toFixed(3) + "," + k.toFixed(3) + ")"; tr.el.style.zIndex = zAt(y);
   }
   function arrive(tb, gi, dish) {
     var g = tb.guests[gi]; if (!g || tb.state === "free" || tb.state === "gone") return;
@@ -1164,7 +1192,7 @@
   }
   function jPlace() {
     if (og.sim || !J.el) return; var k = depth(J.y);
-    J.el.style.transform = "translate(" + (J.x - 20).toFixed(1) + "px," + (J.y - 68).toFixed(1) + "px) scale(" + (J.face < 0 ? -k : k).toFixed(3) + "," + k.toFixed(3) + ")"; J.el.style.zIndex = zAt(J.y);
+    J.el.style.transform = "translate(" + (J.x - 23).toFixed(1) + "px," + (J.y - JH).toFixed(1) + "px) scale(" + (J.face < 0 ? -k : k).toFixed(3) + "," + k.toFixed(3) + ")"; J.el.style.zIndex = zAt(J.y);
   }
   function jReset() { var d = doorSpots()[0]; J.x = d.x; J.y = d.y; J.task = null; J.over = null; J.face = 1; J.inK = false; J.mode = "door"; J.idleAt = og.now + 2500; if (J.el) J.el.classList.remove("ink", "dz"); jSet("walkA"); jPlace(); }
   function jOutOfKitchen() { if (J.inK) { J.inK = false; if (J.el) J.el.classList.remove("ink"); } }
@@ -1187,8 +1215,19 @@
     if (J.task && J.carrying) return;
     J.mode = "door"; jGo(d.x, d.y, "walk", function () { J.face = 1; jPose(big ? "tip" : "door", 1800, tips > 0 ? pick(["Thank you! Come back soon 💛", "Appreciate y'all! 💛", "Thanks for coming! 💛"]) : "Have a good one!"); jRest(3000); });
   }
-  var doorT = 0;
-  function doorOpen(ms) { var d = $("door"); if (!d || og.sim) return; d.classList.add("open"); din.classList.add("dopen"); clearTimeout(doorT); doorT = setTimeout(function () { d.classList.remove("open"); din.classList.remove("dopen"); }, ms || 1500); }
+  // The door is open while anyone is crossing the threshold (walkers near x<40) or for a requested time; when Jurni stands
+  // at the door and is free she holds it: faces the door, leans in, hand on the push bar. Then it swings shut behind them.
+  var doorUntil = 0, doorIs = false;
+  function doorOpen(ms) { if (og.sim) return; doorUntil = Math.max(doorUntil, performance.now() + (ms || 1500)); doorTick(); }
+  function doorTick() {
+    if (og.sim) return; var d = $("door"); if (!d) return;
+    if (WK.some(function (w) { return !w.dead && w.x < 40 && (w.pts.length || w.fade != null) && w.delay <= 0; })) doorUntil = Math.max(doorUntil, performance.now() + 450);
+    var open = performance.now() < doorUntil;
+    if (open !== doorIs) { doorIs = open; d.classList.toggle("open", open); din.classList.toggle("dopen", open); }
+    var hold = open && !J.task && !J.inK && J.x < 40 && J.y > 132;
+    if (hold) { J.face = -1; J.over = "door"; J.overUntil = og.now + 250; }
+    if (hold !== !!J.hold) { J.hold = hold; if (J.el) J.el.classList.toggle("push", hold); }
+  }
   function jRest(ms) { J.idleAt = og.now + ms + Math.random() * 1500; }
   function faceTo(tb) { return tb.def.x * dsz().w >= J.x ? 1 : -1; }
   // her routine (state machine): check on tables (favoring just-fed / getting-impatient ones), dance when it's calm,
@@ -1351,7 +1390,7 @@
     if (!og.running || og.sim || D.hidden) return;
     step(dt); render();
   }
-  function render() { frame++; drawTables(); if (og.act && og.act.length) drawStations(); if (frame % 4 === 0) passHeat(); if (frame % 6 === 0) railPatience(); hud(); }
+  function render() { frame++; doorTick(); drawTables(); if (og.act && og.act.length) drawStations(); if (frame % 4 === 0) passHeat(); if (frame % 6 === 0) railPatience(); hud(); }
   requestAnimationFrame(tick);
 
   /* ================= ATTRACT MODE (silent demo behind the start menu) ================= */
@@ -1508,6 +1547,7 @@
     levelUp: function () { og.lt = 1; }, jPose: function (p, ms, b) { jPose(p, ms || 1500, b); }, jGoodbye: jGoodbye, jDeliverTest: function (id) { var tb = og.tables[id - 1]; jDeliver(tb, 0, DISHES[2]); }, end: end, openPoster: openPoster,
     jurni: function () { return { x: J.x, y: J.y, inK: !!J.inK, mode: J.mode, task: !!J.task }; }, furniture: furniture, route: route, navNodes: navNodes,
     people: function () { return [{ k: "jurni", x: J.x, y: J.y, hid: !!J.inK }].concat(og.trips.filter(function (t) { return t.x != null && t.y <= dsz().h; }).map(function (t) { return { k: "server", x: t.x, y: t.y }; }), WK.filter(function (w) { return !w.dead; }).map(function (w) { return { k: "guest", x: w.x, y: w.y }; })); },
+    walkInTest: function (ids, tableId) { var tb = og.tables[tableId - 1]; if (tb && tb.state === "free") walkIn({ ids: ids, kind: "test" }, tb, null); }, jAt: function (x, y) { J.task = null; J.x = x; J.y = y; J.idleAt = og.now + 60000; jPlace(); }, guestH: guestH, JH: JH,
     jCheck: function (id) { jCheck(og.tables[id - 1]); }, posterWatchNow: function () { og.pwNext = og.now; og.pw = null; }, pw: function () { return og.pw ? { x: og.pw.x, y: og.pw.y, rx: (og.pw.el.querySelector(".rx") || {}).textContent || "" } : null; }, jDance: function () { jDance(); }, jKitchen: function () { jKitchen(); }, jDoor: function () { jDoorIdle(); },
     seatTest: function (ids, tableId) { var tb = og.tables[tableId - 1]; seat(tb, { ids: ids, kind: "test" }); }
   };

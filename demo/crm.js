@@ -454,7 +454,7 @@
           '<div class="crm-rcode"><input placeholder="Got a receipt? Type its code" maxlength="20"><button type="button" data-a="receipt">Add</button></div></div>' +
         // game access / tokens / free daily spin (CRM_CFG.tokens, CRM_CFG.spin)
         (TC || SPIN ? (function () {
-          var g = e(C.game || "the game"), sp = SPIN ? '<button type="button" data-a="spin"' + (spinReady(me) ? ' class="hot"' : '') + '>' + (spinReady(me) ? '🎡 Free daily spin' : '🎡 Spun today ✓') + '</button>' : '';
+          var g = e(C.game || "the game"), sp = SPIN ? '<button type="button" data-a="spin" style="position:relative"' + (spinReady(me) ? ' class="hot"' : '') + '>' + (spinReady(me) ? '🎡 Free daily spin<b style="position:absolute;right:-5px;top:-7px;min-width:18px;height:18px;border-radius:9px;background:#e3262f;color:#fff;font:900 11px/18px system-ui;padding:0 4px">1</b>' : '🎡 Spun today ✓') + '</button>' : '';
           if (!ON) return '<div class="crm-box" id="crm-tok"><h4>🎮 ' + g + (SPIN ? ' & daily spin' : '') + '</h4>' +
             (TC ? '<p style="margin:0;font-size:13.5px">' + g + ' is <b style="color:#3DDC97">free to play</b> for members' + (hasBoth(me) ? '. Your account is bound to this phone.' : ': add your phone + email once.') + ' Win points and prizes every shift.</p>' : '') +
             '<div class="crm-acts tok-btns">' + (TC ? '<button type="button" data-a="play">🎮 Play now</button>' : '') + sp + '</div>' +
@@ -938,6 +938,8 @@
     balance: function () { var m = this.member(); return m ? m.tok || 0 : 0; },
     canPlay: function () { var m = this.member(); return !!m && hasBoth(m) && (!ON || (m.tok || 0) >= TOK.playCost); },
     spinReady: function () { return spinReady(mine()[0]) || (!!SPIN && !mine()[0]); },
+    // ms until the next free spin (midnight, Los Angeles time)
+    nextSpinMs: function () { var t = new Date().toLocaleTimeString("en-US", { timeZone: "America/Los_Angeles", hour12: false }).split(":"); return Math.max(60000, (86400 - ((+t[0] % 24) * 3600 + +t[1] * 60 + +t[2])) * 1000); },
     play: function (go, opt) { if (!TC) { go(); return; } playGate(go, !!(opt && opt.kid)); },
     isParent: function () { return isParent(mine()[0]); }, kidUnlock: kidUnlock, parentCheck: parentCheck, signOut: signOut,
     kidBest: function (score) { var m = mine()[0]; if (!isParent(m)) return 0; if (score > (m.kidBest || 0)) { m.kidBest = Math.round(score); (m.ledger = m.ledger || []).unshift({ ts: Date.now(), pts: 0, t: "🧒 New kid best in " + (C.game || "the game") + ": " + m.kidBest.toLocaleString() }); put(m); drawJoin(); } return m.kidBest || 0; },

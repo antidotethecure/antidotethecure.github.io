@@ -129,6 +129,8 @@ footer a{color:var(--ink)}
 
 <script>window.REVIEW_EGG={vid:"jGsuQlDKTEs",restaurant:"Churrito Loco",short:"CHURRITO LOCO",bonus:300,img:"img/review/cover.webp",find:"A golden Antidote tile shows up once a run. Make a match right next to it"};</script>
 <script src="../reviewegg.js"></script>
+<script>window.HALFTIME={min:80,max:90};</script>
+<script src="../halftime.js"></script>
 <script>
 "use strict";
 /* ================= CONFIG — the only block that changes per client ================= */
@@ -522,7 +524,10 @@ var CONFIG = {
     cx.font="bold 26px Archivo,sans-serif"; cx.fillStyle="#2B1A0E"; cx.textAlign="center";
     cx.fillText((window.__T||String)("TAP TO PLAY"), W/2, H/2+100);
   }
+  var htPlayed=0;   // ms of play across this visit's runs (halftime)
   function start(){
+  // HALFTIME: no levels here, so the break plays between runs: the first new run after ~90 s of total play opens with Antidote's review reel
+    if(window.Halftime&&Halftime.tick(htPlayed,null,start)) return;
     fill(); score=0; chain=0; tLeft=CONFIG.game.seconds; parts=[]; sel=null; timerAcc=0; last=performance.now();
     $("score").textContent=0; $("timer").textContent=tLeft; $("final").hidden=true;
     $("gmsg").innerHTML="Match 3+ · 4-row <b>+40</b> · 5-row <b>+100</b> · close off the Churrito Man <b>+150</b> · don't touch the Serrano 🌶️ <b>(-25)</b>";
@@ -530,6 +535,7 @@ var CONFIG = {
     state="play"; requestAnimationFrame(loop);
   }
   function end(){
+    if(state!=="over"&&state!=="idle") htPlayed+=Math.max(0,(CONFIG.game.seconds-tLeft)*1000+timerAcc);
     state="over"; sel=null;
     cx.clearRect(0,0,W,H);
     $("final").hidden=false;

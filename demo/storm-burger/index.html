@@ -155,6 +155,8 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 
 <script>window.REVIEW_EGG={vid:"xZG8xJRGy9U",restaurant:"StormBurger",short:"STORMBURGER",bonus:500,img:"img/review/cover.webp",find:"A roadside billboard rolls by once a run. Drive through its golden ▶ token"};</script>
 <script src="../reviewegg.js"></script>
+<script>window.HALFTIME={min:85,max:95};</script>
+<script src="../halftime.js"></script>
 <script>
 window.CONFIG={name:"StormBurger",address:"1500 N La Brea Ave, Inglewood, CA 90302"};
 (function(){
@@ -256,6 +258,7 @@ function ready(im){ return im&&im.complete&&im.naturalWidth; }
 var FOOD=[{k:"burger",p:60,n:"Classic StormBurger",w:64},{k:"fries",p:30,n:"Fries",w:60},{k:"shake",p:40,n:"Shake",w:30},{k:"chicken",p:50,n:"Spicy Chicken",w:62}];
 var DEBRIS=[{k:"cow",w:104,r:30,why:"🐄 MOO!"},{k:"stop",w:70,r:24,why:"🛑 STOP!"}];
 var st; // game state
+var htPlayed=0;   // ms of play across this visit's runs (halftime)
 function fresh(){ return {running:false,over:false,lane:1,x:LX(1),score:0,lives:3,t:45000,items:[],bolts:[],rain:[],pops:[],speed:3.2,shake:0,inv:0,flash:0,last:0,spawnT:0,boltT:2500,coins:0,dmg:0,flames:[],smoke:[],cracks:[],dying:0,spin:0,rot:0,skids:[],rear:null}; }
 st=fresh();
 for(var i=0;i<90;i++) st.rain.push({x:Math.random()*W,y:Math.random()*H,l:8+Math.random()*14,v:9+Math.random()*7});
@@ -266,11 +269,14 @@ best();
 function setLane(n){ if(!st.running||st.dying) return; st.lane=Math.max(0,Math.min(LANES-1,n)); }
 window.__S={get:function(){return st;},setLane:function(n){st.lane=Math.max(0,Math.min(LANES-1,n));},LX:LX,start:function(){start();}};
 function start(){
+  // HALFTIME: no levels here, so the break plays between runs: the first new run after ~90 s of total play opens with Antidote's review reel
+  if(window.Halftime&&Halftime.tick(htPlayed,null,start)) return;
   var keep=st.rain; st=fresh(); st.rain=keep; st.running=true; st.last=performance.now();
   if(window.ReviewEgg) ReviewEgg.reset(18,30); // Antidote's review billboard: once a run, 18-30 s in
   $("over").classList.remove("on"); hud();
 }
 function end(){
+  if(st.running) htPlayed+=Math.max(0,Math.min(45000,45000-st.t));
   st.running=false; st.over=true;
   var b=best(); if(st.score>b){ try{localStorage.setItem("sb-best",st.score);}catch(e){} }
   best();

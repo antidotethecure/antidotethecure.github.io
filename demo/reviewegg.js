@@ -8,7 +8,12 @@
      <script src="../reviewegg.js"></script>
    Game side: ReviewEgg.reset() at the start of a run · ReviewEgg.due(elapsedMs) → true once when it's time to spawn ·
    ReviewEgg.collect() → bonus points (once per run) · ReviewEgg.drawSign(ctx,x,y,w) draws the billboard on a canvas ·
-   ReviewEgg.endCard(host, beforeEl) puts the card on the end screen. Test: add ?egg=1 to spawn it ~2.5 s into a run. */
+   ReviewEgg.endCard(host, beforeEl) puts the card on the end screen. Test: add ?egg=1 to spawn it ~2.5 s into a run
+   (ReviewEgg.testLevel is the ?egg= number, for games with their own test steps).
+   The cover always shows UNCROPPED (contain, full 16:9 frame) on the billboard, toast, end card and Points panel.
+   Caught it this run → the end screen plays a 5–10 s preview of the review's money shot (REVIEW_EGG.preview, default
+   img/review/preview.mp4 + preview.jpg poster): muted autoplay, TAP FOR SOUND, plays twice, then a big red
+   "▶ Watch it now" to the full review and @therealantidote. Not caught → the small card + a hint to catch it next run. */
 (function () {
   "use strict";
   if (window.ReviewEgg) return;
@@ -16,7 +21,8 @@
   var W = window, D = document;
   var T = function (s) { return (W.__T || String)(s); };
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]; }); };
-  var TEST = /[?&]egg=1(?:&|$)/.test(location.search);
+  var TL = (location.search.match(/[?&]egg=(\d+)/) || [])[1], TEST = TL === "1", TEST_LEVEL = TL ? +TL : 0;
+  var PREVIEW = C.preview || "img/review/preview.mp4", PREVIEW_POSTER = C.previewPoster || PREVIEW.replace(/\.mp4$/, ".jpg");
   var URL_ = "https://www.youtube.com/watch?v=" + encodeURIComponent(C.vid);
   var BONUS = C.bonus || 500, SHORT = C.short || C.restaurant.toUpperCase(), CLIP = C.kind === "clip";
   var me = D.currentScript, base = me && me.src ? me.src.replace(/reviewegg\.js(\?.*)?$/, "") : "../";
@@ -31,23 +37,35 @@
   /* ---------- styles: his brand (blue base, bold yellow, red play button) ---------- */
   var st = D.createElement("style");
   st.textContent =
-    ".re-card{display:flex;align-items:center;gap:10px;width:100%;max-width:340px;margin:10px auto 4px;padding:8px 10px 8px 8px;box-sizing:border-box;border-radius:14px;" +
-    "background:linear-gradient(135deg,#0b2a6b,#08183f);border:1px solid rgba(255,210,63,.55);box-shadow:0 6px 18px rgba(0,0,0,.28);color:#fff;text-decoration:none;text-align:left;" +
-    "font:600 12.5px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-tap-highlight-color:transparent}" +
-    ".re-card *{box-sizing:border-box}.re-card:active{transform:scale(.98)}" +
-    ".re-th{position:relative;flex:none;width:92px;aspect-ratio:16/9;border-radius:9px;overflow:hidden;background:#000;box-shadow:0 0 0 2px #ffd23f}" +
-    ".re-th img{display:block;width:100%;height:100%;object-fit:cover}" +
-    ".re-th i{position:absolute;left:50%;top:50%;width:26px;height:18px;margin:-9px 0 0 -13px;border-radius:5px;background:#e3262f;box-shadow:0 2px 6px rgba(0,0,0,.45)}" +
-    ".re-th i::after{content:'';position:absolute;left:10px;top:4.5px;border-left:8px solid #fff;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent}" +
+    ".re-card{display:block;width:100%;max-width:360px;margin:10px auto 4px;box-sizing:border-box;text-align:center;font:600 12.5px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}" +
+    ".re-card *{box-sizing:border-box}" +
+    ".re-link{display:block;padding:8px;border-radius:14px;background:linear-gradient(135deg,#0b2a6b,#08183f);border:1px solid rgba(255,210,63,.55);box-shadow:0 6px 18px rgba(0,0,0,.28);color:#fff;text-decoration:none;text-align:left;-webkit-tap-highlight-color:transparent}" +
+    ".re-link:active{transform:scale(.98)}" +
+    ".re-th{position:relative;display:block;width:100%;aspect-ratio:16/9;border-radius:9px;overflow:hidden;background:#000;box-shadow:0 0 0 2px #ffd23f}" +
+    ".re-th img{display:block;width:100%;height:100%;object-fit:contain}" +
+    ".re-th i{position:absolute;left:50%;top:50%;width:46px;height:32px;margin:-16px 0 0 -23px;border-radius:9px;background:rgba(227,38,47,.94);box-shadow:0 2px 8px rgba(0,0,0,.5)}" +
+    ".re-th i::after{content:'';position:absolute;left:18px;top:8px;border-left:14px solid #fff;border-top:8px solid transparent;border-bottom:8px solid transparent}" +
+    ".re-row{display:flex;align-items:center;gap:9px;margin-top:8px}" +
     ".re-tx{flex:1;min-width:0}.re-tx b{display:block;color:#ffd23f;font-weight:900;font-size:13px;line-height:1.2}.re-tx small{display:block;margin-top:2px;color:#dbe4ff;font-size:12px}" +
     ".re-tx em{display:block;font-style:normal;font-weight:900;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#7dffb5;margin-bottom:2px}" +
     ".re-logo{flex:none;width:30px;height:auto;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}" +
-    ".re-toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));z-index:2147483004;display:flex;align-items:center;gap:9px;max-width:min(360px,calc(100vw - 32px));" +
+    ".re-hint{margin:7px 4px 0;color:#ffd23f;font-weight:800;font-size:12.5px;text-shadow:0 1px 2px rgba(0,0,0,.5)}" +
+    ".re-prev{padding:10px;border-radius:16px;background:linear-gradient(160deg,#0f3aa8,#06164f);border:2px solid #ffd23f;box-shadow:0 8px 24px rgba(0,0,0,.35);color:#fff}" +
+    ".re-prev .re-k{display:block;font:900 12px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#7dffb5;margin:0 0 8px}" +
+    ".re-vb{position:relative;width:100%;height:min(46vh,400px);border-radius:12px;overflow:hidden;background:#000;box-shadow:0 0 0 2px rgba(255,210,63,.6)}" +
+    ".re-vb video{display:block;width:100%;height:100%;object-fit:contain;background:#000}" +
+    ".re-snd{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);padding:9px 14px;border-radius:999px;border:2px solid #ffd23f;background:rgba(0,0,0,.6);color:#fff;font:400 15px/1 Impact,'Arial Black',sans-serif;letter-spacing:1.5px;cursor:pointer;white-space:nowrap}" +
+    ".re-snd[hidden]{display:none}" +
+    ".re-watch{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;padding:14px 12px;border-radius:999px;background:#e10600;border:3px solid #ffd23f;color:#ffd23f;" +
+    "font:400 23px/1 Impact,'Arial Black',sans-serif;letter-spacing:1px;text-decoration:none;box-shadow:0 5px 0 #780000,0 10px 22px rgba(0,0,0,.4)}" +
+    ".re-watch:active{transform:translateY(3px);box-shadow:0 2px 0 #780000}" +
+    ".re-handle{display:block;margin-top:9px;font:400 17px/1 Impact,'Arial Black',sans-serif;letter-spacing:1px;color:#ffd23f;text-shadow:0 2px 0 #8a0000}" +
+    ".re-toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));z-index:2147483004;display:flex;align-items:center;gap:9px;width:max-content;max-width:min(360px,calc(100vw - 32px));box-sizing:border-box;" +
     "padding:7px 12px 7px 7px;border-radius:14px;background:rgba(8,24,63,.94);border:1px solid #ffd23f;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.4);pointer-events:none;" +
     "font:800 13.5px/1.25 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;opacity:0;transform:translate(-50%,-140%);transition:opacity .3s,transform .35s cubic-bezier(.34,1.4,.64,1)}" +
-    ".re-toast.on{opacity:1;transform:translate(-50%,0)}.re-toast img{flex:none;width:64px;aspect-ratio:16/9;object-fit:cover;border-radius:7px;box-shadow:0 0 0 2px #ffd23f}" +
+    ".re-toast.on{opacity:1;transform:translate(-50%,0)}.re-toast img{flex:none;width:80px;aspect-ratio:16/9;object-fit:contain;background:#000;border-radius:7px;box-shadow:0 0 0 2px #ffd23f}" +
     ".re-toast b{color:#ffd23f}.re-toast small{display:block;font-weight:600;color:#dbe4ff;font-size:12px}" +
-    ".gm-r.re-row .gm-ic img{max-width:46px;border-radius:6px}" +
+    ".gm-r.re-mrow .gm-ic img{max-width:56px;aspect-ratio:16/9;object-fit:contain;background:#000;border-radius:6px}" +
     "@media (prefers-reduced-motion:reduce){.re-toast{transition:opacity .2s}}";
   D.head.appendChild(st);
 
@@ -60,29 +78,55 @@
     clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove("on"); }, 3200);
   }
 
-  /* ---------- the card (end screen + Points panel) ---------- */
-  function cardHTML(found) {
+  /* ---------- the card (end screen + Points panel): full-width, uncropped cover ---------- */
+  function linkHTML(found) {
     var head = CLIP ? "Antidote The Foodie pulled up to " + C.restaurant : "Antidote The Foodie reviewed " + C.restaurant;
     var sub = CLIP ? "Watch the clip on YouTube ↗" : "Watch the review on YouTube ↗";
-    return '<a class="re-card" href="' + URL_ + '" target="_blank" rel="noopener" aria-label="' + esc(head + ". " + sub) + '">' +
-      '<span class="re-th"><img src="' + esc(cover.src) + '" alt="" loading="lazy"><i></i></span>' +
-      '<span class="re-tx">' + (found ? "<em>📺 " + esc(T("You found it")) + " · +" + BONUS + "</em>" : "") + "<b>" + esc(T(head)) + "</b><small>" + esc(T(sub)) + "</small></span>" +
-      '<img class="re-logo" src="' + esc(LOGO_SRC) + '" alt="Antidote The Foodie"></a>';
+    return '<a class="re-link" href="' + URL_ + '" target="_blank" rel="noopener" aria-label="' + esc(head + ". " + sub) + '">' +
+      '<span class="re-th"><img src="' + esc(cover.src) + '" alt="' + esc(head) + '" loading="lazy"><i></i></span>' +
+      '<span class="re-row"><img class="re-logo" src="' + esc(LOGO_SRC) + '" alt="Antidote The Foodie"><span class="re-tx">' +
+      (found ? "<em>📺 " + esc(T("You found it")) + " · +" + BONUS + "</em>" : "") + "<b>" + esc(T(head)) + "</b><small>" + esc(T(sub)) + "</small></span></span></a>";
+  }
+  function cardHTML(found, hint) {
+    return '<div class="re-card">' + linkHTML(found) + (hint ? '<p class="re-hint">🔒 ' + esc(T("Catch the hidden review next run to unlock the preview")) + "</p>" : "") + "</div>";
+  }
+  function previewHTML() {
+    return '<div class="re-card"><div class="re-prev"><span class="re-k">📺 ' + esc(T(CLIP ? "You found Antidote's clip" : "You found Antidote's review")) + " · +" + BONUS + "</span>" +
+      '<div class="re-vb"><video muted playsinline webkit-playsinline autoplay preload="auto" poster="' + esc(PREVIEW_POSTER) + '" src="' + esc(PREVIEW) + '"></video>' +
+      '<button type="button" class="re-snd">🔊 ' + esc(T("TAP FOR SOUND")) + "</button></div>" +
+      '<a class="re-watch" href="' + URL_ + '" target="_blank" rel="noopener">&#9654; ' + esc(T("Watch it now")) + "</a>" +
+      '<span class="re-handle">@therealantidote</span></div></div>';
+  }
+  var pvT = null;
+  function wirePreview(root) {
+    var v = root.querySelector("video"), snd = root.querySelector(".re-snd"); if (!v) return;
+    var plays = 1;
+    v.muted = true; v.defaultMuted = true;
+    function go(muted) { v.muted = muted; var p = v.play(); if (p && p.catch) p.catch(function () { if (!muted) { v.muted = true; snd.hidden = false; v.play().catch(function () {}); } }); }
+    v.addEventListener("ended", function () { if (plays < 2) { plays++; try { v.currentTime = 0; } catch (e) {} go(v.muted); } else snd.hidden = true; });   // loops once
+    v.addEventListener("error", function () { var vb = root.querySelector(".re-vb"); if (vb) vb.innerHTML = '<span class="re-th" style="height:100%;aspect-ratio:auto"><img src="' + esc(cover.src) + '" alt=""></span>'; });
+    snd.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); snd.hidden = true; if (v.ended || (plays >= 2 && v.paused)) { plays = 1; try { v.currentTime = 0; } catch (x) {} } go(false); });
+    v.addEventListener("click", function (e) { e.stopPropagation(); if (v.paused) { snd.hidden = true; if (v.ended) { plays = 1; try { v.currentTime = 0; } catch (x) {} } go(false); } });
+    go(true);
+    // the end screen goes away (new run): stop the clip so it never plays on unseen
+    if (pvT) clearInterval(pvT);
+    pvT = setInterval(function () { if (!D.contains(v)) { clearInterval(pvT); pvT = null; try { v.pause(); } catch (e) {} return; } if (!v.paused && v.offsetParent === null) try { v.pause(); } catch (e) {} }, 600);
   }
   function endCard(host, before) {
     if (!host) return null;
-    var old = host.querySelector(".re-card"); if (old) old.remove();
-    var w = D.createElement("div"); w.innerHTML = cardHTML(S.found); var a = w.firstChild;
+    [].forEach.call(host.querySelectorAll(".re-card"), function (o) { o.remove(); });
+    var w = D.createElement("div"); w.innerHTML = S.found ? previewHTML() : cardHTML(false, true); var a = w.firstChild;
     // taps on the card must open the video, not restart the game underneath
     ["pointerdown", "touchstart", "mousedown", "click"].forEach(function (ev) { a.addEventListener(ev, function (e) { e.stopPropagation(); }, { passive: true }); });
     if (before && before.parentNode === host) host.insertBefore(a, before); else host.appendChild(a);
+    if (S.found) wirePreview(a);
     return a;
   }
   // the start menu's 🏆 Points panel (gamemenu.js calls this with its own row renderer)
   function menuHTML(row) {
     var it = { img: cover.src, name: "📺 Antidote's " + (CLIP ? "clip" : "review") + " — find it for +" + BONUS, note: (C.find || "Hidden somewhere in every run") + (ever() ? " · you've found it before" : ""), pts: "+" + BONUS, gold: true };
-    var r = row ? row(it).replace('class="gm-r"', 'class="gm-r re-row"') : "";
-    return '<p class="gm-g">' + esc(T("Secret")) + "</p>" + r + cardHTML(false);
+    var r = row ? row(it).replace('class="gm-r"', 'class="gm-r re-mrow"') : "";
+    return '<p class="gm-g">' + esc(T("Secret")) + "</p>" + r + cardHTML(false, false);
   }
 
   /* ---------- canvas billboard: the cover in a gold frame with a label strip ---------- */
@@ -97,7 +141,11 @@
     var fg = c.createLinearGradient(x0, y0, x0, y0 + fh); fg.addColorStop(0, "#ffe27a"); fg.addColorStop(.5, "#d9a21b"); fg.addColorStop(1, "#ffd23f");
     c.fillStyle = fg; rr(c, x0, y0, fw, fh, 6); c.fill();
     c.fillStyle = "#08183f"; c.fillRect(x0 + pad, y0 + pad, w, ih + lh);
-    if (ready(cover)) c.drawImage(cover, x0 + pad, y0 + pad, w, ih); else { c.fillStyle = "#0b2a6b"; c.fillRect(x0 + pad, y0 + pad, w, ih); }
+    c.fillStyle = "#000"; c.fillRect(x0 + pad, y0 + pad, w, ih);
+    if (ready(cover)) {   // the WHOLE cover, never cropped: fit inside the 16:9 frame
+      var ca = cover.naturalWidth / cover.naturalHeight, dw = w, dh = w / ca; if (dh > ih) { dh = ih; dw = ih * ca; }
+      c.drawImage(cover, x0 + pad + (w - dw) / 2, y0 + pad + (ih - dh) / 2, dw, dh);
+    } else { c.fillStyle = "#0b2a6b"; c.fillRect(x0 + pad, y0 + pad, w, ih); }
     // red play button
     var bw = w * 0.2, bh = bw * 0.7, bx = x - bw / 2, by = y0 + pad + ih / 2 - bh / 2;
     c.fillStyle = "rgba(227,38,47,.92)"; rr(c, bx, by, bw, bh, bh * 0.25); c.fill();
@@ -127,7 +175,7 @@
     return BONUS;
   }
 
-  W.ReviewEgg = { cfg: C, url: URL_, bonus: BONUS, test: TEST, cover: cover, logo: logo, ready: ready,
+  W.ReviewEgg = { cfg: C, url: URL_, bonus: BONUS, test: TEST, testLevel: TEST_LEVEL, preview: PREVIEW, previewHTML: previewHTML, cover: cover, logo: logo, ready: ready,
     reset: reset, due: due, missed: missed, collect: collect, toast: toast, drawSign: drawSign, cardHTML: cardHTML, endCard: endCard, menuHTML: menuHTML,
     get found() { return S.found; }, get spawned() { return S.spawned; } };
 })();

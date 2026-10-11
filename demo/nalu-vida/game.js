@@ -1781,12 +1781,12 @@
   })();
 
   /* ---------- 3D renderer (game3d.js: Three.js + GLB models in 3d/) ----------
-     Opt-in: ?render=3d, or Settings → "3D graphics (beta)" (remembered on this phone). ?render=2d always forces 2D.
+     On by default (Settings → "3D graphics" turns it off, remembered on this phone). ?render=2d always forces 2D.
      The 3D layer draws the world (ocean, waves, sand, pier, surfer, sea life, splashes) on its own canvas under the 2D
      canvas, which keeps every label, ring, banner and the HUD. It drops back to the 2D renderer if WebGL / the module
      fails, or under ~40 fps for 5 s (test hook &keep3d=1 turns that off). Game logic never reads the 3D layer. */
   var RQ = QS.get("render"), KEEP3 = QS.get("keep3d") === "1", FPSM = { n: 0, acc: 0, low: 0, last: 0 }, gen3 = 0, PREF3 = false;
-  try { PREF3 = localStorage.getItem("nalu-3d") === "1"; } catch (e) {}
+  PREF3 = true; try { PREF3 = localStorage.getItem("nalu-3d") !== "0"; } catch (e) {}   // 3D (realistic ocean) is the default; Settings can turn it off
   var API3 = { G: G, W: W, H: H, HC: HC, PIER_X: PIER_X, PIER_W: PIER_W, STUB: STUB, SHORE_X: SHORE_X, CAM: CAM, SHK: SHK, IM: IM, reduce: REDUCE, wrap: wrap,
     zoom: function () { return ZOOM; }, sy: sy, pierX: pierX, bossYw: bossYw, gore: function () { return GORE; }, speed: speed };
   function off3D(why) {

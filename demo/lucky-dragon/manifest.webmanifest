@@ -1,0 +1,31 @@
+{
+  "name": "Lucky Dragon Hibachi — Menu, Rewards & Game",
+  "short_name": "Lucky Dragon",
+  "start_url": "./?s=homescreen&src=homescreen",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D0404",
+  "theme_color": "#0D0404",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ice Cream Trucks: Details</title>
+<meta name="description" content="Half the street never hears the truck music. SousShift AI rings their phone with an ice-cream-truck jingle when your truck is close, and gives them points to come back. English and Spanish.">
+<meta name="theme-color" content="#03060e">
+<link rel="canonical" href="https://antidotethecure.github.io/ice-cream/details/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SousShift AI">
+<meta property="og:title" content="SousShift AI for Ice Cream Trucks">
+<meta property="og:description" content="Your truck rings their phone when you're on their street. QR sticker, alerts, points. English y español.">
+<meta property="og:url" content="https://antidotethecure.github.io/ice-cream/details/">
+<meta property="og:image" content="https://antidotethecure.github.io/sousshift/img/og.jpg">
+<link rel="icon" href="../../second-shift/img/ssai-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="../ice.css">
+<style>
+.hero{text-align:center;padding:26px 0 4px}
+.hero h1{font-size:clamp(25px,7vw,40px)}
+.hero .lead{max-width:600px;margin:12px auto 0;font-size:18px}
+.hero .row{max-width:520px;margin:18px auto 0}
+.hook{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.hook div{border-radius:16px;padding:14px 10px;text-align:center;border:1px solid var(--edge);background:var(--panel);font-size:14.5px;color:var(--dim);line-height:1.3}
+.hook b{display:block;font-family:"Orbitron",sans-serif;font-size:22px;color:var(--ink);margin-bottom:4px}
+.hook .yes{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08)}
+.hook .no{border-color:rgba(255,184,107,.45);background:rgba(255,184,107,.06)}
+
+.steps{display:grid;gap:12px;counter-reset:st}
+.stp{display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center}
+.stp .pic{width:64px;height:64px;border-radius:18px;background:linear-gradient(180deg,#14306a,#0b1a3d);border:1px solid var(--edge);display:grid;place-items:center;font-size:32px;position:relative}
+.stp .pic::after{counter-increment:st;content:counter(st);position:absolute;top:-8px;left:-8px;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#2a1a00;font:900 13px "Orbitron",sans-serif;display:grid;place-items:center}
+.stp h3{margin-bottom:2px}
+.stp p{margin:0;color:var(--silver);font-size:15.5px}
+
+.truck{position:relative;max-width:560px;margin:0 auto}
+.truck svg{display:block;width:100%;height:auto}
+.mock{display:grid;gap:14px}
+@media(min-width:640px){.mock{grid-template-columns:1fr 1fr;align-items:start}}
+.phone{max-width:290px;margin:0 auto;border-radius:38px;border:8px solid #1b2236;background:linear-gradient(180deg,#1d3d7a,#0d1a3a 60%,#1a1030);padding:44px 12px 22px;min-height:440px;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.phone::before{content:"";position:absolute;top:10px;left:50%;transform:translateX(-50%);width:90px;height:22px;border-radius:12px;background:#000}
+.phone .clock{text-align:center;font:700 46px "Rajdhani",sans-serif;color:#fff;line-height:1;margin:8px 0 2px}
+.phone .date{text-align:center;color:#c9d3e6;font-size:14px;margin-bottom:18px}
+.phone .ring{margin-bottom:10px}
+.phone .mini{background:rgba(255,255,255,.12);border-radius:16px;padding:10px 12px;color:#eef3ff;font-size:14px}
+.phone .mini b{color:var(--gold)}
+
+/* calculator */
+.calc label{display:flex;justify-content:space-between;gap:10px;font-size:15.5px;font-weight:600}
+.calc label output{font-family:"Orbitron",sans-serif;font-size:14px;color:var(--gold);white-space:nowrap}
+.calc .f{margin:12px 0 2px}
+.calc .f small{display:block;color:var(--dim);font-size:13px;line-height:1.3}
+.calc input[type=range]{width:100%;accent-color:var(--blue);height:30px;margin:2px 0 0}
+.calc details{margin-top:10px;border-top:1px solid var(--edge);padding-top:6px}
+.calc summary{cursor:pointer;font-weight:700;color:var(--volt);min-height:44px;display:flex;align-items:center}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.res div{background:rgba(255,255,255,.04);border:1px solid var(--edge);border-radius:14px;padding:12px 10px;font-size:13.5px;color:var(--dim);line-height:1.25}
+.res b{display:block;font-family:"Orbitron",sans-serif;font-size:19px;color:var(--ink);margin-bottom:3px}
+.res .big{grid-column:1/-1;background:rgba(52,211,153,.09);border-color:rgba(52,211,153,.45);text-align:center}
+.res .big b{font-size:28px;color:var(--good)}
+table.t{width:100%;border-collapse:collapse;font-size:15px;margin-top:10px}
+table.t td{padding:8px 4px;border-top:1px solid var(--edge);vertical-align:top}
+table.t td.n{text-align:right;white-space:nowrap;font-weight:700}
+table.t small{display:block;color:var(--dim);font-size:12.5px;line-height:1.3}
+table.t tr.sum td{border-top:2px solid var(--gold);font-weight:800}
+table.t tr.minus td.n{color:var(--warn)}
+
+.rw{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.rw div{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:12px;font-size:14.5px;line-height:1.3;color:var(--silver)}
+.rw b{display:block;font-family:"Orbitron",sans-serif;font-size:14px;color:var(--gold);margin-bottom:4px}
+ul.honest{margin:0;padding-left:20px}
+ul.honest li{margin:8px 0;color:var(--silver)}
+ul.honest b{color:var(--ink)}
+.price{border-color:var(--gold);background:linear-gradient(180deg,rgba(255,209,102,.10),var(--panel));text-align:center}
+.price .tbd{font-family:"Orbitron",sans-serif;font-size:22px;color:var(--gold);margin:6px 0}
+.faq details{border-top:1px solid var(--edge);padding:2px 0}
+.faq details:first-child{border-top:0}
+.faq summary{cursor:pointer;font-weight:700;min-height:48px;display:flex;align-items:center;font-size:16.5px}
+.faq p{margin:2px 0 12px;color:var(--silver)}
+.src{font-size:13.5px;color:var(--dim);padding-left:18px;margin:0}
+.src li{margin:5px 0}
+.src a{word-break:break-word}
+.top .back{font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap}
+@media(max-width:420px){.top b small{display:none}}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <img class="brand" src="../../assets/sousshift-lockup-800w.png" alt="SousShift AI">
+  <b>SousShift AI<small data-t="topSub">for Ice Cream Trucks</small></b>
+  <a href="../" class="back" data-t="back">← Quick tour</a><span class="sp"></span>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true">EN</button><button data-lang="es" aria-pressed="false">ES</button></div>
+</div></div>
+
+<main class="wrap">
+  <header class="hero">
+    <p class="kick" data-t="heroKick">Ice cream trucks</p>
+    <h1 class="chrome" data-t="heroH">Half the street never hears your music.</h1>
+    <p class="lead" data-t="heroLead">Now their phone rings. When your truck turns onto their block, every customer who joined gets an alert with an ice-cream-truck jingle, so the people inside with the TV on, the AC running or headphones in know you're outside.</p>
+    <div class="row">
+      <a class="btn primary" href="../demo/" data-t="heroDemo">Try the customer demo</a>
+      <a class="btn ghost" href="#numbers" data-t="heroNums">Run your numbers</a>
+    </div>
+    <div class="hook">
+      <div class="yes"><b data-t="hookYesB">Hears it</b><span data-t="hookYes">Walks out, buys a paleta. You already get these sales.</span></div>
+      <div class="no"><b data-t="hookNoB">Never hears it</b><span data-t="hookNo">Inside, AC on, headphones in. Today you lose that sale. With the app, their phone rings.</span></div>
+    </div>
+  </header>
+
+  <section class="s" id="how">
+    <header><p class="kick" data-t="howKick">How it works</p><h2 class="chrome" data-t="howH">4 simple steps</h2></header>
+    <div class="steps">
+      <div class="stp"><div class="pic" aria-hidden="true">🔲</div><div><h3 data-t="s1H">A QR sticker on your truck</h3><p data-t="s1P">We give you a printed QR sticker for the window by where you serve. Customers scan it while they wait in line.</p></div></div>
+      <div class="stp"><div class="pic" aria-hidden="true">📲</div><div><h3 data-t="s2H">They join in 10 seconds</h3><p data-t="s2P">No app store, no download. They type their name, tap "Allow location" one time so we know which street is theirs, and turn on alerts. Free points just for joining.</p></div></div>
+      <div class="stp"><div class="pic" aria-hidden="true">🚚</div><div><h3 data-t="s3H">Your phone shares the truck's location</h3><p data-t="s3P">The driver taps "I'm on my route" on their phone. It shares where the truck is while you drive. Tap "Done for today" and it stops.</p></div></div>
+      <div class="stp"><div class="pic" aria-hidden="true">🔔</div><div><h3 data-t="s4H">Close by? Their phone rings</h3><p data-t="s4P">When the truck gets close (you pick the distance, like ¼ mile), their phone plays the jingle: "Paletas El Sol is on your street, 3 min away." They walk out, pay, and you scan their code for points.</p></div></div>
+    </div>
+  </section>
+
+  <section class="s" id="sticker">
+    <header><p class="kick" data-t="stKick">The sticker</p><h2 class="chrome" data-t="stH">What goes on your truck</h2><p class="lead" data-t="stLead">One sticker by the service window, one on the side people see from the curb. Big enough to scan from a few feet away.</p></header>
+    <div class="truck card">
+      <svg viewBox="0 0 560 300" role="img" aria-label="Ice cream truck with a QR sticker on the window">
+        <defs>
+          <linearGradient id="body" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f4f7ff"/><stop offset="1" stop-color="#cfd9f2"/></linearGradient>
+          <linearGradient id="stripe" x1="0" x2="1"><stop offset="0" stop-color="#ff8fc4"/><stop offset=".5" stop-color="#ffd166"/><stop offset="1" stop-color="#7ff0d0"/></linearGradient>
+        </defs>
+        <rect x="0" y="262" width="560" height="38" fill="#1a2440"/>
+        <rect x="0" y="270" width="560" height="4" fill="#2c3a62"/>
+        <path d="M40 90 Q40 70 60 70 H380 V250 H40 Z" fill="url(#body)"/>
+        <path d="M380 110 H450 Q470 110 482 128 L515 180 Q522 192 522 206 V250 H380 Z" fill="url(#body)"/>
+        <path d="M392 122 H446 Q458 122 466 134 L494 178 H392 Z" fill="#244a8a" opacity=".85"/>
+        <rect x="40" y="205" width="482" height="14" fill="url(#stripe)"/>
+        <rect x="70" y="92" width="210" height="96" rx="8" fill="#16305f"/>
+        <rect x="70" y="92" width="210" height="96" rx="8" fill="none" stroke="#8aa4d6" stroke-width="3"/>
+        <text x="175" y="128" text-anchor="middle" font-family="Rajdhani,Arial" font-weight="700" font-size="17" fill="#ffd166">PALETAS · RASPADOS</text>
+        <text x="175" y="152" text-anchor="middle" font-family="Rajdhani,Arial" font-weight="700" font-size="17" fill="#ffffff">ELOTES · FRITOS</text>
+        <text x="175" y="175" text-anchor="middle" font-family="Rajdhani,Arial" font-weight="600" font-size="13" fill="#9eb6e6">ice cream · helados</text>
+        <rect x="292" y="84" width="80" height="108" rx="8" fill="#ffffff" stroke="#ffd166" stroke-width="3"/>
+        <image href="../qr-sticker.svg" x="296" y="88" width="72" height="100" preserveAspectRatio="xMidYMid meet"/>
+        <path d="M150 40 l14 30 h-28 z" fill="#ffd166"/><circle cx="150" cy="34" r="16" fill="#ff8fc4"/><circle cx="150" cy="22" r="11" fill="#7ff0d0"/>
+        <rect x="140" y="58" width="20" height="14" fill="#f4f7ff"/>
+        <circle cx="120" cy="252" r="30" fill="#0f1526"/><circle cx="120" cy="252" r="13" fill="#9aa6c2"/>
+        <circle cx="440" cy="252" r="30" fill="#0f1526"/><circle cx="440" cy="252" r="13" fill="#9aa6c2"/>
+        <rect x="508" y="196" width="16" height="10" rx="3" fill="#ffd166"/>
+      </svg>
+      <div class="row" style="margin-top:12px">
+        <a class="btn gold" href="../qr-sticker.svg" download="ice-cream-truck-qr-sticker.svg" data-t="stDl">Download sticker (SVG)</a>
+        <a class="btn ghost" href="../qr-sticker.png" download="ice-cream-truck-qr-sticker.png" data-t="stPng">PNG for printing</a>
+      </div>
+      <p class="note" data-t="stNote">Sample sticker points to the demo truck. Yours gets your truck's name, colors and its own link. Print on outdoor vinyl, at least 4 × 5 in.</p>
+    </div>
+  </section>
+
+  <section class="s" id="see">
+    <header><p class="kick" data-t="seeKick">What the customer sees</p><h2 class="chrome" data-t="seeH">Their phone rings like a call</h2></header>
+    <div class="mock">
+      <div class="phone" aria-label="Phone lock screen with the truck alert">
+        <div class="clock">4:12</div>
+        <div class="date" data-t="phDate">Saturday, July 18</div>
+        <div class="ring on"><div class="ic">🍦</div><div><small data-t="phApp">Paletas El Sol · now</small><b data-t="phTitle">The truck is on your street!</b><span data-t="phBody">0.2 mi away, about 3 min. Walk out now 🎶</span></div></div>
+        <div class="mini" data-t="phPts">You have <b>40 pts</b>. 10 more = <b>$1 off</b> today.</div>
+      </div>
+      <div class="card">
+        <h3 data-t="seeWhatH">What they get</h3>
+        <ul class="honest">
+          <li data-t="see1">An alert with the <b>ice cream truck jingle</b> when you're close (our own original tune, no copyright problems).</li>
+          <li data-t="see2">A live map: <b>"Truck is 0.3 mi away, 4 min."</b></li>
+          <li data-t="see3">Your menu and prices, in English and Spanish.</li>
+          <li data-t="see4">Points every time they buy, and simple rewards.</li>
+          <li data-t="see5">A switch to pause alerts or leave any time.</li>
+        </ul>
+        <div class="row" style="margin-top:12px">
+          <button class="btn gold" id="hear" type="button" data-t="hearBtn">▶ Hear the jingle</button>
+          <a class="btn primary" href="../demo/" data-t="seeDemo">Open the demo</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="numbers">
+    <header><p class="kick" data-t="numKick">The numbers</p><h2 class="chrome" data-t="numH">What you make now vs. with the app</h2><p class="lead" data-t="numLead">Move the sliders to match your truck. Every number here is an <span class="est">estimate</span>, not a promise. Sources are listed below.</p></header>
+    <div class="card calc" id="calc">
+      <div class="f"><label><span data-t="cStops">Stops per day</span><output id="o-stops"></output></label><input type="range" id="stops" min="5" max="60" step="1" value="25"></div>
+      <div class="f"><label><span data-t="cHomes">Homes on the block at each stop</span><output id="o-homes"></output></label><small data-t="cHomesS">Houses or apartments close enough to hear the music.</small><input type="range" id="homes" min="10" max="150" step="5" value="40"></div>
+      <div class="f"><label><span data-t="cHear">% who hear your music today</span><output id="o-hear"></output></label><small data-t="cHearS">Antidote's estimate is about half. No study measures this, so use your gut.</small><input type="range" id="hear" min="10" max="90" step="5" value="50"></div>
+      <div class="f"><label><span data-t="cBuy">% of those who hear it and come out to buy</span><output id="o-buy"></output></label><small data-t="cBuyS">Set this so "today" matches your real day. Default lands at about $250/day.</small><input type="range" id="buy" min="2" max="30" step="1" value="10"></div>
+      <div class="f"><label><span data-t="cJoin">% of homes that join the app</span><output id="o-join"></output></label><small data-t="cJoinS">Takes a few weeks of the sticker on the truck to build up.</small><input type="range" id="join" min="1" max="40" step="1" value="10"></div>
+      <div class="f"><label><span data-t="cTicket">Average sale per customer</span><output id="o-ticket"></output></label><small data-t="cTicketS">Most truck items are $2 to $5. Use what you really average.</small><input type="range" id="ticket" min="2" max="15" step="0.5" value="5"></div>
+      <div class="f"><label><span data-t="cDays">Days you work per month</span><output id="o-days"></output></label><input type="range" id="days" min="4" max="30" step="1" value="22"></div>
+      <details>
+        <summary data-t="cMore">More settings (cards, repeat visits, routes)</summary>
+        <div class="f"><label><span data-t="cCard">% of customers who pay by card or in the app</span><output id="o-card"></output></label><input type="range" id="card" min="0" max="90" step="5" value="40"></div>
+        <div class="f"><label><span data-t="cLift">Bigger sale when paying by card</span><output id="o-lift"></output></label><small data-t="cLiftS">Studies found +32% to +50% (see sources). We use a careful 15%.</small><input type="range" id="lift" min="0" max="50" step="5" value="15"></div>
+        <div class="f"><label><span data-t="cRep">More visits from members (points)</span><output id="o-rep"></output></label><small data-t="cRepS">Restaurant loyalty members visit about 22% more (Circana 2025).</small><input type="range" id="rep" min="0" max="50" step="5" value="20"></div>
+        <div class="f"><label><span data-t="cSave">Minutes saved per day on dead streets</span><output id="o-save"></output></label><small data-t="cSaveS">The app shows where your members live, so you skip blocks where nobody buys.</small><input type="range" id="save" min="0" max="90" step="5" value="20"></div>
+        <div class="f"><label><span data-t="cMin">Minutes per stop (driving + serving)</span><output id="o-min"></output></label><input type="range" id="min" min="3" max="20" step="1" value="8"></div>
+      </details>
+
+      <div class="res" aria-live="polite">
+        <div><b id="r-today"></b><span data-t="rToday">per month today (cash only)</span></div>
+        <div><b id="r-app"></b><span data-t="rApp">per month with the app</span></div>
+        <div class="big"><b id="r-extra"></b><span id="r-extra-l"></span></div>
+        <div><b id="r-members"></b><span data-t="rMembers">customers signed up on your route</span></div>
+        <div><b id="r-rang"></b><span data-t="rRang">phones that ring each day for people who wouldn't hear the music</span></div>
+      </div>
+      <table class="t">
+        <tbody>
+          <tr><td><span data-t="lAlert">New sales from alerts</span><small data-t="lAlertS">Members who didn't hear the music come out at the same rate as people who do.</small></td><td class="n" id="l-alert"></td></tr>
+          <tr><td><span data-t="lRep">Repeat visits from points</span><small data-t="lRepS">Members buy more often to reach a reward.</small></td><td class="n" id="l-rep"></td></tr>
+          <tr><td><span data-t="lCard">Bigger sales by card / app</span><small data-t="lCardS">People spend more when they aren't limited to the cash in their pocket.</small></td><td class="n" id="l-card"></td></tr>
+          <tr><td><span data-t="lRoute">Time saved on routes</span><small data-t="lRouteS">Saved minutes turned into extra stops on streets with members.</small></td><td class="n" id="l-route"></td></tr>
+          <tr class="minus"><td><span data-t="lCost">Cost of rewards you give away</span><small data-t="lCostS">If every point gets cashed in: about 20¢ per member visit.</small></td><td class="n" id="l-cost"></td></tr>
+          <tr class="sum"><td data-t="lSum">Extra per month</td><td class="n" id="l-sum"></td></tr>
+        </tbody>
+      </table>
+      <p class="note" data-t="calcFoot">Before the SousShift monthly price (TBD). Card processing fees (about 3%) are not included. Month one will be lower while people join.</p>
+    </div>
+  </section>
+
+  <section class="s" id="rewards">
+    <header><p class="kick" data-t="rwKick">Rewards</p><h2 class="chrome" data-t="rwH">Small rewards, big reasons to come out</h2><p class="lead" data-t="rwLead">No big game. Just points that add up fast and treats your customers actually want. You pick the rewards.</p></header>
+    <div class="rw">
+      <div><b data-t="rw1B">10 pts</b><span data-t="rw1">every purchase (scan their code at the window)</span></div>
+      <div><b data-t="rw2B">30 pts</b><span data-t="rw2">50¢ off</span></div>
+      <div><b data-t="rw3B">50 pts</b><span data-t="rw3">$1 off</span></div>
+      <div><b data-t="rw4B">80 pts</b><span data-t="rw4">Free chili cheese Fritos</span></div>
+      <div><b data-t="rw5B">+20 pts</b><span data-t="rw5">Birthday treat, or bring a neighbor who joins</span></div>
+      <div><b data-t="rw6B">Optional</b><span data-t="rw6">A tiny daily "spin" for 1 to 5 bonus points. One tap, no game to learn.</span></div>
+    </div>
+  </section>
+
+  <section class="s" id="honest">
+    <header><p class="kick" data-t="hoKick">Straight talk</p><h2 class="chrome" data-t="hoH">How it really works (the fine print, in plain words)</h2></header>
+    <div class="card">
+      <ul class="honest">
+        <li data-t="ho1"><b>iPhone:</b> alerts only work after the customer adds the app to their Home Screen (Share → "Add to Home Screen"). That's Apple's rule for web apps. The join screen walks them through it. Android works right from the browser.</li>
+        <li data-t="ho2"><b>Location is only with permission.</b> The customer taps "Allow" once so we know which street to ring. They can type their street instead, and nobody's exact address is shown to anyone.</li>
+        <li data-t="ho3"><b>They can turn it off any time:</b> pause alerts, change the distance, or delete their account in one tap.</li>
+        <li data-t="ho4"><b>We never sell their data.</b> Your customer list is yours, and only used to let them know you're nearby.</li>
+        <li data-t="ho5"><b>The driver's phone has to be on the route screen</b> for the truck's location to update. Keep it charging on a dash mount.</li>
+        <li data-t="ho6"><b>No spamming:</b> one alert per truck visit, never late at night. Customers set their own quiet hours.</li>
+        <li data-t="ho7"><b>The numbers above are estimates.</b> Your street, weather and prices decide the real result.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="s" id="price">
+    <div class="card price">
+      <p class="kick" data-t="prKick">Price</p>
+      <div class="tbd" data-t="prTbd">Price TBD: ask Antidote</div>
+      <p class="note" data-t="prNote">Setup includes your truck's app, menu in English and Spanish, the jingle alerts, points and the printed QR stickers. Monthly price still being set.</p>
+    </div>
+  </section>
+
+  <section class="s faq" id="faq">
+    <header><p class="kick">FAQ</p><h2 class="chrome" data-t="faqH">Questions owners ask</h2></header>
+    <div class="card">
+      <details><summary data-t="q1">Do my customers have to download an app?</summary><p data-t="a1">No. They scan the QR and it opens in their phone's browser. On iPhone they add it to the Home Screen so alerts can come through. It looks and works like an app.</p></details>
+      <details><summary data-t="q2">Does it work if I only take cash?</summary><p data-t="a2">Yes. Alerts and points work with cash. You scan their code at the window to give points. Taking cards or Cash App/Zelle in the app is optional, but people tend to spend more when they can pay with their phone.</p></details>
+      <details><summary data-t="q3">What if my customers speak Spanish?</summary><p data-t="a3">Everything is in English and Spanish, and each customer picks their language.</p></details>
+      <details><summary data-t="q4">Will it drain the driver's phone battery?</summary><p data-t="a4">Sharing location uses battery like a maps app does. Keep the phone plugged in on a dash mount while you drive.</p></details>
+      <details><summary data-t="q5">Can I control who gets alerts and when?</summary><p data-t="a5">Yes. You set the alert distance and the hours. Customers can only get one alert per visit, and they can pause it any time.</p></details>
+      <details><summary data-t="q6">Is the jingle a real song?</summary><p data-t="a6">It's our own original tune, made for this app, so there's no copyright trouble. If you have your own truck song you're licensed to use, we can use that instead.</p></details>
+      <details><summary data-t="q7">What do I have to do every day?</summary><p data-t="a7">Tap "I'm on my route" when you start and "Done" when you finish. Scan codes for points at the window. That's it.</p></details>
+    </div>
+  </section>
+
+  <section class="s" id="contact">
+    <div class="card" style="text-align:center">
+      <h2 class="chrome" data-t="ctH">Want this on your truck?</h2>
+      <p class="lead" data-t="ctLead">Send a message and Antidote will set up a free walkthrough with your truck's name on it.</p>
+      <div class="row" style="margin-top:14px">
+        <a class="btn primary" id="ct-mail" href="mailto:secondshiftai@gmail.com" data-t="ctMail">✉️ Email Antidote</a>
+        <a class="btn ghost off" id="ct-sms" href="#contact" aria-disabled="true" data-t="ctSms">💬 Text (number coming soon)</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="sources">
+    <header><p class="kick" data-t="srcKick">Sources</p><h2 class="chrome" data-t="srcH">Where the numbers come from</h2><p class="lead" data-t="srcLead">Real research where we found it. Anything without a source is labeled as our estimate.</p></header>
+    <div class="card">
+      <ol class="src">
+        <li><span data-t="src1">Ice cream trucks commonly gross $200–$400 a day in season, $500–$1,000+ on holiday weekends.</span> <a href="https://beancount.io/blog/2026/07/12/ice-cream-truck-business-bookkeeping-guide" target="_blank" rel="noopener">Beancount, 2026</a></li>
+        <li><span data-t="src2">A truck that went cashless-ready with Square sells 500–800 items a day on average (one business, not an industry average).</span> <a href="https://squareup.com/us/en/the-bottom-line/reaching-customers/ice-cream-social-summer-sales" target="_blank" rel="noopener">Square</a></li>
+        <li><span data-t="src3">Restaurant loyalty members made about 22% more visits a year than non-members (receipt data, correlation not proof).</span> <a href="https://www.nrn.com/restaurant-loyalty/loyalty-traffic-doubled-in-past-5-years-and-is-more-than-a-third-of-restaurant-visits-study-finds" target="_blank" rel="noopener">Circana via Nation's Restaurant News, 2025</a></li>
+        <li><span data-t="src4">After Costco food courts started taking cards, debit tickets were 40% higher and AmEx 50% higher than cash tickets.</span> <a href="https://www.digitaltransactions.net/costco-gets-a-lift-by-adding-card-acceptance-to-food-courts/" target="_blank" rel="noopener">Digital Transactions, 2015</a></li>
+        <li><span data-t="src5">Vending customers spent 32% more paying by card than cash (study by a card-reader company).</span> <a href="https://cantaloupeinc.gcs-web.com/news-releases/news-release-details/usa-technologies-vending-machine-survey-confirms-consumers-spend/" target="_blank" rel="noopener">USA Technologies (Cantaloupe)</a></li>
+        <li><span data-t="src6">Push alerts tied to a real moment get opened far more: 14.4% for contextual alerts vs 4.2% for generic ones; click rates run 0.5%–7.4% by industry.</span> <a href="https://batch.com/blog/case-studies/benchmark-notifications-push-crm-mobile" target="_blank" rel="noopener">Batch</a> · <a href="https://www.pushwoosh.com/blog/push-notification-benchmarks/" target="_blank" rel="noopener">Pushwoosh, 2025</a></li>
+        <li><span data-t="src7">On iPhone, web alerts work only for web apps added to the Home Screen (iOS 16.4+).</span> <a href="https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/" target="_blank" rel="noopener">WebKit (Apple)</a></li>
+        <li><span data-t="src8">Our estimates (no study found): % of homes that hear the music, % who join, minutes saved on routes, minutes per stop, share paying by card.</span></li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer class="f wrap">
+  <img src="../../assets/sousshift-lockup-800w.png" alt="SousShift AI">
+  <span data-t="foot">SousShift AI · built by Antidote · "Paletas El Sol" is a made-up sample truck.</span>
+</footer>
+
+<script>
+window.T = {
+en: {
+  _title: "Ice Cream Trucks: Details",
+  back: "← Quick tour",
+  topSub: "for Ice Cream Trucks",
+  heroKick: "Ice cream trucks",
+  heroH: "Half the street never hears your music.",
+  heroLead: "Now their phone rings. When your truck turns onto their block, every customer who joined gets an alert with an ice-cream-truck jingle, so the people inside with the TV on, the AC running or headphones in know you're outside.",
+  heroDemo: "Try the customer demo", heroNums: "Run your numbers",
+  hookYesB: "Hears it", hookYes: "Walks out, buys a paleta. You already get these sales.",
+  hookNoB: "Never hears it", hookNo: "Inside, AC on, headphones in. Today you lose that sale. With the app, their phone rings.",
+  howKick: "How it works", howH: "4 simple steps",
+  s1H: "A QR sticker on your truck", s1P: "We give you a printed QR sticker for the window by where you serve. Customers scan it while they wait in line.",
+  s2H: "They join in 10 seconds", s2P: "No app store, no download. They type their name, tap \"Allow location\" one time so we know which street is theirs, and turn on alerts. Free points just for joining.",
+  s3H: "Your phone shares the truck's location", s3P: "The driver taps \"I'm on my route\" on their phone. It shares where the truck is while you drive. Tap \"Done for today\" and it stops.",
+  s4H: "Close by? Their phone rings", s4P: "When the truck gets close (you pick the distance, like ¼ mile), their phone plays the jingle: \"Paletas El Sol is on your street, 3 min away.\" They walk out, pay, and you scan their code for points.",
+  stKick: "The sticker", stH: "What goes on your truck", stLead: "One sticker by the service window, one on the side people see from the curb. Big enough to scan from a few feet away.",
+  stDl: "Download sticker (SVG)", stPng: "PNG for printing",
+  stNote: "Sample sticker points to the demo truck. Yours gets your truck's name, colors and its own link. Print on outdoor vinyl, at least 4 × 5 in.",
+  seeKick: "What the customer sees", seeH: "Their phone rings like a call",
+  phDate: "Saturday, July 18", phApp: "Paletas El Sol · now", phTitle: "The truck is on your street!", phBody: "0.2 mi away, about 3 min. Walk out now 🎶",
+  phPts: "You have <b>40 pts</b>. 10 more = <b>$1 off</b> today.",
+  seeWhatH: "What they get",
+  see1: "An alert with the <b>ice cream truck jingle</b> when you're close (our own original tune, no copyright problems).",
+  see2: "A live map: <b>\"Truck is 0.3 mi away, 4 min.\"</b>",
+  see3: "Your menu and prices, in English and Spanish.",
+  see4: "Points every time they buy, and simple rewards.",
+  see5: "A switch to pause alerts or leave any time.",
+  hearBtn: "▶ Hear the jingle", hearStop: "■ Stop", seeDemo: "Open the demo",
+  numKick: "The numbers", numH: "What you make now vs. with the app",
+  numLead: "Move the sliders to match your truck. Every number here is an <span class=\"est\">estimate</span>, not a promise. Sources are listed below.",
+  cStops: "Stops per day", cHomes: "Homes on the block at each stop", cHomesS: "Houses or apartments close enough to hear the music.",
+  cHear: "% who hear your music today", cHearS: "Antidote's estimate is about half. No study measures this, so use your gut.",
+  cBuy: "% of those who hear it and come out to buy", cBuyS: "Set this so \"today\" matches your real day. Default lands at about $250/day.",
+  cJoin: "% of homes that join the app", cJoinS: "Takes a few weeks of the sticker on the truck to build up.",
+  cTicket: "Average sale per customer", cTicketS: "Most truck items are $2 to $5. Use what you really average.",
+  cDays: "Days you work per month", cMore: "More settings (cards, repeat visits, routes)",
+  cCard: "% of customers who pay by card or in the app", cLift: "Bigger sale when paying by card", cLiftS: "Studies found +32% to +50% (see sources). We use a careful 15%.",
+  cRep: "More visits from members (points)", cRepS: "Restaurant loyalty members visit about 22% more (Circana 2025).",
+  cSave: "Minutes saved per day on dead streets", cSaveS: "The app shows where your members live, so you skip blocks where nobody buys.",
+  cMin: "Minutes per stop (driving + serving)",
+  rToday: "per month today (cash only)", rApp: "per month with the app",
+  rExtra: "more per month ({p} more)", rMembers: "customers signed up on your route",
+  rRang: "phones that ring each day for people who wouldn't hear the music",
+  lAlert: "New sales from alerts", lAlertS: "Members who didn't hear the music come out at the same rate as people who do.",
+  lRep: "Repeat visits from points", lRepS: "Members buy more often to reach a reward.",
+  lCard: "Bigger sales by card / app", lCardS: "People spend more when they aren't limited to the cash in their pocket.",
+  lRoute: "Time saved on routes", lRouteS: "Saved minutes turned into extra stops on streets with members.",
+  lCost: "Cost of rewards you give away", lCostS: "If every point gets cashed in: about 20¢ per member visit.",
+  lSum: "Extra per month",
+  calcFoot: "Before the SousShift monthly price (TBD). Card processing fees (about 3%) are not included. Month one will be lower while people join.",
+  rwKick: "Rewards", rwH: "Small rewards, big reasons to come out",
+  rwLead: "No big game. Just points that add up fast and treats your customers actually want. You pick the rewards.",
+  rw1B: "10 pts", rw1: "every purchase (scan their code at the window)",
+  rw2B: "30 pts", rw2: "50¢ off", rw3B: "50 pts", rw3: "$1 off", rw4B: "80 pts", rw4: "Free chili cheese Fritos",
+  rw5B: "+20 pts", rw5: "Birthday treat, or bring a neighbor who joins",
+  rw6B: "Optional", rw6: "A tiny daily \"spin\" for 1 to 5 bonus points. One tap, no game to learn.",
+  hoKick: "Straight talk", hoH: "How it really works (the fine print, in plain words)",
+  ho1: "<b>iPhone:</b> alerts only work after the customer adds the app to their Home Screen (Share → \"Add to Home Screen\"). That's Apple's rule for web apps. The join screen walks them through it. Android works right from the browser.",
+  ho2: "<b>Location is only with permission.</b> The customer taps \"Allow\" once so we know which street to ring. They can type their street instead, and nobody's exact address is shown to anyone.",
+  ho3: "<b>They can turn it off any time:</b> pause alerts, change the distance, or delete their account in one tap.",
+  ho4: "<b>We never sell their data.</b> Your customer list is yours, and only used to let them know you're nearby.",
+  ho5: "<b>The driver's phone has to be on the route screen</b> for the truck's location to update. Keep it charging on a dash mount.",
+  ho6: "<b>No spamming:</b> one alert per truck visit, never late at night. Customers set their own quiet hours.",
+  ho7: "<b>The numbers above are estimates.</b> Your street, weather and prices decide the real result.",
+  prKick: "Price", prTbd: "Price TBD: ask Antidote",
+  prNote: "Setup includes your truck's app, menu in English and Spanish, the jingle alerts, points and the printed QR stickers. Monthly price still being set.",
+  faqH: "Questions owners ask",
+  q1: "Do my customers have to download an app?", a1: "No. They scan the QR and it opens in their phone's browser. On iPhone they add it to the Home Screen so alerts can come through. It looks and works like an app.",
+  q2: "Does it work if I only take cash?", a2: "Yes. Alerts and points work with cash. You scan their code at the window to give points. Taking cards or Cash App/Zelle in the app is optional, but people tend to spend more when they can pay with their phone.",
+  q3: "What if my customers speak Spanish?", a3: "Everything is in English and Spanish, and each customer picks their language.",
+  q4: "Will it drain the driver's phone battery?", a4: "Sharing location uses battery like a maps app does. Keep the phone plugged in on a dash mount while you drive.",
+  q5: "Can I control who gets alerts and when?", a5: "Yes. You set the alert distance and the hours. Customers can only get one alert per visit, and they can pause it any time.",
+  q6: "Is the jingle a real song?", a6: "It's our own original tune, made for this app, so there's no copyright trouble. If you have your own truck song you're licensed to use, we can use that instead.",
+  q7: "What do I have to do every day?", a7: "Tap \"I'm on my route\" when you start and \"Done\" when you finish. Scan codes for points at the window. That's it.",
+  ctH: "Want this on your truck?", ctLead: "Send a message and Antidote will set up a free walkthrough with your truck's name on it.",
+  ctMail: "✉️ Email Antidote", ctSms: "💬 Text (number coming soon)",
+  ctSubject: "Ice cream truck app", ctBody: "Hi Antidote, I have an ice cream truck and I'd like to see the app. My truck name: ",
+  srcKick: "Sources", srcH: "Where the numbers come from", srcLead: "Real research where we found it. Anything without a source is labeled as our estimate.",
+  src1: "Ice cream trucks commonly gross $200–$400 a day in season, $500–$1,000+ on holiday weekends.",
+  src2: "A truck that went cashless-ready with Square sells 500–800 items a day on average (one business, not an industry average).",
+  src3: "Restaurant loyalty members made about 22% more visits a year than non-members (receipt data, correlation not proof).",
+  src4: "After Costco food courts started taking cards, debit tickets were 40% higher and AmEx 50% higher than cash tickets.",
+  src5: "Vending customers spent 32% more paying by card than cash (study by a card-reader company).",
+  src6: "Push alerts tied to a real moment get opened far more: 14.4% for contextual alerts vs 4.2% for generic ones; click rates run 0.5%–7.4% by industry.",
+  src7: "On iPhone, web alerts work only for web apps added to the Home Screen (iOS 16.4+).",
+  src8: "Our estimates (no study found): % of homes that hear the music, % who join, minutes saved on routes, minutes per stop, share paying by card.",
+  foot: "SousShift AI · built by Antidote · \"Paletas El Sol\" is a made-up sample truck.",
+  perDay: "/day"
+},
+es: {
+  _title: "Troques de Helados: Detalles",
+  back: "← Recorrido rápido",
+  topSub: "para troques de helados",
+  heroKick: "Troques de helados y paletas",
+  heroH: "La mitad de la cuadra nunca oye tu música.",
+  heroLead: "Ahora les suena el celular. Cuando tu troque entra a su cuadra, cada cliente que se unió recibe una alerta con una melodía de troque de helados. Así la gente que está adentro, con la tele prendida, el aire acondicionado o los audífonos puestos, sabe que estás afuera.",
+  heroDemo: "Prueba el demo del cliente", heroNums: "Saca tus números",
+  hookYesB: "La oye", hookYes: "Sale y compra una paleta. Esas ventas ya las tienes.",
+  hookNoB: "Nunca la oye", hookNo: "Adentro, con el aire prendido y los audífonos puestos. Hoy pierdes esa venta. Con la app, le suena el celular.",
+  howKick: "Cómo funciona", howH: "4 pasos sencillos",
+  s1H: "Un sticker con código QR en tu troque", s1P: "Te damos un sticker QR impreso para la ventanilla donde despachas. Los clientes lo escanean mientras esperan en la fila.",
+  s2H: "Se unen en 10 segundos", s2P: "Sin tienda de apps y sin descargar nada. Escriben su nombre, tocan \"Permitir ubicación\" una sola vez para saber cuál es su calle y activan las alertas. Ganan puntos gratis nomás por unirse.",
+  s3H: "Tu celular comparte dónde va el troque", s3P: "El chofer toca \"Ya ando en ruta\" en su celular y se comparte la ubicación del troque mientras manejas. Tocas \"Terminé por hoy\" y se apaga.",
+  s4H: "¿Ya estás cerca? Les suena el celular", s4P: "Cuando el troque se acerca (tú escoges la distancia, como ¼ de milla), su celular toca la melodía: \"Paletas El Sol está en tu calle, a 3 min.\" Salen, pagan y tú escaneas su código para darles puntos.",
+  stKick: "El sticker", stH: "Lo que va en tu troque", stLead: "Un sticker junto a la ventanilla y otro en el costado que se ve desde la banqueta. Lo bastante grande para escanearlo a unos pasos.",
+  stDl: "Descargar sticker (SVG)", stPng: "PNG para imprimir",
+  stNote: "Este sticker de muestra lleva al troque del demo. El tuyo lleva el nombre de tu troque, tus colores y su propio enlace. Imprímelo en vinil para exterior, de por lo menos 4 × 5 pulgadas.",
+  seeKick: "Lo que ve el cliente", seeH: "Su celular suena como una llamada",
+  phDate: "Sábado, 18 de julio", phApp: "Paletas El Sol · ahora", phTitle: "¡El troque está en tu calle!", phBody: "A 0.2 millas, como 3 min. Sal ahorita 🎶",
+  phPts: "Tienes <b>40 pts</b>. Con 10 más = <b>$1 de descuento</b> hoy.",
+  seeWhatH: "Lo que reciben",
+  see1: "Una alerta con la <b>melodía del troque de helados</b> cuando estás cerca (una canción original nuestra, sin problemas de derechos de autor).",
+  see2: "Un mapa en vivo: <b>\"El troque está a 0.3 millas, 4 min.\"</b>",
+  see3: "Tu menú y tus precios, en inglés y en español.",
+  see4: "Puntos cada vez que compran, y premios sencillos.",
+  see5: "Un botón para pausar las alertas o salirse cuando quieran.",
+  hearBtn: "▶ Escuchar la melodía", hearStop: "■ Parar", seeDemo: "Abrir el demo",
+  numKick: "Los números", numH: "Lo que ganas hoy vs. con la app",
+  numLead: "Mueve las barras para que se parezca a tu troque. Todos los números son un <span class=\"est\">estimado</span>, no una promesa. Las fuentes están abajo.",
+  cStops: "Paradas por día", cHomes: "Casas en la cuadra en cada parada", cHomesS: "Casas o departamentos lo bastante cerca para oír la música.",
+  cHear: "% que oye tu música hoy", cHearS: "Antidote calcula que como la mitad. Ningún estudio mide esto, así que usa tu instinto.",
+  cBuy: "% de los que la oyen y salen a comprar", cBuyS: "Ajústalo para que \"hoy\" se parezca a tu día real. Así como está da unos $250 al día.",
+  cJoin: "% de casas que se unen a la app", cJoinS: "Toma unas semanas con el sticker en el troque para que crezca.",
+  cTicket: "Venta promedio por cliente", cTicketS: "Casi todo en el troque cuesta de $2 a $5. Usa tu promedio real.",
+  cDays: "Días que trabajas al mes", cMore: "Más ajustes (tarjeta, visitas repetidas, rutas)",
+  cCard: "% de clientes que pagan con tarjeta o en la app", cLift: "Venta más grande al pagar con tarjeta", cLiftS: "Los estudios encontraron de +32% a +50% (ver fuentes). Nosotros usamos un 15% conservador.",
+  cRep: "Más visitas de los miembros (puntos)", cRepS: "Los miembros de programas de lealtad en restaurantes van como 22% más (Circana 2025).",
+  cSave: "Minutos que ahorras al día en calles muertas", cSaveS: "La app te enseña dónde viven tus miembros, así te saltas las cuadras donde nadie compra.",
+  cMin: "Minutos por parada (manejar + despachar)",
+  rToday: "al mes hoy (solo efectivo)", rApp: "al mes con la app",
+  rExtra: "más al mes ({p} más)", rMembers: "clientes inscritos en tu ruta",
+  rRang: "celulares que suenan al día de gente que no oiría la música",
+  lAlert: "Ventas nuevas por las alertas", lAlertS: "Los miembros que no oyeron la música salen igual que los que sí la oyen.",
+  lRep: "Visitas repetidas por los puntos", lRepS: "Los miembros compran más seguido para llegar a un premio.",
+  lCard: "Ventas más grandes con tarjeta / app", lCardS: "La gente gasta más cuando no depende del efectivo que trae en la bolsa.",
+  lRoute: "Tiempo que ahorras en la ruta", lRouteS: "Los minutos ahorrados se vuelven paradas extra en calles con miembros.",
+  lCost: "Lo que cuestan los premios que regalas", lCostS: "Si se canjean todos los puntos: como 20¢ por visita de miembro.",
+  lSum: "Extra al mes",
+  calcFoot: "Antes del precio mensual de SousShift (por definir). No incluye la comisión por tarjeta (como 3%). El primer mes será menos mientras la gente se une.",
+  rwKick: "Premios", rwH: "Premios chiquitos, buenas razones para salir",
+  rwLead: "Nada de juegos grandes. Nomás puntos que se juntan rápido y antojitos que tus clientes sí quieren. Tú escoges los premios.",
+  rw1B: "10 pts", rw1: "en cada compra (escaneas su código en la ventanilla)",
+  rw2B: "30 pts", rw2: "50¢ de descuento", rw3B: "50 pts", rw3: "$1 de descuento", rw4B: "80 pts", rw4: "Fritos con chili y queso gratis",
+  rw5B: "+20 pts", rw5: "Antojito de cumpleaños, o por traer a un vecino que se una",
+  rw6B: "Opcional", rw6: "Una \"ruletita\" diaria de 1 a 5 puntos extra. Un toque y ya, sin juego que aprender.",
+  hoKick: "Hablando claro", hoH: "Cómo funciona de verdad (la letra chiquita, en palabras sencillas)",
+  ho1: "<b>iPhone:</b> las alertas solo funcionan cuando el cliente agrega la app a su pantalla de inicio (Compartir → \"Agregar a pantalla de inicio\"). Es regla de Apple para las apps web. La pantalla para unirse les explica cómo. En Android funciona directo desde el navegador.",
+  ho2: "<b>La ubicación es solo con permiso.</b> El cliente toca \"Permitir\" una vez para saber en qué calle sonarle. También puede escribir su calle, y la dirección exacta de nadie se le enseña a nadie.",
+  ho3: "<b>La pueden apagar cuando quieran:</b> pausar alertas, cambiar la distancia o borrar su cuenta con un toque.",
+  ho4: "<b>Nunca vendemos sus datos.</b> Tu lista de clientes es tuya y solo se usa para avisarles que andas cerca.",
+  ho5: "<b>El celular del chofer tiene que estar en la pantalla de ruta</b> para que se actualice dónde va el troque. Tráelo cargando en un soporte en el tablero.",
+  ho6: "<b>Nada de spam:</b> una alerta por cada pasada del troque, nunca tarde en la noche. Cada cliente pone sus horas de silencio.",
+  ho7: "<b>Los números de arriba son estimados.</b> Tu calle, el clima y tus precios deciden el resultado real.",
+  prKick: "Precio", prTbd: "Precio por definir: pregúntale a Antidote",
+  prNote: "La instalación incluye la app de tu troque, el menú en inglés y español, las alertas con melodía, los puntos y los stickers QR impresos. El precio mensual todavía se está definiendo.",
+  faqH: "Lo que preguntan los dueños",
+  q1: "¿Mis clientes tienen que descargar una app?", a1: "No. Escanean el QR y se abre en el navegador de su celular. En iPhone la agregan a la pantalla de inicio para que les lleguen las alertas. Se ve y funciona como una app.",
+  q2: "¿Funciona si solo acepto efectivo?", a2: "Sí. Las alertas y los puntos funcionan con efectivo. Escaneas su código en la ventanilla para darles puntos. Aceptar tarjeta, Cash App o Zelle en la app es opcional, pero la gente suele gastar más cuando puede pagar con el celular.",
+  q3: "¿Y si mis clientes hablan español?", a3: "Todo está en inglés y en español, y cada cliente escoge su idioma.",
+  q4: "¿Se le acaba rápido la batería al celular del chofer?", a4: "Compartir la ubicación gasta batería como una app de mapas. Trae el celular conectado en un soporte mientras manejas.",
+  q5: "¿Puedo controlar a quién le llegan las alertas y cuándo?", a5: "Sí. Tú pones la distancia y el horario. Cada cliente recibe solo una alerta por pasada, y la puede pausar cuando quiera.",
+  q6: "¿La melodía es una canción conocida?", a6: "Es una melodía original nuestra, hecha para esta app, así que no hay problemas de derechos de autor. Si tienes tu propia canción de troque con permiso para usarla, podemos usar esa.",
+  q7: "¿Qué tengo que hacer cada día?", a7: "Tocar \"Ya ando en ruta\" cuando empiezas y \"Terminé\" cuando acabas. Escanear códigos en la ventanilla para los puntos. Y ya.",
+  ctH: "¿Lo quieres en tu troque?", ctLead: "Mándale un mensaje a Antidote y te arma un recorrido gratis con el nombre de tu troque.",
+  ctMail: "✉️ Escríbele a Antidote", ctSms: "💬 Mensaje de texto (número muy pronto)",
+  ctSubject: "App para troque de helados", ctBody: "Hola Antidote, tengo un troque de helados y me gustaría ver la app. Nombre de mi troque: ",
+  srcKick: "Fuentes", srcH: "De dónde salen los números", srcLead: "Investigación real donde la encontramos. Lo que no tiene fuente está marcado como estimado nuestro.",
+  src1: "Los troques de helados suelen vender de $200 a $400 al día en temporada, y de $500 a más de $1,000 en fines de semana festivos.",
+  src2: "Un troque que empezó a aceptar tarjeta con Square vende de 500 a 800 productos al día en promedio (un solo negocio, no un promedio de la industria).",
+  src3: "Los miembros de programas de lealtad en restaurantes hicieron como 22% más visitas al año que los que no son miembros (datos de recibos; es correlación, no prueba).",
+  src4: "Cuando las cafeterías de Costco empezaron a aceptar tarjeta, las ventas con débito fueron 40% más altas y con AmEx 50% más altas que en efectivo.",
+  src5: "En máquinas expendedoras la gente gastó 32% más con tarjeta que con efectivo (estudio de una empresa que vende lectores de tarjeta).",
+  src6: "Las alertas que llegan en el momento justo se abren mucho más: 14.4% contra 4.2% de las genéricas; los clics van de 0.5% a 7.4% según la industria.",
+  src7: "En iPhone, las alertas web solo funcionan en apps web agregadas a la pantalla de inicio (iOS 16.4 o más nuevo).",
+  src8: "Estimados nuestros (no encontramos estudio): % de casas que oyen la música, % que se une, minutos ahorrados en la ruta, minutos por parada y cuántos pagan con tarjeta.",
+  foot: "SousShift AI · hecho por Antidote · \"Paletas El Sol\" es un troque de muestra inventado.",
+  perDay: "/día"
+}};
+</script>
+<script src="../lang.js"></script>
+<script src="../jingle.js"></script>
+<script src="../model.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var ids = ["stops", "homes", "hear", "buy", "join", "ticket", "days", "card", "lift", "rep", "save", "min"];
+  function money(n, cents) {
+    var loc = ICE.lang === "es" ? "es-US" : "en-US";
+    return (n < 0 ? "−" : "") + "$" + Math.abs(n).toLocaleString(loc, { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 });
+  }
+  function num(n) { return Math.round(n).toLocaleString(ICE.lang === "es" ? "es-US" : "en-US"); }
+  function v(id) { return parseFloat($(id).value); }
+  function calc() {
+    var stops = v("stops"), homes = v("homes"), hear = v("hear") / 100, buy = v("buy") / 100, join = v("join") / 100,
+        ticket = v("ticket"), days = v("days"), card = v("card") / 100, lift = v("lift") / 100, rep = v("rep") / 100,
+        save = v("save"), min = v("min");
+    // labels
+    $("o-stops").textContent = stops; $("o-homes").textContent = homes; $("o-hear").textContent = Math.round(hear * 100) + "%";
+    $("o-buy").textContent = Math.round(buy * 100) + "%"; $("o-join").textContent = Math.round(join * 100) + "%";
+    $("o-ticket").textContent = money(ticket, ticket % 1 !== 0); $("o-days").textContent = days;
+    $("o-card").textContent = Math.round(card * 100) + "%"; $("o-lift").textContent = "+" + Math.round(lift * 100) + "%";
+    $("o-rep").textContent = "+" + Math.round(rep * 100) + "%"; $("o-save").textContent = save + " min"; $("o-min").textContent = min + " min";
+    var r = IceModel.run({ stops: stops, homes: homes, hear: hear * 100, buy: buy * 100, join: join * 100, ticket: ticket, days: days,
+      card: card * 100, lift: lift * 100, rep: rep * 100, save: save, min: min });
+    $("r-today").textContent = money(r.todayMo);
+    $("r-app").textContent = money(r.appMo);
+    $("r-extra").textContent = "+" + money(r.extraMo);
+    $("r-extra-l").textContent = ICE.t("rExtra").replace("{p}", Math.round(r.pct) + "%");
+    $("r-members").textContent = num(r.members);
+    $("r-rang").textContent = num(r.rang);
+    $("l-alert").textContent = "+" + money(r.lines.alert);
+    $("l-rep").textContent = "+" + money(r.lines.rep);
+    $("l-card").textContent = "+" + money(r.lines.card);
+    $("l-route").textContent = "+" + money(r.lines.route);
+    $("l-cost").textContent = "−" + money(r.lines.cost);
+    $("l-sum").textContent = "+" + money(r.extraMo);
+  }
+  ids.forEach(function (id) { $(id).addEventListener("input", calc); });
+
+  function contact() {
+    var m = $("ct-mail");
+    m.href = "mailto:secondshiftai@gmail.com?subject=" + encodeURIComponent(ICE.t("ctSubject")) + "&body=" + encodeURIComponent(ICE.t("ctBody"));
+    // TEXT_NUMBER: put Antidote's business number here (e.g. "+13105550123") to turn the Text button on.
+    var TEXT_NUMBER = "";
+    var s = $("ct-sms");
+    if (TEXT_NUMBER) { s.href = "sms:" + TEXT_NUMBER + "?&body=" + encodeURIComponent(ICE.t("ctBody")); s.classList.remove("off"); s.removeAttribute("aria-disabled"); }
+    else s.addEventListener("click", function (e) { e.preventDefault(); });
+  }
+  var hearBtn = $("hear");
+  hearBtn.addEventListener("click", function () {
+    if (window.Jingle.playing) { window.Jingle.stop(); hearBtn.textContent = ICE.t("hearBtn"); return; }
+    hearBtn.textContent = ICE.t("hearStop");
+    window.Jingle.play(2).then(function () { hearBtn.textContent = ICE.t("hearBtn"); });
+  });
+  ICE.on(function () { calc(); contact(); if (window.Jingle.playing) hearBtn.textContent = ICE.t("hearStop"); });
+  calc(); contact();
+})();
+</script>
+</body>
+</html>

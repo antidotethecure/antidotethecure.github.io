@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SousShift AI for Ice Cream Trucks</title>
+<meta name="description" content="Half the street never hears the truck music. SousShift AI rings their phone with an ice-cream-truck jingle when your truck is close. 1-minute tour, English y español.">
+<meta name="theme-color" content="#03060e">
+<link rel="canonical" href="https://antidotethecure.github.io/ice-cream/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SousShift AI">
+<meta property="og:title" content="SousShift AI for Ice Cream Trucks">
+<meta property="og:description" content="Your truck rings their phone when you're on their street. QR sticker, alerts, points. English y español.">
+<meta property="og:url" content="https://antidotethecure.github.io/ice-cream/">
+<meta property="og:image" content="https://antidotethecure.github.io/sousshift/img/og.jpg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="../second-shift/img/ssai-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="ice.css">
+<style>
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{display:flex;flex-direction:column;height:100dvh}
+.top .wrap{height:54px}
+.dots{display:flex;gap:6px;align-items:center;flex:1;justify-content:center}
+.dots button{width:9px;height:9px;padding:0;border-radius:99px;border:0;background:#2a3f6e;cursor:pointer;transition:width .3s,background .3s}
+.dots button[aria-current=true]{width:24px;background:var(--gold)}
+.dots button::before{content:"";display:block;margin:-12px -6px;height:33px}
+.deck{flex:1;position:relative;overflow:hidden;touch-action:pan-y}
+.track{display:flex;height:100%;transition:transform .45s cubic-bezier(.22,.8,.24,1);will-change:transform}
+.card-s{flex:0 0 100%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column}
+.inner{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;max-width:560px;width:100%;margin:0 auto;padding:18px 16px 8px;opacity:.25;transform:scale(.97);transition:opacity .45s,transform .45s}
+.card-s.on .inner{opacity:1;transform:none}
+.big-emoji{font-size:64px;line-height:1;margin-bottom:10px}
+.t1{font-family:"Orbitron",sans-serif;font-weight:900;font-size:clamp(28px,8.4vw,44px);line-height:1.12;margin:0}
+.t2{font-size:clamp(19px,5vw,23px);color:var(--silver);margin:12px 0 0;line-height:1.3;font-weight:600}
+.t2 b{color:var(--gold)}
+.foot{flex:none;padding:10px 16px calc(14px + env(safe-area-inset-bottom));max-width:560px;width:100%;margin:0 auto;display:flex;gap:10px}
+.foot .btn{flex:1;font-size:15px;min-height:56px}
+.foot .prev{flex:0 0 64px}
+.foot .prev[hidden]{display:none}
+
+/* 1 hook */
+.homes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:22px auto 0;max-width:330px}
+.homes span{font-size:34px;line-height:1;position:relative}
+.homes span.miss{filter:grayscale(1) brightness(.6)}
+.homes span.miss::after{content:"🔇";position:absolute;right:-4px;bottom:-6px;font-size:16px}
+.legend{margin-top:12px;font-size:15px;color:var(--dim)}
+.legend .est{margin-left:4px}
+
+/* 2 how */
+.how3{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:start;gap:4px;margin:24px 0 6px;width:100%}
+.how3 .i{display:flex;flex-direction:column;align-items:center;gap:8px}
+.how3 .i div{width:76px;height:76px;border-radius:22px;display:grid;place-items:center;font-size:38px;background:linear-gradient(180deg,#14306a,#0b1a3d);border:1px solid var(--edge)}
+.how3 .i b{font-size:17px;line-height:1.15}
+.how3 .ar{font-size:22px;color:var(--gold);padding-top:24px}
+#play{margin-top:22px;min-height:58px;font-size:15px;padding:14px 26px}
+
+/* 3 money */
+.bignum{font-family:"Orbitron",sans-serif;font-weight:900;font-size:clamp(42px,13vw,66px);color:var(--good);line-height:1;margin:14px 0 4px;text-shadow:0 0 30px rgba(52,211,153,.35)}
+.bignum-l{font-size:18px;color:var(--silver);font-weight:700}
+.vs{display:flex;gap:8px;justify-content:center;margin:12px 0 4px;font-size:15px;color:var(--dim);flex-wrap:wrap}
+.vs b{color:var(--ink);font-family:"Orbitron",sans-serif;font-size:14px}
+.sl{width:100%;max-width:420px;margin-top:10px;text-align:left}
+.sl label{display:flex;justify-content:space-between;font-weight:700;font-size:17px}
+.sl output{font-family:"Orbitron",sans-serif;color:var(--gold);font-size:16px}
+.sl input{width:100%;height:34px;accent-color:var(--blue);margin:0}
+.more{margin-top:10px;font-size:15px;font-weight:700}
+
+/* 4 rewards */
+.chips{display:grid;gap:10px;width:100%;max-width:380px;margin-top:20px}
+.chip{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:18px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);text-align:left}
+.chip i{font-style:normal;font-size:32px}
+.chip b{display:block;font-family:"Orbitron",sans-serif;font-size:19px;color:var(--gold);line-height:1.15}
+.chip span{color:var(--dim);font-size:15px;font-weight:700}
+
+/* 5 demo */
+.phone{width:min(270px,78vw);margin:18px auto 0;border-radius:34px;border:7px solid #1b2236;background:linear-gradient(180deg,#1d3d7a,#0d1a3a 60%,#1a1030);padding:40px 10px 26px;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.phone::before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:80px;height:20px;border-radius:12px;background:#000}
+.phone .clock{font:700 42px "Rajdhani",sans-serif;color:#fff;line-height:1;margin-bottom:14px}
+
+/* 6 cta */
+.cta{display:grid;gap:10px;width:100%;max-width:400px;margin-top:22px}
+.cta .btn{min-height:58px;font-size:14px}
+.price{margin-top:16px;padding:10px 16px;border-radius:14px;border:1px solid rgba(255,209,102,.5);background:rgba(255,209,102,.08);color:var(--gold);font-weight:800;font-size:16px}
+.details{margin-top:18px;font-size:16px;font-weight:700}
+
+@media (max-height:640px){.big-emoji{font-size:48px}.homes span{font-size:28px}.how3 .i div{width:64px;height:64px;font-size:32px}.phone{padding-top:34px}}
+@media (prefers-reduced-motion:reduce){.track,.inner{transition:none}}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <img class="brand" src="../assets/sousshift-lockup-800w.png" alt="SousShift AI">
+  <nav class="dots" id="dots" aria-label="Progress"></nav>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true">EN</button><button data-lang="es" aria-pressed="false">ES</button></div>
+</div></div>
+
+<main class="deck" id="deck">
+  <div class="track" id="track">
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <p class="kick" data-t="k1">For ice cream trucks</p>
+        <h1 class="t1 chrome" data-t="h1">Half your street never hears your music.</h1>
+        <p class="t2" data-t="p1">Inside. AC on. Headphones in.<br><b>That's money driving past.</b></p>
+        <div class="homes" aria-hidden="true"><span>🏠</span><span class="miss">🏠</span><span>🏠</span><span class="miss">🏠</span><span class="miss">🏠</span><span>🏠</span><span class="miss">🏠</span><span>🏠</span><span>🏠</span><span class="miss">🏠</span></div>
+        <p class="legend" data-t="leg1">About 1 in 2 homes miss the truck <span class="est">estimate</span></p>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <p class="kick" data-t="k2">How it works</p>
+        <h1 class="t1 chrome" data-t="h2">Now their phone rings.</h1>
+        <div class="how3">
+          <div class="i"><div aria-hidden="true">🔲</div><b data-t="i1">Scan the QR on your truck</b></div>
+          <div class="ar" aria-hidden="true">→</div>
+          <div class="i"><div aria-hidden="true">📍</div><b data-t="i2">Turn on location</b></div>
+          <div class="ar" aria-hidden="true">→</div>
+          <div class="i"><div aria-hidden="true">🔔</div><b data-t="i3">Truck's close? Phone rings</b></div>
+        </div>
+        <button class="btn gold" id="play" type="button" data-t="play">▶ Hear the ringtone</button>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <p class="kick" data-t="k3">The money</p>
+        <div class="bignum" id="big">+$0</div>
+        <div class="bignum-l" data-t="bigL">extra per month <span class="est">estimate</span></div>
+        <div class="vs"><span><span data-t="now">Now</span> <b id="now"></b></span><span>→</span><span><span data-t="with">With the app</span> <b id="with"></b></span></div>
+        <div class="sl"><label><span data-t="s1">Stops per day</span><output id="o-stops"></output></label><input type="range" id="stops" min="5" max="60" step="1" value="25"></div>
+        <div class="sl"><label><span data-t="s2">Average sale</span><output id="o-ticket"></output></label><input type="range" id="ticket" min="2" max="15" step="0.5" value="5"></div>
+        <div class="sl"><label><span data-t="s3">Days per month</span><output id="o-days"></output></label><input type="range" id="days" min="4" max="30" step="1" value="22"></div>
+        <a class="more" href="details/#numbers" data-t="more">How we got this →</a>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <p class="kick" data-t="k4">Rewards</p>
+        <h1 class="t1 chrome" data-t="h4">Points that bring them back.</h1>
+        <p class="t2" data-t="p4"><b>10 points</b> every purchase. No big game.</p>
+        <div class="chips">
+          <div class="chip"><i aria-hidden="true">🪙</i><div><b data-t="c1">50¢ off</b><span>30 pts</span></div></div>
+          <div class="chip"><i aria-hidden="true">💵</i><div><b data-t="c2">$1 off</b><span>50 pts</span></div></div>
+          <div class="chip"><i aria-hidden="true">🌶️</i><div><b data-t="c3">Free chili cheese Fritos</b><span>80 pts</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <p class="kick" data-t="k5">See it</p>
+        <h1 class="t1 chrome" data-t="h5">Try it yourself.</h1>
+        <div class="phone" aria-hidden="true">
+          <div class="clock">4:12</div>
+          <div class="ring on"><div class="ic">🍦</div><div><small data-t="phApp">Paletas El Sol · now</small><b data-t="phTitle">The truck is on your street!</b><span data-t="phBody">0.2 mi away, about 3 min 🎶</span></div></div>
+        </div>
+        <a class="btn primary" href="demo/" style="margin-top:20px;min-height:58px;font-size:15px" data-t="demo">Open the demo →</a>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <div class="big-emoji" aria-hidden="true">🍦</div>
+        <h1 class="t1 chrome" data-t="h6">Let's set you up.</h1>
+        <p class="t2" data-t="p6">Your truck's name. Your menu. <b>Your customers' phones ringing.</b></p>
+        <div class="cta">
+          <a class="btn gold" id="ct-mail" href="mailto:secondshiftai@gmail.com" data-t="mail">✉️ Email Antidote</a>
+          <a class="btn ghost off" id="ct-sms" href="#" aria-disabled="true" data-t="sms">💬 Text (number coming soon)</a>
+        </div>
+        <div class="price" data-t="price">Price TBD: ask Antidote</div>
+        <a class="details" href="details/" data-t="det">See the details (numbers, sources, FAQ) →</a>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<div class="foot">
+  <button class="btn ghost prev" id="prev" type="button" data-t-aria="back" aria-label="Back">←</button>
+  <button class="btn primary" id="next" type="button" data-t="next">Next →</button>
+</div>
+
+<script>
+window.T = {
+en: {
+  _title: "SousShift AI for Ice Cream Trucks",
+  k1: "For ice cream trucks", h1: "Half your street never hears your music.",
+  p1: "Inside. AC on. Headphones in.<br><b>That's money driving past.</b>",
+  leg1: "About 1 in 2 homes miss the truck <span class=\"est\">estimate</span>",
+  k2: "How it works", h2: "Now their phone rings.",
+  i1: "Scan the QR on your truck", i2: "Turn on location", i3: "Truck's close? Phone rings",
+  play: "▶ Hear the ringtone", stop: "■ Stop",
+  k3: "The money", bigL: "extra per month <span class=\"est\">estimate</span>", now: "Now", with: "With the app",
+  s1: "Stops per day", s2: "Average sale", s3: "Days per month", more: "How we got this →",
+  k4: "Rewards", h4: "Points that bring them back.", p4: "<b>10 points</b> every purchase. No big game.",
+  c1: "50¢ off", c2: "$1 off", c3: "Free chili cheese Fritos",
+  k5: "See it", h5: "Try it yourself.", phApp: "Paletas El Sol · now", phTitle: "The truck is on your street!", phBody: "0.2 mi away, about 3 min 🎶",
+  demo: "Open the demo →",
+  h6: "Let's set you up.", p6: "Your truck's name. Your menu. <b>Your customers' phones ringing.</b>",
+  mail: "✉️ Email Antidote", sms: "💬 Text (number coming soon)", price: "Price TBD: ask Antidote",
+  det: "See the details (numbers, sources, FAQ) →",
+  next: "Next →", last: "Start over ↺", back: "Back",
+  subject: "Ice cream truck app", body: "Hi Antidote, I have an ice cream truck and I'd like to get set up. My truck name: "
+},
+es: {
+  _title: "SousShift AI para Troques de Helados",
+  k1: "Para troques de helados", h1: "La mitad de tu cuadra nunca oye tu música.",
+  p1: "Adentro. Con el aire prendido. Con audífonos.<br><b>Es dinero que se te pasa de largo.</b>",
+  leg1: "Como 1 de cada 2 casas no oye el troque <span class=\"est\">estimado</span>",
+  k2: "Cómo funciona", h2: "Ahora les suena el celular.",
+  i1: "Escanean el QR de tu troque", i2: "Activan su ubicación", i3: "¿El troque cerca? Les suena el cel",
+  play: "▶ Escuchar el tono", stop: "■ Parar",
+  k3: "El dinero", bigL: "extra al mes <span class=\"est\">estimado</span>", now: "Hoy", with: "Con la app",
+  s1: "Paradas por día", s2: "Venta promedio", s3: "Días al mes", more: "¿De dónde sale esto? →",
+  k4: "Premios", h4: "Puntos que los hacen volver.", p4: "<b>10 puntos</b> en cada compra. Sin juegos complicados.",
+  c1: "50¢ de descuento", c2: "$1 de descuento", c3: "Fritos con chili y queso gratis",
+  k5: "Míralo", h5: "Pruébalo tú mismo.", phApp: "Paletas El Sol · ahora", phTitle: "¡El troque está en tu calle!", phBody: "A 0.2 millas, como 3 min 🎶",
+  demo: "Abrir el demo →",
+  h6: "Vamos a armarte la tuya.", p6: "El nombre de tu troque. Tu menú. <b>Los celulares de tus clientes sonando.</b>",
+  mail: "✉️ Escríbele a Antidote", sms: "💬 Texto (número muy pronto)", price: "Precio por definir: pregúntale a Antidote",
+  det: "Ver los detalles (números, fuentes, preguntas) →",
+  next: "Siguiente →", last: "Empezar de nuevo ↺", back: "Atrás",
+  subject: "App para troque de helados", body: "Hola Antidote, tengo un troque de helados y quiero que me lo instalen. Nombre de mi troque: "
+}};
+</script>
+<script src="lang.js"></script>
+<script src="jingle.js"></script>
+<script src="model.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var track = $("track"), slides = [].slice.call(track.children), N = slides.length, i = 0;
+  var dots = $("dots");
+  slides.forEach(function (_, k) {
+    var b = document.createElement("button"); b.type = "button"; b.setAttribute("aria-label", (k + 1) + " / " + N);
+    b.addEventListener("click", function () { go(k); }); dots.appendChild(b);
+  });
+  function go(k) {
+    i = Math.max(0, Math.min(N - 1, k));
+    track.style.transform = "translateX(" + (-i * 100) + "%)";
+    slides.forEach(function (s, n) { s.classList.toggle("on", n === i); s.setAttribute("aria-hidden", n === i ? "false" : "true"); s.inert = n !== i; });
+    [].forEach.call(dots.children, function (d, n) { d.setAttribute("aria-current", n === i ? "true" : "false"); });
+    $("prev").hidden = i === 0;
+    $("next").textContent = ICE.t(i === N - 1 ? "last" : "next");
+    try { history.replaceState(null, "", "#" + (i + 1)); } catch (e) {}
+  }
+  $("next").addEventListener("click", function () { go(i === N - 1 ? 0 : i + 1); });
+  $("prev").addEventListener("click", function () { go(i - 1); });
+  document.addEventListener("keydown", function (e) {
+    if (e.target && e.target.type === "range") return;
+    if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); go(i + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(i - 1); }
+  });
+  // swipe (ignored when the finger starts on a slider)
+  var sx = null, sy = 0;
+  $("deck").addEventListener("touchstart", function (e) {
+    if (e.target.closest("input")) { sx = null; return; }
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+  }, { passive: true });
+  $("deck").addEventListener("touchend", function (e) {
+    if (sx == null) return;
+    var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) go(i + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+
+  // money card
+  function calc() {
+    var r = IceModel.run({ stops: +$("stops").value, ticket: +$("ticket").value, days: +$("days").value }), L = ICE.lang;
+    $("o-stops").textContent = $("stops").value;
+    $("o-ticket").textContent = IceModel.money(+$("ticket").value, L, +$("ticket").value % 1 !== 0);
+    $("o-days").textContent = $("days").value;
+    $("big").textContent = "+" + IceModel.money(r.extraMo, L);
+    $("now").textContent = IceModel.money(r.todayMo, L);
+    $("with").textContent = IceModel.money(r.appMo, L);
+  }
+  ["stops", "ticket", "days"].forEach(function (id) { $(id).addEventListener("input", calc); });
+
+  // jingle
+  var play = $("play");
+  play.addEventListener("click", function () {
+    if (Jingle.playing) { Jingle.stop(); play.textContent = ICE.t("play"); return; }
+    play.textContent = ICE.t("stop");
+    if (navigator.vibrate) try { navigator.vibrate([300, 150, 300]); } catch (e) {}
+    Jingle.play(2).then(function () { play.textContent = ICE.t("play"); });
+  });
+
+  function contact() {
+    $("ct-mail").href = "mailto:secondshiftai@gmail.com?subject=" + encodeURIComponent(ICE.t("subject")) + "&body=" + encodeURIComponent(ICE.t("body"));
+    // TEXT_NUMBER: Antidote's business number (e.g. "+13105550123") turns the Text button on.
+    var TEXT_NUMBER = "", s = $("ct-sms");
+    if (TEXT_NUMBER) { s.href = "sms:" + TEXT_NUMBER + "?&body=" + encodeURIComponent(ICE.t("body")); s.classList.remove("off"); s.removeAttribute("aria-disabled"); }
+  }
+  $("ct-sms").addEventListener("click", function (e) { if (this.classList.contains("off")) e.preventDefault(); });
+
+  ICE.on(function () { calc(); contact(); go(i); if (Jingle.playing) play.textContent = ICE.t("stop"); });
+  window.addEventListener("hashchange", function () { var n = parseInt(location.hash.slice(1), 10); if (n >= 1 && n <= N && n - 1 !== i) go(n - 1); });
+  var h = parseInt((location.hash || "").slice(1), 10);
+  calc(); contact(); go(h >= 1 && h <= N ? h - 1 : 0);
+})();
+</script>
+</body>
+</html>

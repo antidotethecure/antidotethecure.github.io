@@ -110,7 +110,7 @@
   /* ---------- images ---------- */
   var IM = {};
   ["surfer_m", "surfer_f", "shark", "eel", "jelly", "gull", "boat", "heli", "plane", "raft_taco", "raft_burger", "raft_oysters", "raft_mimosa", "raft_shrimp",
-    "drop", "buoy", "shore", "pier", "pierend", "lifeguard_f", "lifeguard_m", "staff", "palm", "storefront", "wave", "splash", "fish_gold", "fish_mahi", "fish_parrot", "raft_fries", "skeleton"].forEach(function (k) { var i = new Image(); i.decoding = "async"; i.src = "img/game/" + k + ".webp"; IM[k] = i; });
+    "drop", "buoy", "shore", "pier", "pierend", "lifeguard_f", "lifeguard_m", "staff", "palm", "storefront", "wave", "splash", "fish_gold", "fish_mahi", "fish_parrot", "raft_fries", "skeleton", "paddler_m", "paddler_f", "beachlady"].forEach(function (k) { var i = new Image(); i.decoding = "async"; i.src = "img/game/" + k + ".webp"; IM[k] = i; });
   function ok(i) { return i && i.complete && i.naturalWidth > 0; }
   function spr(k, x, y, w, rot, alpha) {
     var i = IM[k]; if (!ok(i)) return false; var h = w * i.naturalHeight / i.naturalWidth;
@@ -1071,8 +1071,32 @@
   function board(x, y, w, h) { var bg = cx.createLinearGradient(0, y - h, 0, y + h); bg.addColorStop(0, "#ff8a2a"); bg.addColorStop(.5, "#ffd23f"); bg.addColorStop(.52, "#38a7e0"); bg.addColorStop(1, "#1a4f9c");
     cx.fillStyle = bg; cx.beginPath(); cx.ellipse(x, y, w, h, 0, 0, 7); cx.fill(); cx.strokeStyle = "rgba(255,255,255,.85)"; cx.lineWidth = .8; cx.beginPath(); cx.moveTo(x, y - h + 2); cx.lineTo(x, y + h - 2); cx.stroke(); }
   function suit(m) { return m ? "#2f6fb5" : "#13858c"; }
+  /* the realistic run-out / paddle-out surfer: img/game/paddler_m|f.webp is one strip of 8 equal, registered cells,
+     the same person (and board) as surfer_m|f, seen from overhead, head up the cell:
+     0-2 running with the board under the arm, 3 wading, 4 left-arm stroke, 5 arms out, 6 right-arm stroke, 7 duck-dive.
+     Damage (red tint, bruises, bandages) is baked onto a copy of the strip per hit level, like hurtImg. */
+  var PK = .32;   // strip px → game px: the prone board comes out the same length as the riding surfer's board
+  var PAD_RUN = [0, 1, 2, 1], PAD_STROKE = [4, 5, 6, 5];
+  function padStrip(lvl) {
+    var k = G.surfer === "m" ? "paddler_m" : "paddler_f", i = IM[k]; if (!ok(i)) return null;
+    if (lvl <= 0) return i; var key = k + lvl; if (DMG[key]) return DMG[key];
+    var w = i.naturalWidth, h = i.naturalHeight, cw = w / 8, c = document.createElement("canvas"); c.width = w; c.height = h; var x = c.getContext("2d"); x.drawImage(i, 0, 0);
+    x.globalCompositeOperation = "source-atop"; x.fillStyle = "rgba(235,60,60," + (lvl * .1) + ")"; x.fillRect(0, 0, w, h);
+    for (var f = 0; f < 8; f++) marks(x, cw * .62, h * .5, lvl, f * cw + cw * .19, h * (f < 4 ? .08 : .12));   // on the back / shoulders of each pose
+    DMG[key] = c; return c;
+  }
+  // one cell of the strip, centred on (x, y), rotated (rot 0 = head up the screen); false if the art isn't loaded yet
+  function padFrame(f, x, y, rot, sc, alpha) {
+    var im = padStrip(G.dmg); if (!im) return false; var n = IM[G.surfer === "m" ? "paddler_m" : "paddler_f"], cw = n.naturalWidth / 8, ch = n.naturalHeight, w = cw * PK * sc, h = ch * PK * sc;
+    cx.save(); cx.translate(x, y); cx.rotate(rot); if (alpha != null) cx.globalAlpha = alpha;
+    cx.fillStyle = "rgba(0,20,35,.22)"; cx.beginPath(); cx.ellipse(5, 6, w * .32, h * .44, 0, 0, 7); cx.fill();   // soft shadow, like the riding surfer's
+    cx.filter = "brightness(1.2) contrast(1.08) saturate(1.12)";   // the riding sprite's grade, so the two read as the same person
+    cx.drawImage(im, f * cw, 0, cw, ch, -w / 2, -h / 2, w, h); cx.restore(); return true;
+  }
+  function animF(seq, fps) { return REDUCE ? seq[1] : seq[Math.floor(G.t * fps) % seq.length]; }
   // running on the sand with the board under his/her arm (top-down, head toward rot = 0 → up the screen)
   function runner(x, y, rot) {
+    if (padFrame(animF(PAD_RUN, 9), x, y - (REDUCE ? 0 : Math.abs(Math.sin(G.t * 14)) * 1.5), rot, .92)) return;
     var t = G.t * 11, s1 = Math.sin(t), m = G.surfer === "m", sk = skinCol();
     cx.save(); cx.translate(x, y - Math.abs(s1) * 2); cx.rotate(rot); cx.scale(1.3, 1.3);
     cx.fillStyle = "rgba(60,40,20,.25)"; cx.beginPath(); cx.ellipse(4, 8, 12, 15, 0, 0, 7); cx.fill();
@@ -1091,6 +1115,25 @@
   function paddler(x, y, rot, sink) {
     var t = G.t * 6, m = G.surfer === "m", sk = skinCol(), duck = G.duck > 0 ? Math.sin(Math.min(1, (0.8 - G.duck) / .8) * Math.PI) : 0;
     sink = Math.max(sink || 0, duck);
+    if (G.phase === "swim" && G.yw < 70 && !sink) {   // wading in: the first few steps into the shallows, board still under the arm
+      var by = y + (REDUCE ? 0 : Math.sin(G.t * 7) * 1.2);
+      if (padFrame(REDUCE ? 3 : [3, 1][Math.floor(G.t * 4) % 2], x, by, rot, .92)) {
+        cx.save(); cx.translate(x, by); cx.rotate(rot);   // the water line over the legs + a ring of foam
+        var wl = 21 - Math.min(1, Math.max(0, G.yw) / 70) * 15, wg = cx.createLinearGradient(0, wl - 6, 0, wl + 10);   // the water line climbs as it gets deeper
+        wg.addColorStop(0, "rgba(22,112,136,0)"); wg.addColorStop(1, "rgba(22,112,136,.72)");
+        var lh = (29 - wl) / 2;   // just the legs below the water line (the feet end ~27 px below the centre)
+        cx.fillStyle = wg; cx.beginPath(); cx.ellipse(1, wl + lh - 1, 11, lh + 1, 0, 0, 7); cx.fill();
+        cx.strokeStyle = "rgba(255,255,255,.65)"; cx.lineWidth = 1.5; cx.beginPath(); cx.ellipse(1, wl + 2, 13 + Math.sin(G.t * 5), 4, 0, 0, 7); cx.stroke(); cx.restore();
+        return;
+      }
+    }
+    var pf = G.duck > 0 || (sink > .05 && G.phase !== "death") ? 7 : animF(PAD_STROKE, 4.5);
+    if (padFrame(pf, x, y + Math.sin(G.t * 2.2) * 2, rot, 1 - sink * .2, 1 - sink * .45)) {
+      if (sink > .05) { cx.save(); cx.translate(x, y); cx.rotate(rot); cx.globalAlpha = sink * .4; cx.fillStyle = "rgba(20,100,140,1)"; cx.beginPath(); cx.ellipse(0, 4, 16, 44, 0, 0, 7); cx.fill(); cx.restore(); }
+      else if (!REDUCE && (pf === 4 || pf === 6)) { cx.fillStyle = "rgba(255,255,255,.7)"; var sd = pf === 4 ? -1 : 1;   // the reaching hand splashes in
+        for (var q = 0; q < 3; q++) { var lx = sd * (13 + q * 3), ly = -30 + q * 4; cx.beginPath(); cx.arc(x + Math.cos(rot) * lx - Math.sin(rot) * ly, y + Math.sin(rot) * lx + Math.cos(rot) * ly, 2.2 - q * .5, 0, 7); cx.fill(); } }
+      return;
+    }
     cx.save(); cx.translate(x, y + Math.sin(G.t * 2.2) * 2); cx.rotate(rot); var s = 1.3 * (1 - sink * .2); cx.scale(s, s); cx.globalAlpha = 1 - sink * .6;
     cx.fillStyle = "rgba(0,20,35,.22)"; cx.beginPath(); cx.ellipse(4, 6, 9, 27, 0, 0, 7); cx.fill();
     board(0, 2, 7.5, 25);
@@ -1118,8 +1161,18 @@
     cx.fillStyle = pg; cx.beginPath(); cx.arc(nx, ny, 90, 0, 7); cx.fill();
     label("★ NALU VIDA ★", 342, y0 + 214, "#ffd23f"); label("Venice Beach", 70, y0 + 95, "#fff"); label("Venice Fishing Pier", PIER_X, y0 - 26, "#fff"); label("Washington Blvd", 140, y0 + 382, "#fff");
     // lifeguards next to the two towers on the aerial
-    spr("lifeguard_f", 140, y0 + 52, 26); spr("lifeguard_m", 330, y0 + 54, 24);
+    beachLady(140, y0 + 74); spr("lifeguard_m", 330, y0 + 54, 24);
     if (G.phase === "beach" || G.phase === "sand") { spr("staff", 300, y0 + 150 + Math.sin(G.t * 6) * 2, 30); spr("staff", 372, y0 + 160, 28); }
+  }
+  /* the lifeguard by the left tower: img/game/beachlady.webp, 3 registered cells of the same woman as lifeguard_f, her arm
+     swinging through a wave. She waves while the surfer is on the sand or near the shore; reduced motion = one still frame. */
+  function beachLady(x, fy) {
+    var i = IM.beachlady; if (!ok(i)) { spr("lifeguard_f", x, fy - 22, 26); return; }
+    var cw = i.naturalWidth / 3, ch = i.naturalHeight, h = 70, w = h * cw / ch;
+    var near = G.phase === "sand" || G.phase === "beach" || G.phase === "ridein" || ((G.phase === "swim" || G.phase === "popup") && G.yw < 420);
+    var f = REDUCE || !near ? 1 : [0, 1, 2, 1][Math.floor(G.t * 5) % 4];
+    cx.fillStyle = "rgba(60,40,20,.32)"; cx.beginPath(); cx.ellipse(x + 7, fy - 1, 12, 4.5, -.15, 0, 7); cx.fill();   // shadow on the sand
+    cx.drawImage(i, f * cw, 0, cw, ch, x - w / 2, fy - h * .985, w, h);   // feet sit on the bottom of the cell
   }
   // palms on the aerial sway in the breeze and bend hard in a helicopter's downwash
   var PALMS = [[.27, .49], [.24, .535], [.35, .55], [.69, .49], [.715, .53], [.20, .77], [.33, .68], [.64, .705], [.67, .86], [.40, .82], [.91, .95], [.08, .66]];
@@ -1191,7 +1244,7 @@
         if (sk && ok(IM.skeleton)) { var sw = 60, sh = sw * IM.skeleton.naturalHeight / IM.skeleton.naturalWidth; cx.save(); cx.globalAlpha = dt0 > 2.2 ? Math.max(0, 1 - (dt0 - 2.2) / .6) : 1; cx.translate(x, y); cx.rotate(G.ang); cx.globalCompositeOperation = "lighter"; cx.drawImage(IM.skeleton, -sw / 2, -sh / 2, sw, sh); cx.restore(); return; } }
       sink = Math.min(1, dt0 * 1.5);
     }
-    if (blink) return;
+    if (blink && !(G.phase === "swim" && G.yw < 70)) return;   // (no blink while wading in: the invulnerability is unchanged, it just stays visible)
     if (G.phase === "swim" || (G.phase === "popup" && G.popT < .5) || (G.phase === "death" && G.deathPaddle)) { paddler(x, y, G.ang, G.phase === "death" ? sink : 0); return; }
     var pop0 = G.phase === "popup" ? Math.min(1, (G.popT - .5) / .5) : 1;
     var air = G.jump > 0 ? Math.sin(Math.PI * (1 - G.jump / G.jumpDur)) * (G.jumpDur > .9 ? 1 : .6) : 0;

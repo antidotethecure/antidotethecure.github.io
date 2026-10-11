@@ -1,0 +1,104 @@
+{
+ "restaurant": "churrito-loco",
+ "outro": "outro.mp4",
+ "clips": [
+  {
+   "file": "c01.mp4",
+   "poster": "c01.jpg",
+   "start": 20.2,
+   "end": 26.6,
+   "label": "Churrito Loco sign"
+  },
+  {
+   "file": "c02.mp4",
+   "poster": "c02.jpg",
+   "start": 43.2,
+   "end": 50.0,
+   "label": "OPEN + oreo churros"
+  },
+  {
+   "file": "c03.mp4",
+   "poster": "c03.jpg",
+   "start": 50.0,
+   "end": 56.5,
+   "label": "chicken chipotle loaded fries"
+  },
+  {
+   "file": "c04.mp4",
+   "poster": "c04.jpg",
+   "start": 67.5,
+   "end": 74.5,
+   "label": "build your own churros"
+  },
+  {
+   "file": "c05.mp4",
+   "poster": "c05.jpg",
+   "start": 74.5,
+   "end": 81.5,
+   "label": "churro CLAMP"
+  },
+  {
+   "file": "c06.mp4",
+   "poster": "c06.jpg",
+   "start": 81.5,
+   "end": 88.5,
+   "label": "fool me twice"
+  },
+  {
+   "file": "c07.mp4",
+   "poster": "c07.jpg",
+   "start": 88.5,
+   "end": 95.6,
+   "label": "jelly sandwich bite"
+  },
+  {
+   "file": "c08.mp4",
+   "poster": "c08.jpg",
+   "start": 99.3,
+   "end": 105.9,
+   "label": "warning: crack"
+  },
+  {
+   "file": "c09.mp4",
+   "poster": "c09.jpg",
+   "start": 105.9,
+   "end": 112.9,
+   "label": "build-your-own churro shake"
+  },
+  {
+   "file": "c10.mp4",
+   "poster": "c10.jpg",
+   "start": 122.5,
+   "end": 129.5,
+   "label": "shake precision"
+  },
+  {
+   "file": "c11.mp4",
+   "poster": "c11.jpg",
+   "start": 129.5,
+   "end": 136.5,
+   "label": "first sip"
+  },
+  {
+   "file": "c12.mp4",
+   "poster": "c12.jpg",
+   "start": 151.5,
+   "end": 158.3,
+   "label": "mexican funnel cake"
+  },
+  {
+   "file": "c13.mp4",
+   "poster": "c13.jpg",
+   "start": 162.4,
+   "end": 169.4,
+   "label": "funnel cake CLAMP"
+  },
+  {
+   "file": "c14.mp4",
+   "poster": "c14.jpg",
+   "start": 172.4,
+   "end": 179.4,
+   "label": "Antidote Drizzle on the head"
+  }
+ ]
+}

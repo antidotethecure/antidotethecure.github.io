@@ -1,12 +1,12 @@
-/* SousShift AI — HALFTIME: a ~20 s break that plays Antidote The Foodie's own highlight reel of THIS restaurant's review
-   (three big bites + a FOLLOW @THEREALANTIDOTE outro), then offers "▶ Watch the full review" (YouTube) or "Back to the game".
+/* SousShift AI — HALFTIME: a ~17–25 s break that plays Antidote The Foodie's own review of THIS restaurant: 2–3 random ~7 s
+   clips from its pool (img/review/clips/clips.json, a different part of the review every time) + a FOLLOW @THEREALANTIDOTE outro, then offers "▶ Watch the full review" (YouTube) or "Back to the game".
    Same look and behaviour as the Drizzle Bowl halftime: full-screen overlay, HALFTIME tag, SKIP, TAP FOR SOUND when the
    browser blocks sound, game music paused and resumed, stall watch.
 
    Include it early (before the game creates its AudioContext, so it can pause the game's sound), after REVIEW_EGG:
      <script>window.REVIEW_EGG={vid:"<YouTube id>",restaurant:"…",short:"…"};</script>
      <script src="../halftime.js"></script>
-   Optional window.HALFTIME={src:"img/review/halftime.mp4",poster:"img/review/halftime.jpg",vid:"…",min:90,max:120}.
+   Optional window.HALFTIME={clips:"img/review/clips/",src:"img/review/halftime.mp4" (fallback reel),poster:"img/review/halftime.jpg",vid:"…",min:90,max:120}.
 
    When it shows (once per run):
      · games with levels: Halftime.levelUp(newLevel, resume[, playMs]) at every level-up. It takes over at the first
@@ -23,6 +23,10 @@
   var VID = C.vid || E.vid || "";
   var URL_ = VID ? "https://www.youtube.com/watch?v=" + encodeURIComponent(VID) : "https://www.youtube.com/@therealantidote";
   var SRC = C.src || "img/review/halftime.mp4", POSTER = C.poster || "img/review/halftime.jpg";
+  /* clip pool: img/review/clips/clips.json lists ~7 s cuts from all over the review (+ outro.mp4). Each break deals 2–3 of them
+     from a per-device shuffled deck (shared with reviewegg.js, so nothing repeats until the whole pool has played), then the outro.
+     No manifest → the old single halftime.mp4 reel. */
+  var CLIPS = C.clips || "img/review/clips/", DECK_KEY = "rv-deck:" + (VID || location.pathname);
   var SHORT = (C.short || E.short || E.restaurant || "").toUpperCase();
   var TEST = /[?&]half=1(?:&|$)/.test(location.search);
   var T = function (s) { return (W.__T || String)(s); };
@@ -45,6 +49,35 @@
   pickAt();
   function played(ms) { if (typeof ms === "number" && ms >= 0) S.lastPlay = ms; return S.lastPlay != null ? S.lastPlay : now() - S.t0; }
   function canPlay() { var v = D.createElement("video"); return !!(v.canPlayType && v.canPlayType("video/mp4")); }
+
+  /* ---------- the clip deck (same code + key as reviewegg.js) ---------- */
+  var memDeck = {};
+  function deal(key, n, k) {
+    var st = null; try { st = JSON.parse(W.localStorage.getItem(key)); } catch (e) {} if (!st) st = memDeck[key];
+    if (!st || st.n !== n || !Array.isArray(st.q)) st = { n: n, q: [], last: -1 };
+    var out = [];
+    while (out.length < Math.min(k, n)) {
+      if (!st.q.length) {
+        var q = []; for (var i = 0; i < n; i++) q.push(i);
+        for (var j = n - 1; j > 0; j--) { var r = Math.floor(Math.random() * (j + 1)), t = q[j]; q[j] = q[r]; q[r] = t; }
+        q.sort(function (x, y) { return (out.indexOf(x) >= 0 || x === st.last) - (out.indexOf(y) >= 0 || y === st.last); });   // a fresh deck never opens on what just played
+        st.q = q;
+      }
+      var c = st.q.shift(); if (out.indexOf(c) < 0) out.push(c); st.last = c;
+    }
+    memDeck[key] = st; try { W.localStorage.setItem(key, JSON.stringify(st)); } catch (e) {}
+    return out;
+  }
+  var manP = null;
+  function manifest() {   // fetched only when a break starts; cached for the rest of the session
+    if (!manP) manP = new Promise(function (ok, no) {
+      if (!W.fetch) return no();
+      var to = sT(no, 3000);
+      W.fetch(CLIPS + "clips.json", { cache: "no-cache" }).then(function (r) { if (!r.ok) throw 0; return r.json(); })
+        .then(function (j) { cT(to); if (j && j.clips && j.clips.length) ok(j); else no(); }, function () { cT(to); no(); });
+    }).catch(function (e) { manP = null; throw e; });
+    return manP;
+  }
 
   /* ---------- styles (Drizzle Bowl halftime, in his brand: blue base, bold yellow, red play) ---------- */
   var st = D.createElement("style");
@@ -103,7 +136,7 @@
 
   function show(resume) {
     build(); S.shown = true; S.active = true; hush();
-    var done = false, ended = false, wantSound = true, timers = [], lastT = -1, stuck = 0, started = false, backT = null;
+    var done = false, ended = false, wantSound = true, timers = [], lastT = -1, stuck = 0, started = false, backT = null, blobs = [];
     function later(f, ms) { var id = sT(f, ms); timers.push(id); return id; }
     sub.textContent = "ANTIDOTE REVIEWS" + (SHORT ? " · " + SHORT : "");
     tag.textContent = T("HALFTIME"); tag.style.display = ""; sub.style.display = "";
@@ -114,6 +147,7 @@
       if (done) return; done = true; S.active = false;
       timers.forEach(cT); cI(watch); if (backT) cI(backT);
       try { v.pause(); } catch (e) {} v.onended = v.onerror = null; v.removeAttribute("src"); try { v.load(); } catch (e) {}
+      blobs.forEach(function (u) { try { URL.revokeObjectURL(u); } catch (e) {} });
       el.classList.remove("on"); unhush();
       try { resume && resume(); } catch (e) { if (W.console) console.error(e); }
     }
@@ -132,47 +166,76 @@
     }
     skip.onclick = function (e) { e.stopPropagation(); if (!ended) endPanel(); else finish(); };
     later(function () { skip.classList.add("on"); }, 3000);                       // SKIP after ~3 s
-    v.onended = endPanel;
-    v.onerror = function () { started ? endPanel() : finish(); };               // the reel won't load at all: straight back to the game
-    v.muted = false; v.src = SRC; try { v.load(); } catch (e) { finish(); return; }
-    var p = v.play();
-    if (p && p.catch) p.catch(function () {                                      // sound blocked: play muted + TAP FOR SOUND
-      if (done) return; wantSound = false; v.muted = true; tap.hidden = false; tap.textContent = T("TAP FOR SOUND");
-      tap.onclick = function (e) { e.stopPropagation(); wantSound = true; v.muted = false; tap.hidden = true; var p3 = v.play(); if (p3 && p3.catch) p3.catch(function () {}); };
-      var p2 = v.play(); if (p2 && p2.catch) p2.catch(function () {
-        tap.textContent = T("TAP TO PLAY");
-        tap.onclick = function (e) { e.stopPropagation(); v.muted = false; tap.hidden = true; var p4 = v.play(); if (p4 && p4.catch) p4.catch(endPanel); };
+    /* the playlist: 2–3 dealt clips + the outro (or the legacy single reel). Only these files are fetched; the next one is
+       pulled into a blob while the current one plays, so the cut to it is instant. */
+    var list = null, idx = 0, legacyTried = false;
+    function soundOn(e) { e.stopPropagation(); wantSound = true; v.muted = false; tap.hidden = true; var p3 = v.play(); if (p3 && p3.catch) p3.catch(function () {}); }
+    function playIt() {
+      var p = v.play();
+      if (p && p.catch) p.catch(function (err) {
+        if (done || ended || (err && err.name === "AbortError")) return;          // AbortError = we just switched clips
+        if (!v.muted) { wantSound = false; v.muted = true; tap.hidden = false; tap.textContent = T("TAP FOR SOUND"); tap.onclick = soundOn; }   // sound blocked: muted + TAP FOR SOUND
+        var p2 = v.play(); if (p2 && p2.catch) p2.catch(function (er2) {
+          if (done || ended || (er2 && er2.name === "AbortError")) return;
+          tap.hidden = false; tap.textContent = T("TAP TO PLAY");
+          tap.onclick = function (e) { e.stopPropagation(); wantSound = true; v.muted = false; tap.hidden = true; var p4 = v.play(); if (p4 && p4.catch) p4.catch(endPanel); };
+        });
       });
-    });
+    }
+    function preload(i) {
+      var it = list && list[i]; if (!it || it.pre || !W.fetch || !W.URL || !URL.createObjectURL) return; it.pre = 1;
+      W.fetch(it.src).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function (b) { if (!done) { it.blob = URL.createObjectURL(b); blobs.push(it.blob); } }, function () {});
+    }
+    function playItem(i) {
+      if (done || ended) return;
+      idx = i; lastT = -1; stuck = 0; noData = 0; var it = list[i];
+      v.muted = !wantSound; v.src = it.blob || it.src; try { v.load(); } catch (e) {}
+      playIt(); preload(i + 1);
+    }
+    function next() { if (list && idx + 1 < list.length) playItem(idx + 1); else if (!started && !legacyTried) legacy(); else if (started) endPanel(); else finish(); }
+    function legacy() { legacyTried = true; list = [{ src: SRC, legacy: true }]; playItem(0); }
+    v.onended = next;
+    v.onerror = function () { if (!done && !ended) next(); };                   // a clip that won't load is skipped; nothing loads at all: back to the game
+    manifest().then(function (j) {
+      if (done || ended) return;
+      var picks = deal(DECK_KEY, j.clips.length, Math.random() < 0.5 ? 2 : 3);
+      list = picks.map(function (i) { return { src: CLIPS + j.clips[i].file, file: j.clips[i].file }; });
+      if (j.outro) list.push({ src: CLIPS + j.outro, outro: true });
+      S.played = picks.map(function (i) { return j.clips[i].file; });
+      playItem(0);
+    }, function () { if (!done && !ended) legacy(); });
     /* stall watch: a phone gets time to buffer; a reel that truly stops moving goes to the end panel. A clip with no data yet
        is kept out of sight so nobody stares at a frozen first frame. */
     var noData = 0, watch = sI(function () {
-      if (done || ended) return;
+      if (done || ended || !list) return;
       if (v.readyState >= 2) { noData = 0; v.style.visibility = ""; } else if (++noData >= 2) v.style.visibility = "hidden";
-      sub.style.display = v.duration && v.currentTime > v.duration - 4.8 ? "none" : "";   // the outro card carries its own text
+      var cur = list[idx] || {};
+      sub.style.display = cur.outro || (cur.legacy && v.duration && v.currentTime > v.duration - 4.8) ? "none" : "";   // the outro card carries its own text
       if (!tap.hidden && v.paused) return;                                        // parked on the user's tap
       if (v.paused && !v.ended) { try { v.muted = !wantSound; var pw = v.play(); if (pw && pw.catch) pw.catch(function () { v.muted = true; v.play().catch(function () {}); }); } catch (e) {} }
       if (v.currentTime > lastT + 0.05) { lastT = v.currentTime; stuck = 0; started = true; return; }
       stuck++;
-      if (v.readyState < 2 && stuck >= 20) { started ? endPanel() : finish(); return; }   // 10 s and no data
+      if (v.readyState < 2 && stuck >= 20) { next(); return; }                  // 10 s and no data: next clip (or out)
       if (stuck >= 30) endPanel();
     }, 500);
     later(function () { if (!done && !ended) endPanel(); }, 60000);              // never longer than a minute of reel
   }
 
+  function warm(ms) { if (TEST || ms > 30000) manifest().catch(function () {}); }   // the tiny clips.json only, a little before the break
   function levelUp(newLevel, resume, playMs) {
     if (S.shown || S.active || !canPlay()) return false;
-    var n = +newLevel || 0, ms = played(playMs);
+    var n = +newLevel || 0, ms = played(playMs); warm(ms);
     if (!TEST) { if (n < 3 || n > 5) return false; if (ms < (C.min || 90) * 1000 && n !== 5) return false; }
     show(resume); return true;
   }
   function tick(playMs, pauseGame, resume) {
     if (S.shown || S.active || !canPlay()) return false;
-    if (played(playMs) < S.at) return false;
+    var ms = played(playMs); warm(ms);
+    if (ms < S.at) return false;
     try { pauseGame && pauseGame(); } catch (e) {}
     show(resume); return true;
   }
 
   W.Halftime = { levelUp: levelUp, tick: tick, reset: reset, show: function (resume) { if (!S.active) show(resume); }, url: URL_, test: TEST,
-    get active() { return S.active; }, get shown() { return S.shown; } };
+    get active() { return S.active; }, get shown() { return S.shown; }, get played() { return S.played || []; } };
 })();

@@ -1,0 +1,118 @@
+{
+ "restaurant": "melody-lax",
+ "outro": "outro.mp4",
+ "clips": [
+  {
+   "file": "c01.mp4",
+   "poster": "c01.jpg",
+   "start": 4.5,
+   "end": 11.5,
+   "label": "planes over the patio"
+  },
+  {
+   "file": "c02.mp4",
+   "poster": "c02.jpg",
+   "start": 11.5,
+   "end": 18.5,
+   "label": "inside the bar"
+  },
+  {
+   "file": "c03.mp4",
+   "poster": "c03.jpg",
+   "start": 46.3,
+   "end": 53.0,
+   "label": "french toast + syrup"
+  },
+  {
+   "file": "c04.mp4",
+   "poster": "c04.jpg",
+   "start": 53.0,
+   "end": 60.0,
+   "label": "plate dance"
+  },
+  {
+   "file": "c05.mp4",
+   "poster": "c05.jpg",
+   "start": 60.5,
+   "end": 67.5,
+   "label": "philly omelette"
+  },
+  {
+   "file": "c06.mp4",
+   "poster": "c06.jpg",
+   "start": 78.0,
+   "end": 85.0,
+   "label": "parmesan chicken mac"
+  },
+  {
+   "file": "c07.mp4",
+   "poster": "c07.jpg",
+   "start": 85.0,
+   "end": 92.0,
+   "label": "mac & cheese pull"
+  },
+  {
+   "file": "c08.mp4",
+   "poster": "c08.jpg",
+   "start": 92.0,
+   "end": 99.0,
+   "label": "melody burger mac"
+  },
+  {
+   "file": "c09.mp4",
+   "poster": "c09.jpg",
+   "start": 106.0,
+   "end": 113.0,
+   "label": "lobster mac & cheese"
+  },
+  {
+   "file": "c10.mp4",
+   "poster": "c10.jpg",
+   "start": 121.0,
+   "end": 128.0,
+   "label": "lemon pepper wings"
+  },
+  {
+   "file": "c11.mp4",
+   "poster": "c11.jpg",
+   "start": 128.0,
+   "end": 135.0,
+   "label": "pulling the wing apart"
+  },
+  {
+   "file": "c12.mp4",
+   "poster": "c12.jpg",
+   "start": 138.2,
+   "end": 145.2,
+   "label": "zoom on the crispy skin"
+  },
+  {
+   "file": "c13.mp4",
+   "poster": "c13.jpg",
+   "start": 145.2,
+   "end": 152.2,
+   "label": "first wing bite"
+  },
+  {
+   "file": "c14.mp4",
+   "poster": "c14.jpg",
+   "start": 152.2,
+   "end": 159.2,
+   "label": "bite under the LAX planes"
+  },
+  {
+   "file": "c15.mp4",
+   "poster": "c15.jpg",
+   "start": 176.6,
+   "end": 183.4,
+   "label": "bite at the bar"
+  },
+  {
+   "file": "c16.mp4",
+   "poster": "c16.jpg",
+   "start": 188.5,
+   "end": 195.5,
+   "label": "one more at the bar"
+  }
+ ]
+}

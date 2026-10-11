@@ -13,7 +13,7 @@ var W=400,H=560,D=Math.min(2,window.devicePixelRatio||1),TAU=Math.PI*2;
 /* ---------- layer ---------- */
 var st=document.createElement("style");
 st.textContent=".sfx-wrap{position:relative;border-radius:12px;transform-origin:50% 60%}"+
-  ".sfx{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;border-radius:12px}";
+  ".sfx-wrap>canvas.sfx{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;border-radius:12px}";
 document.head.appendChild(st);
 var wrap=document.createElement("div"); wrap.className="sfx-wrap";
 game.parentNode.insertBefore(wrap,game); wrap.appendChild(game);

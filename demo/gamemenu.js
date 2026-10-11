@@ -34,12 +34,26 @@
    Audio convention (games that have sound expose it; the menu wires to it):
      window.GAME_AUDIO={ music:function(on){}, sfx:function(on){}, state:function(){ return {hasMusic:true,hasSfx:true,music:true,sfx:true}; } }
      music(false) must silence ONLY the music (gain 0 / pause the <audio>), never suspend the shared AudioContext.
+     fullscreen:{hide:".how", maxWidth:520}   (optional) passed to fullscreen.js: what to hide in full screen, layout width cap
+   FULL SCREEN (every game, standing rule): this file loads fullscreen.js next to it. The menu gets ⛶ Full screen (and 📲 Add to
+   Home Screen when a2hs.js is on the page); PLAY re-enters full screen automatically when the guest chose it last time
+   (PLAY is a user gesture, which the Fullscreen API needs). In-game there is a small ⛶ / ✕ corner button.
    API: window.GameMenu.open() · .close() · .panel("points"|"how"|"settings") */
 (function () {
   "use strict";
   if (window.GameMenu) return;
   var C = window.GAME_MENU; if (!C) return;
   var W = window, D = document;
+  // full screen helper (demo/fullscreen.js) lives next to this file
+  var meSrc = D.currentScript && D.currentScript.src;
+  if (meSrc && !W.GameFS && !D.querySelector("script[src*='fullscreen.js']")) {
+    var fsj = D.createElement("script"); fsj.src = meSrc.replace(/gamemenu\.js(\?.*)?$/, "fullscreen.js");
+    fsj.onload = function () { fsAttach(); if (W.GameMenu) W.GameMenu.refresh(); };
+    D.head.appendChild(fsj);
+  }
+  function FS() { return W.GameFS || null; }
+  function AH() { return (W.A2HS && W.A2HS.available && W.A2HS.available()) ? W.A2HS : null; }
+  function fsAttach() { var f = FS(); if (!f || !box) return; var o = C.fullscreen || {}; f.attach({ box: box, hide: o.hide, maxWidth: o.maxWidth, minWidth: o.minWidth, bg: o.bg || th.bg }); }
   var T = function (s) { return (W.__T || String)(s); };
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]; }); };
   var th = C.theme || {};
@@ -144,6 +158,7 @@
     ".gm-wb button i{font-style:normal;font-size:24px;line-height:1}.gm-wb button small{font:700 11px/1.2 var(--gm-body);color:var(--gm-dim)}.gm-wb button[aria-pressed=true]{border-color:var(--gm-acc2);background:color-mix(in srgb,var(--gm-acc) 30%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--gm-acc2) 40%,transparent)}" +
     ".gm-who.need{animation:gmShake .45s}@keyframes gmShake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}" +
     ".gm-ov.hasmodes .gm-tag{display:none}.gm-ov.hasmodes .gm-hero{height:46px}.gm-ov.hasmodes .gm-hero img{height:42px}" +
+    ".gm-fstip{display:block;width:min(300px,100%);margin:-4px 0 0;padding:4px 6px;border:0;background:none;color:var(--gm-dim);font:700 12px/1.3 var(--gm-body);cursor:pointer;text-decoration:underline;text-underline-offset:2px}" +
     "@media (prefers-reduced-motion:reduce){.gm-hero img,.gm-play{animation:none}}";
   D.head.appendChild(st);
 
@@ -171,18 +186,24 @@
       : '<button type="button" class="gm-b" data-gm="spin"><i>🎡</i>' + esc(T(sr ? "Free daily spin" : "Spun today ✓")) + "</button>");
     if (tk && tk.on) bs.push('<button type="button" class="gm-b" data-gm="tokens"><i>🪙</i>' + esc(T("Get tokens")) + "</button>");
     if (hasMusic()) bs.push('<button type="button" class="gm-b" data-gm="music" aria-pressed="' + !!S.music + '"><i>' + (S.music ? "🎵" : "🔇") + "</i>" + esc(T(S.music ? "Music on" : "Music off")) + "</button>");
+    var fsOn = !!(FS() && FS().active);
+    bs.push('<button type="button" class="gm-b" data-gm="fs" aria-pressed="' + fsOn + '"><i>' + (fsOn ? "✕" : "⛶") + "</i>" + esc(T(fsOn ? "Exit full screen" : "Full screen")) + "</button>");
+    if (AH()) bs.push('<button type="button" class="gm-b" data-gm="a2hs"><i>📲</i>' + esc(T("Add to Home Screen")) + "</button>");
     bs.push('<button type="button" class="gm-b" data-gm="settings"><i>⚙️</i>' + esc(T("Settings")) + "</button>");
     bs.push('<button type="button" class="gm-b" data-gm="how"><i>❓</i>' + esc(T("How to play")) + "</button>");
     bs.push('<button type="button" class="gm-b' + (badge ? " gm-spin" : "") + '" data-gm="points"><i>🏆</i>' + esc(T("Points & prizes")) + (badge ? '<b class="gm-nb" aria-label="1 free spin waiting">1</b>' : "") + "</button>");
     if (bs.length % 2) bs[bs.length - 1] = bs[bs.length - 1].replace('class="gm-b"', 'class="gm-b wide"');
-    return h + '<div class="gm-grid">' + bs.join("") + "</div>";
+    h += '<div class="gm-grid">' + bs.join("") + "</div>";
+    if (fsOn && FS().iPhone && AH()) h += '<button type="button" class="gm-fstip" data-gm="a2hs">' + esc(T("For true full screen, add us to your Home Screen")) + "</button>";
+    return h;
   }
   function place() {
     if (!ov || !mount || !box) return;
     var b = box.getBoundingClientRect(), m = mount.getBoundingClientRect();
-    ov.style.left = (m.left - b.left - box.clientLeft) + "px"; ov.style.top = (m.top - b.top - box.clientTop) + "px";
-    ov.style.width = m.width + "px"; ov.style.height = m.height + "px";
-    ov.classList.toggle("tight", m.height < 400);
+    var k = box.offsetWidth ? b.width / box.offsetWidth : 1; if (!(k > 0.05)) k = 1;   // full screen scales the box (fullscreen.js)
+    ov.style.left = ((m.left - b.left) / k - box.clientLeft) + "px"; ov.style.top = ((m.top - b.top) / k - box.clientTop) + "px";
+    ov.style.width = m.width / k + "px"; ov.style.height = m.height / k + "px";
+    ov.classList.toggle("tight", m.height / k < 400);
   }
   function build() {
     mount = q(C.mount) || D.querySelector(".gamebox canvas, canvas#game");
@@ -195,7 +216,8 @@
     if (C.spinBadge) setInterval(function () { if (opened && ov && ov.querySelector(".gm-cd")) ov.innerHTML = menuHTML(); }, 30000);
     ov.addEventListener("click", onBtn);
     place();
-    if (W.ResizeObserver) new ResizeObserver(place).observe(box); W.addEventListener("resize", place);
+    if (W.ResizeObserver) new ResizeObserver(place).observe(box); W.addEventListener("resize", function () { place(); (W.requestAnimationFrame || setTimeout)(place); });
+    fsAttach();
     hideOld(true); opened = true; D.documentElement.classList.add("gm-up");
     // menu taps (except PLAY) must not lock the screen or show Pause: stop them before gamelock/gamepause see them
     ["touchstart", "pointerdown"].forEach(function (ev) {
@@ -208,6 +230,8 @@
     var a = b.getAttribute("data-gm");
     if (a === "play") play();
     else if (a === "music") setMusic(!S.music);
+    else if (a === "fs") { if (FS()) { FS().toggle(); ov.innerHTML = menuHTML(); (W.requestAnimationFrame || setTimeout)(place); } }
+    else if (a === "a2hs") { closeSheet(); if (W.A2HS) W.A2HS.open("menu"); }
     else if (a === "pclose") closeSheet();
     else if (a === "howlink") { closeSheet(); try { C.how.links[+b.getAttribute("data-v")][1](); } catch (x) {} }
     else if (a === "mode") { try { C.modes.set(b.getAttribute("data-v")); } catch (x) {} if (ov && opened) ov.innerHTML = menuHTML(); }
@@ -223,6 +247,8 @@
   function cd() { var tk = TK(), ms = tk && tk.nextSpinMs ? tk.nextSpinMs() : 0, m = Math.max(1, Math.round(ms / 60000)); return (m >= 60 ? Math.floor(m / 60) + "h " : "") + (m % 60) + "m"; }
   function play() {
     closeSheet();
+    // they chose full screen last time → enter it now, inside the PLAY tap (the Fullscreen API needs a user gesture)
+    var f = FS(); if (f && f.pref && !f.active) f.enter(false);
     var M = C.modes, cur = "";
     if (M) { try { cur = M.get() || ""; } catch (x) {} if (!cur) { var w = ov.querySelector(".gm-who"); if (w) { w.classList.remove("need"); void w.offsetWidth; w.classList.add("need"); } return; } }
     var tk = TK(); if (tk) { tk.play(go, { kid: cur === "kid" }); return; }   // account check (Phase 1) / token cost (Phase 2) first
@@ -231,7 +257,7 @@
   function go() {
     ov.classList.add("off"); opened = false; D.documentElement.classList.remove("gm-up");
     setTimeout(function () { if (!opened) ov.classList.add("gone"); }, 260);
-    started = true; applyAudio();
+    started = true; applyAudio(); if (FS()) FS().playing(true);
     try { C.start && C.start(); } catch (x) { if (W.console) console.error(x); }
     showM();
   }

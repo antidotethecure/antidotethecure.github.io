@@ -3,6 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nalu Vida">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Nalu Vida — Menu, Drinks &amp; Surf Game</title>
 <script src="../lang-th.js"></script>
 <meta name="description" content="Nalu Vida at the foot of the Venice Pier: tropical bites, craft cocktails, order from your seat, surf the Nalu for prizes.">
@@ -312,7 +318,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
   {group:"Harpoons & bosses",items:[{icon:"🔱",name:"Harpoon pickup",note:"Up to 9 at a time",pts:"+3 🔱"},{img:"img/game/shark.webp",name:"Harpoon a shark off",note:"2 hits (3 from level 4)",pts:"+300"},{icon:"🎯",name:"Harpoon or crash a boss",note:"Harpoon −5 HP, rocks −14/−16, pier −10/−12",pts:"+20 × damage"},{img:"img/game/shark.webp",name:"Beat Big Manō",note:"Level 3 boss · 60 HP",pts:"+5,000",gold:true},{img:"img/game/shark.webp",name:"Beat Manō Nui",note:"Final boss · 170 HP",pts:"+15,000",gold:true}]},
   {group:"Dodge these (5 hits and you're out)",items:[{icon:"🌊",name:"Engulfed by a wave",pts:"−❤️",bad:true},{icon:"💥",name:"Bail mid-trick (wipeout)",pts:"−❤️ −300",bad:true},{img:"img/game/shark.webp",name:"Shark bite / boss chomp",pts:"−❤️",bad:true},{icon:"🐟",name:"Stingray",pts:"−❤️",bad:true},{img:"img/game/eel.webp",name:"Electric eel zap",pts:"−❤️",bad:true},{img:"img/game/jelly.webp",name:"Jellyfish sting",pts:"−❤️",bad:true},{icon:"🪵",name:"Hit the pier",note:"JUMP it instead",pts:"−❤️ −200",bad:true},{icon:"🪨",name:"Rocks",pts:"−❤️",bad:true},{icon:"🌊",name:"Tail-slap wave (Manō Nui)",pts:"−❤️",bad:true},{img:"img/game/boat.webp",name:"Boat wake",pts:"−❤️",bad:true}]}],
  prizes:{champion:"#1 on the weekly board wins half off their meal",tiers:[["30,000","$3 off any drink","Ride in from level 1","🥤"],["55,000","Free Jungle Fries","About level 3","img/game/raft_fries.webp"],["95,000","Free Coconut Shrimp","Beat Big Manō","img/game/raft_shrimp.webp"],["150,000","Free Signature Taco plate","Reach or beat Manō Nui","img/game/raft_taco.webp"]],note:"Every prize is good for 3 days · one reward per visit."}};</script>
-<script src="../gamemenu.js"></script>
+<script src="../gamemenu.js"></script><script src="../a2hs.js"></script>
 <div class="prizes" id="prizes"></div>
 
 <div id="champs" data-game="naluvida" style="max-width:430px;margin:12px auto"></div><script src="../champs.js"></script>

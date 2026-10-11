@@ -1086,9 +1086,9 @@
   (function () {
     var inView = false, moved = false, t = 0;
     function tryAuto() {
-      if (!inView || !moved) return; var s = earnSeen(), m = mine()[0];
+      if (!inView || !moved || document.documentElement.classList.contains("ssai-fs")) return; var s = earnSeen(), m = mine()[0];   // not while a game is full screen (fullscreen.js)
       if (s === "m" || (s === "g" && !m)) return;
-      clearTimeout(t); t = setTimeout(function () { if (inView) openEarn(); }, 900);
+      clearTimeout(t); t = setTimeout(function () { if (inView && !document.documentElement.classList.contains("ssai-fs")) openEarn(); }, 900);
     }
     function mv() { moved = true; tryAuto(); }
     window.addEventListener("scroll", mv, { passive: true }); window.addEventListener("pointerdown", mv, { passive: true });

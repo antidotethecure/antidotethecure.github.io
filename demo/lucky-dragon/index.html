@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lucky Dragon">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#0D0404">
 <title>Lucky Dragon Hibachi — Menu & Game</title>
 <script src="../lang-th.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -726,7 +733,7 @@ window.GAME_MENU={id:"lucky-dragon",name:"Hibachi Catch",by:"Lucky Dragon Hibach
   {group:"Bonuses",items:[{icon:"⭐",name:"Gold star",note:"Rare. Keeps your streak going",pts:"+50",gold:true},{icon:"🔗",name:"Streak bonus",note:"+2 per catch in a row, up to +10 extra (5+ streak = +20 a catch)",pts:"up to +10"}]},
   {group:"Dodge these",items:[{icon:"🔥",name:"Flame",note:"Resets your streak",pts:"−20",bad:true},{icon:"🍭",name:"Candy",note:"Resets your streak",pts:"−20",bad:true},{icon:"🧊",name:"Ice",note:"Resets your streak",pts:"−20",bad:true},{img:S.dragon,name:"Dragon fire",note:"Resets your streak. 3 hits burns the food and ends the run",pts:"−30",bad:true}]}],
  prizes:{champion:"1st place this week: 50% OFF your next meal",tiers:[["2nd","20% OFF next meal","2nd place on the weekly board","🥈"],["650+","15% OFF next meal","Puts you on the weekly board","🏆"]],note:"Sample prizes. The owner sets the real ones and the board resets every Monday."}}; })();</script>
-<script src="../gamemenu.js"></script>
+<script src="../gamemenu.js"></script><script src="../a2hs.js"></script>
 <script src="../gamelock.js"></script>
 <script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
 window.SPECIALS=[

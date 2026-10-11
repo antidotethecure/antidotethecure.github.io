@@ -130,7 +130,7 @@ footer a{color:var(--ink)}
 <div id="instafeed"></div>
 <script>window.INSTA_FEED={"handle":"churritoloco","posts":["https://www.instagram.com/reel/DeS7vbqP5Pc/","https://www.instagram.com/p/DeQgZWmy2so/","https://www.instagram.com/reel/DePglu1N-_q/","https://www.instagram.com/reel/DeNgAHrRAns/","https://www.instagram.com/reel/DeLGrKhMKCY/","https://www.instagram.com/reel/DeJ1160T1te/"],"theme":{"card":"var(--card)","ink":"var(--ink)","accent":"var(--accent)","edge":"var(--edge)"}}; /* posts = snapshot 2026-10-10; live:{provider:"behold",id:"..."} turns on auto-updating, see ../instafeed.js */</script>
 <script src="../instafeed.js" defer></script>
-<footer>
+<footer><a href="rules.html">Game &amp; daily spin official rules (draft)</a><br>
   Built by <b>SOUSSHIFT AI</b> — menus, games, AI phone agents, content & growth, hands-free.<br>
   One evening to build. <a href="https://claude.ai/artifact/7LuVHK9AwWibWpwA3qso7i" target="_blank" rel="noopener">See what else SousShift AI can do</a> · growth: antidotepromo.com<br>
   <span style="font-size:11px">Demo page: menu items & prices from the restaurant's public Yelp menu (Sep 2026) and may change — confirm in store. Prize games go live only with the owner, as free-entry promotions with official rules. Food photos are AI-styled plates matched to the menu — real shots swap in when the page goes live.</span>
@@ -564,8 +564,9 @@ var CONFIG = {
     if(c<0||c>=COLS||r<0||r>=ROWS) return null;
     return {c:c,r:r,x:x,y:y};
   }
+  function replay(){ var t=window.SSAI_TOKENS; if(t&&t.account) t.play(function(){ start(); }); else start(); }   // replays go through the member gate / token cost too (crm.js)
   cv.addEventListener("pointerdown",function(e){
-    if(state==="idle"||state==="over"){ start(); return; }
+    if(state==="idle"||state==="over"){ replay(); return; }
     var p=cellAt(e); if(!p||state!=="play") return;
     down=p;
     if(sel){
@@ -590,7 +591,14 @@ var CONFIG = {
 })();
 </script>
 <script src="../contract.js"></script>
-<script>window.CRM_CFG={name:"Churrito Loco",offer:"A free churro with your next order",tiers:[[200,"Free churro"],[400,"Free horchata"],[700,"Free loaded churro"],[1100,"Churros for the table"]],referral:{gift:"Free churro"}};</script>
+<script>window.CRM_CFG={name:"Churrito Loco",offer:"A free churro with your next order",tiers:[[200,"Free churro"],[400,"Free horchata"],[700,"Free loaded churro"],[1100,"Churros for the table"]],referral:{gift:"Free churro"},
+ // Loco Match access. PHASE 1 (live default): free to play for members (name + phone + email, one account per phone).
+ // PHASE 2 (built, off): enabled:true → a play costs 10 tokens; tokens come with food purchases (1 per $1), +10 free every week and
+ // +10 free on request once a day (no purchase necessary). ?tokens=1 previews Phase 2. Legal notes: see crm.js TOKENS block.
+ game:"Loco Match",tokens:{enabled:false,perDollar:1,perOrder:0,playCost:10,weeklyFree:10,freeDaily:10},
+ // FREE daily spin: one per member per day (LA time), never sold, never costs tokens. Odds = w / 100 and must match rules.html. Never alcohol.
+ spin:{rules:"rules.html",hub:"🌶️",colors:["#F57A1A","#2B1A0E","#FFB347","#1F8A43","#FFE9CF","#C2560A"],prizes:[{t:"+50 points",pts:50,w:30},{t:"+100 points",pts:100,w:20},{t:"+5 tokens",tok:5,alt:{t:"+75 points",pts:75},w:15},
+  {t:"$1 off any churro",code:true,w:15},{t:"Free churro",code:true,w:8},{t:"Free horchata",code:true,w:7},{t:"10% off order",code:true,w:5}]}};</script>
 <script src="../crm.js"></script>
 <script>window.NEARBY={name:"Churrito Loco",pin:"🌶️",spots:[{label:"South Gate",lat:33.955939,lng:-118.222585,q:"2801 Firestone Blvd, South Gate, CA"}],offer:"Show this at the counter for double stars on today's churros."};</script>
 <script src="../nearby.js"></script>
@@ -599,6 +607,7 @@ var CONFIG = {
 window.GAME_MENU={id:"churrito-loco",name:"Loco Match",by:"Churrito Loco",tagline:"Match the snacks. 90 seconds on the clock.",
  hero:[ic(0),ic(2),ic(5),ic(3),ic(1)],
  theme:{bg:"#FFF8F0",bg2:"#FFE9CF",card:"#FFFFFF",edge:"#F0DFC8",accent:"#F57A1A",accent2:"#FFB347",label:"#C2560A",ink:"#2B1A0E",dim:"#7A5E46",btnInk:"#2B1A0E",soft:"rgba(43,26,14,.06)",track:"rgba(43,26,14,.18)",good:"#1F8A43",bad:"#C0392B",display:"Archivo,system-ui,sans-serif",body:"Archivo,system-ui,sans-serif"},
+ tokens:true,spinBadge:true,
  mount:document.getElementById("game").closest(".gamebox"),start:function(){ window.__CL.start(); },
  how:{goal:"Score as many points as you can in 90 seconds by lining up 3 or more of the same snack.",time:"90 seconds on the clock",
   steps:[["👆","Tap a snack, then tap the one next to it to swap them"],["👉","Or swipe a snack toward its neighbor"],["🔁","Swaps only stick if they make a match"],["⭐","Make a match right next to the Churrito Man to clear him for a big bonus"],["🌶️","Leave the grilled Serrano alone. It burns out by itself"]]},

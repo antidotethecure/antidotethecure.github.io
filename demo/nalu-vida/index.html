@@ -309,6 +309,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <script>window.GAME_MENU={id:"nalu-vida",name:"Ride the Nalu",by:"Nalu Vida",tagline:"Run in, paddle out, ride the wave home to Nalu Vida. 5 levels, 2 boss sharks, free food.",
  logo:"img/logo.png",hero:["img/game/surfer_f.webp","img/game/shark.webp","img/game/raft_taco.webp","img/game/surfer_m.webp"],
  theme:{bg:"#06182e",bg2:"#0b3b5e",card:"#0f3354",edge:"#1d4f78",accent:"#ff7a3d",accent2:"#ffd23f",label:"#ffd23f",ink:"#f4fbff",dim:"#a9c8de",btnInk:"#3a1600",soft:"rgba(127,227,242,.10)",track:"rgba(255,255,255,.22)",good:"#3ddc97",bad:"#ff6b6b",display:"'Alfa Slab One',Georgia,serif",body:"system-ui,-apple-system,sans-serif"},
+ tokens:true,spinBadge:true,
  mount:"#nalu-game .nv-wrap",hide:"#nv-start",start:function(){ window.__NV.pick(); },vibrate:true,
  switches:[{label:"Cartoon red",icon:"🩸",note:"On: a soft cartoon red cloud when a shark gets you. Off: just a splash and bubbles.",get:function(){return window.__NV&&__NV.gore();},set:function(on){window.__NV&&__NV.gore(on);}}],
  how:{goal:"Each level: run in from the sand, paddle out past the break, pop up and ride the wave back in to Nalu Vida. Beat Big Manō on level 3 and the giant Manō Nui on level 5 for the top prize.",time:"Level 1 is about 2 minutes (30 s paddle-out, 90 s ride); later levels have a 12–15 s paddle-out · 5 hits and you're out",
@@ -384,7 +385,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <div id="instafeed"></div>
 <script>window.INSTA_FEED={"handle":"naluvidavenice","posts":[],"theme":{"card":"var(--panel)","ink":"var(--ink)","accent":"var(--sun1)","edge":"var(--edge)"}}; /* posts = snapshot 2026-10-10; live:{provider:"behold",id:"..."} turns on auto-updating, see ../instafeed.js */</script>
 <script src="../instafeed.js" defer></script>
-<footer>Nalu Vida · 1 Washington Blvd, Venice · app by SousShift AI · prices from Nalu Vida's menu · menu photos are previews until Nalu Vida signs off</footer>
+<footer><a href="rules.html">Game &amp; daily spin official rules (draft)</a><br>Nalu Vida · 1 Washington Blvd, Venice · app by SousShift AI · prices from Nalu Vida's menu · menu photos are previews until Nalu Vida signs off</footer>
 </div>
 
 <div id="obar"><button type="button" id="obtn"><span><span class="n" id="ocount">0</span> &nbsp;<span id="oseat">Review order</span></span><span id="ototal">$0.00</span></button></div>
@@ -1076,10 +1077,17 @@ var sun=new Date(monday+6*864e5);
 $("evsub").textContent="Week of "+MON[new Date(monday).getUTCMonth()]+" "+new Date(monday).getUTCDate()+"–"+MON[sun.getUTCMonth()]+" "+sun.getUTCDate()+". Music, trivia, salsa and the game on every TV.";
 })();
 </script>
-<script>window.CRM_CFG={draw:{odds:15,prizes:["Free Jungle Fries","Free mocktail (Wish You Were Here)","Free French Toast brunch","Free Chips, Salsa & Guac"]},name:"Nalu Vida",offer:"Free Jungle Fries on your next visit",mount:"#rwhost",tiers:[[250,"Free Jungle Fries"],[500,"Free Chips, Salsa & Guac"],[800,"Free Coconut Shrimp"],[1300,"Free Signature Taco plate"]],
+<script>window.CRM_CFG={name:"Nalu Vida",offer:"Free Jungle Fries on your next visit",mount:"#rwhost",tiers:[[250,"Free Jungle Fries"],[500,"Free Chips, Salsa & Guac"],[800,"Free Coconut Shrimp"],[1300,"Free Signature Taco plate"]],
   /* two balances that never mix: bar points (drinks only) and kitchen points (food only). California ABC: bar rewards are drink discounts or free non-alcoholic items, never free alcohol. */
   wallets:{split:true,bonusTo:"food",bar:{label:"Bar",icon:"🍸",perDollar:10,tiers:[[250,"$3 off any drink"],[500,"Half off any cocktail"],[800,"Free mocktail (Wish You Were Here or Put the Lime in the Coconut)"],[1300,"$10 off a bar tab of $30+"]]},
-    food:{label:"Kitchen",icon:"🍔",perDollar:10,tiers:[[250,"Free Jungle Fries"],[500,"Free Chips, Salsa & Guac"],[800,"Free Coconut Shrimp"],[1300,"Free Signature Taco plate"]]}},referral:{gift:"Free Jungle Fries"},earn:{checkin:25,firstOrder:50,birthday:100,review:{pts:75,platform:"app"},instagram:{pts:25,url:"https://www.instagram.com/naluvidavenice/"},referral:{join:75,friend:25,friendGift:"Free Chips, Salsa & Guac",first:50,every:10}}};</script>
+    food:{label:"Kitchen",icon:"🍔",perDollar:10,tiers:[[250,"Free Jungle Fries"],[500,"Free Chips, Salsa & Guac"],[800,"Free Coconut Shrimp"],[1300,"Free Signature Taco plate"]]}},referral:{gift:"Free Jungle Fries"},earn:{checkin:25,firstOrder:50,birthday:100,review:{pts:75,platform:"app"},instagram:{pts:25,url:"https://www.instagram.com/naluvidavenice/"},referral:{join:75,friend:25,friendGift:"Free Chips, Salsa & Guac",first:50,every:10}},
+ // Ride the Nalu access. PHASE 1 (live default): free to play for members (name + phone + email, one account per phone).
+ // PHASE 2 (built, off): enabled:true → a play costs 10 tokens; tokens come with food purchases (1 per $1, food and non-alcoholic only, never alcohol), +10 free every week and
+ // +10 free on request once a day (no purchase necessary). ?tokens=1 previews Phase 2. Legal notes: see crm.js TOKENS block.
+ game:"Ride the Nalu",tokens:{enabled:false,perDollar:1,perOrder:0,playCost:10,weeklyFree:10,freeDaily:10,noAlc:true},
+ // FREE daily spin: one per member per day (LA time), never sold, never costs tokens. Odds = w / 100 and must match rules.html. Never alcohol.
+ spin:{rules:"rules.html",hub:"🏄",colors:["#ffd23f","#0b2e52","#7fe3f2","#ff6a2b","#f3e2c3","#1673c4"],prizes:[{t:"+50 kitchen pts",pts:50,w:30},{t:"+100 kitchen pts",pts:100,w:20},{t:"+5 tokens",tok:5,alt:{t:"+75 kitchen pts",pts:75},w:15},
+  {t:"$2 off any food",code:true,w:15},{t:"Free Jungle Fries",code:true,w:8},{t:"Free mocktail",code:true,w:7},{t:"10% off food",code:true,w:5}]}};</script>
 <script src="../crm.js"></script>
 <script>window.NEARBY={name:"Nalu Vida",pin:"🏄",mount:"#rwhost",spots:[{label:"Venice Pier",lat:33.9779,lng:-118.4669,q:"1 Washington Blvd, Venice, CA 90292"}],offer:"Happy hour Mon–Fri 3–6 PM and 10 PM–close, dine-in."};</script>
 <script src="../nearby.js"></script>

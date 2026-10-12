@@ -5,7 +5,10 @@
       glowing POCKET just ahead of the curl to the exit on the far side (bonus). Behind the curl or under the falling
       lip = washed (−½ ❤️); too far out front = you slow down. JUMP only launches off the LIP (top of the face, in the
       pocket); in the air tap TRICK (or swipe up/down) for a spin or flip; still mid-trick on landing = a bail (−1 ❤️).
-      The Venice Pier is narrow and off to the side; now and then a section drifts across your line: JUMP it (−1 ❤️).
+      The ride itself is just the wave and the odd shark (packs from level 4). Everything else lives on the paddle-out: the Nalu
+      Vida care boat (food rafts, a heart, a harpoon bundle), stingrays / eels / jellies ramping up by level, double sets from
+      level 3, and from level 2 a submarine that surfaces ahead, locks a red aim line on you and fires a harpoon (dodge it or
+      duck-dive; level 4+ fires twice). Boss fights bring pier sections (JUMP them, −1 ❤️) and rocks to ram the boss into.
       The first ride of a run gets a tutorial card (once per phone; replay from How to play) and lifeguard coaching.
       Bosses (Big Manō L3, Manō Nui L5) show up in the ride.
    3. RIDE IN (~125–130 s on level 1): ride onto the sand and run up the beach into Nalu Vida to eat. Between levels
@@ -31,13 +34,17 @@
   /* ---------- levels: the arc timings, in seconds ----------
      swim = sand run + paddle out (level 1 is the full 30 s; later levels are shorter so the whole game doesn't drag)
      ride = riding before the ride-in (on a boss level: riding before the boss shows up; the ride-in follows the boss)
-     set = seconds between incoming waves on the paddle-out · peel = how fast the curl peels (px/s) · pier = seconds between pier sections */
+     set = seconds between incoming waves on the paddle-out · peel = how fast the curl peels (px/s) · pier = seconds between pier sections
+     The paddle-out carries the busy stuff (care-package boat, food, hearts, harpoons, rays/eels/jellies, the submarine); the ride
+     itself is just the wave plus the odd shark (bosses still bring their rocks, pier sections and harpoon jet ski).
+     sray / seel = extra stingray / eel share on the paddle-out · dbl = chance a set comes as two waves back to back
+     subm = seconds between submarines (they surface ahead and fire a harpoon you have to dodge; level 4+ fires twice) */
   var LV = [null,
-    { swim: 30, ride: 90, set: [3.4, 4.4], peel: 60, pier: [13, 18], spd: 1.00, haz: 1.00, shark: .30, lunge: 330, eel: 60, jel: 0, ray: .22, rock: 0, harp: [18, 24], pack: 0, sub: "Paddle out · ride the wave in" },
-    { swim: 15, ride: 72, set: [3.0, 3.9], peel: 68, pier: [11, 15], spd: 1.07, haz: 1.25, shark: .36, lunge: 365, eel: 75, jel: .25, ray: .26, rock: [10, 14], harp: [15, 21], pack: 0, sub: "Faster sharks · rocks · stingrays" },
-    { swim: 13, ride: 50, set: [2.8, 3.6], peel: 74, pier: [10, 14], spd: 1.11, haz: 1.42, shark: .40, lunge: 395, eel: 88, jel: .35, ray: .28, rock: [8, 11], harp: [12, 17], pack: 0, boss: 3, sub: "Something BIG is hunting out there…" },
-    { swim: 13, ride: 72, set: [2.6, 3.3], peel: 80, pier: [9, 13], spd: 1.16, haz: 1.65, shark: .44, lunge: 425, eel: 100, jel: .45, ray: .30, rock: [7, 10], harp: [11, 15], pack: .25, sub: "Shark packs · bigger sets" },
-    { swim: 12, ride: 42, set: [2.4, 3.1], peel: 86, pier: [9, 12], spd: 1.20, haz: 1.85, shark: .46, lunge: 450, eel: 110, jel: .5, ray: .32, rock: [6, 9], harp: [9, 13], pack: .35, boss: 5, sub: "Final ride · Manō Nui is waiting" }];
+    { swim: 30, ride: 90, set: [3.4, 4.4], peel: 60, pier: [13, 18], spd: 1.00, haz: 1.00, shark: .30, lunge: 330, eel: 60, jel: 0, ray: .22, rock: 0, harp: [18, 24], pack: 0, sray: 0, seel: 0, dbl: 0, subm: 0, sub: "Paddle out · ride the wave in" },
+    { swim: 20, ride: 72, set: [3.0, 3.9], peel: 68, pier: [11, 15], spd: 1.07, haz: 1.25, shark: .36, lunge: 365, eel: 75, jel: .25, ray: .26, rock: [10, 14], harp: [15, 21], pack: 0, sray: .2, seel: .2, dbl: 0, subm: [9, 12], sub: "More stingrays · eels · a SUBMARINE surfaces" },
+    { swim: 18, ride: 50, set: [2.8, 3.6], peel: 74, pier: [10, 14], spd: 1.11, haz: 1.42, shark: .40, lunge: 395, eel: 88, jel: .35, ray: .28, rock: [8, 11], harp: [12, 17], pack: 0, sray: .32, seel: .26, dbl: .25, subm: [7.5, 10], boss: 3, sub: "Something BIG is hunting out there…" },
+    { swim: 18, ride: 72, set: [2.6, 3.3], peel: 80, pier: [9, 13], spd: 1.16, haz: 1.65, shark: .44, lunge: 425, eel: 100, jel: .45, ray: .30, rock: [7, 10], harp: [11, 15], pack: .25, sray: .45, seel: .32, dbl: .35, subm: [6.5, 8.5], sub: "Double sets · subs fire twice · shark packs" },
+    { swim: 18, ride: 42, set: [2.4, 3.1], peel: 86, pier: [9, 12], spd: 1.20, haz: 1.85, shark: .46, lunge: 450, eel: 110, jel: .5, ray: .32, rock: [6, 9], harp: [9, 13], pack: .35, sray: .55, seel: .38, dbl: .45, subm: [5.5, 7.5], boss: 5, sub: "Final ride · Manō Nui is waiting" }];
   var BOSS = {
     3: { name: "BIG MANŌ", size: 150, hp: 60, harp: 5, rock: 14, pier: 10, charge: 430, warn: .72, stalk: [1.7, 2.5], bonus: 5000 },
     5: { name: "MANŌ NUI", size: 225, hp: 170, harp: 5, rock: 16, pier: 12, charge: 500, warn: .58, stalk: [1.1, 1.8], bonus: 15000 } };
@@ -113,7 +120,7 @@
   /* ---------- images ---------- */
   var IM = {};
   ["surfer_m", "surfer_f", "shark", "eel", "jelly", "gull", "boat", "heli", "plane", "raft_taco", "raft_burger", "raft_oysters", "raft_mimosa", "raft_shrimp",
-    "drop", "buoy", "shore", "pier", "pierend", "lifeguard_f", "lifeguard_m", "staff", "palm", "storefront", "wave", "splash", "fish_gold", "fish_mahi", "fish_parrot", "raft_fries", "skeleton", "paddler_m", "paddler_f", "beachlady"].forEach(function (k) { var i = new Image(); i.decoding = "async"; i.src = "img/game/" + k + ".webp"; IM[k] = i; });
+    "drop", "buoy", "shore", "pier", "pierend", "lifeguard_f", "lifeguard_m", "staff", "palm", "storefront", "wave", "splash", "fish_gold", "fish_mahi", "fish_parrot", "raft_fries", "skeleton", "paddler_m", "paddler_f", "beachlady", "surfer_m_rider", "surfer_m_board", "surfer_f_rider", "surfer_f_board"].forEach(function (k) { var i = new Image(); i.decoding = "async"; i.src = "img/game/" + k + ".webp"; IM[k] = i; });
   function ok(i) { return i && i.complete && i.naturalWidth > 0; }
   function spr(k, x, y, w, rot, alpha) {
     var i = IM[k]; if (!ok(i)) return false; var h = w * i.naturalHeight / i.naturalWidth;
@@ -335,13 +342,17 @@
     radioOnce("ray", "Stingrays in the water — steer around them!", { tone: "warn" }); }
   function hazard() {
     var P = L(), r = Math.random(), x = laneX(), y = ahead(H * 0.75), sh = G.boss ? 0 : P.shark;
-    if (G.phase === "swim") {   // the paddle-out: mostly jellies and stingrays in the shallows, the odd shark further out
+    if (G.phase === "swim") {   // the paddle-out: jellies and stingrays in the shallows, eels from level 2, the odd shark further out
       if (r < sh * .35 && G.yw > 600) shark(x, y);
-      else if (r < .55) ray(null, y);
-      else if (G.level >= 2 && r < .7) add({ t: "eel", x: Math.random() < .5 ? -40 : W + 40, yw: y, r: 18, ph: Math.random() * 6, sp: P.eel * .7 * (Math.random() < .5 ? 1 : -1), base: y });
+      else if (r < .5) ray(null, y);
+      else if (r < .5 + P.seel && (radioOnce("eel", "Eels in the water, stay sharp!", { tone: "warn" }), 1)) add({ t: "eel", x: Math.random() < .5 ? -40 : W + 40, yw: y, r: 18, ph: Math.random() * 6, sp: P.eel * .7 * (Math.random() < .5 ? 1 : -1), base: y });
       else { add({ t: "jelly", x: x, yw: y, r: 17, ph: Math.random() * 6 }); radioOnce("jelly", "Jellyfish ahead!", { tone: "warn" }); }
+      if (Math.random() < P.sray) ray(null, y + G.dir * rnd(70, 130));   // later levels: a second stingray glides through
       return;
     }
+    if (!G.boss) {   // the ride: just the wave and, now and then, a shark (packs from level 4)
+      shark(x, y); if (Math.random() < P.pack) add({ t: "shark", x: x < W / 2 ? x + rnd(90, 140) : x - rnd(90, 140), yw: y + G.dir * rnd(60, 120), r: 20, st: "fin", vx: 0, vy: 0, lunge: 0, hp: 2 });
+      return; }
     if (r < sh) { shark(x, y);
       if (Math.random() < P.pack) add({ t: "shark", x: x < W / 2 ? x + rnd(90, 140) : x - rnd(90, 140), yw: y + G.dir * rnd(60, 120), r: 20, st: "fin", vx: 0, vy: 0, lunge: 0, hp: 2 }); }
     else if (r < sh + P.ray) ray(null, y);
@@ -350,6 +361,10 @@
     if (Math.random() < P.jel) add({ t: "jelly", x: laneX(), yw: y + G.dir * 90, r: 17, ph: 0 });
   }
   function boat() { radioOnce("help", "Help's on the way! Grab the boat toss.", { tone: "info" }); var fromL = Math.random() < .5; add({ t: "boat", x: fromL ? -70 : W + 70, yw: ahead(H * 0.42), vx: fromL ? 95 : -95, r: 34, toss: 0.6 }); }
+  // the paddle-out care boat: the Nalu Vida crew idle slowly across up ahead and toss care packages (food rafts, a rescue-can
+  // heart when you're hurt, and always one harpoon bundle for the sharks on the ride in). It never hurts you: it nudges you aside.
+  function careBoat() { radioOnce("care", "Nalu Vida crew boat! Grab the care packages, there's a harpoon in there.", { tone: "info" });
+    var fromL = G.x > W / 2; add({ t: "boat", care: 1, x: fromL ? -70 : W + 70, yw: ahead(240), vx: fromL ? 58 : -58, r: 34, toss: 1.2, n: 0, yw0: 0 }); }
   function heli() { radioOnce("help", "Help's on the way! Chopper drop incoming.", { tone: "info" }); var fromL = Math.random() < .5; add({ t: "heli", x: fromL ? -60 : W + 60, yw: ahead(H * 0.3), vx: fromL ? 110 : -110, drops: 3, dt: 0.7, sky: 1 }); }
   function plane() { var fromR = Math.random() < .5; add({ t: "plane", x: fromR ? W + 60 : -330, y: rnd(70, 150), vx: fromR ? -70 : 70, sky: 1, scr: 1 }); }
   // a breaking wave rolling in toward the sand while you paddle out: duck-dive under it (JUMP) or get engulfed
@@ -374,6 +389,23 @@
   function harpPick(x, yw) { return add({ t: "harpoon", x: x, yw: yw, r: 20, bob: Math.random() * 6 }); }
   // lifeguard on a rescue jet ski: crosses the screen and tosses you a harpoon bundle
   function ski() { var fromL = G.x > W / 2; add({ t: "ski", x: fromL ? -50 : W + 50, yw: ahead(rnd(150, 230)), vx: fromL ? 160 : -160, tossed: 0, sky: 0 }); }
+  // the submarine (paddle-out, level 2+): a periscope wake shows up ahead, the hull surfaces, it swings round and locks on
+  // (red aim line), fires a harpoon straight down that line, then dives. Steer off the line or duck-dive under it. Level 4+ fires twice.
+  function sub() { var x = G.x < W / 2 ? rnd(W * .6, W - 45) : rnd(45, W * .4);
+    add({ t: "sub", x: x, yw: ahead(rnd(165, 180)), st: "peri", tt: 0, shots: G.level >= 4 ? 2 : 1, ang: 0, ax: G.x, ayw: G.yw });
+    radioOnce("sub", "🚢 Submarine surfacing! Get off its aim line, or duck-dive the harpoon.", { tone: "warn", pri: 2 }); }
+  function subStep(e, dt) {
+    e.tt += dt; if (G.phase === "swim") e.yw = Math.max(e.yw, G.yw + 160);   // stays out ahead of you while it's up
+    var lock = e.st === "aim" && e.tt > .75;
+    if (!lock && (e.st === "surf" || e.st === "aim")) { e.ax = G.x; e.ayw = G.yw; }
+    e.ang = Math.atan2(e.ax - e.x, -(e.ayw - e.yw) * -1);
+    if (e.st === "peri" && e.tt > 1.2) { e.st = "surf"; e.tt = 0; sfx("splash"); G.fx.push({ k: "splash", x: e.x, y: sy(e.yw), t: 0 }); }
+    else if (e.st === "surf" && e.tt > .6) { e.st = "aim"; e.tt = 0; }
+    else if (e.st === "aim" && e.tt > 1.05) { var dx = e.ax - e.x, dy = e.ayw - e.yw, l = Math.hypot(dx, dy) || 1, v = 230 + 15 * (G.level - 2);
+      add({ t: "sharp", x: e.x + dx / l * 30, yw: e.yw + dy / l * 30, vx: dx / l * v, vy: dy / l * v, r: 6 }); sfx("lunge"); buzz(12);
+      e.shots--; e.st = e.shots > 0 ? "aim" : "dive"; e.tt = e.shots > 0 ? .15 : 0; }
+    else if (e.st === "dive" && e.tt > .9) return true;
+    return false; }
   function gull() { var fromL = Math.random() < .5; G.gulls.push({ x: fromL ? -30 : W + 30, y: rnd(40, H - 60), vx: (fromL ? 1 : -1) * rnd(60, 110), vy: rnd(-12, 12), f: Math.random() * 6 }); }
 
   /* ---------- scoring ---------- */
@@ -470,7 +502,7 @@
   function rescueStep(dt) {
     if (G.rescPend && !G.beer && rescueOk()) rescueLaunch();
     var b = G.beer; if (!b) return;
-    b.t += dt; G.spawn.haz = Math.max(G.spawn.haz || 0, .6); G.spawn.rock = Math.max(G.spawn.rock || 0, .6); G.spawn.set = Math.max(G.spawn.set || 0, 1.2);   // hold new hazards + set waves back while it flies
+    b.t += dt; G.spawn.haz = Math.max(G.spawn.haz || 0, .6); G.spawn.sub = Math.max(G.spawn.sub || 0, 1.5); G.spawn.rock = Math.max(G.spawn.rock || 0, .6); G.spawn.set = Math.max(G.spawn.set || 0, 1.2);   // hold new hazards + set waves back while it flies
     var top = toWorld(0, 0).y - 24, ty = sy(G.yw);
     if (b.st === "wind") {   // the line shows, the catch ring appears, then the throw
       b.x = b.sx; b.y = top;
@@ -553,7 +585,8 @@
     if (rin) { G.x += (SHORE_X - G.x) * Math.min(1, dt * 1.6); G.vx *= .9; }
     else { G.x += G.vx * dt; G.vx *= Math.pow(0.0009, dt); G.x = Math.max(16, Math.min(W - 16, G.x)); }
     var base = G.dir > 0 ? 0 : Math.PI;
-    G.ang += (base + Math.max(-0.5, Math.min(0.5, G.vx / 420)) * G.dir - G.ang) * Math.min(1, dt * 8);
+    var amax = riding ? .85 : .5;   // riding: the board swings further across the face (carving the wave, not a flat sticker)
+    G.ang += (base + Math.max(-amax, Math.min(amax, G.vx / (riding ? 300 : 420))) * G.dir - G.ang) * Math.min(1, dt * 8);
     G.lead += ((G.dir > 0 ? LEAD : -RLEAD) - G.lead) * Math.min(1, dt * 2.5);
     G.cam = G.yw + G.lead;
     if (riding) G.score += Math.round(v * dt * 0.05 * G.mult * 100) / 100;
@@ -564,27 +597,25 @@
     // spawns
     var S = G.spawn, lv = G.level;
     for (var sk in S) S[sk] -= dt;
-    if (swim) {
-      if (S.set <= 0) { set(); S.set = rnd(P.set[0], P.set[1]); }
-      if (S.food <= 0) { food(laneX(), ahead(H * 0.75)); S.food = rnd(2.4, 3.6); }
+    if (swim) {   // the paddle-out: sets to duck-dive, the care boat, food, hazards ramping by level, the submarine from level 2
+      if (S.set <= 0) { set(); S.set = G.dblNext ? .95 : rnd(P.set[0], P.set[1]); G.dblNext = !G.dblNext && Math.random() < P.dbl; if (G.dblNext) S.set = .95; }
+      var busy = G.ents.some(function (e) { return e.t === "boat" || e.t === "sub"; });   // the care boat and a sub never share the screen
+      if (S.boat <= 0) { if (busy) S.boat = 1.5; else { careBoat(); S.boat = rnd(12, 16); busy = true; } }
+      if (S.food <= 0) { food(laneX(), ahead(H * 0.75)); S.food = rnd(3.6, 5.2); }
       if (S.haz <= 0) { hazard(); S.haz = rnd(2.2, 3.2) / P.haz; }
       if (S.fish <= 0) { fish(); S.fish = rnd(8, 12); }
-    } else if (riding) {
-      if (S.food <= 0) { food(laneX(), ahead(H * 0.75)); if (Math.random() < .2) food(laneX(), ahead(H * 0.75 + 90)); S.food = rnd(2.0, 3.2) / (1 + 0.06 * lv); }
-      if (S.fish <= 0) { fish(); S.fish = rnd(8, 13); }
-      if (S.haz <= 0) { hazard(); S.haz = rnd(1.6, 2.5) / P.haz * (G.boss ? 2.2 : 1); }
-      if (S.boat <= 0) { boat(); S.boat = rnd(11, 16); }
-      if (S.heli <= 0) { heli(); S.heli = rnd(18, 26); }
-      if (S.pier <= 0) { pierSection(); S.pier = G.boss ? rnd(6, 9) : rnd(P.pier[0], P.pier[1]); }
-      if (S.harp <= 0) { harpPick(laneX(), ahead(H * 0.75)); S.harp = G.boss ? rnd(5, 7) : rnd(P.harp[0], P.harp[1]); }
-      if (S.rock <= 0 && (P.rock || G.boss)) { rocks(); S.rock = G.boss ? rnd(2.4, 3.4) : rnd(P.rock[0], P.rock[1]); }
-      if (S.ski <= 0 && (G.boss || G.level >= 3)) { ski(); S.ski = G.boss ? rnd(8, 11) : rnd(22, 30); }
-    }
-    if (!rin) {
+      if (P.subm && S.sub <= 0) { if (busy) S.sub = 1.5; else { sub(); S.sub = rnd(P.subm[0], P.subm[1]); } }
       if (S.buoy <= 0 && G.hearts < 4) { add({ t: "buoy", x: laneX(), yw: ahead(H * 0.75), r: 16 }); S.buoy = rnd(30, 45); }
-      if (!G.boss && window.ReviewEgg && ReviewEgg.due(G.eggT * 1000)) add({ t: "rsign", x: Math.max(70, Math.min(W - 70, laneX())), yw: ahead(H * 0.75), r: 30, bob: Math.random() * 6 });
+      if (window.ReviewEgg && ReviewEgg.due(G.eggT * 1000)) add({ t: "rsign", x: Math.max(70, Math.min(W - 70, laneX())), yw: ahead(H * 0.75), r: 30, bob: Math.random() * 6 });
+      if (S.plane <= 0) { plane(); S.plane = rnd(40, 55); }
+    } else if (riding && !G.boss) {   // the ride in: only the wave and the odd shark
+      if (S.haz <= 0) { hazard(); S.haz = rnd(7, 10) / P.haz; }
+    } else if (riding) {              // a boss fight keeps its tools: harpoons, the lifeguard jet ski, rocks and pier sections to ram him into
+      if (S.pier <= 0) { pierSection(); S.pier = rnd(6, 9); }
+      if (S.harp <= 0) { harpPick(laneX(), ahead(H * 0.75)); S.harp = rnd(5, 7); }
+      if (S.rock <= 0) { rocks(); S.rock = rnd(2.4, 3.4); }
+      if (S.ski <= 0) { ski(); S.ski = rnd(8, 11); }
     }
-    if (S.plane <= 0) { plane(); S.plane = rnd(40, 55); }
     if (Math.random() < dt * 0.35 && G.gulls.length < 5) gull();
     // entities
     var py = sy(G.yw);
@@ -602,11 +633,18 @@
       else if (e.t === "jelly") { e.ph += dt; e.x += Math.sin(e.ph * .8) * 12 * dt; }
       else if (e.t === "ray") { e.ph += dt; e.x += e.vx * dt; e.yw += Math.sin(e.ph * 1.3) * 18 * dt * G.dir; e.sub = .5 + .5 * Math.sin(e.ph * .9); }
       else if (e.t === "brk") { e.yw += e.vy * dt; e.ph += dt; }
+      else if (e.t === "boat" && e.care) { e.x += e.vx * dt; e.toss -= dt; if (swim) e.yw = Math.max(e.yw, G.yw + 185);   // keeps up ahead of you while it crosses
+        if (e.toss <= 0 && e.x > 30 && e.x < W - 30) { e.toss = 1.05; e.n++;
+          var it = !e.gave && e.n >= 2 ? "harpoon" : G.hearts < 5 && !e.heart && Math.random() < .35 ? "buoy" : 0;
+          if (it === "harpoon") e.gave = 1; if (it === "buoy") e.heart = 1;
+          tossTo(e.x, e.yw, Math.max(30, Math.min(W - 30, G.x + rnd(-120, 120))), ahead(rnd(110, 170)), "boat", it); } }
       else if (e.t === "boat") { e.x += e.vx * dt; e.toss -= dt; if (e.toss <= 0 && e.x > 20 && e.x < W - 20) { e.toss = 0.75; var hp0 = !e.gave && G.level >= 2 && Math.random() < (G.boss ? .6 : .18); if (hp0) e.gave = 1; tossTo(e.x, e.yw, laneX(), ahead(rnd(120, 230)), "boat", hp0 ? "harpoon" : 0); } }
       else if (e.t === "ski") { e.x += e.vx * dt; if (!e.tossed && Math.abs(e.x - G.x) < 90) { e.tossed = 1; tossTo(e.x, e.yw, Math.max(30, Math.min(W - 30, G.x + rnd(-40, 40))), ahead(rnd(130, 190)), "ski", "harpoon"); toast(Math.random() < .5 ? "lifeguard_m" : "lifeguard_f", "Catch! 🔱 Harpoons incoming"); } }
       else if (e.t === "rock") { e.ph += dt; }
       else if (e.t === "heli") { e.x += e.vx * dt; e.dt -= dt; if (e.drops > 0 && e.dt <= 0 && e.x > 30 && e.x < W - 30) { e.drops--; e.dt = 0.8; var tx = Math.max(30, Math.min(W - 30, G.x + rnd(-110, 110))); add({ t: "drop", x: tx, yw: ahead(rnd(150, 260)), r: 20, air: 1.4, pts: 250 }); } }
       else if (e.t === "plane") { e.x += e.vx * dt; }
+      else if (e.t === "sub") { if (subStep(e, dt)) { G.fx.push({ k: "splash", x: e.x, y: sy(e.yw), t: 0 }); G.ents.splice(i, 1); continue; } }
+      else if (e.t === "sharp") { e.x += e.vx * dt; e.yw += e.vy * dt; }
       else if (e.t === "toss") { e.f += dt / e.dur; if (e.f >= 1) { landToss(e); G.ents.splice(i, 1); continue; } }
       else if (e.t === "drop") { e.air -= dt; }
       else if (e.t === "fish") { e.ph += dt; var lp = e.ph % 1.6; e.air = lp > .9 ? (lp - .9) / .7 : 0; if (e.air && !e.sp0) { e.sp0 = 1; G.fx.push({ k: "spray", x: e.x, y: sy(e.yw), t: 0 }); } if (!e.air) e.sp0 = 0; }
@@ -626,6 +664,10 @@
         if (e.t === "rock") { if (d < e.r + 12 && G.jump <= .06) { var sd = G.x >= e.x ? 1 : -1; G.x = e.x + sd * (e.r + 14); G.vx = sd * 280; if (G.inv <= 0) { hurt("Hit the rocks!"); G.fx.push({ k: "wsplash", x: G.x, y: py, t: 0 }); } } continue; }
         if (e.t === "rsign" && d < e.r + 24) { var eb = ReviewEgg.collect(); G.score += eb; pop(e.x, sy(e.yw) - 40, "+" + eb + " 📺 ANTIDOTE'S REVIEW", "#ffd23f", 1); sfx("egg"); buzz([20, 40, 20]); G.fx.push({ k: "ring", x: e.x, y: sy(e.yw), t: 0 }); G.fx.push({ k: "wsplash", x: e.x, y: sy(e.yw), t: 0 }); G.ents.splice(i, 1); continue; }
         if (e.t === "buoy" && d < hitR + 6) { G.hearts = Math.min(5, G.hearts + 1); pop(e.x, sy(e.yw), "+1 ❤️ Lifeguard save!", "#ff9db0", 1); toast("lifeguard_f", "Rescue can! +1 heart"); G.ents.splice(i, 1); continue; }
+        if (e.t === "boat" && e.care) { if (d < e.r + 14) { var bs2 = G.x >= e.x ? 1 : -1; G.vx = bs2 * 220; } continue; }
+        if (e.t === "sharp") { if (!e.done && d < 17 && G.duck <= 0 && hurt("HARPOONED!", "ray")) { e.done = 1; G.ents.splice(i, 1); if (G.phase === "death") return; continue; }
+          if (!e.done && !e.miss && (G.yw - e.yw) * G.dir > 26) { e.miss = 1; gain(150, G.x, py - 40, "DODGED!"); } continue; }
+        if (e.t === "sub") continue;
         var danger = e.t === "jelly" || e.t === "ray" || (e.t === "eel" && e.zap) || (e.t === "shark" && e.st === "lunge") || e.t === "boat";
         if (danger && d < hitR && G.duck <= 0) { hurt(e.t === "shark" ? "SHARK BITE!" : e.t === "eel" ? "⚡ ZAPPED!" : e.t === "jelly" ? "Jellyfish sting!" : e.t === "ray" ? "STINGRAY!" : "Boat wake!"); if (e.t === "shark") e.st = "gone"; if (G.phase === "death") return; continue; }
         if ((e.t === "jelly" || e.t === "eel" || e.t === "shark" || e.t === "ray") && !e.nm && d < hitR + 26 && d >= hitR && (e.t !== "shark" || e.st === "lunge")) { e.nm = 1; gain(50, G.x, py - 40, "close one!"); }
@@ -737,7 +779,7 @@
     G.tricks = [];
   }
   function tossTo(fx, fyw, tx, tyw, from, item) { add({ t: "toss", x: fx, yw: fyw, fx: fx, fyw: fyw, tx: tx, tyw: tyw, f: 0, dur: 0.75, from: from, item: item }); }
-  function landToss(e) { if (e.item === "harpoon") harpPick(e.tx, e.tyw); else food(e.tx, e.tyw, { from: e.from }); }
+  function landToss(e) { if (e.item === "harpoon") harpPick(e.tx, e.tyw); else if (e.item === "buoy") add({ t: "buoy", x: e.tx, yw: e.tyw, r: 16 }); else food(e.tx, e.tyw, { from: e.from }); }
 
   /* ---------- the arc: sand → swim → pop up → ride → ride in → beach ---------- */
   function sandStep(dt) {   // run down the sand into the water
@@ -745,7 +787,7 @@
     G.cam += (G.yw + G.lead - G.cam) * Math.min(1, dt * 4); tickEnts(dt);
     if (G.yw >= 0) toSwim();
   }
-  function toSwim() { G.phase = "swim"; G.inv = .6; G.fx.push({ k: "splash", x: G.x, y: sy(G.yw), t: 0 }); sfx("splash"); buzz(20); G.hint = 5; }
+  function toSwim() { G.spawn.boat = Math.min(G.spawn.boat, 3.5); G.spawn.sub = 5; G.dblNext = false; G.phase = "swim"; G.inv = .6; G.fx.push({ k: "splash", x: G.x, y: sy(G.yw), t: 0 }); sfx("splash"); buzz(20); G.hint = 5; }
   function popUp() {   // stand up, spin round and take the wave in
     G.phase = "popup"; G.popT = 0; G.duck = 0; G.ents = G.ents.filter(function (e) { return e.sky; });
     pop(G.x, sy(G.yw) - 60, "STAND UP!", "#ffd23f", 1); sfx("level"); buzz([20, 30, 20]);
@@ -757,7 +799,7 @@
     tickEnts(dt);
     if (f >= 1) startRide();
   }
-  function startRide() { G.phase = "ride"; G.dir = -1; G.ang = Math.PI; G.lead = -RLEAD; G.cam = G.yw + G.lead; G.rideT = 0; G.inv = 1; G.hint = 5; newWave(); G.spawn.haz = 2; G.spawn.food = .6; G.spawn.pier = 6;
+  function startRide() { G.phase = "ride"; G.dir = -1; G.ang = Math.PI; G.lead = -RLEAD; G.cam = G.yw + G.lead; G.rideT = 0; G.inv = 1; G.hint = 5; newWave(); G.spawn.haz = 6; G.spawn.food = .6; G.spawn.pier = 6;
     G.coach = !G.rodeOnce; G.rodeOnce = 1;   // the lifeguard coaches the first ride of a run
     var seen = 0; try { seen = localStorage.getItem("nalu-ride-tut") === "1"; } catch (e) {}
     G.tutPend = G.coach && (DBG_TUT || (!seen && !DBG_BOT && !DBG_WASH)) ? 1 : 0; }   // shown on the first ride frame (update)
@@ -988,8 +1030,18 @@
   }
 
   /* ---------- drawing ---------- */
+  // riding the wave in (2D renderer): the camera tips a little toward a low drone angle, still mostly overhead, so the
+  // wave behind you stands up on the horizon side. A CSS perspective on the two canvases (the HUD stays flat); the 3D
+  // renderer already has its own tilted camera, so it stays off there.
+  var TLT = 0, TLTs = "";
+  function droneTilt() {
+    var on = !D3 && !REDUCE && G.running && (G.phase === "ride" || G.phase === "ridein" || G.phase === "victory" || (G.phase === "popup" && G.popT > .5));
+    TLT += ((on ? 1 : 0) - TLT) * (on ? .025 : .08); if (TLT < .004) TLT = 0;
+    var v = TLT ? "perspective(1150px) rotateX(" + (22 * TLT).toFixed(2) + "deg) scale(" + (1 + .2 * TLT).toFixed(3) + ")" : "";
+    if (v !== TLTs) { TLTs = v; [cv, gl_c].forEach(function (c) { c.style.transformOrigin = "50% 52%"; c.style.transform = v; }); }
+  }
   function draw() {
-    camUpdate();
+    camUpdate(); droneTilt();
     SHK.x = SHK.y = 0; if (G.shake > 0.5) { SHK.x = rnd(-G.shake, G.shake); SHK.y = rnd(-G.shake, G.shake); }
     if (D3) { var t3 = performance.now(); try { R3.render(); } catch (e) { off3D("render error: " + (e && e.message)); } FPSM.r3 = (FPSM.r3 || 0) * .9 + (performance.now() - t3) * .1; } if (false) { try { R3.render(); } catch (e) { off3D("render error: " + (e && e.message)); } }   // the 3D world (game3d.js); the 2D canvas is the overlay on top
     if (!D3) water(G.t, G.cam);
@@ -999,7 +1051,9 @@
     cx.translate(SHK.x, SHK.y);
     drawShore();
     if (G.wv && G.phase === "ride") drawPocket();
-    G.ents.forEach(function (e) { if (e.t === "brk") drawWave(e); });
+    // paddling out, the breaking waves roll OVER the surfer (drawn after him); otherwise they sit under everything
+    var wOver = G.phase === "swim" || (G.phase === "death" && G.deathPaddle);
+    if (!wOver) G.ents.forEach(function (e) { if (e.t === "brk") drawWave(e); });
     if (G.phase === "death") deathWater();
     // wake
     if (!D3) { G.wake.forEach(function (w) { cx.globalAlpha = (1 - w.t / 1.1) * .7; cx.fillStyle = "#fff"; cx.beginPath(); cx.arc(w.x, sy(w.yw), w.s * (1 + w.t), 0, 7); cx.fill(); }); cx.globalAlpha = 1; }
@@ -1007,6 +1061,7 @@
     drawBoss(); drawBlobs();
     drawPier();      // the deck never overlaps a grounded surfer (it pushes you off), so the surfer always draws on top
     drawSurfer();
+    if (wOver) { G.ents.forEach(function (e) { if (e.t === "brk") drawWave(e); }); washOver(); }
     drawHarps(); drawBossBar(); drawRescue();
     G.ents.forEach(function (e) { if (e.t === "toss") drawEnt(e); });
     // sky layer: gull shadows, gulls, heli, plane
@@ -1032,6 +1087,39 @@
     if (G.phase === "beach") drawNalu();
     drawConf(); drawBanner();
     hud(); jumpBtn();
+  }
+  // the submarine, from overhead: dark steel hull with a sail (conning tower), a foam wake; the periscope stage is just a wake line
+  function drawSub(e, x, y) {
+    var st = e.st, up = st === "peri" ? 0 : st === "surf" ? Math.min(1, e.tt / .6) : st === "dive" ? Math.max(0, 1 - e.tt / .9) : 1;
+    var a = e.ang;
+    // periscope wake (always while it's near the surface)
+    cx.strokeStyle = "rgba(255,255,255,.75)"; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(x - 14, y + 26); cx.lineTo(x, y); cx.lineTo(x + 14, y + 26); cx.stroke();
+    cx.fillStyle = "#2b3238"; cx.beginPath(); cx.arc(x, y, 3.2, 0, 7); cx.fill();
+    if (st === "peri") { cx.strokeStyle = "rgba(255,255,255," + (.4 + .4 * Math.sin(G.t * 10)) + ")"; cx.lineWidth = 2; cx.beginPath(); cx.arc(x, y, 18 + (e.tt * 30) % 22, 0, 7); cx.stroke(); return; }
+    cx.save(); cx.translate(x, y); cx.rotate(a);
+    cx.globalAlpha = .25 + .75 * up;
+    cx.fillStyle = "rgba(255,255,255,.55)"; cx.beginPath(); cx.ellipse(0, 0, 26 + 4 * up, 74, 0, 0, 7); cx.fill();                  // foam around the hull
+    var hg = cx.createLinearGradient(-18, 0, 18, 0); hg.addColorStop(0, "#5a6670"); hg.addColorStop(.45, "#38434c"); hg.addColorStop(1, "#1b2228");
+    cx.fillStyle = hg; cx.beginPath(); cx.ellipse(0, 0, 17, 64, 0, 0, 7); cx.fill();
+    cx.strokeStyle = "rgba(255,210,63,.85)"; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(-10, 40); cx.lineTo(10, 40); cx.stroke();      // a yellow stripe on the stern
+    cx.fillStyle = "#262d33"; cx.beginPath(); cx.ellipse(0, -12, 8, 17, 0, 0, 7); cx.fill();                                            // the sail
+    cx.fillStyle = "#4b565f"; cx.fillRect(-14, -14, 28, 4);                                                                              // dive planes
+    cx.fillStyle = "#e2452b"; cx.beginPath(); cx.arc(0, -56, 4, 0, 7); cx.fill();                                                       // the launcher in the bow
+    cx.restore(); cx.globalAlpha = 1;
+    if (st === "aim") { var lk = e.tt > .75, dx = e.ax - x, dy = sy(e.ayw) - y, l = Math.hypot(dx, dy) || 1;   // the aim line: flickers while it tracks, solid once locked
+      cx.strokeStyle = "rgba(255,60,60," + (lk ? .95 : .35 + .35 * Math.sin(G.t * 30)) + ")"; cx.lineWidth = lk ? 3 : 2; cx.setLineDash([10, 8]); cx.beginPath(); cx.moveTo(x, y); cx.lineTo(x + dx / l * 700, y + dy / l * 700); cx.stroke(); cx.setLineDash([]);
+      if (lk) label("DODGE!", x, y - 50, "#ff6b6b"); }
+  }
+  // a wave passing over the surfer on the paddle-out: whitewater churning on top of him + bubbles (both renderers; in 3D the
+  // rigged surfer already sinks under the 3D whitewater, so this is for the 2D sprite surfers)
+  function washOver() {
+    if (D3 && R3.rig(G.surfer)) return; var x = G.x, y = sy(G.yw);
+    G.ents.forEach(function (e) { if (e.t !== "brk") return; var d = (e.yw - G.yw) * G.dir; if (d > 46 || d < -70) return;
+      var k = 1 - Math.abs(d + 12) / 58; if (k <= 0) return; k = Math.min(1, k * 1.4);
+      var g = cx.createRadialGradient(x, y, 4, x, y, 58); g.addColorStop(0, "rgba(240,252,255," + (.82 * k) + ")"); g.addColorStop(.6, "rgba(215,240,250," + (.5 * k) + ")"); g.addColorStop(1, "rgba(215,240,250,0)");
+      cx.fillStyle = g; cx.beginPath(); cx.ellipse(x, y, 62, 50, 0, 0, 7); cx.fill();
+      cx.strokeStyle = "rgba(255,255,255," + (.7 * k) + ")"; cx.lineWidth = 1.3;
+      for (var b = 0; b < 9; b++) { var a = b * 2.39 + G.t * 1.7, r = 10 + (b * 7.3 + G.t * 30) % 38; cx.beginPath(); cx.arc(x + Math.cos(a) * r, y + Math.sin(a) * r * .8 - ((G.t * 40 + b * 9) % 20), 1.5 + b % 3, 0, 7); cx.stroke(); } });
   }
   // an incoming breaking wave on the paddle-out: dark trough, sunlit face, a white crest (photo art), whitewater and spray
   function drawWave(e) {
@@ -1150,8 +1238,13 @@
     for (var i = 0; i < Math.min(BRUISE.length, lvl); i++) bruise(x, ox + BRUISE[i][0] * w, oy + BRUISE[i][1] * h, w * .07);
     for (var k = 0; k < Math.min(BAND.length, lvl - 1); k++) bandage(x, ox + BAND[k][0] * w, oy + BAND[k][1] * h, w * .2, w * .075, BAND[k][2]);
   }
+  var SIL = {};
+  function silh(img) {   // the rider as a flat dark shape (his shadow on the deck), cached per image
+    var key = img.src.split("/").pop(); if (SIL[key]) return SIL[key];
+    var c = document.createElement("canvas"); c.width = img.naturalWidth; c.height = img.naturalHeight; var x = c.getContext("2d");
+    x.drawImage(img, 0, 0); x.globalCompositeOperation = "source-in"; x.fillStyle = "#00121e"; x.fillRect(0, 0, c.width, c.height); SIL[key] = c; return c; }
   function hurtImg(img, lvl) {
-    if (lvl <= 0) return img; var key = (img.src.indexOf("surfer_m") > 0 ? "m" : "f") + lvl; if (DMG[key]) return DMG[key];
+    if (lvl <= 0) return img; var key = img.src.split("/").pop() + lvl; if (DMG[key]) return DMG[key];
     var w = img.naturalWidth, h = img.naturalHeight, c = document.createElement("canvas"); c.width = w; c.height = h; var x = c.getContext("2d"); x.drawImage(img, 0, 0);
     x.globalCompositeOperation = "source-atop"; x.fillStyle = "rgba(235,60,60," + (lvl * .1) + ")"; x.fillRect(0, 0, w, h);
     marks(x, w, h, lvl);
@@ -1361,14 +1454,27 @@
     if (G.pocket) { cx.strokeStyle = "rgba(127,227,242," + (.5 + .3 * Math.sin(G.t * 10)) + ")"; cx.lineWidth = 2.5; cx.beginPath(); cx.arc(x, y, 38, 0, 7); cx.stroke(); }
     var sun = cx.createRadialGradient(x, y, 4, x, y, 46); sun.addColorStop(0, "rgba(255,240,200,.30)"); sun.addColorStop(1, "rgba(255,240,200,0)"); cx.fillStyle = sun; cx.beginPath(); cx.arc(x, y, 46, 0, 7); cx.fill();
     var lean = Math.max(-.55, Math.min(.55, G.vx / 380)), shift = lean * 6;                       // weight shifts into the turn
+    if ((G.phase === "ride" || G.phase === "ridein") && !air && Math.abs(lean) > .18 && !REDUCE) {   // carving: a fan of spray thrown off the tail, out past the outside rail
+      var sp = Math.min(1, (Math.abs(lean) - .18) / .37), tl = 24, tx0 = x - Math.sin(G.ang) * tl, ty0 = y + Math.cos(G.ang) * tl, out = lean > 0 ? -1 : 1;
+      for (var q = 0; q < 14; q++) { var ph2 = (G.t * 3.1 + q * .173) % 1, an2 = -Math.PI / 2 + out * (.5 + q / 14 * 1.1), d2 = ph2 * (26 + 30 * sp);
+        cx.fillStyle = "rgba(255,255,255," + (.75 * sp * (1 - ph2)) + ")"; cx.beginPath(); cx.arc(tx0 + Math.cos(an2) * d2, ty0 + Math.sin(an2) * d2 * .8, 1.4 + ph2 * 3.2 * sp, 0, 7); cx.fill(); } }
     cx.save(); cx.filter = "brightness(1.2) contrast(1.08) saturate(1.12)";
-    var drew = (function () { var i = IM[G.surfer === "m" ? "surfer_m" : "surfer_f"]; if (!ok(i)) return false; var w = 56 * (1 + air * .42) * (.75 + .25 * pop0), h = w * i.naturalHeight / i.naturalWidth;
+    var drew = (function () { var k0 = G.surfer === "m" ? "surfer_m" : "surfer_f", i = IM[k0]; if (!ok(i)) return false; var w = 56 * (1 + air * .42) * (.75 + .25 * pop0), h = w * i.naturalHeight / i.naturalWidth;
       var spin = 0, flip = 1, tk = G.trick, wipe = G.wipe > 0 ? (1 - G.wipe / .9) : 0;
       if (tk) { var f = tk.t / tk.dur; if (tk.k === "spin") spin = f * Math.PI * 2; else flip = Math.cos(f * Math.PI * 2); }
       if (wipe) { spin += wipe * Math.PI * 2.4; w *= 1 - Math.sin(wipe * Math.PI) * .25; h = w * i.naturalHeight / i.naturalWidth; }
       if (G.phase === "death") { var dd = G.deathT; spin += G.deathCause === "wave" ? dd * 6 : 0; w *= G.deathCause === "shark" || G.deathCause === "ray" ? Math.max(.2, 1 - dd * 1.6) : G.deathCause === "wave" ? Math.max(.2, 1 - dd * .7) : 1; h = w * i.naturalHeight / i.naturalWidth; }
       cx.translate(x + shift, y); cx.rotate(G.ang + (G.surfer === "m" ? Math.PI : 0) + tilt * .6 + air * .25 * (G.vx > 0 ? 1 : -1) + spin); cx.transform(1, 0, -lean * .35, 1, 0, 0); cx.scale(1 - Math.abs(lean) * .1, flip);
       if (flip < 0) cx.filter = "brightness(.75) contrast(1.08)";    // the underside of the board shows mid-flip
+      var rb = IM[k0 + "_rider"], bb = IM[k0 + "_board"];
+      if (flip > 0 && ok(rb) && ok(bb)) {   // layered: the board, the rider's shadow on the deck, then the rider standing up off it
+        var rot = G.ang + (G.surfer === "m" ? Math.PI : 0) + tilt * .6 + air * .25 * (G.vx > 0 ? 1 : -1) + spin, bank = Math.min(1, Math.abs(lean) / .55),
+          ax = (G.surfer === "m" ? .05 : 0) * w, ay = (G.surfer === "m" ? 0 : .05) * h,   // the rider's stance (between the feet), relative to the sprite centre
+          sdx = 4 + bank * 3 + air * 10, sdy = 6 + air * 12, lx = sdx * Math.cos(rot) + sdy * Math.sin(rot), ly = -sdx * Math.sin(rot) + sdy * Math.cos(rot);   // a down-right screen offset, in sprite space
+        cx.save(); cx.scale(1 - bank * .24, 1); cx.drawImage(bb, -w / 2, -h / 2, w, h); cx.restore();   // railed over: the deck narrows as it tips onto its edge
+        cx.save(); cx.filter = "none"; cx.globalAlpha = .42 * (1 - air * .5); cx.drawImage(silh(rb), -w / 2 + lx, -h / 2 + ly, w, h); cx.restore();
+        cx.translate(ax, ay); cx.transform(1, 0, -lean * .55, 1, 0, 0); cx.scale(1.08 + air * .04, 1.08 + air * .04); cx.translate(-ax, -ay);   // up off the deck, leaning into the carve
+        cx.drawImage(hurtImg(rb, G.dmg), -w / 2, -h / 2, w, h); return true; }
       cx.drawImage(hurtImg(i, G.dmg), -w / 2, -h / 2, w, h); return true; })();
     cx.restore();
     if (!drew) {
@@ -1390,6 +1496,12 @@
     if (e.t === "rock") { drawRock(e, x, y); return; }
     if (e.t === "rsign") { drawRSign(e, x, y); return; }
     if (e.t === "harpoon") { drawHarpPick(e, x, y); return; }
+    if (e.t === "sub") { drawSub(e, x, y); return; }
+    if (e.t === "sharp") { var ha = Math.atan2(e.vx, e.vy);
+      cx.fillStyle = "rgba(0,20,35,.25)"; cx.beginPath(); cx.ellipse(x + 5, y + 6, 4, 16, ha, 0, 7); cx.fill();
+      cx.save(); cx.translate(x, y); cx.rotate(ha); cx.strokeStyle = "#cfd6dc"; cx.lineWidth = 3; cx.lineCap = "round"; cx.beginPath(); cx.moveTo(0, 22); cx.lineTo(0, -12); cx.stroke();
+      cx.fillStyle = "#eef3f6"; cx.beginPath(); cx.moveTo(0, -24); cx.lineTo(-5, -11); cx.lineTo(5, -11); cx.closePath(); cx.fill();
+      cx.strokeStyle = "rgba(255,255,255,.55)"; cx.lineWidth = 1; cx.setLineDash([3, 4]); cx.beginPath(); cx.moveTo(0, 22); cx.lineTo(Math.sin(G.t * 9) * 3, 70); cx.stroke(); cx.setLineDash([]); cx.restore(); return; }
     if (e.t === "ski") { drawSki(e, x, y); return; }
     if (e.t === "food") {
       var b = Math.sin(G.t * 3 + e.bob) * 2.5;
@@ -1437,6 +1549,7 @@
       var f = e.f, tx = e.fx + (e.tx - e.fx) * f, ty = sy(e.fyw + (e.tyw - e.fyw) * f) - Math.sin(f * Math.PI) * 90;
       cx.fillStyle = "rgba(0,20,35,.18)"; cx.beginPath(); cx.ellipse(tx + 10, sy(e.fyw + (e.tyw - e.fyw) * f) + 6, 16, 7, 0, 0, 7); cx.fill();
       if (e.item === "harpoon") { spear(tx - 4, ty, f * 9, 40); spear(tx + 4, ty, f * 9 + .5, 40, 1); }
+      else if (e.item === "buoy") { if (!spr("buoy", tx, ty, 38, f * 6)) { cx.fillStyle = "#e2452b"; cx.beginPath(); cx.arc(tx, ty, 13, 0, 7); cx.fill(); } }
       else spr(FOOD[(e.tx * 7 | 0) % FOOD.length][0], tx, ty, 40 + Math.sin(f * Math.PI) * 12, f * 6);
     } else if (e.t === "plane") {
       var dir = e.vx > 0 ? 1 : -1, bx = x - dir * 70, bw = 250, bh = 34, by = y - bh / 2;

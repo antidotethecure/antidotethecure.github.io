@@ -567,7 +567,9 @@ async function init(A) {
     // ---- entities ----
     const seen = new Set();
     G.ents.forEach(e => {
-      if (e.t === "pier" || e.t === "brk" || e.t === "plane" || e.t === "toss" || e.t === "fish" || e.t === "drop" || e.t === "harpoon" || e.t === "ski") {
+      if (e.t === "pier" || e.t === "brk" || e.t === "plane" || e.t === "toss" || e.t === "fish" || e.t === "drop" || e.t === "harpoon" || e.t === "ski" || e.t === "sub" || e.t === "sharp") {   // (drawn on the 2D overlay)
+        if (e.t === "sub" && e.st !== "peri") { foamDot(e.x, sy(e.yw), 40, .45); poke(e.x, sy(e.yw), -1.2, 22); }
+        if (e.t === "sharp") foamDot(e.x, sy(e.yw) + 10, 5, .5);
         if (e.t === "fish" && !e.air) foamDot(e.x, sy(e.yw), 12, .5, 1);
         if (e.t === "ski") { const d = e.vx > 0 ? 1 : -1; for (let k = 1; k < 6; k++) foamDot(e.x - d * (20 + k * 14), sy(e.yw), 6 + k * 2, .5); }
         return; }
@@ -707,7 +709,7 @@ async function init(A) {
     let spin = 0, flip = 0; const tk = G.trick; if (tk) { const f = tk.t / tk.dur; if (tk.k === "spin") spin = f * Math.PI * 2; else flip = f * Math.PI * 2; }
     let wipeSpin = 0; if (G.wipe > 0) wipeSpin = (1 - G.wipe / .9) * Math.PI * 2.4;
     if (ph === "death" && G.deathCause === "wave") wipeSpin = G.deathT * 6;
-    lift.rotation.set(flip, spin + wipeSpin, lean * .5 * (ph === "ride" ? 1 : 0));
+    lift.rotation.set(flip, spin + wipeSpin, lean * (ph === "ride" ? 1.05 : 0));   // riding: rolls well onto the rail, carving the face
     body.position.set(0, 3.4 - 9.5 * prone, 9 * (1 - prone) * (1 - carry) - 4 * prone); body.rotation.set(0, 0, 0);
     // the board: under the chest (paddling), under the feet (riding), under the arm (running), tumbling away (wipeout)
     if (carry > .5) {   // tucked under the right arm, nose forward, deck against the body

@@ -1696,6 +1696,8 @@
       "<div class='nv-board'><b>This week's top riders</b> <span id='nv-wk' style='opacity:.7'></span><ol id='nv-list'><li>Loading…</li></ol>" +
       "<input id='nv-n' maxlength='16' placeholder='Name for the board' value='" + esc(sv.n || "") + "'><input id='nv-ig' maxlength='31' placeholder='@instagram (optional)' value='" + (sv.ig ? "@" + esc(sv.ig) : "") + "'>" +
       "<button class='nv-btn' id='nv-post' type='button' style='width:100%;margin-top:6px'>Post my score</button><div id='nv-msg' style='margin-top:6px;font-size:12.5px'></div></div>";
+    // "Until Toast is connected" explainer under the points (interim mode, demo/interim.js)
+    if (window.SSAI_INTERIM && $("nv-pts")) { var ex = document.createElement("div"); ex.innerHTML = SSAI_INTERIM.explainerHTML(1); $("nv-pts").insertAdjacentElement("afterend", ex); }
     if (window.ReviewEgg) ReviewEgg.endCard($("nv-end"), $("nv-order"));
     $("nv-end").style.display = "flex";
     var fly = document.createElement("button"); fly.type = "button"; fly.className = "nv-fly"; fly.setAttribute("aria-label", "Fly to Melody Bar and Grill");

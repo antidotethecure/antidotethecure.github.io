@@ -20,8 +20,19 @@ window.SSAI_REWARDS={
   birthday:250,                       // once a year, on their birthday
   referral:100,                       // per friend who joins with your code AND makes a first visit
   game:{perScore:100,dailyCap:50},    // Ride the Nalu: 1 point per 100 score, at most 50 points a day
-  tiers:[[250,"Free mocktail, soft drink or Jungle Fries"],[500,"Free shareable: Chips, Salsa & Guac, Calamari or Wings"],
-    [1000,"$10 off your check"],[1500,"Free entrée: any Signature Island Tacos or the Poke Bowl"]]   // never free alcohol (California ABC)
+  // [points, reward, Toast button]. toast.type: "item" = 100% off ONE item (server selects it first), "fixed" = $ off the check.
+  // toast.max = the priciest item that reward covers (for the Toast setup sheet). Never free alcohol (California ABC).
+  tiers:[[250,"Free mocktail, soft drink or Jungle Fries",{button:"App Reward – Free Mocktail/Soft Drink/Jungle Fries",type:"item",max:15.00}],
+    [500,"Free shareable: Chips, Salsa & Guac, Calamari or Wings",{button:"App Reward – Free Shareable",type:"item",max:17.00}],
+    [1000,"$10 off your check",{button:"App Reward – $10 Off",type:"fixed",amount:10}],
+    [1500,"Free entrée: any Signature Island Tacos or the Poke Bowl",{button:"App Reward – Free Entrée",type:"item",max:24.00}]],
+  /* INTERIM MODE (until Toast approves the loyalty integration, ~30 days): staff never use their own phones.
+     Guests earn with "Add my visit" (receipt claim) and redeem by showing a live 10-minute pass; the server taps the
+     matching Toast discount button. See demo/interim.js and kit/toast-interim.html. */
+  mode:"interim",
+  interim:{passMinutes:10, codePrefix:"NV", logo:"img/logo.png", kit:"../../nalu-vida/kit/toast-interim.html",
+    claimCap:150, claimsPerDay:1, claimDaysBack:1, redeemsPerDay:1, photoMaxPx:900,
+    api:""}               // Apps Script /exec URL (same Code.gs as Melody). Empty = this phone only.
 };</script>
 <meta name="description" content="Nalu Vida at the foot of the Venice Pier: tropical bites, craft cocktails, order from your seat, surf the Nalu and earn Nalu Vida Rewards points.">
 <meta name="theme-color" content="#0a2540">
@@ -328,7 +339,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <script src="../reviewegg.js"></script>
 <script src="../halftime.js"></script>
 <script src="../radio-avatar.js"></script>
-<script src="game.js?v=cf1"></script>
+<script src="game.js?v=cf2"></script>
 <script>(function(){ var gp=(window.SSAI_REWARDS&&window.SSAI_REWARDS.game)||{}, per=gp.perScore||100, cap=gp.dailyCap||50;
 window.GAME_MENU={id:"nalu-vida",name:"Ride the Nalu",by:"Nalu Vida",tagline:"Run in, paddle out, ride the wave home to Nalu Vida. 5 levels. Earn Rewards points.",
  logo:"img/logo.png",hero:["img/game/surfer_f.webp","img/game/raft_taco.webp","img/game/raft_fries.webp","img/game/surfer_m.webp"],
@@ -1105,7 +1116,7 @@ $("evsub").textContent="Week of "+MON[new Date(monday).getUTCMonth()]+" "+new Da
 <script>/* Simple program (Christian, 2026-10): one balance, the numbers live in window.SSAI_REWARDS at the top of this page.
    No split wallets, visit levels, tokens, daily spin or welcome voucher (see crm.js SIMPLE). */
 window.CRM_CFG={name:"Nalu Vida",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Ride the Nalu"};</script>
-<script src="../crm.js?v=cf1"></script>
+<script src="../crm.js?v=cf2"></script><script src="../interim.js?v=cf2"></script>
 <script>window.NEARBY={name:"Nalu Vida",pin:"🏄",mount:"#rwhost",spots:[{label:"Venice Pier",lat:33.9779,lng:-118.4669,q:"1 Washington Blvd, Venice, CA 90292"}],offer:"Happy hour Mon–Fri 3–6 PM and 10 PM–close, dine-in."};</script>
 <script src="../nearby.js"></script>
 <script src="../gamelock.js"></script>

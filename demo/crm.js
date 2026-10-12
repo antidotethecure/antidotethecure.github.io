@@ -55,6 +55,11 @@
     if (SIMPLE.join == null) SIMPLE.join = 100; if (SIMPLE.birthday == null) SIMPLE.birthday = 250; if (SIMPLE.referral == null) SIMPLE.referral = 100;
     if (SIMPLE.perDollar) C.perDollar = SIMPLE.perDollar; if (SIMPLE.tiers) C.tiers = SIMPLE.tiers;
     C.wallets = null; C.tokens = null; C.spin = null; C.draw = null; C.levels = C.levels || [{ visits: 0, name: "Member", perk: "", mult: 1 }]; }
+  // INTERIM MODE (SIMPLE.mode === "interim", Melody + Nalu until Toast approves the integration): staff never use their own
+  // phones. Guests earn with "Add my visit" (receipt claim) and redeem with a live "show and tap" pass; both flows live in
+  // demo/interim.js, which this file hands the member store to through window.SSAI_CRM. The QR / ring-up / receipt-code
+  // demo controls are hidden and the ladder buttons read "Use reward".
+  var INTERIM = !!(SIMPLE && SIMPLE.mode === "interim");
   var NAME = C.name || (window.NEARBY && window.NEARBY.name) || document.title.split(" — ")[0];
   var OFFER = SIMPLE ? SIMPLE.join + " welcome points" : C.offer || "10% off your next visit";
   var SLUG = NAME.toLowerCase().replace(/[^a-z0-9]+/g, "-"), KEY = "ssai_crm_" + SLUG;
@@ -430,6 +435,16 @@
   function gpFor(score) { var g = SIMPLE.game; return Math.max(0, Math.min(g.dailyCap, Math.floor((+score || 0) / g.perScore))); }
   function gpAdd(m, n, why) { if (m.gday !== gpDay()) { m.gday = gpDay(); m.gpts = 0; } n = Math.max(0, Math.min(n, SIMPLE.game.dailyCap - m.gpts)); if (n) { addPts(m, n, why); tag(m, "game_bonus"); m.gpts += n; } return n; }
   function gpCredit(m) { var h = gpHeld(); m.lastGame = 0; if (!h || !h.pts) return 0; try { localStorage.removeItem(GPKEY); } catch (x) {} m.lastGame = gpAdd(m, h.pts, "🎮 " + (C.game || "Game") + " points (played before joining)"); return m.lastGame; }
+  // member store for demo/interim.js (interim mode only): read / change the member on this phone, then redraw
+  if (INTERIM) window.SSAI_CRM = {
+    name: NAME, slug: SLUG, key: KEY, cfg: SIMPLE, tiers: function () { return TIERS; }, sheet: C.sheet || "",
+    member: function () { return mine()[0] || null; },
+    add: function (m, n, why, k) { addPts(m, n, why); if (k) tag(m, k); },
+    save: function (m) { put(m); drawJoin(); drawOwn(); },
+    redraw: function () { drawJoin(); drawOwn(); },
+    join: function (cb) { GATE_TXT.interim = ["Join " + NAME + " Rewards first", "Free. Add your name and a phone or email, then add your visit.", "🎁 Join free"]; return gate("interim", cb); },
+    toast: toast, esc: e, code4: code4
+  };
   if (SIMPLE) window.SSAI_GAMEPTS = {
     cfg: SIMPLE.game,
     forScore: gpFor,
@@ -499,14 +514,15 @@
         // points + scan to earn
         (WAL ? '<div class="crm-box">' + walTiles(me) + '<button type="button" class="crm-scan" data-a="scan" style="width:100%;margin-top:10px">📲 Scan to earn</button>'
           : '<div class="crm-box"><div class="crm-pts"><div><div class="k" style="font-size:10px">Your points</div><div class="n">' + pts.toLocaleString() + '<small>pts</small></div></div>' +
-          '<button type="button" class="crm-scan" data-a="scan">📲 Scan to earn</button></div>') +
+          (INTERIM ? '<button type="button" class="crm-scan" data-a="visit">🧾 Add my visit</button></div>' : '<button type="button" class="crm-scan" data-a="scan">📲 Scan to earn</button></div>')) +
           '<div class="crm-qr"><div class="qr"></div><div class="d4">' + regCode(me) + '</div><small>Show this to the cashier or bartender, or scan it at the register.<br>They ring you up and your points land here. Code refreshes every 5 min.</small></div>' +
           (WAL ? '<p style="margin:10px 0 0;font-size:13px">' + walEarnLine() + ' <b>They never mix:</b> bar points only buy bar rewards, kitchen points only buy food rewards.</p>'
-            : SIMPLE ? '<p style="margin:10px 0 0;font-size:13px">Earn <b style="color:#FFD23F">' + PER + ' points per $1</b> on eligible purchases: show this code when staff ring you up.' + (window.SSAI_GAMEPTS ? ' 🎮 Game points today: <b>' + gpUsed(me) + ' of ' + SIMPLE.game.dailyCap + '</b>.' : '') + '</p>'
+            : SIMPLE ? '<p style="margin:10px 0 0;font-size:13px">Earn <b style="color:#FFD23F">' + PER + ' points per $1</b> on eligible purchases: ' + (INTERIM ? 'tap <b>Add my visit</b> after you pay and snap your receipt.' : 'show this code when staff ring you up.') + (window.SSAI_GAMEPTS ? ' 🎮 Game points today: <b>' + gpUsed(me) + ' of ' + SIMPLE.game.dailyCap + '</b>.' : '') + '</p>'
             : '<p style="margin:10px 0 0;font-size:13px">Earn <b style="color:#FFD23F">' + PER + ' points for every $1</b> you spend in store or in the app.</p>') +
           '<button type="button" class="crm-elink" data-a="earn">✨ Ways to earn points →</button>' +
+          (INTERIM ? (window.SSAI_INTERIM ? SSAI_INTERIM.cardHTML(me) : '') + '</div>' :
           '<button type="button" class="crm-demo" data-a="ring">▶ Demo: the cashier rings you up</button>' +
-          '<div class="crm-rcode"><input placeholder="Got a receipt? Type its code" maxlength="20"><button type="button" data-a="receipt">Add</button></div></div>' +
+          '<div class="crm-rcode"><input placeholder="Got a receipt? Type its code" maxlength="20"><button type="button" data-a="receipt">Add</button></div></div>') +
         // game access / tokens / free daily spin (CRM_CFG.tokens, CRM_CFG.spin)
         (TC || SPIN ? (function () {
           var g = e(C.game || "the game"), sp = SPIN ? '<button type="button" data-a="spin" style="position:relative"' + (spinReady(me) ? ' class="hot"' : '') + '>' + (spinReady(me) ? '🎡 Free daily spin<b style="position:absolute;right:-5px;top:-7px;min-width:18px;height:18px;border-radius:9px;background:#e3262f;color:#fff;font:900 11px/18px system-ui;padding:0 4px">1</b>' : '🎡 Spun today ✓') + '</button>' : '';
@@ -526,7 +542,7 @@
         // rewards
         (WAL ? '<div class="crm-box"><h4>🏆 Use your points</h4>' + walTiers(me, "bar") + walTiers(me, "food") + '</div>' :
         '<div class="crm-box"><h4>🏆 Use your points</h4>' + TIERS.map(function (t, i) {
-          return '<div class="crm-tier"><span><b>' + t[0].toLocaleString() + '</b> pts · ' + e(t[1]) + '</span><button type="button" data-redeem="' + i + '"' + (pts >= t[0] ? '' : ' disabled') + '>' + (pts >= t[0] ? 'Redeem' : (t[0] - pts).toLocaleString() + ' to go') + '</button>' +
+          return '<div class="crm-tier"><span><b>' + t[0].toLocaleString() + '</b> pts · ' + e(t[1]) + '</span><button type="button" data-redeem="' + i + '"' + (pts >= t[0] ? '' : ' disabled') + '>' + (pts >= t[0] ? (INTERIM ? 'Use reward' : 'Redeem') : (t[0] - pts).toLocaleString() + ' to go') + '</button>' +
             '<span class="bar"><i style="width:' + Math.min(100, pts / t[0] * 100) + '%"></i></span></div>'; }).join("") +
           (me.redeem ? '<div class="crm-win" style="margin-top:10px"><b>' + e(me.redeem.t) + '</b><div class="code">' + e(me.redeem.c) + '</div><small>Show this code when you order. One reward per order.</small></div>' : '') + '</div>') +
         // referrals
@@ -569,6 +585,8 @@
           addPts(m, -tw[0], "🎟️ Redeemed: " + tw[1], wk); (m.rdm = m.rdm || {})[wk] = { t: tw[1], c: (wk === "bar" ? "BAR-" : "FOOD-") + code4(4), w: wk };
           put(m); drawJoin(); drawOwn(); toast("🎟️ " + W[wk].label + " reward ready: " + tw[1]); return;
         }
+        if (b.dataset.redeem != null && INTERIM && window.SSAI_INTERIM) { SSAI_INTERIM.redeem(+b.dataset.redeem); return; }
+        if (a === "visit" && window.SSAI_INTERIM) { SSAI_INTERIM.claim(); return; }
         if (b.dataset.redeem != null) {
           var t = TIERS[+b.dataset.redeem]; if (m.stars < t[0]) return;
           addPts(m, -t[0], "🎟️ Redeemed: " + t[1]); m.redeem = { t: t[1], c: "R-" + code4(4) }; put(m); drawJoin(); drawOwn(); toast("🎟️ " + t[1] + " is ready. Show your code."); return;
@@ -1077,7 +1095,8 @@
     function B(a, label, hot) { return '<button type="button" data-e="' + a + '"' + (hot ? ' class="hot"' : '') + '>' + label + '</button>'; }
     function row(ic, t, p, sub, btn, done) { return '<div class="crm-er' + (done ? ' done' : '') + '"><span class="ic">' + ic + '</span><span class="tx"><b>' + t + '</b><small>' + sub + '</small></span><span class="pp">' + (done ? '✓ Earned' : p) + '</span>' + (btn && !done ? '<span class="bt">' + btn + '</span>' : '') + '</div>'; }
     var gp = SIMPLE && SIMPLE.game, rows = SIMPLE ?
-      row("🧾", "Eligible purchases", PER + "/$1", PER + " points for every $1 on eligible purchases. Show your code when staff ring you up.", m ? B("qr", "📲 Show my code", 1) : "") +
+      (INTERIM ? row("🧾", "Add my visit", PER + "/$1", PER + " points for every $1 (before tip). After you pay, tap Add my visit and snap your receipt or type the check number.", m ? B("visit", "🧾 Add my visit", 1) : "")
+        : row("🧾", "Eligible purchases", PER + "/$1", PER + " points for every $1 on eligible purchases. Show your code when staff ring you up.", m ? B("qr", "📲 Show my code", 1) : "")) +
       row("👋", "Join", "+" + SIMPLE.join, "Once, when you join. Free.", "", !!m) +
       row("🎂", "Your birthday", "+" + EARN.birthday, "Once a year, on your birthday.", m && !(m.bday >= 0) ? B("bday", "🎂 Add my birthday") : "", ed["birthday_" + yr]) +
       row("🤝", "Refer a friend", "+" + REF.first, "Per friend who joins with your code and makes their first visit.", m ? B("ref", "📋 Copy my referral link") : "") +
@@ -1097,6 +1116,7 @@
         'Bar points come from drinks, kitchen points from food, and they never mix. <b>Every bonus below goes to your ' + wname(BONUS) + ' points</b> (a friend\'s orders pay into the side they bought from).</p>' :
       '<div class="crm-egoal"><span>' + e(T0[1]) + '</span><b>' + T0[0].toLocaleString() + ' pts</b></div>' +
       '<p style="margin:0 0 6px">' + (m ? 'You have <b style="color:#FFD23F">' + (m.stars || 0).toLocaleString() + ' pts</b>. ' : '') + 'Here\'s every way to get there:</p>') + rows +
+      (INTERIM && window.SSAI_INTERIM ? SSAI_INTERIM.explainerHTML() : '') +
       '<div class="crm-fbk"></div>' +
       (m ? '<button type="button" class="go" data-e="x">Got it</button>' : '<button type="button" class="go" data-e="join">🎁 Join free to start earning</button><button type="button" class="crm-gx" data-e="x">Not now</button>') +
       '<p class="crm-fine">' + (SIMPLE ? 'One points balance. Rewards: one per visit, no stacking. ' : '') + 'Sample numbers: ' + e(NAME) + ' sets the real ones.' + (m ? ' Reopen this anytime from "Ways to earn" in your rewards card.' : '') + '</p></section>';
@@ -1112,6 +1132,7 @@
       if (a === "x") return close();
       if (a === "join") { close(); var f = join.querySelector("form"); join.scrollIntoView({ behavior: "smooth", block: "start" }); if (f) setTimeout(function () { try { f.elements.name.focus({ preventScroll: true }); } catch (x) {} }, 500); return; }
       if (!m) return;
+      if (a === "visit") { close(); if (window.SSAI_INTERIM) SSAI_INTERIM.claim(); return; }
       if (a === "qr") { close(); drawJoin(true); var q = join.querySelector(".crm-qr"); if (q) q.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
       if (a === "ref") return copyRef(m);
       if (a === "ig") { try { window.open(IG.url, "_blank", "noopener"); } catch (x) {} if (earnOnce(m, "ig", IG.pts, "📸 Followed on Instagram")) { put(m); done("+" + IG.pts + " points · thanks for the follow!"); b.closest(".crm-er").className = "crm-er done"; b.parentNode.remove(); } return; }

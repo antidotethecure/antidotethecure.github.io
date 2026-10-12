@@ -11,6 +11,7 @@
   var q = (location.search.match(/[?&]lang=(en|es)\b/) || [])[1];
   var nav = (navigator.language || "en").slice(0, 2).toLowerCase();
   var cur = q || read() || (nav === "es" ? "es" : "en");
+  if (q) save(q); // a texted ?lang=es link keeps Spanish on every page they open next
   function t(k) { var d = T[cur] || T.en; return d[k] != null ? d[k] : (T.en[k] != null ? T.en[k] : k); }
   function apply() {
     document.documentElement.lang = cur;

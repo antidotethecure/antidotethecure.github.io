@@ -84,7 +84,27 @@ ul.honest b{color:var(--ink)}
 .src li{margin:5px 0}
 .src a{word-break:break-word}
 .top .back{font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap}
+.routebar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;border:1px solid rgba(255,209,102,.55);background:rgba(255,209,102,.08);border-radius:14px;padding:10px 12px;font-size:15px;color:var(--silver)}
+.routebar[hidden]{display:none}
+.routebar b{color:var(--gold)}
+.routebar button{background:none;border:1px solid var(--edge);color:var(--volt);border-radius:10px;font:700 14px "Rajdhani",sans-serif;min-height:40px;padding:0 12px;cursor:pointer}
+.calc input[disabled]{opacity:.35}
+table.t tr.keep td{font-weight:800;color:var(--good)}
+table.fee{width:100%;border-collapse:collapse;font-size:15px}
+table.fee th{text-align:left;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:6px 4px;font-weight:800}
+table.fee td{padding:9px 4px;border-top:1px solid var(--edge);vertical-align:top}
+table.fee td.n{text-align:right;white-space:nowrap;font-weight:700}
+table.fee td:nth-child(2){white-space:nowrap}
+table.fee small{display:block;color:var(--dim);font-size:12.5px;line-height:1.3}
+.pr{display:grid;gap:10px;text-align:left;margin-top:10px}
+.pr .ln{display:flex;justify-content:space-between;gap:10px;align-items:baseline;border-top:1px solid var(--edge);padding-top:10px}
+.pr .ln:first-child{border-top:0;padding-top:0}
+.pr .ln b{font-family:"Orbitron",sans-serif;color:var(--gold);white-space:nowrap;font-size:17px}
+.pr .ln s{color:var(--dim);font-size:14px;margin-right:6px}
+.pr .ln span small{display:block;color:var(--dim);font-size:13.5px;line-height:1.3}
+.roi{margin:14px 0 4px;font-weight:800;color:var(--good);font-size:17px}
 @media(max-width:420px){.top b small{display:none}}
+@media(max-width:480px){.top b{display:none}}
 </style>
 </head>
 <body>
@@ -92,7 +112,7 @@ ul.honest b{color:var(--ink)}
   <img class="brand" src="../../assets/sousshift-lockup-800w.png" alt="SousShift AI">
   <b>SousShift AI<small data-t="topSub">for Ice Cream Trucks</small></b>
   <a href="../" class="back" data-t="back">← Quick tour</a><span class="sp"></span>
-  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true">EN</button><button data-lang="es" aria-pressed="false">ES</button></div>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">English</button><button data-lang="es" aria-pressed="false" lang="es">Español</button></div>
 </div></div>
 
 <main class="wrap">
@@ -104,6 +124,7 @@ ul.honest b{color:var(--ink)}
       <a class="btn primary" href="../demo/" data-t="heroDemo">Try the customer demo</a>
       <a class="btn ghost" href="#numbers" data-t="heroNums">Run your numbers</a>
     </div>
+    <div style="margin-top:12px"><button class="spk-btn" type="button" id="listenPage" aria-pressed="false" data-t="listenPage">🔊 Listen to this page</button></div>
     <div class="hook">
       <div class="yes"><b data-t="hookYesB">Hears it</b><span data-t="hookYes">Walks out, buys a paleta. You already get these sales.</span></div>
       <div class="no"><b data-t="hookNoB">Never hears it</b><span data-t="hookNo">Inside, AC on, headphones in. Today you lose that sale. With the app, their phone rings.</span></div>
@@ -184,12 +205,14 @@ ul.honest b{color:var(--ink)}
   <section class="s" id="numbers">
     <header><p class="kick" data-t="numKick">The numbers</p><h2 class="chrome" data-t="numH">What you make now vs. with the app</h2><p class="lead" data-t="numLead">Move the sliders to match your truck. Every number here is an <span class="est">estimate</span>, not a promise. Sources are listed below.</p></header>
     <div class="card calc" id="calc">
+      <div class="routebar" id="routebar" hidden><span id="routebar-t"></span><button type="button" id="route-off" data-t="routeOff">Use stops × homes instead</button></div>
       <div class="f"><label><span data-t="cStops">Stops per day</span><output id="o-stops"></output></label><input type="range" id="stops" min="5" max="60" step="1" value="25"></div>
       <div class="f"><label><span data-t="cHomes">Homes on the block at each stop</span><output id="o-homes"></output></label><small data-t="cHomesS">Houses or apartments close enough to hear the music.</small><input type="range" id="homes" min="10" max="150" step="5" value="40"></div>
       <div class="f"><label><span data-t="cHear">% who hear your music today</span><output id="o-hear"></output></label><small data-t="cHearS">Antidote's estimate is about half. No study measures this, so use your gut.</small><input type="range" id="hear" min="10" max="90" step="5" value="50"></div>
       <div class="f"><label><span data-t="cBuy">% of those who hear it and come out to buy</span><output id="o-buy"></output></label><small data-t="cBuyS">Set this so "today" matches your real day. Default lands at about $250/day.</small><input type="range" id="buy" min="2" max="30" step="1" value="10"></div>
       <div class="f"><label><span data-t="cJoin">% of homes that join the app</span><output id="o-join"></output></label><small data-t="cJoinS">Takes a few weeks of the sticker on the truck to build up.</small><input type="range" id="join" min="1" max="40" step="1" value="10"></div>
       <div class="f"><label><span data-t="cTicket">Average sale per customer</span><output id="o-ticket"></output></label><small data-t="cTicketS">Most truck items are $2 to $5. Use what you really average.</small><input type="range" id="ticket" min="2" max="15" step="0.5" value="5"></div>
+      <div class="f"><label><span data-t="cNocash">% of customers who walk away with no cash</span><output id="o-nocash"></output></label><small data-t="cNocashS">Want something, no cash on them. Fed 2025: 24% of adults carried no cash. We use a careful 15%.</small><input type="range" id="nocash" min="0" max="40" step="1" value="15"></div>
       <div class="f"><label><span data-t="cDays">Days you work per month</span><output id="o-days"></output></label><input type="range" id="days" min="4" max="30" step="1" value="22"></div>
       <details>
         <summary data-t="cMore">More settings (cards, repeat visits, routes)</summary>
@@ -211,14 +234,50 @@ ul.honest b{color:var(--ink)}
         <tbody>
           <tr><td><span data-t="lAlert">New sales from alerts</span><small data-t="lAlertS">Members who didn't hear the music come out at the same rate as people who do.</small></td><td class="n" id="l-alert"></td></tr>
           <tr><td><span data-t="lRep">Repeat visits from points</span><small data-t="lRepS">Members buy more often to reach a reward.</small></td><td class="n" id="l-rep"></td></tr>
+          <tr><td><span data-t="lRec">No-cash sales you win back</span><small data-t="lRecS">People with no cash pay by card, Apple Pay, Venmo, Cash App or Zelle instead of walking away.</small></td><td class="n" id="l-rec"></td></tr>
           <tr><td><span data-t="lCard">Bigger sales by card / app</span><small data-t="lCardS">People spend more when they aren't limited to the cash in their pocket.</small></td><td class="n" id="l-card"></td></tr>
           <tr><td><span data-t="lRoute">Time saved on routes</span><small data-t="lRouteS">Saved minutes turned into extra stops on streets with members.</small></td><td class="n" id="l-route"></td></tr>
           <tr class="minus"><td><span data-t="lCost">Cost of rewards you give away</span><small data-t="lCostS">If every point gets cashed in: about 20¢ per member visit.</small></td><td class="n" id="l-cost"></td></tr>
+          <tr class="minus"><td><span data-t="lFee">Payment processing fees</span><small data-t="lFeeS">Paid by you to Square, Venmo or Cash App (about 4% blended on a $5 sale). See the fee table.</small></td><td class="n" id="l-fee"></td></tr>
           <tr class="sum"><td data-t="lSum">Extra per month</td><td class="n" id="l-sum"></td></tr>
+          <tr class="minus"><td><span data-t="lSsai">SousShift monthly price</span></td><td class="n" id="l-ssai"></td></tr>
+          <tr class="keep"><td data-t="lKeep">You keep each month</td><td class="n" id="l-keep"></td></tr>
         </tbody>
       </table>
-      <p class="note" data-t="calcFoot">Before the SousShift monthly price (TBD). Card processing fees (about 3%) are not included. Month one will be lower while people join.</p>
+      <p class="note" data-t="calcFoot">Processing fees are included. Month one will be lower while people join.</p>
     </div>
+  </section>
+
+  <section class="s" id="pay">
+    <header><p class="kick" data-t="payKick">Take every payment</p><h2 class="chrome" data-t="payH">Cash only? You're losing sales.</h2><p class="lead" data-t="payLead"></p></header>
+    <div class="card">
+      <div class="res" aria-live="polite">
+        <div><b id="p-rec"></b><span data-t="pRec"></span></div>
+        <div><b id="p-card"></b><span id="p-card-l"></span></div>
+        <div><b id="p-fee"></b><span data-t="pFee"></span></div>
+        <div><b id="p-pct"></b><span data-t="pPct"></span></div>
+        <div class="big"><b id="p-net"></b><span data-t="pNet"></span></div>
+      </div>
+      <p class="note" data-t="payWhy"></p>
+    </div>
+    <div class="card">
+      <h3 data-t="feeH">What each one costs you</h3>
+      <table class="fee"><thead><tr><th data-t="feeTh1">Way to pay</th><th data-t="feeTh2">Fee</th><th style="text-align:right" data-t="feeTh3">You keep on $5</th></tr></thead><tbody id="fee-body"></tbody></table>
+      <p class="note" data-t="feeNote"></p>
+    </div>
+    <div class="card">
+      <h3 data-t="setH">The simple setup we recommend</h3>
+      <ul class="honest">
+        <li data-t="set1"></li>
+        <li data-t="set2"></li>
+        <li data-t="set3"></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="s" id="route">
+    <header><p class="kick" data-t="rtKick">Your route</p><h2 class="chrome" data-t="rtH">How many homes do you drive past?</h2><p class="lead" data-t="rtLead"></p></header>
+    <div class="row"><a class="btn gold" href="../route/" data-t="rtBtn">📍 Count the houses on YOUR route</a><a class="btn ghost" href="../route/?sample=1" data-t="rtSample">See a sample route</a></div>
   </section>
 
   <section class="s" id="rewards">
@@ -251,8 +310,10 @@ ul.honest b{color:var(--ink)}
   <section class="s" id="price">
     <div class="card price">
       <p class="kick" data-t="prKick">Price</p>
-      <div class="tbd" data-t="prTbd">Price TBD: ask Antidote</div>
-      <p class="note" data-t="prNote">Setup includes your truck's app, menu in English and Spanish, the jingle alerts, points and the printed QR stickers. Monthly price still being set.</p>
+      <h2 class="chrome" data-t="prH">Simple price. No contract.</h2>
+      <div class="pr" id="pr"></div>
+      <div class="roi" id="roi"></div>
+      <p class="note" data-t="prFees"></p>
     </div>
   </section>
 
@@ -260,7 +321,7 @@ ul.honest b{color:var(--ink)}
     <header><p class="kick">FAQ</p><h2 class="chrome" data-t="faqH">Questions owners ask</h2></header>
     <div class="card">
       <details><summary data-t="q1">Do my customers have to download an app?</summary><p data-t="a1">No. They scan the QR and it opens in their phone's browser. On iPhone they add it to the Home Screen so alerts can come through. It looks and works like an app.</p></details>
-      <details><summary data-t="q2">Does it work if I only take cash?</summary><p data-t="a2">Yes. Alerts and points work with cash. You scan their code at the window to give points. Taking cards or Cash App/Zelle in the app is optional, but people tend to spend more when they can pay with their phone.</p></details>
+      <details><summary data-t="q2">Does it work if I only take cash?</summary><p data-t="a2">Yes. Alerts and points work with cash. You scan their code at the window to give points. We also set you up to take cards, Apple Pay, Venmo, Cash App and Zelle, because people with no cash on them walk away, and people spend more when they can pay with their phone.</p></details>
       <details><summary data-t="q3">What if my customers speak Spanish?</summary><p data-t="a3">Everything is in English and Spanish, and each customer picks their language.</p></details>
       <details><summary data-t="q4">Will it drain the driver's phone battery?</summary><p data-t="a4">Sharing location uses battery like a maps app does. Keep the phone plugged in on a dash mount while you drive.</p></details>
       <details><summary data-t="q5">Can I control who gets alerts and when?</summary><p data-t="a5">Yes. You set the alert distance and the hours. Customers can only get one alert per visit, and they can pause it any time.</p></details>
@@ -291,7 +352,14 @@ ul.honest b{color:var(--ink)}
         <li><span data-t="src5">Vending customers spent 32% more paying by card than cash (study by a card-reader company).</span> <a href="https://cantaloupeinc.gcs-web.com/news-releases/news-release-details/usa-technologies-vending-machine-survey-confirms-consumers-spend/" target="_blank" rel="noopener">USA Technologies (Cantaloupe)</a></li>
         <li><span data-t="src6">Push alerts tied to a real moment get opened far more: 14.4% for contextual alerts vs 4.2% for generic ones; click rates run 0.5%–7.4% by industry.</span> <a href="https://batch.com/blog/case-studies/benchmark-notifications-push-crm-mobile" target="_blank" rel="noopener">Batch</a> · <a href="https://www.pushwoosh.com/blog/push-notification-benchmarks/" target="_blank" rel="noopener">Pushwoosh, 2025</a></li>
         <li><span data-t="src7">On iPhone, web alerts work only for web apps added to the Home Screen (iOS 16.4+).</span> <a href="https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/" target="_blank" rel="noopener">WebKit (Apple)</a></li>
-        <li><span data-t="src8">Our estimates (no study found): % of homes that hear the music, % who join, minutes saved on routes, minutes per stop, share paying by card.</span></li>
+        <li><span data-t="src9"></span> <a href="https://squareup.com/us/en/payments/tap-to-pay" target="_blank" rel="noopener">Square</a></li>
+        <li><span data-t="src10"></span> <a href="https://help.venmo.com/hc/en-us/articles/1500003204302" target="_blank" rel="noopener">Venmo Help</a></li>
+        <li><span data-t="src11"></span> <a href="https://cash.app/help/6521-cash-app-business-fees" target="_blank" rel="noopener">Cash App Help</a></li>
+        <li><span data-t="src12"></span> <a href="https://www.fultonbank.com/Small-Business/Banking/Online-and-Mobile-Banking/Zelle-for-Small-Business" target="_blank" rel="noopener">Fulton Bank</a> · <a href="https://td.com/us/en/small-business/zelle-for-business" target="_blank" rel="noopener">TD Bank</a></li>
+        <li><span data-t="src13"></span> <a href="https://www.paymentsdive.com/news/cash-lags-credit-debit-payments-consumer-spending-federal-reserve/827751/" target="_blank" rel="noopener">Payments Dive, Aug 13, 2026</a> · <a href="https://www.frbservices.org/binaries/content/assets/crsocms/news/research/2026-diary-consumer-payments-choice.pdf" target="_blank" rel="noopener">Federal Reserve</a></li>
+        <li><span data-t="src14"></span> <a href="https://www.pewresearch.org/short-reads/2026/09/30/from-cash-to-credit-how-americans-payment-methods-have-changed-in-the-past-decade/" target="_blank" rel="noopener">Pew Research Center, Sept 30, 2026</a></li>
+        <li><span data-t="src15"></span> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></li>
+        <li><span data-t="src8">Our estimates (no study found): % of homes that hear the music, % who join, minutes saved on routes, minutes per stop, share paying by card, % with no cash who walk away, the mix of payment apps.</span></li>
       </ol>
     </div>
   </section>
@@ -353,7 +421,49 @@ en: {
   lRoute: "Time saved on routes", lRouteS: "Saved minutes turned into extra stops on streets with members.",
   lCost: "Cost of rewards you give away", lCostS: "If every point gets cashed in: about 20¢ per member visit.",
   lSum: "Extra per month",
-  calcFoot: "Before the SousShift monthly price (TBD). Card processing fees (about 3%) are not included. Month one will be lower while people join.",
+  listenPage: "🔊 Listen to this page", listenStop: "⏹ Stop", listenSec: "Read this part out loud",
+  spHero: "Here's the idea. Half the street never hears your music. Now their phone rings. When your truck turns onto their block, everyone who joined gets an alert with an ice cream truck jingle.",
+  spNum: "Here are the numbers, using the sliders. Today you make about {today} a month. With the app, about {app} a month. That's about {extra} more, after payment fees. After the SousShift price of {monthly} a month, you keep about {keep} more every month. These are estimates, so move the sliders to match your truck.",
+  spPay: "Cash only means lost sales. About one in four adults carried no cash last year. If {nocash} percent of your customers walk away with no cash, taking every payment wins back about {rec} a month. Bigger tickets on card add about {card}. The fees cost about {fee}. That leaves about {net} more a month. You pay those fees straight to Square, Venmo or Cash App, never to SousShift. We recommend Square Tap to Pay on your phone, Venmo and Cash App signs on the window, and Zelle for your regulars.",
+  spPrice: "The price is simple. Setup is {setup}, but the first {slots} trucks pay just {founding}. Then it's {monthly} a month, with no contract, and you can cancel any time. It pays for itself with about {roi} extra ice creams a month.",
+  routeOff: "Use stops × homes instead", routeOn: "Using your route <b>{name}</b>: <b>{n}</b> homes", routeHomesO: "your route",
+  cNocash: "% of customers who walk away with no cash", cNocashS: "Want something, no cash on them. Fed 2025: 24% of adults carried no cash. We use a careful 15%.",
+  lRec: "No-cash sales you win back", lRecS: "People with no cash pay by card, Apple Pay, Venmo, Cash App or Zelle instead of walking away.",
+  lFee: "Payment processing fees", lFeeS: "Paid by you to Square, Venmo or Cash App (about 4% blended on a $5 sale). See the fee table.",
+  lSsai: "SousShift monthly price", lKeep: "You keep each month",
+  payKick: "Take every payment", payH: "Cash only? You're losing sales.",
+  payLead: "Kids run out with no cash. Parents only have cards. Today they walk back inside. Take cards, Apple Pay, Venmo, Cash App and Zelle and they buy. <b>We set it all up for you.</b>",
+  pRec: "no-cash sales won back per month", pCard: "bigger tickets on card (+{l}%)", pFee: "processing fees you pay", pPct: "blended fee on a typical sale",
+  pNet: "extra per month from taking every payment, after fees",
+  payWhy: "Why 15%? In 2025, 24% of U.S. adults carried no cash on them (Federal Reserve), and 42% say they don't use cash for any purchase in a typical week (Pew, 2026). Not everyone with no cash would have bought, so we use a careful 15%. Change it in the calculator above.",
+  feeH: "What each one costs you", feeTh1: "Way to pay", feeTh2: "Fee", feeTh3: "You keep on $5",
+  fee_square: "Square Tap to Pay", fee_squareS: "Cards, Apple Pay, Google Pay on your phone",
+  fee_venmo: "Venmo business profile", fee_venmoS: "QR sign on the window. Tap to Pay through Venmo is 2.29% + 10¢",
+  fee_cashapp: "Cash App for Business", fee_cashappS: "QR sign on the window. Instant Deposit costs extra",
+  fee_zelle: "Zelle", fee_zelleS: "Free on most business accounts. No buyer protection, can't be reversed",
+  feeFree: "Free",
+  feeNote: "<b>You pay these fees straight to Square, Venmo or Cash App, never to SousShift.</b> Rates checked Oct 11, 2026 on each company's own page (sources below). They can change; check before you sign up.",
+  setH: "The simple setup we recommend",
+  set1: "<b>Square Tap to Pay on your phone.</b> Customers tap a card, Apple Pay or Google Pay on your iPhone or Android. No card reader to buy.",
+  set2: "<b>Venmo and Cash App QR signs on the window.</b> They scan, pay, show you the screen. We print the signs.",
+  set3: "<b>Zelle for regulars and big orders</b> (parties, events). Free, but it works like cash: no buyer protection and it can't be reversed, so use it with people you know. Your bank has to offer Zelle on business accounts.",
+  rtKick: "Your route", rtH: "How many homes do you drive past?",
+  rtLead: "Draw your usual route on the map and we count the houses and apartments along it, from OpenStreetMap. That's how many homes could get the \"truck nearby\" alert, and the number can go straight into the calculator above.",
+  rtBtn: "📍 Count the houses on YOUR route", rtSample: "See a sample route",
+  prH: "Simple price. No contract.",
+  prSetup: "Setup", prSetupS: "Payments set up (Tap to Pay + Venmo, Cash App and Zelle window QR signs), your truck app with \"truck nearby\" alerts, rewards, the QR window sticker, and your route house count.",
+  prFound: "Founding truck price", prFoundS: "Setup for the first {n} trucks.",
+  prMonthly: "Monthly", prMonthlyS: "App hosting, alerts, rewards, menu and price updates, support, keeping your payment links working, and the route house counter. No contract, cancel any time.",
+  prMo: "/mo", prRoi: "Pays for itself with about {n} extra ice creams a month (at {t} each).",
+  prFees: "Payment processing fees go from you straight to Square, Venmo or Cash App. SousShift never takes a cut of your sales.",
+  src9: "Square Tap to Pay on iPhone (US): 2.6% + 15¢ per tap. Checked Oct 11, 2026.",
+  src10: "Venmo business profile: 1.9% + 10¢ per payment of $1 or more from another Venmo account (Tap to Pay through Venmo: 2.29% + 10¢). Checked Oct 11, 2026.",
+  src11: "Cash App for Business: 2.75% taken from each payment received; Instant Deposit costs extra (0.5%–1.75%). Checked Oct 11, 2026.",
+  src12: "Zelle for small business: most banks charge no fee, but there is no purchase protection and payments can't be reversed. Checked Oct 11, 2026.",
+  src13: "Share of U.S. adults who carried cash fell from 79% (2024) to 76% (2025), so about 24% carried none (Fed Diary of Consumer Payment Choice, released Aug 2026).",
+  src14: "42% of Americans say they don't use cash for any purchases in a typical week (24% in 2015).",
+  src15: "Homes on a route: buildings from OpenStreetMap (most of LA County comes from the county's building import), counted live on the route page.",
+  calcFoot: "Processing fees are included. Month one will be lower while people join.",
   rwKick: "Rewards", rwH: "Small rewards, big reasons to come out",
   rwLead: "No big game. Just points that add up fast and treats your customers actually want. You pick the rewards.",
   rw1B: "10 pts", rw1: "every purchase (scan their code at the window)",
@@ -368,11 +478,10 @@ en: {
   ho5: "<b>The driver's phone has to be on the route screen</b> for the truck's location to update. Keep it charging on a dash mount.",
   ho6: "<b>No spamming:</b> one alert per truck visit, never late at night. Customers set their own quiet hours.",
   ho7: "<b>The numbers above are estimates.</b> Your street, weather and prices decide the real result.",
-  prKick: "Price", prTbd: "Price TBD: ask Antidote",
-  prNote: "Setup includes your truck's app, menu in English and Spanish, the jingle alerts, points and the printed QR stickers. Monthly price still being set.",
+  prKick: "Price",
   faqH: "Questions owners ask",
   q1: "Do my customers have to download an app?", a1: "No. They scan the QR and it opens in their phone's browser. On iPhone they add it to the Home Screen so alerts can come through. It looks and works like an app.",
-  q2: "Does it work if I only take cash?", a2: "Yes. Alerts and points work with cash. You scan their code at the window to give points. Taking cards or Cash App/Zelle in the app is optional, but people tend to spend more when they can pay with their phone.",
+  q2: "Does it work if I only take cash?", a2: "Yes. Alerts and points work with cash. You scan their code at the window to give points. We also set you up to take cards, Apple Pay, Venmo, Cash App and Zelle, because people with no cash on them walk away, and people spend more when they can pay with their phone.",
   q3: "What if my customers speak Spanish?", a3: "Everything is in English and Spanish, and each customer picks their language.",
   q4: "Will it drain the driver's phone battery?", a4: "Sharing location uses battery like a maps app does. Keep the phone plugged in on a dash mount while you drive.",
   q5: "Can I control who gets alerts and when?", a5: "Yes. You set the alert distance and the hours. Customers can only get one alert per visit, and they can pause it any time.",
@@ -389,7 +498,7 @@ en: {
   src5: "Vending customers spent 32% more paying by card than cash (study by a card-reader company).",
   src6: "Push alerts tied to a real moment get opened far more: 14.4% for contextual alerts vs 4.2% for generic ones; click rates run 0.5%–7.4% by industry.",
   src7: "On iPhone, web alerts work only for web apps added to the Home Screen (iOS 16.4+).",
-  src8: "Our estimates (no study found): % of homes that hear the music, % who join, minutes saved on routes, minutes per stop, share paying by card.",
+  src8: "Our estimates (no study found): % of homes that hear the music, % who join, minutes saved on routes, minutes per stop, share paying by card, % with no cash who walk away, the mix of payment apps.",
   foot: "SousShift AI · built by Antidote · \"Paletas El Sol\" is a made-up sample truck.",
   perDay: "/day"
 },
@@ -442,7 +551,49 @@ es: {
   lRoute: "Tiempo que ahorras en la ruta", lRouteS: "Los minutos ahorrados se vuelven paradas extra en calles con miembros.",
   lCost: "Lo que cuestan los premios que regalas", lCostS: "Si se canjean todos los puntos: como 20¢ por visita de miembro.",
   lSum: "Extra al mes",
-  calcFoot: "Antes del precio mensual de SousShift (por definir). No incluye la comisión por tarjeta (como 3%). El primer mes será menos mientras la gente se une.",
+  listenPage: "🔊 Escuchar esta página", listenStop: "⏹ Parar", listenSec: "Leer esta parte en voz alta",
+  spHero: "La idea es esta. La mitad de la cuadra nunca oye tu música. Ahora les suena el celular. Cuando tu troque entra a su calle, todos los que se unieron reciben una alerta con la musiquita del troque de helados.",
+  spNum: "Estos son los números, según las barras. Hoy ganas como {today} al mes. Con la app, como {app} al mes. Son como {extra} más, ya sin comisiones. Después del precio de SousShift de {monthly} al mes, te quedan como {keep} más cada mes. Son estimados, así que mueve las barras para que se parezcan a tu troque.",
+  spPay: "Solo efectivo es perder ventas. Como uno de cada cuatro adultos no traía efectivo el año pasado. Si el {nocash} por ciento de tus clientes se va porque no trae efectivo, aceptar todos los pagos te regresa como {rec} al mes. Las ventas más grandes con tarjeta suman como {card}. Las comisiones cuestan como {fee}. Te quedan como {net} más al mes. Esas comisiones las pagas directo a Square, Venmo o Cash App, nunca a SousShift. Te recomendamos Square Tap to Pay en tu celular, letreros de Venmo y Cash App en la ventanilla, y Zelle para tus clientes de siempre.",
+  spPrice: "El precio es sencillo. La instalación cuesta {setup}, pero los primeros {slots} troques pagan solo {founding}. Luego son {monthly} al mes, sin contrato, y cancelas cuando quieras. Se paga sola con unos {roi} helados extra al mes.",
+  routeOff: "Usar paradas × casas", routeOn: "Usando tu ruta <b>{name}</b>: <b>{n}</b> casas", routeHomesO: "tu ruta",
+  cNocash: "% de clientes que se van porque no traen efectivo", cNocashS: "Quieren algo, pero no traen efectivo. Fed 2025: el 24% de los adultos no traía efectivo. Nosotros usamos un 15% conservador.",
+  lRec: "Ventas sin efectivo que recuperas", lRecS: "Quien no trae efectivo paga con tarjeta, Apple Pay, Venmo, Cash App o Zelle en vez de irse.",
+  lFee: "Comisiones por cobrar", lFeeS: "Las pagas tú a Square, Venmo o Cash App (como 4% en promedio en una venta de $5). Mira la tabla de comisiones.",
+  lSsai: "Precio mensual de SousShift", lKeep: "Lo que te queda al mes",
+  payKick: "Acepta todos los pagos", payH: "¿Solo efectivo? Estás perdiendo ventas.",
+  payLead: "Los niños salen sin efectivo. Los papás solo traen tarjeta. Hoy se regresan para adentro. Acepta tarjetas, Apple Pay, Venmo, Cash App y Zelle y te compran. <b>Nosotros te lo dejamos listo.</b>",
+  pRec: "ventas sin efectivo recuperadas al mes", pCard: "ventas más grandes con tarjeta (+{l}%)", pFee: "comisiones que pagas", pPct: "comisión promedio en una venta normal",
+  pNet: "extra al mes por aceptar todos los pagos, ya sin comisiones",
+  payWhy: "¿Por qué 15%? En 2025, el 24% de los adultos en EE. UU. no traía efectivo (Reserva Federal), y el 42% dice que no usa efectivo para ninguna compra en una semana normal (Pew, 2026). No todos los que no traen efectivo iban a comprar, así que usamos un 15% conservador. Cámbialo en la calculadora de arriba.",
+  feeH: "Cuánto te cuesta cada uno", feeTh1: "Forma de pago", feeTh2: "Comisión", feeTh3: "Te quedan de $5",
+  fee_square: "Square Tap to Pay", fee_squareS: "Tarjetas, Apple Pay y Google Pay en tu celular",
+  fee_venmo: "Perfil de negocio en Venmo", fee_venmoS: "Letrero QR en la ventanilla. Tap to Pay con Venmo cuesta 2.29% + 10¢",
+  fee_cashapp: "Cash App for Business", fee_cashappS: "Letrero QR en la ventanilla. El depósito instantáneo cuesta extra",
+  fee_zelle: "Zelle", fee_zelleS: "Gratis en la mayoría de las cuentas de negocio. Sin protección al comprador, no se puede revertir",
+  feeFree: "Gratis",
+  feeNote: "<b>Estas comisiones las pagas tú directo a Square, Venmo o Cash App, nunca a SousShift.</b> Tarifas revisadas el 11 de oct. de 2026 en la página de cada compañía (fuentes abajo). Pueden cambiar; revísalas antes de inscribirte.",
+  setH: "La forma sencilla que recomendamos",
+  set1: "<b>Square Tap to Pay en tu celular.</b> El cliente acerca su tarjeta, Apple Pay o Google Pay a tu iPhone o Android. No tienes que comprar lector de tarjetas.",
+  set2: "<b>Letreros QR de Venmo y Cash App en la ventanilla.</b> Escanean, pagan y te enseñan la pantalla. Nosotros imprimimos los letreros.",
+  set3: "<b>Zelle para clientes de siempre y pedidos grandes</b> (fiestas, eventos). Es gratis, pero funciona como efectivo: no hay protección al comprador y no se puede revertir, así que úsalo con gente que conoces. Tu banco tiene que ofrecer Zelle en cuentas de negocio.",
+  rtKick: "Tu ruta", rtH: "¿Cuántas casas pasas en tu ruta?",
+  rtLead: "Dibuja tu ruta de siempre en el mapa y contamos las casas y apartamentos a lo largo de ella, con datos de OpenStreetMap. Son las casas que podrían recibir la alerta de \"el troque está cerca\", y el número puede ir directo a la calculadora de arriba.",
+  rtBtn: "📍 Cuenta las casas de TU ruta", rtSample: "Ver una ruta de ejemplo",
+  prH: "Precio sencillo. Sin contrato.",
+  prSetup: "Instalación", prSetupS: "Te dejamos los pagos listos (Tap to Pay + letreros QR de Venmo, Cash App y Zelle para la ventanilla), la app de tu troque con alertas de \"el troque está cerca\", premios, el sticker QR para la ventanilla y el conteo de casas de tu ruta.",
+  prFound: "Precio de troque fundador", prFoundS: "Instalación para los primeros {n} troques.",
+  prMonthly: "Mensual", prMonthlyS: "Hospedaje de la app, alertas, premios, cambios de menú y precios, soporte, que tus links de pago sigan funcionando, y el contador de casas de tu ruta. Sin contrato, cancela cuando quieras.",
+  prMo: "/mes", prRoi: "Se paga sola con unos {n} helados extra al mes (a {t} cada uno).",
+  prFees: "Las comisiones por cobrar van de ti directo a Square, Venmo o Cash App. SousShift nunca se queda con parte de tus ventas.",
+  src9: "Square Tap to Pay en iPhone (EE. UU.): 2.6% + 15¢ por cobro. Revisado el 11 de oct. de 2026.",
+  src10: "Perfil de negocio en Venmo: 1.9% + 10¢ por pago de $1 o más desde otra cuenta de Venmo (Tap to Pay con Venmo: 2.29% + 10¢). Revisado el 11 de oct. de 2026.",
+  src11: "Cash App for Business: 2.75% de cada pago recibido; el depósito instantáneo cuesta extra (0.5%–1.75%). Revisado el 11 de oct. de 2026.",
+  src12: "Zelle para negocios: la mayoría de los bancos no cobra, pero no hay protección de compra y los pagos no se pueden revertir. Revisado el 11 de oct. de 2026.",
+  src13: "Los adultos en EE. UU. que traían efectivo bajaron de 79% (2024) a 76% (2025), o sea que como 24% no traía (Diario de Elección de Pago del Consumidor de la Fed, publicado en agosto de 2026).",
+  src14: "El 42% de los estadounidenses dice que no usa efectivo para ninguna compra en una semana normal (24% en 2015).",
+  src15: "Casas en una ruta: edificios de OpenStreetMap (casi todo el condado de LA viene de los datos de edificios del condado), contados en vivo en la página de la ruta.",
+  calcFoot: "Ya incluye las comisiones de pago. El primer mes será menos mientras la gente se une.",
   rwKick: "Premios", rwH: "Premios chiquitos, buenas razones para salir",
   rwLead: "Nada de juegos grandes. Nomás puntos que se juntan rápido y antojitos que tus clientes sí quieren. Tú escoges los premios.",
   rw1B: "10 pts", rw1: "en cada compra (escaneas su código en la ventanilla)",
@@ -457,11 +608,10 @@ es: {
   ho5: "<b>El celular del chofer tiene que estar en la pantalla de ruta</b> para que se actualice dónde va el troque. Tráelo cargando en un soporte en el tablero.",
   ho6: "<b>Nada de spam:</b> una alerta por cada pasada del troque, nunca tarde en la noche. Cada cliente pone sus horas de silencio.",
   ho7: "<b>Los números de arriba son estimados.</b> Tu calle, el clima y tus precios deciden el resultado real.",
-  prKick: "Precio", prTbd: "Precio por definir: pregúntale a Antidote",
-  prNote: "La instalación incluye la app de tu troque, el menú en inglés y español, las alertas con melodía, los puntos y los stickers QR impresos. El precio mensual todavía se está definiendo.",
+  prKick: "Precio",
   faqH: "Lo que preguntan los dueños",
   q1: "¿Mis clientes tienen que descargar una app?", a1: "No. Escanean el QR y se abre en el navegador de su celular. En iPhone la agregan a la pantalla de inicio para que les lleguen las alertas. Se ve y funciona como una app.",
-  q2: "¿Funciona si solo acepto efectivo?", a2: "Sí. Las alertas y los puntos funcionan con efectivo. Escaneas su código en la ventanilla para darles puntos. Aceptar tarjeta, Cash App o Zelle en la app es opcional, pero la gente suele gastar más cuando puede pagar con el celular.",
+  q2: "¿Funciona si solo acepto efectivo?", a2: "Sí. Las alertas y los puntos funcionan con efectivo. Escaneas su código en la ventanilla para darles puntos. También te dejamos listo para aceptar tarjetas, Apple Pay, Venmo, Cash App y Zelle, porque quien no trae efectivo se va, y la gente gasta más cuando puede pagar con el celular.",
   q3: "¿Y si mis clientes hablan español?", a3: "Todo está en inglés y en español, y cada cliente escoge su idioma.",
   q4: "¿Se le acaba rápido la batería al celular del chofer?", a4: "Compartir la ubicación gasta batería como una app de mapas. Trae el celular conectado en un soporte mientras manejas.",
   q5: "¿Puedo controlar a quién le llegan las alertas y cuándo?", a5: "Sí. Tú pones la distancia y el horario. Cada cliente recibe solo una alerta por pasada, y la puede pausar cuando quiera.",
@@ -478,7 +628,7 @@ es: {
   src5: "En máquinas expendedoras la gente gastó 32% más con tarjeta que con efectivo (estudio de una empresa que vende lectores de tarjeta).",
   src6: "Las alertas que llegan en el momento justo se abren mucho más: 14.4% contra 4.2% de las genéricas; los clics van de 0.5% a 7.4% según la industria.",
   src7: "En iPhone, las alertas web solo funcionan en apps web agregadas a la pantalla de inicio (iOS 16.4 o más nuevo).",
-  src8: "Estimados nuestros (no encontramos estudio): % de casas que oyen la música, % que se une, minutos ahorrados en la ruta, minutos por parada y cuántos pagan con tarjeta.",
+  src8: "Estimados nuestros (no encontramos estudio): % de casas que oyen la música, % que se une, minutos ahorrados en la ruta, minutos por parada, cuántos pagan con tarjeta, % sin efectivo que se va y qué apps de pago usan.",
   foot: "SousShift AI · hecho por Antidote · \"Paletas El Sol\" es un troque de muestra inventado.",
   perDay: "/día"
 }};
@@ -486,29 +636,40 @@ es: {
 <script src="../lang.js"></script>
 <script src="../jingle.js"></script>
 <script src="../model.js"></script>
+<script src="../speak.js"></script>
 <script>
 (function () {
   "use strict";
   var $ = function (id) { return document.getElementById(id); };
-  var ids = ["stops", "homes", "hear", "buy", "join", "ticket", "days", "card", "lift", "rep", "save", "min"];
+  var ids = ["stops", "homes", "hear", "buy", "join", "ticket", "days", "nocash", "card", "lift", "rep", "save", "min"];
+  // homes counted on the owner's real route (from /ice-cream/route/ "Use these homes in the calculator")
+  var qs = new URLSearchParams(location.search), routeHomes = Math.max(0, Math.round(+qs.get("rh") || 0)), routeName = (qs.get("rn") || "").slice(0, 60);
+  var routeOn = routeHomes > 0;
+  $("route-off").addEventListener("click", function () { routeOn = false; calc(); });
   function money(n, cents) {
     var loc = ICE.lang === "es" ? "es-US" : "en-US";
     return (n < 0 ? "−" : "") + "$" + Math.abs(n).toLocaleString(loc, { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 });
   }
+  function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
   function num(n) { return Math.round(n).toLocaleString(ICE.lang === "es" ? "es-US" : "en-US"); }
   function v(id) { return parseFloat($(id).value); }
   function calc() {
     var stops = v("stops"), homes = v("homes"), hear = v("hear") / 100, buy = v("buy") / 100, join = v("join") / 100,
         ticket = v("ticket"), days = v("days"), card = v("card") / 100, lift = v("lift") / 100, rep = v("rep") / 100,
-        save = v("save"), min = v("min");
+        save = v("save"), min = v("min"), nocash = v("nocash");
     // labels
-    $("o-stops").textContent = stops; $("o-homes").textContent = homes; $("o-hear").textContent = Math.round(hear * 100) + "%";
+    $("o-stops").textContent = stops; $("o-homes").textContent = routeOn ? ICE.t("routeHomesO") : homes; $("homes").disabled = routeOn;
+    $("o-nocash").textContent = nocash + "%";
+    $("routebar").hidden = !routeOn;
+    if (routeOn) $("routebar-t").innerHTML = ICE.t("routeOn").replace("{name}", esc(routeName || "✓")).replace("{n}", num(routeHomes)); $("o-hear").textContent = Math.round(hear * 100) + "%";
     $("o-buy").textContent = Math.round(buy * 100) + "%"; $("o-join").textContent = Math.round(join * 100) + "%";
     $("o-ticket").textContent = money(ticket, ticket % 1 !== 0); $("o-days").textContent = days;
     $("o-card").textContent = Math.round(card * 100) + "%"; $("o-lift").textContent = "+" + Math.round(lift * 100) + "%";
     $("o-rep").textContent = "+" + Math.round(rep * 100) + "%"; $("o-save").textContent = save + " min"; $("o-min").textContent = min + " min";
     var r = IceModel.run({ stops: stops, homes: homes, hear: hear * 100, buy: buy * 100, join: join * 100, ticket: ticket, days: days,
-      card: card * 100, lift: lift * 100, rep: rep * 100, save: save, min: min });
+      card: card * 100, lift: lift * 100, rep: rep * 100, save: save, min: min, nocash: nocash, routeHomes: routeOn ? routeHomes : 0 });
+    lastR = r;
+    var P = IceModel.PRICING;
     $("r-today").textContent = money(r.todayMo);
     $("r-app").textContent = money(r.appMo);
     $("r-extra").textContent = "+" + money(r.extraMo);
@@ -520,7 +681,18 @@ es: {
     $("l-card").textContent = "+" + money(r.lines.card);
     $("l-route").textContent = "+" + money(r.lines.route);
     $("l-cost").textContent = "−" + money(r.lines.cost);
+    $("l-rec").textContent = "+" + money(r.lines.rec);
+    $("l-fee").textContent = "−" + money(r.lines.fees);
     $("l-sum").textContent = "+" + money(r.extraMo);
+    $("l-ssai").textContent = "−" + money(P.monthly);
+    $("l-keep").textContent = (r.extraMo - P.monthly >= 0 ? "+" : "") + money(r.extraMo - P.monthly);
+    $("p-rec").textContent = "+" + money(r.lines.rec);
+    $("p-card").textContent = "+" + money(r.lines.card);
+    $("p-card-l").textContent = ICE.t("pCard").replace("{l}", Math.round(lift * 100));
+    $("p-fee").textContent = "−" + money(r.lines.fees);
+    $("p-pct").textContent = (r.feeRate * 100).toFixed(1) + "%";
+    $("p-net").textContent = "+" + money(r.payMo);
+    $("roi").textContent = ICE.t("prRoi").replace("{n}", IceModel.roiCount(ticket)).replace("{t}", money(ticket, ticket % 1 !== 0));
   }
   ids.forEach(function (id) { $(id).addEventListener("input", calc); });
 
@@ -539,8 +711,64 @@ es: {
     hearBtn.textContent = ICE.t("hearStop");
     window.Jingle.play(2).then(function () { hearBtn.textContent = ICE.t("hearBtn"); });
   });
-  ICE.on(function () { calc(); contact(); if (window.Jingle.playing) hearBtn.textContent = ICE.t("hearStop"); });
-  calc(); contact();
+  function feeTable() {
+    $("fee-body").innerHTML = IceModel.FEES.map(function (f) {
+      var fee = f.pct || f.fixed ? (f.pct ? f.pct + "%" : "") + (f.fixed ? " + " + Math.round(f.fixed * 100) + "¢" : "") : ICE.t("feeFree");
+      var keep = 5 - (f.pct / 100 * 5 + f.fixed);
+      return "<tr><td>" + ICE.t("fee_" + f.id) + "<small>" + ICE.t("fee_" + f.id + "S") + "</small></td><td>" + fee + "</td><td class=\"n\">" + money(keep, true) + "</td></tr>";
+    }).join("");
+  }
+  function price() {
+    var P = IceModel.PRICING, m = function (n) { return money(n); };
+    $("pr").innerHTML =
+      '<div class="ln"><span>' + ICE.t("prSetup") + "<small>" + ICE.t("prSetupS") + "</small></span><b>" + m(P.setup) + "</b></div>" +
+      '<div class="ln"><span>' + ICE.t("prFound") + "<small>" + ICE.t("prFoundS").replace("{n}", P.foundingSlots) + "</small></span><b>" + m(P.founding) + "</b></div>" +
+      '<div class="ln"><span>' + ICE.t("prMonthly") + "<small>" + ICE.t("prMonthlyS") + "</small></span><b>" + m(P.monthly) + ICE.t("prMo") + "</b></div>";
+  }
+  /* ---------- read aloud ---------- */
+  var lastR = null, reading = null;
+  function fill(k, o) { var t = ICE.t(k); for (var x in o) t = t.split("{" + x + "}").join(o[x]); return t; }
+  function spoken(id) {
+    var L = ICE.lang, r = lastR, P = IceModel.PRICING, D = function (n) { return Speak.dollars(n, L); }, W = function (n) { return Speak.words(n, L); };
+    if (id === "hero") return ICE.t("spHero");
+    if (id === "numbers") return fill("spNum", { today: D(r.todayMo), app: D(r.appMo), extra: D(r.extraMo), monthly: D(P.monthly), keep: D(Math.max(0, r.extraMo - P.monthly)) });
+    if (id === "pay") return fill("spPay", { nocash: W(v("nocash")), rec: D(r.lines.rec), card: D(r.lines.card), fee: D(r.lines.fees), net: D(r.payMo) });
+    if (id === "price") return fill("spPrice", { setup: D(P.setup), slots: W(P.foundingSlots), founding: D(P.founding), monthly: D(P.monthly), roi: W(IceModel.roiCount(v("ticket"))) });
+    if (id === "faq") { var out = []; for (var q = 1; q <= 7; q++) out.push(ICE.t("q" + q) + " " + ICE.t("a" + q)); return out.join(" "); }
+    var sec = $(id); if (!sec) return "";
+    var c = sec.cloneNode(true);
+    c.querySelectorAll("svg,button,input,select,output,table,.spk-mini,.row,.phone").forEach(function (e) { e.remove(); });
+    c.querySelectorAll("h2,h3,p,li,div,summary,span").forEach(function (e) { e.appendChild(document.createTextNode(". ")); });
+    return c.textContent.replace(/(\.\s*){2,}/g, ". ").replace(/([?!])\./g, "$1");
+  }
+  function read(key, text) {
+    if (reading === key && Speak.speaking) { Speak.stop(); return; }
+    reading = key; Speak.say(text); speakUI();
+  }
+  var SECS = ["how", "sticker", "see", "numbers", "pay", "route", "rewards", "honest", "price", "faq", "contact"];
+  SECS.forEach(function (id) {
+    var sec = $(id), h = sec && sec.querySelector("h2"); if (!h) return;
+    var b = document.createElement("button"); b.type = "button"; b.className = "spk-mini"; b.textContent = "🔊"; b.setAttribute("data-sec", id);
+    b.addEventListener("click", function () { read(id, spoken(id)); });
+    b.style.cssFloat = "right"; h.parentNode.insertBefore(b, h); // outside the h2: its text is replaced on language switch
+  });
+  $("listenPage").addEventListener("click", function () {
+    read("page", ["hero", "how", "numbers", "pay", "price"].map(spoken).join(" "));
+  });
+  function speakUI() {
+    var on = Speak.speaking;
+    $("listenPage").textContent = ICE.t(on && reading === "page" ? "listenStop" : "listenPage");
+    $("listenPage").setAttribute("aria-pressed", on && reading === "page" ? "true" : "false");
+    document.querySelectorAll(".spk-mini").forEach(function (b) {
+      var me = on && reading === b.getAttribute("data-sec");
+      b.textContent = me ? "⏹" : "🔊"; b.setAttribute("aria-label", ICE.t(me ? "listenStop" : "listenSec")); b.title = ICE.t("listenSec");
+    });
+  }
+  Speak.on(speakUI); Speak.css();
+
+  ICE.on(function () { speakUI(); calc(); contact(); feeTable(); price(); if (window.Jingle.playing) hearBtn.textContent = ICE.t("hearStop"); });
+  calc(); contact(); feeTable(); price(); speakUI();
+  if (routeOn) setTimeout(function () { var c = $("calc"); if (c) c.scrollIntoView(); }, 60);
 })();
 </script>
 </body>

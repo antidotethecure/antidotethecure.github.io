@@ -94,7 +94,7 @@ body{padding-bottom:30px}
   <div class="logo" aria-hidden="true">🍦</div>
   <b>Paletas El Sol<small><span data-t="topSub">Truck alerts</span> <span class="tag">demo</span></small></b>
   <span class="sp"></span>
-  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true">EN</button><button data-lang="es" aria-pressed="false">ES</button></div>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">English</button><button data-lang="es" aria-pressed="false" lang="es">Español</button></div>
 </div></div>
 
 <main class="wrap">
@@ -103,6 +103,7 @@ body{padding-bottom:30px}
     <div class="st" id="status">Truck is <em>0.9 mi</em> away · 12 min</div>
     <div class="sub" id="substatus" data-t="subStatus">We'll ring your phone when it's close.</div>
     <button class="btn gold" id="test" type="button" data-t="testBtn">🔔 Test the alert</button>
+    <div style="margin-top:10px"><button class="spk-btn" type="button" id="explain" aria-pressed="false" data-t="explain">🔊 What is this demo?</button></div>
   </section>
 
   <div class="map" aria-label="Map showing the truck coming toward your street">
@@ -216,6 +217,8 @@ en: {
   topSub: "Truck alerts", onRoute: "On route now",
   status: "Truck is <em>{d} mi</em> away · {m} min", statusHere: "The truck is <em>on your street!</em>", statusGone: "The truck passed. Next round soon.",
   subStatus: "We'll ring your phone when it's close.",
+  explain: "🔊 What is this demo?", explainStop: "⏹ Stop",
+  explainSay: "This is a demo of what your customers see on their phone. Paletas El Sol is a made-up truck. At the top, the live map shows the truck coming toward their street. Tap Test the alert to hear the jingle that rings their phone when the truck is close. Scroll down to see how they join in ten seconds, collect points, check your menu, and turn alerts on or off. Your truck gets its own name, colors and menu.",
   testBtn: "🔔 Test the alert", replay: "↺ Replay the route", faster: "⏩ Bring it closer",
   joinKick: "Step 1", joinH: "Join in 10 seconds", nameL: "Your first name", namePh: "Maria",
   joinBtn: "Join + get 10 free points", joinNote: "Demo only: nothing is sent anywhere. It stays on this phone.",
@@ -256,6 +259,8 @@ es: {
   topSub: "Alertas del troque", onRoute: "En ruta ahorita",
   status: "El troque está a <em>{d} mi</em> · {m} min", statusHere: "¡El troque está <em>en tu calle!</em>", statusGone: "Ya pasó el troque. Pronto vuelve.",
   subStatus: "Te sonamos el celular cuando esté cerca.",
+  explain: "🔊 ¿Qué es este demo?", explainStop: "⏹ Parar",
+  explainSay: "Este es un demo de lo que tus clientes ven en su celular. Paletas El Sol es un troque inventado. Arriba, el mapa en vivo muestra el troque acercándose a su calle. Toca Probar la alerta para oír la musiquita que les suena en el celular cuando el troque está cerca. Baja para ver cómo se unen en diez segundos, juntan puntos, ven tu menú, y prenden o apagan las alertas. Tu troque lleva su propio nombre, colores y menú.",
   testBtn: "🔔 Probar la alerta", replay: "↺ Repetir la ruta", faster: "⏩ Acercar el troque",
   joinKick: "Paso 1", joinH: "Únete en 10 segundos", nameL: "Tu nombre", namePh: "María",
   joinBtn: "Unirme + 10 puntos gratis", joinNote: "Solo es demo: no se manda nada a ningún lado. Se queda en este celular.",
@@ -294,6 +299,7 @@ es: {
 </script>
 <script src="../lang.js"></script>
 <script src="../jingle.js"></script>
+<script src="../speak.js"></script>
 <script>
 (function () {
   "use strict";
@@ -434,6 +440,12 @@ es: {
     showJoin(); renderPts(); renderSet(); toast(t("resetDone"));
   });
 
+  (function () { // read-aloud explainer
+    var b = $("explain");
+    function ui() { b.textContent = ICE.t(Speak.speaking ? "explainStop" : "explain"); b.setAttribute("aria-pressed", Speak.speaking ? "true" : "false"); }
+    b.addEventListener("click", function () { if (Speak.speaking) Speak.stop(); else Speak.say(ICE.t("explainSay")); ui(); });
+    Speak.on(ui); Speak.css(); ICE.on(ui);
+  })();
   ICE.on(function () { showJoin(); renderPts(); renderMenu(); statusKey = ""; if ($("ringer").classList.contains("show")) $("nBody").textContent = fmt(t("nBody"), { d: dec(lastD), m: lastM }); });
   showJoin(); renderPts(); renderMenu(); renderSet();
 })();

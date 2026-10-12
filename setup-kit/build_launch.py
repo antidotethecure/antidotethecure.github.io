@@ -115,7 +115,7 @@ def build(owner_slug):
     t = (t.replace("__RESTAURANTS__", json.dumps(rest)).replace("__OWNER__", html.escape(o["owner"])).replace("__LAUNCH_NAMES__", names_html)
           .replace("__KEY__", f"{owner_slug}-launch-v1").replace("__CONTACTS__", json.dumps(o.get("contacts", [])))
           .replace("__AIAGENTS__", json.dumps(agents(o))).replace("__VALUECARD__", value_card(owner_slug, o))
-          .replace("__THEME__", theme).replace("__LOGOS__", logos).replace("__AMBIENT__", json.dumps(amb)))
+          .replace("__THEME__", theme).replace("__LOGOS__", logos).replace("__AMBIENT__", json.dumps(amb)).replace("__INTERIM__", json.dumps(o.get("interim"))))
     if fonts: t = t.replace("</title>", f'</title><link href="{fonts}" rel="stylesheet">', 1)
     dst = ROOT / "onboarding" / owner_slug / "index.html"; dst.parent.mkdir(parents=True, exist_ok=True); dst.write_text(t)
     go = f"/onboarding/{owner_slug}/"

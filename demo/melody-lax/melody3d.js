@@ -267,6 +267,12 @@ async function boot() {
   function flamesAt(B, x, y, Y, size, ang, tt, ph, n, uv) { for (let t = 0; t < n; t++) { const fl = .72 + .28 * Math.sin(tt * .021 + ph + t * 2.1) + .18 * Math.random(), s = size * fl / 26, a = ang + (t - (n - 1) / 2) * .38 + Math.sin(tt * .013 + ph * 3 + t) * .18;
     tongueQ(B, x + (t - (n - 1) / 2) * size * .12, y, Y, s, a + Math.PI / 2, uv, 1, 1, 1, Math.min(1, .65 + .35 * fl)); } }
 
+  /* ---------------- melody lot planes (lanes, line + windows): canvases from __M3.LOT ---------------- */
+  const lotMats = {}, lotMeshes = [];
+  function lotMat(key, canvas, blend) { if (!lotMats[key]) { const t = new THREE.Texture(canvas); t.colorSpace = THREE.SRGBColorSpace; t.needsUpdate = true;
+    lotMats[key] = new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, blending: blend || THREE.NormalBlending }); } return lotMats[key]; }
+  function lotPlane(i, mat, Y, x, y, w, h, order) { let m = lotMeshes[i]; if (!m) { m = new THREE.Mesh(tileGeo, mat); scene.add(m); lotMeshes[i] = m; }
+    m.material = mat; m.visible = true; m.renderOrder = order; m.scale.set(w, 1, h); m.position.set(x + w / 2 - W / 2, Y, y + h / 2 - H / 2); return m; }
   /* ---------------- per-frame: ground ---------------- */
   const LMK = { theme: 1, melody: 1, innout: 1, sofi: 1, crypto: 1 };
   function drawGround(now, G) {
@@ -283,6 +289,14 @@ async function boot() {
         let m = lmMeshes[li++]; if (!m) { m = new THREE.Mesh(tileGeo, mm); m.receiveShadow = true; scene.add(m); lmMeshes.push(m); } m.material = mm; m.visible = true; m.renderOrder = 50; m.scale.set(w, 1, h); m.position.set(x + w / 2 - W / 2, .2, y + h / 2 - H / 2);
         if (g.k === "theme" && th < THEMES.length) { themeSkin(); const t3 = THEMES[th++]; t3.visible = true; t3.position.set(x + w * TH_CX - W / 2, 0, y + h * TH_CY - H / 2); } } }
     });
+    // drive-thru lanes (under the cars), the line + lit windows (over the sprite): same rects as the 2D canvas
+    let lm = 0; const LT = M.LOT;
+    if (LT) G.ground.forEach(g => { if (g.k !== "melody") return; const p = LT.geom(g), ox = p.x0 + LT.BX, oy = p.y0 + LT.BY, side = g.side < 0 ? "R" : "L";
+      lotPlane(lm++, lotMat("lane" + side, LT.lanes[side]), .25, ox, oy, LT.BW, LT.BH, 30);
+      lotPlane(lm++, lotMat("lot", LT.base), .5, ox, oy, LT.BW, LT.BH, 51);
+      lotPlane(lm++, lotMat("lit", LT.lit, THREE.AdditiveBlending), .7, ox, oy, LT.BW, LT.BH, 52);
+      lotMats.lit.opacity = LT.ramp(now) * (.86 + .14 * Math.sin(now / 330 + g.y * .013)); });
+    for (let i = lm; i < lotMeshes.length; i++) lotMeshes[i].visible = false;
     for (let i = ti; i < tileMeshes.length; i++) tileMeshes[i].visible = false;
     for (let i = li; i < lmMeshes.length; i++) lmMeshes[i].visible = false;
     for (let i = th; i < THEMES.length; i++) THEMES[i].visible = false;
@@ -297,7 +311,10 @@ async function boot() {
         Bc.q(c.x, y, .4, 4.8 * k, 9.6 * k, c.a + Math.PI / 2, UV.car, col[0], col[1], col[2], c.al);
         BcA.q(c.x + ca * (4.4 + 11) * k, y + sa * (4.4 + 11) * k, .5, 12 * k, 22 * k, c.a + Math.PI / 2, UV.beam2, 1, 1, 1, .55 * c.al);
         for (const sd of [-1, 1]) { BcA.q(c.x + ca * 4.6 * k + sd * sa * 1.5 * k, y + sa * 4.6 * k - sd * ca * 1.5 * k, .6, 2.4, 2.4, 0, UV.dot, 1, .96, .86, c.al);
-          BcA.q(c.x - ca * 4.7 * k + sd * sa * 1.6 * k, y - sa * 4.7 * k - sd * ca * 1.6 * k, .6, 2.6, 2.6, 0, UV.dot, 1, .16, .12, .9 * c.al); } } } }
+          BcA.q(c.x - ca * 4.7 * k + sd * sa * 1.6 * k, y - sa * 4.7 * k - sd * ca * 1.6 * k, .6, 2.6, 2.6, 0, UV.dot, 1, .16, .12, .9 * c.al); }
+        if (c.cop && c.al > 0) { const f = Math.floor(performance.now() / 110) % 2, A = f ? [1, .2, .2] : [.24, .55, 1], B = f ? [.24, .55, 1] : [1, .2, .2];   // police light bars
+          BcA.q(c.x - sa * 2.4 * k, y + ca * 2.4 * k, .9, 5, 5, 0, UV.dot, A[0], A[1], A[2], c.al); BcA.q(c.x + sa * 2.4 * k, y - ca * 2.4 * k, .9, 5, 5, 0, UV.dot, B[0], B[1], B[2], c.al);
+          BcA.q(c.x - sa * 2.4 * k, y + ca * 2.4 * k, .8, 16, 16, 0, UV.dot, A[0], A[1], A[2], .3 * c.al); } } } }
 
   /* ---------------- per-frame: FX (the game's pooled particles, same caps/timings — only drawn here) ---------------- */
   let crashAlt = -1, crashX = 0, crashY = 0, playerAlt = -1, playerX = 0, playerY = 0;

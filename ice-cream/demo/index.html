@@ -6,7 +6,7 @@
 <title>Paletas El Sol: Truck Alerts</title>
 <meta name="description" content="Demo: get a ring with an ice-cream-truck jingle when Paletas El Sol is on your street. Points, rewards and the menu. Sample truck by SousShift AI.">
 <meta name="theme-color" content="#03060e">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest?v=20261011c">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,8 +16,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="../ice.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="../ice.css?v=20261011c">
 <style>
+[hidden]{display:none!important}
 body{padding-bottom:30px}
 .top .logo{width:40px;height:40px;border-radius:12px;background:radial-gradient(circle at 50% 40%,#ffd166 0 38%,#ff9a3c 39% 100%);display:grid;place-items:center;font-size:22px;flex:none}
 .tag{font:800 10px "Rajdhani",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#2a1a00;background:var(--gold);border-radius:99px;padding:1px 7px;margin-left:4px;vertical-align:2px}
@@ -32,11 +34,49 @@ body{padding-bottom:30px}
 @keyframes pl{to{box-shadow:0 0 0 12px rgba(52,211,153,0)}}
 #test{width:100%;min-height:64px;font-size:16px;margin-top:12px}
 
-/* map */
-.map{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--edge);background:#0b1733;margin-top:12px}
-.map svg{display:block;width:100%;height:auto}
+/* ETA panel */
+.eta{margin-top:12px;border-radius:18px;border:1px solid var(--edge);background:linear-gradient(180deg,#0d1d40,#0a1631);padding:12px 14px;text-align:center}
+.eta .chip{display:inline-flex;align-items:center;gap:6px;font:800 12.5px "Rajdhani",sans-serif;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;padding:3px 10px;background:rgba(63,169,255,.14);color:var(--volt);border:1px solid rgba(63,169,255,.4)}
+.eta[data-s=almost] .chip{background:rgba(255,209,102,.16);color:var(--gold);border-color:rgba(255,209,102,.55)}
+.eta[data-s=here] .chip{background:rgba(52,211,153,.16);color:var(--good);border-color:rgba(52,211,153,.55)}
+.eta[data-s=gone] .chip{background:rgba(158,173,204,.12);color:var(--dim);border-color:var(--edge)}
+.eta[data-s=here]{border-color:rgba(52,211,153,.6);box-shadow:0 0 0 3px rgba(52,211,153,.12)}
+.eta[data-s=almost]{border-color:rgba(255,209,102,.6)}
+.eta .big{font-family:"Orbitron",sans-serif;font-weight:900;font-size:clamp(22px,6.6vw,30px);line-height:1.15;margin:6px 0 2px}
+.eta .big b{color:var(--gold)}
+.eta .dist{font-weight:700;font-size:17px;color:var(--silver)}
+.eta .dist span{color:var(--dim);font-weight:600}
+
+/* live map */
+.map{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--edge);background:#0b1733;margin-top:12px;height:clamp(300px,58vh,380px)}
+#lmap{position:absolute;inset:0;background:#2a2a2b}
+.map .leaflet-container{font-family:"Rajdhani",system-ui,sans-serif;background:#2a2a2b}
+.map .osmdark{filter:invert(1) hue-rotate(195deg) brightness(.92) contrast(.88) saturate(.7)}
+.map .leaflet-control-attribution{font-size:10.5px;background:rgba(3,6,14,.7);color:var(--dim)}
+.map .leaflet-control-attribution a{color:var(--silver)}
+.mapchip{position:absolute;left:10px;top:10px;z-index:500;background:rgba(3,6,14,.82);border:1px solid var(--edge);border-radius:12px;padding:5px 10px;font:800 15px "Rajdhani",sans-serif;color:var(--ink);pointer-events:none;max-width:calc(100% - 130px)}
+.mapchip b{color:var(--gold)}
+#recenter{position:absolute;right:10px;top:10px;z-index:500;min-height:40px;border-radius:12px;border:1px solid var(--edge);background:rgba(3,6,14,.82);color:var(--ink);font:800 14px "Rajdhani",sans-serif;padding:6px 12px;cursor:pointer}
+.mapmsg{position:absolute;left:10px;right:10px;top:58px;z-index:500;background:rgba(3,6,14,.85);border:1px solid rgba(255,184,107,.5);color:#ffe0bd;border-radius:12px;padding:6px 10px;font-size:13.5px;font-weight:700;text-align:center}
+.mapnone{position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;color:var(--dim);font-weight:700}
+.truckpin{transition:none}
+.truckpin .tk{position:relative;width:52px;height:40px}
+.truckpin .tk svg{display:block;width:52px;height:40px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
+.truckpin .tk.flip svg{transform:scaleX(-1)}
+.truckpin .tk::before{content:"";position:absolute;left:50%;top:60%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;box-shadow:0 0 0 0 rgba(255,209,102,.7);animation:tp 1.8s infinite}
+@keyframes tp{to{box-shadow:0 0 0 26px rgba(255,209,102,0)}}
+.homepin .hp{position:relative;width:40px;height:40px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:#2f7bff;border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.55)}
+.homepin .hp span{position:absolute;inset:0;display:grid;place-items:center;transform:rotate(45deg);font-size:19px}
+.homepin .hl{position:absolute;left:50%;top:44px;transform:translateX(-50%);white-space:nowrap;background:#fff;color:#0b1630;border-radius:99px;padding:0 8px;font:800 12.5px "Rajdhani",sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.4)}
 .mapctl{display:flex;gap:8px;margin-top:10px}
 .mapctl .btn{flex:1;min-height:44px;font-size:11.5px;padding:10px}
+.spd{display:flex;align-items:center;gap:10px;margin-top:8px}
+.spd>span{font-weight:700;font-size:14.5px;color:var(--silver);flex:none}
+.spd .seg{flex:1}
+.spd .seg button{min-height:40px;font-size:14px}
+.privacy{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;font-size:14.5px;color:var(--silver);font-weight:600}
+.privacy i{font-style:normal}
+.credits{color:var(--dim);font-size:12px;margin:6px 0 0;line-height:1.35}
 
 /* forms */
 .fld{display:block;margin:10px 0}
@@ -58,6 +98,21 @@ body{padding-bottom:30px}
 .rwi div small{display:block;color:var(--dim);font-weight:700}
 .rwi button{min-height:42px;padding:8px 12px;font-size:11px}
 .code{font-family:"Orbitron",sans-serif;font-size:20px;letter-spacing:.12em;background:#fff;color:#0b1630;border-radius:12px;padding:10px;text-align:center;margin-top:10px}
+
+/* visit punch card */
+.punch{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0 6px}
+.punch span{aspect-ratio:1;border-radius:50%;border:2px dashed #2f4a86;display:grid;place-items:center;font:900 15px "Orbitron",sans-serif;color:#4a6399;background:rgba(255,255,255,.02);transition:transform .3s,background .3s}
+.punch span.on{border:2px solid var(--gold);background:radial-gradient(circle at 40% 35%,#fff3c4,#ffd166 45%,#f2a93b);color:#3a1500;font-size:clamp(22px,7vw,30px);transform:scale(1.04)}
+.punch span.gift{border-color:var(--pink);color:var(--pink);font-size:20px}
+.bonus{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;margin-top:12px;font-weight:700;font-size:15px;line-height:1.25}
+.bonus.on{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.45);color:#c9f5e4}
+.bonus.off{background:rgba(255,184,107,.1);border:1px solid rgba(255,184,107,.55);color:#ffe0bd}
+.bonus i{font-style:normal;font-size:22px}
+.bonus span{flex:1}
+.bonus button{min-height:40px;padding:6px 12px;font-size:11px}
+.pick{margin-top:12px;padding:12px;border-radius:16px;border:1px solid var(--pink);background:rgba(255,143,196,.08);text-align:center}
+.pick p{margin:0 0 10px;font-weight:800;font-size:17px}
+.pick .row .btn{min-height:56px;font-size:13px}
 
 /* menu */
 .menu{display:grid;gap:8px}
@@ -94,42 +149,39 @@ body{padding-bottom:30px}
   <div class="logo" aria-hidden="true">🍦</div>
   <b>Paletas El Sol<small><span data-t="topSub">Truck alerts</span> <span class="tag">demo</span></small></b>
   <span class="sp"></span>
-  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true">EN</button><button data-lang="es" aria-pressed="false">ES</button></div>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">English</button><button data-lang="es" aria-pressed="false" lang="es">Español</button></div>
 </div></div>
 
 <main class="wrap">
   <section class="live" aria-live="polite">
     <span class="pulse" data-t="onRoute">On route now</span>
-    <div class="st" id="status">Truck is <em>0.9 mi</em> away · 12 min</div>
+    <div class="eta" id="eta" data-s="way">
+      <span class="chip" id="etaState">On the way</span>
+      <div class="big" id="etaBig">Arriving in <b>~10 min</b></div>
+      <div class="dist" id="etaDist">1.2 mi away</div>
+    </div>
     <div class="sub" id="substatus" data-t="subStatus">We'll ring your phone when it's close.</div>
     <button class="btn gold" id="test" type="button" data-t="testBtn">🔔 Test the alert</button>
+    <div style="margin-top:10px"><button class="spk-btn" type="button" id="explain" aria-pressed="false" data-t="explain">🔊 What is this demo?</button></div>
   </section>
 
-  <div class="map" aria-label="Map showing the truck coming toward your street">
-    <svg viewBox="0 0 360 240" id="mapsvg">
-      <rect width="360" height="240" fill="#0b1733"/>
-      <g fill="#10224a">
-        <rect x="12" y="12" width="84" height="56" rx="6"/><rect x="112" y="12" width="84" height="56" rx="6"/><rect x="212" y="12" width="84" height="56" rx="6"/><rect x="312" y="12" width="40" height="56" rx="6"/>
-        <rect x="12" y="92" width="84" height="56" rx="6"/><rect x="112" y="92" width="84" height="56" rx="6"/><rect x="212" y="92" width="84" height="56" rx="6"/><rect x="312" y="92" width="40" height="56" rx="6"/>
-        <rect x="12" y="172" width="84" height="56" rx="6"/><rect x="112" y="172" width="84" height="56" rx="6"/><rect x="212" y="172" width="84" height="56" rx="6"/><rect x="312" y="172" width="40" height="56" rx="6"/>
-      </g>
-      <rect x="236" y="104" width="44" height="34" rx="6" fill="#163a2a"/><text x="258" y="126" text-anchor="middle" font-size="14">🌳</text>
-      <g stroke="#1f3a72" stroke-width="10" stroke-linecap="round" fill="none">
-        <path d="M0 80H360M0 160H360M104 0V240M204 0V240M304 0V240"/>
-      </g>
-      <circle id="zone" cx="154" cy="160" r="60" fill="rgba(255,209,102,.07)" stroke="rgba(255,209,102,.45)" stroke-dasharray="4 5"/>
-      <path id="route" d="M-10 80 H104 V160 H360" fill="none" stroke="rgba(63,169,255,.55)" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round"/>
-      <g id="home" transform="translate(154 160)">
-        <circle r="13" fill="#2f7bff" opacity=".25"/><circle r="7" fill="#3fa9ff" stroke="#fff" stroke-width="2"/>
-      </g>
-      <text x="154" y="186" text-anchor="middle" font-family="Rajdhani,Arial" font-weight="700" font-size="12" fill="#c9d3e6" id="youLbl" data-t="you">You</text>
-      <g id="truck"><circle r="15" fill="#ffd166"/><text y="6" text-anchor="middle" font-size="17">🚚</text></g>
-    </svg>
+  <div class="map" data-t-aria="mapAria" aria-label="Live map: your house and the ice cream truck">
+    <div id="lmap"></div>
+    <div class="mapchip" id="mapChip" aria-hidden="true">🚚 <b>~10 min</b> · 1.2 mi</div>
+    <button type="button" id="recenter" data-t="recenter">◎ Recenter</button>
+    <div class="mapmsg" id="mapMsg" hidden></div>
   </div>
+  <p class="privacy"><i aria-hidden="true">🔒</i><span data-t="privacyMap">Your house pin is saved only on your phone. The truck never sees your address. (A free map service draws the route.)</span></p>
+  <p class="note" id="homeMsg" aria-live="polite"></p>
   <div class="mapctl">
     <button class="btn ghost" id="replay" type="button" data-t="replay">↺ Replay the route</button>
     <button class="btn ghost" id="faster" type="button" data-t="faster">⏩ Bring it closer</button>
   </div>
+  <div class="spd">
+    <span data-t="speedL">Demo speed</span>
+    <div class="seg" id="speed" role="group"><button type="button" data-x="1" aria-pressed="false" data-t="speed1">1x real time</button><button type="button" data-x="10" aria-pressed="true" data-t="speed10">10x (demo)</button></div>
+  </div>
+  <p class="credits" data-t="mapCredits">Map © OpenStreetMap contributors (ODbL). Street routing: OSRM. Address search: Nominatim.</p>
 
   <section class="s" id="join">
     <header><p class="kick" data-t="joinKick">Step 1</p><h2 class="chrome" data-t="joinH">Join in 10 seconds</h2></header>
@@ -163,6 +215,20 @@ body{padding-bottom:30px}
 
   <section class="s" id="points">
     <header><p class="kick" data-t="ptsKick">Your points</p><h2 class="chrome" data-t="ptsH">Points + rewards</h2></header>
+    <div class="card" id="visitCard">
+      <p class="kick" data-t="vKick">Visit card</p>
+      <h3 data-t="vH">5 visits = a treat on us</h3>
+      <div class="punch" id="punch" aria-hidden="true"></div>
+      <p class="note" id="vNext" aria-live="polite"></p>
+      <button class="btn gold" id="checkin" type="button" style="width:100%" data-t="checkBtn">📍 Check in at the truck</button>
+      <p class="note" data-t="checkNote">For real, you scan the QR on the truck: one check-in per truck visit. In this demo you can tap as much as you like.</p>
+      <div class="pick" id="pick" hidden>
+        <p data-t="pickH">🎉 5th visit! Pick your treat:</p>
+        <div class="row"><button class="btn primary" id="pick10" type="button" data-t="pick10">🏷️ 10% off</button><button class="btn primary" id="pickScoop" type="button" data-t="pickScoop">🍦 Extra scoop free</button></div>
+      </div>
+      <div id="vCodeBox" hidden><p class="note" data-t="codeL" style="margin:10px 0 0">Show this to the driver:</p><div class="code" id="vCode"></div></div>
+      <div class="bonus" id="bonus" aria-live="polite"></div>
+    </div>
     <div class="card">
       <div class="pts"><b id="ptsN">0</b><span data-t="ptsL">points</span></div>
       <div class="bar"><i id="ptsBar"></i></div>
@@ -214,8 +280,22 @@ window.T = {
 en: {
   _title: "Paletas El Sol: Truck Alerts", you: "You",
   topSub: "Truck alerts", onRoute: "On route now",
-  status: "Truck is <em>{d} mi</em> away · {m} min", statusHere: "The truck is <em>on your street!</em>", statusGone: "The truck passed. Next round soon.",
+  stWay: "🚚 On the way", stStop: "🍦 Stopped to sell", stAlmost: "⏰ Almost here", stHere: "🎶 On your street", stGone: "👋 Truck has left",
+  etaIn: "Arriving in <b>~{m} min</b>", etaSoon: "Arriving in <b>under 1 min</b>", etaHere: "Truck is <b>here!</b>", etaGone: "Next round <b>soon</b>",
+  etaDist: "{d} mi away", etaDistStop: "{d} mi away <span>· selling at a stop</span>", etaDistHere: "Truck is on your street! Walk out now 🏃", etaDistGone: "{d} mi past your house",
+  chip: "🚚 <b>~{m} min</b> · {d} mi", chipSoon: "🚚 <b>&lt;1 min</b> · {d} mi", chipHere: "🚚 <b>Here!</b>", chipGone: "🚚 Left",
+  mapAria: "Live map: your house and the ice cream truck", recenter: "◎ Recenter", homeLbl: "Your house",
+  privacyMap: "Your house pin is saved only on your phone. The truck never sees your address. (A free map service draws the route.)",
+  homeSample: "📍 Showing a sample street in South Gate. Tap <b>Allow location</b> or <b>Type my street</b> below to put the pin on your house.",
+  homeGps: "🏠 Pin set from your location (saved on this phone only).", homeTyped: "🏠 Pin set: {s}", homeFinding: "Finding {s} on the map…",
+  homeNotFound: "Couldn't find that street. The map still shows your last pin.",
+  routeStraight: "Street routing is offline, so the path is approximate.", mapOff: "The map couldn't load, but the arrival time still works.",
+  speedL: "Demo speed", speed1: "1x real time", speed10: "10x (demo)",
+  toastSpeed1: "Real time: the truck drives at about 10 mph.", toastSpeed10: "10x demo speed: 1 minute passes in 6 seconds.",
+  mapCredits: "Map © OpenStreetMap contributors (ODbL). Street routing: OSRM. Address search: Nominatim.",
   subStatus: "We'll ring your phone when it's close.",
+  explain: "🔊 What is this demo?", explainStop: "⏹ Stop",
+  explainSay: "This is a demo of what your customers see on their phone. Paletas El Sol is a made-up truck. At the top is a live map with a GPS pin on their house and the ice cream truck driving toward it on real streets, with the arrival time, like arriving in six minutes, counting down so they know exactly when to walk out. Tap Test the alert to hear the jingle that rings their phone when the truck is close. Scroll down to see how they join in ten seconds and check in at your truck. Every fifth visit, they pick ten percent off or an extra scoop free. If they keep their truck alerts on, they get five bonus points every visit, so they keep the alerts on and you keep ringing their phone. They also collect points, check your menu, and control their alerts. Your truck gets its own name, colors and menu.",
   testBtn: "🔔 Test the alert", replay: "↺ Replay the route", faster: "⏩ Bring it closer",
   joinKick: "Step 1", joinH: "Join in 10 seconds", nameL: "Your first name", namePh: "Maria",
   joinBtn: "Join + get 10 free points", joinNote: "Demo only: nothing is sent anywhere. It stays on this phone.",
@@ -228,6 +308,14 @@ en: {
   streetOk: "✅ Saved: {s}",
   iosKick: "Step 3 · iPhone", iosH: "Turn on alerts",
   iosP: "On iPhone, tap <b>Share</b> (the square with the arrow) → <b>Add to Home Screen</b> → open it from your Home Screen and allow notifications. That's Apple's rule for alerts. On Android, just tap \"Allow\" when it asks.",
+  vKick: "Visit card", vH: "5 visits = a treat on us",
+  vNext: "{n} more visits to your treat", vLast: "1 more visit to your treat!", vReady: "Your 5th visit is in. Pick your treat below 👇",
+  checkBtn: "📍 Check in at the truck", checkNote: "For real, you scan the QR on the truck: one check-in per truck visit. In this demo you can tap as much as you like.",
+  pickH: "🎉 5th visit! Pick your treat:", pick10: "🏷️ 10% off", pickScoop: "🍦 Extra scoop free",
+  t10: "10% off", tScoop: "Extra scoop free",
+  toastVisit: "Visit {v} of 5 checked in! ✅", toastVisitBonus: "Visit {v} of 5 checked in! +5 alerts bonus 🔔", toastPick: "Treat unlocked. Show the code to the driver. Your card starts over.",
+  bonusOn: "<b>Alerts on:</b> +5 bonus points every visit", bonusOff: "<b>Alerts off:</b> you're missing +5 bonus points every visit", bonusFix: "Turn on",
+  toastAlertsOff: "Alerts off: no more +5 bonus per visit.", toastAlertsOn: "Alerts on: +5 bonus every visit 🔔",
   ptsKick: "Your points", ptsH: "Points + rewards", ptsL: "points",
   ptsNext: "{n} more points to {r}", ptsAll: "You can get every reward. Nice!",
   buyBtn: "🧾 Pretend I bought something (+10)", buyNote: "For real, the driver scans your code at the window.",
@@ -254,8 +342,22 @@ en: {
 es: {
   _title: "Paletas El Sol: Alertas del Troque", you: "Tú",
   topSub: "Alertas del troque", onRoute: "En ruta ahorita",
-  status: "El troque está a <em>{d} mi</em> · {m} min", statusHere: "¡El troque está <em>en tu calle!</em>", statusGone: "Ya pasó el troque. Pronto vuelve.",
+  stWay: "🚚 En camino", stStop: "🍦 Parado vendiendo", stAlmost: "⏰ Ya casi llega", stHere: "🎶 En tu calle", stGone: "👋 Ya se fue el troque",
+  etaIn: "Llega en <b>~{m} min</b>", etaSoon: "Llega en <b>menos de 1 min</b>", etaHere: "¡Ya <b>llegó!</b>", etaGone: "Pronto <b>vuelve</b>",
+  etaDist: "A {d} mi", etaDistStop: "A {d} mi <span>· vendiendo en una parada</span>", etaDistHere: "¡El troque está en tu calle! Sal ahorita 🏃", etaDistGone: "{d} mi después de tu casa",
+  chip: "🚚 <b>~{m} min</b> · {d} mi", chipSoon: "🚚 <b>&lt;1 min</b> · {d} mi", chipHere: "🚚 <b>¡Aquí!</b>", chipGone: "🚚 Se fue",
+  mapAria: "Mapa en vivo: tu casa y el troque de helados", recenter: "◎ Centrar", homeLbl: "Tu casa",
+  privacyMap: "El pin de tu casa solo se guarda en tu celular. El troque nunca ve tu dirección. (Un servicio de mapas gratis dibuja la ruta.)",
+  homeSample: "📍 Mostrando una calle de muestra en South Gate. Toca <b>Permitir ubicación</b> o <b>Escribir mi calle</b> abajo para poner el pin en tu casa.",
+  homeGps: "🏠 Pin puesto con tu ubicación (guardado solo en este celular).", homeTyped: "🏠 Pin puesto: {s}", homeFinding: "Buscando {s} en el mapa…",
+  homeNotFound: "No encontramos esa calle. El mapa sigue mostrando tu último pin.",
+  routeStraight: "Las calles no cargaron, así que el camino es aproximado.", mapOff: "El mapa no cargó, pero la hora de llegada sigue funcionando.",
+  speedL: "Velocidad del demo", speed1: "1x tiempo real", speed10: "10x (demo)",
+  toastSpeed1: "Tiempo real: el troque va a unas 10 millas por hora.", toastSpeed10: "Velocidad 10x: 1 minuto pasa en 6 segundos.",
+  mapCredits: "Mapa © colaboradores de OpenStreetMap (ODbL). Calles: OSRM. Búsqueda de direcciones: Nominatim.",
   subStatus: "Te sonamos el celular cuando esté cerca.",
+  explain: "🔊 ¿Qué es este demo?", explainStop: "⏹ Parar",
+  explainSay: "Este es un demo de lo que tus clientes ven en su celular. Paletas El Sol es un troque inventado. Arriba hay un mapa en vivo con un pin GPS en su casa y el troque de helados manejando hacia ella por calles reales, con la hora de llegada, como llega en seis minutos, contando para atrás para que sepan exactamente cuándo salir. Toca Probar la alerta para oír la musiquita que les suena en el celular cuando el troque está cerca. Baja para ver cómo se unen en diez segundos y registran su visita en tu troque. Cada quinta visita escogen diez por ciento de descuento o una bola extra gratis. Si dejan las alertas prendidas, ganan cinco puntos extra en cada visita, así que las dejan prendidas y tú les sigues sonando el celular. También juntan puntos, ven tu menú, y controlan sus alertas. Tu troque lleva su propio nombre, colores y menú.",
   testBtn: "🔔 Probar la alerta", replay: "↺ Repetir la ruta", faster: "⏩ Acercar el troque",
   joinKick: "Paso 1", joinH: "Únete en 10 segundos", nameL: "Tu nombre", namePh: "María",
   joinBtn: "Unirme + 10 puntos gratis", joinNote: "Solo es demo: no se manda nada a ningún lado. Se queda en este celular.",
@@ -268,6 +370,14 @@ es: {
   streetOk: "✅ Guardado: {s}",
   iosKick: "Paso 3 · iPhone", iosH: "Activa las alertas",
   iosP: "En iPhone, toca <b>Compartir</b> (el cuadrito con la flecha) → <b>Agregar a pantalla de inicio</b> → ábrela desde tu pantalla de inicio y permite las notificaciones. Es regla de Apple para las alertas. En Android, nomás toca \"Permitir\" cuando te pregunte.",
+  vKick: "Tarjeta de visitas", vH: "5 visitas = un antojo de regalo",
+  vNext: "Te faltan {n} visitas para tu premio", vLast: "¡Te falta 1 visita para tu premio!", vReady: "Ya llevas 5 visitas. Escoge tu premio abajo 👇",
+  checkBtn: "📍 Registrar visita al troque", checkNote: "En la vida real, escaneas el QR del troque: una visita por cada pasada del troque. En este demo puedes tocar las veces que quieras.",
+  pickH: "🎉 ¡Quinta visita! Escoge tu premio:", pick10: "🏷️ 10% de descuento", pickScoop: "🍦 Bola extra gratis",
+  t10: "10% de descuento", tScoop: "Bola extra gratis",
+  toastVisit: "¡Visita {v} de 5 registrada! ✅", toastVisitBonus: "¡Visita {v} de 5 registrada! +5 puntos por alertas 🔔", toastPick: "Premio listo. Enséñale el código al chofer. Tu tarjeta empieza de nuevo.",
+  bonusOn: "<b>Alertas prendidas:</b> +5 puntos extra en cada visita", bonusOff: "<b>Alertas apagadas:</b> te estás perdiendo +5 puntos extra en cada visita", bonusFix: "Prender",
+  toastAlertsOff: "Alertas apagadas: ya no ganas +5 puntos por visita.", toastAlertsOn: "Alertas prendidas: +5 puntos extra en cada visita 🔔",
   ptsKick: "Tus puntos", ptsH: "Puntos + premios", ptsL: "puntos",
   ptsNext: "Te faltan {n} puntos para {r}", ptsAll: "Ya te alcanza para todos los premios. ¡Bien!",
   buyBtn: "🧾 Hacer como que compré algo (+10)", buyNote: "En la vida real, el chofer escanea tu código en la ventanilla.",
@@ -292,14 +402,16 @@ es: {
   footLink: "Para dueños de troques: tenlo en tu troque →"
 }};
 </script>
-<script src="../lang.js"></script>
-<script src="../jingle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="../lang.js?v=20261011c"></script>
+<script src="../jingle.js?v=20261011c"></script>
+<script src="../speak.js?v=20261011c"></script>
 <script>
 (function () {
   "use strict";
   var $ = function (id) { return document.getElementById(id); };
   var KEY = "ssai:ice:demo";
-  var S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "" };
+  var S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "", visits: 0 };
   try { var saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved) for (var k in saved) S[k] = saved[k]; } catch (e) {}
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   var t = function (k) { return ICE.t(k); };
@@ -326,35 +438,291 @@ es: {
   $("silence").addEventListener("click", hide);
   $("coming").addEventListener("click", function () { hide(); toast(t("toastComing")); });
 
-  /* ---------- map + truck ---------- */
-  var route = $("route"), truck = $("truck"), LEN = route.getTotalLength();
-  var HOME = { x: 154, y: 160 };
-  var homeAt = (function () { var best = 0, bd = 1e9; for (var s = 0; s <= LEN; s += 1) { var p = route.getPointAtLength(s), dd = Math.hypot(p.x - HOME.x, p.y - HOME.y); if (dd < bd) { bd = dd; best = s; } } return best; })();
-  var MI_PER_PX = 0.9 / homeAt;        // start of route is 0.9 mi (by road) from home
-  var MPH_MIN = 0.075;                  // ~0.075 mi per minute with stops (≈4.5 mph): 0.3 mi ≈ 4 min
-  var pos = 0, speed = LEN / 60, rung = false, unlocked = false, lastTs = 0, statusKey = "";
-  function zoneR() { return S.dist / MI_PER_PX; }
-  function frame(ts) {
-    var dt = lastTs ? Math.min(0.1, (ts - lastTs) / 1000) : 0; lastTs = ts;
-    pos += speed * dt;
-    if (pos > LEN + 40) { pos = 0; rung = false; speed = LEN / 60; }
-    var p = route.getPointAtLength(Math.min(pos, LEN));
-    truck.setAttribute("transform", "translate(" + p.x.toFixed(1) + " " + p.y.toFixed(1) + ")");
-    var left = (homeAt - pos) * MI_PER_PX;
-    var st;
-    if (left > 0.04) {
-      var mins = Math.max(1, Math.round(left / MPH_MIN));
-      st = fmt(t("status"), { d: dec(left), m: mins });
-      if (!rung && left <= S.dist) { rung = true; if (unlocked) ring(left, mins); else toast(fmt(t("nBody"), { d: dec(left), m: mins })); }
-    } else if (left > -0.12) st = t("statusHere");
-    else st = t("statusGone");
-    if (st !== statusKey) { $("status").innerHTML = st; statusKey = st; }
-    requestAnimationFrame(frame);
+  /* ---------- live map: house pin + truck on real streets + arrival time ---------- */
+  var MI = 1609.344;
+  var AVG_MPH = 10;             // ice cream trucks crawl: ~8–12 mph while rolling
+  var STOP_EVERY = 0.2 * MI;    // they pull over to sell every few blocks…
+  var STOP_SEC = 20;            // …for about 20 seconds
+  var HOME_STOP_SEC = 90;       // and sit on your street for ~1.5 min
+  var HERE_M = 60, GONE_M = 110; // "on your street" window around the house (meters along the route)
+  var SAMPLE_HOME = { lat: 33.95155, lng: -118.20330 }; // sample residential block in South Gate, CA
+  var OSRM = "https://router.project-osrm.org/route/v1/driving/";
+  var NOMINATIM = "https://nominatim.openstreetmap.org/search";
+  var esc = function (x) { return String(x).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); };
+
+  function hav(a, b) {
+    var r = Math.PI / 180, dLa = (b[0] - a[0]) * r, dLo = (b[1] - a[1]) * r;
+    var x = Math.sin(dLa / 2) * Math.sin(dLa / 2) + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLo / 2) * Math.sin(dLo / 2);
+    return 12742000 * Math.asin(Math.min(1, Math.sqrt(x)));
   }
-  requestAnimationFrame(frame);
-  $("replay").addEventListener("click", function () { unlocked = true; pos = 0; rung = false; speed = LEN / 60; });
-  $("faster").addEventListener("click", function () { unlocked = true; var target = homeAt - (S.dist + 0.06) / MI_PER_PX; if (pos < target) { pos = target; rung = false; } speed = LEN / 30; });
+  function timedFetch(url, ms) {
+    var ctl = window.AbortController ? new AbortController() : null, id, o = { headers: { "Accept": "application/json" } };
+    if (ctl) { o.signal = ctl.signal; id = setTimeout(function () { ctl.abort(); }, ms); }
+    return fetch(url, o).then(function (r) { clearTimeout(id); if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); },
+      function (e) { clearTimeout(id); throw e; });
+  }
+
+  /* route = { line:[[lat,lng]…], cum:[meters…], total, homeAt (meters from start to the house), snapped } */
+  function mkRoute(line, snapped, homePt, hint) {
+    var cum = [0];
+    for (var i = 1; i < line.length; i++) cum.push(cum[i - 1] + hav(line[i - 1], line[i]));
+    var r = { line: line, cum: cum, total: cum[cum.length - 1], snapped: snapped, homeAt: 0 };
+    r.homeAt = project(r, homePt, hint).along;
+    return r;
+  }
+  // nearest point on the route to p; "hint" keeps it from jumping to a far part of the route that doubles back
+  function project(r, p, hint) {
+    var k = Math.cos(p[0] * Math.PI / 180) * 111320, best = null;
+    for (var i = 1; i < r.line.length; i++) {
+      var a = r.line[i - 1], b = r.line[i];
+      var ax = (a[1] - p[1]) * k, ay = (a[0] - p[0]) * 110540, bx = (b[1] - p[1]) * k, by = (b[0] - p[0]) * 110540;
+      var dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy, u = L2 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / L2)) : 0;
+      var cx = ax + u * dx, cy = ay + u * dy, d = Math.sqrt(cx * cx + cy * cy), along = r.cum[i - 1] + u * (r.cum[i] - r.cum[i - 1]);
+      var score = d + (hint != null ? Math.abs(along - hint) * 0.15 : 0);
+      if (!best || score < best.score) best = { score: score, d: d, along: along };
+    }
+    return best || { d: 0, along: 0 };
+  }
+  function pointAt(r, s) {
+    s = Math.max(0, Math.min(r.total, s));
+    var lo = 0, hi = r.cum.length - 1;
+    while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (r.cum[mid] <= s) lo = mid; else hi = mid; }
+    var a = r.line[lo], b = r.line[hi], seg = r.cum[hi] - r.cum[lo], u = seg ? (s - r.cum[lo]) / seg : 0;
+    return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u];
+  }
+  // the truck starts ~1 mi away (by road) and keeps going ~0.3 mi past the house
+  function ends(h) { return { s: [h.lat + 0.0105, h.lng - 0.0085], e: [h.lat - 0.0042, h.lng + 0.0034] }; }
+  // offline fallback: a gently curved path, never a broken demo
+  function curvedRoute(h) {
+    var E = ends(h), H = [h.lat, h.lng], line = [];
+    function bez(a, b, bend, n, skipFirst) {
+      var mx = (a[0] + b[0]) / 2 - (b[1] - a[1]) * bend, my = (a[1] + b[1]) / 2 + (b[0] - a[0]) * bend;
+      for (var i = skipFirst ? 1 : 0; i <= n; i++) { var t = i / n, q = 1 - t; line.push([q * q * a[0] + 2 * q * t * mx + t * t * b[0], q * q * a[1] + 2 * q * t * my + t * t * b[1]]); }
+    }
+    bez(E.s, H, 0.18, 48, false); bez(H, E.e, -0.12, 16, true);
+    return mkRoute(line, false, H, null);
+  }
+  function buildRoute(h) {
+    var E = ends(h), H = [h.lat, h.lng];
+    var url = OSRM + [E.s, H, E.e].map(function (p) { return p[1].toFixed(6) + "," + p[0].toFixed(6); }).join(";") + "?overview=full&geometries=geojson";
+    if (!window.fetch) return Promise.resolve(curvedRoute(h));
+    return timedFetch(url, 12000).then(function (j) {
+      if (!j || j.code !== "Ok" || !j.routes || !j.routes[0] || !j.routes[0].geometry) throw new Error("no route");
+      var line = j.routes[0].geometry.coordinates.map(function (c) { return [c[1], c[0]]; });
+      var wp = j.waypoints && j.waypoints[1] ? [j.waypoints[1].location[1], j.waypoints[1].location[0]] : H;
+      var legs = j.routes[0].legs || [], r = mkRoute(line, true, wp, legs[0] ? legs[0].distance : null);
+      if (line.length < 2 || r.total > 6 * MI || r.homeAt < 0.25 * MI) throw new Error("odd route");
+      return r;
+    }).catch(function () { return curvedRoute(h); });
+  }
+
+  /* ---------- TruckFeed: the ONLY source of truck positions. The UI just listens. ----------
+     TruckFeed.on(fn) → fn({ lat, lng, t, stopped?, stopLeft?, lap? }) on every update.
+     • simulate (used now): drives a truck along a planned street route at ice-cream-truck speed, with selling stops.
+     • live (stub, not wired yet): see TruckFeed.live below. Going live = call TruckFeed.live.start(id) instead of
+       TruckFeed.simulate.start(route). Nothing in the UI changes. */
+  var TruckFeed = {
+    mode: "simulate", subs: [], last: null,
+    on: function (fn) { this.subs.push(fn); },
+    emit: function (u) { this.last = u; for (var i = 0; i < this.subs.length; i++) this.subs[i](u); },
+
+    simulate: {
+      route: null, s: 0, x: 10, stopLeft: 0, stops: [], next: 0, lap: 0, endWait: 0, timer: 0, ts: 0,
+      start: function (route) {
+        var self = this; this.route = route; TruckFeed.mode = "simulate"; this.reset();
+        if (!this.timer) this.timer = setInterval(function () { self.tick(); }, 100);
+      },
+      stop: function () { clearInterval(this.timer); this.timer = 0; },
+      reset: function () {
+        var r = this.route, st = [];
+        for (var d = STOP_EVERY; d < r.total; d += STOP_EVERY) if (Math.abs(d - r.homeAt) > 0.08 * MI) st.push({ at: d, dur: STOP_SEC });
+        st.push({ at: r.homeAt, dur: HOME_STOP_SEC });
+        st.sort(function (a, b) { return a.at - b.at; });
+        this.stops = st; this.next = 0; this.s = 0; this.stopLeft = 0; this.endWait = 0; this.lap++; this.ts = Date.now(); this.send();
+      },
+      setSpeed: function (x) { this.x = x; },
+      jumpTo: function (s) {
+        if (s <= this.s) return;
+        this.s = s; this.stopLeft = 0;
+        while (this.next < this.stops.length && this.stops[this.next].at <= s) this.next++;
+        this.send();
+      },
+      mph: function (s) { return AVG_MPH + 2 * Math.sin(s / 140); }, // wobbles between 8 and 12 mph
+      tick: function () {
+        var now = Date.now(), real = Math.min(1, (now - this.ts) / 1000), dt = real * this.x, r = this.route;
+        this.ts = now;
+        if (this.endWait > 0) { this.endWait -= real; if (this.endWait <= 0) this.reset(); return; }
+        while (dt > 0 && this.s < r.total) {
+          if (this.stopLeft > 0) { var w = Math.min(dt, this.stopLeft); this.stopLeft -= w; dt -= w; continue; }
+          var v = this.mph(this.s) * MI / 3600, go = v * dt, nx = this.stops[this.next];
+          if (nx && this.s + go >= nx.at) { dt -= (nx.at - this.s) / v; this.s = nx.at; this.stopLeft = nx.dur; this.next++; }
+          else { this.s += go; dt = 0; }
+        }
+        if (this.s >= r.total) { this.s = r.total; this.endWait = 6; }
+        this.send();
+      },
+      send: function () {
+        var p = pointAt(this.route, this.s);
+        TruckFeed.emit({ lat: p[0], lng: p[1], t: Date.now(), stopped: this.stopLeft > 0, stopLeft: this.stopLeft, lap: this.lap });
+      }
+    },
+
+    /* LIVE MODE (stub — no backend yet, so it is never started):
+       1. Driver's phone (driver app): navigator.geolocation.watchPosition → POST {lat, lng, t} every 5–10 s to a backend,
+          e.g. ~/dev/antidote-cloud on Railway (POST /api/trucks/:id/ping) or a Firebase Realtime DB path trucks/:id.
+       2. Customer app (this page): poll GET /api/trucks/:id/latest every 5 s (or subscribe with SSE / Firebase onValue)
+          and pass each fix to TruckFeed.emit({ lat, lng, t }).
+       3. The UI's ETA math already works from lat/lng alone; with a live truck, refresh the truck→house OSRM route every ~30 s. */
+    live: {
+      url: null, timer: 0, // e.g. "https://<antidote-cloud>.up.railway.app/api/trucks/" (set when the backend exists)
+      start: function (truckId) {
+        if (!this.url) return false; // no backend yet: keep the simulation
+        var self = this; TruckFeed.mode = "live"; TruckFeed.simulate.stop();
+        this.timer = setInterval(function () {
+          timedFetch(self.url + encodeURIComponent(truckId) + "/latest", 8000).then(function (p) {
+            if (p && isFinite(p.lat) && isFinite(p.lng)) TruckFeed.emit({ lat: +p.lat, lng: +p.lng, t: +p.t || Date.now() });
+          }).catch(function () {});
+        }, 5000);
+        return true;
+      },
+      stop: function () { clearInterval(this.timer); this.timer = 0; }
+    }
+  };
+
+  /* ---------- the customer's map (only consumes TruckFeed updates) ---------- */
+  var home = S.home && isFinite(S.home.lat) ? { lat: S.home.lat, lng: S.home.lng } : { lat: SAMPLE_HOME.lat, lng: SAMPLE_HOME.lng };
+  var R = null, prog = 0, lap = -1, rung = false, unlocked = false, lastU = null, prevLng = null, routeSeq = 0;
+  var map = null, homeMk = null, truckMk = null, zoneC = null, fullLine = null, leftLine = null, userMoved = false, lastFit = 0;
+
+  function truckHtml() {
+    return '<div class="tk"><svg viewBox="0 0 52 40" aria-hidden="true">' +
+      '<circle cx="19" cy="6" r="5" fill="#ff8fc4" stroke="#fff" stroke-width="1"/><path d="M14.5 9.5h9L19 15z" fill="#f2a93b"/>' +
+      '<rect x="3" y="14" width="32" height="18" rx="3" fill="#fff" stroke="#0b1630" stroke-width="1.5"/>' +
+      '<rect x="8" y="17" width="16" height="7" rx="1.5" fill="#3fa9ff"/><rect x="3" y="26" width="32" height="3" fill="#ff8fc4"/>' +
+      '<path d="M35 18h8l6 6.5V32H35z" fill="#ffd166" stroke="#0b1630" stroke-width="1.5"/><path d="M37.5 20.5h4.8l3.6 4h-8.4z" fill="#9fd8ff"/>' +
+      '<circle cx="12" cy="33" r="4" fill="#0b1630" stroke="#c9d3e6" stroke-width="1.5"/><circle cx="41" cy="33" r="4" fill="#0b1630" stroke="#c9d3e6" stroke-width="1.5"/>' +
+      '</svg></div>';
+  }
+  function homeIcon() {
+    return L.divIcon({ className: "homepin", iconSize: [40, 40], iconAnchor: [20, 48],
+      html: '<div class="hp"><span>🏠</span></div><div class="hl">' + esc(t("homeLbl")) + '</div>' });
+  }
+  function mapMsg(k) { var m = $("mapMsg"); if (!k) { m.hidden = true; return; } m.textContent = t(k); m.hidden = false; m.setAttribute("data-k", k); }
+  function initMap() {
+    if (!window.L) { var n = document.createElement("div"); n.className = "mapnone"; n.setAttribute("data-t", "mapOff"); n.textContent = t("mapOff"); $("lmap").appendChild(n); $("recenter").hidden = true; return; }
+    map = L.map("lmap", { zoomControl: false, attributionControl: true }).setView([home.lat, home.lng], 15);
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
+    // OpenStreetMap tiles, darkened with a CSS filter (.osmdark) to match the page
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, className: "osmdark",
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).addTo(map);
+    zoneC = L.circle([home.lat, home.lng], { radius: S.dist * MI, color: "#ffd166", weight: 1.5, opacity: .6, dashArray: "4 6", fillColor: "#ffd166", fillOpacity: .06, interactive: false }).addTo(map);
+    fullLine = L.polyline([], { color: "#3fa9ff", weight: 5, opacity: .25, interactive: false }).addTo(map);
+    leftLine = L.polyline([], { color: "#ffd166", weight: 4, opacity: .95, dashArray: "1 9", lineCap: "round", interactive: false }).addTo(map);
+    homeMk = L.marker([home.lat, home.lng], { icon: homeIcon(), keyboard: false, interactive: false, zIndexOffset: 500 }).addTo(map);
+    map.on("dragstart", function () { userMoved = true; });
+  }
+  function fit(anim) {
+    if (!map) return;
+    var pts = [[home.lat, home.lng]];
+    if (lastU) pts.push([lastU.lat, lastU.lng]);
+    lastFit = Date.now();
+    if (pts.length < 2 || hav(pts[0], pts[1]) < 120) { map.setView(pts[0], 17, { animate: !!anim }); return; }
+    map.fitBounds(L.latLngBounds(pts), { paddingTopLeft: [40, $("mapMsg").hidden ? 70 : 120], paddingBottomRight: [40, 40], maxZoom: 17, animate: !!anim });
+  }
+  $("recenter").addEventListener("click", function () { userMoved = false; fit(true); });
+
+  function placeHome() {
+    if (!map) return;
+    homeMk.setLatLng([home.lat, home.lng]); zoneC.setLatLng([home.lat, home.lng]);
+  }
+  function loadRoute() {
+    var my = ++routeSeq;
+    return buildRoute(home).then(function (r) {
+      if (my !== routeSeq) return;
+      R = r; prog = 0; lap = -1;
+      mapMsg(r.snapped ? "" : "routeStraight");
+      if (fullLine) fullLine.setLatLngs(r.line);
+      TruckFeed.simulate.start(r);
+      userMoved = false; fit(false);
+    });
+  }
+  function renderHomeMsg() {
+    var m = $("homeMsg"), h = S.home;
+    if (!h || !isFinite(h.lat)) m.innerHTML = t("homeSample");
+    else if (h.src === "typed") m.textContent = fmt(t("homeTyped"), { s: h.label || "" });
+    else m.textContent = t("homeGps");
+  }
+  function setHome(lat, lng, src, label) {
+    home = { lat: +(+lat).toFixed(5), lng: +(+lng).toFixed(5) };
+    S.home = { lat: home.lat, lng: home.lng, src: src, label: label || "" }; save(); // saved on this phone only
+    renderHomeMsg(); placeHome(); return loadRoute();
+  }
+
+  function etaSec(leftM, u) { // remaining road distance ÷ average speed + the selling stops still ahead
+    var stops = Math.floor(Math.max(0, leftM - 1) / STOP_EVERY);
+    return leftM / MI / AVG_MPH * 3600 + stops * STOP_SEC + (u.stopped ? (u.stopLeft != null ? u.stopLeft : STOP_SEC / 2) : 0);
+  }
+  function miles(m) { return dec(Math.max(0.1, Math.abs(m) / MI)); }
+  var shown = {};
+  function setHTML(id, html) { if (shown[id] !== html) { $(id).innerHTML = html; shown[id] = html; } }
+
+  function render(u) {
+    var p = [u.lat, u.lng], left;
+    if (R) { var pr = project(R, p, prog); prog = pr.along; left = R.homeAt - prog; }
+    else left = hav(p, [home.lat, home.lng]) * 1.3; // live truck before a route exists: straight line × road factor
+    var eta = etaSec(Math.max(0, left), u), mins = Math.max(1, Math.round(eta / 60)), state, big, dist, chip, label;
+    if (left > HERE_M) {
+      state = eta <= 120 ? "almost" : "way";
+      label = state === "almost" ? "stAlmost" : (u.stopped ? "stStop" : "stWay");
+      big = eta < 60 ? t("etaSoon") : fmt(t("etaIn"), { m: mins });
+      dist = fmt(t(u.stopped ? "etaDistStop" : "etaDist"), { d: miles(left) });
+      chip = fmt(t(eta < 60 ? "chipSoon" : "chip"), { m: mins, d: miles(left) });
+    } else if (left > -GONE_M) { state = "here"; label = "stHere"; big = t("etaHere"); dist = t("etaDistHere"); chip = t("chipHere"); }
+    else { state = "gone"; label = "stGone"; big = t("etaGone"); dist = fmt(t("etaDistGone"), { d: miles(left) }); chip = t("chipGone"); }
+    $("eta").setAttribute("data-s", state);
+    setHTML("etaState", t(label)); setHTML("etaBig", big); setHTML("etaDist", dist); setHTML("mapChip", chip);
+    // ring once per pass: at "almost here" (≤ 2 min) or inside the distance picked in Settings
+    if (!rung && left > -GONE_M && (state === "almost" || state === "here" || left <= S.dist * MI)) {
+      rung = true;
+      var dm = Math.max(0, left) / MI;
+      if (unlocked) ring(dm, mins); else toast(fmt(t("nBody"), { d: dec(dm), m: mins }));
+    }
+    if (!map) return;
+    if (!truckMk) truckMk = L.marker(p, { icon: L.divIcon({ className: "truckpin", html: truckHtml(), iconSize: [52, 40], iconAnchor: [26, 30] }), keyboard: false, interactive: false, zIndexOffset: 1000 }).addTo(map);
+    else truckMk.setLatLng(p);
+    if (prevLng != null && Math.abs(u.lng - prevLng) > 1e-6) { var el = truckMk.getElement(); if (el) el.firstChild.classList.toggle("flip", u.lng < prevLng); }
+    prevLng = u.lng;
+    if (R && left > 0) { // dashed: the part of the route still to drive to your house
+      var pts = [p];
+      for (var i = 0; i < R.line.length; i++) if (R.cum[i] > prog && R.cum[i] < R.homeAt) pts.push(R.line[i]);
+      pts.push(pointAt(R, R.homeAt)); leftLine.setLatLngs(pts);
+    } else leftLine.setLatLngs([]);
+    if (!userMoved && Date.now() - lastFit > 4000) {
+      var b = map.getBounds();
+      if (!b.contains(p) || Date.now() - lastFit > 8000) fit(true);
+    }
+  }
+  TruckFeed.on(function (u) {
+    if (u.lap != null && u.lap !== lap) { lap = u.lap; rung = false; prog = 0; if (lap > 1 && !userMoved) setTimeout(function () { fit(true); }, 50); }
+    lastU = u; render(u);
+  });
+
+  $("replay").addEventListener("click", function () { unlocked = true; if (!R) return; userMoved = false; TruckFeed.simulate.reset(); fit(true); });
+  $("faster").addEventListener("click", function () {
+    unlocked = true; if (!R) return;
+    var target = R.homeAt - Math.max(S.dist * MI + 100, 0.3 * MI);
+    if (prog < target) { rung = false; TruckFeed.simulate.jumpTo(target); }
+    userMoved = false; fit(true);
+  });
+  function renderSpeed() { [].forEach.call($("speed").children, function (b) { b.setAttribute("aria-pressed", +b.getAttribute("data-x") === TruckFeed.simulate.x ? "true" : "false"); }); }
+  $("speed").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    var x = +b.getAttribute("data-x"); TruckFeed.simulate.setSpeed(x); renderSpeed(); toast(t(x === 1 ? "toastSpeed1" : "toastSpeed10"));
+  });
   document.addEventListener("pointerdown", function () { unlocked = true; }, { once: true });
+  window.IceDemo = { feed: TruckFeed, get route() { return R; }, get progress() { return prog; } }; // handy for testing
+
+  initMap(); renderHomeMsg(); renderSpeed(); loadRoute();
 
   /* ---------- join ---------- */
   function showJoin() {
@@ -365,16 +733,29 @@ es: {
     e.preventDefault(); S.name = $("name").value.trim().slice(0, 30); if (!S.joined) { S.joined = true; S.pts += 10; } save(); showJoin(); renderPts(); toast(t("toastBuy"));
   });
 
-  /* ---------- location ---------- */
+  /* ---------- location → the house pin (saved on this phone only) ---------- */
   $("locBtn").addEventListener("click", function () {
     var m = $("locMsg");
     if (!navigator.geolocation) { m.textContent = t("locNA"); $("streetFld").hidden = false; return; }
     m.textContent = t("locAsking");
-    navigator.geolocation.getCurrentPosition(function () { m.textContent = t("locOk"); S.street = "gps"; save(); },
-      function () { m.textContent = t("locNo"); }, { timeout: 12000, maximumAge: 600000 });
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      m.textContent = t("locOk"); S.street = "gps"; setHome(pos.coords.latitude, pos.coords.longitude, "gps");
+    }, function () { m.textContent = t("locNo"); }, { timeout: 12000, maximumAge: 600000 });
   });
   $("typeBtn").addEventListener("click", function () { $("streetFld").hidden = false; $("street").focus(); });
-  $("street").addEventListener("change", function () { var v = this.value.trim(); if (v) { S.street = v; save(); $("locMsg").textContent = fmt(t("streetOk"), { s: v }); } });
+  var geoBusy = false;
+  $("street").addEventListener("change", function () {
+    var v = this.value.trim(); if (!v || geoBusy) return;
+    S.street = v; save(); $("locMsg").textContent = fmt(t("streetOk"), { s: v });
+    if (!window.fetch) return;
+    geoBusy = true; $("homeMsg").textContent = fmt(t("homeFinding"), { s: v });
+    var url = NOMINATIM + "?format=jsonv2&limit=1&countrycodes=us&viewbox=-118.95,34.35,-117.6,33.65&accept-language=" + ICE.lang + "&q=" + encodeURIComponent(v);
+    timedFetch(url, 12000).then(function (j) {
+      geoBusy = false;
+      if (j && j[0] && isFinite(+j[0].lat)) { setHome(+j[0].lat, +j[0].lon, "typed", v); location.hash = ""; $("lmap").scrollIntoView({ behavior: "smooth", block: "center" }); }
+      else $("homeMsg").textContent = t("homeNotFound");
+    }).catch(function () { geoBusy = false; $("homeMsg").textContent = t("homeNotFound"); });
+  });
 
   /* ---------- points ---------- */
   var REW = [{ k: "r1", c: 30, e: "🪙" }, { k: "r2", c: 50, e: "💵" }, { k: "r3", c: 80, e: "🌶️" }, { k: "r4", c: 100, e: "🍓" }];
@@ -404,6 +785,40 @@ es: {
     S.pts += 10; save(); renderPts(); toast(t("toastBuy"));
   });
 
+  /* ---------- visit card: 5 check-ins -> 10% off or an extra scoop; alerts on = +5 bonus per visit ---------- */
+  function renderVisits() {
+    var v = Math.min(5, S.visits || 0), box = $("punch"); box.innerHTML = "";
+    for (var n = 1; n <= 5; n++) {
+      var c = document.createElement("span");
+      if (n <= v) { c.className = "on"; c.textContent = "🍦"; } else if (n === 5) { c.className = "gift"; c.textContent = "🎁"; } else c.textContent = n;
+      box.appendChild(c);
+    }
+    $("vNext").textContent = v >= 5 ? t("vReady") : (5 - v === 1 ? t("vLast") : fmt(t("vNext"), { n: 5 - v }));
+    $("pick").hidden = v < 5; $("checkin").style.display = v >= 5 ? "none" : "";
+    var b = $("bonus");
+    b.className = "bonus " + (S.alerts ? "on" : "off");
+    b.innerHTML = '<i aria-hidden="true">' + (S.alerts ? "🔔" : "🔕") + '</i><span>' + t(S.alerts ? "bonusOn" : "bonusOff") + '</span>' +
+      (S.alerts ? "" : '<button type="button" class="btn gold" id="bonusFix">' + t("bonusFix") + '</button>');
+    if (!S.alerts) $("bonusFix").addEventListener("click", function () { setAlerts(true); });
+  }
+  function setAlerts(on) { S.alerts = on; save(); renderSet(); renderVisits(); toast(t(on ? "toastAlertsOn" : "toastAlertsOff")); }
+  $("checkin").addEventListener("click", function () {
+    if (!S.joined) { toast(t("toastJoin")); location.hash = "join"; return; }
+    if ((S.visits || 0) >= 5) return;
+    S.visits = (S.visits || 0) + 1;
+    if (S.alerts) S.pts += 5;
+    save(); renderVisits(); renderPts(); $("vCodeBox").hidden = true;
+    toast(fmt(t(S.alerts ? "toastVisitBonus" : "toastVisit"), { v: S.visits }));
+  });
+  function pickTreat(k) {
+    if ((S.visits || 0) < 5) return;
+    S.visits = 0; save(); renderVisits();
+    $("vCodeBox").hidden = false; $("vCode").textContent = "SOL-" + String(Math.floor(1000 + Math.random() * 9000)) + " · " + t(k);
+    toast(t("toastPick"));
+  }
+  $("pick10").addEventListener("click", function () { pickTreat("t10"); });
+  $("pickScoop").addEventListener("click", function () { pickTreat("tScoop"); });
+
   /* ---------- menu ---------- */
   var MENU = [["🍓", "m1", 2.5], ["🍫", "m2", 3], ["🍧", "m3", 4], ["🌶️", "m4", 5], ["🌽", "m5", 5], ["🌽", "m6", 4.5]];
   function renderMenu() {
@@ -421,21 +836,33 @@ es: {
   function renderSet() {
     [].forEach.call($("dist").children, function (b) { b.setAttribute("aria-pressed", +b.getAttribute("data-d") === S.dist ? "true" : "false"); });
     $("alertsOn").checked = S.alerts; $("soundOn").checked = S.sound; $("quietOn").checked = S.quiet;
-    $("zone").setAttribute("r", zoneR().toFixed(1));
+    if (zoneC) zoneC.setRadius(S.dist * MI);
   }
   $("dist").addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b) return; S.dist = +b.getAttribute("data-d"); save(); renderSet(); });
-  $("alertsOn").addEventListener("change", function () { S.alerts = this.checked; save(); });
+  $("alertsOn").addEventListener("change", function () { setAlerts(this.checked); });
   $("soundOn").addEventListener("change", function () { S.sound = this.checked; save(); });
   $("quietOn").addEventListener("change", function () { S.quiet = this.checked; save(); });
   $("reset").addEventListener("click", function () {
     try { localStorage.removeItem(KEY); } catch (e) {}
-    S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "" };
-    $("name").value = ""; $("street").value = ""; $("locMsg").textContent = ""; $("codeBox").hidden = true;
-    showJoin(); renderPts(); renderSet(); toast(t("resetDone"));
+    S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "", visits: 0 };
+    $("name").value = ""; $("street").value = ""; $("locMsg").textContent = ""; $("codeBox").hidden = true; $("vCodeBox").hidden = true;
+    home = { lat: SAMPLE_HOME.lat, lng: SAMPLE_HOME.lng }; renderHomeMsg(); placeHome(); loadRoute();
+    showJoin(); renderPts(); renderVisits(); renderSet(); toast(t("resetDone"));
   });
 
-  ICE.on(function () { showJoin(); renderPts(); renderMenu(); statusKey = ""; if ($("ringer").classList.contains("show")) $("nBody").textContent = fmt(t("nBody"), { d: dec(lastD), m: lastM }); });
-  showJoin(); renderPts(); renderMenu(); renderSet();
+  (function () { // read-aloud explainer
+    var b = $("explain");
+    function ui() { b.textContent = ICE.t(Speak.speaking ? "explainStop" : "explain"); b.setAttribute("aria-pressed", Speak.speaking ? "true" : "false"); }
+    b.addEventListener("click", function () { if (Speak.speaking) Speak.stop(); else Speak.say(ICE.t("explainSay")); ui(); });
+    Speak.on(ui); Speak.css(); ICE.on(ui);
+  })();
+  ICE.on(function () {
+    showJoin(); renderPts(); renderVisits(); renderMenu(); renderHomeMsg();
+    if (homeMk) homeMk.setIcon(homeIcon());
+    var mk = $("mapMsg"); if (!mk.hidden) mk.textContent = t(mk.getAttribute("data-k"));
+    shown = {}; if (lastU) render(lastU);
+    if ($("ringer").classList.contains("show")) $("nBody").textContent = fmt(t("nBody"), { d: dec(lastD), m: lastM }); });
+  showJoin(); renderPts(); renderVisits(); renderMenu(); renderSet();
 })();
 </script>
 </body>

@@ -159,6 +159,16 @@ var DEMOS=[
   ["🍔","StormBurger · build your burger","Smash burger or chicken sandwich","storm-burger/#build"],
   ["🐉","Lucky Dragon","Hibachi Catch game + build your hibachi plate","lucky-dragon/"],
   ["🌶️","Churrito Loco","Loco Match puzzle game","churrito-loco/"]]],
+ ["Ice cream trucks · separate product (EN + ES)",[
+  ["🧰","Ice cream owner kit (just for you)","Send buttons, all the links, plans, go-live checklist","https://antidotethecure.github.io/ice-cream/kit/"],
+  ["🍦","Ice cream owner tour","Swipe tour: phones ring, payments, rewards, plans","https://antidotethecure.github.io/ice-cream/"],
+  ["🚚","Ice cream customer app","Live truck map with ETA, alerts, points + rewards","https://antidotethecure.github.io/ice-cream/demo/"],
+  ["📋","Ice cream details + money math","Full breakdown, calculator, fees, sources","https://antidotethecure.github.io/ice-cream/details/"],
+  ["📍","Route house counter","Owner counts the homes on their real route","https://antidotethecure.github.io/ice-cream/route/"]]],
+ ["Food trucks + the truck link to send",[
+  ["📲","Send to ANY truck owner (setup page, Trucks section)","Opens straight on the ice cream + food truck apps and truck plans","https://antidotethecure.github.io/demo/setup/?type=truck#trucks"],
+  ["🚚","Food truck owner tour","Owner live view: app users nearby, cook queue timed to arrivals, plans","https://antidotethecure.github.io/food-truck/"],
+  ["🌮","Food truck customer app","Live truck map, today's stops, distance + ETA, order ahead timed hot","https://antidotethecure.github.io/food-truck/demo/"]]],
  ["Sales pages",[
   ["💲","Everything you get + prices","Every tool, packages, autopilot texts, AI phone","everything/"],
   ["📱","All demos in one place + free sample","Tap any app, swipe a live one","setup/"],
@@ -176,7 +186,7 @@ function render(){
     return '<div class="tier'+(p.star?' star':'')+'"><div class="nm">'+p.n+(p.star?' <span class="tag">MOST POPULAR</span>':'')+'</div><div class="mo">$'+p.mo+'<small>/mo</small></div><div style="color:var(--dim);font-size:13.5px">$'+p.set.toLocaleString()+' setup</div><p>'+esc(p.d)+'</p><div class="txt" id="t'+k+'" style="display:none">'+esc(t)+'</div><button class="cp" data-copy="t'+k+'">Copy</button></div>'; }).join("");
   $("plans").textContent="Pay in full: $2,500 today, $400/month, month to month.\nHalf down: $1,250 today, $525/month for 12 months, then $400.\nStarter: $500 today, $600/month for 12 months, then $400.";
   $("faqhost").innerHTML=FAQ.map(function(q,i){ var a=typeof q[1]==="function"?q[1](x):q[1]; return '<details class="q"><summary>'+esc(q[0])+'</summary><div class="a"><div class="txt" id="q'+i+'">'+esc(a)+'</div><div style="margin-top:8px"><button class="cp" data-copy="q'+i+'">Copy answer</button></div></div></details>'; }).join("");
-  $("demohost").innerHTML=(x.link&&F.link?'<div class="grp">This restaurant</div><div class="links">'+lk("⭐",x.r+" sample","Their own app",F.link,true)+'</div>':'')+DEMOS.map(function(g){ return '<div class="grp">'+esc(g[0])+'</div><div class="links">'+g[1].map(function(d){ return lk(d[0],d[1],d[2],BASE+d[3],d[4]); }).join("")+'</div>'; }).join("");
+  $("demohost").innerHTML=(x.link&&F.link?'<div class="grp">This restaurant</div><div class="links">'+lk("⭐",x.r+" sample","Their own app",F.link,true)+'</div>':'')+DEMOS.map(function(g){ return '<div class="grp">'+esc(g[0])+'</div><div class="links">'+g[1].map(function(d){ return lk(d[0],d[1],d[2],(/^https?:/.test(d[3])?d[3]:BASE+d[3]),d[4]); }).join("")+'</div>'; }).join("");
   $("reshost").innerHTML='<div class="links">'+RES.map(function(r){ return lk(r[0],r[1],"",BASE+r[2]); }).join("")+'</div>';
 }
 var LKN=0;

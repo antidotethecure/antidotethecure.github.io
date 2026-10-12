@@ -1,0 +1,18 @@
+{
+  "name": "Taco Titan: Where's the Truck? (demo)",
+  "short_name": "Taco Titan",
+  "description": "See where the taco truck is parked, how far it is, and order ahead so it's hot when you get there. Sample truck by SousShift AI.",
+  "start_url": "./?src=homescreen",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0605",
+  "theme_color": "#0a0605",
+  "lang": "en",
+  "icons": [
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -6,7 +6,7 @@
 <title>Paletas El Sol: Truck Alerts</title>
 <meta name="description" content="Demo: get a ring with an ice-cream-truck jingle when Paletas El Sol is on your street. Points, rewards and the menu. Sample truck by SousShift AI.">
 <meta name="theme-color" content="#03060e">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest?v=20261011b">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="../ice.css">
+<link rel="stylesheet" href="../ice.css?v=20261011b">
 <style>
 body{padding-bottom:30px}
 .top .logo{width:40px;height:40px;border-radius:12px;background:radial-gradient(circle at 50% 40%,#ffd166 0 38%,#ff9a3c 39% 100%);display:grid;place-items:center;font-size:22px;flex:none}
@@ -58,6 +58,21 @@ body{padding-bottom:30px}
 .rwi div small{display:block;color:var(--dim);font-weight:700}
 .rwi button{min-height:42px;padding:8px 12px;font-size:11px}
 .code{font-family:"Orbitron",sans-serif;font-size:20px;letter-spacing:.12em;background:#fff;color:#0b1630;border-radius:12px;padding:10px;text-align:center;margin-top:10px}
+
+/* visit punch card */
+.punch{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0 6px}
+.punch span{aspect-ratio:1;border-radius:50%;border:2px dashed #2f4a86;display:grid;place-items:center;font:900 15px "Orbitron",sans-serif;color:#4a6399;background:rgba(255,255,255,.02);transition:transform .3s,background .3s}
+.punch span.on{border:2px solid var(--gold);background:radial-gradient(circle at 40% 35%,#fff3c4,#ffd166 45%,#f2a93b);color:#3a1500;font-size:clamp(22px,7vw,30px);transform:scale(1.04)}
+.punch span.gift{border-color:var(--pink);color:var(--pink);font-size:20px}
+.bonus{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;margin-top:12px;font-weight:700;font-size:15px;line-height:1.25}
+.bonus.on{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.45);color:#c9f5e4}
+.bonus.off{background:rgba(255,184,107,.1);border:1px solid rgba(255,184,107,.55);color:#ffe0bd}
+.bonus i{font-style:normal;font-size:22px}
+.bonus span{flex:1}
+.bonus button{min-height:40px;padding:6px 12px;font-size:11px}
+.pick{margin-top:12px;padding:12px;border-radius:16px;border:1px solid var(--pink);background:rgba(255,143,196,.08);text-align:center}
+.pick p{margin:0 0 10px;font-weight:800;font-size:17px}
+.pick .row .btn{min-height:56px;font-size:13px}
 
 /* menu */
 .menu{display:grid;gap:8px}
@@ -164,6 +179,20 @@ body{padding-bottom:30px}
 
   <section class="s" id="points">
     <header><p class="kick" data-t="ptsKick">Your points</p><h2 class="chrome" data-t="ptsH">Points + rewards</h2></header>
+    <div class="card" id="visitCard">
+      <p class="kick" data-t="vKick">Visit card</p>
+      <h3 data-t="vH">5 visits = a treat on us</h3>
+      <div class="punch" id="punch" aria-hidden="true"></div>
+      <p class="note" id="vNext" aria-live="polite"></p>
+      <button class="btn gold" id="checkin" type="button" style="width:100%" data-t="checkBtn">📍 Check in at the truck</button>
+      <p class="note" data-t="checkNote">For real, you scan the QR on the truck: one check-in per truck visit. In this demo you can tap as much as you like.</p>
+      <div class="pick" id="pick" hidden>
+        <p data-t="pickH">🎉 5th visit! Pick your treat:</p>
+        <div class="row"><button class="btn primary" id="pick10" type="button" data-t="pick10">🏷️ 10% off</button><button class="btn primary" id="pickScoop" type="button" data-t="pickScoop">🍦 Extra scoop free</button></div>
+      </div>
+      <div id="vCodeBox" hidden><p class="note" data-t="codeL" style="margin:10px 0 0">Show this to the driver:</p><div class="code" id="vCode"></div></div>
+      <div class="bonus" id="bonus" aria-live="polite"></div>
+    </div>
     <div class="card">
       <div class="pts"><b id="ptsN">0</b><span data-t="ptsL">points</span></div>
       <div class="bar"><i id="ptsBar"></i></div>
@@ -218,7 +247,7 @@ en: {
   status: "Truck is <em>{d} mi</em> away · {m} min", statusHere: "The truck is <em>on your street!</em>", statusGone: "The truck passed. Next round soon.",
   subStatus: "We'll ring your phone when it's close.",
   explain: "🔊 What is this demo?", explainStop: "⏹ Stop",
-  explainSay: "This is a demo of what your customers see on their phone. Paletas El Sol is a made-up truck. At the top, the live map shows the truck coming toward their street. Tap Test the alert to hear the jingle that rings their phone when the truck is close. Scroll down to see how they join in ten seconds, collect points, check your menu, and turn alerts on or off. Your truck gets its own name, colors and menu.",
+  explainSay: "This is a demo of what your customers see on their phone. Paletas El Sol is a made-up truck. At the top, the live map shows the truck coming toward their street. Tap Test the alert to hear the jingle that rings their phone when the truck is close. Scroll down to see how they join in ten seconds and check in at your truck. Every fifth visit, they pick ten percent off or an extra scoop free. If they keep their truck alerts on, they get five bonus points every visit, so they keep the alerts on and you keep ringing their phone. They also collect points, check your menu, and control their alerts. Your truck gets its own name, colors and menu.",
   testBtn: "🔔 Test the alert", replay: "↺ Replay the route", faster: "⏩ Bring it closer",
   joinKick: "Step 1", joinH: "Join in 10 seconds", nameL: "Your first name", namePh: "Maria",
   joinBtn: "Join + get 10 free points", joinNote: "Demo only: nothing is sent anywhere. It stays on this phone.",
@@ -231,6 +260,14 @@ en: {
   streetOk: "✅ Saved: {s}",
   iosKick: "Step 3 · iPhone", iosH: "Turn on alerts",
   iosP: "On iPhone, tap <b>Share</b> (the square with the arrow) → <b>Add to Home Screen</b> → open it from your Home Screen and allow notifications. That's Apple's rule for alerts. On Android, just tap \"Allow\" when it asks.",
+  vKick: "Visit card", vH: "5 visits = a treat on us",
+  vNext: "{n} more visits to your treat", vLast: "1 more visit to your treat!", vReady: "Your 5th visit is in. Pick your treat below 👇",
+  checkBtn: "📍 Check in at the truck", checkNote: "For real, you scan the QR on the truck: one check-in per truck visit. In this demo you can tap as much as you like.",
+  pickH: "🎉 5th visit! Pick your treat:", pick10: "🏷️ 10% off", pickScoop: "🍦 Extra scoop free",
+  t10: "10% off", tScoop: "Extra scoop free",
+  toastVisit: "Visit {v} of 5 checked in! ✅", toastVisitBonus: "Visit {v} of 5 checked in! +5 alerts bonus 🔔", toastPick: "Treat unlocked. Show the code to the driver. Your card starts over.",
+  bonusOn: "<b>Alerts on:</b> +5 bonus points every visit", bonusOff: "<b>Alerts off:</b> you're missing +5 bonus points every visit", bonusFix: "Turn on",
+  toastAlertsOff: "Alerts off: no more +5 bonus per visit.", toastAlertsOn: "Alerts on: +5 bonus every visit 🔔",
   ptsKick: "Your points", ptsH: "Points + rewards", ptsL: "points",
   ptsNext: "{n} more points to {r}", ptsAll: "You can get every reward. Nice!",
   buyBtn: "🧾 Pretend I bought something (+10)", buyNote: "For real, the driver scans your code at the window.",
@@ -260,7 +297,7 @@ es: {
   status: "El troque está a <em>{d} mi</em> · {m} min", statusHere: "¡El troque está <em>en tu calle!</em>", statusGone: "Ya pasó el troque. Pronto vuelve.",
   subStatus: "Te sonamos el celular cuando esté cerca.",
   explain: "🔊 ¿Qué es este demo?", explainStop: "⏹ Parar",
-  explainSay: "Este es un demo de lo que tus clientes ven en su celular. Paletas El Sol es un troque inventado. Arriba, el mapa en vivo muestra el troque acercándose a su calle. Toca Probar la alerta para oír la musiquita que les suena en el celular cuando el troque está cerca. Baja para ver cómo se unen en diez segundos, juntan puntos, ven tu menú, y prenden o apagan las alertas. Tu troque lleva su propio nombre, colores y menú.",
+  explainSay: "Este es un demo de lo que tus clientes ven en su celular. Paletas El Sol es un troque inventado. Arriba, el mapa en vivo muestra el troque acercándose a su calle. Toca Probar la alerta para oír la musiquita que les suena en el celular cuando el troque está cerca. Baja para ver cómo se unen en diez segundos y registran su visita en tu troque. Cada quinta visita escogen diez por ciento de descuento o una bola extra gratis. Si dejan las alertas prendidas, ganan cinco puntos extra en cada visita, así que las dejan prendidas y tú les sigues sonando el celular. También juntan puntos, ven tu menú, y controlan sus alertas. Tu troque lleva su propio nombre, colores y menú.",
   testBtn: "🔔 Probar la alerta", replay: "↺ Repetir la ruta", faster: "⏩ Acercar el troque",
   joinKick: "Paso 1", joinH: "Únete en 10 segundos", nameL: "Tu nombre", namePh: "María",
   joinBtn: "Unirme + 10 puntos gratis", joinNote: "Solo es demo: no se manda nada a ningún lado. Se queda en este celular.",
@@ -273,6 +310,14 @@ es: {
   streetOk: "✅ Guardado: {s}",
   iosKick: "Paso 3 · iPhone", iosH: "Activa las alertas",
   iosP: "En iPhone, toca <b>Compartir</b> (el cuadrito con la flecha) → <b>Agregar a pantalla de inicio</b> → ábrela desde tu pantalla de inicio y permite las notificaciones. Es regla de Apple para las alertas. En Android, nomás toca \"Permitir\" cuando te pregunte.",
+  vKick: "Tarjeta de visitas", vH: "5 visitas = un antojo de regalo",
+  vNext: "Te faltan {n} visitas para tu premio", vLast: "¡Te falta 1 visita para tu premio!", vReady: "Ya llevas 5 visitas. Escoge tu premio abajo 👇",
+  checkBtn: "📍 Registrar visita al troque", checkNote: "En la vida real, escaneas el QR del troque: una visita por cada pasada del troque. En este demo puedes tocar las veces que quieras.",
+  pickH: "🎉 ¡Quinta visita! Escoge tu premio:", pick10: "🏷️ 10% de descuento", pickScoop: "🍦 Bola extra gratis",
+  t10: "10% de descuento", tScoop: "Bola extra gratis",
+  toastVisit: "¡Visita {v} de 5 registrada! ✅", toastVisitBonus: "¡Visita {v} de 5 registrada! +5 puntos por alertas 🔔", toastPick: "Premio listo. Enséñale el código al chofer. Tu tarjeta empieza de nuevo.",
+  bonusOn: "<b>Alertas prendidas:</b> +5 puntos extra en cada visita", bonusOff: "<b>Alertas apagadas:</b> te estás perdiendo +5 puntos extra en cada visita", bonusFix: "Prender",
+  toastAlertsOff: "Alertas apagadas: ya no ganas +5 puntos por visita.", toastAlertsOn: "Alertas prendidas: +5 puntos extra en cada visita 🔔",
   ptsKick: "Tus puntos", ptsH: "Puntos + premios", ptsL: "puntos",
   ptsNext: "Te faltan {n} puntos para {r}", ptsAll: "Ya te alcanza para todos los premios. ¡Bien!",
   buyBtn: "🧾 Hacer como que compré algo (+10)", buyNote: "En la vida real, el chofer escanea tu código en la ventanilla.",
@@ -297,15 +342,15 @@ es: {
   footLink: "Para dueños de troques: tenlo en tu troque →"
 }};
 </script>
-<script src="../lang.js"></script>
-<script src="../jingle.js"></script>
-<script src="../speak.js"></script>
+<script src="../lang.js?v=20261011b"></script>
+<script src="../jingle.js?v=20261011b"></script>
+<script src="../speak.js?v=20261011b"></script>
 <script>
 (function () {
   "use strict";
   var $ = function (id) { return document.getElementById(id); };
   var KEY = "ssai:ice:demo";
-  var S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "" };
+  var S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "", visits: 0 };
   try { var saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved) for (var k in saved) S[k] = saved[k]; } catch (e) {}
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   var t = function (k) { return ICE.t(k); };
@@ -410,6 +455,40 @@ es: {
     S.pts += 10; save(); renderPts(); toast(t("toastBuy"));
   });
 
+  /* ---------- visit card: 5 check-ins -> 10% off or an extra scoop; alerts on = +5 bonus per visit ---------- */
+  function renderVisits() {
+    var v = Math.min(5, S.visits || 0), box = $("punch"); box.innerHTML = "";
+    for (var n = 1; n <= 5; n++) {
+      var c = document.createElement("span");
+      if (n <= v) { c.className = "on"; c.textContent = "🍦"; } else if (n === 5) { c.className = "gift"; c.textContent = "🎁"; } else c.textContent = n;
+      box.appendChild(c);
+    }
+    $("vNext").textContent = v >= 5 ? t("vReady") : (5 - v === 1 ? t("vLast") : fmt(t("vNext"), { n: 5 - v }));
+    $("pick").hidden = v < 5; $("checkin").style.display = v >= 5 ? "none" : "";
+    var b = $("bonus");
+    b.className = "bonus " + (S.alerts ? "on" : "off");
+    b.innerHTML = '<i aria-hidden="true">' + (S.alerts ? "🔔" : "🔕") + '</i><span>' + t(S.alerts ? "bonusOn" : "bonusOff") + '</span>' +
+      (S.alerts ? "" : '<button type="button" class="btn gold" id="bonusFix">' + t("bonusFix") + '</button>');
+    if (!S.alerts) $("bonusFix").addEventListener("click", function () { setAlerts(true); });
+  }
+  function setAlerts(on) { S.alerts = on; save(); renderSet(); renderVisits(); toast(t(on ? "toastAlertsOn" : "toastAlertsOff")); }
+  $("checkin").addEventListener("click", function () {
+    if (!S.joined) { toast(t("toastJoin")); location.hash = "join"; return; }
+    if ((S.visits || 0) >= 5) return;
+    S.visits = (S.visits || 0) + 1;
+    if (S.alerts) S.pts += 5;
+    save(); renderVisits(); renderPts(); $("vCodeBox").hidden = true;
+    toast(fmt(t(S.alerts ? "toastVisitBonus" : "toastVisit"), { v: S.visits }));
+  });
+  function pickTreat(k) {
+    if ((S.visits || 0) < 5) return;
+    S.visits = 0; save(); renderVisits();
+    $("vCodeBox").hidden = false; $("vCode").textContent = "SOL-" + String(Math.floor(1000 + Math.random() * 9000)) + " · " + t(k);
+    toast(t("toastPick"));
+  }
+  $("pick10").addEventListener("click", function () { pickTreat("t10"); });
+  $("pickScoop").addEventListener("click", function () { pickTreat("tScoop"); });
+
   /* ---------- menu ---------- */
   var MENU = [["🍓", "m1", 2.5], ["🍫", "m2", 3], ["🍧", "m3", 4], ["🌶️", "m4", 5], ["🌽", "m5", 5], ["🌽", "m6", 4.5]];
   function renderMenu() {
@@ -430,14 +509,14 @@ es: {
     $("zone").setAttribute("r", zoneR().toFixed(1));
   }
   $("dist").addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b) return; S.dist = +b.getAttribute("data-d"); save(); renderSet(); });
-  $("alertsOn").addEventListener("change", function () { S.alerts = this.checked; save(); });
+  $("alertsOn").addEventListener("change", function () { setAlerts(this.checked); });
   $("soundOn").addEventListener("change", function () { S.sound = this.checked; save(); });
   $("quietOn").addEventListener("change", function () { S.quiet = this.checked; save(); });
   $("reset").addEventListener("click", function () {
     try { localStorage.removeItem(KEY); } catch (e) {}
-    S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "" };
-    $("name").value = ""; $("street").value = ""; $("locMsg").textContent = ""; $("codeBox").hidden = true;
-    showJoin(); renderPts(); renderSet(); toast(t("resetDone"));
+    S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "", visits: 0 };
+    $("name").value = ""; $("street").value = ""; $("locMsg").textContent = ""; $("codeBox").hidden = true; $("vCodeBox").hidden = true;
+    showJoin(); renderPts(); renderVisits(); renderSet(); toast(t("resetDone"));
   });
 
   (function () { // read-aloud explainer
@@ -446,8 +525,8 @@ es: {
     b.addEventListener("click", function () { if (Speak.speaking) Speak.stop(); else Speak.say(ICE.t("explainSay")); ui(); });
     Speak.on(ui); Speak.css(); ICE.on(ui);
   })();
-  ICE.on(function () { showJoin(); renderPts(); renderMenu(); statusKey = ""; if ($("ringer").classList.contains("show")) $("nBody").textContent = fmt(t("nBody"), { d: dec(lastD), m: lastM }); });
-  showJoin(); renderPts(); renderMenu(); renderSet();
+  ICE.on(function () { showJoin(); renderPts(); renderVisits(); renderMenu(); statusKey = ""; if ($("ringer").classList.contains("show")) $("nBody").textContent = fmt(t("nBody"), { d: dec(lastD), m: lastM }); });
+  showJoin(); renderPts(); renderVisits(); renderMenu(); renderSet();
 })();
 </script>
 </body>

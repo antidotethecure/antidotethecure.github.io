@@ -160,7 +160,7 @@ async function boot() {
   /* ---------------- procedural props: coin, drizzle emblem, med kit, crate + chute, blimp, rotors, Theme Building ---------------- */
   function capTex(draw, n) { const c = mkc(n || 128, n || 128); draw(c.getContext("2d"), c.width); return canTex(c, true); }
   const coinCap = capTex((x, n) => { const g = x.createLinearGradient(0, 0, n, n); g.addColorStop(0, "#fff7c2"); g.addColorStop(.4, "#ffd23f"); g.addColorStop(.75, "#c88a0c"); g.addColorStop(1, "#ffe38a"); x.fillStyle = g; x.fillRect(0, 0, n, n);
-    x.strokeStyle = "#9b6a06"; x.lineWidth = 6; x.beginPath(); x.arc(n / 2, n / 2, n * .42, 0, TAU); x.stroke(); x.fillStyle = "#9b6a06"; x.font = "900 " + (n * .55 | 0) + "px 'Playfair Display',Georgia,serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("M", n / 2, n / 2 + 4); });
+    x.strokeStyle = "#9b6a06"; x.lineWidth = 6; x.beginPath(); x.arc(n / 2, n / 2, n * .42, 0, TAU); x.stroke(); x.fillStyle = "#9b6a06"; x.font = "900 " + (n * .55 | 0) + "px 'Playfair Display',Georgia,serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("\u266A", n / 2, n / 2 + 4); });   // a gold music note (Melody), not a coin: one currency (points)
   const goldSide = new THREE.MeshStandardMaterial({ color: 0xd9a21b, metalness: .35, roughness: .35, emissive: 0x4a3000, emissiveIntensity: .6 });
   const coinGeo = new THREE.CylinderGeometry(1, 1, .22, 36);
   function coinMesh() { const m = new THREE.Mesh(coinGeo, [goldSide, new THREE.MeshStandardMaterial({ map: coinCap, metalness: .25, roughness: .4, emissive: 0x3a2600, emissiveIntensity: .5 }), new THREE.MeshStandardMaterial({ map: coinCap, metalness: .25, roughness: .4 })]); m.castShadow = true; return m; }

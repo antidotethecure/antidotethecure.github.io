@@ -295,7 +295,7 @@
       if (TK()) { try { h += TK().menuHTML(row, "points"); } catch (e) {} }   // reviewegg.js: "📺 Antidote's review" secret + watch card
       var pr = C.prizes;
       if (pr) {
-        h += '<p class="gm-g">' + esc(T("Prizes")) + "</p>";
+        h += '<p class="gm-g">' + esc(T(pr.title || "Prizes")) + "</p>";   // prizes.title: optional heading (e.g. "Rewards points")
         if (pr.champion) h += row({ icon: "👑", name: "Weekly champion", note: pr.champion, pts: "#1", gold: true });
         (pr.tiers || []).forEach(function (t) { var pic = /[\/.]/.test(t[3] || ""); h += row({ icon: !pic && t[3] || "🎁", img: pic ? t[3] : null, name: t[1], note: t[2], pts: t[0], gold: true }); });
         if (pr.note) h += '<p class="gm-note">' + esc(T(pr.note)) + "</p>";

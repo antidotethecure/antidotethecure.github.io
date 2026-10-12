@@ -19,11 +19,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="ice.css">
+<link rel="stylesheet" href="ice.css?v=20261011b">
 <style>
 html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 body{display:flex;flex-direction:column;height:100dvh}
-.top .wrap{height:54px}
+.top .wrap{height:56px}
+@media(max-width:400px){.top img.brand{display:none}}
 .dots{display:flex;gap:6px;align-items:center;flex:1;justify-content:center}
 .dots button{width:9px;height:9px;padding:0;border-radius:99px;border:0;background:#2a3f6e;cursor:pointer;transition:width .3s,background .3s}
 .dots button[aria-current=true]{width:24px;background:var(--gold)}
@@ -41,6 +42,9 @@ body{display:flex;flex-direction:column;height:100dvh}
 .foot .btn{flex:1;font-size:15px;min-height:56px}
 .foot .prev{flex:0 0 64px}
 .foot .prev[hidden]{display:none}
+.foot .auto{flex:0 0 auto;font-size:12px;padding:0 12px;letter-spacing:.02em}
+.foot .auto[aria-pressed=true]{background:rgba(255,209,102,.16);border-color:var(--gold);color:var(--gold)}
+.listen{margin:0 0 12px}
 
 /* 1 hook */
 .homes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:22px auto 0;max-width:330px}
@@ -68,6 +72,13 @@ body{display:flex;flex-direction:column;height:100dvh}
 .sl output{font-family:"Orbitron",sans-serif;color:var(--gold);font-size:16px}
 .sl input{width:100%;height:34px;accent-color:var(--blue);margin:0}
 .more{margin-top:10px;font-size:15px;font-weight:700}
+.route-btn{margin-top:14px;min-height:52px;font-size:13px}
+
+/* 3b payments */
+.pays{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:18px 0 4px;max-width:420px}
+.pays span{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:12px;font-weight:800;font-size:15px;background:#f0f4ff;color:#0b1630;line-height:1}
+.pays .cash{background:rgba(255,184,107,.12);color:var(--warn);border:1px dashed rgba(255,184,107,.6);text-decoration:line-through}
+.pays .ap{background:#000;color:#fff}.pays .vm{background:#008cff;color:#fff}.pays .ca{background:#00d64f;color:#002b10}.pays .ze{background:#6d1ed4;color:#fff}
 
 /* 4 rewards */
 .chips{display:grid;gap:10px;width:100%;max-width:380px;margin-top:20px}
@@ -84,8 +95,57 @@ body{display:flex;flex-direction:column;height:100dvh}
 /* 6 cta */
 .cta{display:grid;gap:10px;width:100%;max-width:400px;margin-top:22px}
 .cta .btn{min-height:58px;font-size:14px}
-.price{margin-top:16px;padding:10px 16px;border-radius:14px;border:1px solid rgba(255,209,102,.5);background:rgba(255,209,102,.08);color:var(--gold);font-weight:800;font-size:16px}
+.price{margin-top:16px;padding:12px 16px;border-radius:14px;border:1px solid rgba(255,209,102,.5);background:rgba(255,209,102,.08);color:var(--ink);font-weight:700;font-size:15.5px;line-height:1.35;max-width:400px}
+.price b{color:var(--gold);font-family:"Orbitron",sans-serif;font-size:17px}
+.price s{color:var(--dim)}
+.price small{display:block;color:var(--dim);font-size:13.5px;margin-top:4px}
 .details{margin-top:18px;font-size:16px;font-weight:700}
+
+/* qr */
+.qr-art{width:min(210px,52vw);height:auto;border-radius:22px;margin:14px auto 0;display:block;box-shadow:0 14px 40px rgba(255,143,196,.25),0 0 0 1px rgba(255,209,102,.35)}
+
+/* map */
+.map-wrap{position:relative;width:100%;max-width:420px;margin:14px auto 0;border-radius:20px;overflow:hidden;border:1px solid var(--edge);background:#0a1530;box-shadow:0 16px 40px rgba(0,0,0,.45)}
+.map-wrap canvas{display:block;width:100%;height:auto}
+.map-stat{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.map-stat div{padding:8px 12px;border-radius:12px;background:var(--panel);border:1px solid var(--edge);font-weight:700;font-size:14px;color:var(--silver)}
+.map-stat b{font-family:"Orbitron",sans-serif;color:var(--gold);font-size:18px;margin-right:4px}
+.map-leg{display:flex;gap:14px;justify-content:center;margin-top:8px;font-size:13.5px;color:var(--dim);font-weight:700;flex-wrap:wrap}
+.map-leg i{display:inline-block;width:10px;height:10px;border-radius:99px;margin-right:5px;vertical-align:0}
+
+/* rewards v2 */
+.punch{display:flex;gap:8px;justify-content:center;margin:16px 0 4px}
+.punch span{width:44px;height:44px;border-radius:99px;display:grid;place-items:center;font-size:22px;background:var(--panel);border:2px dashed var(--edge)}
+.punch span.on{background:linear-gradient(180deg,#ff8fc4,#ff5fa2);border:2px solid #ffd166}
+.punch span.gift{border:2px solid var(--gold);background:rgba(255,209,102,.14)}
+.punch-l{font-size:16px;font-weight:700;color:var(--silver);margin:4px 0 0}
+.punch-l b{color:var(--gold)}
+.chips.sm{margin-top:12px}
+.chips.sm .chip{padding:10px 14px}
+.chips.sm .chip b{font-size:16px}
+.chips.sm .chip i{font-size:26px}
+
+/* tiers */
+.tiers{display:grid;gap:10px;width:100%;max-width:440px;margin-top:14px;text-align:left}
+.tier{all:unset;box-sizing:border-box;display:block;cursor:pointer;padding:12px 14px;border-radius:18px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);position:relative;transition:border-color .2s,box-shadow .2s}
+.tier:focus-visible{outline:3px solid var(--volt);outline-offset:2px}
+.tier[aria-pressed=true]{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 10px 30px rgba(255,209,102,.15)}
+.tier .hd{display:flex;align-items:center;gap:10px}
+.tier .em{font-size:28px;line-height:1}
+.tier .nm{flex:1;font-family:"Orbitron",sans-serif;font-weight:800;font-size:16px;color:var(--ink);line-height:1.15}
+.tier .nm small{display:block;font-family:"Rajdhani",sans-serif;font-size:13.5px;color:var(--dim);font-weight:700}
+.tier .pp{text-align:right;font-family:"Orbitron",sans-serif;font-weight:900;color:var(--gold);font-size:17px;line-height:1.1;white-space:nowrap}
+.tier .pp small{display:block;font-family:"Rajdhani",sans-serif;font-weight:700;color:var(--dim);font-size:13px}
+.tier .pp s{color:var(--dim);font-size:12px;margin-right:4px}
+.tier .badge{position:absolute;top:-9px;right:14px;background:var(--gold);color:#1a1300;font:800 11px "Rajdhani",sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:2px 9px;border-radius:99px}
+.tier ul{margin:10px 0 0;padding:0;list-style:none;display:none}
+.tier[aria-pressed=true] ul{display:block}
+.tier li{font-size:15px;font-weight:600;color:var(--silver);padding:3px 0 3px 22px;position:relative;line-height:1.3}
+.tier li::before{content:"✓";position:absolute;left:2px;color:var(--good);font-weight:900}
+.tier .est-l{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--edge);font-size:14.5px;font-weight:700;color:var(--silver)}
+.tier[aria-pressed=true] .est-l{display:block}
+.tier .est-l b{color:var(--good);font-family:"Orbitron",sans-serif}
+.tiers-note{margin-top:10px;font-size:14px;color:var(--dim);font-weight:700}
 
 @media (max-height:640px){.big-emoji{font-size:48px}.homes span{font-size:28px}.how3 .i div{width:64px;height:64px;font-size:32px}.phone{padding-top:34px}}
 @media (prefers-reduced-motion:reduce){.track,.inner{transition:none}}
@@ -95,7 +155,7 @@ body{display:flex;flex-direction:column;height:100dvh}
 <div class="top"><div class="wrap">
   <img class="brand" src="../assets/sousshift-lockup-800w.png" alt="SousShift AI">
   <nav class="dots" id="dots" aria-label="Progress"></nav>
-  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true">EN</button><button data-lang="es" aria-pressed="false">ES</button></div>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">English</button><button data-lang="es" aria-pressed="false" lang="es">Español</button></div>
 </div></div>
 
 <main class="deck" id="deck">
@@ -115,6 +175,7 @@ body{display:flex;flex-direction:column;height:100dvh}
       <div class="inner">
         <p class="kick" data-t="k2">How it works</p>
         <h1 class="t1 chrome" data-t="h2">Now their phone rings.</h1>
+        <img class="qr-art" src="img/qr-designer.png?v=20261011b" onerror="this.onerror=null;this.src='qr-sticker.png'" alt="" data-t-alt="qrAlt" width="340" height="340">
         <div class="how3">
           <div class="i"><div aria-hidden="true">🔲</div><b data-t="i1">Scan the QR on your truck</b></div>
           <div class="ar" aria-hidden="true">→</div>
@@ -123,6 +184,16 @@ body{display:flex;flex-direction:column;height:100dvh}
           <div class="i"><div aria-hidden="true">🔔</div><b data-t="i3">Truck's close? Phone rings</b></div>
         </div>
         <button class="btn gold" id="play" type="button" data-t="play">▶ Hear the ringtone</button>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide" id="mapcard">
+      <div class="inner">
+        <p class="kick" data-t="kMap">Live map</p>
+        <h1 class="t1 chrome" data-t="hMap">Watch their phones ring.</h1>
+        <div class="map-wrap"><canvas id="map" width="840" height="560" role="img" data-t-aria="mapAria" aria-label="Map: the truck drives down the street and phones ring in homes that have the app"></canvas></div>
+        <div class="map-stat"><div><b id="rang">0</b><span data-t="mRang">phones rang</span></div><div><b id="walk">0</b><span data-t="mWalk">coming out</span></div></div>
+        <div class="map-leg"><span><i style="background:#ffd166"></i><span data-t="legApp">Has the app</span></span><span><i style="background:#5b6f99"></i><span data-t="legNo">No app</span></span></div>
       </div>
     </section>
 
@@ -136,6 +207,21 @@ body{display:flex;flex-direction:column;height:100dvh}
         <div class="sl"><label><span data-t="s2">Average sale</span><output id="o-ticket"></output></label><input type="range" id="ticket" min="2" max="15" step="0.5" value="5"></div>
         <div class="sl"><label><span data-t="s3">Days per month</span><output id="o-days"></output></label><input type="range" id="days" min="4" max="30" step="1" value="22"></div>
         <a class="more" href="details/#numbers" data-t="more">How we got this →</a>
+        <a class="btn ghost route-btn" href="route/" data-t="routeBtn">📍 Count the houses on YOUR route</a>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <p class="kick" data-t="k3b">Take every payment</p>
+        <h1 class="t1 chrome" data-t="h3b">Cash only? You're losing sales.</h1>
+        <div class="bignum" id="paybig">+$0</div>
+        <div class="bignum-l" data-t="payL">extra per month, after fees <span class="est">estimate</span></div>
+        <div class="pays" aria-label="Cards, Apple Pay, Google Pay, Venmo, Cash App, Zelle">
+          <span data-t="payCard">💳 Cards</span><span class="ap">Apple Pay</span><span>Google Pay</span><span class="vm">venmo</span><span class="ca">$ Cash App</span><span class="ze">Zelle</span>
+        </div>
+        <p class="t2" data-t="p3b"><b>We set it all up for you.</b></p>
+        <a class="more" href="details/#pay" data-t="payMore">Fees and the math →</a>
       </div>
     </section>
 
@@ -143,11 +229,11 @@ body{display:flex;flex-direction:column;height:100dvh}
       <div class="inner">
         <p class="kick" data-t="k4">Rewards</p>
         <h1 class="t1 chrome" data-t="h4">Points that bring them back.</h1>
-        <p class="t2" data-t="p4"><b>10 points</b> every purchase. No big game.</p>
-        <div class="chips">
-          <div class="chip"><i aria-hidden="true">🪙</i><div><b data-t="c1">50¢ off</b><span>30 pts</span></div></div>
-          <div class="chip"><i aria-hidden="true">💵</i><div><b data-t="c2">$1 off</b><span>50 pts</span></div></div>
-          <div class="chip"><i aria-hidden="true">🌶️</i><div><b data-t="c3">Free chili cheese Fritos</b><span>80 pts</span></div></div>
+        <div class="punch" aria-hidden="true"><span class="on">🍦</span><span class="on">🍦</span><span class="on">🍦</span><span class="on">🍦</span><span class="gift">🎁</span></div>
+        <p class="punch-l" data-t="punch">Check in 5 times → <b>10% off</b> or <b>an extra scoop</b></p>
+        <div class="chips sm">
+          <div class="chip"><i aria-hidden="true">🔔</i><div><b data-t="cAl">Alerts on = +5 bonus</b><span data-t="cAlS">every time the truck comes by</span></div></div>
+          <div class="chip"><i aria-hidden="true">🪙</i><div><b data-t="cPts">10 points every purchase</b><span data-t="cPtsS">50¢ off · $1 off · free chili cheese Fritos</span></div></div>
         </div>
       </div>
     </section>
@@ -166,6 +252,15 @@ body{display:flex;flex-direction:column;height:100dvh}
 
     <section class="card-s" aria-roledescription="slide">
       <div class="inner">
+        <p class="kick" data-t="kT">Pick your plan</p>
+        <h1 class="t1 chrome" data-t="hT">Three scoops. Pick yours.</h1>
+        <div class="tiers" id="tiers"></div>
+        <p class="tiers-note" data-t="tNote">No contract. Move up or down any time.</p>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
         <div class="big-emoji" aria-hidden="true">🍦</div>
         <h1 class="t1 chrome" data-t="h6">Let's set you up.</h1>
         <p class="t2" data-t="p6">Your truck's name. Your menu. <b>Your customers' phones ringing.</b></p>
@@ -173,7 +268,7 @@ body{display:flex;flex-direction:column;height:100dvh}
           <a class="btn gold" id="ct-mail" href="mailto:secondshiftai@gmail.com" data-t="mail">✉️ Email Antidote</a>
           <a class="btn ghost off" id="ct-sms" href="#" aria-disabled="true" data-t="sms">💬 Text (number coming soon)</a>
         </div>
-        <div class="price" data-t="price">Price TBD: ask Antidote</div>
+        <div class="price" id="price" aria-live="polite"></div>
         <a class="details" href="details/" data-t="det">See the details (numbers, sources, FAQ) →</a>
       </div>
     </section>
@@ -183,6 +278,7 @@ body{display:flex;flex-direction:column;height:100dvh}
 
 <div class="foot">
   <button class="btn ghost prev" id="prev" type="button" data-t-aria="back" aria-label="Back">←</button>
+  <button class="btn ghost auto" id="auto" type="button" aria-pressed="false" data-t="auto">🔊 Auto</button>
   <button class="btn primary" id="next" type="button" data-t="next">Next →</button>
 </div>
 
@@ -196,17 +292,37 @@ en: {
   k2: "How it works", h2: "Now their phone rings.",
   i1: "Scan the QR on your truck", i2: "Turn on location", i3: "Truck's close? Phone rings",
   play: "▶ Hear the ringtone", stop: "■ Stop",
+  qrAlt: "Designer ice cream QR sticker for the truck",
+  kMap: "Live map", hMap: "Watch their phones ring.", mRang: "phones rang", mWalk: "coming out",
+  legApp: "Has the app", legNo: "No app", mapAria: "Map: the truck drives down the street and phones ring in homes that have the app",
   k3: "The money", bigL: "extra per month <span class=\"est\">estimate</span>", now: "Now", with: "With the app",
   s1: "Stops per day", s2: "Average sale", s3: "Days per month", more: "How we got this →",
-  k4: "Rewards", h4: "Points that bring them back.", p4: "<b>10 points</b> every purchase. No big game.",
-  c1: "50¢ off", c2: "$1 off", c3: "Free chili cheese Fritos",
+  routeBtn: "📍 Count the houses on YOUR route",
+  k3b: "Take every payment", h3b: "Cash only? You're losing sales.", payL: "extra per month, after fees <span class=\"est\">estimate</span>",
+  payCard: "💳 Cards", p3b: "<b>We set it all up for you.</b>", payMore: "Fees and the math →",
+  k4: "Rewards", h4: "Rewards that bring them back.",
+  punch: "Check in 5 times → <b>10% off</b> or <b>an extra scoop</b>",
+  cAl: "Alerts on = +5 bonus", cAlS: "every time the truck comes by",
+  cPts: "10 points every purchase", cPtsS: "50¢ off · $1 off · free chili cheese Fritos",
+  kT: "Pick your plan", hT: "Three scoops. Pick yours.", tNote: "No contract. Move up or down any time.",
+  tPopular: "Most popular", tSetup: "setup", tMo: "/mo", tFound: "first {n} trucks", tTrucks: "up to {n} trucks · {p} each",
+  tEst: "Extra for you: <b>{x}/mo</b> <span class=\"est\">estimate</span><br>Pays for itself with about {n} ice creams a month.",
+  t_single: "Single Scoop", t_singleS: "Just the basics", t_double: "Double Scoop", t_doubleS: "Everything for one truck", t_sundae: "Sundae", t_sundaeS: "For 2–3 trucks",
+  f_single: ["Designer ice cream QR sticker", "Phones ring when your truck is close", "Live truck map", "Points + 5-visit reward"],
+  f_double: ["Everything in Single Scoop", "Take cards, Apple Pay, Venmo, Cash App, Zelle (we set it up)", "Route house counter", "Monthly money report"],
+  f_sundae: ["Everything in Double Scoop, for up to 3 trucks", "Slow-day blast: send a deal to all your members (2 a month)", "Parties + events booking page", "Priority help"],
+  priceTier: "<b>{name}</b>: {setup} setup, then <b>{monthly}/mo</b>. No contract, cancel any time.",
   k5: "See it", h5: "Try it yourself.", phApp: "Paletas El Sol · now", phTitle: "The truck is on your street!", phBody: "0.2 mi away, about 3 min 🎶",
   demo: "Open the demo →",
   h6: "Let's set you up.", p6: "Your truck's name. Your menu. <b>Your customers' phones ringing.</b>",
-  mail: "✉️ Email Antidote", sms: "💬 Text (number coming soon)", price: "Price TBD: ask Antidote",
+  mail: "✉️ Email Antidote", sms: "💬 Text (number coming soon)",
+  priceSetup: "Setup <s>{setup}</s> <b>{founding}</b> for the first {slots} trucks",
+  priceMo: "then <b>{monthly}/mo</b>. No contract, cancel any time.",
+  priceRoi: "Pays for itself with about {n} extra ice creams a month.",
   det: "See the details (numbers, sources, FAQ) →",
   next: "Next →", last: "Start over ↺", back: "Back",
-  subject: "Ice cream truck app", body: "Hi Antidote, I have an ice cream truck and I'd like to get set up. My truck name: "
+  listen: "🔊 Listen", listenStop: "⏹ Stop", auto: "🔊 Auto", autoAria: "Auto-play: read each card out loud when you tap Next",
+  subject: "Ice cream truck app", body: "Hi Antidote, I have an ice cream truck and I'd like the {plan} plan. My truck name: "
 },
 es: {
   _title: "SousShift AI para Troques de Helados",
@@ -216,22 +332,43 @@ es: {
   k2: "Cómo funciona", h2: "Ahora les suena el celular.",
   i1: "Escanean el QR de tu troque", i2: "Activan su ubicación", i3: "¿El troque cerca? Les suena el cel",
   play: "▶ Escuchar el tono", stop: "■ Parar",
+  qrAlt: "Calcomanía QR de diseñador con un helado para el troque",
+  kMap: "Mapa en vivo", hMap: "Mira cómo les suena el cel.", mRang: "celulares sonaron", mWalk: "salen a comprar",
+  legApp: "Tiene la app", legNo: "Sin la app", mapAria: "Mapa: el troque pasa por la calle y suenan los celulares en las casas que tienen la app",
   k3: "El dinero", bigL: "extra al mes <span class=\"est\">estimado</span>", now: "Hoy", with: "Con la app",
   s1: "Paradas por día", s2: "Venta promedio", s3: "Días al mes", more: "¿De dónde sale esto? →",
-  k4: "Premios", h4: "Puntos que los hacen volver.", p4: "<b>10 puntos</b> en cada compra. Sin juegos complicados.",
-  c1: "50¢ de descuento", c2: "$1 de descuento", c3: "Fritos con chili y queso gratis",
+  routeBtn: "📍 Cuenta las casas de TU ruta",
+  k3b: "Acepta todos los pagos", h3b: "¿Solo efectivo? Estás perdiendo ventas.", payL: "extra al mes, ya sin comisiones <span class=\"est\">estimado</span>",
+  payCard: "💳 Tarjetas", p3b: "<b>Nosotros te lo dejamos listo.</b>", payMore: "Comisiones y las cuentas →",
+  k4: "Premios", h4: "Premios que los hacen volver.",
+  punch: "Registra 5 visitas → <b>10% de descuento</b> o <b>una bola extra</b>",
+  cAl: "Alertas prendidas = +5 extra", cAlS: "cada vez que pasa el troque",
+  cPts: "10 puntos en cada compra", cPtsS: "50¢ menos · $1 menos · Fritos con chili y queso gratis",
+  kT: "Escoge tu plan", hT: "Tres bolas. Escoge la tuya.", tNote: "Sin contrato. Sube o baja de plan cuando quieras.",
+  tPopular: "El más popular", tSetup: "instalación", tMo: "/mes", tFound: "primeros {n} troques", tTrucks: "hasta {n} troques · {p} c/u",
+  tEst: "Extra para ti: <b>{x}/mes</b> <span class=\"est\">estimado</span><br>Se paga sola con unos {n} helados al mes.",
+  t_single: "Una Bola", t_singleS: "Lo básico", t_double: "Doble Bola", t_doubleS: "Todo para un troque", t_sundae: "Sundae", t_sundaeS: "Para 2–3 troques",
+  f_single: ["Calcomanía QR de diseñador con un helado", "Les suena el cel cuando tu troque está cerca", "Mapa del troque en vivo", "Puntos + premio a las 5 visitas"],
+  f_double: ["Todo lo de Una Bola", "Acepta tarjetas, Apple Pay, Venmo, Cash App, Zelle (te lo dejamos listo)", "Contador de casas en tu ruta", "Reporte de dinero cada mes"],
+  f_sundae: ["Todo lo de Doble Bola, para hasta 3 troques", "Oferta para días flojos: manda una promo a todos tus clientes (2 al mes)", "Página para reservar fiestas y eventos", "Ayuda prioritaria"],
+  priceTier: "<b>{name}</b>: {setup} de instalación, luego <b>{monthly} al mes</b>. Sin contrato, cancela cuando quieras.",
   k5: "Míralo", h5: "Pruébalo tú mismo.", phApp: "Paletas El Sol · ahora", phTitle: "¡El troque está en tu calle!", phBody: "A 0.2 millas, como 3 min 🎶",
   demo: "Abrir el demo →",
   h6: "Vamos a armarte la tuya.", p6: "El nombre de tu troque. Tu menú. <b>Los celulares de tus clientes sonando.</b>",
-  mail: "✉️ Escríbele a Antidote", sms: "💬 Texto (número muy pronto)", price: "Precio por definir: pregúntale a Antidote",
+  mail: "✉️ Escríbele a Antidote", sms: "💬 Texto (número muy pronto)",
+  priceSetup: "Instalación <s>{setup}</s> <b>{founding}</b> para los primeros {slots} troques",
+  priceMo: "luego <b>{monthly} al mes</b>. Sin contrato, cancela cuando quieras.",
+  priceRoi: "Se paga sola con unos {n} helados extra al mes.",
   det: "Ver los detalles (números, fuentes, preguntas) →",
   next: "Siguiente →", last: "Empezar de nuevo ↺", back: "Atrás",
-  subject: "App para troque de helados", body: "Hola Antidote, tengo un troque de helados y quiero que me lo instalen. Nombre de mi troque: "
+  listen: "🔊 Escuchar", listenStop: "⏹ Parar", auto: "🔊 Auto", autoAria: "Leer en voz alta cada tarjeta al tocar Siguiente",
+  subject: "App para troque de helados", body: "Hola Antidote, tengo un troque de helados y quiero el plan {plan}. Nombre de mi troque: "
 }};
 </script>
-<script src="lang.js"></script>
-<script src="jingle.js"></script>
-<script src="model.js"></script>
+<script src="lang.js?v=20261011b"></script>
+<script src="jingle.js?v=20261011b"></script>
+<script src="model.js?v=20261011b"></script>
+<script src="speak.js?v=20261011b"></script>
 <script>
 (function () {
   "use strict";
@@ -250,7 +387,9 @@ es: {
     $("prev").hidden = i === 0;
     $("next").textContent = ICE.t(i === N - 1 ? "last" : "next");
     try { history.replaceState(null, "", "#" + (i + 1)); } catch (e) {}
+    if (window.Speak && typeof onCard === "function" && i !== lastCard) { lastCard = i; onCard(i); }
   }
+  var lastCard = -1;
   $("next").addEventListener("click", function () { go(i === N - 1 ? 0 : i + 1); });
   $("prev").addEventListener("click", function () { go(i - 1); });
   document.addEventListener("keydown", function (e) {
@@ -270,6 +409,84 @@ es: {
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) go(i + (dx < 0 ? 1 : -1));
   }, { passive: true });
 
+  /* ---------- read aloud: a friendly spoken script per card (numbers said as words) ---------- */
+  function sayMoney(n, L) { // $5 -> "five dollars", $5.50 -> "five dollars and fifty cents"
+    var d = Math.floor(n), c = Math.round((n - d) * 100);
+    if (!c) return Speak.dollars(d, L);
+    return L === "es" ? Speak.dollars(d, L) + " con " + Speak.words(c, L) + " centavos" : Speak.dollars(d, L) + " and " + Speak.words(c, L) + " cents";
+  }
+  function script(k) {
+    var L = ICE.lang, r = IceModel.run({ stops: +$("stops").value, ticket: +$("ticket").value, days: +$("days").value }), P = IceModel.PRICING;
+    var w = function (n) { return Speak.words(n, L); }, $$ = function (n) { return Speak.dollars(n, L); };
+    function setupSay(t, l) {
+      if (t.founding) return l === "es" ? "La instalación cuesta " + $$(t.setup) + ", pero los primeros " + w(t.foundingSlots) + " troques pagan solo " + $$(t.founding) + "."
+        : "Setup is " + $$(t.setup) + ", but the first " + w(t.foundingSlots) + " trucks pay just " + $$(t.founding) + ".";
+      return l === "es" ? "La instalación cuesta " + $$(t.setup) + "." : "Setup is " + $$(t.setup) + ".";
+    }
+    function tierSay(l) {
+      var T3 = IceModel.TIERS, q = { stops: +$("stops").value, ticket: +$("ticket").value, days: +$("days").value };
+      var e = function (t) { return $$(IceModel.tierRun(t, q).extra); };
+      return l === "es"
+        ? "Hay tres planes. Una Bola cuesta " + $$(T3[0].monthly) + " al mes: el QR, las alertas, el mapa y los premios. Te deja como " + e(T3[0]) + " extra al mes. Doble Bola, el más popular, cuesta " + $$(T3[1].monthly) + " al mes, y además te dejamos listo para aceptar todos los pagos, más el contador de casas de tu ruta. Son como " + e(T3[1]) + " extra al mes. Y Sundae cuesta " + $$(T3[2].monthly) + " al mes para hasta tres troques, con promos para los días flojos y reservas para fiestas. Toca un plan para ver lo que incluye."
+        : "There are three plans. Single Scoop is " + $$(T3[0].monthly) + " a month: the QR, the alerts, the map and the rewards. That's about " + e(T3[0]) + " extra a month. Double Scoop, the most popular, is " + $$(T3[1].monthly) + " a month, and we also set you up to take every payment, plus the route house counter. That's about " + e(T3[1]) + " extra a month. And Sundae is " + $$(T3[2].monthly) + " a month for up to three trucks, with slow-day deals and party bookings. Tap a plan to see what's inside.";
+    }
+    var S = {
+      en: [
+        "Hey! Quick question. When your truck rolls down the street, about half the people inside never hear your music. The TV is on, the AC is running, they've got headphones in. That's money driving right past you.",
+        "Here's how it works. Your truck gets a designer ice cream QR sticker. Your customers scan it. They turn on their location, one time. Then, when your truck gets close, their phone rings with an ice cream truck jingle. Now they know you're outside.",
+        "This is the live map. Watch the truck drive down the street. Every gold house has the app. When the truck gets close, their phone rings, and some of them come right out to buy. The gray houses don't have the app yet, so they only hear the music if they're lucky.",
+        "Let's talk money. With " + w(+$("stops").value) + " stops a day and an average sale of " + sayMoney(+$("ticket").value, L) + ", you make about " + $$(r.todayMo) + " a month today. With the app, that's about " + $$(r.extraMo) + " more every month. It's an estimate, so move the sliders to match your truck.",
+        "Do you only take cash? Then you're losing sales. A lot of people don't carry cash anymore. Take cards, Apple Pay, Venmo, Cash App and Zelle, and that's about " + $$(r.payMo) + " more a month, after the fees. And we set it all up for you.",
+        "Rewards keep them coming back. Every time they check in at your truck, they get a punch. After five visits, they pick ten percent off or an extra scoop. If they keep their truck alerts turned on, they get five bonus points every time you come by, so they never turn you off. And every purchase still gets ten points, for fifty cents off, a dollar off, or free chili cheese Fritos.",
+        "Want to see it for yourself? Tap Open the demo, and you'll see exactly what your customers see on their phone: the live map, the alert, and their points.",
+        tierSay("en"),
+        "Ready? We set it all up: your truck's name, your menu, and your customers' phones ringing. You picked " + ICE.t("t_" + tier.id) + ". " + setupSay(tier, "en") + " Then it's " + $$(tier.monthly) + " a month. No contract, cancel any time. It pays for itself with about " + w(IceModel.roiCount(+$("ticket").value, tier.monthly)) + " ice creams a month. Tap Email Antidote or Text to get started."
+      ],
+      es: [
+        "¡Oye! Una pregunta rápida. Cuando tu troque pasa por la calle, como la mitad de la gente que está adentro nunca oye tu música. Tienen la tele prendida, el aire prendido, o traen audífonos. Es dinero que se te pasa de largo.",
+        "Así funciona. Tu troque lleva una calcomanía QR de diseñador con un helado. Tus clientes la escanean. Activan su ubicación una sola vez. Y cuando tu troque se acerca, les suena el celular con la musiquita del troque de helados. Así saben que estás afuera.",
+        "Este es el mapa en vivo. Mira el troque pasar por la calle. Cada casa dorada tiene la app. Cuando el troque se acerca, les suena el celular, y varios salen de una vez a comprar. Las casas grises todavía no tienen la app, así que solo oyen la música si tienen suerte.",
+        "Hablemos de dinero. Con " + w(+$("stops").value) + " paradas al día y una venta promedio de " + sayMoney(+$("ticket").value, L) + ", hoy ganas como " + $$(r.todayMo) + " al mes. Con la app, son como " + $$(r.extraMo) + " más cada mes. Es un estimado, así que mueve las barras para que se parezca a tu troque.",
+        "¿Solo aceptas efectivo? Entonces estás perdiendo ventas. Mucha gente ya no trae efectivo. Acepta tarjetas, Apple Pay, Venmo, Cash App y Zelle, y son como " + $$(r.payMo) + " más al mes, ya sin las comisiones. Y nosotros te lo dejamos todo listo.",
+        "Los premios hacen que regresen. Cada vez que registran su visita en tu troque, ganan un sello. A las cinco visitas, escogen diez por ciento de descuento o una bola extra. Si dejan las alertas del troque prendidas, ganan cinco puntos extra cada vez que pasas, así nunca te apagan. Y cada compra les sigue dando diez puntos, para cincuenta centavos menos, un dólar menos, o Fritos con chili y queso gratis.",
+        "¿Quieres verlo tú mismo? Toca Abrir el demo, y vas a ver exactamente lo que tus clientes ven en su celular: el mapa en vivo, la alerta y sus puntos.",
+        tierSay("es"),
+        "¿Listo? Nosotros te armamos todo: el nombre de tu troque, tu menú, y los celulares de tus clientes sonando. Escogiste " + ICE.t("t_" + tier.id) + ". " + setupSay(tier, "es") + " Luego son " + $$(tier.monthly) + " al mes. Sin contrato, cancela cuando quieras. Se paga sola con unos " + w(IceModel.roiCount(+$("ticket").value, tier.monthly)) + " helados al mes. Toca Escríbele a Antidote o Texto para empezar."
+      ]
+    };
+    return (S[L] || S.en)[k] || "";
+  }
+  var auto = false, reading = -1;
+  slides.forEach(function (sl, k) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "spk-btn listen"; b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () {
+      if (reading === k && Speak.speaking) { Speak.stop(); return; }
+      reading = k; Speak.say(script(k));
+      listenUI();
+    });
+    var inner = sl.querySelector(".inner"); inner.insertBefore(b, inner.firstChild);
+  });
+  function listenUI() {
+    slides.forEach(function (sl, k) {
+      var b = sl.querySelector(".listen"), on = Speak.speaking && reading === k;
+      b.textContent = ICE.t(on ? "listenStop" : "listen"); b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    $("auto").setAttribute("aria-pressed", auto ? "true" : "false");
+    $("auto").setAttribute("aria-label", ICE.t("autoAria")); $("auto").title = ICE.t("autoAria");
+  }
+  Speak.on(function () { listenUI(); });
+  Speak.css();
+  $("auto").addEventListener("click", function () {
+    auto = !auto;
+    if (auto) { reading = i; Speak.say(script(i)); } else Speak.stop();
+    listenUI();
+  });
+  function onCard(k) { // card changed: read it if auto-play is on, otherwise stop talking
+    if (auto) { reading = k; Speak.say(script(k)); } else if (Speak.speaking) Speak.stop();
+    listenUI();
+  }
+
   // money card
   function calc() {
     var r = IceModel.run({ stops: +$("stops").value, ticket: +$("ticket").value, days: +$("days").value }), L = ICE.lang;
@@ -279,8 +496,126 @@ es: {
     $("big").textContent = "+" + IceModel.money(r.extraMo, L);
     $("now").textContent = IceModel.money(r.todayMo, L);
     $("with").textContent = IceModel.money(r.appMo, L);
+    $("paybig").textContent = "+" + IceModel.money(r.payMo, L);
+    var m = function (n) { return IceModel.money(n, L); }, q = { stops: +$("stops").value, ticket: +$("ticket").value, days: +$("days").value };
+    var setupHtml = function (t) { return t.founding ? "<s>" + m(t.setup) + "</s>" + m(t.founding) : m(t.setup); };
+    $("tiers").innerHTML = IceModel.TIERS.map(function (t) {
+      var r = IceModel.tierRun(t, q), sub = t.founding ? ICE.t("tFound").replace("{n}", t.foundingSlots) : t.trucks > 1 ? ICE.t("tTrucks").replace("{n}", t.trucks).replace("{p}", m(r.perTruck)) : ICE.t("tSetup");
+      return '<button type="button" class="tier" data-tier="' + t.id + '" aria-pressed="' + (t.id === tier.id) + '">' +
+        (t.best ? '<span class="badge">' + ICE.t("tPopular") + "</span>" : "") +
+        '<div class="hd"><span class="em" aria-hidden="true">' + t.emoji + '</span><span class="nm">' + ICE.t("t_" + t.id) + "<small>" + ICE.t("t_" + t.id + "S") + "</small></span>" +
+        '<span class="pp">' + m(t.monthly) + ICE.t("tMo") + "<small>" + setupHtml(t) + " " + (t.founding ? "· " + sub : t.trucks > 1 ? ICE.t("tSetup") + "<br>" + sub : sub) + "</small></span></div>" +
+        "<ul>" + ICE.t("f_" + t.id).map(function (f) { return "<li>" + f + "</li>"; }).join("") + "</ul>" +
+        '<div class="est-l">' + ICE.t("tEst").replace("{x}", "+" + m(r.extra)).replace("{n}", r.roi) + "</div></button>";
+    }).join("");
+    var setupTxt = tier.founding ? "<s>" + m(tier.setup) + "</s> " + m(tier.founding) + " (" + ICE.t("tFound").replace("{n}", tier.foundingSlots) + ")" : m(tier.setup);
+    $("price").innerHTML = ICE.t("priceTier").replace("{name}", tier.emoji + " " + ICE.t("t_" + tier.id)).replace("{setup}", setupTxt).replace("{monthly}", m(tier.monthly)) +
+      "<small>" + ICE.t("priceRoi").replace("{n}", IceModel.roiCount(+$("ticket").value, tier.monthly)) + "</small>";
   }
+  var tier = IceModel.TIERS.filter(function (t) { return t.best; })[0];
+  try { var saved = localStorage.getItem("ssai:ice:tier"); IceModel.TIERS.forEach(function (t) { if (t.id === saved) tier = t; }); } catch (e) {}
+  $("tiers").addEventListener("click", function (e) {
+    var b = e.target.closest(".tier"); if (!b) return;
+    IceModel.TIERS.forEach(function (t) { if (t.id === b.getAttribute("data-tier")) tier = t; });
+    try { localStorage.setItem("ssai:ice:tier", tier.id); } catch (er) {}
+    calc(); contact();
+    var nb = $("tiers").querySelector('[data-tier="' + tier.id + '"]'); if (nb) nb.focus();
+  });
   ["stops", "ticket", "days"].forEach(function (id) { $(id).addEventListener("input", calc); });
+
+
+  /* ---------- live map: the truck drives, phones ring in homes with the app ---------- */
+  (function map() {
+    var cv = $("map"), cx = cv.getContext("2d"), W = cv.width, H = cv.height, card = $("mapcard");
+    var ROWS = [130, 290, 450], COLS = [60, 420, 780], ALERT = 150, HEAR = 70, SPEED = 95;
+    var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    var homes = [];
+    ROWS.forEach(function (y, r) {
+      [-1, 1].forEach(function (side) {
+        for (var x = 30; x < W - 20; x += 58) {
+          if (COLS.some(function (c) { return Math.abs(c - x) < 34; })) continue;
+          if (side === -1 && r === 0) { /* top row houses above street */ }
+          homes.push({ x: x, y: y + side * 50, side: side, app: rnd() < 0.36, out: rnd() < 0.45, hue: 200 + rnd() * 140, rung: -1, walk: 0 });
+        }
+      });
+    });
+    var path = [[-40, ROWS[0]], [W - 60, ROWS[0]], [W - 60, ROWS[1]], [60, ROWS[1]], [60, ROWS[2]], [W + 40, ROWS[2]]];
+    var segs = [], total = 0;
+    for (var k = 1; k < path.length; k++) { var dx = path[k][0] - path[k - 1][0], dy = path[k][1] - path[k - 1][1], l = Math.hypot(dx, dy); segs.push({ a: path[k - 1], dx: dx, dy: dy, l: l, s: total }); total += l; }
+    function at(d) { for (var q = 0; q < segs.length; q++) { var g = segs[q]; if (d <= g.s + g.l) { var f = (d - g.s) / g.l; return [g.a[0] + g.dx * f, g.a[1] + g.dy * f, g.dx, g.dy]; } } var z = segs[segs.length - 1]; return [z.a[0] + z.dx, z.a[1] + z.dy, z.dx, z.dy]; }
+    var dist = 0, last = 0, t = 0, rang = 0, walk = 0, raf = 0;
+    function reset() { dist = 0; rang = 0; walk = 0; homes.forEach(function (h) { h.rung = -1; h.walk = 0; }); $("rang").textContent = 0; $("walk").textContent = 0; }
+    function rr(x, y, w, h, r) { cx.beginPath(); cx.moveTo(x + r, y); cx.arcTo(x + w, y, x + w, y + h, r); cx.arcTo(x + w, y + h, x, y + h, r); cx.arcTo(x, y + h, x, y, r); cx.arcTo(x, y, x + w, y, r); cx.closePath(); }
+    function draw() {
+      var g = cx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0d1f45"); g.addColorStop(1, "#081430");
+      cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+      // parks / blocks
+      cx.fillStyle = "rgba(52,211,153,.06)"; rr(440, 330, 320, 80, 18); cx.fill();
+      // streets
+      cx.lineCap = "round";
+      ROWS.forEach(function (y) { cx.strokeStyle = "#22355f"; cx.lineWidth = 36; cx.beginPath(); cx.moveTo(-20, y); cx.lineTo(W + 20, y); cx.stroke(); });
+      COLS.forEach(function (x) { cx.strokeStyle = "#22355f"; cx.lineWidth = 36; cx.beginPath(); cx.moveTo(x, -20); cx.lineTo(x, H + 20); cx.stroke(); });
+      cx.setLineDash([14, 14]); cx.lineWidth = 2; cx.strokeStyle = "rgba(255,209,102,.25)";
+      ROWS.forEach(function (y) { cx.beginPath(); cx.moveTo(0, y); cx.lineTo(W, y); cx.stroke(); });
+      cx.setLineDash([]);
+      var p = at(dist), tx = p[0], ty = p[1];
+      // alert radius
+      var pulse = (t % 1.6) / 1.6;
+      cx.strokeStyle = "rgba(255,209,102," + (0.35 * (1 - pulse)) + ")"; cx.lineWidth = 3;
+      cx.beginPath(); cx.arc(tx, ty, ALERT * (0.4 + 0.6 * pulse), 0, 7); cx.stroke();
+      cx.fillStyle = "rgba(255,209,102,.05)"; cx.beginPath(); cx.arc(tx, ty, ALERT, 0, 7); cx.fill();
+      // homes
+      homes.forEach(function (h) {
+        var d = Math.hypot(h.x - tx, h.y - ty);
+        if (h.app && h.rung < 0 && d < ALERT) { h.rung = t; rang++; $("rang").textContent = rang; if (h.out) { walk++; $("walk").textContent = walk; } }
+        var on = h.rung >= 0, age = on ? t - h.rung : 0;
+        if (on && age < 2.4) for (var w = 0; w < 3; w++) { var a = (age * 1.4 - w * 0.35); if (a > 0 && a < 1) { cx.strokeStyle = "rgba(255,209,102," + (1 - a) + ")"; cx.lineWidth = 3; cx.beginPath(); cx.arc(h.x, h.y - 4, 12 + a * 34, 0, 7); cx.stroke(); } }
+        // house
+        var c = h.app ? (on ? "#ffd166" : "#c9a64a") : "#4a5d88";
+        cx.fillStyle = c; rr(h.x - 13, h.y - 8, 26, 20, 4); cx.fill();
+        cx.beginPath(); cx.moveTo(h.x - 17, h.y - 7); cx.lineTo(h.x, h.y - 21); cx.lineTo(h.x + 17, h.y - 7); cx.closePath(); cx.fill();
+        cx.fillStyle = "rgba(3,6,14,.55)"; cx.fillRect(h.x - 4, h.y + 2, 8, 10);
+        if (h.app) { // little phone; it shakes + glows while ringing
+          var sh = on && age < 2.4 ? Math.sin(age * 40) * 2.5 : 0;
+          cx.save(); cx.translate(h.x + 16 + sh, h.y - 20);
+          if (on && age < 2.4) { cx.shadowColor = "#ffd166"; cx.shadowBlur = 14; }
+          cx.fillStyle = on && age < 2.4 ? "#ffffff" : "#0b1630"; rr(-6, -10, 12, 20, 3); cx.fill(); cx.shadowBlur = 0;
+          cx.strokeStyle = "#ffd166"; cx.lineWidth = 1.5; rr(-6, -10, 12, 20, 3); cx.stroke();
+          cx.fillStyle = on && age < 2.4 ? "#ff5fa2" : "#2f7bff"; cx.fillRect(-4, -7, 8, 12);
+          cx.restore();
+        } else if (d < HEAR && h.hue > 270) { cx.font = "bold 18px Arial"; cx.textAlign = "center"; cx.fillStyle = "rgba(255,255,255,.75)"; cx.fillText("\u266A", h.x + 14, h.y - 16); }
+        // customer walks to the curb
+        if (on && h.out) {
+          var f = Math.min(1, age / 1.8), px = h.x + (tx - h.x) * f * 0.35, py = h.y + (ty - h.y) * f * 0.75;
+          if (age < 7) { cx.fillStyle = "#ff8fc4"; cx.beginPath(); cx.arc(px, py, 7, 0, 7); cx.fill(); cx.fillStyle = "#fff"; cx.beginPath(); cx.arc(px, py - 9, 4.5, 0, 7); cx.fill(); }
+        }
+      });
+      // truck
+      cx.save(); cx.translate(tx, ty); var ang = Math.atan2(p[3], p[2]); var flip = Math.abs(ang) > Math.PI / 2;
+      cx.rotate(flip ? ang + Math.PI : ang); if (flip) cx.scale(-1, 1);
+      cx.shadowColor = "rgba(255,143,196,.8)"; cx.shadowBlur = 18;
+      var tg = cx.createLinearGradient(0, -16, 0, 16); tg.addColorStop(0, "#ffffff"); tg.addColorStop(1, "#ffc2de");
+      cx.fillStyle = tg; rr(-30, -16, 60, 32, 8); cx.fill(); cx.shadowBlur = 0;
+      cx.fillStyle = "#2f7bff"; rr(14, -12, 14, 24, 4); cx.fill();
+      cx.fillStyle = "#ff5fa2"; cx.fillRect(-30, 4, 44, 5);
+      cx.restore();
+      // cone on the roof
+      cx.fillStyle = "#e0a352"; cx.beginPath(); cx.moveTo(tx - 9, ty - 14); cx.lineTo(tx + 9, ty - 14); cx.lineTo(tx, ty + 6); cx.closePath(); cx.fill();
+      cx.fillStyle = "#ffd1e6"; cx.beginPath(); cx.arc(tx, ty - 18, 10, 0, 7); cx.fill();
+      cx.fillStyle = "#ff8fc4"; cx.beginPath(); cx.arc(tx - 3, ty - 24, 6, 0, 7); cx.fill();
+    }
+    function frame(now) {
+      raf = 0;
+      if (!card.classList.contains("on") || document.hidden) { last = 0; return; }
+      var dt = last ? Math.min(0.05, (now - last) / 1000) : 0; last = now; t += dt; dist += SPEED * dt;
+      if (dist > total) reset();
+      draw(); raf = requestAnimationFrame(frame);
+    }
+    function kick() { if (!raf && card.classList.contains("on")) raf = requestAnimationFrame(frame); }
+    new MutationObserver(kick).observe(card, { attributes: true, attributeFilter: ["class"] });
+    document.addEventListener("visibilitychange", kick);
+    draw(); kick();
+  })();
 
   // jingle
   var play = $("play");
@@ -291,15 +626,16 @@ es: {
     Jingle.play(2).then(function () { play.textContent = ICE.t("play"); });
   });
 
+  function body() { return ICE.t("body").replace("{plan}", ICE.t("t_" + tier.id)); }
   function contact() {
-    $("ct-mail").href = "mailto:secondshiftai@gmail.com?subject=" + encodeURIComponent(ICE.t("subject")) + "&body=" + encodeURIComponent(ICE.t("body"));
+    $("ct-mail").href = "mailto:secondshiftai@gmail.com?subject=" + encodeURIComponent(ICE.t("subject")) + "&body=" + encodeURIComponent(body());
     // TEXT_NUMBER: Antidote's business number (e.g. "+13105550123") turns the Text button on.
-    var TEXT_NUMBER = "", s = $("ct-sms");
-    if (TEXT_NUMBER) { s.href = "sms:" + TEXT_NUMBER + "?&body=" + encodeURIComponent(ICE.t("body")); s.classList.remove("off"); s.removeAttribute("aria-disabled"); }
+    var TEXT_NUMBER = "+14243094068", s = $("ct-sms");
+    if (TEXT_NUMBER) { s.href = "sms:" + TEXT_NUMBER + "?&body=" + encodeURIComponent(body()); s.classList.remove("off"); s.removeAttribute("aria-disabled"); }
   }
   $("ct-sms").addEventListener("click", function (e) { if (this.classList.contains("off")) e.preventDefault(); });
 
-  ICE.on(function () { calc(); contact(); go(i); if (Jingle.playing) play.textContent = ICE.t("stop"); });
+  ICE.on(function () { calc(); contact(); lastCard = -1; go(i); listenUI(); if (Jingle.playing) play.textContent = ICE.t("stop"); });
   window.addEventListener("hashchange", function () { var n = parseInt(location.hash.slice(1), 10); if (n >= 1 && n <= N && n - 1 !== i) go(n - 1); });
   var h = parseInt((location.hash || "").slice(1), 10);
   calc(); contact(); go(h >= 1 && h <= N ? h - 1 : 0);

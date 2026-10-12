@@ -30,9 +30,12 @@ h3{font-size:16px}
 .top b{font-family:"Orbitron",sans-serif;font-size:12.5px;letter-spacing:.06em;line-height:1.15}
 .top b small{display:block;font-family:"Rajdhani",sans-serif;font-size:13px;letter-spacing:.02em;color:var(--dim);font-weight:600}
 .top .sp{flex:1}
-.lt{display:flex;border:1px solid var(--edge);border-radius:12px;overflow:hidden;flex:none}
-.lt button{background:none;border:0;color:var(--dim);font:800 14px "Rajdhani",sans-serif;min-width:44px;min-height:40px;padding:0 10px;cursor:pointer}
-.lt button[aria-pressed=true]{background:var(--blue);color:#fff}
+/* language switch: always visible, top corner, "English / Español" */
+.lt{display:flex;border:1.5px solid var(--volt);border-radius:12px;overflow:hidden;flex:none;margin-left:auto;background:rgba(3,6,14,.6)}
+.lt button{background:none;border:0;color:var(--silver);font:800 15px "Rajdhani",sans-serif;min-width:64px;min-height:44px;padding:0 10px;cursor:pointer;white-space:nowrap}
+.lt button+button{border-left:1px solid var(--edge)}
+.lt button[aria-pressed=true]{background:var(--blue);color:#fff;box-shadow:inset 0 -3px 0 var(--gold)}
+@media(max-width:420px){.lt button{min-width:58px;padding:0 7px;font-size:14px}}
 
 /* common blocks */
 section.s{margin-top:44px}

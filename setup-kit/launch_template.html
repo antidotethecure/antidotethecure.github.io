@@ -73,6 +73,8 @@ __VALUECARD__<h2>4 · AI agents (optional add-on)</h2>
 
 <p class="prog" id="prog"></p>
 </main>
+<div class="q" id="smsopt"><label style="display:flex;gap:10px;align-items:flex-start;font-size:14px"><input type="checkbox" id="smsok" style="width:22px;height:22px;flex:none;margin-top:2px"> <span>Text me SousShift AI Owner Support messages (support replies, setup steps, launch updates and billing reminders) at <b>(424) 296-3303</b>. Message frequency varies. Message &amp; data rates may apply. Reply HELP for help, STOP to opt out. Consent is not a condition of purchase. <a href="../../sousshift/sms/" style="color:inherit">Terms</a> · <a href="../../sousshift/privacy/" style="color:inherit">Privacy</a></span></label></div>
+<script>document.addEventListener("DOMContentLoaded",function(){var c=document.getElementById("smsok");try{c.checked=!!S.sms_optin;}catch(e){}c.onchange=function(){S.sms_optin=c.checked?new Date().toISOString():"";save();};});</script>
 <div class="bar"><div class="prog" id="prog2"></div><button id="send" type="button">✅ Send everything to Antidote</button></div>
 <script>
 var REST=__RESTAURANTS__, OWNER="__OWNER__", AMB=__AMBIENT__;
@@ -258,6 +260,7 @@ document.getElementById("send").onclick=function(){
     out.push("REGISTERS"); REST.forEach(function(r){ out.push("• "+r.short+": "+(S["pos_"+r.key]||"(no answer)")+" — "+(S["posway_"+r.key]||"(no answer)")); });
     if(INTERIM){ out.push("","AGREEMENTS (signer: "+OWNER+")"); REST.forEach(function(r){ out.push("• "+r.short+" LLC legal name: "+(S["llc_"+r.key]||"(missing)")); });
       out.push("","INTERIM MODE (until Toast is connected)"); REST.forEach(function(r){ out.push("• "+r.short+": "+(S["interim_ok_"+r.key]||"(no answer)")+" · Toast buttons: "+(S["toastbtn_"+r.key]||"(no answer)")); }); out.push("• Toast rep: "+(S["toastrep"]||"(no answer)")); }
+    out.push("","OWNER SUPPORT TEXTS: "+(S.sms_optin?"opted in "+S.sms_optin:"not opted in"));
     out.push("","LAUNCH WEEK");
     var rows=[["date","Go live"]].concat(REST.map(function(r){ return ["tables_"+r.key,r.short+" tables"]; })).concat([["print","Print"],["ig","IG bio links"],["msgs","Messages go to"],["msghow","Message by"],["fwd","Call forwarding"],["staff","Staff walkthrough"],["assets","Logos & prices"],["gmail","Google email"],["ready","Before launch"]]);
     rows.forEach(function(p){ var v=S[p[0]]; out.push("• "+p[1]+": "+(Array.isArray(v)?v.join(", "):(v||"(no answer)"))); });

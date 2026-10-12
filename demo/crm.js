@@ -38,8 +38,25 @@
 (function () {
   "use strict";
   var C = window.CRM_CFG || {};
+  // ---- SIMPLE PROGRAM (opt-in: CRM_CFG.simple, used by Melody + Nalu Vida since Christian's 2026-10 feedback) ----
+  // One plain Starbucks / McDonald's-style program: ONE points balance per restaurant, points per eligible $1 (staff ring-up),
+  // plus a few capped bonuses, and one rewards ladder. Everything else in this file that stacks discounts is switched off:
+  // no split wallets, no visit levels / multipliers, no tokens, no daily spin, no daily draw, no check-in / first-order /
+  // feedback / Instagram bonuses, no welcome voucher, no friend gift, no 3-friend gift, no missed-call voucher (unless
+  // CRM_CFG.missed is set explicitly). Shape (the page keeps it in ONE object, window.SSAI_REWARDS):
+  //   { perDollar:10, join:100, birthday:250, referral:100, game:{perScore:100, dailyCap:50}, tiers:[[250,"…"],…] }
+  //   join      points once, when a guest joins
+  //   birthday  points once a year, on the birthday
+  //   referral  points to the member per friend who joins with their code AND makes a first visit
+  //   game      1 point per `perScore` game score, at most `dailyCap` game points a day (LA date). Guests can play first;
+  //             their points are held on this phone for the day and credited when they join (window.SSAI_GAMEPTS).
+  var SIMPLE = C.simple || null;
+  if (SIMPLE) { SIMPLE.game = SIMPLE.game || {}; if (!SIMPLE.game.perScore) SIMPLE.game.perScore = 100; if (SIMPLE.game.dailyCap == null) SIMPLE.game.dailyCap = 50;
+    if (SIMPLE.join == null) SIMPLE.join = 100; if (SIMPLE.birthday == null) SIMPLE.birthday = 250; if (SIMPLE.referral == null) SIMPLE.referral = 100;
+    if (SIMPLE.perDollar) C.perDollar = SIMPLE.perDollar; if (SIMPLE.tiers) C.tiers = SIMPLE.tiers;
+    C.wallets = null; C.tokens = null; C.spin = null; C.draw = null; C.levels = C.levels || [{ visits: 0, name: "Member", perk: "", mult: 1 }]; }
   var NAME = C.name || (window.NEARBY && window.NEARBY.name) || document.title.split(" — ")[0];
-  var OFFER = C.offer || "10% off your next visit";
+  var OFFER = SIMPLE ? SIMPLE.join + " welcome points" : C.offer || "10% off your next visit";
   var SLUG = NAME.toLowerCase().replace(/[^a-z0-9]+/g, "-"), KEY = "ssai_crm_" + SLUG;
   // contact gate: guests only give their info when they order or save a game prize / score (see gate() below).
   // Exposed right away so game and order code can call it: SSAI_GATE("order" | "prize" | "score", function (member) { ... })
@@ -121,6 +138,10 @@
   if (REF.friend == null) REF.friend = 50;
   if (!REF.friendGift) REF.friendGift = "Free soft drink";
   for (rk in EARN.referral) REF[rk] = EARN.referral[rk];
+  if (SIMPLE) {   // only the bonuses the owner chose: join, birthday, referral (on the friend's first visit), game (capped)
+    EARN.checkin = 0; EARN.firstOrder = 0; EARN.review = { pts: 0, platform: "app", url: "" }; EARN.instagram = { pts: 0, url: "" }; EARN.birthday = SIMPLE.birthday;
+    REF.join = 0; REF.friend = 0; REF.first = SIMPLE.referral; REF.every = 0; REF.goal = 0; REF.gift = ""; REF.friendGift = "";
+  }
   function reviewUrl() { var N = window.NEARBY, sp = N && N.spots && N.spots[0]; return EARN.review.url || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(NAME + (sp && sp.q ? " " + sp.q : "")); }
   var lastBonus = 0;   // bonus pts added by the last visit() call, for the toast
   function earnOnce(m, key, pts, why) { m.earned = m.earned || {}; if (m.earned[key] || !pts) return 0; m.earned[key] = Date.now(); addPts(m, pts, why); tag(m, key.replace(/_\d+$/, "") + "_bonus"); return pts; }
@@ -308,7 +329,7 @@
   function toast(t) { var d = document.createElement("div"); d.className = "crm-toast"; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2600); }
   var qs = new URLSearchParams(location.search), INVITE = (qs.get("ref") || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 16);
   // missed-call text-back: the auto-text after an unanswered or after-hours call links here with ?missed=1
-  var MISSED = qs.get("missed") === "1" || qs.get("src") === "call", MC = C.missed || { offer: "10% off your order", days: 7 };
+  var MISSED = (qs.get("missed") === "1" || qs.get("src") === "call") && (!SIMPLE || !!C.missed), MC = C.missed || { offer: "10% off your order", days: 7 };
   var FRIENDS = ["Jasmine", "Carlos", "Devon", "Mia", "Andre", "Lily", "Marco", "Keisha", "Tran", "Gabby"];
   function shareLink(m) { return location.origin + location.pathname + "?ref=" + encodeURIComponent(m.ref) + "#crm-join"; }
 
@@ -399,6 +420,36 @@
   };
   function pending() { try { return JSON.parse(localStorage.getItem(PEND) || "null"); } catch (x) { return null; } }
 
+  // ---- GAME POINTS (simple program): 1 pt per SIMPLE.game.perScore score, at most SIMPLE.game.dailyCap a day (LA date) ----
+  // Guests play first: award() holds their points on this phone for the day (GPKEY); joining (any sign-up path) credits
+  // them through gpCredit(). Members get them straight away. The cap counts everything credited that day, held or not.
+  var GPKEY = KEY + "_gamepts";
+  function gpDay() { return new Date().toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" }); }
+  function gpHeld() { try { var h = JSON.parse(localStorage.getItem(GPKEY) || "null"); return h && h.day === gpDay() ? h : null; } catch (x) { return null; } }
+  function gpUsed(m) { return m && m.gday === gpDay() ? m.gpts || 0 : 0; }
+  function gpFor(score) { var g = SIMPLE.game; return Math.max(0, Math.min(g.dailyCap, Math.floor((+score || 0) / g.perScore))); }
+  function gpAdd(m, n, why) { if (m.gday !== gpDay()) { m.gday = gpDay(); m.gpts = 0; } n = Math.max(0, Math.min(n, SIMPLE.game.dailyCap - m.gpts)); if (n) { addPts(m, n, why); tag(m, "game_bonus"); m.gpts += n; } return n; }
+  function gpCredit(m) { var h = gpHeld(); m.lastGame = 0; if (!h || !h.pts) return 0; try { localStorage.removeItem(GPKEY); } catch (x) {} m.lastGame = gpAdd(m, h.pts, "🎮 " + (C.game || "Game") + " points (played before joining)"); return m.lastGame; }
+  if (SIMPLE) window.SSAI_GAMEPTS = {
+    cfg: SIMPLE.game,
+    forScore: gpFor,
+    member: function () { return mine()[0] || null; },
+    // call ONCE per finished run. Returns {pts, saved, capped, today, cap}: pts actually credited (member) or held (guest)
+    award: function (score, label) {
+      var want = gpFor(score), cap = SIMPLE.game.dailyCap, m = mine()[0], got, today;
+      if (m) { got = gpAdd(m, want, "🎮 " + (label || C.game || "Game") + " · score " + Math.round(+score || 0).toLocaleString()); today = gpUsed(m); put(m); drawJoin(); drawOwn(); }
+      else { var h = gpHeld() || { day: gpDay(), pts: 0 }; got = Math.max(0, Math.min(want, cap - h.pts)); h.pts += got; today = h.pts; try { localStorage.setItem(GPKEY, JSON.stringify(h)); } catch (x) {} drawJoin(); }
+      return { pts: got, want: want, saved: !!m, capped: got < want, today: today, cap: cap };
+    },
+    held: function () { var h = gpHeld(); return h ? h.pts : 0; },
+    // opens the short sign-up sheet; on success the held points are credited, then cb({pts, member})
+    join: function (cb) {
+      var n = gpHeld() ? gpHeld().pts : 0;
+      GATE_TXT.gamepts = [n ? "Join to save your " + n + " points" : "Join " + NAME + " Rewards", "Free. Add your name and a phone or email: your game points go to your " + NAME + " Rewards balance.", n ? "🎁 Save my " + n + " points" : "🎁 Join free"];
+      return gate("gamepts", function (m) { if (cb) cb({ pts: m ? m.lastGame || 0 : 0, member: m }); });
+    }
+  };
+
   // ---- split-wallet pieces of the member card ----
   function nextTier(k, bal) { return W[k].tiers.filter(function (t) { return t[0] > bal; })[0] || null; }
   function walTiles(m) {
@@ -434,22 +485,24 @@
       var first = e(me.name.split(" ")[0]);
       join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards</span><h3>Hey ' + first + '! 👋</h3>' +
         (activeWin(me) ? '<div class="crm-win" style="border-color:#3DDC97"><div style="font-size:30px">' + (activeWin(me).k === "missed" ? '📞' : '🏆') + '</div><b>' + (activeWin(me).k === "missed" ? 'Sorry we missed your call! Here\'s ' + e(activeWin(me).t) : 'You won ' + e(activeWin(me).t) + '!') + '</b>' + kidTag(activeWin(me)) + '<div class="code">' + e(activeWin(me).c) + '</div><small>' + (activeWin(me).kid ? '<b>' + e(KID_RULE) + '</b> ' : '') + 'Show this code at ' + e(NAME) + ' to redeem it. Use by <b>' + e(until(activeWin(me))) + '</b>. One reward per visit; win again after you use this one.</small></div><div style="height:10px"></div>' : '') +
-        '<div class="crm-win"><div style="font-size:30px">🎁</div><b>' + e(me.offer || OFFER) + '</b><div class="code">' + e(me.code) + '</div><small>Your welcome reward. Show this at the counter.</small></div>' +
+        (SIMPLE ? '' : '<div class="crm-win"><div style="font-size:30px">🎁</div><b>' + e(me.offer || OFFER) + '</b><div class="code">' + e(me.code) + '</div><small>Your welcome reward. Show this at the counter.</small></div>') +
         (me.fgift && !me.fgift.used ? '<div class="crm-win" style="margin-top:10px;border-color:#3DDC97"><div style="font-size:30px">🤝</div><b>Friend gift: ' + e(me.fgift.t) + '</b><div class="code">' + e(me.fgift.c) + '</div><small>Because a friend invited you. Show this code with your first order.</small></div>' : '') +
-        (me.bday >= 0 ? (isBday(me) || me.bdemo ? '<div class="crm-win bd"><div style="font-size:30px">🎂</div><b>Happy birthday, ' + first + '! Your free birthday treat is unlocked</b><div class="code">' + e(me.bcode || "BDAY") + '</div><small>Show this code with a photo ID that says ' + e(bdayStr(me)) + '. Good for 7 days.</small></div>'
+        (SIMPLE ? (me.bday >= 0 ? '<div class="crm-bday"><h4>🎂 Birthday bonus · ' + e(bdayStr(me)) + '</h4><div style="font-size:13px;color:#C9D2EE">' + ((isBday(me) || me.bdemo) ? 'Happy birthday, ' + first + '! Your <b>+' + EARN.birthday + ' birthday points</b> are in your balance.' : '<b>+' + EARN.birthday + ' points</b> land in your balance on your birthday, once a year.') + '</div>' + (isBday(me) || me.bdemo ? '' : '<button type="button" class="crm-demo" data-a="bday">▶ Demo: it\'s my birthday</button>') + '</div>' : '') :
+        me.bday >= 0 ? (isBday(me) || me.bdemo ? '<div class="crm-win bd"><div style="font-size:30px">🎂</div><b>Happy birthday, ' + first + '! Your free birthday treat is unlocked</b><div class="code">' + e(me.bcode || "BDAY") + '</div><small>Show this code with a photo ID that says ' + e(bdayStr(me)) + '. Good for 7 days.</small></div>'
           : '<div class="crm-bday"><h4>🎂 Birthday treat · ' + e(bdayStr(me)) + '</h4><div style="font-size:13px;color:#C9D2EE">It unlocks on your birthday and we\'ll text you a reminder that morning. To claim it, bring a photo ID that matches this date.</div><button type="button" class="crm-demo" data-a="bday">▶ Demo: it\'s my birthday</button></div>') : '') +
         // visit level this month
-        (function () { var v = monthVisits(me), L = levelOf(me), N = nextLevel(me);
+        (SIMPLE ? '' : function () { var v = monthVisits(me), L = levelOf(me), N = nextLevel(me);
           return '<div class="crm-box"><h4>📅 Your level this month: <span style="color:#FFD23F">' + e(L.name) + '</span></h4>' +
             '<div style="display:flex;gap:6px;margin:6px 0 8px">' + LEVELS.map(function (l) { var on = v >= l.visits; return '<div style="flex:1;text-align:center;padding:7px 2px;border-radius:10px;border:1px solid ' + (on ? '#FFD23F' : '#2A303C') + ';background:' + (on ? '#FFD23F22' : 'transparent') + ';font-size:11.5px"><b style="display:block;font-size:13px">' + e(l.name) + '</b>' + l.visits + '+ visits<br><span style="color:#9AA6CC">' + e(l.perk) + (l.mult > 1 ? ' · ' + l.mult + '× pts' : '') + '</span></div>'; }).join("") + '</div>' +
             '<p style="margin:0;font-size:13px">' + v + ' visit' + (v === 1 ? '' : 's') + ' this month' + (N ? ' · <b>' + (N.visits - v) + ' more</b> to reach ' + e(N.name) + ' (' + e(N.perk) + ')' : ' · top level reached 🔥') + '. Resets on the 1st. One visit counts per day.</p>' +
-            '<p class="crm-fine" style="margin-top:6px">Sample perks: ' + e(NAME) + ' sets the real ones.</p></div>'; })() +
+            '<p class="crm-fine" style="margin-top:6px">Sample perks: ' + e(NAME) + ' sets the real ones.</p></div>'; }()) +
         // points + scan to earn
         (WAL ? '<div class="crm-box">' + walTiles(me) + '<button type="button" class="crm-scan" data-a="scan" style="width:100%;margin-top:10px">📲 Scan to earn</button>'
           : '<div class="crm-box"><div class="crm-pts"><div><div class="k" style="font-size:10px">Your points</div><div class="n">' + pts.toLocaleString() + '<small>pts</small></div></div>' +
           '<button type="button" class="crm-scan" data-a="scan">📲 Scan to earn</button></div>') +
           '<div class="crm-qr"><div class="qr"></div><div class="d4">' + regCode(me) + '</div><small>Show this to the cashier or bartender, or scan it at the register.<br>They ring you up and your points land here. Code refreshes every 5 min.</small></div>' +
           (WAL ? '<p style="margin:10px 0 0;font-size:13px">' + walEarnLine() + ' <b>They never mix:</b> bar points only buy bar rewards, kitchen points only buy food rewards.</p>'
+            : SIMPLE ? '<p style="margin:10px 0 0;font-size:13px">Earn <b style="color:#FFD23F">' + PER + ' points per $1</b> on eligible purchases: show this code when staff ring you up.' + (window.SSAI_GAMEPTS ? ' 🎮 Game points today: <b>' + gpUsed(me) + ' of ' + SIMPLE.game.dailyCap + '</b>.' : '') + '</p>'
             : '<p style="margin:10px 0 0;font-size:13px">Earn <b style="color:#FFD23F">' + PER + ' points for every $1</b> you spend in store or in the app.</p>') +
           '<button type="button" class="crm-elink" data-a="earn">✨ Ways to earn points →</button>' +
           '<button type="button" class="crm-demo" data-a="ring">▶ Demo: the cashier rings you up</button>' +
@@ -477,6 +530,12 @@
             '<span class="bar"><i style="width:' + Math.min(100, pts / t[0] * 100) + '%"></i></span></div>'; }).join("") +
           (me.redeem ? '<div class="crm-win" style="margin-top:10px"><b>' + e(me.redeem.t) + '</b><div class="code">' + e(me.redeem.c) + '</div><small>Show this code when you order. One reward per order.</small></div>' : '') + '</div>') +
         // referrals
+        (SIMPLE ? '<div class="crm-box" id="crm-ref"><h4>🤝 Invite friends</h4><div class="crm-refcode">' + e(me.ref) + '</div>' +
+          '<div class="crm-acts" style="margin-top:0"><button type="button" class="hot" data-a="text">💬 Text a friend</button><button type="button" data-a="copy">📋 Copy invite link</button></div>' +
+          '<ul class="crm-rules" style="margin-top:12px"><li><span>👋 A friend joins with your code and makes their first visit</span><b>+' + REF.first + ' pts</b></li><li><span>🎁 Your friend gets the usual ' + SIMPLE.join + ' welcome points</span><b>✓</b></li></ul>' +
+          '<div class="crm-stats" style="grid-template-columns:repeat(2,1fr);margin-bottom:4px"><div><b>' + fr.length + '</b>friends joined</div><div><b>' + refPts.toLocaleString() + '</b>pts earned</div></div>' +
+          '<button type="button" class="crm-demo" data-a="friend">▶ Demo: a friend joins with your code</button>' +
+          '<button type="button" class="crm-demo" data-a="forder"' + (fr.length ? '' : ' disabled') + '>▶ Demo: your friend makes their first visit</button></div>' :
         '<div class="crm-box" id="crm-ref"><h4>🤝 Invite friends, earn forever</h4><div class="crm-refcode">' + e(me.ref) + '</div>' +
           '<div class="crm-acts" style="margin-top:0"><button type="button" class="hot" data-a="text">💬 Text a friend</button><button type="button" data-a="copy">📋 Copy invite link</button></div>' +
           '<ul class="crm-rules" style="margin-top:12px"><li><span>👋 A friend joins with your code</span><b>+' + REF.join + ' pts</b></li><li><span>🎁 Your friend gets ' + e(REF.friendGift) + ' with their first order</span><b>+' + REF.friend + ' pts</b></li><li><span>🛒 Their first order</span><b>+' + REF.first + ' pts</b></li>' +
@@ -484,7 +543,7 @@
           '<div style="font-size:13px;color:#9AA6CC">' + Math.min(fr.length, REF.goal) + ' of ' + REF.goal + ' friends toward ' + e(REF.gift) + (fr.length >= REF.goal ? ' ✅' : '') + '</div><div class="crm-goal"><i style="width:' + Math.min(100, fr.length / REF.goal * 100) + '%"></i></div>' +
           '<div class="crm-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:4px"><div><b>' + fr.length + '</b>friends</div><div><b>' + fo + '</b>their orders</div><div><b>' + refPts.toLocaleString() + '</b>pts earned</div></div>' +
           '<button type="button" class="crm-demo" data-a="friend">▶ Demo: a friend joins with your code</button>' +
-          '<button type="button" class="crm-demo" data-a="forder"' + (fr.length ? '' : ' disabled') + '>▶ Demo: your friend places an order</button></div>' +
+          '<button type="button" class="crm-demo" data-a="forder"' + (fr.length ? '' : ' disabled') + '>▶ Demo: your friend places an order</button></div>') +
         // activity
         '<div class="crm-box"><h4>📜 Points activity</h4><div class="crm-feed">' + ((me.ledger || []).map(function (l) {
           return '<div><span>' + (WAL && W[l.w] ? '<i class="crm-wt">' + wname(l.w) + '</i>' : '') + e(l.t) + '</span><b class="' + (l.pts >= 0 ? 'plus' : 'minus') + '">' + (l.pts >= 0 ? '+' : '') + l.pts.toLocaleString() + '</b></div>'; }).join("") || '<div><span>Nothing yet. Scan at the register to start earning.</span></div>') + '</div></div>' +
@@ -546,12 +605,13 @@
           m.friends.unshift({ name: nm, ts: Date.now(), orders: 0 });
           addPts(m, REF.join, "👋 " + nm + " joined with your code"); m.ledger[0].ref = 1; tag(m, "referral_join");
           if (m.friends.length === REF.goal) { m.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎁 " + REF.goal + " friends joined: " + REF.gift + " unlocked", ref: 1 }); toast("🎁 " + REF.gift + " unlocked!"); }
-          else toast("+" + REF.join + " points · " + nm + " joined");
+          else toast(SIMPLE ? nm + " joined · you get +" + REF.first + " after their first visit" : "+" + REF.join + " points · " + nm + " joined");
           put(m); drawJoin(); drawOwn(); return;
         }
         if (a === "forder") {
           if (!m.friends.length) return;
-          var f = m.friends[(Math.random() * m.friends.length) | 0], firstOrder = f.orders === 0, p2 = firstOrder ? REF.first : REF.every; f.orders++;
+          if (SIMPLE && !m.friends.filter(function (x) { return !x.orders; }).length) { toast("Every friend has visited. Referral points pay once per friend."); return; }
+          var f = SIMPLE ? m.friends.filter(function (x) { return !x.orders; })[0] : m.friends[(Math.random() * m.friends.length) | 0], firstOrder = f.orders === 0, p2 = firstOrder ? REF.first : REF.every; f.orders++;
           // split wallets: "earn when your friend spends" lands in the wallet matching what the friend bought
           var fw = WAL ? (Math.random() < 0.5 ? "bar" : "food") : null, fwt = fw ? (fw === "bar" ? " (drinks)" : " (food)") : "";
           addPts(m, p2, (firstOrder ? "🛒 " + f.name + "'s first order" : "🔁 " + f.name + " ordered again") + fwt, fw); m.ledger[0].ref = 1; tag(m, "referral_order"); put(m);
@@ -575,17 +635,20 @@
     join.innerHTML = '<span class="k">' + e(NAME) + ' Rewards · free · join anytime</span>' +
       (pw ? '<div class="crm-invited" style="border-color:#FFD23F;background:#FFD23F22;color:#FFE9A3">🏆 You won <b>' + e(pw.t) + '</b> in the game! Join below to save it, then show it at ' + e(NAME) + ' to redeem.</div>' : '') +
       (MISSED ? '<div class="crm-invited" style="border-color:#7FB3FF;background:#7FB3FF22;color:#DCE8FF">📞 Sorry we missed your call! Join below with your name and phone or email and get <b>' + e(MC.offer) + '</b> on your next visit. Just show your code at the counter.</div>' : '') +
-      (INVITE ? '<div class="crm-invited">🤝 ' + e(inviter) + ' invited you! Join with code <b>' + e(INVITE) + '</b> and you get <b>' + e(REF.friendGift) + '</b> with your first order + <b>' + REF.friend + ' bonus points</b>.</div>' : '') +
+      (SIMPLE && window.SSAI_GAMEPTS && SSAI_GAMEPTS.held() ? '<div class="crm-invited" style="border-color:#FFD23F;background:#FFD23F22;color:#FFE9A3">🎮 You have <b>' + SSAI_GAMEPTS.held() + ' game points</b> waiting from today. Join below to save them.</div>' : '') +
+      (INVITE && SIMPLE ? '<div class="crm-invited">🤝 ' + e(inviter) + ' invited you! Join with code <b>' + e(INVITE) + '</b>.</div>' : '') +
+      (INVITE && !SIMPLE ? '<div class="crm-invited">🤝 ' + e(inviter) + ' invited you! Join with code <b>' + e(INVITE) + '</b> and you get <b>' + e(REF.friendGift) + '</b> with your first order + <b>' + REF.friend + ' bonus points</b>.</div>' : '') +
       '<div class="crm-gift"><b>🎁</b><span>Join now and get <u>' + e(OFFER) + '</u> instantly</span></div>' +
-      '<h3>Unlock your reward</h3><p>Plus ' + (WAL ? W.bar.per + ' ' + wname("bar") + ' pts per $1 on drinks, ' + W.food.per + ' ' + wname("food") + ' pts per $1 on food' : PER + ' points for every $1') + ', a birthday treat, and your own code to invite friends. Takes 10 seconds.</p>' +
+      (SIMPLE ? '<h3>One simple rewards program</h3><p>Earn ' + PER + ' points per $1 on eligible purchases, +' + EARN.birthday + ' on your birthday, +' + REF.first + ' for every friend who joins and visits, and up to ' + SIMPLE.game.dailyCap + ' a day from the game. Takes 10 seconds.</p>' :
+      '<h3>Unlock your reward</h3><p>Plus ' + (WAL ? W.bar.per + ' ' + wname("bar") + ' pts per $1 on drinks, ' + W.food.per + ' ' + wname("food") + ' pts per $1 on food' : PER + ' points for every $1') + ', a birthday treat, and your own code to invite friends. Takes 10 seconds.</p>') +
       '<button type="button" class="crm-elink" data-a="earn" style="margin:-4px 0 4px">✨ See every way to earn →</button>' +
       '<form autocomplete="on" novalidate><label>First name</label><input name="name" maxlength="40" autocomplete="given-name">' +
       '<div class="two"><div><label>Phone</label><input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(310) 555-0123"></div>' +
       '<div><label>or Email</label><input name="email" type="email" maxlength="120" autocomplete="email"></div></div>' +
-      '<label>Birthday (for your free birthday treat)</label><div class="three"><select name="bday" aria-label="Birth month"><option value="">Month</option>' + MONTHS_L.map(function (m, i) { return '<option value="' + i + '">' + m + '</option>'; }).join("") + '</select>' +
+      '<label>Birthday (' + (SIMPLE ? '+' + EARN.birthday + ' points on the day' : 'for your free birthday treat') + ')</label><div class="three"><select name="bday" aria-label="Birth month"><option value="">Month</option>' + MONTHS_L.map(function (m, i) { return '<option value="' + i + '">' + m + '</option>'; }).join("") + '</select>' +
         '<select name="bdd" aria-label="Birth day"><option value="">Day</option>' + Array.apply(null, Array(31)).map(function (x, i) { return '<option>' + (i + 1) + '</option>'; }).join("") + '</select>' +
         '<select name="bdy" aria-label="Birth year"><option value="">Year</option>' + Array.apply(null, Array(88)).map(function (x, i) { var y = new Date().getFullYear() - 13 - i; return '<option>' + y + '</option>'; }).join("") + '</select></div>' +
-      '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat. We\'ll text you a reminder on the day.</div>' +
+      (SIMPLE ? '' : '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat. We\'ll text you a reminder on the day.</div>') +
       '<label>Friend\'s referral code (optional)</label><input name="ref" maxlength="16" autocapitalize="characters" value="' + e(INVITE) + '" placeholder="e.g. MARIA-21">' +
       '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Send my rewards (points, prize and birthday codes) from ' + e(NAME) + ' to me by text or email. Msg & data rates may apply. Reply STOP anytime.</span></label>' + smsBox() +
       '<button class="go" type="submit">🎁 Get my reward</button><div class="err"></div></form>' +
@@ -616,9 +679,11 @@
         ref: refCode(v("name")), refBy: rc, refByName: rc ? (byName || "code " + rc) : "", friends: [], ledger: [] };
       // marketing texts need their own consent + a phone number; keep when and where it was given (the consent record)
       if (v("sms") && /\d{7,}/.test(v("phone").replace(/\D/g, ""))) { r.sms = true; r.smsAt = Date.now(); r.smsSrc = "sign-up form: " + location.pathname; }
-      addPts(r, 100, "🎉 Welcome to " + NAME + " Rewards");
-      if (rc) { addPts(r, REF.friend, "🤝 Joined with " + (byName ? byName.split(" ")[0] + "'s" : "a friend's") + " code"); tag(r, "referred_bonus");
+      addPts(r, SIMPLE ? SIMPLE.join : 100, "🎉 Welcome to " + NAME + " Rewards"); if (SIMPLE) tag(r, "join_bonus");
+      if (rc && SIMPLE) r.ledger.unshift({ ts: Date.now(), pts: 0, t: "🤝 Joined with " + (byName ? byName.split(" ")[0] + "'s" : "a friend's") + " code: they earn " + REF.first + " pts after your first visit" });
+      else if (rc) { addPts(r, REF.friend, "🤝 Joined with " + (byName ? byName.split(" ")[0] + "'s" : "a friend's") + " code"); tag(r, "referred_bonus");
         r.fgift = { t: REF.friendGift + " with your first order", c: "FRIEND-" + code4(4), ts: Date.now() }; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎁 Friend gift: " + r.fgift.t }); }
+      if (SIMPLE) gpCredit(r);   // game points this guest earned before joining (held on this phone, today only, within the daily cap)
       var pz = pending(); if (pz) { r.wins = [pz]; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "🏆 Won " + pz.t + " in the game" }); try { localStorage.removeItem(PEND); } catch (x) {} }
       else if (MISSED) { r.wins = [{ t: MC.offer, c: "CALL-" + code4(4), ts: Date.now(), ttl: (MC.days || 7) * 864e5, k: "missed" }]; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "📞 Sorry we missed your call: " + MC.offer }); r.src = "missed call"; }
       // game accounts (CRM_CFG.tokens): ONE member per device, bound to it (live: server-side + SMS verification)
@@ -658,14 +723,14 @@
     if (m && !kidg) T = [T[0], "Add your " + (okPhone(m.phone) ? "email" : okEmail(m.email) ? "phone number" : "phone number and email") + " to finish your free account. It's tied to this phone.", T[2]];
     var ov = document.createElement("div"); ov.className = "crm-gate"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", rid); ov.setAttribute("data-scroll-ok", "");
     ov.innerHTML = '<section class="crm-card"><span class="k">' + e(NAME) + ' Rewards · free</span><h3 id="' + rid + '">' + e(T[0]) + '</h3><p>' + e(T[1]) + '</p>' +
-      (m ? '' : '<div class="crm-gift"><b>🎁</b><span>You also get <u>' + e(OFFER) + '</u> + 100 ' + (WAL ? W[BONUS].label.toLowerCase() + ' ' : '') + 'points' + (both && ON ? ' + ' + TOK.weeklyFree + ' free tokens a week' : '') + '</span></div>') +
-      (INVITE && !m ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: ' + e(REF.friendGift) + ' with your first order + ' + REF.friend + ' bonus points.</div>' : '') +
+      (m ? '' : SIMPLE ? '<div class="crm-gift"><b>🎁</b><span>You also get <u>' + SIMPLE.join + ' welcome points</u> on joining</span></div>' : '<div class="crm-gift"><b>🎁</b><span>You also get <u>' + e(OFFER) + '</u> + 100 ' + (WAL ? W[BONUS].label.toLowerCase() + ' ' : '') + 'points' + (both && ON ? ' + ' + TOK.weeklyFree + ' free tokens a week' : '') + '</span></div>') +
+      (INVITE && !m && SIMPLE ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: your friend earns ' + REF.first + ' points after your first visit.</div>' : '') + (INVITE && !m && !SIMPLE ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: ' + e(REF.friendGift) + ' with your first order + ' + REF.friend + ' bonus points.</div>' : '') +
       '<form autocomplete="on" novalidate>' + (kidg ? '<div class="crm-invited" style="border-color:#FFD23F;background:#FFD23F22;color:#FFE9A3">🧒 Kids: hand the phone to a parent or guardian for this part.</div>' : '') + '<label>' + (kidg ? "Parent or guardian's first name" : "First name") + '</label><input name="name" maxlength="40" autocomplete="given-name" enterkeyhint="next"' + pre("name") + '>' +
       '<div class="two"><div><label>Phone</label><input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(310) 555-0123"' + pre("phone") + '></div>' +
       '<div><label>' + (both ? 'Email' : 'or Email') + '</label><input name="email" type="email" maxlength="120" autocomplete="email" autocapitalize="none"' + pre("email") + '></div></div>' +
       (both ? '<div class="crm-idnote">📱 One account per phone. Live, we text you a code to confirm the number.</div>' : '') +
       (kidg ? '<label class="crm-optin"><input type="checkbox" name="guardian"> <span><b>I\'m the parent or guardian (18+)</b> and this is my own phone and email. My child\'s points and prizes are saved to my account.</span></label>' : '') +
-      (m || kidg ? '' : '<details class="crm-gbd"><summary>🎂 Add birthday for a free treat</summary><div class="three"><select name="bday" aria-label="Birth month"><option value="">Month</option>' + MONTHS_L.map(function (x, i) { return '<option value="' + i + '">' + x + '</option>'; }).join("") + '</select>' +
+      (m || kidg ? '' : '<details class="crm-gbd"><summary>🎂 Add birthday for ' + (SIMPLE ? '+' + EARN.birthday + ' points' : 'a free treat') + '</summary><div class="three"><select name="bday" aria-label="Birth month"><option value="">Month</option>' + MONTHS_L.map(function (x, i) { return '<option value="' + i + '">' + x + '</option>'; }).join("") + '</select>' +
         '<select name="bdd" aria-label="Birth day"><option value="">Day</option>' + Array.apply(null, Array(31)).map(function (x, i) { return '<option>' + (i + 1) + '</option>'; }).join("") + '</select>' +
         '<select name="bdy" aria-label="Birth year"><option value="">Year</option>' + Array.apply(null, Array(88)).map(function (x, i) { return '<option>' + (new Date().getFullYear() - 13 - i) + '</option>'; }).join("") + '</select></div>' +
         '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat.</div></details>') +
@@ -982,12 +1047,13 @@
   // ---- owner: earn activity (bonus counts per kind; sample customers get made-up counts) ----
   var EK = [["checkin_bonus", "📲 QR check-ins"], ["first_order_bonus", "🥇 First-order bonuses"], ["review_bonus", "⭐ In-app feedback"], ["ig_bonus", "📸 Instagram follows"],
     ["birthday_bonus", "🎂 Birthday bonuses"], ["referral_join", "🤝 Friends referred"], ["referral_order", "🔁 Orders from referred friends"]];
+  if (SIMPLE) EK = [["join_bonus", "👋 Join bonuses"], ["birthday_bonus", "🎂 Birthday bonuses"], ["referral_order", "🤝 Referred friends who visited"], ["game_bonus", "🎮 Game points (capped " + SIMPLE.game.dailyCap + "/day)"]];
   function earnCounts(r, i) {
     if (!r.sample) return r.ec || {};
     return { checkin_bonus: r.visits, first_order_bonus: 1, review_bonus: i % 3 === 2 ? 0 : 1, ig_bonus: i % 2, birthday_bonus: r.bday === mo && i % 2 ? 1 : 0, referral_join: r.nfr || 0, referral_order: r.nfo || 0 };
   }
   function earnBox(rows) {
-    var tot = {}, pts = { checkin_bonus: EARN.checkin, first_order_bonus: EARN.firstOrder, review_bonus: EARN.review.pts, ig_bonus: EARN.instagram.pts, birthday_bonus: EARN.birthday, referral_join: REF.join, referral_order: REF.every };
+    var tot = {}, pts = { checkin_bonus: EARN.checkin, first_order_bonus: EARN.firstOrder, review_bonus: EARN.review.pts, ig_bonus: EARN.instagram.pts, birthday_bonus: EARN.birthday, referral_join: REF.join, referral_order: SIMPLE ? REF.first : REF.every, join_bonus: SIMPLE ? SIMPLE.join : 0 };
     rows.forEach(function (r, i) { var c = earnCounts(r, i); for (var k in c) tot[k] = (tot[k] || 0) + c[k]; });
     var fbs = rows.filter(function (r) { return r.fb; });
     return '<div class="crm-box crm-lead"><h4>✨ Ways-to-earn activity</h4><p style="margin:0;font-size:13px">What your bonus points are buying you. Each one is in the customer\'s ledger and the CSV export.</p>' +
@@ -1002,7 +1068,7 @@
   var EFLAG = KEY + "_earn_seen", earnEl = null;
   function earnSeen() { try { return localStorage.getItem(EFLAG) || ""; } catch (x) { return "m"; } }
   function earnMark(v) { try { localStorage.setItem(EFLAG, v); } catch (x) {} }
-  function inviteMsg(m) { return "Join " + NAME + " Rewards with my code " + m.ref + ": you get " + REF.friendGift + " with your first order + " + REF.friend + " points 🎁 " + shareLink(m); }
+  function inviteMsg(m) { if (SIMPLE) return "Join " + NAME + " Rewards with my code " + m.ref + ": " + SIMPLE.join + " welcome points + " + PER + " pts per $1 🎁 " + shareLink(m); return "Join " + NAME + " Rewards with my code " + m.ref + ": you get " + REF.friendGift + " with your first order + " + REF.friend + " points 🎁 " + shareLink(m); }
   function copyRef(m) { var L = shareLink(m); (navigator.clipboard ? navigator.clipboard.writeText(L) : Promise.reject()).then(function () { toast("Referral link copied"); }, function () { prompt("Copy your referral link:", L); }); }
   function openEarn() {
     if (earnEl || document.querySelector(".crm-gate,.crm-draw")) return false;
@@ -1010,7 +1076,14 @@
     earnMark(m ? "m" : "g");
     function B(a, label, hot) { return '<button type="button" data-e="' + a + '"' + (hot ? ' class="hot"' : '') + '>' + label + '</button>'; }
     function row(ic, t, p, sub, btn, done) { return '<div class="crm-er' + (done ? ' done' : '') + '"><span class="ic">' + ic + '</span><span class="tx"><b>' + t + '</b><small>' + sub + '</small></span><span class="pp">' + (done ? '✓ Earned' : p) + '</span>' + (btn && !done ? '<span class="bt">' + btn + '</span>' : '') + '</div>'; }
-    var rows = row("📲", "Show your QR every visit", "+" + EARN.checkin, "+" + EARN.checkin + " once a day when staff scan your code, plus " + (WAL ? W.bar.per + " bar pts per $1 on drinks and " + W.food.per + " kitchen pts per $1 on food." : PER + " pts for every $1 you spend."), m ? B("qr", "📲 Show my QR", 1) : "") +
+    var gp = SIMPLE && SIMPLE.game, rows = SIMPLE ?
+      row("🧾", "Eligible purchases", PER + "/$1", PER + " points for every $1 on eligible purchases. Show your code when staff ring you up.", m ? B("qr", "📲 Show my code", 1) : "") +
+      row("👋", "Join", "+" + SIMPLE.join, "Once, when you join. Free.", "", !!m) +
+      row("🎂", "Your birthday", "+" + EARN.birthday, "Once a year, on your birthday.", m && !(m.bday >= 0) ? B("bday", "🎂 Add my birthday") : "", ed["birthday_" + yr]) +
+      row("🤝", "Refer a friend", "+" + REF.first, "Per friend who joins with your code and makes their first visit.", m ? B("ref", "📋 Copy my referral link") : "") +
+      (C.game ? row("🎮", "Play " + e(C.game), "≤" + gp.dailyCap + "/day", "1 point per " + gp.perScore.toLocaleString() + " score, up to " + gp.dailyCap + " points a day. You can play before you join; join to save them.", "") : "") +
+      '<div class="crm-egoal" style="margin-top:10px"><span><b>Rewards</b></span><b></b></div>' + TIERS.map(function (t) { return '<div class="crm-egoal"><span>' + e(t[1]) + '</span><b>' + t[0].toLocaleString() + ' pts</b></div>'; }).join("")
+      : row("📲", "Show your QR every visit", "+" + EARN.checkin, "+" + EARN.checkin + " once a day when staff scan your code, plus " + (WAL ? W.bar.per + " bar pts per $1 on drinks and " + W.food.per + " kitchen pts per $1 on food." : PER + " pts for every $1 you spend."), m ? B("qr", "📲 Show my QR", 1) : "") +
       (EARN.firstOrder ? row("🥇", "Your first order", "+" + EARN.firstOrder, "One-time bonus on top of your order points.", "", ed.first_order) : "") +
       (R.pts ? row("⭐", app ? "Tell us how we did" : "Leave a review", "+" + R.pts, app ? "Honest feedback in the app. Any star rating counts the same: your rating never changes your points. Once per member." : "Once per member, honor system. Your rating never changes your points.", m ? B("review", app ? "⭐ Leave feedback" : "⭐ Leave a review") : "", ed.review) : "") +
       row("🤝", "Refer a friend", "+" + REF.join, "Per friend who joins. They get " + e(REF.friendGift) + " with their first order + " + REF.friend + " pts. You get +" + REF.first + " on their first order, then +" + REF.every + " every time they order.", m ? B("ref", "📋 Copy my referral link") : "") +
@@ -1026,7 +1099,7 @@
       '<p style="margin:0 0 6px">' + (m ? 'You have <b style="color:#FFD23F">' + (m.stars || 0).toLocaleString() + ' pts</b>. ' : '') + 'Here\'s every way to get there:</p>') + rows +
       '<div class="crm-fbk"></div>' +
       (m ? '<button type="button" class="go" data-e="x">Got it</button>' : '<button type="button" class="go" data-e="join">🎁 Join free to start earning</button><button type="button" class="crm-gx" data-e="x">Not now</button>') +
-      '<p class="crm-fine">Sample numbers: ' + e(NAME) + ' sets the real ones.' + (m ? ' Reopen this anytime from "Ways to earn" in your rewards card.' : '') + '</p></section>';
+      '<p class="crm-fine">' + (SIMPLE ? 'One points balance. Rewards: one per visit, no stacking. ' : '') + 'Sample numbers: ' + e(NAME) + ' sets the real ones.' + (m ? ' Reopen this anytime from "Ways to earn" in your rewards card.' : '') + '</p></section>';
     var html = document.documentElement, prevOv = html.style.overflow, fb = ov.querySelector(".crm-fbk");
     function key(ev) { if (ev.key === "Escape") close(); }
     function close() { if (!ov.parentNode) return; ov.remove(); earnEl = null; html.style.overflow = prevOv; document.removeEventListener("keydown", key); }
@@ -1426,6 +1499,9 @@
     var DEF = { all: "Hey {first}! Double stars at " + NAME + " this week only 🔥", new: "Welcome to the club, {first}! Your next visit earns 2× stars.",
       vip: "{first}, you're one of our VIPs 👑 Next one's on us this week.", risk: "Hey {first}, we miss you! 👀 Come back this week for 2× stars.",
       bday: "Happy birthday {first}! 🎂 Your free treat is waiting. Show your code + a photo ID at the counter." };
+    if (SIMPLE) DEF = { all: "Hey {first}! New on the menu at " + NAME + " this week. Your points are waiting 🔥", new: "Welcome to " + NAME + " Rewards, {first}! Show your code next visit to earn " + PER + " pts per $1.",
+      vip: "{first}, thanks for being a regular 👑 Check your points: you might have a reward ready.", risk: "Hey {first}, we miss you! 👀 Your points are still here whenever you come back.",
+      bday: "Happy birthday {first}! 🎂 " + EARN.birthday + " birthday points just landed in your " + NAME + " Rewards." };
     function preview() {
       var who = pick.filter(canText), first = who[0] ? who[0].name.split(" ")[0] : "there";
       cmp.querySelector(".crm-bub").textContent = ta.value.replace(/\{first\}/g, first);

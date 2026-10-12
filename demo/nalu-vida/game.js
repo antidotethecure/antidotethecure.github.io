@@ -7,12 +7,14 @@
       pocket); in the air tap TRICK (or swipe up/down) for a spin or flip; still mid-trick on landing = a bail (−1 ❤️).
       The Venice Pier is narrow and off to the side; now and then a section drifts across your line: JUMP it (−1 ❤️).
       The first ride of a run gets a tutorial card (once per phone; replay from How to play) and lifeguard coaching.
-      Bosses (Big Manō L3, Manō Nui L5) show up in the ride.
+      Family version (Christian's feedback, 2026-10): no harpoons, no boss fights, no red/injury effects. Sea life is only
+      something to steer around; touching it = a mild wipeout (splash, bubbles, pop back up). Level 5's ride-in ends the run.
    3. RIDE IN (~125–130 s on level 1): ride onto the sand and run up the beach into Nalu Vida to eat. Between levels
       that is drawn in-engine; the final win and game over play the Higgsfield cutscene img/scene/ending.mp4.
-   All arc timings live in the LV table. 5 hearts, lost in halves: washed by the wave / under the lip = ½, Manō Nui = 1½,
-   pier wall, bail, shark bite, stingray, jellies, eels, rocks = 1 each. Out at 0. Shark/stingray hits turn the surfer cartoon-red with bruises and bandages; a 5th
-   shark hit leaves a soft cartoon red cloud (Settings → "Cartoon red" off = a splash and bubbles). Family game: no gore.
+   All arc timings live in the LV table. 5 hearts, lost in halves: washed by the wave / under the lip = ½,
+   pier wall, bail, bumping a shark, stingray, jelly, eel or rocks = 1 each (a splash wipeout). Out at 0.
+   REWARDS: the run's score turns into Nalu Vida Rewards points through window.SSAI_GAMEPTS (crm.js): 1 pt per 100 score,
+   capped per day (SSAI_REWARDS.game). Playing never needs an account; a guest is offered "Join to save your N points".
    Scoring has no ceiling: grab 4 in a row for ×2, 8 = ×3 … A hit resets it.
    Test hooks: ?lvl=1-5 &boss=1 &god=1 &spd=1-8 &phase=swim|ride|ending &hits=0-4 &gore=0 &bot=1 (autopilot) &bot=wash &tut=1 &render=2d|3d &keep3d=1
    Water = WebGL shader (falls back to a 2D gradient). Sprites live in img/game/*.webp; anything missing is drawn. */
@@ -21,7 +23,6 @@
   var mount = document.getElementById("nalu-game"); if (!mount) return;
   // PIER_X / STUB: the narrow pier that runs out from the sand (off to the side of the Nalu Vida paddle-out lane at SHORE_X)
   var W = 400, H = 640, HC = H / 2, LEAD = H * 0.16, PIER_X = 200, PIER_W = 24, STUB = 760, SHORE_X = 322, WGAP = 62, RLEAD = LEAD * .45;   // RLEAD: riding, the camera sits you lower so the wave behind you stays on screen
-  var PRIZES = window.NALU_PRIZES || [[30000, "$3 off any drink"], [55000, "Free Jungle Fries"], [95000, "Free Coconut Shrimp"], [150000, "Free Signature Taco plate"]];
   var QS = (function () { try { return new URLSearchParams(location.search); } catch (e) { return { get: function () { return null; } }; } })();
   var DBG_LVL = Math.max(1, Math.min(5, +QS.get("lvl") || 1)), DBG_BOSS = QS.get("boss") === "1", DBG_GOD = QS.get("god") === "1", DBG_SPD = Math.max(1, Math.min(8, +QS.get("spd") || 1)),
     DBG_PHASE = QS.get("phase") || "", DBG_HITS = Math.max(0, Math.min(4, +QS.get("hits") || 0)), DBG_BOT = QS.get("bot") === "1",
@@ -33,11 +34,11 @@
      ride = riding before the ride-in (on a boss level: riding before the boss shows up; the ride-in follows the boss)
      set = seconds between incoming waves on the paddle-out · peel = how fast the curl peels (px/s) · pier = seconds between pier sections */
   var LV = [null,
-    { swim: 30, ride: 90, set: [3.4, 4.4], peel: 60, pier: [13, 18], spd: 1.00, haz: 1.00, shark: .30, lunge: 330, eel: 60, jel: 0, ray: .22, rock: 0, harp: [18, 24], pack: 0, sub: "Paddle out · ride the wave in" },
-    { swim: 15, ride: 72, set: [3.0, 3.9], peel: 68, pier: [11, 15], spd: 1.07, haz: 1.25, shark: .36, lunge: 365, eel: 75, jel: .25, ray: .26, rock: [10, 14], harp: [15, 21], pack: 0, sub: "Faster sharks · rocks · stingrays" },
-    { swim: 13, ride: 50, set: [2.8, 3.6], peel: 74, pier: [10, 14], spd: 1.11, haz: 1.42, shark: .40, lunge: 395, eel: 88, jel: .35, ray: .28, rock: [8, 11], harp: [12, 17], pack: 0, boss: 3, sub: "Something BIG is hunting out there…" },
-    { swim: 13, ride: 72, set: [2.6, 3.3], peel: 80, pier: [9, 13], spd: 1.16, haz: 1.65, shark: .44, lunge: 425, eel: 100, jel: .45, ray: .30, rock: [7, 10], harp: [11, 15], pack: .25, sub: "Shark packs · bigger sets" },
-    { swim: 12, ride: 42, set: [2.4, 3.1], peel: 86, pier: [9, 12], spd: 1.20, haz: 1.85, shark: .46, lunge: 450, eel: 110, jel: .5, ray: .32, rock: [6, 9], harp: [9, 13], pack: .35, boss: 5, sub: "Final ride · Manō Nui is waiting" }];
+    { swim: 30, ride: 90, set: [3.4, 4.4], peel: 60, pier: [13, 18], spd: 1.00, haz: 1.00, shark: .30, lunge: 330, eel: 60, jel: 0, ray: .22, rock: 0, pack: 0, sub: "Paddle out · ride the wave in" },
+    { swim: 15, ride: 72, set: [3.0, 3.9], peel: 68, pier: [11, 15], spd: 1.07, haz: 1.25, shark: .36, lunge: 365, eel: 75, jel: .25, ray: .26, rock: [10, 14], pack: 0, sub: "Rocks · stingrays · more to dodge" },
+    { swim: 13, ride: 50, set: [2.8, 3.6], peel: 74, pier: [10, 14], spd: 1.11, haz: 1.42, shark: .40, lunge: 395, eel: 88, jel: .35, ray: .28, rock: [8, 11], pack: 0, sub: "Bigger sets · more sea life to dodge" },
+    { swim: 13, ride: 72, set: [2.6, 3.3], peel: 80, pier: [9, 13], spd: 1.16, haz: 1.65, shark: .44, lunge: 425, eel: 100, jel: .45, ray: .30, rock: [7, 10], pack: .25, sub: "Busier water · bigger sets" },
+    { swim: 12, ride: 42, set: [2.4, 3.1], peel: 86, pier: [9, 12], spd: 1.20, haz: 1.85, shark: .46, lunge: 450, eel: 110, jel: .5, ray: .32, rock: [6, 9], pack: .35, sub: "Final ride · bring it home to Nalu Vida" }];
   var BOSS = {
     3: { name: "BIG MANŌ", size: 150, hp: 60, harp: 5, rock: 14, pier: 10, charge: 430, warn: .72, stalk: [1.7, 2.5], bonus: 5000 },
     5: { name: "MANŌ NUI", size: 225, hp: 170, harp: 5, rock: 16, pier: 12, charge: 500, warn: .58, stalk: [1.1, 1.8], bonus: 15000 } };
@@ -87,13 +88,12 @@
     '<div class="nv-bar"><i id="nv-prog" style="width:0"></i></div>' +
     '<button type="button" id="nv-jump" aria-label="Jump">JUMP</button>' +
     '<button type="button" id="nv-trick" aria-label="Trick"><b>🌀</b>TRICK</button>' +
-    '<button type="button" id="nv-fire" aria-label="Fire harpoon"><b>🔱</b>×0</button>' +
     '<div class="nv-cut" id="nv-cut"><video id="nv-cutv" muted playsinline preload="none" poster="img/scene/ending.jpg"></video><h3>Back to Nalu Vida 🏄</h3><p>Tap to skip</p></div>' +
     '<div class="nv-toast" id="nv-toast"><img id="nv-toast-img" alt=""><span id="nv-toast-t"></span></div>' +
-    '<div class="nv-ov" id="nv-start"><h3>Ride the Nalu</h3><p>Run in from the sand, paddle out past the break, ride the wave back to Nalu Vida. Win free food &amp; drinks.</p>' +
+    '<div class="nv-ov" id="nv-start"><h3>Ride the Nalu</h3><p>Run in from the sand, paddle out past the break, ride the wave back to Nalu Vida. Earn Nalu Vida Rewards points.</p>' +
     '<div class="nv-pick"><button type="button" data-s="f"><img src="img/game/surfer_f.webp" alt="" onerror="this.outerHTML=\'<div class=ph style=font-size:64px;line-height:96px>🏄‍♀️</div>\'">She rides</button>' +
     '<button type="button" data-s="m"><img src="img/game/surfer_m.webp" alt="" onerror="this.outerHTML=\'<div class=ph style=font-size:64px;line-height:96px>🏄‍♂️</div>\'">He rides</button></div>' +
-    '<p class="nv-how">Drag to steer · <b>Paddle out:</b> tap JUMP to duck-dive under each breaking wave · <b>Ride:</b> the wave peels across the screen: ride the glowing pocket just ahead of the curl all the way to the exit. Behind the curl or under the lip = −½ ❤️; too far out front = you slow down · tap JUMP at <b>⬆ LIP</b> for big air, TRICK in the air, land it · JUMP the pier when it drifts across · Grab food, 4 in a row = ×2 · Dodge sharks, stingrays, eels &amp; jellies · <b>5 levels</b> · Fire 🔱 harpoons at the boss sharks · Tap the banner plane 👀</p><p class="nv-how" id="nv-best"></p></div>' +
+    '<p class="nv-how">Drag to steer · <b>Paddle out:</b> tap JUMP to duck-dive under each breaking wave · <b>Ride:</b> the wave peels across the screen: ride the glowing pocket just ahead of the curl all the way to the exit. Behind the curl or under the lip = −½ ❤️; too far out front = you slow down · tap JUMP at <b>⬆ LIP</b> for big air, TRICK in the air, land it · JUMP the pier when it drifts across · Grab food, 4 in a row = ×2 · Steer around sharks, stingrays, eels &amp; jellies (a bump = a splash wipeout) · <b>5 levels</b> · Tap the banner plane 👀</p><p class="nv-how" id="nv-best"></p></div>' +
     '<div class="nv-ov" id="nv-end" data-scroll-ok style="display:none"></div>' +
     "</div>";
   var wrap = mount.firstChild, gl_c = document.getElementById("nv-water"), cv = document.getElementById("cv"), cx = cv.getContext("2d");
@@ -260,9 +260,8 @@
     x: SHORE_X, yw: -230, vx: 0, ang: 0, cam: 0, lead: LEAD, t: 0, ents: [], fx: [], wake: [], gulls: [], spawn: {}, surfer: "f", runId: 0,
     level: 1, lvT: 0, rideT: 0, ammo: 0, fcd: 0, harps: [], blobs: [], boss: null, banner: null, conf: [], wo: 0, won: 0, tricks: [], trick: null, wv: null };
   try { G.best = +localStorage.getItem("nalu-best") || 0; } catch (e) {}
-  // "Cartoon red" (Settings): on = a soft cartoon red cloud on the 5th shark hit; off = a splash and bubbles. Default on.
-  var GORE = true; try { GORE = localStorage.getItem("nalu-gore") !== "0"; } catch (e) {}
-  if (QS.get("gore") === "0") GORE = false; else if (QS.get("gore") === "1") GORE = true;
+  // No red effects ever (Christian's feedback): the old "Cartoon red" option is gone; a wipeout is a splash and bubbles.
+  var GORE = false;
   $("nv-best").textContent = G.best ? "Your best: " + G.best.toLocaleString() : "";
   function buzz(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} }
   var sy = function (yw) { return HC - (yw - G.cam); };
@@ -286,16 +285,16 @@
   function reset() {
     G.rodeOnce = 0; G.exits = 0;
     G.score = 0; G.lap = 1; G.hearts = 5; G.dmg = 0; G.streak = 0; G.mult = 1; G.hurt = 0; G.shake = 0; G.runId++; G.posted = 0; G.planeTapped = 0; G.lastGain = G.t;
-    G.level = DBG_LVL; G.ammo = G.level > 1 ? 3 : 0; G.fcd = 0; G.harps = []; G.blobs = []; G.boss = null; G.bossBeat = 0; G.banner = null; G.conf = []; G.won = 0; G.finaleMsg = "";
+    G.level = DBG_LVL; G.ammo = 0; G.fcd = 0; G.harps = []; G.blobs = []; G.boss = null; G.bossBeat = 0; G.banner = null; G.conf = []; G.won = 0; G.finaleMsg = "";
     G.eggT = 0; if (window.ReviewEgg) ReviewEgg.reset(20, 40);   // Antidote's review billboard buoy: once a run, 20-40 s in
     if (window.Halftime) Halftime.reset();   // halftime: Antidote's Nalu Vida review reel, once a run, between levels after ~90 s
-    if (DBG_HITS) { G.hearts = 5 - DBG_HITS; G.dmg = DBG_HITS; }
+    if (DBG_HITS) { G.hearts = 5 - DBG_HITS; }
     G.hitsRun = DBG_HITS; G.resc = 0; G.rescPend = 0; G.beer = null;   // lifeguard beer rescue: once a run, on the 2nd hit
-    if (DBG_RESC && !DBG_HITS) { G.hearts = 3; G.dmg = 2; G.hitsRun = 2; G.rescPend = 1; }   // ?rescue=1&hits=1 instead tests the real 2nd-hit trigger
+    if (DBG_RESC && !DBG_HITS) { G.hearts = 3; G.hitsRun = 2; G.rescPend = 1; }   // ?rescue=1&hits=1 instead tests the real 2nd-hit trigger
     levelStart(true);
     if (DBG_PHASE === "swim") { G.yw = 120; G.lvT = 4; toSwim(); }
     else if (DBG_PHASE === "ride" || DBG_BOSS) { G.lvT = L().swim; G.yw = 2400; startRide(); if (DBG_BOSS && L().boss) G.rideT = L().ride - 2; }
-    else if (DBG_PHASE === "ending") { G.level = 5; G.won = 1; G.bossBeat = 1; G.finaleMsg = "🏆 Champion of the Nalu"; G.lvT = L().swim; G.yw = 520; startRide(); rideIn(true); G.banner = null; }
+    else if (DBG_PHASE === "ending") { G.level = 5; G.won = 1; G.bossBeat = 1; G.finaleMsg = "🏆 All 5 levels ridden"; G.lvT = L().swim; G.yw = 520; startRide(); rideIn(true); G.banner = null; }
     zoomSnap();
   }
   // every level starts on the sand in front of Nalu Vida, a run away from the water
@@ -394,16 +393,15 @@
   }
   var tt = 0;
   function toast(img, t) { var e = $("nv-toast"), i = $("nv-toast-img"); if (ok(IM[img])) { i.src = IM[img].src; i.style.display = ""; } else i.style.display = "none"; $("nv-toast-t").textContent = t; e.classList.add("on"); clearTimeout(tt); tt = setTimeout(function () { e.classList.remove("on"); }, 1800); }
-  /* hearts come in halves: washed by the wave / whitewater or hit by the falling lip = ½ ❤️, a Manō Nui bite = 1½ ❤️,
+  /* hearts come in halves: washed by the wave / whitewater or hit by the falling lip = ½ ❤️, (boss bites removed: no bosses),
      everything else (pier, sharks, stingrays, eels, jellies, rocks, a bail) = 1 ❤️. Game over at 0. */
   function hurt(why, cause, amt) {
     if (G.inv > 0 || !inWater() || G.jump > 0.06) return false;
-    cause = cause || (/SHARK|CHOMP/.test(why) ? "shark" : /ZAP/.test(why) ? "eel" : /STINGRAY/.test(why) ? "ray" : "wave");
+    cause = cause || (/SHARK/.test(why) ? "shark" : /EEL/.test(why) ? "eel" : /STINGRAY/.test(why) ? "ray" : "wave");
     if (DBG_GOD) { G.inv = 1; G.streak = 0; G.mult = 1; pop(G.x, sy(G.yw) - 30, why, "#ff6b6b"); return true; }
     amt = amt || 1; G.hearts = Math.max(0, Math.round((G.hearts - amt) * 2) / 2);
-    if (cause === "shark" || cause === "ray") G.dmg = Math.min(5, G.dmg + amt);   // the cartoon damage on the surfer (steps by half a heart)
     G.inv = 1.6; G.hurt = 0.35; G.shake = 10; G.streak = 0; G.mult = 1; G.eng = 0; G.trick = null; G.tricks = []; buzz([60, 40, 90]);
-    pop(G.x, sy(G.yw) - 30, why, "#ff6b6b", 1); sfx(cause === "shark" || cause === "ray" ? "bite" : cause === "eel" ? "zap" : "hit");
+    pop(G.x, sy(G.yw) - 30, why, "#ff6b6b", 1); sfx(cause === "wave" ? "hit" : "splash");
     if (G.hearts <= 0) { die(cause); return true; }
     if (++G.hitsRun === 2 && !G.resc) G.rescPend = 1;   // 2nd hit: the lifeguard throws a rescue (rescueStep picks a safe moment)
     if (G.hearts <= 1) radio("Last heart! Easy out there.", { tone: "warn", ms: 2400, pri: 2 });
@@ -411,15 +409,16 @@
     return true;
   }
   function die(cause) {
+    if (cause === "eel" || cause === "shark") cause = "ray";   // family version: every sea-life wipeout ends the same mild way (splash + bubbles, no zap/x-ray, no shark swim-by)
     G.beer = null; G.rescPend = 0;
     G.deathPaddle = G.phase === "swim"; G.boss = null; G.blobs = []; G.harps = []; G.phase = "death"; G.deathT = 0; G.deathCause = cause; G.deathX = G.x; G.deathYw = G.yw; G.jump = 0; G.wipe = 0; G.duck = 0; G.trick = null;
-    G.shake = cause === "eel" ? 18 : 12; buzz(cause === "eel" ? [80, 40, 80, 40, 200] : [140, 60, 220]); sfx("over"); if (cause === "shark" || cause === "ray") sfx("splash");
+    G.shake = 8; buzz([100, 60, 160]); sfx("over"); if (cause !== "wave") sfx("splash");
     radio("Out of the water! Come grab a bite and try again.", { tone: "warn", ms: 3400, pri: 2 });
     if (cause === "shark") add({ t: "shark", x: G.x - 70, yw: G.yw + G.dir * 50, r: 0, st: "lunge", vx: 260, vy: -G.dir * 120, lunge: 0, dead: 1 });
-    G.finaleMsg = cause === "shark" ? "🦈 The lifeguards pulled you out" : cause === "eel" ? "⚡ The lifeguards revived you" : cause === "ray" ? "🩹 The lifeguards patched you up" : "🌊 The Nalu Vida crew pulled you in";
+    G.finaleMsg = cause === "wave" ? "🌊 The Nalu Vida crew pulled you in" : "🌊 Wiped out · the lifeguards paddled you in";
   }
   function deathStep(dt) {
-    G.deathT += dt; if (G.deathCause === "eel") G.shake = Math.max(G.shake, 9 * Math.max(0, 1 - G.deathT / 2.4));
+    G.deathT += dt;
     G.ents.forEach(function (e) { if (e.dead) { e.x += e.vx * dt; e.yw += e.vy * dt; } });
     if (Math.random() < dt * 16) G.fx.push({ k: "bubble", x: G.deathX + rnd(-30, 30), y: sy(G.deathYw) + rnd(-24, 24), t: 0 });
     G.cam += (G.yw + G.lead - G.cam) * Math.min(1, dt * 3); tickEnts(dt);
@@ -542,7 +541,7 @@
     G.yw += G.dir * v * dt; G.eggT += dt; G.lvT += dt;
     if (riding) { G.rideT += dt; if (G.yw < 1500) wrapWorld(2400); }   // the ride never runs out of ocean; the ride-in brings the sand back
     if (swim && G.lvT >= P.swim) { popUp(); return; }
-    if (riding && !G.boss && G.rideT >= P.ride) { if (P.boss && !G.bossBeat) bossStart(P.boss); else if (!P.boss || G.bossBeat) { rideIn(false); return; } }
+    if (riding && !G.boss && G.rideT >= P.ride) { if (G.level >= 5) { G.won = 1; G.finaleMsg = "🏆 All 5 levels ridden"; var fb = 5000; G.score += fb; pop(W / 2, H * .3, "+" + fb.toLocaleString() + " FINAL RIDE!", "#ffd23f", 1); confetti(60); rideIn(true); } else rideIn(false); return; }
     if (rin && G.yw <= 40) { toBeach(); return; }
     if (SURF && AC) { var nearP = G.yw > -40 && G.yw < STUB ? Math.max(0, 1 - Math.abs(G.x - PIER_X) / 170) : 0; SURF.gain.setTargetAtTime(.15 + .14 * nearP + (swim ? .06 : 0), AC.currentTime, .3); }
     if (MUSG && AC && MUSIC_ON) MUSG.gain.setTargetAtTime(G.boss ? MUSIC_VOL * .6 : MUSIC_VOL, AC.currentTime, .5);
@@ -576,7 +575,6 @@
       if (S.boat <= 0) { boat(); S.boat = rnd(11, 16); }
       if (S.heli <= 0) { heli(); S.heli = rnd(18, 26); }
       if (S.pier <= 0) { pierSection(); S.pier = G.boss ? rnd(6, 9) : rnd(P.pier[0], P.pier[1]); }
-      if (S.harp <= 0) { harpPick(laneX(), ahead(H * 0.75)); S.harp = G.boss ? rnd(5, 7) : rnd(P.harp[0], P.harp[1]); }
       if (S.rock <= 0 && (P.rock || G.boss)) { rocks(); S.rock = G.boss ? rnd(2.4, 3.4) : rnd(P.rock[0], P.rock[1]); }
       if (S.ski <= 0 && (G.boss || G.level >= 3)) { ski(); S.ski = G.boss ? rnd(8, 11) : rnd(22, 30); }
     }
@@ -602,8 +600,8 @@
       else if (e.t === "jelly") { e.ph += dt; e.x += Math.sin(e.ph * .8) * 12 * dt; }
       else if (e.t === "ray") { e.ph += dt; e.x += e.vx * dt; e.yw += Math.sin(e.ph * 1.3) * 18 * dt * G.dir; e.sub = .5 + .5 * Math.sin(e.ph * .9); }
       else if (e.t === "brk") { e.yw += e.vy * dt; e.ph += dt; }
-      else if (e.t === "boat") { e.x += e.vx * dt; e.toss -= dt; if (e.toss <= 0 && e.x > 20 && e.x < W - 20) { e.toss = 0.75; var hp0 = !e.gave && G.level >= 2 && Math.random() < (G.boss ? .6 : .18); if (hp0) e.gave = 1; tossTo(e.x, e.yw, laneX(), ahead(rnd(120, 230)), "boat", hp0 ? "harpoon" : 0); } }
-      else if (e.t === "ski") { e.x += e.vx * dt; if (!e.tossed && Math.abs(e.x - G.x) < 90) { e.tossed = 1; tossTo(e.x, e.yw, Math.max(30, Math.min(W - 30, G.x + rnd(-40, 40))), ahead(rnd(130, 190)), "ski", "harpoon"); toast(Math.random() < .5 ? "lifeguard_m" : "lifeguard_f", "Catch! 🔱 Harpoons incoming"); } }
+      else if (e.t === "boat") { e.x += e.vx * dt; e.toss -= dt; if (e.toss <= 0 && e.x > 20 && e.x < W - 20) { e.toss = 0.75; tossTo(e.x, e.yw, laneX(), ahead(rnd(120, 230)), "boat", 0); } }
+      else if (e.t === "ski") { e.x += e.vx * dt; if (!e.tossed && Math.abs(e.x - G.x) < 90) { e.tossed = 1; tossTo(e.x, e.yw, Math.max(30, Math.min(W - 30, G.x + rnd(-40, 40))), ahead(rnd(130, 190)), "ski", 0); toast(Math.random() < .5 ? "lifeguard_m" : "lifeguard_f", "Catch! Snack incoming 🌮"); } }
       else if (e.t === "rock") { e.ph += dt; }
       else if (e.t === "heli") { e.x += e.vx * dt; e.dt -= dt; if (e.drops > 0 && e.dt <= 0 && e.x > 30 && e.x < W - 30) { e.drops--; e.dt = 0.8; var tx = Math.max(30, Math.min(W - 30, G.x + rnd(-110, 110))); add({ t: "drop", x: tx, yw: ahead(rnd(150, 260)), r: 20, air: 1.4, pts: 250 }); } }
       else if (e.t === "plane") { e.x += e.vx * dt; }
@@ -627,7 +625,7 @@
         if (e.t === "rsign" && d < e.r + 24) { var eb = ReviewEgg.collect(); G.score += eb; pop(e.x, sy(e.yw) - 40, "+" + eb + " 📺 ANTIDOTE'S REVIEW", "#ffd23f", 1); sfx("egg"); buzz([20, 40, 20]); G.fx.push({ k: "ring", x: e.x, y: sy(e.yw), t: 0 }); G.fx.push({ k: "wsplash", x: e.x, y: sy(e.yw), t: 0 }); G.ents.splice(i, 1); continue; }
         if (e.t === "buoy" && d < hitR + 6) { G.hearts = Math.min(5, G.hearts + 1); pop(e.x, sy(e.yw), "+1 ❤️ Lifeguard save!", "#ff9db0", 1); toast("lifeguard_f", "Rescue can! +1 heart"); G.ents.splice(i, 1); continue; }
         var danger = e.t === "jelly" || e.t === "ray" || (e.t === "eel" && e.zap) || (e.t === "shark" && e.st === "lunge") || e.t === "boat";
-        if (danger && d < hitR && G.duck <= 0) { hurt(e.t === "shark" ? "SHARK BITE!" : e.t === "eel" ? "⚡ ZAPPED!" : e.t === "jelly" ? "Jellyfish sting!" : e.t === "ray" ? "STINGRAY!" : "Boat wake!"); if (e.t === "shark") e.st = "gone"; if (G.phase === "death") return; continue; }
+        if (danger && d < hitR && G.duck <= 0) { hurt(e.t === "shark" ? "SHARK BUMP! Wipeout" : e.t === "eel" ? "EEL BUMP! Wipeout" : e.t === "jelly" ? "Jellyfish! Wipeout" : e.t === "ray" ? "STINGRAY! Wipeout" : "Boat wake!"); if (e.t === "shark") e.st = "gone"; if (G.phase === "death") return; continue; }
         if ((e.t === "jelly" || e.t === "eel" || e.t === "shark" || e.t === "ray") && !e.nm && d < hitR + 26 && d >= hitR && (e.t !== "shark" || e.st === "lunge")) { e.nm = 1; gain(50, G.x, py - 40, "close one!"); }
       }
       ey = e.scr ? e.y : sy(e.t === "pier" ? e.yb : e.yw);
@@ -787,8 +785,8 @@
     G.phase = "ridein"; G.final = final ? 1 : 0; G.wv = null; G.pocket = 0; G.eng = 0; G.trick = null; G.jump = 0;
     G.ents = G.ents.filter(function (e) { return e.sky || e.t === "food" || e.t === "toss"; });
     if (G.yw > 980) wrapWorld(980 - G.yw);
-    banner("RIDE IT IN", "Back to Nalu Vida 🌴", final ? "🏆 CHAMPION OF THE NALU" : "LEVEL " + G.level + " DONE", "#ffd23f", 2.2);
-    radio(final ? "Champ! Ride it in, dinner's on us." : "Nice set! Ride it in to Nalu Vida.", { tone: "win", ms: 2600 });
+    banner("RIDE IT IN", "Back to Nalu Vida 🌴", final ? "🏆 ALL 5 LEVELS" : "LEVEL " + G.level + " DONE", "#ffd23f", 2.2);
+    radio(final ? "All five! Ride it in, champ." : "Nice set! Ride it in to Nalu Vida.", { tone: "win", ms: 2600 });
   }
   function toBeach() { G.phase = "beach"; G.beachT = 0; G.bx0 = G.x; G.by0 = G.yw; G.fx.push({ k: "splash", x: G.x, y: sy(G.yw), t: 0 }); sfx("splash"); G.ents = G.ents.filter(function (e) { return e.sky; }); }
   function beachStep(dt) {   // hop off, run up the sand into Nalu Vida; then the level-clear card
@@ -798,13 +796,13 @@
     if (G.beachT > 2.4 && !G.cleared) { G.cleared = 1;
       if (G.final) { cutscene("win"); return; }
       var bonus = 1500 * G.level; G.score += bonus; banner("LEVEL " + G.level + " CLEAR", "+" + bonus.toLocaleString() + " · fuel up and paddle back out", "BACK TO NALU VIDA 🏄", "#ffd23f", 2.8); G.banner.y = 410;
-      sfx("level"); buzz([30, 40, 30]); confetti(40); radio(G.level === 4 ? "Level 4 clear! One more, then Manō Nui." : "Level " + G.level + " clear! Grab a bite, then back out.", { tone: "win" }); }
+      sfx("level"); buzz([30, 40, 30]); confetti(40); radio(G.level === 4 ? "Level 4 clear! One more ride to go." : "Level " + G.level + " clear! Grab a bite, then back out.", { tone: "win" }); }
     if (G.beachT > 5.4) { G.cleared = 0; levelUp(); }
   }
   // on to the next level: back on the sand for the next paddle-out
   function levelUp() {
     var lv = Math.min(5, G.level + 1), rid = G.runId, go = function () { if (G.runId !== rid || G.over) return;
-      G.level = lv; G.bossBeat = 0; if (G.level >= 2 && G.ammo < 3) G.ammo = 3; levelStart(false); };   // levelStart shows the banner + radio line
+      G.level = lv; G.bossBeat = 0; levelStart(false); };   // levelStart shows the banner + radio line
     G.phase = "cut0";   // hold still on the storefront card while a halftime break (if any) plays
     // HALFTIME between levels (after level 2, 3 or 4 once ~90 s are ridden): everything freezes until the break is over
     if (window.Halftime && Halftime.levelUp(lv, function () { if (G.runId !== rid || G.over) return; G.running = true; last = 0; drag = null; musicSync(); go(); })) { G.running = false; drag = null; }
@@ -959,6 +957,7 @@
   }
   function tgPos(tg) { if (!tg) return null; if (tg.boss) { var b = G.boss; if (!b || b.sub >= .6 || b.st === "ko") return null; return { x: b.x, yw: bossYw(b) }; } if (tg.e.st === "flee" || G.ents.indexOf(tg.e) < 0) return null; return { x: tg.e.x, yw: tg.e.yw }; }
   function fire() {
+    return;   // harpoons removed (family version)
     if (!G.running || G.phase !== "ride" || G.ammo <= 0 || G.fcd > 0) return;
     G.ammo--; G.fcd = .32; var tg = harpTarget(), p = tgPos(tg), ax = 0, ay = G.dir;
     if (p) { ax = p.x - G.x; ay = p.yw - G.yw; var l = Math.hypot(ax, ay) || 1; ax /= l; ay /= l; }
@@ -1103,7 +1102,7 @@
   }
   function deathWater() {
     var x = G.deathX, y = sy(G.deathYw), t = G.deathT;
-    if (D3) { if (G.deathCause === "shark" || G.deathCause === "ray") comicSplash(x, y, t, G.deathCause === "ray" ? "OUCH!" : GORE ? "CHOMP!" : "SPLASH!");
+    if (D3) { if (G.deathCause === "shark" || G.deathCause === "ray") comicSplash(x, y, t, "SPLASH!");
       else if (G.deathCause === "eel") { cx.save(); cx.globalCompositeOperation = "lighter"; var er3 = 60 + t * 120, gl3 = cx.createRadialGradient(x, y, 4, x, y, er3); gl3.addColorStop(0, "rgba(140,230,255," + (.5 * Math.max(0, 1 - t / 2.8)) + ")"); gl3.addColorStop(1, "rgba(60,160,255,0)"); cx.fillStyle = gl3; cx.beginPath(); cx.arc(x, y, er3, 0, 7); cx.fill(); cx.restore(); }
       return; }
     if (G.deathCause === "shark" && GORE) {   // cartoon only: a soft, rounded red dye cloud spreading in the water (no gore)
@@ -1111,7 +1110,7 @@
       for (var k = 0; k < 9; k++) { var an = k * 2.399, d = (6 + k * 6) * g, r = (16 + (k % 3) * 9) * (.35 + g * 1.25);
         cx.fillStyle = "rgba(226,58,78," + ((.3 - k * .018) * fade) + ")"; cx.beginPath(); cx.arc(x + Math.cos(an) * d, y + Math.sin(an) * d * .8, r, 0, 7); cx.fill(); }
       cx.fillStyle = "rgba(255,150,160," + (.22 * fade) + ")"; cx.beginPath(); cx.arc(x - 8 * g, y - 6 * g, 18 * (.4 + g), 0, 7); cx.fill();
-      comicSplash(x, y, t, "CHOMP!");
+      comicSplash(x, y, t, "SPLASH!");
     } else if (G.deathCause === "shark" || G.deathCause === "ray") {   // "Cartoon red" off (and stingrays): a splash and bubbles
       for (var j = 0; j < 3; j++) { var rr = ((t * .8 + j / 3) % 1); cx.strokeStyle = "rgba(255,255,255," + (.7 * (1 - rr)) + ")"; cx.lineWidth = 2.5; cx.beginPath(); cx.ellipse(x, y, 14 + rr * 70, 9 + rr * 44, 0, 0, 7); cx.stroke(); }
       comicSplash(x, y, t, G.deathCause === "ray" ? "OUCH!" : "SPLASH!");
@@ -1674,33 +1673,41 @@
   function showEnd() {
     G.running = false; G.over = true; var sc = Math.floor(G.score); G.score = sc; if (RA) RA.clear();   // the lifeguard bubble would sit over the end card
     if (sc > G.best) { G.best = sc; try { localStorage.setItem("nalu-best", sc); } catch (e) {} }
-    var prize = ""; PRIZES.forEach(function (p) { if (sc >= p[0]) prize = p[1]; });
-    var win = "";
-    var member = window.SSAI_GATE && SSAI_GATE.member ? SSAI_GATE.member() : null;
-    function claimHtml(r) { return r.blocked ? "🏆 You'd win " + esc(prize) + ", but you already have <b>" + esc(r.prize.t) + "</b> waiting (code " + r.prize.c + ")." : "🏆 You won <b>" + esc(prize) + "</b>!<br><span style='font:900 20px ui-monospace,Menlo,monospace;letter-spacing:.1em;color:#ffd23f'>" + r.prize.c + "</span><br><span style='font-weight:600;font-size:12.5px'>Show this at Nalu Vida · good for 3 days</span>"; }
-    if (prize && window.SSAI_WIN && member) win = claimHtml(window.SSAI_WIN(prize));
-    else if (prize) win = "🏆 You won <b>" + esc(prize) + "</b>!<br><button class='nv-btn' id='nv-save' type='button' style='margin-top:8px'>Save my prize</button><br><span style='font-weight:600;font-size:12px;opacity:.85'>Add your name and phone or email to get your code</span>";
-    var next = PRIZES.filter(function (p) { return p[0] > sc; })[0];
+    // Rewards points (crm.js SSAI_GAMEPTS): 1 pt per 100 score, capped per day. Members get them now; a guest's are held
+    // until they join ("Join to save your N points"). award() runs once per finished run.
+    var GP = window.SSAI_GAMEPTS || null, RW = (window.SSAI_REWARDS && window.SSAI_REWARDS.game) || {}, per = (GP && GP.cfg && GP.cfg.perScore) || RW.perScore || 100, cap = (GP && GP.cfg && GP.cfg.dailyCap) || RW.dailyCap || 50;
+    var worth = GP && GP.forScore ? GP.forScore(sc) : Math.min(cap, Math.floor(sc / per)), aw = null;
+    if (GP && GP.award && G.awarded !== G.runId) { G.awarded = G.runId; try { aw = GP.award(sc, "🏄 Rode the Nalu · score " + sc.toLocaleString()); } catch (e) { aw = null; } G.lastAward = aw; } else aw = G.lastAward || null;
+    function ptsHtml(a) {
+      var head = "Score " + sc.toLocaleString() + " → <b>" + worth + " point" + (worth === 1 ? "" : "s") + "</b>";
+      if (!GP) return head + "<br><span style='font-weight:600;font-size:12.5px'>1 point per " + per + " score · up to " + cap + " a day</span>";
+      if (!a) return head;
+      if (a.saved) return head + "<br>" + (a.pts > 0 ? "+" + a.pts + " points added to your Nalu Vida Rewards" : "Daily game limit reached (" + cap + " a day)") +
+        "<br><span style='font-weight:600;font-size:12.5px'>" + (a.today != null ? a.today + " of " + cap + " game points today" : "") + "</span>";
+      if (a.pts > 0) return head + "<br><button class='nv-btn' id='nv-join' type='button' style='margin-top:8px'>🎁 Join to save your " + a.pts + " points</button><br><span style='font-weight:600;font-size:12px;opacity:.85'>Free Nalu Vida Rewards · up to " + cap + " game points a day</span>";
+      return head + "<br>Daily game limit reached (" + cap + " a day)";
+    }
+    var win = ptsHtml(aw);
     var sv = {}; try { sv = JSON.parse(localStorage.getItem("nalu-board") || "{}"); } catch (e) {}
-    $("nv-end").innerHTML = (ok(IM.storefront) ? "<img src='" + IM.storefront.src + "' alt='Nalu Vida' style='width:100%;max-width:330px;" + (window.ReviewEgg ? "max-height:110px;object-fit:cover;" : "") + "border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.4);margin-bottom:8px'>" : "") + (G.won ? "<h3>You beat Manō Nui! 🏆</h3>" : "<h3>You made it to Nalu Vida! 🌴</h3>") + "<p style='font:900 30px system-ui;margin:4px 0'>" + sc.toLocaleString() + "</p><p>" + (G.won ? "All 5 levels cleared" : "Level " + G.level + "/5") + " · best " + G.best.toLocaleString() + "</p>" +
-      (win ? "<div class='nv-win'>" + win + "</div>" : next ? "<p>" + (next[0] - sc).toLocaleString() + " more points wins <b>" + esc(next[1]) + "</b></p>" : "") +
+    $("nv-end").innerHTML = (ok(IM.storefront) ? "<img src='" + IM.storefront.src + "' alt='Nalu Vida' style='width:100%;max-width:330px;" + (window.ReviewEgg ? "max-height:110px;object-fit:cover;" : "") + "border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.4);margin-bottom:8px'>" : "") + (G.won ? "<h3>All 5 levels ridden! 🏆</h3>" : "<h3>You made it to Nalu Vida! 🌴</h3>") + "<p style='font:900 30px system-ui;margin:4px 0'>" + sc.toLocaleString() + "</p><p>" + (G.won ? "All 5 levels cleared" : "Level " + G.level + "/5") + " · best " + G.best.toLocaleString() + "</p>" +
+      "<div class='nv-win' id='nv-pts'>" + win + "</div>" +
       "<button class='nv-btn' id='nv-order' type='button' style='font-size:18px;padding:14px 24px'>🍽️ Head inside &amp; order</button><br>" +
       "<button class='nv-btn' id='nv-again' type='button' style='background:#fff'>🏄 Ride again</button>" +
       "<div class='nv-board'><b>This week's top riders</b> <span id='nv-wk' style='opacity:.7'></span><ol id='nv-list'><li>Loading…</li></ol>" +
       "<input id='nv-n' maxlength='16' placeholder='Name for the board' value='" + esc(sv.n || "") + "'><input id='nv-ig' maxlength='31' placeholder='@instagram (optional)' value='" + (sv.ig ? "@" + esc(sv.ig) : "") + "'>" +
-      "<button class='nv-btn' id='nv-post' type='button' style='width:100%;margin-top:6px'>Post my score</button><div id='nv-msg' style='margin-top:6px;font-size:12.5px'></div><div style='font-size:12px;opacity:.8;margin-top:4px'>#1 at the end of the week wins half off their meal.</div></div>";
+      "<button class='nv-btn' id='nv-post' type='button' style='width:100%;margin-top:6px'>Post my score</button><div id='nv-msg' style='margin-top:6px;font-size:12.5px'></div></div>";
     if (window.ReviewEgg) ReviewEgg.endCard($("nv-end"), $("nv-order"));
     $("nv-end").style.display = "flex";
     var fly = document.createElement("button"); fly.type = "button"; fly.className = "nv-fly"; fly.setAttribute("aria-label", "Fly to Melody Bar and Grill");
-    fly.innerHTML = "<img src='img/game/plane.webp' alt=''><span>✈ Fly to Melody Bar &amp; Grill · LAX — tap for a deal</span>";
-    fly.onclick = function () { var code; try { code = localStorage.getItem("nalu-melody-egg-" + new Date().toDateString()); } catch (e) {}
-      if (!code) { code = "MELODY-" + Math.random().toString(36).slice(2, 6).toUpperCase(); try { localStorage.setItem("nalu-melody-egg-" + new Date().toDateString(), code); } catch (e) {} }
-      location.href = "../melody-lax/?from=nalu&deal=" + encodeURIComponent(code) + "#play"; };
+    fly.innerHTML = "<img src='img/game/plane.webp' alt=''><span>✈ Visit our sister spot: Melody Bar &amp; Grill · LAX</span>";
+    fly.onclick = function () { location.href = "../melody-lax/?from=nalu#play"; };
     $("nv-end").appendChild(fly);
-    $("nv-again").onclick = function () { var t = window.SSAI_TOKENS; if (t && t.account) t.play(function () { start(); }); else start(); };   // member gate / token cost (crm.js)
+    $("nv-again").onclick = function () { start(); };   // play again: never gated (guests can play before joining)
     $("nv-order").onclick = function () { $("nv-end").style.display = "none"; var t = document.getElementById("seat") || document.getElementById("food"); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); };
     $("nv-post").onclick = function () { if (window.SSAI_GATE) SSAI_GATE("score", function (m) { if (m && !$("nv-n").value) $("nv-n").value = (m.name || "").split(" ")[0]; post(); }); else post(); }; loadBoard();
-    var sv2 = $("nv-save"); if (sv2) sv2.onclick = function () { SSAI_GATE("prize", function (m) { var r = window.SSAI_WIN(prize); sv2.parentNode.innerHTML = claimHtml(r); if (m && !$("nv-n").value) $("nv-n").value = (m.name || "").split(" ")[0]; }); };
+    var jb = $("nv-join"); if (jb && GP && GP.join) jb.onclick = function () { GP.join(function (r) { var m = (r && r.member) || (GP.member && GP.member());
+        var got = r && r.pts != null ? r.pts : (aw ? aw.pts : 0); $("nv-pts").innerHTML = "Score " + sc.toLocaleString() + " → <b>" + worth + " points</b><br>✅ +" + got + " points saved to your Nalu Vida Rewards";
+        if (m && !$("nv-n").value) $("nv-n").value = (m.name || "").split(" ")[0]; }); };
   }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function wkey(off) { var d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7) - 7 * (off || 0)); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
@@ -1717,16 +1724,13 @@
       G.posted = G.runId; try { localStorage.setItem("nalu-board", JSON.stringify({ n: n, ig: ig })); } catch (e) {} m.textContent = "✅ You're on the board!"; loadBoard(); buzz(20);
     }).catch(function () { m.textContent = "No connection. Try again in a sec."; });
   }
-  // weekly champion: last week's #1 on this phone gets half off, once
-  (function () { var sv = {}; try { sv = JSON.parse(localStorage.getItem("nalu-board") || "{}"); } catch (e) {} if (!sv.n) return; var lw = wkey(1), k = "nalu-champ-" + lw; try { if (localStorage.getItem(k)) return; } catch (e) {}
-    fetch(BAPI + "?game=" + BGAME + "&week=" + lw).then(function (r) { return r.json(); }).then(function (rows) { if (rows[0] && rows[0].name === sv.n && window.SSAI_WIN) { var r = window.SSAI_WIN("Weekly champion: half off your meal"); try { localStorage.setItem(k, "1"); } catch (e) {} if (!r.blocked) toast("lifeguard_f", "👑 Last week's #1! Half off your meal · " + r.prize.c); } }).catch(function () {}); })();
 
   // Easter egg: the Melody banner plane
   function melodyEgg() {
-    var key = "nalu-melody-egg-" + new Date().toDateString(), code; try { code = localStorage.getItem(key); } catch (e) {}
-    sfx("egg"); if (!code) { code = "MELODY-" + Math.random().toString(36).slice(2, 6).toUpperCase(); try { localStorage.setItem(key, code); } catch (e) {} gain(500, W / 2, 120, "EASTER EGG!"); }
+    var key = "nalu-melody-egg-" + new Date().toDateString(), seen; try { seen = localStorage.getItem(key); } catch (e) {}
+    sfx("egg"); if (!seen) { try { localStorage.setItem(key, "1"); } catch (e) {} gain(500, W / 2, 120, "EASTER EGG!"); }
     var o = document.createElement("div"); o.className = "nv-ov"; o.style.zIndex = 5;
-    o.innerHTML = "<h3 style='font-size:26px'>✈️ You found it!</h3><p>Nalu Vida's sister spot by LAX says hi.</p><div class='nv-win'>Show this at <b>Melody Bar &amp; Grill</b><br>$3 off any drink<br><span style='font:900 20px ui-monospace,Menlo,monospace;color:#ffd23f'>" + code + "</span><br><span style='font-weight:600;font-size:12.5px'>9132 S Sepulveda Blvd · good for 3 days</span></div>" +
+    o.innerHTML = "<h3 style='font-size:26px'>✈️ You found it!</h3><p>Nalu Vida's sister spot by LAX says hi.</p><div class='nv-win'><b>Melody Bar &amp; Grill</b><br><span style='font-weight:600;font-size:12.5px'>9132 S Sepulveda Blvd · by LAX</span></div>" +
       "<a class='nv-btn' href='../melody-lax/' style='text-decoration:none'>See Melody's app</a><button class='nv-btn' type='button' style='background:#fff'>Keep surfing</button>";
     var was = G.running; G.running = false; wrap.appendChild(o);
     o.querySelector("button").onclick = function () { o.remove(); G.running = was && !G.over; last = 0; };
@@ -1749,13 +1753,12 @@
   cv.addEventListener("pointerup", function (e) { if (drag && !drag.sw && drag.moved < 10 && performance.now() - drag.t0 < 280) { var p = local(e); if (Math.abs(p.y - drag.y0) < 20) jump(); } drag = null; });
   cv.addEventListener("pointercancel", function () { drag = null; });
   var keys = {};
-  window.addEventListener("keydown", function (e) { if (!G.running) return; if (e.key === "f" || e.key === "F" || e.key === "x" || e.key === "X") { fire(); e.preventDefault(); return; } if (e.key === " " || e.key === "ArrowUp") { jump(); e.preventDefault(); return; }
+  window.addEventListener("keydown", function (e) { if (!G.running) return; if (e.key === " " || e.key === "ArrowUp") { jump(); e.preventDefault(); return; }
     if (e.key === "t" || e.key === "T" || e.key === "ArrowDown") { trick(); e.preventDefault(); return; } if (e.key === "ArrowLeft" || e.key === "ArrowRight") { keys[e.key] = 1; e.preventDefault(); } });
   window.addEventListener("keyup", function (e) { keys[e.key] = 0; });
   setInterval(function () { if (keys.ArrowLeft) G.vx = Math.max(-380, G.vx - 90); if (keys.ArrowRight) G.vx = Math.min(380, G.vx + 90); }, 50);
   $("nv-jump").addEventListener("pointerdown", function (e) { e.preventDefault(); e.stopPropagation(); jump(); buzz(8); });
   $("nv-trick").addEventListener("pointerdown", function (e) { e.preventDefault(); e.stopPropagation(); trick(); });
-  $("nv-fire").addEventListener("pointerdown", function (e) { e.preventDefault(); e.stopPropagation(); fire(); });
   $("nv-mute").onclick = function () { audio(); if (AC && AC.state === "suspended") AC.resume(); setMute(!MUTED); }; setMute(MUTED);
   [].forEach.call(wrap.querySelectorAll(".nv-pick button"), function (b) { b.onclick = function () { start(b.getAttribute("data-s")); }; });
 
@@ -1765,17 +1768,16 @@
       ["raft_oysters", "$2 Oysters raft", "+200"], ["drop", "Helicopter drink drop", "+250"], ["boat", "Nalu Vida crew boat toss", "+100–200"], ["", "🌟 Golden Poke Bowl (rare)", "+500"],
       ["", "🤿 Duck-dive under a wave (paddle-out)", "+100"], ["", "🌊 Every 3 s in the pocket", "+250 (and points while you're in it)"], ["", "🏄 Ride the barrel out the exit", "+200"], ["", "⬆ JUMP off the lip (in the pocket)", "big air"],
       ["", "🌀 360 / 🤸 flip, landed clean", "+400 / +600 (×2 for a combo)"], ["", "🪵 Jump the pier", "+500"], ["", "✈️ Big air off the lip", "+150"], ["", "😮 Close call with a shark/ray/eel/jelly", "+50"],
-      ["", "⭐ Ride in to Nalu Vida (clear a level)", "+1,500 × level"], ["", "🔱 Harpoon a shark off", "+300"],
-      ["", "🦈 Harpoon / crash a boss", "+20 × damage"], ["shark", "Beat Big Manō (level 3)", "+5,000"], ["shark", "Beat Manō Nui (final boss)", "+15,000"], ["plane", "Tap the Melody banner plane", "+500 + a Melody deal"], ["", "📺 Ride through Antidote's review billboard (secret)", "+500"], ["buoy", "Lifeguard rescue can", "+1 ❤️"],
-      ["", "🌊 Washed: whitewater or the falling lip", "−½ ❤️ −100", 1], ["shark", "Manō Nui bite (final boss)", "−1½ ❤️", 1], ["", "💥 Bail mid-trick (wipeout)", "−❤️ −300", 1], ["", "🪵 Hit the pier", "−❤️ −200", 1], ["shark", "Shark bite", "−❤️", 1], ["", "🐟 Stingray", "−❤️", 1],
-      ["eel", "Electric eel zap", "−❤️", 1], ["jelly", "Jellyfish sting", "−❤️", 1], ["", "🪨 Rocks / boat wake", "−❤️", 1]];
+      ["", "⭐ Ride in to Nalu Vida (clear a level)", "+1,500 × level"], ["", "🏆 Finish level 5", "+5,000"], ["plane", "Tap the Melody banner plane", "+500"], ["", "📺 Ride through Antidote's review billboard (secret)", "+500"], ["buoy", "Lifeguard rescue can", "+1 ❤️"],
+      ["", "🌊 Washed: whitewater or the falling lip", "−½ ❤️ −100", 1], ["", "💥 Bail mid-trick (wipeout)", "−❤️ −300", 1], ["", "🪵 Hit the pier", "−❤️ −200", 1], ["shark", "Bump a shark (splash wipeout)", "−❤️", 1], ["", "🐟 Bump a stingray", "−❤️", 1],
+      ["eel", "Bump an eel", "−❤️", 1], ["jelly", "Bump a jellyfish", "−❤️", 1], ["", "🪨 Rocks / boat wake", "−❤️", 1]];
     var st = document.createElement("style");
     st.textContent = ".nv-pts{max-width:430px;margin:14px auto 0;color:inherit}.nv-pts h4{margin:0 0 4px;font:900 18px 'Alfa Slab One',Georgia,serif}.nv-pts p{margin:0 0 8px;font-size:13px;opacity:.85}" +
       ".nv-pts .g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.nv-pts .r{min-width:0;display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:12px;background:rgba(6,40,70,.08);border:1px solid rgba(6,60,100,.15);font-size:12.5px;line-height:1.2}" +
       ".nv-pts .r img,.nv-pts .r .e{width:38px;height:38px;flex:none;object-fit:contain;text-align:center;font-size:22px;line-height:38px}.nv-pts .r div.t{min-width:0;display:flex;flex-direction:column;gap:2px}.nv-pts .r b{color:#ff8a3d;font-weight:900}.nv-pts .r.bad b{color:#d33}";
     document.head.appendChild(st);
     var box = document.createElement("div"); box.className = "nv-pts";
-    box.innerHTML = "<h4>What everything's worth</h4><p>5 levels. Each one: run in from the sand, paddle out through the break (duck-dive the waves), pop up and ride the wave back in to Nalu Vida. Level 1 is about 2 minutes; later levels have a shorter paddle-out. Big Manō hunts you on level 3, the giant Manō Nui on level 5: catch 🔱 harpoons, fire them at sharks, and make the bosses crash into rocks and the pier. 5 hits and you're out. Grab 4 in a row without getting hit and every point doubles (×2); 8 in a row = ×3 and it keeps climbing. One hit resets the streak.</p><div class='g'>" +
+    box.innerHTML = "<h4>What everything's worth</h4><p>5 levels. Each one: run in from the sand, paddle out through the break (duck-dive the waves), pop up and ride the wave back in to Nalu Vida. Level 1 is about 2 minutes; later levels have a shorter paddle-out. Steer around the sea life: a bump is just a splash wipeout, and 5 wipeouts end the run. Grab 4 in a row without getting hit and every point doubles (×2); 8 in a row = ×3 and it keeps climbing. One hit resets the streak. Your score turns into Nalu Vida Rewards points: " + (function () { var g = (window.SSAI_REWARDS && window.SSAI_REWARDS.game) || {}; return "1 point per " + (g.perScore || 100) + " score, up to " + (g.dailyCap || 50) + " a day"; })() + ".</p><div class='g'>" +
       rows.map(function (r) { var em = r[1].match(/^(\S+)\s/); return "<div class='r" + (r[3] ? " bad" : "") + "'>" + (r[0] ? "<img src='img/game/" + r[0] + ".webp' alt='' loading='lazy'>" : "<div class='e'>" + (em ? em[1] : "") + "</div>") + "<div class='t'><span>" + (r[0] ? r[1] : r[1].replace(/^\S+\s/, "")) + "</span><b>" + r[2] + "</b></div></div>"; }).join("") + "</div>";
     mount.appendChild(box);
   })();
@@ -1812,8 +1814,8 @@
     // Settings switch: remembered per phone; takes effect right away
     pref: function (on) { if (on == null) return RQ === "3d" || (RQ !== "2d" && PREF3); PREF3 = !!on; try { localStorage.setItem("nalu-3d", on ? "1" : "0"); } catch (e) {} if (on && RQ !== "2d") on3D(); else off3D("switched off"); } };
 
-  window.__NV = { zoom: function () { return ZOOM; }, radio: function (t, o) { radio(t, o); }, get: function () { return G; }, start: start, end: function () { if (G.running) showEnd(); }, W: W, H: H, PIER_X: PIER_X, fire: fire, boss: function (k) { bossStart(k || 5); }, levelUp: function () { if (G.running) rideIn(false); }, jump: jump, trick: trick,
-    gore: function (on) { if (on == null) return GORE; GORE = !!on; try { localStorage.setItem("nalu-gore", on ? "1" : "0"); } catch (e) {} },
+  window.__NV = { zoom: function () { return ZOOM; }, radio: function (t, o) { radio(t, o); }, get: function () { return G; }, start: start, end: function () { if (G.running) showEnd(); }, W: W, H: H, PIER_X: PIER_X, fire: fire, boss: function () {},   /* boss fights removed (Christian, 2026-10) */ levelUp: function () { if (G.running) rideIn(false); }, jump: jump, trick: trick,
+    gore: function () { return false; },   // red effects removed for good
     // the start menu's PLAY: show the surfer pick (character select) instead of the old full start screen
     rescue: function () { G.resc = 0; G.beer = null; G.rescPend = 1; return true; },   // test hook (?rescue=1): queue another throw
     rescueInfo: function () { return { spots: RESC_SPOTS.slice(), beer: G.beer ? { st: G.beer.st, x: G.beer.x, y: G.beer.y, tx: G.beer.tx, sx: G.beer.sx } : null, used: G.resc, pending: G.rescPend, hits: G.hitsRun, hearts: G.hearts, dmg: G.dmg, phase: G.phase }; },

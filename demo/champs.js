@@ -3,7 +3,9 @@
    Reads /champions.json (written every Sunday 11 PM LA by the weekly champions job) and shows last week's
    top 3 + a live countdown to this week's close. Colors come from the page: --gold/--accent, --ink, --dim, --edge.
    Optional data-me="<localStorage key>" ({n:name} as saved by the page's board form): if this phone was #2 or #3,
-   their prize is dropped into the app once through window.SSAI_WIN (the page itself handles #1). */
+   their prize is dropped into the app once through window.SSAI_WIN (the page itself handles #1).
+   Optional data-prizes="off": a bragging-rights board only. No "won …" lines, no prizes dropped into the app, and the
+   number reads as the game "score" (so it is never confused with rewards points). Used by Melody + Nalu Vida. */
 (function () {
   "use strict";
   var me = document.currentScript, base = me && me.src ? me.src : location.href;
@@ -58,16 +60,16 @@
   }
 
   function render(el, data) {
-    var g = data && data.games && data.games[el.getAttribute("data-game")], top = g && g.top3 || [], html = "";
+    var g = data && data.games && data.games[el.getAttribute("data-game")], top = g && g.top3 || [], html = "", np = el.getAttribute("data-prizes") === "off", unit = np ? " score" : " pts";
     if (data === undefined) {
       html += '<p class="ch-k">Weekly champion</p>';
     } else if (top.length) {
       var c = top[0];
       html += '<div class="ch-1"><div class="ch-who">' +
         '<div class="ch-name">👑 Last week\'s champion: ' + esc(c.name) + ig(c.ig) + '</div>' +
-        '<div><span class="ch-sc">' + num(c.score) + '</span> pts · <span class="ch-won">won ' + esc(c.prize) + "</span></div></div></div>";
+        '<div><span class="ch-sc">' + num(c.score) + '</span>' + unit + (np ? '' : ' · <span class="ch-won">won ' + esc(c.prize) + "</span>") + "</div></div></div>";
       if (top.length > 1) html += '<ol class="ch-rest">' + top.slice(1).map(function (r) {
-        return '<li class="ch-row"><b>#' + r.rank + " " + esc(r.name) + "</b>" + ig(r.ig) + '<span class="ch-sc">' + num(r.score) + "</span><small>won " + esc(r.prize) + "</small></li>";
+        return '<li class="ch-row"><b>#' + r.rank + " " + esc(r.name) + "</b>" + ig(r.ig) + '<span class="ch-sc">' + num(r.score) + "</span>" + (np ? "" : "<small>won " + esc(r.prize) + "</small>") + "</li>";
       }).join("") + "</ol>";
     } else {
       html += '<p class="ch-k">Weekly champion</p><div class="ch-empty">👑 Be the first champion — board closes Sunday 11 PM</div>';
@@ -84,7 +86,7 @@
   }
   function runnerUpPrize(el, data) {
     var key = el.getAttribute("data-me"), g = data && data.games && data.games[el.getAttribute("data-game")];
-    if (!key || !g || !window.SSAI_WIN) return;
+    if (!key || !g || !window.SSAI_WIN || el.getAttribute("data-prizes") === "off") return;
     var sv = {}; try { sv = JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) { return; }
     if (!sv.n) return;
     (g.top3 || []).slice(1).forEach(function (r) {

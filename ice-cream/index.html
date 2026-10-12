@@ -407,7 +407,7 @@ es: {
   function contact() {
     $("ct-mail").href = "mailto:secondshiftai@gmail.com?subject=" + encodeURIComponent(ICE.t("subject")) + "&body=" + encodeURIComponent(ICE.t("body"));
     // TEXT_NUMBER: Antidote's business number (e.g. "+13105550123") turns the Text button on.
-    var TEXT_NUMBER = "", s = $("ct-sms");
+    var TEXT_NUMBER = "+14243094068", s = $("ct-sms");
     if (TEXT_NUMBER) { s.href = "sms:" + TEXT_NUMBER + "?&body=" + encodeURIComponent(ICE.t("body")); s.classList.remove("off"); s.removeAttribute("aria-disabled"); }
   }
   $("ct-sms").addEventListener("click", function (e) { if (this.classList.contains("off")) e.preventDefault(); });

@@ -700,7 +700,7 @@ es: {
     var m = $("ct-mail");
     m.href = "mailto:secondshiftai@gmail.com?subject=" + encodeURIComponent(ICE.t("ctSubject")) + "&body=" + encodeURIComponent(ICE.t("ctBody"));
     // TEXT_NUMBER: put Antidote's business number here (e.g. "+13105550123") to turn the Text button on.
-    var TEXT_NUMBER = "";
+    var TEXT_NUMBER = "+14243094068";
     var s = $("ct-sms");
     if (TEXT_NUMBER) { s.href = "sms:" + TEXT_NUMBER + "?&body=" + encodeURIComponent(ICE.t("ctBody")); s.classList.remove("off"); s.removeAttribute("aria-disabled"); }
     else s.addEventListener("click", function (e) { e.preventDefault(); });

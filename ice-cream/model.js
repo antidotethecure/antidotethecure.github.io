@@ -16,7 +16,8 @@
     rep: 20,      // % more visits from members (Circana 2025: ~22%)
     save: 20,     // minutes saved per day skipping dead streets (estimate)
     min: 8,       // minutes per stop, driving + serving (estimate)
-    rewardPerVisit: 0.20, // 10 pts per visit, 50 pts = $1 -> 20 cents per member visit if every point is cashed in
+    rewardPerVisit: 0.43, // per member visit if every reward is cashed in: 10 pts (20¢) + alerts-on bonus 5 pts (10¢)
+                          // + 5th-visit reward (10% off or extra scoop, ~65¢ cost / 5 visits = 13¢)
     nocash: 15,   // % of would-be buyers with no cash who walk away today (estimate; Fed 2025: 24% carried no cash, we use a careful 15%)
     routeHomes: 0 // if > 0: homes counted on the owner's real route (route counter) replace stops × homes
   };
@@ -32,13 +33,22 @@
     var f = 0, m = 0; FEES.forEach(function (x) { f += x.mix * (x.pct / 100 * amount + x.fixed); m += x.mix; });
     return m ? f / m : 0;
   }
-  /* SousShift price for ice cream trucks — change it here, every page reads it. */
+  /* SousShift price for ice cream trucks — change it here, every page reads it.
+     PRICING = the main tier (Double Scoop). TIERS = all three, cheapest first. */
   var PRICING = {
     setup: 299,          // one-time setup
     founding: 199,       // "founding truck" setup price
     foundingSlots: 10,   // ...for the first 10 trucks
-    monthly: 50          // maintenance per month, no contract (route house counter included; tiers come later)
+    monthly: 50          // maintenance per month, no contract
   };
+  /* has: which money lines from run() the tier turns on (alert = phones ring, rep = points/visits,
+     pay = take every payment, route = route house counter). trucks = trucks covered by one plan. */
+  var TIERS = [
+    { id: "single", emoji: "🍦", setup: 99, monthly: 29, trucks: 1, has: { alert: 1, rep: 1 } },
+    { id: "double", emoji: "🍨", setup: PRICING.setup, founding: PRICING.founding, foundingSlots: PRICING.foundingSlots,
+      monthly: PRICING.monthly, trucks: 1, best: true, has: { alert: 1, rep: 1, pay: 1, route: 1 } },
+    { id: "sundae", emoji: "🍧", setup: 599, monthly: 129, trucks: 3, has: { alert: 1, rep: 1, pay: 1, route: 1, blast: 1 } }
+  ];
   function run(p) {
     var o = {}, k; for (k in DEFAULTS) o[k] = DEFAULTS[k]; for (k in (p || {})) if (p[k] != null && !isNaN(p[k])) o[k] = +p[k];
     var hear = o.hear / 100, buy = o.buy / 100, join = o.join / 100, card = o.card / 100, lift = o.lift / 100, rep = o.rep / 100;
@@ -76,6 +86,16 @@
   function money(n, lang, cents) {
     return (n < 0 ? "−" : "") + "$" + Math.abs(n).toLocaleString(lang === "es" ? "es-US" : "en-US", { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 });
   }
-  function roiCount(ticket) { return Math.ceil(PRICING.monthly / (ticket || DEFAULTS.ticket)); }
-  window.IceModel = { DEFAULTS: DEFAULTS, run: run, money: money, FEES: FEES, feePerSale: feePerSale, PRICING: PRICING, roiCount: roiCount };
+  function roiCount(ticket, monthly) { return Math.ceil((monthly || PRICING.monthly) / (ticket || DEFAULTS.ticket)); }
+  /* Estimated extra per month a tier earns the owner (all its trucks), and what's left after the SousShift fee. */
+  function tierRun(tier, p) {
+    var r = run(p), L = r.lines, h = tier.has, one = 0;
+    if (h.alert) one += L.alert;
+    if (h.rep) one += L.rep - L.cost;
+    if (h.pay) one += L.rec + L.card - L.fees;
+    if (h.route) one += L.route;
+    var extra = one * tier.trucks;
+    return { extra: extra, keep: extra - tier.monthly, perTruck: tier.monthly / tier.trucks, roi: roiCount(r.p.ticket, tier.monthly) };
+  }
+  window.IceModel = { DEFAULTS: DEFAULTS, run: run, money: money, FEES: FEES, feePerSale: feePerSale, PRICING: PRICING, TIERS: TIERS, tierRun: tierRun, roiCount: roiCount };
 })();

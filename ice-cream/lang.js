@@ -1,6 +1,6 @@
 /* SousShift AI — Ice Cream Trucks: English / Spanish switch for /ice-cream/ and /ice-cream/demo/.
    Each page defines window.T = {en:{key:"…"}, es:{key:"…"}} before loading this file.
-   Elements: data-t="key" (innerHTML), data-t-ph="key" (placeholder), data-t-aria="key" (aria-label).
+   Elements: data-t="key" (innerHTML), data-t-ph="key" (placeholder), data-t-alt="key" (img alt), data-t-aria="key" (aria-label).
    Buttons with data-lang="en|es" switch. Choice remembered in localStorage "ssai:ice:lang"; ?lang=es overrides.
    API: window.ICE.lang, ICE.t(key), ICE.set(lang), ICE.on(fn) — fn(lang) runs after every switch. */
 (function () {
@@ -17,6 +17,7 @@
     document.documentElement.lang = cur;
     document.querySelectorAll("[data-t]").forEach(function (el) { el.innerHTML = t(el.getAttribute("data-t")); });
     document.querySelectorAll("[data-t-ph]").forEach(function (el) { el.placeholder = t(el.getAttribute("data-t-ph")); });
+    document.querySelectorAll("[data-t-alt]").forEach(function (el) { el.alt = t(el.getAttribute("data-t-alt")); });
     document.querySelectorAll("[data-t-aria]").forEach(function (el) { el.setAttribute("aria-label", t(el.getAttribute("data-t-aria"))); });
     document.querySelectorAll("[data-lang]").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-lang") === cur ? "true" : "false"); });
     if (T[cur] && T[cur]._title) document.title = T[cur]._title;

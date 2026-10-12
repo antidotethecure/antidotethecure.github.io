@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="../ice.css">
+<link rel="stylesheet" href="../ice.css?v=20261011b">
 <style>
 .hero{text-align:center;padding:26px 0 4px}
 .hero h1{font-size:clamp(25px,7vw,40px)}
@@ -99,7 +99,9 @@ table.fee small{display:block;color:var(--dim);font-size:12.5px;line-height:1.3}
 .pr{display:grid;gap:10px;text-align:left;margin-top:10px}
 .pr .ln{display:flex;justify-content:space-between;gap:10px;align-items:baseline;border-top:1px solid var(--edge);padding-top:10px}
 .pr .ln:first-child{border-top:0;padding-top:0}
-.pr .ln b{font-family:"Orbitron",sans-serif;color:var(--gold);white-space:nowrap;font-size:17px}
+.pr .ln b{font-family:"Orbitron",sans-serif;color:var(--gold);white-space:nowrap;font-size:17px;text-align:right}
+.pr .ln b small{display:block;font:700 13px "Rajdhani",sans-serif;color:var(--dim)}
+.pr .ln em{font-style:normal;color:var(--good);font-weight:700}
 .pr .ln s{color:var(--dim);font-size:14px;margin-right:6px}
 .pr .ln span small{display:block;color:var(--dim);font-size:13.5px;line-height:1.3}
 .roi{margin:14px 0 4px;font-weight:800;color:var(--good);font-size:17px}
@@ -195,7 +197,7 @@ table.fee small{display:block;color:var(--dim);font-size:12.5px;line-height:1.3}
           <li data-t="see5">A switch to pause alerts or leave any time.</li>
         </ul>
         <div class="row" style="margin-top:12px">
-          <button class="btn gold" id="hear" type="button" data-t="hearBtn">▶ Hear the jingle</button>
+          <button class="btn gold" id="hear-btn" type="button" data-t="hearBtn">▶ Hear the jingle</button>
           <a class="btn primary" href="../demo/" data-t="seeDemo">Open the demo</a>
         </div>
       </div>
@@ -237,7 +239,7 @@ table.fee small{display:block;color:var(--dim);font-size:12.5px;line-height:1.3}
           <tr><td><span data-t="lRec">No-cash sales you win back</span><small data-t="lRecS">People with no cash pay by card, Apple Pay, Venmo, Cash App or Zelle instead of walking away.</small></td><td class="n" id="l-rec"></td></tr>
           <tr><td><span data-t="lCard">Bigger sales by card / app</span><small data-t="lCardS">People spend more when they aren't limited to the cash in their pocket.</small></td><td class="n" id="l-card"></td></tr>
           <tr><td><span data-t="lRoute">Time saved on routes</span><small data-t="lRouteS">Saved minutes turned into extra stops on streets with members.</small></td><td class="n" id="l-route"></td></tr>
-          <tr class="minus"><td><span data-t="lCost">Cost of rewards you give away</span><small data-t="lCostS">If every point gets cashed in: about 20¢ per member visit.</small></td><td class="n" id="l-cost"></td></tr>
+          <tr class="minus"><td><span data-t="lCost">Cost of rewards you give away</span><small data-t="lCostS">If every reward gets cashed in: about 43¢ per member visit (points, the alerts-on bonus and the 5-visit reward).</small></td><td class="n" id="l-cost"></td></tr>
           <tr class="minus"><td><span data-t="lFee">Payment processing fees</span><small data-t="lFeeS">Paid by you to Square, Venmo or Cash App (about 4% blended on a $5 sale). See the fee table.</small></td><td class="n" id="l-fee"></td></tr>
           <tr class="sum"><td data-t="lSum">Extra per month</td><td class="n" id="l-sum"></td></tr>
           <tr class="minus"><td><span data-t="lSsai">SousShift monthly price</span></td><td class="n" id="l-ssai"></td></tr>
@@ -419,13 +421,13 @@ en: {
   lRep: "Repeat visits from points", lRepS: "Members buy more often to reach a reward.",
   lCard: "Bigger sales by card / app", lCardS: "People spend more when they aren't limited to the cash in their pocket.",
   lRoute: "Time saved on routes", lRouteS: "Saved minutes turned into extra stops on streets with members.",
-  lCost: "Cost of rewards you give away", lCostS: "If every point gets cashed in: about 20¢ per member visit.",
+  lCost: "Cost of rewards you give away", lCostS: "If every reward gets cashed in: about 43¢ per member visit (points, the alerts-on bonus and the 5-visit reward).",
   lSum: "Extra per month",
   listenPage: "🔊 Listen to this page", listenStop: "⏹ Stop", listenSec: "Read this part out loud",
   spHero: "Here's the idea. Half the street never hears your music. Now their phone rings. When your truck turns onto their block, everyone who joined gets an alert with an ice cream truck jingle.",
   spNum: "Here are the numbers, using the sliders. Today you make about {today} a month. With the app, about {app} a month. That's about {extra} more, after payment fees. After the SousShift price of {monthly} a month, you keep about {keep} more every month. These are estimates, so move the sliders to match your truck.",
   spPay: "Cash only means lost sales. About one in four adults carried no cash last year. If {nocash} percent of your customers walk away with no cash, taking every payment wins back about {rec} a month. Bigger tickets on card add about {card}. The fees cost about {fee}. That leaves about {net} more a month. You pay those fees straight to Square, Venmo or Cash App, never to SousShift. We recommend Square Tap to Pay on your phone, Venmo and Cash App signs on the window, and Zelle for your regulars.",
-  spPrice: "The price is simple. Setup is {setup}, but the first {slots} trucks pay just {founding}. Then it's {monthly} a month, with no contract, and you can cancel any time. It pays for itself with about {roi} extra ice creams a month.",
+  spPrice: "There are three plans, and none has a contract. Single Scoop is {s1} to set up and {m1} a month, for the QR, the alerts, the map and the rewards. Double Scoop, the most popular, is {setup} to set up, but the first {slots} trucks pay just {founding}. Then it's {monthly} a month, and it adds every payment, the route counter and a monthly money report. It pays for itself with about {roi} ice creams a month. Sundae is {s3} to set up and {m3} a month for up to three trucks.",
   routeOff: "Use stops × homes instead", routeOn: "Using your route <b>{name}</b>: <b>{n}</b> homes", routeHomesO: "your route",
   cNocash: "% of customers who walk away with no cash", cNocashS: "Want something, no cash on them. Fed 2025: 24% of adults carried no cash. We use a careful 15%.",
   lRec: "No-cash sales you win back", lRecS: "People with no cash pay by card, Apple Pay, Venmo, Cash App or Zelle instead of walking away.",
@@ -450,7 +452,11 @@ en: {
   rtKick: "Your route", rtH: "How many homes do you drive past?",
   rtLead: "Draw your usual route on the map and we count the houses and apartments along it, from OpenStreetMap. That's how many homes could get the \"truck nearby\" alert, and the number can go straight into the calculator above.",
   rtBtn: "📍 Count the houses on YOUR route", rtSample: "See a sample route",
-  prH: "Simple price. No contract.",
+  prH: "Three plans. No contract.",
+  trH_single: "🍦 Single Scoop", trS_single: "QR sticker, phones ring when you're close, live map, points + 5-visit reward (10% off or an extra scoop). Cash or whatever you take now.",
+  trH_double: "🍨 Double Scoop · most popular", trS_double: "Everything in Single Scoop, plus we set you up to take every payment (Tap to Pay + Venmo, Cash App, Zelle signs), the route house counter and a monthly money report.",
+  trH_sundae: "🍧 Sundae · up to 3 trucks", trS_sundae: "Everything in Double Scoop for up to 3 trucks ({p} a truck), slow-day deal blasts (2 a month), a parties + events booking page, and priority help.",
+  trSetup: "setup", trExtra: "Estimated extra for you: {x}/mo · pays for itself with about {n} ice creams a month",
   prSetup: "Setup", prSetupS: "Payments set up (Tap to Pay + Venmo, Cash App and Zelle window QR signs), your truck app with \"truck nearby\" alerts, rewards, the QR window sticker, and your route house count.",
   prFound: "Founding truck price", prFoundS: "Setup for the first {n} trucks.",
   prMonthly: "Monthly", prMonthlyS: "App hosting, alerts, rewards, menu and price updates, support, keeping your payment links working, and the route house counter. No contract, cancel any time.",
@@ -549,13 +555,13 @@ es: {
   lRep: "Visitas repetidas por los puntos", lRepS: "Los miembros compran más seguido para llegar a un premio.",
   lCard: "Ventas más grandes con tarjeta / app", lCardS: "La gente gasta más cuando no depende del efectivo que trae en la bolsa.",
   lRoute: "Tiempo que ahorras en la ruta", lRouteS: "Los minutos ahorrados se vuelven paradas extra en calles con miembros.",
-  lCost: "Lo que cuestan los premios que regalas", lCostS: "Si se canjean todos los puntos: como 20¢ por visita de miembro.",
+  lCost: "Lo que cuestan los premios que regalas", lCostS: "Si se canjean todos los premios: como 43¢ por visita de miembro (puntos, el bono por alertas prendidas y el premio de 5 visitas).",
   lSum: "Extra al mes",
   listenPage: "🔊 Escuchar esta página", listenStop: "⏹ Parar", listenSec: "Leer esta parte en voz alta",
   spHero: "La idea es esta. La mitad de la cuadra nunca oye tu música. Ahora les suena el celular. Cuando tu troque entra a su calle, todos los que se unieron reciben una alerta con la musiquita del troque de helados.",
   spNum: "Estos son los números, según las barras. Hoy ganas como {today} al mes. Con la app, como {app} al mes. Son como {extra} más, ya sin comisiones. Después del precio de SousShift de {monthly} al mes, te quedan como {keep} más cada mes. Son estimados, así que mueve las barras para que se parezcan a tu troque.",
   spPay: "Solo efectivo es perder ventas. Como uno de cada cuatro adultos no traía efectivo el año pasado. Si el {nocash} por ciento de tus clientes se va porque no trae efectivo, aceptar todos los pagos te regresa como {rec} al mes. Las ventas más grandes con tarjeta suman como {card}. Las comisiones cuestan como {fee}. Te quedan como {net} más al mes. Esas comisiones las pagas directo a Square, Venmo o Cash App, nunca a SousShift. Te recomendamos Square Tap to Pay en tu celular, letreros de Venmo y Cash App en la ventanilla, y Zelle para tus clientes de siempre.",
-  spPrice: "El precio es sencillo. La instalación cuesta {setup}, pero los primeros {slots} troques pagan solo {founding}. Luego son {monthly} al mes, sin contrato, y cancelas cuando quieras. Se paga sola con unos {roi} helados extra al mes.",
+  spPrice: "Hay tres planes, y ninguno tiene contrato. Una Bola cuesta {s1} de instalación y {m1} al mes, con el QR, las alertas, el mapa y los premios. Doble Bola, el más popular, cuesta {setup} de instalación, pero los primeros {slots} troques pagan solo {founding}. Luego son {monthly} al mes, y suma todos los pagos, el contador de ruta y un reporte de dinero cada mes. Se paga sola con unos {roi} helados al mes. Sundae cuesta {s3} de instalación y {m3} al mes para hasta tres troques.",
   routeOff: "Usar paradas × casas", routeOn: "Usando tu ruta <b>{name}</b>: <b>{n}</b> casas", routeHomesO: "tu ruta",
   cNocash: "% de clientes que se van porque no traen efectivo", cNocashS: "Quieren algo, pero no traen efectivo. Fed 2025: el 24% de los adultos no traía efectivo. Nosotros usamos un 15% conservador.",
   lRec: "Ventas sin efectivo que recuperas", lRecS: "Quien no trae efectivo paga con tarjeta, Apple Pay, Venmo, Cash App o Zelle en vez de irse.",
@@ -580,7 +586,11 @@ es: {
   rtKick: "Tu ruta", rtH: "¿Cuántas casas pasas en tu ruta?",
   rtLead: "Dibuja tu ruta de siempre en el mapa y contamos las casas y apartamentos a lo largo de ella, con datos de OpenStreetMap. Son las casas que podrían recibir la alerta de \"el troque está cerca\", y el número puede ir directo a la calculadora de arriba.",
   rtBtn: "📍 Cuenta las casas de TU ruta", rtSample: "Ver una ruta de ejemplo",
-  prH: "Precio sencillo. Sin contrato.",
+  prH: "Tres planes. Sin contrato.",
+  trH_single: "🍦 Una Bola", trS_single: "Sticker QR, les suena el cel cuando estás cerca, mapa en vivo, puntos + premio a las 5 visitas (10% de descuento o una bola extra). Efectivo o lo que ya aceptas.",
+  trH_double: "🍨 Doble Bola · el más popular", trS_double: "Todo lo de Una Bola, y te dejamos listo para aceptar todos los pagos (Tap to Pay + letreros de Venmo, Cash App, Zelle), el contador de casas de tu ruta y un reporte de dinero cada mes.",
+  trH_sundae: "🍧 Sundae · hasta 3 troques", trS_sundae: "Todo lo de Doble Bola para hasta 3 troques ({p} por troque), promos para días flojos (2 al mes), página para reservar fiestas y eventos, y ayuda prioritaria.",
+  trSetup: "instalación", trExtra: "Extra estimado para ti: {x}/mes · se paga sola con unos {n} helados al mes",
   prSetup: "Instalación", prSetupS: "Te dejamos los pagos listos (Tap to Pay + letreros QR de Venmo, Cash App y Zelle para la ventanilla), la app de tu troque con alertas de \"el troque está cerca\", premios, el sticker QR para la ventanilla y el conteo de casas de tu ruta.",
   prFound: "Precio de troque fundador", prFoundS: "Instalación para los primeros {n} troques.",
   prMonthly: "Mensual", prMonthlyS: "Hospedaje de la app, alertas, premios, cambios de menú y precios, soporte, que tus links de pago sigan funcionando, y el contador de casas de tu ruta. Sin contrato, cancela cuando quieras.",
@@ -633,10 +643,10 @@ es: {
   perDay: "/día"
 }};
 </script>
-<script src="../lang.js"></script>
-<script src="../jingle.js"></script>
-<script src="../model.js"></script>
-<script src="../speak.js"></script>
+<script src="../lang.js?v=20261011b"></script>
+<script src="../jingle.js?v=20261011b"></script>
+<script src="../model.js?v=20261011b"></script>
+<script src="../speak.js?v=20261011b"></script>
 <script>
 (function () {
   "use strict";
@@ -694,7 +704,7 @@ es: {
     $("p-net").textContent = "+" + money(r.payMo);
     $("roi").textContent = ICE.t("prRoi").replace("{n}", IceModel.roiCount(ticket)).replace("{t}", money(ticket, ticket % 1 !== 0));
   }
-  ids.forEach(function (id) { $(id).addEventListener("input", calc); });
+  ids.forEach(function (id) { $(id).addEventListener("input", function () { calc(); price(); }); });
 
   function contact() {
     var m = $("ct-mail");
@@ -705,7 +715,7 @@ es: {
     if (TEXT_NUMBER) { s.href = "sms:" + TEXT_NUMBER + "?&body=" + encodeURIComponent(ICE.t("ctBody")); s.classList.remove("off"); s.removeAttribute("aria-disabled"); }
     else s.addEventListener("click", function (e) { e.preventDefault(); });
   }
-  var hearBtn = $("hear");
+  var hearBtn = $("hear-btn");
   hearBtn.addEventListener("click", function () {
     if (window.Jingle.playing) { window.Jingle.stop(); hearBtn.textContent = ICE.t("hearBtn"); return; }
     hearBtn.textContent = ICE.t("hearStop");
@@ -720,10 +730,13 @@ es: {
   }
   function price() {
     var P = IceModel.PRICING, m = function (n) { return money(n); };
-    $("pr").innerHTML =
-      '<div class="ln"><span>' + ICE.t("prSetup") + "<small>" + ICE.t("prSetupS") + "</small></span><b>" + m(P.setup) + "</b></div>" +
-      '<div class="ln"><span>' + ICE.t("prFound") + "<small>" + ICE.t("prFoundS").replace("{n}", P.foundingSlots) + "</small></span><b>" + m(P.founding) + "</b></div>" +
-      '<div class="ln"><span>' + ICE.t("prMonthly") + "<small>" + ICE.t("prMonthlyS") + "</small></span><b>" + m(P.monthly) + ICE.t("prMo") + "</b></div>";
+    var q = { stops: v("stops"), ticket: v("ticket"), days: v("days") };
+    $("pr").innerHTML = IceModel.TIERS.map(function (t) {
+      var r = IceModel.tierRun(t, q), setup = t.founding ? "<s>" + m(t.setup) + "</s>" + m(t.founding) : m(t.setup);
+      return '<div class="ln"><span>' + ICE.t("trH_" + t.id) + "<small>" + ICE.t("trS_" + t.id).replace("{p}", m(r.perTruck)) +
+        (t.founding ? " " + ICE.t("prFoundS").replace("{n}", t.foundingSlots) : "") + "<br><em>" + ICE.t("trExtra").replace("{x}", "+" + m(r.extra)).replace("{n}", r.roi) +
+        "</em></small></span><b>" + m(t.monthly) + ICE.t("prMo") + "<small>" + setup + " " + ICE.t("trSetup") + "</small></b></div>";
+    }).join("");
   }
   /* ---------- read aloud ---------- */
   var lastR = null, reading = null;
@@ -733,7 +746,7 @@ es: {
     if (id === "hero") return ICE.t("spHero");
     if (id === "numbers") return fill("spNum", { today: D(r.todayMo), app: D(r.appMo), extra: D(r.extraMo), monthly: D(P.monthly), keep: D(Math.max(0, r.extraMo - P.monthly)) });
     if (id === "pay") return fill("spPay", { nocash: W(v("nocash")), rec: D(r.lines.rec), card: D(r.lines.card), fee: D(r.lines.fees), net: D(r.payMo) });
-    if (id === "price") return fill("spPrice", { setup: D(P.setup), slots: W(P.foundingSlots), founding: D(P.founding), monthly: D(P.monthly), roi: W(IceModel.roiCount(v("ticket"))) });
+    if (id === "price") return fill("spPrice", { setup: D(P.setup), slots: W(P.foundingSlots), founding: D(P.founding), monthly: D(P.monthly), roi: W(IceModel.roiCount(v("ticket"))), s1: D(IceModel.TIERS[0].setup), m1: D(IceModel.TIERS[0].monthly), s3: D(IceModel.TIERS[2].setup), m3: D(IceModel.TIERS[2].monthly) });
     if (id === "faq") { var out = []; for (var q = 1; q <= 7; q++) out.push(ICE.t("q" + q) + " " + ICE.t("a" + q)); return out.join(" "); }
     var sec = $(id); if (!sec) return "";
     var c = sec.cloneNode(true);

@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SousShift AI for Food Trucks</title>
+<meta name="description" content="Your regulars know where you're parked before you do. SousShift AI pings them when your food truck parks nearby and lets them order ahead, timed so it's hot when they walk up. 1-minute tour, English y español.">
+<meta name="theme-color" content="#0a0605">
+<link rel="canonical" href="https://antidotethecure.github.io/food-truck/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SousShift AI">
+<meta property="og:title" content="SousShift AI for Food Trucks">
+<meta property="og:description" content="Ping your regulars when you park nearby. Order ahead, timed hot. QR sticker, points. English y español.">
+<meta property="og:url" content="https://antidotethecure.github.io/food-truck/">
+<meta property="og:image" content="https://antidotethecure.github.io/sousshift/img/og.jpg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="../second-shift/img/ssai-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="ft.css?v=20261012a">
+<style>
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{display:flex;flex-direction:column;height:100dvh}
+[hidden]{display:none!important}
+@media(max-width:400px){.top img.brand{display:none}}
+.dots{display:flex;gap:6px;align-items:center;flex:1;justify-content:center}
+.dots button{width:9px;height:9px;padding:0;border-radius:99px;border:0;background:#4a3428;cursor:pointer;transition:width .3s,background .3s}
+.dots button[aria-current=true]{width:24px;background:var(--gold)}
+.dots button::before{content:"";display:block;margin:-12px -6px;height:33px}
+.deck{flex:1;position:relative;overflow:hidden;touch-action:pan-y}
+.track{display:flex;height:100%;transition:transform .45s cubic-bezier(.22,.8,.24,1);will-change:transform}
+.card-s{flex:0 0 100%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column}
+.inner{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;max-width:560px;width:100%;margin:0 auto;padding:18px 16px 8px;opacity:.25;transform:scale(.97);transition:opacity .45s,transform .45s}
+.card-s.on .inner{opacity:1;transform:none}
+.big-emoji{font-size:64px;line-height:1;margin-bottom:10px}
+.t1{font-family:"Orbitron",sans-serif;font-weight:900;font-size:clamp(26px,7.8vw,42px);line-height:1.12;margin:0}
+.t2{font-size:clamp(18px,4.8vw,22px);color:var(--silver);margin:12px 0 0;line-height:1.3;font-weight:600}
+.t2 b{color:var(--gold)}
+.foot{flex:none;padding:10px 16px calc(14px + env(safe-area-inset-bottom));max-width:560px;width:100%;margin:0 auto;display:flex;gap:10px}
+.foot .btn{flex:1;font-size:15px;min-height:56px}
+.foot .prev{flex:0 0 64px}
+.listen{margin:0 0 12px}
+
+/* 1 hook */
+.pings{display:grid;gap:8px;width:100%;max-width:380px;margin-top:20px}
+.pings .ring{padding:10px 12px}
+.pings .ring:nth-child(2){transform:translateX(10px) scale(.97);opacity:.85}
+.pings .ring:nth-child(3){transform:translateX(20px) scale(.94);opacity:.65}
+
+/* 2 how */
+.how4{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0 4px;width:100%;max-width:440px}
+.how4 div{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;border-radius:18px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);position:relative}
+.how4 i{font-style:normal;font-size:34px;line-height:1}
+.how4 b{font-size:16.5px;line-height:1.15}
+.how4 small{color:var(--dim);font-size:14px;font-weight:600;line-height:1.2}
+.how4 em{position:absolute;left:8px;top:6px;font:900 12px "Orbitron",sans-serif;color:var(--volt);font-style:normal}
+
+/* 3 owner live view */
+.omap{position:relative;width:100%;max-width:440px;height:clamp(230px,36vh,300px);margin:12px auto 0;border-radius:18px;overflow:hidden;border:1px solid var(--edge);background:#241d1a}
+#omap{position:absolute;inset:0}
+.ring-l{font:800 11px "Rajdhani",sans-serif;color:var(--gold);background:rgba(10,6,5,.7);border-radius:6px;padding:0 4px;white-space:nowrap}
+.otruck{font-size:30px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.7))}
+.ostat{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;max-width:440px;margin-top:8px}
+.ostat div{padding:6px 4px;border-radius:12px;background:var(--panel);border:1px solid var(--edge);font-weight:700;font-size:13px;color:var(--silver);line-height:1.15}
+.ostat b{display:block;font-family:"Orbitron",sans-serif;color:var(--gold);font-size:19px}
+.ostat .g b{color:var(--good)}
+.oleg{display:flex;gap:12px;justify-content:center;margin-top:6px;font-size:13px;color:var(--dim);font-weight:700;flex-wrap:wrap}
+.oleg i{display:inline-block;width:10px;height:10px;border-radius:99px;margin-right:4px}
+.queue{width:100%;max-width:440px;margin-top:10px;text-align:left}
+.queue h3{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--volt);margin:0 0 6px}
+.qrow{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--edge);background:rgba(255,255,255,.03);margin-bottom:6px;font-weight:700;font-size:14.5px;line-height:1.25}
+.qrow .w{flex:1;min-width:0}
+.qrow small{display:block;color:var(--dim);font-weight:600;font-size:13px}
+.qrow .st{flex:none;font:800 12px "Rajdhani",sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:#3b281d;color:var(--silver);white-space:nowrap}
+.qrow.cook{border-color:rgba(255,106,43,.7)}
+.qrow.cook .st{background:var(--blue);color:#fff}
+.qrow.ready{border-color:rgba(61,220,151,.6)}
+.qrow.ready .st{background:var(--good);color:#002b18}
+.qempty{color:var(--dim);font-size:14px;font-weight:600}
+
+/* 4 timed hot */
+.tl{width:100%;max-width:420px;margin-top:18px;text-align:left;list-style:none;padding:0}
+.tl li{position:relative;padding:0 0 16px 58px;line-height:1.25}
+.tl li::before{content:attr(data-t2);position:absolute;left:0;top:0;width:48px;font:900 12px "Orbitron",sans-serif;color:var(--gold)}
+.tl li::after{content:"";position:absolute;left:52px;top:4px;bottom:-4px;width:2px;background:var(--edge)}
+.tl li:last-child::after{display:none}
+.tl b{display:block;font-size:17px}
+.tl small{color:var(--dim);font-weight:600;font-size:14.5px}
+.tl li.hot b{color:var(--good)}
+.vs2{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:420px;margin-top:6px}
+.vs2 div{padding:10px;border-radius:14px;border:1px solid var(--edge);background:var(--panel);font-weight:700;font-size:14.5px;line-height:1.25}
+.vs2 .bad{border-color:rgba(255,77,61,.5);color:#ffc9c2}
+.vs2 .good{border-color:rgba(61,220,151,.55);color:#c9f5e4}
+
+/* 5 demo */
+.phone{width:min(270px,78vw);margin:16px auto 0;border-radius:34px;border:7px solid #2a1f1a;background:linear-gradient(180deg,#5a2a14,#1f120c 60%,#2a1010);padding:40px 10px 22px;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.phone::before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:80px;height:20px;border-radius:12px;background:#000}
+.phone .clock{font:700 42px "Rajdhani",sans-serif;color:#fff;line-height:1;margin-bottom:14px}
+.qrbox{display:flex;gap:12px;align-items:center;margin-top:16px;padding:10px;border-radius:16px;background:var(--panel);border:1px solid var(--edge);text-align:left;max-width:360px}
+.qrbox img{width:96px;height:96px;border-radius:10px;background:#fff;padding:4px;flex:none}
+.qrbox span{font-weight:700;font-size:15px;color:var(--silver);line-height:1.3}
+
+/* 6 tiers */
+.tiers{display:grid;gap:10px;width:100%;max-width:440px;margin-top:14px;text-align:left}
+.tier{all:unset;box-sizing:border-box;display:block;cursor:pointer;padding:12px 14px;border-radius:18px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);position:relative;transition:border-color .2s,box-shadow .2s}
+.tier:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.tier[aria-pressed=true]{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 10px 30px rgba(255,210,63,.15)}
+.tier .hd{display:flex;align-items:center;gap:10px}
+.tier .em{font-size:28px;line-height:1}
+.tier .nm{flex:1;font-family:"Orbitron",sans-serif;font-weight:800;font-size:16px;color:var(--ink);line-height:1.15}
+.tier .nm small{display:block;font-family:"Rajdhani",sans-serif;font-size:13.5px;color:var(--dim);font-weight:700}
+.tier .pp{text-align:right;font-family:"Orbitron",sans-serif;font-weight:900;color:var(--gold);font-size:17px;line-height:1.1;white-space:nowrap}
+.tier .pp small{display:block;font-family:"Rajdhani",sans-serif;font-weight:700;color:var(--dim);font-size:13px}
+.tier .pp s{color:var(--dim);font-size:12px;margin-right:4px}
+.tier .badge{position:absolute;top:-9px;right:14px;background:var(--gold);color:#1a1300;font:800 11px "Rajdhani",sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:2px 9px;border-radius:99px}
+.tier ul{margin:10px 0 0;padding:0;list-style:none;display:none}
+.tier[aria-pressed=true] ul{display:block}
+.tier li{font-size:15px;font-weight:600;color:var(--silver);padding:3px 0 3px 22px;position:relative;line-height:1.3}
+.tier li::before{content:"✓";position:absolute;left:2px;color:var(--good);font-weight:900}
+.tiers-note{margin-top:10px;font-size:14px;color:var(--dim);font-weight:700}
+
+/* 7 cta */
+.cta{display:grid;gap:10px;width:100%;max-width:400px;margin-top:22px}
+.cta .btn{min-height:58px;font-size:14px}
+.price{margin-top:16px;padding:12px 16px;border-radius:14px;border:1px solid rgba(255,210,63,.5);background:rgba(255,210,63,.08);color:var(--ink);font-weight:700;font-size:15.5px;line-height:1.35;max-width:400px}
+.price b{color:var(--gold);font-family:"Orbitron",sans-serif;font-size:17px}
+.price s{color:var(--dim)}
+@media (max-height:640px){.big-emoji{font-size:48px}.how4 i{font-size:28px}.phone{padding-top:34px}}
+@media (prefers-reduced-motion:reduce){.track,.inner{transition:none}}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <img class="brand" src="../assets/sousshift-lockup-800w.png" alt="SousShift AI">
+  <nav class="dots" id="dots" aria-label="Progress"></nav>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">English</button><button data-lang="es" aria-pressed="false" lang="es">Español</button></div>
+</div></div>
+
+<main class="deck" id="deck">
+  <div class="track" id="track">
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <p class="kick" data-t="k1">For food trucks</p>
+        <h1 class="t1 chrome" data-t="h1">Your regulars know where you're parked before you do.</h1>
+        <p class="t2" data-t="p1">No more "where are you today?" DMs.<br><b>Park. Their phone tells them.</b></p>
+        <div class="pings" aria-hidden="true">
+          <div class="ring on"><div class="ic">🌮</div><div><small data-t="nApp">Your truck · now</small><b data-t="n1">Just parked 0.3 mi from you!</b><span data-t="n1b">Open until 9 PM. Order ahead so it's hot.</span></div></div>
+          <div class="ring"><div class="ic">🔥</div><div><small data-t="nApp">Your truck · now</small><b data-t="n2">Your order comes off the grill at 12:47</b><span data-t="n2b">Leave at 12:39 and it's hot when you walk up.</span></div></div>
+          <div class="ring"><div class="ic">📍</div><div><small data-t="nApp">Your truck · now</small><b data-t="n3">In your area at 5:30 PM</b><span data-t="n3b">Firestone Blvd · in 2 h 10 min</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <p class="kick" data-t="k2">How it works</p>
+        <h1 class="t1 chrome" data-t="h2">Four steps. Zero DMs.</h1>
+        <div class="how4">
+          <div><em>1</em><i aria-hidden="true">🔲</i><b data-t="i1">QR sticker on your window</b><small data-t="i1s">Designed for your truck</small></div>
+          <div><em>2</em><i aria-hidden="true">📲</i><b data-t="i2">Customers join</b><small data-t="i2s">10 seconds, no app store</small></div>
+          <div><em>3</em><i aria-hidden="true">🔔</i><b data-t="i3">You park nearby? They get pinged</b><small data-t="i3s">Only people close to your stop</small></div>
+          <div><em>4</em><i aria-hidden="true">🔥</i><b data-t="i4">They order ahead, timed hot</b><small data-t="i4s">Food is done as they walk up</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide" id="livecard">
+      <div class="inner">
+        <p class="kick" data-t="k3">Your live view</p>
+        <h1 class="t1 chrome" data-t="h3" style="font-size:clamp(22px,6.4vw,34px)">See who's coming before they get there.</h1>
+        <div class="omap" data-t-aria="omapAria" aria-label="Owner map: your truck, rings at half a mile, 1 and 2 miles, and customers who have the app"><div id="omap"></div></div>
+        <div class="ostat" aria-live="polite">
+          <div><b id="cNear">0</b><span data-t="cNear">within 1 mi</span></div>
+          <div><b id="cAlert">0</b><span data-t="cAlert">alerted</span></div>
+          <div class="g"><b id="cHead">0</b><span data-t="cHead">heading over</span></div>
+        </div>
+        <div class="oleg"><span><i style="background:#ffd23f"></i><span data-t="lAlert">Alerted</span></span><span><i style="background:#3ddc97"></i><span data-t="lHead">Heading over</span></span><span><i style="background:#8a7565"></i><span data-t="lApp">Has the app</span></span></div>
+        <div class="queue"><h3 data-t="qH">Cook queue · by arrival</h3><div id="queue"></div></div>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <p class="kick" data-t="k4">Order ahead, timed hot</p>
+        <h1 class="t1 chrome" data-t="h4">Off the grill as they walk up.</h1>
+        <ol class="tl">
+          <li data-t2="12:31"><b data-t="tl1">Maria orders 2 tacos + horchata</b><small data-t="tl1s">She's a 9-minute walk away</small></li>
+          <li data-t2="12:33"><b data-t="tl2">She taps "I'm on my way"</b><small data-t="tl2s">Your screen: arriving 12:42 → start at 12:36</small></li>
+          <li data-t2="12:36"><b data-t="tl3">Tacos hit the grill</b><small data-t="tl3s">6 minutes, not sitting in a bag</small></li>
+          <li data-t2="12:42" class="hot"><b data-t="tl4">She walks up. Food comes off the grill. 🔥</b><small data-t="tl4s">Pays at the window. +10 points.</small></li>
+        </ol>
+        <div class="vs2"><div class="bad" data-t="bad">❌ Food made too early: soggy, cold, bad review</div><div class="good" data-t="good">✅ Timed to arrival: hot every time, shorter line</div></div>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <p class="kick" data-t="k5">See it</p>
+        <h1 class="t1 chrome" data-t="h5">Try the customer app.</h1>
+        <div class="phone" aria-hidden="true">
+          <div class="clock">5:31</div>
+          <div class="ring on"><div class="ic">🌮</div><div><small data-t="phApp">Taco Titan · now</small><b data-t="phTitle">Taco Titan just parked near you!</b><span data-t="phBody">0.3 mi away. Open until 9:00 PM. 🌮</span></div></div>
+        </div>
+        <a class="btn primary" href="demo/" style="margin-top:18px;min-height:58px;font-size:15px" data-t="demo">Open the demo →</a>
+        <div class="qrbox"><img src="img/demo-qr.svg?v=20261012a" alt="" data-t-alt="qrAlt" width="96" height="96"><span data-t="qrTx">Or scan with your phone to open the demo there.</span></div>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <p class="kick" data-t="kT">Pick your plan</p>
+        <h1 class="t1 chrome" data-t="hT">Three plates. Pick yours.</h1>
+        <div class="tiers" id="tiers"></div>
+        <p class="tiers-note" data-t="tNote">No contract. Move up or down any time.</p>
+      </div>
+    </section>
+
+    <section class="card-s" aria-roledescription="slide">
+      <div class="inner">
+        <div class="big-emoji" aria-hidden="true">🌮</div>
+        <h1 class="t1 chrome" data-t="h7">Let's set you up.</h1>
+        <p class="t2" data-t="p7">Your truck's name. Your menu. Your stops. <b>Your regulars always knowing where you are.</b></p>
+        <div class="cta">
+          <a class="btn gold" id="ct-mail" href="mailto:secondshiftai@gmail.com" data-t="mail">✉️ Email Antidote</a>
+          <a class="btn ghost" id="ct-sms" href="sms:+14243094068" data-t="sms">💬 Text Antidote</a>
+          <a class="btn ghost" href="demo/" data-t="demo2">🌮 Open the customer demo</a>
+        </div>
+        <div class="price" id="price" aria-live="polite"></div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<div class="foot">
+  <button class="btn ghost prev" id="prev" type="button" data-t-aria="back" aria-label="Back">←</button>
+  <button class="btn primary" id="next" type="button" data-t="next">Next →</button>
+</div>
+
+<script>
+window.T = {
+en: {
+  _title: "SousShift AI for Food Trucks",
+  k1: "For food trucks", h1: "Your regulars know where you're parked before you do.",
+  p1: "No more \"where are you today?\" DMs.<br><b>Park. Their phone tells them.</b>",
+  nApp: "Your truck · now", n1: "Just parked 0.3 mi from you!", n1b: "Open until 9 PM. Order ahead so it's hot.",
+  n2: "Your order comes off the grill at 12:47", n2b: "Leave at 12:39 and it's hot when you walk up.",
+  n3: "In your area at 5:30 PM", n3b: "Firestone Blvd · in 2 h 10 min",
+  k2: "How it works", h2: "Four steps. Zero DMs.",
+  i1: "QR sticker on your window", i1s: "Designed for your truck", i2: "Customers join", i2s: "10 seconds, no app store",
+  i3: "You park nearby? They get pinged", i3s: "Only people close to your stop", i4: "They order ahead, timed hot", i4s: "Food is done as they walk up",
+  k3: "Your live view", h3: "See who's coming before they get there.",
+  omapAria: "Owner map: your truck, rings at half a mile, 1 and 2 miles, and customers who have the app",
+  cNear: "within 1 mi", cAlert: "alerted", cHead: "heading over", lAlert: "Alerted", lHead: "Heading over", lApp: "Has the app",
+  qH: "Cook queue · by arrival", qEmpty: "Waiting for the first order…",
+  qLine: "{n} · {o}", qSub: "arriving {a} → start {s}", qSubNow: "arriving {a} → cook now", qSubHere: "at the window",
+  inMin: "in {m} min", now: "now", stWait: "start in {m}", stCook: "🔥 cooking", stReady: "✅ ready",
+  k4: "Order ahead, timed hot", h4: "Off the grill as they walk up.",
+  tl1: "Maria orders 2 tacos + horchata", tl1s: "She's a 9-minute walk away",
+  tl2: "She taps \"I'm on my way\"", tl2s: "Your screen: arriving 12:42 → start at 12:36",
+  tl3: "Tacos hit the grill", tl3s: "6 minutes, not sitting in a bag",
+  tl4: "She walks up. Food comes off the grill. 🔥", tl4s: "Pays at the window. +10 points.",
+  bad: "❌ Food made too early: soggy, cold, bad review", good: "✅ Timed to arrival: hot every time, shorter line",
+  k5: "See it", h5: "Try the customer app.", phApp: "Taco Titan · now", phTitle: "Taco Titan just parked near you!", phBody: "0.3 mi away. Open until 9:00 PM. 🌮",
+  demo: "Open the demo →", qrAlt: "QR code that opens the Taco Titan demo", qrTx: "Or scan with your phone to open the demo there.",
+  kT: "Pick your plan", hT: "Three plates. Pick yours.", tNote: "No contract. Move up or down any time.",
+  tPopular: "Most popular", tSetup: "setup", tMo: "/mo", tFound: "first {n} trucks", tTrucks: "up to {n} trucks · {p} each",
+  t_single: "Street Taco", t_singleS: "Just the basics", t_double: "Combo Plate", t_doubleS: "Everything for one truck", t_sundae: "Full Fleet", t_sundaeS: "For 2–3 trucks",
+  f_single: ["Designer QR sticker for your window", "\"Parked near you\" pings", "Live map + today's stops for customers", "Points + 5-visit reward"],
+  f_double: ["Everything in Street Taco", "Order ahead, timed hot", "Owner live view + cook queue", "Take cards, Apple Pay, Venmo, Cash App, Zelle (we set it up)", "Monthly money report"],
+  f_sundae: ["Everything in Combo Plate, for up to 3 trucks", "Slow-day blast: send a deal to all your members (2 a month)", "Catering + events booking page", "Priority help"],
+  priceTier: "<b>{name}</b>: {setup} setup, then <b>{monthly}/mo</b>. No contract, cancel any time.",
+  h7: "Let's set you up.", p7: "Your truck's name. Your menu. Your stops. <b>Your regulars always knowing where you are.</b>",
+  mail: "✉️ Email Antidote", sms: "💬 Text Antidote", demo2: "🌮 Open the customer demo",
+  next: "Next →", last: "Start over ↺", back: "Back", listen: "🔊 Listen", listenStop: "⏹ Stop",
+  subject: "Food truck app", body: "Hi Antidote, I have a food truck and I'd like the {plan} plan. My truck name: ",
+  say: [
+    "Hey! Your regulars love your food, but half the time they don't know where you're parked. With this, they know before you even open the window. You park, and their phone tells them.",
+    "Here's how it works. You put a designer QR sticker on your window. Customers scan it and join in ten seconds. When you park near them, they get a ping. And they can order ahead, timed so the food is hot when they walk up.",
+    "This is your live view. That's your truck in the middle, with rings at half a mile, one mile and two miles. Every dot is a customer with the app. Yellow ones got the ping. Green ones are heading over right now. Below, your cook queue is sorted by who arrives first, and it tells you when to start each order so it's fresh.",
+    "Order ahead, timed hot. Maria orders two tacos and a horchata. She's a nine minute walk away. When she taps I'm on my way, your screen says start at twelve thirty six. The tacos come off the grill right as she walks up. No soggy food sitting in a bag. She pays at the window and gets her points.",
+    "Want to see it for yourself? Tap Open the demo, or scan the QR code with your phone. You'll see exactly what your customers see: where the truck is, how far it is, when it's in their area, and ordering ahead.",
+    "There are three plans. Street Taco is twenty nine dollars a month: the QR sticker, the parked near you pings, the live map and the rewards. Combo Plate, the most popular, is fifty dollars a month, and adds order ahead timed hot, your live view with the cook queue, and taking every payment. Full Fleet is a hundred twenty nine dollars a month for up to three trucks. Tap a plan to see what's inside.",
+    "Ready? We set it all up for you: your truck's name, your menu and your stops. No contract, cancel any time. Tap Email Antidote or Text Antidote to get started."
+  ]
+},
+es: {
+  _title: "SousShift AI para Food Trucks",
+  k1: "Para food trucks", h1: "Tus clientes saben dónde te estacionaste antes que tú.",
+  p1: "Se acabaron los mensajes de \"¿dónde andan hoy?\".<br><b>Te estacionas. Su celular les avisa.</b>",
+  nApp: "Tu troque · ahora", n1: "¡Se estacionó a 0.3 mi de ti!", n1b: "Abierto hasta las 9 PM. Ordena antes para que esté calientito.",
+  n2: "Tu orden sale de la plancha a las 12:47", n2b: "Sal a las 12:39 y estará calientita cuando llegues.",
+  n3: "En tu zona a las 5:30 PM", n3b: "Firestone Blvd · en 2 h 10 min",
+  k2: "Cómo funciona", h2: "Cuatro pasos. Cero mensajes.",
+  i1: "Calcomanía QR en tu ventanilla", i1s: "Diseñada para tu troque", i2: "Tus clientes se unen", i2s: "10 segundos, sin tienda de apps",
+  i3: "¿Te estacionas cerca? Les llega un aviso", i3s: "Solo a la gente cerca de tu parada", i4: "Ordenan antes, calientito", i4s: "La comida sale cuando llegan",
+  k3: "Tu vista en vivo", h3: "Mira quién viene antes de que llegue.",
+  omapAria: "Mapa del dueño: tu troque, círculos a media milla, 1 y 2 millas, y los clientes que tienen la app",
+  cNear: "a menos de 1 mi", cAlert: "avisados", cHead: "en camino", lAlert: "Avisados", lHead: "En camino", lApp: "Tiene la app",
+  qH: "Fila de cocina · por llegada", qEmpty: "Esperando la primera orden…",
+  qLine: "{n} · {o}", qSub: "llega {a} → empieza {s}", qSubNow: "llega {a} → cocina ya", qSubHere: "en la ventanilla",
+  inMin: "en {m} min", now: "ya", stWait: "empieza en {m}", stCook: "🔥 cocinando", stReady: "✅ lista",
+  k4: "Ordenan antes, calientito", h4: "Sale de la plancha cuando llegan.",
+  tl1: "María pide 2 tacos + horchata", tl1s: "Está a 9 minutos caminando",
+  tl2: "Toca \"Ya voy en camino\"", tl2s: "Tu pantalla: llega 12:42 → empieza 12:36",
+  tl3: "Los tacos a la plancha", tl3s: "6 minutos, no esperando en una bolsa",
+  tl4: "Llega. La comida sale de la plancha. 🔥", tl4s: "Paga en la ventanilla. +10 puntos.",
+  bad: "❌ Comida hecha muy temprano: aguada, fría, mala reseña", good: "✅ Calculada a su llegada: calientita siempre, menos fila",
+  k5: "Míralo", h5: "Prueba la app del cliente.", phApp: "Taco Titan · ahora", phTitle: "¡Taco Titan se estacionó cerca de ti!", phBody: "A 0.3 mi. Abierto hasta las 9:00 PM. 🌮",
+  demo: "Abrir el demo →", qrAlt: "Código QR que abre el demo de Taco Titan", qrTx: "O escanéalo con tu celular para abrir el demo ahí.",
+  kT: "Escoge tu plan", hT: "Tres platos. Escoge el tuyo.", tNote: "Sin contrato. Sube o baja de plan cuando quieras.",
+  tPopular: "El más popular", tSetup: "instalación", tMo: "/mes", tFound: "primeros {n} troques", tTrucks: "hasta {n} troques · {p} c/u",
+  t_single: "Taco Callejero", t_singleS: "Lo básico", t_double: "Plato Combinado", t_doubleS: "Todo para un troque", t_sundae: "Flotilla", t_sundaeS: "Para 2–3 troques",
+  f_single: ["Calcomanía QR de diseñador para tu ventanilla", "Avisos de \"se estacionó cerca\"", "Mapa en vivo + paradas de hoy para tus clientes", "Puntos + premio a las 5 visitas"],
+  f_double: ["Todo lo de Taco Callejero", "Ordenan antes, calientito", "Tu vista en vivo + fila de cocina", "Acepta tarjetas, Apple Pay, Venmo, Cash App, Zelle (te lo dejamos listo)", "Reporte de dinero cada mes"],
+  f_sundae: ["Todo lo de Plato Combinado, para hasta 3 troques", "Oferta para días flojos: manda una promo a todos tus clientes (2 al mes)", "Página para reservar banquetes y eventos", "Ayuda prioritaria"],
+  priceTier: "<b>{name}</b>: {setup} de instalación, luego <b>{monthly} al mes</b>. Sin contrato, cancela cuando quieras.",
+  h7: "Vamos a armarte la tuya.", p7: "El nombre de tu troque. Tu menú. Tus paradas. <b>Tus clientes siempre sabiendo dónde estás.</b>",
+  mail: "✉️ Escríbele a Antidote", sms: "💬 Mándale texto a Antidote", demo2: "🌮 Abrir el demo del cliente",
+  next: "Siguiente →", last: "Empezar de nuevo ↺", back: "Atrás", listen: "🔊 Escuchar", listenStop: "⏹ Parar",
+  subject: "App para food truck", body: "Hola Antidote, tengo un food truck y quiero el plan {plan}. Nombre de mi troque: ",
+  say: [
+    "¡Oye! Tus clientes aman tu comida, pero la mitad del tiempo no saben dónde te estacionaste. Con esto, lo saben antes de que abras la ventanilla. Te estacionas, y su celular les avisa.",
+    "Así funciona. Pones una calcomanía QR de diseñador en tu ventanilla. Tus clientes la escanean y se unen en diez segundos. Cuando te estacionas cerca de ellos, les llega un aviso. Y pueden ordenar antes, calculado para que la comida esté calientita cuando llegan.",
+    "Esta es tu vista en vivo. Tu troque está en medio, con círculos a media milla, una milla y dos millas. Cada punto es un cliente con la app. Los amarillos recibieron el aviso. Los verdes van en camino ahorita. Abajo, tu fila de cocina está ordenada por quién llega primero, y te dice cuándo empezar cada orden para que salga fresca.",
+    "Ordenan antes, calientito. María pide dos tacos y una horchata. Está a nueve minutos caminando. Cuando toca Ya voy en camino, tu pantalla dice empieza a las doce treinta y seis. Los tacos salen de la plancha justo cuando ella llega. Nada de comida aguada en una bolsa. Paga en la ventanilla y gana sus puntos.",
+    "¿Quieres verlo tú mismo? Toca Abrir el demo, o escanea el código QR con tu celular. Vas a ver exactamente lo que ven tus clientes: dónde está el troque, qué tan lejos, cuándo llega a su zona, y cómo ordenar antes.",
+    "Hay tres planes. Taco Callejero cuesta veintinueve dólares al mes: la calcomanía QR, los avisos de se estacionó cerca, el mapa en vivo y los premios. Plato Combinado, el más popular, cuesta cincuenta dólares al mes, y agrega ordenar antes calientito, tu vista en vivo con la fila de cocina, y aceptar todos los pagos. Flotilla cuesta ciento veintinueve dólares al mes para hasta tres troques. Toca un plan para ver lo que incluye.",
+    "¿Listo? Nosotros te armamos todo: el nombre de tu troque, tu menú y tus paradas. Sin contrato, cancela cuando quieras. Toca Escríbele a Antidote o Mándale texto para empezar."
+  ]
+}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="lang.js?v=20261012a"></script>
+<script src="../ice-cream/model.js?v=20261012a"></script>
+<script src="speak.js?v=20261012a"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = function (s, o) { return String(s).replace(/\{(\w+)\}/g, function (_, k) { return o[k] != null ? o[k] : ""; }); };
+  var track = $("track"), slides = [].slice.call(track.children), N = slides.length, i = 0, lastCard = -1;
+  var dots = $("dots");
+  slides.forEach(function (_, k) {
+    var b = document.createElement("button"); b.type = "button"; b.setAttribute("aria-label", (k + 1) + " / " + N);
+    b.addEventListener("click", function () { go(k); }); dots.appendChild(b);
+  });
+  function go(k) {
+    i = Math.max(0, Math.min(N - 1, k));
+    track.style.transform = "translateX(" + (-i * 100) + "%)";
+    slides.forEach(function (s, n) { s.classList.toggle("on", n === i); s.setAttribute("aria-hidden", n === i ? "false" : "true"); s.inert = n !== i; });
+    [].forEach.call(dots.children, function (d, n) { d.setAttribute("aria-current", n === i ? "true" : "false"); });
+    $("prev").hidden = i === 0;
+    $("next").textContent = ICE.t(i === N - 1 ? "last" : "next");
+    try { history.replaceState(null, "", "#" + (i + 1)); } catch (e) {}
+    if (i !== lastCard) { lastCard = i; if (Speak.speaking) Speak.stop(); listenUI(); }
+    if (slides[i].id === "livecard") live.show();
+  }
+  $("next").addEventListener("click", function () { go(i === N - 1 ? 0 : i + 1); });
+  $("prev").addEventListener("click", function () { go(i - 1); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); go(i + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(i - 1); }
+  });
+  var sx = null, sy = 0; // swipe (not on the map: dragging the map must pan it)
+  $("deck").addEventListener("touchstart", function (e) {
+    if (e.target.closest(".omap")) { sx = null; return; }
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+  }, { passive: true });
+  $("deck").addEventListener("touchend", function (e) {
+    if (sx == null) return;
+    var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) go(i + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+
+  /* ---------- read aloud: one Listen button per card ---------- */
+  var reading = -1;
+  slides.forEach(function (sl, k) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "spk-btn listen"; b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () {
+      if (reading === k && Speak.speaking) { Speak.stop(); return; }
+      reading = k; Speak.say(ICE.t("say")[k] || ""); listenUI();
+    });
+    var inner = sl.querySelector(".inner"); inner.insertBefore(b, inner.firstChild);
+  });
+  function listenUI() {
+    slides.forEach(function (sl, k) {
+      var b = sl.querySelector(".listen"), on = Speak.speaking && reading === k;
+      b.textContent = ICE.t(on ? "listenStop" : "listen"); b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+  Speak.on(listenUI); Speak.css();
+
+  /* ---------- owner live view: truck + rings + customers with the app + cook queue (simulated) ---------- */
+  var live = (function () {
+    var MI = 1609.344, TRUCK = [33.9580, -118.2020]; // sample spot in South Gate, CA
+    var NAMES = ["Maria", "Jose", "Ana", "Luis", "Kim", "Devon", "Rosa", "Marcus", "Lupe", "Tony", "Jasmine", "Carlos", "Nina", "Andre", "Sofia", "Ray"];
+    var ORD = { en: [["2 tacos", 6], ["3 tacos + horchata", 7], ["burrito", 8], ["quesadilla + elote", 7], ["2 burritos", 9], ["elote + jamaica", 4]],
+      es: [["2 tacos", 6], ["3 tacos + horchata", 7], ["burrito", 8], ["quesadilla + elote", 7], ["2 burritos", 9], ["elote + jamaica", 4]] };
+    var map = null, people = [], queue = [], timer = 0, clock = 0, seed = 11, started = false;
+    function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    function hav(a, b) {
+      var r = Math.PI / 180, dLa = (b[0] - a[0]) * r, dLo = (b[1] - a[1]) * r;
+      var x = Math.sin(dLa / 2) * Math.sin(dLa / 2) + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLo / 2) * Math.sin(dLo / 2);
+      return 12742000 * Math.asin(Math.min(1, Math.sqrt(x)));
+    }
+    function init() {
+      if (map || !window.L) return;
+      map = L.map("omap", { zoomControl: false, attributionControl: true, scrollWheelZoom: false }).setView(TRUCK, 13);
+      map.attributionControl.setPrefix(false);
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, className: "osmdark",
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(map);
+      [0.5, 1, 2].forEach(function (r) {
+        L.circle(TRUCK, { radius: r * MI, color: "#ffd23f", weight: 1.3, opacity: .55, dashArray: "4 6", fill: r === 0.5, fillColor: "#ff6a2b", fillOpacity: .06, interactive: false }).addTo(map);
+        var lab = [TRUCK[0] + r * MI / 111320, TRUCK[1]];
+        L.marker(lab, { icon: L.divIcon({ className: "", html: '<span class="ring-l">' + r + " mi</span>", iconSize: [36, 14], iconAnchor: [18, 7] }), interactive: false, keyboard: false }).addTo(map);
+      });
+      for (var k = 0; k < 64; k++) { // customers with the app, denser close to the truck
+        var d = Math.pow(rnd(), 0.8) * 2.3 * MI, a = rnd() * Math.PI * 2;
+        var p = [TRUCK[0] + d * Math.sin(a) / 110540, TRUCK[1] + d * Math.cos(a) / (111320 * Math.cos(TRUCK[0] * Math.PI / 180))];
+        var c = { home: p, pos: p.slice(), d: hav(p, TRUCK) / MI, alerts: rnd() < 0.82, state: "app", name: NAMES[k % NAMES.length] + " " + "ABCDEFGHJKLMNPRSTW"[Math.floor(rnd() * 18)] + "." };
+        c.mk = L.circleMarker(p, { radius: 5, weight: 1.5, color: "#1a0f08", fillColor: "#8a7565", fillOpacity: .95, interactive: false }).addTo(map);
+        people.push(c);
+      }
+      L.marker(TRUCK, { icon: L.divIcon({ className: "", html: '<div class="otruck">🚚</div>', iconSize: [34, 34], iconAnchor: [17, 20] }), zIndexOffset: 1000, interactive: false, keyboard: false }).addTo(map);
+      map.fitBounds(L.latLng(TRUCK).toBounds(2.1 * MI * 2), { animate: false });
+    }
+    function paint(c) {
+      var col = c.state === "head" ? "#3ddc97" : c.state === "alert" ? "#ffd23f" : "#8a7565";
+      c.mk.setStyle({ fillColor: col, radius: c.state === "head" ? 7 : c.state === "alert" ? 6 : 5 });
+    }
+    function step() { // 1 tick = 1 real second = 15 demo seconds
+      if (!map) return;
+      clock += 0.25;
+      if (clock === 0.25) people.forEach(function (c) { if (c.alerts && c.d <= 1) { c.state = "alert"; paint(c); } });
+      // every ~2 demo minutes someone alerted orders + heads over
+      if (Math.floor(clock * 4) % 8 === 1 && queue.length < 6) {
+        var pool = people.filter(function (c) { return c.state === "alert"; });
+        if (pool.length) {
+          var c = pool[Math.floor(rnd() * pool.length)], o = ORD.en[Math.floor(rnd() * ORD.en.length)];
+          var travel = Math.max(3, Math.round(c.d / 3 * 60 * 0.9)); // walk at ~3 mph
+          c.state = "head"; paint(c);
+          queue.push({ c: c, o: Math.floor(rnd() * 6), prep: o[1], at: clock, arrive: clock + travel, oi: ORD.en.indexOf(o) });
+        }
+      }
+      queue.forEach(function (q) { // walk the dot toward the truck
+        var f = Math.min(1, (clock - q.at) / (q.arrive - q.at)), h = q.c.home;
+        q.c.mk.setLatLng([h[0] + (TRUCK[0] - h[0]) * f, h[1] + (TRUCK[1] - h[1]) * f]);
+      });
+      queue = queue.filter(function (q) { // picked up 2 min after arriving: back home, reset
+        if (clock < q.arrive + 2) return true;
+        q.c.state = "app"; q.c.mk.setLatLng(q.c.home); paint(q.c); return false;
+      });
+      render();
+    }
+    function render() {
+      var L1 = people.filter(function (c) { return c.d <= 1; });
+      $("cNear").textContent = L1.length;
+      $("cAlert").textContent = people.filter(function (c) { return c.state === "alert" || c.state === "head"; }).length;
+      $("cHead").textContent = queue.length;
+      var box = $("queue"), sorted = queue.slice().sort(function (a, b) { return a.arrive - b.arrive; });
+      if (!sorted.length) { box.innerHTML = '<p class="qempty">' + ICE.t("qEmpty") + "</p>"; return; }
+      box.innerHTML = sorted.map(function (q) {
+        var left = q.arrive - clock, start = q.arrive - q.prep - clock, cls, st, sub;
+        var ord = ORD[ICE.lang] ? ORD[ICE.lang][q.oi][0] : ORD.en[q.oi][0];
+        var inm = function (m) { return m <= 0.5 ? ICE.t("now") : fmt(ICE.t("inMin"), { m: Math.ceil(m) }); };
+        if (left <= 0) { cls = "ready"; st = ICE.t("stReady"); sub = ICE.t("qSubHere"); }
+        else if (start <= 0) { cls = "cook"; st = ICE.t("stCook"); sub = fmt(ICE.t("qSubNow"), { a: inm(left) }); }
+        else { cls = ""; st = fmt(ICE.t("stWait"), { m: Math.ceil(start) + " min" }); sub = fmt(ICE.t("qSub"), { a: inm(left), s: inm(start) }); }
+        return '<div class="qrow ' + cls + '"><div class="w">' + fmt(ICE.t("qLine"), { n: q.c.name, o: ord }) + "<small>" + sub + '</small></div><span class="st">' + st + "</span></div>";
+      }).join("");
+    }
+    return {
+      show: function () {
+        init(); if (map) setTimeout(function () { map.invalidateSize(); }, 480);
+        if (!started) { started = true; render(); timer = setInterval(function () { if (!document.hidden && slides[i].id === "livecard") step(); }, 1000); }
+      },
+      render: render
+    };
+  })();
+
+  /* ---------- plans: the same three tiers + prices as the ice cream trucks (read from ../ice-cream/model.js) ---------- */
+  var TIERS = (window.IceModel && IceModel.TIERS) || [];
+  var EMO = { single: "🌮", double: "🌯", sundae: "🚚" };
+  var tier = TIERS.filter(function (t) { return t.best; })[0] || TIERS[0];
+  try { var sv = localStorage.getItem("ssai:ft:tier"); TIERS.forEach(function (t) { if (t.id === sv) tier = t; }); } catch (e) {}
+  function money(n) { return "$" + n.toLocaleString(ICE.lang === "es" ? "es-US" : "en-US"); }
+  function tiers() {
+    if (!tier) return;
+    var m = money, setupHtml = function (t) { return t.founding ? "<s>" + m(t.setup) + "</s>" + m(t.founding) : m(t.setup); };
+    $("tiers").innerHTML = TIERS.map(function (t) {
+      var sub = t.founding ? fmt(ICE.t("tFound"), { n: t.foundingSlots }) : t.trucks > 1 ? fmt(ICE.t("tTrucks"), { n: t.trucks, p: m(Math.round(t.monthly / t.trucks)) }) : ICE.t("tSetup");
+      return '<button type="button" class="tier" data-tier="' + t.id + '" aria-pressed="' + (t.id === tier.id) + '">' +
+        (t.best ? '<span class="badge">' + ICE.t("tPopular") + "</span>" : "") +
+        '<div class="hd"><span class="em" aria-hidden="true">' + EMO[t.id] + '</span><span class="nm">' + ICE.t("t_" + t.id) + "<small>" + ICE.t("t_" + t.id + "S") + "</small></span>" +
+        '<span class="pp">' + m(t.monthly) + ICE.t("tMo") + "<small>" + setupHtml(t) + " " + (t.founding ? "· " + sub : t.trucks > 1 ? ICE.t("tSetup") + "<br>" + sub : sub) + "</small></span></div>" +
+        "<ul>" + ICE.t("f_" + t.id).map(function (f) { return "<li>" + f + "</li>"; }).join("") + "</ul></button>";
+    }).join("");
+    var setupTxt = tier.founding ? "<s>" + m(tier.setup) + "</s> " + m(tier.founding) + " (" + fmt(ICE.t("tFound"), { n: tier.foundingSlots }) + ")" : m(tier.setup);
+    $("price").innerHTML = fmt(ICE.t("priceTier"), { name: EMO[tier.id] + " " + ICE.t("t_" + tier.id), setup: setupTxt, monthly: m(tier.monthly) });
+  }
+  $("tiers").addEventListener("click", function (e) {
+    var b = e.target.closest(".tier"); if (!b) return;
+    TIERS.forEach(function (t) { if (t.id === b.getAttribute("data-tier")) tier = t; });
+    try { localStorage.setItem("ssai:ft:tier", tier.id); } catch (er) {}
+    tiers(); contact();
+    var nb = $("tiers").querySelector('[data-tier="' + tier.id + '"]'); if (nb) nb.focus();
+  });
+  function contact() {
+    var body = fmt(ICE.t("body"), { plan: tier ? ICE.t("t_" + tier.id) : "" });
+    $("ct-mail").href = "mailto:secondshiftai@gmail.com?subject=" + encodeURIComponent(ICE.t("subject")) + "&body=" + encodeURIComponent(body);
+    $("ct-sms").href = "sms:+14243094068?&body=" + encodeURIComponent(body);
+  }
+
+  ICE.on(function () { tiers(); contact(); lastCard = -1; go(i); listenUI(); live.render(); });
+  window.addEventListener("hashchange", function () { var n = parseInt(location.hash.slice(1), 10); if (n >= 1 && n <= N && n - 1 !== i) go(n - 1); });
+  var h = parseInt((location.hash || "").slice(1), 10);
+  tiers(); contact(); go(h >= 1 && h <= N ? h - 1 : 0);
+})();
+</script>
+</body>
+</html>

@@ -72,6 +72,8 @@ async function boot() {
   ax.drawImage(FXI.FBALL, 64, 64); slot("fball", 64, 64, 128, 128);
   ax.drawImage(FXI.SCORCH, 192, 64); slot("scorch", 192, 64, 128, 128);
   ax.strokeStyle = "#fff"; ax.lineWidth = 9; ax.beginPath(); ax.arc(384, 128, 56, 0, TAU); ax.stroke(); slot("ring", 320, 64, 128, 128);
+  if (FXI.SPARK) { ax.drawImage(FXI.SPARK, 704, 64); slot("spark", 704, 64, 8, 32); }
+  const CR = M.CARS; if (CR) { ax.drawImage(CR.WHITE, 648, 64); slot("car", 648, 64, 16, 32); ax.drawImage(CR.BEAM, 668, 64); slot("beam2", 668, 64, 32, 64); }
   let flameOK = false, smokeOK = false;
   function lateSprites() {   // the game's flame/smoke images may still be loading when we boot
     if (!flameOK && M.ready(S.flame)) { ax.clearRect(448, 64, 58, 160); ax.drawImage(S.flame, 448, 64, 58, 160); slot("flame", 448, 64, 58, 160); flameOK = true; atlasTex.needsUpdate = true; }
@@ -110,7 +112,9 @@ async function boot() {
   const BgA = new Batch(700, THREE.AdditiveBlending, 71);  // ground light: fire glow, Nalu LEDs, collapse flash
   const Bn = new Batch(1400, THREE.NormalBlending, 120);   // smoke, dust, dark bits, on-airframe flames
   const Ba = new Batch(2600, THREE.AdditiveBlending, 130); // fire, embers, fireballs, glows, tracers, lasers, lights
-  const BATCHES = [Bg, BgA, Bn, Ba];
+  const Bc = new Batch(400, THREE.NormalBlending, 40);     // street traffic: car bodies (over the aerial tiles, under the runway + landmarks)
+  const BcA = new Batch(1600, THREE.AdditiveBlending, 41); // headlight beams, head + tail lights
+  const BATCHES = [Bg, BgA, Bn, Ba, Bc, BcA];
   const hex = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255]; };
   const rgbaCache = {}; function rgb(s) { if (rgbaCache[s]) return rgbaCache[s]; let v; if (s[0] === "#") v = hex(s); else { const m = s.match(/[\d.]+/g).map(Number); v = [m[0] / 255, m[1] / 255, m[2] / 255]; } return rgbaCache[s] = v; }
 
@@ -233,17 +237,12 @@ async function boot() {
   const rwC = mkc(500, 900), rwX = rwC.getContext("2d"), rwTex = canTex(rwC, true);
   const rwMesh = new THREE.Mesh(tileGeo, new THREE.MeshBasicMaterial({ map: rwTex, transparent: true, depthWrite: false })); rwMesh.renderOrder = 60; rwMesh.visible = false; scene.add(rwMesh);
   const shadowCatcher = new THREE.Mesh(new THREE.PlaneGeometry(W * 1.6, H * 1.6), new THREE.ShadowMaterial({ opacity: .44, depthWrite: false })); shadowCatcher.rotation.x = -Math.PI / 2; shadowCatcher.position.y = .6; shadowCatcher.receiveShadow = true; shadowCatcher.renderOrder = 80; scene.add(shadowCatcher);
-  // burnt-out blocks where a crash takes out a building (subtle extrusions, ride the scrolling ground with the scorch)
-  const ruinGeo = new THREE.BoxGeometry(1, 1, 1); ruinGeo.translate(0, .5, 0);
-  const ruinMat = new THREE.MeshLambertMaterial({ color: 0x2b2420 });
-  const RUIN_N = 96, ruins = new THREE.InstancedMesh(ruinGeo, ruinMat, RUIN_N);
-  [ruins].forEach(m => { m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; m.count = 0; scene.add(m); });
-  const siteInfo = new Map();
   // tumbling 3D debris (panel shards, rivets, rubble) — the game's own debris particles, given depth
   const shardGeo = new THREE.BoxGeometry(1, .28, .7);
-  const debrisMesh = new THREE.InstancedMesh(shardGeo, new THREE.MeshStandardMaterial({ roughness: .65, metalness: .15 }), 80);
+  // unlit: lit shards went near-black against the fireball behind them (the "black blocks" in the crash fire); flat colour reads like the 2D shards
+  const debrisMesh = new THREE.InstancedMesh(shardGeo, new THREE.MeshBasicMaterial({ color: 0xd8d8d8 }), 80);
   debrisMesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(80 * 3), 3); debrisMesh.castShadow = true; debrisMesh.frustumCulled = false; debrisMesh.count = 0; scene.add(debrisMesh);
-  const DM = new THREE.Matrix4(), DQ = new THREE.Quaternion(), DE = new THREE.Euler(), DP = new THREE.Vector3(), DS = new THREE.Vector3(), DC = new THREE.Color();
+  const HOT = new THREE.Color(1.6, .62, .18), DM = new THREE.Matrix4(), DQ = new THREE.Quaternion(), DE = new THREE.Euler(), DP = new THREE.Vector3(), DS = new THREE.Vector3(), DC = new THREE.Color();
   // the review banner: his cover on a towed cloth that ripples (canvas re-drawn by the game's own rpBanner each frame)
   const banC = mkc(256, 192), banX = banC.getContext("2d"), banTex = canTex(banC, true);
   const banGeo = new THREE.PlaneGeometry(128, 96, 18, 2); banGeo.rotateX(-Math.PI / 2);
@@ -263,6 +262,8 @@ async function boot() {
     if (((t / 900) | 0) % 3 === 0 && (t % 900) < 90) Ba.w((L.x + R.x) / 2, L.y + 1, (L.z + R.z) / 2 - r * 3, r * 4, r * 4, 0, UV.dot, 1, 1, 1, .9); }
   function tongueQ(B, x, y, Y, s, rot, uv, r, g, b, a) { // flame tongue anchored at its hot base (x,y), like FX drawFlames (sprite 32x64, base at 16,52)
     const ox = 20 * s * Math.sin(rot), oy = -20 * s * Math.cos(rot); B.q(x + ox, y + oy, Y, 32 * s, 64 * s, rot, uv, r, g, b, a); }
+  function streak(B, x, y, Y, vx, vy, w, el, a) { // spark sprite: bright head at (x,y), tail trailing back along the velocity (like the 2D drawImage)
+    const r = Math.atan2(vy, vx) - Math.PI / 2, cy = -el / 2; B.q(x - cy * Math.sin(r), y + cy * Math.cos(r), Y, w, el, r, UV.spark, 1, 1, 1, a); }
   function flamesAt(B, x, y, Y, size, ang, tt, ph, n, uv) { for (let t = 0; t < n; t++) { const fl = .72 + .28 * Math.sin(tt * .021 + ph + t * 2.1) + .18 * Math.random(), s = size * fl / 26, a = ang + (t - (n - 1) / 2) * .38 + Math.sin(tt * .013 + ph * 3 + t) * .18;
     tongueQ(B, x + (t - (n - 1) / 2) * size * .12, y, Y, s, a + Math.PI / 2, uv, 1, 1, 1, Math.min(1, .65 + .35 * fl)); } }
 
@@ -288,6 +289,16 @@ async function boot() {
     rwMesh.visible = rwOn;
   }
 
+  /* ---------------- per-frame: street traffic (positions come from the game's CARS module, same as 2D) ---------------- */
+  function drawCars(G) { if (!UV.car) return;
+    for (let gi = 0; gi < G.ground.length; gi++) { const g = G.ground[gi]; if (!g.cars || g.k === "runway") continue;
+      for (let i = 0; i < g.cars.length; i++) { const c = g.cars[i], y = g.y + c.ry; if (c.al <= 0 || y < -20 || y > H + 20) continue;
+        const k = c.k, ca = Math.cos(c.a), sa = Math.sin(c.a), col = rgb(c.col);
+        Bc.q(c.x, y, .4, 4.8 * k, 9.6 * k, c.a + Math.PI / 2, UV.car, col[0], col[1], col[2], c.al);
+        BcA.q(c.x + ca * (4.4 + 11) * k, y + sa * (4.4 + 11) * k, .5, 12 * k, 22 * k, c.a + Math.PI / 2, UV.beam2, 1, 1, 1, .55 * c.al);
+        for (const sd of [-1, 1]) { BcA.q(c.x + ca * 4.6 * k + sd * sa * 1.5 * k, y + sa * 4.6 * k - sd * ca * 1.5 * k, .6, 2.4, 2.4, 0, UV.dot, 1, .96, .86, c.al);
+          BcA.q(c.x - ca * 4.7 * k + sd * sa * 1.6 * k, y - sa * 4.7 * k - sd * ca * 1.6 * k, .6, 2.6, 2.6, 0, UV.dot, 1, .16, .12, .9 * c.al); } } } }
+
   /* ---------------- per-frame: FX (the game's pooled particles, same caps/timings — only drawn here) ---------------- */
   let crashAlt = -1, crashX = 0, crashY = 0, playerAlt = -1, playerX = 0, playerY = 0;
   function birthAlt(p) { // which layer a new particle belongs to: a ground fire, the falling plane, or the sky
@@ -299,43 +310,38 @@ async function boot() {
   function drawFX(now, G) {
     const { SM, FI, DB, RG, SITES, WR, LITE } = FXI;
     // ground sites: scorch decal, rubble, skid, glow, flames
-    let ri = 0; const seen = new Set();
-    for (let i = 0; i < SITES.length; i++) { const s = SITES[i]; seen.add(s);
-      if (s.n3) { s.n3 = 0; const rnd = []; for (let j = 0; j < 14; j++) rnd.push(Math.random()); siteInfo.set(s, rnd); }
+    for (let i = 0; i < SITES.length; i++) { const s = SITES[i];
+      s.n3 = 0;
       const fa = Math.min(1, s.age / 180) * (s.age > s.life - 1500 ? Math.max(0, (s.life - s.age) / 1500) : 1);
       Bg.q(s.x, s.y, 1.2, s.rx * 2, s.ry * 2, 0, UV.scorch, 1, 1, 1, .88 * fa);
-      const rnd = siteInfo.get(s) || [];
-      if (s.v === "building" && !s.lite) { // collapsed block: a burnt slab and broken wall stubs rising out of the scorch
-        const k = ws(0), rise = Math.min(1, s.age / 400) * fa, put1 = (m, idx, x, y, w, d, h, rot) => { DM.compose(DP.set(wx(x, 0), 0, wz(y, 0)), DQ.setFromEuler(DE.set(0, rot || 0, 0)), DS.set(w * k, Math.max(.01, h * rise), d * k)); m.setMatrixAt(idx, DM); };
-        if (ri + 7 < RUIN_N) { put1(ruins, ri++, s.x, s.y, 68, 48, 3, -.08);
-          for (let r2 = 0; r2 < 6; r2++) put1(ruins, ri++, s.x - 30 + r2 * 11 + 4.5, s.y - 20 + (r2 % 3) * 13 + 4, 9, 8, 5 + (rnd[r2] || .5) * 16, -.08); }
-        }
-      if (s.v === "street" && !s.lite) { const a = .7 * fa; Bg.q(s.x, s.y + 35, 1.3, 7, 70, 0, UV.sq, .08, .06, .05, a); Bg.q(s.x - 13, s.y + 31, 1.3, 3, 54, -.04, UV.sq, .08, .06, .05, a); Bg.q(s.x + 13.5, s.y + 30, 1.3, 3, 52, .05, UV.sq, .08, .06, .05, a); }
+      // (a crashed building no longer gets dark slab/wall-stub boxes: from straight above they read as black squares over the fire)
+      if (s.v === "street" && !s.lite) { const a = .7 * fa; Bg.q(s.x, s.y + 35, 1.3, 9, 74, 0, UV.beam, .08, .06, .05, a); Bg.q(s.x - 13, s.y + 31, 1.3, 4.5, 58, -.04, UV.beam, .08, .06, .05, a); Bg.q(s.x + 13.5, s.y + 30, 1.3, 4.5, 56, .05, UV.beam, .08, .06, .05, a); }
       const it = s.inten || 0; if (it <= 0) continue;
-      if (s.v === "building" && !s.lite && s.age < 520) { const f2 = 1 - s.age / 520; BgA.q(s.x, s.y, 2, 80 + 60 * (1 - f2), 60 + 44 * (1 - f2), 0, UV.sq, 1, .93, .75, .95 * f2); }
+      if (s.v === "building" && !s.lite && s.age < 520) { const f2 = 1 - s.age / 520; BgA.q(s.x, s.y, 2, 120 + 100 * (1 - f2), 96 + 80 * (1 - f2), 0, UV.fball, 1, 1, 1, f2); }
       if (s.v === "theme" && !s.lite) { const pu = .6 + .4 * Math.sin(now / 170); BgA.q(s.x, s.y, 2, 220, 220, 0, UV.glow, 1, 1, 1, .42 * it * pu); }
       const gr = (s.lite ? 26 : s.rx * 1.9) * (.92 + .08 * Math.sin(now / 90 + s.x)); BgA.q(s.x, s.y, 2, gr * 2, gr * 2, 0, UV.glow, 1, 1, 1, (s.lite ? .35 : .5) * it);
       for (let j = 0; j < s.fires.length; j++) { const f = s.fires[j]; if (s.age < f.on) continue; const fi = it * Math.min(1, (s.age - f.on) / 300), sz = f.s * fi * (s.lite ? 1 : 1.6); if (sz < .6) continue;
-        Ba.q(s.x + f.dx, s.y + f.dy, 6, sz * 3, sz * 3, 0, UV.glow, 1, 1, 1, .5 * fi);
-        flamesAt(Ba, s.x + f.dx, s.y + f.dy, 8 + j * .3, sz * 1.5, -Math.PI / 2 + .45, now, f.ph, s.lite || LITE ? 1 : 2, UV.tongue); } }
-    for (const k of siteInfo.keys()) if (!seen.has(k)) siteInfo.delete(k);
-    ruins.count = ri; ruins.instanceMatrix.needsUpdate = true;
+        Ba.q(s.x + f.dx, s.y + f.dy, 6, sz * 3, sz * 3, 0, UV.glow, 1, 1, 1, .38 * fi);
+        flamesAt(Ba, s.x + f.dx, s.y + f.dy, 8 + j * .3, sz * 1.5, -Math.PI / 2 + .45, now, f.ph, s.lite || LITE ? 1 : 3, UV.tongue);
+        const fk = .75 + .25 * Math.sin(now * .031 + f.ph * 5) * Math.sin(now * .017 + f.ph), cr = sz * .42 * fk; Ba.q(s.x + f.dx, s.y + f.dy, 9 + j * .3, cr * 2, cr * 2, 0, UV.fball, 1, 1, 1, .5 * fi * fk); } }
     // smoke (normal blend, the game's own 4-shade puffs), rising off ground fires toward the camera
     for (let i = 0; i < SM.length; i++) { const p = SM[i]; if (p.n3) { p.n3 = 0; p.alt = birthAlt(p); }
       const u = p.age / p.life, al = p.a * (u < .1 ? u / .1 : 1) * Math.pow(1 - u, 1.5); if (al < .01) continue;
-      const Y = p.alt < 0 ? 10 + 70 * u : p.alt; Bn.q(p.x, p.y, Y, p.s * 2, p.s * 2, 0, UV["sm" + p.sh + p.v], 1, 1, 1, al); }
+      const Y = p.alt < 0 ? 10 + 70 * u : p.alt; Bn.q(p.x, p.y, Y, p.s * 2, p.s * 2, 0, UV["sm" + p.sh + p.v], 1, 1, 1, al);
+      if (p.hot && u < .3) Ba.q(p.x, p.y, Y + .5, p.s * 1.6, p.s * 1.6, 0, UV.glow, 1, 1, 1, .3 * (1 - u / .3) * p.a); }
     // debris: 3D tumbling shards that fall away toward the ground, burning ones glow
     let dn = 0;
     for (let i = 0; i < DB.length && dn < 80; i++) { const p = DB[i]; if (p.n3) { p.n3 = 0; p.alt = birthAlt(p); if (p.alt < 0) p.alt = 18; p.tilt = Math.random() * 6.3; }
       const u = p.age / p.life, sc = (1 - .6 * u) * p.sz * (p.sx || 1), Y = Math.max(2, p.alt * (1 - u * .9)), k = ws(Y);
       DM.compose(DP.set(wx(p.x, Y), Y, wz(p.y, Y)), DQ.setFromEuler(DE.set(p.tilt + p.rot * 1.3, -p.rot, p.rot * .7)), DS.set(sc * 2 * k, sc * 2 * k, sc * 2 * k / (p.sx || 1)));
-      debrisMesh.setMatrixAt(dn, DM); debrisMesh.setColorAt(dn, DC.set(p.col)); dn++;
+      DC.set(p.col); if (p.burn) DC.lerp(HOT, Math.max(0, 1 - u * 1.6)); debrisMesh.setMatrixAt(dn, DM); debrisMesh.setColorAt(dn, DC); dn++;
       if (p.burn) { const g = 5 + p.sz; Ba.q(p.x, p.y, Y + 2, g * 2, g * 2, 0, UV.glow, 1, 1, 1, .7 * (1 - u)); } }
     debrisMesh.count = dn; debrisMesh.instanceMatrix.needsUpdate = true; if (debrisMesh.instanceColor) debrisMesh.instanceColor.needsUpdate = true;
     // fire: embers, fireballs, flame licks (additive)
     for (let i = 0; i < FI.length; i++) { const p = FI[i]; if (p.n3) { p.n3 = 0; p.alt = birthAlt(p); }
       const u = p.age / p.life, Y = p.alt < 0 ? 12 + 30 * u : p.alt + 4;
-      if (p.k === "em") { const c = u < .3 ? [1, .95, .77] : u < .6 ? [1, .7, .28] : [1, .35, .12]; Ba.q(p.x, p.y, Y, p.s * 1.6, p.s * 1.6, 0, UV.dot, c[0], c[1], c[2], 1 - u); }
+      if (p.k === "em") { if (UV.spark) streak(Ba, p.x, p.y, Y, p.vx, p.vy, p.s * 1.8, p.s * 2 + Math.hypot(p.vx, p.vy) * 3.2, 1 - u);
+        else { const c = u < .3 ? [1, .95, .77] : u < .6 ? [1, .7, .28] : [1, .35, .12]; Ba.q(p.x, p.y, Y, p.s * 1.6, p.s * 1.6, 0, UV.dot, c[0], c[1], c[2], 1 - u); } }
       else if (p.k === "fb") { const r = u < .22 ? p.s * (.3 + .7 * u / .22) : p.s * (1 - .45 * (u - .22) / .78); Ba.q(p.x, p.y, Y + 2, r * 2, r * 2, 0, UV.fball, 1, 1, 1, u < .22 ? 1 : Math.max(0, 1 - (u - .22) / .78)); }
       else { const s2 = p.s * (1 - .4 * u); tongueQ(Ba, p.x, p.y, Y, s2, p.ang + Math.PI / 2, UV.tongue, 1, 1, 1, 1 - u); } }
     // shock rings + dust rings
@@ -348,7 +354,7 @@ async function boot() {
       put(o, p.x, p.y, Y, p.w * (1 - .6 * u), false, base - p.rot, Math.sin(p.t / 90) * .9, .5 * u); flash(o, .15, 0xff5a1f); }
     // the game's older one-shot sprites (G.fx): spark squares, catch rings, kamikaze smoke, flame bursts
     for (let i = 0; i < G.fx.length; i++) { const p = G.fx[i], a = Math.max(0, Math.min(1, p.a));
-      if (p.k === "e") Ba.q(p.x + p.s / 2, p.y + p.s / 2, A.air + 6, p.s * 1.4, p.s * 1.4, 0, UV.sq, 1, .81, .42, a);
+      if (p.k === "e") { if (UV.spark) streak(Ba, p.x, p.y, A.air + 6, p.vx, p.vy, p.s * 1.2, p.s * 2 + Math.hypot(p.vx, p.vy) * 2.5, a); else Ba.q(p.x, p.y, A.air + 6, p.s * 1.4, p.s * 1.4, 0, UV.dot, 1, .81, .42, a); }
       else if (p.k === "r") Ba.q(p.x, p.y, A.air + 6, p.s * 2.2, p.s * 2.2, 0, UV.ring, 1, .81, .54, a);
       else if (p.k === "s" && UV.smoke) Bn.q(p.x, p.y, A.kami - 8, p.s * 2, p.s * 2, p.rot || 0, UV.smoke, 1, 1, 1, Math.min(1, p.a));
       else if (p.k === "f" && UV.flame) { const h = p.s * 2.4, w = h * 58 / 160, r = Math.PI + (p.rot || 0); Ba.q(p.x - h * .4 * Math.sin(r), p.y + h * .4 * Math.cos(r), A.air + 4, w, h, r, UV.flame, 1, 1, 1, a); } }
@@ -503,6 +509,7 @@ async function boot() {
     const G = M.G(); lateSprites();
     BATCHES.forEach(b => b.begin()); poolsBegin(); ROTORS.n = 0; cardN = 0; kitN = 0;
     drawGround(now, G);
+    drawCars(G);
     drawFX(now, G);
     drawPlayer(now, G); drawEnemies(now, G); drawReview(now, G); drawRescue(now, G); drawItems(now, G); drawShots(now, G);
     for (let i = ROTORS.n; i < ROTORS.list.length; i++) ROTORS.list[i].visible = false;

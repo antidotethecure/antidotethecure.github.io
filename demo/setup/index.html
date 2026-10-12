@@ -97,6 +97,33 @@ header{text-align:center;padding-top:22px}
 .sticky.on{display:block}
 .sticky .btn{width:100%}
 footer{text-align:center;color:var(--dim);font-size:12px;margin-top:30px;line-height:1.7}
+/* mode switch: restaurants vs trucks */
+.mode{display:inline-flex;gap:4px;background:#0b1230;border:1px solid var(--edge);border-radius:99px;padding:4px;margin:0 auto 14px}
+.mode button{font:800 13.5px var(--body);border:0;border-radius:99px;padding:9px 14px;background:transparent;color:var(--dim);cursor:pointer}
+.mode button[aria-pressed=true]{background:var(--bolt);color:#fff}
+.t-only{display:none}
+body.truck .t-only{display:block}
+body.truck .cta.t-only,body.truck .strip.t-only{display:flex}
+body.truck .r-only{display:none}
+/* trucks section */
+.trucks{display:grid;gap:12px}
+.tk{border-radius:22px;padding:16px;border:1px solid var(--edge);background:var(--card);scroll-margin-top:16px}
+.tk.ice{background:radial-gradient(120% 90% at 100% 0,#ff8fc433,transparent 60%),linear-gradient(160deg,#16224d,#121C40);border-color:#ff7eb6}
+.tk.food{background:radial-gradient(120% 90% at 100% 0,#ffb02e33,transparent 60%),linear-gradient(160deg,#2a1a12,#121C40);border-color:#ff9a3c}
+.tk .top{display:flex;gap:12px;align-items:center}
+.tk .top .em{font-size:44px;line-height:1}
+.tk .top b{display:block;font-family:var(--display);font-weight:400;font-size:32px;letter-spacing:.03em;line-height:1}
+.tk .top small{color:var(--dim);font-size:13px}
+.tk ul{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:7px}
+.tk li{font-size:14.5px;line-height:1.35;padding-left:28px;position:relative}
+.tk li i{position:absolute;left:0;top:0;font-style:normal}
+.tk .cta{justify-content:flex-start;margin-top:14px}
+.tk .btn{padding:12px 15px;font-size:15px}
+.tk.ice .btn.hot{background:#ff4f9a;border-color:#ff4f9a;box-shadow:0 8px 24px #ff4f9a55}
+.tk.food .btn.hot{background:#ff7a1a;border-color:#ff7a1a;box-shadow:0 8px 24px #ff7a1a55}
+.app.ft{background:radial-gradient(120% 80% at 50% 25%,#ffb02e55,transparent 60%),linear-gradient(160deg,#2a1208,#e8582a55 70%),var(--card)}
+.app.ft .big{position:absolute;inset:0;display:grid;place-items:center;font-size:84px;padding-bottom:30%}
+.tp{margin-top:14px}
 @media (max-width:360px){.price{grid-template-columns:1fr}.feats{grid-template-columns:1fr}}
 </style>
 </head>
@@ -108,13 +135,21 @@ footer{text-align:center;color:var(--dim);font-size:12px;margin-top:30px;line-he
   <img class="logo" src="../../assets/sousshift-lockup.jpg" alt="SousShift AI">
   <p class="for" id="for">Made for <b id="forName"></b></p>
   <p class="k">SousShift AI</p>
-  <h1>Your business, in your customers' <em>pocket</em>.</h1>
-  <p class="sub">Your menu, a game made around your food, rewards that bring people back, a customer list you own, and every language your neighborhood speaks. All in one tap from a QR on the table.</p>
-  <div class="cta">
+  <div class="mode" role="group" aria-label="Business type"><button type="button" data-m="r" aria-pressed="true">🍽️ Restaurants</button><button type="button" data-m="t" aria-pressed="false">🍦🚚 Trucks</button></div>
+  <h1 class="r-only">Your business, in your customers' <em>pocket</em>.</h1>
+  <h1 class="t-only">Your truck, on your customers' <em>map</em>.</h1>
+  <p class="sub r-only">Your menu, a game made around your food, rewards that bring people back, a customer list you own, and every language your neighborhood speaks. All in one tap from a QR on the table.</p>
+  <p class="sub t-only">Ice cream trucks and food trucks: customers see exactly where you are, their phone rings when you're close, they see how long until you reach their street, and food truck orders are timed so they're hot when the customer walks up.</p>
+  <div class="cta r-only">
     <a class="btn hot" href="../start/" id="ctaTop">⚡ Build my free sample</a>
     <a class="btn" href="#apps">See live apps ↓</a>
   </div>
-  <div class="strip"><span>🎮 Custom game</span><span>🎁 Rewards</span><span>📇 Your customer list</span><span>⭐ Google reviews</span><span>🌐 12 languages</span></div>
+  <div class="cta t-only">
+    <a class="btn hot" href="../start/?type=foodtruck">🚚 Set up my truck</a>
+    <a class="btn" href="#trucks">See the truck apps ↓</a>
+  </div>
+  <div class="strip r-only"><span>🎮 Custom game</span><span>🎁 Rewards</span><span>📇 Your customer list</span><span>⭐ Google reviews</span><span>🌐 12 languages</span></div>
+  <div class="strip t-only"><span>📍 Live truck map</span><span>🔔 Phones ring nearby</span><span>⏱️ ETA to their street</span><span>🔥 Order ahead, timed hot</span><span>🎁 Check-in rewards</span></div>
 </header>
 
 <section id="apps">
@@ -128,8 +163,49 @@ footer{text-align:center;color:var(--dim);font-size:12px;margin-top:30px;line-he
     <a class="app" href="../melody-lax/" style="background-image:url(../melody-lax/img/cover.jpg)"><span class="tag">✈️ FULL PACKAGE</span><div class="in"><div class="em">🍸</div><b>Melody Bar &amp; Grill</b><small>Westchester by LAX<br>Table ordering + flight game</small><span class="go">OPEN APP →</span></div></a>
     <a class="app" href="../gritz-n-wafflez/" style="background-image:url(../gritz-n-wafflez/img/wingz-wafflez.jpg)"><span class="tag">💛 WOMAN-OWNED</span><div class="in"><div class="em">🧇</div><b>Gritz N Wafflez</b><small>Wilshire Blvd · LA<br>"Waffle Run" game while you wait</small><span class="go">OPEN APP →</span></div></a>
     <a class="app" href="../nalu-vida/" style="background-image:url(../nalu-vida/img/hero.jpg)"><span class="tag">🌊 FULL PACKAGE</span><div class="in"><div class="em">🏄</div><b>Nalu Vida</b><small>Venice Pier · beach bar<br>"Ride the Nalu" surf game</small><span class="go">OPEN APP →</span></div></a>
-    <a class="app ic" href="../../ice-cream/demo/"><span class="tag">🍦 NEW · FOOD TRUCKS</span><div class="big" aria-hidden="true">🍦</div><div class="in"><div class="em">🚚</div><b>Ice Cream Trucks</b><small>Live truck map + ETA<br>"Truck's on your street" alerts</small><span class="go">OPEN APP →</span></div></a>
+    <a class="app ic" href="../../ice-cream/demo/"><span class="tag">🍦 NEW · TRUCKS</span><div class="big" aria-hidden="true">🍦</div><div class="in"><div class="em">🚚</div><b>Ice Cream Trucks</b><small>Live truck map + ETA<br>"Truck's on your street" alerts</small><span class="go">OPEN APP →</span></div></a>
+    <a class="app ft" href="../../food-truck/demo/"><span class="tag">🚚 NEW · TRUCKS</span><div class="big" aria-hidden="true">🌮</div><div class="in"><div class="em">🚚</div><b>Food Trucks</b><small>Live map + order ahead<br>Food ready hot when you arrive</small><span class="go">OPEN APP →</span></div></a>
   </div>
+</section>
+
+<section id="trucks">
+  <p class="k">Ice cream trucks · food trucks</p>
+  <h2>Run a truck? Get found.</h2>
+  <p class="lead">No more "where's the truck?". Customers scan your QR sticker once. After that they can see you on a live map, their phone rings when you're close, and they know how long until you're on their street. Tap one to try it.</p>
+  <div class="trucks">
+    <div class="tk ice" id="ice-cream">
+      <div class="top"><div class="em">🍦</div><div><b>Ice Cream Trucks</b><small>"Truck's on your street" alerts</small></div></div>
+      <ul>
+        <li><i>📍</i>Live map: the customer's house and exactly where the truck is</li>
+        <li><i>⏱️</i>"Arriving in ~6 min" ETA that counts your stops to sell</li>
+        <li><i>🔔</i>Phones ring for app users on the block as you get close</li>
+        <li><i>🎁</i>Check in 5 times → 10% off or an extra scoop; bonus points for keeping alerts on</li>
+        <li><i>🧾</i>Route counter: see how many extra sales each street brings</li>
+      </ul>
+      <div class="cta"><a class="btn hot" href="../../ice-cream/demo/">📍 Try the customer app</a><a class="btn" href="../../ice-cream/">Owner tour →</a></div>
+    </div>
+    <div class="tk food" id="food-truck">
+      <div class="top"><div class="em">🚚</div><div><b>Food Trucks</b><small>Find it, order ahead, pick it up hot</small></div></div>
+      <ul>
+        <li><i>📍</i>Live map of where the truck is parked or driving, plus today's stops and times</li>
+        <li><i>📏</i>How far each customer is: miles, walk time and drive time</li>
+        <li><i>⏱️</i>"In your area at 5:30" countdown when the truck heads their way</li>
+        <li><i>🔥</i>Order ahead, timed hot: it shows when the food will be ready and when to leave, and the cook starts so it comes off the grill as they walk up</li>
+        <li><i>👀</i>Owner view: customers with the app on a map, who's heading over, and a cook queue sorted by arrival</li>
+      </ul>
+      <div class="cta"><a class="btn hot" href="../../food-truck/demo/">📍 Try the customer app</a><a class="btn" href="../../food-truck/">Owner tour →</a></div>
+    </div>
+  </div>
+  <div class="tp">
+    <p class="k" style="text-align:center;margin-bottom:8px">Truck plans</p>
+    <div class="price">
+      <div class="pp"><small>🍦 Single Scoop</small><b>$99</b><span>then $29/mo · 1 truck</span></div>
+      <div class="pp best"><small>🍨 Double Scoop</small><b>$299</b><span>$199 for the first 10 trucks · then $50/mo</span></div>
+      <div class="pp"><small>🍧 Sundae</small><b>$599</b><span>then $129/mo · up to 3 trucks</span></div>
+    </div>
+    <p style="text-align:center;color:var(--dim);font-size:13px;margin:10px 0 0">Same plans for ice cream trucks and food trucks. Ordering ahead is included from Double Scoop up.</p>
+  </div>
+  <div class="cta"><a class="btn hot" href="../start/?type=foodtruck">🚚 Set up my truck</a><a class="btn" href="sms:+14243094068?&body=Hi%20Antidote%2C%20I%20run%20a%20truck%20and%20want%20the%20truck%20app">💬 Text Antidote</a></div>
 </section>
 
 <section>
@@ -141,12 +217,14 @@ footer{text-align:center;color:var(--dim);font-size:12px;margin-top:30px;line-he
     <button type="button" data-d="lucky-dragon" aria-pressed="false">🐉 Lucky Dragon</button>
     <button type="button" data-d="melody-lax" aria-pressed="false">✈️ Melody</button>
     <button type="button" data-d="gritz-n-wafflez" aria-pressed="false">🧇 Gritz N Wafflez</button>
+    <button type="button" data-src="../../ice-cream/demo/" aria-pressed="false">🍦 Ice cream truck</button>
+    <button type="button" data-src="../../food-truck/demo/" aria-pressed="false">🚚 Food truck</button>
   </div>
-  <div class="phone"><div class="notch"></div><div class="scr"><iframe id="ph" title="Live app" src="../storm-burger/" loading="lazy"></iframe></div></div>
+  <div class="phone"><div class="notch"></div><div class="scr"><iframe id="ph" title="Live app" src="../storm-burger/" loading="lazy" allow="geolocation"></iframe></div></div>
   <p class="tapnote">It's live: scroll it, play the game, join the club.</p>
 </section>
 
-<section>
+<section class="r-only">
   <p class="k">What's inside</p>
   <h2>Everything your app does</h2>
   <div class="feats">
@@ -172,7 +250,7 @@ footer{text-align:center;color:var(--dim);font-size:12px;margin-top:30px;line-he
   <div class="cta"><a class="btn hot" href="../start/">⚡ Start my free sample</a></div>
 </section>
 
-<section>
+<section class="r-only">
   <p class="k">When you're ready</p>
   <h2>Start with as little as $500</h2>
   <div class="price">
@@ -190,12 +268,12 @@ footer{text-align:center;color:var(--dim);font-size:12px;margin-top:30px;line-he
   <p class="k">Your turn</p>
   <h2>Let's build yours</h2>
   <p class="lead" style="margin-bottom:0">Free sample, built around your menu and your photos.</p>
-  <div class="cta"><a class="btn hot" href="../start/">⚡ Build my free sample</a><a class="btn" href="https://instagram.com/second.shiftai" target="_blank" rel="noopener">DM @second.shiftai</a></div>
+  <div class="cta"><a class="btn hot" href="../start/" data-truck-href="../start/?type=foodtruck">⚡ Build my free sample</a><a class="btn" href="https://instagram.com/second.shiftai" target="_blank" rel="noopener">DM @second.shiftai</a></div>
 </section>
 
-<footer><b style="color:var(--gold)">SOUSSHIFT AI</b> · menus · games · rewards · customer lists · reviews · outreach<br>Demo apps use sample prizes; games run as free-entry promotions.</footer>
+<footer><b style="color:var(--gold)">SOUSSHIFT AI</b> · restaurants · ice cream trucks · food trucks · menus · games · rewards · customer lists · reviews<br>Demo apps use sample prizes; games run as free-entry promotions.</footer>
 </div>
-<div class="sticky" id="sticky"><a class="btn hot" href="../start/">⚡ Build my free sample</a></div>
+<div class="sticky" id="sticky"><a class="btn hot" href="../start/" data-truck-href="../start/?type=foodtruck">⚡ Build my free sample</a></div>
 
 <script>
 (function(){
@@ -206,9 +284,31 @@ footer{text-align:center;color:var(--dim);font-size:12px;margin-top:30px;line-he
     $("forName").textContent = who; $("for").style.display = "block";
     $("growthLink").href = "../growth/?for=" + encodeURIComponent(who);
   }
+  // Restaurants vs trucks. Truck mode: ?type=truck|icecream|foodtruck or #trucks / #ice-cream / #food-truck
+  var qs = new URLSearchParams(location.search), qt = (qs.get("type") || "").toLowerCase();
+  var truckLink = /^(truck|trucks|icecream|ice-cream|foodtruck|food-truck)$/.test(qt) || /^#(trucks|ice-cream|food-truck)$/.test(location.hash);
+  var modeBtns = document.querySelectorAll(".mode button"), trucksSec = $("trucks"), appsSec = $("apps");
+  function setMode(t, scroll){
+    document.body.classList.toggle("truck", t);
+    modeBtns.forEach(function(b){ b.setAttribute("aria-pressed", (b.dataset.m === "t") === t ? "true" : "false"); });
+    // trucks section goes first in truck mode
+    if (t) appsSec.parentNode.insertBefore(trucksSec, appsSec); else appsSec.parentNode.insertBefore(trucksSec, appsSec.nextSibling);
+    document.querySelectorAll("[data-truck-href]").forEach(function(a){ if (!a.dataset.rHref) a.dataset.rHref = a.getAttribute("href"); a.setAttribute("href", t ? a.dataset.truckHref : a.dataset.rHref); });
+    document.title = t ? "SousShift AI — Truck App: live map, alerts, order ahead" : "SousShift AI — Your Business App";
+    if (scroll) trucksSec.scrollIntoView({behavior: "smooth"});
+  }
+  modeBtns.forEach(function(b){ b.addEventListener("click", function(){
+    var t = b.dataset.m === "t"; setMode(t, false);
+    try { history.replaceState(null, "", location.pathname + location.search.replace(/([?&])type=[^&]*&?/, "$1").replace(/[?&]$/, "") + (t ? "#trucks" : "")); } catch (e) {}
+  }); });
+  if (truckLink) {
+    setMode(true, false);
+    var target = location.hash && document.querySelector(location.hash);
+    if (target) setTimeout(function(){ target.scrollIntoView(); }, 60);
+  }
   var chips = document.querySelectorAll("#chips button"), ph = $("ph");
   chips.forEach(function(b){ b.addEventListener("click", function(){
-    chips.forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); ph.src = "../" + b.dataset.d + "/";
+    chips.forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); ph.src = b.dataset.src || ("../" + b.dataset.d + "/");
   }); });
   // sticky CTA once the top button scrolls away
   if ("IntersectionObserver" in window) new IntersectionObserver(function(en){ $("sticky").classList.toggle("on", !en[0].isIntersecting); }).observe($("ctaTop"));

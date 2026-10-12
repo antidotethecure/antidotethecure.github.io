@@ -150,6 +150,9 @@ details{margin-top:10px}summary{cursor:pointer;color:var(--dim);font-size:13.5px
   "use strict";
   var T = window.SSAI_TYPES, $ = function(id){ return document.getElementById(id); };
   var type = "restaurant", photos = [];
+  var qt = new URLSearchParams(location.search).get("type");
+  if (qt === "icecream" || qt === "ice-cream") qt = "foodtruck";
+  if (qt && Object.prototype.hasOwnProperty.call(T, qt)) type = qt;
 
   // 1. type chips
   $("types").innerHTML = Object.keys(T).map(function(k){

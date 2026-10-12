@@ -20,14 +20,44 @@
     wait:{en:"Pending",es:"Pendiente"}, dec:{en:"Decided against",es:"Descartada"}
   };
 
-  function TABS(){ return [
+  /* one client can have a state case and a federal case at the same time: the switch swaps the header, dates, deadlines and motions */
+  var CASE = "state";
+  var CASES = {
+    state:{n:"00-XX-00000", court:"Sample County Superior Court", lbl:{en:"State case",es:"Caso estatal"}},
+    fed:{n:"0:00-mj-00000", court:"U.S. District Court · Sample District", lbl:{en:"Federal case",es:"Caso federal"}}
+  };
+  var BY_CASE = {
+    state:{
+      deadlines:[
+        { h:{en:"Suppression motion notice (to be heard at prelim)",es:"Aviso de moción de supresión (para la preliminar)"}, st:"wait", m:{en:"Due "+d(9)+" · 5 court days before the prelim · flagged 2 weeks ahead",es:"Vence "+d(9)+" · 5 días hábiles antes de la preliminar · avisado con 2 semanas"} },
+        { h:{en:"Discovery request follow-up",es:"Seguimiento de descubrimiento"}, st:"wait", m:{en:"Due "+d(6)+" · [attorney note]",es:"Vence "+d(6)+" · [nota del abogado]"} },
+        { h:{en:"Bail review window",es:"Plazo de revisión de fianza"}, st:"ok", m:{en:"Reviewed "+d(-5)+" · client told the reason",es:"Revisado "+d(-5)+" · se le explicó al cliente"} }
+      ],
+      dates:[
+        { h:{en:"Court: preliminary hearing",es:"Corte: audiencia preliminar"}, m:d(16)+" · 8:30 AM · Dept. 00 · Sample County Superior Court", a:[ICS,MAP] },
+        { h:{en:"Meeting with public defender",es:"Reunión con el defensor público"}, m:d(2)+" · 1:00 PM · [Your office]", a:[ICS,CALL] },
+        { h:{en:"Court: pretrial hearing",es:"Corte: audiencia previa al juicio"}, m:d(4)+" · 8:30 AM · Dept. 00", a:[ICS,MAP] }
+      ]},
+    fed:{
+      deadlines:[
+        { h:{en:"Indictment deadline (Speedy Trial Act)",es:"Plazo de acusación formal (Ley de Juicio Rápido)"}, st:"wait", m:{en:"Due "+d(21)+" · 30 days from arrest · flagged 2 weeks ahead",es:"Vence "+d(21)+" · 30 días desde el arresto · avisado con 2 semanas"} },
+        { h:{en:"Preliminary hearing (unless indicted)",es:"Audiencia preliminar (si no hay acusación)"}, st:"wait", m:{en:d(13)+" · [attorney note]",es:d(13)+" · [nota del abogado]"} },
+        { h:{en:"Pretrial services report review",es:"Revisión del informe de servicios previos"}, st:"ok", m:{en:"Reviewed "+d(-2),es:"Revisado "+d(-2)} }
+      ],
+      dates:[
+        { h:{en:"Court: status conference",es:"Corte: conferencia de estado"}, m:d(7)+" · 10:00 AM · Courtroom 0X · U.S. District Court", a:[ICS,MAP] },
+        { h:{en:"Pretrial services check-in",es:"Presentación con servicios previos al juicio"}, m:d(1)+" · 9:00 AM · [Officer]", a:[ICS,CALL] },
+        { h:{en:"Meeting with federal defender",es:"Reunión con el defensor federal"}, m:d(3)+" · 2:00 PM · [Your office]", a:[ICS,CALL] }
+      ]}
+  };
+
+  function TABS(){ var C = BY_CASE[CASE]; return [
+    { id:"deadlines", t:{en:"⏰ Deadlines",es:"⏰ Plazos"},
+      why:{en:"Every filing window, counted from the court rules and flagged 2 weeks ahead, so nobody hears about a deadline the day before.",es:"Cada plazo de presentación, contado según las reglas de la corte y avisado con 2 semanas, para que nadie se entere un día antes."},
+      rows:C.deadlines },
     { id:"dates", t:{en:"📅 Dates",es:"📅 Fechas"},
       why:{en:"Every court date and appointment, with reminders the day before and the morning of.",es:"Cada fecha de corte y cita, con recordatorios el día antes y esa mañana."},
-      rows:[
-        { h:{en:"Court: pretrial hearing",es:"Corte: audiencia previa al juicio"}, m:d(4)+" · 8:30 AM · Dept. 00 · Sample County Superior Court", a:[ICS,MAP] },
-        { h:{en:"Meeting with attorney",es:"Reunión con el abogado"}, m:d(2)+" · 1:00 PM · [Your firm]", a:[ICS,CALL] },
-        { h:{en:"Court: preliminary hearing",es:"Corte: audiencia preliminar"}, m:d(11)+" · 9:00 AM · Dept. 00", a:[ICS,MAP] }
-      ]},
+      rows:C.dates },
     { id:"checkins", t:{en:"✅ Check-ins",es:"✅ Presentaciones"},
       why:{en:"Pretrial, probation and bond check-ins with a timestamped log. Missed ones are flagged.",es:"Presentaciones de libertad previa, probatoria y fianza, con registro de hora. Las perdidas se marcan."},
       rows:[
@@ -148,7 +178,7 @@
   ];
 
   var tabsEl = document.getElementById("tabs"), pane = document.getElementById("pane");
-  var cur = "dates";
+  var cur = "deadlines";
 
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
 
@@ -215,8 +245,25 @@
     var body = l === "es" ? "Hola, vi la demo de Case Companion y quiero una para mi oficina." : "Hi, I saw the Case Companion demo and want one for my office.";
     sms.href = "sms:+14243094068?&body=" + encodeURIComponent(body);
     mail.href = "mailto:secondshiftai@gmail.com?subject=" + encodeURIComponent("Case Companion demo") + "&body=" + encodeURIComponent(body);
-    stopSpeak(); renderTabs(); renderFolders();
+    stopSpeak(); renderCase(); renderFolders();
   }
+  function renderCase(){
+    var c = CASES[CASE];
+    document.getElementById("caseNo").textContent = c.n; document.getElementById("caseCourt").textContent = c.court;
+    document.getElementById("caseSw").innerHTML = ["state","fed"].map(function(k){ return '<button type="button" data-case="'+k+'" aria-pressed="'+(k===CASE)+'">'+esc(L(CASES[k].lbl))+'</button>'; }).join("");
+    renderTabs();
+  }
+  document.getElementById("caseSw").addEventListener("click", function(e){
+    var b = e.target.closest("button[data-case]"); if (!b) return;
+    CASE = b.getAttribute("data-case"); stopSpeak(); renderCase();
+  });
+  /* the pitch messages: copy buttons */
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("button[data-copy]"); if (!b) return;
+    var el = document.getElementById(b.getAttribute("data-copy")), txt = el ? el.innerText.trim() : "";
+    function done(){ var o = b.textContent; b.textContent = LANG === "es" ? "Copiado ✓" : "Copied ✓"; setTimeout(function(){ b.textContent = o; }, 1600); }
+    try { navigator.clipboard.writeText(txt).then(done, done); } catch (x) { done(); }
+  });
   Array.prototype.forEach.call(document.querySelectorAll(".lt button"), function(b){
     b.addEventListener("click", function(){ setLang(b.getAttribute("data-lang")); });
   });

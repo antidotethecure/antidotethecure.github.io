@@ -117,3 +117,10 @@ section.s>header{margin-bottom:14px}
 .price b{font-family:"Orbitron",sans-serif;color:var(--gold);font-size:18px}
 footer.f{margin:50px 0 30px;text-align:center;color:var(--dim);font-size:14px}
 footer.f img{width:96px;margin:0 auto 8px;display:block;border-radius:12px}
+
+/* state / federal switch + pitch messages */
+.casesw{display:flex;gap:6px;padding:6px 10px 0}
+.casesw button{flex:1;font:inherit;font-size:12px;font-weight:700;padding:6px 4px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:transparent;color:inherit;cursor:pointer}
+.casesw button[aria-pressed="true"]{background:var(--gold);color:#111;border-color:var(--gold)}
+.msg{margin:12px 0 8px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.06);border:1px dashed rgba(255,255,255,.25);font-size:14px;line-height:1.45}
+.msg p{margin:0;overflow-wrap:anywhere}

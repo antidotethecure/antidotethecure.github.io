@@ -114,10 +114,11 @@
           </div>
           <div class="cap">
             <span class="en">Client:</span><span class="es">Cliente:</span> <b>Jordan Sample</b> <span class="sample-flag">SAMPLE</span><br>
-            <span class="en">Case #:</span><span class="es">Caso #:</span> <b>00-XX-00000</b> · Sample County Superior Court<br>
+            <span class="en">Case #:</span><span class="es">Caso #:</span> <b id="caseNo">00-XX-00000</b> · <span id="caseCourt">Sample County Superior Court</span><br>
             <span class="en">Attorney:</span><span class="es">Abogado:</span> <b>[Your firm]</b>
           </div>
         </div>
+        <div class="casesw" id="caseSw" role="group" aria-label="State or federal case"></div>
         <div class="tabs" id="tabs" role="tablist" aria-label="Folders"></div>
         <div class="pane" id="pane" role="tabpanel" aria-live="polite"></div>
         <div class="toast" id="toast" role="status"></div>
@@ -128,13 +129,13 @@
         <h3><span class="en">What you're looking at</span><span class="es">Lo que está viendo</span></h3>
         <ul class="en">
           <li>A skeleton of a real working build, with every name, number and court replaced by a placeholder.</li>
-          <li>Swipe the tabs: dates, check-ins, motions, evidence, discovery, witnesses, contacts, bail, documents, letters, research, family, appeal, pro bono.</li>
+          <li>Switch between the <b>state case</b> and the <b>federal case</b>: one client, two courts, one app. Swipe the tabs: deadlines, dates, check-ins, motions, evidence, discovery, witnesses, contacts, bail, documents, letters, research, family, appeal, pro bono.</li>
           <li>Call, Text and Email buttons are live in a real build, with the case number already in the subject line.</li>
           <li>🔊 reads the open folder aloud on the device. Nothing is sent to an outside service.</li>
         </ul>
         <ul class="es">
           <li>El esqueleto de una versión real, con cada nombre, número y corte cambiado por un ejemplo.</li>
-          <li>Deslice las pestañas: fechas, presentaciones, mociones, pruebas, descubrimiento, testigos, contactos, fianza, documentos, cartas, investigación, familia, apelación, abogados gratuitos.</li>
+          <li>Cambie entre el <b>caso estatal</b> y el <b>caso federal</b>: un cliente, dos cortes, una app. Deslice las pestañas: plazos, fechas, presentaciones, mociones, pruebas, descubrimiento, testigos, contactos, fianza, documentos, cartas, investigación, familia, apelación, abogados gratuitos.</li>
           <li>En una versión real, Llamar, Texto y Correo funcionan, con el número de caso ya en el asunto.</li>
           <li>🔊 lee la carpeta abierta en voz alta en el teléfono. No se envía nada a servicios externos.</li>
         </ul>
@@ -152,6 +153,47 @@
           <li><b>Abogado:</b> mociones, pruebas, descubrimiento e investigación con otra clave.</li>
         </ul>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="pitch">
+  <header>
+    <p class="kick"><span class="en">Why it pays for itself</span><span class="es">Por qué se paga solo</span></p>
+    <h2><span class="en">What your office gets out of it</span><span class="es">Lo que gana su oficina</span></h2>
+  </header>
+  <div class="who">
+    <div class="card" id="pitch-pd">
+      <div class="ic">🏛️</div>
+      <h3><span class="en">For public defenders</span><span class="es">Para defensores públicos</span></h3>
+      <ul>
+        <li class="en"><b>Clients show up.</b> Reminders go out before every date, so fewer bench warrants and fewer re-set hearings eat your calendar.</li>
+        <li class="es"><b>El cliente se presenta.</b> Recordatorios antes de cada fecha: menos órdenes de arresto y menos audiencias reprogramadas.</li>
+        <li class="en"><b>No deadline surprises.</b> Filing windows like suppression notices and indictment deadlines are flagged 2 weeks out, for you and the client.</li>
+        <li class="es"><b>Sin plazos sorpresa.</b> Avisos de supresión y plazos de acusación se marcan con 2 semanas, para usted y el cliente.</li>
+        <li class="en"><b>Fewer calls, fewer complaints.</b> The client and family can see what was filed, what wasn't and why, so they don't have to call the office to ask.</li>
+        <li class="es"><b>Menos llamadas y quejas.</b> El cliente y la familia ven qué se presentó, qué no y por qué, sin llamar a la oficina.</li>
+        <li class="en"><b>State and federal in one place</b> when a client has both, so the two attorneys stay in sync.</li>
+        <li class="es"><b>Estatal y federal en un lugar</b> cuando el cliente tiene ambos, y los dos abogados quedan coordinados.</li>
+      </ul>
+      <div class="msg" id="msg-pd"><p class="en">Hi [Name], I build Case Companion, a private app for each client: every court date with reminders, filing deadlines flagged 2 weeks out, a motions tracker showing filed, not filed or decided against with the reason, and a plain-language guide for the family. It cuts missed hearings and the calls to your office. Here's a 2-minute sample with fake data: https://antidotethecure.github.io/case-app/. Could I show you how it would work for your caseload?</p><p class="es">Hola [Nombre], hago Case Companion, una app privada para cada cliente: cada fecha de corte con recordatorios, plazos avisados con 2 semanas, control de mociones con motivo y una guía sencilla para la familia. Reduce audiencias perdidas y llamadas a su oficina. Muestra de 2 minutos con datos ficticios: https://antidotethecure.github.io/case-app/. ¿Le muestro cómo funcionaría con sus casos?</p></div>
+      <button type="button" class="btn ghost" data-copy="msg-pd"><span class="en">Copy PD message</span><span class="es">Copiar mensaje</span></button>
+    </div>
+    <div class="card" id="pitch-bond">
+      <div class="ic">🔔</div>
+      <h3><span class="en">For bail bondsmen</span><span class="es">Para fiadores</span></h3>
+      <ul>
+        <li class="en"><b>Protect the bond.</b> One forfeiture can cost you the whole bond amount. Text and calendar reminders before every date keep clients from missing court.</li>
+        <li class="es"><b>Proteja la fianza.</b> Un decomiso le puede costar la fianza completa. Recordatorios por texto y calendario evitan ausencias.</li>
+        <li class="en"><b>Know first.</b> If a client misses a check-in, it's flagged right away, and the cosigner's contact is one tap away.</li>
+        <li class="es"><b>Entérese primero.</b> Una presentación perdida se marca al instante, con el contacto del cofirmante a un toque.</li>
+        <li class="en"><b>One board for every bond:</b> next court date, check-ins and risk, state and federal.</li>
+        <li class="es"><b>Un panel para cada fianza:</b> próxima fecha, presentaciones y riesgo, estatal y federal.</li>
+        <li class="en"><b>Your brand on it.</b> Your name, license number and phone on the client's screen, so referrals come back to you.</li>
+        <li class="es"><b>Su marca.</b> Su nombre, licencia y teléfono en la pantalla del cliente: las referencias regresan a usted.</li>
+      </ul>
+      <div class="msg" id="msg-bond"><p class="en">Hi [Name], one missed court date can turn into a forfeiture. I build Case Companion, a branded app for each client you bond out: court-date reminders by text and calendar, a check-in log that flags misses right away, cosigner contacts one tap away, and one board showing every bond's next date and risk. Sample with fake data: https://antidotethecure.github.io/case-app/. Want a version with your name and license number on it?</p><p class="es">Hola [Nombre], una fecha de corte perdida puede terminar en decomiso. Hago Case Companion, una app con su marca para cada cliente: recordatorios por texto y calendario, registro de presentaciones que marca ausencias al instante, contacto del cofirmante a un toque y un panel con la próxima fecha y el riesgo de cada fianza. Muestra con datos ficticios: https://antidotethecure.github.io/case-app/. ¿Quiere una versión con su nombre y licencia?</p></div>
+      <button type="button" class="btn ghost" data-copy="msg-bond"><span class="en">Copy bondsman message</span><span class="es">Copiar mensaje</span></button>
     </div>
   </div>
 </section>

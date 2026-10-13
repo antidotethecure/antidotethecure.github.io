@@ -1,0 +1,368 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><title>Veronika · Your Plan · SousShift AI</title>
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b1220">
+<style>
+:root{--bg:#0b1220;--card:#121c33;--edge:#24345c;--ink:#f3f6ff;--dim:#a9b6d6;--gold:#f5c400;--ok:#2fbf71;--sage:#7fd6a6;--warn:#ff8a5b;--bad:#ff5b6e}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,system-ui,Segoe UI,Roboto,sans-serif}
+main{max-width:680px;margin:0 auto;padding:18px 16px 80px}
+a{color:#8fc1ff}
+.top{display:flex;align-items:center;gap:10px}.top img{height:44px;border-radius:8px}
+h1{font-size:28px;line-height:1.15;margin:14px 0 6px}h2{font-size:20px;margin:30px 0 8px}h3{font-size:16px;margin:14px 0 4px}
+.s{color:var(--dim)}.note{font-size:13px;color:var(--dim)}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px 16px;margin:10px 0}
+.card.ok{border-color:#2fbf7155;background:linear-gradient(180deg,#123024,#121c33)}
+.card.warn{border-color:#ff8a5b66;background:linear-gradient(180deg,#3a1d14,#121c33)}
+.card.lock{border-color:#7fd6a666;background:linear-gradient(180deg,#14302a,#121c33)}
+.pill{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:#ffffff14;color:var(--gold)}
+.pill.g{color:#7dffb5}.pill.r{color:var(--warn)}
+.big{font-size:22px;font-weight:900}
+.prog{height:10px;border-radius:99px;background:#ffffff14;overflow:hidden;margin:8px 0}.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--ok),var(--gold));transition:width .3s}
+.ck{list-style:none;margin:8px 0 0;padding:0}.ck li{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--edge)}.ck li:first-child{border-top:0}
+.ck input{flex:none;width:22px;height:22px;margin-top:2px;accent-color:var(--ok)}.ck label{flex:1}.ck small{display:block;color:var(--dim);font-size:13.5px;margin-top:2px}
+.ck small b{color:var(--sage);font-weight:700}
+.ck li.done label>b{color:var(--dim);text-decoration:line-through}
+.ck li.fixed i{flex:none;width:22px;height:22px;border-radius:50%;background:var(--ok);color:#06210f;display:grid;place-items:center;font-style:normal;font-weight:900;font-size:13px;margin-top:2px}
+details.pj{background:var(--card);border:1px solid var(--edge);border-radius:16px;margin:10px 0;padding:0 16px}
+details.pj summary{cursor:pointer;list-style:none;padding:14px 0;display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px}
+details.pj summary::-webkit-details-marker{display:none}details.pj summary .em{font-size:26px}details.pj summary .ct{margin-left:auto;font-size:13px;color:var(--dim);font-weight:700;white-space:nowrap}
+details.pj[open]{padding-bottom:12px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}.tbl td,.tbl th{padding:7px 6px;border-top:1px solid var(--edge);vertical-align:top;text-align:left}.tbl th{color:var(--dim);font-size:12px;text-transform:uppercase;letter-spacing:.05em;border-top:0}
+.ok2{color:#7dffb5}.no{color:var(--bad)}
+.btn{display:block;text-align:center;margin:10px 0;padding:14px;border-radius:14px;background:var(--gold);color:#111;font-weight:800;text-decoration:none;border:0;width:100%;font-size:16px;cursor:pointer;font-family:inherit}
+.btn.alt{background:transparent;border:1px solid var(--edge);color:var(--ink)}
+.btn.sm{display:inline-block;width:auto;padding:8px 14px;font-size:14px;margin:6px 0 0}
+.fld{display:block;margin:10px 0 0}.fld span{display:block;font-size:13px;color:var(--dim);margin-bottom:4px}
+.fld input,.fld textarea,.fld select{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--edge);background:#0b1426;color:var(--ink);font:inherit;font-size:16px}
+.fld textarea{min-height:76px;resize:vertical}
+pre.pr{white-space:pre-wrap;background:#0b1426;border:1px solid var(--edge);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.45;margin:8px 0 0;max-height:240px;overflow:auto}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.toc a{font-size:14px;font-weight:700;text-decoration:none;color:var(--ink);background:#ffffff10;border:1px solid var(--edge);border-radius:999px;padding:6px 12px}
+.faq details{border-top:1px solid var(--edge);padding:10px 0}.faq details:first-child{border-top:0}.faq summary{cursor:pointer;font-weight:700}
+.rl{margin:6px 0 0;padding-left:20px}.rl li{margin:4px 0}
+details.rk{border-color:#ff8a5b55}
+.rg{border-radius:12px;padding:8px 12px;margin:8px 0;background:#0b1426;border-left:4px solid var(--edge)}.rg h3{margin:2px 0 4px;font-size:15px}.rg ul{margin:0;padding-left:20px}.rg li{margin:4px 0;font-size:14.5px}
+.rg.ry{border-left-color:var(--ok)}.rg.ry h3{color:#7dffb5}.rg.rn{border-left-color:var(--bad)}.rg.rn h3{color:var(--bad)}.rg.rw{border-left-color:var(--warn)}.rg.rw h3{color:var(--warn)}
+a.rkl{display:inline-block;margin:0 0 6px;font-size:14px;font-weight:700;color:var(--warn)}
+@media print{body{background:#fff;color:#111}.card,details.pj{background:#fff;border-color:#ccc}.btn,.save,.toc,#intake{display:none}details.pj{display:block}details.pj>*{display:block}.s,.note,.ck small{color:#444}}
+</style></head><body><main>
+<div class="top"><img src="../../assets/ssai-lockup.jpg" alt="SousShift AI"></div>
+<p class="save note">📲 Save this: tap Share → <b>Add to Home Screen</b>. It works like an app.</p>
+<h1>Veronika, here's your plan 🌿</h1>
+<p class="s">Your 4 priorities, in your order. Every to-do has a <b>How</b> line telling you exactly how to do it. Check things off as we go. Your progress saves on this phone.</p>
+
+<div class="card ok"><span class="pill g">You're in ✅</span>
+<p class="big" style="margin:8px 0 2px">Kickoff: Monday, Oct 19 · 11:00 AM</p>
+<p style="margin:0">On Zoom (you're remote in Sacramento). The link will be texted to you before Monday.</p>
+<div class="prog"><i id="bar" style="width:0"></i></div><p class="note" id="pct"></p>
+</div>
+
+<section id="risks" aria-labelledby="risksH">
+<h2 id="risksH">⚠️ Read this first: warnings and risks</h2>
+<div class="card warn"><span class="pill r">Before any task</span>
+<p style="margin:8px 0 6px">Everything you're planning can be done, as long as it stays on the right side of a few clear lines. This section puts every warning from your 4 tasks in one place. For each task: what you <b>can</b> do safely, what you <b>can't</b>, and what could go wrong for you if a line gets crossed.</p>
+<ul class="rl">
+<li><b>Never advertise</b> psilocybin, psychedelics, peyote, or "sacrament" / entheogen products or ceremonies, on any platform, with any wording.</li>
+<li><b>No health or medical claims</b>, in ads or on the page the ad links to.</li>
+<li><b>Never try to get around ad review.</b> Cloaking (showing reviewers a different page than customers) means a ban.</li>
+<li><b>Psilocybin and peyote are federally Schedule I.</b> Talk to a lawyer before offering any sacrament service.</li>
+<li><b>Every answer on a grant application must be true.</b></li>
+</ul>
+<p class="note" style="margin:8px 0 0">This is general information, not legal advice; check with a lawyer before you act on anything here that touches the law.</p>
+</div>
+
+<details class="pj rk" id="risk-0"><summary><span class="em">🍄</span><span>Task 1 · Sunshine Mushroom Wellness ads + shop</span></summary>
+<div class="rg ry"><h3>✅ You can</h3><ul>
+<li>Advertise culinary / functional mushrooms (lion's mane, reishi, chaga, cordyceps) with <b>no health claims</b>: describe the product and the people, never a health result.</li>
+<li>Post education and community content (growing, cooking, events, your story) on your own profiles, without selling ⛔ items or encouraging use.</li>
+<li>Run a Shopify shop with a <b>separate, clean page</b> for the products you advertise. (Spotify's shop only works for music artists with a Spotify for Artists profile.)</li></ul></div>
+<div class="rg rn"><h3>⛔ You can't</h3><ul>
+<li>Advertise psilocybin, "magic", microdosing, psychedelic, entheogen or plant-medicine products, on Facebook, Instagram or TikTok, even where they're decriminalized and even with careful wording.</li>
+<li>Say a product treats, cures, heals or prevents anything ("heals anxiety", "cures depression"), or use before/after.</li>
+<li>Link an ad to a page or shop that also sells anything from the ⛔ list. Meta and TikTok review the landing page too.</li>
+<li>Get around review: coded words, swapping the page after approval (cloaking), or resubmitting the same rejected ad over and over.</li></ul></div>
+<div class="rg rw"><h3>⚠️ What could go wrong for you</h3><ul>
+<li>A <b>permanent ban</b> on the ad account and the whole Business Manager (Business Portfolio). It can spill over to the linked Pages and Instagram, to your <b>personal Facebook profile</b>, and to your other businesses run from the same account.</li>
+<li>Products rejected from Instagram / Facebook Shops, which must follow Meta's commerce rules.</li>
+<li>Psilocybin is federally Schedule I. Selling or advertising it can bring <b>criminal and civil exposure</b>, even where local law has relaxed.</li></ul></div>
+</details>
+
+<details class="pj rk" id="risk-1"><summary><span class="em">⛪</span><span>Task 2 · Green Light Sanctuary ads + marketing</span></summary>
+<div class="rg ry"><h3>✅ You can</h3><ul>
+<li>Advertise the church community: services, gatherings, volunteering, events, donations.</li>
+<li>Share education and harm-reduction awareness that doesn't sell or encourage use.</li>
+<li>Run drug-policy advocacy ads only under Meta's "Social issues, elections or politics" category, with ID verification and a "Paid for by" line.</li></ul></div>
+<div class="rg rn"><h3>⛔ You can't</h3><ul>
+<li>Advertise ceremonies or "sacrament" offered with a controlled substance, or retreats built around one.</li>
+<li>Show drug use or paraphernalia, or post anything that encourages drug use.</li>
+<li>Run an advocacy ad without the social-issues category.</li>
+<li>Use health or healing claims, on the ad or on the page it links to.</li></ul></div>
+<div class="rg rw"><h3>⚠️ What could go wrong for you</h3><ul>
+<li>The same permanent ad-account and Business Manager ban as Task 1, which can also take down Sunshine's accounts and your personal profile if they share a Business Portfolio.</li>
+<li><b>Legal exposure.</b> Peyote and psilocybin are federally Schedule I. Native American Church religious-use protection is narrow: under AIRFA (42 U.S.C. § 1996a) it covers <b>peyote</b> used in traditional ceremonies by <b>members of federally recognized tribes</b>. It does not cover psilocybin, and it does not cover people outside those tribes. Offering or advertising entheogens can bring criminal and civil exposure.</li>
+<li><b>Talk to a lawyer before offering any sacrament service.</b></li></ul></div>
+</details>
+
+<details class="pj rk" id="risk-2"><summary><span class="em">📜</span><span>Task 3 · Native American Church / harm-reduction grants</span></summary>
+<div class="rg ry"><h3>✅ You can</h3><ul>
+<li>Apply as a nonprofit, a church with IRS recognition, or through a <b>fiscal sponsor</b> (an existing nonprofit that receives the grant for your project for a small fee, usually 5–10%).</li>
+<li>Focus on private foundations, which are the better bet right now.</li>
+<li>Register on SAM.gov for a UEI. It's free: never pay a website for it.</li>
+<li>Have Claude draft sections, as long as you correct anything that's not 100% true before you sign.</li></ul></div>
+<div class="rg rn"><h3>⛔ You can't</h3><ul>
+<li>Get most grants as a for-profit <b>LLC</b>. Use the nonprofit or fiscal-sponsor route instead.</li>
+<li>Apply for federal grants without SAM.gov registration and a UEI.</li>
+<li>Use SAMHSA's 2026 money for harm reduction: its 2026 notices bar it, including harm-reduction supplies. Federal tribal programs are limited to federally recognized tribes.</li>
+<li>Spend grant money on anything other than the purpose you stated in the application.</li></ul></div>
+<div class="rg rw"><h3>⚠️ What could go wrong for you</h3><ul>
+<li><b>Disqualification</b> for pending lawsuits or court cases, judgments, tax liens or unfiled returns, federal debarment, or a state filing that's suspended. That's why the 🚧 checklist comes before any application.</li>
+<li>A <b>false statement on a federal application is a federal crime</b> (18 U.S.C. § 1001). Answer every question truthfully, even the uncomfortable ones.</li>
+<li>Money spent outside its stated purpose <b>must be paid back</b>.</li></ul></div>
+</details>
+
+<details class="pj rk" id="risk-3"><summary><span class="em">💐</span><span>Task 4 · Rebrand or sell iDesignEvents</span></summary>
+<div class="rg ry"><h3>✅ You can</h3><ul>
+<li>Sell the décor in lots (Facebook Marketplace, local wedding planners, rental companies).</li>
+<li>List the brand (domain, socials, site) on a marketplace such as Flippa, or rebrand and rent under a new name.</li>
+<li>Transfer a client list if you're allowed to (that's one of your 5 questions).</li></ul></div>
+<div class="rg rn"><h3>⛔ You can't</h3><ul>
+<li>Leave out liabilities or litigation when a buyer asks. Disclose them.</li>
+<li>Transfer social or platform accounts in a way that breaks that platform's terms.</li>
+<li>Close the deal on a handshake. Get any sale in writing.</li></ul></div>
+<div class="rg rw"><h3>⚠️ What could go wrong for you</h3><ul>
+<li>A buyer who finds an undisclosed problem later can come back on you.</li>
+<li>Accounts transferred against the platform's terms can be shut down, leaving the buyer, and you, in a dispute.</li>
+<li>Without a written agreement, there's no clear record of what was sold or what was paid.</li></ul></div>
+</details>
+
+<div class="card lock"><span class="pill g">🔒 For everything: your privacy</span>
+<ul class="rl">
+<li>Keep your case details (lawsuits, case numbers, liens, legal questions) <b>off public pages</b>: no posts, ads, bios or shop pages.</li>
+<li>Those details go only in the <a href="#intake">private info form</a>, which stays on your phone until you tap Send.</li></ul></div>
+</section>
+
+<nav class="toc" aria-label="Sections"><a href="#risks">⚠️ Warnings</a><a href="#tasks">🚀 Your 4 tasks</a><a href="#ads">📣 Ad rules</a><a href="#grants">📜 Grants</a><a href="#docs">🗂️ Documents</a><a href="#intake">🔒 Private info</a><a href="#agent">🤖 Your AI helper</a><a href="#updates">🗞️ Updates</a><a href="#faq">❓ FAQ</a><a href="#issue">🛠️ Report a problem</a></nav>
+
+<h2>✅ Done so far</h2>
+<div class="card"><ul class="ck">
+<li class="fixed"><i>✓</i><label><b>Payment received: $300</b><small>Oct 12, 2026 · Zelle · Month 1 (Oct 19 – Nov 18). Thank you!</small></label></li>
+<li class="fixed"><i>✓</i><label><b>Your 4 priorities are written down</b><small>From your own list, in your order (below)</small></label></li>
+<li class="fixed"><i>✓</i><label><b>Kickoff booked</b><small>Monday, Oct 19 at 11:00 AM on Zoom</small></label></li>
+</ul></div>
+
+<h2>📝 Your to-dos before Monday</h2>
+<div class="card"><ul class="ck" id="before"></ul></div>
+
+<h2 id="tasks">🚀 Your 4 tasks</h2>
+<p class="s" style="margin-top:0">Tap a task to open it. Each step has a checkbox and a <b>How</b> line.</p>
+<div id="projects"></div>
+
+<h2 id="ads">📣 Ad rules: what Meta and TikTok allow</h2>
+<div class="card warn"><span class="pill r">Read this first</span>
+<p style="margin:8px 0 6px"><b>Psilocybin ("magic mushrooms"), psychedelics, peyote and "sacrament" or ceremony services can't be advertised on Facebook, Instagram or TikTok.</b> That's true even where they're decriminalized or protected for religious use. Trying it, even with careful wording, can get the ad account <b>and the Page</b> banned for good. We won't disguise a banned product to sneak it past review.</p>
+<p class="note" style="margin:0">That still leaves a lot you <b>can</b> do. See the green column.</p></div>
+<div class="card"><table class="tbl">
+<tr><th>✅ Generally OK to advertise</th><th>⛔ Not allowed in ads</th></tr>
+<tr><td class="ok2">Culinary / functional mushrooms (lion's mane, reishi, chaga, cordyceps) <b>with no health claims</b></td><td class="no">Psilocybin, "magic", microdosing, psychedelic, entheogen or plant-medicine products</td></tr>
+<tr><td class="ok2">Your church community: services, gatherings, volunteering, events, donations</td><td class="no">Ceremonies or "sacrament" offered with a controlled substance, or retreats built around one</td></tr>
+<tr><td class="ok2">Education, harm-reduction awareness and advocacy that doesn't sell or encourage use</td><td class="no">Anything that encourages drug use, or images of drug use or paraphernalia</td></tr>
+<tr><td class="ok2">Merch, apparel, art, books, event décor and rentals</td><td class="no">Claims that a product treats, cures or prevents anything ("heals anxiety", "cures depression")</td></tr>
+<tr><td class="ok2">CBD: Meta only, with prior written OK from Meta + LegitScript certification, US only, 18+</td><td class="no">THC / psychoactive cannabis products (Meta)</td></tr>
+</table>
+<h3>Words to avoid in ads and on the landing page</h3>
+<p class="s" style="margin:0">cure, treat, heal (a condition), anxiety, depression, PTSD, addiction recovery (as a product promise), dose, microdose, trip, psychedelic, magic, shrooms, plant medicine, sacrament (next to a product), "legal high", before/after.</p>
+<h3>Say this instead</h3>
+<p class="s" style="margin:0">"Organic lion's mane, grown in Sacramento", "a daily ritual", "earthy, nutty flavor", "join us Sunday", "community", "made by hand". Describe the product and the people, never a health result.</p>
+<h3>The landing page must match the ad</h3>
+<p class="s" style="margin:0">Meta and TikTok review the page your ad links to, not only the ad. If the ad is for lion's mane but the shop also sells anything from the ⛔ column, the ad can be rejected and the account flagged. Use a <b>separate, clean shop page</b> for advertised products.</p>
+<p class="note">Sources (checked Oct 13, 2026): <a href="https://transparency.meta.com/policies/ad-standards/restricted-goods-services/drugs-pharmaceuticals/" target="_blank" rel="noopener">Meta Advertising Standards: Drugs &amp; pharmaceuticals</a> (last change Feb 26, 2025) · <a href="https://ads.tiktok.com/business/library/NA_SMB_Ad_Policy_One_Pager.pdf" target="_blank" rel="noopener">TikTok Ads policy, North America one-pager</a> · <a href="https://ads.tiktok.com/help/" target="_blank" rel="noopener">TikTok Ads help center</a>. Neither policy names psilocybin outright: it falls under their illegal / recreational drug bans. Rules change, so we re-check before every campaign.</p>
+</div>
+
+<h2 id="grants">📜 Grants: where the money is, and who qualifies</h2>
+<div class="card warn"><span class="pill r">The big catch</span>
+<p style="margin:8px 0 0">Almost every grant goes to a <b>nonprofit</b> (a 501(c)(3), a church with IRS recognition, or a tribe), <b>not to an LLC</b>. If the church is set up as an LLC, there are two routes: (1) form a nonprofit / get church status recognized, or (2) apply through a <b>fiscal sponsor</b> (an existing nonprofit that receives the grant for your project and takes a small fee, usually 5–10%). We pick the route together after you fill in the private info form below.</p></div>
+<div class="card warn"><span class="pill r">Federal money right now</span>
+<p style="margin:8px 0 0">SAMHSA's 2026 funding notices say grant money <b>can't</b> be used for harm reduction (for example the Tribal Opioid Response and drug-court notices), and the big July 2026 deadlines have passed. Federal tribal programs are limited to federally recognized tribes. So for now, <b>private foundations are the better bet</b>. We'll watch for the 2027 notices.</p></div>
+<div class="card"><h3 style="margin-top:0">Starter list (checked Oct 13, 2026)</h3>
+<p class="note">Amounts and deadlines come from the funder or grant listings and can change: always confirm on the funder's own site before applying.</p>
+<div id="glist"></div></div>
+
+<h2 id="docs">🗂️ Documents grants ask for</h2>
+<div class="card"><p class="s" style="margin-top:0">Check off what you already have. Missing ones become to-dos.</p><ul class="ck" id="doclist"></ul></div>
+<h2>🚧 Things that can block or disqualify a grant</h2>
+<div class="card"><p class="s" style="margin-top:0">Funders ask about these. Check each one once you've looked into it, so nothing surprises us mid-application. Put the details in the private form below, not here.</p><ul class="ck" id="blocklist"></ul></div>
+
+<h2 id="intake">🔒 Your private info (stays on your phone)</h2>
+<div class="card lock"><span class="pill g">Stays on this phone</span>
+<p class="s" style="margin:8px 0 0">What you type here is saved <b>only on this phone</b>. It's never uploaded to the website. When you're ready, tap <b>Send to Anthony</b> and it opens a text or email on your phone with your answers filled in, so you choose what to send.</p>
+<form id="pf" autocomplete="off">
+<label class="fld"><span>Church's legal name (as registered)</span><input name="church"></label>
+<label class="fld"><span>How is the church set up?</span><select name="entity"><option value="">Choose…</option><option>LLC</option><option>Nonprofit corporation, 501(c)(3) letter received</option><option>Nonprofit corporation, no IRS letter yet</option><option>Church (508(c)(1)(A)), no IRS letter</option><option>Not registered yet</option><option>Not sure</option></select></label>
+<label class="fld"><span>State where it's registered + year formed</span><input name="state"></label>
+<label class="fld"><span>Do you have an EIN? (yes/no, don't type the number)</span><input name="ein"></label>
+<label class="fld"><span>Native American Church / tribal affiliation and any documents that show it</span><textarea name="nac"></textarea></label>
+<label class="fld"><span>Annual budget (rough) and who's on the board</span><textarea name="budget"></textarea></label>
+<label class="fld"><span>Any lawsuit, court case, judgment, tax lien or government action now or in the past 5 years? Court, case number, status</span><textarea name="legal"></textarea></label>
+<label class="fld"><span>Anything about the products or ceremonies a funder might ask about legally</span><textarea name="exposure"></textarea></label>
+<label class="fld"><span>The same questions for Sunshine Mushroom Wellness and iDesignEvents (LLC? registered where? in good standing?)</span><textarea name="biz"></textarea></label>
+</form>
+<p class="note" id="pfSaved">Saved on this phone.</p>
+<button class="btn" type="button" id="pfText">💬 Send to Anthony by text</button>
+<button class="btn alt" type="button" id="pfMail">✉️ Send to Anthony by email</button>
+<button class="btn alt" type="button" id="pfClear">🗑️ Clear this form from this phone</button>
+</div>
+
+<h2 id="agent">🤖 Your AI helper (Claude)</h2>
+<p class="s" style="margin-top:0">Copy a prompt, paste it into Claude (inside the right Project), and fill in the [brackets]. We'll set these up in your own Claude account at kickoff. Later we can also set up an automatic <b>weekly grant search</b> that sends you new matches.</p>
+<div id="prompts"></div>
+
+<h2 id="updates">🗞️ Updates</h2>
+<div class="card"><ul class="ck" id="upd"></ul></div>
+
+<h2>💳 Billing</h2>
+<div class="card">
+<table class="tbl" style="font-size:15px">
+<tr><td>✅ Month 1 · Oct 19 – Nov 18</td><td style="text-align:right;font-weight:900;color:#7dffb5">$300 paid</td></tr>
+<tr><td>🗓️ Month 2 · starts Nov 19</td><td style="text-align:right">$300</td></tr>
+</table>
+<p class="note">Zelle to secondshiftai@gmail.com or (424) 309-4068.</p>
+</div>
+
+<h2 id="faq">❓ Questions</h2>
+<div class="card faq" id="faqs"></div>
+
+<h2 id="issue">🛠️ Report a problem or ask for a change</h2>
+<div class="card"><p class="s" style="margin-top:0">Something not working, not right, or not what you wanted? Tell us here. It opens a text to Anthony, and your note is also kept in the list below on this phone.</p>
+<label class="fld"><span>What's it about?</span><select id="isK"><option>Something isn't working</option><option>I'm not happy with something</option><option>Change request</option><option>Billing</option><option>Question</option></select></label>
+<label class="fld"><span>Tell us what happened</span><textarea id="isT"></textarea></label>
+<button class="btn" type="button" id="isSend">Send to Anthony</button>
+<ul class="ck" id="isList"></ul></div>
+
+<button class="btn alt" type="button" onclick="document.querySelectorAll('details').forEach(function(d){d.open=true});window.print()">🖨️ Save as PDF / print</button>
+<a class="btn" href="sms:+14243094068">💬 Text Anthony</a>
+<p class="note" style="text-align:center">Antidote Enterprises LLC dba SousShift AI · secondshiftai@gmail.com · (424) 309-4068<br>We only help with legal products, and every ad follows Meta's and TikTok's ad rules. This app is general guidance, not legal or tax advice.</p>
+</main>
+<script>
+var BEFORE=[
+ ["Sign the agreement and scan it back","This week, at the office. How: sign, take a clear photo of every page (or scan with the Notes app: tap 📎 → Scan Documents), and text or email it to Anthony."],
+ ["Have your logins ready, not written down","Facebook/Instagram (Meta Business), TikTok, your websites and shop. How: make sure you can log in to each one and that 2-step login codes come to your phone. Don't text passwords; we set up access together on Zoom."],
+ ["Gather logos and your best photos","How: make one phone album per business (Green Light Sanctuary, Sunshine Mushroom Wellness, iDesignEvents) with the logo and 10–20 of your best photos."],
+ ["Fill in the private info form below","Church setup, documents, and anything legal a funder might ask about. It stays on your phone until you send it."],
+ ["Decor inventory: any list or old website link","So we can pull every item out and label it (for task 4)."]
+];
+// each task: [emoji, title, goal, [[step, how], ...]]
+var P=[
+["🍄","1 · Brand Sunshine Mushroom Wellness on Meta, TikTok and more, with ads that get approved, and connect the shop","Learn to run the brand yourself, keep every ad inside the rules, and get the online shop connected.",[
+ ["Confirm the product list and split it into \"can advertise\" and \"can't advertise\"","How: list every product. Put each one in the ✅ or ⛔ column of the Ad rules section. Only ✅ products are ever advertised; ⛔ products never appear in ads or on the advertised shop page."],
+ ["Brand kit: name, logo, colors, a one-line bio","How: in Claude (Sunshine project), use the \"Brand kit\" prompt below. Pick 2–3 colors and one font; save them in a note so every post matches."],
+ ["Product photos that pass review","How: natural light, product on a plain surface, no people looking \"high\", no before/after, no medical props. 3 photos per product."],
+ ["Set up the Instagram, Facebook Page and TikTok profiles","How: same name and photo everywhere. Instagram → Settings → Account type → Switch to professional → Business. TikTok → Settings → Account → Switch to Business Account."],
+ ["Set up Meta Business (Business Portfolio) and verify it","How: business.facebook.com → create a Business Portfolio with the business's legal name → add the Page and Instagram → Security Center → Start verification (you'll need the legal name, address, phone, website and a document such as articles or a utility bill in the business name). Turn on 2-step login for every admin."],
+ ["Connect the shop","How: Spotify's shop only works for musicians: a Spotify for Artists profile + a Shopify store, max 250 items. If Sunshine isn't a music artist on Spotify, it doesn't apply, so we use a <b>Shopify</b> store instead (we'll confirm on Monday whether you meant Shopify). Shop products must also follow Meta's commerce rules before they show in Instagram/Facebook Shops."],
+ ["Write ads that get approved","How: use the \"Ad copy checker\" prompt below on every ad before submitting. No health claims, no ⛔ words, age 18+ if anything is wellness-related, and link to the clean shop page."],
+ ["Organic plan for what can't be advertised","How: education and community posts (growing, cooking, events, your story) on your own profiles, without selling ⛔ items or encouraging use. Reels/TikToks 3×/week, 1 story a day."],
+ ["Launch: first posts + a small test ad","How: 9 posts on the grid before any ad. Then one ad, $5–10/day for 5 days, Sacramento area, 18+. If it's rejected, don't resubmit the same thing: send Anthony the rejection screen."]]],
+["⛪","2 · Claude helps run Meta-approved posts and ads for Green Light Sanctuary on Facebook + Instagram, plus marketing","Posts and ads for the church that get approved, plus simple marketing you can keep up.",[
+ ["Check the Facebook Page, Instagram and Meta Business account are set up and connected","How: business.facebook.com → Settings → Accounts → Pages and Instagram accounts. Both should be listed. If not, tap Add."],
+ ["Pick the right ad category","How: church services, community and events are normal ads. If an ad is about a social issue (e.g. drug policy advocacy) Meta requires the \"Social issues, elections or politics\" category with ID verification and a \"Paid for by\" line."],
+ ["Brand kit: logo, colors, 3 message themes","How: \"Brand kit\" prompt below (Green Light project). Example themes: community, service, gatherings."],
+ ["30-day content calendar","How: \"30-day calendar\" prompt below. Claude drafts, you approve, then schedule in Meta Business Suite → Planner."],
+ ["First small test ad","How: Boost your best-performing post, $5/day for 5 days, people within 25 miles of Sacramento. Ads never mention ceremonies with controlled substances."],
+ ["Weekly check-in","How: every Monday, Meta Business Suite → Insights. Note reach, new followers and messages; we keep what worked and drop what didn't."]]],
+["📜","3 · Find and apply for Native American Church / harm-reduction grants","Find grants that fit the church and harm-reduction work, get eligible, and apply.",[
+ ["Fill in the private info form","How: the 🔒 section below. It tells us which route you're on (nonprofit, church, LLC + fiscal sponsor)."],
+ ["Decide the route: nonprofit, church recognition, or fiscal sponsor","How: most grants exclude LLCs. If the church is an LLC, we compare forming a nonprofit vs. using a fiscal sponsor (faster, small fee) on Monday."],
+ ["Collect the documents","How: the 🗂️ checklist below. Scan each one into one folder named \"Grant docs\"."],
+ ["Clear the blockers","How: the 🚧 checklist below. Anything open (a case, a lien, a missing filing) gets a plan before we apply."],
+ ["Register on SAM.gov (for federal grants only)","How: sam.gov → Get Started → register the entity to get a UEI. It's free (never pay a website for it) and can take several weeks, so start early once you have nonprofit status."],
+ ["Pick the top 3–5 grants","How: from the starter list + the weekly grant search. Fit first, deadline second."],
+ ["Write the applications","How: \"Grant writer\" prompt below. Claude drafts each section, you review, correct anything that's not 100% true, and sign."],
+ ["Submit and track","How: note each one in the Updates list (funder, date sent, amount, follow-up date). Most funders take 2–4 months."]]],
+["💐","4 · iDesignEvents: rebrand or sell?","20+ years of wedding décor: decide whether to rebrand, rent it out or sell, then do it.",[
+ ["Answer the 5 questions first","How: (1) Do you still want to do events? (2) How many hours a week can you give it? (3) Do you need a lump sum now, or monthly income? (4) Who owns the name, domain and social accounts? (5) Is there a client list and are you allowed to transfer it?"],
+ ["Inventory: pull every item out and label it","How: name, photo, size, quantity, condition, what you paid. A shared spreadsheet; Claude can build it from your photos."],
+ ["Value it","How: (a) décor: resale value, usually a fraction of what you paid; (b) the business: domain, social accounts, templates, client list and reviews are what buyers pay for. Online businesses usually sell for a multiple of yearly profit, so a business with little current profit sells mostly as inventory."],
+ ["If you SELL","How: sell the décor in lots (Facebook Marketplace, local wedding planners, rental companies) and list the brand (domain + socials + site) on a marketplace such as Flippa. Empire Flippers usually wants businesses with steady monthly profit."],
+ ["If you REBRAND or RENT","How: check the new name and domain are free (e.g. rentmywedding.com), move the socials to the new name, build a catalog site with prices and a booking form, then announce to past clients and planners."],
+ ["Decide and set a date","How: we run the numbers on each path together, then you choose. Write the decision and date in Updates."]]],
+["📦","Extra idea: national shipping for church products","Explore shipping nationwide.",[
+ ["List the products and confirm each one is legal to ship everywhere you'd sell","How: every state's rules differ; anything controlled can't ship. We check each item before any shop listing."],
+ ["Shipping costs, packaging and a shop checkout","How: weigh one of each item, price it on Pirate Ship or USPS, add to the shop."],
+ ["Decide go or no-go","How: only if the numbers work and every item is clearly legal to ship."]]],
+["🍬","Extra idea: the gummy business","Look at the proposal before spending money.",[
+ ["Get the full proposal details","How: who, what ingredients, costs, who manufactures."],
+ ["Check licensing and rules for the product and your state","How: food/manufacturing license, labeling rules, and whether it can be advertised (see Ad rules)."],
+ ["Simple numbers: cost, price, profit","How: Claude can build the sheet from the proposal."],
+ ["Decide go or no-go","How: only with clear licensing and positive numbers."]]]
+];
+var GR=[
+ {n:"Comer Family Foundation: syringe services & community harm reduction",u:"https://platform.grantexec.com/grants/96ac7198-40ca-4ad5-a784-65b1672b6382-syringe-services-community-based-harm-reduction",el:"501(c)(3) nonprofits; fiscal sponsors welcome; budget under $600k; syringe programs must have run 1 full year",amt:"Listings conflict: $2,500–$20,000 or $10,000–$100,000",dl:"Nov 1, 2026 (per listing)",fit:"Best current match if the church runs real harm-reduction services. Confirm on the foundation's site."},
+ {n:"AIDS United: Harm Reduction Futures Fund (Round 17)",u:"https://aidsunited.org/new-funding-available-for-harm-reduction-organizations/",el:"Syringe services programs providing direct services; past rounds required 501(c)(3) and budget under $1.5M",amt:"See the round's request",dl:"Pre-application survey posted Aug 2026: check the current date",fit:"Only if you provide direct syringe services. No advocacy grants this round."},
+ {n:"First Nations Development Institute",u:"https://www.firstnations.org/",el:"Native-controlled nonprofits (most of the board and leaders Native), tribal programs, Native community groups",amt:"About $10,000–$40,000 on recent food-sovereignty grants",dl:"Recurring yearly; the 2026 food grant closed Mar 17, 2026",fit:"Good if the organization is Native-led. Watch their RFP page for the next cycle."},
+ {n:"Riverstyx Foundation / Indigenous Peyote Conservation Initiative (IPCI)",u:"https://kvia.com/news/2024/12/26/peyote-sacred-to-native-americans-threatened-by-psychedelic-renaissance-and-development/",el:"Relationship-based philanthropy focused on peyote conservation and Indigenous medicine",amt:"Not published",dl:"No open call found",fit:"Networking target for NAC work, not an open application. (Source: 2024 AP report.)"},
+ {n:"SAMHSA (federal)",u:"https://www.samhsa.gov/grants/grant-announcements/ti-26-019",el:"Nonprofits incl. faith-based; tribal programs only for federally recognized tribes; needs SAM.gov/UEI",amt:"Overdose-prevention notice: up to about $850k/yr (per summaries)",dl:"FY2026 deadlines passed (Jul 13 and Jul 27, 2026)",fit:"Low for now: 2026 notices bar harm-reduction spending. Watch for FY2027."},
+ {n:"NDN Collective · Seventh Generation Fund",u:"https://ndncollective.org/",el:"Indigenous-led grantmakers",amt:"Varies",dl:"Not checked yet",fit:"To research next (also 7genfund.org). Not verified in this pass."},
+ {n:"Grants.gov + California grants portal",u:"https://www.grants.gov/search-grants",el:"Search: harm reduction, Native American, faith-based, Sacramento",amt:"Varies",dl:"Rolling",fit:"Where the weekly grant search looks. Also grants.ca.gov for state money."}
+];
+var DOCS=["Legal entity type confirmed (LLC, nonprofit corporation, or church)","EIN letter from the IRS (CP 575 or 147C)","Articles of incorporation / organization (filed with the state)","Bylaws (nonprofit/church) or operating agreement (LLC)","Certificate of good standing from the state (CA Secretary of State; Franchise Tax Board for CA)","IRS 501(c)(3) determination letter, or a fiscal sponsor agreement","Board list (names, roles) and a conflict-of-interest policy","This year's budget + last year's income and expenses","Mission statement and a one-page description of the programs","Letters of support (community partners, tribal or NAC leaders)","Documentation of Native American Church / tribal affiliation, where relevant","SAM.gov registration + UEI (federal grants only)","Insurance certificate (some funders ask)"];
+var BLOCK=["Pending lawsuits or court cases involving the church, the businesses or the leaders","Judgments or unpaid court orders","Tax liens or unfiled tax returns (IRS or California FTB)","Federal debarment or exclusion (check sam.gov → Search → Exclusions)","Controlled-substance legal exposure (what the church does and how it's protected legally)","State filing status: suspended or not in good standing","Conflicts of interest (board members paid by the organization)"];
+var PROMPTS=[
+ ["🔎 Weekly grant scout","Grants project","You are my grant researcher. My organization: [church legal name], a [entity type] in [state], doing [Native American Church community work / harm reduction: describe]. Budget about $[amount].\nSearch for grants open now or opening in the next 90 days that fit. For each one give: funder, program name, link to the funder's own page, who's eligible (entity type, location, Native-led or not), amount, deadline, and a 1–10 fit score with one sentence why.\nRules: only list grants you can link to on the funder's site; say \"not verified\" if you can't confirm a detail; flag any that exclude LLCs, exclude harm reduction, or require 501(c)(3)/SAM.gov."],
+ ["✍️ Grant writer","Grants project","Help me draft an application for [funder + program, paste the link]. Here are the questions: [paste]. Here are my facts: [paste mission, programs, numbers]. Write each answer in plain, warm, specific language, inside the word limits. Never invent numbers, partners or results: leave [FILL IN] where you need a fact from me. End with a checklist of attachments they ask for."],
+ ["🛡️ Ad copy checker","Sunshine / Green Light projects","Check this ad against Meta's and TikTok's current ad policies before I submit it. Ad text: [paste]. Image: [describe]. Landing page: [link/describe]. Flag anything that could be rejected: health or medical claims, drug references, before/after, wording that implies an effect, or a landing page that sells restricted items. Then rewrite it so it stays honest and passes review. If the product itself can't be advertised, say so plainly instead of rewording it."],
+ ["🎨 Brand kit","each business project","Make a simple brand kit for [business]: who it's for, a one-line bio for Instagram and TikTok, 3 message themes, a color palette (hex codes), font pairing, tone of voice (5 do's and 5 don'ts), and 10 post ideas. Keep everything inside Meta's and TikTok's ad rules: no health claims."],
+ ["🗓️ 30-day calendar","each business project","Make a 30-day content calendar for [business] on Instagram, Facebook and TikTok: date, format (Reel, carousel, story), hook, caption, hashtags, and call to action. 3 Reels a week. Mark which posts are good to boost as ads. No health claims and no drug references."],
+ ["💐 iDesignEvents: rebrand or sell","iDesignEvents project","Here's my décor inventory: [paste or photos] and my answers to the 5 questions: [paste]. Compare three paths (sell everything, rent it out under a new brand, keep and rebrand) with rough numbers, time needed per week, and risks. Then give a step-by-step plan for the path that fits my answers."]
+];
+var UPD=[
+ ["Oct 13","Your plan is updated with your 4 tasks, the ad rules, a starter grant list and the documents checklist"],
+ ["Oct 12","Payment received, kickoff booked for Mon Oct 19, 11:00 AM on Zoom"]
+];
+var FAQ=[
+ ["Can we advertise the mushroom products?","Culinary and functional mushrooms (like lion's mane), yes, with no health claims. Psilocybin or any psychedelic, no, on any platform, even with careful wording. See Ad rules."],
+ ["What if an ad gets rejected?","Don't resubmit the same ad and don't argue it with a lot of appeals. Send Anthony a screenshot of the rejection. Repeated rejections can restrict the whole account."],
+ ["Can an LLC get grants?","Rarely. Most grants require a nonprofit, a recognized church, or a tribe. The fast route is a fiscal sponsor: an existing nonprofit that takes the grant for your project for a small fee."],
+ ["Is my private info safe in this app?","The private form saves only on your phone. Nothing is uploaded to the website. It's only sent if you tap Send and choose to send the text or email."],
+ ["Does the Spotify shop work for us?","Only if the business is a music artist with a Spotify for Artists profile: Spotify sells artists' merch through Shopify. Otherwise we use a regular Shopify store."],
+ ["How do I reach Anthony?","Text (424) 309-4068 or email secondshiftai@gmail.com. Kickoff is Monday Oct 19 at 11:00 AM on Zoom."]
+];
+var KEY="vv-plan-v2", st={}; try{ st=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){}
+function save(){ try{localStorage.setItem(KEY,JSON.stringify(st));}catch(err){} }
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+function how(t){ return esc(t).replace(/^How:/,"<b>How:</b>").replace(/&lt;b&gt;(.*?)&lt;\/b&gt;/g,"<b>$1</b>"); }
+function li(id,title,sub){ return "<li><input type='checkbox' id='"+id+"'><label for='"+id+"'><b>"+esc(title)+"</b>"+(sub?"<small>"+how(sub)+"</small>":"")+"</label></li>"; }
+document.getElementById("before").innerHTML=BEFORE.map(function(b,i){ return li("b"+i,b[0],b[1]); }).join("");
+document.getElementById("projects").innerHTML=P.map(function(p,i){
+ return "<details class='pj'"+(i===0?" open":"")+"><summary><span class='em'>"+p[0]+"</span><span>"+esc(p[1])+"</span><span class='ct' id='ct"+i+"'></span></summary><p class='s' style='margin:0 0 4px'>"+esc(p[2])+"</p><a class='rkl' href='#"+(i<4?"risk-"+i:"risks")+"'>⚠️ Read the warnings for this "+(i<4?"task":"idea")+" first</a><ul class='ck'>"+p[3].map(function(t,j){ return li("p"+i+"_"+j,t[0],t[1]); }).join("")+"</ul></details>"; }).join("");
+document.getElementById("glist").innerHTML=GR.map(function(g){ return "<div style='border-top:1px solid var(--edge);padding:10px 0'><b><a href='"+g.u+"' target='_blank' rel='noopener'>"+esc(g.n)+"</a></b><div class='note'><b>Who:</b> "+esc(g.el)+"<br><b>Amount:</b> "+esc(g.amt)+" · <b>Deadline:</b> "+esc(g.dl)+"</div><div class='s' style='font-size:14px'>"+esc(g.fit)+"</div></div>"; }).join("");
+document.getElementById("doclist").innerHTML=DOCS.map(function(d,i){ return li("d"+i,d); }).join("");
+document.getElementById("blocklist").innerHTML=BLOCK.map(function(d,i){ return li("k"+i,d,"Checked and noted in the private form"); }).join("");
+document.getElementById("prompts").innerHTML=PROMPTS.map(function(p,i){ return "<details class='pj'><summary><span>"+esc(p[0])+"</span><span class='ct'>"+esc(p[1])+"</span></summary><pre class='pr' id='pr"+i+"'>"+esc(p[2])+"</pre><button class='btn sm' type='button' data-copy='"+i+"'>📋 Copy prompt</button></details>"; }).join("");
+document.getElementById("upd").innerHTML=UPD.map(function(u){ return "<li class='fixed'><i>•</i><label><b>"+esc(u[1])+"</b><small>"+esc(u[0])+"</small></label></li>"; }).join("");
+document.getElementById("faqs").innerHTML=FAQ.map(function(f){ return "<details><summary>"+esc(f[0])+"</summary><p class='s' style='margin:6px 0 0'>"+esc(f[1])+"</p></details>"; }).join("");
+function paint(){ var all=document.querySelectorAll(".ck input"),n=0;
+ all.forEach(function(c){ c.checked=!!st[c.id]; c.closest("li").classList.toggle("done",c.checked); if(c.checked)n++; });
+ P.forEach(function(p,i){ var d=p[3].filter(function(t,j){return st["p"+i+"_"+j];}).length; document.getElementById("ct"+i).textContent=d+"/"+p[3].length; });
+ var tot=all.length+3, done=n+3; document.getElementById("bar").style.width=Math.round(100*done/tot)+"%"; document.getElementById("pct").textContent=done+" of "+tot+" steps done"; }
+document.addEventListener("change",function(e){ if(e.target.type!=="checkbox"||!e.target.id)return; st[e.target.id]=e.target.checked; save(); paint(); });
+document.addEventListener("click",function(e){ var b=e.target.closest("[data-copy]"); if(!b)return; var t=document.getElementById("pr"+b.getAttribute("data-copy")).textContent;
+ (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){ b.textContent="✅ Copied"; setTimeout(function(){b.textContent="📋 Copy prompt";},1600); },function(){ var r=document.createRange(); r.selectNodeContents(document.getElementById("pr"+b.getAttribute("data-copy"))); var s=getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent="Selected: tap Copy"; }); });
+paint();
+// warnings: a link to #risk-N opens that section
+function openRisk(){ var h=location.hash.slice(1); if(!/^risk-\d$/.test(h))return; var d=document.getElementById(h); if(d){ d.open=true; d.scrollIntoView(); } }
+window.addEventListener("hashchange",openRisk); openRisk();
+document.addEventListener("click",function(e){ var a=e.target.closest("a.rkl"); if(!a)return; var h=a.getAttribute("href").slice(1), d=document.getElementById(h); if(d&&d.tagName==="DETAILS"){ d.open=true; } });
+// private intake: localStorage only, never sent anywhere unless she taps Send (opens her own SMS/email app)
+var PK="vv-private-v1", pf=document.getElementById("pf"), pv={}; try{ pv=JSON.parse(localStorage.getItem(PK))||{}; }catch(e){}
+Array.prototype.forEach.call(pf.elements,function(el){ if(el.name&&pv[el.name]) el.value=pv[el.name]; });
+pf.addEventListener("input",function(){ Array.prototype.forEach.call(pf.elements,function(el){ if(el.name) pv[el.name]=el.value; }); try{localStorage.setItem(PK,JSON.stringify(pv));}catch(e){} document.getElementById("pfSaved").textContent="Saved on this phone ✓"; });
+function body(){ var L=[]; Array.prototype.forEach.call(pf.elements,function(el){ if(el.name&&el.value.trim()){ var lab=el.closest("label").querySelector("span").textContent; L.push(lab+": "+el.value.trim()); } }); return "Veronika's grant info\n\n"+(L.join("\n\n")||"(nothing filled in yet)"); }
+document.getElementById("pfText").onclick=function(){ location.href="sms:+14243094068"+(/iPhone|iPad|iPod/.test(navigator.userAgent)?"&":"?")+"body="+encodeURIComponent(body()); };
+document.getElementById("pfMail").onclick=function(){ location.href="mailto:secondshiftai@gmail.com?subject="+encodeURIComponent("Veronika: grant info")+"&body="+encodeURIComponent(body()); };
+document.getElementById("pfClear").onclick=function(){ pf.reset(); pv={}; try{localStorage.removeItem(PK);}catch(e){} document.getElementById("pfSaved").textContent="Cleared from this phone."; };
+// report a problem: opens a text; the note is also kept on this phone
+var IK="vv-issues-v1", iss=[]; try{ iss=JSON.parse(localStorage.getItem(IK))||[]; }catch(e){}
+function paintIs(){ document.getElementById("isList").innerHTML=iss.map(function(x){ return "<li class='fixed'><i>✉</i><label><b>"+esc(x.k)+"</b><small>"+esc(x.d)+" · "+esc(x.t)+"</small></label></li>"; }).join(""); }
+document.getElementById("isSend").onclick=function(){ var k=document.getElementById("isK").value, t=document.getElementById("isT").value.trim(); if(!t){ document.getElementById("isT").focus(); return; }
+ iss.unshift({k:k,t:t,d:new Date().toLocaleDateString()}); try{localStorage.setItem(IK,JSON.stringify(iss));}catch(e){} paintIs(); document.getElementById("isT").value="";
+ location.href="sms:+14243094068"+(/iPhone|iPad|iPod/.test(navigator.userAgent)?"&":"?")+"body="+encodeURIComponent("Veronika: "+k+"\n"+t); };
+paintIs();
+</script></body></html>

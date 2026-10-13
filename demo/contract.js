@@ -7,7 +7,8 @@
    Three clauses are ON by default for every new agreement (2026-10-10), each with its own switch in the form:
      2A Performance share: pct% (10) of ALL App-Attributed Sales in a calendar month they exceed threshold ($3,000);
         food + non-alcoholic only, no tax, tips or alcohol. Tracked by demo/crm.js ("Ring up a member" + "App sales").
-     3A 90-day results check: cancel with 30 days' notice if under N (12) tracked return visits a month by day 90.
+     3A Results promise (2026-10-11): if in the first 3 months after Go-Live there's no 30-day period with N (30) tracked
+        return visits, the next 2 monthly payments are waived. Same text as clauses() in make_contract.py.
      5A Customer data: full access while paying, complete export within 10 days of termination, no collection after.
    CONFIG.locations = ["Melody Bar and Grill", "Nalu Vida"] (2+ names) makes the threshold apply per restaurant.
    Draft wording: not legal advice; have a California business attorney review it. */
@@ -19,12 +20,10 @@
   var PROVIDER = { name: "Anthony Louis Suggs Jr.", email: "antidotethecure@gmail.com",
                    co: "Antidote Enterprises LLC, doing business as SousShift AI" };
   var PRESETS = {
-    // Pricing v4 (2026-10-09). Full package: car-style plans, less down = higher monthly for 12 months, then $400.
-    full:     { label: "Full · $2,500 down", plan: "Full", setup_list: 2500, monthly_list: 400, sd: 0, md: 0, months: 0, minimum: 0, upfront: 100, intro: 0, intro_months: 0 },
-    half:     { label: "Full · half down $1,250", plan: "Full, half down", setup_list: 1250, monthly_list: 400, sd: 0, md: 0, months: 0, minimum: 12, upfront: 100, intro: 525, intro_months: 12 },
-    starter:  { label: "Full · starter $500", plan: "Full, starter", setup_list: 500, monthly_list: 400, sd: 0, md: 0, months: 0, minimum: 12, upfront: 100, intro: 600, intro_months: 12 },
-    core:     { label: "Core · $2,000 + $300", plan: "Core", setup_list: 2000, monthly_list: 300, sd: 0, md: 0, months: 0, minimum: 0, upfront: 100, intro: 0, intro_months: 0 },
-    founding: { label: "Founding · Full at Core price", plan: "Full (founding)", setup_list: 2500, monthly_list: 400, sd: 20, md: 25, months: 0, minimum: 3, upfront: 50, intro: 0, intro_months: 0 }
+    // Pricing v5 (Antidote, 2026-10-11), per restaurant. Keep in sync with app/data.js + the contract skill.
+    basic:  { label: "Basic · $3,000 + $350", plan: "Basic", setup_list: 3000, monthly_list: 350, sd: 0, md: 0, months: 0, minimum: 3, upfront: 50, intro: 0, intro_months: 0 },
+    growth: { label: "Growth · $3,500 + $650", plan: "Growth", setup_list: 3500, monthly_list: 650, sd: 0, md: 0, months: 0, minimum: 3, upfront: 50, intro: 0, intro_months: 0 },
+    dfy:    { label: "Done-for-you · $4,000 + $950", plan: "Done-for-you", setup_list: 4000, monthly_list: 950, sd: 0, md: 0, months: 0, minimum: 3, upfront: 50, intro: 0, intro_months: 0 }
   };
   var SCOPE = [
     "A mobile menu page with Client's real menu, prices, hours, call and directions buttons",
@@ -32,7 +31,8 @@
     "A weekly prize board with Client-chosen prizes, reset every week",
     "QR table tents for Client's tables (one print run included)",
     "Hosting, security updates, menu and price updates on request, and support",
-    "Full package only: customer referral program, scan-to-earn points at the register, nearby-customer alerts, and text campaigns to opted-in customers (up to 2,000 texts per month)"
+    "Growth and Done-for-you plans: Google review prompts, nearby-customer alerts, the AI Text Assistant, automatic birthday, win-back and holiday texts to opted-in customers, and missed-call text-back",
+    "Done-for-you plan only: the AI Voice Host, and Provider runs Client's texting and marketing"
   ];
 
   var css = [
@@ -100,8 +100,8 @@
     '<label>Clauses (on by default)</label>' +
     '<label class="ck"><input type="checkbox" name="ps" checked> 2A Performance share</label>' +
     '<div class="row"><div><label>Share %</label><input name="ps_pct" type="number" min="0" max="100" value="10"></div><div><label>Over $ / month</label><input name="ps_th" type="number" min="0" value="3000"></div></div>' +
-    '<label class="ck"><input type="checkbox" name="rc" checked> 3A 90-day results check</label>' +
-    '<label>Return visits a month needed</label><input name="rc_n" type="number" min="0" value="12">' +
+    '<label class="ck"><input type="checkbox" name="rc" checked> 3A Results promise (2 months free if not met)</label>' +
+    '<label>Tracked return visits in a 30-day period</label><input name="rc_n" type="number" min="0" value="30">' +
     '<label class="ck"><input type="checkbox" name="cd" checked> 5A Customer data</label>' +
     '<label class="ck"><input type="checkbox" name="dx" checked> Founding discount expires if setup not paid in 3 business days (−$100/day to regular)</label>' +
     '<label>Special terms</label><textarea name="special" rows="3" placeholder="Anything you agreed that is not above"></textarea>' +
@@ -135,7 +135,7 @@
         '<p>"App-Attributed Sales" means sales to customers who join, engage with or come back through the App: (a) orders placed through the App, and (b) purchases at Client\'s register where the customer is identified through the App, because the customer shows their member QR code or code, staff enter the member\'s phone number, or the customer redeems an App reward, promo code or points. App-Attributed Sales count food and non-alcoholic beverage sales only. They exclude sales tax, tips and gratuities, and all alcoholic beverages. Client\'s other sales are never included.</p>' +
         '<p>Provider will send Client a statement by the 5th day of each month for the month before, listing each App-Attributed sale (date, receipt number, member, how the member was identified, and the amount counted). Client may dispute a statement in writing within 10 days of receiving it, and the parties will reconcile the disputed items against Client\'s register (POS) reports in good faith. Payment is due within 15 days of the statement date; a disputed amount is due within 15 days after it is resolved.</p>';
     }
-    if (rc) c.s3a = '<h2>3A. 90-day results check</h2><p>If, by day 90 after Go-Live, the App is not bringing back at least ' + n + ' tracked return visits a month' + (ps && many ? ' across the restaurants covered by this Agreement' : '') + ', Client may cancel the monthly plan by giving 30 days\' written notice (email counts), even during a minimum term. A "tracked return visit" is a visit by a customer identified through the App (an App order, the member\'s QR code or code, the member\'s phone number, or an App reward or promo code) on a later day than that customer\'s first visit. The count comes from the App\'s records for the most recent full calendar month, which Client can see in its owner view. Fees already paid, including the setup fee, are not refunded.</p>';
+    if (rc) c.s3a = '<h2>3A. Results promise</h2><p>Provider\'s goal is for the App to bring back at least ' + n + ' tracked return visits' + (ps && many ? ' across the restaurants covered by this Agreement' : '') + ' within a 30-day period. If, during the first 3 months after Go-Live, there is no 30-day period in which the App brought back at least ' + n + ' tracked return visits' + (ps && many ? ' across the restaurants covered by this Agreement' : '') + ', Provider will give Client 2 months of service free: the next 2 monthly payments after that 3-month period are waived. A "tracked return visit" is a visit by a customer identified through the App (an App order, the member\'s QR code or code, the member\'s phone number, or an App reward or promo code) on a later day than that customer\'s first visit. The count comes from the App\'s records, which Client can see in its owner view. This credit is Client\'s only remedy under this Section. It is not a promise of any particular sales or revenue, and fees already paid, including the setup fee, are not refunded.</p>';
     if (cd) {
       c.cancel = "If Client cancels, Client's customer data is handled as described in Section 5A.";
       c.s5a = '<h2>5A. Customer data</h2><p><b>While Client is paying.</b> While Client is paying for the service, Client has full access to all customer information collected through the App, including names, phone numbers, email addresses, visit and points history, and the export (CSV) of that list.</p>' +
@@ -163,7 +163,7 @@
     var sn = sl * (1 - sd / 100), mn = ml * (1 - md / 100);
     var intro = num("intro"), introM = Math.round(num("intro_months"));
     if (!(intro > 0 && introM > 0)) { intro = 0; introM = 0; }
-    var full = PRESETS.full;
+    var full = PRESETS.basic;
     var today = new Date(), ymd = "" + today.getFullYear() + String(today.getMonth() + 1).padStart(2, "0") + String(today.getDate()).padStart(2, "0");
     var party = v("legal") && v("legal") !== BIZ ? e(v("legal")) + ", doing business as " + e(BIZ) : e(BIZ);
     var pay = up >= 100 ? "The full setup fee (" + money(sn) + ") is due when this Agreement is signed."
@@ -205,7 +205,7 @@
     S.innerHTML = "Setup <b>" + money(sn) + "</b>" + (sd ? " (was " + money(sl) + ")" : "") + " · " + up + "% today = <b>" + money(sn * up / 100) + "</b><br>" +
       "Monthly <b>" + (intro ? money(intro) + "</b> × " + introM + ", then <b>" + money(mn) + "</b>" : money(mn) + "</b>") + (md && months ? " × " + months + ", then " + money(ml) : "") + (minimum ? " · " + minimum + "-month minimum" : "") +
       (F.ps.checked ? "<br>Performance share <b>" + num("ps_pct") + "%</b> of app sales in a month over <b>" + money(num("ps_th")) + "</b>" : "") +
-      (F.rc.checked ? " · 90-day check (" + Math.round(num("rc_n")) + " returns/mo)" : "") + (F.cd.checked ? " · customer-data clause" : "") + (DX.sec ? " · discount expires after 3 business days unpaid" : "");
+      (F.rc.checked ? " · results promise (" + Math.round(num("rc_n")) + " returns in 30 days, else 2 months free)" : "") + (F.cd.checked ? " · customer-data clause" : "") + (DX.sec ? " · discount expires after 3 business days unpaid" : "");
     D.querySelectorAll("canvas[data-sig]").forEach(pad);
   }
 
@@ -240,6 +240,6 @@
   };
   function open() { o.classList.add("on"); document.body.style.overflow = "hidden"; render(); }
   k.querySelector("button").onclick = open;
-  preset("full");
+  preset("basic");
   if (location.hash === "#contract") open();
 })();

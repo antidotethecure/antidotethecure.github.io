@@ -256,14 +256,14 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
     <div class="sub" id="rank">Flight complete</div>
     <div id="final">0 pts</div>
     <div id="won"></div>
-    <div id="post" class="seat" style="margin:12px auto 0;max-width:360px;text-align:left">
+    <div id="post" class="seat" style="display:none;margin:12px auto 0;max-width:360px;text-align:left"><!-- replaced by the billboard.js score sheet; kept for the old ids -->
       <b style="display:block;margin-bottom:6px">🏆 Put your score on the board</b>
       <input id="bn" maxlength="16" placeholder="Name on the board" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--edge);background:#0b1220;color:var(--ink);font:600 15px var(--body)">
       <input id="big" maxlength="31" placeholder="@instagram (optional, so people can follow you)" autocapitalize="none" style="width:100%;margin-top:8px;padding:11px;border-radius:10px;border:1px solid var(--edge);background:#0b1220;color:var(--ink);font:600 15px var(--body)">
       <button class="btn hot" type="button" id="bpost" style="width:100%;justify-content:center;margin-top:8px">Post my score</button>
       <div class="now" id="bmsg"></div>
     </div>
-    <div class="btns"><button class="btn hot" type="button" id="again">✈️ Fly again</button><a class="btn" href="#points">Point values</a></div>
+    <div class="btns"><button class="btn hot" type="button" id="again">✈️ Re-fly</button><button class="btn" type="button" id="bbopen">🏆 Billboard</button><a class="btn" href="#points">Point values</a></div>
   </div>
   <div id="points"></div>
 </div>
@@ -2249,11 +2249,17 @@ function end(){
   if(window.SSAI_INTERIM&&!G.debug){ var ex=document.createElement("div"); ex.innerHTML=SSAI_INTERIM.explainerHTML(1); var old=$("over").querySelector(".ir-endx"); if(old) old.remove(); ex.className="ir-endx"; $("won").insertAdjacentElement("afterend",ex); }
   if(window.ReviewEgg) ReviewEgg.endCard($("over"),$("post"));
   $("over").classList.add("on");
+  // the score sheet (billboard.js): input frozen ~1.2 s, Post / Skip before Re-fly, canvas taps can't restart under it
+  if(window.MelBoard) MelBoard.over({run:G.runId,mode:sv?"survival":"campaign",score:G.score,survMs:G.surv,lvl:G.lvl,debug:!!G.debug,won:!!G.won,rankText:$("rank").textContent});
 }
 /* ---- weekly leaderboard (shared with the bowling site's score service, its own board) ---- */
 var BAPI="https://drizzle-bowl-scores.higgsfield.app/api/game-scores", BGAME="melody", BGAME_S="melody-survival";   // two weekly boards: campaign score, survival seconds
 var BTAB=MODE==="survival"?"s":"c";
 function wkey(off){ var d=new Date(); d.setDate(d.getDate()-((d.getDay()+6)%7)-7*(off||0)); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+/* billboard.js (the game-over score sheet + the billboard) posts to these same two boards; members only, see that file */
+window.MELODY_BB={api:BAPI,game:BGAME,gameS:BGAME_S,wkey:function(){ return wkey(); },
+  refly:function(){ SND.unlock(); replay(); try{ cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); }catch(e){} },
+  posted:function(rec,tab){ if(rec&&rec.run===G.runId) G.posted=G.runId; BTAB=tab; loadBoard(); }};
 function loadBoard(){ $("bweek").textContent="Week of "+wkey(); var tab=BTAB, sv=tab==="s";
   [].forEach.call(document.querySelectorAll("[data-btab]"),function(x){ x.setAttribute("aria-pressed",x.getAttribute("data-btab")===tab?"true":"false"); });
   fetch(BAPI+"?game="+(sv?BGAME_S:BGAME)+"&week="+wkey()).then(function(r){return r.json();}).then(function(rows){ if(tab!==BTAB) return;
@@ -2287,7 +2293,7 @@ function alertBox(t){ var d=document.createElement("div"); d.className="ok"; d.s
 
 window.__MG={get:function(){return G;},start:function(){start();},end:function(){ if(G.running) end(); },W:W,H:H,mode:function(m){ if(m) setMode(m); return MODE; },attract:function(on){ ATT=on?1:0; },LV:LV,BOSS_AT:BOSS_AT};
 window.MELODY_MODE=function(m){ if(m) setMode(m); return MODE; };
-window.MELODY_START=function(){ SND.unlock(); if(!G.running) start(); try{ cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); }catch(e){} };   // the shared start menu's PLAY
+window.MELODY_START=function(){ SND.unlock(); if(window.MelBoard&&MelBoard.blocking()) return; if(!G.running) start(); try{ cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); }catch(e){} };   // the shared start menu's PLAY
 requestAnimationFrame(frame);
 // steer: press/drag anywhere on the game and the plane glides to your finger (on touch it rides ~70 px above your thumb so
 // you can see it). Arrow keys / WASD accelerate and coast smoothly. The motion itself lives in steer() (dt-based, 60 fps or not)
@@ -2295,7 +2301,7 @@ var drag=null;
 function replay(){ start(); }   // play before registering: no member gate, no tokens (Christian, 2026-10)
 function aim(e){ var r=cv.getBoundingClientRect(), x=(e.clientX-r.left)*W/r.width, y=(e.clientY-r.top)*H/r.height, off=e.pointerType==="mouse"?0:-70;
   G.tx=Math.max(30,Math.min(W-30,x)); G.ty=Math.max(H*.32,Math.min(H-50,y+off)); }
-cv.addEventListener("pointerdown",function(e){ e.preventDefault(); SND.unlock(); if(!G.running){ replay(); return; }
+cv.addEventListener("pointerdown",function(e){ e.preventDefault(); SND.unlock(); if(!G.running){ if(window.MelBoard&&MelBoard.blocking()) return; replay(); return; }   // the score sheet is up: a stray tap never wipes the score
   drag={id:e.pointerId}; CTL.mode="ptr"; aim(e); try{ cv.setPointerCapture(e.pointerId); }catch(x){} });
 cv.addEventListener("pointermove",function(e){ if(!drag||!G.running||e.pointerId!==drag.id) return; e.preventDefault(); aim(e); });
 ["pointerup","pointercancel","lostpointercapture"].forEach(function(t){ cv.addEventListener(t,function(e){ if(drag&&e.pointerId===drag.id) drag=null; }); });
@@ -2310,7 +2316,8 @@ addEventListener("keydown",function(e){ if(!G.running) return; var tg=e.target, 
   e.preventDefault(); CTL.keys[c]=1; CTL.mode="key"; });
 addEventListener("keyup",function(e){ var c=KEYS[e.code]||KEYS[e.key]; if(c) delete CTL.keys[c]; });
 addEventListener("blur",function(){ CTL.keys={}; });
-$("again").addEventListener("click",function(){ replay(); cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
+$("bbopen").addEventListener("click",function(){ var p=window.MelBoard&&MelBoard.pending(); if(p) MelBoard.open(p,{fromStart:true}); else $("boardbox").scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
+$("again").addEventListener("click",function(){ if(window.MelBoard&&MelBoard.blocking()) return; replay(); cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
 $("wbtn").addEventListener("click",function(e){ e.preventDefault(); e.stopPropagation(); SND.unlock(); cycleGun(1); });
 ["pointerdown","touchstart"].forEach(function(t){ $("wbtn").addEventListener(t,function(e){ e.stopPropagation(); },{passive:true}); });
 /* Pause menu (gamepause.js): ↻ Restart = a fresh flight in the current mode (level 1, score 0, full health, enemies cleared).
@@ -2340,6 +2347,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
   '<div class="ptsh">Melody Rewards points (BETA: switching on soon)</div><div class="pts">'+row('<span class="e">⭐</span>',"1 point per "+GPC.perScore+" score, once rewards are on",GPC.dailyCap+"/day")+row('<span class="e">⏱️</span>',"Survival ranks by time","time")+'</div>';
 })();
 </script>
+<script src="billboard.js?v=bb1"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
 <script type="module" src="melody3d.js?v=st3"></script>
 <style id="ms-css">
@@ -2406,7 +2414,7 @@ function mvp(esc,T){ var F=window.SSAI_CHAMPS?SSAI_CHAMPS.fmt:function(n){ retur
     '<p class="ms-cd">'+esc(T("Boards close Sunday 11 PM."))+' '+esc(T(on()?"The winners get the weekly prize.":"Bragging rights during the beta: prizes switch on soon."))+'</p>'; }
 function mbtn(v,ic,n,sub,cur,T,esc){ return '<button type="button" data-mel="mode" data-v="'+v+'" aria-pressed="'+(cur===v)+'"><i>'+ic+'</i><span>'+esc(T(n))+'<small>'+esc(T(sub))+'</small></span></button>'; }
 function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?MELODY_MODE():"campaign", prize=WK.prize||"Free Melody Fries";
-  return '<div class="ms">'+
+  return '<div class="ms">'+(window.MelBoard?MelBoard.bannerHTML():"")+
     '<div class="ms-top"><div class="ms-hd"><p class="ms-by notranslate">Melody Bar &amp; Grill · Melody Approach</p>'+
       (live?'<span class="ms-beta on">'+esc(T("LIVE · Win this week"))+'</span>':'<span class="ms-beta">'+esc(T("BETA · Coming soon: win rewards"))+'</span>')+
       '<div class="ms-h" role="heading" aria-level="2">'+esc(T("Can you win the weekly challenge?"))+'</div></div>'+
@@ -2415,6 +2423,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-food" aria-label="'+esc(T("Catch the food for points"))+'">'+FOOD.map(function(f){ return '<span class="ms-f" style="--d:'+f[4]+'" title="'+esc(T(f[1]))+'">'+(f[3]?'<span class="ms-st"><i></i><i></i><i></i></span>':'')+'<img src="'+g+f[0]+'.webp?v='+(f[5]||"ag1")+'" alt="'+esc(T(f[1]))+'"><b>'+f[2]+'</b></span>'; }).join("")+'</div>'+
     '<div class="ms-mode" role="group" aria-label="'+esc(T("Game mode"))+'">'+mbtn("campaign","🏆","Campaign","10 levels · 6 bosses",cur,T,esc)+mbtn("survival","⏱️","Survival","How long can you last?",cur,T,esc)+'</div>'+
     P.play+'<div class="ms-grid">'+P.buttons.join("")+'</div>'+
+    (window.MelBoard?MelBoard.sceneHTML("start",cur==="survival"?"s":"c"):"")+
     '<div class="ms-mvp">'+mvp(esc,T)+'</div></div>'; }
 document.addEventListener("click",function(e){ var b=e.target&&e.target.closest&&e.target.closest("[data-mel=mode]"); if(!b) return; e.preventDefault(); if(window.MELODY_MODE) MELODY_MODE(b.getAttribute("data-v")); if(window.GameMenu) GameMenu.refresh(); });
 window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill",tagline:"Night dogfight over LA: 10 levels and six bosses, or Survival. Catch the food, win the week.",

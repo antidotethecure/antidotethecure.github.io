@@ -26,6 +26,29 @@
   claims.forEach(function (x) { x.pts = Math.floor(Math.min(x.total, 150) * 10); });
   ["Ana", "Luis", "Kai", "Mo"].forEach(function (nm, k) { for (var r = 0; r < 4 + k; r++) staff.push([pick(slugs), ymd(now - r * DAY), nm, pick(["Melody Approach", "Ride the Nalu"]), Math.floor(rnd() * 8000), Math.floor(rnd() * 80)]); });
   trained.push([ymd(now - 2 * DAY), "Ana", 92, "yes"], [ymd(now - DAY), "Luis", 75, "no"]);
+  // 🛡️ Scout (made-up): duplicates the fake server rejected + open flags, same shapes as Code.gs scoutData()
+  var M = function (n) { return members[n - 1]; }, H = 36e5;
+  var scout = { adjustments: [], rejected: [
+    { ts: now - 2 * H, slug: M(1).slug, member: M(1).id, name: M(1).name, dev: "DEV12", kind: "receipt claim", what: "Check #142 · " + ymd(now) + " · $48.50", why: "Same check # + date at this restaurant" },
+    { ts: now - 3 * H, slug: M(2).slug, member: M(2).id, name: M(2).name, dev: "DEV40", kind: "redemption", what: "Free soft drink (test)", why: "Pass code MEL-T001 was already used" },
+    { ts: now - 5 * H, slug: M(4).slug, member: M(4).id, name: M(4).name, dev: "DEV17", kind: "game points", what: "Game · score 4200 · 42 pts", why: "Daily game cap (50 pts) already reached by this member or phone" },
+    { ts: now - 9 * H, slug: M(5).slug, member: M(5).id, name: M(5).name, dev: "DEV17", kind: "receipt claim", what: "Check #155 · " + ymd(now - DAY) + " · $61.20", why: "Same total $61.20 claimed by another member (Test G.) 4 min earlier" },
+    { ts: now - 26 * H, slug: M(7).slug, member: M(7).id, name: M(7).name, dev: "DEV55", kind: "points award", what: "join bonus · 100 pts", why: "Already credited 1x (once ever)" },
+    { ts: now - 30 * H, slug: M(3).slug, member: M(3).id, name: M(3).name, dev: "DEV60", kind: "receipt claim", what: "Check #88 · " + ymd(now - DAY) + " · $33.00", why: "Same receipt photo as an earlier claim" },
+    { ts: now - 50 * H, slug: M(8).slug, member: M(8).id, name: M(8).name, dev: "DEV61", kind: "redemption", what: "Free starter (test)", why: "Double tap: same member + reward within 30 s" } ], flags: [
+    { id: "device:a1b2c3d4e5f60718", kind: "device", slug: "melody-bar-grill", sev: "high", title: "5 members on one phone", reason: "One phone (DEV17) used 5 different member accounts. Real guests have one account each.",
+      members: [1, 2, 4, 5, 7].map(function (n) { return M(n).id; }), evidence: [1, 2, 4, 5, 7].map(function (n) { return M(n).name + " (" + M(n).id + ")"; }), pts: 0, claims: [], status: "open" },
+    { id: "referral_ring:b2c3d4e5f6071829", kind: "referral_ring", slug: "melody-bar-grill", sev: "high", title: "Referral loop of 2 members", reason: "These members referred each other in a loop, so each collects referral points from the others.",
+      members: [M(10).id, M(11).id], evidence: [M(10).name + " used code " + M(11).ref, M(11).name + " used code " + M(10).ref], pts: 200, claims: [], status: "open" },
+    { id: "under_cap:c3d4e5f60718293a", kind: "under_cap", slug: "melody-bar-grill", sev: "medium", title: "2 receipts just under the $150 cap", reason: M(13).name + " claimed 2 checks between $135 and $150 in 30 days. Compare with Toast.",
+      members: [M(13).id], evidence: ["#171 · " + ymd(now - 3 * DAY) + " · $148.75 · 1487 pts", "#190 · " + ymd(now - DAY) + " · $149.50 · 1495 pts"], pts: 2982, claims: ["CTEST3", "CTEST4"], status: "open" },
+    { id: "fast_redeem:d4e5f60718293a4b", kind: "fast_redeem", slug: "nalu-vida", sev: "medium", title: "Reward used 40 min after joining", reason: M(6).name + " joined and used Free shareable (test) (500 pts) 40 minutes later.",
+      members: [M(6).id], evidence: ["Pass NV-T009 · Free shareable (test)"], pts: 500, claims: [], status: "open" },
+    { id: "phone_pattern:e5f60718293a4b5c", kind: "phone_pattern", slug: "nalu-vida", sev: "medium", title: "3 sign-ups with look-alike phone numbers", reason: "3 members joined this week with phone numbers that differ only in the last 2 digits (555-010-00xx).",
+      members: [M(9).id, M(12).id, M(15).id], evidence: [M(9).name + " · …0009", M(12).name + " · …0012", M(15).name + " · …0015"], pts: 0, claims: [], status: "open" },
+    { id: "velocity:f60718293a4b5c6d", kind: "velocity", slug: "melody-bar-grill", sev: "medium", title: "1,280 points in 24 hours", reason: M(14).name + " earned 1280 points in the last 24 hours (4 events). A normal visit is a few hundred.",
+      members: [M(14).id], evidence: ["24 h total: 1280 pts"], pts: 1280, claims: [], status: "open" } ] };
+  scout.flags.push({ id: "dup_tries:0718293a4b5c6d7e", kind: "dup_tries", slug: "melody-bar-grill", sev: "low", title: "3 duplicate tries in 7 days", reason: M(4).name + " sent 3 things that were already counted this week.", members: [M(4).id], evidence: ["game points · Daily game cap reached", "receipt claim · Same check # + date", "redemption · Double tap"], pts: 0, claims: [], status: "open" });
   var USERS = { christian: { name: "Christian", email: "christian@example.com" }, antidote: { name: "Antidote", email: "antidote@example.com" } }, TOK = {}, PEND = {}, fails = 0;
   function label(f, k) { if (k === "lb") return f === "on" ? "Location bonus on/off" : "Location bonus points"; return { pts: "Points cost", amount: "$ off", percent: "% off", label: "Reward name" }[f] || f; }
   var EB = { "melody-bar-grill": {}, "nalu-vida": {} };
@@ -47,6 +70,10 @@
   function valid(key, field, v) {
     if (key === "eb") return ebValid(field, v);
     if (key === "lb") { if (field === "on") return v === "on" || v === "off" ? v : null; if (field === "pts") { v = Math.round(+v); return v >= 10 && v <= 1000 ? v : null; } return null; }
+    if (key === "scout") { v = String(v || ""); var fid = /^[a-z_]{3,20}:[0-9a-f]{16}$/, sp = v.split("|");
+      if (field === "ok") return fid.test(v) ? v : null;
+      if (field === "reverse") return sp.length === 3 && fid.test(sp[0]) && /^[A-Z0-9]{4,16}$/.test(sp[1]) && +sp[2] >= 1 && +sp[2] <= 20000 ? sp[0] + "|" + sp[1] + "|" + Math.round(+sp[2]) : null;
+      return null; }
     if (!/^(t[0-9]|jl)$/.test(key)) return null;
     if (key === "jl") { v = Math.round(+v); return field === "percent" && v >= 1 && v <= 50 ? v : null; }
     if (field === "pts") { v = Math.round(+v); return v >= 50 && v <= 10000 ? v : null; }
@@ -63,10 +90,10 @@
     var u = TOK[d.token]; if (!u) return { ok: false, auth: false, reason: "Signed out. Log in again." };
     if (d.type === "bo_logout") { delete TOK[d.token]; return { ok: true }; }
     if (d.type === "bo_summary") return { ok: true, members: members.length, joined7: members.filter(function (m) { return m.joined > now - 7 * DAY; }).length, plays7: games.length, redeems7: redeems.length, pendingClaims: claims.filter(function (x) { return x.status === "pending"; }).length };
-    if (d.type === "bo_data") return { ok: true, test: true, eb: ebStats(), me: USERS[u].name, now: Date.now(), members: members, games: games, opens: opens, redeems: redeems, claims: claims, staff: staff, trained: trained, audit: audit, disc: disc, lb: { "melody-bar-grill": { credited: 3, devices: 11 } } };
+    if (d.type === "bo_data") return { ok: true, test: true, scout: scout, eb: ebStats(), me: USERS[u].name, now: Date.now(), members: members, games: games, opens: opens, redeems: redeems, claims: claims, staff: staff, trained: trained, audit: audit, disc: disc, lb: { "melody-bar-grill": { credited: 3, devices: 11 } } };
     if (d.type === "disc_propose") {
       var v = valid(d.key, d.field, d.value); if (v == null) return { ok: false, reason: "That value isn't allowed. Points 50–10,000 · $ off 1–100 · percent 1–50 · names 3–80 characters · location bonus 10–1,000." };
-      var cur = d.key === "eb" ? (EB[d.slug][d.field] != null ? EB[d.slug][d.field] : d.field === "on" ? "off" : d.field === "draw" ? "not drawn" : "(not set)") : disc[d.slug] && disc[d.slug][d.key] && disc[d.slug][d.key][d.field], id = "P" + Math.random().toString(36).slice(2, 10), code = String(100000 + Math.floor(Math.random() * 900000));
+      var cur = d.key === "scout" ? "open" : d.key === "eb" ? (EB[d.slug][d.field] != null ? EB[d.slug][d.field] : d.field === "on" ? "off" : d.field === "draw" ? "not drawn" : "(not set)") : disc[d.slug] && disc[d.slug][d.key] && disc[d.slug][d.key][d.field], id = "P" + Math.random().toString(36).slice(2, 10), code = String(100000 + Math.floor(Math.random() * 900000));
       PEND[id] = { user: u, slug: d.slug, key: d.key, field: d.field, value: v, before: cur != null ? cur : d.before, reward: d.reward, code: code, tries: 0, exp: Date.now() + 6e5 };
       return { ok: true, id: id, sentTo: USERS[u].email.replace(/^(.).*(@.*)$/, "$1•••$2"), before: PEND[id].before, after: v, testCode: code };
     }
@@ -75,6 +102,17 @@
       if (p.user !== u) return { ok: false, reason: "This change was started by someone else." };
       if (String(d.code) !== p.code) { if (++p.tries >= 5) { delete PEND[d.id]; return { ok: false, reason: "5 wrong codes. Start again." }; } return { ok: false, reason: "Wrong code. " + (5 - p.tries) + " tries left." }; }
       delete PEND[d.id];
+      if (p.key === "scout") {
+        var sp = String(p.value).split("|"), fl = scout.flags.filter(function (f) { return f.id === sp[0]; })[0], msg = "flag marked OK", nm2 = USERS[u].name;
+        if (p.field === "reverse") { var who = members.filter(function (m) { return m.id === sp[1]; })[0];
+          scout.adjustments.unshift({ ts: Date.now(), slug: p.slug, member: sp[1], name: who ? who.name : sp[1], pts: -(+sp[2]), why: "Points reversed by " + nm2 + " (Scout)", by: nm2 });
+          if (who) { who.stars = Math.max(0, who.stars - sp[2]); who.earned = Math.max(0, who.earned - sp[2]); }
+          if (fl && fl.claims.length) claims.forEach(function (c) { if (fl.claims.indexOf(c.id) >= 0 && c.member === sp[1]) c.status = "void"; });
+          msg = sp[2] + " points reversed for member " + sp[1]; }
+        if (fl) { fl.status = p.field === "reverse" ? "reversed" : "ok"; fl.reviewedBy = nm2; fl.reviewedAt = Date.now(); }
+        audit.push({ ts: Date.now(), who: nm2, slug: p.slug === "nalu-vida" ? "Nalu Vida" : "Melody Bar & Grill", reward: p.reward, field: p.field === "reverse" ? "Scout: reverse points" : "Scout: mark OK", before: "open", after: p.value, status: "applied: " + msg });
+        return { ok: true, slug: p.slug, key: "scout", field: p.field, before: "open", after: msg, scout: scout, testNotice: "TEST MODE: no email sent. Live, the other login holder is emailed and the member's app takes the points back the next time it opens." };
+      }
       if (p.key === "eb") {
         var E = EB[p.slug];
         if (p.field === "draw") { if (E.mode !== "raffle" || E.drawn) return { ok: false, reason: E.drawn ? "Winners were already drawn." : "The gift isn't in raffle mode." };

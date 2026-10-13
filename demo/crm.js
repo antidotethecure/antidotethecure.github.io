@@ -79,8 +79,11 @@
   function boPost(o) {
     if (!API || STAFF && o.type !== "staff_practice") return;
     o.slug = SLUG; o.restaurant = NAME;
-    try { fetch(API, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }); } catch (x) {}
+    try { fetch(API, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }).catch(function () {}); } catch (x) {}
   }
+  // SCOUT (Code.gs): every points event carries a unique event id (eid). The server rejects duplicates and over-cap awards
+  // ("Already counted") and writes an adjustment for points this phone showed but the server refused; pullAdj() applies it once.
+  function evId(p) { return p + Date.now().toString(36) + code4(6); }
   var syncT = 0, syncM = null;
   function syncLater(m) {
     if (!API || STAFF || !SIMPLE || !m || !m.id || m.sample) return;
@@ -181,7 +184,10 @@
   function reviewUrl() { var N = window.NEARBY, sp = N && N.spots && N.spots[0]; return EARN.review.url || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(NAME + (sp && sp.q ? " " + sp.q : "")); }
   var lastBonus = 0;   // bonus pts added by the last visit() call, for the toast
   function earnOnce(m, key, pts, why) { m.earned = m.earned || {}; if (m.earned[key] || !pts) return 0; m.earned[key] = Date.now(); addPts(m, pts, why); tag(m, key.replace(/_\d+$/, "") + "_bonus"); return pts; }
-  function tag(m, k) { m.ledger[0].k = k; (m.ec = m.ec || {})[k] = (m.ec[k] || 0) + 1; }
+  function tag(m, k) { m.ledger[0].k = k; (m.ec = m.ec || {})[k] = (m.ec[k] || 0) + 1;
+    // bonus points (join, birthday, referral, spin, check-in…) go to the server ledger; game points and interim claims have their own events
+    if (SIMPLE && API && !STAFF && m.id && !m.sample && m.ledger[0].pts > 0 && k !== "game_bonus" && /_bonus$|^referral_/.test(k))
+      boPost({ type: "award", source: k, pts: m.ledger[0].pts, member: m.id, dev: devId(), eid: evId("A") }); }
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   var MONTHS_L = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   // birthday: full date so the treat lands on the real day; staff check a photo ID with the same date before giving it out
@@ -496,10 +502,10 @@
     // call ONCE per finished run. Returns {pts, saved, capped, today, cap}: pts actually credited (member) or held (guest)
     award: function (score, label) {
       if (STAFF) return staffAward(score, label);
-      if (API) boPost({ type: "game", member: (mine()[0] || {}).id || "", dev: devId(), score: Math.max(0, Math.round(+score || 0)), pts: gpFor(score) });
       var want = gpFor(score), cap = SIMPLE.game.dailyCap, m = mine()[0], got, today;
       if (m) { got = gpAdd(m, want, "🎮 " + (label || C.game || "Game") + " · score " + Math.round(+score || 0).toLocaleString()); today = gpUsed(m); put(m); drawJoin(); drawOwn(); }
       else { var h = gpHeld() || { day: gpDay(), pts: 0 }; got = Math.max(0, Math.min(want, cap - h.pts)); h.pts += got; today = h.pts; try { localStorage.setItem(GPKEY, JSON.stringify(h)); } catch (x) {} drawJoin(); }
+      if (API) boPost({ type: "game", member: m ? m.id : "", dev: devId(), score: Math.max(0, Math.round(+score || 0)), pts: got, eid: evId("G") });   // pts = what this phone credited
       return { pts: got, want: want, saved: !!m, capped: got < want, today: today, cap: cap };
     },
     held: function () { var h = gpHeld(); return h ? h.pts : 0; },
@@ -1303,8 +1309,8 @@
   // how identified, staff initials, and visit "first" | "return". A RETURN = the member had already been in on an earlier
   // day (an earlier attributed sale, an earlier app visit, or joined on an earlier day). Same-day repeats keep that day's type.
   // PERFORMANCE SHARE (CRM_CFG.perfShare = {threshold:3000, pct:10, returns:12}; billed ONLY when the signed agreement has it):
-  // in a calendar month (LA time) where app-attributed food & non-alc sales EXCEED the threshold, the share is pct% of ALL
-  // of that month's app-attributed food & non-alc sales (not only the part above it), on top of the monthly fee. Statement
+  // in a calendar month (LA time) where app-attributed food & non-alc sales EXCEED the threshold, the share is pct% of ONLY
+  // the amount OVER the threshold (2026-10-13: $5,000 -> 10% of $2,000 = $200), on top of the monthly fee. Statement
   // by the 5th of the next month; the client may dispute within 10 days (reconciled against register reports); payment is
   // due 15 days after the statement. returns = the 90-day results check (tracked return visits a month).
   // STORAGE: localStorage on this device (KEY_sales) AND a POST of every sale to CRM_CFG.sheet when set (Apps Script web
@@ -1406,7 +1412,7 @@
     var food = sum(l, "food"), over = food > PS.threshold;
     return { ym: ym, rows: l, n: l.length, food: food, alcohol: sum(l, "alcohol"), total: sum(l, "total"), retFood: sum(ret, "food"), fstFood: sum(fst, "food"), retN: ret.length, fstN: fst.length,
       visits: Object.keys(vis).length, retVisits: Object.keys(rv).length, members: Object.keys(l.reduce(function (o, x) { o[x.mid] = 1; return o; }, {})).length,
-      appN: l.filter(function (x) { return x.how === "app"; }).length, over: over, share: over ? r2(food * PS.pct / 100) : 0 };
+      appN: l.filter(function (x) { return x.how === "app"; }).length, over: over, excess: over ? r2(food - PS.threshold) : 0, share: over ? r2((food - PS.threshold) * PS.pct / 100) : 0 };
   }
   function salesBox() {
     var ym = laYMD(Date.now()).slice(0, 7), S = monthStats(ym), pct = Math.min(100, S.food / PS.threshold * 100);
@@ -1419,7 +1425,7 @@
       '<div class="crm-stats" style="grid-template-columns:repeat(2,1fr)"><div><b>' + usd(S.retFood) + '</b>🔁 returning members (' + S.retN + ')</div><div><b>' + usd(S.fstFood) + '</b>🆕 first visits (' + S.fstN + ')</div>' +
       '<div><b>' + S.visits + '</b>member visits · ' + S.members + ' members</div><div><b>' + S.retVisits + '</b>return visits (' + PS.returns + '/mo check)</div></div>' +
       '<div class="crm-as-share"><span>Performance share estimate</span><b>' + (S.over ? usd(S.share) : '$0.00') + '</b></div>' +
-      '<p class="crm-fine" style="margin:4px 0 0">Only if your agreement includes it: in a month where app sales pass ' + usd(PS.threshold).replace(".00", "") + ', it\'s ' + PS.pct + '% of that month\'s app sales (' + PS.pct + '% × ' + usd(S.food) + '), on top of the monthly fee. Alcohol excluded this month: ' + usd(S.alcohol) + '.</p>' +
+      '<p class="crm-fine" style="margin:4px 0 0">Only if your agreement includes it: in a month where app sales pass ' + usd(PS.threshold).replace(".00", "") + ', it\'s ' + PS.pct + '% of only the amount over ' + usd(PS.threshold).replace(".00", "") + ' (' + PS.pct + '% × ' + usd(S.excess) + '), on top of the monthly fee. Alcohol excluded this month: ' + usd(S.alcohol) + '.</p>' +
       '<div class="crm-feed" style="max-height:170px;margin-top:8px">' + (S.rows.slice(0, 12).map(function (x) { return '<div><span>' + e(x.day.slice(5)) + ' · #' + e(x.receipt) + ' · ' + e(x.member) + '<br><span style="color:#9AA6CC">' + e(HOW[x.how] || x.how) + ' · ' + (x.visit === "return" ? "🔁 return" : "🆕 first") + (x.staff ? ' · ' + e(x.staff) : '') + '</span></span><b class="plus">' + usd(x.food) + '</b></div>'; }).join("") || '<div><span>No app sales yet this month. Ring up a member above.</span></div>') + '</div>' +
       '<div class="crm-acts"><button type="button" data-a="scsv">⬇️ Sales CSV</button><button type="button" class="hot" data-a="stmt">🧾 Statement</button></div>' +
       '<label style="margin-top:8px">Statement month</label><select data-r="sym">' + yms.map(function (x) { return '<option value="' + x + '">' + ymLabel(x) + (x === ym ? ' (so far)' : '') + '</option>'; }).join("") + '</select>' +
@@ -1442,7 +1448,7 @@
       '<tr><td>Returning members / first visits</td><td>' + usd(S.retFood) + ' / ' + usd(S.fstFood) + '</td></tr><tr><td>Member visits / return visits</td><td>' + S.visits + ' / ' + S.retVisits + '</td></tr>' +
       '<tr><td>Alcohol on those checks (excluded)</td><td>' + usd(S.alcohol) + '</td></tr>' +
       '<tr><td>Threshold check</td><td>' + (S.over ? 'Met: ' + usd(S.food) + ' is over ' + usd(PS.threshold) : 'Not met: ' + usd(S.food) + ' is not over ' + usd(PS.threshold) + '. No share is due.') + '</td></tr>' +
-      '<tr class="st-tot"><td>Performance share (' + PS.pct + '% of ' + usd(S.food) + ')</td><td>' + usd(S.share) + '</td></tr>' +
+      '<tr class="st-tot"><td>Performance share (' + PS.pct + '% of ' + usd(S.excess) + ', the amount over ' + usd(PS.threshold) + ')</td><td>' + usd(S.share) + '</td></tr>' +
       '<tr><td>Dispute window</td><td>Until ' + longDate(addDays(sd, 10)) + ' (10 days). Reconciled against Client\'s register reports.</td></tr>' +
       '<tr><td>Payment due</td><td>' + (S.share ? longDate(addDays(sd, 15)) + ' (15 days after the statement)' : 'Nothing due') + '</td></tr></table>' +
       '<h4>Line items</h4><div class="st-sc"><table class="st-li"><tr><th>Date</th><th>Check #</th><th>Member</th><th>How identified</th><th>Visit</th><th>Food & non-alc</th><th>Alcohol (excl.)</th></tr>' +
@@ -1603,6 +1609,19 @@
     if (localStorage.getItem(ok) !== td) { localStorage.setItem(ok, td); if (mine()[0]) syncLater(mine()[0]);   // daily re-sync: members who joined before the backend existed get counted too
       boPost({ type: "open", dev: devId(), member: (mine()[0] || {}).id || "", standalone: (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone ? 1 : 0 }); }
   } catch (x) {}
+  // Scout adjustments: points the server refused as duplicates / over a cap, or that Christian HQ reversed. Each applies once.
+  function pullAdj() {
+    var m = mine()[0]; if (!SIMPLE || !API || STAFF || !m || !m.id || m.sample) return;
+    fetch(API + (API.indexOf("?") < 0 ? "?" : "&") + "adj=1&slug=" + encodeURIComponent(SLUG) + "&member=" + encodeURIComponent(m.id) + "&dev=" + encodeURIComponent(devId()) + "&t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.json(); }).then(function (j) {
+        var mm = mine()[0]; if (!j || !j.ok || !j.adj || !j.adj.length || !mm || mm.id !== m.id) return;
+        var done = mm.adjDone = mm.adjDone || [], tot = 0;
+        j.adj.forEach(function (a) { var p = Math.round(+a.pts || 0); if (!a.id || !p || done.indexOf(a.id) >= 0) return; done.push(a.id); tot += p;
+          if (WAL) addPts(mm, p, "🛡️ " + a.why); else { mm.stars = Math.max(0, (mm.stars || 0) + p); if (p < 0 && mm.earned != null) mm.earned = Math.max(0, mm.earned + p); (mm.ledger = mm.ledger || []).unshift({ ts: Date.now(), pts: p, t: "🛡️ " + (p < 0 ? "Already counted: " : "") + a.why, k: "scout_adj" }); mm.ledger = mm.ledger.slice(0, 40); } });
+        if (tot) { put(mm); drawJoin(); drawOwn(); toast(tot < 0 ? "🛡️ " + tot + " points: those were already counted" : "🛡️ +" + tot + " points added by " + NAME); }
+      }).catch(function () {});
+  }
+  try { pullAdj(); } catch (x) {}
   if (STAFF) {
     var sb = document.createElement("div"); sb.id = "ssai-staff-bar"; sb.setAttribute("role", "status");
     sb.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:2147483600;background:#FFD23F;color:#1a1206;font:800 13px/1.3 system-ui,sans-serif;padding:7px 12px;padding-top:calc(7px + env(safe-area-inset-top));display:flex;gap:8px;align-items:center;justify-content:space-between;box-shadow:0 2px 10px #0006";

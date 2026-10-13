@@ -68,10 +68,18 @@ window.APP = {
 
   /* Contract terms on every NEW agreement (already in the contract generator) */
   terms: {
-    perf: { pct: 10, threshold: 3000 },
+    perf: { pct: 10, threshold: 3000 },   // 2026-10-13: pct% of the amount OVER threshold only ($5,000 in app sales -> $200)
     results: { returns: 30, day: 30, windowMonths: 3, freeMonths: 2 },
     discount: { graceBusinessDays: 3, perDay: 100 },
-    minimumMonths: 3
+    minimumMonths: 3,
+    /* How the owner can pay the setup (Antidote, 2026-10-12). Same numbers in demo/contract.js + make_contract.py.
+       split: % of setup at signing, the rest at Go-Live (app delivered).
+       flex:  pay at least minDown (per restaurant) at signing; the unpaid setup balance is spread over `months` equal
+              installments added to the monthly fee, then the monthly drops back to normal. Exact cents: each installment
+              is the balance / months rounded to the cent and the last one absorbs the rounding.
+              feePct = OPTIONAL flexible-plan fee as a % of the unpaid balance. 0 = plain math, nothing extra (default).
+              Only change it if Antidote approves a fee; never call it interest, a loan or financing. */
+    payment: { split: 50, flex: { minDown: 750, months: 12, feePct: 0 } }
   },
 
   /* ---------------- 2 · What it costs elsewhere ----------------

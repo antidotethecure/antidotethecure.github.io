@@ -91,6 +91,19 @@ section.s>header{margin-bottom:14px}
 .tot{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 .tot div{background:rgba(47,123,255,.12);border:1px solid rgba(47,123,255,.4);border-radius:12px;padding:10px 6px;text-align:center;font-size:12.5px;color:var(--dim);line-height:1.2}
 .tot b{display:block;font-family:"Orbitron",sans-serif;color:var(--ink);font-size:17px;margin-bottom:3px}
+.pay3{display:grid;grid-template-columns:1fr;gap:8px;margin:8px 0}
+@media(min-width:600px){.pay3{grid-template-columns:repeat(3,1fr)}}
+.pay3 div{border:1px solid var(--edge);border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.03);line-height:1.25}
+.pay3 div.on{border-color:var(--blue);background:rgba(47,123,255,.12)}
+.pay3 small{display:block;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--volt)}
+.pay3 b{display:block;font-family:"Orbitron",sans-serif;font-size:16px;margin:3px 0}
+.pay3 span{font-size:13.5px;color:var(--dim)}
+.downrow{display:flex;align-items:center;gap:10px}
+.downrow span{font:800 20px "Orbitron",sans-serif}
+.downrow input[type=number]{width:120px;flex:none;min-height:46px;border-radius:12px;border:1px solid var(--edge);background:var(--panel);color:var(--ink);padding:0 10px;font:700 18px "Rajdhani",sans-serif}
+.downrow input[type=range]{flex:1;min-width:0;accent-color:var(--blue);height:30px}
+.err{color:#ff8a8a;font-weight:700;font-size:14px;margin:6px 0 0;min-height:0}
+.err:empty{display:none}
 .lbl{font-weight:700;margin:12px 0 6px;font-size:14px;color:var(--silver);text-transform:uppercase;letter-spacing:.08em}
 
 /* tables */
@@ -203,6 +216,15 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
       <div class="lbl">Restaurants</div><div class="step"><button type="button" id="bMinus" aria-label="One fewer restaurant">−</button><output id="bN" aria-live="polite">1</output><button type="button" id="bPlus" aria-label="One more restaurant">+</button></div>
       <div class="tot" aria-live="polite"><div><b id="tSetup">$0</b>setup, once</div><div><b id="tMonthly">$0</b>per month</div><div><b id="tYear">$0</b>first year</div></div>
       <p class="note" id="bLines"></p>
+    </div>
+    <div class="card" id="payCalc"><h3>💳 How to pay the setup</h3>
+      <p class="note" id="pFor"></p>
+      <div class="pay3" id="payOpts"></div>
+      <div class="lbl"><label for="pDown">Flexible plan · your down payment</label></div>
+      <div class="downrow"><span aria-hidden="true">$</span><input id="pDown" type="number" inputmode="decimal" step="50"><input id="pRange" type="range" step="50" aria-label="Down payment slider"></div>
+      <p class="err" id="pErr" role="alert"></p>
+      <div class="tot" id="pOut" aria-live="polite"></div>
+      <p class="note" id="pFine"></p>
     </div>
   </section>
 

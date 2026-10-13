@@ -44,6 +44,8 @@ td.n,th.n{text-align:right}.tag{display:inline-block;font-size:11px;font-weight:
 .steps{margin:8px 0;padding-left:20px}.steps li{margin:4px 0}
 .st{display:inline-block;font-weight:800;font-size:12px;padding:2px 9px;border-radius:99px}.st.done{background:#2fbf7133;color:#8ff0bd}.st.tbd{background:#ffb34733;color:#ffd79a}
 .links a{display:inline-block;margin:4px 6px 4px 0;padding:8px 12px;border-radius:999px;background:#ffffff10;border:1px solid var(--edge);text-decoration:none;color:var(--ink);font-weight:700;font-size:14px}
+.tag.lo{background:#ffffff1a;color:var(--dim)}.ev{margin:6px 0 10px;padding-left:18px;font-size:13px;color:var(--dim)}.ev li{margin:2px 0;word-break:break-word}
+.sheet select,.sheet .pts{width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px;letter-spacing:0;text-align:left;margin:4px 0 8px}
 [hidden]{display:none!important}
 </style></head><body><main>
 <div class="top"><img src="icon-192.png" alt=""><div><h1>Christian HQ</h1><small>Melody Bar &amp; Grill × Nalu Vida · back office</small></div><span class="sp"></span><button class="btn alt sm" id="out" hidden>Log out</button></div>
@@ -70,7 +72,7 @@ td.n,th.n{text-align:right}.tag{display:inline-block;font-size:11px;font-weight:
   <p class="note" id="stamp"></p>
 </section>
 </main>
-<script src="../../demo/christian-live.js?v=lb1"></script>
+<script src="../../demo/christian-live.js?v=lb2"></script>
 <script>
 (function(){
 "use strict";
@@ -88,7 +90,7 @@ function api(body){
   if(!API) return Promise.resolve({ok:false,reason:"Backend not connected yet."});
   return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(body)}).then(function(r){ return r.json(); }).catch(function(){ return {ok:false,reason:"Can't reach the backend. Check the connection."}; });
 }
-function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=lb1"; s.onload=cb; document.head.appendChild(s); }
+function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=lb2"; s.onload=cb; document.head.appendChild(s); }
 if(TEST) $("testBar").hidden=false; else if(!API) $("notConn").hidden=false;
 try{ TOKEN=sessionStorage.getItem(TKEY); }catch(e){}
 $("lf").onsubmit=function(ev){ ev.preventDefault(); var b=$("go"); b.disabled=true; b.textContent="Checking…"; $("lerr").textContent="";
@@ -102,7 +104,7 @@ function load(){ loadMock(function(){ api({type:"bo_data",token:TOKEN}).then(fun
   DATA=r; $("login").hidden=true; $("app").hidden=false; $("out").hidden=false; $("stamp").textContent="Signed in as "+r.me+" · loaded "+new Date(r.now).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})+(r.test?" · TEST DATA":""); draw(); }); }); }
 $("refresh").onclick=load;
 document.querySelector(".seg").addEventListener("click",function(e){ var b=e.target.closest("[data-r]"); if(!b) return; R=b.dataset.r; document.querySelectorAll("[data-r]").forEach(function(x){ x.setAttribute("aria-pressed",x===b?"true":"false"); }); draw(); });
-var TABS=[["overview","📊 Overview"],["members","👥 Members"],["rewards","🎟️ Rewards & claims"],["games","🎮 Games"],["discounts","🏷️ Discounts"],["earlybird","🎁 Early bird"],["staff","🧑‍🍳 Staff"],["audit","🧾 Audit log"],["links","🔗 Links"]];
+var TABS=[["overview","📊 Overview"],["members","👥 Members"],["rewards","🎟️ Rewards & claims"],["scout","🛡️ Scout"],["games","🎮 Games"],["discounts","🏷️ Discounts"],["earlybird","🎁 Early bird"],["staff","🧑‍🍳 Staff"],["audit","🧾 Audit log"],["links","🔗 Links"]];
 $("tabs").innerHTML=TABS.map(function(t){ return "<button role='tab' data-t='"+t[0]+"' aria-selected='"+(t[0]===TAB)+"'>"+t[1]+"</button>"; }).join("");
 $("tabs").addEventListener("click",function(e){ var b=e.target.closest("[data-t]"); if(!b) return; TAB=b.dataset.t; document.querySelectorAll("#tabs button").forEach(function(x){ x.setAttribute("aria-selected",x===b?"true":"false"); }); draw(); });
 function inR(s){ return R==="all"||s===R; }
@@ -227,7 +229,50 @@ function staff(){ var f=F(), by={}; f.staff.forEach(function(x){ var k=x[2]; by[
     "<h2>🎮 Practice tally (120 days)</h2>"+table(["Employee","Practice runs","Practice points","Best score"],rows,[1,2,3])+
     "<h2>✅ Training quiz</h2>"+table(["Day","Employee","Score","Passed"],DATA.trained.slice().reverse().map(function(t){ return [esc(t[0]),esc(t[1]),t[2]+"%",t[3]==="yes"?"<span class='tag ok'>Trained ✓</span>":"<span class='tag p'>not yet</span>"]; }),[2])+
     "<p><a href='../../staff/christian/'>Open the staff app</a> · text staff this link so they can add it to their Home Screen.</p>"; }
-function audit(){ return "<p class='note' style='margin-top:12px'>Every discount change: who, what, before → after, when.</p>"+table(["When","Who","Restaurant","Reward","Field","Before","After","Status"],(DATA.audit||[]).slice().reverse().map(function(a){ return [new Date(a.ts).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}),esc(a.who),esc(a.slug),esc(a.reward),esc(a.field),esc(a.before),esc(a.after),esc(a.status)]; })); }
+// ---- 🛡️ SCOUT: duplicates the server rejected (never credited) + suspicious patterns, with Reverse points / Mark OK ----
+function scoutD(){ return DATA.scout||{flags:[],rejected:[],adjustments:[]}; }
+function mname(slug,id){ var m=DATA.members.filter(function(x){ return x.slug===slug&&x.id===id; })[0]; return m?m.name:(id||"guest"); }
+function when2(t){ return t?new Date(t).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"—"; }
+function sevTag(s){ return "<span class='tag "+(s==="high"?"f":s==="medium"?"p":"lo")+"'>"+esc(String(s).toUpperCase())+"</span>"; }
+function scout(){ var S=scoutD(), fl=S.flags.filter(function(f){ return inR(f.slug); }), open=fl.filter(function(f){ return f.status==="open"; }), done=fl.filter(function(f){ return f.status!=="open"; }),
+    rej=S.rejected.filter(function(x){ return inR(x.slug); }), adj=(S.adjustments||[]).filter(function(x){ return inR(x.slug); }), wk=Date.now()-7*DAY;
+  var h="<p class='note' style='margin-top:12px'>Scout checks every points award, receipt claim and reward the moment it reaches the server. A duplicate is <b>rejected, never credited</b>, and the guest sees “Already counted”. Flags are patterns worth a look: nothing changes until you act. <b>Reverse points</b> and <b>Mark OK</b> need the emailed 6-digit code and are written to the Audit log.</p>";
+  h+="<div class='kpis'>"+kpi(n(rej.filter(function(x){ return x.ts>=wk; }).length),"duplicates rejected, 7 days")+kpi(n(open.filter(function(f){ return f.sev==="high"; }).length),"open HIGH flags")+kpi(n(open.length),"open flags")+kpi(n(done.length),"flags reviewed")+"</div>";
+  h+="<h2>🚩 Open flags ("+open.length+")</h2>"+(open.length?"<div class='dl'>"+open.map(function(f){
+    return "<div class='dc' data-flag='"+esc(f.id)+"'><div class='row'>"+sevTag(f.sev)+tagR(f.slug)+"<b>"+esc(f.title)+"</b></div><p style='margin:6px 0'>"+esc(f.reason)+"</p>"+
+      "<ul class='ev'>"+(f.evidence||[]).map(function(e){ return "<li>"+esc(e)+"</li>"; }).join("")+"</ul>"+
+      "<div class='row'><button class='btn sm' data-scout='reverse' data-fid='"+esc(f.id)+"'>↩︎ Reverse points</button><button class='btn alt sm' data-scout='ok' data-fid='"+esc(f.id)+"'>✓ Mark OK</button></div></div>"; }).join("")+"</div>":"<p class='note'>Nothing suspicious right now. ✅</p>");
+  h+="<h2>⛔ Rejected duplicates ("+rej.length+", last 30 days)</h2><p class='note'>Caught and refused at the moment they arrived. Nothing here was credited.</p>"+
+    table(["When","","Who","What","Why"],rej.map(function(x){ return [when2(x.ts),tagR(x.slug),esc(x.name||mname(x.slug,x.member)),"<b>"+esc(x.kind)+"</b> · "+esc(x.what),esc(x.why)]; }));
+  if(adj.length) h+="<h2>↩︎ Points taken back ("+adj.length+")</h2>"+table(["When","","Member","Points","Why","By"],adj.map(function(a){ return [when2(a.ts),tagR(a.slug),esc(a.name||mname(a.slug,a.member)),n(a.pts),esc(a.why),esc(a.by)]; }),[3]);
+  if(done.length) h+="<h2>✓ Reviewed flags ("+done.length+")</h2>"+table(["Flag","","Severity","Result","By","When"],done.map(function(f){ return [esc(f.title),tagR(f.slug),sevTag(f.sev),f.status==="reversed"?"<span class='tag f'>points reversed</span>":"<span class='tag ok'>marked OK</span>",esc(f.reviewedBy||""),when2(f.reviewedAt)]; }));
+  return h; }
+function scoutFlag(id){ return scoutD().flags.filter(function(f){ return f.id===id; })[0]; }
+function scoutAsk(btn){ var f=scoutFlag(btn.dataset.fid); if(!f) return; var field=btn.dataset.scout;
+  if(field==="ok") return scoutPropose(f,"ok",f.id,"Mark OK: no action, close the flag","open","marked OK");
+  var ov=document.createElement("div"); ov.className="ov"; ov.setAttribute("role","dialog"); ov.setAttribute("aria-modal","true");
+  ov.innerHTML="<div class='sheet'><h3 style='margin-top:0'>↩︎ Reverse points</h3><div class='note'>"+esc(NAMES[f.slug])+" · "+esc(f.title)+"</div>"+
+    "<label class='note' for='sm'>Member</label><select id='sm'>"+(f.members||[]).map(function(id){ return "<option value='"+esc(id)+"'>"+esc(mname(f.slug,id))+" ("+esc(id)+")</option>"; }).join("")+"</select>"+
+    "<label class='note' for='sp'>Points to take back</label><input id='sp' class='pts' inputmode='numeric' value='"+esc(f.pts||"")+"' placeholder='e.g. 300'>"+
+    "<p class='note'>The points come off the member's balance the next time they open the app"+(f.kind==="under_cap"?", and the flagged receipt claims are marked void":"")+". Next: a 6-digit code is emailed to you.</p><div class='err' id='serr'></div>"+
+    "<button class='btn' style='width:100%;margin-top:6px' id='sgo'>Email me the code</button><button class='btn alt' style='width:100%;margin-top:8px' id='scan'>Cancel</button></div>";
+  document.body.appendChild(ov); $("scan").onclick=function(){ ov.remove(); };
+  $("sgo").onclick=function(){ var m=$("sm").value, p=Math.round(+$("sp").value); if(!m){ $("serr").textContent="Pick a member."; return; } if(!(p>=1&&p<=20000)){ $("serr").textContent="Type the points to take back (1–20,000)."; return; }
+    ov.remove(); scoutPropose(f,"reverse",f.id+"|"+m+"|"+p,"Reverse "+n(p)+" points from "+mname(f.slug,m),"open","−"+n(p)+" pts"); }; }
+function scoutPropose(f,field,value,what,before,after){
+  api({type:"disc_propose",token:TOKEN,slug:f.slug,key:"scout",field:field,value:value,before:before,reward:"Scout · "+f.title}).then(function(r){
+    if(!r||!r.ok){ if(r&&r.auth===false) return signOut("Signed out. Log in again."); alert((r&&r.reason)||"Couldn't start that."); return; }
+    var ov=document.createElement("div"); ov.className="ov"; ov.setAttribute("role","dialog"); ov.setAttribute("aria-modal","true");
+    ov.innerHTML="<div class='sheet'><h3 style='margin-top:0'>Confirm: "+esc(what)+"</h3><div class='note'>"+esc(NAMES[f.slug])+" · 🛡️ "+esc(f.title)+"</div><div class='ba'><div><small>Flag</small><b>"+esc(before)+"</b></div><span>→</span><div><small>After</small><b>"+esc(after)+"</b></div></div>"+
+      "<p>We emailed a 6-digit code to <b>"+esc(r.sentTo)+"</b>. It works for 10 minutes.</p>"+(r.testCode?"<div class='test'>🧪 TEST MODE: no email sent. Your code is <b>"+esc(r.testCode)+"</b>.</div>":"")+
+      "<input id='otp' inputmode='numeric' autocomplete='one-time-code' maxlength='6' aria-label='6-digit code'><div class='err' id='oerr'></div><button class='btn' style='width:100%;margin-top:10px' id='oconf'>Confirm</button><button class='btn alt' style='width:100%;margin-top:8px' id='ocan'>Cancel</button></div>";
+    document.body.appendChild(ov); $("otp").focus(); $("ocan").onclick=function(){ ov.remove(); };
+    $("oconf").onclick=function(){ var cb=this; cb.disabled=true; api({type:"disc_confirm",token:TOKEN,id:r.id,code:$("otp").value.trim()}).then(function(c){ cb.disabled=false;
+      if(!c||!c.ok){ $("oerr").textContent=(c&&c.reason)||"Couldn't apply."; return; }
+      if(c.scout) DATA.scout=c.scout;
+      ov.querySelector(".sheet").innerHTML="<h3 style='margin-top:0'>✅ Done</h3><p>"+esc(c.after)+"</p><p class='note'>Written to the Audit log. The other login holder was emailed.</p>"+(c.testNotice?"<div class='test'>"+esc(c.testNotice)+"</div>":"")+"<button class='btn' style='width:100%' id='odone'>Done</button>";
+      $("odone").onclick=function(){ ov.remove(); load(); }; }); }; }); }
+function audit(){ return "<p class='note' style='margin-top:12px'>Every discount change and Scout action: who, what, before → after, when.</p>"+table(["When","Who","Restaurant","Reward","Field","Before","After","Status"],(DATA.audit||[]).slice().reverse().map(function(a){ return [new Date(a.ts).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}),esc(a.who),esc(a.slug),esc(a.reward),esc(a.field),esc(a.before),esc(a.after),esc(a.status)]; })); }
 function links(){ var h="<div class='card links'><a href='../../onboarding/christian/plan/'>📲 Game plan app</a><a href='../../onboarding/christian/'>Onboarding</a><a href='../../demo/melody-lax/'>✈️ Melody app</a><a href='../../demo/nalu-vida/'>🏄 Nalu Vida app</a><a href='../../staff/christian/'>🧑‍🍳 Staff app</a><a href='../../melody/kit/'>Melody print kit</a><a href='../../nalu-vida/kit/'>Nalu print kit</a><a href='../../onboarding/christian/placement/'>📍 Where to put the QR pieces</a><a href='../../melody/kit/toast-interim.html'>Melody Toast sheet</a><a href='../../nalu-vida/kit/toast-interim.html'>Nalu Toast sheet</a></div>";
   h+="<h2>🍞 Toast discount buttons</h2>"; (LIVE.slugs||[]).filter(inR).forEach(function(s){ var c=cur(s), ts=LIVE.defaults[s].toastStatus||{};
     var rows=c.tiers.map(function(t){ var b=t[2]||{}; return ["<span class='toastbtn'>"+esc(b.button)+"</span>",b.type==="fixed"?"$"+b.amount+" off check":"100% off 1 item"+(b.max?" (≤ $"+(+b.max).toFixed(2)+")":""),n(t[0])+" pts"]; });
@@ -235,13 +280,14 @@ function links(){ var h="<div class='card links'><a href='../../onboarding/chris
     h+="<h3>"+esc(NAMES[s])+" <span class='st "+(ts.state==="done"?"done":"tbd")+"'>"+(ts.state==="done"?"Set up ✓":"TBD")+"</span></h3><p class='note'>"+esc(ts.note)+"</p>"+table(["Button","Discount","Points"],rows); });
   return h; }
 function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY;
-  p.innerHTML={overview:overview,members:members,rewards:rewards,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links}[TAB]();
+  p.innerHTML={overview:overview,members:members,rewards:rewards,scout:scout,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links}[TAB]();
   if(TAB==="members"){ var q=$("q"); q.oninput=function(){ Q=q.value; var pos=q.selectionStart; draw(); var q2=$("q"); q2.focus(); try{ q2.setSelectionRange(pos,pos); }catch(e){} }; $("csv").onclick=csv;
     p.querySelectorAll("[data-sort]").forEach(function(th){ th.onclick=function(){ var k=th.dataset.sort; SORT={k:k,d:SORT.k===k?-SORT.d:-1}; draw(); }; }); }
   p.querySelectorAll("[data-led]").forEach(function(box){ var hid=$(box.dataset.led), up=function(){ var a=[], sum=0; box.querySelectorAll(".row").forEach(function(r){ var nm=r.querySelector(".li").value.trim(), v=parseInt(r.querySelector(".ln").value,10); if(nm&&v>0){ a.push([nm,v]); sum+=v; } });
     hid.value=JSON.stringify(a); var su=box.querySelector("[data-sum]"); if(su) su.textContent=/slices/.test(box.dataset.led)?"Total: "+sum+"%"+(sum===100?" ✓":" (must be 100)"):a.reduce(function(x,y){ return x+y[1]; },0)+" winner(s) in all"; };
     box.addEventListener("input",up); up(); });
   p.querySelectorAll("[data-save]").forEach(function(b){ b.onclick=function(){ saveFlow(b); }; });
+  p.querySelectorAll("[data-scout]").forEach(function(b){ b.onclick=function(){ scoutAsk(b); }; });
   window.scrollTo(0,y); }
 if(TOKEN) load();
 if("serviceWorker" in navigator && !TEST) navigator.serviceWorker.register("sw.js").catch(function(){});

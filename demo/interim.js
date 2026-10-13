@@ -19,7 +19,11 @@
    - interim.api SET (the Apps Script web app in command-center/clients/<client>/signup-sheet/Code.gs, deployed): every
      pass code, redemption and claim is checked and logged server-side under a script lock BEFORE points move, so a code,
      a check number + date, or a member's daily claim can never be used twice, on any device. If the server can't be
-     reached the phone falls back to its own checks and keeps the item in the queue to upload later. */
+     reached the phone falls back to its own checks and keeps the item in the queue to upload later.
+   - SCOUT (Code.gs): every redemption / claim carries an event id (eid = the pass code / claim id, reused on retries and
+     queue uploads), the phone id and a receipt-photo fingerprint. The server rejects duplicates BEFORE points move (same
+     event, same pass code, same check # + date, same total from another member within 10 min, same receipt photo, double
+     taps) with reason "Already counted"; the guest sees a friendly "already added, nothing changed" message. */
 (function () {
   "use strict";
   var CRM = window.SSAI_CRM, R = window.SSAI_REWARDS || {};
@@ -52,6 +56,9 @@
       .then(function (r) { return r.json(); }).catch(function () { return null; });
   }
   function queue(l, item) { l.queue.push(item); }
+  function devId() { try { return localStorage.getItem(CRM.key + "_dev") || ""; } catch (x) { return ""; } }
+  // the server's answer → what the guest reads ("Already counted" = Scout caught a duplicate, nothing was added or used)
+  function why(r, dflt) { return r && r.dup ? "Already counted ✓ This was already added, so nothing changed." : (r && r.reason) || dflt; }
   function flush() {   // upload anything that didn't reach the server yet
     if (!I.api) return; var l = load(), left = [];
     var p = Promise.resolve();
@@ -133,11 +140,11 @@
       '<button type="button" class="ir-go" data-ir="go">🎟️ Show my pass now</button><div class="ir-err"></div><button type="button" class="ir-x" data-ir="x">Not yet</button>');
     ov.querySelector("[data-ir=go]").onclick = function () {
       var btn = this; btn.disabled = true; btn.textContent = "One moment…";
-      var c = code(), now = Date.now(), rec = { type: "interim_redeem", code: c, tier: t.i, reward: t.name, button: t.button, pts: t.pts, ts: now, exp: now + I.passMinutes * 60000,
+      var c = code(), now = Date.now(), rec = { type: "interim_redeem", code: c, eid: c, dev: devId(), tier: t.i, reward: t.name, button: t.button, pts: t.pts, ts: now, exp: now + I.passMinutes * 60000,
         member: m.id, memberName: m.name, phone: m.phone || "", status: "live", day: day(now) };
       api(JSON.parse(JSON.stringify(rec))).then(function (r) {
-        if (r && !r.ok) { btn.disabled = false; btn.textContent = "🎟️ Show my pass now"; ov.querySelector(".ir-err").textContent = r.reason || "That reward can't be used right now."; return; }
-        var l = load(); rec.synced = !!r; if (!r) queue(l, { type: "interim_redeem", code: c, tier: t.i, reward: t.name, button: t.button, pts: t.pts, ts: now, member: m.id, memberName: m.name, day: rec.day });
+        if (r && !r.ok) { btn.disabled = false; btn.textContent = "🎟️ Show my pass now"; ov.querySelector(".ir-err").textContent = why(r, "That reward can't be used right now."); return; }
+        var l = load(); rec.synced = !!r; if (!r) queue(l, { type: "interim_redeem", code: c, eid: c, dev: rec.dev, tier: t.i, reward: t.name, button: t.button, pts: t.pts, ts: now, member: m.id, memberName: m.name, day: rec.day });
         l.redeems.unshift(rec); store(l);
         m = CRM.member(); CRM.add(m, -t.pts, "🎟️ Used: " + t.name + " · " + c, "interim_redeem"); CRM.save(m);
         ov.remove(); openPass(c);
@@ -176,9 +183,17 @@
     var url = URL.createObjectURL(file), im = new Image();
     im.onload = function () { var s = Math.min(1, I.photoMaxPx / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement("canvas");
       c.width = Math.round(im.naturalWidth * s); c.height = Math.round(im.naturalHeight * s); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
-      URL.revokeObjectURL(url); cb(c.toDataURL("image/jpeg", 0.6)); };
-    im.onerror = function () { URL.revokeObjectURL(url); cb(""); };
+      URL.revokeObjectURL(url); cb(c.toDataURL("image/jpeg", 0.6), fingerprint(im)); };
+    im.onerror = function () { URL.revokeObjectURL(url); cb("", ""); };
     im.src = url;
+  }
+  // receipt-photo fingerprint (8×8 average hash, 16 hex): the same photo re-sent from another phone or re-saved matches
+  function fingerprint(im) {
+    try { var c = document.createElement("canvas"), g = c.getContext("2d"), px, sum = 0, v = [], h = "";
+      c.width = c.height = 8; g.drawImage(im, 0, 0, 8, 8); px = g.getImageData(0, 0, 8, 8).data;
+      for (var i = 0; i < 64; i++) { var y = px[i * 4] * 0.299 + px[i * 4 + 1] * 0.587 + px[i * 4 + 2] * 0.114; v.push(y); sum += y; }
+      for (var j = 0; j < 64; j += 4) { var n = 0; for (var k = 0; k < 4; k++) n = n * 2 + (v[j + k] > sum / 64 ? 1 : 0); h += n.toString(16); }
+      return h; } catch (x) { return ""; }
   }
   function claim() {
     var m = CRM.member();
@@ -189,7 +204,7 @@
       return;
     }
     var opts = ""; for (var b = 0; b <= I.claimDaysBack; b++) opts += '<option value="' + dayBack(b) + '">' + (b === 0 ? "Today" : b === 1 ? "Yesterday" : b + " days ago") + ' (' + new Date(dayBack(b) + "T12:00").toLocaleDateString([], { month: "short", day: "numeric" }) + ')</option>';
-    var photo = "", ov = sheet('<h3>🧾 Add my visit</h3><p>' + PER + ' points for every $1 before tip. Use the receipt from ' + e(NAME) + '.</p>' +
+    var photo = "", fp = "", ov = sheet('<h3>🧾 Add my visit</h3><p>' + PER + ' points for every $1 before tip. Use the receipt from ' + e(NAME) + '.</p>' +
       '<label>Receipt photo (optional, helps us confirm it)</label><div class="ir-photo"><label class="ir-pick" style="margin:0">📷 Snap the receipt<input type="file" accept="image/*" capture="environment" data-ir="file" style="display:none"></label><img data-ir="thumb" alt="" style="display:none"></div>' +
       '<label>Check number (top of the Toast receipt)</label><input data-ir="check" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="e.g. 142">' +
       '<div class="ir-two"><div><label>Total before tip ($)</label><input data-ir="total" inputmode="decimal" maxlength="8" placeholder="48.50"></div><div><label>Date</label><select data-ir="date">' + opts + '</select></div></div>' +
@@ -197,7 +212,7 @@
       '<p class="ir-fine">One receipt per day. Each check can only be added once. Up to $' + I.claimCap + ' per check. Claims are checked against ' + e(NAME) + '\'s sales report; made-up checks lose their points.</p>' +
       '<button type="button" class="ir-x" data-ir="x">Cancel</button>');
     var q = function (k) { return ov.querySelector("[data-ir=" + k + "]"); }, err = ov.querySelector(".ir-err");
-    q("file").onchange = function () { var f = this.files && this.files[0]; if (!f) return; downscale(f, function (d) { photo = d; if (d) { q("thumb").src = d; q("thumb").style.display = "block"; } }); };
+    q("file").onchange = function () { var f = this.files && this.files[0]; if (!f) return; downscale(f, function (d, f2) { photo = d; fp = f2 || ""; if (d) { q("thumb").src = d; q("thumb").style.display = "block"; } }); };
     q("go").onclick = function () {
       var btn = this, chk = q("check").value.trim().replace(/^#/, "").toUpperCase(), tot = Math.round(parseFloat(q("total").value.replace(/[$,\s]/g, "")) * 100) / 100, dt = q("date").value;
       err.textContent = "";
@@ -212,10 +227,10 @@
       var rec = { type: "interim_claim", id: "C" + now.toString(36) + CRM.code4(3), check: chk, date: dt, total: tot, credited: base, pts: pts, ts: now, member: m.id, memberName: m.name, phone: m.phone || "",
         status: "pending", capped: capped };
       btn.disabled = true; btn.textContent = "Checking…";
-      api({ type: "interim_claim", id: rec.id, check: chk, date: dt, total: tot, pts: pts, ts: now, member: m.id, memberName: m.name, photo: photo }).then(function (r) {
-        if (r && !r.ok) { btn.disabled = false; btn.textContent = "Add my points"; err.textContent = r.reason || "That check can't be added."; return; }
+      api({ type: "interim_claim", id: rec.id, eid: rec.id, dev: devId(), fp: fp, check: chk, date: dt, total: tot, pts: pts, ts: now, member: m.id, memberName: m.name, photo: photo }).then(function (r) {
+        if (r && !r.ok) { btn.disabled = false; btn.textContent = "Add my points"; err.textContent = why(r, "That check can't be added."); return; }
         var l2 = load(); rec.synced = !!r; rec.photo = photo;
-        if (!r) queue(l2, { type: "interim_claim", id: rec.id, check: chk, date: dt, total: tot, pts: pts, ts: now, member: m.id, memberName: m.name });   // photo stays on the phone
+        if (!r) queue(l2, { type: "interim_claim", id: rec.id, eid: rec.id, dev: devId(), fp: fp, check: chk, date: dt, total: tot, pts: pts, ts: now, member: m.id, memberName: m.name });   // photo stays on the phone
         l2.claims.unshift(rec); store(l2);
         m = CRM.member(); CRM.add(m, pts, "🧾 Visit · check #" + chk + " · $" + base.toFixed(2) + (capped ? " (capped)" : "") + " · pending review", "interim_claim");
         m.visits = (m.visits || 0) + 1; m.last = now; CRM.save(m);

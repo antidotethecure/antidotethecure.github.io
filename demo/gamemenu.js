@@ -31,6 +31,11 @@
                                     available; once used it shows "next spin in 5h 12m".
      preview:function(on){}         (opt-in) live "attract mode": the menu card turns see-through over the game area and the
                                     game runs a silent demo behind it. Called with true when the menu opens, false on PLAY.
+     showcase:function(parts){ return html }   (opt-in) replaces the default stacked layout with the game's own start screen.
+                                    parts = {play:"<button …PLAY>", buttons:["<button class=gm-b …>",…], esc, T}: the game places
+                                    them anywhere in its HTML (they keep working: data-gm wiring is unchanged). The overlay then
+                                    gets class gm-show (top-aligned, scrolls inside itself, opaque) and preview() never turns it
+                                    see-through. GameMenu.refresh() re-renders it.
    Audio convention (games that have sound expose it; the menu wires to it):
      window.GAME_AUDIO={ music:function(on){}, sfx:function(on){}, state:function(){ return {hasMusic:true,hasSfx:true,music:true,sfx:true}; } }
      music(false) must silence ONLY the music (gain 0 / pause the <audio>), never suspend the shared AudioContext.
@@ -159,6 +164,7 @@
     ".gm-who.need{animation:gmShake .45s}@keyframes gmShake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}" +
     ".gm-ov.hasmodes .gm-tag{display:none}.gm-ov.hasmodes .gm-hero{height:46px}.gm-ov.hasmodes .gm-hero img{height:42px}" +
     ".gm-fstip{display:block;width:min(300px,100%);margin:-4px 0 0;padding:4px 6px;border:0;background:none;color:var(--gm-dim);font:700 12px/1.3 var(--gm-body);cursor:pointer;text-decoration:underline;text-underline-offset:2px}" +
+    ".gm-ov.gm-show{justify-content:flex-start;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none}.gm-ov.gm-show::-webkit-scrollbar{display:none}" +
     "@media (prefers-reduced-motion:reduce){.gm-hero img,.gm-play{animation:none}}";
   D.head.appendChild(st);
 
@@ -179,7 +185,8 @@
     if (M) h += '<div class="gm-who" role="group" aria-label="' + esc(T(M.title || "Who's playing?")) + '"><p>' + esc(T(M.title || "Who's playing?")) + '</p><div class="gm-wb">' +
       M.options.map(function (o) { return '<button type="button" data-gm="mode" data-v="' + esc(o[0]) + '" aria-pressed="' + (cur === o[0]) + '"><i>' + o[1] + "</i>" + esc(T(o[2])) + "<small>" + esc(T(o[3])) + "</small></button>"; }).join("") + "</div></div>";
     if (tk) { try { h += '<p class="gm-tok" aria-live="polite">' + tk.statusHTML(cur === "kid") + "</p>"; } catch (e) {} }
-    h += '<button type="button" class="gm-play' + (tk && tk.locked() ? " lock" : "") + '" data-gm="play"><b></b>' + esc(T(tk ? tk.playLabel() : "PLAY")) + "</button>";
+    var playH = '<button type="button" class="gm-play' + (tk && tk.locked() ? " lock" : "") + '" data-gm="play"><b></b>' + esc(T(tk ? tk.playLabel() : "PLAY")) + "</button>";
+    h += playH;
     var bs = [];
     var sr = !!(tk && tk.spin && tk.spinReady()), badge = C.spinBadge && sr;
     if (tk && tk.spin) bs.push(C.spinBadge ? '<button type="button" class="gm-b gm-spin' + (sr ? " rdy" : "") + '" data-gm="spin"><i>🎡</i><span>' + esc(T(sr ? "Free daily spin" : "Spun today ✓")) + (sr ? "" : '<small class="gm-cd">' + esc(T("next spin in")) + " " + cd() + "</small>") + "</span>" + (sr ? '<b class="gm-nb" aria-label="1 spin available">1</b>' : "") + "</button>"
@@ -192,6 +199,7 @@
     bs.push('<button type="button" class="gm-b" data-gm="settings"><i>⚙️</i>' + esc(T("Settings")) + "</button>");
     bs.push('<button type="button" class="gm-b" data-gm="how"><i>❓</i>' + esc(T("How to play")) + "</button>");
     bs.push('<button type="button" class="gm-b' + (badge ? " gm-spin" : "") + '" data-gm="points"><i>🏆</i>' + esc(T("Points & prizes")) + (badge ? '<b class="gm-nb" aria-label="1 free spin waiting">1</b>' : "") + "</button>");
+    if (C.showcase) { try { return C.showcase({ play: playH, buttons: bs.slice(), esc: esc, T: T }); } catch (e) { if (W.console) console.error(e); } }
     if (bs.length % 2) bs[bs.length - 1] = bs[bs.length - 1].replace('class="gm-b"', 'class="gm-b wide"');
     h += '<div class="gm-grid">' + bs.join("") + "</div>";
     if (fsOn && FS().iPhone && AH()) h += '<button type="button" class="gm-fstip" data-gm="a2hs">' + esc(T("For true full screen, add us to your Home Screen")) + "</button>";
@@ -211,7 +219,9 @@
     box = q(C.box) || (mount.closest && mount.closest(".gamebox")) || mount.parentNode;
     if (getComputedStyle(box).position === "static") box.style.position = "relative";
     ov = el("div", "gm-ov"); ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", (C.name || "Game") + " start menu");
-    ov.innerHTML = menuHTML(); if (C.modes) ov.classList.add("hasmodes"); if (C.preview) ov.classList.add("gm-pv"); box.appendChild(ov);
+    ov.innerHTML = menuHTML(); if (C.modes) ov.classList.add("hasmodes");
+    if (C.showcase) { ov.classList.add("gm-show"); ov.setAttribute("data-scroll-ok", ""); } else if (C.preview) ov.classList.add("gm-pv");
+    box.appendChild(ov);
     preview(true);
     if (C.spinBadge) setInterval(function () { if (opened && ov && ov.querySelector(".gm-cd")) ov.innerHTML = menuHTML(); }, 30000);
     ov.addEventListener("click", onBtn);

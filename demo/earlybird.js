@@ -79,8 +79,8 @@
     }
     if (window.SSAI_INTERIM && SSAI_INTERIM.usedToday()) { b.disabled = false; SSAI_INTERIM.giftPass(S.item, S.cfg.button, ""); return; }   // shows "one reward per visit"
     var code = SSAI_INTERIM.newCode();
-    call({ type: "eb_redeem", code: code }).then(function (r) {
-      b.disabled = false; if (!r || !r.ok) { err((r && r.reason) || "Can't reach " + NAME + " right now. Try again at the table."); if (r && r.state) { S.state = r.state; draw(); } return; }
+    call({ type: "eb_redeem", code: code, eid: code }).then(function (r) {   // eid: Scout rejects a re-sent pass ("Already counted")
+      b.disabled = false; if (!r || !r.ok) { err(r && r.dup ? "Already counted ✓ This gift was already used, so nothing changed." : (r && r.reason) || "Can't reach " + NAME + " right now. Try again at the table."); if (r && r.state) { S.state = r.state; draw(); } return; }
       SSAI_INTERIM.giftPass(S.item, S.cfg.button, code, function () { S.state = "used"; draw(); });
     });
   }

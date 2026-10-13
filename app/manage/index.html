@@ -110,5 +110,6 @@ document.addEventListener("submit",function(e){ var f=e.target.closest("[data-ad
 if(location.hash){ var c=location.hash.slice(1); if(CL.some(function(x){return x.id===c;})) setTimeout(function(){ var el=document.getElementById(c); if(el) el.scrollIntoView(); },50); }
 render();
 </script>
+<script src="backoffice.js?v=bo1"></script>
 </body>
 </html>

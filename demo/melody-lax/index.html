@@ -39,9 +39,16 @@ window.SSAI_REWARDS={
     redeemsPerDay:1,       // rewards per member per day (one per visit)
     photoMaxPx:900,        // receipt photos are downscaled to this before they're stored / uploaded
     api:""},               // Apps Script /exec URL (command-center/clients/melody-lax/signup-sheet/Code.gs). Empty = this phone only.
+  /* NEARBY ALERTS + LOCATION BUDDY BONUS (demo/locbonus.js, 2026-10-12). on + pts are editable in Christian HQ › Discounts
+     ("Location bonus", key lb). One-time bonus once location + notifications were confirmed ON when the app was opened on
+     minDays different days spanning spanDays days. Web apps can only read location while open (no background/geofence).
+     lat/lng = 9132 S Sepulveda Blvd (US Census + OpenStreetMap geocode, 2026-10-12). push.vapid empty = no push server yet. */
+  locationBonus:{on:true, pts:100, minDays:3, spanDays:7, radiusMi:0.5, lat:33.95418, lng:-118.39602, pin:"✈️",
+    nearbyDeal:"Happy hour is 3–6 daily. Show your app to your server and add your visit for points.",
+    push:{vapid:"", schedule:[["Lunch at Melody","11:30"],["Happy hour starts now","15:00"]]}},
   justLanded:{offer:"10% off your first order today",toast:{button:"App – Just Landed 10% Off",type:"percent",percent:10},note:"Landed at LAX in the last 24 hours? Show your boarding pass to your server. One per guest, can't be combined with other offers."}
 };</script>
-<script src="../christian-live.js?v=bo1" data-slug="melody-bar-grill"></script>
+<script src="../christian-live.js?v=lb1" data-slug="melody-bar-grill"></script>
 <meta name="description" content="Melody Bar & Grill by LAX: drinks and food menu, Melody Rewards points, the Just Landed deal, and the Melody flight game.">
 <meta name="theme-color" content="#0b1220">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -285,6 +292,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 
 <h2 id="rewards"><small>Melody Rewards</small>Earn points, get rewards</h2>
 <div id="rwhost"></div>
+<div id="lbhost"></div>
 
 <h2 id="visit"><small>Come through</small>Visit Melody</h2>
 <div class="info">
@@ -1939,7 +1947,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
 <script>/* Simple program (Christian, 2026-10): one balance, the numbers live in window.SSAI_REWARDS at the top of this page.
    No split wallets, visit levels, tokens, daily spin or welcome voucher (see crm.js SIMPLE). */
 window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Melody Approach"};</script>
-<script src="../crm.js?v=bo1"></script><script src="../interim.js?v=bo1"></script><script src="../earlybird.js?v=bo1"></script>
+<script src="../crm.js?v=bo1"></script><script src="../interim.js?v=bo1"></script><script src="../earlybird.js?v=bo1"></script><script src="../locbonus.js?v=lb1"></script>
 <script>window.NEARBY={name:"Melody Bar & Grill",pin:"✈️",mount:"#rwhost",spots:[{label:"Westchester",lat:33.9487,lng:-118.3918,q:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"}],offer:"Happy hour is 3–6 daily."};</script>
 <script src="../nearby.js?v=cf1"></script>
 <script src="../menu3d.js"></script>

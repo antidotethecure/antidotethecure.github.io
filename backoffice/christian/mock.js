@@ -27,7 +27,7 @@
   ["Ana", "Luis", "Kai", "Mo"].forEach(function (nm, k) { for (var r = 0; r < 4 + k; r++) staff.push([pick(slugs), ymd(now - r * DAY), nm, pick(["Melody Approach", "Ride the Nalu"]), Math.floor(rnd() * 8000), Math.floor(rnd() * 80)]); });
   trained.push([ymd(now - 2 * DAY), "Ana", 92, "yes"], [ymd(now - DAY), "Luis", 75, "no"]);
   var USERS = { christian: { name: "Christian", email: "christian@example.com" }, antidote: { name: "Antidote", email: "antidote@example.com" } }, TOK = {}, PEND = {}, fails = 0;
-  function label(f) { return { pts: "Points cost", amount: "$ off", percent: "% off", label: "Reward name" }[f] || f; }
+  function label(f, k) { if (k === "lb") return f === "on" ? "Location bonus on/off" : "Location bonus points"; return { pts: "Points cost", amount: "$ off", percent: "% off", label: "Reward name" }[f] || f; }
   var EB = { "melody-bar-grill": {}, "nalu-vida": {} };
   function ebValid(f, v) {
     v = String(v == null ? "" : v).trim();
@@ -46,6 +46,7 @@
     o[s] = { cfg: c, qualify: c.golive ? q : 0, activated: c.on === "on" ? Math.floor(q / 3) : 0, redeemed: c.on === "on" ? Math.floor(q / 5) : 0, won: c.drawn ? c.won || 0 : 0, items: {} }; }); return o; }
   function valid(key, field, v) {
     if (key === "eb") return ebValid(field, v);
+    if (key === "lb") { if (field === "on") return v === "on" || v === "off" ? v : null; if (field === "pts") { v = Math.round(+v); return v >= 10 && v <= 1000 ? v : null; } return null; }
     if (!/^(t[0-9]|jl)$/.test(key)) return null;
     if (key === "jl") { v = Math.round(+v); return field === "percent" && v >= 1 && v <= 50 ? v : null; }
     if (field === "pts") { v = Math.round(+v); return v >= 50 && v <= 10000 ? v : null; }
@@ -62,9 +63,9 @@
     var u = TOK[d.token]; if (!u) return { ok: false, auth: false, reason: "Signed out. Log in again." };
     if (d.type === "bo_logout") { delete TOK[d.token]; return { ok: true }; }
     if (d.type === "bo_summary") return { ok: true, members: members.length, joined7: members.filter(function (m) { return m.joined > now - 7 * DAY; }).length, plays7: games.length, redeems7: redeems.length, pendingClaims: claims.filter(function (x) { return x.status === "pending"; }).length };
-    if (d.type === "bo_data") return { ok: true, test: true, eb: ebStats(), me: USERS[u].name, now: Date.now(), members: members, games: games, opens: opens, redeems: redeems, claims: claims, staff: staff, trained: trained, audit: audit, disc: disc };
+    if (d.type === "bo_data") return { ok: true, test: true, eb: ebStats(), me: USERS[u].name, now: Date.now(), members: members, games: games, opens: opens, redeems: redeems, claims: claims, staff: staff, trained: trained, audit: audit, disc: disc, lb: { "melody-bar-grill": { credited: 3, devices: 11 } } };
     if (d.type === "disc_propose") {
-      var v = valid(d.key, d.field, d.value); if (v == null) return { ok: false, reason: "That value isn't allowed. Points 50–10,000 · $ off 1–100 · percent 1–50 · names 3–80 characters." };
+      var v = valid(d.key, d.field, d.value); if (v == null) return { ok: false, reason: "That value isn't allowed. Points 50–10,000 · $ off 1–100 · percent 1–50 · names 3–80 characters · location bonus 10–1,000." };
       var cur = d.key === "eb" ? (EB[d.slug][d.field] != null ? EB[d.slug][d.field] : d.field === "on" ? "off" : d.field === "draw" ? "not drawn" : "(not set)") : disc[d.slug] && disc[d.slug][d.key] && disc[d.slug][d.key][d.field], id = "P" + Math.random().toString(36).slice(2, 10), code = String(100000 + Math.floor(Math.random() * 900000));
       PEND[id] = { user: u, slug: d.slug, key: d.key, field: d.field, value: v, before: cur != null ? cur : d.before, reward: d.reward, code: code, tries: 0, exp: Date.now() + 6e5 };
       return { ok: true, id: id, sentTo: USERS[u].email.replace(/^(.).*(@.*)$/, "$1•••$2"), before: PEND[id].before, after: v, testCode: code };
@@ -85,9 +86,9 @@
       }
       ((disc[p.slug] = disc[p.slug] || {})[p.key] = disc[p.slug][p.key] || {})[p.field] = p.value;
       var other = Object.keys(USERS).filter(function (k) { return k !== u; })[0];
-      audit.push({ ts: Date.now(), who: USERS[u].name, slug: p.slug === "nalu-vida" ? "Nalu Vida" : "Melody Bar & Grill", reward: p.reward, field: label(p.field), before: p.before, after: p.value, status: "applied" });
+      audit.push({ ts: Date.now(), who: USERS[u].name, slug: p.slug === "nalu-vida" ? "Nalu Vida" : "Melody Bar & Grill", reward: p.reward, field: label(p.field, p.key), before: p.before, after: p.value, status: "applied" });
       return { ok: true, slug: p.slug, key: p.key, field: p.field, before: p.before, after: p.value, disc: disc,
-        testNotice: "TEST MODE: no email sent. Live, " + USERS[other].name + " would get: “" + USERS[u].name + " changed " + (p.slug === "nalu-vida" ? "Nalu Vida" : "Melody") + " '" + p.reward + "' " + label(p.field).toLowerCase() + " from " + p.before + " to " + p.value + " at " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + "”" };
+        testNotice: "TEST MODE: no email sent. Live, " + USERS[other].name + " would get: “" + USERS[u].name + " changed " + (p.slug === "nalu-vida" ? "Nalu Vida" : "Melody") + " '" + p.reward + "' " + label(p.field, p.key).toLowerCase() + " from " + p.before + " to " + p.value + " at " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + "”" };
     }
     return { ok: false };
   }

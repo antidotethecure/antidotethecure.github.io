@@ -21,7 +21,9 @@
         [1000, "$10 off your check", { button: "App Reward – $10 Off", type: "fixed", amount: 10 }],
         [1500, "Free entrée: any Mac & Cheese or burrito", { button: "App Reward – Free Entrée", type: "item", max: 21.50 }]],
       justLanded: { offer: "10% off your first order today", toast: { button: "App – Just Landed 10% Off", type: "percent", percent: 10 }, note: "Landed at LAX in the last 24 hours? Show your boarding pass to your server. One per guest, can't be combined with other offers." },
-      toastStatus: { state: "done", when: "2026-10-12", note: "All 5 buttons set up in Toast (confirmed by Antidote, Oct 12, 2026)" } },
+      toastStatus: { state: "done", when: "2026-10-12", note: "All 5 buttons set up in Toast (confirmed by Antidote, Oct 12, 2026)" },
+      // one-time "Location buddy" bonus (demo/locbonus.js). Melody only for now; give Nalu Vida the same line to turn it on there.
+      locationBonus: { on: true, pts: 100, minDays: 3, spanDays: 7 } },
     "nalu-vida": { name: "Nalu Vida", short: "Nalu Vida", prefix: "NV", page: "demo/nalu-vida/", game: "Ride the Nalu",
       perDollar: 10, join: 100, birthday: 250, referral: 100, game_: { perScore: 100, dailyCap: 50 },
       tiers: [[250, "Free mocktail, soft drink or Jungle Fries", { button: "App Reward – Free Mocktail/Soft Drink/Jungle Fries", type: "item", max: 15.00 }],
@@ -48,6 +50,8 @@
       if (t[2] && t[2].type === "fixed" && a != null) { t[2].amount = a; if (l == null) t[1] = t[1].replace(/\$\d+(\.\d+)?/, function () { return "$" + (a % 1 ? a.toFixed(2) : a); }); }
       if (l != null) t[1] = l;
     });
+    var lb = o.lb, L = R.locationBonus;   // Location buddy bonus: {on:"on"|"off", pts}
+    if (lb && L) { if (lb.on === "on" || lb.on === "off") L.on = lb.on === "on"; var lp = int(lb.pts, 10, 1000); if (lp != null) L.pts = lp; }
     var j = o.jl, jl = R.justLanded;
     if (j && jl && jl.toast) { var pc = int(j.percent, 1, 90); if (pc != null) { jl.toast.percent = pc; jl.offer = jl.offer.replace(/\d+%/, function () { return pc + "%"; }); } }
     return R;
@@ -72,9 +76,10 @@
     var c = cached(); if (c) apply(R, c.d[SLUG]);
     fetchLive(function (fresh) {
       if (!fresh) return;
-      var before = JSON.stringify([R.tiers, R.justLanded]); apply(R, fresh.d[SLUG]);
-      if (JSON.stringify([R.tiers, R.justLanded]) === before) return;
+      var before = JSON.stringify([R.tiers, R.justLanded, R.locationBonus]); apply(R, fresh.d[SLUG]);
+      if (JSON.stringify([R.tiers, R.justLanded, R.locationBonus]) === before) return;
       if (window.SSAI_CRM && SSAI_CRM.redraw) SSAI_CRM.redraw();
+      if (window.SSAI_LOCBONUS) SSAI_LOCBONUS.redraw();
       var lo = document.getElementById("landoffer"); if (lo && R.justLanded) lo.textContent = "Just Landed: " + R.justLanded.offer;
     });
   }

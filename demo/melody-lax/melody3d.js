@@ -1,7 +1,7 @@
 /* Melody Approach: optional real-3D renderer (three.js r160 + GLB models).
    VISUAL ONLY. The game in index.html keeps running exactly as before (logic, scoring, hitboxes, timing, HUD).
    When this layer is on, the game's 2D canvas becomes a transparent HUD/text overlay and this module draws the world
-   (aerial LA ground, runway, landmarks, every aircraft, pickups, shots, smoke/fire/debris/explosions) in WebGL under it,
+   (aerial LA ground, runway, generic scenery, every aircraft, pickups, shots, smoke/fire/debris/explosions) in WebGL under it,
    reading positions, rotations and types from the game's own objects each frame (window.__M3 bridge).
    Camera: straight down over the same 400x600 field. The ground plane maps 1:1 to the 2D layout and every flying object is
    placed so it lands on exactly the same screen spot and size as its 2D sprite; altitude only adds parallax, real shadows
@@ -30,7 +30,7 @@ async function boot() {
   const D = 1000;                                   // camera height above the ground plane
   const ws = Y => (D - Y) / D;                      // world units per screen px at altitude Y
   const wx = (x, Y) => (x - W / 2) * ws(Y), wz = (y, Y) => (y - H / 2) * ws(Y);
-  const A = { player: 150, ufo: 176, jet: 192, cop: 200, kami: 182, gun: 214, sj: 200, rp: 236, blimp: 250, item: 104, shot: 150, eshot: 164, air: 138 };
+  const A = { trf: 128, player: 150, ufo: 176, jet: 192, cop: 200, kami: 182, gun: 214, sj: 200, rp: 236, blimp: 250, item: 104, shot: 150, eshot: 164, air: 138 };
 
   /* ---------------- renderer, camera, lights ---------------- */
   const cv = document.getElementById("cv"), wrap = cv.parentNode;
@@ -134,6 +134,21 @@ async function boot() {
   }
   await Promise.all(Object.keys(FILES).map(loadModel));
   if (!MODELS.plane) throw new Error("player model missing");
+  // other traffic: a small unbranded high-wing prop plane, built from primitives (nose = +Z, like the GLB aircraft). No logos, no livery.
+  (() => { const g = new THREE.Group(), body = new THREE.MeshStandardMaterial({ color: 0xf4f1ea, roughness: .5 }), trim = new THREE.MeshStandardMaterial({ color: 0x1f8a8a, roughness: .5 }),
+      glass = new THREE.MeshStandardMaterial({ color: 0x22344f, roughness: .2, metalness: .3 }), dark = new THREE.MeshStandardMaterial({ color: 0x2a2d35, roughness: .6, transparent: true, opacity: .45 });
+    const add = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; g.add(m); return m; };
+    const fus = new THREE.CylinderGeometry(2.3, 0.9, 24, 14); fus.rotateX(Math.PI / 2); add(fus, body, 0, 0, 0);
+    const nose = new THREE.SphereGeometry(2.3, 14, 10); nose.scale(1, 1, 1.25); add(nose, body, 0, 0, 12);
+    add(new THREE.BoxGeometry(36, .7, 5.2), body, 0, 2.3, 4);                          // high wing
+    add(new THREE.BoxGeometry(3.4, .8, 5.3), trim, 16.4, 2.3, 4); add(new THREE.BoxGeometry(3.4, .8, 5.3), trim, -16.4, 2.3, 4);
+    add(new THREE.BoxGeometry(13, .5, 3.4), body, 0, .5, -10.6);                       // tailplane
+    add(new THREE.BoxGeometry(.6, 4.6, 4.2), trim, 0, 2.6, -10.2);                     // fin
+    add(new THREE.BoxGeometry(3.8, 1.5, 3.2), glass, 0, 1.6, 8);                       // windshield
+    const prop = add(new THREE.BoxGeometry(9, .25, .4), dark, 0, 0, 14.8); prop.castShadow = false;
+    const box = new THREE.Box3().setFromObject(g), c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
+    g.position.sub(c); const inner = new THREE.Group(); inner.add(g); MODELS.trf = { node: inner, size: sz };
+  })();
 
   // instances: each model type has a pool of clones; materials are cloned per clone so hit flashes/tints stay local
   const POOLS = {};
@@ -157,7 +172,7 @@ async function boot() {
   // model-local point given in fractions of the model's bbox
   function frac(o, fx, fy, fz) { const s = o.userData.size; return local(o, fx * s.x, fy * s.y, fz * s.z); }
 
-  /* ---------------- procedural props: coin, drizzle emblem, med kit, crate + chute, blimp, rotors, Theme Building ---------------- */
+  /* ---------------- procedural props: coin, drizzle emblem, med kit, crate + chute, blimp, rotors ---------------- */
   function capTex(draw, n) { const c = mkc(n || 128, n || 128); draw(c.getContext("2d"), c.width); return canTex(c, true); }
   const coinCap = capTex((x, n) => { const g = x.createLinearGradient(0, 0, n, n); g.addColorStop(0, "#fff7c2"); g.addColorStop(.4, "#ffd23f"); g.addColorStop(.75, "#c88a0c"); g.addColorStop(1, "#ffe38a"); x.fillStyle = g; x.fillRect(0, 0, n, n);
     x.strokeStyle = "#9b6a06"; x.lineWidth = 6; x.beginPath(); x.arc(n / 2, n / 2, n * .42, 0, TAU); x.stroke(); x.fillStyle = "#9b6a06"; x.font = "900 " + (n * .55 | 0) + "px 'Playfair Display',Georgia,serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("\u266A", n / 2, n / 2 + 4); });   // a gold music note (Melody), not a coin: one currency (points)
@@ -206,25 +221,6 @@ async function boot() {
     const word = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: lt, transparent: true, depthWrite: false })); word.rotation.x = -Math.PI / 2; word.scale.set(44, 44, 1); word.renderOrder = 111; g.add(word);
     const prop = new THREE.Mesh(rotorGeo, rotorMat); prop.renderOrder = 111; g.add(prop);
     g.userData = { word, prop, env }; g.visible = false; scene.add(g); return g; })();
-  // the LAX Theme Building: two crossing white parabolic arches over the saucer restaurant, purple-blue uplights (procedural)
-  // the LAX Theme Building: its circular plaza is lifted out of the ground as a real 3D plinth (the aerial photo on top,
-  // lit stone sides, purple uplight band) so aircraft shadows and the perspective show its height. Built for the 230 px sprite.
-  const TH_R = 97, TH_H = 11, TH_CX = .5, TH_CY = .53;
-  let themeTop = null;
-  const thTopGeo = new THREE.CircleGeometry(TH_R, 64); thTopGeo.rotateX(-Math.PI / 2);
-  const thSideGeo = new THREE.CylinderGeometry(TH_R, TH_R + 3, TH_H, 64, 1, true); thSideGeo.translate(0, TH_H / 2, 0);
-  const thBandTex = capTex((x, n) => { const g = x.createLinearGradient(0, 0, 0, n); g.addColorStop(0, "#c9c3e8"); g.addColorStop(.18, "#3a3550"); g.addColorStop(.7, "#1d1b28"); g.addColorStop(1, "#0d0c14"); x.fillStyle = g; x.fillRect(0, 0, n, n);
-    for (let i = 0; i < 16; i++) { const cx = (i + .5) * n / 16, gl = x.createRadialGradient(cx, n * .85, 0, cx, n * .85, n * .09); gl.addColorStop(0, "rgba(150,110,255,.95)"); gl.addColorStop(1, "rgba(150,110,255,0)"); x.fillStyle = gl; x.fillRect(cx - n * .1, n * .6, n * .2, n * .4); } }, 128);
-  const thSideMat = new THREE.MeshStandardMaterial({ map: thBandTex, roughness: .8, emissive: 0x2a1f66, emissiveIntensity: .35 });
-  function makeTheme() { const g = new THREE.Group();
-    const top = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, alphaTest: .35 }); const t = new THREE.Mesh(thTopGeo, top); t.position.y = TH_H; t.receiveShadow = true; g.add(t);
-    const side = new THREE.Mesh(thSideGeo, thSideMat); side.castShadow = true; side.receiveShadow = true; g.add(side);
-    g.userData.top = top; g.visible = false; scene.add(g); return g; }
-  function themeSkin() { // the plinth's top wears the game's own Theme photo, cropped to the plaza circle
-    if (themeTop || !M.ready(S.theme)) return; const im = S.theme, sw = 230, sh = 230 * im.naturalHeight / im.naturalWidth, ru = TH_R / sw, rv = TH_R / sh;
-    const t = new THREE.Texture(im); t.colorSpace = THREE.SRGBColorSpace; t.repeat.set(2 * ru, 2 * rv); t.offset.set(TH_CX - ru, (1 - TH_CY) - rv); t.needsUpdate = true; themeTop = t;
-    THEMES.forEach(g => { g.userData.top.map = t; g.userData.top.needsUpdate = true; }); }
-  const THEMES = [makeTheme(), makeTheme()];
 
   /* ---------------- ground: lit aerial tiles, landmarks, runway, shadow catcher ---------------- */
   const tileGeo = new THREE.PlaneGeometry(1, 1); tileGeo.rotateX(-Math.PI / 2);
@@ -268,9 +264,9 @@ async function boot() {
     tongueQ(B, x + (t - (n - 1) / 2) * size * .12, y, Y, s, a + Math.PI / 2, uv, 1, 1, 1, Math.min(1, .65 + .35 * fl)); } }
 
   /* ---------------- per-frame: ground ---------------- */
-  const LMK = { theme: 1, melody: 1, innout: 1, sofi: 1, crypto: 1 };
+  const LMK = { melody: 1, stadium: 1, towers: 1 }, LMW = M.LMW || { melody: 250, stadium: 270, towers: 240 };
   function drawGround(now, G) {
-    let ti = 0, li = 0, th = 0, rwOn = false;
+    let ti = 0, li = 0, rwOn = false;
     G.ground.forEach((g, idx) => {
       const T = M.TILES[g.t], mat = tileMat(g.t);
       if (T && mat) { let m = tileMeshes[ti++]; if (!m) { m = new THREE.Mesh(tileGeo, mat); m.receiveShadow = false; scene.add(m); tileMeshes.push(m); }
@@ -279,13 +275,11 @@ async function boot() {
         BgA.q(gx, gy, 1, 160, 160, 0, UV.dot, 1, .67, .35, .45 * p); BgA.q(gx, gy, 1, 150, 150, 0, UV.glow, .31, .67, 1, .25 * p); }
       if (g.k === "runway" && g.y < H + 40 && g.y + g.h + 150 > -40) { rwOn = true; const sc = rwC.width / W; rwX.setTransform(1, 0, 0, 1, 0, 0); rwX.clearRect(0, 0, rwC.width, rwC.height); rwX.setTransform(sc, 0, 0, sc, 0, 0);
         M.runway(rwX, g, 40); rwTex.needsUpdate = true; const hh = rwC.height / sc; rwMesh.scale.set(W, 1, hh); rwMesh.position.set(0, .3, g.y - 40 + hh / 2 - H / 2); }
-      if (LMK[g.k]) { const im = S[g.k], mm = lmMat(g.k); if (mm) { const w = g.k === "melody" ? 250 : g.k === "sofi" ? 270 : 230, h = w * im.naturalHeight / im.naturalWidth, x = W / 2 + g.side * 70 - w / 2, y = g.y + (g.h - h) / 2;
-        let m = lmMeshes[li++]; if (!m) { m = new THREE.Mesh(tileGeo, mm); m.receiveShadow = true; scene.add(m); lmMeshes.push(m); } m.material = mm; m.visible = true; m.renderOrder = 50; m.scale.set(w, 1, h); m.position.set(x + w / 2 - W / 2, .2, y + h / 2 - H / 2);
-        if (g.k === "theme" && th < THEMES.length) { themeSkin(); const t3 = THEMES[th++]; t3.visible = true; t3.position.set(x + w * TH_CX - W / 2, 0, y + h * TH_CY - H / 2); } } }
+      if (LMK[g.k]) { const im = S[g.k], mm = lmMat(g.k); if (mm) { const w = LMW[g.k] || 230, h = w * im.naturalHeight / im.naturalWidth, x = W / 2 + g.side * 70 - w / 2, y = g.y + (g.h - h) / 2;
+        let m = lmMeshes[li++]; if (!m) { m = new THREE.Mesh(tileGeo, mm); m.receiveShadow = true; scene.add(m); lmMeshes.push(m); } m.material = mm; m.visible = true; m.renderOrder = 50; m.scale.set(w, 1, h); m.position.set(x + w / 2 - W / 2, .2, y + h / 2 - H / 2); } }
     });
     for (let i = ti; i < tileMeshes.length; i++) tileMeshes[i].visible = false;
     for (let i = li; i < lmMeshes.length; i++) lmMeshes[i].visible = false;
-    for (let i = th; i < THEMES.length; i++) THEMES[i].visible = false;
     rwMesh.visible = rwOn;
   }
 
@@ -424,6 +418,12 @@ async function boot() {
       if (b.t === "gunship") { const o = take("cop0", 0x9aa66a); if (o) { put(o, b.x, b.y, A.gun * (1 - u * .6), M.GS_LEN * sc, true, -(b.spin || 0), .4 * u, .3 * u); flash(o, .25, 0xff5a1f); } }
       else { const o = take("jet", 0x6a7184); if (o) { put(o, b.x, b.y, A.sj * (1 - u * .6), M.SJ_W * sc, false, -((b.a || 0) + (b.spin || 0)), .6 * u, .3 * u); flash(o, .25, 0xff5a1f); } } } }
   }
+  const TRF_TINT = (M.TRF_COLS || []).map(c => new THREE.Color(c[0]).getHex());
+  function drawTraffic(now, G) { const T = G.trf; if (!T) return;
+    for (let i = 0; i < T.length; i++) { const p = T[i], o = take("trf", TRF_TINT[p.v] || 0); if (!o) continue;
+      const roll = p.wob > 0 ? Math.sin(now / 55) * p.wob * .5 : Math.sin(now / 900 + p.seed) * .05;
+      put(o, p.x, p.y, A.trf, p.w, false, Math.atan2(p.vx, p.vy), roll, 0); flash(o, 0);
+      navPair(now, p.seed, frac(o, .47, .2, .1).clone(), frac(o, -.47, .2, .1), 1.6); } }
   function drawReview(now, G) {
     const p = G.rp, D = G.rpDie; banner.visible = false; tow.visible = false;
     if (p) { const px = p.x + (p.sway || 0), bx = px - p.d * 128, by = p.y + 4, o = take("plane");
@@ -499,6 +499,8 @@ async function boot() {
         p = body(-17); Ba.q(p[0], p[1], Y + .2, 4, 12, rot, UV.beam, 1, .78, .47, .8); }
       else if (es.bomb) { const bl = (now / 150 | 0) % 2; Bn.q(es.x, es.y, Y, es.r * 2.4, es.r * 2.4, 0, UV.dot, .11, .12, .16, 1); Bn.q(es.x, es.y, Y + .2, es.r * 2, es.r * 2, 0, UV.dot, .11, .12, .16, 1);
         if (bl) { Ba.q(es.x, es.y, Y + .5, 16, 16, 0, UV.dot, 1, .23, .23, 1); } }
+      else if (es.bullet && es.big) { const L = Math.hypot(es.vx, es.vy) * 2.6, rot = Math.atan2(-es.vx, es.vy);   // heavy slugs (gunship, LAPD heavy burst): thick glowing round
+        Ba.q(es.x - es.vx * 1.3, es.y - es.vy * 1.3, Y, 9, L + 6, rot, UV.beam, c[0], c[1], c[2], .95); Ba.q(es.x, es.y, Y + .3, 20, 20, 0, UV.dot, c[0], c[1], c[2], .7); Ba.q(es.x, es.y, Y + .5, 8, 8, 0, UV.dot, 1, .97, .85, 1); }
       else if (es.bullet) { const L = Math.hypot(es.vx, es.vy) * 3, rot = Math.atan2(-es.vx, es.vy); Ba.q(es.x - es.vx * 1.5, es.y - es.vy * 1.5, Y, 3.4, L + 3, rot, UV.beam, 1, .86, .55, .95); Ba.q(es.x, es.y, Y, 10, 10, 0, UV.dot, 1, .86, .55, .6); }
       else { Ba.q(es.x, es.y, Y, es.r * 5, es.r * 5, 0, UV.dot, c[0], c[1], c[2], .55); Ba.q(es.x, es.y, Y + .5, es.r * 2.1, es.r * 2.1, 0, UV.dot, Math.min(1, c[0] + .4), Math.min(1, c[1] + .4), Math.min(1, c[2] + .4), 1); } }
   }
@@ -511,7 +513,7 @@ async function boot() {
     drawGround(now, G);
     drawCars(G);
     drawFX(now, G);
-    drawPlayer(now, G); drawEnemies(now, G); drawReview(now, G); drawRescue(now, G); drawItems(now, G); drawShots(now, G);
+    drawPlayer(now, G); drawTraffic(now, G); drawEnemies(now, G); drawReview(now, G); drawRescue(now, G); drawItems(now, G); drawShots(now, G);
     for (let i = ROTORS.n; i < ROTORS.list.length; i++) ROTORS.list[i].visible = false;
     hideFrom(cards, cardN); poolsEnd(); BATCHES.forEach(b => b.end());
     const sh = M.SHK; cam.position.set(-sh[0], D, -sh[1]);

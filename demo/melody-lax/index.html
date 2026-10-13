@@ -23,10 +23,11 @@ window.SSAI_REWARDS={
   game:{perScore:100,dailyCap:50},    // Melody Approach: 1 point per 100 score, at most 50 points a day
   // [points, reward, Toast button]. toast.type: "item" = 100% off ONE item (server selects it first), "fixed" = $ off the check.
   // toast.max = the priciest item that reward covers (for the Toast setup sheet). Never free alcohol (California ABC).
-  tiers:[[250,"Free soft drink or Melody Fries",{button:"App Reward – Free Soft Drink or Melody Fries",type:"item",max:5.75}],
-    [500,"Free starter: Fried Green Beans, Avocado Toast or Chicken Pot Stickers",{button:"App Reward – Free Starter",type:"item",max:15.00}],
-    [1000,"$10 off your check",{button:"App Reward – $10 Off",type:"fixed",amount:10}],
-    [1500,"Free entrée: any Mac & Cheese or burrito",{button:"App Reward – Free Entrée",type:"item",max:21.50}]],
+  // Owner rule (2026-10): a reward costs at least its dollar value at 100 points = $1 (≈ $10 spent per $1 of reward).
+  tiers:[[600,"Free soft drink or Melody Fries",{button:"App Reward – Free Soft Drink or Melody Fries",type:"item",max:5.75}],
+    [1100,"$10 off your check",{button:"App Reward – $10 Off",type:"fixed",amount:10}],
+    [1600,"Free starter: Fried Green Beans, Avocado Toast or Chicken Pot Stickers",{button:"App Reward – Free Starter",type:"item",max:15.00}],
+    [2200,"Free entrée: any Mac & Cheese or burrito",{button:"App Reward – Free Entrée",type:"item",max:21.50}]],
   /* INTERIM MODE (until Toast approves the loyalty integration, ~30 days): staff never use their own phones.
      Guests earn with "Add my visit" (receipt claim) and redeem by showing a live 10-minute pass; the server taps the
      matching Toast discount button. See demo/interim.js and kit/toast-interim.html. */
@@ -212,16 +213,17 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 </header>
 
 <h2 id="play"><small>Play &amp; earn points</small>Fly the Melody approach</h2>
-<p class="sub">A scenic night flight: take off from LAX and cruise five legs over Westchester, the stadium, downtown, the Hollywood Hills, Venice Beach, Nalu Vida on the Venice Pier and the Santa Monica Pier, then land back at LAX. Catch Melody's food and music notes as they float by. Drag anywhere on the game to steer. No sign-up needed to play: every 100 points of score is worth 1 Melody Rewards point, up to 50 a day.</p>
+<p class="sub">A scenic night flight: take off from LAX and cruise five legs over Westchester, past the stadium and downtown, up over the hills and down the coast past Nalu Vida and the pier, then land back at LAX. Catch Melody's food and music notes as they float by, and ease around the few small planes sharing the sky (a bump is just a wobble). Drag anywhere on the game and the plane glides to your finger. No sign-up needed to play: every 100 points of score is worth 1 Melody Rewards point, up to 50 a day.</p>
 <div class="gamebox">
   <div class="hud">
     <span>Score <span class="sc" id="score">0</span></span>
-    <div class="hp" id="hpbox" style="visibility:hidden" aria-hidden="true"><div class="lbl"><span>Health</span><span id="hpn">100%</span></div><div class="bar"><i id="hpbar" style="width:100%"></i></div></div>
+    <div class="hp" id="hpbox"><div class="lbl"><span>Health</span><span id="hpn">100%</span></div><div class="bar"><i id="hpbar" style="width:100%"></i></div></div>
     <span id="time">60s</span>
   </div>
   <div class="hud2"><span id="lvl">Level <b>1</b> of 5</span><span id="wpn"></span></div>
   <div class="cvwrap"><canvas id="cv" width="400" height="600" aria-label="Melody flight game. Drag anywhere to steer the plane."></canvas>
-    <button type="button" class="gbtn" id="sndb" style="top:8px;right:8px" aria-label="Mute all sound">🔊</button></div>
+    <button type="button" class="gbtn" id="sndb" style="top:8px;right:8px" aria-label="Mute all sound">🔊</button>
+    <button type="button" class="gbtn" id="cmbb" style="top:8px;right:48px" aria-label="Combat mode is on. Turn combat off" aria-pressed="true" title="Combat mode: on">⚔️</button></div>
   <div id="over">
     <div class="sub" id="rank">Flight complete</div>
     <div id="final">0 pts</div>
@@ -305,7 +307,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 <div id="obar"><button type="button" id="obtn"><span><span class="n" id="ocount">0</span> &nbsp;<span id="oseat">Review order</span></span><span id="ototal">$0.00</span></button></div>
 <div id="sheet" role="dialog" aria-modal="true" aria-label="Your order"><div class="in" id="sheetin"></div></div>
 
-<script>window.REVIEW_EGG={vid:"AhJGIPsywm0",restaurant:"Melody Bar & Grill",short:"MELODY",bonus:500,img:"img/review/cover.webp",find:"Catch 7 Antidote Drizzle emblems to unlock the review plane, then shoot it down"};</script>
+<script>window.REVIEW_EGG={vid:"AhJGIPsywm0",restaurant:"Melody Bar & Grill",short:"MELODY",bonus:500,img:"img/review/cover.webp",find:"Catch 7 Antidote Drizzle emblems to call in the review plane, then fly through its banner"};</script>
 <script src="../reviewegg.js"></script>
 <script src="../halftime.js"></script>
 <script>window.MELODY_CLIPS={"bacon-mac":"img/clips/bacon-mac.mp4","burger-mac":"img/clips/burger-mac.mp4","espresso-martini":"img/clips/espresso-martini.mp4","house-mac":"img/clips/house-mac.mp4","lobster-mac":"img/clips/lobster-mac.mp4","mango-marg":"img/clips/mango-marg.mp4","margarita":"img/clips/margarita.mp4","moscow-mule":"img/clips/moscow-mule.mp4","nachos":"img/clips/nachos.mp4","old-fashioned":"img/clips/old-fashioned.mp4","paloma":"img/clips/paloma.mp4","philly-fries":"img/clips/philly-fries.mp4","ribs":"img/clips/ribs.mp4","wings":"img/clips/wings.mp4"};</script>
@@ -547,7 +549,7 @@ var R3=0;   // 1 = melody3d.js renders the world in WebGL under this canvas; thi
 function img(src){ var i=new Image(); i.src=src; return i; }
 function ready(i){ return i&&i.complete&&i.naturalWidth; }
 var S={plane:img("img/game/plane.webp"),ufo:img("img/game/ufo.webp"),jet:img("img/game/jet.webp"),kami:img("img/game/plane.webp"),
-  theme:img("img/game/theme.webp"),sofi:img("img/game/sofi.webp"),crypto:img("img/game/crypto.webp"),hollywood:img("img/game/hollywood.webp"),pier:img("img/game/pier.webp"),venice:img("img/game/venice.webp"),vsign:img("img/game/vsign.webp"),mar0:img("img/game/marshal0.webp"),cop0:img("img/game/lapd_blue.webp"),cop1:img("img/game/lapd_black.webp"),mar1:img("img/game/marshal1.webp"),mar2:img("img/game/marshal2.webp"),cone:img("img/game/cone.webp"),innout:img("img/game/innout.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
+  stadium:img("img/game/stadium.webp"),towers:img("img/game/towers.webp"),mar0:img("img/game/marshal0.webp"),cop0:img("img/game/lapd_blue.webp"),cop1:img("img/game/lapd_black.webp"),mar1:img("img/game/marshal1.webp"),mar2:img("img/game/marshal2.webp"),cone:img("img/game/cone.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
 // pickups: Melody's real food + bar life. e = emoji fallback while the photo loads
 var PICK=[{k:"p_mac",n:"Mac & Cheese",p:80,e:"🧀",w:58},{k:"p_wings",n:"Lemon Pepper Wings",p:70,e:"🍗",w:60},{k:"p_toast",n:"French Toast",p:60,e:"🍞",w:58},
   {k:"p_omelette",n:"Philly Omelette",p:60,e:"🍳",w:60},{k:"p_marg",n:"Mango Marg",p:50,e:"🍹",w:40},{k:"p_bottle",n:"Bottle service",p:40,e:"🍾",w:34},{k:"p_shots",n:"Round of shots",p:40,e:"🥃",w:46}];
@@ -555,11 +557,16 @@ PICK.forEach(function(p){ p.im=img("img/game/"+p.k+".webp"); });
 var MIC={k:"p_mic",n:"Karaoke mic",e:"🎤",w:36}; MIC.im=img("img/game/p_mic.webp");
 var PLANE_W=86;
 var G={running:false,over:false};
-/* CALM FLIGHT (Christian's feedback, 2026-10): a peaceful scenic flight. No enemies, gunships, missiles, guns, lightning,
-   crashes, explosions or fire. You steer, catch Melody's food + music notes, and land back at LAX. A dropped item is a
-   gentle "missed it" (it ends your catch streak), never a crash. The old combat code below stays in the file but never runs. */
-var CALM=true;
-var CALM_SUB=["Wheels up over Westchester","Past the stadium and downtown","Over the Hollywood Hills","Down the coast to Venice","Santa Monica Pier, then home to LAX"];
+/* COMBAT IS BACK (Antidote, 2026-10-12): the original game (enemies, bosses, missiles, lightning, health, fire and crashes)
+   with these changes: you take off WITHOUT guns and unlock them by flying into the gun blimp (then the old crate/level
+   weapon upgrades continue); about a third fewer enemies/shots/items on screen than the original; passing jets fly
+   slower (they linger, so they're harder to dodge); innocent bystanders (small planes, skydivers, balloons, birds) cost
+   POINTS if you hit them and your bullets pass through them. CALM=true still switches back to the scenic no-combat flight. */
+var CALM=false;   // ⚔️ toggle on the game: combat is ON by default; only an explicit off ("0" on this phone, or ?combat=0) gives the calm flight
+try{ CALM=localStorage.getItem("melody_combat")==="0"; }catch(x){}
+(function(){ var c=new URLSearchParams(location.search).get("combat"); if(c==="0") CALM=true; else if(c==="1") CALM=false; })();
+var DENS=1.3;   // spawn intervals × this vs the original game (≈ 23% fewer enemies, bolts and planes on screen; was 1.5, a touch harder now)
+var CALM_SUB=["Wheels up over Westchester","Past the stadium and downtown","Up over the hills","Down the coast to Nalu Vida","Past the pier, then home to LAX"];
 /* ---- 5 levels, 60 s each: enemies get tougher every level; an Army gunship ends level 3, the Super Jet ends level 5 ---- */
 var LV=[{ufo:2,cop:6,kami:4,jet:1,pace:1,copV:1,bul:4.4,sub:"Wheels up over Westchester"},
   {ufo:4,cop:12,kami:8,jet:2,pace:.88,copV:1.2,bul:4.8,sub:"UFOs armor up · LAPD gets faster"},
@@ -571,12 +578,14 @@ function L(){ var l=LV[Math.max(0,Math.min(4,G.lvl-1))]; if(CALM){ l=Object.assi
 var WPN=[{n:"Twin guns",c:"#f0d375",rate:260,dmg:1,v:11},{n:"Laser",c:"#7dff6a",rate:200,dmg:1.5,v:15},{n:"Power gun",c:"#ff9a2e",rate:280,dmg:3,v:10},
   {n:"Blue beams",c:"#3aa8ff",rate:100,dmg:1.4,v:16},{n:"Red beams",c:"#ff3b3b",rate:85,dmg:2,v:17,pierce:1}];
 var CRATE_AT=[32000,20000,16000,16000,12000];   // when each level's weapon crate parachutes in (a second one follows if you miss it)
-var DBG=(function(){ var q=new URLSearchParams(location.search), o={}; ["lvl","wpn","boss","god"].forEach(function(k){ if(q.get(k)!=null) o[k]=+q.get(k)||0; }); return o; })();
+var DBG=(function(){ var q=new URLSearchParams(location.search), o={}; ["lvl","wpn","boss","god","legms"].forEach(function(k){ if(q.get(k)!=null) o[k]=+q.get(k)||0; }); return o; })();
 // damage/crash/rescue test hooks: ?dmg=1|2|3 (damage look, pair with ?god=1), ?crash=1 (or building|street|theme|plume) crashes after takeoff, ?rescue=1 calls the tower blimp
 var DBG2=(function(){ var q=new URLSearchParams(location.search); return {dmg:Math.max(0,Math.min(3,+q.get("dmg")||0)),crash:q.get("crash")||"",rescue:q.get("rescue")==="1"}; })();
 function shadowOf(im,a){ var c=document.createElement("canvas"), w=im.naturalWidth||im.width, h=im.naturalHeight||im.height; c.width=w; c.height=h; var x=c.getContext("2d"); x.drawImage(im,0,0); x.globalCompositeOperation="source-in"; x.fillStyle="rgba(0,0,0,"+a+")"; x.fillRect(0,0,w,h); return c; }
 var PSH=null;
-function fresh(){ return {running:false,over:false,x:W/2,y:H-110,tx:W/2,ty:H-110,vx:0,hp:100,score:0,t:60000,el:0,items:[],ens:[],shots:[],eshots:[],bolts:[],pops:[],fx:[],clouds:[],heals:0,lastHeal:0,
+// leg length. Test hook: ?legms=8000 flies 8-second legs (marks the flight as practice: no points, no board)
+var LEG_MS=DBG.legms?Math.max(3000,DBG.legms):60000;
+function fresh(){ return {running:false,over:false,x:W/2,y:H-110,tx:W/2,ty:H-110,vx:0,mvx:0,mvy:0,bank:0,wob:0,trf:[],trfCalls:[],trfT:9000,trfN:0,bumps:0,guns:0,gb:null,gbT:12000,gbN:0,hzCD:0,hitN:0,penalty:0,tips:{},hp:100,score:0,t:LEG_MS,el:0,items:[],ens:[],shots:[],eshots:[],bolts:[],pops:[],fx:[],clouds:[],heals:0,lastHeal:0,
   spawnT:600,ufoT:7000,jetT:13000,boltT:9000,kamiT:16000,copT:19000,copN:0,shotT:0,inv:0,mult:1,multT:0,shake:0,flash:0,red:0,dying:0,scroll:0,ground:[],gy:0,warn:[],
   lvl:1,lel:0,wpn:0,gotCrate:0,crates:0,crateT:CRATE_AT[0],boss:null,bossDie:null,banner:null,upT:0,mfl:0,home:0,won:0,god:0,debug:0,
   half:0,dz:0,dzT:9000,rp:null,rpT:0,rpPasses:0,rpDone:0,rpDie:null,sev:0,crash:null,crashed:0,crashVar:"",rescue:null,rescueUsed:0,lastSpd:0}; }
@@ -586,35 +595,36 @@ var HK="";
 function hud(){ $("score").textContent=G.score.toLocaleString(); $("time").textContent=G.landing?(G.touched?"🛬":"Landing"):G.home?"🏁":(G.boss||G.bossDie)?"BOSS":Math.ceil(Math.max(0,G.t)/1000)+"s";
   var hp=Math.max(0,Math.round(G.hp)), b=$("hpbar"); b.style.width=hp+"%"; b.className=hp>66?"":hp>33?"mid":"low"; $("hpn").textContent=hp+"%";
   var key=G.lvl+"|"+G.wpn; if(key!==HK){ HK=key; var w=WPN[G.wpn], p=""; for(var i=0;i<5;i++) p+='<i'+(i<=G.wpn?' style="background:'+WPN[i].c+';border-color:'+WPN[i].c+'"':'')+'></i>';
-    $("lvl").innerHTML=esc(T(CALM?"Leg":"Level"))+" <b>"+G.lvl+"</b> "+esc(T("of"))+" 5"; if(CALM){ $("wpn").innerHTML=(G.streak>1?"🔥 "+esc(T("Streak"))+" <b>"+G.streak+"</b>":""); HK=""; } else $("wpn").innerHTML='<b style="color:'+w.c+'">'+esc(T(w.n))+'</b><span class="pips" aria-label="weapon tier '+(G.wpn+1)+' of 5">'+p+'</span>'; } }
+    $("lvl").innerHTML=esc(T(CALM?"Leg":"Level"))+" <b>"+G.lvl+"</b> "+esc(T("of"))+" 5"; if(CALM){ $("wpn").innerHTML=(G.streak>1?"🔥 "+esc(T("Streak"))+" <b>"+G.streak+"</b>":""); HK=""; } else if(!G.guns){ $("wpn").innerHTML='<b style="color:#9aa3b5">🔒 '+esc(T("No guns yet"))+'</b>'; HK=""; } else $("wpn").innerHTML='<b style="color:'+w.c+'">'+esc(T(w.n))+'</b><span class="pips" aria-label="weapon tier '+(G.wpn+1)+' of 5">'+p+'</span>'; } }
 function best(){ try{ return +localStorage.getItem("melody-best")||0; }catch(e){ return 0; } }
 var RUN=0;
 function start(){ if(RA){ RA.clear(); pickT=-1e9; radio("Tower to Captain: you're cleared for takeoff!",{tone:"info",ms:2200}); } var keep=G.clouds, posted=G.posted; G=fresh(); G.clouds=keep; G.posted=posted; G.runId=++RUN; G.running=true; G.last=performance.now(); seedGround(); $("over").classList.remove("on");
   if(window.ReviewEgg) ReviewEgg.reset(24,40);   // Antidote's review quest: catch DRIZ_N drizzle emblems → his review plane → shoot it down
   if(window.Halftime) Halftime.reset();           // halftime: his Melody review reel, once a flight, at a level-up after ~90 s
   var etl=window.ReviewEgg?ReviewEgg.testLevel:0; if(etl===1) G.dz=DRIZ_N-1; if(etl===2){ G.dz=DRIZ_N; G.rpT=4800; }
-  if(DBG.lvl||DBG.wpn!=null||DBG.boss||DBG.god) applyDbg(); FX.reset();
+  if(DBG.lvl||DBG.wpn!=null||DBG.boss||DBG.god) applyDbg(); if(DBG.legms) G.debug=1; FX.reset(); CTL.keys={};
   if(!CALM&&(DBG2.dmg||DBG2.crash||DBG2.rescue)){ G.debug=1; if(DBG2.dmg){ G.hp=[100,66.66,50,33.32][DBG2.dmg]; G.sev=DBG2.dmg; } }
   hud(); }
 // testing hooks (?lvl=1-5, ?wpn=0-4, ?boss=1, ?god=1 or window.MELODY_DEBUG). Any of them marks the flight as practice: no prizes, no board.
-function applyDbg(){ G.debug=1; if(DBG.god) G.god=1; var lv=Math.max(1,Math.min(5,DBG.lvl||1)); if(lv>1){ G.lvl=lv; G.el=6000; G.alt=1; levelTimers(); G.crateT=CRATE_AT[lv-1]; }
+function applyDbg(){ G.debug=1; if(DBG.wpn!=null||(DBG.lvl||1)>1||DBG.boss) G.guns=1; if(DBG.god) G.god=1; var lv=Math.max(1,Math.min(5,DBG.lvl||1)); if(lv>1){ G.lvl=lv; G.el=6000; G.alt=1; levelTimers(); G.crateT=CRATE_AT[lv-1]; }
   G.wpn=DBG.wpn!=null?Math.max(0,Math.min(4,DBG.wpn)):Math.min(4,lv-1); if(DBG.boss) G.t=1200; }
-window.MELODY_DEBUG={level:function(n){ if(!G.running) start(); G.debug=1; G.lvl=Math.max(1,Math.min(5,n)); G.el=Math.max(G.el,6000); G.t=60000; G.lel=0; levelTimers(); G.wpn=Math.min(4,G.lvl-1); },
-  weapon:function(n){ G.debug=1; G.wpn=Math.max(0,Math.min(4,n)); }, boss:function(){ G.debug=1; G.t=300; }, god:function(on){ G.debug=1; G.god=on!==false; }, crate:function(){ G.debug=1; G.crateT=0; G.gotCrate=0; G.crates=0; }, G:function(){ return G; },
+window.MELODY_DEBUG={level:function(n){ if(!G.running) start(); G.debug=1; G.lvl=Math.max(1,Math.min(5,n)); G.el=Math.max(G.el,6000); G.t=60000; G.lel=0; levelTimers(); G.guns=1; G.wpn=Math.min(4,G.lvl-1); },
+  guns:function(){ G.debug=1; gunsOn(); }, gunBlimp:function(){ G.debug=1; G.gbT=0; }, weapon:function(n){ G.debug=1; G.guns=1; G.wpn=Math.max(0,Math.min(4,n)); }, boss:function(){ G.debug=1; G.t=300; }, god:function(on){ G.debug=1; G.god=on!==false; }, crate:function(){ G.debug=1; G.crateT=0; G.gotCrate=0; G.crates=0; }, G:function(){ return G; },
   dmg:function(n){ G.debug=1; n=Math.max(0,Math.min(3,n|0)); G.hp=[100,66.66,50,33.32][n]; G.sev=n; },
   crash:function(v){ if(!G.running||G.dying) return; G.debug=1; G.god=0; G.inv=0; G.hp=1; G.crashVar=v||""; hurt(G.x,G.y,"💥"); },
-  rescue:function(){ if(!G.running||G.dying) return; G.debug=1; G.rescue=null; rescueArm(); }, hit:function(){ var g=G.god; G.god=0; G.inv=0; G.debug=1; hurt(G.x,G.y,"💥"); G.god=g; }, rescueLog:function(){ return RESCUE_LOG.slice(); }, fx:function(){ return FX.count(); }};
+  rescue:function(){ if(!G.running||G.dying) return; G.debug=1; G.rescue=null; rescueArm(); }, hit:function(){ var g=G.god; G.god=0; G.inv=0; G.debug=1; hurt(G.x,G.y,"💥"); G.god=g; }, rescueLog:function(){ return RESCUE_LOG.slice(); }, fx:function(){ return FX.count(); },
+  traffic:function(o){ G.debug=1; TRF.spawn(o||null); }, ctl:function(){ return {mode:CTL.mode,x:G.x,y:G.y,tx:G.tx,ty:G.ty,vx:G.mvx,vy:G.mvy,bank:G.vx,trf:G.trf.length,bumps:G.bumps,streak:G.streak||0}; }};
 
 /* ---- the ground: Westchester at night, LAX runways and the landmarks rolling under you ---- */
-var SEQ=["city","theme","city","melody","city","city","sofi","city","crypto","hills","hollywood","hills","coast","venice","coast","pier","city","melody","city"];   // no burger-chain lot (trade dress); see LBL
-var COAST={coast:1,venice:1,vsign:1,pier:1};
-// third-party names genericized (Christian's branding review): no sponsor names, no burger chain, no Hollywood Sign (trademarked)
-var LBL={venice:"★ NALU VIDA · VENICE PIER ★",vsign:"Venice Beach",theme:"Theme Building",melody:"★ MELODY BAR & GRILL ★",innout:"Burger stand",sofi:"The stadium",crypto:"Downtown arena",hollywood:"Hollywood Hills",pier:"Santa Monica Pier"};
+var SEQ=["city","towers","city","melody","city","city","stadium","city","towers","hills","hills","hills","coast","venice","coast","pier","city","melody","city"];   // generic LA scenery only: original stadium/tower art, no real landmarks, no burger-chain lot
+var COAST={coast:1,venice:1,pier:1};
+// labels: only the owner's own two spots are named. No landmark, venue, sign or neighborhood-landmark names anywhere (2026-10 branding pass)
+var LBL={venice:"★ NALU VIDA ★",melody:"★ MELODY BAR & GRILL ★"};
 function seedGround(){ G.ground=[]; G.gy=H+100; G.seq=0; G.ground.push({k:"runway",t:"city1",y:G.gy-520,h:520,side:1}); G.gy-=520; while(G.gy>-400) addSeg(); }
 // photoreal aerial ground (dusk): every segment is a full-width aerial tile; landmark sprites sit on top of a city tile
-var TILE_OF={city:["city1","city2"],theme:["city2"],melody:["city1"],innout:["city2"],sofi:["city1"],crypto:["city2"],hills:["hills"],hollywood:["hills"],coast:["venicecoast"],venice:["nalu"],pier:["smpier"]};
+var TILE_OF={city:["city1","city2"],towers:["city2"],melody:["city1"],stadium:["city1"],hills:["hills"],coast:["venicecoast"],venice:["nalu"],pier:["pier"]};
 var TILES={}, TILE_FEATHER=56;
-["city1","city2","hills","hollywood","venicecoast","nalu","smpier"].forEach(function(k){ var i=img("img/game/ground/"+k+".jpg"); i.onload=function(){ // pre-render once: the tile's own bottom edge fades out over the tile below
+["city1","city2","hills","venicecoast","nalu","pier"].forEach(function(k){ var i=img("img/game/ground/"+k+".jpg"); i.onload=function(){ // pre-render once: the tile's own bottom edge fades out over the tile below
   var w=W*2, h=Math.round(w*i.naturalHeight/i.naturalWidth), F=TILE_FEATHER*2, c=document.createElement("canvas"); c.width=w; c.height=h; var x=c.getContext("2d"); x.drawImage(i,0,0,w,h);
   x.globalCompositeOperation="destination-out"; var gr=x.createLinearGradient(0,h-F,0,h); gr.addColorStop(0,"rgba(0,0,0,0)"); gr.addColorStop(1,"rgba(0,0,0,1)"); x.fillStyle=gr; x.fillRect(0,h-F,w,F);
   TILES[k]={c:c,h:(h-F)/2}; }; });   // tiles are spaced by their height minus the fade, so the fade overlaps the tile below
@@ -622,6 +632,7 @@ var tileN=0; window.__TILES=TILES;
 function addSeg(){ var k=G.landing&&!G.rwyQueued?(G.rwyQueued=1,"runway"):SEQ[G.seq++%SEQ.length];
   if(k==="runway"){ G.gy-=520; G.ground.push({k:k,t:"city2",y:G.gy,h:520,side:1}); return; }
   var opts=TILE_OF[k]||["city1"], t=opts[(tileN++)%opts.length], h=TILES[t]?TILES[t].h:600; G.gy-=h; G.ground.push({k:k,t:t,y:G.gy,h:h,side:Math.random()<.5?-1:1}); }
+var LMW={melody:250,stadium:270,towers:240};   // sprite widths (the 3D layer uses the same numbers via M3.LMW)
 function drawGround(dy){
   if(!R3){ cx.fillStyle="#0c1220"; cx.fillRect(0,0,W,H); }
   for(var i=G.ground.length-1;i>=0;i--){ var g=G.ground[i]; g.y+=dy; if(g.y>H+40){ G.ground.splice(i,1); continue; } }
@@ -636,9 +647,10 @@ function drawGround(dy){
     cx.save(); cx.globalCompositeOperation="lighter"; cx.fillStyle=gr; cx.fillRect(gx-80,gy-80,160,160); cx.restore(); });
   G.ground.forEach(function(g){
     if(g.k==="runway"){ if(!R3) drawRunway(g); }
-    else if(g.k==="hollywood"||g.k==="venice"||g.k==="pier"||g.k==="coast"){ var L2={hollywood:["Hollywood Hills",.52,.66],venice:["★ NALU VIDA · VENICE PIER ★",.62,.36],pier:["Santa Monica Pier",.32,.56],coast:["Venice Beach",.7,.5]}[g.k];
+    else if(g.k==="pier"||g.k==="coast"){ /* plain coast tiles: no labels */ }
+    else if(g.k==="venice"){ var L2=[LBL.venice,.62,.36];
       cx.font="800 13px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.85)"; cx.strokeText(L2[0],W*L2[1],g.y+g.h*L2[2]); cx.fillStyle=g.k==="venice"?"#f0d375":"#e8eefc"; cx.fillText(L2[0],W*L2[1],g.y+g.h*L2[2]); }
-    else if(g.k!=="city"&&g.k!=="hills"){ var im=S[g.k]; if(ready(im)){ var w=g.k==="melody"?250:g.k==="hollywood"?300:g.k==="sofi"?270:230, h=w*im.naturalHeight/im.naturalWidth, x=(g.k==="venice"||g.k==="pier")?W*0.32-w/2:g.k==="vsign"?W*0.74-w/2:W/2+g.side*70-w/2;
+    else if(g.k!=="city"&&g.k!=="hills"){ var im=S[g.k]; if(ready(im)){ var w=LMW[g.k]||230, h=w*im.naturalHeight/im.naturalWidth, x=W/2+g.side*70-w/2;
       if(!R3){ cx.save(); cx.globalAlpha=.95; cx.drawImage(im,x,g.y+(g.h-h)/2,w,h); cx.restore(); }
       if(LBL[g.k]){ cx.font="800 13px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.8)"; cx.strokeText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); cx.fillStyle=(g.k==="melody"||g.k==="venice")?"#f0d375":"#e8eefc"; cx.fillText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); } } }
   });
@@ -711,9 +723,10 @@ function spawnPick(){
 }
 function spawnUfo(){ var h=L().ufo; G.ens.push({t:"ufo",x:60+Math.random()*(W-120),y:-50,r:28,hp:h,mhp:h,ph:Math.random()*6,fire:(900+Math.random()*700)*L().pace,w:84}); }
 function spawnJet(){ var x=50+Math.random()*(W-100); G.warn.push({x:x,t:900,k:"jet"}); setTimeout(function(){ if(G.running&&!G.dying&&!G.boss&&!G.won){ var h=L().jet; G.ens.push({t:"jet",x:x,y:-70,r:24,hp:h,mhp:h,w:70,fired:0}); SND.play("jet"); } },900); }
+var JET_V=2.4, KAMI_V=3.4;   // px per 60 Hz frame (was 7.5 and 5.2): jets come down slowly, steering at you; easy to see, possible to dodge
 function spawnKami(){ // an airliner coming head-on, aimed at where you are: red flash + buzz first
   var x=Math.max(60,Math.min(W-60,G.x+(Math.random()-.5)*60)); G.red=1; G.warn.push({x:x,t:1100,k:"kami"}); buzz([60,60,60,60,120]);
-  setTimeout(function(){ if(G.running&&!G.dying&&!G.boss&&!G.won){ var h=L().kami; G.ens.push({t:"kami",x:x,y:-110,r:34,hp:h,mhp:h,w:120,vx:(G.x-x)/140}); SND.play("jet"); } },1100); }
+  setTimeout(function(){ if(G.running&&!G.dying&&!G.boss&&!G.won){ var h=L().kami; G.ens.push({t:"kami",x:x,y:-110,r:34,hp:h,mhp:h,w:120,vx:(G.x-x)/(140*5.2/KAMI_V)}); SND.play("jet"); } },1100); }
 function spawnBolt(){ var x=40+Math.random()*(W-80); if(Math.random()<.5) x=Math.max(40,Math.min(W-40,G.x)); G.bolts.push({x:x,ph:"warn",age:0}); }
 /* LAPD air unit: drops in, tracks you, fires 5-round bursts (pop-pop-pop-pop-pop), pauses, repeats 3x, peels off */
 var COPA=[{hub:[.42,.52],bar:[.47,.72],gun:[.92,.74]},{hub:[.60,.516],bar:[.60,.425],gun:[.10,.62]}], COP_LEN=150;
@@ -739,6 +752,7 @@ function pop(x,y,txt,col){ G.pops.push({x:x,y:y,txt:txt,col:col,a:1}); }
 
 /* ---- damage ---- */
 function hurt(x,y,why){
+  if(!CALM&&!G.dying&&G.inv<=0) G.hitN++;   // test metric: hits a pilot would have taken (counted even with ?god=1)
   if(CALM||G.inv>0||G.dying||G.god) return;   // calm flight: nothing can hurt the plane
   SND.play("hurt"); G.hp-=100/3+0.01; G.inv=70; G.shake=14; G.flash=.4; pop(x,y-10,why,"#ff7a59"); buzz(G.hp<=0?[90,60,220]:70);
   if(G.hp<=0){ G.hp=0; startCrash(); return; }   // the spiral, the ground impact, then the tower's "Mayday!" and the end screen (crashStep)
@@ -930,7 +944,7 @@ var FX=(function(){
     if(sev>=2){ fireball(x-w*.15,y-h*.09,16,420); shed(x,y,w,h,rot,1,1,LITE?2:5,sev); }
     else shed(x,y,w,h,rot,1,1,LITE?1:2,0.5); }
   function reset(){ [SM,FI,DB,RG,SITES,WR].forEach(function(a){ while(a.length) POOL.push(a.pop()); }); shedT=0; }
-  return {SPARK:SPARK,update:update,drawGround:drawGround,drawAir:drawAir,planeFire:planeFire,shed:shed,hitBurst:hitBurst,explode:explode,site:site,wreck:wreck,smoke:smoke,flame:flame,ember:ember,fireball:fireball,debris:debris,ring:ring,reset:reset,
+  return {LITE:LITE,SPARK:SPARK,update:update,drawGround:drawGround,drawAir:drawAir,planeFire:planeFire,shed:shed,hitBurst:hitBurst,explode:explode,site:site,wreck:wreck,smoke:smoke,flame:flame,ember:ember,fireball:fireball,debris:debris,ring:ring,reset:reset,
     _i:function(){ return {SM:SM,FI:FI,DB:DB,RG:RG,SITES:SITES,WR:WR,PTS:PTS,SMK:SMK,TONGUE:TONGUE,TONGUEN:TONGUEN,GLOW:GLOW,FBALL:FBALL,SCORCH:SCORCH,SHAPES:SHAPES,SPARK:SPARK,LITE:LITE}; },   // read-only view for melody3d.js
     count:function(){ return {sm:SM.length,fi:FI.length,db:DB.length,rg:RG.length,sites:SITES.length,wr:WR.length,pool:POOL.length}; }, sites:function(){ return SITES.map(function(s){ return {v:s.v,x:s.x|0,y:s.y|0}; }); }};
 })();
@@ -943,7 +957,7 @@ var CARS=(function(){
     city1:{far:1,r:[{p:[[.17,.385],[.35,.47],[.5,.555],[.65,.645],[.8,.735],[1.02,.85]],l:5},{p:[[-.02,.605],[.25,.57],[.5,.525],[.72,.455],[.9,.395],[1.02,.36]],l:4},{p:[[-.01,.66],[.04,.75],[.09,.87],[.13,1.01]],l:4}]},
     city2:{far:1,r:[{p:[[.33,.05],[.36,.2],[.4,.35],[.45,.5],[.5,.65],[.56,.8],[.6,.92],[.63,1.01]],l:6},{p:[[.6,.935],[.8,.905],[1.02,.88]],l:4}]},
     venicecoast:{r:[{p:[[.935,-.01],[.935,.33]],l:3},{p:[[.93,.78],[.93,1.01]],l:3}]},
-    smpier:{r:[{p:[[.88,-.01],[.88,.44]],l:7},{p:[[.88,.52],[.88,1.01]],l:7}]}};
+    pier:{r:[{p:[[.88,-.01],[.88,.44]],l:7},{p:[[.88,.52],[.88,1.01]],l:7}]}};
   var COL=["#e9ecf1","#c9ced6","#30343d","#8f1d22","#2a4f9a","#b9babf","#3d3f45","#f2c230","#e9ecf1","#5a6170"], LITE=reduce;
   function cv2(w,h){ var c=document.createElement("canvas"); c.width=w; c.height=h; return c; }
   // one white car seen from above, nose up (16x32): tinted per colour for 2D, tinted in the shader for 3D
@@ -1002,17 +1016,18 @@ function drawHeal(it,now){ var p=1+.08*Math.sin(now/150); cx.save(); cx.translat
 
 /* ---- the crash: the plane spirals down for ~2 s (shrinking = falling away toward the ground), burning and shedding parts,
    then hits whatever is under it. Then the usual game over: the tower's "Mayday!" line and the end screen. ---- */
-var CRASH_V={building:"Hit a Westchester block",street:"Down in a Westchester parking lot",theme:"Down by the LAX Theme Building",plume:"Brush fire in the Hollywood Hills"};   // test hook ?crash=<variant> forces one
+var CRASH_V={building:"Hit a Westchester block",street:"Down in a Westchester parking lot",theme:"Down by the airport",plume:"Brush fire in the hills"};   // test hook ?crash=<variant> forces one
 function crashSite(x,y){ // what's on the ground at this point of the screen
   var seg=null; G.ground.forEach(function(g){ if(y>=g.y&&y<g.y+g.h) seg=g; });
   if(!seg) return {v:"street",at:T("Going down by LAX")};
   var k=seg.k, im=S[k];
   if(k==="theme"&&ready(im)){ var w=230, h=w*im.naturalHeight/im.naturalWidth, cxm=W/2+seg.side*70, cym=seg.y+seg.h/2;
-    if(Math.hypot(x-cxm,y-cym)<Math.max(150,h*.9)) return {v:"theme",at:T("Down by the LAX Theme Building")}; }
+    if(Math.hypot(x-cxm,y-cym)<Math.max(150,h*.9)) return {v:"theme",at:T("Down by the airport")}; }
   if(k==="runway") return {v:"street",at:T("Down on the LAX runway")};
-  if(k==="hills"||k==="hollywood") return {v:"plume",at:T("Brush fire in the Hollywood Hills")};
+  if(k==="hills") return {v:"plume",at:T("Brush fire in the hills")};
   if(COAST[k]) return {v:"plume",at:T("Down on the beach")};
-  if(k==="melody"||k==="innout"||k==="sofi"||k==="crypto") return {v:"street",at:T("Down in the lot by")+" "+T(LBL[k].replace(/★/g,"").trim())};   // real businesses: the lot next door, never the building
+  if(k==="melody") return {v:"street",at:T("Down in the lot by")+" "+T(LBL[k].replace(/★/g,"").trim())};
+  if(k==="stadium"||k==="towers") return {v:"street",at:T("Down in a Westchester parking lot")};   // real businesses: the lot next door, never the building
   var hsh=Math.abs(Math.sin(Math.floor(x/40)*12.9898+Math.floor((y-seg.y)/40)*78.233)*43758.5453)%1;
   return hsh<.6?{v:"building",at:T("Hit a Westchester block")}:{v:"street",at:T("Down in a Westchester parking lot")}; }
 function startCrash(){ var spd0=G.lastSpd||3;
@@ -1036,9 +1051,12 @@ function crashStep(now,dt,k){ var C=G.crash; if(!C) return; C.t+=dt;
     if(Math.random()<(reduce?.02:.045)*k) FX.explode(C.x+(Math.random()-.5)*26*C.sc,C.y+(Math.random()-.5)*26*C.sc,8);
     if(p>=1){ C.hit=1; var site=G.crashVar&&CRASH_V[G.crashVar]?{v:G.crashVar,at:T(CRASH_V[G.crashVar])}:crashSite(C.x,C.y); C.v2=site.v; C.at=site.at;
       FX.site(C.x,C.y,site.v,{ang:C.rot}); FX.explode(C.x,C.y,site.v==="building"?64:52,{rubble:site.v==="building"}); FX.ring(C.x,C.y,150,700);
+      C.spread=[]; var nsp=FX.LITE?2:5; for(var si=0;si<nsp;si++){ var sa=si/nsp*6.283+Math.random()*.8, sr=58+Math.random()*46; C.spread.push({t:260+si*300,x:C.x+Math.cos(sa)*sr,y:C.y+Math.sin(sa)*sr*.7}); }
       G.flash=.85; G.shake=reduce?0:24; SND.play("bigboom"); buzz([120,60,240]);
       radio("Mayday! Come grab a bite and try again.",{tone:"warn",ms:3400}); } }
-  else { C.after+=dt; if(C.after>2000){ G.dying=0; G.crashed=1; end(); } } }
+  else { C.after+=dt;   // burning fuel and wreckage set the ground alight in a widening ring around the impact
+    if(C.spread) for(var sq=C.spread.length-1;sq>=0;sq--){ var sp=C.spread[sq]; if(C.after>=sp.t){ C.spread.splice(sq,1); FX.site(sp.x,sp.y,"plume",{ang:Math.random()*6.283}); FX.explode(sp.x,sp.y,FX.LITE?10:18); } }
+    if(C.after>3000){ G.dying=0; G.crashed=1; end(); } } }
 
 /* ---- TOWER RESCUE: on the 2nd hit (once a flight) Christian on the tower radio sends his blimp. It flies to a random spot
    along the top (never the same spot twice in a row on this phone), waits for a clean line, then fires a fast med kit at you.
@@ -1166,6 +1184,12 @@ function drawDrizHud(now){ if(!G.running||G.dz<=0||G.rpDone) return; var t="🍯
 /* the review plane: slow, drifts side to side across the upper sky, tows his review banner; 10 hits brings it down */
 // CALM: it flies lower (inside the area you can steer to) and you fly THROUGH its banner to unlock the review; nothing is shot
 var RP_Y=CALM?250:118;
+/* ⚔️ Combat toggle: switching it mid-flight restarts the flight in the new mode */
+function combatSync(){ RP_Y=CALM?250:118; var b=$("cmbb"), on=!CALM; if(b){ b.classList.toggle("off",!on); b.setAttribute("aria-pressed",on?"true":"false"); b.setAttribute("aria-label",on?"Combat mode is on. Turn combat off":"Combat mode is off. Turn combat on"); b.title="Combat mode: "+(on?"on":"off"); }
+  var hb=$("hpbox"); if(hb){ hb.style.visibility=on?"visible":"hidden"; hb.setAttribute("aria-hidden",on?"false":"true"); } }
+function setCombat(on){ CALM=!on; try{ localStorage.setItem("melody_combat",on?"1":"0"); }catch(x){} combatSync(); hud();
+  if(window.ReviewEgg) ReviewEgg.toast(on?"⚔️ "+T("Combat on"):"🕊️ "+T("Combat off"),on?T("Guns, enemies and bosses. The flight restarts."):T("Calm scenic flight. The flight restarts."));
+  if(G.running) start(); }
 function rpSpawn(){ var d=G.rpPasses%2?-1:1; G.rp={x:d>0?-150:W+150,y:RP_Y,d:d,t:0,hp:RP_HITS,hit:0,cool:0,tears:[],flick:0,leave:0}; SND.play("flyby"); }
 function rpTick(dt,k,takeoff,landing){
   if(!window.ReviewEgg||(G.rpDone&&!(G.rp&&G.rp.caught))) return;
@@ -1273,7 +1297,7 @@ var SND=(function(){
   function hiss(dur,f0,f1,vol,type,q,dl){ var t=ctx.currentTime+(dl||0), n=ctx.createBufferSource(), f=ctx.createBiquadFilter(), g=ctx.createGain(); n.buffer=nb; f.type=type||"lowpass"; f.Q.value=q||.8;
     f.frequency.setValueAtTime(f0,t); f.frequency.exponentialRampToValueAtTime(Math.max(30,f1),t+dur); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0005,t+dur);
     n.connect(f); f.connect(g); g.connect(fx); n.start(t,Math.random()*1.5); n.stop(t+dur+.03); }
-  var GAP={w0:60,w1:60,w2:60,w3:60,w4:60,boom:90,whistle:260,jet:300,pickup:50,pop:40};
+  var GAP={bump:400,w0:60,w1:60,w2:60,w3:60,w4:60,boom:90,whistle:260,jet:300,pickup:50,pop:40};
   var LIB={
     w0:function(){ tone("square",900,260,.05,.035); hiss(.04,3500,1200,.03,"highpass"); },                                  // twin guns: dry tick
     w1:function(){ tone("sine",1900,300,.13,.07); tone("square",2400,500,.05,.012); },                                         // laser: pew
@@ -1291,6 +1315,7 @@ var SND=(function(){
     victory:function(){ [523,659,784,1047,784,1047].forEach(function(f,i){ tone("square",f,f,i<5?.14:.7,.06,i*.13); tone("triangle",f/2,f/2,i<5?.14:.7,.06,i*.13); }); },
     hurt:function(){ tone("sine",140,40,.3,.25); hiss(.22,700,80,.2); },
     pickup:function(){ tone("sine",1200,1900,.07,.035); },
+    bump:function(){ tone("sine",250,150,.24,.09); tone("triangle",520,420,.12,.03,.02); hiss(.16,900,220,.035); },   // soft "boop", never a crash
     crate:function(){ tone("triangle",392,392,.1,.06); tone("triangle",587,587,.18,.06,.09); },
     chime:function(n){ var b=[784,988,1175,1568][(n||0)%4]; tone("sine",b,b,.18,.07); tone("sine",b*1.5,b*1.5,.3,.05,.07); tone("triangle",b*2,b*2,.4,.025,.14); },
     pop:function(){ popSnd(); }
@@ -1311,7 +1336,7 @@ var SND=(function(){
 var RA=window.RadioAvatar, pickT=-1e9;
 if(RA) RA.mount({host:document.querySelector(".cvwrap"),base:"img/game/",who:"captain",top:"28px",left:"6px",right:"48px",sound:function(){ return SND.out(); }});
 function radio(t,o){ if(!RA) return; o=o||{}; o.who="captain"; RA.say(t,o); }
-var CLEAR_LINES=["Nice flying! You're cleared to land at Melody Bar & Grill ✈️","Smooth air ahead, Captain. Leg 2 complete!","Hollywood Hills behind you. Leg 3 complete, Captain!","Leg 4 complete. One more leg, then home to Melody!"];
+var CLEAR_LINES=["Nice flying! You're cleared to land at Melody Bar & Grill ✈️","Smooth air ahead, Captain. Leg 2 complete!","Hills behind you. Leg 3 complete, Captain!","Leg 4 complete. One more leg, then home to Melody!"];
 window.GAME_AUDIO={music:function(on){ SND.set("music",on!==false); }, sfx:function(on){ SND.set("sfx",on!==false); }, sound:function(on){ SND.set("sound",on!==false); }, state:function(){ return SND.state(); }};
 function syncBtns(){ var s=SND.state(), a=$("sndb"), m=$("musb"); if(a){ a.textContent=s.sound?"🔊":"🔇"; a.classList.toggle("off",!s.sound); a.setAttribute("aria-label",s.sound?"Mute all sound":"Turn sound on"); a.setAttribute("aria-pressed",s.sound?"false":"true"); }
   if(m){ m.classList.toggle("off",!s.music); m.setAttribute("aria-label",s.music?"Turn music off":"Turn music on"); m.setAttribute("aria-pressed",s.music?"true":"false"); } }
@@ -1358,10 +1383,10 @@ function drawCrate(it,now){ var nx=WPN[Math.min(4,G.wpn+1)], max=G.wpn>=4, col=m
   var lb=max?T("MAX POWER +750"):T(nx.n).toUpperCase(); cx.font="900 11px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.9)"; cx.strokeText(lb,it.x,it.y+30); cx.fillStyle=col; cx.fillText(lb,it.x,it.y+30); }
 
 /* ---- level flow ---- */
-function levelTimers(){ var p=L().pace; G.spawnT=600; G.ufoT=2600; G.jetT=6500*p; G.boltT=6000*p; G.kamiT=10000*p; G.copT=G.lvl>=4?6000:9000; }
+function levelTimers(){ var p=L().pace; G.spawnT=600; G.ufoT=3600; G.jetT=6500*p*DENS; G.boltT=6000*p*DENS; G.kamiT=10000*p*DENS; G.copT=(G.lvl>=4?6000:9000)*DENS; }
 function levelEnd(){ G.t=0; if(CALM){ if(G.lvl>=5) victory(); else nextLevel(); return; } if((G.lvl===3||G.lvl===5)&&!G.boss&&!G.bossDie){ spawnBoss(G.lvl===3?"gunship":"superjet"); return; } nextLevel(); }
-function nextLevel(){ var bonus=500*G.lvl, up=""; G.score+=bonus; if(!CALM&&!G.gotCrate&&G.wpn<4){ upgrade(1); up=T(WPN[G.wpn].n)+" "+T("unlocked"); }
-  G.lvl++; G.t=60000; G.lel=0; G.heals=0; G.gotCrate=0; G.crates=0; G.crateT=CRATE_AT[G.lvl-1]; levelTimers();
+function nextLevel(){ var bonus=500*G.lvl, up=""; G.score+=bonus; if(!CALM&&G.guns&&!G.gotCrate&&G.wpn<4){ upgrade(1); up=T(WPN[G.wpn].n)+" "+T("unlocked"); }
+  G.lvl++; G.t=LEG_MS; G.lel=0; G.heals=0; G.gotCrate=0; G.crates=0; G.crateT=CRATE_AT[G.lvl-1]; levelTimers();
   G.ens.forEach(function(e){ e.fleeing=1; });
   var lv=G.lvl, rid=G.runId, go=function(){ if(G.runId!==rid) return; G.banner={t:0,txt:T("LEVEL")+" "+lv,sub:T(L().sub),up:up,bonus:bonus}; SND.play("level"); buzz([30,40,30]);
     radio(CLEAR_LINES[lv-2]||("Level "+(lv-1)+" complete. Nice flying, Captain!"),{tone:"win",ms:3000}); };
@@ -1411,7 +1436,7 @@ function superjetIm(){ if(BIM.j) return BIM.j; var im=S.jet; if(!ready(im)) retu
   x.globalCompositeOperation="destination-in"; x.drawImage(im,0,0); x.globalCompositeOperation="source-atop";
   x.fillStyle="rgba(220,25,35,.6)"; x.fillRect(0,0,w*.12,h); x.fillRect(w*.88,0,w*.12,h); x.fillRect(0,0,w,h*.12);   // red wingtips + tail fins
   x.globalCompositeOperation="source-over"; BIM.j=c; BIM.js=shadowOf(c,.4); return c; }
-function spawnBoss(kind){ G.ens.forEach(function(e){ e.fleeing=1; }); G.red=.8; buzz([60,60,60,60,160]); SND.play("alarm"); radio("Bogey at 12 o'clock! Big one inbound!",{tone:"warn",ms:3000});
+function spawnBoss(kind){ if(!G.guns&&!G.gb) G.gbT=0; G.ens.forEach(function(e){ e.fleeing=1; }); G.red=.8; buzz([60,60,60,60,160]); SND.play("alarm"); radio("Bogey at 12 o'clock! Big one inbound!",{tone:"warn",ms:3000});
   G.banner={t:0,txt:kind==="gunship"?T("BOSS!"):T("FINAL BOSS!"),sub:kind==="gunship"?T("Army gunship · two door gunners"):T("The Super Jet · shoot it while it turns"),boss:1};
   var b=kind==="gunship"?{t:"gunship",boss:1,x:W/2,y:-170,hp:620,mhp:620,r:60,rw:46,rh:84,hoverY:150,ph:0,guns:[{f:1800,n:0,fl:0},{f:2700,n:0,fl:0}],rockT:3000,name:T("ARMY GUNSHIP")}
     :{t:"superjet",boss:1,x:W/2,y:-170,hp:1400,mhp:1400,r:60,rw:52,rh:72,a:0,st:"arrive",stT:-1200,fireT:1600,tx:W/2,name:T("SUPER JET")};
@@ -1420,8 +1445,8 @@ function gunshipStep(b,dt,k){ var rage=b.hp<b.mhp/2;
   if(!b.inPos){ b.y+=1.6*k; b.armor=.5; if(b.y>=b.hoverY) b.inPos=1; return; } b.armor=1;
   b.ph+=(rage?.013:.009)*k; var tx=W/2+Math.sin(b.ph)*100+(G.x-W/2)*.25, ty=b.hoverY+Math.sin(b.ph*2)*28; b.x+=(tx-b.x)*.04*k; b.y+=(ty-b.y)*.04*k;
   b.guns.forEach(function(g,i){ if(g.fl>0) g.fl-=dt; g.f-=dt; if(g.f>0) return; var p=gsPt(b,i?"gunR":"gunL"), ang=Math.atan2(G.y-p[1],G.x-p[0])+(Math.random()-.5)*.14;
-    G.eshots.push({x:p[0],y:p[1],vx:Math.cos(ang)*5,vy:Math.sin(ang)*5,c:"#ffd27a",r:3,bullet:1,mil:1}); g.fl=90; g.n++; SND.play("pop");
-    if(g.n<(rage?6:5)) g.f=190; else { g.n=0; g.f=rage?1300:1750; } });
+    G.eshots.push({x:p[0],y:p[1],vx:Math.cos(ang)*7,vy:Math.sin(ang)*7,c:"#ffb347",r:6,bullet:1,mil:1,big:1}); if(window.__MLOG) __MLOG.push(["gs",Math.round(G.el)]); g.fl=90; g.n++; SND.play("pop");
+    if(g.n<(rage?6:5)) g.f=150; else { g.n=0; g.f=rage?1250:1650; } });
   if(rage){ b.rockT-=dt; if(b.rockT<=0){ b.rockT=4200; [-1,1].forEach(function(s){ var p=gsPt(b,s<0?"podL":"podR"); G.eshots.push({x:p[0],y:p[1]+10,vx:s*.6,vy:3.2,c:"#ff5a3c",r:4,missile:1,home:70}); }); SND.play("whistle"); }
     if(Math.random()<.35*k) emit(b.x+12,b.y-30,false); } }
 function gunshipDraw(b,now){ if(R3) return; var im=gunshipIm(), tt=now/1000, h=GS_LEN, w=im?h*im.width/im.height:100, hb=gsPt(b,"hub");
@@ -1487,6 +1512,93 @@ function drawBossBar(){ var b=G.boss; if(!b) return; var x=40, w=W-88, y=8, h=13
   cx.font="900 10px Barlow,system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.lineWidth=3; cx.strokeStyle="rgba(0,0,0,.7)"; var lb=b.name+(b.armor<1&&b.inPos!==0?" · "+T("ARMORED"):"");
   cx.strokeText(lb,W/2,y+h/2+.5); cx.fillStyle="#fff"; cx.fillText(lb,W/2,y+h/2+.5); cx.restore(); }
 
+/* ---- smooth steering (2026-10 rebuild): eased, speed-limited and frame-rate independent ----
+   Pointer: the plane steers toward the target (finger) with a desired speed proportional to the distance (capped at VMAX),
+   and its real velocity can only change by ACC per second, so it accelerates, glides and settles without snapping.
+   Keys: hold to accelerate up to VKEY, release to coast to a stop. Sub-stepped so 30, 60 and 120 Hz feel the same. */
+var CTL={mode:"ptr",keys:{}}, VMAX=640, KP=7.5, ACC=5200, VKEY=360, AKEY=1500, DKEY=1900;
+function steer(dt,auto){ var s=dt/1000, n=Math.max(1,Math.ceil(dt/10)), h=s/n, kx=0, ky=0;
+  if(auto){ G.tx=W/2; G.ty=G.landing?H*0.64:H-110; CTL.mode="ptr"; }
+  if(CTL.mode==="key"){ kx=(CTL.keys.r?1:0)-(CTL.keys.l?1:0); ky=(CTL.keys.d?1:0)-(CTL.keys.u?1:0); }
+  for(var i=0;i<n;i++){ var dvx,dvy,acc;
+    if(CTL.mode==="key"){ var l=Math.hypot(kx,ky)||1; dvx=kx/l*VKEY; dvy=ky/l*VKEY; acc=(kx||ky)?AKEY:DKEY; }
+    else { dvx=(G.tx-G.x)*KP; dvy=(G.ty-G.y)*KP; var m=Math.hypot(dvx,dvy), cap=auto?220:VMAX; if(m>cap){ dvx*=cap/m; dvy*=cap/m; } acc=ACC; }
+    var ax=dvx-G.mvx, ay=dvy-G.mvy, am=Math.hypot(ax,ay), lim=acc*h; if(am>lim){ ax*=lim/am; ay*=lim/am; }
+    G.mvx+=ax; G.mvy+=ay; G.x+=G.mvx*h; G.y+=G.mvy*h;
+    if(G.x<30){ G.x=30; if(G.mvx<0) G.mvx=0; } else if(G.x>W-30){ G.x=W-30; if(G.mvx>0) G.mvx=0; }
+    if(G.y<H*.32){ G.y=H*.32; if(G.mvy<0) G.mvy=0; } else if(G.y>H-50){ G.y=H-50; if(G.mvy>0) G.mvy=0; } }
+  if(CTL.mode==="key"){ G.tx=G.x; G.ty=G.y; }
+  // banking: eases toward the sideways speed (slight, max ~12 deg); a bump adds a short wobble. G.vx feeds both renderers' roll
+  G.bank+=(G.mvx/130-G.bank)*(1-Math.exp(-s*9)); if(G.wob>0) G.wob=Math.max(0,G.wob-s*1.1);
+  G.vx=G.bank+(G.wob>0?Math.sin(G.el/60)*G.wob*7:0); }
+
+/* ---- other traffic (2026-10): a few slow, unbranded small planes share the sky. Steer around them. No shooting, no crashing:
+   touching one is a soft bump (wobble, a short blink, "Close call!") and your catch streak starts over. Gentle, a bit more per leg. ---- */
+var TRF=(function(){
+  var GAP=[11000,9500,8500,7500,6500], MAXN=[1,2,2,2,3], SPD=[1,1.06,1.12,1.18,1.24], WARN=1300, PW=62;
+  var COLS=[["#f4f1ea","#1f8a8a"],["#efe6cf","#b8323a"],["#dfe9f5","#2b5fa8"],["#f2d44a","#30343e"],["#f3efe8","#e07a2e"]];
+  function build(body,trim){ var c=document.createElement("canvas"), S2=3; c.width=100*S2; c.height=80*S2; var x=c.getContext("2d"); x.scale(S2,S2);
+    var dk="rgba(20,24,32,.55)"; x.lineJoin="round"; x.lineWidth=1;
+    // high wing (straight, rounded tips) with trim on the tips + a sky window over the cabin
+    x.fillStyle=body; x.strokeStyle=dk; x.beginPath(); x.moveTo(6,22); x.lineTo(94,22); x.quadraticCurveTo(99,27,94,33); x.lineTo(6,33); x.quadraticCurveTo(1,27,6,22); x.fill(); x.stroke();
+    x.fillStyle=trim; x.fillRect(5,22.5,9,10); x.fillRect(86,22.5,9,10);
+    x.fillStyle="rgba(0,0,0,.08)"; x.fillRect(6,30,88,3);
+    // fuselage: rounded nose, tapering tail
+    x.fillStyle=body; x.beginPath(); x.moveTo(44,10); x.quadraticCurveTo(50,2,56,10); x.lineTo(57,30); x.quadraticCurveTo(55,52,52,74); x.lineTo(48,74); x.quadraticCurveTo(45,52,43,30); x.closePath(); x.fill(); x.stroke();
+    x.fillStyle=trim; x.beginPath(); x.moveTo(49,36); x.lineTo(51,36); x.lineTo(51.4,72); x.lineTo(48.6,72); x.closePath(); x.fill();
+    // windshield + skylight, engine cowl, spinner
+    x.fillStyle="#22344f"; x.beginPath(); x.moveTo(44.5,14); x.quadraticCurveTo(50,11,55.5,14); x.lineTo(55,21); x.lineTo(45,21); x.closePath(); x.fill();
+    x.fillStyle="rgba(150,200,255,.55)"; x.fillRect(46,23.5,8,7);
+    x.fillStyle="rgba(0,0,0,.12)"; x.beginPath(); x.moveTo(44,10); x.quadraticCurveTo(50,2,56,10); x.lineTo(56,12); x.lineTo(44,12); x.closePath(); x.fill();
+    x.fillStyle="#d7dbe2"; x.beginPath(); x.arc(50,4.2,2.2,0,6.283); x.fill();
+    // tailplane + fin
+    x.fillStyle=body; x.beginPath(); x.moveTo(36,66); x.lineTo(64,66); x.quadraticCurveTo(67,69,64,72); x.lineTo(36,72); x.quadraticCurveTo(33,69,36,66); x.fill(); x.stroke();
+    x.fillStyle=trim; x.fillRect(48.8,60,2.4,16);
+    return c; }
+  var SPR=null, SHD=null;
+  function sprites(){ if(!SPR){ SPR=COLS.map(function(c){ return build(c[0],c[1]); }); SHD=SPR.map(function(c){ return shadowOf(c,.42); }); } }
+  function live(){ return G.trf.length+G.trfCalls.length; }
+  function canSpawn(){ return !G.home&&!G.won&&!G.landing&&!G.rp&&!(G.banner&&G.banner.t<1800); }
+  function call(o){ // a soft heads-up at the edge before a plane enters, then it flies in
+    var first=!G.trfN; G.trfN++; o.t=WARN; G.trfCalls.push(o);
+    if(first) radio(o.side?"Traffic crossing ahead, Captain. Just ease around it.":"Traffic at 12 o'clock, Captain. Just ease around it.",{tone:"info",ms:2600}); }
+  function spawnTick(dt){ if(!canSpawn()) return; G.trfT-=dt; if(G.trfT>0) return; var L=Math.max(0,Math.min(4,G.lvl-1));
+    G.trfT=GAP[L]+Math.random()*3000; if(live()>=MAXN[L]) { G.trfT=2500; return; } spawn(L); }
+  function spawn(L,o){ var sp=SPD[L], v=(Math.random()*COLS.length)|0;
+    if(!o){ if(Math.random()<.6){ var x=Math.max(50,Math.min(W-50,G.x+(Math.random()-.5)*220)); o={x:x,y:-46,vx:(Math.random()-.5)*36,vy:(95+Math.random()*40)*sp}; }
+      else { var d=Math.random()<.5?1:-1; o={side:d,x:d>0?-46:W+46,y:H*(.2+Math.random()*.32),vx:d*(80+Math.random()*35)*sp,vy:(25+Math.random()*30)*sp}; } }
+    o.v=o.v==null?v:o.v; o.seed=1+Math.random()*9; o.w=PW; o.wob=0; call(o); }
+  function bump(p){ var dx=G.x-p.x, dy=G.y-p.y, l=Math.hypot(dx,dy)||1, nx=dx/l, ny=dy/l;
+    p.bumped=1; p.wob=1; p.vx-=nx*70; p.vy-=ny*40;
+    G.bumps++; G.inv=84; G.wob=1; G.mvx+=nx*300; G.mvy+=ny*220;
+    G.tx=Math.max(30,Math.min(W-30,G.tx+nx*36)); G.ty=Math.max(H*.32,Math.min(H-50,G.ty+ny*28));
+    pop(G.x,G.y-50,T("Close call!"),"#ffd27a"); if(G.streak>0) pop(G.x,G.y-30,T("streak starts over"),"#9aa3b5"); G.streak=0;
+    SND.play("bump"); buzz(25);
+    if(G.bumps===1||performance.now()-pickT>25000){ pickT=performance.now(); radio(G.bumps===1?"Whoa, easy there! Give the traffic a little room, Captain.":"Close one! Plenty of sky out there, Captain.",{tone:"info",ms:2400}); } }
+  function step(dt,run,takeoff,landing){ var s=dt/1000, i;
+    for(i=G.trfCalls.length-1;i>=0;i--){ var c=G.trfCalls[i]; if(run) c.t-=dt; if(c.t<=0){ G.trfCalls.splice(i,1); if(canSpawn()) G.trf.push(c); } }
+    for(i=G.trf.length-1;i>=0;i--){ var p=G.trf[i];
+      if(run){ if(G.landing||G.home||G.won){ p.leaving=1; } if(p.leaving){ p.vx+=(p.x<W/2?-1:1)*160*s; }
+        p.x+=p.vx*s; p.y+=p.vy*s; if(p.wob>0) p.wob=Math.max(0,p.wob-s*1.2); }
+      if(p.y>H+80||p.y<-140||p.x<-110||p.x>W+110){ G.trf.splice(i,1); continue; }
+      if(run&&!takeoff&&!landing&&!p.bumped&&G.inv<=0&&!G.dying){ var ex=(p.x-G.x)/44, ey=(p.y-G.y)/34; if(ex*ex+ey*ey<1) bump(p); } } }
+  function head(p){ return Math.atan2(p.vx,-p.vy); }
+  function draw(now){ if(R3||!G.trf.length) return; sprites();
+    G.trf.forEach(function(p){ var im=SPR[p.v], sh=SHD[p.v], w=p.w, h=w*im.height/im.width, a=head(p), roll=p.wob>0?Math.sin(now/55)*p.wob*.35:0;
+      cx.save(); cx.translate(p.x+16,p.y+22); cx.rotate(a); cx.scale(.66*(1-Math.abs(roll)*.4),.66); cx.drawImage(sh,-w/2,-h/2,w,h); cx.restore();   // shadow on the ground
+      cx.save(); cx.translate(p.x,p.y); cx.rotate(a+roll*.5); cx.scale(1-Math.abs(roll)*.4,1); cx.drawImage(im,-w/2,-h/2,w,h);
+      var pr=(now/16)%6.283; cx.fillStyle="rgba(30,32,40,.28)"; cx.beginPath(); cx.ellipse(0,-h/2+1.5,w*.15,1.6,0,0,6.283); cx.fill();   // prop blur
+      cx.strokeStyle="rgba(30,32,40,.6)"; cx.lineWidth=1.2; cx.beginPath(); cx.moveTo(-Math.cos(pr)*w*.14,-h/2+1.5); cx.lineTo(Math.cos(pr)*w*.14,-h/2+1.5); cx.stroke();
+      navLights(-w*.47,w*.47,-h*.16,p.seed,1.6); cx.restore(); }); }
+  function calls(now,dt){ G.trfCalls.forEach(function(c){ var a=Math.min(1,(WARN-c.t)/250)*(.55+.25*Math.sin(now/170)), x,y,ang;
+      if(c.side){ x=c.side>0?16:W-16; y=Math.max(70,Math.min(H-40,c.y)); ang=c.side>0?Math.PI/2:-Math.PI/2; } else { x=Math.max(26,Math.min(W-26,c.x)); y=58; ang=Math.PI; }
+      cx.save(); cx.globalAlpha=a; cx.translate(x,y); cx.fillStyle="rgba(8,13,26,.55)"; cx.beginPath(); cx.arc(0,0,15,0,6.283); cx.fill();
+      cx.rotate(ang); cx.fillStyle="#ffd27a"; cx.beginPath(); cx.moveTo(0,-8); cx.lineTo(7,5); cx.lineTo(0,1.5); cx.lineTo(-7,5); cx.closePath(); cx.fill(); cx.restore();
+      cx.save(); cx.globalAlpha=a; cx.font="800 11px Barlow,system-ui"; cx.textAlign=c.side>0?"left":c.side<0?"right":"center"; cx.textBaseline="middle"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.85)";
+      var tx=c.side>0?x+20:c.side<0?x-20:x, ty=c.side?y:y+24; cx.strokeText(T("Traffic"),tx,ty); cx.fillStyle="#ffe7b0"; cx.fillText(T("Traffic"),tx,ty); cx.restore(); }); }
+  return {spawnTick:spawnTick,step:step,draw:draw,calls:calls,spawn:function(o){ spawn(Math.max(0,Math.min(4,G.lvl-1)),o); },COLS:COLS};
+})();
+
 /* ---- main loop ---- */
 function frame(now){
   requestAnimationFrame(frame);
@@ -1517,21 +1629,21 @@ function frame(now){
     if(G.home) G.t-=dt; else if(!G.boss&&!G.bossDie&&!G.won){ G.t-=dt; if(G.t<=0) levelEnd(); }   // each level is 60 s; levels 3 and 5 end on a boss
     if(G.won&&!G.home&&!G.banner){ G.home=1; G.t=LAND+2500; }                                     // after the victory banner: fly home and land at LAX
     if(!takeoff&&!landing){
-    G.spawnT-=dt; if(G.spawnT<=0){ spawnPick(); G.spawnT=Math.max(420,820-G.lel/80); }
+    G.spawnT-=dt; if(G.spawnT<=0){ spawnPick(); G.spawnT=Math.max(560,1100-G.lel/80); }
     if(!G.home&&!G.boss&&!G.bossDie&&!G.won&&!(G.banner&&G.banner.t<1800)){ var pc=L().pace; if(!CALM){   // same ramp as the original game each level, faster pace as levels climb
-    G.ufoT-=dt; if(G.ufoT<=0){ spawnUfo(); G.ufoT=Math.max(4200,8000-G.lel/20)*pc; }
-    G.jetT-=dt; if(G.jetT<=0){ spawnJet(); G.jetT=Math.max(5200,9500-G.lel/18)*pc; }
-    G.boltT-=dt; if(G.boltT<=0){ spawnBolt(); G.boltT=Math.max(3800,7000-G.lel/25)*pc; }
-    G.kamiT-=dt; if(G.kamiT<=0){ spawnKami(); G.kamiT=(14000+Math.random()*6000)*pc; }
-    G.copT-=dt; if(G.copT<=0){ spawnCop(); if(G.lvl>=4) setTimeout(spawnCop,1600); G.copT=(18000+Math.random()*8000)*pc; } }
+    G.ufoT-=dt; if(G.ufoT<=0){ spawnUfo(); G.ufoT=Math.max(4200,8000-G.lel/20)*pc*DENS; }
+    G.jetT-=dt; if(G.jetT<=0){ spawnJet(); G.jetT=Math.max(5200,9500-G.lel/18)*pc*DENS; }
+    G.boltT-=dt; if(G.boltT<=0){ spawnBolt(); G.boltT=Math.max(3800,7000-G.lel/25)*pc*DENS; }
+    G.kamiT-=dt; if(G.kamiT<=0){ spawnKami(); G.kamiT=(14000+Math.random()*6000)*pc*DENS; }
+    G.copT-=dt; if(G.copT<=0){ spawnCop(); if(G.lvl>=4) setTimeout(spawnCop,1600); G.copT=(18000+Math.random()*8000)*pc*DENS; } }
+    if(CALM) TRF.spawnTick(dt);
     if(window.ReviewEgg&&!G.home&&G.dz<DRIZ_N){ G.dzT-=dt; if(G.dzT<=0) G.dzT=spawnDriz()?DRIZ_GAP+Math.random()*2000:1500; }
-    G.crateT-=dt; if(!CALM&&G.crateT<=0&&G.crates<2&&!G.gotCrate){ G.crates++; G.crateT=1e9; G.items.push({t:"crate",x:60+Math.random()*(W-120),y:-60,r:26,sw:Math.random()*6}); }
+    G.crateT-=dt; if(!CALM&&G.guns&&G.crateT<=0&&G.crates<2&&!G.gotCrate){ G.crates++; G.crateT=1e9; G.items.push({t:"crate",x:60+Math.random()*(W-120),y:-60,r:26,sw:Math.random()*6}); }
     } }
-    if(takeoff||landing){ G.tx=W/2; G.ty=landing?H*0.64:H-110; }
-    var ox=G.x; G.x+=(G.tx-G.x)*Math.min(1,.22*k); G.y+=(G.ty-G.y)*Math.min(1,.22*k); G.vx=(G.x-ox)/Math.max(.5,k);
+    steer(dt,takeoff||landing);
     if(G.inv>0) G.inv-=k; if(G.multT>0){ G.multT-=dt; if(G.multT<=0) G.mult=1; }
     if(Math.floor(now/250)!==Math.floor((now-dt)/250)) G.score+=G.mult;
-    G.shotT-=dt; if(G.mfl>0) G.mfl-=dt; if(!CALM&&G.shotT<=0&&!takeoff&&!landing&&!G.home&&!G.won) fire();
+    G.shotT-=dt; if(G.mfl>0) G.mfl-=dt; if(!CALM&&G.guns&&G.shotT<=0&&!takeoff&&!landing&&!G.home&&!G.won) fire();
     rpTick(dt,k,takeoff,landing);
     rescueStep(dt,k,spd,takeoff,landing); sevStep(dt);
     if(!CALM&&G.el>5200&&!G.dbgDone&&(DBG2.crash||DBG2.rescue)){ G.dbgDone=1; if(DBG2.crash) MELODY_DEBUG.crash(DBG2.crash==="1"?"":DBG2.crash); else { G.hp=Math.min(G.hp,33.32); G.sev=Math.max(G.sev,2); rescueArm(); } }
@@ -1545,7 +1657,7 @@ function frame(now){
   // pickups
   for(var i=G.items.length-1;i>=0;i--){ var it=G.items[i]; if(run){ it.y+=spd*(it.t==="crate"?.8:it.t==="driz"?.95:1.15)*k; if(it.rot!=null) it.rot+=(it.vr||0)*k; if(it.t==="driz"){ it.ph+=.03*k; it.x=it.x0+Math.sin(it.ph)*14; } }
     if(it.y>H+60){ if(it.t==="crate"&&!G.gotCrate) G.crateT=9000;
-      if(CALM&&run&&it.t==="food"){ if(G.streak>=3) pop(Math.max(50,Math.min(W-50,it.x)),H-36,T("Missed it · streak ends"),"#9aa3b5"); else pop(Math.max(40,Math.min(W-40,it.x)),H-36,T("missed it"),"#9aa3b5"); G.streak=0; }
+      if(run&&it.t==="food"){ if(G.streak>=3) pop(Math.max(50,Math.min(W-50,it.x)),H-36,T("Missed it · streak ends"),"#9aa3b5"); else pop(Math.max(40,Math.min(W-40,it.x)),H-36,T("missed it"),"#9aa3b5"); G.streak=0; }
       G.items.splice(i,1); continue; }
     if(it.t==="crate") drawCrate(it,now);
     else if(it.t==="driz") drawDriz(it,now);
@@ -1560,7 +1672,7 @@ function frame(now){
       else if(it.t==="heal"){ SND.play("crate"); var before=G.hp; G.hp=Math.min(100,G.hp+25); pop(it.x,it.y,"+"+Math.round(G.hp-before)+"% health","#7dffb5"); buzz(30); }
       else if(it.t==="mic"){ G.mult=2; G.multT=6000; pop(it.x,it.y,T("🎤 Karaoke! 2× score"),"#ff9db0"); buzz([20,30,20]); }
       else { G.score+=it.p.p*G.mult; pop(it.x,it.y,"+"+it.p.p*G.mult+" "+T(it.p.n),"#f0d375");
-        if(CALM){ G.streak=(G.streak||0)+1; G.bestStreak=Math.max(G.bestStreak||0,G.streak); if(G.streak%5===0){ var sb=Math.min(500,50*G.streak); G.score+=sb; pop(it.x,it.y-26,"🔥 "+G.streak+" "+T("in a row")+" +"+sb,"#ffb36b"); SND.play("chime",3); } } }
+        { G.streak=(G.streak||0)+1; G.bestStreak=Math.max(G.bestStreak||0,G.streak); if(G.streak%5===0){ var sb=Math.min(500,50*G.streak); G.score+=sb; pop(it.x,it.y-26,"🔥 "+G.streak+" "+T("in a row")+" +"+sb,"#ffb36b"); SND.play("chime",3); } } }
       G.items.splice(i,1); } }
   // warnings for jets and kamikaze planes
   for(var w=G.warn.length-1;w>=0;w--){ var wn=G.warn[w]; wn.t-=dt; if(wn.t<=0){ G.warn.splice(w,1); continue; } var fl=(now/120|0)%2;
@@ -1580,18 +1692,26 @@ function frame(now){
       if(run&&G.boss===en&&Math.abs(en.x-G.x)<en.rw+16&&Math.abs(en.y-G.y)<en.rh+18) hurt(G.x,G.y,T("💥 Hit the boss!")); continue; }
     if(run){ if(en.t==="ufo"&&en.fleeing){ en.x+=(en.x<W/2?-5:5)*k; en.y-=.6*k; }
       else if(en.t==="ufo"){ var lv=G.lvl; en.ph+=.03*k; en.y+=1.1*(1+.08*(lv-1))*k; en.x+=Math.sin(en.ph)*1.6*k; en.fire-=dt;
-        if(en.fire<=0&&en.y>20){ var ang=Math.atan2(G.y-en.y,G.x-en.x), usp=3.6*(1+.06*(lv-1)); (lv>=3?[-.22,0,.22]:[0]).forEach(function(o){ G.eshots.push({x:en.x,y:en.y+12,vx:Math.cos(ang+o)*usp,vy:Math.sin(ang+o)*usp,c:"#7ef7c8",r:6}); }); en.fire=(1700+Math.random()*900)*L().pace; } }
-      else if(en.t==="jet"){ en.y+=7.5*(1+.06*(G.lvl-1))*k; if(!en.fired&&en.y>60){ en.fired=1; G.eshots.push({x:en.x-14,y:en.y+30,vx:0,vy:9,c:"#ff5a3c",r:4,missile:1},{x:en.x+14,y:en.y+30,vx:0,vy:9,c:"#ff5a3c",r:4,missile:1}); } }
+        if(en.fire<=0&&en.y>20){ var ang=Math.atan2(G.y-en.y,G.x-en.x), usp=3.6*(1+.06*(lv-1)); (lv>=3?[-.22,0,.22]:[0]).forEach(function(o){ G.eshots.push({x:en.x,y:en.y+12,vx:Math.cos(ang+o)*usp,vy:Math.sin(ang+o)*usp,c:"#7ef7c8",r:6}); }); en.fire=(1700+Math.random()*900)*L().pace*1.35; } }
+      else if(en.t==="jet"){ en.y+=JET_V*(1+.06*(G.lvl-1))*k;   // dives at you like a kamikaze (turn rate is capped, so a sharp sidestep beats it)
+        en.vx=(en.vx||0)+Math.max(-.07,Math.min(.07,(G.x-en.x)*.004))*k; en.vx=Math.max(-1.8,Math.min(1.8,en.vx)); if(en.y<G.y-40) en.x+=en.vx*k;
+        if(en.jf==null) en.jf=650+Math.random()*350; en.jf-=dt;   // one aimed missile every 2-3 s while it's above you
+        if(en.jf<=0&&en.y>30&&en.y<G.y-50){ var ja=Math.atan2(G.y-en.y,G.x-en.x); G.eshots.push({x:en.x,y:en.y+26,vx:Math.cos(ja)*5,vy:Math.sin(ja)*5,c:"#ff5a3c",r:4,missile:1}); SND.play("whistle"); en.jf=2000+Math.random()*1000; if(window.__MLOG) __MLOG.push(["jet",Math.round(G.el),en.jid||(en.jid=Math.random())]); } }
       else if(en.t==="cop"&&!en.fleeing){
-        var cv=L().copV; if(en.y<en.hoverY) en.y+=2.2*cv*k; else { en.y+=Math.sin(now/400)*.3*k; en.x+=Math.max(-1.3*cv,Math.min(1.3*cv,(G.x-en.x)*.02*cv))*k; }
+        var cv=L().copV; if(en.y<en.hoverY) en.y+=2.2*cv*k; else { en.y+=Math.sin(now/400)*.3*k; en.sw=(en.sw||0)+.018*cv*k; if(en.cx0==null) en.cx0=en.x; en.cx0+=Math.max(-.5,Math.min(.5,(G.x-en.cx0)*.006))*k;   // strafes back and forth across your line
+          var stx=Math.max(50,Math.min(W-50,en.cx0+Math.sin(en.sw)*110)); en.x+=Math.max(-2.4*cv,Math.min(2.4*cv,(stx-en.x)*.08))*k; }
         en.fireT-=dt;
         if(en.fireT<=0&&en.y>=en.hoverY-4){ // one round of the burst
           var gp0=copPt(en,"gun"), mx=gp0[0], my=gp0[1], ang=Math.atan2(G.y-my,G.x-mx)+(Math.random()-.5)*.12;
-          G.eshots.push({x:mx,y:my,vx:Math.cos(ang)*L().bul,vy:Math.sin(ang)*L().bul,c:"#ffd27a",r:3,bullet:1}); en.flash=90; popSnd(); en.shot++;
-          if(en.shot<5) en.fireT=210; else { en.shot=0; en.bursts++; en.fireT=1650/Math.sqrt(L().copV); if(en.bursts>=3){ en.fleeing=1; } } }
+          var pat=en.bursts%3, bs=L().bul;   // burst 1: 5 aimed tracers · burst 2: heavy slugs · burst 3: 3-way spread
+          if(pat===0) G.eshots.push({x:mx,y:my,vx:Math.cos(ang)*bs,vy:Math.sin(ang)*bs,c:"#ffd27a",r:3,bullet:1});
+          else if(pat===1) G.eshots.push({x:mx,y:my,vx:Math.cos(ang)*bs*1.2,vy:Math.sin(ang)*bs*1.2,c:"#ff9a3c",r:5,bullet:1,big:1});
+          else [-.28,0,.28].forEach(function(o){ G.eshots.push({x:mx,y:my,vx:Math.cos(ang+o)*bs*.8,vy:Math.sin(ang+o)*bs*.8,c:"#ff6b6b",r:4}); });
+          if(window.__MLOG) __MLOG.push(["cop"+pat,Math.round(G.el)]); en.flash=90; popSnd(); en.shot++;
+          if(en.shot<(en.bursts%3===0?4:en.bursts%3===1?2:1)) en.fireT=en.bursts%3===1?320:210; else { en.shot=0; en.bursts++; en.fireT=1650/Math.sqrt(L().copV); if(en.bursts>=3){ en.fleeing=1; } } }
         if(en.flash>0) en.flash-=dt; }
       else if(en.fleeing){ en.x+=(en.x<W/2?-6:6)*k; en.y-=1*k; }
-      else if(en.t==="kami"){ en.y+=5.2*k; en.x+=en.vx*k; if(Math.random()<.5) G.fx.push({k:"s",x:en.x+(Math.random()-.5)*30,y:en.y-40,vx:0,vy:-1,s:4,g:.25,a:.25,rot:0}); } }
+      else if(en.t==="kami"){ en.y+=KAMI_V*k; en.x+=en.vx*k; if(Math.random()<.5) G.fx.push({k:"s",x:en.x+(Math.random()-.5)*30,y:en.y-40,vx:0,vy:-1,s:4,g:.25,a:.25,rot:0}); } }
     if(en.y>H+120||en.x<-120||en.x>W+120){ G.ens.splice(e,1); continue; }
     if(R3){ if(en.t==="cop"){ rv=Math.max(rv,1-Math.hypot(en.x-G.x,en.y-G.y)/450); cx.font="900 11px Barlow,system-ui"; cx.textAlign="center"; cx.fillStyle="rgba(255,255,255,.9)"; cx.fillText("LAPD",en.x,en.y+COP_LEN*.56); } }   // the 3D layer draws the aircraft
     else if(en.t==="ufo"){ var gg=cx.createRadialGradient(en.x,en.y+16,2,en.x,en.y+16,60); gg.addColorStop(0,"rgba(126,247,200,.35)"); gg.addColorStop(1,"rgba(126,247,200,0)"); cx.fillStyle=gg; cx.beginPath(); cx.arc(en.x,en.y+16,60,0,6.283); cx.fill(); sprite(S.ufo,en.x,en.y,en.w,0,false,"🛸"); }
@@ -1611,6 +1731,7 @@ function frame(now){
     if(en.mhp>2&&en.hp<en.mhp){ var hbw=40, hby=en.y-(en.t==="cop"?COP_LEN*.5+6:en.r+14); cx.fillStyle="rgba(0,0,0,.6)"; cx.fillRect(en.x-hbw/2-1,hby-1,hbw+2,6); cx.fillStyle=en.hp/en.mhp>.5?"#7ef7c8":"#ffb03b"; cx.fillRect(en.x-hbw/2,hby,hbw*Math.max(0,en.hp/en.mhp),4); }
     if(run&&Math.abs(en.x-G.x)<en.r+22&&Math.abs(en.y-G.y)<en.r+26){ hurt(en.x,en.y,en.t==="kami"?T("💥 Mid-air hit!"):en.t==="ufo"?T("🛸 Abducted!"):en.t==="cop"?T("🚁 Rammed the chopper!"):T("💥 Jet hit!")); boom(en.x,en.y,24); G.ens.splice(e,1); } }
   SND.rotor(run?rv:0);
+  TRF.step(dt,run,takeoff,landing); TRF.draw(now);   // the other small planes fly under you (lower altitude)
   rpDraw(now,dt,k);
   if(G.bossDie) bossDieStep(dt,k);
   drawRescue(now);
@@ -1630,8 +1751,9 @@ function frame(now){
     if(es.missile){ cx.translate(es.x,es.y); cx.rotate(Math.atan2(es.vy,es.vx)-Math.PI/2); cx.fillRect(-2,-12,4,14); cx.fillStyle="rgba(255,200,120,.8)"; cx.fillRect(-1.5,-22,3,10); }
     else if(es.bomb){ var bl=(now/150|0)%2; cx.shadowBlur=0; cx.fillStyle="#1d2028"; cx.beginPath(); cx.arc(es.x,es.y,es.r,0,6.283); cx.fill(); cx.strokeStyle="#6a7080"; cx.lineWidth=1.5; cx.stroke();
       cx.fillStyle=bl?"#ff3b3b":"#5a1010"; cx.shadowColor="#ff3b3b"; cx.shadowBlur=bl?14:0; cx.beginPath(); cx.arc(es.x,es.y,2.8,0,6.283); cx.fill(); }
+    else if(es.bullet&&es.big){ cx.strokeStyle=es.c; cx.lineWidth=7; cx.lineCap="round"; cx.beginPath(); cx.moveTo(es.x-es.vx*2.6,es.y-es.vy*2.6); cx.lineTo(es.x,es.y); cx.stroke(); cx.strokeStyle="rgba(255,250,220,.95)"; cx.lineWidth=3; cx.beginPath(); cx.moveTo(es.x-es.vx*1.6,es.y-es.vy*1.6); cx.lineTo(es.x,es.y); cx.stroke(); }
     else if(es.bullet){ cx.strokeStyle="rgba(255,220,140,.95)"; cx.lineWidth=3; cx.beginPath(); cx.moveTo(es.x-es.vx*3,es.y-es.vy*3); cx.lineTo(es.x,es.y); cx.stroke(); } else { cx.beginPath(); cx.arc(es.x,es.y,es.r,0,6.283); cx.fill(); } cx.restore(); }
-    if(run&&Math.abs(es.x-G.x)<(es.bomb?24:20)&&Math.abs(es.y-G.y)<(es.bomb?26:24)){ G.eshots.splice(q,1); if(es.bomb) boom(es.x,es.y,14);
+    if(run&&Math.abs(es.x-G.x)<(es.bomb?24:es.big?23:20)&&Math.abs(es.y-G.y)<(es.bomb?26:es.big?27:24)){ G.eshots.splice(q,1); if(es.bomb) boom(es.x,es.y,14);
       hurt(G.x,G.y,es.bomb?T("💣 Bombed!"):es.missile?T("🚀 Missile hit!"):es.bullet?(es.mil?T("🚁 Gunship fire!"):T("🚁 Hit by LAPD fire!")):T("🛸 Zapped!")); } }
   // the plane: smoke, debris and fireballs under it, its fire points on top. Going down = crashStep (spiral → ground impact → end)
   FX.drawAir(now);
@@ -1642,8 +1764,9 @@ function frame(now){
     if(!G.crashed){ var proll=Math.max(-1,Math.min(1,G.vx*.12)), palt=G.alt==null?(G.running?1:0):G.alt, pw=PLANE_W*(0.74+0.26*palt);
       var vis=G.inv<=0||G.landing||Math.floor(G.inv/6)%2===0; if(vis) drawPlane(G.x,G.y,proll,1,palt);
       if(G.sev>.15) FX.planeFire(G.x,G.y,pw,pw*524/520,proll*.35,Math.max(.72,1-Math.abs(proll)*.5),1,G.sev,dt,k,now,G.running,!vis||R3); }
-    if(run) muzzle();
+    if(run&&!CALM) muzzle();
   }
+  TRF.calls(now,dt);
   drawClouds(spd*k);
   for(var pI=G.pops.length-1;pI>=0;pI--){ var po=G.pops[pI]; po.y-=1.1*k; po.a-=.02*k; if(po.a<=0){ G.pops.splice(pI,1); continue; } cx.globalAlpha=po.a; cx.fillStyle=po.col; cx.font="800 17px Barlow,system-ui"; cx.textAlign="center"; cx.fillText(po.txt,po.x,po.y); cx.globalAlpha=1; }
   drawBossBar(); drawUpgrade(dt); drawBanner(dt); drawDrizHud(now);
@@ -1661,7 +1784,7 @@ function frame(now){
 }
 /* ---- bridge for the optional 3D renderer (melody3d.js). Read-only views of the game state + visual hooks; it never changes the game. ---- */
 var SHK=[0,0];
-var M3=window.__M3={render:null,G:function(){ return G; },S:S,W:W,H:H,PLANE_W:PLANE_W,COP_LEN:COP_LEN,GS_LEN:GS_LEN,SJ_W:SJ_W,DRIZ_N:DRIZ_N,RP_HITS:RP_HITS,WPN:WPN,NAV:NAV,PICK:PICK,MIC:MIC,TILES:TILES,LBL:LBL,DRIZ_IM:DRIZ_IM,FX:FX,CARS:CARS,SHK:SHK,reduce:reduce,
+var M3=window.__M3={render:null,G:function(){ return G; },S:S,W:W,H:H,PLANE_W:PLANE_W,COP_LEN:COP_LEN,GS_LEN:GS_LEN,SJ_W:SJ_W,DRIZ_N:DRIZ_N,RP_HITS:RP_HITS,WPN:WPN,NAV:NAV,PICK:PICK,MIC:MIC,TILES:TILES,LBL:LBL,LMW:LMW,TRF_COLS:TRF.COLS,DRIZ_IM:DRIZ_IM,FX:FX,CARS:CARS,SHK:SHK,reduce:reduce,
   copPt:copPt,gsPt:gsPt,gunshipIm:gunshipIm,superjetIm:superjetIm,ready:ready,
   rpBanner:function(c,x,y,p,a,r){ rpBanner(c,x,y,p,a,r); },
   runway:function(c,g,oy){ var o=cx, y0=g.y; cx=c; g.y=oy; try{ drawRunway(g); } finally{ cx=o; g.y=y0; } },   // draws the animated runway into the 3D layer's texture
@@ -1723,19 +1846,28 @@ function alertBox(t){ var d=document.createElement("div"); d.className="ok"; d.s
 window.__MG={get:function(){return G;},start:function(){start();},end:function(){ if(G.running) end(); },W:W,H:H};
 window.MELODY_START=function(){ SND.unlock(); if(!G.running) start(); try{ cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); }catch(e){} };   // the shared start menu's PLAY
 requestAnimationFrame(frame);
-// steer: drag anywhere; the plane follows your finger's movement, not its position, so your thumb never covers it
+// steer: press/drag anywhere on the game and the plane glides to your finger (on touch it rides ~70 px above your thumb so
+// you can see it). Arrow keys / WASD accelerate and coast smoothly. The motion itself lives in steer() (dt-based, 60 fps or not)
 var drag=null;
 function replay(){ start(); }   // play before registering: no member gate, no tokens (Christian, 2026-10)
+function aim(e){ var r=cv.getBoundingClientRect(), x=(e.clientX-r.left)*W/r.width, y=(e.clientY-r.top)*H/r.height, off=e.pointerType==="mouse"?0:-70;
+  G.tx=Math.max(30,Math.min(W-30,x)); G.ty=Math.max(H*.32,Math.min(H-50,y+off)); }
 cv.addEventListener("pointerdown",function(e){ e.preventDefault(); SND.unlock(); if(!G.running){ replay(); return; }
-  var r=cv.getBoundingClientRect(); drag={id:e.pointerId,px:e.clientX,py:e.clientY,sx:G.tx,sy:G.ty,k:W/r.width}; try{ cv.setPointerCapture(e.pointerId); }catch(x){} });
-cv.addEventListener("pointermove",function(e){ if(!drag||!G.running) return; e.preventDefault();
-  G.tx=Math.max(30,Math.min(W-30,drag.sx+(e.clientX-drag.px)*drag.k*1.25)); G.ty=Math.max(H*.32,Math.min(H-50,drag.sy+(e.clientY-drag.py)*drag.k*1.25)); });
-["pointerup","pointercancel"].forEach(function(t){ cv.addEventListener(t,function(){ drag=null; }); });
+  drag={id:e.pointerId}; CTL.mode="ptr"; aim(e); try{ cv.setPointerCapture(e.pointerId); }catch(x){} });
+cv.addEventListener("pointermove",function(e){ if(!drag||!G.running||e.pointerId!==drag.id) return; e.preventDefault(); aim(e); });
+["pointerup","pointercancel","lostpointercapture"].forEach(function(t){ cv.addEventListener(t,function(e){ if(drag&&e.pointerId===drag.id) drag=null; }); });
 ["touchend","click"].forEach(function(t){ cv.addEventListener(t,function(){ SND.unlock(); },{passive:true}); });   // iOS unlocks audio on touchend/click
 $("sndb").addEventListener("click",function(){ SND.unlock(); SND.set("sound",!SND.state().sound); });
 syncBtns();
-addEventListener("keydown",function(e){ if(!G.running) return; var m={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[e.key]; if(!m) return; e.preventDefault(); G.tx=Math.max(30,Math.min(W-30,G.tx+m[0])); G.ty=Math.max(H*.32,Math.min(H-50,G.ty+m[1])); });
+var KEYS={ArrowLeft:"l",ArrowRight:"r",ArrowUp:"u",ArrowDown:"d",KeyA:"l",KeyD:"r",KeyW:"u",KeyS:"d"};
+addEventListener("keydown",function(e){ if(!G.running) return; var c=KEYS[e.code]||KEYS[e.key]; if(!c) return;
+  var tg=e.target, tn=tg&&tg.tagName; if(tn==="INPUT"||tn==="TEXTAREA"||tn==="SELECT"||(tg&&tg.isContentEditable)) return;
+  e.preventDefault(); CTL.keys[c]=1; CTL.mode="key"; });
+addEventListener("keyup",function(e){ var c=KEYS[e.code]||KEYS[e.key]; if(c) delete CTL.keys[c]; });
+addEventListener("blur",function(){ CTL.keys={}; });
 $("again").addEventListener("click",function(){ replay(); cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
+$("cmbb").addEventListener("click",function(e){ e.preventDefault(); e.stopPropagation(); SND.unlock(); setCombat(CALM); });
+combatSync();
 hud();
 
 /* ---- point values table ---- */
@@ -1746,26 +1878,32 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
   row('<span class="e">♪</span>',"Gold music note","+10")+row(ic(MIC),"Karaoke mic","2× · 6s")+row('<img src="../review/antidote-foodie.webp" alt="">',"Antidote Drizzle emblem (catch "+DRIZ_N+")","+50")+'</div>'+
   '<div class="ptsh">Bonuses (score)</div><div class="pts">'+row('<span class="e">🔥</span>',"Every 5 catches in a row","+250…500")+row('<span class="e">⏱️</span>',"Finish a leg (500 × leg)","+500")+
   row('<span class="e">📺</span>',"Fly through Antidote's review banner","+500")+row('<span class="e">🛬</span>',"Fly all 5 legs and land","+3k")+'</div>'+
-  '<div class="ptsh">Nothing to dodge</div><div class="pts">'+row('<span class="e">🌙</span>',"A dropped item is just \u201cmissed it\u201d: it ends your streak","—",1)+'</div>'+
+  '<div class="ptsh">Easy does it</div><div class="pts">'+row('<span class="e">🛩️</span>',"Touch another plane: a soft bump, your streak starts over","—",1)+row('<span class="e">🌙</span>',"A dropped item is just \u201cmissed it\u201d: it ends your streak","—",1)+'</div>'+
   '<div class="ptsh">Melody Rewards points</div><div class="pts">'+row('<span class="e">⭐</span>',"1 point per "+GPC.perScore+" score","max "+GPC.dailyCap+"/day")+row('<span class="e">🎁</span>',"Play first, join after to save them","free")+'</div>';
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=cf1"></script>
+<script type="module" src="melody3d.js?v=sd1"></script>
 <script>(function(){ var g="img/game/", GP=(window.SSAI_REWARDS&&SSAI_REWARDS.game)||{perScore:100,dailyCap:50};
-window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill",tagline:"A scenic night flight from LAX over LA. Catch the food, land back home.",
+window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill",tagline:"Night dogfight over LA: shoot down jets, choppers and two bosses, catch the food, land back at LAX.",
  hero:[g+"p_mac.webp",g+"plane.webp",g+"p_marg.webp",g+"p_wings.webp"],
  theme:{bg:"#0b1220",bg2:"#1c2547",card:"#141e34",edge:"#27324d",accent:"#d4af37",accent2:"#f0d375",label:"#f0d375",ink:"#f6f1e4",dim:"#9aa3b5",btnInk:"#1a1206",soft:"rgba(255,255,255,.06)",track:"#27324d",good:"#3fbf8f",bad:"#ff7a59",
   display:"Anton,Impact,'Arial Narrow',sans-serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
  tokens:false,
  mount:"#cv",start:function(){ window.MELODY_START(); },vibrate:true,
- how:{goal:"Fly 5 scenic legs over LA (Westchester, the stadium, downtown, the Hollywood Hills, Venice and the Santa Monica Pier), catch as much of Melody's food as you can, then land back at LAX. No sign-up needed to play.",
-  time:"5 legs × 60 seconds + the landing · nothing can hurt you",
-  steps:[["👆","Drag anywhere on the game to steer. The plane follows your finger's movement, so your thumb never covers it"],
+ how:{goal:"Fly 5 levels over LA (the stadium, downtown, the hills and the coast). Grab your guns from the gun blimp, shoot down the jets, UFOs and LAPD choppers, beat the Army gunship (end of level 3) and the Super Jet (end of level 5), catch Melody's food, then land back at LAX. Prefer a calm flight? Tap ⚔️ on the game to turn combat off.",
+  time:"5 levels × 60 seconds + 2 bosses + the landing · 3 hits and you go down",
+  steps:[["👆","Touch or drag anywhere on the game and the plane glides smoothly to your finger (it flies just above your thumb so you can see it). On a computer, drag with the mouse or hold the arrow keys / WASD"],
+   ["🔫","You take off without guns: fly into the gun blimp to arm up. Your guns then fire on their own, and weapon crates upgrade them"],
+   ["🛩️","Jets dive slowly at you like kamikazes and fire a missile every 2 to 3 seconds. Sidestep: they can't turn fast"],
+   ["🚁","LAPD choppers strafe side to side and mix it up: tracer bursts, heavy slugs and 3-way spreads"],
+   ["🪖","Level 3 boss: the Army gunship fires fast, heavy rounds from both doors. Keep moving"],
+   ["🛩️","Level 5 boss: the Super Jet. It dives, bombs and sweeps with missiles"],
+   ["⚠️","Small planes, skydivers and balloons are bystanders: don't hit them, and your bullets pass through them"],
    ["🍔","Catch the food and gold music notes as they float up. Drop one and it's just \u201cmissed it\u201d: your catch streak starts over"],
    ["🔥","Every 5 catches in a row pays a streak bonus"],
    ["🎤","Grab the karaoke mic for 2× score for 6 seconds"],
-   ["🍯","Secret quest: catch 7 spinning Antidote Drizzle emblems. Antidote's banner plane flies in towing his Melody review: fly through the banner to unlock it"],
+   ["🍯","Secret quest: catch 7 spinning Antidote Drizzle emblems. Antidote's banner plane flies in towing his Melody review: shoot it down (with combat off, fly through the banner) to unlock it"],
    ["📺","Halftime: once a flight, between legs, a 20-second reel of Antidote The Foodie's Melody review plays. Skip it any time"],
    ["⭐","After you land, your score turns into Melody Rewards points: 1 point per "+GP.perScore+" score, up to "+GP.dailyCap+" a day. Not a member? Join after the flight to save them"]]},
  points:[
@@ -1775,7 +1913,10 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
    {img:"../review/antidote-foodie.webp",name:"Antidote Drizzle emblem",note:"Catch 7 to call in Antidote's review plane",pts:"+50",gold:true}]},
   {group:"Bonuses (score)",items:[{icon:"🔥",name:"5 catches in a row",note:"Then every 5 more",pts:"+250…500"},{icon:"⏱️",name:"Finish a leg",pts:"+500 × leg"},
    {icon:"📺",name:"Fly through Antidote's review banner",note:"After 7 emblems · unlocks his Melody review",pts:"+500",gold:true},{icon:"🛬",name:"Fly all 5 legs and land at LAX",note:"Plus a bonus for your best streak",pts:"+3,000",gold:true}]},
-  {group:"Legs",items:[{icon:"1️⃣",name:"Westchester & the Theme Building",pts:"60 s"},{icon:"2️⃣",name:"The stadium & downtown",pts:"60 s"},{icon:"3️⃣",name:"Hollywood Hills",pts:"60 s"},{icon:"4️⃣",name:"Venice Beach & Nalu Vida",pts:"60 s"},{icon:"5️⃣",name:"Santa Monica Pier, then land",pts:"60 s"}]}],
+  {group:"Shoot these down",items:[{img:g+"ufo.webp",name:"UFO",note:"Tougher each level",pts:"+150"},{img:g+"jet.webp",name:"Fighter jet",note:"Dives at you, a missile every 2-3 s",pts:"+200"},
+   {img:g+"plane.webp",name:"Kamikaze plane",note:"Aimed right at you",pts:"+300"},{icon:"🚁",name:"LAPD chopper",note:"Strafes · tracers, heavy slugs, spreads",pts:"+500"},
+   {icon:"🪖",name:"BOSS: Army gunship",note:"End of level 3 · fast, heavy rounds",pts:"+3,000",gold:true},{icon:"🛩️",name:"BOSS: Super Jet",note:"End of level 5",pts:"+5,000",gold:true}]},
+  {group:"Legs",items:[{icon:"1️⃣",name:"Wheels up over Westchester",pts:"60 s"},{icon:"2️⃣",name:"The stadium & downtown",pts:"60 s"},{icon:"3️⃣",name:"Up over the hills",pts:"60 s"},{icon:"4️⃣",name:"Down the coast & Nalu Vida",pts:"60 s"},{icon:"5️⃣",name:"Past the pier, then land",pts:"60 s"}]}],
  prizes:{title:"Rewards points",note:"Melody Rewards points: 1 point per "+GP.perScore+" score, up to "+GP.dailyCap+" points a day, added to your one Melody Rewards balance. No prizes or discount codes from the game. The weekly board is for bragging rights."}};
 })();</script>
 <script src="../gamemenu.js?v=cf1"></script><script src="../a2hs.js"></script>

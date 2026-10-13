@@ -241,7 +241,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 </header>
 
 <h2 id="play"><small>Play &amp; earn points</small>Fly the Melody approach</h2>
-<p class="sub">A night dogfight over LA. <b>Campaign:</b> 10 levels from LAX over Westchester, the stadium, the hills and the coast, each a little harder, with six bosses (an Army gunship, the Super Jet, a big jet and its escorts, a rocket ship, an army base and a final flock of white birds), then land back at LAX. <b>Survival:</b> no finish line, it just keeps getting harder: how long can you last? Catch Melody's food as it floats by. Drag anywhere on the game and the plane glides to your finger. Prefer a calm flight? Tap ⚔️ to turn combat off. <b>BETA:</b> weekly prizes switch on soon; the boards are live now.</p>
+<p class="sub">A night dogfight over LA. <b>Campaign:</b> 10 levels from LAX over Westchester, the stadium, the hills and the coast, each a little harder, with six bosses (an Army gunship, the Super Jet, a big jet and its escorts, a rocket ship, an army base and a final flock of white birds), then land back at LAX. <b>Survival:</b> no finish line, it just keeps getting harder: how long can you last? Catch Melody's food as it floats by. Drag anywhere on the game and the plane glides to your finger. Prefer a calm flight? Pause and turn combat off. <b>BETA:</b> weekly prizes switch on soon; the boards are live now.</p>
 <div class="gamebox">
   <div class="hud">
     <span>Score <span class="sc" id="score">0</span></span>
@@ -251,8 +251,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
   <div class="hud2"><span id="lvl">Level <b>1</b> of 10</span><span id="wpn"></span></div>
   <div class="cvwrap"><canvas id="cv" width="400" height="600" aria-label="Melody flight game. Drag anywhere to steer the plane."></canvas>
     <button type="button" class="gbtn" id="sndb" style="top:8px;right:8px" aria-label="Mute all sound">🔊</button>
-    <button type="button" class="gbtn wbtn" id="wbtn" style="display:none" aria-label="Switch guns"></button>
-    <button type="button" class="gbtn" id="cmbb" style="top:8px;right:48px" aria-label="Combat mode is on. Turn combat off" aria-pressed="true" title="Combat mode: on">⚔️</button></div>
+    <button type="button" class="gbtn wbtn" id="wbtn" style="display:none" aria-label="Switch guns"></button></div>
   <div id="over">
     <div class="sub" id="rank">Flight complete</div>
     <div id="final">0 pts</div>
@@ -588,7 +587,7 @@ var S={plane:img("img/game/plane.webp"),ufo:img("img/game/ufo.webp"),jet:img("im
 // pickups: Melody's real food + bar life (every item is on melodylax.com's menus). e = emoji fallback while the photo loads,
 // v = cache-bust per sprite/GLB, wt = spawn weight (default 1; the burger is doubled so it still shows up often with the bigger list)
 var PICK=[{k:"p_mac",n:"Mac & Cheese",p:80,e:"🧀",w:58},{k:"p_wings",n:"Lemon Pepper Wings",p:70,e:"🍗",w:60},
-  {k:"p_burger",n:"Melody Burger & Fries",p:90,e:"🍔",w:66,wt:2},{k:"p_toast",n:"French Toast",p:60,e:"🍞",w:62,v:"fv2"},
+  {k:"p_burger",n:"Melody Burger & Fries",p:90,e:"🍔",w:66,wt:2},{k:"p_toast",n:"French Toast",p:60,e:"🍞",w:68,v:"st3",tilt3:-.9},
   {k:"p_omelette",n:"Philly Omelette",p:60,e:"🍳",w:60},{k:"p_lobmac",n:"Lobster Mac & Cheese",p:90,e:"🦞",w:60,v:"fv2"},
   {k:"p_ribs",n:"Baby Back Ribs & Fries",p:80,e:"🍖",w:66,v:"fv2"},{k:"p_tacos",n:"Shrimp Tacos",p:70,e:"🌮",w:58,v:"fv2"},
   {k:"p_nachos",n:"Nachos",p:60,e:"🧀",w:62,v:"fv2"},{k:"p_strips",n:"Chicken Strips & Fries",p:60,e:"🍗",w:62,v:"fv2"},
@@ -607,7 +606,7 @@ var G={running:false,over:false};
    weapon upgrades continue); about a third fewer enemies/shots/items on screen than the original; passing jets fly
    slower (they linger, so they're harder to dodge); innocent bystanders (small planes, skydivers, balloons, birds) cost
    POINTS if you hit them and your bullets pass through them. CALM=true still switches back to the scenic no-combat flight. */
-var CALM=false;   // ⚔️ toggle on the game: combat is ON by default; only an explicit off ("0" on this phone, or ?combat=0) gives the calm flight
+var CALM=false;   // ⚔️ Combat row in the Pause menu: combat is ON by default; only an explicit off ("0" on this phone, or ?combat=0) gives the calm flight
 try{ CALM=localStorage.getItem("melody_combat")==="0"; }catch(x){}
 (function(){ var c=new URLSearchParams(location.search).get("combat"); if(c==="0") CALM=true; else if(c==="1") CALM=false; })();
 var DENS=1.3;   // spawn intervals × this vs the original game (≈ 23% fewer enemies, bolts and planes on screen; was 1.5, a touch harder now)
@@ -1292,7 +1291,7 @@ function drawDrizHud(now){ if(!G.running||G.dz<=0||G.rpDone) return; var t=Math.
 /* the review plane: slow, drifts side to side across the upper sky, tows his review banner; 10 hits brings it down */
 // CALM: it flies lower (inside the area you can steer to) and you fly THROUGH its banner to unlock the review; nothing is shot
 var RP_Y=CALM?250:118;
-/* ⚔️ Combat toggle: switching it mid-flight restarts the flight in the new mode */
+/* ⚔️ Combat toggle (a row in the Pause menu since 2026-10-13; the on-screen ⚔️ button is gone): switching it mid-flight restarts the flight in the new mode */
 function combatSync(){ RP_Y=CALM?250:118; var b=$("cmbb"), on=!CALM; if(b){ b.classList.toggle("off",!on); b.setAttribute("aria-pressed",on?"true":"false"); b.setAttribute("aria-label",on?"Combat mode is on. Turn combat off":"Combat mode is off. Turn combat on"); b.title="Combat mode: "+(on?"on":"off"); }
   var hb=$("hpbox"); if(hb){ hb.style.visibility=on?"visible":"hidden"; hb.setAttribute("aria-hidden",on?"false":"true"); } }
 function setCombat(on){ CALM=!on; try{ localStorage.setItem("melody_combat",on?"1":"0"); }catch(x){} combatSync(); hud();
@@ -2314,7 +2313,18 @@ addEventListener("blur",function(){ CTL.keys={}; });
 $("again").addEventListener("click",function(){ replay(); cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
 $("wbtn").addEventListener("click",function(e){ e.preventDefault(); e.stopPropagation(); SND.unlock(); cycleGun(1); });
 ["pointerdown","touchstart"].forEach(function(t){ $("wbtn").addEventListener(t,function(e){ e.stopPropagation(); },{passive:true}); });
-$("cmbb").addEventListener("click",function(e){ e.preventDefault(); e.stopPropagation(); SND.unlock(); setCombat(CALM); });
+/* Pause menu (gamepause.js): ↻ Restart = a fresh flight in the current mode (level 1, score 0, full health, enemies cleared).
+   Before 2026-10-13 Restart fell through to GameMenu.play() → MELODY_START, which only starts when no flight is running, so mid-flight it did nothing. */
+window.GAMEPAUSE_RESTART=function(){ SND.unlock(); if(window.GamePause&&GamePause.paused) GamePause.resume(); start(); };
+(function(){ function addCombat(ov){ if(ov.querySelector(".mel-cmb")) return;
+    var b=document.createElement("button"); b.type="button"; b.className="mel-cmb";
+    var lbl=function(){ var on=!CALM; b.textContent="⚔️ "+T("Combat")+": "+T(on?"On":"Off"); b.setAttribute("aria-pressed",on?"true":"false"); b.setAttribute("aria-label",on?T("Combat is on. Turn combat off (restarts the flight)"):T("Combat is off. Turn combat on (restarts the flight)")); };
+    lbl(); b.addEventListener("click",function(e){ e.preventDefault(); e.stopPropagation(); SND.unlock(); if(window.GamePause&&GamePause.paused) GamePause.resume(); setCombat(CALM); lbl(); });
+    ["pointerdown","pointerup","touchstart","touchend","mousedown","mouseup"].forEach(function(t){ b.addEventListener(t,function(e){ e.stopPropagation(); },{passive:true}); });
+    var rs=ov.querySelector(".ssai-restart"); ov.insertBefore(b,rs?rs.nextSibling:ov.querySelector("p")); }
+  var st=document.createElement("style"); st.textContent=".ssai-pauseov .mel-cmb{margin-top:-6px;font-size:15px!important;padding:10px 22px!important;background:rgba(255,255,255,.12)!important;color:#fff!important;border:1px solid rgba(255,255,255,.35)!important;box-shadow:none!important}.ssai-pauseov .mel-cmb[aria-pressed=false]{opacity:.75}"; document.head.appendChild(st);
+  function look(){ var ov=document.querySelector(".ssai-pauseov"); if(ov){ addCombat(ov); return true; } }
+  if(!look()&&window.MutationObserver){ var mo=new MutationObserver(function(){ if(look()) mo.disconnect(); }); mo.observe(document.body,{childList:true}); } })();
 combatSync();
 hud();
 
@@ -2331,7 +2341,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=lv1"></script>
+<script type="module" src="melody3d.js?v=st3"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}
@@ -2386,7 +2396,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 <script>(function(){ var g="img/game/", GP=(window.SSAI_REWARDS&&SSAI_REWARDS.game)||{perScore:100,dailyCap:50}, WK=(window.SSAI_REWARDS&&SSAI_REWARDS.weekly)||{};
 /* START SCREEN: sells the food + the weekly challenge; the live game preview sits small in the corner (index.html previewCopy). */
 var CH=null; if(window.SSAI_CHAMPS) SSAI_CHAMPS.load(function(d){ CH=d; if(window.GameMenu) GameMenu.refresh(); });
-var FOOD=[["p_burger","Melody Burger & Fries","+90",1,"-1.4s"],["p_toast","French Toast","+60",1,"-1.7s","fv2"],["p_lobmac","Lobster Mac & Cheese","+90",1,"-.2s","fv2"],["p_blueice","Blue Ice","+55",0,"-.6s","fv2"],["p_wings","Lemon Pepper Wings","+70",1,"-1.1s"]];   // 5 fit one row on a phone; everything else still spawns in the game
+var FOOD=[["p_burger","Melody Burger & Fries","+90",1,"-1.4s"],["p_toast","French Toast","+60",1,"-1.7s","st3"],["p_lobmac","Lobster Mac & Cheese","+90",1,"-.2s","fv2"],["p_blueice","Blue Ice","+55",0,"-.6s","fv2"],["p_wings","Lemon Pepper Wings","+70",1,"-1.1s"]];   // 5 fit one row on a phone; everything else still spawns in the game
 function on(){ return !!(window.MELODY_REWARDS_ON&&MELODY_REWARDS_ON()); }
 function mvp(esc,T){ var F=window.SSAI_CHAMPS?SSAI_CHAMPS.fmt:function(n){ return Number(n||0).toLocaleString(); }, gs=CH&&CH.games||{}, c=gs.melody, s=gs["melody-survival"];
   function top(gm,unit,lab,ic){ var t=gm&&gm.top3&&gm.top3[0];
@@ -2413,7 +2423,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
   display:"Anton,Impact,'Arial Narrow',sans-serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
  tokens:false, showcase:showcase, preview:function(v){ if(window.__MG&&__MG.attract) __MG.attract(v); },
  mount:"#cv",start:function(){ window.MELODY_START(); },vibrate:true,
- how:{goal:"CAMPAIGN: fly 10 levels over LA, each a little harder, beat the six bosses and land back at LAX. SURVIVAL: no finish line, the sky keeps getting harder and bosses keep coming: how long can you last? Grab your guns from the gun blimp, catch Melody's food for points. Prefer a calm flight? Tap ⚔️ on the game to turn combat off.",
+ how:{goal:"CAMPAIGN: fly 10 levels over LA, each a little harder, beat the six bosses and land back at LAX. SURVIVAL: no finish line, the sky keeps getting harder and bosses keep coming: how long can you last? Grab your guns from the gun blimp, catch Melody's food for points. Prefer a calm flight? Tap Pause, then ⚔️ Combat: On to turn it off.",
   time:"Campaign: 10 levels × 45 seconds + 6 bosses + the landing · Survival: until you go down · 3 hits and you go down",
   steps:[["👆","Touch or drag anywhere on the game and the plane glides smoothly to your finger (it flies just above your thumb so you can see it). On a computer, drag with the mouse or hold the arrow keys / WASD"],
    ["🔫","Guns go live 20 seconds into the flight (watch for “Guns online in 3…2…1”). Until then, dodge and catch. Then they fire on their own"],
@@ -2434,7 +2444,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
    ["🛡️","Secret quest: catch 7 spinning Antidote Drizzle emblems. Antidote's banner plane flies in towing his Melody review: shoot it down (with combat off, fly through the banner) to unlock it"],
    ["🧪","BETA: rewards switch on soon. Until Melody turns them on, the weekly boards rank you for bragging rights and no prizes or game points are given out"]]},
  points:[
-  {group:"Catch these (score)",items:[{img:g+"p_burger.webp?v=ag1",name:"Melody Burger & Fries",pts:"+90"},{img:g+"p_mac.webp?v=ag1",name:"Mac & Cheese",pts:"+80"},{img:g+"p_wings.webp?v=ag1",name:"Lemon Pepper Wings",pts:"+70"},{img:g+"p_toast.webp?v=fv2",name:"French Toast",pts:"+60"},{img:g+"p_omelette.webp?v=ag1",name:"Philly Omelette",pts:"+60"},
+  {group:"Catch these (score)",items:[{img:g+"p_burger.webp?v=ag1",name:"Melody Burger & Fries",pts:"+90"},{img:g+"p_mac.webp?v=ag1",name:"Mac & Cheese",pts:"+80"},{img:g+"p_wings.webp?v=ag1",name:"Lemon Pepper Wings",pts:"+70"},{img:g+"p_toast.webp?v=st3",name:"French Toast",pts:"+60"},{img:g+"p_omelette.webp?v=ag1",name:"Philly Omelette",pts:"+60"},
    {img:g+"p_lobmac.webp?v=fv2",name:"Lobster Mac & Cheese",pts:"+90"},{img:g+"p_ribs.webp?v=fv2",name:"Baby Back Ribs & Fries",pts:"+80"},{img:g+"p_tacos.webp?v=fv2",name:"Shrimp Tacos",pts:"+70"},
    {img:g+"p_nachos.webp?v=fv2",name:"Nachos",pts:"+60"},{img:g+"p_strips.webp?v=fv2",name:"Chicken Strips & Fries",pts:"+60"},
    {img:g+"p_blueice.webp?v=fv2",name:"Blue Ice",pts:"+55"},{img:g+"p_espresso.webp?v=fv2",name:"Espresso Martini",pts:"+55"},

@@ -144,6 +144,7 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:26px;line-
     var cv = document.getElementById("cv"), x = cv.getContext("2d"), W = cv.width, H = cv.height;
     var pics = P.map(function(src){ var i = new Image(); i.src = src; return i; });
     var st = null, px = W / 2, tm = 0;
+    window.GAMELOCK_RUNNING = function(){ return !!st; };   // gamelock.js: lock the screen only while a run is live
     function idle(msg){
       x.clearRect(0, 0, W, H); x.fillStyle = "#EEF2FF"; x.textAlign = "center";
       x.font = "900 26px Archivo, sans-serif"; x.fillText(msg || (window.__T || String)("TAP TO PLAY"), W / 2, H / 2);
@@ -199,6 +200,6 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:26px;line-
 })();
 </script>
 <script src="../menu3d.js"></script>
-<script src="../gamelock.js"></script><script>window.GAME_FS={hide:".tiers, .gamebox > .sub"};</script><script src="../fullscreen.js"></script>
+<script src="../gamelock.js?v=pl1"></script><script>window.GAME_FS={hide:".tiers, .gamebox > .sub"};</script><script src="../fullscreen.js"></script>
 </body>
 </html>

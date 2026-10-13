@@ -14,7 +14,7 @@
   "use strict";
   if (window.__ssaiGamePause) return;
   window.__ssaiGamePause = 1;
-  var AREA = "canvas#game, canvas#cv, canvas[data-game], [data-game]:not(#champs), .gamebox:not(.keybox)" + (window.GAMEPAUSE_AREA ? ", " + window.GAMEPAUSE_AREA : "");
+  var AREA = "canvas#game, canvas#cv, canvas[data-game], [data-game]:not(#champs):not([data-champs]), .gamebox:not(.keybox)" + (window.GAMEPAUSE_AREA ? ", " + window.GAMEPAUSE_AREA : "");
   var lockPos = (window.GAMELOCK_POS || "bottom-left").split("-");
   var POS = (window.GAMEPAUSE_POS || ("bottom-" + (lockPos[1] === "right" ? "left" : "right"))).split("-");
 

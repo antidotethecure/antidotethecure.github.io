@@ -635,6 +635,7 @@
         '<div class="crm-box"><h4>📜 Points activity</h4><div class="crm-feed">' + ((me.ledger || []).map(function (l) {
           return '<div><span>' + (WAL && W[l.w] ? '<i class="crm-wt">' + wname(l.w) + '</i>' : '') + e(l.t) + '</span><b class="' + (l.pts >= 0 ? 'plus' : 'minus') + '">' + (l.pts >= 0 ? '+' : '') + l.pts.toLocaleString() + '</b></div>'; }).join("") || '<div><span>Nothing yet. Scan at the register to start earning.</span></div>') + '</div></div>' +
         '<button type="button" class="go" style="background:#1a2656;box-shadow:none" data-a="owner">👀 See what the owner sees ↓</button>' +
+        (STAFF ? '' : '<button type="button" class="crm-gx" data-a="restore">📱 Not you? Sign back in to your account</button>') +
         (TC ? '<button type="button" class="crm-gx" data-a="signout">🚪 Sign out of this phone' + (me.guardian ? ' (parent check)' : '') + '</button>' : '') +
         '<p class="crm-fine">Demo: points and friends here are saved on this phone only. Live, they\'re in the business\'s database, so they follow the customer to any phone.</p>';
       var qr = join.querySelector(".crm-qr");
@@ -716,6 +717,7 @@
           if (window.GameMenu) setTimeout(function () { window.GameMenu.open(); }, 400); return;
         }
         if (a === "earn") { openEarn(); return; }
+        if (a === "restore") { openRestore(); return; }
         if (a === "owner") own.scrollIntoView({ behavior: "smooth", block: "start" });
       };
       return;
@@ -730,6 +732,7 @@
       '<div class="crm-gift"><b>🎁</b><span>Join now and get <u>' + e(OFFER) + '</u> instantly</span></div>' +
       (SIMPLE ? '<h3>One simple rewards program</h3><p>Earn ' + PER + ' points per $1 on eligible purchases, +' + EARN.birthday + ' on your birthday, +' + REF.first + ' for every friend who joins and visits, and up to ' + SIMPLE.game.dailyCap + ' a day from the game. Takes 10 seconds.</p>' :
       '<h3>Unlock your reward</h3><p>Plus ' + (WAL ? W.bar.per + ' ' + wname("bar") + ' pts per $1 on drinks, ' + W.food.per + ' ' + wname("food") + ' pts per $1 on food' : PER + ' points for every $1') + ', a birthday treat, and your own code to invite friends. Takes 10 seconds.</p>') +
+      '<button type="button" class="crm-elink" data-a="restore" style="margin:-4px 0 0">📱 Already a member? Sign back in</button>' +
       '<button type="button" class="crm-elink" data-a="earn" style="margin:-4px 0 4px">✨ See every way to earn →</button>' +
       '<form autocomplete="on" novalidate><label>First name</label><input name="name" maxlength="40" autocomplete="given-name">' +
       '<div class="two"><div><label>Phone</label><input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(310) 555-0123"></div>' +
@@ -742,7 +745,7 @@
       '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Send my rewards (points, prize and birthday codes) from ' + e(NAME) + ' to me by text or email. Msg & data rates may apply. Reply STOP anytime.</span></label>' + smsBox() +
       '<button class="go" type="submit">🎁 Get my reward</button><div class="err"></div></form>' +
       '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + '</p>';
-    join.onclick = function (ev) { var b = ev.target.closest("[data-a=earn]"); if (b) openEarn(); };
+    join.onclick = function (ev) { var b = ev.target.closest("[data-a=earn],[data-a=restore]"); if (!b) return; if (b.dataset.a === "restore") openRestore(); else openEarn(); };
     join.querySelector("form").onsubmit = function (ev) {
       ev.preventDefault();
       var res = createMember(this);
@@ -826,6 +829,7 @@
         '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat.</div></details>') +
       '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Send my rewards (points, prize and birthday codes) from ' + e(NAME) + ' to me by text or email. Msg & data rates may apply. Reply STOP anytime.</span></label>' + smsBox() +
       '<button class="go" type="submit">' + e(T[2]) + '</button><div class="err" role="alert"></div>' +
+      (m ? '' : '<button type="button" class="crm-elink" data-a="restore" style="text-align:center">📱 Already a member? Sign back in</button>') +
       '<button type="button" class="crm-gx">Not now</button></form>' +
       '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + '</p></section>';
     var html = document.documentElement, prevOv = html.style.overflow, vv = window.visualViewport;
@@ -838,6 +842,7 @@
     ov.close = close; gateEl = ov;
     var f = ov.querySelector("form");
     ov.querySelector(".crm-gx").onclick = close;
+    var rsb = ov.querySelector("[data-a=restore]"); if (rsb) rsb.onclick = function () { close(); openRestore(cb); };
     ov.addEventListener("click", function (ev) { if (ev.target === ov) close(); });
     f.onsubmit = function (ev) {
       ev.preventDefault();
@@ -862,6 +867,123 @@
     return false;
   }
   gate.member = function () { return mine()[0] || null; };
+
+  // ---- SIGN BACK IN: restore my account on a new phone (2026-10-13, standard for every restaurant) ----
+  // A guest on a new phone (or after Safari cleared the site) types the phone OR email they joined with, gets a 6-digit code
+  // (text via Twilio Verify, or email) and types it. Code.gs restore_start / restore_check never says whether a contact is
+  // a member, sends the code, and on a match returns THAT member's server record and moves the member to this phone's
+  // device id. The phone writes the server's numbers (points, card ID, ledger, today's prize + game points, unused wins,
+  // best score, location bonus) into the usual member store and never sends its own points up first. One member per
+  // phone: if this phone holds someone else, the guest confirms the switch and that member is signed out HERE only (their
+  // account stays safe on the server). Staff can't do this for a guest and never see codes.
+  // No API (demo): a friendly "works once the app is live" note. ?test=1 without an API = a mock (any contact, code 123456).
+  var RS_TEST = !API && /[?&]test=1(&|$)/.test(location.search);
+  var BESTK = C.bestKey || { "melody-bar-grill": "melody-best" }[SLUG] || "";
+  function rsPost(o, cb) {
+    o.slug = SLUG; o.dev = devId();
+    if (RS_TEST) { setTimeout(function () { cb(rsMock(o)); }, 350); return; }
+    var done = false, fin = function (j) { if (!done) { done = true; cb(j); } };
+    try { fetch(API, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }).then(function (x) { return x.json(); })
+      .then(function (j) { if (j && !j.ok && j.reason === "unknown type") j = { ok: false, reason: "Signing back in isn't switched on yet. Your points are safe: try again in a day or two." }; fin(j || { ok: false }); }, function () { fin({ ok: false, reason: "No connection. Check your signal and try again." }); }); }
+    catch (x) { fin({ ok: false, reason: "No connection. Check your signal and try again." }); }
+  }
+  function rsMock(o) {   // ?test=1 only: lets the flow be clicked through without a backend
+    if (o.type === "restore_start") return /@/.test(o.contact) || /\d{10}/.test(String(o.contact).replace(/\D/g, "")) ? { ok: true, sent: true, masked: /@/.test(o.contact) ? String(o.contact).charAt(0) + "•••@" + String(o.contact).split("@")[1] : "•••" + String(o.contact).replace(/\D/g, "").slice(-4), msg: "Test mode: the code is 123456." } : { ok: false, reason: "Type the phone number or email you joined with." };
+    if (String(o.code) !== "123456") return { ok: false, wrong: true, reason: "Wrong code. (Test mode: it's 123456.)" };
+    var now = Date.now();
+    return { ok: true, member: { id: "TESTRSTR", name: "Test Guest", phone: /@/.test(o.contact) ? "" : o.contact, email: /@/.test(o.contact) ? o.contact : "", bday: "", joined: now - 30 * 864e5, last: now - 2 * 864e5,
+      stars: 1234, earned: 1500, spent: 266, visits: 5, ref: "TEST-R2D", refBy: "", friends: 0, gameTotal: 40, redeems: 1, sms: false, smsAt: "", src: "test", card: "" },
+      ledger: [{ ts: now, pts: 0, t: "📱 Signed back in on a new phone" }, { ts: now - 2 * 864e5, pts: 40, t: "🎮 Game points · score 4,000" }, { ts: now - 30 * 864e5, pts: 100, t: "🎉 Welcome bonus" }],
+      ec: {}, friendIds: {}, best: 4000, gameToday: 0, wins: [], prizeToday: false, adjDone: [], eb: { state: "none" }, locBonus: false };
+  }
+  // server record → the member object this file already uses (same fields createMember / syncLater use)
+  function rsApply(j) {
+    var s = j.member || {}, old = mine()[0], same = old && old.id === s.id, now = Date.now(), bd = String(s.bday || "").split("/");
+    var refBy = String(s.refBy || "").replace(/^Referral code /i, "").trim();
+    var r = { id: String(s.id), name: String(s.name || "Member"), phone: String(s.phone || ""), email: String(s.email || ""),
+      bday: +bd[0] >= 1 && +bd[0] <= 12 ? +bd[0] - 1 : -1, bdd: +bd[1] || 0, bdy: +bd[2] || 0,
+      visits: +s.visits || 0, stars: +s.stars || 0, earned: +s.earned || 0, spent: +s.spent || 0, nred: +s.redeems || 0, gtot: +s.gameTotal || 0,
+      last: +s.last || now, joined: +s.joined || now, code: same && old.code || code(), offer: OFFER, ref: String(s.ref || "") || refCode(String(s.name || "")),
+      refBy: refBy, refByName: refBy ? "code " + refBy : "", friends: [], card: /^[A-Z]{2,4}-[A-Z0-9]{5}$/.test(s.card || "") ? s.card : "",
+      ledger: (j.ledger || []).slice(0, 40).map(function (l) { var x = { ts: +l.ts || now, pts: Math.round(+l.pts || 0), t: String(l.t || "") }; if (l.k) x.k = String(l.k); return x; }),
+      ec: j.ec || {}, adjDone: (j.adjDone || []).map(String), dev: devId(), bound: now, restored: now, src: String(s.src || "") };
+    var fid = j.friendIds || {}; Object.keys(fid).forEach(function (k) { r.friends.push({ name: "Friend", id: k, orders: fid[k] ? 1 : 0 }); });
+    while (r.friends.length < (+s.friends || 0)) r.friends.push({ name: "Friend", orders: 0 });
+    if (s.sms) { r.sms = true; r.smsAt = Date.parse(s.smsAt) || now; r.smsSrc = "restored with the account"; }
+    if (j.prizeToday) r.pday = pdKey();
+    if (SIMPLE && +j.gameToday) { r.gday = gpDay(); r.gpts = Math.min(+j.gameToday, SIMPLE.game.dailyCap); }
+    r.wins = (j.wins || []).slice(0, 5).map(function (w) { var x = { t: String(w.t), c: "WIN-" + code4(4), ts: +w.ts || now, k: String(w.k || "game") }; x.until = until(x); return x; });
+    if (j.locBonus) r.locBuddy = now;
+    if (+j.best) { r.best = +j.best; if (BESTK) try { if ((+localStorage.getItem(BESTK) || 0) < r.best) localStorage.setItem(BESTK, String(r.best)); } catch (x) {} }
+    if (!r.ledger.some(function (l) { return /Signed back in/.test(l.t); })) r.ledger.unshift({ ts: now, pts: 0, t: "📱 Signed back in on a new phone" });
+    if (same && old.guardian) r.guardian = old.guardian;
+    save([r]);   // one member per phone: anyone else on this phone is signed out here (their account stays on the server)
+    if (!RS_TEST) syncLater(r);
+    return r;
+  }
+  var rsEl = null;
+  function openRestore(cb) {
+    if (STAFF) { toast("🧑‍🍳 Staff practice: guests sign back in on their own phone."); return; }
+    if (rsEl) rsEl.close();
+    var m = mine()[0], rid = "crm-r" + code4(4), live = !!(API || RS_TEST), contact = "";
+    var ov = document.createElement("div"); ov.className = "crm-gate"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", rid); ov.setAttribute("data-scroll-ok", "");
+    var html = document.documentElement, prevOv = html.style.overflow;
+    function close() { if (!ov.parentNode) return; ov.remove(); rsEl = null; html.style.overflow = prevOv; document.removeEventListener("keydown", key); }
+    function key(ev) { if (ev.key === "Escape") close(); }
+    ov.close = close; rsEl = ov;
+    function head(sub) { return '<section class="crm-card"><span class="k">' + e(NAME) + ' Rewards · sign back in</span><h3 id="' + rid + '">📱 Sign back in</h3><p>' + sub + '</p>'; }
+    var foot = '<p class="crm-fine">Staff can\'t sign in for you and never see your code. Tip: add this app to your Home Screen so you stay signed in.</p></section>';
+    function step1(err) {
+      if (!live) { ov.innerHTML = head("Signing back in on a new phone works once " + e(NAME) + "'s app is live. Your points are safe: nothing is lost.") +
+        '<button type="button" class="go" data-a="x">OK</button>' + foot; return; }
+      ov.innerHTML = head("New phone? Type the <b>phone number or email you joined with</b>. We'll send you a 6-digit code.") +
+        (m ? '<div class="crm-invited" style="border-color:#FFD23F;background:#FFD23F22;color:#FFE9A3">This phone has <b>' + e(m.name.split(" ")[0]) + '\'s</b> rewards. If you sign in to a different account, ' + e(m.name.split(" ")[0]) + ' is signed out on this phone only (their points stay on their account).</div>' : '') +
+        '<form novalidate autocomplete="on"><label>Phone or email</label><input name="c" maxlength="120" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="(310) 555-0123 or you@email.com" value="' + e(contact) + '">' +
+        (m ? '<label class="crm-optin"><input type="checkbox" name="sw"> <span>Yes, switch this phone to my account.</span></label>' : '') +
+        '<button class="go" type="submit">Send my code</button><div class="err" role="alert">' + e(err || "") + '</div><button type="button" class="crm-gx" data-a="x">Not now</button></form>' + foot;
+      var f = ov.querySelector("form");
+      f.onsubmit = function (ev) {
+        ev.preventDefault(); var v = f.elements.c.value.trim(), er = f.querySelector(".err");
+        if (!okEmail(v) && String(v).replace(/\D/g, "").length < 10) { er.textContent = "Type the phone number (with area code) or email you joined with."; return; }
+        if (m && f.elements.sw && !f.elements.sw.checked) { er.textContent = "Tick the box to switch this phone to your account."; return; }
+        contact = v; var b = f.querySelector(".go"); b.disabled = true; b.textContent = "Sending…";
+        rsPost({ type: "restore_start", contact: v }, function (j) { if (!ov.parentNode) return; if (!j.ok) { step1(j.reason || "Something went wrong. Try again."); return; } step2(j); });
+      };
+      setTimeout(function () { try { f.elements.c.focus({ preventScroll: true }); } catch (x) {} }, 60);
+    }
+    function step2(j, err) {
+      ov.innerHTML = head(e(j.msg || "If that's a member, we sent a code.") + (j.masked ? ' Sent to <b>' + e(j.masked) + '</b>.' : '') + ' It works once and expires in ' + (j.mins || 10) + ' minutes.') +
+        '<form novalidate><label>6-digit code</label><input name="code" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="6" placeholder="123456" style="letter-spacing:.3em;font-size:22px;text-align:center">' +
+        '<button class="go" type="submit">Sign me back in</button><div class="err" role="alert">' + e(err || "") + '</div>' +
+        '<button type="button" class="crm-gx" data-a="again">Send a new code</button><button type="button" class="crm-gx" data-a="back">Use a different phone or email</button></form>' + foot;
+      var f = ov.querySelector("form");
+      f.onsubmit = function (ev) {
+        ev.preventDefault(); var c = f.elements.code.value.replace(/\D/g, ""), er = f.querySelector(".err");
+        if (c.length !== 6) { er.textContent = "Type the 6 digits from your text or email."; return; }
+        var b = f.querySelector(".go"); b.disabled = true; b.textContent = "Checking…";
+        rsPost({ type: "restore_check", contact: contact, code: c }, function (k) {
+          if (!ov.parentNode) return;
+          if (!k.ok || !k.member) { if (k.locked || k.expired) step1(k.reason); else step2(j, k.reason || "That didn't work. Try again."); return; }
+          var r = rsApply(k); close(); drawJoin(); drawOwn();
+          try { if (window.SSAI_CARD && SSAI_CARD.refresh) SSAI_CARD.refresh(); } catch (x) {}
+          try { window.dispatchEvent(new CustomEvent("ssai:restored", { detail: { member: r } })); } catch (x) {}
+          refreshMenu(); toast("👋 Welcome back, " + r.name.split(" ")[0] + "! " + (r.stars || 0).toLocaleString() + " points restored");
+          if (cb) cb(r);
+        });
+      };
+      setTimeout(function () { try { f.elements.code.focus({ preventScroll: true }); } catch (x) {} }, 60);
+    }
+    ov.addEventListener("click", function (ev) {
+      if (ev.target === ov) { close(); return; }
+      var b = ev.target.closest("[data-a]"); if (!b) return;
+      if (b.dataset.a === "x") close();
+      else if (b.dataset.a === "back") step1();
+      else if (b.dataset.a === "again") { b.disabled = true; rsPost({ type: "restore_start", contact: contact }, function (j) { if (!ov.parentNode) return; if (!j.ok) { if (j.locked) step1(j.reason); else step2(j.msg ? j : { msg: "" }, j.reason); return; } step2(j); toast("New code sent"); }); }
+    });
+    step1(); document.body.appendChild(ov); html.style.overflow = "hidden"; document.addEventListener("keydown", key);
+    return false;
+  }
+  window.SSAI_RESTORE = openRestore;
 
   // ======================= GAME ACCESS · TOKENS · FREE DAILY SPIN (opt-in: CRM_CFG.tokens / CRM_CFG.spin) =======================
   // LEGAL STRUCTURE (California). Draft for the restaurant's attorney to review before launch; this is not legal advice.

@@ -89,6 +89,7 @@
       var tk = "TEST" + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + "x".repeat(20); TOK[tk] = d.user; return { ok: true, token: tk, name: USERS[d.user].name };
     }
     var u = TOK[d.token]; if (!u) return { ok: false, auth: false, reason: "Signed out. Log in again." };
+    if (d.type === "bo_dedupe") return { ok: true, removed: 0 };
     if (d.type === "bo_logout") { delete TOK[d.token]; return { ok: true }; }
     if (d.type === "bo_summary") return { ok: true, members: members.length, joined7: members.filter(function (m) { return m.joined > now - 7 * DAY; }).length, plays7: games.length, redeems7: redeems.length, pendingClaims: claims.filter(function (x) { return x.status === "pending"; }).length };
     if (d.type === "bo_data") return { ok: true, test: true, scout: scout, restores7: { "melody-bar-grill": 2, "nalu-vida": 1 }, oneprize: { "melody-bar-grill": { codes: 7, used: 5, expired: 2, refused: 3, mins: 10 }, "nalu-vida": { codes: 4, used: 4, expired: 0, refused: 1, mins: 10 } }, eb: ebStats(), me: USERS[u].name, now: Date.now(), members: members, games: games, opens: opens, redeems: redeems, claims: claims, staff: staff, trained: trained, audit: audit, disc: disc, lb: { "melody-bar-grill": { credited: 3, devices: 11 } } };

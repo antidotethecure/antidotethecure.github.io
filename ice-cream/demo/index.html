@@ -6,10 +6,10 @@
 <title>Paletas El Sol: Truck Alerts</title>
 <meta name="description" content="Demo: get a ring with an ice-cream-truck jingle when Paletas El Sol is on your street. Points, rewards and the menu. Sample truck by SousShift AI.">
 <meta name="theme-color" content="#03060e">
-<link rel="manifest" href="manifest.webmanifest?v=20261013a">
-<link rel="icon" href="favicon.svg?v=20261013a" type="image/svg+xml">
-<link rel="icon" href="favicon-32.png?v=20261013a" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261013a">
+<link rel="manifest" href="manifest.webmanifest?v=20261013b">
+<link rel="icon" href="favicon.svg?v=20261013b" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png?v=20261013b" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261013b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="El Sol">
@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
-<link rel="stylesheet" href="../ice.css?v=20261013a">
+<link rel="stylesheet" href="../ice.css?v=20261013b">
 <style>
 [hidden]{display:none!important}
 body{padding-bottom:30px}
@@ -60,12 +60,6 @@ body{padding-bottom:30px}
 #recenter{position:absolute;right:10px;top:10px;z-index:500;min-height:40px;border-radius:12px;border:1px solid var(--edge);background:rgba(3,6,14,.82);color:var(--ink);font:800 14px "Rajdhani",sans-serif;padding:6px 12px;cursor:pointer}
 .mapmsg{position:absolute;left:10px;right:10px;top:58px;z-index:500;background:rgba(3,6,14,.85);border:1px solid rgba(255,184,107,.5);color:#ffe0bd;border-radius:12px;padding:6px 10px;font-size:13.5px;font-weight:700;text-align:center}
 .mapnone{position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;color:var(--dim);font-weight:700}
-.truckpin{transition:none}
-.truckpin .tk{position:relative;width:52px;height:40px}
-.truckpin .tk svg{display:block;width:52px;height:40px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
-.truckpin .tk.flip svg{transform:scaleX(-1)}
-.truckpin .tk::before{content:"";position:absolute;left:50%;top:60%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;box-shadow:0 0 0 0 rgba(255,209,102,.7);animation:tp 1.8s infinite}
-@keyframes tp{to{box-shadow:0 0 0 26px rgba(255,209,102,0)}}
 .homepin .hp{position:relative;width:40px;height:40px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:#2f7bff;border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.55)}
 .homepin .hp span{position:absolute;inset:0;display:grid;place-items:center;transform:rotate(45deg);font-size:19px}
 .homepin .hl{position:absolute;left:50%;top:44px;transform:translateX(-50%);white-space:nowrap;background:#fff;color:#0b1630;border-radius:99px;padding:0 8px;font:800 12.5px "Rajdhani",sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.4)}
@@ -147,7 +141,7 @@ body{padding-bottom:30px}
 </head>
 <body>
 <div class="top"><div class="wrap">
-  <img class="logo" src="icon-192.png?v=20261013a" alt="" width="40" height="40">
+  <img class="logo" src="icon-192.png?v=20261013b" alt="" width="40" height="40">
   <b>Paletas El Sol<small><span data-t="topSub">Truck alerts</span> <span class="tag">demo</span></small></b>
   <span class="sp"></span>
   <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">English</button><button data-lang="es" aria-pressed="false" lang="es">Español</button></div>
@@ -269,7 +263,7 @@ body{padding-bottom:30px}
 
 <div id="ringer" role="alertdialog" aria-live="assertive" aria-hidden="true">
   <div class="ring on">
-    <div class="ic app"><img src="icon-192.png?v=20261013a" alt=""></div>
+    <div class="ic app"><img src="icon-192.png?v=20261013b" alt=""></div>
     <div><small data-t="nApp">Paletas El Sol · now</small><b data-t="nTitle">The truck is on your street!</b><span id="nBody"></span></div>
     <div class="acts"><button class="go" id="coming" type="button" data-t="coming">🏃 I'm coming!</button><button class="no" id="silence" type="button" data-t="silence">Silence</button></div>
   </div>
@@ -285,6 +279,8 @@ en: {
   etaIn: "Arriving in <b>~{m} min</b>", etaSoon: "Arriving in <b>under 1 min</b>", etaHere: "Truck is <b>here!</b>", etaGone: "Next round <b>soon</b>",
   etaDist: "{d} mi away", etaDistStop: "{d} mi away <span>· selling at a stop</span>", etaDistHere: "Truck is on your street! Walk out now 🏃", etaDistGone: "{d} mi past your house",
   chip: "🚚 <b>~{m} min</b> · {d} mi", chipSoon: "🚚 <b>&lt;1 min</b> · {d} mi", chipHere: "🚚 <b>Here!</b>", chipGone: "🚚 Left",
+  blFar: "On its way 🍦", blMid: "Getting closer 🍦🍦", blNear: "Right around the corner!", blHere: "It's here! 🍦🍦🍦",
+  blMelt: "Leaving your area… it's melting!", blNoLoc: "Ice cream truck 🍦",
   mapAria: "Live map: your house and the ice cream truck", recenter: "◎ Recenter", homeLbl: "Your house",
   privacyMap: "Your house pin is saved only on your phone. The truck never sees your address. (A free map service draws the route.)",
   homeSample: "📍 Showing a sample street in South Gate. Tap <b>Allow location</b> or <b>Type my street</b> below to put the pin on your house.",
@@ -347,6 +343,8 @@ es: {
   etaIn: "Llega en <b>~{m} min</b>", etaSoon: "Llega en <b>menos de 1 min</b>", etaHere: "¡Ya <b>llegó!</b>", etaGone: "Pronto <b>vuelve</b>",
   etaDist: "A {d} mi", etaDistStop: "A {d} mi <span>· vendiendo en una parada</span>", etaDistHere: "¡El troque está en tu calle! Sal ahorita 🏃", etaDistGone: "{d} mi después de tu casa",
   chip: "🚚 <b>~{m} min</b> · {d} mi", chipSoon: "🚚 <b>&lt;1 min</b> · {d} mi", chipHere: "🚚 <b>¡Aquí!</b>", chipGone: "🚚 Se fue",
+  blFar: "Ya viene 🍦", blMid: "Cada vez más cerca 🍦🍦", blNear: "¡Ya está a la vuelta!", blHere: "¡Ya llegó! 🍦🍦🍦",
+  blMelt: "Se va de tu zona… ¡se está derritiendo!", blNoLoc: "Troque de helados 🍦",
   mapAria: "Mapa en vivo: tu casa y el troque de helados", recenter: "◎ Centrar", homeLbl: "Tu casa",
   privacyMap: "El pin de tu casa solo se guarda en tu celular. El troque nunca ve tu dirección. (Un servicio de mapas gratis dibuja la ruta.)",
   homeSample: "📍 Mostrando una calle de muestra en South Gate. Toca <b>Permitir ubicación</b> o <b>Escribir mi calle</b> abajo para poner el pin en tu casa.",
@@ -404,9 +402,10 @@ es: {
 }};
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="../lang.js?v=20261013a"></script>
-<script src="../jingle.js?v=20261013a"></script>
-<script src="../speak.js?v=20261013a"></script>
+<script src="../lang.js?v=20261013b"></script>
+<script src="../jingle.js?v=20261013b"></script>
+<script src="../speak.js?v=20261013b"></script>
+<script src="../truck.js?v=20261013b"></script>
 <script>
 (function () {
   "use strict";
@@ -445,6 +444,14 @@ es: {
   var STOP_EVERY = 0.2 * MI;    // they pull over to sell every few blocks…
   var STOP_SEC = 20;            // …for about 20 seconds
   var HOME_STOP_SEC = 90;       // and sit on your street for ~1.5 min
+  /* ?sim=1 test path: a longer drive that starts ~1.6 mi out and leaves ~1.5 mi past the house, short stops and
+     30x speed, so one lap shows every blimp state: 1 scoop → 2 → 3 → melting while it drives away. ?loc=0 = no location. */
+  var QS = location.search;
+  var SIM = /[?&]sim=1\b/.test(QS), NO_LOC = /[?&]loc=0\b/.test(QS);
+  if (SIM) { STOP_SEC = 6; HOME_STOP_SEC = 12; }
+  function qnum(k, d) { var m = QS.match(new RegExp("[?&]" + k + "=([0-9.]+)")); return m && +m[1] > 0 ? +m[1] : d; }
+  // blimp scoops by distance from your location (miles). Tweak here, or test with ?near=0.3&mid=1.2
+  var BLIMP = { near: qnum("near", 0.25), mid: qnum("mid", 1.0) };
   var HERE_M = 60, GONE_M = 110; // "on your street" window around the house (meters along the route)
   var SAMPLE_HOME = { lat: 33.95155, lng: -118.20330 }; // sample residential block in South Gate, CA
   var OSRM = "https://router.project-osrm.org/route/v1/driving/";
@@ -491,8 +498,12 @@ es: {
     var a = r.line[lo], b = r.line[hi], seg = r.cum[hi] - r.cum[lo], u = seg ? (s - r.cum[lo]) / seg : 0;
     return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u];
   }
-  // the truck starts ~1 mi away (by road) and keeps going ~0.3 mi past the house
-  function ends(h) { return { s: [h.lat + 0.0105, h.lng - 0.0085], e: [h.lat - 0.0042, h.lng + 0.0034] }; }
+  // the truck starts ~1 mi away (by road) and keeps going ~0.7 mi past the house, so you see the blimp melt as it leaves
+  // (?sim=1: ~1.6 mi out, ~1.5 mi past, so one lap shows 1, 2 and 3 scoops and then the melt)
+  function ends(h) {
+    if (SIM) return { s: [h.lat + 0.0235, h.lng - 0.003], e: [h.lat - 0.0132, h.lng + 0.0108] };
+    return { s: [h.lat + 0.0105, h.lng - 0.0085], e: [h.lat - 0.008, h.lng + 0.002] };
+  }
   // offline fallback: a gently curved path, never a broken demo
   function curvedRoute(h) {
     var E = ends(h), H = [h.lat, h.lng], line = [];
@@ -512,7 +523,7 @@ es: {
       var line = j.routes[0].geometry.coordinates.map(function (c) { return [c[1], c[0]]; });
       var wp = j.waypoints && j.waypoints[1] ? [j.waypoints[1].location[1], j.waypoints[1].location[0]] : H;
       var legs = j.routes[0].legs || [], r = mkRoute(line, true, wp, legs[0] ? legs[0].distance : null);
-      if (line.length < 2 || r.total > 6 * MI || r.homeAt < 0.25 * MI) throw new Error("odd route");
+      if (line.length < 2 || r.total > (SIM ? 8 : 6) * MI || r.homeAt < 0.25 * MI) throw new Error("odd route");
       return r;
     }).catch(function () { return curvedRoute(h); });
   }
@@ -528,7 +539,7 @@ es: {
     emit: function (u) { this.last = u; for (var i = 0; i < this.subs.length; i++) this.subs[i](u); },
 
     simulate: {
-      route: null, s: 0, x: 10, stopLeft: 0, stops: [], next: 0, lap: 0, endWait: 0, timer: 0, ts: 0,
+      route: null, s: 0, x: SIM ? 30 : 10, stopLeft: 0, stops: [], next: 0, lap: 0, endWait: 0, timer: 0, ts: 0, clock: 0,
       start: function (route) {
         var self = this; this.route = route; TruckFeed.mode = "simulate"; this.reset();
         if (!this.timer) this.timer = setInterval(function () { self.tick(); }, 100);
@@ -551,7 +562,7 @@ es: {
       mph: function (s) { return AVG_MPH + 2 * Math.sin(s / 140); }, // wobbles between 8 and 12 mph
       tick: function () {
         var now = Date.now(), real = Math.min(1, (now - this.ts) / 1000), dt = real * this.x, r = this.route;
-        this.ts = now;
+        this.ts = now; this.clock += dt; // feed-time clock (seconds), so trend math works at any demo speed
         if (this.endWait > 0) { this.endWait -= real; if (this.endWait <= 0) this.reset(); return; }
         while (dt > 0 && this.s < r.total) {
           if (this.stopLeft > 0) { var w = Math.min(dt, this.stopLeft); this.stopLeft -= w; dt -= w; continue; }
@@ -564,7 +575,7 @@ es: {
       },
       send: function () {
         var p = pointAt(this.route, this.s);
-        TruckFeed.emit({ lat: p[0], lng: p[1], t: Date.now(), stopped: this.stopLeft > 0, stopLeft: this.stopLeft, lap: this.lap });
+        TruckFeed.emit({ lat: p[0], lng: p[1], t: Date.now(), clock: this.clock, stopped: this.stopLeft > 0, stopLeft: this.stopLeft, lap: this.lap });
       }
     },
 
@@ -594,16 +605,12 @@ es: {
   var home = S.home && isFinite(S.home.lat) ? { lat: S.home.lat, lng: S.home.lng } : { lat: SAMPLE_HOME.lat, lng: SAMPLE_HOME.lng };
   var R = null, prog = 0, lap = -1, rung = false, unlocked = false, lastU = null, prevLng = null, routeSeq = 0;
   var map = null, homeMk = null, truckMk = null, zoneC = null, fullLine = null, leftLine = null, userMoved = false, lastFit = 0;
+  var blimp = new IceTruck.Blimp(null, { near: BLIMP.near, mid: BLIMP.mid, t: t });
+  // Is there a "you" to measure from? A pin from GPS or a typed street, or (demo only) the sample house that the
+  // simulation drives to. No location (?loc=0, or a live truck with no pin) → neutral 1-scoop blimp, no melting.
+  function haveLoc() { return !NO_LOC && (!!(S.home && isFinite(S.home.lat)) || TruckFeed.mode === "simulate"); }
 
-  function truckHtml() {
-    return '<div class="tk"><svg viewBox="0 0 52 40" aria-hidden="true">' +
-      '<circle cx="19" cy="6" r="5" fill="#ff8fc4" stroke="#fff" stroke-width="1"/><path d="M14.5 9.5h9L19 15z" fill="#f2a93b"/>' +
-      '<rect x="3" y="14" width="32" height="18" rx="3" fill="#fff" stroke="#0b1630" stroke-width="1.5"/>' +
-      '<rect x="8" y="17" width="16" height="7" rx="1.5" fill="#3fa9ff"/><rect x="3" y="26" width="32" height="3" fill="#ff8fc4"/>' +
-      '<path d="M35 18h8l6 6.5V32H35z" fill="#ffd166" stroke="#0b1630" stroke-width="1.5"/><path d="M37.5 20.5h4.8l3.6 4h-8.4z" fill="#9fd8ff"/>' +
-      '<circle cx="12" cy="33" r="4" fill="#0b1630" stroke="#c9d3e6" stroke-width="1.5"/><circle cx="41" cy="33" r="4" fill="#0b1630" stroke="#c9d3e6" stroke-width="1.5"/>' +
-      '</svg></div>';
-  }
+  function truckHtml() { return IceTruck.html(); } // realistic step-van + ice cream blimp (../truck.js)
   function homeIcon() {
     return L.divIcon({ className: "homepin", iconSize: [40, 40], iconAnchor: [20, 48],
       html: '<div class="hp"><span>🏠</span></div><div class="hl">' + esc(t("homeLbl")) + '</div>' });
@@ -628,7 +635,7 @@ es: {
     if (lastU) pts.push([lastU.lat, lastU.lng]);
     lastFit = Date.now();
     if (pts.length < 2 || hav(pts[0], pts[1]) < 120) { map.setView(pts[0], 17, { animate: !!anim }); return; }
-    map.fitBounds(L.latLngBounds(pts), { paddingTopLeft: [40, $("mapMsg").hidden ? 70 : 120], paddingBottomRight: [40, 40], maxZoom: 17, animate: !!anim });
+    map.fitBounds(L.latLngBounds(pts), { paddingTopLeft: [40, $("mapMsg").hidden ? 150 : 190], paddingBottomRight: [40, 40], maxZoom: 17, animate: !!anim });
   }
   $("recenter").addEventListener("click", function () { userMoved = false; fit(true); });
 
@@ -689,9 +696,14 @@ es: {
       if (unlocked) ring(dm, mins); else toast(fmt(t("nBody"), { d: dec(dm), m: mins }));
     }
     if (!map) return;
-    if (!truckMk) truckMk = L.marker(p, { icon: L.divIcon({ className: "truckpin", html: truckHtml(), iconSize: [52, 40], iconAnchor: [26, 30] }), keyboard: false, interactive: false, zIndexOffset: 1000 }).addTo(map);
-    else truckMk.setLatLng(p);
-    if (prevLng != null && Math.abs(u.lng - prevLng) > 1e-6) { var el = truckMk.getElement(); if (el) el.firstChild.classList.toggle("flip", u.lng < prevLng); }
+    if (!truckMk) {
+      truckMk = L.marker(p, { icon: L.divIcon({ className: "truckpin", html: truckHtml(), iconSize: [64, 46], iconAnchor: [32, 40] }), keyboard: false, interactive: false, zIndexOffset: 1000 }).addTo(map);
+      blimp.root = truckMk.getElement().querySelector(".itk");
+    } else truckMk.setLatLng(p);
+    // face the direction of travel (the van is drawn facing east); ignore sub-meter GPS jitter
+    if (prevLng != null && Math.abs(u.lng - prevLng) > 2e-6) { var el = truckMk.getElement(); if (el) el.firstChild.classList.toggle("flip", u.lng < prevLng); }
+    // the ice cream blimp: scoops = how close, melting = driving away from you
+    blimp.update({ d: haveLoc() ? hav(p, [home.lat, home.lng]) : null, clock: u.clock });
     prevLng = u.lng;
     if (R && left > 0) { // dashed: the part of the route still to drive to your house
       var pts = [p];
@@ -704,7 +716,7 @@ es: {
     }
   }
   TruckFeed.on(function (u) {
-    if (u.lap != null && u.lap !== lap) { lap = u.lap; rung = false; prog = 0; if (lap > 1 && !userMoved) setTimeout(function () { fit(true); }, 50); }
+    if (u.lap != null && u.lap !== lap) { lap = u.lap; rung = false; prog = 0; blimp.reset(); if (lap > 1 && !userMoved) setTimeout(function () { fit(true); }, 50); }
     lastU = u; render(u);
   });
 
@@ -721,7 +733,7 @@ es: {
     var x = +b.getAttribute("data-x"); TruckFeed.simulate.setSpeed(x); renderSpeed(); toast(t(x === 1 ? "toastSpeed1" : "toastSpeed10"));
   });
   document.addEventListener("pointerdown", function () { unlocked = true; }, { once: true });
-  window.IceDemo = { feed: TruckFeed, get route() { return R; }, get progress() { return prog; } }; // handy for testing
+  window.IceDemo = { feed: TruckFeed, blimp: blimp, BLIMP: BLIMP, get map() { return map; }, get route() { return R; }, get progress() { return prog; } }; // handy for testing
 
   initMap(); renderHomeMsg(); renderSpeed(); loadRoute();
 
@@ -861,7 +873,7 @@ es: {
     showJoin(); renderPts(); renderVisits(); renderMenu(); renderHomeMsg();
     if (homeMk) homeMk.setIcon(homeIcon());
     var mk = $("mapMsg"); if (!mk.hidden) mk.textContent = t(mk.getAttribute("data-k"));
-    shown = {}; if (lastU) render(lastU);
+    shown = {}; if (lastU) render(lastU); blimp.relabel();
     if ($("ringer").classList.contains("show")) $("nBody").textContent = fmt(t("nBody"), { d: dec(lastD), m: lastM }); });
   showJoin(); renderPts(); renderVisits(); renderMenu(); renderSet();
 })();

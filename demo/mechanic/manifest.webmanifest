@@ -1,6 +1,6 @@
 {
-  "name": "Your Garage · Mobile Mechanic (demo)",
-  "short_name": "Your Garage",
+  "name": "Carlos' Mobile Mechanic (demo)",
+  "short_name": "Carlos'",
   "description": "Demo: tap your car, get a sample quote, book a slot and track the repair. Sample shop by SousShift AI.",
   "start_url": "./?src=homescreen",
   "scope": "./",

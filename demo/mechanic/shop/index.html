@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Your Garage: Shop (Demo)</title>
+<title>Carlos' Mobile Mechanic: Shop (Demo)</title>
 <meta name="description" content="Demo: the mechanic's side of the SousShift AI mobile mechanic app. Requests, quotes, job stages and customer alerts.">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#04060c">
-<link rel="icon" href="../favicon.svg?v=20261013a" type="image/svg+xml">
-<link rel="apple-touch-icon" href="../apple-touch-icon.png?v=20261013a">
+<link rel="icon" href="../favicon.svg?v=20261013b" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png?v=20261013b">
 <meta name="apple-mobile-web-app-title" content="Shop">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="../app.css?v=20261013a">
+<link rel="stylesheet" href="../app.css?v=20261013b">
 </head>
 <body>
 <div class="top"><div class="wrap">
-  <img id="logo" src="../icon-192.png?v=20261013a" alt="" width="40" height="40">
-  <b><span id="bName">Your Garage</span><small><span data-t="topSub">Shop view</span> <span class="demo-tag">Demo</span></small></b>
+  <img id="logo" src="../icon-192.png?v=20261013b" alt="" width="40" height="40">
+  <b><span id="bName">Carlos' Mobile Mechanic</span><small><span data-t="topSub">Shop view</span> <span class="demo-tag">Demo</span></small></b>
   <span class="sp"></span>
   <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">EN</button><button data-lang="es" aria-pressed="false" lang="es">ES</button></div>
 </div></div>
@@ -50,6 +50,10 @@
         <button type="button" data-tab="all" aria-pressed="false" data-t="tAll">All</button>
       </div>
       <div id="list"></div>
+      <div class="card" id="srcCard" hidden>
+        <p class="kick" data-t="srcKick">Parts sources</p>
+        <div id="srcList"></div>
+      </div>
       <div class="demo-note"><i aria-hidden="true">🧪</i><span data-t="sDemo"><b>Demo:</b> requests live only in this browser. Open the customer page in another tab of the same browser and watch its tracker move when you advance a stage. "Notify" never sends a real text or email: texting goes live after Twilio A2P approval (pending); email later through the Apps Script mailer.</span></div>
       <div class="row" style="margin-top:12px">
         <button class="btn ghost" id="reset" type="button" data-t="reset">↺ Reset demo data</button>
@@ -60,7 +64,7 @@
 </main>
 
 <footer class="f wrap">
-  <span data-t="foot">"Your Garage" is a made-up sample shop. Sample customers only.</span>
+  <span data-t="foot">Demo shop view for Carlos' Mobile Mechanic. Sample customers only.</span>
   <span class="pw"><b>Powered by SousShift AI</b> · Demo</span>
 </footer>
 
@@ -101,7 +105,10 @@ en: {
   gNote: "In the live app this is the owner's own login. The demo PIN is shown so anyone can try it.", gBad: "Wrong PIN. (Demo PIN is shown above.)",
   kNew: "New", kAct: "In progress", kDone: "Ready", tabsAria: "Filter", tNew: "New", tAct: "Active", tDone: "Done", tAll: "All",
   sDemo: "<b>Demo:</b> requests live only in this browser. Open the customer page in another tab of the same browser and watch its tracker move when you advance a stage. \"Notify\" never sends a real text or email: texting goes live after Twilio A2P approval (pending); email later through the Apps Script mailer.",
-  reset: "↺ Reset demo data", lockBtn: "🔒 Lock", foot: "\"Your Garage\" is a made-up sample shop. Sample customers only.",
+  reset: "↺ Reset demo data", lockBtn: "🔒 Lock", foot: "Demo shop view for Carlos' Mobile Mechanic. Sample customers only.",
+  srcKick: "Parts sources", prefSupp: "Preferred parts supplier", directions: "Directions", website: "Website", call: "Call", callN: "Call {n}", copy: "Copy", copied: "📋 Copied", copiedAll: "📋 Parts list copied", copyFail: "Couldn't copy.",
+  copyAll: "Copy all parts for this job", whatToAsk: "What to ask {n}", theStore: "the store",
+  srcHonest: "Business info from the store's own website. Call for price & availability: no partnership, discount, live inventory or ordering is set up.",
   empty: "Nothing here yet. New requests from the customer page land here.", customer: "Customer (demo)", sampleTag: "Sample", fromPage: "From the customer page",
   est: "Est.", quote: "Quote", arrival: "Arrival", ready: "Ready by", noSlot: "No slot", alertsL: "Alerts:", aApp: "In-app", aText: "Text", aEmail: "Email",
   accept: "✅ Accept with quote", decline: "Decline", advance: "⏩ Next: {s}", notify: "📣 Notify customer", done: "🏁 Ready for pickup", reopen: "Reopen",
@@ -120,7 +127,10 @@ es: {
   gNote: "En la app real es el inicio de sesión del dueño. El PIN del demo se muestra para que cualquiera lo pruebe.", gBad: "PIN incorrecto. (El PIN del demo está arriba.)",
   kNew: "Nuevos", kAct: "En proceso", kDone: "Listos", tabsAria: "Filtro", tNew: "Nuevos", tAct: "Activos", tDone: "Listos", tAll: "Todos",
   sDemo: "<b>Demo:</b> los pedidos viven solo en este navegador. Abre la página del cliente en otra pestaña del mismo navegador y mira cómo avanza el seguimiento. \"Avisar\" nunca manda texto ni correo real: los textos se activan con la aprobación A2P de Twilio (pendiente); el correo después por el Apps Script.",
-  reset: "↺ Borrar datos del demo", lockBtn: "🔒 Bloquear", foot: "\"Your Garage\" es un taller de muestra inventado. Solo clientes de muestra.",
+  reset: "↺ Borrar datos del demo", lockBtn: "🔒 Bloquear", foot: "Vista de taller demo para Carlos' Mobile Mechanic. Solo clientes de muestra.",
+  srcKick: "Dónde comprar piezas", prefSupp: "Proveedor de piezas preferido", directions: "Cómo llegar", website: "Sitio web", call: "Llamar", callN: "Llamar a {n}", copy: "Copiar", copied: "📋 Copiado", copiedAll: "📋 Lista de piezas copiada", copyFail: "No se pudo copiar.",
+  copyAll: "Copiar todas las piezas de este trabajo", whatToAsk: "Qué pedir en {n}", theStore: "la tienda",
+  srcHonest: "Datos del negocio tomados de su propio sitio web. Llama para precio y existencia: no hay sociedad, descuento, inventario en vivo ni pedidos conectados.",
   empty: "Aún no hay nada. Los pedidos nuevos de la página del cliente llegan aquí.", customer: "Cliente (demo)", sampleTag: "Muestra", fromPage: "De la página del cliente",
   est: "Est.", quote: "Cotización", arrival: "Llegada", ready: "Listo", noSlot: "Sin hora", alertsL: "Alertas:", aApp: "App", aText: "Texto", aEmail: "Correo",
   accept: "✅ Aceptar con cotización", decline: "Rechazar", advance: "⏩ Siguiente: {s}", notify: "📣 Avisar al cliente", done: "🏁 Listo para recoger", reopen: "Reabrir",
@@ -136,8 +146,9 @@ es: {
 }
 };
 </script>
-<script src="../config.js?v=20261013a"></script>
-<script src="../core.js?v=20261013a"></script>
-<script src="shop.js?v=20261013a"></script>
+<script src="../config.js?v=20261013b"></script>
+<script src="../core.js?v=20261013b"></script>
+<script src="../parts.js?v=20261013b"></script>
+<script src="shop.js?v=20261013b"></script>
 </body>
 </html>

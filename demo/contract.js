@@ -5,7 +5,8 @@
    only lives on this device until the page is closed.
    Wording mirrors ~/plugin/skills/second-shift-contract/template.html. Change both together.
    Three clauses are ON by default for every new agreement (2026-10-10), each with its own switch in the form:
-     2A Performance share: pct% (10) of ALL App-Attributed Sales in a calendar month they exceed threshold ($3,000);
+     2A Performance share (2026-10-13): pct% (10) of the amount OVER threshold ($3,000) in a calendar month App-Attributed
+        Sales exceed it ($5,000 -> $200);
         food + non-alcoholic only, no tax, tips or alcohol. Tracked by demo/crm.js ("Ring up a member" + "App sales").
      3A Results promise (2026-10-11): if in the first 3 months after Go-Live there's no 30-day period with N (30) tracked
         return visits, the next 2 monthly payments are waived. Same text as clauses() in make_contract.py.
@@ -143,9 +144,9 @@
     var locs = (CFG.locations || []).filter(Boolean), many = locs.length > 1, c = { row: "", s2a: "", s3a: "", s5a: "",
       cancel: "If Client cancels, Provider will hand over Client's customer and player data in a standard file format." };
     if (ps) {
-      c.row = '<tr><td>Performance share</td><td>None</td><td><b>' + pct + ' of App-Attributed Sales</b><br><span class="sm">only in a month they exceed ' + th + (many ? ' at a restaurant' : '') + '; food and non-alcoholic only; see Section 2A</span></td></tr>';
-      c.s2a = '<h2>2A. Performance share</h2><p>In addition to the monthly fee, in any calendar month in which App-Attributed Sales exceed ' + th + ', Client will pay Provider ' + pct + ' of that month\'s App-Attributed Sales. The ' + pct + ' applies to all of that month\'s App-Attributed Sales, not only the amount above ' + th + '. In a month where App-Attributed Sales are ' + th + ' or less, no performance share is owed.' +
-        (many ? ' The ' + th + ' threshold applies separately to each restaurant covered by this Agreement (' + e(andList(locs)) + '). Each restaurant\'s App-Attributed Sales are measured and tested on their own, the performance share is owed only for a restaurant whose own App-Attributed Sales exceed ' + th + ' that month, and sales from different restaurants are never combined.' : '') + '</p>' +
+      c.row = '<tr><td>Performance share</td><td>None</td><td><b>' + pct + ' of App-Attributed Sales over ' + th + '</b><br><span class="sm">only in a month they exceed ' + th + (many ? ' at a restaurant' : '') + '; food and non-alcoholic only; see Section 2A</span></td></tr>';
+      c.s2a = '<h2>2A. Performance share</h2><p>In addition to the monthly fee, in any calendar month in which App-Attributed Sales exceed ' + th + ', Client will pay Provider ' + pct + ' of the amount by which that month\'s App-Attributed Sales exceed ' + th + '. The ' + pct + ' applies only to the amount above ' + th + ', not to the first ' + th + ' (for example, App-Attributed Sales of $5,000 in a month means ' + pct + ' of $2,000). In a month where App-Attributed Sales are ' + th + ' or less, no performance share is owed.' +
+        (many ? ' The ' + th + ' threshold applies separately to each restaurant covered by this Agreement (' + e(andList(locs)) + '). Each restaurant\'s App-Attributed Sales are measured and tested on their own, the performance share is owed only for a restaurant whose own App-Attributed Sales exceed ' + th + ' that month and only on that restaurant\'s amount above ' + th + ', and sales from different restaurants are never combined.' : '') + '</p>' +
         '<p>"App-Attributed Sales" means sales to customers who join, engage with or come back through the App: (a) orders placed through the App, and (b) purchases at Client\'s register where the customer is identified through the App, because the customer shows their member QR code or code, staff enter the member\'s phone number, or the customer redeems an App reward, promo code or points. App-Attributed Sales count food and non-alcoholic beverage sales only. They exclude sales tax, tips and gratuities, and all alcoholic beverages. Client\'s other sales are never included.</p>' +
         '<p>Provider will send Client a statement by the 5th day of each month for the month before, listing each App-Attributed sale (date, receipt number, member, how the member was identified, and the amount counted). Client may dispute a statement in writing within 10 days of receiving it, and the parties will reconcile the disputed items against Client\'s register (POS) reports in good faith. Payment is due within 15 days of the statement date; a disputed amount is due within 15 days after it is resolved.</p>';
     }
@@ -231,7 +232,7 @@
       '<p class="sm">Prepared ' + today.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) + '.</p>';
     S.innerHTML = "Setup <b>" + money(sn) + "</b>" + (sd ? " (was " + money(sl) + ")" : "") + " · " + (fx ? "flexible: <b>" + money(fx.down) + "</b> down today" : up + "% today = <b>" + money(sn * up / 100) + "</b>" + (up < 100 ? ", " + money(sn - sn * up / 100) + " at Go-Live" : "")) + "<br>" +
       "Monthly <b>" + (fx ? money(fx.monthly) + "</b> × " + fx.months + ", then <b>" + money(mn) + "</b>" : money(mn) + "</b>") + (md && months ? " × " + months + ", then " + money(ml) : "") + (minimum ? " · " + minimum + "-month minimum" : "") +
-      (F.ps.checked ? "<br>Performance share <b>" + num("ps_pct") + "%</b> of app sales in a month over <b>" + money(num("ps_th")) + "</b>" : "") +
+      (F.ps.checked ? "<br>Performance share <b>" + num("ps_pct") + "%</b> of app sales over <b>" + money(num("ps_th")) + "</b> in a month" : "") +
       (F.rc.checked ? " · results promise (" + Math.round(num("rc_n")) + " returns in 30 days, else 2 months free)" : "") + (F.cd.checked ? " · customer-data clause" : "") + (DX.sec ? " · discount expires after 3 business days unpaid" : "");
     D.querySelectorAll("canvas[data-sig]").forEach(pad);
   }

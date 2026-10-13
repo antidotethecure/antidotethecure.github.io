@@ -1303,8 +1303,8 @@
   // how identified, staff initials, and visit "first" | "return". A RETURN = the member had already been in on an earlier
   // day (an earlier attributed sale, an earlier app visit, or joined on an earlier day). Same-day repeats keep that day's type.
   // PERFORMANCE SHARE (CRM_CFG.perfShare = {threshold:3000, pct:10, returns:12}; billed ONLY when the signed agreement has it):
-  // in a calendar month (LA time) where app-attributed food & non-alc sales EXCEED the threshold, the share is pct% of ALL
-  // of that month's app-attributed food & non-alc sales (not only the part above it), on top of the monthly fee. Statement
+  // in a calendar month (LA time) where app-attributed food & non-alc sales EXCEED the threshold, the share is pct% of ONLY
+  // the amount OVER the threshold (2026-10-13: $5,000 -> 10% of $2,000 = $200), on top of the monthly fee. Statement
   // by the 5th of the next month; the client may dispute within 10 days (reconciled against register reports); payment is
   // due 15 days after the statement. returns = the 90-day results check (tracked return visits a month).
   // STORAGE: localStorage on this device (KEY_sales) AND a POST of every sale to CRM_CFG.sheet when set (Apps Script web
@@ -1406,7 +1406,7 @@
     var food = sum(l, "food"), over = food > PS.threshold;
     return { ym: ym, rows: l, n: l.length, food: food, alcohol: sum(l, "alcohol"), total: sum(l, "total"), retFood: sum(ret, "food"), fstFood: sum(fst, "food"), retN: ret.length, fstN: fst.length,
       visits: Object.keys(vis).length, retVisits: Object.keys(rv).length, members: Object.keys(l.reduce(function (o, x) { o[x.mid] = 1; return o; }, {})).length,
-      appN: l.filter(function (x) { return x.how === "app"; }).length, over: over, share: over ? r2(food * PS.pct / 100) : 0 };
+      appN: l.filter(function (x) { return x.how === "app"; }).length, over: over, excess: over ? r2(food - PS.threshold) : 0, share: over ? r2((food - PS.threshold) * PS.pct / 100) : 0 };
   }
   function salesBox() {
     var ym = laYMD(Date.now()).slice(0, 7), S = monthStats(ym), pct = Math.min(100, S.food / PS.threshold * 100);
@@ -1419,7 +1419,7 @@
       '<div class="crm-stats" style="grid-template-columns:repeat(2,1fr)"><div><b>' + usd(S.retFood) + '</b>🔁 returning members (' + S.retN + ')</div><div><b>' + usd(S.fstFood) + '</b>🆕 first visits (' + S.fstN + ')</div>' +
       '<div><b>' + S.visits + '</b>member visits · ' + S.members + ' members</div><div><b>' + S.retVisits + '</b>return visits (' + PS.returns + '/mo check)</div></div>' +
       '<div class="crm-as-share"><span>Performance share estimate</span><b>' + (S.over ? usd(S.share) : '$0.00') + '</b></div>' +
-      '<p class="crm-fine" style="margin:4px 0 0">Only if your agreement includes it: in a month where app sales pass ' + usd(PS.threshold).replace(".00", "") + ', it\'s ' + PS.pct + '% of that month\'s app sales (' + PS.pct + '% × ' + usd(S.food) + '), on top of the monthly fee. Alcohol excluded this month: ' + usd(S.alcohol) + '.</p>' +
+      '<p class="crm-fine" style="margin:4px 0 0">Only if your agreement includes it: in a month where app sales pass ' + usd(PS.threshold).replace(".00", "") + ', it\'s ' + PS.pct + '% of only the amount over ' + usd(PS.threshold).replace(".00", "") + ' (' + PS.pct + '% × ' + usd(S.excess) + '), on top of the monthly fee. Alcohol excluded this month: ' + usd(S.alcohol) + '.</p>' +
       '<div class="crm-feed" style="max-height:170px;margin-top:8px">' + (S.rows.slice(0, 12).map(function (x) { return '<div><span>' + e(x.day.slice(5)) + ' · #' + e(x.receipt) + ' · ' + e(x.member) + '<br><span style="color:#9AA6CC">' + e(HOW[x.how] || x.how) + ' · ' + (x.visit === "return" ? "🔁 return" : "🆕 first") + (x.staff ? ' · ' + e(x.staff) : '') + '</span></span><b class="plus">' + usd(x.food) + '</b></div>'; }).join("") || '<div><span>No app sales yet this month. Ring up a member above.</span></div>') + '</div>' +
       '<div class="crm-acts"><button type="button" data-a="scsv">⬇️ Sales CSV</button><button type="button" class="hot" data-a="stmt">🧾 Statement</button></div>' +
       '<label style="margin-top:8px">Statement month</label><select data-r="sym">' + yms.map(function (x) { return '<option value="' + x + '">' + ymLabel(x) + (x === ym ? ' (so far)' : '') + '</option>'; }).join("") + '</select>' +
@@ -1442,7 +1442,7 @@
       '<tr><td>Returning members / first visits</td><td>' + usd(S.retFood) + ' / ' + usd(S.fstFood) + '</td></tr><tr><td>Member visits / return visits</td><td>' + S.visits + ' / ' + S.retVisits + '</td></tr>' +
       '<tr><td>Alcohol on those checks (excluded)</td><td>' + usd(S.alcohol) + '</td></tr>' +
       '<tr><td>Threshold check</td><td>' + (S.over ? 'Met: ' + usd(S.food) + ' is over ' + usd(PS.threshold) : 'Not met: ' + usd(S.food) + ' is not over ' + usd(PS.threshold) + '. No share is due.') + '</td></tr>' +
-      '<tr class="st-tot"><td>Performance share (' + PS.pct + '% of ' + usd(S.food) + ')</td><td>' + usd(S.share) + '</td></tr>' +
+      '<tr class="st-tot"><td>Performance share (' + PS.pct + '% of ' + usd(S.excess) + ', the amount over ' + usd(PS.threshold) + ')</td><td>' + usd(S.share) + '</td></tr>' +
       '<tr><td>Dispute window</td><td>Until ' + longDate(addDays(sd, 10)) + ' (10 days). Reconciled against Client\'s register reports.</td></tr>' +
       '<tr><td>Payment due</td><td>' + (S.share ? longDate(addDays(sd, 15)) + ' (15 days after the statement)' : 'Nothing due') + '</td></tr></table>' +
       '<h4>Line items</h4><div class="st-sc"><table class="st-li"><tr><th>Date</th><th>Check #</th><th>Member</th><th>How identified</th><th>Visit</th><th>Food & non-alc</th><th>Alcohol (excl.)</th></tr>' +

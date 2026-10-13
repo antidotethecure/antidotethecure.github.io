@@ -12,7 +12,7 @@
    The staff app and Christian HQ include it too and use window.SSAI_CHRISTIAN (read only on the staff side). */
 (function () {
   "use strict";
-  var API = "";   // ← paste the Apps Script /exec URL here (one deployment serves both restaurants)
+  var API = "https://script.google.com/macros/s/AKfycbyiSN1EM8D3H_gLkMn8TuBU6_Secn3H6vEerWXkaXAPbfwG7ql1Ijy2Wz5SR1uNQnKGSQ/exec";   // ← paste the Apps Script /exec URL here (one deployment serves both restaurants)
   var DEFAULTS = {
     "melody-bar-grill": { name: "Melody Bar & Grill", short: "Melody", prefix: "MEL", page: "demo/melody-lax/", game: "Melody Approach",
       perDollar: 10, join: 100, birthday: 250, referral: 100, game_: { perScore: 100, dailyCap: 50 },

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SousShift App</title>
-<meta name="description" content="SousShift AI for restaurant owners: plans and prices, what it costs elsewhere, what you get back, printing, contracts, FAQ and an AI guide. Everything you need to choose and sign.">
+<meta name="description" content="SousShift AI for restaurant owners and truck owners: live apps we've built, plans and prices, what it costs elsewhere, what you get back, printing, contracts, FAQ and an AI guide. Everything you need to choose and sign.">
 <meta name="theme-color" content="#03060e">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
@@ -181,6 +181,66 @@ nav.tabs .ask span{background:linear-gradient(180deg,#4a90ff,#1f5fe0);border-rad
 footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hl{animation:none}}
 @media (min-width:640px){.plans{grid-template-columns:repeat(3,1fr)}}
+/* ===== Live apps showcase + trucks + try-it (merged from /demo/setup/) ===== */
+.forpill{display:none;width:max-content;max-width:100%;margin:12px auto 0;padding:6px 14px;border-radius:99px;border:1px solid rgba(63,169,255,.5);background:rgba(47,123,255,.12);font-weight:700;font-size:14px}
+.forpill b{color:var(--gold)}
+.xf{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.xf button{min-height:40px;border-radius:99px;border:1px solid var(--edge);background:rgba(255,255,255,.03);color:var(--dim);font:700 14.5px "Rajdhani",sans-serif;padding:4px 14px;cursor:pointer}
+.xf button[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 4px 16px var(--glow)}
+.xf button i{font-style:normal;opacity:.7;margin-left:4px;font-size:12.5px}
+.xg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.xa{position:relative;display:flex;flex-direction:column;min-width:0;border-radius:18px;overflow:hidden;text-decoration:none;color:var(--ink);background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.xa:hover,.xa:focus-visible{transform:translateY(-3px);border-color:var(--blue);box-shadow:0 0 0 1px var(--blue),0 12px 32px var(--glow)}
+.xa:active{transform:scale(.98)}
+.xa[hidden]{display:none}
+.xa-m{position:relative;aspect-ratio:4/3;overflow:hidden;background:#071230}
+.xa-m img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.xa:hover .xa-m img{transform:scale(1.05)}
+.xa-m::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,6,14,0) 45%,rgba(7,17,42,.92) 100%);pointer-events:none}
+.xa-m.art{display:grid;place-items:center;font-size:64px;line-height:1}
+.xa-m.ice{background:radial-gradient(90% 70% at 50% 35%,rgba(255,143,196,.38),transparent 65%),linear-gradient(160deg,#0d1d40,#163a8a)}
+.xa-m.food{background:radial-gradient(90% 70% at 50% 35%,rgba(255,176,46,.38),transparent 65%),linear-gradient(160deg,#1a1230,#7a2e12)}
+.xa-m.art span{filter:drop-shadow(0 8px 24px rgba(0,0,0,.6))}
+.xa-tag{position:absolute;top:8px;left:8px;z-index:1;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:rgba(3,6,14,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(63,169,255,.55);border-radius:99px;padding:3px 8px;max-width:calc(100% - 16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xa-b{display:flex;flex-direction:column;flex:1;padding:10px 12px 12px;gap:2px}
+.xa-b b{font-family:"Orbitron",sans-serif;font-size:14px;line-height:1.25;letter-spacing:.02em}
+.xa-b small{color:var(--dim);font-size:13.5px;line-height:1.25}
+.xa-b .g{color:var(--silver);font-size:14px;line-height:1.25;margin-top:2px}
+.xa-go{margin-top:auto;padding-top:8px;font-family:"Orbitron",sans-serif;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--volt)}
+.xin{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.xin div{background:rgba(255,255,255,.03);border:1px solid var(--edge);border-radius:14px;padding:10px 12px;font-size:13.5px;line-height:1.3;color:var(--dim)}
+.xin b{display:block;color:var(--ink);font-size:15px;margin-bottom:2px}
+.xsteps{display:grid;gap:8px;margin:4px 0 0;padding:0;list-style:none;counter-reset:x}
+.xsteps li{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center;counter-increment:x;font-size:14.5px;color:var(--dim);line-height:1.3}
+.xsteps li::before{content:counter(x);display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#4a90ff,#1f5fe0);box-shadow:0 4px 16px var(--glow);font:800 17px "Orbitron",sans-serif;color:#fff}
+.xsteps b{display:block;color:var(--ink);font-size:16px}
+.tk{scroll-margin-top:70px}
+.tk .hd{display:flex;gap:12px;align-items:center}
+.tk .hd span{font-size:40px;line-height:1}
+.tk.ice{border-color:rgba(255,126,182,.55);background:radial-gradient(120% 90% at 100% 0,rgba(255,143,196,.14),transparent 60%),linear-gradient(180deg,var(--panel2),var(--panel))}
+.tk.food{border-color:rgba(255,154,60,.55);background:radial-gradient(120% 90% at 100% 0,rgba(255,176,46,.14),transparent 60%),linear-gradient(180deg,var(--panel2),var(--panel))}
+.tk ul{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.tk li{position:relative;padding-left:28px;font-size:15px;line-height:1.35}
+.tk li i{position:absolute;left:0;top:0;font-style:normal}
+.xtp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.xtp div{border:1px solid var(--edge);border-radius:14px;padding:10px 6px;text-align:center;background:rgba(255,255,255,.03);font-size:12.5px;color:var(--dim);line-height:1.25}
+.xtp div.on{border-color:var(--blue);background:rgba(47,123,255,.12);box-shadow:0 0 22px var(--glow)}
+.xtp small{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--volt)}
+.xtp b{display:block;font-family:"Orbitron",sans-serif;font-size:20px;color:var(--ink);margin:4px 0 2px}
+.xdc{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.xdc::-webkit-scrollbar{display:none}
+.xdc button{flex:none;min-height:40px;border-radius:99px;border:1px solid var(--edge);background:rgba(255,255,255,.03);color:var(--dim);font:700 14px "Rajdhani",sans-serif;padding:4px 13px;cursor:pointer}
+.xdc button[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff}
+.xph{position:relative;width:300px;max-width:100%;height:610px;margin:6px auto 0;border-radius:46px;padding:12px;background:linear-gradient(145deg,#1c2f57,#050a18);box-shadow:0 0 0 2px #2a4680,0 30px 80px rgba(0,0,0,.8),0 0 60px var(--glow)}
+.xph .scr{position:relative;width:276px;height:586px;border-radius:36px;overflow:hidden;background:#000}
+.xph iframe{width:390px;height:828px;border:0;transform:scale(.7077);transform-origin:0 0;display:block}
+.xph .notch{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:92px;height:24px;border-radius:99px;background:#000;z-index:2}
+@media (min-width:640px){.xg{grid-template-columns:repeat(3,1fr)}.xin{grid-template-columns:repeat(4,1fr)}.tks{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tks .card{margin:0}}
+@media (max-width:359px){.xg,.xin{grid-template-columns:1fr}.xtp{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.xa,.xa-m img{transition:none}.xa:hover{transform:none}}
+.xa.in{animation:xin .35s ease both}
+@keyframes xin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.xa.in{animation:none}}
 </style>
 </head>
 <body>
@@ -189,9 +249,12 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
 <main class="wrap" id="main">
   <section class="hero" id="home">
     <img class="logo" src="../assets/ssai-lockup.jpg" alt="SousShift AI" width="640" height="392">
+    <p class="forpill" id="forPill">Made for <b id="forName"></b></p>
     <h1 class="chrome">Your restaurant's app, explained</h1>
-    <p class="lead">Plans, prices, what it would cost elsewhere, what you get back, printing and the contract. Everything to choose and sign, in one place.</p>
+    <p class="lead">See the live apps we've built, then plans, prices, what it would cost elsewhere, what you get back, printing and the contract. Everything to choose and sign, in one place.</p>
     <nav class="menu" aria-label="Sections">
+      <a href="#apps"><span>🚀</span>Live apps</a>
+      <a href="#trucks"><span>🍦</span>Truck apps</a>
       <a href="#plans"><span>💳</span>Plans &amp; prices</a>
       <a href="#market"><span>⚖️</span>Cost elsewhere</a>
       <a href="#run"><span>🧰</span>Our running costs</a>
@@ -204,6 +267,98 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
       <a href="manage/"><span>🗂️</span>Management</a>
     </nav>
     <p class="note" style="margin-top:12px">Already a client? Your signed deal stays exactly as agreed. These prices are for new restaurants.</p>
+  </section>
+
+  <section class="s" id="apps"><header><p class="kick">Live apps · real LA spots</p><h2 class="chrome">Apps we've built</h2><p class="lead">Each one is built around the business's real menu, with a game themed to their food. Tap one and play. Yours gets the same treatment.</p></header>
+    <div class="xf" id="xFilter" role="group" aria-label="Filter apps">
+      <button type="button" data-f="all" aria-pressed="true">All<i>8</i></button>
+      <button type="button" data-f="rest" aria-pressed="false">🍽️ Restaurants<i>6</i></button>
+      <button type="button" data-f="full" aria-pressed="false">✨ Full package<i>2</i></button>
+      <button type="button" data-f="truck" aria-pressed="false">🚚 Trucks<i>2</i></button>
+    </div>
+    <div class="xg" id="xGrid">
+      <a class="xa" data-k="rest" href="../demo/storm-burger/"><div class="xa-m"><img src="../demo/storm-burger/img/classic.jpg" alt="StormBurger classic burger" width="720" height="720" loading="lazy" decoding="async"><span class="xa-tag">⚡ Fan favorite</span></div><div class="xa-b"><b>⚡ StormBurger</b><small>Inglewood · Long Beach</small><span class="g">"Storm Run" driving game</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa" data-k="rest" href="../demo/churrito-loco/"><div class="xa-m"><img src="../demo/churrito-loco/img/churros.jpg" alt="Churrito Loco churros" width="900" height="657" loading="lazy" decoding="async"></div><div class="xa-b"><b>🌶️ Churrito Loco</b><small>South Gate</small><span class="g">"Loco Match" puzzle game</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa" data-k="rest" href="../demo/lucky-dragon/"><div class="xa-m"><img src="../demo/lucky-dragon/img/shrimp.jpg" alt="Lucky Dragon hibachi shrimp" width="900" height="657" loading="lazy" decoding="async"></div><div class="xa-b"><b>🐉 Lucky Dragon</b><small>Compton · hibachi</small><span class="g">"Hibachi Catch" dragon game</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa" data-k="rest full" href="../demo/melody-lax/"><div class="xa-m"><img src="../demo/melody-lax/img/cover.jpg" alt="Melody Bar &amp; Grill" width="720" height="956" loading="lazy" decoding="async"><span class="xa-tag">✈️ Full package</span></div><div class="xa-b"><b>🍸 Melody Bar &amp; Grill</b><small>Westchester by LAX</small><span class="g">Table ordering + flight game</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa" data-k="rest" href="../demo/gritz-n-wafflez/"><div class="xa-m"><img src="../demo/gritz-n-wafflez/img/wingz-wafflez.jpg" alt="Gritz N Wafflez wings and waffles" width="720" height="720" loading="lazy" decoding="async"><span class="xa-tag">💛 Woman-owned</span></div><div class="xa-b"><b>🧇 Gritz N Wafflez</b><small>Wilshire Blvd · LA</small><span class="g">"Waffle Run" game while you wait</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa" data-k="rest full" href="../demo/nalu-vida/"><div class="xa-m"><img src="../demo/nalu-vida/img/hero.jpg" alt="Nalu Vida beach bar" width="1200" height="1500" loading="lazy" decoding="async"><span class="xa-tag">🌊 Full package</span></div><div class="xa-b"><b>🏄 Nalu Vida</b><small>Venice Pier · beach bar</small><span class="g">"Ride the Nalu" surf game</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa" data-k="truck" href="../ice-cream/demo/"><div class="xa-m art ice" aria-hidden="true"><span>🍦</span><span class="xa-tag">🍦 New · Trucks</span></div><div class="xa-b"><b>🚚 Ice Cream Trucks</b><small>Live truck map + ETA</small><span class="g">"Truck's on your street" alerts</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa" data-k="truck" href="../food-truck/demo/"><div class="xa-m art food" aria-hidden="true"><span>🌮</span><span class="xa-tag">🚚 New · Trucks</span></div><div class="xa-b"><b>🚚 Food Trucks</b><small>Live map + order ahead</small><span class="g">Food ready hot when you arrive</span><span class="xa-go">Open app →</span></div></a>
+    </div>
+
+    <div class="card" id="try"><h3>📱 Try one right here</h3><p class="note" style="margin:4px 0 10px">It's live: scroll it, play the game, join the club.</p>
+      <div class="xdc" id="xDemo" role="group" aria-label="Pick an app to preview">
+        <button type="button" data-src="../demo/storm-burger/" aria-pressed="true">⚡ StormBurger</button>
+        <button type="button" data-src="../demo/churrito-loco/" aria-pressed="false">🌶️ Churrito Loco</button>
+        <button type="button" data-src="../demo/lucky-dragon/" aria-pressed="false">🐉 Lucky Dragon</button>
+        <button type="button" data-src="../demo/melody-lax/" aria-pressed="false">✈️ Melody</button>
+        <button type="button" data-src="../demo/gritz-n-wafflez/" aria-pressed="false">🧇 Gritz N Wafflez</button>
+        <button type="button" data-src="../demo/nalu-vida/" aria-pressed="false">🏄 Nalu Vida</button>
+        <button type="button" data-src="../ice-cream/demo/" aria-pressed="false">🍦 Ice cream truck</button>
+        <button type="button" data-src="../food-truck/demo/" aria-pressed="false">🚚 Food truck</button>
+      </div>
+      <div class="xph"><div class="notch"></div><div class="scr"><iframe id="xPh" title="Live app preview" src="../demo/storm-burger/" loading="lazy" allow="geolocation"></iframe></div></div>
+    </div>
+
+    <div class="card"><h3>What's inside every app</h3>
+      <div class="xin">
+        <div><b>🍔 Your menu in 3D</b>Real items, real prices, photos that spin like they're on the plate.</div>
+        <div><b>🎮 A game made for you</b>Themed to your food. Weekly prize board keeps people coming back.</div>
+        <div><b>🎁 Instant rewards</b>Customers drop their phone or email and get a reward on the spot.</div>
+        <div><b>📇 Your customer list</b>Every signup saved for you: VIPs, birthdays, who hasn't been back.</div>
+        <div><b>💬 Bring them back</b>Text a group in one tap: slow-day specials, birthday treats, "we miss you".</div>
+        <div><b>⭐ More Google reviews</b>One-tap review button plus a map that shows you're close by.</div>
+        <div><b>🌐 12 languages</b>Español, 中文, 한국어, Հայերեն, Русский and more, one tap away.</div>
+        <div><b>📱 No download</b>Scan the QR on the table and it opens. Nothing to install.</div>
+      </div>
+      <p class="note" style="margin:10px 0 0">Some tools come with specific plans. See <a href="#plans">Plans &amp; prices</a> for what's in each.</p>
+    </div>
+
+    <div class="card" id="sample"><h3>⚡ Free sample in 3 steps</h3>
+      <ol class="xsteps">
+        <li><div><b>Tell us about your business</b>Pick your type, add a few items and prices, drop 2–6 photos. About 3 minutes.</div></li>
+        <li><div><b>We build your sample</b>Antidote reviews it personally and builds your app with your name and photos.</div></li>
+        <li><div><b>You see it on your phone</b>Play it, show your staff, then decide. No card, no pressure.</div></li>
+      </ol>
+      <div class="btns"><a class="btn primary" href="../demo/start/">⚡ Build my free sample</a><a class="btn ghost" id="growthLink" href="../demo/growth/">📈 See the growth math</a><a class="btn ghost" href="https://instagram.com/second.shiftai" target="_blank" rel="noopener">DM @second.shiftai</a></div>
+    </div>
+  </section>
+
+  <section class="s" id="trucks"><header><p class="kick">Ice cream trucks · food trucks</p><h2 class="chrome">Run a truck? Get found.</h2><p class="lead">No more "where's the truck?". Customers scan your QR sticker once. After that they see you on a live map, their phone rings when you're close, and they know how long until you're on their street.</p></header>
+    <div class="tks">
+      <div class="card tk ice" id="ice-cream">
+        <div class="hd"><span aria-hidden="true">🍦</span><div><h3>Ice Cream Trucks</h3><p class="note" style="margin:2px 0 0">"Truck's on your street" alerts</p></div></div>
+        <ul>
+          <li><i>📍</i>Live map: the customer's house and exactly where the truck is</li>
+          <li><i>⏱️</i>"Arriving in ~6 min" ETA that counts your stops to sell</li>
+          <li><i>🔔</i>Phones ring for app users on the block as you get close</li>
+          <li><i>🎁</i>Check in 5 times → 10% off or an extra scoop; bonus points for keeping alerts on</li>
+          <li><i>🧾</i>Route counter: see how many extra sales each street brings</li>
+        </ul>
+        <div class="btns"><a class="btn primary" href="../ice-cream/demo/">📍 Try the customer app</a><a class="btn ghost" href="../ice-cream/">Owner tour →</a></div>
+      </div>
+      <div class="card tk food" id="food-truck">
+        <div class="hd"><span aria-hidden="true">🚚</span><div><h3>Food Trucks</h3><p class="note" style="margin:2px 0 0">Find it, order ahead, pick it up hot</p></div></div>
+        <ul>
+          <li><i>📍</i>Live map of where the truck is parked or driving, plus today's stops and times</li>
+          <li><i>📏</i>How far each customer is: miles, walk time and drive time</li>
+          <li><i>⏱️</i>"In your area at 5:30" countdown when the truck heads their way</li>
+          <li><i>🔥</i>Order ahead, timed hot: the cook starts so it comes off the grill as they walk up</li>
+          <li><i>👀</i>Owner view: customers with the app on a map, who's heading over, and a cook queue sorted by arrival</li>
+        </ul>
+        <div class="btns"><a class="btn primary" href="../food-truck/demo/">📍 Try the customer app</a><a class="btn ghost" href="../food-truck/">Owner tour →</a></div>
+      </div>
+    </div>
+    <div class="card"><h3>Truck plans</h3>
+      <div class="xtp">
+        <div><small>🍦 Single Scoop</small><b>$99</b>then $29/mo · 1 truck</div>
+        <div class="on"><small>🍨 Double Scoop</small><b>$299</b>$199 for the first 10 trucks · then $50/mo</div>
+        <div><small>🍧 Sundae</small><b>$599</b>then $129/mo · up to 3 trucks</div>
+      </div>
+      <p class="note" style="margin:10px 0 0">Same plans for ice cream trucks and food trucks. Ordering ahead is included from Double Scoop up.</p>
+      <div class="btns"><a class="btn primary" href="../demo/start/?type=foodtruck">🚚 Set up my truck</a><a class="btn ghost" href="sms:+14243094068?&amp;body=Hi%20Antidote%2C%20I%20run%20a%20truck%20and%20want%20the%20truck%20app">💬 Text Antidote</a></div>
+    </div>
   </section>
 
   <section class="s" id="plans"><header><p class="kick">1 · Plans &amp; prices</p><h2 class="chrome">Pick your plan</h2><p class="lead">Per restaurant. One-time setup, then monthly.</p></header>
@@ -298,6 +453,7 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
 <script>window.CONFIG = { name: "Your Restaurant" }; window.A2HS_CFG = { name: "SousShift", theme: { bg: "#07112a", card: "#0d1d40", edge: "#1c2f57", accent: "#2f7bff", ink: "#eef3ff", dim: "#9eadcc", btnInk: "#fff" } };</script>
 <script src="app.js"></script>
 <script src="guide.js"></script>
+<script src="apps.js"></script>
 <script src="../assets/printspots.js"></script>
 <script src="../demo/contract.js"></script>
 <script src="../demo/a2hs.js"></script>

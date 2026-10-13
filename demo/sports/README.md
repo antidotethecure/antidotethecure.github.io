@@ -97,7 +97,7 @@ In `teams.js`, copy the `la` entry under a new key (e.g. `bay`). List each team 
 
 ## Perk: Football Squares (`squares.js`, server = Code.gs)
 
-A **free promotional contest**: no paid entry, no purchase necessary, and no cash or money prizes in or out. Owner-set prizes are limited to:
+A **promotional contest with a free way in**: no entry fee, **no purchase necessary** (every member gets 1 free square per board), and no cash or money prizes in or out. Purchases can add squares (see Entry), so the free square must always stay: purchase-only entry + prize + chance is an illegal lottery in California (Penal Code 319). Owner-set prizes are limited to:
 - food
 - merch
 - % off the check
@@ -108,7 +108,7 @@ Never offer free alcohol (California ABC). The server refuses anything that read
 
 How it works:
 - **Board:** one 10×10 board per NFL or college game, with up to `max` players (default 20) × `per` squares each (default 5).
-- **Entry:** players must be Rewards members with a name (the existing sign-in), with one entry per member. They tap squares or use auto-pick.
+- **Entry:** players must be Rewards members with a name (the existing sign-in), with one entry per member. Each gets **1 free square** per board ("Get my free square", no purchase). Each purchase can add 1 more: staff scan the member's Rewards card in Christian HQ › 🏈 Squares › **+1 Squares ticket** (Code.gs `squares_admin` op `ticket`), 1 ticket = 1 square, up to the board's per-person cap. The board never holds more than 100 squares. They tap squares or use auto-pick.
 - **Kickoff:** entries lock, and the row (home) and column (away) digits are drawn and revealed.
 - **Winners:** at the end of Q1, halftime, Q3 and the final, the last digit of each score picks the winning square. Scores come from ESPN's `summary?event=` JSON on the server.
 - **Unclaimed squares:** the prize rolls to the next quarter if the owner turns rollover on.

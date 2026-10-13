@@ -27,6 +27,10 @@
     if (p.kind === "drink" && BOOZE.test(text)) return { err: "No free alcohol (California ABC). Use a non-alcoholic drink, or % off a drink (21+)." };
     return { kind: p.kind, text: text };
   }
+  // free entry: 1 free square per member per board + 1 per purchase ticket, up to the owner's cap (same as Code.gs sqAllowed)
+  function tix(b, m) { var t = (b.tickets || {})[m]; return t ? +t.n || 0 : 0; }
+  function allowed(b, m) { return Math.min(b.per, 1 + tix(b, m)); }
+  var LEGAL = "No purchase necessary · 1 free square per member per game · extra squares with purchase";
   function whoList(b) { var n = {}; Object.keys(b.claims).forEach(function (k) { n[b.claims[k].m] = 1; }); return Object.keys(n); }
   function results(b, comp) {
     if (!b.rows || !b.cols || !comp) return b.results || {};
@@ -66,11 +70,13 @@
     return { id: b.id, game: b.game, league: b.league, event: b.event, kickoff: b.kickoff, status: b.status, max: b.max, per: b.per, entrants: whoList(b).length,
       rows: shown ? b.rows : null, cols: shown ? b.cols : null, prizes: b.prizes, rollover: b.rollover, claims: claims, mine: mine, results: res, redeemed: b.redeemed || {}, home: b.home, away: b.away,
       score: b.score ? { state: b.score.state, period: b.score.period, home: b.score.home.score, away: b.score.away.score } : null, test: true,
-      legal: "Free to play · No purchase necessary · Prizes set by " + (SLUGS[b.slug] || "the restaurant") };
+      taken: Object.keys(b.claims).length, my: member ? { have: mine.length, tickets: tix(b, member), allowed: allowed(b, member), free: mine.length ? 0 : 1 } : null,
+      legal: LEGAL + " · Prizes set by " + (SLUGS[b.slug] || "the restaurant") };
   }
   function full(b) {
     var p = pub(b, ""); p.rows = b.rows; p.cols = b.cols; p.by = b.by; p.slug = b.slug;
-    p.entrantsList = whoList(b).map(function (id) { var n = "", sq = []; Object.keys(b.claims).forEach(function (k) { if (b.claims[k].m === id) { n = b.claims[k].n; sq.push(+k); } }); return { member: id, name: n, squares: sq }; });
+    p.entrantsList = whoList(b).map(function (id) { var n = "", sq = []; Object.keys(b.claims).forEach(function (k) { if (b.claims[k].m === id) { n = b.claims[k].n; sq.push(+k); } }); return { member: id, name: n, squares: sq, tickets: tix(b, id), allowed: allowed(b, id) }; });
+    p.ticketsOut = Object.keys(b.tickets || {}).map(function (id) { var t = b.tickets[id]; return { member: id, name: t.name || "", n: +t.n || 0, last: t.log && t.log.length ? t.log[t.log.length - 1] : null }; });
     Object.keys(p.results).forEach(function (q) { p.results[q].member = (b.results[q] || {}).member || ""; });
     return p;
   }
@@ -78,6 +84,7 @@
     var S = load(), boards = S.boards || (S.boards = []), slug = d.slug || "melody-bar-grill";
     var mine = boards.filter(function (b) { return b.slug === slug && b.status !== "void"; });
     var finish = function (o) { S.boards = boards; save(S); return o; };
+    if (d.member && d.card) { S.members = S.members || {}; S.members[String(d.card).toUpperCase()] = { id: String(d.member), name: String(d.name || "") }; }
     if (d.type === "squares_get") return Promise.all(mine.map(tick)).then(function () { return finish({ ok: true, test: true, now: Date.now(), boards: mine.map(function (b) { return pub(b, d.member); }) }); });
     if (d.type === "squares_claim") {
       var b = mine.filter(function (x) { return x.id === d.board; })[0]; if (!b) return Promise.resolve({ ok: false, reason: "That board isn't open." });
@@ -87,7 +94,7 @@
         if (!m || !name) return { ok: false, join: true, reason: "Join Melody Rewards (free) with your name to play Football Squares." };
         var who = whoList(b), have = Object.keys(b.claims).filter(function (k) { return b.claims[k].m === m; }).length;
         if (who.indexOf(m) < 0 && who.length >= b.max) return { ok: false, full: true, reason: "This board is full (" + b.max + " players)." };
-        var left = b.per - have; if (left <= 0) return { ok: false, reason: "You already have your " + b.per + " squares." };
+        var left = allowed(b, m) - have; if (left <= 0) return { ok: false, cap: have >= b.per, reason: have >= b.per ? "You have the most squares allowed on this board (" + b.per + ")." : "You've used your free square. Each purchase can add another: ask your server to scan your Rewards card." };
         var free = [], want = []; for (var i = 0; i < 100; i++) if (!b.claims[i]) free.push(i);
         if (d.auto) { var n = Math.min(left, Math.max(1, Math.round(+d.auto) || left)); for (var k = 0; k < n && free.length; k++) want.push(free.splice(Math.floor(Math.random() * free.length), 1)[0]); }
         else (d.squares || []).forEach(function (s) { s = Math.round(+s); if (s >= 0 && s < 100 && !b.claims[s] && want.indexOf(s) < 0 && want.length < left) want.push(s); });
@@ -111,6 +118,16 @@
         var nb = { id: "SQ" + Math.random().toString(36).slice(2, 12).toUpperCase(), slug: d.slug || "melody-bar-grill", league: g.league, event: String(g.event), game: String(g.title || "").slice(0, 80), kickoff: +g.kickoff, status: "open",
           max: max, per: per, rows: null, cols: null, prizes: pz, rollover: d.rollover !== false, claims: {}, results: {}, redeemed: {}, by: d.by || "Test owner", home: g.home || "", away: g.away || "" };
         boards.push(nb); return Promise.resolve(finish({ ok: true, board: full(nb) }));
+      }
+      if (op === "ticket") {   // "+1 Squares ticket" (test mode: the card ID or the member ID from the guest app on this browser)
+        var key = String(d.card || d.member || "").trim(); if (!key) return Promise.resolve({ ok: false, reason: "Scan or type the guest's Rewards card ID." });
+        var open = all.filter(function (x) { return x.status === "open" && x.kickoff > Date.now(); }).sort(function (a, c) { return a.kickoff - c.kickoff; });
+        var tb = d.board ? open.filter(function (x) { return x.id === d.board; })[0] : open[0]; if (!tb) return Promise.resolve({ ok: false, reason: "No open Squares board right now." });
+        var known = (S.members || {})[key.toUpperCase()] || null, id = known ? known.id : key, nm = known ? known.name : (d.name || "Test guest");
+        var tk = tix(tb, id); if (1 + tk >= tb.per) return Promise.resolve({ ok: false, cap: true, reason: nm + " already has the most squares allowed on this board (" + tb.per + ": 1 free + " + tk + " with purchase)." });
+        tb.tickets = tb.tickets || {}; var tt = tb.tickets[id] = tb.tickets[id] || { n: 0, name: short(nm), log: [] };
+        tt.n += 1; tt.log.push({ by: d.by || "Test owner", ts: Date.now(), rcpt: String(d.rcpt || "").slice(0, 24) });
+        return Promise.resolve(finish({ ok: true, member: { name: tt.name, card: known ? key.toUpperCase() : "", tickets: tt.n, allowed: allowed(tb, id) }, board: full(tb) }));
       }
       var bd = all.filter(function (x) { return x.id === d.board; })[0]; if (!bd) return Promise.resolve({ ok: false, reason: "Board not found." });
       if (op === "prizes") { if (bd.status === "final") return Promise.resolve({ ok: false, reason: "The game is over: prizes can't change now." });

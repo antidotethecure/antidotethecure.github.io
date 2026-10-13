@@ -1,13 +1,16 @@
 /* Christian HQ · 🏈 Squares tab (Football Squares owner controls, 2026-10). Christian HQ passes its api() + bo token in html({api, token, draw}) and the
-   backend squares_admin endpoint in Code.gs (list · create · prizes · rollover · lock · randomize · redeem · void).
+   backend squares_admin endpoint in Code.gs (list · create · prizes · rollover · lock · randomize · redeem · void · ticket).
+   ENTRY: every Rewards member gets 1 FREE square per board (no purchase necessary, California Penal Code 319). Each purchase
+   can add one more: staff scan / type the guest's Rewards card ID here and tap "+1 Squares ticket" (1 ticket = 1 square),
+   up to the per-person cap ("Squares each") set on the board.
    ?test=1: answered by demo/sports/squares-mock.js through mock.js (made-up data, this browser only).
    Destructive actions (lock + reveal, delete, mark redeemed) need two taps within 5 seconds.
-   LEGAL: free promotional contest only. No paid entry, no cash, no money prizes. Prize types are food, merch, % off the
+   LEGAL: promotional contest with a free way in. No entry fee, no cash, no money prizes. Prize types are food, merch, % off the
    check, a free NON-alcoholic drink, or % off a drink (21+). Never free alcohol (California ABC). */
 (function () {
   "use strict";
   var X = null;   // {api, token, draw} handed in by Christian HQ on every draw
-  var BOARDS = null, GAMES = null, MSG = "", ARM = {}, BUSY = false, SLUG = "melody-bar-grill";
+  var BOARDS = null, GAMES = null, MSG = "", TMSG = "", TOK = false, ARM = {}, BUSY = false, SLUG = "melody-bar-grill";
   var Q = ["q1", "q2", "q3", "final"], QN = { q1: "Q1", q2: "Halftime", q3: "Q3", final: "Final" };
   var KINDS = [["", "No prize"], ["food", "🍔 Food item"], ["percent", "🏷️ % off the check"], ["drink", "🥤 Free non-alcoholic drink"], ["drinkdeal", "🍹 % off a drink (21+)"], ["merch", "🧢 Merch"]];
   // NFL + college teams Melody runs boards for (ESPN team IDs)
@@ -62,8 +65,9 @@
       (win ? '<h3>Winners</h3><div class="tw"><table><tbody>' + win + '</tbody></table></div>' : '') +
       (b.status !== "final" ? '<h3>Prizes</h3>' + prizeFields(b.id, b.prizes) + '<div class="row" style="margin-top:6px"><button class="btn sm" data-prz="' + b.id + '">💾 Save prizes</button>' +
         '<label class="note"><input type="checkbox" data-roll="' + b.id + '"' + (b.rollover ? " checked" : "") + '> Unclaimed prize rolls to the next quarter</label></div>' : '') +
-      '<h3>Entrants (' + ent.length + ')</h3>' + (ent.length ? '<div class="tw"><table><thead><tr><th>Name</th><th class="n">Squares</th><th>Member</th></tr></thead><tbody>' +
-        ent.map(function (x) { return "<tr><td>" + E(x.name) + "</td><td class='n'>" + x.squares.length + "</td><td><code>" + E(x.member) + "</code></td></tr>"; }).join("") + '</tbody></table></div>' : '<p class="note">No one yet.</p>') +
+      '<h3>Entrants (' + ent.length + ')</h3>' + (ent.length ? '<div class="tw"><table><thead><tr><th>Name</th><th class="n">Squares</th><th class="n">Purchase tickets</th><th>Member</th></tr></thead><tbody>' +
+        ent.map(function (x) { return "<tr><td>" + E(x.name) + "</td><td class='n'>" + x.squares.length + " of " + (x.allowed || 1) + "</td><td class='n'>" + (x.tickets || 0) + "</td><td><code>" + E(x.member) + "</code></td></tr>"; }).join("") + '</tbody></table></div>' : '<p class="note">No one yet.</p>') +
+      ((b.ticketsOut || []).filter(function (t) { return !ent.some(function (x) { return x.member === t.member; }); }).length ? '<p class="note">Tickets not used yet: ' + b.ticketsOut.filter(function (t) { return !ent.some(function (x) { return x.member === t.member; }); }).map(function (t) { return E(t.name) + " (" + t.n + ")"; }).join(", ") + '</p>' : '') +
       '<div class="row" style="margin-top:10px">' + (b.status === "open" ? armBtn("lock:" + b.id, "🔒 Lock now + reveal numbers") + ' <button class="btn sm alt" data-rnd="' + b.id + '">🎲 Draw numbers now (hidden)</button>' : '') +
       armBtn("void:" + b.id, "🗑️ Delete board", false, "alt") + '</div></div>';
   }
@@ -73,11 +77,14 @@
     if (GAMES === null) { GAMES = []; loadGames(); }
     var g = GAMES || [];
     return '<div class="card"><h2 style="margin-top:0">🏈 Football Squares</h2>' +
-      '<div class="test" style="background:#2fbf7122;border-color:#2fbf7166;color:#c9f5dc">⚖️ <b>Free promotional contest only.</b> Free to play · no purchase necessary · no cash or money prizes in or out. Prizes: food, merch, % off, a free non-alcoholic drink, or % off a drink (21+). Never free alcohol (California ABC). Guests must be Melody Rewards members with a name: one entry each.</div>' +
-      '<p class="note">How it works: 10×10 board, up to 20 players × 5 squares. Entries lock at kickoff and the row/column numbers are drawn then. At the end of Q1, halftime, Q3 and the final, the last digit of each team\'s score picks the winning square. Scores come from ESPN automatically.</p>' +
+      '<div class="test" style="background:#2fbf7122;border-color:#2fbf7166;color:#c9f5dc">⚖️ <b>No purchase necessary.</b> Every Rewards member gets <b>1 free square per game</b> (California law: a purchase-only entry would be an illegal lottery, so the free square must always be offered). Each purchase can add 1 more square, up to the per-person cap. No entry fee, no cash or money prizes in or out. Prizes: food, merch, % off, a free non-alcoholic drink, or % off a drink (21+). Never free alcohol (California ABC).</div>' +
+      '<h3>🎟️ +1 Squares ticket (after a purchase)</h3><div class="dc"><p class="note" style="margin-top:0">Scan the guest\'s Rewards card QR, or type the card ID on it (like MLD-4K7Q2). 1 ticket = 1 more square on the next open board. Their free square never needs a ticket.</p>' +
+      '<div class="row"><div style="flex:2"><label>Card ID</label><input id="sqCard" autocapitalize="characters" placeholder="MLD-4K7Q2" maxlength="40"></div><div style="flex:1"><label>Receipt # (optional)</label><input id="sqRcpt" maxlength="24" placeholder="1042"></div></div>' +
+      '<button class="btn" id="sqTix" style="margin-top:8px">🎟️ +1 Squares ticket</button><div class="err" id="sqTMsg" style="margin-top:6px' + (TOK ? ";color:#8ff0bd" : "") + '">' + E(TMSG) + '</div></div>' +
+      '<p class="note">How it works: 10×10 board, up to 20 players × 5 squares each (1 free + up to 4 with purchase). Entries lock at kickoff and the row/column numbers are drawn then. At the end of Q1, halftime, Q3 and the final, the last digit of each team\'s score picks the winning square. Scores come from ESPN automatically.</p>' +
       '<h3>New board</h3><div class="dc"><label>Game (next 3 weeks: Rams, Chargers, 49ers, USC, UCLA, Cal, Stanford)</label><select id="sqGame" style="width:100%;padding:9px;border-radius:10px;border:1px solid var(--edge);background:#081022;color:var(--ink)">' +
       (g.length ? g.map(function (x, i) { return '<option value="' + i + '">' + E(x.title + " · " + when(x.kickoff)) + '</option>'; }).join("") : '<option value="">Loading games…</option>') + '</select>' +
-      '<div class="row" style="margin-top:8px"><div style="flex:1"><label>Players (max)</label><input id="sqMax" type="number" min="2" max="100" value="20"></div><div style="flex:1"><label>Squares each</label><input id="sqPer" type="number" min="1" max="50" value="5"></div></div>' +
+      '<div class="row" style="margin-top:8px"><div style="flex:1"><label>Players (max)</label><input id="sqMax" type="number" min="2" max="100" value="20"></div><div style="flex:1"><label>Max squares per person (1 free + purchases)</label><input id="sqPer" type="number" min="1" max="50" value="5"></div></div>' +
       prizeFields("new", { q1: { kind: "food", text: "Melody Fries" }, q2: { kind: "percent", percent: 10 }, final: { kind: "food", text: "Free Mac & Cheese entrée" } }) +
       '<label class="note" style="display:block;margin-top:6px"><input type="checkbox" id="sqRoll" checked> Unclaimed winning square: prize rolls to the next quarter</label>' +
       '<button class="btn" id="sqCreate" style="margin-top:8px">➕ Create board</button></div>' +
@@ -87,6 +94,16 @@
   }
   function done(r, ok) { MSG = r && r.ok ? (ok || "") : (r && r.reason) || "Didn't work. Try again."; if (r && r.ok) return refresh(); redraw(); }
   function bind(p) {
+    var tb = p.querySelector("#sqTix");
+    if (tb) tb.onclick = function () {
+      var card = p.querySelector("#sqCard").value.trim(), rc = p.querySelector("#sqRcpt").value.trim();
+      if (!card) { TOK = false; TMSG = "Scan or type the guest's Rewards card ID."; redraw(); return; }
+      tb.disabled = true; tb.textContent = "Adding…";
+      call({ op: "ticket", card: card, rcpt: rc }).then(function (r) {
+        TOK = !!(r && r.ok); TMSG = TOK ? "✅ +1 ticket for " + r.member.name + ": " + r.member.tickets + " purchase ticket" + (r.member.tickets === 1 ? "" : "s") + ", up to " + r.member.allowed + " squares on " + r.board.game + ". They pick it in the app (🏈 Squares)." : (r && r.reason) || "Didn't work. Try again.";
+        if (TOK) refresh(); else redraw();
+      });
+    };
     var c = p.querySelector("#sqCreate");
     if (c) c.onclick = function () {
       var gi = p.querySelector("#sqGame").value, gm = (GAMES || [])[+gi]; if (!gm) { MSG = "Pick a game."; redraw(); return; }

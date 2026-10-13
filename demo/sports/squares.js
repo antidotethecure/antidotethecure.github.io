@@ -1,7 +1,10 @@
 /* Sports Bar Package perk: FOOTBALL SQUARES (2026-10). Adds a "🏈 Squares" tab to the scoreboard sheet when the client
-   has a board up. A FREE promotional contest: no paid entry, no purchase necessary, no cash. Prizes are set by the owner in
+   has a board up. A promotional contest with a FREE way in (California Penal Code 319: purchase-only entry would be an illegal
+   lottery): every Rewards member gets 1 FREE square per board, no purchase necessary ("Get my free square"); each purchase can
+   add one more square (staff scan the member's Rewards card in Christian HQ → "+1 Squares ticket"), up to the owner's per-person
+   cap. No paid entry fee, no cash prizes. Prizes are set by the owner in
    the back office (food, merch, % off, a non-alcoholic drink, or % off a drink 21+).
-   How it plays: a 10x10 board per NFL / college game. Rewards members (with a name) claim up to N squares before kickoff,
+   How it plays: a 10x10 board per NFL / college game. Rewards members (with a name) claim their squares before kickoff,
    tapping them or using auto-pick. At kickoff entries lock and the row (home) / column (away) digits are drawn and shown.
    After Q1, halftime, Q3 and the final, the last digit of each team's score picks the winning square; an unclaimed square
    rolls its prize to the next quarter if the owner has rollover on.
@@ -22,7 +25,7 @@
   function loadMock() {
     if (window.SQUARES_MOCK) return Promise.resolve();
     if (mockReady) return mockReady;
-    mockReady = new Promise(function (res) { var s = document.createElement("script"); s.src = (SQ.mockUrl || "../sports/squares-mock.js") + "?v=sq1"; s.onload = res; s.onerror = res; document.head.appendChild(s); });
+    mockReady = new Promise(function (res) { var s = document.createElement("script"); s.src = (SQ.mockUrl || "../sports/squares-mock.js") + "?v=sq2"; s.onload = res; s.onerror = res; document.head.appendChild(s); });
     return mockReady;
   }
   function call(body) {
@@ -34,10 +37,14 @@
   }
   function load() {
     var m = me();
-    return call({ type: "squares_get", member: m ? m.id : "" }).then(function (r) {
+    var q = { type: "squares_get", member: m ? m.id : "" };
+    if (MOCK && m && m.card) { q.card = m.card; q.name = m.name; }   // test mode only: lets Christian HQ (?test=1) find this guest by card ID
+    return call(q).then(function (r) {
       if (!r || !r.ok) return;   // not deployed yet ("unknown type") or offline: keep the tab hidden / keep the last boards
       boards = (r.boards || []).filter(function (b) { return b.status !== "void"; }).sort(function (a, b) { return a.kickoff - b.kickoff; });
-      if (!ready && boards.length) { ready = true; SB.addTab({ id: "squares", label: "🏈 Squares", visible: function () { return boards.length > 0; }, render: render }); }
+      if (!ready && boards.length) { ready = true; SB.addTab({ id: "squares", label: "🏈 Squares", visible: function () { return boards.length > 0; }, render: render });
+        if (window.MelodyGames && SQ.tile !== false) window.MelodyGames.register({ id: "squares", order: 15, icon: "🏈", title: "Football Squares", sub: "1 free square per game for Rewards members. No purchase necessary.", tag: "Free",
+          start: function () { window.MelodyGames.close(); SB.open("squares"); } }); }
       else if (SB.isOpen()) SB.render();
     });
   }
@@ -80,14 +87,18 @@
     if (!boards.length) { box.innerHTML = '<div class="sp-empty"><b>No squares board right now</b>' + esc(SQ.owner || "The bar") + ' posts one for big game days.</div>'; return; }
     boards.forEach(function (b) {
       var n = (b.mine || []).length, pick = Object.keys(sel[b.id] || {}).length, open = b.status === "open";
+      var my = b.my || { have: n, tickets: 0, allowed: 1 }, allowed = Math.max(1, Math.min(b.per, my.allowed || 1)), left = Math.max(0, allowed - n), tk = my.tickets || 0;
       h += '<div class="sp-fx sq-card"><div class="sp-tp">' + statusChip(b) + '<span>' + esc((b.league === "cfb" ? "College" : "NFL") + " · " + H.fmtTime(b.kickoff, true)) + '</span></div>' +
-        '<div class="ev">' + esc(b.game) + '</div><div class="sq-legal">' + esc(b.legal || "Free to play · No purchase necessary") + (b.test ? " · TEST MODE (made-up data)" : "") + '</div>' +
+        '<div class="ev">' + esc(b.game) + '</div><div class="sq-legal">' + esc(b.legal || "No purchase necessary · 1 free square per member per game · extra squares with purchase") + (b.test ? " · TEST MODE (made-up data)" : "") + '</div>' +
         '<div class="sq-prizes">' + Q.map(function (q) { return '<div><small>' + QN[q] + '</small>' + prizeLine(b.prizes[q]) + '</div>'; }).join("") + '</div>' +
-        '<div class="sp-info" style="border:0;padding-top:0"><div>👥 ' + b.entrants + ' of ' + b.max + ' players · ' + b.per + ' squares each' + (m ? ' · <b>you: ' + n + ' of ' + b.per + '</b>' : '') + (b.rollover ? ' · unclaimed prizes roll over' : '') + '</div></div>' +
+        '<div class="sp-info" style="border:0;padding-top:0"><div>👥 ' + b.entrants + ' of ' + b.max + ' players · up to ' + b.per + ' squares each (1 free + purchases)' + (m ? ' · <b>you: ' + n + ' square' + (n === 1 ? '' : 's') + (tk ? ', ' + tk + ' purchase ticket' + (tk === 1 ? '' : 's') : '') + '</b>' : '') + (b.rollover ? ' · unclaimed prizes roll over' : '') + '</div></div>' +
         gridHTML(b) +
-        (open ? (n < b.per ? '<div class="sq-act"><button type="button" class="sp-btn" data-claim="' + esc(b.id) + '"' + (pick ? "" : " disabled") + '>✅ Claim ' + (pick || "") + ' square' + (pick === 1 ? "" : "s") + '</button><button type="button" class="sp-btn sq-alt" data-auto="' + esc(b.id) + '">🎲 Auto-pick ' + (b.per - n) + '</button></div>' +
-          '<p class="sp-cred">' + (m ? "Tap empty squares (up to " + (b.per - n) + " more), then Claim." : "Free for Rewards members: tap Auto-pick or choose squares and you'll be asked to join (free).") + '</p>'
-          : '<p class="sp-cred">✅ You have all ' + b.per + ' squares. Numbers are drawn at kickoff.</p>') : '') +
+        (open ? (!m || n === 0 ? '<div class="sq-act"><button type="button" class="sp-btn" data-free="' + esc(b.id) + '">🎟️ Get my free square' + (pick ? " (the one you picked)" : "") + '</button></div>' +
+            '<p class="sp-cred">' + (m ? "No purchase necessary. Tap an empty square to choose it, or we'll pick one for you." : "Free for Rewards members: 1 free square per game, no purchase necessary. You'll be asked to join (free).") + '</p>'
+          : left > 0 ? '<div class="sq-act"><button type="button" class="sp-btn" data-claim="' + esc(b.id) + '"' + (pick ? "" : " disabled") + '>✅ Claim ' + (pick || "") + ' square' + (pick === 1 ? "" : "s") + '</button><button type="button" class="sp-btn sq-alt" data-auto="' + esc(b.id) + '">🎲 Auto-pick ' + left + '</button></div>' +
+            '<p class="sp-cred">Your purchases added ' + left + ' more square' + (left === 1 ? "" : "s") + ': tap empty squares, then Claim.</p>'
+          : n >= b.per ? '<p class="sp-cred">✅ You have the most squares allowed (' + b.per + '). Numbers are drawn at kickoff.</p>'
+          : '<p class="sp-cred">✅ You\'re in with ' + n + ' square' + (n === 1 ? "" : "s") + '. Want more? Each purchase adds a square (up to ' + b.per + '): ask your server to scan your Rewards card.</p>') : '') +
         winnersHTML(b) + '</div>';
     });
     box.innerHTML = h + '<p class="sp-cred">Row = last digit of the home score, column = away score, at the end of Q1, halftime, Q3 and the final.</p>';
@@ -95,29 +106,33 @@
       el.onclick = function () {
         var bid = el.getAttribute("data-b"), k = +el.getAttribute("data-sq"), b = boards.filter(function (x) { return x.id === bid; })[0];
         if (!b || b.status !== "open" || b.claims[k]) return;
-        var s = sel[bid] = sel[bid] || {}, left = b.per - (b.mine || []).length;
-        if (s[k]) delete s[k]; else { if (Object.keys(s).length >= left) { H.toast("You can have " + b.per + " squares on this board."); return; } s[k] = 1; }
+        var s = sel[bid] = sel[bid] || {}, mm = me(), have = (b.mine || []).length, left = !mm || !have ? 1 : Math.max(0, Math.min(b.per, (b.my && b.my.allowed) || 1) - have);
+        if (s[k]) delete s[k]; else { if (left === 1 && Object.keys(s).length >= 1) { s = sel[bid] = {}; } else if (Object.keys(s).length >= left) { H.toast(left ? "You can pick " + left + " more square" + (left === 1 ? "" : "s") + "." : "Each purchase adds a square: ask your server to scan your Rewards card."); return; } s[k] = 1; }
         render(box, H);
       };
     });
     [].forEach.call(box.querySelectorAll("[data-claim],[data-auto]"), function (el) {
       el.onclick = function () { var bid = el.getAttribute("data-claim") || el.getAttribute("data-auto"); claim(bid, !!el.getAttribute("data-auto"), box, H); };
     });
+    // free square: the one square they picked, or one picked for them (no purchase necessary)
+    [].forEach.call(box.querySelectorAll("[data-free]"), function (el) {
+      el.onclick = function () { var bid = el.getAttribute("data-free"); claim(bid, !Object.keys(sel[bid] || {}).length, box, H, 1); };
+    });
   }
-  function claim(bid, auto, box, H) {
+  function claim(bid, auto, box, H, only) {
     if (busy) return;
     var m = me();
     if (!m || !m.id || !m.name) {
-      if (SQ.join) { H.close(); SQ.join(function () { SB.open("squares"); setTimeout(function () { claim(bid, auto, box, H); }, 400); }); }
+      if (SQ.join) { H.close(); SQ.join(function () { SB.open("squares"); setTimeout(function () { claim(bid, auto, box, H, only); }, 400); }); }
       else H.toast("Join Rewards (free) to play Football Squares.");
       return;
     }
     busy = true;
     var body = { type: "squares_claim", board: bid, member: m.id, name: m.name, dev: dev() };
-    if (auto) body.auto = 99; else body.squares = Object.keys(sel[bid] || {}).map(Number);
+    if (auto) body.auto = only || 99; else body.squares = Object.keys(sel[bid] || {}).map(Number).slice(0, only || 100);
     call(body).then(function (r) {
       busy = false;
-      if (r && r.ok) { sel[bid] = {}; boards = boards.map(function (b) { return b.id === bid ? r.board : b; }); H.toast("🏈 You're in: " + r.got.length + " square" + (r.got.length === 1 ? "" : "s") + ". Numbers are drawn at kickoff."); }
+      if (r && r.ok) { sel[bid] = {}; boards = boards.map(function (b) { return b.id === bid ? r.board : b; }); H.toast("🏈 You're in: " + r.got.length + (only ? " free" : "") + " square" + (r.got.length === 1 ? "" : "s") + ". Numbers are drawn at kickoff."); }
       else { H.toast(esc((r && r.reason) || "Didn't work. Try again.")); if (r && r.locked) load(); }
       SB.render();
     });

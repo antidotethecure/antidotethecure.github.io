@@ -2511,7 +2511,7 @@ window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",regio
     // ?test=1 = offline demo backend (made-up data). Members only: the existing Rewards sign-in, name required.
     squares:{on:true,slug:"melody-bar-grill",owner:"Melody",
       api:function(){ return window.SSAI_CHRISTIAN&&window.SSAI_CHRISTIAN.api; },
-      member:function(){ var m=window.SSAI_GAMEPTS&&window.SSAI_GAMEPTS.member(); return m&&m.id&&m.name?{id:m.id,name:m.name}:null; },
+      member:function(){ var m=window.SSAI_GAMEPTS&&window.SSAI_GAMEPTS.member(); return m&&m.id&&m.name?{id:m.id,name:m.name,card:m.card||""}:null; },
       join:function(cb){ if(window.SSAI_GAMEPTS) window.SSAI_GAMEPTS.join(function(){ if(cb) cb(); }); }}
   },
   points:{unit:"Melody Rewards points",
@@ -2519,7 +2519,7 @@ window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",regio
     award:function(n,label){ var GP=window.SSAI_GAMEPTS; return GP.award(n*GP.cfg.perScore,label); },
     offNote:"🧪 BETA: pick points switch on when Melody turns game rewards on. Picks are just for fun until then."}
 };</script>
-<script src="../sports/teams.js?v=sb1"></script><script src="../sports/sports.js?v=sq2"></script><script src="../sports/squares.js?v=sq1"></script><script src="layout.js?v=ml1"></script><script src="../interim.js?v=co1"></script><script src="../earlybird.js?v=op1"></script><script src="../loyaltycard.js?v=lc1"></script><script src="../locbonus.js?v=lb1"></script>
+<script src="../sports/teams.js?v=sb1"></script><script src="../sports/sports.js?v=sq2"></script><script src="../sports/squares.js?v=sq2"></script><script src="layout.js?v=ml1"></script><script src="../interim.js?v=co1"></script><script src="../earlybird.js?v=op1"></script><script src="../loyaltycard.js?v=lc1"></script><script src="../locbonus.js?v=lb1"></script>
 <script>window.NEARBY={name:"Melody Bar & Grill",pin:"✈️",mount:"#rwhost",spots:[{label:"Westchester",lat:33.9487,lng:-118.3918,q:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"}],offer:"Happy hour is 3–6 daily."};</script>
 <script src="../nearby.js?v=co1"></script>
 <script src="../menu3d.js"></script>

@@ -132,18 +132,10 @@ async function boot() {
       const box = new THREE.Box3().setFromObject(root), c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
       root.position.sub(c); const inner = new THREE.Group(); inner.add(root);
       if (k === "p_shots") addShotGlasses(inner, sz);
-      if (k === "p_toast") { addPlate(inner, sz); new THREE.Box3().setFromObject(inner).getSize(sz); }   // size = plate + toast, so the screen size covers the whole plate
       MODELS[k] = { node: inner, size: sz }; STATUS.loaded++;
     } catch (e) { console.warn("[melody3d] model failed", k, e); }
   }
-  // PICK tilt3 = per-pickup camera tilt override (the toast uses it so the stacked slices and the plate rim both show).
-  // French toast (2026-10-13): the generated GLB is the 3-slice stack with strawberries, butter and syrup; it sits on a real white
-  // china plate built here (lathe profile: flat well, raised rim) so the plate always shows, whatever the image-to-3D kept
-  function addPlate(g, sz) {
-    const R = .64 * Math.max(sz.x, sz.z), H = .07 * R, P = [[0, 0], [R * .6, 0], [R * .64, H * .2], [R * .9, H * .8], [R, H], [R * .985, H * 1.18], [R * .9, H * 1.02], [R * .66, H * .42], [R * .6, H * .3], [0, H * .3]];
-    const geo = new THREE.LatheGeometry(P.map(p => new THREE.Vector2(p[0], p[1])), 48);
-    const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .22, metalness: 0, emissive: 0xc9ccd2, emissiveIntensity: .5, side: THREE.DoubleSide }); mat.userData.keep = 1;
-    const m = new THREE.Mesh(geo, mat); m.position.y = -sz.y / 2 - H * .25; m.castShadow = true; m.receiveShadow = true; g.add(m); }
+  // PICK tilt3 = per-pickup camera tilt override (the French toast uses it so the three stacked slices and the white plate both show)
   // round of shots: the generated GLB is the wooden tray; six glass shot glasses with real golden tequila in them sit on it (3 x 2), lime wedges between
   function addShotGlasses(g, sz) {
     const r = sz.x * .1, h = r * 2.3, top = sz.y / 2 - sz.y * .25;

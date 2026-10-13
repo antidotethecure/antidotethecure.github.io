@@ -89,6 +89,12 @@
   function memberPost(o) {
     o.slug = SLUG; o.restaurant = NAME;
     try { fetch(API, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }).then(function (x) { return x.json(); }).then(function (j) {
+      if (j && j.dup) {   // server: this phone number / email / phone already has a membership here (one per person, one per phone)
+        var dl = mine(), dm = dl[0]; if (!dm || dm.id !== o.id) return;
+        if (j.same && j.member) { rsApply(j); toast("✅ You're already a member here. We kept your original card and points."); }
+        else { toast("📱 That number is already a member. Sign back in to use it on this phone."); openRestore(); }
+        return;
+      }
       if (!j || !j.card || !/^[A-Z]{2,4}-[A-Z0-9]{5}$/.test(j.card)) return;
       var l = mine(), m = l[0]; if (!m || m.id !== o.id || m.card === j.card) return;
       m.card = j.card; save(l); drawJoin(); if (window.SSAI_CARD && SSAI_CARD.refresh) SSAI_CARD.refresh();

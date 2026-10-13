@@ -193,7 +193,9 @@
   }
   function reviewUrl() { var N = window.NEARBY, sp = N && N.spots && N.spots[0]; return EARN.review.url || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(NAME + (sp && sp.q ? " " + sp.q : "")); }
   var lastBonus = 0;   // bonus pts added by the last visit() call, for the toast
-  function earnOnce(m, key, pts, why) { m.earned = m.earned || {}; if (m.earned[key] || !pts) return 0; m.earned[key] = Date.now(); addPts(m, pts, why); tag(m, key.replace(/_\d+$/, "") + "_bonus"); return pts; }
+  // one-time bonus keys live in m.once (m.earned is the lifetime points NUMBER from addPts; older builds kept the keys in m.earned)
+  function onceMap(m) { if (!m.once) m.once = (m.earned && typeof m.earned === "object") ? m.earned : {}; if (typeof m.earned === "object") m.earned = null; return m.once; }
+  function earnOnce(m, key, pts, why) { var o = onceMap(m); if (o[key] || !pts) return 0; o[key] = Date.now(); addPts(m, pts, why); tag(m, key.replace(/_\d+$/, "") + "_bonus"); return pts; }
   function tag(m, k) { m.ledger[0].k = k; (m.ec = m.ec || {})[k] = (m.ec[k] || 0) + 1;
     // bonus points (join, birthday, referral, spin, check-in…) go to the server ledger; game points and interim claims have their own events
     if (SIMPLE && API && !STAFF && m.id && !m.sample && m.ledger[0].pts > 0 && k !== "game_bonus" && /_bonus$|^referral_/.test(k))
@@ -367,6 +369,7 @@
     if (WAL) { migrate(m); wk = W[wk] ? wk : BONUS; m.w[wk] = Math.max(0, (m.w[wk] || 0) + n); m.stars = m.w.bar + m.w.food; l.w = wk; }
     else m.stars = Math.max(0, (m.stars || 0) + n);
     // lifetime counters for the back office (the ledger keeps only the last 40 lines)
+    if (m.earned != null && typeof m.earned === "object") onceMap(m);
     if (m.earned == null) { m.earned = Math.max(0, (m.stars || 0) - (n > 0 ? n : 0)); m.spent = m.spent || 0; }
     if (n > 0) m.earned += n; else if (n < 0) { m.spent = (m.spent || 0) - n; m.nred = (m.nred || 0) + 1; }
     (m.ledger = m.ledger || []).unshift(l); m.ledger = m.ledger.slice(0, 40);
@@ -1284,7 +1287,7 @@
   function copyRef(m) { var L = shareLink(m); (navigator.clipboard ? navigator.clipboard.writeText(L) : Promise.reject()).then(function () { toast("Referral link copied"); }, function () { prompt("Copy your referral link:", L); }); }
   function openEarn() {
     if (earnEl || document.querySelector(".crm-gate,.crm-draw")) return false;
-    var m = mine()[0], T0 = TIERS[0], R = EARN.review, IG = EARN.instagram, app = (R.platform || "app") === "app", ed = (m && m.earned) || {}, yr = new Date().getFullYear();
+    var m = mine()[0], T0 = TIERS[0], R = EARN.review, IG = EARN.instagram, app = (R.platform || "app") === "app", ed = m ? onceMap(m) : {}, yr = new Date().getFullYear();
     earnMark(m ? "m" : "g");
     function B(a, label, hot) { return '<button type="button" data-e="' + a + '"' + (hot ? ' class="hot"' : '') + '>' + label + '</button>'; }
     function row(ic, t, p, sub, btn, done) { return '<div class="crm-er' + (done ? ' done' : '') + '"><span class="ic">' + ic + '</span><span class="tx"><b>' + t + '</b><small>' + sub + '</small></span><span class="pp">' + (done ? '✓ Earned' : p) + '</span>' + (btn && !done ? '<span class="bt">' + btn + '</span>' : '') + '</div>'; }

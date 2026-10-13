@@ -1121,10 +1121,12 @@ $("evsub").textContent="Week of "+MON[new Date(monday).getUTCMonth()]+" "+new Da
 </script>
 <script>/* Simple program (Christian, 2026-10): one balance, the numbers live in window.SSAI_REWARDS at the top of this page.
    No split wallets, visit levels, tokens, daily spin or welcome voucher (see crm.js SIMPLE). */
-window.CRM_CFG={name:"Nalu Vida",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Ride the Nalu"};</script>
-<script src="../crm.js?v=rs2"></script><script src="../interim.js?v=op1"></script><script src="../earlybird.js?v=op1"></script><script src="../loyaltycard.js?v=lc1"></script>
+window.CRM_CFG={name:"Nalu Vida",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Ride the Nalu",customerOnly:true};
+/* CUSTOMER-ONLY (2026-10-13): live customer app, no owner view / manager log / sample players / "Demo:" notes. Owner tools = Christian HQ. */
+window.SSAI_CUSTOMER_ONLY=true;</script>
+<script src="../crm.js?v=co1"></script><script src="../interim.js?v=co1"></script><script src="../earlybird.js?v=op1"></script><script src="../loyaltycard.js?v=lc1"></script>
 <script>window.NEARBY={name:"Nalu Vida",pin:"🏄",mount:"#rwhost",spots:[{label:"Venice Pier",lat:33.9779,lng:-118.4669,q:"1 Washington Blvd, Venice, CA 90292"}],offer:"Happy hour Mon–Fri 3–6 PM and 10 PM–close, dine-in."};</script>
-<script src="../nearby.js"></script>
+<script src="../nearby.js?v=co1"></script>
 <script src="../gamelock.js?v=ml1"></script>
 <script>document.getElementById("arrive-play").addEventListener("click",function(){setTimeout(function(){var b=document.querySelector(".nv-pick button");if(b)b.animate&&b.animate([{transform:"scale(1)"},{transform:"scale(1.08)"},{transform:"scale(1)"}],{duration:600,iterations:2});},700);});</script>
 <script>
@@ -1249,7 +1251,7 @@ window.SPECIALS=[
  {id:"cinco",holiday:"cinco",title:"Cinco on the Pier",desc:"Baja Blaze Chicken Tacos + Tostadas de la Tierra, and 20% off Nalu Margaritas (21+).",item:"Baja Blaze Chicken Tacos",start:"05-01",end:"05-05"},
  {id:"july4",holiday:"july4",title:"Fourth on the Pier",desc:"Smash-N-Stack Burger + Jungle Fries, then fireworks over the water.",item:"Smash-N-Stack Burger",start:"07-01",end:"07-04"}
 ];</script>
-<script src="../specials.js"></script>
+<script src="../specials.js?v=co1"></script>
 <script src="../seasons/seasons.js?v=20261013a" defer></script>
 <script src="../poweredby.js?v=20261013a" defer></script>
 </body>

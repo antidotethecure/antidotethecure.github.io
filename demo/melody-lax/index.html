@@ -232,17 +232,18 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
   <img class="logo" src="img/logo.png" alt="Melody Bar &amp; Grill" width="305" height="145">
   <div class="tag" id="greet">The closest bar to LAX</div>
   <p>9132 S Sepulveda Blvd · Westchester · since 1952</p>
-  <div class="btns">
-    <a class="btn hot" href="#play">✈️ Play &amp; win</a>
-    <a class="btn wine" href="#games">🎲 Games</a>
-    <a class="btn" href="#seat">🪑 Order</a>
-    <a class="btn" href="#landed">🛬 Just landed</a>
-    <a class="btn" href="#drinks">🍸 Drinks</a>
-    <a class="btn" href="#food">🍽️ Food</a>
-  </div>
-  <div id="sp-ticker"></div>
 </header>
 
+<nav id="mtabs" aria-label="Sections"><div class="mt-row">
+  <a href="#sec-sports" data-tab="sports">📺 Sports</a><a href="#sec-games" data-tab="games">✈️ Games</a><a href="#sec-trivia" data-tab="trivia">🎤 Trivia</a><a href="#sec-members" data-tab="members">⭐ Members</a><a href="#sec-menu" data-tab="menu">🍽️ Menu</a>
+</div></nav>
+
+<section class="msec" id="sec-sports" data-tab="sports">
+<h2 id="sports"><small>Live · LA &amp; California teams</small>Today's games</h2>
+<div id="spcar" aria-live="polite"></div>
+</section>
+
+<section class="msec" id="sec-games" data-tab="games">
 <h2 id="play"><small>Play &amp; earn points</small>Fly the Melody approach</h2>
 <p class="sub">A night dogfight over LA. <b>Campaign:</b> 10 levels from LAX over Westchester, the stadium, the hills and the coast, each a little harder, with six bosses (an Army gunship, the Super Jet, a big jet and its escorts, a rocket ship, an army base and a final flock of white birds), then land back at LAX. <b>Survival:</b> no finish line, it just keeps getting harder: how long can you last? Catch Melody's food as it floats by. Drag anywhere on the game and the plane glides to your finger. Prefer a calm flight? Pause and turn combat off. <b>BETA:</b> weekly prizes switch on soon; the boards are live now.</p>
 <div class="gamebox">
@@ -279,15 +280,39 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 <div id="champs" data-game="melody" data-me="melody-board" data-prizes="off" data-title="Campaign · weekly champion"></div>
 <div data-champs data-game="melody-survival" data-unit="time" data-prizes="off" data-title="Survival · longest flight"></div><script src="../champs.js?v=lv1"></script>
 
-<h2 id="games"><small>Games Pack · play at the table</small>Melody Games</h2>
+</section>
+
+<section class="msec" id="sec-trivia" data-tab="trivia">
+<h2 id="games"><small>Trivia &amp; table games</small>Melody Games</h2>
 <p class="sub">Live LA scores, trivia, sports trivia, Truth or Dare and the daily Melody Word. Play solo or pass the phone around the table.</p>
 <div id="gameshost"></div>
+
+</section>
 
 <div id="fromnalu" style="display:none"></div>
 <script>(function(){ var q=new URLSearchParams(location.search); if(q.get("from")!=="nalu") return; var c=(q.get("deal")||"").replace(/[^A-Z0-9-]/gi,"").slice(0,16);
   var d=document.createElement("div"); d.style.cssText="position:fixed;left:12px;right:12px;top:calc(56px + env(safe-area-inset-top,0px));z-index:90;max-width:520px;margin:0 auto;padding:12px 14px;border-radius:14px;background:#0b1220;border:1px solid #f0d375;color:#fbf1de;box-shadow:0 10px 40px #000a;font:600 14px/1.4 system-ui";
   d.innerHTML="✈️ <b>Welcome from Nalu Vida!</b> Same owners, right by LAX. Melody Rewards has its own points balance: join free below.<div style='font-size:12px;opacity:.8'>9132 S Sepulveda Blvd · tap to close</div>";
   d.onclick=function(){ d.remove(); }; document.body.appendChild(d); })();</script>
+<section class="msec" id="sec-members" data-tab="members">
+<h2 id="rewards"><small>Melody Rewards · free to join</small>Become a member, get your gold card</h2>
+<p class="sub">Join in 10 seconds: earn points on every check and from the games, and carry your gold Melody Rewards card on your phone.</p>
+<div id="rwhost"></div>
+<div id="lbhost"></div>
+
+
+<h2 id="landed"><small>Melody's "Just Landed" deal</small>Just got off a flight? ✈️</h2>
+<p class="sub">Melody is 5 minutes from LAX. One simple offer for everyone who just flew in.</p>
+<div class="seat" id="landbox">
+  <div style="text-align:center;padding:4px 0 2px"><div style="font-size:30px">✈️</div><b id="landoffer" style="display:block;color:var(--gold2);font-family:var(--punch);font-size:26px;letter-spacing:.02em">Just Landed</b>
+    <div class="now" id="landnote" style="margin:4px 0 10px"></div>
+    <button type="button" class="btn hot" id="landgo" style="justify-content:center">🛬 I just landed</button></div>
+  <div class="now" id="landout"></div>
+</div>
+
+</section>
+
+<section class="msec" id="sec-menu" data-tab="menu">
 <h2 id="seat"><small>Order from your phone</small>Where are you sitting?</h2>
 <p class="sub">Pick your spot and your order goes to the right place. Scanned a table code? It's already picked.</p>
 <div class="seat">
@@ -300,15 +325,6 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
   <div class="now" id="seatnow">Not picked yet.</div>
 </div>
 
-<h2 id="landed"><small>Melody's "Just Landed" deal</small>Just got off a flight? ✈️</h2>
-<p class="sub">Melody is 5 minutes from LAX. One simple offer for everyone who just flew in.</p>
-<div class="seat" id="landbox">
-  <div style="text-align:center;padding:4px 0 2px"><div style="font-size:30px">✈️</div><b id="landoffer" style="display:block;color:var(--gold2);font-family:var(--punch);font-size:26px;letter-spacing:.02em">Just Landed</b>
-    <div class="now" id="landnote" style="margin:4px 0 10px"></div>
-    <button type="button" class="btn hot" id="landgo" style="justify-content:center">🛬 I just landed</button></div>
-  <div class="now" id="landout"></div>
-</div>
-
 <div class="menuonly" id="menuonly">📋 Browse the menu here. Order and pay with your server, and you still earn points on every check.</div>
 <h2 id="drinks"><small>Tap a drink to pour it</small>Drinks</h2>
 <p class="sub">Happy hour 3–6 daily · $6 margaritas on Tuesdays.</p>
@@ -318,10 +334,9 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 <nav class="chips" id="chips" aria-label="Menu sections"></nav>
 <div id="menu"></div>
 <div id="foodhost"></div>
+<div id="buildhost"></div>
 
-<h2 id="rewards"><small>Melody Rewards</small>Earn points, get rewards</h2>
-<div id="rwhost"></div>
-<div id="lbhost"></div>
+</section>
 
 <h2 id="visit"><small>Come through</small>Visit Melody</h2>
 <div class="info">
@@ -339,7 +354,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 <div id="instafeed"></div>
 <script>window.INSTA_FEED={"handle":"melodylax","posts":["https://www.instagram.com/reel/DeSEiI5Rrlj/","https://www.instagram.com/reel/DeKcmQAPukY/","https://www.instagram.com/reel/DeIXlEsP8-s/","https://www.instagram.com/reel/DeBGSrkE4qe/","https://www.instagram.com/reel/Dd_2K6FA-t2/","https://www.instagram.com/reel/Dd-c43QT44B/"],"theme":{"card":"var(--panel)","ink":"var(--ink)","accent":"var(--wine2)","edge":"var(--edge)"}}; /* posts = snapshot 2026-10-10; live:{provider:"behold",id:"..."} turns on auto-updating, see ../instafeed.js */</script>
 <script src="../instafeed.js" defer></script>
-<footer><a href="rules.html">Rewards &amp; game rules (draft)</a></footer>
+<footer><a href="rules.html">Rewards &amp; game rules (draft)</a><br>Food prices from Melody's menu · drink prices and menu photos are previews until Melody signs off</footer>
 </div>
 
 <div id="obar"><button type="button" id="obtn"><span><span class="n" id="ocount">0</span> &nbsp;<span id="oseat">Review order</span></span><span id="ototal">$0.00</span></button></div>
@@ -2484,7 +2499,7 @@ window.SSAI_CUSTOMER_ONLY=true;</script>
 <link rel="stylesheet" href="../sports/sports.css?v=sb1">
 <script>/* SPORTS BAR PACKAGE (demo/sports/README.md): Melody = install #1, LA/California teams. Perks text stays empty until
    Christian sets a real deal: an empty watchParty.text hides the banner (no made-up deals). */
-window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",region:"la",ticker:"#sp-ticker",
+window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",region:"la",   /* no ticker: the Today's games carousel (layout.js) replaces it */
   leagues:["mlb","nfl","nba","nhl","mls","wnba","cfb","cbb","ufc"],
   theme:{bg:"var(--sky)",panel:"var(--panel)",edge:"var(--edge)",accent:"var(--gold)",accent2:"var(--gold2)",ink:"var(--ink)",dim:"var(--dim)",onAccent:"#1a1405",display:"var(--display)",body:"var(--body)",punch:"var(--punch)"},
   fightNight:{url:"../sports/events.json"},
@@ -2498,12 +2513,12 @@ window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",regio
     award:function(n,label){ var GP=window.SSAI_GAMEPTS; return GP.award(n*GP.cfg.perScore,label); },
     offNote:"🧪 BETA: pick points switch on when Melody turns game rewards on. Picks are just for fun until then."}
 };</script>
-<script src="../sports/teams.js?v=sb1"></script><script src="../sports/sports.js?v=sb1"></script><script src="../interim.js?v=co1"></script><script src="../earlybird.js?v=op1"></script><script src="../loyaltycard.js?v=lc1"></script><script src="../locbonus.js?v=lb1"></script>
+<script src="../sports/teams.js?v=sb1"></script><script src="../sports/sports.js?v=ml1"></script><script src="layout.js?v=ml1"></script><script src="../interim.js?v=co1"></script><script src="../earlybird.js?v=op1"></script><script src="../loyaltycard.js?v=lc1"></script><script src="../locbonus.js?v=lb1"></script>
 <script>window.NEARBY={name:"Melody Bar & Grill",pin:"✈️",mount:"#rwhost",spots:[{label:"Westchester",lat:33.9487,lng:-118.3918,q:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"}],offer:"Happy hour is 3–6 daily."};</script>
 <script src="../nearby.js?v=co1"></script>
 <script src="../menu3d.js"></script>
 <script src="realphotos.js?v=rp2"></script>
-<script>window.BUILDER={mode:"plate",accent:"mac & cheese",name:"Melody",img:"img/build/",fire:"img/game/flame.webp",mount:"#rewards",
+<script>window.BUILDER={mode:"plate",accent:"mac & cheese",name:"Melody",img:"img/build/",fire:"img/game/flame.webp",mount:"#buildhost",
   base:0,fireLabel:"Bake it",fireBusy:"Baking the crust",baseLine:"Creamy fusilli's in. Load it up.",
   lines:["That's cheesy.","Oh that's a Melody mac.","Load it up.","Chef's kiss.","Now we're talking."],
   spots:[[0,-.18,.3],[.18,.1,.28],[-.18,.12,.28],[.05,.26,.26],[-.22,-.1,.26],[.24,-.14,.26],[0,.02,.28]],

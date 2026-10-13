@@ -172,7 +172,7 @@
   function due() { var l = +lsGet(LAST) || 0; return Date.now() - l > WEEK; }
   function busy() {
     return inRun || !!(W.Halftime && W.Halftime.active) || !!(W.GamePause && W.GamePause.paused) ||
-      !!D.querySelector(".gm-sheet.on, .a2hs.on, .ht.on, .crm-ov.on") || D.visibilityState === "hidden";
+      !!D.querySelector(".gm-sheet.on, .a2hs.on, .ht.on, .crm-ov.on, #mg-ov.on, #sp-ov.on") || D.visibilityState === "hidden";
   }
   function auto(reason, delay) {
     if (!available() || !due() || pending) return;

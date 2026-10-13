@@ -302,6 +302,8 @@ async function init(A) {
   const body = new THREE.Group(); lift.add(body);
   const boardG = new THREE.Group(); scene.add(boardG);
   const board = makeBoard(); boardG.add(board);
+  // the board always draws under the rider: it renders first and is pushed back in depth, so his feet never sink into the deck
+  board.traverse(o => { if (o.isMesh) { o.renderOrder = -1; const ms = Array.isArray(o.material) ? o.material : [o.material]; ms.forEach(m => { m.polygonOffset = true; m.polygonOffsetFactor = 2; m.polygonOffsetUnits = 2; }); } });
   let mixer = null, act = {}, skinMats = [], bones = {}, marks = [];
   if (gSurf) {
     const m = gSurf.scene; fitHeight(m, 66); body.add(m);
@@ -569,7 +571,10 @@ async function init(A) {
     // ---- entities ----
     const seen = new Set();
     G.ents.forEach(e => {
-      if (e.t === "pier" || e.t === "brk" || e.t === "plane" || e.t === "toss" || e.t === "fish" || e.t === "drop" || e.t === "harpoon" || e.t === "ski") {
+      if (e.t === "pier" || e.t === "brk" || e.t === "plane" || e.t === "toss" || e.t === "fish" || e.t === "drop" || e.t === "harpoon" || e.t === "ski" || e.t === "sub" || e.t === "sharp" || e.t === "qfin") {   // (drawn on the 2D overlay)
+        if (e.t === "qfin") { foamDot(e.x, sy(e.yw), 16, .5); poke(e.x, sy(e.yw), -.4, 6); }
+        if (e.t === "sub" && e.st !== "peri") { foamDot(e.x, sy(e.yw), 40, .45); poke(e.x, sy(e.yw), -1.2, 22); }
+        if (e.t === "sharp") foamDot(e.x, sy(e.yw) + 10, 5, .5);
         if (e.t === "fish" && !e.air) foamDot(e.x, sy(e.yw), 12, .5, 1);
         if (e.t === "ski") { const d = e.vx > 0 ? 1 : -1; for (let k = 1; k < 6; k++) foamDot(e.x - d * (20 + k * 14), sy(e.yw), 6 + k * 2, .5); }
         return; }
@@ -669,7 +674,7 @@ async function init(A) {
   function underwater(on) {
     if (on === uwOn) return; uwOn = on;
     uwMats().forEach(m => { m.depthTest = !on; m.transparent = on; m.opacity = on ? .55 : 1; if (!m.userData.cU) m.userData.cU = m.color.clone(); if (on) m.color.copy(m.userData.cU).multiply(uwTint); else m.color.copy(m.userData.cU); m.needsUpdate = true; });
-    rig.traverse(o => { if (o.isMesh) o.renderOrder = on ? .5 : 0; }); boardG.traverse(o => { if (o.isMesh) o.renderOrder = on ? .5 : 0; });
+    rig.traverse(o => { if (o.isMesh) o.renderOrder = on ? .5 : 0; }); boardG.traverse(o => { if (o.isMesh) o.renderOrder = on ? .4 : -1; });   // (the board still draws just before the rider)
   }
   function syncSurfer(dt) {
     const ph = G.phase, x = G.x, y = A.sy(G.yw), m = G.surfer === "m";
@@ -713,11 +718,12 @@ async function init(A) {
     if (mixer) mixer.update(dt);
     // lean into turns (weight shift), pocket bob
     const lean = Math.max(-.55, Math.min(.55, G.vx / 380)), bob = ph === "ride" ? Math.sin(G.t * 2.3 + G.yw * .018) * 1.2 : 0;
-    const sw = swellH(x, y); P(rig, x, y, h - sink + bob + sw); rig.rotation.set(0, yaw, 0);
+    const sw = swellH(x, y), sinkB = sink * (prone ? 1 : .6);
+    P(rig, x, y, h - Math.min(sink, sinkB) + bob + sw + 1.2); rig.rotation.set(0, yaw, 0);   // feet on the deck (+1.2 = deck thickness), never under it
     let spin = 0, flip = 0; const tk = G.trick; if (tk) { const f = tk.t / tk.dur; if (tk.k === "spin") spin = f * Math.PI * 2; else flip = f * Math.PI * 2; }
     let wipeSpin = 0; if (G.wipe > 0) wipeSpin = (1 - G.wipe / .9) * Math.PI * 2.4;
     if (ph === "death" && G.deathCause === "wave") wipeSpin = G.deathT * 6;
-    lift.rotation.set(flip, spin + wipeSpin, lean * .5 * (ph === "ride" ? 1 : 0));
+    lift.rotation.set(flip, spin + wipeSpin, lean * (ph === "ride" ? 1.05 : 0));   // riding: rolls well onto the rail, carving the face
     body.position.set(0, 3.4 - 9.5 * prone, 9 * (1 - prone) * (1 - carry) - 4 * prone); body.rotation.set(0, 0, 0);
     // the board: under the chest (paddling), under the feet (riding), under the arm (running), tumbling away (wipeout)
     if (carry > .5) {   // tucked under the right arm, nose forward, deck against the body
@@ -727,7 +733,7 @@ async function init(A) {
       boardG.position.y += Math.abs(Math.sin(G.t * 14)) * (ph === "swim" ? 0 : 1.2);
     } else {
       rig.updateMatrixWorld(true); lift.updateMatrixWorld(true);
-      boardG.position.set(x, h - sink * (prone ? 1 : .6) + bob + sw, y * K); boardG.quaternion.copy(lift.getWorldQuaternion(boardQ));
+      boardG.position.set(x, h - sinkB + bob + sw, y * K); boardG.quaternion.copy(lift.getWorldQuaternion(boardQ));
       boardG.rotateY(Math.PI);
       if (fallW > .3 && ph !== "death") { boardG.position.x += Math.sin(wipeSpin) * 30; boardG.rotateZ(wipeSpin * 1.3); boardG.position.y += Math.abs(Math.sin(wipeSpin)) * 20; }
     }

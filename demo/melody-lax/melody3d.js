@@ -122,7 +122,7 @@ async function boot() {
   const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
   const BASE = new URL("3d/", location.href).href, MODELS = {};
   const FILES = { plane: "plane.glb", jet: "jet.glb", ufo: "ufo.glb", cop0: "heli_blue.glb", cop1: "heli_black.glb",
-    p_wings: "p_wings.glb?v=ag1", p_toast: "p_toast.glb", p_omelette: "p_omelette.glb", p_marg: "p_marg.glb?v=ag1", p_bottle: "p_bottle.glb?v=ag1", p_shots: "p_shots.glb?v=ag1", p_mic: "p_mic.glb", p_mac: "p_mac.glb" };
+    p_wings: "p_wings.glb?v=ag1", p_toast: "p_toast.glb", p_omelette: "p_omelette.glb", p_marg: "p_marg.glb?v=ag1", p_bottle: "p_bottle.glb?v=ag1", p_shots: "p_shots.glb?v=ag1", p_mic: "p_mic.glb", p_mac: "p_mac.glb", p_burger: "p_burger.glb?v=ag1" };
   async function loadModel(k) {
     try {
       const g = await loader.loadAsync(BASE + FILES[k]); const root = g.scene;

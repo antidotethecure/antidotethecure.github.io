@@ -62,6 +62,8 @@ details{border-top:1px solid var(--edge);padding:9px 0}details:first-of-type{bor
 [hidden]{display:none!important}
 </style></head><body class="m"><main id="app"></main>
 <script src="../../demo/christian-live.js?v=lb2"></script>
+<script src="voice/lines.js?v=1"></script>
+<script src="voice/player.js?v=1"></script>
 <script>
 (function(){
 "use strict";
@@ -282,7 +284,7 @@ function render(){ var y=window.scrollY; document.documentElement.lang=LANG; doc
   "<div class='card'><label for='nm' style='font-weight:800'>"+L(W.yourName)+"</label><div class='name' style='margin-top:6px'><input id='nm' maxlength='24' autocomplete='given-name' value='"+esc(nm())+"'><button class='btn' id='nmSave'>"+L(W.save)+"</button></div><p class='note' style='margin:6px 0 0'>"+L(W.nameHint)+"</p></div>"+
   "<nav class='nav' aria-label='Sections'>"+W.nav.map(function(x){ return "<a href='#"+x[0]+"'>"+L(x[1])+"</a>"; }).join("")+"</nav>"+
   guests()+deals()+tutorials()+say()+faq()+games()+quiz()+"<p class='note' style='margin-top:24px'>"+L(W.install)+"</p>";
- window.scrollTo(0,y); tickDemo(); showLk(); }
+ window.scrollTo(0,y); tickDemo(); showLk(); if(window.StaffVoice) StaffVoice.decorate(LANG); }
 var $app=document.getElementById("app"), dpEnd=0;
 function tickDemo(){ var c=document.getElementById("dpClock"), d=document.getElementById("dpCd"), p=document.getElementById("demoPass"); if(!c) return;
  var now=new Date(); c.textContent=now.toLocaleDateString(LANG==="es"?"es-US":"en-US",{weekday:"short",month:"short",day:"numeric"})+" · "+now.toLocaleTimeString(LANG==="es"?"es-US":"en-US",{hour:"numeric",minute:"2-digit",second:"2-digit"});

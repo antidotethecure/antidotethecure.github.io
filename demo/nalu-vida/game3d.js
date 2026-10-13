@@ -431,7 +431,7 @@ async function init(A) {
   })();
 
   /* ------------------------------------------------------------ particles (splash, spray, bubbles, debris) + the red cloud ---------- */
-  const NP = 900, pPos = new Float32Array(NP * 3), pVel = new Float32Array(NP * 3), pLife = new Float32Array(NP), pMax = new Float32Array(NP), pSize = new Float32Array(NP), pCol = new Float32Array(NP * 3), pA = new Float32Array(NP); let pHead = 0;
+  const NP = 1600, pPos = new Float32Array(NP * 3), pVel = new Float32Array(NP * 3), pLife = new Float32Array(NP), pMax = new Float32Array(NP), pSize = new Float32Array(NP), pCol = new Float32Array(NP * 3), pA = new Float32Array(NP); let pHead = 0;
   const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3)); pGeo.setAttribute("size", new THREE.BufferAttribute(pSize, 1)); pGeo.setAttribute("col", new THREE.BufferAttribute(pCol, 3)); pGeo.setAttribute("alpha", new THREE.BufferAttribute(pA, 1));
   const pMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uPx: { value: 1 } },
     vertexShader: "attribute float size,alpha;attribute vec3 col;uniform float uPx;varying float vA;varying vec3 vC;void main(){vA=alpha;vC=col;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);gl_PointSize=size*uPx;}",
@@ -547,16 +547,18 @@ async function init(A) {
       for (let k = 0; k < 6; k++) foamDot(wv.pd > 0 ? wv.px - 30 - k * 40 : wv.px + 30 + k * 40, ry + 8 + Math.sin(G.t * 3 + k) * 4, 26, .5);   // foam rolling off the whitewater
       // the lip: thrown from the crest, arcing forward and down onto the landing spot → a burst of spray and foam
       const crestSy = ry + 12 - 74 / K, landX = wv.px + wv.pd * 2, H0 = u.uH.value;
-      for (let k = 0; k < 3; k++) emit(wv.px - wv.pd * rnd(0, 14), crestSy, H0 * rnd(.85, 1), wv.pd * rnd(-10, 30), rnd(0, 60), rnd(90, 150), rnd(.35, .55), rnd(3, 6), FOAMC);
-      if (Math.random() < .55) for (let k = 0; k < 4; k++) { const a = rnd(0, 6.28), sp = rnd(30, 110); emit(landX + rnd(-8, 8), ry + rnd(-4, 6), 4, Math.cos(a) * sp - wv.pd * 30, rnd(110, 230), Math.sin(a) * sp * .5, rnd(.4, .75), rnd(4, 8), WHITE); }
+      for (let k = 0; k < 6; k++) emit(wv.px - wv.pd * rnd(0, 14), crestSy, H0 * rnd(.85, 1.05), wv.pd * rnd(-10, 40), rnd(0, 80), rnd(90, 170), rnd(.35, .6), rnd(3, 7), FOAMC);
+      if (Math.random() < .85) for (let k = 0; k < 7; k++) { const a = rnd(0, 6.28), sp = rnd(30, 130); emit(landX + rnd(-10, 10), ry + rnd(-4, 6), 4, Math.cos(a) * sp - wv.pd * 30, rnd(130, 300), Math.sin(a) * sp * .5, rnd(.45, .85), rnd(4, 9), WHITE); }
+      // every ~0.7 s the lip comes down hard: an explosion of spray, a ring of foam and a dent in the water
+      crashT -= 1 / 60; if (crashT <= 0) { crashT = rnd(.55, .85); for (let k = 0; k < 16; k++) { const a = rnd(0, 6.28), sp = rnd(60, 190); emit(landX + rnd(-12, 12), ry + rnd(-4, 8), 6, Math.cos(a) * sp - wv.pd * 40, rnd(200, 380), Math.sin(a) * sp * .6, rnd(.5, .95), rnd(5, 10), WHITE); } foamRing(landX, ry + 4, 34, 12, .8, 4); foamPatch(landX, ry + 6, rnd(22, 34), rnd(2.2, 3.2), -wv.pd * 10); poke(landX, ry, -5, 26); }
       if (Math.random() < .25) foamPatch(landX - wv.pd * rnd(0, 30), ry + rnd(-6, 10), rnd(14, 26), rnd(1.6, 2.6), -wv.pd * rnd(4, 14));
-      poke(landX, ry, -2.2, 14);
+      poke(landX, ry, -3, 16);
       if (!close) foamDot(wv.px - wv.pd * 6, ry, 20, .45); }
     else rideWave.visible = false;
     let wi = 0;
     G.ents.forEach(e => { if (e.t !== "brk" || wi >= wallPool.length) return; const m = wallPool[wi++], y = sy(e.yw); m.visible = true; const u = m.material.uniforms;
       u.uT.value = G.t + e.ph; u.uCz.value = (y + 22) * K - 34;
-      if (Math.random() < .6) emit(rnd(-20, W + 20), y + 10, 18, rnd(-20, 20), rnd(40, 120), rnd(60, 140), rnd(.3, .55), rnd(3, 6), FOAMC);
+      for (let k = 0; k < 2; k++) emit(rnd(-20, W + 20), y + 10, 18, rnd(-20, 20), rnd(60, 170), rnd(60, 160), rnd(.35, .6), rnd(3, 7), FOAMC); if (Math.random() < .2) { const cx0 = rnd(0, W); for (let k = 0; k < 8; k++) emit(cx0 + rnd(-10, 10), y + 14, 10, rnd(-80, 80), rnd(160, 300), rnd(-20, 60), rnd(.45, .8), rnd(4, 8), WHITE); poke(cx0, y + 20, -3, 18); }
       if (Math.random() < .12) foamPatch(rnd(0, W), y + 30, rnd(14, 24), rnd(1.2, 2), 0); u.uPx.value = -9999; u.uFade.value = 1; fx.fillStyle = "rgba(255,0,0,.3)"; const a = fPos(-40, y + 18), b = fPos(W + 40, y + 44); fx.fillRect(a[0], a[1], b[0] - a[0], b[1] - a[1]); });
     if (G.phase === "death" && G.deathCause === "wave" && wi < wallPool.length) { const m = wallPool[wi++], f = Math.min(1, G.deathT / 1.2), y = sy(G.deathYw); m.visible = true; const u = m.material.uniforms; u.uT.value = G.t; u.uCz.value = (y - 160 + f * 190) * K - 34; u.uFade.value = Math.min(1, 1.6 - G.deathT * .5); }
     for (; wi < wallPool.length; wi++) wallPool[wi].visible = false;
@@ -663,10 +665,10 @@ async function init(A) {
   const boardQ = new THREE.Quaternion(), tmpE = new THREE.Euler();
   function wset(a, w) { if (a) a.setEffectiveWeight(w); }
   // duck-diving: the surfer and board show through the water, tinted blue, drawn before the whitewater passing over
-  let uwOn = false; const uwMats = () => { const l = skinMats.slice(); boardG.traverse(o => { if (o.isMesh) l.push(o.material); }); return l; };
+  let uwOn = false, uwTint = new THREE.Color(.45, .75, 1), crashT = .5, duckPrev = 0, duckPeak = 0; const uwMats = () => { const l = skinMats.slice(); boardG.traverse(o => { if (o.isMesh) l.push(o.material); }); return l; };
   function underwater(on) {
     if (on === uwOn) return; uwOn = on;
-    uwMats().forEach(m => { m.depthTest = !on; m.transparent = on; m.opacity = on ? .55 : 1; if (!m.userData.cU) m.userData.cU = m.color.clone(); if (on) m.color.copy(m.userData.cU).multiply(new THREE.Color(.45, .75, 1)); else m.color.copy(m.userData.cU); m.needsUpdate = true; });
+    uwMats().forEach(m => { m.depthTest = !on; m.transparent = on; m.opacity = on ? .55 : 1; if (!m.userData.cU) m.userData.cU = m.color.clone(); if (on) m.color.copy(m.userData.cU).multiply(uwTint); else m.color.copy(m.userData.cU); m.needsUpdate = true; });
     rig.traverse(o => { if (o.isMesh) o.renderOrder = on ? .5 : 0; }); boardG.traverse(o => { if (o.isMesh) o.renderOrder = on ? .5 : 0; });
   }
   function syncSurfer(dt) {
@@ -691,7 +693,15 @@ async function init(A) {
       if (G.deathCause === "wave" && t > 1.1) { rig.visible = boardG.visible = false; return; }
       if (!G.deathPaddle) { fall = 1; bal = 0; } sink = Math.min(1, t * 1.5) * 20; }
     const duck = ph === "swim" && G.duck > 0 ? Math.sin(Math.min(1, (.8 - G.duck) / .8) * Math.PI) : 0;
-    if (duck) { sink = duck * 30; if (Math.random() < .6) emit(x + rnd(-14, 14), y + rnd(-20, 20), 2, rnd(-6, 6), rnd(30, 60), rnd(-6, 6), rnd(.4, .7), rnd(2, 3.5), [.8, .95, 1]); }
+    if (duck) { sink = duck * 48;   // deeper dive: he goes well under the surface
+      for (let k = 0; k < 2; k++) emit(x + rnd(-14, 14), y + rnd(-22, 22), 1, rnd(-8, 8), rnd(40, 90), rnd(-8, 8), rnd(.5, .9), rnd(2, 4), [.85, .97, 1]);   // bubble trail rising
+      // the deeper he is, the darker and bluer he looks and the more the water hides him
+      uwTint.setRGB(.75 - .45 * duck, .9 - .35 * duck, 1); uwMats().forEach(m => { if (uwOn && m.userData.cU) { m.color.copy(m.userData.cU).multiply(uwTint); m.opacity = .7 - .35 * duck; } }); }
+    // splash going in, and again popping back up
+    if (duck > 0 && duckPrev === 0) { for (let k = 0; k < 18; k++) { const a = rnd(0, 6.28), sp = rnd(40, 140); emit(x + rnd(-8, 8), y + rnd(-6, 6), 4, Math.cos(a) * sp, rnd(150, 290), Math.sin(a) * sp * .6, rnd(.45, .8), rnd(4, 8), WHITE); } foamRing(x, y, 30, 12, .85, 4); poke(x, y, -5, 22); }
+    if (duck > duckPeak) duckPeak = duck;
+    if (duckPeak > .9 && duck < .3 && duck > 0) { duckPeak = 0; for (let k = 0; k < 12; k++) { const a = rnd(0, 6.28), sp = rnd(30, 110); emit(x + rnd(-8, 8), y - 30 + rnd(-6, 6), 4, Math.cos(a) * sp, rnd(120, 240), Math.sin(a) * sp * .6, rnd(.4, .7), rnd(3, 7), WHITE); } foamRing(x, y - 30, 22, 9, .7, 3); poke(x, y - 30, -3, 18); }
+    if (!duck) duckPeak = 0; duckPrev = duck;
     // washed: tumbling in the foam, pushed under, then he pops back up
     if (G.wipe > 0 && ph === "ride") { const w = 1 - G.wipe / .9; sink = Math.max(sink, Math.sin(w * Math.PI) * 16); foamDot(x, y, 46, .8); if (Math.random() < .5) emit(x + rnd(-20, 20), y + rnd(-10, 10), 4, rnd(-60, 60), rnd(60, 160), rnd(-30, 30), rnd(.4, .7), rnd(4, 8), FOAMC); }
     underwater(duck > .25);
@@ -723,7 +733,7 @@ async function init(A) {
     }
     // damage: redder skin, bruise patches, bandage wraps (stepped back by the beer catch)
     const dk = Math.min(1, G.dmg / 5) * .8;
-    skinMats.forEach(mt => { mt.color.copy(mt.userData.c0).lerp(new THREE.Color(1, .55, .5), dk); if (uwOn) mt.color.multiply(new THREE.Color(.45, .75, 1)); mt.emissive = mt.emissive || new THREE.Color(); const e = G.hurt > 0 ? G.hurt * 1.4 : 0, z = ph === "death" && G.deathCause === "eel" && Math.floor(G.deathT * 16) % 2 ? .9 : 0; mt.emissive.setRGB(e + z * .4, z, z); });
+    skinMats.forEach(mt => { mt.color.copy(mt.userData.c0).lerp(new THREE.Color(1, .55, .5), dk); if (uwOn) mt.color.multiply(uwTint); mt.emissive = mt.emissive || new THREE.Color(); const e = G.hurt > 0 ? G.hurt * 1.4 : 0, z = ph === "death" && G.deathCause === "eel" && Math.floor(G.deathT * 16) % 2 ? .9 : 0; mt.emissive.setRGB(e + z * .4, z, z); });
     let nb = 0, nw = 0; marks.forEach(mk => { if (mk.userData.kind === "b") mk.visible = nb++ < G.dmg; else mk.visible = nw++ < G.dmg - 1; });
     rig.visible = boardG.visible = !blink;
     if (ph === "death" && G.deathCause === "eel" && G.deathT > 2.2) rig.visible = false;

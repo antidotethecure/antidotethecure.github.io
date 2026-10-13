@@ -398,6 +398,8 @@
   }
 
   /* ---------- the sheet ---------- */
+  var EXTRA = [];   // perk modules add their own tabs: SportsBar.addTab({id, label, render(box, helpers), visible?()})
+  function extraTabs() { return EXTRA.filter(function (t) { try { return !t.visible || t.visible(); } catch (e) { return false; } }); }
   var ov = null, box = null, tab = "teams", busy = false, again = 0, poll = null, prevOverflow = "";
   function sheet() {
     if (ov) return ov;
@@ -411,7 +413,7 @@
   function screen(title, html) { sheet(); ov.querySelector(".t").textContent = title; var i = ov.querySelector(".sp-in"); i.innerHTML = html; ov.querySelector(".sp-body").scrollTop = 0; return i; }
   function open(which) {
     sheet(); if (!ov.classList.contains("on")) { prevOverflow = document.documentElement.style.overflow; document.documentElement.style.overflow = "hidden"; ov.classList.add("on"); }
-    if (which === "fights" || which === "teams") tab = which;
+    if (which === "fights" || which === "teams" || EXTRA.some(function (t) { return t.id === which; })) tab = which;
     board();
     if (!poll) poll = setInterval(function () { if (!document.hidden && ov.classList.contains("on")) refresh(true); }, 30000);
   }
@@ -420,7 +422,9 @@
   function hasFights() { return LORDER.indexOf("ufc") >= 0 || !!CFG.fightNight; }
   function board() {
     var w = screen(CFG.title || "Scoreboard", '<div class="sp-h"><small>' + esc(RNAME) + ' teams' + (hasFights() ? ' · fights' : '') + '</small>' + esc(CFG.title || "Scoreboard") + '</div>' +
-      (hasFights() ? '<div class="sp-tabs" role="group" aria-label="Section"><button type="button" data-tab="teams" aria-pressed="' + (tab === "teams") + '">🏟️ Teams</button><button type="button" data-tab="fights" aria-pressed="' + (tab === "fights") + '">🥊 Fights</button></div>' : '') +
+      (hasFights() || extraTabs().length ? '<div class="sp-tabs" role="group" aria-label="Section"><button type="button" data-tab="teams" aria-pressed="' + (tab === "teams") + '">🏟️ Teams</button>' +
+        (hasFights() ? '<button type="button" data-tab="fights" aria-pressed="' + (tab === "fights") + '">🥊 Fights</button>' : '') +
+        extraTabs().map(function (t) { return '<button type="button" data-tab="' + esc(t.id) + '" aria-pressed="' + (tab === t.id) + '">' + esc(t.label) + '</button>'; }).join("") + '</div>' : '') +
       '<div class="sp-bar"><button type="button" id="sp-pickbtn">★ My teams' + (follows().length ? " (" + follows().length + ")" : "") + '</button><button type="button" id="sp-rf">↻ Refresh</button></div><div id="sp-box"></div>');
     box = w.querySelector("#sp-box");
     [].forEach.call(w.querySelectorAll("[data-tab]"), function (b) { b.onclick = function () { tab = b.getAttribute("data-tab"); board(); }; });
@@ -430,7 +434,8 @@
   }
   function render() {
     if (!box || !document.body.contains(box)) return;
-    var m = collect(), f = follows(), h = "";
+    var m = collect(), f = follows(), h = "", ex = extraTabs().filter(function (t) { return t.id === tab; })[0];
+    if (ex) { try { ex.render(box, { esc: esc, toast: toast, close: close, open: open, rerender: render, fmtTime: fmtTime, day: day }); } catch (e) { box.innerHTML = '<div class="sp-empty"><b>Unavailable right now</b></div>'; } return; }
     if (tab === "fights" && hasFights()) h = fightNightHTML() + (LORDER.indexOf("ufc") >= 0 ? '<div class="sp-sec">UFC</div>' + (lastOk || SBerr.ufc ? ufcHTML() : '<div class="sp-empty"><b>Loading…</b></div>') : "");
     else {
       h += watchPartyHTML(m);
@@ -527,6 +532,7 @@
     window.MelodyGames.register({ id: "scores", order: 10, wide: true, icon: "📺", title: CFG.title || "Scoreboard", sub: CFG.tileSub || "Live scores for every " + RNAME + " team. Follow your teams" + (hasFights() ? ", plus fight nights." : "."), tag: "Live",
       start: function () { window.MelodyGames.close(); open("teams"); } });
   }
-  window.SportsBar = { open: open, close: close, refresh: refresh, config: CFG, teams: TEAMS, leagues: L, render: render,
+  function addTab(def) { if (def && def.id && def.render && !EXTRA.some(function (t) { return t.id === def.id; })) { EXTRA.push(def); if (isOpen()) board(); } }
+  window.SportsBar = { open: open, close: close, refresh: refresh, config: CFG, teams: TEAMS, leagues: L, render: render, addTab: addTab, isOpen: isOpen, toast: toast, esc: esc,
     _state: { SB: SB, SBerr: SBerr, SCHED: SCHED, STAND: STAND, LEAGUE: LEAGUE } };
 })();

@@ -221,7 +221,8 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
   </div>
   <div class="hud2"><span id="lvl">Level <b>1</b> of 5</span><span id="wpn"></span></div>
   <div class="cvwrap"><canvas id="cv" width="400" height="600" aria-label="Melody flight game. Drag anywhere to steer the plane."></canvas>
-    <button type="button" class="gbtn" id="sndb" style="top:8px;right:8px" aria-label="Mute all sound">🔊</button></div>
+    <button type="button" class="gbtn" id="sndb" style="top:8px;right:8px" aria-label="Mute all sound">🔊</button>
+    <button type="button" class="gbtn off" id="cmbb" style="top:8px;right:48px" aria-label="Combat mode is off. Turn combat on" aria-pressed="false" title="Combat mode: off">⚔️</button></div>
   <div id="over">
     <div class="sub" id="rank">Flight complete</div>
     <div id="final">0 pts</div>
@@ -557,8 +558,11 @@ var PLANE_W=86;
 var G={running:false,over:false};
 /* CALM FLIGHT (Christian's feedback, 2026-10): a peaceful scenic flight. No enemies, gunships, missiles, guns, lightning,
    crashes, explosions or fire. You steer, catch Melody's food + music notes, and land back at LAX. A dropped item is a
-   gentle "missed it" (it ends your catch streak), never a crash. The old combat code below stays in the file but never runs. */
+   gentle "missed it" (it ends your catch streak), never a crash. The old combat code below stays in the file and runs only when
+   the player turns on the ⚔️ Combat toggle (off by default, remembered on this phone; ?combat=1 / ?combat=0 force it). */
 var CALM=true;
+try{ CALM=localStorage.getItem("melody_combat")!=="1"; }catch(x){}
+(function(){ var c=new URLSearchParams(location.search).get("combat"); if(c==="1") CALM=false; else if(c==="0") CALM=true; })();
 var CALM_SUB=["Wheels up over Westchester","Past the stadium and downtown","Over the Hollywood Hills","Down the coast to Venice","Santa Monica Pier, then home to LAX"];
 /* ---- 5 levels, 60 s each: enemies get tougher every level; an Army gunship ends level 3, the Super Jet ends level 5 ---- */
 var LV=[{ufo:2,cop:6,kami:4,jet:1,pace:1,copV:1,bul:4.4,sub:"Wheels up over Westchester"},
@@ -1166,6 +1170,12 @@ function drawDrizHud(now){ if(!G.running||G.dz<=0||G.rpDone) return; var t="🍯
 /* the review plane: slow, drifts side to side across the upper sky, tows his review banner; 10 hits brings it down */
 // CALM: it flies lower (inside the area you can steer to) and you fly THROUGH its banner to unlock the review; nothing is shot
 var RP_Y=CALM?250:118;
+/* ⚔️ Combat toggle: switching it mid-flight restarts the flight in the new mode */
+function combatSync(){ RP_Y=CALM?250:118; var b=$("cmbb"), on=!CALM; if(b){ b.classList.toggle("off",!on); b.setAttribute("aria-pressed",on?"true":"false"); b.setAttribute("aria-label",on?"Combat mode is on. Turn combat off":"Combat mode is off. Turn combat on"); b.title="Combat mode: "+(on?"on":"off"); }
+  var hb=$("hpbox"); if(hb){ hb.style.visibility=on?"visible":"hidden"; hb.setAttribute("aria-hidden",on?"false":"true"); } }
+function setCombat(on){ CALM=!on; try{ localStorage.setItem("melody_combat",on?"1":"0"); }catch(x){} combatSync(); hud();
+  if(window.ReviewEgg) ReviewEgg.toast(on?"⚔️ "+T("Combat on"):"🕊️ "+T("Combat off"),on?T("Enemies, guns and bosses are back. The flight restarts."):T("Calm scenic flight. The flight restarts."));
+  if(G.running) start(); }
 function rpSpawn(){ var d=G.rpPasses%2?-1:1; G.rp={x:d>0?-150:W+150,y:RP_Y,d:d,t:0,hp:RP_HITS,hit:0,cool:0,tears:[],flick:0,leave:0}; SND.play("flyby"); }
 function rpTick(dt,k,takeoff,landing){
   if(!window.ReviewEgg||(G.rpDone&&!(G.rp&&G.rp.caught))) return;
@@ -1528,7 +1538,8 @@ function frame(now){
     G.crateT-=dt; if(!CALM&&G.crateT<=0&&G.crates<2&&!G.gotCrate){ G.crates++; G.crateT=1e9; G.items.push({t:"crate",x:60+Math.random()*(W-120),y:-60,r:26,sw:Math.random()*6}); }
     } }
     if(takeoff||landing){ G.tx=W/2; G.ty=landing?H*0.64:H-110; }
-    var ox=G.x; G.x+=(G.tx-G.x)*Math.min(1,.22*k); G.y+=(G.ty-G.y)*Math.min(1,.22*k); G.vx=(G.x-ox)/Math.max(.5,k);
+    if(KEYS.x||KEYS.y){ G.tx=Math.max(30,Math.min(W-30,G.tx+KEYS.x*9*k)); G.ty=Math.max(H*.32,Math.min(H-50,G.ty+KEYS.y*9*k)); }   // held arrow keys glide
+    var ox=G.x; G.x+=(G.tx-G.x)*Math.min(1,.38*k); G.y+=(G.ty-G.y)*Math.min(1,.38*k); G.vx=(G.x-ox)/Math.max(.5,k);
     if(G.inv>0) G.inv-=k; if(G.multT>0){ G.multT-=dt; if(G.multT<=0) G.mult=1; }
     if(Math.floor(now/250)!==Math.floor((now-dt)/250)) G.score+=G.mult;
     G.shotT-=dt; if(G.mfl>0) G.mfl-=dt; if(!CALM&&G.shotT<=0&&!takeoff&&!landing&&!G.home&&!G.won) fire();
@@ -1729,12 +1740,20 @@ function replay(){ start(); }   // play before registering: no member gate, no t
 cv.addEventListener("pointerdown",function(e){ e.preventDefault(); SND.unlock(); if(!G.running){ replay(); return; }
   var r=cv.getBoundingClientRect(); drag={id:e.pointerId,px:e.clientX,py:e.clientY,sx:G.tx,sy:G.ty,k:W/r.width}; try{ cv.setPointerCapture(e.pointerId); }catch(x){} });
 cv.addEventListener("pointermove",function(e){ if(!drag||!G.running) return; e.preventDefault();
-  G.tx=Math.max(30,Math.min(W-30,drag.sx+(e.clientX-drag.px)*drag.k*1.25)); G.ty=Math.max(H*.32,Math.min(H-50,drag.sy+(e.clientY-drag.py)*drag.k*1.25)); });
+  G.tx=Math.max(30,Math.min(W-30,drag.sx+(e.clientX-drag.px)*drag.k*1.8)); G.ty=Math.max(H*.32,Math.min(H-50,drag.sy+(e.clientY-drag.py)*drag.k*1.8));
+  drag.sx=G.tx; drag.sy=G.ty; drag.px=e.clientX; drag.py=e.clientY; });
 ["pointerup","pointercancel"].forEach(function(t){ cv.addEventListener(t,function(){ drag=null; }); });
 ["touchend","click"].forEach(function(t){ cv.addEventListener(t,function(){ SND.unlock(); },{passive:true}); });   // iOS unlocks audio on touchend/click
 $("sndb").addEventListener("click",function(){ SND.unlock(); SND.set("sound",!SND.state().sound); });
 syncBtns();
-addEventListener("keydown",function(e){ if(!G.running) return; var m={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[e.key]; if(!m) return; e.preventDefault(); G.tx=Math.max(30,Math.min(W-30,G.tx+m[0])); G.ty=Math.max(H*.32,Math.min(H-50,G.ty+m[1])); });
+// keyboard: hold arrows / WASD to glide (moved every frame), instead of one 24 px hop per key press
+var KEYS={x:0,y:0}, KD={}, KM={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1],a:[-1,0],d:[1,0],w:[0,-1],s:[0,1],A:[-1,0],D:[1,0],W:[0,-1],S:[0,1]};
+function keysSum(){ KEYS.x=0; KEYS.y=0; for(var k2 in KD){ KEYS.x+=KM[k2][0]; KEYS.y+=KM[k2][1]; } KEYS.x=Math.max(-1,Math.min(1,KEYS.x)); KEYS.y=Math.max(-1,Math.min(1,KEYS.y)); }
+addEventListener("keydown",function(e){ if(!G.running||!KM[e.key]) return; if(/^(INPUT|TEXTAREA|SELECT)$/.test((e.target||{}).tagName||"")) return; e.preventDefault(); KD[e.key]=1; keysSum(); });
+addEventListener("keyup",function(e){ if(KD[e.key]){ delete KD[e.key]; keysSum(); } });
+addEventListener("blur",function(){ KD={}; keysSum(); });
+$("cmbb").addEventListener("click",function(e){ e.preventDefault(); e.stopPropagation(); SND.unlock(); setCombat(CALM); });
+combatSync();
 $("again").addEventListener("click",function(){ replay(); cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
 hud();
 
@@ -1762,6 +1781,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
  how:{goal:"Fly 5 scenic legs over LA (Westchester, the stadium, downtown, the Hollywood Hills, Venice and the Santa Monica Pier), catch as much of Melody's food as you can, then land back at LAX. No sign-up needed to play.",
   time:"5 legs × 60 seconds + the landing · nothing can hurt you",
   steps:[["👆","Drag anywhere on the game to steer. The plane follows your finger's movement, so your thumb never covers it"],
+   ["⚔️","Want a fight? Tap the ⚔️ button on the game to turn Combat on: your guns, enemy planes, LAPD choppers and bosses come back. Tap it again for the calm flight"],
    ["🍔","Catch the food and gold music notes as they float up. Drop one and it's just \u201cmissed it\u201d: your catch streak starts over"],
    ["🔥","Every 5 catches in a row pays a streak bonus"],
    ["🎤","Grab the karaoke mic for 2× score for 6 seconds"],

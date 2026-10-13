@@ -375,6 +375,8 @@ var FOOD=[
   ["Chicken Parmesan Mac & Cheese",18.25,"Chicken parmesan in a vodka sauce.","chicken-parm-mac","herbs"],
   ["Parmesan & Mushroom Mac & Cheese",17.25,"Baked parmesan and mushroom crust.","mushroom-mac","herbs"],
   ["House Mac",15.00,"Fusilli pasta in a creamy cheese blend.","house-mac","steam"]]},
+ {id:"burgers",name:"Burgers",note:"Mondays: half off burgers 11–3.",items:[
+  ["Melody Burger",19.25,"Grilled Angus beef on a pretzel bun with caramelized onions, Gorgonzola blue cheese, apple-smoked bacon, spinach & BBQ sauce. Served with fries.","melody-burger","steam"]]},
  {id:"fries",name:"Fries",items:[
   ["Gilroy Garlic Fries",6.75,"Shoestring fries tossed with sizzling garlic & Italian herbs.","garlic-fries","herbs"],
   ["Melody Fries",5.75,"Shoestring fries, sea salt & pepper. Add cheese +$2.00","melody-fries","steam"],
@@ -584,7 +586,8 @@ function ready(i){ return i&&i.complete&&i.naturalWidth; }
 var S={plane:img("img/game/plane.webp"),ufo:img("img/game/ufo.webp"),jet:img("img/game/jet.webp"),kami:img("img/game/plane.webp"),
   stadium:img("img/game/stadium.webp"),towers:img("img/game/towers.webp"),mar0:img("img/game/marshal0.webp"),cop0:img("img/game/lapd_blue.webp"),cop1:img("img/game/lapd_black.webp"),mar1:img("img/game/marshal1.webp"),mar2:img("img/game/marshal2.webp"),cone:img("img/game/cone.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
 // pickups: Melody's real food + bar life. e = emoji fallback while the photo loads
-var PICK=[{k:"p_mac",n:"Mac & Cheese",p:80,e:"🧀",w:58},{k:"p_wings",n:"Lemon Pepper Wings",p:70,e:"🍗",w:60},{k:"p_toast",n:"French Toast",p:60,e:"🍞",w:58},
+var PICK=[{k:"p_mac",n:"Mac & Cheese",p:80,e:"🧀",w:58},{k:"p_wings",n:"Lemon Pepper Wings",p:70,e:"🍗",w:60},
+  {k:"p_burger",n:"Melody Burger & Fries",p:90,e:"🍔",w:66},{k:"p_toast",n:"French Toast",p:60,e:"🍞",w:58},
   {k:"p_omelette",n:"Philly Omelette",p:60,e:"🍳",w:60},{k:"p_marg",n:"Mango Marg",p:50,e:"🍹",w:30,w3:46,drink:1},{k:"p_bottle",n:"Bottle service",p:40,e:"🍾",w:34,w3:48,drink:1},{k:"p_shots",n:"Round of shots",p:40,e:"🥃",w:50,drink:1}];
 PICK.forEach(function(p){ p.im=img("img/game/"+p.k+".webp?v=ag1"); });
 var MIC={k:"p_mic",n:"Karaoke mic",e:"🎤",w:36}; MIC.im=img("img/game/p_mic.webp");
@@ -2374,7 +2377,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 <script>(function(){ var g="img/game/", GP=(window.SSAI_REWARDS&&SSAI_REWARDS.game)||{perScore:100,dailyCap:50}, WK=(window.SSAI_REWARDS&&SSAI_REWARDS.weekly)||{};
 /* START SCREEN: sells the food + the weekly challenge; the live game preview sits small in the corner (index.html previewCopy). */
 var CH=null; if(window.SSAI_CHAMPS) SSAI_CHAMPS.load(function(d){ CH=d; if(window.GameMenu) GameMenu.refresh(); });
-var FOOD=[["p_mac","Mac & Cheese","+80",1,"-.2s"],["p_wings","Lemon Pepper Wings","+70",1,"-1.1s"],["p_marg","Mango Marg","+50",0,"-.6s"],["p_toast","French Toast","+60",1,"-1.7s"],["p_shots","Round of shots","+40",0,"-.9s"]];
+var FOOD=[["p_burger","Melody Burger & Fries","+90",1,"-1.4s"],["p_mac","Mac & Cheese","+80",1,"-.2s"],["p_wings","Lemon Pepper Wings","+70",1,"-1.1s"],["p_marg","Mango Marg","+50",0,"-.6s"],["p_toast","French Toast","+60",1,"-1.7s"]];   // 5 fit one row on a phone; shots still spawn in the game
 function on(){ return !!(window.MELODY_REWARDS_ON&&MELODY_REWARDS_ON()); }
 function mvp(esc,T){ var F=window.SSAI_CHAMPS?SSAI_CHAMPS.fmt:function(n){ return Number(n||0).toLocaleString(); }, gs=CH&&CH.games||{}, c=gs.melody, s=gs["melody-survival"];
   function top(gm,unit,lab,ic){ var t=gm&&gm.top3&&gm.top3[0];
@@ -2422,7 +2425,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
    ["🛡️","Secret quest: catch 7 spinning Antidote Drizzle emblems. Antidote's banner plane flies in towing his Melody review: shoot it down (with combat off, fly through the banner) to unlock it"],
    ["🧪","BETA: rewards switch on soon. Until Melody turns them on, the weekly boards rank you for bragging rights and no prizes or game points are given out"]]},
  points:[
-  {group:"Catch these (score)",items:[{img:g+"p_mac.webp?v=ag1",name:"Mac & Cheese",pts:"+80"},{img:g+"p_wings.webp?v=ag1",name:"Lemon Pepper Wings",pts:"+70"},{img:g+"p_toast.webp?v=ag1",name:"French Toast",pts:"+60"},{img:g+"p_omelette.webp?v=ag1",name:"Philly Omelette",pts:"+60"},
+  {group:"Catch these (score)",items:[{img:g+"p_burger.webp?v=ag1",name:"Melody Burger & Fries",pts:"+90"},{img:g+"p_mac.webp?v=ag1",name:"Mac & Cheese",pts:"+80"},{img:g+"p_wings.webp?v=ag1",name:"Lemon Pepper Wings",pts:"+70"},{img:g+"p_toast.webp?v=ag1",name:"French Toast",pts:"+60"},{img:g+"p_omelette.webp?v=ag1",name:"Philly Omelette",pts:"+60"},
    {img:g+"p_marg.webp?v=ag1",name:"Mango Marg",pts:"+50"},{img:g+"p_bottle.webp?v=ag1",name:"Bottle service",pts:"+40"},{img:g+"p_shots.webp?v=ag1",name:"Round of shots",pts:"+40"},{icon:"♪",name:"Gold music note",pts:"+10"},
    {img:g+"p_mic.webp?v=ag1",name:"Karaoke mic",note:"Double score for 6 seconds",pts:"2×"},
    {img:"img/game/antidote-logo.webp?v=ag1",name:"Antidote Drizzle emblem",note:"Catch 7 to call in Antidote's review plane",pts:"+50",gold:true}]},

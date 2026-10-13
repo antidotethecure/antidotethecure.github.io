@@ -390,12 +390,18 @@
   var KID_RULE = "Kid prize — redeemable with the young player at the table, one per kid per visit.";
   window.SSAI_KID_RULE = KID_RULE;
   function kidTag(w) { return w && w.kid ? '<div style="display:inline-block;margin:4px 0 2px;background:#FFD23F;color:#1a0d00;font:900 12px system-ui;letter-spacing:.06em;border-radius:99px;padding:3px 10px">🧒 KID PRIZE</div>' : ''; }
+  // ONE PRIZE PER DAY (2026-10-13, standard; McDonald's-style): a member wins / uses at most one prize per LA day: game win,
+  // daily draw, spin, ladder reward or early-bird gift (m.pday = that day). A 2nd win the same day is "Come back tomorrow"
+  // (the game still plays for fun and score). The real check is server-side (Code.gs prize_win / PrizeDay tab).
+  function pdKey() { return new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); }
+  function prizeUsedToday(m) { return !!(m && m.pday === pdKey()); }
   window.SSAI_WIN = function (prize, opt) {
     var w = { t: prize, c: "WIN-" + code4(4), ts: Date.now() }, m = mine()[0], held = activeWin(m);
     if (opt && opt.kid) { w.kid = 1; w.c = "KID-" + code4(4); }
     if (held) return { prize: held, saved: !!m, blocked: true, until: until(held) };
+    if (prizeUsedToday(m)) { toast("🏆 One prize per day: come back tomorrow for your next prize. Your score still counts."); return { prize: { t: prize, c: "", ts: w.ts, until: "tomorrow" }, saved: false, blocked: true, tomorrow: true, until: "tomorrow" }; }
     w.until = until(w);
-    if (m) { (m.wins = m.wins || []).unshift(w); m.wins = m.wins.slice(0, 5); (m.ledger = m.ledger || []).unshift({ ts: w.ts, pts: 0, t: "🏆 Won " + prize + " in the game" }); put(m); }
+    if (m) { m.pday = pdKey(); boPost({ type: "prize_win", member: m.id, dev: devId(), source: "game", prize: prize, eid: "W" + w.ts.toString(36) + code4(4) }); (m.wins = m.wins || []).unshift(w); m.wins = m.wins.slice(0, 5); (m.ledger = m.ledger || []).unshift({ ts: w.ts, pts: 0, t: "🏆 Won " + prize + " in the game" }); put(m); }
     else { try { localStorage.setItem(PEND, JSON.stringify(w)); } catch (x) {} }
     drawJoin(); return { prize: w, saved: !!m };
   };
@@ -406,7 +412,7 @@
     var D = C.draw; if (!D || !D.odds || !(D.prizes || []).length) return;
     var m = mine()[0]; if (!m || m.sample) return;
     var day = new Date().toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" });
-    if (m.drawDay === day || activeWin(m) || document.querySelector(".crm-draw")) return;
+    if (m.drawDay === day || activeWin(m) || prizeUsedToday(m) || document.querySelector(".crm-draw")) return;
     var won = Math.random() < 1 / D.odds, prize = D.prizes[(Math.random() * D.prizes.length) | 0];
     var ov = document.createElement("div"); ov.className = "crm-draw";
     ov.innerHTML = '<div class="crm-draw-card"><div class="crm-draw-h">🎟️ Your daily lucky draw</div><div class="crm-draw-s">' + e(NAME) + ' picks a winner every day. Tap to scratch.</div>' +
@@ -419,7 +425,7 @@
       m = mine()[0]; m.drawDay = day;
       setTimeout(function () {
         if (won) {
-          var w = { t: prize, c: "LUCKY-" + code4(4), ts: Date.now(), k: "draw" }; w.until = until(w);
+          var w = { t: prize, c: "LUCKY-" + code4(4), ts: Date.now(), k: "draw" }; w.until = until(w); m.pday = pdKey();
           (m.wins = m.wins || []).unshift(w); m.wins = m.wins.slice(0, 5); (m.ledger = m.ledger || []).unshift({ ts: w.ts, pts: 0, t: "🎟️ Won the daily lucky draw: " + prize }); put(m);
           t.innerHTML = "<span>🎉 WINNER</span>"; t.classList.add("win");
           r.innerHTML = "You won <b>" + e(prize) + "</b>!<div class='crm-draw-c'>" + w.c + "</div>Show this code at " + e(NAME) + " · good until " + e(w.until) + " (3 days)";
@@ -493,7 +499,8 @@
     save: function (m) { put(m); drawJoin(); drawOwn(); },
     redraw: function () { drawJoin(); drawOwn(); },
     join: function (cb) { GATE_TXT.interim = ["Join " + NAME + " Rewards first", "Free. Add your name and a phone or email, then add your visit.", "🎁 Join free"]; return gate("interim", cb); },
-    toast: toast, esc: e, code4: code4
+    toast: toast, esc: e, code4: code4,
+    dev: function () { return devId(); }, pday: pdKey, prizeUsedToday: function () { return prizeUsedToday(mine()[0]); }
   };
   if (SIMPLE) window.SSAI_GAMEPTS = {
     cfg: SIMPLE.game,
@@ -988,7 +995,7 @@
     });
   }
   // ---- FREE DAILY SPIN: one per member per day (LA date). Never costs tokens, never needs a purchase, never for sale. ----
-  function spinReady(m) { return !!(SPIN && m && m.spinDay !== laDay()); }
+  function spinReady(m) { return !!(SPIN && m && m.spinDay !== laDay() && !prizeUsedToday(m)); }
   function darkHex(c) { var h = String(c).replace("#", ""); if (h.length === 3) h = h.replace(/./g, "$&$&"); var n = parseInt(h, 16); if (!(n >= 0)) return false; return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 < 140; }
   function pickSpin(P) { var tot = P.reduce(function (a, p) { return a + (p.w || 1); }, 0), r = Math.random() * tot; for (var i = 0; i < P.length; i++) { r -= P[i].w || 1; if (r < 0) return i; } return P.length - 1; }
   function openSpin() {
@@ -1002,7 +1009,7 @@
         '<div class="spin-w"><div class="pin"></div><div class="wh" style="background:conic-gradient(' + grad + ')">' + P.map(function (p, i) {
           var c = COL[i % COL.length], dk = darkHex(c);
           return '<span class="' + (dk ? 'dk' : '') + '" style="transform:rotate(' + ((i + 0.5) * seg - 90) + 'deg)">' + e(p.t) + '</span>'; }).join("") + '</div><div class="hub">' + e(SPIN.hub || "🧇") + '</div></div>' +
-        '<div class="spin-r" aria-live="polite">' + (ready ? '' : 'You already spun today. Come back tomorrow for another free spin!') + '</div>' +
+        '<div class="spin-r" aria-live="polite">' + (ready ? '' : 'One prize per day: today\'s is used. Come back tomorrow for another free spin!') + '</div>' +
         '<button type="button" class="go" data-t="go"' + (ready ? '' : ' disabled style="opacity:.5"') + '>' + (ready ? '🎡 Spin (free)' : 'Next free spin tomorrow') + '</button>' +
         '<button type="button" class="crm-gx" data-t="x">Close</button>' +
         '<details class="spin-odds"><summary>Odds & prizes</summary><ul style="list-style:none;padding:0;margin:6px 0 0">' + P.map(function (p) { return '<li><span>' + e(p.t) + '</span><b>' + Math.round((p.w || 1) / tot * 1000) / 10 + '%</b></li>'; }).join("") + '</ul></details>' +
@@ -1010,7 +1017,7 @@
       var wh = ov.querySelector(".wh"), res = ov.querySelector(".spin-r"), btn = ov.querySelector("[data-t=go]");
       btn.onclick = function () {
         var mm = mine()[0]; if (!spinReady(mm) || btn.disabled) return; btn.disabled = true; btn.style.opacity = ".5";
-        var i = pickSpin(P), p = P[i]; mm.spinDay = laDay(); mm.spins = (mm.spins || 0) + 1;
+        var i = pickSpin(P), p = P[i]; mm.spinDay = laDay(); mm.pday = pdKey(); mm.spins = (mm.spins || 0) + 1;
         // award first, then animate: closing the sheet mid-spin can't lose (or re-roll) the prize
         var line = "🎡 Daily spin: " + p.t, code = "";
         if (p.pts) { addPts(mm, p.pts, line); tag(mm, "spin_bonus"); }

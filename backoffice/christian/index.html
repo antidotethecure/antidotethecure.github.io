@@ -72,7 +72,7 @@ td.n,th.n{text-align:right}.tag{display:inline-block;font-size:11px;font-weight:
   <p class="note" id="stamp"></p>
 </section>
 </main>
-<script src="../../demo/christian-live.js?v=bo1"></script>
+<script src="../../demo/christian-live.js?v=lb2"></script>
 <script>
 (function(){
 "use strict";
@@ -90,7 +90,7 @@ function api(body){
   if(!API) return Promise.resolve({ok:false,reason:"Backend not connected yet."});
   return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(body)}).then(function(r){ return r.json(); }).catch(function(){ return {ok:false,reason:"Can't reach the backend. Check the connection."}; });
 }
-function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=bo2"; s.onload=cb; document.head.appendChild(s); }
+function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=lb2"; s.onload=cb; document.head.appendChild(s); }
 if(TEST) $("testBar").hidden=false; else if(!API) $("notConn").hidden=false;
 try{ TOKEN=sessionStorage.getItem(TKEY); }catch(e){}
 $("lf").onsubmit=function(ev){ ev.preventDefault(); var b=$("go"); b.disabled=true; b.textContent="Checking…"; $("lerr").textContent="";
@@ -165,10 +165,18 @@ function discounts(){ var h="<p class='note' style='margin-top:12px'>Change a po
       h+="<div class='dc'><b>"+n(t[0])+" pts · "+esc(t[1])+"</b><div class='note'>Toast button: <code>"+esc(b.button)+"</code> · "+(b.type==="fixed"?"$"+b.amount+" off the check":"100% off one item"+(b.max?" (up to $"+(+b.max).toFixed(2)+")":""))+"</div>"+
         fld(s,"t"+i,"pts","Points cost",t[0],"number",t[1])+fld(s,"t"+i,"label","Reward name (what guests see)",t[1],"text",t[1])+(b.type==="fixed"?fld(s,"t"+i,"amount","$ off the check",b.amount,"number",t[1]):"")+"</div>"; });
     if(c.justLanded&&c.justLanded.toast) h+="<div class='dc'><b>Just Landed · "+esc(c.justLanded.offer)+"</b><div class='note'>Toast button: <code>"+esc(c.justLanded.toast.button)+"</code> · no points (boarding pass, last 24 h)</div>"+fld(s,"jl","percent","% off the check",c.justLanded.toast.percent,"number","Just Landed")+"</div>";
+    if(c.locationBonus){ var L=c.locationBonus, ch=c.tiers.slice().sort(function(a,b){ return a[0]-b[0]; })[0], pct=ch?Math.round(L.pts/ch[0]*100):0, lid="d_"+s+"_lb_on";
+      h+="<div class='dc' id='lbrow'><b>📍 Location bonus · "+(L.on?"ON":"OFF")+" · +"+n(L.pts)+" pts, once per guest</b>"+
+        "<div class='note'>One-time “Location buddy” bonus for guests who keep location + notifications on: confirmed on app opens on "+(L.minDays||3)+"+ different days spanning "+(L.spanDays||7)+"+ days. Can't be earned twice (turning location off and on doesn't reset it). No Toast button: it's app points only.</div>"+
+        "<div class='note' style='margin-top:6px'><b>"+n(L.pts)+" pts = "+pct+"%</b> of the cheapest reward"+(ch?" ("+esc(ch[1])+", "+n(ch[0])+" pts)":"")+". The guest still has to earn the rest by visiting. Lower it if you'd rather give away less.</div>"+
+        "<div class='f'><div><label for='"+lid+"'>Location bonus on/off</label><select id='"+lid+"' data-orig='"+(L.on?"on":"off")+"'><option value='on'"+(L.on?" selected":"")+">On</option><option value='off'"+(L.on?"":" selected")+">Off</option></select></div><button class='btn sm' data-save='"+esc(JSON.stringify([s,"lb","on","Location bonus"]))+"' data-for='"+lid+"'>Save</button></div>"+
+        fld(s,"lb","pts","Bonus points (10–1,000)",L.pts,"number","Location bonus")+
+        (DATA&&DATA.lb&&DATA.lb[s]?"<div class='note'>So far: <b>"+n(DATA.lb[s].credited||0)+"</b> guest(s) earned it · <b>"+n(DATA.lb[s].devices||0)+"</b> phone(s) with alerts on in the last 30 days.</div>":"")+"</div>"; }
     h+="</div>"; });
   return h; }
 function fld(s,k,f,label,val,type,reward){ var id="d_"+s+"_"+k+"_"+f; return "<div class='f'><div><label for='"+id+"'>"+label+"</label><input id='"+id+"' type='"+type+"'"+(type==="number"?" inputmode='decimal' step='any'":" maxlength='80'")+" value='"+esc(val)+"' data-orig='"+esc(val)+"'></div><button class='btn sm' data-save='"+esc(JSON.stringify([s,k,f,reward]))+"' data-for='"+id+"'>Save</button></div>"; }
 function toastStep(s,k,f,before,after){ if(k==="eb") return f==="gift"||f==="slices"||f==="items"||(f==="on"&&after==="on")?"<p><b>Toast:</b> guests redeem with the live pass and your server taps <span class='toastbtn'>App Reward – Early Bird Gift</span> (100% off one item). If that button isn't in Toast yet, add it: "+TOASTPATH+" › + Add a Discount › that exact name › % Off 100 · Applies to Item › Save › Publish.</p>":"<p><b>Toast: nothing to change.</b></p>";
+  if(k==="lb") return "<p><b>Toast: nothing to change.</b> The location bonus is app points only (no Toast button). "+(f==="on"&&after==="off"?"Guests who already earned it keep their points; nobody new earns it while it's off.":"Guests who already earned it don't get it again.")+"</p>";
   var c=cur(s), t=k==="jl"?null:c.tiers[+k.slice(1)], b=k==="jl"?c.justLanded.toast.button:(t[2]||{}).button;
   if(f==="pts") return "<p><b>Toast: nothing to change.</b> Points costs live only in the app. The Toast button <span class='toastbtn'>"+esc(b)+"</span> stays the same.</p>";
   if(f==="label") return "<p><b>Toast: usually nothing to change.</b> Servers still select the item and tap <span class='toastbtn'>"+esc(b)+"</span>."+(t&&t[2]&&t[2].max?" If the new reward can cost more than $"+(+t[2].max).toFixed(2)+", tell Antidote so the Toast sheet's “up to” price is updated.":"")+" Tell your staff about the new reward.</p>";

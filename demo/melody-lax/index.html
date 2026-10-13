@@ -552,8 +552,8 @@ var S={plane:img("img/game/plane.webp"),ufo:img("img/game/ufo.webp"),jet:img("im
   stadium:img("img/game/stadium.webp"),towers:img("img/game/towers.webp"),mar0:img("img/game/marshal0.webp"),cop0:img("img/game/lapd_blue.webp"),cop1:img("img/game/lapd_black.webp"),mar1:img("img/game/marshal1.webp"),mar2:img("img/game/marshal2.webp"),cone:img("img/game/cone.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
 // pickups: Melody's real food + bar life. e = emoji fallback while the photo loads
 var PICK=[{k:"p_mac",n:"Mac & Cheese",p:80,e:"🧀",w:58},{k:"p_wings",n:"Lemon Pepper Wings",p:70,e:"🍗",w:60},{k:"p_toast",n:"French Toast",p:60,e:"🍞",w:58},
-  {k:"p_omelette",n:"Philly Omelette",p:60,e:"🍳",w:60},{k:"p_marg",n:"Mango Marg",p:50,e:"🍹",w:40},{k:"p_bottle",n:"Bottle service",p:40,e:"🍾",w:34},{k:"p_shots",n:"Round of shots",p:40,e:"🥃",w:46}];
-PICK.forEach(function(p){ p.im=img("img/game/"+p.k+".webp"); });
+  {k:"p_omelette",n:"Philly Omelette",p:60,e:"🍳",w:60},{k:"p_marg",n:"Mango Marg",p:50,e:"🍹",w:30,w3:46,drink:1},{k:"p_bottle",n:"Bottle service",p:40,e:"🍾",w:34,w3:48,drink:1},{k:"p_shots",n:"Round of shots",p:40,e:"🥃",w:50,drink:1}];
+PICK.forEach(function(p){ p.im=img("img/game/"+p.k+".webp?v=ag1"); });
 var MIC={k:"p_mic",n:"Karaoke mic",e:"🎤",w:36}; MIC.im=img("img/game/p_mic.webp");
 var PLANE_W=86;
 var G={running:false,over:false};
@@ -1141,12 +1141,26 @@ function drawCoin(it,now){ it.spin+=.11; if(R3) return; var c=Math.cos(it.spin),
   cx.fillStyle="#8a5a06"; cx.beginPath(); cx.ellipse(1.5,0,sx,r,0,0,6.283); cx.fill(); cx.fillStyle=fg; cx.beginPath(); cx.ellipse(0,0,sx,r,0,0,6.283); cx.fill();
   if(sx>6){ cx.fillStyle="#9b6a06"; cx.font="900 "+(r*1.1|0)+"px 'Playfair Display',Georgia,serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.save(); cx.scale(sx/r,1); cx.fillText("\u266A",0,1); cx.restore(); }   // gold music note, not a coin
   cx.restore(); }
+/* food pickups: soft wispy steam off the hot plates, a moving glint on the drinks. Pre-rendered puff, 3 drawImage calls per plate. */
+var PUFF=(function(){ var c=document.createElement("canvas"); c.width=c.height=48; var x=c.getContext("2d"), g=x.createRadialGradient(24,24,0,24,24,24);
+  g.addColorStop(0,"rgba(255,255,255,.55)"); g.addColorStop(.5,"rgba(255,255,255,.22)"); g.addColorStop(1,"rgba(255,255,255,0)"); x.fillStyle=g; x.fillRect(0,0,48,48); return c; })();
+function steam(x,y,w,now){ if(reduce) return; cx.save();
+  for(var i=0;i<3;i++){ var u=((now/1500)+i/3+x*.013)%1, sz=w*(.26+.42*u), dx=(i-1)*w*.2+Math.sin(now/420+i*2.1+x)*w*.09*(1+u);
+    cx.globalAlpha=.85*Math.sin(u*Math.PI); cx.drawImage(PUFF,x+dx-sz/2,y-w*.22-u*w*.75-sz/2,sz,sz*1.25); }
+  cx.restore(); }
+function drinkSheen(P,x,y,now){ var h=P.w*P.im.naturalHeight/(P.im.naturalWidth||1), u=((now/1300)+x*.01)%1; if(!(h>0)) return;
+  cx.save(); cx.globalCompositeOperation="lighter"; cx.globalAlpha=.32*Math.sin(u*Math.PI); var gx=x-P.w*.5+u*P.w;
+  var g=cx.createLinearGradient(gx-6,0,gx+6,0); g.addColorStop(0,"rgba(255,255,255,0)"); g.addColorStop(.5,"rgba(255,250,225,1)"); g.addColorStop(1,"rgba(255,255,255,0)");
+  cx.fillStyle=g; cx.fillRect(gx-6,y-h*.38,12,h*.7); cx.restore(); }
 /* ---- ANTIDOTE'S REVIEW QUEST: catch DRIZ_N "Antidote Drizzle" emblems → his banner plane flies in towing the Melody review →
    shoot it down (~10 hits) → bonus + the review unlocks (preview clip on the end screen). It never shoots and never hurts you. ---- */
 var DRIZ_N=Math.max(5,Math.min(10,+(window.MELODY_DRIZZLE||7)||7));   // his "5 or 10" range, default 7
 var DRIZ_GAP=8200;                       // ms between emblems (+0-2 s): a decent pilot has all 7 in ~60-90 s of flying
 var RP_HITS=10;
-var DRIZ_IM=img("../review/antidote-foodie.webp");
+var DRIZ_IM=img("img/game/antidote-logo.webp?v=ag1");   // his ANTIDOTE The Foodie shield, cut out of its yellow glow (Melody only)
+// soft gold halo, pre-rendered once (one drawImage per emblem per frame)
+var DZ_GLOW=(function(){ var c=document.createElement("canvas"); c.width=c.height=128; var x=c.getContext("2d"), g=x.createRadialGradient(64,64,0,64,64,64);
+  g.addColorStop(0,"rgba(255,236,150,.95)"); g.addColorStop(.28,"rgba(255,206,60,.62)"); g.addColorStop(.6,"rgba(255,170,20,.22)"); g.addColorStop(1,"rgba(255,150,0,0)"); x.fillStyle=g; x.fillRect(0,0,128,128); return c; })();
 // an emblem only goes where grabbing it can't force a hit: away from lightning columns, warnings, low enemies and bombs
 function spawnDriz(){ if(G.boss||G.bossDie||G.won||G.home||G.red>.05||(G.banner&&G.banner.t<1800)) return false;
   var best=null, bs=-1;
@@ -1159,28 +1173,28 @@ function spawnDriz(){ if(G.boss||G.bossDie||G.won||G.home||G.red>.05||(G.banner&
     if(d>bs){ bs=d; best=x; } }
   if(bs<46) return false;
   G.items.push({t:"driz",x:best,x0:best,y:-34,r:22,ph:Math.random()*6,spin:Math.random()*6}); return true; }
-function drawDriz(it,now){ it.spin+=.07; if(R3) return; var c=Math.cos(it.spin), sx=Math.max(.12,Math.abs(c)), R=22, pu=.5+.5*Math.sin(now/180);
-  cx.save(); cx.translate(it.x,it.y);
-  var gl=cx.createRadialGradient(0,0,3,0,0,R*2.3); gl.addColorStop(0,"rgba(255,210,63,"+(.55+.25*pu)+")"); gl.addColorStop(.55,"rgba(225,6,0,.28)"); gl.addColorStop(1,"rgba(225,6,0,0)");
-  cx.fillStyle=gl; cx.beginPath(); cx.arc(0,0,R*2.3,0,6.283); cx.fill();
-  cx.scale(sx,1);
-  cx.fillStyle="#7a0000"; cx.beginPath(); cx.arc(1.5,1.5,R,0,6.283); cx.fill();
-  var fg=cx.createLinearGradient(-R,-R,R,R); fg.addColorStop(0,"#ffe27a"); fg.addColorStop(.5,"#d9a21b"); fg.addColorStop(1,"#ffd23f"); cx.fillStyle=fg; cx.beginPath(); cx.arc(0,0,R,0,6.283); cx.fill();
-  cx.fillStyle=c>0?"#e10600":"#b80000"; cx.beginPath(); cx.arc(0,0,R-3.5,0,6.283); cx.fill();
-  if(ready(DRIZ_IM)){ var h=R*1.75, w=h*DRIZ_IM.naturalWidth/DRIZ_IM.naturalHeight; cx.save(); cx.beginPath(); cx.arc(0,0,R-3.5,0,6.283); cx.clip(); cx.drawImage(DRIZ_IM,-w/2,-h/2+1,w,h); cx.restore(); }
-  else { cx.font="900 18px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText("🍯",0,1); }
+function drawDriz(it,now){ it.spin+=.07; if(R3) return; var c=Math.cos(it.spin), sx=Math.max(.14,Math.abs(c)), pu=.5+.5*Math.sin(now/180), H2=54;
+  // pulsing gold aura (additive), then the shield itself turning like a coin
+  cx.save(); cx.globalCompositeOperation="lighter"; var gr=H2*(1.05+.18*pu); cx.globalAlpha=.55+.35*pu; cx.drawImage(DZ_GLOW,it.x-gr,it.y-gr,gr*2,gr*2);
+  cx.globalAlpha=.35+.25*pu; cx.drawImage(DZ_GLOW,it.x-gr*.55,it.y-gr*.55,gr*1.1,gr*1.1); cx.restore();
+  cx.save(); cx.translate(it.x,it.y); cx.scale(sx,1);
+  if(ready(DRIZ_IM)){ var w=H2*DRIZ_IM.naturalWidth/DRIZ_IM.naturalHeight; cx.drawImage(DRIZ_IM,-w/2,-H2/2,w,H2);
+    if(c<0){ cx.globalCompositeOperation="source-atop"; cx.fillStyle="rgba(120,40,0,.18)"; cx.fillRect(-w/2,-H2/2,w,H2); }   // back face a touch darker so the spin reads
+    else { cx.globalCompositeOperation="lighter"; cx.globalAlpha=.16+.14*pu; cx.drawImage(DRIZ_IM,-w/2,-H2/2,w,H2); } }   // front face catches the light
+  else { cx.font="900 22px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillStyle="#ffd23f"; cx.fillText("★",0,1); }
   cx.restore();
-  if((now/90|0)%7===0){ cx.save(); cx.globalCompositeOperation="lighter"; cx.fillStyle="rgba(255,255,220,.9)"; var a=Math.random()*6.283; cx.beginPath(); cx.arc(it.x+Math.cos(a)*R*1.2,it.y+Math.sin(a)*R*1.2,1.8,0,6.283); cx.fill(); cx.restore(); } }
+  if((now/90|0)%5===0){ cx.save(); cx.globalCompositeOperation="lighter"; cx.fillStyle="rgba(255,250,210,.95)"; var a=Math.random()*6.283; cx.beginPath(); cx.arc(it.x+Math.cos(a)*H2*.62,it.y+Math.sin(a)*H2*.62,1.9,0,6.283); cx.fill(); cx.restore(); } }
 function catchDriz(it){ G.dz++; SND.play("chime",G.dz); buzz(18); G.score+=50*G.mult;
   for(var i=0;i<16;i++){ var a=Math.random()*6.283, v=1.2+Math.random()*3; G.fx.push({k:"e",x:it.x,y:it.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,s:2+Math.random()*2.5,g:0,a:1}); }
   G.fx.push({k:"r",x:it.x,y:it.y,vx:0,vy:0,s:8,g:2.2,a:.9});
-  pop(it.x,it.y-12,"🍯 "+G.dz+"/"+DRIZ_N+" "+T("Antidote Drizzle"),"#ffd23f");
+  pop(it.x,it.y-12,"✦ "+G.dz+"/"+DRIZ_N+" "+T("Antidote Drizzle"),"#ffd23f");
   if(G.dz>=DRIZ_N){ G.rpT=2600; if(window.ReviewEgg) ReviewEgg.toast("🛩️ "+(CALM?T("Review unlocked — fly through the banner plane's banner!"):T("Review unlocked — shoot down the banner plane!")),T("Antidote's Melody review is inbound"));
     radio(CALM?"Antidote's banner plane inbound. Fly through his banner, Captain!":"Antidote's banner plane inbound. Take it down, Captain!",{tone:"warn",ms:3200}); } }
-function drawDrizHud(now){ if(!G.running||G.dz<=0||G.rpDone) return; var t="🍯 "+Math.min(G.dz,DRIZ_N)+"/"+DRIZ_N, full=G.dz>=DRIZ_N;
-  cx.save(); cx.font="900 14px Barlow,system-ui"; var w=cx.measureText(t).width+18, x=W-8-w, y=50;
-  cx.fillStyle="rgba(8,13,26,.82)"; roundRect(x,y,w,24,12); cx.fill(); cx.strokeStyle=full?(((now/200|0)%2)?"#ffd23f":"#e10600"):"rgba(255,210,63,.6)"; cx.lineWidth=1.5; cx.stroke();
-  cx.fillStyle="#ffd23f"; cx.textAlign="left"; cx.textBaseline="middle"; cx.fillText(t,x+9,y+12.5); cx.restore(); }
+function drawDrizHud(now){ if(!G.running||G.dz<=0||G.rpDone) return; var t=Math.min(G.dz,DRIZ_N)+"/"+DRIZ_N, full=G.dz>=DRIZ_N, lh=22, lw=ready(DRIZ_IM)?lh*DRIZ_IM.naturalWidth/DRIZ_IM.naturalHeight:12;
+  cx.save(); cx.font="900 14px Barlow,system-ui"; var w=cx.measureText(t).width+lw+24, x=W-8-w, y=50;
+  cx.fillStyle="rgba(8,13,26,.82)"; roundRect(x,y,w,26,13); cx.fill(); cx.strokeStyle=full?(((now/200|0)%2)?"#ffd23f":"#e10600"):"rgba(255,210,63,.6)"; cx.lineWidth=1.5; cx.stroke();
+  if(ready(DRIZ_IM)){ cx.save(); cx.globalCompositeOperation="lighter"; cx.globalAlpha=.5; cx.drawImage(DZ_GLOW,x+9+lw/2-16,y+13-16,32,32); cx.restore(); cx.drawImage(DRIZ_IM,x+9,y+2,lw,lh); }   // his logo, not a honey pot
+  cx.fillStyle="#ffd23f"; cx.textAlign="left"; cx.textBaseline="middle"; cx.fillText(t,x+lw+15,y+13.5); cx.restore(); }
 /* the review plane: slow, drifts side to side across the upper sky, tows his review banner; 10 hits brings it down */
 // CALM: it flies lower (inside the area you can steer to) and you fly THROUGH its banner to unlock the review; nothing is shot
 var RP_Y=CALM?250:118;
@@ -1663,7 +1677,8 @@ function frame(now){
     else if(it.t==="driz") drawDriz(it,now);
     else if(it.t==="coin") drawCoin(it,now);
     else if(it.t==="heal") drawHeal(it,now);
-    else if(!R3){ var P=it.t==="mic"?MIC:it.p, bob=Math.sin(now/260+it.x)*3; var gl=cx.createRadialGradient(it.x,it.y,4,it.x,it.y,P.w*.8); gl.addColorStop(0,it.t==="mic"?"rgba(228,107,131,.55)":"rgba(240,211,117,.45)"); gl.addColorStop(1,"rgba(0,0,0,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(it.x,it.y,P.w*.8,0,6.283); cx.fill(); sprite(P.im,it.x,it.y+bob,P.w,it.rot,false,P.e); }
+    else if(!R3){ var P=it.t==="mic"?MIC:it.p, bob=Math.sin(now/260+it.x)*3; var gl=cx.createRadialGradient(it.x,it.y,4,it.x,it.y,P.w*.9); gl.addColorStop(0,it.t==="mic"?"rgba(228,107,131,.55)":"rgba(255,226,140,.6)"); gl.addColorStop(1,"rgba(0,0,0,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(it.x,it.y,P.w*.9,0,6.283); cx.fill(); sprite(P.im,it.x,it.y+bob,P.w,it.rot,false,P.e);
+      if(it.t==="food"){ if(P.drink) drinkSheen(P,it.x,it.y+bob,now); else steam(it.x,it.y+bob,P.w,now); } }
     if(run&&Math.abs(it.x-G.x)<it.r+26&&Math.abs(it.y-G.y)<it.r+28){
       if((it.t==="crate"||it.t==="heal"||it.t==="mic")&&performance.now()-pickT>20000){ pickT=performance.now(); radio(it.t==="crate"?"Nice pickup! Weapons upgraded.":it.t==="heal"?"Nice pickup! Patching you up.":"Nice pickup! Double score, sing it!",{tone:"info",ms:2200}); }
       if(it.t==="driz") catchDriz(it);
@@ -1875,7 +1890,7 @@ function row(icon,name,val,bad){ return '<div'+(bad?' class="bad"':'')+'>'+icon+
 function ic(p){ return '<img src="img/game/'+p.k+'.webp" alt="" onerror="this.outerHTML=\'<span class=e>'+p.e+'</span>\'">'; }
 var GPC=(window.SSAI_REWARDS&&SSAI_REWARDS.game)||{perScore:100,dailyCap:50};
 $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pts">'+PICK.map(function(p){return row(ic(p),p.n,"+"+p.p);}).join("")+
-  row('<span class="e">♪</span>',"Gold music note","+10")+row(ic(MIC),"Karaoke mic","2× · 6s")+row('<img src="../review/antidote-foodie.webp" alt="">',"Antidote Drizzle emblem (catch "+DRIZ_N+")","+50")+'</div>'+
+  row('<span class="e">♪</span>',"Gold music note","+10")+row(ic(MIC),"Karaoke mic","2× · 6s")+row('<img src="img/game/antidote-logo.webp?v=ag1" alt="">',"Antidote Drizzle emblem (catch "+DRIZ_N+")","+50")+'</div>'+
   '<div class="ptsh">Bonuses (score)</div><div class="pts">'+row('<span class="e">🔥</span>',"Every 5 catches in a row","+250…500")+row('<span class="e">⏱️</span>',"Finish a leg (500 × leg)","+500")+
   row('<span class="e">📺</span>',"Fly through Antidote's review banner","+500")+row('<span class="e">🛬</span>',"Fly all 5 legs and land","+3k")+'</div>'+
   '<div class="ptsh">Easy does it</div><div class="pts">'+row('<span class="e">🛩️</span>',"Touch another plane: a soft bump, your streak starts over","—",1)+row('<span class="e">🌙</span>',"A dropped item is just \u201cmissed it\u201d: it ends your streak","—",1)+'</div>'+
@@ -1883,10 +1898,10 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=sd1"></script>
+<script type="module" src="melody3d.js?v=ag1"></script>
 <script>(function(){ var g="img/game/", GP=(window.SSAI_REWARDS&&SSAI_REWARDS.game)||{perScore:100,dailyCap:50};
 window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill",tagline:"Night dogfight over LA: shoot down jets, choppers and two bosses, catch the food, land back at LAX.",
- hero:[g+"p_mac.webp",g+"plane.webp",g+"p_marg.webp",g+"p_wings.webp"],
+ hero:[g+"p_mac.webp?v=ag1",g+"plane.webp",g+"p_marg.webp?v=ag1",g+"p_wings.webp?v=ag1"],
  theme:{bg:"#0b1220",bg2:"#1c2547",card:"#141e34",edge:"#27324d",accent:"#d4af37",accent2:"#f0d375",label:"#f0d375",ink:"#f6f1e4",dim:"#9aa3b5",btnInk:"#1a1206",soft:"rgba(255,255,255,.06)",track:"#27324d",good:"#3fbf8f",bad:"#ff7a59",
   display:"Anton,Impact,'Arial Narrow',sans-serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
  tokens:false,
@@ -1903,14 +1918,14 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
    ["🍔","Catch the food and gold music notes as they float up. Drop one and it's just \u201cmissed it\u201d: your catch streak starts over"],
    ["🔥","Every 5 catches in a row pays a streak bonus"],
    ["🎤","Grab the karaoke mic for 2× score for 6 seconds"],
-   ["🍯","Secret quest: catch 7 spinning Antidote Drizzle emblems. Antidote's banner plane flies in towing his Melody review: shoot it down (with combat off, fly through the banner) to unlock it"],
+   ["🛡️","Secret quest: catch 7 spinning Antidote Drizzle emblems. Antidote's banner plane flies in towing his Melody review: shoot it down (with combat off, fly through the banner) to unlock it"],
    ["📺","Halftime: once a flight, between legs, a 20-second reel of Antidote The Foodie's Melody review plays. Skip it any time"],
    ["⭐","After you land, your score turns into Melody Rewards points: 1 point per "+GP.perScore+" score, up to "+GP.dailyCap+" a day. Not a member? Join after the flight to save them"]]},
  points:[
-  {group:"Catch these (score)",items:[{img:g+"p_mac.webp",name:"Mac & Cheese",pts:"+80"},{img:g+"p_wings.webp",name:"Lemon Pepper Wings",pts:"+70"},{img:g+"p_toast.webp",name:"French Toast",pts:"+60"},{img:g+"p_omelette.webp",name:"Philly Omelette",pts:"+60"},
-   {img:g+"p_marg.webp",name:"Mango Marg",pts:"+50"},{img:g+"p_bottle.webp",name:"Bottle service",pts:"+40"},{img:g+"p_shots.webp",name:"Round of shots",pts:"+40"},{icon:"♪",name:"Gold music note",pts:"+10"},
-   {img:g+"p_mic.webp",name:"Karaoke mic",note:"Double score for 6 seconds",pts:"2×"},
-   {img:"../review/antidote-foodie.webp",name:"Antidote Drizzle emblem",note:"Catch 7 to call in Antidote's review plane",pts:"+50",gold:true}]},
+  {group:"Catch these (score)",items:[{img:g+"p_mac.webp?v=ag1",name:"Mac & Cheese",pts:"+80"},{img:g+"p_wings.webp?v=ag1",name:"Lemon Pepper Wings",pts:"+70"},{img:g+"p_toast.webp?v=ag1",name:"French Toast",pts:"+60"},{img:g+"p_omelette.webp?v=ag1",name:"Philly Omelette",pts:"+60"},
+   {img:g+"p_marg.webp?v=ag1",name:"Mango Marg",pts:"+50"},{img:g+"p_bottle.webp?v=ag1",name:"Bottle service",pts:"+40"},{img:g+"p_shots.webp?v=ag1",name:"Round of shots",pts:"+40"},{icon:"♪",name:"Gold music note",pts:"+10"},
+   {img:g+"p_mic.webp?v=ag1",name:"Karaoke mic",note:"Double score for 6 seconds",pts:"2×"},
+   {img:"img/game/antidote-logo.webp?v=ag1",name:"Antidote Drizzle emblem",note:"Catch 7 to call in Antidote's review plane",pts:"+50",gold:true}]},
   {group:"Bonuses (score)",items:[{icon:"🔥",name:"5 catches in a row",note:"Then every 5 more",pts:"+250…500"},{icon:"⏱️",name:"Finish a leg",pts:"+500 × leg"},
    {icon:"📺",name:"Fly through Antidote's review banner",note:"After 7 emblems · unlocks his Melody review",pts:"+500",gold:true},{icon:"🛬",name:"Fly all 5 legs and land at LAX",note:"Plus a bonus for your best streak",pts:"+3,000",gold:true}]},
   {group:"Shoot these down",items:[{img:g+"ufo.webp",name:"UFO",note:"Tougher each level",pts:"+150"},{img:g+"jet.webp",name:"Fighter jet",note:"Dives at you, a missile every 2-3 s",pts:"+200"},

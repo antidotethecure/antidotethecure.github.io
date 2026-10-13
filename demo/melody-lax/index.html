@@ -23,11 +23,11 @@ window.SSAI_REWARDS={
   game:{perScore:100,dailyCap:50},    // Melody Approach: 1 point per 100 score, at most 50 points a day
   // [points, reward, Toast button]. toast.type: "item" = 100% off ONE item (server selects it first), "fixed" = $ off the check.
   // toast.max = the priciest item that reward covers (for the Toast setup sheet). Never free alcohol (California ABC).
-  // Owner rule (2026-10): a reward costs at least its dollar value at 100 points = $1 (≈ $10 spent per $1 of reward).
-  tiers:[[600,"Free soft drink or Melody Fries",{button:"App Reward – Free Soft Drink or Melody Fries",type:"item",max:5.75}],
-    [1100,"$10 off your check",{button:"App Reward – $10 Off",type:"fixed",amount:10}],
-    [1600,"Free starter: Fried Green Beans, Avocado Toast or Chicken Pot Stickers",{button:"App Reward – Free Starter",type:"item",max:15.00}],
-    [2200,"Free entrée: any Mac & Cheese or burrito",{button:"App Reward – Free Entrée",type:"item",max:21.50}]],
+  // Point costs match Christian's Toast setup sheet (Antidote, 2026-10-12): 250 / 500 / 1,000 / 1,500.
+  tiers:[[250,"Free soft drink or Melody Fries",{button:"App Reward – Free Soft Drink or Melody Fries",type:"item",max:5.75}],
+    [500,"Free starter: Fried Green Beans, Avocado Toast or Chicken Pot Stickers",{button:"App Reward – Free Starter",type:"item",max:15.00}],
+    [1000,"$10 off your check",{button:"App Reward – $10 Off",type:"fixed",amount:10}],
+    [1500,"Free entrée: any Mac & Cheese or burrito",{button:"App Reward – Free Entrée",type:"item",max:21.50}]],
   /* INTERIM MODE (until Toast approves the loyalty integration, ~30 days): staff never use their own phones.
      Guests earn with "Add my visit" (receipt claim) and redeem by showing a live 10-minute pass; the server taps the
      matching Toast discount button. See demo/interim.js and kit/toast-interim.html. */

@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Your Garage: Mobile Mechanic (Demo)</title>
+<meta name="description" content="Demo: a mobile mechanic's app. See services, tap your car to build a job, get an instant sample quote, book an open slot and track the repair from your phone. Sample shop by SousShift AI.">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#04060c">
+<link rel="manifest" href="manifest.webmanifest?v=20261013a">
+<link rel="icon" href="favicon.svg?v=20261013a" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png?v=20261013a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261013a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Your Garage">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="preconnect" href="https://vpic.nhtsa.dot.gov">
+<link rel="stylesheet" href="app.css?v=20261013a">
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <img id="logo" src="icon-192.png?v=20261013a" alt="" width="40" height="40">
+  <b><span id="bName">Your Garage</span><small><span data-brand="tagline">Mobile Mechanic</span> <span class="demo-tag">Demo</span></small></b>
+  <span class="sp"></span>
+  <button class="bell" id="bell" type="button" data-t-aria="bellAria" aria-label="Alerts">🔔<i id="bellN" hidden>0</i></button>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">EN</button><button data-lang="es" aria-pressed="false" lang="es">ES</button></div>
+</div></div>
+<nav class="snav" aria-label="Sections"><div class="wrap">
+  <a href="#services" data-t="navSvc">Services</a><a href="#car" data-t="navCar">Your car</a><a href="#diagram" data-t="navTap">Tap the car</a><a href="#quote" data-t="navQuote">Quote</a><a href="#book" data-t="navBook">Book</a><a href="#track" data-t="navTrack">Track</a><a href="#alerts" data-t="navAlerts">Alerts</a>
+</div></nav>
+
+<main class="wrap">
+  <section class="hero" aria-labelledby="h1">
+    <div class="openbar" id="openbar"><i></i><span id="openTxt"></span></div>
+    <h1 id="h1" class="chrome" data-t="heroH">We fix it <em>where it's parked.</em></h1>
+    <p data-t="heroP">Tap your car, get a price range in seconds, pick a time, and watch the repair move along, right here on your phone.</p>
+    <div class="stat"><span id="stArea" data-brand="area"></span><span id="stCity"></span></div>
+    <div class="row">
+      <a class="btn primary" href="#diagram" data-t="heroGo">🔧 Build my quote</a>
+      <a class="btn ghost" id="callBtn" href="tel:+15550100000" data-t="heroCall">📞 Call / text</a>
+    </div>
+  </section>
+
+  <section class="s" id="services">
+    <header><p class="kick" data-t="svcKick">What we do</p><h2 class="chrome" data-t="svcH">Services</h2><p class="lead" data-t="svcLead">Tap any service to add it to your job. Sample prices, final quote after inspection.</p></header>
+    <div class="svcs" id="svcList"></div>
+    <div class="card" style="margin-top:16px">
+      <p class="kick" data-t="baKick">Before / after</p>
+      <h3 data-t="baH">Drag the slider</h3>
+      <p class="note" data-t="baNote">Placeholder art for the demo. His real before/after photos go here.</p>
+      <div class="bas" id="baList" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <section class="s" id="car">
+    <header><p class="kick" data-t="carKick">Step 1</p><h2 class="chrome" data-t="carH">Your car</h2><p class="lead" data-t="carLead">Pick year, make and model, or decode your VIN.</p></header>
+    <div class="card">
+      <div class="grid2">
+        <label class="fld"><span data-t="yearL">Year</span><select id="year"></select></label>
+        <label class="fld"><span data-t="makeL">Make</span><select id="make"></select></label>
+      </div>
+      <label class="fld"><span data-t="modelL">Model</span><select id="model" disabled></select></label>
+      <label class="fld" id="modelTxtF" hidden><span data-t="modelTxtL">Type your make + model</span><input id="modelTxt" maxlength="40" autocomplete="off"></label>
+      <p class="note" id="modelMsg" aria-live="polite"></p>
+      <div class="vinrow">
+        <label class="fld"><span data-t="vinL">VIN (optional)</span><input id="vin" maxlength="17" autocomplete="off" autocapitalize="characters" spellcheck="false" data-t-ph="vinPh" placeholder="17 characters"></label>
+        <button class="btn ghost" id="vinBtn" type="button" data-t="vinBtn">Decode</button>
+      </div>
+      <p class="note" id="vinMsg" aria-live="polite"></p>
+      <div class="grid2">
+        <label class="fld"><span data-t="milesL">Mileage</span><input id="miles" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="85,000"></label>
+        <span></span>
+      </div>
+      <label class="fld"><span data-t="probL">What's going on?</span><textarea id="problem" maxlength="400" data-t-ph="probPh" placeholder="Squeaks when I brake, check-engine light came on…"></textarea></label>
+      <div class="carbadge" id="carBadge" hidden><i>🚗</i><div><b id="carName"></b><small id="carSub"></small></div></div>
+      <p class="src" data-t="vpicSrc">Make / model / VIN data: NHTSA vPIC (free public U.S. government database). Saved on this phone only.</p>
+    </div>
+  </section>
+
+  <section class="s" id="diagram">
+    <header><p class="kick" data-t="tapKick">Step 2</p><h2 class="chrome" data-t="tapH">Tap the car</h2><p class="lead" data-t="tapLead">Tap a glowing spot to add that repair to your job.</p></header>
+    <div class="views" role="group" data-t-aria="viewAria" aria-label="Car view">
+      <button type="button" data-view="side" aria-pressed="true" data-t="vSide">Side</button>
+      <button type="button" data-view="front" aria-pressed="false" data-t="vFront">Front</button>
+      <button type="button" data-view="back" aria-pressed="false" data-t="vBack">Back</button>
+    </div>
+    <div class="stage"><div class="grid"></div>
+      <div class="carwrap" id="carwrap"></div>
+      <div class="legend"><span id="viewLbl"></span><span><b id="hsCount">0</b> <span data-t="inJob">in your job</span></span></div>
+    </div>
+    <p class="hint"><span aria-hidden="true">👆</span><span data-t="tapHint">Flip to Front / Back for the battery, A/C, the other tires and the trunk.</span></p>
+  </section>
+
+  <section class="s" id="quote">
+    <header><p class="kick" data-t="qKick">Step 3</p><h2 class="chrome" data-t="qH">Instant quote</h2></header>
+    <div class="card">
+      <div class="job" id="jobList"></div>
+      <div class="tot" id="tot" hidden>
+        <p class="kick" style="margin:0" data-t="estTotal">Estimated total</p>
+        <div class="big" id="totBig"></div>
+        <dl>
+          <dt data-t="parts">Parts</dt><dd id="tParts"></dd>
+          <dt id="tLabL">Labor</dt><dd id="tLab"></dd>
+          <dt data-t="trip">Trip fee</dt><dd id="tTrip"></dd>
+          <dt data-t="time">Time on the car</dt><dd id="tTime"></dd>
+          <dt data-t="arrive">We arrive</dt><dd id="tArr"></dd>
+          <dt data-t="readyBy">Ready by about</dt><dd class="rb" id="tReady"></dd>
+        </dl>
+        <p class="disc" data-t="disc">⚠️ Sample prices, final quote after inspection.</p>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <a class="btn ghost" href="#book" data-t="pickTime">🗓️ Pick a time</a>
+        <button class="btn primary" id="reqBtn" type="button" data-t="reqBtn">Request this job</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="book">
+    <header><p class="kick" data-t="bKick">Step 4</p><h2 class="chrome" data-t="bH">Availability</h2><p class="lead" data-t="bLead">Open arrival windows this week. Tap one to hold it for your job.</p></header>
+    <div class="card">
+      <div class="days" id="days" role="group" data-t-aria="daysAria" aria-label="Pick a day"></div>
+      <div class="slots" id="slots"></div>
+      <div class="legend2"><span><i style="background:color-mix(in srgb,var(--good) 35%,transparent)"></i><span data-t="lgOpen">Open</span></span><span><i style="background:var(--accent)"></i><span data-t="lgPick">Your pick</span></span><span><i style="background:#ffffff14"></i><span data-t="lgBooked">Booked</span></span></div>
+      <p class="note" id="slotMsg" aria-live="polite"></p>
+    </div>
+    <div class="card">
+      <p class="kick" data-t="hKick">Hours</p>
+      <div class="hrs" id="hours"></div>
+    </div>
+  </section>
+
+  <section class="s" id="track">
+    <header><p class="kick" data-t="tKick">In your pocket</p><h2 class="chrome" data-t="tH">Job tracker</h2><p class="lead" data-t="tLead">Every update from the mechanic shows up here.</p></header>
+    <div class="card" id="reqCard">
+      <p class="kick" data-t="myReq">My requests</p>
+      <div class="reqs" id="reqs"></div>
+    </div>
+    <div class="card" id="trackCard"></div>
+  </section>
+
+  <section class="s" id="alerts">
+    <header><p class="kick" data-t="aKick">Alerts</p><h2 class="chrome" data-t="aH">Tell me when it's almost done</h2></header>
+    <div class="card">
+      <label class="sw"><span><span data-t="aApp">In-app alerts</span><small data-t="aAppS">Pop-ups + the 🔔 inbox on this page</small></span><input type="checkbox" id="aApp" checked></label>
+      <label class="sw"><span><span data-t="aText">📲 Text me when it's almost done</span><small data-t="aTextS">And when it's ready</small></span><input type="checkbox" id="aText"></label>
+      <label class="fld" id="aPhoneF" hidden><span data-t="aPhone">Mobile number</span><input id="aPhone" type="tel" inputmode="tel" maxlength="20" autocomplete="off" placeholder="(555) 010-0199"></label>
+      <label class="sw"><span><span data-t="aEmail">✉️ Email me when it's almost done</span><small data-t="aEmailS">And when it's ready</small></span><input type="checkbox" id="aEmail"></label>
+      <label class="fld" id="aMailF" hidden><span data-t="aMail">Email</span><input id="aMail" type="email" maxlength="60" autocomplete="off" placeholder="you@example.com"></label>
+      <button class="btn cyan w100" id="testAlert" type="button" style="margin-top:8px" data-t="testAlert">🔔 Show me a sample alert</button>
+      <div class="demo-note"><i aria-hidden="true">🧪</i><span data-t="aDemo"><b>Demo:</b> nothing is sent and nothing leaves this phone. Real texts go live once the business's texting number is approved by the carriers (Twilio A2P 10DLC, pending). Email will go out through the shop's own Google Apps Script mailer later.</span></div>
+    </div>
+  </section>
+</main>
+
+<footer class="f wrap">
+  <span data-t="foot">"Your Garage" is a made-up sample shop. Names, prices and hours are placeholders.</span>
+  <span class="pw"><b>Powered by SousShift AI</b> · <span data-t="pwDemo">Demo</span></span>
+</footer>
+
+<div id="jobpill" aria-live="polite"><div><b id="pillTot"></b><small id="pillN"></small></div><a class="btn primary" href="#quote" data-t="pillGo">Quote →</a></div>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shT"><div class="sc">
+  <div class="grab"></div>
+  <div class="hd"><span class="e" id="shE"></span><div><h3 id="shT"></h3><small id="shS"></small></div><button class="x" type="button" data-close data-t-aria="close" aria-label="Close">✕</button></div>
+  <div id="shPos"></div>
+  <div class="opts" id="shOpts"></div>
+  <p class="disc" data-t="disc">⚠️ Sample prices, final quote after inspection.</p>
+  <button class="btn primary w100" id="shSave" type="button" style="margin-top:10px" data-t="shSave">Save to job</button>
+</div></div>
+
+<div class="sheet" id="confirm" role="dialog" aria-modal="true" aria-labelledby="cfT"><div class="sc">
+  <div class="grab"></div>
+  <div class="hd"><span class="e">📝</span><div><h3 id="cfT" data-t="cfT">Send this request?</h3><small data-t="cfS">The mechanic accepts it with a final quote.</small></div><button class="x" type="button" data-close data-t-aria="close" aria-label="Close">✕</button></div>
+  <div id="cfBody"></div>
+  <label class="fld"><span data-t="cfName">First name (optional)</span><input id="cfName" maxlength="30" autocomplete="off" data-t-ph="cfNamePh" placeholder="Alex"></label>
+  <button class="btn primary w100" id="cfSend" type="button" data-t="cfSend">Send request (demo)</button>
+  <p class="note" data-t="cfNote">Demo only: saved on this phone, nothing is sent anywhere.</p>
+</div></div>
+
+<div class="sheet" id="inbox" role="dialog" aria-modal="true" aria-labelledby="ibT"><div class="sc">
+  <div class="grab"></div>
+  <div class="hd"><span class="e">🔔</span><div><h3 id="ibT" data-t="ibT">Alerts</h3><small data-t="ibS">Updates on your jobs</small></div><button class="x" type="button" data-close data-t-aria="close" aria-label="Close">✕</button></div>
+  <div class="inbox" id="ibList"></div>
+</div></div>
+
+<div id="banner" role="status" aria-live="assertive"><div class="bn"><div class="ic" id="bnIc"></div><div><small id="bnApp"></small><b id="bnT"></b><span id="bnB"></span><em id="bnD"></em></div></div></div>
+<div id="toast" role="status"></div>
+
+<script>
+window.T = {
+en: {
+  _title: "{name}: Mobile Mechanic (Demo)",
+  bellAria: "Alerts", close: "Close", navSvc: "Services", navCar: "Your car", navTap: "Tap the car", navQuote: "Quote", navBook: "Book", navTrack: "Track", navAlerts: "Alerts",
+  openNow: "Open now · until {t}", openLater: "Closed now · opens {d} {t}", heroH: "We fix it <em>where it's parked.</em>",
+  heroP: "Tap your car, get a price range in seconds, pick a time, and watch the repair move along, right here on your phone.",
+  heroGo: "🔧 Build my quote", heroCall: "📞 Call / text",
+  svcKick: "What we do", svcH: "Services", svcLead: "Tap any service to add it to your job. Sample prices, final quote after inspection.",
+  from: "from {p}", addon: "Add-on", baKick: "Before / after", baH: "Drag the slider", baNote: "Placeholder art for the demo. His real before/after photos go here.", before: "Before", after: "After", baDemo: "Sample art",
+  carKick: "Step 1", carH: "Your car", carLead: "Pick year, make and model, or decode your VIN.",
+  yearL: "Year", makeL: "Make", modelL: "Model", pickYear: "Year…", pickMake: "Make…", pickModel: "Model…", otherMake: "Other (type it)", modelTxtL: "Type your make + model",
+  loadingModels: "Loading models from NHTSA…", modelsOk: "{n} models for {y} {m}.", modelsNone: "No models listed for that year. Type it below.", modelsErr: "Couldn't reach the model list. Type it below.",
+  vinL: "VIN (optional)", vinPh: "17 characters", vinBtn: "Decode", vinBad: "A VIN is 17 letters and numbers (no I, O or Q).", vinLoading: "Decoding your VIN…",
+  vinOk: "✅ Decoded: {c}", vinErr: "Couldn't decode that VIN. Check it, or pick the car above.", milesL: "Mileage", probL: "What's going on?", probPh: "Squeaks when I brake, check-engine light came on…",
+  vpicSrc: "Make / model / VIN data: NHTSA vPIC (free public U.S. government database). Saved on this phone only.", milesSub: "{m} miles",
+  tapKick: "Step 2", tapH: "Tap the car", tapLead: "Tap a glowing spot to add that repair to your job.", viewAria: "Car view", vSide: "Side", vFront: "Front", vBack: "Back",
+  vSideL: "Driver side", vFrontL: "Front", vBackL: "Back", inJob: "in your job", tapHint: "Flip to Front / Back for the battery, A/C, the other tires and the trunk.",
+  qKick: "Step 3", qH: "Instant quote", estTotal: "Estimated total", parts: "Parts", labor: "Labor ({h} × {r}/hr)", trip: "Trip fee", free: "Free", time: "Time on the car",
+  arrive: "We arrive", readyBy: "Ready by about", disc: "⚠️ Sample prices, final quote after inspection.", pickTime: "🗓️ Pick a time", reqBtn: "Request this job",
+  emptyJob: "Your job is empty. Tap the car or a service to add repairs.", remove: "Remove", nextOpen: "{s} (next open)",
+  bKick: "Step 4", bH: "Availability", bLead: "Open arrival windows this week. Tap one to hold it for your job.", daysAria: "Pick a day",
+  nOpen: "{n} open", lgOpen: "Open", lgPick: "Your pick", lgBooked: "Booked", slotOpen: "Open", slotBooked: "Booked", slotPast: "Passed", slotYours: "Picked",
+  dayClosed: "Closed this day. Pick another day.", dayFull: "Fully booked. Pick another day.", slotPicked: "✅ Held for your job: {s}", hKick: "Hours",
+  tKick: "In your pocket", tH: "Job tracker", tLead: "Every update from the mechanic shows up here.", myReq: "My requests",
+  noReq: "No requests yet. Here's a <b>sample job</b> so you can see how tracking works.",
+  stReq: "Requested", stGo: "In progress", stDone: "Ready", stNo: "Declined",
+  waitH: "Waiting for the mechanic", waitP: "Your request is in. You'll get an alert when it's accepted with a final quote.",
+  declined: "The mechanic can't take this one. Try another time.", estimate: "Estimate", quote: "Quote", slotL: "Arrival", jobId: "Job {id}",
+  skipped: "Skipped", sample: "Sample job", playSample: "▶ Play the sample", replay: "↺ Replay", sampleCar: "2016 Sample Sedan",
+  sampleNotes: ["Got your request. On my way at 10.", "Scan shows worn front pads. Rotors are grooved.", "Pads + rotors ordered, here in about an hour.", "Wheels off, starting the front axle.", "Driver side done. Doing the passenger side.", "Bedding in the brakes on a test drive.", "All done. Brakes feel great. Ready when you are."],
+  aKick: "Alerts", aH: "Tell me when it's almost done", aApp: "In-app alerts", aAppS: "Pop-ups + the 🔔 inbox on this page",
+  aText: "📲 Text me when it's almost done", aTextS: "And when it's ready", aPhone: "Mobile number", aEmail: "✉️ Email me when it's almost done", aEmailS: "And when it's ready", aMail: "Email",
+  testAlert: "🔔 Show me a sample alert",
+  aDemo: "<b>Demo:</b> nothing is sent and nothing leaves this phone. Real texts go live once the business's texting number is approved by the carriers (Twilio A2P 10DLC, pending). Email will go out through the shop's own Google Apps Script mailer later.",
+  foot: "\"Your Garage\" is a made-up sample shop. Names, prices and hours are placeholders.", pwDemo: "Demo",
+  pillN: "{n} item(s) · {h}", pillGo: "Quote →",
+  shSave: "Save to job", shNone: "Remove from job", shS: "Pick what you need", posL: "Which one?", inJobTag: "In job", added: "✅ Added to your job", removed: "Removed from your job", updated: "Job updated",
+  cfT: "Send this request?", cfS: "The mechanic accepts it with a final quote.", cfName: "First name (optional)", cfNamePh: "Alex", cfSend: "Send request (demo)",
+  cfNote: "Demo only: saved on this phone, nothing is sent anywhere.", cfCar: "Car", cfItems: "Job", cfEst: "Estimate", cfSlot: "Arrival", cfAlerts: "Alerts",
+  noItems: "Tap the car or a service first.", sending: "Sending…", sent: "✅ Request sent (demo). Track it below.",
+  ibT: "Alerts", ibS: "Updates on your jobs", ibEmpty: "No alerts yet.",
+  chApp: "In-app", chText: "Text (simulated)", chEmail: "Email (simulated)", bnText: "Messages · now", bnMail: "Mail · now", bnApp: "{n} · now",
+  bnDemo: "Simulated: demo, nothing was sent", sampleAlertT: "Almost done! ⏳", sampleAlertB: "Your {c} is almost done. About 20 more minutes. Reply here with any questions.",
+  nAccepted: "Accepted ✅", nAcceptedB: "Your {c} is booked. Final quote: {q}.", nStage: "{s}", nStageB: "Update on your {c}.", nDeclined: "Request declined",
+  carUnknown: "Car not picked yet", alertsOff: "In-app only"
+},
+es: {
+  _title: "{name}: Mecánico a domicilio (Demo)",
+  bellAria: "Alertas", close: "Cerrar", navSvc: "Servicios", navCar: "Tu carro", navTap: "Toca el carro", navQuote: "Cotización", navBook: "Agendar", navTrack: "Seguimiento", navAlerts: "Alertas",
+  openNow: "Abierto · hasta las {t}", openLater: "Cerrado · abre {d} {t}", heroH: "Lo arreglamos <em>donde está estacionado.</em>",
+  heroP: "Toca tu carro, ve un rango de precio en segundos, escoge la hora y sigue la reparación paso a paso desde tu teléfono.",
+  heroGo: "🔧 Armar mi cotización", heroCall: "📞 Llamar / mensaje",
+  svcKick: "Lo que hacemos", svcH: "Servicios", svcLead: "Toca un servicio para agregarlo a tu trabajo. Precios de muestra, cotización final después de revisar.",
+  from: "desde {p}", addon: "Extra", baKick: "Antes / después", baH: "Desliza", baNote: "Arte de muestra para el demo. Aquí van sus fotos reales de antes y después.", before: "Antes", after: "Después", baDemo: "Arte de muestra",
+  carKick: "Paso 1", carH: "Tu carro", carLead: "Escoge año, marca y modelo, o decodifica tu VIN.",
+  yearL: "Año", makeL: "Marca", modelL: "Modelo", pickYear: "Año…", pickMake: "Marca…", pickModel: "Modelo…", otherMake: "Otra (escríbela)", modelTxtL: "Escribe marca y modelo",
+  loadingModels: "Cargando modelos de NHTSA…", modelsOk: "{n} modelos para {m} {y}.", modelsNone: "No hay modelos para ese año. Escríbelo abajo.", modelsErr: "No se pudo cargar la lista. Escríbelo abajo.",
+  vinL: "VIN (opcional)", vinPh: "17 caracteres", vinBtn: "Decodificar", vinBad: "El VIN tiene 17 letras y números (sin I, O ni Q).", vinLoading: "Decodificando tu VIN…",
+  vinOk: "✅ Decodificado: {c}", vinErr: "No se pudo decodificar. Revísalo o escoge el carro arriba.", milesL: "Millaje", probL: "¿Qué le pasa?", probPh: "Rechina al frenar, se prendió la luz del motor…",
+  vpicSrc: "Datos de marca / modelo / VIN: NHTSA vPIC (base de datos pública y gratuita del gobierno de EE. UU.). Se guarda solo en este teléfono.", milesSub: "{m} millas",
+  tapKick: "Paso 2", tapH: "Toca el carro", tapLead: "Toca un punto brillante para agregar esa reparación.", viewAria: "Vista del carro", vSide: "Lado", vFront: "Frente", vBack: "Atrás",
+  vSideL: "Lado del conductor", vFrontL: "Frente", vBackL: "Atrás", inJob: "en tu trabajo", tapHint: "Cambia a Frente / Atrás para la batería, el A/C, las otras llantas y la cajuela.",
+  qKick: "Paso 3", qH: "Cotización al instante", estTotal: "Total estimado", parts: "Piezas", labor: "Mano de obra ({h} × {r}/h)", trip: "Visita", free: "Gratis", time: "Tiempo en el carro",
+  arrive: "Llegamos", readyBy: "Listo aprox.", disc: "⚠️ Precios de muestra, cotización final después de revisar.", pickTime: "🗓️ Escoger hora", reqBtn: "Pedir este trabajo",
+  emptyJob: "Tu trabajo está vacío. Toca el carro o un servicio.", remove: "Quitar", nextOpen: "{s} (siguiente libre)",
+  bKick: "Paso 4", bH: "Disponibilidad", bLead: "Horarios libres esta semana. Toca uno para apartarlo.", daysAria: "Escoge un día",
+  nOpen: "{n} libres", lgOpen: "Libre", lgPick: "Tu hora", lgBooked: "Ocupado", slotOpen: "Libre", slotBooked: "Ocupado", slotPast: "Ya pasó", slotYours: "Apartado",
+  dayClosed: "Cerrado ese día. Escoge otro.", dayFull: "Todo ocupado. Escoge otro día.", slotPicked: "✅ Apartado para tu trabajo: {s}", hKick: "Horario",
+  tKick: "En tu bolsillo", tH: "Seguimiento", tLead: "Cada novedad del mecánico aparece aquí.", myReq: "Mis pedidos",
+  noReq: "Aún no hay pedidos. Aquí hay un <b>trabajo de muestra</b> para que veas cómo funciona.",
+  stReq: "Pedido", stGo: "En proceso", stDone: "Listo", stNo: "Rechazado",
+  waitH: "Esperando al mecánico", waitP: "Tu pedido llegó. Te avisamos cuando lo acepte con la cotización final.",
+  declined: "El mecánico no puede tomar este. Prueba otra hora.", estimate: "Estimado", quote: "Cotización", slotL: "Llegada", jobId: "Trabajo {id}",
+  skipped: "Saltado", sample: "Trabajo de muestra", playSample: "▶ Ver la muestra", replay: "↺ Repetir", sampleCar: "Sedán de muestra 2016",
+  sampleNotes: ["Recibí tu pedido. Llego a las 10.", "El escaneo muestra balatas gastadas. Los discos están rayados.", "Balatas + discos pedidos, llegan en una hora.", "Llantas fuera, empezando el eje delantero.", "Lado del conductor listo. Sigo con el otro.", "Asentando los frenos en una prueba.", "Todo listo. Los frenos se sienten muy bien."],
+  aKick: "Alertas", aH: "Avísame cuando esté casi listo", aApp: "Alertas en la app", aAppS: "Avisos + la bandeja 🔔 de esta página",
+  aText: "📲 Mándame texto cuando esté casi listo", aTextS: "Y cuando esté listo", aPhone: "Número de celular", aEmail: "✉️ Mándame correo cuando esté casi listo", aEmailS: "Y cuando esté listo", aMail: "Correo",
+  testAlert: "🔔 Ver una alerta de muestra",
+  aDemo: "<b>Demo:</b> no se envía nada y nada sale de este teléfono. Los textos reales se activan cuando las compañías aprueben el número del negocio (Twilio A2P 10DLC, pendiente). El correo saldrá después por el Google Apps Script del taller.",
+  foot: "\"Your Garage\" es un taller de muestra inventado. Nombres, precios y horarios son de ejemplo.", pwDemo: "Demo",
+  pillN: "{n} servicio(s) · {h}", pillGo: "Cotizar →",
+  shSave: "Guardar en el trabajo", shNone: "Quitar del trabajo", shS: "Escoge lo que necesitas", posL: "¿Cuál?", inJobTag: "En el trabajo", added: "✅ Agregado a tu trabajo", removed: "Quitado de tu trabajo", updated: "Trabajo actualizado",
+  cfT: "¿Enviar este pedido?", cfS: "El mecánico lo acepta con la cotización final.", cfName: "Nombre (opcional)", cfNamePh: "Alex", cfSend: "Enviar pedido (demo)",
+  cfNote: "Solo demo: se guarda en este teléfono, no se envía nada.", cfCar: "Carro", cfItems: "Trabajo", cfEst: "Estimado", cfSlot: "Llegada", cfAlerts: "Alertas",
+  noItems: "Primero toca el carro o un servicio.", sending: "Enviando…", sent: "✅ Pedido enviado (demo). Síguelo abajo.",
+  ibT: "Alertas", ibS: "Novedades de tus trabajos", ibEmpty: "Aún no hay alertas.",
+  chApp: "En la app", chText: "Texto (simulado)", chEmail: "Correo (simulado)", bnText: "Mensajes · ahora", bnMail: "Correo · ahora", bnApp: "{n} · ahora",
+  bnDemo: "Simulado: es demo, no se envió nada", sampleAlertT: "¡Casi listo! ⏳", sampleAlertB: "Tu {c} está casi listo. Unos 20 minutos más. Responde aquí si tienes dudas.",
+  nAccepted: "Aceptado ✅", nAcceptedB: "Tu {c} quedó agendado. Cotización final: {q}.", nStage: "{s}", nStageB: "Novedad de tu {c}.", nDeclined: "Pedido rechazado",
+  carUnknown: "Carro sin escoger", alertsOff: "Solo en la app"
+}
+};
+</script>
+<script src="config.js?v=20261013a"></script>
+<script src="core.js?v=20261013a"></script>
+<script src="car.js?v=20261013a"></script>
+<script src="app.js?v=20261013a"></script>
+<script>(function(){var c=SHOP_CFG.colors;window.A2HS_CFG={name:SHOP_CFG.brand.name,theme:{bg:c.bg,bg2:c.panel2,edge:c.edge,accent:c.accent,accent2:c.accent2,ink:c.ink,dim:c.dim,btnInk:"#1d0b00",display:"Orbitron,sans-serif",body:"Rajdhani,system-ui,sans-serif"}};})();</script>
+<script src="../a2hs.js"></script>
+</body>
+</html>

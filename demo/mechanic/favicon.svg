@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+<title>Mobile mechanic app icon (placeholder)</title>
+<defs>
+<radialGradient id="bg" cx=".5" cy=".2" r=".95"><stop offset="0" stop-color="#22324f"/><stop offset=".5" stop-color="#0b1222"/><stop offset="1" stop-color="#04060c"/></radialGradient>
+<linearGradient id="or" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb36b"/><stop offset=".55" stop-color="#ff7a1a"/><stop offset="1" stop-color="#d9520a"/></linearGradient>
+<linearGradient id="cy" x1="0" x2="1"><stop offset="0" stop-color="#2de2ff"/><stop offset="1" stop-color="#ff7a1a"/></linearGradient>
+<linearGradient id="st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#b9c4da"/></linearGradient>
+<filter id="gl" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="14" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000" flood-opacity=".55"/></filter>
+<clipPath id="sq"><rect width="1024" height="1024" rx="228"/></clipPath>
+</defs>
+<g clip-path="url(#sq)">
+<rect width="1024" height="1024" fill="url(#bg)"/>
+<g stroke="#2de2ff" stroke-opacity=".08" stroke-width="4"><path d="M0 256H1024M0 512H1024M0 768H1024M256 0V1024M512 0V1024M768 0V1024"/></g>
+<path d="M172 640 A340 340 0 0 1 852 640" fill="none" stroke="#0a0f1c" stroke-width="64" stroke-linecap="round"/>
+<path d="M172 640 A340 340 0 0 1 852 640" fill="none" stroke="url(#cy)" stroke-width="64" stroke-linecap="round" stroke-dasharray="820 2000" filter="url(#gl)"/>
+<mask id="jaw"><rect width="1024" height="1024" fill="#fff"/><rect x="474" y="150" width="76" height="132" rx="10" fill="#000"/></mask>
+<g filter="url(#sh)" transform="rotate(42 512 640)">
+<rect x="478" y="300" width="68" height="350" rx="20" fill="url(#st)"/>
+<circle cx="512" cy="270" r="104" fill="url(#or)" mask="url(#jaw)"/>
+<circle cx="512" cy="652" r="74" fill="url(#or)"/><circle cx="512" cy="652" r="30" fill="#0b1222"/>
+</g>
+<text x="512" y="900" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="96" letter-spacing="10" fill="#eef3ff" opacity=".92">DEMO</text>
+</g>
+</svg>

@@ -79,8 +79,11 @@
   function boPost(o) {
     if (!API || STAFF && o.type !== "staff_practice") return;
     o.slug = SLUG; o.restaurant = NAME;
-    try { fetch(API, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }); } catch (x) {}
+    try { fetch(API, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }).catch(function () {}); } catch (x) {}
   }
+  // SCOUT (Code.gs): every points event carries a unique event id (eid). The server rejects duplicates and over-cap awards
+  // ("Already counted") and writes an adjustment for points this phone showed but the server refused; pullAdj() applies it once.
+  function evId(p) { return p + Date.now().toString(36) + code4(6); }
   var syncT = 0, syncM = null;
   function syncLater(m) {
     if (!API || STAFF || !SIMPLE || !m || !m.id || m.sample) return;
@@ -181,7 +184,10 @@
   function reviewUrl() { var N = window.NEARBY, sp = N && N.spots && N.spots[0]; return EARN.review.url || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(NAME + (sp && sp.q ? " " + sp.q : "")); }
   var lastBonus = 0;   // bonus pts added by the last visit() call, for the toast
   function earnOnce(m, key, pts, why) { m.earned = m.earned || {}; if (m.earned[key] || !pts) return 0; m.earned[key] = Date.now(); addPts(m, pts, why); tag(m, key.replace(/_\d+$/, "") + "_bonus"); return pts; }
-  function tag(m, k) { m.ledger[0].k = k; (m.ec = m.ec || {})[k] = (m.ec[k] || 0) + 1; }
+  function tag(m, k) { m.ledger[0].k = k; (m.ec = m.ec || {})[k] = (m.ec[k] || 0) + 1;
+    // bonus points (join, birthday, referral, spin, check-in…) go to the server ledger; game points and interim claims have their own events
+    if (SIMPLE && API && !STAFF && m.id && !m.sample && m.ledger[0].pts > 0 && k !== "game_bonus" && /_bonus$|^referral_/.test(k))
+      boPost({ type: "award", source: k, pts: m.ledger[0].pts, member: m.id, dev: devId(), eid: evId("A") }); }
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   var MONTHS_L = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   // birthday: full date so the treat lands on the real day; staff check a photo ID with the same date before giving it out
@@ -496,10 +502,10 @@
     // call ONCE per finished run. Returns {pts, saved, capped, today, cap}: pts actually credited (member) or held (guest)
     award: function (score, label) {
       if (STAFF) return staffAward(score, label);
-      if (API) boPost({ type: "game", member: (mine()[0] || {}).id || "", dev: devId(), score: Math.max(0, Math.round(+score || 0)), pts: gpFor(score) });
       var want = gpFor(score), cap = SIMPLE.game.dailyCap, m = mine()[0], got, today;
       if (m) { got = gpAdd(m, want, "🎮 " + (label || C.game || "Game") + " · score " + Math.round(+score || 0).toLocaleString()); today = gpUsed(m); put(m); drawJoin(); drawOwn(); }
       else { var h = gpHeld() || { day: gpDay(), pts: 0 }; got = Math.max(0, Math.min(want, cap - h.pts)); h.pts += got; today = h.pts; try { localStorage.setItem(GPKEY, JSON.stringify(h)); } catch (x) {} drawJoin(); }
+      if (API) boPost({ type: "game", member: m ? m.id : "", dev: devId(), score: Math.max(0, Math.round(+score || 0)), pts: got, eid: evId("G") });   // pts = what this phone credited
       return { pts: got, want: want, saved: !!m, capped: got < want, today: today, cap: cap };
     },
     held: function () { var h = gpHeld(); return h ? h.pts : 0; },
@@ -1603,6 +1609,19 @@
     if (localStorage.getItem(ok) !== td) { localStorage.setItem(ok, td); if (mine()[0]) syncLater(mine()[0]);   // daily re-sync: members who joined before the backend existed get counted too
       boPost({ type: "open", dev: devId(), member: (mine()[0] || {}).id || "", standalone: (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone ? 1 : 0 }); }
   } catch (x) {}
+  // Scout adjustments: points the server refused as duplicates / over a cap, or that Christian HQ reversed. Each applies once.
+  function pullAdj() {
+    var m = mine()[0]; if (!SIMPLE || !API || STAFF || !m || !m.id || m.sample) return;
+    fetch(API + (API.indexOf("?") < 0 ? "?" : "&") + "adj=1&slug=" + encodeURIComponent(SLUG) + "&member=" + encodeURIComponent(m.id) + "&dev=" + encodeURIComponent(devId()) + "&t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.json(); }).then(function (j) {
+        var mm = mine()[0]; if (!j || !j.ok || !j.adj || !j.adj.length || !mm || mm.id !== m.id) return;
+        var done = mm.adjDone = mm.adjDone || [], tot = 0;
+        j.adj.forEach(function (a) { var p = Math.round(+a.pts || 0); if (!a.id || !p || done.indexOf(a.id) >= 0) return; done.push(a.id); tot += p;
+          if (WAL) addPts(mm, p, "🛡️ " + a.why); else { mm.stars = Math.max(0, (mm.stars || 0) + p); if (p < 0 && mm.earned != null) mm.earned = Math.max(0, mm.earned + p); (mm.ledger = mm.ledger || []).unshift({ ts: Date.now(), pts: p, t: "🛡️ " + (p < 0 ? "Already counted: " : "") + a.why, k: "scout_adj" }); mm.ledger = mm.ledger.slice(0, 40); } });
+        if (tot) { put(mm); drawJoin(); drawOwn(); toast(tot < 0 ? "🛡️ " + tot + " points: those were already counted" : "🛡️ +" + tot + " points added by " + NAME); }
+      }).catch(function () {});
+  }
+  try { pullAdj(); } catch (x) {}
   if (STAFF) {
     var sb = document.createElement("div"); sb.id = "ssai-staff-bar"; sb.setAttribute("role", "status");
     sb.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:2147483600;background:#FFD23F;color:#1a1206;font:800 13px/1.3 system-ui,sans-serif;padding:7px 12px;padding-top:calc(7px + env(safe-area-inset-top));display:flex;gap:8px;align-items:center;justify-content:space-between;box-shadow:0 2px 10px #0006";

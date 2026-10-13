@@ -30,7 +30,7 @@ async function boot() {
   const D = 1000;                                   // camera height above the ground plane
   const ws = Y => (D - Y) / D;                      // world units per screen px at altitude Y
   const wx = (x, Y) => (x - W / 2) * ws(Y), wz = (y, Y) => (y - H / 2) * ws(Y);
-  const A = { trf: 128, player: 150, ufo: 176, jet: 192, cop: 200, kami: 182, gun: 214, sj: 200, rp: 236, blimp: 250, item: 104, shot: 150, eshot: 164, air: 138 };
+  const A = { trf: 128, player: 150, ufo: 176, jet: 192, cop: 200, kami: 182, gun: 214, sj: 200, rp: 236, blimp: 250, item: 104, shot: 150, eshot: 164, air: 138, esc: 188, bigjet: 208, rocket: 222, base: 14, bird: 172 };
 
   /* ---------------- renderer, camera, lights ---------------- */
   const cv = document.getElementById("cv"), wrap = cv.parentNode;
@@ -166,6 +166,57 @@ async function boot() {
     g.position.sub(c); const inner = new THREE.Group(); inner.add(g); MODELS.trf = { node: inner, size: sz };
   })();
 
+  /* ---- new bosses (2026-10-12): simple procedural meshes. Nose / head = +Z (screen down), like the GLB aircraft. ---- */
+  const std = (c, o) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: .5 }, o || {}));
+  const meshIn = (g, geo, mat, x, y, z, cast) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = cast !== false; g.add(m); return m; };
+  const along = (geo) => { geo.rotateX(Math.PI / 2); return geo; };   // cylinders/cones: Y axis → Z axis (tip toward +Z)
+  function normGroup(g) { const box = new THREE.Box3().setFromObject(g), c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3()); g.position.sub(c); const o = new THREE.Group(); o.add(g); return { node: o, size: sz }; }
+  // the rocket ship: polished body, red nose + bands, red fins, engine bell, two missile pods
+  function buildRocket() { const g = new THREE.Group(), metal = std(0xe9edf3, { metalness: .45, roughness: .28 }), red = std(0xc8262f, { roughness: .45 }), dark = std(0x30343d, { roughness: .6 }), pod = std(0xb7bcc6, { metalness: .4, roughness: .35 });
+    meshIn(g, along(new THREE.CylinderGeometry(13, 13, 104, 28)), metal, 0, 0, 0);
+    meshIn(g, along(new THREE.ConeGeometry(13, 34, 28)), metal, 0, 0, 69);
+    meshIn(g, along(new THREE.ConeGeometry(5.6, 15, 20)), red, 0, 0, 79.5);
+    meshIn(g, along(new THREE.CylinderGeometry(13.4, 13.4, 7, 28)), red, 0, 0, -30);
+    meshIn(g, along(new THREE.CylinderGeometry(13.4, 13.4, 4, 28)), dark, 0, 0, 40);
+    meshIn(g, along(new THREE.CylinderGeometry(9, 12.5, 12, 20)), dark, 0, 0, -58);
+    [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([a, b]) => { const f = meshIn(g, new THREE.BoxGeometry(a ? 22 : 1.6, b ? 22 : 1.6, 26), red, a * 23, b * 23, -40); f.rotation.z = 0; });
+    [-1, 1].forEach(sx => { meshIn(g, along(new THREE.CylinderGeometry(5.5, 5.5, 34, 16)), pod, sx * 40, 0, 4); meshIn(g, along(new THREE.ConeGeometry(5.5, 8, 16)), red, sx * 40, 0, 25); meshIn(g, new THREE.BoxGeometry(22, 2, 8), dark, sx * 25, 0, 4); });
+    const win = meshIn(g, new THREE.SphereGeometry(4.5, 14, 10), std(0x1d3554, { metalness: .6, roughness: .15, emissive: 0x2a6acc, emissiveIntensity: .35 }), 0, 11.5, 10); win.scale.set(1, .5, 1);
+    return normGroup(g); }
+  // the army base: the 2D base art on a concrete slab + real hangars, launcher turrets (rotating), radar and fuel tank
+  function buildBase() { const BW = M.BASE_W, BH = M.BASE_H, g = new THREE.Group(), olive = std(0x7d8761, { roughness: .7 }), dark = std(0x3f4630, { roughness: .7 }), steel = std(0x9aa0a8, { metalness: .4, roughness: .4 });
+    const t = canTex(M.baseIm(), true); t.anisotropy = 4;
+    const slab = meshIn(g, new THREE.BoxGeometry(BW, 4, BH), [dark, dark, new THREE.MeshStandardMaterial({ map: t, roughness: .85 }), dark, dark, dark], 0, 0, 0, false); slab.receiveShadow = true;
+    [[-90, -40], [90, -40]].forEach(([x, z]) => { const h = meshIn(g, new THREE.CylinderGeometry(23, 23, 74, 22).rotateZ(Math.PI / 2), olive, x, 2, z); h.scale.set(1, .62, 1); h.receiveShadow = true; });
+    const L = [], tubeG = along(new THREE.CylinderGeometry(2.6, 2.6, 18, 10)), tubeM = std(0x262a20, { roughness: .8 });
+    (M.BASE_L || []).forEach(p => { const tg = new THREE.Group(); tg.position.set(p[0] - BW / 2, 6, p[1] - BH / 2); g.add(tg);
+      meshIn(tg, new THREE.CylinderGeometry(11, 12, 5, 18), dark, 0, -2, 0);
+      const head = new THREE.Group(); tg.add(head); meshIn(head, new THREE.BoxGeometry(22, 9, 20), olive, 0, 3, 0);
+      for (let i = 0; i < 4; i++) { const tb = meshIn(head, tubeG, tubeM, (i % 2 ? 5 : -5), 6 + (i < 2 ? 3.5 : -1.5), 6); tb.rotation.x = -.45; }
+      L.push(head); });
+    const radar = new THREE.Group(); radar.position.set(28 - BW / 2, 2, 112 - BH / 2); g.add(radar);
+    meshIn(radar, new THREE.CylinderGeometry(2, 3, 16, 10), steel, 0, 8, 0); const dish = meshIn(radar, new THREE.BoxGeometry(24, 7, 2.5), std(0xd6dacb, { roughness: .45 }), 0, 17, 0); dish.rotation.x = -.3;
+    meshIn(g, new THREE.CylinderGeometry(12, 12, 14, 20), std(0xdfe3e8, { metalness: .3, roughness: .35 }), 266 - BW / 2, 8, 116 - BH / 2);
+    const n = normGroup(g); n.node.userData = { L, radar }; return n; }
+  // a white bird (dove or a plumper pigeon): body, head, pink beak, tail fan, two wings on shoulder pivots that flap
+  const BIRD_M = std(0xffffff, { roughness: .6, emissive: 0xc9d3ea, emissiveIntensity: .55, side: THREE.DoubleSide }), BIRD_TIP = std(0xd9dee6, { roughness: .6, emissive: 0x7a8396, emissiveIntensity: .35 }), BEAK_M = std(0xf2a8a0, { roughness: .5 });
+  const EYE_M = new THREE.MeshBasicMaterial({ color: 0x1a1d24 });
+  function buildBird(pg) { const g = new THREE.Group(), bodyG = new THREE.SphereGeometry(1, 14, 10);
+    const body = meshIn(g, bodyG, BIRD_M, 0, 0, 0); body.scale.set(pg ? 6.6 : 5.2, pg ? 5.2 : 4.4, pg ? 12 : 12.5);
+    meshIn(g, new THREE.SphereGeometry(pg ? 4.8 : 4.1, 12, 10), BIRD_M, 0, 1.6, pg ? 11 : 12);
+    meshIn(g, along(new THREE.ConeGeometry(1.3, 4, 8)), BEAK_M, 0, 1.2, pg ? 17 : 17.5);
+    [-1, 1].forEach(sx => meshIn(g, new THREE.SphereGeometry(.8, 6, 5), EYE_M, sx * 2.4, 3, pg ? 13.5 : 14.3, false));
+    // tail fan + wings as flat feathered shapes (lying in the XZ plane), not boxes
+    const flat = (pts) => { const sh = new THREE.Shape(); sh.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) sh.lineTo(pts[i][0], pts[i][1]); const geo = new THREE.ShapeGeometry(sh); geo.rotateX(Math.PI / 2); return geo; };
+    const tw = pg ? 7.5 : 5.5; meshIn(g, flat([[-2.5, -5], [-tw, -19], [-tw * .5, -21], [0, -21.5], [tw * .5, -21], [tw, -19], [2.5, -5]]), BIRD_M, 0, .8, 0);
+    const span = pg ? 19 : 22, ch = pg ? 11 : 8.5;
+    const wings = [-1, 1].map(sx => { const pv = new THREE.Group(); pv.position.set(sx * 3, 1.5, 1); g.add(pv);
+      const pts = [[0, 3], [span * .5, 3.5], [span, 1], [span - 1, -ch * .35], [span * .78, -ch * .6], [span * .55, -ch * .5], [span * .32, -ch * .78], [span * .1, -ch * .62], [0, -ch * .7]].map(([x, z]) => [sx * x, z]);
+      meshIn(pv, flat(pts), BIRD_M, 0, 0, 0); return pv; });
+    const n = normGroup(g); n.wings = wings; return n; }
+  const BIRDS = [[], []], BOSSM = {}; let birdN = [0, 0];
+  function birdGet(pg) { let o = BIRDS[pg][birdN[pg]++]; if (!o) { const b = buildBird(pg); o = b.node; o.userData = { size: b.size, wings: b.wings }; o.rotation.order = "YXZ"; o.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(o); BIRDS[pg].push(o); } o.visible = true; return o; }
+  function bossMesh(k) { if (!BOSSM[k]) { const b = k === "rocket" ? buildRocket() : buildBase(); const o = b.node; o.userData = Object.assign(o.userData || {}, { size: b.size, mats: [] }); o.traverse(n => { if (n.isMesh) { n.material = Array.isArray(n.material) ? n.material.map(m => m.clone()) : n.material.clone(); (Array.isArray(n.material) ? n.material : [n.material]).forEach(m => o.userData.mats.push(m)); } }); o.rotation.order = "YXZ"; scene.add(o); BOSSM[k] = o; } const o = BOSSM[k]; o.visible = true; o.userData.used = 1; return o; }
   // instances: each model type has a pool of clones; materials are cloned per clone so hit flashes/tints stay local
   const POOLS = {};
   function cloneModel(k, tint) {
@@ -186,7 +237,7 @@ async function boot() {
   }
   // pickups glow from their own texture (emissiveMap = map) so they read bright; procedural parts (glass, liquid) keep their own look
   function foodLit(o, v) { const m = o.userData.mats; for (let i = 0; i < m.length; i++) if (m[i].emissiveMap) { m[i].emissive.setHex(0xffffff); m[i].emissiveIntensity = v; } }
-  function flash(o, v, col) { const m = o.userData.mats; for (let i = 0; i < m.length; i++) { m[i].emissive.setHex(col || 0xffffff); m[i].emissiveIntensity = v; } }
+  function flash(o, v, col) { const m = o.userData.mats; for (let i = 0; i < m.length; i++) { if (!m[i].emissive) continue; m[i].emissive.setHex(col || 0xffffff); m[i].emissiveIntensity = v; } }
   const V = new THREE.Vector3();
   function local(o, lx, ly, lz) { V.set(lx, ly, lz); return o.localToWorld(V); }   // model-local (normalized by its bbox) → world
   // model-local point given in fractions of the model's bbox
@@ -368,6 +419,7 @@ async function boot() {
     for (let i = 0; i < G.fx.length; i++) { const p = G.fx[i], a = Math.max(0, Math.min(1, p.a));
       if (p.k === "e") { if (UV.spark) streak(Ba, p.x, p.y, A.air + 6, p.vx, p.vy, p.s * 1.2, p.s * 2 + Math.hypot(p.vx, p.vy) * 2.5, a); else Ba.q(p.x, p.y, A.air + 6, p.s * 1.4, p.s * 1.4, 0, UV.dot, 1, .81, .42, a); }
       else if (p.k === "r") Ba.q(p.x, p.y, A.air + 6, p.s * 2.2, p.s * 2.2, 0, UV.ring, 1, .81, .54, a);
+      else if (p.k === "w") Bn.q(p.x, p.y, A.bird + 4, p.s * 2.8, p.s, (p.rot || 0) + p.a * 3, UV.dot, 1, 1, 1, a);
       else if (p.k === "s" && UV.smoke) Bn.q(p.x, p.y, A.kami - 8, p.s * 2, p.s * 2, p.rot || 0, UV.smoke, 1, 1, 1, Math.min(1, p.a));
       else if (p.k === "f" && UV.flame) { const h = p.s * 2.4, w = h * 58 / 160, r = Math.PI + (p.rot || 0); Ba.q(p.x - h * .4 * Math.sin(r), p.y + h * .4 * Math.cos(r), A.air + 4, w, h, r, UV.flame, 1, 1, 1, a); } }
     // fire lights: the three hottest things light the ground and the airframes around them
@@ -431,9 +483,26 @@ async function boot() {
         [-7, 7].forEach(of => { const lx = of, ly = -h * .47, x = en.x + lx * ca - ly * sa, y = en.y + lx * sa + ly * ca, L = (26 + Math.random() * 10) * burn; tongueQ(Ba, x, y, A.sj - 2, L / 46, a, UV.tongue, 1, .9, .8, .95); });
         if (en.st === "turn") { const pu = .5 + .5 * Math.sin(now / 90), ly = -h * .18; Ba.q(en.x - ly * sa, en.y + ly * ca, A.sj + 8, 80, 80, 0, UV.dot, 1, .31, .24, .75 * pu); }
         navPair(now, 7, local(o, o.userData.size.x * .47, 0, 0).clone(), local(o, -o.userData.size.x * .47, 0, 0), 2.6); }
+      else if (en.t === "esc") { const o = take("jet", 0x9fb0c8); if (!o) continue; const ex = ext(en), lean = Math.max(-.4, Math.min(.4, (en.x - ex.px) * -.2)); ex.px = en.x; ex.lean = (ex.lean || 0) * .85 + lean * .15;
+        put(o, en.x, en.y, A.esc, en.w, false, 0, ex.lean, -.05); flash(o, hit * .5);
+        navPair(now, ext(en).seed, frac(o, .45, 0, .05).clone(), frac(o, -.45, 0, .05), 1.8); Ba.q(en.x, en.y - en.w * .55, A.esc - 4, 9, 24, 0, UV.tongue, 1, .7, .4, .7); }
+      else if (en.t === "squad") { const o = take("jet", 0xc4b48a); if (!o) continue; put(o, en.x, en.y, A.bigjet, M.BJ_W, false, 0, Math.sin(en.ph || 0) * .1, -.04); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
+        const h = M.BJ_W * (S.jet.naturalHeight || 708) / (S.jet.naturalWidth || 520); [-26, -9, 9, 26].forEach(of => tongueQ(Ba, en.x + of, en.y - h * .47, A.bigjet - 2, (22 + Math.random() * 10) / 46, 0, UV.tongue, 1, .9, .8, .9));
+        navPair(now, 5, frac(o, .47, 0, .05).clone(), frac(o, -.47, 0, .05), 3); }
+      else if (en.t === "rocket") { const o = bossMesh("rocket"); put(o, en.x, en.y, A.rocket, M.RK_L, true, 0, Math.sin(now / 900) * .06, 0); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
+        const ey = en.y - M.RK_L * .47, L2 = 46 + Math.random() * 16; Ba.q(en.x, ey - L2 / 2, A.rocket - 4, 22, L2, 0, UV.tongue, .55, .8, 1, .95); Ba.q(en.x, ey, A.rocket - 3, 40, 40, 0, UV.glow, .5, .7, 1, .6); }
+      else if (en.t === "base") { const o = bossMesh("base"); put(o, en.x, en.y, A.base, M.BASE_W, false, 0, 0, 0); flash(o, Math.min(1, (en.hit || 0) / 700) * .35, 0xffc070);
+        const u = o.userData; (en.L || []).forEach((l, i) => { const hd = u.L[i]; if (hd) hd.rotation.y = Math.PI / 2 - l.a; }); if (u.radar) u.radar.rotation.y = -en.rad; }
+      else if (en.t === "bird") { const pg = en.pg ? 1 : 0, o = birdGet(pg), vx = en.vx || 0, vy = en.vy || 1, fl = Math.sin((en.fl || 0) / 8 * TAU), wing = o.userData.wings;
+        put(o, en.x, en.y, A.bird, M.BIRD_W, false, Math.atan2(vx, vy), 0, en.st === "dive" ? .25 : 0); wing[0].rotation.z = fl * .75; wing[1].rotation.z = -fl * .75;
+        if (en.hit > 0) Ba.q(en.x, en.y, A.bird + 6, 40, 40, 0, UV.dot, 1, 1, 1, Math.min(.8, en.hit / 200)); }
     }
-    const bd = G.bossDie; if (bd) { const b = bd.b, dur = b.t === "gunship" ? 1800 : 2600; if (bd.t < dur * .8) { const sc = 1 - .25 * bd.t / dur, u = bd.t / dur;
+    const bd = G.bossDie; if (bd) { const b = bd.b, dur = b.t === "gunship" ? 1800 : b.t === "flock" ? 900 : 2600; if (bd.t < dur * .8) { const sc = 1 - .25 * bd.t / dur, u = bd.t / dur;
       if (b.t === "gunship") { const o = take("cop0", 0x9aa66a); if (o) { put(o, b.x, b.y, A.gun * (1 - u * .6), M.GS_LEN * sc, true, -(b.spin || 0), .4 * u, .3 * u); flash(o, .25, 0xff5a1f); } }
+      else if (b.t === "squad") { const o = take("jet", 0xc4b48a); if (o) { put(o, b.x, b.y, A.bigjet * (1 - u * .6), M.BJ_W * sc, false, -(b.spin || 0), .6 * u, .3 * u); flash(o, .25, 0xff5a1f); } }
+      else if (b.t === "rocket") { const o = bossMesh("rocket"); put(o, b.x, b.y, A.rocket * (1 - u * .6), M.RK_L * sc, true, -(b.spin || 0), .6 * u, .3 * u); flash(o, .25, 0xff5a1f); }
+      else if (b.t === "base") { const o = bossMesh("base"); put(o, b.x, b.y, A.base, M.BASE_W, false, 0, 0, 0); flash(o, .3 + .2 * Math.sin(now / 60), 0xff5a1f); }
+      else if (b.t === "flock") { }
       else { const o = take("jet", 0x6a7184); if (o) { put(o, b.x, b.y, A.sj * (1 - u * .6), M.SJ_W * sc, false, -((b.a || 0) + (b.spin || 0)), .6 * u, .3 * u); flash(o, .25, 0xff5a1f); } } } }
   }
   const TRF_TINT = (M.TRF_COLS || []).map(c => new THREE.Color(c[0]).getHex());
@@ -522,6 +591,7 @@ async function boot() {
       else if (sh.w === 3) { Ba.q(x, y + 14, Y, 11, 40, 0, UV.beam, .23, .66, 1, .45); Ba.q(x, y + 14, Y + .3, 6, 34, 0, UV.beam, .47, .78, 1, .85); Ba.q(x, y + 14, Y + .6, 2.4, 30, 0, UV.beam, .93, .97, 1, 1); }
       else { Ba.q(x, y + 18, Y, 16, 52, 0, UV.beam, 1, .16, .16, .4); Ba.q(x, y + 18, Y + .3, 8, 46, 0, UV.beam, 1, .27, .24, .9); Ba.q(x, y + 18, Y + .6, 3.4, 40, 0, UV.beam, 1, .95, .93, 1); } }
     for (let q = 0; q < G.eshots.length; q++) { const es = G.eshots[q]; if (!es) continue; const c = rgb(es.c), Y = A.eshot;
+      if (es.tr && es.tr.length) for (let ti = 0; ti < es.tr.length; ti += 2) { const tu = ti / es.tr.length; Bn.q(es.tr[ti], es.tr[ti + 1], Y - 2, 5 + 7 * (1 - tu), 5 + 7 * (1 - tu), 0, UV.dot, .86, .87, .9, .1 + .3 * tu); }
       if (es.missile) { const rot = Math.atan2(es.vy, es.vx) - Math.PI / 2, ca = Math.cos(rot), sa = Math.sin(rot), body = (ly) => [es.x - ly * sa, es.y + ly * ca];
         let p = body(-5); Bn.q(p[0], p[1], Y, 4, 14, rot, UV.sq, c[0] * .9, c[1] * .9, c[2] * .9, 1); Ba.q(p[0], p[1], Y + .5, 12, 24, rot, UV.dot, c[0], c[1], c[2], .55);
         p = body(-17); Ba.q(p[0], p[1], Y + .2, 4, 12, rot, UV.beam, 1, .78, .47, .8); }
@@ -537,13 +607,13 @@ async function boot() {
   let last = 0, fpsT = 0, fpsN = 0, bad = 0, started = performance.now();
   function render(now, dt) {
     const G = M.G(); lateSprites();
-    BATCHES.forEach(b => b.begin()); poolsBegin(); ROTORS.n = 0; cardN = 0; kitN = 0;
+    BATCHES.forEach(b => b.begin()); poolsBegin(); ROTORS.n = 0; cardN = 0; kitN = 0; birdN = [0, 0]; for (const k in BOSSM) BOSSM[k].userData.used = 0;
     drawGround(now, G);
     drawCars(G);
     drawFX(now, G);
     drawPlayer(now, G); drawTraffic(now, G); drawEnemies(now, G); drawReview(now, G); drawRescue(now, G); drawItems(now, G); drawShots(now, G);
     for (let i = ROTORS.n; i < ROTORS.list.length; i++) ROTORS.list[i].visible = false;
-    hideFrom(cards, cardN); poolsEnd(); BATCHES.forEach(b => b.end());
+    hideFrom(cards, cardN); poolsEnd(); hideFrom(BIRDS[0], birdN[0]); hideFrom(BIRDS[1], birdN[1]); for (const k in BOSSM) if (!BOSSM[k].userData.used) BOSSM[k].visible = false; BATCHES.forEach(b => b.end());
     const sh = M.SHK; cam.position.set(-sh[0], D, -sh[1]);
     renderer.render(scene, cam);
     // frame-rate guard (auto mode): under ~40 fps for 5 s straight → back to the 2D renderer for this visit

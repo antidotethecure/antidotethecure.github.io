@@ -95,6 +95,39 @@ In `teams.js`, copy the `la` entry under a new key (e.g. `bay`). List each team 
 
 `clients` is optional. Leave it out, or use `["all"]`, to show the card at every client. A card hides itself 8 hours after its start time. Only enter real, confirmed events.
 
+## Perk: Football Squares (`squares.js`, server = Code.gs)
+
+A **free promotional contest**: no paid entry, no purchase necessary, and no cash or money prizes in or out. Owner-set prizes are limited to:
+- food
+- merch
+- % off the check
+- a free **non-alcoholic** drink
+- % off a drink (21+)
+
+Never offer free alcohol (California ABC). The server refuses anything that reads like money (`$`, cash, gift card, credit…).
+
+How it works:
+- **Board:** one 10×10 board per NFL or college game, with up to `max` players (default 20) × `per` squares each (default 5).
+- **Entry:** players must be Rewards members with a name (the existing sign-in), with one entry per member. They tap squares or use auto-pick.
+- **Kickoff:** entries lock, and the row (home) and column (away) digits are drawn and revealed.
+- **Winners:** at the end of Q1, halftime, Q3 and the final, the last digit of each score picks the winning square. Scores come from ESPN's `summary?event=` JSON on the server.
+- **Unclaimed squares:** the prize rolls to the next quarter if the owner turns rollover on.
+
+Client config:
+```js
+perks: { squares: { on: true, slug: "melody-bar-grill", owner: "Melody",
+  api: function () { return "<Apps Script /exec URL>"; },             // POST squares_get / squares_claim
+  member: function () { return { id: "...", name: "..." } || null; },  // the signed-in Rewards member
+  join: function (cb) { /* open the client's existing sign-up, then cb() */ } } }
+```
+Include `<script src="../sports/squares.js?v=sq1"></script>` after `sports.js`. It adds a "🏈 Squares" tab to the scoreboard. The tab appears only when the server returns at least one board, so it stays hidden until the endpoints are deployed.
+
+Owner controls are in the Christian HQ 🏈 Squares tab (`backoffice/christian/squares-hq.js`): create a board from upcoming games, set prizes per quarter, toggle rollover, lock and reveal, see entrants and winners, mark prizes redeemed, and delete. Destructive actions need two taps.
+
+`?test=1` on either page uses `squares-mock.js`, an offline copy of the server logic with made-up data, kept in that browser's localStorage.
+
+Server endpoints are in `command-center/clients/melody-lax/signup-sheet/Code.gs` (Squares tab): `squares_get`, `squares_claim` and `squares_admin` (bo token). Tests are in `tests/squares.test.mjs`.
+
 ## Follow-ups (not built)
 
 - Push notifications for followed teams. This needs a push server, like the locbonus `push.vapid` plan.

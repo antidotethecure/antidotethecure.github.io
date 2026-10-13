@@ -47,7 +47,7 @@
 
   var C = null, el, badge, imC, imT, lbl, ghost, typed, Q = [], cur = null, timers = [], flapT = 0, seq = 0;
   function later(fn, ms) { var id = setTimeout(fn, ms); timers.push(id); return id; }
-  function src(who, f) { return (C.base || "") + who + "-" + f + ".webp"; }
+  function src(who, f) { return (C.base || "") + who + "-" + f + ".webp?v=cs1"; }
   function preload(who) { ["closed", "talk"].forEach(function (f) { var i = new Image(); i.decoding = "async"; i.src = src(who, f); }); }
 
   function mount(cfg) {

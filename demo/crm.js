@@ -63,6 +63,37 @@
   var NAME = C.name || (window.NEARBY && window.NEARBY.name) || document.title.split(" — ")[0];
   var OFFER = SIMPLE ? SIMPLE.join + " welcome points" : C.offer || "10% off your next visit";
   var SLUG = NAME.toLowerCase().replace(/[^a-z0-9]+/g, "-"), KEY = "ssai_crm_" + SLUG;
+  // ---- BACK OFFICE SYNC (simple program, Christian's restaurants, 2026-10-12) ----
+  // The owner's back office (/backoffice/christian/, "Christian HQ") reads members, points, game plays and app opens from
+  // the Apps Script web app (command-center/clients/melody-lax/signup-sheet/Code.gs). Its /exec URL lives in
+  // SSAI_REWARDS.interim.api (filled from demo/christian-live.js). EMPTY = nothing leaves the phone (today's state).
+  // What is sent: a member snapshot whenever the member changes (name, phone, email, birthday, points balance / earned /
+  // used, visits, referral code + who referred them, text consent), one "game" row per finished run, and one anonymous
+  // "open" per device per day (installed to Home Screen or not). Nothing is sent from staff practice mode.
+  var API = C.sheet || (SIMPLE && SIMPLE.interim && SIMPLE.interim.api) || "";
+  if (API && !C.sheet) C.sheet = API;
+  // STAFF PRACTICE (?staff=1, opened from the staff app /staff/christian/): game runs go to the employee's practice tally
+  // (this phone + the backend's StaffPractice tab), never to a member, real rewards or the customer leaderboard.
+  var STAFF = null;
+  try { if (SIMPLE && /[?&]staff=1(&|$)/.test(location.search)) STAFF = { name: String(localStorage.getItem("ssai_staff_name") || "Staff").slice(0, 24) }; } catch (x) { if (SIMPLE && /[?&]staff=1(&|$)/.test(location.search)) STAFF = { name: "Staff" }; }
+  function boPost(o) {
+    if (!API || STAFF && o.type !== "staff_practice") return;
+    o.slug = SLUG; o.restaurant = NAME;
+    try { fetch(API, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }); } catch (x) {}
+  }
+  var syncT = 0, syncM = null;
+  function syncLater(m) {
+    if (!API || STAFF || !SIMPLE || !m || !m.id || m.sample) return;
+    syncM = m; clearTimeout(syncT);
+    syncT = setTimeout(function () {
+      var r = syncM; if (!r) return;
+      boPost({ type: "member", id: r.id, name: r.name, phone: r.phone || "", email: r.email || "",
+        bday: r.bday >= 0 ? (r.bday + 1) + "/" + (r.bdd || "") + "/" + (r.bdy || "") : "", joined: r.joined || 0, last: r.last || 0,
+        stars: r.stars || 0, earned: r.earned != null ? r.earned : (r.stars || 0), spent: r.spent || 0, visits: r.visits || 0,
+        ref: r.ref || "", refBy: r.refBy || "", friends: (r.friends || []).length, gameTotal: r.gtot || 0, redeems: r.nred || 0,
+        sms: r.sms && !r.stop ? "yes" : "no", smsAt: r.smsAt ? new Date(r.smsAt).toISOString() : "", src: r.src || "", dev: devId() });
+    }, 1200);
+  }
   // contact gate: guests only give their info when they order or save a game prize / score (see gate() below).
   // Exposed right away so game and order code can call it: SSAI_GATE("order" | "prize" | "score", function (member) { ... })
   window.SSAI_GATE = gate;
@@ -313,12 +344,15 @@
   function refCode(first) { return (first.replace(/[^A-Za-z]/g, "").slice(0, 6).toUpperCase() || "FRIEND") + "-" + code4(3); }
   // the 4-digit "give this to the cashier" code changes every 5 minutes, like the big chains' apps
   function regCode(m) { var w = Math.floor(Date.now() / 3e5), h = 7; String(m.id + ":" + w).split("").forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) % 1000003; }); return String(h % 10000).padStart(4, "0"); }
-  function put(m) { var l = mine(); l[0] = m; save(l); }
+  function put(m) { var l = mine(); l[0] = m; save(l); syncLater(m); }
   // wk ("bar" | "food") only matters with split wallets; anything without one (bonuses) goes to the bonusTo wallet
   function addPts(m, n, why, wk) {
     var l = { ts: Date.now(), pts: n, t: why };
     if (WAL) { migrate(m); wk = W[wk] ? wk : BONUS; m.w[wk] = Math.max(0, (m.w[wk] || 0) + n); m.stars = m.w.bar + m.w.food; l.w = wk; }
     else m.stars = Math.max(0, (m.stars || 0) + n);
+    // lifetime counters for the back office (the ledger keeps only the last 40 lines)
+    if (m.earned == null) { m.earned = Math.max(0, (m.stars || 0) - (n > 0 ? n : 0)); m.spent = m.spent || 0; }
+    if (n > 0) m.earned += n; else if (n < 0) { m.spent = (m.spent || 0) - n; m.nred = (m.nred || 0) + 1; }
     (m.ledger = m.ledger || []).unshift(l); m.ledger = m.ledger.slice(0, 40);
   }
   // split wallets: one purchase with separate food and bar dollars → kitchen points and bar points, each at its own rate.
@@ -433,7 +467,17 @@
   function gpHeld() { try { var h = JSON.parse(localStorage.getItem(GPKEY) || "null"); return h && h.day === gpDay() ? h : null; } catch (x) { return null; } }
   function gpUsed(m) { return m && m.gday === gpDay() ? m.gpts || 0 : 0; }
   function gpFor(score) { var g = SIMPLE.game; return Math.max(0, Math.min(g.dailyCap, Math.floor((+score || 0) / g.perScore))); }
-  function gpAdd(m, n, why) { if (m.gday !== gpDay()) { m.gday = gpDay(); m.gpts = 0; } n = Math.max(0, Math.min(n, SIMPLE.game.dailyCap - m.gpts)); if (n) { addPts(m, n, why); tag(m, "game_bonus"); m.gpts += n; } return n; }
+  function gpAdd(m, n, why) { if (m.gday !== gpDay()) { m.gday = gpDay(); m.gpts = 0; } n = Math.max(0, Math.min(n, SIMPLE.game.dailyCap - m.gpts)); if (n) { addPts(m, n, why); tag(m, "game_bonus"); m.gpts += n; m.gtot = (m.gtot || 0) + n; } return n; }
+  // staff practice: practice points only (no daily cap), kept apart from members and rewards
+  function staffAward(score, label) {
+    var sc = Math.max(0, Math.round(+score || 0)), p = Math.floor(sc / SIMPLE.game.perScore), k = "ssai_staff_practice", t = {};
+    try { t = JSON.parse(localStorage.getItem(k) || "{}") || {}; } catch (x) {}
+    t.runs = (t.runs || []); t.runs.unshift({ ts: Date.now(), slug: SLUG, game: C.game || "Game", score: sc, pts: p, name: STAFF.name }); t.runs = t.runs.slice(0, 300);
+    try { localStorage.setItem(k, JSON.stringify(t)); } catch (x) {}
+    boPost({ type: "staff_practice", name: STAFF.name, game: C.game || "Game", score: sc, pts: p, dev: devId() });
+    toast("🧑‍🍳 +" + p + " practice points for " + STAFF.name + " (practice only, not Rewards)");
+    return { pts: p, want: p, saved: true, capped: false, today: p, cap: SIMPLE.game.dailyCap, practice: true };
+  }
   function gpCredit(m) { var h = gpHeld(); m.lastGame = 0; if (!h || !h.pts) return 0; try { localStorage.removeItem(GPKEY); } catch (x) {} m.lastGame = gpAdd(m, h.pts, "🎮 " + (C.game || "Game") + " points (played before joining)"); return m.lastGame; }
   // member store for demo/interim.js (interim mode only): read / change the member on this phone, then redraw
   if (INTERIM) window.SSAI_CRM = {
@@ -451,6 +495,8 @@
     member: function () { return mine()[0] || null; },
     // call ONCE per finished run. Returns {pts, saved, capped, today, cap}: pts actually credited (member) or held (guest)
     award: function (score, label) {
+      if (STAFF) return staffAward(score, label);
+      if (API) boPost({ type: "game", member: (mine()[0] || {}).id || "", dev: devId(), score: Math.max(0, Math.round(+score || 0)), pts: gpFor(score) });
       var want = gpFor(score), cap = SIMPLE.game.dailyCap, m = mine()[0], got, today;
       if (m) { got = gpAdd(m, want, "🎮 " + (label || C.game || "Game") + " · score " + Math.round(+score || 0).toLocaleString()); today = gpUsed(m); put(m); drawJoin(); drawOwn(); }
       else { var h = gpHeld() || { day: gpDay(), pts: 0 }; got = Math.max(0, Math.min(want, cap - h.pts)); h.pts += got; today = h.pts; try { localStorage.setItem(GPKEY, JSON.stringify(h)); } catch (x) {} drawJoin(); }
@@ -706,10 +752,10 @@
       else if (MISSED) { r.wins = [{ t: MC.offer, c: "CALL-" + code4(4), ts: Date.now(), ttl: (MC.days || 7) * 864e5, k: "missed" }]; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "📞 Sorry we missed your call: " + MC.offer }); r.src = "missed call"; }
       // game accounts (CRM_CFG.tokens): ONE member per device, bound to it (live: server-side + SMS verification)
       if (TC) { r.dev = devId(); r.bound = Date.now(); }
-      var list = mine(); list.unshift(r); save(TC ? [r] : list.slice(0, 5));
+      var list = mine(); list.unshift(r); save(TC ? [r] : list.slice(0, 5)); syncLater(r);
       // live restaurants: send the sign-up to the owner's Google Sheet (Apps Script web app in CRM_CFG.sheet)
       if (C.sheet) try { fetch(C.sheet, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({
-        name: r.name, phone: r.phone, email: r.email, bday: r.bday >= 0 ? (r.bday + 1) + "/" + r.bdd + "/" + r.bdy : "",
+        slug: SLUG, restaurant: NAME, memberId: r.id, name: r.name, phone: r.phone, email: r.email, bday: r.bday >= 0 ? (r.bday + 1) + "/" + r.bdd + "/" + r.bdy : "",
         src: r.src || qs.get("s") || qs.get("src") || (rc ? "referral " + rc : "app"), code: r.code, prize: (r.wins && r.wins[0] && r.wins[0].t) || "", prizeCode: (r.wins && r.wins[0] && r.wins[0].c) || "", ref: r.ref,
         smsConsent: r.sms ? "yes" : "no", smsConsentAt: r.sms ? new Date(r.smsAt).toISOString() : "", smsConsentText: r.sms ? SMS_TEXT : "" }) }); } catch (x) {}
     return { member: r };
@@ -727,6 +773,7 @@
   };
   var gateEl = null;
   function gate(reason, cb) {
+    if (STAFF) { toast("🧑‍🍳 Staff practice: no sign-ups, orders or leaderboard posts here."); return; }
     // KIDS' PRIVACY (COPPA): Kid mode only unlocks through a PARENT/GUARDIAN account on this phone. Reasons "kidunlock" /
     // "kidprize" word the sheet for the parent, require the "I'm the parent/guardian (18+) and this is my own phone and
     // email" box, and mark the account m.guardian. The account and every contact detail belong to the parent; the child
@@ -1550,4 +1597,16 @@
     else { document.body.appendChild(join); document.body.appendChild(own); }
   }
   drawJoin(); drawOwn("all");
+  // one anonymous "open" per device per day for the back office (installs = opened from the Home Screen icon)
+  if (SIMPLE && API && !STAFF) try {
+    var ok = KEY + "_open", td = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    if (localStorage.getItem(ok) !== td) { localStorage.setItem(ok, td); if (mine()[0]) syncLater(mine()[0]);   // daily re-sync: members who joined before the backend existed get counted too
+      boPost({ type: "open", dev: devId(), member: (mine()[0] || {}).id || "", standalone: (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone ? 1 : 0 }); }
+  } catch (x) {}
+  if (STAFF) {
+    var sb = document.createElement("div"); sb.id = "ssai-staff-bar"; sb.setAttribute("role", "status");
+    sb.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:2147483600;background:#FFD23F;color:#1a1206;font:800 13px/1.3 system-ui,sans-serif;padding:7px 12px;padding-top:calc(7px + env(safe-area-inset-top));display:flex;gap:8px;align-items:center;justify-content:space-between;box-shadow:0 2px 10px #0006";
+    sb.innerHTML = '<span>🧑‍🍳 STAFF PRACTICE · ' + e(STAFF.name) + ' · practice points only, never real Rewards</span><a href="../../staff/christian/#games" style="color:#1a1206;white-space:nowrap">‹ Staff app</a>';
+    document.body.appendChild(sb);
+  }
 })();

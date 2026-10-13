@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>Christian HQ</title><meta name="theme-color" content="#0b1220">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Christian HQ">
+<!-- Christian HQ: the owner's back office for Melody Bar & Grill + Nalu Vida (Christian + Antidote only).
+     This page holds NO customer data. After a per-person login the backend (Apps Script, see demo/christian-live.js)
+     returns a 6-hour token; data is fetched with it and kept only in memory. ?test=1 runs against a fake backend (mock.js). -->
+<style>
+:root{--bg:#0b1220;--card:#121c33;--card2:#0f1830;--edge:#24345c;--ink:#f3f6ff;--dim:#a9b6d6;--gold:#f5c400;--mel:#b3263a;--nal:#1673c4;--ok:#2fbf71;--bad:#ff6b6b;--warn:#ffb347}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:15.5px/1.45 -apple-system,system-ui,Segoe UI,Roboto,sans-serif;overflow-x:hidden}
+main{max-width:980px;margin:0 auto;padding:14px 16px 80px}
+a{color:#8fc2ff}button,input,select{font:inherit}
+.top{display:flex;align-items:center;gap:10px}.top img{width:44px;height:44px;border-radius:10px}.top h1{font-size:21px;margin:0}.top small{color:var(--dim);display:block;font-size:12.5px}
+.top .sp{flex:1}.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;background:var(--gold);color:#1a1400}.btn.alt{background:#ffffff14;color:var(--ink);border:1px solid var(--edge)}.btn.sm{padding:6px 10px;font-size:13px;border-radius:10px}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px;margin:12px 0}
+.login{max-width:420px;margin:30px auto}.login label{display:block;font-size:13px;color:var(--dim);margin:10px 0 4px}
+.login input,.login select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px}
+.err{color:var(--bad);min-height:20px;margin-top:8px;font-weight:700}
+.test{background:#ffb34722;border:1px solid #ffb34766;color:#ffe0b0;border-radius:12px;padding:8px 12px;font-size:13.5px;margin:10px 0}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.seg button{border:1px solid var(--edge);background:#ffffff0d;color:var(--ink);border-radius:999px;padding:7px 12px;font-weight:700;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--gold);color:#1a1400;border-color:var(--gold)}
+.seg button.m[aria-pressed=true]{background:var(--mel);color:#fff;border-color:var(--mel)}.seg button.n[aria-pressed=true]{background:var(--nal);color:#fff;border-color:var(--nal)}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--edge);margin-top:6px}.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;background:none;border:0;color:var(--dim);padding:9px 10px;font-weight:800;cursor:pointer;border-bottom:3px solid transparent}.tabs button[aria-selected=true]{color:var(--ink);border-color:var(--gold)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}.kpi{background:var(--card2);border:1px solid var(--edge);border-radius:14px;padding:10px}.kpi b{display:block;font-size:24px;line-height:1.1}.kpi span{font-size:12.5px;color:var(--dim)}
+h2{font-size:17px;margin:18px 0 8px}h3{font-size:15px;margin:12px 0 6px}
+.bars{display:flex;align-items:flex-end;gap:2px;height:90px;padding-top:6px}.bars i{flex:1;background:linear-gradient(180deg,var(--gold),#b38f00);border-radius:3px 3px 0 0;min-height:1px;position:relative}
+.axis{display:flex;justify-content:space-between;font-size:11px;color:var(--dim)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--edge);border-radius:12px;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:13.5px}th,td{padding:7px 9px;text-align:left;border-bottom:1px solid #ffffff10;white-space:nowrap}th{position:sticky;top:0;background:#16213d;cursor:pointer;font-size:12px;color:var(--dim)}
+td.n,th.n{text-align:right}.tag{display:inline-block;font-size:11px;font-weight:800;padding:1px 7px;border-radius:99px}.tag.m{background:#b3263a33;color:#ffb3bd}.tag.v{background:#1673c433;color:#a9d3ff}
+.tag.ok{background:#2fbf7133;color:#8ff0bd}.tag.p{background:#f5c40033;color:#ffe680}.tag.f{background:#ff6b6b33;color:#ffb3b3}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row input[type=search]{flex:1;min-width:160px;padding:9px 11px;border-radius:10px;border:1px solid var(--edge);background:#081022;color:var(--ink)}
+.dl{display:grid;grid-template-columns:1fr;gap:10px}.dc{background:var(--card2);border:1px solid var(--edge);border-radius:14px;padding:12px}
+.dc .f{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:end;margin-top:8px}.dc label{font-size:12.5px;color:var(--dim);display:block;margin-bottom:3px}
+.dc input{width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px}
+.dc code,.toastbtn{font-size:12.5px;background:#ffffff10;border-radius:6px;padding:1px 6px;word-break:break-word}
+.note{font-size:12.5px;color:var(--dim)}
+.ov{position:fixed;inset:0;background:#000a;display:flex;align-items:flex-end;justify-content:center;z-index:50}.sheet{background:var(--card);border:1px solid var(--edge);border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));width:100%;max-width:520px;max-height:92vh;overflow:auto}
+.sheet input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:22px;letter-spacing:.3em;text-align:center}
+.ba{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;text-align:center;margin:10px 0}.ba div{background:#081022;border:1px solid var(--edge);border-radius:12px;padding:8px}.ba small{display:block;color:var(--dim);font-size:11.5px}
+.steps{margin:8px 0;padding-left:20px}.steps li{margin:4px 0}
+.st{display:inline-block;font-weight:800;font-size:12px;padding:2px 9px;border-radius:99px}.st.done{background:#2fbf7133;color:#8ff0bd}.st.tbd{background:#ffb34733;color:#ffd79a}
+.links a{display:inline-block;margin:4px 6px 4px 0;padding:8px 12px;border-radius:999px;background:#ffffff10;border:1px solid var(--edge);text-decoration:none;color:var(--ink);font-weight:700;font-size:14px}
+[hidden]{display:none!important}
+</style></head><body><main>
+<div class="top"><img src="icon-192.png" alt=""><div><h1>Christian HQ</h1><small>Melody Bar &amp; Grill × Nalu Vida · back office</small></div><span class="sp"></span><button class="btn alt sm" id="out" hidden>Log out</button></div>
+<div class="test" id="testBar" hidden>🧪 <b>TEST MODE</b>: fake guests and a fake backend. Nothing is real, nothing is sent. Log in as <b>christian</b> or <b>antidote</b> with password <b>test-mode-only</b>.</div>
+
+<section class="card login" id="login">
+  <h2 style="margin-top:0">🔒 Log in</h2>
+  <p class="note" style="margin:0">Only Christian and Antidote. Each person has their own login, so changes show who made them.</p>
+  <form id="lf" autocomplete="on">
+    <label for="u">Who are you?</label><select id="u" name="username" autocomplete="username"><option value="christian">Christian</option><option value="antidote">Antidote</option></select>
+    <label for="p">Password</label><input id="p" name="password" type="password" autocomplete="current-password" required minlength="4">
+    <button class="btn" style="width:100%;margin-top:14px" id="go">Log in</button>
+    <div class="err" id="lerr" role="alert"></div>
+  </form>
+  <p class="note" id="notConn" hidden>⚠️ The backend isn't connected yet (Antidote deploys it). Until then guest data stays on each guest's own phone, so there is nothing to show here. <a href="?test=1">Open test mode</a> to see how it works.</p>
+  <p class="note">📲 Save this app: Share → Add to Home Screen. It shows as “Christian HQ”.</p>
+</section>
+
+<section id="app" hidden>
+  <div class="seg" role="group" aria-label="Restaurant"><button data-r="all" aria-pressed="true">Both</button><button class="m" data-r="melody-bar-grill" aria-pressed="false">✈️ Melody</button><button class="n" data-r="nalu-vida" aria-pressed="false">🏄 Nalu Vida</button>
+    <span style="flex:1"></span><button class="btn alt sm" id="refresh">↻ Refresh</button></div>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div id="pane"></div>
+  <p class="note" id="stamp"></p>
+</section>
+</main>
+<script src="../../demo/christian-live.js?v=bo1"></script>
+<script>
+(function(){
+"use strict";
+var TEST=/[?&]test=1(&|$)/.test(location.search), LIVE=window.SSAI_CHRISTIAN||{defaults:{},apply:function(r){return r;}}, API=LIVE.api||"";
+var TKEY="christian-hq-token"+(TEST?"-test":""), TOKEN=null, DATA=null, R="all", TAB="overview", SORT={k:"earned",d:-1}, Q="";
+var DAY=864e5, NAMES={"melody-bar-grill":"Melody Bar & Grill","nalu-vida":"Nalu Vida"};
+function $(id){ return document.getElementById(id); }
+function esc(t){ return String(t==null?"":t).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+function n(x){ return (+x||0).toLocaleString("en-US"); }
+function ymd(t){ return new Date(t).toLocaleDateString("en-CA",{timeZone:"America/Los_Angeles"}); }
+function dt(t){ return t?new Date(t).toLocaleDateString([], {month:"short",day:"numeric"}):"—"; }
+function tagR(s){ return s==="nalu-vida"?"<span class='tag v'>Nalu</span>":"<span class='tag m'>Melody</span>"; }
+function api(body){
+  if(TEST) return window.HQ_MOCK?HQ_MOCK(body):Promise.resolve({ok:false,reason:"Test backend missing"});
+  if(!API) return Promise.resolve({ok:false,reason:"Backend not connected yet."});
+  return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(body)}).then(function(r){ return r.json(); }).catch(function(){ return {ok:false,reason:"Can't reach the backend. Check the connection."}; });
+}
+function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=bo1"; s.onload=cb; document.head.appendChild(s); }
+if(TEST) $("testBar").hidden=false; else if(!API) $("notConn").hidden=false;
+try{ TOKEN=sessionStorage.getItem(TKEY); }catch(e){}
+$("lf").onsubmit=function(ev){ ev.preventDefault(); var b=$("go"); b.disabled=true; b.textContent="Checking…"; $("lerr").textContent="";
+  loadMock(function(){ api({type:"bo_login",user:$("u").value,pw:$("p").value}).then(function(r){ b.disabled=false; b.textContent="Log in"; $("p").value="";
+    if(!r||!r.ok){ $("lerr").textContent=(r&&r.reason)||"Wrong name or password."; return; }
+    TOKEN=r.token; try{ sessionStorage.setItem(TKEY,TOKEN); }catch(e){} load(); }); }); };
+$("out").onclick=function(){ if(TOKEN) api({type:"bo_logout",token:TOKEN}); signOut(""); };
+function signOut(msg){ TOKEN=null; DATA=null; try{ sessionStorage.removeItem(TKEY); }catch(e){} $("app").hidden=true; $("out").hidden=true; $("login").hidden=false; $("pane").innerHTML=""; $("lerr").textContent=msg||""; }
+function load(){ loadMock(function(){ api({type:"bo_data",token:TOKEN}).then(function(r){
+  if(!r||!r.ok){ signOut(r&&r.auth===false?"Signed out. Log in again.":(r&&r.reason)||"Couldn't load."); return; }
+  DATA=r; $("login").hidden=true; $("app").hidden=false; $("out").hidden=false; $("stamp").textContent="Signed in as "+r.me+" · loaded "+new Date(r.now).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})+(r.test?" · TEST DATA":""); draw(); }); }); }
+$("refresh").onclick=load;
+document.querySelector(".seg").addEventListener("click",function(e){ var b=e.target.closest("[data-r]"); if(!b) return; R=b.dataset.r; document.querySelectorAll("[data-r]").forEach(function(x){ x.setAttribute("aria-pressed",x===b?"true":"false"); }); draw(); });
+var TABS=[["overview","📊 Overview"],["members","👥 Members"],["rewards","🎟️ Rewards & claims"],["games","🎮 Games"],["discounts","🏷️ Discounts"],["earlybird","🎁 Early bird"],["staff","🧑‍🍳 Staff"],["audit","🧾 Audit log"],["links","🔗 Links"]];
+$("tabs").innerHTML=TABS.map(function(t){ return "<button role='tab' data-t='"+t[0]+"' aria-selected='"+(t[0]===TAB)+"'>"+t[1]+"</button>"; }).join("");
+$("tabs").addEventListener("click",function(e){ var b=e.target.closest("[data-t]"); if(!b) return; TAB=b.dataset.t; document.querySelectorAll("#tabs button").forEach(function(x){ x.setAttribute("aria-selected",x===b?"true":"false"); }); draw(); });
+function inR(s){ return R==="all"||s===R; }
+function F(){ var d=DATA; return { mem:d.members.filter(function(m){ return inR(m.slug); }), games:d.games.filter(function(g){ return inR(g[0]); }), opens:d.opens.filter(function(o){ return inR(o[0]); }),
+  red:d.redeems.filter(function(x){ return inR(x.slug); }), clm:d.claims.filter(function(x){ return inR(x.slug); }), staff:d.staff.filter(function(x){ return inR(x[0]); }) }; }
+function bars(map,days,label){ var keys=[],t=Date.now(); for(var i=days-1;i>=0;i--) keys.push(ymd(t-i*DAY)); var mx=Math.max.apply(null,keys.map(function(k){ return map[k]||0; }).concat([1]));
+  return "<h3>"+label+"</h3><div class='bars' role='img' aria-label='"+esc(label)+"'>"+keys.map(function(k){ return "<i title='"+k+": "+(map[k]||0)+"' style='height:"+Math.round(100*(map[k]||0)/mx)+"%'></i>"; }).join("")+"</div><div class='axis'><span>"+dt(t-(days-1)*DAY)+"</span><span>today</span></div>"; }
+function count(arr,f){ var m={}; arr.forEach(function(x){ var k=f(x); if(k) m[k]=(m[k]||0)+1; }); return m; }
+function distinct(arr,f){ var s={}; arr.forEach(function(x){ s[f(x)]=1; }); return Object.keys(s).length; }
+function kpi(v,l){ return "<div class='kpi'><b>"+v+"</b><span>"+l+"</span></div>"; }
+function overview(){ var f=F(), t=Date.now(), td=ymd(t), w=t-7*DAY, mo=t-30*DAY, g7=f.games.filter(function(g){ return g[1]>=ymd(w); }), o7=f.opens.filter(function(o){ return o[1]>=ymd(w); });
+  var earned=f.mem.reduce(function(a,m){ return a+m.earned; },0), spent=f.mem.reduce(function(a,m){ return a+m.spent; },0), bal=f.mem.reduce(function(a,m){ return a+m.stars; },0);
+  var scores=f.games.map(function(g){ return g[4]; }), refd=f.mem.filter(function(m){ return m.refBy; }).length;
+  var h="<div class='kpis'>"+kpi(n(f.mem.length),"members (joined the app)")+kpi(n(f.mem.filter(function(m){ return ymd(m.joined)===td; }).length),"joined today")+kpi(n(f.mem.filter(function(m){ return m.joined>=w; }).length),"joined last 7 days")+kpi(n(f.mem.filter(function(m){ return m.joined>=mo; }).length),"joined last 30 days")+
+    kpi(n(distinct(f.opens.filter(function(o){ return o[3]; }),function(o){ return o[0]+o[2]; })),"phones opened it from the Home Screen (installs)")+kpi(n(distinct(o7,function(o){ return o[0]+o[2]; })),"phones that opened the app, 7 days")+
+    kpi(n(distinct(g7,function(g){ return g[0]+(g[2]||g[3]); })),"active players, 7 days")+kpi(n(g7.length),"game plays, 7 days")+kpi(n(f.games.length),"game plays, 120 days")+
+    kpi(scores.length?n(Math.round(scores.reduce(function(a,b){ return a+b; },0)/scores.length)):"—","average score")+kpi(scores.length?n(Math.max.apply(null,scores)):"—","best score")+
+    kpi(n(earned),"points earned")+kpi(n(spent),"points used on rewards")+kpi(n(bal),"points still in wallets")+kpi(n(f.red.length),"rewards used (live passes)")+
+    kpi(n(f.clm.length),"receipt claims")+kpi(n(f.clm.filter(function(c){ return c.status==="pending"; }).length),"claims to spot-check")+kpi(n(refd),"joined with a friend's code")+kpi(n(f.mem.filter(function(m){ return m.sms==="yes"; }).length),"OK'd deal texts")+"</div>";
+  h+="<div class='card'>"+bars(count(f.mem,function(m){ return ymd(m.joined); }),30,"Joins per day (30 days)")+bars(count(f.games,function(g){ return g[1]; }),30,"Game plays per day")+bars((function(){ var m={}, s={}; f.opens.forEach(function(o){ var k=o[1]+o[0]+o[2]; if(!s[k]){ s[k]=1; m[o[1]]=(m[o[1]]||0)+1; } }); return m; })(),30,"Phones opening the app per day")+"</div>";
+  var top=f.mem.slice().sort(function(a,b){ return b.earned-a.earned; }).slice(0,10);
+  h+="<h2>🏆 Top members (points earned)</h2>"+table(["Name","","Earned","Balance","Visits"],top.map(function(m){ return [esc(m.name),tagR(m.slug),n(m.earned),n(m.stars),n(m.visits)]; }),[2,3,4]);
+  var refs={}; f.mem.forEach(function(m){ if(m.refBy) refs[m.slug+"|"+m.refBy]=(refs[m.slug+"|"+m.refBy]||0)+1; });
+  var rr=Object.keys(refs).map(function(k){ var p=k.split("|"), who=f.mem.filter(function(m){ return m.ref===p[1]&&m.slug===p[0]; })[0]; return [who?esc(who.name):"code "+esc(p[1]),tagR(p[0]),refs[k]]; }).sort(function(a,b){ return b[2]-a[2]; }).slice(0,10);
+  h+="<h2>🤝 Top referrers</h2>"+(rr.length?table(["Member","","Friends joined"],rr,[2]):"<p class='note'>No referrals yet.</p>");
+  return h; }
+function table(head,rows,numCols){ numCols=numCols||[]; return "<div class='tw'><table><thead><tr>"+head.map(function(x,i){ return "<th"+(numCols.indexOf(i)>=0?" class='n'":"")+">"+x+"</th>"; }).join("")+"</tr></thead><tbody>"+
+  (rows.length?rows.map(function(r){ return "<tr>"+r.map(function(c,i){ return "<td"+(numCols.indexOf(i)>=0?" class='n'":"")+">"+c+"</td>"; }).join("")+"</tr>"; }).join(""):"<tr><td colspan='"+head.length+"' class='note'>Nothing yet.</td></tr>")+"</tbody></table></div>"; }
+var MCOL=[["name","Name"],["slug",""],["email","Email"],["phone","Phone"],["stars","Balance",1],["earned","Earned",1],["spent","Used",1],["redeems","Rewards used",1],["visits","Visits",1],["gamePts","Game pts",1],["joined","Joined"],["last","Last active"],["refBy","Referred by"],["friends","Friends",1],["sms","Deal texts"],["bday","Birthday"]];
+function members(){ var f=F(), q=Q.toLowerCase(), list=f.mem.filter(function(m){ return !q||(m.name+" "+m.email+" "+m.phone+" "+m.ref).toLowerCase().indexOf(q)>=0; });
+  list.sort(function(a,b){ var x=a[SORT.k],y=b[SORT.k]; return (x>y?1:x<y?-1:0)*SORT.d; });
+  return "<div class='row' style='margin:10px 0'><input type='search' id='q' placeholder='Search name, email, phone, code' value='"+esc(Q)+"' aria-label='Search members'><button class='btn sm' id='csv'>⬇︎ CSV</button></div>"+
+    "<p class='note'>"+n(list.length)+" members"+(R==="all"?" at both restaurants":"")+". Tap a column to sort. Private: don't share screenshots of this list.</p>"+
+    "<div class='tw'><table><thead><tr>"+MCOL.map(function(c){ return "<th data-sort='"+c[0]+"'"+(c[2]?" class='n'":"")+">"+c[1]+(SORT.k===c[0]?(SORT.d>0?" ▲":" ▼"):"")+"</th>"; }).join("")+"</tr></thead><tbody>"+
+    list.map(function(m){ return "<tr><td>"+esc(m.name)+(m.signupOnly?" <span class='tag p'>sign-up only</span>":"")+"</td><td>"+tagR(m.slug)+"</td><td>"+(m.email?"<a href='mailto:"+esc(m.email)+"'>"+esc(m.email)+"</a>":"—")+"</td><td>"+(m.phone?"<a href='tel:"+esc(String(m.phone).replace(/[^\d+]/g,""))+"'>"+esc(m.phone)+"</a>":"—")+"</td>"+
+      "<td class='n'>"+n(m.stars)+"</td><td class='n'>"+n(m.earned)+"</td><td class='n'>"+n(m.spent)+"</td><td class='n'>"+n(m.redeems)+"</td><td class='n'>"+n(m.visits)+"</td><td class='n'>"+n(m.gamePts)+"</td><td>"+dt(m.joined)+"</td><td>"+dt(m.last)+"</td><td>"+esc(m.refBy||"—")+"</td><td class='n'>"+n(m.friends)+"</td><td>"+(m.sms==="yes"?"✅":"—")+"</td><td>"+esc(m.bday||"—")+"</td></tr>"; }).join("")+"</tbody></table></div>"; }
+function csv(){ var f=F(), cols=["slug","name","email","phone","stars","earned","spent","redeems","visits","gamePts","joined","last","ref","refBy","friends","sms","smsAt","bday","src"];
+  var q=function(v){ v=String(v==null?"":v); if(/^[=+\-@]/.test(v)) v="'"+v; return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  var txt=[cols.join(",")].concat(f.mem.map(function(m){ return cols.map(function(c){ return q(c==="joined"||c==="last"?(m[c]?new Date(m[c]).toISOString():""):m[c]); }).join(","); })).join("\n");
+  var a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([txt],{type:"text/csv"})); a.download="christian-members-"+ymd(Date.now())+(TEST?"-TEST":"")+".csv"; a.click(); }
+function rewards(){ var f=F(), h="<h2>🎟️ Rewards used ("+f.red.length+")</h2>"+table(["When","","Code","Member","Reward","Toast button","Points"],f.red.slice().sort(function(a,b){ return b.ts-a.ts; }).map(function(x){ return [dt(x.ts),tagR(x.slug),esc(x.code),esc(x.name),esc(x.reward),"<span class='toastbtn'>"+esc(x.button)+"</span>",n(x.pts)]; }),[6]);
+  h+="<h2>🧾 Receipt claims, “Add my visit” ("+f.clm.length+")</h2><p class='note'>Interim mode. Spot-check against Toast's daily sales report (check # + total). Approve / Flag from the manager log in each restaurant app.</p>"+
+    table(["When","","Check #","Check date","Total","Points","Member","Photo","Status"],f.clm.slice().sort(function(a,b){ return b.ts-a.ts; }).map(function(c){ return [dt(c.ts),tagR(c.slug),"#"+esc(c.check),esc(c.date),"$"+(+c.total).toFixed(2),n(c.pts),esc(c.name),c.photo?"📷":"—","<span class='tag "+(c.status==="approved"?"ok":c.status==="flagged"?"f":"p")+"'>"+esc(c.status)+"</span>"]; }),[4,5]);
+  var ready=[]; LIVE.slugs&&LIVE.slugs.forEach(function(s){ if(!inR(s)) return; var t=cur(s).tiers||[]; f.mem.filter(function(m){ return m.slug===s&&t.length&&m.stars>=t[0][0]; }).forEach(function(m){ var best=t.filter(function(x){ return m.stars>=x[0]; }).pop(); ready.push([esc(m.name),tagR(s),n(m.stars),esc(best[1])]); }); });
+  h+="<h2>🎁 Members with a reward ready ("+ready.length+")</h2>"+table(["Member","","Balance","Best reward they can use"],ready,[2]);
+  return h; }
+function games(){ var f=F(), h=bars(count(f.games,function(g){ return g[1]; }),30,"Plays per day"), byDay={};
+  var top=f.games.slice().sort(function(a,b){ return b[4]-a[4]; }).slice(0,15), mem={}; DATA.members.forEach(function(m){ mem[m.id]=m.name; });
+  h+="<div class='kpis' style='margin-top:10px'>"+kpi(n(f.games.length),"plays (120 days)")+kpi(n(f.games.filter(function(g){ return !g[2]; }).length),"plays by guests who hadn't joined")+kpi(n(distinct(f.games,function(g){ return g[0]+(g[2]||g[3]); })),"different players")+kpi(n(f.mem.reduce(function(a,m){ return a+m.gamePts; },0)),"game points credited")+"</div>";
+  h+="<h2>🏅 Top scores</h2>"+table(["Day","","Player","Score","Points worth"],top.map(function(g){ return [esc(g[1]),tagR(g[0]),g[2]?esc(mem[g[2]]||g[2]):"guest (not joined)",n(g[4]),n(g[5])]; }),[3,4]);
+  return h; }
+function cur(slug){ var d=JSON.parse(JSON.stringify(LIVE.defaults[slug]||{})); return LIVE.apply(d,(DATA&&DATA.disc&&DATA.disc[slug])||{}); }
+var TOASTPATH="Toast Web (toasttab.com) › Finance › Related › Settings › Discounts &amp; promo codes";
+function discounts(){ var h="<p class='note' style='margin-top:12px'>Change a points cost, a reward name or a discount amount. After <b>Save</b> a 6-digit code is emailed to <b>you</b> (from secondshiftai@gmail.com); type it to apply. The other person gets an email about the change, and it's logged in the Audit log. Guest apps pick up the new value automatically. <b>Toast doesn't change by itself</b>: you'll get the exact Toast step after saving.</p>";
+  (LIVE.slugs||[]).filter(inR).forEach(function(s){ var c=cur(s), d=LIVE.defaults[s], ts=d.toastStatus||{};
+    h+="<h2>"+(s==="nalu-vida"?"🏄 ":"✈️ ")+esc(NAMES[s])+" <span class='st "+(ts.state==="done"?"done":"tbd")+"'>"+(ts.state==="done"?"Toast buttons set up ✓":"Toast buttons: TBD")+"</span></h2><p class='note'>"+esc(ts.note||"")+"</p><div class='dl'>";
+    c.tiers.forEach(function(t,i){ var b=t[2]||{};
+      h+="<div class='dc'><b>"+n(t[0])+" pts · "+esc(t[1])+"</b><div class='note'>Toast button: <code>"+esc(b.button)+"</code> · "+(b.type==="fixed"?"$"+b.amount+" off the check":"100% off one item"+(b.max?" (up to $"+(+b.max).toFixed(2)+")":""))+"</div>"+
+        fld(s,"t"+i,"pts","Points cost",t[0],"number",t[1])+fld(s,"t"+i,"label","Reward name (what guests see)",t[1],"text",t[1])+(b.type==="fixed"?fld(s,"t"+i,"amount","$ off the check",b.amount,"number",t[1]):"")+"</div>"; });
+    if(c.justLanded&&c.justLanded.toast) h+="<div class='dc'><b>Just Landed · "+esc(c.justLanded.offer)+"</b><div class='note'>Toast button: <code>"+esc(c.justLanded.toast.button)+"</code> · no points (boarding pass, last 24 h)</div>"+fld(s,"jl","percent","% off the check",c.justLanded.toast.percent,"number","Just Landed")+"</div>";
+    h+="</div>"; });
+  return h; }
+function fld(s,k,f,label,val,type,reward){ var id="d_"+s+"_"+k+"_"+f; return "<div class='f'><div><label for='"+id+"'>"+label+"</label><input id='"+id+"' type='"+type+"'"+(type==="number"?" inputmode='decimal' step='any'":" maxlength='80'")+" value='"+esc(val)+"' data-orig='"+esc(val)+"'></div><button class='btn sm' data-save='"+esc(JSON.stringify([s,k,f,reward]))+"' data-for='"+id+"'>Save</button></div>"; }
+function toastStep(s,k,f,before,after){ if(k==="eb") return f==="gift"||f==="slices"||f==="items"||(f==="on"&&after==="on")?"<p><b>Toast:</b> guests redeem with the live pass and your server taps <span class='toastbtn'>App Reward – Early Bird Gift</span> (100% off one item). If that button isn't in Toast yet, add it: "+TOASTPATH+" › + Add a Discount › that exact name › % Off 100 · Applies to Item › Save › Publish.</p>":"<p><b>Toast: nothing to change.</b></p>";
+  var c=cur(s), t=k==="jl"?null:c.tiers[+k.slice(1)], b=k==="jl"?c.justLanded.toast.button:(t[2]||{}).button;
+  if(f==="pts") return "<p><b>Toast: nothing to change.</b> Points costs live only in the app. The Toast button <span class='toastbtn'>"+esc(b)+"</span> stays the same.</p>";
+  if(f==="label") return "<p><b>Toast: usually nothing to change.</b> Servers still select the item and tap <span class='toastbtn'>"+esc(b)+"</span>."+(t&&t[2]&&t[2].max?" If the new reward can cost more than $"+(+t[2].max).toFixed(2)+", tell Antidote so the Toast sheet's “up to” price is updated.":"")+" Tell your staff about the new reward.</p>";
+  var unit=f==="percent"?"%":"$", fmt=function(v){ return unit==="$"?"$"+v:v+"%"; };
+  return "<p><b>Now update the matching Toast button</b> so Toast and the app stay in sync:</p><ol class='steps'><li>On a computer: "+TOASTPATH+".</li><li>Open <span class='toastbtn'>"+esc(b)+"</span>.</li><li>Change the amount from <b>"+fmt(before)+"</b> to <b>"+fmt(after)+"</b>.</li><li>Keep the button name as it is (the guest's live pass names it), or ask Antidote to rename it in Toast and the app together.</li><li>Save, then <b>Publish</b> so every POS gets it.</li></ol>"; }
+function saveFlow(btn){ var a=JSON.parse(btn.dataset.save), inp=$(btn.dataset.for), v=String(inp.value).trim(), before=inp.dataset.orig;
+  if(v===before){ if(inp.type!=="hidden") inp.focus(); return; }
+  if(a[2]==="draw"&&!confirm("Draw the raffle winners now? This can only be done once.")) return;
+  btn.disabled=true; btn.textContent="…";
+  api({type:"disc_propose",token:TOKEN,slug:a[0],key:a[1],field:a[2],value:v,before:before,reward:a[3]}).then(function(r){ btn.disabled=false; btn.textContent="Save";
+    if(!r||!r.ok){ if(r&&r.auth===false) return signOut("Signed out. Log in again."); alert((r&&r.reason)||"Couldn't save."); return; }
+    var ov=document.createElement("div"); ov.className="ov"; ov.setAttribute("role","dialog"); ov.setAttribute("aria-modal","true");
+    ov.innerHTML="<div class='sheet'><h3 style='margin-top:0'>Confirm the change</h3><div class='note'>"+esc(NAMES[a[0]])+" · "+esc(a[3])+"</div><div class='ba'><div><small>Before</small><b>"+esc(r.before)+"</b></div><span>→</span><div><small>After</small><b>"+esc(r.after)+"</b></div></div>"+
+      "<p>We emailed a 6-digit code to <b>"+esc(r.sentTo)+"</b>. It works for 10 minutes.</p>"+(r.testCode?"<div class='test'>🧪 TEST MODE: no email sent. Your code is <b>"+esc(r.testCode)+"</b>.</div>":"")+
+      "<input id='otp' inputmode='numeric' autocomplete='one-time-code' maxlength='6' aria-label='6-digit code'><div class='err' id='oerr'></div><button class='btn' style='width:100%;margin-top:10px' id='oconf'>Apply change</button><button class='btn alt' style='width:100%;margin-top:8px' id='ocan'>Cancel</button></div>";
+    document.body.appendChild(ov); $("otp").focus();
+    $("ocan").onclick=function(){ ov.remove(); };
+    $("oconf").onclick=function(){ var cb=this; cb.disabled=true; api({type:"disc_confirm",token:TOKEN,id:r.id,code:$("otp").value.trim()}).then(function(c){ cb.disabled=false;
+      if(!c||!c.ok){ $("oerr").textContent=(c&&c.reason)||"Couldn't apply."; return; }
+      DATA.disc=c.disc||DATA.disc; load();
+      ov.querySelector(".sheet").innerHTML="<h3 style='margin-top:0'>✅ Saved</h3><div class='ba'><div><small>Before</small><b>"+esc(c.before)+"</b></div><span>→</span><div><small>After</small><b>"+esc(c.after)+"</b></div></div><p class='note'>The guest apps show the new value now (within a minute). The other login holder was emailed and the Audit log has it.</p>"+
+        (c.testNotice?"<div class='test'>"+esc(c.testNotice)+"</div>":"")+toastStep(a[0],a[1],a[2],c.before,c.after)+"<button class='btn' style='width:100%' id='odone'>Done</button>";
+      $("odone").onclick=function(){ ov.remove(); draw(); }; }); };
+  }); }
+function ebField(s,f,label,val,inputHTML){ var id="d_"+s+"_eb_"+f; return "<div class='f'><div><label for='"+id+"'>"+label+"</label>"+inputHTML.replace("%ID%",id).replace("%ORIG%",esc(val))+"</div><button class='btn sm' data-save='"+esc(JSON.stringify([s,"eb",f,"Early-bird gift"]))+"' data-for='"+id+"'>Save</button></div>"; }
+function listEd(s,f,arr,numLabel){ var id="d_"+s+"_eb_"+f, rows=(arr&&arr.length?arr:[["",""]]).concat([["",""]]);
+  return "<div class='dc' data-led='"+id+"'>"+rows.map(function(r){ return "<div class='row' style='margin:4px 0'><input class='li' placeholder='Free item' value='"+esc(r[0])+"' style='flex:2;min-width:0'><input class='ln' inputmode='numeric' placeholder='"+numLabel+"' value='"+esc(r[1])+"' style='flex:1;min-width:0'></div>"; }).join("")+
+  "<input type='hidden' id='"+id+"' value='"+esc(JSON.stringify(arr||[]))+"' data-orig='"+esc(JSON.stringify(arr||[]))+"'><div class='note' data-sum></div></div>"; }
+function earlybird(){ var h="<p class='note' style='margin-top:12px'>An optional launch gift for <b>founding members</b>: everyone who joined before the go-live date. OFF until you turn it on. Every change needs the emailed 6-digit code, and the other person is told. Who qualifies, the wheel result and the raffle draw are decided by the server, so a phone can't rig them.</p>";
+  (LIVE.slugs||[]).filter(inR).forEach(function(s){ var E=(DATA.eb&&DATA.eb[s])||{cfg:{}}, c=E.cfg||{}, sl=[], it=[]; try{ sl=JSON.parse(c.slices||"[]"); it=JSON.parse(c.items||"[]"); }catch(e){}
+    var mode=c.mode||"fixed", on=c.on==="on";
+    h+="<h2>"+(s==="nalu-vida"?"🏄 ":"✈️ ")+esc(NAMES[s])+" <span class='st "+(on?"done":"tbd")+"'>"+(on?"ON":"OFF")+"</span></h2>";
+    h+="<div class='kpis'>"+kpi(n(E.qualify||0),"members who qualify (joined before go-live)")+kpi(n(E.activated||0),"started their gift")+kpi(n(E.redeemed||0),"redeemed at the table")+(mode==="raffle"?kpi(c.drawn?n(E.won||0):"—","raffle winners"+(c.drawn?" (drawn "+esc(c.drawn)+")":"")):"")+"</div>";
+    var items=E.items||{}, ik=Object.keys(items); if(ik.length) h+="<p class='note'>Gifts handed out: "+ik.map(function(k){ return esc(k)+" × "+items[k]; }).join(" · ")+"</p>";
+    h+="<div class='dl'><div class='dc'><b>Setup</b>"+
+      ebField(s,"on","On / off",on?"on":"off","<select id='%ID%' data-orig='%ORIG%' style='width:100%;padding:9px;border-radius:10px;background:#081022;color:#f3f6ff;border:1px solid #24345c;font-size:16px'><option value='off'"+(on?"":" selected")+">Off</option><option value='on'"+(on?" selected":"")+">On</option></select>")+
+      ebField(s,"golive","Go-live date (members who joined BEFORE this day qualify; the gift starts this day)",c.golive||"","<input id='%ID%' type='date' value='%ORIG%' data-orig='%ORIG%'>")+
+      ebField(s,"mode","Mode",mode,"<select id='%ID%' data-orig='%ORIG%' style='width:100%;padding:9px;border-radius:10px;background:#081022;color:#f3f6ff;border:1px solid #24345c;font-size:16px'><option value='fixed'"+(mode==="fixed"?" selected":"")+">Fixed gift: everyone gets the same</option><option value='wheel'"+(mode==="wheel"?" selected":"")+">Spin the wheel: every spin wins</option><option value='raffle'"+(mode==="raffle"?" selected":"")+">Raffle: draw N winners</option></select>")+"</div>";
+    if(mode==="fixed") h+="<div class='dc'><b>Fixed gift</b>"+ebField(s,"gift","The gift (guests see “You joined early: free …”)",c.gift||"","<input id='%ID%' maxlength='60' placeholder='Free Mac & Cheese' value='%ORIG%' data-orig='%ORIG%'>")+"</div>";
+    if(mode==="wheel") h+="<div class='dc'><b>Wheel slices</b><p class='note'>Free food or non-alcoholic items only. Odds in %, must add up to 100. Every spin wins.</p>"+listEd(s,"slices",sl,"odds %")+"<button class='btn sm' data-save='"+esc(JSON.stringify([s,"eb","slices","Early-bird gift"]))+"' data-for='d_"+s+"_eb_slices'>Save slices</button></div>";
+    if(mode==="raffle") h+="<div class='dc'><b>Raffle</b><div class='test' style='margin:8px 0'>⚖️ Before turning on a raffle: check California giveaway / sweepstakes rules. Keep it <b>free to enter (no purchase necessary)</b>, post the official rules (prizes, odds, draw date, who can enter), and never give alcohol as a prize. Ask your lawyer if unsure.</div>"+
+      "<p class='note'>Prizes and how many winners each:</p>"+listEd(s,"items",it,"winners")+"<button class='btn sm' data-save='"+esc(JSON.stringify([s,"eb","items","Early-bird gift"]))+"' data-for='d_"+s+"_eb_items'>Save prizes</button>"+
+      ebField(s,"drawDate","Draw date",c.drawDate||"","<input id='%ID%' type='date' value='%ORIG%' data-orig='%ORIG%'>")+
+      "<div class='f'><div><label>Draw the winners (once, on or after the draw date; logged in the Audit log)</label><input type='hidden' id='d_"+s+"_eb_draw' value='now' data-orig='"+(c.drawn?"now":"")+"'></div><button class='btn sm' "+(c.drawn?"disabled":"")+" data-save='"+esc(JSON.stringify([s,"eb","draw","Raffle draw"]))+"' data-for='d_"+s+"_eb_draw'>🎲 Draw winners</button></div>"+(c.drawn?"<p class='note'>Drawn on "+esc(c.drawn)+".</p>":"")+"</div>";
+    h+="<div class='dc'><b>At the table</b><p class='note'>From the go-live date the guest taps <b>Use my gift</b> (or spins), which starts a 3-day window. They redeem with the same live pass; staff tap <span class='toastbtn'>App Reward – Early Bird Gift</span> in Toast (100% off one item; add it in Toast before going live). One per member, then it shows USED or EXPIRED.</p></div></div>"; });
+  return h; }
+function staff(){ var f=F(), by={}; f.staff.forEach(function(x){ var k=x[2]; by[k]=by[k]||{runs:0,pts:0,best:0}; by[k].runs++; by[k].pts+=x[5]; by[k].best=Math.max(by[k].best,x[4]); });
+  var rows=Object.keys(by).map(function(k){ return [esc(k),n(by[k].runs),n(by[k].pts),n(by[k].best)]; }).sort(function(a,b){ return +b[2].replace(/,/g,"")-+a[2].replace(/,/g,""); });
+  return "<p class='note' style='margin-top:12px'>From the staff app. Practice points are separate from guest points: they never become rewards and never show on the guest leaderboard. Staff only enter a first name or nickname.</p>"+
+    "<h2>🎮 Practice tally (120 days)</h2>"+table(["Employee","Practice runs","Practice points","Best score"],rows,[1,2,3])+
+    "<h2>✅ Training quiz</h2>"+table(["Day","Employee","Score","Passed"],DATA.trained.slice().reverse().map(function(t){ return [esc(t[0]),esc(t[1]),t[2]+"%",t[3]==="yes"?"<span class='tag ok'>Trained ✓</span>":"<span class='tag p'>not yet</span>"]; }),[2])+
+    "<p><a href='../../staff/christian/'>Open the staff app</a> · text staff this link so they can add it to their Home Screen.</p>"; }
+function audit(){ return "<p class='note' style='margin-top:12px'>Every discount change: who, what, before → after, when.</p>"+table(["When","Who","Restaurant","Reward","Field","Before","After","Status"],(DATA.audit||[]).slice().reverse().map(function(a){ return [new Date(a.ts).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}),esc(a.who),esc(a.slug),esc(a.reward),esc(a.field),esc(a.before),esc(a.after),esc(a.status)]; })); }
+function links(){ var h="<div class='card links'><a href='../../onboarding/christian/plan/'>📲 Game plan app</a><a href='../../onboarding/christian/'>Onboarding</a><a href='../../demo/melody-lax/'>✈️ Melody app</a><a href='../../demo/nalu-vida/'>🏄 Nalu Vida app</a><a href='../../staff/christian/'>🧑‍🍳 Staff app</a><a href='../../melody/kit/'>Melody print kit</a><a href='../../nalu-vida/kit/'>Nalu print kit</a><a href='../../onboarding/christian/placement/'>📍 Where to put the QR pieces</a><a href='../../melody/kit/toast-interim.html'>Melody Toast sheet</a><a href='../../nalu-vida/kit/toast-interim.html'>Nalu Toast sheet</a></div>";
+  h+="<h2>🍞 Toast discount buttons</h2>"; (LIVE.slugs||[]).filter(inR).forEach(function(s){ var c=cur(s), ts=LIVE.defaults[s].toastStatus||{};
+    var rows=c.tiers.map(function(t){ var b=t[2]||{}; return ["<span class='toastbtn'>"+esc(b.button)+"</span>",b.type==="fixed"?"$"+b.amount+" off check":"100% off 1 item"+(b.max?" (≤ $"+(+b.max).toFixed(2)+")":""),n(t[0])+" pts"]; });
+    if(c.justLanded&&c.justLanded.toast) rows.push(["<span class='toastbtn'>"+esc(c.justLanded.toast.button)+"</span>",c.justLanded.toast.percent+"% off check","no points"]);
+    h+="<h3>"+esc(NAMES[s])+" <span class='st "+(ts.state==="done"?"done":"tbd")+"'>"+(ts.state==="done"?"Set up ✓":"TBD")+"</span></h3><p class='note'>"+esc(ts.note)+"</p>"+table(["Button","Discount","Points"],rows); });
+  return h; }
+function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY;
+  p.innerHTML={overview:overview,members:members,rewards:rewards,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links}[TAB]();
+  if(TAB==="members"){ var q=$("q"); q.oninput=function(){ Q=q.value; var pos=q.selectionStart; draw(); var q2=$("q"); q2.focus(); try{ q2.setSelectionRange(pos,pos); }catch(e){} }; $("csv").onclick=csv;
+    p.querySelectorAll("[data-sort]").forEach(function(th){ th.onclick=function(){ var k=th.dataset.sort; SORT={k:k,d:SORT.k===k?-SORT.d:-1}; draw(); }; }); }
+  p.querySelectorAll("[data-led]").forEach(function(box){ var hid=$(box.dataset.led), up=function(){ var a=[], sum=0; box.querySelectorAll(".row").forEach(function(r){ var nm=r.querySelector(".li").value.trim(), v=parseInt(r.querySelector(".ln").value,10); if(nm&&v>0){ a.push([nm,v]); sum+=v; } });
+    hid.value=JSON.stringify(a); var su=box.querySelector("[data-sum]"); if(su) su.textContent=/slices/.test(box.dataset.led)?"Total: "+sum+"%"+(sum===100?" ✓":" (must be 100)"):a.reduce(function(x,y){ return x+y[1]; },0)+" winner(s) in all"; };
+    box.addEventListener("input",up); up(); });
+  p.querySelectorAll("[data-save]").forEach(function(b){ b.onclick=function(){ saveFlow(b); }; });
+  window.scrollTo(0,y); }
+if(TOKEN) load();
+if("serviceWorker" in navigator && !TEST) navigator.serviceWorker.register("sw.js").catch(function(){});
+})();
+</script>
+</body></html>

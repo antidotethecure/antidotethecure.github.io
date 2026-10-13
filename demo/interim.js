@@ -282,7 +282,17 @@
   });
   function mountLog() { var own = document.getElementById("crm-owner"); if (own && own.parentNode && logEl.parentNode !== own.parentNode) own.parentNode.insertBefore(logEl, own.nextSibling); drawLog(); }
 
-  window.SSAI_INTERIM = { redeem: redeem, claim: claim, openPass: openPass, closePass: closePass, cardHTML: cardHTML, explainerHTML: explainerHTML, toastButtons: toastButtons, log: drawLog,
+  // early-bird / founding-member gift (demo/earlybird.js): same live pass, no points, the server already checked the gift.
+  // Counts as that visit's one reward.
+  function giftPass(item, button, code, cb) {
+    var m = CRM.member(); if (!m) return false; sweep();
+    var live = activePass(); if (live) { openPass(live.code); return false; }
+    var used = memberRedeems(m, day());
+    if (used.length >= I.redeemsPerDay) { sheet('<h3>One reward per visit</h3><p>You already used <b>' + e(used[0].reward) + '</b> today (' + e(used[0].code) + '). Use your gift on your next visit, before it expires.</p><button type="button" class="ir-go" data-ir="x">OK</button>'); return false; }
+    var now = Date.now(), rec = { type: "eb", code: code, tier: -1, reward: "Early bird: " + item, button: button, pts: 0, ts: now, exp: now + I.passMinutes * 60000, member: m.id, memberName: m.name, status: "live", day: day(now), synced: true };
+    var l = load(); l.redeems.unshift(rec); store(l); openPass(code); if (cb) cb(); return true;
+  }
+  window.SSAI_INTERIM = { redeem: redeem, giftPass: giftPass, newCode: code, usedToday: function () { var m = CRM.member(); return m ? memberRedeems(m, day()).length >= I.redeemsPerDay : false; }, claim: claim, openPass: openPass, closePass: closePass, cardHTML: cardHTML, explainerHTML: explainerHTML, toastButtons: toastButtons, log: drawLog,
     data: load, cfg: I,
     // test hooks
     expireNow: function () { var l = load(); l.redeems.forEach(function (r) { if (r.status === "live") r.exp = Date.now(); }); store(l); } };

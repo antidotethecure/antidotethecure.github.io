@@ -68,7 +68,7 @@ window.APP = {
 
   /* Contract terms on every NEW agreement (already in the contract generator) */
   terms: {
-    perf: { pct: 10, threshold: 3000 },
+    perf: { pct: 10, threshold: 3000 },   // 2026-10-13: pct% of the amount OVER threshold only ($5,000 in app sales -> $200)
     results: { returns: 30, day: 30, windowMonths: 3, freeMonths: 2 },
     discount: { graceBusinessDays: 3, perDay: 100 },
     minimumMonths: 3,

@@ -123,7 +123,7 @@ async function boot() {
   const BASE = new URL("3d/", location.href).href, MODELS = {};
   const FILES = { plane: "plane.glb", jet: "jet.glb", ufo: "ufo.glb", cop0: "heli_blue.glb", cop1: "heli_black.glb",
     p_wings: "p_wings.glb?v=ag1", p_toast: "p_toast.glb?v=st3", p_omelette: "p_omelette.glb", p_marg: "p_marg.glb?v=ag1", p_bottle: "p_bottle.glb?v=ag1", p_shots: "p_shots.glb?v=ag1", p_mic: "p_mic.glb", p_mac: "p_mac.glb", p_burger: "p_burger.glb?v=ag1",
-    p_lobmac: "p_lobmac.glb?v=fv2", p_ribs: "p_ribs.glb?v=fv2", p_tacos: "p_tacos.glb?v=fv2", p_nachos: "p_nachos.glb?v=fv2", p_strips: "p_strips.glb?v=fv2",
+    p_lobmac: "p_lobmac.glb?v=fv2", p_ribs: "p_ribs.glb?v=st3", p_tacos: "p_tacos.glb?v=st3", p_nachos: "p_nachos.glb?v=fv2", p_strips: "p_strips.glb?v=fv2",
     p_blueice: "p_blueice.glb?v=fv2", p_blackirish: "p_blackirish.glb?v=fv2", p_rumpunch: "p_rumpunch.glb?v=fv2", p_espresso: "p_espresso.glb?v=fv2", p_pearmarg: "p_pearmarg.glb?v=fv2", p_mimosa: "p_mimosa.glb?v=fv2" };
   async function loadModel(k) {
     try {

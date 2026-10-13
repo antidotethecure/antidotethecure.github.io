@@ -122,8 +122,8 @@ async function boot() {
   const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
   const BASE = new URL("3d/", location.href).href, MODELS = {};
   const FILES = { plane: "plane.glb", jet: "jet.glb", ufo: "ufo.glb", cop0: "heli_blue.glb", cop1: "heli_black.glb",
-    p_wings: "p_wings.glb?v=ag1", p_toast: "p_toast.glb?v=fv2", p_omelette: "p_omelette.glb", p_marg: "p_marg.glb?v=ag1", p_bottle: "p_bottle.glb?v=ag1", p_shots: "p_shots.glb?v=ag1", p_mic: "p_mic.glb", p_mac: "p_mac.glb", p_burger: "p_burger.glb?v=ag1",
-    p_lobmac: "p_lobmac.glb?v=fv2", p_ribs: "p_ribs.glb?v=fv2", p_tacos: "p_tacos.glb?v=fv2", p_nachos: "p_nachos.glb?v=fv2", p_strips: "p_strips.glb?v=fv2",
+    p_wings: "p_wings.glb?v=st3", p_toast: "p_toast.glb?v=st3", p_omelette: "p_omelette.glb", p_marg: "p_marg.glb?v=ag1", p_bottle: "p_bottle.glb?v=ag1", p_shots: "p_shots.glb?v=ag1", p_mic: "p_mic.glb", p_mac: "p_mac.glb", p_burger: "p_burger.glb?v=ag1",
+    p_lobmac: "p_lobmac.glb?v=fv2", p_ribs: "p_ribs.glb?v=st3", p_tacos: "p_tacos.glb?v=st3", p_nachos: "p_nachos.glb?v=fv2", p_strips: "p_strips.glb?v=st3",
     p_blueice: "p_blueice.glb?v=fv2", p_blackirish: "p_blackirish.glb?v=fv2", p_rumpunch: "p_rumpunch.glb?v=fv2", p_espresso: "p_espresso.glb?v=fv2", p_pearmarg: "p_pearmarg.glb?v=fv2", p_mimosa: "p_mimosa.glb?v=fv2" };
   async function loadModel(k) {
     try {
@@ -135,6 +135,7 @@ async function boot() {
       MODELS[k] = { node: inner, size: sz }; STATUS.loaded++;
     } catch (e) { console.warn("[melody3d] model failed", k, e); }
   }
+  // PICK tilt3 = per-pickup camera tilt override (the French toast uses it so the three stacked slices and the white plate both show)
   // round of shots: the generated GLB is the wooden tray; six glass shot glasses with real golden tequila in them sit on it (3 x 2), lime wedges between
   function addShotGlasses(g, sz) {
     const r = sz.x * .1, h = r * 2.3, top = sz.y / 2 - sz.y * .25;
@@ -567,7 +568,7 @@ async function boot() {
         const c = rgb(col); Ba.q(it.x, it.y + 4, A.item - 12, 92, 92, 0, UV.dot, c[0], c[1], c[2], .45 + .2 * Math.sin(now / 140)); }
       else { const P = it.t === "mic" ? M.MIC : it.p, key = P.k, bob = Math.sin(now / 260 + it.x) * 3, o = MODELS[key] ? take(key) : null;
         if (o) { const zs = o.userData.size, flat = zs.y < .5 * Math.max(zs.x, zs.z);   // plates/skillets show their top (the food), glasses/bottles/mic lean toward the camera
-          put(o, it.x, it.y + bob, A.item, (P.w3 || P.w) * zs.x / (flat ? Math.max(zs.x, zs.z) : Math.max(zs.x, zs.y)), false, now / 1100 + it.x, (it.rot || 0) * .8, flat ? .32 : FOOD_TILT); o.rotation.order = "XYZ"; foodLit(o, it.t === "mic" ? 0 : P.drink ? .5 : .42); }
+          put(o, it.x, it.y + bob, A.item, (P.w3 || P.w) * zs.x / (flat ? Math.max(zs.x, zs.z) : Math.max(zs.x, zs.y)), false, now / 1100 + it.x, (it.rot || 0) * .8, P.tilt3 != null ? P.tilt3 : flat ? .32 : FOOD_TILT); o.rotation.order = "XYZ"; foodLit(o, it.t === "mic" ? 0 : P.drink ? .5 : .42); }
         else if (M.ready(P.im)) cardAt(P, it.x, it.y + bob, it.rot || 0);
         const c = it.t === "mic" ? [.89, .42, .51] : [1, .88, .55]; Ba.q(it.x, it.y, A.item - 16, P.w * 1.7, P.w * 1.7, 0, UV.dot, c[0], c[1], c[2], .4);
         if (it.t === "food") { if (P.drink) drinkGlint(P, it.x, it.y + bob, now); else steam3(P, it.x, it.y + bob, now); } } }

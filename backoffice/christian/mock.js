@@ -10,7 +10,8 @@
   for (var i = 1; i <= 46; i++) {
     var n = ("0" + i).slice(-2), slug = i % 3 === 0 ? "nalu-vida" : "melody-bar-grill", joined = now - Math.floor(rnd() * 34) * DAY - Math.floor(rnd() * DAY);
     var earned = 100 + Math.floor(rnd() * 26) * 60, spent = rnd() < 0.35 ? pick([250, 500, 750]) : 0; spent = Math.min(spent, earned);
-    members.push({ slug: slug, id: "TEST" + n + "XY", name: "Test Guest " + n, phone: "(555) 010-00" + n, email: "guest" + n + "@example.com", bday: rnd() < 0.5 ? (1 + (i % 12)) + "/" + (1 + (i % 27)) + "/1990" : "",
+    var ABC = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", cid = ""; for (var q = 0; q < 5; q++) cid += ABC[Math.floor(rnd() * ABC.length)];
+    members.push({ card: (slug === "nalu-vida" ? "NLV-" : "MLD-") + cid, slug: slug, id: "TEST" + n + "XY", name: "Test Guest " + n, phone: "(555) 010-00" + n, email: "guest" + n + "@example.com", bday: rnd() < 0.5 ? (1 + (i % 12)) + "/" + (1 + (i % 27)) + "/1990" : "",
       joined: joined, last: Math.min(now, joined + Math.floor(rnd() * 10) * DAY), stars: earned - spent, earned: earned, spent: spent, visits: 1 + Math.floor(rnd() * 6), ref: "GUEST" + n + "-K9",
       refBy: i > 6 && rnd() < 0.25 ? "GUEST0" + (1 + (i % 6)) + "-K9" : "", friends: 0, gamePts: Math.floor(rnd() * 200), redeems: spent ? 1 : 0, sms: rnd() < 0.4 ? "yes" : "no", smsAt: "", src: pick(["table QR", "window poster", "app", "referral"]) });
   }

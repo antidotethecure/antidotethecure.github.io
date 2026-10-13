@@ -13,7 +13,18 @@
   $("logo").src = (/^(https?:)?\//.test(C.brand.logo) ? "" : "../") + C.brand.logo;
   $("demoPin").textContent = C.demoPin;
 
-  function gate() { var u = unlocked(); $("gate").hidden = u; $("app").hidden = !u; if (u) { M.seedSamples(); render(); } }
+  function gate() { var u = unlocked(); $("gate").hidden = u; $("app").hidden = !u; if (u) { M.seedSamples(); render(); sources(); } }
+  /* parts sources (config.suppliers): business info only, call for price & availability */
+  function sources() {
+    var list = C.suppliers || []; $("srcCard").hidden = !list.length;
+    $("srcList").innerHTML = list.map(function (s) {
+      return '<div class="supp"><div class="sh">' + (s.preferred ? '<span class="badge">⭐ ' + t("prefSupp") + "</span>" : "") + "<b>" + esc(s.name) + "</b><small>" + esc(s.address || s.area || "") + "</small></div>" +
+        '<p class="note">' + esc(M.p(s.note)) + "</p>" + (s.hours ? '<p class="note">🕗 ' + esc(M.p(s.hours)) + "</p>" : "") +
+        '<div class="row sb">' + (s.tel ? '<a class="btn primary small" href="tel:' + esc(s.tel) + '">📞 ' + esc(s.phone || t("call")) + "</a>" : "") +
+        (s.mapsUrl ? '<a class="btn ghost small" href="' + esc(s.mapsUrl) + '" target="_blank" rel="noopener">🧭 ' + t("directions") + "</a>" : "") +
+        (s.website ? '<a class="btn ghost small" href="' + esc(s.website) + '" target="_blank" rel="noopener">🌐 ' + t("website") + "</a>" : "") + "</div></div>";
+    }).join("") + '<p class="fine">' + t("srcHonest") + "</p>";
+  }
   $("pinForm").addEventListener("submit", function (e) {
     e.preventDefault();
     if ($("pin").value.trim() === String(C.demoPin)) { setUnlocked(true); $("pin").value = ""; $("pinMsg").textContent = ""; gate(); }
@@ -36,7 +47,20 @@
   }
   function card(r) {
     var st = r.status === "declined" ? '<span class="st no">' + esc(t("decline")) + "</span>" : r.status === "requested" ? '<span class="st req">' + t("tNew") + "</span>" : r.stage >= 6 ? '<span class="st done">' + esc(M.stageName(6)) + "</span>" : '<span class="st go">' + esc(M.stageName(r.stage)) + "</span>";
-    var items = (r.items || []).map(function (it) { var pr = M.price(it); return "<li>" + esc(M.itemName(it)) + ' <small style="color:var(--dim)">' + M.range(pr.lo, pr.hi) + "</small></li>"; }).join("");
+    var PT = window.PARTS, sup = PT && PT.supplier(), anyParts = false;
+    var items = (r.items || []).map(function (it, ix) {
+      var pr = M.price(it), pl = PT ? PT.forItem(it, r.car || {}) : null, say = "";
+      if (pl && !pl.na && pl.parts.length) {
+        say = pl.parts.map(function (pp, j) {
+          var sc = PT.script(pp, r.car || {}, M.lang(), it); if (!sc) return "";
+          anyParts = true;
+          return '<div class="say"><b style="font-size:14px">' + esc(M.p(pp.name)) + "</b><p>" + esc(sc) + '</p><div class="sayb"><button type="button" class="btn ghost small" data-copy="' + r.id + "|" + ix + "|" + j + '">📋 ' + t("copy") + "</button>" +
+            (sup && sup.tel ? '<a class="btn primary small" href="tel:' + esc(sup.tel) + '">📞 ' + esc(t("callN", { n: sup.short || sup.name })) + "</a>" : "") + "</div></div>";
+        }).join("");
+      }
+      return "<li>" + esc(M.itemName(it)) + ' <small style="color:var(--dim)">' + M.range(pr.lo, pr.hi) + "</small>" + (it.codes && it.codes.length ? ' <span class="pill acc">' + esc(it.codes.join(", ")) + "</span>" : "") +
+        (say ? '<details class="more" style="margin:6px 0"><summary>🔩 ' + esc(t("whatToAsk", { n: sup ? sup.short || sup.name : t("theStore") })) + "</summary>" + say + "</details>" : "") + "</li>";
+    }).join("");
     var pct = r.stage >= 0 ? M.STAGES[r.stage].pct : 0;
     var acts = "";
     if (r.status === "requested") acts = '<button class="btn primary" type="button" data-act="accept" data-id="' + r.id + '">' + t("accept") + '</button><button class="btn ghost" type="button" data-act="decline" data-id="' + r.id + '">' + t("decline") + "</button>";
@@ -46,6 +70,7 @@
       '<div class="meta">' + (r.sample ? '<span class="pill">' + t("sampleTag") + "</span>" : '<span class="pill acc">' + t("fromPage") + "</span>") +
       (r.car && r.car.miles ? '<span class="pill">' + esc(r.car.miles) + " mi</span>" : "") + '<span class="pill">' + t("alertsL") + " " + esc(chs(r).join(" + ")) + "</span></div>" +
       (r.problem ? '<div class="prob">“' + esc(r.problem) + "”</div>" : "") + "<ul>" + items + "</ul>" +
+      (anyParts ? '<button type="button" class="btn ghost small w100" style="margin:6px 0" data-copyall="' + r.id + '">📋 ' + t("copyAll") + "</button>" : "") +
       '<div class="meta"><span class="pill acc">' + t("est") + " " + M.range(r.est.lo, r.est.hi) + "</span>" + (r.quote ? '<span class="pill ok">' + t("quote") + " " + M.money(r.quote) + "</span>" : "") +
       '<span class="pill">' + t("arrival") + " " + esc(r.slot ? M.fSlot(r.slot) : t("noSlot")) + "</span>" + (r.readyBy ? '<span class="pill">' + t("ready") + " " + esc(M.fWhen(r.readyBy)) + "</span>" : "") + "</div>" +
       (r.status === "accepted" ? '<div class="mini"><i style="width:' + pct + '%"></i></div><small style="color:var(--dim)">' + pct + "% · " + esc(M.stageName(r.stage)) + "</small>" : "") +
@@ -53,7 +78,19 @@
   }
   D.querySelectorAll("[data-tab]").forEach(function (b) { b.addEventListener("click", function () { tab = b.getAttribute("data-tab"); render(); }); });
 
+  function copyText(s) {
+    function fb() { var ta = D.createElement("textarea"); ta.value = s; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0"; D.body.appendChild(ta); ta.select(); var ok = false; try { ok = D.execCommand("copy"); } catch (e) {} D.body.removeChild(ta); return ok; }
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(s).then(function () { return true; }, function () { return fb(); });
+    return Promise.resolve(fb());
+  }
   $("list").addEventListener("click", function (e) {
+    var cp = e.target.closest("[data-copy]"), ca = e.target.closest("[data-copyall]");
+    if (cp) {
+      var k = cp.getAttribute("data-copy").split("|"), rq = M.get(k[0]), it = rq && rq.items[+k[1]], pl = it && window.PARTS.forItem(it, rq.car || {});
+      if (pl && pl.parts[+k[2]]) copyText(window.PARTS.script(pl.parts[+k[2]], rq.car || {}, M.lang(), it)).then(function (ok) { M.toast(ok ? t("copied") : t("copyFail")); });
+      return;
+    }
+    if (ca) { var rr = M.get(ca.getAttribute("data-copyall")); if (rr) copyText(window.PARTS.jobList(rr.items || [], rr.car || {}, M.lang())).then(function (ok) { M.toast(ok ? t("copiedAll") : t("copyFail")); }); return; }
     var b = e.target.closest("[data-act]"); if (!b) return;
     var r = M.get(b.getAttribute("data-id")); if (!r) return; cur = r.id;
     var a = b.getAttribute("data-act");
@@ -120,7 +157,7 @@
   D.addEventListener("keydown", function (e) { if (e.key === "Escape") D.querySelectorAll(".sheet.on").forEach(function (s) { close(s.id); }); });
 
   M.onChange(function () { if (unlocked()) render(); });
-  M.onLang(function () { if (unlocked()) render(); });
+  M.onLang(function () { if (unlocked()) { render(); sources(); } });
   M.applyLang();
   gate();
 })();

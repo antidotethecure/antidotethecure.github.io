@@ -335,3 +335,191 @@ footer.f .pw b{font-family:"Orbitron",sans-serif;font-size:11.5px;letter-spacing
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 }
+
+/* ===== v2: searchable car picker ===== */
+.cbx{position:relative}
+.cb{position:relative}
+.cb input{width:100%;min-height:48px;border-radius:12px;border:1px solid var(--edge);background:#060b18;color:var(--ink);font:600 17px "Rajdhani",sans-serif;padding:8px 40px 8px 12px}
+.cb input:disabled{opacity:.55}
+.cb .cbt{position:absolute;right:4px;top:4px;width:40px;height:40px;border:0;background:none;color:var(--dim);font-size:16px;cursor:pointer}
+.cb ul{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);max-height:min(320px,52vh);overflow-y:auto;overscroll-behavior:contain;margin:0;padding:6px;list-style:none;border-radius:14px;border:1px solid var(--edge);background:#0a1224;box-shadow:0 18px 40px #000a}
+.cb li{padding:10px 10px;border-radius:9px;font-weight:700;cursor:pointer;min-height:40px}
+.cb li[aria-selected=true]{color:var(--accent)}
+.cb li.act,.cb li:hover{background:color-mix(in srgb,var(--accent2) 16%,transparent)}
+.cb li.cbg{cursor:default;font:800 10.5px "Orbitron",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:8px 10px 4px;min-height:0}
+.cb li.cbg:hover{background:none}
+.more{margin:10px 0;border:1px solid var(--edge);border-radius:14px;padding:4px 12px;background:#ffffff05}
+.more summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+.more .fld select{min-height:46px}
+.bodypick{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.bodypick button{flex:1 1 30%;min-height:42px;border-radius:11px;border:1px solid var(--edge);background:#ffffff06;color:var(--dim);font:700 14px "Rajdhani",sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.bodypick button[aria-pressed=true]{color:#fff;border-color:var(--accent2);background:color-mix(in srgb,var(--accent2) 16%,transparent)}
+.carbadge .mini{width:64px;height:auto;flex:none}
+.carbadge>div{min-width:0}
+/* known issues */
+.issues h3{margin-bottom:4px}
+.issues .sub{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2);font-weight:800;margin:14px 0 6px}
+.free{margin:4px 0 8px;padding:8px 10px;border-radius:12px;background:color-mix(in srgb,var(--good) 12%,transparent);border:1px solid color-mix(in srgb,var(--good) 40%,transparent);font-weight:700;font-size:15px}
+.rc{border:1px solid var(--edge);border-radius:12px;padding:8px 10px;margin:6px 0;background:#ffffff05}
+.rc summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;min-height:36px}
+.rc summary small{flex-basis:100%;color:var(--dim);font-size:12.5px}
+.rc p{font-size:14.5px;margin:8px 0}
+.pill.bad{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 50%,transparent)}
+.linkbtn{background:none;border:0;color:var(--accent2);font:700 14px "Rajdhani",sans-serif;text-decoration:underline;cursor:pointer;padding:6px 0;min-height:36px}
+.okline{color:var(--good);font-weight:700}
+.warnline{color:var(--warn);font-weight:700}
+.most{font-weight:700;margin:4px 0 8px}
+.bars{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.bars li{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto auto;gap:8px;align-items:center;font-size:14px}
+.bars .bl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bars .bt{height:8px;border-radius:99px;background:#ffffff10;overflow:hidden}
+.bars .bt i{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px}
+.bars .chk{border:1px solid var(--edge);background:#ffffff08;color:var(--ink);border-radius:99px;font:700 12.5px "Rajdhani",sans-serif;padding:3px 8px;min-height:30px;cursor:pointer;white-space:nowrap}
+.src a{word-break:break-all}
+/* quote rows */
+.ji .codes{display:block;color:var(--accent2);font-weight:700}
+.ji .jact{grid-column:3;justify-self:end;display:flex;gap:10px;align-items:center}
+.ji .jact .x{grid-column:auto}
+.pbtn2{background:none;border:0;color:var(--accent2);font:700 13px "Rajdhani",sans-serif;cursor:pointer;padding:2px 0;min-height:28px;text-decoration:underline;white-space:nowrap}
+.pbtn{cursor:pointer;font-family:inherit}
+/* parts sheet */
+.supp{border:1px solid color-mix(in srgb,var(--gold) 55%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--gold) 12%,#0b1120),#0b1120 70%);border-radius:16px;padding:12px;margin:10px 0}
+.supp .sh b{display:block;font-family:"Orbitron",sans-serif;font-size:14px;margin-top:6px}
+.supp .sh small{color:var(--dim)}
+.supp .badge{display:inline-block;font:800 10.5px "Rajdhani",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#1d1000;background:var(--gold);border-radius:99px;padding:2px 8px}
+.supp .sb{margin-top:8px}
+.supp .sb>.btn{flex:1 1 30%}
+.fine{font-size:12px;color:var(--dim);margin:8px 0 0}
+.qbox{border:1px dashed var(--edge);border-radius:14px;padding:10px;margin:8px 0}
+.qrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0}
+.qrow>span{flex-basis:100%;font-weight:700;font-size:14px}
+.qrow .pill{cursor:pointer;min-height:34px;font-family:inherit;text-decoration:none}
+.sayhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 0 4px}
+.lt.mini button{min-width:36px;min-height:34px;font-size:13px}
+.part{border:1px solid var(--edge);border-radius:14px;padding:10px 12px;margin:8px 0;background:#ffffff05}
+.part>b{font-size:16px}
+.say{margin-top:8px;border-left:3px solid var(--accent);background:#060b18;border-radius:0 12px 12px 0;padding:8px 10px}
+.say p{margin:0 0 8px;font-size:15.5px;line-height:1.4}
+.sayb{display:flex;flex-wrap:wrap;gap:6px}
+.sayb .btn{flex:1 1 40%}
+.find{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-top:8px;font-size:14px}
+.find span{color:var(--dim);font-weight:700}
+.find a{font-weight:700;min-height:32px;display:inline-flex;align-items:center}
+/* scan */
+.scanwarn{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:14px;border:1px solid color-mix(in srgb,var(--warn) 55%,transparent);background:color-mix(in srgb,var(--warn) 10%,transparent);font-weight:700;font-size:15px}
+.adapters{margin:8px 0 0;padding-left:18px;font-size:14.5px}
+.adapters li{margin:3px 0}
+.codeform{display:flex;gap:8px;align-items:flex-end}
+.codeform .fld{flex:1;margin-bottom:0}
+.codeform input{text-transform:uppercase;letter-spacing:.08em}
+.scanhead{display:flex;flex-direction:column;gap:2px;margin:12px 0 6px}
+.scanhead small{color:var(--dim);font-size:14px}
+.dtc{border:1px solid var(--edge);border-left-width:5px;border-radius:14px;padding:12px;margin:10px 0;background:#ffffff06}
+.dtc.sev-stop{border-left-color:var(--bad)}
+.dtc.sev-soon{border-left-color:var(--warn)}
+.dtc.sev-ok{border-left-color:var(--good)}
+.dtc .dh{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.dtc .code{font-family:"Orbitron",sans-serif;font-size:18px;letter-spacing:.06em}
+.dtc .sev{margin-left:auto;font-weight:800;font-size:14px}
+.dtc.sev-stop .sev{color:var(--bad)}.dtc.sev-soon .sev{color:var(--warn)}.dtc.sev-ok .sev{color:var(--good)}
+.dtc .mean{font-weight:700;margin:6px 0}
+.dtc dl{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:6px 0 8px;font-size:14.5px}
+.dtc dt{color:var(--dim)}
+.dtc dd{margin:0}
+/* swatches */
+.swatches{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 2px}
+.swatches span{font-weight:700;font-size:14px;color:var(--dim);margin-right:4px}
+.swatches button{width:30px;height:30px;border-radius:50%;border:2px solid #ffffff30;cursor:pointer;padding:0}
+.swatches button[aria-pressed=true]{border-color:#fff;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent2) 60%,transparent)}
+.greet{font-family:"Orbitron",sans-serif;font-size:15px;margin:10px 0 6px;color:#fff}
+.privacy{font-size:13px;color:var(--dim);margin-top:6px}
+
+/* ===== v2: the home-garage scene ===== */
+.scn{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--edge);aspect-ratio:400/250;background:#2a63c9;box-shadow:0 18px 40px #0008,inset 0 0 0 1px #ffffff10}
+.scn svg{display:block;width:100%;height:100%}
+.scn .lyr{transition:transform .25s ease-out;will-change:transform}
+.scn .cl{animation:cloud 26s linear infinite alternate}
+.scn .c2{animation-duration:34s}
+@keyframes cloud{to{transform:translateX(28px)}}
+.scn .actor .car{transition:transform 2.2s cubic-bezier(.45,.05,.3,1);transform:translate(-70px,246px) scale(.2)}
+.scn[data-st=req] .actor .car{transform:translate(196px,247px) scale(.2)}
+.scn[data-st=rec] .actor .car,.scn[data-st=diag] .actor .car,.scn[data-st=parts] .actor .car,.scn[data-st=ready] .actor .car{transform:translate(284px,236px) scale(.2)}
+.scn[data-st=work] .actor .car{transform:translate(280px,157px) scale(.1)}
+.scn[data-st=almost] .actor .car{transform:translate(283px,196px) scale(.15)}
+.scn .whl{transform-box:fill-box;transform-origin:center}
+.scn .hood{opacity:0;transform-box:fill-box;transform-origin:100% 50%;transition:transform .8s .6s,opacity .3s .6s}
+.scn[data-st=diag] .hood{opacity:1;transform:rotate(28deg)}
+.scn .gateL,.scn .gateR{transition:transform 1.1s ease;transform-box:fill-box}
+.scn .gateL{transform-origin:0 50%}.scn .gateR{transform-origin:100% 50%}
+.scn[data-st=work] .gateL,.scn[data-st=almost] .gateL,.scn[data-st=work] .gateR,.scn[data-st=almost] .gateR{transform:scaleX(.14)}
+.scn .fx>g{opacity:0;transition:opacity .5s}
+.scn .fx-diag{transform:translate(318px,206px)}
+.scn[data-st=diag] .fx-diag{opacity:1;transition-delay:1.4s}
+.scn .ping{animation:ping 1.4s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes ping{from{transform:scale(.6);opacity:1}to{transform:scale(2.2);opacity:0}}
+.scn .fx-truck{transform:translate(-40px,244px)}
+.scn[data-st=parts] .fx-truck{opacity:1;animation:truck 5s ease-in-out infinite}
+@keyframes truck{0%{transform:translate(-40px,244px)}45%,60%{transform:translate(206px,244px)}100%{transform:translate(430px,244px)}}
+.scn .fx-work{transform:translate(272px,142px)}
+.scn[data-st=work] .fx-work{opacity:1;transition-delay:2s}
+.scn .wr{animation:wr 1s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:20% 80%}
+@keyframes wr{from{transform:rotate(-25deg)}to{transform:rotate(20deg)}}
+.scn .spk circle{animation:spk .6s steps(2) infinite}
+.scn .spk circle:nth-child(2){animation-delay:.2s}.scn .spk circle:nth-child(3){animation-delay:.35s}
+@keyframes spk{50%{opacity:0}}
+.scn .fx-shine{transform:translate(283px,180px)}
+.scn[data-st=almost] .fx-shine{opacity:1;transition-delay:1.6s}
+.scn .bub{animation:bub 2.2s ease-in infinite;transform-box:fill-box}
+.scn .b2{animation-delay:.6s}.scn .b3{animation-delay:1.2s}
+@keyframes bub{from{transform:translateY(4px);opacity:.8}to{transform:translateY(-22px);opacity:0}}
+.scn .sp1,.scn .sp2{animation:tw 1.2s ease-in-out infinite alternate}
+.scn .sp2{animation-delay:.5s}
+@keyframes tw{from{opacity:.2}to{opacity:1}}
+.scn .fx-ready{transform:translate(284px,214px)}
+.scn[data-st=ready] .fx-ready{opacity:1;transition-delay:2s}
+.scn .conf rect{animation:conf 1.8s linear infinite;transform-box:fill-box}
+.scn .conf rect:nth-child(2n){animation-delay:.5s}.scn .conf rect:nth-child(3n){animation-delay:1s}
+@keyframes conf{from{transform:translateY(-6px) rotate(0)}to{transform:translateY(30px) rotate(300deg);opacity:0}}
+.scn .fx-truck .tl{paint-order:stroke;stroke:#000a;stroke-width:2px}
+.scn.still *,.scn.still .actor .car{transition:none!important;animation:none!important}
+.scn.still .fx-truck{transform:translate(200px,244px)}
+@media (prefers-reduced-motion:reduce){.scn *{transition:none!important;animation:none!important}.scn[data-st=parts] .fx-truck{transform:translate(200px,244px)}}
+.hero .scn{margin:-20px -16px 14px;border-radius:0;border:0;border-bottom:1px solid var(--edge);box-shadow:none}
+.hero .scn .actor .car{transform:translate(280px,157px) scale(.1)}
+.trackscn{margin:12px 0 4px}
+
+/* ===== v2: paint, photo, My Garage, Tesla ===== */
+.fldl{font-weight:700;font-size:15px;margin:12px 0 2px}
+.paintbox{margin-top:6px}
+.swc{position:relative;display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13px;color:var(--dim);cursor:pointer}
+.swc input{width:30px;height:30px;border:2px solid #ffffff30;border-radius:50%;padding:0;background:none;cursor:pointer}
+.swc input::-webkit-color-swatch-wrapper{padding:0}.swc input::-webkit-color-swatch{border:0;border-radius:50%}
+.photorow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:6px}
+#photoPrev img{width:96px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--edge);display:block}
+.pill .dot{display:inline-block;width:12px;height:12px;border-radius:50%;border:1px solid #fff6}
+.soon{font-size:13px;color:var(--dim);margin:8px 0 0;opacity:.85}
+.gcar{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);border-radius:18px;padding:14px;margin:12px 0}
+.gcar.act{border-color:var(--accent2);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent2) 25%,transparent) inset}
+.gtop{display:flex;gap:12px;align-items:center}
+.gph{flex:none;width:96px;height:64px;border-radius:12px;overflow:hidden;background:#060b18;border:1px solid var(--edge);display:grid;place-items:center}
+.gph img{width:100%;height:100%;object-fit:cover}
+.gph svg{width:92px;height:auto}
+.gtx{flex:1;min-width:0}
+.gtx small{display:block;color:var(--dim);font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gnick{width:100%;background:none;border:0;border-bottom:1px dashed var(--edge);color:var(--ink);font:800 17px "Rajdhani",sans-serif;padding:2px 0;min-height:32px}
+.gbtns{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.gbtns .btn{flex:1 1 auto}
+.glist{list-style:none;margin:0;padding:0 0 6px;display:grid;gap:8px}
+.glist li{font-size:14.5px}
+.glist .sl b{font-size:14.5px}.glist .sl small{display:block;color:var(--dim)}
+.glist small{display:block;color:var(--dim)}
+.pill.st-open{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 50%,transparent)}
+.pill.st-quote,.pill.st-job{color:var(--accent2);border-color:color-mix(in srgb,var(--accent2) 50%,transparent)}
+.pill.st-fixed{color:var(--good);border-color:color-mix(in srgb,var(--good) 50%,transparent)}
+.rm-due b{color:var(--bad)}.rm-soon b{color:var(--warn)}.rm-ok b{color:var(--good)}
+.tesla{border-color:color-mix(in srgb,#e82127 55%,var(--edge))}
+.tesla .sub{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2);font-weight:800;margin:14px 0 6px}
+.tslinks{margin:0;padding-left:18px;font-size:14.5px}
+.tslinks li{margin:5px 0}
+.tslinks small{color:var(--dim)}
+.evnote{border-color:color-mix(in srgb,var(--accent2) 50%,var(--edge))}

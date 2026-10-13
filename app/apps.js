@@ -29,6 +29,14 @@
     if (!location.hash) setTimeout(function () { var t = $("trucks"); if (t) t.scrollIntoView(); }, 60);
   }
 
+  // business-type links: ?type=auto|mechanic|legal|restaurant → that category first
+  var cat = /^(auto|automotive|mechanic|mechanics|shop)$/.test(qt) ? ["auto", "auto"] : /^(legal|law|lawyer|court|bail)$/.test(qt) ? ["legal", "legal-apps"] : /^(rest|restaurant|restaurants|food)$/.test(qt) ? ["rest", "apps"] : null;
+  if (cat) {
+    filter(cat[0]);
+    if (!location.hash) setTimeout(function () { var t = $(cat[1]); if (t) t.scrollIntoView(); }, 60);
+  }
+  document.querySelectorAll(".cats a[data-cat]").forEach(function (a) { a.addEventListener("click", function () { filter(a.dataset.cat); }); });
+
   // live phone preview
   var dBtns = document.querySelectorAll("#xDemo button"), ph = $("xPh");
   dBtns.forEach(function (b) { b.addEventListener("click", function () {

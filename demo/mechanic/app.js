@@ -17,9 +17,15 @@
   function key(it) { return it.svc + "|" + it.opt + "|" + (it.pos || ""); }
 
   /* ---------- brand ---------- */
+  var heroSc = null;
+  function heroScene() {
+    if (!W.SCENE) return;
+    heroSc = W.SCENE.mount($("heroScene"), { body: car.body || "suv", color: carColor(), partsFrom: "", readyTxt: t("readyTxt"), from: "work" });
+    heroSc.go("work", true); W.SCENE.parallax($("heroScene"));
+  }
   function brand() {
     $("bName").textContent = C.brand.name;
-    $("logo").src = C.brand.logo + (C.brand.logo.indexOf("?") < 0 ? "?v=20261013a" : "");
+    $("logo").src = C.brand.logo + (C.brand.logo.indexOf("?") < 0 ? "?v=20261013b" : "");
     $("stCity").textContent = "📍 " + C.brand.city;
     $("callBtn").href = "sms:" + C.brand.sms;
     var now = new Date(), h = C.hours[now.getDay()], mins = now.getHours() * 60 + now.getMinutes(), ob = $("openbar");
@@ -57,93 +63,225 @@
   }
   $("baList").addEventListener("input", function (e) { if (e.target.matches("input[type=range]")) e.target.parentNode.style.setProperty("--x", e.target.value + "%"); });
 
-  /* ---------- your car (NHTSA vPIC) ---------- */
-  var MAKES = ["ACURA", "AUDI", "BMW", "BUICK", "CADILLAC", "CHEVROLET", "CHRYSLER", "DODGE", "FIAT", "FORD", "GENESIS", "GMC", "HONDA", "HYUNDAI", "INFINITI", "JEEP", "KIA", "LEXUS", "LINCOLN", "MAZDA", "MERCEDES-BENZ", "MINI", "MITSUBISHI", "NISSAN", "RAM", "SUBARU", "TESLA", "TOYOTA", "VOLKSWAGEN", "VOLVO"];
-  var API = "https://vpic.nhtsa.dot.gov/api/vehicles/", cache = {};
-  function title(s) { return String(s || "").toLowerCase().replace(/(^|[\s-])\w/g, function (m) { return m.toUpperCase(); }).replace(/\bBmw\b/, "BMW").replace(/\bGmc\b/, "GMC").replace(/\bRam\b/, "RAM").replace(/\bMini\b/, "MINI"); }
-  function fillYearMake() {
-    var y = new Date().getFullYear() + 1, yo = '<option value="">' + t("pickYear") + "</option>";
-    for (var i = y; i >= 1981; i--) yo += '<option' + (String(i) === String(car.year) ? " selected" : "") + ">" + i + "</option>";
-    $("year").innerHTML = yo;
-    var mk = car.make && MAKES.indexOf(car.make) < 0 && car.make !== "__other" ? MAKES.concat([car.make]).sort() : MAKES;
-    $("make").innerHTML = '<option value="">' + t("pickMake") + "</option>" + mk.map(function (m) { return '<option value="' + esc(m) + '"' + (m === car.make ? " selected" : "") + ">" + esc(title(m)) + "</option>"; }).join("") +
-      '<option value="__other"' + (car.make === "__other" ? " selected" : "") + ">" + t("otherMake") + "</option>";
-  }
-  function setModelOptions(list, sel) {
-    $("model").innerHTML = '<option value="">' + t("pickModel") + "</option>" + list.map(function (m) { return '<option' + (m === sel ? " selected" : "") + ">" + esc(m) + "</option>"; }).join("");
-    $("model").disabled = !list.length;
-  }
-  function loadModels(keepSel) {
-    var y = $("year").value, mk = $("make").value;
-    $("modelTxtF").hidden = mk !== "__other";
-    if (mk === "__other") { setModelOptions([], ""); $("modelMsg").textContent = ""; return Promise.resolve(); }
-    if (!y || !mk) { setModelOptions([], ""); $("modelMsg").textContent = ""; return Promise.resolve(); }
-    var k = mk + "|" + y;
-    if (cache[k]) { done(cache[k]); return Promise.resolve(); }
-    $("modelMsg").textContent = t("loadingModels"); $("model").disabled = true;
-    var types = ["car", "truck", "mpv"];
-    return Promise.all(types.map(function (ty) {
-      return fetch(API + "GetModelsForMakeYear/make/" + encodeURIComponent(mk) + "/modelyear/" + y + "/vehicletype/" + ty + "?format=json")
-        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) { return d.Results || []; }).catch(function () { return null; });
-    })).then(function (res) {
-      if (res.every(function (r) { return r === null; })) { $("modelMsg").textContent = t("modelsErr"); $("modelTxtF").hidden = false; setModelOptions([], ""); return; }
-      var names = {}; res.forEach(function (r) { (r || []).forEach(function (m) { names[String(m.Model_Name).trim()] = 1; }); });
-      cache[k] = Object.keys(names).sort(function (a, b) { return a.localeCompare(b); });
-      if ($("year").value + "" === y && $("make").value === mk) done(cache[k]);
-    });
-    function done(list) {
-      setModelOptions(list, keepSel ? car.model : "");
-      $("modelMsg").textContent = list.length ? t("modelsOk", { n: list.length, y: y, m: title(mk) }) : t("modelsNone");
-      $("modelTxtF").hidden = list.length > 0 && mk !== "__other";
+  /* ---------- your car: Year -> Make -> Model (+ optional engine / drivetrain / trim), or a VIN ----------
+     Data: NHTSA vPIC via vehicle.js (cached in localStorage). vPIC model lists have no trims, so trim / engine / drivetrain
+     come from a VIN decode or the optional "More details" pickers. */
+  var V = W.VEH, PT = W.PARTS;
+  var FALLBACK_MAKES = ["ACURA", "AUDI", "BMW", "BUICK", "CADILLAC", "CHEVROLET", "CHRYSLER", "DODGE", "FIAT", "FORD", "GENESIS", "GMC", "HONDA", "HYUNDAI", "INFINITI", "JEEP", "KIA", "LAND ROVER", "LEXUS", "LINCOLN", "MAZDA", "MERCEDES-BENZ", "MINI", "MITSUBISHI", "NISSAN", "PORSCHE", "RAM", "RIVIAN", "SUBARU", "TESLA", "TOYOTA", "VOLKSWAGEN", "VOLVO"];
+  function title(s) { return V.title(s); }
+
+  /* searchable list (type-to-filter combobox). items: [{ v, label, group? }] */
+  function Combo(root, onPick) {
+    var inp = root.querySelector("input"), ul = root.querySelector("ul"), items = [], act = -1, shown = [], cur = { v: "", label: "" }, MAX = 150;
+    var lid = ul.id;
+    function nrm(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]/g, ""); }
+    function render() {
+      var q = inp.value === cur.label ? "" : nrm(inp.value), html = "", n = 0, more = 0, groups = {};
+      shown = [];
+      items.forEach(function (it) {
+        if (q) { var k = nrm(it.label); if (k.indexOf(q) < 0 || groups["_" + it.v]) return; groups["_" + it.v] = 1; }
+        if (n >= MAX) { more++; return; }
+        if (!q && it.group && !groups[it.group]) { groups[it.group] = 1; html += '<li class="cbg" role="presentation">' + esc(it.group) + "</li>"; }
+        shown.push(it);
+        html += '<li role="option" id="' + lid + "-" + n + '" data-i="' + n + '" aria-selected="' + (it.v === cur.v) + '">' + esc(it.label) + "</li>";
+        n++;
+      });
+      if (more) html += '<li class="cbg" role="presentation">' + esc(t("keepTyping", { n: more })) + "</li>";
+      if (!n) html = '<li class="cbg" role="presentation">' + esc(t("noMatch")) + "</li>";
+      ul.innerHTML = html; act = q && shown.length ? 0 : -1; mark();
     }
+    function mark() {
+      ul.querySelectorAll("[role=option]").forEach(function (li) { li.classList.toggle("act", +li.getAttribute("data-i") === act); });
+      if (act >= 0) { inp.setAttribute("aria-activedescendant", lid + "-" + act); var el = D.getElementById(lid + "-" + act); if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest" }); }
+      else inp.removeAttribute("aria-activedescendant");
+    }
+    function openL() { if (inp.disabled) return; ul.hidden = false; inp.setAttribute("aria-expanded", "true"); root.classList.add("open"); render(); }
+    function closeL() { ul.hidden = true; inp.setAttribute("aria-expanded", "false"); root.classList.remove("open"); }
+    function pick(it) { cur = { v: it.v, label: it.label }; inp.value = it.label; closeL(); onPick(it); }
+    inp.addEventListener("focus", function () { openL(); try { inp.select(); } catch (e) {} });
+    inp.addEventListener("click", openL);
+    inp.addEventListener("input", function () { if (ul.hidden) openL(); else render(); });
+    inp.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown") { e.preventDefault(); if (ul.hidden) openL(); act = Math.min(shown.length - 1, act + 1); mark(); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); act = Math.max(0, act - 1); mark(); }
+      else if (e.key === "Enter") { if (!ul.hidden && shown[act]) { e.preventDefault(); pick(shown[act]); } }
+      else if (e.key === "Escape") { closeL(); inp.value = cur.label; }
+    });
+    inp.addEventListener("blur", function () { setTimeout(function () { closeL(); if (inp.value !== cur.label) inp.value = cur.label; }, 150); });
+    ul.addEventListener("mousedown", function (e) { e.preventDefault(); });
+    ul.addEventListener("click", function (e) { var li = e.target.closest("[data-i]"); if (li) pick(shown[+li.getAttribute("data-i")]); });
+    root.querySelector(".cbt").addEventListener("click", function () { if (ul.hidden) inp.focus(); else closeL(); });
+    return {
+      set: function (list, v) { items = list; this.val(v); },
+      val: function (v) { var it = items.filter(function (x) { return x.v === v; })[0]; cur = it ? { v: it.v, label: it.label } : { v: "", label: "" }; inp.value = cur.label; },
+      get: function () { return cur.v; },
+      disable: function (d) { inp.disabled = !!d; root.classList.toggle("dis", !!d); if (d) closeL(); },
+      placeholder: function (s) { inp.placeholder = s; }
+    };
   }
+  var yearC = Combo($("yearC"), function (it) { if (car.year !== it.v) { car.year = it.v; car.model = ""; resetSpecs(); } carChanged(true); loadModels(); });
+  var makeC = Combo($("makeC"), function (it) { if (car.make !== it.v) { car.make = it.v; car.model = ""; resetSpecs(); } carChanged(true); loadModels(); });
+  var modelC = Combo($("modelC"), function (it) {
+    if (car.model !== it.v) { var keepVin = car.vinModel === it.v; car.model = it.v; if (!keepVin) resetSpecs(); }
+    car.vtype = it.type || "";
+    if (!car.bodyManual) car.body = V.bodyFrom("", it.type, it.v);
+    if (!car.engine && V.isEV(car.make, it.v)) { car.engine = "EV"; car.fuel = "electric"; }
+    carChanged(true);
+  });
+  var makeList = null;
+  function fillYearMake() {
+    var y = new Date().getFullYear() + 1, ys = [];
+    for (var i = y; i >= 1981; i--) ys.push({ v: String(i), label: String(i) });
+    yearC.set(ys, String(car.year || "")); yearC.placeholder(t("pickYear"));
+    var src = makeList || FALLBACK_MAKES, have = {}, items = [];
+    src.forEach(function (m) { have[m] = 1; });
+    V.POPULAR.forEach(function (m) { if (have[m]) items.push({ v: m, label: title(m), group: t("popular") }); });
+    src.forEach(function (m) { items.push({ v: m, label: title(m), group: t("allMakes") }); });
+    if (car.make && car.make !== "__other" && !have[car.make]) items.push({ v: car.make, label: title(car.make), group: t("allMakes") });
+    items.push({ v: "__other", label: t("otherMake"), group: t("allMakes") });
+    makeC.set(items, car.make || ""); makeC.placeholder(makeList ? t("pickMakeN", { n: src.length }) : t("pickMake"));
+  }
+  function loadMakes() {
+    return V.makes().then(function (list) { makeList = list; fillYearMake(); }, function () { $("modelMsg").textContent = t("makesErr"); });
+  }
+  var modelReq = 0, modelMsg = null;
+  function loadModels() {
+    var y = car.year, mk = car.make, my = ++modelReq;
+    $("modelTxtF").hidden = mk !== "__other";
+    if (mk === "__other" || !y || !mk) { modelC.set([], ""); modelC.disable(true); $("modelMsg").textContent = ""; return Promise.resolve(); }
+    $("modelMsg").textContent = t("loadingModels"); modelC.disable(true);
+    return V.models(mk, y).then(function (list) {
+      if (my !== modelReq) return;
+      if (car.model && !list.some(function (m) { return m.name === car.model; })) list = list.concat([{ name: car.model, type: car.vtype || "" }]);
+      modelC.set(list.map(function (m) { return { v: m.name, label: m.name, type: m.type }; }), car.model || "");
+      modelC.disable(!list.length); modelC.placeholder(t("pickModel"));
+      modelMsg = list.length ? ["modelsOk", { n: list.length, y: y, m: title(mk) }] : ["modelsNone"]; $("modelMsg").textContent = t(modelMsg[0], modelMsg[1]);
+      $("modelTxtF").hidden = list.length > 0;
+    }, function () {
+      if (my !== modelReq) return;
+      $("modelMsg").textContent = t("modelsErr"); $("modelTxtF").hidden = false; modelC.set([], ""); modelC.disable(true);
+    });
+  }
+  /* optional details */
+  var ENGINES = ["1.0", "1.2", "1.3", "1.4", "1.5", "1.6", "1.8", "2.0", "2.2", "2.3", "2.4", "2.5", "2.7", "3.0", "3.2", "3.3", "3.5", "3.6", "3.7", "3.8", "4.0", "4.2", "4.3", "4.6", "4.7", "4.8", "5.0", "5.3", "5.4", "5.7", "6.0", "6.2", "6.4", "6.6", "6.7", "7.3"];
+  function fillDetails() {
+    var e = car.engine || "";
+    var list = ENGINES.indexOf(e) < 0 && e && e !== "EV" ? ENGINES.concat([e]).sort(function (a, b) { return a - b; }) : ENGINES;
+    $("eng").innerHTML = '<option value="">' + t("notSure") + '</option><option value="EV"' + (e === "EV" ? " selected" : "") + ">" + t("engEV") + "</option>" +
+      list.map(function (x) { return '<option value="' + x + '"' + (x === e ? " selected" : "") + ">" + x + "L</option>"; }).join("");
+    $("fuel").value = car.fuel && car.fuel !== "electric" ? car.fuel : ""; $("fuelF").hidden = e === "EV";
+    $("drive").value = car.drive || ""; $("trim").value = car.trim || ""; $("lights").value = car.lights || ""; $("abs").value = car.abs || "";
+    D.querySelectorAll("#bodyPick [data-body]").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-body") === (car.body || "") ? "true" : "false"); });
+  }
+  function readDetails() {
+    car.engine = $("eng").value; car.fuel = car.engine === "EV" ? "electric" : $("fuel").value; car.drive = $("drive").value;
+    car.trim = $("trim").value.trim(); car.lights = $("lights").value; car.abs = $("abs").value; $("fuelF").hidden = car.engine === "EV";
+    carChanged(false);
+  }
+  ["eng", "fuel", "drive", "lights", "abs"].forEach(function (id) { $(id).addEventListener("change", readDetails); });
+  $("trim").addEventListener("input", readDetails);
+  $("bodyPick").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-body]"); if (!b) return;
+    car.body = b.getAttribute("data-body"); car.bodyManual = true; fillDetails(); carChanged(false);
+  });
   function saveCar() {
-    var mk = $("make").value;
-    car.year = $("year").value; car.make = mk;
-    car.model = mk === "__other" || !$("model").options.length || $("model").disabled ? $("modelTxt").value.trim() : $("model").value;
-    if (mk !== "__other" && !$("model").value && $("modelTxt").value.trim() && !$("modelTxtF").hidden) car.model = $("modelTxt").value.trim();
-    car.miles = $("miles").value.trim(); car.problem = $("problem").value.trim(); car.vin = $("vin").value.trim().toUpperCase();
-    M.lsSet(CKEY, car); badge();
+    if (typeof syncGarage === "function") syncGarage();
+    if (car.make === "__other") car.model = $("modelTxt").value.trim();
+    else if (!$("modelTxtF").hidden && $("modelTxt").value.trim() && !modelC.get()) car.model = $("modelTxt").value.trim();
+    car.miles = $("miles").value.trim(); car.problem = $("problem").value.trim();
+    M.lsSet(CKEY, car); badge(); syncGarage();
   }
-  function carLabel(c) {
-    c = c || car; var mk = c.make === "__other" ? "" : title(c.make);
-    var s = [c.year, mk, c.model].filter(Boolean).join(" ");
-    return s || "";
+  var issuesKey = "";
+  function carChanged(identity, fromGarage) {
+    if (identity && !fromGarage && car.gid) { var g = gFind(car.gid); if (g && (g.year !== car.year || g.make !== car.make || g.model !== car.model)) { car.gid = ""; car.scans = []; delete car.pid; car.nick = ""; renderPhoto(); } }
+    saveCar(); fillDetails(); renderCar(false); renderTesla();
+    if (identity) loadIssues();
   }
+  function resetSpecs() { ["trim", "engine", "cyl", "fuel", "drive", "lights", "abs", "vin", "vinModel", "paint"].forEach(function (k) { car[k] = ""; }); car.bodyManual = false; $("vin").value = ""; $("vinMsg").textContent = ""; }
+  function carLabel(c) { return PT.label(c || car); }
   function badge() {
-    var s = carLabel(); $("carBadge").hidden = !s;
+    var s = carLabel(); $("carBadge").hidden = !s; $("saveGarage").hidden = !s || !!car.gid;
     $("carName").textContent = s;
-    $("carSub").textContent = [car.trim, car.engine, car.miles ? t("milesSub", { m: car.miles }) : ""].filter(Boolean).join(" · ");
+    $("carMini").innerHTML = W.CAR.mini(car.body, car.color);
+    $("carSub").textContent = [car.body && PT.BODY[car.body] ? p(PT.BODY[car.body]) : "", car.miles ? t("milesSub", { m: car.miles }) : "", car.vin ? "VIN …" + car.vin.slice(-8) : ""].filter(Boolean).join(" · ");
   }
-  $("year").addEventListener("change", function () { car.trim = car.engine = ""; loadModels(false).then(saveCar); });
-  $("make").addEventListener("change", function () { car.trim = car.engine = ""; loadModels(false).then(saveCar); });
-  ["model", "modelTxt", "miles", "problem"].forEach(function (id) { $(id).addEventListener(id === "model" ? "change" : "input", saveCar); });
+  ["modelTxt", "miles", "problem"].forEach(function (id) { $(id).addEventListener("input", saveCar); });
+  $("modelTxt").addEventListener("change", function () { saveCar(); loadIssues(); });
   $("miles").addEventListener("blur", function () { var n = parseInt($("miles").value.replace(/\D/g, ""), 10); if (n) { $("miles").value = n.toLocaleString("en-US"); saveCar(); } });
   $("vinBtn").addEventListener("click", function () {
     var v = $("vin").value.trim().toUpperCase().replace(/\s/g, "");
     $("vin").value = v;
     if (!/^[A-HJ-NPR-Z0-9]{17}$/.test(v)) { $("vinMsg").textContent = t("vinBad"); return; }
     $("vinMsg").textContent = t("vinLoading"); $("vinBtn").disabled = true;
-    fetch(API + "DecodeVinValues/" + v + "?format=json").then(function (r) { return r.json(); }).then(function (d) {
-      var r = (d.Results || [])[0] || {};
-      if (!r.Make || !r.ModelYear) throw new Error("nodecode");
-      car.year = r.ModelYear; car.make = String(r.Make).toUpperCase(); car.model = r.Model || "";
-      car.trim = r.Trim || ""; car.engine = r.DisplacementL ? (Math.round(parseFloat(r.DisplacementL) * 10) / 10) + "L" + (r.EngineCylinders ? " " + r.EngineCylinders + "-cyl" : "") : "";
-      car.vin = v; fillYearMake();
-      return loadModels(true).then(function () {
-        if (car.model && $("model").options.length && ![].some.call($("model").options, function (o) { return o.value === car.model; })) {
-          var o = D.createElement("option"); o.textContent = car.model; $("model").appendChild(o); $("model").disabled = false;
-        }
-        $("model").value = car.model; M.lsSet(CKEY, car); badge();
-        $("vinMsg").textContent = t("vinOk", { c: carLabel() + (car.trim ? " " + car.trim : "") });
+    V.decodeVin(v).then(function (r) {
+      car.year = r.year; car.make = r.make; car.model = r.model; car.vinModel = r.model; car.trim = r.trim; car.engine = r.engine; car.cyl = r.cyl;
+      car.fuel = r.fuel; car.drive = r.drive; car.body = r.body; car.bodyManual = false; if (r.abs) car.abs = r.abs; car.vin = v;
+      fillYearMake(); fillDetails(); $("moreD").open = true;
+      return loadModels().then(function () {
+        carChanged(true);
+        $("vinMsg").textContent = t("vinOk", { c: carLabel() });
       });
     }).catch(function () { $("vinMsg").textContent = t("vinErr"); }).then(function () { $("vinBtn").disabled = false; });
+  });
+  $("vin").addEventListener("change", function () { if (!$("vin").value.trim()) { car.vin = ""; saveCar(); } });
+
+  /* ---------- known issues for your car (NHTSA recalls + complaints) ---------- */
+  function loadIssues() {
+    var mk = car.make, md = car.model, y = car.year, box = $("issues");
+    if (!y || !mk || mk === "__other" || !md) { box.hidden = true; issuesKey = ""; issuesData = null; return; }
+    var k = [y, mk, md].join("|"); if (k === issuesKey) return; issuesKey = k; issuesData = null;
+    box.hidden = false;
+    $("issuesCar").textContent = [y, title(mk), md].join(" ");
+    $("recalls").innerHTML = '<p class="note">' + t("loadingIssues") + "</p>"; $("complaints").innerHTML = "";
+    $("issuesSrc").innerHTML = t("issuesSrc", { r: esc(V.recallsUrl(mk, md, y)), c: esc(V.complaintsUrl(mk, md, y)) });
+    var R = V.recalls(mk, md, y).then(function (x) { return { ok: x }; }, function () { return { err: 1 }; });
+    var Cp = V.complaints(mk, md, y).then(function (x) { return { ok: x }; }, function () { return { err: 1 }; });
+    Promise.all([R, Cp]).then(function (res) {
+      if (k !== issuesKey) return;
+      issuesData = { r: res[0], c: res[1] }; renderIssues(); renderTesla();
+    });
+  }
+  var issuesData = null, showAllRecalls = false;
+  function renderIssues() {
+    if (!issuesData) return;
+    var r = issuesData.r, c = issuesData.c, h = "";
+    if (r.err) h = '<p class="note">' + t("recallsErr") + "</p>";
+    else if (!r.ok.length) h = '<p class="okline">✅ ' + t("noRecalls") + "</p>";
+    else {
+      var list = showAllRecalls ? r.ok : r.ok.slice(0, 3);
+      h = '<p class="free">🛠️ ' + t("recallFree", { n: r.ok.length }) + "</p>" + list.map(function (x) {
+        var flag = x.parkIt ? '<span class="pill bad">' + t("parkIt") + "</span>" : x.parkOutSide ? '<span class="pill bad">' + t("parkOut") + "</span>" : x.ota ? '<span class="pill">' + t("otaFix") + "</span>" : "";
+        return '<details class="rc"><summary><b>' + esc(title(x.comp.split(":")[0])) + "</b>" + flag + "<small>" + esc(x.id) + " · " + esc(nDate(x.date)) + "</small></summary>" +
+          "<p>" + esc(x.summary) + "</p>" + (x.remedy ? '<p class="note"><b>' + t("remedy") + "</b> " + esc(x.remedy) + "</p>" : "") +
+          '<a href="https://www.nhtsa.gov/recalls?nhtsaId=' + encodeURIComponent(x.id) + '" target="_blank" rel="noopener">' + t("onNhtsa") + " ↗</a></details>";
+      }).join("") + (r.ok.length > 3 ? '<button class="linkbtn" type="button" id="moreRecalls">' + (showAllRecalls ? t("showLess") : t("showAll", { n: r.ok.length })) + "</button>" : "") +
+        '<p class="note">' + t("recallCheck") + "</p>";
+    }
+    $("recalls").innerHTML = h;
+    var ch = "";
+    if (c.err) ch = '<p class="note">' + t("complaintsErr") + "</p>";
+    else if (!c.ok.total) ch = '<p class="note">' + t("noComplaints") + "</p>";
+    else {
+      var max = c.ok.top[0] ? c.ok.top[0][1] : 1;
+      ch = '<p class="most">' + t("mostReported") + " " + c.ok.top.slice(0, 3).map(function (x) { return esc(x[0]) + " (" + x[1] + ")"; }).join(", ") + "…</p>" +
+        '<ul class="bars">' + c.ok.top.slice(0, 6).map(function (x) {
+          var s = V.compSvc(x[0]), sv = s && M.svc(s);
+          return '<li><span class="bl">' + esc(title(x[0])) + '</span><span class="bt"><i style="width:' + Math.max(4, Math.round(x[1] / max * 100)) + '%"></i></span><b>' + x[1] + "</b>" +
+            (sv ? '<button type="button" class="chk" data-svc="' + s + '">' + sv.icon + " " + t("checkIt") + "</button>" : "<span></span>") + "</li>";
+        }).join("") + "</ul>" + '<p class="note">' + t("complaintsOf", { n: c.ok.total }) + "</p>";
+    }
+    $("complaints").innerHTML = ch;
+  }
+  $("issues").addEventListener("click", function (e) {
+    if (e.target.id === "moreRecalls") { showAllRecalls = !showAllRecalls; renderIssues(); return; }
+    var b = e.target.closest(".chk[data-svc]"); if (b) openSheet(b.getAttribute("data-svc"), null);
   });
 
   /* ---------- tap-the-car ---------- */
   function hsOn(h) {
     return job.some(function (j) {
       if (j.svc !== h.svc) return false;
+      if (h.opt && j.opt !== h.opt) return false;
       if (!h.pos || !j.pos) return true;
       if (j.pos === h.pos) return true;
       return j.pos.length === 1 && h.pos.length === 2 && h.pos[0] === j.pos;   // axle item lights its wheels
@@ -152,7 +290,7 @@
   function renderCar(animate) {
     var w = $("carwrap");
     function draw() {
-      w.innerHTML = W.CAR.svg[view] + W.CAR.hs[view].map(function (h) {
+      w.innerHTML = W.CAR.svg(view, car.body, car.color) + W.CAR.hs(view, car.body).map(function (h) {
         var s = M.svc(h.svc); if (!s) return "";
         return '<button type="button" class="hs" data-hs="' + h.id + '" style="left:' + (h.x / 4) + "%;top:" + (h.y / 2.1) + '%" aria-label="' + esc(p(h.label)) + '"><span aria-hidden="true">' + s.icon + '</span><span class="tip">' + esc(p(h.label)) + "</span></button>";
       }).join("");
@@ -164,7 +302,7 @@
     D.querySelectorAll("[data-view]").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-view") === view ? "true" : "false"); });
   }
   function renderHotspots() {
-    var list = W.CAR.hs[view];
+    var list = W.CAR.hs(view, car.body);
     D.querySelectorAll("#carwrap .hs").forEach(function (b) {
       var h = list.filter(function (x) { return x.id === b.getAttribute("data-hs"); })[0];
       var on = h && hsOn(h); b.classList.toggle("on", !!on); b.setAttribute("aria-pressed", on ? "true" : "false");
@@ -174,7 +312,7 @@
   D.querySelectorAll("[data-view]").forEach(function (b) { b.addEventListener("click", function () { if (view === b.getAttribute("data-view")) return; view = b.getAttribute("data-view"); renderCar(true); }); });
   $("carwrap").addEventListener("click", function (e) {
     var b = e.target.closest(".hs"); if (!b) return;
-    var h = W.CAR.hs[view].filter(function (x) { return x.id === b.getAttribute("data-hs"); })[0];
+    var h = W.CAR.hs(view, car.body).filter(function (x) { return x.id === b.getAttribute("data-hs"); })[0];
     if (h) openSheet(h.svc, h);
   });
 
@@ -190,6 +328,7 @@
     var s = M.svc(svcId); if (!s) return;
     sh.svc = svcId; sh.pos = h && h.pos ? h.pos : null; sh.sel = {};
     s.options.forEach(function (o) { var it = { svc: svcId, opt: o.id, pos: posFor(o, sh.pos) }; if (job.some(function (j) { return key(j) === key(it); })) sh.sel[o.id] = true; });
+    if (h && h.opt && !Object.keys(sh.sel).length) sh.sel[h.opt] = true;
     $("shE").textContent = s.icon; $("shT").textContent = p(s.name);
     $("shS").textContent = h ? p(h.label) : t("shS");
     drawSheet(); open("sheet");
@@ -210,6 +349,9 @@
     }).join("");
     var any = Object.keys(sh.sel).some(function (k) { return sh.sel[k]; });
     var had = job.some(function (j) { return j.svc === sh.svc; });
+    var picked = s.options.filter(function (o) { return sh.sel[o.id]; });
+    $("shParts").innerHTML = picked.length ? '<p class="note" style="margin:10px 0 4px">' + t("partsFor") + '</p><div class="chipline">' + picked.map(function (o) {
+      return '<button type="button" class="pill acc pbtn" data-parts="' + o.id + '">🔩 ' + esc(p(o.name)) + "</button>"; }).join("") + "</div>" : "";
     $("shSave").textContent = any ? t("shSave") : t("shNone");
     $("shSave").disabled = !any && !had;
   }
@@ -218,6 +360,11 @@
     sh.pos = b.getAttribute("data-pos"); sh.sel = {};
     M.svc(sh.svc).options.forEach(function (o) { var it = { svc: sh.svc, opt: o.id, pos: posFor(o, sh.pos) }; if (job.some(function (j) { return key(j) === key(it); })) sh.sel[o.id] = true; });
     drawSheet();
+  });
+  $("shParts").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-parts]"); if (!b) return;
+    var o = M.opt(sh.svc, b.getAttribute("data-parts")), it = { svc: sh.svc, opt: o.id }, ps = posFor(o, sh.pos); if (ps) it.pos = ps;
+    openParts(it);
   });
   $("shOpts").addEventListener("click", function (e) { var b = e.target.closest("[data-op]"); if (!b) return; var id = b.getAttribute("data-op"); sh.sel[id] = !sh.sel[id]; drawSheet(); });
   $("shSave").addEventListener("click", function () {
@@ -246,7 +393,8 @@
       var s = M.svc(it.svc), o = M.opt(it.svc, it.opt); if (!s || !o) return "";
       var pr = M.price(it);
       return '<div class="ji"><span class="e" aria-hidden="true">' + s.icon + "</span><b>" + esc(p(s.name)) + '</b><span class="pr">' + M.range(pr.lo, pr.hi) + "</span><small>" + esc(p(o.name)) + (it.pos ? " · " + esc(p(M.POS[it.pos])) : "") + " · " + M.hrs(pr.hLo, pr.hHi) +
-        '</small><button class="x" type="button" data-rm="' + i + '">' + t("remove") + "</button></div>";
+        (it.codes && it.codes.length ? '<span class="codes">' + t("fromCode", { c: it.codes.map(esc).join(", ") }) + "</span>" : "") +
+        '</small><span class="jact"><button class="pbtn2" type="button" data-pi="' + i + '">🔩 ' + t("partsBtn") + '</button><button class="x" type="button" data-rm="' + i + '">' + t("remove") + "</button></span></div>";
     }).join("");
     var tt = M.total(job), cs = chosenSlot();
     $("tot").hidden = false;
@@ -260,7 +408,7 @@
     $("tReady").textContent = cs ? M.fWhen(M.readyBy(cs.s.start, tt.hHi)) : "—";
     pill();
   }
-  $("jobList").addEventListener("click", function (e) { var b = e.target.closest("[data-rm]"); if (!b) return; job.splice(+b.getAttribute("data-rm"), 1); saveJob(); M.toast(t("removed")); });
+  $("jobList").addEventListener("click", function (e) { var pb = e.target.closest("[data-pi]"); if (pb) { openParts(job[+pb.getAttribute("data-pi")]); return; } var b = e.target.closest("[data-rm]"); if (!b) return; job.splice(+b.getAttribute("data-rm"), 1); saveJob(); M.toast(t("removed")); });
   function pill() {
     var el = $("jobpill"), tt = M.total(job);
     $("pillTot").textContent = job.length ? M.range(tt.lo, tt.hi) : "";
@@ -315,8 +463,9 @@
     var b = $("cfSend"); if (b.disabled) return;
     var tt = M.total(job), cs = chosenSlot(), a = readAlerts();
     var r = { id: M.uid(), own: true, createdAt: new Date().toISOString(), name: $("cfName").value.trim().slice(0, 30),
-      car: { year: car.year || "", make: car.make === "__other" ? "" : title(car.make), model: car.model || "", miles: car.miles || "", vin: car.vin ? car.vin.slice(0, 3) + "…" + car.vin.slice(-4) : "" },
-      problem: car.problem || "", items: job.slice(), est: tt, slot: cs ? { start: cs.s.start, end: cs.s.end } : null,
+      car: { year: car.year || "", make: car.make === "__other" ? "" : title(car.make), model: car.model || "", miles: car.miles || "", vin: car.vin ? car.vin.slice(0, 3) + "…" + car.vin.slice(-4) : "",
+        vin8: car.vin ? car.vin.slice(-8) : "", trim: car.trim || "", engine: car.engine || "", cyl: car.cyl || "", fuel: car.fuel || "", drive: car.drive || "", body: car.body || "", lights: car.lights || "", abs: car.abs || "", color: car.color || "" },
+      problem: car.problem || "", items: job.slice(), est: tt, garageId: car.gid || "", slot: cs ? { start: cs.s.start, end: cs.s.end } : null,
       readyBy: cs ? M.readyBy(cs.s.start, tt.hHi).toISOString() : null, status: "requested", stage: -1, history: [], notifs: [],
       alerts: { app: a.app, text: a.text, email: a.email, phone: a.text ? a.phone : "", email_: a.email ? a.email_ : "" } };
     b.disabled = true; b.textContent = t("sending");
@@ -349,6 +498,24 @@
       ticks + '<g class="needle" id="gneedle" style="transform:rotate(-90deg)"><path d="M150 150 L146 146 L150 52 L154 146 Z" fill="#fff"/><circle cx="150" cy="150" r="10" fill="#1a2440" stroke="var(--accent)" stroke-width="3"/></g></svg>';
   }
   var VROOM = '<svg viewBox="0 0 44 22" aria-hidden="true"><path d="M2 16 L2 11 Q3 8 7 8 L12 7 Q16 2 22 2 L29 2 Q33 3 36 7 L40 8 Q43 9 43 12 L43 16 Z" fill="var(--accent)"/><path d="M15 7 Q18 4 22 4 L24 4 L24 7 Z M26 4 L29 4 Q31 5 33 7 L26 7 Z" fill="#0b1730"/><circle cx="11" cy="16.5" r="4" fill="#0b0e15" stroke="#cfd8ea" stroke-width="1.5"/><circle cx="34" cy="16.5" r="4" fill="#0b0e15" stroke="#cfd8ea" stroke-width="1.5"/></svg>';
+  /* ---------- the animated scene: the customer's car moves through Carlos' place with the stage ---------- */
+  var GK = ["g_rec", "g_diag", "g_parts", "g_work", "g_half", "g_almost", "g_ready"], lastSt = {};
+  function mech() { return C.brand.mechanic || C.brand.short || C.brand.name; }
+  function suppName() { var s = PT.supplier(); return s ? s.short || s.name : ""; }
+  function greet(st) { return t(st < 0 ? "g_req" : GK[st], { m: esc(mech()), s: esc(suppName()) }); }
+  function carColor(r) { return car.color || (r && r.car && r.car.color) || "#c8242b"; }
+  function sceneBlock(st) {
+    return '<p class="greet">' + greet(st) + '</p><div class="trackscn" id="tscn"></div>' +
+      '<div class="swatches" role="group" aria-label="' + esc(t("colorL")) + '"><span>' + t("colorL") + "</span>" + swatches(car.color || "") + "</div>";
+  }
+  function mountScene(id, body, st) {
+    var el = D.getElementById("tscn"); if (!el || !W.SCENE) return;
+    var from = lastSt[id];
+    var sc = W.SCENE.mount(el, { body: body || car.body || "sedan", color: carColor(M.get(id)), partsFrom: t("partsFrom", { s: suppName() }), readyTxt: t("readyTxt"), from: from == null ? "off" : from });
+    W.SCENE.parallax(el);
+    lastSt[id] = st;
+    if (from === st) sc.go(st, true); else requestAnimationFrame(function () { requestAnimationFrame(function () { sc.go(st); }); });
+  }
   function trackerHTML(r, sample) {
     var st = Math.max(0, r.stage), pct = M.STAGES[st].pct, hist = {}, notes = sample ? t("sampleNotes") : null;
     (r.history || []).forEach(function (h) { hist[h.stage] = h; });
@@ -361,7 +528,7 @@
         (note && i <= st ? '<div class="msg">' + esc(note) + "<em>— " + esc(C.brand.name) + "</em></div>" : "") +
         (h && h.photo && i <= st ? M.stageArt(i) : "") + "</li>";
     }).join("");
-    return '<div class="gauge">' + gaugeSVG() + '<div class="read"><b id="gpct">' + pct + '%</b><span>' + esc(M.stageName(st)) + "</span></div></div>" +
+    return sceneBlock(st) + '<div class="gauge">' + gaugeSVG() + '<div class="read"><b id="gpct">' + pct + '%</b><span>' + esc(M.stageName(st)) + "</span></div></div>" +
       '<div class="track"><div class="road"></div><div class="fill" id="tfill"></div>' + dots + '<div class="vroom" id="vroom" style="left:0%">' + VROOM + '</div><span class="flag" id="tflag" aria-hidden="true">🏁</span></div>' +
       '<ol class="tl">' + tl + "</ol>";
   }
@@ -390,9 +557,10 @@
     var head = '<div class="jobhead"><div><b>' + esc(M.carName(r.car) || t("carUnknown")) + "</b><small>" + t("jobId", { id: r.id }) + (r.slot ? " · " + t("slotL") + " " + esc(M.fSlot(r.slot)) : "") + "</small></div>" + statusPill(r) + "</div>";
     var money = r.quote ? '<div class="chipline"><span class="pill ok">' + t("quote") + ": " + M.money(r.quote) + '</span><span class="pill">' + t("readyBy") + " " + esc(r.readyBy ? M.fWhen(r.readyBy) : "—") + "</span></div>"
       : '<div class="chipline"><span class="pill acc">' + t("estimate") + ": " + M.range(r.est.lo, r.est.hi) + "</span>" + (r.readyBy ? '<span class="pill">' + t("readyBy") + " " + esc(M.fWhen(r.readyBy)) + "</span>" : "") + "</div>";
-    if (r.status === "requested") { card.innerHTML = head + money + '<div class="wait"><div class="spin"></div><b>' + t("waitH") + '</b><p class="note">' + t("waitP") + "</p></div>"; return; }
+    if (r.status === "requested") { card.innerHTML = head + money + sceneBlock(-1) + '<div class="wait"><div class="spin"></div><b>' + t("waitH") + '</b><p class="note">' + t("waitP") + "</p></div>"; mountScene(r.id, r.car && r.car.body, -1); return; }
     if (r.status === "declined") { card.innerHTML = head + '<p class="note">' + t("declined") + "</p>"; return; }
     card.innerHTML = head + money + trackerHTML(r, false);
+    mountScene(r.id, r.car && r.car.body, Math.max(0, r.stage));
     var pct = M.STAGES[Math.max(0, r.stage)].pct, from = lastPct[r.id] != null ? lastPct[r.id] : 0;
     // start from where it was so a new stage visibly drives forward
     var arc = D.getElementById("garc"); arc.setAttribute("stroke-dasharray", from + " 100"); D.getElementById("gneedle").style.transform = "rotate(" + (-90 + from * 1.8) + "deg)";
@@ -412,12 +580,13 @@
     var card = $("trackCard");
     card.innerHTML = '<div class="jobhead"><div><b>' + t("sampleCar") + "</b><small>" + t("sample") + '</small></div><span class="st go">' + t("sample") + "</span></div>" +
       trackerHTML(sampleJob(sStage), true) + '<button class="btn cyan w100" id="playS" type="button" style="margin-top:6px">' + (sTimer ? t("replay") : t("playSample")) + "</button>";
+    mountScene("SAMPLE", car.body || "sedan", sStage);
     var from = lastPct.SAMPLE != null ? lastPct.SAMPLE : 0, pct = M.STAGES[sStage].pct;
     D.getElementById("garc").setAttribute("stroke-dasharray", from + " 100"); D.getElementById("gneedle").style.transform = "rotate(" + (-90 + from * 1.8) + "deg)";
     D.getElementById("tfill").style.width = from + "%"; D.getElementById("vroom").style.left = "calc(" + from + "% - " + (from / 100 * 8) + "px)";
     lastPct.SAMPLE = pct; animateTo(pct);
     $("playS").onclick = function () {
-      stopSample(); sStage = 0; lastPct.SAMPLE = 0; sampleTrack();
+      stopSample(); sStage = 0; lastPct.SAMPLE = 0; delete lastSt.SAMPLE; sampleTrack();
       sTimer = setInterval(function () {
         if (sStage >= 6) { stopSample(); return; }
         sStage++; sampleTrack();
@@ -504,6 +673,389 @@
     M.lsSet(READ, list.length); bell(); open("inbox");
   });
 
+  /* ---------- parts sheet: typical parts, what to ask the counter, where to look ---------- */
+  var partsIt = null, scriptLang = null, sayText = [];
+  function openParts(it) { if (!it) return; partsIt = it; scriptLang = M.lang(); drawParts(); open("partsSh"); }
+  function supplierCard(sup) {
+    return '<div class="supp"><div class="sh"><span class="badge">⭐ ' + t("prefSupp") + "</span><b>" + t("checkFirst", { n: esc(sup.short || sup.name) }) + "</b><small>" + esc(sup.name) + " · " + esc(sup.area || "") + "</small></div>" +
+      '<p class="note">' + esc(p(sup.note)) + "</p>" + (sup.hours ? '<p class="note">🕗 ' + esc(p(sup.hours)) + "</p>" : "") +
+      '<div class="row sb">' + (sup.tel ? '<a class="btn primary small" href="tel:' + esc(sup.tel) + '">📞 ' + t("callN", { n: esc(sup.short || sup.name) }) + "</a>" : "") +
+      (sup.mapsUrl ? '<a class="btn ghost small" href="' + esc(sup.mapsUrl) + '" target="_blank" rel="noopener">🧭 ' + t("directions") + "</a>" : "") +
+      (sup.website ? '<a class="btn ghost small" href="' + esc(sup.website) + '" target="_blank" rel="noopener">🌐 ' + t("website") + "</a>" : "") + "</div>" +
+      '<p class="fine">' + t("suppHonest") + "</p></div>";
+  }
+  function drawParts() {
+    var it = partsIt, s = M.svc(it.svc), o = M.opt(it.svc, it.opt); if (!s || !o) return;
+    $("psE").textContent = s.icon; $("psT").textContent = p(o.name) + (it.pos ? " · " + p(M.POS[it.pos]) : "");
+    $("psS").textContent = carLabel() || t("carUnknown");
+    var r = PT.forItem(it, car), sup = PT.supplier(), h = "";
+    sayText = [];
+    if (!car.year || !car.make) h += '<p class="note warnline">🚗 ' + t("pickCarFirst") + ' <a href="#car" data-close>' + t("pickCarGo") + "</a></p>";
+    if (r.na || !r.parts.length) h += '<div class="empty">' + esc(p(r.none)) + "</div>";
+    else {
+      var unk = {}; r.parts.forEach(function (pp) { PT.unknowns(pp, car, it).forEach(function (k) { unk[k] = 1; }); });
+      var q = "";
+      if (unk.lights) q += '<div class="qrow"><span>' + t("qLights") + "</span>" + ["halogen", "hid", "led"].map(function (v) { return '<button type="button" class="pill" data-q="lights" data-v="' + v + '">' + t("l_" + v) + "</button>"; }).join("") + "</div>";
+      if (unk.abs) q += '<div class="qrow"><span>' + t("qAbs") + '</span><button type="button" class="pill" data-q="abs" data-v="yes">' + t("yes") + '</button><button type="button" class="pill" data-q="abs" data-v="no">' + t("no") + "</button></div>";
+      if (unk.body) q += '<div class="qrow"><span>' + t("qBody") + "</span>" + W.CAR.bodies.map(function (v) { return '<button type="button" class="pill" data-q="body" data-v="' + v + '">' + esc(p(PT.BODY[v])) + "</button>"; }).join("") + "</div>";
+      if (unk.engine || unk.drive || unk.trim) q += '<div class="qrow"><span>' + t("qMore", { w: ["engine", "drive", "trim"].filter(function (k) { return unk[k]; }).map(function (k) { return t("w_" + k); }).join(", ") }) + '</span><a class="pill acc" href="#car" data-close data-moreopen>' + t("addIt") + "</a></div>";
+      if (q) h += '<div class="qbox"><p class="kick" style="margin:0 0 4px">' + t("counterAsks") + "</p>" + q + "</div>";
+      if (sup) h += supplierCard(sup);
+      h += '<div class="sayhead"><p class="kick" style="margin:0">' + t("whatToAsk", { n: esc(sup ? sup.short || sup.name : t("theStore")) }) + '</p><div class="lt mini" role="group" aria-label="Script language"><button type="button" data-sl="en" aria-pressed="' + (scriptLang === "en") + '">EN</button><button type="button" data-sl="es" aria-pressed="' + (scriptLang === "es") + '">ES</button></div></div>';
+      r.parts.forEach(function (pp, i) {
+        var sc = PT.script(pp, car, scriptLang, it); sayText[i] = sc;
+        var links = pp.find ? PT.storeLinks(car, pp.find) : [];
+        h += '<div class="part"><b>' + esc(p(pp.name)) + "</b>" + (pp.detail ? '<p class="note">' + esc(p(pp.detail)) + "</p>" : "") +
+          (sc ? '<div class="say"><p lang="' + scriptLang + '">' + esc(sc) + '</p><div class="sayb"><button type="button" class="btn ghost small" data-copy="' + i + '">📋 ' + t("copy") + "</button>" +
+            (sup && sup.tel ? '<a class="btn primary small" href="tel:' + esc(sup.tel) + '">📞 ' + t("callN", { n: esc(sup.short || sup.name) }) + "</a>" : "") +
+            (sup && sup.sms ? '<a class="btn ghost small" href="sms:' + esc(sup.sms) + "?&body=" + encodeURIComponent(sc) + '">💬 ' + t("text") + "</a>" : "") + "</div></div>" : "") +
+          (links.length ? '<div class="find"><span>' + t("findExact") + "</span>" + links.map(function (l) { return '<a href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.name) + " ↗</a>"; }).join("") + "</div>" : "") + "</div>";
+      });
+    }
+    if (r.note) h += '<p class="note">ℹ️ ' + esc(p(r.note)) + "</p>";
+    h += '<p class="disc">' + t("partsHonest") + "</p>";
+    $("psBody").innerHTML = h;
+  }
+  function copyText(s) {
+    function fb() { var ta = D.createElement("textarea"); ta.value = s; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0"; D.body.appendChild(ta); ta.select(); var ok = false; try { ok = D.execCommand("copy"); } catch (e) {} D.body.removeChild(ta); return ok; }
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(s).then(function () { return true; }, function () { return fb(); });
+    return Promise.resolve(fb());
+  }
+  $("psBody").addEventListener("click", function (e) {
+    var c = e.target.closest("[data-copy]");
+    if (c) { copyText(sayText[+c.getAttribute("data-copy")] || "").then(function (ok) { M.toast(ok ? t("copied") : t("copyFail")); }); return; }
+    var sl = e.target.closest("[data-sl]"); if (sl) { scriptLang = sl.getAttribute("data-sl"); drawParts(); return; }
+    var qb = e.target.closest("[data-q]");
+    if (qb) { var k = qb.getAttribute("data-q"); car[k] = qb.getAttribute("data-v"); if (k === "body") car.bodyManual = true; carChanged(false); drawParts(); return; }
+    if (e.target.closest("[data-moreopen]")) $("moreD").open = true;
+  });
+
+  /* ---------- scan my car (OBD-II) ---------- */
+  var scan = { res: null, manual: [], busy: false, elm: null };
+  function ensureDB() {
+    if (W.OBD_CODES) return Promise.resolve();
+    return new Promise(function (res) { var s = D.createElement("script"); s.src = "obd-codes.js?v=20261013b"; s.onload = res; s.onerror = res; D.head.appendChild(s); });
+  }
+  function renderSupport() {
+    var sup = W.OBD.support();
+    $("btSupport").innerHTML = sup.ok ? t("btOk") : sup.ios ? t("btIos") : t("btNo");
+    $("btSupport").className = "note " + (sup.ok ? "okline" : "warnline");
+    $("btGo").disabled = !sup.ok || scan.busy;
+  }
+  function codeCard(code, kind) {
+    var i = W.OBD.info(code); if (!i) return "";
+    var inJob = job.some(function (j) { return (j.codes || []).indexOf(i.code) >= 0; });
+    var meaning = i.mfr ? t("mfrCode") : i.desc ? esc(i.desc) : t("unlisted", { s: esc(p(i.sys)) });
+    var jobs = i.jobs.map(function (x) { var sv = M.svc(x[0]), op = M.opt(x[0], x[1]); return sv && op ? sv.icon + " " + esc(p(sv.name)) + " · " + esc(p(op.name)) : ""; }).filter(Boolean);
+    return '<article class="dtc sev-' + i.sev + '"><div class="dh"><b class="code">' + i.code + "</b>" + (kind === "pending" ? '<span class="pill">' + t("pendingTag") + "</span>" : kind === "manual" ? '<span class="pill">' + t("typedTag") + "</span>" : "") +
+      '<span class="sev">' + (i.sev === "stop" ? "🛑 " : i.sev === "soon" ? "⚠️ " : "✅ ") + esc(p(W.OBD.SEV[i.sev])) + "</span></div>" +
+      '<p class="mean">' + meaning + "</p>" +
+      "<dl><dt>" + t("system") + "</dt><dd>" + esc(p(i.sys)) + "</dd>" + (i.causes ? "<dt>" + t("causes") + "</dt><dd>" + esc(p(i.causes)) + "</dd>" : "") +
+      "<dt>" + t("likelyJob") + "</dt><dd>" + jobs.join("<br>") + "</dd></dl>" + (i.warn ? '<p class="warnline">' + esc(p(i.warn)) + "</p>" : "") +
+      (inJob ? '<button class="btn ghost small w100" type="button" disabled>✓ ' + t("inYourJob") + "</button>" : '<button class="btn primary small w100" type="button" data-addcode="' + i.code + '">➕ ' + t("addToJob") + "</button>") + "</article>";
+  }
+  function addCodeJobs(code) {
+    var i = W.OBD.info(code); if (!i) return;
+    i.jobs.forEach(function (x) {
+      if (!M.opt(x[0], x[1])) return;
+      var it = { svc: x[0], opt: x[1] }, ex = job.filter(function (j) { return key(j) === key(it); })[0];
+      if (ex) { ex.codes = (ex.codes || []).concat(ex.codes && ex.codes.indexOf(code) >= 0 ? [] : [code]); }
+      else { it.codes = [code]; job.push(it); }
+    });
+  }
+  function renderScan() {
+    renderSupport();
+    var r = scan.res, h = "";
+    if (r) {
+      var live = [];
+      if (r.status) live.push(r.status.mil ? "🔴 " + t("milOn") : "⚪ " + t("milOff"));
+      if (r.rpm != null) live.push(Math.round(r.rpm) + " rpm");
+      if (r.coolant != null) live.push(t("coolantT", { c: r.coolant, f: Math.round(r.coolant * 9 / 5 + 32) }));
+      if (r.volts != null) live.push(r.volts.toFixed(1) + " V");
+      h += '<div class="scanhead"><b>' + (r.simulated ? t("simTitle") : t("scanTitle")) + "</b>" + (live.length ? "<small>" + live.join(" · ") + "</small>" : "") + "</div>";
+      if (!r.stored.length && !r.pending.length) h += '<p class="okline">✅ ' + t("noCodes") + "</p>";
+      h += r.stored.map(function (c) { return codeCard(c, "stored"); }).join("") + r.pending.map(function (c) { return codeCard(c, "pending"); }).join("");
+    }
+    h += scan.manual.map(function (c) { return codeCard(c, "manual"); }).join("");
+    $("scanOut").innerHTML = h;
+  }
+  $("scanOut").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-addcode]"); if (!b) return;
+    var code = b.getAttribute("data-addcode");
+    addCodeJobs(code); saveJob(); renderScan(); renderGarage(); M.toast(t("codeAdded", { c: code }));
+  });
+  function logResult(src, r) {
+    logScan(src, r.stored.map(function (c) { return { c: c, k: "stored" }; }).concat(r.pending.map(function (c) { return { c: c, k: "pending" }; })),
+      { mil: r.status ? r.status.mil : null, volts: r.volts != null ? r.volts : null });
+  }
+  $("codeForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var c = W.OBD.norm($("codeIn").value);
+    if (!c) { $("codeMsg").textContent = t("codeBad"); return; }
+    $("codeMsg").textContent = "";
+    ensureDB().then(function () { scan.manual = [c].concat(scan.manual.filter(function (x) { return x !== c; })).slice(0, 6); $("codeIn").value = ""; logScan("typed", [{ c: c, k: "typed" }]); renderScan(); });
+  });
+  $("simBtn").addEventListener("click", function () {
+    $("btMsg").textContent = t("simRunning");
+    ensureDB().then(function () { setTimeout(function () { scan.res = W.OBD.simulate(); $("btMsg").textContent = t("simDone"); logResult("demo", scan.res); renderScan(); $("scanOut").scrollIntoView({ behavior: M.RM ? "auto" : "smooth", block: "nearest" }); }, M.RM ? 50 : 700); });
+  });
+  $("btGo").addEventListener("click", function () {
+    if (scan.busy) return;
+    scan.busy = true; renderSupport();
+    var elm = new W.OBD.Elm(), step = 0;
+    $("btMsg").textContent = t("btPick");
+    ensureDB().then(function () {
+      return elm.connect(function (k, v) { if (k === "pair") $("btMsg").textContent = t("btPaired", { n: v }); });
+    }).then(function () {
+      return elm.scan(function () { step++; $("btMsg").textContent = t("btReading", { n: step }); });
+    }).then(function (r) { scan.res = r; $("btMsg").textContent = t("btDone"); logResult("bt", r); renderScan(); })
+      .catch(function (err) {
+        var m = String(err && (err.name || err.message) || "");
+        $("btMsg").textContent = /NotFound|cancel/i.test(m) ? t("btCancel") : /nouart/.test(m) ? t("btNoUart") : /Security|NotAllowed/i.test(m) ? t("btDenied") : t("btFail");
+      })
+      .then(function () { elm.close(); scan.busy = false; renderSupport(); });
+  });
+
+  /* ---------- paint color (+ custom) ---------- */
+  function colorName(hex) { var c = (C.carColors || []).filter(function (x) { return x.hex === hex; })[0]; return c ? p(c) : t("customColor"); }
+  function swatches(sel) {
+    return (C.carColors || []).map(function (c) {
+      return '<button type="button" data-color="' + c.hex + '" style="background:' + c.hex + '" title="' + esc(p(c)) + '" aria-label="' + esc(p(c)) + '" aria-pressed="' + (c.hex === sel) + '"></button>';
+    }).join("") + '<label class="swc" title="' + esc(t("customColor")) + '"><input type="color" data-colorc value="' + (sel && /^#[0-9a-f]{6}$/i.test(sel) ? sel : "#888888") + '" aria-label="' + esc(t("customColor")) + '"><span>' + t("customShort") + "</span></label>";
+  }
+  function setColor(hex) {
+    car.color = hex; saveCar(); renderCar(false); renderPaint();
+    D.querySelectorAll(".scn .actor .paint").forEach(function (pth) { pth.setAttribute("fill", hex); });
+    D.querySelectorAll(".scn .actor .hood").forEach(function (pth) { pth.setAttribute("stroke", hex); });
+    D.querySelectorAll(".swatches [data-color]").forEach(function (x) { x.setAttribute("aria-pressed", x.getAttribute("data-color") === hex ? "true" : "false"); });
+  }
+  function renderPaint() { $("paintPick").innerHTML = swatches(car.color || ""); $("paintCode").value = car.paint || ""; }
+  D.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest("[data-color]"); if (b) setColor(b.getAttribute("data-color")); });
+  D.addEventListener("change", function (e) { if (e.target.matches && e.target.matches("[data-colorc]")) setColor(e.target.value); });
+  $("paintCode").addEventListener("input", function () { car.paint = $("paintCode").value.trim().toUpperCase().slice(0, 14); saveCar(); });
+
+  /* ---------- car photo: on this phone only (IndexedDB, falls back to localStorage) ---------- */
+  var PH = (function () {
+    var dbp = null;
+    function db() {
+      if (dbp) return dbp;
+      dbp = new Promise(function (res, rej) {
+        try { var r = indexedDB.open("ssai-mech", 1); r.onupgradeneeded = function () { r.result.createObjectStore("photos"); }; r.onsuccess = function () { res(r.result); }; r.onerror = function () { rej(r.error); }; }
+        catch (e) { rej(e); }
+      });
+      return dbp;
+    }
+    function tx(mode, fn) { return db().then(function (d) { return new Promise(function (res, rej) { var x = d.transaction("photos", mode), st = x.objectStore("photos"), q = fn(st); x.oncomplete = function () { res(q && q.result); }; x.onerror = function () { rej(x.error); }; }); }); }
+    return {
+      put: function (id, url) { return tx("readwrite", function (s) { return s.put(url, id); }).catch(function () { try { localStorage.setItem("ssai:mech:photo:" + id, url); } catch (e) {} }); },
+      get: function (id) { return tx("readonly", function (s) { return s.get(id); }).then(function (v) { return v || null; }, function () { try { return localStorage.getItem("ssai:mech:photo:" + id); } catch (e) { return null; } }); },
+      del: function (id) { return tx("readwrite", function (s) { return s.delete(id); }).catch(function () { try { localStorage.removeItem("ssai:mech:photo:" + id); } catch (e) {} }); }
+    };
+  })();
+  var photoCache = {};
+  function photoUrl(pid) { if (!pid) return Promise.resolve(null); if (photoCache[pid] !== undefined) return Promise.resolve(photoCache[pid]); return PH.get(pid).then(function (u) { photoCache[pid] = u; return u; }); }
+  /* resize to max 640px, JPEG; then sample the middle of the frame (where the car usually is) against the paint swatches */
+  function processPhoto(file) {
+    return new Promise(function (res, rej) {
+      var img = new Image(), url = URL.createObjectURL(file);
+      img.onload = function () {
+        var k = Math.min(1, 640 / Math.max(img.width, img.height)), w = Math.round(img.width * k), h = Math.round(img.height * k);
+        var cv = D.createElement("canvas"); cv.width = w; cv.height = h; var cx = cv.getContext("2d"); cx.drawImage(img, 0, 0, w, h);
+        var data = cv.toDataURL("image/jpeg", 0.8);
+        var sm = D.createElement("canvas"); sm.width = 24; sm.height = 24; var sx = sm.getContext("2d");
+        sx.drawImage(img, img.width * 0.15, img.height * 0.35, img.width * 0.7, img.height * 0.45, 0, 0, 24, 24);
+        var px = sx.getImageData(0, 0, 24, 24).data, votes = {};
+        var sw = (C.carColors || []).map(function (c) { var n = parseInt(c.hex.slice(1), 16); return { hex: c.hex, r: n >> 16, g: (n >> 8) & 255, b: n & 255 }; });
+        for (var i = 0; i < px.length; i += 4) {
+          var best = null, bd = 1e9;
+          sw.forEach(function (c) { var d = (px[i] - c.r) * (px[i] - c.r) * 0.3 + (px[i + 1] - c.g) * (px[i + 1] - c.g) * 0.59 + (px[i + 2] - c.b) * (px[i + 2] - c.b) * 0.11; if (d < bd) { bd = d; best = c.hex; } });
+          votes[best] = (votes[best] || 0) + 1;
+        }
+        var top = Object.keys(votes).sort(function (a, b) { return votes[b] - votes[a]; })[0];
+        URL.revokeObjectURL(url); res({ data: data, suggest: top });
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); rej(new Error("img")); };
+      img.src = url;
+    });
+  }
+  var photoFor = null;   // garage id when the photo button on a garage card was used
+  $("photoBtn").addEventListener("click", function () { photoFor = null; $("photoIn").click(); });
+  $("photoIn").addEventListener("change", function () {
+    var f = $("photoIn").files && $("photoIn").files[0]; $("photoIn").value = ""; if (!f) return;
+    $("photoMsg").textContent = t("photoWorking");
+    processPhoto(f).then(function (r) {
+      var target = photoFor && photoFor !== car.gid ? gFind(photoFor) : car;
+      if (!target) return;
+      if (!target.pid) target.pid = "p" + Date.now().toString(36);
+      photoCache[target.pid] = r.data;
+      return PH.put(target.pid, r.data).then(function () {
+        if (target !== car) gSave(); else saveCar();
+        renderPhoto(); renderGarage();
+        photoSuggest = { hex: r.suggest, gid: photoFor };
+        $("photoMsg").innerHTML = t("photoSaved") + (r.suggest ? ' <button type="button" class="pill acc" id="useSuggest"><i class="dot" style="background:' + r.suggest + '"></i>' + esc(t("photoLooks", { c: colorName(r.suggest) })) + "</button>" : "");
+        if (photoFor) $("garage").scrollIntoView({ behavior: M.RM ? "auto" : "smooth" });
+      });
+    }).catch(function () { $("photoMsg").textContent = t("photoFail"); });
+  });
+  var photoSuggest = null;
+  $("photoMsg").addEventListener("click", function (e) {
+    if (!e.target.closest("#useSuggest") || !photoSuggest) return;
+    if (photoSuggest.gid) { var g = gFind(photoSuggest.gid); if (g) { g.color = photoSuggest.hex; gSave(); renderGarage(); } if (car.gid === photoSuggest.gid) setColor(photoSuggest.hex); }
+    else setColor(photoSuggest.hex);
+    $("photoMsg").textContent = t("photoColorSet", { c: colorName(photoSuggest.hex) });
+  });
+  function renderPhoto() {
+    photoUrl(car.pid).then(function (u) { $("photoPrev").innerHTML = u ? '<img src="' + u + '" alt="' + esc(t("photoAlt")) + '">' : ""; });
+  }
+
+  /* ---------- My Garage (this phone only) ---------- */
+  var GKEY = "ssai:mech:garage", garage = M.lsGet(GKEY, []); if (!Array.isArray(garage)) garage = [];
+  var FIELDS = ["year", "make", "model", "vtype", "vinModel", "trim", "engine", "cyl", "fuel", "drive", "body", "bodyManual", "lights", "abs", "color", "paint", "vin", "miles", "pid", "nick", "scans"];
+  function gFind(id) { return garage.filter(function (g) { return g.id === id; })[0] || null; }
+  function gSave() { if (!M.lsSet(GKEY, garage)) M.toast(t("storageFull")); }
+  function snapshot(src, dst) { FIELDS.forEach(function (k) { if (src[k] !== undefined) dst[k] = src[k]; }); return dst; }
+  function syncGarage() { if (!car.gid) return; var g = gFind(car.gid); if (!g) { car.gid = ""; return; } snapshot(car, g); gSave(); }
+  function saveToGarage() {
+    if (!car.year || !car.make) { M.toast(t("pickCarFirst")); return; }
+    var g = car.gid && gFind(car.gid);
+    if (!g) { g = { id: "G" + Date.now().toString(36), added: new Date().toISOString() }; garage.unshift(g); car.gid = g.id; }
+    if (!car.nick) car.nick = car.model || title(car.make);
+    snapshot(car, g); gSave(); M.lsSet(CKEY, car); renderGarage(); badge();
+    M.toast(t("savedGarage", { n: g.nick }));
+  }
+  $("saveGarage").addEventListener("click", saveToGarage);
+  function useCar(id) {
+    var g = gFind(id); if (!g) return Promise.resolve();
+    car = snapshot(g, {}); car.gid = g.id; car.problem = ""; M.lsSet(CKEY, car);
+    issuesKey = ""; fillYearMake(); fillDetails(); renderPaint(); renderPhoto();
+    $("miles").value = car.miles || ""; $("vin").value = car.vin || ""; $("problem").value = "";
+    return loadModels().then(function () { carChanged(true, true); });
+  }
+  /* code status across this car's jobs: fixed > in a job > in your quote > open */
+  function codeStatus(gid, code) {
+    var reqs = M.all().filter(function (r) { return r.own && r.garageId === gid && r.status !== "declined"; });
+    var inReq = reqs.filter(function (r) { return (r.items || []).some(function (it) { return (it.codes || []).indexOf(code) >= 0; }); });
+    if (inReq.some(function (r) { return r.stage >= 6; })) return "fixed";
+    if (inReq.length) return "job";
+    if (car.gid === gid && job.some(function (it) { return (it.codes || []).indexOf(code) >= 0; })) return "quote";
+    return "open";
+  }
+  function services(gid) { return M.all().filter(function (r) { return r.own && r.garageId === gid && r.status === "accepted" && r.stage >= 6; }).sort(function (a, b) { return a.createdAt < b.createdAt ? 1 : -1; }); }
+  function miles(s) { var n = parseInt(String(s || "").replace(/\D/g, ""), 10); return isFinite(n) ? n : 0; }
+  function fDate(d) { return new Date(d).toLocaleDateString(M.lang() === "es" ? "es-MX" : "en-US", { month: "short", day: "numeric", year: "numeric" }); }
+  /* NHTSA dates come as dd/mm/yyyy */
+  function nDate(s) { var m = String(s || "").match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m ? fDate(new Date(+m[3], +m[2] - 1, +m[1])) : s; }
+  function reminders(g) {
+    var mt = C.maintenance || {}, out = [], hist = services(g.id), now = Date.now(), ev = PT.isEV(g), cur = miles(g.miles);
+    function last(svcIds) { var r = hist.filter(function (h) { return h.items.some(function (it) { return svcIds.indexOf(it.svc + (it.opt ? "." + it.opt : "")) >= 0 || svcIds.indexOf(it.svc) >= 0; }); })[0]; return r ? { at: new Date(r.history && r.history.length ? r.history[r.history.length - 1].at : r.createdAt), mi: miles(r.car && r.car.miles) } : null; }
+    function rule(key, svcIds, everyMi, everyMo) {
+      var l = last(svcIds), st = "unknown", txt;
+      if (l) {
+        var dueAt = everyMo ? new Date(l.at.getFullYear(), l.at.getMonth() + everyMo, l.at.getDate()) : null, leftMi = everyMi && l.mi && cur ? l.mi + everyMi - cur : null;
+        var over = (dueAt && dueAt.getTime() < now) || (leftMi != null && leftMi <= 0), soon = (dueAt && dueAt.getTime() - now < 30 * 864e5) || (leftMi != null && leftMi < 500);
+        st = over ? "due" : soon ? "soon" : "ok";
+        txt = t("remLast", { d: fDate(l.at) }) + (leftMi != null ? " · " + (leftMi <= 0 ? t("remOverMi", { n: Math.abs(leftMi).toLocaleString("en-US") }) : t("remInMi", { n: leftMi.toLocaleString("en-US") })) : "") + (dueAt ? " · " + t("remBy", { d: fDate(dueAt) }) : "");
+      } else txt = t("remNone", { e: [everyMi ? everyMi.toLocaleString("en-US") + " mi" : "", everyMo ? t("remMo", { n: everyMo }) : ""].filter(Boolean).join(t("remOr")) });
+      out.push({ k: key, st: st, txt: txt });
+    }
+    if (!ev) rule("oil", ["oil"], mt.oilMiles, mt.oilMonths);
+    rule("rotate", ["tires.rotate", "tires.four"], ev ? mt.evRotateMiles || mt.rotateMiles : mt.rotateMiles, ev ? 0 : mt.rotateMonths);
+    rule("brake", ["brakes"], 0, mt.brakeMonths);
+    return out;
+  }
+  var gIssues = {};
+  function gIssuesHTML(g) {
+    var k = [g.year, g.make, g.model].join("|"), d = gIssues[k];
+    if (!d) return '<p class="note">' + t("loadingIssues") + "</p>";
+    var h = "";
+    h += d.r ? (d.r.length ? '<p class="free">🛠️ ' + t("recallFree", { n: d.r.length }) + "</p>" + d.r.slice(0, 3).map(function (x) { return '<p class="note">• <b>' + esc(title(x.comp.split(":")[0])) + "</b> · " + esc(x.id) + (x.ota ? " · " + t("otaFix") : "") + "</p>"; }).join("") : '<p class="okline">✅ ' + t("noRecalls") + "</p>") : '<p class="note">' + t("recallsErr") + "</p>";
+    h += d.c ? (d.c.total ? '<p class="most">' + t("mostReported") + " " + d.c.top.slice(0, 3).map(function (x) { return esc(x[0]) + " (" + x[1] + ")"; }).join(", ") + "</p>" : "") : "";
+    return h;
+  }
+  function loadGIssues(g) {
+    var k = [g.year, g.make, g.model].join("|"); if (gIssues[k] || !g.model || g.make === "__other") return;
+    Promise.all([V.recalls(g.make, g.model, g.year).catch(function () { return null; }), V.complaints(g.make, g.model, g.year).catch(function () { return null; })])
+      .then(function (res) { gIssues[k] = { r: res[0], c: res[1] }; D.querySelectorAll('[data-giss="' + g.id + '"]').forEach(function (el) { el.innerHTML = gIssuesHTML(g); }); });
+  }
+  var SRC = { demo: "srcDemo", bt: "srcBt", typed: "srcTyped" }, STAT = { fixed: "stFixed", job: "stInJob", quote: "stInQuote", open: "stOpen" };
+  function renderGarage() {
+    var L = $("garageList");
+    if (!garage.length) { L.innerHTML = '<div class="empty">' + t("gEmpty") + "</div>"; return; }
+    L.innerHTML = garage.map(function (g) {
+      var lbl = PT.label(g), scans = (g.scans || []).slice().reverse(), hist = services(g.id), act = car.gid === g.id;
+      var sc = scans.length ? scans.map(function (s) {
+        return '<li><div class="sl"><b>' + esc(M.fWhen(s.at)) + "</b><small>" + t(SRC[s.src] || "srcTyped") + (s.mil != null ? " · " + (s.mil ? "🔴 " + t("milOn") : "⚪ " + t("milOff")) : "") + (s.volts ? " · 🔋 " + s.volts.toFixed(1) + " V" : "") + "</small></div>" +
+          '<div class="chipline">' + (s.codes.length ? s.codes.map(function (c) { var st = codeStatus(g.id, c.c); return '<span class="pill st-' + st + '">' + esc(c.c) + (c.k === "pending" ? "*" : "") + " · " + t(STAT[st]) + "</span>"; }).join("") : '<span class="pill ok">' + t("noCodesShort") + "</span>") + "</div></li>";
+      }).join("") : '<li class="note">' + t("noScans") + "</li>";
+      var sv = hist.length ? hist.map(function (r) { return "<li><b>" + esc(M.fDay(r.createdAt)) + "</b> · " + esc(r.items.map(M.itemName).join(", ")) + (r.car && r.car.miles ? " · " + esc(r.car.miles) + " mi" : "") + "</li>"; }).join("") : '<li class="note">' + t("noService") + "</li>";
+      var rem = reminders(g).map(function (x) { return '<li class="rm-' + x.st + '"><b>' + t("rem_" + x.k) + "</b><small>" + esc(x.txt) + "</small></li>"; }).join("");
+      return '<article class="gcar' + (act ? " act" : "") + '" data-gid="' + g.id + '"><div class="gtop"><div class="gph" data-ph="' + esc(g.pid || "") + '">' + W.CAR.mini(g.body, g.color) + "</div>" +
+        '<div class="gtx"><input class="gnick" data-nick="' + g.id + '" value="' + esc(g.nick || "") + '" maxlength="24" aria-label="' + esc(t("nickL")) + '"><small>' + esc(lbl) + "</small><small>" +
+        esc([g.color ? colorName(g.color) + (g.paint ? " (" + g.paint + ")" : "") : "", g.miles ? g.miles + " mi" : "", g.vin ? "VIN …" + g.vin.slice(-8) : ""].filter(Boolean).join(" · ")) + "</small></div>" +
+        (act ? '<span class="pill ok">' + t("gActive") + "</span>" : "") + "</div>" +
+        '<div class="gbtns"><button class="btn primary small" type="button" data-gfix="' + g.id + '">🔧 ' + t("getFixed") + "</button>" +
+        (act ? "" : '<button class="btn ghost small" type="button" data-guse="' + g.id + '">' + t("useCar") + "</button>") +
+        '<button class="btn ghost small" type="button" data-gphoto="' + g.id + '">📷 ' + t("photoShort") + '</button><button class="btn ghost small" type="button" data-gdel="' + g.id + '" aria-label="' + esc(t("gDelete")) + '">🗑</button></div>' +
+        '<details class="more"><summary>' + t("gIssuesH") + '</summary><div data-giss="' + g.id + '">' + gIssuesHTML(g) + "</div></details>" +
+        '<details class="more"' + (scans.length ? " open" : "") + "><summary>" + t("gScansH", { n: scans.length }) + '</summary><ul class="glist">' + sc + "</ul></details>" +
+        '<details class="more"><summary>' + t("gSvcH", { n: hist.length }) + '</summary><ul class="glist">' + sv + "</ul></details>" +
+        '<div class="rems"><p class="kick" style="margin:8px 0 4px">' + t("remH") + '</p><ul class="glist">' + rem + "</ul></div></article>";
+    }).join("") + '<p class="note">' + t("gPrivacy") + "</p>";
+    garage.forEach(function (g) {
+      loadGIssues(g);
+      if (g.pid) photoUrl(g.pid).then(function (u) { if (!u) return; D.querySelectorAll('.gph[data-ph="' + g.pid + '"]').forEach(function (el) { el.innerHTML = '<img src="' + u + '" alt="' + esc(t("photoAlt")) + '">'; }); });
+    });
+  }
+  $("garageList").addEventListener("change", function (e) {
+    var n = e.target.closest("[data-nick]"); if (!n) return;
+    var g = gFind(n.getAttribute("data-nick")); if (!g) return; g.nick = n.value.trim().slice(0, 24) || g.model; gSave(); if (car.gid === g.id) { car.nick = g.nick; M.lsSet(CKEY, car); }
+  });
+  $("garageList").addEventListener("click", function (e) {
+    var b;
+    if ((b = e.target.closest("[data-guse]"))) { useCar(b.getAttribute("data-guse")).then(function () { renderGarage(); M.toast(t("usingCar", { n: gFind(car.gid).nick })); $("car").scrollIntoView({ behavior: M.RM ? "auto" : "smooth" }); }); return; }
+    if ((b = e.target.closest("[data-gphoto]"))) { photoFor = b.getAttribute("data-gphoto"); $("photoIn").click(); return; }
+    if ((b = e.target.closest("[data-gdel]"))) {
+      var g = gFind(b.getAttribute("data-gdel")); if (!g || !confirm(t("gDelConfirm", { n: g.nick }))) return;
+      if (g.pid) PH.del(g.pid);
+      garage = garage.filter(function (x) { return x !== g; }); gSave(); if (car.gid === g.id) { car.gid = ""; M.lsSet(CKEY, car); } renderGarage(); badge(); return;
+    }
+    if ((b = e.target.closest("[data-gfix]"))) getFixed(b.getAttribute("data-gfix"));
+  });
+  /* "Get it fixed": load the car + pre-fill the job with every open code from its scan history (or a basic scan) */
+  function getFixed(id) {
+    useCar(id).then(function () {
+      var g = gFind(id), open = {};
+      (g.scans || []).forEach(function (s) { s.codes.forEach(function (c) { if (codeStatus(id, c.c) === "open") open[c.c] = 1; }); });
+      var codes = Object.keys(open);
+      codes.forEach(function (code) { addCodeJobs(code); });
+      if (!job.length) job.push({ svc: "diag", opt: "scan" });
+      saveJob();
+      var last = (g.scans || [])[g.scans ? g.scans.length - 1 : 0];
+      $("problem").value = codes.length ? t("fixProblem", { c: codes.join(", "), d: last ? M.fDay(last.at) : "" }) : "";
+      saveCar(); renderGarage();
+      M.toast(codes.length ? t("fixFilled", { n: codes.length }) : t("fixBasic"));
+      $("quote").scrollIntoView({ behavior: M.RM ? "auto" : "smooth" });
+    });
+  }
+  /* scan history: every scan / typed code goes on the current car (and its garage card) */
+  function logScan(src, codes, extra) {
+    car.scans = (car.scans || []).concat([Object.assign({ at: new Date().toISOString(), src: src, codes: codes }, extra || {})]).slice(-30);
+    saveCar(); renderGarage();
+  }
+
+  /* ---------- Tesla card + EV scan note ---------- */
+  function renderTesla() {
+    var tes = String(car.make || "").toUpperCase() === "TESLA", ev = PT.isEV(car);
+    $("teslaCard").hidden = !tes;
+    if (tes) {
+      var r = issuesData && issuesData.r && issuesData.r.ok, ota = r ? r.filter(function (x) { return x.ota; }).length : 0;
+      $("tsOta").innerHTML = r ? t("tsOta", { n: r.length, o: ota }) : t("tsOtaWait");
+    }
+    $("evNote").hidden = !ev; $("btCard").hidden = tes;
+    $("evNoteTxt").innerHTML = tes ? t("evTesla") : t("evOther");
+    $("scanFor").textContent = carLabel() ? t("scanFor", { c: carLabel() }) + (car.gid ? "" : " " + t("scanSaveHint")) : "";
+  }
+
   /* ---------- sheets ---------- */
   var lastFocus = null;
   function open(id) { lastFocus = D.activeElement; var s = $(id); s.classList.add("on"); s.setAttribute("aria-hidden", "false"); setTimeout(function () { var f = s.querySelector(".x"); if (f) f.focus({ preventScroll: true }); }, 50); }
@@ -528,17 +1080,14 @@
   }
 
   /* ---------- live sync with the shop page (same browser) ---------- */
-  M.onChange(function () { renderTrack(); checkNew(); renderDays(); });
+  M.onChange(function () { renderTrack(); checkNew(); renderDays(); renderGarage(); });
   W.addEventListener("focus", function () { M.fire(); });
   D.addEventListener("visibilitychange", function () { if (!D.hidden) M.fire(); });
 
   /* ---------- boot ---------- */
   function renderAll() {
-    brand(); renderSvcs(); renderBA(); fillYearMake(); renderCar(false); renderJob(); renderDays(); renderHours(); renderTrack(); bell();
-    var m = $("model").value; setModelOptionsKeep(m);
-  }
-  function setModelOptionsKeep() { /* model list re-labels itself on language change (only the placeholder is translated) */
-    var o = $("model").options[0]; if (o && !o.value) o.textContent = t("pickModel");
+    brand(); heroScene(); renderSvcs(); renderBA(); fillYearMake(); fillDetails(); badge(); renderCar(false); renderJob(); renderDays(); renderHours(); renderTrack(); bell();
+    modelC.placeholder(t("pickModel")); if (modelMsg) $("modelMsg").textContent = t(modelMsg[0], modelMsg[1]); renderIssues(); renderScan(); renderPaint(); renderGarage(); renderTesla(); if (partsIt && $("partsSh").classList.contains("on")) drawParts();
   }
   M.onLang(function () { if (booted) renderAll(); });
   var booted = false;
@@ -546,9 +1095,12 @@
   dayIdx = firstOpenDay();
   if (slot) { var ds = M.days(); ds.forEach(function (d, i) { if (d.slots.some(function (s) { return s.start === slot.start; })) dayIdx = i; }); }
   $("miles").value = car.miles || ""; $("problem").value = car.problem || ""; $("vin").value = car.vin || ""; $("modelTxt").value = car.make === "__other" ? car.model || "" : "";
+  if (car.body && !W.CAR.bodies.includes(car.body)) car.body = "";
+  renderPhoto();
   syncAlertsUI();
   booted = true; renderAll(); badge();
-  if (car.year && car.make) loadModels(true);
+  loadMakes();
+  if (car.year && car.make) loadModels().then(function () { loadIssues(); });
   // don't fire banners for alerts that arrived while the page was closed? We DO show them: that's the point of the tracker.
   checkNew();
   navSpy();

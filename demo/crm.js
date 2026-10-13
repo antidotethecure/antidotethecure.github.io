@@ -85,12 +85,22 @@
   // ("Already counted") and writes an adjustment for points this phone showed but the server refused; pullAdj() applies it once.
   function evId(p) { return p + Date.now().toString(36) + code4(6); }
   var syncT = 0, syncM = null;
+  // like boPost, but the answer is readable (text/plain = a "simple" CORS request): the server hands back the card ID
+  function memberPost(o) {
+    o.slug = SLUG; o.restaurant = NAME;
+    try { fetch(API, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }).then(function (x) { return x.json(); }).then(function (j) {
+      if (!j || !j.card || !/^[A-Z]{2,4}-[A-Z0-9]{5}$/.test(j.card)) return;
+      var l = mine(), m = l[0]; if (!m || m.id !== o.id || m.card === j.card) return;
+      m.card = j.card; save(l); drawJoin(); if (window.SSAI_CARD && SSAI_CARD.refresh) SSAI_CARD.refresh();
+    }).catch(function () {}); } catch (x) {}
+  }
   function syncLater(m) {
     if (!API || STAFF || !SIMPLE || !m || !m.id || m.sample) return;
     syncM = m; clearTimeout(syncT);
     syncT = setTimeout(function () {
       var r = syncM; if (!r) return;
-      boPost({ type: "member", id: r.id, name: r.name, phone: r.phone || "", email: r.email || "",
+      // the reply carries the member's permanent card ID (assigned server-side, e.g. MLD-4K7Q2): keep it on the phone
+      memberPost({ type: "member", id: r.id, name: r.name, phone: r.phone || "", email: r.email || "",
         bday: r.bday >= 0 ? (r.bday + 1) + "/" + (r.bdd || "") + "/" + (r.bdy || "") : "", joined: r.joined || 0, last: r.last || 0,
         stars: r.stars || 0, earned: r.earned != null ? r.earned : (r.stars || 0), spent: r.spent || 0, visits: r.visits || 0,
         ref: r.ref || "", refBy: r.refBy || "", friends: (r.friends || []).length, gameTotal: r.gtot || 0, redeems: r.nred || 0,
@@ -500,7 +510,8 @@
     redraw: function () { drawJoin(); drawOwn(); },
     join: function (cb) { GATE_TXT.interim = ["Join " + NAME + " Rewards first", "Free. Add your name and a phone or email, then add your visit.", "🎁 Join free"]; return gate("interim", cb); },
     toast: toast, esc: e, code4: code4,
-    dev: function () { return devId(); }, pday: pdKey, prizeUsedToday: function () { return prizeUsedToday(mine()[0]); }
+    dev: function () { return devId(); }, pday: pdKey, prizeUsedToday: function () { return prizeUsedToday(mine()[0]); },
+    sync: function () { var m = mine()[0]; if (m) syncLater(m); }, api: API, perDollar: PER
   };
   if (SIMPLE) window.SSAI_GAMEPTS = {
     cfg: SIMPLE.game,
@@ -573,7 +584,8 @@
         // points + scan to earn
         (WAL ? '<div class="crm-box">' + walTiles(me) + '<button type="button" class="crm-scan" data-a="scan" style="width:100%;margin-top:10px">📲 Scan to earn</button>'
           : '<div class="crm-box"><div class="crm-pts"><div><div class="k" style="font-size:10px">Your points</div><div class="n">' + pts.toLocaleString() + '<small>pts</small></div></div>' +
-          (INTERIM ? '<button type="button" class="crm-scan" data-a="visit">🧾 Add my visit</button></div>' : '<button type="button" class="crm-scan" data-a="scan">📲 Scan to earn</button></div>')) +
+          (INTERIM ? '<button type="button" class="crm-scan" data-a="visit">🧾 Add my visit</button></div>' : '<button type="button" class="crm-scan" data-a="scan">📲 Scan to earn</button></div>') +
+          (window.SSAI_CARD ? SSAI_CARD.buttonHTML(me) : '')) +
           '<div class="crm-qr"><div class="qr"></div><div class="d4">' + regCode(me) + '</div><small>Show this to the cashier or bartender, or scan it at the register.<br>They ring you up and your points land here. Code refreshes every 5 min.</small></div>' +
           (WAL ? '<p style="margin:10px 0 0;font-size:13px">' + walEarnLine() + ' <b>They never mix:</b> bar points only buy bar rewards, kitchen points only buy food rewards.</p>'
             : SIMPLE ? '<p style="margin:10px 0 0;font-size:13px">Earn <b style="color:#FFD23F">' + PER + ' points per $1</b> on eligible purchases: ' + (INTERIM ? 'tap <b>Add my visit</b> after you pay and snap your receipt.' : 'show this code when staff ring you up.') + (window.SSAI_GAMEPTS ? ' 🎮 Game points today: <b>' + gpUsed(me) + ' of ' + SIMPLE.game.dailyCap + '</b>.' : '') + '</p>'

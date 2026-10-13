@@ -81,7 +81,7 @@ var W={
  yourName:{en:"Your first name or nickname",es:"Tu nombre o apodo"},
  nameHint:{en:"For your practice points and your Trained badge. It stays on this phone.",es:"Para tus puntos de práctica y tu insignia de Capacitado. Se queda en este teléfono."},
  save:{en:"Save",es:"Guardar"},
- nav:[["guests",{en:"For guests",es:"Para clientes"}],["deals",{en:"Deals",es:"Ofertas"}],["tut",{en:"Step by step",es:"Paso a paso"}],["t-oneprize",{en:"One prize a day",es:"Un premio al día"}],["say",{en:"What to say",es:"Qué decir"}],["faq",{en:"Problems & FAQ",es:"Problemas y preguntas"}],["games",{en:"Practice games",es:"Juegos de práctica"}],["quiz",{en:"Test yourself",es:"Ponte a prueba"}]],
+ nav:[["guests",{en:"For guests",es:"Para clientes"}],["deals",{en:"Deals",es:"Ofertas"}],["tut",{en:"Step by step",es:"Paso a paso"}],["t-oneprize",{en:"One prize a day",es:"Un premio al día"}],["t-card",{en:"Rewards card",es:"Tarjeta"}],["say",{en:"What to say",es:"Qué decir"}],["faq",{en:"Problems & FAQ",es:"Problemas y preguntas"}],["games",{en:"Practice games",es:"Juegos de práctica"}],["quiz",{en:"Test yourself",es:"Ponte a prueba"}]],
  install:{en:"📲 Save this guide: Share → Add to Home Screen (“Staff Rewards”). Works offline after the first visit.",es:"📲 Guarda esta guía: Compartir → Agregar a inicio (“Staff Rewards”). Funciona sin internet después de la primera vez."}
 };
 function guests(){ var R=rw(), jl=R.justLanded;
@@ -179,7 +179,24 @@ function tutorials(){ var R=rw(), t0=R.tiers[0], code=LIVE.defaults[SL[REST]].pr
   stp("4",{en:"<b>Referral codes:</b> a guest can use one friend's code, once, when they join. It never stacks with another reward on the same visit.",es:"<b>Códigos de referido:</b> el cliente puede usar el código de un amigo, una vez, al unirse. Nunca se combina con otra recompensa en la misma visita."})+
   "<div class='card' style='margin-top:10px'><b>🔎 "+L({en:"Check a pass code",es:"Revisar un código de pase"})+"</b><p class='note' style='margin:4px 0 8px'>"+L({en:"Not sure about a code? Type it here: you'll see if it's live, already used or expired. No guest info is shown.",es:"¿Dudas de un código? Escríbelo aquí: verás si está vigente, ya usado o vencido. No se muestran datos del cliente."})+"</p>"+
   "<div class='name'><input id='ccIn' maxlength='12' autocapitalize='characters' autocomplete='off' placeholder='"+LIVE.defaults[SL[REST]].prefix+"-7K3P2'><button class='btn' id='ccGo'>"+L({en:"Check",es:"Revisar"})+"</button></div><p class='note' id='ccOut' aria-live='polite' style='margin:8px 0 0'></p></div></section>";
+ // 10 digital rewards card
+ var cid=(REST==="m"?"MLD":"NLV")+"-4K7Q2";
+ h+="<section class='tut' id='t-card'><h3>10 · "+L({en:"The digital rewards card: scan or look up a member",es:"La tarjeta digital de recompensas: escanear o buscar a un miembro"})+"</h3>"+
+  stp("1",{en:"The guest taps <b>💳 My Rewards Card</b>. It shows their name, points, next reward and a permanent <b>card ID</b> like <code>"+cid+"</code> (it never changes).",es:"El cliente toca <b>💳 My Rewards Card</b>. Muestra su nombre, puntos, próxima recompensa y un <b>ID de tarjeta</b> permanente como <code>"+cid+"</code> (nunca cambia)."})+
+  stp("2",{en:"<b>Scan:</b> point your phone's camera at the QR on their card and tap the link. This guide opens and checks the card for you.",es:"<b>Escanear:</b> apunta la cámara de tu teléfono al QR de su tarjeta y toca el enlace. Esta guía se abre y revisa la tarjeta por ti."})+
+  stp("3",{en:"<b>Or type it:</b> enter the card ID below. You'll see if it's a real member (first name + last initial, member since) and whether today's prize is already used. No phone, email or points are shown.",es:"<b>O escríbelo:</b> escribe el ID abajo. Verás si es un miembro real (nombre + inicial del apellido, miembro desde) y si ya usó el premio de hoy. No se muestran teléfono, correo ni puntos."})+
+  stp("4",{en:"Rewards still go through the <b>live pass</b>: the one-time code for this visit shows on their card while a pass is open. Never apply a reward from the card ID alone.",es:"Las recompensas siguen pasando por el <b>pase en vivo</b>: el código de un solo uso de esta visita aparece en su tarjeta mientras el pase está abierto. Nunca apliques una recompensa solo con el ID de la tarjeta."})+
+  "<div class='card' style='margin-top:10px'><b>🔎 "+L({en:"Look up a card",es:"Buscar una tarjeta"})+"</b><div class='name' style='margin-top:8px'><input id='lkIn' maxlength='12' autocapitalize='characters' autocomplete='off' placeholder='"+cid+"' value='"+esc(LK||"")+"'><button class='btn' id='lkGo'>"+L({en:"Look up",es:"Buscar"})+"</button></div><p class='note' id='lkOut' aria-live='polite' style='margin:8px 0 0'></p></div></section>";
  return h; }
+var LK="", LKR=null;
+function lookup(){ var o=document.getElementById("lkOut"), c=(document.getElementById("lkIn").value||"").toUpperCase().replace(/\s+/g,""); LK=c;
+ if(!/^[A-Z]{2,4}-[A-Z0-9]{5}$/.test(c)){ o.textContent=L({en:"Type the card ID, like MLD-4K7Q2.",es:"Escribe el ID de la tarjeta, como MLD-4K7Q2."}); return; }
+ if(!LIVE.api){ o.textContent=L({en:"Not connected yet.",es:"Aún no conectado."}); return; }
+ o.textContent="…";
+ fetch(LIVE.api+(LIVE.api.indexOf("?")<0?"?":"&")+"card="+encodeURIComponent(c)+"&slug="+SL[REST]).then(function(r){ return r.json(); }).then(function(j){ LKR=j; showLk(); }).catch(function(){ o.textContent=L({en:"Can't reach the server right now.",es:"No hay conexión con el servidor."}); }); }
+function showLk(){ var o=document.getElementById("lkOut"), j=LKR; if(!o||!j) return;
+ o.innerHTML=j.valid?"✅ <b>"+esc(j.name)+"</b> · "+esc(j.restaurant)+" "+L({en:"member",es:"miembro"})+(j.since?" "+L({en:"since",es:"desde"})+" "+esc(j.since):"")+" · <code>"+esc(j.card)+"</code><br>"+(j.prizeToday?"🌙 "+L({en:"Today's prize is already used: next one tomorrow.",es:"Ya usó el premio de hoy: el siguiente mañana."}):"🎁 "+L({en:"No prize used today.",es:"No ha usado premio hoy."}))
+  :"⛔ "+L({en:"Not a member card at "+NAME[REST]+".",es:"No es una tarjeta de miembro de "+NAME[REST]+"."}); }
 function codeCheck(){ var o=document.getElementById("ccOut"), c=(document.getElementById("ccIn").value||"").toUpperCase().replace(/\s+/g,"");
  if(!c){ o.textContent=L({en:"Type the code from the pass.",es:"Escribe el código del pase."}); return; }
  if(!LIVE.api){ o.textContent=L({en:"Not connected yet: check the live pass on the guest's phone.",es:"Aún no conectado: revisa el pase en vivo en el teléfono del cliente."}); return; }
@@ -235,6 +252,7 @@ function bank(){ var R=rw(), t=R.tiers, wrongB=t.slice(1).map(function(x){ retur
   {q:{en:"How long does a pass code work?",es:"¿Cuánto tiempo funciona un código de pase?"},a:[{en:"Once, for 10 minutes, this visit only",es:"Una vez, por 10 minutos, solo en esta visita"},{en:"All day",es:"Todo el día"},{en:"Until the guest closes the app",es:"Hasta que el cliente cierre la app"}],t:"t-oneprize"},
   {q:{en:"A guest used a reward, played the game, won again and wants it now. What happens?",es:"Un cliente usó una recompensa, jugó, volvió a ganar y lo quiere ahora. ¿Qué pasa?"},a:[{en:"Come back tomorrow: one prize per day",es:"Vuelva mañana: un premio por día"},{en:"Ring it, it's a new prize",es:"Lo marcas, es un premio nuevo"},{en:"Give half off instead",es:"Das la mitad de descuento"}],t:"t-oneprize"},
   {q:{en:"Can a referral code be used with another reward on the same visit?",es:"¿Se puede usar un código de referido con otra recompensa en la misma visita?"},a:[{en:"No. One referral code, once, never stacked",es:"No. Un código de referido, una vez, nunca combinado"},{en:"Yes, both together",es:"Sí, los dos juntos"},{en:"Yes, if the friend is there",es:"Sí, si el amigo está presente"}],t:"t-oneprize"},
+  {q:{en:"What does a member's card ID (like MLD-4K7Q2) let you do?",es:"¿Qué te permite hacer el ID de tarjeta de un miembro (como MLD-4K7Q2)?"},a:[{en:"Check it's a real member and if today's prize is used",es:"Verificar que es un miembro real y si ya usó el premio de hoy"},{en:"Apply a reward without the live pass",es:"Aplicar una recompensa sin el pase en vivo"},{en:"See their phone number",es:"Ver su número de teléfono"}],t:"t-card"},
   {q:{en:"A guest's phone died before paying. What do you tell them?",es:"Al cliente se le murió el teléfono antes de pagar. ¿Qué le dices?"},a:[{en:"Keep the receipt; add the visit today or tomorrow",es:"Guarde el recibo; agregue la visita hoy o mañana"},{en:"I'll add the points for you",es:"Yo le agrego los puntos"},{en:"The points are lost",es:"Los puntos se pierden"}],t:"t-problems"}]; }
 function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), x=a[i]; a[i]=a[j]; a[j]=x; } return a; }
 function newQuiz(){ QZ={qs:shuffle(bank().map(function(x,i){ return {i:i,order:shuffle([0,1,2])}; })).slice(0,12),ans:{}}; }
@@ -262,7 +280,7 @@ function render(){ var y=window.scrollY; document.documentElement.lang=LANG; doc
   "<div class='card'><label for='nm' style='font-weight:800'>"+L(W.yourName)+"</label><div class='name' style='margin-top:6px'><input id='nm' maxlength='24' autocomplete='given-name' value='"+esc(nm())+"'><button class='btn' id='nmSave'>"+L(W.save)+"</button></div><p class='note' style='margin:6px 0 0'>"+L(W.nameHint)+"</p></div>"+
   "<nav class='nav' aria-label='Sections'>"+W.nav.map(function(x){ return "<a href='#"+x[0]+"'>"+L(x[1])+"</a>"; }).join("")+"</nav>"+
   guests()+deals()+tutorials()+say()+faq()+games()+quiz()+"<p class='note' style='margin-top:24px'>"+L(W.install)+"</p>";
- window.scrollTo(0,y); tickDemo(); }
+ window.scrollTo(0,y); tickDemo(); showLk(); }
 var $app=document.getElementById("app"), dpEnd=0;
 function tickDemo(){ var c=document.getElementById("dpClock"), d=document.getElementById("dpCd"), p=document.getElementById("demoPass"); if(!c) return;
  var now=new Date(); c.textContent=now.toLocaleDateString(LANG==="es"?"es-US":"en-US",{weekday:"short",month:"short",day:"numeric"})+" · "+now.toLocaleTimeString(LANG==="es"?"es-US":"en-US",{hour:"numeric",minute:"2-digit",second:"2-digit"});
@@ -273,11 +291,14 @@ document.addEventListener("click",function(e){ var t=e.target;
  var l=t.closest("[data-lang]"); if(l){ LANG=l.dataset.lang; set(LS.lang,LANG); render(); return; }
  if(t.id==="nmSave"){ var v=document.getElementById("nm").value.replace(/[<>]/g,"").trim().slice(0,24); set(LS.name,v); render(); return; }
  if(t.id==="ccGo"){ codeCheck(); return; }
+ if(t.id==="lkGo"){ lookup(); return; }
  if(t.id==="dpEnd"){ dpEnd=dpEnd?0:Date.now()+3000; return; }
  var qz=t.closest("[data-qz]"); if(qz){ newQuiz(); render(); document.getElementById("quiz").scrollIntoView(); return; }
  var qa=t.closest("[data-qa]"); if(qa&&QZ){ var p=qa.dataset.qa.split(":"); if(QZ.ans[+p[0]]==null){ QZ.ans[+p[0]]=+p[1]; if(Object.keys(QZ.ans).length===QZ.qs.length) finishQuiz(); render(); } return; } });
 if(!get("ssai_staff_dev","")) set("ssai_staff_dev","S"+Math.random().toString(36).slice(2,10).toUpperCase());
+(function(){ var q=new URLSearchParams(location.search), c=q.get("card"), r=q.get("r"); if(!c) return; LK=c.toUpperCase(); if(r==="nalu-vida") REST="n"; else if(r==="melody-bar-grill") REST="m"; })();
 render();
+if(LK){ lookup(); var tc=document.getElementById("t-card"); if(tc) tc.scrollIntoView(); }
 if(LIVE.onChange) LIVE.onChange(function(){ render(); }); if(LIVE.fetch) LIVE.fetch();
 if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function(){});
 })();

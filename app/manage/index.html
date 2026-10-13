@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>SousShift Management</title>
+<meta name="theme-color" content="#03060e">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#03060e;--panel:#0a1631;--panel2:#0d1d40;--edge:#1c2f57;--ink:#eef3ff;--dim:#9eadcc;--blue:#2f7bff;--volt:#3fa9ff;--good:#34d399;--gold:#ffd166;--warn:#ff9f5b;--bad:#ff5b6e}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(900px 520px at 50% -120px,rgba(47,123,255,.28),transparent 70%),var(--bg);background-color:var(--bg);color:var(--ink);font-family:"Rajdhani",system-ui,-apple-system,sans-serif;font-size:17px;line-height:1.45}
+a{color:var(--volt)}
+h1,h2,h3{font-family:"Orbitron",sans-serif;letter-spacing:.02em;line-height:1.2;margin:0}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 60px}
+.back{display:inline-block;margin:4px 0 10px;text-decoration:none;font-weight:700}
+h1{font-size:24px;margin:6px 0 6px}.lead{color:var(--dim);margin:0 0 12px}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 16px}.sum div{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:10px;text-align:center}.sum b{display:block;font-family:Orbitron;font-size:22px}.sum span{font-size:13px;color:var(--dim)}
+.client{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);border-radius:18px;margin:14px 0;overflow:hidden}
+.ch{display:flex;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--edge)}
+.ch .av{flex:none;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:24px;background:#ffffff10}
+.ch h2{font-size:17px}.ch p{margin:2px 0 0;color:var(--dim);font-size:15px}
+.st{margin-left:auto;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.st.a{background:#34d39922;color:var(--good)}.st.o{background:#ffd16622;color:var(--gold)}
+.tabs{display:flex;gap:4px;padding:8px 10px 0;overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;font:700 15px Rajdhani,system-ui;color:var(--dim);background:transparent;border:1px solid transparent;border-radius:10px 10px 0 0;padding:7px 10px;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--ink);background:#ffffff0d;border-color:var(--edge);border-bottom-color:transparent}
+.pane{padding:12px 16px 16px;border-top:1px solid var(--edge);margin-top:-1px}
+.links{display:flex;flex-wrap:wrap;gap:6px}.links a{font-weight:700;font-size:15px;text-decoration:none;background:#ffffff0d;border:1px solid var(--edge);border-radius:999px;padding:6px 11px;color:var(--ink)}
+.links a.app{background:var(--blue);border-color:var(--blue)}
+ul.ck{list-style:none;margin:0;padding:0}ul.ck li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--edge)}ul.ck li:first-child{border-top:0}
+ul.ck input{flex:none;width:21px;height:21px;margin-top:2px;accent-color:var(--good)}ul.ck label{flex:1}ul.ck small{display:block;color:var(--dim);font-size:14px}
+ul.ck li.done label>b{color:var(--dim);text-decoration:line-through}
+.u{padding:7px 0;border-top:1px solid var(--edge)}.u:first-child{border-top:0}.u time{color:var(--dim);font-size:13px;margin-right:6px}
+.cp{padding:8px 0;border-top:1px solid var(--edge)}.cp:first-child{border-top:0}.cp b{display:block}.cp small{color:var(--dim)}
+.tag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:999px;margin-left:6px}.tag.open{background:#ff9f5b22;color:var(--warn)}.tag.done{background:#34d39922;color:var(--good)}
+details{border-top:1px solid var(--edge);padding:8px 0}details:first-child{border-top:0}summary{cursor:pointer;font-weight:700}details p{margin:6px 0 0;color:var(--dim)}
+.add{display:grid;gap:6px;margin-top:10px}.add input,.add select{width:100%;padding:9px 11px;border-radius:10px;border:1px solid var(--edge);background:#060d1f;color:var(--ink);font:inherit;font-size:16px}
+.add button,.mini{font:700 15px Rajdhani,system-ui;padding:9px 12px;border-radius:10px;border:0;background:var(--blue);color:#fff;cursor:pointer}
+.mini{padding:3px 9px;font-size:13px;background:#ffffff14;margin-left:6px}
+.note{font-size:13px;color:var(--dim)}
+.prog{height:8px;border-radius:99px;background:#ffffff12;overflow:hidden;margin:6px 0 0}.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--good),var(--gold))}
+</style>
+</head>
+<body>
+<main class="wrap">
+<a class="back" href="../">‹ SousShift app</a>
+<h1 class="chrome">🗂️ Management</h1>
+<p class="lead">Every active client and project: their apps, what's left to do, updates, complaints and FAQs. Checkboxes and complaints you log save on this phone.</p>
+<div class="sum"><div><b id="sClients">0</b><span>clients</span></div><div><b id="sOpen">0</b><span>open to-dos</span></div><div><b id="sIssues">0</b><span>open complaints</span></div></div>
+<div id="clients"></div>
+<p class="note">Client apps are separate Home Screen apps each owner saves on their own phone (Share → Add to Home Screen). Billing details live in the private billing dashboard, not here.</p>
+</main>
+<script>
+var CL=[
+{id:"christian",av:"🍔",owner:"Christian",biz:"Melody Bar & Grill + Nalu Vida",st:"Active",cls:"a",
+ links:[["📲 Christian's app","../../onboarding/christian/plan/",1],["Onboarding","../../onboarding/christian/"],["Melody app","../../demo/melody-lax/"],["Nalu Vida app","../../demo/nalu-vida/"],["Melody setup","../../melody/setup/"],["Nalu setup","../../nalu-vida/setup/"]],
+ todo:[["Nalu Vida setup payment","Separate agreement, due Oct 19"],["Toast integration approval","Submitted, pending (about 30 days). Interim mode runs until then"],["Toast reward buttons set up","Melody 5 / Nalu 4 buttons, about 10 min (Start-here screen in his app)"],["Confirm the monthly amount per restaurant","Listed as $150 each, to confirm"],["Agreements signed with the LLC legal names",""],["Merge open PRs: menu photo requests (#284), payments card (#287), Melody combat + steering, Nalu ride update",""],["Check with Christian before combat goes back on in Melody / harpoons in Nalu","Resolved Oct 12, 2026: Antidote confirmed Christian approved combat for both games (Melody combat + Nalu harpoons)",1],["Print kit: stickers + window posters delivered",""]],
+ upd:[["Oct 13","Melody combat + faster steering and the Nalu ride update in review"],["Oct 12","Christian approved combat for both games (Melody combat, Nalu harpoons)"],["Oct 12","Start-here Toast reward-button setup is the first screen in his app"],["Oct 12","Interim mode (show-and-tap rewards, receipt points) while Toast is pending"],["Oct 12","His feedback applied: simpler rewards, calm flight, no gore, no third-party landmarks"],["Oct 12","Melody setup paid"],["Oct 11","Game-plan app: split Melody | Nalu header, one-tap register buttons, Home Screen install"]],
+ cmp:[["Games felt too intense (guns, enemies, crashes, gore)","Oct 12","done","Calm mode shipped (#280). Oct 12: Christian approved combat for both games"],["Reward program too complicated","Oct 12","done","One points balance, simple ladder (#280)"],["No in-app ordering or payment at Melody","Oct 11","done","Menu-only mode (#265)"],["Real landmarks / other brands shown in the game","Oct 12","done","Genericized (#280)"]],
+ faq:[["How long does Toast approval take?","About 30 days. Until then interim mode: guests show a live pass and staff tap a reward button."],["Do staff need their own phones?","No. Guests use theirs; staff tap a button on the register."],["Can he change rewards later?","Yes, anytime: text Antidote."],["What does SousShift cover?","The Toast integration costs and the print designs (see his app)."]]},
+{id:"jurni",av:"🧇",owner:"Jurni",biz:"Gritz N Wafflez",st:"Onboarding",cls:"o",
+ links:[["📲 Jurni's app","../../onboarding/jurni/plan/",1],["Onboarding","../../onboarding/jurni/"],["Gritz app + game","../../demo/gritz-n-wafflez/"],["Deals setup","../../gritz-n-wafflez/setup/"]],
+ todo:[["Send Jurni his app link","Text it so he saves it to his Home Screen"],["Confirm plan + price","TBD: not set yet"],["Jurni picks deals, giveaways, prizes","Onboarding page, section 1"],["Jurni picks his register (POS)","Onboarding page, section 2"],["Send the agreement from secondshiftai@gmail.com",""],["Receive \"Send everything\" from his onboarding page",""],["Print kit: QR stickers + poster approved and printed",""],["Launch week",""]],
+ upd:[["Oct 13","Jurni's own game-plan app built (Home Screen installable)"],["Oct 12","Owner support SMS opt-in on his onboarding page"],["Oct 11","Gritz Order Up! game: every food tile visible, clear labels, hint glow"]],
+ cmp:[],
+ faq:[["When does it go live?","Same day once he sends his choices and signs."],["Does he need Toast?","No: any register; discount buttons work from day one."],["Are the AI agents included?","No, optional: $75/mo text, $150/mo voice + text."]]},
+{id:"veronika",av:"🌿",owner:"Veronika",biz:"Claude training + marketing · Green Light Sanctuary, Sunshine Mushroom Wellness, iDesignEvents",st:"Active",cls:"a",
+ links:[["📲 Veronika's app","../../onboarding/veronika-ec2ee4/",1]],
+ todo:[["Text her the Zoom link before Monday","Kickoff Mon Oct 19, 11:00 AM"],["Signed agreement scanned back",""],["She fills in the private info form in her app","Church setup, documents, any legal matters: stays on her phone until she sends it"],["Decide the grant route: nonprofit, church recognition or fiscal sponsor","Most grants exclude LLCs"],["Ad-policy check on every product before any ad","Psilocybin / sacrament products can't be advertised on Meta or TikTok"],["Confirm Shopify vs. Spotify shop","Spotify merch only works for Spotify for Artists profiles"],["Set up her own Claude account + one Project per business","At kickoff"],["iDesignEvents: inventory + rebrand-or-sell decision",""],["Month 2 payment","Due Nov 19"]],
+ upd:[["Oct 13","Her app now opens with a Read this first: warnings and risks section (can / can't / what could go wrong for each task), linked from every task"],["Oct 13","Her app now has the 4 tasks with How steps, ad rules, a starter grant list, document + blocker checklists, private intake form and Claude prompts"],["Oct 12","Month 1 paid; kickoff booked Mon Oct 19, 11:00 AM"]],
+ cmp:[],
+ faq:[["Can she advertise mushrooms?","Culinary/functional with no health claims: yes. Psilocybin/psychedelics/sacrament: never, on any platform."],["Can her LLC get grants?","Rarely. Nonprofit, recognized church, or fiscal sponsor route."],["Where does her private info go?","Only her phone, until she taps Send (opens her own text/email)."]]}
+];
+var KEY="ssai-manage-v1", S={}; try{ S=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){}
+S.ck=S.ck||{}; S.cmp=S.cmp||{}; S.cmpDone=S.cmpDone||{}; S.tab=S.tab||{};
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+function esc(t){ return String(t).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+var TABS=[["todo","✅ To-dos"],["upd","🗞️ Updates"],["cmp","🛠️ Complaints"],["faq","❓ FAQ"],["links","📲 Apps"]];
+function pane(c,t){
+ if(t==="links") return "<div class='links'>"+c.links.map(function(l){ return "<a"+(l[2]?" class='app'":"")+" href='"+l[1]+"'>"+esc(l[0])+"</a>"; }).join("")+"</div><p class='note'>The 📲 link is the owner's own Home Screen app. Text it to them.</p>";
+ if(t==="todo") return "<ul class='ck'>"+c.todo.map(function(x,i){ var id=c.id+"_"+i, dn=!!(S.ck[id]||x[2]); return "<li"+(dn?" class='done'":"")+"><input type='checkbox' data-ck='"+id+"' id='"+id+"'"+(dn?" checked":"")+(x[2]?" disabled":"")+"><label for='"+id+"'><b>"+esc(x[0])+"</b>"+(x[1]?"<small>"+esc(x[1])+"</small>":"")+"</label></li>"; }).join("")+"</ul>";
+ if(t==="upd") return c.upd.map(function(u){ return "<div class='u'><time>"+esc(u[0])+"</time>"+esc(u[1])+"</div>"; }).join("");
+ if(t==="faq") return c.faq.map(function(f){ return "<details><summary>"+esc(f[0])+"</summary><p>"+esc(f[1])+"</p></details>"; }).join("");
+ var mine=(S.cmp[c.id]||[]), all=c.cmp.map(function(x,i){ return {t:x[0],d:x[1],s:S.cmpDone[c.id+"_b"+i]?"done":x[2],n:x[3],k:c.id+"_b"+i}; }).concat(mine.map(function(x,i){ return {t:x.t,d:x.d,s:S.cmpDone[c.id+"_m"+i]?"done":"open",n:x.n,k:c.id+"_m"+i}; }));
+ return (all.length?all.map(function(x){ return "<div class='cp'><b>"+esc(x.t)+"<span class='tag "+x.s+"'>"+(x.s==="done"?"resolved":"open")+"</span>"+(x.s==="open"?"<button class='mini' data-res='"+x.k+"'>Mark resolved</button>":"")+"</b><small>"+esc(x.d)+(x.n?" · "+esc(x.n):"")+"</small></div>"; }).join(""):"<p class='note'>No complaints logged.</p>")+
+  "<form class='add' data-add='"+c.id+"'><input name='t' placeholder='Log a complaint or issue' required><input name='n' placeholder='Notes / what we did (optional)'><button>Add</button></form>";
+}
+function openCount(c){ var n=c.todo.filter(function(x,i){ return !x[2]&&!S.ck[c.id+"_"+i]; }).length; return n; }
+function issueCount(c){ var n=c.cmp.filter(function(x,i){ return x[2]!=="done"&&!S.cmpDone[c.id+"_b"+i]; }).length; (S.cmp[c.id]||[]).forEach(function(x,i){ if(!S.cmpDone[c.id+"_m"+i]) n++; }); return n; }
+function render(){
+ document.getElementById("clients").innerHTML=CL.map(function(c){ var t=S.tab[c.id]||"todo", o=openCount(c), d=c.todo.length-o;
+  return "<section class='client' id='"+c.id+"'><div class='ch'><div class='av'>"+c.av+"</div><div><h2>"+esc(c.owner)+"</h2><p>"+esc(c.biz)+"</p><div class='prog' style='width:160px'><i style='width:"+Math.round(100*d/c.todo.length)+"%'></i></div></div><span class='st "+c.cls+"'>"+esc(c.st)+"</span></div>"+
+  "<div class='tabs' role='tablist'>"+TABS.map(function(x){ var lab=x[1]+(x[0]==="todo"?" ("+o+")":x[0]==="cmp"?" ("+issueCount(c)+")":""); return "<button role='tab' data-c='"+c.id+"' data-t='"+x[0]+"' aria-selected='"+(t===x[0])+"'>"+lab+"</button>"; }).join("")+"</div><div class='pane' role='tabpanel'>"+pane(c,t)+"</div></section>"; }).join("");
+ document.getElementById("sClients").textContent=CL.length;
+ document.getElementById("sOpen").textContent=CL.reduce(function(a,c){ return a+openCount(c); },0);
+ document.getElementById("sIssues").textContent=CL.reduce(function(a,c){ return a+issueCount(c); },0);
+}
+document.addEventListener("click",function(e){ var b=e.target.closest("[data-t]"); if(b){ S.tab[b.dataset.c]=b.dataset.t; save(); render(); return; }
+ var r=e.target.closest("[data-res]"); if(r){ e.preventDefault(); S.cmpDone[r.dataset.res]=1; save(); render(); } });
+document.addEventListener("change",function(e){ var k=e.target.getAttribute("data-ck"); if(!k) return; S.ck[k]=e.target.checked; save(); render(); });
+document.addEventListener("submit",function(e){ var f=e.target.closest("[data-add]"); if(!f) return; e.preventDefault(); var id=f.dataset.add; (S.cmp[id]=S.cmp[id]||[]).push({t:f.t.value.trim(),n:f.n.value.trim(),d:new Date().toLocaleDateString()}); save(); render(); });
+if(location.hash){ var c=location.hash.slice(1); if(CL.some(function(x){return x.id===c;})) setTimeout(function(){ var el=document.getElementById(c); if(el) el.scrollIntoView(); },50); }
+render();
+</script>
+<script src="backoffice.js?v=bo1"></script>
+</body>
+</html>

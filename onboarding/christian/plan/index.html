@@ -62,7 +62,8 @@ ul{margin:6px 0 0;padding-left:20px}li{margin:6px 0}
 <span class="pill">Start here · about 10 minutes</span>
 <h2 id="tsh">🍞 Set up your reward buttons in Toast</h2>
 <p class="s" style="margin:0">Until Toast approves the full connection (about 30 days), guests redeem with a live pass on their phone and your server taps one of these buttons in Toast. Antidote can do it with you on a call.</p>
-<div class="rt" role="group" aria-label="Restaurant"><button type="button" class="m" data-r="m" aria-pressed="true">✈️ Melody · 5 buttons</button><button type="button" class="n" data-r="n" aria-pressed="false">🏄 Nalu Vida · 4 buttons</button></div>
+<div class="rt" role="group" aria-label="Restaurant"><button type="button" class="m" data-r="m" aria-pressed="true">✈️ Melody · 5 buttons ✅</button><button type="button" class="n" data-r="n" aria-pressed="false">🏄 Nalu Vida · 4 buttons</button></div>
+<p id="tsStat" style="margin:8px 0;font-weight:800"></p>
 <table id="tsBtns"></table>
 <p class="note" style="margin-top:2px">Free-item buttons take 100% off <b>one</b> item: the server picks the item on the check first, then taps the button. Never use them for alcohol (California ABC).</p>
 <div id="tsSteps"></div>
@@ -229,6 +230,8 @@ ul{margin:6px 0 0;padding-left:20px}li{margin:6px 0}
 (function(){
 var B={m:[["App Reward – Free Soft Drink or Melody Fries","100% off 1 item","250 pts"],["App Reward – Free Starter","100% off 1 item","500 pts"],["App Reward – $10 Off","$10 off check","1,000 pts"],["App Reward – Free Entrée","100% off 1 item","1,500 pts"],["App – Just Landed 10% Off","10% off check","first order"]],
 n:[["App Reward – Free Mocktail/Soft Drink/Jungle Fries","100% off 1 item","250 pts"],["App Reward – Free Shareable","100% off 1 item","500 pts"],["App Reward – $10 Off","$10 off check","1,000 pts"],["App Reward – Free Entrée","100% off 1 item","1,500 pts"]]};
+// Toast status per restaurant: Melody's 5 buttons are set up (Antidote confirmed 2026-10-12). Nalu Vida: not confirmed yet.
+var TS={m:["done","✅ Done: all 5 buttons are set up in Melody's Toast (confirmed Oct 12, 2026)."],n:["tbd","⏳ TBD: not confirmed yet that Nalu Vida's 4 buttons are in Toast."]};
 var NAME={m:"Melody",n:"Nalu Vida"}, PR={m:"../../../melody/kit/toast-interim.html",n:"../../../nalu-vida/kit/toast-interim.html"};
 var STEPS=[["Sign in to Toast Web","On a computer, go to toasttab.com and log in with a manager or owner account."],
 ["Open Discounts & promo codes","Finance › Related › Settings › <b>Discounts &amp; promo codes</b> (on some accounts: Payments › Comps and promos › Discounts and promo codes)."],
@@ -243,7 +246,8 @@ function draw(){
   document.getElementById("tsBtns").innerHTML=B[cur].map(function(b,i){ return "<tr><td style='width:22px;font-weight:900'>"+(i+1)+"</td><td><code>"+esc(b[0])+"</code></td><td style='white-space:nowrap;color:var(--dim)'>"+b[1]+"<br>"+b[2]+"</td></tr>"; }).join("");
   document.getElementById("tsSteps").innerHTML=STEPS.map(function(x,i){ var k=cur+i; return "<div class='sp'><input type='checkbox' id='ts"+k+"' data-k='"+k+"'"+(st[k]?" checked":"")+"><label for='ts"+k+"'><b class='t'>"+(i+1)+". "+x[0]+"</b>"+x[1]+"</label></div>"; }).join("");
   document.getElementById("tsPrint").href=PR[cur];
-  var all=STEPS.every(function(x,i){ return st[cur+i]; }); document.getElementById("tsDone").hidden=!all; document.getElementById("tsDoneR").textContent=NAME[cur];
+  var ts=document.getElementById("tsStat"); ts.textContent=TS[cur][1]; ts.style.color=TS[cur][0]==="done"?"#7dffb5":"#ffd79a";
+  var all=TS[cur][0]==="done"||STEPS.every(function(x,i){ return st[cur+i]; }); document.getElementById("tsDone").hidden=!all; document.getElementById("tsDoneR").textContent=NAME[cur];
 }
 document.querySelectorAll("#toast-setup .rt button").forEach(function(b){ b.onclick=function(){ cur=b.dataset.r; document.querySelectorAll("#toast-setup .rt button").forEach(function(x){ x.setAttribute("aria-pressed",x===b?"true":"false"); }); draw(); }; });
 document.getElementById("tsSteps").addEventListener("change",function(e){ var k=e.target.dataset.k; if(!k) return; st[k]=e.target.checked; try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(err){} draw(); });

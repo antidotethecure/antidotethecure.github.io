@@ -90,7 +90,7 @@ function api(body){
   if(!API) return Promise.resolve({ok:false,reason:"Backend not connected yet."});
   return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(body)}).then(function(r){ return r.json(); }).catch(function(){ return {ok:false,reason:"Can't reach the backend. Check the connection."}; });
 }
-function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=lb2"; s.onload=cb; document.head.appendChild(s); }
+function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=dd1"; s.onload=cb; document.head.appendChild(s); }
 if(TEST) $("testBar").hidden=false; else if(!API) $("notConn").hidden=false;
 try{ TOKEN=sessionStorage.getItem(TKEY); }catch(e){}
 $("lf").onsubmit=function(ev){ ev.preventDefault(); var b=$("go"); b.disabled=true; b.textContent="Checking…"; $("lerr").textContent="";
@@ -134,9 +134,14 @@ function overview(){ var f=F(), t=Date.now(), td=ymd(t), w=t-7*DAY, mo=t-30*DAY,
 function table(head,rows,numCols){ numCols=numCols||[]; return "<div class='tw'><table><thead><tr>"+head.map(function(x,i){ return "<th"+(numCols.indexOf(i)>=0?" class='n'":"")+">"+x+"</th>"; }).join("")+"</tr></thead><tbody>"+
   (rows.length?rows.map(function(r){ return "<tr>"+r.map(function(c,i){ return "<td"+(numCols.indexOf(i)>=0?" class='n'":"")+">"+c+"</td>"; }).join("")+"</tr>"; }).join(""):"<tr><td colspan='"+head.length+"' class='note'>Nothing yet.</td></tr>")+"</tbody></table></div>"; }
 var MCOL=[["name","Name"],["card","Card ID"],["slug",""],["email","Email"],["phone","Phone"],["stars","Balance",1],["earned","Earned",1],["spent","Used",1],["redeems","Rewards used",1],["visits","Visits",1],["gamePts","Game pts",1],["joined","Joined"],["last","Last active"],["refBy","Referred by"],["friends","Friends",1],["sms","Deal texts"],["bday","Birthday"]];
+function dupCount(){ var all=(DATA&&DATA.members)||[], seen={}, n=0; all.slice().sort(function(a,b){ return (+a.joined||0)-(+b.joined||0); }).forEach(function(m){ if(m.signupOnly) return;
+  var k=[], p=String(m.phone||"").replace(/\D/g,"").slice(-10), e=String(m.email||"").trim().toLowerCase(); if(p.length===10) k.push(m.slug+"|p|"+p); if(e) k.push(m.slug+"|e|"+e);
+  if(k.some(function(x){ return seen[x]; })) n++; else k.forEach(function(x){ seen[x]=1; }); }); return n; }
+var DUPARM=0;
 function members(){ var f=F(), q=Q.toLowerCase(), list=f.mem.filter(function(m){ return !q||(m.name+" "+m.email+" "+m.phone+" "+m.ref+" "+(m.card||"")).toLowerCase().indexOf(q)>=0; });
   list.sort(function(a,b){ var x=a[SORT.k],y=b[SORT.k]; return (x>y?1:x<y?-1:0)*SORT.d; });
   return "<div class='row' style='margin:10px 0'><input type='search' id='q' placeholder='Search name, card ID (MLD-…), email, phone' value='"+esc(Q)+"' aria-label='Search members'><button class='btn sm' id='csv'>⬇︎ CSV</button></div>"+
+    (dupCount()?"<div class='card' style='margin:0 0 10px;border-color:#f5c518'><b>⚠️ "+n(dupCount())+" duplicate membership"+(dupCount()>1?"s":"")+"</b><p class='note' style='margin:4px 0 8px'>Same restaurant + same phone or email. Keeps each guest's FIRST sign-up (their card ID stays), removes the newer copies. The member list is backed up first and it's logged in the audit log.</p><button class='btn sm' id='dedupe'>"+(DUPARM>Date.now()?"Tap again to remove "+n(dupCount()):"🧹 Remove duplicates")+"</button> <span class='note' id='dedupeOut'></span></div>":"")+
     "<p class='note'>"+n(list.length)+" members"+(R==="all"?" at both restaurants":"")+". Tap a column to sort. Private: don't share screenshots of this list.</p>"+
     "<div class='tw'><table><thead><tr>"+MCOL.map(function(c){ return "<th data-sort='"+c[0]+"'"+(c[2]?" class='n'":"")+">"+c[1]+(SORT.k===c[0]?(SORT.d>0?" ▲":" ▼"):"")+"</th>"; }).join("")+"</tr></thead><tbody>"+
     list.map(function(m){ return "<tr><td>"+esc(m.name)+(m.signupOnly?" <span class='tag p'>sign-up only</span>":"")+"</td><td class='cid'>"+(m.card?"<code>"+esc(m.card)+"</code>":"<span class='note'>next sync</span>")+"</td><td>"+tagR(m.slug)+"</td><td>"+(m.email?"<a href='mailto:"+esc(m.email)+"'>"+esc(m.email)+"</a>":"—")+"</td><td>"+(m.phone?"<a href='tel:"+esc(String(m.phone).replace(/[^\d+]/g,""))+"'>"+esc(m.phone)+"</a>":"—")+"</td>"+
@@ -285,7 +290,8 @@ function links(){ var h="<div class='card links'><a href='../../onboarding/chris
   return h; }
 function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY;
   p.innerHTML={overview:overview,members:members,rewards:rewards,scout:scout,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links}[TAB]();
-  if(TAB==="members"){ var q=$("q"); q.oninput=function(){ Q=q.value; var pos=q.selectionStart; draw(); var q2=$("q"); q2.focus(); try{ q2.setSelectionRange(pos,pos); }catch(e){} }; $("csv").onclick=csv;
+  if(TAB==="members"){ var q=$("q"); q.oninput=function(){ Q=q.value; var pos=q.selectionStart; draw(); var q2=$("q"); q2.focus(); try{ q2.setSelectionRange(pos,pos); }catch(e){} }; $("csv").onclick=csv; var dd=$("dedupe"); if(dd) dd.onclick=function(){ if(DUPARM<Date.now()){ DUPARM=Date.now()+6000; draw(); setTimeout(function(){ if(DUPARM&&DUPARM<Date.now()){ DUPARM=0; draw(); } },6100); return; }
+    DUPARM=0; dd.disabled=true; dd.textContent="Removing…"; api({type:"bo_dedupe",token:TOKEN}).then(function(r){ if(r&&r.ok){ $("dedupeOut").textContent="✅ Removed "+n(r.removed)+". Refreshing…"; load(); } else { dd.disabled=false; dd.textContent="🧹 Remove duplicates"; $("dedupeOut").textContent=(r&&r.reason)||"Didn't work. Try again."; } }); };
     p.querySelectorAll("[data-sort]").forEach(function(th){ th.onclick=function(){ var k=th.dataset.sort; SORT={k:k,d:SORT.k===k?-SORT.d:-1}; draw(); }; }); }
   p.querySelectorAll("[data-led]").forEach(function(box){ var hid=$(box.dataset.led), up=function(){ var a=[], sum=0; box.querySelectorAll(".row").forEach(function(r){ var nm=r.querySelector(".li").value.trim(), v=parseInt(r.querySelector(".ln").value,10); if(nm&&v>0){ a.push([nm,v]); sum+=v; } });
     hid.value=JSON.stringify(a); var su=box.querySelector("[data-sum]"); if(su) su.textContent=/slices/.test(box.dataset.led)?"Total: "+sum+"%"+(sum===100?" ✓":" (must be 100)"):a.reduce(function(x,y){ return x+y[1]; },0)+" winner(s) in all"; };

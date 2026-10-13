@@ -200,6 +200,8 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
 .xa-m.art{display:grid;place-items:center;font-size:64px;line-height:1}
 .xa-m.ice{background:radial-gradient(90% 70% at 50% 35%,rgba(255,143,196,.38),transparent 65%),linear-gradient(160deg,#0d1d40,#163a8a)}
 .xa-m.food{background:radial-gradient(90% 70% at 50% 35%,rgba(255,176,46,.38),transparent 65%),linear-gradient(160deg,#1a1230,#7a2e12)}
+.xa-m.auto{background:radial-gradient(90% 70% at 50% 35%,rgba(255,122,26,.40),transparent 65%),linear-gradient(160deg,#0b1222,#13406b)}
+.xa-m.law{background:radial-gradient(90% 70% at 50% 35%,rgba(214,178,94,.38),transparent 65%),linear-gradient(160deg,#121a2e,#3a2a12)}
 .xa-m.art span{filter:drop-shadow(0 8px 24px rgba(0,0,0,.6))}
 .xa-m.art img.xa-ic{width:92px;height:92px;display:block;filter:drop-shadow(0 10px 24px rgba(0,0,0,.55))}
 .xa-tag{position:absolute;top:8px;left:8px;z-index:1;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:rgba(3,6,14,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(63,169,255,.55);border-radius:99px;padding:3px 8px;max-width:calc(100% - 16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -220,6 +222,13 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
 .tk .hd span{font-size:40px;line-height:1}
 .tk.ice{border-color:rgba(255,126,182,.55);background:radial-gradient(120% 90% at 100% 0,rgba(255,143,196,.14),transparent 60%),linear-gradient(180deg,var(--panel2),var(--panel))}
 .tk.food{border-color:rgba(255,154,60,.55);background:radial-gradient(120% 90% at 100% 0,rgba(255,176,46,.14),transparent 60%),linear-gradient(180deg,var(--panel2),var(--panel))}
+.tk.auto{border-color:rgba(255,122,26,.55);background:radial-gradient(120% 90% at 100% 0,rgba(255,122,26,.14),transparent 60%),linear-gradient(180deg,var(--panel2),var(--panel))}
+.tk.shop{border-color:rgba(45,226,255,.5);background:radial-gradient(120% 90% at 100% 0,rgba(45,226,255,.12),transparent 60%),linear-gradient(180deg,var(--panel2),var(--panel))}
+.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 0 12px}
+.cats a{display:flex;gap:10px;align-items:center;border:1px solid var(--edge);border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.03);color:var(--ink);text-decoration:none;font-weight:800;font-size:14px;line-height:1.2}
+.cats a span{font-size:26px;line-height:1}
+.cats a small{display:block;font-weight:500;color:var(--dim);font-size:12px}
+@media (min-width:640px){.cats{grid-template-columns:repeat(4,1fr)}}
 .tk ul{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:6px}
 .tk li{position:relative;padding-left:28px;font-size:15px;line-height:1.35}
 .tk li i{position:absolute;left:0;top:0;font-style:normal}
@@ -256,6 +265,8 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
     <nav class="menu" aria-label="Sections">
       <a href="#apps"><span>🚀</span>Demo apps</a>
       <a href="#trucks"><span>🍦</span>Truck apps</a>
+      <a href="#auto"><span>🔧</span>Auto apps</a>
+      <a href="#legal-apps"><span>⚖️</span>Legal apps</a>
       <a href="#plans"><span>💳</span>Plans &amp; prices</a>
       <a href="#market"><span>⚖️</span>Cost elsewhere</a>
       <a href="#run"><span>🧰</span>Our running costs</a>
@@ -271,11 +282,19 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
   </section>
 
   <section class="s" id="apps"><header><p class="kick">Demo apps · sample builds</p><h2 class="chrome">Apps we've built</h2><p class="lead">Each one is built around the business's real menu, with a game themed to their food. Tap one and play. Yours gets the same treatment.</p><p class="note" style="margin-top:8px"><b>These are demo samples</b> made to show what we build. <b>Melody Bar &amp; Grill</b> is the first one getting ready to launch; Nalu Vida and the rest are still in the works and not live yet.</p></header>
+    <div class="cats" aria-label="Apps by business type">
+      <a href="#apps" data-cat="rest"><span>🍽️</span><div>Restaurants<small>Menu, game, rewards</small></div></a>
+      <a href="#trucks"><span>🚚</span><div>Trucks<small>Ice cream + food trucks</small></div></a>
+      <a href="#auto"><span>🔧</span><div>Automotive<small>Mechanics + auto shops</small></div></a>
+      <a href="#legal-apps"><span>⚖️</span><div>Legal<small>Court dates + clients</small></div></a>
+    </div>
     <div class="xf" id="xFilter" role="group" aria-label="Filter apps">
-      <button type="button" data-f="all" aria-pressed="true">All<i>8</i></button>
+      <button type="button" data-f="all" aria-pressed="true">All<i>10</i></button>
       <button type="button" data-f="rest" aria-pressed="false">🍽️ Restaurants<i>6</i></button>
       <button type="button" data-f="full" aria-pressed="false">✨ Full package<i>2</i></button>
       <button type="button" data-f="truck" aria-pressed="false">🚚 Trucks<i>2</i></button>
+      <button type="button" data-f="auto" aria-pressed="false">🔧 Automotive<i>1</i></button>
+      <button type="button" data-f="legal" aria-pressed="false">⚖️ Legal<i>1</i></button>
     </div>
     <div class="xg" id="xGrid">
       <a class="xa" data-k="rest" href="../demo/storm-burger/"><div class="xa-m"><img src="../demo/storm-burger/img/classic.jpg" alt="StormBurger classic burger" width="720" height="720" loading="lazy" decoding="async"><span class="xa-tag">Demo sample</span></div><div class="xa-b"><b>⚡ StormBurger</b><small>Inglewood · Long Beach</small><span class="g">"Storm Run" driving game</span><span class="xa-go">Open app →</span></div></a>
@@ -286,6 +305,8 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
       <a class="xa" data-k="rest full" href="../demo/nalu-vida/"><div class="xa-m"><img src="../demo/nalu-vida/img/hero.jpg" alt="Nalu Vida beach bar" width="1200" height="1500" loading="lazy" decoding="async"><span class="xa-tag">🛠️ In the works</span></div><div class="xa-b"><b>🏄 Nalu Vida</b><small>Venice Pier · beach bar</small><span class="g">"Ride the Nalu" surf game</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="truck" href="../ice-cream/demo/"><div class="xa-m art ice" aria-hidden="true"><img class="xa-ic" src="../ice-cream/demo/icon-192.png?v=20261013a" alt="" width="92" height="92"><span class="xa-tag">Demo sample · Trucks</span></div><div class="xa-b"><b>🚚 Ice Cream Trucks</b><small>Live truck map + ETA</small><span class="g">"Truck's on your street" alerts</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="truck" href="../food-truck/demo/"><div class="xa-m art food" aria-hidden="true"><span>🌮</span><span class="xa-tag">Demo sample · Trucks</span></div><div class="xa-b"><b>🚚 Food Trucks</b><small>Live map + order ahead</small><span class="g">Food ready hot when you arrive</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa" data-k="auto" href="../demo/mechanic/"><div class="xa-m art auto" aria-hidden="true"><img class="xa-ic" src="../demo/mechanic/icon-192.png?v=20261013c" alt="" width="92" height="92"><span class="xa-tag">Demo sample · Automotive</span></div><div class="xa-b"><b>🔧 Carlos' Mobile Mechanic</b><small>Tap your car, get a quote</small><span class="g">OBD-II scan + recalls + booking</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa" data-k="legal" href="https://antidotethecure.github.io/court-companion/"><div class="xa-m art law" aria-hidden="true"><span>⚖️</span><span class="xa-tag">Demo sample · Legal</span></div><div class="xa-b"><b>⚖️ Court Companion</b><small>Sample client · fake case</small><span class="g">Court dates, reminders, lawyer tasks</span><span class="xa-go">Open app →</span></div></a>
     </div>
 
     <div class="card" id="try"><h3>📱 Try one right here</h3><p class="note" style="margin:4px 0 10px">It's a working demo: scroll it, play the game, try the club.</p>
@@ -298,6 +319,7 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
         <button type="button" data-src="../demo/nalu-vida/" aria-pressed="false">🏄 Nalu Vida</button>
         <button type="button" data-src="../ice-cream/demo/" aria-pressed="false">🍦 Ice cream truck</button>
         <button type="button" data-src="../food-truck/demo/" aria-pressed="false">🚚 Food truck</button>
+        <button type="button" data-src="../demo/mechanic/" aria-pressed="false">🔧 Mechanic</button>
       </div>
       <div class="xph"><div class="notch"></div><div class="scr"><iframe id="xPh" title="Demo app preview" src="../demo/storm-burger/" loading="lazy" allow="geolocation"></iframe></div></div>
     </div>
@@ -351,6 +373,20 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
         <div class="btns"><a class="btn primary" href="../food-truck/demo/">📍 Try the customer app</a><a class="btn ghost" href="../food-truck/">Owner tour →</a></div>
       </div>
     </div>
+    <div class="card tk food" id="food-truck-marketing"><h3>📣 Food trucks: keep fans coming to the window</h3>
+      <p class="note" style="margin:4px 0 10px">Everything your customers need to find you, plus reasons to show up today.</p>
+      <div class="xin">
+        <div><b>📍 Today's spot + hours</b>Where you're parked, what time you open and close, and tomorrow's stops.</div>
+        <div><b>🏷️ Deals board</b>Post today's specials and combos. Change them from your phone in seconds.</div>
+        <div><b>⏰ Happy hour window</b>"Come between 3 and 5 for a free drink or 15% off." Only counts inside the window.</div>
+        <div><b>🔔 "We're parked" alerts</b>Fans near your stop get a text or alert when you open, or when happy hour starts.</div>
+        <div><b>🎮 Your own game</b>A quick game with your truck logo and your real menu items. A weekly top score wins a free item.</div>
+        <div><b>🎁 Points + rewards</b>Points on every order. They unlock free items you pick.</div>
+        <div><b>🔥 Order ahead</b>Food comes off the grill as they walk up. Ordering ahead comes with Double Scoop and up.</div>
+        <div><b>⭐ Reviews + followers</b>One-tap Google review and IG follow after they eat.</div>
+      </div>
+      <p class="note" style="margin:10px 0 0">Coming to the demo: happy hour window and the branded game. The rest is in the <a href="../food-truck/demo/">food truck app</a> now.</p>
+    </div>
     <div class="card"><h3>Truck plans</h3>
       <div class="xtp">
         <div><small>🍦 Single Scoop</small><b>$99</b>then $29/mo · 1 truck</div>
@@ -359,6 +395,59 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
       </div>
       <p class="note" style="margin:10px 0 0">Same plans for ice cream trucks and food trucks. Ordering ahead is included from Double Scoop up.</p>
       <div class="btns"><a class="btn primary" href="../demo/start/?type=foodtruck">🚚 Set up my truck</a><a class="btn ghost" href="sms:+14243094068?&amp;body=Hi%20Antidote%2C%20I%20run%20a%20truck%20and%20want%20the%20truck%20app">💬 Text Antidote</a></div>
+    </div>
+  </section>
+
+  <section class="s" id="auto"><header><p class="kick">Automotive · mechanics · auto shops</p><h2 class="chrome">Fix cars? Fill the bays.</h2><p class="lead">Customers tap the part of their car that's wrong, see a sample quote and book a time. You get the job with the year, make, model, VIN and trouble codes already filled in.</p></header>
+    <div class="tks">
+      <div class="card tk auto" id="mobile-mechanic">
+        <div class="hd"><span aria-hidden="true">🚐</span><div><h3>Mobile Mechanics</h3><p class="note" style="margin:2px 0 0">"Tap your car, get a quote"</p></div></div>
+        <ul>
+          <li><i>🚗</i>Every year, make and model, or decode the VIN in one tap</li>
+          <li><i>🩺</i>Scan my car: plug-in OBD-II reader or type the check-engine code</li>
+          <li><i>⚠️</i>Recalls and the top known problems for that exact car</li>
+          <li><i>🧾</i>Sample quote: parts + labor, before you drive over</li>
+          <li><i>📅</i>Book a slot and track the repair: on the way, working, done</li>
+        </ul>
+        <div class="btns"><a class="btn primary" href="../demo/mechanic/">🔧 Try the customer app</a><a class="btn ghost" href="../demo/mechanic/shop/">Shop view →</a></div>
+      </div>
+      <div class="card tk shop" id="auto-shop">
+        <div class="hd"><span aria-hidden="true">🏁</span><div><h3>Auto Shops</h3><p class="note" style="margin:2px 0 0">Your shop's own app, your logo</p></div></div>
+        <ul>
+          <li><i>👀</i>Shop view: every request with the car, codes and quote attached</li>
+          <li><i>🔩</i>Parts list per job, with a call script for your parts store</li>
+          <li><i>🧰</i>"My Garage": customers save their cars and service history</li>
+          <li><i>🌐</i>English + Español built in</li>
+          <li><i>📱</i>No download: scan the QR sticker and it opens</li>
+        </ul>
+        <div class="btns"><a class="btn primary" href="../demo/mechanic/shop/">👀 See the shop view</a><a class="btn ghost" href="sms:+14243094068?&amp;body=Hi%20Antidote%2C%20I%20run%20an%20auto%20shop%20and%20want%20the%20mechanic%20app">💬 Text Antidote</a></div>
+      </div>
+    </div>
+    <div class="card"><h3>📣 Marketing that brings cars back</h3>
+      <div class="xin">
+        <div><b>🛢️ Service reminders</b>"Your oil change is due" texts, by mileage or by months.</div>
+        <div><b>⚠️ Recall alerts</b>Tell customers when their car has an open recall, then book the visit.</div>
+        <div><b>⭐ Review after every job</b>One-tap Google review request when the car is done.</div>
+        <div><b>🤝 Referral rewards</b>Customers earn credit when a friend books.</div>
+        <div><b>🌧️ Season pushes</b>A/C before summer, batteries and wipers before winter, brakes before road trips.</div>
+        <div><b>🎥 Before/after reels</b>Short repair clips for IG, TikTok and Facebook in your brand.</div>
+        <div><b>🏷️ Your brand</b>Your logo, colors and shop name on the app, stickers and texts.</div>
+        <div><b>📇 Your customer list</b>Every car and owner saved: who's due, who hasn't been back.</div>
+      </div>
+      <p class="note" style="margin:10px 0 0">Mechanic pricing is set per shop. Text Antidote for a quote.</p>
+    </div>
+  </section>
+
+  <section class="s" id="legal-apps"><header><p class="kick">Legal · lawyers · bail bonds</p><h2 class="chrome">Clients who show up to court.</h2><p class="lead">A phone app for your clients: every court date, reminders before each one, the courthouse address and what to bring, plus tasks from their lawyer.</p></header>
+    <div class="card tk" id="court-companion">
+      <div class="hd"><span aria-hidden="true">⚖️</span><div><h3>Court Companion</h3><p class="note" style="margin:2px 0 0">Sample client, fake case, for demo only</p></div></div>
+      <ul>
+        <li><i>📅</i>Court dates with reminders before each one</li>
+        <li><i>📍</i>Courthouse directions and tap-to-call</li>
+        <li><i>✅</i>Lawyer task checklist the client can follow</li>
+        <li><i>🏷️</i>Can carry a law firm's or bail bond company's brand</li>
+      </ul>
+      <div class="btns"><a class="btn primary" href="https://antidotethecure.github.io/court-companion/">⚖️ Try the sample app</a></div>
     </div>
   </section>
 

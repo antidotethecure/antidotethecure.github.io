@@ -23,7 +23,11 @@
    - SCOUT (Code.gs): every redemption / claim carries an event id (eid = the pass code / claim id, reused on retries and
      queue uploads), the phone id and a receipt-photo fingerprint. The server rejects duplicates BEFORE points move (same
      event, same pass code, same check # + date, same total from another member within 10 min, same receipt photo, double
-     taps) with reason "Already counted"; the guest sees a friendly "already added, nothing changed" message. */
+     taps) with reason "Already counted"; the guest sees a friendly "already added, nothing changed" message.
+   - ONE CODE PER VISIT · ONE PRIZE PER DAY (2026-10-13, standard): each pass gets a fresh one-time code that dies when its
+   10-minute countdown ends (the server issues / confirms it and returns {code, exp}); one prize per member and per phone per
+   LA day across rewards, early-bird gifts and game / spin wins. A 2nd one shows "Come back tomorrow · next prize available
+   tomorrow" (server answer {prizeDay:true}); the same rule runs on the phone (m.pday) so it also holds offline. */
 (function () {
   "use strict";
   var CRM = window.SSAI_CRM, R = window.SSAI_REWARDS || {};
@@ -51,7 +55,7 @@
   // ---- backend (Apps Script). POST text/plain = a "simple" request, so the JSON answer is readable cross-origin. ----
   function api(body) {
     if (!I.api) return Promise.resolve(null);
-    body.restaurant = NAME; body.slug = CRM.slug;
+    body.restaurant = NAME; body.slug = CRM.slug; if (CRM.dev && !body.dev) body.dev = CRM.dev();
     return fetch(I.api, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
       .then(function (r) { return r.json(); }).catch(function () { return null; });
   }
@@ -124,16 +128,21 @@
     l.redeems.forEach(function (r) { if (r.status === "live" && r.exp <= now) { r.status = "used"; ch = true; } });
     if (ch) store(l); return ch;
   }
+  function tomorrowStr() { var d = new Date(Date.now() + 864e5); return d.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" }); }
+  function tomorrowSheet(what, code, after) {
+    return sheet('<h3>🌙 Come back tomorrow</h3><p><b>One code per visit, one prize per day.</b> ' + (what ? 'You already got <b>' + e(what) + '</b>' + (code ? ' (' + e(code) + ')' : '') + ' today.' : 'Today\'s prize is already used.') + '</p>' +
+      '<p class="ir-card" style="margin-top:10px">⏭️ <b>Next prize available tomorrow</b> (' + e(tomorrowStr()) + ')' + (after ? '. ' + after : '. Your points stay in your balance.') + '</p>' +
+      '<button type="button" class="ir-go" data-ir="x">OK</button>');
+  }
+  function markPrize(m) { if (m && CRM.pday) { m.pday = CRM.pday(); CRM.save(m); } }
   function redeem(i) {
     var m = CRM.member(), t = tier(i); if (!m || !t) return;
     sweep();
     var live = activePass(); if (live) { openPass(live.code); return; }
     if ((m.stars || 0) < t.pts) { CRM.toast("You need " + (t.pts - (m.stars || 0)).toLocaleString() + " more points"); return; }
     var used = memberRedeems(m, day());
-    if (used.length >= I.redeemsPerDay) {
-      sheet('<h3>One reward per visit</h3><p>You already used <b>' + e(used[0].reward) + '</b> today (' + e(used[0].code) + '). Your next reward can be used tomorrow.</p><button type="button" class="ir-go" data-ir="x">OK</button>');
-      return;
-    }
+    if (used.length >= I.redeemsPerDay) { tomorrowSheet(used[0].reward, used[0].code); return; }
+    if (CRM.prizeUsedToday && CRM.prizeUsedToday()) { tomorrowSheet(""); return; }
     var ov = sheet('<h3>Use ' + e(t.name) + '?</h3>' +
       '<p style="font-size:17px"><b>Show this to your server. It can only be used once and expires in ' + I.passMinutes + ' minutes.</b></p>' +
       '<p class="ir-fine">' + t.pts.toLocaleString() + ' points come off your balance now. Open it when you\'re ready to order or pay, with your server at the table.</p>' +
@@ -143,10 +152,12 @@
       var c = code(), now = Date.now(), rec = { type: "interim_redeem", code: c, eid: c, dev: devId(), tier: t.i, reward: t.name, button: t.button, pts: t.pts, ts: now, exp: now + I.passMinutes * 60000,
         member: m.id, memberName: m.name, phone: m.phone || "", status: "live", day: day(now) };
       api(JSON.parse(JSON.stringify(rec))).then(function (r) {
+        if (r && r.prizeDay) { ov.remove(); markPrize(CRM.member()); tomorrowSheet(r.had || ""); return; }
         if (r && !r.ok) { btn.disabled = false; btn.textContent = "🎟️ Show my pass now"; ov.querySelector(".ir-err").textContent = why(r, "That reward can't be used right now."); return; }
+        if (r && r.code) c = rec.code = r.code;   // the server's one-time code is the one staff can check
         var l = load(); rec.synced = !!r; if (!r) queue(l, { type: "interim_redeem", code: c, eid: c, dev: rec.dev, tier: t.i, reward: t.name, button: t.button, pts: t.pts, ts: now, member: m.id, memberName: m.name, day: rec.day });
         l.redeems.unshift(rec); store(l);
-        m = CRM.member(); CRM.add(m, -t.pts, "🎟️ Used: " + t.name + " · " + c, "interim_redeem"); CRM.save(m);
+        m = CRM.member(); CRM.add(m, -t.pts, "🎟️ Used: " + t.name + " · " + c, "interim_redeem"); if (CRM.pday) m.pday = CRM.pday(); CRM.save(m);
         ov.remove(); openPass(c);
       });
     };
@@ -157,9 +168,10 @@
     if (passEl) closePass();
     var el = document.createElement("div"); el.className = "ir-pass"; el.setAttribute("role", "dialog"); el.setAttribute("aria-label", "Live reward pass");
     el.innerHTML = '<img src="' + e(I.logo) + '" alt="' + e(NAME) + '" onerror="this.style.display=\'none\'"><div class="ir-k">' + e(NAME) + ' · live reward</div>' +
-      '<div class="ir-rw">' + e(rec.reward) + '</div><div class="ir-clock" data-ir="clock"></div><div class="ir-cd" data-ir="cd"></div><div class="ir-stamp">USED / EXPIRED</div>' +
+      '<div class="ir-rw">' + e(rec.reward) + '</div><div class="ir-clock" data-ir="clock"></div><div class="ir-k" style="margin-top:4px">One-time code · expires in</div><div class="ir-cd" data-ir="cd"></div><div class="ir-stamp">USED / EXPIRED</div>' +
       '<div class="ir-code">' + e(rec.code) + '</div>' +
       '<div class="ir-srv">Server: ring the Toast button <b>‘' + e(rec.button) + '’</b>' + (rec.button.indexOf("$") < 0 ? ' on the item' : '') + ' and type code <b>' + e(rec.code) + '</b> as the reason.</div>' +
+      '<div class="ir-k" style="opacity:.85;letter-spacing:.06em;text-transform:none">Works once, this visit only · next prize available tomorrow</div>' +
       '<button type="button" class="ir-hide">Hide pass</button>';
     document.body.appendChild(el); passEl = el;
     el.querySelector(".ir-hide").onclick = closePass;
@@ -244,7 +256,7 @@
     return '<div class="ir-card"' + (dark ? ' style="text-align:left;margin:10px auto 0;max-width:420px"' : '') + '><b>⏳ Until Toast is connected</b><ol>' +
       '<li><b>Earn:</b> tap <b>\u201cAdd my visit\u201d</b> and snap your receipt. ' + PER + ' points per $1 before tip.</li>' +
       '<li><b>Redeem:</b> tap <b>\u201cUse reward\u201d</b> and show the live pass; your server taps the reward button in Toast. Works once, lasts ' + I.passMinutes + ' minutes.</li>' +
-      '<li>One reward and one receipt per visit.</li></ol>' +
+      '<li><b>One code per visit, one prize per day.</b> Each pass gets a fresh code that works once and expires after ' + I.passMinutes + ' minutes. One receipt per day too.</li></ol>' +
       '<span class="ir-fine">Automatic once Toast is switched on. Your points carry over.</span></div>';
   }
   // the Toast discount buttons the owner creates (ladder + Melody's Just Landed), same names as kit/toast-interim.html
@@ -256,7 +268,9 @@
   // ================= live-pass button on the rewards card =================
   function cardHTML(m) {
     sweep(); var live = activePass();
+    var done = !live && m && (memberRedeems(m, day()).length >= I.redeemsPerDay || (CRM.prizeUsedToday && CRM.prizeUsedToday()));
     return (live ? '<button type="button" class="ir-live" onclick="SSAI_INTERIM.openPass(\'' + e(live.code) + '\')">🎟️ Show my live pass · ' + mmss(live.exp - Date.now()) + ' left</button>' : '') +
+      (done ? '<div class="ir-card" data-ir="tomorrow">✅ <b>Today\'s prize is used.</b> Next prize available tomorrow (' + e(tomorrowStr()) + ').</div>' : '') +
       explainerHTML();
   }
 
@@ -303,11 +317,11 @@
     var m = CRM.member(); if (!m) return false; sweep();
     var live = activePass(); if (live) { openPass(live.code); return false; }
     var used = memberRedeems(m, day());
-    if (used.length >= I.redeemsPerDay) { sheet('<h3>One reward per visit</h3><p>You already used <b>' + e(used[0].reward) + '</b> today (' + e(used[0].code) + '). Use your gift on your next visit, before it expires.</p><button type="button" class="ir-go" data-ir="x">OK</button>'); return false; }
+    if (used.length >= I.redeemsPerDay) { tomorrowSheet(used[0].reward, used[0].code, "Use your gift on your next visit, before it expires."); return false; }
     var now = Date.now(), rec = { type: "eb", code: code, tier: -1, reward: "Early bird: " + item, button: button, pts: 0, ts: now, exp: now + I.passMinutes * 60000, member: m.id, memberName: m.name, status: "live", day: day(now), synced: true };
-    var l = load(); l.redeems.unshift(rec); store(l); openPass(code); if (cb) cb(); return true;
+    var l = load(); l.redeems.unshift(rec); store(l); markPrize(m); openPass(code); if (cb) cb(); return true;
   }
-  window.SSAI_INTERIM = { redeem: redeem, giftPass: giftPass, newCode: code, usedToday: function () { var m = CRM.member(); return m ? memberRedeems(m, day()).length >= I.redeemsPerDay : false; }, claim: claim, openPass: openPass, closePass: closePass, cardHTML: cardHTML, explainerHTML: explainerHTML, toastButtons: toastButtons, log: drawLog,
+  window.SSAI_INTERIM = { redeem: redeem, giftPass: giftPass, tomorrow: tomorrowSheet, newCode: code, usedToday: function () { var m = CRM.member(); return m ? memberRedeems(m, day()).length >= I.redeemsPerDay : false; }, claim: claim, openPass: openPass, closePass: closePass, cardHTML: cardHTML, explainerHTML: explainerHTML, toastButtons: toastButtons, log: drawLog,
     data: load, cfg: I,
     // test hooks
     expireNow: function () { var l = load(); l.redeems.forEach(function (r) { if (r.status === "live") r.exp = Date.now(); }); store(l); } };

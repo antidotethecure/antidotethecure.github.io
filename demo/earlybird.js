@@ -68,7 +68,8 @@
     b.disabled = true; err("");
     if (b.getAttribute("data-eb") === "act") {
       call({ type: "eb_activate" }).then(function (r) {
-        b.disabled = false; if (!r || !r.ok) { err((r && r.reason) || "Can't reach " + NAME + " right now. Try again."); return; }
+        b.disabled = false; if (r && r.prizeDay && SSAI_INTERIM.tomorrow) { SSAI_INTERIM.tomorrow(r.had || "", "", "Your early-bird gift waits for you."); return; }   // one prize per day (server rule)
+        if (!r || !r.ok) { err((r && r.reason) || "Can't reach " + NAME + " right now. Try again."); return; }
         var finish = function () { S.state = "active"; S.item = r.item; S.until = r.until; draw(); CRM.toast("🎁 " + r.item + " · use it within " + S.cfg.days + " days"); };
         if (S.cfg.mode === "wheel" && S.state === "ready" && r.slice >= 0) {   // animate to the slice the SERVER picked
           var w = el.querySelector("[data-eb=wheel]"), acc = 0; S.cfg.slices.forEach(function (s, i) { if (i < r.slice) acc += s[1]; });
@@ -80,8 +81,9 @@
     if (window.SSAI_INTERIM && SSAI_INTERIM.usedToday()) { b.disabled = false; SSAI_INTERIM.giftPass(S.item, S.cfg.button, ""); return; }   // shows "one reward per visit"
     var code = SSAI_INTERIM.newCode();
     call({ type: "eb_redeem", code: code, eid: code }).then(function (r) {   // eid: Scout rejects a re-sent pass ("Already counted")
-      b.disabled = false; if (!r || !r.ok) { err(r && r.dup ? "Already counted ✓ This gift was already used, so nothing changed." : (r && r.reason) || "Can't reach " + NAME + " right now. Try again at the table."); if (r && r.state) { S.state = r.state; draw(); } return; }
-      SSAI_INTERIM.giftPass(S.item, S.cfg.button, code, function () { S.state = "used"; draw(); });
+      b.disabled = false; if (r && r.prizeDay && SSAI_INTERIM.tomorrow) { SSAI_INTERIM.tomorrow(r.had || "", "", "Use your gift on your next visit, before it expires."); return; }   // one prize per day (server rule)
+      if (!r || !r.ok) { err(r && r.dup ? "Already counted ✓ This gift was already used, so nothing changed." : (r && r.reason) || "Can't reach " + NAME + " right now. Try again at the table."); if (r && r.state) { S.state = r.state; draw(); } return; }
+      SSAI_INTERIM.giftPass(S.item, S.cfg.button, r.code || code, function () { S.state = "used"; draw(); });
     });
   }
   function load() { if (!CRM.member()) { S = null; draw(); return; } call({ type: "status" }).then(function (r) { if (r && r.ok) { S = r; draw(); } }); }

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<title>Ice cream truck alerts</title>
+<defs><linearGradient id="p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff8cc2"/><stop offset="1" stop-color="#d4166a"/></linearGradient></defs>
+<rect width="64" height="64" rx="14" fill="#0b1c4f"/>
+<path d="M32 60 C28 54 16 46 16 34 A16 16 0 1 1 48 34 C48 46 36 54 32 60 Z" fill="url(#p)"/>
+<path d="M14 27 C13 21 18 18 22 18 L42 18 C46 18 51 21 50 27 C50 30 47 31 45 30 L44 37 C43 40 40 40 40 37 L39 31 L30 31 L29 35 C28 38 25 38 25 35 L24 31 L19 31 C16 31 14 30 14 27 Z" fill="#fff6e6"/>
+<path d="M20 19 C19 14 24 11 28 11 L36 11 C41 11 45 14 44 19 Z" fill="#fff6e6"/>
+<path d="M28 12 C27 7 33 4 36 6 C35 9 34 11 32 12 Z" fill="#fff6e6"/>
+<circle cx="32" cy="41" r="5.5" fill="#fff6e6"/>
+</svg>

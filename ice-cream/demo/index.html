@@ -6,9 +6,10 @@
 <title>Paletas El Sol: Truck Alerts</title>
 <meta name="description" content="Demo: get a ring with an ice-cream-truck jingle when Paletas El Sol is on your street. Points, rewards and the menu. Sample truck by SousShift AI.">
 <meta name="theme-color" content="#03060e">
-<link rel="manifest" href="manifest.webmanifest?v=20261011c">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest?v=20261013a">
+<link rel="icon" href="favicon.svg?v=20261013a" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png?v=20261013a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261013a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="El Sol">
@@ -17,11 +18,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
-<link rel="stylesheet" href="../ice.css?v=20261011c">
+<link rel="stylesheet" href="../ice.css?v=20261013a">
 <style>
 [hidden]{display:none!important}
 body{padding-bottom:30px}
-.top .logo{width:40px;height:40px;border-radius:12px;background:radial-gradient(circle at 50% 40%,#ffd166 0 38%,#ff9a3c 39% 100%);display:grid;place-items:center;font-size:22px;flex:none}
+.top img.logo{width:40px;height:40px;border-radius:10px;flex:none;display:block;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(255,77,151,.35))}
 .tag{font:800 10px "Rajdhani",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#2a1a00;background:var(--gold);border-radius:99px;padding:1px 7px;margin-left:4px;vertical-align:2px}
 
 /* hero / live status */
@@ -146,7 +147,7 @@ body{padding-bottom:30px}
 </head>
 <body>
 <div class="top"><div class="wrap">
-  <div class="logo" aria-hidden="true">🍦</div>
+  <img class="logo" src="icon-192.png?v=20261013a" alt="" width="40" height="40">
   <b>Paletas El Sol<small><span data-t="topSub">Truck alerts</span> <span class="tag">demo</span></small></b>
   <span class="sp"></span>
   <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">English</button><button data-lang="es" aria-pressed="false" lang="es">Español</button></div>
@@ -268,7 +269,7 @@ body{padding-bottom:30px}
 
 <div id="ringer" role="alertdialog" aria-live="assertive" aria-hidden="true">
   <div class="ring on">
-    <div class="ic">🍦</div>
+    <div class="ic app"><img src="icon-192.png?v=20261013a" alt=""></div>
     <div><small data-t="nApp">Paletas El Sol · now</small><b data-t="nTitle">The truck is on your street!</b><span id="nBody"></span></div>
     <div class="acts"><button class="go" id="coming" type="button" data-t="coming">🏃 I'm coming!</button><button class="no" id="silence" type="button" data-t="silence">Silence</button></div>
   </div>
@@ -403,9 +404,9 @@ es: {
 }};
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="../lang.js?v=20261011c"></script>
-<script src="../jingle.js?v=20261011c"></script>
-<script src="../speak.js?v=20261011c"></script>
+<script src="../lang.js?v=20261013a"></script>
+<script src="../jingle.js?v=20261013a"></script>
+<script src="../speak.js?v=20261013a"></script>
 <script>
 (function () {
   "use strict";

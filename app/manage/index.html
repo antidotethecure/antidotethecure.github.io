@@ -46,6 +46,8 @@ details{border-top:1px solid var(--edge);padding:8px 0}details:first-child{borde
 .add button,.mini{font:700 15px Rajdhani,system-ui;padding:9px 12px;border-radius:10px;border:0;background:var(--blue);color:#fff;cursor:pointer}
 .mini{padding:3px 9px;font-size:13px;background:#ffffff14;margin-left:6px}
 .note{font-size:13px;color:var(--dim)}
+.earnbtn{display:inline-flex;align-items:center;gap:6px;font:700 16px Rajdhani,system-ui;text-decoration:none;color:#1b1500;background:var(--gold);border-radius:12px;padding:10px 14px;margin:0 0 12px;min-height:44px}
+.ch a.earn{display:inline-flex;align-items:center;margin-top:8px;font:700 14px Rajdhani,system-ui;color:#1b1500;background:var(--gold);text-decoration:none;border-radius:999px;padding:5px 12px;min-height:32px}
 .prog{height:8px;border-radius:99px;background:#ffffff12;overflow:hidden;margin:6px 0 0}.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--good),var(--gold))}
 </style>
 </head>
@@ -54,9 +56,10 @@ details{border-top:1px solid var(--edge);padding:8px 0}details:first-child{borde
 <a class="back" href="../">‹ SousShift app</a>
 <h1 class="chrome">🗂️ Management</h1>
 <p class="lead">Every active client and project: their apps, what's left to do, updates, complaints and FAQs. Checkboxes and complaints you log save on this phone.</p>
+<a class="earnbtn" href="https://antidotethefoodie.com/hq/clients-935965/#earnings">💰 Earnings <small style="font-weight:600;opacity:.75">· private, password / Face ID</small></a>
 <div class="sum"><div><b id="sClients">0</b><span>clients</span></div><div><b id="sOpen">0</b><span>open to-dos</span></div><div><b id="sIssues">0</b><span>open complaints</span></div></div>
 <div id="clients"></div>
-<p class="note">Client apps are separate Home Screen apps each owner saves on their own phone (Share → Add to Home Screen). Billing details live in the private billing dashboard, not here.</p>
+<p class="note">Client apps are separate Home Screen apps each owner saves on their own phone (Share → Add to Home Screen). Billing details live in the private billing dashboard (💰 Earnings), not here.</p>
 </main>
 <script>
 var CL=[
@@ -79,6 +82,7 @@ var CL=[
  cmp:[],
  faq:[["Can she advertise mushrooms?","Culinary/functional with no health claims: yes. Psilocybin/psychedelics/sacrament: never, on any platform."],["Can her LLC get grants?","Rarely. Nonprofit, recognized church, or fiscal sponsor route."],["Where does her private info go?","Only her phone, until she taps Send (opens her own text/email)."]]}
 ];
+var EARN="https://antidotethefoodie.com/hq/clients-935965/"; /* private encrypted billing dashboard; no amounts on this public page */
 var KEY="ssai-manage-v1", S={}; try{ S=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){}
 S.ck=S.ck||{}; S.cmp=S.cmp||{}; S.cmpDone=S.cmpDone||{}; S.tab=S.tab||{};
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
@@ -97,7 +101,7 @@ function openCount(c){ var n=c.todo.filter(function(x,i){ return !x[2]&&!S.ck[c.
 function issueCount(c){ var n=c.cmp.filter(function(x,i){ return x[2]!=="done"&&!S.cmpDone[c.id+"_b"+i]; }).length; (S.cmp[c.id]||[]).forEach(function(x,i){ if(!S.cmpDone[c.id+"_m"+i]) n++; }); return n; }
 function render(){
  document.getElementById("clients").innerHTML=CL.map(function(c){ var t=S.tab[c.id]||"todo", o=openCount(c), d=c.todo.length-o;
-  return "<section class='client' id='"+c.id+"'><div class='ch'><div class='av'>"+c.av+"</div><div><h2>"+esc(c.owner)+"</h2><p>"+esc(c.biz)+"</p><div class='prog' style='width:160px'><i style='width:"+Math.round(100*d/c.todo.length)+"%'></i></div></div><span class='st "+c.cls+"'>"+esc(c.st)+"</span></div>"+
+  return "<section class='client' id='"+c.id+"'><div class='ch'><div class='av'>"+c.av+"</div><div><h2>"+esc(c.owner)+"</h2><p>"+esc(c.biz)+"</p><div class='prog' style='width:160px'><i style='width:"+Math.round(100*d/c.todo.length)+"%'></i></div><a class='earn' href='"+EARN+"#earn-"+c.id+"' aria-label='Earnings for "+esc(c.owner)+" (private dashboard)'>💰 Earnings</a></div><span class='st "+c.cls+"'>"+esc(c.st)+"</span></div>"+
   "<div class='tabs' role='tablist'>"+TABS.map(function(x){ var lab=x[1]+(x[0]==="todo"?" ("+o+")":x[0]==="cmp"?" ("+issueCount(c)+")":""); return "<button role='tab' data-c='"+c.id+"' data-t='"+x[0]+"' aria-selected='"+(t===x[0])+"'>"+lab+"</button>"; }).join("")+"</div><div class='pane' role='tabpanel'>"+pane(c,t)+"</div></section>"; }).join("");
  document.getElementById("sClients").textContent=CL.length;
  document.getElementById("sOpen").textContent=CL.reduce(function(a,c){ return a+openCount(c); },0);

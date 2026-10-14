@@ -685,6 +685,9 @@ var CONFIG = {
         : "<b>"+CONFIG.game.prizeAt+" makes the board.</b> Tap to run it back.");
     saveBest(score); renderBoard();
     if(window.ReviewEgg) ReviewEgg.endCard(cv.parentNode,null);
+    // PLAY FIRST, CLAIM AFTER (demo/claimscore.js): rank vs the page's weekly board, then the same member sheet the old PLAY gate used
+    if(window.SSAI_CLAIM) SSAI_CLAIM.show({key:"lucky-dragon",score:score,rows:CONFIG.promo.sample.map(function(r){ return {name:r[0],score:r[1]}; }),boardName:"the weekly board",
+      reason:"play",mount:$("gmsg"),where:"afterend",again:function(){ replay(); },alive:function(){ return !running; }});
   }
   window.__LD={get:function(){return {running:running,score:score,drops:drops,bowlX:bowlX,W:W,H:H};},set:function(x){bowlX=Math.max(30,Math.min(W-30,x));},start:function(){start();},end:function(){ if(running) end(); }};
   function pointer(e){
@@ -704,14 +707,14 @@ var CONFIG = {
 </script>
 <script src="../contract.js"></script>
 <script>window.CRM_CFG={name:"Lucky Dragon Hibachi",offer:"Free Extra Yum-Yum + 10% off your next plate",tiers:[[250,"Free extra Yum-Yum"],[500,"Free fried rice"],[800,"Free hibachi plate"],[1300,"Dinner for two"]],referral:{gift:"Free fried rice"},
- // Hibachi Catch access. PHASE 1 (live default): free to play for members (name + phone + email, one account per phone).
+ // Hibachi Catch access. PHASE 1 (live default): free to play, no sign-up first; guests save their score + prize after the run with a member account (name + phone + email, one account per phone).
  // PHASE 2 (built, off): enabled:true → a play costs 10 tokens; tokens come with food purchases (1 per $1), +10 free every week and
  // +10 free on request once a day (no purchase necessary). ?tokens=1 previews Phase 2. Legal notes: see crm.js TOKENS block.
  game:"Hibachi Catch",tokens:{enabled:false,perDollar:1,perOrder:0,playCost:10,weeklyFree:10,freeDaily:10},
  // FREE daily spin: one per member per day (LA time), never sold, never costs tokens. Odds = w / 100 and must match rules.html. Never alcohol.
  spin:{rules:"rules.html",hub:"🐉",colors:["#FFC82E","#E6483D","#F7EFE6","#4A1F1C","#FFE08A","#8E1E16"],prizes:[{t:"+50 points",pts:50,w:30},{t:"+100 points",pts:100,w:20},{t:"+5 tokens",tok:5,alt:{t:"+75 points",pts:75},w:15},
   {t:"$2 off a hibachi plate",code:true,w:15},{t:"Free extra Yum-Yum",code:true,w:8},{t:"Free fried rice",code:true,w:7},{t:"10% off order",code:true,w:5}]}};</script>
-<script src="../crm.js"></script>
+<script src="../crm.js?v=cs1"></script><script src="../claimscore.js?v=cs1"></script>
 <script>window.NEARBY={name:"Lucky Dragon Hibachi",pin:"🐉",approx:true,spots:[{label:"Compton",lat:33.8958,lng:-118.2201,q:"Compton CA"}],offer:"Show this at the counter for double stars on today's order."};</script>
 <script src="../nearby.js"></script>
 <script src="../menu3d.js"></script>

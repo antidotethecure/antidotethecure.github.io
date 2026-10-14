@@ -1021,6 +1021,122 @@
           "y": 80.0
         }
       ]
+    },
+    {
+      "id": "nissan-altima",
+      "make": "Nissan",
+      "model": "Altima",
+      "aliases": [],
+      "years": [
+        2019,
+        2025
+      ],
+      "drawn": "2021 Altima, Gun Metallic gray",
+      "ev": false,
+      "file": "nissan-altima-full.webp",
+      "small": "nissan-altima-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-14",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 32.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 27.0
+        },
+        {
+          "g": "bumperF",
+          "x": 7.0,
+          "y": 50.0
+        },
+        {
+          "g": "bumperR",
+          "x": 92.0,
+          "y": 43.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 40.0
+        },
+        {
+          "g": "tail",
+          "x": 90.0,
+          "y": 35.0
+        },
+        {
+          "g": "motor",
+          "x": 20.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 34.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 52.0,
+          "y": 54.0
+        },
+        {
+          "g": "exhaust",
+          "x": 86.0,
+          "y": 53.0
+        },
+        {
+          "g": "suspF",
+          "x": 26.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 64.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesF",
+          "x": 7.0,
+          "y": 66.0
+        },
+        {
+          "g": "brakesR",
+          "x": 77.0,
+          "y": 68.0
+        },
+        {
+          "g": "wheels",
+          "x": 42.0,
+          "y": 67.0
+        },
+        {
+          "g": "doors",
+          "x": 66.0,
+          "y": 48.0
+        },
+        {
+          "g": "interior",
+          "x": 50.0,
+          "y": 41.0
+        },
+        {
+          "g": "hatch",
+          "x": 82.0,
+          "y": 29.0
+        },
+        {
+          "g": "dash",
+          "x": 19.0,
+          "y": 80.0
+        }
+      ]
     }
   ]
 }

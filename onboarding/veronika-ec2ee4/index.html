@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow"><title>Veronika · Your Plan · SousShift AI</title>
-<link rel="manifest" href="manifest.webmanifest?v=2"><link rel="apple-touch-icon" sizes="180x180" href="icon-180.png?v=2"><link rel="icon" type="image/svg+xml" href="icon.svg?v=2"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2"><link rel="icon" sizes="48x48" href="favicon.ico?v=2"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b1220">
+<link rel="manifest" href="manifest.webmanifest?v=3"><link rel="apple-touch-icon" sizes="180x180" href="icon-180.png?v=3"><link rel="icon" type="image/svg+xml" href="icon.svg?v=3"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=3"><link rel="icon" sizes="48x48" href="favicon.ico?v=3"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b1220">
 <style>
 :root{--bg:#0b1220;--card:#121c33;--edge:#24345c;--ink:#f3f6ff;--dim:#a9b6d6;--gold:#f5c400;--ok:#2fbf71;--sage:#7fd6a6;--warn:#ff8a5b;--bad:#ff5b6e}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,system-ui,Segoe UI,Roboto,sans-serif}
@@ -42,7 +42,15 @@ details.rk{border-color:#ff8a5b55}
 .rg{border-radius:12px;padding:8px 12px;margin:8px 0;background:#0b1426;border-left:4px solid var(--edge)}.rg h3{margin:2px 0 4px;font-size:15px}.rg ul{margin:0;padding-left:20px}.rg li{margin:4px 0;font-size:14.5px}
 .rg.ry{border-left-color:var(--ok)}.rg.ry h3{color:#7dffb5}.rg.rn{border-left-color:var(--bad)}.rg.rn h3{color:var(--bad)}.rg.rw{border-left-color:var(--warn)}.rg.rw h3{color:var(--warn)}
 a.rkl{display:inline-block;margin:0 0 6px;font-size:14px;font-weight:700;color:var(--warn)}
-@media print{body{background:#fff;color:#111}.card,details.pj{background:#fff;border-color:#ccc}.btn,.save,.toc,#intake{display:none}details.pj{display:block}details.pj>*{display:block}.s,.note,.ck small{color:#444}}
+.ask{border-color:#f5c40055;background:linear-gradient(180deg,#2a2510,#121c33)}
+.ask .row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--dim);margin-top:4px}
+.ask .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.ask .btn[disabled]{opacity:.55;cursor:default}
+.ask .err{display:none;margin:8px 0 0;padding:10px 12px;border-radius:12px;background:#3a1418;border:1px solid #ff5b6e66;color:#ffd0d6;font-size:14px}
+.ask .err.on{display:block}.ask .err button{margin-left:8px}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,30px);opacity:0;pointer-events:none;background:var(--ok);color:#06210f;font-weight:900;padding:12px 18px;border-radius:999px;box-shadow:0 8px 30px #0008;transition:.25s;z-index:50;white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media print{body{background:#fff;color:#111}.card,details.pj{background:#fff;border-color:#ccc}.btn,.save,.toc,#intake,#ask,.toast{display:none}details.pj{display:block}details.pj>*{display:block}.s,.note,.ck small{color:#444}}
 </style></head><body><main>
 <div class="top"><img src="../../assets/ssai-lockup.jpg" alt="SousShift AI"></div>
 <p class="save note">📲 Save this: tap Share → <b>Add to Home Screen</b>. It works like an app.</p>
@@ -139,7 +147,7 @@ a.rkl{display:inline-block;margin:0 0 6px;font-size:14px;font-weight:700;color:v
 <li>Those details go only in the <a href="#intake">private info form</a>, which stays on your phone until you tap Send.</li></ul></div>
 </section>
 
-<nav class="toc" aria-label="Sections"><a href="#risks">⚠️ Warnings</a><a href="#tasks">🚀 Your 4 tasks</a><a href="#ads">📣 Ad rules</a><a href="#grants">📜 Grants</a><a href="#docs">🗂️ Documents</a><a href="#intake">🔒 Private info</a><a href="#agent">🤖 Your AI helper</a><a href="#updates">🗞️ Updates</a><a href="#faq">❓ FAQ</a><a href="#issue">🛠️ Report a problem</a></nav>
+<nav class="toc" aria-label="Sections"><a href="#risks">⚠️ Warnings</a><a href="#tasks">🚀 Your 4 tasks</a><a href="#ads">📣 Ad rules</a><a href="#grants">📜 Grants</a><a href="#docs">🗂️ Documents</a><a href="#intake">🔒 Private info</a><a href="#agent">🤖 Your AI helper</a><a href="#updates">🗞️ Updates</a><a href="#faq">❓ FAQ</a><a href="#ask">💡 Questions &amp; ideas</a><a href="#issue">🛠️ Report a problem</a></nav>
 
 <h2>✅ Done so far</h2>
 <div class="card"><ul class="ck">
@@ -228,6 +236,22 @@ a.rkl{display:inline-block;margin:0 0 6px;font-size:14px;font-weight:700;color:v
 
 <h2 id="faq">❓ Questions</h2>
 <div class="card faq" id="faqs"></div>
+
+<h2 id="askH">💡 Questions, ideas or info? Type here</h2>
+<div class="card ask" id="ask"><span class="pill">Goes straight to Anthony</span>
+<p class="s" style="margin:8px 0 0">A question, an idea, a link, something you learned. Type it and tap Send. Anthony gets it right away and looks into it.</p>
+<form id="askF" autocomplete="off">
+<label class="fld"><span>Your message</span><textarea id="askT" maxlength="2000" rows="4" placeholder="Type your question, idea or info…"></textarea></label>
+<div class="row"><span id="askC">0 / 2,000</span><span id="askW"></span></div>
+<label class="fld"><span>Your name (optional)</span><input id="askN" type="text" maxlength="60" value="Veronika" autocomplete="name"></label>
+<label class="hp" aria-hidden="true">Leave this empty<input id="askHp" type="text" tabindex="-1" autocomplete="off"></label>
+<button class="btn" type="submit" id="askB">Send to Anthony</button>
+<div class="err" id="askE" role="alert">Couldn't send. Check your signal and try again.<button class="btn alt sm" type="button" id="askR">Retry</button></div>
+</form>
+<h3 id="askHH" style="display:none">Sent from this phone</h3>
+<ul class="ck" id="askL"></ul>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite">Sent to Antidote ✓</div>
 
 <h2 id="issue">🛠️ Report a problem or ask for a change</h2>
 <div class="card"><p class="s" style="margin-top:0">Something not working, not right, or not what you wanted? Tell us here. It opens a text to Anthony, and your note is also kept in the list below on this phone.</p>
@@ -365,4 +389,45 @@ document.getElementById("isSend").onclick=function(){ var k=document.getElementB
  iss.unshift({k:k,t:t,d:new Date().toLocaleDateString()}); try{localStorage.setItem(IK,JSON.stringify(iss));}catch(e){} paintIs(); document.getElementById("isT").value="";
  location.href="sms:+14243094068"+(/iPhone|iPad|iPod/.test(navigator.userAgent)?"&":"?")+"body="+encodeURIComponent("Veronika: "+k+"\n"+t); };
 paintIs();
-</script></body></html>
+// questions / ideas box: POSTs to the private pitch-pipeline Apps Script, which emails Anthony. Only a copy stays on this phone.
+(function(){
+ var API="https://script.google.com/macros/s/AKfycbwEYjZoJOWxu4oUwYWMXJdx_GmSJ4rEnXJ7oczl1fS05gWRDf-C2tFx_ZEVlFV52FvRkQ/exec";
+ var F=document.getElementById("askF"),T=document.getElementById("askT"),N=document.getElementById("askN"),HP=document.getElementById("askHp"),
+  B=document.getElementById("askB"),E=document.getElementById("askE"),C=document.getElementById("askC"),W=document.getElementById("askW"),L=document.getElementById("askL"),TO=document.getElementById("toast");
+ var AK="vv-asks-v1",MAX=2000,GAP=10000,hist=[],last=0,busy=false,tt;
+ try{ hist=JSON.parse(localStorage.getItem(AK))||[]; }catch(e){ hist=[]; }
+ try{ last=+localStorage.getItem(AK+"-last")||0; }catch(e){}
+ function keep(){ try{ localStorage.setItem(AK,JSON.stringify(hist.slice(0,30))); localStorage.setItem(AK+"-last",String(last)); }catch(e){} }
+ function paint(){ document.getElementById("askHH").style.display=hist.length?"":"none";
+  L.innerHTML=hist.map(function(x){ return "<li class='fixed'><i>✓</i><label><b>Sent</b><small>"+esc(x.d)+"</small><small style='color:var(--ink);white-space:pre-wrap'>"+esc(x.t)+"</small></label></li>"; }).join(""); }
+ function count(){ C.textContent=T.value.length.toLocaleString()+" / 2,000"; }
+ function toast(){ TO.classList.add("on"); clearTimeout(tt); tt=setTimeout(function(){ TO.classList.remove("on"); },2600); }
+ function send(){
+  var t=T.value.trim(); E.classList.remove("on"); W.textContent="";
+  if(!t){ T.focus(); return; }
+  if(busy) return;
+  if(HP.value){ T.value=""; count(); toast(); return; }               // bot filled the hidden field
+  var wait=GAP-(Date.now()-last); if(wait>0){ W.textContent="Wait "+Math.ceil(wait/1000)+"s"; setTimeout(function(){ W.textContent=""; },wait); return; }
+  t=t.slice(0,MAX);
+  var who=(N.value.trim()||"Veronika").slice(0,60), now=new Date(), stamp=now.toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+  var page=location.href.split("#")[0];
+  var body=new URLSearchParams({type:"note",from:who,text:t,page:page,sent:now.toISOString(),hp:"",
+   // older deployment of the same script only knows these fields; they keep the email coming until it is updated
+   name:"📝 "+who+" (app)",phone:"",email:"",lanes:t,quote:t.replace(/\s+/g," ").slice(0,80),submitted:now.toISOString()+" · "+page});
+  busy=true; last=Date.now(); B.disabled=true; B.textContent="Sending…";
+  fetch(API,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:body.toString()})
+   .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+   .then(function(j){ if(!j||!j.ok) throw new Error((j&&j.error)||"failed");
+     hist.unshift({t:t,d:stamp}); keep(); paint(); T.value=""; count(); toast(); })
+   .catch(function(){ last=0; keep(); E.classList.add("on"); })
+   .then(function(){ busy=false; B.disabled=false; B.textContent="Send to Anthony"; });
+  keep();
+ }
+ F.addEventListener("submit",function(ev){ ev.preventDefault(); send(); });
+ document.getElementById("askR").onclick=send;
+ T.addEventListener("input",function(){ if(T.value.length>MAX) T.value=T.value.slice(0,MAX); count(); });
+ count(); paint();
+})();
+</script>
+<script src="../../demo/poweredby.js?v=20261013a" defer></script>
+</body></html>

@@ -1,0 +1,77 @@
+{
+  "_readme": "Carlos's real before/after photo pairs. Put image paths (relative to demo/mechanic/, e.g. photos/windshield-before.jpg) in before + after. When BOTH are set, the photos replace the sample art on that card and the 'Sample art' tag goes away. Leave empty to keep the art. Use photos of the car work only: no faces, plates, house or address.",
+  "items": {
+    "windshield": {
+      "before": "",
+      "after": ""
+    },
+    "flat": {
+      "before": "",
+      "after": ""
+    },
+    "door": {
+      "before": "",
+      "after": ""
+    },
+    "sound": {
+      "before": "",
+      "after": ""
+    },
+    "brakes": {
+      "before": "",
+      "after": ""
+    },
+    "oil": {
+      "before": "",
+      "after": ""
+    },
+    "battery": {
+      "before": "",
+      "after": ""
+    },
+    "cel": {
+      "before": "",
+      "after": ""
+    },
+    "ac": {
+      "before": "",
+      "after": ""
+    },
+    "plugs": {
+      "before": "",
+      "after": ""
+    },
+    "susp": {
+      "before": "",
+      "after": ""
+    },
+    "headlight": {
+      "before": "",
+      "after": ""
+    },
+    "tail": {
+      "before": "",
+      "after": ""
+    },
+    "tint": {
+      "before": "",
+      "after": ""
+    },
+    "exhaust": {
+      "before": "",
+      "after": ""
+    },
+    "body": {
+      "before": "",
+      "after": ""
+    },
+    "paint": {
+      "before": "",
+      "after": ""
+    },
+    "interior": {
+      "before": "",
+      "after": ""
+    }
+  }
+}

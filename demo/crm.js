@@ -60,6 +60,11 @@
   // demo/interim.js, which this file hands the member store to through window.SSAI_CRM. The QR / ring-up / receipt-code
   // demo controls are hidden and the ladder buttons read "Use reward".
   var INTERIM = !!(SIMPLE && SIMPLE.mode === "interim");
+  // CUSTOMER-ONLY (opt-in: window.SSAI_CUSTOMER_ONLY or CRM_CFG.customerOnly; Melody since 2026-10-13): the page is a live
+  // customer app, so the owner view (customer list, holiday blast, ring-up, app sales, performance share, top referrers,
+  // and interim.js's manager log that mounts next to it) is never put on the page, and every "Demo:" button / note is hidden.
+  // Owner tools live in the back office. Pitch/demo pages leave this unset and keep the full owner view.
+  var CUST = !!(window.SSAI_CUSTOMER_ONLY || C.customerOnly);
   var NAME = C.name || (window.NEARBY && window.NEARBY.name) || document.title.split(" — ")[0];
   var OFFER = SIMPLE ? SIMPLE.join + " welcome points" : C.offer || "10% off your next visit";
   var SLUG = NAME.toLowerCase().replace(/[^a-z0-9]+/g, "-"), KEY = "ssai_crm_" + SLUG;
@@ -276,6 +281,7 @@
     ".crm-qr small{display:block;color:#555;font-size:12.5px;margin-top:4px}",
     ".crm-demo{display:block;width:100%;margin-top:8px;border:1px dashed #3DDC97;background:transparent;color:#3DDC97;border-radius:12px;padding:10px;font-size:13.5px;font-weight:800;cursor:pointer}",
     ".crm-demo:disabled{opacity:.4;cursor:default}",
+    CUST ? ".crm-demo{display:none!important}" : "",
     ".crm-tier{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:9px 0;border-top:1px solid #25336A;font-size:14px}",
     ".crm-tier:first-of-type{border-top:0}.crm-tier .bar{grid-column:1/3;height:6px;border-radius:9px;background:#1a2656;overflow:hidden}.crm-tier .bar i{display:block;height:100%;background:linear-gradient(90deg,#E8582A,#FFD23F)}",
     ".crm-tier button{border:0;border-radius:10px;padding:8px 12px;font-weight:900;font-size:13px;background:#E8582A;color:#fff;cursor:pointer}.crm-tier button:disabled{background:#1a2656;color:#7F8AAA;cursor:default}",
@@ -643,10 +649,10 @@
         // activity
         '<div class="crm-box"><h4>📜 Points activity</h4><div class="crm-feed">' + ((me.ledger || []).map(function (l) {
           return '<div><span>' + (WAL && W[l.w] ? '<i class="crm-wt">' + wname(l.w) + '</i>' : '') + e(l.t) + '</span><b class="' + (l.pts >= 0 ? 'plus' : 'minus') + '">' + (l.pts >= 0 ? '+' : '') + l.pts.toLocaleString() + '</b></div>'; }).join("") || '<div><span>Nothing yet. Scan at the register to start earning.</span></div>') + '</div></div>' +
-        '<button type="button" class="go" style="background:#1a2656;box-shadow:none" data-a="owner">👀 See what the owner sees ↓</button>' +
+        (CUST ? '' : '<button type="button" class="go" style="background:#1a2656;box-shadow:none" data-a="owner">👀 See what the owner sees ↓</button>') +
         (STAFF ? '' : '<button type="button" class="crm-gx" data-a="restore">📱 Not you? Sign back in to your account</button>') +
         (TC ? '<button type="button" class="crm-gx" data-a="signout">🚪 Sign out of this phone' + (me.guardian ? ' (parent check)' : '') + '</button>' : '') +
-        '<p class="crm-fine">Demo: points and friends here are saved on this phone only. Live, they\'re in the business\'s database, so they follow the customer to any phone.</p>';
+        (CUST ? '' : '<p class="crm-fine">Demo: points and friends here are saved on this phone only. Live, they\'re in the business\'s database, so they follow the customer to any phone.</p>');
       var qr = join.querySelector(".crm-qr");
       function showQR() {
         qr.style.display = "block";
@@ -803,13 +809,18 @@
   // Otherwise a short sign-up sheet opens (name, phone or email, opt-in, optional birthday); on submit the member is
   // created through createMember() (welcome points, referral, Google Sheet, any pending game prize), then cb(member).
   // "Not now" closes it without calling cb. Returns true when cb already ran.
+  // opts (optional, used by demo/claimscore.js "claim your score after the game"): {title, sub, btn} override the sheet's
+  // wording, lead = extra HTML under it (rank / prize), later = the "Not now" label, onLater() runs after "Not now",
+  // onOpen(overlay) / onClose() hooks, noFocus = don't focus the first field (the glove pointer shows it instead), cls = extra
+  // overlay class. The fields, consent boxes, createMember() and where the info goes are exactly the same as without opts.
   var GATE_TXT = {
     order: ["Finish your order", "Add your name and a phone or email so " + NAME + " can reach you about this order.", "Send my order"],
     prize: ["Save your prize & score", "Add your name and a phone or email to save your prize to your " + NAME + " Rewards. Your code shows right after.", "🎁 Save my prize"],
     score: ["Save your prize & score", "Add your name and a phone or email to put your score on the weekly board. If you win, that's how we reach you.", "🏆 Post my score"]
   };
   var gateEl = null;
-  function gate(reason, cb) {
+  function gate(reason, cb, opts) {
+    opts = opts || {};
     if (STAFF) { toast("🧑‍🍳 Staff practice: no sign-ups, orders or leaderboard posts here."); return; }
     // KIDS' PRIVACY (COPPA): Kid mode only unlocks through a PARENT/GUARDIAN account on this phone. Reasons "kidunlock" /
     // "kidprize" word the sheet for the parent, require the "I'm the parent/guardian (18+) and this is my own phone and
@@ -822,9 +833,10 @@
     if (m && (!both || hasBoth(m)) && (!kidg || m.guardian)) { if (cb) cb(m); return true; }
     if (gateEl) gateEl.close();
     var T = GATE_TXT[reason] || GATE_TXT.order, rid = "crm-g" + code4(4), pre = function (k) { return m && m[k] ? ' value="' + e(m[k]) + '"' : ''; };
+    if (opts.title) T = [opts.title, opts.sub || T[1], opts.btn || T[2]];
     if (m && !kidg) T = [T[0], "Add your " + (okPhone(m.phone) ? "email" : okEmail(m.email) ? "phone number" : "phone number and email") + " to finish your free account. It's tied to this phone.", T[2]];
-    var ov = document.createElement("div"); ov.className = "crm-gate"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", rid); ov.setAttribute("data-scroll-ok", "");
-    ov.innerHTML = '<section class="crm-card"><span class="k">' + e(NAME) + ' Rewards · free</span><h3 id="' + rid + '">' + e(T[0]) + '</h3><p>' + e(T[1]) + '</p>' +
+    var ov = document.createElement("div"); ov.className = "crm-gate" + (opts.cls ? " " + opts.cls : ""); ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", rid); ov.setAttribute("data-scroll-ok", "");
+    ov.innerHTML = '<section class="crm-card"><span class="k">' + e(NAME) + ' Rewards · free</span><h3 id="' + rid + '">' + e(T[0]) + '</h3><p>' + e(T[1]) + '</p>' + (opts.lead || '') +
       (m ? '' : SIMPLE ? '<div class="crm-gift"><b>🎁</b><span>You also get <u>' + SIMPLE.join + ' welcome points</u> on joining</span></div>' : '<div class="crm-gift"><b>🎁</b><span>You also get <u>' + e(OFFER) + '</u> + 100 ' + (WAL ? W[BONUS].label.toLowerCase() + ' ' : '') + 'points' + (both && ON ? ' + ' + TOK.weeklyFree + ' free tokens a week' : '') + '</span></div>') +
       (INVITE && !m && SIMPLE ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: your friend earns ' + REF.first + ' points after your first visit.</div>' : '') + (INVITE && !m && !SIMPLE ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: ' + e(REF.friendGift) + ' with your first order + ' + REF.friend + ' bonus points.</div>' : '') +
       '<form autocomplete="on" novalidate>' + (kidg ? '<div class="crm-invited" style="border-color:#FFD23F;background:#FFD23F22;color:#FFE9A3">🧒 Kids: hand the phone to a parent or guardian for this part.</div>' : '') + '<label>' + (kidg ? "Parent or guardian's first name" : "First name") + '</label><input name="name" maxlength="40" autocomplete="given-name" enterkeyhint="next"' + pre("name") + '>' +
@@ -839,7 +851,7 @@
       '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Send my rewards (points, prize and birthday codes) from ' + e(NAME) + ' to me by text or email. Msg & data rates may apply. Reply STOP anytime.</span></label>' + smsBox() +
       '<button class="go" type="submit">' + e(T[2]) + '</button><div class="err" role="alert"></div>' +
       (m ? '' : '<button type="button" class="crm-elink" data-a="restore" style="text-align:center">📱 Already a member? Sign back in</button>') +
-      '<button type="button" class="crm-gx">Not now</button></form>' +
+      '<button type="button" class="crm-gx">' + e(opts.later || "Not now") + '</button></form>' +
       '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + '</p></section>';
     var html = document.documentElement, prevOv = html.style.overflow, vv = window.visualViewport;
     function fit() { if (vv) { ov.style.height = vv.height + "px"; ov.style.top = vv.offsetTop + "px"; } }
@@ -847,10 +859,11 @@
     function close() {
       if (!ov.parentNode) return; ov.remove(); gateEl = null; html.style.overflow = prevOv;
       document.removeEventListener("keydown", key); if (vv) { vv.removeEventListener("resize", fit); vv.removeEventListener("scroll", fit); }
+      if (opts.onClose) try { opts.onClose(); } catch (x) {}
     }
     ov.close = close; gateEl = ov;
     var f = ov.querySelector("form");
-    ov.querySelector(".crm-gx").onclick = close;
+    ov.querySelector(".crm-gx").onclick = function () { close(); if (opts.onLater) try { opts.onLater(); } catch (x) {} };
     var rsb = ov.querySelector("[data-a=restore]"); if (rsb) rsb.onclick = function () { close(); openRestore(cb); };
     ov.addEventListener("click", function (ev) { if (ev.target === ov) close(); });
     f.onsubmit = function (ev) {
@@ -872,10 +885,12 @@
     };
     document.body.appendChild(ov); html.style.overflow = "hidden";
     document.addEventListener("keydown", key); if (vv) { vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); fit(); }
-    setTimeout(function () { try { f.elements.name.focus({ preventScroll: true }); } catch (x) { f.elements.name.focus(); } }, 60);
+    if (opts.onOpen) try { opts.onOpen(ov); } catch (x) {}
+    if (!opts.noFocus) setTimeout(function () { try { f.elements.name.focus({ preventScroll: true }); } catch (x) { f.elements.name.focus(); } }, 60);
     return false;
   }
   gate.member = function () { return mine()[0] || null; };
+  gate.offer = OFFER;   // what joining gets you (CRM_CFG.offer, or "N welcome points" on the simple program): claimscore.js quotes it
 
   // ---- SIGN BACK IN: restore my account on a new phone (2026-10-13, standard for every restaurant) ----
   // A guest on a new phone (or after Safari cleared the site) types the phone OR email they joined with, gets a 6-digit code
@@ -1066,7 +1081,13 @@
     if (!bound(m)) return { err: "Token codes only go into the account bound to this phone." };
     hit.used = Date.now(); hit.by = m.id; tcSave(l); tokAdd(m, hit.n, "🧾 Code " + v + " · $" + hit.amt.toFixed(2) + " order", "purchase"); put(m); return { n: hit.n };
   }
-  // the game's PLAY button calls this. Phase 1: members play free. Phase 2: costs playCost tokens.
+  // Phase 1 adult play: no gate. A member on this phone still gets the play counted on their account.
+  function guestPlay(go) {
+    var m = mine()[0];
+    if (m && hasBoth(m) && bound(m)) { m.plays = (m.plays || 0) + 1; put(m); drawJoin(); drawOwn(); refreshMenu(); }
+    go();
+  }
+  // the game's PLAY button calls this. Phase 1: everyone plays free (guestPlay; Kid mode still needs the parent). Phase 2: costs playCost tokens.
   function playGate(go, kid) {
     // Kid mode plays on the signed-in parent's account (gate "kidunlock" passes straight through once it exists)
     return gate(kid ? "kidunlock" : "play", function () {
@@ -1229,7 +1250,10 @@
     spinReady: function () { return spinReady(mine()[0]) || (!!SPIN && !mine()[0]); },
     // ms until the next free spin (midnight, Los Angeles time)
     nextSpinMs: function () { var t = new Date().toLocaleTimeString("en-US", { timeZone: "America/Los_Angeles", hour12: false }).split(":"); return Math.max(60000, (86400 - ((+t[0] % 24) * 3600 + +t[1] * 60 + +t[2])) * 1000); },
-    play: function (go, opt) { if (!TC) { go(); return; } playGate(go, !!(opt && opt.kid)); },
+    // PLAY FIRST (2026-10-14, Antidote): guests start right away, no sign-up sheet before the game. They save their score and any
+    // prize after the run (demo/claimscore.js -> SSAI_GATE, same fields, consent and destination). Still gated: Kid mode (a signed-in
+    // parent/guardian account, 18+) and Phase 2 tokens (a play costs tokens, which live on an account).
+    play: function (go, opt) { if (!TC) { go(); return; } var kid = !!(opt && opt.kid); if (kid || ON) { playGate(go, kid); return; } guestPlay(go); },
     isParent: function () { return isParent(mine()[0]); }, kidUnlock: kidUnlock, parentCheck: parentCheck, signOut: signOut,
     kidBest: function (score) { var m = mine()[0]; if (!isParent(m)) return 0; if (score > (m.kidBest || 0)) { m.kidBest = Math.round(score); (m.ledger = m.ledger || []).unshift({ ts: Date.now(), pts: 0, t: "🧒 New kid best in " + (C.game || "the game") + ": " + m.kidBest.toLocaleString() }); put(m); drawJoin(); } return m.kidBest || 0; },
     openSpin: openSpin, openTokens: function () { if (ON) tokSheet(); }, issueCode: function (a) { return ON ? issueCode(a) : null; },
@@ -1240,7 +1264,7 @@
     statusHTML: function (kid) {
       var m = this.member();
       if (kid) return isParent(m) ? "🧒 Kid mode · playing on " + e(String(m.name || "").split(" ")[0]) + "'s account" + (ON ? " · 🪙 " + (m.tok || 0) : "") : "🔒 Kid mode needs a parent or guardian signed in";
-      if (!ON) return m && hasBoth(m) ? "✅ Free to play for members" : "🎮 Free to play · free member account (phone + email)";
+      if (!ON) return m && hasBoth(m) ? "✅ Free to play · your scores save to your account" : "🎮 Free to play · no sign-up · save your score after";
       if (!m) return "🪙 Free account → " + TOK.weeklyFree + " free tokens every week";
       var b = m.tok || 0; return "🪙 <b>" + b + "</b> token" + (b === 1 ? "" : "s") + (b < TOK.playCost ? " · 🔒 need " + TOK.playCost + " to play" : " · a play costs " + TOK.playCost);
     },
@@ -1251,11 +1275,11 @@
           row({ icon: "🎁", name: "Weekly free tokens", note: "Every member, every week, added automatically", pts: "+" + TOK.weeklyFree }) +
           row({ icon: "🙋", name: "Free tokens on request", note: "Once a day, no purchase necessary", pts: "+" + TOK.freeDaily }) +
           row({ icon: "🧾", name: "Buy food", note: (TOK.perDollar ? TOK.perDollar + " token per $1" : "") + (TOK.perOrder ? " + " + TOK.perOrder + " per order" : "") + ": staff ring-up, receipt / staff code or app order" + (TOK.noAlc ? ". Never on alcohol" : ""), pts: "+" + (TOK.perDollar || TOK.perOrder) + (TOK.perDollar ? "/$1" : "") });
-        else if (TC) h += G("Free to play") + row({ icon: "🎮", name: (C.game || "The game") + " is free for members", note: "Free account with phone + email, tied to this phone. Points and prizes save to it", pts: "Free", gold: true });
+        else if (TC) h += G("Free to play") + row({ icon: "🎮", name: (C.game || "The game") + " is free to play", note: "No sign-up to play. After a run, save your score and prizes to a free account (phone + email, tied to this phone)", pts: "Free", gold: true });
         if (SPIN) h += G("Daily spin") + row({ icon: "🎡", name: "Free daily spin", note: "One per member per day. Wins " + (ON ? "tokens, " : "") + "points or food discounts. No purchase necessary", pts: "Free", gold: true });
       } else if (p === "how") {
         if (TC) h += G(ON ? "Tokens" : "Who can play") + (ON ? row({ icon: "🪙", name: "Each play costs " + TOK.playCost + " tokens", note: "+" + TOK.weeklyFree + " free every week, +" + TOK.freeDaily + " free on request once a day, and more with food you buy" }) :
-          row({ icon: "🎮", name: "Free to play for members", note: "Make a free account with your phone + email once. It stays bound to this phone" }));
+          row({ icon: "🎮", name: "Free to play, no sign-up", note: "Tap PLAY and go. To keep a score or prize, make a free account with your phone + email after the run. It stays bound to this phone" }));
         if (SPIN) h += row({ icon: "🎡", name: "Free daily spin", note: "Tap 🎡 on the start screen once a day. Always free" });
       }
       return h;
@@ -1746,11 +1770,11 @@
   }
 
   var mount = C.mount && document.querySelector(C.mount);
-  if (mount) { mount.appendChild(join); mount.appendChild(own); }
+  if (mount) { mount.appendChild(join); if (!CUST) mount.appendChild(own); }
   else {
     var ref = document.querySelector("#ssai-n") || document.querySelector("#ssai-k") || document.querySelector("footer");
-    if (ref && ref.parentNode) { ref.parentNode.insertBefore(join, ref); ref.parentNode.insertBefore(own, ref); }
-    else { document.body.appendChild(join); document.body.appendChild(own); }
+    if (ref && ref.parentNode) { ref.parentNode.insertBefore(join, ref); if (!CUST) ref.parentNode.insertBefore(own, ref); }
+    else { document.body.appendChild(join); if (!CUST) document.body.appendChild(own); }
   }
   drawJoin(); drawOwn("all");
   // one anonymous "open" per device per day for the back office (installs = opened from the Home Screen icon)

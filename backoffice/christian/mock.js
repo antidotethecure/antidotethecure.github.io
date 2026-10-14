@@ -89,6 +89,7 @@
       var tk = "TEST" + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + "x".repeat(20); TOK[tk] = d.user; return { ok: true, token: tk, name: USERS[d.user].name };
     }
     var u = TOK[d.token]; if (!u) return { ok: false, auth: false, reason: "Signed out. Log in again." };
+    if (d.type === "squares_admin") return window.SQUARES_MOCK ? window.SQUARES_MOCK(Object.assign({}, d, { by: USERS[u].name })) : { ok: false, reason: "Test squares backend missing" };   // demo/sports/squares-mock.js
     if (d.type === "bo_dedupe") return { ok: true, removed: 0 };
     if (d.type === "bo_logout") { delete TOK[d.token]; return { ok: true }; }
     if (d.type === "bo_summary") return { ok: true, members: members.length, joined7: members.filter(function (m) { return m.joined > now - 7 * DAY; }).length, plays7: games.length, redeems7: redeems.length, pendingClaims: claims.filter(function (x) { return x.status === "pending"; }).length };
@@ -132,5 +133,7 @@
     }
     return { ok: false };
   }
-  window.HQ_MOCK = function (body) { return new Promise(function (res) { setTimeout(function () { res(JSON.parse(JSON.stringify(handle(JSON.parse(JSON.stringify(body)))))); }, 120); }); };
+  window.HQ_MOCK = function (body) { return new Promise(function (res) { setTimeout(function () { Promise.resolve(handle(JSON.parse(JSON.stringify(body)))).then(function (r) { res(JSON.parse(JSON.stringify(r))); }); }, 120); }); };
+  // Football Squares test backend (shared with the guest app's ?test=1 through this browser's localStorage)
+  if (!window.SQUARES_MOCK) { var sqs = document.createElement("script"); sqs.src = "../../demo/sports/squares-mock.js?v=sq2"; document.head.appendChild(sqs); }
 })();

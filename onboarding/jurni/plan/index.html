@@ -118,4 +118,6 @@ document.getElementById("isSend").onclick=function(){ var k=document.getElementB
  iss.unshift({k:k,t:t,d:new Date().toLocaleDateString()}); try{localStorage.setItem(IK,JSON.stringify(iss));}catch(e){} paintIs(); document.getElementById("isT").value="";
  location.href="sms:+14243094068"+(/iPhone|iPad|iPod/.test(navigator.userAgent)?"&":"?")+"body="+encodeURIComponent("Gritz N Wafflez: "+k+"\n"+t); };
 paintIs();
-</script></body></html>
+</script>
+<script src="../../../demo/poweredby.js?v=20261013a" defer></script>
+</body></html>

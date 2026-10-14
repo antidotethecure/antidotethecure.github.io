@@ -17,6 +17,9 @@
   var e = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var q = function (s) { return encodeURIComponent(s).replace(/%20/g, "+"); };
   var main = N.spots[0];
+  // CUSTOMER-ONLY (window.SSAI_CUSTOMER_ONLY, e.g. Melody): no sample "players nearby" dots, no player-sharing toggle,
+  // no "preview the alert" button and no "Demo:" note. Reviews, the map, "you" and Directions stay. Pitch pages unchanged.
+  var CUST = !!window.SSAI_CUSTOMER_ONLY;
   var listing = "https://www.google.com/maps/search/?api=1&query=" + q(N.name + " " + (main.q || "")) + (N.placeId ? "&query_place_id=" + N.placeId : "");
   var writeUrl = N.placeId ? "https://search.google.com/local/writereview?placeid=" + N.placeId : listing;
 
@@ -58,16 +61,18 @@
     '<a class="b gold" href="' + e(writeUrl) + '" target="_blank" rel="noopener">⭐ Write a Google review</a>' +
     '<div id="ssai-rv"></div>' +
     '<div class="sep"></div>' +
-    '<span class="k">Who\'s nearby</span><h3>Find us and the crew 📍</h3>' +
-    '<p>Turn on location to see how close you are. Players who opt in show up at neighborhood level, never their exact spot.</p>' +
+    (CUST ? '<span class="k">Find us</span><h3>How close are you? 📍</h3>' +
+      '<p>Turn on location to see how far you are from ' + e(N.name) + '. Your location stays on this phone.</p>'
+    : '<span class="k">Who\'s nearby</span><h3>Find us and the crew 📍</h3>' +
+      '<p>Turn on location to see how close you are. Players who opt in show up at neighborhood level, never their exact spot.</p>') +
     '<div id="ssai-map"></div>' +
-    '<div class="leg"><span style="--c:#F7C04A">' + e(N.name) + '</span><span style="--c:#1E6BFF">You</span><span style="--c:#3DDC97">Players nearby (demo)</span></div>' +
+    '<div class="leg"><span style="--c:#F7C04A">' + e(N.name) + '</span><span style="--c:#1E6BFF">You</span>' + (CUST ? '' : '<span style="--c:#3DDC97">Players nearby (demo)</span>') + '</div>' +
     '<button class="b gold" type="button" id="ssai-loc">📍 Show me on the map</button>' +
-    '<label class="row"><input type="checkbox" id="ssai-share"> Let other players see me (approximate, nickname only)</label>' +
+    '<label class="row"' + (CUST ? ' style="display:none"' : '') + '><input type="checkbox" id="ssai-share"> Let other players see me (approximate, nickname only)</label>' +
     '<label class="row" id="ssai-nickrow" style="display:none"><input type="text" id="ssai-nick" maxlength="16" placeholder="Nickname, e.g. BigMike"></label>' +
     '<div class="st" id="ssai-st"></div>' +
-    '<button class="b ghost" type="button" id="ssai-sim">👀 Preview the "you\'re nearby" alert</button>' +
-    '<p class="fine">Demo: your location stays on this phone and the green players are samples. Live, alerts reach customers who opted in while they have the page open or through texts they signed up for.</p>';
+    '<button class="b ghost" type="button" id="ssai-sim"' + (CUST ? ' style="display:none"' : '') + '>👀 Preview the "you\'re nearby" alert</button>' +
+    (CUST ? '' : '<p class="fine">Demo: your location stays on this phone and the green players are samples. Live, alerts reach customers who opted in while they have the page open or through texts they signed up for.</p>');
 
   var mount = N.mount && document.querySelector(N.mount);
   if (mount) mount.appendChild(box);
@@ -133,7 +138,7 @@
       L.marker([s.lat, s.lng], { icon: L.divIcon({ className: "", html: '<div class="ssai-pin">' + (N.pin || "📍") + "</div>", iconSize: [30, 30], iconAnchor: [15, 28] }) })
         .addTo(map).bindPopup("<b>" + e(N.name) + "</b><br>" + e(s.label || "") + (N.approx ? "<br><i>pin approximate until launch</i>" : "") + '<br><a href="' + dirUrl(s) + '" target="_blank" rel="noopener">Directions</a>');
       pts.push([s.lat, s.lng]);
-      for (var i = 0; i < Math.ceil(9 / N.spots.length); i++) {
+      for (var i = 0; !CUST && i < Math.ceil(9 / N.spots.length); i++) {
         var ang = rnd() * Math.PI * 2, dist = 0.3 + rnd() * 2.6, dLat = dist / 69 * Math.cos(ang), dLng = dist / (69 * Math.cos(s.lat * Math.PI / 180)) * Math.sin(ang);
         L.circle([s.lat + dLat, s.lng + dLng], { radius: 420, color: "#3DDC97", weight: 1, fillColor: "#3DDC97", fillOpacity: .28 })
           .addTo(map).bindTooltip(NICKS[(i + pts.length * 3) % NICKS.length] + " · " + (Math.round(dist * 10) / 10) + " mi away");

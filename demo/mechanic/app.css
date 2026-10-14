@@ -550,10 +550,10 @@ html.dvlock,html.dvlock body{overflow:hidden}
 .dvspots{position:absolute;inset:0}
 .dvspot{position:absolute;transform:translate(-8px,-50%) scale(calc(1 / var(--z,1)));transform-origin:8px 50%;display:flex;align-items:center;gap:4px;padding:0;border:0;background:none;cursor:pointer}
 .dvspot::before{content:"";position:absolute;left:-8px;top:-8px;width:38px;height:38px}
-.dvspot i{display:block;width:16px;height:16px;flex:none;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 40%,transparent),0 2px 8px #0008;animation:dvp 1.8s ease-out infinite}
+.dvspot i{display:block;width:16px;height:16px;flex:none;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 2px 6px #0006;animation:dvp 1.8s ease-out infinite}
 .dvspot span{font:700 13px/1 "Rajdhani",sans-serif;color:#fff;background:#04060ce0;border-radius:99px;padding:5px 8px;white-space:nowrap;display:none}
 .dvin.lbl .dvspot span{display:block}
-@keyframes dvp{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 70%,transparent),0 2px 8px #0008}100%{box-shadow:0 0 0 12px transparent,0 2px 8px #0008}}
+@keyframes dvp{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent),0 2px 6px #0006}100%{box-shadow:0 0 0 7px transparent,0 2px 6px #0006}}
 @media (prefers-reduced-motion:reduce){.dvspot i{animation:none}}
 .dv.nohs .dvspots{display:none}
 .dvfoot{margin:0;padding:8px 14px calc(10px + env(safe-area-inset-bottom));font-size:13px;color:var(--dim);text-align:center}

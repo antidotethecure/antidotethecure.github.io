@@ -180,7 +180,8 @@
     }
     sec.innerHTML = '<span class="k">Specials</span><h3>' + (on.length ? "On now at " + esc(NAME) : "Holiday specials coming up") + '</h3>' +
       on.map(function (sp) { return card(sp, true); }).join("") + next.map(function (sp) { return card(sp, false); }).join("") +
-      '<p class="fine">' + (on.length ? "" : "Nothing running today. ") + 'Sample specials made from the real menu. The owner sets the final deal and price before launch.</p>';
+      // customer-only pages (window.SSAI_CUSTOMER_ONLY, e.g. Melody) drop the owner-facing "sample specials" note
+      (window.SSAI_CUSTOMER_ONLY ? '' : '<p class="fine">' + (on.length ? "" : "Nothing running today. ") + 'Sample specials made from the real menu. The owner sets the final deal and price before launch.</p>');
     sec.addEventListener("click", function (ev) { var bt = ev.target.closest("[data-sp]"); if (!bt) return; var sp = LIST.filter(function (s) { return s.id === bt.dataset.sp; })[0]; if (sp) { var el = findItem(sp.item); if (el) { el.scrollIntoView({ behavior: "smooth", block: "center" }); flashEl(el); } else bt.textContent = "On the menu: " + sp.item; } });
     var at = null, sels = CFG.before ? [CFG.before] : ["#chips", "#menu", "#menuhost"];
     for (var i = 0; i < sels.length && !at; i++) at = document.querySelector(sels[i]);

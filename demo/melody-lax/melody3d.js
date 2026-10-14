@@ -463,7 +463,7 @@ async function boot() {
     for (let e = 0; e < G.ens.length; e++) { const en = G.ens[e]; if (!en) continue; const hit = en.hit > 0 ? Math.min(1, en.hit / 240) : 0;
       if (en.t === "ufo") { const bob = Math.sin(now / 300 + en.ph) * .06, o = take("ufo"); put(o, en.x, en.y, A.ufo, en.w, false, now / 700 + en.ph, bob, .18); flash(o, hit * .45);
         Ba.q(en.x, en.y + 16, A.ufo - 30, 120, 120, 0, UV.dot, .49, .97, .78, .35); }
-      else if (en.t === "jet") { const o = take("jet"); put(o, en.x, en.y, A.jet, en.w, false, 0, 0, -.05); flash(o, hit * .45);
+      else if (en.t === "jet") { const o = take("jet"); put(o, en.x, en.y, A.jet, en.w, false, -(en.ra || 0), 0, -.05); flash(o, hit * .45);
         navPair(now, ext(en).seed, frac(o, .45, 0, .05).clone(), frac(o, -.45, 0, .05), 1.9);
         Ba.q(en.x, en.y - en.w * .55, A.jet - 4, 10, 26, 0, UV.tongue, 1, .7, .4, .7); }
       else if (en.t === "kami") { const o = take("plane"); put(o, en.x, en.y, A.kami, en.w, false, 0, Math.sin(now / 500 + en.x) * .08, .08); flash(o, hit * .45);
@@ -476,7 +476,7 @@ async function boot() {
         const on = Math.floor(tt * 7) % 2, bp = M.copPt(en, "bar");
         if (on) Ba.q(bp[0] - 7, bp[1], top - 4, 52, 52, 0, UV.dot, 1, .16, .24, .95); else Ba.q(bp[0] + 7, bp[1], top - 4, 52, 52, 0, UV.dot, .16, .47, 1, .95);
         if (en.flash > 0) { const gp = M.copPt(en, "gun"); Ba.q(gp[0], gp[1], A.cop + 4, 32, 32, 0, UV.dot, 1, .9, .6, 1); } }
-      else if (en.t === "gunship") { const o = take("cop0", 0x9aa66a); if (!o) continue; put(o, en.x, en.y, A.gun, M.GS_LEN, true, 0, Math.sin(en.ph || 0) * .08, .05); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
+      else if (en.t === "gunship") { const o = take("cop0", 0x9aa66a); if (!o) continue; put(o, en.x, en.y, A.gun, M.GS_LEN, true, -(en.a || 0), Math.sin(en.ph || 0) * .08, .05); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
         const top = o.position.y + o.userData.size.y * o.scale.x * .5 + 2, hb = M.gsPt(en, "hub"), tp = M.gsPt(en, "tail");
         rotor(hb[0], hb[1], top, 102, tt * 2.6 * 3.1); rotor(tp[0], tp[1], top - 6, 15, tt * 1.8 * 2.6 * 3.1);
         navPair(now, 4, frac(o, .5, .2, .1).clone(), frac(o, -.5, .2, .1), 2.4);
@@ -566,6 +566,7 @@ async function boot() {
         u.ch.position.set(0, 26, -30); u.ch.rotation.set(-.55, 0, 0);
         const L = u.lines.geometry.attributes.position.array; L.set([-12, 11, -6, -24, 22, -24, 12, 11, -6, 24, 22, -24, -5, 11, -8, -8, 26, -30, 5, 11, -8, 8, 26, -30]); u.lines.geometry.attributes.position.needsUpdate = true;
         const c = rgb(col); Ba.q(it.x, it.y + 4, A.item - 12, 92, 92, 0, UV.dot, c[0], c[1], c[2], .45 + .2 * Math.sin(now / 140)); }
+      else if (it.t === "slow" || it.t === "boost") { }   // slow-mo hourglass + boost pickup: drawn on the 2D overlay (index.html)
       else { const P = it.t === "mic" ? M.MIC : it.p, key = P.k, bob = Math.sin(now / 260 + it.x) * 3, o = MODELS[key] ? take(key) : null;
         if (o) { const zs = o.userData.size, flat = zs.y < .5 * Math.max(zs.x, zs.z);   // plates/skillets show their top (the food), glasses/bottles/mic lean toward the camera
           put(o, it.x, it.y + bob, A.item, (P.w3 || P.w) * zs.x / (flat ? Math.max(zs.x, zs.z) : Math.max(zs.x, zs.y)), false, now / 1100 + it.x, (it.rot || 0) * .8, P.tilt3 != null ? P.tilt3 : flat ? .32 : FOOD_TILT); o.rotation.order = "XYZ"; foodLit(o, it.t === "mic" ? 0 : P.drink ? .5 : .42); }

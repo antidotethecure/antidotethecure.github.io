@@ -79,7 +79,7 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:26px;line-
   function load(){
     fetch(window.SSAI_API + "?id=" + encodeURIComponent(id) + "&t=" + encodeURIComponent(tk)).then(function(r){ return r.json(); }).then(function(d){
       if (!d.ok) { A.innerHTML = '<div class="state"><div style="font-size:40px">🔍</div><h1>Not found</h1><p>Check the link, or <a href="../start/" style="color:var(--gold)">send your info again</a>.</p></div>'; return; }
-      if (d.status === "rejected") { A.innerHTML = '<div class="state"><div style="font-size:40px">🙏</div><h1>Thanks, ' + e(d.name) + '</h1><p>We couldn\'t build a sample from this one. DM <a style="color:var(--gold)" href="https://instagram.com/second.shiftai">@second.shiftai</a> and we\'ll sort it out.</p></div>'; return; }
+      if (d.status === "rejected") { A.innerHTML = '<div class="state"><div style="font-size:40px">🙏</div><h1>Thanks, ' + e(d.name) + '</h1><p>We couldn\'t build a sample from this one. DM <a style="color:var(--gold)" href="https://instagram.com/sousshiftai">@SousShiftAi</a> and we\'ll sort it out.</p></div>'; return; }
       if (d.status !== "approved") { pending(d); setTimeout(load, 60000); return; }
       render(d);
     }).catch(function(){ A.innerHTML = '<div class="state"><h1>Connection hiccup</h1><p>Refresh in a moment.</p></div>'; });
@@ -125,7 +125,7 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:26px;line-
       (dishes.length > items.length ? '<div class="gal menu">' + dishes.slice(items.length).map(function(p){ return '<img src="' + p + '" alt="' + e(d.name) + '">'; }).join("") + '</div>' : '') +
 
       '<div class="cta"><h2>Make it real</h2><p class="sub">This sample is yours to keep looking at. The full version adds your rewards program, your customer list, automatic win-back texts and more, built around <span class="notranslate" translate="no">' + e(d.name) + '</span>.</p>' +
-      '<div class="acts"><a class="btn hot" href="../growth/?for=' + encodeURIComponent(d.name) + '">See plans & what you get →</a><a class="btn" href="https://instagram.com/second.shiftai" target="_blank" rel="noopener">DM @second.shiftai</a></div></div>';
+      '<div class="acts"><a class="btn hot" href="../growth/?for=' + encodeURIComponent(d.name) + '">See plans & what you get →</a><a class="btn" href="https://instagram.com/sousshiftai" target="_blank" rel="noopener">DM @SousShiftAi</a></div></div>';
     game(t, P);
     window.CRM_CFG = { name: d.name, offer: t.welcome || "10% off your next visit", mount: "#crm-slot" };
     var cs = document.createElement("script"); cs.src = "../crm.js"; document.body.appendChild(cs);

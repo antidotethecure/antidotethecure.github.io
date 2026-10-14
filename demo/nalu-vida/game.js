@@ -121,7 +121,7 @@
   /* ---------- images ---------- */
   var IM = {};
   ["surfer_m", "surfer_f", "shark", "eel", "jelly", "gull", "boat", "heli", "plane", "raft_taco", "raft_burger", "raft_oysters", "raft_mimosa", "raft_shrimp",
-    "drop", "buoy", "shore", "pier", "pierend", "lifeguard_f", "lifeguard_m", "staff", "palm", "storefront", "wave", "splash", "fish_gold", "fish_mahi", "fish_parrot", "raft_fries", "skeleton", "paddler_m", "paddler_f", "beachlady", "surfer_m_rider", "surfer_m_board", "surfer_f_rider", "surfer_f_board"].forEach(function (k) { var i = new Image(); i.decoding = "async"; i.src = "img/game/" + k + ".webp"; IM[k] = i; });
+    "drop", "buoy", "shore", "pier", "lifeguard_f", "lifeguard_m", "staff", "palm", "storefront", "wave", "splash", "fish_gold", "fish_mahi", "fish_parrot", "raft_fries", "skeleton", "paddler_m", "paddler_f", "beachlady", "surfer_m_rider", "surfer_m_board", "surfer_f_rider", "surfer_f_board"].forEach(function (k) { var i = new Image(); i.decoding = "async"; i.src = "img/game/" + k + ".webp"; IM[k] = i; });
   function ok(i) { return i && i.complete && i.naturalWidth > 0; }
   function spr(k, x, y, w, rot, alpha) {
     var i = IM[k]; if (!ok(i)) return false; var h = w * i.naturalHeight / i.naturalWidth;
@@ -308,7 +308,7 @@
   // every level starts on the sand in front of Nalu Vida, a run away from the water
   function levelStart(first) {
     G.phase = "sand"; G.lvT = 0; G.rideT = 0; G.dir = 1; G.lead = LEAD; G.x = SHORE_X; G.yw = -230; G.vx = 0; G.ang = 0; G.cam = G.yw + G.lead; G.wo = 0;
-    G.ents = []; G.fx = []; G.wake = []; G.jump = 0; G.jumpDur = 0; G.jcd = 0; G.duck = 0; G.dcd = 0; G.trick = null; G.tricks = []; G.wave = 0; G.wipe = 0; G.eng = 0; G.wv = null;
+    G.ents = []; G.fx = []; RND.clear(); G.wake = []; G.jump = 0; G.jumpDur = 0; G.jcd = 0; G.duck = 0; G.dcd = 0; G.trick = null; G.tricks = []; G.wave = 0; G.wipe = 0; G.eng = 0; G.wv = null;
     G.pocket = 0; G.pocketT = 0; G.kick = 0; G.lip = 0; G.lipRise = 0; G.flat = 0; G.lipZone = 0; G.final = 0; G.beachT = 0; G.inv = 1; G.hint = 0; G.popT = 0;
     if (G.beer) { G.beer = null; if (!G.resc || DBG_RESC) G.rescPend = 1; }
     G.spawn = { food: 2.5, haz: 3.5, set: 2.6, hb: 9, boat: 12, heli: 20, plane: first ? 24 : 40, buoy: 28, harp: G.level > 1 ? 6 : 14, rock: 6, ski: 12, pier: 5, ray: 7, fish: 8 };
@@ -613,7 +613,7 @@
       else if (e.t === "boat" && e.hunt) { e.x += e.vx * dt; if (swim) e.yw = Math.max(e.yw, G.yw + 176);   // keeps out ahead of you while it crosses
         var q = e.q, on = e.x > 36 && e.x < W - 36;
         if (q && !q.leave && e.shots > 0 && on) { if (e.aim > 0) { e.aim -= dt; if (e.aim <= 0) { var hx = q.x - e.x, hy = q.yw - e.yw, hl = Math.hypot(hx, hy) || 1, hv = 235 + 12 * (G.level - 1);
-                add({ t: "sharp", x: e.x + hx / hl * 30, yw: e.yw + hy / hl * 30, vx: hx / hl * hv, vy: hy / hl * hv, r: 6 }); sfx("lunge"); buzz(12); e.shots--; e.cd = 1.15; } }
+                add({ t: "sharp", x: e.x + hx / hl * 30, yw: e.yw + hy / hl * 30, vx: hx / hl * hv, vy: hy / hl * hv, r: 6 }); RND.fire(e.x + hx / hl * 30, e.yw + hy / hl * 30, hx, hy); sfx("lunge"); buzz(12); e.shots--; e.cd = 1.15; } }
             else { e.cd -= dt; if (e.cd <= 0) { e.aim = .85; e.ax = q.x; e.ayw = q.yw; } } }
         if (e.aim > 0 && q) { e.ax = q.x; e.ayw = q.yw; }
         if (q && (e.shots <= 0 || !on && e.shots < (G.level >= 3 ? 3 : 2))) q.leave = 1; }
@@ -644,8 +644,10 @@
         if (e.t === "buoy" && d < hitR + 6) { G.hearts = Math.min(5, G.hearts + 1); pop(e.x, sy(e.yw), "+1 ❤️ Lifeguard save!", "#ff9db0", 1); toast("lifeguard_f", "Rescue can! +1 heart"); G.ents.splice(i, 1); continue; }
         if (e.t === "boat" && e.hunt) { if (d < e.r + 14) { var bs2 = G.x >= e.x ? 1 : -1; G.vx = bs2 * 220; } continue; }
         if (e.t === "qfin") continue;
-        if (e.t === "sharp") { if (!e.done && d < 17 && G.duck <= 0 && hurt("HARPOONED!", "ray")) { e.done = 1; G.ents.splice(i, 1); if (G.phase === "death") return; continue; }
-          if (!e.done && !e.miss && (G.yw - e.yw) * G.dir > 26) { e.miss = 1; gain(150, G.x, py - 40, "DODGED!"); } continue; }
+        if (e.t === "sharp") { if (!e.done && d < 17 && G.duck <= 0 && hurt("HARPOONED!", "ray")) { e.done = 1; RND.hit(e.x, e.yw); G.ents.splice(i, 1); if (G.phase === "death") return; continue; }
+          if (!e.done && !e.miss && (G.yw - e.yw) * G.dir > 26) { e.miss = 1; gain(150, G.x, py - 40, "DODGED!"); }
+          if (e.miss && (G.yw - e.yw) * G.dir > 70) { RND.splash(e.x, e.yw); G.ents.splice(i, 1); }   // a miss drops into the water behind you (looks only)
+          continue; }
         var danger = e.t === "jelly" || e.t === "ray" || (e.t === "eel" && e.zap) || (e.t === "shark" && e.st === "lunge") || e.t === "boat";
         if (danger && d < hitR && G.duck <= 0) { hurt(e.t === "shark" ? "SHARK BUMP! Wipeout" : e.t === "eel" ? "EEL BUMP! Wipeout" : e.t === "jelly" ? "Jellyfish! Wipeout" : e.t === "ray" ? "STINGRAY! Wipeout" : "Boat wake!"); if (e.t === "shark") e.st = "gone"; if (G.phase === "death") return; continue; }
         if ((e.t === "jelly" || e.t === "eel" || e.t === "shark" || e.t === "ray") && !e.nm && d < hitR + 26 && d >= hitR && (e.t !== "shark" || e.st === "lunge")) { e.nm = 1; gain(50, G.x, py - 40, "close one!"); }
@@ -1059,6 +1061,7 @@
       else if (f.k === "debris") { f.p.forEach(function (q) { var d = q[1] * f.t, a = 1 - f.t / .6; cx.fillStyle = "rgba(110,104,96," + a + ")"; cx.beginPath(); cx.arc(f.x + Math.cos(q[0]) * d, f.y + Math.sin(q[0]) * d * .8 - Math.sin(f.t / .6 * Math.PI) * 24, q[2] * (1 - f.t), 0, 7); cx.fill(); }); }
       else if (f.k === "spray") { for (var k = 0; k < 10; k++) { cx.fillStyle = "rgba(255,255,255," + (1 - f.t / .6) + ")"; cx.beginPath(); cx.arc(f.x + Math.cos(k) * f.t * 80, f.y + Math.sin(k * 2) * f.t * 50, 3, 0, 7); cx.fill(); } }
     });
+    RND.draw();   // the fisherman's rounds: flash, smoke, brass, sparks, splashes (2D overlay in both renderers)
     if (G.hint > 0 && (G.phase === "ride" || G.phase === "swim")) { cx.save(); cx.setTransform(DPR, 0, 0, DPR, 0, 0); cx.globalAlpha = Math.min(1, G.hint) * (.6 + .4 * Math.sin(G.t * 6));
       label(G.phase === "swim" ? "🌊 Tap DUCK DIVE as each wave reaches you" : "🏄 Ride the glowing pocket ahead of the curl to the exit", W / 2, H - 132, "#fff"); cx.restore(); }
     if (G.phase === "death" && G.deathCause === "eel") eelScreen();
@@ -1456,11 +1459,7 @@
     if (e.t === "rsign") { drawRSign(e, x, y); return; }
     if (e.t === "harpoon") { drawHarpPick(e, x, y); return; }
     if (e.t === "qfin") { qfin(e, x, y); return; }
-    if (e.t === "sharp") { var ha = Math.atan2(e.vx, e.vy);
-      cx.fillStyle = "rgba(0,20,35,.25)"; cx.beginPath(); cx.ellipse(x + 5, y + 6, 4, 16, ha, 0, 7); cx.fill();
-      cx.save(); cx.translate(x, y); cx.rotate(ha); cx.strokeStyle = "#cfd6dc"; cx.lineWidth = 3; cx.lineCap = "round"; cx.beginPath(); cx.moveTo(0, 22); cx.lineTo(0, -12); cx.stroke();
-      cx.fillStyle = "#eef3f6"; cx.beginPath(); cx.moveTo(0, -24); cx.lineTo(-5, -11); cx.lineTo(5, -11); cx.closePath(); cx.fill();
-      cx.strokeStyle = "rgba(255,255,255,.55)"; cx.lineWidth = 1; cx.setLineDash([3, 4]); cx.beginPath(); cx.moveTo(0, 22); cx.lineTo(Math.sin(G.t * 9) * 3, 70); cx.stroke(); cx.setLineDash([]); cx.restore(); return; }
+    if (e.t === "sharp") { RND.bullet(e, x, y); return; }
     if (e.t === "ski") { drawSki(e, x, y); return; }
     if (e.t === "food") {
       var b = Math.sin(G.t * 3 + e.bob) * 2.5;
@@ -1605,6 +1604,99 @@
     cx.fillStyle = "#ff7a3d"; cx.fillRect(-2.6, -len / 2, 5.2, 4); cx.strokeStyle = "#f4e2b8"; cx.lineWidth = 1.2; cx.beginPath(); cx.arc(0, -len / 2 - 3, 3, 0, 7); cx.stroke();
     cx.restore();
   }
+  /* ---------- the fisherman's rounds: a real copper-jacketed bullet + tracer, muzzle flash, brass, sparks, splashes ----------
+     Looks only: the hitbox, speed and "DODGED!" logic are the same as before. Every sprite is pre-rendered once into a small
+     canvas, and the effects come from a fixed pool of 48 particles (nothing is allocated per frame; a full pool just skips). */
+  var RND = (function () {
+    var SC = 3, SP = null, P = [], N = 48, last = 0;
+    for (var i = 0; i < N; i++) P.push({ on: 0, k: 0, x: 0, yw: 0, z: 0, vx: 0, vy: 0, vz: 0, t: 0, life: 1, a: 0, va: 0, s: 1 });
+    function mk(w, h, fn) { var c = document.createElement("canvas"); c.width = Math.ceil(w * SC); c.height = Math.ceil(h * SC); var g = c.getContext("2d"); g.scale(SC, SC); fn(g, w, h); return c; }
+    function build() {
+      SP = {};
+      // the round, nose along +x: boat-tail base, cylindrical copper jacket with a cannelure, pointed ogive, top-lit specular
+      SP.bul = mk(16, 6, function (g) {
+        var m = 3, L = 15.5, r = 2.5, cyl = 8.6;
+        g.beginPath(); g.moveTo(.4, m - r * .78); g.lineTo(1.4, m - r); g.lineTo(cyl, m - r);
+        g.bezierCurveTo(cyl + 3.4, m - r, L - 1.8, m - .9, L, m); g.bezierCurveTo(L - 1.8, m + .9, cyl + 3.4, m + r, cyl, m + r);
+        g.lineTo(1.4, m + r); g.lineTo(.4, m + r * .78); g.closePath();
+        var gr = g.createLinearGradient(0, m - r, 0, m + r);
+        gr.addColorStop(0, "#5e2a10"); gr.addColorStop(.18, "#c26a33"); gr.addColorStop(.34, "#ffd8b0"); gr.addColorStop(.5, "#e08e52");
+        gr.addColorStop(.78, "#94461f"); gr.addColorStop(1, "#3f1a08"); g.fillStyle = gr; g.fill();
+        g.lineWidth = .35; g.strokeStyle = "rgba(40,14,4,.75)"; g.stroke();
+        g.strokeStyle = "rgba(55,20,6,.7)"; g.lineWidth = .5; g.beginPath(); g.moveTo(6.4, m - r + .15); g.lineTo(6.4, m + r - .15); g.stroke();   // cannelure
+        g.strokeStyle = "rgba(255,240,220,.85)"; g.lineWidth = .45; g.beginPath(); g.moveTo(1.6, m - 1.25); g.lineTo(cyl + 1.2, m - 1.25); g.quadraticCurveTo(cyl + 4, m - 1.1, L - 1.6, m - .35); g.stroke();   // specular streak
+        g.fillStyle = "rgba(255,255,255,.9)"; g.beginPath(); g.ellipse(cyl + 1.6, m - 1.1, 1.3, .35, -.1, 0, 7); g.fill();
+      });
+      // tracer / motion streak: warm, faint at the tail, brighter at the round
+      SP.trc = mk(64, 6, function (g, w, h) {
+        var gr = g.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, "rgba(255,170,80,0)"); gr.addColorStop(.65, "rgba(255,190,110,.35)"); gr.addColorStop(1, "rgba(255,236,190,.95)");
+        g.fillStyle = gr; g.beginPath(); g.moveTo(0, h / 2 - .2); g.lineTo(w - 2, h / 2 - 1.5); g.quadraticCurveTo(w, h / 2, w - 2, h / 2 + 1.5); g.lineTo(0, h / 2 + .2); g.closePath(); g.fill();
+      });
+      // muzzle flash, firing along +x from (6, 16): hot core + a 3-petal cone + side jets
+      SP.fl = mk(48, 32, function (g) {
+        var gr = g.createRadialGradient(8, 16, 0, 8, 16, 34); gr.addColorStop(0, "rgba(255,255,235,1)"); gr.addColorStop(.18, "rgba(255,226,120,.95)"); gr.addColorStop(.5, "rgba(255,140,40,.6)"); gr.addColorStop(1, "rgba(255,90,20,0)");
+        g.fillStyle = gr; g.beginPath();
+        g.moveTo(4, 16); g.quadraticCurveTo(20, 11, 46, 16); g.quadraticCurveTo(20, 21, 4, 16);
+        g.moveTo(6, 15); g.quadraticCurveTo(18, 6, 34, 4); g.quadraticCurveTo(18, 11, 8, 16);
+        g.moveTo(6, 17); g.quadraticCurveTo(18, 26, 34, 28); g.quadraticCurveTo(18, 21, 8, 16);
+        g.moveTo(8, 15); g.lineTo(11, 3); g.lineTo(10, 15); g.moveTo(8, 17); g.lineTo(11, 29); g.lineTo(10, 17);
+        g.fill(); g.beginPath(); g.arc(8, 16, 5, 0, 7); g.fill();
+      });
+      SP.pf = mk(32, 32, function (g) { var gr = g.createRadialGradient(16, 16, 0, 16, 16, 16); gr.addColorStop(0, "rgba(225,228,232,.75)"); gr.addColorStop(.6, "rgba(200,205,212,.35)"); gr.addColorStop(1, "rgba(200,205,212,0)"); g.fillStyle = gr; g.fillRect(0, 0, 32, 32); });
+      SP.ca = mk(7, 3, function (g) {   // a spent brass case, mouth to the right
+        var gr = g.createLinearGradient(0, 0, 0, 3); gr.addColorStop(0, "#8a6418"); gr.addColorStop(.35, "#f6dc8c"); gr.addColorStop(.6, "#cf9f3e"); gr.addColorStop(1, "#6d4c10");
+        g.fillStyle = gr; g.fillRect(.6, .3, 6.2, 2.4); g.fillStyle = "#7a5512"; g.fillRect(0, .15, .8, 2.7); g.fillStyle = "#3a2706"; g.fillRect(6.4, .7, .5, 1.6);
+      });
+    }
+    function get() { for (var i = 0; i < N; i++) if (!P[i].on) return P[i]; return null; }
+    function emit(k, x, yw, vx, vy, life, a, va, s, z, vz) { var p = get(); if (!p) return null;
+      p.on = 1; p.k = k; p.x = x; p.yw = yw; p.vx = vx; p.vy = vy; p.life = life; p.t = 0; p.a = a || 0; p.va = va || 0; p.s = s || 1; p.z = z || 0; p.vz = vz || 0; return p; }
+    // vx/vy below are SCREEN px/s (x right, y down); world yw runs opposite to screen y (sy = HC - (yw - cam))
+    function fire(x, yw, wvx, wvy) {
+      var l = Math.hypot(wvx, wvy) || 1, dx = wvx / l, dy = -wvy / l, a = Math.atan2(dy, dx), side = dx >= 0 ? 1 : -1;
+      emit(1, x, yw, 0, 0, .085, a, 0, 1);                                         // the flash (2-3 frames)
+      emit(2, x + dx * 10, yw - dy * 10, dx * 26, dy * 26 - 6, .55, 0, 0, .7);    // a little powder smoke drifting off the muzzle
+      if (!REDUCE) emit(3, x - dx * 22, yw + dy * 22, -dy * side * rnd(55, 85) - dx * 15, dx * side * rnd(55, 85) - dy * 15, .9, rnd(0, 6), rnd(-24, 24) || 14, 1, 6, rnd(70, 95));   // one ejected case, tumbling
+    }
+    function sparks(x, yw) { for (var i = 0; i < 9; i++) { var an = rnd(0, 6.283), v = rnd(140, 260); emit(4, x, yw, Math.cos(an) * v, Math.sin(an) * v * .75, rnd(.16, .28), an, 0, 1); } }
+    function splash(x, yw, big) {
+      emit(6, x, yw, 0, 0, .55, 0, 0, big ? 1.3 : 1);
+      for (var i = 0; i < (big ? 7 : 5); i++) emit(5, x + rnd(-3, 3), yw, rnd(-45, 45), rnd(-14, 14), rnd(.4, .6), 0, 0, rnd(1.4, 2.4), 0, rnd(60, 110));
+    }
+    function hit(x, yw) { sparks(x, yw); splash(x, yw, 1); }
+    function clear() { for (var i = 0; i < N; i++) P[i].on = 0; }
+    function step(dt) {
+      for (var i = 0; i < N; i++) { var p = P[i]; if (!p.on) continue; p.t += dt; if (p.t >= p.life) { p.on = 0; continue; }
+        p.x += p.vx * dt; p.yw -= p.vy * dt; p.a += p.va * dt;
+        if (p.k === 4) { p.vx *= .9; p.vy *= .9; }
+        else if (p.k === 2) { p.vx *= .96; p.vy *= .96; }
+        else if (p.k === 3 || p.k === 5) { p.vz -= 320 * dt; p.z += p.vz * dt;
+          if (p.z <= 0) { p.z = 0; if (p.k === 3) { p.on = 0; emit(6, p.x, p.yw, 0, 0, .35, 0, 0, .4); } else p.on = 0; } } }
+    }
+    // the round itself, drawn where the old harpoon was. Points along its screen velocity.
+    function bullet(e, x, y) {
+      if (!SP) build(); var a = Math.atan2(-e.vy, e.vx), sp = Math.hypot(e.vx, e.vy), tl = Math.min(70, 26 + sp * .14);
+      cx.globalAlpha = .22; cx.fillStyle = "#001423"; cx.beginPath(); cx.ellipse(x + 5, y + 7, 9, 2.4, a, 0, 7); cx.fill();   // its shadow on the water
+      cx.save(); cx.translate(x, y); cx.rotate(a);
+      cx.globalCompositeOperation = "lighter"; cx.globalAlpha = .75; cx.drawImage(SP.trc, -tl + 5, -3.6, tl, 7.2);
+      cx.globalCompositeOperation = "source-over"; cx.globalAlpha = 1; cx.drawImage(SP.bul, -10, -3.75, 20, 7.5);   // ~1.25x real-to-screen so it reads on a phone
+      cx.restore(); cx.globalAlpha = 1;
+    }
+    function draw() {
+      var now = performance.now(), dt = last ? Math.min(.05, (now - last) / 1000) : 0; last = now; step(dt);
+      if (!SP) build(); var any = 0;
+      for (var i = 0; i < N; i++) { var p = P[i]; if (!p.on) continue; any = 1; var f = p.t / p.life, x = p.x, y = sy(p.yw) - p.z;
+        if (p.k === 1) { cx.save(); cx.globalCompositeOperation = "lighter"; cx.globalAlpha = 1 - f * .6; cx.translate(x, y); cx.rotate(p.a); var k = .85 + .3 * (1 - f); cx.drawImage(SP.fl, -8 * k, -16 * k, 48 * k, 32 * k); cx.restore(); }
+        else if (p.k === 2) { var r = 8 + f * 18; cx.globalAlpha = .55 * (1 - f); cx.drawImage(SP.pf, x - r, y - r, r * 2, r * 2); }
+        else if (p.k === 3) { cx.globalAlpha = f > .7 ? (1 - f) / .3 : 1; cx.fillStyle = "#001423"; cx.save(); cx.globalAlpha *= .25; cx.beginPath(); cx.ellipse(x + 2, sy(p.yw) + 2, 3, 1.2, 0, 0, 7); cx.fill(); cx.restore(); cx.save(); cx.translate(x, y); cx.rotate(p.a); cx.drawImage(SP.ca, -3.5, -1.5, 7, 3); cx.restore(); }
+        else if (p.k === 4) { var ln = 10 * (1 - f) + 3, cs = Math.cos(p.a), sn = Math.sin(p.a); cx.globalCompositeOperation = "lighter"; cx.globalAlpha = 1 - f; cx.strokeStyle = "#ffd27a"; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(x, y); cx.lineTo(x - cs * ln, y - sn * ln * .75); cx.stroke(); cx.globalCompositeOperation = "source-over"; }
+        else if (p.k === 5) { cx.globalAlpha = .85 * (1 - f); cx.fillStyle = "#f4fbff"; cx.beginPath(); cx.arc(x, y, p.s, 0, 7); cx.fill(); }
+        else if (p.k === 6) { cx.globalAlpha = .7 * (1 - f); cx.strokeStyle = "#eaf8ff"; cx.lineWidth = 1.6; cx.beginPath(); cx.ellipse(x, y, (4 + f * 22) * p.s, (2 + f * 9) * p.s, 0, 0, 7); cx.stroke(); }
+      }
+      if (any) cx.globalAlpha = 1;
+    }
+    return { fire: fire, hit: hit, splash: splash, bullet: bullet, draw: draw, clear: clear };
+  })();
   function drawHarpPick(e, x, y) {
     var b = Math.sin(G.t * 3 + e.bob) * 2.5, pul = .5 + .5 * Math.sin(G.t * 5 + e.bob);
     cx.save(); cx.globalCompositeOperation = "lighter"; var gg = cx.createRadialGradient(x, y + b, 3, x, y + b, 38); gg.addColorStop(0, "rgba(255,170,80," + (.35 + pul * .25) + ")"); gg.addColorStop(1, "rgba(255,170,80,0)"); cx.fillStyle = gg; cx.beginPath(); cx.arc(x, y + b, 38, 0, 7); cx.fill(); cx.restore();

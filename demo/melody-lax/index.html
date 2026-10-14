@@ -108,7 +108,7 @@ h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;le
 .hud2{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:-4px 2px 8px;font-size:12.5px;font-weight:800;color:var(--dim);min-width:0}
 .hud2 span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hud2 b{color:var(--ink)}
 .hud2 .pips{display:inline-flex;gap:2px;vertical-align:middle;margin-left:5px}.hud2 .pips i{width:7px;height:10px;border-radius:2px;background:#1c2540;border:1px solid #2a365a}
-#cv{display:block;width:100%;height:auto;aspect-ratio:400/600;border-radius:12px;background:#05081a;touch-action:none;cursor:pointer}
+#cv{display:block;width:100%;height:auto;aspect-ratio:400/600;border-radius:12px;background:#05081a;touch-action:pan-y pinch-zoom;cursor:pointer}
 .cvwrap{position:relative}
 .gbtn{position:absolute;z-index:2;width:34px;height:34px;padding:0;border-radius:50%;border:1px solid #ffffff38;background:rgba(8,13,26,.62);color:#fff;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .gbtn.off{opacity:.6}
@@ -2519,7 +2519,7 @@ window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",regio
     {id:"parsley",name:"Parsley",price:0,max:1,group:"Toppings"}]};</script>
 <script src="../builder.js"></script>
 <script src="dish3d.js?v=d3d3"></script>
-<script src="../gamelock.js"></script>
+<script src="../gamelock.js?v=ml1"></script>
 <script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
 window.SPECIALS=[
  {id:"halloween",holiday:"halloween",title:"Spooky Mac Night",desc:"Bacon, Cheddar & Jalapeño Mac & Cheese with a side of Phat Fries, all Halloween week.",item:"Bacon, Cheddar & Jalapeno Mac & Cheese",start:"10-20",end:"10-31",code:"BOO"},

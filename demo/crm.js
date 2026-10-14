@@ -73,8 +73,9 @@
   // the Apps Script web app (command-center/clients/melody-lax/signup-sheet/Code.gs). Its /exec URL lives in
   // SSAI_REWARDS.interim.api (filled from demo/christian-live.js). EMPTY = nothing leaves the phone (today's state).
   // What is sent: a member snapshot whenever the member changes (name, phone, email, birthday, points balance / earned /
-  // used, visits, referral code + who referred them, text consent), one "game" row per finished run, and one anonymous
-  // "open" per device per day (installed to Home Screen or not). Nothing is sent from staff practice mode.
+  // used, visits, referral code + who referred them, text consent), one "game" row per finished run, and one "open" per
+  // app open (max 1 per 10 min: time, device summary, Home Screen or not, approximate location only if already allowed;
+  // see logOpen below). Nothing is sent from staff practice mode.
   var API = C.sheet || (SIMPLE && SIMPLE.interim && SIMPLE.interim.api) || "";
   if (API && !C.sheet) C.sheet = API;
   // STAFF PRACTICE (?staff=1, opened from the staff app /staff/christian/): game runs go to the employee's practice tally
@@ -1777,12 +1778,48 @@
     else { document.body.appendChild(join); if (!CUST) document.body.appendChild(own); }
   }
   drawJoin(); drawOwn("all");
-  // one anonymous "open" per device per day for the back office (installs = opened from the Home Screen icon)
-  if (SIMPLE && API && !STAFF) try {
-    var ok = KEY + "_open", td = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
-    if (localStorage.getItem(ok) !== td) { localStorage.setItem(ok, td); if (mine()[0]) syncLater(mine()[0]);   // daily re-sync: members who joined before the backend existed get counted too
-      boPost({ type: "open", dev: devId(), member: (mine()[0] || {}).id || "", standalone: (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone ? 1 : 0 }); }
-  } catch (x) {}
+  // VISIT LOG for the back office (Christian HQ › Visits): one "open" each time the app is opened or brought back to the
+  // screen (max 1 per 10 min per phone), with the phone's local time, a short device summary from the user agent
+  // ("iPhone · iOS 18.6 · Safari") and Home Screen vs browser. Location: ONLY if this person ALREADY allowed location for
+  // the app (Permissions API says "granted"); we never ask for it here. Then one coarse reading, rounded to 2 decimals
+  // (about 1 km) + its accuracy. No tracking: nothing runs in the background. Disclosed in rules.html.
+  function devSummary() {
+    var ua = navigator.userAgent || "", m, kind, os = "", br;
+    var iPad = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    if (/iPhone|iPod/.test(ua) || iPad) { kind = iPad ? "iPad" : "iPhone"; m = ua.match(/OS (\d+)[_.](\d+)/); os = m ? "iOS " + m[1] + (m[2] !== "0" ? "." + m[2] : "") : "iOS"; }
+    else if (/Android/.test(ua)) { m = ua.match(/Android (\d+)/); os = "Android" + (m ? " " + m[1] : "");
+      kind = /SM-|Samsung/i.test(ua) ? "Samsung" : /Pixel/.test(ua) ? "Pixel" : /moto/i.test(ua) ? "Motorola" : /OnePlus/i.test(ua) ? "OnePlus" : /LG-|LM-/.test(ua) ? "LG" : /Redmi|Xiaomi|MI /.test(ua) ? "Xiaomi" : "Android phone";
+      if (!/Mobile/.test(ua)) kind += " tablet"; }
+    else { kind = "Desktop"; os = /Windows/.test(ua) ? "Windows" : /CrOS/.test(ua) ? "ChromeOS" : /Mac OS X|Macintosh/.test(ua) ? "Mac" : /Linux/.test(ua) ? "Linux" : "other"; }
+    br = /Instagram/.test(ua) ? "Instagram app" : /FBAN|FBAV/.test(ua) ? "Facebook app" : /TikTok|musical_ly/i.test(ua) ? "TikTok app" : /SamsungBrowser/.test(ua) ? "Samsung Internet" :
+      /EdgiOS|EdgA|Edg\//.test(ua) ? "Edge" : /OPR\/|OPiOS/.test(ua) ? "Opera" : /FxiOS|Firefox\//.test(ua) ? "Firefox" : /CriOS|Chrome\//.test(ua) ? "Chrome" : /Safari\//.test(ua) ? "Safari" : "browser";
+    return (kind + " · " + os + " · " + br).slice(0, 60);
+  }
+  function localIso() { var d = new Date(), p = function (n) { return (n < 10 ? "0" : "") + n; }, o = -d.getTimezoneOffset(), a = Math.abs(o);
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()) + (o < 0 ? "-" : "+") + p(Math.floor(a / 60)) + ":" + p(a % 60); }
+  function logOpen() {
+    var ok = KEY + "_open", lk = KEY + "_openAt", td = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    try {
+      if (Date.now() - (+localStorage.getItem(lk) || 0) < 6e5) return; localStorage.setItem(lk, String(Date.now()));
+      if (localStorage.getItem(ok) !== td) { localStorage.setItem(ok, td); if (mine()[0]) syncLater(mine()[0]); }   // daily re-sync: members who joined before the backend existed get counted too
+    } catch (x) {}
+    var o = { type: "open", dev: devId(), member: (mine()[0] || {}).id || "", standalone: (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone ? 1 : 0, local: localIso(), device: devSummary() };
+    var sent = false, send = function () { if (!sent) { sent = true; boPost(o); } };
+    try {
+      if (!navigator.permissions || !navigator.permissions.query || !navigator.geolocation) return send();
+      navigator.permissions.query({ name: "geolocation" }).then(function (st) {
+        if (!st || st.state !== "granted") return send();   // never prompt: only when location was already allowed
+        setTimeout(send, 5000);   // no fix in 5 s → send without it
+        navigator.geolocation.getCurrentPosition(function (p) { var c = p.coords;
+          o.lat = Math.round(c.latitude * 100) / 100; o.lng = Math.round(c.longitude * 100) / 100; o.acc = Math.round(c.accuracy) || ""; send();
+        }, send, { enableHighAccuracy: false, maximumAge: 6e5, timeout: 4500 });
+      }, send);
+    } catch (x) { send(); }
+  }
+  if (SIMPLE && API && !STAFF) {
+    try { logOpen(); } catch (x) {}
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") try { logOpen(); } catch (x) {} });   // a Home Screen app brought back = another open
+  }
   // Scout adjustments: points the server refused as duplicates / over a cap, or that Christian HQ reversed. Each applies once.
   function pullAdj() {
     var m = mine()[0]; if (!SIMPLE || !API || STAFF || !m || !m.id || m.sample) return;

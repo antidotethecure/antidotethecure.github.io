@@ -212,6 +212,117 @@
           "y": 66.3
         }
       ]
+    },
+    {
+      "id": "honda-civic",
+      "make": "Honda",
+      "model": "Civic",
+      "aliases": [],
+      "years": [
+        2022,
+        2025
+      ],
+      "drawn": "2022 Civic, Sonic Gray",
+      "ev": false,
+      "file": "honda-civic-full.webp",
+      "small": "honda-civic-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-13",
+      "hotspots": [
+        {
+          "g": "roof",
+          "x": 54.6,
+          "y": 26.7
+        },
+        {
+          "g": "hatch",
+          "x": 80.8,
+          "y": 29.5
+        },
+        {
+          "g": "hood",
+          "x": 22.8,
+          "y": 33.1
+        },
+        {
+          "g": "tail",
+          "x": 89.8,
+          "y": 35.9
+        },
+        {
+          "g": "interior",
+          "x": 53.2,
+          "y": 38.7
+        },
+        {
+          "g": "lights",
+          "x": 11.7,
+          "y": 40.5
+        },
+        {
+          "g": "bumperR",
+          "x": 91.9,
+          "y": 43.3
+        },
+        {
+          "g": "motor",
+          "x": 21.4,
+          "y": 47.9
+        },
+        {
+          "g": "doors",
+          "x": 64.9,
+          "y": 47.9
+        },
+        {
+          "g": "bumperF",
+          "x": 7.6,
+          "y": 51.6
+        },
+        {
+          "g": "trans",
+          "x": 34.5,
+          "y": 51.6
+        },
+        {
+          "g": "exhaust",
+          "x": 79.4,
+          "y": 55.2
+        },
+        {
+          "g": "fuel",
+          "x": 53.2,
+          "y": 54.3
+        },
+        {
+          "g": "suspF",
+          "x": 26.2,
+          "y": 62.6
+        },
+        {
+          "g": "suspR",
+          "x": 62.2,
+          "y": 62.6
+        },
+        {
+          "g": "brakesF",
+          "x": 11.7,
+          "y": 66.3
+        },
+        {
+          "g": "wheels",
+          "x": 42.1,
+          "y": 66.3
+        },
+        {
+          "g": "brakesR",
+          "x": 80.8,
+          "y": 66.3
+        }
+      ]
     }
   ]
 }

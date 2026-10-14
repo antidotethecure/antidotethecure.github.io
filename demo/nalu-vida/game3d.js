@@ -571,7 +571,8 @@ async function init(A) {
     // ---- entities ----
     const seen = new Set();
     G.ents.forEach(e => {
-      if (e.t === "pier" || e.t === "brk" || e.t === "plane" || e.t === "toss" || e.t === "fish" || e.t === "drop" || e.t === "harpoon" || e.t === "ski" || e.t === "sub" || e.t === "sharp" || e.t === "qfin") {   // (drawn on the 2D overlay)
+      if (e.t === "pier" || e.t === "brk" || e.t === "plane" || e.t === "toss" || e.t === "fish" || e.t === "drop" || e.t === "harpoon" || e.t === "ski" || e.t === "sub" || e.t === "sharp" || e.t === "qfin" || e.t === "hkit") {   // (drawn on the 2D overlay)
+        if (e.t === "hkit") { foamRing(e.x, sy(e.yw) + 3, 28, 14, .45, 2); poke(e.x, sy(e.yw), -.4, 8); }
         if (e.t === "qfin") { foamDot(e.x, sy(e.yw), 16, .5); poke(e.x, sy(e.yw), -.4, 6); }
         if (e.t === "sub" && e.st !== "peri") { foamDot(e.x, sy(e.yw), 40, .45); poke(e.x, sy(e.yw), -1.2, 22); }
         if (e.t === "sharp") foamDot(e.x, sy(e.yw) + 10, 5, .5);
@@ -690,7 +691,7 @@ async function init(A) {
       else { swim = 1; prone = 1; } }
     else if (ph === "popup") { const f = Math.min(1, (G.popT - .5) / .5); swim = 1 - f; bal = f; prone = 1 - f; }
     else { bal = 1; }
-    const airF = G.jump > 0 ? Math.sin(Math.PI * (1 - G.jump / G.jumpDur)) * (G.jumpDur > .9 ? 1 : .6) : 0;
+    const airF = G.jump > 0 ? Math.sin(Math.PI * (1 - G.jump / G.jumpDur)) * (G.airAmp || (G.jumpDur > .9 ? 1 : .6)) : 0;   // G.airAmp: launch height off the lip (game.js launch())
     if (ph === "ride" && airF > 0) { air = 1; bal = 0; h = airF * 34 / SIN; }
     if (ph === "ride") h += (G.lipRise || 0) * 18;   // up at the top of the face in the lip window
     if (G.wipe > 0) { const w = 1 - G.wipe / .9; fall = Math.sin(w * Math.PI); bal *= 1 - fall; }
@@ -720,10 +721,10 @@ async function init(A) {
     const lean = Math.max(-.55, Math.min(.55, G.vx / 380)), bob = ph === "ride" ? Math.sin(G.t * 2.3 + G.yw * .018) * 1.2 : 0;
     const sw = swellH(x, y), sinkB = sink * (prone ? 1 : .6);
     P(rig, x, y, h - Math.min(sink, sinkB) + bob + sw + 1.2); rig.rotation.set(0, yaw, 0);   // feet on the deck (+1.2 = deck thickness), never under it
-    let spin = 0, flip = 0; const tk = G.trick; if (tk) { const f = tk.t / tk.dur; if (tk.k === "spin") spin = f * Math.PI * 2; else flip = f * Math.PI * 2; }
+    let spin = 0, flip = 0, grab = 0; const tk = G.trick; if (tk) { const f = tk.t / tk.dur; if (tk.k === "spin") spin = f * Math.PI * 2; else if (tk.k === "grab") { grab = Math.sin(f * Math.PI); spin = grab * .5; } else flip = f * Math.PI * 2; }
     let wipeSpin = 0; if (G.wipe > 0) wipeSpin = (1 - G.wipe / .9) * Math.PI * 2.4;
     if (ph === "death" && G.deathCause === "wave") wipeSpin = G.deathT * 6;
-    lift.rotation.set(flip, spin + wipeSpin, lean * (ph === "ride" ? 1.05 : 0));   // riding: rolls well onto the rail, carving the face
+    lift.rotation.set(flip + grab * .35, spin + wipeSpin, lean * (ph === "ride" ? 1.05 : 0) + grab * .9);   // grab: tweaked out sideways, nose tipped up   // riding: rolls well onto the rail, carving the face
     body.position.set(0, 3.4 - 9.5 * prone, 9 * (1 - prone) * (1 - carry) - 4 * prone); body.rotation.set(0, 0, 0);
     // the board: under the chest (paddling), under the feet (riding), under the arm (running), tumbling away (wipeout)
     if (carry > .5) {   // tucked under the right arm, nose forward, deck against the body

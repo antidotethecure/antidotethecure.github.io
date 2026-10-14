@@ -19,7 +19,7 @@
   var raf = W.requestAnimationFrame.bind(W), caf = W.cancelAnimationFrame.bind(W);   // real ones, before gamepause.js wraps them
   var T = function (s) { return (W.__T || String)(s); };
   // name: [game model in 3d/ (or null), base, upgraded model in 3d/menu/ (or null), { az: max degrees either side of the front,
-  //   minPolar/maxPolar: tilt limits in radians, fill: width on the plate (plate radius 1, default 1.62) }]
+  //   minPolar/maxPolar: tilt limits in radians, fill: width on the plate (plate radius 1, default 1.62), rotY: degrees }]
   // An upgraded model (real-photo scan) loads first and falls back to the game model if it fails. A dish with neither is hidden.
   // Single-photo scans invent their hidden back: if it looks bad, set az (e.g. 60) to keep the spin to the photographed side.
   var DISH = {
@@ -34,9 +34,9 @@
     "Mango Margarita": ["p_marg.glb?v=ag1", "coaster"],  // mango + chili rim: NOT used for the House Margarita (lime/salt)
     "Mimosa": ["p_mimosa.glb?v=fv2", "coaster"],
     "Espresso Martini": ["p_espresso.glb?v=fv2", "coaster"],
-    // scan of the real @melodylax photo (Tripo, 2026-10-13). The game's p_burger.glb is a low-poly prop, so no fallback model:
+    // scan of the real @melodylax photo with its fries cup (Tripo v2, 2026-10-13; rotY turns the photographed side to the front). The game's p_burger.glb is a low-poly prop, so no fallback model:
     // the back and the top were invented from one photo, so the spin stays on the photographed front half
-    "Melody Burger": [null, "plate", "menu/melody-burger.glb?v=tr1", { az: 75, minPolar: 0.6, fill: 1.08 }]
+    "Melody Burger": [null, "plate", "menu/melody-burger.glb?v=tr2", { rotY: -90, az: 75, minPolar: 0.5, fill: 1.55 }]
     // Michelada: there is no michelada model (p_mic.glb is the karaoke microphone).
   };
   var HERE = ((D.currentScript || {}).src || "").replace(/[^\/]*$/, "");
@@ -267,6 +267,7 @@
         if (cur !== name) return;
         group.clear();
         var m = src.clone(true), base = cfg[1], drink = base === "coaster";
+        if (cfg[3] && cfg[3].rotY) m.rotation.y = cfg[3].rotY * Math.PI / 180;
         m.updateMatrixWorld(true);
         var bb = new THREE.Box3().setFromObject(m), sz = bb.getSize(new THREE.Vector3()), foot = Math.max(sz.x, sz.z);
         var s, surface, baseR;

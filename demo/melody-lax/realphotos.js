@@ -2,24 +2,36 @@
    Every photo here is a frame from Antidote's own 4K review of Melody (he owns it), so it can be shown in the app.
    Yelp photos belong to the people who uploaded them, so we only LINK to Melody's Yelp photos page, never copy them.
    To add a photo: drop a 1080x1350 JPG in img/real/ and add a row below. "item" must match the menu name exactly
-   (leave it out for a dish that is not on the menu, like the brunch French toast). t = seconds into the review. */
+   clip/poster = a real 2.5x slow-motion cut of that dish from the same review (1080x1350, no audio); ct = where it is in the review.
+   (only dishes that are on the app's menu: Antidote, 2026-10-13, nothing off-menu anywhere in the app). t = seconds into the review. */
 (function(){
 "use strict";
 var VID="AhJGIPsywm0";
 var YELP="https://www.yelp.com/biz_photos/melody-bar-and-grill-los-angeles-2";   // verified: 9132 S Sepulveda Blvd listing
 var PHOTOS=[
   {item:"Lemon Pepper Wings",            img:"img/real/wings.jpg",            t:125},
-  {item:"Lobster Mac & Cheese",          img:"img/real/lobster-mac.jpg",      t:82},
+  {item:"Lobster Mac & Cheese",          img:"img/real/lobster-mac.jpg",      t:82,  clip:"img/real/clips/lobster-mac.mp4",      poster:"img/real/clips/lobster-mac.jpg",      ct:110},
   {item:"Melody Burger Mac & Cheese",    img:"img/real/burger-mac.jpg",       t:98},
-  {item:"Chicken Parmesan Mac & Cheese", img:"img/real/chicken-parm-mac.jpg", t:80},
-  {item:"Mango Margarita",               img:"img/real/mango-marg.jpg",       t:20},
-  {name:"French Toast Breakfast",        img:"img/real/french-toast.jpg",     t:46, note:"Brunch plate from the review"}
+  {item:"Chicken Parmesan Mac & Cheese", img:"img/real/chicken-parm-mac.jpg", t:80,  clip:"img/real/clips/chicken-parm-mac.mp4", poster:"img/real/clips/chicken-parm-mac.jpg", ct:86},
+  {item:"Mango Margarita",               img:"img/real/mango-marg.jpg",       t:20}
 ];
 var T=function(s){ return (window.__T||String)(s); };
 function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
 function yt(t){ return "https://youtu.be/"+VID+"?t="+t; }
 function clock(t){ return Math.floor(t/60)+":"+("0"+(t%60)).slice(-2); }
 function label(p){ return p.item||p.name; }
+var RM=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* real slow-mo clips: muted, looped, inline; the file only loads once the clip is on screen and it pauses when it scrolls away.
+   Reduced motion = the poster still, no video at all. The img carries data-m3d so ../menu3d.js leaves it alone. */
+function media(p,cls){
+  if(p.clip&&!RM) return '<video class="'+cls+'" data-rpv="'+p.clip+'" poster="'+p.poster+'" muted loop playsinline preload="none" width="1080" height="1350" aria-label="'+esc(T("Real slow-motion clip of")+" "+label(p))+'"></video>';
+  return '<img class="'+cls+'" src="'+(p.clip?p.poster:p.img)+'" alt="'+esc(T("Real photo of")+" "+label(p))+'" loading="lazy" decoding="async" width="1080" height="1350" data-m3d="skip">';
+}
+var IO=window.IntersectionObserver?new IntersectionObserver(function(es){ es.forEach(function(e){ var v=e.target;
+  if(e.isIntersecting){ if(!v.getAttribute("src")) v.src=v.getAttribute("data-rpv"); v.muted=true; var pr=v.play(); if(pr&&pr.catch) pr.catch(function(){}); }
+  else if(!v.paused) v.pause(); }); },{rootMargin:"120px 0px",threshold:.25}):null;
+function watch(root){ root.querySelectorAll("video[data-rpv]").forEach(function(v){ if(v._rp) return; v._rp=1;
+  if(IO) IO.observe(v); else { v.src=v.getAttribute("data-rpv"); v.autoplay=true; } }); }
 
 var css=document.createElement("style");
 css.textContent=
@@ -32,7 +44,8 @@ css.textContent=
 ".rp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}"+
 ".rp-card{margin:0;background:var(--panel);border:1px solid var(--edge);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;min-width:0}"+
 ".rp-card button{display:block;border:0;padding:0;background:#0a0f1c;cursor:zoom-in;aspect-ratio:4/5;width:100%}"+
-".rp-card button img{width:100%;height:100%;object-fit:cover;display:block}"+
+".rp-card button img,.rp-card button video{width:100%;height:100%;object-fit:cover;display:block}"+
+".rp-card button{position:relative}.rp-sm{position:absolute;left:8px;top:8px;padding:3px 8px;border-radius:999px;background:#000a;color:#fff;font:800 11px var(--body);letter-spacing:.04em}"+
 ".rp-card figcaption{padding:9px 11px 11px;display:flex;flex-direction:column;gap:4px;flex:1}"+
 ".rp-card b{font-size:14.5px;line-height:1.22;color:var(--ink)}"+
 ".rp-card small{color:var(--dim);font-size:12px}"+
@@ -40,7 +53,7 @@ css.textContent=
 ".rp-box{position:fixed;inset:0;z-index:200;background:#000d;display:flex;align-items:center;justify-content:center;padding:16px}"+
 ".rp-box[hidden]{display:none}"+
 ".rp-in{position:relative;width:100%;max-width:440px;max-height:100%;overflow:auto;background:var(--sky2,#121b30);border:1px solid var(--edge);border-radius:18px}"+
-".rp-in img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover}"+
+".rp-in img,.rp-in video{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;background:#0a0f1c}"+
 ".rp-in .rp-tx{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;color:var(--ink)}"+
 ".rp-in .rp-tx b{font-family:var(--display);font-size:21px;color:var(--cream)}"+
 ".rp-in .rp-tx small{color:var(--dim);font-size:12.5px;line-height:1.4}"+
@@ -55,15 +68,16 @@ var lastFocus=null;
 function open(p){
   lastFocus=document.activeElement;
   box.innerHTML='<div class="rp-in"><button type="button" class="rp-x" aria-label="'+esc(T("Close"))+'">×</button>'+
-    '<img src="'+p.img+'" alt="'+esc(T("Real photo of")+" "+label(p))+'" width="1080" height="1350">'+
+    media(p,"rp-big")+
     '<div class="rp-tx"><b>'+esc(T(label(p)))+'</b>'+
-    '<small>📸 '+esc(T("Real photo"))+' · '+esc(T("frame from Antidote's food review at Melody"))+' ('+clock(p.t)+')'+(p.note?' · '+esc(T(p.note)):'')+'</small>'+
-    '<a href="'+yt(p.t)+'" target="_blank" rel="noopener">'+esc(T("Watch it in Antidote's review"))+' ▶</a>'+
+    '<small>'+(p.clip?'🎬 '+esc(T("Real slow-mo"))+' · '+esc(T("from Antidote's food review at Melody"))+' ('+clock(p.ct)+')':'📸 '+esc(T("Real photo"))+' · '+esc(T("frame from Antidote's food review at Melody"))+' ('+clock(p.t)+')')+(p.note?' · '+esc(T(p.note)):'')+'</small>'+
+    '<a href="'+yt(p.clip?p.ct:p.t)+'" target="_blank" rel="noopener">'+esc(T("Watch it in Antidote's review"))+' ▶</a>'+
     '<a href="'+YELP+'" target="_blank" rel="noopener">'+esc(T("See more real photos on Yelp"))+' ↗</a></div></div>';
-  box.hidden=false; document.documentElement.style.overflow="hidden";
+  box.hidden=false; document.documentElement.style.overflow="hidden"; watch(box);
   box.querySelector(".rp-x").focus();
 }
-function close(){ box.hidden=true; box.innerHTML=""; document.documentElement.style.overflow=""; if(lastFocus&&lastFocus.focus) lastFocus.focus(); }
+function close(){ var v=box.querySelector("video"); if(v){ if(IO) IO.unobserve(v); v.pause(); v.removeAttribute("src"); v.load(); }
+  box.hidden=true; box.innerHTML=""; document.documentElement.style.overflow=""; if(lastFocus&&lastFocus.focus) lastFocus.focus(); }
 box.addEventListener("click",function(e){ if(e.target===box||e.target.closest(".rp-x")) close(); });
 document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&!box.hidden) close(); });
 
@@ -74,7 +88,7 @@ function tagCards(){
     var i=BY[a.getAttribute("data-name")]; if(i==null||a.querySelector(".rp-tag")) return;
     var tx=a.querySelector(".tx"), b=document.createElement("button"); if(!tx) return;
     b.type="button"; b.className="rp-tag"; b.setAttribute("data-rp",i);
-    b.innerHTML='<img src="'+PHOTOS[i].img+'" alt="" loading="lazy" width="34" height="34" data-m3d="skip"><span>📸 '+esc(T("Real photo"))+'</span>';
+    b.innerHTML='<img src="'+PHOTOS[i].img+'" alt="" loading="lazy" width="34" height="34" data-m3d="skip"><span>'+(PHOTOS[i].clip?'🎬 '+esc(T("Real slow-mo")):'📸 '+esc(T("Real photo")))+'</span>';
     var p=tx.querySelector("p"); tx.insertBefore(b,p?p.nextSibling:null);
   });
 }
@@ -94,11 +108,11 @@ function gallery(){
     '<div class="rp-head"><a class="rp-yelp" href="'+YELP+'" target="_blank" rel="noopener">'+esc(T("See more real photos on Yelp"))+' ↗</a></div>'+
     '<div class="rp-grid">'+PHOTOS.map(function(p,i){
       return '<figure class="rp-card"><button type="button" data-rp="'+i+'" aria-label="'+esc(T("Open real photo of")+" "+label(p))+'">'+
-        '<img src="'+p.img+'" alt="'+esc(label(p))+'" loading="lazy" decoding="async" width="1080" height="1350"></button>'+
-        '<figcaption><b>'+esc(T(label(p)))+'</b>'+(p.note?'<small>'+esc(T(p.note))+'</small>':'')+
-        '<a href="'+yt(p.t)+'" target="_blank" rel="noopener">'+esc(T("Watch it in Antidote's review"))+' ▶</a></figcaption></figure>';
+        media(p,"rp-th")+(p.clip?'<span class="rp-sm">🎬 '+esc(T("Slow-mo"))+'</span>':'')+'</button>'+
+        '<figcaption><b>'+esc(T(label(p)))+'</b>'+(p.clip?'<small>'+esc(T("Real cheese pull, slowed down 2.5×"))+'</small>':p.note?'<small>'+esc(T(p.note))+'</small>':'')+
+        '<a href="'+yt(p.clip?p.ct:p.t)+'" target="_blank" rel="noopener">'+esc(T("Watch it in Antidote's review"))+' ▶</a></figcaption></figure>';
     }).join("")+'</div>';
-  host.parentNode.insertBefore(s,host.nextSibling); host.parentNode.insertBefore(h,s);
+  host.parentNode.insertBefore(s,host.nextSibling); host.parentNode.insertBefore(h,s); watch(s);
   var chips=document.getElementById("chips");
   if(chips&&!chips.querySelector('[href="#realphotos"]')){ var c=document.createElement("a"); c.href="#realphotos"; c.textContent="📸 "+T("Real photos"); chips.insertBefore(c,chips.firstChild); }
 }

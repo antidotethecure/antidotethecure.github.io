@@ -122,9 +122,9 @@ async function boot() {
   const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
   const BASE = new URL("3d/", location.href).href, MODELS = {};
   const FILES = { plane: "plane.glb", jet: "jet.glb", ufo: "ufo.glb", cop0: "heli_blue.glb", cop1: "heli_black.glb",
-    p_wings: "p_wings.glb?v=st3", p_toast: "p_toast.glb?v=st3", p_omelette: "p_omelette.glb", p_marg: "p_marg.glb?v=ag1", p_bottle: "p_bottle.glb?v=ag1", p_shots: "p_shots.glb?v=ag1", p_mic: "p_mic.glb", p_mac: "p_mac.glb", p_burger: "p_burger.glb?v=ag1",
+    p_wings: "p_wings.glb?v=st3", p_marg: "p_marg.glb?v=ag1", p_shots: "p_shots.glb?v=ag1", p_mic: "p_mic.glb", p_mac: "p_mac.glb", p_burger: "p_burger.glb?v=ag1",
     p_lobmac: "p_lobmac.glb?v=fv2", p_ribs: "p_ribs.glb?v=st3", p_tacos: "p_tacos.glb?v=st3", p_nachos: "p_nachos.glb?v=fv2", p_strips: "p_strips.glb?v=st3",
-    p_blueice: "p_blueice.glb?v=fv2", p_blackirish: "p_blackirish.glb?v=fv2", p_rumpunch: "p_rumpunch.glb?v=fv2", p_espresso: "p_espresso.glb?v=fv2", p_pearmarg: "p_pearmarg.glb?v=fv2", p_mimosa: "p_mimosa.glb?v=fv2" };
+    p_espresso: "p_espresso.glb?v=fv2", p_mimosa: "p_mimosa.glb?v=fv2" };
   async function loadModel(k) {
     try {
       const g = await loader.loadAsync(BASE + FILES[k]); const root = g.scene;
@@ -135,7 +135,7 @@ async function boot() {
       MODELS[k] = { node: inner, size: sz }; STATUS.loaded++;
     } catch (e) { console.warn("[melody3d] model failed", k, e); }
   }
-  // PICK tilt3 = per-pickup camera tilt override (the French toast uses it so the three stacked slices and the white plate both show)
+  // PICK tilt3 = optional per-pickup camera tilt override
   // round of shots: the generated GLB is the wooden tray; six glass shot glasses with real golden tequila in them sit on it (3 x 2), lime wedges between
   function addShotGlasses(g, sz) {
     const r = sz.x * .1, h = r * 2.3, top = sz.y / 2 - sz.y * .25;

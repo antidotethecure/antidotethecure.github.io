@@ -590,17 +590,16 @@ function img(src){ var i=new Image(); i.src=src; return i; }
 function ready(i){ return i&&i.complete&&i.naturalWidth; }
 var S={plane:img("img/game/plane.webp"),ufo:img("img/game/ufo.webp"),jet:img("img/game/jet.webp"),kami:img("img/game/plane.webp"),
   stadium:img("img/game/stadium.webp"),towers:img("img/game/towers.webp"),mar0:img("img/game/marshal0.webp"),cop0:img("img/game/lapd_blue.webp"),cop1:img("img/game/lapd_black.webp"),mar1:img("img/game/marshal1.webp"),mar2:img("img/game/marshal2.webp"),cone:img("img/game/cone.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
-// pickups: Melody's real food + bar life (every item is on melodylax.com's menus). e = emoji fallback while the photo loads,
+// pickups: only items on the app's own FOOD/DRINKS menu (Antidote, 2026-10-13: nothing off-menu in the game or the app). e = emoji fallback while the photo loads,
 // v = cache-bust per sprite/GLB, wt = spawn weight (default 1; the burger is doubled so it still shows up often with the bigger list)
 var PICK=[{k:"p_mac",n:"Mac & Cheese",p:80,e:"🧀",w:58},{k:"p_wings",n:"Lemon Pepper Wings",p:70,e:"🍗",w:60},
-  {k:"p_burger",n:"Melody Burger & Fries",p:90,e:"🍔",w:66,wt:2},{k:"p_toast",n:"French Toast",p:60,e:"🍞",w:68,v:"st3",tilt3:-.9},
-  {k:"p_omelette",n:"Philly Omelette",p:60,e:"🍳",w:60},{k:"p_lobmac",n:"Lobster Mac & Cheese",p:90,e:"🦞",w:60,v:"fv2"},
+  {k:"p_burger",n:"Melody Burger & Fries",p:90,e:"🍔",w:66,wt:2},
+  {k:"p_lobmac",n:"Lobster Mac & Cheese",p:90,e:"🦞",w:60,v:"fv2"},
   {k:"p_ribs",n:"Baby Back Ribs & Fries",p:80,e:"🍖",w:66,v:"fv2"},{k:"p_tacos",n:"Shrimp Tacos",p:70,e:"🌮",w:58,v:"fv2"},
   {k:"p_nachos",n:"Nachos",p:60,e:"🧀",w:62,v:"fv2"},{k:"p_strips",n:"Chicken Strips & Fries",p:60,e:"🍗",w:62,v:"fv2"},
-  {k:"p_marg",n:"Mango Marg",p:50,e:"🍹",w:30,w3:46,drink:1},{k:"p_bottle",n:"Bottle service",p:40,e:"🍾",w:34,w3:48,drink:1},{k:"p_shots",n:"Round of shots",p:40,e:"🥃",w:50,drink:1},
-  {k:"p_blueice",n:"Blue Ice",p:55,e:"🍸",w:36,w3:48,drink:1,v:"fv2"},{k:"p_blackirish",n:"Black Irish",p:50,e:"🍹",w:24,w3:48,drink:1,v:"fv2"},
-  {k:"p_rumpunch",n:"Melody Rum Punch",p:50,e:"🍹",w:24,w3:50,drink:1,v:"fv2"},{k:"p_espresso",n:"Espresso Martini",p:55,e:"🍸",w:34,w3:46,drink:1,v:"fv2"},
-  {k:"p_pearmarg",n:"Prickly Pear Marg",p:50,e:"🍹",w:38,w3:44,drink:1,v:"fv2"},{k:"p_mimosa",n:"Mimosa",p:45,e:"🥂",w:22,w3:50,drink:1,v:"fv2"}];
+  {k:"p_marg",n:"Mango Marg",p:50,e:"🍹",w:30,w3:46,drink:1},{k:"p_shots",n:"Round of shots",p:40,e:"🥃",w:50,drink:1},
+  {k:"p_espresso",n:"Espresso Martini",p:55,e:"🍸",w:34,w3:46,drink:1,v:"fv2"},
+  {k:"p_mimosa",n:"Mimosa",p:45,e:"🥂",w:22,w3:50,drink:1,v:"fv2"}];
 PICK.forEach(function(p){ p.im=img("img/game/"+p.k+".webp?v="+(p.v||"ag1")); });
 var PICK_WT=PICK.reduce(function(a,p){ return a+(p.wt||1); },0);
 function pickOne(){ var r=Math.random()*PICK_WT; for(var i=0;i<PICK.length;i++){ r-=PICK[i].wt||1; if(r<0) return PICK[i]; } return PICK[0]; }
@@ -2347,7 +2346,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=st3"></script>
+<script type="module" src="melody3d.js?v=mo1"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}
@@ -2402,7 +2401,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 <script>(function(){ var g="img/game/", GP=(window.SSAI_REWARDS&&SSAI_REWARDS.game)||{perScore:100,dailyCap:50}, WK=(window.SSAI_REWARDS&&SSAI_REWARDS.weekly)||{};
 /* START SCREEN: sells the food + the weekly challenge; the live game preview sits small in the corner (index.html previewCopy). */
 var CH=null; if(window.SSAI_CHAMPS) SSAI_CHAMPS.load(function(d){ CH=d; if(window.GameMenu) GameMenu.refresh(); });
-var FOOD=[["p_burger","Melody Burger & Fries","+90",1,"-1.4s"],["p_toast","French Toast","+60",1,"-1.7s","st3"],["p_lobmac","Lobster Mac & Cheese","+90",1,"-.2s","fv2"],["p_blueice","Blue Ice","+55",0,"-.6s","fv2"],["p_wings","Lemon Pepper Wings","+70",1,"-1.1s"]];   // 5 fit one row on a phone; everything else still spawns in the game
+var FOOD=[["p_burger","Melody Burger & Fries","+90",1,"-1.4s"],["p_ribs","Baby Back Ribs & Fries","+80",1,"-1.7s","fv2"],["p_lobmac","Lobster Mac & Cheese","+90",1,"-.2s","fv2"],["p_espresso","Espresso Martini","+55",0,"-.6s","fv2"],["p_wings","Lemon Pepper Wings","+70",1,"-1.1s"]];   // 5 fit one row on a phone; everything else still spawns in the game
 function on(){ return !!(window.MELODY_REWARDS_ON&&MELODY_REWARDS_ON()); }
 function mvp(esc,T){ var F=window.SSAI_CHAMPS?SSAI_CHAMPS.fmt:function(n){ return Number(n||0).toLocaleString(); }, gs=CH&&CH.games||{}, c=gs.melody, s=gs["melody-survival"];
   function top(gm,unit,lab,ic){ var t=gm&&gm.top3&&gm.top3[0];
@@ -2450,13 +2449,13 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
    ["🛡️","Secret quest: catch 7 spinning Antidote Drizzle emblems. Antidote's banner plane flies in towing his Melody review: shoot it down (with combat off, fly through the banner) to unlock it"],
    ["🧪","BETA: rewards switch on soon. Until Melody turns them on, the weekly boards rank you for bragging rights and no prizes or game points are given out"]]},
  points:[
-  {group:"Catch these (score)",items:[{img:g+"p_burger.webp?v=ag1",name:"Melody Burger & Fries",pts:"+90"},{img:g+"p_mac.webp?v=ag1",name:"Mac & Cheese",pts:"+80"},{img:g+"p_wings.webp?v=ag1",name:"Lemon Pepper Wings",pts:"+70"},{img:g+"p_toast.webp?v=st3",name:"French Toast",pts:"+60"},{img:g+"p_omelette.webp?v=ag1",name:"Philly Omelette",pts:"+60"},
+  {group:"Catch these (score)",items:[{img:g+"p_burger.webp?v=ag1",name:"Melody Burger & Fries",pts:"+90"},{img:g+"p_mac.webp?v=ag1",name:"Mac & Cheese",pts:"+80"},{img:g+"p_wings.webp?v=ag1",name:"Lemon Pepper Wings",pts:"+70"},
    {img:g+"p_lobmac.webp?v=fv2",name:"Lobster Mac & Cheese",pts:"+90"},{img:g+"p_ribs.webp?v=fv2",name:"Baby Back Ribs & Fries",pts:"+80"},{img:g+"p_tacos.webp?v=fv2",name:"Shrimp Tacos",pts:"+70"},
    {img:g+"p_nachos.webp?v=fv2",name:"Nachos",pts:"+60"},{img:g+"p_strips.webp?v=fv2",name:"Chicken Strips & Fries",pts:"+60"},
-   {img:g+"p_blueice.webp?v=fv2",name:"Blue Ice",pts:"+55"},{img:g+"p_espresso.webp?v=fv2",name:"Espresso Martini",pts:"+55"},
-   {img:g+"p_marg.webp?v=ag1",name:"Mango Marg",pts:"+50"},{img:g+"p_pearmarg.webp?v=fv2",name:"Prickly Pear Marg",pts:"+50"},{img:g+"p_blackirish.webp?v=fv2",name:"Black Irish",pts:"+50"},
-   {img:g+"p_rumpunch.webp?v=fv2",name:"Melody Rum Punch",pts:"+50"},{img:g+"p_mimosa.webp?v=fv2",name:"Mimosa",pts:"+45"},
-   {img:g+"p_bottle.webp?v=ag1",name:"Bottle service",pts:"+40"},{img:g+"p_shots.webp?v=ag1",name:"Round of shots",pts:"+40"},{icon:"♪",name:"Gold music note",pts:"+10"},
+   {img:g+"p_espresso.webp?v=fv2",name:"Espresso Martini",pts:"+55"},
+   {img:g+"p_marg.webp?v=ag1",name:"Mango Marg",pts:"+50"},
+   {img:g+"p_mimosa.webp?v=fv2",name:"Mimosa",pts:"+45"},
+   {img:g+"p_shots.webp?v=ag1",name:"Round of shots",pts:"+40"},{icon:"♪",name:"Gold music note",pts:"+10"},
    {img:g+"p_mic.webp?v=ag1",name:"Karaoke mic",note:"Double score for 6 seconds",pts:"2×"},
    {img:"img/game/antidote-logo.webp?v=ag1",name:"Antidote Drizzle emblem",note:"Catch 7 to call in Antidote's review plane",pts:"+50",gold:true}]},
   {group:"Bonuses (score)",items:[{icon:"🔥",name:"5 catches in a row",note:"Then every 5 more",pts:"+250…500"},{icon:"⏱️",name:"Finish a level",pts:"+500 × level"},
@@ -2477,7 +2476,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
 <script>/* Simple program (Christian, 2026-10): one balance, the numbers live in window.SSAI_REWARDS at the top of this page.
    No split wallets, visit levels, tokens, daily spin or welcome voucher (see crm.js SIMPLE). */
 window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Melody Approach"};</script>
-<script src="../crm.js?v=rs2"></script><script src="games-data.js?v=gp1"></script><script src="games.js?v=gp1"></script>
+<script src="../crm.js?v=rs2"></script><script src="games-data.js?v=mo1"></script><script src="games.js?v=gp1"></script>
 <link rel="stylesheet" href="../sports/sports.css?v=sb1">
 <script>/* SPORTS BAR PACKAGE (demo/sports/README.md): Melody = install #1, LA/California teams. Perks text stays empty until
    Christian sets a real deal: an empty watchParty.text hides the banner (no made-up deals). */
@@ -2499,7 +2498,7 @@ window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",regio
 <script>window.NEARBY={name:"Melody Bar & Grill",pin:"✈️",mount:"#rwhost",spots:[{label:"Westchester",lat:33.9487,lng:-118.3918,q:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"}],offer:"Happy hour is 3–6 daily."};</script>
 <script src="../nearby.js?v=cf1"></script>
 <script src="../menu3d.js"></script>
-<script src="realphotos.js?v=rp1"></script>
+<script src="realphotos.js?v=rp2"></script>
 <script>window.BUILDER={mode:"plate",accent:"mac & cheese",name:"Melody",img:"img/build/",fire:"img/game/flame.webp",mount:"#rewards",
   base:0,fireLabel:"Bake it",fireBusy:"Baking the crust",baseLine:"Creamy fusilli's in. Load it up.",
   lines:["That's cheesy.","Oh that's a Melody mac.","Load it up.","Chef's kiss.","Now we're talking."],

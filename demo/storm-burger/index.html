@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#070B1E">
 <title>StormBurger — Menu & Game</title>
 <script src="../lang-th.js"></script>
+<script src="../gamepad.js?v=20261013gp1"></script>
 <meta name="description" content="StormBurger's menu, Storm Run game and weekly prizes. Demo by SousShift AI.">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,7 +52,7 @@ h2::before{content:"";width:22px;height:22px;background:var(--bolt);clip-path:po
 .hud{display:flex;justify-content:space-between;align-items:center;font-weight:800;padding:2px 4px 10px;gap:8px;flex-wrap:wrap}
 .hud .sc{font-family:var(--display);font-size:30px;color:var(--gold);letter-spacing:.04em;font-weight:400}
 .hud .lv{letter-spacing:2px}
-#game{display:block;width:100%;height:auto;aspect-ratio:400/560;border-radius:12px;background:#05081a;touch-action:none;cursor:pointer}
+#game{display:block;width:100%;height:auto;aspect-ratio:400/560;border-radius:12px;background:#05081a;touch-action:pan-y pinch-zoom;cursor:pointer}
 .keys{display:flex;justify-content:center;gap:10px;margin-top:10px}
 .keys button{flex:1;max-width:170px;font:800 22px var(--body);background:#1a2656;color:#fff;border:1px solid var(--edge);border-radius:12px;padding:12px 0;cursor:pointer}
 .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px;font-size:13.5px;color:var(--dim)}
@@ -656,7 +657,7 @@ hud();
   {group:"Dodge these",items:[{img:"img/game/cow.webp",name:"Flying cow",note:"Costs a life",pts:"−100",bad:true},{img:"img/game/stop.webp",name:"Stop sign",note:"Costs a life",pts:"−100",bad:true},{icon:"⚡",name:"Lightning strike",note:"Costs a life. Watch for the glowing lane",pts:"−100",bad:true}]}],
  prizes:{champion:"Free Double Classic StormBurger Combo for the top score by Sunday close",tiers:[["1,000","Free Classic StormBurger","One run over 1,000 points","img/game/burger.webp"],["800","Free milkshake","Vanilla, chocolate or mix","img/game/shake.webp"],["600","Free fries or onion rings","With any order","img/game/fries.webp"],["400","Free house sauce","Storm, Thunder, Ranch… your pick","🥫"]],note:"Sample prizes. StormBurger picks the real ones and the board resets every Monday."}};</script>
 <script src="../gamemenu.js"></script><script src="../a2hs.js"></script>
-<script src="../gamelock.js"></script>
+<script src="../gamelock.js?v=ml1"></script>
 <script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
 window.SPECIALS=[
  {id:"halloween",holiday:"halloween",title:"Thunder Night Combo",desc:"Jalapeño Lightning Burger Combo with Thunder sauce on the side. Spooky-spicy.",item:"Jalapeño Lightning Burger Combo",start:"10-20",end:"10-31",code:"BOO"},

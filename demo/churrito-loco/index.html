@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#F57A1A">
 <title>Churrito Loco — Menu & Game</title>
 <script src="../lang-th.js"></script>
+<script src="../gamepad.js?v=20261013gp1"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
 <style>
 /* ============================================================
@@ -65,7 +66,7 @@ h2::after{content:"";flex:1;height:1px;background:var(--edge)}
 .gamehead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .gamehead b{font-size:17px}
 .gamehead .hud{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--gold)}
-canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#FFF2E0 0%,#FFE6C7 100%);border:1px solid var(--edge);touch-action:none;margin-top:10px}
+canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#FFF2E0 0%,#FFE6C7 100%);border:1px solid var(--edge);touch-action:pan-y pinch-zoom;margin-top:10px}
 .gamemsg{text-align:center;color:var(--dim);font-size:13px;margin:10px 0 2px}
 .gamemsg b{color:var(--ink)}
 .bigscore{text-align:center;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:30px;color:var(--gold);margin:6px 0 2px}
@@ -616,7 +617,7 @@ window.GAME_MENU={id:"churrito-loco",name:"Loco Match",by:"Churrito Loco",taglin
   {group:"Watch out",items:[{img:ic(6),name:"Grilled Serrano",note:"Swiping it burns you. It burns out on its own",pts:"−25",bad:true}]}],
  prizes:{champion:"1st place this week: 50% OFF your next order",tiers:[["2nd","20% OFF next order","2nd place on the weekly board","🥈"],["4,150+","15% OFF next order","Puts you on the weekly board (test players averaged 3,913)","🏆"]],note:"Sample prizes. The owner sets the real ones and the board resets every Monday."}}; })();</script>
 <script src="../gamemenu.js"></script><script src="../a2hs.js"></script>
-<script src="../gamelock.js"></script>
+<script src="../gamelock.js?v=ml1"></script>
 <script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
 window.SPECIALS=[
  {id:"halloween",holiday:"halloween",title:"Hot Cheetos Spooky Combo",desc:"Hot Cheetos Corn + Filled Churros (2pc). Trick or treat yourself.",item:"Hot Cheetos Corn",start:"10-20",end:"10-31",code:"BOO"},

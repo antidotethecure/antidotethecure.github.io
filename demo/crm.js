@@ -60,6 +60,11 @@
   // demo/interim.js, which this file hands the member store to through window.SSAI_CRM. The QR / ring-up / receipt-code
   // demo controls are hidden and the ladder buttons read "Use reward".
   var INTERIM = !!(SIMPLE && SIMPLE.mode === "interim");
+  // CUSTOMER-ONLY (opt-in: window.SSAI_CUSTOMER_ONLY or CRM_CFG.customerOnly; Melody since 2026-10-13): the page is a live
+  // customer app, so the owner view (customer list, holiday blast, ring-up, app sales, performance share, top referrers,
+  // and interim.js's manager log that mounts next to it) is never put on the page, and every "Demo:" button / note is hidden.
+  // Owner tools live in the back office. Pitch/demo pages leave this unset and keep the full owner view.
+  var CUST = !!(window.SSAI_CUSTOMER_ONLY || C.customerOnly);
   var NAME = C.name || (window.NEARBY && window.NEARBY.name) || document.title.split(" — ")[0];
   var OFFER = SIMPLE ? SIMPLE.join + " welcome points" : C.offer || "10% off your next visit";
   var SLUG = NAME.toLowerCase().replace(/[^a-z0-9]+/g, "-"), KEY = "ssai_crm_" + SLUG;
@@ -276,6 +281,7 @@
     ".crm-qr small{display:block;color:#555;font-size:12.5px;margin-top:4px}",
     ".crm-demo{display:block;width:100%;margin-top:8px;border:1px dashed #3DDC97;background:transparent;color:#3DDC97;border-radius:12px;padding:10px;font-size:13.5px;font-weight:800;cursor:pointer}",
     ".crm-demo:disabled{opacity:.4;cursor:default}",
+    CUST ? ".crm-demo{display:none!important}" : "",
     ".crm-tier{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:9px 0;border-top:1px solid #25336A;font-size:14px}",
     ".crm-tier:first-of-type{border-top:0}.crm-tier .bar{grid-column:1/3;height:6px;border-radius:9px;background:#1a2656;overflow:hidden}.crm-tier .bar i{display:block;height:100%;background:linear-gradient(90deg,#E8582A,#FFD23F)}",
     ".crm-tier button{border:0;border-radius:10px;padding:8px 12px;font-weight:900;font-size:13px;background:#E8582A;color:#fff;cursor:pointer}.crm-tier button:disabled{background:#1a2656;color:#7F8AAA;cursor:default}",
@@ -643,10 +649,10 @@
         // activity
         '<div class="crm-box"><h4>📜 Points activity</h4><div class="crm-feed">' + ((me.ledger || []).map(function (l) {
           return '<div><span>' + (WAL && W[l.w] ? '<i class="crm-wt">' + wname(l.w) + '</i>' : '') + e(l.t) + '</span><b class="' + (l.pts >= 0 ? 'plus' : 'minus') + '">' + (l.pts >= 0 ? '+' : '') + l.pts.toLocaleString() + '</b></div>'; }).join("") || '<div><span>Nothing yet. Scan at the register to start earning.</span></div>') + '</div></div>' +
-        '<button type="button" class="go" style="background:#1a2656;box-shadow:none" data-a="owner">👀 See what the owner sees ↓</button>' +
+        (CUST ? '' : '<button type="button" class="go" style="background:#1a2656;box-shadow:none" data-a="owner">👀 See what the owner sees ↓</button>') +
         (STAFF ? '' : '<button type="button" class="crm-gx" data-a="restore">📱 Not you? Sign back in to your account</button>') +
         (TC ? '<button type="button" class="crm-gx" data-a="signout">🚪 Sign out of this phone' + (me.guardian ? ' (parent check)' : '') + '</button>' : '') +
-        '<p class="crm-fine">Demo: points and friends here are saved on this phone only. Live, they\'re in the business\'s database, so they follow the customer to any phone.</p>';
+        (CUST ? '' : '<p class="crm-fine">Demo: points and friends here are saved on this phone only. Live, they\'re in the business\'s database, so they follow the customer to any phone.</p>');
       var qr = join.querySelector(".crm-qr");
       function showQR() {
         qr.style.display = "block";
@@ -1746,11 +1752,11 @@
   }
 
   var mount = C.mount && document.querySelector(C.mount);
-  if (mount) { mount.appendChild(join); mount.appendChild(own); }
+  if (mount) { mount.appendChild(join); if (!CUST) mount.appendChild(own); }
   else {
     var ref = document.querySelector("#ssai-n") || document.querySelector("#ssai-k") || document.querySelector("footer");
-    if (ref && ref.parentNode) { ref.parentNode.insertBefore(join, ref); ref.parentNode.insertBefore(own, ref); }
-    else { document.body.appendChild(join); document.body.appendChild(own); }
+    if (ref && ref.parentNode) { ref.parentNode.insertBefore(join, ref); if (!CUST) ref.parentNode.insertBefore(own, ref); }
+    else { document.body.appendChild(join); if (!CUST) document.body.appendChild(own); }
   }
   drawJoin(); drawOwn("all");
   // one anonymous "open" per device per day for the back office (installs = opened from the Home Screen icon)

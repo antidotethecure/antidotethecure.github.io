@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#0D0404">
 <title>Lucky Dragon Hibachi — Menu & Game</title>
 <script src="../lang-th.js"></script>
+<script src="../gamepad.js?v=20261013gp1"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Cinzel:wght@700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
 <style>
@@ -103,7 +104,7 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 .gamehead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .gamehead b{font-size:17px}
 .gamehead .hud{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--gold)}
-canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#140707 0%,#241008 100%);touch-action:none;margin-top:10px}
+canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#140707 0%,#241008 100%);touch-action:pan-y pinch-zoom;margin-top:10px}
 .gamemsg{text-align:center;color:var(--dim);font-size:13px;margin:10px 0 2px}
 .gamemsg b{color:var(--ink)}
 .bigscore{text-align:center;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:30px;color:var(--gold);margin:6px 0 2px}
@@ -743,7 +744,7 @@ window.GAME_MENU={id:"lucky-dragon",name:"Hibachi Catch",by:"Lucky Dragon Hibach
   {group:"Dodge these",items:[{icon:"🔥",name:"Flame",note:"Resets your streak",pts:"−20",bad:true},{icon:"🍭",name:"Candy",note:"Resets your streak",pts:"−20",bad:true},{icon:"🧊",name:"Ice",note:"Resets your streak",pts:"−20",bad:true},{img:S.dragon,name:"Dragon fire",note:"Resets your streak. 3 hits burns the food and ends the run",pts:"−30",bad:true}]}],
  prizes:{champion:"1st place this week: 50% OFF your next meal",tiers:[["2nd","20% OFF next meal","2nd place on the weekly board","🥈"],["650+","15% OFF next meal","Puts you on the weekly board","🏆"]],note:"Sample prizes. The owner sets the real ones and the board resets every Monday."}}; })();</script>
 <script src="../gamemenu.js"></script><script src="../a2hs.js"></script>
-<script src="../gamelock.js"></script>
+<script src="../gamelock.js?v=ml1"></script>
 <script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
 window.SPECIALS=[
  {id:"halloween",holiday:"halloween",title:"Dragon Fire Night",desc:"Hibachi Steak with Extra Yum-Yum, straight off the flames.",item:"Hibachi Steak",start:"10-20",end:"10-31",code:"BOO"},

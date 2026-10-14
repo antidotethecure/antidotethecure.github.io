@@ -52,16 +52,9 @@
   }
   $("svcList").addEventListener("click", function (e) { var b = e.target.closest("[data-svc]"); if (b) openSheet(b.getAttribute("data-svc"), null); });
 
-  /* before / after sliders */
-  function renderBA() {
-    $("baList").innerHTML = C.beforeAfter.map(function (b, i) {
-      var bf = b.before ? '<img src="' + esc(b.before) + '" alt="">' : M.art(b.art, false), af = b.after ? '<img src="' + esc(b.after) + '" alt="">' : M.art(b.art, true);
-      return '<div class="ba"><div class="cmp" style="--x:50%"><div>' + bf + '</div><div class="aft">' + af + '</div><span class="hd"></span><span class="lb l">' + t("before") + '</span><span class="lb r">' + t("after") + "</span>" +
-        '<input type="range" min="0" max="100" value="50" aria-label="' + esc(p(b.title)) + ": " + t("before") + " / " + t("after") + '" data-ba="' + i + '"></div>' +
-        "<p>" + esc(p(b.title)) + (b.before ? "" : " <small>· " + t("baDemo") + "</small>") + "</p></div>";
-    }).join("");
-  }
-  $("baList").addEventListener("input", function (e) { if (e.target.matches("input[type=range]")) e.target.parentNode.style.setProperty("--x", e.target.value + "%"); });
+  /* before / after carousel lives in beforeafter.js (+ .css); "Book this" opens the service sheet with the option preselected */
+  M.openSvc = function (svcId, h) { openSheet(svcId, h || null); };
+  function renderBA() { if (W.BA) W.BA.render($("baList")); }
 
   /* ---------- your car: Year -> Make -> Model (+ optional engine / drivetrain / trim), or a VIN ----------
      Data: NHTSA vPIC via vehicle.js (cached in localStorage). vPIC model lists have no trims, so trim / engine / drivetrain
@@ -1114,7 +1107,8 @@
   /* ---------- sheets ---------- */
   var lastFocus = null;
   function open(id) { lastFocus = D.activeElement; var s = $(id); s.classList.add("on"); s.setAttribute("aria-hidden", "false"); setTimeout(function () { var f = s.querySelector(".x"); if (f) f.focus({ preventScroll: true }); }, 50); }
-  function close(id) { var s = $(id); s.classList.remove("on"); s.setAttribute("aria-hidden", "true"); if (lastFocus && lastFocus.focus) try { lastFocus.focus({ preventScroll: true }); } catch (e) {} }
+  function close(id) { var s = $(id); s.classList.remove("on"); s.setAttribute("aria-hidden", "true"); // never hand focus back to a text field: on phones that pops the keyboard (number pad) open over the page
+    if (lastFocus && lastFocus.focus && !/^(INPUT|TEXTAREA|SELECT)$/.test(lastFocus.tagName) && !lastFocus.isContentEditable) try { lastFocus.focus({ preventScroll: true }); } catch (e) {} }
   D.querySelectorAll(".sheet").forEach(function (s) {
     s.setAttribute("aria-hidden", "true");
     s.addEventListener("click", function (e) { if (e.target === s || e.target.closest("[data-close]")) close(s.id); });

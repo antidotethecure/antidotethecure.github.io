@@ -238,6 +238,7 @@
     { id: "f-social", q: "What is Social & SEO Growth?", a: "An optional " + usd(ours) + "/mo add-on: content plan, short videos from your food, posting on Instagram, TikTok and YouTube, Google Business Profile + local SEO, and a monthly report. Market average is ~" + usd(mAvg) + "/mo. " + S.honest, go: "social" },
     { id: "f-time", q: "How long does setup take?", a: "Most restaurants go live within a couple of weeks of getting us the menu, photos and logo. Your onboarding page tracks every step.", go: "faq" },
     { id: "f-multi", q: "I have more than one restaurant.", a: "Prices are per restaurant. Use \"Build my plan\" to total it for any number of locations, and the $3,000 performance-share test is counted per restaurant.", go: "plans" },
+    { id: "f-talk", q: "Can I just talk to someone?", a: "Yes. Call our AI line at (424) 296-3303, any time, 24/7. Nia, our AI guide, walks you through the plans, add-ons and pricing, answers questions about SousShift, and can connect you with Antidote. (That number is for calls only; to text, use the Text Antidote button.)", go: "faq" },
     { id: "f-existing", q: "I'm already a client. Do my prices change?", a: "No. Signed deals keep their terms. These prices are for new restaurants.", go: "plans" }];
   $("faqList").innerHTML = A.faq.map(function (f) { return '<details id="' + f.id + '"><summary>' + esc(f.q) + '</summary><p>' + esc(f.a) + '</p></details>'; }).join("");
 

@@ -1,5 +1,5 @@
 /* Shared "Powered by SousShift AI" credit footer for every app built for a business.
-   One tag per page:  <script src="<rel>/demo/poweredby.js?v=20261013a" defer></script>
+   One tag per page:  <script src="<rel>/demo/poweredby.js?v=20261013b" defer></script>
    Optional: data-into="#selector" on the tag to place the footer inside a scroll container
    instead of <body>.
    - Credit line only: no prices, no pitch.
@@ -7,13 +7,18 @@
      never SousShift's own blue/yellow.
    - Idempotent: runs once per page. An older "Powered by SousShift AI" line is replaced unless it
      already carries both the Instagram and the email contact.
-   - Keeps clear of fixed/sticky bottom bars by reserving their height under the footer. */
+   - Keeps clear of fixed/sticky bottom bars by reserving their height under the footer.
+   - Adds the SousShift AI sales line (Nia, 24/7, calls only: tel:, never sms:). Left off on
+     client-private pages (staff, back office, onboarding, files, owner setup) or with data-call="off". */
 (function () {
   "use strict";
   var IG = "https://instagram.com/second.shiftai";
   var MAIL = "mailto:secondshiftai@gmail.com?subject=" + encodeURIComponent("App for my business");
+  var TEL = "tel:+14242963303", TEL_TXT = "(424) 296-3303";
   var ID = "ssai-pw";
   var me = document.currentScript;
+  var CALL = !(me && me.getAttribute("data-call") === "off") &&
+             !/\/(staff|backoffice|onboarding|files|setup)\//i.test(location.pathname);
 
   function hasBoth(el) {
     var h = el.innerHTML || "";
@@ -54,6 +59,10 @@
     "@media print{#" + ID + "{opacity:1;padding-bottom:6px}}";
 
   var ICON_IG = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg>';
+  var ICON_TEL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>';
+  function callLink() {
+    return '<a href="' + TEL + '" aria-label="Call SousShift AI, 24/7 AI line, ' + TEL_TXT + '">' + ICON_TEL + '<span>' + TEL_TXT + '</span></a>';
+  }
   var ICON_MAIL = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg>';
 
   function build() {
@@ -63,7 +72,14 @@
       if (!keep && hasBoth(old[i])) { keep = old[i]; continue; }
       old[i].parentNode && old[i].parentNode.removeChild(old[i]);
     }
-    if (keep) { keep.id = keep.id || ID; return; }
+    if (keep) {
+      keep.id = keep.id || ID;
+      if (CALL && !/tel:\+?14242963303/.test(keep.innerHTML || "")) {
+        /* text-only link: this page's own credit line has no icon styles */
+        keep.insertAdjacentHTML("beforeend", ' · <a href="' + TEL + '" style="color:inherit;white-space:nowrap">📞 ' + TEL_TXT + '</a>');
+      }
+      return;
+    }
 
     var st = document.createElement("style"); st.id = ID + "-css"; st.textContent = CSS; document.head.appendChild(st);
     var f = document.createElement("footer");
@@ -71,7 +87,8 @@
     var c = muted(); if (c) f.style.color = c;
     f.innerHTML = '<span class="pw">Powered by SousShift AI</span><span class="ct">' +
       '<a href="' + IG + '" target="_blank" rel="noopener">' + ICON_IG + '<span>@second.shiftai</span></a>' +
-      '<a href="' + MAIL + '">' + ICON_MAIL + '<span>secondshiftai@gmail.com</span></a></span>';
+      '<a href="' + MAIL + '">' + ICON_MAIL + '<span>secondshiftai@gmail.com</span></a>' +
+      (CALL ? callLink() : "") + '</span>';
     var host = null, sel = me && me.getAttribute("data-into");
     if (sel) { try { host = document.querySelector(sel); } catch (e) {} }
     (host || document.body).appendChild(f);

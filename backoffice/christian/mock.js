@@ -19,7 +19,24 @@
   function ymd(t) { return new Date(t).toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); }
   for (var g = 0; g < 380; g++) { var t = now - Math.floor(rnd() * 30) * DAY, m = rnd() < 0.6 ? pick(members) : null, sc = Math.floor(rnd() * 9000);
     games.push([m ? m.slug : pick(slugs), ymd(t), m ? m.id : "", "DEV" + Math.floor(rnd() * 90), sc, Math.min(50, Math.floor(sc / 100))]); }
-  for (var o = 0; o < 520; o++) { var t2 = now - Math.floor(rnd() * 30) * DAY; opens.push([pick(slugs), ymd(t2), "DEV" + Math.floor(rnd() * 120), rnd() < 0.3 ? 1 : 0]); }
+  // 📍 visit log (made-up): [slug, day, device, home screen, server ms, member, local time, device summary, lat, lng, accuracy m]
+  // like Code.gs data(). 120 phones; every 2nd member is linked to one; DEV7 is a heavy opener (dozens of opens a day,
+  // linked to Test Guest 04) and DEV9 a heavy opener who never joined. ~30% of phones have location on.
+  var DEVS = ["iPhone · iOS 18.6 · Safari", "iPhone · iOS 18.6 · Instagram app", "iPhone · iOS 17.5 · Safari", "iPhone · iOS 18.6 · Chrome", "Samsung · Android 14 · Chrome", "Samsung · Android 15 · Samsung Internet", "Pixel · Android 15 · Chrome", "Motorola · Android 13 · Chrome", "Desktop · Mac · Chrome", "Desktop · Windows · Edge"],
+    SPOT = { "melody-bar-grill": [33.95, -118.40], "nalu-vida": [33.99, -118.47] }, dv = [];
+  members.forEach(function (m, k) { if (k % 2 === 1) m.dev = "DEV" + (k * 2 + 1); });
+  for (var d = 0; d < 120; d++) dv.push({ id: "DEV" + d, ua: d === 7 ? DEVS[1] : d === 9 ? DEVS[4] : pick(DEVS), pwa: rnd() < 0.35, loc: d === 7 || d === 9 || rnd() < 0.3, far: rnd() < 0.15, slug: pick(slugs) });
+  members.forEach(function (m) { if (m.dev) dv[+m.dev.slice(3)].slug = m.slug; });
+  function hourPick() { var r = rnd(); return r < 0.4 ? 11 + rnd() * 3 : r < 0.85 ? 17 + rnd() * 5 : 8 + rnd() * 15; }   // lunch + dinner rush
+  function addOpen(v, t) { if (t > now) t = now - Math.floor(rnd() * 36e5); var mm = members.filter(function (x) { return x.dev === v.id; })[0], sp = SPOT[v.slug], ll = null;
+    if (v.loc) ll = v.far ? [34.05 + Math.round(rnd() * 8) / 100, -118.25 - Math.round(rnd() * 8) / 100] : [sp[0] + (rnd() < 0.7 ? 0 : 0.01), sp[1] + (rnd() < 0.7 ? 0 : -0.01)];
+    opens.push([v.slug, ymd(t), v.id, v.pwa ? 1 : 0, t, mm ? mm.id : "", new Date(t).toLocaleString("sv-SE", { timeZone: "America/Los_Angeles" }).replace(" ", "T") + "-07:00", v.ua,
+      ll ? Math.round(ll[0] * 100) / 100 : null, ll ? Math.round(ll[1] * 100) / 100 : null, ll ? 12 + Math.floor(rnd() * 60) : null]); }
+  function dayStart(k) { var x = now - k * DAY; return x - ((+new Date(x).toLocaleString("en-US", { timeZone: "America/Los_Angeles", hour: "numeric", hour12: false }) % 24) * 36e5) - (new Date(x).getMinutes() * 6e4); }
+  for (var o = 0; o < 520; o++) addOpen(dv[Math.floor(rnd() * 120)], dayStart(Math.floor(rnd() * 30)) + Math.floor(hourPick() * 36e5));
+  for (var k7 = 0; k7 < 14; k7++) { var nn = 3 + Math.floor(rnd() * (k7 < 3 ? 9 : 5)); for (var z = 0; z < nn; z++) addOpen(dv[7], dayStart(k7) + Math.floor((9 + rnd() * 14) * 36e5)); }
+  for (var k9 = 0; k9 < 6; k9++) for (var z9 = 0; z9 < 4; z9++) addOpen(dv[9], dayStart(k9) + Math.floor((10 + rnd() * 12) * 36e5));
+  opens.sort(function (a, b) { return a[4] - b[4]; });
   members.filter(function (m) { return m.spent; }).forEach(function (m, k) { var t3 = now - Math.floor(rnd() * 20) * DAY;
     redeems.push({ ts: t3, code: (m.slug === "nalu-vida" ? "NV-" : "MEL-") + "T" + ("00" + k).slice(-3), slug: m.slug, day: ymd(t3), member: m.id, name: m.name, reward: m.spent >= 500 ? "Free starter (test)" : "Free soft drink (test)", button: "App Reward – Test", pts: m.spent }); });
   for (var c = 0; c < 24; c++) { var mm = pick(members), t4 = now - Math.floor(rnd() * 14) * DAY;

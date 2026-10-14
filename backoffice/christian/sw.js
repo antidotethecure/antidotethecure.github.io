@@ -1,6 +1,6 @@
 /* Christian HQ: caches only the app shell (page, icons, scripts) so it opens fast. Customer data is NEVER cached:
    it comes from the backend after login and lives only in memory while the app is open. */
-var C = "christian-hq-v5", SHELL = ["./", "index.html", "mock.js", "squares-hq.js", "../../demo/christian-live.js", "icon-192.png", "icon-512.png", "manifest.webmanifest"];
+var C = "christian-hq-v6", SHELL = ["./", "index.html", "mock.js", "squares-hq.js", "../../demo/christian-live.js", "icon-192.png", "icon-512.png", "manifest.webmanifest"];
 self.addEventListener("install", function (e) { e.waitUntil(caches.open(C).then(function (c) { return c.addAll(SHELL); }).catch(function () {})); self.skipWaiting(); });
 self.addEventListener("activate", function (e) { e.waitUntil(caches.keys().then(function (k) { return Promise.all(k.filter(function (x) { return x !== C; }).map(function (x) { return caches.delete(x); })); })); self.clients.claim(); });
 self.addEventListener("fetch", function (e) {

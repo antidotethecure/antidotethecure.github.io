@@ -1071,6 +1071,7 @@
       var d = m.d, src = W.DIAG.BASE + (d.small || d.file);
       $("dgH").textContent = t("dgH", { c: dgName() });
       if ($("dgImg").getAttribute("src") !== src) $("dgImg").src = src;
+      $("dgImg").style.aspectRatio = d.w && d.h ? d.w + " / " + d.h : "";
       $("dgImg").alt = t("dgAlt", { c: dgName() });
       $("dgTable").hidden = !d.imageHasSpecTable;
       $("dgYear").hidden = m.yearOk; if (!m.yearOk) $("dgYear").textContent = t("dgYear", { d: d.drawn || d.years.join("–"), y: car.year });

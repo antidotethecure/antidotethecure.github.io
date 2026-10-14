@@ -2270,6 +2270,13 @@ function end(){
   if(window.SSAI_INTERIM&&!G.debug){ var ex=document.createElement("div"); ex.innerHTML=SSAI_INTERIM.explainerHTML(1); var old=$("over").querySelector(".ir-endx"); if(old) old.remove(); ex.className="ir-endx"; $("won").insertAdjacentElement("afterend",ex); }
   if(window.ReviewEgg) ReviewEgg.endCard($("over"),$("post"));
   $("over").classList.add("on");
+  // PLAY FIRST, CLAIM AFTER (demo/claimscore.js): a guest's rank on this week's board + the "save your score" sheet (same SSAI_GATE
+  // "score" sheet as Post my score). Saving posts this flight with the same postScore() and saves the held Rewards points.
+  if(window.SSAI_CLAIM&&!G.debug) SSAI_CLAIM.show({key:sv?BGAME_S:BGAME,score:sv?Math.floor(G.surv/1000):G.score,unit:sv?"time":"",
+    board:{api:BAPI,game:sv?BGAME_S:BGAME,week:wkey()},boardName:sv?"this week's Survival board":"this week's Campaign board",
+    prize:rewardsOn()?(((window.SSAI_REWARDS||{}).weekly||{}).prize||false):false,fame:"ig",reason:"score",mount:$("post"),
+    after:function(m){ if(m&&!$("bn").value.trim()) $("bn").value=m.name.split(" ")[0]; postScore(); var b=$("wsave"); if(b) b.click(); },
+    again:function(){ $("again").click(); },alive:function(){ return G.over&&!G.running; }});
 }
 /* ---- weekly leaderboard (shared with the bowling site's score service, its own board) ---- */
 var BAPI="https://drizzle-bowl-scores.higgsfield.app/api/game-scores", BGAME="melody", BGAME_S="melody-survival";   // two weekly boards: campaign score, survival seconds
@@ -2495,7 +2502,7 @@ window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REW
 /* CUSTOMER-ONLY (2026-10-13): this is Melody's live customer app. No owner view, manager log, sales numbers, sample
    players or "Demo:" notes (crm.js, interim.js, nearby.js, specials.js read this flag). Owner tools = Christian HQ. */
 window.SSAI_CUSTOMER_ONLY=true;</script>
-<script src="../crm.js?v=co1"></script><script src="games-data.js?v=mo1"></script><script src="games.js?v=gp1"></script>
+<script src="../crm.js?v=cs1"></script><script src="../claimscore.js?v=cs1"></script><script src="games-data.js?v=mo1"></script><script src="games.js?v=gp1"></script>
 <link rel="stylesheet" href="../sports/sports.css?v=sb2">
 <script>/* SPORTS BAR PACKAGE (demo/sports/README.md): Melody = install #1, LA/California teams. Perks text stays empty until
    Christian sets a real deal: an empty watchParty.text hides the banner (no made-up deals). */

@@ -37,7 +37,7 @@ h2::before{content:"";display:inline-block;vertical-align:-2px;margin-right:10px
 .gamebox{background:linear-gradient(180deg,#121c40,#0b1230);border:1px solid var(--edge);border-radius:18px;padding:12px}
 .hud{display:flex;justify-content:space-between;font-weight:800;padding:0 4px 8px}
 .hud b{font-family:var(--display);font-weight:400;font-size:28px;color:var(--gold);letter-spacing:.04em}
-canvas{display:block;width:100%;aspect-ratio:3/4;border-radius:12px;background:#0b1230;touch-action:none}
+canvas{display:block;width:100%;aspect-ratio:3/4;border-radius:12px;background:#0b1230;touch-action:pan-y pinch-zoom}
 .tiers{display:grid;gap:8px;margin-top:12px}
 .tier{display:flex;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:10px 12px;font-size:14px}
 .tier b{font-family:var(--display);font-weight:400;font-size:22px;color:var(--gold);letter-spacing:.03em}
@@ -145,6 +145,7 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:26px;line-
     var cv = document.getElementById("cv"), x = cv.getContext("2d"), W = cv.width, H = cv.height;
     var pics = P.map(function(src){ var i = new Image(); i.src = src; return i; });
     var st = null, px = W / 2, tm = 0;
+    window.GAMELOCK_RUNNING = function(){ return !!st; };   // gamelock.js: a run is live (lets go of the screen lock at game over)
     function idle(msg){
       x.clearRect(0, 0, W, H); x.fillStyle = "#EEF2FF"; x.textAlign = "center";
       x.font = "900 26px Archivo, sans-serif"; x.fillText(msg || (window.__T || String)("TAP TO PLAY"), W / 2, H / 2);
@@ -200,7 +201,7 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:26px;line-
 })();
 </script>
 <script src="../menu3d.js"></script>
-<script src="../gamelock.js"></script><script>window.GAME_FS={hide:".tiers, .gamebox > .sub"};</script><script src="../fullscreen.js"></script>
+<script src="../gamelock.js?v=ml1"></script><script>window.GAME_FS={hide:".tiers, .gamebox > .sub"};</script><script src="../fullscreen.js"></script>
 <script src="../poweredby.js?v=20261013a" defer></script>
 </body>
 </html>

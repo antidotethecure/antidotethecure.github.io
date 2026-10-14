@@ -18,10 +18,14 @@
   var W = window, D = document;
   var raf = W.requestAnimationFrame.bind(W), caf = W.cancelAnimationFrame.bind(W);   // real ones, before gamepause.js wraps them
   var T = function (s) { return (W.__T || String)(s); };
-  // name: [game model in 3d/ (or null), base, upgraded model in 3d/menu/ (or null), { az: max degrees either side of the front }]
+  // name: [game model in 3d/ (or null), base, upgraded model in 3d/menu/ (or null), { az: max degrees either side of the front,
+  //   minPolar/maxPolar: tilt limits in radians, fill: width on the plate (plate radius 1, default 1.62) }]
   // An upgraded model (real-photo scan) loads first and falls back to the game model if it fails. A dish with neither is hidden.
   // Single-photo scans invent their hidden back: if it looks bad, set az (e.g. 60) to keep the spin to the photographed side.
   var DISH = {
+    // a Tripo scan of the real review frame (125.5 s) was tried 2026-10-13 and NOT used: smooth glazed drumsticks with no lemon-
+    // pepper crust, burnt-black blobs and a sauce cup floating off the tray; the game model reads better. To try it again:
+    // ["p_wings.glb?v=st3", "plate", "menu/wings.glb?v=…", { az: 70 }]
     "Lemon Pepper Wings": ["p_wings.glb?v=st3", "plate"],
     "Buttermilk Chicken Strips & Fries": ["p_strips.glb?v=st3", "plate"],
     "Baby Back Ribs & Fries": ["p_ribs.glb?v=st3", "plate"],
@@ -30,9 +34,9 @@
     "Mango Margarita": ["p_marg.glb?v=ag1", "coaster"],  // mango + chili rim: NOT used for the House Margarita (lime/salt)
     "Mimosa": ["p_mimosa.glb?v=fv2", "coaster"],
     "Espresso Martini": ["p_espresso.glb?v=fv2", "coaster"],
-    // p_burger.glb is a low-poly game prop (faceted bun, shard fries) and looks fake up close: the burger stays hidden until a
-    // real-photo scan lands in 3d/menu/ (then: [null, "plate", "menu/melody-burger.glb?v=…"])
-    "Melody Burger": [null, "plate", null]
+    // scan of the real @melodylax photo (Tripo, 2026-10-13). The game's p_burger.glb is a low-poly prop, so no fallback model:
+    // the back and the top were invented from one photo, so the spin stays on the photographed front half
+    "Melody Burger": [null, "plate", "menu/melody-burger.glb?v=tr1", { az: 75, minPolar: 0.6, fill: 1.08 }]
     // Michelada: there is no michelada model (p_mic.glb is the karaoke microphone).
   };
   var HERE = ((D.currentScript || {}).src || "").replace(/[^\/]*$/, "");
@@ -218,7 +222,10 @@
     var cache = {}, group = new THREE.Group(); scene.add(group);
     function load(url) {
       if (!cache[url]) cache[url] = loader.loadAsync(HERE + "3d/" + url).then(function (g) {
-        g.scene.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; [].concat(o.material).forEach(function (m) { if (m.map) m.map.anisotropy = 4; m.envMapIntensity = 0.8; }); } });
+        g.scene.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; [].concat(o.material).forEach(function (m) { if (m.map) m.map.anisotropy = 4; m.envMapIntensity = 0.8;
+          // real-photo scans (3d/menu/) already carry the photo's light in their colour: tone them down a touch and give the
+          // glaze back a little shine so they don't wash out under the studio key light
+          if (/^menu\//.test(url)) { m.color.multiplyScalar(0.8); m.roughness = 0.72; m.envMapIntensity = 0.65; } }); } });
         return g.scene;
       });
       cache[url].catch(function () { delete cache[url]; });
@@ -231,7 +238,14 @@
       if (w !== size[0] || h !== size[1]) { size = [w, h]; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); return true; }
     }
     function reset() { cam.position.copy(home.pos); ctl.target.copy(home.tgt); ctl.autoRotate = true; ctl.update(); }
-    function loop() { if (!running) return; fit(); ctl.update(); renderer.render(scene, cam); frame = raf(loop); }
+    var azLim = Infinity;
+    function loop() {
+      if (!running) return; fit();
+      if (ctl.autoRotate && azLim < Math.PI) {   // limited dish: the slow spin swings back and forth inside the limit
+        var a = ctl.getAzimuthalAngle(), sp = Math.abs(ctl.autoRotateSpeed);
+        if (a >= azLim - 0.03) ctl.autoRotateSpeed = sp; else if (a <= -azLim + 0.03) ctl.autoRotateSpeed = -sp;
+      }
+      ctl.update(); renderer.render(scene, cam); frame = raf(loop); }
     W.addEventListener("resize", function () { if (running && fit()) frame3(); });
     function frame3() { var r = group.userData.r; if (r) aim(r); }
 
@@ -246,8 +260,9 @@
 
     function show(name, cfg) {
       var src0 = cfg[2] ? load(cfg[2]).catch(function (e) { if (!cfg[0]) throw e; console.warn("[dish3d] upgraded model failed, using the game model", e && e.message); return load(cfg[0]); }) : load(cfg[0]);
-      var lim = cfg[3] && cfg[3].az ? cfg[3].az * Math.PI / 180 : Infinity;
-      ctl.minAzimuthAngle = -lim; ctl.maxAzimuthAngle = lim;
+      var o = cfg[3] || {}, lim = o.az ? o.az * Math.PI / 180 : Infinity;
+      azLim = lim; ctl.minAzimuthAngle = -lim; ctl.maxAzimuthAngle = lim;
+      ctl.minPolarAngle = o.minPolar || 0.12; ctl.maxPolarAngle = o.maxPolar || 1.42;
       return src0.then(function (src) {
         if (cur !== name) return;
         group.clear();
@@ -261,7 +276,7 @@
         } else if (base === "board") {
           s = 1.95 / foot; surface = 0.08; baseR = 1.18; group.add(board);
         } else {       // plate: the food fills ~78% of the well-to-rim width
-          s = 1.62 / foot; surface = 0.03; baseR = 1.02; group.add(plate);
+          s = ((cfg[3] && cfg[3].fill) || 1.62) / foot; surface = 0.03; baseR = 1.02; group.add(plate);
         }
         m.scale.setScalar(s); m.updateMatrixWorld(true);
         bb.setFromObject(m); var c = footCenter(m, bb);

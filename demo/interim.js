@@ -309,7 +309,8 @@
     if (!api({ type: "interim_review", id: id, status: st })) queue(l, { type: "interim_review", id: id, status: st });
     store(l); drawLog();
   });
-  function mountLog() { var own = document.getElementById("crm-owner"); if (own && own.parentNode && logEl.parentNode !== own.parentNode) own.parentNode.insertBefore(logEl, own.nextSibling); drawLog(); }
+  // customer-only pages (window.SSAI_CUSTOMER_ONLY, e.g. Melody) never show the manager log; crm.js also leaves #crm-owner off the page
+  function mountLog() { if (window.SSAI_CUSTOMER_ONLY) return; var own = document.getElementById("crm-owner"); if (own && own.parentNode && logEl.parentNode !== own.parentNode) own.parentNode.insertBefore(logEl, own.nextSibling); drawLog(); }
 
   // early-bird / founding-member gift (demo/earlybird.js): same live pass, no points, the server already checked the gift.
   // Counts as that visit's one reward.

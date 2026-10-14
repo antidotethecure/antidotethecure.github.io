@@ -452,29 +452,34 @@
     var y = box.closest(".sp-body"), sc = y ? y.scrollTop : 0;
     box.innerHTML = h; if (y) y.scrollTop = sc;
     [].forEach.call(box.querySelectorAll("[data-pk]"), function (b) {
-      b.onclick = function () {
-        var p = picks(), id = b.getAttribute("data-pk"), tm = b.getAttribute("data-tm");
-        var ev = m.all.filter(function (r) { return String(r.e.id) === id; })[0]; if (!ev || state(ev.e) !== "pre" || new Date(ev.e.date) <= Date.now()) { toast("Picks lock when the game starts."); return; }
-        if (p[id] && String(p[id].team) === tm) delete p[id]; else p[id] = { team: tm, ts: Date.now() };
-        var ks = Object.keys(p); if (ks.length > 200) delete p[ks[0]]; lsSet(K("picks"), p); render();
-      };
+      b.onclick = function () { setPick(b.getAttribute("data-pk"), b.getAttribute("data-tm")); };
     });
     [].forEach.call(box.querySelectorAll("[data-rsvp]"), function (a) {
       a.onclick = function (e) { var rs = PERKS.rsvp; if (rs && typeof rs.action === "function") { e.preventDefault(); close(); try { rs.action(FN.d[+a.getAttribute("data-rsvp")]); } catch (x) {} } else close(); };
     });
   }
+  // one pick per game, only before it starts (same store + points as the scoreboard sheet); returns false when locked
+  function setPick(id, tm) {
+    id = String(id); tm = String(tm);
+    var p = picks(), ev = collect().all.filter(function (r) { return String(r.e.id) === id; })[0];
+    if (!ev || state(ev.e) !== "pre" || new Date(ev.e.date) <= Date.now()) { toast("Picks lock when the game starts."); return false; }
+    if (p[id] && String(p[id].team) === tm) delete p[id]; else p[id] = { team: tm, ts: Date.now() };
+    var ks = Object.keys(p); if (ks.length > 200) delete p[ks[0]]; lsSet(K("picks"), p); render(); notify(); return true;
+  }
+  // page widgets (e.g. Melody's sports carousel) listen for this after every data refresh; read data via SportsBar.api
+  function notify() { try { document.dispatchEvent(new CustomEvent("sportsbar:update")); } catch (e) {} }
   function refresh(full) {
     if (busy) { again = Math.max(again, full ? 2 : 1); return Promise.resolve(); } busy = true;
     var after = function () { busy = false; if (again) { var a = again; again = 0; refresh(a === 2); } };
     return Promise.all([loadScoreboards(), full ? loadFightNight() : null]).then(function () {
-      var m = collect(); settlePicks(m.fin); render(); drawTicker(); after();
+      var m = collect(); settlePicks(m.fin); render(); drawTicker(); notify(); after();
       if (!full) return;
       var keys = {}, lgs = {};
       m.all.forEach(function (r) { r.keys.forEach(function (k) { keys[k] = 1; lgs[r.lg] = 1; }); });
       follows().forEach(function (k) { keys[k] = 1; lgs[TK[k][0]] = 1; });
       if (!m.all.length) TEAMS.forEach(function (t) { keys[t[0] + ":" + t[1]] = 1; });   // to find the next scheduled game
-      return Promise.all(Object.keys(keys).map(loadSched).concat(Object.keys(lgs).map(loadStand))).then(render);
-    }, function () { after(); render(); });
+      return Promise.all(Object.keys(keys).map(loadSched).concat(Object.keys(lgs).map(loadStand))).then(function () { render(); notify(); });
+    }, function () { after(); render(); notify(); });
   }
   function picker() {
     box = null;
@@ -527,6 +532,8 @@
     window.MelodyGames.register({ id: "scores", order: 10, wide: true, icon: "📺", title: CFG.title || "Scoreboard", sub: CFG.tileSub || "Live scores for every " + RNAME + " team. Follow your teams" + (hasFights() ? ", plus fight nights." : "."), tag: "Live",
       start: function () { window.MelodyGames.close(); open("teams"); } });
   }
-  window.SportsBar = { open: open, close: close, refresh: refresh, config: CFG, teams: TEAMS, leagues: L, render: render,
+  window.SportsBar = { open: open, close: close, refresh: refresh, config: CFG, teams: TEAMS, leagues: L, render: render, picker: function () { open("teams"); picker(); },
+    api: { collect: collect, allErr: allErr, follows: follows, teamInfo: teamInfo, nextEv: nextEv, comp: comp, state: state, statusText: statusText, score: score, nm: nm, fmtTime: fmtTime, headline: headline, tv: tv, logoFor: logoFor, TK: TK, esc: esc, L: L, BASE: BASE, getJSON: getJSON, loadSched: loadSched, loadStand: loadStand, SCHED: SCHED,
+      pickHTML: pickHTML, setPick: setPick, picks: picks, toast: toast },
     _state: { SB: SB, SBerr: SBerr, SCHED: SCHED, STAND: STAND, LEAGUE: LEAGUE } };
 })();

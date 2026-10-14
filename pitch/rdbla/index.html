@@ -1,0 +1,54 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>RDBLA × SousShift AI</title>
+<style>
+:root{--red:#e22120;--redd:#b21817;--yel:#5cb5ff;--cream:#f8eded;--ink:#000000}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.w{max-width:980px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 8px;text-align:center}.duo{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+.lg{height:72px;width:auto;max-width:220px;object-fit:contain;background:var(--ink);padding:8px 12px;border-radius:12px}
+.lgt{font:800 28px/1.1 system-ui,sans-serif}.x{font-size:28px;color:#8a817a}.ss{height:60px;border-radius:10px}
+h1{font-size:clamp(26px,5vw,42px);line-height:1.15;margin:18px 0 10px}.hook{font-size:18px;font-weight:700;max-width:720px;margin:0 auto 8px}
+.intro{max-width:720px;margin:0 auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start;margin:28px 0}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border-radius:18px;padding:20px 22px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.card h2{margin:0 0 10px;font-size:22px}ul.of{margin:0;padding-left:20px}ul.of li{margin:0 0 7px}
+video{width:100%;max-width:360px;display:block;margin:0 auto;border-radius:16px;background:#000}
+.phone{width:min(360px,100%);height:700px;margin:0 auto;border:12px solid #111;border-radius:40px;overflow:hidden;background:#000}
+.phone iframe{width:100%;height:100%;border:0;background:#fff}
+.btn{display:inline-block;background:var(--red);color:#fff;font-weight:800;text-decoration:none;padding:13px 22px;border-radius:12px;margin:6px 6px 0 0}
+.btn.alt{background:#fff;color:var(--redd);border:2px solid var(--redd)}
+.q{border-left:6px solid var(--yel)}.note{font-size:13px;color:#6b625c}
+footer{text-align:center;font-size:12px;color:#8a817a;padding:26px 0 90px}footer a{color:#8a817a}
+</style></head><body>
+<header class="w"><div class="duo"><img class="lg" src="img/rdbla-logo.png" alt="RDBLA"><span class="x">×</span><img class="ss" src="https://antidotethecure.github.io/assets/ssai-lockup.jpg" alt="SousShift AI"></div>
+<h1>Your own service app, made for RDBLA</h1>
+<p class="hook">Tesla and Carvana run their own apps, and big dealer groups like AutoNation do too: customers book service, follow their car and get offers right from their phone.</p><p class="intro">We build that kind of app for RDBLA, under your own name and brand. Customers scan a QR or tap a link, with no download, and book service, see what was done and come back.</p></header>
+<main class="w">
+<div class="grid">
+ <section class="card"><h2>What we offer</h2><ul class="of"><li>A branded service app: customers book service and get a text when the car is almost ready</li><li>Exploded-view parts diagrams for the car they drive, so they see exactly what you&#x27;re replacing</li><li>Before-and-after photos of the work, right in the app</li><li>An OBD code lookup: check-engine codes explained in plain English</li><li>Service reminders, so oil changes and maintenance come back to you</li><li>Loyalty and rewards for repeat service visits</li><li>Text marketing to customers who opt in</li><li>A parts-store guide that answers &quot;where do I get this part?&quot;</li></ul></section>
+ <section class="card" id="video"><h2>Watch the 60-sec video</h2>
+  <video controls playsinline preload="metadata" poster="../assets/commercial-poster.jpg"><source src="../assets/commercial.mp4" type="video/mp4"></video>
+  <p class="note">The SousShift AI highlight reel: the same platform, built around your business.</p></section>
+</div>
+<div class="grid">
+ <section class="card"><h2>See it live</h2><p>our live auto-service demo app. Pick a car, open the parts diagram, try the OBD lookup.</p>
+  <a class="btn" href="https://antidotethecure.github.io/demo/mechanic/" target="_blank" rel="noopener">Open the live demo →</a>
+  <p class="note">Live demo app. Service reminders and rewards get added in your build. Your version gets your name, logo and colors.</p></section>
+ <div class="phone"><iframe src="https://antidotethecure.github.io/demo/mechanic/" title="Live demo" loading="lazy"></iframe></div>
+</div>
+<section class="card q" id="quote"><h2>Get a quote</h2>
+ <p>Tell us what you like and we'll put together a quote for RDBLA.</p>
+ <p><b>Have questions? Just reply to this email, and we&#x27;ll answer and set up a quick call with our team.</b></p>
+ <a class="btn" href="mailto:secondshiftai@gmail.com?subject=Quote%20for%20RDBLA&amp;body=Hi%20SousShift%20AI%2C%20this%20is%20RDBLA.%20We%27d%20like%20a%20quote%20for%20our%20own%20app.">✉️ Email us</a>
+ <a class="btn alt" href="https://ig.me/m/second.shiftai" target="_blank" rel="noopener">💬 DM @second.shiftai</a>
+</section>
+</main>
+<footer class="w"><p>Questions: <a href="mailto:secondshiftai@gmail.com">secondshiftai@gmail.com</a> · Instagram <a href="https://instagram.com/second.shiftai">@second.shiftai</a></p>
+<p>Powered by SousShift AI</p></footer>
+<script>/* the embedded demo can grab focus and scroll the page: keep the visitor at the top unless they moved */
+(function(){var moved=false,f=document.querySelector('.phone iframe');['wheel','touchstart','keydown'].forEach(function(e){addEventListener(e,function(){moved=true},{once:true,passive:true})});
+if(f&&!location.hash)f.addEventListener('load',function(){setTimeout(function(){if(!moved)scrollTo(0,0)},60)});})();</script>
+<script src="../../demo/faqbot.js?v=f1" data-kb="../../app/faq.json" data-mode="sales" defer></script>
+</body></html>

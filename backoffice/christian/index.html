@@ -94,13 +94,22 @@ function api(body){
 function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=sq2"; s.onload=cb; document.head.appendChild(s); }
 if(TEST) $("testBar").hidden=false; else if(!API) $("notConn").hidden=false;
 try{ TOKEN=sessionStorage.getItem(TKEY); }catch(e){}
-$("lf").onsubmit=function(ev){ ev.preventDefault(); var b=$("go"); b.disabled=true; b.textContent="Checking…"; $("lerr").textContent="";
-  loadMock(function(){ api({type:"bo_login",user:$("u").value,pw:$("p").value}).then(function(r){ b.disabled=false; b.textContent="Log in"; $("p").value="";
-    if(!r||!r.ok){ $("lerr").textContent=(r&&r.reason)||"Wrong name or password."; return; }
+// Speed: wake the Apps Script backend as soon as the page opens (cold starts take 5-10 s), so it's warm by the time you tap Log in.
+function warm(){ if(TEST||!API) return; try{ fetch(API+"?discounts=1",{cache:"no-store"}).catch(function(){}); }catch(e){} }
+warm(); $("u").addEventListener("focus",warm,{once:true});
+// Live status under the button so you always know what's happening (and that the password was right).
+var TICK=null; function status(t,ok){ var el=$("lerr"); el.style.color=ok?"#3ddc84":""; el.textContent=t; }
+function stopTick(){ if(TICK){ clearInterval(TICK); TICK=null; } }
+function ticking(label){ stopTick(); var t0=Date.now(); status(label+"…",true); TICK=setInterval(function(){ status(label+"… "+Math.round((Date.now()-t0)/1000)+"s",true); },1000); }
+$("lf").onsubmit=function(ev){ ev.preventDefault(); var b=$("go"); b.disabled=true; b.textContent="Checking…"; ticking("Checking your password");
+  loadMock(function(){ api({type:"bo_login",user:$("u").value,pw:$("p").value}).then(function(r){ $("p").value="";
+    if(!r||!r.ok){ stopTick(); b.disabled=false; b.textContent="Log in"; status((r&&r.reason)||"Wrong name or password."); return; }
+    b.textContent="✓ Password correct"; ticking("✓ Password correct. Loading your members and stats");
     TOKEN=r.token; try{ sessionStorage.setItem(TKEY,TOKEN); }catch(e){} load(); }); }); };
 $("out").onclick=function(){ if(TOKEN) api({type:"bo_logout",token:TOKEN}); signOut(""); };
 function signOut(msg){ TOKEN=null; DATA=null; try{ sessionStorage.removeItem(TKEY); }catch(e){} $("app").hidden=true; $("out").hidden=true; $("login").hidden=false; $("pane").innerHTML=""; $("lerr").textContent=msg||""; }
 function load(){ loadMock(function(){ api({type:"bo_data",token:TOKEN}).then(function(r){
+  stopTick(); var b=$("go"); b.disabled=false; b.textContent="Log in"; $("lerr").style.color="";
   if(!r||!r.ok){ signOut(r&&r.auth===false?"Signed out. Log in again.":(r&&r.reason)||"Couldn't load."); return; }
   DATA=r; $("login").hidden=true; $("app").hidden=false; $("out").hidden=false; $("stamp").textContent="Signed in as "+r.me+" · loaded "+new Date(r.now).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})+(r.test?" · TEST DATA":""); draw(); }); }); }
 $("refresh").onclick=load;

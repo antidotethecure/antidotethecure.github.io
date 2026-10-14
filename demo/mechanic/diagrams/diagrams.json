@@ -6,7 +6,10 @@
       "make": "Tesla",
       "model": "Model Y",
       "aliases": [],
-      "years": [2020, 2024],
+      "years": [
+        2020,
+        2024
+      ],
       "drawn": "2023 Model Y, Pearl White",
       "ev": true,
       "file": "tesla-model-y-full.webp",
@@ -17,22 +20,197 @@
       "imageHasSpecTable": true,
       "added": "2026-10-13",
       "hotspots": [
-        { "g": "roof", "x": 47.7, "y": 19.3 },
-        { "g": "hatch", "x": 29.7, "y": 21.6 },
-        { "g": "interior", "x": 49.7, "y": 27.6 },
-        { "g": "dash", "x": 63.5, "y": 28.5 },
-        { "g": "tail", "x": 24.5, "y": 34.5 },
-        { "g": "doors", "x": 42.8, "y": 38.7 },
-        { "g": "hood", "x": 75.3, "y": 41.0 },
-        { "g": "suspR", "x": 28.0, "y": 44.2 },
-        { "g": "lights", "x": 80.5, "y": 50.5 },
-        { "g": "brakesR", "x": 25.9, "y": 53.4 },
-        { "g": "suspF", "x": 69.1, "y": 54.3 },
-        { "g": "battery", "x": 47.0, "y": 54.3 },
-        { "g": "bumperF", "x": 84.9, "y": 58.0 },
-        { "g": "motor", "x": 64.6, "y": 59.4 },
-        { "g": "brakesF", "x": 66.3, "y": 69.1 },
-        { "g": "wheels", "x": 55.9, "y": 71.8 }
+        {
+          "g": "roof",
+          "x": 47.7,
+          "y": 19.3
+        },
+        {
+          "g": "hatch",
+          "x": 29.7,
+          "y": 21.6
+        },
+        {
+          "g": "interior",
+          "x": 49.7,
+          "y": 27.6
+        },
+        {
+          "g": "dash",
+          "x": 63.5,
+          "y": 28.5
+        },
+        {
+          "g": "tail",
+          "x": 24.5,
+          "y": 34.5
+        },
+        {
+          "g": "doors",
+          "x": 42.8,
+          "y": 38.7
+        },
+        {
+          "g": "hood",
+          "x": 75.3,
+          "y": 41.0
+        },
+        {
+          "g": "suspR",
+          "x": 28.0,
+          "y": 44.2
+        },
+        {
+          "g": "lights",
+          "x": 80.5,
+          "y": 50.5
+        },
+        {
+          "g": "brakesR",
+          "x": 25.9,
+          "y": 53.4
+        },
+        {
+          "g": "suspF",
+          "x": 69.1,
+          "y": 54.3
+        },
+        {
+          "g": "battery",
+          "x": 47.0,
+          "y": 54.3
+        },
+        {
+          "g": "bumperF",
+          "x": 84.9,
+          "y": 58.0
+        },
+        {
+          "g": "motor",
+          "x": 64.6,
+          "y": 59.4
+        },
+        {
+          "g": "brakesF",
+          "x": 66.3,
+          "y": 69.1
+        },
+        {
+          "g": "wheels",
+          "x": 55.9,
+          "y": 71.8
+        }
+      ]
+    },
+    {
+      "id": "toyota-camry",
+      "make": "Toyota",
+      "model": "Camry",
+      "aliases": [],
+      "years": [
+        2018,
+        2024
+      ],
+      "drawn": "2022 Camry, Celestial Silver",
+      "ev": false,
+      "file": "toyota-camry-full.webp",
+      "small": "toyota-camry-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-13",
+      "hotspots": [
+        {
+          "g": "roof",
+          "x": 54.6,
+          "y": 26.7
+        },
+        {
+          "g": "hatch",
+          "x": 80.8,
+          "y": 29.5
+        },
+        {
+          "g": "hood",
+          "x": 22.8,
+          "y": 33.1
+        },
+        {
+          "g": "tail",
+          "x": 89.8,
+          "y": 35.9
+        },
+        {
+          "g": "interior",
+          "x": 53.2,
+          "y": 38.7
+        },
+        {
+          "g": "lights",
+          "x": 11.7,
+          "y": 40.5
+        },
+        {
+          "g": "bumperR",
+          "x": 91.9,
+          "y": 43.3
+        },
+        {
+          "g": "motor",
+          "x": 21.4,
+          "y": 47.9
+        },
+        {
+          "g": "doors",
+          "x": 64.9,
+          "y": 47.9
+        },
+        {
+          "g": "bumperF",
+          "x": 7.6,
+          "y": 51.6
+        },
+        {
+          "g": "trans",
+          "x": 34.5,
+          "y": 51.6
+        },
+        {
+          "g": "exhaust",
+          "x": 79.4,
+          "y": 53.4
+        },
+        {
+          "g": "fuel",
+          "x": 53.2,
+          "y": 54.3
+        },
+        {
+          "g": "suspF",
+          "x": 26.2,
+          "y": 62.6
+        },
+        {
+          "g": "suspR",
+          "x": 62.2,
+          "y": 62.6
+        },
+        {
+          "g": "brakesF",
+          "x": 11.7,
+          "y": 66.3
+        },
+        {
+          "g": "wheels",
+          "x": 42.1,
+          "y": 66.3
+        },
+        {
+          "g": "brakesR",
+          "x": 80.8,
+          "y": 66.3
+        }
       ]
     }
   ]

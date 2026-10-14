@@ -47,5 +47,8 @@ footer{text-align:center;font-size:12px;color:#8a817a;padding:26px 0 90px}footer
 </main>
 <footer class="w"><p>Questions: <a href="mailto:secondshiftai@gmail.com">secondshiftai@gmail.com</a> · Instagram <a href="https://instagram.com/second.shiftai">@second.shiftai</a></p>
 <p>Powered by SousShift AI</p></footer>
+<script>/* the embedded demo can grab focus and scroll the page: keep the visitor at the top unless they moved */
+(function(){var moved=false,f=document.querySelector('.phone iframe');['wheel','touchstart','keydown'].forEach(function(e){addEventListener(e,function(){moved=true},{once:true,passive:true})});
+if(f&&!location.hash)f.addEventListener('load',function(){setTimeout(function(){if(!moved)scrollTo(0,0)},60)});})();</script>
 <script src="../../demo/faqbot.js?v=f1" data-kb="../../app/faq.json" data-mode="sales" defer></script>
 </body></html>

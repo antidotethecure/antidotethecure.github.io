@@ -1,7 +1,8 @@
 /* Christian HQ TEST MODE (?test=1 only). A fake backend that behaves like Code.gs, with made-up guests
    ("Test Guest 01", guest01@example.com, 555 numbers). Nothing here is real and nothing is ever sent:
-   the "emailed" one-time code is shown on screen instead. Test logins: user christian or antidote,
-   password "test-mode-only" (works ONLY against this fake backend, never the real one). */
+   the "emailed" one-time code is shown on screen instead. Test logins: user christian, antidote or melody-manager
+   (the shared MANAGER login "Melody Management": Melody only, like Code.gs), password "test-mode-only" (works ONLY
+   against this fake backend, never the real one). Also fakes the 💲 menu overrides and the ✅ to-do list (bo_todo). */
 (function () {
   "use strict";
   var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
@@ -67,7 +68,20 @@
     { id: "velocity:f60718293a4b5c6d", kind: "velocity", slug: "melody-bar-grill", sev: "medium", title: "1,280 points in 24 hours", reason: M(14).name + " earned 1280 points in the last 24 hours (4 events). A normal visit is a few hundred.",
       members: [M(14).id], evidence: ["24 h total: 1280 pts"], pts: 1280, claims: [], status: "open" } ] };
   scout.flags.push({ id: "dup_tries:0718293a4b5c6d7e", kind: "dup_tries", slug: "melody-bar-grill", sev: "low", title: "3 duplicate tries in 7 days", reason: M(4).name + " sent 3 things that were already counted this week.", members: [M(4).id], evidence: ["game points · Daily game cap reached", "receipt claim · Same check # + date", "redemption · Double tap"], pts: 0, claims: [], status: "open" });
-  var USERS = { christian: { name: "Christian", email: "christian@example.com" }, antidote: { name: "Antidote", email: "antidote@example.com" } }, TOK = {}, PEND = {}, fails = 0;
+  var USERS = { christian: { name: "Christian", email: "christian@example.com" }, antidote: { name: "Antidote", email: "antidote@example.com" },
+    "melody-manager": { name: "Melody Management", email: "melody-team@example.com", role: "manager", slugs: ["melody-bar-grill"] } }, TOK = {}, PEND = {}, fails = 0;
+  var MENU = {}, TODOS = [{ id: "TTEST1", ts: now - 5 * 36e5, slug: "melody-bar-grill", text: "Put new QR table tents on the patio", go: "", by: "Christian", status: "open" }], TODO_DONE = [];
+  function scopeOf(u) { var U = USERS[u]; return U.role === "manager" ? { role: "manager", slugs: U.slugs } : { role: "owner", slugs: slugs.slice() }; }
+  function can(u, s) { return scopeOf(u).slugs.indexOf(s) >= 0; }
+  function sm(u, o) { var sc = scopeOf(u); if (sc.role === "owner") return o; var y = {}; Object.keys(o || {}).forEach(function (k) { if (sc.slugs.indexOf(k) >= 0) y[k] = o[k]; }); return y; }
+  function todoOut(u) { var sc = scopeOf(u); return { ok: true, todos: TODOS.filter(function (t) { return t.status === "open" && (sc.role === "owner" || sc.slugs.indexOf(t.slug) >= 0); }), todoDone: TODO_DONE.filter(function (k) { return sc.role === "owner" || sc.slugs.indexOf(k.split(":")[1]) >= 0; }) }; }
+  var MLABEL = { price: "Menu price", sp_on: "Special on/off", sp_title: "Special name", sp_desc: "Special description", sp_price: "Special price", hh: "Happy hour & weekly specials" };
+  function mPrice(v) { v = String(v == null ? "" : v).replace(/[$,\s]/g, ""); if (v === "") return ""; var x = Math.round(+v * 100) / 100; return isFinite(x) && x >= 0.5 && x <= 500 ? x.toFixed(2) : null; }
+  function mValid(f, v, item) { if (!MLABEL[f]) return null; var t = function (x, lo, hi) { x = String(x == null ? "" : x).replace(/[<>]/g, "").replace(/\s+/g, " ").trim(); return x.length >= lo && x.length <= hi ? x : null; };
+    if (f === "hh") { var ls = String(v || "").split(/\n/).map(function (l) { return l.replace(/[<>]/g, "").trim(); }).filter(Boolean); return ls.length && ls.length <= 8 && ls.every(function (l) { return l.length <= 70; }) ? { item: "weekly", value: ls.join("\n") } : null; }
+    if (f === "price") { var nm = t(item, 2, 80), pr = mPrice(v); return nm && pr != null ? { item: nm, value: pr } : null; }
+    if (!/^[a-z0-9_-]{2,24}$/.test(String(item || ""))) return null;
+    var val = f === "sp_on" ? (v === "on" || v === "off" ? v : null) : f === "sp_title" ? t(v, 3, 60) : f === "sp_desc" ? t(v, 3, 200) : mPrice(v); return val == null ? null : { item: item, value: val }; }
   function label(f, k) { if (k === "lb") return f === "on" ? "Location bonus on/off" : "Location bonus points"; return { pts: "Points cost", amount: "$ off", percent: "% off", label: "Reward name" }[f] || f; }
   var EB = { "melody-bar-grill": {}, "nalu-vida": {} };
   function ebValid(f, v) {
@@ -99,19 +113,46 @@
     if (field === "label") { v = String(v || "").replace(/[<>]/g, "").trim(); return v.length >= 3 && v.length <= 80 ? v : null; }
     return null;
   }
+  function scopeData(u, o) { var sc = scopeOf(u); if (sc.role === "owner") return o; var ok = function (s) { return sc.slugs.indexOf(s) >= 0; };
+    var c = JSON.parse(JSON.stringify(o)); c.members = c.members.filter(function (m) { return ok(m.slug); }); c.games = c.games.filter(function (g) { return ok(g[0]); }); c.opens = c.opens.filter(function (x) { return ok(x[0]); });
+    c.redeems = c.redeems.filter(function (x) { return ok(x.slug); }); c.claims = c.claims.filter(function (x) { return ok(x.slug); }); c.staff = c.staff.filter(function (x) { return ok(x[0]); });
+    c.audit = c.audit.filter(function (a) { return a.slug === "Melody Bar & Grill"; }); ["eb", "lb", "oneprize", "restores7", "disc", "menu"].forEach(function (k) { c[k] = sm(u, c[k]); });
+    c.scout = { flags: c.scout.flags.filter(function (f) { return ok(f.slug); }), rejected: c.scout.rejected.filter(function (x) { return ok(x.slug); }), adjustments: c.scout.adjustments.filter(function (x) { return ok(x.slug); }) };
+    return c; }
   function handle(d) {
     if (d.type === "bo_login") {
       if (fails >= 10) return { ok: false, reason: "Too many wrong tries. Wait 15 minutes, then try again." };
       if (!USERS[d.user] || d.pw !== "test-mode-only") { fails++; return { ok: false, reason: "Wrong name or password." }; }
-      var tk = "TEST" + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + "x".repeat(20); TOK[tk] = d.user; return { ok: true, token: tk, name: USERS[d.user].name };
+      var tk = "TEST" + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + "x".repeat(20); TOK[tk] = d.user; var lsc = scopeOf(d.user); return { ok: true, token: tk, name: USERS[d.user].name, role: lsc.role, slugs: lsc.slugs };
     }
     var u = TOK[d.token]; if (!u) return { ok: false, auth: false, reason: "Signed out. Log in again." };
+    var SC = scopeOf(u), NOPE = { ok: false, reason: "Your login can't do that. Ask Christian." };
+    if (d.type === "squares_admin" && SC.role !== "owner" && d.slug && !can(u, d.slug)) return NOPE;
     if (d.type === "squares_admin") return window.SQUARES_MOCK ? window.SQUARES_MOCK(Object.assign({}, d, { by: USERS[u].name })) : { ok: false, reason: "Test squares backend missing" };   // demo/sports/squares-mock.js
-    if (d.type === "bo_dedupe") return { ok: true, removed: 0 };
+    if (d.type === "bo_dedupe") return SC.role === "owner" ? { ok: true, removed: 0 } : NOPE;
+    if (d.type === "bo_todo") {
+      if (d.op === "add") { var tx = String(d.text || "").replace(/[<>]/g, "").trim(); if (tx.length < 3 || tx.length > 140) return { ok: false, reason: "Type the to-do (3 to 140 characters)." };
+        var ts = d.slug === "all" ? "all" : d.slug || (SC.role === "owner" ? "all" : SC.slugs[0]); if (ts === "all" ? SC.role !== "owner" : !can(u, ts)) return NOPE;
+        TODOS.push({ id: "T" + Math.random().toString(36).slice(2, 10), ts: Date.now(), slug: ts, text: tx, go: d.go || "", by: USERS[u].name, status: "open" });
+        audit.push({ ts: Date.now(), who: USERS[u].name, slug: ts === "all" ? "Both" : ts === "nalu-vida" ? "Nalu Vida" : "Melody Bar & Grill", reward: "To-do", field: "To-do added", before: "", after: tx, status: "applied" }); return todoOut(u); }
+      if (d.op === "done") { var title = "", tsl = "";
+        if (d.key) { tsl = String(d.key).split(":")[1]; if (tsl === "all" ? SC.role !== "owner" : !can(u, tsl)) return NOPE; if (TODO_DONE.indexOf(d.key) < 0) TODO_DONE.push(d.key); title = d.text || d.key; }
+        else { var it = TODOS.filter(function (t) { return t.id === d.id; })[0]; if (!it) return { ok: false, reason: "That to-do is gone. Refresh." }; tsl = it.slug; if (tsl === "all" ? SC.role !== "owner" : !can(u, tsl)) return NOPE; it.status = "done"; title = it.text; }
+        audit.push({ ts: Date.now(), who: USERS[u].name, slug: tsl === "all" ? "Both" : tsl === "nalu-vida" ? "Nalu Vida" : "Melody Bar & Grill", reward: "To-do", field: "To-do done", before: title, after: "done", status: "applied" }); return todoOut(u); }
+      return { ok: false, reason: "Unknown action." }; }
     if (d.type === "bo_logout") { delete TOK[d.token]; return { ok: true }; }
+    if (d.type === "bo_summary" && SC.role !== "owner") return NOPE;
     if (d.type === "bo_summary") return { ok: true, members: members.length, joined7: members.filter(function (m) { return m.joined > now - 7 * DAY; }).length, plays7: games.length, redeems7: redeems.length, pendingClaims: claims.filter(function (x) { return x.status === "pending"; }).length };
-    if (d.type === "bo_data") return { ok: true, test: true, scout: scout, restores7: { "melody-bar-grill": 2, "nalu-vida": 1 }, oneprize: { "melody-bar-grill": { codes: 7, used: 5, expired: 2, refused: 3, mins: 10 }, "nalu-vida": { codes: 4, used: 4, expired: 0, refused: 1, mins: 10 } }, eb: ebStats(), me: USERS[u].name, now: Date.now(), members: members, games: games, opens: opens, redeems: redeems, claims: claims, staff: staff, trained: trained, audit: audit, disc: disc, lb: { "melody-bar-grill": { credited: 3, devices: 11 } } };
+    if (d.type === "bo_data") return scopeData(u, { ok: true, test: true, role: SC.role, slugs: SC.slugs, menu: MENU, todos: todoOut(u).todos, todoDone: todoOut(u).todoDone,
+      mgr: SC.role === "owner" ? Object.keys(USERS).filter(function (k) { return USERS[k].role === "manager"; }).map(function (k) { return USERS[k].name; }) : [], scout: scout, restores7: { "melody-bar-grill": 2, "nalu-vida": 1 }, oneprize: { "melody-bar-grill": { codes: 7, used: 5, expired: 2, refused: 3, mins: 10 }, "nalu-vida": { codes: 4, used: 4, expired: 0, refused: 1, mins: 10 } }, eb: ebStats(), me: USERS[u].name, now: Date.now(), members: members, games: games, opens: opens, redeems: redeems, claims: claims, staff: staff, trained: trained, audit: audit, disc: disc, lb: { "melody-bar-grill": { credited: 3, devices: 11 } } });
     if (d.type === "disc_propose") {
+      if (!can(u, d.slug)) return NOPE;
+      if (d.key === "scout" && SC.role !== "owner") return { ok: false, reason: "Scout actions are for Christian. Tell him what you saw." };
+      if (d.key === "menu") { var mv = mValid(d.field, d.value, d.item); if (!mv) return { ok: false, reason: "That value isn't allowed. Prices $0.50–$500 (blank = back to the menu price) · special names 3–60 characters · descriptions 3–200 · up to 8 lines of 70 for happy hour." };
+        var MM = MENU[d.slug] || {}, mb = d.field === "price" ? (MM.p || {})[mv.item] : d.field === "hh" ? MM.hh : ((MM.s || {})[mv.item] || {})[d.field.slice(3)];
+        var mid = "P" + Math.random().toString(36).slice(2, 10), mcode = String(100000 + Math.floor(Math.random() * 900000));
+        PEND[mid] = { user: u, slug: d.slug, key: "menu", field: d.field, item: mv.item, value: mv.value, before: mb != null && mb !== "" ? (typeof mb === "number" ? mb.toFixed(2) : mb) : (d.before || "(not set)"), reward: d.reward || mv.item, code: mcode, tries: 0, exp: Date.now() + 6e5 };
+        return { ok: true, id: mid, sentTo: USERS[u].email.replace(/^(.).*(@.*)$/, "$1•••$2"), before: PEND[mid].before, after: mv.value === "" ? "(menu default)" : mv.value, testCode: mcode }; }
       var v = valid(d.key, d.field, d.value); if (v == null) return { ok: false, reason: "That value isn't allowed. Points 50–10,000 · $ off 1–100 · percent 1–50 · names 3–80 characters · location bonus 10–1,000." };
       var cur = d.key === "scout" ? "open" : d.key === "eb" ? (EB[d.slug][d.field] != null ? EB[d.slug][d.field] : d.field === "on" ? "off" : d.field === "draw" ? "not drawn" : "(not set)") : disc[d.slug] && disc[d.slug][d.key] && disc[d.slug][d.key][d.field], id = "P" + Math.random().toString(36).slice(2, 10), code = String(100000 + Math.floor(Math.random() * 900000));
       PEND[id] = { user: u, slug: d.slug, key: d.key, field: d.field, value: v, before: cur != null ? cur : d.before, reward: d.reward, code: code, tries: 0, exp: Date.now() + 6e5 };
@@ -122,6 +163,15 @@
       if (p.user !== u) return { ok: false, reason: "This change was started by someone else." };
       if (String(d.code) !== p.code) { if (++p.tries >= 5) { delete PEND[d.id]; return { ok: false, reason: "5 wrong codes. Start again." }; } return { ok: false, reason: "Wrong code. " + (5 - p.tries) + " tries left." }; }
       delete PEND[d.id];
+      if (!can(u, p.slug)) return NOPE;
+      if (p.key === "menu") { var M2 = MENU[p.slug] = MENU[p.slug] || {};
+        if (p.field === "price") { M2.p = M2.p || {}; if (p.value === "") delete M2.p[p.item]; else M2.p[p.item] = +p.value; }
+        else if (p.field === "hh") M2.hh = p.value;
+        else { M2.s = M2.s || {}; var sp2 = M2.s[p.item] = M2.s[p.item] || {}; if (p.value === "") delete sp2[p.field.slice(3)]; else sp2[p.field.slice(3)] = p.value; }
+        var aft = p.value === "" ? "(menu default)" : p.value;
+        audit.push({ ts: Date.now(), who: USERS[u].name, slug: "Melody Bar & Grill", reward: p.reward, field: MLABEL[p.field], before: String(p.before).replace(/\n/g, " / "), after: String(aft).replace(/\n/g, " / "), status: "applied" });
+        return { ok: true, slug: p.slug, key: "menu", field: p.field, item: p.item, before: p.before, after: aft, menu: sm(u, MENU),
+          testNotice: "TEST MODE: no email sent. Live, " + (SC.role === "owner" ? "the other owner" : "Christian and Antidote") + " would get: “" + USERS[u].name + " changed the Melody Bar & Grill menu: " + p.reward + " " + MLABEL[p.field].toLowerCase() + " " + p.before + " → " + aft + "”" }; }
       if (p.key === "scout") {
         var sp = String(p.value).split("|"), fl = scout.flags.filter(function (f) { return f.id === sp[0]; })[0], msg = "flag marked OK", nm2 = USERS[u].name;
         if (p.field === "reverse") { var who = members.filter(function (m) { return m.id === sp[1]; })[0];
@@ -143,9 +193,9 @@
         return { ok: true, slug: p.slug, key: "eb", field: p.field, before: p.before, after: p.value, disc: disc, testNotice: "TEST MODE: no email sent. Live, the other login holder would be emailed about this change." };
       }
       ((disc[p.slug] = disc[p.slug] || {})[p.key] = disc[p.slug][p.key] || {})[p.field] = p.value;
-      var other = Object.keys(USERS).filter(function (k) { return k !== u; })[0];
+      var other = u === "christian" ? "antidote" : "christian";
       audit.push({ ts: Date.now(), who: USERS[u].name, slug: p.slug === "nalu-vida" ? "Nalu Vida" : "Melody Bar & Grill", reward: p.reward, field: label(p.field, p.key), before: p.before, after: p.value, status: "applied" });
-      return { ok: true, slug: p.slug, key: p.key, field: p.field, before: p.before, after: p.value, disc: disc,
+      return { ok: true, slug: p.slug, key: p.key, field: p.field, before: p.before, after: p.value, disc: sm(u, disc),
         testNotice: "TEST MODE: no email sent. Live, " + USERS[other].name + " would get: “" + USERS[u].name + " changed " + (p.slug === "nalu-vida" ? "Nalu Vida" : "Melody") + " '" + p.reward + "' " + label(p.field, p.key).toLowerCase() + " from " + p.before + " to " + p.value + " at " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + "”" };
     }
     return { ok: false };

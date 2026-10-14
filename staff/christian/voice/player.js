@@ -167,7 +167,7 @@
     var all = []; try { all = speechSynthesis.getVoices() || []; } catch (e) {}
     var pre = l === "es" ? /^es[-_](US|MX|419)/i : /^en[-_]US/i, any = l === "es" ? /^es/i : /^en/i;
     var list = all.filter(function (v) { return pre.test(v.lang); }); if (!list.length) list = all.filter(function (v) { return any.test(v.lang); });
-    var good = /premium|enhanced|natural|neural|siri/i, named = l === "es" ? /paulina|m[oó]nica|marisol|google/i : /ava|samantha|allison|zoe|google us/i;
+    var good = /premium|enhanced|natural|neural|siri/i, named = l === "es" ? /paulina|m[oó]nica|marisol|google/i : /\bava\b|samantha|google us english|allison|zoe/i;   // same order as demo/listen.js
     return list.find(function (v) { return good.test(v.name); }) || list.find(function (v) { return named.test(v.name); }) || list.find(function (v) { return v.localService; }) || list[0] || null;
   }
   function speak(words) {
@@ -182,7 +182,7 @@
     if (my !== ttsSeq || ttsPaused) return;
     if (ttsI >= ttsQ.length) { ttsPaused = true; ui(); tick(); return; }
     var u = new SpeechSynthesisUtterance(ttsQ[ttsI]), v = voice(lang);
-    if (v) u.voice = v; u.lang = v ? v.lang : (lang === "es" ? "es-US" : "en-US"); u.rate = 1; u.pitch = 1;
+    if (v) u.voice = v; u.lang = v ? v.lang : (lang === "es" ? "es-US" : "en-US"); u.rate = 1.05; u.pitch = 1;
     u.onend = function () { if (my !== ttsSeq) return; ttsI++; tick(); next(my); };
     u.onerror = function () { if (my !== ttsSeq) return; ttsI++; next(my); };
     tick();

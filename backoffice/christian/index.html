@@ -54,15 +54,27 @@ td.n,th.n{text-align:right}.tag{display:inline-block;font-size:11px;font-weight:
 tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{background:#f5c40014}.devid{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#ffffff10;border-radius:6px;padding:1px 5px;color:var(--ink);border:0;cursor:pointer}
 .tag.hot{background:#ff6b6b33;color:#ffb3b3}.tag.pw{background:#2fbf7126;color:#8ff0bd}.tag.br{background:#ffffff14;color:var(--dim)}
 .dim{color:var(--dim)}
+/* ✅ to-do list, pinned at the top (owner + manager) */
+.todo{border-color:#f5c40066}.todo h2{margin:0;display:flex;align-items:center;gap:8px}.badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 8px;border-radius:99px;background:var(--bad);color:#fff;font-size:14px;font-weight:900}.badge.z{background:var(--ok)}
+.ti{display:flex;align-items:stretch;gap:8px;margin:8px 0}.ti .go{flex:1;min-width:0;display:flex;gap:10px;align-items:center;text-align:left;background:var(--card2);border:1px solid var(--edge);border-radius:14px;padding:12px;color:var(--ink);cursor:pointer;min-height:56px;font:inherit}
+.ti .go:active{background:#ffffff14}.ti .go b{display:block;font-size:15px;line-height:1.3}.ti .go small{display:block;color:var(--dim);font-size:12.5px;margin-top:2px}.ti .dot{flex:none;width:12px;height:12px;border-radius:50%}.ti .p1{background:var(--bad)}.ti .p2{background:var(--warn)}.ti .p3{background:var(--gold)}.ti .p4,.ti .p5{background:var(--dim)}
+.ti .dn{flex:none;min-width:76px;border-radius:14px;border:1px solid var(--edge);background:#2fbf7122;color:#8ff0bd;cursor:pointer;font:inherit;font-weight:800}
+.todo .add{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.todo .add input,.todo .add select,.mf input,.mf select,.mf textarea{width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px}
+.big{min-height:48px;font-size:16px}
+/* 💲 prices & specials */
+.mi{display:grid;grid-template-columns:1fr 110px 76px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #ffffff10}.mi b{font-size:15px}.mi small{display:block;color:var(--dim);font-size:12.5px}.mi input{width:100%;padding:12px 8px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px;text-align:right}
+.mi .btn{min-height:48px}.chg{color:var(--gold);font-weight:800}.mf label{display:block;font-size:13px;color:var(--dim);margin:10px 0 4px}.mf textarea{min-height:120px;font-family:inherit}
+.help p,.help li{font-size:16px;line-height:1.55}.help h3{margin-top:18px}
+@media (max-width:420px){.mi{grid-template-columns:1fr 92px 70px}}
 </style></head><body><main>
 <div class="top"><img src="icon-192.png" alt=""><div><h1>Christian HQ</h1><small>Melody Bar &amp; Grill × Nalu Vida · back office</small></div><span class="sp"></span><button class="btn alt sm" id="out" hidden>Log out</button></div>
-<div class="test" id="testBar" hidden>🧪 <b>TEST MODE</b>: fake guests and a fake backend. Nothing is real, nothing is sent. Log in as <b>christian</b> or <b>antidote</b> with password <b>test-mode-only</b>.</div>
+<div class="test" id="testBar" hidden>🧪 <b>TEST MODE</b>: fake guests and a fake backend. Nothing is real, nothing is sent. Log in as <b>Christian</b>, <b>Antidote</b> or <b>Melody Management</b> (the manager view) with password <b>test-mode-only</b>.</div>
 
 <section class="card login" id="login">
   <h2 style="margin-top:0">🔒 Log in</h2>
-  <p class="note" style="margin:0">Only Christian and Antidote. Each person has their own login, so changes show who made them.</p>
+  <p class="note" style="margin:0">For Christian, Antidote and Melody Management. Every change shows who made it.</p>
   <form id="lf" autocomplete="on">
-    <label for="u">Who are you?</label><select id="u" name="username" autocomplete="username"><option value="christian">Christian</option><option value="antidote">Antidote</option></select>
+    <label for="u">Who are you?</label><select id="u" name="username" autocomplete="username"></select>
     <label for="p">Password</label><input id="p" name="password" type="password" autocomplete="current-password" required minlength="4">
     <button class="btn" style="width:100%;margin-top:14px" id="go">Log in</button>
     <div class="err" id="lerr" role="alert"></div>
@@ -74,19 +86,28 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
 <section id="app" hidden>
   <div class="seg" role="group" aria-label="Restaurant"><button data-r="all" aria-pressed="true">Both</button><button class="m" data-r="melody-bar-grill" aria-pressed="false">✈️ Melody</button><button class="n" data-r="nalu-vida" aria-pressed="false">🏄 Nalu Vida</button>
     <span style="flex:1"></span><button class="btn alt sm" id="refresh">↻ Refresh</button></div>
+  <section class="card todo" id="todo" aria-label="To-do list"></section>
   <div class="tabs" role="tablist" id="tabs"></div>
   <div id="pane"></div>
   <p class="note" id="stamp"></p>
 </section>
 </main>
-<script src="../../demo/christian-live.js?v=lb2"></script>
+<script src="../../demo/christian-live.js?v=mg1"></script>
 <script src="squares-hq.js?v=sq2"></script>
+<script src="../../demo/melody-lax/menu-data.js?v=mg1"></script>
+<script src="../../demo/listen.js?v=ls1"></script>
 <script>
 (function(){
 "use strict";
 var TEST=/[?&]test=1(&|$)/.test(location.search), LIVE=window.SSAI_CHRISTIAN||{defaults:{},apply:function(r){return r;}}, API=LIVE.api||"";
 var TKEY="christian-hq-token"+(TEST?"-test":""), TOKEN=null, DATA=null, R="all", TAB="overview", SORT={k:"earned",d:-1}, Q="";
 var DAY=864e5, NAMES={"melody-bar-grill":"Melody Bar & Grill","nalu-vida":"Nalu Vida"};
+// LOGINS: [user id, what the login list shows]. The name in the Audit log comes from the backend (BO_USERS "name").
+// "melody-manager" is ONE login shared by Melody's management team (manager role: Melody only, enforced by Code.gs).
+var LOGINS=[["christian","Christian"],["antidote","Antidote"],["melody-manager","Melody Management (manager)"]];
+var ROLE="owner", MYSLUGS=["melody-bar-grill","nalu-vida"], MGR=false;
+$("u").innerHTML=LOGINS.map(function(x){ return "<option value='"+esc(x[0])+"'>"+esc(x[1])+"</option>"; }).join("");
+try{ var lastU=localStorage.getItem("christian-hq-user"); if(lastU) $("u").value=lastU; }catch(e){}
 function $(id){ return document.getElementById(id); }
 function esc(t){ return String(t==null?"":t).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
 function n(x){ return (+x||0).toLocaleString("en-US"); }
@@ -98,7 +119,7 @@ function api(body){
   if(!API) return Promise.resolve({ok:false,reason:"Backend not connected yet."});
   return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(body)}).then(function(r){ return r.json(); }).catch(function(){ return {ok:false,reason:"Can't reach the backend. Check the connection."}; });
 }
-function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=vl1"; s.onload=cb; document.head.appendChild(s); }
+function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=mg1"; s.onload=cb; document.head.appendChild(s); }
 if(TEST) $("testBar").hidden=false; else if(!API) $("notConn").hidden=false;
 try{ TOKEN=sessionStorage.getItem(TKEY); }catch(e){}
 // Speed: wake the Apps Script backend as soon as the page opens (cold starts take 5-10 s), so it's warm by the time you tap Log in.
@@ -112,17 +133,25 @@ $("lf").onsubmit=function(ev){ ev.preventDefault(); var b=$("go"); b.disabled=tr
   loadMock(function(){ api({type:"bo_login",user:$("u").value,pw:$("p").value}).then(function(r){ $("p").value="";
     if(!r||!r.ok){ stopTick(); b.disabled=false; b.textContent="Log in"; status((r&&r.reason)||"Wrong name or password."); return; }
     b.textContent="✓ Password correct"; ticking("✓ Password correct. Loading your members and stats");
-    TOKEN=r.token; try{ sessionStorage.setItem(TKEY,TOKEN); }catch(e){} load(); }); }); };
+    TOKEN=r.token; try{ sessionStorage.setItem(TKEY,TOKEN); localStorage.setItem("christian-hq-user",$("u").value); }catch(e){} load(); }); }); };
 $("out").onclick=function(){ if(TOKEN) api({type:"bo_logout",token:TOKEN}); signOut(""); };
-function signOut(msg){ TOKEN=null; DATA=null; try{ sessionStorage.removeItem(TKEY); }catch(e){} $("app").hidden=true; $("out").hidden=true; $("login").hidden=false; $("pane").innerHTML=""; $("lerr").textContent=msg||""; }
+function signOut(msg){ TOKEN=null; DATA=null; if(window.SSAI_LISTEN) SSAI_LISTEN.stop(); $("todo").innerHTML=""; try{ sessionStorage.removeItem(TKEY); }catch(e){} $("app").hidden=true; $("out").hidden=true; $("login").hidden=false; $("pane").innerHTML=""; $("lerr").textContent=msg||""; }
 function load(){ loadMock(function(){ api({type:"bo_data",token:TOKEN}).then(function(r){
   stopTick(); var b=$("go"); b.disabled=false; b.textContent="Log in"; $("lerr").style.color="";
   if(!r||!r.ok){ signOut(r&&r.auth===false?"Signed out. Log in again.":(r&&r.reason)||"Couldn't load."); return; }
-  DATA=r; $("login").hidden=true; $("app").hidden=false; $("out").hidden=false; $("stamp").textContent="Signed in as "+r.me+" · loaded "+new Date(r.now).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})+(r.test?" · TEST DATA":""); draw(); }); }); }
+  DATA=r; setRole(r); $("login").hidden=true; $("app").hidden=false; $("out").hidden=false; $("stamp").textContent="Signed in as "+r.me+" · loaded "+new Date(r.now).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})+(MGR?" · manager view (Melody)":"")+(r.test?" · TEST DATA":""); drawTodo(); draw(); }); }); }
 $("refresh").onclick=load;
 document.querySelector(".seg").addEventListener("click",function(e){ var b=e.target.closest("[data-r]"); if(!b) return; R=b.dataset.r; document.querySelectorAll("[data-r]").forEach(function(x){ x.setAttribute("aria-pressed",x===b?"true":"false"); }); draw(); });
-var TABS=[["overview","📊 Overview"],["visits","📍 Visits"],["members","👥 Members"],["rewards","🎟️ Rewards & claims"],["scout","🛡️ Scout"],["games","🎮 Games"],["discounts","🏷️ Discounts"],["earlybird","🎁 Early bird"],["staff","🧑‍🍳 Staff"],["squares","🏈 Squares"],["audit","🧾 Audit log"],["links","🔗 Links"]];
-$("tabs").innerHTML=TABS.map(function(t){ return "<button role='tab' data-t='"+t[0]+"' aria-selected='"+(t[0]===TAB)+"'>"+t[1]+"</button>"; }).join("");
+var TABS=[["overview","📊 Overview"],["visits","📍 Visits"],["members","👥 Members"],["rewards","🎟️ Rewards & claims"],["scout","🛡️ Scout"],["games","🎮 Games"],["discounts","🏷️ Discounts"],["menu","💲 Prices & specials"],["earlybird","🎁 Early bird"],["staff","🧑‍🍳 Staff"],["squares","🏈 Squares"],["audit","🧾 Audit log"],["help","❓ Help"],["links","🔗 Links"]];
+function drawTabs(){ $("tabs").innerHTML=TABS.map(function(t){ return "<button role='tab' data-t='"+t[0]+"' aria-selected='"+(t[0]===TAB)+"'>"+t[1]+"</button>"; }).join(""); }
+drawTabs();
+// role from the backend (bo_data). Managers: Melody only (the server already sends nothing else), no restaurant switch,
+// no Scout actions / Remove duplicates. Owners: unchanged.
+function setRole(r){ ROLE=r.role==="manager"?"manager":"owner"; MGR=ROLE==="manager"; MYSLUGS=MGR?(r.slugs||[]):["melody-bar-grill","nalu-vida"];
+  document.querySelectorAll(".seg [data-r]").forEach(function(b){ b.hidden=MGR&&MYSLUGS.indexOf(b.dataset.r)<0; });
+  var allB=document.querySelector(".seg [data-r=all]"); if(allB) allB.hidden=MGR;
+  if(MGR){ var only=MYSLUGS[0]||"none"; if(R!==only){ R=only; document.querySelectorAll("[data-r]").forEach(function(x){ x.setAttribute("aria-pressed",x.dataset.r===R?"true":"false"); }); } }
+  document.querySelector("h1").textContent=MGR?"Melody HQ":"Christian HQ"; document.querySelector(".top small").textContent=MGR?"Melody Bar & Grill · manager back office":"Melody Bar & Grill × Nalu Vida · back office"; }
 $("tabs").addEventListener("click",function(e){ var b=e.target.closest("[data-t]"); if(!b) return; TAB=b.dataset.t; document.querySelectorAll("#tabs button").forEach(function(x){ x.setAttribute("aria-selected",x===b?"true":"false"); }); draw(); });
 function inR(s){ return R==="all"||s===R; }
 function F(){ var d=DATA; return { mem:d.members.filter(function(m){ return inR(m.slug); }), games:d.games.filter(function(g){ return inR(g[0]); }), opens:d.opens.filter(function(o){ return inR(o[0]); }),
@@ -225,7 +254,7 @@ var DUPARM=0;
 function members(){ var f=F(), q=Q.toLowerCase(), list=f.mem.filter(function(m){ return !q||(m.name+" "+m.email+" "+m.phone+" "+m.ref+" "+(m.card||"")).toLowerCase().indexOf(q)>=0; });
   list.sort(function(a,b){ var x=a[SORT.k],y=b[SORT.k]; return (x>y?1:x<y?-1:0)*SORT.d; });
   return "<div class='row' style='margin:10px 0'><input type='search' id='q' placeholder='Search name, card ID (MLD-…), email, phone' value='"+esc(Q)+"' aria-label='Search members'><button class='btn sm' id='csv'>⬇︎ CSV</button></div>"+
-    (dupCount()?"<div class='card' style='margin:0 0 10px;border-color:#f5c518'><b>⚠️ "+n(dupCount())+" duplicate membership"+(dupCount()>1?"s":"")+"</b><p class='note' style='margin:4px 0 8px'>Same restaurant + same phone or email. Keeps each guest's FIRST sign-up (their card ID stays), removes the newer copies. The member list is backed up first and it's logged in the audit log.</p><button class='btn sm' id='dedupe'>"+(DUPARM>Date.now()?"Tap again to remove "+n(dupCount()):"🧹 Remove duplicates")+"</button> <span class='note' id='dedupeOut'></span></div>":"")+
+    (dupCount()&&!MGR?"<div class='card' style='margin:0 0 10px;border-color:#f5c518'><b>⚠️ "+n(dupCount())+" duplicate membership"+(dupCount()>1?"s":"")+"</b><p class='note' style='margin:4px 0 8px'>Same restaurant + same phone or email. Keeps each guest's FIRST sign-up (their card ID stays), removes the newer copies. The member list is backed up first and it's logged in the audit log.</p><button class='btn sm' id='dedupe'>"+(DUPARM>Date.now()?"Tap again to remove "+n(dupCount()):"🧹 Remove duplicates")+"</button> <span class='note' id='dedupeOut'></span></div>":"")+
     "<p class='note'>"+n(list.length)+" members"+(R==="all"?" at both restaurants":"")+". Tap a column to sort. Private: don't share screenshots of this list.</p>"+
     "<div class='tw'><table><thead><tr>"+MCOL.map(function(c){ return "<th data-sort='"+c[0]+"'"+(c[2]?" class='n'":"")+">"+c[1]+(SORT.k===c[0]?(SORT.d>0?" ▲":" ▼"):"")+"</th>"; }).join("")+"</tr></thead><tbody>"+
     list.map(function(m){ return "<tr><td>"+esc(m.name)+(m.signupOnly?" <span class='tag p'>sign-up only</span>":"")+"</td><td class='cid'>"+(m.card?"<code>"+esc(m.card)+"</code>":"<span class='note'>next sync</span>")+"</td><td>"+tagR(m.slug)+"</td><td>"+(m.email?"<a href='mailto:"+esc(m.email)+"'>"+esc(m.email)+"</a>":"—")+"</td><td>"+(m.phone?"<a href='tel:"+esc(String(m.phone).replace(/[^\d+]/g,""))+"'>"+esc(m.phone)+"</a>":"—")+"</td>"+
@@ -239,7 +268,7 @@ function onePrize(){ var o=(DATA&&DATA.oneprize)||null; if(!o) return ""; var t=
   return "<div class='kpis' id='oneprize'>"+kpi(n(t.codes),"pass codes issued today")+kpi(n(t.used),"checked &amp; used at the register")+kpi(n(t.expired),"expired unused ("+t.mins+" min)")+kpi(n(t.refused),"2nd prizes refused today")+(rs7==null?"":kpi(n(rs7),"signed back in on a new phone (7 days)"))+"</div>"+
    "<p class='note'><b>One code per visit, one prize per day</b> (server-enforced, LA date): every pass code works once and expires "+t.mins+" minutes after it opens. A member or phone gets one prize a day (a reward, an early-bird gift, a game or spin win); a 2nd one is refused with “Come back tomorrow”. Referral codes are applied once at sign-up and never stack with a reward the same visit.</p>"; }
 function rewards(){ var f=F(), h="<h2>🎟️ Rewards used ("+f.red.length+")</h2>"+onePrize()+table(["When","","Code","Member","Reward","Toast button","Points"],f.red.slice().sort(function(a,b){ return b.ts-a.ts; }).map(function(x){ return [dt(x.ts),tagR(x.slug),esc(x.code),esc(x.name),esc(x.reward),"<span class='toastbtn'>"+esc(x.button)+"</span>",n(x.pts)]; }),[6]);
-  h+="<h2>🧾 Receipt claims, “Add my visit” ("+f.clm.length+")</h2><p class='note'>Interim mode. Spot-check against Toast's daily sales report (check # + total). Approve / Flag from the manager log in each restaurant app.</p>"+
+  h+="<h2 id='claims'>🧾 Receipt claims, “Add my visit” ("+f.clm.length+")</h2><p class='note'>Interim mode. Spot-check against Toast's daily sales report (check # + total). Approve / Flag from the manager log in each restaurant app.</p>"+
     table(["When","","Check #","Check date","Total","Points","Member","Photo","Status"],f.clm.slice().sort(function(a,b){ return b.ts-a.ts; }).map(function(c){ return [dt(c.ts),tagR(c.slug),"#"+esc(c.check),esc(c.date),"$"+(+c.total).toFixed(2),n(c.pts),esc(c.name),c.photo?"📷":"—","<span class='tag "+(c.status==="approved"?"ok":c.status==="flagged"?"f":"p")+"'>"+esc(c.status)+"</span>"]; }),[4,5]);
   var ready=[]; LIVE.slugs&&LIVE.slugs.forEach(function(s){ if(!inR(s)) return; var t=cur(s).tiers||[]; f.mem.filter(function(m){ return m.slug===s&&t.length&&m.stars>=t[0][0]; }).forEach(function(m){ var best=t.filter(function(x){ return m.stars>=x[0]; }).pop(); ready.push([esc(m.name),tagR(s),n(m.stars),esc(best[1])]); }); });
   h+="<h2>🎁 Members with a reward ready ("+ready.length+")</h2>"+table(["Member","","Balance","Best reward they can use"],ready,[2]);
@@ -316,7 +345,10 @@ function discounts(){ var h="<p class='note' style='margin-top:12px'>Change a po
     h+="</div>"; });
   return h; }
 function fld(s,k,f,label,val,type,reward){ var id="d_"+s+"_"+k+"_"+f; return "<div class='f'><div><label for='"+id+"'>"+label+"</label><input id='"+id+"' type='"+type+"'"+(type==="number"?" inputmode='decimal' step='any'":" maxlength='80'")+" value='"+esc(val)+"' data-orig='"+esc(val)+"'></div><button class='btn sm' data-save='"+esc(JSON.stringify([s,k,f,reward]))+"' data-for='"+id+"'>Save</button></div>"; }
-function toastStep(s,k,f,before,after){ if(k==="eb") return f==="gift"||f==="slices"||f==="items"||(f==="on"&&after==="on")?"<p><b>Toast:</b> guests redeem with the live pass and your server taps <span class='toastbtn'>App Reward – Early Bird Gift</span> (100% off one item). If that button isn't in Toast yet, add it: "+TOASTPATH+" › + Add a Discount › that exact name › % Off 100 · Applies to Item › Save › Publish.</p>":"<p><b>Toast: nothing to change.</b></p>";
+function toastStep(s,k,f,before,after){
+  if(k==="menu") return f==="price"?"<p><b>Now change it in Toast too.</b> The app only shows prices: guests pay what Toast charges. In Toast, open this item in your menu, set the price to <b>$"+esc(after)+"</b>, save, then <b>Publish</b>. (If you're not sure where, ask Christian or Antidote.)</p>":
+    "<p><b>Toast: nothing to change</b>, unless this special has its own price or discount button in Toast. Then change it there too so the check matches.</p>";
+  if(k==="eb") return f==="gift"||f==="slices"||f==="items"||(f==="on"&&after==="on")?"<p><b>Toast:</b> guests redeem with the live pass and your server taps <span class='toastbtn'>App Reward – Early Bird Gift</span> (100% off one item). If that button isn't in Toast yet, add it: "+TOASTPATH+" › + Add a Discount › that exact name › % Off 100 · Applies to Item › Save › Publish.</p>":"<p><b>Toast: nothing to change.</b></p>";
   if(k==="lb") return "<p><b>Toast: nothing to change.</b> The location bonus is app points only (no Toast button). "+(f==="on"&&after==="off"?"Guests who already earned it keep their points; nobody new earns it while it's off.":"Guests who already earned it don't get it again.")+"</p>";
   var c=cur(s), t=k==="jl"?null:c.tiers[+k.slice(1)], b=k==="jl"?c.justLanded.toast.button:(t[2]||{}).button;
   if(f==="pts") return "<p><b>Toast: nothing to change.</b> Points costs live only in the app. The Toast button <span class='toastbtn'>"+esc(b)+"</span> stays the same.</p>";
@@ -327,7 +359,7 @@ function saveFlow(btn){ var a=JSON.parse(btn.dataset.save), inp=$(btn.dataset.fo
   if(v===before){ if(inp.type!=="hidden") inp.focus(); return; }
   if(a[2]==="draw"&&!confirm("Draw the raffle winners now? This can only be done once.")) return;
   btn.disabled=true; btn.textContent="…";
-  api({type:"disc_propose",token:TOKEN,slug:a[0],key:a[1],field:a[2],value:v,before:before,reward:a[3]}).then(function(r){ btn.disabled=false; btn.textContent="Save";
+  api({type:"disc_propose",token:TOKEN,slug:a[0],key:a[1],field:a[2],value:v,before:before,reward:a[3],item:a[4]||""}).then(function(r){ btn.disabled=false; btn.textContent="Save";
     if(!r||!r.ok){ if(r&&r.auth===false) return signOut("Signed out. Log in again."); alert((r&&r.reason)||"Couldn't save."); return; }
     var ov=document.createElement("div"); ov.className="ov"; ov.setAttribute("role","dialog"); ov.setAttribute("aria-modal","true");
     ov.innerHTML="<div class='sheet'><h3 style='margin-top:0'>Confirm the change</h3><div class='note'>"+esc(NAMES[a[0]])+" · "+esc(a[3])+"</div><div class='ba'><div><small>Before</small><b>"+esc(r.before)+"</b></div><span>→</span><div><small>After</small><b>"+esc(r.after)+"</b></div></div>"+
@@ -337,7 +369,7 @@ function saveFlow(btn){ var a=JSON.parse(btn.dataset.save), inp=$(btn.dataset.fo
     $("ocan").onclick=function(){ ov.remove(); };
     $("oconf").onclick=function(){ var cb=this; cb.disabled=true; api({type:"disc_confirm",token:TOKEN,id:r.id,code:$("otp").value.trim()}).then(function(c){ cb.disabled=false;
       if(!c||!c.ok){ $("oerr").textContent=(c&&c.reason)||"Couldn't apply."; return; }
-      DATA.disc=c.disc||DATA.disc; load();
+      DATA.disc=c.disc||DATA.disc; if(c.menu) DATA.menu=c.menu; load();
       ov.querySelector(".sheet").innerHTML="<h3 style='margin-top:0'>✅ Saved</h3><div class='ba'><div><small>Before</small><b>"+esc(c.before)+"</b></div><span>→</span><div><small>After</small><b>"+esc(c.after)+"</b></div></div><p class='note'>The guest apps show the new value now (within a minute). The other login holder was emailed and the Audit log has it.</p>"+
         (c.testNotice?"<div class='test'>"+esc(c.testNotice)+"</div>":"")+toastStep(a[0],a[1],a[2],c.before,c.after)+"<button class='btn' style='width:100%' id='odone'>Done</button>";
       $("odone").onclick=function(){ ov.remove(); draw(); }; }); };
@@ -382,7 +414,7 @@ function scout(){ var S=scoutD(), fl=S.flags.filter(function(f){ return inR(f.sl
   h+="<h2>🚩 Open flags ("+open.length+")</h2>"+(open.length?"<div class='dl'>"+open.map(function(f){
     return "<div class='dc' data-flag='"+esc(f.id)+"'><div class='row'>"+sevTag(f.sev)+tagR(f.slug)+"<b>"+esc(f.title)+"</b></div><p style='margin:6px 0'>"+esc(f.reason)+"</p>"+
       "<ul class='ev'>"+(f.evidence||[]).map(function(e){ return "<li>"+esc(e)+"</li>"; }).join("")+"</ul>"+
-      "<div class='row'><button class='btn sm' data-scout='reverse' data-fid='"+esc(f.id)+"'>↩︎ Reverse points</button><button class='btn alt sm' data-scout='ok' data-fid='"+esc(f.id)+"'>✓ Mark OK</button></div></div>"; }).join("")+"</div>":"<p class='note'>Nothing suspicious right now. ✅</p>");
+      (MGR?"<p class='note'>Only Christian can reverse points or close a flag. Tell him what you saw.</p>":"<div class='row'><button class='btn sm' data-scout='reverse' data-fid='"+esc(f.id)+"'>↩︎ Reverse points</button><button class='btn alt sm' data-scout='ok' data-fid='"+esc(f.id)+"'>✓ Mark OK</button></div>")+"</div>"; }).join("")+"</div>":"<p class='note'>Nothing suspicious right now. ✅</p>");
   h+="<h2>⛔ Rejected duplicates ("+rej.length+", last 30 days)</h2><p class='note'>Caught and refused at the moment they arrived. Nothing here was credited.</p>"+
     table(["When","","Who","What","Why"],rej.map(function(x){ return [when2(x.ts),tagR(x.slug),esc(x.name||mname(x.slug,x.member)),"<b>"+esc(x.kind)+"</b> · "+esc(x.what),esc(x.why)]; }));
   if(adj.length) h+="<h2>↩︎ Points taken back ("+adj.length+")</h2>"+table(["When","","Member","Points","Why","By"],adj.map(function(a){ return [when2(a.ts),tagR(a.slug),esc(a.name||mname(a.slug,a.member)),n(a.pts),esc(a.why),esc(a.by)]; }),[3]);
@@ -413,15 +445,16 @@ function scoutPropose(f,field,value,what,before,after){
       if(c.scout) DATA.scout=c.scout;
       ov.querySelector(".sheet").innerHTML="<h3 style='margin-top:0'>✅ Done</h3><p>"+esc(c.after)+"</p><p class='note'>Written to the Audit log. The other login holder was emailed.</p>"+(c.testNotice?"<div class='test'>"+esc(c.testNotice)+"</div>":"")+"<button class='btn' style='width:100%' id='odone'>Done</button>";
       $("odone").onclick=function(){ ov.remove(); load(); }; }); }; }); }
-function audit(){ return "<p class='note' style='margin-top:12px'>Every discount change and Scout action: who, what, before → after, when.</p>"+table(["When","Who","Restaurant","Reward","Field","Before","After","Status"],(DATA.audit||[]).slice().reverse().map(function(a){ return [new Date(a.ts).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}),esc(a.who),esc(a.slug),esc(a.reward),esc(a.field),esc(a.before),esc(a.after),esc(a.status)]; })); }
-function links(){ var h="<div class='card links'><a href='../../onboarding/christian/plan/'>📲 Game plan app</a><a href='../../onboarding/christian/'>Onboarding</a><a href='../../demo/melody-lax/'>✈️ Melody app</a><a href='../../demo/nalu-vida/'>🏄 Nalu Vida app</a><a href='../../staff/christian/'>🧑‍🍳 Staff app</a><a href='../../melody/kit/'>Melody print kit</a><a href='../../nalu-vida/kit/'>Nalu print kit</a><a href='../../onboarding/christian/placement/'>📍 Where to put the QR pieces</a><a href='../../melody/kit/toast-interim.html'>Melody Toast sheet</a><a href='../../nalu-vida/kit/toast-interim.html'>Nalu Toast sheet</a></div>";
+function audit(){ return "<p class='note' style='margin-top:12px'>Every discount, price, special, to-do and Scout change: who, what, before → after, when. Melody Management's changes show as “Melody Management”.</p>"+table(["When","Who","Restaurant","Reward","Field","Before","After","Status"],(DATA.audit||[]).slice().reverse().map(function(a){ return [new Date(a.ts).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}),esc(a.who),esc(a.slug),esc(a.reward),esc(a.field),esc(a.before),esc(a.after),esc(a.status)]; })); }
+function links(){ if(MGR) return "<div class='card links'><a href='../../demo/melody-lax/'>✈️ Melody app</a><a href='../../staff/christian/'>🧑‍🍳 Staff guide</a><a href='../../melody/kit/'>Melody print kit</a><a href='../../melody/kit/toast-interim.html'>Melody Toast sheet</a></div>";
+  var h="<div class='card links'><a href='../../onboarding/christian/plan/'>📲 Game plan app</a><a href='../../onboarding/christian/'>Onboarding</a><a href='../../demo/melody-lax/'>✈️ Melody app</a><a href='../../demo/nalu-vida/'>🏄 Nalu Vida app</a><a href='../../staff/christian/'>🧑‍🍳 Staff app</a><a href='../../melody/kit/'>Melody print kit</a><a href='../../nalu-vida/kit/'>Nalu print kit</a><a href='../../onboarding/christian/placement/'>📍 Where to put the QR pieces</a><a href='../../melody/kit/toast-interim.html'>Melody Toast sheet</a><a href='../../nalu-vida/kit/toast-interim.html'>Nalu Toast sheet</a></div>";
   h+="<h2>🍞 Toast discount buttons</h2>"; (LIVE.slugs||[]).filter(inR).forEach(function(s){ var c=cur(s), ts=LIVE.defaults[s].toastStatus||{};
     var rows=c.tiers.map(function(t){ var b=t[2]||{}; return ["<span class='toastbtn'>"+esc(b.button)+"</span>",b.type==="fixed"?"$"+b.amount+" off check":"100% off 1 item"+(b.max?" (≤ $"+(+b.max).toFixed(2)+")":""),n(t[0])+" pts"]; });
     if(c.justLanded&&c.justLanded.toast) rows.push(["<span class='toastbtn'>"+esc(c.justLanded.toast.button)+"</span>",c.justLanded.toast.percent+"% off check","no points"]);
     h+="<h3>"+esc(NAMES[s])+" <span class='st "+(ts.state==="done"?"done":"tbd")+"'>"+(ts.state==="done"?"Set up ✓":"TBD")+"</span></h3><p class='note'>"+esc(ts.note)+"</p>"+table(["Button","Discount","Points"],rows); });
   return h; }
 function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY;
-  p.innerHTML={overview:overview,visits:visits,members:members,rewards:rewards,scout:scout,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links,squares:function(){ return window.SquaresHQ?SquaresHQ.html({api:api,token:TOKEN,draw:draw}):"<div class='card'>Loading…</div>"; }}[TAB]();
+  p.innerHTML={overview:overview,visits:visits,members:members,rewards:rewards,scout:scout,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links,menu:menu,help:help,squares:function(){ return window.SquaresHQ?SquaresHQ.html({api:api,token:TOKEN,draw:draw}):"<div class='card'>Loading…</div>"; }}[TAB]();
   if(TAB==="squares"&&window.SquaresHQ) SquaresHQ.bind(p);
   if(TAB==="members"){ var q=$("q"); q.oninput=function(){ Q=q.value; var pos=q.selectionStart; draw(); var q2=$("q"); q2.focus(); try{ q2.setSelectionRange(pos,pos); }catch(e){} }; $("csv").onclick=csv; var dd=$("dedupe"); if(dd) dd.onclick=function(){ if(DUPARM<Date.now()){ DUPARM=Date.now()+6000; draw(); setTimeout(function(){ if(DUPARM&&DUPARM<Date.now()){ DUPARM=0; draw(); } },6100); return; }
     DUPARM=0; dd.disabled=true; dd.textContent="Removing…"; api({type:"bo_dedupe",token:TOKEN}).then(function(r){ if(r&&r.ok){ $("dedupeOut").textContent="✅ Removed "+n(r.removed)+". Refreshing…"; load(); } else { dd.disabled=false; dd.textContent="🧹 Remove duplicates"; $("dedupeOut").textContent=(r&&r.reason)||"Didn't work. Try again."; } }); };
@@ -433,13 +466,105 @@ function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY;
   p.querySelectorAll("[data-scout]").forEach(function(b){ b.onclick=function(){ scoutAsk(b); }; });
   p.querySelectorAll("[data-cd]").forEach(function(b){ b.onclick=function(){ CDAYS=+b.dataset.cd; draw(); }; });
   p.querySelectorAll("[data-goto]").forEach(function(b){ b.onclick=function(e){ e.preventDefault(); goTab(b.dataset.goto); }; });
+  if(TAB==="menu"){ var mq=$("mq"); if(mq) mq.oninput=function(){ MQ=mq.value; var pos=mq.selectionStart; draw(); var m2=$("mq"); m2.focus(); try{ m2.setSelectionRange(pos,pos); }catch(e){} }; }
   if(TAB==="visits"){ var vq=$("vq"); vq.oninput=function(){ VQ=vq.value; VMORE=100; var pos=vq.selectionStart; draw(); var v2=$("vq"); v2.focus(); try{ v2.setSelectionRange(pos,pos); }catch(e){} };
     var vc=$("vclr"); if(vc) vc.onclick=function(){ VQ=""; VDEV=""; draw(); };
     var vx=$("vdx"); if(vx) vx.onclick=function(){ VDEV=""; draw(); };
     var vm=$("vmore"); if(vm) vm.onclick=function(){ VMORE+=100; draw(); };
     p.querySelectorAll("[data-dev]").forEach(function(r){ var go=function(e){ if(e.target.closest("a")) return; VDEV=r.dataset.dev; draw(); var c=$("devcard"); if(c) c.scrollIntoView({behavior:"smooth",block:"start"}); };
       r.onclick=go; r.onkeydown=function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); go(e); } }; }); }
-  window.scrollTo(0,y); }
+  window.scrollTo(0,y); drawTodo(); }
+// ---- ✅ TO-DO LIST (pinned at the top). Automatic items come from the data on screen; manual ones are saved on the
+// backend ("Todos" tab, bo_todo). Done on an automatic item is remembered by its key (kind:restaurant:fingerprint), so it
+// comes back by itself when the data behind it changes (e.g. a new receipt claim arrives). Managers only get Melody.
+var TODO_MORE=false, TODO_ADD=false;
+var TABNAME={overview:"Overview",visits:"Visits",members:"Members",rewards:"Rewards & claims",scout:"Scout",games:"Games",discounts:"Discounts",menu:"Prices & specials",earlybird:"Early bird",staff:"Staff",squares:"Squares",audit:"Audit log",help:"Help",links:"Links"};
+function effMenu(s){ var base=window.SSAI_MENU&&SSAI_MENU[s]; if(!base) return null; var M=JSON.parse(JSON.stringify(base)); delete M._base; return LIVE.applyMenu?LIVE.applyMenu(s,M,(DATA.menu||{})[s]||null):M; }
+function mdDays(md){ var y=new Date().getFullYear(), t=new Date(ymd(Date.now())+"T12:00:00"), d=new Date(y+"-"+md+"T12:00:00"); if(d<t) d=new Date((y+1)+"-"+md+"T12:00:00"); return Math.round((d-t)/DAY); }   // days until the NEXT time it's that date (0 = today)
+function mdLive(sp){ var td=ymd(Date.now()).slice(5); return sp.start<=sp.end?td>=sp.start&&td<=sp.end:td>=sp.start||td<=sp.end; }
+function autoTodos(){ var d=DATA, out=[], done={}, now=Date.now(); (d.todoDone||[]).forEach(function(k){ done[k]=1; });
+  var add=function(kind,slug,fp,pri,ts,text,sub,go,extra){ var key=kind+":"+slug+":"+String(fp).replace(/[^A-Za-z0-9:._|-]/g,"").slice(0,90); if(done[key]) return; out.push({key:key,slug:slug,pri:pri,ts:ts||0,text:text,sub:sub,go:go,extra:extra||null}); };
+  var mx=function(a){ return Math.max.apply(null,[0].concat(a)); };
+  var mine=(LIVE.slugs||[]).filter(function(s){ return MYSLUGS.indexOf(s)>=0; });
+  mine.forEach(function(s){ var nm=s==="nalu-vida"?"Nalu Vida":"Melody";
+    var pend=d.claims.filter(function(c){ return c.slug===s&&c.status==="pending"; }), last=mx(pend.map(function(c){ return c.ts; }));
+    if(pend.length) add("claims_pending",s,pend.length+"|"+last,pend.some(function(c){ return now-c.ts>DAY; })?1:2,last,pend.length+" receipt claim"+(pend.length>1?"s":"")+" waiting",nm+" · spot-check against the Toast report (check # + total)","rewards",{anchor:"claims"});
+    var fl=d.claims.filter(function(c){ return c.slug===s&&c.status==="flagged"; }), lf=mx(fl.map(function(c){ return c.ts; }));
+    if(fl.length) add("claims_flagged",s,fl.length+"|"+lf,1,lf,fl.length+" flagged receipt claim"+(fl.length>1?"s":""),nm+" · compare with Toast before anyone gets points","rewards",{anchor:"claims"});
+    var S=d.scout||{flags:[],rejected:[]}, of=(S.flags||[]).filter(function(f){ return f.slug===s&&f.status==="open"; }), hi=of.filter(function(f){ return f.sev==="high"; });
+    if(hi.length) add("scout_high",s,hi.map(function(f){ return f.id.slice(-6); }).sort().join("."),1,now,hi.length+" serious Scout flag"+(hi.length>1?"s":"")+": "+hi[0].title,nm+(MGR?" · take a look, then tell Christian":" · Reverse points or Mark OK"),"scout");
+    var lo=of.length-hi.length; if(lo) add("scout_flags",s,of.filter(function(f){ return f.sev!=="high"; }).map(function(f){ return f.id.slice(-4); }).sort().join("."),3,now-1,lo+" other Scout flag"+(lo>1?"s":"")+" to look at",nm+" · patterns worth a look, nothing is blocked","scout");
+    var rj=(S.rejected||[]).filter(function(x){ return x.slug===s&&now-x.ts<DAY; }), lr=mx(rj.map(function(x){ return x.ts; }));
+    if(rj.length) add("dupes",s,rj.length+"|"+lr,4,lr,rj.length+" duplicate"+(rj.length>1?"s":"")+" blocked in the last 24 hours",nm+" · already refused, nothing credited. Just so you know.","scout");
+    var per={}, d3=ymd(now-2*DAY); d.opens.forEach(function(o){ if(o[0]!==s||o[1]<d3) return; var k=o[2]+"|"+o[1]; per[k]=(per[k]||0)+1; });
+    var heavy={}; Object.keys(per).forEach(function(k){ var dv=k.split("|")[0]; if(per[k]>=10) heavy[dv]=Math.max(heavy[dv]||0,per[k]); });
+    var hk=Object.keys(heavy).sort(function(a,b){ return heavy[b]-heavy[a]; });
+    if(hk.length) add("heavy_open",s,hk.slice().sort().join("."),3,now-2,hk.length+" phone"+(hk.length>1?"s":"")+" opening the app 10+ times a day",nm+" · could be a fan or someone farming points: tap to see "+(hk.length>1?"the busiest one":"it"),"visits",{dev:s+"|"+hk[0]});
+    var M=effMenu(s); if(M) (M.specials||[]).forEach(function(sp){ if(sp.on===false||sp.price) return; var live=mdLive(sp), dd=live?0:mdDays(sp.start);
+      if(live||dd<=21) add("special_price",s,sp.id+"|"+new Date().getFullYear(),live?1:2,now-3-dd,"Set a price for “"+sp.title+"”",nm+" · "+(live?"on now":"starts in "+dd+" day"+(dd===1?"":"s"))+": guests see it without a price","menu",{anchor:"sp-"+sp.id}); });
+    var E=((d.eb||{})[s]||{}).cfg||{}; if(E.on==="on"&&E.mode==="raffle"&&E.drawDate&&!E.drawn&&ymd(now)>=E.drawDate) add("raffle_draw",s,E.drawDate,1,now,"Draw the early-bird raffle winners",nm+" · the draw date ("+E.drawDate+") is here","earlybird");
+    if(!MGR){ var ts=(LIVE.defaults[s]||{}).toastStatus||{}; if(ts.state==="tbd") add("toast_tbd",s,"tbd",3,0,"Confirm the "+nm+" Toast discount buttons are set up",ts.note||"","links"); } });
+  if(!MGR&&d.mgr&&d.mgr.length){ var ch=(d.audit||[]).filter(function(a){ return d.mgr.indexOf(a.who)>=0&&now-a.ts<7*DAY&&!/^To-do/.test(a.field); });
+    if(ch.length){ var z=ch[ch.length-1], lt=mx(ch.map(function(a){ return a.ts; })); add("mgr_changes","all",ch.length+"|"+lt,2,lt,z.who+" made "+ch.length+" change"+(ch.length>1?"s":"")+" this week","Latest: "+z.reward+" · "+z.field+" "+z.before+" → "+z.after+". Take a look.","audit"); } }
+  var fails={}; (d.trained||[]).forEach(function(t){ if(t[3]==="yes") delete fails[t[1]]; else fails[t[1]]=t[0]; }); var fk=Object.keys(fails).sort();
+  if(fk.length) add("staff_quiz",MGR?MYSLUGS[0]:"all",fk.join("."),5,0,fk.length+" employee"+(fk.length>1?"s":"")+" still need to pass the staff quiz",fk.join(", ")+" · send them the staff guide","staff");
+  return out; }
+function allTodos(){ var man=(DATA.todos||[]).map(function(t){ return {id:t.id,slug:t.slug,pri:2,ts:t.ts,text:t.text,sub:(t.slug==="all"?"Both":t.slug==="nalu-vida"?"Nalu Vida":"Melody")+" · added by "+t.by+" · "+when2(t.ts),go:t.go,manual:1}; });
+  return man.concat(autoTodos()).sort(function(a,b){ return a.pri-b.pri||b.ts-a.ts; }); }
+function drawTodo(){ var box=$("todo"); if(!box||!DATA) return; var L=allTodos(), shown=TODO_MORE?L:L.slice(0,3);
+  var h="<h2>✅ To-do <span class='badge"+(L.length?"":" z")+"' aria-label='"+L.length+" open'>"+L.length+"</span><span style='flex:1'></span><button class='btn alt sm big' id='tdAdd'>＋ Add</button></h2>";
+  h+=L.length?shown.map(function(t,i){ return "<div class='ti'><button class='go' data-tgo='"+i+"'><span class='dot p"+t.pri+"' aria-hidden='true'></span><span><b>"+esc(t.text)+"</b><small>"+esc(t.sub||"")+(t.go?" · tap to open "+esc(TABNAME[t.go]||t.go):"")+"</small></span></button><button class='dn' data-tdone='"+i+"' aria-label='Mark done: "+esc(t.text)+"'>✓ Done</button></div>"; }).join("")
+    :"<p style='margin:10px 0 0;font-size:16px'>🎉 <b>All caught up.</b> Nothing needs you right now.</p>";
+  if(L.length>3) h+="<button class='btn alt sm big' id='tdMore' style='width:100%'>"+(TODO_MORE?"Show less":"Show all "+L.length)+"</button>";
+  if(TODO_ADD) h+="<div class='add'><label class='note' for='tdText'>New to-do</label><input id='tdText' maxlength='140' placeholder='e.g. Order new table tents'>"+
+    (MGR?"":"<select id='tdSlug' aria-label='Restaurant'><option value='all'>Both restaurants</option><option value='melody-bar-grill'>Melody</option><option value='nalu-vida'>Nalu Vida</option></select>")+
+    "<select id='tdGo' aria-label='Where it gets done'><option value=''>No page</option>"+Object.keys(TABNAME).map(function(k){ return "<option value='"+k+"'>"+esc(TABNAME[k])+"</option>"; }).join("")+"</select>"+
+    "<button class='btn big' id='tdSave'>Save to-do</button><div class='err' id='tdErr'></div></div>";
+  box.innerHTML=h; box._list=shown; }
+function todoReply(r){ if(!r||!r.ok){ if(r&&r.auth===false) return signOut("Signed out. Log in again."); alert((r&&r.reason)||"Didn't work. Try again."); return false; } DATA.todos=r.todos||[]; DATA.todoDone=r.todoDone||[]; drawTodo(); return true; }
+$("todo").addEventListener("click",function(e){ var box=$("todo"), b=e.target.closest("button"); if(!b||!DATA) return;
+  if(b.id==="tdMore"){ TODO_MORE=!TODO_MORE; drawTodo(); return; }
+  if(b.id==="tdAdd"){ TODO_ADD=!TODO_ADD; drawTodo(); if(TODO_ADD) $("tdText").focus(); return; }
+  if(b.id==="tdSave"){ var tx=$("tdText").value.trim(); if(tx.length<3){ $("tdErr").textContent="Type at least 3 characters."; return; } b.disabled=true;
+    api({type:"bo_todo",token:TOKEN,op:"add",text:tx,slug:MGR?MYSLUGS[0]:$("tdSlug").value,go:$("tdGo").value}).then(function(r){ if(todoReply(r)){ TODO_ADD=false; drawTodo(); } else b.disabled=false; }); return; }
+  var t=box._list&&box._list[+(b.dataset.tgo!=null?b.dataset.tgo:b.dataset.tdone)]; if(!t) return;
+  if(b.dataset.tdone!=null){ b.disabled=true; b.textContent="…"; api(t.manual?{type:"bo_todo",token:TOKEN,op:"done",id:t.id}:{type:"bo_todo",token:TOKEN,op:"done",key:t.key,text:t.text}).then(function(r){ if(!todoReply(r)){ b.disabled=false; b.textContent="✓ Done"; } }); return; }
+  if(t.go){ if(t.extra&&t.extra.dev) VDEV=t.extra.dev;
+    goTab(t.go); var a=t.extra&&(t.extra.anchor||(t.extra.dev&&"devcard")); if(a) setTimeout(function(){ var el=$(a); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },60); } });
+// ---- 💲 PRICES & SPECIALS: what guests SEE in the app (menu-data.js + saved changes). Same Save → emailed code → Audit flow.
+var MQ="";
+function mBtn(s,f,item,reward){ return "data-save='"+esc(JSON.stringify([s,"menu",f,reward,item]))+"'"; }
+function mid(s,name){ var h=0; for(var i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))>>>0; return "m_"+s+"_"+h.toString(36); }
+function menu(){ var h="<div class='card help' id='menuHelp' style='margin-top:12px'><p style='margin:0'>Change a price, a special or the happy-hour list that guests see in the app. Tap <b>Save</b>, then type the 6-digit code we email you. It shows in the app within a minute and is written to the Audit log. "+
+    "<b>Toast doesn't change by itself</b>: change the same price in Toast too, so the check matches. To go back to the menu's own price, clear the box and tap Save.</p><p style='margin:10px 0 0' data-noread>"+(window.SSAI_LISTEN?SSAI_LISTEN.button("menuHelp","🔊 Listen"):"")+"</p></div>";
+  var any=false;
+  (LIVE.slugs||[]).filter(inR).forEach(function(s){ var M=effMenu(s), B=window.SSAI_MENU&&SSAI_MENU[s]; if(!M){ if(!MGR) h+="<h2>🏄 "+esc(NAMES[s])+"</h2><p class='note'>Nalu Vida's menu isn't set up for editing here yet. Ask Antidote.</p>"; return; } any=true;
+    var q=MQ.toLowerCase(), row=function(it,base,cat){ if(q&&(it[0]+" "+cat).toLowerCase().indexOf(q)<0) return ""; var id=mid(s,it[0]), chg=+it[1]!==+base[1];
+      return "<div class='mi'><div><b>"+esc(it[0])+"</b><small>"+esc(cat)+(chg?" · <span class='chg'>changed</span> (menu: $"+(+base[1]).toFixed(2)+")":"")+"</small></div><input id='"+id+"' inputmode='decimal' aria-label='Price of "+esc(it[0])+"' value='"+(+it[1]).toFixed(2)+"' data-orig='"+(+it[1]).toFixed(2)+"'><button class='btn sm' "+mBtn(s,"price",it[0],it[0])+" data-for='"+id+"'>Save</button></div>"; };
+    h+="<h2>✈️ "+esc(NAMES[s])+" · prices</h2><div class='row' style='margin:6px 0'><input type='search' id='mq' placeholder='Find an item (e.g. wings, margarita)' value='"+esc(MQ)+"' aria-label='Find a menu item' style='min-height:48px;font-size:16px'></div><div class='card' style='padding:4px 12px'>";
+    M.food.forEach(function(c,ci){ c.items.forEach(function(it,ii){ h+=row(it,B.food[ci].items[ii],c.name); }); });
+    M.drinks.forEach(function(it,i){ h+=row(it,B.drinks[i],"Drinks"); });
+    h+="</div>";
+    h+="<h2>🎉 Holiday & seasonal specials</h2><p class='note'>They show at the top of the app during their dates. No free alcohol (California): drink specials are discounts only.</p><div class='dl'>";
+    M.specials.forEach(function(sp){ var on=sp.on!==false, pid="m_"+s+"_sp_"+sp.id, pr=String(sp.price||"").replace("$","");
+      h+="<div class='dc mf' id='sp-"+esc(sp.id)+"'><b>"+esc(sp.title)+"</b> <span class='st "+(on?"done":"tbd")+"'>"+(on?"ON":"OFF")+"</span><div class='note'>"+esc(sp.start)+" → "+esc(sp.end)+(sp.price?" · "+esc(sp.price):" · <span class='chg'>no price yet</span>")+"</div>"+
+        "<div class='f'><div><label for='"+pid+"_on'>Show it in the app</label><select id='"+pid+"_on' data-orig='"+(on?"on":"off")+"'><option value='on'"+(on?" selected":"")+">On</option><option value='off'"+(on?"":" selected")+">Off</option></select></div><button class='btn sm big' "+mBtn(s,"sp_on",sp.id,sp.title)+" data-for='"+pid+"_on'>Save</button></div>"+
+        "<div class='f'><div><label for='"+pid+"_price'>Price ($, blank = no price)</label><input id='"+pid+"_price' inputmode='decimal' value='"+esc(pr)+"' data-orig='"+esc(pr)+"' placeholder='e.g. 14.99'></div><button class='btn sm big' "+mBtn(s,"sp_price",sp.id,sp.title)+" data-for='"+pid+"_price'>Save</button></div>"+
+        "<div class='f'><div><label for='"+pid+"_title'>Name</label><input id='"+pid+"_title' maxlength='60' value='"+esc(sp.title)+"' data-orig='"+esc(sp.title)+"'></div><button class='btn sm big' "+mBtn(s,"sp_title",sp.id,sp.title)+" data-for='"+pid+"_title'>Save</button></div>"+
+        "<div class='f'><div><label for='"+pid+"_desc'>What it is</label><textarea id='"+pid+"_desc' maxlength='200' rows='3' data-orig='"+esc(sp.desc)+"'>"+esc(sp.desc)+"</textarea></div><button class='btn sm big' "+mBtn(s,"sp_desc",sp.id,sp.title)+" data-for='"+pid+"_desc'>Save</button></div></div>"; });
+    h+="</div><h2>🍻 Happy hour & weekly specials</h2><div class='dc mf'><label for='m_"+s+"_hh'>One per line (up to 8 lines). Shows on the “Visit Melody” card.</label><textarea id='m_"+s+"_hh' maxlength='600' data-orig='"+esc(M.weekly.join("\n"))+"'>"+esc(M.weekly.join("\n"))+"</textarea><button class='btn big' style='width:100%;margin-top:8px' "+mBtn(s,"hh","weekly","Happy hour & weekly specials")+" data-for='m_"+s+"_hh'>Save happy hour</button></div>"; });
+  if(!any&&MGR) h+="<p class='note'>Nothing to edit here.</p>";
+  return h; }
+// ---- ❓ HELP: plain-English guide (with 🔊 Listen) for managers and owners
+function help(){ var lb=window.SSAI_LISTEN?SSAI_LISTEN.button("helpText","🔊 Listen to this page"):"";
+  return "<div class='card help' id='helpText' style='margin-top:12px'><h2 style='margin-top:0'>How to use "+(MGR?"Melody HQ":"Christian HQ")+"</h2><p data-noread>"+lb+"</p>"+
+    "<h3>✅ The to-do list</h3><p>The list at the top shows what needs you, most important first. Tap an item to go straight to the page where you handle it. Tap <b>Done</b> when it's handled. If something new comes in later, it shows up again by itself. Use <b>＋ Add</b> to write your own reminder.</p>"+
+    "<h3>🏷️ Changing a discount or reward</h3><p>Open <b>Discounts</b>. Change the points, the reward name or the dollars off, then tap <b>Save</b>. We email a 6-digit code to your login's email. Type it in and tap <b>Apply change</b>. The guest app updates within a minute.</p>"+
+    "<h3>💲 Changing a price or a special</h3><p>Open <b>Prices &amp; specials</b>. Type the new price and tap <b>Save</b>, then the emailed code. This changes what guests see in the app. Toast does not change by itself, so change the same price in Toast too. To go back to the menu's own price, clear the box and tap Save.</p>"+
+    "<h3>🧾 Everything is logged</h3><p>Every change is written to the <b>Audit log</b> with who made it and what it was before and after."+(MGR?" Your changes show as “Melody Management”, and Christian gets an email about each one.":"")+"</p>"+
+    "<h3>🍞 Toast</h3><p>The app is not connected to Toast, and there's no Toast partnership. Staff check the guest's pass code, ring the reward in Toast as a discount by hand, and guests add their points with the check number from their Toast receipt.</p>"+
+    (MGR?"<h3>🚫 What this login can't do</h3><p>It only shows Melody. It can't see or change Nalu Vida, reverse a guest's points, or remove duplicate members. For those, ask Christian.</p>":"")+
+    "<h3>🧑‍🍳 Staff</h3><p>Your team's guide is the <a href='../../staff/christian/'>staff guide</a>: how guests sign up, how to check a pass and ring it in Toast, receipt points, what to say and common problems. It has a Listen button too. It never shows guest info, so it's safe to text the link to staff.</p></div>"; }
 function goTab(t){ TAB=t; document.querySelectorAll("#tabs button").forEach(function(x){ x.setAttribute("aria-selected",x.dataset.t===t?"true":"false"); }); draw(); window.scrollTo(0,0); }
 // chart tooltips: hover (mouse) or tap (touch) any [data-tip]; content was escaped when the chart was built
 var TIP=document.createElement("div"); TIP.id="tip"; TIP.hidden=true; TIP.setAttribute("role","tooltip"); document.body.appendChild(TIP);

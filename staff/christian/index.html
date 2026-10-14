@@ -60,10 +60,12 @@ details{border-top:1px solid var(--edge);padding:9px 0}details:first-of-type{bor
 .badge2{display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,#123024,#121c33);border:1px solid #2fbf7188;border-radius:16px;padding:12px 14px;margin:10px 0}.badge2 b{font-size:20px;color:#8ff0bd}
 .note{font-size:13px;color:var(--dim)}
 [hidden]{display:none!important}
+.lsr{margin:2px 0 10px}
 </style></head><body class="m"><main id="app"></main>
-<script src="../../demo/christian-live.js?v=lb2"></script>
+<script src="../../demo/christian-live.js?v=mg1"></script>
 <script src="voice/lines.js?v=1"></script>
-<script src="voice/player.js?v=1"></script>
+<script src="voice/player.js?v=2"></script>
+<script src="../../demo/listen.js?v=ls1"></script>
 <script>
 (function(){
 "use strict";
@@ -83,13 +85,13 @@ var W={
  yourName:{en:"Your first name or nickname",es:"Tu nombre o apodo"},
  nameHint:{en:"For your practice points and your Trained badge. It stays on this phone.",es:"Para tus puntos de práctica y tu insignia de Capacitado. Se queda en este teléfono."},
  save:{en:"Save",es:"Guardar"},
- nav:[["guests",{en:"For guests",es:"Para clientes"}],["deals",{en:"Deals",es:"Ofertas"}],["tut",{en:"Step by step",es:"Paso a paso"}],["t-oneprize",{en:"One prize a day",es:"Un premio al día"}],["t-card",{en:"Rewards card",es:"Tarjeta"}],["say",{en:"What to say",es:"Qué decir"}],["faq",{en:"Problems & FAQ",es:"Problemas y preguntas"}],["games",{en:"Practice games",es:"Juegos de práctica"}],["quiz",{en:"Test yourself",es:"Ponte a prueba"}]],
+ nav:[["guests",{en:"For guests",es:"Para clientes"}],["t-pos",{en:"With Toast",es:"Con Toast"}],["deals",{en:"Deals",es:"Ofertas"}],["tut",{en:"Step by step",es:"Paso a paso"}],["t-oneprize",{en:"One prize a day",es:"Un premio al día"}],["t-card",{en:"Rewards card",es:"Tarjeta"}],["say",{en:"What to say",es:"Qué decir"}],["faq",{en:"Problems & FAQ",es:"Problemas y preguntas"}],["games",{en:"Practice games",es:"Juegos de práctica"}],["quiz",{en:"Test yourself",es:"Ponte a prueba"}]],
  install:{en:"📲 Save this guide: Share → Add to Home Screen (“Staff Rewards”). Works offline after the first visit.",es:"📲 Guarda esta guía: Compartir → Agregar a inicio (“Staff Rewards”). Funciona sin internet después de la primera vez."}
 };
 function guests(){ var R=rw(), jl=R.justLanded;
  var li=[
   {en:"<b>Free to join</b> by scanning the QR on the table or window. They get <b>"+R.join+" welcome points</b>.",es:"<b>Unirse es gratis</b> escaneando el QR de la mesa o la ventana. Reciben <b>"+R.join+" puntos de bienvenida</b>."},
-  {en:"<b>"+R.perDollar+" points for every $1</b> before tip. Until Toast is connected, the guest adds them with <b>Add my visit</b> (receipt).",es:"<b>"+R.perDollar+" puntos por cada $1</b> antes de la propina. Mientras Toast no esté conectado, el cliente los agrega con <b>Add my visit</b> (recibo)."},
+  {en:"<b>"+R.perDollar+" points for every $1</b> before tip. Toast doesn't send points to the app (they aren't connected), so the guest adds them with <b>Add my visit</b> (receipt).",es:"<b>"+R.perDollar+" puntos por cada $1</b> antes de la propina. Toast no le manda puntos a la app (no están conectados), así que el cliente los agrega con <b>Add my visit</b> (recibo)."},
   {en:"<b>Rewards</b> from "+R.tiers[0][0].toLocaleString()+" points. To use one they tap <b>Use reward</b> and show you a <b>live pass</b>. You tap the matching button in Toast.",es:"<b>Recompensas</b> desde "+R.tiers[0][0].toLocaleString()+" puntos. Para usar una tocan <b>Use reward</b> y te muestran un <b>pase en vivo</b>. Tú tocas el botón correspondiente en Toast."},
   {en:"A free game (<b>"+esc(LIVE.defaults[SL[REST]].game)+"</b>): 1 point per "+R.game_.perScore+" score, up to "+R.game_.dailyCap+" points a day. No prizes from the game.",es:"Un juego gratis (<b>"+esc(LIVE.defaults[SL[REST]].game)+"</b>): 1 punto por cada "+R.game_.perScore+" de puntaje, hasta "+R.game_.dailyCap+" puntos al día. El juego no da premios."},
   {en:"<b>+"+R.birthday+"</b> on their birthday and <b>+"+R.referral+"</b> for each friend who joins with their code and visits.",es:"<b>+"+R.birthday+"</b> en su cumpleaños y <b>+"+R.referral+"</b> por cada amigo que se une con su código y nos visita."},
@@ -190,6 +192,15 @@ function tutorials(){ var R=rw(), t0=R.tiers[0], code=LIVE.defaults[SL[REST]].pr
   stp("3",{en:"<b>Or type it:</b> enter the card ID below. You'll see if it's a real member (first name + last initial, member since) and whether today's prize is already used. No phone, email or points are shown.",es:"<b>O escríbelo:</b> escribe el ID abajo. Verás si es un miembro real (nombre + inicial del apellido, miembro desde) y si ya usó el premio de hoy. No se muestran teléfono, correo ni puntos."})+
   stp("4",{en:"Rewards still go through the <b>live pass</b>: the one-time code for this visit shows on their card while a pass is open. Never apply a reward from the card ID alone.",es:"Las recompensas siguen pasando por el <b>pase en vivo</b>: el código de un solo uso de esta visita aparece en su tarjeta mientras el pase está abierto. Nunca apliques una recompensa solo con el ID de la tarjeta."})+
   "<div class='card' style='margin-top:10px'><b>🔎 "+L({en:"Look up a card",es:"Buscar una tarjeta"})+"</b><div class='name' style='margin-top:8px'><input id='lkIn' maxlength='12' autocapitalize='characters' autocomplete='off' placeholder='"+cid+"' value='"+esc(LK||"")+"'><button class='btn' id='lkGo'>"+L({en:"Look up",es:"Buscar"})+"</button></div><p class='note' id='lkOut' aria-live='polite' style='margin:8px 0 0'></p></div></section>";
+ // 11 how it works alongside Toast (and other registers). Honest: there is NO Toast integration or partnership.
+ h+="<section class='tut' id='t-pos'><h3>11 · "+L({en:"How it works with Toast (and other registers)",es:"Cómo funciona con Toast (y otras cajas)"})+"</h3>"+
+  "<p>"+L({en:"<b>The app is not connected to Toast.</b> There's no official Toast connection and no partnership. The two work side by side, and you are the link between them. It takes a few seconds:",es:"<b>La app no está conectada a Toast.</b> No hay una conexión oficial ni una alianza. Funcionan lado a lado y tú eres el enlace entre las dos. Toma unos segundos:"})+"</p>"+
+  stp("1",{en:"<b>Check the pass code.</b> Look at the live pass on the guest's phone (moving clock + countdown). Not sure? Type the code in <b>Check a pass code</b> (step 9): it says Live, Already used or Expired.",es:"<b>Revisa el código del pase.</b> Mira el pase en vivo en el teléfono del cliente (reloj que avanza + cuenta regresiva). ¿Dudas? Escribe el código en <b>Revisar un código de pase</b> (paso 9): dice Vigente, Ya usado o Vencido."})+
+  stp("2",{en:"<b>Ring it in Toast by hand</b> as a discount on the check (or a comp, if your manager set it up that way): select the item for a free-item reward, tap <b>Discounts</b>, tap the button named on the pass, and type the pass code as the reason.",es:"<b>Márcalo en Toast a mano</b> como descuento en la cuenta (o cortesía, si tu gerente lo configuró así): selecciona el artículo si es gratis, toca <b>Discounts</b>, toca el botón que dice el pase y escribe el código del pase como motivo."})+
+  stp("3",{en:"<b>Receipt points come from the Toast receipt.</b> The guest types the <b>check #</b> printed on their Toast receipt and the total before tip in <b>Add my visit</b>. Toast doesn't send anything to the app. The manager compares claims with Toast reports.",es:"<b>Los puntos del recibo salen del recibo de Toast.</b> El cliente escribe el <b># de cuenta</b> impreso en su recibo de Toast y el total antes de propina en <b>Add my visit</b>. Toast no le manda nada a la app. El gerente compara los reclamos con los reportes de Toast."})+
+  stp("4",{en:"<b>Prices:</b> the app's menu is for looking only. The price on the check is whatever Toast says. If they don't match, Toast wins; tell your manager.",es:"<b>Precios:</b> el menú de la app es solo para ver. El precio de la cuenta es el de Toast. Si no coinciden, manda Toast; avísale a tu gerente."})+
+  stp("+",{en:"<b>Another register</b> (Square, Clover, a paper check): same steps. Add a manual discount on the check, write the pass code in the note, and the guest uses that receipt's check number.",es:"<b>Otra caja</b> (Square, Clover, cuenta en papel): los mismos pasos. Agrega un descuento manual a la cuenta, escribe el código del pase en la nota, y el cliente usa el número de cuenta de ese recibo."})+
+  stp("!",{en:"No discount button, or no permission? Get your manager. Never use a different discount, and never give a reward without a live pass.",es:"¿No está el botón de descuento o no tienes permiso? Llama a tu gerente. Nunca uses otro descuento y nunca des una recompensa sin un pase en vivo."})+"</section>";
  return h; }
 var LK="", LKR=null;
 function lookup(){ var o=document.getElementById("lkOut"), c=(document.getElementById("lkIn").value||"").toUpperCase().replace(/\s+/g,""); LK=c;
@@ -226,7 +237,7 @@ function faq(){ var F=[
   [{en:"What do I never share?",es:"¿Qué nunca debo compartir?"},{en:"Any guest's name, phone, email or points, with anyone. And never read a pass code out loud to other tables.",es:"El nombre, teléfono, correo o puntos de cualquier cliente, con nadie. Y nunca leas un código en voz alta para otras mesas."}],
   [{en:"A guest asks about the location / “nearby alerts” bonus.",es:"Un cliente pregunta por el bono de ubicación / “nearby alerts”."},{en:"Only where it's on (Melody). Tap 📍 Turn on nearby alerts under the rewards card and allow location + notifications (iPhone: add to Home Screen first). Open the app on 3 different days over 7+ days and the one-time bonus lands by itself. It doesn't track them when the app is closed, and location is never sold. See step 8.",es:"Solo donde está activo (Melody). Toca 📍 Turn on nearby alerts debajo de la tarjeta de recompensas y permite ubicación + notificaciones (iPhone: primero agregar a inicio). Abre la app en 3 días distintos durante 7+ días y el bono único llega solo. No los rastrea con la app cerrada y la ubicación nunca se vende. Mira el paso 8."}],
   [{en:"Why didn't I get a “you're nearby” notification when I walked by?",es:"¿Por qué no recibí una notificación de “estás cerca” al pasar?"},{en:"A web app can't watch location in the background. The nearby banner shows when the guest opens the app near the restaurant.",es:"Una app web no puede vigilar la ubicación en segundo plano. El aviso aparece cuando el cliente abre la app cerca del restaurante."}],
-  [{en:"What happens when Toast is connected?",es:"¿Qué pasa cuando se conecte Toast?"},{en:"Points will be added automatically and you'll redeem inside Toast. Guests keep their points. Until then, use the steps above.",es:"Los puntos se agregarán solos y canjearás dentro de Toast. Los clientes conservan sus puntos. Mientras tanto, usa los pasos de arriba."}]];
+  [{en:"Is the app connected to Toast?",es:"¿La app está conectada a Toast?"},{en:"No. There's no official Toast connection or partnership. The app and Toast work side by side: you check the pass code, ring the reward in Toast as a discount by hand, and guests add points with the check # from their Toast receipt. See step 11.",es:"No. No hay una conexión oficial ni una alianza con Toast. La app y Toast funcionan lado a lado: revisas el código del pase, marcas la recompensa en Toast como descuento a mano, y los clientes agregan puntos con el # de cuenta de su recibo de Toast. Mira el paso 11."}]];
  return "<h2 id='faq'>❓ "+L({en:"Problems and FAQ",es:"Problemas y preguntas frecuentes"})+"</h2><div class='card'>"+F.map(function(x){ return "<details><summary>"+L(x[0])+"</summary><p>"+L(x[1])+"</p></details>"; }).join("")+"</div>"; }
 function tally(){ var t={}; try{ t=JSON.parse(get(LS.prac,"{}"))||{}; }catch(e){} var me=nm(), runs=(t.runs||[]).filter(function(r){ return me&&r.name===me; });
  return {runs:runs.length,pts:runs.reduce(function(a,r){ return a+r.pts; },0),best:runs.reduce(function(a,r){ return Math.max(a,r.score); },0)}; }
@@ -274,6 +285,12 @@ function quiz(){ var B=bank(), b=quizBadge(), h="<h2 id='quiz'>✅ "+L({en:"Opti
 function finishQuiz(){ var right=QZ.qs.filter(function(x){ return QZ.ans[x.i]===0; }).length, pct=Math.round(100*right/QZ.qs.length), pass=pct>=80, day=new Date().toLocaleDateString("en-CA");
  if(pass) set(LS.quiz,JSON.stringify({passed:true,name:nm()||"",day:day,score:pct}));
  if(LIVE.api) try{ fetch(LIVE.api,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({type:"staff_trained",name:(nm()||"Staff").slice(0,24),score:pct,passed:pass,dev:get("ssai_staff_dev","")})}); }catch(e){} }
+// ---------------- 🔊 Listen (demo/listen.js: the phone's own free voice reads a section, paragraph by paragraph) ----------------
+// every h2 section (guests, deals, tut, say, faq) is wrapped so it can be read, and every step section gets its own button
+function listenify(h){ if(!window.SSAI_LISTEN) return h; var lb=L({en:"🔊 Listen",es:"🔊 Escuchar"});
+ h=h.replace(/<h2 id='([a-z-]+)'>([\s\S]*?)<\/h2>/g,function(m,id,t){ return "</div-wrap><div class='lsw' id='ls-"+id+"'><h2 id='"+id+"'>"+t+"</h2><p class='lsr' data-noread>"+SSAI_LISTEN.button("ls-"+id,lb)+"</p>"; });
+ h=h.replace(/<section class='tut' id='(t-[a-z]+)'><h3>([\s\S]*?)<\/h3>/g,function(m,id,t){ return m+"<p class='lsr' data-noread>"+SSAI_LISTEN.button(id,lb)+"</p>"; });
+ return h.replace("</div-wrap>","").replace(/<\/div-wrap>/g,"</div>")+"</div>"; }
 // ---------------- page ----------------
 function render(){ var y=window.scrollY; document.documentElement.lang=LANG; document.body.className=REST;
  document.title=LANG==="es"?"Guía del personal · Melody × Nalu Vida":"Staff Rewards · Melody × Nalu Vida";
@@ -283,7 +300,7 @@ function render(){ var y=window.scrollY; document.documentElement.lang=LANG; doc
   "<h1>"+L(W.title)+"</h1><p class='s'>"+L(W.intro)+"</p>"+
   "<div class='card'><label for='nm' style='font-weight:800'>"+L(W.yourName)+"</label><div class='name' style='margin-top:6px'><input id='nm' maxlength='24' autocomplete='given-name' value='"+esc(nm())+"'><button class='btn' id='nmSave'>"+L(W.save)+"</button></div><p class='note' style='margin:6px 0 0'>"+L(W.nameHint)+"</p></div>"+
   "<nav class='nav' aria-label='Sections'>"+W.nav.map(function(x){ return "<a href='#"+x[0]+"'>"+L(x[1])+"</a>"; }).join("")+"</nav>"+
-  guests()+deals()+tutorials()+say()+faq()+games()+quiz()+"<p class='note' style='margin-top:24px'>"+L(W.install)+"</p>";
+  listenify(guests()+deals()+tutorials()+say()+faq())+games()+quiz()+"<p class='note' style='margin-top:24px'>"+L(W.install)+"</p>";
  window.scrollTo(0,y); tickDemo(); showLk(); if(window.StaffVoice) StaffVoice.decorate(LANG); }
 var $app=document.getElementById("app"), dpEnd=0;
 function tickDemo(){ var c=document.getElementById("dpClock"), d=document.getElementById("dpCd"), p=document.getElementById("demoPass"); if(!c) return;
@@ -291,8 +308,8 @@ function tickDemo(){ var c=document.getElementById("dpClock"), d=document.getEle
  var left=dpEnd?Math.max(0,dpEnd-Date.now()):600000-(Date.now()%600000); if(dpEnd&&left<=0){ p.classList.add("dead"); d.textContent="0:00"; return; } p.classList.remove("dead"); var s=Math.ceil(left/1000); d.textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
 setInterval(tickDemo,250);
 document.addEventListener("click",function(e){ var t=e.target;
- var r=t.closest("[data-rest]"); if(r){ REST=r.dataset.rest; set(LS.rest,REST); if(QZ) newQuiz(); render(); return; }
- var l=t.closest("[data-lang]"); if(l){ LANG=l.dataset.lang; set(LS.lang,LANG); render(); return; }
+ var r=t.closest("[data-rest]"); if(r){ if(window.SSAI_LISTEN) SSAI_LISTEN.stop(); REST=r.dataset.rest; set(LS.rest,REST); if(QZ) newQuiz(); render(); return; }
+ var l=t.closest("[data-lang]"); if(l){ LANG=l.dataset.lang; set(LS.lang,LANG); if(window.SSAI_LISTEN) SSAI_LISTEN.stop(); render(); return; }
  if(t.id==="nmSave"){ var v=document.getElementById("nm").value.replace(/[<>]/g,"").trim().slice(0,24); set(LS.name,v); render(); return; }
  if(t.id==="ccGo"){ codeCheck(); return; }
  if(t.id==="lkGo"){ lookup(); return; }

@@ -55,6 +55,7 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
 .tag.hot{background:#ff6b6b33;color:#ffb3b3}.tag.pw{background:#2fbf7126;color:#8ff0bd}.tag.br{background:#ffffff14;color:var(--dim)}
 .dim{color:var(--dim)}
 /* ✅ to-do list, pinned at the top (owner + manager) */
+.hqalert{display:flex;gap:10px;align-items:flex-start;margin:0 0 12px;padding:12px 14px;border-radius:14px;border:2px solid #ff4d4d;background:#3a0d12;color:#fff;animation:hqblink 1.4s ease-in-out infinite}.hqalert .ic{font-size:22px;line-height:1}.hqalert b{display:block;font-size:16px}.hqalert small{display:block;color:#ffd9d9;font-size:14px;margin-top:3px}.hqalert ul{margin:6px 0 0;padding-left:18px;font-size:14px;color:#ffe9e9}.hqalert .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}@keyframes hqblink{0%,100%{box-shadow:0 0 0 0 #ff4d4d00;border-color:#ff4d4d}50%{box-shadow:0 0 14px 2px #ff4d4daa;border-color:#ffb3b3}}@media (prefers-reduced-motion:reduce){.hqalert{animation:none}}
 .todo{border-color:#f5c40066}.todo h2{margin:0;display:flex;align-items:center;gap:8px}.badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 8px;border-radius:99px;background:var(--bad);color:#fff;font-size:14px;font-weight:900}.badge.z{background:var(--ok)}
 .ti{display:flex;align-items:stretch;gap:8px;margin:8px 0}.ti .go{flex:1;min-width:0;display:flex;gap:10px;align-items:center;text-align:left;background:var(--card2);border:1px solid var(--edge);border-radius:14px;padding:12px;color:var(--ink);cursor:pointer;min-height:56px;font:inherit}
 .ti .go:active{background:#ffffff14}.ti .go b{display:block;font-size:15px;line-height:1.3}.ti .go small{display:block;color:var(--dim);font-size:12.5px;margin-top:2px}.ti .dot{flex:none;width:12px;height:12px;border-radius:50%}.ti .p1{background:var(--bad)}.ti .p2{background:var(--warn)}.ti .p3{background:var(--gold)}.ti .p4,.ti .p5{background:var(--dim)}
@@ -86,6 +87,7 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
 <section id="app" hidden>
   <div class="seg" role="group" aria-label="Restaurant"><button data-r="all" aria-pressed="true">Both</button><button class="m" data-r="melody-bar-grill" aria-pressed="false">✈️ Melody</button><button class="n" data-r="nalu-vida" aria-pressed="false">🏄 Nalu Vida</button>
     <span style="flex:1"></span><button class="btn alt sm" id="refresh">↻ Refresh</button></div>
+  <div id="hqalert" role="alert"></div>
   <section class="card todo" id="todo" aria-label="To-do list"></section>
   <div class="tabs" role="tablist" id="tabs"></div>
   <div id="pane"></div>
@@ -135,7 +137,7 @@ $("lf").onsubmit=function(ev){ ev.preventDefault(); var b=$("go"); b.disabled=tr
     b.textContent="✓ Password correct"; ticking("✓ Password correct. Loading your members and stats");
     TOKEN=r.token; try{ sessionStorage.setItem(TKEY,TOKEN); localStorage.setItem("christian-hq-user",$("u").value); }catch(e){} load(); }); }); };
 $("out").onclick=function(){ if(TOKEN) api({type:"bo_logout",token:TOKEN}); signOut(""); };
-function signOut(msg){ TOKEN=null; DATA=null; if(window.SSAI_LISTEN) SSAI_LISTEN.stop(); $("todo").innerHTML=""; try{ sessionStorage.removeItem(TKEY); }catch(e){} $("app").hidden=true; $("out").hidden=true; $("login").hidden=false; $("pane").innerHTML=""; $("lerr").textContent=msg||""; }
+function signOut(msg){ TOKEN=null; DATA=null; if(window.SSAI_LISTEN) SSAI_LISTEN.stop(); $("todo").innerHTML=""; $("hqalert").innerHTML=""; try{ sessionStorage.removeItem(TKEY); }catch(e){} $("app").hidden=true; $("out").hidden=true; $("login").hidden=false; $("pane").innerHTML=""; $("lerr").textContent=msg||""; }
 function load(){ loadMock(function(){ api({type:"bo_data",token:TOKEN}).then(function(r){
   stopTick(); var b=$("go"); b.disabled=false; b.textContent="Log in"; $("lerr").style.color="";
   if(!r||!r.ok){ signOut(r&&r.auth===false?"Signed out. Log in again.":(r&&r.reason)||"Couldn't load."); return; }
@@ -507,6 +509,8 @@ function autoTodos(){ var d=DATA, out=[], done={}, now=Date.now(); (d.todoDone||
   if(!MGR&&d.mgr&&d.mgr.length){ var ch=(d.audit||[]).filter(function(a){ return d.mgr.indexOf(a.who)>=0&&now-a.ts<7*DAY&&!/^To-do/.test(a.field); });
     if(ch.length){ var z=ch[ch.length-1], lt=mx(ch.map(function(a){ return a.ts; })); add("mgr_changes","all",ch.length+"|"+lt,2,lt,z.who+" made "+ch.length+" change"+(ch.length>1?"s":"")+" this week","Latest: "+z.reward+" · "+z.field+" "+z.before+" → "+z.after+". Take a look.","audit"); } }
   var fails={}; (d.trained||[]).forEach(function(t){ if(t[3]==="yes") delete fails[t[1]]; else fails[t[1]]=t[0]; }); var fk=Object.keys(fails).sort();
+  // Antidote 2026-10-14: Sammy runs marketing for Christian. Owner view only; Done (tap in the alert or the list) clears it for good.
+  if(!MGR) add("onboard_sammy","all","2026-10-14",0,now+1,"Onboard Sammy so she can run the marketing","Walk her through both apps, promo codes & discounts, specials and the early bird, and get her a login","discounts",{alert:1});
   if(fk.length) add("staff_quiz",MGR?MYSLUGS[0]:"all",fk.join("."),5,0,fk.length+" employee"+(fk.length>1?"s":"")+" still need to pass the staff quiz",fk.join(", ")+" · send them the staff guide","staff");
   return out; }
 function allTodos(){ var man=(DATA.todos||[]).map(function(t){ return {id:t.id,slug:t.slug,pri:2,ts:t.ts,text:t.text,sub:(t.slug==="all"?"Both":t.slug==="nalu-vida"?"Nalu Vida":"Melody")+" · added by "+t.by+" · "+when2(t.ts),go:t.go,manual:1}; });
@@ -520,7 +524,16 @@ function drawTodo(){ var box=$("todo"); if(!box||!DATA) return; var L=allTodos()
     (MGR?"":"<select id='tdSlug' aria-label='Restaurant'><option value='all'>Both restaurants</option><option value='melody-bar-grill'>Melody</option><option value='nalu-vida'>Nalu Vida</option></select>")+
     "<select id='tdGo' aria-label='Where it gets done'><option value=''>No page</option>"+Object.keys(TABNAME).map(function(k){ return "<option value='"+k+"'>"+esc(TABNAME[k])+"</option>"; }).join("")+"</select>"+
     "<button class='btn big' id='tdSave'>Save to-do</button><div class='err' id='tdErr'></div></div>";
-  box.innerHTML=h; box._list=shown; }
+  box.innerHTML=h; box._list=shown; drawAlert(L); }
+function drawAlert(L){ var el=$("hqalert"); if(!el) return; var a=(L||[]).filter(function(t){ return t.extra&&t.extra.alert; })[0];
+  if(!a){ el.innerHTML=""; el._a=null; return; } el._a=a;
+  el.innerHTML="<div class='hqalert'><span class='ic' aria-hidden='true'>🚨</span><div style='flex:1'><b>Action needed: onboard Sammy</b>"+
+    "<small>Sammy will handle the marketing you don't have time for. Make sure she knows the app before she starts:</small>"+
+    "<ul><li>Tour the Melody and Nalu Vida guest apps (games, rewards, menu)</li><li>Promo codes and discounts: how they ring up in Toast</li><li>Prices &amp; specials and the early-bird gift</li><li>Her own back-office login (ask Antidote to set it up)</li></ul>"+
+    "<div class='row'><button class='btn sm' data-ago='discounts'>Open Discounts</button><button class='btn alt sm' data-ago='links'>App links</button><button class='btn alt sm' data-adone='1'>✓ Sammy is onboarded</button></div></div></div>"; }
+$("hqalert").addEventListener("click",function(e){ var b=e.target.closest("button"), el=$("hqalert"), a=el._a; if(!b||!a||!DATA) return;
+  if(b.dataset.ago){ goTab(b.dataset.ago); return; }
+  if(b.dataset.adone){ b.disabled=true; b.textContent="…"; api({type:"bo_todo",token:TOKEN,op:"done",key:a.key,text:a.text}).then(function(r){ if(!todoReply(r)){ b.disabled=false; b.textContent="✓ Sammy is onboarded"; } }); } });
 function todoReply(r){ if(!r||!r.ok){ if(r&&r.auth===false) return signOut("Signed out. Log in again."); alert((r&&r.reason)||"Didn't work. Try again."); return false; } DATA.todos=r.todos||[]; DATA.todoDone=r.todoDone||[]; drawTodo(); return true; }
 $("todo").addEventListener("click",function(e){ var box=$("todo"), b=e.target.closest("button"); if(!b||!DATA) return;
   if(b.id==="tdMore"){ TODO_MORE=!TODO_MORE; drawTodo(); return; }

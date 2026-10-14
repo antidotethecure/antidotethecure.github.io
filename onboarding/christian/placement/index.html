@@ -61,4 +61,6 @@ var bs=document.querySelectorAll('#ck input');bs.forEach(function(b){var k=b.get
 b.addEventListener('change',function(){s[k]=b.checked;b.parentNode.classList.toggle('done',b.checked);try{localStorage.setItem(K,JSON.stringify(s))}catch(e){}})});
 document.getElementById('pck').addEventListener('click',function(){document.body.classList.add('ckonly');window.print();setTimeout(function(){document.body.classList.remove('ckonly')},500)});window.addEventListener('afterprint',function(){document.body.classList.remove('ckonly')});
 document.getElementById('reset').addEventListener('click',function(){s={};bs.forEach(function(b){b.checked=false;b.parentNode.classList.remove('done')});try{localStorage.removeItem(K)}catch(e){}});})();
-</script></body></html>
+</script>
+<script src="../../../demo/poweredby.js?v=20261013a" defer></script>
+</body></html>

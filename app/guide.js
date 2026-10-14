@@ -72,7 +72,7 @@
   function handoff(q) {
     var body = encodeURIComponent("Hi Antidote, a question from the SousShift app: " + q);
     var m = add("Good question. I'll have Antidote answer that one personally.", "bot");
-    m.insertAdjacentHTML("beforeend", '<br><a class="go" href="mailto:' + A.contact.email + '?subject=SousShift%20question&body=' + body + '">✉️ Email ' + A.contact.email + '</a><br><a class="go" href="sms:' + (A.contact.sms || "") + '&body=' + body + '">💬 Text Antidote</a><br><a class="go" href="tel:+14242963303">📞 Call Nia, our AI line · (424) 296-3303 (24/7)</a>');
+    m.insertAdjacentHTML("beforeend", '<br><a class="go" href="mailto:' + A.contact.email + '?subject=SousShift%20question&body=' + body + '">✉️ Email ' + A.contact.email + '</a><br><a class="go" href="sms:' + (A.contact.sms || "") + '&body=' + body + '">💬 Text Antidote</a>');
   }
   function reply(q) {   // returns the matched intent id (or null) so tests can check routing
     q = String(q || "").trim(); if (!q) return null;

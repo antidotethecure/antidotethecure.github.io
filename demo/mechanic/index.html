@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
 <link rel="preconnect" href="https://vpic.nhtsa.dot.gov">
 <link rel="preconnect" href="https://api.nhtsa.gov">
-<link rel="stylesheet" href="app.css?v=20261013b">
+<link rel="stylesheet" href="app.css?v=20261013e">
 </head>
 <body>
 <div class="top"><div class="wrap">
@@ -145,6 +145,18 @@
       <p class="src"><span data-t="tsSrc">Intervals: Tesla Model 3 service manual,</span> <a href="https://service.tesla.com/docs/Model3/ServiceManual/en-us/GUID-B8F74731-ACEA-4CEC-9516-EF6DF9AB9D9A.html" target="_blank" rel="noopener">service.tesla.com ↗</a></p>
       <p class="soon"><span aria-hidden="true">🔒</span> <span data-t="tsLive">Live battery, software version and service alerts need Tesla's official Fleet API sign-in: coming later. This app never asks for your Tesla password.</span></p>
     </div>
+    <div class="card dgm" id="dgmCard" hidden>
+      <p class="kick" data-t="dgKick">Exploded view</p>
+      <h3 id="dgH"></h3>
+      <button class="dgimg" id="dgOpen" type="button"><img id="dgImg" alt="" width="1100" height="825" decoding="async"><span class="dgzoom" data-t="dgZoom">⤢ Tap to zoom</span></button>
+      <p class="dglbl"><span aria-hidden="true">ⓘ</span> <span data-t="dgLabel">Illustration — for reference, not a factory diagram.</span> <span id="dgTable" data-t="dgTable">Numbers drawn in the picture are not checked: use the verified specs below.</span></p>
+      <p class="note" id="dgYear" hidden></p>
+      <p class="sub" data-t="dgSpecH">Verified specs</p>
+      <div class="dgspec" id="dgSpec"></div>
+      <p class="sub" data-t="dgJump">Tap a part to add it to your job</p>
+      <div class="chipline" id="dgChips"></div>
+    </div>
+    <p class="soon" id="dgSoon" hidden><span aria-hidden="true">🔩</span> <span data-t="dgSoon">Exploded-view diagram for this model: coming soon.</span></p>
   </section>
 
   <section class="s" id="diagram">
@@ -301,6 +313,14 @@
 window.T = {
 en: {
   _title: "{name} (Demo)",
+  dgKick: "Exploded view", dgH: "Every part of your {c}", dgZoom: "⤢ Tap to zoom", dgLabel: "Illustration — for reference, not a factory diagram.",
+  dgTable: "Numbers drawn in the picture are not checked: use the verified specs below.", dgSpecH: "Verified specs", dgJump: "Tap a part to add it to your job",
+  dgSoon: "Exploded-view diagram for this model: coming soon.", dgYear: "Drawn from a {d}. Your {y} may look a little different.",
+  dgSpecLoad: "Loading official specs…", dgSpecErr: "Couldn't reach fueleconomy.gov right now.", dgSpecNone: "No EPA listing for this exact year and model. Check the sticker in the driver's door jamb.",
+  dgSpecPick: "Pick the year to see official specs.", dgSrc: "Specs: U.S. EPA / DOE, fueleconomy.gov", dgParts: "Show parts", dgClose: "Close diagram",
+  dgFoot: "Pinch or double-tap to zoom, drag to move. Tap a dot to add that part to your job. AI illustration, not a factory diagram.",
+  dgAlt: "Exploded-view illustration of a {c} showing its major parts", dgTitle: "{c}: exploded view",
+  sp_range: "{v} mi EPA range", sp_mpge: "{v} MPGe", sp_mpg: "{v} MPG combined ({c} city / {h} hwy)", sp_hybrid: "Hybrid",
   bellAria: "Alerts", close: "Close", navSvc: "Services", navCar: "Your car", navTap: "Tap the car", navQuote: "Quote", navBook: "Book", navTrack: "Track", navAlerts: "Alerts",
   openNow: "Open now · until {t}", openLater: "Closed now · opens {d} {t}", heroH: "Bring it to Carlos. <em>Or he comes to you.</em>",
   heroP: "Pick your car, see known issues, scan the check-engine light, get a price range in seconds and watch Carlos work on it, right here on your phone.",
@@ -413,6 +433,14 @@ en: {
 },
 es: {
   _title: "{name} (Demo)",
+  dgKick: "Vista despiezada", dgH: "Todas las partes de tu {c}", dgZoom: "⤢ Toca para ampliar", dgLabel: "Ilustración: solo de referencia, no es un diagrama de fábrica.",
+  dgTable: "Los números dibujados en la imagen no están verificados: usa los datos verificados de abajo.", dgSpecH: "Datos verificados", dgJump: "Toca una parte para agregarla a tu trabajo",
+  dgSoon: "Diagrama despiezado para este modelo: próximamente.", dgYear: "Dibujado de un {d}. Tu {y} puede verse un poco diferente.",
+  dgSpecLoad: "Cargando datos oficiales…", dgSpecErr: "No se pudo consultar fueleconomy.gov.", dgSpecNone: "No hay ficha de la EPA para este año y modelo. Revisa la etiqueta en el marco de la puerta del conductor.",
+  dgSpecPick: "Escoge el año para ver los datos oficiales.", dgSrc: "Datos: EPA / DOE de EE. UU., fueleconomy.gov", dgParts: "Ver partes", dgClose: "Cerrar diagrama",
+  dgFoot: "Pellizca o toca dos veces para ampliar, arrastra para mover. Toca un punto para agregar esa parte. Ilustración con IA, no es diagrama de fábrica.",
+  dgAlt: "Ilustración despiezada de un {c} con sus partes principales", dgTitle: "{c}: vista despiezada",
+  sp_range: "{v} mi de autonomía EPA", sp_mpge: "{v} MPGe", sp_mpg: "{v} MPG combinado ({c} ciudad / {h} carretera)", sp_hybrid: "Híbrido",
   bellAria: "Alertas", close: "Cerrar", navSvc: "Servicios", navCar: "Tu carro", navTap: "Toca el carro", navQuote: "Cotización", navBook: "Agendar", navTrack: "Seguimiento", navAlerts: "Alertas",
   openNow: "Abierto · hasta las {t}", openLater: "Cerrado · abre {d} {t}", heroH: "Tráelo con Carlos. <em>O él va a ti.</em>",
   heroP: "Escoge tu carro, ve problemas conocidos, escanea la luz del motor, ve un precio en segundos y mira a Carlos trabajar en él, desde tu teléfono.",
@@ -532,7 +560,8 @@ es: {
 <script src="parts.js?v=20261013b"></script>
 <script src="obd.js?v=20261013b"></script>
 <script src="scene.js?v=20261013b"></script>
-<script src="app.js?v=20261013b"></script>
+<script src="diagrams.js?v=20261013e"></script>
+<script src="app.js?v=20261013d"></script>
 <script>(function(){var c=SHOP_CFG.colors;window.A2HS_CFG={name:SHOP_CFG.brand.name,theme:{bg:c.bg,bg2:c.panel2,edge:c.edge,accent:c.accent,accent2:c.accent2,ink:c.ink,dim:c.dim,btnInk:"#1d0b00",display:"Orbitron,sans-serif",body:"Rajdhani,system-ui,sans-serif"}};})();</script>
 <script src="../a2hs.js"></script>
 <script src="../seasons/seasons.js?v=20261013a" defer></script>

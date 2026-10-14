@@ -194,7 +194,7 @@
   var issuesKey = "";
   function carChanged(identity, fromGarage) {
     if (identity && !fromGarage && car.gid) { var g = gFind(car.gid); if (g && (g.year !== car.year || g.make !== car.make || g.model !== car.model)) { car.gid = ""; car.scans = []; delete car.pid; car.nick = ""; renderPhoto(); } }
-    saveCar(); fillDetails(); renderCar(false); renderTesla();
+    saveCar(); fillDetails(); renderCar(false); renderTesla(); renderDiagram();
     if (identity) loadIssues();
   }
   function resetSpecs() { ["trim", "engine", "cyl", "fuel", "drive", "lights", "abs", "vin", "vinModel", "paint"].forEach(function (k) { car[k] = ""; }); car.bodyManual = false; $("vin").value = ""; $("vinMsg").textContent = ""; }
@@ -1056,6 +1056,61 @@
     $("scanFor").textContent = carLabel() ? t("scanFor", { c: carLabel() }) + (car.gid ? "" : " " + t("scanSaveHint")) : "";
   }
 
+  /* ---------- exploded-view diagram (diagrams.js) + verified specs (fueleconomy.gov) ---------- */
+  var dgCur = null, dgView = null, dgSpecKey = "";
+  var DG_DEFAULT = ["hood", "bumperF", "lights", "motor", "battery", "suspF", "brakesF", "wheels", "interior", "hatch"];
+  function dgEV(m) { return PT.isEV(car) || !!(m && m.d.ev); }
+  function dgName() { return [title(car.make), car.model].filter(Boolean).join(" "); }
+  function renderDiagram() {
+    var card = $("dgmCard"), soon = $("dgSoon");
+    if (!W.DIAG || !car.make || car.make === "__other" || !car.model) { card.hidden = true; soon.hidden = true; dgCur = null; return; }
+    W.DIAG.load().then(function () {
+      var m = W.DIAG.match(car), ev = dgEV(m);
+      dgCur = m; card.hidden = !m; soon.hidden = !!m;
+      if (!m) return;
+      var d = m.d, src = W.DIAG.BASE + (d.small || d.file);
+      $("dgH").textContent = t("dgH", { c: dgName() });
+      if ($("dgImg").getAttribute("src") !== src) $("dgImg").src = src;
+      $("dgImg").style.aspectRatio = d.w && d.h ? d.w + " / " + d.h : "";
+      $("dgImg").alt = t("dgAlt", { c: dgName() });
+      $("dgTable").hidden = !d.imageHasSpecTable;
+      $("dgYear").hidden = m.yearOk; if (!m.yearOk) $("dgYear").textContent = t("dgYear", { d: d.drawn || d.years.join("–"), y: car.year });
+      var gs = (d.hotspots && d.hotspots.length ? d.hotspots.map(function (h) { return h.g; }) : DG_DEFAULT).filter(function (g, i, a) { return a.indexOf(g) === i && W.DIAG.groupFor(g, ev); });
+      $("dgChips").innerHTML = gs.map(function (g) { var G = W.DIAG.groupFor(g, ev); return '<button type="button" class="pill dgchip" data-g="' + g + '">' + G.icon + " " + esc(p(G.label)) + "</button>"; }).join("");
+      renderSpecs();
+    });
+  }
+  function renderSpecs() {
+    var box = $("dgSpec");
+    if (!car.year) { dgSpecKey = ""; box.innerHTML = '<p class="note">' + t("dgSpecPick") + "</p>"; return; }
+    var k = [car.year, car.make, car.model].join("|"); dgSpecKey = k;
+    box.innerHTML = '<p class="note">' + t("dgSpecLoad") + "</p>";
+    W.DIAG.specs(car.year, car.make, car.model).then(function (r) {
+      if (k !== dgSpecKey) return;
+      if (!r || r.err) { box.innerHTML = '<p class="note">' + t("dgSpecErr") + "</p>"; return; }
+      if (!r.rows.length) { box.innerHTML = '<p class="note">' + t("dgSpecNone") + "</p>"; return; }
+      box.innerHTML = r.rows.map(function (row) {
+        return '<div class="dgrow"><b>' + esc(r.year + " " + row.name) + "</b><span>" + row.bits.map(function (b) {
+          if (b.k === "range") return t("sp_range", { v: b.v });
+          if (b.k === "mpge") return t("sp_mpge", { v: b.v });
+          if (b.k === "mpg") return t("sp_mpg", { v: b.v, c: b.c, h: b.h });
+          if (b.k === "hybrid") return t("sp_hybrid");
+          return esc(b.v);
+        }).join(" · ") + "</span></div>";
+      }).join("") + '<p class="src">✓ <a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + t("dgSrc") + " ↗</a></p>";
+    });
+  }
+  function dgPick(g) {
+    var G = W.DIAG.groupFor(g, dgEV(dgCur)); if (!G) return;
+    openSheet(G.svc, { svc: G.svc, opt: G.opt, pos: G.pos, label: G.label });
+  }
+  $("dgChips").addEventListener("click", function (e) { var b = e.target.closest("[data-g]"); if (b) dgPick(b.getAttribute("data-g")); });
+  $("dgOpen").addEventListener("click", function () {
+    if (!dgCur) return;
+    if (!dgView) dgView = W.DIAG.Viewer({ onPick: dgPick });
+    dgView.open(dgCur.d, { title: t("dgTitle", { c: dgName() }), hsLabel: t("dgParts"), closeLabel: t("dgClose"), foot: t("dgFoot"), alt: t("dgAlt", { c: dgName() }), ev: dgEV(dgCur), esc: esc, p: p });
+  });
+
   /* ---------- sheets ---------- */
   var lastFocus = null;
   function open(id) { lastFocus = D.activeElement; var s = $(id); s.classList.add("on"); s.setAttribute("aria-hidden", "false"); setTimeout(function () { var f = s.querySelector(".x"); if (f) f.focus({ preventScroll: true }); }, 50); }
@@ -1087,7 +1142,7 @@
   /* ---------- boot ---------- */
   function renderAll() {
     brand(); heroScene(); renderSvcs(); renderBA(); fillYearMake(); fillDetails(); badge(); renderCar(false); renderJob(); renderDays(); renderHours(); renderTrack(); bell();
-    modelC.placeholder(t("pickModel")); if (modelMsg) $("modelMsg").textContent = t(modelMsg[0], modelMsg[1]); renderIssues(); renderScan(); renderPaint(); renderGarage(); renderTesla(); if (partsIt && $("partsSh").classList.contains("on")) drawParts();
+    modelC.placeholder(t("pickModel")); if (modelMsg) $("modelMsg").textContent = t(modelMsg[0], modelMsg[1]); renderIssues(); renderScan(); renderPaint(); renderGarage(); renderTesla(); renderDiagram(); if (partsIt && $("partsSh").classList.contains("on")) drawParts();
   }
   M.onLang(function () { if (booted) renderAll(); });
   var booted = false;

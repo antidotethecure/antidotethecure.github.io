@@ -523,3 +523,37 @@ footer.f .pw b{font-family:"Orbitron",sans-serif;font-size:11.5px;letter-spacing
 .tslinks li{margin:5px 0}
 .tslinks small{color:var(--dim)}
 .evnote{border-color:color-mix(in srgb,var(--accent2) 50%,var(--edge))}
+
+/* ---------- exploded-view diagram card + full-screen viewer (diagrams.js) ---------- */
+.dgm .sub{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2);font-weight:800;margin:14px 0 6px}
+.dgimg{display:block;position:relative;width:100%;padding:0;margin:8px 0 0;border:1px solid var(--edge);border-radius:14px;overflow:hidden;background:#f4f5f7;cursor:zoom-in}
+.dgimg img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:contain}
+.dgzoom{position:absolute;right:8px;bottom:8px;font:700 12px/1 "Rajdhani",sans-serif;letter-spacing:.04em;color:#fff;background:#04060cd0;border:1px solid #ffffff2a;border-radius:99px;padding:7px 11px}
+.dglbl{font-size:13px;color:var(--warn);margin:8px 0 0;line-height:1.35}
+.dglbl #dgTable{color:var(--dim)}
+.dgspec .dgrow{display:flex;flex-direction:column;gap:1px;padding:8px 10px;border:1px solid var(--edge);border-radius:12px;background:#ffffff06;margin:0 0 6px}
+.dgspec .dgrow b{font-size:15px}
+.dgspec .dgrow span{font-size:14px;color:var(--dim)}
+.dgspec .src a{color:var(--good)}
+.dgchip{cursor:pointer;font-size:14px;min-height:36px}
+html.dvlock,html.dvlock body{overflow:hidden}
+.dv{position:fixed;inset:0;z-index:95;display:flex;flex-direction:column;background:#04060c;opacity:0;pointer-events:none;transition:opacity .2s}
+.dv.on{opacity:1;pointer-events:auto}
+.dvbar{display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) 12px 10px}
+.dvbar .dvt{flex:1;min-width:0;font-family:"Orbitron",sans-serif;font-size:13px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dvhs{flex:none;min-height:40px;border-radius:99px;border:1px solid var(--edge);background:#ffffff08;color:var(--dim);font:700 13px "Rajdhani",sans-serif;padding:0 12px;cursor:pointer}
+.dvhs[aria-pressed=true]{color:#fff;border-color:var(--accent);background:color-mix(in srgb,var(--accent) 22%,transparent)}
+.dvx{flex:none;width:42px;height:42px;border-radius:50%;border:1px solid var(--edge);background:#ffffff08;color:var(--ink);font-size:18px;cursor:pointer}
+.dvstage{position:relative;flex:1;overflow:hidden;touch-action:none;background:#eef0f3;cursor:grab}
+.dvin{position:absolute;transform-origin:0 0;will-change:transform}
+.dvin img{display:block;width:100%;height:100%;user-select:none;-webkit-user-select:none;pointer-events:none}
+.dvspots{position:absolute;inset:0}
+.dvspot{position:absolute;transform:translate(-8px,-50%) scale(calc(1 / var(--z,1)));transform-origin:8px 50%;display:flex;align-items:center;gap:4px;padding:0;border:0;background:none;cursor:pointer}
+.dvspot::before{content:"";position:absolute;left:-8px;top:-8px;width:38px;height:38px}
+.dvspot i{display:block;width:16px;height:16px;flex:none;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 2px 6px #0006;animation:dvp 1.8s ease-out infinite}
+.dvspot span{font:700 13px/1 "Rajdhani",sans-serif;color:#fff;background:#04060ce0;border-radius:99px;padding:5px 8px;white-space:nowrap;display:none}
+.dvin.lbl .dvspot span{display:block}
+@keyframes dvp{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent),0 2px 6px #0006}100%{box-shadow:0 0 0 7px transparent,0 2px 6px #0006}}
+@media (prefers-reduced-motion:reduce){.dvspot i{animation:none}}
+.dv.nohs .dvspots{display:none}
+.dvfoot{margin:0;padding:8px 14px calc(10px + env(safe-area-inset-bottom));font-size:13px;color:var(--dim);text-align:center}

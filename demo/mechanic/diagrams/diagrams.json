@@ -555,6 +555,124 @@
           "y": 83.0
         }
       ]
+    },
+    {
+      "id": "chevrolet-silverado-1500",
+      "make": "Chevrolet",
+      "model": "Silverado 1500",
+      "aliases": [
+        "Silverado"
+      ],
+      "years": [
+        2019,
+        2025
+      ],
+      "drawn": "2022 Silverado 1500, Summit White",
+      "ev": false,
+      "file": "chevrolet-silverado-1500-full.webp",
+      "small": "chevrolet-silverado-1500-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-14",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 32.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 27.0
+        },
+        {
+          "g": "bumperF",
+          "x": 7.0,
+          "y": 52.0
+        },
+        {
+          "g": "bumperR",
+          "x": 90.0,
+          "y": 48.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 40.0
+        },
+        {
+          "g": "tail",
+          "x": 90.0,
+          "y": 42.0
+        },
+        {
+          "g": "motor",
+          "x": 20.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 34.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 51.0,
+          "y": 55.0
+        },
+        {
+          "g": "exhaust",
+          "x": 86.0,
+          "y": 56.0
+        },
+        {
+          "g": "suspF",
+          "x": 25.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 64.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesF",
+          "x": 8.0,
+          "y": 66.0
+        },
+        {
+          "g": "brakesR",
+          "x": 79.0,
+          "y": 68.0
+        },
+        {
+          "g": "wheels",
+          "x": 42.0,
+          "y": 67.0
+        },
+        {
+          "g": "doors",
+          "x": 65.0,
+          "y": 48.0
+        },
+        {
+          "g": "interior",
+          "x": 50.0,
+          "y": 40.0
+        },
+        {
+          "g": "hatch",
+          "x": 79.0,
+          "y": 30.0
+        },
+        {
+          "g": "dash",
+          "x": 18.0,
+          "y": 81.0
+        }
+      ]
     }
   ]
 }

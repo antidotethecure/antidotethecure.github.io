@@ -1952,6 +1952,11 @@
     var jb = $("nv-join"); if (jb && GP && GP.join) jb.onclick = function () { GP.join(function (r) { var m = (r && r.member) || (GP.member && GP.member());
         var got = r && r.pts != null ? r.pts : (aw ? aw.pts : 0); $("nv-pts").innerHTML = "Score " + sc.toLocaleString() + " → <b>" + worth + " points</b><br>✅ +" + got + " points saved to your Nalu Vida Rewards";
         if (m && !$("nv-n").value) $("nv-n").value = (m.name || "").split(" ")[0]; }); };
+    // PLAY FIRST, CLAIM AFTER (demo/claimscore.js): a guest's rank on this week's board + the "save your score" sheet (same SSAI_GATE
+    // "score" sheet as Post my score). Saving posts this ride with the same post() and saves the held Rewards points. No weekly prize here.
+    if (window.SSAI_CLAIM) SSAI_CLAIM.show({ key: BGAME, score: sc, board: { api: BAPI, game: BGAME, week: wkey() }, prize: false, fame: "ig", reason: "score", mount: $("nv-order"),
+      after: function (m) { if (m && !$("nv-n").value) $("nv-n").value = (m.name || "").split(" ")[0]; post(); var j = $("nv-join"); if (j) j.click(); },
+      again: function () { start(); }, alive: function () { return G.over && !G.running; } });
   }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function wkey(off) { var d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7) - 7 * (off || 0)); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }

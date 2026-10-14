@@ -70,7 +70,9 @@
         while (i < raw.length && seen < want.length) { if (/[a-z0-9]/.test(raw[i])) seen++; i++; }
         return i >= raw.length || !/[a-z0-9]/.test(raw[i]);
       });
-      /* skip hybrids/plug-ins only when there are more than 4 variants */
+      /* most common first: plain trims before AWD/4WD/hybrid/plug-in/performance variants, shorter names first */
+      var odd = function (v) { return (/hybrid|plug-in|phev|awd|4wd|performance|ffv|cng/i.test(v) ? 1 : 0); };
+      vs.sort(function (a, b) { return odd(a) - odd(b) || a.length - b.length || (a < b ? -1 : 1); });
       vs = vs.slice(0, 4);
       return Promise.all(vs.map(function (v) {
         return feGet("menu/options?year=" + y + "&make=" + encodeURIComponent(mk) + "&model=" + encodeURIComponent(v)).then(function (o) {

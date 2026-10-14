@@ -209,6 +209,7 @@ drawTabs();
 // Non-owners (managers + staff): only their restaurant(s) (the server sends nothing else), only the tabs their 🔐 switches
 // allow, no Scout actions / Remove duplicates / Team access. Owners: unchanged.
 function setRole(r){ ROLE=r.role==="manager"?"manager":"owner"; MGR=ROLE==="manager"; MYSLUGS=MGR?(r.slugs||[]):["melody-bar-grill","nalu-vida"]; PERMS=r.perms||{}; JOB=r.job||"";
+  if(!r.perms){ PERMS={}; PERMS_UI.forEach(function(x){ PERMS[x[0]]=true; }); JOB="manager"; }   // backend from before Team access (no perms sent): same view as before; the server still decides
   document.querySelectorAll(".seg [data-r]").forEach(function(b){ b.hidden=MGR&&b.dataset.r!=="all"&&MYSLUGS.indexOf(b.dataset.r)<0; });
   var allB=document.querySelector(".seg [data-r=all]"); if(allB) allB.hidden=MGR&&MYSLUGS.length<2;
   if(MGR&&(R==="all"?MYSLUGS.length<2:MYSLUGS.indexOf(R)<0)){ R=MYSLUGS.length>1?"all":(MYSLUGS[0]||"none"); document.querySelectorAll("[data-r]").forEach(function(x){ x.setAttribute("aria-pressed",x.dataset.r===R?"true":"false"); }); }

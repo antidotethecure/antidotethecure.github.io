@@ -42,34 +42,34 @@ TRIVIA: [
 ["Which singer is called \"Queen Bey\"?","Beyoncé","Rihanna","Alicia Keys","Mary J. Blige","music"],
 ["Tupac's \"California Love\" featured which producer?","Dr. Dre","Timbaland","Pharrell","Kanye West","music"],
 /* ---- food & drink ---- */
-["Guacamole is made mainly from…","Avocado","Tomatillo","Green pepper","Cucumber","food"],
+["Calamari is another name for which seafood?","Squid","Octopus","Shrimp","Clams","food"],
 ["Tequila is made from which plant?","Blue agave","Cactus","Sugarcane","Corn","food"],
-["Which spirit goes in a classic mojito?","Rum","Gin","Vodka","Whiskey","food"],
+["Which spirit is the base of an Old Fashioned?","Whiskey","Vodka","Gin","Rum","food"],
 ["Which spirit is the base of a Moscow Mule?","Vodka","Rum","Tequila","Bourbon","food"],
 ["A Moscow Mule is classically served in a mug made of…","Copper","Pewter","Glass","Clay","food"],
 ["Mac and cheese is usually made with which pasta shape?","Elbow macaroni","Penne","Spaghetti","Bowtie","food"],
-["Which nut is used in classic basil pesto?","Pine nuts","Walnuts","Almonds","Cashews","food"],
-["Sushi rice is seasoned with…","Rice vinegar","Soy sauce","Lime juice","Fish sauce","food"],
-["Which fruit is in a piña colada?","Pineapple","Mango","Banana","Papaya","food"],
+["Gorgonzola is what kind of cheese?","Blue cheese","Goat cheese","Smoked cheese","Cream cheese","food"],
+["Gorgonzola cheese comes from which country?","Italy","France","Switzerland","Spain","food"],
+["Fusilli pasta (the noodle in Melody's mac) is shaped like…","A corkscrew","A tube","A bow tie","A shell","food"],
 ["Espresso comes from which country?","Italy","France","Brazil","Spain","food"],
-["Hummus is made mainly from…","Chickpeas","Lentils","Black beans","Peas","food"],
-["Kimchi is a staple of which cuisine?","Korean","Japanese","Thai","Chinese","food"],
-["Risotto is made with which grain?","Rice","Quinoa","Barley","Couscous","food"],
+["Pot stickers are a kind of…","Dumpling","Egg roll","Noodle","Spring roll","food"],
+["A Paloma is tequila plus which fruit's flavor?","Grapefruit","Pineapple","Cherry","Watermelon","food"],
+["Carnitas is slow-cooked…","Pork","Beef","Chicken","Turkey","food"],
 ["Which of these peppers is the hottest?","Habanero","Jalapeño","Poblano","Bell pepper","food"],
-["Tempura comes from which country?","Japan","China","Vietnam","Korea","food"],
-["Which drink is made from fermented tea?","Kombucha","Horchata","Lassi","Kefir","food"],
-["French toast is soaked in…","Eggs and milk","Butter and sugar","Orange juice","Maple syrup","food"],
-["A mimosa is orange juice plus…","Sparkling wine","Vodka","Soda water","Lemonade","food"],
-["What is a \"slider\"?","A small burger","A thin pancake","A hot dog bun","A grilled cheese","food"],
-["Al pastor tacos were inspired by immigrants from which country?","Lebanon","Spain","Greece","Turkey","food"],
+["Chimichurri sauce comes from which country?","Argentina","Mexico","Spain","Peru","food"],
+["Panko is a kind of…","Breadcrumb","Noodle","Rice","Cheese","food"],
+["A bisque is a…","Smooth, creamy soup","Thin cracker","Spicy dip","Fried snack","food"],
+["A mimosa is orange juice plus…","Sparkling wine","Vodka","Soda water","Ginger beer","food"],
+["Classic French onion soup is topped with…","Melted cheese and bread","Sour cream","Crushed peanuts","Fresh cilantro","food"],
+["Pico de gallo is a fresh, chunky…","Salsa","Cheese","Tortilla","Bean dip","food"],
 ["Orange juice is famous for which vitamin?","Vitamin C","Vitamin D","Vitamin A","Vitamin K","food"],
-["Pho is a soup from which country?","Vietnam","Thailand","Cambodia","Laos","food"],
-["The Caesar salad was invented in which city?","Tijuana","Rome","New York","Paris","food"],
-["What are the chewy \"boba\" in bubble tea?","Tapioca pearls","Jelly beans","Rice balls","Chia seeds","food"],
-["Paella comes from which country?","Spain","Italy","Portugal","Mexico","food"],
+["A Michelada is made with…","Beer","Vodka","Gin","Whiskey","food"],
+["Gilroy, California calls itself the capital of which crop?","Garlic","Onions","Avocados","Lettuce","food"],
+["Sweet potato fries get their orange color from…","Beta-carotene","Food coloring","Paprika","Carrot juice","food"],
+["A ripe jalapeño left on the plant turns…","Red","Yellow","Purple","Black","food"],
 ["Which cheese is on a classic Philly cheesesteak, besides Provolone?","Cheez Whiz","Brie","Feta","Swiss","food"],
 ["Lemon pepper wings got famous in which city's wing spots?","Atlanta","Buffalo","Chicago","Houston","food"],
-["Horchata is usually made from…","Rice","Corn","Oats","Coconut","food"],
+["How much tea is in a Long Island Iced Tea?","None","One shot","Half the glass","A splash","food"],
 ["What is a margarita's classic citrus?","Lime","Lemon","Orange","Grapefruit","food"],
 ["An espresso martini is shaken with…","Coffee","Chocolate milk","Cola","Green tea","food"],
 /* ---- pop culture ---- */
@@ -257,7 +257,7 @@ TRUTHS: [
 "If you could only eat one thing on the Melody menu forever, what would it be?","What's the farthest you've ever flown?",
 "Window seat or aisle seat, and why?","What's a hidden talent of yours?","What's the best meal you've ever had?",
 "Which celebrity would you want to grab lunch with?","What's your favorite LA spot that most people don't know about?",
-"What was your first job?","What's a movie you can quote by heart?","Pineapple on pizza: yes or no? Defend your answer.",
+"What was your first job?","What's a movie you can quote by heart?","Ranch or buffalo with your wings? Defend your answer.",
 "What's your dream vacation?","Who at this table would last longest in a zombie movie?","What app do you open first in the morning?",
 "What song always gets you dancing?","What was your favorite cartoon as a kid?","What would your walk-up song be?",
 "What's your go-to drive-thru order?","What's one thing on your bucket list?","If you could live in any decade, which one?",
@@ -312,32 +312,32 @@ DARES: [
 ["Pretend you're a game-show host and introduce the table.",30],["Name 5 Dodgers or Lakers players in 20 seconds.",20]
 ],
 /* Melody Word: 5-letter answers, family-friendly. The day's word is picked by date (same for everyone that day). */
-WORDS: ("MUSIC DANCE TACOS PIZZA CHEER SALSA LEMON MANGO FRIES GRILL HONEY APPLE BEACH BLUES BREAD CANDY CHAIR CHORD CLOUD COAST "+
-"CRISP CROWN DREAM DRUMS EAGLE FEAST FIELD FLAME FLASH FLUTE FRESH FROST GIANT GLASS GRAPE GUEST HAPPY HEART HOTEL HOUSE "+
-"JUICE LASER LIGHT LUCKY LUNCH MAPLE MELON MIXER NACHO NIGHT OCEAN OLIVE ONION PARTY PEACH PIANO PILOT PLANE PLATE PRIZE "+
-"RADIO RANCH RHYME ROYAL SAUCE SCORE SHINE SKATE SLICE SMILE SOLAR SOUND SPICE SPOON STAGE STEAK STORM SUGAR SUNNY SWEET "+
-"TABLE TEMPO TOAST TOWER TRACK TRAIN TRUCK TULIP TUNES VOCAL WAFFLE WATER WHEAT WORLD YOUTH ZESTY ANGEL BACON BAGEL BASIL "+
-"BERRY BLEND BOOTH BRAVE BRUNCH BURST CABIN CAMEO CHILI CIDER CLASS CLOCK COCOA CORAL COUCH CREAM CREPE CURRY DAILY DELTA "+
-"DINER DISCO DOUGH EARTH ELBOW FAIRY FANCY FIBER FLOAT FOCUS FRAME FUDGE GLOVE GRAVY GREEN GUAVA HALLS HOTEL HUMOR IVORY "+
-"JELLY JOLLY KNEAD LATTE LAYER LEMON LEVEL LIMES LINEN LOCAL LOYAL MAGIC MARCH MEDAL METRO MINTY MOCHA MOTOR NOVEL OASIS "+
-"ORBIT PALMS PANEL PASTA PATIO PEARL PECAN PEPPY PIXEL PLAZA POINT POLAR POWER PRIME QUEST QUIET RAPID REIGN RIDGE RIVER "+
-"ROAST ROBIN ROUTE RUMBA SALAD SANDY SCONE SHAKE SHORE SKIES SLIDE SNACK SPARK SPRAY SQUAD STARS STEEL STEER STONE SUSHI "+
-"SWING SYRUP TANGO THYME TIGER TITAN TOPAZ TORCH TOTAL TREAT TREND TROPHY TWIRL ULTRA UNITY URBAN VALUE VENUE VIDEO VINYL "+
-"VIVID WAGON WAVES WHALE WHEEL WINGS WOVEN YACHT ZEBRA BANJO CELLO OPERA ALBUM BEATS LYRIC VERSE SOLOS NOTES CHOIR BRASS").split(" ")
+WORDS: ("MUSIC DANCE TACOS CHEER SALSA LEMON MANGO FRIES GRILL HONEY APPLE BEACH BLUES BREAD CHAIR CHORD CLOUD COAST CRISP CROWN "+
+"DREAM DRUMS EAGLE FEAST FIELD FLAME FLASH FLUTE FRESH FROST GIANT GLASS GUEST HAPPY HEART HOTEL HOUSE JUICE LASER LIGHT "+
+"LUCKY LUNCH MIXER NACHO NIGHT OCEAN OLIVE ONION PARTY PIANO PILOT PLANE PLATE PRIZE RADIO RANCH RHYME ROYAL SAUCE SCORE "+
+"SHINE SKATE SLICE SMILE SOLAR SOUND SPICE SPOON STAGE STEAK STORM SUGAR SUNNY SWEET TABLE TEMPO TOAST TOWER TRACK TRAIN "+
+"TRUCK TULIP TUNES VOCAL WATER WHEAT WORLD YOUTH ZESTY ANGEL BACON BLEND BOOTH BRAVE BURST CABIN CAMEO CHILI CLASS CLOCK "+
+"CORAL COUCH CREAM DAILY DELTA DINER DISCO EARTH ELBOW FAIRY FANCY FIBER FLOAT FOCUS FRAME GLOVE GREEN HALLS HOTEL HUMOR "+
+"IVORY JOLLY LAYER LEMON LEVEL LIMES LINEN LOCAL LOYAL MAGIC MARCH MEDAL METRO MINTY MOTOR NOVEL OASIS ORBIT PALMS PANEL "+
+"PASTA PATIO PEARL PEPPY PIXEL PLAZA POINT POLAR POWER PRIME QUEST QUIET RAPID REIGN RIDGE RIVER ROAST ROBIN ROUTE RUMBA "+
+"SANDY SHAKE SHORE SKIES SLIDE SNACK SPARK SPRAY SQUAD STARS STEEL STEER STONE SWING TANGO TIGER TITAN TOPAZ TORCH TOTAL "+
+"TREAT TREND TROPHY TWIRL ULTRA UNITY URBAN VALUE VENUE VIDEO VINYL VIVID WAGON WAVES WHALE WHEEL WINGS WOVEN YACHT ZEBRA "+
+"BANJO CELLO OPERA ALBUM BEATS LYRIC VERSE SOLOS NOTES CHOIR BRASS BEANS SWISS WRAPS SQUID PANKO CAJUN CRUST SOUPS BEERS "+
+"SHOTS SPICY AIOLI ANGUS MULES VODKA HERBS SALTY PATTY TAJIN SAUCY").split(" ")
   .filter(function (w, i, a) { return /^[A-Z]{5}$/.test(w) && a.indexOf(w) === i; }),
 /* Melody Mix (word scramble): [word, hint] */
 SCRAMBLE: [["GUITAR","Music"],["KARAOKE","Melody night"],["RUNWAY","LAX"],["AIRPORT","Next door"],["BURGER","Food"],["NACHOS","Food"],
-["WINGS","Food"],["WAFFLE","Brunch"],["OMELETTE","Brunch"],["MIMOSA","Brunch drink"],["MARGARITA","Drink"],["ESPRESSO","Coffee"],
+["WINGS","Food"],["PALOMA","Drink"],["MICHELADA","Drink"],["MIMOSA","Bubbles + OJ"],["MARGARITA","Drink"],["ESPRESSO","Martini"],
 ["DODGERS","LA team"],["LAKERS","LA team"],["CLIPPERS","LA team"],["GALAXY","LA team"],["SPARKS","LA team"],["CHARGERS","LA team"],
 ["ANGELS","Team / city nickname"],["SUNSET","LA boulevard"],["VENICE","Beach"],["MALIBU","Beach"],["HOLLYWOOD","LA"],["PACIFIC","Ocean"],
 ["PALMTREE","LA"],["FREEWAY","LA traffic"],["MICROPHONE","Karaoke"],["SPEAKER","Music"],["DRUMMER","Music"],["TRUMPET","Music"],
 ["CHORUS","Song part"],["MELODY","You're here"],["RHYTHM","Music"],["CONCERT","Music"],["PLAYLIST","Music"],["JUKEBOX","Bar"],
-["DARTBOARD","Bar game"],["TRIVIA","Bar game"],["HAPPYHOUR","3 to 6 daily"],["SLIDERS","Friday special"],["LOBSTER","Mac & cheese"],
-["CHEDDAR","Cheese"],["PRETZEL","Snack"],["AVOCADO","Toast"],["CHURRO","Dessert"],["TORTILLA","Tacos"],["JALAPENO","Spicy"],
+["DARTBOARD","Bar game"],["TRIVIA","Bar game"],["HAPPYHOUR","3 to 6 daily"],["CALAMARI","Starter"],["LOBSTER","Mac & cheese"],
+["CHEDDAR","Cheese"],["PRETZEL","Burger bun"],["AVOCADO","Toast"],["CARNITAS","Tacos"],["TORTILLA","Tacos"],["JALAPENO","Spicy"],
 ["PILOT","Cockpit"],["JETLAG","After a long flight"],["LUGGAGE","Travel"],["PASSPORT","Travel"],["BOARDING","Gate"],["TAKEOFF","Flight"],
 ["LANDING","Flight"],["COCKPIT","Plane"],["HELICOPTER","Flies"],["SKATEBOARD","Venice"],["SURFBOARD","Beach"],["TOUCHDOWN","Football"],
 ["HOMERUN","Baseball"],["SLAMDUNK","Basketball"],["PENALTY","Soccer"],["GOALIE","Soccer / hockey"],["STADIUM","Game day"],["MASCOT","Game day"],
 ["DUGOUT","Baseball"],["PITCHER","Baseball"],["QUARTERBACK","Football"],["REFEREE","Any sport"],["TROPHY","Winner"],["PLAYOFFS","Postseason"],
 ["SUNSHINE","LA weather"],["OBSERVATORY","Griffith"],["HIGHWAY","Road"],["TACOTRUCK","LA food"],["BOULEVARD","Big street"],["CANYON","Hills"],
-["COASTLINE","Beach"],["PIER","Santa Monica"],["CHEESEBURGER","Food"],["MILKSHAKE","Drink"],["LEMONADE","Drink"]]
+["COASTLINE","Beach"],["PIER","Santa Monica"],["GORGONZOLA","Burger cheese"],["POTSTICKERS","Starter"],["QUESADILLA","Cheesy"]]
 };

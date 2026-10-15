@@ -456,6 +456,14 @@
     $("fdOut").innerHTML = h;
   }
   $("fdForm").addEventListener("submit", function (e) { e.preventDefault(); if (!$("fdIn").value.trim()) { M.toast(t("fdEmpty")); return; } runFinder(); });
+  function probGo() {                                    // "What's going on?" box: same finder, then jump to the results
+    var v = $("problem").value.trim(); if (!v) { M.toast(t("fdEmpty")); $("problem").focus(); return; }
+    $("fdIn").value = v; runFinder(); setTimeout(function () { $("finder").scrollIntoView({ behavior: M.RM ? "auto" : "smooth", block: "start" }); }, 80);
+  }
+  $("probGo").addEventListener("click", probGo);
+  function enterGo(el, fn) { el.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); fn(); } }); }
+  enterGo($("problem"), probGo);
+  enterGo($("fdIn"), function () { $("fdForm").requestSubmit ? $("fdForm").requestSubmit() : $("fdForm").dispatchEvent(new Event("submit", { cancelable: true })); });
   var fdT = null;
   $("fdIn").addEventListener("input", function () { clearTimeout(fdT); fdT = setTimeout(runFinder, 450); });
   $("fdOut").addEventListener("click", function (e) {

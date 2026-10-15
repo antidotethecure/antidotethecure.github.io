@@ -64,7 +64,8 @@ window.SSAI_REWARDS={
   window.MELODY_REWARDS_ON=function(){ return on; };
   if(wk.flagUrl&&q.get("rewards")==null) fetch(wk.flagUrl,{cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(!j) return; if(typeof j.rewardsActive==="boolean") on=j.rewardsActive; if(j.prize) wk.prize=String(j.prize).slice(0,60); if(window.GameMenu) GameMenu.refresh(); }).catch(function(){});
 })();</script>
-<script src="../christian-live.js?v=lb2" data-slug="melody-bar-grill"></script>
+<script src="../christian-live.js?v=mg2" data-slug="melody-bar-grill"></script>
+<script src="menu-data.js?v=mg1"></script>
 <meta name="description" content="Melody Bar & Grill by LAX: drinks and food menu, Melody Rewards points, the Just Landed deal, and the Melody flight game.">
 <meta name="theme-color" content="#0b1220">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -349,7 +350,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 <h2 id="visit"><small>Come through</small>Visit Melody</h2>
 <div class="info">
   <div class="card"><b>Address</b>9132 S Sepulveda Blvd<br>Los Angeles, CA 90045<div class="btns" style="justify-content:flex-start"><a class="btn hot" href="https://www.google.com/maps/dir/?api=1&amp;destination=9132+S+Sepulveda+Blvd+Los+Angeles+CA+90045" target="_blank" rel="noopener">📍 Directions</a><a class="btn" href="tel:+13106701994">📞 Call</a></div></div>
-  <div class="card"><b>Happy hour &amp; specials</b>Happy hour 3–6 daily<br>Mon: half off burgers 11–3<br>Tue: $3 tacos &amp; $6 margaritas<br>Thu: half off sandwiches 11–3<br>Fri: $3 sliders 11–3</div>
+  <div class="card"><b>Happy hour &amp; specials</b><span id="hhlines">Happy hour 3–6 daily<br>Mon: half off burgers 11–3<br>Tue: $3 tacos &amp; $6 margaritas<br>Thu: half off sandwiches 11–3<br>Fri: $3 sliders 11–3</span></div>
   <div class="card"><b>Every week</b>Karaoke · live bands · DJs · trivia · every game on the TVs</div>
 </div>
 
@@ -385,69 +386,9 @@ function buzz(p){ if(navigator.vibrate) try{navigator.vibrate(p);}catch(e){} }
 
 /* ---------------- DATA (food prices from melodylax.com; drinks are sample prices) ---------------- */
 // [name, price, description, image key, effect]  effect: steam | herbs (parsley + steam) | none
-var FOOD=[
- {id:"starters",name:"Starters",items:[
-  ["Lemon Pepper Wings",16.00,"Crispy wings dusted in lemon pepper. Ranch or buffalo on the side.","wings","herbs"],
-  ["Avocado Toast",13.00,"Vine ripened avocados on sourdough with micro greens, tomato, olive oil, sea salt, lemon and a pinch of cayenne pepper.","avocado-toast","none"],
-  ["BBQ Rib Grilled Cheese Bites",15.00,"Melted jack and cheddar cheese with bbq baby back rib meat on grilled sourdough.","rib-grilled-cheese","steam"],
-  ["Buttermilk Chicken Strips & Fries",16.00,"Chicken breast dipped in buttermilk breading and fried. Served with ranch and bbq dipping sauce.","chicken-strips","steam"],
-  ["Chicken Pot Stickers",15.00,"Made with free range chicken, cabbage and garlic. Served with honey soy dipping sauce.","potstickers","steam"],
-  ["Fried Green Beans",13.00,"Hand battered green beans served with ranch and spicy aioli.","green-beans","steam"],
-  ["Fried Shrimp",18.25,"Southern spice blend, breaded and fried.","fried-shrimp","herbs"],
-  ["Jalapeno Calamari",16.00,"Lemon pepper breaded squid and jalapeno pieces lightly fried. Cocktail sauce & spicy aioli.","calamari","herbs"],
-  ["Lettuce Wraps",16.00,"Seasoned umami chicken, water chestnuts, onions, peanuts and cilantro.","lettuce-wraps","none"],
-  ["Baby Back Ribs & Fries",20.25,"Slow cooked baby back ribs slathered in our house-made bourbon BBQ sauce.","ribs","steam"]]},
- {id:"mac",name:"Mac & Cheese",note:"Fusilli in a creamy cheese blend, baked to order.",items:[
-  ["Lobster Mac & Cheese",21.50,"Fusilli in a creamy cheese blend with lobster and a baked parmesan crust.","lobster-mac","herbs"],
-  ["Melody Burger Mac & Cheese",19.25,"Ground beef, caramelized onions, spinach & gorgonzola.","burger-mac","herbs"],
-  ["Bacon, Cheddar & Jalapeno Mac & Cheese",17.25,"Caramelized bacon, cheddar cheese & jalapeno.","bacon-mac","steam"],
-  ["Chicken Parmesan Mac & Cheese",18.25,"Chicken parmesan in a vodka sauce.","chicken-parm-mac","herbs"],
-  ["Parmesan & Mushroom Mac & Cheese",17.25,"Baked parmesan and mushroom crust.","mushroom-mac","herbs"],
-  ["House Mac",15.00,"Fusilli pasta in a creamy cheese blend.","house-mac","steam"]]},
- {id:"burgers",name:"Burgers",note:"Mondays: half off burgers 11–3.",items:[
-  ["Melody Burger",19.25,"Grilled Angus beef on a pretzel bun with caramelized onions, Gorgonzola blue cheese, apple-smoked bacon, spinach & BBQ sauce. Served with fries.","melody-burger","steam"]]},
- {id:"fries",name:"Fries",items:[
-  ["Gilroy Garlic Fries",6.75,"Shoestring fries tossed with sizzling garlic & Italian herbs.","garlic-fries","herbs"],
-  ["Melody Fries",5.75,"Shoestring fries, sea salt & pepper. Add cheese +$2.00","melody-fries","steam"],
-  ["Onion Strings",9.75,"Fried onion strings served with jalapeño ketchup.","onion-strings","steam"],
-  ["Phat Fries",7.75,"Add cheese +$2.00","phat-fries","steam"],
-  ["Philly Cheese Steak Fries",17.25,"Shoestring fries topped with thinly sliced Angus steak, grilled onions, peppers, mushrooms & Swiss cheese.","philly-fries","steam"],
-  ["Sweet Potato Fries",7.75,"Served with spicy aioli dipping sauce.","sweet-potato-fries","steam"]]},
- {id:"soups",name:"Soups",items:[
-  ["French Onion Soup (Bowl)",15.00,"Served with grilled cheese dunker.","french-onion","steam"],
-  ["French Onion Soup (Cup)",11.00,"Served with 1/2 grilled cheese dunker.","french-onion","steam"],
-  ["Tomato Bisque Soup (Bowl)",15.00,"Served with grilled cheese dunker.","tomato-bisque","steam"],
-  ["Tomato Bisque Soup (Cup)",11.00,"Served with 1/2 grilled cheese dunker.","tomato-bisque","steam"],
-  ["Black Bean Soup (Bowl)",14.00,"Olive oil garlic toast.","black-bean-soup","steam"],
-  ["Black Bean Soup (Cup)",9.75,"Olive oil garlic toast.","black-bean-soup","steam"]]},
- {id:"tacos",name:"Tacos & Burritos",note:"Tuesdays: $3 tacos.",items:[
-  ["Shrimp Tacos",16.00,"2 tacos, cajun spiced shrimp sautéed with butter, garlic & onions, cabbage, cilantro, sweet honey jalapeños & spicy aioli.","shrimp-tacos","herbs"],
-  ["Salmon Tacos",16.00,"2 blackened salmon with onions, cilantro, lettuce, & creme de lemon.","salmon-tacos","herbs"],
-  ["Carnitas Tacos",14.00,"2 slow roasted pork topped with onions, cilantro & lettuce.","carnitas-tacos","herbs"],
-  ["Chicken Tacos",13.00,"2 grilled chicken tacos, onions, cilantro, & lettuce.","chicken-tacos","herbs"],
-  ["Avocado Tacos",13.00,"2 panko crusted avocado, chimichurri, onion, cilantro, tomato & cabbage.","avocado-tacos","herbs"],
-  ["Beyond Tacos",14.00,"2 tacos, beyond meat, black bean, pico de gallo, & lettuce.","beyond-tacos","herbs"],
-  ["Nachos",15.00,"Melted cheddar and jack, jalapenos, pico de gallo, & sour cream. + Chicken $4 · Pulled Pork $5 · Steak $6","nachos","steam"],
-  ["Cheese Quesadilla",15.00,"Melted mozzarella on a flour tortilla, salsa & sour cream.","quesadilla","steam"],
-  ["Carnitas Burrito",18.25,"Pulled pork, black beans, pico de gallo & shredded cheese.","carnitas-burrito","steam"],
-  ["Steak Burrito",18.25,"Chopped steak, black beans, pico de gallo & shredded cheese.","steak-burrito","steam"],
-  ["Chicken Burrito",17.25,"Chopped chicken, black beans, pico de gallo & shredded cheese.","chicken-burrito","steam"],
-  ["Bean & Cheese Burrito",14.00,"Black beans and shredded cheese.","bean-burrito","steam"]]}
-];
-// drinks: [name, price, description, image key, pour color]
-var DRINKS=[
- ["Mango Margarita",12,"Fresh mango, tequila, lime, chili-lime rim. A Melody favorite.","mango-marg","#f6a21a"],
- ["House Margarita",12,"Tequila, fresh lime, salted rim. $6 on Tuesdays.","margarita","#d9e88a"],
- ["Paloma",12,"Tequila, grapefruit, lime, salt rim.","paloma","#f7a0a0"],
- ["Old Fashioned",14,"Bourbon, bitters, orange peel, big rock.","old-fashioned","#b5651d"],
- ["Moscow Mule",13,"Vodka, ginger beer, lime, copper mug.","moscow-mule","#e8d9a0"],
- ["Espresso Martini",15,"Vodka, espresso, coffee liqueur.","espresso-martini","#3b2414"],
- ["Long Island",14,"Five spirits, cola, lemon.","long-island","#a0612a"],
- ["Michelada",10,"Cold beer, lime, spice, tajin rim.","michelada","#c2401f"],
- ["Draft Beer",8,"Ask what's on tap tonight.","draft-beer","#e9b83a"],
- ["Mimosa",10,"Bubbles and fresh orange juice.","mimosa","#ffb347"],
- ["Round of Shots",10,"Pick your tequila or whiskey. Per shot.","shots","#e0c27a"],
- ["Bucket of Beers (5)",30,"Five ice-cold bottles for the table.","beer-bucket","#e9b83a"]];
+// menu data lives in menu-data.js (shared with Christian HQ › Prices & specials); saved price changes are laid over it first
+var MENU=window.SSAI_MENU["melody-bar-grill"]; if(window.SSAI_CHRISTIAN&&SSAI_CHRISTIAN.applyMenu) SSAI_CHRISTIAN.applyMenu("melody-bar-grill",MENU);
+var FOOD=MENU.food, DRINKS=MENU.drinks;
 var CLIPS=window.MELODY_CLIPS||{};   // {imageKey: "img/clips/key.mp4"} — real pour / steam clips when they exist
 
 /* ---------------- seat ---------------- */
@@ -472,7 +413,9 @@ $("tbls").closest(".seat").addEventListener("click",function(e){   // the seat b
 var cart={}; try{ cart=JSON.parse(localStorage.getItem("melody-cart")||"{}"); }catch(e){}
 function card(it,drink){
   var key=it[3], q=cart[it[0]]?cart[it[0]].q:0, clip=CLIPS[key];
-  var media=drink
+  var media=it[5]   // a real photo added in Christian HQ (christian-live.js) replaces the standard picture
+    ? '<div class="media"><img loading="lazy" src="'+esc(it[5])+'" alt="'+esc(it[0])+'" width="720" height="720" style="object-fit:cover"></div>'
+    : drink
     ? '<div class="media" data-pc="'+it[4]+'"><img class="empty" loading="lazy" src="img/menu/'+key+(clip?'-empty':'')+'.jpg" alt="" onerror="this.style.display=\'none\'"><img class="full" loading="lazy" src="img/menu/'+key+'.jpg" alt="'+esc(it[0])+'" style="clip-path:inset(100% 0 0 0)">'+(clip?'<video muted playsinline preload="none" src="'+clip+'"></video>':'')+'<span class="stream"></span><span class="poured">Poured 🍸</span></div>'
     : '<div class="media" data-fx="'+it[4]+'"><img loading="lazy" src="img/menu/'+key+'.jpg" alt="'+esc(it[0])+'" width="720" height="720">'+(clip?'<video muted playsinline preload="none" src="'+clip+'"></video>':'')+'<span class="steam"><i></i><i></i><i></i></span><span class="herbs"></span></div>';
   return '<article class="item'+(drink?' drink':'')+'" data-name="'+esc(it[0])+'">'+media+
@@ -485,6 +428,11 @@ $("foodhost").innerHTML=FOOD.map(function(c){
   return '<section class="cat" id="cat-'+c.id+'"><h3>'+esc(c.name)+'</h3>'+(c.note?'<p class="note">'+esc(c.note)+'</p>':'')+'<div class="items">'+c.items.map(function(it){return card(it,false);}).join("")+'</div></section>';
 }).join("");
 var PRICE={}; FOOD.forEach(function(c){c.items.forEach(function(it){PRICE[it[0]]=it[1];});}); DRINKS.forEach(function(d){PRICE[d[0]]=d[1];});
+// happy-hour card + live price changes from Christian HQ (christian-live.js calls this when the saved menu changes)
+function drawHH(){ var h=$("hhlines"); if(h&&MENU.weekly&&MENU.weekly.length) h.innerHTML=MENU.weekly.map(esc).join("<br>"); }
+drawHH();
+window.SSAI_MENU_REDRAW=function(){ FOOD.forEach(function(c){c.items.forEach(function(it){PRICE[it[0]]=it[1];});}); DRINKS.forEach(function(d){PRICE[d[0]]=d[1];});
+  document.querySelectorAll(".item[data-name]").forEach(function(a){ var p=PRICE[a.dataset.name], s=a.querySelector(".pr"); if(s&&p!=null) s.textContent="$"+(+p).toFixed(2); }); drawHH(); };
 
 /* pour a drink: real pour clip if we have one, otherwise the glass fills from the bottom with a stream from above */
 function pour(m){
@@ -2678,7 +2626,7 @@ window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REW
 /* CUSTOMER-ONLY (2026-10-13): this is Melody's live customer app. No owner view, manager log, sales numbers, sample
    players or "Demo:" notes (crm.js, interim.js, nearby.js, specials.js read this flag). Owner tools = Christian HQ. */
 window.SSAI_CUSTOMER_ONLY=true;</script>
-<script src="../crm.js?v=cs1"></script><script src="../claimscore.js?v=cs1"></script><script src="games-data.js?v=mo1"></script><script src="games.js?v=gp1"></script>
+<script src="../crm.js?v=vl1"></script><script src="../claimscore.js?v=cs1"></script><script src="games-data.js?v=mo1"></script><script src="games.js?v=gp1"></script>
 <link rel="stylesheet" href="../sports/sports.css?v=sb2">
 <script>/* SPORTS BAR PACKAGE (demo/sports/README.md): Melody = install #1, LA/California teams. Perks text stays empty until
    Christian sets a real deal: an empty watchParty.text hides the banner (no made-up deals). */
@@ -2728,16 +2676,7 @@ window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",regio
 <script src="dish3d.js?v=d3d3"></script>
 <script src="../gamelock.js?v=ml1"></script>
 <script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
-window.SPECIALS=[
- {id:"halloween",holiday:"halloween",title:"Spooky Mac Night",desc:"Bacon, Cheddar & Jalapeño Mac & Cheese with a side of Phat Fries, all Halloween week.",item:"Bacon, Cheddar & Jalapeno Mac & Cheese",start:"10-20",end:"10-31",code:"BOO"},
- {id:"thanksgiving",holiday:"thanksgiving",title:"Harvest Soup & Bites",desc:"A bowl of Tomato Bisque with BBQ Rib Grilled Cheese Bites for dipping.",item:"BBQ Rib Grilled Cheese Bites",start:"11-20",end:"11-28"},
- {id:"christmas",holiday:"christmas",title:"Holiday Lobster Mac",desc:"Lobster Mac & Cheese with Gilroy Garlic Fries, the treat-yourself holiday plate.",item:"Lobster Mac & Cheese",start:"12-15",end:"12-25"},
- {id:"newyear",holiday:"newyear",title:"Countdown Wings",desc:"Lemon Pepper Wings for the table + 20% off Espresso Martinis (21+, with ID).",item:"Lemon Pepper Wings",start:"12-29",end:"01-01"},
- {id:"valentines",holiday:"valentines",title:"Date Night Tacos for Two",desc:"Shrimp Tacos and Salmon Tacos to share, plus Sweet Potato Fries.",item:"Shrimp Tacos",start:"02-07",end:"02-14"},
- {id:"stpatricks",holiday:"stpatricks",title:"Lucky Green Plate",desc:"Fried Green Beans + Chicken Pot Stickers, and 20% off Draft Beer (21+).",item:"Fried Green Beans",start:"03-14",end:"03-17"},
- {id:"cinco",holiday:"cinco",title:"Cinco Taco Fiesta",desc:"Carnitas Tacos + Nachos to share, and 20% off House Margaritas (21+).",item:"Carnitas Tacos",start:"05-01",end:"05-05"},
- {id:"july4",holiday:"july4",title:"Fourth of July Ribs",desc:"Baby Back Ribs & Fries with a side of Onion Strings for the fireworks crew.",item:"Baby Back Ribs & Fries",start:"07-01",end:"07-04"}
-];</script>
+window.SPECIALS=(window.SSAI_MENU["melody-bar-grill"].specials||[]).filter(function(s){ return s.on!==false; });   // from menu-data.js (+ saved changes)</script>
 <script src="../specials.js?v=co1"></script>
 <script src="../seasons/seasons.js?v=20261013a" defer></script>
 <script src="../poweredby.js?v=20261013a" defer></script>

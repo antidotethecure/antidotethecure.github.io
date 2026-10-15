@@ -64,7 +64,7 @@ window.SSAI_REWARDS={
   window.MELODY_REWARDS_ON=function(){ return on; };
   if(wk.flagUrl&&q.get("rewards")==null) fetch(wk.flagUrl,{cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(!j) return; if(typeof j.rewardsActive==="boolean") on=j.rewardsActive; if(j.prize) wk.prize=String(j.prize).slice(0,60); if(window.GameMenu) GameMenu.refresh(); }).catch(function(){});
 })();</script>
-<script src="../christian-live.js?v=mg1" data-slug="melody-bar-grill"></script>
+<script src="../christian-live.js?v=mg2" data-slug="melody-bar-grill"></script>
 <script src="menu-data.js?v=mg1"></script>
 <meta name="description" content="Melody Bar & Grill by LAX: drinks and food menu, Melody Rewards points, the Just Landed deal, and the Melody flight game.">
 <meta name="theme-color" content="#0b1220">
@@ -413,7 +413,9 @@ $("tbls").closest(".seat").addEventListener("click",function(e){   // the seat b
 var cart={}; try{ cart=JSON.parse(localStorage.getItem("melody-cart")||"{}"); }catch(e){}
 function card(it,drink){
   var key=it[3], q=cart[it[0]]?cart[it[0]].q:0, clip=CLIPS[key];
-  var media=drink
+  var media=it[5]   // a real photo added in Christian HQ (christian-live.js) replaces the standard picture
+    ? '<div class="media"><img loading="lazy" src="'+esc(it[5])+'" alt="'+esc(it[0])+'" width="720" height="720" style="object-fit:cover"></div>'
+    : drink
     ? '<div class="media" data-pc="'+it[4]+'"><img class="empty" loading="lazy" src="img/menu/'+key+(clip?'-empty':'')+'.jpg" alt="" onerror="this.style.display=\'none\'"><img class="full" loading="lazy" src="img/menu/'+key+'.jpg" alt="'+esc(it[0])+'" style="clip-path:inset(100% 0 0 0)">'+(clip?'<video muted playsinline preload="none" src="'+clip+'"></video>':'')+'<span class="stream"></span><span class="poured">Poured 🍸</span></div>'
     : '<div class="media" data-fx="'+it[4]+'"><img loading="lazy" src="img/menu/'+key+'.jpg" alt="'+esc(it[0])+'" width="720" height="720">'+(clip?'<video muted playsinline preload="none" src="'+clip+'"></video>':'')+'<span class="steam"><i></i><i></i><i></i></span><span class="herbs"></span></div>';
   return '<article class="item'+(drink?' drink':'')+'" data-name="'+esc(it[0])+'">'+media+

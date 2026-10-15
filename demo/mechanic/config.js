@@ -114,7 +114,7 @@ window.SHOP_CFG = {
         { id: "thermo", name: { en: "Thermostat", es: "Termostato" }, parts: [20, 80], hrs: [1, 2] }
       ] },
     { id: "susp", icon: "🧲", on: true, name: { en: "Suspension", es: "Suspensión" },
-      desc: { en: "Shocks, struts, links", es: "Amortiguadores, bases, rótulas" },
+      desc: { en: "Shocks, struts, control arms, links", es: "Amortiguadores, horquillas, rótulas, tornillos" },
       options: [
         { id: "inspect", name: { en: "Inspect clunks / noises", es: "Revisar ruidos" }, parts: [0, 0], hrs: [0.5, 0.75] },
         { id: "struts", name: { en: "Shocks / struts (pair)", es: "Amortiguadores (par)" }, parts: [200, 500], hrs: [2, 3.5], perAxle: true },

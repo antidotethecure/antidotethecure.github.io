@@ -113,7 +113,8 @@
         <label class="fld"><span data-t="milesL">Mileage</span><input id="miles" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="85,000"></label>
         <span></span>
       </div>
-      <label class="fld"><span data-t="probL">What's going on?</span><textarea id="problem" maxlength="400" data-t-ph="probPh" placeholder="Squeaks when I brake, check-engine light came on…"></textarea></label>
+      <label class="fld"><span data-t="probL">What's going on?</span><textarea id="problem" maxlength="400" enterkeyhint="search" data-t-ph="probPh" placeholder="Squeaks when I brake, check-engine light came on…"></textarea></label>
+      <button class="btn cyan w100" id="probGo" type="button" style="margin-top:8px" data-t="fdGo">🔎 Find the fix + price</button>
       <div class="carbadge" id="carBadge" hidden><span id="carMini"></span><div><b id="carName"></b><small id="carSub"></small></div></div>
       <button class="btn cyan w100" id="saveGarage" type="button" style="margin-top:10px" hidden data-t="saveGarage">🏠 Save to My Garage</button>
       <p class="src" data-t="vpicSrc">Make / model / VIN data: NHTSA vPIC (free public U.S. government database). Saved on this phone only.</p>
@@ -164,7 +165,7 @@
     <header><p class="kick" data-t="tapKick">Step 2</p><h2 class="chrome" data-t="tapH">Type it or tap it</h2><p class="lead" data-t="tapLead">Say what's wrong in your own words, or tap a glowing spot on the car.</p></header>
     <div class="card finder" id="finder">
       <form id="fdForm" autocomplete="off">
-        <label class="fld"><span data-t="fdL">What's wrong with it?</span><textarea id="fdIn" maxlength="300" rows="2" data-t-ph="fdPh" placeholder="Electrical is acting up, steering feels loose, control arm…"></textarea></label>
+        <label class="fld"><span data-t="fdL">What's wrong with it?</span><textarea id="fdIn" maxlength="300" enterkeyhint="search" rows="2" data-t-ph="fdPh" placeholder="Electrical is acting up, steering feels loose, control arm…"></textarea></label>
         <button class="btn cyan w100" type="submit" style="margin-top:8px" data-t="fdGo">🔎 Find the fix + price</button>
       </form>
       <p class="note" id="fdFor" aria-live="polite"></p>
@@ -586,7 +587,7 @@ es: {
 <script src="obd.js?v=20261013b"></script>
 <script src="scene.js?v=20261013b"></script>
 <script src="diagrams.js?v=20261013e"></script>
-<script src="app.js?v=20261015a"></script>
+<script src="app.js?v=20261015b"></script>
 <script>(function(){var c=SHOP_CFG.colors;window.A2HS_CFG={name:SHOP_CFG.brand.name,theme:{bg:c.bg,bg2:c.panel2,edge:c.edge,accent:c.accent,accent2:c.accent2,ink:c.ink,dim:c.dim,btnInk:"#1d0b00",display:"Orbitron,sans-serif",body:"Rajdhani,system-ui,sans-serif"}};})();</script>
 <script src="../a2hs.js"></script>
 <script src="../seasons/seasons.js?v=20261013a" defer></script>

@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
 <link rel="preconnect" href="https://vpic.nhtsa.dot.gov">
 <link rel="preconnect" href="https://api.nhtsa.gov">
-<link rel="stylesheet" href="app.css?v=20261014a">
+<link rel="stylesheet" href="app.css?v=20261015a">
 <link rel="stylesheet" href="beforeafter.css?v=20261013a">
 </head>
 <body>
@@ -32,7 +32,7 @@
   <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">EN</button><button data-lang="es" aria-pressed="false" lang="es">ES</button></div>
 </div></div>
 <nav class="snav" aria-label="Sections"><div class="wrap">
-  <a href="#services" data-t="navSvc">Services</a><a href="#garage" data-t="navGarage">My Garage</a><a href="#car" data-t="navCar">Your car</a><a href="#diagram" data-t="navTap">Tap the car</a><a href="#scan" data-t="navScan">Scan</a><a href="#quote" data-t="navQuote">Quote</a><a href="#book" data-t="navBook">Book</a><a href="#track" data-t="navTrack">Track</a><a href="#alerts" data-t="navAlerts">Alerts</a>
+  <a href="#services" data-t="navSvc">Services</a><a href="#garage" data-t="navGarage">My Garage</a><a href="#car" data-t="navCar">Your car</a><a href="#diagram" data-t="navTap">What's wrong</a><a href="#scan" data-t="navScan">Scan</a><a href="#quote" data-t="navQuote">Quote</a><a href="#book" data-t="navBook">Book</a><a href="#track" data-t="navTrack">Track</a><a href="#alerts" data-t="navAlerts">Alerts</a>
 </div></nav>
 
 <main class="wrap">
@@ -113,7 +113,8 @@
         <label class="fld"><span data-t="milesL">Mileage</span><input id="miles" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="85,000"></label>
         <span></span>
       </div>
-      <label class="fld"><span data-t="probL">What's going on?</span><textarea id="problem" maxlength="400" data-t-ph="probPh" placeholder="Squeaks when I brake, check-engine light came on…"></textarea></label>
+      <label class="fld"><span data-t="probL">What's going on?</span><textarea id="problem" maxlength="400" enterkeyhint="search" data-t-ph="probPh" placeholder="Squeaks when I brake, check-engine light came on…"></textarea></label>
+      <button class="btn cyan w100" id="probGo" type="button" style="margin-top:8px" data-t="fdGo">🔎 Find the fix + price</button>
       <div class="carbadge" id="carBadge" hidden><span id="carMini"></span><div><b id="carName"></b><small id="carSub"></small></div></div>
       <button class="btn cyan w100" id="saveGarage" type="button" style="margin-top:10px" hidden data-t="saveGarage">🏠 Save to My Garage</button>
       <p class="src" data-t="vpicSrc">Make / model / VIN data: NHTSA vPIC (free public U.S. government database). Saved on this phone only.</p>
@@ -161,7 +162,15 @@
   </section>
 
   <section class="s" id="diagram">
-    <header><p class="kick" data-t="tapKick">Step 2</p><h2 class="chrome" data-t="tapH">Tap the car</h2><p class="lead" data-t="tapLead">Tap a glowing spot to add that repair to your job.</p></header>
+    <header><p class="kick" data-t="tapKick">Step 2</p><h2 class="chrome" data-t="tapH">Type it or tap it</h2><p class="lead" data-t="tapLead">Say what's wrong in your own words, or tap a glowing spot on the car.</p></header>
+    <div class="card finder" id="finder">
+      <form id="fdForm" autocomplete="off">
+        <label class="fld"><span data-t="fdL">What's wrong with it?</span><textarea id="fdIn" maxlength="300" enterkeyhint="search" rows="2" data-t-ph="fdPh" placeholder="Electrical is acting up, steering feels loose, control arm…"></textarea></label>
+        <button class="btn cyan w100" type="submit" style="margin-top:8px" data-t="fdGo">🔎 Find the fix + price</button>
+      </form>
+      <p class="note" id="fdFor" aria-live="polite"></p>
+      <div id="fdOut" aria-live="polite"></div>
+    </div>
     <div class="views" role="group" data-t-aria="viewAria" aria-label="Car view">
       <button type="button" data-view="side" aria-pressed="true" data-t="vSide">Side</button>
       <button type="button" data-view="front" aria-pressed="false" data-t="vFront">Front</button>
@@ -228,6 +237,10 @@
       <div class="row" style="margin-top:12px">
         <a class="btn ghost" href="#book" data-t="pickTime">🗓️ Pick a time</a>
         <button class="btn primary" id="reqBtn" type="button" data-t="reqBtn">Request this job</button>
+      </div>
+      <div class="row qshare" id="qShare" hidden>
+        <button class="btn ghost small" id="qCopy" type="button" data-t="qCopy">📋 Copy quote</button>
+        <a class="btn ghost small" id="qText" href="sms:" data-t="qText">💬 Text quote</a>
       </div>
     </div>
   </section>
@@ -322,7 +335,7 @@ en: {
   dgFoot: "Pinch or double-tap to zoom, drag to move. Tap a dot to add that part to your job. AI illustration, not a factory diagram.",
   dgAlt: "Exploded-view illustration of a {c} showing its major parts", dgTitle: "{c}: exploded view",
   sp_range: "{v} mi EPA range", sp_mpge: "{v} MPGe", sp_mpg: "{v} MPG combined ({c} city / {h} hwy)", sp_hybrid: "Hybrid",
-  bellAria: "Alerts", close: "Close", navSvc: "Services", navCar: "Your car", navTap: "Tap the car", navQuote: "Quote", navBook: "Book", navTrack: "Track", navAlerts: "Alerts",
+  bellAria: "Alerts", close: "Close", navSvc: "Services", navCar: "Your car", navTap: "What's wrong", navQuote: "Quote", navBook: "Book", navTrack: "Track", navAlerts: "Alerts",
   openNow: "Open now · until {t}", openLater: "Closed now · opens {d} {t}", heroH: "Bring it to Carlos. <em>Or he comes to you.</em>",
   heroP: "Pick your car, see known issues, scan the check-engine light, get a price range in seconds and watch Carlos work on it, right here on your phone.",
   heroGo: "🔧 Build my quote", heroCall: "📞 Call / text",
@@ -334,7 +347,12 @@ en: {
   vinL: "VIN (optional)", vinPh: "17 characters", vinBtn: "Decode", vinBad: "A VIN is 17 letters and numbers (no I, O or Q).", vinLoading: "Decoding your VIN…",
   vinOk: "✅ Decoded: {c}", vinErr: "Couldn't decode that VIN. Check it, or pick the car above.", milesL: "Mileage", probL: "What's going on?", probPh: "Squeaks when I brake, check-engine light came on…",
   vpicSrc: "Make / model / VIN data: NHTSA vPIC (free public U.S. government database). Saved on this phone only.", milesSub: "{m} miles",
-  tapKick: "Step 2", tapH: "Tap the car", tapLead: "Tap a glowing spot to add that repair to your job.", viewAria: "Car view", vSide: "Side", vFront: "Front", vBack: "Back",
+    fdL: "What's wrong with it?", fdPh: "Electrical is acting up, steering feels loose, control arm…", fdGo: "🔎 Find the fix + price",
+  fdFor: "Prices for: {c}", fdForNone: "Pick your car in Step 1 for a closer price.", fdTier: "{t}: parts priced about {p}% higher", fdNone: "No match yet. Try other words (noise, light, leak, steering…), or start with a diagnosis:",
+  fdEmpty: "Type what you feel, hear or see.", fdAdd: "➕ Add {n} to my quote", fdAddNone: "Tick at least one repair", fdAdded: "✅ {n} added to your quote", fdSome: "Likely fixes: tick what you want quoted",
+  fdNote: "Sample prices. The real fix is confirmed after Carlos looks at it.", qCopy: "📋 Copy quote", qText: "💬 Text quote",
+  qTxtHead: "{b} · Quote (sample)", qTxtCar: "Car: {c}", qTxtProb: "Problem: {p}", qTxtTot: "Estimated total: {t}", qTxtSplit: "Parts {p} + labor {l} ({h} at {r}/h)", qTxtFoot: "Sample prices, final quote after inspection.", tierTag: "{t} parts pricing",
+  tapKick: "Step 2", tapH: "Type it or tap it", tapLead: "Say what's wrong in your own words, or tap a glowing spot on the car.", viewAria: "Car view", vSide: "Side", vFront: "Front", vBack: "Back",
   vSideL: "Driver side", vFrontL: "Front", vBackL: "Back", inJob: "in your job", tapHint: "Flip to Front / Back for the battery, A/C, the other tires and the trunk.",
   qKick: "Step 3", qH: "Instant quote", estTotal: "Estimated total", parts: "Parts", labor: "Labor ({h} × {r}/hr)", trip: "Trip fee", free: "Free", time: "Time on the car",
   arrive: "We arrive", readyBy: "Ready by about", disc: "⚠️ Sample prices, final quote after inspection.", pickTime: "🗓️ Pick a time", reqBtn: "Request this job",
@@ -442,7 +460,7 @@ es: {
   dgFoot: "Pellizca o toca dos veces para ampliar, arrastra para mover. Toca un punto para agregar esa parte. Ilustración con IA, no es diagrama de fábrica.",
   dgAlt: "Ilustración despiezada de un {c} con sus partes principales", dgTitle: "{c}: vista despiezada",
   sp_range: "{v} mi de autonomía EPA", sp_mpge: "{v} MPGe", sp_mpg: "{v} MPG combinado ({c} ciudad / {h} carretera)", sp_hybrid: "Híbrido",
-  bellAria: "Alertas", close: "Cerrar", navSvc: "Servicios", navCar: "Tu carro", navTap: "Toca el carro", navQuote: "Cotización", navBook: "Agendar", navTrack: "Seguimiento", navAlerts: "Alertas",
+  bellAria: "Alertas", close: "Cerrar", navSvc: "Servicios", navCar: "Tu carro", navTap: "Qué tiene", navQuote: "Cotización", navBook: "Agendar", navTrack: "Seguimiento", navAlerts: "Alertas",
   openNow: "Abierto · hasta las {t}", openLater: "Cerrado · abre {d} {t}", heroH: "Tráelo con Carlos. <em>O él va a ti.</em>",
   heroP: "Escoge tu carro, ve problemas conocidos, escanea la luz del motor, ve un precio en segundos y mira a Carlos trabajar en él, desde tu teléfono.",
   heroGo: "🔧 Armar mi cotización", heroCall: "📞 Llamar / mensaje",
@@ -454,7 +472,12 @@ es: {
   vinL: "VIN (opcional)", vinPh: "17 caracteres", vinBtn: "Decodificar", vinBad: "El VIN tiene 17 letras y números (sin I, O ni Q).", vinLoading: "Decodificando tu VIN…",
   vinOk: "✅ Decodificado: {c}", vinErr: "No se pudo decodificar. Revísalo o escoge el carro arriba.", milesL: "Millaje", probL: "¿Qué le pasa?", probPh: "Rechina al frenar, se prendió la luz del motor…",
   vpicSrc: "Datos de marca / modelo / VIN: NHTSA vPIC (base de datos pública y gratuita del gobierno de EE. UU.). Se guarda solo en este teléfono.", milesSub: "{m} millas",
-  tapKick: "Paso 2", tapH: "Toca el carro", tapLead: "Toca un punto brillante para agregar esa reparación.", viewAria: "Vista del carro", vSide: "Lado", vFront: "Frente", vBack: "Atrás",
+    fdL: "¿Qué tiene tu carro?", fdPh: "Falla lo eléctrico, la dirección está floja, la horquilla…", fdGo: "🔎 Buscar la reparación + precio",
+  fdFor: "Precios para: {c}", fdForNone: "Escoge tu carro en el Paso 1 para un precio más exacto.", fdTier: "{t}: piezas como {p}% más caras", fdNone: "Todavía no encontramos nada. Prueba otras palabras (ruido, luz, fuga, dirección…), o empieza con un diagnóstico:",
+  fdEmpty: "Escribe lo que sientes, oyes o ves.", fdAdd: "➕ Agregar {n} a mi cotización", fdAddNone: "Marca al menos una reparación", fdAdded: "✅ {n} agregadas a tu cotización", fdSome: "Reparaciones probables: marca lo que quieres cotizar",
+  fdNote: "Precios de muestra. La reparación real se confirma cuando Carlos lo revise.", qCopy: "📋 Copiar cotización", qText: "💬 Mandar por texto",
+  qTxtHead: "{b} · Cotización (muestra)", qTxtCar: "Carro: {c}", qTxtProb: "Problema: {p}", qTxtTot: "Total estimado: {t}", qTxtSplit: "Piezas {p} + mano de obra {l} ({h} a {r}/h)", qTxtFoot: "Precios de muestra, cotización final después de revisar.", tierTag: "Precio de piezas: {t}",
+  tapKick: "Paso 2", tapH: "Escríbelo o tócalo", tapLead: "Di qué tiene con tus palabras, o toca un punto brillante del carro.", viewAria: "Vista del carro", vSide: "Lado", vFront: "Frente", vBack: "Atrás",
   vSideL: "Lado del conductor", vFrontL: "Frente", vBackL: "Atrás", inJob: "en tu trabajo", tapHint: "Cambia a Frente / Atrás para la batería, el A/C, las otras llantas y la cajuela.",
   qKick: "Paso 3", qH: "Cotización al instante", estTotal: "Total estimado", parts: "Piezas", labor: "Mano de obra ({h} × {r}/h)", trip: "Visita", free: "Gratis", time: "Tiempo en el carro",
   arrive: "Llegamos", readyBy: "Listo aprox.", disc: "⚠️ Precios de muestra, cotización final después de revisar.", pickTime: "🗓️ Escoger hora", reqBtn: "Pedir este trabajo",
@@ -554,16 +577,17 @@ es: {
 }
 };
 </script>
-<script src="config.js?v=20261013b"></script>
-<script src="core.js?v=20261013c"></script>
+<script src="config.js?v=20261015b"></script>
+<script src="core.js?v=20261015a"></script>
 <script src="beforeafter.js?v=20261013a"></script>
 <script src="car.js?v=20261013b"></script>
 <script src="vehicle.js?v=20261013b"></script>
-<script src="parts.js?v=20261013b"></script>
+<script src="parts.js?v=20261015a"></script>
+<script src="symptoms.js?v=20261015a"></script>
 <script src="obd.js?v=20261013b"></script>
 <script src="scene.js?v=20261013b"></script>
 <script src="diagrams.js?v=20261013e"></script>
-<script src="app.js?v=20261014a"></script>
+<script src="app.js?v=20261015b"></script>
 <script>(function(){var c=SHOP_CFG.colors;window.A2HS_CFG={name:SHOP_CFG.brand.name,theme:{bg:c.bg,bg2:c.panel2,edge:c.edge,accent:c.accent,accent2:c.accent2,ink:c.ink,dim:c.dim,btnInk:"#1d0b00",display:"Orbitron,sans-serif",body:"Rajdhani,system-ui,sans-serif"}};})();</script>
 <script src="../a2hs.js"></script>
 <script src="../seasons/seasons.js?v=20261013a" defer></script>

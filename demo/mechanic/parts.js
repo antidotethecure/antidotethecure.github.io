@@ -80,8 +80,11 @@
   /* ---------- the job -> parts map ----------
      each part: n = list name, say = what to ask the counter for (with article), find = search words,
      q = what the counter will ask (engine / drive / trim / body / lights / abs), d = detail (fn(car) or {en,es}) */
+  var CORNER = { FL: L("front driver-side", "delantera del lado del conductor"), FR: L("front passenger-side", "delantera del lado del pasajero"),
+    RL: L("rear driver-side", "trasera del lado del conductor"), RR: L("rear passenger-side", "trasera del lado del pasajero") };
   var PAINT = L("Body parts arrive primed (unpainted). Paint matching is quoted separately after he sees the car.", "Las piezas de carrocería llegan con primer (sin pintar). La pintura se cotiza aparte cuando vea el carro.");
   function P(n, say, find, q, d) { return { n: n, say: say || n, find: find, q: q || [], d: d || null }; }
+  var ALIGN = P(L("Wheel alignment afterwards (recommended)", "Alineación después (recomendado)"), L("", ""), "", []);
   var NA_EV = L("Electric cars don't have this part. Nothing to buy here.", "Los carros eléctricos no tienen esta pieza. No hay nada que comprar.");
   var MAP = {
     "diag.scan": { none: L("No parts: scan + inspection labor only.", "Sin piezas: solo escaneo e inspección.") },
@@ -135,6 +138,10 @@
         P(L("Wheel alignment afterwards (recommended)", "Alineación después (recomendado)"), L("", ""), "", [])];
     } },
     "susp.links": { parts: function () { return [P(L("Sway bar end links (pair)", "Tornillos estabilizadores (par)"), L("a pair of front sway bar end links", "un par de tornillos estabilizadores delanteros"), "sway bar link", ["drive", "trim"])]; } },
+    "susp.lowerArm": { parts: function (c, it) { var d = CORNER[it.pos] || CORNER.FL; return [P(L("Lower control arm (" + d.en + ")", "Horquilla inferior (" + d.es + ")"), L("a " + d.en + " lower control arm", "una horquilla inferior " + d.es), d.en + " lower control arm", ["drive", "trim"], L("Most come with new bushings and the ball joint already pressed in: easier and usually worth it.", "Casi todas ya traen bujes nuevos y la rótula puesta: más fácil y normalmente vale la pena.")), ALIGN]; } },
+    "susp.upperArm": { parts: function (c, it) { var d = CORNER[it.pos] || CORNER.FL; return [P(L("Upper control arm (" + d.en + ")", "Horquilla superior (" + d.es + ")"), L("a " + d.en + " upper control arm", "una horquilla superior " + d.es), d.en + " upper control arm", ["drive", "trim"]), ALIGN]; } },
+    "susp.ball": { parts: function (c, it) { var d = CORNER[it.pos] || CORNER.FL; return [P(L("Ball joint (" + d.en + ")", "Rótula (" + d.es + ")"), L("a " + d.en + " ball joint", "una rótula " + d.es), d.en + " ball joint", ["drive", "trim"], L("On many cars the ball joint only comes with the control arm. The counter will tell you.", "En muchos carros la rótula solo viene con la horquilla. En el mostrador te dicen.")), ALIGN]; } },
+    "susp.bush": { parts: function () { return [P(L("Control arm bushings (pair)", "Bujes de horquilla (par)"), L("a pair of control arm bushings", "un par de bujes de horquilla"), "control arm bushing", ["drive", "trim"]), ALIGN]; } },
     "ac.recharge": { parts: function (c) { return [P(L("A/C refrigerant", "Gas refrigerante de A/C"), L("A/C refrigerant", "gas refrigerante para A/C"), "AC refrigerant", [], refrigerant), P(L("UV dye (optional)", "Tinte UV (opcional)"), L("A/C UV leak dye", "tinte UV para fugas de A/C"), "AC UV dye")]; } },
     "ac.leak": { parts: function (c) { return [P(L("UV dye + O-ring kit", "Tinte UV + kit de o-rings"), L("A/C UV dye and an O-ring kit", "tinte UV y un kit de o-rings para A/C"), "AC o-ring kit", [], refrigerant)]; } },
     "ac.cabin": { parts: function () { return [P(L("Cabin air filter", "Filtro de cabina"), L("a cabin air filter", "un filtro de cabina"), "cabin air filter", ["trim"])]; } },

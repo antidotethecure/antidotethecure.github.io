@@ -118,7 +118,11 @@ window.SHOP_CFG = {
       options: [
         { id: "inspect", name: { en: "Inspect clunks / noises", es: "Revisar ruidos" }, parts: [0, 0], hrs: [0.5, 0.75] },
         { id: "struts", name: { en: "Shocks / struts (pair)", es: "Amortiguadores (par)" }, parts: [200, 500], hrs: [2, 3.5], perAxle: true },
-        { id: "links", name: { en: "Sway bar links (pair)", es: "Tornillos estabilizadores (par)" }, parts: [40, 120], hrs: [1, 1.5] }
+        { id: "links", name: { en: "Sway bar links (pair)", es: "Tornillos estabilizadores (par)" }, parts: [40, 120], hrs: [1, 1.5] },
+        { id: "lowerArm", name: { en: "Lower control arm (this corner)", es: "Horquilla inferior (esta esquina)" }, parts: [70, 260], hrs: [1, 2], perWheel: true },
+        { id: "upperArm", name: { en: "Upper control arm (this corner)", es: "Horquilla superior (esta esquina)" }, parts: [60, 220], hrs: [1, 1.75], perWheel: true },
+        { id: "ball", name: { en: "Ball joint (this corner)", es: "Rótula (esta esquina)" }, parts: [35, 140], hrs: [1, 2], perWheel: true },
+        { id: "bush", name: { en: "Control arm bushings (pair)", es: "Bujes de horquilla (par)" }, parts: [40, 140], hrs: [2, 3] }
       ] },
     { id: "ac", icon: "❄️", on: true, name: { en: "A/C", es: "Aire acondicionado" },
       desc: { en: "Recharge, leak check, filter", es: "Recarga, fugas, filtro" },

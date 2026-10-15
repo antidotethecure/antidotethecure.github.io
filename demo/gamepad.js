@@ -15,7 +15,7 @@
      Start / Options  pause ↔ resume (gamepause.js), or PLAY on the start menu
      Select / Share   restart on the game-over screen, otherwise opens "How to play with a controller"
      LB / RB          per game (Melody: switch gun)     Triggers + right stick  scroll the page / panel in menus
-   Game profiles are detected from each game's own API object (__MG Melody, __S Storm Run, __NV Nalu Vida, __LD Hibachi
+   Game profiles are detected from each game's own API object (__MG Melody, __MD Menu Dash (Venue Versus), __S Storm Run, __NV Nalu Vida, __LD Hibachi
    Catch, __CL Loco Match, __OG Order Up!, the /try catch game), so copied pages work without config.
    Optional page config: window.GAMEPAD_CFG = { hint:"…", keys:{A:" ",X:"t"}, kind:"keys"|"pointer"|"nav" } (rarely needed).
    Locking: this file NEVER locks the screen (manual-only rule: only gamelock.js's lock button locks). It sends no touch
@@ -51,6 +51,10 @@
       hp: function () { return g(W.__MG, function (m) { return m.get().hp; }); },
       A: ["b", "KeyB"], X: ["e", "KeyE"], LB: ["q", "KeyQ"], RB: ["e", "KeyE"],
       hint: "Stick or D-pad: fly. Your guns fire on their own. A: speed boost. X, LB or RB: switch gun." },
+    { id: "dash", test: function () { return W.__MD; }, kind: "keys", canvas: "canvas#game",
+      running: function () { return g(W.__MD, function (m) { return !!m.get().running; }); },
+      A: [" ", "Space"], X: ["ArrowDown", "ArrowDown"],
+      hint: "A or up: jump (again in the air = double jump). X or down: slide. Menu Dash, Venue Versus." },
     { id: "storm", test: function () { return W.__S; }, kind: "keys", canvas: "canvas#game", repeat: { ArrowLeft: 1, ArrowRight: 1 },
       running: function () { return g(W.__S, function (s) { return !!s.get().running; }); },
       hp: function () { return g(W.__S, function (s) { return -(s.get().dmg || 0); }); },

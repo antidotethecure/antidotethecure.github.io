@@ -13,7 +13,11 @@
   var mine = M.lsGet(MKEY, []); if (!Array.isArray(mine)) mine = [];
   var prefs = M.lsGet(M.PKEY, { app: true, text: false, email: false, phone: "", email_: "" }) || {};
   var view = "side", dayIdx = 0, curReq = null;
-  function saveJob() { M.lsSet(JKEY, job); renderJob(); renderHotspots(); renderSvcs(); }
+  function saveJob() { stampTier(); M.lsSet(JKEY, job); renderJob(); renderHotspots(); renderSvcs(); }
+  /* parts price tier (performance trim / luxury make, config.partsTiers) rides on each job item as mult, so the shop page prices it the same */
+  function curTier() { return W.SYMPTOMS ? W.SYMPTOMS.tier(car, [car.problem, $("fdIn") ? $("fdIn").value : ""].join(" ")) : null; }
+  function stampTier() { var tr = curTier(); job.forEach(function (it) { if (tr) { it.mult = tr.mult; it.tier = tr.id; } else { delete it.mult; delete it.tier; } }); }
+  function withTier(it) { var tr = curTier(); if (tr) { it.mult = tr.mult; it.tier = tr.id; } return it; }
   function key(it) { return it.svc + "|" + it.opt + "|" + (it.pos || ""); }
 
   /* ---------- brand ---------- */
@@ -187,7 +191,7 @@
   var issuesKey = "";
   function carChanged(identity, fromGarage) {
     if (identity && !fromGarage && car.gid) { var g = gFind(car.gid); if (g && (g.year !== car.year || g.make !== car.make || g.model !== car.model)) { car.gid = ""; car.scans = []; delete car.pid; car.nick = ""; renderPhoto(); } }
-    saveCar(); fillDetails(); renderCar(false); renderTesla(); renderDiagram();
+    saveCar(); fillDetails(); renderCar(false); renderTesla(); renderDiagram(); saveJob(); renderFinder();
     if (identity) loadIssues();
   }
   function resetSpecs() { ["trim", "engine", "cyl", "fuel", "drive", "lights", "abs", "vin", "vinModel", "paint"].forEach(function (k) { car[k] = ""; }); car.bodyManual = false; $("vin").value = ""; $("vinMsg").textContent = ""; }
@@ -336,7 +340,7 @@
     }
     $("shPos").innerHTML = ph;
     $("shOpts").innerHTML = s.options.map(function (o) {
-      var pr = M.price({ svc: sh.svc, opt: o.id }), it = { svc: sh.svc, opt: o.id, pos: posFor(o, sh.pos) }, inj = job.some(function (j) { return key(j) === key(it); });
+      var pr = M.price(withTier({ svc: sh.svc, opt: o.id })), it = { svc: sh.svc, opt: o.id, pos: posFor(o, sh.pos) }, inj = job.some(function (j) { return key(j) === key(it); });
       return '<button type="button" class="op" data-op="' + o.id + '" aria-pressed="' + (!!sh.sel[o.id]) + '"><span class="r"></span><div><b>' + esc(p(o.name)) + "</b><small>" + t("parts") + " " + M.range(pr.pLo, pr.pHi) + " · " + M.hrs(pr.hLo, pr.hHi) + "</small>" +
         (inj ? '<span class="in">' + t("inJobTag") + "</span>" : "") + '</div><span class="pr">' + M.range(pr.lo, pr.hi) + "</span></button>";
     }).join("");
@@ -381,12 +385,14 @@
   }
   function renderJob() {
     var L = $("jobList");
+    $("qShare").hidden = !job.length;
     if (!job.length) { L.innerHTML = '<div class="empty">' + t("emptyJob") + "</div>"; $("tot").hidden = true; pill(); return; }
     L.innerHTML = job.map(function (it, i) {
       var s = M.svc(it.svc), o = M.opt(it.svc, it.opt); if (!s || !o) return "";
       var pr = M.price(it);
       return '<div class="ji"><span class="e" aria-hidden="true">' + s.icon + "</span><b>" + esc(p(s.name)) + '</b><span class="pr">' + M.range(pr.lo, pr.hi) + "</span><small>" + esc(p(o.name)) + (it.pos ? " · " + esc(p(M.POS[it.pos])) : "") + " · " + M.hrs(pr.hLo, pr.hHi) +
         (it.codes && it.codes.length ? '<span class="codes">' + t("fromCode", { c: it.codes.map(esc).join(", ") }) + "</span>" : "") +
+        (it.tier ? '<span class="codes">' + esc(t("tierTag", { t: tierName(it.tier) })) + "</span>" : "") +
         '</small><span class="jact"><button class="pbtn2" type="button" data-pi="' + i + '">🔩 ' + t("partsBtn") + '</button><button class="x" type="button" data-rm="' + i + '">' + t("remove") + "</button></span></div>";
     }).join("");
     var tt = M.total(job), cs = chosenSlot();
@@ -399,8 +405,73 @@
     $("tTime").textContent = M.hrs(tt.hLo, tt.hHi);
     $("tArr").textContent = cs ? (cs.auto ? t("nextOpen", { s: M.fWhen(cs.s.start) }) : M.fWhen(cs.s.start)) : "—";
     $("tReady").textContent = cs ? M.fWhen(M.readyBy(cs.s.start, tt.hHi)) : "—";
+    $("qText").href = "sms:" + (C.brand.sms || "") + (/iPhone|iPad|iPod/.test(navigator.userAgent) ? "&" : "?") + "body=" + encodeURIComponent(quoteText());
     pill();
   }
+  function tierName(id) { var x = (C.partsTiers || []).filter(function (y) { return y.id === id; })[0]; return x ? p(x.name) : ""; }
+  /* plain-text quote to copy or text (same numbers as the screen) */
+  function quoteText() {
+    var tt = M.total(job), L = [t("qTxtHead", { b: p(C.brand.name) })];
+    if (carLabel()) L.push(t("qTxtCar", { c: carLabel() }));
+    var pr0 = car.problem || ($("fdIn") ? $("fdIn").value.trim() : ""); if (pr0) L.push(t("qTxtProb", { p: pr0 }));
+    L.push("");
+    job.forEach(function (it) { var x = M.price(it); L.push("• " + M.itemName(it) + ": " + M.range(x.lo, x.hi)); });
+    L.push("", t("qTxtTot", { t: M.range(tt.lo, tt.hi) }), t("qTxtSplit", { p: M.range(tt.pLo, tt.pHi), l: M.range(tt.lLo, tt.lHi), h: M.hrs(tt.hLo, tt.hHi), r: M.money(C.laborRate) }));
+    var tr = job[0] && job[0].tier ? tierName(job[0].tier) : ""; if (tr) L.push(t("tierTag", { t: tr }));
+    L.push(t("qTxtFoot"));
+    return L.join("\n");
+  }
+  $("qCopy").addEventListener("click", function () { copyText(quoteText()).then(function (ok) { M.toast(ok ? t("copied") : t("copyFail")); }); });
+
+  /* ---------- type what's wrong (symptoms.js) ---------- */
+  var fd = { groups: [], sel: {}, text: "" };
+  function fdKey(f) { return f.svc + "." + f.opt; }
+  function fdItem(f) { var o = M.opt(f.svc, f.opt), it = { svc: f.svc, opt: f.opt }, ps = o ? posFor(o, null) : undefined; if (ps) it.pos = ps; return withTier(it); }
+  function runFinder() {
+    fd.text = $("fdIn").value.trim(); fd.groups = W.SYMPTOMS ? W.SYMPTOMS.match(fd.text) : []; fd.sel = {};
+    fd.groups.forEach(function (g) { g.fix.forEach(function (f) { if (f.sel) fd.sel[fdKey(f)] = true; }); });
+    if (fd.text && !fd.groups.length) fd.sel["diag.scan"] = true;
+    stampTier(); renderJob(); renderFinder();
+  }
+  function fdRow(f) {
+    var s = M.svc(f.svc), o = M.opt(f.svc, f.opt); if (!s || !o) return "";
+    var it = fdItem(f), pr = M.price(it), k = fdKey(f), inj = job.some(function (j) { return j.svc === f.svc && j.opt === f.opt; });
+    return '<button type="button" class="op" data-fd="' + k + '" aria-pressed="' + (!!fd.sel[k]) + '"><span class="r"></span><div><b>' + esc(p(o.name)) + "</b><small>" + s.icon + " " + esc(p(s.name)) + " · " + t("parts") + " " + M.range(pr.pLo, pr.pHi) + " · " + M.hrs(pr.hLo, pr.hHi) + "</small>" +
+      (inj ? '<span class="in">' + t("inJobTag") + "</span>" : "") + '</div><span class="pr">' + M.range(pr.lo, pr.hi) + "</span></button>";
+  }
+  function renderFinder() {
+    if (!$("fdOut")) return;
+    var lbl = carLabel(), tr = curTier();
+    $("fdFor").innerHTML = (lbl ? esc(t("fdFor", { c: lbl })) : esc(t("fdForNone"))) + (tr ? '<br><span class="pill acc" style="margin-top:6px">' + esc(t("fdTier", { t: p(tr.name), p: Math.round((tr.mult - 1) * 100) })) + "</span>" : "");
+    if (!fd.text) { $("fdOut").innerHTML = ""; return; }
+    var h = "";
+    if (!fd.groups.length) h = '<p class="note">' + t("fdNone") + '</p><div class="fdlist">' + fdRow({ svc: "diag", opt: "scan" }) + "</div>";
+    else h = '<p class="kick" style="margin:12px 0 4px">' + t("fdSome") + "</p>" + fd.groups.map(function (g) {
+      return '<div class="fdg"><h4><span aria-hidden="true">' + g.icon + "</span> " + esc(p(g.title)) + '</h4><p class="note">' + esc(p(g.why)) + '</p><div class="fdlist">' + g.fix.map(fdRow).join("") + "</div></div>";
+    }).join("");
+    var n = Object.keys(fd.sel).filter(function (k) { return fd.sel[k]; }).length, tot = { lo: 0, hi: 0 };
+    Object.keys(fd.sel).forEach(function (k) { if (!fd.sel[k]) return; var a = k.split("."), x = M.price(fdItem({ svc: a[0], opt: a[1] })); tot.lo += x.lo; tot.hi += x.hi; });
+    h += '<button class="btn primary w100" id="fdAdd" type="button" style="margin-top:12px"' + (n ? "" : " disabled") + ">" + (n ? t("fdAdd", { n: n }) + " · " + M.range(tot.lo, tot.hi) : t("fdAddNone")) + "</button>" +
+      '<p class="disc" style="margin-top:8px">' + t("fdNote") + "</p>";
+    $("fdOut").innerHTML = h;
+  }
+  $("fdForm").addEventListener("submit", function (e) { e.preventDefault(); if (!$("fdIn").value.trim()) { M.toast(t("fdEmpty")); return; } runFinder(); });
+  var fdT = null;
+  $("fdIn").addEventListener("input", function () { clearTimeout(fdT); fdT = setTimeout(runFinder, 450); });
+  $("fdOut").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-fd]");
+    if (b) { var k = b.getAttribute("data-fd"); fd.sel[k] = !fd.sel[k]; renderFinder(); return; }
+    if (!e.target.closest("#fdAdd")) return;
+    var addN = 0;
+    Object.keys(fd.sel).forEach(function (k) {
+      if (!fd.sel[k]) return; var a = k.split("."), it = fdItem({ svc: a[0], opt: a[1] });
+      if (!job.some(function (j) { return key(j) === key(it); })) { job.push(it); addN++; }
+    });
+    if (!car.problem && fd.text) { car.problem = fd.text; $("problem").value = fd.text; saveCar(); }
+    saveJob(); renderFinder();
+    M.toast(addN ? t("fdAdded", { n: addN }) : t("updated"));
+    setTimeout(function () { $("quote").scrollIntoView({ behavior: M.RM ? "auto" : "smooth" }); }, 150);
+  });
   $("jobList").addEventListener("click", function (e) { var pb = e.target.closest("[data-pi]"); if (pb) { openParts(job[+pb.getAttribute("data-pi")]); return; } var b = e.target.closest("[data-rm]"); if (!b) return; job.splice(+b.getAttribute("data-rm"), 1); saveJob(); M.toast(t("removed")); });
   function pill() {
     var el = $("jobpill"), tt = M.total(job);
@@ -1136,7 +1207,7 @@
   /* ---------- boot ---------- */
   function renderAll() {
     brand(); heroScene(); renderSvcs(); renderBA(); fillYearMake(); fillDetails(); badge(); renderCar(false); renderJob(); renderDays(); renderHours(); renderTrack(); bell();
-    modelC.placeholder(t("pickModel")); if (modelMsg) $("modelMsg").textContent = t(modelMsg[0], modelMsg[1]); renderIssues(); renderScan(); renderPaint(); renderGarage(); renderTesla(); renderDiagram(); if (partsIt && $("partsSh").classList.contains("on")) drawParts();
+    renderFinder(); modelC.placeholder(t("pickModel")); if (modelMsg) $("modelMsg").textContent = t(modelMsg[0], modelMsg[1]); renderIssues(); renderScan(); renderPaint(); renderGarage(); renderTesla(); renderDiagram(); if (partsIt && $("partsSh").classList.contains("on")) drawParts();
   }
   M.onLang(function () { if (booted) renderAll(); });
   var booted = false;

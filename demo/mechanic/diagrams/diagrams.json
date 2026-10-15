@@ -1248,6 +1248,107 @@
           "y": 80.0
         }
       ]
+    },
+    {
+      "id": "toyota-tacoma",
+      "make": "Toyota",
+      "model": "Tacoma",
+      "aliases": [],
+      "years": [
+        2016,
+        2023
+      ],
+      "drawn": "2021 Tacoma, Silver Sky",
+      "ev": false,
+      "file": "toyota-tacoma-full.webp",
+      "small": "toyota-tacoma-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-15",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 22.0,
+          "y": 32.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 39.0
+        },
+        {
+          "g": "bumperF",
+          "x": 6.0,
+          "y": 48.0
+        },
+        {
+          "g": "motor",
+          "x": 20.0,
+          "y": 46.0
+        },
+        {
+          "g": "trans",
+          "x": 32.0,
+          "y": 50.0
+        },
+        {
+          "g": "fuel",
+          "x": 51.0,
+          "y": 55.0
+        },
+        {
+          "g": "exhaust",
+          "x": 76.0,
+          "y": 55.0
+        },
+        {
+          "g": "suspF",
+          "x": 26.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 61.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesF",
+          "x": 8.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesR",
+          "x": 77.0,
+          "y": 65.0
+        },
+        {
+          "g": "wheels",
+          "x": 41.0,
+          "y": 66.0
+        },
+        {
+          "g": "doors",
+          "x": 64.0,
+          "y": 48.0
+        },
+        {
+          "g": "roof",
+          "x": 54.0,
+          "y": 26.0
+        },
+        {
+          "g": "tail",
+          "x": 90.0,
+          "y": 36.0
+        },
+        {
+          "g": "hatch",
+          "x": 82.0,
+          "y": 30.0
+        }
+      ]
     }
   ]
 }

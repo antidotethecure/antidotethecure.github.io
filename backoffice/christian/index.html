@@ -55,7 +55,7 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
 .tag.hot{background:#ff6b6b33;color:#ffb3b3}.tag.pw{background:#2fbf7126;color:#8ff0bd}.tag.br{background:#ffffff14;color:var(--dim)}
 .dim{color:var(--dim)}
 /* ✅ to-do list, pinned at the top (owner + manager) */
-.todo{border-color:#f5c40066}.todo h2{margin:0;display:flex;align-items:center;gap:8px}.badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 8px;border-radius:99px;background:var(--bad);color:#fff;font-size:14px;font-weight:900}.badge.z{background:var(--ok)}
+.todo{border:2px solid var(--bad);background:linear-gradient(#ff4d4d14,#ff4d4d05)}.todo h2{margin:0;color:#ff8a8a;display:flex;align-items:center;gap:8px}.badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 8px;border-radius:99px;background:var(--bad);color:#fff;font-size:14px;font-weight:900}.badge.z{background:var(--ok)}
 .ti{display:flex;align-items:stretch;gap:8px;margin:8px 0}.ti .go{flex:1;min-width:0;display:flex;gap:10px;align-items:center;text-align:left;background:var(--card2);border:1px solid var(--edge);border-radius:14px;padding:12px;color:var(--ink);cursor:pointer;min-height:56px;font:inherit}
 .ti .go:active{background:#ffffff14}.ti .go b{display:block;font-size:15px;line-height:1.3}.ti .go small{display:block;color:var(--dim);font-size:12.5px;margin-top:2px}.ti .dot{flex:none;width:12px;height:12px;border-radius:50%}.ti .p1{background:var(--bad)}.ti .p2{background:var(--warn)}.ti .p3{background:var(--gold)}.ti .p4,.ti .p5{background:var(--dim)}
 .ti .dn{flex:none;min-width:76px;border-radius:14px;border:1px solid var(--edge);background:#2fbf7122;color:#8ff0bd;cursor:pointer;font:inherit;font-weight:800}
@@ -63,7 +63,8 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
 .big{min-height:48px;font-size:16px}
 /* 💲 prices & specials */
 .mi{display:grid;grid-template-columns:1fr 110px 76px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #ffffff10}.mi b{font-size:15px}.mi small{display:block;color:var(--dim);font-size:12.5px}.mi input{width:100%;padding:12px 8px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px;text-align:right}
-.mi .btn{min-height:48px}.chg{color:var(--gold);font-weight:800}.mf label{display:block;font-size:13px;color:var(--dim);margin:10px 0 4px}.mf textarea{min-height:120px;font-family:inherit}
+.mi .btn{min-height:48px}.chg{color:var(--gold);font-weight:800}.nf{border:2px solid var(--bad)}.nf h2{color:#ff8a8a;margin:0 0 6px}.nf ul{margin:4px 0 10px;padding-left:20px}.nf li{margin:3px 0}.nt{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;background:#ff4d4d26;color:#ffb3b3;font-size:12px;font-weight:800}
+.mf label{display:block;font-size:13px;color:var(--dim);margin:10px 0 4px}.mf textarea{min-height:120px;font-family:inherit}
 .help p,.help li{font-size:16px;line-height:1.55}.help h3{margin-top:18px}
 @media (max-width:420px){.mi{grid-template-columns:1fr 92px 70px}}
 /* 🔐 team access: big phone-friendly switches */
@@ -122,7 +123,7 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
 </main>
 <script src="../../demo/christian-live.js?v=mg1"></script>
 <script src="squares-hq.js?v=sq2"></script>
-<script src="../../demo/melody-lax/menu-data.js?v=mg1"></script>
+<script src="../../demo/melody-lax/menu-data.js?v=mg2"></script>
 <script src="../../demo/listen.js?v=ls1"></script>
 <script>
 (function(){
@@ -547,6 +548,25 @@ function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY; if(!tabOk(
 var TODO_MORE=false, TODO_ADD=false;
 var TABNAME={team:"Team access",overview:"Overview",visits:"Visits",members:"Members",rewards:"Rewards & claims",scout:"Scout",games:"Games",discounts:"Discounts",menu:"Prices & specials",earlybird:"Early bird",staff:"Staff",squares:"Squares",audit:"Audit log",help:"Help",links:"Links"};
 function effMenu(s){ var base=window.SSAI_MENU&&SSAI_MENU[s]; if(!base) return null; var M=JSON.parse(JSON.stringify(base)); delete M._base; return LIVE.applyMenu?LIVE.applyMenu(s,M,(DATA.menu||{})[s]||null):M; }
+// 🛠️ MENU FIXES: which items still need a real photo, a confirmed price, or have no picture file at all (menu-data.js:
+// realPhotos / unconfirmed; missing files are found by loading each picture once). Feeds the red to-do + the Prices tab.
+var NOPIC={}, PICCHK={};
+function picCheck(s){ var B=window.SSAI_MENU&&SSAI_MENU[s]; if(!B||PICCHK[s]||s!=="melody-bar-grill") return; PICCHK[s]=1; NOPIC[s]={};
+  var all=[]; B.food.forEach(function(c){ c.items.forEach(function(it){ all.push(it); }); }); B.drinks.forEach(function(it){ all.push(it); });
+  all.forEach(function(it){ if(!it[3]) { NOPIC[s][it[0]]=1; return; } var im=new Image(); im.onerror=function(){ NOPIC[s][it[0]]=1; if(DATA){ drawTodo(); if(TAB==="menu") draw(); } }; im.src="../../demo/melody-lax/img/menu/"+it[3]+".jpg"; }); }
+function menuNeeds(s){ var B=window.SSAI_MENU&&SSAI_MENU[s]; if(!B) return null; picCheck(s);
+  var real={}, unc=B.unconfirmed||[], o={photo:[],price:[],nopic:[]}; (B.realPhotos||[]).forEach(function(n){ real[n]=1; });
+  var one=function(it,isDrink){ if(NOPIC[s]&&NOPIC[s][it[0]]) o.nopic.push(it[0]); else if(B.realPhotos&&!real[it[0]]) o.photo.push(it[0]);
+    if((isDrink&&unc.indexOf("drinks")>=0)||unc.indexOf(it[0])>=0) o.price.push(it[0]); };
+  B.food.forEach(function(c){ c.items.forEach(function(it){ one(it,false); }); }); B.drinks.forEach(function(it){ one(it,true); }); return o; }
+function needTags(o,name){ if(!o) return ""; return (o.nopic.indexOf(name)>=0?"<span class='nt'>🚫 no picture</span>":o.photo.indexOf(name)>=0?"<span class='nt'>📸 needs real photo</span>":"")+(o.price.indexOf(name)>=0?"<span class='nt'>💲 confirm price</span>":""); }
+function listNames(a,max){ return a.slice(0,max).join(", ")+(a.length>max?" + "+(a.length-max)+" more":""); }
+function needsCard(s){ var o=menuNeeds(s); if(!o||!(o.photo.length+o.price.length+o.nopic.length)) return "";
+  var ul=function(a){ return "<ul>"+a.map(function(n){ return "<li>"+esc(n)+"</li>"; }).join("")+"</ul>"; };
+  return "<div class='card nf' id='mneeds' style='margin-top:12px'><h2>🛠️ "+esc(NAMES[s])+" menu: needs fixing</h2>"+
+    (o.nopic.length?"<p><b>🚫 No picture at all ("+o.nopic.length+")</b>: guests see a blank spot.</p>"+ul(o.nopic):"")+
+    (o.price.length?"<p><b>💲 Price not confirmed ("+o.price.length+")</b>: these are sample prices. Check them against Toast, then fix any that are wrong below.</p>"+ul(o.price):"")+
+    (o.photo.length?"<p><b>📸 Needs a real photo ("+o.photo.length+")</b>: the app shows a made-up picture for now. Snap a well-lit photo of the plate and send it to Antidote.</p>"+ul(o.photo):"")+"</div>"; }
 function mdDays(md){ var y=new Date().getFullYear(), t=new Date(ymd(Date.now())+"T12:00:00"), d=new Date(y+"-"+md+"T12:00:00"); if(d<t) d=new Date((y+1)+"-"+md+"T12:00:00"); return Math.round((d-t)/DAY); }   // days until the NEXT time it's that date (0 = today)
 function mdLive(sp){ var td=ymd(Date.now()).slice(5); return sp.start<=sp.end?td>=sp.start&&td<=sp.end:td>=sp.start||td<=sp.end; }
 function autoTodos(){ var d=DATA, out=[], done={}, now=Date.now(); (d.todoDone||[]).forEach(function(k){ done[k]=1; });
@@ -569,6 +589,10 @@ function autoTodos(){ var d=DATA, out=[], done={}, now=Date.now(); (d.todoDone||
     if(hk.length) add("heavy_open",s,hk.slice().sort().join("."),3,now-2,hk.length+" phone"+(hk.length>1?"s":"")+" opening the app 10+ times a day",nm+" · could be a fan or someone farming points: tap to see "+(hk.length>1?"the busiest one":"it"),"visits",{dev:s+"|"+hk[0]});
     var M=effMenu(s); if(M) (M.specials||[]).forEach(function(sp){ if(sp.on===false||sp.price) return; var live=mdLive(sp), dd=live?0:mdDays(sp.start);
       if(live||dd<=21) add("special_price",s,sp.id+"|"+new Date().getFullYear(),live?1:2,now-3-dd,"Set a price for “"+sp.title+"”",nm+" · "+(live?"on now":"starts in "+dd+" day"+(dd===1?"":"s"))+": guests see it without a price","menu",{anchor:"sp-"+sp.id}); });
+    var N=menuNeeds(s); if(N){
+      if(N.nopic.length) add("menu_nopic",s,N.nopic.length+"|"+N.nopic.join(".").length,1,now-4,N.nopic.length+" menu item"+(N.nopic.length>1?"s have":" has")+" no picture",nm+" · "+listNames(N.nopic,4),"menu",{anchor:"mneeds"});
+      if(N.price.length) add("menu_price",s,N.price.length+"|"+N.price.join(".").length,1,now-5,N.price.length+" menu price"+(N.price.length>1?"s":"")+" to confirm",nm+" · sample prices: "+listNames(N.price,4),"menu",{anchor:"mneeds"});
+      if(N.photo.length) add("menu_photo",s,N.photo.length+"|"+N.photo.join(".").length,1,now-6,N.photo.length+" menu item"+(N.photo.length>1?"s need":" needs")+" a real photo",nm+" · "+listNames(N.photo,4),"menu",{anchor:"mneeds"}); }
     var E=((d.eb||{})[s]||{}).cfg||{}; if(E.on==="on"&&E.mode==="raffle"&&E.drawDate&&!E.drawn&&ymd(now)>=E.drawDate) add("raffle_draw",s,E.drawDate,1,now,"Draw the early-bird raffle winners",nm+" · the draw date ("+E.drawDate+") is here","earlybird");
     if(!MGR){ var ts=(LIVE.defaults[s]||{}).toastStatus||{}; if(ts.state==="tbd") add("toast_tbd",s,"tbd",3,0,"Confirm the "+nm+" Toast discount buttons are set up",ts.note||"","links"); } });
   if(!MGR&&d.mgr&&d.mgr.length){ var ch=(d.audit||[]).filter(function(a){ return d.mgr.indexOf(a.who)>=0&&now-a.ts<7*DAY&&!/^To-do/.test(a.field); });
@@ -609,7 +633,8 @@ function menu(){ var cP=can("prices"), cS=can("specials");
   var any=false;
   (LIVE.slugs||[]).filter(inR).forEach(function(s){ var M=effMenu(s), B=window.SSAI_MENU&&SSAI_MENU[s]; if(!M){ if(!MGR) h+="<h2>🏄 "+esc(NAMES[s])+"</h2><p class='note'>Nalu Vida's menu isn't set up for editing here yet. Ask Antidote.</p>"; return; } any=true;
     var q=MQ.toLowerCase(), row=function(it,base,cat){ if(q&&(it[0]+" "+cat).toLowerCase().indexOf(q)<0) return ""; var id=mid(s,it[0]), chg=+it[1]!==+base[1];
-      return "<div class='mi'><div><b>"+esc(it[0])+"</b><small>"+esc(cat)+(chg?" · <span class='chg'>changed</span> (menu: $"+(+base[1]).toFixed(2)+")":"")+"</small></div><input id='"+id+"' inputmode='decimal' aria-label='Price of "+esc(it[0])+"' value='"+(+it[1]).toFixed(2)+"' data-orig='"+(+it[1]).toFixed(2)+"'><button class='btn sm' "+mBtn(s,"price",it[0],it[0])+" data-for='"+id+"'>Save</button></div>"; };
+      return "<div class='mi'><div><b>"+esc(it[0])+"</b><small>"+esc(cat)+needTags(NO,it[0])+(chg?" · <span class='chg'>changed</span> (menu: $"+(+base[1]).toFixed(2)+")":"")+"</small></div><input id='"+id+"' inputmode='decimal' aria-label='Price of "+esc(it[0])+"' value='"+(+it[1]).toFixed(2)+"' data-orig='"+(+it[1]).toFixed(2)+"'><button class='btn sm' "+mBtn(s,"price",it[0],it[0])+" data-for='"+id+"'>Save</button></div>"; };
+    h+=needsCard(s); var NO=menuNeeds(s);
     if(cP){ h+="<h2>✈️ "+esc(NAMES[s])+" · prices</h2><div class='row' style='margin:6px 0'><input type='search' id='mq' placeholder='Find an item (e.g. wings, margarita)' value='"+esc(MQ)+"' aria-label='Find a menu item' style='min-height:48px;font-size:16px'></div><div class='card' style='padding:4px 12px'>";
     M.food.forEach(function(c,ci){ c.items.forEach(function(it,ii){ h+=row(it,B.food[ci].items[ii],c.name); }); });
     M.drinks.forEach(function(it,i){ h+=row(it,B.drinks[i],"Drinks"); });
@@ -629,9 +654,9 @@ function menu(){ var cP=can("prices"), cS=can("specials");
 function specialsView(M){ var h="<h2>🎉 Specials</h2><div class='dl'>"+M.specials.map(function(sp){ var on=sp.on!==false; return "<div class='dc'><b>"+esc(sp.title)+"</b> <span class='st "+(on?"done":"tbd")+"'>"+(on?"ON":"OFF")+"</span><div class='note'>"+esc(sp.start)+" → "+esc(sp.end)+(sp.price?" · "+esc(sp.price):"")+"</div><p style='margin:6px 0 0'>"+esc(sp.desc)+"</p></div>"; }).join("")+"</div>";
   return h+"<h2>🍻 Happy hour &amp; weekly specials</h2><div class='dc'>"+(M.weekly.length?M.weekly.map(function(l){ return "<p style='margin:4px 0;font-size:16px'>"+esc(l)+"</p>"; }).join(""):"<p class='note'>Nothing set.</p>")+"</div>"; }
 function menuView(){ var h="<div class='card help' style='margin-top:12px'><p style='margin:0'>What guests see in the app right now. Your login can <b>look</b> at the menu, specials and happy hour. To change them, ask Christian to turn it on for you.</p></div>", any=false;
-  (LIVE.slugs||[]).filter(inR).forEach(function(s){ var M=effMenu(s); if(!M) return; any=true; h+="<h2>"+(s==="nalu-vida"?"🏄 ":"✈️ ")+esc(NAMES[s])+"</h2>"+specialsView(M);
-    h+="<h2>💲 Prices</h2><div class='card' style='padding:4px 12px'>"+M.food.map(function(c){ return c.items.map(function(it){ return "<div class='mi' style='grid-template-columns:1fr auto'><div><b>"+esc(it[0])+"</b><small>"+esc(c.name)+"</small></div><b>$"+(+it[1]).toFixed(2)+"</b></div>"; }).join(""); }).join("")+
-      M.drinks.map(function(it){ return "<div class='mi' style='grid-template-columns:1fr auto'><div><b>"+esc(it[0])+"</b><small>Drinks</small></div><b>$"+(+it[1]).toFixed(2)+"</b></div>"; }).join("")+"</div>"; });
+  (LIVE.slugs||[]).filter(inR).forEach(function(s){ var M=effMenu(s); if(!M) return; any=true; h+="<h2>"+(s==="nalu-vida"?"🏄 ":"✈️ ")+esc(NAMES[s])+"</h2>"+needsCard(s)+specialsView(M); var NO=menuNeeds(s);
+    h+="<h2>💲 Prices</h2><div class='card' style='padding:4px 12px'>"+M.food.map(function(c){ return c.items.map(function(it){ return "<div class='mi' style='grid-template-columns:1fr auto'><div><b>"+esc(it[0])+"</b><small>"+esc(c.name)+needTags(NO,it[0])+"</small></div><b>$"+(+it[1]).toFixed(2)+"</b></div>"; }).join(""); }).join("")+
+      M.drinks.map(function(it){ return "<div class='mi' style='grid-template-columns:1fr auto'><div><b>"+esc(it[0])+"</b><small>Drinks"+needTags(NO,it[0])+"</small></div><b>$"+(+it[1]).toFixed(2)+"</b></div>"; }).join("")+"</div>"; });
   return any?h:h+"<p class='note'>This restaurant's menu isn't in HQ yet.</p>"; }
 // ---- 🔐 TEAM ACCESS (owners only): approve / decline staff requests, turn people on/off, job, restaurants, one switch per
 // thing they can do. Every tap goes to the server (bo_team), which saves it, logs it in the Audit log and emails the person.

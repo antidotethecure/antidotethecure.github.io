@@ -83,5 +83,10 @@ specials: [
  {id:"cinco",holiday:"cinco",title:"Cinco Taco Fiesta",desc:"Carnitas Tacos + Nachos to share, and 20% off House Margaritas (21+).",item:"Carnitas Tacos",start:"05-01",end:"05-05"},
  {id:"july4",holiday:"july4",title:"Fourth of July Ribs",desc:"Baby Back Ribs & Fries with a side of Onion Strings for the fireworks crew.",item:"Baby Back Ribs & Fries",start:"07-01",end:"07-04"}
 ],
+// What still needs fixing (shows on Christian HQ's red to-do list + the Prices tab). Update when it's fixed:
+//   realPhotos = dishes that already have a REAL photo (keep in step with realphotos.js); every other item needs one.
+//   unconfirmed = "drinks" while the drink prices are still samples, plus any item name whose price/description Melody must check.
+realPhotos: ["Lemon Pepper Wings","Lobster Mac & Cheese","Melody Burger Mac & Cheese","Chicken Parmesan Mac & Cheese","Mango Margarita"],
+unconfirmed: ["drinks"],
 weekly: ["Happy hour 3–6 daily","Mon: half off burgers 11–3","Tue: $3 tacos & $6 margaritas","Thu: half off sandwiches 11–3","Fri: $3 sliders 11–3"]
 };

@@ -65,8 +65,8 @@
     if (!M._base) M._base = JSON.stringify({ food: M.food, drinks: M.drinks, specials: M.specials, weekly: M.weekly });
     var B = JSON.parse(M._base);
     // write back into the SAME arrays/objects (the page holds references to them)
-    (M.food || []).forEach(function (c, i) { c.items.forEach(function (it, j) { it[1] = B.food[i].items[j][1]; }); });
-    (M.drinks || []).forEach(function (d, i) { d[1] = B.drinks[i][1]; });
+    (M.food || []).forEach(function (c, i) { c.items.forEach(function (it, j) { it[1] = B.food[i].items[j][1]; if (it.length > 5) it.length = 5; }); });
+    (M.drinks || []).forEach(function (d, i) { d[1] = B.drinks[i][1]; if (d.length > 5) d.length = 5; });
     (M.specials || []).forEach(function (sp, i) { var b = B.specials[i]; ["title", "desc", "price"].forEach(function (k) { if (b[k] == null) delete sp[k]; else sp[k] = b[k]; }); sp.on = b.on !== false; });
     if (M.weekly) { M.weekly.length = 0; (B.weekly || []).forEach(function (l) { M.weekly.push(l); }); }
     if (!o) return M;
@@ -77,6 +77,10 @@
       if (x.on === "off") sp.on = false; else if (x.on === "on") sp.on = true;
       var t = txt(x.title); if (t) sp.title = t; if (x.desc) { var d = String(x.desc).replace(/[<>]/g, "").trim().slice(0, 200); if (d.length >= 3) sp.desc = d; }
       var v = pr(x.price); if (v != null) sp.price = "$" + v.toFixed(2); });
+    // 📸 real photos added in Christian HQ (o.ph = {item: Drive file id}) → it[5] = picture URL, shown instead of the standard one
+    var PH = o.ph || {}, pu = function (n) { var f = PH[n]; return typeof f === "string" && /^[A-Za-z0-9_-]{20,80}$/.test(f) ? "https://lh3.googleusercontent.com/d/" + f + "=w1080" : null; };
+    (M.food || []).forEach(function (c) { c.items.forEach(function (it) { var u = pu(it[0]); if (u) it[5] = u; }); });
+    (M.drinks || []).forEach(function (d) { var u = pu(d[0]); if (u) d[5] = u; });
     if (o.hh && M.weekly) { var ls = String(o.hh).split("\n").map(function (l) { return l.replace(/[<>]/g, "").trim().slice(0, 70); }).filter(Boolean).slice(0, 8); if (ls.length) { M.weekly.length = 0; ls.forEach(function (l) { M.weekly.push(l); }); } }
     return M;
   }

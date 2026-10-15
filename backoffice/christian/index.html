@@ -63,7 +63,7 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
 .big{min-height:48px;font-size:16px}
 /* 💲 prices & specials */
 .mi{display:grid;grid-template-columns:1fr 110px 76px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #ffffff10}.mi b{font-size:15px}.mi small{display:block;color:var(--dim);font-size:12.5px}.mi input{width:100%;padding:12px 8px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px;text-align:right}
-.mi .btn{min-height:48px}.chg{color:var(--gold);font-weight:800}.nf{border:2px solid var(--bad)}.nf h2{color:#ff8a8a;margin:0 0 6px}.nf ul{margin:4px 0 10px;padding-left:20px}.nf li{margin:3px 0}.nt{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;background:#ff4d4d26;color:#ffb3b3;font-size:12px;font-weight:800}
+.mi .btn{min-height:48px}.chg{color:var(--gold);font-weight:800}.nf{border:2px solid var(--bad)}.nf h3{margin:14px 0 4px;font-size:16px}.nx{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #ffffff10;flex-wrap:wrap}.nx>div{flex:1;min-width:140px}.nx b{display:block;font-size:15px}.nx small{display:block;color:var(--dim);font-size:12.5px}.nx img{width:64px;height:64px;object-fit:cover;border-radius:10px}.nb{display:flex;gap:6px;align-items:center}.nb input{width:96px;padding:12px 8px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px;text-align:right}.nf h2{color:#ff8a8a;margin:0 0 6px}.nf ul{margin:4px 0 10px;padding-left:20px}.nf li{margin:3px 0}.nt{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;background:#ff4d4d26;color:#ffb3b3;font-size:12px;font-weight:800}
 .mf label{display:block;font-size:13px;color:var(--dim);margin:10px 0 4px}.mf textarea{min-height:120px;font-family:inherit}
 .help p,.help li{font-size:16px;line-height:1.55}.help h3{margin-top:18px}
 @media (max-width:420px){.mi{grid-template-columns:1fr 92px 70px}}
@@ -121,7 +121,7 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
   <p class="note" id="stamp"></p>
 </section>
 </main>
-<script src="../../demo/christian-live.js?v=mg1"></script>
+<script src="../../demo/christian-live.js?v=mg2"></script>
 <script src="squares-hq.js?v=sq2"></script>
 <script src="../../demo/melody-lax/menu-data.js?v=mg2"></script>
 <script src="../../demo/listen.js?v=ls1"></script>
@@ -160,7 +160,7 @@ function api(body){
   if(!API) return Promise.resolve({ok:false,reason:"Backend not connected yet."});
   return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(body)}).then(function(r){ return r.json(); }).catch(function(){ return {ok:false,reason:"Can't reach the backend. Check the connection."}; });
 }
-function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=tm1"; s.onload=cb; document.head.appendChild(s); }
+function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=tm3"; s.onload=cb; document.head.appendChild(s); }
 if(TEST) $("testBar").hidden=false; else if(!API) $("notConn").hidden=false;
 try{ TOKEN=sessionStorage.getItem(TKEY); }catch(e){}
 // Speed: wake the Apps Script backend as soon as the page opens (cold starts take 5-10 s), so it's warm by the time you tap Log in.
@@ -530,6 +530,7 @@ function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY; if(!tabOk(
     hid.value=JSON.stringify(a); var su=box.querySelector("[data-sum]"); if(su) su.textContent=/slices/.test(box.dataset.led)?"Total: "+sum+"%"+(sum===100?" ✓":" (must be 100)"):a.reduce(function(x,y){ return x+y[1]; },0)+" winner(s) in all"; };
     box.addEventListener("input",up); up(); });
   p.querySelectorAll("[data-save]").forEach(function(b){ b.onclick=function(){ saveFlow(b); }; });
+  bindNeeds(p);
   p.querySelectorAll("[data-scout]").forEach(function(b){ b.onclick=function(){ scoutAsk(b); }; });
   p.querySelectorAll("[data-cd]").forEach(function(b){ b.onclick=function(){ CDAYS=+b.dataset.cd; draw(); }; });
   p.querySelectorAll("[data-goto]").forEach(function(b){ b.onclick=function(e){ e.preventDefault(); goTab(b.dataset.goto); }; });
@@ -555,18 +556,42 @@ function picCheck(s){ var B=window.SSAI_MENU&&SSAI_MENU[s]; if(!B||PICCHK[s]||s!
   var all=[]; B.food.forEach(function(c){ c.items.forEach(function(it){ all.push(it); }); }); B.drinks.forEach(function(it){ all.push(it); });
   all.forEach(function(it){ if(!it[3]) { NOPIC[s][it[0]]=1; return; } var im=new Image(); im.onerror=function(){ NOPIC[s][it[0]]=1; if(DATA){ drawTodo(); if(TAB==="menu") draw(); } }; im.src="../../demo/melody-lax/img/menu/"+it[3]+".jpg"; }); }
 function menuNeeds(s){ var B=window.SSAI_MENU&&SSAI_MENU[s]; if(!B) return null; picCheck(s);
-  var real={}, unc=B.unconfirmed||[], o={photo:[],price:[],nopic:[]}; (B.realPhotos||[]).forEach(function(n){ real[n]=1; });
-  var one=function(it,isDrink){ if(NOPIC[s]&&NOPIC[s][it[0]]) o.nopic.push(it[0]); else if(B.realPhotos&&!real[it[0]]) o.photo.push(it[0]);
-    if((isDrink&&unc.indexOf("drinks")>=0)||unc.indexOf(it[0])>=0) o.price.push(it[0]); };
+  var real={}, unc=B.unconfirmed||[], sv=(DATA&&DATA.menu&&DATA.menu[s])||{}, P=sv.p||{}, PH=sv.ph||{}, o={photo:[],price:[],nopic:[],wait:[],live:[]}; (B.realPhotos||[]).forEach(function(n){ real[n]=1; });
+  var W={}; ((DATA&&DATA.photos)||[]).forEach(function(x){ if(x.slug===s&&x.status==="pending"){ W[x.item]=1; o.wait.push(x); } });
+  Object.keys(PH).forEach(function(n){ o.live.push(n); });
+  var one=function(it,isDrink){ var nm=it[0]; if(PH[nm]){} else if(W[nm]){} else if(NOPIC[s]&&NOPIC[s][nm]) o.nopic.push(nm); else if(B.realPhotos&&!real[nm]) o.photo.push(nm);
+    if(((isDrink&&unc.indexOf("drinks")>=0)||unc.indexOf(nm)>=0)&&!(nm in P)) o.price.push(nm); };
   B.food.forEach(function(c){ c.items.forEach(function(it){ one(it,false); }); }); B.drinks.forEach(function(it){ one(it,true); }); return o; }
-function needTags(o,name){ if(!o) return ""; return (o.nopic.indexOf(name)>=0?"<span class='nt'>🚫 no picture</span>":o.photo.indexOf(name)>=0?"<span class='nt'>📸 needs real photo</span>":"")+(o.price.indexOf(name)>=0?"<span class='nt'>💲 confirm price</span>":""); }
+function needTags(o,name){ if(!o) return ""; if(o.wait.some(function(x){ return x.item===name; })) return "<span class='nt' style='background:#f5c40026;color:#ffe08a'>⏳ photo waiting for OK</span>"+(o.price.indexOf(name)>=0?"<span class='nt'>💲 confirm price</span>":""); return (o.nopic.indexOf(name)>=0?"<span class='nt'>🚫 no picture</span>":o.photo.indexOf(name)>=0?"<span class='nt'>📸 needs real photo</span>":"")+(o.price.indexOf(name)>=0?"<span class='nt'>💲 confirm price</span>":""); }
 function listNames(a,max){ return a.slice(0,max).join(", ")+(a.length>max?" + "+(a.length-max)+" more":""); }
-function needsCard(s){ var o=menuNeeds(s); if(!o||!(o.photo.length+o.price.length+o.nopic.length)) return "";
-  var ul=function(a){ return "<ul>"+a.map(function(n){ return "<li>"+esc(n)+"</li>"; }).join("")+"</ul>"; };
-  return "<div class='card nf' id='mneeds' style='margin-top:12px'><h2>🛠️ "+esc(NAMES[s])+" menu: needs fixing</h2>"+
-    (o.nopic.length?"<p><b>🚫 No picture at all ("+o.nopic.length+")</b>: guests see a blank spot.</p>"+ul(o.nopic):"")+
-    (o.price.length?"<p><b>💲 Price not confirmed ("+o.price.length+")</b>: these are sample prices. Check them against Toast, then fix any that are wrong below.</p>"+ul(o.price):"")+
-    (o.photo.length?"<p><b>📸 Needs a real photo ("+o.photo.length+")</b>: the app shows a made-up picture for now. Snap a well-lit photo of the plate and send it to Antidote.</p>"+ul(o.photo):"")+"</div>"; }
+function phUrl(f){ if(/^data:image\//.test(f)) return f; return "https://lh3.googleusercontent.com/d/"+encodeURIComponent(f)+"=w400"; }
+function priceOf(s,name){ var M=effMenu(s), v=null; if(!M) return ""; M.food.forEach(function(c){ c.items.forEach(function(it){ if(it[0]===name) v=it[1]; }); }); M.drinks.forEach(function(it){ if(it[0]===name) v=it[1]; }); return v==null?"":(+v).toFixed(2); }
+// 🛠️ the "needs fixing" card: every line is tappable. 💲 = type the right price (or keep it) → Save → emailed code (same as
+// Prices). 📸 = take or pick a photo → it's shrunk on the phone and sent (bo_photo); Christian's go live at once, others wait for his OK.
+function needsCard(s){ var o=menuNeeds(s); if(!o||!(o.photo.length+o.price.length+o.nopic.length+o.wait.length+(isOwnerUI()?o.live.length:0))) return "";
+  var cP=can("prices"), add=function(n,miss){ return "<div class='nx'><div><b>"+esc(n)+"</b>"+(miss?"<small>No picture at all right now</small>":"<small>Shows a made-up picture now</small>")+"</div><button class='btn sm big' data-addph='"+esc(JSON.stringify([s,n]))+"'>📷 Add photo</button></div>"; };
+  var h="<div class='card nf' id='mneeds' style='margin-top:12px'><h2>🛠️ "+esc(NAMES[s])+" menu: needs fixing</h2><p class='note' style='margin:0 0 6px'>Tap an item to fix it right here.</p>";
+  if(o.wait.length) h+="<h3>⏳ Photos waiting for Christian's OK ("+o.wait.length+")</h3>"+o.wait.map(function(x){ return "<div class='nx'><img src='"+phUrl(x.file)+"' alt='Photo of "+esc(x.item)+"' loading='lazy'><div><b>"+esc(x.item)+"</b><small>from "+esc(x.by)+" · "+when2(x.ts)+"</small></div>"+
+      (isOwnerUI()?"<span class='nb'><button class='btn sm big' data-phok='"+esc(x.id)+"'>✓ Use it</button><button class='btn alt sm big' data-phno='"+esc(x.id)+"'>✗ Not this one</button></span>":"<small class='dim'>Christian will look at it</small>")+"</div>"; }).join("");
+  if(o.nopic.length) h+="<h3>🚫 No picture at all ("+o.nopic.length+")</h3>"+o.nopic.map(function(n){ return add(n,1); }).join("");
+  if(o.price.length) h+="<h3>💲 Price to confirm ("+o.price.length+")</h3><p class='note'>Sample prices. Type the real price from Toast (or keep it if it's right) and tap <b>Save</b>. We email you a code to finish.</p>"+
+    (cP?o.price.map(function(n){ var id="fx_"+mid(s,n).slice(2), pr=priceOf(s,n); return "<div class='nx'><div><b>"+esc(n)+"</b><small>now $"+esc(pr)+"</small></div><span class='nb'><input id='"+id+"' inputmode='decimal' value='"+esc(pr)+"' data-orig='' aria-label='Real price of "+esc(n)+"'><button class='btn sm big' "+mBtn(s,"price",n,n)+" data-for='"+id+"'>Save</button></span></div>"; }).join("")
+      :"<p class='note'>Your login can't change prices. Tell Christian (or ask him to turn Prices on for you).</p><ul>"+o.price.map(function(n){ return "<li>"+esc(n)+" · $"+esc(priceOf(s,n))+"</li>"; }).join("")+"</ul>");
+  if(o.photo.length) h+="<h3>📸 Needs a real photo ("+o.photo.length+")</h3><p class='note'>Good light, plate fills the picture, no people. Tap <b>📷 Add photo</b> to take one or pick it from your photos.</p>"+o.photo.map(function(n){ return add(n,0); }).join("");
+  if(isOwnerUI()&&o.live.length) h+="<h3>✅ Photos added here, live in the app ("+o.live.length+")</h3>"+o.live.map(function(n){ return "<div class='nx'><img src='"+phUrl(((DATA.menu[s]||{}).ph||{})[n])+"' alt='Photo of "+esc(n)+"' loading='lazy'><div><b>"+esc(n)+"</b></div><span class='nb'><button class='btn alt sm big' data-addph='"+esc(JSON.stringify([s,n]))+"'>📷 Replace</button><button class='btn alt sm big' data-phrm='"+esc(JSON.stringify([s,n]))+"'>↩︎ Remove</button></span></div>"; }).join("");
+  return h+"<input type='file' id='phFile' accept='image/*' hidden></div>"; }
+function isOwnerUI(){ return !MGR; }
+// shrink to ≤1350 px JPEG on the phone before sending (keeps uploads small and fast)
+function shrink(file){ return new Promise(function(res,rej){ var u=URL.createObjectURL(file), im=new Image(); im.onload=function(){ var k=Math.min(1,1350/Math.max(im.width,im.height)), c=document.createElement("canvas"); c.width=Math.round(im.width*k); c.height=Math.round(im.height*k);
+  c.getContext("2d").drawImage(im,0,0,c.width,c.height); URL.revokeObjectURL(u); res(c.toDataURL("image/jpeg",0.85)); }; im.onerror=function(){ URL.revokeObjectURL(u); rej(); }; im.src=u; }); }
+function photoReply(r,msg){ if(!r||!r.ok){ if(r&&r.auth===false) return signOut("Signed out. Log in again."); alert((r&&r.reason)||"Didn't work. Try again."); return; } DATA.photos=r.photos||[]; if(r.menu) DATA.menu=r.menu; draw(); drawTodo(); if(msg) alert(msg); }
+function bindNeeds(p){ var f=$("phFile"), want=null; if(!f) return;
+  p.querySelectorAll("[data-addph]").forEach(function(b){ b.onclick=function(){ want={a:JSON.parse(b.dataset.addph),b:b}; f.value=""; f.click(); }; });
+  f.onchange=function(){ var file=f.files&&f.files[0]; if(!file||!want) return; var w=want; w.b.disabled=true; w.b.textContent="Sending…";
+    shrink(file).then(function(d){ return api({type:"bo_photo",token:TOKEN,op:"add",slug:w.a[0],item:w.a[1],photo:d}); }).then(function(r){ photoReply(r,r&&r.ok?(isOwnerUI()?"✅ Photo of "+w.a[1]+" is live in the app.":"✅ Sent. Christian will OK it, then it shows in the app."):""); })
+      .catch(function(){ w.b.disabled=false; w.b.textContent="📷 Add photo"; alert("That photo couldn't be read. Try another one."); }); };
+  p.querySelectorAll("[data-phok],[data-phno]").forEach(function(b){ b.onclick=function(){ b.disabled=true; api({type:"bo_photo",token:TOKEN,op:b.dataset.phok?"ok":"no",id:b.dataset.phok||b.dataset.phno}).then(function(r){ photoReply(r); }); }; });
+  p.querySelectorAll("[data-phrm]").forEach(function(b){ b.onclick=function(){ var a=JSON.parse(b.dataset.phrm); if(!confirm("Go back to the standard picture for "+a[1]+"?")) return; b.disabled=true; api({type:"bo_photo",token:TOKEN,op:"remove",slug:a[0],item:a[1]}).then(function(r){ photoReply(r); }); }; }); }
 function mdDays(md){ var y=new Date().getFullYear(), t=new Date(ymd(Date.now())+"T12:00:00"), d=new Date(y+"-"+md+"T12:00:00"); if(d<t) d=new Date((y+1)+"-"+md+"T12:00:00"); return Math.round((d-t)/DAY); }   // days until the NEXT time it's that date (0 = today)
 function mdLive(sp){ var td=ymd(Date.now()).slice(5); return sp.start<=sp.end?td>=sp.start&&td<=sp.end:td>=sp.start||td<=sp.end; }
 function autoTodos(){ var d=DATA, out=[], done={}, now=Date.now(); (d.todoDone||[]).forEach(function(k){ done[k]=1; });
@@ -592,6 +617,7 @@ function autoTodos(){ var d=DATA, out=[], done={}, now=Date.now(); (d.todoDone||
     var N=menuNeeds(s); if(N){
       if(N.nopic.length) add("menu_nopic",s,N.nopic.length+"|"+N.nopic.join(".").length,1,now-4,N.nopic.length+" menu item"+(N.nopic.length>1?"s have":" has")+" no picture",nm+" · "+listNames(N.nopic,4),"menu",{anchor:"mneeds"});
       if(N.price.length) add("menu_price",s,N.price.length+"|"+N.price.join(".").length,1,now-5,N.price.length+" menu price"+(N.price.length>1?"s":"")+" to confirm",nm+" · sample prices: "+listNames(N.price,4),"menu",{anchor:"mneeds"});
+      if(N.wait.length&&!MGR) add("menu_phwait",s,N.wait.map(function(x){ return x.id.slice(-4); }).sort().join("."),1,now-3,N.wait.length+" menu photo"+(N.wait.length>1?"s":"")+" waiting for your OK",nm+" · "+listNames(N.wait.map(function(x){ return x.item; }),4),"menu",{anchor:"mneeds"});
       if(N.photo.length) add("menu_photo",s,N.photo.length+"|"+N.photo.join(".").length,1,now-6,N.photo.length+" menu item"+(N.photo.length>1?"s need":" needs")+" a real photo",nm+" · "+listNames(N.photo,4),"menu",{anchor:"mneeds"}); }
     var E=((d.eb||{})[s]||{}).cfg||{}; if(E.on==="on"&&E.mode==="raffle"&&E.drawDate&&!E.drawn&&ymd(now)>=E.drawDate) add("raffle_draw",s,E.drawDate,1,now,"Draw the early-bird raffle winners",nm+" · the draw date ("+E.drawDate+") is here","earlybird");
     if(!MGR){ var ts=(LIVE.defaults[s]||{}).toastStatus||{}; if(ts.state==="tbd") add("toast_tbd",s,"tbd",3,0,"Confirm the "+nm+" Toast discount buttons are set up",ts.note||"","links"); } });

@@ -137,7 +137,7 @@
     TEAM.push({ id: em, name: nm, email: em, sl: sl, job: d.job, status: "pending", pw: pw, asked: Date.now() });
     audit.push({ ts: Date.now(), who: nm + " (sign-up)", slug: sl.length > 1 ? "Both" : restNames(sl), reward: "Team access", field: "Access requested", before: "", after: jobName(d.job) + " · " + em, status: "pending" });
     return { ok: true, sent: true }; }
-  var MENU = {}, TODOS = [{ id: "TTEST1", ts: now - 5 * 36e5, slug: "melody-bar-grill", text: "Put new QR table tents on the patio", go: "", by: "Christian", status: "open" }], TODO_DONE = [];
+  var PHOTOS = [], MENU = {}, TODOS = [{ id: "TTEST1", ts: now - 5 * 36e5, slug: "melody-bar-grill", text: "Put new QR table tents on the patio", go: "", by: "Christian", status: "open" }], TODO_DONE = [];
   function scopeOf(u) { var r = rec(u); return { role: r.role, slugs: r.slugs.slice() }; }
   function can(u, s) { return scopeOf(u).slugs.indexOf(s) >= 0; }
   function sm(u, o) { var sc = scopeOf(u); if (sc.role === "owner") return o; var y = {}; Object.keys(o || {}).forEach(function (k) { if (sc.slugs.indexOf(k) >= 0) y[k] = o[k]; }); return y; }
@@ -212,10 +212,23 @@
         else { var it = TODOS.filter(function (t) { return t.id === d.id; })[0]; if (!it) return { ok: false, reason: "That to-do is gone. Refresh." }; tsl = it.slug; if (tsl === "all" ? SC.role !== "owner" : !can(u, tsl)) return NOPE; it.status = "done"; title = it.text; }
         audit.push({ ts: Date.now(), who: rec(u).name, slug: tsl === "all" ? "Both" : tsl === "nalu-vida" ? "Nalu Vida" : "Melody Bar & Grill", reward: "To-do", field: "To-do done", before: title, after: "done", status: "applied" }); return todoOut(u); }
       return { ok: false, reason: "Unknown action." }; }
+    if (d.type === "bo_photo") {   // 📸 same rules as Code.gs photoAct; the "file" is the picture itself (data URL), nothing is uploaded
+      var own = SC.role === "owner", phOut = function () { return { ok: true, photos: PHOTOS.filter(function (x) { return (x.status === "pending" || x.status === "live") && (own || can(u, x.slug)); }), menu: MENU }; },
+        phSet = function (sl, it, f) { var M = MENU[sl] = MENU[sl] || {}; M.ph = M.ph || {}; if (f) M.ph[it] = f; else delete M.ph[it]; },
+        logp = function (sl, it, v) { audit.push({ ts: Date.now(), who: rec(u).name, slug: sl === "nalu-vida" ? "Nalu Vida" : "Melody Bar & Grill", reward: it, field: "Menu photo", before: "", after: v, status: "applied" }); };
+      if (d.op === "add") { var it2 = String(d.item || "").replace(/[<>]/g, "").trim(); if (!can(u, d.slug) || !it2) return NOPE; if (!/^data:image\/jpeg;base64,/.test(String(d.photo || ""))) return { ok: false, reason: "That picture didn't come through. Try another photo." };
+        PHOTOS.forEach(function (x) { if (x.slug === d.slug && x.item === it2 && (x.status === "pending" || (own && x.status === "live"))) x.status = "replaced"; }); if (own) phSet(d.slug, it2, d.photo);
+        PHOTOS.push({ ts: Date.now(), id: "P" + Math.random().toString(36).slice(2, 12), slug: d.slug, item: it2, file: d.photo, by: rec(u).name, status: own ? "live" : "pending" }); logp(d.slug, it2, own ? "added (live)" : "added (waiting for Christian's OK)");
+        var out = phOut(); out.testNotice = own ? "" : "TEST MODE: no email sent. Live, Christian would get an email to OK it."; return out; }
+      if (!own) return { ok: false, reason: "Christian OKs the photos. Tell him it's there." };
+      if (d.op === "remove") { PHOTOS.forEach(function (x) { if (x.slug === d.slug && x.item === d.item && x.status === "live") x.status = "removed"; }); phSet(d.slug, d.item, ""); logp(d.slug, d.item, "standard picture"); return phOut(); }
+      var px = PHOTOS.filter(function (x) { return x.id === d.id && x.status === "pending"; })[0]; if (!px) return { ok: false, reason: "That photo was already handled. Tap Refresh." };
+      if (d.op === "ok") { PHOTOS.forEach(function (x) { if (x.slug === px.slug && x.item === px.item && x.status === "live") x.status = "replaced"; }); phSet(px.slug, px.item, px.file); px.status = "live"; }
+      else px.status = "declined"; logp(px.slug, px.item, px.status); return phOut(); }
     if (d.type === "bo_logout") { delete TOK[d.token]; return { ok: true }; }
     if (d.type === "bo_summary" && SC.role !== "owner") return NOPE;
     if (d.type === "bo_summary") return { ok: true, members: members.length, joined7: members.filter(function (m) { return m.joined > now - 7 * DAY; }).length, plays7: games.length, redeems7: redeems.length, pendingClaims: claims.filter(function (x) { return x.status === "pending"; }).length };
-    if (d.type === "bo_data") return scopeData(u, { ok: true, test: true, role: SC.role, slugs: SC.slugs, job: rec(u).job, perms: rec(u).perms, team: SC.role === "owner" ? teamList() : [], menu: MENU, todos: todoOut(u).todos, todoDone: todoOut(u).todoDone,
+    if (d.type === "bo_data") return scopeData(u, { ok: true, test: true, role: SC.role, slugs: SC.slugs, job: rec(u).job, perms: rec(u).perms, team: SC.role === "owner" ? teamList() : [], menu: MENU, photos: PHOTOS.filter(function (x) { return (x.status === "pending" || x.status === "live") && (SC.role === "owner" || can(u, x.slug)); }), todos: todoOut(u).todos, todoDone: todoOut(u).todoDone,
       mgr: SC.role === "owner" ? Object.keys(USERS).filter(function (k) { return USERS[k].role === "manager"; }).map(function (k) { return USERS[k].name; }) : [], scout: scout, restores7: { "melody-bar-grill": 2, "nalu-vida": 1 }, oneprize: { "melody-bar-grill": { codes: 7, used: 5, expired: 2, refused: 3, mins: 10 }, "nalu-vida": { codes: 4, used: 4, expired: 0, refused: 1, mins: 10 } }, eb: ebStats(), me: rec(u).name, now: Date.now(), members: members, games: games, opens: opens, redeems: redeems, claims: claims, staff: staff, trained: trained, audit: audit, disc: disc, lb: { "melody-bar-grill": { credited: 3, devices: 11 } } });
     if (d.type === "disc_propose") {
       if (!can(u, d.slug)) return NOPE;

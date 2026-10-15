@@ -557,3 +557,10 @@ html.dvlock,html.dvlock body{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.dvspot i{animation:none}}
 .dv.nohs .dvspots{display:none}
 .dvfoot{margin:0;padding:8px 14px calc(10px + env(safe-area-inset-bottom));font-size:13px;color:var(--dim);text-align:center}
+/* type what's wrong (symptoms.js) */
+.finder textarea{min-height:64px}
+.fdg{margin-top:12px;padding-top:10px;border-top:1px solid var(--edge)}
+.fdg h4{margin:0;font-size:17px;display:flex;gap:8px;align-items:center}
+.fdg .note{margin:4px 0 8px}
+.fdlist{display:grid;gap:8px}
+.qshare{margin-top:8px}

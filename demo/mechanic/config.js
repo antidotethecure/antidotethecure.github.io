@@ -124,6 +124,26 @@ window.SHOP_CFG = {
         { id: "ball", name: { en: "Ball joint (this corner)", es: "Rótula (esta esquina)" }, parts: [35, 140], hrs: [1, 2], perWheel: true },
         { id: "bush", name: { en: "Control arm bushings (pair)", es: "Bujes de horquilla (par)" }, parts: [40, 140], hrs: [2, 3] }
       ] },
+    { id: "steer", icon: "🎯", on: true, name: { en: "Steering", es: "Dirección" },
+      desc: { en: "Tie rods, rack, pump, alignment", es: "Terminales, cremallera, bomba, alineación" },
+      options: [
+        { id: "inspect", name: { en: "Steering + front-end inspection", es: "Revisión de dirección y tren delantero" }, parts: [0, 0], hrs: [0.5, 0.75] },
+        { id: "tieOuter", name: { en: "Outer tie rod ends (pair)", es: "Terminales exteriores (par)" }, parts: [60, 160], hrs: [1, 1.5] },
+        { id: "tieInner", name: { en: "Inner + outer tie rods (pair)", es: "Terminales interiores y exteriores (par)" }, parts: [120, 300], hrs: [1.5, 2.5] },
+        { id: "pump", name: { en: "Power steering pump", es: "Bomba de dirección hidráulica" }, parts: [150, 450], hrs: [1.5, 3] },
+        { id: "rack", name: { en: "Steering rack (incl. electric racks)", es: "Cremallera de dirección (incluye eléctricas)" }, parts: [450, 1300], hrs: [3, 5.5] },
+        { id: "align", name: { en: "Wheel alignment (partner shop)", es: "Alineación (taller asociado)" }, parts: [100, 160], hrs: [0, 0] }
+      ] },
+    { id: "elec", icon: "⚡", on: true, name: { en: "Electrical", es: "Sistema eléctrico" },
+      desc: { en: "Alternator, starter, shorts, drains", es: "Alternador, marcha, cortos, consumo" },
+      options: [
+        { id: "alt", name: { en: "Alternator", es: "Alternador" }, parts: [180, 480], hrs: [1, 2.5] },
+        { id: "starter", name: { en: "Starter", es: "Marcha" }, parts: [150, 420], hrs: [1, 2.5] },
+        { id: "drain", name: { en: "Battery drain (parasitic draw) test", es: "Prueba de consumo de batería" }, parts: [0, 0], hrs: [1, 2] },
+        { id: "wiring", name: { en: "Wiring / short repair", es: "Reparación de cableado / corto" }, parts: [10, 60], hrs: [1, 3] },
+        { id: "fuse", name: { en: "Fuse / relay", es: "Fusible / relevador" }, parts: [5, 40], hrs: [0.25, 0.75] },
+        { id: "ground", name: { en: "Ground strap / battery cable", es: "Tierra / cable de batería" }, parts: [15, 60], hrs: [0.5, 1] }
+      ] },
     { id: "ac", icon: "❄️", on: true, name: { en: "A/C", es: "Aire acondicionado" },
       desc: { en: "Recharge, leak check, filter", es: "Recarga, fugas, filtro" },
       options: [
@@ -186,6 +206,16 @@ window.SHOP_CFG = {
         { id: "ext", name: { en: "Wash + wax", es: "Lavado + cera" }, parts: [20, 40], hrs: [1.5, 2] },
         { id: "full", name: { en: "Full detail", es: "Detallado completo" }, parts: [40, 80], hrs: [3, 4] }
       ] }
+  ],
+
+  /* Parts price tiers (SAMPLE): performance trims and luxury makes usually cost more for parts (bigger brakes, heavier
+     suspension, pricier electrics). Multiplies the parts part of each estimate only, never labor. First match wins.
+     match = regex on trim / model / what the customer typed; makes = vPIC make names (upper case). */
+  partsTiers: [
+    { id: "perf", mult: 1.35, name: { en: "Performance trim", es: "Versión deportiva" },
+      match: "scat ?pack|\\bsrt\\b|hellcat|demon|redeye|jailbreak|trackhawk|shelby|gt500|mach 1|raptor|\\btrx\\b|\\bzl1\\b|\\bz06\\b|\\bss\\b|1le|amg|\\bm[2-8]\\b|\\brs ?[3-7]\\b|type ?r|\\bsti\\b|nismo|trd pro|392|6\\.4" },
+    { id: "lux", mult: 1.4, name: { en: "Luxury make", es: "Marca de lujo" },
+      makes: ["BMW", "MERCEDES-BENZ", "AUDI", "PORSCHE", "LAND ROVER", "JAGUAR", "LEXUS", "VOLVO", "GENESIS", "MASERATI", "ALFA ROMEO", "CADILLAC", "LINCOLN", "ACURA", "INFINITI", "TESLA"] }
   ],
 
   /* Parts suppliers. The first one shows as "Check <short> first" on every parts list and in the shop page's Parts sources card.

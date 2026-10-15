@@ -77,7 +77,8 @@
   function price(it) {
     var o = opt(it.svc, it.opt); if (!o) return { lo: 0, hi: 0, hLo: 0, hHi: 0, pLo: 0, pHi: 0, lLo: 0, lHi: 0 };
     var lLo = o.hrs[0] * C.laborRate, lHi = o.hrs[1] * C.laborRate;
-    return { pLo: o.parts[0], pHi: o.parts[1], lLo: r5(lLo), lHi: r5(lHi), lo: r5(o.parts[0] + lLo), hi: r5(o.parts[1] + lHi), hLo: o.hrs[0], hHi: o.hrs[1] };
+    var m = +it.mult > 0 ? +it.mult : 1, pLo = m === 1 ? o.parts[0] : r5(o.parts[0] * m), pHi = m === 1 ? o.parts[1] : r5(o.parts[1] * m);   // mult = parts price tier (config.partsTiers)
+    return { pLo: pLo, pHi: pHi, lLo: r5(lLo), lHi: r5(lHi), lo: r5(pLo + lLo), hi: r5(pHi + lHi), hLo: o.hrs[0], hHi: o.hrs[1] };
   }
   function total(items) {
     var s = { lo: 0, hi: 0, hLo: 0, hHi: 0, pLo: 0, pHi: 0, lLo: 0, lHi: 0 };

@@ -250,12 +250,14 @@ async function boot() {
   function birdGet(pg) { let o = BIRDS[pg][birdN[pg]++]; if (!o) { const b = buildBird(pg); o = b.node; o.userData = { size: b.size, wings: b.wings }; o.rotation.order = "YXZ"; o.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(o); BIRDS[pg].push(o); } o.visible = true; return o; }
   function bossMesh(k) { if (!BOSSM[k]) { const b = k === "rocket" ? buildRocket() : buildBase(); const o = b.node; o.userData = Object.assign(o.userData || {}, { size: b.size, mats: [] }); o.traverse(n => { if (n.isMesh) { n.material = Array.isArray(n.material) ? n.material.map(m => m.clone()) : n.material.clone(); (Array.isArray(n.material) ? n.material : [n.material]).forEach(m => o.userData.mats.push(m)); } }); o.rotation.order = "YXZ"; scene.add(o); BOSSM[k] = o; } const o = BOSSM[k]; o.visible = true; o.userData.used = 1; return o; }
   // chase view: the player flies air3d's detailed airliner (one instance, never pooled, so its wounds stay put)
-  let AIR = null, PLY = null, FXA = null, pDmg = null, ENEMY = null;
+  let AIR = null, PLY = null, FXA = null, pDmg = null, ENEMY = null, WORLD = null;
+  const alt3 = (o, d) => CHASE && o && o.z3 != null ? o.z3 : d;   // chase view: things fly at their own height (the game's z3)
   if (CHASE) {
     AIR = AIRM.buildAirliner(THREE); PLY = new THREE.Group(); PLY.add(AIR.node); PLY.rotation.order = "YXZ"; PLY.userData = { size: AIR.size, mats: [] };
     AIR.node.traverse(n => { if (n.isMesh) { n.castShadow = true; if (n.material.emissive && !PLY.userData.mats.includes(n.material) && n.material !== AIR.mats.gold) PLY.userData.mats.push(n.material); } });
     scene.add(PLY); PLY.visible = false;
-    FXA = AIRM.makeFX(THREE, scene, { max: 1600 }); pDmg = AIRM.makeDamage(THREE, FXA, AIR.node, AIR.pts.wound);
+    FXA = AIRM.makeFX(THREE, scene, { max: 1800 }); pDmg = AIRM.makeDamage(THREE, FXA, AIR.node, AIR.pts.wound);
+    WORLD = WORLDM.makeWorld(THREE, { fx: FXA }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
     ENEMY = AIRM.buildAirliner(THREE, { livery: "enemy" }); MODELS.kami3 = { node: ENEMY.node, size: ENEMY.size };   // the head-on airliners: same detailed airframe, grey
   }
   const PK = "plane";
@@ -381,16 +383,16 @@ async function boot() {
     let ti = 0, li = 0, si = 0, rwOn = false;
     G.ground.forEach((g, idx) => {
       const T = M.TILES[g.t], mat = tileMat(g.t);
-      if (T && mat) { let m = tileMeshes[ti++]; if (!m) { m = new THREE.Mesh(tileGeo, mat); m.receiveShadow = false; scene.add(m); tileMeshes.push(m); }
+      if (T && mat && !CHASE) { let m = tileMeshes[ti++]; if (!m) { m = new THREE.Mesh(tileGeo, mat); m.receiveShadow = false; scene.add(m); tileMeshes.push(m); }
         const h = T.c.height / 2; m.material = mat; m.visible = true; m.scale.set(W, 1, h); m.position.set(0, .01 * idx, g.y + h / 2 - H / 2); m.renderOrder = idx;
         if (CHASE) for (const sd of [-1, 1]) {   // the chase camera sees past the 400-wide field: mirrored copies of the same tile left and right
           let e = sideMeshes[si++]; if (!e) { e = new THREE.Mesh(tileGeo, mat); scene.add(e); sideMeshes.push(e); }
           e.material = mat; e.visible = true; e.scale.set(-W, 1, h); e.position.set(sd * W, .01 * idx, m.position.z); e.renderOrder = idx; } }
-      if (g.k === "nalu" || g.t === "nalu") { const gx = W * .74, gy = g.y + g.h * .12, p = .55 + .45 * Math.sin(now / 260) * Math.sin(now / 610);
+      if (!CHASE && (g.k === "nalu" || g.t === "nalu")) { const gx = W * .74, gy = g.y + g.h * .12, p = .55 + .45 * Math.sin(now / 260) * Math.sin(now / 610);
         BgA.q(gx, gy, 1, 160, 160, 0, UV.dot, 1, .67, .35, .45 * p); BgA.q(gx, gy, 1, 150, 150, 0, UV.glow, .31, .67, 1, .25 * p); }
       if (g.k === "runway" && g.y < H + 40 && g.y + g.h + 150 > -40) { rwOn = true; const sc = rwC.width / W; rwX.setTransform(1, 0, 0, 1, 0, 0); rwX.clearRect(0, 0, rwC.width, rwC.height); rwX.setTransform(sc, 0, 0, sc, 0, 0);
         M.runway(rwX, g, 40); rwTex.needsUpdate = true; const hh = rwC.height / sc; rwMesh.scale.set(W, 1, hh); rwMesh.position.set(0, .3, g.y - 40 + hh / 2 - H / 2); }
-      if (LMK[g.k]) { const im = S[g.k], mm = lmMat(g.k); if (mm) { const w = LMW[g.k] || 230, h = w * im.naturalHeight / im.naturalWidth, x = W / 2 + g.side * 70 - w / 2, y = g.y + (g.h - h) / 2;
+      if (LMK[g.k] && !CHASE) { const im = S[g.k], mm = lmMat(g.k); if (mm) { const w = LMW[g.k] || 230, h = w * im.naturalHeight / im.naturalWidth, x = W / 2 + g.side * 70 - w / 2, y = g.y + (g.h - h) / 2;
         let m = lmMeshes[li++]; if (!m) { m = new THREE.Mesh(tileGeo, mm); m.receiveShadow = true; scene.add(m); lmMeshes.push(m); } m.material = mm; m.visible = true; m.renderOrder = 50; m.scale.set(w, 1, h); m.position.set(x + w / 2 - W / 2, .2, y + h / 2 - H / 2); } }
     });
     for (let i = ti; i < tileMeshes.length; i++) tileMeshes[i].visible = false;
@@ -491,14 +493,14 @@ async function boot() {
   function drawPlayer(now, G) {
     const C = G.crash;
     if (G.dying && C) { if (C.hit) { crashAlt = -1; if (CHASE) PLY.visible = false; return; }
-      const p = Math.min(1, C.t / C.dur), Y = Math.max(6, A.player * (1 - p)), o = CHASE ? PLY : take(PK); if (CHASE) PLY.visible = true; crashAlt = Y; crashX = C.x; crashY = C.y; PL.x = C.x; PL.y = C.y; PL.Y = Y;
+      const p = Math.min(1, C.t / C.dur), Y = Math.max(6, (CHASE ? (C.a0 || (C.a0 = Math.max(40, PL.Y))) : A.player) * (1 - p)), o = CHASE ? PLY : take(PK); if (CHASE) PLY.visible = true; crashAlt = Y; crashX = C.x; crashY = C.y; PL.x = C.x; PL.y = C.y; PL.Y = Y;
       put(o, C.x, C.y, Y, M.PLANE_W * C.sc, false, Math.PI - C.rot, C.dir * (.5 + p * 1.1), -.25 * p); flash(o, 0); playerFire(o, G, now, 3.6, C); return; }
     crashAlt = -1; playerAlt = -1; if (CHASE) PLY.visible = false; if (G.crashed) return;
     const proll = Math.max(-1, Math.min(1, G.vx * .12)), palt = G.alt == null ? (G.running ? 1 : 0) : G.alt, pw = M.PLANE_W * (.74 + .26 * palt);
     const vis = G.inv <= 0 || G.landing || Math.floor(G.inv / 6) % 2 === 0; if (!vis) return;
-    let Y = 5 + (A.player - 5) * palt; const o = CHASE ? PLY : take(PK); if (CHASE) PLY.visible = true;
+    let Y = 5 + ((CHASE && G.alt3 != null ? G.alt3 : A.player) - 5) * palt; const o = CHASE ? PLY : take(PK); if (CHASE) PLY.visible = true;
     if (CHASE) {   // chase view: bank into the turn, nose up when you push ahead (and climb a touch), nose down when you ease back
-      const pv = Math.max(-1, Math.min(1, (G.mvy || 0) / 520)) * (G.running ? 1 : 0); PL.pitch += (pv - PL.pitch) * .12; Y -= PL.pitch * 7 * palt;
+      const pv = Math.max(-1, Math.min(1, -(G.mvz || 0) / 240)) * (G.running ? 1 : 0); PL.pitch += (pv - PL.pitch) * .12;
       put(o, G.x, G.y, Y, pw, false, Math.PI - proll * .16, proll * .95, PL.pitch * .3 * Math.max(.3, palt));
       AIR.spin(now / 1000); o.updateMatrixWorld(true); const L = (q) => AIR.node.localToWorld(V.copy(q)), bst = G.boostT > 0 ? 1.8 : 1;
       AIR.pts.eng.forEach(e => FXA.glow(L(e), 9 * bst, G.boostT > 0 ? [.45, .75, 1] : [1, .55, .25], .55));
@@ -518,44 +520,44 @@ async function boot() {
   function drawEnemies(now, G) {
     const tt = now / 1000;
     for (let e = 0; e < G.ens.length; e++) { const en = G.ens[e]; if (!en) continue; const hit = en.hit > 0 ? Math.min(1, en.hit / 240) : 0;
-      if (en.t === "ufo") { const bob = Math.sin(now / 300 + en.ph) * .06, o = take("ufo"); put(o, en.x, en.y, A.ufo, en.w, false, now / 700 + en.ph, bob, .18); flash(o, hit * .45);
-        Ba.q(en.x, en.y + 16, A.ufo - 30, 120, 120, 0, UV.dot, .49, .97, .78, .35); }
-      else if (en.t === "jet") { const o = take("jet"); put(o, en.x, en.y, A.jet, en.w, false, -(en.ra || 0), 0, -.05); flash(o, hit * .45);
+      if (en.t === "ufo") { const bob = Math.sin(now / 300 + en.ph) * .06, o = take("ufo"); put(o, en.x, en.y, alt3(en, A.ufo), en.w, false, now / 700 + en.ph, bob, .18); flash(o, hit * .45);
+        Ba.q(en.x, en.y + 16, alt3(en, A.ufo) - 30, 120, 120, 0, UV.dot, .49, .97, .78, .35); }
+      else if (en.t === "jet") { const o = take("jet"); put(o, en.x, en.y, alt3(en, A.jet), en.w, false, -(en.ra || 0), 0, -.05); flash(o, hit * .45);
         navPair(now, ext(en).seed, frac(o, .45, 0, .05).clone(), frac(o, -.45, 0, .05), 1.9);
-        Ba.q(en.x, en.y - en.w * .55, A.jet - 4, 10, 26, 0, UV.tongue, 1, .7, .4, .7); }
-      else if (en.t === "kami") { const o = take(CHASE ? "kami3" : "plane"); put(o, en.x, en.y, A.kami, en.w, false, 0, Math.sin(now / 500 + en.x) * .08, CHASE ? 0 : .08); flash(o, hit * .45);
-        Ba.q(en.x, en.y + 50, A.kami - 10, 180, 180, 0, UV.dot, 1, .98, .86, .55);
+        Ba.q(en.x, en.y - en.w * .55, alt3(en, A.jet) - 4, 10, 26, 0, UV.tongue, 1, .7, .4, .7); }
+      else if (en.t === "kami") { const o = take(CHASE ? "kami3" : "plane"); put(o, en.x, en.y, alt3(en, A.kami), en.w, false, 0, Math.sin(now / 500 + en.x) * .08, CHASE ? 0 : .08); flash(o, hit * .45);
+        Ba.q(en.x, en.y + 50, alt3(en, A.kami) - 10, 180, 180, 0, UV.dot, 1, .98, .86, .55);
         navPair(now, ext(en).seed, frac(o, -.47, .1, .02).clone(), frac(o, .47, .1, .02), 2.6); }
       else if (en.t === "cop") { const key = en.v ? "cop1" : "cop0", o = take(key); if (!o) continue; const hb = M.copPt(en, "hub");
         const ex = ext(en), lean = Math.max(-.3, Math.min(.3, (en.x - ex.px) * -.25)); ex.px = en.x; ex.lean = (ex.lean || 0) * .85 + lean * .15;
-        put(o, en.x, en.y, A.cop, M.COP_LEN, true, 0, ex.lean, .06); flash(o, hit * .45);
+        put(o, en.x, en.y, alt3(en, A.cop), M.COP_LEN, true, 0, ex.lean, .06); flash(o, hit * .45);
         const top = o.position.y + o.userData.size.y * o.scale.x * .5 + 2; rotor(hb[0], hb[1], top, 70, tt * 2.6 * (en.v ? -1 : 1) * 3.1);
         const on = Math.floor(tt * 7) % 2, bp = M.copPt(en, "bar");
         if (on) Ba.q(bp[0] - 7, bp[1], top - 4, 52, 52, 0, UV.dot, 1, .16, .24, .95); else Ba.q(bp[0] + 7, bp[1], top - 4, 52, 52, 0, UV.dot, .16, .47, 1, .95);
-        if (en.flash > 0) { const gp = M.copPt(en, "gun"); Ba.q(gp[0], gp[1], A.cop + 4, 32, 32, 0, UV.dot, 1, .9, .6, 1); } }
-      else if (en.t === "gunship") { const o = take("cop0", 0x9aa66a); if (!o) continue; put(o, en.x, en.y, A.gun, M.GS_LEN, true, -(en.a || 0), Math.sin(en.ph || 0) * .08, .05); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
+        if (en.flash > 0) { const gp = M.copPt(en, "gun"); Ba.q(gp[0], gp[1], alt3(en, A.cop) + 4, 32, 32, 0, UV.dot, 1, .9, .6, 1); } }
+      else if (en.t === "gunship") { const o = take("cop0", 0x9aa66a); if (!o) continue; put(o, en.x, en.y, alt3(en, A.gun), M.GS_LEN, true, -(en.a || 0), Math.sin(en.ph || 0) * .08, .05); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
         const top = o.position.y + o.userData.size.y * o.scale.x * .5 + 2, hb = M.gsPt(en, "hub"), tp = M.gsPt(en, "tail");
         rotor(hb[0], hb[1], top, 102, tt * 2.6 * 3.1); rotor(tp[0], tp[1], top - 6, 15, tt * 1.8 * 2.6 * 3.1);
         navPair(now, 4, frac(o, .5, .2, .1).clone(), frac(o, -.5, .2, .1), 2.4);
-        en.guns.forEach((g, i) => { if (g.fl <= 0) return; const p = M.gsPt(en, i ? "gunR" : "gunL"); Ba.q(p[0], p[1], A.gun + 4, 36, 36, 0, UV.dot, 1, .9, .6, 1); }); }
-      else if (en.t === "superjet") { const o = take("jet", 0x6a7184); if (!o) continue; const a = en.a || 0; put(o, en.x, en.y, A.sj, M.SJ_W, false, -a, Math.sin(a * 2) * .35, 0); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
+        en.guns.forEach((g, i) => { if (g.fl <= 0) return; const p = M.gsPt(en, i ? "gunR" : "gunL"); Ba.q(p[0], p[1], alt3(en, A.gun) + 4, 36, 36, 0, UV.dot, 1, .9, .6, 1); }); }
+      else if (en.t === "superjet") { const o = take("jet", 0x6a7184); if (!o) continue; const a = en.a || 0; put(o, en.x, en.y, alt3(en, A.sj), M.SJ_W, false, -a, Math.sin(a * 2) * .35, 0); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
         const h = M.SJ_W * (S.jet.naturalHeight || 708) / (S.jet.naturalWidth || 520), burn = (en.st === "streak" || en.st === "zip") ? 1.7 : en.phase === 3 ? 1.15 : .75, ca = Math.cos(a), sa = Math.sin(a);
-        [-7, 7].forEach(of => { const lx = of, ly = -h * .47, x = en.x + lx * ca - ly * sa, y = en.y + lx * sa + ly * ca, L = (26 + Math.random() * 10) * burn; tongueQ(Ba, x, y, A.sj - 2, L / 46, a, UV.tongue, 1, .9, .8, .95); });
-        if (en.st === "turn") { const pu = .5 + .5 * Math.sin(now / 90), ly = -h * .18; Ba.q(en.x - ly * sa, en.y + ly * ca, A.sj + 8, 80, 80, 0, UV.dot, 1, .31, .24, .75 * pu); }
+        [-7, 7].forEach(of => { const lx = of, ly = -h * .47, x = en.x + lx * ca - ly * sa, y = en.y + lx * sa + ly * ca, L = (26 + Math.random() * 10) * burn; tongueQ(Ba, x, y, alt3(en, A.sj) - 2, L / 46, a, UV.tongue, 1, .9, .8, .95); });
+        if (en.st === "turn") { const pu = .5 + .5 * Math.sin(now / 90), ly = -h * .18; Ba.q(en.x - ly * sa, en.y + ly * ca, alt3(en, A.sj) + 8, 80, 80, 0, UV.dot, 1, .31, .24, .75 * pu); }
         navPair(now, 7, local(o, o.userData.size.x * .47, 0, 0).clone(), local(o, -o.userData.size.x * .47, 0, 0), 2.6); }
       else if (en.t === "esc") { const o = take("jet", 0x9fb0c8); if (!o) continue; const ex = ext(en), lean = Math.max(-.4, Math.min(.4, (en.x - ex.px) * -.2)); ex.px = en.x; ex.lean = (ex.lean || 0) * .85 + lean * .15;
-        put(o, en.x, en.y, A.esc, en.w, false, 0, ex.lean, -.05); flash(o, hit * .5);
-        navPair(now, ext(en).seed, frac(o, .45, 0, .05).clone(), frac(o, -.45, 0, .05), 1.8); Ba.q(en.x, en.y - en.w * .55, A.esc - 4, 9, 24, 0, UV.tongue, 1, .7, .4, .7); }
-      else if (en.t === "squad") { const o = take("jet", 0xc4b48a); if (!o) continue; put(o, en.x, en.y, A.bigjet, M.BJ_W, false, 0, Math.sin(en.ph || 0) * .1, -.04); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
-        const h = M.BJ_W * (S.jet.naturalHeight || 708) / (S.jet.naturalWidth || 520); [-26, -9, 9, 26].forEach(of => tongueQ(Ba, en.x + of, en.y - h * .47, A.bigjet - 2, (22 + Math.random() * 10) / 46, 0, UV.tongue, 1, .9, .8, .9));
+        put(o, en.x, en.y, alt3(en, A.esc), en.w, false, 0, ex.lean, -.05); flash(o, hit * .5);
+        navPair(now, ext(en).seed, frac(o, .45, 0, .05).clone(), frac(o, -.45, 0, .05), 1.8); Ba.q(en.x, en.y - en.w * .55, alt3(en, A.esc) - 4, 9, 24, 0, UV.tongue, 1, .7, .4, .7); }
+      else if (en.t === "squad") { const o = take("jet", 0xc4b48a); if (!o) continue; put(o, en.x, en.y, alt3(en, A.bigjet), M.BJ_W, false, 0, Math.sin(en.ph || 0) * .1, -.04); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
+        const h = M.BJ_W * (S.jet.naturalHeight || 708) / (S.jet.naturalWidth || 520); [-26, -9, 9, 26].forEach(of => tongueQ(Ba, en.x + of, en.y - h * .47, alt3(en, A.bigjet) - 2, (22 + Math.random() * 10) / 46, 0, UV.tongue, 1, .9, .8, .9));
         navPair(now, 5, frac(o, .47, 0, .05).clone(), frac(o, -.47, 0, .05), 3); }
-      else if (en.t === "rocket") { const o = bossMesh("rocket"); put(o, en.x, en.y, A.rocket, M.RK_L, true, 0, Math.sin(now / 900) * .06, 0); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
-        const ey = en.y - M.RK_L * .47, L2 = 46 + Math.random() * 16; Ba.q(en.x, ey - L2 / 2, A.rocket - 4, 22, L2, 0, UV.tongue, .55, .8, 1, .95); Ba.q(en.x, ey, A.rocket - 3, 40, 40, 0, UV.glow, .5, .7, 1, .6); }
+      else if (en.t === "rocket") { const o = bossMesh("rocket"); put(o, en.x, en.y, alt3(en, A.rocket), M.RK_L, true, 0, Math.sin(now / 900) * .06, 0); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
+        const ey = en.y - M.RK_L * .47, L2 = 46 + Math.random() * 16; Ba.q(en.x, ey - L2 / 2, alt3(en, A.rocket) - 4, 22, L2, 0, UV.tongue, .55, .8, 1, .95); Ba.q(en.x, ey, alt3(en, A.rocket) - 3, 40, 40, 0, UV.glow, .5, .7, 1, .6); }
       else if (en.t === "base") { const o = bossMesh("base"); put(o, en.x, en.y, A.base, M.BASE_W, false, 0, 0, 0); flash(o, Math.min(1, (en.hit || 0) / 700) * .35, 0xffc070);
         const u = o.userData; (en.L || []).forEach((l, i) => { const hd = u.L[i]; if (hd) hd.rotation.y = Math.PI / 2 - l.a; }); if (u.radar) u.radar.rotation.y = -en.rad; }
       else if (en.t === "bird") { const pg = en.pg ? 1 : 0, o = birdGet(pg), vx = en.vx || 0, vy = en.vy || 1, fl = Math.sin((en.fl || 0) / 8 * TAU), wing = o.userData.wings;
-        put(o, en.x, en.y, A.bird, M.BIRD_W, false, Math.atan2(vx, vy), 0, en.st === "dive" ? .25 : 0); wing[0].rotation.z = fl * .75; wing[1].rotation.z = -fl * .75;
-        if (en.hit > 0) Ba.q(en.x, en.y, A.bird + 6, 40, 40, 0, UV.dot, 1, 1, 1, Math.min(.8, en.hit / 200)); }
+        put(o, en.x, en.y, alt3(en, A.bird), M.BIRD_W, false, Math.atan2(vx, vy), 0, en.st === "dive" ? .25 : 0); wing[0].rotation.z = fl * .75; wing[1].rotation.z = -fl * .75;
+        if (en.hit > 0) Ba.q(en.x, en.y, alt3(en, A.bird) + 6, 40, 40, 0, UV.dot, 1, 1, 1, Math.min(.8, en.hit / 200)); }
     }
     const bd = G.bossDie; if (bd) { const b = bd.b, dur = b.t === "gunship" ? 1800 : b.t === "flock" ? 900 : 2600; if (bd.t < dur * .8) { const sc = 1 - .25 * bd.t / dur, u = bd.t / dur;
       if (b.t === "gunship") { const o = take("cop0", 0x9aa66a); if (o) { put(o, b.x, b.y, A.gun * (1 - u * .6), M.GS_LEN * sc, true, -(b.spin || 0), .4 * u, .3 * u); flash(o, .25, 0xff5a1f); } }
@@ -569,7 +571,7 @@ async function boot() {
   function drawTraffic(now, G) { const T = G.trf; if (!T) return;
     for (let i = 0; i < T.length; i++) { const p = T[i], o = take("trf", TRF_TINT[p.v] || 0); if (!o) continue;
       const roll = p.wob > 0 ? Math.sin(now / 55) * p.wob * .5 : Math.sin(now / 900 + p.seed) * .05;
-      put(o, p.x, p.y, A.trf, p.w, false, Math.atan2(p.vx, p.vy), roll, 0); flash(o, 0);
+      put(o, p.x, p.y, alt3(p, A.trf), p.w, false, Math.atan2(p.vx, p.vy), roll, 0); flash(o, 0);
       navPair(now, p.seed, frac(o, .47, .2, .1).clone(), frac(o, -.47, .2, .1), 1.6); } }
   function drawReview(now, G) {
     const p = G.rp, D = G.rpDie; banner.visible = false; tow.visible = false;
@@ -599,36 +601,36 @@ async function boot() {
     const K = R.kit; if (K) { kitAt(K, now, true); if (!M.reduce) { const L = Math.hypot(K.vx, K.vy) * 9, rot = Math.atan2(-K.vx, K.vy); Ba.q(K.x - K.vx * 4.5, K.y - K.vy * 4.5, A.item - 2, 12, L, rot, UV.beam, .31, 1, .59, .55); } }
   }
   let kitN = 0;
-  function kitAt(it, now, fast) { const o = poolGet(kits, kitN++, () => { const m = new THREE.Mesh(kitGeo, kitMats); m.castShadow = true; return m; }), p = 1 + .08 * Math.sin(now / 150), k = ws(A.item);
-    o.position.set(wx(it.x, A.item), A.item, wz(it.y, A.item)); o.scale.setScalar(k * p); o.rotation.set(CHASE ? .95 : -.35, Math.sin(now / 400) * .3 + (fast ? now / 200 : 0), 0);
+  function kitAt(it, now, fast) { const o = poolGet(kits, kitN++, () => { const m = new THREE.Mesh(kitGeo, kitMats); m.castShadow = true; return m; }), p = 1 + .08 * Math.sin(now / 150), k = ws(A.item), IY = alt3(it, A.item);
+    o.position.set(wx(it.x, IY), IY, wz(it.y, IY)); o.scale.setScalar(k * p); o.rotation.set(CHASE ? .95 : -.35, Math.sin(now / 400) * .3 + (fast ? now / 200 : 0), 0);
     Ba.q(it.x, it.y, A.item - 14, 68 * p, 68 * p, 0, UV.dot, .31, 1, .59, .55); }
   const FOOD_TILT = -1.05;
   function drawItems(now, G) {
     let cn = 0, dn2 = 0, crn = 0;
     for (let i = 0; i < G.items.length; i++) { const it = G.items[i];
-      if (it.t === "coin") { const o = poolGet(coins, cn++, coinMesh), r = it.r, k = ws(A.item); o.position.set(wx(it.x, A.item), A.item, wz(it.y, A.item)); o.scale.set(r * k, r * k, r * k); if (CHASE) { o.rotation.order = "YXZ"; o.rotation.set(Math.PI / 2, it.spin || 0, 0); } else { o.rotation.set(0, 0, it.spin || 0); o.rotation.order = "ZXY"; }
-        Ba.q(it.x, it.y, A.item - 12, r * 4, r * 4, 0, UV.dot, 1, .84, .27, .45); }
+      if (it.t === "coin") { const o = poolGet(coins, cn++, coinMesh), r = it.r, k = ws(alt3(it, A.item)); o.position.set(wx(it.x, alt3(it, A.item)), alt3(it, A.item), wz(it.y, alt3(it, A.item))); o.scale.set(r * k, r * k, r * k); if (CHASE) { o.rotation.order = "YXZ"; o.rotation.set(Math.PI / 2, it.spin || 0, 0); } else { o.rotation.set(0, 0, it.spin || 0); o.rotation.order = "ZXY"; }
+        Ba.q(it.x, it.y, alt3(it, A.item) - 12, r * 4, r * 4, 0, UV.dot, 1, .84, .27, .45); }
       else if (it.t === "driz") { const tex = drizTex(); const o = poolGet(drizs, dn2++, () => new THREE.Mesh(drizGeo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: .35, side: THREE.DoubleSide, color: 0xffffff })));
         if (tex && o.material.map !== tex) { o.material.map = tex; o.material.needsUpdate = true; } o.visible = !!tex;
-        const Yd = A.item + 6, k = ws(Yd), pu = .5 + .5 * Math.sin(now / 180), Hd = 54, Wd = tex ? Hd * tex.image.naturalWidth / tex.image.naturalHeight : 34, c = Math.cos(it.spin || 0);
+        const Yd = alt3(it, A.item) + 6, k = ws(Yd), pu = .5 + .5 * Math.sin(now / 180), Hd = 54, Wd = tex ? Hd * tex.image.naturalWidth / tex.image.naturalHeight : 34, c = Math.cos(it.spin || 0);
         o.position.set(wx(it.x, Yd), Yd, wz(it.y, Yd)); o.scale.set(Wd * k * Math.max(.14, Math.abs(c)), 1, Hd * k); o.rotation.set(CHASE ? Math.PI / 2 : 0, 0, 0);   // coin-style turn (never fully edge-on), like the 2D one
         o.material.color.setScalar(c < 0 ? .82 : 1.08 + .12 * pu);
         const gr = Hd * (1.05 + .18 * pu) * 2;   // pulsing soft gold halo, same as 2D
         Ba.q(it.x, it.y, Yd - 10, gr * 1.25, gr * 1.25, 0, UV.dot, 1, .8, .26, .5 + .3 * pu); Ba.q(it.x, it.y, Yd - 9, gr * .6, gr * .6, 0, UV.dot, 1, .92, .6, .3 + .25 * pu);
         if ((now / 90 | 0) % 5 === 0) { const a = Math.random() * TAU; Ba.q(it.x + Math.cos(a) * 34, it.y + Math.sin(a) * 34, Yd + 20, 5, 5, 0, UV.dot, 1, 1, .86, .95); } }
       else if (it.t === "heal") kitAt(it, now, false);
-      else if (it.t === "crate") { const nx = M.WPN[Math.min(4, G.wpn + 1)], col = G.wpn >= 4 ? "#ffd23f" : nx.c, sw = Math.sin(now / 420 + it.sw) * .16, k = ws(A.item);
+      else if (it.t === "crate") { const nx = M.WPN[Math.min(4, G.wpn + 1)], col = G.wpn >= 4 ? "#ffd23f" : nx.c, sw = Math.sin(now / 420 + it.sw) * .16, k = ws(alt3(it, A.item));
         const o = poolGet(crates, crn++, makeCrate), u = o.userData; if (!crateTexC[col]) crateTexC[col] = crateTex(col); if (u.box.material.map !== crateTexC[col]) { u.box.material.map = crateTexC[col]; u.box.material.needsUpdate = true; }
-        o.position.set(wx(it.x, A.item), A.item, wz(it.y, A.item)); o.scale.setScalar(k); o.rotation.set(0, -sw, 0);
+        o.position.set(wx(it.x, alt3(it, A.item)), alt3(it, A.item), wz(it.y, alt3(it, A.item))); o.scale.setScalar(k); o.rotation.set(0, -sw, 0);
         u.ch.position.set(0, 26, -30); u.ch.rotation.set(-.55, 0, 0);
         const L = u.lines.geometry.attributes.position.array; L.set([-12, 11, -6, -24, 22, -24, 12, 11, -6, 24, 22, -24, -5, 11, -8, -8, 26, -30, 5, 11, -8, 8, 26, -30]); u.lines.geometry.attributes.position.needsUpdate = true;
-        const c = rgb(col); Ba.q(it.x, it.y + 4, A.item - 12, 92, 92, 0, UV.dot, c[0], c[1], c[2], .45 + .2 * Math.sin(now / 140)); }
+        const c = rgb(col); Ba.q(it.x, it.y + 4, alt3(it, A.item) - 12, 92, 92, 0, UV.dot, c[0], c[1], c[2], .45 + .2 * Math.sin(now / 140)); }
       else if (it.t === "slow" || it.t === "boost") { }   // slow-mo hourglass + boost pickup: drawn on the 2D overlay (index.html)
       else { const P = it.t === "mic" ? M.MIC : it.p, key = P.k, bob = Math.sin(now / 260 + it.x) * 3, o = MODELS[key] ? take(key) : null;
         if (o) { const zs = o.userData.size, flat = zs.y < .5 * Math.max(zs.x, zs.z);   // plates/skillets show their top (the food), glasses/bottles/mic lean toward the camera
-          put(o, it.x, it.y + bob, A.item, (P.w3 || P.w) * zs.x / (flat ? Math.max(zs.x, zs.z) : Math.max(zs.x, zs.y)), false, now / 1100 + it.x, (it.rot || 0) * .8, CHASE ? (flat ? .8 : .12) : P.tilt3 != null ? P.tilt3 : flat ? .32 : FOOD_TILT); o.rotation.order = "XYZ"; foodLit(o, it.t === "mic" ? 0 : P.drink ? .5 : .42); }
+          put(o, it.x, it.y + bob, alt3(it, A.item), (P.w3 || P.w) * zs.x / (flat ? Math.max(zs.x, zs.z) : Math.max(zs.x, zs.y)), false, now / 1100 + it.x, (it.rot || 0) * .8, CHASE ? (flat ? .8 : .12) : P.tilt3 != null ? P.tilt3 : flat ? .32 : FOOD_TILT); o.rotation.order = "XYZ"; foodLit(o, it.t === "mic" ? 0 : P.drink ? .5 : .42); }
         else if (M.ready(P.im)) cardAt(P, it.x, it.y + bob, it.rot || 0);
-        const c = it.t === "mic" ? [.89, .42, .51] : [1, .88, .55]; Ba.q(it.x, it.y, A.item - 16, P.w * 1.7, P.w * 1.7, 0, UV.dot, c[0], c[1], c[2], .4);
+        const c = it.t === "mic" ? [.89, .42, .51] : [1, .88, .55]; Ba.q(it.x, it.y, alt3(it, A.item) - 16, P.w * 1.7, P.w * 1.7, 0, UV.dot, c[0], c[1], c[2], .4);
         if (it.t === "food") { if (P.drink) drinkGlint(P, it.x, it.y + bob, now); else steam3(P, it.x, it.y + bob, now); } } }
     hideFrom(coins, cn); hideFrom(drizs, dn2); hideFrom(kits, kitN); hideFrom(crates, crn);
   }
@@ -645,13 +647,13 @@ async function boot() {
     const k = ws(A.item), h = P.w * P.im.naturalHeight / P.im.naturalWidth; o.position.set(wx(x, A.item), A.item, wz(y, A.item)); o.scale.set(P.w * k, h * k, 1); o.rotation.set(CHASE ? -.15 : -Math.PI / 2 + .35, 0, -rot); }
   function drawShots(now, G) {
     const run = G.running && !G.dying, LK = CHASE ? 3 : 1; Ba.ax = CHASE ? 1 : 0;   // chase view: bolts turn on their own axis and are stretched so they read flying away from you
-    for (let s = 0; s < G.shots.length; s++) { const sh = G.shots[s], x = sh.x, y = sh.y, Y = A.shot + 2;
+    for (let s = 0; s < G.shots.length; s++) { const sh = G.shots[s], x = sh.x, y = sh.y, Y = alt3(sh, A.shot) + 2;
       if (sh.w === 0) { Ba.q(x, y + 6, Y, 3.4, 13 * LK, 0, UV.beam, .94, .83, .46, 1); Ba.q(x, y + 6, Y - 1, 9, 22 * LK, 0, UV.beam, .94, .83, .46, .35); }
       else if (sh.w === 1) { Ba.q(x, y + 11, Y, 8, 32 * LK, 0, UV.beam, .49, 1, .42, .45); Ba.q(x, y + 11, Y + .5, 2.6, 24 * LK, 0, UV.beam, .92, 1, .88, 1); }
       else if (sh.w === 2) { Ba.q(x, y + 12, Y, 6, 18 * LK, 0, UV.beam, 1, .55, .16, .45); Ba.q(x, y, Y + .5, 22, 22, 0, UV.fball, 1, 1, 1, 1); }
       else if (sh.w === 3) { Ba.q(x, y + 14, Y, 11, 40 * LK, 0, UV.beam, .23, .66, 1, .45); Ba.q(x, y + 14, Y + .3, 6, 34 * LK, 0, UV.beam, .47, .78, 1, .85); Ba.q(x, y + 14, Y + .6, 2.4, 30 * LK, 0, UV.beam, .93, .97, 1, 1); }
       else { Ba.q(x, y + 18, Y, 16, 52 * LK, 0, UV.beam, 1, .16, .16, .4); Ba.q(x, y + 18, Y + .3, 8, 46 * LK, 0, UV.beam, 1, .27, .24, .9); Ba.q(x, y + 18, Y + .6, 3.4, 40 * LK, 0, UV.beam, 1, .95, .93, 1); } }
-    for (let q = 0; q < G.eshots.length; q++) { const es = G.eshots[q]; if (!es) continue; const c = rgb(es.c), Y = A.eshot;
+    for (let q = 0; q < G.eshots.length; q++) { const es = G.eshots[q]; if (!es) continue; const c = rgb(es.c), Y = alt3(es, A.eshot);
       if (es.tr && es.tr.length) for (let ti = 0; ti < es.tr.length; ti += 2) { const tu = ti / es.tr.length; Bn.q(es.tr[ti], es.tr[ti + 1], Y - 2, 5 + 7 * (1 - tu), 5 + 7 * (1 - tu), 0, UV.dot, .86, .87, .9, .1 + .3 * tu); }
       if (es.missile) { const rot = Math.atan2(es.vy, es.vx) - Math.PI / 2, ca = Math.cos(rot), sa = Math.sin(rot), body = (ly) => [es.x - ly * sa, es.y + ly * ca];
         let p = body(-5); Bn.q(p[0], p[1], Y, 4, 14, rot, UV.sq, c[0] * .9, c[1] * .9, c[2] * .9, 1); Ba.q(p[0], p[1], Y + .5, 12, 24, rot, UV.dot, c[0], c[1], c[2], .55);
@@ -677,7 +679,7 @@ async function boot() {
   function chaseCam(G, dt) {
     const X = PL.x - W / 2, Z = PL.y - H / 2, bank = Math.max(-1, Math.min(1, (G.vx || 0) * .12));
     // behind and a little above the plane; the camera follows you sideways most of the way so the field stays in view
-    CT.set(X * .8, Math.max(26, PL.Y + 50), Z + 215); LT.set(X * .5, PL.Y + 4, Z - 300);
+    CT.set(X * .82, Math.max(28, PL.Y * .85 + 52), Z + 182); LT.set(X * .75, Math.max(0, PL.Y * .7 - 20), Z - 380); wMesh.position.y = PL.Y + 1;
     const a = CAM.ok ? 1 - Math.exp(-(dt || 16) / 1000 * 6.5) : 1; CAM.ok = true;
     CAM.p.lerp(CT, a); CAM.l.lerp(LT, a); CAM.roll += (-bank * .07 - CAM.roll) * a;
     const sh = M.SHK; cam.position.set(CAM.p.x - sh[0] * .5, CAM.p.y + sh[1] * .5, CAM.p.z);
@@ -687,8 +689,52 @@ async function boot() {
     for (let i = 0; i < G.clouds.length; i++) { const c = G.clouds[i]; Bn.q(c.x, c.y, A.player + [-60, 45, 95][i % 3], c.s * 2.6, c.s * 1.5, 0, UV.smoke, .78, .82, .98, .2); } }
   const PV = new THREE.Vector3(), TF = Math.tan(cam.fov * Math.PI / 360);
   // game px (x, y) at altitude Y (default: your flight level) → [x, y, scale] on the 400x600 overlay, or null if behind the camera
-  function proj(x, y, Y) { PV.set(x - W / 2, Y == null ? A.player : Y, y - H / 2).applyMatrix4(cam.matrixWorldInverse); const vz = -PV.z; if (vz < 8) return null;
+  function proj(x, y, Y) { PV.set(x - W / 2, Y == null ? PL.Y : Y, (Y === 0 ? y : far(y)) - H / 2).applyMatrix4(cam.matrixWorldInverse); const vz = -PV.z; if (vz < 8) return null;
     PV.applyMatrix4(cam.projectionMatrix); return [(PV.x + 1) / 2 * W, (1 - PV.y) / 2 * H, (H / 2) / (vz * TF)]; }
+
+
+  /* ---------------- chase view: the 3D ground, breaking buildings, the Easter egg, wounds ---------------- */
+  const SEGS = new Map(), KIND = { runway: "runway", city: "city", towers: "towers", melody: "melody", stadium: "stadium", hills: "hills", coast: "coast", venice: "venice", pier: "pier" };
+  const V2 = new THREE.Vector3(), WV = new THREE.Vector3();
+  let segSeed = 1, eggRun = -1, eggSeg = null, clipCD = 0, lastHp = 100;
+  function drawWorld(now, dt, G) {
+    const t = now / 1000, s = Math.min(.05, (dt || 16) / 1000), gsp = (G.gsp || 0) * 60; WORLD.wind.set(0, 0, gsp); WORLD.tick(s, t);
+    if (G.runId !== eggRun) { eggRun = G.runId; eggSeg = null; }
+    // Antidote's car + review screen: once the review is unlocked (7 Drizzle emblems) or past EGG_SCORE, one city strip ahead gets them
+    const unlocked = G.running && !G.debug && ((G.dz || 0) >= M.DRIZ_N || G.score >= (M.EGG_SCORE || 3000)), live = new Set(), camZ = cam.position.z;
+    for (const g of G.ground) { const kind = KIND[g.k] || "city"; let sg = SEGS.get(g);
+      if (sg && sg.kind !== kind) { scene.remove(sg.group); sg.dispose(); if (sg === eggSeg) eggSeg = null; sg = null; }
+      if (!sg) { const egg = !eggSeg && unlocked && !G.eggFound && kind === "city" && g.y < -200; sg = WORLD.segment(kind, g.h, segSeed++, { side: g.side || 1, noStrip: true, egg, eggSide: g.side || 1 }); if (egg) eggSeg = sg; scene.add(sg.group); SEGS.set(g, sg); }
+      sg.group.position.z = g.y + g.h / 2 - H / 2; sg.update(t, s, Math.abs(sg.group.position.z - camZ) < 1400); live.add(g); }
+    for (const [g, sg] of SEGS) if (!live.has(g)) { scene.remove(sg.group); sg.dispose(); SEGS.delete(g); if (sg === eggSeg) eggSeg = null; }
+    M.egg = eggSeg && eggSeg.egg ? { on: true, x: eggSeg.egg.x + W / 2, y: eggSeg.group.position.z + eggSeg.egg.z + H / 2 } : null;
+    const PX = PL.x - W / 2, PZ = PL.y - H / 2; clipCD -= s;
+    // you vs the buildings: a rooftop scrape is a small hit, flying into one is a full hit; either way the building breaks where you hit it
+    if (G.running && !G.dying && clipCD <= 0 && (G.alt == null || G.alt > .95)) for (const sg of SEGS.values()) { if (Math.abs(PZ - sg.group.position.z) > sg.len / 2 + 20) continue;
+      const h = sg.collide(PX, PL.Y - 4, PZ, 30, 16); if (h) { const scrape = h.o.h - PL.Y < 14; sg.smash(h, PX, PL.Y, PZ, "plane"); clipCD = .7; if (M.bldHit) M.bldHit(!scrape); break; } }
+    // your shots vs the buildings (they chip them; the shot is spent)
+    for (const sh of G.shots) { if (sh.dead) continue; const sx = sh.x - W / 2, sz = far(sh.y) - H / 2, sy = alt3(sh, A.shot);
+      for (const sg of SEGS.values()) { if (Math.abs(sz - sg.group.position.z) > sg.len / 2) continue; const h = sg.collide(sx, sy, sz, 2, 14); if (h) { sg.smash(h, sx, sy, sz, "shot"); sh.dead = 1; if (M.bldShot) M.bldShot(); } break; } }
+    // skimming the water: spray and a wake
+    if (G.running) for (const sg of SEGS.values()) { if (Math.abs(PZ - sg.group.position.z) > sg.len / 2) continue; if (sg.water(PX) && PL.Y < 95) { const k = (95 - PL.Y) / 30;
+      for (let i = 0; i < 3; i++) if (Math.random() < s * 60 * k) FXA.emit(V.set(PX + (Math.random() - .5) * 50, 1.5, PZ + 10 + Math.random() * 20), V2.set((Math.random() - .5) * 30, 18 + Math.random() * 22, gsp + 30 * Math.random()), .9, 3, 14, [.97, .97, .96], [.85, .88, .9], .75, false, 0, .8, -30); } break; }
+  }
+  const ALT_OF = { ufo: "ufo", jet: "jet", cop: "cop", kami: "kami", gunship: "gun", superjet: "sj", esc: "esc", squad: "bigjet", rocket: "rocket", base: "base", bird: "bird" };
+  // enemies: each hit leaves a burning hole on the airframe that trails smoke; badly hurt ones burn before they blow
+  function enemyWounds(now, dt, G) { const s = Math.min(.05, (dt || 16) / 1000), wz0 = (G.gsp || 0) * 60;
+    for (const en of G.ens) { if (!en || !en.mhp || en.t === "base") continue; const lvl = 1 - Math.max(0, en.hp) / en.mhp; if (lvl <= .02) continue; const e = ext(en); e.w = e.w || [];
+      const n = Math.min(5, Math.ceil(lvl * 4)); while (e.w.length < n) e.w.push([(Math.random() - .5) * .7, .1 + Math.random() * .3, (Math.random() - .4) * .6]);
+      const size = en.boss ? (en.rw || 80) * 1.6 : (en.w || en.r * 2.4), cx = en.x - W / 2, cz = far(en.y) - H / 2, cy = alt3(en, A[ALT_OF[en.t]] || A.air);
+      for (const w of e.w) { V.set(cx + w[0] * size, cy + w[1] * size * .4, cz + w[2] * size); FXA.dark(V, 4 + size * .05, .85); FXA.glow(V, 3 + size * .03, [1, .45, .12], .9);
+        if (Math.random() < s * (10 + 12 * lvl)) FXA.emit(V, V2.set((Math.random() - .5) * 8, 8, wz0 + (Math.random() - .5) * 8), 1.2 + lvl, 3, 12 + 14 * lvl, lvl > .55 ? [.2, .18, .17] : [.5, .48, .47], [.12, .12, .12], .7, false, 0, .4, 4);
+        if (lvl > .45 && Math.random() < s * 36) FXA.emit(V, V2.set(0, 6, wz0 * .9), .3, 7 * (.6 + Math.random() * .6), 2, [1, .82, .35], [1, .25, .05], 1, true, 0, 0, 16); } } }
+  // you: each health drop opens a wound on a wing / engine / fuselage that keeps smoking; low health = engine fire + black smoke
+  function playerWounds(now, dt, G) { const s = Math.min(.05, (dt || 16) / 1000);
+    if (G.hp >= 99.9 && !G.dying && pDmg.count()) pDmg.reset();
+    if (G.hp < lastHp - .5) { const n = Math.max(1, Math.round((lastHp - G.hp) / 20)); for (let i = 0; i < n; i++) pDmg.hit(AIR.pts.wound[(Math.random() * AIR.pts.wound.length) | 0]); }
+    else if (G.hp > lastHp + 5) pDmg.heal();
+    lastHp = G.hp; pDmg.level = G.dying ? 1 : 1 - G.hp / 100;
+    if (PLY.visible) pDmg.update(s, now / 1000, PLY.scale.x, WV.set(0, 0, (G.gsp || 0) * 60), AIR.pts.eng); }
 
   /* ---------------- frame ---------------- */
   let last = 0, fpsT = 0, fpsN = 0, bad = 0, started = performance.now();
@@ -700,6 +746,7 @@ async function boot() {
     drawFX(now, G);
     if (CHASE) drawClouds(G);
     drawPlayer(now, G); drawTraffic(now, G); drawEnemies(now, G); drawReview(now, G); drawRescue(now, G); drawItems(now, G); drawShots(now, G);
+    if (CHASE) { drawWorld(now, dt, G); enemyWounds(now, dt, G); playerWounds(now, dt, G); FXA.update((dt || 16) / 1000); }
     for (let i = ROTORS.n; i < ROTORS.list.length; i++) ROTORS.list[i].visible = false;
     hideFrom(cards, cardN); poolsEnd(); hideFrom(BIRDS[0], birdN[0]); hideFrom(BIRDS[1], birdN[1]); for (const k in BOSSM) if (!BOSSM[k].userData.used) BOSSM[k].visible = false; BATCHES.forEach(b => b.end());
     if (CHASE) { chaseCam(G, dt); wTex.needsUpdate = true; } else { const sh = M.SHK; cam.position.set(-sh[0], D, -sh[1]); }
@@ -709,7 +756,7 @@ async function boot() {
     if (now - fpsT >= 1000) { const fps = fpsN * 1000 / (now - fpsT); STATUS.fps = Math.round(fps); fpsN = 0; fpsT = now;
       if (MODE === "auto" && !document.hidden && now - started > 4000) { bad = fps < 40 ? bad + 1 : 0; if (bad >= 5) fallback("low fps " + Math.round(fps)); } }
   }
-  function fallback(why) { STATUS.reason = why; STATUS.on = false; M.render = null; M.chase = 0; M.wcx = null; M.proj = null; M.on(false); gl.remove(); try { renderer.dispose(); } catch (e) {} console.info("[melody3d] switched to 2D:", why); }
+  function fallback(why) { STATUS.reason = why; STATUS.on = false; M.render = null; M.chase = 0; M.wcx = null; M.proj = null; M.egg = null; M.on(false); gl.remove(); try { renderer.dispose(); } catch (e) {} console.info("[melody3d] switched to 2D:", why); }
   gl.addEventListener("webglcontextlost", (e) => { e.preventDefault(); fallback("context lost"); });
   wrap.style.isolation = "isolate";
   wrap.insertBefore(gl, cv);

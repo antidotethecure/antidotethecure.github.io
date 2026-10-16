@@ -51,7 +51,7 @@ export function makeQuality(O = {}) {
       if (document.hidden) return "";
       if (fps < target) low++; else low = 0;
       if (auto() && low >= 3 && tier !== "low") { const i = TIER_NAMES.indexOf(tier); Q.set(TIER_NAMES[i - 1], false); low = 0; return "down"; }
-      if (tier === "low") { lowLow = fps < minFps ? lowLow + 1 : 0; if (lowLow >= 5) return "fail"; } else lowLow = 0;
+      if (tier === "low") { lowLow = fps < minFps ? lowLow + 1 : 0; if (lowLow >= (O.failSecs || 5)) return "fail"; } else lowLow = 0;
       return ""; },
   };
   return Q;

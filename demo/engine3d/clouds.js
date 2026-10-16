@@ -10,7 +10,7 @@
      const cl = makeClouds(THREE, { renderer, sky, quality: { scale, steps, light } })
      cl.render(camera, depthTexture|null, t, dt, params)   params: { cover, density, base, top, wind: Vector3, puffs: [[x,y,z,r]...], sunCol, sunI, fogCol, fogFar, wet }
      cl.full / cl.front (textures) · cl.compositeShader (for postfx.js) · cl.mist (0..1, how deep the camera is inside a cloud) */
-import { SKY_GLSL } from "./sky.js";
+import { SKY_GLSL } from "./sky.js?v=e3f";
 
 const NOISE_GLSL = `
   vec3 hash33(vec3 p){ p = vec3(dot(p, vec3(127.1, 311.7, 74.7)), dot(p, vec3(269.5, 183.3, 246.1)), dot(p, vec3(113.5, 271.9, 124.6))); return -1.0 + 2.0 * fract(sin(p) * 43758.5453123); }
@@ -109,7 +109,7 @@ export function makeClouds(THREE, O) {
     fragmentShader: "uniform sampler2D t; uniform vec2 px; varying vec2 vUv; void main(){ vec4 c = texture2D(t, vUv) * .25; c += (texture2D(t, vUv + vec2(px.x, 0.)) + texture2D(t, vUv - vec2(px.x, 0.)) + texture2D(t, vUv + vec2(0., px.y)) + texture2D(t, vUv - vec2(0., px.y))) * .125; c += (texture2D(t, vUv + px) + texture2D(t, vUv - px) + texture2D(t, vUv + vec2(px.x, -px.y)) + texture2D(t, vUv + vec2(-px.x, px.y))) * .0625; gl_FragColor = c; }" });
   const bq = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), blurM); bq.frustumCulled = false; const bs = new THREE.Scene(); bs.add(bq);
   function ensure(w, h) { const W = Math.max(32, Math.round(w * Q.scale)), H2 = Math.max(32, Math.round(h * Q.scale)); if (rt && rt.width === W && rt.height === H2) return;
-    if (rt) rt.dispose(); rt = new THREE.WebGLMultipleRenderTargets(W, H2, 2, { type: THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
+    if (rt) rt.dispose(); rt = new THREE.WebGLMultipleRenderTargets(W, H2, 2, { type: O.rtType || THREE.HalfFloatType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
     rt.texture.forEach(t => { t.minFilter = t.magFilter = THREE.LinearFilter; t.generateMipmaps = false; }); U.uRes.value.set(W, H2); }
   const api = { mist: 0, uniforms: U,
     get full() { return rt && rt.texture[0]; }, get fullSoft() { return rtSoft ? rtSoft.texture : rt && rt.texture[0]; }, get front() { return rt && rt.texture[1]; },
@@ -128,7 +128,7 @@ export function makeClouds(THREE, O) {
       if (cp.y > U.uBase.value + 20) m = Math.max(m, Math.min(1, U.uCover.value * 1.3) * Math.min(1, (cp.y - U.uBase.value) / 120));
       api.mist += (Math.max(0, Math.min(1, m * 1.8)) - api.mist) * Math.min(1, dt * 2.5);
       const prev = renderer.getRenderTarget(); renderer.setRenderTarget(rt); renderer.render(qs, qc);
-      if (P.soft) { if (!rtSoft || rtSoft.width !== rt.width || rtSoft.height !== rt.height) { if (rtSoft) rtSoft.dispose(); rtSoft = new THREE.WebGLRenderTarget(rt.width, rt.height, { type: THREE.HalfFloatType, depthBuffer: false }); }
+      if (P.soft) { if (!rtSoft || rtSoft.width !== rt.width || rtSoft.height !== rt.height) { if (rtSoft) rtSoft.dispose(); rtSoft = new THREE.WebGLRenderTarget(rt.width, rt.height, { type: O.rtType || THREE.HalfFloatType, depthBuffer: false }); }
         blurM.uniforms.t.value = rt.texture[0]; blurM.uniforms.px.value.set(1.2 / rt.width, 1.2 / rt.height); renderer.setRenderTarget(rtSoft); renderer.render(bs, qc); }
       renderer.setRenderTarget(prev); },
   };

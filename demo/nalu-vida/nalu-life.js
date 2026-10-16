@@ -12,7 +12,7 @@ const CDN = "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/";
 export async function makeNaluLife(THREE, O) {
   const { R, scene, cam, sun, hemi, A, G, K, loader, oceanMat, hide, makeBoard } = O;
   const imp = (n) => import("../engine3d/" + n + ".js?v=n1"), addons = (p) => import(CDN + p + "/+esm");
-  const [QM, SKYM, CLDM, WXM, POSTM, CRM, AUDM] = await Promise.all(["quality", "sky", "clouds", "weather", "postfx", "crowd", "audio"].map(imp));
+  const [QM, SKYM, CLDM, WXM, POSTM, CRM, AUDM, BBM] = await Promise.all(["quality", "sky", "clouds", "weather", "postfx", "crowd", "audio", "billboard"].map(imp));
   const QUAL = window.__E3Q = QM.makeQuality({ id: "nalu-vida", renderer: R, target: 50, minFps: 40 });
   const prBase = R.getPixelRatio(); const applyPR = () => { R.setPixelRatio(Math.min(prBase, QUAL.cfg.pr)); };
   applyPR();
@@ -81,6 +81,9 @@ export async function makeNaluLife(THREE, O) {
       p.yw0 = 300 + i * 260 + R0() * 120; p.wait = !(i % 3); const b = makeBoard ? makeBoard() : null; if (b) { b.scale.multiplyScalar(.9); scene.add(b); p.board = b; } water.push(p); }
   }
   hide.forEach(o => { if (o) o.visible = false; });
+  // a big LED screen on the boardwalk by Nalu Vida playing Antidote's review (muted, inline, looping; poster if autoplay is blocked)
+  const VB = BBM.makeVideoBoards(THREE, { src: new URL("img/review/billboard.mp4", location.href).href, poster: new URL("img/review/billboard.jpg", location.href).href });
+  const board = VB.create({ w: 46, pole: 24, caption: "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" }); board.scale.setScalar(1); scene.add(board);
   const _v = new THREE.Vector3();
 
   /* ---------------- per frame ---------------- */
@@ -96,7 +99,8 @@ export async function makeNaluLife(THREE, O) {
       if (oceanMat) { const U = oceanMat.uniforms; U.uWxDark.value = w.dark * .9 + night * .25; U.uRain.value = w.rain; }
       // people
       if (crowd) { const y0 = f.y0, vis = f.shoreVisible;
-        if (O.placeProps) { O.placeProps(y0); O.propsVisible(vis); } patio.visible = vis; patio.position.set(342, 0, (y0 + 200) * K);
+        if (O.placeProps) { O.placeProps(y0); O.propsVisible(vis); }
+        board.visible = vis; board.position.set(262, 0, (y0 + 112) * K); board.rotation.set(-.5, 0, 0); VB.update(t); patio.visible = vis; patio.position.set(342, 0, (y0 + 200) * K);
         const near = f.near, rain = w.rain > .35;
         for (const p of beach) {
           if (p.kind === "pier") { const L = f.pier; if (!L) { p.visible = false; continue; } p.visible = true; p.pier.u = (p.pier.u + p.pier.sp * s + 1) % 1; p.set(L.x + p.pier.lane, L.h, L.z0 - p.pier.u * L.len, p.pier.sp > 0 ? Math.PI : 0); p.play(rain ? "coverRun" : "walk"); continue; }

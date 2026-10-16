@@ -345,13 +345,20 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <script src="../reviewegg.js"></script>
 <script src="../halftime.js"></script>
 <script src="../radio-avatar.js"></script>
-<script src="game.js?v=rb3"></script>
+<script src="game.js?v=e3n1"></script>
 <script>(function(){ var gp=(window.SSAI_REWARDS&&window.SSAI_REWARDS.game)||{}, per=gp.perScore||100, cap=gp.dailyCap||50;
 window.GAME_MENU={id:"nalu-vida",name:"Ride the Nalu",by:"Nalu Vida",tagline:"Run in, paddle out, ride the wave home to Nalu Vida. 5 levels. Earn Rewards points.",
  logo:"img/logo.png",hero:["img/game/surfer_f.webp","img/game/raft_taco.webp","img/game/raft_fries.webp","img/game/surfer_m.webp"],
  theme:{bg:"#06182e",bg2:"#0b3b5e",card:"#0f3354",edge:"#1d4f78",accent:"#ff7a3d",accent2:"#ffd23f",label:"#ffd23f",ink:"#f4fbff",dim:"#a9c8de",btnInk:"#3a1600",soft:"rgba(127,227,242,.10)",track:"rgba(255,255,255,.22)",good:"#3ddc97",bad:"#ff6b6b",display:"'Alfa Slab One',Georgia,serif",body:"system-ui,-apple-system,sans-serif"},
  tokens:false,spinBadge:false,
  mount:"#nalu-game .nv-wrap",hide:"#nv-start",start:function(){ window.__NV.pick(); },vibrate:true,
+ // engine3d look: graphics tier, weather and time of day (visual only; they never change the game)
+ selects:[{title:"Graphics",options:[["auto","Auto"],["low","Low"],["med","Medium"],["high","High"],["ultra","Ultra"]],note:"Auto picks for this phone and steps down if it gets choppy.",
+   get:function(){ return window.__E3Q?__E3Q.pref:"auto"; },set:function(v){ if(window.__E3Q) __E3Q.set(v); else try{ localStorage.setItem("e3-quality:nalu-vida",v); }catch(e){} }},
+  {title:"Weather",options:[["live","Live"],["sunny","Sunny"],["partly","Clouds"],["overcast","Overcast"],["fog","Fog"],["rain","Rain"],["storm","Storm"]],
+   get:function(){ return window.NALU_ENV?NALU_ENV.get().weather:"live"; },set:function(v){ if(window.NALU_ENV) NALU_ENV.weather(v); else try{ localStorage.setItem("nalu-weather",v); }catch(e){} }},
+  {title:"Time of day",options:[["live","Live"],["sunrise","Sunrise"],["day","Day"],["sunset","Sunset"],["night","Night"]],
+   get:function(){ return window.NALU_ENV?NALU_ENV.get().sky:"live"; },set:function(v){ if(window.NALU_ENV) NALU_ENV.sky(v); else try{ localStorage.setItem("nalu-sky",v); }catch(e){} }}],
  switches:[{label:"3D graphics (beta)",icon:"🧊",note:"On: a real 3D ocean, wave and surfer. Turns itself off on phones that can't keep it smooth.",get:function(){return !!(window.__NV3&&__NV3.pref());},set:function(on){window.__NV3&&__NV3.pref(on);}}],
  how:{goal:"Each level: run in from the sand, paddle out past the break, pop up and ride the wave back in to Nalu Vida. Ride all 5 levels for a big finish bonus. No sign-up needed to play.",time:"Level 1 is about 2 minutes (30 s paddle-out, 90 s ride); later levels have a 12–15 s paddle-out · 5 hearts, lost in halves",
   steps:[["👆","Drag left and right to steer"],["🤿","Paddling out: tap DUCK DIVE (or the screen) as each breaking wave reaches you. Get caught = a wipeout, −1 ❤️"],["🎣","Paddling out you'll pass stingrays and a fisherman hunting a shark. When his orange aim line shows, get off it (or duck-dive): a stray harpoon is −1 ❤️, a dodge is +150. Sharks are rare out there"],["🌊","Riding back in it's just you and the wave, nothing else in the water. The wave forms on one side and peels across: white foam behind the curl, a clean face ahead of it and out along the shoulder"],["⚠️","Only the white foam can hurt you: touch it = a wipeout, −½ ❤️. Stay on the clean face, or go round to the side with no foam"],["🏄","Tap JUMP (or swipe up) anywhere on the clean face to ride up the lip and launch. Closer to the curl and carving fast = bigger air"],["🌀","In the air tap TRICK (or the screen) for a 360, grab or flip, or swipe: sideways = 360, down = grab, up = flip. Finish the ring and land it: NICE! Land mid-trick = a little bail (−150)"],["🩹","Hurt? Health kits float by every 20 to 30 seconds on the ride in. Ride through one: +1 ❤️"],[null,"Grab the food rafts on the paddle-out. 4 in a row = ×2, 8 = ×3 and it keeps climbing","img/game/raft_taco.webp"],["💦","Any hit is just a splash wipeout: you pop back up"],["🎁","At the end your score turns into Nalu Vida Rewards points: 1 point per "+per+" score, up to "+cap+" a day. Join free to save them"]],
@@ -361,7 +368,7 @@ window.GAME_MENU={id:"nalu-vida",name:"Ride the Nalu",by:"Nalu Vida",tagline:"Ru
   {group:"Steer around these (5 hearts, lost in halves)",items:[{icon:"🌊",name:"Touch the white foam",note:"Riding in, it's the only thing that hurts",pts:"−½ ❤️ −100",bad:true},{icon:"💦",name:"Land mid-trick (light bail)",pts:"−150",bad:true},{icon:"🐟",name:"Stingray",note:"Paddle-out",pts:"−❤️",bad:true},{icon:"🎣",name:"Fisherman's stray harpoon",note:"Paddle-out · watch his orange aim line",pts:"−❤️",bad:true},{img:"img/game/jelly.webp",name:"Bump a jellyfish",pts:"−❤️",bad:true}]}],
  prizes:{title:"Rewards points",note:"Game points: 1 point per "+per+" score, up to "+cap+" points a day. They go to your Nalu Vida Rewards balance (join free to save them)."}};
 })();</script>
-<script src="../gamemenu.js?v=cf1"></script><script src="../a2hs.js"></script>
+<script src="../gamemenu.js?v=e3s1"></script><script src="../a2hs.js"></script>
 <div class="prizes" id="prizes"></div>
 
 <div id="champs" data-game="naluvida" data-prizes="off" style="max-width:430px;margin:12px auto"></div><script src="../champs.js?v=cf1"></script>

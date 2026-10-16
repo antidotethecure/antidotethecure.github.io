@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Cars Bench</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
+<style>body{margin:0;background:#9ab}</style></head><body><script type="module">
+import * as THREE from "three"; import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"; import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+const q = new URLSearchParams(location.search), r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(innerWidth, innerHeight); document.body.appendChild(r.domElement); r.outputColorSpace = THREE.SRGBColorSpace;
+const s = new THREE.Scene(); s.background = new THREE.Color(0x9ab); s.add(new THREE.HemisphereLight(0xffffff, 0x666666, 2)); const d = new THREE.DirectionalLight(0xffffff, 2); d.position.set(2, 4, 3); s.add(d);
+const L = new GLTFLoader(); L.setMeshoptDecoder(MeshoptDecoder); const g = await L.loadAsync("../assets/cars/cars.glb"); let i = 0;
+g.scene.traverse(o => { if (!o.isMesh) return; const p = o.geometry.attributes._part, c = o.geometry.attributes.color; if (q.get("parts")) for (let k = 0; k < p.count; k++) { const v = p.getX(k); if (v > .5) c.setXYZ(k, ...[[1,0,1],[0,1,1],[1,1,0],[1,0,0]][v - 1]); }
+  o.material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .5 }); });
+const kids = [...g.scene.children]; kids.forEach((o, k) => { o.position.set((k % 6) * 2.2 - 5.5, 0, -(k / 6 | 0) * 3.4); o.rotation.y = .6; s.add(o); });
+const c = new THREE.PerspectiveCamera(35, innerWidth / innerHeight, .1, 100); c.position.set(0, 6, 9); c.lookAt(0, 0, -1.6); r.render(s, c);
+</script></body></html>

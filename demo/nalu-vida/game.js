@@ -2046,7 +2046,8 @@
   var RQ = QS.get("render"), KEEP3 = QS.get("keep3d") === "1", FPSM = { n: 0, acc: 0, low: 0, last: 0 }, gen3 = 0, PREF3 = false;
   PREF3 = true; try { PREF3 = localStorage.getItem("nalu-3d") !== "0"; } catch (e) {}   // 3D (realistic ocean) is the default; Settings can turn it off
   var API3 = { G: G, W: W, H: H, HC: HC, PIER_X: PIER_X, PIER_W: PIER_W, STUB: STUB, SHORE_X: SHORE_X, CAM: CAM, SHK: SHK, IM: IM, reduce: REDUCE, wrap: wrap,
-    zoom: function () { return ZOOM; }, sy: sy, pierX: pierX, bossYw: bossYw, gore: function () { return GORE; }, speed: speed };
+    zoom: function () { return ZOOM; }, sy: sy, pierX: pierX, bossYw: bossYw, gore: function () { return GORE; }, speed: speed,
+    audioOut: function () { return (typeof AC !== "undefined" && AC && FX) ? FX : null; } };   // engine3d ambience plays through the sound-effects bus (mute + Settings still rule)
   function off3D(why) {
     gen3++; var was = D3 || R3; D3 = false; try { if (R3) R3.dispose(); } catch (e) {} R3 = null;
     var c = $("nv-3d"); if (c) c.remove(); gl_c.style.display = ""; if (was || why) try { console.warn("[nv3d] 2D renderer: " + why); } catch (e) {}
@@ -2055,6 +2056,7 @@
     var now = performance.now(); if (!D3 || !G.running || document.hidden) { FPSM.n = FPSM.acc = 0; FPSM.t = now; return; }
     FPSM.n++; FPSM.acc = (now - (FPSM.t || now)) / 1000; if (FPSM.acc < 1) return; FPSM.t = now;
     FPSM.last = FPSM.n / FPSM.acc; FPSM.n = FPSM.acc = 0; FPSM.low = FPSM.last < 40 ? FPSM.low + 1 : 0;
+    if (window.__NVLIFE) { try { window.__NVLIFE.sample(FPSM.last); if (window.__E3Q && window.__E3Q.tier !== "low") FPSM.low = 0; } catch (e) {} }   // engine3d steps the quality tier down first; 2D only after LOW fails
     if (FPSM.low >= 5 && !KEEP3) off3D("slow (" + Math.round(FPSM.last) + " fps)");
   }
   function on3D() {
@@ -2062,7 +2064,7 @@
     var c = document.createElement("canvas"); c.id = "nv-3d"; c.setAttribute("aria-hidden", "true"); wrap.insertBefore(c, cv); API3.canvas = c;
     var boot = function (M) { if (my !== gen3) return; M.init(API3).then(function (r) { if (my !== gen3) { r.dispose(); return; } R3 = r; D3 = true; gl_c.style.display = "none"; }, function (e) { if (my === gen3) off3D("init: " + (e && e.message || e)); }); };
     if (window.NV3D) boot(window.NV3D);
-    else { window.__NV3boot = boot; var s = document.createElement("script"); s.type = "module"; s.src = "game3d.js?v=sh3"; s.onerror = function () { if (my === gen3) off3D("game3d.js failed to load"); }; document.head.appendChild(s); }
+    else { window.__NV3boot = boot; var s = document.createElement("script"); s.type = "module"; s.src = "game3d.js?v=e3n1"; s.onerror = function () { if (my === gen3) off3D("game3d.js failed to load"); }; document.head.appendChild(s); }
     setTimeout(function () { if (my === gen3 && !D3) off3D("3D took too long to load"); }, 25000);
   }
   if (RQ === "3d" || (RQ !== "2d" && PREF3)) on3D();

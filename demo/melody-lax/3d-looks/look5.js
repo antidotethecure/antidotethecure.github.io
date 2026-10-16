@@ -116,5 +116,6 @@ function frame(t) { while (simT < t - 1e-6) { const d = Math.min(1 / 30, t - sim
 let frames = 0, ft = performance.now(), fps = 0;
 window.__E3 = { fx, cb: COMBAT, tr: TRAFFIC, wx: WX, sky: SKY, clouds: CLOUDS, stats: () => Object.assign({ fps, tier: QUAL.tier, hours: SKY.hours, state: WX.state, mist: CLOUDS.mist }, CROWD.stats(), { calls: renderer.info.render.calls, tris: renderer.info.render.triangles }) };
 const t0 = performance.now();
-const loop = (now) => { const t = TFIX != null ? +TFIX : (now - t0) / 1000; frame(t); frames++; if (now - ft > 1000) { fps = Math.round(frames * 1000 / (now - ft)); frames = 0; ft = now; } requestAnimationFrame(loop); };
+window.capFrame = (t) => { CAPT = t; frame(t); return cv.toDataURL("image/jpeg", .88); }; let CAPT = null;
+const loop = (now) => { const t = CAPT != null ? CAPT : TFIX != null ? +TFIX : (now - t0) / 1000; frame(t); frames++; if (now - ft > 1000) { fps = Math.round(frames * 1000 / (now - ft)); frames = 0; ft = now; } requestAnimationFrame(loop); };
 requestAnimationFrame(loop);

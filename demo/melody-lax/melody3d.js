@@ -46,7 +46,7 @@ async function boot() {
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
   const QM = await import("../engine3d/quality.js?v=e1");
-  const [PARTM, DMGM, ACM, SKYM, CLDM, WXM, POSTM, WATM, AUDM, CBM] = CHASE ? await Promise.all(["particles", "damage", "aircraft", "sky", "clouds", "weather", "postfx", "water", "audio", "combat"].map(n => import("../engine3d/" + n + ".js?v=e3b"))) : [];
+  const [PARTM, DMGM, ACM, SKYM, CLDM, WXM, POSTM, WATM, AUDM, CBM, APXM] = CHASE ? await Promise.all(["particles", "damage", "aircraft", "sky", "clouds", "weather", "postfx", "water", "audio", "combat", "apex"].map(n => import("../engine3d/" + n + ".js?v=e3b"))) : [];
   const W = M.W, H = M.H, S = M.S, FX = M.FX, FXI = FX._i(), TAU = Math.PI * 2;
   const D = 1000;                                   // camera height above the ground plane
   const ws = Y => CHASE ? 1 : (D - Y) / D;          // world units per screen px at altitude Y (chase view: 1:1, no top-down parallax)
@@ -567,7 +567,7 @@ async function boot() {
   }
   const EXT = new WeakMap(); const ext = (o) => { let e = EXT.get(o); if (!e) { e = { seed: 1 + Math.random() * 9, px: o.x }; EXT.set(o, e); } return e; };
   function drawEnemies(now, G) {
-    const tt = now / 1000;
+    const tt = now / 1000; if (APXO) { APXO.visible = false; BEAMM.forEach(m => m.visible = false); }
     for (let e = 0; e < G.ens.length; e++) { const en = G.ens[e]; if (!en) continue; const hit = en.hit > 0 ? Math.min(1, en.hit / 240) : 0;
       if (en.t === "ufo") { const bob = Math.sin(now / 300 + en.ph) * .06, o = take("ufo"); put(o, en.x, en.y, alt3(en, A.ufo), en.w, false, now / 700 + en.ph, bob, .18); flash(o, hit * .45); Object.assign(ext(en), { o, key: "ufo", tint: undefined });
         Ba.q(en.x, en.y + 16, alt3(en, A.ufo) - 30, 120, 120, 0, UV.dot, .49, .97, .78, .35); }
@@ -600,6 +600,7 @@ async function boot() {
       else if (en.t === "squad") { const o = take("jet", 0xc4b48a); if (!o) continue; put(o, en.x, en.y, alt3(en, A.bigjet), M.BJ_W, false, 0, Math.sin(en.ph || 0) * .1, -.04); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
         const h = M.BJ_W * (S.jet.naturalHeight || 708) / (S.jet.naturalWidth || 520); [-26, -9, 9, 26].forEach(of => tongueQ(Ba, en.x + of, en.y - h * .47, alt3(en, A.bigjet) - 2, (22 + Math.random() * 10) / 46, 0, UV.tongue, 1, .9, .8, .9));
         navPair(now, 5, frac(o, .47, 0, .05).clone(), frac(o, -.47, 0, .05), 3); }
+      else if (en.t === "apex") { drawApex(now, en); }
       else if (en.t === "rocket") { const o = bossMesh("rocket"); put(o, en.x, en.y, alt3(en, A.rocket), M.RK_L, true, 0, Math.sin(now / 900) * .06, 0); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
         const ey = en.y - M.RK_L * .47, L2 = 46 + Math.random() * 16; Ba.q(en.x, ey - L2 / 2, alt3(en, A.rocket) - 4, 22, L2, 0, UV.tongue, .55, .8, 1, .95); Ba.q(en.x, ey, alt3(en, A.rocket) - 3, 40, 40, 0, UV.glow, .5, .7, 1, .6); }
       else if (en.t === "base") { const o = bossMesh("base"); put(o, en.x, en.y, A.base, M.BASE_W, false, 0, 0, 0); flash(o, Math.min(1, (en.hit || 0) / 700) * .35, 0xffc070);
@@ -613,7 +614,7 @@ async function boot() {
       else if (b.t === "squad") { const o = take("jet", 0xc4b48a); if (o) { put(o, b.x, b.y, A.bigjet * (1 - u * .6), M.BJ_W * sc, false, -(b.spin || 0), .6 * u, .3 * u); flash(o, .25, 0xff5a1f); } }
       else if (b.t === "rocket") { const o = bossMesh("rocket"); put(o, b.x, b.y, A.rocket * (1 - u * .6), M.RK_L * sc, true, -(b.spin || 0), .6 * u, .3 * u); flash(o, .25, 0xff5a1f); }
       else if (b.t === "base") { const o = bossMesh("base"); put(o, b.x, b.y, A.base, M.BASE_W, false, 0, 0, 0); flash(o, .3 + .2 * Math.sin(now / 60), 0xff5a1f); }
-      else if (b.t === "flock") { }
+      else if (b.t === "flock" || b.t === "apex") { }
       else { const o = take("jet", 0x6a7184); if (o) { put(o, b.x, b.y, A.sj * (1 - u * .6), M.SJ_W * sc, false, -((b.a || 0) + (b.spin || 0)), .6 * u, .3 * u); flash(o, .25, 0xff5a1f); } } } }
   }
   const TRF_TINT = (M.TRF_COLS || []).map(c => new THREE.Color(c[0]).getHex());
@@ -861,12 +862,39 @@ async function boot() {
     let rotor = null; if (kind === "heli") { rotor = new THREE.Mesh(rotorGeo, rotorMat); const sz = o.userData.size; rotor.position.set(0, sz.y * .5 + 1, 0); rotor.scale.setScalar(70 / o.scale.x); o.add(rotor); }
     const span = new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3()).length();
     COMBAT.crash({ obj: o, kind, k: Math.max(.6, span / 90), rotor, eject: kind === "jet", ground: 0 }); };
+  // FINAL BOSS: APEX, the flying wedge supercar (engine3d/apex.js). Thrusters under the folded wheels puff smoke, burst on every
+  // direction change; the red lock-on laser and the beam are real 3D lines; damage = sparks, smoke and a flickering light bar.
+  let APX = null, APXO = null, BEAMM = null; const APV = new THREE.Vector3(), APV2 = new THREE.Vector3(), APD = new THREE.Vector3();
+  function apexMesh() { if (APX) return APXO; APX = APXM.buildApex(THREE); APX.fold(1); APXO = new THREE.Group(); APXO.add(APX.node); APXO.rotation.order = "YXZ"; APXO.userData = { size: APX.size, mats: [] }; scene.add(APXO);
+    BEAMM = [0, 1, 2].map(() => { const m = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 10, 1, true).translate(0, .5, 0).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: new THREE.Color(3, .25, .2), transparent: true, opacity: .8, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); m.visible = false; m.renderOrder = 150; scene.add(m); return m; });
+    return APXO; }
+  function beamLine(m, a, b, r, op) { m.visible = true; m.position.copy(a); APD.copy(b).sub(a); const L = APD.length(); m.scale.set(r, r, L); m.lookAt(b); m.material.opacity = op; }
+  function drawApex(now, en) { const G = M.G(), o = apexMesh(), t = now / 1000, Y = alt3(en, A.rocket), roll = Math.max(-.5, Math.min(.5, -(en.vx || 0) * .07));
+    o.visible = true; put(o, en.x, en.y, Y, 118, true, 0, roll, en.st === "swoop" ? .18 : en.st === "lock" ? -.12 : 0); o.updateMatrixWorld(true);
+    const dmg = 1 - en.hp / en.mhp, burst = en.burst > 0 ? 1 : 0, k = o.scale.x / 25;   // k ≈ 1 at the boss's size (the mesh is ~4.6 model units long, drawn ~118 game px)
+    APX.update(t, { dmg: dmg * .5, flicker: dmg > .5 && Math.random() < .3 + dmg * .4, thrust: .6 + burst * .4 });
+    if (en.hit > 0) flash(o, 0); 
+    APX.pts.thrusters.forEach((q, i) => { APX.node.localToWorld(APV.copy(q)); FXA.glow(APV, (9 + burst * 10) * k, [1, .7, .35], .9);
+      if (Math.random() < (burst ? .9 : .35)) FXA.emit(APV, APV2.set((Math.random() - .5) * 10, -60 - burst * 60, (G.gsp || 0) * 60 + 20), .8 + burst * .6, 3 * k, (12 + burst * 14) * k, [.85, .85, .85], [.55, .55, .58], .5, false, 0, 1.2, 8); });
+    APX.pts.lightF.forEach(q => FXA.glow(APX.node.localToWorld(APV.copy(q)), 10 * k, [.85, .9, 1], .7));
+    if (dmg > .25 && Math.random() < .15 + dmg * .5) { APX.node.localToWorld(APV.set((Math.random() - .5) * 1.6, .9, (Math.random() - .5) * 3)); FXA.emit(APV, APV2.set(0, 12, (G.gsp || 0) * 60 + 30), 1.8, 4 * k, 18 * k, dmg > .6 ? [.18, .17, .16] : [.5, .5, .5], [.1, .1, .1], .7, false, 0, .4, 5);
+      if (dmg > .5 && FXA.sparks && Math.random() < .3) FXA.sparks(APV, APV2.set(0, 1, 0), null, k * 1.5, 6); }
+    // the lock-on laser(s) and the beam, from the nose to the locked point and beyond
+    BEAMM.forEach(m => m.visible = false);
+    if (en.st === "lock" || en.st === "beam") { APX.node.localToWorld(APV.copy(APX.pts.nose)); const dirs = en.st === "beam" ? en.dirs : M.apexDirs ? M.apexDirs(en) : [Math.atan2(en.aimY - en.y - 26, en.aimX - en.x)];
+      const az = CHASE ? en.aimZ : A.player;
+      dirs.forEach((a, i) => { const L = 900, ex = en.x + Math.cos(a) * L, ey = en.y + 26 + Math.sin(a) * L; APV2.set(ex - W / 2, az + (APV.y - az) * 0, far(ey) - H / 2);
+        if (en.st === "beam") { const f = en.beamT / 480; beamLine(BEAMM[i], APV, APV2, 2 + 6 * f, .9 * f); FXA.glow(APV, 30, [1, .3, .25], f); }
+        else beamLine(BEAMM[i], APV, APV2, en.frz ? .9 : .35, en.frz ? .95 : .45 + .3 * Math.sin(now / 60)); });
+      if (en.st === "lock") FXA.glow(APV, en.frz ? 16 : 9, [1, .2, .15], .9); } }
   const SHOTV = new THREE.Vector3(), SHOTD = new THREE.Vector3();
   function gunfire(now, G) { if (!COMBAT) return; let n = 0;
     for (const sh of G.shots) { if (SEEN.has(sh)) continue; SEEN.add(sh); if (n++ > 3 || !PLY.visible) continue; const c = rgb(M.WPN[G.wpn].c);
       PLY.updateMatrixWorld(true); const mz = AIR.pts.muzzle[(sh.x < G.x ? 1 : 0) % AIR.pts.muzzle.length]; AIR.node.localToWorld(SHOTV.copy(mz)); COMBAT.muzzle(SHOTV, SHOTD.set(0, 0, -1), c, 1.1); }
     for (const es of G.eshots) { if (SEEN.has(es)) continue; SEEN.add(es); if (es.bomb || n++ > 6) continue; const Y = alt3(es, A.eshot); SHOTV.set(es.x - W / 2, Y, far(es.y) - H / 2);
       SHOTD.set(es.vx || 0, 0, es.vy || 1).normalize(); SHOTV.addScaledVector(SHOTD, -6); COMBAT.muzzle(SHOTV, SHOTD, es.missile ? [1, .7, .4] : [1, .85, .5], es.big ? 1.3 : .9); } }
+  M.onBossDown = (b) => { if (!CHASE || !COMBAT || b.t !== "apex" || !APXO) return; const o = APXO.clone(true); o.traverse(n => { if (n.isMesh) n.material = n.material.clone(); }); o.visible = true; scene.add(o);
+    COMBAT.crash({ obj: o, kind: "apex", k: 1.6, ground: 0, eject: false }); APXO.visible = false; };
   const HITS = []; M.onHurt = (x, y, es) => { if (CHASE && HITS.length < 6) HITS.push({ x, y, es }); };
   M.onBoom = (x, y, n) => { if (!CHASE || !WORLD) return; const X = x - W / 2, Z = far(y) - H / 2, r = 60 + n * 3; for (const sg of SEGS.values()) if (Math.abs(Z - sg.group.position.z) < sg.len / 2 + r && sg.scatter) sg.scatter(X, Z, r); };
   if (CHASE) { M.wcx = wcx; M.proj = proj; M.chase = 1; chaseCam(M.G(), 0); cam.updateMatrixWorld(); }

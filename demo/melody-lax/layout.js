@@ -60,6 +60,7 @@
     ".ms-wrap{overflow-x:auto;max-width:100%}.ms-l5{display:flex;gap:6px;flex-wrap:wrap}.ms-l5 i{font-style:normal;min-width:30px;padding:5px 8px;border-radius:9px;text-align:center;font:900 13px var(--body);background:#0b1220;border:1px solid var(--edge)}.ms-l5 i.W{color:var(--go);border-color:#3fbf8f66}.ms-l5 i.L{color:var(--pink);border-color:#a3364566}" +
     ".ms-w{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #27324d88}.ms-w:last-child{border-bottom:0}.ms-w b{flex:1}.ms-w a{flex:none;text-decoration:none;border-radius:10px;padding:8px 11px;font:800 13px var(--body);background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405}" +
     ".ms-sub{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;font:800 10.5px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--gold2);border:1px solid #d4af3766}" +
+    ".ms-va{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}.ms-va a{flex:1 1 auto;text-align:center;text-decoration:none;min-height:36px;line-height:36px;padding:0 10px;border-radius:10px;border:1px solid var(--edge);background:var(--panel);color:var(--ink);font:800 13px var(--body)}.ms-va a:first-child{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;border-color:var(--gold)}" +
     ".ms-mel{margin-top:12px;padding:12px;border-radius:14px;background:linear-gradient(120deg,#3a1520,#141e34);border:1px solid var(--wine);font:700 14px var(--body)}" +
     ".ms-hero{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;text-align:center}.ms-hero img{width:64px;height:64px;object-fit:contain}.ms-hero b{display:block;font:400 18px var(--punch);letter-spacing:.04em}" +
     ".ms-pk{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.ms-pk button{flex:1;min-width:110px;border:1px solid var(--edge);background:#0b1220;color:var(--ink);border-radius:12px;padding:11px;font:800 14px var(--body);cursor:pointer}.ms-pk button[aria-pressed=true]{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;border-color:var(--gold)}" +
@@ -200,8 +201,19 @@
         (hit ? '<a href="' + esc(hit[2]) + '" target="_blank" rel="noopener">Official site ↗</a>' : '') + '</div>';
     }).join("");
     return (rows ? '<div class="ms-card">' + rows + '</div>' : '<div class="ms-card">📺 Check local listings. No TV or streaming info from ESPN for this one yet.</div>') +
-      '<div class="ms-mel">📺 <b>Watch it live at Melody.</b> Every game on the TVs, 5 minutes from LAX.</div>' +
+      venuesHTML() +
       '<p class="ms-fine">Links open each network\'s official site or app. Availability depends on where you are and your TV or streaming plan.</p>';
+  }
+  // the places to watch it in person: SPORTS_CFG.watchAt (Melody first, sister spot Nalu Vida after)
+  function venuesHTML() {
+    var A = SBapi(), v = A && A.watchAt ? A.watchAt() : [];
+    if (!v.length) return '<div class="ms-mel">📺 <b>Watch it live at Melody.</b> Every game on the TVs, 5 minutes from LAX.</div>';
+    return v.map(function (p, i) {
+      var maps = p.maps || (p.address ? "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(p.address) : "");
+      return '<div class="ms-mel"' + (i ? ' style="background:var(--panel);border-color:var(--edge)"' : '') + '>📺 <b>Watch it live at ' + esc(p.name) + '.</b> ' + esc(p.note || "") +
+        '<div class="ms-va">' + (maps ? '<a href="' + esc(maps) + '" target="_blank" rel="noopener">📍 Directions</a>' : '') + (p.tel ? '<a href="tel:' + esc(p.tel) + '">📞 Call</a>' : '') +
+        (p.book ? '<a href="' + esc(p.book) + '" target="_blank" rel="noopener">📅 Book</a>' : '') + (p.app ? '<a href="' + esc(p.app) + '">' + esc(p.appLabel || "Their app") + '</a>' : '') + '</div></div>';
+    }).join("");
   }
   function openWatch(c, title) { openSheet(title || "Where to watch", function (done) { done(watchHTML(c)); }); }
 
@@ -321,7 +333,7 @@
   }
 
   /* ---------------- Today's games carousel ---------------- */
-  var host = $("#spcar"), rowsNow = [], idxNow = 0, firstFull = false;
+  var host = $("#spcar"), rowsNow = [], idxNow = 0, firstFull = false, allMode = false;   // allMode: every game today, not just LA teams
   function cardHTML(r, i) {
     var A = SBapi(), c = comp(r.e); if (!c) return "";
     var sd = sides(c), f = A.follows(), fol = r.keys.some(function (k) { return f.indexOf(k) >= 0; });
@@ -336,7 +348,7 @@
       '<div class="sc-top">' + top + '<span>' + esc(A.L[r.lg].name) + '</span></div>' +
       '<div class="sc-mu">' + tm(sd.away) + '<div class="sc-mid">' + mid + '</div>' + tm(sd.home) + '</div>' +
       '<div class="sc-sub">' + esc(sub) + '</div>' +
-      '<div class="sc-act"><button type="button" class="sc-btn hot" data-watch="' + i + '">📺 Where to watch</button><button type="button" class="sc-btn" data-game="' + i + '">Game details ›</button></div></article>';
+      '<div class="sc-act"><button type="button" class="sc-btn hot" data-watch="' + i + '">' + (live ? '▶ Watch live' : '📺 Where to watch') + '</button><button type="button" class="sc-btn" data-game="' + i + '">Game details ›</button></div></article>';
   }
   function raceHTML(key) {
     var A = SBapi(), t = A.TK[key], info = A.teamInfo(key); if (!info || !(info.lines.length || info.badges.length || info.rec)) return "";
@@ -349,9 +361,9 @@
   }
   function draw() {
     var A = SBapi(); if (!host || !A) return;
-    var m = A.collect(), rows = m.live.concat(m.up, m.fin), f = A.follows(), extra = "", label = "";
+    var m = allMode && A.collectAll ? A.collectAll() : A.collect(), rows = m.live.concat(m.up, m.fin), f = A.follows(), extra = "", label = "";
     var sb = A.SCHED, loadedAny = rows.length || Object.keys(sb).length;
-    if (!rows.length) {
+    if (!rows.length && !allMode) {
       // no LA game today: next scheduled games (one per team, soonest first) + playoff race cards
       var seen = {}, nx = [];
       A.TK && Object.keys(A.TK).forEach(function (k) { var e = A.nextEv(k); if (e && !seen[e.id]) { seen[e.id] = 1; nx.push({ lg: A.TK[k][0], e: e, s: "pre", keys: [k], next: 1 }); } });
@@ -365,12 +377,12 @@
       if (r.next) h = h.replace('<span>Today</span>', '<span>' + esc(fmtTime(r.e.date, true)) + '</span>').replace(/<div class="sc-st">[^<]*<\/div>/, '<div class="sc-st">' + esc(new Date(r.e.date).toLocaleDateString("en-US", { timeZone: "America/Los_Angeles", weekday: "short", month: "short", day: "numeric" })) + '</div>');
       return h;
     });
-    if (!m.all.length) Object.keys(A.TK).forEach(function (k) { var h = raceHTML(k); if (h) cards.push(h); });
+    if (!m.all.length && !allMode) Object.keys(A.TK).forEach(function (k) { var h = raceHTML(k); if (h) cards.push(h); });
     var nLive = m.live.length, nUp = m.up.length, nFin = m.fin.length;
     var sum = m.all.length ? [nLive && nLive + " live", nUp && nUp + " later", nFin && nFin + " final"].filter(Boolean).join(" · ") : label;
-    var bar = '<div class="scx-bar"><button type="button" class="scx-chip gold" data-my>★ My teams' + (f.length ? " (" + f.length + ")" : "") + '</button><button type="button" class="scx-chip" data-full>Full scoreboard ›</button><span class="scx-sum">' + esc(sum) + '</span></div>';
+    var bar = '<div class="scx-bar"><button type="button" class="scx-chip gold" data-my>★ My teams' + (f.length ? " (" + f.length + ")" : "") + '</button>' + (A.collectAll ? '<button type="button" class="scx-chip' + (allMode ? ' gold' : '') + '" data-allg aria-pressed="' + allMode + '">' + (allMode ? '🌴 LA teams' : '📅 All games') + '</button>' : '') + '<button type="button" class="scx-chip" data-full>Full scoreboard ›</button><span class="scx-sum">' + esc(sum) + '</span></div>';
     if (!cards.length) {
-      host.innerHTML = bar + '<div class="scx-empty">' + (A.allErr() ? '<b>Scores are taking a break</b>We can\'t reach the live scores right now. Try the full scoreboard in a minute.' : loadedAny ? '<b>No LA games today</b>Open the full scoreboard for standings and what\'s next.' : '<b>Loading today\'s games…</b>LA &amp; California teams, live.') + '</div>';
+      host.innerHTML = bar + '<div class="scx-empty">' + (allMode && !A.allErr() ? '<b>No games today</b>Check back on game day.' : A.allErr() ? '<b>Scores are taking a break</b>We can\'t reach the live scores right now. Try the full scoreboard in a minute.' : loadedAny ? '<b>No LA games today</b>Open the full scoreboard for standings and what\'s next.' : '<b>Loading today\'s games…</b>LA &amp; California teams, live.') + '</div>';
     } else {
       host.innerHTML = bar + '<div class="scx-track" role="list">' + cards.join("") + '</div><div class="scx-dots" role="tablist" aria-label="Games">' + cards.map(function (_, i) { return '<button type="button" role="tab" aria-label="Game ' + (i + 1) + '" data-dot="' + i + '"></button>'; }).join("") + '</div>';
     }
@@ -380,7 +392,8 @@
     var A = SBapi(), SB = window.SportsBar;
     var my = $("[data-my]", host), full = $("[data-full]", host);
     if (my) my.onclick = function () { SB.picker(); };
-    if (full) full.onclick = function () { SB.open("teams"); };
+    if (full) full.onclick = function () { SB.open(allMode ? "all" : "teams"); };
+    var ag = $("[data-allg]", host); if (ag) ag.onclick = function () { allMode = !allMode; idxNow = 0; draw(); };
     var tr = $(".scx-track", host); if (!tr) return;
     var dots = $$("[data-dot]", host), cardsEl = $$(".sc-card", tr);
     function markDot() {

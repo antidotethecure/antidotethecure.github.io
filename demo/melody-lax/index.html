@@ -913,7 +913,7 @@ function emit(x,y,heavy){
   if(Math.random()<(heavy?.85:.5)) FX.smoke(x+(Math.random()-.5)*6,y,(Math.random()-.5)*.5,1.1+Math.random()*.8,heavy?6+Math.random()*4:4+Math.random()*3,heavy?(Math.random()<.5?3:2):1,heavy?1500:1100,.24,heavy?.6:.45);
   if(Math.random()<(heavy?.6:.35)) FX.flame(x+(Math.random()-.5)*8,y,(Math.random()-.5)*.4,1+Math.random()*.6,heavy?.75:.55,Math.PI/2);
 }
-function boom(x,y,n){ n=n||18; SND.play("boom",n); var ne=reduce?Math.ceil(n/3):Math.ceil(n/2); for(var i=0;i<ne;i++){ var a=Math.random()*6.283,v=1+Math.random()*4; G.fx.push({k:"e",x:x,y:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,s:2+Math.random()*3,g:0,a:1}); }
+function boom(x,y,n){ n=n||18; SND.play("boom",n); if(window.__M3&&__M3.onBoom) try{ __M3.onBoom(x,y,n); }catch(e){} var ne=reduce?Math.ceil(n/3):Math.ceil(n/2); for(var i=0;i<ne;i++){ var a=Math.random()*6.283,v=1+Math.random()*4; G.fx.push({k:"e",x:x,y:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,s:2+Math.random()*3,g:0,a:1}); }
   FX.explode(x,y,n); }
 function drawFx(k){
   for(var i=G.fx.length-1;i>=0;i--){ var p=G.fx[i]; p.x+=p.vx*k; p.y+=p.vy*k; p.s+=p.g*k; p.a-=(p.k==="f"?.045:p.k==="e"?.03:p.k==="r"?.03:.012)*k; if(p.a<=0||p.s<=.5) G.fx.splice(i,1); }

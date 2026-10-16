@@ -168,6 +168,72 @@ export function makeBeachKit(THREE, K) {
     return { add, update, frozen, list, meshes };
   }
 
+  /* ---------------- engine3d crowd (real rigged Nalu Vida humans, demo/engine3d/crowd.js) ----------------
+     Same agent API as makeCrowd above (add(kind, R, extra) → agent with x/y/z/ry/pose/wave…, update, frozen, list), but every
+     agent is a person in the shared engine crowd: VAT-instanced at distance, real SkinnedMesh close up. Behaviour code is unchanged;
+     the pose is mapped to an animation clip. Reactions on top: wave/cheer on a low pass, duck when you buzz them really low,
+     scatter (run away) from explosions, umbrellas or a run for cover in the rain. */
+  const BLUES = ["#2f6fb5", "#3b82c4", "#1f5a9e", "#2a7f9e", "#334f8a"];
+  function lookFor(E, kind, R, pick) { const c = E.col, rnd = Math.floor(R() * 1e9);
+    const L = (body, style) => E.randomLook(rnd, body, style);
+    switch (kind) {
+      case "surferM": { const l = L("m", "beach"); l.top = [0, 0, 0, 0]; l.cloth = c(pick(BLUES)); return { body: "m", look: l }; }
+      case "surferF": { const l = L("f", "beach"); l.cloth = c("#15161a"); l.top = [...c("#15161a"), 3]; l.bot = [...c("#15161a"), 1]; return { body: "f", look: l }; }
+      case "guardM": { const l = L("m", "beach"); l.top = [...c("#f4f4f2"), 2]; l.cloth = c("#d9473f"); return { body: "m", look: l }; }
+      case "guardF": { const l = L("f", "beach"); l.cloth = c("#d42a2a"); l.top = [0, 0, 0, 0]; return { body: "f", look: l }; }
+      case "staff": { const l = L("m", "beach"); l.top = [...c("#e88b8b"), 2]; l.bot = [...c("#f2efe8"), 3]; l.hair = c("#1a120e"); return { body: "m", look: l }; }
+      case "kid": { const b = R() < .5 ? "m" : "f"; return { body: b, look: L(b, "beach"), scale: .56 + R() * .1 }; }
+      case "street": { const b = R() < .5 ? "m" : "f"; return { body: b, look: L(b, "street") }; }
+      default: { const b = kind === "beachF" ? "f" : "m"; return { body: b, look: L(b, "beach") }; }
+    } }
+  function makeCrowdE(E, group) {
+    const list = [];
+    function add(kind, R, extra) { const pick = (a) => a[(R() * a.length) | 0], spec = lookFor(E, kind, R, pick);
+      const c = Object.assign({ kind, ph: R() * TAU, x: 0, y: 0, z: 0, ry: 0, pose: "stand", wave: 0, ox: 0, oz: 0, duck: 0, flee: 0, fvx: 0, fvz: 0,
+        idle: pick(["idle", "idle", "idle2", "talk", "phone", "text", "idle"]), umb: R() < .45 }, extra || {});
+      c.p = E.add({ body: spec.body, look: spec.look, scale: spec.scale, seed: (R() * 1e9) | 0 }); c.p.parent = group; list.push(c); return c; }
+    function clipOf(c, t) {
+      if (c.flee > 0) return ["run", 0];
+      const p = c.pose;
+      if (p === "lie") return [c.wave > 0 ? "lieWave" : c.sup ? "lieBack" : "lieFront", 0];
+      if (p === "paddle") return ["paddle", -1.1];
+      if (p === "swim") return ["swim", -1.6];
+      if (p === "tumble") return ["tumble", -1.2];
+      if (p === "surf") return ["stance", 0];
+      if (c.duck > 0 && p !== "sit" && p !== "kneel") return ["duck", 0];
+      if (c.wave > 0 && p !== "binos") return [c.cheer ? "cheer" : "wave", 0];
+      if (RAIN.v > .35 && (p === "stand" || p === "walk")) return [p === "walk" ? (c.umb ? "walk" : "coverRun") : c.umb ? "idle" : "coverRun", 0];
+      switch (p) {
+        case "walk": return ["walk", 0];
+        case "sit": return ["sit", 0];
+        case "kneel": return ["kneel", 0];
+        case "binos": return ["binos", 0];
+        case "wade": return [(c.down || 0) > .3 ? "tumble" : "wade", -2.6 + (c.jump || 0) * 2.4];
+        case "volley": return [(c.jump || 0) > .2 ? "set" : "volley", (c.jump || 0) * 3];
+        case "serve": return ["serve", 0];
+        case "sitChair": return ["sitChair", 0];
+        default: return [c.idle, 0];
+      } }
+    function update(t, dt, near) {
+      for (const c of list) { c.p.visible = near; if (!near) continue;
+        if (c.tick) c.tick(c, t, dt); if (c.wave > 0) c.wave = Math.max(0, c.wave - dt * .45); if (c.duck > 0) c.duck -= dt;
+        if (c.flee > 0) { c.flee -= dt; c.ox += c.fvx * dt; c.oz += c.fvz * dt; }
+        const [clip, dy] = clipOf(c, t), moving = c.flee > 0;
+        const yaw = moving ? Math.atan2(c.fvx, c.fvz) : c.ry;
+        c.p.set(c.x + c.ox, c.y + dy, c.z + c.oz, yaw); c.p.play(clip);
+        c.p.umbrella = RAIN.v > .35 && c.umb && (c.pose === "stand" || c.pose === "walk") && !moving; } }
+    function frozen() {}
+    function dispose() { list.forEach(c => E.remove(c.p)); list.length = 0; }
+    // explosions: everyone within r runs directly away for a few seconds
+    function scatter(lx, lz, r) { for (const c of list) { if (c.pose === "swim" || c.pose === "paddle" || c.pose === "surf" || c.pose === "tumble") continue; const dx = c.x + c.ox - lx, dz = c.z + c.oz - lz, d = Math.hypot(dx, dz);
+      if (d < r) { const k = 34 + Math.random() * 14; c.flee = 2.2 + Math.random() * 1.6; c.fvx = dx / (d || 1) * k; c.fvz = dz / (d || 1) * k; if (c.pose === "lie" || c.pose === "sit") c.pose = "stand"; } } }
+    function buzz(lx, lz, low) { for (const c of list) { const dx = c.x + c.ox - lx, dz = c.z + c.oz - lz; if (dx * dx + dz * dz < 110 * 110) { if (low) c.duck = 1.4; } } }
+    const WV = new THREE.Vector3();
+    function scatterW(wx, wz, r) { group.updateWorldMatrix(true, false); WV.set(wx, 0, wz); group.worldToLocal(WV); scatter(WV.x, WV.z, r); }
+    return { add, update, frozen, list, meshes: [], dispose, scatter, scatterW, buzz, engine: true };
+  }
+  const RAIN = K.rain || { v: 0 };
+
   /* ---------------- the beach itself ---------------- */
   function populate(seg, R, len, SHORE, H) {   // H: helpers from world3d (mesh, inst, set, setE, merge, T4, palms, TOWEL, SMP, SMV, glowTex)
     const g = seg.group, pick = (a) => a[(R() * a.length) | 0];
@@ -176,7 +242,7 @@ export function makeBeachKit(THREE, K) {
     for (let i = 0; i < bp.count; i++) { const d = SHORE - bp.getX(i); bp.setY(i, -1.2 - Math.max(0, d) * .055); const k = Math.max(0, Math.min(1, d / 220)); bc.push(.62 - .5 * k, .55 - .38 * k, .42 - .2 * k); }
     bed.setAttribute("color", new THREE.Float32BufferAttribute(bc, 3)); bed.computeVertexNormals(); g.add(H.mesh(bed, bedMat));
     const og = new THREE.PlaneGeometry(1900, len, 110, 48).rotateX(-Math.PI / 2).translate(SHORE - 950 + 26, 0, 0); const wm = H.mesh(og, water); wm.renderOrder = 5; g.add(wm);
-    const crowd = makeCrowd(g, 150); seg.crowd = crowd;
+    const E = K.E && K.E(), crowd = E ? makeCrowdE(E, g) : makeCrowd(g, 150); seg.crowd = crowd; if (E) (seg.crowds = seg.crowds || []).push(crowd);
     // towels + umbrellas, with people lying on most towels and sitting under the umbrellas
     const tw = [], um = []; for (let i = 0; i < 40; i++) tw.push([SHORE + 40 + R() * 160, (R() - .5) * len * .9, (R() - .5) * .5]); for (let i = 0; i < 16; i++) um.push([SHORE + 48 + R() * 150, (R() - .5) * len * .88]);
     const twM = H.inst(new THREE.BoxGeometry(7, .25, 13).translate(0, .15, 0), new THREE.MeshLambertMaterial(), tw.length, true); tw.forEach((p, i) => { H.set(twM, i, p[0], 0, p[1], p[2]); twM.instanceColor.setXYZ(i, ...QC.set(pick(H.TOWEL)).toArray()); }); g.add(twM);
@@ -237,7 +303,7 @@ export function makeBeachKit(THREE, K) {
     crowd.frozen();
     seg.tick.push((t, dt, near) => { water.uniforms.t.value = t; crowd.update(t, dt, near); });
     // the reaction: the 3D layer calls seg.flyby(world x, height, world z) every frame you are over this beach
-    seg.flyby = (px, py, pz) => { if (py > 120) return 0; const gp = seg.group.position; let n = 0; for (const c of crowd.list) { const dx = gp.x + c.x - px, dz = gp.z + c.z - pz; if (dx * dx + dz * dz < 150 * 150) { if (!c.wave) c.cheer = R() < .45; c.wave = Math.max(c.wave || 0, 2); n++; } } return n; };
+    seg.flyby = (px, py, pz) => { if (py > 120) return 0; const gp = seg.group.position; let n = 0; if (crowd.buzz && py < 42) crowd.buzz(px - gp.x, pz - gp.z, true); for (const c of crowd.list) { const dx = gp.x + c.x - px, dz = gp.z + c.z - pz; if (dx * dx + dz * dz < 150 * 150) { if (!c.wave) c.cheer = R() < .45; c.wave = Math.max(c.wave || 0, 2); n++; } } return n; };
   }
-  return { populate, water, SUN };
+  return { populate, water, SUN, makeCrowdE, lookFor };
 }

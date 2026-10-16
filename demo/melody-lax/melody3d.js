@@ -32,10 +32,14 @@ async function boot() {
   const THREE = await import("three");
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
+  // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
+  const AIRM = CHASE ? await import("./air3d.js?v=c1") : null, WORLDM = CHASE ? await import("./world3d.js?v=c1") : null;
+  const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   const W = M.W, H = M.H, S = M.S, FX = M.FX, FXI = FX._i(), TAU = Math.PI * 2;
   const D = 1000;                                   // camera height above the ground plane
   const ws = Y => CHASE ? 1 : (D - Y) / D;          // world units per screen px at altitude Y (chase view: 1:1, no top-down parallax)
-  const wx = (x, Y) => (x - W / 2) * ws(Y), wz = (y, Y) => (y - H / 2) * ws(Y);
+  const far = y => CHASE && y < 0 ? y * 3.2 : y;   // chase view: the strip above the field stretches out toward the horizon (spawns fade in from far away, not pop)
+  const wx = (x, Y) => (x - W / 2) * ws(Y), wz = (y, Y) => (far(y) - H / 2) * ws(Y);
   const A = { trf: 128, player: 150, ufo: 176, jet: 192, cop: 200, kami: 182, gun: 214, sj: 200, rp: 236, blimp: 250, item: 104, shot: 150, eshot: 164, air: 138, esc: 188, bigjet: 208, rocket: 222, base: 14, bird: 172 };
   // chase view: everything that flies sits close to your own flight level (150), so your shots visibly meet what they hit
   if (CHASE) Object.assign(A, { trf: 132, ufo: 156, jet: 158, cop: 160, kami: 154, gun: 162, sj: 158, rp: 172, blimp: 186, item: 146, shot: 150, eshot: 151, air: 150, esc: 156, bigjet: 160, rocket: 160, bird: 154 });
@@ -58,10 +62,12 @@ async function boot() {
   if (CHASE) {   // dusk sky over LA + haze that swallows the far ground, so the field ahead fades into the night instead of ending
     cam.fov = 64; cam.near = 4; cam.far = 3200; cam.up.set(0, 1, 0); cam.updateProjectionMatrix();
     const sc = document.createElement("canvas"); sc.width = 4; sc.height = 256; const sx = sc.getContext("2d"), sg = sx.createLinearGradient(0, 0, 0, 256);
-    [[0, "#03061a"], [.2, "#0a1236"], [.33, "#1d1f4c"], [.4, "#4a2f5c"], [.44, "#8a4560"], [.47, "#c2685c"], [.5, "#3a3358"], [.56, "#272b4c"], [1, "#272b4c"]].forEach(c => sg.addColorStop(c[0], c[1]));
+    [[0, "#141c44"], [.2, "#2b2c62"], [.32, "#6a3f72"], [.39, "#c4616e"], [.43, "#f29a5c"], [.455, "#ffd08a"], [.48, "#e9a26c"], [1, "#e9a26c"]].forEach(c => sg.addColorStop(c[0], c[1]));
     sx.fillStyle = sg; sx.fillRect(0, 0, 4, 256);
     const st = new THREE.CanvasTexture(sc); st.colorSpace = THREE.SRGBColorSpace; scene.background = st;
-    scene.fog = new THREE.Fog(0x2a2d4e, 560, 1500);
+    scene.fog = new THREE.Fog(0xd89068, 900, 3100); cam.fov = 56; cam.updateProjectionMatrix();
+    renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+    const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new RoomEnvironment(), .04).texture; pm.dispose();
   }
   const hemi = new THREE.HemisphereLight(0xc4d0ff, 0x3a2c22, 1.25);   // r160 lights are physical (÷π): these sum to ~1.05× on the flat ground so the aerial photo keeps its 2D brightness scene.add(hemi);
   const sun = new THREE.DirectionalLight(0xffe0bc, 1.75);   // low warm LA sun from the upper left: shadows fall down-right like the 2D drop shadows
@@ -243,64 +249,16 @@ async function boot() {
   const BIRDS = [[], []], BOSSM = {}; let birdN = [0, 0];
   function birdGet(pg) { let o = BIRDS[pg][birdN[pg]++]; if (!o) { const b = buildBird(pg); o = b.node; o.userData = { size: b.size, wings: b.wings }; o.rotation.order = "YXZ"; o.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(o); BIRDS[pg].push(o); } o.visible = true; return o; }
   function bossMesh(k) { if (!BOSSM[k]) { const b = k === "rocket" ? buildRocket() : buildBase(); const o = b.node; o.userData = Object.assign(o.userData || {}, { size: b.size, mats: [] }); o.traverse(n => { if (n.isMesh) { n.material = Array.isArray(n.material) ? n.material.map(m => m.clone()) : n.material.clone(); (Array.isArray(n.material) ? n.material : [n.material]).forEach(m => o.userData.mats.push(m)); } }); o.rotation.order = "YXZ"; scene.add(o); BOSSM[k] = o; } const o = BOSSM[k]; o.visible = true; o.userData.used = 1; return o; }
-  /* ---- the player's airliner for the chase view (2026-10-16): a plain white twin-jet built from primitives, Melody wine-red
-     tail, cheatline and winglets, gold trim and a gold music note on the fin (the same note as the Melody coins). No airline
-     names, logos or real liveries. Nose = +Z like the GLB aircraft; 8 draw calls. ---- */
-  function buildAirliner() {
-    const g = new THREE.Group();
-    const skinC = mkc(512, 256), sk = skinC.getContext("2d");   // fuselage skin: u = around (0 belly, .25 right side, .5 top, .75 left), v = tail → nose
-    sk.fillStyle = "#f6f6f3"; sk.fillRect(0, 0, 512, 256);
-    sk.fillStyle = "#d9dce2"; sk.fillRect(0, 0, 40, 256); sk.fillRect(472, 0, 40, 256);                         // light grey belly
-    [[.25, 1], [.75, -1]].forEach(([u, d]) => { const x = u * 512;
-      sk.fillStyle = "#a33645"; sk.fillRect(x + d * 4 - 7, 0, 14, 256);                                         // wine cheatline
-      sk.fillStyle = "#d4af37"; sk.fillRect(x - d * 9 - 2, 0, 4, 256);                                          // gold pinstripe under it
-      sk.fillStyle = "#1c2433"; for (let v = 40; v < 226; v += 7.5) sk.fillRect(x + d * 17 - 3, v, 6, 4.2); });  // cabin windows
-    const skinT = canTex(skinC, true); skinT.anisotropy = 4;
-    const white = std(0xf6f6f3, { roughness: .38, metalness: .12 }), skin = std(0xffffff, { map: skinT, roughness: .36, metalness: .1 }),
-      wine = std(0xa33645, { roughness: .42, metalness: .15 }), gold = std(0xd4af37, { roughness: .28, metalness: .75, emissive: 0x3a2800, emissiveIntensity: .4 }),
-      grey = std(0xb9bec8, { roughness: .4, metalness: .35 }), dark = std(0x23272f, { roughness: .55, metalness: .3 });
-    const merge = (parts) => { const pos = [], nor = []; parts.forEach(([geo, m]) => { const q = geo.index ? geo.toNonIndexed() : geo.clone(); q.applyMatrix4(m);
-        if (m.determinant() < 0) { const a = q.attributes.position.array; for (let i = 0; i < a.length; i += 9) for (let j = 0; j < 3; j++) { const t = a[i + 3 + j]; a[i + 3 + j] = a[i + 6 + j]; a[i + 6 + j] = t; } }   // mirrored half: keep the faces pointing out
-        q.computeVertexNormals(); pos.push(...q.attributes.position.array); nor.push(...q.attributes.normal.array); });
-      const out = new THREE.BufferGeometry(); out.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); out.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); return out; };
-    const M4 = (x, y, z, sx) => new THREE.Matrix4().makeScale(sx || 1, 1, 1).setPosition(x, y, z);
-    // fuselage (textured), nose cap with cockpit glass, tail cone
-    const fus = new THREE.CylinderGeometry(2, 2, 27, 28, 1, true); fus.rotateX(Math.PI / 2); meshIn(g, fus, skin, 0, 0, 0);
-    const nose = new THREE.SphereGeometry(2, 24, 12, 0, TAU, 0, Math.PI / 2); nose.rotateX(Math.PI / 2); nose.scale(1, 1, 1.9); meshIn(g, nose, white, 0, 0, 13.5);
-    const tail = new THREE.CylinderGeometry(2, .45, 8, 24, 1, true); tail.rotateX(Math.PI / 2); meshIn(g, tail, white, 0, .25, -17.5);
-    // swept wings with a little dihedral; tailplanes
-    const plan = (pts) => { const sh = new THREE.Shape(); sh.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) sh.lineTo(pts[i][0], pts[i][1]); sh.closePath(); return sh; };
-    const slab = (sh, t, dih) => { const geo = new THREE.ExtrudeGeometry(sh, { depth: t, bevelEnabled: false }); geo.rotateX(Math.PI / 2); geo.translate(0, t / 2, 0);   // shape (x, y) → (x, -z)
-      const a = geo.attributes.position; for (let i = 0; i < a.count; i++) a.setY(i, a.getY(i) + Math.abs(a.getX(i)) * (dih || 0)); return geo; };
-    const wing = slab(plan([[1.2, 4], [17, -6.6], [17, -8.4], [1.2, -3.4]]), .42, .075);
-    meshIn(g, merge([[wing, M4(0, -.9, 0)], [wing, M4(0, -.9, 0, -1)]]), white, 0, 0, 0);
-    const stab = slab(plan([[.4, -15.2], [6.6, -19.6], [6.6, -21.2], [.4, -18.6]]), .3, .05);
-    meshIn(g, merge([[stab, M4(0, .7, 0)], [stab, M4(0, .7, 0, -1)]]), white, 0, 0, 0);
-    // fin + winglets in wine; gold fin leading edge, gold engine lips, a gold note on each side of the fin
-    const fin = new THREE.ExtrudeGeometry(plan([[-12.6, 1.4], [-21.6, 1.4], [-22.6, 9.6], [-19.4, 9.6]]), { depth: .4, bevelEnabled: false }); fin.rotateY(-Math.PI / 2); fin.translate(.2, 0, 0);   // shape x → z, shape y → y
-    const wl = new THREE.ExtrudeGeometry(plan([[-6.6, 0], [-8.4, 0], [-8.9, 2.6], [-7.8, 2.6]]), { depth: .22, bevelEnabled: false }); wl.rotateY(-Math.PI / 2);
-    const tipY = -.9 + 17 * .075 + .2;
-    meshIn(g, merge([[fin, M4(0, 0, 0)], [wl, M4(17.05, tipY, 0)], [wl, M4(-16.83, tipY, 0)]]), wine, 0, 0, 0);
-    const lead = new THREE.CylinderGeometry(.26, .26, 1, 8), lz = 19.4 - 12.6, ly = 9.6 - 1.4;
-    const leadG = lead.clone().applyMatrix4(new THREE.Matrix4().makeScale(1, Math.hypot(lz, ly), 1)).applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.atan2(lz, ly))).translate(0, (1.4 + 9.6) / 2, -(12.6 + 19.4) / 2);
-    const ENG = [-6.4, 6.4], ey = -2.3, ez = 1.6;
-    const lip = new THREE.TorusGeometry(1.02, .17, 8, 22);
-    meshIn(g, merge([[leadG, M4(0, 0, 0)]].concat(ENG.map(x => [lip, M4(x, ey, ez + 2.3)]))), gold, 0, 0, 0);
-    const noteC = mkc(128, 128), nx = noteC.getContext("2d"); nx.fillStyle = "#e6c25a"; nx.font = "900 104px 'Playfair Display',Georgia,serif"; nx.textAlign = "center"; nx.textBaseline = "middle"; nx.fillText("♪", 64, 70);
-    const noteM = new THREE.MeshStandardMaterial({ map: canTex(noteC, true), transparent: true, alphaTest: .3, roughness: .3, metalness: .5, emissive: 0x6a4800, emissiveIntensity: .6, side: THREE.DoubleSide });
-    [-1, 1].forEach(sx => { const ng = new THREE.PlaneGeometry(3.8, 3.8); ng.rotateY(sx * Math.PI / 2); meshIn(g, ng, noteM, sx * .26, 5.3, -19.1, false); });
-    // engines under the wings: grey nacelles, dark fan faces, exhaust cones and pylons
-    const nac = new THREE.CylinderGeometry(1.05, .88, 4.6, 20, 1, true); nac.rotateX(Math.PI / 2);
-    meshIn(g, merge(ENG.map(x => [nac, M4(x, ey, ez)])), grey, 0, 0, 0);
-    const fan = new THREE.CircleGeometry(.96, 20), cone = new THREE.ConeGeometry(.62, 1.7, 14); cone.rotateX(-Math.PI / 2);
-    const pyl = new THREE.BoxGeometry(.34, 1.3, 3.6);
-    meshIn(g, merge(ENG.map(x => [fan, M4(x, ey, ez + 2.15)]).concat(ENG.map(x => [cone, M4(x, ey, ez - 3.1)]), ENG.map(x => [pyl, M4(x, ey + 1.05, ez - .3)]))), dark, 0, 0, 0, false);
-    const n = normGroup(g), off = g.position.clone();   // normGroup re-centred the airframe: shift the light/engine points the same way
-    n.eng = ENG.map(x => new THREE.Vector3(x, ey, ez - 4).add(off)); n.tips = [new THREE.Vector3(17.2, tipY + .2, -7.6).add(off), new THREE.Vector3(-17.2, tipY + .2, -7.6).add(off)];
-    return n; }
-  let AIR = null;
-  if (CHASE) { AIR = buildAirliner(); AIR.node.traverse(n => { if (n.isMesh && n.material.emissiveIntensity > 0) n.material.userData.keep = 1; }); MODELS.player = { node: AIR.node, size: AIR.size }; }
-  const PK = CHASE ? "player" : "plane";   // the player's own airframe
+  // chase view: the player flies air3d's detailed airliner (one instance, never pooled, so its wounds stay put)
+  let AIR = null, PLY = null, FXA = null, pDmg = null, ENEMY = null;
+  if (CHASE) {
+    AIR = AIRM.buildAirliner(THREE); PLY = new THREE.Group(); PLY.add(AIR.node); PLY.rotation.order = "YXZ"; PLY.userData = { size: AIR.size, mats: [] };
+    AIR.node.traverse(n => { if (n.isMesh) { n.castShadow = true; if (n.material.emissive && !PLY.userData.mats.includes(n.material) && n.material !== AIR.mats.gold) PLY.userData.mats.push(n.material); } });
+    scene.add(PLY); PLY.visible = false;
+    FXA = AIRM.makeFX(THREE, scene, { max: 1600 }); pDmg = AIRM.makeDamage(THREE, FXA, AIR.node, AIR.pts.wound);
+    ENEMY = AIRM.buildAirliner(THREE, { livery: "enemy" }); MODELS.kami3 = { node: ENEMY.node, size: ENEMY.size };   // the head-on airliners: same detailed airframe, grey
+  }
+  const PK = "plane";
   // instances: each model type has a pool of clones; materials are cloned per clone so hit flashes/tints stay local
   const POOLS = {};
   function cloneModel(k, tint) {
@@ -532,23 +490,28 @@ async function boot() {
       Ba.q(x, y, Y + 1, sz * 1.8, sz * 1.8, 0, UV.glow, 1, 1, 1, .32 * it * (.8 + .2 * Math.sin(now * .03 + i))); } }
   function drawPlayer(now, G) {
     const C = G.crash;
-    if (G.dying && C) { if (C.hit) { crashAlt = -1; return; }
-      const p = Math.min(1, C.t / C.dur), Y = Math.max(6, A.player * (1 - p)), o = take(PK); crashAlt = Y; crashX = C.x; crashY = C.y; PL.x = C.x; PL.y = C.y; PL.Y = Y;
+    if (G.dying && C) { if (C.hit) { crashAlt = -1; if (CHASE) PLY.visible = false; return; }
+      const p = Math.min(1, C.t / C.dur), Y = Math.max(6, A.player * (1 - p)), o = CHASE ? PLY : take(PK); if (CHASE) PLY.visible = true; crashAlt = Y; crashX = C.x; crashY = C.y; PL.x = C.x; PL.y = C.y; PL.Y = Y;
       put(o, C.x, C.y, Y, M.PLANE_W * C.sc, false, Math.PI - C.rot, C.dir * (.5 + p * 1.1), -.25 * p); flash(o, 0); playerFire(o, G, now, 3.6, C); return; }
-    crashAlt = -1; playerAlt = -1; if (G.crashed) return;
+    crashAlt = -1; playerAlt = -1; if (CHASE) PLY.visible = false; if (G.crashed) return;
     const proll = Math.max(-1, Math.min(1, G.vx * .12)), palt = G.alt == null ? (G.running ? 1 : 0) : G.alt, pw = M.PLANE_W * (.74 + .26 * palt);
     const vis = G.inv <= 0 || G.landing || Math.floor(G.inv / 6) % 2 === 0; if (!vis) return;
-    let Y = 5 + (A.player - 5) * palt; const o = take(PK);
+    let Y = 5 + (A.player - 5) * palt; const o = CHASE ? PLY : take(PK); if (CHASE) PLY.visible = true;
     if (CHASE) {   // chase view: bank into the turn, nose up when you push ahead (and climb a touch), nose down when you ease back
       const pv = Math.max(-1, Math.min(1, (G.mvy || 0) / 520)) * (G.running ? 1 : 0); PL.pitch += (pv - PL.pitch) * .12; Y -= PL.pitch * 7 * palt;
       put(o, G.x, G.y, Y, pw, false, Math.PI - proll * .16, proll * .95, PL.pitch * .3 * Math.max(.3, palt));
-      AIR.eng.forEach(e => { const w = local(o, e.x, e.y, e.z); const f = .75 + .25 * Math.sin(now / 37 + e.x), bst = G.boostT > 0 ? 1.7 : 1; Ba.w(w.x, w.y, w.z, 9 * f * bst, 9 * f * bst, 0, UV.dot, 1, .62, .3, .75); Ba.w(w.x, w.y, w.z + .3, 4 * bst, 4 * bst, 0, UV.dot, 1, .95, .8, 1); });
+      AIR.spin(now / 1000); o.updateMatrixWorld(true); const L = (q) => AIR.node.localToWorld(V.copy(q)), bst = G.boostT > 0 ? 1.8 : 1;
+      AIR.pts.eng.forEach(e => FXA.glow(L(e), 9 * bst, G.boostT > 0 ? [.45, .75, 1] : [1, .55, .25], .55));
+      FXA.glow(L(AIR.pts.tipL), 9, [1, .15, .12], .95); FXA.glow(L(AIR.pts.tipR), 9, [.15, 1, .35], .95);   // nav lights: red left, green right
+      const sp = (now / 1000) % 1.2; if (sp < .06 || (sp > .16 && sp < .22)) { FXA.glow(L(AIR.pts.tipL), 28, [1, 1, 1], 1); FXA.glow(L(AIR.pts.tipR), 28, [1, 1, 1], 1); FXA.glow(L(AIR.pts.tail), 20, [1, 1, 1], 1); }   // double strobe
+      if ((now / 1000 + .5) % 1 < .12) { FXA.glow(L(AIR.pts.beaconTop), 13, [1, .1, .05], 1); FXA.glow(L(AIR.pts.beaconBot), 13, [1, .1, .05], 1); }
+      if (palt < .5) AIR.pts.land.forEach(q => FXA.glow(L(q), 26, [1, .96, .85], .8));   // landing lights low and slow
     } else put(o, G.x, G.y, Y, pw, false, Math.PI - proll * .35, -proll * .62, 0);
     playerAlt = Y; playerX = G.x; playerY = G.y; PL.x = G.x; PL.y = G.y; PL.Y = Y; flash(o, 0);
-    if (CHASE) navPair(now, 0, local(o, AIR.tips[1].x, AIR.tips[1].y, AIR.tips[1].z).clone(), local(o, AIR.tips[0].x, AIR.tips[0].y, AIR.tips[0].z), 2.2);
-    else navPair(now, 0, frac(o, .47, .1, -.02).clone(), frac(o, -.47, .1, -.02), 2.2);
-    if (G.sev > .15) playerFire(o, G, now, G.sev, null);
-    if (G.mfl > 0 && G.running && !G.dying) { const c = rgb(M.WPN[G.wpn].c), a = G.mfl / 70, pts = G.wpn < 3 ? [-22, 22] : [-22, 0, 22];
+    if (!CHASE) navPair(now, 0, frac(o, .47, .1, -.02).clone(), frac(o, -.47, .1, -.02), 2.2);
+    if (G.sev > .15 && !CHASE) playerFire(o, G, now, G.sev, null);   // chase view: real wounds instead (playerWounds)
+    if (CHASE && G.mfl > 0 && G.running && !G.dying) { const c = rgb(M.WPN[G.wpn].c); AIR.pts.muzzle.forEach(q => FXA.glow(AIR.node.localToWorld(V.copy(q)), 24, c, G.mfl / 70)); }
+    else if (G.mfl > 0 && G.running && !G.dying) { const c = rgb(M.WPN[G.wpn].c), a = G.mfl / 70, pts = G.wpn < 3 ? [-22, 22] : [-22, 0, 22];
       pts.forEach(of => { const x = G.x + of, y = G.y - (of ? 20 : 36); Ba.q(x, y, Y + 6, 24, 24, 0, UV.dot, c[0], c[1], c[2], a); Ba.q(x, y, Y + 7, 10, 10, 0, UV.dot, 1, 1, 1, a); }); }
   }
   const EXT = new WeakMap(); const ext = (o) => { let e = EXT.get(o); if (!e) { e = { seed: 1 + Math.random() * 9, px: o.x }; EXT.set(o, e); } return e; };
@@ -560,7 +523,7 @@ async function boot() {
       else if (en.t === "jet") { const o = take("jet"); put(o, en.x, en.y, A.jet, en.w, false, -(en.ra || 0), 0, -.05); flash(o, hit * .45);
         navPair(now, ext(en).seed, frac(o, .45, 0, .05).clone(), frac(o, -.45, 0, .05), 1.9);
         Ba.q(en.x, en.y - en.w * .55, A.jet - 4, 10, 26, 0, UV.tongue, 1, .7, .4, .7); }
-      else if (en.t === "kami") { const o = take("plane"); put(o, en.x, en.y, A.kami, en.w, false, 0, Math.sin(now / 500 + en.x) * .08, .08); flash(o, hit * .45);
+      else if (en.t === "kami") { const o = take(CHASE ? "kami3" : "plane"); put(o, en.x, en.y, A.kami, en.w, false, 0, Math.sin(now / 500 + en.x) * .08, CHASE ? 0 : .08); flash(o, hit * .45);
         Ba.q(en.x, en.y + 50, A.kami - 10, 180, 180, 0, UV.dot, 1, .98, .86, .55);
         navPair(now, ext(en).seed, frac(o, -.47, .1, .02).clone(), frac(o, .47, .1, .02), 2.6); }
       else if (en.t === "cop") { const key = en.v ? "cop1" : "cop0", o = take(key); if (!o) continue; const hb = M.copPt(en, "hub");

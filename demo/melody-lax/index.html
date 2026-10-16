@@ -555,6 +555,13 @@ addEventListener("scroll",tryPromo,{passive:true}); addEventListener("load",tryP
 
 /* ======================= GAME: Melody Approach ======================= */
 var cv=$("cv"), cx=cv.getContext("2d"), W=400, H=600, DPR=Math.min(2,window.devicePixelRatio||1);
+/* CHASE VIEW (melody3d.js, 2026-10-16): the 3D camera sits behind your plane, so this canvas splits in two. CH=1 while it is on.
+   CX0 = this canvas = the HUD on top. Things that live IN the world (aim lines, lanes, the beam, the boost trail) are drawn to
+   M3.wcx, a canvas the 3D layer lays on your flight level. Labels, pops, pickups and health bars are "billboarded" with bb():
+   drawn upright on the HUD at the projected spot, so they stay readable. With CH=0 (2D, or the top-down 3D) nothing changes. */
+var CX0=cx, CH=0;
+function bb(x,y,Y,fn,smin,smax){ if(!CH||!M3.proj){ fn(); return; } var p=M3.proj(x,y,Y); if(!p) return; var s=Math.max(smin||.45,Math.min(smax||1.6,p[2])), o=cx;
+  cx=CX0; cx.save(); cx.translate(p[0],p[1]); cx.scale(s,s); cx.translate(-x,-y); try{ fn(); } finally{ cx.restore(); cx=o; } }
 cv.width=W*DPR; cv.height=H*DPR; cx.scale(DPR,DPR);
 var R3=0;
 var ATT=0;   // attract mode: while the start menu is up the world scrolls under a gently weaving plane (the menu's live preview)   // 1 = melody3d.js renders the world in WebGL under this canvas; this canvas then only draws the HUD/text overlay (visual only, logic untouched)
@@ -707,7 +714,7 @@ var LMW={melody:250,stadium:270,towers:240};   // sprite widths (the 3D layer us
 function drawGround(dy){
   if(!R3){ cx.fillStyle="#0c1220"; cx.fillRect(0,0,W,H); }
   for(var i=G.ground.length-1;i>=0;i--){ var g=G.ground[i]; g.y+=dy; if(g.y>H+40){ G.ground.splice(i,1); continue; } }
-  while(G.ground.length&&G.ground[G.ground.length-1].y>-420) { G.gy=G.ground[G.ground.length-1].y; addSeg(); }
+  while(G.ground.length&&G.ground[G.ground.length-1].y>(CH?-2000:-420)) { G.gy=G.ground[G.ground.length-1].y; addSeg(); }   // chase view: segments out to the horizon
   // aerial tiles, bottom to top so each upper tile's soft edge lays over the one below
   var tW=performance.now();
   if(!R3) G.ground.forEach(function(g){ var T=TILES[g.t]; if(!T) return; cx.drawImage(T.c,0,g.y,W,T.c.height/2); });
@@ -720,13 +727,13 @@ function drawGround(dy){
     if(g.k==="runway"){ if(!R3) drawRunway(g); }
     else if(g.k==="pier"||g.k==="coast"){ /* plain coast tiles: no labels */ }
     else if(g.k==="venice"){ var L2=[LBL.venice,.62,.36];
-      cx.font="800 13px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.85)"; cx.strokeText(L2[0],W*L2[1],g.y+g.h*L2[2]); cx.fillStyle=g.k==="venice"?"#f0d375":"#e8eefc"; cx.fillText(L2[0],W*L2[1],g.y+g.h*L2[2]); }
+      bb(W*L2[1],g.y+g.h*L2[2],0,function(){ cx.font="800 13px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.85)"; cx.strokeText(L2[0],W*L2[1],g.y+g.h*L2[2]); cx.fillStyle=g.k==="venice"?"#f0d375":"#e8eefc"; cx.fillText(L2[0],W*L2[1],g.y+g.h*L2[2]); }); }
     else if(g.k!=="city"&&g.k!=="hills"){ var im=S[g.k]; if(ready(im)){ var w=LMW[g.k]||230, h=w*im.naturalHeight/im.naturalWidth, x=W/2+g.side*70-w/2;
       if(!R3){ cx.save(); cx.globalAlpha=.95; cx.drawImage(im,x,g.y+(g.h-h)/2,w,h); cx.restore(); }
-      if(LBL[g.k]){ cx.font="800 13px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.8)"; cx.strokeText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); cx.fillStyle=(g.k==="melody"||g.k==="venice")?"#f0d375":"#e8eefc"; cx.fillText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); } } }
+      if(LBL[g.k]&&!CH){ cx.font="800 13px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.8)"; cx.strokeText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); cx.fillStyle=(g.k==="melody"||g.k==="venice")?"#f0d375":"#e8eefc"; cx.fillText(LBL[g.k],x+w/2,g.y+(g.h-h)/2+h+14); } } }   // chase view: Melody's own 3D sign is on the building
   });
 }
-function groundDepth(){ var hz=cx.createLinearGradient(0,0,0,H*.45); hz.addColorStop(0,"rgba(16,26,52,.55)"); hz.addColorStop(1,"rgba(16,26,52,0)"); cx.fillStyle=hz; cx.fillRect(0,0,W,H*.45);
+function groundDepth(){ if(CH) return; var hz=cx.createLinearGradient(0,0,0,H*.45); hz.addColorStop(0,"rgba(16,26,52,.55)"); hz.addColorStop(1,"rgba(16,26,52,0)"); cx.fillStyle=hz; cx.fillRect(0,0,W,H*.45);
   var vg=cx.createRadialGradient(W/2,H*.62,H*.3,W/2,H*.62,H*.85); vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,"rgba(0,0,0,.35)"); cx.fillStyle=vg; cx.fillRect(0,0,W,H); }
 // LAX-style runway: worn asphalt, real markings, edge/threshold/end lights, approach-light "rabbit", PAPI, a taxiway, and ground crew waving wands
 var RWT=null;
@@ -781,7 +788,7 @@ function drawRunway(g){
 }
 function drawClouds(dy){ var sm=S.smoke; if(!ready(sm)) return;
   G.clouds.forEach(function(c){ c.y+=dy*c.v*0.55; if(c.y>H+c.s){ c.y=-c.s-Math.random()*200; c.x=Math.random()*W; }
-    cx.globalAlpha=.16; cx.drawImage(sm,c.x-c.s,c.y-c.s*0.6,c.s*2,c.s*1.2); }); cx.globalAlpha=1; }
+    if(!CH){ cx.globalAlpha=.16; cx.drawImage(sm,c.x-c.s,c.y-c.s*0.6,c.s*2,c.s*1.2); } }); cx.globalAlpha=1; }   // chase view: the 3D layer flies you through them
 
 /* ---- spawning ---- */
 function spawnPick(){
@@ -2127,7 +2134,7 @@ var TRF=(function(){
       cx.strokeStyle="rgba(30,32,40,.6)"; cx.lineWidth=1.2; cx.beginPath(); cx.moveTo(-Math.cos(pr)*w*.14,-h/2+1.5); cx.lineTo(Math.cos(pr)*w*.14,-h/2+1.5); cx.stroke();
       navLights(-w*.47,w*.47,-h*.16,p.seed,1.6); cx.restore(); }); }
   function calls(now,dt){ G.trfCalls.forEach(function(c){ var a=Math.min(1,(WARN-c.t)/250)*(.55+.25*Math.sin(now/170)), x,y,ang;
-      if(c.side){ x=c.side>0?16:W-16; y=Math.max(70,Math.min(H-40,c.y)); ang=c.side>0?Math.PI/2:-Math.PI/2; } else { x=Math.max(26,Math.min(W-26,c.x)); y=58; ang=Math.PI; }
+      if(c.side){ x=c.side>0?16:W-16; y=Math.max(70,Math.min(H-40,c.y)); ang=c.side>0?Math.PI/2:-Math.PI/2; } else { x=Math.max(26,Math.min(W-26,c.x)); y=58; ang=Math.PI; if(CH){ var pj=M3.proj(c.x,-40); if(pj) x=Math.max(26,Math.min(W-26,pj[0])); } }
       cx.save(); cx.globalAlpha=a; cx.translate(x,y); cx.fillStyle="rgba(8,13,26,.55)"; cx.beginPath(); cx.arc(0,0,15,0,6.283); cx.fill();
       cx.rotate(ang); cx.fillStyle="#ffd27a"; cx.beginPath(); cx.moveTo(0,-8); cx.lineTo(7,5); cx.lineTo(0,1.5); cx.lineTo(-7,5); cx.closePath(); cx.fill(); cx.restore();
       cx.save(); cx.globalAlpha=a; cx.font="800 11px Barlow,system-ui"; cx.textAlign=c.side>0?"left":c.side<0?"right":"center"; cx.textBaseline="middle"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,.85)";
@@ -2137,7 +2144,7 @@ var TRF=(function(){
 
 /* ---- main loop ---- */
 function frame(now){
-  requestAnimationFrame(frame);
+  requestAnimationFrame(frame); cx=CX0;
   if(G.half){ G.last=now; return; }   // halftime: the whole flight is frozen on its last frame until the break ends
   var dt=Math.max(0,Math.min(50,now-(G.last||now))); G.last=now; var k=dt/16.67, run=G.running&&!G.dying;
   var TO=4500, LAND=8000, takeoff=run&&G.el<TO, landing=run&&G.home&&G.t<=LAND;
@@ -2146,7 +2153,7 @@ function frame(now){
   if(takeoff){ spd=0.5+2.2*Math.pow(G.el/TO,1.4); G.alt=Math.max(0,Math.min(1,(G.el-1300)/2800)); }
   else if(run&&!landing) G.alt=1;
   if(landing){ if(!G.landing){ G.landing=1; G.inv=1e9; G.warn=[]; G.bolts=[]; G.ens.forEach(function(e){ e.fleeing=1; });
-      G.ground.forEach(function(g){ if(g.y+g.h<-20&&g.k!=="runway") g.k="city"; }); G.seq=1; } // coming home: plain city, then LAX
+      G.ground.forEach(function(g){ if(g.y+g.h<-20&&g.k!=="runway") g.k="city"; }); while(G.ground.length>1&&G.ground[G.ground.length-2].y<=-420) G.ground.pop(); G.seq=1; } // coming home: plain city, then LAX
     var rw=null; G.ground.forEach(function(g){ if(g.k==="runway"&&G.landing&&g.y<G.y&&g.y+g.h-34>G.y) rw=g; });
     if(rw){ G.alt=Math.max(0,(G.alt==null?1:G.alt)-dt/1700); }
     if(G.alt<=0){ G.roll=(G.roll==null?1:G.roll)*Math.pow(0.975,k); if(!G.touched){ G.touched=1; G.shake=6; pop(G.x,G.y-40,T("Touchdown!"),"#7ef7c8"); buzz(40); } }
@@ -2159,6 +2166,7 @@ function frame(now){
   G.scroll+=gsp*k; SND.engine(G.running&&!G.dying?Math.min(1,Math.max(0,(spd-.5)/4.1)):-1);
   if(reduce) G.shake=0;
   if(R3) cx.clearRect(0,0,W,H);
+  CH=R3&&M3.chase&&M3.wcx?1:0; if(CH){ cx=M3.wcx; cx.clearRect(0,0,W,H); }   // chase view: world-space drawing goes to the 3D layer's canvas until the HUD part
   SHK[0]=SHK[1]=0; cx.save(); if(G.shake>0){ SHK[0]=(Math.random()-.5)*G.shake; SHK[1]=(Math.random()-.5)*G.shake; cx.translate(SHK[0],SHK[1]); G.shake*=.86; if(G.shake<.5) G.shake=0; }
   if(!G.ground.length) seedGround();
   CARS.step(dt);
@@ -2207,7 +2215,8 @@ function frame(now){
     if(it.y>H+60){ if(it.t==="crate"&&!G.gotCrate) G.crateT=9000;
       if(run&&it.t==="food"){ if(G.streak>=3) pop(Math.max(50,Math.min(W-50,it.x)),H-36,T("Missed it · streak ends"),"#9aa3b5"); else pop(Math.max(40,Math.min(W-40,it.x)),H-36,T("missed it"),"#9aa3b5"); G.streak=0; }
       G.items.splice(i,1); continue; }
-    if(it.t==="slow") drawSlowItem(it,now);
+    if(CH&&(it.t==="slow"||it.t==="boost"||it.t==="crate"||it.t==="heal")) bb(it.x,it.y,null,function(){ if(it.t==="slow") drawSlowItem(it,now); else if(it.t==="boost") drawBoostItem(it,now); else if(it.t==="crate") drawCrate(it,now); else drawHeal(it,now); });
+    else if(it.t==="slow") drawSlowItem(it,now);
     else if(it.t==="boost") drawBoostItem(it,now);
     else if(it.t==="crate") drawCrate(it,now);
     else if(it.t==="driz") drawDriz(it,now);
@@ -2235,8 +2244,9 @@ function frame(now){
       cx.beginPath(); cx.moveTo(wn.x+dr*18,wn.y); cx.lineTo(wn.x-dr*6,wn.y-16); cx.lineTo(wn.x-dr*6,wn.y+16); cx.closePath(); cx.fill();
       cx.font="900 13px Barlow,system-ui"; cx.textAlign=dr>0?"left":"right"; cx.fillText(T("MISSILE RUN!"),wn.x+dr*24,wn.y-10); continue; }
     if(wn.k==="sj"){ cx.save(); cx.fillStyle="rgba(255,40,40,"+(fl?.16:.08)+")"; cx.fillRect(wn.x-52,0,104,H); cx.restore(); }
-    cx.beginPath(); cx.moveTo(wn.x,46); cx.lineTo(wn.x-16,18); cx.lineTo(wn.x+16,18); cx.closePath(); cx.fill();
-    cx.font="900 13px Barlow,system-ui"; cx.textAlign="center"; cx.fillText(wn.k==="kami"?T("INCOMING PLANE!"):wn.k==="cop"?T("LAPD AIR UNIT!"):wn.k==="sj"?T("SUPER JET!"):wn.k==="esc"?T("ESCORT DIVE!"):T("JET!"),wn.x,62);
+    var wc=CH?CX0:cx, wx2=wn.x; if(CH){ var wp=M3.proj(wn.x,-60); if(wp) wx2=Math.max(60,Math.min(W-60,wp[0])); wc.fillStyle=cx.fillStyle; }
+    wc.beginPath(); wc.moveTo(wx2,46); wc.lineTo(wx2-16,18); wc.lineTo(wx2+16,18); wc.closePath(); wc.fill();
+    wc.font="900 13px Barlow,system-ui"; wc.textAlign="center"; wc.fillText(wn.k==="kami"?T("INCOMING PLANE!"):wn.k==="cop"?T("LAPD AIR UNIT!"):wn.k==="sj"?T("SUPER JET!"):wn.k==="esc"?T("ESCORT DIVE!"):T("JET!"),wx2,62);
     if(wn.k==="esc"){ cx.save(); cx.fillStyle="rgba(255,40,40,"+(fl?.13:.06)+")"; cx.fillRect(wn.x-34,0,68,H); cx.restore(); } }
   if(run) teleStep(dt*G.ts); teleDraw(now);
   // enemies (enemy time: slow-mo scales k/dt for everything they do, restored after the loop)
@@ -2247,7 +2257,7 @@ function frame(now){
       if(run&&G.boss===en&&!en.ground&&en.rw&&Math.abs(en.x-G.x)<en.rw+16&&Math.abs(en.y-G.y)<en.rh+18) hurt(G.x,G.y,T("💥 Hit the boss!")); continue; }
     if(en.t==="esc"||en.t==="bird"){ var isB=en.t==="bird"; if(run){ if(isB) birdStep(en,dt,k,now); else escStep(en,dt,k,now); }
       if(en.fleeing&&(en.y<-120||en.x<-120||en.x>W+120)){ G.ens.splice(e,1); continue; }
-      if(isB) birdDraw(en,now); else { escDraw(en,now); if(en.hp<en.mhp){ var ehw=36, ehy=en.y-en.r-14; cx.fillStyle="rgba(0,0,0,.6)"; cx.fillRect(en.x-ehw/2-1,ehy-1,ehw+2,6); cx.fillStyle=en.hp/en.mhp>.5?"#7ef7c8":"#ffb03b"; cx.fillRect(en.x-ehw/2,ehy,ehw*Math.max(0,en.hp/en.mhp),4); } }
+      if(isB) birdDraw(en,now); else { escDraw(en,now); if(en.hp<en.mhp) bb(en.x,en.y,null,function(){ var ehw=36, ehy=en.y-en.r-14; cx.fillStyle="rgba(0,0,0,.6)"; cx.fillRect(en.x-ehw/2-1,ehy-1,ehw+2,6); cx.fillStyle=en.hp/en.mhp>.5?"#7ef7c8":"#ffb03b"; cx.fillRect(en.x-ehw/2,ehy,ehw*Math.max(0,en.hp/en.mhp),4); }); }
       if(run&&!en.fleeing&&en.y>0&&Math.abs(en.x-G.x)<en.r+20&&Math.abs(en.y-G.y)<en.r+22){ hurt(en.x,en.y,isB?T("🕊️ Bird strike!"):T("💥 Escort hit!")); boom(en.x,en.y,isB?10:24); if(isB) birdKilled(en,false); else { var ei=G.ens.indexOf(en); if(ei>=0) G.ens.splice(ei,1); } }
       continue; }
     if(run){ if(en.t==="ufo"&&en.fleeing){ en.x+=(en.x<W/2?-5:5)*k; en.y-=.6*k; }
@@ -2270,7 +2280,7 @@ function frame(now){
       else if(en.fleeing){ en.x+=(en.x<W/2?-6:6)*k; en.y-=1*k; }
       else if(en.t==="kami"){ en.y+=KAMI_V*k; en.x+=en.vx*k; if(Math.random()<.5) G.fx.push({k:"s",x:en.x+(Math.random()-.5)*30,y:en.y-40,vx:0,vy:-1,s:4,g:.25,a:.25,rot:0}); } }
     if(en.y>H+120||en.x<-120||en.x>W+120){ G.ens.splice(e,1); continue; }
-    if(R3){ if(en.t==="cop"){ rv=Math.max(rv,1-Math.hypot(en.x-G.x,en.y-G.y)/450); cx.font="900 11px Barlow,system-ui"; cx.textAlign="center"; cx.fillStyle="rgba(255,255,255,.9)"; cx.fillText("LAPD",en.x,en.y+COP_LEN*.56); } }   // the 3D layer draws the aircraft
+    if(R3){ if(en.t==="cop"){ rv=Math.max(rv,1-Math.hypot(en.x-G.x,en.y-G.y)/450); bb(en.x,en.y,null,function(){ cx.font="900 11px Barlow,system-ui"; cx.textAlign="center"; cx.fillStyle="rgba(255,255,255,.9)"; cx.fillText("LAPD",en.x,en.y+COP_LEN*.56); }); } }   // the 3D layer draws the aircraft
     else if(en.t==="ufo"){ var gg=cx.createRadialGradient(en.x,en.y+16,2,en.x,en.y+16,60); gg.addColorStop(0,"rgba(126,247,200,.35)"); gg.addColorStop(1,"rgba(126,247,200,0)"); cx.fillStyle=gg; cx.beginPath(); cx.arc(en.x,en.y+16,60,0,6.283); cx.fill(); sprite(S.ufo,en.x,en.y,en.w,0,false,"🛸"); }
     else if(en.t==="jet"){ sprite(S.jet,en.x,en.y,en.w,en.ra||0,false,"🛩️"); if(!en.seed) en.seed=1+Math.random()*9; navLights(en.x-en.w*.42,en.x+en.w*.42,en.y+en.w*.12,en.seed,1.9); }
     else if(en.t==="cop"){ var tt=now/1000; rv=Math.max(rv,1-Math.hypot(en.x-G.x,en.y-G.y)/450);
@@ -2285,7 +2295,7 @@ function frame(now){
     else { // head-on airliner: nose down, landing lights blazing
       cx.save(); cx.globalCompositeOperation="lighter"; var lg=cx.createRadialGradient(en.x,en.y+50,2,en.x,en.y+50,90); lg.addColorStop(0,"rgba(255,250,220,.55)"); lg.addColorStop(1,"rgba(255,250,220,0)"); cx.fillStyle=lg; cx.beginPath(); cx.arc(en.x,en.y+50,90,0,6.283); cx.fill(); cx.restore();
       sprite(S.kami,en.x,en.y,en.w,Math.PI,false,"✈️"); if(!en.seed) en.seed=1+Math.random()*9; navLights(en.x-en.w*.47,en.x+en.w*.47,en.y-en.w*.05,en.seed,2.6); }
-    if(en.mhp>2&&en.hp<en.mhp){ var hbw=40, hby=en.y-(en.t==="cop"?COP_LEN*.5+6:en.r+14); cx.fillStyle="rgba(0,0,0,.6)"; cx.fillRect(en.x-hbw/2-1,hby-1,hbw+2,6); cx.fillStyle=en.hp/en.mhp>.5?"#7ef7c8":"#ffb03b"; cx.fillRect(en.x-hbw/2,hby,hbw*Math.max(0,en.hp/en.mhp),4); }
+    if(en.mhp>2&&en.hp<en.mhp) bb(en.x,en.y,null,function(){ var hbw=40, hby=en.y-(en.t==="cop"?COP_LEN*.5+6:en.r+14); cx.fillStyle="rgba(0,0,0,.6)"; cx.fillRect(en.x-hbw/2-1,hby-1,hbw+2,6); cx.fillStyle=en.hp/en.mhp>.5?"#7ef7c8":"#ffb03b"; cx.fillRect(en.x-hbw/2,hby,hbw*Math.max(0,en.hp/en.mhp),4); });
     if(run&&Math.abs(en.x-G.x)<en.r+22&&Math.abs(en.y-G.y)<en.r+26){ hurt(en.x,en.y,en.t==="kami"?T("💥 Mid-air hit!"):en.t==="ufo"?T("🛸 Abducted!"):en.t==="cop"?T("🚁 Rammed the chopper!"):T("💥 Jet hit!")); boom(en.x,en.y,24); G.ens.splice(e,1); } }
   k=k0; dt=dt0;
   SND.rotor(run?rv:0);
@@ -2322,7 +2332,7 @@ function frame(now){
   // the plane: smoke, debris and fireballs under it, its fire points on top. Going down = crashStep (spiral → ground impact → end)
   FX.drawAir(now);
   if(G.dying){ drawFx(k); crashStep(now,dt,k); var d=(now-G.dying)/1000, C=G.crash||{};
-    var ta=Math.min(1,d/.35); cx.save(); cx.globalAlpha=ta; cx.translate(W/2,H*.38); cx.font="400 60px Anton,Impact,sans-serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.lineWidth=6; cx.strokeStyle="#111"; cx.strokeText(T("MAYDAY!"),0,0); cx.fillStyle="#ff4a3a"; cx.fillText(T("MAYDAY!"),0,0); cx.font="800 17px Barlow,system-ui"; cx.lineWidth=4; var sub=C.at||T("Going down by LAX"); cx.strokeText(sub,0,40); cx.fillStyle="#f0d375"; cx.fillText(sub,0,40); cx.restore(); }
+    var ta=Math.min(1,d/.35), cxw=cx; cx=CX0; cx.save(); cx.globalAlpha=ta; cx.translate(W/2,H*.38); cx.font="400 60px Anton,Impact,sans-serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.lineWidth=6; cx.strokeStyle="#111"; cx.strokeText(T("MAYDAY!"),0,0); cx.fillStyle="#ff4a3a"; cx.fillText(T("MAYDAY!"),0,0); cx.font="800 17px Barlow,system-ui"; cx.lineWidth=4; var sub=C.at||T("Going down by LAX"); cx.strokeText(sub,0,40); cx.fillStyle="#f0d375"; cx.fillText(sub,0,40); cx.restore(); cx=cxw; }
   else {
     drawFx(k);
     if(!G.crashed){ var proll=Math.max(-1,Math.min(1,G.vx*.12)), palt=G.alt==null?(G.running?1:0):G.alt, pw=PLANE_W*(0.74+0.26*palt);
@@ -2330,9 +2340,10 @@ function frame(now){
       if(G.sev>.15) FX.planeFire(G.x,G.y,pw,pw*524/520,proll*.35,Math.max(.72,1-Math.abs(proll)*.5),1,G.sev,dt,k,now,G.running,!vis||R3); }
     if(run&&!CALM){ muzzle(); beamDraw(now); }
   }
-  TRF.calls(now,dt);
+  if(!CH) TRF.calls(now,dt);
   drawClouds(spd*k);
-  for(var pI=G.pops.length-1;pI>=0;pI--){ var po=G.pops[pI]; po.y-=1.1*k; po.a-=.02*k; if(po.a<=0){ G.pops.splice(pI,1); continue; } cx.globalAlpha=po.a; cx.fillStyle=po.col; cx.font="800 17px Barlow,system-ui"; cx.textAlign="center"; cx.fillText(po.txt,po.x,po.y); cx.globalAlpha=1; }
+  if(CH){ cx.restore(); cx=CX0; cx.save(); if(SHK[0]||SHK[1]) cx.translate(SHK[0],SHK[1]); TRF.calls(now,dt); eggCheck(); }   // chase view: from here on it is the HUD
+  for(var pI=G.pops.length-1;pI>=0;pI--){ var po=G.pops[pI]; po.y-=1.1*k; po.a-=.02*k; if(po.a<=0){ G.pops.splice(pI,1); continue; } bb(po.x,po.y,null,function(){ cx.globalAlpha=po.a; cx.fillStyle=po.col; cx.font="800 17px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,"+(CH?.75:0)+")"; if(CH) cx.strokeText(po.txt,po.x,po.y); cx.fillText(po.txt,po.x,po.y); cx.globalAlpha=1; },.75,1.5); }
   slowHud(now); drawBossBar(); drawUpgrade(dt); drawBanner(dt); drawDrizHud(now); gunCue(run,takeoff);
   if(takeoff||(landing&&!G.touched)){ var msg=takeoff?(G.el<1500?T("Cleared for takeoff · Runway 25L"):T("Wheels up! Catch the food")):T("Melody tower: cleared to land 25L"); cx.save(); cx.font="900 17px Barlow,system-ui"; cx.textAlign="center"; var tw=cx.measureText(msg).width+28; cx.fillStyle="rgba(8,13,26,.82)"; roundRect(W/2-tw/2,64,tw,34,17); cx.fill(); cx.fillStyle="#f0d375"; cx.textBaseline="middle"; cx.fillText(msg,W/2,81); cx.restore(); }
   if(G.mult>1&&run){ cx.fillStyle="rgba(228,107,131,.9)"; cx.font="900 16px Barlow,system-ui"; cx.textAlign="left"; cx.fillText("🎤 2× "+Math.ceil(G.multT/1000)+"s",10,G.boss?44:24); }
@@ -2347,6 +2358,12 @@ function frame(now){
   if(R3&&M3.render) M3.render(now,dt,spd);   // the WebGL world under this overlay, from the same state this frame just stepped
   if(ATT&&!G.running) previewCopy(now);
 }
+/* ANTIDOTE'S CAR (chase view Easter egg, 2026-10-16): after you catch the Drizzle emblems (or pass 3,000 points), a roadside
+   screen down in the city plays his Melody review and his white sedan (plate ANTIDOTE) cruises under it. Fly over it once a flight:
+   +500 and a toast; the end screen's review card links to the full review. Never in calm practice/debug boards, never hurts you. */
+var EGG_SCORE=3000;
+function eggCheck(){ var E=M3.egg; if(!E||!E.on||G.eggFound||!G.running||G.dying) return; if(Math.abs(E.x-G.x)<46&&Math.abs(E.y-G.y)<54){ G.eggFound=1; var b=500*G.mult; G.score+=b; pop(G.x,G.y-60,"🚗 +"+b+" "+T("You found Antidote!"),"#f0d375"); SND.play("upgrade"); buzz([20,30,20]);
+  if(window.ReviewEgg) ReviewEgg.toast("🚗 "+T("You found Antidote!"),T("Watch his Melody review on the end screen")); } }
 // the start menu's small live preview: a scaled copy of this frame (WebGL world + this overlay), ~30 fps, only while the menu is up
 var PVT=0;
 function previewCopy(now){ if(now-PVT<33) return; PVT=now; var pv=document.getElementById("mpv"); if(!pv||!pv.isConnected) return; var c=pv.getContext("2d"), w=pv.width, h=pv.height;
@@ -2354,7 +2371,7 @@ function previewCopy(now){ if(now-PVT<33) return; PVT=now; var pv=document.getEl
 function rewardsOn(){ return !!(window.MELODY_REWARDS_ON&&window.MELODY_REWARDS_ON()); }
 /* ---- bridge for the optional 3D renderer (melody3d.js). Read-only views of the game state + visual hooks; it never changes the game. ---- */
 var SHK=[0,0];
-var M3=window.__M3={render:null,G:function(){ return G; },S:S,W:W,H:H,PLANE_W:PLANE_W,COP_LEN:COP_LEN,GS_LEN:GS_LEN,SJ_W:SJ_W,DRIZ_N:DRIZ_N,RP_HITS:RP_HITS,WPN:WPN,NAV:NAV,PICK:PICK,MIC:MIC,TILES:TILES,LBL:LBL,LMW:LMW,TRF_COLS:TRF.COLS,DRIZ_IM:DRIZ_IM,FX:FX,CARS:CARS,SHK:SHK,reduce:reduce,
+var M3=window.__M3={render:null,egg:null,EGG_SCORE:EGG_SCORE,G:function(){ return G; },S:S,W:W,H:H,PLANE_W:PLANE_W,COP_LEN:COP_LEN,GS_LEN:GS_LEN,SJ_W:SJ_W,DRIZ_N:DRIZ_N,RP_HITS:RP_HITS,WPN:WPN,NAV:NAV,PICK:PICK,MIC:MIC,TILES:TILES,LBL:LBL,LMW:LMW,TRF_COLS:TRF.COLS,DRIZ_IM:DRIZ_IM,FX:FX,CARS:CARS,SHK:SHK,reduce:reduce,
   copPt:copPt,gsPt:gsPt,gunshipIm:gunshipIm,superjetIm:superjetIm,ready:ready,
   BJ_W:BJ_W,ESC_W:ESC_W,RK_L:RK_CH*RK_K,BASE_W:BASE_W,BASE_H:BASE_H,BASE_L:BASE_L,BIRD_W:BIRD_W,rkPod:rkPod,LITE:LITE,baseIm:baseIm,
   rpBanner:function(c,x,y,p,a,r){ rpBanner(c,x,y,p,a,r); },
@@ -2438,10 +2455,11 @@ requestAnimationFrame(frame);
 // you can see it). Arrow keys / WASD accelerate and coast smoothly. The motion itself lives in steer() (dt-based, 60 fps or not)
 var drag=null;
 function replay(){ start(); }   // play before registering: no member gate, no tokens (Christian, 2026-10)
-function aim(e){ var r=cv.getBoundingClientRect(), x=(e.clientX-r.left)*W/r.width, y=(e.clientY-r.top)*H/r.height, off=e.pointerType==="mouse"?0:-70;
+function aim(e,first){ var r=cv.getBoundingClientRect(), x=(e.clientX-r.left)*W/r.width, y=(e.clientY-r.top)*H/r.height, off=e.pointerType==="mouse"?0:-70;
+  if(CH){ if(first||!drag.a) drag.a={x:x,y:y,tx:G.x,ty:G.y}; var a=drag.a; x=a.tx+(x-a.x)*1.5; y=a.ty+(y-a.y)*1.3; off=0; }   // chase view: relative drag
   G.tx=Math.max(30,Math.min(W-30,x)); G.ty=Math.max(H*.32,Math.min(H-50,y+off)); }
 cv.addEventListener("pointerdown",function(e){ e.preventDefault(); SND.unlock(); if(!G.running){ replay(); return; }
-  drag={id:e.pointerId}; CTL.mode="ptr"; aim(e); try{ cv.setPointerCapture(e.pointerId); }catch(x){} });
+  drag={id:e.pointerId}; CTL.mode="ptr"; aim(e,true); try{ cv.setPointerCapture(e.pointerId); }catch(x){} });
 cv.addEventListener("pointermove",function(e){ if(!drag||!G.running||e.pointerId!==drag.id) return; e.preventDefault(); aim(e); });
 ["pointerup","pointercancel","lostpointercapture"].forEach(function(t){ cv.addEventListener(t,function(e){ if(drag&&e.pointerId===drag.id) drag=null; }); });
 ["touchend","click"].forEach(function(t){ cv.addEventListener(t,function(){ SND.unlock(); },{passive:true}); });   // iOS unlocks audio on touchend/click

@@ -11,7 +11,7 @@ export async function makePost(THREE, O) {
     imp("postprocessing/OutputPass.js"), imp("postprocessing/SMAAPass.js"), imp("shaders/FXAAShader.js"), imp("postprocessing/Pass.js")]);
   let GTAOPass = null; try { ({ GTAOPass } = await imp("postprocessing/GTAOPass.js")); } catch (e) {}
   let Q = Object.assign({ on: true, bloom: true, ssao: false, aa: "fxaa", grade: true }, O.quality || {}), W = O.width, H = O.height, PR = O.pixelRatio || 1;
-  const mkRT = () => { const rt = new THREE.WebGLRenderTarget(W * PR, H * PR, { type: THREE.HalfFloatType }); rt.depthTexture = new THREE.DepthTexture(W * PR, H * PR); rt.depthTexture.type = THREE.UnsignedIntType; return rt; };
+  const mkRT = () => { const rt = new THREE.WebGLRenderTarget(W * PR, H * PR, { type: O.rtType || THREE.HalfFloatType }); rt.depthTexture = new THREE.DepthTexture(W * PR, H * PR); rt.depthTexture.type = THREE.UnsignedIntType; return rt; };
   // the cloud composite as a Pass: it needs the depth of the scene the RenderPass just drew
   class CloudPass extends Pass {
     constructor() { super(); this.fsq = new FullScreenQuad(new THREE.ShaderMaterial(clouds.compositeShader)); this.needsSwap = true; this.P = {}; this.t = 0; this.dt = 0; }
@@ -37,7 +37,7 @@ export async function makePost(THREE, O) {
   function build() {
     if (composer) { composer.renderTarget1.dispose(); composer.renderTarget2.dispose(); composer = null; }
     if (!Q.on) return;
-    composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(W * PR, H * PR, { type: THREE.HalfFloatType, depthBuffer: false })); composer.setPixelRatio(1); composer.setSize(W * PR, H * PR);
+    composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(W * PR, H * PR, { type: O.rtType || THREE.HalfFloatType, depthBuffer: false })); composer.setPixelRatio(1); composer.setSize(W * PR, H * PR);
     passes.clouds = new CloudPass(); composer.addPass(passes.clouds);
     if (Q.ssao && GTAOPass) { passes.ao = new GTAOPass(scene, camera, W * PR, H * PR); passes.ao.output = GTAOPass.OUTPUT.Default; passes.ao.blendIntensity = .65; try { passes.ao.updateGtaoMaterial({ radius: 2.5, distanceExponent: 1, thickness: 1, scale: 1, distanceFallOff: 1 }); } catch (e) {} composer.addPass(passes.ao); } else passes.ao = null;
     if (Q.bloom) { passes.bloom = new UnrealBloomPass(new THREE.Vector2(W * PR / 2, H * PR / 2), .5, .45, .82); composer.addPass(passes.bloom); } else passes.bloom = null;

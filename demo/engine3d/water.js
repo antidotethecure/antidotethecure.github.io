@@ -7,7 +7,7 @@
    Shader side: vec4 r = uReflMat * vec4(worldPos, 1.); vec2 uv = r.xy / r.w + N.xz * .035; texture2D(uRefl, uv) (rgb, a = coverage). */
 export function makeMirror(THREE, renderer, O = {}) {
   const h = O.y || 0, scale = O.scale || .5;
-  const rt = new THREE.WebGLRenderTarget(16, 16, { type: THREE.HalfFloatType }); rt.texture.generateMipmaps = false;
+  const rt = new THREE.WebGLRenderTarget(16, 16, { type: O.rtType || THREE.HalfFloatType }); rt.texture.generateMipmaps = false;
   const vcam = new THREE.PerspectiveCamera(), matrix = new THREE.Matrix4(), N = new THREE.Vector3(0, 1, 0), P = new THREE.Vector3(), V = new THREE.Vector3(), T = new THREE.Vector3(), L = new THREE.Vector3(), Rm = new THREE.Matrix4();
   const clip = [new THREE.Plane(new THREE.Vector3(0, 1, 0), -h - .2)], size = new THREE.Vector2(), cc = new THREE.Color();
   const api = { texture: rt.texture, matrix, enabled: true,

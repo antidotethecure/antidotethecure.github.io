@@ -19,9 +19,11 @@ import { makeWeather } from "../../engine3d/weather.js";
 import { makePost } from "../../engine3d/postfx.js";
 import { makeTraffic } from "../../engine3d/traffic.js";
 import { makeMirror } from "../../engine3d/water.js";
+import { makeCombat } from "../../engine3d/combat.js";
+import { buildBlimp } from "../../engine3d/blimp.js";
 import { makeQuality } from "../../engine3d/quality.js";
 
-const Qs = new URLSearchParams(location.search), W = 720, H = 1280, V = 150;
+const Qs = new URLSearchParams(location.search), W = 720, H = 1280, V = +(Qs.get("v") || 150);
 const ROUTE = Qs.get("route") || "beach", ALT = +(Qs.get("alt") || 70), TFIX = Qs.get("t");
 const cv = document.getElementById("gl");
 const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, preserveDrawingBuffer: true, powerPreference: "high-performance" });
@@ -82,6 +84,12 @@ function step(t, dt) {
   else if (mode === "street") { cam.position.set(X + 60, 14, Z - 120); cam.lookAt(X + 20, 8, Z - 260); }
   else if (mode === "low") { cam.position.set(X * .9, Y * .5 + 18, Z + 120); cam.lookAt(X * .9, 6, Z - 260); }
   else { cam.position.set(X * .82, Y * .85 + 50, Z + 176); cam.lookAt(X * .9, Y * .6 - 24, Z - 380); }
+  ENM.forEach(e => { if (e.done) return; if (t < e.at) { e.o.position.set(X + e.dx, Y + e.dy, Z + e.dz); e.o.rotation.set(0, e.kind === "jet" ? 0 : Math.PI, 0); if (e.kind === "jet") fx.glow(e.o.position, 6, [1, .6, .3], .6); }
+    else { e.done = true; fx.boom(e.o.position.clone(), 1.2); COMBAT.crash({ obj: e.o, kind: e.kind, k: 1, ground: 0, eject: e.kind === "jet" }); } });
+  if (FXQ === "guns" && (t * 12 | 0) !== step.lg) { step.lg = t * 12 | 0; AIR.pts.muzzle.forEach(m => { const p = AIR.node.localToWorld(m.clone()); COMBAT.muzzle(p, new THREE.Vector3(0, 0, -1), [1, .85, .4], 1.2);
+      fx.emit(p, new THREE.Vector3(0, 0, -900), .5, 3, 3, [1, .9, .5], [1, .6, .2], 1, true, 2, 0, 0); }); }
+  if (BL) { BL.node.position.set(X + 40, Y + 60 + Math.sin(t) * 2, Z - 230); BL.node.rotation.set(Math.sin(t * .6) * .03, Math.PI * .85, Math.sin(t * .9) * .04); BL.node.scale.setScalar(1.2); BL.update(t, fx); }
+  COMBAT.update(dt, t, { scroll: 0 });
   sun.position.set(X - 260, 420, Z + 360); sun.target.position.set(X, 0, Z - 200);
   cam.updateMatrixWorld(); TRAFFIC.update(cam, t, dt, { night: SKY.info.night, rain: WX.v.rain }); fx.update(dt); CROWD.update(cam, t, dt);
   WX.update(dt, t, cam); SKY.setTime(TODQ + (Qs.get("live") ? t / 6 : 0)); SKY.update(dt, WX.v, t); world.setDaylight(SKY.info.night, WX.v); world.setSkyLight(SKY.info, WX.v); RAIN.v = WX.v.rain;
@@ -89,6 +97,13 @@ function step(t, dt) {
 const ENVW = new THREE.Vector3(), ENVA = new THREE.Color(), ENVB = new THREE.Color(), ENVM = new THREE.Color(), MOON = new THREE.Color(.5, .58, .85), WHITE = new THREE.Color(1, 1, 1);
 const PUFFS = (Qs.get("puffs") || "").split(";").filter(Boolean).map(s => s.split(",").map(Number));
 const MIRROR = makeMirror(THREE, renderer, { y: 0, scale: .5 });
+// combat + blimp showcase: ?fx=crash (a jet and a helicopter shot down ahead: fall, crash, ejection) · ?fx=guns (muzzle flashes) · ?blimp=1
+const COMBAT = makeCombat(THREE, { scene, fx, crowd: () => CROWD, lights: 2, quality: () => ({ lights: 2, shells: true, debris: 1 }), debris: (p, n, c, sp) => world.debris(p, n, c, sp) });
+const FXQ = Qs.get("fx"), ENM = [];
+if (FXQ === "crash") { const [gj, gh] = await Promise.all(["../3d/jet.glb", "../3d/heli_blue.glb"].map(f => loader.loadAsync(f)));
+  const norm = (g, w) => { const o = g.scene; o.traverse(n => { if (n.isMesh) { n.material.metalness = 0; n.material.roughness = .55; n.castShadow = true; } }); const b = new THREE.Box3().setFromObject(o), sz = b.getSize(new THREE.Vector3()); o.position.sub(b.getCenter(new THREE.Vector3())); const h = new THREE.Group(); h.add(o); h.scale.setScalar(w / Math.max(sz.x, sz.z)); scene.add(h); return h; };
+  ENM.push({ o: norm(gj, 70), kind: "jet", dx: -60, dy: 70, dz: -260, at: +(Qs.get("kt") || .6) }, { o: norm(gh, 80), kind: "heli", dx: 70, dy: 40, dz: -330, at: +(Qs.get("kt") || .6) + .5 }); }
+let BL = null; if (Qs.get("blimp")) { const lt = new THREE.TextureLoader().load("../../nalu-vida/img/logo.png"); lt.colorSpace = THREE.SRGBColorSpace; BL = buildBlimp(THREE, { top: "MELODY", logo: lt }); scene.add(BL.node); }
 function env(t, dt) { world.setWind(.15 + WX.v.wind * .85); const U = world.beachWater.uniforms, on = QUAL.cfg.water.reflect && ROUTE === "beach"; U.uReflOn.value = on ? 1 : 0; if (on) { MIRROR.render(scene, cam); U.uRefl.value = MIRROR.texture; U.uReflMat.value.copy(MIRROR.matrix); }
   const w = WX.v, I = SKY.info, vis = w.vis, fl = WX.flash; scene.fog.color.copy(I.horizon); scene.fog.near = 900 + 900 * vis; scene.fog.far = 4000 + 3000 * vis;
   renderer.toneMappingExposure = 1.05 * I.exposure * (1 + fl * 1.6); ENVW.set(-14 * w.wind, 0, -V + 22 * w.wind); const night = I.night > .5;
@@ -99,7 +114,7 @@ function env(t, dt) { world.setWind(.15 + WX.v.wind * .85); const U = world.beac
 let simT = 0;
 function frame(t) { while (simT < t - 1e-6) { const d = Math.min(1 / 30, t - simT); simT += d; step(simT, d); } if (simT === 0) step(0, 0); POST.render(1 / 60, simT, env(simT, 1 / 60)); }
 let frames = 0, ft = performance.now(), fps = 0;
-window.__E3 = { tr: TRAFFIC, wx: WX, sky: SKY, clouds: CLOUDS, stats: () => Object.assign({ fps, tier: QUAL.tier, hours: SKY.hours, state: WX.state, mist: CLOUDS.mist }, CROWD.stats(), { calls: renderer.info.render.calls, tris: renderer.info.render.triangles }) };
+window.__E3 = { fx, cb: COMBAT, tr: TRAFFIC, wx: WX, sky: SKY, clouds: CLOUDS, stats: () => Object.assign({ fps, tier: QUAL.tier, hours: SKY.hours, state: WX.state, mist: CLOUDS.mist }, CROWD.stats(), { calls: renderer.info.render.calls, tris: renderer.info.render.triangles }) };
 const t0 = performance.now();
 const loop = (now) => { const t = TFIX != null ? +TFIX : (now - t0) / 1000; frame(t); frames++; if (now - ft > 1000) { fps = Math.round(frames * 1000 / (now - ft)); frames = 0; ft = now; } requestAnimationFrame(loop); };
 requestAnimationFrame(loop);

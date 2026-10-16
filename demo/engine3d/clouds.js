@@ -144,7 +144,7 @@ export function makeClouds(THREE, O) {
       uniform vec2 uCRes;
       vec4 soft(sampler2D t, vec2 uv){ vec2 o = 1.0 / uCRes; return (texture2D(t, uv + vec2(-.6, -.6) * o) + texture2D(t, uv + vec2(.6, -.6) * o) + texture2D(t, uv + vec2(-.6, .6) * o) + texture2D(t, uv + vec2(.6, .6) * o)) * .25; }
       void main(){ vec4 sc = texture2D(tDiffuse, vUv); float d = texture2D(tDepth, vUv).x; vec4 F = soft(tFull, vUv), Fr = soft(tFront, vUv); vec3 col;
-        if (d >= .99999) col = uKeepBg > .5 ? sc.rgb : F.rgb;
+        if (d >= .99999) col = uKeepBg > .5 ? sc.rgb : F.rgb * (1.0 - clamp(sc.a, 0.0, 1.0)) + sc.rgb;   // sky: clouds + whatever transparent effects (smoke, fire, rain) were drawn over it
         else { vec3 c = sc.rgb, P = wpos(vUv, d);
           // cloud shadow: the coverage straight up the sun ray from this point, at mid-cloud height
           float k = ((uBase + uTop) * .5 - P.y) / max(uSunDir.y, .12); vec3 q = P + uSunDir * k + uOff;

@@ -42,11 +42,11 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=e3a") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3a") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=e3b") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3b") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
   const QM = await import("../engine3d/quality.js?v=e1");
-  const [PARTM, DMGM, ACM, SKYM, CLDM, WXM, POSTM, WATM, AUDM] = CHASE ? await Promise.all(["particles", "damage", "aircraft", "sky", "clouds", "weather", "postfx", "water", "audio"].map(n => import("../engine3d/" + n + ".js?v=e1"))) : [];
+  const [PARTM, DMGM, ACM, SKYM, CLDM, WXM, POSTM, WATM, AUDM, CBM] = CHASE ? await Promise.all(["particles", "damage", "aircraft", "sky", "clouds", "weather", "postfx", "water", "audio", "combat"].map(n => import("../engine3d/" + n + ".js?v=e3b"))) : [];
   const W = M.W, H = M.H, S = M.S, FX = M.FX, FXI = FX._i(), TAU = Math.PI * 2;
   const D = 1000;                                   // camera height above the ground plane
   const ws = Y => CHASE ? 1 : (D - Y) / D;          // world units per screen px at altitude Y (chase view: 1:1, no top-down parallax)
@@ -281,7 +281,7 @@ async function boot() {
   function birdGet(pg) { let o = BIRDS[pg][birdN[pg]++]; if (!o) { const b = buildBird(pg); o = b.node; o.userData = { size: b.size, wings: b.wings }; o.rotation.order = "YXZ"; o.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(o); BIRDS[pg].push(o); } o.visible = true; return o; }
   function bossMesh(k) { if (!BOSSM[k]) { const b = k === "rocket" ? buildRocket() : buildBase(); const o = b.node; o.userData = Object.assign(o.userData || {}, { size: b.size, mats: [] }); o.traverse(n => { if (n.isMesh) { n.material = Array.isArray(n.material) ? n.material.map(m => m.clone()) : n.material.clone(); (Array.isArray(n.material) ? n.material : [n.material]).forEach(m => o.userData.mats.push(m)); } }); o.rotation.order = "YXZ"; scene.add(o); BOSSM[k] = o; } const o = BOSSM[k]; o.visible = true; o.userData.used = 1; return o; }
   // chase view: the player flies air3d's detailed airliner (one instance, never pooled, so its wounds stay put)
-  let AIR = null, UPA = null, PLY = null, FXA = null, pDmg = null, ENEMY = null, WORLD = null, CROWD = null, TRAFFIC = null; const RAIN = { v: 0 };
+  let AIR = null, UPA = null, PLY = null, FXA = null, pDmg = null, ENEMY = null, WORLD = null, CROWD = null, TRAFFIC = null, COMBAT = null; const SEEN = new WeakSet(); const RAIN = { v: 0 };
   const alt3 = (o, d) => CHASE && o && o.z3 != null ? o.z3 : d;   // chase view: things fly at their own height (the game's z3)
   if (CHASE) {
     AIR = AIRM.buildAirliner(THREE); UPA = ACM.upgradeAircraft(THREE, AIR, { envIntensity: 1.25 }); PLY = new THREE.Group(); PLY.add(AIR.node); PLY.rotation.order = "YXZ"; PLY.userData = { size: AIR.size, mats: [] };
@@ -290,6 +290,10 @@ async function boot() {
     // GPU particles (engine3d/particles.js, same API as air3d's makeFX) + raycast bullet damage with decals (engine3d/damage.js)
     FXA = PARTM.makeGPUFX(THREE, scene, { max: 4096 }); pDmg = DMGM.makeHitDamage(THREE, { fx: FXA, target: AIR.node, engines: AIR.pts.eng, maxDecals: QUAL.cfg.decals });
     WORLD = WORLDM.makeWorld(THREE, { fx: FXA, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
+    // muzzle flashes + real crashes + jet pilot ejections (engine3d/combat.js); detail follows the quality tier
+    COMBAT = CBM.makeCombat(THREE, { scene, fx: FXA, crowd: () => CROWD, lights: QUAL.tier === "low" ? 0 : QUAL.tier === "med" ? 1 : 2,
+      quality: () => ({ lights: QUAL.tier === "low" ? 0 : 2, shells: QUAL.tier !== "low", debris: QUAL.tier === "low" ? .4 : QUAL.tier === "med" ? .7 : 1 }),
+      debris: (p, n, col, sp) => WORLD.debris(p, n, col, sp), onImpact: (p, k) => { for (const sg of SEGS.values()) if (Math.abs(p.z - sg.group.position.z) < sg.len / 2 + 200 && sg.scatter) sg.scatter(p.x, p.z, 120 + 60 * k); } });
     // engine3d crowd: the Nalu Vida cast as real rigged, animated people (VAT-instanced far, SkinnedMesh near). Loads after the game is up.
     if (renderer.capabilities.isWebGL2) import("../engine3d/crowd.js?v=e1").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
       .then(c => { CROWD = c; STATUS.crowd = "on"; if (TRAFFIC && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => c.setQuality(cfg.crowd)); }).catch(e => { STATUS.crowd = "off: " + (e && e.message || e); console.warn("[melody3d] crowd", e); });
@@ -372,6 +376,11 @@ async function boot() {
     const word = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: lt, transparent: true, depthWrite: false })); word.rotation.x = -Math.PI / 2; word.scale.set(44, 44, 1); word.renderOrder = 111; g.add(word);
     const prop = new THREE.Mesh(rotorGeo, rotorMat); prop.renderOrder = 111; g.add(prop);
     g.userData = { word, prop, env }; g.visible = false; scene.add(g); return g; })();
+  // chase view: the detailed airship (engine3d/blimp.js): fabric gores, fins, gondola, props, a scrolling LED band with
+  // "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" on both sides, MELODY on top, the Nalu Vida logo low on the flanks + belly
+  let BLIMP3 = null;
+  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3b"), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
+    BLIMP3 = BM.buildBlimp(THREE, { top: "MELODY", led: ["ANTIDOTE FOOD REVIEW", "antidotethefoodie.com"], logo: lt }); BLIMP3.node.visible = false; BLIMP3.node.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(BLIMP3.node); }
 
   /* ---------------- ground: lit aerial tiles, landmarks, runway, shadow catcher ---------------- */
   const tileGeo = new THREE.PlaneGeometry(1, 1); tileGeo.rotateX(-Math.PI / 2);
@@ -499,7 +508,7 @@ async function boot() {
     for (let i = 0; i < RG.length; i++) { const p = RG[i], u = p.age / p.life, r = p.s * (1 - Math.pow(1 - u, 2)); if (r < 1) continue;
       if (p.dust) Bn.q(p.x, p.y, 3, r * 2.3, r * 2.3, 0, UV.ring, .61, .58, .54, .45 * (1 - u)); else Ba.q(p.x, p.y, A.air - 10, r * 2.3, r * 2.3, 0, UV.ring, 1, .81, .54, .85 * (1 - u)); }
     // wrecks: the shot-down aircraft spin down to the ground as real models
-    for (let i = 0; i < WR.length; i++) { const p = WR[i], u = Math.min(1, p.t / p.dur), key = p.im === S.cop1 ? "cop1" : p.im === S.cop0 ? "cop0" : p.im === S.jet ? "jet" : "plane";
+    for (let i = 0; i < WR.length && !(CHASE && COMBAT); i++) { const p = WR[i], u = Math.min(1, p.t / p.dur), key = p.im === S.cop1 ? "cop1" : p.im === S.cop0 ? "cop0" : p.im === S.jet ? "jet" : "plane";
       const o = take(key); if (!o) continue; const Y = Math.max(8, (key === "jet" ? A.jet : key === "plane" ? A.kami : A.cop) * (1 - u * .92));
       const base = key === "plane" ? Math.PI : 0;   // 2D draws wrecks at sprite width p.w, shrinking as they fall
       put(o, p.x, p.y, Y, p.w * (1 - .6 * u), false, base - p.rot, Math.sin(p.t / 90) * .9, .5 * u); flash(o, .15, 0xff5a1f); }
@@ -560,17 +569,17 @@ async function boot() {
   function drawEnemies(now, G) {
     const tt = now / 1000;
     for (let e = 0; e < G.ens.length; e++) { const en = G.ens[e]; if (!en) continue; const hit = en.hit > 0 ? Math.min(1, en.hit / 240) : 0;
-      if (en.t === "ufo") { const bob = Math.sin(now / 300 + en.ph) * .06, o = take("ufo"); put(o, en.x, en.y, alt3(en, A.ufo), en.w, false, now / 700 + en.ph, bob, .18); flash(o, hit * .45);
+      if (en.t === "ufo") { const bob = Math.sin(now / 300 + en.ph) * .06, o = take("ufo"); put(o, en.x, en.y, alt3(en, A.ufo), en.w, false, now / 700 + en.ph, bob, .18); flash(o, hit * .45); Object.assign(ext(en), { o, key: "ufo", tint: undefined });
         Ba.q(en.x, en.y + 16, alt3(en, A.ufo) - 30, 120, 120, 0, UV.dot, .49, .97, .78, .35); }
-      else if (en.t === "jet") { const o = take("jet"); put(o, en.x, en.y, alt3(en, A.jet), en.w, false, -(en.ra || 0), 0, -.05); flash(o, hit * .45);
+      else if (en.t === "jet") { const o = take("jet"); put(o, en.x, en.y, alt3(en, A.jet), en.w, false, -(en.ra || 0), 0, -.05); flash(o, hit * .45); Object.assign(ext(en), { o, key: "jet", tint: undefined });
         navPair(now, ext(en).seed, frac(o, .45, 0, .05).clone(), frac(o, -.45, 0, .05), 1.9);
         Ba.q(en.x, en.y - en.w * .55, alt3(en, A.jet) - 4, 10, 26, 0, UV.tongue, 1, .7, .4, .7); }
-      else if (en.t === "kami") { const o = take(CHASE ? "kami3" : "plane"); put(o, en.x, en.y, alt3(en, A.kami), en.w, false, 0, Math.sin(now / 500 + en.x) * .08, CHASE ? 0 : .08); flash(o, hit * .45);
+      else if (en.t === "kami") { const o = take(CHASE ? "kami3" : "plane"); put(o, en.x, en.y, alt3(en, A.kami), en.w, false, 0, Math.sin(now / 500 + en.x) * .08, CHASE ? 0 : .08); flash(o, hit * .45); Object.assign(ext(en), { o, key: CHASE ? "kami3" : "plane", tint: undefined });
         Ba.q(en.x, en.y + 50, alt3(en, A.kami) - 10, 180, 180, 0, UV.dot, 1, .98, .86, .55);
         navPair(now, ext(en).seed, frac(o, -.47, .1, .02).clone(), frac(o, .47, .1, .02), 2.6); }
       else if (en.t === "cop") { const key = en.v ? "cop1" : "cop0", o = take(key); if (!o) continue; const hb = M.copPt(en, "hub");
         const ex = ext(en), lean = Math.max(-.3, Math.min(.3, (en.x - ex.px) * -.25)); ex.px = en.x; ex.lean = (ex.lean || 0) * .85 + lean * .15;
-        put(o, en.x, en.y, alt3(en, A.cop), M.COP_LEN, true, 0, ex.lean, .06); flash(o, hit * .45);
+        put(o, en.x, en.y, alt3(en, A.cop), M.COP_LEN, true, 0, ex.lean, .06); flash(o, hit * .45); Object.assign(ex, { o, key, tint: undefined, hub: hb });
         const top = o.position.y + o.userData.size.y * o.scale.x * .5 + 2; rotor(hb[0], hb[1], top, 70, tt * 2.6 * (en.v ? -1 : 1) * 3.1);
         const on = Math.floor(tt * 7) % 2, bp = M.copPt(en, "bar");
         if (on) Ba.q(bp[0] - 7, bp[1], top - 4, 52, 52, 0, UV.dot, 1, .16, .24, .95); else Ba.q(bp[0] + 7, bp[1], top - 4, 52, 52, 0, UV.dot, .16, .47, 1, .95);
@@ -586,7 +595,7 @@ async function boot() {
         if (en.st === "turn") { const pu = .5 + .5 * Math.sin(now / 90), ly = -h * .18; Ba.q(en.x - ly * sa, en.y + ly * ca, alt3(en, A.sj) + 8, 80, 80, 0, UV.dot, 1, .31, .24, .75 * pu); }
         navPair(now, 7, local(o, o.userData.size.x * .47, 0, 0).clone(), local(o, -o.userData.size.x * .47, 0, 0), 2.6); }
       else if (en.t === "esc") { const o = take("jet", 0x9fb0c8); if (!o) continue; const ex = ext(en), lean = Math.max(-.4, Math.min(.4, (en.x - ex.px) * -.2)); ex.px = en.x; ex.lean = (ex.lean || 0) * .85 + lean * .15;
-        put(o, en.x, en.y, alt3(en, A.esc), en.w, false, 0, ex.lean, -.05); flash(o, hit * .5);
+        put(o, en.x, en.y, alt3(en, A.esc), en.w, false, 0, ex.lean, -.05); flash(o, hit * .5); Object.assign(ex, { o, key: "jet", tint: 0x9fb0c8 });
         navPair(now, ext(en).seed, frac(o, .45, 0, .05).clone(), frac(o, -.45, 0, .05), 1.8); Ba.q(en.x, en.y - en.w * .55, alt3(en, A.esc) - 4, 9, 24, 0, UV.tongue, 1, .7, .4, .7); }
       else if (en.t === "squad") { const o = take("jet", 0xc4b48a); if (!o) continue; put(o, en.x, en.y, alt3(en, A.bigjet), M.BJ_W, false, 0, Math.sin(en.ph || 0) * .1, -.04); flash(o, Math.min(1, (en.hit || 0) / 400) * .5);
         const h = M.BJ_W * (S.jet.naturalHeight || 708) / (S.jet.naturalWidth || 520); [-26, -9, 9, 26].forEach(of => tongueQ(Ba, en.x + of, en.y - h * .47, alt3(en, A.bigjet) - 2, (22 + Math.random() * 10) / 46, 0, UV.tongue, 1, .9, .8, .9));
@@ -633,9 +642,11 @@ async function boot() {
     banner.visible = true; banner.position.set(wx(bx, Y), Y, wz(by + 4, Y)); banner.scale.set(k, 1, k); banner.rotation.set(CHASE ? Math.PI / 2 : 0, -(rot || 0), 0);   // chase view: the towed review banner hangs upright, facing you banner.material.opacity = alpha;
   }
   function drawRescue(now, G) {
-    const R = G.rescue; blimp.visible = false; if (!R || R.st === "wait") return;
+    const R = G.rescue; blimp.visible = false; if (BLIMP3) BLIMP3.node.visible = false; if (!R || R.st === "wait") return;
     const by = R.by + (M.reduce ? 0 : Math.sin(now / 520) * 3), d = R.st === "out" ? R.d : (R.lx >= R.bx ? 1 : -1);
-    if (R.bx > -110 && R.bx < W + 110) { const k = ws(A.blimp); blimp.visible = true; blimp.position.set(wx(R.bx, A.blimp), A.blimp, wz(by, A.blimp)); blimp.scale.setScalar(k); blimp.rotation.set(0, d > 0 ? 0 : Math.PI, Math.sin(now / 900) * .04);
+    if (BLIMP3 && R.bx > -110 && R.bx < W + 110) { const b = BLIMP3.node; b.visible = true; b.position.set(wx(R.bx, A.blimp), A.blimp + Math.sin(now / 1300) * 2.5, wz(by, A.blimp)); b.scale.setScalar(ws(A.blimp) * 1.05);
+      b.rotation.set(Math.sin(now / 1700) * .035, d > 0 ? 0 : Math.PI, Math.sin(now / 900) * .04); BLIMP3.update(now / 1000, FXA); }
+    else if (R.bx > -110 && R.bx < W + 110) { const k = ws(A.blimp); blimp.visible = true; blimp.position.set(wx(R.bx, A.blimp), A.blimp, wz(by, A.blimp)); blimp.scale.setScalar(k); blimp.rotation.set(0, d > 0 ? 0 : Math.PI, Math.sin(now / 900) * .04);
       const u = blimp.userData; u.word.position.set(0, 18, d > 0 ? -5 : 5); u.word.rotation.set(-Math.PI / 2, 0, d > 0 ? 0 : Math.PI); u.prop.position.set(-54, 0, 0); u.prop.scale.setScalar(8); u.prop.rotation.y = now / 30;
       const bl = (now / 380 | 0) % 2, nose = local(blimp, 46, 4, 0); if (bl) navLight(nose.x, nose.y, nose.z, "#ff3b3b", 2.2); }
     const K = R.kit; if (K) { kitAt(K, now, true); if (!M.reduce) { const L = Math.hypot(K.vx, K.vy) * 9, rot = Math.atan2(-K.vx, K.vy); Ba.q(K.x - K.vx * 4.5, K.y - K.vy * 4.5, A.item - 2, 12, L, rot, UV.beam, .31, 1, .59, .55); } }
@@ -805,6 +816,7 @@ async function boot() {
     hideFrom(cards, cardN); poolsEnd(); hideFrom(BIRDS[0], birdN[0]); hideFrom(BIRDS[1], birdN[1]); for (const k in BOSSM) if (!BOSSM[k].userData.used) BOSSM[k].visible = false; BATCHES.forEach(b => b.end());
     if (CHASE) { chaseCam(G, dt); wTex.needsUpdate = true; } else { const sh = M.SHK; cam.position.set(-sh[0], D, -sh[1]); }
     if (PROPT) PROPT.rotation = -now / 1000 * 9.7;
+    if (COMBAT) { gunfire(now, G); COMBAT.update((dt || 16) / 1000, now / 1000, { scroll: (G.gsp || 0) * 60, cullZ: cam.position.z + 220 }); }
     if (TRAFFIC && SKY) TRAFFIC.update(cam, now / 1000, (dt || 16) / 1000, { night: SKY.info.night, rain: WX.v.rain });
     if (CROWD) { cam.updateMatrixWorld(); CROWD.update(cam, now / 1000, (dt || 16) / 1000); }
     if (POST) envFrame(now, dt, G); else renderer.render(scene, cam);
@@ -817,7 +829,7 @@ async function boot() {
   }
   // sky + weather + clouds + post for this frame (chase view)
   const ENV = { wind: new THREE.Vector3(), puffs: [], moon: new THREE.Color(.5, .58, .85), ambT: new THREE.Color(), ambB: new THREE.Color(), mist: new THREE.Color(), white: new THREE.Color(1, 1, 1) };
-  function envFrame(now, dt, G) { const t = now / 1000, s = Math.min(.05, (dt || 16) / 1000); STATUS.mist = +CLOUDS.mist.toFixed(2); STATUS.hours = +todH.toFixed(2); STATUS.weather = WX.state;
+  function envFrame(now, dt, G) { const t = now / 1000, s = Math.min(.05, (dt || 16) / 1000); STATUS.mist = +CLOUDS.mist.toFixed(2); if (COMBAT) STATUS.combat = COMBAT.stats(); STATUS.hours = +todH.toFixed(2); STATUS.weather = WX.state;
     if (SKYPREF() === "live") todH = (todH + s / 80) % 24;
     SKY.setTime(todH); WX.update(s, t, cam); const w = WX.v; SKY.update(s, w, t); const I = SKY.info, fl = WX.flash;
     scene.fog.color.copy(I.horizon); const vis = w.vis; scene.fog.near = POST.on ? 900 + 900 * vis : 250 + 650 * vis; scene.fog.far = POST.on ? 4000 + 3000 * vis : 900 + 2300 * vis;
@@ -842,6 +854,19 @@ async function boot() {
   wrap.style.isolation = "isolate";
   wrap.insertBefore(gl, cv);
   // explosions (the game's boom()): people on the ground nearby scatter, the bigger the blast the wider (visual only)
+  // a kill: the 2D game already scored it; here the aircraft burns, falls, crashes (and a jet pilot ejects)
+  M.onKill = (en) => { if (!CHASE || !COMBAT) return; const ex = EXT.get(en); if (!ex || !ex.o || !MODELS[ex.key]) return;
+    const kind = en.t === "cop" ? "heli" : en.t === "ufo" ? "ufo" : en.t === "kami" ? "airliner" : "jet";
+    const o = cloneModel(ex.key, ex.tint); o.position.copy(ex.o.position); o.quaternion.copy(ex.o.quaternion); o.scale.copy(ex.o.scale); o.visible = true;
+    let rotor = null; if (kind === "heli") { rotor = new THREE.Mesh(rotorGeo, rotorMat); const sz = o.userData.size; rotor.position.set(0, sz.y * .5 + 1, 0); rotor.scale.setScalar(70 / o.scale.x); o.add(rotor); }
+    const span = new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3()).length();
+    COMBAT.crash({ obj: o, kind, k: Math.max(.6, span / 90), rotor, eject: kind === "jet", ground: 0 }); };
+  const SHOTV = new THREE.Vector3(), SHOTD = new THREE.Vector3();
+  function gunfire(now, G) { if (!COMBAT) return; let n = 0;
+    for (const sh of G.shots) { if (SEEN.has(sh)) continue; SEEN.add(sh); if (n++ > 3 || !PLY.visible) continue; const c = rgb(M.WPN[G.wpn].c);
+      PLY.updateMatrixWorld(true); const mz = AIR.pts.muzzle[(sh.x < G.x ? 1 : 0) % AIR.pts.muzzle.length]; AIR.node.localToWorld(SHOTV.copy(mz)); COMBAT.muzzle(SHOTV, SHOTD.set(0, 0, -1), c, 1.1); }
+    for (const es of G.eshots) { if (SEEN.has(es)) continue; SEEN.add(es); if (es.bomb || n++ > 6) continue; const Y = alt3(es, A.eshot); SHOTV.set(es.x - W / 2, Y, far(es.y) - H / 2);
+      SHOTD.set(es.vx || 0, 0, es.vy || 1).normalize(); SHOTV.addScaledVector(SHOTD, -6); COMBAT.muzzle(SHOTV, SHOTD, es.missile ? [1, .7, .4] : [1, .85, .5], es.big ? 1.3 : .9); } }
   const HITS = []; M.onHurt = (x, y, es) => { if (CHASE && HITS.length < 6) HITS.push({ x, y, es }); };
   M.onBoom = (x, y, n) => { if (!CHASE || !WORLD) return; const X = x - W / 2, Z = far(y) - H / 2, r = 60 + n * 3; for (const sg of SEGS.values()) if (Math.abs(Z - sg.group.position.z) < sg.len / 2 + r && sg.scatter) sg.scatter(X, Z, r); };
   if (CHASE) { M.wcx = wcx; M.proj = proj; M.chase = 1; chaseCam(M.G(), 0); cam.updateMatrixWorld(); }

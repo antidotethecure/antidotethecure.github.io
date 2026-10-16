@@ -65,7 +65,7 @@ export function makeGPUFX(THREE, scene, O = {}) {
     A.aP.array.set([p.x, p.y, p.z, T], i * 4); A.aV.array.set([v.x, v.y, v.z, life], i * 4); A.aS.array.set([s0, s1, drag || 0, rise || 0], i * 4);
     A.aC0.array.set([c0[0], c0[1], c0[2], a], i * 4); A.aC1.array.set([c1[0], c1[1], c1[2], 0], i * 4); A.aSlot.array[i] = slot || 0; }
   function flush(B) { if (B.d0 < 0) return; const A = B.A;
-    for (const k in A) { const a = A[k], n = a.itemSize; a.clearUpdateRanges && a.clearUpdateRanges();
+    for (const k in A) { const a = A[k], n = a.itemSize;
       if (B.d1 >= B.d0) a.addUpdateRange(B.d0 * n, (B.d1 - B.d0 + 1) * n); else { a.addUpdateRange(B.d0 * n, (MAX - B.d0) * n); a.addUpdateRange(0, (B.d1 + 1) * n); } a.needsUpdate = true; }
     B.d0 = B.d1 = -1; }
   // one-frame sprites (lights, strobes, hole embers) — CPU batch, a few hundred at most

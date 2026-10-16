@@ -17,7 +17,7 @@ export async function makePost(THREE, O) {
     constructor() { super(); this.fsq = new FullScreenQuad(new THREE.ShaderMaterial(clouds.compositeShader)); this.needsSwap = true; this.P = {}; this.t = 0; this.dt = 0; }
     render(r, write) { // the scene itself, into our own HDR target with a depth texture, then the cloud composite into the chain
       if (!sceneRT || sceneRT.width !== W * PR || sceneRT.height !== H * PR) { if (sceneRT) sceneRT.dispose(); sceneRT = mkRT(); }
-      r.setRenderTarget(sceneRT); r.clear(); r.render(scene, camera);
+      const ca = r.getClearAlpha(); r.getClearColor(CC); r.setClearColor(0x000000, 0); r.setRenderTarget(sceneRT); r.clear(); r.render(scene, camera); r.setClearColor(CC, ca);   // alpha 0 where nothing was drawn, so particles over the sky survive the composite
       const depth = sceneRT.depthTexture; clouds.render(camera, depth, this.t, this.dt, this.P);
       const u = this.fsq.material.uniforms; u.tDiffuse.value = sceneRT.texture; u.tDepth.value = depth; u.tFull.value = clouds.full; u.tFront.value = clouds.front; u.uMist.value = Math.min(.86, clouds.mist * (this.P.mistK != null ? this.P.mistK : 1));
       if (this.P.mistCol) u.uMistCol.value.copy(this.P.mistCol); u.uWet.value = this.P.wet || 0; if (this.P.skyRef) u.uSkyRef.value.copy(this.P.skyRef); u.uSunVis.value = this.P.sunVis != null ? this.P.sunVis : 1; if (this.P.fogStart != null) u.uFogStart.value = this.P.fogStart; u.uKeepBg.value = this.P.keepBg ? 1 : 0; u.uShadowK.value = this.P.shadowK || 1; if (this.P.shadow != null) u.uShadow.value = this.P.shadow; if (this.P.fogDen != null) u.uFogDen.value = this.P.fogDen;
@@ -33,13 +33,13 @@ export async function makePost(THREE, O) {
         vec2 d = vUv - .5; x *= 1.0 - uVig * dot(d, d) * 1.6;
         float n = fract(sin(dot(vUv * 1000.0 + uT, vec2(12.9898, 78.233))) * 43758.5453) - .5; x += n * uGrain;
         gl_FragColor = vec4(clamp(x, 0.0, 1.0), c.a); }` };
-  let composer = null, passes = {}, sceneRT = null;
+  let composer = null, passes = {}, sceneRT = null; const CC = new THREE.Color();
   function build() {
     if (composer) { composer.renderTarget1.dispose(); composer.renderTarget2.dispose(); composer = null; }
     if (!Q.on) return;
     composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(W * PR, H * PR, { type: THREE.HalfFloatType, depthBuffer: false })); composer.setPixelRatio(1); composer.setSize(W * PR, H * PR);
     passes.clouds = new CloudPass(); composer.addPass(passes.clouds);
-    if (Q.ssao && GTAOPass) { passes.ao = new GTAOPass(scene, camera, W * PR, H * PR); passes.ao.output = GTAOPass.OUTPUT.Default; passes.ao.blendIntensity = .9; try { passes.ao.updateGtaoMaterial({ radius: 6, distanceExponent: 1.4, thickness: 4, scale: 1.1 }); } catch (e) {} composer.addPass(passes.ao); } else passes.ao = null;
+    if (Q.ssao && GTAOPass) { passes.ao = new GTAOPass(scene, camera, W * PR, H * PR); passes.ao.output = GTAOPass.OUTPUT.Default; passes.ao.blendIntensity = .65; try { passes.ao.updateGtaoMaterial({ radius: 2.5, distanceExponent: 1, thickness: 1, scale: 1, distanceFallOff: 1 }); } catch (e) {} composer.addPass(passes.ao); } else passes.ao = null;
     if (Q.bloom) { passes.bloom = new UnrealBloomPass(new THREE.Vector2(W * PR / 2, H * PR / 2), .5, .45, .82); composer.addPass(passes.bloom); } else passes.bloom = null;
     composer.addPass(new OutputPass());
     if (Q.grade) { passes.grade = new ShaderPass(GRADE); composer.addPass(passes.grade); } else passes.grade = null;

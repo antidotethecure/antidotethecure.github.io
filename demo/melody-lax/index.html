@@ -1536,6 +1536,7 @@ function dmgEn(en,d,x,y){ if(en.boss){ if(en.dead) return; d*=en.armor==null?1:e
   if(en.t==="bird"){ birdKilled(en,true); return; }
   var base=en.t==="ufo"?150:en.t==="jet"?200:en.t==="esc"?250:en.t==="cop"?500:300, pts=Math.round(base*(1+.25*(Math.min(G.lvl,12)-1))/10)*10; G.score+=pts*G.mult;
   pop(en.x,en.y,"+"+pts*G.mult+(en.t==="ufo"?" UFO down":en.t==="jet"?" Jet down":en.t==="esc"?" Escort down":en.t==="cop"?" Chopper down":" Plane turned away"),"#7ef7c8"); boom(en.x,en.y,22);
+  if(window.__M3&&__M3.onKill) try{ __M3.onKill(en); }catch(e){}   // 3D layer: the real crash (visual only; the kill and score are already counted)
   if(en.t==="esc") FX.wreck(S.jet,en.x,en.y,en.w*.9,0); else if(en.t==="cop") FX.wreck(en.v?S.cop1:S.cop0,en.x,en.y,copPt(en,"hub")[2]*.9,0); else if(en.t==="kami") FX.wreck(S.kami,en.x,en.y,en.w*.9,Math.PI); else if(en.t==="jet") FX.wreck(S.jet,en.x,en.y,en.w*.9,0);   // spins down, small fire where it lands
   G.ens.splice(i,1); }
 

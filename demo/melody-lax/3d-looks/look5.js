@@ -90,6 +90,7 @@ function step(t, dt) {
       fx.emit(p, new THREE.Vector3(0, 0, -900), .5, 3, 3, [1, .9, .5], [1, .6, .2], 1, true, 2, 0, 0); }); }
   if (BL) { BL.node.position.set(X + 40, Y + 60 + Math.sin(t) * 2, Z - 230); BL.node.rotation.set(Math.sin(t * .6) * .03, Math.PI * .85, Math.sin(t * .9) * .04); BL.node.scale.setScalar(1.2); BL.update(t, fx); }
   COMBAT.update(dt, t, { scroll: 0 });
+  if (SHAKE > 0) { SHAKE = Math.max(0, SHAKE - dt * 1.8); cam.position.x += (Math.random() - .5) * 8 * SHAKE; cam.position.y += (Math.random() - .5) * 6 * SHAKE; }
   sun.position.set(X - 260, 420, Z + 360); sun.target.position.set(X, 0, Z - 200);
   cam.updateMatrixWorld(); TRAFFIC.update(cam, t, dt, { night: SKY.info.night, rain: WX.v.rain }); fx.update(dt); CROWD.update(cam, t, dt);
   WX.update(dt, t, cam); SKY.setTime(TODQ + (Qs.get("live") ? t / 6 : 0)); SKY.update(dt, WX.v, t); world.setDaylight(SKY.info.night, WX.v); world.setSkyLight(SKY.info, WX.v); RAIN.v = WX.v.rain;
@@ -98,7 +99,10 @@ const ENVW = new THREE.Vector3(), ENVA = new THREE.Color(), ENVB = new THREE.Col
 const PUFFS = (Qs.get("puffs") || "").split(";").filter(Boolean).map(s => s.split(",").map(Number));
 const MIRROR = makeMirror(THREE, renderer, { y: 0, scale: .5 });
 // combat + blimp showcase: ?fx=crash (a jet and a helicopter shot down ahead: fall, crash, ejection) · ?fx=guns (muzzle flashes) · ?blimp=1
-const COMBAT = makeCombat(THREE, { scene, fx, crowd: () => CROWD, lights: 2, quality: () => ({ lights: 2, shells: true, debris: 1 }), debris: (p, n, c, sp) => world.debris(p, n, c, sp) });
+const COMBAT = makeCombat(THREE, { scene, fx, crowd: () => CROWD, lights: 2, quality: () => ({ lights: 2, shells: true, debris: 1 }), debris: (p, n, c, sp) => world.debris(p, n, c, sp),
+  aim: (p) => { if (!Qs.get("bld")) return null; let best = null; for (const sg of segs) for (const B of sg.blds || []) { const n = B.nearest(p.x, p.z - 60, 300); if (n && (!best || Math.hypot(n.x - p.x, n.z - p.z) < Math.hypot(best.x - p.x, best.z - p.z))) best = n; } return best && { x: best.x, y: best.y, z: best.z }; },
+  hitTest: (p, k) => { for (const sg of segs) { const h = sg.collide(p.x, p.y, p.z, 5 * k, 5 * k); if (h) return sg.smash(h, p.x, p.y, p.z, "wreck"); } return null; }, shake: () => { SHAKE = 1; } });
+let SHAKE = 0;
 const FXQ = Qs.get("fx"), ENM = [];
 if (FXQ === "crash") { const [gj, gh] = await Promise.all(["../3d/jet.glb", "../3d/heli_blue.glb"].map(f => loader.loadAsync(f)));
   const norm = (g, w) => { const o = g.scene; o.traverse(n => { if (n.isMesh) { n.material.metalness = 0; n.material.roughness = .55; n.castShadow = true; } }); const b = new THREE.Box3().setFromObject(o), sz = b.getSize(new THREE.Vector3()); o.position.sub(b.getCenter(new THREE.Vector3())); const h = new THREE.Group(); h.add(o); h.scale.setScalar(w / Math.max(sz.x, sz.z)); scene.add(h); return h; };

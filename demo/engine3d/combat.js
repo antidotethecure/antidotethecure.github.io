@@ -37,6 +37,8 @@ export function makeCombat(THREE, O) {
     else if (c.kind === "ufo") { c.spin.set(0, 4 * r, 0); c.vel.x = 50 * r; c.vel.y = 30; c.wob = 0; }
     else if (c.kind === "apex") { c.spin.set(.5, 2.6 * r, 1.2 * r); c.vel.y = 20; c.vel.x = 40 * r; }
     else { c.spin.set(-.35, .1 * r, .7 * r); c.vel.y = 0; c.vel.z = 40; }
+    // steer toward a nearby building (O.aim) so wrecks hit buildings often; O.hitTest smashes one on contact
+    if (O.aim && !c.noAim) { const T = O.aim(c.obj.position, c.kind); if (T) { c.tgt = T; } }
     c.r0 = c.obj.rotation.clone(); crashes.push(c); return c; }
   function burnTrail(c, s) { const p = c.obj.position, k = c.k, n = Math.max(1, Math.round(s * 70)), hot = Math.min(1, c.t * 3);
     for (let i = 0; i < n; i++) { fx.emit(V.copy(p).add(V2.set((Math.random() - .5) * 10 * k, (Math.random() - .5) * 6 * k, (Math.random() - .5) * 10 * k)), V2.set((Math.random() - .5) * 14, 16, 26), .45, 16 * k * hot, 5 * k, [1, .85, .42], [1, .3, .06], 1, true, 0, .6, 12);
@@ -47,7 +49,7 @@ export function makeCombat(THREE, O) {
     if (O.debris) O.debris(p.clone(), Math.round(14 * (q.debris || 1)), c.kind === "ufo" ? "#9aa0a8" : null, 110);
     p.y = c.ground + (c.kind === "ufo" ? 2 : 3); c.obj.rotation.set(c.kind === "heli" ? .5 : .15, c.obj.rotation.y, (Math.random() - .5) * .8);
     c.obj.traverse(n => { if (n.isMesh && n.material) [].concat(n.material).forEach(m => { if (m.color) m.color.multiplyScalar(.28); if (m.emissive) { m.emissive.setRGB(.5, .12, .02); m.emissiveIntensity = .6; } }); });
-    const sc = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), scorchM); sc.position.set(p.x, c.ground + .4, p.z); sc.scale.setScalar(60 * k); sc.rotation.y = Math.random() * 6; scene.add(sc); scorches.push({ m: sc, t: 0 });
+    const sc = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), scorchM); sc.position.set(p.x, c.ground + .4, p.z); sc.scale.setScalar(c.building ? 30 * k : 60 * k); sc.rotation.y = Math.random() * 6; scene.add(sc); scorches.push({ m: sc, t: 0 });
     if (O.onImpact) O.onImpact(p.clone(), k); }
   /* ---- the ejection ---- */
   function eject(c) { const P0 = {}; const p = c.obj.position.clone(), k = c.k, up = new THREE.Vector3(0, 1, 0).applyQuaternion(c.obj.quaternion);
@@ -84,11 +86,15 @@ export function makeCombat(THREE, O) {
         else if (c.kind === "ufo") { c.vel.y = Math.max(-220, c.vel.y - 140 * s); c.wob += s; o.rotation.x = Math.sin(c.wob * 9) * (.15 + c.wob * .25); o.rotation.z = Math.cos(c.wob * 7) * (.15 + c.wob * .25); if (fx.sparks && Math.random() < s * 14) fx.sparks(p, V2.set(0, 1, 0), null, c.k, 6); }
         else c.vel.y = Math.max(c.kind === "jet" ? -280 : -170, c.vel.y - (c.kind === "jet" ? 170 : 90) * s);
         if (c.kind === "apex" && Math.random() < s * 10) { fx.glow(p, 40 * c.k, [1, .7, .3], 1); if (fx.sparks) fx.sparks(p, V2.set(0, -1, 0), null, c.k, 10); }   // thrusters sputter
-        c.vel.z += (scroll - c.vel.z) * s * .5; p.addScaledVector(c.vel, s);
+        if (c.tgt) { const dx = c.tgt.x - p.x, dz = c.tgt.z + (c.tgt.vz || 0) - p.z, dy = Math.max(20, p.y - c.tgt.y), tl = Math.max(.35, dy / Math.max(40, -c.vel.y + 40));
+          c.vel.x += (dx / tl - c.vel.x) * Math.min(1, s * 3); c.vel.z += (dz / tl + scroll * .3 - c.vel.z) * Math.min(1, s * 3); c.tgt.z += scroll * s; }
+        else c.vel.z += (scroll - c.vel.z) * s * .5;
+        p.addScaledVector(c.vel, s);
+        if (O.hitTest) { const h = O.hitTest(p, c.k); if (h) { p.set(h.x, h.y, h.z); c.ground = h.y; c.building = 1; if (O.shake) O.shake(1); impact(c); continue; } }
         if (c.kind !== "ufo") { o.rotation.x += c.spin.x * s; o.rotation.y += c.spin.y * s; o.rotation.z += c.spin.z * s; } else o.rotation.y += c.spin.y * s;
         burnTrail(c, s);
         if (c.eject && !c.ejected && c.t > .3) { c.ejected = true; eject(c); }
-        if (p.y <= c.ground + 4 * c.k) { impact(c); if (c.kind === "apex") { fx.boom(p, c.k * 2.4); fx.boom(V.copy(p).add(V2.set(30, 5, -20)), c.k * 1.6); } } }
+        if (p.y <= c.ground + 4 * c.k) { if (O.shake) O.shake(.5); impact(c); if (c.kind === "apex") { fx.boom(p, c.k * 2.4); fx.boom(V.copy(p).add(V2.set(30, 5, -20)), c.k * 1.6); } } }
       else { o.position.z += scroll * s; c.t += 0;
         const life = q.debris >= 1 ? 7 : 4; if (Math.random() < s * 18 * Math.max(0, 1 - c.t / life)) fx.emit(V.copy(o.position).add(V2.set((Math.random() - .5) * 10 * c.k, 2, (Math.random() - .5) * 10 * c.k)), V2.set((Math.random() - .5) * 6, 18, scroll), 3, 6 * c.k, 26 * c.k, [.2, .19, .18], [.08, .08, .08], .7, false, 0, .3, 6);
         if (c.t < life * .5 && Math.random() < s * 30) fx.emit(V.copy(o.position).add(V2.set((Math.random() - .5) * 8 * c.k, 1, (Math.random() - .5) * 8 * c.k)), V2.set(0, 14, scroll), .5, 6 * c.k, 2 * c.k, [1, .8, .35], [1, .3, .05], 1, true, 0, 0, 12);

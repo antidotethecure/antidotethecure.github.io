@@ -42,7 +42,7 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=e3b") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3b") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=e3b") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3d") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
   const QM = await import("../engine3d/quality.js?v=e1");
@@ -289,11 +289,16 @@ async function boot() {
     scene.add(PLY); PLY.visible = false;
     // GPU particles (engine3d/particles.js, same API as air3d's makeFX) + raycast bullet damage with decals (engine3d/damage.js)
     FXA = PARTM.makeGPUFX(THREE, scene, { max: 4096 }); pDmg = DMGM.makeHitDamage(THREE, { fx: FXA, target: AIR.node, engines: AIR.pts.eng, maxDecals: QUAL.cfg.decals });
-    WORLD = WORLDM.makeWorld(THREE, { fx: FXA, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
+    WORLD = WORLDM.makeWorld(THREE, { fx: FXA, fxScale: () => ({ low: .3, med: .6, high: .85, ultra: 1 })[QUAL.tier] || 1, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
     // muzzle flashes + real crashes + jet pilot ejections (engine3d/combat.js); detail follows the quality tier
     COMBAT = CBM.makeCombat(THREE, { scene, fx: FXA, crowd: () => CROWD, lights: QUAL.tier === "low" ? 0 : QUAL.tier === "med" ? 1 : 2,
       quality: () => ({ lights: QUAL.tier === "low" ? 0 : 2, shells: QUAL.tier !== "low", debris: QUAL.tier === "low" ? .4 : QUAL.tier === "med" ? .7 : 1 }),
-      debris: (p, n, col, sp) => WORLD.debris(p, n, col, sp), onImpact: (p, k) => { for (const sg of SEGS.values()) if (Math.abs(p.z - sg.group.position.z) < sg.len / 2 + 200 && sg.scatter) sg.scatter(p.x, p.z, 120 + 60 * k); } });
+      debris: (p, n, col, sp) => WORLD.debris(p, n, col, sp),
+      // wrecks steer into a nearby building most of the time and smash it (world3d wreck smash); Melody / Nalu Vida / billboards aren't buildings here, so they're never hit
+      aim: (p, kind) => { if (Math.random() > .75) return null; let best = null; for (const sg of SEGS.values()) { if (Math.abs(p.z - sg.group.position.z) > sg.len / 2 + 300) continue; for (const B of sg.blds || []) { const n = B.nearest(p.x, p.z - 120, 260); if (n && (!best || Math.hypot(n.x - p.x, n.z - p.z) < Math.hypot(best.x - p.x, best.z - p.z))) best = n; } } return best ? { x: best.x, y: best.y, z: best.z } : null; },
+      hitTest: (p, k) => { for (const sg of SEGS.values()) { if (Math.abs(p.z - sg.group.position.z) > sg.len / 2 + 40) continue; const h = sg.collide(p.x, p.y, p.z, 5 * k, 5 * k); if (h) { const r = sg.smash(h, p.x, p.y, p.z, "wreck"); if (sg.scatter) sg.scatter(p.x, p.z, 200); return r; } } return null; },
+      shake: (k) => { const G = M.G(); G.shake = Math.max(G.shake || 0, 14 + 14 * k); },
+      onImpact: (p, k) => { for (const sg of SEGS.values()) if (Math.abs(p.z - sg.group.position.z) < sg.len / 2 + 200 && sg.scatter) sg.scatter(p.x, p.z, 120 + 60 * k); } });
     // engine3d crowd: the Nalu Vida cast as real rigged, animated people (VAT-instanced far, SkinnedMesh near). Loads after the game is up.
     if (renderer.capabilities.isWebGL2) import("../engine3d/crowd.js?v=e1").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
       .then(c => { CROWD = c; STATUS.crowd = "on"; if (TRAFFIC && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => c.setQuality(cfg.crowd)); }).catch(e => { STATUS.crowd = "off: " + (e && e.message || e); console.warn("[melody3d] crowd", e); });

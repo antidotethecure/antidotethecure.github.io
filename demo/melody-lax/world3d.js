@@ -134,21 +134,22 @@ export function makeWorld(THREE, O = {}) {
 
   /* ---------- world-level: wind (the air moves past you), debris chunks, the clock ---------- */
   const FX = O.fx || null, root = new THREE.Group(), wind = new THREE.Vector3();
-  const DN = 90, debrisM = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial(), DN); debrisM.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(DN * 3), 3); debrisM.frustumCulled = false; debrisM.count = DN; root.add(debrisM);
+  const DN = 160, debrisM = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial(), DN); debrisM.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(DN * 3), 3); debrisM.frustumCulled = false; debrisM.count = DN; root.add(debrisM);
   const DB = Array.from({ length: DN }, () => ({ p: new THREE.Vector3(), v: new THREE.Vector3(), r: new THREE.Euler(), vr: new THREE.Vector3(), s: 0, life: 0 })); let dbi = 0;
   const DQ = new THREE.Quaternion(), DS = new THREE.Vector3(), DM = new THREE.Matrix4(), ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
   for (let i = 0; i < DN; i++) debrisM.setMatrixAt(i, ZERO);
-  function debris(p, n, col, sp) { for (let i = 0; i < n; i++) { const d = DB[dbi = (dbi + 1) % DN]; d.p.copy(p); d.v.set((Math.random() - .5) * sp, Math.random() * sp * .6, (Math.random() - .5) * sp).add(wind); d.r.set(Math.random() * 6, Math.random() * 6, 0); d.vr.set(Math.random() * 8, Math.random() * 8, Math.random() * 8); d.s = 2 + Math.random() * 4.5; d.life = 2.6;
+  function debris(p, n, col, sp, sz) { for (let i = 0; i < n; i++) { const d = DB[dbi = (dbi + 1) % DN]; d.p.copy(p); d.v.set((Math.random() - .5) * sp, Math.random() * sp * .6, (Math.random() - .5) * sp).add(wind); d.r.set(Math.random() * 6, Math.random() * 6, 0); d.vr.set(Math.random() * 8, Math.random() * 8, Math.random() * 8); d.s = (2 + Math.random() * 4.5) * (sz || 1); d.life = sz ? 3.6 : 2.6;
     debrisM.setColorAt(dbi, QC.set(col || (Math.random() < .5 ? "#8b8680" : "#5d5a56"))); } debrisM.instanceColor.needsUpdate = true; }
   // the digital billboards playing Antidote's Melody review (one shared muted, inline, looping video; poster if autoplay is blocked)
   let VB = null; const vboards = () => VB || (VB = makeVideoBoards(THREE, { src: BASE + "img/review/billboard.mp4", poster: BASE + "img/review/billboard.jpg" }));
   function billboard(group, x, z, ry, sc) { const b = vboards().create({ w: 64 * (sc || 1), pole: 44, caption: "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" }); b.position.set(x, 0, z); b.rotation.y = ry || 0; group.add(b); return b; }
-  function tick(dt, t) { UT.value = t; if (VB) VB.update(t); for (let i = 0; i < DN; i++) { const d = DB[i]; if (d.life <= 0) continue; d.life -= dt; d.v.y -= 160 * dt; d.p.addScaledVector(d.v, dt); if (d.p.y < .8) { d.p.y = .8; d.v.set(wind.x, 0, wind.z); d.vr.set(0, 0, 0); }
+  function tick(dt, t) { UT.value = t; if (VB) VB.update(t); toppleTick(dt); for (let i = 0; i < DN; i++) { const d = DB[i]; if (d.life <= 0) continue; d.life -= dt; d.v.y -= 160 * dt; d.p.addScaledVector(d.v, dt); if (d.p.y < .8) { d.p.y = .8; if (Math.abs(d.v.y) > 25) { d.v.y = -d.v.y * .35; d.v.x *= .5; d.v.z *= .5; d.vr.multiplyScalar(.5); } else { d.v.set(wind.x, 0, wind.z); d.vr.set(0, 0, 0); } }   // chunks bounce once or twice, then rest
       d.r.x += d.vr.x * dt; d.r.y += d.vr.y * dt; d.r.z += d.vr.z * dt; DQ.setFromEuler(d.r); const s = d.life > 0 ? d.s : 0; debrisM.setMatrixAt(i, DM.compose(d.p, DQ, DS.set(s, s * .6, s * .8))); if (d.life <= 0) debrisM.setMatrixAt(i, ZERO); }
     debrisM.instanceMatrix.needsUpdate = true; }
   const SMV = new THREE.Vector3(), SMP = new THREE.Vector3(), GPV = new THREE.Vector3();
   function puff(p, kind, k) { if (!FX) return; k = k || 1;   // kind: "steam" (kitchen), "smoke" (fire), "fire"
     if (kind === "fire") FX.emit(p, SMV.set(wind.x * .9 + (Math.random() - .5) * 6, 10 + Math.random() * 8, wind.z * .9 + (Math.random() - .5) * 6), .45, 6 * k, 2 * k, [1, .82, .35], [1, .25, .05], 1, true, 0, 0, 20);
+    else if (kind === "dust") FX.emit(p, SMV.set(wind.x + (Math.random() - .5) * 40, 6 + Math.random() * 10, wind.z + (Math.random() - .5) * 40), 3.4, 10 * k, 48 * k, [.62, .58, .52], [.5, .48, .45], .55, false, 0, .9, 2);
     else if (kind === "smoke") FX.emit(p, SMV.set(wind.x + (Math.random() - .5) * 6, 14 + Math.random() * 6, wind.z + (Math.random() - .5) * 6), 3.2, 6 * k, 30 * k, [.22, .2, .19], [.1, .1, .1], .7, false, 0, .3, 4);
     else FX.emit(p, SMV.set(wind.x + (Math.random() - .5) * 4, 12 + Math.random() * 5, wind.z + (Math.random() - .5) * 4), 2.6, 3 * k, 16 * k, [.86, .85, .84], [.6, .6, .62], .45, false, 0, .4, 3); }
 
@@ -166,6 +167,15 @@ export function makeWorld(THREE, O = {}) {
   }
   function palms(seg, R, spots) { const tr = inst(trunkG, M.trunk, spots.length), cr = inst(crownG, M.leaf, spots.length);
     spots.forEach((p, i) => { const s = .8 + R() * .5, ry = R() * TAU; set(tr, i, p[0], 0, p[1], ry, s, s, s); set(cr, i, p[0], 0, p[1], ry, s, s, s); }); seg.group.add(tr, cr); }
+  // a building's top section toppling off after a wreck hits it (pooled; one box with the facade texture, pivoting on a roof edge)
+  const TOP = [], topM = new THREE.MeshLambertMaterial({ map: winTex[0], color: 0x9a948c });
+  for (let i = 0; i < 4; i++) { const pv = new THREE.Group(), b = new THREE.Mesh(box, topM); b.castShadow = true; pv.add(b); pv.visible = false; root.add(pv); TOP.push({ pv, b, t: -1 }); }
+  function topple(x, y, z, w, h, d, side) { const T = TOP.find(q => q.t < 0) || TOP[0]; T.t = 0; T.side = side; T.h = h; T.y0 = y; T.pv.visible = true; T.pv.position.set(x + side * w / 2, y, z); T.pv.rotation.set(0, 0, 0); T.b.scale.set(w, h, d); T.b.position.set(-side * w / 2, 0, 0); T.w = w; T.d = d; }
+  function toppleTick(dt) { for (const T of TOP) { if (T.t < 0) continue; T.t += dt; const u = T.t;
+      T.pv.rotation.z = -T.side * Math.min(1.45, u * u * 1.1); if (u > 1.1) T.pv.position.y = Math.max(-T.h, T.y0 - (u - 1.1) * (u - 1.1) * 260);
+      if (FX && u > .3 && Math.random() < dt * 30) puff(SMP.set(T.pv.position.x, T.pv.position.y + 4, T.pv.position.z), "dust", 2);
+      if (u > 1.1 && !T.landed && T.pv.position.y < T.y0 * .5) { T.landed = 1; debris(T.pv.position.clone(), 18, null, 140, 1.6); for (let i = 0; i < 10; i++) puff(SMP.set(T.pv.position.x + (Math.random() - .5) * T.w, 3, T.pv.position.z + (Math.random() - .5) * T.d), "dust", 3); }
+      if (u > 3.2) { T.t = -1; T.landed = 0; T.pv.visible = false; } } }
   function buildings(seg, R, lots, opt) {   // lots: [x, z, w, d, h]
     opt = opt || {}; const n = lots.length, geo = box.clone(), dmg = new THREE.InstancedBufferAttribute(new Float32Array(Math.max(1, n)), 1); geo.setAttribute("aDmg", dmg);
     const im = new THREE.InstancedMesh(geo, [M.facade, M.facade, M.roof, M.roof, M.facade, M.facade], Math.max(1, n)); im.count = n; im.frustumCulled = false;
@@ -197,17 +207,33 @@ export function makeWorld(THREE, O = {}) {
       stk.forEach(a => { if (a[0].h < a[0].h0 - 1) return; if (Math.random() < dt * 3) puff(SMP.set(gp.x + a[0].x + a[1], a[0].h + 11, gp.z + a[0].z + a[2]), "steam", 1); });
       L.forEach(o => o.fires.forEach(f => { const P = SMP.set(gp.x + f[0], f[1], gp.z + f[2]); if (Math.random() < dt * 9 * f[3]) puff(P, "smoke", f[3]); if (Math.random() < dt * 22 * f[3]) puff(P, "fire", f[3]); })); });
     const B = { L, im, dmg,
+      // the closest standing building to a world point (for falling wrecks that steer into one), or null
+      nearest(wx, wz, maxD) { const gp = seg.group.getWorldPosition(GPV); let best = null, bd = maxD * maxD;
+        for (const o of L) { if (o.h < 16) continue; const dx = gp.x + o.x - wx, dz = gp.z + o.z - wz, dd = dx * dx + dz * dz; if (dd < bd) { bd = dd; best = { x: gp.x + o.x, y: o.h, z: gp.z + o.z, o, B }; } } return best; },
       // the building under/at a world point (plane or shot), or null
       hit(wx, wy, wz, rx, rz) { const gp = seg.group.getWorldPosition(GPV), lx = wx - gp.x, lz = wz - gp.z;
         for (const o of L) if (Math.abs(lx - o.x) < o.w / 2 + rx && Math.abs(lz - o.z) < o.d / 2 + rz && wy < o.h + 2) return o; return null; },
       // knock the top off down to `to` (world y) where it was hit: debris falls, windows there go dark, the hole burns
-      smash(o, wx, wy, wz, how) { const gp = seg.group.getWorldPosition(GPV), plane = how === "plane", to = plane ? Math.max(6, wy - 18) : Math.max(6, o.h - 4);
+      smash(o, wx, wy, wz, how) { if (how === "wreck") return B.wreck(o, wx, wy, wz);
+        const gp = seg.group.getWorldPosition(GPV), plane = how === "plane", to = plane ? Math.max(6, wy - 18) : Math.max(6, o.h - 4);
         const P = SMP.set(Math.max(o.x - o.w / 2, Math.min(o.x + o.w / 2, wx - gp.x)), Math.min(o.h, wy), Math.max(o.z - o.d / 2, Math.min(o.z + o.d / 2, wz - gp.z)));
         debris(new THREE.Vector3(gp.x + P.x, P.y, gp.z + P.z), plane ? 22 : 5, null, plane ? 120 : 60);
         if (plane || o.h - to > 0) { o.h = to; set(im, o.i, o.x, 0, o.z, 0, o.w, o.h, o.d); im.instanceMatrix.needsUpdate = true; place(); if (o.sign) o.sign.visible = false; }
         o.dmg = Math.min(1, o.dmg + (plane ? .65 : .12)); dmg.setX(o.i, o.dmg); dmg.needsUpdate = true;
         if (o.fires.length < 3) o.fires.push([P.x, o.h + 1, P.z, plane ? 1.4 : .8]); else o.fires.forEach(f => { f[1] = o.h + 1; f[3] = Math.min(1.8, f[3] + .1); });
-        for (let i = 0; i < (plane ? 10 : 3); i++) puff(new THREE.Vector3(gp.x + P.x, P.y, gp.z + P.z), i % 2 ? "fire" : "smoke", plane ? 1.6 : 1); return o; } };
+        for (let i = 0; i < (plane ? 10 : 3); i++) puff(new THREE.Vector3(gp.x + P.x, P.y, gp.z + P.z), i % 2 ? "fire" : "smoke", plane ? 1.6 : 1); return o; },
+      // a falling wreck smashes into it: fireball, wall/roof/glass chunks flying, the top section topples off, dust rolls out,
+      // the windows go dark, the hole keeps burning (and the broken shell stays as it is while it's on screen)
+      wreck(o, wx, wy, wz) { const gp = seg.group.getWorldPosition(GPV), q = O.fxScale ? O.fxScale() : 1, old = o.h, to = Math.max(8, Math.min(old - 10, old * (.3 + R() * .2)));
+        const cx = gp.x + o.x, cz = gp.z + o.z, hitP = new THREE.Vector3(Math.max(cx - o.w / 2, Math.min(cx + o.w / 2, wx)), Math.min(old, Math.max(to, wy)), Math.max(cz - o.d / 2, Math.min(cz + o.d / 2, wz)));
+        if (FX && FX.boom) FX.boom(hitP, 2.4);
+        debris(hitP, Math.round(30 * q), null, 160, 1.5); debris(hitP, Math.round(14 * q), "#9fc4dc", 190, .7);   // concrete + wall chunks, glass
+        if (old - to > 6) topple(cx, to, cz, o.w * .96, old - to, o.d * .96, wx < cx ? 1 : -1);
+        o.h = to; set(im, o.i, o.x, 0, o.z, 0, o.w, o.h, o.d); im.instanceMatrix.needsUpdate = true; place(); if (o.sign) o.sign.visible = false;
+        o.dmg = 1; dmg.setX(o.i, 1); dmg.needsUpdate = true; o.wrecked = 1;
+        o.fires = [[o.x, o.h + 1, o.z, 1.8], [o.x - o.w * .25, o.h + 1, o.z + o.d * .2, 1.3], [o.x + o.w * .2, o.h + 1, o.z - o.d * .2, 1.2]];
+        for (let i = 0; i < Math.round(16 * q) + 4; i++) puff(SMP.set(cx + (Math.random() - .5) * o.w * 1.4, 2 + Math.random() * 6, cz + (Math.random() - .5) * o.d * 1.4), "dust", 2.2);   // the dust cloud rolling out at street level
+        return { y: to, x: hitP.x, z: hitP.z }; } };
     (seg.blds = seg.blds || []).push(B); return B; }
 
   /* ---------- people: one shaped figure (legs, torso, arms, head, hair) instanced per crowd; the vertex shader animates it

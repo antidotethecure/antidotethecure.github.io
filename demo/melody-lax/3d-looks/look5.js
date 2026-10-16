@@ -13,6 +13,10 @@ import { createCrowd } from "../../engine3d/crowd.js";
 import { makeGPUFX } from "../../engine3d/particles.js";
 import { makeHitDamage } from "../../engine3d/damage.js";
 import { upgradeAircraft } from "../../engine3d/aircraft.js";
+import { makeSky } from "../../engine3d/sky.js";
+import { makeClouds } from "../../engine3d/clouds.js";
+import { makeWeather } from "../../engine3d/weather.js";
+import { makePost } from "../../engine3d/postfx.js";
 import { makeQuality } from "../../engine3d/quality.js";
 
 const Qs = new URLSearchParams(location.search), W = 720, H = 1280, V = 150;
@@ -29,7 +33,12 @@ const pmrem = new THREE.PMREMGenerator(renderer); scene.environment = pmrem.from
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; scene.background = t; }
 scene.fog = new THREE.Fog(0xd89068, 1000, 3600);
 const hemi = new THREE.HemisphereLight(0xffe2c4, 0x3a2c3a, 1.15); scene.add(hemi);
-const sun = new THREE.DirectionalLight(0xffc28a, 2.3); scene.add(sun, sun.target); sun.castShadow = QUAL.cfg.shadows > 0; sun.shadow.mapSize.set(QUAL.cfg.shadowSize, QUAL.cfg.shadowSize);
+const sun = new THREE.DirectionalLight(0xffc28a, 2.3); scene.add(sun, sun.target);
+const TODQ = Qs.get("tod") != null ? +Qs.get("tod") : 18.4;
+const SKY = makeSky(THREE, { renderer, scene, sun, hemi, hours: TODQ, azimuth: -.42 });
+const CLOUDS = makeClouds(THREE, { renderer, sky: SKY, quality: QUAL.cfg.clouds });
+const WX = makeWeather(THREE, { scene, state: Qs.get("weather") || "partly", quality: { rain: QUAL.cfg.rain } }); WX.set(Qs.get("weather") || "partly", 0);
+const POST = await makePost(THREE, { renderer, scene, camera: cam, clouds: CLOUDS, quality: QUAL.cfg.post, width: W, height: H, pixelRatio: 1 }); sun.castShadow = QUAL.cfg.shadows > 0; sun.shadow.mapSize.set(QUAL.cfg.shadowSize, QUAL.cfg.shadowSize);
 Object.assign(sun.shadow.camera, { left: -420, right: 420, top: 420, bottom: -420, near: 10, far: 1600 }); sun.shadow.bias = -.0008; sun.shadow.normalBias = 1.2;
 
 window.__DMG = () => DMG; window.__AIR = () => AIR; window.__THREE = THREE;
@@ -62,18 +71,28 @@ function step(t, dt) {
   if (Qs.get("boom") && !step.boomed && t > +Qs.get("boom")) { step.boomed = 1; const bx = X + 120, bz = Z - 260; segs.forEach(s => s.scatter && s.scatter(bx, bz, 140)); fx.boom(tmp.set(bx, 4, bz), 2.2); }
   segs.forEach(s => s.update(t, dt, Math.abs(s.group.position.z - Z) < 1500));
   const mode = Qs.get("cam") || "chase";
-  if (mode === "wound" && DMG.wounds().length) { const w = DMG.wounds()[0], P = w.g.getWorldPosition(new THREE.Vector3()), N = w.n.clone().transformDirection(AIR.node.matrixWorld); cam.position.copy(P).addScaledVector(N, 16).add(new THREE.Vector3(0, 4, 6)); cam.lookAt(P); }
+  if (mode === "sky") { cam.position.set(X, Y + 20, Z + 100); cam.lookAt(X - 100, Y + 20 + 220, Z - 600); }
+  else if (mode === "wound" && DMG.wounds().length) { const w = DMG.wounds()[0], P = w.g.getWorldPosition(new THREE.Vector3()), N = w.n.clone().transformDirection(AIR.node.matrixWorld); cam.position.copy(P).addScaledVector(N, 16).add(new THREE.Vector3(0, 4, 6)); cam.lookAt(P); }
   else if (mode === "plane") { const a = t * .4 + 2.2; cam.position.set(X + Math.sin(a) * (+(Qs.get("cd") || 70)), Y + 34, Z + Math.cos(a) * (+(Qs.get("cd") || 70))); cam.lookAt(X, Y, Z); }
   else if (mode === "street") { cam.position.set(X + 60, 14, Z - 120); cam.lookAt(X + 20, 8, Z - 260); }
   else if (mode === "low") { cam.position.set(X * .9, Y * .5 + 18, Z + 120); cam.lookAt(X * .9, 6, Z - 260); }
   else { cam.position.set(X * .82, Y * .85 + 50, Z + 176); cam.lookAt(X * .9, Y * .6 - 24, Z - 380); }
   sun.position.set(X - 260, 420, Z + 360); sun.target.position.set(X, 0, Z - 200);
   fx.update(dt); cam.updateMatrixWorld(); CROWD.update(cam, t, dt);
+  WX.update(dt, t, cam); SKY.setTime(TODQ + (Qs.get("live") ? t / 6 : 0)); SKY.update(dt, WX.v, t); world.setDaylight(SKY.info.night, WX.v); world.setSkyLight(SKY.info, WX.v); RAIN.v = WX.v.rain;
 }
+const ENVW = new THREE.Vector3(), ENVA = new THREE.Color(), ENVB = new THREE.Color(), ENVM = new THREE.Color(), MOON = new THREE.Color(.5, .58, .85), WHITE = new THREE.Color(1, 1, 1);
+const PUFFS = (Qs.get("puffs") || "").split(";").filter(Boolean).map(s => s.split(",").map(Number));
+function env(t, dt) { const w = WX.v, I = SKY.info, vis = w.vis, fl = WX.flash; scene.fog.color.copy(I.horizon); scene.fog.near = 900 + 900 * vis; scene.fog.far = 4000 + 3000 * vis;
+  renderer.toneMappingExposure = 1.05 * I.exposure * (1 + fl * 1.6); ENVW.set(-14 * w.wind, 0, -V + 22 * w.wind); const night = I.night > .5;
+  ENVA.copy(I.zenith).multiplyScalar(1.1).lerp(WHITE, .15 * (1 - I.night)); ENVB.copy(I.horizon).multiplyScalar(.6); ENVM.copy(I.horizon).lerp(WHITE, .45 - .3 * I.night);
+  const zz = pz(0), puffs = PUFFS.map(p => [p[0], p[1], zz + p[2], p[3]]);
+  return { cover: w.cover, density: w.density, base: w.base, top: w.base + 560, dark: w.dark, wind: ENVW.set(0, 0, 0), puffs, sunCol: night ? MOON : I.sunCol, sunI: night ? .12 : .25 + I.sunI * .5,
+    ambTop: ENVA, ambBot: ENVB, fogCol: I.horizon, fogFar: scene.fog.far * .8, flash: fl, wet: w.wet, skyRef: I.horizon, sunVis: 1 - I.night, mistCol: ENVM, fogStart: 80 + 1300 * vis * vis, fogDen: .0001 + .0035 * Math.pow(1 - vis, 1.5), bloom: .3 + .2 * I.night, bloomT: 1.5 + 1.8 * (1 - I.night) }; }
 let simT = 0;
-function frame(t) { while (simT < t - 1e-6) { const d = Math.min(1 / 30, t - simT); simT += d; step(simT, d); } if (simT === 0) step(0, 0); renderer.render(scene, cam); }
+function frame(t) { while (simT < t - 1e-6) { const d = Math.min(1 / 30, t - simT); simT += d; step(simT, d); } if (simT === 0) step(0, 0); POST.render(1 / 60, simT, env(simT, 1 / 60)); }
 let frames = 0, ft = performance.now(), fps = 0;
-window.__E3 = { stats: () => Object.assign({ fps, tier: QUAL.tier }, CROWD.stats(), { calls: renderer.info.render.calls, tris: renderer.info.render.triangles }) };
+window.__E3 = { wx: WX, sky: SKY, clouds: CLOUDS, stats: () => Object.assign({ fps, tier: QUAL.tier, hours: SKY.hours, state: WX.state, mist: CLOUDS.mist }, CROWD.stats(), { calls: renderer.info.render.calls, tris: renderer.info.render.triangles }) };
 const t0 = performance.now();
 const loop = (now) => { const t = TFIX != null ? +TFIX : (now - t0) / 1000; frame(t); frames++; if (now - ft > 1000) { fps = Math.round(frames * 1000 / (now - ft)); frames = 0; ft = now; } requestAnimationFrame(loop); };
 requestAnimationFrame(loop);

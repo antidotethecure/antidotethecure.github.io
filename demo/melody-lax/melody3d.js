@@ -37,7 +37,7 @@ async function boot() {
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
   const QM = await import("../engine3d/quality.js?v=e1");
-  const [PARTM, DMGM, ACM] = CHASE ? await Promise.all([import("../engine3d/particles.js?v=e1"), import("../engine3d/damage.js?v=e1"), import("../engine3d/aircraft.js?v=e1")]) : [];
+  const [PARTM, DMGM, ACM, SKYM, CLDM, WXM, POSTM] = CHASE ? await Promise.all(["particles", "damage", "aircraft", "sky", "clouds", "weather", "postfx"].map(n => import("../engine3d/" + n + ".js?v=e1"))) : [];
   const W = M.W, H = M.H, S = M.S, FX = M.FX, FXI = FX._i(), TAU = Math.PI * 2;
   const D = 1000;                                   // camera height above the ground plane
   const ws = Y => CHASE ? 1 : (D - Y) / D;          // world units per screen px at altitude Y (chase view: 1:1, no top-down parallax)
@@ -69,12 +69,12 @@ async function boot() {
     const sc = document.createElement("canvas"); sc.width = 4; sc.height = 256; const sx = sc.getContext("2d"), sg = sx.createLinearGradient(0, 0, 0, 256);
     [[0, "#141c44"], [.2, "#2b2c62"], [.32, "#6a3f72"], [.39, "#c4616e"], [.43, "#f29a5c"], [.455, "#ffd08a"], [.48, "#e9a26c"], [1, "#e9a26c"]].forEach(c => sg.addColorStop(c[0], c[1]));
     sx.fillStyle = sg; sx.fillRect(0, 0, 4, 256);
-    const st = new THREE.CanvasTexture(sc); st.colorSpace = THREE.SRGBColorSpace; scene.background = st;
+    const st = new THREE.CanvasTexture(sc); st.colorSpace = THREE.SRGBColorSpace; scene.background = st;   // (replaced by the physical sky below; kept as the first-frame fallback)
     scene.fog = new THREE.Fog(0xd89068, 900, 3100); cam.fov = 56; cam.updateProjectionMatrix();
     renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
-    const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new RoomEnvironment(), .04).texture; pm.dispose();
   }
   const hemi = new THREE.HemisphereLight(0xc4d0ff, 0x3a2c22, 1.25);   // r160 lights are physical (÷π): these sum to ~1.05× on the flat ground so the aerial photo keeps its 2D brightness scene.add(hemi);
+  if (CHASE) scene.add(hemi);   // chase view: the sky's ambient (driven by engine3d/sky.js)
   const sun = new THREE.DirectionalLight(0xffe0bc, 1.75);   // low warm LA sun from the upper left: shadows fall down-right like the 2D drop shadows
   sun.position.set(-170, 1000, -230); sun.target.position.set(0, 0, 0); scene.add(sun, sun.target);
   sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);
@@ -82,6 +82,21 @@ async function boot() {
   sun.shadow.bias = -0.0015; sun.shadow.radius = 4; sun.shadow.camera.updateProjectionMatrix();
   const rim = new THREE.DirectionalLight(0x8fa6ff, 0.8); rim.position.set(220, 500, 300); scene.add(rim);   // cool sky fill on the far sides
   const FIRE_L = [0, 1, 2].map(() => { const l = new THREE.PointLight(0xff7a2a, 0, 340, 0); l.position.set(0, 40, 0); scene.add(l); return l; });
+  /* ---- chase view: physical sky + time of day, volumetric clouds, weather, post-processing (demo/engine3d) ---- */
+  const LS = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+  const TOD = { sunrise: 6.35, day: 12.4, sunset: 18.55, night: 22.5 }, SKYPREF = () => (Q.get("tod") ? "fixed" : LS("melody-sky", "live")), WXPREF = () => Q.get("weather") || LS("melody-weather", "live");
+  let SKY = null, CLOUDS = null, WX = null, POST = null, todH = Q.get("tod") ? +Q.get("tod") : TOD[SKYPREF()] || 18.35;
+  if (CHASE) {
+    SKY = SKYM.makeSky(THREE, { renderer, scene, sun, hemi, hours: todH, azimuth: -.42, envEvery: QUAL.tier === "low" ? 6000 : 1500 });
+    CLOUDS = CLDM.makeClouds(THREE, { renderer, sky: SKY, quality: QUAL.cfg.clouds });
+    const wp = WXPREF(); WX = WXM.makeWeather(THREE, { scene, state: wp === "live" ? "partly" : wp, auto: wp === "live", quality: { rain: QUAL.cfg.rain }, airflow: () => (M.G().gsp || 0) * 60 });
+    POST = await POSTM.makePost(THREE, { renderer, scene, camera: cam, clouds: CLOUDS, quality: QUAL.cfg.post, width: W, height: H, pixelRatio: renderer.getPixelRatio() });
+    rim.intensity = .35;
+    QUAL.onChange((t, cfg) => { CLOUDS.setQuality(cfg.clouds); WX.setQuality({ rain: cfg.rain }); POST.setQuality(cfg.post); POST.setSize(W, H, renderer.getPixelRatio()); sun.shadow.mapSize.set(cfg.shadowSize, cfg.shadowSize); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } });
+    // the game menu's Settings → Sky / Weather (gamemenu.js selects) talk to these
+    window.MELODY_ENV = { sky(v) { try { localStorage.setItem("melody-sky", v); } catch (e) {} if (TOD[v]) todH = TOD[v]; }, weather(v) { try { localStorage.setItem("melody-weather", v); } catch (e) {} if (v === "live") WX.auto(true); else { WX.auto(false); WX.set(v, 8); } },
+      get: () => ({ sky: SKYPREF(), weather: WXPREF(), hours: todH, state: WX.state }) };
+  }
 
   /* ---------------- textures ---------------- */
   const mkc = (w, h) => { const c = document.createElement("canvas"); c.width = w; c.height = h; return c; };
@@ -769,7 +784,7 @@ async function boot() {
     drawGround(now, G);
     drawCars(G);
     drawFX(now, G);
-    if (CHASE) drawClouds(G);
+    if (CHASE && !POST) drawClouds(G);
     drawPlayer(now, G); drawTraffic(now, G); drawEnemies(now, G); drawReview(now, G); drawRescue(now, G); drawItems(now, G); drawShots(now, G);
     if (CHASE) { drawWorld(now, dt, G); enemyWounds(now, dt, G); playerWounds(now, dt, G); FXA.update((dt || 16) / 1000); }
     for (let i = ROTORS.n; i < ROTORS.list.length; i++) ROTORS.list[i].visible = false;
@@ -777,13 +792,28 @@ async function boot() {
     if (CHASE) { chaseCam(G, dt); wTex.needsUpdate = true; } else { const sh = M.SHK; cam.position.set(-sh[0], D, -sh[1]); }
     if (PROPT) PROPT.rotation = -now / 1000 * 9.7;
     if (CROWD) { cam.updateMatrixWorld(); CROWD.update(cam, now / 1000, (dt || 16) / 1000); }
-    renderer.render(scene, cam);
+    if (POST) envFrame(now, dt, G); else renderer.render(scene, cam);
     // frame-rate guard (auto mode): under ~40 fps for 5 s straight → back to the 2D renderer for this visit
     fpsN++; if (!fpsT) fpsT = now;
     if (now - fpsT >= 1000) { const fps = fpsN * 1000 / (now - fpsT); STATUS.fps = Math.round(fps); fpsN = 0; fpsT = now;
       // quality tiers: step down ultra → high → med → low while the frame rate stays under 50; only when LOW still can't hold
       // ~40 fps for 5 s does this visit fall back to the 2D renderer (the old guard, now the last resort)
       if (!document.hidden && now - started > 4000) { const r = QUAL.sample(fps); if (r === "fail" && MODE === "auto") fallback("low fps " + Math.round(fps)); } }
+  }
+  // sky + weather + clouds + post for this frame (chase view)
+  const ENV = { wind: new THREE.Vector3(), puffs: [], moon: new THREE.Color(.5, .58, .85), ambT: new THREE.Color(), ambB: new THREE.Color(), mist: new THREE.Color(), white: new THREE.Color(1, 1, 1) };
+  function envFrame(now, dt, G) { const t = now / 1000, s = Math.min(.05, (dt || 16) / 1000);
+    if (SKYPREF() === "live") todH = (todH + s / 80) % 24;
+    SKY.setTime(todH); WX.update(s, t, cam); const w = WX.v; SKY.update(s, w, t); const I = SKY.info, fl = WX.flash;
+    scene.fog.color.copy(I.horizon); const vis = w.vis; scene.fog.near = POST.on ? 900 + 900 * vis : 250 + 650 * vis; scene.fog.far = POST.on ? 4000 + 3000 * vis : 900 + 2300 * vis;
+    renderer.toneMappingExposure = 1.05 * I.exposure * (1 + fl * 1.6); RAIN.v = w.rain; if (WORLD.setDaylight) { WORLD.setDaylight(I.night, w); WORLD.setSkyLight(I, w); }
+    const gsp = (G.gsp || 0) * 60; ENV.wind.set(-14 * w.wind, 0, gsp + 22 * w.wind);
+    ENV.puffs.length = 0; if (G.clouds) for (let i = 0; i < G.clouds.length && ENV.puffs.length < 6; i++) { const c = G.clouds[i]; ENV.puffs.push([c.x - W / 2, A.player + [170, 40, 260][i % 3], far(c.y) - H / 2, c.s * (i % 3 === 1 ? .42 : .6)]); }
+    const night = I.night > .5;
+    ENV.ambT.copy(I.zenith).multiplyScalar(1.1).lerp(ENV.white, .15 * (1 - I.night)); ENV.ambB.copy(I.horizon).multiplyScalar(.6); ENV.mist.copy(I.horizon).lerp(ENV.white, .45 - .3 * I.night);
+    POST.render(s, t, { cover: w.cover, density: w.density, base: w.base, top: w.base + 560, dark: w.dark, wind: ENV.wind, puffs: ENV.puffs, sunCol: night ? ENV.moon : I.sunCol, sunI: night ? .12 : .25 + I.sunI * .5,
+      ambTop: ENV.ambT, ambBot: ENV.ambB, fogCol: I.horizon, fogFar: scene.fog.far * .8, flash: fl, wet: w.wet, skyRef: I.horizon, sunVis: 1 - I.night, mistCol: ENV.mist,
+      fogStart: 80 + 1300 * vis * vis, fogDen: .0001 + .0035 * Math.pow(1 - vis, 1.5), bloom: .3 + .2 * I.night, bloomT: 1.5 + 1.8 * (1 - I.night) });
   }
   function fallback(why) { STATUS.reason = why; STATUS.on = false; M.render = null; M.chase = 0; M.wcx = null; M.proj = null; M.egg = null; M.on(false); gl.remove(); try { renderer.dispose(); } catch (e) {} console.info("[melody3d] switched to 2D:", why); }
   gl.addEventListener("webglcontextlost", (e) => { e.preventDefault(); fallback("context lost"); });

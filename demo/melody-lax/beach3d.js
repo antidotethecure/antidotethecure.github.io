@@ -21,7 +21,8 @@ export function makeBeachKit(THREE, K) {
 
   /* ---------------- water ---------------- */
   const water = new THREE.ShaderMaterial({ fog: true, transparent: true, depthWrite: false,
-    uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { t: { value: 0 }, shore: { value: -110 }, sunDir: { value: SUN } }]),
+    uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { t: { value: 0 }, shore: { value: -110 }, sunDir: { value: SUN }, uLight: { value: new THREE.Vector3(1, 1, 1) }, uSkyH: { value: new THREE.Color(1, .72, .48) }, uSkyZ: { value: new THREE.Color(.16, .17, .4) }, uSunAmt: { value: 1 },
+      uRefl: { value: null }, uReflOn: { value: 0 }, uReflMat: { value: new THREE.Matrix4() } }]),
     vertexShader: `#include <fog_pars_vertex>
       uniform float t; uniform float shore; varying vec3 vW; varying vec3 vL; varying vec3 vN;
       float sw(vec2 p){ float d = shore - p.x; float calm = .3 + .7 * smoothstep(0., 160., d);
@@ -33,9 +34,9 @@ export function makeBeachKit(THREE, K) {
         #include <fog_vertex>
       }`,
     fragmentShader: `#include <fog_pars_fragment>
-      uniform float t; uniform float shore; uniform vec3 sunDir; varying vec3 vW; varying vec3 vL; varying vec3 vN;
-      vec3 sky(vec3 r){ float y = clamp(r.y, 0., 1.); vec3 hor = vec3(1., .72, .48), mid = vec3(.78, .42, .48), top = vec3(.16, .17, .4);
-        vec3 c = mix(hor, mid, smoothstep(.02, .18, y)); c = mix(c, top, smoothstep(.18, .6, y)); float s = max(dot(r, sunDir), 0.); return c + vec3(1., .75, .45) * pow(s, 24.) * 1.2; }
+      uniform float t; uniform float shore; uniform vec3 sunDir; uniform vec3 uLight; uniform vec3 uSkyH; uniform vec3 uSkyZ; uniform float uSunAmt; uniform sampler2D uRefl; uniform float uReflOn; uniform mat4 uReflMat; varying vec3 vW; varying vec3 vL; varying vec3 vN;
+      vec3 sky(vec3 r){ float y = clamp(r.y, 0., 1.); vec3 hor = uSkyH, mid = mix(uSkyH, uSkyZ, .45), top = uSkyZ;
+        vec3 c = mix(hor, mid, smoothstep(.02, .18, y)); c = mix(c, top, smoothstep(.18, .6, y)); float s = max(dot(r, sunDir), 0.); return c + vec3(1., .75, .45) * pow(s, 24.) * 1.2 * uSunAmt; }
       void main(){ float d = shore - vL.x;
         float wash = 7. + 5. * sin(t * .8 + vL.z * .015) + 3. * sin(vL.z * .05 - t * 1.1);
         // small ripples: a few travelling sine normals on top of the swell normal
@@ -46,19 +47,21 @@ export function makeBeachKit(THREE, K) {
         vec3 V = normalize(cameraPosition - vW), Rf = reflect(-V, N);
         float fr = .02 + .98 * pow(1. - max(dot(N, V), 0.), 5.);
         vec3 shal = vec3(.36, .8, .74), turq = vec3(.07, .55, .6), deep = vec3(.02, .14, .26);
-        vec3 body = mix(shal, turq, smoothstep(2., 60., d)); body = mix(body, deep, smoothstep(60., 420., d));
-        vec3 c = mix(body, sky(Rf) * .85, clamp(fr * .7, 0., .8));
-        float s = max(dot(Rf, sunDir), 0.); c += vec3(1., .82, .55) * (pow(s, 40.) * 1.1 + pow(s, 500.) * 3.5);          // the sun's glitter path
+        vec3 body = mix(shal, turq, smoothstep(2., 60., d)); body = mix(body, deep, smoothstep(60., 420., d)); body *= uLight;
+        vec3 rc = sky(Rf) * .85;
+        if (uReflOn > .5) { vec4 ru = uReflMat * vec4(vW, 1.0); vec2 uvR = ru.xy / ru.w + N.xz * .035; vec4 rr = texture2D(uRefl, clamp(uvR, .001, .999)); rc = mix(rc, rr.rgb, rr.a * .9); }   // planar reflection (engine3d/water.js)
+        vec3 c = mix(body, rc, clamp(fr * .7, 0., .8));
+        float s = max(dot(Rf, sunDir), 0.); c += vec3(1., .82, .55) * (pow(s, 40.) * 1.1 + pow(s, 500.) * 3.5) * uSunAmt;          // the sun's glitter path
         float n = .55 + .45 * sin(vL.z * .09 + sin(vL.z * .021 + t * .3) * 3.) * sin(vL.z * .035 - t * .4);
         float crest = pow(.5 + .5 * sin((vL.x - t * 26.) * .045), 14.);
         float foam = crest * smoothstep(150., 35., d) * smoothstep(0., 12., d) * (.55 + .6 * n);
         foam += pow(.5 + .5 * sin((vL.x - t * 26.) * .045 - .5), 30.) * smoothstep(110., 20., d) * .5 * n;
         foam += smoothstep(wash + 3., wash - 1., d) * smoothstep(wash - 7., wash - 2., d) * 1.2;                          // the wash's leading edge
         foam += smoothstep(.8, .99, sin(vL.x * .21 + t * 1.7) * sin(vL.z * .17 - t * 1.3)) * .3 * smoothstep(60., 300., d);
-        c = mix(c, vec3(.97, .95, .91), clamp(foam, 0., 1.));
+        c = mix(c, vec3(.97, .95, .91) * uLight, clamp(foam, 0., 1.));
         // clear water: the sand bottom shows through in the shallows (alpha), the receding wash leaves a wet sheen on the sand
         float a = mix(.35, .97, smoothstep(0., 80., d)); a = max(a, clamp(foam, 0., 1.));
-        if (d < wash - 1.) { float wet = smoothstep(wash - 22., wash - 2., d); c = sky(Rf) * .55 + vec3(1., .8, .55) * pow(s, 40.) * 1.5; a = .28 * wet; if (a < .01) discard; }
+        if (d < wash - 1.) { float wet = smoothstep(wash - 22., wash - 2., d); c = sky(Rf) * .55 + vec3(1., .8, .55) * pow(s, 40.) * 1.5 * uSunAmt; a = .28 * wet; if (a < .01) discard; }
         gl_FragColor = vec4(c, a);
         #include <fog_fragment>
       }` });

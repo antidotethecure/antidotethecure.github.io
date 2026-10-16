@@ -489,5 +489,13 @@ export function makeWorld(THREE, O = {}) {
     seg.update(0, 0, false); return seg;
   }
   const SHARED = new Set([box, trunkG, crownG, carG, lampG, poolG, bodyG, headG, boardG, lyingG, lyingHead, PERSON]);
-  return { segment, root, wind, tick, debris, sun: SUN, M, ocean: oceanM, coverTex, logoTex };
+  // time of day: window lights, street lamps, pools of light and the searchlights fade with the daylight (engine3d/sky.js → night 0..1)
+  const BASEI = { facade: M.facade.emissiveIntensity, pool: M.pool.opacity, beam: M.beam.opacity };
+  // the ocean follows the sky: body colour by the light level, reflections of the real horizon/zenith, the glitter path from the real sun
+  function setSkyLight(info, w) { const U = BEACH.water.uniforms, L = Math.max(.08, (1 - info.night) * Math.min(1, .35 + info.sunI * .25) * (1 - (w ? w.dark * .8 : 0))) * (1 - info.night * .7) + info.night * .02;
+    U.uLight.value.set(L, L * (1 - info.night * .1), L * (1 + info.night * .25)); U.uSkyH.value.copy(info.horizon); U.uSkyZ.value.copy(info.zenith); U.uSunAmt.value = Math.max(0, Math.min(1, info.sunI / 2)); if (info.night > .5) U.uSunAmt.value = 0;
+    U.sunDir.value.copy(info.sunDir); }
+  function setDaylight(night, w) { const n = Math.max(.08, Math.min(1, night * 1.15 + (w ? w.dark * .5 : 0)));
+    M.facade.emissiveIntensity = BASEI.facade * (.12 + .88 * n); M.pool.opacity = BASEI.pool * n; M.beam.opacity = BASEI.beam * n; M.lamp.color.setScalar(.35 + .65 * n); }
+  return { segment, root, wind, tick, debris, sun: SUN, M, ocean: oceanM, coverTex, logoTex, setDaylight, setSkyLight, beachWater: BEACH.water };
 }

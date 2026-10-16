@@ -901,12 +901,13 @@ function hurt(x,y,why){
   if(!CALM&&!G.dying&&G.inv<=0) G.hitN++;   // test metric: hits a pilot would have taken (counted even with ?god=1)
   if(CALM||G.inv>0||G.dying||G.god) return;   // calm flight: nothing can hurt the plane
   SND.play("hurt"); G.hp-=100/3+0.01; G.inv=70; G.shake=14; G.flash=.4; pop(x,y-10,why,"#ff7a59"); buzz(G.hp<=0?[90,60,220]:70);
+  if(window.__M3&&__M3.onHurt) try{ __M3.onHurt(x,y,G.lastES||null,1); }catch(e){} G.lastES=null;   // 3D layer: put the wound where the bullet actually struck
   if(G.hp<=0){ G.hp=0; startCrash(); return; }   // the spiral, the ground impact, then the tower's "Mayday!" and the end screen (crashStep)
   G.sev=Math.max(G.sev,Math.min(2,sevTarget(G.hp))); FX.hitBurst(G.x,G.y,PLANE_W,PLANE_W*524/520,0,G.sev);
   if(G.hp<50&&!G.rescueUsed) rescueArm();          // 2nd hit: Christian sends the med-kit blimp, once a flight
 }
 function hurtBy(x,y,why,amt){ if(!CALM&&!G.dying&&G.inv<=0) G.hitN++; if(CALM||G.inv>0||G.dying||G.god) return;
-  SND.play("hurt"); G.hp-=amt; G.inv=40; G.shake=9; G.flash=.25; pop(x,y-10,why,"#ff7a59"); buzz(50);
+  SND.play("hurt"); G.hp-=amt; G.inv=40; G.shake=9; G.flash=.25; pop(x,y-10,why,"#ff7a59"); buzz(50); if(window.__M3&&__M3.onHurt) try{ __M3.onHurt(x,y,null,amt/33); }catch(e){}
   if(G.hp<=0){ G.hp=0; startCrash(); return; } G.sev=Math.max(G.sev,Math.min(2,sevTarget(G.hp))); if(G.hp<50&&!G.rescueUsed) rescueArm(); }
 // burning smoke trail (bosses, the review plane): soft pooled puffs + a flame tongue (FX below)
 function emit(x,y,heavy){
@@ -2342,7 +2343,7 @@ function frame(now){
       cx.fillStyle=bl?"#ff3b3b":"#5a1010"; cx.shadowColor="#ff3b3b"; cx.shadowBlur=bl?14:0; cx.beginPath(); cx.arc(es.x,es.y,2.8,0,6.283); cx.fill(); }
     else if(es.bullet&&es.big){ cx.strokeStyle=es.c; cx.lineWidth=7; cx.lineCap="round"; cx.beginPath(); cx.moveTo(es.x-es.vx*2.6,es.y-es.vy*2.6); cx.lineTo(es.x,es.y); cx.stroke(); cx.strokeStyle="rgba(255,250,220,.95)"; cx.lineWidth=3; cx.beginPath(); cx.moveTo(es.x-es.vx*1.6,es.y-es.vy*1.6); cx.lineTo(es.x,es.y); cx.stroke(); }
     else if(es.bullet){ cx.strokeStyle="rgba(255,220,140,.95)"; cx.lineWidth=3; cx.beginPath(); cx.moveTo(es.x-es.vx*3,es.y-es.vy*3); cx.lineTo(es.x,es.y); cx.stroke(); } else { cx.beginPath(); cx.arc(es.x,es.y,es.r,0,6.283); cx.fill(); } cx.restore(); }
-    if(run&&Math.abs(es.x-G.x)<(es.bomb?24:es.big?23:20)&&Math.abs(es.y-G.y)<(es.bomb?26:es.big?27:24)&&zOK(es,es.big?20:16)){ G.eshots.splice(q,1); if(es.bomb) boom(es.x,es.y,14);
+    if(run&&Math.abs(es.x-G.x)<(es.bomb?24:es.big?23:20)&&Math.abs(es.y-G.y)<(es.bomb?26:es.big?27:24)&&zOK(es,es.big?20:16)){ G.eshots.splice(q,1); G.lastES=es; if(es.bomb) boom(es.x,es.y,14);
       hurt(G.x,G.y,es.bomb?T("💣 Bombed!"):es.army?T("🚀 Army missile!"):es.hm?T("🚀 Homing missile!"):es.missile?T("🚀 Missile hit!"):es.bullet?(es.mil?T("🚁 Gunship fire!"):T("🚁 Hit by LAPD fire!")):T("🛸 Zapped!")); } }
   k=k0;
   // the plane: smoke, debris and fireballs under it, its fire points on top. Going down = crashStep (spiral → ground impact → end)

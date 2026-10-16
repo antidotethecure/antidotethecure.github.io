@@ -54,7 +54,7 @@ export async function makePost(THREE, O) {
       if (composer) { passes.clouds.P = P; passes.clouds.t = t; passes.clouds.dt = dt; GRADE.uniforms.uT.value = t % 10; if (passes.bloom && P.bloom != null) passes.bloom.strength = P.bloom; if (passes.bloom && P.bloomT != null) passes.bloom.threshold = P.bloomT;
         const bg = scene.background; scene.background = null; composer.render(dt); scene.background = bg; return; }
       // LOW: clouds + sky rendered first (no depth) and shown as the background; the in-cloud mist goes into the fog
-      clouds.render(camera, null, t, dt, P); scene.background = clouds.full; renderer.setRenderTarget(null); renderer.render(scene, camera); },
+      P.soft = true; clouds.render(camera, null, t, dt, P); scene.background = clouds.fullSoft; renderer.setRenderTarget(null); renderer.render(scene, camera); },
   };
   return api;
 }

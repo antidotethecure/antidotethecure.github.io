@@ -18,6 +18,7 @@ import { makeClouds } from "../../engine3d/clouds.js";
 import { makeWeather } from "../../engine3d/weather.js";
 import { makePost } from "../../engine3d/postfx.js";
 import { makeTraffic } from "../../engine3d/traffic.js";
+import { makeMirror } from "../../engine3d/water.js";
 import { makeQuality } from "../../engine3d/quality.js";
 
 const Qs = new URLSearchParams(location.search), W = 720, H = 1280, V = 150;
@@ -87,7 +88,9 @@ function step(t, dt) {
 }
 const ENVW = new THREE.Vector3(), ENVA = new THREE.Color(), ENVB = new THREE.Color(), ENVM = new THREE.Color(), MOON = new THREE.Color(.5, .58, .85), WHITE = new THREE.Color(1, 1, 1);
 const PUFFS = (Qs.get("puffs") || "").split(";").filter(Boolean).map(s => s.split(",").map(Number));
-function env(t, dt) { const w = WX.v, I = SKY.info, vis = w.vis, fl = WX.flash; scene.fog.color.copy(I.horizon); scene.fog.near = 900 + 900 * vis; scene.fog.far = 4000 + 3000 * vis;
+const MIRROR = makeMirror(THREE, renderer, { y: 0, scale: .5 });
+function env(t, dt) { world.setWind(.15 + WX.v.wind * .85); const U = world.beachWater.uniforms, on = QUAL.cfg.water.reflect && ROUTE === "beach"; U.uReflOn.value = on ? 1 : 0; if (on) { MIRROR.render(scene, cam); U.uRefl.value = MIRROR.texture; U.uReflMat.value.copy(MIRROR.matrix); }
+  const w = WX.v, I = SKY.info, vis = w.vis, fl = WX.flash; scene.fog.color.copy(I.horizon); scene.fog.near = 900 + 900 * vis; scene.fog.far = 4000 + 3000 * vis;
   renderer.toneMappingExposure = 1.05 * I.exposure * (1 + fl * 1.6); ENVW.set(-14 * w.wind, 0, -V + 22 * w.wind); const night = I.night > .5;
   ENVA.copy(I.zenith).multiplyScalar(1.1).lerp(WHITE, .15 * (1 - I.night)); ENVB.copy(I.horizon).multiplyScalar(.6); ENVM.copy(I.horizon).lerp(WHITE, .45 - .3 * I.night);
   const zz = pz(0), puffs = PUFFS.map(p => [p[0], p[1], zz + p[2], p[3]]);

@@ -2388,7 +2388,7 @@ function previewCopy(now){ if(now-PVT<33) return; PVT=now; var pv=document.getEl
 function rewardsOn(){ return !!(window.MELODY_REWARDS_ON&&window.MELODY_REWARDS_ON()); }
 /* ---- bridge for the optional 3D renderer (melody3d.js). Read-only views of the game state + visual hooks; it never changes the game. ---- */
 var SHK=[0,0];
-var M3=window.__M3={render:null,egg:null,EGG_SCORE:EGG_SCORE,G:function(){ return G; },S:S,W:W,H:H,PLANE_W:PLANE_W,COP_LEN:COP_LEN,GS_LEN:GS_LEN,SJ_W:SJ_W,DRIZ_N:DRIZ_N,RP_HITS:RP_HITS,WPN:WPN,NAV:NAV,PICK:PICK,MIC:MIC,TILES:TILES,LBL:LBL,LMW:LMW,TRF_COLS:TRF.COLS,DRIZ_IM:DRIZ_IM,FX:FX,CARS:CARS,SHK:SHK,reduce:reduce,
+var M3=window.__M3={render:null,audioOut:function(){ try{ return SND.out(); }catch(e){ return null; } },egg:null,EGG_SCORE:EGG_SCORE,G:function(){ return G; },S:S,W:W,H:H,PLANE_W:PLANE_W,COP_LEN:COP_LEN,GS_LEN:GS_LEN,SJ_W:SJ_W,DRIZ_N:DRIZ_N,RP_HITS:RP_HITS,WPN:WPN,NAV:NAV,PICK:PICK,MIC:MIC,TILES:TILES,LBL:LBL,LMW:LMW,TRF_COLS:TRF.COLS,DRIZ_IM:DRIZ_IM,FX:FX,CARS:CARS,SHK:SHK,reduce:reduce,
   copPt:copPt,gsPt:gsPt,gunshipIm:gunshipIm,superjetIm:superjetIm,ready:ready,
   BJ_W:BJ_W,ESC_W:ESC_W,RK_L:RK_CH*RK_K,BASE_W:BASE_W,BASE_H:BASE_H,BASE_L:BASE_L,BIRD_W:BIRD_W,rkPod:rkPod,LITE:LITE,baseIm:baseIm,
   rpBanner:function(c,x,y,p,a,r){ rpBanner(c,x,y,p,a,r); },
@@ -2528,7 +2528,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=ch1"></script>
+<script type="module" src="melody3d.js?v=e3a"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}
@@ -2610,6 +2610,13 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
   display:"Anton,Impact,'Arial Narrow',sans-serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
  tokens:false, showcase:showcase, preview:function(v){ if(window.__MG&&__MG.attract) __MG.attract(v); },
  mount:"#cv",start:function(){ window.MELODY_START(); },vibrate:true,
+ // 3D look (engine3d): graphics tier, weather and time of day. Visual only; they never change the game.
+ selects:[{title:"Graphics",options:[["auto","Auto"],["low","Low"],["med","Medium"],["high","High"],["ultra","Ultra"]],note:"Auto picks for this phone and steps down if it gets choppy.",
+   get:function(){ return window.__E3Q?__E3Q.pref:"auto"; },set:function(v){ if(window.__E3Q) __E3Q.set(v); }},
+  {title:"Weather",options:[["live","Live"],["sunny","Sunny"],["partly","Clouds"],["overcast","Overcast"],["fog","Fog"],["rain","Rain"],["storm","Storm"]],
+   get:function(){ return window.MELODY_ENV?MELODY_ENV.get().weather:"live"; },set:function(v){ if(window.MELODY_ENV) MELODY_ENV.weather(v); else try{ localStorage.setItem("melody-weather",v); }catch(e){} }},
+  {title:"Time of day",options:[["live","Live"],["sunrise","Sunrise"],["day","Day"],["sunset","Sunset"],["night","Night"]],
+   get:function(){ return window.MELODY_ENV?MELODY_ENV.get().sky:"live"; },set:function(v){ if(window.MELODY_ENV) MELODY_ENV.sky(v); else try{ localStorage.setItem("melody-sky",v); }catch(e){} }}],
  how:{goal:"CAMPAIGN: fly 10 levels over LA, each a little harder, beat the six bosses and land back at LAX. SURVIVAL: no finish line, the sky keeps getting harder and bosses keep coming: how long can you last? Grab your guns from the gun blimp, catch Melody's food for points. Prefer a calm flight? Tap Pause, then ⚔️ Combat: On to turn it off.",
   time:"Campaign: 10 levels × 45 seconds + 6 bosses + the landing · Survival: until you go down · 3 hits and you go down",
   steps:[["👆","Touch or drag anywhere on the game and the plane glides smoothly to your finger (it flies just above your thumb so you can see it). On a computer, drag with the mouse or hold the arrow keys / WASD"],
@@ -2657,7 +2664,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
   {group:"Weekly boards",items:[{icon:"🏆",name:"Campaign board",note:"Ranked by score (levels beaten add big bonuses)",pts:"score"},{icon:"⏱️",name:"Survival board",note:"Ranked by the longest time survived",pts:"time"}]}],
  prizes:{title:"Weekly challenge (BETA)",champion:"Top of each weekly board wins "+(WK.prize||"Free Melody Fries")+" once Melody turns rewards on",note:"BETA: rewards are off until Melody switches them on. Until then the boards rank players for bragging rights and the game gives no prizes or Melody Rewards points. When they're on: 1 point per "+GP.perScore+" score, up to "+GP.dailyCap+" points a day."}};
 })();</script>
-<script src="../gamemenu.js?v=lv1"></script><script src="../a2hs.js?v=mg1"></script>
+<script src="../gamemenu.js?v=e3s1"></script><script src="../a2hs.js?v=mg1"></script>
 <script>/* Simple program (Christian, 2026-10): one balance, the numbers live in window.SSAI_REWARDS at the top of this page.
    No split wallets, visit levels, tokens, daily spin or welcome voucher (see crm.js SIMPLE). */
 window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Melody Approach",customerOnly:true};

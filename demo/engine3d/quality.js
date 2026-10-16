@@ -7,13 +7,13 @@
 export const TIER_NAMES = ["low", "med", "high", "ultra"];
 export const TIERS = {
   low: { pr: 1, shadows: 0, shadowSize: 512, crowd: { near: 0, lod1: false, maxDist: 900, lod1Dist: 0, nearDist: 0, max: 220, shadows: false, density: .55 },
-    clouds: { scale: .2, steps: 14, light: 3 }, post: { on: false, bloom: false, ssao: false, aa: "none", grade: false }, water: { reflect: false }, rain: 1500, particles: 900, traffic: .55, decals: 12 },
+    clouds: { scale: .3, steps: 20, light: 3, jitter: .45 }, post: { on: false, bloom: false, ssao: false, aa: "none", grade: false }, water: { reflect: false }, rain: 1500, particles: 900, traffic: .55, decals: 12 },
   med: { pr: 1.5, shadows: 1, shadowSize: 1024, crowd: { near: 0, lod1: true, maxDist: 1300, lod1Dist: 380, nearDist: 0, max: 360, shadows: false, density: .8 },
-    clouds: { scale: .25, steps: 22, light: 4 }, post: { on: true, bloom: true, ssao: false, aa: "fxaa", grade: true }, water: { reflect: false }, rain: 3000, particles: 1500, traffic: .8, decals: 24 },
+    clouds: { scale: .3, steps: 26, light: 4, jitter: .5 }, post: { on: true, bloom: true, ssao: false, aa: "fxaa", grade: true }, water: { reflect: false }, rain: 3000, particles: 1500, traffic: .8, decals: 24 },
   high: { pr: 2, shadows: 2, shadowSize: 2048, crowd: { near: 4, lod1: true, maxDist: 1800, lod1Dist: 650, nearDist: 140, max: 520, shadows: false, density: 1 },
-    clouds: { scale: .33, steps: 36, light: 5 }, post: { on: true, bloom: true, ssao: false, aa: "smaa", grade: true }, water: { reflect: true }, rain: 5000, particles: 2200, traffic: 1, decals: 40 },
+    clouds: { scale: .4, steps: 36, light: 5, jitter: .6 }, post: { on: true, bloom: true, ssao: false, aa: "smaa", grade: true }, water: { reflect: true }, rain: 5000, particles: 2200, traffic: 1, decals: 40 },
   ultra: { pr: 2, shadows: 2, shadowSize: 4096, crowd: { near: 8, lod1: true, maxDist: 2400, lod1Dist: 900, nearDist: 200, max: 700, shadows: true, density: 1 },
-    clouds: { scale: .5, steps: 56, light: 6 }, post: { on: true, bloom: true, ssao: true, aa: "smaa", grade: true }, water: { reflect: true }, rain: 8000, particles: 3200, traffic: 1, decals: 64 },
+    clouds: { scale: .5, steps: 56, light: 6, jitter: .6 }, post: { on: true, bloom: true, ssao: true, aa: "smaa", grade: true }, water: { reflect: true }, rain: 8000, particles: 3200, traffic: 1, decals: 64 },
 };
 
 export function gpuInfo(renderer) {

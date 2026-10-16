@@ -18,7 +18,7 @@
    the break, towels, umbrellas, volleyball, a lifeguard tower, the boardwalk, the pier, and Nalu Vida on the pier with its logo.
    Used by melody3d.js (the game) and 3d-looks/look2.js + look3.js (the preview clips).
    makeWorld(THREE, {base, fx}) → { segment(kind, len, seed, o), root, wind, tick(dt, t), debris(...) }. */
-import { makeBeachKit } from "./beach3d.js?v=b1";
+import { makeBeachKit } from "./beach3d.js?v=e3a";
 /* The storefront name. The real business is "Melody Bar & Grill"; change this one line to rename the awning / blade sign / door
    glass lettering (the gold logo boards use the real artwork, img/logo.png). */
 export const MELODY_SIGN_TEXT = "MELODY BAR & GRILL";
@@ -57,7 +57,7 @@ export function makeWorld(THREE, O = {}) {
     ground: new THREE.MeshLambertMaterial({ map: groundTex }),
     facade: new THREE.MeshLambertMaterial({ map: winTex[0], emissiveMap: winTex[1], emissive: 0xffffff, emissiveIntensity: .95 }),
     roof: new THREE.MeshLambertMaterial({ map: roofTex }),
-    trunk: new THREE.MeshLambertMaterial({ color: 0x7a5a3c }), leaf: new THREE.MeshLambertMaterial({ color: 0x3f7a35, side: THREE.DoubleSide }),
+    trunk: new THREE.MeshLambertMaterial({ color: 0x8a6a4a }), leaf: new THREE.MeshLambertMaterial({ color: 0x4f8a3a, side: THREE.DoubleSide, alphaTest: .45 }),
     car: new THREE.MeshStandardMaterial({ roughness: .35, metalness: .55 }), glass: new THREE.MeshStandardMaterial({ color: 0x141a24, roughness: .1, metalness: .6 }),
     lamp: new THREE.MeshBasicMaterial({ toneMapped: false }), pool: new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xfff1c8, opacity: .55, toneMapped: false }),
     person: new THREE.MeshLambertMaterial(), sand: new THREE.MeshLambertMaterial({ color: 0xd9b98a }), grass: new THREE.MeshLambertMaterial({ color: 0x4f7a3a }),
@@ -76,6 +76,18 @@ export function makeWorld(THREE, O = {}) {
       "  float per = 4.0 + h * 18.0, ph = floor((uT + h * 97.0) / per); float on = step(.6, fract(sin(dot(cell + vec2(ph * 3.1, vId), vec2(39.35, 11.13))) * 24634.63));\n" +
       "  totalEmissiveRadiance *= on * (1.0 - vDmg); diffuseColor.rgb *= 1.0 - vDmg * .6; }"); };
   M.facade.customProgramCacheKey = () => "facade-flicker";
+  // palm fronds sway: the further from the crown, the more they move; gusts follow the weather's wind (setWind)
+  const UWIND = { value: .3 };
+  M.leaf.onBeforeCompile = (sh) => { sh.uniforms.uT = UT; sh.uniforms.uWind = UWIND;
+    sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nuniform float uT; uniform float uWind;").replace("#include <begin_vertex>", `#include <begin_vertex>
+      { vec3 ip = vec3(0.0);
+        #ifdef USE_INSTANCING
+          ip = instanceMatrix[3].xyz;
+        #endif
+        float r = length(transformed.xz), k = smoothstep(1.0, 16.0, r), ph = ip.x * .07 + ip.z * .05;
+        float g = sin(uT * (1.1 + uWind) + ph) * .6 + sin(uT * 2.7 + ph * 1.7) * .25 + sin(uT * 6.1 + r * .4 + ph) * .12;
+        transformed.x += g * k * (1.2 + 3.5 * uWind); transformed.z += cos(uT * 1.3 + ph) * k * (.6 + 2.0 * uWind) * .5; transformed.y -= abs(g) * k * k * (.5 + 1.5 * uWind); }`); };
+  M.leaf.customProgramCacheKey = () => "palm-sway";
   const ROOF = { ac: new THREE.MeshLambertMaterial({ color: 0xb8bcc2 }), tank: new THREE.MeshLambertMaterial({ color: 0x7a5236 }), pad: null, stack: new THREE.MeshLambertMaterial({ color: 0x8a8e94 }) };
   ROOF.pad = new THREE.MeshLambertMaterial({ map: (() => { const c = mkc(128, 128), x = c.getContext("2d"); x.fillStyle = "#3a3d44"; x.beginPath(); x.arc(64, 64, 62, 0, TAU); x.fill(); x.strokeStyle = "#f0d375"; x.lineWidth = 6; x.beginPath(); x.arc(64, 64, 50, 0, TAU); x.stroke(); x.fillStyle = "#f2f2f2"; x.font = "900 64px Arial"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("H", 64, 68); return tex(c, false); })(), transparent: true });
   let SIGNS = null; const signMats = () => SIGNS || (SIGNS = ["HOTEL", "LOFTS", "DINER", "TACOS", "PHARMACY", "PLAZA"].map(w => new THREE.MeshBasicMaterial({ map: textTex(w, ["#ff5a5a", "#f0d375", "#7ee0ff", "#ffffff"][w.length % 4], 512, 128, "900 86px Arial,sans-serif"), transparent: true, toneMapped: false, side: THREE.DoubleSide })));
@@ -85,8 +97,18 @@ export function makeWorld(THREE, O = {}) {
   const merge = (parts) => { const pos = [], nor = [], uv = []; parts.forEach(([g, m]) => { const q = (g.index ? g.toNonIndexed() : g.clone()).applyMatrix4(m); q.computeVertexNormals(); pos.push(...q.attributes.position.array); nor.push(...q.attributes.normal.array); if (q.attributes.uv) uv.push(...q.attributes.uv.array); });
     const o = new THREE.BufferGeometry(); o.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); o.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); if (uv.length === pos.length / 3 * 2) o.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); return o; };
   const T4 = (x, y, z, rx, ry, rz, sx, sy, sz) => new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromEuler(new THREE.Euler(rx || 0, ry || 0, rz || 0)), new THREE.Vector3(sx || 1, sy || 1, sz || 1));
-  const trunkG = new THREE.CylinderGeometry(.9, 1.5, 34, 6).translate(0, 17, 0);
-  const crownG = merge(Array.from({ length: 8 }, (_, i) => [new THREE.BoxGeometry(2.8, .3, 15).translate(0, 0, 7.5), T4(0, 34, 0, .45 + (i % 2) * .2, i / 8 * TAU, 0)]));
+  // palms: a slightly leaning ringed trunk and a crown of 11 arching fronds (pinnate leaf texture, alpha-tested) that sway in the wind
+  const trunkG = (() => { const g = new THREE.CylinderGeometry(.75, 1.45, 34, 8, 8).translate(0, 17, 0), p = g.attributes.position; for (let i = 0; i < p.count; i++) { const y = p.getY(i), k = y / 34; p.setX(i, p.getX(i) + k * k * 2.2); } g.computeVertexNormals(); return g; })();
+  const leafTex = (() => { const c = mkc(64, 256), x = c.getContext("2d"); x.strokeStyle = "#fff"; x.lineCap = "round";
+    for (let i = 0; i < 46; i++) { const y = 8 + i * 5.3, L = 26 * Math.sin(Math.min(1, (i + 3) / 46) * Math.PI) + 3; x.lineWidth = 2.6; x.beginPath(); x.moveTo(32, y); x.lineTo(32 - L, y + 10); x.moveTo(32, y); x.lineTo(32 + L, y + 10); x.stroke(); }
+    x.lineWidth = 3; x.beginPath(); x.moveTo(32, 0); x.lineTo(32, 256); x.stroke(); const t = new THREE.CanvasTexture(c); return t; })();
+  M.leaf.alphaMap = leafTex;
+  const crownG = (() => { const parts = []; for (let i = 0; i < 11; i++) { const g = new THREE.PlaneGeometry(5, 17, 1, 8), p = g.attributes.position;
+      for (let k = 0; k < p.count; k++) { const v = (p.getY(k) + 8.5) / 17, x0 = p.getX(k); p.setXYZ(k, x0 * (1 - v * .35), Math.sin(v * 1.9) * 4.5 - v * v * 9, v * 16); }   // arch out, then droop
+      g.computeVertexNormals(); parts.push([g, T4(2.2, 34, 0, -.08 * (i % 3), i / 11 * TAU + (i % 2) * .2, 0)]); }
+    const o = new THREE.BufferGeometry(), pos = [], nor = [], uv = [], idx = []; let base = 0;
+    parts.forEach(([g, m]) => { const q = g.clone().applyMatrix4(m); pos.push(...q.attributes.position.array); nor.push(...q.attributes.normal.array); uv.push(...q.attributes.uv.array); for (const k of q.index.array) idx.push(k + base); base += q.attributes.position.count; });
+    o.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); o.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); o.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); o.setIndex(idx); return o; })();
   const carG = merge([[new THREE.BoxGeometry(7, 2.6, 15.5), T4(0, 2.1, 0)], [new THREE.BoxGeometry(6.2, 2.2, 7.5), T4(0, 4.4, -1)]]);
   const lampG = new THREE.BoxGeometry(1.5, 1, .5);
   const poolG = new THREE.PlaneGeometry(9, 26).rotateX(-Math.PI / 2).translate(0, .35, 20);
@@ -479,6 +501,13 @@ export function makeWorld(THREE, O = {}) {
     for (let i = 0; i < 2600; i++) { const v = R(); x.fillStyle = v < .5 ? "rgba(120,96,70,.12)" : "rgba(255,248,230,.14)"; x.fillRect(R() * 256, R() * 256, 1 + R() * 2, 1 + R() * 2); }
     for (let i = 0; i < 40; i++) { x.strokeStyle = "rgba(150,124,94,.18)"; x.beginPath(); const y0 = R() * 256; x.moveTo(40, y0); x.bezierCurveTo(100, y0 + 20, 160, y0 - 20, 256, y0 + 10); x.stroke(); }   // footprints / tracks
     const t = tex(c, true); return t; })();
+  // sand relief: wind ripples (finer toward the dry sand), footprints and grain, used as a bump map so low sun rakes across it
+  const sandBump = (() => { const c = mkc(512, 512), x = c.getContext("2d"), R = rng(23), im = x.createImageData(512, 512), d = im.data;
+    for (let j = 0; j < 512; j++) for (let i = 0; i < 512; i++) { const u = i / 512, v = j / 512, w = Math.sin((v * 34 + Math.sin(u * 9 + v * 6) * .9 + Math.sin(u * 23) * .2) * 6.283) * .5 + .5;
+      const k = (i * 7 + j * 13) % 17 / 17, val = 110 + w * 80 * Math.min(1, u * 3) + (R() - .5) * 60 * (.4 + k * .6); const o = (j * 512 + i) * 4; d[o] = d[o + 1] = d[o + 2] = val; d[o + 3] = 255; }
+    x.putImageData(im, 0, 0); for (let i = 0; i < 160; i++) { const px = R() * 512, py = R() * 512; x.fillStyle = "rgba(40,40,40,.35)"; x.beginPath(); x.ellipse(px, py, 3, 6, R() * 3, 0, TAU); x.fill(); }
+    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; })();
+  const sandMat = new THREE.MeshStandardMaterial({ map: sandTex, bumpMap: sandBump, bumpScale: 2.2, roughness: .96, metalness: 0 });
   const naluTex = img("../nalu-vida/img/logo.png");
   const SURF = ["#f2f2ee", "#f0d375", "#ff7a3a", "#3aa8ff", "#e4566b", "#7ee0b0", "#ffffff"], TOWEL = ["#ff5a6a", "#f0d375", "#3aa8ff", "#7ee0b0", "#ffffff", "#ff9a2e", "#a33645", "#5a4ad8"];
   const BEACH_SKIN = SKIN.concat(["#c68e63", "#e0b48c", "#5e3a28", "#8d5a3b"]);
@@ -491,7 +520,7 @@ export function makeWorld(THREE, O = {}) {
   function coast(seg, R, len, kind) {
     seg.shore = SHORE; seg.water = (wx) => wx - seg.group.position.x < SHORE;
     const sg = new THREE.PlaneGeometry(260, len).rotateX(-Math.PI / 2), su = sg.attributes.uv; for (let i = 0; i < su.count; i++) su.setY(i, su.getY(i) * len / 256);
-    seg.group.add(mesh(sg, new THREE.MeshLambertMaterial({ map: sandTex }), SHORE + 130 - 12, -.4, 0));
+    seg.group.add(mesh(sg, sandMat, SHORE + 130 - 12, -.4, 0));
     seg.group.add(mesh(new THREE.PlaneGeometry(26, len).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: 0x8a8580 }), 133, .2, 0));   // the boardwalk
     seg.group.add(mesh(new THREE.PlaneGeometry(260, len).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: 0x56544f }), 280, .1, 0));
     const cityG = new THREE.Group(); cityG.position.x = 1410; seg.group.add(cityG); city({ group: cityG, tick: seg.tick, blds: seg.blds || (seg.blds = []), crowds: seg.crowds || (seg.crowds = []) }, R, len, { cars: 14, noPeds: true, noTraffic: true });
@@ -568,5 +597,5 @@ export function makeWorld(THREE, O = {}) {
     U.sunDir.value.copy(info.sunDir); }
   function setDaylight(night, w) { const n = Math.max(.08, Math.min(1, night * 1.15 + (w ? w.dark * .5 : 0)));
     M.facade.emissiveIntensity = BASEI.facade * (.12 + .88 * n); M.pool.opacity = BASEI.pool * n; M.beam.opacity = BASEI.beam * n; M.lamp.color.setScalar(.35 + .65 * n); }
-  return { segment, root, wind, tick, debris, sun: SUN, M, ocean: oceanM, coverTex, logoTex, setDaylight, setSkyLight, beachWater: BEACH.water };
+  return { segment, root, wind, tick, debris, sun: SUN, M, ocean: oceanM, coverTex, logoTex, setDaylight, setSkyLight, beachWater: BEACH.water, setWind: (v) => { UWIND.value = v; } };
 }

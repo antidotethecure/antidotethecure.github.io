@@ -244,7 +244,7 @@ export function makeBeachKit(THREE, K) {
     const bed = new THREE.PlaneGeometry(520, len, 26, 1).rotateX(-Math.PI / 2).translate(SHORE - 260 + 14, -2.2, 0), bp = bed.attributes.position, bc = [];
     for (let i = 0; i < bp.count; i++) { const d = SHORE - bp.getX(i); bp.setY(i, -1.2 - Math.max(0, d) * .055); const k = Math.max(0, Math.min(1, d / 220)); bc.push(.62 - .5 * k, .55 - .38 * k, .42 - .2 * k); }
     bed.setAttribute("color", new THREE.Float32BufferAttribute(bc, 3)); bed.computeVertexNormals(); g.add(H.mesh(bed, bedMat));
-    const og = new THREE.PlaneGeometry(1900, len, 110, 48).rotateX(-Math.PI / 2).translate(SHORE - 950 + 26, 0, 0); const wm = H.mesh(og, water); wm.renderOrder = 5; g.add(wm);
+    const og = new THREE.PlaneGeometry(1900, len, 110, 48).rotateX(-Math.PI / 2).translate(SHORE - 950 + 26, 0, 0); const wm = H.mesh(og, water); wm.renderOrder = 5; wm.userData.noMirror = true; g.add(wm);
     const E = K.E && K.E(), crowd = E ? makeCrowdE(E, g) : makeCrowd(g, 150); seg.crowd = crowd; if (E) (seg.crowds = seg.crowds || []).push(crowd);
     // towels + umbrellas, with people lying on most towels and sitting under the umbrellas
     const tw = [], um = []; for (let i = 0; i < 40; i++) tw.push([SHORE + 40 + R() * 160, (R() - .5) * len * .9, (R() - .5) * .5]); for (let i = 0; i < 16; i++) um.push([SHORE + 48 + R() * 150, (R() - .5) * len * .88]);

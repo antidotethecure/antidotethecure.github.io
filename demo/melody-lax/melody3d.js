@@ -696,7 +696,7 @@ async function boot() {
   /* ---------------- chase view: the 3D ground, breaking buildings, the Easter egg, wounds ---------------- */
   const SEGS = new Map(), KIND = { runway: "runway", city: "city", towers: "towers", melody: "melody", stadium: "stadium", hills: "hills", coast: "coast", venice: "venice", pier: "pier" };
   const V2 = new THREE.Vector3(), WV = new THREE.Vector3();
-  let segSeed = 1, eggRun = -1, eggSeg = null, clipCD = 0, lastHp = 100;
+  let segSeed = 1, eggRun = -1, eggSeg = null, clipCD = 0, lastHp = 100; const FLY = { seg: null, ok: false, hp: 100 };
   function drawWorld(now, dt, G) {
     const t = now / 1000, s = Math.min(.05, (dt || 16) / 1000), gsp = (G.gsp || 0) * 60; WORLD.wind.set(0, 0, gsp); WORLD.tick(s, t);
     if (G.runId !== eggRun) { eggRun = G.runId; eggSeg = null; }
@@ -705,7 +705,7 @@ async function boot() {
     for (const g of G.ground) { const kind = KIND[g.k] || "city"; let sg = SEGS.get(g);
       if (sg && sg.kind !== kind) { scene.remove(sg.group); sg.dispose(); if (sg === eggSeg) eggSeg = null; sg = null; }
       if (!sg) { const egg = !eggSeg && unlocked && !G.eggFound && kind === "city" && g.y < -200; sg = WORLD.segment(kind, g.h, segSeed++, { side: g.side || 1, noStrip: true, egg, eggSide: g.side || 1 }); if (egg) eggSeg = sg; scene.add(sg.group); SEGS.set(g, sg); }
-      sg.group.position.z = g.y + g.h / 2 - H / 2; sg.update(t, s, Math.abs(sg.group.position.z - camZ) < 1400); live.add(g); }
+      sg.group.position.z = g.y + g.h / 2 - H / 2; sg.update(t, s, Math.abs(sg.group.position.z - camZ) < 1150); live.add(g); }
     for (const [g, sg] of SEGS) if (!live.has(g)) { scene.remove(sg.group); sg.dispose(); SEGS.delete(g); if (sg === eggSeg) eggSeg = null; }
     M.egg = eggSeg && eggSeg.egg ? { on: true, x: eggSeg.egg.x + W / 2, y: eggSeg.group.position.z + eggSeg.egg.z + H / 2 } : null;
     const PX = PL.x - W / 2, PZ = PL.y - H / 2; clipCD -= s;
@@ -715,6 +715,10 @@ async function boot() {
     // your shots vs the buildings (they chip them; the shot is spent)
     for (const sh of G.shots) { if (sh.dead) continue; const sx = sh.x - W / 2, sz = far(sh.y) - H / 2, sy = alt3(sh, A.shot);
       for (const sg of SEGS.values()) { if (Math.abs(sz - sg.group.position.z) > sg.len / 2) continue; const h = sg.collide(sx, sy, sz, 2, 14); if (h) { sg.smash(h, sx, sy, sz, "shot"); sh.dead = 1; if (M.bldShot) M.bldShot(); } break; } }
+    // the beach: a low pass makes the crowd wave and cheer; a whole beach strip flown low without a hit pays a bonus
+    let onBeach = null; for (const sg of SEGS.values()) { if (!sg.flyby) continue; if (Math.abs(PZ - sg.group.position.z) < sg.len / 2 + 160 && G.running) sg.flyby(PX, PL.Y, PZ); if (Math.abs(PZ - sg.group.position.z) <= sg.len / 2) onBeach = sg; }
+    if (onBeach !== FLY.seg) { if (FLY.seg && FLY.ok && G.running && !G.dying && M.beachBonus) M.beachBonus(); FLY.seg = onBeach; FLY.ok = !!onBeach; FLY.hp = G.hp; }
+    if (FLY.seg && (PL.Y > 100 || G.hp < FLY.hp)) FLY.ok = false;
     // skimming the water: spray and a wake
     if (G.running) for (const sg of SEGS.values()) { if (Math.abs(PZ - sg.group.position.z) > sg.len / 2) continue; if (sg.water(PX) && PL.Y < 95) { const k = (95 - PL.Y) / 30;
       for (let i = 0; i < 3; i++) if (Math.random() < s * 60 * k) FXA.emit(V.set(PX + (Math.random() - .5) * 50, 1.5, PZ + 10 + Math.random() * 20), V2.set((Math.random() - .5) * 30, 18 + Math.random() * 22, gsp + 30 * Math.random()), .9, 3, 14, [.97, .97, .96], [.85, .88, .9], .75, false, 0, .8, -30); } break; }

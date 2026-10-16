@@ -2394,7 +2394,8 @@ var M3=window.__M3={render:null,egg:null,EGG_SCORE:EGG_SCORE,G:function(){ retur
   runway:function(c,g,oy){ var o=cx, y0=g.y; cx=c; g.y=oy; try{ drawRunway(g); } finally{ cx=o; g.y=y0; } },   // draws the animated runway into the 3D layer's texture
   on:function(v){ R3=v?1:0; cv.style.background=R3?"transparent":""; }, isOn:function(){ return !!R3; },
   bldHit:function(big){ if(!G.running||G.dying) return; if(big) hurt(G.x,G.y,T("💥 Flew into a building!")); else hurtBy(G.x,G.y,T("Rooftop scrape!"),12); },   // chase view: you clipped or hit a building
-  bldShot:function(){ if(G.running) G.score+=2*G.mult; }};
+  bldShot:function(){ if(G.running) G.score+=2*G.mult; },
+  beachBonus:function(){ if(!G.running||G.dying) return; var b=250*G.mult; G.score+=b; pop(G.x,G.y-60,"🏖️ "+T("Beach flyby!")+" +"+b,"#7ef7c8"); SND.play("chime",3); }};   // chase view: a whole beach flown low, no hits
 /* End of a flight → Melody Rewards points (window.SSAI_REWARDS.game, via crm.js SSAI_GAMEPTS): 1 point per 100 score,
    at most 50 game points a day. No prizes, no codes, no discounts from the game. Guests can play first: their points are
    held on this phone for the day and saved when they tap "Join to save your N points". */
@@ -2526,7 +2527,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=mo3"></script>
+<script type="module" src="melody3d.js?v=ch1"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}

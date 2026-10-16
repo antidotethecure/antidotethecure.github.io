@@ -18,6 +18,7 @@
    the break, towels, umbrellas, volleyball, a lifeguard tower, the boardwalk, the pier, and Nalu Vida on the pier with its logo.
    Used by melody3d.js (the game) and 3d-looks/look2.js + look3.js (the preview clips).
    makeWorld(THREE, {base, fx}) → { segment(kind, len, seed, o), root, wind, tick(dt, t), debris(...) }. */
+import { makeBeachKit } from "./beach3d.js?v=b1";
 export function makeWorld(THREE, O = {}) {
   const TAU = Math.PI * 2, BASE = O.base || "";
   const rng = (seed) => { let s = (seed * 2654435761) | 0; return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
@@ -399,9 +400,10 @@ export function makeWorld(THREE, O = {}) {
   const lyingG = new THREE.CapsuleGeometry(1.4, 3.6, 3, 8).rotateX(Math.PI / 2).translate(0, 1.3, 0), lyingHead = new THREE.SphereGeometry(1.2, 8, 6).translate(0, 1.4, 3.9);
   const E4 = new THREE.Euler();
   const setE = (im, i, x, y, z, rx, ry, rz, s) => { QP.set(x, y, z); QQ.setFromEuler(E4.set(rx, ry, rz, "YXZ")); QS.set(s || 1, s || 1, s || 1); im.setMatrixAt(i, Q.compose(QP, QQ, QS)); };
+  const BEACH = makeBeachKit(THREE, { FX, wind, UT, rng });
+  const H = { mesh, inst, set, setE, merge, T4, TOWEL, SMP, SMV, white: M.white, boardG, get glowTex() { return glowTex; } };
   function coast(seg, R, len, kind) {
     seg.shore = SHORE; seg.water = (wx) => wx - seg.group.position.x < SHORE;
-    const og = new THREE.PlaneGeometry(XW, len, 90, 46).rotateX(-Math.PI / 2).translate(SHORE - XW / 2 + 24, 0, 0); seg.group.add(mesh(og, oceanM));
     const sg = new THREE.PlaneGeometry(260, len).rotateX(-Math.PI / 2), su = sg.attributes.uv; for (let i = 0; i < su.count; i++) su.setY(i, su.getY(i) * len / 256);
     seg.group.add(mesh(sg, new THREE.MeshLambertMaterial({ map: sandTex }), SHORE + 130 - 12, -.4, 0));
     seg.group.add(mesh(new THREE.PlaneGeometry(26, len).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: 0x8a8580 }), 133, .2, 0));   // the boardwalk
@@ -413,44 +415,7 @@ export function makeWorld(THREE, O = {}) {
     const SHOP = ["#f4d8b0", "#7ec8c0", "#f29a8a", "#f6efe0", "#c8a8e0", "#f0d375", "#8fc0e8"]; shops.forEach((b, i) => { set(sh, i, b[0], 0, b[1], Math.PI / 2, b[3], b[4], b[2]); sh.instanceColor.setXYZ(i, ...QC.set(SHOP[(R() * SHOP.length) | 0]).toArray()); }); seg.group.add(sh);
     const awM = inst(new THREE.BoxGeometry(6, .8, 1).translate(0, 9, 0), M.wine, aw.length, true); aw.forEach((a, i) => { set(awM, i, a[0], 0, a[1], 0, 1, 1, a[2]); awM.instanceColor.setXYZ(i, ...QC.set(TOWEL[i % TOWEL.length]).toArray()); }); seg.group.add(awM);
     const pl = []; for (let z = -len / 2 + 14; z < len / 2; z += 38) pl.push([116, z + R() * 8], [150, z + 19]); palms(seg, R, pl);
-    // the sand: towels, umbrellas, people lying, sitting, walking, volleyball, a lifeguard tower
-    const tw = [], um = []; for (let i = 0; i < 46; i++) tw.push([SHORE + 40 + R() * 170, (R() - .5) * len * .92, R() * .6 - .3]); for (let i = 0; i < 18; i++) um.push([SHORE + 50 + R() * 150, (R() - .5) * len * .9]);
-    const twM = inst(new THREE.BoxGeometry(6.5, .25, 12).translate(0, .15, 0), new THREE.MeshLambertMaterial(), tw.length, true); tw.forEach((p, i) => { set(twM, i, p[0], 0, p[1], p[2]); twM.instanceColor.setXYZ(i, ...QC.set(TOWEL[(R() * TOWEL.length) | 0]).toArray()); }); seg.group.add(twM);
-    const umC = inst(new THREE.ConeGeometry(8, 3.4, 10).translate(0, 13, 0), new THREE.MeshLambertMaterial(), um.length, true), umP = inst(new THREE.CylinderGeometry(.3, .3, 13, 4).translate(0, 6.5, 0), M.white, um.length);
-    um.forEach((p, i) => { set(umC, i, p[0], 0, p[1], 0); set(umP, i, p[0], 0, p[1], 0); umC.instanceColor.setXYZ(i, ...QC.set(TOWEL[(R() * TOWEL.length) | 0]).toArray()); }); seg.group.add(umC, umP);
-    const SWIM = ["#e4566b", "#f0d375", "#3aa8ff", "#111318", "#ff7a3a", "#7ee0b0", "#ffffff", "skin", "skin"];
-    const swimShirt = (R) => SWIM[(R() * SWIM.length) | 0], swimPants = (R) => ["#1f2a44", "#e4566b", "#3aa8ff", "#111318", "#f0d375", "#ff7a3a"][(R() * 6) | 0];
-    crowd(seg.group, R, tw.slice(0, 30).map(p => [p[0], p[1] + 4, p[2]]), { mode: 2, shirt: swimShirt, pants: swimPants, skin: BEACH_SKIN, y: .2 });   // sunbathers on the towels
-    const walkers = []; for (let i = 0; i < 30; i++) { const lane = R() < .45 ? SHORE + 10 + R() * 14 : R() < .5 ? 128 + R() * 10 : SHORE + 40 + R() * 150; walkers.push([lane, (R() - .5) * len, R() < .5 ? 0 : Math.PI, -1, 0]); }
-    const net = []; for (let i = 0; i < 2; i++) net.push([SHORE + 120 + i * 50, (R() - .5) * len * .6]);
-    net.forEach(n => { seg.group.add(mesh(merge([[new THREE.CylinderGeometry(.4, .4, 12, 4), T4(n[0], 6, n[1] - 14)], [new THREE.CylinderGeometry(.4, .4, 12, 4), T4(n[0], 6, n[1] + 14)], [new THREE.BoxGeometry(.2, 3.5, 28), T4(n[0], 9.5, n[1])]]), M.white));
-      for (let k = 0; k < 4; k++) walkers.push([n[0] + (k < 2 ? -10 : 10), n[1] + (k % 2 ? 7 : -7), k < 2 ? Math.PI / 2 : -Math.PI / 2, -1, 1]); });   // players (they hop)
-    const wk = crowd(seg.group, R, walkers.map(p => [p[0], p[1], p[2], -1, p[4] ? 0 : 1]), { shirt: swimShirt, pants: swimPants, skin: BEACH_SKIN }); walkers.forEach(p => p.push(R() * 6, 8 + R() * 10));
-    const lg = new THREE.Group(); lg.position.set(SHORE + 70, 0, (R() - .5) * len * .5); seg.group.add(lg);   // lifeguard tower: stilts, blue hut, white trim, ramp, a red rescue can
-    lg.add(mesh(merge([[new THREE.CylinderGeometry(.5, .5, 9, 4), T4(-6, 4.5, -5)], [new THREE.CylinderGeometry(.5, .5, 9, 4), T4(6, 4.5, -5)], [new THREE.CylinderGeometry(.5, .5, 9, 4), T4(-6, 4.5, 5)], [new THREE.CylinderGeometry(.5, .5, 9, 4), T4(6, 4.5, 5)], [new THREE.BoxGeometry(5, .5, 16), T4(12, 4.5, 0, 0, 0, -.5)]]), M.white));
-    lg.add(mesh(new THREE.BoxGeometry(14, 9, 12).translate(0, 13.5, 0), new THREE.MeshLambertMaterial({ color: 0x5fa8d8 }))); lg.add(mesh(new THREE.BoxGeometry(16, 1, 14).translate(0, 18.5, 0), M.white));
-    lg.add(mesh(new THREE.BoxGeometry(10, 3, .3).translate(0, 14, -6.2), new THREE.MeshBasicMaterial({ color: 0x1a2a3a })));
-    // the water: surfers riding the faces, paddlers and heads past the break
-    const NS = 7, NP = 9, NH = 12, surf = [], padl = [], heads = [];
-    for (let i = 0; i < NS; i++) surf.push({ ph: R(), z0: (R() - .5) * len, v: (R() < .5 ? -1 : 1) * (18 + R() * 16), c: SURF[i % SURF.length] });
-    for (let i = 0; i < NP; i++) padl.push({ d: 150 + R() * 130, z: (R() - .5) * len * .9, ry: R() * TAU, ph: R() * 6, c: SURF[(R() * SURF.length) | 0] });
-    for (let i = 0; i < NH; i++) heads.push({ d: 70 + R() * 150, z: (R() - .5) * len * .9, ph: R() * 6 });
-    const bd = inst(boardG, new THREE.MeshStandardMaterial({ roughness: .3, metalness: .1 }), NS + NP, true);
-    surf.forEach((s2, i) => bd.instanceColor.setXYZ(i, ...QC.set(s2.c).toArray())); padl.forEach((s2, i) => bd.instanceColor.setXYZ(NS + i, ...QC.set(s2.c).toArray())); seg.group.add(bd);
-    const riders = crowd(seg.group, R, surf.map(() => [0, 0, 0, -1, 6]), { shirt: () => "#111318", pants: () => "#111318", skin: BEACH_SKIN });   // wetsuits
-    const paddlers = crowd(seg.group, R, padl.map(() => [0, 0, 0, -1, 3]), { shirt: () => "#111318", pants: () => "#111318", skin: BEACH_SKIN });
-    const swimmers = crowd(seg.group, R, heads.map(() => [0, 0, 0, -1, 0]), { shirt: swimShirt, pants: swimPants, skin: BEACH_SKIN });
-    const LAMB = 2 * Math.PI / .045;
-    const animate = (t, dt, near) => {
-      walkers.forEach((p, i) => { const hop = p[4] ? Math.max(0, Math.sin(t * 5 + p[5])) * 3 : 0, z = p[4] ? p[1] : ((p[1] + t * p[6] * (p[2] ? -1 : 1) + len * 50) % len) - len / 2; wk.set(i, p[0], hop, z, p[2]); }); wk.done();
-      surf.forEach((s2, i) => { const d = 125 - ((t * 26 + s2.ph * 95) % 95), x = SHORE - d, z = ((s2.z0 + t * s2.v + len * 60) % len) - len / 2, lean = Math.sin(t * 1.4 + i) * .25, ry = s2.v > 0 ? -.35 : Math.PI + .35;
-        setE(bd, i, x, 3.2, z, 0, ry, lean * .4, 1); setE(riders.im, i, x, 3.5, z, 0, ry + Math.PI / 2, lean, 1);
-        if (near && FX && Math.random() < dt * 14) { const gp = seg.group.position; FX.emit(SMP.set(gp.x + x + (Math.random() - .5) * 3, 2.5, gp.z + z - Math.sign(s2.v) * 8), SMV.set(wind.x - 6, 8 + Math.random() * 6, wind.z - Math.sign(s2.v) * 10), .8, 2, 7, [.95, .95, .95], [.85, .88, .9], .7, false, 0, .5, -10); } });
-      padl.forEach((s2, i) => { const y = .6 + Math.sin(t * 1.3 + s2.ph) * .8; setE(bd, NS + i, SHORE - s2.d, y, s2.z, Math.sin(t * 1.1 + s2.ph) * .06, s2.ry, 0, 1); setE(paddlers.im, i, SHORE - s2.d - Math.sin(s2.ry) * 3, y + .4, s2.z - Math.cos(s2.ry) * 3, 0, s2.ry + Math.PI, 0, 1); });
-      heads.forEach((s2, i) => swimmers.set(i, SHORE - s2.d, -6.4 + Math.sin(t * 1.5 + s2.ph) * .6, s2.z, s2.ph));
-      [bd, riders.im, paddlers.im, swimmers.im].forEach(m => m.instanceMatrix.needsUpdate = true); };
-    animate(0, 0, false);
-    seg.tick.push((t, dt, near) => { oceanM.uniforms.t.value = t; if (near) animate(t, dt, near); });
+    BEACH.populate(seg, R, len, SHORE, H);   // the water, the seabed and everyone on the beach and in the waves (beach3d.js)
     if (kind === "pier" || kind === "venice") pier(seg, R, len, kind);
   }
   function pier(seg, R, len, kind) {   // the pier into the ocean; "venice" puts Nalu Vida on it

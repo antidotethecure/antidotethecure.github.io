@@ -32,8 +32,8 @@ export const SKY_GLSL = `
     // night: deep blue gradient, stars, moon (fades in as the sun goes down)
     float h = max(dir.y, 0.0);
     vec3 night = mix(vec3(.018, .026, .06), vec3(.003, .006, .02), pow(h, .5));
-    if (disc) { vec3 sp = floor(dir * 420.0); float st = hashS(sp); float tw = .6 + .4 * sin(uStarT * (2.0 + st * 5.0) + st * 40.0);
-      night += vec3(.85, .9, 1.0) * step(.9965, st) * tw * smoothstep(.0, .25, h) * 1.4 * (1.0 - uOvercast) * smoothstep(.35, .9, uNight);
+    if (disc) { vec3 sp = floor(dir * 900.0); float st = hashS(sp); float tw = .6 + .4 * sin(uStarT * (2.0 + st * 5.0) + st * 40.0);
+      night += vec3(.85, .9, 1.0) * step(.9935, st) * tw * smoothstep(.0, .25, h) * 1.4 * (1.0 - uOvercast) * smoothstep(.35, .9, uNight);
       float mc = dot(dir, normalize(uMoonDir)); night += vec3(.9, .92, 1.0) * smoothstep(.9994, .99955, mc) * 2.2 * (1.0 - uOvercast) + vec3(.06, .07, .1) * pow(max(mc, 0.0), 60.0) * (1.0 - uOvercast); }
     // twilight: a deep blue-violet overhead while the sun is just below / on the horizon
     float tw = smoothstep(.14, -.02, sd.y) * (1.0 - uNight); c = mix(c, vec3(.05, .06, .17) * (1.0 + .6 * smoothstep(.0, .15, sd.y + .05)), tw * smoothstep(.06, .55, dir.y) * .75);

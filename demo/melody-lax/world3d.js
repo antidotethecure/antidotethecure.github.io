@@ -19,6 +19,9 @@
    Used by melody3d.js (the game) and 3d-looks/look2.js + look3.js (the preview clips).
    makeWorld(THREE, {base, fx}) → { segment(kind, len, seed, o), root, wind, tick(dt, t), debris(...) }. */
 import { makeBeachKit } from "./beach3d.js?v=b1";
+/* The storefront name. The real business is "Melody Bar & Grill"; change this one line to rename the awning / blade sign / door
+   glass lettering (the gold logo boards use the real artwork, img/logo.png). */
+export const MELODY_SIGN_TEXT = "MELODY BAR & GRILL";
 export function makeWorld(THREE, O = {}) {
   const TAU = Math.PI * 2, BASE = O.base || "";
   const rng = (seed) => { let s = (seed * 2654435761) | 0; return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
@@ -247,6 +250,8 @@ export function makeWorld(THREE, O = {}) {
   function streetLamps(seg, spots) { const g = merge([[new THREE.CylinderGeometry(.5, .7, 26, 5), T4(0, 13, 0)], [new THREE.BoxGeometry(6, .6, 1.2), T4(-3, 26, 0)]]), p = inst(g, M.dark, spots.length), bulbs = inst(new THREE.SphereGeometry(1.2, 6, 4), M.lamp, spots.length, true), pl = inst(new THREE.PlaneGeometry(26, 26).rotateX(-Math.PI / 2), M.pool, spots.length);
     spots.forEach((s, i) => { set(p, i, s[0], 0, s[1], s[2]); const ox = -Math.cos(s[2]) * 6, oz = Math.sin(s[2]) * 6; set(bulbs, i, s[0] + ox, 25.4, s[1] + oz, 0); bulbs.instanceColor.setXYZ(i, 1.7, 1.4, .9); set(pl, i, s[0] + ox, .4, s[1] + oz, 0); }); seg.group.add(p, bulbs, pl); }
 
+  // cross streets of a strip, where the ground texture draws them (tile edges, counted from the strip's +z end)
+  const streetsOf = (len) => { const a = []; for (let z = len / 2; z > -len / 2; z -= CZ) if (Math.abs(z) < len / 2 - 20) a.push(z); return a; };
   /* ---------- the city block strip (base for most segments) ---------- */
   function city(seg, R, len, o) {
     const g = new THREE.PlaneGeometry(XW, len).rotateX(-Math.PI / 2), uv = g.attributes.uv;
@@ -271,30 +276,93 @@ export function makeWorld(THREE, O = {}) {
           C.add("street", R, { x, z: z0, ry: sp > 0 ? 0 : Math.PI, pose: "walk", tick: (c, t) => { c.z = ((z0 + t * sp + len * 50) % len) - len / 2; } }); }
         if (R() < .5 * dens) { const z = (Math.floor(R() * (len / CZ)) - .5) * CZ * .5, x = ax + sd * (half + 1); for (let k = 0; k < 2 + (R() * 2 | 0); k++) C.add("street", R, { x: x + (R() - .5) * 5, z: z + (R() - .5) * 6, ry: R() * TAU, pose: "stand" }); } }
       (seg.crowds = seg.crowds || []).push(C); seg.tick.push((t, dt, near) => C.update(t, dt, near)); }
-    const lanes = []; for (const ax of AVE) lanes.push(["z", ax - 8, 1], ["z", ax + 8, -1]);
-    for (let z = -len / 2; z < len / 2; z += CZ) if (Math.abs(z) < len / 2 - 20) lanes.push(["x", z + 8, 1], ["x", z - 8, -1]);
-    cars(seg, R, o.cars || 30, len, lanes);
+    // traffic: engine3d/traffic.js (signals, stops, turns, brake lights, crossing pedestrians) when the page has it, else the simple loop
+    const TR = !o.noTraffic && O.traffic && O.traffic();
+    if (TR) { const net = TR.network(seg.group, { avenues: AVE, streets: streetsOf(len), len, width: XW * .9, road: ROAD, lane: 8, cars: (o.cars || 30) * 1.9, parked: o.parked != null ? o.parked : 22, parkedAt: o.parkedAt, crowd: getE(), pedestrians: 12, rng: R });
+      (seg.nets = seg.nets || []).push(net); }
+    else { const lanes = []; for (const ax of AVE) lanes.push(["z", ax - 8, 1], ["z", ax + 8, -1]);
+      for (let z = -len / 2; z < len / 2; z += CZ) if (Math.abs(z) < len / 2 - 20) lanes.push(["x", z + 8, 1], ["x", z - 8, -1]);
+      cars(seg, R, o.cars || 30, len, lanes); }
   }
 
   /* ---------- landmarks ---------- */
-  function melody(seg, R, len, side) {   // Melody Bar & Grill: wine brick building, gold sign (real logo), patio with string lights, guard + line, searchlights
-    const cx = side * 64, cz = -10, BW = 150, BD = 96, BH = 34, gp = new THREE.Group(); gp.position.set(cx, 0, cz); seg.group.add(gp);
-    gp.add(mesh(new THREE.BoxGeometry(BW, BH, BD).translate(0, BH / 2, 0), M.brick));
+  // Melody faces a cross street: its front wall sits on the sidewalk line of the street nearest the strip's middle
+  function melodyZ(len) { const st = streetsOf(len); let z = st[0]; for (const q of st) if (Math.abs(q - 20) < Math.abs(z - 20)) z = q;
+    const front = z - ROAD / 2 - SIDE, BD = 96;
+    return { street: z, front, cz: front - BD / 2, parked: (side) => [0, 1, 2, 3].map(i => [side * (-40 + i * 34) + (i > 1 ? side * 40 : 0), z - ROAD / 2 + 4, Math.PI / 2 * (i % 2 ? 1 : -1) * 0 - Math.PI / 2]) }; }
+  const brickTex = (() => { const c = mkc(256, 256), x = c.getContext("2d"), R = rng(31); x.fillStyle = "#4a2025"; x.fillRect(0, 0, 256, 256);
+    for (let r = 0; r < 32; r++) for (let q = 0; q < 9; q++) { const o = r % 2 ? 14 : 0, v = 70 + R() * 40; x.fillStyle = `rgb(${v + 30 | 0},${v * .42 | 0},${v * .45 | 0})`; x.fillRect(q * 30 + o - 14, r * 8 + 1, 28, 6); }
+    return tex(c, true); })();
+  const interiorTex = (() => { const c = mkc(512, 256), x = c.getContext("2d"), g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#3a1d12"); g.addColorStop(.5, "#a0552a"); g.addColorStop(1, "#2a140c"); x.fillStyle = g; x.fillRect(0, 0, 512, 256);
+    for (let i = 0; i < 9; i++) { const px = 30 + i * 56, gr = x.createRadialGradient(px, 40, 0, px, 40, 46); gr.addColorStop(0, "rgba(255,214,140,.95)"); gr.addColorStop(1, "rgba(255,214,140,0)"); x.fillStyle = gr; x.fillRect(px - 50, 0, 100, 110); }   // pendant lights
+    x.fillStyle = "#1c0f0a"; x.fillRect(0, 150, 512, 40); x.fillStyle = "#d4af37"; x.fillRect(0, 148, 512, 3);   // the bar counter + brass rail
+    for (let i = 0; i < 70; i++) { x.fillStyle = ["#7ec8e3", "#f0d375", "#a33645", "#e8e2d0", "#3e6b4a"][i % 5]; x.fillRect(8 + i * 7.2, 104 + (i % 3) * 2, 3, 14 + (i % 4) * 3); }   // bottles on the back bar
+    const R = rng(77); for (let i = 0; i < 16; i++) { const px = R() * 512, h = 50 + R() * 26; x.fillStyle = "rgba(20,10,8,.85)"; x.beginPath(); x.arc(px, 256 - h - 10, 9, 0, TAU); x.fill(); x.fillRect(px - 11, 256 - h, 22, h); }   // guests in silhouette
+    for (let i = 0; i < 3; i++) { x.fillStyle = "#0b2a4a"; x.fillRect(60 + i * 160, 60, 70, 40); x.fillStyle = "#3f8a3a"; x.fillRect(64 + i * 160, 64, 62, 32); }   // TVs (a game on)
+    return tex(c, false); })();
+  const signTextTex = (txt, w, h, size, col) => { const c = mkc(w, h), x = c.getContext("2d"); x.fillStyle = "#14080a"; x.fillRect(0, 0, w, h); x.font = `800 ${size}px Georgia, 'Times New Roman', serif`; x.textAlign = "center"; x.textBaseline = "middle";
+    x.shadowColor = col; x.shadowBlur = size * .35; x.fillStyle = col; x.fillText(txt, w / 2, h / 2 + 2); return tex(c, false); };
+  function melody(seg, R, len, side, mz) {   // Melody Bar & Grill: brick building, real gold logo, glass storefront with the bar inside, doors that open, sconces, the line, the guard
+    const BW = 150, BD = 96, BH = 34, cx = side * 64, cz = mz.cz, gp = new THREE.Group(); gp.position.set(cx, 0, cz); seg.group.add(gp);
+    const brick = new THREE.MeshStandardMaterial({ map: brickTex, roughness: .82, metalness: 0 }); brickTex.repeat.set(5, 1.4);
+    gp.add(mesh(new THREE.BoxGeometry(BW, BH, BD).translate(0, BH / 2, 0), brick));
     gp.add(mesh(new THREE.BoxGeometry(BW + 4, 3, BD + 4).translate(0, BH + 1.5, 0), M.gold));                                     // gold cornice
     const roofSign = mesh(new THREE.PlaneGeometry(128, 64).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, depthWrite: false, toneMapped: false }), 0, BH + 3.2, 0); gp.add(roofSign);
     const front = new THREE.Group(); front.position.set(0, 0, BD / 2); gp.add(front);
-    front.add(mesh(new THREE.BoxGeometry(96, 30, 3).translate(0, 44, 1.5), M.dark)); front.add(mesh(new THREE.BoxGeometry(100, 33, 1.5).translate(0, 44, 0), M.gold));   // raised sign board + gold frame
+    // raised sign board with the real gold logo, framed, lit by two gooseneck lamps
+    front.add(mesh(new THREE.BoxGeometry(96, 30, 3).translate(0, 44, 1.5), M.dark)); front.add(mesh(new THREE.BoxGeometry(100, 33, 1.5).translate(0, 44, 0), M.gold));
     const fs = mesh(new THREE.PlaneGeometry(84, 28), new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, toneMapped: false }), 0, 44, 3.2); front.add(fs);
-    front.add(mesh(new THREE.BoxGeometry(50, 3, 14).translate(0, 18, 7), M.wine));                                                       // awning over the door
-    front.add(mesh(new THREE.BoxGeometry(12, 16, 1).translate(side * 20, 8, .6), new THREE.MeshBasicMaterial({ color: 0xffd38a, toneMapped: false })));   // lit doorway
-    // the line: gold stanchions + 12 guests along the front sidewalk, the guard at the door
-    const dx = side * 20, n = 12, sp = [];
-    for (let i = 0; i < n; i++) sp.push([cx + dx - side * (14 + i * 8.2), cz + BD / 2 + 12 + (i % 2) * 1.5, side > 0 ? -Math.PI / 2 : Math.PI / 2, -1]);
-    sp.push([cx + dx + side * 8, cz + BD / 2 + 8, Math.PI, 0]);                                                                          // security (black)
-    people(seg, R, sp, true);
-    const st = inst(new THREE.CylinderGeometry(.5, .5, 6, 5).translate(0, 3, 0), M.gold, n + 1); for (let i = 0; i <= n; i++) set(st, i, cx + dx - side * (10 + i * 8.2), 0, cz + BD / 2 + 18, 0); seg.group.add(st);
-    const rope = mesh(new THREE.BoxGeometry(n * 8.2, .6, .6).translate(0, 5, 0), M.wine, cx + dx - side * (10 + n * 4.1), 0, cz + BD / 2 + 18); seg.group.add(rope);
-    // back patio on the field side: deck, umbrellas, tables, string lights in swags
+    // storefront: dark brass mullions, reflective glass over a lit bar interior (two bays either side of the door)
+    const interior = new THREE.MeshBasicMaterial({ map: interiorTex, toneMapped: false, color: new THREE.Color(1.5, 1.5, 1.5) }), glass = new THREE.MeshPhysicalMaterial({ color: 0x0a0f14, roughness: .04, metalness: 0, clearcoat: 1, transparent: true, opacity: .18, envMapIntensity: 1.6, depthWrite: false });
+    for (const sx of [-1, 1]) { const bx = sx * 44; front.add(mesh(new THREE.PlaneGeometry(56, 17), interior, bx, 11.5, .25)); const gl = mesh(new THREE.PlaneGeometry(56, 17), glass, bx, 11.5, .55); gl.renderOrder = 3; front.add(gl);
+      front.add(mesh(merge([[new THREE.BoxGeometry(58, 1.2, 1.2), T4(0, 20.6, .9)], [new THREE.BoxGeometry(58, 1.4, 1.4), T4(0, 2.6, .9)], [new THREE.BoxGeometry(1, 18, 1.2), T4(-28.5, 11.5, .9)], [new THREE.BoxGeometry(1, 18, 1.2), T4(28.5, 11.5, .9)], [new THREE.BoxGeometry(.8, 18, 1), T4(-9.5, 11.5, .9)], [new THREE.BoxGeometry(.8, 18, 1), T4(9.5, 11.5, .9)]]), M.gold, bx, 0, 0)); }
+    // the door: a lit vestibule and two glass leaves on hinges (they swing open as guests go in and out)
+    const dx = side * 20 * 0; front.add(mesh(new THREE.PlaneGeometry(16, 17), new THREE.MeshBasicMaterial({ color: 0xc8823e, toneMapped: false }), dx, 8.5, .2));
+    const leaves = [-1, 1].map(sd => { const hinge = new THREE.Group(); hinge.position.set(dx + sd * 8, 0, .6); front.add(hinge);
+      const leaf = mesh(new THREE.BoxGeometry(7.8, 16.4, .5).translate(-sd * 3.9, 8.4, 0), new THREE.MeshPhysicalMaterial({ color: 0x1a120c, roughness: .1, transparent: true, opacity: .55, clearcoat: 1, envMapIntensity: 1.4 })); hinge.add(leaf);
+      hinge.add(mesh(new THREE.BoxGeometry(.5, 6, .7).translate(-sd * 6.6, 9, .5), M.gold)); return hinge; });
+    // awning with the name (MELODY_SIGN_TEXT), wall sconces, marquee bulbs around the sign board, uplights
+    const awn = mesh(new THREE.BoxGeometry(46, 2.6, 14).translate(0, 19.4, 7), M.wine); front.add(awn);
+    const awT = mesh(new THREE.PlaneGeometry(44, 2.4), new THREE.MeshBasicMaterial({ map: signTextTex(MELODY_SIGN_TEXT, 1024, 56, 40, "#f0d375"), toneMapped: false }), 0, 19.4, 14.05); front.add(awT);
+    const blade = mesh(new THREE.BoxGeometry(1.2, 22, 9).translate(0, 0, 0), M.dark, side * -72, 30, 6); front.add(blade);
+    [-1, 1].forEach(f => { const bt = mesh(new THREE.PlaneGeometry(8, 20), new THREE.MeshBasicMaterial({ map: signTextTex("MELODY", 128, 320, 0, "#f0d375"), toneMapped: false }), side * -72 + f * .65, 30, 6); bt.rotation.y = f * Math.PI / 2;
+      const c2 = mkc(96, 320), x2 = c2.getContext("2d"); x2.fillStyle = "#14080a"; x2.fillRect(0, 0, 96, 320); x2.font = "900 54px Georgia,serif"; x2.textAlign = "center"; x2.fillStyle = "#f0d375"; x2.shadowColor = "#f0d375"; x2.shadowBlur = 16; "MELODY".split("").forEach((ch, i) => x2.fillText(ch, 48, 52 + i * 50)); bt.material.map = tex(c2, false); front.add(bt); });
+    const sconces = [[-30, 24], [30, 24], [-74, 24], [74, 24], [-12, 21], [12, 21]], scM = inst(new THREE.CylinderGeometry(1, .6, 2.4, 8), M.lamp, sconces.length, true);
+    sconces.forEach((p, i) => { set(scM, i, p[0], p[1], 1.6, 0); scM.instanceColor.setXYZ(i, 2, 1.6, 1); }); front.add(scM);
+    const bulbs2 = []; for (let i = 0; i <= 24; i++) { const u = i / 24; bulbs2.push([-50 + u * 100, 61.5], [-50 + u * 100, 26.5]); } for (let i = 1; i < 8; i++) { const u = i / 8; bulbs2.push([-50, 26.5 + u * 35], [50, 26.5 + u * 35]); }
+    const mq = inst(new THREE.SphereGeometry(.8, 6, 4), M.lamp, bulbs2.length, true); bulbs2.forEach((b, i) => { set(mq, i, b[0], b[1], 1.2, 0); }); front.add(mq);
+    const washes = mesh(new THREE.PlaneGeometry(BW + 6, 50), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffb060, opacity: .25, toneMapped: false }), 0, 22, 1.2); front.add(washes);
+    const sidewalkGlow = mesh(new THREE.PlaneGeometry(130, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffb860, opacity: .35, toneMapped: false }), 0, .5, 14); front.add(sidewalkGlow);
+    // gold stanchions + rope along the curb side of the sidewalk
+    const n = 12, lineX = (i) => cx + dx + side * (16 + i * 8.4), lineZ = cz + BD / 2 + 4.6;
+    const st = inst(new THREE.CylinderGeometry(.5, .5, 6, 5).translate(0, 3, 0), M.gold, n + 1); for (let i = 0; i <= n; i++) set(st, i, cx + dx + side * (12 + i * 8.4), 0, cz + BD / 2 + 8.4, 0); seg.group.add(st);
+    seg.group.add(mesh(new THREE.BoxGeometry(n * 8.4, .6, .6).translate(0, 5, 0), M.wine, cx + dx + side * (12 + n * 4.2), 0, cz + BD / 2 + 8.4));
+    // the people: engine3d crowd (talk / phone / text / laugh while they wait; the line moves up; guests go in, others come out)
+    const E = getE(); let lineState = null;
+    if (E) { const C = BEACH.makeCrowdE(E, seg.group), q = [], VIBE = ["talk", "phone", "laugh", "text", "idle", "talk", "idle2", "laugh"];
+      const mk = (i) => { const c = C.add("street", R, { x: lineX(i), z: lineZ + (i % 2) * 1.2, ry: side > 0 ? -Math.PI / 2 : Math.PI / 2, pose: "stand" }); c.idle = VIBE[(R() * VIBE.length) | 0]; c.slot = i; c.tx = c.x; c.tz = c.z; return c; };
+      for (let i = 0; i < n; i++) q.push(mk(i));
+      const guard = C.add("street", R, { x: cx + dx - side * 10, z: lineZ - 1, ry: 0, pose: "stand" }); guard.idle = "idle2"; { const L = guard.p.look; L.top = [.04, .04, .05, 3]; L.bot = [.03, .03, .04, 3]; L._pk = null; }
+      const goers = []; let nextIn = 4 + R() * 3, nextOut = 7 + R() * 6, doorOpen = 0;
+      // walkers: move toward (tx, tz) at their pace, then hold their idle
+      const walkTo = (c, x, z, sp) => { c.tx = x; c.tz = z; c.sp = sp || 11; };
+      C.list.forEach(c => { c.tick = (cc, t, dt) => { const dX = cc.tx - cc.x, dZ = cc.tz - cc.z, d = Math.hypot(dX, dZ);
+        if (d > .4) { const k = Math.min(1, (cc.sp || 11) * dt / d); cc.x += dX * k; cc.z += dZ * k; cc.pose = "walk"; cc.ry = Math.atan2(dX, dZ); } else if (cc.pose === "walk") { cc.pose = "stand"; cc.ry = cc === guard ? 0 : side > 0 ? -Math.PI / 2 : Math.PI / 2; } }; });
+      seg.tick.push((t, dt, near) => { if (!near) { C.update(t, dt, false); return; }
+        nextIn -= dt; nextOut -= dt; doorOpen = Math.max(0, doorOpen - dt);
+        if (nextIn <= 0 && q.length) { const g0 = q.shift(); walkTo(g0, cx + dx, cz + BD / 2 + 1.5, 9); g0.inside = true; goers.push(g0);   // the front of the line goes in
+          q.forEach((c, i) => { c.slot = i; walkTo(c, lineX(i), lineZ + (i % 2) * 1.2, 6); });
+          const nc = q.length < n ? (() => { const c = mk(n - 1); c.x = lineX(n + 8); c.tx = c.x; walkTo(c, lineX(q.length), lineZ + (q.length % 2) * 1.2, 10); c.tick = C.list[0].tick; return c; })() : null; if (nc) q.push(nc);   // a newcomer joins the back
+          nextIn = 7 + R() * 6; }
+        for (let i = goers.length - 1; i >= 0; i--) { const c = goers[i]; if (Math.hypot(c.x - (cx + dx), c.z - (cz + BD / 2 + 1.5)) < 1.2) { doorOpen = 1.4; if (c.inside) { c.p.visible = false; C.list.splice(C.list.indexOf(c), 1); E.remove(c.p); goers.splice(i, 1); } } }
+        if (nextOut <= 0) { const c = C.add("street", R, { x: cx + dx, z: cz + BD / 2 - 1, ry: 0, pose: "stand" }); c.idle = "talk"; c.tick = C.list[0].tick; walkTo(c, cx + dx - side * 160, cz + BD / 2 + 6, 10); c.leaving = 1; doorOpen = 1.4; nextOut = 9 + R() * 8; }
+        C.list.forEach(c => { if (c.leaving && Math.abs(c.x - c.tx) < 1) { c.p.visible = false; E.remove(c.p); C.list.splice(C.list.indexOf(c), 1); } });
+        const open = Math.min(1, doorOpen * 2); leaves.forEach((h, k) => { h.rotation.y += ((k ? -1 : 1) * open * 1.25 - h.rotation.y) * Math.min(1, dt * 8); });
+        C.update(t, dt, near); });
+      (seg.crowds = seg.crowds || []).push(C); lineState = { q, guard };
+    } else {   // no engine crowd (WebGL1): the primitive figures, as before
+      const sp = []; for (let i = 0; i < n; i++) sp.push([lineX(i), lineZ + (i % 2) * 1.5, side > 0 ? -Math.PI / 2 : Math.PI / 2, -1]); sp.push([cx + dx - side * 10, lineZ - 1, Math.PI, 0]); people(seg, R, sp, true); }
+    // back patio on the field side: deck, umbrellas, tables, string lights in swags, seated guests
     const px = cx - side * (BW / 2 + 48), pg = new THREE.Group(); pg.position.set(px, 0, cz); seg.group.add(pg);
     pg.add(mesh(new THREE.BoxGeometry(92, 1.4, 92).translate(0, .7, 0), M.wood));
     const fence = merge([[new THREE.BoxGeometry(92, 6, 1), T4(0, 3, 46)], [new THREE.BoxGeometry(92, 6, 1), T4(0, 3, -46)], [new THREE.BoxGeometry(1, 6, 92), T4(-side * 46, 3, 0)]]); pg.add(mesh(fence, M.wine));
@@ -305,14 +373,17 @@ export function makeWorld(THREE, O = {}) {
     const swag = (a, b) => { for (let k = 1; k < 14; k++) { const u = k / 14; bulbs.push([a[0] + (b[0] - a[0]) * u, 22 - Math.sin(u * Math.PI) * 6, a[1] + (b[1] - a[1]) * u]); } };
     swag(posts[0], posts[2]); swag(posts[1], posts[3]); swag(posts[0], posts[1]); swag(posts[2], posts[3]);
     const bl = inst(new THREE.SphereGeometry(.9, 6, 4), M.lamp, bulbs.length, true); bulbs.forEach((b, i) => { set(bl, i, b[0], b[1], b[2], 0); bl.instanceColor.setXYZ(i, 1.8, 1.35, .7); }); pg.add(bl);
-    const glow = mesh(new THREE.PlaneGeometry(110, 110).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffb860, opacity: .5, toneMapped: false }), 0, 1.6, 0); pg.add(glow);
-    const guests = []; for (let i = 0; i < 10; i++) guests.push([px + ((i % 5) - 2) * 15 + (R() - .5) * 5, cz + ((i / 5 | 0) - .5) * 40 + (R() - .5) * 10, R() * TAU, -1]); people(seg, R, guests, true);
-    seg.tick.push((t, dt, near) => { if (near && FX && Math.random() < dt * 2.5) puff(SMP.set(seg.group.position.x + cx - side * 40, BH + 10, seg.group.position.z + cz - 20), "steam", 1.2); });   // Melody's kitchen
-    gp.add(mesh(merge([[new THREE.CylinderGeometry(1.8, 2, 9, 8), T4(-side * 40, BH + 4.5, -20)], [new THREE.CylinderGeometry(2.6, 2.6, 1.2, 8), T4(-side * 40, BH + 9.6, -20)]]), ROOF.stack, -cx + cx, 0, 0));
+    const glow = mesh(new THREE.PlaneGeometry(110, 110).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffb060, opacity: .5, toneMapped: false }), 0, 1.6, 0); pg.add(glow);
+    const guests = []; for (let i = 0; i < 6; i++) { const x = ((i % 3) - 1) * 28, z = ((i / 3 | 0) - .5) * 40; guests.push([px + x - 5, cz + z, Math.PI / 2, -1, 4], [px + x + 5, cz + z, -Math.PI / 2, -1, 4]); }
+    for (let i = 0; i < 4; i++) guests.push([px + (R() - .5) * 70, cz + (R() - .5) * 70, R() * TAU, -1]);
+    if (E) crowd(seg.group, R, guests.map(g => [g[0], g[1], g[2], -1, g[4] != null ? g[4] : 0]), { kind: "street", y: 1.4 }, seg); else people(seg, R, guests, true);
+    seg.tick.push((t, dt, near) => { if (near && FX && Math.random() < dt * 2.5) puff(SMP.set(seg.group.position.x + cx - side * 40, BH + 10, seg.group.position.z + cz - 20), "steam", 1.2);   // Melody's kitchen
+      const twinkle = (t * 6 | 0) % 3; for (let i = 0; i < bulbs2.length; i++) { const on = (i + twinkle) % 3 !== 0 ? 1.9 : .5; mq.instanceColor.setXYZ(i, on, on * .78, on * .42); } mq.instanceColor.needsUpdate = true; });
+    gp.add(mesh(merge([[new THREE.CylinderGeometry(1.8, 2, 9, 8), T4(-side * 40, BH + 4.5, -20)], [new THREE.CylinderGeometry(2.6, 2.6, 1.2, 8), T4(-side * 40, BH + 9.6, -20)]]), ROOF.stack, 0, 0, 0));
     // two searchlights sweeping the sky over the roof
-    const beams = [-1, 1].map(s => { const b = mesh(new THREE.CylinderGeometry(9, 1.5, 260, 12, 1, true).translate(0, 130, 0), M.beam, cx + s * 50, BH, cz - 30); seg.group.add(b); return b; });
+    const beams = [-1, 1].map(s2 => { const b = mesh(new THREE.CylinderGeometry(9, 1.5, 260, 12, 1, true).translate(0, 130, 0), M.beam, cx + s2 * 50, BH, cz - 30); seg.group.add(b); return b; });
     seg.tick.push((t) => { beams.forEach((b, i) => { b.rotation.set(.35 * Math.sin(t * .7 + i * 2), 0, .4 * Math.cos(t * .5 + i)); }); glow.material.opacity = .42 + .08 * Math.sin(t * 3); });
-    seg.melody = { x: cx, z: cz };
+    seg.melody = { x: cx, z: cz, front: cz + BD / 2, line: lineState };
   }
   function egg(seg, R, len, side) {   // Antidote's Easter egg: a roadside screen with his Melody review + a white electric sedan with his plate
     const ax = side * 160, sx = ax + side * (ROAD / 2 + 26), gp = new THREE.Group(); gp.position.set(sx, 0, -len * .12); seg.group.add(gp);
@@ -423,7 +494,7 @@ export function makeWorld(THREE, O = {}) {
     seg.group.add(mesh(sg, new THREE.MeshLambertMaterial({ map: sandTex }), SHORE + 130 - 12, -.4, 0));
     seg.group.add(mesh(new THREE.PlaneGeometry(26, len).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: 0x8a8580 }), 133, .2, 0));   // the boardwalk
     seg.group.add(mesh(new THREE.PlaneGeometry(260, len).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: 0x56544f }), 280, .1, 0));
-    const cityG = new THREE.Group(); cityG.position.x = 1410; seg.group.add(cityG); city({ group: cityG, tick: seg.tick, blds: seg.blds || (seg.blds = []), crowds: seg.crowds || (seg.crowds = []) }, R, len, { cars: 14, noPeds: true });
+    const cityG = new THREE.Group(); cityG.position.x = 1410; seg.group.add(cityG); city({ group: cityG, tick: seg.tick, blds: seg.blds || (seg.blds = []), crowds: seg.crowds || (seg.crowds = []) }, R, len, { cars: 14, noPeds: true, noTraffic: true });
     // boardwalk shops (low, colourful, awnings) + palms
     const shops = [], aw = []; for (let z = -len / 2 + 20; z < len / 2 - 20; z += 34 + R() * 10) { const w = 40 + R() * 20, d = 26 + R() * 6, h = 14 + R() * 12; shops.push([186 + R() * 10, z, w, d, h]); aw.push([186 - w / 2 - 3, z, d * .9]); }
     const sh = new THREE.InstancedMesh(box, new THREE.MeshLambertMaterial(), shops.length); sh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(shops.length * 3), 3); sh.frustumCulled = false;
@@ -478,14 +549,14 @@ export function makeWorld(THREE, O = {}) {
     else if (kind === "hills") hills(seg, R, len);
     else if (kind === "coast" || kind === "venice" || kind === "pier") coast(seg, R, len, kind);
     else if (kind === "stadium") stadium(seg, R, len, side);
-    else if (kind === "melody") { city(seg, R, len, { clear: [[side * 64 - side * 50, -10, 300, 150]], cars: 24 }); melody(seg, R, len, side); }
+    else if (kind === "melody") { const mz = melodyZ(len); city(seg, R, len, { clear: [[side * 64 - side * 50, mz.cz, 300, 150]], cars: 24, parkedAt: mz.parked(side) }); melody(seg, R, len, side, mz); }
     else { city(seg, R, len, { tall: kind === "towers", clear: o.egg ? [[(o.eggSide || 1) * 210, -len * .12, 70, 40]] : [], cars: 30 }); if (o.egg) egg(seg, R, len, o.eggSide || 1); }
     seg.update = (t, dt, near) => { for (let i = 0; i < seg.tick.length; i++) seg.tick[i](t, dt || 0, !!near); };
     // the building a world point is inside (plane: rx/rz = half wingspan / half length; shots: small), or null
     seg.collide = (wx, wy, wz, rx, rz) => { for (const B of seg.blds) { const o = B.hit(wx, wy, wz, rx, rz); if (o) return { B, o }; } return null; };
     seg.smash = (h, wx, wy, wz, how) => h.B.smash(h.o, wx, wy, wz, how);
     seg.scatter = (wx, wz, r) => { (seg.crowds || []).forEach(C => C.scatterW && C.scatterW(wx, wz, r)); };
-    seg.dispose = () => { (seg.crowds || []).forEach(C => C.dispose && C.dispose()); seg.group.traverse(n => { if (n.isInstancedMesh) n.dispose(); if (n.isMesh && n.geometry && !SHARED.has(n.geometry)) n.geometry.dispose(); }); };
+    seg.dispose = () => { (seg.crowds || []).forEach(C => C.dispose && C.dispose()); (seg.nets || []).forEach(n => n.dispose()); seg.group.traverse(n => { if (n.isInstancedMesh) n.dispose(); if (n.isMesh && n.geometry && !SHARED.has(n.geometry)) n.geometry.dispose(); }); };
     seg.update(0, 0, false); return seg;
   }
   const SHARED = new Set([box, trunkG, crownG, carG, lampG, poolG, bodyG, headG, boardG, lyingG, lyingHead, PERSON]);

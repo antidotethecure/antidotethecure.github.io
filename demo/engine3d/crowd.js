@@ -211,6 +211,12 @@ export async function createCrowd(THREE, O) {
   const root = new THREE.Group(); root.name = "crowd"; (O.scene || O.parent) && (O.scene || O.parent).add(root);
   const INST = {}; for (const key of ["m", "f"]) { INST[key] = [makeInst(BAKED[key].vat[0], key), makeInst(BAKED[key].vat[1], key)]; root.add(INST[key][0], INST[key][1]); }
 
+  /* ---------------- umbrellas (rain): one instanced canopy + pole, opened over anyone with p.umbrella ---------------- */
+  const UMAX = 400, umbG = (() => { const c = new THREE.ConeGeometry(.62, .2, 10, 1, true).translate(0, 1.18, 0), pl = new THREE.CylinderGeometry(.012, .012, .62, 4).translate(0, .87, 0);
+    const g = new THREE.BufferGeometry(), a = c.toNonIndexed(), b = pl.toNonIndexed(); g.setAttribute("position", new THREE.Float32BufferAttribute([...a.attributes.position.array, ...b.attributes.position.array], 3)); g.computeVertexNormals(); return g; })();
+  const umb = new THREE.InstancedMesh(umbG, new THREE.MeshStandardMaterial({ roughness: .55, side: THREE.DoubleSide }), UMAX); umb.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(UMAX * 3), 3); umb.count = 0; umb.frustumCulled = false; root.add(umb);
+  const UMC = ["#1b1d22", "#a33645", "#2c4a7a", "#e8c070", "#3e6b4a", "#f2efe8", "#d42a2a", "#5a4ad8"].map(h => new THREE.Color(h));
+
   /* ---------------- looks ---------------- */
   const SKINS = ["#3b2219", "#4a2c1f", "#5b3826", "#6b4430", "#7c4f34", "#8d5a3b", "#9c6844", "#a9744d", "#b98559", "#c99a6e", "#d8ad84", "#e5c09c", "#f0cfae"];
   const HAIRS = ["#1a120e", "#231711", "#2e1e14", "#4a2e1c", "#5c3a22", "#0f0d0c", "#7a4e2c", "#b88a52", "#c9a063", "#8a8a8a", "#d9d4cc", "#3b2416"];
@@ -230,7 +236,7 @@ export async function createCrowd(THREE, O) {
   function clipInfo(name) { name = ALIAS[name] || name; const F = FRAMES[name] || FRAMES.idle; return F; }
   function add(o = {}) { const R = rnd(o.seed || seedC++), body = o.body || (R() < .5 ? "m" : "f");
     const p = { body, look: o.look || randomLook(R, body, o.style || "beach"), x: 0, y: 0, z: 0, yaw: 0, s: (o.scale || (.94 + R() * .14)) * H, visible: true,
-      clip: "idle", t0: -R() * 10, prev: null, pt0: 0, bt: -10, speed: 1, near: null, d: 0,
+      clip: "idle", uc: (R() * 64) | 0, t0: -R() * 10, prev: null, pt0: 0, bt: -10, speed: 1, near: null, d: 0,
       set(x, y, z, yaw) { this.x = x; this.y = y; this.z = z; if (yaw != null) this.yaw = yaw; return this; },
       play(name, opt) { name = ALIAS[name] || name; if (!FRAMES[name]) name = "idle"; if (name === this.clip && !(opt && opt.restart)) return this; this.prev = this.clip; this.pt0 = this.t0; this.clip = name; this.t0 = NOW - ((opt && opt.offset) || (FRAMES[name].loop ? Math.random() * 3 : 0)); this.bt = NOW; return this; } };
     if (o.body === undefined && o.look) p.body = body; people.push(p); return p; }
@@ -271,8 +277,9 @@ export async function createCrowd(THREE, O) {
     const wantNear = new Set(); if (nearReady) { const cand = vis.filter(p => p.d < Q.nearDist).sort((a, b) => a.d - b.d); const per = { m: 0, f: 0 }; for (const p of cand) { if (per[p.body] >= Q.near) continue; per[p.body]++; wantNear.add(p); } }
     if (nearReady) { for (const s of NEAR.slots) if (s.p && !wantNear.has(s.p)) { s.p.near = null; s.p = null; s.holder.visible = false; s.cur = null; }
       for (const p of wantNear) { if (p.near) continue; const s = NEAR.slots.find(q => !q.p && q.key === p.body); if (!s) { wantNear.delete(p); continue; } s.p = p; p.near = s; s.cur = null; } }
-    const cnt = { m: [0, 0], f: [0, 0] };
+    const cnt = { m: [0, 0], f: [0, 0] }; let un = 0;
     for (const p of vis) {
+      if (p.umbrella && un < UMAX) { const k = p.s, sw = Math.sin(t * 1.3 + p.s) * .06; QY.setFromEuler(_e.set(sw, p.yaw, sw * .5)); M4.compose(PV.set(p.wx, p.wy, p.wz), QY, SV.set(k, k, k)); umb.setMatrixAt(un, M4); umb.setColorAt(un, UMC[p.uc % UMC.length]); un++; }
       if (p.near) { const s = p.near, L = p.look; s.holder.visible = true; s.holder.position.set(p.wx, p.wy, p.wz); s.holder.rotation.set(0, p.yaw, 0); s.holder.scale.set(p.s * (1 + (L.girth || 0)), p.s, p.s);
         s.U.skin.value.set(...L.skin); s.U.cloth.value.set(...L.cloth, 0); s.U.top.value.set(...L.top); s.U.bot.value.set(...L.bot); s.U.hair.value.set(...L.hair, 0);
         const F = FRAMES[p.clip], a = s.acts[p.clip], dur = F.count / F.fps; if (s.cur !== p.clip) { s.mx.stopAllAction(); a.reset().play(); s.cur = p.clip; }
@@ -284,6 +291,7 @@ export async function createCrowd(THREE, O) {
       if (!L._pk) L._pk = [pk(L.skin), pk(L.cloth), pk(L.hair), pk(L.top), pk(L.bot), (L.top[3] | 0) * 4 + (L.bot[3] | 0)];
       A.iLookA.setXYZW(i, L._pk[0], L._pk[1], L._pk[2], L._pk[3]); A.iLookB.setXYZW(i, L._pk[4], L._pk[5], L.girth || 0, p.bt);
       QY.setFromAxisAngle(YA, p.yaw); M4.compose(PV.set(p.wx, p.wy, p.wz), QY, SV.set(p.s, p.s, p.s)); im.setMatrixAt(i, M4); }
+    umb.count = un; if (un) { umb.instanceMatrix.needsUpdate = true; umb.instanceColor.needsUpdate = true; }
     for (const key of ["m", "f"]) for (let l = 0; l < 2; l++) { const im = INST[key][l], n = Math.min(Q.max, cnt[key][l]); im.count = n; if (!n) continue; im.instanceMatrix.needsUpdate = true; const A = im.userData.A; for (const k of IN) { A[k].needsUpdate = true; if (A[k].addUpdateRange) { A[k].clearUpdateRanges(); A[k].addUpdateRange(0, n * 4); } } if (im.instanceMatrix.addUpdateRange) { im.instanceMatrix.clearUpdateRanges(); im.instanceMatrix.addUpdateRange(0, n * 16); } }
     stats = { total: people.length, visible: vis.length, near: wantNear.size, lod1: cnt.m[0] + cnt.f[0], lod2: cnt.m[1] + cnt.f[1], bakeMs: Math.round(bakeMs), frames: totalFrames };
   }

@@ -17,6 +17,7 @@ import { makeSky } from "../../engine3d/sky.js";
 import { makeClouds } from "../../engine3d/clouds.js";
 import { makeWeather } from "../../engine3d/weather.js";
 import { makePost } from "../../engine3d/postfx.js";
+import { makeTraffic } from "../../engine3d/traffic.js";
 import { makeQuality } from "../../engine3d/quality.js";
 
 const Qs = new URLSearchParams(location.search), W = 720, H = 1280, V = 150;
@@ -46,7 +47,8 @@ const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
 const fx = makeGPUFX(THREE, scene, { max: 4096 });
 let CROWD = null; const RAIN = { v: 0 };
 CROWD = await createCrowd(THREE, { base: "../../engine3d/assets/humans/", loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd });
-const world = makeWorld(THREE, { base: "../", fx, crowd: () => CROWD, rain: RAIN, density: () => QUAL.cfg.crowd.density }); scene.add(world.root);
+const TRAFFIC = await makeTraffic(THREE, { loader, base: "../../engine3d/assets/cars/", parent: scene, fx, quality: { density: QUAL.cfg.traffic } });
+const world = makeWorld(THREE, { base: "../", fx, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density }); scene.add(world.root);
 const ROUTES = { beach: [["coast", 520], ["coast", 520], ["venice", 560], ["pier", 540], ["coast", 500]], melody: [["city", 460], ["melody", 520], ["city", 460], ["city", 460]], city: [["city", 460], ["towers", 460], ["city", 460], ["city", 460]] };
 const segs = []; { let z = 600; ROUTES[ROUTE].forEach((r, i) => { const s = world.segment(r[0], r[1], 51 + i * 7, { side: 1 }); s.group.position.z = z - r[1] / 2; z -= r[1]; scene.add(s.group); segs.push(s); }); }
 const AIR = buildAirliner(THREE), plane = new THREE.Group(); plane.add(AIR.node); AIR.node.scale.setScalar(86 / AIR.size.x); plane.rotation.order = "YXZ"; scene.add(plane);
@@ -71,14 +73,16 @@ function step(t, dt) {
   if (Qs.get("boom") && !step.boomed && t > +Qs.get("boom")) { step.boomed = 1; const bx = X + 120, bz = Z - 260; segs.forEach(s => s.scatter && s.scatter(bx, bz, 140)); fx.boom(tmp.set(bx, 4, bz), 2.2); }
   segs.forEach(s => s.update(t, dt, Math.abs(s.group.position.z - Z) < 1500));
   const mode = Qs.get("cam") || "chase";
-  if (mode === "sky") { cam.position.set(X, Y + 20, Z + 100); cam.lookAt(X - 100, Y + 20 + 220, Z - 600); }
+  if (mode === "ave") { const ax = +(Qs.get("ax") || 160); cam.position.set(ax + 26, +(Qs.get("ch") || 26), Z - 60); cam.lookAt(ax - 6, 4, Z - 420); }
+  else if (mode === "melody") { const sg = segs.find(s => s.melody), m = sg.melody, gp = sg.group.position, a = +(Qs.get("ang") || .35); const cd = +(Qs.get("cd") || 150); cam.position.set(gp.x + m.x + Math.sin(a) * cd, +(Qs.get("ch") || 40), gp.z + m.front + Math.cos(a) * cd); cam.lookAt(gp.x + m.x + +(Qs.get("lx") || 0), +(Qs.get("ly") || 14), gp.z + m.front); }
+  else if (mode === "sky") { cam.position.set(X, Y + 20, Z + 100); cam.lookAt(X - 100, Y + 20 + 220, Z - 600); }
   else if (mode === "wound" && DMG.wounds().length) { const w = DMG.wounds()[0], P = w.g.getWorldPosition(new THREE.Vector3()), N = w.n.clone().transformDirection(AIR.node.matrixWorld); cam.position.copy(P).addScaledVector(N, 16).add(new THREE.Vector3(0, 4, 6)); cam.lookAt(P); }
   else if (mode === "plane") { const a = t * .4 + 2.2; cam.position.set(X + Math.sin(a) * (+(Qs.get("cd") || 70)), Y + 34, Z + Math.cos(a) * (+(Qs.get("cd") || 70))); cam.lookAt(X, Y, Z); }
   else if (mode === "street") { cam.position.set(X + 60, 14, Z - 120); cam.lookAt(X + 20, 8, Z - 260); }
   else if (mode === "low") { cam.position.set(X * .9, Y * .5 + 18, Z + 120); cam.lookAt(X * .9, 6, Z - 260); }
   else { cam.position.set(X * .82, Y * .85 + 50, Z + 176); cam.lookAt(X * .9, Y * .6 - 24, Z - 380); }
   sun.position.set(X - 260, 420, Z + 360); sun.target.position.set(X, 0, Z - 200);
-  fx.update(dt); cam.updateMatrixWorld(); CROWD.update(cam, t, dt);
+  cam.updateMatrixWorld(); TRAFFIC.update(cam, t, dt, { night: SKY.info.night, rain: WX.v.rain }); fx.update(dt); CROWD.update(cam, t, dt);
   WX.update(dt, t, cam); SKY.setTime(TODQ + (Qs.get("live") ? t / 6 : 0)); SKY.update(dt, WX.v, t); world.setDaylight(SKY.info.night, WX.v); world.setSkyLight(SKY.info, WX.v); RAIN.v = WX.v.rain;
 }
 const ENVW = new THREE.Vector3(), ENVA = new THREE.Color(), ENVB = new THREE.Color(), ENVM = new THREE.Color(), MOON = new THREE.Color(.5, .58, .85), WHITE = new THREE.Color(1, 1, 1);
@@ -92,7 +96,7 @@ function env(t, dt) { const w = WX.v, I = SKY.info, vis = w.vis, fl = WX.flash; 
 let simT = 0;
 function frame(t) { while (simT < t - 1e-6) { const d = Math.min(1 / 30, t - simT); simT += d; step(simT, d); } if (simT === 0) step(0, 0); POST.render(1 / 60, simT, env(simT, 1 / 60)); }
 let frames = 0, ft = performance.now(), fps = 0;
-window.__E3 = { wx: WX, sky: SKY, clouds: CLOUDS, stats: () => Object.assign({ fps, tier: QUAL.tier, hours: SKY.hours, state: WX.state, mist: CLOUDS.mist }, CROWD.stats(), { calls: renderer.info.render.calls, tris: renderer.info.render.triangles }) };
+window.__E3 = { tr: TRAFFIC, wx: WX, sky: SKY, clouds: CLOUDS, stats: () => Object.assign({ fps, tier: QUAL.tier, hours: SKY.hours, state: WX.state, mist: CLOUDS.mist }, CROWD.stats(), { calls: renderer.info.render.calls, tris: renderer.info.render.triangles }) };
 const t0 = performance.now();
 const loop = (now) => { const t = TFIX != null ? +TFIX : (now - t0) / 1000; frame(t); frames++; if (now - ft > 1000) { fps = Math.round(frames * 1000 / (now - ft)); frames = 0; ft = now; } requestAnimationFrame(loop); };
 requestAnimationFrame(loop);

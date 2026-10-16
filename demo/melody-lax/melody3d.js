@@ -270,7 +270,7 @@ async function boot() {
   function birdGet(pg) { let o = BIRDS[pg][birdN[pg]++]; if (!o) { const b = buildBird(pg); o = b.node; o.userData = { size: b.size, wings: b.wings }; o.rotation.order = "YXZ"; o.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(o); BIRDS[pg].push(o); } o.visible = true; return o; }
   function bossMesh(k) { if (!BOSSM[k]) { const b = k === "rocket" ? buildRocket() : buildBase(); const o = b.node; o.userData = Object.assign(o.userData || {}, { size: b.size, mats: [] }); o.traverse(n => { if (n.isMesh) { n.material = Array.isArray(n.material) ? n.material.map(m => m.clone()) : n.material.clone(); (Array.isArray(n.material) ? n.material : [n.material]).forEach(m => o.userData.mats.push(m)); } }); o.rotation.order = "YXZ"; scene.add(o); BOSSM[k] = o; } const o = BOSSM[k]; o.visible = true; o.userData.used = 1; return o; }
   // chase view: the player flies air3d's detailed airliner (one instance, never pooled, so its wounds stay put)
-  let AIR = null, UPA = null, PLY = null, FXA = null, pDmg = null, ENEMY = null, WORLD = null, CROWD = null; const RAIN = { v: 0 };
+  let AIR = null, UPA = null, PLY = null, FXA = null, pDmg = null, ENEMY = null, WORLD = null, CROWD = null, TRAFFIC = null; const RAIN = { v: 0 };
   const alt3 = (o, d) => CHASE && o && o.z3 != null ? o.z3 : d;   // chase view: things fly at their own height (the game's z3)
   if (CHASE) {
     AIR = AIRM.buildAirliner(THREE); UPA = ACM.upgradeAircraft(THREE, AIR, { envIntensity: 1.25 }); PLY = new THREE.Group(); PLY.add(AIR.node); PLY.rotation.order = "YXZ"; PLY.userData = { size: AIR.size, mats: [] };
@@ -278,10 +278,13 @@ async function boot() {
     scene.add(PLY); PLY.visible = false;
     // GPU particles (engine3d/particles.js, same API as air3d's makeFX) + raycast bullet damage with decals (engine3d/damage.js)
     FXA = PARTM.makeGPUFX(THREE, scene, { max: 4096 }); pDmg = DMGM.makeHitDamage(THREE, { fx: FXA, target: AIR.node, engines: AIR.pts.eng, maxDecals: QUAL.cfg.decals });
-    WORLD = WORLDM.makeWorld(THREE, { fx: FXA, crowd: () => CROWD, rain: RAIN, density: () => QUAL.cfg.crowd.density }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
+    WORLD = WORLDM.makeWorld(THREE, { fx: FXA, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
     // engine3d crowd: the Nalu Vida cast as real rigged, animated people (VAT-instanced far, SkinnedMesh near). Loads after the game is up.
     if (renderer.capabilities.isWebGL2) import("../engine3d/crowd.js?v=e1").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
       .then(c => { CROWD = c; STATUS.crowd = "on"; QUAL.onChange((t, cfg) => c.setQuality(cfg.crowd)); }).catch(e => { STATUS.crowd = "off: " + (e && e.message || e); console.warn("[melody3d] crowd", e); });
+    // engine3d traffic: Kenney CC0 cars on the street grid with signals, turns, brake lights, crossing pedestrians
+    import("../engine3d/traffic.js?v=e1").then(m => m.makeTraffic(THREE, { loader, base: new URL("../engine3d/assets/cars/", location.href).href, parent: scene, fx: FXA, quality: { density: QUAL.cfg.traffic } }))
+      .then(tr => { TRAFFIC = tr; STATUS.traffic = "on"; QUAL.onChange((t, cfg) => tr.setQuality({ density: cfg.traffic })); }).catch(e => { STATUS.traffic = "off: " + (e && e.message || e); console.warn("[melody3d] traffic", e); });
     ENEMY = AIRM.buildAirliner(THREE, { livery: "enemy" }); MODELS.kami3 = { node: ENEMY.node, size: ENEMY.size };   // the head-on airliners: same detailed airframe, grey
   }
   const PK = "plane";
@@ -791,6 +794,7 @@ async function boot() {
     hideFrom(cards, cardN); poolsEnd(); hideFrom(BIRDS[0], birdN[0]); hideFrom(BIRDS[1], birdN[1]); for (const k in BOSSM) if (!BOSSM[k].userData.used) BOSSM[k].visible = false; BATCHES.forEach(b => b.end());
     if (CHASE) { chaseCam(G, dt); wTex.needsUpdate = true; } else { const sh = M.SHK; cam.position.set(-sh[0], D, -sh[1]); }
     if (PROPT) PROPT.rotation = -now / 1000 * 9.7;
+    if (TRAFFIC && SKY) TRAFFIC.update(cam, now / 1000, (dt || 16) / 1000, { night: SKY.info.night, rain: WX.v.rain });
     if (CROWD) { cam.updateMatrixWorld(); CROWD.update(cam, now / 1000, (dt || 16) / 1000); }
     if (POST) envFrame(now, dt, G); else renderer.render(scene, cam);
     // frame-rate guard (auto mode): under ~40 fps for 5 s straight → back to the 2D renderer for this visit

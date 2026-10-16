@@ -205,7 +205,7 @@ export function makeBeachKit(THREE, K) {
       if (p === "surf") return ["stance", 0];
       if (c.duck > 0 && p !== "sit" && p !== "kneel") return ["duck", 0];
       if (c.wave > 0 && p !== "binos") return [c.cheer ? "cheer" : "wave", 0];
-      if (RAIN.v > .35 && (p === "stand" || p === "walk")) return [p === "walk" ? (c.umb ? "walk" : "coverRun") : c.umb ? "idle" : "coverRun", 0];
+      if (RAIN.v > .35 && (p === "stand" || p === "walk")) return [p === "walk" ? (c.umb ? "walk" : "coverRun") : "idle", 0];   // standing: umbrella up; walking: umbrella or hurry
       switch (p) {
         case "walk": return ["walk", 0];
         case "sit": return ["sit", 0];
@@ -224,7 +224,7 @@ export function makeBeachKit(THREE, K) {
         const [clip, dy] = clipOf(c, t), moving = c.flee > 0;
         const yaw = moving ? Math.atan2(c.fvx, c.fvz) : c.ry;
         c.p.set(c.x + c.ox, c.y + dy, c.z + c.oz, yaw); c.p.play(clip);
-        c.p.umbrella = RAIN.v > .35 && c.umb && (c.pose === "stand" || c.pose === "walk") && !moving; } }
+        c.p.umbrella = RAIN.v > .35 && ((c.umb && c.pose === "walk") || c.pose === "stand") && !moving; } }
     function frozen() {}
     function dispose() { list.forEach(c => E.remove(c.p)); list.length = 0; }
     // explosions: everyone within r runs directly away for a few seconds

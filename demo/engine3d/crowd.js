@@ -245,7 +245,7 @@ export async function createCrowd(THREE, O) {
 
   /* ---------------- near LOD: real SkinnedMesh clones ---------------- */
   let nearReady = false;
-  async function loadNear() { if (!NEAR) return; const { clone } = await import("three/addons/utils/SkeletonUtils.js");
+  async function loadNear() { if (!NEAR) return; const { clone } = await (O.addons ? O.addons("utils/SkeletonUtils.js") : import("three/addons/utils/SkeletonUtils.js"));
     const [m, f] = await Promise.all([load(BODIES.m.near), load(BODIES.f.near)]); const src = { m: m.scene, f: f.scene };
     for (const key of ["m", "f"]) for (let i = 0; i < Q.near; i++) { const o = clone(src[key]); let sk = null; o.traverse(n => { if (n.isSkinnedMesh) sk = n; });
       sk.frustumCulled = false; sk.castShadow = !!Q.shadows; sk.receiveShadow = !!Q.shadows; const mat = sk.material.clone(); sk.material = mat;

@@ -58,10 +58,10 @@ export function makeWeather(THREE, O) {
       if (autoOn && (nextAuto -= s) < 0) { const order = ["sunny", "partly", "partly", "overcast", "rain", "storm", "rain", "fog", "partly", "sunny"]; api.set(order[(Math.random() * order.length) | 0], 18); nextAuto = 70 + Math.random() * 80; }
       // rain
       const n = Math.round(Q.rain * Math.min(1, v.rain * 1.1)); g.instanceCount = n; rain.visible = n > 20;
-      RU.uT.value = t; if (cam) RU.uCam.value.copy(cam.position); RU.uWind.value.set(-60 * v.wind, 0, 120 * v.wind + (O.airflow ? O.airflow() : 0)); RU.uLen.value = 10 + 16 * v.rain; RU.uAlpha.value = .16 + .22 * v.rain;
+      RU.uT.value = t; if (O.center) RU.uCam.value.copy(O.center()); else if (cam) RU.uCam.value.copy(cam.position); RU.uWind.value.set(-60 * v.wind, 0, 120 * v.wind + (O.airflow ? O.airflow() : 0)); RU.uLen.value = 10 + 16 * v.rain; RU.uAlpha.value = .16 + .22 * v.rain;
       // lightning
-      if (v.lightning > .5 && cam && Math.random() < s * .22 * v.lightning) strike(cam);
-      if (boltT > 0) { boltT -= s; const fl = boltT > .2 ? 1 : boltT > .14 ? .25 : boltT > .08 ? .9 : Math.max(0, boltT / .08) * .4; boltMat.opacity = fl; glowM.opacity = fl * .35; } else { boltMat.opacity = 0; glowM.opacity = 0; }
+      if (v.lightning > .5 && cam && Math.random() < s * .22 * v.lightning) { if (O.bolt === false) { flash = 1; boltT = .3; thunder.forEach(f => f(.4 + Math.random() * 2.2, .5 + Math.random() * .5)); } else strike(cam); }
+      if (boltT > 0) { boltT -= s; const fl = boltT > .2 ? 1 : boltT > .14 ? .25 : boltT > .08 ? .9 : Math.max(0, boltT / .08) * .4; boltMat.opacity = O.bolt === false ? 0 : fl; glowM.opacity = O.bolt === false ? 0 : fl * .35; if (O.bolt === false) flash = Math.max(flash, fl * .9); } else { boltMat.opacity = 0; glowM.opacity = 0; }
       flash = Math.max(0, flash - s * 4.5); api.flash = boltT > 0 ? Math.max(flash, boltMat.opacity * .8) : flash; RU.uFlash.value = api.flash * .5; },
     dispose() { scene.remove(rain, bolt, boltGlow); g.dispose(); rainMat.dispose(); boltGeo.dispose(); } };
   return api;

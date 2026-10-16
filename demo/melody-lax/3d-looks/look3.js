@@ -119,7 +119,7 @@ function step(t, dt) {
   tracers.forEach(g => { const u = g.userData, age = t - u.tf; g.visible = age > 0 && age < 1.4; if (!g.visible) return; g.position.copy(u.from).addScaledVector(u.dir, 900 * age); g.lookAt(tmp.copy(g.position).add(u.dir)); if (age < .05) fx.glow(u.from, 30, [1, .8, .4], 1); });
   // pickups: a Melody burger and the 7th Drizzle token, at different heights
   burger.visible = t < 4.75; burger.position.set(px(4.75), py(4.75) + 2, pz(4.75)); burger.rotation.set(.35, t * 2.2, 0); fx.glow(burger.position, 70, [1, .8, .45], .45);
-  token.visible = t < 4.25; token.position.set(px(4.25), py(4.25) + 4, pz(4.25)); token.rotation.y = t * 3; fx.glow(token.position, 80, [1, .82, .3], .55);
+  token.visible = t < 4.25; token.position.set(px(4.25), py(4.25) + 4, pz(4.25)); token.scale.x = Math.max(.15, Math.abs(Math.cos(t * 3))); fx.glow(token.position, 80, [1, .82, .3], .55);
   if (t >= 4.25 && !tokenGot) { tokenGot = true; POPS.push({ t0: t, txt: "7/7 Drizzle! Review unlocked", col: "#f0d375", v: token.position.clone() }); }
   if (t >= 4.75 && !burgerGot) { burgerGot = true; POPS.push({ t0: t, txt: "+50 Classic Burger", col: "#f0d375", v: burger.position.clone() }); }
   if (t >= 5.6 && !POPS.some(p => p.dodge)) POPS.push({ t0: 5.9, dodge: 1, txt: "Dodged!", col: "#7ef7c8", v: plane.position.clone().add(new THREE.Vector3(0, 34, 0)) });

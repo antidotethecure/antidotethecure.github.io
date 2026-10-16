@@ -179,11 +179,61 @@ export function makeWorld(THREE, O = {}) {
         if (o.fires.length < 3) o.fires.push([P.x, o.h + 1, P.z, plane ? 1.4 : .8]); else o.fires.forEach(f => { f[1] = o.h + 1; f[3] = Math.min(1.8, f[3] + .1); });
         for (let i = 0; i < (plane ? 10 : 3); i++) puff(new THREE.Vector3(gp.x + P.x, P.y, gp.z + P.z), i % 2 ? "fire" : "smoke", plane ? 1.6 : 1); return o; } };
     (seg.blds = seg.blds || []).push(B); return B; }
-  function people(seg, R, spots, anim) {   // spots: [x, z, ry, outfit|-1]
-    const n = spots.length, b = inst(bodyG, M.person, n, true), h = inst(headG, M.person, n, true);
-    spots.forEach((p, i) => { b.instanceColor.setXYZ(i, ...QC.set(p[3] != null && p[3] >= 0 ? CLOTH[p[3]] : CLOTH[(R() * CLOTH.length) | 0]).toArray()); h.instanceColor.setXYZ(i, ...QC.set(SKIN[(R() * SKIN.length) | 0]).toArray()); p.push(R() * 6, .9 + R() * .25); });
-    const place = (t) => { spots.forEach((p, i) => { const bob = anim ? Math.abs(Math.sin(t * 2.2 + p[4])) * .5 : 0, sw = anim ? Math.sin(t * 1.3 + p[4]) * .12 : 0; set(b, i, p[0], bob, p[1], p[2] + sw, p[5], p[5], p[5]); set(h, i, p[0], bob, p[1], p[2] + sw, p[5], p[5], p[5]); }); b.instanceMatrix.needsUpdate = h.instanceMatrix.needsUpdate = true; };
-    place(0); if (anim) seg.tick.push(place); seg.group.add(b, h); }
+
+  /* ---------- people: one shaped figure (legs, torso, arms, head, hair) instanced per crowd; the vertex shader animates it
+     (walk, stand, lie, swim, sit, surf stance), the instance picks shirt / pants / skin / hair colours. One draw call a crowd. ---------- */
+  const PERSON = (() => { const parts = [];
+    const P = (geo, part, m) => { const q = (geo.index ? geo.toNonIndexed() : geo).applyMatrix4(m); const n = q.attributes.position.count; q.setAttribute("aPart", new THREE.Float32BufferAttribute(new Float32Array(n).fill(part), 1)); parts.push(q); };
+    for (const sx of [-1, 1]) P(new THREE.CapsuleGeometry(.52, 3.2, 3, 8), sx < 0 ? 1 : 2, T4(sx * .62, 2.05, 0));                          // legs (pants)
+    P(new THREE.CapsuleGeometry(1.0, 1.0, 3, 10), 0, T4(0, 3.95, 0, 0, 0, 0, 1.12, 1, .8));                                                // hips (pants colour via shirt? no: part 0 = shirt)
+    P(new THREE.CapsuleGeometry(1.05, 1.9, 4, 12), 0, T4(0, 5.35, 0, 0, 0, 0, 1.08, 1, .72));                                               // torso
+    for (const sx of [-1, 1]) P(new THREE.CapsuleGeometry(.36, 2.5, 3, 8), sx < 0 ? 3 : 4, T4(sx * 1.48, 4.95, 0, 0, 0, sx * .08));       // arms
+    P(new THREE.CylinderGeometry(.38, .42, .7, 8), 5, T4(0, 6.85, 0));                                                                       // neck
+    P(new THREE.SphereGeometry(.92, 14, 10), 5, T4(0, 7.75, .05, 0, 0, 0, .92, 1.05, 1));                                                     // head
+    P(new THREE.SphereGeometry(.98, 14, 8, 0, TAU, 0, Math.PI * .56), 6, T4(0, 7.9, -.08));                                                  // hair
+    const pos = [], nor = [], prt = []; parts.forEach(q => { q.computeVertexNormals(); pos.push(...q.attributes.position.array); nor.push(...q.attributes.normal.array); prt.push(...q.attributes.aPart.array); });
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute("aPart", new THREE.Float32BufferAttribute(prt, 1));
+    g.setAttribute("color", new THREE.Float32BufferAttribute(new Float32Array(pos.length).fill(1), 3)); return g; })();
+  const crowdM = new THREE.MeshLambertMaterial({ vertexColors: true });
+  crowdM.onBeforeCompile = (sh) => { sh.uniforms.uT = UT;
+    sh.vertexShader = sh.vertexShader.replace("#include <common>", `#include <common>
+      uniform float uT; attribute float aPart; attribute vec3 aShirt; attribute vec3 aPants; attribute vec3 aSkin; attribute vec3 aHair; attribute vec2 aAnim;
+      mat3 rotX(float a){ float c = cos(a), s = sin(a); return mat3(1., 0., 0., 0., c, s, 0., -s, c); }
+      mat3 rotZ(float a){ float c = cos(a), s = sin(a); return mat3(c, s, 0., -s, c, 0., 0., 0., 1.); }`)
+    .replace("#include <begin_vertex>", `#include <begin_vertex>
+      { float mode = aAnim.x, ph = aAnim.y, sw = sin(uT * 6.5 + ph), walk = mode == 1. ? 1. : 0., swim = mode == 3. ? 1. : 0., sit = mode == 4. ? 1. : 0., surf = mode == 6. ? 1. : 0., idle = mode == 0. ? 1. : 0.;
+        vec3 hip = vec3(0., 3.75, 0.), sho = vec3(0., 6.25, 0.);
+        if (aPart == 1.) transformed = hip + rotX(sw * .6 * walk - 1.45 * sit + .25 * surf) * (transformed - hip);
+        if (aPart == 2.) transformed = hip + rotX(-sw * .6 * walk - 1.45 * sit - .25 * surf) * (transformed - hip);
+        float idleArm = idle * .06 * sin(uT * 1.7 + ph);
+        if (aPart == 3.) transformed = sho + rotZ(-1.15 * surf) * rotX(-sw * .5 * walk + swim * (uT * 3.6 + ph) + idleArm) * (transformed - sho);
+        if (aPart == 4.) transformed = sho + rotZ(1.15 * surf) * rotX(sw * .5 * walk + swim * (uT * 3.6 + ph + 3.14) - idleArm) * (transformed - sho);
+        if (surf > .5) { transformed = rotX(.18) * transformed; transformed.y -= .6; }
+        transformed.y -= 1.9 * sit;
+        if (mode == 2. || swim > .5) { transformed = rotX(-1.5708) * transformed; transformed.y += .9; }
+        if (walk > .5) transformed.y += abs(sw) * .25; }`)
+    .replace("#include <color_vertex>", `#include <color_vertex>
+      vColor.rgb = aPart < .5 ? aShirt : (aPart < 2.5 ? aPants : (aPart < 5.5 ? aSkin : aHair));`); };
+  crowdM.customProgramCacheKey = () => "crowd-v1";
+  const HAIR = ["#141012", "#1c1512", "#2a1c14", "#0e0c0c", "#3a2618", "#4a3020", "#151515", "#5a3a22"];
+  const PANTS = ["#1f2a44", "#2b2f36", "#111318", "#5a4a36", "#3b4b6b", "#7a6a52", "#f2efe8", "#2a3550"];
+  // spots: [x, z, ry]; o: { mode 0 stand · 1 walk · 2 lie · 3 swim · 4 sit · 6 surf, shirt: fn(R)|hex, y, skin }
+  function crowd(group, R, spots, o) { o = o || {}; const n = Math.max(1, spots.length), g = PERSON.clone();
+    const A3 = (k) => { const a = new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3); g.setAttribute(k, a); return a; };
+    const sh = A3("aShirt"), pa = A3("aPants"), sk = A3("aSkin"), ha = A3("aHair"), an = new THREE.InstancedBufferAttribute(new Float32Array(n * 2), 2); g.setAttribute("aAnim", an);
+    const im = new THREE.InstancedMesh(g, crowdM, n); im.count = spots.length; im.frustumCulled = false; group.add(im);
+    const skins = o.skin || SKIN;
+    spots.forEach((p, i) => { const pick = (a) => a[(R() * a.length) | 0];
+      const shirt = p[3] === 0 ? "#111318" : typeof o.shirt === "function" ? o.shirt(R, i) : o.shirt || pick(CLOTH), skin = pick(skins);
+      sh.setXYZ(i, ...QC.set(shirt === "skin" ? skin : shirt).toArray()); pa.setXYZ(i, ...QC.set(p[3] === 0 ? "#111318" : o.pants ? (typeof o.pants === "function" ? o.pants(R, i) : o.pants) : pick(PANTS)).toArray());
+      sk.setXYZ(i, ...QC.set(skin).toArray()); ha.setXYZ(i, ...QC.set(pick(HAIR)).toArray()); an.setXY(i, p[4] != null ? p[4] : (o.mode || 0), R() * 6);
+      set(im, i, p[0], o.y || 0, p[1], p[2], .95 + R() * .18, .95 + R() * .18, .95 + R() * .18); });
+    return { im, n: spots.length, set: (i, x, y, z, ry, s) => set(im, i, x, y, z, ry, s || 1, s || 1, s || 1), mode: (i, m) => { an.setX(i, m); an.needsUpdate = true; }, done: () => { im.instanceMatrix.needsUpdate = true; } }; }
+
+  function people(seg, R, spots, anim, o) {   // spots: [x, z, ry, outfit|-1 (0 = all black: security)]
+    const c = crowd(seg.group, R, spots, o || {}), base = spots.map(p => [p[0], p[1], p[2], R() * 6]);   // standing guests: a little weight shifting + turning
+    if (anim) seg.tick.push((t, dt, near) => { if (!near) return; base.forEach((p, i) => c.set(i, p[0], (o && o.y) || 0, p[1], p[2] + Math.sin(t * .7 + p[3]) * .25)); c.done(); });
+    return c; }
   function streetLamps(seg, spots) { const g = merge([[new THREE.CylinderGeometry(.5, .7, 26, 5), T4(0, 13, 0)], [new THREE.BoxGeometry(6, .6, 1.2), T4(-3, 26, 0)]]), p = inst(g, M.dark, spots.length), bulbs = inst(new THREE.SphereGeometry(1.2, 6, 4), M.lamp, spots.length, true), pl = inst(new THREE.PlaneGeometry(26, 26).rotateX(-Math.PI / 2), M.pool, spots.length);
     spots.forEach((s, i) => { set(p, i, s[0], 0, s[1], s[2]); const ox = -Math.cos(s[2]) * 6, oz = Math.sin(s[2]) * 6; set(bulbs, i, s[0] + ox, 25.4, s[1] + oz, 0); bulbs.instanceColor.setXYZ(i, 1.7, 1.4, .9); set(pl, i, s[0] + ox, .4, s[1] + oz, 0); }); seg.group.add(p, bulbs, pl); }
 
@@ -368,16 +418,14 @@ export function makeWorld(THREE, O = {}) {
     const twM = inst(new THREE.BoxGeometry(6.5, .25, 12).translate(0, .15, 0), new THREE.MeshLambertMaterial(), tw.length, true); tw.forEach((p, i) => { set(twM, i, p[0], 0, p[1], p[2]); twM.instanceColor.setXYZ(i, ...QC.set(TOWEL[(R() * TOWEL.length) | 0]).toArray()); }); seg.group.add(twM);
     const umC = inst(new THREE.ConeGeometry(8, 3.4, 10).translate(0, 13, 0), new THREE.MeshLambertMaterial(), um.length, true), umP = inst(new THREE.CylinderGeometry(.3, .3, 13, 4).translate(0, 6.5, 0), M.white, um.length);
     um.forEach((p, i) => { set(umC, i, p[0], 0, p[1], 0); set(umP, i, p[0], 0, p[1], 0); umC.instanceColor.setXYZ(i, ...QC.set(TOWEL[(R() * TOWEL.length) | 0]).toArray()); }); seg.group.add(umC, umP);
-    const lying = tw.slice(0, 30), lyB = inst(lyingG, M.person, lying.length, true), lyH = inst(lyingHead, M.person, lying.length, true);
-    lying.forEach((p, i) => { setE(lyB, i, p[0], .3, p[1] - 1, 0, p[2], 0, 1); setE(lyH, i, p[0], .3, p[1] - 1, 0, p[2], 0, 1); lyB.instanceColor.setXYZ(i, ...QC.set(TOWEL[(R() * TOWEL.length) | 0]).toArray()); lyH.instanceColor.setXYZ(i, ...QC.set(BEACH_SKIN[(R() * BEACH_SKIN.length) | 0]).toArray()); });
-    lyB.instanceColor.needsUpdate = lyH.instanceColor.needsUpdate = true; seg.group.add(lyB, lyH);
-    const walkers = []; for (let i = 0; i < 30; i++) { const lane = R() < .45 ? SHORE + 10 + R() * 14 : R() < .5 ? 128 + R() * 10 : SHORE + 40 + R() * 150; walkers.push([lane, (R() - .5) * len, R() < .5 ? 0 : Math.PI, -1]); }
+    const SWIM = ["#e4566b", "#f0d375", "#3aa8ff", "#111318", "#ff7a3a", "#7ee0b0", "#ffffff", "skin", "skin"];
+    const swimShirt = (R) => SWIM[(R() * SWIM.length) | 0], swimPants = (R) => ["#1f2a44", "#e4566b", "#3aa8ff", "#111318", "#f0d375", "#ff7a3a"][(R() * 6) | 0];
+    crowd(seg.group, R, tw.slice(0, 30).map(p => [p[0], p[1] + 4, p[2]]), { mode: 2, shirt: swimShirt, pants: swimPants, skin: BEACH_SKIN, y: .2 });   // sunbathers on the towels
+    const walkers = []; for (let i = 0; i < 30; i++) { const lane = R() < .45 ? SHORE + 10 + R() * 14 : R() < .5 ? 128 + R() * 10 : SHORE + 40 + R() * 150; walkers.push([lane, (R() - .5) * len, R() < .5 ? 0 : Math.PI, -1, 0]); }
     const net = []; for (let i = 0; i < 2; i++) net.push([SHORE + 120 + i * 50, (R() - .5) * len * .6]);
     net.forEach(n => { seg.group.add(mesh(merge([[new THREE.CylinderGeometry(.4, .4, 12, 4), T4(n[0], 6, n[1] - 14)], [new THREE.CylinderGeometry(.4, .4, 12, 4), T4(n[0], 6, n[1] + 14)], [new THREE.BoxGeometry(.2, 3.5, 28), T4(n[0], 9.5, n[1])]]), M.white));
       for (let k = 0; k < 4; k++) walkers.push([n[0] + (k < 2 ? -10 : 10), n[1] + (k % 2 ? 7 : -7), k < 2 ? Math.PI / 2 : -Math.PI / 2, -1, 1]); });   // players (they hop)
-    const wB = inst(bodyG, M.person, walkers.length, true), wH = inst(headG, M.person, walkers.length, true);
-    walkers.forEach((p, i) => { wB.instanceColor.setXYZ(i, ...QC.set(TOWEL[(R() * TOWEL.length) | 0]).toArray()); wH.instanceColor.setXYZ(i, ...QC.set(BEACH_SKIN[(R() * BEACH_SKIN.length) | 0]).toArray()); p.push(R() * 6, 8 + R() * 10); });
-    seg.group.add(wB, wH);
+    const wk = crowd(seg.group, R, walkers.map(p => [p[0], p[1], p[2], -1, p[4] ? 0 : 1]), { shirt: swimShirt, pants: swimPants, skin: BEACH_SKIN }); walkers.forEach(p => p.push(R() * 6, 8 + R() * 10));
     const lg = new THREE.Group(); lg.position.set(SHORE + 70, 0, (R() - .5) * len * .5); seg.group.add(lg);   // lifeguard tower: stilts, blue hut, white trim, ramp, a red rescue can
     lg.add(mesh(merge([[new THREE.CylinderGeometry(.5, .5, 9, 4), T4(-6, 4.5, -5)], [new THREE.CylinderGeometry(.5, .5, 9, 4), T4(6, 4.5, -5)], [new THREE.CylinderGeometry(.5, .5, 9, 4), T4(-6, 4.5, 5)], [new THREE.CylinderGeometry(.5, .5, 9, 4), T4(6, 4.5, 5)], [new THREE.BoxGeometry(5, .5, 16), T4(12, 4.5, 0, 0, 0, -.5)]]), M.white));
     lg.add(mesh(new THREE.BoxGeometry(14, 9, 12).translate(0, 13.5, 0), new THREE.MeshLambertMaterial({ color: 0x5fa8d8 }))); lg.add(mesh(new THREE.BoxGeometry(16, 1, 14).translate(0, 18.5, 0), M.white));
@@ -387,21 +435,20 @@ export function makeWorld(THREE, O = {}) {
     for (let i = 0; i < NS; i++) surf.push({ ph: R(), z0: (R() - .5) * len, v: (R() < .5 ? -1 : 1) * (18 + R() * 16), c: SURF[i % SURF.length] });
     for (let i = 0; i < NP; i++) padl.push({ d: 150 + R() * 130, z: (R() - .5) * len * .9, ry: R() * TAU, ph: R() * 6, c: SURF[(R() * SURF.length) | 0] });
     for (let i = 0; i < NH; i++) heads.push({ d: 70 + R() * 150, z: (R() - .5) * len * .9, ph: R() * 6 });
-    const bd = inst(boardG, new THREE.MeshStandardMaterial({ roughness: .3, metalness: .1 }), NS + NP, true), rB = inst(bodyG, M.person, NS, true), rH = inst(headG, M.person, NS + NH, true), pB = inst(lyingG, M.person, NP, true), pH = inst(lyingHead, M.person, NP, true);
-    surf.forEach((s, i) => { bd.instanceColor.setXYZ(i, ...QC.set(s.c).toArray()); rB.instanceColor.setXYZ(i, ...QC.set(R() < .5 ? "#111318" : "#2c4a7a").toArray()); rH.instanceColor.setXYZ(i, ...QC.set(BEACH_SKIN[(R() * BEACH_SKIN.length) | 0]).toArray()); });
-    padl.forEach((s, i) => { bd.instanceColor.setXYZ(NS + i, ...QC.set(s.c).toArray()); pB.instanceColor.setXYZ(i, ...QC.set("#111318").toArray()); pH.instanceColor.setXYZ(i, ...QC.set(BEACH_SKIN[(R() * BEACH_SKIN.length) | 0]).toArray()); });
-    heads.forEach((s, i) => rH.instanceColor.setXYZ(NS + i, ...QC.set(BEACH_SKIN[(R() * BEACH_SKIN.length) | 0]).toArray()));
-    seg.group.add(bd, rB, rH, pB, pH);
+    const bd = inst(boardG, new THREE.MeshStandardMaterial({ roughness: .3, metalness: .1 }), NS + NP, true);
+    surf.forEach((s2, i) => bd.instanceColor.setXYZ(i, ...QC.set(s2.c).toArray())); padl.forEach((s2, i) => bd.instanceColor.setXYZ(NS + i, ...QC.set(s2.c).toArray())); seg.group.add(bd);
+    const riders = crowd(seg.group, R, surf.map(() => [0, 0, 0, -1, 6]), { shirt: () => "#111318", pants: () => "#111318", skin: BEACH_SKIN });   // wetsuits
+    const paddlers = crowd(seg.group, R, padl.map(() => [0, 0, 0, -1, 3]), { shirt: () => "#111318", pants: () => "#111318", skin: BEACH_SKIN });
+    const swimmers = crowd(seg.group, R, heads.map(() => [0, 0, 0, -1, 0]), { shirt: swimShirt, pants: swimPants, skin: BEACH_SKIN });
     const LAMB = 2 * Math.PI / .045;
     const animate = (t, dt, near) => {
-      walkers.forEach((p, i) => { const hop = p[4] ? Math.max(0, Math.sin(t * 5 + p[6])) * 3 : Math.abs(Math.sin(t * 6 + p[6])) * .5, z = p[4] ? p[1] : ((p[1] + t * p[7] * (p[2] ? -1 : 1) + len * 50) % len) - len / 2;
-        set(wB, i, p[0], hop, z, p[2] + (p[4] ? 0 : Math.sin(t * 3 + p[6]) * .1)); set(wH, i, p[0], hop, z, p[2]); });
-      surf.forEach((s, i) => { const d = 125 - ((t * 26 + s.ph * 95) % 95), x = SHORE - d, z = ((s.z0 + t * s.v + len * 60) % len) - len / 2, lean = Math.sin(t * 1.4 + i) * .25;
-        setE(bd, i, x, 3.2, z, 0, s.v > 0 ? -.35 : Math.PI + .35, lean * .4, 1); setE(rB, i, x, 3.6, z, 0, s.v > 0 ? -1.2 : 1.9, lean, 1); setE(rH, i, x, 3.6, z, 0, 0, lean, 1);
-        if (near && FX && Math.random() < dt * 14) { const gp = seg.group.getWorldPosition(GPV); FX.emit(SMP.set(gp.x + x + (Math.random() - .5) * 3, 2.5, gp.z + z - Math.sign(s.v) * 8), SMV.set(wind.x - 6, 8 + Math.random() * 6, wind.z - Math.sign(s.v) * 10), .8, 2, 7, [.95, .95, .95], [.85, .88, .9], .7, false, 0, .5, -10); } });
-      padl.forEach((s, i) => { const y = .6 + Math.sin(t * 1.3 + s.ph) * .8; setE(bd, NS + i, SHORE - s.d, y, s.z, Math.sin(t * 1.1 + s.ph) * .06, s.ry, 0, 1); setE(pB, i, SHORE - s.d, y + .2, s.z - 1, 0, s.ry, 0, 1); setE(pH, i, SHORE - s.d, y + .2, s.z - 1, 0, s.ry, 0, 1); });
-      heads.forEach((s, i) => set(rH, NS + i, SHORE - s.d, -6.2 + Math.sin(t * 1.5 + s.ph) * .7, s.z, 0));
-      [wB, wH, bd, rB, rH, pB, pH].forEach(m => m.instanceMatrix.needsUpdate = true); };
+      walkers.forEach((p, i) => { const hop = p[4] ? Math.max(0, Math.sin(t * 5 + p[5])) * 3 : 0, z = p[4] ? p[1] : ((p[1] + t * p[6] * (p[2] ? -1 : 1) + len * 50) % len) - len / 2; wk.set(i, p[0], hop, z, p[2]); }); wk.done();
+      surf.forEach((s2, i) => { const d = 125 - ((t * 26 + s2.ph * 95) % 95), x = SHORE - d, z = ((s2.z0 + t * s2.v + len * 60) % len) - len / 2, lean = Math.sin(t * 1.4 + i) * .25, ry = s2.v > 0 ? -.35 : Math.PI + .35;
+        setE(bd, i, x, 3.2, z, 0, ry, lean * .4, 1); setE(riders.im, i, x, 3.5, z, 0, ry + Math.PI / 2, lean, 1);
+        if (near && FX && Math.random() < dt * 14) { const gp = seg.group.position; FX.emit(SMP.set(gp.x + x + (Math.random() - .5) * 3, 2.5, gp.z + z - Math.sign(s2.v) * 8), SMV.set(wind.x - 6, 8 + Math.random() * 6, wind.z - Math.sign(s2.v) * 10), .8, 2, 7, [.95, .95, .95], [.85, .88, .9], .7, false, 0, .5, -10); } });
+      padl.forEach((s2, i) => { const y = .6 + Math.sin(t * 1.3 + s2.ph) * .8; setE(bd, NS + i, SHORE - s2.d, y, s2.z, Math.sin(t * 1.1 + s2.ph) * .06, s2.ry, 0, 1); setE(paddlers.im, i, SHORE - s2.d - Math.sin(s2.ry) * 3, y + .4, s2.z - Math.cos(s2.ry) * 3, 0, s2.ry + Math.PI, 0, 1); });
+      heads.forEach((s2, i) => swimmers.set(i, SHORE - s2.d, -6.4 + Math.sin(t * 1.5 + s2.ph) * .6, s2.z, s2.ph));
+      [bd, riders.im, paddlers.im, swimmers.im].forEach(m => m.instanceMatrix.needsUpdate = true); };
     animate(0, 0, false);
     seg.tick.push((t, dt, near) => { oceanM.uniforms.t.value = t; if (near) animate(t, dt, near); });
     if (kind === "pier" || kind === "venice") pier(seg, R, len, kind);
@@ -414,7 +461,7 @@ export function makeWorld(THREE, O = {}) {
     const lm = inst(new THREE.SphereGeometry(1.3, 6, 4), M.lamp, 28, true), lp = inst(new THREE.CylinderGeometry(.3, .3, 9, 4).translate(0, 4.5, 0), M.dark, 28);
     for (let i = 0; i < 28; i++) { const x = -600 + i * 27, z = i % 2 ? 16 : -16; set(lp, i, x, 13, z, 0); set(lm, i, x, 22.5, z, 0); lm.instanceColor.setXYZ(i, 1.8, 1.5, 1); } g.add(lm, lp);
     const strollers = []; for (let i = 0; i < 18; i++) strollers.push([-560 + R() * 680, (R() - .5) * 24, R() < .5 ? Math.PI / 2 : -Math.PI / 2, -1]);
-    const pg = { group: g, tick: seg.tick }; people(pg, R, strollers.map(p => [p[0], p[1], p[2], p[3]]), true); g.children.slice(-2).forEach(m => m.position.y = 13.2);
+    crowd(g, R, strollers.map(p => [p[0], p[1], p[2], -1, 1]), { y: 13.2, skin: BEACH_SKIN, shirt: (R) => TOWEL[(R() * TOWEL.length) | 0] });   // strolling the pier
     if (kind === "pier") { const wheel = new THREE.Group(); wheel.position.set(-430, 70, -30); g.add(wheel); wheel.add(mesh(new THREE.TorusGeometry(46, 1.4, 6, 40), M.white));
       const spk = []; for (let i = 0; i < 12; i++) spk.push([new THREE.BoxGeometry(.8, 92, .8), T4(0, 0, 0, 0, 0, i / 12 * Math.PI)]); wheel.add(mesh(merge(spk), M.white));
       const cabs = inst(new THREE.BoxGeometry(6, 6, 6), M.lamp, 12, true); wheel.add(cabs); g.add(mesh(new THREE.CylinderGeometry(2, 3, 60, 5).translate(0, 30, 0), M.white, -430, 12, -30));
@@ -426,12 +473,14 @@ export function makeWorld(THREE, O = {}) {
       n.add(mesh(new THREE.BoxGeometry(100, 3, 50).translate(0, 23.5, -18), new THREE.MeshStandardMaterial({ color: 0x1d6f8a, roughness: .5 })));          // ocean-blue roof band
       n.add(mesh(new THREE.BoxGeometry(80, 1.2, 10).translate(0, 14, 7.5), new THREE.MeshStandardMaterial({ color: 0xff7a3a, roughness: .5 })));          // orange awning
       n.add(mesh(new THREE.BoxGeometry(70, 9, .6).translate(0, 6, 5.4), new THREE.MeshBasicMaterial({ color: 0xffd7a0, toneMapped: false })));             // lit windows
-      const lf = mesh(new THREE.CircleGeometry(13, 40), new THREE.MeshBasicMaterial({ map: naluTex, transparent: true, toneMapped: false }), 0, 31, 6); n.add(lf);   // round sign on a post
-      n.add(mesh(new THREE.CylinderGeometry(.6, .6, 10, 5).translate(0, 22, 5.6), M.dark));
-      const lr = mesh(new THREE.CircleGeometry(19, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: naluTex, transparent: true, toneMapped: false }), 0, 25.2, -18); n.add(lr);
+      const lf = mesh(new THREE.CircleGeometry(22, 48), new THREE.MeshBasicMaterial({ map: naluTex, transparent: true, toneMapped: false }), 0, 46, 8); lf.rotation.x = -.28; n.add(lf);   // big round sign facing the approach, tipped up toward you
+      n.add(mesh(new THREE.TorusGeometry(22.6, 1.1, 8, 48), new THREE.MeshBasicMaterial({ color: 0xff8a8a, toneMapped: false }), 0, 46, 7.6)).rotation.x = -.28;
+      n.add(mesh(merge([[new THREE.CylinderGeometry(.8, .8, 26, 6), T4(-14, 13, 7)], [new THREE.CylinderGeometry(.8, .8, 26, 6), T4(14, 13, 7)]]), M.dark));
+      const lr = mesh(new THREE.CircleGeometry(27, 48).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: naluTex, transparent: true, toneMapped: false }), 0, 25.4, -18); n.add(lr);   // lit rooftop logo, readable from above
+      n.add(mesh(new THREE.RingGeometry(27, 30, 48).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xffb070, toneMapped: false }), 0, 25.3, -18));
       const tb = inst(new THREE.CylinderGeometry(3.2, 3.2, .8, 10).translate(0, 4.6, 0), M.white, 8), ub = inst(new THREE.ConeGeometry(7, 3, 8).translate(0, 12, 0), new THREE.MeshLambertMaterial(), 8, true);
       const diners = []; for (let i = 0; i < 8; i++) { const x = ((i % 4) - 1.5) * 26, z = 26 + (i / 4 | 0) * 22; set(tb, i, x, 0, z, 0); set(ub, i, x, 0, z, 0); ub.instanceColor.setXYZ(i, ...QC.set(i % 2 ? "#ff7a3a" : "#1d9bb8").toArray()); diners.push([nx + x - 4, pz + z, Math.PI / 2, -1], [nx + x + 4, pz + z, -Math.PI / 2, -1]); }
-      n.add(tb, ub); const dg = { group: seg.group, tick: seg.tick }; people(dg, R, diners, true); seg.group.children.slice(-2).forEach(m => { m.position.y = 13.2; m.scale.y = .8; });
+      n.add(tb, ub); crowd(g, R, diners.map(d => [d[0], d[1] - pz, d[2], -1, 4]), { y: 13.4, skin: BEACH_SKIN });   // diners, seated
       const bulbs = []; const swag = (a, b) => { for (let k = 1; k < 16; k++) { const u = k / 16; bulbs.push([a[0] + (b[0] - a[0]) * u, 20 - Math.sin(u * Math.PI) * 5, a[1] + (b[1] - a[1]) * u]); } };
       swag([-60, 8], [60, 8]); swag([-60, 52], [60, 52]); swag([-60, 8], [-60, 52]); swag([60, 8], [60, 52]); swag([-60, 8], [60, 52]);
       const bl = inst(new THREE.SphereGeometry(.85, 6, 4), M.lamp, bulbs.length, true); bulbs.forEach((b, i) => { set(bl, i, b[0], b[1], b[2], 0); bl.instanceColor.setXYZ(i, 1.8, 1.35, .7); }); n.add(bl);
@@ -458,6 +507,6 @@ export function makeWorld(THREE, O = {}) {
     seg.dispose = () => { seg.group.traverse(n => { if (n.isInstancedMesh) n.dispose(); if (n.isMesh && n.geometry && !SHARED.has(n.geometry)) n.geometry.dispose(); }); };
     seg.update(0, 0, false); return seg;
   }
-  const SHARED = new Set([box, trunkG, crownG, carG, lampG, poolG, bodyG, headG, boardG, lyingG, lyingHead]);
+  const SHARED = new Set([box, trunkG, crownG, carG, lampG, poolG, bodyG, headG, boardG, lyingG, lyingHead, PERSON]);
   return { segment, root, wind, tick, debris, sun: SUN, M, ocean: oceanM, coverTex, logoTex };
 }

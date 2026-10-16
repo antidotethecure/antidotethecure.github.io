@@ -118,6 +118,7 @@ export function makeFX(THREE, scene, O = {}) {
     parts.push(o); }
   const glows = [];
   function glow(p, size, col, a) { glows.push(p.x, p.y, p.z, size, col[0], col[1], col[2], a); }
+  const darks = []; function dark(p, size, a) { darks.push(p.x, p.y, p.z, size, a); }   // a one-frame scorch spot (normal blend)
   function put(B, x, y, z, rot, r, g, b, size, a, slot) { if (B.n >= MAX) return; const i = B.n++; B.P[i * 4] = x; B.P[i * 4 + 1] = y; B.P[i * 4 + 2] = z; B.P[i * 4 + 3] = rot; B.C[i * 4] = r; B.C[i * 4 + 1] = g; B.C[i * 4 + 2] = b; B.C[i * 4 + 3] = size; B.A[i] = a; B.S[i] = slot; }
   function update(dt) { const s = Math.min(.05, dt); SM.n = AD.n = 0;
     for (let i = parts.length - 1; i >= 0; i--) { const o = parts[i]; o.age += s; if (o.age >= o.life) { free.push(o); parts[i] = parts[parts.length - 1]; parts.pop(); continue; }
@@ -125,7 +126,7 @@ export function makeFX(THREE, scene, O = {}) {
       const u = o.age / o.life, fade = Math.min(1, u * 8) * (1 - u) * (1 - u) * 1.3;
       put(o.add ? AD : SM, o.x, o.y, o.z, o.rot, lerp(o.c0[0], o.c1[0], u), lerp(o.c0[1], o.c1[1], u), lerp(o.c0[2], o.c1[2], u), lerp(o.s0, o.s1, u), o.a * fade, o.slot); }
     for (let i = 0; i < glows.length; i += 8) put(AD, glows[i], glows[i + 1], glows[i + 2], 0, glows[i + 4], glows[i + 5], glows[i + 6], glows[i + 3], glows[i + 7], 1);
-    glows.length = 0;
+    glows.length = 0; for (let i = 0; i < darks.length; i += 5) put(SM, darks[i], darks[i + 1], darks[i + 2], 0, .07, .05, .045, darks[i + 3], darks[i + 4], 1); darks.length = 0;
     [SM, AD].forEach(B => { B.g.instanceCount = B.n; [B.aP, B.aC, B.aA, B.aS].forEach(a => { a.needsUpdate = true; a.clearUpdateRanges && a.clearUpdateRanges(); }); }); }
   function clear() { parts.length = 0; glows.length = 0; }
   // a full explosion at p (world units scale k): flash, fireballs, smoke column, embers
@@ -137,7 +138,7 @@ export function makeFX(THREE, scene, O = {}) {
       emit(P2.copy(p).add(V.set(Math.cos(a) * 3 * k, Math.random() * 3 * k, Math.sin(a) * 3 * k)), V.set(wx + Math.cos(a) * sp, wy + e * sp, wz + Math.sin(a) * sp), .7 + Math.random() * .6, 14 * k, 40 * k, [1, .78, .35], [.9, .25, .05], 1, true, 0, 2.2, 6 * k);
       emit(P2, V.set(wx + Math.cos(a) * sp * .6, wy + e * sp * .5, wz + Math.sin(a) * sp * .6), 2.2 + Math.random() * 1.6, 12 * k, 46 * k, [.32, .29, .28], [.12, .11, .11], .6, false, 0, 1.3, 9 * k); }
     for (let i = 0; i < 26; i++) { const a = Math.random() * 6.283, sp = (30 + Math.random() * 60) * k; emit(p, V.set(wx + Math.cos(a) * sp, wy + (Math.random() * 1.4 - .2) * sp, wz + Math.sin(a) * sp), .6 + Math.random() * .8, 2.4 * k, .8 * k, [1, .85, .4], [1, .35, .1], 1, true, 1, .8, -40 * k); } }
-  return { emit, glow, update, clear, boom, meshes: [SM.mesh, AD.mesh] };
+  return { emit, glow, dark, update, clear, boom, meshes: [SM.mesh, AD.mesh] };
 }
 
 /* ---------- wounds on one aircraft ---------- */

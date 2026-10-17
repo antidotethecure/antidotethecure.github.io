@@ -10,9 +10,9 @@ export function makeVideoBoards(THREE, O) {
   Object.assign(video, { src: O.src, muted: true, loop: true, playsInline: true, autoplay: true, preload: "auto", crossOrigin: "anonymous" });
   video.setAttribute("muted", ""); video.setAttribute("playsinline", ""); video.setAttribute("webkit-playsinline", ""); video.defaultMuted = true;
   video.style.cssText = "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none";
-  const vtex = new THREE.VideoTexture(video); vtex.colorSpace = THREE.SRGBColorSpace; vtex.minFilter = THREE.LinearFilter; vtex.generateMipmaps = false;
+  const vtex = new THREE.VideoTexture(video); vtex.colorSpace = THREE.SRGBColorSpace; vtex.minFilter = THREE.LinearFilter; vtex.magFilter = THREE.LinearFilter; vtex.generateMipmaps = false; vtex.anisotropy = 1;   // crisp: no mip blur, no re-scaling (the file is 640×1138 H.264 High)
   const ptex = new THREE.TextureLoader().load(O.poster); ptex.colorSpace = THREE.SRGBColorSpace;
-  const U = { uVid: { value: vtex }, uPoster: { value: ptex }, uLive: { value: 0 }, uT: { value: 0 }, uGrid: { value: new THREE.Vector2(O.cols || 90, O.rows || 160) }, uBright: { value: O.bright || 1.6 } };
+  const U = { uVid: { value: vtex }, uPoster: { value: ptex }, uLive: { value: 0 }, uT: { value: 0 }, uGrid: { value: new THREE.Vector2(O.cols || 216, O.rows || 384) }, uBright: { value: O.bright || 1.6 } };
   let tried = 0; const tryPlay = () => { tried++; const p = video.play(); if (p && p.catch) p.catch(() => {}); };
   video.addEventListener("playing", () => { U.uLive.value = 1; api.playing = true; });
   ["pointerdown", "touchstart", "keydown"].forEach(ev => window.addEventListener(ev, () => { if (video.paused) tryPlay(); }, { passive: true }));
@@ -25,7 +25,7 @@ export function makeVideoBoards(THREE, O) {
         c = pow(c, vec3(2.2));                                            // video is sRGB; the bright LED value lives in linear space
         vec2 g = fract(vUv * uGrid) - .5; float led = smoothstep(.5, .28, max(abs(g.x), abs(g.y)));   // the LED pixel grid
         float scan = .96 + .04 * sin(uT * 40.0 + vUv.y * 600.0);
-        gl_FragColor = vec4(c * (.35 + .65 * led) * uBright * scan + c * .08, 1.0); }` });
+        gl_FragColor = vec4(c * (.86 + .14 * led) * uBright * scan + c * .04, 1.0); }   // a fine, faint LED pitch: the review stays sharp (no visible boxes)` });
   const bezel = new THREE.MeshStandardMaterial({ color: 0x0c0d10, roughness: .5, metalness: .6 }), steel = new THREE.MeshStandardMaterial({ color: 0x5d636c, roughness: .45, metalness: .8 });
   const glowTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 64; const x = c.getContext("2d"), g = x.createRadialGradient(32, 32, 0, 32, 32, 32); g.addColorStop(0, "rgba(255,255,255,.9)"); g.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = g; x.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
   const capTex = (txt) => { const c = document.createElement("canvas"); c.width = 1024; c.height = 64; const x = c.getContext("2d"); x.fillStyle = "#0b0b0e"; x.fillRect(0, 0, 1024, 64); x.font = "800 34px Arial, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillStyle = "#f0d375"; x.shadowColor = "#f0d375"; x.shadowBlur = 10; x.fillText(txt, 512, 34); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; };

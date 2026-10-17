@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Nalu Vida — Menu, Drinks &amp; Surf Game</title>
 <script src="../lang-th.js"></script>
-<script src="../gamepad.js?v=20261013gp1"></script>
+<script src="../gamepad.js?v=20261017gp3"></script>
 <script>/* ===== NALU VIDA REWARDS: the ONE place to change the program (Christian's feedback, 2026-10). =====
    One points balance for Nalu Vida (separate from Melody). The rewards card, the "How to earn" sheet and the surf
    game's end screen all read from here. Proposed defaults until Christian approves them. */
@@ -345,12 +345,14 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <script src="../reviewegg.js"></script>
 <script src="../halftime.js"></script>
 <script src="../radio-avatar.js"></script>
-<script src="game.js?v=e3n3"></script>
+<script src="../songswitch.js?v=ms1"></script>
+<script src="game.js?v=ms1-e3n3"></script>
 <script>(function(){ var gp=(window.SSAI_REWARDS&&window.SSAI_REWARDS.game)||{}, per=gp.perScore||100, cap=gp.dailyCap||50;
 window.GAME_MENU={id:"nalu-vida",name:"Ride the Nalu",by:"Nalu Vida",tagline:"Run in, paddle out, ride the wave home to Nalu Vida. 5 levels. Earn Rewards points.",
  logo:"img/logo.png",hero:["img/game/card-3d-beach.webp?v=n3","img/game/card-3d-rain.webp?v=n3","img/game/surfer_m.webp"],
  theme:{bg:"#06182e",bg2:"#0b3b5e",card:"#0f3354",edge:"#1d4f78",accent:"#ff7a3d",accent2:"#ffd23f",label:"#ffd23f",ink:"#f4fbff",dim:"#a9c8de",btnInk:"#3a1600",soft:"rgba(127,227,242,.10)",track:"rgba(255,255,255,.22)",good:"#3ddc97",bad:"#ff6b6b",display:"'Alfa Slab One',Georgia,serif",body:"system-ui,-apple-system,sans-serif"},
  tokens:false,spinBadge:false,
+ selects:[{title:"Song",options:[["cheat","Cheat Code"],["xrp","Xtreme Rich Person"]],get:function(){ return window.GameMusic?GameMusic.cur().id:"cheat"; },set:function(v){ if(window.GameMusic) GameMusic.set(v); }}],
  mount:"#nalu-game .nv-wrap",hide:"#nv-start",start:function(){ window.__NV.pick(); },vibrate:true,
  // engine3d look: graphics tier, weather and time of day (visual only; they never change the game)
  selects:[{title:"Graphics",options:[["auto","Auto"],["low","Low"],["med","Medium"],["high","High"],["ultra","Ultra"]],note:"Auto picks for this phone and steps down if it gets choppy.",

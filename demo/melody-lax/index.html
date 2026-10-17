@@ -2132,23 +2132,28 @@ function boostDraw(now){ var bt=G.btr; if(!G.running||!bt||bt.length<4) return; 
       cx.fillStyle=g; cx.beginPath(); cx.moveTo(x0-7,y0); cx.lineTo(x0+7,y0); cx.lineTo(x0,y0+L); cx.closePath(); cx.fill(); });
     for(var q=0;q<5;q++){ var lx=Math.random()*W, ly=Math.random()*H; cx.strokeStyle="rgba(200,235,255,.22)"; cx.lineWidth=1.5; cx.beginPath(); cx.moveTo(lx,ly); cx.lineTo(lx,ly+40+Math.random()*40); cx.stroke(); } }
   cx.restore(); }
+/* steering = critically damped springs (no snapping, no overshoot): position follows the finger / mouse with ~150 ms response,
+   eased in and out; keys + gamepad ease the VELOCITY in and out the same way; altitude has its own spring; bank follows the
+   sideways speed proportionally and levels itself when you let go. SD.v holds the spring's rate (written back by the caller). */
+var SD={v:0}; function sdamp(cur,tgt,vel,T,maxV,h){ var w=2/T, x=w*h, e=1/(1+x+.48*x*x+.235*x*x*x), ch=cur-tgt, mc=maxV*T; if(ch>mc) ch=mc; else if(ch<-mc) ch=-mc;
+  var tmp=(vel+w*ch)*h; vel=(vel-w*tmp)*e; var out=cur-ch+(ch+tmp)*e; if((tgt-cur>0)===(out>tgt)){ out=tgt; vel=0; } SD.v=vel; return out; }
 function steer(dt,auto){ var s=dt/1000, n=Math.max(1,Math.ceil(dt/10)), h=s/n, kx=0, ky=0;
   if(auto){ G.tx=W/2; G.ty=G.landing?H*0.64:H-110; CTL.mode="ptr"; }
   if(CTL.mode==="key"){ kx=(CTL.keys.r?1:0)-(CTL.keys.l?1:0); ky=(CTL.keys.d?1:0)-(CTL.keys.u?1:0); }
   var kz=0; if(CH){ kz=-ky; ky=0; if(auto) G.ta=ALT_DEF; else G.ty=H-130; }   // chase view: up/down = climb/dive, you hold your place in the line
-  var bm=!auto&&G.boostT>0?BOOST.mul:1;
-  for(var i=0;i<n;i++){ var dvx,dvy,acc;
-    if(CTL.mode==="key"){ var l=Math.hypot(kx,ky)||1; dvx=kx/l*VKEY*bm; dvy=ky/l*VKEY*bm; acc=((kx||ky)?AKEY:DKEY)*bm; }
-    else { dvx=(G.tx-G.x)*KP*(bm>1?1.3:1); dvy=(G.ty-G.y)*KP*(bm>1?1.3:1); var m=Math.hypot(dvx,dvy), cap=auto?220:VMAX*bm; if(m>cap){ dvx*=cap/m; dvy*=cap/m; } acc=ACC*bm; }
-    var ax=dvx-G.mvx, ay=dvy-G.mvy, am=Math.hypot(ax,ay), lim=acc*h; if(am>lim){ ax*=lim/am; ay*=lim/am; }
-    G.mvx+=ax; G.mvy+=ay; G.x+=G.mvx*h; G.y+=G.mvy*h;
-    if(CH){ var kk=CTL.mode==="key"&&!auto, dvz=kk?kz*VKEY*.6*bm:Math.max(-VMAX*.42,Math.min(VMAX*.42,(G.ta-G.alt3)*KP*.8)), az=dvz-G.mvz, lz=(kk?(kz?AKEY:DKEY):ACC)*.7*h;
-      G.mvz+=Math.max(-lz,Math.min(lz,az)); G.alt3+=G.mvz*h; if(G.alt3<ALT_LO){ G.alt3=ALT_LO; if(G.mvz<0) G.mvz=0; } else if(G.alt3>ALT_HI){ G.alt3=ALT_HI; if(G.mvz>0) G.mvz=0; } }
+  var bm=!auto&&G.boostT>0?BOOST.mul:1, T=auto?.3:(bm>1?.095:.12), key=CTL.mode==="key"&&!auto;
+  for(var i=0;i<n;i++){
+    if(key){ var l=Math.hypot(kx,ky)||1, tx=kx/l*VKEY*bm, ty=ky/l*VKEY*bm, Tk=(kx||ky)?.11:.16;   // keys/gamepad: the speed eases in and out
+      G.mvx=sdamp(G.mvx,tx,G.kax||0,Tk,1e5,h); G.kax=SD.v; G.mvy=sdamp(G.mvy,ty,G.kay||0,Tk,1e5,h); G.kay=SD.v; G.x+=G.mvx*h; G.y+=G.mvy*h; }
+    else { G.x=sdamp(G.x,G.tx,G.mvx,T,VMAX*bm,h); G.mvx=SD.v; G.y=sdamp(G.y,G.ty,G.mvy,T,VMAX*bm,h); G.mvy=SD.v; }
+    if(CH){ if(key){ G.mvz=sdamp(G.mvz,kz*VKEY*.6*bm,G.kaz||0,kz?.12:.16,1e5,h); G.kaz=SD.v; G.alt3+=G.mvz*h; }
+      else { G.alt3=sdamp(G.alt3,G.ta,G.mvz,T*1.15,VMAX*.42*bm,h); G.mvz=SD.v; }
+      if(G.alt3<ALT_LO){ G.alt3=ALT_LO; if(G.mvz<0) G.mvz=0; } else if(G.alt3>ALT_HI){ G.alt3=ALT_HI; if(G.mvz>0) G.mvz=0; } }
     if(G.x<30){ G.x=30; if(G.mvx<0) G.mvx=0; } else if(G.x>W-30){ G.x=W-30; if(G.mvx>0) G.mvx=0; }
     if(G.y<H*.32){ G.y=H*.32; if(G.mvy<0) G.mvy=0; } else if(G.y>H-50){ G.y=H-50; if(G.mvy>0) G.mvy=0; } }
   if(CTL.mode==="key"){ G.tx=G.x; G.ty=G.y; if(CH) G.ta=G.alt3; }
-  // banking: eases toward the sideways speed (slight, max ~12 deg); a bump adds a short wobble. G.vx feeds both renderers' roll
-  G.bank+=(G.mvx/130-G.bank)*(1-Math.exp(-s*9)); if(G.wob>0) G.wob=Math.max(0,G.wob-s*1.1);
+  // banking: proportional to the sideways speed (max ~12 deg), critically damped, back to level when you stop; a bump adds a short wobble
+  var bt=Math.max(-1.3,Math.min(1.3,G.mvx/130)); G.bank=sdamp(G.bank,bt,G.bkv||0,.12,40,s); G.bkv=SD.v; if(G.wob>0) G.wob=Math.max(0,G.wob-s*1.1);
   G.vx=G.bank+(G.wob>0?Math.sin(G.el/60)*G.wob*7:0); }
 
 /* ---- other traffic (2026-10): a few slow, unbranded small planes share the sky. Steer around them. No shooting, no crashing:
@@ -2590,7 +2595,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=e3h"></script>
+<script type="module" src="melody3d.js?v=e3i"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}
@@ -2659,7 +2664,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-top"><div class="ms-hd"><p class="ms-by notranslate">Melody Bar &amp; Grill · Melody Approach</p>'+
       (live?'<span class="ms-beta on">'+esc(T("LIVE · Win this week"))+'</span>':'<span class="ms-beta">'+esc(T("BETA · Coming soon: win rewards"))+'</span>')+
       '<div class="ms-h" role="heading" aria-level="2">'+esc(T("Can you win the weekly challenge?"))+'</div></div>'+
-      '<div class="ms-pv" aria-hidden="true"><canvas id="mpv" width="120" height="180" style="background:#0c1220 url(img/game/card-3d-flight.webp?v=e3h) center/cover"></canvas><i>LIVE</i></div></div>'+
+      '<div class="ms-pv" aria-hidden="true"><canvas id="mpv" width="120" height="180" style="background:#0c1220 url(img/game/card-3d-flight.webp?v=e3i) center/cover"></canvas><i>LIVE</i></div></div>'+
     '<div class="ms-prize"><img src="'+esc(WK.img||"img/menu/melody-fries.jpg")+'" alt=""><div><small>'+esc(T(live?"This week's prize":"Weekly prize · coming soon"))+'</small><b>'+esc(T(prize))+'</b><em>'+esc(T(live?(WK.note||"Top score of the week wins"):"The boards are live now. Prizes switch on soon."))+'</em></div></div>'+
     '<div class="ms-food" aria-label="'+esc(T("Catch the food for points"))+'">'+FOOD.map(function(f){ return '<span class="ms-f" style="--d:'+f[4]+'" title="'+esc(T(f[1]))+'">'+(f[3]?'<span class="ms-st"><i></i><i></i><i></i></span>':'')+'<img src="'+g+f[0]+'.webp?v='+(f[5]||"ag1")+'" alt="'+esc(T(f[1]))+'"><b>'+f[2]+'</b></span>'; }).join("")+'</div>'+
     '<div class="ms-mode" role="group" aria-label="'+esc(T("Game mode"))+'">'+mbtn("campaign","🏆","Campaign","10 levels · 6 bosses",cur,T,esc)+mbtn("survival","⏱️","Survival","How long can you last?",cur,T,esc)+'</div>'+
@@ -2667,7 +2672,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-mvp">'+mvp(esc,T)+'</div></div>'; }
 document.addEventListener("click",function(e){ var b=e.target&&e.target.closest&&e.target.closest("[data-mel=mode]"); if(!b) return; e.preventDefault(); if(window.MELODY_MODE) MELODY_MODE(b.getAttribute("data-v")); if(window.GameMenu) GameMenu.refresh(); });
 window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill",tagline:"Night dogfight over LA: 10 levels and six bosses, or Survival. Catch the food, win the week.",
- hero:[g+"card-3d-flight.webp?v=e3h",g+"card-3d-boss.webp?v=e3h",g+"card-3d-beach.webp?v=e3h"],   // the 3D game (2026-10-16), not the old 2D sprites
+ hero:[g+"card-3d-flight.webp?v=e3i",g+"card-3d-boss.webp?v=e3i",g+"card-3d-beach.webp?v=e3i"],   // the 3D game (2026-10-16), not the old 2D sprites
  theme:{bg:"#0b1220",bg2:"#1c2547",card:"#141e34",edge:"#27324d",accent:"#d4af37",accent2:"#f0d375",label:"#f0d375",ink:"#f6f1e4",dim:"#9aa3b5",btnInk:"#1a1206",soft:"rgba(255,255,255,.06)",track:"#27324d",good:"#3fbf8f",bad:"#ff7a59",
   display:"Anton,Impact,'Arial Narrow',sans-serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
  tokens:false, showcase:showcase, preview:function(v){ if(window.__MG&&__MG.attract) __MG.attract(v); },
@@ -2726,7 +2731,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
   {group:"Weekly boards",items:[{icon:"🏆",name:"Campaign board",note:"Ranked by score (levels beaten add big bonuses)",pts:"score"},{icon:"⏱️",name:"Survival board",note:"Ranked by the longest time survived",pts:"time"}]}],
  prizes:{title:"Weekly challenge (BETA)",champion:"Top of each weekly board wins "+(WK.prize||"Free Melody Fries")+" once Melody turns rewards on",note:"BETA: rewards are off until Melody switches them on. Until then the boards rank players for bragging rights and the game gives no prizes or Melody Rewards points. When they're on: 1 point per "+GP.perScore+" score, up to "+GP.dailyCap+" points a day."}};
 })();</script>
-<script src="../gamemenu.js?v=e3h"></script><script src="../a2hs.js?v=mg1"></script>
+<script src="../gamemenu.js?v=e3i"></script><script src="../a2hs.js?v=mg1"></script>
 <script>/* Simple program (Christian, 2026-10): one balance, the numbers live in window.SSAI_REWARDS at the top of this page.
    No split wallets, visit levels, tokens, daily spin or welcome voucher (see crm.js SIMPLE). */
 window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Melody Approach",customerOnly:true};

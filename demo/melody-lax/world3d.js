@@ -18,9 +18,9 @@
    the break, towels, umbrellas, volleyball, a lifeguard tower, the boardwalk, the pier, and Nalu Vida on the pier with its logo.
    Used by melody3d.js (the game) and 3d-looks/look2.js + look3.js (the preview clips).
    makeWorld(THREE, {base, fx}) → { segment(kind, len, seed, o), root, wind, tick(dt, t), debris(...) }. */
-import { makeBeachKit } from "./beach3d.js?v=e3h";
-import { makeVideoBoards } from "../engine3d/billboard.js?v=e3h";
-import { makeFacades } from "../engine3d/facades.js?v=e3h";
+import { makeBeachKit } from "./beach3d.js?v=e3i";
+import { makeVideoBoards } from "../engine3d/billboard.js?v=e3i";
+import { makeFacades } from "../engine3d/facades.js?v=e3i";
 /* The storefront name. The real business is "Melody Bar & Grill"; change this one line to rename the awning / blade sign / door
    glass lettering (the gold logo boards use the real artwork, img/logo.png). */
 export const MELODY_SIGN_TEXT = "MELODY BAR & GRILL";
@@ -158,9 +158,14 @@ export function makeWorld(THREE, O = {}) {
   let VB = null; const vboards = () => VB || (VB = makeVideoBoards(THREE, { src: BASE + "img/review/billboard.mp4", poster: BASE + "img/review/billboard.jpg" }));
   // the review billboard shows up about once per 2 minutes of flight (O.clock = seconds flown); the first one ~1 minute in.
   // The Venice pier board counts toward the same budget. Warm-up strips (o.warm) always get one so its shader is compiled early.
-  let bbLast = -60, WARM = false; const bbDue = () => { if (WARM) return true; const t = O.clock ? O.clock() : performance.now() / 1000; if (t - bbLast >= 120) { bbLast = t; return true; } return false; };
+  // Sides alternate (left, right, left…); boards are never back to back (≥ 120 s of flight apart, so two are never on screen together).
+  let bbLast = O.bbFirst != null ? O.bbFirst : -60, bbSide = -1, WARM = false;
+  const bbDue = (side) => { if (WARM) return side || 1; const t = O.clock ? O.clock() : performance.now() / 1000; if (t - bbLast < (O.bbGap || 120)) return 0;
+    if (side && side !== bbSide) return 0;   // a fixed-side board (the pier) only when it's that side's turn
+    bbLast = t; const s = bbSide; bbSide = -bbSide; return s; };
+  const boardsAll = [];
   function billboard(group, x, z, ry, sc) { if (O.noVideo) return null; try { return billboard0(group, x, z, ry, sc); } catch (e) { O.noVideo = 1; console.warn("[world3d] video billboard off:", e); return null; } }
-  function billboard0(group, x, z, ry, sc) { const b = vboards().create({ w: 64 * (sc || 1), pole: 44, caption: "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" }); b.position.set(x, 0, z); b.rotation.y = ry || 0; group.add(b); return b; }
+  function billboard0(group, x, z, ry, sc) { const b = vboards().create({ w: 64 * (sc || 1), pole: 44, caption: "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" }); b.position.set(x, 0, z); b.rotation.y = ry || 0; group.add(b); if (!WARM) { boardsAll.push(b); if (boardsAll.length > 3) boardsAll.shift(); } return b; }
   function tick(dt, t) { UT.value = t; if (VB) VB.update(t); toppleTick(dt); for (let i = 0; i < DN; i++) { const d = DB[i]; if (d.life <= 0) continue; d.life -= dt; d.v.y -= 160 * dt; d.p.addScaledVector(d.v, dt); if (d.p.y < .8) { d.p.y = .8; if (Math.abs(d.v.y) > 25) { d.v.y = -d.v.y * .35; d.v.x *= .5; d.v.z *= .5; d.vr.multiplyScalar(.5); } else { d.v.set(wind.x, 0, wind.z); d.vr.set(0, 0, 0); } }   // chunks bounce once or twice, then rest
       d.r.x += d.vr.x * dt; d.r.y += d.vr.y * dt; d.r.z += d.vr.z * dt; DQ.setFromEuler(d.r); const s = d.life > 0 ? d.s : 0; debrisM.setMatrixAt(i, DM.compose(d.p, DQ, DS.set(s, s * .6, s * .8))); if (d.life <= 0) debrisM.setMatrixAt(i, ZERO); }
     debrisM.instanceMatrix.needsUpdate = true; }
@@ -337,7 +342,7 @@ export function makeWorld(THREE, O = {}) {
     seg.group.add(mesh(g, M.ground));
     const lots = [], tall = o.tall || 0, clear = (o.clear || []).slice(), palmSpots = [], lampSpots = [];
     // a review billboard beside the flight path on most city strips (in the lot between the 1st and 2nd avenue)
-    if (!o.noBillboard && bbDue()) { const sd = R() < .5 ? -1 : 1, bx = sd * (250 + R() * 60), bz = (R() - .5) * len * .45; clear.push([bx, bz, 90, 60]); billboard(seg.group, bx, bz, -sd * .28); }
+    let sd0; if (!o.noBillboard && (sd0 = bbDue())) { const sd = sd0, bx = sd * (250 + R() * 60), bz = (R() - .5) * len * .45; clear.push([bx, bz, 90, 60]); billboard(seg.group, bx, bz, -sd * .28); }
     const free = (x, z, w, d) => !clear.some(c => Math.abs(x - c[0]) < (w + c[2]) / 2 && Math.abs(z - c[1]) < (d + c[3]) / 2);
     for (let ax = 0; ax < AVE.length - 1; ax++) { const x0 = AVE[ax] + ROAD / 2 + SIDE + 4, x1 = AVE[ax + 1] - ROAD / 2 - SIDE - 4;
       for (let z0 = -len / 2 + ROAD / 2 + SIDE + 4; z0 < len / 2 - 40; z0 += CZ) { const z1 = Math.min(len / 2 - 6, z0 + CZ - ROAD - 2 * SIDE - 8);
@@ -624,7 +629,7 @@ export function makeWorld(THREE, O = {}) {
       const bl = inst(new THREE.SphereGeometry(.85, 6, 4), M.lamp, bulbs.length, true); bulbs.forEach((b, i) => { set(bl, i, b[0], b[1], b[2], 0); bl.instanceColor.setXYZ(i, 1.8, 1.35, .7); }); n.add(bl);
       const glow = mesh(new THREE.PlaneGeometry(200, 160).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffa860, opacity: .4, toneMapped: false }), 0, .8, 20); n.add(glow);
       seg.nalu = { x: nx, z: pz };
-      if (bbDue()) billboard(seg.group, SHORE + 70, pz + 70, .25, 1.1);   // by the pier, next to Nalu Vida: Antidote's review on a big LED screen
+      if (bbDue(-1)) billboard(seg.group, SHORE + 70, pz + 70, .25, 1.1);   // by the pier, next to Nalu Vida: Antidote's review on a big LED screen
       seg.tick.push((t, dt, near) => { glow.material.opacity = .34 + .06 * Math.sin(t * 2.6); if (near && FX && Math.random() < dt * 2) puff(SMP.set(seg.group.position.x + nx + 30, 40, seg.group.position.z + pz - 30), "steam", 1); });
     }
   }
@@ -656,5 +661,5 @@ export function makeWorld(THREE, O = {}) {
     U.sunDir.value.copy(info.sunDir); }
   function setDaylight(night, w) { const n = Math.max(.08, Math.min(1, night * 1.15 + (w ? w.dark * .5 : 0)));
     M.facade.emissiveIntensity = BASEI.facade * (.12 + .88 * n); M.pool.opacity = BASEI.pool * n; M.beam.opacity = BASEI.beam * n; M.lamp.color.setScalar(.35 + .65 * n); }
-  return { segment, root, wind, tick, debris, sun: SUN, M, ocean: oceanM, coverTex, logoTex, setDaylight, setSkyLight, beachWater: BEACH.water, setWind: (v) => { UWIND.value = v; } };
+  return { boards: () => boardsAll.filter(b => { let p = b.parent, n = 0; while (p && n++ < 12) { if (p.isScene) return true; p = p.parent; } return false; }), segment, root, wind, tick, debris, sun: SUN, M, ocean: oceanM, coverTex, logoTex, setDaylight, setSkyLight, beachWater: BEACH.water, setWind: (v) => { UWIND.value = v; } };
 }

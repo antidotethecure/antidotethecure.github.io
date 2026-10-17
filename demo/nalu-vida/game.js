@@ -2064,7 +2064,7 @@
     var c = document.createElement("canvas"); c.id = "nv-3d"; c.setAttribute("aria-hidden", "true"); wrap.insertBefore(c, cv); API3.canvas = c;
     var boot = function (M) { if (my !== gen3) return; M.init(API3).then(function (r) { if (my !== gen3) { r.dispose(); return; } R3 = r; D3 = true; gl_c.style.display = "none"; }, function (e) { if (my === gen3) off3D("init: " + (e && e.message || e)); }); };
     if (window.NV3D) boot(window.NV3D);
-    else { window.__NV3boot = boot; var s = document.createElement("script"); s.type = "module"; s.src = "game3d.js?v=e3n2"; s.onerror = function () { if (my === gen3) off3D("game3d.js failed to load"); }; document.head.appendChild(s); }
+    else { window.__NV3boot = boot; var s = document.createElement("script"); s.type = "module"; s.src = "game3d.js?v=e3n3"; s.onerror = function () { if (my === gen3) off3D("game3d.js failed to load"); }; document.head.appendChild(s); }
     setTimeout(function () { if (my === gen3 && !D3) off3D("3D took too long to load"); }, 25000);
   }
   if (RQ === "3d" || (RQ !== "2d" && PREF3)) on3D();

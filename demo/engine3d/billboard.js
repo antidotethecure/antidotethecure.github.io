@@ -42,6 +42,11 @@ export function makeVideoBoards(THREE, O) {
       const halo = new THREE.Mesh(new THREE.PlaneGeometry(w * 2.2, h * 1.7), new THREE.MeshBasicMaterial({ map: glowTex, color: 0x9fb8ff, transparent: true, opacity: .22, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); halo.position.set(0, pole + h / 2, -.8); g.add(halo);
       const pool = new THREE.Mesh(new THREE.PlaneGeometry(w * 2, w * 1.6).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, color: 0xb0c4ff, transparent: true, opacity: .28, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); pool.position.set(0, .6, w * .6); g.add(pool);
       g.userData.halo = halo; g.userData.pool = pool; return g; },
-    update(t) { U.uT.value = t; if (!api.playing && video.readyState >= 2 && !video.paused) { U.uLive.value = 1; api.playing = true; } } };
+    // the video only decodes while a board is actually in the scene (no board around → paused: no decode, no texture uploads)
+    update(t) { U.uT.value = t; if (!api.playing && video.readyState >= 2 && !video.paused) { U.uLive.value = 1; api.playing = true; }
+      if (++chk % 20 === 0) { for (let i = boards.length - 1; i >= 0; i--) if (!inScene(boards[i])) boards.splice(i, 1); const want = boards.length > 0;
+        if (!want && !video.paused) { video.pause(); hold = true; } else if (want && video.paused && hold) { hold = false; tryPlay(); } } } };
+  let chk = 0, hold = false; const boards = [], inScene = (o) => { let p = o.parent, n = 0; while (p && n++ < 12) { if (p.isScene) return true; p = p.parent; } return false; };
+  const create0 = api.create; api.create = (o) => { const g = create0(o); boards.push(g); return g; };
   return api;
 }

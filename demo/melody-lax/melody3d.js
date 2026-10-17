@@ -54,16 +54,16 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=e3j") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3j") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=e3k") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3k") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
-  const QM = await import("../engine3d/quality.js?v=e3j");
+  const QM = await import("../engine3d/quality.js?v=e3k");
   // every optional system loads and starts on its own: one that fails (import, shader, GPU feature) switches only itself off (STATUS.off)
   const FAILQ = (Q.get("fail") || "").split(",");   // test hook: ?fail=clouds,post,crowd,… makes those systems fail on purpose
   const offNote = (n, e) => { const m = n + ": " + String(e && e.message || e).slice(0, 80); if (!STATUS.off.includes(m)) STATUS.off.push(m); console.warn("[melody3d] " + m); };
   const safe = (n, fn) => { try { if (FAILQ.includes(n)) throw new Error("forced by ?fail"); return fn(); } catch (e) { offNote(n, e); return null; } };
   const safeA = async (n, fn) => { try { if (FAILQ.includes(n)) throw new Error("forced by ?fail"); return await fn(); } catch (e) { offNote(n, e); return null; } };
-  const impE = (n) => import("../engine3d/" + n + ".js?v=e3j").catch(e => { offNote(n, e); return null; });
+  const impE = (n) => import("../engine3d/" + n + ".js?v=e3k").catch(e => { offNote(n, e); return null; });
   const [PARTM, DMGM, ACM, SKYM, CLDM, WXM, POSTM, WATM, AUDM, CBM, APXM] = CHASE ? await Promise.all(["particles", "damage", "aircraft", "sky", "clouds", "weather", "postfx", "water", "audio", "combat", "apex"].map(impE)) : [];
   const W = M.W, H = M.H, S = M.S, FX = M.FX, FXI = FX._i(), TAU = Math.PI * 2;
   const D = 1000;                                   // camera height above the ground plane
@@ -85,7 +85,8 @@ async function boot() {
   const MOBILE = /iPhone|iPad|Android|Mobile|Tesla|QtCarBrowser/i.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
   const QUAL = window.__E3Q = QM.makeQuality({ id: "melody-lax", renderer, target: MOBILE ? 40 : 50, minFps: MOBILE ? 20 : 40, failSecs: MOBILE ? 8 : 5,
     calm: () => { const G = M.G(); return !G.running || (G.ens.length <= 3 && !G.ens.some(e => e && e.boss)); } });   // tier changes wait for a quiet moment
-  let WARMQ = 0; const SIDECAM = Q.get("side") === "1", BBCAM = Q.get("bbcam") === "1", CARCAM = Q.get("carcam") === "1", SMOOTH = QUAL.smooth, tierName = () => (QUAL.smooth ? "smooth" : QUAL.tier) + (QUAL.lock30 ? " 30" : "");
+  let WARMQ = 0; const OLDCAM = Q.get("cam") === "old", CAM_PITCH_DEG = 22, CAM_HEIGHT = 175, CAM_PLANE_DEG = 38, CAM_MIN_Y = 150;   // above-the-plane chase camera: tune here
+  const SIDECAM = Q.get("side") === "1", BBCAM = Q.get("bbcam") === "1", CARCAM = Q.get("carcam") === "1", SMOOTH = QUAL.smooth, tierName = () => (QUAL.smooth ? "smooth" : QUAL.tier) + (QUAL.lock30 ? " 30" : "");
   // GPU features: render targets fall back to 8-bit when half/float colour buffers aren't renderable (some iOS / older GPUs)
   const glc0 = renderer.getContext(), isGL2 = renderer.capabilities.isWebGL2, NOF = Q.get("nofloat") === "1";
   const CAPS = { gl2: isGL2, half: !NOF && isGL2 && !!(glc0.getExtension("EXT_color_buffer_float") || glc0.getExtension("EXT_color_buffer_half_float")), floatLin: !NOF && !!glc0.getExtension("OES_texture_float_linear") };
@@ -358,10 +359,10 @@ async function boot() {
       shake: (k) => { const G = M.G(); G.shake = Math.max(G.shake || 0, 14 + 14 * k); },
       onImpact: (p, k) => { for (const sg of SEGS.values()) if (Math.abs(p.z - sg.group.position.z) < sg.len / 2 + 200 && sg.scatter) sg.scatter(p.x, p.z, 120 + 60 * k); } }));
     // engine3d crowd: the Nalu Vida cast as real rigged, animated people (VAT-instanced far, SkinnedMesh near). Loads after the game is up.
-    if (renderer.capabilities.isWebGL2 && !FAILQ.includes("crowd")) import("../engine3d/crowd.js?v=e3j").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
+    if (renderer.capabilities.isWebGL2 && !FAILQ.includes("crowd")) import("../engine3d/crowd.js?v=e3k").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
       .then(c => { CROWD = c; STATUS.crowd = "on"; WARMQ = 1; if (TRAFFIC && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => c.setQuality(cfg.crowd)); }).catch(e => { offNote("crowd", e); STATUS.crowd = "off: " + (e && e.message || e); console.warn("[melody3d] crowd", e); });
     // engine3d traffic: Kenney CC0 cars on the street grid with signals, turns, brake lights, crossing pedestrians
-    (FAILQ.includes("traffic") ? Promise.reject(new Error("forced by ?fail")) : import("../engine3d/traffic.js?v=e3j").then(m => m.makeTraffic(THREE, { procedural: true, loader, base: new URL("../engine3d/assets/cars/", location.href).href, parent: scene, fx: FXA, quality: { density: QUAL.cfg.traffic } })))
+    (FAILQ.includes("traffic") ? Promise.reject(new Error("forced by ?fail")) : import("../engine3d/traffic.js?v=e3k").then(m => m.makeTraffic(THREE, { procedural: true, loader, base: new URL("../engine3d/assets/cars/", location.href).href, parent: scene, fx: FXA, quality: { density: QUAL.cfg.traffic } })))
       .then(tr => { TRAFFIC = tr; STATUS.traffic = "on"; WARMQ = 1; if (CROWD && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => tr.setQuality({ density: cfg.traffic })); }).catch(e => { offNote("traffic", e); STATUS.traffic = "off: " + (e && e.message || e); console.warn("[melody3d] traffic", e); });
     ENEMY = AIRM.buildAirliner(THREE, { livery: "enemy" }); MODELS.kami3 = { node: ENEMY.node, size: ENEMY.size };   // the head-on airliners: same detailed airframe, grey
   }
@@ -442,7 +443,7 @@ async function boot() {
   // chase view: the detailed airship (engine3d/blimp.js): fabric gores, fins, gondola, props, a scrolling LED band with
   // "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" on both sides, MELODY on top, the Nalu Vida logo low on the flanks + belly
   let BLIMP3 = null;
-  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3j").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
+  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3k").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
     BLIMP3 = BM.buildBlimp(THREE, { top: "MELODY", led: ["ANTIDOTE FOOD REVIEW", "antidotethefoodie.com"], logo: lt }); BLIMP3.node.visible = false; BLIMP3.node.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(BLIMP3.node); }
 
   /* ---------------- ground: lit aerial tiles, landmarks, runway, shadow catcher ---------------- */
@@ -825,7 +826,12 @@ async function boot() {
   function chaseCam(G, dt) {
     const X = PL.x - W / 2, Z = zm(PL.y, PL.Y) - H / 2, bank = Math.max(-1, Math.min(1, (G.vx || 0) * .12));
     // behind and a little above the plane; the camera follows you sideways most of the way so the field stays in view
-    CT.set(X * .9, Math.max(34, PL.Y * .85 + 76), Z + 248); LT.set(X * .82, Math.max(0, PL.Y * .7 + 14), Z - 380);   // further back + a bit higher: ~35% more of the world around you, plane in the lower middle wMesh.position.y = PL.Y + 1;
+    if (OLDCAM) { CT.set(X * .9, Math.max(34, PL.Y * .85 + 76), Z + 248); LT.set(X * .82, Math.max(0, PL.Y * .7 + 14), Z - 380); }   /* ?cam=old: the previous low chase framing */
+    else {   // ABOVE-the-plane chase: CAM_HEIGHT over the plane (never below CAM_MIN_Y, so rooftops can't block it), looking down CAM_PITCH_DEG;
+             // the plane is seen ~38 deg down (lower-middle third), the horizon band stays at the top, buildings keep their 3D sides
+      const cy = Math.max(CAM_MIN_Y, PL.Y + CAM_HEIGHT), back = (cy - PL.Y) / Math.tan(CAM_PLANE_DEG * Math.PI / 180), p = CAM_PITCH_DEG * Math.PI / 180;
+      CT.set(X * .9, cy, Z + back); LT.set(X * .84 + 0, cy - Math.sin(p) * 1000, Z + back - Math.cos(p) * 1000); }
+    wMesh.position.y = PL.Y + 1;
     const ds = Math.min(.1, (dt || 16) / 1000), a = CAM.ok ? 1 - Math.exp(-ds * 5.2) : 1, al = CAM.ok ? 1 - Math.exp(-ds * 7.5) : 1; CAM.ok = true;   // body lags a little more than the aim: smooth, never floaty
     CAM.p.lerp(CT, a); CAM.l.lerp(LT, al); CAM.roll += (-bank * .07 - CAM.roll) * a;
     const sh = M.SHK; cam.position.set(CAM.p.x - sh[0] * .5, CAM.p.y + sh[1] * .5, CAM.p.z);
@@ -885,7 +891,7 @@ async function boot() {
      Where the 2D game drew its mar0/mar1/mar2 sprites (beside the runway, ahead of the parked plane): "proceed" until the wheels
      leave the ground, then the big two-arm wave-off. The wands are lit along the forearm the clip is playing right now. */
   const MAR = { list: null, on: false }, MARV = new THREE.Vector3(), MARS = [[-50, 62, "m"], [54, 122, "f"], [-78, 215, "m"]];
-  const MCLIP = {}; import("../engine3d/clips.js?v=e3j").then(m => { MCLIP.c = m.CLIPS; }).catch(() => {});
+  const MCLIP = {}; import("../engine3d/clips.js?v=e3k").then(m => { MCLIP.c = m.CLIPS; }).catch(() => {});
   function drawMarshals(now, G) {
     const rw = G.ground.find(g => g.k === "runway"), show = !!(CROWD && rw && !G.landing && !G.over && (!G.running || (G.el || 0) < 7000) && rw.y < H + 300);
     M.crew3d = !!CROWD; if (!show) { if (MAR.on) { MAR.list.forEach(m => { m.p.visible = false; m.ear.visible = false; }); MAR.on = false; } return; }

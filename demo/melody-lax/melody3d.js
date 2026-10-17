@@ -54,16 +54,16 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=e3g") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3g") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=e3h") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3h") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
-  const QM = await import("../engine3d/quality.js?v=e3g");
+  const QM = await import("../engine3d/quality.js?v=e3h");
   // every optional system loads and starts on its own: one that fails (import, shader, GPU feature) switches only itself off (STATUS.off)
   const FAILQ = (Q.get("fail") || "").split(",");   // test hook: ?fail=clouds,post,crowd,… makes those systems fail on purpose
   const offNote = (n, e) => { const m = n + ": " + String(e && e.message || e).slice(0, 80); if (!STATUS.off.includes(m)) STATUS.off.push(m); console.warn("[melody3d] " + m); };
   const safe = (n, fn) => { try { if (FAILQ.includes(n)) throw new Error("forced by ?fail"); return fn(); } catch (e) { offNote(n, e); return null; } };
   const safeA = async (n, fn) => { try { if (FAILQ.includes(n)) throw new Error("forced by ?fail"); return await fn(); } catch (e) { offNote(n, e); return null; } };
-  const impE = (n) => import("../engine3d/" + n + ".js?v=e3g").catch(e => { offNote(n, e); return null; });
+  const impE = (n) => import("../engine3d/" + n + ".js?v=e3h").catch(e => { offNote(n, e); return null; });
   const [PARTM, DMGM, ACM, SKYM, CLDM, WXM, POSTM, WATM, AUDM, CBM, APXM] = CHASE ? await Promise.all(["particles", "damage", "aircraft", "sky", "clouds", "weather", "postfx", "water", "audio", "combat", "apex"].map(impE)) : [];
   const W = M.W, H = M.H, S = M.S, FX = M.FX, FXI = FX._i(), TAU = Math.PI * 2;
   const D = 1000;                                   // camera height above the ground plane
@@ -73,7 +73,7 @@ async function boot() {
   // drift away), and spawns start far out near the horizon. Your plane's row (y = H-130) maps to itself, so every 2D hit lines up.
   const YP = H - 130, KF = 2.4, KB = 1.5;
   const far = y => CHASE ? (y < YP ? YP + (y - YP) * KF : YP + (y - YP) * KB) : y;
-  const wx = (x, Y) => (x - W / 2) * ws(Y), wz = (y, Y) => ((CHASE && Y <= 20 ? y : far(y)) - H / 2) * ws(Y);   // things on the ground (Y ≤ 20) move with the ground
+  const wx = (x, Y) => (x - W / 2) * ws(Y), zm = (y, Y) => { if (!CHASE) return y; const f = Math.max(0, Math.min(1, (Y - 16) / 50)); return y + (far(y) - y) * f; }, wz = (y, Y) => (zm(y, Y) - H / 2) * ws(Y);   // things on the ground (Y < 16) move with the ground; it blends to the stretched air depth by Y 66 (no jump at lift-off)
   const A = { trf: 128, player: 150, ufo: 176, jet: 192, cop: 200, kami: 182, gun: 214, sj: 200, rp: 236, blimp: 250, item: 104, shot: 150, eshot: 164, air: 138, esc: 188, bigjet: 208, rocket: 222, base: 14, bird: 172 };
   // chase view: everything that flies sits close to your own flight level (150), so your shots visibly meet what they hit
   if (CHASE) Object.assign(A, { trf: 132, ufo: 156, jet: 158, cop: 160, kami: 154, gun: 162, sj: 158, rp: 172, blimp: 186, item: 146, shot: 150, eshot: 151, air: 150, esc: 156, bigjet: 160, rocket: 160, bird: 154 });
@@ -85,7 +85,7 @@ async function boot() {
   const MOBILE = /iPhone|iPad|Android|Mobile|Tesla|QtCarBrowser/i.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
   const QUAL = window.__E3Q = QM.makeQuality({ id: "melody-lax", renderer, target: MOBILE ? 40 : 50, minFps: MOBILE ? 20 : 40, failSecs: MOBILE ? 8 : 5,
     calm: () => { const G = M.G(); return !G.running || (G.ens.length <= 3 && !G.ens.some(e => e && e.boss)); } });   // tier changes wait for a quiet moment
-  let WARMQ = 0; const SMOOTH = QUAL.smooth, tierName = () => (QUAL.smooth ? "smooth" : QUAL.tier) + (QUAL.lock30 ? " 30" : "");
+  let WARMQ = 0; const SIDECAM = Q.get("side") === "1", SMOOTH = QUAL.smooth, tierName = () => (QUAL.smooth ? "smooth" : QUAL.tier) + (QUAL.lock30 ? " 30" : "");
   // GPU features: render targets fall back to 8-bit when half/float colour buffers aren't renderable (some iOS / older GPUs)
   const glc0 = renderer.getContext(), isGL2 = renderer.capabilities.isWebGL2, NOF = Q.get("nofloat") === "1";
   const CAPS = { gl2: isGL2, half: !NOF && isGL2 && !!(glc0.getExtension("EXT_color_buffer_float") || glc0.getExtension("EXT_color_buffer_half_float")), floatLin: !NOF && !!glc0.getExtension("OES_texture_float_linear") };
@@ -314,7 +314,7 @@ async function boot() {
   function birdGet(pg) { let o = BIRDS[pg][birdN[pg]++]; if (!o) { const b = buildBird(pg); o = b.node; o.userData = { size: b.size, wings: b.wings }; o.rotation.order = "YXZ"; o.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(o); BIRDS[pg].push(o); } o.visible = true; return o; }
   function bossMesh(k) { if (!BOSSM[k]) { const b = k === "rocket" ? buildRocket() : buildBase(); const o = b.node; o.userData = Object.assign(o.userData || {}, { size: b.size, mats: [] }); o.traverse(n => { if (n.isMesh) { n.material = Array.isArray(n.material) ? n.material.map(m => m.clone()) : n.material.clone(); (Array.isArray(n.material) ? n.material : [n.material]).forEach(m => o.userData.mats.push(m)); } }); o.rotation.order = "YXZ"; scene.add(o); BOSSM[k] = o; } const o = BOSSM[k]; o.visible = true; o.userData.used = 1; return o; }
   // chase view: the player flies air3d's detailed airliner (one instance, never pooled, so its wounds stay put)
-  let AIR = null, UPA = null, PLY = null, FXA = null, pDmg = null, ENEMY = null, WORLD = null, CROWD = null, TRAFFIC = null, COMBAT = null; const SEEN = new WeakSet(); const RAIN = { v: 0 };
+  let AIR = null, UPA = null, PLY = null, FXA = null, pDmg = null, ENEMY = null, WORLD = null, CROWD = null, TRAFFIC = null, COMBAT = null; const SEEN = new WeakSet(); const RAIN = { v: 0 }, FLYT = { s: 0 };
   const alt3 = (o, d) => CHASE && o && o.z3 != null ? o.z3 : d;   // chase view: things fly at their own height (the game's z3)
   if (CHASE) {
     AIR = AIRM.buildAirliner(THREE); UPA = (ACM && safe("aircraft-pbr", () => ACM.upgradeAircraft(THREE, AIR, { envIntensity: 1.25 }))) || { attitude: (dt, b, p) => ({ bank: b, pitch: p }), spin: (t) => AIR.spin(t) }; PLY = new THREE.Group(); PLY.add(AIR.node); PLY.rotation.order = "YXZ"; PLY.userData = { size: AIR.size, mats: [] };
@@ -323,7 +323,7 @@ async function boot() {
     // GPU particles (engine3d/particles.js, same API as air3d's makeFX) + raycast bullet damage with decals (engine3d/damage.js)
     FXA = (PARTM && CAPS.gl2 && safe("gpu-particles", () => PARTM.makeGPUFX(THREE, scene, { max: SMOOTH ? 1024 : MOBILE ? 2048 : 4096 }))) || AIRM.makeFX(THREE, scene, { max: 1800 });
     pDmg = (DMGM && safe("bullet-damage", () => DMGM.makeHitDamage(THREE, { fx: FXA, target: AIR.node, engines: AIR.pts.eng, maxDecals: QUAL.cfg.decals }))) || (() => { const d = AIRM.makeDamage(THREE, FXA, AIR.node, AIR.pts.wound); const h = d.hit; d.hit = () => { h(); return true; }; d.hitNear = (l) => h(l); const u = d.update; d.update = (s2, t2, k2, w2) => u(s2, t2, k2, w2, AIR.pts.eng); return d; })();
-    WORLD = WORLDM.makeWorld(THREE, { noVideo: FAILQ.includes("video"), fx: FXA, fxScale: () => ({ low: .3, med: .6, high: .85, ultra: 1 })[QUAL.tier] || 1, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
+    WORLD = WORLDM.makeWorld(THREE, { clock: () => FLYT.s, pbr: !SMOOTH && QUAL.tier !== "low", facadeSize: SMOOTH ? 512 : 1024, lite: SMOOTH, noVideo: FAILQ.includes("video"), fx: FXA, fxScale: () => ({ low: .3, med: .6, high: .85, ultra: 1 })[QUAL.tier] || 1, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
     // muzzle flashes + real crashes + jet pilot ejections (engine3d/combat.js); detail follows the quality tier
     COMBAT = CBM && safe("combat", () => CBM.makeCombat(THREE, { scene, fx: FXA, crowd: () => CROWD, lights: QUAL.tier === "low" ? 0 : QUAL.tier === "med" ? 1 : 2,
       quality: () => ({ lights: QUAL.tier === "low" ? 0 : 2, shells: QUAL.tier !== "low", debris: QUAL.tier === "low" ? .4 : QUAL.tier === "med" ? .7 : 1 }),
@@ -334,10 +334,10 @@ async function boot() {
       shake: (k) => { const G = M.G(); G.shake = Math.max(G.shake || 0, 14 + 14 * k); },
       onImpact: (p, k) => { for (const sg of SEGS.values()) if (Math.abs(p.z - sg.group.position.z) < sg.len / 2 + 200 && sg.scatter) sg.scatter(p.x, p.z, 120 + 60 * k); } }));
     // engine3d crowd: the Nalu Vida cast as real rigged, animated people (VAT-instanced far, SkinnedMesh near). Loads after the game is up.
-    if (renderer.capabilities.isWebGL2 && !FAILQ.includes("crowd")) import("../engine3d/crowd.js?v=e3g").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
+    if (renderer.capabilities.isWebGL2 && !FAILQ.includes("crowd")) import("../engine3d/crowd.js?v=e3h").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
       .then(c => { CROWD = c; STATUS.crowd = "on"; WARMQ = 1; if (TRAFFIC && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => c.setQuality(cfg.crowd)); }).catch(e => { offNote("crowd", e); STATUS.crowd = "off: " + (e && e.message || e); console.warn("[melody3d] crowd", e); });
     // engine3d traffic: Kenney CC0 cars on the street grid with signals, turns, brake lights, crossing pedestrians
-    (FAILQ.includes("traffic") ? Promise.reject(new Error("forced by ?fail")) : import("../engine3d/traffic.js?v=e3g").then(m => m.makeTraffic(THREE, { loader, base: new URL("../engine3d/assets/cars/", location.href).href, parent: scene, fx: FXA, quality: { density: QUAL.cfg.traffic } })))
+    (FAILQ.includes("traffic") ? Promise.reject(new Error("forced by ?fail")) : import("../engine3d/traffic.js?v=e3h").then(m => m.makeTraffic(THREE, { loader, base: new URL("../engine3d/assets/cars/", location.href).href, parent: scene, fx: FXA, quality: { density: QUAL.cfg.traffic } })))
       .then(tr => { TRAFFIC = tr; STATUS.traffic = "on"; WARMQ = 1; if (CROWD && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => tr.setQuality({ density: cfg.traffic })); }).catch(e => { offNote("traffic", e); STATUS.traffic = "off: " + (e && e.message || e); console.warn("[melody3d] traffic", e); });
     ENEMY = AIRM.buildAirliner(THREE, { livery: "enemy" }); MODELS.kami3 = { node: ENEMY.node, size: ENEMY.size };   // the head-on airliners: same detailed airframe, grey
   }
@@ -418,7 +418,7 @@ async function boot() {
   // chase view: the detailed airship (engine3d/blimp.js): fabric gores, fins, gondola, props, a scrolling LED band with
   // "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" on both sides, MELODY on top, the Nalu Vida logo low on the flanks + belly
   let BLIMP3 = null;
-  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3g").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
+  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3h").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
     BLIMP3 = BM.buildBlimp(THREE, { top: "MELODY", led: ["ANTIDOTE FOOD REVIEW", "antidotethefoodie.com"], logo: lt }); BLIMP3.node.visible = false; BLIMP3.node.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(BLIMP3.node); }
 
   /* ---------------- ground: lit aerial tiles, landmarks, runway, shadow catcher ---------------- */
@@ -499,7 +499,7 @@ async function boot() {
 
   /* ---------------- per-frame: FX (the game's pooled particles, same caps/timings — only drawn here) ---------------- */
   let crashAlt = -1, crashX = 0, crashY = 0, playerAlt = -1, playerX = 0, playerY = 0;
-  const PL = { x: W / 2, y: H - 110, Y: 5, pitch: 0 };   // where the player's plane was last drawn (the chase camera follows it)
+  const PL = { x: W / 2, y: H - 110, Y: 5, pitch: 0 }, GEAR = { v: 1, t: 0 }, RWY = .45, TOS = -1;   // TOS: the sign that tips the nose up (model faces +z)   // where the player's plane was last drawn (the chase camera follows it)
   function birthAlt(p) { // which layer a new particle belongs to: a ground fire, the falling plane, or the sky
     if (crashAlt >= 0 && Math.abs(p.x - crashX) < 60 && Math.abs(p.y - crashY) < 60) return Math.max(4, crashAlt - 6);
     if (playerAlt >= 0 && Math.abs(p.x - playerX) < 50 && Math.abs(p.y - playerY) < 60) return CHASE ? -2 : Math.max(3, playerAlt - 8);   // chase view: your own hits are drawn by engine3d/damage.js (decals, sparks, localized fire)
@@ -586,10 +586,17 @@ async function boot() {
     const proll = Math.max(-1, Math.min(1, G.vx * .12)), palt = G.alt == null ? (G.running ? 1 : 0) : G.alt, pw = M.PLANE_W * (.74 + .26 * palt);
     const vis = G.inv <= 0 || G.landing || Math.floor(G.inv / 6) % 2 === 0; if (!vis) return;
     let Y = 5 + ((CHASE && G.alt3 != null ? G.alt3 : A.player) - 5) * palt; const o = CHASE ? PLY : take(PK); if (CHASE) PLY.visible = true;
+    let pTO = 0; if (CHASE) {   // on the runway: sit on the wheels (gear bottom on the asphalt), rotate nose-up, lift off, gear up; gear down again to land
+      const k = pw / PLY.userData.size.x, Yg = RWY - AIR.pts.gearLow * k, gearOn = palt < .14 || (G.landing && palt < .7) || !G.running;
+      GEAR.v += ((gearOn ? 1 : 0) - GEAR.v) * Math.min(1, (now - (GEAR.t || now)) / 900); GEAR.t = now; if (AIR.gear) AIR.gear(GEAR.v);
+      const top = G.alt3 != null ? G.alt3 : A.player; Y = Yg + (top - Yg) * palt * palt * (3 - 2 * palt);
+      if (G.running && !G.landing) { const rot = Math.max(0, Math.min(1, ((G.el || 0) - 950) / 450)); pTO = .2 * rot * (1 - Math.max(0, Math.min(1, (palt - .45) / .55))); }
+      else if (G.landing && palt < .5) pTO = .07 * palt / .5;   // landing flare
+      Y += Math.sin(pTO) * 2.6 * k; }   // rotating about the main wheels, not the middle of the plane
     if (CHASE) {   // chase view: bank into the turn, nose up when you push ahead (and climb a touch), nose down when you ease back
       const pv = Math.max(-1, Math.min(1, -(G.mvz || 0) / 240)) * (G.running ? 1 : 0); PL.pitch += (pv - PL.pitch) * (1 - Math.exp(-Math.min(100, now - (PL.tA || now)) / 130));   // frame-rate independent
       const att = UPA.attitude((now - (PL.tA || now)) / 1000, proll * .95, PL.pitch * .3 * Math.max(.3, palt), 7); PL.tA = now;   // critically damped bank + pitch
-      put(o, G.x, G.y, Y, pw, false, Math.PI - att.bank * .17, att.bank, att.pitch);
+      put(o, G.x, G.y, Y, pw, false, Math.PI - att.bank * .17, att.bank * Math.min(1, palt * 3), att.pitch + TOS * pTO);
       UPA.spin(now / 1000, G.boostT > 0 ? 1 : .85); o.updateMatrixWorld(true); const L = (q) => AIR.node.localToWorld(V.copy(q)), bst = G.boostT > 0 ? 1.8 : 1;
       AIR.pts.eng.forEach(e => FXA.glow(L(e), 9 * bst, G.boostT > 0 ? [.45, .75, 1] : [1, .55, .25], .55));
       FXA.glow(L(AIR.pts.tipL), 9, [1, .15, .12], .95); FXA.glow(L(AIR.pts.tipR), 9, [.15, 1, .35], .95);   // nav lights: red left, green right
@@ -739,8 +746,11 @@ async function boot() {
   function drawShots(now, G) {
     const run = G.running && !G.dying, LK = CHASE ? 3 : 1, BK = MOBILE ? 1.7 : 1.25; Ba.ax = CHASE ? 1 : 0;   // chase view: bolts turn on their own axis and are stretched so they read flying away from you
     // every round = wide soft halo (reads on any tier, even without bloom) + coloured streak + HDR white-hot core (>1 feeds the bloom)
-    const bolt = (x, y, Y, w, L, r, g, b) => { Ba.q(x, y, Y - .5, w * 3.2 * BK, w * 3.2 * BK, 0, UV.glow, r, g, b, .55); Ba.q(x, y + L * .35, Y, w * 1.7 * BK, L * 1.15 * LK, 0, UV.beam, r, g, b, .75);
-      Ba.q(x, y + L * .3, Y + .5, w * .7 * BK, L * LK, 0, UV.beam, 1 + r, 1 + g, 1 + b, 1); };
+    // (rounds fly straight away from the chase camera, so a streak along the flight path is seen end-on: the read comes from
+    //  bright round sprites — a hot core + halo — and a dotted trail behind each round, which does spread out on screen)
+    const bolt = (x, y, Y, w, L, r, g, b) => { Ba.q(x, y, Y - .5, w * 3.6 * BK, w * 3.6 * BK, 0, UV.dot, r, g, b, .5); Ba.q(x, y + L * .35, Y, w * 1.5 * BK, L * 1.15 * LK, 0, UV.beam, r, g, b, .8);
+      Ba.q(x, y, Y + .5, w * 1.45 * BK, w * 1.45 * BK, 0, UV.dot, 1.6 + r, 1.6 + g, 1.6 + b, 1);
+      for (let k = 1; k <= 3; k++) Ba.q(x, y + k * L * .32, Y, w * (1.5 - k * .3) * BK, w * (1.5 - k * .3) * BK, 0, UV.dot, 1 + r, 1 + g, 1 + b, .75 - k * .18); };
     for (let s = 0; s < G.shots.length; s++) { const sh = G.shots[s], x = sh.x, y = sh.y, Y = alt3(sh, A.shot) + 2;
       if (sh.w === 0) bolt(x, y, Y, 5, 18, 1, .82, .35);
       else if (sh.w === 1) bolt(x, y, Y, 6, 30, .45, 1, .4);
@@ -755,9 +765,9 @@ async function boot() {
       else if (es.bomb) { const bl = (now / 150 | 0) % 2; Bn.q(es.x, es.y, Y, es.r * 2.4, es.r * 2.4, 0, UV.dot, .11, .12, .16, 1); Bn.q(es.x, es.y, Y + .2, es.r * 2, es.r * 2, 0, UV.dot, .11, .12, .16, 1);
         if (bl) { Ba.q(es.x, es.y, Y + .5, 16, 16, 0, UV.dot, 1, .23, .23, 1); } }
       else if (es.bullet && es.big) { const L = Math.hypot(es.vx, es.vy) * 2.6, rot = Math.atan2(-es.vx, es.vy);   // heavy slugs (gunship, LAPD heavy burst): thick glowing round
-        Ba.q(es.x, es.y, Y - .5, 34 * BK, 34 * BK, 0, UV.glow, 1, .3, .08, .6); Ba.q(es.x - es.vx * 1.3, es.y - es.vy * 1.3, Y, 10 * BK, L + 6, rot, UV.beam, 1, .35, .1, .95); Ba.q(es.x, es.y, Y + .3, 20 * BK, 20 * BK, 0, UV.dot, 1, .45, .15, .8); Ba.q(es.x, es.y, Y + .5, 8, 8, 0, UV.dot, 1, .97, .85, 1); }
+        Ba.q(es.x, es.y, Y - .5, 36 * BK, 36 * BK, 0, UV.dot, 1, .3, .08, .55); Ba.q(es.x - es.vx * 1.3, es.y - es.vy * 1.3, Y, 10 * BK, L + 6, rot, UV.beam, 1, .35, .1, .95); Ba.q(es.x, es.y, Y + .3, 20 * BK, 20 * BK, 0, UV.dot, 1, .45, .15, .8); Ba.q(es.x, es.y, Y + .5, 8, 8, 0, UV.dot, 1, .97, .85, 1); }
       else if (es.bullet) { const L = Math.hypot(es.vx, es.vy) * 3, rot = Math.atan2(-es.vx, es.vy);   // enemy rounds: red/orange tracer with a hot core, coming at you
-        Ba.q(es.x, es.y, Y - .5, 22 * BK, 22 * BK, 0, UV.glow, 1, .3, .08, .6); Ba.q(es.x - es.vx * 1.5, es.y - es.vy * 1.5, Y, 6 * BK, L + 5, rot, UV.beam, 1, .38, .1, .9); Ba.q(es.x - es.vx * .8, es.y - es.vy * .8, Y + .3, 2.4 * BK, L * .7 + 3, rot, UV.beam, 2, 1.3, .6, 1); Ba.q(es.x, es.y, Y + .5, 9 * BK, 9 * BK, 0, UV.dot, 2, .9, .4, 1); }
+        Ba.q(es.x, es.y, Y - .5, 24 * BK, 24 * BK, 0, UV.dot, 1, .3, .08, .55); for (let k = 1; k <= 3; k++) Ba.q(es.x - es.vx * k * 2.2, es.y - es.vy * k * 2.2, Y, (9 - k * 2) * BK, (9 - k * 2) * BK, 0, UV.dot, 1.6, .55, .15, .8 - k * .2); Ba.q(es.x - es.vx * 1.5, es.y - es.vy * 1.5, Y, 6 * BK, L + 5, rot, UV.beam, 1, .38, .1, .9); Ba.q(es.x - es.vx * .8, es.y - es.vy * .8, Y + .3, 2.4 * BK, L * .7 + 3, rot, UV.beam, 2, 1.3, .6, 1); Ba.q(es.x, es.y, Y + .5, 9 * BK, 9 * BK, 0, UV.dot, 2, .9, .4, 1); }
       else { Ba.q(es.x, es.y, Y, es.r * 5, es.r * 5, 0, UV.dot, c[0], c[1], c[2], .55); Ba.q(es.x, es.y, Y + .5, es.r * 2.1, es.r * 2.1, 0, UV.dot, Math.min(1, c[0] + .4), Math.min(1, c[1] + .4), Math.min(1, c[2] + .4), 1); } }
   Ba.ax = 0;
   }
@@ -776,13 +786,14 @@ async function boot() {
   wMesh.position.y = A.player + 1; wMesh.renderOrder = 1000; wMesh.frustumCulled = false; wMesh.visible = CHASE; scene.add(wMesh);
   const CAM = { p: new THREE.Vector3(), l: new THREE.Vector3(), roll: 0, ok: false }, CT = new THREE.Vector3(), LT = new THREE.Vector3();
   function chaseCam(G, dt) {
-    const X = PL.x - W / 2, Z = far(PL.y) - H / 2, bank = Math.max(-1, Math.min(1, (G.vx || 0) * .12));
+    const X = PL.x - W / 2, Z = zm(PL.y, PL.Y) - H / 2, bank = Math.max(-1, Math.min(1, (G.vx || 0) * .12));
     // behind and a little above the plane; the camera follows you sideways most of the way so the field stays in view
     CT.set(X * .82, Math.max(28, PL.Y * .85 + 52), Z + 182); LT.set(X * .75, Math.max(0, PL.Y * .7 - 20), Z - 380); wMesh.position.y = PL.Y + 1;
     const a = CAM.ok ? 1 - Math.exp(-(dt || 16) / 1000 * 6.5) : 1; CAM.ok = true;
     CAM.p.lerp(CT, a); CAM.l.lerp(LT, a); CAM.roll += (-bank * .07 - CAM.roll) * a;
     const sh = M.SHK; cam.position.set(CAM.p.x - sh[0] * .5, CAM.p.y + sh[1] * .5, CAM.p.z);
     cam.up.set(Math.sin(CAM.roll), Math.cos(CAM.roll), 0); cam.lookAt(CAM.l);
+    if (SIDECAM) { cam.up.set(0, 1, 0); cam.position.set(X + 150, PL.Y + 12, Z + 20); cam.lookAt(X, PL.Y + 4, Z); }   // ?side=1: a look at the gear + rotation from the side (testing)
   }
   function drawClouds(G) { if (!smokeOK || !G.clouds) return;   // the game's drifting cloud wisps, now at different heights so you fly past and through them
     for (let i = 0; i < G.clouds.length; i++) { const c = G.clouds[i]; Bn.q(c.x, c.y, A.player + [-60, 45, 95][i % 3], c.s * 2.6, c.s * 1.5, 0, UV.smoke, .78, .82, .98, .2); } }
@@ -809,7 +820,7 @@ async function boot() {
       sg.group.position.z = g.y + g.h / 2 - H / 2; sg.update(t, s, Math.abs(sg.group.position.z - camZ) < 1150); live.add(g); }
     for (const [g, sg] of SEGS) if (!live.has(g)) { scene.remove(sg.group); sg.dispose(); SEGS.delete(g); if (sg === eggSeg) eggSeg = null; }
     M.egg = eggSeg && eggSeg.egg ? { on: true, x: eggSeg.egg.x + W / 2, y: eggSeg.group.position.z + eggSeg.egg.z + H / 2 } : null;
-    const PX = PL.x - W / 2, PZ = far(PL.y) - H / 2; clipCD -= s;
+    const PX = PL.x - W / 2, PZ = zm(PL.y, PL.Y) - H / 2; clipCD -= s;
     // you vs the buildings: a rooftop scrape is a small hit, flying into one is a full hit; either way the building breaks where you hit it
     if (G.running && !G.dying && clipCD <= 0 && (G.alt == null || G.alt > .95)) for (const sg of SEGS.values()) { if (Math.abs(PZ - sg.group.position.z) > sg.len / 2 + 20) continue;
       const h = sg.collide(PX, PL.Y - 4, PZ, 30, 16); if (h) { const scrape = h.o.h - PL.Y < 14; sg.smash(h, PX, PL.Y, PZ, "plane"); if (sg.scatter) sg.scatter(PX, PZ, 160); clipCD = .7; if (M.bldHit) M.bldHit(!scrape); break; } }
@@ -823,6 +834,31 @@ async function boot() {
     // skimming the water: spray and a wake
     if (G.running) for (const sg of SEGS.values()) { if (Math.abs(PZ - sg.group.position.z) > sg.len / 2) continue; if (sg.water(PX) && PL.Y < 95) { const k = (95 - PL.Y) / 30;
       for (let i = 0; i < 3; i++) if (Math.random() < s * 60 * k) FXA.emit(V.set(PX + (Math.random() - .5) * 50, 1.5, PZ + 10 + Math.random() * 20), V2.set((Math.random() - .5) * 30, 18 + Math.random() * 22, gsp + 30 * Math.random()), .9, 3, 14, [.97, .97, .96], [.85, .88, .9], .75, false, 0, .8, -30); } break; }
+  }
+  /* ---- takeoff: ground crew (aircraft marshallers) from the crowd system — hi-vis vests, ear defenders, glowing orange wands.
+     Where the 2D game drew its mar0/mar1/mar2 sprites (beside the runway, ahead of the parked plane): "proceed" until the wheels
+     leave the ground, then the big two-arm wave-off. The wands are lit along the forearm the clip is playing right now. */
+  const MAR = { list: null, on: false }, MARV = new THREE.Vector3(), MARS = [[-50, 62, "m"], [54, 122, "f"], [-78, 215, "m"]];
+  const MCLIP = {}; import("../engine3d/clips.js?v=e3h").then(m => { MCLIP.c = m.CLIPS; }).catch(() => {});
+  function drawMarshals(now, G) {
+    const rw = G.ground.find(g => g.k === "runway"), show = !!(CROWD && rw && !G.landing && !G.over && (!G.running || (G.el || 0) < 7000) && rw.y < H + 300);
+    M.crew3d = !!CROWD; if (!show) { if (MAR.on) { MAR.list.forEach(m => { m.p.visible = false; m.ear.visible = false; }); MAR.on = false; } return; }
+    if (!MAR.list) { const vest = CROWD.col ? CROWD.col("#c9ff1c") : [.58, 1, .02], pants = CROWD.col ? CROWD.col("#1f232b") : [.02, .02, .03];
+      const earM = new THREE.MeshStandardMaterial({ color: 0x1b1d22, roughness: .5 }), capM = new THREE.MeshStandardMaterial({ color: 0xffc21a, roughness: .45 });
+      MAR.list = MARS.map(([dx, dy, body], i) => { const look = CROWD.randomLook(77 + i * 13, body, "street"); look.top = [...vest, 2]; look.bot = [...pants, 3]; delete look._pk;
+        const p = CROWD.add({ body, look, seed: 900 + i, scale: 1.35 }); p.play("marshal");
+        const ear = new THREE.Group(); [-1, 1].forEach(sx => { const c = new THREE.Mesh(new THREE.SphereGeometry(.075, 10, 8), earM); c.scale.set(.55, 1, 1); c.position.set(sx * .075, 0, 0); ear.add(c); const d = new THREE.Mesh(new THREE.CircleGeometry(.04, 10), capM); d.rotation.y = sx * Math.PI / 2; d.position.set(sx * .097, 0, 0); ear.add(d); });
+        const band = new THREE.Mesh(new THREE.TorusGeometry(.078, .012, 6, 16, Math.PI), earM); ear.add(band); scene.add(ear); return { p, dx, dy, ear }; }); }
+    MAR.on = true; const lifted = G.running && (G.alt || 0) > .02, t = now / 1000, C = MCLIP.c;
+    for (const m of MAR.list) { const p = m.p, x = W / 2 + m.dx, y = rw.y + 307 - m.dy, X = x - W / 2, Z = y - H / 2, s = p.s;
+      const yaw = Math.atan2(PL.x - x, (H - 110) - y + 200) * .6; p.visible = true; p.set(X, RWY, Z, yaw); p.play(lifted ? "waveoff" : "marshal");
+      m.ear.visible = true; m.ear.position.set(X, RWY + s * .915, Z); m.ear.rotation.y = yaw; m.ear.scale.setScalar(s);
+      if (!C) continue; const clip = C[p.clip] || C.marshal, u = (((t - p.t0) / clip.dur) % 1 + 1) % 1, P = clip.fn(u), cy = Math.cos(yaw), sy = Math.sin(yaw);
+      for (const [arm, sx] of [[P.armL, 1], [P.armR, -1]]) { const up = arm[0], fo = arm[1];
+        const hx = sx * .17 + up[0] * .17 + fo[0] * .25, hy = .81 + up[1] * .17 + fo[1] * .25, hz = up[2] * .17 + fo[2] * .25;
+        for (let q = 0; q < 5; q++) { const e = q * .055, lx = hx + fo[0] * e, ly = hy + fo[1] * e, lz = hz + fo[2] * e;   // the wand: a lit tube out of the hand
+          MARV.set(X + (lx * cy + lz * sy) * s, RWY + ly * s, Z + (-lx * sy + lz * cy) * s); FXA.glow(MARV, q === 4 ? 3.4 : 2.4, [1, .42, .06], 1); }
+        MARV.set(X + ((hx + fo[0] * .12) * cy + (hz + fo[2] * .12) * sy) * s, RWY + (hy + fo[1] * .12) * s, Z + (-(hx + fo[0] * .12) * sy + (hz + fo[2] * .12) * cy) * s); FXA.glow(MARV, 10, [1, .35, .04], .5); } }
   }
   const ALT_OF = { ufo: "ufo", jet: "jet", cop: "cop", kami: "kami", gunship: "gun", superjet: "sj", esc: "esc", squad: "bigjet", rocket: "rocket", base: "base", bird: "bird" };
   // enemies: each hit leaves a burning hole on the airframe that trails smoke; badly hurt ones burn before they blow
@@ -856,13 +892,13 @@ async function boot() {
   // frame budget probe: which part of a slow frame (>28 ms) took the time; window.__M3SPK (read by the perf harness / ?debug)
   const SPK = window.__M3SPK = [], PT = { n: 0, k: [], v: [], t: 0 }; function pt(k) { const t = performance.now(); if (PT.n === 0) PT.t0 = PT.t; PT.k[PT.n] = k; PT.v[PT.n] = t - (PT.n ? PT.t : PT.s); PT.n++; PT.t = t; }
   function render(now, dt) {
-    const G = M.G(); if (WARMQ === 2 || (WARMQ && !G.running)) { WARMQ = 0; if (!Q.get("nowarm")) warm(now, G); } const T0 = performance.now(); PT.n = 0; PT.s = T0; lateSprites();
+    const G = M.G(); if (G.running && !G.dying) FLYT.s += Math.min(.05, (dt || 16) / 1000); if (WARMQ === 2 || (WARMQ && !G.running)) { WARMQ = 0; if (!Q.get("nowarm")) warm(now, G); } const T0 = performance.now(); PT.n = 0; PT.s = T0; lateSprites();
     BATCHES.forEach(b => b.begin()); poolsBegin(); ROTORS.n = 0; cardN = 0; kitN = 0; birdN = [0, 0]; for (const k in BOSSM) BOSSM[k].userData.used = 0;
     drawGround(now, G);
     drawCars(G);
     drawFX(now, G);
     if (CHASE && !POST) drawClouds(G);
-    pt("ground+fx"); drawPlayer(now, G); drawTraffic(now, G); drawEnemies(now, G); drawReview(now, G); drawRescue(now, G); drawItems(now, G); drawShots(now, G); pt("actors");
+    pt("ground+fx"); drawPlayer(now, G); if (CHASE) drawMarshals(now, G); drawTraffic(now, G); drawEnemies(now, G); drawReview(now, G); drawRescue(now, G); drawItems(now, G); drawShots(now, G); pt("actors");
     if (CHASE) { drawWorld(now, dt, G); pt("world"); enemyWounds(now, dt, G); playerWounds(now, dt, G); FXA.update((dt || 16) / 1000); pt("wounds+particles"); }
     for (let i = ROTORS.n; i < ROTORS.list.length; i++) ROTORS.list[i].visible = false;
     hideFrom(cards, cardN); poolsEnd(); hideFrom(BIRDS[0], birdN[0]); hideFrom(BIRDS[1], birdN[1]); for (const k in BOSSM) if (!BOSSM[k].userData.used) BOSSM[k].visible = false; BATCHES.forEach(b => b.end());
@@ -970,7 +1006,7 @@ async function boot() {
       [0, 1].forEach(pg => { try { front(birdGet(pg), i++); } catch (e) {} });
       if (APXM) try { front(apexMesh(), i++); BEAMM.forEach(m => { m.visible = true; m.position.set(0, 100, z0); tmp.push(m); }); } catch (e) {}
       if (BLIMP3) front(BLIMP3.node, i++); front(blimp, i++); if (PLY) { PLY.visible = true; tmp.push(PLY); }
-      ["city", "towers", "melody", "stadium", "hills", "coast", "venice", "pier", "runway"].forEach((k, j) => { try { const sg = WORLD.segment(k, 700, 9000 + j, { side: j % 2 ? 1 : -1, noStrip: true }); sg.group.position.z = z0 - 300; scene.add(sg.group); sg.update(now / 1000, .016, true); segs.push(sg); } catch (e) {} });
+      ["city", "towers", "melody", "stadium", "hills", "coast", "venice", "pier", "runway"].forEach((k, j) => { try { const sg = WORLD.segment(k, 700, 9000 + j, { side: j % 2 ? 1 : -1, noStrip: true, warm: true }); sg.group.position.z = z0 - 300; scene.add(sg.group); sg.update(now / 1000, .016, true); segs.push(sg); } catch (e) {} });
       BATCHES.forEach(b => { b.begin(); b.w(0, 100, z0, 10, 10, 0, UV.dot, 1, 1, 1, .5); b.end(); });
       cam.updateMatrixWorld(); if (CROWD) CROWD.update(cam, now / 1000, .016); if (TRAFFIC) TRAFFIC.update(cam, now / 1000, .016, { night: .5, rain: 0 });
       if (SKY) envFrame(now, 0, G); else renderer.render(scene, cam);

@@ -81,9 +81,25 @@ export function buildAirliner(THREE, O = {}) {
   g.position.sub(ctr); const node = new THREE.Group(); node.add(g); const off = g.position.clone(), P = (px, py, pz) => new THREE.Vector3(px, py, pz).add(off);
   const pts = { eng: ENG.map(e => P(e, ey, ez - 3.9)), tipL: P(17.25, tipY + .3, -7.6), tipR: P(-17.25, tipY + .3, -7.6), tail: P(0, .4, -21.7), beaconTop: P(0, 2.15, 1), beaconBot: P(0, -2.25, -2),
     land: [P(-2.4, -1.3, 3), P(2.4, -1.3, 3)], muzzle: [P(-7.6, -1.4, 3.2), P(7.6, -1.4, 3.2)],
+    gearLow: P(0, -4.85, 0).y,
     wound: [P(9.5, -.1, -3.6), P(-9.5, -.1, -3.6), P(6.4, ey + .2, ez + .4), P(-6.4, ey + .2, ez + .4), P(1.9, .4, -6), P(-1.9, .4, -9), P(13.5, .2, -5.6), P(-13.5, .2, -5.6), P(0, 5, -18.4)] };
+  // landing gear (added after the bbox so the model's size/scale doesn't change): nose leg + two 4-wheel main bogies on hinges.
+  // gear(k): 1 = down and locked, 0 = retracted (mains swing inward into the belly, the nose leg folds forward); hidden when up
+  const tire = new THREE.MeshStandardMaterial({ color: 0x15161a, roughness: .85 }), strutM = new THREE.MeshStandardMaterial({ color: 0xc9cdd3, roughness: .35, metalness: .7 });
+  const legs = [];
+  const leg = (x, y, z, len, wr, bogie) => { const pv = new THREE.Group(); pv.position.set(x, y, z); g.add(pv);
+    const st = new THREE.Mesh(new THREE.CylinderGeometry(.13, .16, len, 8).translate(0, -len / 2, 0), strutM); st.castShadow = true; pv.add(st);
+    const wg = new THREE.CylinderGeometry(wr, wr, .3, 16).rotateZ(Math.PI / 2), hub = new THREE.CylinderGeometry(wr * .5, wr * .5, .32, 10).rotateZ(Math.PI / 2);
+    const ws = bogie ? [[-.3, -.55], [.3, -.55], [-.3, .55], [.3, .55]] : [[-.24, 0], [.24, 0]];
+    if (bogie) { const b = new THREE.Mesh(new THREE.BoxGeometry(.18, .18, 1.5), strutM); b.position.y = -len; pv.add(b); }
+    ws.forEach(([wx, wz]) => { const w = new THREE.Mesh(wg, tire); w.position.set(wx, -len, wz); w.castShadow = true; pv.add(w); const h = new THREE.Mesh(hub, strutM); h.position.copy(w.position); pv.add(h); });
+    legs.push(pv); return pv; };
+  const mL = leg(2.7, -2.3, -1.4, 4.85 - 2.3 - .55, .55, true), mR = leg(-2.7, -2.3, -1.4, 4.85 - 2.3 - .55, .55, true), nz = leg(0, -1.7, 10.2, 4.85 - 1.7 - .42, .42, false);
+  let gearK = 0; const gear = (k) => { k = Math.max(0, Math.min(1, k)); if (k === gearK) return; gearK = k; const r = (1 - k) * Math.PI / 2;
+    mL.rotation.z = -r; mR.rotation.z = r; nz.rotation.x = -r; legs.forEach(l => { l.visible = k > .02; }); };
+  legs.forEach(l => { l.visible = false; });
   node.traverse(n => { if (n.isMesh) n.material.userData.keep = 1; });
-  return { node, size, pts, fans, mats, spin(t) { fans.forEach((f, i) => { f.rotation.z = t * (i ? 41 : -43); }); } };
+  return { node, size, pts, fans, mats, gear, spin(t) { fans.forEach((f, i) => { f.rotation.z = t * (i ? 41 : -43); }); } };
 }
 
 /* ---------- one billboard particle system: smoke (normal blend) + fire/glow (additive) ---------- */

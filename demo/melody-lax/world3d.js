@@ -18,8 +18,9 @@
    the break, towels, umbrellas, volleyball, a lifeguard tower, the boardwalk, the pier, and Nalu Vida on the pier with its logo.
    Used by melody3d.js (the game) and 3d-looks/look2.js + look3.js (the preview clips).
    makeWorld(THREE, {base, fx}) → { segment(kind, len, seed, o), root, wind, tick(dt, t), debris(...) }. */
-import { makeBeachKit } from "./beach3d.js?v=e3g";
-import { makeVideoBoards } from "../engine3d/billboard.js?v=e3g";
+import { makeBeachKit } from "./beach3d.js?v=e3h";
+import { makeVideoBoards } from "../engine3d/billboard.js?v=e3h";
+import { makeFacades } from "../engine3d/facades.js?v=e3h";
 /* The storefront name. The real business is "Melody Bar & Grill"; change this one line to rename the awning / blade sign / door
    glass lettering (the gold logo boards use the real artwork, img/logo.png). */
 export const MELODY_SIGN_TEXT = "MELODY BAR & GRILL";
@@ -33,15 +34,31 @@ export function makeWorld(THREE, O = {}) {
   const AVE = [-800, -480, -160, 160, 480, 800];                          // avenues run along the flight (z); cross streets every CZ
 
   /* ---------- shared textures ---------- */
-  const groundTex = (() => { const c = mkc(512, 368), x = c.getContext("2d"), sx = 512 / CX, sz = 368 / CZ, rw = ROAD * sx, rz = ROAD * sz, sw = SIDE * sx, swz = SIDE * sz;
+  // streets: asphalt with grain, patches, cracks, tyre-polished lanes, manholes, oil stains; concrete sidewalks in slabs with a
+  // kerb line; lots with gravel/grass/parking. One 1024-wide tile per street-grid cell (drawn once, mipmapped)
+  const groundTex = (() => { const GW = O.lite ? 512 : 1024, GH = Math.round(GW * 368 / 512), c = mkc(GW, GH), x = c.getContext("2d"), k = GW / 512; x.scale(k, k);
+    const sx = 512 / CX, sz = 368 / CZ, rw = ROAD * sx, rz = ROAD * sz, sw = SIDE * sx, swz = SIDE * sz, R = rng(5);
     x.fillStyle = "#56544f"; x.fillRect(0, 0, 512, 368);                                                   // lots
-    const R = rng(5); for (let i = 0; i < 90; i++) { x.fillStyle = R() < .5 ? "rgba(60,82,52,.55)" : "rgba(40,40,44,.35)"; x.fillRect(R() * 512, R() * 368, 8 + R() * 50, 8 + R() * 40); }
+    for (let i = 0; i < 90; i++) { x.fillStyle = R() < .5 ? "rgba(60,82,52,.55)" : "rgba(40,40,44,.35)"; x.fillRect(R() * 512, R() * 368, 8 + R() * 50, 8 + R() * 40); }
+    for (let i = 0; i < 700; i++) { x.fillStyle = `rgba(${R() < .5 ? "255,255,255" : "0,0,0"},${.03 + R() * .05})`; x.fillRect(R() * 512, R() * 368, .6 + R(), .6 + R()); }   // gravel
     x.fillStyle = "#8d8a84"; x.fillRect(0, 0, rw / 2 + sw, 368); x.fillRect(512 - rw / 2 - sw, 0, rw / 2 + sw, 368); x.fillRect(0, 0, 512, rz / 2 + swz); x.fillRect(0, 368 - rz / 2 - swz, 512, rz / 2 + swz);   // sidewalks
+    x.strokeStyle = "rgba(0,0,0,.12)"; x.lineWidth = .35; for (let z = 0; z < 368; z += 6) { x.beginPath(); x.moveTo(0, z); x.lineTo(rw / 2 + sw, z); x.moveTo(512 - rw / 2 - sw, z); x.lineTo(512, z); x.stroke(); }   // sidewalk slabs
+    for (let q = 0; q < 512; q += 6) { x.beginPath(); x.moveTo(q, 0); x.lineTo(q, rz / 2 + swz); x.moveTo(q, 368 - rz / 2 - swz); x.lineTo(q, 368); x.stroke(); }
     x.fillStyle = "#2b2c31"; x.fillRect(0, 0, rw / 2, 368); x.fillRect(512 - rw / 2, 0, rw / 2, 368); x.fillRect(0, 0, 512, rz / 2); x.fillRect(0, 368 - rz / 2, 512, rz / 2);   // asphalt
-    x.fillStyle = "#e3b93a"; x.fillRect(0, 0, 2, 368); x.fillRect(510, 0, 2, 368);                                                       // yellow centre lines
+    const onRoad = (px, py) => px < rw / 2 || px > 512 - rw / 2 || py < rz / 2 || py > 368 - rz / 2;
+    for (let i = 0; i < 2600; i++) { const px = R() * 512, py = R() * 368; if (!onRoad(px, py)) continue; x.fillStyle = `rgba(${R() < .5 ? "190,190,190" : "0,0,0"},${.05 + R() * .08})`; x.fillRect(px, py, .5 + R() * .8, .5 + R() * .8); }   // aggregate
+    for (let i = 0; i < 14; i++) { const v = R() < .5, px = v ? (R() < .5 ? R() * rw / 2 : 512 - R() * rw / 2) : R() * 512, py = v ? R() * 368 : (R() < .5 ? R() * rz / 2 : 368 - R() * rz / 2);
+      x.fillStyle = `rgba(${R() < .5 ? "20,20,24" : "70,70,74"},.5)`; x.fillRect(px - 4, py - 3, 6 + R() * 12, 4 + R() * 8); }   // patches
+    x.strokeStyle = "rgba(10,10,12,.55)"; x.lineWidth = .4; for (let i = 0; i < 26; i++) { let px = R() * 512, py = R() * 368; if (!onRoad(px, py)) continue; x.beginPath(); x.moveTo(px, py); for (let j = 0; j < 5; j++) { px += (R() - .5) * 8; py += (R() - .5) * 8; x.lineTo(px, py); } x.stroke(); }   // cracks
+    for (const lx of [rw * .12, rw * .38, 512 - rw * .12, 512 - rw * .38]) { x.fillStyle = "rgba(0,0,0,.18)"; x.fillRect(lx - 1.2, 0, 2.4, 368); }   // tyre-darkened lanes
+    for (let i = 0; i < 10; i++) { const px = R() < .5 ? rw * (.15 + R() * .25) : 512 - rw * (.15 + R() * .25), py = R() * 368; x.fillStyle = "rgba(5,5,8,.35)"; x.beginPath(); x.ellipse(px, py, 1.5 + R() * 2, 2 + R() * 4, 0, 0, TAU); x.fill(); }   // oil
+    for (const [mx, my] of [[rw * .25, 120], [512 - rw * .25, 260], [200, rz * .25], [330, 368 - rz * .25]]) { x.fillStyle = "#3b3a37"; x.beginPath(); x.arc(mx, my, 1.8, 0, TAU); x.fill(); x.strokeStyle = "#1a1a1c"; x.lineWidth = .3; x.stroke(); }   // manholes
+    x.fillStyle = "#b9b4a9"; x.fillRect(rw / 2, 0, .8, 368); x.fillRect(512 - rw / 2 - .8, 0, .8, 368); x.fillRect(0, rz / 2, 512, .8); x.fillRect(0, 368 - rz / 2 - .8, 512, .8);   // kerbs
+    x.fillStyle = "#e3b93a"; x.fillRect(0, 0, 1.2, 368); x.fillRect(510.8, 0, 1.2, 368); x.fillRect(0, 0, 512, .9); x.fillRect(0, 367.1, 512, .9);   // yellow centre lines
     x.fillStyle = "rgba(240,240,240,.8)"; for (let z = 30; z < 340; z += 26) { x.fillRect(rw * .25 - 1, z, 2, 12); x.fillRect(512 - rw * .25 - 1, z, 2, 12); }
     for (let i = 0; i < 6; i++) { x.fillRect(rw / 2 + 4 + i * 7, rz / 2 + 2, 4, swz + 6); x.fillRect(rw / 2 + 4 + i * 7, 368 - rz / 2 - swz - 8, 4, swz + 6); }   // crosswalks
-    return tex(c, true); })();
+    x.fillRect(rw / 2 + 1, rz / 2 + swz + 9, 1.2, rw / 2 - 2);   // stop bar
+    const t = tex(c, true); t.anisotropy = 8; return t; })();
   const winTex = (() => { const c = mkc(256, 256), x = c.getContext("2d"), e = mkc(256, 256), ex = e.getContext("2d"), R = rng(9);
     x.fillStyle = "#c9c2b6"; x.fillRect(0, 0, 256, 256); ex.fillStyle = "#000"; ex.fillRect(0, 0, 256, 256);
     for (let r = 0; r < 32; r++) for (let q = 0; q < 24; q++) { const px = 3 + q * 10.6, py = 3 + r * 8;
@@ -54,9 +71,10 @@ export function makeWorld(THREE, O = {}) {
   const coneTex = (() => { const c = mkc(32, 64), x = c.getContext("2d"), g = x.createLinearGradient(0, 64, 0, 0); g.addColorStop(0, "rgba(255,255,255,.9)"); g.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = g; x.fillRect(0, 0, 32, 64); return new THREE.CanvasTexture(c); })();
 
   /* ---------- shared materials ---------- */
+  const UT = { value: 0 }, ROOF0 = {};
   const M = {
     ground: new THREE.MeshLambertMaterial({ map: groundTex }),
-    facade: new THREE.MeshLambertMaterial({ map: winTex[0], emissiveMap: winTex[1], emissive: 0xffffff, emissiveIntensity: .95 }),
+    facade: null,
     roof: new THREE.MeshLambertMaterial({ map: roofTex }),
     trunk: new THREE.MeshLambertMaterial({ color: 0x8a6a4a }), leaf: new THREE.MeshLambertMaterial({ color: 0x4f8a3a, side: THREE.DoubleSide, alphaTest: .45 }),
     car: new THREE.MeshStandardMaterial({ roughness: .35, metalness: .55 }), glass: new THREE.MeshStandardMaterial({ color: 0x141a24, roughness: .1, metalness: .6 }),
@@ -69,14 +87,10 @@ export function makeWorld(THREE, O = {}) {
   };
   M.car.vertexColors = false;
   // window lights: one cell of the window grid = one window; each switches on/off on its own clock. aDmg (per building) darkens a broken one
-  const UT = { value: 0 };
-  M.facade.onBeforeCompile = (sh) => { sh.uniforms.uT = UT;
-    sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nattribute float aDmg; varying float vDmg; varying float vId;").replace("#include <begin_vertex>", "#include <begin_vertex>\nvDmg = aDmg; vId = float(gl_InstanceID);");
-    sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nuniform float uT; varying float vDmg; varying float vId;").replace("#include <emissivemap_fragment>",
-      "#include <emissivemap_fragment>\n{ vec2 cell = floor(vEmissiveMapUv * vec2(24.0, 32.0)); float h = fract(sin(dot(cell + vec2(vId * 1.37, vId * .71), vec2(12.9898, 78.233))) * 43758.5453);\n" +
-      "  float per = 4.0 + h * 18.0, ph = floor((uT + h * 97.0) / per); float on = step(.6, fract(sin(dot(cell + vec2(ph * 3.1, vId), vec2(39.35, 11.13))) * 24634.63));\n" +
-      "  totalEmissiveRadiance *= on * (1.0 - vDmg); diffuseColor.rgb *= 1.0 - vDmg * .6; }"); };
-  M.facade.customProgramCacheKey = () => "facade-flicker";
+  // facades: engine3d/facades.js — stucco / glass curtain wall / brick / concrete office in one atlas, tiled at real window size,
+  // normal + roughness detail on the PBR path (Lambert on Smooth), every window lit on its own clock; aDmg darkens a broken one
+  const FAC = makeFacades(THREE, { size: O.facadeSize || 1024, pbr: O.pbr !== false, time: UT }); M.facade = FAC.material;
+  ROOF0.para = new THREE.MeshLambertMaterial({ color: 0xa29d94 }); ROOF0.house = new THREE.MeshLambertMaterial({ color: 0x8f8a82 });
   // palm fronds sway: the further from the crown, the more they move; gusts follow the weather's wind (setWind)
   const UWIND = { value: .3 };
   M.leaf.onBeforeCompile = (sh) => { sh.uniforms.uT = UT; sh.uniforms.uWind = UWIND;
@@ -142,6 +156,9 @@ export function makeWorld(THREE, O = {}) {
     debrisM.setColorAt(dbi, QC.set(col || (Math.random() < .5 ? "#8b8680" : "#5d5a56"))); } debrisM.instanceColor.needsUpdate = true; }
   // the digital billboards playing Antidote's Melody review (one shared muted, inline, looping video; poster if autoplay is blocked)
   let VB = null; const vboards = () => VB || (VB = makeVideoBoards(THREE, { src: BASE + "img/review/billboard.mp4", poster: BASE + "img/review/billboard.jpg" }));
+  // the review billboard shows up about once per 2 minutes of flight (O.clock = seconds flown); the first one ~1 minute in.
+  // The Venice pier board counts toward the same budget. Warm-up strips (o.warm) always get one so its shader is compiled early.
+  let bbLast = -60, WARM = false; const bbDue = () => { if (WARM) return true; const t = O.clock ? O.clock() : performance.now() / 1000; if (t - bbLast >= 120) { bbLast = t; return true; } return false; };
   function billboard(group, x, z, ry, sc) { if (O.noVideo) return null; try { return billboard0(group, x, z, ry, sc); } catch (e) { O.noVideo = 1; console.warn("[world3d] video billboard off:", e); return null; } }
   function billboard0(group, x, z, ry, sc) { const b = vboards().create({ w: 64 * (sc || 1), pole: 44, caption: "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" }); b.position.set(x, 0, z); b.rotation.y = ry || 0; group.add(b); return b; }
   function tick(dt, t) { UT.value = t; if (VB) VB.update(t); toppleTick(dt); for (let i = 0; i < DN; i++) { const d = DB[i]; if (d.life <= 0) continue; d.life -= dt; d.v.y -= 160 * dt; d.p.addScaledVector(d.v, dt); if (d.p.y < .8) { d.p.y = .8; if (Math.abs(d.v.y) > 25) { d.v.y = -d.v.y * .35; d.v.x *= .5; d.v.z *= .5; d.vr.multiplyScalar(.5); } else { d.v.set(wind.x, 0, wind.z); d.vr.set(0, 0, 0); } }   // chunks bounce once or twice, then rest
@@ -179,11 +196,16 @@ export function makeWorld(THREE, O = {}) {
       if (u > 3.2) { T.t = -1; T.landed = 0; T.pv.visible = false; } } }
   function buildings(seg, R, lots, opt) {   // lots: [x, z, w, d, h]
     opt = opt || {}; const n = lots.length, geo = box.clone(), dmg = new THREE.InstancedBufferAttribute(new Float32Array(Math.max(1, n)), 1); geo.setAttribute("aDmg", dmg);
+    const vr = new THREE.InstancedBufferAttribute(new Float32Array(Math.max(1, n)), 1); geo.setAttribute("aVar", vr);
     const im = new THREE.InstancedMesh(geo, [M.facade, M.facade, M.roof, M.roof, M.facade, M.facade], Math.max(1, n)); im.count = n; im.frustumCulled = false;
     im.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(Math.max(1, n) * 3), 3);
     const TINT = ["#efe6d8", "#b9b0a4", "#9fa9b4", "#d8c4ac", "#8e949b", "#e9e0d4", "#c4a986", "#a08f7c", "#7d8691", "#cfd6dc"];
     const L = lots.map((b, i) => ({ i, x: b[0], z: b[1], w: b[2], d: b[3], h: b[4], h0: b[4], dmg: 0, props: [], fires: [], vent: null }));
-    L.forEach(o => { set(im, o.i, o.x, 0, o.z, 0, o.w, o.h, o.d); im.instanceColor.setXYZ(o.i, ...QC.set(TINT[(R() * TINT.length) | 0]).toArray()); });
+    L.forEach(o => { set(im, o.i, o.x, 0, o.z, 0, o.w, o.h, o.d); const v = FAC.pick(R, o.h); vr.setX(o.i, v); im.instanceColor.setXYZ(o.i, ...QC.set(FAC.tint(R, v)).toArray()); });
+    // roof edges: a parapet wall round every roof (4 thin walls per building, one instanced draw) + stair/lift houses on many
+    const para = inst(box, ROOF0.para, n * 4), house = [];
+    L.forEach(o => { if (!opt.plain && o.h > 24 && R() < .5) house.push([o, (R() - .5) * o.w * .3, (R() - .5) * o.d * .3, .18 + R() * .14, 4 + R() * 3]); });
+    const hsM = inst(box, ROOF0.house, house.length);
     seg.group.add(im);
     // rooftop kit: AC units on most, a water tank on some, antennas (blinking red) on the tall ones, helipads on the biggest, a few signs, kitchen stacks
     const ac = [], tank = [], ant = [], pad = [], stk = [], signs = [];
@@ -200,8 +222,11 @@ export function makeWorld(THREE, O = {}) {
     const place = () => { ac.forEach((a, j) => set(acM, j, a[0].x + a[1], a[0].h, a[0].z + a[2], 0, a[3] * 1.5, a[3], a[3] * 1.2)); tank.forEach((a, j) => set(tkM, j, a[0].x + a[1], a[0].h, a[0].z + a[2], 0));
       ant.forEach((a, j) => { set(anM, j, a[0].x + a[1], a[0].h, a[0].z + a[2], 0, 1, a[3], 1); set(anL, j, a[0].x + a[1], a[0].h + a[3], a[0].z + a[2], 0); });
       pad.forEach((a, j) => set(pdM, j, a[0].x, a[0].h + .3, a[0].z, 0, Math.min(a[0].w, a[0].d) * .4, 1, Math.min(a[0].w, a[0].d) * .4)); stk.forEach((a, j) => set(stM, j, a[0].x + a[1], a[0].h, a[0].z + a[2], 0));
-      [acM, tkM, anM, anL, pdM, stM].forEach(m => m.instanceMatrix.needsUpdate = true); };
-    place(); seg.group.add(acM, tkM, anM, anL, pdM, stM);
+      L.forEach(o => { const t = Math.min(1.4, o.w * .04), ph = o.wrecked ? .01 : 2.2; set(para, o.i * 4, o.x, o.h, o.z - o.d / 2 + t / 2, 0, o.w, ph, t); set(para, o.i * 4 + 1, o.x, o.h, o.z + o.d / 2 - t / 2, 0, o.w, ph, t);
+        set(para, o.i * 4 + 2, o.x - o.w / 2 + t / 2, o.h, o.z, 0, t, ph, o.d); set(para, o.i * 4 + 3, o.x + o.w / 2 - t / 2, o.h, o.z, 0, t, ph, o.d); });
+      house.forEach((a, j) => set(hsM, j, a[0].x + a[1], a[0].h, a[0].z + a[2], 0, a[0].w * a[3], a[0].wrecked ? .01 : a[4], a[0].d * a[3]));
+      [acM, tkM, anM, anL, pdM, stM, para, hsM].forEach(m => m.instanceMatrix.needsUpdate = true); };
+    place(); seg.group.add(acM, tkM, anM, anL, pdM, stM, para, hsM);
     signs.forEach(([o, w]) => { const sg = mesh(new THREE.PlaneGeometry(o.w * .8, o.w * .2), signMats()[w], o.x, o.h + o.w * .12, o.z + o.d * .3); seg.group.add(sg); o.sign = sg; });
     seg.tick.push((t, dt, near) => { const on = (t % 1.3) < .45; ant.forEach((a, j) => anL.instanceColor.setXYZ(j, on ? 2 : .25, on ? .08 : .02, on ? .06 : .02)); if (ant.length) anL.instanceColor.needsUpdate = true;
       if (!near || !FX) return; const gp = seg.group.getWorldPosition(GPV);
@@ -312,7 +337,7 @@ export function makeWorld(THREE, O = {}) {
     seg.group.add(mesh(g, M.ground));
     const lots = [], tall = o.tall || 0, clear = (o.clear || []).slice(), palmSpots = [], lampSpots = [];
     // a review billboard beside the flight path on most city strips (in the lot between the 1st and 2nd avenue)
-    if (!o.noBillboard && R() < .5) { const sd = R() < .5 ? -1 : 1, bx = sd * (250 + R() * 60), bz = (R() - .5) * len * .45; clear.push([bx, bz, 90, 60]); billboard(seg.group, bx, bz, -sd * .28); }
+    if (!o.noBillboard && bbDue()) { const sd = R() < .5 ? -1 : 1, bx = sd * (250 + R() * 60), bz = (R() - .5) * len * .45; clear.push([bx, bz, 90, 60]); billboard(seg.group, bx, bz, -sd * .28); }
     const free = (x, z, w, d) => !clear.some(c => Math.abs(x - c[0]) < (w + c[2]) / 2 && Math.abs(z - c[1]) < (d + c[3]) / 2);
     for (let ax = 0; ax < AVE.length - 1; ax++) { const x0 = AVE[ax] + ROAD / 2 + SIDE + 4, x1 = AVE[ax + 1] - ROAD / 2 - SIDE - 4;
       for (let z0 = -len / 2 + ROAD / 2 + SIDE + 4; z0 < len / 2 - 40; z0 += CZ) { const z1 = Math.min(len / 2 - 6, z0 + CZ - ROAD - 2 * SIDE - 8);
@@ -599,7 +624,7 @@ export function makeWorld(THREE, O = {}) {
       const bl = inst(new THREE.SphereGeometry(.85, 6, 4), M.lamp, bulbs.length, true); bulbs.forEach((b, i) => { set(bl, i, b[0], b[1], b[2], 0); bl.instanceColor.setXYZ(i, 1.8, 1.35, .7); }); n.add(bl);
       const glow = mesh(new THREE.PlaneGeometry(200, 160).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffa860, opacity: .4, toneMapped: false }), 0, .8, 20); n.add(glow);
       seg.nalu = { x: nx, z: pz };
-      billboard(seg.group, SHORE + 70, pz + 70, .25, 1.1);   // by the pier, next to Nalu Vida: Antidote's review on a big LED screen
+      if (bbDue()) billboard(seg.group, SHORE + 70, pz + 70, .25, 1.1);   // by the pier, next to Nalu Vida: Antidote's review on a big LED screen
       seg.tick.push((t, dt, near) => { glow.material.opacity = .34 + .06 * Math.sin(t * 2.6); if (near && FX && Math.random() < dt * 2) puff(SMP.set(seg.group.position.x + nx + 30, 40, seg.group.position.z + pz - 30), "steam", 1); });
     }
   }
@@ -607,7 +632,7 @@ export function makeWorld(THREE, O = {}) {
   /* ---------- a ground segment: kind ∈ city|towers|melody|stadium|hills|coast|venice|pier|runway ---------- */
   function segment(kind, len, seed, o = {}) {
     const R = rng(seed || 1), seg = { kind, len, seed: seed || 1, group: new THREE.Group(), tick: [], egg: null, melody: null, nalu: null, blds: [], shore: null, water: () => false };
-    const side = o.side || 1;
+    const side = o.side || 1; WARM = !!o.warm;
     if (kind === "runway") runway(seg, R, len, o);
     else if (kind === "hills") hills(seg, R, len);
     else if (kind === "coast" || kind === "venice" || kind === "pier") coast(seg, R, len, kind);
@@ -620,7 +645,7 @@ export function makeWorld(THREE, O = {}) {
     seg.smash = (h, wx, wy, wz, how) => h.B.smash(h.o, wx, wy, wz, how);
     seg.scatter = (wx, wz, r) => { (seg.crowds || []).forEach(C => C.scatterW && C.scatterW(wx, wz, r)); };
     seg.dispose = () => { (seg.crowds || []).forEach(C => C.dispose && C.dispose()); (seg.nets || []).forEach(n => n.dispose()); seg.group.traverse(n => { if (n.isInstancedMesh) n.dispose(); if (n.isMesh && n.geometry && !SHARED.has(n.geometry)) n.geometry.dispose(); }); };
-    seg.update(0, 0, false); return seg;
+    seg.update(0, 0, false); WARM = false; return seg;
   }
   const SHARED = new Set([box, trunkG, crownG, carG, lampG, poolG, bodyG, headG, boardG, lyingG, lyingHead, PERSON]);
   // time of day: window lights, street lamps, pools of light and the searchlights fade with the daylight (engine3d/sky.js → night 0..1)

@@ -94,11 +94,23 @@ export function buildApex(THREE, O = {}) {
     add(new THREE.CircleGeometry(.19, 16).rotateX(Math.PI / 2), hot, x * .92, .05, z); thrusters.push(new THREE.Vector3(x * .92, .02, z)); });
   g.traverse(n => { if (n.isMesh) n.receiveShadow = false; });
   const box = new THREE.Box3().setFromObject(g), size = box.getSize(new THREE.Vector3());
+  /* useModel(root): swap the procedural body for a scanned / generated GLB of the car (engine3d/assets/apex). The GLB's own texture is
+     kept but re-lit with clean PBR (satin clearcoat, no fog, the same rim light); its wheels are part of the body, so the procedural
+     wheels are hidden (no fold), while the thrusters, the active wing + struts + side flaps and the full-width red tail bar stay on top. */
+  const keep = new Set([...struts, ...wheels.map(w => w.w), wingG, ...flaps.map(f => f.pv)]); let glbMats = [];
+  const useModel = (root) => { const b = new THREE.Box3().setFromObject(root), sz = b.getSize(new THREE.Vector3()), c = b.getCenter(new THREE.Vector3()), k = 4.62 / sz.z;
+    root.position.set(-c.x * k, -b.min.y * k, -c.z * k); root.scale.setScalar(k);
+    root.traverse(n => { if (!n.isMesh) return; const o = n.material; const m = rimmed(new THREE.MeshPhysicalMaterial({ map: o.map || null, normalMap: o.normalMap || null, color: 0xffffff, roughness: .35, metalness: .1, clearcoat: .7, clearcoatRoughness: .2, envMapIntensity: 1.1 }));
+      n.material = m; glbMats.push(m); n.castShadow = true; n.frustumCulled = false; });
+    g.children.forEach(ch => { if (keep.has(ch)) return; if (ch.isMesh && (ch.material === hot || ch.material === ledR)) return; if (ch.isMesh && ch.material === rimM) return; ch.visible = false; });
+    wheels.forEach(w => { w.w.visible = false; });
+    const zr = -sz.z * k / 2; g.children.forEach(ch => { if (ch.isMesh && ch.material === ledR) { ch.position.set(0, .8, zr + .02); ch.scale.set(.98, 1.4, 1); } });
+    g.add(root); };
   return { node: g, size, mats: { paint, glass, ledF, ledR, hot, black, rim, rimK }, pts: { thrusters, nose: new THREE.Vector3(0, .46, 2.36), lightF: [new THREE.Vector3(.6, .46, 2.35), new THREE.Vector3(-.6, .46, 2.35)], lightR: [new THREE.Vector3(.85, .79, -2.36), new THREE.Vector3(-.85, .79, -2.36)] },
-    fold(f) { wheels.forEach(({ w, x }) => { w.rotation.z = Math.sign(x) * f * Math.PI / 2; w.position.y = .41 + f * .08; w.position.x = x * (1 - .12 * f); }); },
+    useModel, fold(f) { wheels.forEach(({ w, x }) => { w.rotation.z = Math.sign(x) * f * Math.PI / 2; w.position.y = .41 + f * .08; w.position.x = x * (1 - .12 * f); }); },
     wing, get wingK() { return wingK; },
     update(t, o = {}) { const fl = o.flicker ? (Math.sin(t * 47) * Math.sin(t * 13) > .2 ? .15 : 1) : 1, d = o.dmg || 0;
       if (o.wing != null) wing(wingK + (o.wing - wingK) * Math.min(1, (o.dt || .016) * 5));
       ledF.color.setRGB(2.6 * fl, 2.6 * fl, 2.8 * fl); ledR.color.setRGB(2.8 * fl, .1, .1); const th = o.thrust != null ? o.thrust : 1; hot.color.setRGB(1.2 + 1.4 * th, .6 + .7 * th, .35 + .5 * th);
-      paint.color.setRGB(.91 - .45 * d, .91 - .48 * d, .9 - .5 * d); } };
+      paint.color.setRGB(.91 - .45 * d, .91 - .48 * d, .9 - .5 * d); for (const m of glbMats) m.color.setRGB(1 - .5 * d, 1 - .52 * d, 1 - .55 * d); } };
 }

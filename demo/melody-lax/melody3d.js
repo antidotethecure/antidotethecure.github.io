@@ -54,16 +54,16 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=e3m") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3m") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=e3n") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3n") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
-  const QM = await import("../engine3d/quality.js?v=e3m");
+  const QM = await import("../engine3d/quality.js?v=e3n");
   // every optional system loads and starts on its own: one that fails (import, shader, GPU feature) switches only itself off (STATUS.off)
   const FAILQ = (Q.get("fail") || "").split(",");   // test hook: ?fail=clouds,post,crowd,… makes those systems fail on purpose
   const offNote = (n, e) => { const m = n + ": " + String(e && e.message || e).slice(0, 80); if (!STATUS.off.includes(m)) STATUS.off.push(m); console.warn("[melody3d] " + m); };
   const safe = (n, fn) => { try { if (FAILQ.includes(n)) throw new Error("forced by ?fail"); return fn(); } catch (e) { offNote(n, e); return null; } };
   const safeA = async (n, fn) => { try { if (FAILQ.includes(n)) throw new Error("forced by ?fail"); return await fn(); } catch (e) { offNote(n, e); return null; } };
-  const impE = (n) => import("../engine3d/" + n + ".js?v=e3m").catch(e => { offNote(n, e); return null; });
+  const impE = (n) => import("../engine3d/" + n + ".js?v=e3n").catch(e => { offNote(n, e); return null; });
   const [PARTM, DMGM, ACM, SKYM, CLDM, WXM, POSTM, WATM, AUDM, CBM, APXM] = CHASE ? await Promise.all(["particles", "damage", "aircraft", "sky", "clouds", "weather", "postfx", "water", "audio", "combat", "apex"].map(impE)) : [];
   const W = M.W, H = M.H, S = M.S, FX = M.FX, FXI = FX._i(), TAU = Math.PI * 2;
   const D = 1000;                                   // camera height above the ground plane
@@ -359,10 +359,10 @@ async function boot() {
       shake: (k) => { const G = M.G(); G.shake = Math.max(G.shake || 0, 14 + 14 * k); },
       onImpact: (p, k) => { for (const sg of SEGS.values()) if (Math.abs(p.z - sg.group.position.z) < sg.len / 2 + 200 && sg.scatter) sg.scatter(p.x, p.z, 120 + 60 * k); } }));
     // engine3d crowd: the Nalu Vida cast as real rigged, animated people (VAT-instanced far, SkinnedMesh near). Loads after the game is up.
-    if (renderer.capabilities.isWebGL2 && !FAILQ.includes("crowd")) import("../engine3d/crowd.js?v=e3m").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
+    if (renderer.capabilities.isWebGL2 && !FAILQ.includes("crowd")) import("../engine3d/crowd.js?v=e3n").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
       .then(c => { CROWD = c; STATUS.crowd = "on"; WARMQ = 1; if (TRAFFIC && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => c.setQuality(cfg.crowd)); }).catch(e => { offNote("crowd", e); STATUS.crowd = "off: " + (e && e.message || e); console.warn("[melody3d] crowd", e); });
     // engine3d traffic: Kenney CC0 cars on the street grid with signals, turns, brake lights, crossing pedestrians
-    (FAILQ.includes("traffic") ? Promise.reject(new Error("forced by ?fail")) : import("../engine3d/traffic.js?v=e3m").then(m => m.makeTraffic(THREE, { procedural: true, loader, base: new URL("../engine3d/assets/cars/", location.href).href, parent: scene, fx: FXA, quality: { density: QUAL.cfg.traffic } })))
+    (FAILQ.includes("traffic") ? Promise.reject(new Error("forced by ?fail")) : import("../engine3d/traffic.js?v=e3n").then(m => m.makeTraffic(THREE, { procedural: true, loader, base: new URL("../engine3d/assets/cars/", location.href).href, parent: scene, fx: FXA, quality: { density: QUAL.cfg.traffic } })))
       .then(tr => { TRAFFIC = tr; STATUS.traffic = "on"; WARMQ = 1; if (CROWD && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => tr.setQuality({ density: cfg.traffic })); }).catch(e => { offNote("traffic", e); STATUS.traffic = "off: " + (e && e.message || e); console.warn("[melody3d] traffic", e); });
     ENEMY = AIRM.buildAirliner(THREE, { livery: "enemy" }); MODELS.kami3 = { node: ENEMY.node, size: ENEMY.size };   // the head-on airliners: same detailed airframe, grey
   }
@@ -443,7 +443,7 @@ async function boot() {
   // chase view: the detailed airship (engine3d/blimp.js): fabric gores, fins, gondola, props, a scrolling LED band with
   // "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" on both sides, MELODY on top, the Nalu Vida logo low on the flanks + belly
   let BLIMP3 = null;
-  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3m").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
+  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3n").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
     BLIMP3 = BM.buildBlimp(THREE, { top: "MELODY", led: ["ANTIDOTE FOOD REVIEW", "antidotethefoodie.com"], logo: lt }); BLIMP3.node.visible = false; BLIMP3.node.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(BLIMP3.node); }
 
   /* ---------------- ground: lit aerial tiles, landmarks, runway, shadow catcher ---------------- */
@@ -896,7 +896,7 @@ async function boot() {
      Where the 2D game drew its mar0/mar1/mar2 sprites (beside the runway, ahead of the parked plane): "proceed" until the wheels
      leave the ground, then the big two-arm wave-off. The wands are lit along the forearm the clip is playing right now. */
   const MAR = { list: null, on: false }, MARV = new THREE.Vector3(), MARS = [[-50, 62, "m"], [54, 122, "f"], [-78, 215, "m"]];
-  const MCLIP = {}; import("../engine3d/clips.js?v=e3m").then(m => { MCLIP.c = m.CLIPS; }).catch(() => {});
+  const MCLIP = {}; import("../engine3d/clips.js?v=e3n").then(m => { MCLIP.c = m.CLIPS; }).catch(() => {});
   function drawMarshals(now, G) {
     const rw = G.ground.find(g => g.k === "runway"), show = !!(CROWD && rw && !G.landing && !G.over && (!G.running || (G.el || 0) < 7000) && rw.y < H + 300);
     M.crew3d = !!CROWD; if (!show) { if (MAR.on) { MAR.list.forEach(m => { m.p.visible = false; m.ear.visible = false; }); MAR.on = false; } return; }
@@ -949,7 +949,7 @@ async function boot() {
   // frame budget probe: which part of a slow frame (>28 ms) took the time; window.__M3SPK (read by the perf harness / ?debug)
   const SPK = window.__M3SPK = [], PT = { n: 0, k: [], v: [], t: 0 }; function pt(k) { const t = performance.now(); if (PT.n === 0) PT.t0 = PT.t; PT.k[PT.n] = k; PT.v[PT.n] = t - (PT.n ? PT.t : PT.s); PT.n++; PT.t = t; }
   function render(now, dt) {
-    const G = M.G(); if (G.running && !G.dying) FLYT.s += Math.min(.05, (dt || 16) / 1000); if (WARMQ === 2 || (WARMQ && !G.running)) { WARMQ = 0; if (!Q.get("nowarm")) warm(now, G); } const T0 = performance.now(); PT.n = 0; PT.s = T0; lateSprites();
+    const G = M.G(); if (G.running && !G.dying) FLYT.s += Math.min(.05, (dt || 16) / 1000); if (!APEXREQ && G.running && M.NL && G.lvl >= M.NL() - 1) apexPreload(); if (WARMQ === 2 || (WARMQ && !G.running)) { WARMQ = 0; if (!Q.get("nowarm")) warm(now, G); } const T0 = performance.now(); PT.n = 0; PT.s = T0; lateSprites();
     BATCHES.forEach(b => b.begin()); TRC.begin(); poolsBegin(); ROTORS.n = 0; cardN = 0; kitN = 0; birdN = [0, 0]; for (const k in BOSSM) BOSSM[k].userData.used = 0;
     drawGround(now, G);
     drawCars(G);
@@ -1014,12 +1014,19 @@ async function boot() {
     COMBAT.crash({ obj: o, kind, k: Math.max(.6, span / 90), rotor, eject: kind === "jet", ground: 0 }); };
   // FINAL BOSS: APEX, the flying wedge supercar (engine3d/apex.js). Thrusters under the folded wheels puff smoke, burst on every
   // direction change; the red lock-on laser and the beam are real 3D lines; damage = sparks, smoke and a flickering light bar.
-  let APX = null, APXO = null, BEAMM = null; const APXT = { t: 0 }; const APV = new THREE.Vector3(), APV2 = new THREE.Vector3(), APD = new THREE.Vector3();
-  function apexMesh() { if (APX) return APXO; APX = APXM.buildApex(THREE); APX.fold(1); APXO = new THREE.Group(); APXO.add(APX.node); APXO.rotation.order = "YXZ"; APXO.userData = { size: APX.size, mats: [] }; scene.add(APXO);
+  let APX = null, APXO = null, BEAMM = null; const APXT = { t: 0 };
+  // the generated GLB of the roadster (engine3d/assets/apex, ~270 KB high / ~115 KB Smooth+Low): fetched during the level before the
+  // final one, compiled against the scene right away, swapped in for the procedural body (apex.js useModel). The procedural car stays if it fails.
+  let APEXGLB = null, APEXREQ = false, APEXUSED = false;
+  function apexPreload() { if (APEXREQ || !CHASE || FAILQ.includes("apexglb")) return; APEXREQ = true;
+    loader.loadAsync(new URL("../engine3d/assets/apex/apex_" + (SMOOTH || QUAL.tier === "low" ? "lo" : "hi") + ".glb", location.href).href)
+      .then(g => { APEXGLB = g.scene; STATUS.apex = "glb"; apexMesh(); }).catch(e => { STATUS.apex = "procedural: " + (e && e.message || e); console.warn("[melody3d] apex glb", e); }); } const APV = new THREE.Vector3(), APV2 = new THREE.Vector3(), APD = new THREE.Vector3();
+  function apexMesh() { if (APX) { apexSwap(); return APXO; } APX = APXM.buildApex(THREE); APX.fold(1); APXO = new THREE.Group(); APXO.add(APX.node); APXO.rotation.order = "YXZ"; APXO.userData = { size: APX.size, mats: [] }; scene.add(APXO);
     BEAMM = [0, 1, 2].map(() => { const m = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 10, 1, true).translate(0, .5, 0).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: new THREE.Color(3, .25, .2), transparent: true, opacity: .8, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); m.visible = false; m.renderOrder = 150; scene.add(m); return m; });
-    return APXO; }
+    apexSwap(); return APXO; }
+  function apexSwap() { if (APEXUSED || !APEXGLB || !APX) return; APEXUSED = true; try { APX.useModel(APEXGLB); const v = APXO.visible; APXO.visible = true; renderer.compile(APXO, cam, scene); APXO.visible = v; } catch (e) { console.warn("[melody3d] apex swap", e); } }
   function beamLine(m, a, b, r, op) { m.visible = true; m.position.copy(a); APD.copy(b).sub(a); const L = APD.length(); m.scale.set(r, r, L); m.lookAt(b); m.material.opacity = op; }
-  function drawApex(now, en) { const G = M.G(), o = apexMesh(), t = now / 1000, Y = alt3(en, A.rocket), roll = Math.max(-.5, Math.min(.5, -(en.vx || 0) * .07));
+  function drawApex(now, en) { apexPreload(); const G = M.G(), o = apexMesh(), t = now / 1000, Y = alt3(en, A.rocket), roll = Math.max(-.5, Math.min(.5, -(en.vx || 0) * .07));
     o.visible = true; put(o, en.x, en.y, Y, 340, true, 0, roll, en.st === "swoop" ? .18 : en.st === "lock" ? -.12 : 0); o.updateMatrixWorld(true);
     const dmg = 1 - en.hp / en.mhp, burst = en.burst > 0 ? 1 : 0, k = o.scale.x / 25;   // k ≈ 1 at the boss's size (the mesh is ~4.6 model units long, drawn ~118 game px)
     APX.update(t, { dmg: dmg * .5, flicker: dmg > .5 && Math.random() < .3 + dmg * .4, thrust: .6 + burst * .4, dt: Math.min(.05, (now - (APXT.t || now)) / 1000), wing: en.st === "lock" || en.st === "beam" ? 1 : 0 }); APXT.t = now;   // rear wing: High-Downforce while it locks on and fires, Low-Drag flat for the swipes

@@ -17,7 +17,7 @@
      crowd.update(camera, timeSeconds)    (once per frame, after the people moved)
      crowd.clipNames, crowd.dispose(), crowd.stats()
    quality: { near: 0..12, lod1: true|false, maxDist, lod1Dist, nearDist, shadows } */
-import { CLIPS, GLB_CLIPS, ALIAS } from "./clips.js?v=e3m";
+import { CLIPS, GLB_CLIPS, ALIAS } from "./clips.js?v=e3n";
 
 export async function createCrowd(THREE, O) {
   const base = O.base, loader = O.loader, Q = Object.assign({ near: 6, lod1: true, maxDist: 2600, lod1Dist: 900, nearDist: 260, shadows: false, max: 600 }, O.quality || {});

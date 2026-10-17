@@ -18,10 +18,10 @@
    the break, towels, umbrellas, volleyball, a lifeguard tower, the boardwalk, the pier, and Nalu Vida on the pier with its logo.
    Used by melody3d.js (the game) and 3d-looks/look2.js + look3.js (the preview clips).
    makeWorld(THREE, {base, fx}) → { segment(kind, len, seed, o), root, wind, tick(dt, t), debris(...) }. */
-import { makeBeachKit } from "./beach3d.js?v=e3l";
-import { makeVideoBoards } from "../engine3d/billboard.js?v=e3l";
-import { makeFacades } from "../engine3d/facades.js?v=e3l";
-import { buildCars } from "../engine3d/carmodels.js?v=e3l";
+import { makeBeachKit } from "./beach3d.js?v=e3m";
+import { makeVideoBoards } from "../engine3d/billboard.js?v=e3m";
+import { makeFacades } from "../engine3d/facades.js?v=e3m";
+import { buildCars } from "../engine3d/carmodels.js?v=e3m";
 /* The storefront name. The real business is "Melody Bar & Grill"; change this one line to rename the awning / blade sign / door
    glass lettering (the gold logo boards use the real artwork, img/logo.png). */
 export const MELODY_SIGN_TEXT = "MELODY BAR & GRILL";

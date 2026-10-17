@@ -564,6 +564,10 @@ var CX0=cx, CH=0;
    G.alt3 = your height between the rooftops and the ceiling. Drag up/down (touch), W/S or up/down (keys, controller stick) climb and dive;
    left/right stays. Everything that flies gets its own height (o.z3), and a hit needs the heights to match (zOK), so you can dodge a
    burst by climbing or diving and you climb or dive to grab food. The 2D game (CH=0) ignores all of it. */
+/* MAGNET_R: pickups (food, coins, Drizzle tokens, mic, crates, health, power-ups) within this radius of the plane are pulled in —
+   an accelerating zoom, altitude ignored — so you can't miss them because you couldn't tell if they were above or below you.
+   Enemy fire and hazards are never in G.items, so they're never pulled. A magnet power-up (if one is added) can set G.magnetMul. */
+var MAGNET_R=PLANE_W*1.8;
 var ALT_LO=16, ALT_HI=215, ALT_DEF=140, ALT_WARN=ALT_LO+(ALT_HI-ALT_LO)*.25;   // chase view: fly right down to the rooftops and the street; the lower 25% is the "too low" band
 /* too low: "PULL UP" on the HUD, the ALT gauge blinks red, a warning beep, a red pulse on the screen edges. Touch the street and it's a
    full hit + a bounce up; a second street strike within 4 s is fatal. Buildings are hit by the 3D layer (bldHit). Never during takeoff/landing. */
@@ -1479,13 +1483,14 @@ var SND=(function(){
   function hiss(dur,f0,f1,vol,type,q,dl){ var t=ctx.currentTime+(dl||0), n=ctx.createBufferSource(), f=ctx.createBiquadFilter(), g=ctx.createGain(); n.buffer=nb; f.type=type||"lowpass"; f.Q.value=q||.8;
     f.frequency.setValueAtTime(f0,t); f.frequency.exponentialRampToValueAtTime(Math.max(30,f1),t+dur); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0005,t+dur);
     n.connect(f); f.connect(g); g.connect(fx); n.start(t,Math.random()*1.5); n.stop(t+dur+.03); }
-  var GAP={lowbeep:150,hit:70,dry:300,lock:600,bump:400,w0:60,w1:60,w2:60,w3:60,w4:60,boom:90,whistle:260,jet:300,pickup:50,pop:40};
+  var GAP={whoosh:90,lowbeep:150,hit:70,dry:300,lock:600,bump:400,w0:60,w1:60,w2:60,w3:60,w4:60,boom:90,whistle:260,jet:300,pickup:50,pop:40};
   var LIB={
     w0:function(){ hiss(.07,5200,900,.16,"bandpass",.9); tone("square",640,140,.06,.08); tone("sine",130,55,.08,.14); },      // twin guns: a real gun crack (louder, 2026-10-16)
     w1:function(){ tone("sine",1900,300,.13,.14); tone("square",2400,500,.05,.04); hiss(.05,6000,2000,.06,"highpass"); },     // laser: pew
     w2:function(){ tone("sine",170,45,.2,.24); hiss(.12,1400,160,.12); },                                                       // power gun: thump
     w3:function(){ tone("sawtooth",760,420,.06,.08); tone("square",1520,900,.04,.03); hiss(.05,4800,1500,.07,"bandpass",1.2); },   // blue beams: auto buzz
     w4:function(){ tone("sawtooth",280,70,.15,.07); hiss(.1,2600,220,.07); tone("sine",95,40,.14,.12); },                       // red beams: heavy blast
+    whoosh:function(){ hiss(.18,900,4200,.06,"bandpass",1.4); tone("sine",600,1500,.16,.03); },   // a pickup gets pulled toward you
     lowbeep:function(){ tone("square",1180,1180,.09,.07); tone("square",880,880,.06,.04,.1); },   // the PULL UP warning
     hit:function(){ hiss(.06,3000,700,.2,"bandpass",2.2); tone("square",420,110,.07,.09); tone("triangle",1900,1300,.03,.05); },   // bullet strikes an enemy ship: metallic clank
     boom:function(n){ var s=Math.min(1.6,(n||18)/22); hiss(.45+.35*s,900,60,.28*s); tone("sine",95,30,.35,.22*s); },
@@ -2308,6 +2313,10 @@ function frame(now){
     else { if(bo.age>260){ G.bolts.splice(b,1); continue; } var p=bo.pts; cx.save(); cx.strokeStyle="rgba(150,210,255,.45)"; cx.lineWidth=14; cx.beginPath(); p.forEach(function(q,i){ i?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1]); }); cx.stroke(); cx.strokeStyle="#fff"; cx.lineWidth=4; cx.shadowColor="#9fd8ff"; cx.shadowBlur=22; cx.stroke(); cx.restore(); } }
   // pickups
   for(var i=G.items.length-1;i>=0;i--){ var it=G.items[i]; if(CH&&it.z3==null) it.z3=it.ammo?G.alt3:ALT_LO+16+Math.random()*(ALT_HI-ALT_LO-36); if(run&&it.t==="slow"){ if(slowMove(it,k,dt)){ G.items.splice(i,1); continue; } } else if(run){ if(it.ammo){ it.y-=1.35*k; if(it.y<-70){ G.items.splice(i,1); continue; } } else it.y+=spd*(it.t==="crate"?.8:it.t==="driz"?.95:1.15)*k; if(it.rot!=null) it.rot+=(it.vr||0)*k; if(it.t==="driz"){ it.ph+=.03*k; it.x=it.x0+Math.sin(it.ph)*14; } }
+    if(run&&!G.dying&&!it.ammo){ var mdx=G.x-it.x, mdy=G.y-it.y, md=Math.hypot(mdx,mdy), MR=MAGNET_R*(G.magnetMul||1);
+      if(md<MR||it.mag){ if(!it.mag){ it.mag=.001; SND.play("whoosh"); } it.mag+=dt/1000; var stp=Math.min(md,(1.5+it.mag*it.mag*260)*k);   // ease-in: slow start, then zooms in
+        if(md>.5){ it.x+=mdx/md*stp; it.y+=mdy/md*stp; if(it.x0!=null) it.x0+=mdx/md*stp; }
+        if(CH&&it.z3!=null) it.z3+=(G.alt3-it.z3)*Math.min(1,dt/1000*9); } }
     if(it.y>H+60){ if(it.t==="crate"&&!G.gotCrate) G.crateT=9000;
       if(run&&it.t==="food"){ if(G.streak>=3) pop(Math.max(50,Math.min(W-50,it.x)),H-36,T("Missed it · streak ends"),"#9aa3b5"); else pop(Math.max(40,Math.min(W-40,it.x)),H-36,T("missed it"),"#9aa3b5"); G.streak=0; }
       G.items.splice(i,1); continue; }
@@ -2320,7 +2329,7 @@ function frame(now){
     else if(it.t==="heal") drawHeal(it,now);
     else if(!R3){ var P=it.t==="mic"?MIC:it.p, bob=Math.sin(now/260+it.x)*3; var gl=cx.createRadialGradient(it.x,it.y,4,it.x,it.y,P.w*.9); gl.addColorStop(0,it.t==="mic"?"rgba(228,107,131,.55)":"rgba(255,226,140,.6)"); gl.addColorStop(1,"rgba(0,0,0,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(it.x,it.y,P.w*.9,0,6.283); cx.fill(); sprite(P.im,it.x,it.y+bob,P.w,it.rot,false,P.e);
       if(it.t==="food"){ if(P.drink) drinkSheen(P,it.x,it.y+bob,now); else steam(it.x,it.y+bob,P.w,now); } }
-    if(run&&Math.abs(it.x-G.x)<it.r+26&&Math.abs(it.y-G.y)<it.r+28&&zOK(it,it.r+26)){
+    if(run&&Math.abs(it.x-G.x)<it.r+26&&Math.abs(it.y-G.y)<it.r+28&&(it.mag||zOK(it,it.r+26))){   /* pulled-in pickups ignore altitude */
       if((it.t==="crate"||it.t==="heal"||it.t==="mic")&&performance.now()-pickT>20000){ pickT=performance.now(); radio(it.t==="crate"?"Nice pickup! Ammo restocked.":it.t==="heal"?"Nice pickup! Patching you up.":"Nice pickup! Double score, sing it!",{tone:"info",ms:2200}); }
       if(it.t==="slow") slowOn();
       else if(it.t==="boost") boostOn(true);
@@ -2613,7 +2622,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=e3l"></script>
+<script type="module" src="melody3d.js?v=e3m"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}
@@ -2682,7 +2691,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-top"><div class="ms-hd"><p class="ms-by notranslate">Melody Bar &amp; Grill · Melody Approach</p>'+
       (live?'<span class="ms-beta on">'+esc(T("LIVE · Win this week"))+'</span>':'<span class="ms-beta">'+esc(T("BETA · Coming soon: win rewards"))+'</span>')+
       '<div class="ms-h" role="heading" aria-level="2">'+esc(T("Can you win the weekly challenge?"))+'</div></div>'+
-      '<div class="ms-pv" aria-hidden="true"><canvas id="mpv" width="120" height="180" style="background:#0c1220 url(img/game/card-3d-flight.webp?v=e3l) center/cover"></canvas><i>LIVE</i></div></div>'+
+      '<div class="ms-pv" aria-hidden="true"><canvas id="mpv" width="120" height="180" style="background:#0c1220 url(img/game/card-3d-flight.webp?v=e3m) center/cover"></canvas><i>LIVE</i></div></div>'+
     '<div class="ms-prize"><img src="'+esc(WK.img||"img/menu/melody-fries.jpg")+'" alt=""><div><small>'+esc(T(live?"This week's prize":"Weekly prize · coming soon"))+'</small><b>'+esc(T(prize))+'</b><em>'+esc(T(live?(WK.note||"Top score of the week wins"):"The boards are live now. Prizes switch on soon."))+'</em></div></div>'+
     '<div class="ms-food" aria-label="'+esc(T("Catch the food for points"))+'">'+FOOD.map(function(f){ return '<span class="ms-f" style="--d:'+f[4]+'" title="'+esc(T(f[1]))+'">'+(f[3]?'<span class="ms-st"><i></i><i></i><i></i></span>':'')+'<img src="'+g+f[0]+'.webp?v='+(f[5]||"ag1")+'" alt="'+esc(T(f[1]))+'"><b>'+f[2]+'</b></span>'; }).join("")+'</div>'+
     '<div class="ms-mode" role="group" aria-label="'+esc(T("Game mode"))+'">'+mbtn("campaign","🏆","Campaign","10 levels · 6 bosses",cur,T,esc)+mbtn("survival","⏱️","Survival","How long can you last?",cur,T,esc)+'</div>'+
@@ -2690,7 +2699,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-mvp">'+mvp(esc,T)+'</div></div>'; }
 document.addEventListener("click",function(e){ var b=e.target&&e.target.closest&&e.target.closest("[data-mel=mode]"); if(!b) return; e.preventDefault(); if(window.MELODY_MODE) MELODY_MODE(b.getAttribute("data-v")); if(window.GameMenu) GameMenu.refresh(); });
 window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill",tagline:"Night dogfight over LA: 10 levels and six bosses, or Survival. Catch the food, win the week.",
- hero:[g+"card-3d-flight.webp?v=e3l",g+"card-3d-boss.webp?v=e3l",g+"card-3d-beach.webp?v=e3l"],   // the 3D game (2026-10-16), not the old 2D sprites
+ hero:[g+"card-3d-flight.webp?v=e3m",g+"card-3d-boss.webp?v=e3m",g+"card-3d-beach.webp?v=e3m"],   // the 3D game (2026-10-16), not the old 2D sprites
  theme:{bg:"#0b1220",bg2:"#1c2547",card:"#141e34",edge:"#27324d",accent:"#d4af37",accent2:"#f0d375",label:"#f0d375",ink:"#f6f1e4",dim:"#9aa3b5",btnInk:"#1a1206",soft:"rgba(255,255,255,.06)",track:"#27324d",good:"#3fbf8f",bad:"#ff7a59",
   display:"Anton,Impact,'Arial Narrow',sans-serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
  tokens:false, showcase:showcase, preview:function(v){ if(window.__MG&&__MG.attract) __MG.attract(v); },
@@ -2749,7 +2758,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
   {group:"Weekly boards",items:[{icon:"🏆",name:"Campaign board",note:"Ranked by score (levels beaten add big bonuses)",pts:"score"},{icon:"⏱️",name:"Survival board",note:"Ranked by the longest time survived",pts:"time"}]}],
  prizes:{title:"Weekly challenge (BETA)",champion:"Top of each weekly board wins "+(WK.prize||"Free Melody Fries")+" once Melody turns rewards on",note:"BETA: rewards are off until Melody switches them on. Until then the boards rank players for bragging rights and the game gives no prizes or Melody Rewards points. When they're on: 1 point per "+GP.perScore+" score, up to "+GP.dailyCap+" points a day."}};
 })();</script>
-<script src="../gamemenu.js?v=e3l"></script><script src="../a2hs.js?v=mg1"></script>
+<script src="../gamemenu.js?v=e3m"></script><script src="../a2hs.js?v=mg1"></script>
 <script>/* Simple program (Christian, 2026-10): one balance, the numbers live in window.SSAI_REWARDS at the top of this page.
    No split wallets, visit levels, tokens, daily spin or welcome voucher (see crm.js SIMPLE). */
 window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Melody Approach",customerOnly:true};

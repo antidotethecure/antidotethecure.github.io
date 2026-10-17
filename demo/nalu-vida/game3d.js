@@ -761,7 +761,7 @@ async function init(A) {
   // engine3d: real people, the Nalu Vida patio, weather, time of day, cloud shadows, post-processing, ambience (nalu-life.js).
   // Loads after the game is up; until then (or if it fails) the plain renderer keeps going.
   let LIFE = null; const LOFF = new URLSearchParams(location.search).get("life") === "0";
-  if (!LOFF && R.capabilities.isWebGL2) import("./nalu-life.js?v=n4").then(m => m.makeNaluLife(THREE, { R, scene, cam, sun, hemi, A, G, K, loader, oceanMat, makeBoard, hide: [lady, guardM, staff1, staff2] }))
+  if (!LOFF && R.capabilities.isWebGL2) import("./nalu-life.js?v=n5").then(m => m.makeNaluLife(THREE, { R, scene, cam, sun, hemi, A, G, K, loader, oceanMat, makeBoard, hide: [lady, guardM, staff1, staff2] }))
     .then(L => { LIFE = L; window.__NVLIFE = L; }).catch(e => console.warn("[nv3d] engine3d off:", e));
   function dispose() { try { if (ro) ro.disconnect(); R.dispose(); scene.traverse(o => { if (o.geometry) o.geometry.dispose(); }); disposables.forEach(d => d.dispose && d.dispose()); } catch (e) {} }
   // warm-up: compile every shader now so the first frame of play doesn't hitch

@@ -47,6 +47,14 @@ export const CLIPS = {
     P.spine = [.18 * k - .05, .1 * S(u), 0]; P.head = [-.35 + .2 * k, 0, .05]; P.armL = [n3(.25, -.85, .45), n3(-.6, .1, .7)]; P.armR = [n3(-.3, -.6, .55), n3(.4, .55, .6)]; P.hip[1] = -.006 * k; return P; } },
   wave: { fps: 12, dur: 1.2, loop: true, fn: (u) => { const P = base(); const w = S(u, 2);
     P.armR = [n3(-.55, .78, .2), n3(-.25 + .55 * w, 1, .15)]; P.head = [-.45, -.15, 0]; P.spine = [-.06, -.1, 0]; return P; } },
+  // ground crew (aircraft marshaller): "proceed / straight ahead" — upper arms out at shoulder height, forearms up, beckoning back over the head
+  marshal: { fps: 12, dur: 1.1, loop: true, fn: (u) => { const P = base(); const w = .5 + .5 * S(u);
+    P.armL = [n3(.92, .22, .3), n3(.12 * (1 - w), 1, .45 - 1.05 * w)]; P.armR = [n3(-.92, .22, .3), n3(-.12 * (1 - w), 1, .45 - 1.05 * w)];
+    P.head = [-.1, 0, 0]; P.spine[0] = .03 * S(u); return P; } },
+  // ...and the wave-off at lift-off: both arms high, wands sweeping side to side together
+  waveoff: { fps: 12, dur: 1, loop: true, fn: (u) => { const P = base(); const k = S(u);
+    P.armL = [n3(.45 + .35 * k, .9, .15), n3(.25 + .75 * k, 1, .1)]; P.armR = [n3(-.45 + .35 * k, .9, .15), n3(-.25 + .75 * k, 1, .1)];
+    P.head = [-.25, -.15 * k, 0]; P.spine = [-.05, -.08 * k, 0]; return P; } },
   cheer: { fps: 12, dur: .9, loop: true, fn: (u) => { const P = base(); const k = Math.max(0, S(u));
     P.armL = [n3(.35, .9, .12), n3(.15, 1, .05)]; P.armR = [n3(-.35, .9, .12), n3(-.15, 1, .05)]; P.hip[1] = .05 * k; P.head = [-.5, 0, 0];
     P.legL = legPair(.1 * k, .25 * (1 - k), 1); P.legR = legPair(.1 * k, .25 * (1 - k), -1); return P; } },

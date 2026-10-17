@@ -379,11 +379,12 @@
   function addToPause(pov) {
     if (pov.querySelector(".gm-prow")) return;
     var r = el("div", "gm-prow", (hasMusic() ? '<button type="button" data-p="music">🎵 ' + esc(T("Music")) + "</button>" : "") +
+      (W.GameMusic ? '<button type="button" data-p="song">🎶 ' + esc(W.GameMusic.cur().name) + "</button>" : "") +
       '<button type="button" data-p="settings">⚙️ ' + esc(T("Settings")) + '</button><button type="button" data-p="how">❓ ' + esc(T("How to play")) +
       '</button><button type="button" data-p="points">🏆 ' + esc(T("Points")) + "</button>");
     r.addEventListener("click", function (e) {
       var b = e.target.closest("button"); e.stopPropagation(); e.preventDefault(); if (!b) return;
-      var p = b.getAttribute("data-p"); if (p === "music") setMusic(!S.music); else panel(p);
+      var p = b.getAttribute("data-p"); if (p === "music") setMusic(!S.music); else if (p === "song") { W.GameMusic.next(); b.textContent = "🎶 " + W.GameMusic.cur().name; } else panel(p);   /* song: next track (../songswitch.js) */
     });
     var p = pov.querySelector("p"); pov.insertBefore(r, p || null);
   }

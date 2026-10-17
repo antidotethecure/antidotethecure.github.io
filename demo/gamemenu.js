@@ -136,6 +136,7 @@
     ".gm-sw[aria-checked=true] u{background:var(--gm-acc)}.gm-sw[aria-checked=true] u::after{transform:translateX(22px)}" +
     ".gm-seg{display:flex;gap:6px;margin:6px 0}.gm-seg button{flex:1;min-height:46px;border-radius:12px;border:1px solid var(--gm-edge);background:var(--gm-card);color:var(--gm-ink);font:800 14px var(--gm-body);cursor:pointer}" +
     ".gm-seg button[aria-pressed=true]{background:var(--gm-acc);border-color:var(--gm-acc);color:var(--gm-btnink)}" +
+    ".gm-seg-wrap{flex-wrap:wrap}.gm-seg-wrap button{flex:1 1 30%;min-height:40px;font-size:13px}" +
     ".gm-none{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:6px 0;border-radius:14px;border:1px dashed var(--gm-edge);color:var(--gm-dim);font-size:14px;min-height:52px}.gm-none i{font-style:normal;font-size:22px}" +
     /* in-play music button: bottom corner, stacked above the Pause pill */
     ".gm-mbtn{position:fixed;right:calc(10px + env(safe-area-inset-right));bottom:calc(60px + env(safe-area-inset-bottom));z-index:2147483001;width:44px;height:44px;border-radius:50%;" +
@@ -249,6 +250,7 @@
     else if (a === "tokens") { closeSheet(); if (TK()) TK().openTokens(); }
     else if (a === "sw") toggle(b.getAttribute("data-k"));
     else if (a === "xsw") { var xs = (C.switches || [])[+b.getAttribute("data-i")]; if (xs) { try { xs.set(!xs.get()); } catch (x) {} panel("settings"); } }
+    else if (a === "xsel") { var xl = (C.selects || [])[+b.getAttribute("data-i")]; if (xl) { try { xl.set(b.getAttribute("data-v")); } catch (x) {} panel("settings"); } }
     else if (a === "diff") { S.diff = b.getAttribute("data-v"); save(); try { C.difficulty.set(S.diff); } catch (x) {} panel("settings"); }
     else panel(a);
   }
@@ -329,6 +331,10 @@
         h += '<p class="gm-g">' + esc(T("Difficulty")) + '</p><div class="gm-seg">' + C.difficulty.options.map(function (o) {
           return '<button type="button" data-gm="diff" data-v="' + esc(o[0]) + '" aria-pressed="' + (String(cur) === String(o[0])) + '">' + esc(T(o[1])) + "</button>"; }).join("") + "</div>";
       }
+      if (C.selects && C.selects.length) C.selects.forEach(function (sel, i) {   // game-specific choices (e.g. Graphics quality, Weather, Time of day)
+        var cur = ""; try { cur = sel.get(); } catch (e) {}
+        h += '<p class="gm-g">' + esc(T(sel.title)) + '</p><div class="gm-seg gm-seg-wrap">' + sel.options.map(function (o) {
+          return '<button type="button" data-gm="xsel" data-i="' + i + '" data-v="' + esc(o[0]) + '" aria-pressed="' + (String(cur) === String(o[0])) + '">' + esc(T(o[1])) + "</button>"; }).join("") + "</div>" + (sel.note ? '<p class="gm-note">' + esc(T(sel.note)) + "</p>" : ""); });
       if (C.switches && C.switches.length) {   // game-specific on/off switches (e.g. Nalu Vida's "Cartoon red")
         h += '<p class="gm-g">' + esc(T("Display")) + "</p>";
         C.switches.forEach(function (x, i) { var on = false; try { on = !!x.get(); } catch (e) {}

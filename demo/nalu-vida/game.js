@@ -191,6 +191,9 @@
   // buses: FX (surf ambience + effects) and MUSIC (his song "Cheat Code") both feed MASTER; 🔊 mutes MASTER,
   // the small 🎵 button pauses only the music. Nothing is created until the first tap (iOS audio unlock).
   var AC = null, MASTER = null, FX = null, MUSG = null, MUS = null, SURF = null, MUTED = false, SFX_ON = true, MUSIC_ON = true, HELI = null, MUSIC_VOL = 0.18;
+  /* two songs, switchable from the HUD 🎵 pill, the pause menu, Settings, the M key or controller B (../songswitch.js, short crossfade) */
+  var MSW = window.SongSwitch ? SongSwitch({ key: "nalu-song", vol: MUSIC_VOL, fade: .8, songs: [{ id: "cheat", name: "Cheat Code", src: "audio/cheat-code.m4a" }, { id: "xrp", name: "Xtreme Rich Person", src: "audio/xtreme-rich-person.m4a" }],
+    onTap: function () { audio(); if (AC && AC.state === "suspended") AC.resume(); musicSync(); } }) : null;
   try { MUTED = localStorage.getItem("nalu-mute") === "1"; SFX_ON = localStorage.getItem("nalu-sfx") !== "0"; MUSIC_ON = localStorage.getItem("nalu-music") !== "0"; } catch (e) {}
   function audio() {
     if (AC) return AC;
@@ -198,8 +201,8 @@
     MASTER = AC.createGain(); MASTER.gain.value = MUTED ? 0 : 0.8; MASTER.connect(AC.destination);
     FX = AC.createGain(); FX.gain.value = SFX_ON ? 1 : 0; FX.connect(MASTER);
     try {   // the song is streamed through WebAudio so its volume works on iPhone (HTMLAudio volume is read-only there)
-      MUS = new Audio(); MUS.src = "audio/cheat-code.m4a"; MUS.loop = true; MUS.preload = "auto"; MUS.setAttribute("playsinline", "");
-      MUSG = AC.createGain(); MUSG.gain.value = MUSIC_VOL * (MUSIC_ON ? 1 : 0); AC.createMediaElementSource(MUS).connect(MUSG); MUSG.connect(MASTER);
+      MUSG = AC.createGain(); MUSG.gain.value = MUSIC_VOL * (MUSIC_ON ? 1 : 0); MUSG.connect(MASTER);
+      if (MSW) { MSW.attach(AC, MUSG); MUS = MSW.el(); } else { MUS = new Audio(); MUS.src = "audio/cheat-code.m4a"; MUS.loop = true; MUS.preload = "auto"; MUS.setAttribute("playsinline", ""); AC.createMediaElementSource(MUS).connect(MUSG); }
     } catch (e) { MUS = null; }
     // surf: brown noise through a lowpass that swells like waves rolling in
     var len = AC.sampleRate * 4, b = AC.createBuffer(1, len, AC.sampleRate), d = b.getChannelData(0), l = 0;
@@ -263,7 +266,7 @@
   function setMute(m) { MUTED = m; try { localStorage.setItem("nalu-mute", m ? "1" : "0"); } catch (e) {} if (MASTER) MASTER.gain.value = m ? 0 : .8; var b = $("nv-mute"); if (b) b.textContent = m ? "🔇" : "🔊"; musicSync(); }
   function setSfx(on) { SFX_ON = !!on; try { localStorage.setItem("nalu-sfx", on ? "1" : "0"); } catch (e) {} if (FX) FX.gain.value = on ? 1 : 0; }
   function setMusic(on) { MUSIC_ON = !!on; try { localStorage.setItem("nalu-music", on ? "1" : "0"); } catch (e) {} if (MUSG && AC) MUSG.gain.setTargetAtTime(on ? MUSIC_VOL : 0, AC.currentTime, .05); musicSync(); }
-  function musicSync() { if (!MUS) return; if (MUSIC_ON && !MUTED && G && (G.running || G.over)) { var p = MUS.play(); if (p && p.catch) p.catch(function () {}); } else MUS.pause(); }
+  function musicSync() { if (!MUS) return; if (MSW) { MSW.sync(MUSIC_ON && !MUTED && G && (G.running || G.over)); return; } if (MUSIC_ON && !MUTED && G && (G.running || G.over)) { var p = MUS.play(); if (p && p.catch) p.catch(function () {}); } else MUS.pause(); }
   // shared start-menu hook (../gamemenu.js): music(false) only silences the song; nothing here creates audio before a tap
   window.GAME_AUDIO = { music: function (on) { setMusic(on); }, sfx: function (on) { setSfx(on); },
     state: function () { return { hasMusic: true, hasSfx: true, music: MUSIC_ON, sfx: SFX_ON, muted: MUTED, unlocked: !!AC }; } };
@@ -2014,6 +2017,7 @@
   setInterval(function () { if (keys.ArrowLeft) G.vx = Math.max(-380, G.vx - 90); if (keys.ArrowRight) G.vx = Math.min(380, G.vx + 90); }, 50);
   $("nv-jump").addEventListener("pointerdown", function (e) { e.preventDefault(); e.stopPropagation(); jump(); buzz(8); });
   $("nv-trick").addEventListener("pointerdown", function (e) { e.preventDefault(); e.stopPropagation(); trick(); });
+  if (MSW) MSW.button($("nv-mute").parentNode, "nv-songb", "pointer-events:auto;margin:6px 6px 0 0;float:right;border:0;border-radius:999px;padding:6px 10px;background:rgba(6,24,46,.55);color:#fff;font:600 12px/1.2 system-ui,-apple-system,sans-serif;cursor:pointer;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis");
   $("nv-mute").onclick = function () { audio(); if (AC && AC.state === "suspended") AC.resume(); setMute(!MUTED); }; setMute(MUTED);
   [].forEach.call(wrap.querySelectorAll(".nv-pick button"), function (b) { b.onclick = function () { start(b.getAttribute("data-s")); }; });
 

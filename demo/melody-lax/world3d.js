@@ -18,10 +18,10 @@
    the break, towels, umbrellas, volleyball, a lifeguard tower, the boardwalk, the pier, and Nalu Vida on the pier with its logo.
    Used by melody3d.js (the game) and 3d-looks/look2.js + look3.js (the preview clips).
    makeWorld(THREE, {base, fx}) → { segment(kind, len, seed, o), root, wind, tick(dt, t), debris(...) }. */
-import { makeBeachKit } from "./beach3d.js?v=e3q";
-import { makeVideoBoards } from "../engine3d/billboard.js?v=e3q";
-import { makeFacades } from "../engine3d/facades.js?v=e3q";
-import { buildCars } from "../engine3d/carmodels.js?v=e3q";
+import { makeBeachKit } from "./beach3d.js?v=e3r";
+import { makeVideoBoards } from "../engine3d/billboard.js?v=e3r";
+import { makeFacades } from "../engine3d/facades.js?v=e3r";
+import { buildCars } from "../engine3d/carmodels.js?v=e3r";
 /* The storefront name. The real business is "Melody Bar & Grill"; change this one line to rename the awning / blade sign / door
    glass lettering (the gold logo boards use the real artwork, img/logo.png). */
 export const MELODY_SIGN_TEXT = "MELODY BAR & GRILL";
@@ -697,6 +697,6 @@ export function makeWorld(THREE, O = {}) {
     U.uLight.value.set(L, L * (1 - info.night * .1), L * (1 + info.night * .25)); U.uSkyH.value.copy(info.horizon); U.uSkyZ.value.copy(info.zenith); U.uSunAmt.value = Math.max(0, Math.min(1, info.sunI / 2)); if (info.night > .5) U.uSunAmt.value = 0;
     U.sunDir.value.copy(info.sunDir); }
   function setDaylight(night, w) { const n = Math.max(.08, Math.min(1, night * 1.15 + (w ? w.dark * .5 : 0)));
-    M.facade.emissiveIntensity = BASEI.facade * (.12 + .88 * n); M.pool.opacity = BASEI.pool * n; M.beam.opacity = BASEI.beam * n; M.lamp.color.setScalar(.35 + .65 * n); }
+    M.facade.emissiveIntensity = BASEI.facade * (.12 + 1.18 * n); M.pool.opacity = Math.min(1, BASEI.pool * 1.45 * n); M.beam.opacity = BASEI.beam * n; M.lamp.color.setScalar(.35 + .85 * n); }   /* night: windows +30%, street-light pools +45%, lamp heads overbright so they read */
   return { boards: () => boardsAll.filter(b => { let p = b.parent, n = 0; while (p && n++ < 12) { if (p.isScene) return true; p = p.parent; } return false; }), segment, root, wind, tick, debris, sun: SUN, M, ocean: oceanM, coverTex, logoTex, setDaylight, setSkyLight, beachWater: BEACH.water, setWind: (v) => { UWIND.value = v; } };
 }

@@ -11,7 +11,7 @@
 const CDN = "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/";
 export async function makeNaluLife(THREE, O) {
   const { R, scene, cam, sun, hemi, A, G, K, loader, oceanMat, hide, makeBoard } = O;
-  const imp = (n) => import("../engine3d/" + n + ".js?v=n6"), addons = (p) => import(CDN + p + "/+esm");
+  const imp = (n) => import("../engine3d/" + n + ".js?v=n7"), addons = (p) => import(CDN + p + "/+esm");
   const [QM, SKYM, CLDM, WXM, POSTM, CRM, AUDM, BBM] = await Promise.all(["quality", "sky", "clouds", "weather", "postfx", "crowd", "audio", "billboard"].map(imp));
   const QUAL = window.__E3Q = QM.makeQuality({ id: "nalu-vida", renderer: R, target: 50, minFps: 40 });
   const prBase = R.getPixelRatio(); const applyPR = () => { R.setPixelRatio(Math.min(prBase, QUAL.cfg.pr)); };

@@ -11,15 +11,17 @@
    a fixed-cycle signal per intersection (avenues green → yellow → all-red → streets green → yellow → all-red), right/left turns
    along quadratic Bézier arcs, wrap-around at the network ends. */
 export async function makeTraffic(THREE, O) {
-  const g = await O.loader.loadAsync(O.base + "cars.glb"), Q = Object.assign({ density: 1 }, O.quality || {});
-  const TYPES = [], LEN = 15.5, SC = LEN / 2.55;
+  // O.procedural: the realistic procedural cars (engine3d/carmodels.js) instead of the Kenney toy pack
+  const PROC = O.procedural ? (await import("./carmodels.js?v=e3j")).buildCars(THREE) : null;
+  const g = PROC ? { scene: { traverse(fn) { PROC.forEach(c => { const geo = c.geo.clone(); geo.applyMatrix4(new THREE.Matrix4().makeScale(3.3 / SCK, 3.3 / SCK, 3.3 / SCK)); fn({ isMesh: true, name: c.name, geometry: geo, proc: c }); }); } } } : await O.loader.loadAsync(O.base + "cars.glb"), Q = Object.assign({ density: 1 }, O.quality || {});
+  const TYPES = [], LEN = 15.5, SC = LEN / 2.55, SCK = SC;   // (procedural cars are in metres: 3.3 world units per metre)
   const keepPaint = new Set(["taxi", "police", "ambulance", "delivery"]);
   const WEIGHT = { sedan: 5, "sedan-sports": 2, "hatchback-sports": 3, suv: 4, "suv-luxury": 2, taxi: 1.2, van: 1.5, delivery: .8, truck: 1.4, police: .35, ambulance: .2 };
   const fx = O.fx, parent = O.parent;
   const paintCols = ["#e9e9ea", "#1d1f24", "#9aa1ab", "#7b1f2a", "#25467a", "#c9b48a", "#3e4148", "#f2f2ee", "#a8322f", "#5c6b54", "#2a6f9e", "#d9d2c3", "#0f3d2e", "#6e1a1a", "#bfc4cc"].map(h => new THREE.Color(h));
   g.scene.traverse(o => { if (!o.isMesh) return;
     const geo = o.geometry; geo.applyMatrix4(new THREE.Matrix4().makeScale(SC, SC, SC));
-    const col = geo.attributes.color; for (let i = 0; i < col.count; i++) { const c = new THREE.Color().setRGB(col.getX(i), col.getY(i), col.getZ(i), THREE.SRGBColorSpace); col.setXYZ(i, c.r, c.g, c.b); }
+    const col = geo.attributes.color; if (!o.proc) for (let i = 0; i < col.count; i++) { const c = new THREE.Color().setRGB(col.getX(i), col.getY(i), col.getZ(i), THREE.SRGBColorSpace); col.setXYZ(i, c.r, c.g, c.b); }
     const MAX = 160; const ig = new THREE.InstancedBufferGeometry(); ig.index = geo.index; for (const k in geo.attributes) ig.setAttribute(k, geo.attributes[k]);
     const iP = new THREE.InstancedBufferAttribute(new Float32Array(MAX * 4), 4), iL = new THREE.InstancedBufferAttribute(new Float32Array(MAX * 4), 4); iP.setUsage(THREE.DynamicDrawUsage); iL.setUsage(THREE.DynamicDrawUsage); ig.setAttribute("iPaint", iP); ig.setAttribute("iLamp", iL);
     const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .38, metalness: .25, envMapIntensity: 1.3 });
@@ -28,16 +30,18 @@ export async function makeTraffic(THREE, O) {
       sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nvarying float vPart; varying vec4 vPaint; varying vec4 vLamp;")
         .replace("#include <color_fragment>", `#include <color_fragment>
           float pp = floor(vPart + .5);
-          if (pp == 1.0 && vPaint.a < .5) diffuseColor.rgb = vPaint.rgb * (.75 + .5 * dot(vColor.rgb, vec3(.33)));
+          if (pp == 1.0 && (vPaint.a < .5 || vPaint.a > 1.5)) diffuseColor.rgb = vPaint.rgb * (.75 + .5 * dot(vColor.rgb, vec3(.33)));
           if (pp == 2.0) diffuseColor.rgb = vec3(.04, .06, .09);`)
         .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>
           if (pp == 3.0) totalEmissiveRadiance += vec3(1.0, .93, .78) * vLamp.x * 3.0;
           if (pp == 4.0) totalEmissiveRadiance += vec3(1.0, .08, .05) * (.6 * vLamp.x + 3.2 * vLamp.y);`)
-        .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nif (floor(vPart + .5) == 2.0) roughnessFactor = .05;"); };
-    m.customProgramCacheKey = () => "e3-car";
+        .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nif (floor(vPart + .5) == 2.0) roughnessFactor = .05; if (floor(vPart + .5) == 5.0) roughnessFactor = .18; if (floor(vPart + .5) == 1.0 && vPaint.a > 1.5) roughnessFactor = .34; if (floor(vPart + .5) == 0.0) roughnessFactor = .7;")
+        .replace("#include <metalnessmap_fragment>", "#include <metalnessmap_fragment>\nif (floor(vPart + .5) == 5.0) metalnessFactor = .95; if (floor(vPart + .5) == 1.0 && vPaint.a > 1.5) metalnessFactor = .85; if (floor(vPart + .5) == 2.0) metalnessFactor = .1; if (floor(vPart + .5) == 0.0) metalnessFactor = .05;"); };
+    m.customProgramCacheKey = () => "e3-car2";
     const im = new THREE.InstancedMesh(ig, m, MAX); im.count = 0; im.frustumCulled = false; im.castShadow = true; im.instanceMatrix.setUsage(THREE.DynamicDrawUsage); parent.add(im);
-    TYPES.push({ name: o.name, im, iP, iL, max: MAX, w: WEIGHT[o.name] || 1, keep: keepPaint.has(o.name), n: 0 }); });
-  const totalW = TYPES.reduce((a, t) => a + t.w, 0);
+    TYPES.push({ name: o.name, im, iP, iL, max: MAX, w: o.proc ? o.proc.w : WEIGHT[o.name] || 1, keep: o.proc ? (o.proc.keepMetal ? 2 : 0) : keepPaint.has(o.name) ? 1 : 0, pal: o.proc ? o.proc.pal.map(h => new THREE.Color(h)) : null, n: 0 }); });
+  const totalW = TYPES.reduce((a, t) => a + t.w, 0); let TT = 0;
+  const paintFor = (ti, R) => { const P = TYPES[ti].pal || paintCols; return P[(R() * P.length) | 0]; };
   const pickType = (R) => { let r = R() * totalW; for (let i = 0; i < TYPES.length; i++) { r -= TYPES[i].w; if (r <= 0) return i; } return 0; };
   // headlight pools on the road (additive, one draw)
   const poolTex = (() => { const c = document.createElement("canvas"); c.width = 32; c.height = 64; const x = c.getContext("2d"), gr = x.createLinearGradient(0, 64, 0, 0); gr.addColorStop(0, "rgba(255,255,255,.9)"); gr.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = gr; x.beginPath(); x.moveTo(12, 64); x.lineTo(20, 64); x.lineTo(32, 0); x.lineTo(0, 0); x.fill(); return new THREE.CanvasTexture(c); })();
@@ -58,11 +62,11 @@ export async function makeTraffic(THREE, O) {
     STR.forEach((z, i) => { lanes.push({ ax: "x", c: z + lw, d: 1, cross: AVE, ext: width / 2, k: i }, { ax: "x", c: z - lw, d: -1, cross: AVE, ext: width / 2, k: i }); });
     const laneFor = (ax, c, d) => lanes.find(l => l.ax === ax && l.d === d && Math.abs(l.c - (c + (ax === "z" ? -lw * d : lw * d))) < 1e-3);
     const cars = [], N = Math.round((S.cars || 24) * Q.density);
-    for (let i = 0; i < N; i++) { const L = lanes[(R() * lanes.length) | 0]; cars.push({ L, s: (R() * 2 - 1) * L.ext * .95, v: 20 + R() * 20, v0: 40 + R() * 26, type: pickType(R), paint: paintCols[(R() * paintCols.length) | 0], turn: null, plan: null, brake: 0, acc: 0, blink: 0 }); }
+    for (let i = 0; i < N; i++) { const L = lanes[(R() * lanes.length) | 0]; cars.push({ L, s: (R() * 2 - 1) * L.ext * .95, v: 20 + R() * 20, v0: 40 + R() * 26, type: (TT = pickType(R)), paint: paintFor(TT, R), turn: null, plan: null, brake: 0, acc: 0, blink: 0 }); }
     // parked cars along the curbs (never in an intersection)
     const parked = []; for (let i = 0; i < Math.round((S.parked || 0) * Q.density); i++) { const x = AVE[(R() * AVE.length) | 0], sd = R() < .5 ? 1 : -1, z = (R() * 2 - 1) * len * .46;
-      if (STR.some(sz => Math.abs(sz - z) < road * .5 + 14)) continue; parked.push({ x: x + sd * (road / 2 - 3.5), z, yaw: sd > 0 ? Math.PI : 0, type: pickType(R), paint: paintCols[(R() * paintCols.length) | 0] }); }
-    (S.parkedAt || []).forEach(p => parked.push({ x: p[0], z: p[1], yaw: p[2], type: pickType(R), paint: paintCols[(R() * paintCols.length) | 0] }));
+      if (STR.some(sz => Math.abs(sz - z) < road * .5 + 14)) continue; parked.push({ x: x + sd * (road / 2 - 3.5), z, yaw: sd > 0 ? Math.PI : 0, type: (TT = pickType(R)), paint: paintFor(TT, R) }); }
+    (S.parkedAt || []).forEach(p => parked.push({ x: p[0], z: p[1], yaw: p[2], type: (TT = pickType(R)), paint: paintFor(TT, R) }));
     // signal state per intersection (avenue i × street j)
     const sigState = (t, i, j) => phaseAt(t, i * 3 + j);
     const greenFor = (L, st) => (L.ax === "z" ? st === "A" : st === "S"), yellowFor = (L, st) => (L.ax === "z" ? st === "Ay" : st === "Sy");
@@ -120,7 +124,7 @@ export async function makeTraffic(THREE, O) {
     const night = env && env.night || 0, rain = env && env.rain || 0, heads = night > .25 || rain > .35;
     TYPES.forEach(T => T.n = 0); let pn = 0, sn = 0; blinkT = t;
     const put = (car, wx, wy, wz, yaw, lampH, lampB) => { const T = TYPES[car.type]; if (T.n >= T.max) return; const i = T.n++;
-      QY.setFromAxisAngle(YA, yaw); T.im.setMatrixAt(i, M4.compose(PV.set(wx, wy, wz), QY, SV)); T.iP.setXYZW(i, car.paint.r, car.paint.g, car.paint.b, T.keep ? 1 : 0); T.iL.setXYZW(i, lampH, lampB, 0, 0); };
+      QY.setFromAxisAngle(YA, yaw); T.im.setMatrixAt(i, M4.compose(PV.set(wx, wy, wz), QY, SV)); T.iP.setXYZW(i, car.paint.r, car.paint.g, car.paint.b, T.keep); T.iL.setXYZW(i, lampH, lampB, 0, 0); };
     for (const net of nets) { if (net.disposed) continue; const gpos = net.group.getWorldPosition(WP);
       if (Math.abs(gpos.z - camera.position.z) > 2600) continue;
       net.sim(t, Math.min(.05, dt));

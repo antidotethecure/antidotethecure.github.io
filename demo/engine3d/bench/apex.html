@@ -1,11 +1,11 @@
 <!doctype html><html><head><meta charset="utf-8"><title>Apex Bench</title>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<style>body{margin:0;background:#7fa0c8}</style></head><body><script type="module">
+<style>body{margin:0;background:#bdbdbd}</style></head><body><script type="module">
 import * as THREE from "three"; import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js"; import { buildApex } from "../apex.js";
 const q = new URLSearchParams(location.search), r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(innerWidth, innerHeight); r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace; document.body.appendChild(r.domElement);
-const s = new THREE.Scene(); s.background = new THREE.Color(0x7fa0c8); s.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), .04).texture;
+const s = new THREE.Scene(); s.background = new THREE.Color(q.get("bg") ? +("0x" + q.get("bg")) : 0xbdbdbd); s.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), .04).texture;
 s.add(new THREE.HemisphereLight(0xdfefff, 0x806040, 1.2)); const d = new THREE.DirectionalLight(0xfff0dd, 2.5); d.position.set(30, 60, 50); s.add(d);
 
-const b = buildApex(THREE); b.fold(+(q.get("f") || 0)); s.add(b.node); b.update(1);
-const c = new THREE.PerspectiveCamera(35, innerWidth / innerHeight, 1, 2000), a = +(q.get("a") || .5), e = +(q.get("e") || -.1); c.position.set(Math.sin(a) * 12, 3 + Math.sin(e) * 12, Math.cos(a) * 12); c.lookAt(0, .6, 0); r.render(s, c);
+const b = buildApex(THREE); b.fold(+(q.get("f") || 0)); b.wing(+(q.get("w") || 0)); s.add(b.node); b.update(1); { const fl = new THREE.Mesh(new THREE.PlaneGeometry(80, 80).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xb8b8b8, roughness: .9 })); fl.receiveShadow = true; s.add(fl); r.shadowMap.enabled = true; d.castShadow = true; d.shadow.camera.left = d.shadow.camera.bottom = -6; d.shadow.camera.right = d.shadow.camera.top = 6; d.shadow.mapSize.set(2048, 2048); }
+const c = new THREE.PerspectiveCamera(+(q.get("fov") || 30), innerWidth / innerHeight, 1, 2000), a = +(q.get("a") || .5), e = +(q.get("e") || -.1); const DD = +(q.get("d") || 12); c.position.set(Math.sin(a) * DD, Math.sin(e) * DD, Math.cos(a) * DD); c.lookAt(0, .55, 0); r.render(s, c); window.__ok = 1;
 </script></body></html>

@@ -54,16 +54,16 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=e3i") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3i") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=e3j") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3j") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
-  const QM = await import("../engine3d/quality.js?v=e3i");
+  const QM = await import("../engine3d/quality.js?v=e3j");
   // every optional system loads and starts on its own: one that fails (import, shader, GPU feature) switches only itself off (STATUS.off)
   const FAILQ = (Q.get("fail") || "").split(",");   // test hook: ?fail=clouds,post,crowd,… makes those systems fail on purpose
   const offNote = (n, e) => { const m = n + ": " + String(e && e.message || e).slice(0, 80); if (!STATUS.off.includes(m)) STATUS.off.push(m); console.warn("[melody3d] " + m); };
   const safe = (n, fn) => { try { if (FAILQ.includes(n)) throw new Error("forced by ?fail"); return fn(); } catch (e) { offNote(n, e); return null; } };
   const safeA = async (n, fn) => { try { if (FAILQ.includes(n)) throw new Error("forced by ?fail"); return await fn(); } catch (e) { offNote(n, e); return null; } };
-  const impE = (n) => import("../engine3d/" + n + ".js?v=e3i").catch(e => { offNote(n, e); return null; });
+  const impE = (n) => import("../engine3d/" + n + ".js?v=e3j").catch(e => { offNote(n, e); return null; });
   const [PARTM, DMGM, ACM, SKYM, CLDM, WXM, POSTM, WATM, AUDM, CBM, APXM] = CHASE ? await Promise.all(["particles", "damage", "aircraft", "sky", "clouds", "weather", "postfx", "water", "audio", "combat", "apex"].map(impE)) : [];
   const W = M.W, H = M.H, S = M.S, FX = M.FX, FXI = FX._i(), TAU = Math.PI * 2;
   const D = 1000;                                   // camera height above the ground plane
@@ -85,7 +85,7 @@ async function boot() {
   const MOBILE = /iPhone|iPad|Android|Mobile|Tesla|QtCarBrowser/i.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
   const QUAL = window.__E3Q = QM.makeQuality({ id: "melody-lax", renderer, target: MOBILE ? 40 : 50, minFps: MOBILE ? 20 : 40, failSecs: MOBILE ? 8 : 5,
     calm: () => { const G = M.G(); return !G.running || (G.ens.length <= 3 && !G.ens.some(e => e && e.boss)); } });   // tier changes wait for a quiet moment
-  let WARMQ = 0; const SIDECAM = Q.get("side") === "1", BBCAM = Q.get("bbcam") === "1", SMOOTH = QUAL.smooth, tierName = () => (QUAL.smooth ? "smooth" : QUAL.tier) + (QUAL.lock30 ? " 30" : "");
+  let WARMQ = 0; const SIDECAM = Q.get("side") === "1", BBCAM = Q.get("bbcam") === "1", CARCAM = Q.get("carcam") === "1", SMOOTH = QUAL.smooth, tierName = () => (QUAL.smooth ? "smooth" : QUAL.tier) + (QUAL.lock30 ? " 30" : "");
   // GPU features: render targets fall back to 8-bit when half/float colour buffers aren't renderable (some iOS / older GPUs)
   const glc0 = renderer.getContext(), isGL2 = renderer.capabilities.isWebGL2, NOF = Q.get("nofloat") === "1";
   const CAPS = { gl2: isGL2, half: !NOF && isGL2 && !!(glc0.getExtension("EXT_color_buffer_float") || glc0.getExtension("EXT_color_buffer_half_float")), floatLin: !NOF && !!glc0.getExtension("OES_texture_float_linear") };
@@ -207,6 +207,30 @@ async function boot() {
   const Bc = new Batch(400, THREE.NormalBlending, 40);     // street traffic: car bodies (over the aerial tiles, under the runway + landmarks)
   const BcA = new Batch(1600, THREE.AdditiveBlending, 41); // headlight beams, head + tail lights
   const BATCHES = [Bg, BgA, Bn, Ba, Bc, BcA];
+  /* ---- tracer streams (chase view): the rounds fly straight away from the camera, so a world-space streak is seen end-on and
+     vanishes. Each round is drawn as a SCREEN-SPACE line from its head back toward the gun it came from: the vertex shader projects
+     both ends and builds the quad in pixels (min width in device px), additive, depth-tested, no fog. Hot white-yellow core + orange
+     halo (the halo is drawn by the shader itself, so it glows without bloom on Smooth). */
+  const TRC = (() => { const max = 600, g = new THREE.InstancedBufferGeometry(), base = new THREE.PlaneGeometry(1, 1); g.index = base.index; g.setAttribute("position", base.getAttribute("position")); g.setAttribute("uv", base.getAttribute("uv"));
+    const A = new Float32Array(max * 3), B = new Float32Array(max * 3), C = new Float32Array(max * 4), Wd = new Float32Array(max * 2);
+    const aA = new THREE.InstancedBufferAttribute(A, 3), aB = new THREE.InstancedBufferAttribute(B, 3), aC = new THREE.InstancedBufferAttribute(C, 4), aW = new THREE.InstancedBufferAttribute(Wd, 2);
+    [aA, aB, aC, aW].forEach(a => a.setUsage(THREE.DynamicDrawUsage)); g.setAttribute("iA", aA); g.setAttribute("iB", aB); g.setAttribute("iC", aC); g.setAttribute("iW", aW);
+    const U = { uRes: { value: new THREE.Vector2(400, 600) } };
+    const mat = new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending, fog: false,
+      vertexShader: `uniform vec2 uRes; attribute vec3 iA; attribute vec3 iB; attribute vec4 iC; attribute vec2 iW; varying vec2 vUv; varying vec4 vC; varying float vW;
+        void main(){ vec4 ca = projectionMatrix * viewMatrix * vec4(iA, 1.0), cb = projectionMatrix * viewMatrix * vec4(iB, 1.0);
+          if (cb.w < 1.0) cb = mix(ca, cb, (ca.w - 1.0) / max(1e-3, ca.w - cb.w));
+          vec2 sa = ca.xy / ca.w * uRes * .5, sb = cb.xy / cb.w * uRes * .5; vec2 d = sb - sa; float L = length(d); vec2 dir = L > .5 ? d / L : vec2(0.0, -1.0); vec2 nrm = vec2(-dir.y, dir.x);
+          float w = iW.x + iW.y; float t = uv.x; vec2 sp = mix(sa - dir * w * .5, sb + dir * w * .5, t) + nrm * (uv.y - .5) * w * 2.0;
+          vec4 c = t < .5 ? ca : cb; gl_Position = vec4(sp / (uRes * .5) * c.w, c.z, c.w); vUv = uv; vC = iC; vW = iW.x / max(1.0, w); }`,
+      fragmentShader: `varying vec2 vUv; varying vec4 vC; varying float vW;
+        void main(){ float r = abs(vUv.y - .5) * 4.0; float core = smoothstep(vW * 1.15, vW * .35, r), halo = exp(-r * r * 2.2) * .55;
+          float tail = mix(1.0, .25, vUv.x); vec3 col = mix(vC.rgb, vec3(1.0, .97, .85) * 2.2, core) * (core + halo) * tail;
+          gl_FragColor = vec4(col * vC.a, 1.0); }` });
+    const mesh = new THREE.Mesh(g, mat); mesh.frustumCulled = false; mesh.renderOrder = 132; scene.add(mesh); let n = 0;
+    return { mesh, U, begin() { n = 0; }, add(a, b, r, gg, bb, al, core, halo) { if (n >= max) return; A.set([a.x, a.y, a.z], n * 3); B.set([b.x, b.y, b.z], n * 3); C.set([r, gg, bb, al], n * 4); Wd[n * 2] = core; Wd[n * 2 + 1] = halo; n++; },
+      end() { g.instanceCount = n; [aA, aB, aC, aW].forEach(a => { a.needsUpdate = true; }); } }; })();
+  const TRA = new THREE.Vector3(), TRB = new THREE.Vector3(), MZL = [new THREE.Vector3(), new THREE.Vector3()], BEAMT = { t: -1e9, a: [0, 0], far: [new THREE.Vector3(), new THREE.Vector3()] };
   if (CHASE) [Bn, Ba].forEach(b => { b.mesh.material.uniforms.uBill.value = 1; });
   const hex = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255]; };
   const rgbaCache = {}; function rgb(s) { if (rgbaCache[s]) return rgbaCache[s]; let v; if (s[0] === "#") v = hex(s); else { const m = s.match(/[\d.]+/g).map(Number); v = [m[0] / 255, m[1] / 255, m[2] / 255]; } return rgbaCache[s] = v; }
@@ -323,7 +347,7 @@ async function boot() {
     // GPU particles (engine3d/particles.js, same API as air3d's makeFX) + raycast bullet damage with decals (engine3d/damage.js)
     FXA = (PARTM && CAPS.gl2 && safe("gpu-particles", () => PARTM.makeGPUFX(THREE, scene, { max: SMOOTH ? 1024 : MOBILE ? 2048 : 4096 }))) || AIRM.makeFX(THREE, scene, { max: 1800 });
     pDmg = (DMGM && safe("bullet-damage", () => DMGM.makeHitDamage(THREE, { fx: FXA, target: AIR.node, engines: AIR.pts.eng, maxDecals: QUAL.cfg.decals }))) || (() => { const d = AIRM.makeDamage(THREE, FXA, AIR.node, AIR.pts.wound); const h = d.hit; d.hit = () => { h(); return true; }; d.hitNear = (l) => h(l); const u = d.update; d.update = (s2, t2, k2, w2) => u(s2, t2, k2, w2, AIR.pts.eng); return d; })();
-    WORLD = WORLDM.makeWorld(THREE, { clock: () => FLYT.s, bbFirst: Q.get("bb") === "now" ? -500 : null, bbGap: Q.get("bb") === "now" ? 4 : 120, pbr: !SMOOTH && QUAL.tier !== "low", facadeSize: SMOOTH ? 512 : 1024, lite: SMOOTH, noVideo: FAILQ.includes("video"), fx: FXA, fxScale: () => ({ low: .3, med: .6, high: .85, ultra: 1 })[QUAL.tier] || 1, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
+    WORLD = WORLDM.makeWorld(THREE, { clock: () => FLYT.s, bbFirst: Q.get("bb") === "now" ? -500 : Q.get("bb") === "soon" ? -44 : null, bbGap: Q.get("bbgap") ? +Q.get("bbgap") : Q.get("bb") === "now" ? 4 : undefined, pbr: !SMOOTH && QUAL.tier !== "low", facadeSize: SMOOTH ? 512 : 1024, lite: SMOOTH, noVideo: FAILQ.includes("video"), fx: FXA, fxScale: () => ({ low: .3, med: .6, high: .85, ultra: 1 })[QUAL.tier] || 1, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
     // muzzle flashes + real crashes + jet pilot ejections (engine3d/combat.js); detail follows the quality tier
     COMBAT = CBM && safe("combat", () => CBM.makeCombat(THREE, { scene, fx: FXA, crowd: () => CROWD, lights: QUAL.tier === "low" ? 0 : QUAL.tier === "med" ? 1 : 2,
       quality: () => ({ lights: QUAL.tier === "low" ? 0 : 2, shells: QUAL.tier !== "low", debris: QUAL.tier === "low" ? .4 : QUAL.tier === "med" ? .7 : 1 }),
@@ -334,10 +358,10 @@ async function boot() {
       shake: (k) => { const G = M.G(); G.shake = Math.max(G.shake || 0, 14 + 14 * k); },
       onImpact: (p, k) => { for (const sg of SEGS.values()) if (Math.abs(p.z - sg.group.position.z) < sg.len / 2 + 200 && sg.scatter) sg.scatter(p.x, p.z, 120 + 60 * k); } }));
     // engine3d crowd: the Nalu Vida cast as real rigged, animated people (VAT-instanced far, SkinnedMesh near). Loads after the game is up.
-    if (renderer.capabilities.isWebGL2 && !FAILQ.includes("crowd")) import("../engine3d/crowd.js?v=e3i").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
+    if (renderer.capabilities.isWebGL2 && !FAILQ.includes("crowd")) import("../engine3d/crowd.js?v=e3j").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
       .then(c => { CROWD = c; STATUS.crowd = "on"; WARMQ = 1; if (TRAFFIC && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => c.setQuality(cfg.crowd)); }).catch(e => { offNote("crowd", e); STATUS.crowd = "off: " + (e && e.message || e); console.warn("[melody3d] crowd", e); });
     // engine3d traffic: Kenney CC0 cars on the street grid with signals, turns, brake lights, crossing pedestrians
-    (FAILQ.includes("traffic") ? Promise.reject(new Error("forced by ?fail")) : import("../engine3d/traffic.js?v=e3i").then(m => m.makeTraffic(THREE, { loader, base: new URL("../engine3d/assets/cars/", location.href).href, parent: scene, fx: FXA, quality: { density: QUAL.cfg.traffic } })))
+    (FAILQ.includes("traffic") ? Promise.reject(new Error("forced by ?fail")) : import("../engine3d/traffic.js?v=e3j").then(m => m.makeTraffic(THREE, { procedural: true, loader, base: new URL("../engine3d/assets/cars/", location.href).href, parent: scene, fx: FXA, quality: { density: QUAL.cfg.traffic } })))
       .then(tr => { TRAFFIC = tr; STATUS.traffic = "on"; WARMQ = 1; if (CROWD && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => tr.setQuality({ density: cfg.traffic })); }).catch(e => { offNote("traffic", e); STATUS.traffic = "off: " + (e && e.message || e); console.warn("[melody3d] traffic", e); });
     ENEMY = AIRM.buildAirliner(THREE, { livery: "enemy" }); MODELS.kami3 = { node: ENEMY.node, size: ENEMY.size };   // the head-on airliners: same detailed airframe, grey
   }
@@ -418,7 +442,7 @@ async function boot() {
   // chase view: the detailed airship (engine3d/blimp.js): fabric gores, fins, gondola, props, a scrolling LED band with
   // "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" on both sides, MELODY on top, the Nalu Vida logo low on the flanks + belly
   let BLIMP3 = null;
-  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3i").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
+  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3j").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
     BLIMP3 = BM.buildBlimp(THREE, { top: "MELODY", led: ["ANTIDOTE FOOD REVIEW", "antidotethefoodie.com"], logo: lt }); BLIMP3.node.visible = false; BLIMP3.node.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(BLIMP3.node); }
 
   /* ---------------- ground: lit aerial tiles, landmarks, runway, shadow catcher ---------------- */
@@ -751,7 +775,20 @@ async function boot() {
     const bolt = (x, y, Y, w, L, r, g, b) => { Ba.q(x, y, Y - .5, w * 3.6 * BK, w * 3.6 * BK, 0, UV.dot, r, g, b, .5); Ba.q(x, y + L * .35, Y, w * 1.5 * BK, L * 1.15 * LK, 0, UV.beam, r, g, b, .8);
       Ba.q(x, y, Y + .5, w * 1.45 * BK, w * 1.45 * BK, 0, UV.dot, 1.6 + r, 1.6 + g, 1.6 + b, 1);
       for (let k = 1; k <= 3; k++) Ba.q(x, y + k * L * .32, Y, w * (1.5 - k * .3) * BK, w * (1.5 - k * .3) * BK, 0, UV.dot, 1 + r, 1 + g, 1 + b, .75 - k * .18); };
+    if (CHASE && PLY && PLY.visible && AIR) { // tracer streams from the two wing guns
+      const pr = renderer.getPixelRatio(), DP = Math.max(1, pr), WC = MOBILE ? 1.6 : 1.3;
+      TRC.U.uRes.value.set(W * pr, H * pr); PLY.updateMatrixWorld(true); AIR.pts.muzzle.forEach((q, i) => AIR.node.localToWorld(MZL[i].copy(q)));
+      const fired = G.mfl > 0 && run; if (fired) BEAMT.t = now; const ba = Math.max(0, 1 - (now - BEAMT.t) / 150);
+      const far = [null, null];
+      for (let s = 0; s < G.shots.length; s++) { const sh = G.shots[s], Y = alt3(sh, A.shot) + 2; TRA.set(wx(sh.x, Y), Y, wz(sh.y, Y)); const gi = MZL.length > 1 && Math.abs(TRA.x - MZL[1].x) < Math.abs(TRA.x - MZL[0].x) ? 1 : 0, M0 = MZL[gi];   /* the gun on the round's own side */ const d = TRA.distanceTo(M0), seg = Math.min(d, 46 + sh.w * 8); TRB.copy(M0).sub(TRA).setLength(seg).add(TRA);
+        const c = sh.w === 1 ? [.45, 1, .4] : sh.w === 3 ? [.3, .7, 1] : sh.w === 4 ? [1, .25, .2] : [1, .62, .18];
+        TRC.add(TRA, TRB, c[0], c[1], c[2], 1, (3.2 + sh.w * .5) * WC * DP, (7 + sh.w) * WC * DP);
+        if (!far[gi] || d > far[gi].d) far[gi] = { d, p: far[gi] ? far[gi].p.copy(TRA) : TRA.clone() }; }
+      // a faint glowing beam along each gun's stream, fading ~150 ms after the last shot (reads as a strip even at 30 fps)
+      if (ba > 0) for (let i = 0; i < 2; i++) if (far[i]) TRC.add(far[i].p, MZL[i % MZL.length], 1, .55, .15, .35 * ba, 1.2 * WC * DP, 6 * WC * DP);
+    }
     for (let s = 0; s < G.shots.length; s++) { const sh = G.shots[s], x = sh.x, y = sh.y, Y = alt3(sh, A.shot) + 2;
+      if (CHASE) { Ba.q(x, y, Y, 7 * BK, 7 * BK, 0, UV.dot, 2, 1.7, 1.1, .9); continue; }   // (the stream above draws the rest)
       if (sh.w === 0) bolt(x, y, Y, 5, 18, 1, .82, .35);
       else if (sh.w === 1) bolt(x, y, Y, 6, 30, .45, 1, .4);
       else if (sh.w === 2) { bolt(x, y, Y, 8, 20, 1, .55, .16); Ba.q(x, y, Y + .5, 24 * BK, 24 * BK, 0, UV.fball, 1, 1, 1, 1); }
@@ -794,6 +831,7 @@ async function boot() {
     const sh = M.SHK; cam.position.set(CAM.p.x - sh[0] * .5, CAM.p.y + sh[1] * .5, CAM.p.z);
     cam.up.set(Math.sin(CAM.roll), Math.cos(CAM.roll), 0); cam.lookAt(CAM.l);
     if (BBCAM && WORLD) { const bs = WORLD.boards(); if (bs.length) { const b = bs[bs.length - 1]; b.updateWorldMatrix(true, false); b.getWorldPosition(V); const r = b.rotation.y + (b.parent ? b.parent.rotation.y : 0); cam.up.set(0, 1, 0); cam.position.set(V.x + Math.sin(r) * 120, 92, V.z + Math.cos(r) * 120); cam.lookAt(V.x, 92, V.z); } }   // ?bbcam=1: billboard close-up (testing)
+    if (CARCAM) { cam.up.set(0, 1, 0); cam.position.set(174, 15, Z - 30); cam.lookAt(150, 3, Z - 160); }   // ?carcam=1: street-level look at the traffic (testing)
     if (SIDECAM) { cam.up.set(0, 1, 0); cam.position.set(X + 150, PL.Y + 12, Z + 20); cam.lookAt(X, PL.Y + 4, Z); }   // ?side=1: a look at the gear + rotation from the side (testing)
   }
   function drawClouds(G) { if (!smokeOK || !G.clouds) return;   // the game's drifting cloud wisps, now at different heights so you fly past and through them
@@ -805,6 +843,7 @@ async function boot() {
 
 
   /* ---------------- chase view: the 3D ground, breaking buildings, the Easter egg, wounds ---------------- */
+  const BBF = { f: new THREE.Frustum(), m: new THREE.Matrix4(), s: new THREE.Sphere() };
   const SEGS = new Map(), KIND = { runway: "runway", city: "city", towers: "towers", melody: "melody", stadium: "stadium", hills: "hills", coast: "coast", venice: "venice", pier: "pier" };
   const V2 = new THREE.Vector3(), WV = new THREE.Vector3();
   let segSeed = 1, eggRun = -1, eggSeg = null, clipCD = 0, lastHp = 100; const FLY = { seg: null, ok: false, hp: 100 };
@@ -820,6 +859,12 @@ async function boot() {
       if (!sg) { built++; const egg = !eggSeg && unlocked && !G.eggFound && kind === "city" && g.y < -200; sg = WORLD.segment(kind, g.h, segSeed++, { side: g.side || 1, noStrip: true, egg, eggSide: g.side || 1 }); if (egg) eggSeg = sg; scene.add(sg.group); SEGS.set(g, sg); }
       sg.group.position.z = g.y + g.h / 2 - H / 2; sg.update(t, s, Math.abs(sg.group.position.z - camZ) < 1150); live.add(g); }
     for (const [g, sg] of SEGS) if (!live.has(g)) { scene.remove(sg.group); sg.dispose(); SEGS.delete(g); if (sg === eggSeg) eggSeg = null; }
+    // hard rule: at most ONE review screen on screen per frame (billboards + the Easter-egg screen); extra ones are hidden
+    { cam.updateMatrixWorld(); BBF.m.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse); BBF.f.setFromProjectionMatrix(BBF.m); let shown = 0, raw = 0;
+      for (const b of WORLD.boards()) { b.visible = true; b.updateWorldMatrix(true, false); BBF.s.center.setFromMatrixPosition(b.matrixWorld); BBF.s.center.y += 70; BBF.s.radius = 80;
+        if (BBF.f.intersectsSphere(BBF.s)) { raw++; if (shown) b.visible = false; else shown = 1; } }
+      if (eggSeg && eggSeg.egg && eggSeg.egg.screen) { const e = eggSeg.egg.screen; e.visible = true; e.getWorldPosition(BBF.s.center); BBF.s.radius = 60; if (shown && BBF.f.intersectsSphere(BBF.s)) e.visible = false; else if (BBF.f.intersectsSphere(BBF.s)) shown++; }
+      STATUS.screens = shown; if (shown > (window.__BBMAX || 0)) window.__BBMAX = shown; if (raw > (window.__BBRAW || 0)) window.__BBRAW = raw; }
     M.egg = eggSeg && eggSeg.egg ? { on: true, x: eggSeg.egg.x + W / 2, y: eggSeg.group.position.z + eggSeg.egg.z + H / 2 } : null;
     const PX = PL.x - W / 2, PZ = zm(PL.y, PL.Y) - H / 2; clipCD -= s;
     // you vs the buildings: a rooftop scrape is a small hit, flying into one is a full hit; either way the building breaks where you hit it
@@ -840,7 +885,7 @@ async function boot() {
      Where the 2D game drew its mar0/mar1/mar2 sprites (beside the runway, ahead of the parked plane): "proceed" until the wheels
      leave the ground, then the big two-arm wave-off. The wands are lit along the forearm the clip is playing right now. */
   const MAR = { list: null, on: false }, MARV = new THREE.Vector3(), MARS = [[-50, 62, "m"], [54, 122, "f"], [-78, 215, "m"]];
-  const MCLIP = {}; import("../engine3d/clips.js?v=e3i").then(m => { MCLIP.c = m.CLIPS; }).catch(() => {});
+  const MCLIP = {}; import("../engine3d/clips.js?v=e3j").then(m => { MCLIP.c = m.CLIPS; }).catch(() => {});
   function drawMarshals(now, G) {
     const rw = G.ground.find(g => g.k === "runway"), show = !!(CROWD && rw && !G.landing && !G.over && (!G.running || (G.el || 0) < 7000) && rw.y < H + 300);
     M.crew3d = !!CROWD; if (!show) { if (MAR.on) { MAR.list.forEach(m => { m.p.visible = false; m.ear.visible = false; }); MAR.on = false; } return; }
@@ -894,7 +939,7 @@ async function boot() {
   const SPK = window.__M3SPK = [], PT = { n: 0, k: [], v: [], t: 0 }; function pt(k) { const t = performance.now(); if (PT.n === 0) PT.t0 = PT.t; PT.k[PT.n] = k; PT.v[PT.n] = t - (PT.n ? PT.t : PT.s); PT.n++; PT.t = t; }
   function render(now, dt) {
     const G = M.G(); if (G.running && !G.dying) FLYT.s += Math.min(.05, (dt || 16) / 1000); if (WARMQ === 2 || (WARMQ && !G.running)) { WARMQ = 0; if (!Q.get("nowarm")) warm(now, G); } const T0 = performance.now(); PT.n = 0; PT.s = T0; lateSprites();
-    BATCHES.forEach(b => b.begin()); poolsBegin(); ROTORS.n = 0; cardN = 0; kitN = 0; birdN = [0, 0]; for (const k in BOSSM) BOSSM[k].userData.used = 0;
+    BATCHES.forEach(b => b.begin()); TRC.begin(); poolsBegin(); ROTORS.n = 0; cardN = 0; kitN = 0; birdN = [0, 0]; for (const k in BOSSM) BOSSM[k].userData.used = 0;
     drawGround(now, G);
     drawCars(G);
     drawFX(now, G);
@@ -902,7 +947,7 @@ async function boot() {
     pt("ground+fx"); drawPlayer(now, G); if (CHASE) drawMarshals(now, G); drawTraffic(now, G); drawEnemies(now, G); drawReview(now, G); drawRescue(now, G); drawItems(now, G); drawShots(now, G); pt("actors");
     if (CHASE) { drawWorld(now, dt, G); pt("world"); enemyWounds(now, dt, G); playerWounds(now, dt, G); FXA.update((dt || 16) / 1000); pt("wounds+particles"); }
     for (let i = ROTORS.n; i < ROTORS.list.length; i++) ROTORS.list[i].visible = false;
-    hideFrom(cards, cardN); poolsEnd(); hideFrom(BIRDS[0], birdN[0]); hideFrom(BIRDS[1], birdN[1]); for (const k in BOSSM) if (!BOSSM[k].userData.used) BOSSM[k].visible = false; BATCHES.forEach(b => b.end());
+    hideFrom(cards, cardN); poolsEnd(); hideFrom(BIRDS[0], birdN[0]); hideFrom(BIRDS[1], birdN[1]); for (const k in BOSSM) if (!BOSSM[k].userData.used) BOSSM[k].visible = false; BATCHES.forEach(b => b.end()); TRC.end();
     if (CHASE) { chaseCam(G, dt); if (WD.d || WD.was) wTex.needsUpdate = true; WD.was = WD.d; WD.d = 0; } else { const sh = M.SHK; cam.position.set(-sh[0], D, -sh[1]); }
     if (PROPT) PROPT.rotation = -now / 1000 * 9.7;
     pt("batches"); if (COMBAT) { try { gunfire(now, G); COMBAT.update((dt || 16) / 1000, now / 1000, { scroll: (G.gsp || 0) * 60, cullZ: cam.position.z + 220 }); } catch (er) { offNote("combat", er); COMBAT = null; } }
@@ -958,15 +1003,15 @@ async function boot() {
     COMBAT.crash({ obj: o, kind, k: Math.max(.6, span / 90), rotor, eject: kind === "jet", ground: 0 }); };
   // FINAL BOSS: APEX, the flying wedge supercar (engine3d/apex.js). Thrusters under the folded wheels puff smoke, burst on every
   // direction change; the red lock-on laser and the beam are real 3D lines; damage = sparks, smoke and a flickering light bar.
-  let APX = null, APXO = null, BEAMM = null; const APV = new THREE.Vector3(), APV2 = new THREE.Vector3(), APD = new THREE.Vector3();
+  let APX = null, APXO = null, BEAMM = null; const APXT = { t: 0 }; const APV = new THREE.Vector3(), APV2 = new THREE.Vector3(), APD = new THREE.Vector3();
   function apexMesh() { if (APX) return APXO; APX = APXM.buildApex(THREE); APX.fold(1); APXO = new THREE.Group(); APXO.add(APX.node); APXO.rotation.order = "YXZ"; APXO.userData = { size: APX.size, mats: [] }; scene.add(APXO);
     BEAMM = [0, 1, 2].map(() => { const m = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 10, 1, true).translate(0, .5, 0).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: new THREE.Color(3, .25, .2), transparent: true, opacity: .8, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); m.visible = false; m.renderOrder = 150; scene.add(m); return m; });
     return APXO; }
   function beamLine(m, a, b, r, op) { m.visible = true; m.position.copy(a); APD.copy(b).sub(a); const L = APD.length(); m.scale.set(r, r, L); m.lookAt(b); m.material.opacity = op; }
   function drawApex(now, en) { const G = M.G(), o = apexMesh(), t = now / 1000, Y = alt3(en, A.rocket), roll = Math.max(-.5, Math.min(.5, -(en.vx || 0) * .07));
-    o.visible = true; put(o, en.x, en.y, Y, 118, true, 0, roll, en.st === "swoop" ? .18 : en.st === "lock" ? -.12 : 0); o.updateMatrixWorld(true);
+    o.visible = true; put(o, en.x, en.y, Y, 340, true, 0, roll, en.st === "swoop" ? .18 : en.st === "lock" ? -.12 : 0); o.updateMatrixWorld(true);
     const dmg = 1 - en.hp / en.mhp, burst = en.burst > 0 ? 1 : 0, k = o.scale.x / 25;   // k ≈ 1 at the boss's size (the mesh is ~4.6 model units long, drawn ~118 game px)
-    APX.update(t, { dmg: dmg * .5, flicker: dmg > .5 && Math.random() < .3 + dmg * .4, thrust: .6 + burst * .4 });
+    APX.update(t, { dmg: dmg * .5, flicker: dmg > .5 && Math.random() < .3 + dmg * .4, thrust: .6 + burst * .4, dt: Math.min(.05, (now - (APXT.t || now)) / 1000), wing: en.st === "lock" || en.st === "beam" ? 1 : 0 }); APXT.t = now;   // rear wing: High-Downforce while it locks on and fires, Low-Drag flat for the swipes
     if (en.hit > 0) flash(o, 0); 
     APX.pts.thrusters.forEach((q, i) => { APX.node.localToWorld(APV.copy(q)); FXA.glow(APV, (9 + burst * 10) * k, [1, .7, .35], .9);
       if (Math.random() < (burst ? .9 : .35)) FXA.emit(APV, APV2.set((Math.random() - .5) * 10, -60 - burst * 60, (G.gsp || 0) * 60 + 20), .8 + burst * .6, 3 * k, (12 + burst * 14) * k, [.85, .85, .85], [.55, .55, .58], .5, false, 0, 1.2, 8); });

@@ -564,10 +564,23 @@ var CX0=cx, CH=0;
    G.alt3 = your height between the rooftops and the ceiling. Drag up/down (touch), W/S or up/down (keys, controller stick) climb and dive;
    left/right stays. Everything that flies gets its own height (o.z3), and a hit needs the heights to match (zOK), so you can dodge a
    burst by climbing or diving and you climb or dive to grab food. The 2D game (CH=0) ignores all of it. */
-var ALT_LO=62, ALT_HI=215, ALT_DEF=140;
+var ALT_LO=16, ALT_HI=215, ALT_DEF=140, ALT_WARN=ALT_LO+(ALT_HI-ALT_LO)*.25;   // chase view: fly right down to the rooftops and the street; the lower 25% is the "too low" band
+/* too low: "PULL UP" on the HUD, the ALT gauge blinks red, a warning beep, a red pulse on the screen edges. Touch the street and it's a
+   full hit + a bounce up; a second street strike within 4 s is fatal. Buildings are hit by the 3D layer (bldHit). Never during takeoff/landing. */
+function lowAltTick(dt,takeoff,landing,now){ G.low=0; if(!CH||!G.running||G.dying||takeoff||landing||G.home||(G.alt!=null&&G.alt<1)) return;
+  if(G.alt3>=ALT_WARN) return; G.low=1-(G.alt3-ALT_LO)/(ALT_WARN-ALT_LO);
+  if(now-(G.beepT||0)>Math.max(180,420-G.low*240)){ G.beepT=now; SND.play("lowbeep"); }
+  if(G.alt3<=ALT_LO+3){ var again=now-(G.streetT||-1e9)<4000; G.streetT=now;
+    if(again&&!CALM&&!G.god&&!G.dying){ G.inv=0; G.hp=0; pop(G.x,G.y-30,T("💥 Crashed into the street!"),"#ff5a4a"); startCrash(); return; }
+    G.inv=0; hurt(G.x,G.y,T("💥 Hit the street! PULL UP!")); G.alt3=ALT_LO+22; G.mvz=Math.max(G.mvz||0,260); G.ta=Math.max(G.ta,ALT_WARN+16); } }
+function lowAltHud(now){ if(!G.low||G.dying||!G.running){ G.low=0; return; } var bl=(now/260|0)%2, a=.18+.22*Math.sin(now/170)*Math.sin(now/170);
+  cx.save(); var g=cx.createRadialGradient(W/2,H/2,H*.32,W/2,H/2,H*.72); g.addColorStop(0,"rgba(255,0,0,0)"); g.addColorStop(1,"rgba(255,30,20,"+(a*(.5+.5*G.low)).toFixed(3)+")"); cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  { cx.globalAlpha=bl?1:.6; cx.font="900 17px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=4; cx.strokeStyle="rgba(40,0,0,.85)"; cx.strokeText(T("ALTITUDE TOO LOW — PULL UP"),W/2,H*.4); cx.fillStyle="#ff4b3e"; cx.fillText(T("ALTITUDE TOO LOW — PULL UP"),W/2,H*.4); }
+  cx.restore(); }
 function zOK(o,tol){ return !CH||o.z3==null||Math.abs(o.z3-G.alt3)<tol; }
-function altGauge(){ var y0=96, y1=300, f=Math.max(0,Math.min(1,(G.alt3-ALT_LO)/(ALT_HI-ALT_LO))), yy=y1-f*(y1-y0); cx.save(); cx.fillStyle="rgba(8,13,26,.6)"; roundRect(W-22,y0-8,14,y1-y0+16,7); cx.fill();
-  cx.fillStyle="rgba(255,255,255,.2)"; cx.fillRect(W-16,y0,2,y1-y0); cx.fillStyle="#f0d375"; roundRect(W-24,yy-5,18,10,5); cx.fill(); cx.font="800 9px Barlow,system-ui"; cx.textAlign="center"; cx.fillStyle="#c9d2ee"; cx.fillText("ALT",W-15,y0-12); cx.restore(); }
+function altGauge(){ var y0=96, y1=300, f=Math.max(0,Math.min(1,(G.alt3-ALT_LO)/(ALT_HI-ALT_LO))), yy=y1-f*(y1-y0), yw=y1-(ALT_WARN-ALT_LO)/(ALT_HI-ALT_LO)*(y1-y0), blink=G.low&&((performance.now()/260|0)%2); cx.save(); cx.fillStyle=blink?"rgba(120,10,10,.75)":"rgba(8,13,26,.6)"; roundRect(W-22,y0-8,14,y1-y0+16,7); cx.fill();
+  cx.fillStyle="rgba(126,247,200,.35)"; cx.fillRect(W-17,y0,4,yw-y0); cx.fillStyle="rgba(255,70,60,.55)"; cx.fillRect(W-17,yw,4,y1-yw); cx.fillStyle="rgba(255,255,255,.85)"; cx.fillRect(W-23,yw-1,16,2);   // safe band (green) · too-low band (red) · the line between
+  cx.fillStyle="rgba(255,255,255,.2)"; cx.fillRect(W-16,y0,2,y1-y0); cx.fillStyle=G.low?"#ff4b3e":"#f0d375"; roundRect(W-24,yy-5,18,10,5); cx.fill(); cx.font="800 9px Barlow,system-ui"; cx.textAlign="center"; cx.fillStyle="#c9d2ee"; cx.fillText("ALT",W-15,y0-12); cx.restore(); }
 function bb(x,y,Y,fn,smin,smax){ if(!CH||!M3.proj){ fn(); return; } var p=M3.proj(x,y,Y); if(!p) return; var s=Math.max(smin||.45,Math.min(smax||1.6,p[2])), o=cx;
   cx=CX0; cx.save(); cx.translate(p[0],p[1]); cx.scale(s,s); cx.translate(-x,-y); try{ fn(); } finally{ cx.restore(); cx=o; } }
 cv.width=W*DPR; cv.height=H*DPR; cx.scale(DPR,DPR);
@@ -809,7 +822,7 @@ function spawnPick(){
   // health kits: rare, only when hurt, at most two a flight
   if(G.hp<100&&G.heals<2&&G.el-G.lastHeal>12000&&G.lel>9000&&Math.random()<0.12){ G.heals++; G.lastHeal=G.el; G.items.push({t:"heal",x:40+Math.random()*(W-80),y:-40,r:20}); }
 }
-function spawnUfo(){ var h=L().ufo; G.ens.push({t:"ufo",x:60+Math.random()*(W-120),y:-50,r:28,hp:h,mhp:h,ph:Math.random()*6,fire:(900+Math.random()*700)*L().pace,w:84}); }
+function spawnUfo(){ var h=L().ufo, x0=80+Math.random()*(W-160); G.ens.push({t:"ufo",x:x0,x0:x0,amp:60+Math.random()*60,y:-50,r:28,hp:h,mhp:h,ph:Math.random()*6,fire:(900+Math.random()*700)*L().pace,w:84,zl:ALT_LO+46+Math.random()*(ALT_HI-ALT_LO-70)}); }   // UFOs patrol their OWN lane + height: they never follow you
 /* ---- JETS (2026-10-14 rework, Antidote): they come as a back-to-back PAIR. Jet 1 drops in and hangs at the top, sliding after you
    slowly, and fires single aimed shots (2 per jet, 3 from level 4): each one has a red aim line for 650 ms first and flies at
    4.2 px/frame, aimed where you are when it fires (no homing). After 5 s a red lane shows its dive (600 ms), it dives straight
@@ -1466,13 +1479,14 @@ var SND=(function(){
   function hiss(dur,f0,f1,vol,type,q,dl){ var t=ctx.currentTime+(dl||0), n=ctx.createBufferSource(), f=ctx.createBiquadFilter(), g=ctx.createGain(); n.buffer=nb; f.type=type||"lowpass"; f.Q.value=q||.8;
     f.frequency.setValueAtTime(f0,t); f.frequency.exponentialRampToValueAtTime(Math.max(30,f1),t+dur); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0005,t+dur);
     n.connect(f); f.connect(g); g.connect(fx); n.start(t,Math.random()*1.5); n.stop(t+dur+.03); }
-  var GAP={hit:70,dry:300,lock:600,bump:400,w0:60,w1:60,w2:60,w3:60,w4:60,boom:90,whistle:260,jet:300,pickup:50,pop:40};
+  var GAP={lowbeep:150,hit:70,dry:300,lock:600,bump:400,w0:60,w1:60,w2:60,w3:60,w4:60,boom:90,whistle:260,jet:300,pickup:50,pop:40};
   var LIB={
     w0:function(){ hiss(.07,5200,900,.16,"bandpass",.9); tone("square",640,140,.06,.08); tone("sine",130,55,.08,.14); },      // twin guns: a real gun crack (louder, 2026-10-16)
     w1:function(){ tone("sine",1900,300,.13,.14); tone("square",2400,500,.05,.04); hiss(.05,6000,2000,.06,"highpass"); },     // laser: pew
     w2:function(){ tone("sine",170,45,.2,.24); hiss(.12,1400,160,.12); },                                                       // power gun: thump
     w3:function(){ tone("sawtooth",760,420,.06,.08); tone("square",1520,900,.04,.03); hiss(.05,4800,1500,.07,"bandpass",1.2); },   // blue beams: auto buzz
     w4:function(){ tone("sawtooth",280,70,.15,.07); hiss(.1,2600,220,.07); tone("sine",95,40,.14,.12); },                       // red beams: heavy blast
+    lowbeep:function(){ tone("square",1180,1180,.09,.07); tone("square",880,880,.06,.04,.1); },   // the PULL UP warning
     hit:function(){ hiss(.06,3000,700,.2,"bandpass",2.2); tone("square",420,110,.07,.09); tone("triangle",1900,1300,.03,.05); },   // bullet strikes an enemy ship: metallic clank
     boom:function(n){ var s=Math.min(1.6,(n||18)/22); hiss(.45+.35*s,900,60,.28*s); tone("sine",95,30,.35,.22*s); },
     bigboom:function(){ hiss(1.7,1300,35,.6); tone("sine",75,22,1.3,.45); hiss(.5,4000,300,.2,"bandpass",.5,.08); },
@@ -2274,7 +2288,7 @@ function frame(now){
     if(window.ReviewEgg&&!G.home&&G.dz<DRIZ_N){ G.dzT-=dt; if(G.dzT<=0) G.dzT=spawnDriz()?DRIZ_GAP+Math.random()*2000:1500; }
     G.ammoT-=dt; if(!CALM&&G.guns&&G.unl>0&&G.ammoT<=0){ G.ammoT=11000+Math.random()*5000; if(ammoLow()&&!G.items.some(function(x){ return x.ammo; })) G.items.push({t:"crate",ammo:1,x:60+Math.random()*(W-120),y:H+50,r:26,sw:Math.random()*6}); }
     } }
-    boostStep(dt); slowStep(dt); if(!CALM){ slowSpawnTick(dt,takeoff,landing); boostItemTick(dt,takeoff,landing); }
+    boostStep(dt); slowStep(dt); if(!CALM){ slowSpawnTick(dt,takeoff,landing); boostItemTick(dt,takeoff,landing); } lowAltTick(dt,takeoff,landing,now);
     steer(dt,takeoff||landing);
     if(G.inv>0) G.inv-=k; if(G.multT>0){ G.multT-=dt; if(G.multT<=0) G.mult=1; }
     if(Math.floor(now/250)!==Math.floor((now-dt)/250)) G.score+=G.mult;
@@ -2335,7 +2349,7 @@ function frame(now){
   var k0=k, dt0=dt; k*=G.ts; dt*=G.ts;
   var rv=0;
   for(var e=G.ens.length-1;e>=0;e--){ var en=G.ens[e]; if(!en) continue; if(en.hit>0) en.hit-=dt;
-    if(CH&&en.t!=="base"){ if(en.z3==null) en.z3=Math.max(ALT_LO+10,Math.min(ALT_HI-10,G.alt3+(Math.random()-.5)*70)); if(run) en.z3+=Math.max(-.5*k,Math.min(.5*k,(G.alt3-en.z3)*.02*k)); }   // they drift toward your height
+    if(CH&&en.t!=="base"){ if(en.z3==null) en.z3=en.zl!=null?en.zl:Math.max(ALT_LO+10,Math.min(ALT_HI-10,G.alt3+(Math.random()-.5)*70)); if(run&&en.t==="ufo"){ if(en.zl==null) en.zl=en.z3; en.z3=en.zl+Math.sin(en.ph*.7)*14; } else if(run) en.z3+=Math.max(-.5*k,Math.min(.5*k,(G.alt3-en.z3)*.02*k)); }   // they drift toward your height
     if(en.boss){ if(run) bossStep(en,dt,k,now); bossDraw(en,now); if(en.t==="gunship") rv=Math.max(rv,1.2-Math.hypot(en.x-G.x,en.y-G.y)/450);
       if(run&&G.boss===en&&!en.ground&&en.rw&&Math.abs(en.x-G.x)<en.rw+16&&Math.abs(en.y-G.y)<en.rh+18&&zOK(en,(en.rh||50)*.5+24)) hurt(G.x,G.y,T("💥 Hit the boss!")); continue; }
     if(en.t==="esc"||en.t==="bird"){ var isB=en.t==="bird"; if(run){ if(isB) birdStep(en,dt,k,now); else escStep(en,dt,k,now); }
@@ -2344,8 +2358,12 @@ function frame(now){
       if(run&&!en.fleeing&&en.y>0&&Math.abs(en.x-G.x)<en.r+20&&Math.abs(en.y-G.y)<en.r+22&&zOK(en,en.r*.7+18)){ hurt(en.x,en.y,isB?T("🕊️ Bird strike!"):T("💥 Escort hit!")); boom(en.x,en.y,isB?10:24); if(isB) birdKilled(en,false); else { var ei=G.ens.indexOf(en); if(ei>=0) G.ens.splice(ei,1); } }
       continue; }
     if(run){ if(en.t==="ufo"&&en.fleeing){ en.x+=(en.x<W/2?-5:5)*k; en.y-=.6*k; }
-      else if(en.t==="ufo"){ var lv=G.lvl; en.ph+=.03*k; en.y+=1.1*(1+.08*(lv-1))*k; en.x+=Math.sin(en.ph)*1.6*k; en.fire-=dt;
-        if(en.fire<=0&&en.y>20){ var ang=Math.atan2(G.y-en.y,G.x-en.x), usp=3.6*(1+.06*(lv-1)); (lv>=3?[-.22,0,.22]:[0]).forEach(function(o){ G.eshots.push({x:en.x,y:en.y+12,vx:Math.cos(ang+o)*usp,vy:Math.sin(ang+o)*usp,c:"#7ef7c8",r:6}); }); en.fire=(1700+Math.random()*900)*L().pace*1.35; } }
+      else if(en.t==="ufo"){ var lv=G.lvl; en.ph+=.026*k;   // patrol: sweep side to side across its own lane, drift toward you, then swoop in and veer off to its side
+        if(en.x0==null){ en.x0=en.x; en.amp=80; }
+        if(!en.veer&&en.y>H*.42) en.veer=en.x0<W/2?-1:1;
+        en.y+=(en.veer?2.3:1.1)*(1+.08*(lv-1))*k; if(en.veer){ en.x0+=en.veer*3.4*k; en.amp*=Math.pow(.97,k); }
+        en.x=Math.max(30,Math.min(W-30,en.x0+Math.sin(en.ph)*en.amp)); en.fire-=dt;
+        if(en.fire<=0&&en.y>20&&!en.veer){ var ang=Math.PI/2+Math.sin(en.ph)*.18, usp=3.6*(1+.06*(lv-1));   /* fires along its own heading (straight down its lane, swaying with the sweep), never aimed at you */ (lv>=3?[-.22,0,.22]:[0]).forEach(function(o){ G.eshots.push({x:en.x,y:en.y+12,vx:Math.cos(ang+o)*usp,vy:Math.sin(ang+o)*usp,c:"#7ef7c8",r:6}); }); en.fire=(1700+Math.random()*900)*L().pace*1.35; } }
       else if(en.t==="jet"){ jetStep(en,dt,k); if(en.fleeing&&en.y<-110){ G.ens.splice(e,1); continue; } }
       else if(en.t==="cop"&&!en.fleeing){
         var cpv=L().copV;   /* was "var cv": it shadowed the game canvas for the whole frame() (cv.parentNode threw while not flying) */ if(en.y<en.hoverY) en.y+=2.2*cpv*k; else { en.y+=Math.sin(now/400)*.3*k; en.sw=(en.sw||0)+.018*cpv*k; if(en.cx0==null) en.cx0=en.x; en.cx0+=Math.max(-.5,Math.min(.5,(G.x-en.cx0)*.006))*k;   // strafes back and forth across your line
@@ -2426,7 +2444,7 @@ function frame(now){
   }
   if(!CH) TRF.calls(now,dt);
   drawClouds(spd*k);
-  if(CH){ cx.restore(); cx=CX0; cx.save(); if(SHK[0]||SHK[1]) cx.translate(SHK[0],SHK[1]); TRF.calls(now,dt); eggCheck(); if(G.running) altGauge(); }   // chase view: from here on it is the HUD
+  if(CH){ cx.restore(); cx=CX0; cx.save(); if(SHK[0]||SHK[1]) cx.translate(SHK[0],SHK[1]); TRF.calls(now,dt); eggCheck(); if(G.running){ altGauge(); lowAltHud(now); } }   // chase view: from here on it is the HUD
   for(var pI=G.pops.length-1;pI>=0;pI--){ var po=G.pops[pI]; po.y-=1.1*k; po.a-=.02*k; if(po.a<=0){ G.pops.splice(pI,1); continue; } bb(po.x,po.y,null,function(){ cx.globalAlpha=po.a; cx.fillStyle=po.col; cx.font="800 17px Barlow,system-ui"; cx.textAlign="center"; cx.lineWidth=3; cx.strokeStyle="rgba(5,8,20,"+(CH?.75:0)+")"; if(CH) cx.strokeText(po.txt,po.x,po.y); cx.fillText(po.txt,po.x,po.y); cx.globalAlpha=1; },.75,1.5); }
   slowHud(now); drawBossBar(); drawUpgrade(dt); drawBanner(dt); drawDrizHud(now); gunCue(run,takeoff);
   if(takeoff||(landing&&!G.touched)){ var msg=takeoff?(G.el<1500?T("Cleared for takeoff · Runway 25L"):T("Wheels up! Catch the food")):T("Melody tower: cleared to land 25L"); cx.save(); cx.font="900 17px Barlow,system-ui"; cx.textAlign="center"; var tw=cx.measureText(msg).width+28; cx.fillStyle="rgba(8,13,26,.82)"; roundRect(W/2-tw/2,64,tw,34,17); cx.fill(); cx.fillStyle="#f0d375"; cx.textBaseline="middle"; cx.fillText(msg,W/2,81); cx.restore(); }
@@ -2595,7 +2613,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=e3i"></script>
+<script type="module" src="melody3d.js?v=e3j"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}
@@ -2664,7 +2682,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-top"><div class="ms-hd"><p class="ms-by notranslate">Melody Bar &amp; Grill · Melody Approach</p>'+
       (live?'<span class="ms-beta on">'+esc(T("LIVE · Win this week"))+'</span>':'<span class="ms-beta">'+esc(T("BETA · Coming soon: win rewards"))+'</span>')+
       '<div class="ms-h" role="heading" aria-level="2">'+esc(T("Can you win the weekly challenge?"))+'</div></div>'+
-      '<div class="ms-pv" aria-hidden="true"><canvas id="mpv" width="120" height="180" style="background:#0c1220 url(img/game/card-3d-flight.webp?v=e3i) center/cover"></canvas><i>LIVE</i></div></div>'+
+      '<div class="ms-pv" aria-hidden="true"><canvas id="mpv" width="120" height="180" style="background:#0c1220 url(img/game/card-3d-flight.webp?v=e3j) center/cover"></canvas><i>LIVE</i></div></div>'+
     '<div class="ms-prize"><img src="'+esc(WK.img||"img/menu/melody-fries.jpg")+'" alt=""><div><small>'+esc(T(live?"This week's prize":"Weekly prize · coming soon"))+'</small><b>'+esc(T(prize))+'</b><em>'+esc(T(live?(WK.note||"Top score of the week wins"):"The boards are live now. Prizes switch on soon."))+'</em></div></div>'+
     '<div class="ms-food" aria-label="'+esc(T("Catch the food for points"))+'">'+FOOD.map(function(f){ return '<span class="ms-f" style="--d:'+f[4]+'" title="'+esc(T(f[1]))+'">'+(f[3]?'<span class="ms-st"><i></i><i></i><i></i></span>':'')+'<img src="'+g+f[0]+'.webp?v='+(f[5]||"ag1")+'" alt="'+esc(T(f[1]))+'"><b>'+f[2]+'</b></span>'; }).join("")+'</div>'+
     '<div class="ms-mode" role="group" aria-label="'+esc(T("Game mode"))+'">'+mbtn("campaign","🏆","Campaign","10 levels · 6 bosses",cur,T,esc)+mbtn("survival","⏱️","Survival","How long can you last?",cur,T,esc)+'</div>'+
@@ -2672,7 +2690,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-mvp">'+mvp(esc,T)+'</div></div>'; }
 document.addEventListener("click",function(e){ var b=e.target&&e.target.closest&&e.target.closest("[data-mel=mode]"); if(!b) return; e.preventDefault(); if(window.MELODY_MODE) MELODY_MODE(b.getAttribute("data-v")); if(window.GameMenu) GameMenu.refresh(); });
 window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill",tagline:"Night dogfight over LA: 10 levels and six bosses, or Survival. Catch the food, win the week.",
- hero:[g+"card-3d-flight.webp?v=e3i",g+"card-3d-boss.webp?v=e3i",g+"card-3d-beach.webp?v=e3i"],   // the 3D game (2026-10-16), not the old 2D sprites
+ hero:[g+"card-3d-flight.webp?v=e3j",g+"card-3d-boss.webp?v=e3j",g+"card-3d-beach.webp?v=e3j"],   // the 3D game (2026-10-16), not the old 2D sprites
  theme:{bg:"#0b1220",bg2:"#1c2547",card:"#141e34",edge:"#27324d",accent:"#d4af37",accent2:"#f0d375",label:"#f0d375",ink:"#f6f1e4",dim:"#9aa3b5",btnInk:"#1a1206",soft:"rgba(255,255,255,.06)",track:"#27324d",good:"#3fbf8f",bad:"#ff7a59",
   display:"Anton,Impact,'Arial Narrow',sans-serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
  tokens:false, showcase:showcase, preview:function(v){ if(window.__MG&&__MG.attract) __MG.attract(v); },
@@ -2731,7 +2749,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
   {group:"Weekly boards",items:[{icon:"🏆",name:"Campaign board",note:"Ranked by score (levels beaten add big bonuses)",pts:"score"},{icon:"⏱️",name:"Survival board",note:"Ranked by the longest time survived",pts:"time"}]}],
  prizes:{title:"Weekly challenge (BETA)",champion:"Top of each weekly board wins "+(WK.prize||"Free Melody Fries")+" once Melody turns rewards on",note:"BETA: rewards are off until Melody switches them on. Until then the boards rank players for bragging rights and the game gives no prizes or Melody Rewards points. When they're on: 1 point per "+GP.perScore+" score, up to "+GP.dailyCap+" points a day."}};
 })();</script>
-<script src="../gamemenu.js?v=e3i"></script><script src="../a2hs.js?v=mg1"></script>
+<script src="../gamemenu.js?v=e3j"></script><script src="../a2hs.js?v=mg1"></script>
 <script>/* Simple program (Christian, 2026-10): one balance, the numbers live in window.SSAI_REWARDS at the top of this page.
    No split wallets, visit levels, tokens, daily spin or welcome voucher (see crm.js SIMPLE). */
 window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Melody Approach",customerOnly:true};

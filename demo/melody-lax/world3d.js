@@ -18,12 +18,15 @@
    the break, towels, umbrellas, volleyball, a lifeguard tower, the boardwalk, the pier, and Nalu Vida on the pier with its logo.
    Used by melody3d.js (the game) and 3d-looks/look2.js + look3.js (the preview clips).
    makeWorld(THREE, {base, fx}) → { segment(kind, len, seed, o), root, wind, tick(dt, t), debris(...) }. */
-import { makeBeachKit } from "./beach3d.js?v=e3i";
-import { makeVideoBoards } from "../engine3d/billboard.js?v=e3i";
-import { makeFacades } from "../engine3d/facades.js?v=e3i";
+import { makeBeachKit } from "./beach3d.js?v=e3j";
+import { makeVideoBoards } from "../engine3d/billboard.js?v=e3j";
+import { makeFacades } from "../engine3d/facades.js?v=e3j";
+import { buildCars } from "../engine3d/carmodels.js?v=e3j";
 /* The storefront name. The real business is "Melody Bar & Grill"; change this one line to rename the awning / blade sign / door
    glass lettering (the gold logo boards use the real artwork, img/logo.png). */
 export const MELODY_SIGN_TEXT = "MELODY BAR & GRILL";
+// seconds of FLIGHT between two review billboards (they alternate right, left, right…); tune here
+export const BB_GAP_S = 50;
 export function makeWorld(THREE, O = {}) {
   const TAU = Math.PI * 2, BASE = O.base || "";
   const rng = (seed) => { let s = (seed * 2654435761) | 0; return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
@@ -85,7 +88,7 @@ export function makeWorld(THREE, O = {}) {
     gold: new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: .25, metalness: .8, emissive: 0x5a3e00, emissiveIntensity: .7 }),
     beam: new THREE.MeshBasicMaterial({ map: coneTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xfff0c8, opacity: .22, side: THREE.DoubleSide, toneMapped: false }),
   };
-  M.car.vertexColors = false;
+  M.car.vertexColors = true;
   // window lights: one cell of the window grid = one window; each switches on/off on its own clock. aDmg (per building) darkens a broken one
   // facades: engine3d/facades.js — stucco / glass curtain wall / brick / concrete office in one atlas, tiled at real window size,
   // normal + roughness detail on the PBR path (Lambert on Smooth), every window lit on its own clock; aDmg darkens a broken one
@@ -124,7 +127,7 @@ export function makeWorld(THREE, O = {}) {
     const o = new THREE.BufferGeometry(), pos = [], nor = [], uv = [], idx = []; let base = 0;
     parts.forEach(([g, m]) => { const q = g.clone().applyMatrix4(m); pos.push(...q.attributes.position.array); nor.push(...q.attributes.normal.array); uv.push(...q.attributes.uv.array); for (const k of q.index.array) idx.push(k + base); base += q.attributes.position.count; });
     o.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); o.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); o.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); o.setIndex(idx); return o; })();
-  const carG = merge([[new THREE.BoxGeometry(7, 2.6, 15.5), T4(0, 2.1, 0)], [new THREE.BoxGeometry(6.2, 2.2, 7.5), T4(0, 4.4, -1)]]);
+  const carG = (() => { const c = buildCars(THREE).find(k => k.name === "midsize-sedan"); const g = c.geo.clone(); g.scale(3.3, 3.3, 3.3); g.deleteAttribute("_part"); return g; })();   // the simple loop's cars: a real-proportioned sedan (engine3d/carmodels.js), painted per instance
   const lampG = new THREE.BoxGeometry(1.5, 1, .5);
   const poolG = new THREE.PlaneGeometry(9, 26).rotateX(-Math.PI / 2).translate(0, .35, 20);
   const bodyG = new THREE.CapsuleGeometry(1.5, 3.4, 3, 8).translate(0, 3.2, 0), headG = new THREE.SphereGeometry(1.25, 8, 6).translate(0, 7.5, 0);
@@ -159,8 +162,8 @@ export function makeWorld(THREE, O = {}) {
   // the review billboard shows up about once per 2 minutes of flight (O.clock = seconds flown); the first one ~1 minute in.
   // The Venice pier board counts toward the same budget. Warm-up strips (o.warm) always get one so its shader is compiled early.
   // Sides alternate (left, right, left…); boards are never back to back (≥ 120 s of flight apart, so two are never on screen together).
-  let bbLast = O.bbFirst != null ? O.bbFirst : -60, bbSide = -1, WARM = false;
-  const bbDue = (side) => { if (WARM) return side || 1; const t = O.clock ? O.clock() : performance.now() / 1000; if (t - bbLast < (O.bbGap || 120)) return 0;
+  let bbLast = O.bbFirst != null ? O.bbFirst : -BB_GAP_S * .6, bbSide = 1, WARM = false;
+  const bbDue = (side) => { if (WARM) return side || 1; const t = O.clock ? O.clock() : performance.now() / 1000; if (t - bbLast < (O.bbGap || BB_GAP_S)) return 0;
     if (side && side !== bbSide) return 0;   // a fixed-side board (the pier) only when it's that side's turn
     bbLast = t; const s = bbSide; bbSide = -bbSide; return s; };
   const boardsAll = [];
@@ -342,7 +345,7 @@ export function makeWorld(THREE, O = {}) {
     seg.group.add(mesh(g, M.ground));
     const lots = [], tall = o.tall || 0, clear = (o.clear || []).slice(), palmSpots = [], lampSpots = [];
     // a review billboard beside the flight path on most city strips (in the lot between the 1st and 2nd avenue)
-    let sd0; if (!o.noBillboard && (sd0 = bbDue())) { const sd = sd0, bx = sd * (250 + R() * 60), bz = (R() - .5) * len * .45; clear.push([bx, bz, 90, 60]); billboard(seg.group, bx, bz, -sd * .28); }
+    let sd0; if (!o.noBillboard && (sd0 = bbDue())) { const sd = sd0, bx = sd * (196 + R() * 26), bz = (R() - .5) * len * .45; clear.push([bx, bz, 90, 60]); billboard(seg.group, bx, bz, -sd * .28); }
     const free = (x, z, w, d) => !clear.some(c => Math.abs(x - c[0]) < (w + c[2]) / 2 && Math.abs(z - c[1]) < (d + c[3]) / 2);
     for (let ax = 0; ax < AVE.length - 1; ax++) { const x0 = AVE[ax] + ROAD / 2 + SIDE + 4, x1 = AVE[ax + 1] - ROAD / 2 - SIDE - 4;
       for (let z0 = -len / 2 + ROAD / 2 + SIDE + 4; z0 < len / 2 - 40; z0 += CZ) { const z1 = Math.min(len / 2 - 6, z0 + CZ - ROAD - 2 * SIDE - 8);
@@ -490,7 +493,7 @@ export function makeWorld(THREE, O = {}) {
     const ring = mesh(new THREE.RingGeometry(9, 12, 32).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xf0d375, transparent: true, opacity: .55, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), 0, .5, 0); car.add(ring);   // a faint gold ring: findable, not loud
     car.scale.setScalar(1.6); seg.group.add(car);
     const lane = ax - 8, dir = 1;   // drives toward you (the +z lane of that avenue), right past the screen
-    seg.egg = { x: lane, z: 0, car };
+    seg.egg = { x: lane, z: 0, car, screen: scr };
     seg.tick.push((t) => { const s = ((t * 34) % (len * .9)) - len * .45; car.position.set(lane, 0, s * dir); car.rotation.y = dir > 0 ? 0 : Math.PI; seg.egg.z = car.position.z; ring.material.opacity = .35 + .25 * Math.sin(t * 4); });
   }
   function runway(seg, R, len, o) {   // LAX-style runway with approach lights; the game draws its own animated runway texture on top when it has one

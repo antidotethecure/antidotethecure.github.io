@@ -54,22 +54,26 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=e3f") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3f") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=e3g") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3g") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
-  const QM = await import("../engine3d/quality.js?v=e3f");
+  const QM = await import("../engine3d/quality.js?v=e3g");
   // every optional system loads and starts on its own: one that fails (import, shader, GPU feature) switches only itself off (STATUS.off)
   const FAILQ = (Q.get("fail") || "").split(",");   // test hook: ?fail=clouds,post,crowd,… makes those systems fail on purpose
   const offNote = (n, e) => { const m = n + ": " + String(e && e.message || e).slice(0, 80); if (!STATUS.off.includes(m)) STATUS.off.push(m); console.warn("[melody3d] " + m); };
   const safe = (n, fn) => { try { if (FAILQ.includes(n)) throw new Error("forced by ?fail"); return fn(); } catch (e) { offNote(n, e); return null; } };
   const safeA = async (n, fn) => { try { if (FAILQ.includes(n)) throw new Error("forced by ?fail"); return await fn(); } catch (e) { offNote(n, e); return null; } };
-  const impE = (n) => import("../engine3d/" + n + ".js?v=e3f").catch(e => { offNote(n, e); return null; });
+  const impE = (n) => import("../engine3d/" + n + ".js?v=e3g").catch(e => { offNote(n, e); return null; });
   const [PARTM, DMGM, ACM, SKYM, CLDM, WXM, POSTM, WATM, AUDM, CBM, APXM] = CHASE ? await Promise.all(["particles", "damage", "aircraft", "sky", "clouds", "weather", "postfx", "water", "audio", "combat", "apex"].map(impE)) : [];
   const W = M.W, H = M.H, S = M.S, FX = M.FX, FXI = FX._i(), TAU = Math.PI * 2;
   const D = 1000;                                   // camera height above the ground plane
   const ws = Y => CHASE ? 1 : (D - Y) / D;          // world units per screen px at altitude Y (chase view: 1:1, no top-down parallax)
-  const far = y => CHASE && y < 0 ? y * 3.2 : y;   // chase view: the strip above the field stretches out toward the horizon (spawns fade in from far away, not pop)
-  const wx = (x, Y) => (x - W / 2) * ws(Y), wz = (y, Y) => (far(y) - H / 2) * ws(Y);
+  // chase view: depth for things that FLY. Ahead of your plane the 2D field is stretched 2.4× along the flight, so pickups, enemies and
+  // their fire close in on you ~2.4× faster than the ground streams by (at eye level they'd otherwise seem to hang in front of you or
+  // drift away), and spawns start far out near the horizon. Your plane's row (y = H-130) maps to itself, so every 2D hit lines up.
+  const YP = H - 130, KF = 2.4, KB = 1.5;
+  const far = y => CHASE ? (y < YP ? YP + (y - YP) * KF : YP + (y - YP) * KB) : y;
+  const wx = (x, Y) => (x - W / 2) * ws(Y), wz = (y, Y) => ((CHASE && Y <= 20 ? y : far(y)) - H / 2) * ws(Y);   // things on the ground (Y ≤ 20) move with the ground
   const A = { trf: 128, player: 150, ufo: 176, jet: 192, cop: 200, kami: 182, gun: 214, sj: 200, rp: 236, blimp: 250, item: 104, shot: 150, eshot: 164, air: 138, esc: 188, bigjet: 208, rocket: 222, base: 14, bird: 172 };
   // chase view: everything that flies sits close to your own flight level (150), so your shots visibly meet what they hit
   if (CHASE) Object.assign(A, { trf: 132, ufo: 156, jet: 158, cop: 160, kami: 154, gun: 162, sj: 158, rp: 172, blimp: 186, item: 146, shot: 150, eshot: 151, air: 150, esc: 156, bigjet: 160, rocket: 160, bird: 154 });
@@ -79,16 +83,19 @@ async function boot() {
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
   // phones / tablets / Tesla: step the tiers down at < 40 fps, and fall back to 2D only if LOW stays under ~20 fps for 8 s
   const MOBILE = /iPhone|iPad|Android|Mobile|Tesla|QtCarBrowser/i.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
-  const QUAL = window.__E3Q = QM.makeQuality({ id: "melody-lax", renderer, target: MOBILE ? 40 : 50, minFps: MOBILE ? 20 : 40, failSecs: MOBILE ? 8 : 5 });
+  const QUAL = window.__E3Q = QM.makeQuality({ id: "melody-lax", renderer, target: MOBILE ? 40 : 50, minFps: MOBILE ? 20 : 40, failSecs: MOBILE ? 8 : 5,
+    calm: () => { const G = M.G(); return !G.running || (G.ens.length <= 3 && !G.ens.some(e => e && e.boss)); } });   // tier changes wait for a quiet moment
+  let WARMQ = 0; const SMOOTH = QUAL.smooth, tierName = () => (QUAL.smooth ? "smooth" : QUAL.tier) + (QUAL.lock30 ? " 30" : "");
   // GPU features: render targets fall back to 8-bit when half/float colour buffers aren't renderable (some iOS / older GPUs)
   const glc0 = renderer.getContext(), isGL2 = renderer.capabilities.isWebGL2, NOF = Q.get("nofloat") === "1";
   const CAPS = { gl2: isGL2, half: !NOF && isGL2 && !!(glc0.getExtension("EXT_color_buffer_float") || glc0.getExtension("EXT_color_buffer_half_float")), floatLin: !NOF && !!glc0.getExtension("OES_texture_float_linear") };
   STATUS.caps = (CAPS.gl2 ? "gl2" : "gl1") + (CAPS.half ? "" : " no-halfRT") + (CAPS.floatLin ? "" : " no-floatLin");
-  renderer.setPixelRatio(Math.min(QUAL.cfg.pr, window.devicePixelRatio || 1)); STATUS.tier = QUAL.tier;
-  QUAL.onChange((t, cfg) => { STATUS.tier = t; renderer.setPixelRatio(Math.min(cfg.pr, window.devicePixelRatio || 1)); renderer.setSize(W, H, false); renderer.shadowMap.enabled = cfg.shadows > 0; scene.traverse(o => { if (o.material) [].concat(o.material).forEach(m => m.needsUpdate = true); }); });
+  renderer.setPixelRatio(Math.min(QUAL.cfg.pr, window.devicePixelRatio || 1)); STATUS.tier = tierName();
+  // a tier change only recompiles materials when the shadow switch actually flips (that rebuild is the visible hitch)
+  QUAL.onChange((t, cfg) => { STATUS.tier = tierName(); renderer.setPixelRatio(Math.min(cfg.pr, window.devicePixelRatio || 1)); renderer.setSize(W, H, false); const sh = cfg.shadows > 0; if (renderer.shadowMap.enabled !== sh) { renderer.shadowMap.enabled = sh; scene.traverse(o => { if (o.material) [].concat(o.material).forEach(m => m.needsUpdate = true); }); } });
   renderer.setSize(W, H, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.enabled = QUAL.cfg.shadows > 0; renderer.shadowMap.type = MOBILE ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
   renderer.setClearColor(0x0c1220, 1);
   const gl = renderer.domElement;
   gl.className = "m3d"; gl.setAttribute("aria-hidden", "true");
@@ -121,15 +128,15 @@ async function boot() {
   let SKY = null, CLOUDS = null, WX = null, POST = null, MIRROR = null, AMB = null, FLYN = 0, todH = Q.get("tod") ? +Q.get("tod") : TOD[SKYPREF()] || 18.35;
   if (CHASE) {
     const RT = CAPS.half ? THREE.HalfFloatType : THREE.UnsignedByteType;
-    SKY = SKYM && safe("sky", () => SKYM.makeSky(THREE, { renderer, scene, sun, hemi, hours: todH, azimuth: -.42, envEvery: QUAL.tier === "low" ? 6000 : 1500 }));
-    CLOUDS = SKY && CLDM && CAPS.gl2 && CAPS.half ? safe("clouds", () => CLDM.makeClouds(THREE, { renderer, sky: SKY, quality: QUAL.cfg.clouds, rtType: RT })) : null;
+    SKY = SKYM && safe("sky", () => SKYM.makeSky(THREE, { renderer, scene, sun, hemi, hours: todH, azimuth: -.42, envEvery: SMOOTH ? 90000 : QUAL.tier === "low" ? 30000 : 1500 }));   // re-baking the sky reflections is a hitch on phones: rarely on low
+    CLOUDS = SKY && CLDM && CAPS.gl2 && CAPS.half && QUAL.cfg.clouds && QUAL.tier !== "low" ? safe("clouds", () => CLDM.makeClouds(THREE, { renderer, sky: SKY, quality: QUAL.cfg.clouds, rtType: RT })) : null;
     const wp = WXPREF(); WX = WXM && safe("weather", () => WXM.makeWeather(THREE, { scene, state: wp === "live" ? "partly" : wp, auto: wp === "live", quality: { rain: QUAL.cfg.rain }, airflow: () => (M.G().gsp || 0) * 60 }));
     POST = CLOUDS && POSTM ? await safeA("post", () => POSTM.makePost(THREE, { renderer, scene, camera: cam, clouds: CLOUDS, quality: Object.assign({}, QUAL.cfg.post, CAPS.half ? {} : { ssao: false, bloom: false }), width: W, height: H, pixelRatio: renderer.getPixelRatio(), rtType: RT })) : null;
     if (POST) { const ok = safe("post-first-frame", () => { POST.render(.016, 0, { puffs: [] }); return true; }); if (!ok) { POST = null; scene.background = scene.background || null; } }
     rim.intensity = .35;
-    MIRROR = WATM && CAPS.gl2 ? safe("reflections", () => WATM.makeMirror(THREE, renderer, { y: 0, scale: .5, rtType: RT })) : null;
+    MIRROR = WATM && CAPS.gl2 && !SMOOTH ? safe("reflections", () => WATM.makeMirror(THREE, renderer, { y: 0, scale: .5, rtType: RT })) : null;
     AMB = AUDM && safe("audio", () => AUDM.makeAmbience({ out: () => M.audioOut && M.audioOut() })); if (WX && AMB) WX.onThunder((d, k) => { try { AMB.thunder(d, k); } catch (e) {} });
-    QUAL.onChange((t, cfg) => { safe("tier-change", () => { if (CLOUDS) CLOUDS.setQuality(cfg.clouds); if (WX) WX.setQuality({ rain: cfg.rain }); if (POST) { POST.setQuality(Object.assign({}, cfg.post, CAPS.half ? {} : { ssao: false, bloom: false })); POST.setSize(W, H, renderer.getPixelRatio()); } sun.shadow.mapSize.set(cfg.shadowSize, cfg.shadowSize); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }); });
+    QUAL.onChange((t, cfg) => { safe("tier-change", () => { if (CLOUDS && cfg.clouds) CLOUDS.setQuality(cfg.clouds); if (WX) WX.setQuality({ rain: cfg.rain }); if (POST) { POST.setQuality(Object.assign({}, cfg.post, CAPS.half ? {} : { ssao: false, bloom: false })); POST.setSize(W, H, renderer.getPixelRatio()); } sun.shadow.mapSize.set(cfg.shadowSize, cfg.shadowSize); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }); });
     // the game menu's Settings → Sky / Weather (gamemenu.js selects) talk to these
     window.MELODY_ENV = { sky(v) { try { localStorage.setItem("melody-sky", v); } catch (e) {} if (TOD[v]) todH = TOD[v]; }, weather(v) { try { localStorage.setItem("melody-weather", v); } catch (e) {} if (!WX) return; if (v === "live") WX.auto(true); else { WX.auto(false); WX.set(v, 8); } },
       get: () => ({ sky: SKYPREF(), weather: WXPREF(), hours: todH, state: WX ? WX.state : "-" }) };
@@ -314,7 +321,7 @@ async function boot() {
     AIR.node.traverse(n => { if (n.isMesh) { n.castShadow = true; if (n.material.emissive && !PLY.userData.mats.includes(n.material) && n.material !== AIR.mats.gold) PLY.userData.mats.push(n.material); } });
     scene.add(PLY); PLY.visible = false;
     // GPU particles (engine3d/particles.js, same API as air3d's makeFX) + raycast bullet damage with decals (engine3d/damage.js)
-    FXA = (PARTM && CAPS.gl2 && safe("gpu-particles", () => PARTM.makeGPUFX(THREE, scene, { max: MOBILE ? 2048 : 4096 }))) || AIRM.makeFX(THREE, scene, { max: 1800 });
+    FXA = (PARTM && CAPS.gl2 && safe("gpu-particles", () => PARTM.makeGPUFX(THREE, scene, { max: SMOOTH ? 1024 : MOBILE ? 2048 : 4096 }))) || AIRM.makeFX(THREE, scene, { max: 1800 });
     pDmg = (DMGM && safe("bullet-damage", () => DMGM.makeHitDamage(THREE, { fx: FXA, target: AIR.node, engines: AIR.pts.eng, maxDecals: QUAL.cfg.decals }))) || (() => { const d = AIRM.makeDamage(THREE, FXA, AIR.node, AIR.pts.wound); const h = d.hit; d.hit = () => { h(); return true; }; d.hitNear = (l) => h(l); const u = d.update; d.update = (s2, t2, k2, w2) => u(s2, t2, k2, w2, AIR.pts.eng); return d; })();
     WORLD = WORLDM.makeWorld(THREE, { noVideo: FAILQ.includes("video"), fx: FXA, fxScale: () => ({ low: .3, med: .6, high: .85, ultra: 1 })[QUAL.tier] || 1, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
     // muzzle flashes + real crashes + jet pilot ejections (engine3d/combat.js); detail follows the quality tier
@@ -327,11 +334,11 @@ async function boot() {
       shake: (k) => { const G = M.G(); G.shake = Math.max(G.shake || 0, 14 + 14 * k); },
       onImpact: (p, k) => { for (const sg of SEGS.values()) if (Math.abs(p.z - sg.group.position.z) < sg.len / 2 + 200 && sg.scatter) sg.scatter(p.x, p.z, 120 + 60 * k); } }));
     // engine3d crowd: the Nalu Vida cast as real rigged, animated people (VAT-instanced far, SkinnedMesh near). Loads after the game is up.
-    if (renderer.capabilities.isWebGL2 && !FAILQ.includes("crowd")) import("../engine3d/crowd.js?v=e3f").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
-      .then(c => { CROWD = c; STATUS.crowd = "on"; if (TRAFFIC && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => c.setQuality(cfg.crowd)); }).catch(e => { offNote("crowd", e); STATUS.crowd = "off: " + (e && e.message || e); console.warn("[melody3d] crowd", e); });
+    if (renderer.capabilities.isWebGL2 && !FAILQ.includes("crowd")) import("../engine3d/crowd.js?v=e3g").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
+      .then(c => { CROWD = c; STATUS.crowd = "on"; WARMQ = 1; if (TRAFFIC && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => c.setQuality(cfg.crowd)); }).catch(e => { offNote("crowd", e); STATUS.crowd = "off: " + (e && e.message || e); console.warn("[melody3d] crowd", e); });
     // engine3d traffic: Kenney CC0 cars on the street grid with signals, turns, brake lights, crossing pedestrians
-    (FAILQ.includes("traffic") ? Promise.reject(new Error("forced by ?fail")) : import("../engine3d/traffic.js?v=e3f").then(m => m.makeTraffic(THREE, { loader, base: new URL("../engine3d/assets/cars/", location.href).href, parent: scene, fx: FXA, quality: { density: QUAL.cfg.traffic } })))
-      .then(tr => { TRAFFIC = tr; STATUS.traffic = "on"; if (CROWD && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => tr.setQuality({ density: cfg.traffic })); }).catch(e => { offNote("traffic", e); STATUS.traffic = "off: " + (e && e.message || e); console.warn("[melody3d] traffic", e); });
+    (FAILQ.includes("traffic") ? Promise.reject(new Error("forced by ?fail")) : import("../engine3d/traffic.js?v=e3g").then(m => m.makeTraffic(THREE, { loader, base: new URL("../engine3d/assets/cars/", location.href).href, parent: scene, fx: FXA, quality: { density: QUAL.cfg.traffic } })))
+      .then(tr => { TRAFFIC = tr; STATUS.traffic = "on"; WARMQ = 1; if (CROWD && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => tr.setQuality({ density: cfg.traffic })); }).catch(e => { offNote("traffic", e); STATUS.traffic = "off: " + (e && e.message || e); console.warn("[melody3d] traffic", e); });
     ENEMY = AIRM.buildAirliner(THREE, { livery: "enemy" }); MODELS.kami3 = { node: ENEMY.node, size: ENEMY.size };   // the head-on airliners: same detailed airframe, grey
   }
   const PK = "plane";
@@ -340,7 +347,7 @@ async function boot() {
   function cloneModel(k, tint) {
     const src = MODELS[k]; const o = new THREE.Group(), inner = src.node.clone(true); const mats = [];
     const food = k.startsWith("p_") && k !== "p_mic";
-    inner.traverse(n => { if (n.isMesh) { n.material = n.material.clone(); if (tint) n.material.color.multiply(new THREE.Color(tint)); if (!n.material.userData.keep) n.material.emissive = new THREE.Color(0);
+    inner.traverse(n => { if (n.isMesh) { n.material = n.material.clone(); if (tint) n.material.color.multiply(new THREE.Color(tint)); if (!n.material.userData.keep && n.material.emissive) n.material.emissive = new THREE.Color(0);   // (unlit materials have no emissive uniform: giving them one crashed the render)
       if (food && n.material.map) { n.material.emissiveMap = n.material.map; n.material.roughness = .42; n.material.needsUpdate = true; } mats.push(n.material); } });
     o.add(inner); o.rotation.order = "YXZ"; o.userData = { mats, size: src.size, inner }; scene.add(o); return o;
   }
@@ -411,7 +418,7 @@ async function boot() {
   // chase view: the detailed airship (engine3d/blimp.js): fabric gores, fins, gondola, props, a scrolling LED band with
   // "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" on both sides, MELODY on top, the Nalu Vida logo low on the flanks + belly
   let BLIMP3 = null;
-  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3f").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
+  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3g").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
     BLIMP3 = BM.buildBlimp(THREE, { top: "MELODY", led: ["ANTIDOTE FOOD REVIEW", "antidotethefoodie.com"], logo: lt }); BLIMP3.node.visible = false; BLIMP3.node.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(BLIMP3.node); }
 
   /* ---------------- ground: lit aerial tiles, landmarks, runway, shadow catcher ---------------- */
@@ -423,7 +430,7 @@ async function boot() {
   function lmMat(k) { const im = S[k]; if (!M.ready(im)) return null; if (lmMats[k]) return lmMats[k]; const t = new THREE.Texture(im); t.colorSpace = THREE.SRGBColorSpace; t.needsUpdate = true; return lmMats[k] = new THREE.MeshLambertMaterial({ map: t, transparent: true, depthWrite: false, opacity: .95 }); }
   const lmMeshes = [], sideMeshes = [];
   if (CHASE) { const far = new THREE.Mesh(new THREE.PlaneGeometry(9000, 9000), new THREE.MeshBasicMaterial({ color: 0x141829 })); far.rotation.x = -Math.PI / 2; far.position.y = -1.5; far.renderOrder = -1; scene.add(far); }   // night ground beyond the tiles, into the haze
-  const rwC = mkc(500, 900), rwX = rwC.getContext("2d"), rwTex = canTex(rwC, true);
+  const RWT = { t: 0, n: 0 }, rwC = mkc(500, 900), rwX = rwC.getContext("2d"), rwTex = canTex(rwC, true);
   const rwMesh = new THREE.Mesh(tileGeo, new THREE.MeshBasicMaterial({ map: rwTex, transparent: true, depthWrite: false })); rwMesh.renderOrder = 60; rwMesh.visible = false; scene.add(rwMesh);
   const shadowCatcher = new THREE.Mesh(new THREE.PlaneGeometry(W * 1.6, H * 1.6), new THREE.ShadowMaterial({ opacity: .44, depthWrite: false })); shadowCatcher.rotation.x = -Math.PI / 2; shadowCatcher.position.y = .6; shadowCatcher.receiveShadow = true; shadowCatcher.renderOrder = 80; scene.add(shadowCatcher);
   // tumbling 3D debris (panel shards, rivets, rubble) — the game's own debris particles, given depth
@@ -469,8 +476,8 @@ async function boot() {
           e.material = mat; e.visible = true; e.scale.set(-W, 1, h); e.position.set(sd * W, .01 * idx, m.position.z); e.renderOrder = idx; } }
       if (!CHASE && (g.k === "nalu" || g.t === "nalu")) { const gx = W * .74, gy = g.y + g.h * .12, p = .55 + .45 * Math.sin(now / 260) * Math.sin(now / 610);
         BgA.q(gx, gy, 1, 160, 160, 0, UV.dot, 1, .67, .35, .45 * p); BgA.q(gx, gy, 1, 150, 150, 0, UV.glow, .31, .67, 1, .25 * p); }
-      if (g.k === "runway" && g.y < H + 40 && g.y + g.h + 150 > -40) { rwOn = true; const sc = rwC.width / W; rwX.setTransform(1, 0, 0, 1, 0, 0); rwX.clearRect(0, 0, rwC.width, rwC.height); rwX.setTransform(sc, 0, 0, sc, 0, 0);
-        M.runway(rwX, g, 40); rwTex.needsUpdate = true; const hh = rwC.height / sc; rwMesh.scale.set(W, 1, hh); rwMesh.position.set(0, .3, g.y - 40 + hh / 2 - H / 2); }
+      if (g.k === "runway" && g.y < H + 40 && g.y + g.h + 150 > -40) { rwOn = true; const sc = rwC.width / W;
+        if (!RWT.n++ || !(MOBILE || SMOOTH) || now - RWT.t > 66) { RWT.t = now; rwX.setTransform(1, 0, 0, 1, 0, 0); rwX.clearRect(0, 0, rwC.width, rwC.height); rwX.setTransform(sc, 0, 0, sc, 0, 0); M.runway(rwX, g, 40); rwTex.needsUpdate = true; }   /* phones: the animated runway lights redraw at ~15 Hz (canvas glow + upload) */ const hh = rwC.height / sc; rwMesh.scale.set(W, 1, hh); rwMesh.position.set(0, .3, g.y - 40 + hh / 2 - H / 2); }
       if (LMK[g.k] && !CHASE) { const im = S[g.k], mm = lmMat(g.k); if (mm) { const w = LMW[g.k] || 230, h = w * im.naturalHeight / im.naturalWidth, x = W / 2 + g.side * 70 - w / 2, y = g.y + (g.h - h) / 2;
         let m = lmMeshes[li++]; if (!m) { m = new THREE.Mesh(tileGeo, mm); m.receiveShadow = true; scene.add(m); lmMeshes.push(m); } m.material = mm; m.visible = true; m.renderOrder = 50; m.scale.set(w, 1, h); m.position.set(x + w / 2 - W / 2, .2, y + h / 2 - H / 2); } }
     });
@@ -580,7 +587,7 @@ async function boot() {
     const vis = G.inv <= 0 || G.landing || Math.floor(G.inv / 6) % 2 === 0; if (!vis) return;
     let Y = 5 + ((CHASE && G.alt3 != null ? G.alt3 : A.player) - 5) * palt; const o = CHASE ? PLY : take(PK); if (CHASE) PLY.visible = true;
     if (CHASE) {   // chase view: bank into the turn, nose up when you push ahead (and climb a touch), nose down when you ease back
-      const pv = Math.max(-1, Math.min(1, -(G.mvz || 0) / 240)) * (G.running ? 1 : 0); PL.pitch += (pv - PL.pitch) * .12;
+      const pv = Math.max(-1, Math.min(1, -(G.mvz || 0) / 240)) * (G.running ? 1 : 0); PL.pitch += (pv - PL.pitch) * (1 - Math.exp(-Math.min(100, now - (PL.tA || now)) / 130));   // frame-rate independent
       const att = UPA.attitude((now - (PL.tA || now)) / 1000, proll * .95, PL.pitch * .3 * Math.max(.3, palt), 7); PL.tA = now;   // critically damped bank + pitch
       put(o, G.x, G.y, Y, pw, false, Math.PI - att.bank * .17, att.bank, att.pitch);
       UPA.spin(now / 1000, G.boostT > 0 ? 1 : .85); o.updateMatrixWorld(true); const L = (q) => AIR.node.localToWorld(V.copy(q)), bst = G.boostT > 0 ? 1.8 : 1;
@@ -593,7 +600,7 @@ async function boot() {
     playerAlt = Y; playerX = G.x; playerY = G.y; PL.x = G.x; PL.y = G.y; PL.Y = Y; flash(o, 0);
     if (!CHASE) navPair(now, 0, frac(o, .47, .1, -.02).clone(), frac(o, -.47, .1, -.02), 2.2);
     if (G.sev > .15 && !CHASE) playerFire(o, G, now, G.sev, null);   // chase view: real wounds instead (playerWounds)
-    if (CHASE && G.mfl > 0 && G.running && !G.dying) { const c = rgb(M.WPN[G.wpn].c); AIR.pts.muzzle.forEach(q => FXA.glow(AIR.node.localToWorld(V.copy(q)), 24, c, G.mfl / 70)); }
+    if (CHASE && G.mfl > 0 && G.running && !G.dying) { const c = rgb(M.WPN[G.wpn].c); AIR.pts.muzzle.forEach(q => FXA.glow(AIR.node.localToWorld(V.copy(q)), MOBILE ? 40 : 28, c, G.mfl / 70)); }
     else if (G.mfl > 0 && G.running && !G.dying) { const c = rgb(M.WPN[G.wpn].c), a = G.mfl / 70, pts = G.wpn < 3 ? [-22, 22] : [-22, 0, 22];
       pts.forEach(of => { const x = G.x + of, y = G.y - (of ? 20 : 36); Ba.q(x, y, Y + 6, 24, 24, 0, UV.dot, c[0], c[1], c[2], a); Ba.q(x, y, Y + 7, 10, 10, 0, UV.dot, 1, 1, 1, a); }); }
   }
@@ -730,13 +737,16 @@ async function boot() {
     const o = poolGet(cards, cardN++, () => { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), cardMats[P.k]); m.castShadow = true; return m; }); o.material = cardMats[P.k];
     const k = ws(A.item), h = P.w * P.im.naturalHeight / P.im.naturalWidth; o.position.set(wx(x, A.item), A.item, wz(y, A.item)); o.scale.set(P.w * k, h * k, 1); o.rotation.set(CHASE ? -.15 : -Math.PI / 2 + .35, 0, -rot); }
   function drawShots(now, G) {
-    const run = G.running && !G.dying, LK = CHASE ? 3 : 1; Ba.ax = CHASE ? 1 : 0;   // chase view: bolts turn on their own axis and are stretched so they read flying away from you
+    const run = G.running && !G.dying, LK = CHASE ? 3 : 1, BK = MOBILE ? 1.7 : 1.25; Ba.ax = CHASE ? 1 : 0;   // chase view: bolts turn on their own axis and are stretched so they read flying away from you
+    // every round = wide soft halo (reads on any tier, even without bloom) + coloured streak + HDR white-hot core (>1 feeds the bloom)
+    const bolt = (x, y, Y, w, L, r, g, b) => { Ba.q(x, y, Y - .5, w * 3.2 * BK, w * 3.2 * BK, 0, UV.glow, r, g, b, .55); Ba.q(x, y + L * .35, Y, w * 1.7 * BK, L * 1.15 * LK, 0, UV.beam, r, g, b, .75);
+      Ba.q(x, y + L * .3, Y + .5, w * .7 * BK, L * LK, 0, UV.beam, 1 + r, 1 + g, 1 + b, 1); };
     for (let s = 0; s < G.shots.length; s++) { const sh = G.shots[s], x = sh.x, y = sh.y, Y = alt3(sh, A.shot) + 2;
-      if (sh.w === 0) { Ba.q(x, y + 6, Y, 3.4, 13 * LK, 0, UV.beam, .94, .83, .46, 1); Ba.q(x, y + 6, Y - 1, 9, 22 * LK, 0, UV.beam, .94, .83, .46, .35); }
-      else if (sh.w === 1) { Ba.q(x, y + 11, Y, 8, 32 * LK, 0, UV.beam, .49, 1, .42, .45); Ba.q(x, y + 11, Y + .5, 2.6, 24 * LK, 0, UV.beam, .92, 1, .88, 1); }
-      else if (sh.w === 2) { Ba.q(x, y + 12, Y, 6, 18 * LK, 0, UV.beam, 1, .55, .16, .45); Ba.q(x, y, Y + .5, 22, 22, 0, UV.fball, 1, 1, 1, 1); }
-      else if (sh.w === 3) { Ba.q(x, y + 14, Y, 11, 40 * LK, 0, UV.beam, .23, .66, 1, .45); Ba.q(x, y + 14, Y + .3, 6, 34 * LK, 0, UV.beam, .47, .78, 1, .85); Ba.q(x, y + 14, Y + .6, 2.4, 30 * LK, 0, UV.beam, .93, .97, 1, 1); }
-      else { Ba.q(x, y + 18, Y, 16, 52 * LK, 0, UV.beam, 1, .16, .16, .4); Ba.q(x, y + 18, Y + .3, 8, 46 * LK, 0, UV.beam, 1, .27, .24, .9); Ba.q(x, y + 18, Y + .6, 3.4, 40 * LK, 0, UV.beam, 1, .95, .93, 1); } }
+      if (sh.w === 0) bolt(x, y, Y, 5, 18, 1, .82, .35);
+      else if (sh.w === 1) bolt(x, y, Y, 6, 30, .45, 1, .4);
+      else if (sh.w === 2) { bolt(x, y, Y, 8, 20, 1, .55, .16); Ba.q(x, y, Y + .5, 24 * BK, 24 * BK, 0, UV.fball, 1, 1, 1, 1); }
+      else if (sh.w === 3) bolt(x, y, Y, 7, 38, .25, .66, 1);
+      else bolt(x, y, Y, 10, 48, 1, .2, .18); }
     for (let q = 0; q < G.eshots.length; q++) { const es = G.eshots[q]; if (!es) continue; const c = rgb(es.c), Y = alt3(es, A.eshot);
       if (es.tr && es.tr.length) for (let ti = 0; ti < es.tr.length; ti += 2) { const tu = ti / es.tr.length; Bn.q(es.tr[ti], es.tr[ti + 1], Y - 2, 5 + 7 * (1 - tu), 5 + 7 * (1 - tu), 0, UV.dot, .86, .87, .9, .1 + .3 * tu); }
       if (es.missile) { const rot = Math.atan2(es.vy, es.vx) - Math.PI / 2, ca = Math.cos(rot), sa = Math.sin(rot), body = (ly) => [es.x - ly * sa, es.y + ly * ca];
@@ -745,8 +755,9 @@ async function boot() {
       else if (es.bomb) { const bl = (now / 150 | 0) % 2; Bn.q(es.x, es.y, Y, es.r * 2.4, es.r * 2.4, 0, UV.dot, .11, .12, .16, 1); Bn.q(es.x, es.y, Y + .2, es.r * 2, es.r * 2, 0, UV.dot, .11, .12, .16, 1);
         if (bl) { Ba.q(es.x, es.y, Y + .5, 16, 16, 0, UV.dot, 1, .23, .23, 1); } }
       else if (es.bullet && es.big) { const L = Math.hypot(es.vx, es.vy) * 2.6, rot = Math.atan2(-es.vx, es.vy);   // heavy slugs (gunship, LAPD heavy burst): thick glowing round
-        Ba.q(es.x - es.vx * 1.3, es.y - es.vy * 1.3, Y, 9, L + 6, rot, UV.beam, c[0], c[1], c[2], .95); Ba.q(es.x, es.y, Y + .3, 20, 20, 0, UV.dot, c[0], c[1], c[2], .7); Ba.q(es.x, es.y, Y + .5, 8, 8, 0, UV.dot, 1, .97, .85, 1); }
-      else if (es.bullet) { const L = Math.hypot(es.vx, es.vy) * 3, rot = Math.atan2(-es.vx, es.vy); Ba.q(es.x - es.vx * 1.5, es.y - es.vy * 1.5, Y, 3.4, L + 3, rot, UV.beam, 1, .86, .55, .95); Ba.q(es.x, es.y, Y, 10, 10, 0, UV.dot, 1, .86, .55, .6); }
+        Ba.q(es.x, es.y, Y - .5, 34 * BK, 34 * BK, 0, UV.glow, 1, .3, .08, .6); Ba.q(es.x - es.vx * 1.3, es.y - es.vy * 1.3, Y, 10 * BK, L + 6, rot, UV.beam, 1, .35, .1, .95); Ba.q(es.x, es.y, Y + .3, 20 * BK, 20 * BK, 0, UV.dot, 1, .45, .15, .8); Ba.q(es.x, es.y, Y + .5, 8, 8, 0, UV.dot, 1, .97, .85, 1); }
+      else if (es.bullet) { const L = Math.hypot(es.vx, es.vy) * 3, rot = Math.atan2(-es.vx, es.vy);   // enemy rounds: red/orange tracer with a hot core, coming at you
+        Ba.q(es.x, es.y, Y - .5, 22 * BK, 22 * BK, 0, UV.glow, 1, .3, .08, .6); Ba.q(es.x - es.vx * 1.5, es.y - es.vy * 1.5, Y, 6 * BK, L + 5, rot, UV.beam, 1, .38, .1, .9); Ba.q(es.x - es.vx * .8, es.y - es.vy * .8, Y + .3, 2.4 * BK, L * .7 + 3, rot, UV.beam, 2, 1.3, .6, 1); Ba.q(es.x, es.y, Y + .5, 9 * BK, 9 * BK, 0, UV.dot, 2, .9, .4, 1); }
       else { Ba.q(es.x, es.y, Y, es.r * 5, es.r * 5, 0, UV.dot, c[0], c[1], c[2], .55); Ba.q(es.x, es.y, Y + .5, es.r * 2.1, es.r * 2.1, 0, UV.dot, Math.min(1, c[0] + .4), Math.min(1, c[1] + .4), Math.min(1, c[2] + .4), 1); } }
   Ba.ax = 0;
   }
@@ -754,14 +765,18 @@ async function boot() {
   /* ---------------- chase view: camera, the game's world overlay, clouds, screen projection ---------------- */
   // The game's 2D overlay is split in two (index.html): HUD stays on the 2D canvas on top; everything it draws IN the world
   // (lightning lanes, aim lines, warning rings, beams, the boost trail) goes to this canvas, which lies on your flight level.
-  const WSC = 1.5, wcv = mkc(W * WSC, H * WSC), wcx = wcv.getContext("2d"), wTex = canTex(wcv, true);
+  const WSC = MOBILE ? 1.15 : 1.5, wcv = mkc(W * WSC, H * WSC), wcx = wcv.getContext("2d"), wTex = canTex(wcv, true);
   wcx.setTransform(WSC, 0, 0, WSC, 0, 0);
-  const wGeo = new THREE.PlaneGeometry(W, H); wGeo.rotateX(-Math.PI / 2);
+  // smoothness: re-upload this canvas to the GPU only on frames something was drawn on it (plus one more to show it cleared);
+  // a full-canvas texture upload every frame was one of the biggest per-frame costs on iPhone
+  const WD = { d: 0, was: 0 }; ["fill", "stroke", "fillRect", "strokeRect", "fillText", "strokeText", "drawImage", "putImageData"].forEach(k => { const f = wcx[k]; wcx[k] = function () { WD.d = 1; return f.apply(this, arguments); }; });
+  const wGeo = new THREE.PlaneGeometry(W, H, 1, 2); wGeo.rotateX(-Math.PI / 2);
+  { const p = wGeo.attributes.position; for (let i = 0; i < p.count; i++) { const z = p.getZ(i), y = z > -1e-3 && z < 1e-3 ? YP : z + H / 2; p.setZ(i, far(y) - H / 2); } p.needsUpdate = true; }   // the overlay follows the same stretched depth as the 3D things (middle row = your plane's row)
   const wMesh = new THREE.Mesh(wGeo, new THREE.MeshBasicMaterial({ map: wTex, transparent: true, depthTest: false, depthWrite: false, fog: false }));
   wMesh.position.y = A.player + 1; wMesh.renderOrder = 1000; wMesh.frustumCulled = false; wMesh.visible = CHASE; scene.add(wMesh);
   const CAM = { p: new THREE.Vector3(), l: new THREE.Vector3(), roll: 0, ok: false }, CT = new THREE.Vector3(), LT = new THREE.Vector3();
   function chaseCam(G, dt) {
-    const X = PL.x - W / 2, Z = PL.y - H / 2, bank = Math.max(-1, Math.min(1, (G.vx || 0) * .12));
+    const X = PL.x - W / 2, Z = far(PL.y) - H / 2, bank = Math.max(-1, Math.min(1, (G.vx || 0) * .12));
     // behind and a little above the plane; the camera follows you sideways most of the way so the field stays in view
     CT.set(X * .82, Math.max(28, PL.Y * .85 + 52), Z + 182); LT.set(X * .75, Math.max(0, PL.Y * .7 - 20), Z - 380); wMesh.position.y = PL.Y + 1;
     const a = CAM.ok ? 1 - Math.exp(-(dt || 16) / 1000 * 6.5) : 1; CAM.ok = true;
@@ -786,13 +801,15 @@ async function boot() {
     if (G.runId !== eggRun) { eggRun = G.runId; eggSeg = null; }
     // Antidote's car + review screen: once the review is unlocked (7 Drizzle emblems) or past EGG_SCORE, one city strip ahead gets them
     const unlocked = G.running && !G.debug && ((G.dz || 0) >= M.DRIZ_N || G.score >= (M.EGG_SCORE || 3000)), live = new Set(), camZ = cam.position.z;
+    let built = 0;   // at most one new ground strip is built per frame (building one is a few ms of CPU; two at once was a dropped frame)
     for (const g of G.ground) { const kind = KIND[g.k] || "city"; let sg = SEGS.get(g);
       if (sg && sg.kind !== kind) { scene.remove(sg.group); sg.dispose(); if (sg === eggSeg) eggSeg = null; sg = null; }
-      if (!sg) { const egg = !eggSeg && unlocked && !G.eggFound && kind === "city" && g.y < -200; sg = WORLD.segment(kind, g.h, segSeed++, { side: g.side || 1, noStrip: true, egg, eggSide: g.side || 1 }); if (egg) eggSeg = sg; scene.add(sg.group); SEGS.set(g, sg); }
+      if (!sg && built && SEGS.size && g.y + g.h < 0) continue;
+      if (!sg) { built++; const egg = !eggSeg && unlocked && !G.eggFound && kind === "city" && g.y < -200; sg = WORLD.segment(kind, g.h, segSeed++, { side: g.side || 1, noStrip: true, egg, eggSide: g.side || 1 }); if (egg) eggSeg = sg; scene.add(sg.group); SEGS.set(g, sg); }
       sg.group.position.z = g.y + g.h / 2 - H / 2; sg.update(t, s, Math.abs(sg.group.position.z - camZ) < 1150); live.add(g); }
     for (const [g, sg] of SEGS) if (!live.has(g)) { scene.remove(sg.group); sg.dispose(); SEGS.delete(g); if (sg === eggSeg) eggSeg = null; }
     M.egg = eggSeg && eggSeg.egg ? { on: true, x: eggSeg.egg.x + W / 2, y: eggSeg.group.position.z + eggSeg.egg.z + H / 2 } : null;
-    const PX = PL.x - W / 2, PZ = PL.y - H / 2; clipCD -= s;
+    const PX = PL.x - W / 2, PZ = far(PL.y) - H / 2; clipCD -= s;
     // you vs the buildings: a rooftop scrape is a small hit, flying into one is a full hit; either way the building breaks where you hit it
     if (G.running && !G.dying && clipCD <= 0 && (G.alt == null || G.alt > .95)) for (const sg of SEGS.values()) { if (Math.abs(PZ - sg.group.position.z) > sg.len / 2 + 20) continue;
       const h = sg.collide(PX, PL.Y - 4, PZ, 30, 16); if (h) { const scrape = h.o.h - PL.Y < 14; sg.smash(h, PX, PL.Y, PZ, "plane"); if (sg.scatter) sg.scatter(PX, PZ, 160); clipCD = .7; if (M.bldHit) M.bldHit(!scrape); break; } }
@@ -835,31 +852,36 @@ async function boot() {
     if (PLY.visible) pDmg.update(s, now / 1000, PLY.scale.x, WV.set(0, 0, (G.gsp || 0) * 60 + 24)); }
 
   /* ---------------- frame ---------------- */
-  let last = 0, fpsT = 0, fpsN = 0, bad = 0, started = performance.now();
+  let last = 0, fpsT = 0, fpsN = 0, bad = 0, started = performance.now(), FAILP = 0;
+  // frame budget probe: which part of a slow frame (>28 ms) took the time; window.__M3SPK (read by the perf harness / ?debug)
+  const SPK = window.__M3SPK = [], PT = { n: 0, k: [], v: [], t: 0 }; function pt(k) { const t = performance.now(); if (PT.n === 0) PT.t0 = PT.t; PT.k[PT.n] = k; PT.v[PT.n] = t - (PT.n ? PT.t : PT.s); PT.n++; PT.t = t; }
   function render(now, dt) {
-    const G = M.G(); lateSprites();
+    const G = M.G(); if (WARMQ === 2 || (WARMQ && !G.running)) { WARMQ = 0; if (!Q.get("nowarm")) warm(now, G); } const T0 = performance.now(); PT.n = 0; PT.s = T0; lateSprites();
     BATCHES.forEach(b => b.begin()); poolsBegin(); ROTORS.n = 0; cardN = 0; kitN = 0; birdN = [0, 0]; for (const k in BOSSM) BOSSM[k].userData.used = 0;
     drawGround(now, G);
     drawCars(G);
     drawFX(now, G);
     if (CHASE && !POST) drawClouds(G);
-    drawPlayer(now, G); drawTraffic(now, G); drawEnemies(now, G); drawReview(now, G); drawRescue(now, G); drawItems(now, G); drawShots(now, G);
-    if (CHASE) { drawWorld(now, dt, G); enemyWounds(now, dt, G); playerWounds(now, dt, G); FXA.update((dt || 16) / 1000); }
+    pt("ground+fx"); drawPlayer(now, G); drawTraffic(now, G); drawEnemies(now, G); drawReview(now, G); drawRescue(now, G); drawItems(now, G); drawShots(now, G); pt("actors");
+    if (CHASE) { drawWorld(now, dt, G); pt("world"); enemyWounds(now, dt, G); playerWounds(now, dt, G); FXA.update((dt || 16) / 1000); pt("wounds+particles"); }
     for (let i = ROTORS.n; i < ROTORS.list.length; i++) ROTORS.list[i].visible = false;
     hideFrom(cards, cardN); poolsEnd(); hideFrom(BIRDS[0], birdN[0]); hideFrom(BIRDS[1], birdN[1]); for (const k in BOSSM) if (!BOSSM[k].userData.used) BOSSM[k].visible = false; BATCHES.forEach(b => b.end());
-    if (CHASE) { chaseCam(G, dt); wTex.needsUpdate = true; } else { const sh = M.SHK; cam.position.set(-sh[0], D, -sh[1]); }
+    if (CHASE) { chaseCam(G, dt); if (WD.d || WD.was) wTex.needsUpdate = true; WD.was = WD.d; WD.d = 0; } else { const sh = M.SHK; cam.position.set(-sh[0], D, -sh[1]); }
     if (PROPT) PROPT.rotation = -now / 1000 * 9.7;
-    if (COMBAT) { try { gunfire(now, G); COMBAT.update((dt || 16) / 1000, now / 1000, { scroll: (G.gsp || 0) * 60, cullZ: cam.position.z + 220 }); } catch (er) { offNote("combat", er); COMBAT = null; } }
-    if (TRAFFIC) { try { TRAFFIC.update(cam, now / 1000, (dt || 16) / 1000, { night: SKY ? SKY.info.night : .8, rain: WX ? WX.v.rain : 0 }); } catch (er) { offNote("traffic", er); TRAFFIC = null; } }
-    if (CROWD) { try { cam.updateMatrixWorld(); CROWD.update(cam, now / 1000, (dt || 16) / 1000); } catch (er) { offNote("crowd", er); CROWD = null; } }
-    if (SKY) { try { envFrame(now, dt, G); } catch (er) { offNote("sky", er); SKY = null; renderer.render(scene, cam); } } else renderer.render(scene, cam);
+    pt("batches"); if (COMBAT) { try { gunfire(now, G); COMBAT.update((dt || 16) / 1000, now / 1000, { scroll: (G.gsp || 0) * 60, cullZ: cam.position.z + 220 }); } catch (er) { offNote("combat", er); COMBAT = null; } }
+    pt("combat"); if (TRAFFIC) { try { TRAFFIC.update(cam, now / 1000, (dt || 16) / 1000, { night: SKY ? SKY.info.night : .8, rain: WX ? WX.v.rain : 0 }); } catch (er) { offNote("traffic", er); TRAFFIC = null; } }
+    pt("traffic"); if (CROWD) { try { cam.updateMatrixWorld(); CROWD.update(cam, now / 1000, (dt || 16) / 1000); } catch (er) { offNote("crowd", er); CROWD = null; } }
+    pt("crowd"); if (SKY) { try { envFrame(now, dt, G); } catch (er) { offNote("sky", er); SKY = null; renderer.render(scene, cam); } } else renderer.render(scene, cam);
+    pt("render"); { const tot = performance.now() - T0; const AV = window.__M3PT || (window.__M3PT = { n: 0 }); AV.n++; AV.total = (AV.total || 0) + tot; for (let i = 0; i < PT.n; i++) AV[PT.k[i]] = (AV[PT.k[i]] || 0) + PT.v[i]; if (tot > 28 && SPK.length < 60) { const o = { at: (now / 1000).toFixed(1), ms: +tot.toFixed(1) }; for (let i = 0; i < PT.n; i++) if (PT.v[i] > 3) o[PT.k[i]] = +PT.v[i].toFixed(1); SPK.push(o); } }
     if (PVC) { const pv = document.getElementById("mpv"); if (pv && pv.isConnected && now - PVT3 > 60) { PVT3 = now; try { PVC.getContext("2d").drawImage(gl, 0, 0, PVC.width, PVC.height); M.pvFrame = PVC; } catch (er) {} } }
     // frame-rate guard (auto mode): under ~40 fps for 5 s straight → back to the 2D renderer for this visit
     fpsN++; if (!fpsT) fpsT = now;
     if (now - fpsT >= 1000) { const fps = fpsN * 1000 / (now - fpsT); STATUS.fps = Math.round(fps); fpsN = 0; fpsT = now;
       // quality tiers: step down ultra → high → med → low while the frame rate stays under 50; only when LOW still can't hold
       // ~40 fps for 5 s does this visit fall back to the 2D renderer (the old guard, now the last resort)
-      if (!document.hidden && now - started > 4000) { const r = QUAL.sample(fps); if (r === "fail" && MODE === "auto") fallback("low fps " + Math.round(fps)); } }
+      if (!document.hidden && now - started > 4000) { const r = QUAL.sample(fps); STATUS.tier = tierName(); M.lock30 = QUAL.lock30; if (r === "fail" && MODE === "auto") FAILP = Math.round(fps); } }
+    // the 2D fallback (only when even Smooth/LOW can't hold ~20 fps) never happens mid-flight: it waits for the menu / game over
+    if (FAILP && !G.running) { fallback("low fps " + FAILP); return; }
   }
   // sky + weather + clouds + post for this frame (chase view)
   const ENV = { wind: new THREE.Vector3(), puffs: [], moon: new THREE.Color(.5, .58, .85), ambT: new THREE.Color(), ambB: new THREE.Color(), mist: new THREE.Color(), white: new THREE.Color(1, 1, 1) };
@@ -927,12 +949,36 @@ async function boot() {
     for (const sh of G.shots) { if (SEEN.has(sh)) continue; SEEN.add(sh); if (n++ > 3 || !PLY.visible) continue; const c = rgb(M.WPN[G.wpn].c);
       PLY.updateMatrixWorld(true); const mz = AIR.pts.muzzle[(sh.x < G.x ? 1 : 0) % AIR.pts.muzzle.length]; AIR.node.localToWorld(SHOTV.copy(mz)); COMBAT.muzzle(SHOTV, SHOTD.set(0, 0, -1), c, 1.1); }
     for (const es of G.eshots) { if (SEEN.has(es)) continue; SEEN.add(es); if (es.bomb || n++ > 6) continue; const Y = alt3(es, A.eshot); SHOTV.set(es.x - W / 2, Y, far(es.y) - H / 2);
-      SHOTD.set(es.vx || 0, 0, es.vy || 1).normalize(); SHOTV.addScaledVector(SHOTD, -6); COMBAT.muzzle(SHOTV, SHOTD, es.missile ? [1, .7, .4] : [1, .85, .5], es.big ? 1.3 : .9); } }
+      SHOTD.set(es.vx || 0, 0, es.vy || 1).normalize(); SHOTV.addScaledVector(SHOTD, -6); COMBAT.muzzle(SHOTV, SHOTD, es.missile ? [1, .7, .4] : [1, .42, .14], es.big ? 1.3 : .9); } }
   M.onBossDown = (b) => { if (!CHASE || !COMBAT || b.t !== "apex" || !APXO) return; const o = APXO.clone(true); o.traverse(n => { if (n.isMesh) n.material = n.material.clone(); }); o.visible = true; scene.add(o);
     COMBAT.crash({ obj: o, kind: "apex", k: 1.6, ground: 0, eject: false }); APXO.visible = false; };
   const HITS = []; M.onHurt = (x, y, es) => { if (CHASE && HITS.length < 6) HITS.push({ x, y, es }); };
   M.onBoom = (x, y, n) => { if (!CHASE || !WORLD) return; const X = x - W / 2, Z = far(y) - H / 2, r = 60 + n * 3; for (const sg of SEGS.values()) if (Math.abs(Z - sg.group.position.z) < sg.len / 2 + r && sg.scatter) sg.scatter(X, Z, r); };
   if (CHASE) { M.wcx = wcx; M.proj = proj; M.chase = 1; chaseCam(M.G(), 0); cam.updateMatrixWorld(); }
+  /* ---- warm-up: compile every shader and upload every texture BEFORE you fly ----
+     One hidden frame with one of everything in front of the camera (each enemy/pickup model, both bosses, birds, APEX, the
+     blimp, one ground strip of every kind with its people/cars, every sprite batch) through the real pipeline, so nothing
+     compiles or uploads mid-flight (each first-time shader was a 40-200 ms freeze on phones). Runs at the start of a frame
+     (the normal frame then draws over it): once at boot, again when the people + cars have loaded. */
+  WARMQ = CHASE ? 2 : 0;   // 2 = now; 1 = at the next moment you aren't flying (people/cars loaded later never freeze a flight)
+  function warm(now, G) {
+    const t0 = performance.now(), z0 = cam.position.z - 420, tmp = [], segs = [];
+    const front = (o, i) => { o.visible = true; o.position.set(((i % 7) - 3) * 60, 90 + (i % 3) * 30, z0 - (i % 5) * 40); tmp.push(o); };
+    try {
+      poolsBegin(); let i = 0; for (const k in MODELS) { const o = take(k); if (o) front(o, i++); }
+      ["rocket", "base"].forEach(k => { try { front(bossMesh(k), i++); } catch (e) {} });
+      [0, 1].forEach(pg => { try { front(birdGet(pg), i++); } catch (e) {} });
+      if (APXM) try { front(apexMesh(), i++); BEAMM.forEach(m => { m.visible = true; m.position.set(0, 100, z0); tmp.push(m); }); } catch (e) {}
+      if (BLIMP3) front(BLIMP3.node, i++); front(blimp, i++); if (PLY) { PLY.visible = true; tmp.push(PLY); }
+      ["city", "towers", "melody", "stadium", "hills", "coast", "venice", "pier", "runway"].forEach((k, j) => { try { const sg = WORLD.segment(k, 700, 9000 + j, { side: j % 2 ? 1 : -1, noStrip: true }); sg.group.position.z = z0 - 300; scene.add(sg.group); sg.update(now / 1000, .016, true); segs.push(sg); } catch (e) {} });
+      BATCHES.forEach(b => { b.begin(); b.w(0, 100, z0, 10, 10, 0, UV.dot, 1, 1, 1, .5); b.end(); });
+      cam.updateMatrixWorld(); if (CROWD) CROWD.update(cam, now / 1000, .016); if (TRAFFIC) TRAFFIC.update(cam, now / 1000, .016, { night: .5, rain: 0 });
+      if (SKY) envFrame(now, 0, G); else renderer.render(scene, cam);
+      if (renderer.initTexture) scene.traverse(o => { const m = o.material; if (!m) return; [].concat(m).forEach(mm => { for (const k of ["map", "normalMap", "roughnessMap", "emissiveMap", "alphaMap", "metalnessMap", "aoMap"]) if (mm[k] && mm[k].isTexture && !mm[k].isVideoTexture) try { renderer.initTexture(mm[k]); } catch (e) {} }); });
+    } catch (e) { console.warn("[melody3d] warm-up", e); }
+    segs.forEach(sg => { scene.remove(sg.group); sg.dispose(); }); tmp.forEach(o => { o.visible = false; }); poolsBegin(); poolsEnd(); birdN = [0, 0];
+    STATUS.warm = (STATUS.warm ? STATUS.warm + "+" : "") + Math.round(performance.now() - t0) + "ms";
+  }
   M.render = render; M.on(true); STATUS.on = true; document.documentElement.classList.add("m3d-on");
   if (LOADBAR) { LOADBAR.set(.92, "LOADING PEOPLE + CARS"); setTimeout(() => LOADBAR.done(), 25000); if (!CHASE || !renderer.capabilities.isWebGL2) LOADBAR.done(); }
   window.MELODY_3D = { status: () => Object.assign({}, STATUS), off: () => fallback("manual"), _: { THREE, scene, renderer, sun, cam, shadowCatcher, get clouds() { return CLOUDS; }, get post() { return POST; }, get sky() { return SKY; }, get wx() { return WX; } } };

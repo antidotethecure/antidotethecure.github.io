@@ -1456,7 +1456,8 @@ var SND=(function(){
   function songEl(){ if(song) return song; song=new Audio("audio/xtreme-rich-person.m4a"); song.loop=true; song.preload="auto"; song.setAttribute("playsinline",""); song.volume=MUSV; return song; }
   function apply(){ if(!ctx) return; var t=ctx.currentTime; master.gain.setTargetAtTime(st.sound?1:0,t,.05); fx.gain.setTargetAtTime(st.sfx?1:0,t,.05); mus.gain.setTargetAtTime(routed?MUSV:1,t,.05);
     if(song){ if(st.sound&&st.music){ var p=song.play(); if(p&&p.catch) p.catch(function(){}); } else song.pause(); } }
-  function unlock(){ if(!init()) return; if(ctx.state!=="running") try{ ctx.resume(); }catch(e){}
+  function unlock(){ try{ if(navigator.audioSession&&navigator.audioSession.type!=="playback") navigator.audioSession.type="playback"; }catch(e){}   // iOS 17+: play through the silent switch like a game
+    if(!init()) return; if(ctx.state!=="running") try{ ctx.resume(); }catch(e){}
     if(!song){ songEl(); try{ var src=ctx.createMediaElementSource(song); src.connect(mus); routed=true; song.volume=1; }catch(e){ routed=false; } }
     apply(); }
   function ok(){ return ctx&&ctx.state==="running"&&st.sound&&st.sfx; }
@@ -1465,13 +1466,14 @@ var SND=(function(){
   function hiss(dur,f0,f1,vol,type,q,dl){ var t=ctx.currentTime+(dl||0), n=ctx.createBufferSource(), f=ctx.createBiquadFilter(), g=ctx.createGain(); n.buffer=nb; f.type=type||"lowpass"; f.Q.value=q||.8;
     f.frequency.setValueAtTime(f0,t); f.frequency.exponentialRampToValueAtTime(Math.max(30,f1),t+dur); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0005,t+dur);
     n.connect(f); f.connect(g); g.connect(fx); n.start(t,Math.random()*1.5); n.stop(t+dur+.03); }
-  var GAP={dry:300,lock:600,bump:400,w0:60,w1:60,w2:60,w3:60,w4:60,boom:90,whistle:260,jet:300,pickup:50,pop:40};
+  var GAP={hit:70,dry:300,lock:600,bump:400,w0:60,w1:60,w2:60,w3:60,w4:60,boom:90,whistle:260,jet:300,pickup:50,pop:40};
   var LIB={
-    w0:function(){ tone("square",900,260,.05,.035); hiss(.04,3500,1200,.03,"highpass"); },                                  // twin guns: dry tick
-    w1:function(){ tone("sine",1900,300,.13,.07); tone("square",2400,500,.05,.012); },                                         // laser: pew
+    w0:function(){ hiss(.07,5200,900,.16,"bandpass",.9); tone("square",640,140,.06,.08); tone("sine",130,55,.08,.14); },      // twin guns: a real gun crack (louder, 2026-10-16)
+    w1:function(){ tone("sine",1900,300,.13,.14); tone("square",2400,500,.05,.04); hiss(.05,6000,2000,.06,"highpass"); },     // laser: pew
     w2:function(){ tone("sine",170,45,.2,.24); hiss(.12,1400,160,.12); },                                                       // power gun: thump
-    w3:function(){ tone("sawtooth",760,560,.055,.03); tone("square",1520,1150,.04,.012); },                                     // blue beams: auto buzz
+    w3:function(){ tone("sawtooth",760,420,.06,.08); tone("square",1520,900,.04,.03); hiss(.05,4800,1500,.07,"bandpass",1.2); },   // blue beams: auto buzz
     w4:function(){ tone("sawtooth",280,70,.15,.07); hiss(.1,2600,220,.07); tone("sine",95,40,.14,.12); },                       // red beams: heavy blast
+    hit:function(){ hiss(.06,3000,700,.2,"bandpass",2.2); tone("square",420,110,.07,.09); tone("triangle",1900,1300,.03,.05); },   // bullet strikes an enemy ship: metallic clank
     boom:function(n){ var s=Math.min(1.6,(n||18)/22); hiss(.45+.35*s,900,60,.28*s); tone("sine",95,30,.35,.22*s); },
     bigboom:function(){ hiss(1.7,1300,35,.6); tone("sine",75,22,1.3,.45); hiss(.5,4000,300,.2,"bandpass",.5,.08); },
     whistle:function(){ tone("sine",1600,480,.75,.045); },
@@ -1532,7 +1534,7 @@ function muzzle(){ if(G.mfl<=0||R3) return; var c=WPN[G.wpn].c, a=G.mfl/70, pts=
   cx.save(); cx.globalCompositeOperation="lighter"; pts.forEach(function(o){ var x=G.x+o, y=G.y-(o?20:36), g=cx.createRadialGradient(x,y,0,x,y,12); g.addColorStop(0,"rgba(255,255,255,"+a+")"); g.addColorStop(.4,c); g.addColorStop(1,"rgba(0,0,0,0)");
     cx.globalAlpha=a; cx.fillStyle=g; cx.beginPath(); cx.arc(x,y,12,0,6.283); cx.fill(); }); cx.restore(); }
 function upgrade(quiet){ G.wpn=Math.min(4,G.wpn+1); var w=WPN[G.wpn]; if(!quiet){ G.upT=2400; pop(G.x,G.y-56,"⚡ "+T(w.n)+"!",w.c); } SND.play("upgrade"); buzz([20,40,20]); }
-function dmgEn(en,d,x,y){ if(en.boss){ if(en.dead) return; d*=en.armor==null?1:en.armor; } if(en.t==="bird"){ d=1; if(en.fleeing) return; } en.hp-=d; en.hit=120;
+function dmgEn(en,d,x,y){ if(en.boss){ if(en.dead) return; d*=en.armor==null?1:en.armor; } if(en.t==="bird"){ d=1; if(en.fleeing) return; } en.hp-=d; en.hit=120; SND.play("hit");
   if(Math.random()<.35) G.fx.push({k:"e",x:x,y:y,vx:(Math.random()-.5)*3,vy:Math.random()*2-1,s:2,g:0,a:.8});
   if(en.hp>0) return; var i=G.ens.indexOf(en); if(i<0) return;
   if(en.boss){ bossDown(en); return; }
@@ -2218,7 +2220,8 @@ var TRF=(function(){
 
 /* ---- main loop ---- */
 function frame(now){
-  requestAnimationFrame(frame); cx=CX0;
+  requestAnimationFrame(frame); cx=CX0; var F0=performance.now();
+  if(R3&&M3.lock30&&!G.half){ if(now-(M3.lastR||0)<25) return; M3.lastR=now; }   // Smooth mode can't hold 60 here: a steady 30 (every other display frame) instead of a swinging 40-60
   if(G.half){ G.last=now; return; }   // halftime: the whole flight is frozen on its last frame until the break ends
   var dt=Math.max(0,Math.min(50,now-(G.last||now))); G.last=now; var k=dt/16.67, run=G.running&&!G.dying;
   var TO=4500, LAND=8000, takeoff=run&&G.el<TO, landing=run&&G.home&&G.t<=LAND;
@@ -2431,7 +2434,7 @@ function frame(now){
     cx.fillStyle="#f0d375"; cx.font="800 22px Barlow,system-ui"; cx.fillText(T("TAP TO FLY"),W/2,H/2+4);
     cx.fillStyle="#c9d2ee"; cx.font="600 14px Barlow,system-ui"; cx.fillText(CALM?T("5 scenic legs · catch the food · land at LAX"):MODE==="survival"?T("Survival · how long can you last?"):T("10 levels · 6 bosses · land back at LAX"),W/2,H/2+34); }
   if(G.running){ hud(); if(!G.dying&&((G.touched&&G.roll<0.06)||(G.home&&G.t<-9000))) end(); }
-  if(R3&&M3.render) M3.render(now,dt,spd);   // the WebGL world under this overlay, from the same state this frame just stepped
+  var F1=performance.now(); if(window.__M3PT) __M3PT.game2d=(__M3PT.game2d||0)+(F1-F0); if(R3&&M3.render) M3.render(now,dt,spd); if(F1-F0>12&&window.__M3SPK&&__M3SPK.length<60) __M3SPK.push({at:(now/1000).toFixed(1),game2d:+(F1-F0).toFixed(1)});   // the WebGL world under this overlay, from the same state this frame just stepped
   if(ATT&&!G.running) previewCopy(now);
 }
 /* ANTIDOTE'S CAR (chase view Easter egg, 2026-10-16): after you catch the Drizzle emblems (or pass 3,000 points), a roadside
@@ -2587,7 +2590,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=e3f"></script>
+<script type="module" src="melody3d.js?v=e3g"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}
@@ -2656,7 +2659,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-top"><div class="ms-hd"><p class="ms-by notranslate">Melody Bar &amp; Grill · Melody Approach</p>'+
       (live?'<span class="ms-beta on">'+esc(T("LIVE · Win this week"))+'</span>':'<span class="ms-beta">'+esc(T("BETA · Coming soon: win rewards"))+'</span>')+
       '<div class="ms-h" role="heading" aria-level="2">'+esc(T("Can you win the weekly challenge?"))+'</div></div>'+
-      '<div class="ms-pv" aria-hidden="true"><canvas id="mpv" width="120" height="180" style="background:#0c1220 url(img/game/card-3d-flight.webp?v=e3f) center/cover"></canvas><i>LIVE</i></div></div>'+
+      '<div class="ms-pv" aria-hidden="true"><canvas id="mpv" width="120" height="180" style="background:#0c1220 url(img/game/card-3d-flight.webp?v=e3g) center/cover"></canvas><i>LIVE</i></div></div>'+
     '<div class="ms-prize"><img src="'+esc(WK.img||"img/menu/melody-fries.jpg")+'" alt=""><div><small>'+esc(T(live?"This week's prize":"Weekly prize · coming soon"))+'</small><b>'+esc(T(prize))+'</b><em>'+esc(T(live?(WK.note||"Top score of the week wins"):"The boards are live now. Prizes switch on soon."))+'</em></div></div>'+
     '<div class="ms-food" aria-label="'+esc(T("Catch the food for points"))+'">'+FOOD.map(function(f){ return '<span class="ms-f" style="--d:'+f[4]+'" title="'+esc(T(f[1]))+'">'+(f[3]?'<span class="ms-st"><i></i><i></i><i></i></span>':'')+'<img src="'+g+f[0]+'.webp?v='+(f[5]||"ag1")+'" alt="'+esc(T(f[1]))+'"><b>'+f[2]+'</b></span>'; }).join("")+'</div>'+
     '<div class="ms-mode" role="group" aria-label="'+esc(T("Game mode"))+'">'+mbtn("campaign","🏆","Campaign","10 levels · 6 bosses",cur,T,esc)+mbtn("survival","⏱️","Survival","How long can you last?",cur,T,esc)+'</div>'+
@@ -2664,13 +2667,13 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-mvp">'+mvp(esc,T)+'</div></div>'; }
 document.addEventListener("click",function(e){ var b=e.target&&e.target.closest&&e.target.closest("[data-mel=mode]"); if(!b) return; e.preventDefault(); if(window.MELODY_MODE) MELODY_MODE(b.getAttribute("data-v")); if(window.GameMenu) GameMenu.refresh(); });
 window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill",tagline:"Night dogfight over LA: 10 levels and six bosses, or Survival. Catch the food, win the week.",
- hero:[g+"card-3d-flight.webp?v=e3f",g+"card-3d-boss.webp?v=e3f",g+"card-3d-beach.webp?v=e3f"],   // the 3D game (2026-10-16), not the old 2D sprites
+ hero:[g+"card-3d-flight.webp?v=e3g",g+"card-3d-boss.webp?v=e3g",g+"card-3d-beach.webp?v=e3g"],   // the 3D game (2026-10-16), not the old 2D sprites
  theme:{bg:"#0b1220",bg2:"#1c2547",card:"#141e34",edge:"#27324d",accent:"#d4af37",accent2:"#f0d375",label:"#f0d375",ink:"#f6f1e4",dim:"#9aa3b5",btnInk:"#1a1206",soft:"rgba(255,255,255,.06)",track:"#27324d",good:"#3fbf8f",bad:"#ff7a59",
   display:"Anton,Impact,'Arial Narrow',sans-serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
  tokens:false, showcase:showcase, preview:function(v){ if(window.__MG&&__MG.attract) __MG.attract(v); },
  mount:"#cv",start:function(){ window.MELODY_START(); },vibrate:true,
  // 3D look (engine3d): graphics tier, weather and time of day. Visual only; they never change the game.
- selects:[{title:"Graphics",options:[["auto","Auto"],["low","Low"],["med","Medium"],["high","High"],["ultra","Ultra"]],note:"Auto picks for this phone and steps down if it gets choppy.",
+ selects:[{title:"Graphics",options:[["smooth","Smooth (recommended)"],["auto","Auto"],["low","Low"],["med","Medium"],["high","High"],["ultra","Ultra"]],note:"Smooth keeps a steady 60 (or a locked 30) on phones and cars. Auto picks for this device and only ever steps down. Clouds/post effects switch on or off on the next visit.",
    get:function(){ return window.__E3Q?__E3Q.pref:"auto"; },set:function(v){ if(window.__E3Q) __E3Q.set(v); }},
   {title:"Weather",options:[["live","Live"],["sunny","Sunny"],["partly","Clouds"],["overcast","Overcast"],["fog","Fog"],["rain","Rain"],["storm","Storm"]],
    get:function(){ return window.MELODY_ENV?MELODY_ENV.get().weather:"live"; },set:function(v){ if(window.MELODY_ENV) MELODY_ENV.weather(v); else try{ localStorage.setItem("melody-weather",v); }catch(e){} }},
@@ -2723,7 +2726,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
   {group:"Weekly boards",items:[{icon:"🏆",name:"Campaign board",note:"Ranked by score (levels beaten add big bonuses)",pts:"score"},{icon:"⏱️",name:"Survival board",note:"Ranked by the longest time survived",pts:"time"}]}],
  prizes:{title:"Weekly challenge (BETA)",champion:"Top of each weekly board wins "+(WK.prize||"Free Melody Fries")+" once Melody turns rewards on",note:"BETA: rewards are off until Melody switches them on. Until then the boards rank players for bragging rights and the game gives no prizes or Melody Rewards points. When they're on: 1 point per "+GP.perScore+" score, up to "+GP.dailyCap+" points a day."}};
 })();</script>
-<script src="../gamemenu.js?v=e3f"></script><script src="../a2hs.js?v=mg1"></script>
+<script src="../gamemenu.js?v=e3g"></script><script src="../a2hs.js?v=mg1"></script>
 <script>/* Simple program (Christian, 2026-10): one balance, the numbers live in window.SSAI_REWARDS at the top of this page.
    No split wallets, visit levels, tokens, daily spin or welcome voucher (see crm.js SIMPLE). */
 window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Melody Approach",customerOnly:true};

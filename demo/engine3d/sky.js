@@ -8,7 +8,7 @@
      sky.info → { sunDir, elev, night 0..1, horizon (Color), zenith (Color) } */
 export const SKY_GLSL = `
   const float PI_S = 3.141592653589793;
-  uniform vec3 uSunDir; uniform float uTurbidity; uniform float uRayleigh; uniform float uMieK; uniform float uMieG; uniform float uNight; uniform float uOvercast; uniform vec3 uMoonDir; uniform float uStarT; uniform float uSkyGain;
+  uniform vec3 uSunDir; uniform float uTurbidity; uniform float uRayleigh; uniform float uMieK; uniform float uMieG; uniform float uNight; uniform float uOvercast; uniform vec3 uMoonDir; uniform float uStarT; uniform float uSkyGain; uniform float uNightLift;
   const vec3 TOTAL_RAYLEIGH = vec3(5.804542996261093E-6, 1.3562911419845635E-5, 3.0265902468824876E-5);
   const vec3 MIE_CONST = vec3(1.8399918514433978E14, 2.7798023919660528E14, 4.0790479543861094E14);
   float sunIntensityS(float zc){ zc = clamp(zc, -1.0, 1.0); return 1000.0 * max(0.0, 1.0 - pow(2.718281828, -((1.6110731556870734 - acos(zc)) / 1.5))); }
@@ -37,6 +37,7 @@ export const SKY_GLSL = `
       float mc = dot(dir, normalize(uMoonDir)); night += vec3(.9, .92, 1.0) * smoothstep(.9994, .99955, mc) * 2.2 * (1.0 - uOvercast) + vec3(.06, .07, .1) * pow(max(mc, 0.0), 60.0) * (1.0 - uOvercast); }
     // twilight: a deep blue-violet overhead while the sun is just below / on the horizon
     float tw = smoothstep(.14, -.02, sd.y) * (1.0 - uNight); c = mix(c, vec3(.05, .06, .17) * (1.0 + .6 * smoothstep(.0, .15, sd.y + .05)), tw * smoothstep(.06, .55, dir.y) * .75);
+    night += vec3(.035, .06, .16) * uNightLift * (1.0 - .6 * pow(max(dir.y, 0.0), .6));   /* optional: lift the night to a readable dark blue (games without the post pass) */
     c = mix(c, night, uNight);
     // overcast: the sky turns into a flat grey dome, brightest around the sun
     float lum = dot(c, vec3(.3, .59, .11));
@@ -47,7 +48,7 @@ export const SKY_GLSL = `
 export function makeSky(THREE, O) {
   const { renderer, scene } = O;
   const U = { uSunDir: { value: new THREE.Vector3(0, .1, -1) }, uTurbidity: { value: 6 }, uRayleigh: { value: 2.2 }, uMieK: { value: .005 }, uMieG: { value: .8 },
-    uNight: { value: 0 }, uOvercast: { value: 0 }, uMoonDir: { value: new THREE.Vector3(.3, .5, -.8).normalize() }, uStarT: { value: 0 }, uSkyGain: { value: .42 } };
+    uNight: { value: 0 }, uOvercast: { value: 0 }, uMoonDir: { value: new THREE.Vector3(.3, .5, -.8).normalize() }, uStarT: { value: 0 }, uSkyGain: { value: .42 }, uNightLift: { value: 0 } };
   // a sky dome (used for the environment map, and drawn as background on tiers without the cloud pass)
   const mat = new THREE.ShaderMaterial({ uniforms: U, side: THREE.BackSide, depthWrite: false,
     vertexShader: `varying vec3 vDir; void main(){ vDir = normalize((modelMatrix * vec4(position, 1.0)).xyz - cameraPosition); vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_Position = p.xyww; }`,

@@ -12,7 +12,7 @@
    along quadratic Bézier arcs, wrap-around at the network ends. */
 export async function makeTraffic(THREE, O) {
   // O.procedural: the realistic procedural cars (engine3d/carmodels.js) instead of the Kenney toy pack
-  const PROC = O.procedural ? (await import("./carmodels.js?v=e3o")).buildCars(THREE) : null;
+  const PROC = O.procedural ? (await import("./carmodels.js?v=e3p")).buildCars(THREE) : null;
   const g = PROC ? { scene: { traverse(fn) { PROC.forEach(c => { const geo = c.geo.clone(); geo.applyMatrix4(new THREE.Matrix4().makeScale(3.3 / SCK, 3.3 / SCK, 3.3 / SCK)); fn({ isMesh: true, name: c.name, geometry: geo, proc: c }); }); } } } : await O.loader.loadAsync(O.base + "cars.glb"), Q = Object.assign({ density: 1 }, O.quality || {});
   const TYPES = [], LEN = 15.5, SC = LEN / 2.55, SCK = SC;   // (procedural cars are in metres: 3.3 world units per metre)
   const keepPaint = new Set(["taxi", "police", "ambulance", "delivery"]);

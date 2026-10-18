@@ -54,7 +54,7 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=e3t") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3t") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=e3t") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3t.ht4k") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
   const QM = await import("../engine3d/quality.js?v=e3t");

@@ -85,7 +85,7 @@ var W={
  yourName:{en:"Your first name or nickname",es:"Tu nombre o apodo"},
  nameHint:{en:"For your practice points and your Trained badge. It stays on this phone.",es:"Para tus puntos de práctica y tu insignia de Capacitado. Se queda en este teléfono."},
  save:{en:"Save",es:"Guardar"},
- nav:[["guests",{en:"For guests",es:"Para clientes"}],["t-pos",{en:"With Toast",es:"Con Toast"}],["deals",{en:"Deals",es:"Ofertas"}],["tut",{en:"Step by step",es:"Paso a paso"}],["t-oneprize",{en:"One prize a day",es:"Un premio al día"}],["t-card",{en:"Rewards card",es:"Tarjeta"}],["say",{en:"What to say",es:"Qué decir"}],["faq",{en:"Problems & FAQ",es:"Problemas y preguntas"}],["games",{en:"Practice games",es:"Juegos de práctica"}],["quiz",{en:"Test yourself",es:"Ponte a prueba"}]],
+ nav:[["duties",{en:"My job",es:"Mi trabajo"}],["guests",{en:"For guests",es:"Para clientes"}],["t-pos",{en:"With Toast",es:"Con Toast"}],["deals",{en:"Deals",es:"Ofertas"}],["tut",{en:"Step by step",es:"Paso a paso"}],["t-oneprize",{en:"One prize a day",es:"Un premio al día"}],["t-card",{en:"Rewards card",es:"Tarjeta"}],["say",{en:"What to say",es:"Qué decir"}],["faq",{en:"Problems & FAQ",es:"Problemas y preguntas"}],["games",{en:"Practice games",es:"Juegos de práctica"}],["quiz",{en:"Test yourself",es:"Ponte a prueba"}]],
  install:{en:"📲 Save this guide: Share → Add to Home Screen (“Staff Rewards”). Works offline after the first visit.",es:"📲 Guarda esta guía: Compartir → Agregar a inicio (“Staff Rewards”). Funciona sin internet después de la primera vez."}
 };
 function guests(){ var R=rw(), jl=R.justLanded;
@@ -285,12 +285,61 @@ function quiz(){ var B=bank(), b=quizBadge(), h="<h2 id='quiz'>✅ "+L({en:"Opti
 function finishQuiz(){ var right=QZ.qs.filter(function(x){ return QZ.ans[x.i]===0; }).length, pct=Math.round(100*right/QZ.qs.length), pass=pct>=80, day=new Date().toLocaleDateString("en-CA");
  if(pass) set(LS.quiz,JSON.stringify({passed:true,name:nm()||"",day:day,score:pct}));
  if(LIVE.api) try{ fetch(LIVE.api,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({type:"staff_trained",name:(nm()||"Staff").slice(0,24),score:pct,passed:pass,dev:get("ssai_staff_dev","")})}); }catch(e){} }
+// ---------------- 🎯 YOUR OBJECTIVE & DUTIES (2026-10-18): pick your job, see your goal + duties. Saved on this phone only. ----------------
+// Same job list as Christian HQ › 🔐 Team access. What you can CHANGE in HQ is set by Christian there, not here.
+var DUTY={
+ kitchen:[{en:"Kitchen",es:"Cocina"},{en:"Every plate looks like the photo in the app, comes out fast, and matches the menu.",es:"Cada plato se ve como la foto de la app, sale rápido y coincide con el menú."},[
+  {en:"Cook every dish to the recipe and plate it like the app photo.",es:"Cocina cada platillo según la receta y emplátalo como la foto de la app."},
+  {en:"Tell your lead (or Christian) when an item runs out, so it can come off the app or the special.",es:"Avisa a tu encargado (o a Christian) cuando se acabe algo, para quitarlo de la app o del especial."},
+  {en:"If Christian turned it on for you: snap a real photo of a new or fixed dish in HQ (good light, plate fills the picture, no people).",es:"Si Christian te lo activó: toma una foto real de un platillo nuevo o corregido en HQ (buena luz, el plato llena la foto, sin personas)."},
+  {en:"Rewards rung in Toast (free fries, burger…) are made exactly like a paid order.",es:"Las recompensas marcadas en Toast (papas gratis, hamburguesa…) se preparan igual que una orden pagada."},
+  {en:"Keep your station clean and food safe every shift.",es:"Mantén tu estación limpia y la comida segura en cada turno."}]],
+ bartender:[{en:"Bartender",es:"Bartender"},{en:"Great drinks, fast, and every guest leaves knowing about the app and its rewards.",es:"Bebidas excelentes y rápidas, y cada cliente se va sabiendo de la app y sus recompensas."},[
+  {en:"Make drinks to spec and know tonight's specials and happy hour (see Deals below).",es:"Prepara las bebidas según la receta y conoce los especiales y el happy hour de hoy (ver Ofertas abajo)."},
+  {en:"Tell every new guest about the app: free to join, games, points, rewards.",es:"Cuéntale a cada cliente nuevo de la app: es gratis, tiene juegos, puntos y recompensas."},
+  {en:"Check the live pass and ring the matching Toast button for rewards (Step by step 2–4).",es:"Revisa el pase en vivo y marca el botón correcto de Toast para las recompensas (Paso a paso 2–4)."},
+  {en:"Remind guests to add their visit with the receipt check number.",es:"Recuérdales agregar su visita con el número de cheque del recibo."},
+  {en:"Never ask for or write down a guest's phone or email.",es:"Nunca pidas ni anotes el teléfono o correo de un cliente."}]],
+ server:[{en:"Server / floor",es:"Mesero / piso"},{en:"Every table is happy, served on time, and knows how to earn rewards.",es:"Cada mesa está contenta, bien atendida y sabe cómo ganar recompensas."},[
+  {en:"Greet the table, know the specials, and mention the app with the menu.",es:"Saluda a la mesa, conoce los especiales y menciona la app con el menú."},
+  {en:"Help a guest join if they ask (Step by step 1). It takes under a minute.",es:"Ayuda a un cliente a unirse si lo pide (Paso a paso 1). Toma menos de un minuto."},
+  {en:"Check the live pass before ringing any reward in Toast.",es:"Revisa el pase en vivo antes de marcar cualquier recompensa en Toast."},
+  {en:"At the check: \"Add your visit with this receipt to earn points.\"",es:"Con la cuenta: \"Agrega tu visita con este recibo para ganar puntos.\""},
+  {en:"Problems you can't fix: tell the manager on shift.",es:"Problemas que no puedes resolver: díselo al gerente de turno."}]],
+ bar_manager:[{en:"Bar manager",es:"Gerente de bar"},{en:"The bar runs smooth, specials and happy hour are right in the app, and the team knows the rewards.",es:"El bar funciona bien, los especiales y el happy hour están correctos en la app y el equipo conoce las recompensas."},[
+  {en:"Keep drink prices, specials and happy hour correct in HQ (if Christian turned those on for you).",es:"Mantén correctos en HQ los precios de bebidas, especiales y happy hour (si Christian te lo activó)."},
+  {en:"When a price changes in the app, change it in Toast too.",es:"Cuando cambie un precio en la app, cámbialo también en Toast."},
+  {en:"Make sure every bartender has passed the quiz below.",es:"Asegúrate de que cada bartender haya pasado el quiz de abajo."},
+  {en:"Check the HQ to-do list at the start of every shift.",es:"Revisa la lista de pendientes de HQ al inicio de cada turno."}]],
+ marketing:[{en:"Marketing / management",es:"Marketing / gerencia"},{en:"More guests join, come back, and use their rewards. The app always shows the right deals, prices and photos.",es:"Más clientes se unen, regresan y usan sus recompensas. La app siempre muestra las ofertas, precios y fotos correctos."},[
+  {en:"Set and update discounts, reward points and promo deals in HQ › Discounts.",es:"Configura y actualiza descuentos, puntos y promociones en HQ › Discounts."},
+  {en:"Keep specials, happy hour and the early-bird gift current.",es:"Mantén al día los especiales, el happy hour y el regalo early bird."},
+  {en:"Fix the app's menu: real dish photos, prices that match Toast (only what Christian turned on for you).",es:"Corrige el menú de la app: fotos reales y precios iguales a Toast (solo lo que Christian te activó)."},
+  {en:"Watch the charts each week: sign-ups, visits, rewards used. Tell Christian what's working.",es:"Revisa las gráficas cada semana: registros, visitas, recompensas usadas. Dile a Christian qué funciona."},
+  {en:"Every change gets an emailed code and goes in the Audit log, so double-check before you Save.",es:"Cada cambio pide un código por correo y queda en el registro, así que revisa antes de guardar."},
+  {en:"The games themselves are run by Antidote. Ideas for the games? Send them to Christian.",es:"Los juegos los maneja Antidote. ¿Ideas para los juegos? Envíaselas a Christian."}]],
+ manager:[{en:"Manager (general)",es:"Gerente (general)"},{en:"Every shift runs right: staff trained, app correct, guests happy.",es:"Cada turno funciona bien: personal capacitado, app correcta, clientes contentos."},[
+  {en:"Check the HQ to-do list first thing and clear what's yours.",es:"Revisa primero la lista de pendientes de HQ y resuelve lo tuyo."},
+  {en:"Keep prices, specials, discounts and photos right in the app (whatever Christian turned on for you).",es:"Mantén correctos en la app precios, especiales, descuentos y fotos (lo que Christian te activó)."},
+  {en:"Make sure every new hire reads this guide and passes the quiz.",es:"Asegúrate de que cada persona nueva lea esta guía y pase el quiz."},
+  {en:"Handle reward problems the team can't (FAQ below), and tell Christian about anything odd.",es:"Resuelve los problemas de recompensas que el equipo no pueda (FAQ abajo) y avísale a Christian de cualquier cosa rara."}]],
+ other:[{en:"Other employee",es:"Otro empleado"},{en:"Help guests have a great visit and know about the app.",es:"Ayuda a que los clientes tengan una gran visita y conozcan la app."},[
+  {en:"Know how the app and rewards work (read Step by step).",es:"Conoce cómo funcionan la app y las recompensas (lee Paso a paso)."},
+  {en:"Send reward questions to the bartender or manager on shift.",es:"Pasa las preguntas de recompensas al bartender o gerente de turno."},
+  {en:"Never share a guest's personal info.",es:"Nunca compartas información personal de un cliente."}]]};
+function duties(){ var j=get("ssai_staff_job",""), d=DUTY[j];
+ var h="<h2 id='duties'>🎯 "+L({en:"My objective & duties",es:"Mi objetivo y mis tareas"})+"</h2><div class='card'><label for='job' style='font-weight:800'>"+L({en:"My job",es:"Mi puesto"})+"</label>"+
+  "<select id='job' style='display:block;width:100%;margin-top:6px;font-size:17px;padding:10px;border-radius:12px'><option value=''>"+L({en:"Pick your job…",es:"Elige tu puesto…"})+"</option>"+
+  Object.keys(DUTY).map(function(k){ return "<option value='"+k+"'"+(k===j?" selected":"")+">"+L(DUTY[k][0])+"</option>"; }).join("")+"</select>";
+ if(d) h+="<p style='margin:12px 0 4px'><b>🎯 "+L({en:"Objective",es:"Objetivo"})+":</b> "+L(d[1])+"</p><b>📋 "+L({en:"Duties",es:"Tareas"})+"</b><ul class='ck'>"+d[2].map(function(x){ return "<li>"+L(x)+"</li>"; }).join("")+"</ul>";
+ return h+"<p class='note' style='margin-top:8px'>"+L({en:"What you can change in Christian HQ (prices, discounts, photos…) is turned on by Christian. Need more? Ask him.",es:"Lo que puedes cambiar en Christian HQ (precios, descuentos, fotos…) lo activa Christian. ¿Necesitas más? Pídeselo."})+"</p></div>"; }
 // ---------------- 🔊 Listen (demo/listen.js: the phone's own free voice reads a section, paragraph by paragraph) ----------------
 // every h2 section (guests, deals, tut, say, faq) is wrapped so it can be read, and every step section gets its own button
 function listenify(h){ if(!window.SSAI_LISTEN) return h; var lb=L({en:"🔊 Listen",es:"🔊 Escuchar"});
  h=h.replace(/<h2 id='([a-z-]+)'>([\s\S]*?)<\/h2>/g,function(m,id,t){ return "</div-wrap><div class='lsw' id='ls-"+id+"'><h2 id='"+id+"'>"+t+"</h2><p class='lsr' data-noread>"+SSAI_LISTEN.button("ls-"+id,lb)+"</p>"; });
  h=h.replace(/<section class='tut' id='(t-[a-z]+)'><h3>([\s\S]*?)<\/h3>/g,function(m,id,t){ return m+"<p class='lsr' data-noread>"+SSAI_LISTEN.button(id,lb)+"</p>"; });
  return h.replace("</div-wrap>","").replace(/<\/div-wrap>/g,"</div>")+"</div>"; }
+document.addEventListener("change",function(e){ if(e.target&&e.target.id==="job"){ set("ssai_staff_job",e.target.value); render(); var d=document.getElementById("duties"); if(d) d.scrollIntoView(); } });
 // ---------------- page ----------------
 function render(){ var y=window.scrollY; document.documentElement.lang=LANG; document.body.className=REST;
  document.title=LANG==="es"?"Guía del personal · Melody × Nalu Vida":"Staff Rewards · Melody × Nalu Vida";
@@ -300,7 +349,7 @@ function render(){ var y=window.scrollY; document.documentElement.lang=LANG; doc
   "<h1>"+L(W.title)+"</h1><p class='s'>"+L(W.intro)+"</p>"+
   "<div class='card'><label for='nm' style='font-weight:800'>"+L(W.yourName)+"</label><div class='name' style='margin-top:6px'><input id='nm' maxlength='24' autocomplete='given-name' value='"+esc(nm())+"'><button class='btn' id='nmSave'>"+L(W.save)+"</button></div><p class='note' style='margin:6px 0 0'>"+L(W.nameHint)+"</p></div>"+
   "<nav class='nav' aria-label='Sections'>"+W.nav.map(function(x){ return "<a href='#"+x[0]+"'>"+L(x[1])+"</a>"; }).join("")+"</nav>"+
-  listenify(guests()+deals()+tutorials()+say()+faq())+games()+quiz()+"<p class='note' style='margin-top:24px'>"+L(W.install)+"</p>";
+  listenify(duties()+guests()+deals()+tutorials()+say()+faq())+games()+quiz()+"<p class='note' style='margin-top:24px'>"+L(W.install)+"</p>";
  window.scrollTo(0,y); tickDemo(); showLk(); if(window.StaffVoice) StaffVoice.decorate(LANG); }
 var $app=document.getElementById("app"), dpEnd=0;
 function tickDemo(){ var c=document.getElementById("dpClock"), d=document.getElementById("dpCd"), p=document.getElementById("demoPass"); if(!c) return;

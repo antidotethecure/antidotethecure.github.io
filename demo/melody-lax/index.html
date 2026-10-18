@@ -255,7 +255,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 
 <section class="msec" id="sec-games" data-tab="games">
 <h2 id="play"><small>Play &amp; earn points</small>Fly the Melody approach</h2>
-<p class="sub">A night dogfight over LA. <b>Campaign:</b> 10 levels from LAX over Westchester, the stadium, the hills and the coast, each a little harder, with six bosses (an Army gunship, the Super Jet, a big jet and its escorts, a rocket ship, an army base and a final flock of white birds), then land back at LAX. <b>Survival:</b> no finish line, it just keeps getting harder: how long can you last? Catch Melody's food as it floats by. Drag anywhere on the game and the plane glides to your finger; tap ⚡ for a speed boost and grab the hourglass for slow-mo. Prefer a calm flight? Pause and turn combat off. <b>BETA:</b> weekly prizes switch on soon; the boards are live now.</p>
+<p class="sub">A night dogfight over LA. <b>Campaign:</b> 10 levels that follow a real SoCal route: from LAX over Westchester, Venice and Santa Monica to Hollywood, then a loop back down to Long Beach, Compton, the San Gabriel Mountains, Orange County, downtown LA and the Valley, each a little harder, with six bosses (an Army gunship, the Super Jet, a big jet and its escorts, a rocket ship, an army base and a final flock of white birds), then land back at LAX. <b>Survival:</b> no finish line, it just keeps getting harder: how long can you last? Catch Melody's food as it floats by. Drag anywhere on the game and the plane glides to your finger; tap ⚡ for a speed boost and grab the hourglass for slow-mo. Prefer a calm flight? Pause and turn combat off. <b>BETA:</b> weekly prizes switch on soon; the boards are live now.</p>
 <div class="gamebox">
   <div class="hud">
     <span>Score <span class="sc" id="score">0</span></span>
@@ -724,22 +724,47 @@ window.MELODY_DEBUG={level:function(n){ if(!G.running) start(); G.debug=1; G.lvl
   traffic:function(o){ G.debug=1; TRF.spawn(o||null); }, ctl:function(){ return {mode:CTL.mode,x:G.x,y:G.y,tx:G.tx,ty:G.ty,vx:G.mvx,vy:G.mvy,bank:G.vx,trf:G.trf.length,bumps:G.bumps,streak:G.streak||0}; }};
 
 /* ---- the ground: Westchester at night, LAX runways and the landmarks rolling under you ---- */
-var SEQ=["city","towers","city","melody","city","city","stadium","city","towers","hills","hills","hills","coast","venice","coast","pier","city","melody","city"];   // generic LA scenery only: original stadium/tower art, no real landmarks, no burger-chain lot
+var SEQ=["city","towers","city","melody","city","city","stadium","city","towers","hills","hills","hills","coast","venice","coast","pier","city","melody","city"];   // (the old loop: 2D top view only)
+/* THE ROUTE (2026-10-17, Antidote: "follow real SoCal geography as the levels go"). Each level flies over one district, in map order:
+   LAX → Melody (Westchester) → Venice / Nalu Vida → Santa Monica → Hollywood, then a banking turn through the clouds back down
+   the coast to Long Beach → Compton → the San Gabriels → Orange County → downtown LA → the San Fernando Valley, then home to LAX.
+   seq: the ground strips of that district, looped while you're in it (kinds built by world3d.js). Survival keeps cycling the route. */
+var ZONES=[{id:"lax",name:"LAX · Westchester",seq:["city","melody","city","towers"]},
+  {id:"venice",name:"Venice Beach",seq:["coast","venice","coast","city"]},
+  {id:"santamonica",name:"Santa Monica",seq:["oceanave","pier","oceanave","coast"]},
+  {id:"hollywood",name:"Hollywood",seq:["city","hollywood","hills","city"]},
+  {id:"longbeach",name:"Long Beach",seq:["longbeach","harbor","harbor"],loop:1},
+  {id:"compton",name:"Compton",seq:["compton","civic","compton","compton"]},
+  {id:"sangabriel",name:"San Gabriel Mountains",seq:["mountains","mountains","mountains"]},
+  {id:"oc",name:"Orange County",seq:["irvine","ocstadium","irvine","octown"]},
+  {id:"dtla",name:"Downtown LA",seq:["towers","dtla","towers","dtla"]},
+  {id:"valley",name:"San Fernando Valley",seq:["valley","valley","valley"]}];
+var CALM_ZONE=[0,1,2,3,4];   // the calm flight's 5 legs
+function zoneIx(lv){ lv=lv||G.lvl||1; return CALM?CALM_ZONE[Math.max(0,Math.min(4,lv-1))]:(lv-1)%ZONES.length; }
+function zoneNow(){ var q=new URLSearchParams(location.search).get("zone"); if(q){ for(var i=0;i<ZONES.length;i++) if(ZONES[i].id===q) return i; } return zoneIx(); }   /* ?zone=compton (testing / screenshots) */
 var COAST={coast:1,venice:1,pier:1};
 // labels: only the owner's own two spots are named. No landmark, venue, sign or neighborhood-landmark names anywhere (2026-10 branding pass)
 var LBL={venice:"★ NALU VIDA ★",melody:"★ MELODY BAR & GRILL ★"};
 function seedGround(){ G.ground=[]; G.gy=H+100; G.seq=0; G.ground.push({k:"runway",t:"city1",y:G.gy-520,h:520,side:1}); G.gy-=520; while(G.gy>-400) addSeg(); }
 // photoreal aerial ground (dusk): every segment is a full-width aerial tile; landmark sprites sit on top of a city tile
-var TILE_OF={city:["city1","city2"],towers:["city2"],melody:["city1"],stadium:["city1"],hills:["hills"],coast:["venicecoast"],venice:["nalu"],pier:["pier"]};
+var TILE_OF={city:["city1","city2"],towers:["city2"],melody:["city1"],stadium:["city1"],hills:["hills"],coast:["venicecoast"],venice:["nalu"],pier:["pier"],
+  oceanave:["venicecoast"],octown:["venicecoast"],hollywood:["hills"],mountains:["hills"],longbeach:["pier"],harbor:["venicecoast"],compton:["city1"],civic:["city1"],irvine:["city2"],ocstadium:["city1"],dtla:["city2"],valley:["city1"]};
 var TILES={}, TILE_FEATHER=56;
 ["city1","city2","hills","venicecoast","nalu","pier"].forEach(function(k){ var i=img("img/game/ground/"+k+".jpg"); i.onload=function(){ // pre-render once: the tile's own bottom edge fades out over the tile below
   var w=W*2, h=Math.round(w*i.naturalHeight/i.naturalWidth), F=TILE_FEATHER*2, c=document.createElement("canvas"); c.width=w; c.height=h; var x=c.getContext("2d"); x.drawImage(i,0,0,w,h);
   x.globalCompositeOperation="destination-out"; var gr=x.createLinearGradient(0,h-F,0,h); gr.addColorStop(0,"rgba(0,0,0,0)"); gr.addColorStop(1,"rgba(0,0,0,1)"); x.fillStyle=gr; x.fillRect(0,h-F,w,F);
   TILES[k]={c:c,h:(h-F)/2}; }; });   // tiles are spaced by their height minus the fade, so the fade overlaps the tile below
 var tileN=0; window.__TILES=TILES;
-function addSeg(){ var k=G.landing&&!G.rwyQueued?(G.rwyQueued=1,"runway"):SEQ[G.seq++%SEQ.length];
+function addSeg(){ var k=G.landing&&!G.rwyQueued?(G.rwyQueued=1,"runway"):nextKind();
   if(k==="runway"){ G.gy-=520; G.ground.push({k:k,t:"city2",y:G.gy,h:520,side:1}); return; }
   var opts=TILE_OF[k]||["city1"], t=opts[(tileN++)%opts.length], h=TILES[t]?TILES[t].h:600; G.gy-=h; G.ground.push({k:k,t:t,y:G.gy,h:h,side:Math.random()<.5?-1:1}); }
+// the next ground strip: the 3D chase view follows the route (the district of the current level); the 2D top view keeps its old photo loop
+function nextKind(){ if(!CH) return SEQ[G.seq++%SEQ.length]; var zi=zoneNow(); if(G.zi!==zi){ G.zi=zi; G.zs=0; } var z=ZONES[zi]; return z.seq[(G.zs++)%z.seq.length]; }
+/* entering a district: the strips not reached yet switch to it. The loop back to Long Beach is a banking turn through a cloud bank
+   (melody3d.js draws the bank + the cloud; the swap happens while you're inside it, so nothing pops) */
+function zoneEnter(){ if(!CH) return; var zi=zoneNow(), z=ZONES[zi]; if(G.zi===zi) return;
+  var swap=function(){ if(zoneNow()!==zi) return; G.zi=zi; G.zs=0; for(var i=0;i<G.ground.length;i++){ var g=G.ground[i]; if(g.k==="runway"||g.y+g.h>(z.loop?H+40:-260)) continue; g.k=nextKind(); } };
+  if(z.loop){ G.cloud={t0:performance.now(),d:2600}; setTimeout(swap,1050); } else swap(); }
 var LMW={melody:250,stadium:270,towers:240};   // sprite widths (the 3D layer uses the same numbers via M3.LMW)
 function drawGround(dy){
   if(!R3){ cx.fillStyle="#0c1220"; cx.fillRect(0,0,W,H); }
@@ -1628,19 +1653,19 @@ function drawCrate(it,now){ var nx=WPN[Math.min(4,G.wpn+1)], max=true, col="#7ef
 function levelTimers(){ var p=L().pace; G.spawnT=600; G.ufoT=3600; G.jetT=6500*p*DENS; G.boltT=6000*p*DENS; G.kamiT=10000*p*DENS; G.copT=(G.lvl>=4?6000:9000)*DENS; }
 function levelEnd(){ G.t=0; if(CALM){ if(G.lvl>=NL()) victory(); else nextLevel(); return; } var bk=BOSS_AT[G.lvl]; if(bk&&!G.boss&&!G.bossDie&&G.bossN<G.lvl){ G.bossN=G.lvl; spawnBoss(bk); return; } if(G.lvl>=NL()) victory(); else nextLevel(); }
 function nextLevel(){ if(SURV()) return survLevelUp(); var bonus=500*G.lvl, up=""; G.score+=bonus; if(!CALM) up=unlockGun(1);
-  G.lvl++; G.hp=100; G.sev=0; G.t=LEG_MS; G.lel=0; G.heals=0; G.gotCrate=0; G.crates=0; G.crateT=crateAt(G.lvl); levelTimers();
+  G.lvl++; G.hp=100; G.sev=0; G.t=LEG_MS; G.lel=0; G.heals=0; G.gotCrate=0; G.crates=0; G.crateT=crateAt(G.lvl); levelTimers(); zoneEnter();
   G.ens.forEach(function(e){ e.fleeing=1; });
-  var lv=G.lvl, rid=G.runId, go=function(){ if(G.runId!==rid) return; G.banner={t:0,txt:T("LEVEL")+" "+lv,sub:T(L().sub),up:up,bonus:bonus}; SND.play("level"); buzz([30,40,30]);
+  var lv=G.lvl, rid=G.runId, go=function(){ if(G.runId!==rid) return; G.banner={t:0,txt:T("LEVEL")+" "+lv,sub:T(L().sub),up:up,bonus:bonus,zone:CH?ZONES[zoneIx(lv)].name:""}; SND.play("level"); buzz([30,40,30]);
     radio(CLEAR_LINES[lv-2]||("Level "+(lv-1)+" complete. Nice flying, Captain!"),{tone:"win",ms:3000}); };
   // HALFTIME: Antidote's Melody review reel between levels (after level 2, 3 or 4 once ~90 s are flown). The whole game freezes until it's over.
   if(window.Halftime&&Halftime.levelUp(lv,function(){ G.half=0; G.last=performance.now(); go(); },G.el)){ G.half=1; drag=null; return; }
   go(); }
 // SURVIVAL: a new level every 40 s of flying (paused while a boss is up). No landing: it ends when you go down.
 function survLevelUp(){ var up="";
-  var bonus=250*G.lvl; G.score+=bonus; G.lvl++; G.hp=100; G.sev=0; G.lel=0; G.heals=0; G.gotCrate=0; G.crates=0; G.crateT=crateAt(G.lvl); levelTimers();
+  var bonus=250*G.lvl; G.score+=bonus; G.lvl++; G.hp=100; G.sev=0; G.lel=0; G.heals=0; G.gotCrate=0; G.crates=0; G.crateT=crateAt(G.lvl); levelTimers(); zoneEnter();
   G.ens.forEach(function(e){ if(!e.boss) e.fleeing=1; });
   var bk=SURV_BOSS[G.lvl]||(G.lvl>13&&G.lvl%2===1?SURV_ROT[(G.lvl>>1)%SURV_ROT.length]:"");
-  G.banner={t:0,txt:T("LEVEL")+" "+G.lvl,sub:bk?T("Boss incoming!"):T(L().sub),up:up,bonus:bonus}; SND.play("level"); buzz([30,40,30]);
+  G.banner={t:0,txt:T("LEVEL")+" "+G.lvl,sub:bk?T("Boss incoming!"):T(L().sub),up:up,bonus:bonus,zone:CH?ZONES[zoneIx()].name:""}; SND.play("level"); buzz([30,40,30]);
   radio(bk?"Big one on radar, Captain. Stay sharp!":"Still flying! "+mmss(G.surv)+" and counting, Captain.",{tone:"win",ms:2600});
   if(bk) G.survBossK=bk; }
 function victory(){ G.won=1; var bonus=CALM?3000+Math.min(2000,(G.bestStreak||0)*100):5000+Math.round(G.hp)*20; G.score+=bonus; G.inv=1e9; G.eshots=[]; G.warn=[]; G.ens.forEach(function(e){ e.fleeing=1; });
@@ -1648,11 +1673,12 @@ function victory(){ G.won=1; var bonus=CALM?3000+Math.min(2000,(G.bestStreak||0)
 function drawBanner(dt){ var b=G.banner; if(!b) return; b.t+=dt; var D=b.win?3600:2600; if(b.t>D){ G.banner=null; return; }
   var a=Math.max(0,Math.min(1,b.t/220,(D-b.t)/420)), s=1+Math.max(0,.45-b.t/500);
   cx.save(); cx.globalAlpha=a; cx.translate(W/2,H*.34); cx.textAlign="center"; cx.textBaseline="middle";
-  cx.fillStyle="rgba(6,10,22,.55)"; roundRect(-W/2+18,-46,W-36,b.bonus||b.up?132:104,16); cx.fill();
+  cx.fillStyle="rgba(6,10,22,.55)"; roundRect(-W/2+18,-46,W-36,(b.bonus||b.up?132:104)+(b.zone?22:0),16); cx.fill();
   cx.save(); cx.scale(s,s); cx.font="400 56px Anton,Impact,sans-serif"; cx.lineWidth=7; cx.strokeStyle="#0a0f1c"; cx.strokeText(b.txt,0,0); cx.fillStyle=b.boss?"#ff4a3a":b.win?"#7ef7c8":"#f0d375"; cx.fillText(b.txt,0,0); cx.restore();
   cx.lineWidth=4; cx.strokeStyle="rgba(5,8,20,.9)"; cx.font="800 16px Barlow,system-ui"; cx.strokeText(b.sub,0,42); cx.fillStyle="#e8eefc"; cx.fillText(b.sub,0,42);
   var y=64; if(b.up){ cx.font="900 15px Barlow,system-ui"; cx.strokeText("⚡ "+b.up,0,y); cx.fillStyle=b.win?"#f0d375":WPN[G.unl].c; cx.fillText("⚡ "+b.up,0,y); y+=22; }
-  if(b.bonus){ cx.font="800 14px Barlow,system-ui"; var bt="+"+b.bonus.toLocaleString()+" "+T("level bonus"); cx.strokeText(bt,0,y); cx.fillStyle="#f0d375"; cx.fillText(bt,0,y); }
+  if(b.bonus){ cx.font="800 14px Barlow,system-ui"; var bt="+"+b.bonus.toLocaleString()+" "+T("level bonus"); cx.strokeText(bt,0,y); cx.fillStyle="#f0d375"; cx.fillText(bt,0,y); y+=22; }
+  if(b.zone){ cx.font="900 14px Barlow,system-ui"; cx.lineWidth=4; cx.strokeStyle="rgba(5,8,20,.9)"; var zt="📍 "+T("Now flying over")+" "+b.zone; cx.strokeText(zt,0,y); cx.fillStyle="#7ee0ff"; cx.fillText(zt,0,y); }   /* the district you're flying into */
   cx.restore(); }
 function drawUpgrade(dt){ if(G.upT<=0) return; G.upT-=dt; var w=WPN[G.upW==null?G.wpn:G.upW], a=Math.min(1,G.upT/400,(2400-G.upT)/200);
   cx.save(); cx.globalAlpha=Math.max(0,a); cx.textAlign="center"; cx.textBaseline="middle"; cx.lineWidth=6; cx.strokeStyle="#0a0f1c";
@@ -2501,7 +2527,7 @@ function previewCopy(now){ if(now-PVT<33) return; PVT=now; var pv=document.getEl
 function rewardsOn(){ return !!(window.MELODY_REWARDS_ON&&window.MELODY_REWARDS_ON()); }
 /* ---- bridge for the optional 3D renderer (melody3d.js). Read-only views of the game state + visual hooks; it never changes the game. ---- */
 var SHK=[0,0];
-var M3=window.__M3={render:null,NL:function(){ return NL(); },apexDirs:function(b){ return apexBeamDirs(b); },audioOut:function(){ try{ return SND.out(); }catch(e){ return null; } },egg:null,EGG_SCORE:EGG_SCORE,G:function(){ return G; },S:S,W:W,H:H,PLANE_W:PLANE_W,COP_LEN:COP_LEN,GS_LEN:GS_LEN,SJ_W:SJ_W,DRIZ_N:DRIZ_N,RP_HITS:RP_HITS,WPN:WPN,NAV:NAV,PICK:PICK,MIC:MIC,TILES:TILES,LBL:LBL,LMW:LMW,TRF_COLS:TRF.COLS,DRIZ_IM:DRIZ_IM,FX:FX,CARS:CARS,SHK:SHK,reduce:reduce,
+var M3=window.__M3={render:null,NL:function(){ return NL(); },zoneId:function(){ return ZONES[G.zi!=null?G.zi:zoneNow()].id; },apexDirs:function(b){ return apexBeamDirs(b); },audioOut:function(){ try{ return SND.out(); }catch(e){ return null; } },egg:null,EGG_SCORE:EGG_SCORE,G:function(){ return G; },S:S,W:W,H:H,PLANE_W:PLANE_W,COP_LEN:COP_LEN,GS_LEN:GS_LEN,SJ_W:SJ_W,DRIZ_N:DRIZ_N,RP_HITS:RP_HITS,WPN:WPN,NAV:NAV,PICK:PICK,MIC:MIC,TILES:TILES,LBL:LBL,LMW:LMW,TRF_COLS:TRF.COLS,DRIZ_IM:DRIZ_IM,FX:FX,CARS:CARS,SHK:SHK,reduce:reduce,
   copPt:copPt,gsPt:gsPt,gunshipIm:gunshipIm,superjetIm:superjetIm,ready:ready,
   BJ_W:BJ_W,ESC_W:ESC_W,RK_L:RK_CH*RK_K,BASE_W:BASE_W,BASE_H:BASE_H,BASE_L:BASE_L,BIRD_W:BIRD_W,rkPod:rkPod,LITE:LITE,baseIm:baseIm,
   rpBanner:function(c,x,y,p,a,r){ rpBanner(c,x,y,p,a,r); },
@@ -2580,7 +2606,7 @@ function postScore(){
 // weekly board = bragging rights only (no champion prize since Christian's 2026-10 feedback)
 function alertBox(t){ var d=document.createElement("div"); d.className="ok"; d.style.cssText="position:fixed;left:12px;right:12px;top:12px;z-index:80;max-width:520px;margin:0 auto;background:#0b1220;box-shadow:0 10px 40px #000a"; d.innerHTML='<b>'+esc(t)+'</b>'; document.body.appendChild(d); setTimeout(function(){ d.remove(); },7000); }
 
-window.__MG={get:function(){return G;},start:function(){start();},end:function(){ if(G.running) end(); },W:W,H:H,mode:function(m){ if(m) setMode(m); return MODE; },attract:function(on){ ATT=on?1:0; },LV:LV,BOSS_AT:BOSS_AT};
+window.__MG={get:function(){return G;},start:function(){start();},end:function(){ if(G.running) end(); },W:W,H:H,mode:function(m){ if(m) setMode(m); return MODE; },attract:function(on){ ATT=on?1:0; },LV:LV,BOSS_AT:BOSS_AT,ZONES:ZONES,zone:function(){ return ZONES[zoneIx()].id; },nextLevel:function(){ nextLevel(); }};   /* (zone + nextLevel: the route tests) */
 window.MELODY_MODE=function(m){ if(m) setMode(m); return MODE; };
 window.MELODY_START=function(){ SND.unlock(); if(!G.running) start(); try{ cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); }catch(e){} };   // the shared start menu's PLAY
 requestAnimationFrame(frame);
@@ -2641,7 +2667,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=e3r"></script>
+<script type="module" src="melody3d.js?v=e3s"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}
@@ -2710,7 +2736,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-top"><div class="ms-hd"><p class="ms-by notranslate">Melody Bar &amp; Grill · Melody Approach</p>'+
       (live?'<span class="ms-beta on">'+esc(T("LIVE · Win this week"))+'</span>':'<span class="ms-beta">'+esc(T("BETA · Coming soon: win rewards"))+'</span>')+
       '<div class="ms-h" role="heading" aria-level="2">'+esc(T("Can you win the weekly challenge?"))+'</div></div>'+
-      '<div class="ms-pv" aria-hidden="true"><canvas id="mpv" width="120" height="180" style="background:#0c1220 url(img/game/card-3d-flight.webp?v=e3r) center/cover"></canvas><i>LIVE</i></div></div>'+
+      '<div class="ms-pv" aria-hidden="true"><canvas id="mpv" width="120" height="180" style="background:#0c1220 url(img/game/card-3d-flight.webp?v=e3s) center/cover"></canvas><i>LIVE</i></div></div>'+
     '<div class="ms-prize"><img src="'+esc(WK.img||"img/menu/melody-fries.jpg")+'" alt=""><div><small>'+esc(T(live?"This week's prize":"Weekly prize · coming soon"))+'</small><b>'+esc(T(prize))+'</b><em>'+esc(T(live?(WK.note||"Top score of the week wins"):"The boards are live now. Prizes switch on soon."))+'</em></div></div>'+
     '<div class="ms-food" aria-label="'+esc(T("Catch the food for points"))+'">'+FOOD.map(function(f){ return '<span class="ms-f" style="--d:'+f[4]+'" title="'+esc(T(f[1]))+'">'+(f[3]?'<span class="ms-st"><i></i><i></i><i></i></span>':'')+'<img src="'+g+f[0]+'.webp?v='+(f[5]||"ag1")+'" alt="'+esc(T(f[1]))+'"><b>'+f[2]+'</b></span>'; }).join("")+'</div>'+
     '<div class="ms-mode" role="group" aria-label="'+esc(T("Game mode"))+'">'+mbtn("campaign","🏆","Campaign","10 levels · 6 bosses",cur,T,esc)+mbtn("survival","⏱️","Survival","How long can you last?",cur,T,esc)+'</div>'+
@@ -2718,7 +2744,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-mvp">'+mvp(esc,T)+'</div></div>'; }
 document.addEventListener("click",function(e){ var b=e.target&&e.target.closest&&e.target.closest("[data-mel=mode]"); if(!b) return; e.preventDefault(); if(window.MELODY_MODE) MELODY_MODE(b.getAttribute("data-v")); if(window.GameMenu) GameMenu.refresh(); });
 window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill",tagline:"Night dogfight over LA: 10 levels and six bosses, or Survival. Catch the food, win the week.",
- hero:[g+"card-3d-flight.webp?v=e3r",g+"card-3d-boss.webp?v=e3r",g+"card-3d-beach.webp?v=e3r"],   // the 3D game (2026-10-16), not the old 2D sprites
+ hero:[g+"card-3d-flight.webp?v=e3s",g+"card-3d-boss.webp?v=e3s",g+"card-3d-beach.webp?v=e3s"],   // the 3D game (2026-10-16), not the old 2D sprites
  theme:{bg:"#0b1220",bg2:"#1c2547",card:"#141e34",edge:"#27324d",accent:"#d4af37",accent2:"#f0d375",label:"#f0d375",ink:"#f6f1e4",dim:"#9aa3b5",btnInk:"#1a1206",soft:"rgba(255,255,255,.06)",track:"#27324d",good:"#3fbf8f",bad:"#ff7a59",
   display:"Anton,Impact,'Arial Narrow',sans-serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
  tokens:false, showcase:showcase, preview:function(v){ if(window.__MG&&__MG.attract) __MG.attract(v); },

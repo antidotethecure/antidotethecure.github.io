@@ -140,9 +140,23 @@ var ROLE="owner", MYSLUGS=["melody-bar-grill","nalu-vida"], MGR=false, PERMS={},
 // 🔐 TEAM ACCESS: keep JOBS + PERM keys in sync with Code.gs (JOBS / PERM_KEYS). The SERVER enforces every switch;
 // the page only hides what a login can't use. Owners (Christian, Antidote) always have everything.
 var JOBS=[["kitchen","Kitchen"],["marketing","Marketing / management"],["bar_manager","Bar manager"],["bartender","Bartender"],["server","Server / floor"],["manager","Manager (general)"],["other","Other employee"]];
-var PERMS_UI=[["rewards","Change rewards & points","Discounts, points costs, location bonus, receipt claims"],["prices","Raise / lower menu prices","What guests see in the app (Toast is changed in Toast)"],["specials","Specials & happy hour","Turn specials on/off, edit them and the happy-hour list"],
+var PERMS_UI=[["rewards","Discounts, rewards & points","Discount %, dollars off, points costs, location bonus, receipt claims"],["prices","Raise / lower menu prices","What guests see in the app (Toast is changed in Toast)"],["specials","Specials & happy hour","Turn specials on/off, edit them and the happy-hour list"],
+  ["photos","Menu photos go live","Their dish photos show in the app right away (off: each one waits for Christian's OK)"],
   ["members","See guest list & contacts","Guest names, phones, emails, birthdays + Scout flags"],["stats","See sales & visit charts","Overview, Visits and Games"],["earlybird","Early-bird gift","The founding-member gift setup"],["squares","Football Squares","Run the Squares boards"],
   ["todo","To-do list","See, add and tick off to-dos"],["staff","Staff practice & quiz","Staff game scores and the training quiz"],["audit","See the Audit log","Who changed what, before → after"]];
+var JOBPRE={kitchen:"prices specials photos todo",marketing:"stats rewards specials photos earlybird squares todo audit",bar_manager:"stats prices specials photos squares todo staff",bartender:"todo staff",server:"todo staff",manager:"*",other:"todo"};
+// 📖 ACCESS GUIDE (2026-10-18): what each switch unlocks, who usually gets it, and what is never handed out.
+function accessGuide(){ var who=function(k){ return JOBS.filter(function(j){ var p=JOBPRE[j[0]]; return p==="*"||(" "+p+" ").indexOf(" "+k+" ")>=0; }).map(function(j){ return j[1]; }).join(", "); };
+  return "<div class='card help' style='margin-top:12px' id='accessGuide'><h2 style='margin-top:0'>📖 What each access does</h2><p class='note' style='margin:0 0 8px'>Give each person only what their job needs. Turn any switch on or off for one person in <b>👥 Team</b> below. It works on their next tap.</p>"+
+    PERMS_UI.map(function(x){ return "<div style='border-top:1px solid var(--edge,#2a3550);padding:8px 0'><b>"+esc(x[1])+"</b><div class='note' style='margin:2px 0 0'>"+esc(x[2])+"</div><div class='note' style='margin:2px 0 0'>Usually on for: <b>"+esc(who(x[0]))+"</b></div></div>"; }).join("")+
+    "<h3>🙋 Who to add for what</h3><ul style='margin:4px 0 0;padding-left:20px'>"+
+    "<li><b>Marketing (e.g. Sammy):</b> Discounts, rewards &amp; points · Specials &amp; happy hour · Menu photos go live · Early bird · charts. Add <b>Raise / lower menu prices</b> if she fixes prices too.</li>"+
+    "<li><b>Kitchen lead:</b> menu prices, specials, menu photos.</li><li><b>Bar manager:</b> prices, specials &amp; happy hour, photos, staff quiz.</li>"+
+    "<li><b>Bartenders / servers:</b> to-do list and the staff quiz only. They read the menu but change nothing.</li>"+
+    "<li><b>Guest names, phones and emails</b> (See guest list &amp; contacts): only someone you fully trust.</li></ul>"+
+    "<h3>🔒 Never handed out</h3><ul style='margin:4px 0 0;padding-left:20px'><li><b>Team access</b> (adding people, switches): Christian and Antidote only.</li>"+
+    "<li><b>OK-ing other people's photos</b>, Scout actions, Remove duplicates, both-restaurant to-dos: Christian and Antidote only.</li>"+
+    "<li><b>🎮 The games</b> (building them, prizes inside the games, turning them on or off): Antidote only. That's not in HQ.</li></ul></div>"; }
 var TABPERM={overview:"stats",visits:"stats",games:"stats",members:"members",scout:"members",rewards:"rewards",discounts:"rewards",earlybird:"earlybird",staff:"staff",squares:"squares",audit:"audit",team:"owner"};
 function can(k){ return ROLE==="owner"||(k!=="owner"&&PERMS[k]===true); }
 function tabOk(t){ var k=TABPERM[t]; return !k||can(k); }
@@ -588,7 +602,7 @@ function photoReply(r,msg){ if(!r||!r.ok){ if(r&&r.auth===false) return signOut(
 function bindNeeds(p){ var f=$("phFile"), want=null; if(!f) return;
   p.querySelectorAll("[data-addph]").forEach(function(b){ b.onclick=function(){ want={a:JSON.parse(b.dataset.addph),b:b}; f.value=""; f.click(); }; });
   f.onchange=function(){ var file=f.files&&f.files[0]; if(!file||!want) return; var w=want; w.b.disabled=true; w.b.textContent="Sending…";
-    shrink(file).then(function(d){ return api({type:"bo_photo",token:TOKEN,op:"add",slug:w.a[0],item:w.a[1],photo:d}); }).then(function(r){ photoReply(r,r&&r.ok?(isOwnerUI()?"✅ Photo of "+w.a[1]+" is live in the app.":"✅ Sent. Christian will OK it, then it shows in the app."):""); })
+    shrink(file).then(function(d){ return api({type:"bo_photo",token:TOKEN,op:"add",slug:w.a[0],item:w.a[1],photo:d}); }).then(function(r){ photoReply(r,r&&r.ok?(isOwnerUI()||can("photos")?"✅ Photo of "+w.a[1]+" is live in the app.":"✅ Sent. Christian will OK it, then it shows in the app."):""); })
       .catch(function(){ w.b.disabled=false; w.b.textContent="📷 Add photo"; alert("That photo couldn't be read. Try another one."); }); };
   p.querySelectorAll("[data-phok],[data-phno]").forEach(function(b){ b.onclick=function(){ b.disabled=true; api({type:"bo_photo",token:TOKEN,op:b.dataset.phok?"ok":"no",id:b.dataset.phok||b.dataset.phno}).then(function(r){ photoReply(r); }); }; });
   p.querySelectorAll("[data-phrm]").forEach(function(b){ b.onclick=function(){ var a=JSON.parse(b.dataset.phrm); if(!confirm("Go back to the standard picture for "+a[1]+"?")) return; b.disabled=true; api({type:"bo_photo",token:TOKEN,op:"remove",slug:a[0],item:a[1]}).then(function(r){ photoReply(r); }); }; }); }
@@ -690,7 +704,7 @@ function rTags(sl){ return (sl||[]).map(function(x){ return tagR(x); }).join(" "
 function team(){ var L=(DATA.team||[]), pend=L.filter(function(p){ return p.status==="pending"; }), ppl=L.filter(function(p){ return p.status!=="pending"; });
   var jobSel=function(id,cur,act){ return "<select data-tmjob='"+esc(id)+"' data-act='"+act+"' aria-label='Job'>"+JOBS.map(function(j){ return "<option value='"+j[0]+"'"+(j[0]===cur?" selected":"")+">"+esc(j[1])+"</option>"; }).join("")+"</select>"; };
   var h="<div class='card help' style='margin-top:12px'><p style='margin:0'>Who can use HQ besides you and Antidote, and what each person can do. <b>It works right away</b>: switch something off and it stops on their very next tap. Every change is written to the Audit log, and the person gets an email (if we have their email).</p>"+
-    "<p class='note' style='margin:8px 0 0'>New staff ask from the login screen: <b>“New staff? Request access”</b>. They pick their job, and that job's switches are turned on when you approve. Change any switch after.</p></div>";
+    "<p class='note' style='margin:8px 0 0'>New staff ask from the login screen: <b>“New staff? Request access”</b>. They pick their job, and that job's switches are turned on when you approve. Change any switch after.</p></div>"+accessGuide();
   h+="<h2>🙋 Waiting for you ("+pend.length+")</h2>"+(pend.length?pend.map(function(p){
     return "<div class='pc' style='border-color:var(--gold)'><h3>"+esc(p.name)+" "+rTags(p.slugs)+"</h3><div class='note'>"+esc(p.email)+(p.asked?" · asked "+esc(when2(p.asked)):"")+"</div>"+
       "<label>Their job (you can change it)</label>"+jobSel(p.id,p.job,"approve")+

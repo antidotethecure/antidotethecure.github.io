@@ -74,7 +74,7 @@
   scout.flags.push({ id: "dup_tries:0718293a4b5c6d7e", kind: "dup_tries", slug: "melody-bar-grill", sev: "low", title: "3 duplicate tries in 7 days", reason: M(4).name + " sent 3 things that were already counted this week.", members: [M(4).id], evidence: ["game points · Daily game cap reached", "receipt claim · Same check # + date", "redemption · Double tap"], pts: 0, claims: [], status: "open" });
   var USERS = { christian: { name: "Christian", email: "christian@example.com" }, antidote: { name: "Antidote", email: "antidote@example.com" },
     "melody-manager": { name: "Melody Management", email: "melody-team@example.com", role: "manager", slugs: ["melody-bar-grill"] },
-    sammy: { name: "Sammy", email: "", role: "manager", slugs: ["melody-bar-grill"], job: "manager" } }, TOK = {}, PEND = {}, fails = 0;
+    sammy: { name: "Sami", email: "", role: "manager", slugs: ["melody-bar-grill"], job: "manager" } }, TOK = {}, PEND = {}, fails = 0;
   // 🔐 same presets as Code.gs JOBS
   var PERM_KEYS = ["stats", "members", "rewards", "prices", "specials", "photos", "earlybird", "squares", "todo", "staff", "audit"];
   var PERM_LABEL = { stats: "See sales & visit charts", members: "See guest list & contacts", rewards: "Discounts, rewards & points", prices: "Raise / lower menu prices", photos: "Menu photos go live", specials: "Specials & happy hour", earlybird: "Early-bird gift", squares: "Football Squares", todo: "To-do list", staff: "Staff practice & quiz", audit: "See the Audit log" };

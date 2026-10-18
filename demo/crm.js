@@ -401,7 +401,7 @@
   var qs = new URLSearchParams(location.search), INVITE = (qs.get("ref") || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 16);
   // missed-call text-back: the auto-text after an unanswered or after-hours call links here with ?missed=1
   var MISSED = (qs.get("missed") === "1" || qs.get("src") === "call") && (!SIMPLE || !!C.missed), MC = C.missed || { offer: "10% off your order", days: 7 };
-  var FRIENDS = ["Jasmine", "Carlos", "Devon", "Mia", "Andre", "Lily", "Marco", "Keisha", "Tran", "Gabby"];
+  var FRIENDS = ["Jasmine", "Mateo", "Devon", "Mia", "Andre", "Lily", "Marco", "Keisha", "Tran", "Gabby"];
   function shareLink(m) { return location.origin + location.pathname + "?ref=" + encodeURIComponent(m.ref) + "#crm-join"; }
 
   // a game calls SSAI_WIN("Free fries") when a player wins: the prize lands in their wallet with a code to redeem in store

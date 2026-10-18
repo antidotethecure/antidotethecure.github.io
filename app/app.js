@@ -31,7 +31,7 @@
   $("addonList").innerHTML = A.addons.map(function (a) {
     var inc = a.includedIn.map(function (k) { return plan(k).name; });
     return '<div class="addon"><div><b>' + esc(a.name) + '</b><div class="note">' + esc(a.one) + (inc.length ? " <b>Included in " + esc(inc.join(" and ")) + ".</b>" : "") +
-      (a.key === "social" ? ' <a href="#social">Details →</a>' : a.key !== "social" ? ' <a href="../agents/">Demos →</a>' : "") + '</div></div><b class="p">' + usd(a.monthly) + '/mo</b></div>';
+      (a.key === "social" ? ' <a href="#social">Details →</a>' : a.quote ? "" : ' <a href="../agents/">Demos →</a>') + '</div></div><b class="p">' + (a.quote ? (a.soon ? "Soon · Ask us" : "Ask us") : usd(a.monthly) + '/mo') + '</b></div>';
   }).join("") + '<div class="addon"><div><b>' + esc(A.bundle.name) + ' bundle</b><div class="note">' + esc(A.bundle.one) + '</div></div><b class="p">' + usd(bundleMonthly()) + '/mo</b></div>';
 
   function bundleMonthly() { return plan(A.bundle.plan).monthly + addon(A.bundle.addon).monthly - A.bundle.discountMonthly; }
@@ -46,6 +46,7 @@
     if (add.voice) add.text = false;
     A.addons.forEach(function (a) {
       if (!add[a.key] || a.includedIn.indexOf(st.plan) >= 0) return;
+      if (a.quote) { lines.push(a.name + ": quoted separately"); return; }   // no published price yet (Antidote sets it)
       var price = a.monthly;
       if (a.replaces && addon(a.replaces).includedIn.indexOf(st.plan) >= 0) price = a.monthly - addon(a.replaces).monthly;
       m += price; s += a.setup || 0; lines.push(a.name + " +" + usd(price) + "/mo");
@@ -56,7 +57,7 @@
     return { setup: s * N, monthly: m * N, year: (s + 12 * m) * N, perSetup: s, perMonthly: m, n: N, lines: lines, bundled: !!bundled };
   }
   $("bPlan").innerHTML = A.plans.map(function (p) { return '<button type="button" data-k="' + p.key + '" aria-pressed="false">' + esc(p.name) + '</button>'; }).join("");
-  $("bAdd").innerHTML = A.addons.map(function (a) { return '<div class="ck"><input type="checkbox" id="ba-' + a.key + '" data-k="' + a.key + '"><label for="ba-' + a.key + '"><b>' + esc(a.name) + '</b> <span class="note">' + usd(a.monthly) + '/mo</span><small id="bn-' + a.key + '"></small></label></div>'; }).join("");
+  $("bAdd").innerHTML = A.addons.map(function (a) { return '<div class="ck"><input type="checkbox" id="ba-' + a.key + '" data-k="' + a.key + '"><label for="ba-' + a.key + '"><b>' + esc(a.name) + '</b> <span class="note">' + (a.quote ? "Ask us" : usd(a.monthly) + '/mo') + '</span><small id="bn-' + a.key + '"></small></label></div>'; }).join("");
   $("bBundleNote").textContent = plan(A.bundle.plan).name + " + " + addon(A.bundle.addon).name + ": " + usd(plan(A.bundle.plan).setup) + " setup + " + usd(bundleMonthly()) + "/mo (saves " + usd(A.bundle.discountMonthly) + " a month).";
   function draw() {
     [].forEach.call($("bPlan").children, function (b) { b.setAttribute("aria-pressed", String(b.dataset.k === B.plan)); });

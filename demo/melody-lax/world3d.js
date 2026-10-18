@@ -18,10 +18,10 @@
    the break, towels, umbrellas, volleyball, a lifeguard tower, the boardwalk, the pier, and Nalu Vida on the pier with its logo.
    Used by melody3d.js (the game) and 3d-looks/look2.js + look3.js (the preview clips).
    makeWorld(THREE, {base, fx}) → { segment(kind, len, seed, o), root, wind, tick(dt, t), debris(...) }. */
-import { makeBeachKit } from "./beach3d.js?v=e3s";
-import { makeVideoBoards } from "../engine3d/billboard.js?v=e3s";
-import { makeFacades } from "../engine3d/facades.js?v=e3s";
-import { buildCars } from "../engine3d/carmodels.js?v=e3s";
+import { makeBeachKit } from "./beach3d.js?v=e3t";
+import { makeVideoBoards } from "../engine3d/billboard.js?v=e3t";
+import { makeFacades } from "../engine3d/facades.js?v=e3t";
+import { buildCars } from "../engine3d/carmodels.js?v=e3t";
 /* The storefront name. The real business is "Melody Bar & Grill"; change this one line to rename the awning / blade sign / door
    glass lettering (the gold logo boards use the real artwork, img/logo.png). */
 export const MELODY_SIGN_TEXT = "MELODY BAR & GRILL";
@@ -807,23 +807,65 @@ export function makeWorld(THREE, O = {}) {
     for (const mz of [-110, 120]) g.add(mesh(new THREE.CylinderGeometry(.6, .9, 46, 5).translate(0, 23, 0), M.dark, 0, 24, mz));
     const ph = inst(new THREE.SphereGeometry(.8, 4, 3), M.lamp, 120, true); for (let k = 0; k < 120; k++) { const sd = k % 2 ? 15.2 : -15.2, zz = -140 + (k >> 1) * 4.6; set(ph, k, sd * (Math.abs(zz) > 100 ? .8 : 1), 14 + (k % 3) * 4, zz, 0); ph.instanceColor.setXYZ(k, 1.8, 1.5, 1); } g.add(ph);
   }
-  // Compton civic center: the tall concrete courthouse tower and, in front of it, the lawn with the spiky white monument
+  /* Compton civic center, from Antidote's photos (2026-10-17): a civic SUPERBLOCK (two blocks; the cross street between them is closed,
+     it's under the plaza). At the back: the courthouse, a thick square ~14-storey tower in white/cream panels with thin full-height dark
+     window slots on every face (solid white corners) over a recessed dark colonnade with bronze pillar caps, low white walls at the
+     entry. In front: a big open terracotta plaza with a darker sunburst pattern and curved walkways, two small palms in square
+     planters; the monument (a crown of ~14 tall white blades leaning outward in a round raised planter ringed with shrubs) off to
+     one side; on the other side a low, wide, flat-roofed civic building with a rooftop equipment frame and a grove of big round
+     shade trees between it and the plaza. The boulevard runs past the plaza's front. Look-alike primitives, no names or plaques. */
+  function superBlock(len) {   // two blocks with the cross street between them closed (it's under the plaza); a strip's +z edge carries a half road, its -z edge none
+    const st = streetsOf(len).sort((a, b) => a - b), E = ROAD / 2 + SIDE; let best = null;
+    for (let k = 0; k < st.length; k++) { const z0 = k > 0 ? st[k - 1] + E : -len / 2 + 12, z1 = k < st.length - 1 ? st[k + 1] - E : len / 2 - E, sc = Math.abs(z1 - z0 - 400) + Math.abs((z0 + z1) / 2) * .5;
+      if (!best || sc < best.sc) best = { sc, zc: (z0 + z1) / 2, depth: z1 - z0 }; }
+    if (!best) { const mb = midBlock(len); return { zc: mb.zc, depth: mb.depth }; } return best; }
+  const civicTex = (W2, D, mxu, mzv) => {   // the plaza paving at 2 px per unit: salmon slabs, a darker sunburst from the monument, light curved walks
+    const k = 2, c = mkc(Math.round(W2 * k), Math.round(D * k)), x = c.getContext("2d"), R2 = rng(41), mx = mxu * k, my = mzv * k; x.fillStyle = "#cf957d"; x.fillRect(0, 0, c.width, c.height);
+    for (let q = 0; q < 36; q++) { const a0 = q / 36 * TAU, a1 = a0 + TAU / 72; x.fillStyle = q % 2 ? "rgba(150,74,58,.55)" : "rgba(190,112,90,.35)"; x.beginPath(); x.moveTo(mx, my); x.arc(mx, my, 2000, a0, a1); x.closePath(); x.fill(); }   // sunburst wedges
+    for (let q = 0; q < 1400; q++) { x.fillStyle = `rgba(${R2() < .5 ? "255,240,225" : "90,45,35"},${.05 + R2() * .07})`; x.fillRect(R2() * c.width, R2() * c.height, 1 + R2() * 2, 1 + R2() * 2); }
+    x.strokeStyle = "rgba(120,60,48,.35)"; x.lineWidth = 1; for (let q = 0; q < c.width; q += 16) { x.beginPath(); x.moveTo(q, 0); x.lineTo(q, c.height); x.stroke(); } for (let q = 0; q < c.height; q += 16) { x.beginPath(); x.moveTo(0, q); x.lineTo(c.width, q); x.stroke(); }   // slab joints
+    x.strokeStyle = "#e3d8c8"; x.lineWidth = 10; x.beginPath(); x.arc(mx, my, 104 * k, -Math.PI * .32, Math.PI * .42); x.stroke(); x.lineWidth = 7; x.beginPath(); x.arc(mx, my, 70 * k, -Math.PI * .1, Math.PI * .34); x.stroke();   // curved walkways
+    const t = tex(c, false); t.anisotropy = 8; return t; };
   function civic(seg, R, len, zc, depth) {
-    const zb = zc - depth / 2 + 32;   // the tower stands at the back of the block; the lawn runs to the street in front (toward you)
-    buildings(seg, R, [[0, zb, 118, 46, 112], [-100, zb + 8, 50, 44, 40], [100, zb + 8, 50, 44, 40]], { style: 3, tints: { 3: ["#cfc8bb", "#d8d2c6", "#c4bdb0"] }, plain: true });
-    const fins = []; for (let k = -7; k <= 7; k++) fins.push([new THREE.BoxGeometry(2.4, 100, 3), T4(k * 7.6, 56, zb + 24)]); seg.group.add(mesh(merge(fins), new THREE.MeshLambertMaterial({ color: 0xe2ddd2 })));   // vertical concrete fins
-    seg.group.add(mesh(new THREE.BoxGeometry(124, 6, 52).translate(0, 115, 0), new THREE.MeshLambertMaterial({ color: 0xd9d3c7 }), 0, 0, zb));   // the crown band
-    const lz = zb + 23 + (depth - 55) / 2, ld = depth - 60; seg.group.add(mesh(new THREE.PlaneGeometry(250, ld).rotateX(-Math.PI / 2), M.grass, 0, .3, lz));
-    const paths = [[new THREE.PlaneGeometry(6, ld).rotateX(-Math.PI / 2), T4(0, .36, lz)], [new THREE.PlaneGeometry(250, 5).rotateX(-Math.PI / 2), T4(0, .36, lz)], [new THREE.CircleGeometry(24, 28).rotateX(-Math.PI / 2), T4(0, .38, lz)]];
-    seg.group.add(mesh(merge(paths), new THREE.MeshLambertMaterial({ color: 0xc9c4b8 })));
-    // the monument: a crown of tall white curved spikes rising from a round base (look-alike, no plaque/text)
-    const sp = [[new THREE.CylinderGeometry(15, 17, 3, 24), T4(0, 1.5, lz)]];
-    for (let k = 0; k < 9; k++) { const a = k / 9 * TAU, r = 7, h = 52 + (k % 3) * 14; sp.push([new THREE.ConeGeometry(2.8, h, 6).translate(0, h / 2, 0), T4(Math.cos(a) * r, 2.5, lz + Math.sin(a) * r, Math.sin(a) * .2, 0, -Math.cos(a) * .2)]); }
-    sp.push([new THREE.ConeGeometry(3.4, 84, 6).translate(0, 42, 0), T4(0, 2.5, lz)]);
-    const mon = mesh(merge(sp), new THREE.MeshStandardMaterial({ color: 0xf6f4ef, roughness: .5, emissive: 0x3a3a38, emissiveIntensity: .35 })); seg.group.add(mon); seg.monument = { x: 0, z: lz }; seg.focus = { x: 0, z: lz - 20, y: 40, d: 260, h: 120 };
-    const flood = mesh(new THREE.PlaneGeometry(90, 90).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xfff2d8, opacity: .35, toneMapped: false }), 0, .6, lz); seg.group.add(flood);
-    const fp = []; for (const fx of [-30, -22, 22, 30]) fp.push([new THREE.CylinderGeometry(.4, .5, 40, 5), T4(fx, 20, lz + ld / 2 - 10)]); seg.group.add(mesh(merge(fp), M.white));
-    const lp = []; for (let k = 0; k < 8; k++) lp.push([-115 + k * 33, lz - ld / 2 + 6], [-115 + k * 33, lz + ld / 2 - 4]); palms(seg, R, lp, 1.5);
+    const W2 = 264, z0 = zc - depth / 2, z1 = zc + depth / 2, G = new THREE.Group(); seg.group.add(G);
+    const white = new THREE.MeshStandardMaterial({ color: 0xf1ede2, roughness: .62 }), slot = new THREE.MeshStandardMaterial({ color: 0x15191f, roughness: .25, metalness: .5, emissive: 0x3a2c18, emissiveIntensity: .45 });
+    const bronze = new THREE.MeshStandardMaterial({ color: 0x6e4c34, roughness: .6 }), dark = new THREE.MeshLambertMaterial({ color: 0x23262b });
+    // the plaza: one paved surface over the whole superblock (texture sunburst centred on the monument)
+    const plaza = new THREE.PlaneGeometry(W2, depth).rotateX(-Math.PI / 2); const mx = -W2 / 2 + W2 * .26, mz = z0 + depth * .5; G.add(mesh(plaza, new THREE.MeshLambertMaterial({ map: civicTex(W2, depth, mx + W2 / 2, mz - z0) }), 0, .32, zc));
+    // the courthouse tower (thick square, ~14 storeys) at the back of the plaza
+    const TW = 88, TH = 114, BASE = 13, tz = z0 + TW / 2 + 10, tx = 24;
+    G.add(mesh(new THREE.BoxGeometry(TW, TH - BASE, TW).translate(0, BASE + (TH - BASE) / 2, 0), white, tx, 0, tz));
+    G.add(mesh(new THREE.BoxGeometry(TW - 10, BASE, TW - 10).translate(0, BASE / 2, 0), dark, tx, 0, tz));   // recessed ground-floor colonnade
+    const sl = [], pil = [], cap = [], NS = 9, sp = (TW - 16) / (NS - 1);
+    for (let f = 0; f < 4; f++) { const ry = f * Math.PI / 2; for (let k = 0; k < NS; k++) { const u = -TW / 2 + 8 + k * sp, nx = Math.sin(ry), nz = Math.cos(ry), ux = Math.cos(ry), uz = -Math.sin(ry);
+        sl.push([new THREE.BoxGeometry(2.4, TH - BASE - 6, .8), T4(tx + ux * u + nx * (TW / 2 + .2), BASE + (TH - BASE - 6) / 2 + 2, tz + uz * u + nz * (TW / 2 + .2), 0, ry, 0)]);   // full-height window slot
+        sl.push([new THREE.BoxGeometry(.9, TH - BASE, .5), T4(tx + ux * (u + sp / 2) + nx * (TW / 2 + .25), BASE + (TH - BASE) / 2, tz + uz * (u + sp / 2) + nz * (TW / 2 + .25), 0, ry, 0)]);   // panel reveal
+        pil.push([new THREE.BoxGeometry(2.6, BASE, 2.6), T4(tx + ux * u + nx * (TW / 2 - 3), BASE / 2, tz + uz * u + nz * (TW / 2 - 3))]);
+        cap.push([new THREE.BoxGeometry(5, 3, 4), T4(tx + ux * u + nx * (TW / 2 - 2), BASE - 1.5, tz + uz * u + nz * (TW / 2 - 2), 0, ry, 0)]); } }
+    G.add(mesh(merge(sl.filter((q, i) => i % 2 === 0)), slot), mesh(merge(sl.filter((q, i) => i % 2 === 1)), new THREE.MeshLambertMaterial({ color: 0xd9d3c4 })), mesh(merge(pil), white), mesh(merge(cap), bronze));
+    G.add(mesh(new THREE.BoxGeometry(TW + .6, 1.4, TW + .6).translate(0, TH + .7, 0), new THREE.MeshLambertMaterial({ color: 0xdedad0 }), tx, 0, tz));   // roof edge
+    G.add(mesh(merge([[new THREE.BoxGeometry(34, 5, 3), T4(tx - 10, 2.5, tz + TW / 2 + 12)], [new THREE.BoxGeometry(3, 5, 16), T4(tx + 7, 2.5, tz + TW / 2 + 5)], [new THREE.BoxGeometry(26, 4, 3), T4(tx + 34, 2, tz + TW / 2 + 16)]]), white));   // low white entry walls / planters
+    // the monument: ~14 tall white blades leaning outward like a crown, in a round raised planter ringed with shrubs (plaza right side)
+    const mon = [[new THREE.CylinderGeometry(27, 27.5, 2.2, 48), T4(mx, 1.1, mz)]];
+    const blade = (h) => { const sh = new THREE.Shape([new THREE.Vector2(-6.8, 0), new THREE.Vector2(6.8, 0), new THREE.Vector2(1.2, h)]); return new THREE.ExtrudeGeometry(sh, { depth: 1.1, bevelEnabled: false }).translate(0, 0, -.55); };
+    for (let k = 0; k < 15; k++) { const a = k / 15 * TAU + (R() - .5) * .15, h = 44 + R() * 26, r = 7 + R() * 3; mon.push([blade(h), T4(mx + Math.cos(a) * r, 2.2, mz + Math.sin(a) * r, 0, -a + Math.PI / 2, 0).multiply(new THREE.Matrix4().makeRotationX(.3 + R() * .12))]); }
+    G.add(mesh(merge(mon.slice(1)), new THREE.MeshStandardMaterial({ color: 0xf7f5f0, roughness: .45, emissive: 0x333331, emissiveIntensity: .3, side: THREE.DoubleSide })));
+    G.add(mesh(mon[0][0].applyMatrix4(mon[0][1]), new THREE.MeshLambertMaterial({ color: 0xece6da })), mesh(new THREE.CircleGeometry(25.6, 44).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: 0x3e2c20 }), mx, 2.25, mz));
+    const shr = inst(new THREE.SphereGeometry(1.6, 6, 4), new THREE.MeshLambertMaterial({ color: 0x4e7a3a }), 36); for (let k = 0; k < 36; k++) { const a = k / 36 * TAU; set(shr, k, mx + Math.cos(a) * 22.5, 3, mz + Math.sin(a) * 15.5, 0, 1, .8 + R() * .4, 1); } G.add(shr);
+    G.add(mesh(new THREE.PlaneGeometry(110, 110).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xfff2d8, opacity: .3, toneMapped: false }), mx, .7, mz));   // night floodlight on the blades
+    seg.monument = { x: mx, z: mz };
+    // the low, wide civic building (flat white roof, rooftop equipment frame) on the left, a grove of big round shade trees beside it
+    const cbx = W2 / 2 - 62, cbz = z1 - 48; G.add(mesh(new THREE.BoxGeometry(116, 15, 66).translate(0, 7.5, 0), new THREE.MeshLambertMaterial({ color: 0xcfc9bd }), cbx, 0, cbz));
+    G.add(mesh(new THREE.BoxGeometry(118, 6, 68).translate(0, 3, 0), slot, cbx, 0, cbz), mesh(new THREE.BoxGeometry(120, 1.2, 70).translate(0, 15.6, 0), new THREE.MeshLambertMaterial({ color: 0xf2efe8 }), cbx, 0, cbz));
+    G.add(mesh(merge([[new THREE.BoxGeometry(30, 1, 1), T4(0, 19, -9)], [new THREE.BoxGeometry(30, 1, 1), T4(0, 19, 9)], [new THREE.BoxGeometry(1, 1, 18), T4(-15, 19, 0)], [new THREE.BoxGeometry(1, 1, 18), T4(15, 19, 0)], [new THREE.BoxGeometry(12, 4, 7), T4(0, 18, 0)]]), M.white, cbx + 8, 0, cbz - 4));
+    const tr = []; for (let k = 0; k < 11; k++) tr.push([cbx - 30 - R() * 70, cbz - 50 - R() * 40 + (k % 3) * 8]);
+    const trk = inst(new THREE.CylinderGeometry(1.2, 1.8, 10, 6).translate(0, 5, 0), M.trunk, tr.length), crn = inst(new THREE.IcosahedronGeometry(1, 1), new THREE.MeshLambertMaterial(), tr.length, true);
+    tr.forEach((t, k) => { const r = 10 + R() * 5; set(trk, k, t[0], 0, t[1], 0); set(crn, k, t[0], 9 + r * .7, t[1], R() * 3, r, r * .78, r); crn.instanceColor.setXYZ(k, ...QC.set(["#2f5a2a", "#3a6a30", "#2a4f26"][k % 3]).toArray()); }); G.add(trk, crn);
+    // two small palms in square planters along the curved walk
+    const pp = [[mx + 92, mz + 14], [mx + 98, mz + 42]]; G.add(mesh(merge(pp.map(p => [new THREE.BoxGeometry(6, 2.4, 6), T4(p[0], 1.2, p[1])])), new THREE.MeshLambertMaterial({ color: 0xece6da }))); palms(seg, R, pp, .7);
+    // focus + test cameras (?lmcam=civic&lmv=aerial|street)
+    seg.focus = { x: mx + 20, z: mz, y: 20, d: 260, h: 140 };
+    seg.cams = { aerial: { p: [tx - 14, TH + 34, tz + TW / 2 + 34], t: [mx + 24, 0, mz + 60], fov: 88 }, street: { p: [tx - 70, 4, z1 - 4], t: [tx, 60, tz], fov: 78 } };
   }
   // downtown signature towers (generic look-alikes): a stepped cylinder with a lit crown and a slim tower with a sail roof + spire
   function dtlaIcons(seg, side, zc) {   /* (both stand inside the block at zc: never on a street) */ const glass = new THREE.MeshStandardMaterial({ color: 0x5f7486, roughness: .2, metalness: .6, emissive: 0x1a2430, emissiveIntensity: .6 });
@@ -855,7 +897,7 @@ export function makeWorld(THREE, O = {}) {
     else if (kind === "stadium" || kind === "ocstadium") { seg.oc = kind === "ocstadium"; stadium(seg, R, len, side); }
     else if (kind === "longbeach" || kind === "harbor") longBeach(seg, R, len, kind);
     else if (kind === "compton") city(seg, R, len, { res: true, mixed: true, style: "res", cars: 22, hmul: .45, palmGap: 40, parked: 30, bstyle: (R2) => R2() < .7 ? 0 : 3 });
-    else if (kind === "civic") { const mb = midBlock(len); city(seg, R, len, { res: true, style: "res", cars: 22, palmGap: 40, clear: [[0, mb.zc, 290, mb.depth + 4]], noBillboard: true }); civic(seg, R, len, mb.zc, mb.depth); }
+    else if (kind === "civic") { const sb = superBlock(len); city(seg, R, len, { res: true, style: "res", cars: 22, palmGap: 40, block: [[0, sb.zc, 264, sb.depth - 2]], noBillboard: true }); civic(seg, R, len, sb.zc, sb.depth); }
     else if (kind === "irvine") city(seg, R, len, { style: "oc", cars: 26, hmul: .5, hmin: 18, palmGap: 64, bstyle: (R2) => R2() < .55 ? 1 : R2() < .6 ? 3 : 0, tints: { 0: ["#f3eee4", "#efe6d6", "#e8dcc6"], 1: ["#b9c9d6", "#9fb4c4", "#cfd9e0"], 3: ["#e9e5dc", "#ddd7cc"] } });
     else if (kind === "dtla") { const mb = midBlock(len); city(seg, R, len, { tall: 2, hmul: 1.6, cars: 32, clear: [[side * 640, mb.zc, 110, 110], [-side * 650, mb.zc, 100, 80]], bstyle: (R2, h) => h > 90 ? (R2() < .7 ? 1 : 3) : FAC.pick(R2, h) }); dtlaIcons(seg, side, mb.zc); }
     else if (kind === "valley") { city(seg, R, len, { res: true, mixed: true, style: "res", cars: 26, hmul: .4, palmGap: 60, bstyle: (R2) => R2() < .7 ? 0 : 3, tints: { 0: ["#e9dcc3", "#d9c7a7", "#efe6d6", "#cdb998"] } }); ridges(seg, R, len, 1); }

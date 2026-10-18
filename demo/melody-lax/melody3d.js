@@ -54,16 +54,16 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=e3s") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3s") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=e3t") : null, WORLDM = CHASE ? await import("./world3d.js?v=e3t") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
-  const QM = await import("../engine3d/quality.js?v=e3s");
+  const QM = await import("../engine3d/quality.js?v=e3t");
   // every optional system loads and starts on its own: one that fails (import, shader, GPU feature) switches only itself off (STATUS.off)
   const FAILQ = (Q.get("fail") || "").split(",");   // test hook: ?fail=clouds,post,crowd,… makes those systems fail on purpose
   const offNote = (n, e) => { const m = n + ": " + String(e && e.message || e).slice(0, 80); if (!STATUS.off.includes(m)) STATUS.off.push(m); console.warn("[melody3d] " + m); };
   const safe = (n, fn) => { try { if (FAILQ.includes(n)) throw new Error("forced by ?fail"); return fn(); } catch (e) { offNote(n, e); return null; } };
   const safeA = async (n, fn) => { try { if (FAILQ.includes(n)) throw new Error("forced by ?fail"); return await fn(); } catch (e) { offNote(n, e); return null; } };
-  const impE = (n) => import("../engine3d/" + n + ".js?v=e3s").catch(e => { offNote(n, e); return null; });
+  const impE = (n) => import("../engine3d/" + n + ".js?v=e3t").catch(e => { offNote(n, e); return null; });
   const [PARTM, DMGM, ACM, SKYM, CLDM, WXM, POSTM, WATM, AUDM, CBM, APXM] = CHASE ? await Promise.all(["particles", "damage", "aircraft", "sky", "clouds", "weather", "postfx", "water", "audio", "combat", "apex"].map(impE)) : [];
   const W = M.W, H = M.H, S = M.S, FX = M.FX, FXI = FX._i(), TAU = Math.PI * 2;
   const D = 1000;                                   // camera height above the ground plane
@@ -369,10 +369,10 @@ async function boot() {
       shake: (k) => { const G = M.G(); G.shake = Math.max(G.shake || 0, 14 + 14 * k); },
       onImpact: (p, k) => { for (const sg of SEGS.values()) if (Math.abs(p.z - sg.group.position.z) < sg.len / 2 + 200 && sg.scatter) sg.scatter(p.x, p.z, 120 + 60 * k); } }));
     // engine3d crowd: the Nalu Vida cast as real rigged, animated people (VAT-instanced far, SkinnedMesh near). Loads after the game is up.
-    if (renderer.capabilities.isWebGL2 && !FAILQ.includes("crowd")) import("../engine3d/crowd.js?v=e3s").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
+    if (renderer.capabilities.isWebGL2 && !FAILQ.includes("crowd")) import("../engine3d/crowd.js?v=e3t").then(m => m.createCrowd(THREE, { base: new URL("../engine3d/assets/humans/", location.href).href, loader, scene, renderer, height: 8.6, quality: QUAL.cfg.crowd }))
       .then(c => { CROWD = c; STATUS.crowd = "on"; WARMQ = 1; if (TRAFFIC && LOADBAR) LOADBAR.done(); QUAL.onChange((t, cfg) => c.setQuality(cfg.crowd)); }).catch(e => { offNote("crowd", e); STATUS.crowd = "off: " + (e && e.message || e); console.warn("[melody3d] crowd", e); });
     // engine3d traffic: Kenney CC0 cars on the street grid with signals, turns, brake lights, crossing pedestrians
-    (FAILQ.includes("traffic") ? Promise.reject(new Error("forced by ?fail")) : import("../engine3d/traffic.js?v=e3s").then(m => m.makeTraffic(THREE, { procedural: true, lod2: SMOOTH ? 650 : 1000, models: FAILQ.includes("realcars") ? [] : [   // real car models (assets/cars2), procedural cars as the far LOD
+    (FAILQ.includes("traffic") ? Promise.reject(new Error("forced by ?fail")) : import("../engine3d/traffic.js?v=e3t").then(m => m.makeTraffic(THREE, { procedural: true, lod2: SMOOTH ? 650 : 1000, models: FAILQ.includes("realcars") ? [] : [   // real car models (assets/cars2), procedural cars as the far LOD
         { name: "ev", url: new URL("../engine3d/assets/cars2/ev_sedan.glb", location.href).href, w: 3, len: 4.7, proc: "ev-sedan", pal: ["#f4f4f2", "#1a1b1e", "#24418a", "#a3131c", "#8f949a", "#2a2c30", "#5a6470", "#7a1620"] },
         { name: "muscle", url: new URL("../engine3d/assets/cars2/muscle_coupe.glb", location.href).href, w: 1.5, len: 5.0, proc: "muscle-coupe", pal: ["#ffffff", "#e8eef8", "#f4e6e6"] },
         { name: "compact", url: new URL("../engine3d/assets/cars2/compact_sedan.glb", location.href).href, w: 3, len: 4.65, proc: "compact-sedan", pal: ["#ffffff", "#dfe6f2", "#f2e8dc", "#e0e0e0"] },
@@ -458,7 +458,7 @@ async function boot() {
   // chase view: the detailed airship (engine3d/blimp.js): fabric gores, fins, gondola, props, a scrolling LED band with
   // "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" on both sides, MELODY on top, the Nalu Vida logo low on the flanks + belly
   let BLIMP3 = null;
-  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3s").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
+  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3t").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
     BLIMP3 = BM.buildBlimp(THREE, { top: "MELODY", led: ["ANTIDOTE FOOD REVIEW", "antidotethefoodie.com"], logo: lt }); BLIMP3.node.visible = false; BLIMP3.node.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(BLIMP3.node); }
 
   /* ---------------- ground: lit aerial tiles, landmarks, runway, shadow catcher ---------------- */
@@ -874,7 +874,8 @@ async function boot() {
     if (PILOTCAM && COMBAT && COMBAT._p && COMBAT._p.length) { const P = COMBAT._p[COMBAT._p.length - 1].pos; cam.up.set(0, 1, 0); cam.position.set(P.x + 34, P.y + 20, P.z + 44); cam.lookAt(P.x, P.y + 5, P.z); }   // ?pilotcam=1 (testing)
     if (WRECKCAM && COMBAT && COMBAT._c.length) { const P = COMBAT._c[COMBAT._c.length - 1].obj.position; cam.up.set(0, 1, 0); cam.position.set(P.x + 90, P.y + 45, P.z + 120); cam.lookAt(P.x, P.y, P.z); }   // ?wreckcam=1 (testing)
     if (BULCAM) { cam.up.set(0, 1, 0); cam.position.set(X + 34, PL.Y + 8, Z - 40); cam.lookAt(X - 4, PL.Y + 2, Z - 170); }   // ?bulcam=1: beside the guns, looking down the stream (testing)
-    if (LMCAM) { for (const sg of SEGS.values()) if (sg.kind === LMCAM) { const f = sg.focus || { x: 0, z: 0, y: 30, d: 520, h: 220 }, x = sg.group.position.x + f.x, z = sg.group.position.z + f.z; cam.up.set(0, 1, 0); cam.position.set(x + f.d * .35, f.y + f.h, z + f.d); cam.lookAt(x, f.y, z); break; } }   // ?lmcam=<district kind>: a look at its landmark (screenshots)
+    if (LMCAM) { for (const sg of SEGS.values()) if (sg.kind === LMCAM && sg.cams && sg.cams[Q.get("lmv")]) { const c = sg.cams[Q.get("lmv")], gp = sg.group.position; cam.up.set(0, 1, 0); if (c.fov && cam.fov !== c.fov) { cam.fov = c.fov; cam.updateProjectionMatrix(); } cam.position.set(gp.x + c.p[0], c.p[1], gp.z + c.p[2]); cam.lookAt(gp.x + c.t[0], c.t[1], gp.z + c.t[2]); return; }
+      for (const sg of SEGS.values()) if (sg.kind === LMCAM) { const f = sg.focus || { x: 0, z: 0, y: 30, d: 520, h: 220 }, x = sg.group.position.x + f.x, z = sg.group.position.z + f.z; cam.up.set(0, 1, 0); cam.position.set(x + f.d * .35, f.y + f.h, z + f.d); cam.lookAt(x, f.y, z); break; } }   // ?lmcam=<district kind>: a look at its landmark (screenshots)
     if (SIDECAM) { cam.up.set(0, 1, 0); cam.position.set(X + 150, PL.Y + 12, Z + 20); cam.lookAt(X, PL.Y + 4, Z); }   // ?side=1: a look at the gear + rotation from the side (testing)
   }
   function drawClouds(G) { if (!smokeOK || !G.clouds) return;   // the game's drifting cloud wisps, now at different heights so you fly past and through them
@@ -934,7 +935,7 @@ async function boot() {
      Where the 2D game drew its mar0/mar1/mar2 sprites (beside the runway, ahead of the parked plane): "proceed" until the wheels
      leave the ground, then the big two-arm wave-off. The wands are lit along the forearm the clip is playing right now. */
   const MAR = { list: null, on: false }, MARV = new THREE.Vector3(), MARS = [[-50, 62, "m"], [54, 122, "f"], [-78, 215, "m"]];
-  const MCLIP = {}; import("../engine3d/clips.js?v=e3s").then(m => { MCLIP.c = m.CLIPS; }).catch(() => {});
+  const MCLIP = {}; import("../engine3d/clips.js?v=e3t").then(m => { MCLIP.c = m.CLIPS; }).catch(() => {});
   function drawMarshals(now, G) {
     const rw = G.ground.find(g => g.k === "runway"), show = !!(CROWD && rw && !G.landing && !G.over && (!G.running || (G.el || 0) < 7000) && rw.y < H + 300);
     M.crew3d = !!CROWD; if (!show) { if (MAR.on) { MAR.list.forEach(m => { m.p.visible = false; m.ear.visible = false; }); MAR.on = false; } return; }

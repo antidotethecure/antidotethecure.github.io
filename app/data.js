@@ -60,7 +60,7 @@ window.APP = {
     { key: "voice", name: "AI Voice Host + Text", monthly: 150, setup: 0, includedIn: ["dfy"], replaces: "text",
       one: "A natural AI voice answers your phone, takes reservation requests, transfers to staff and texts links. Includes the Text Assistant. 750 minutes + 1,000 texts a month." },
     { key: "ordering", name: "Online Ordering + Delivery", monthly: 300, setup: 0, includedIn: [], soon: true,
-      one: "Guests order and pay by card right in your app (pickup first), with points on every order and live orders in your back office. Delivery by DoorDash drivers, with no marketplace commission. $300/mo flat with no per-order fee, or $200/mo + 5% per order. No fee added to your guests' checks. Coming soon: we're setting it up now." },
+      one: "Guests order and pay by card right in your app (pickup first), with points on every order and live orders in your back office. Delivery by DoorDash drivers, with no marketplace commission. $300/mo flat with no per-order fee, or $200/mo + 5% of the food on each order (never on delivery fees, tips or tax). Example: a $40 order = $2. No fee added to your guests' checks. Flat is cheaper once you do over $2,000 a month in app orders. Coming soon: we're setting it up now." },
     { key: "social", name: "Social & SEO Growth", monthly: 1000, setup: 0, includedIn: [],
       one: "Content plan, short-form video edits from your food, posting on Instagram / TikTok / YouTube, Google Business Profile + local SEO, and a monthly report." }
   ],

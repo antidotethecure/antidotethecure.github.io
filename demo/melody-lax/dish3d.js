@@ -34,9 +34,9 @@
     "Mango Margarita": ["p_marg.glb?v=ag1", "coaster"],  // mango + chili rim: NOT used for the House Margarita (lime/salt)
     "Mimosa": ["p_mimosa.glb?v=fv2", "coaster"],
     "Espresso Martini": ["p_espresso.glb?v=fv2", "coaster"],
-    // scan of the real @melodylax photo with its fries cup (Tripo v2, 2026-10-13; rotY turns the photographed side to the front). The game's p_burger.glb is a low-poly prop, so no fallback model:
-    // the back and the top were invented from one photo, so the spin stays on the photographed front half
-    "Melody Burger": [null, "plate", "menu/melody-burger.glb?v=bf1", { rotY: -90, az: 75, minPolar: 0.5, fill: 1.55 }]
+    // REAL FOOTAGE, not a model (2026-10-17, Antidote: the 3D burger looked fake): an orbit video made from his real burger photo,
+    // built as a seamless ping-pong (5 s forward + 5 s back, keyframe every 0.5 s so dragging can scrub it). Dragging turns the burger.
+    "Melody Burger": [null, "plate", null, { video: "3d/menu/melody-burger-real.mp4?v=rv1", poster: "3d/menu/melody-burger-real.jpg?v=rv1", half: 5 }]
     // Michelada: there is no michelada model (p_mic.glb is the karaoke microphone).
   };
   var HERE = ((D.currentScript || {}).src || "").replace(/[^\/]*$/, "");
@@ -57,6 +57,8 @@
     "#d3d-o .d3d-ld{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#9aa3b5;font-size:13px;font-weight:700;letter-spacing:.08em}#d3d-o.ld .d3d-ld{display:flex}" +
     "#d3d-o .d3d-ld i{width:42px;height:42px;border-radius:50%;border:4px solid #ffffff22;border-top-color:#f0d375;animation:d3dspin .8s linear infinite}" +
     "html #d3d-o .d3d-ld i{animation-play-state:running!important}" +
+    "#d3d-o .d3d-vid{position:absolute;inset:0;display:none;align-items:center;justify-content:center;touch-action:none;cursor:grab}#d3d-o.vid .d3d-vid{display:flex}#d3d-o.vid canvas{display:none}" +
+    "#d3d-o .d3d-vid video{width:min(calc(100% - 32px),82vh);aspect-ratio:1;object-fit:cover;border-radius:22px;box-shadow:0 26px 60px #000b;pointer-events:none;background:#0b1220}" +
     "#d3d-o .d3d-cap{flex:none;padding:10px 16px calc(14px + env(safe-area-inset-bottom));text-align:center;touch-action:none}" +
     "#d3d-o .d3d-hint{display:inline-block;padding:7px 13px;border-radius:99px;background:#0b1220b3;border:1px solid #ffffff22;color:#cfd6e4;font-size:12.5px;font-weight:700;letter-spacing:.03em}" +
     "#d3d-o .d3d-cap p{margin:8px auto 0;max-width:420px;color:#9aa3b5;font-size:13px;line-height:1.35}" +
@@ -65,13 +67,13 @@
 
   /* ---------------- menu buttons ---------------- */
   function cardFor(name) { return D.querySelector('article.item[data-name="' + name.replace(/"/g, '\\"') + '"]'); }
-  function live(name) { var d = DISH[name]; return !!(d && (d[0] || d[2])); }
+  function live(name) { var d = DISH[name]; return !!(d && (d[0] || d[2] || (d[3] && d[3].video))); }
   function addButtons() {
     Object.keys(DISH).filter(live).forEach(function (name) {
       var c = cardFor(name); if (!c || c.querySelector(".d3d-btn")) return;
       var tx = c.querySelector(".tx"), p = tx && tx.querySelector("p"); if (!tx) return;
       var b = D.createElement("button"); b.type = "button"; b.className = "d3d-btn"; b.dataset.d3d = name;
-      b.textContent = "🔄 " + T("Spin in 3D"); b.setAttribute("aria-label", T("Spin in 3D") + ": " + T(name));
+      var real = DISH[name][3] && DISH[name][3].video, lab = real ? T("See it spin") : T("Spin in 3D"); b.textContent = "🔄 " + lab; b.setAttribute("aria-label", lab + ": " + T(name));   /* real footage is not "3D" */
       if (p) p.insertAdjacentElement("afterend", b); else tx.appendChild(b);
     });
   }
@@ -87,7 +89,7 @@
   /* ---------------- overlay ---------------- */
   var O = D.createElement("div"); O.id = "d3d-o"; O.setAttribute("role", "dialog"); O.setAttribute("aria-modal", "true");
   O.innerHTML = '<div class="d3d-top"><span class="d3d-grab" aria-hidden="true"></span><h3></h3><button type="button" class="d3d-x" aria-label="' + T("Close") + '">✕</button></div>' +
-    '<div class="d3d-st"><div class="d3d-ph"><img alt=""></div><div class="d3d-ld" aria-live="polite"><i></i><span>' + T("Plating it…") + '</span></div></div>' +
+    '<div class="d3d-st"><div class="d3d-vid"><video muted playsinline autoplay loop preload="metadata" disablepictureinpicture></video></div><div class="d3d-ph"><img alt=""></div><div class="d3d-ld" aria-live="polite"><i></i><span>' + T("Plating it…") + '</span></div></div>' +
     '<div class="d3d-cap"><span class="d3d-hint"></span><p></p></div>';
   D.body.appendChild(O);
   var stage = O.querySelector(".d3d-st"), hint = O.querySelector(".d3d-hint");
@@ -118,18 +120,36 @@
     O.classList.remove("fb"); O.classList.add("on", "ld");
     prevOverflow = D.documentElement.style.overflow; D.documentElement.style.overflow = "hidden";
     cur = last = name; var my = ++token;
+    var vd = DISH[name] && DISH[name][3] && DISH[name][3].video ? DISH[name][3] : null; O.classList.toggle("vid", !!vd);
+    if (vd) { if (V3) V3.stop(); hint.textContent = T("Drag to turn it"); playVideo(vd, my); O.querySelector(".d3d-x").focus({ preventScroll: true }); return; }
+    stopVideo();
     if (!webgl()) return fallback("no WebGL");
     boot().then(function (V3) { if (my !== token) return; return V3.show(name, DISH[name]); })
       .then(function () { if (my !== token) return; O.classList.remove("ld"); })
       .catch(function (err) { if (my !== token) return; console.warn("[dish3d] showing the photo instead:", err && err.message || err); fallback(); });
     O.querySelector(".d3d-x").focus({ preventScroll: true });
   }
-  function fallback() { O.classList.remove("ld"); O.classList.add("fb"); hint.textContent = T("Photo view"); if (V3) V3.stop(); }
+  function fallback() { O.classList.remove("ld", "vid"); O.classList.add("fb"); hint.textContent = T("Photo view"); if (V3) V3.stop(); stopVideo(); }
+  /* ---------------- real-footage dishes: a looping video (muted, inline, autoplay), drag scrubs it so the dish turns under your finger ---------------- */
+  var vbox = O.querySelector(".d3d-vid"), vid = vbox.querySelector("video"), VS = { half: 5, drag: null };
+  function playVideo(vd, my) { VS.half = vd.half || 5; var src = HERE + vd.video;
+    if (vid.getAttribute("data-src") !== src) { vid.setAttribute("data-src", src); vid.poster = HERE + vd.poster; vid.src = src; }
+    var ok = function () { if (my !== token) return; O.classList.remove("ld"); }; vid.addEventListener("loadeddata", ok, { once: true }); if (vid.readyState >= 2) ok();
+    vid.onerror = function () { if (my !== token) return; console.warn("[dish3d] video failed, showing the photo"); fallback(); };
+    var p = vid.play(); if (p && p.catch) p.catch(function () { O.classList.remove("ld"); });   /* autoplay refused (low power mode): the poster shows, a drag still turns it */ }
+  function stopVideo() { try { vid.pause(); } catch (e) {} }
+  // the file is forward-then-back; dragging works on the forward half: angle = time within [0, half]
+  vbox.addEventListener("pointerdown", function (e) { if (!O.classList.contains("vid")) return; var t = vid.currentTime || 0; VS.drag = { x: e.clientX, id: e.pointerId, a: t > VS.half ? 2 * VS.half - t : t }; vid.pause(); vbox.style.cursor = "grabbing"; try { vbox.setPointerCapture(e.pointerId); } catch (x) {} });
+  vbox.addEventListener("pointermove", function (e) { var d = VS.drag; if (!d || e.pointerId !== d.id) return; var a = Math.max(0, Math.min(VS.half - .04, d.a - (e.clientX - d.x) / Math.max(200, vbox.clientWidth) * VS.half * 1.4));
+    if (Math.abs(a - (vid.currentTime || 0)) > .02 && !vid.seeking) vid.currentTime = a; d.cur = a; });
+  var vEnd = function (e) { var d = VS.drag; if (!d || e.pointerId !== d.id) return; VS.drag = null; vbox.style.cursor = ""; var p = vid.play(); if (p && p.catch) p.catch(function () {}); };
+  vbox.addEventListener("pointerup", vEnd); vbox.addEventListener("pointercancel", vEnd);
+  vbox.addEventListener("dblclick", function () { vid.currentTime = 0; var p = vid.play(); if (p && p.catch) p.catch(function () {}); });
   function close() {
     if (!O.classList.contains("on")) return;
     token++; O.classList.remove("on", "ld", "fb", "drag"); O.style.transform = ""; O.style.opacity = "";
     D.documentElement.style.overflow = prevOverflow; cur = null;
-    if (V3) V3.stop();
+    if (V3) V3.stop(); stopVideo(); O.classList.remove("vid");
     var c = last && cardFor(last), b = c && c.querySelector(".d3d-btn"); if (b) b.focus({ preventScroll: true });
   }
   var hasGL = null;

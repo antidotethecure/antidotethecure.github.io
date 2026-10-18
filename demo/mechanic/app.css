@@ -564,3 +564,74 @@ html.dvlock,html.dvlock body{overflow:hidden}
 .fdg .note{margin:4px 0 8px}
 .fdlist{display:grid;gap:8px}
 .qshare{margin-top:8px}
+
+/* ---------- universal template (2026-10-17): business-type switch, quick actions, tire stock, QR pay ---------- */
+.bizsw{margin:0 0 12px}
+.bizk{display:block;font:800 10px/1 "Orbitron",sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.bizb{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.bizb::-webkit-scrollbar{display:none}
+.bizb a{flex:none;display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:99px;border:1px solid var(--edge);background:#0007;color:var(--dim);font-weight:700;font-size:13.5px;text-decoration:none;white-space:nowrap}
+.bizb a[aria-current=true]{color:#fff;border-color:var(--accent);background:color-mix(in srgb,var(--accent) 22%,#0008)}
+.quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;margin-top:14px}
+.quick a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:72px;padding:8px 6px;border-radius:16px;border:1px solid var(--edge);background:linear-gradient(180deg,var(--panel2),var(--panel));color:var(--ink);text-decoration:none;text-align:center}
+.quick a span{font-size:22px;line-height:1}
+.quick a b{font-size:13.5px;line-height:1.15}
+body[data-biz=tire] .quick a:nth-child(-n+2){border-color:color-mix(in srgb,var(--accent) 60%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent),0 8px 22px color-mix(in srgb,var(--accent) 18%,transparent)}
+.sv .fr.q,.pr.q{color:var(--accent2);font-size:13px;white-space:nowrap}
+.tirow{display:flex;gap:10px;align-items:flex-end}
+.tirow .fld{flex:1;margin:0}
+.tirow .btn{flex:1.4}
+.tires-res{margin-top:12px;border-radius:16px;padding:12px;border:1px solid var(--edge)}
+.tires-res.ok{border-color:color-mix(in srgb,var(--good) 55%,transparent);background:color-mix(in srgb,var(--good) 8%,transparent)}
+.tires-res.no{border-color:color-mix(in srgb,var(--warn) 55%,transparent);background:color-mix(in srgb,var(--warn) 8%,transparent)}
+.tires-res .big{font:900 20px/1.2 "Orbitron",sans-serif;margin:0 0 4px}
+.tires-res.ok .big{color:var(--good)}
+.tires-res.no .big{color:var(--warn)}
+.warnline{color:var(--warn)}
+.trow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--edge)}
+.trow>div{flex:1;min-width:0}
+.trow b{font-family:"Orbitron",sans-serif;font-size:14px}
+.trow small{display:block;color:var(--dim);font-size:13px;margin-top:2px}
+.trow .tq{font-weight:800;color:var(--good);white-space:nowrap;font-size:13.5px}
+.trow.out .tq{color:var(--warn)}
+.tfil{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 6px}
+.tfil button{padding:5px 11px;border-radius:99px;border:1px solid var(--edge);background:#0005;color:var(--dim);font:700 13.5px "Rajdhani",sans-serif;cursor:pointer}
+.tfil button[aria-pressed=true]{color:#fff;border-color:var(--accent2);background:color-mix(in srgb,var(--accent2) 18%,transparent)}
+.sidewall{display:block;width:100%;max-width:360px;margin:8px auto 0}
+.payrow{display:flex;gap:14px;align-items:center}
+.qrbox{flex:none;width:132px;height:132px;border-radius:14px;background:#fff;padding:6px;color:#000;font-size:10px;word-break:break-all}
+.qrbox svg,.qpc-qr svg{display:block;width:100%;height:100%}
+.paytx b{display:block;font-family:"Orbitron",sans-serif;font-size:17px;margin:4px 0;word-break:break-word}
+.paytx small{color:var(--dim);font-size:14px}
+.paym,.qpc-m{display:flex;flex-wrap:wrap;gap:6px}
+.pm{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:10px;border:1px solid var(--edge);background:#ffffff0a;font-weight:700;font-size:13.5px;color:var(--ink)}
+.pm i{font-style:normal;display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:6px;background:#ffffff14;font-size:12px;font-weight:900}
+.paysteps{margin:12px 0 4px;padding-left:20px;color:var(--dim)}
+.paysteps li{margin:3px 0}
+.paypick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pm.big{justify-content:flex-start;min-height:48px;cursor:pointer;font:700 15px "Rajdhani",sans-serif}
+.pm.big[aria-pressed=true]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.paytot{display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;border-radius:12px;background:#ffffff08;border:1px solid var(--edge);margin:6px 0}
+.paytot b{font-family:"Orbitron",sans-serif;font-size:17px}
+.qpc{margin-top:10px;background:#fff;color:#0b1120;border-radius:18px;padding:18px 16px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.qpc img{border-radius:12px}
+.qpc-n{font:900 20px/1.15 "Orbitron",sans-serif;word-break:break-word}
+.qpc-bay{font-weight:800;font-size:15px;padding:2px 10px;border-radius:99px;background:#0b1120;color:#fff}
+.qpc-k{margin:4px 0 0;font:800 13px "Orbitron",sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#c2410c}
+.qpc-qr{width:200px;height:200px}
+.qpc-m{justify-content:center}
+.qpc .pm{color:#0b1120;border-color:#cbd5e1;background:#f1f5f9}
+.qpc .pm i{background:#e2e8f0}
+.qpc-x{margin:4px 0 0;font-size:14.5px;font-weight:600}
+.qpc-demo{margin:0;font-size:11.5px;color:#64748b}
+.qpc-pby{font-size:9.5px;color:#94a3b8;letter-spacing:.04em}
+@media print{
+  body.printqr *{visibility:hidden!important}
+  body.printqr #qpc,body.printqr #qpc *{visibility:visible!important}
+  body.printqr #qpc{position:fixed;left:0;top:0;width:100%;box-shadow:none;border:2px solid #0b1120}
+}
+.tiadd{display:grid;grid-template-columns:1.2fr 1.6fr;gap:6px;margin-top:10px}
+.tiadd input,.tiadd select,.tiq input{width:100%;min-height:40px;border-radius:10px;border:1px solid var(--edge);background:#0007;color:var(--ink);font:600 15px "Rajdhani",sans-serif;padding:6px 8px}
+.tiq{flex:none;width:76px}
+.trow .x{flex:none}
+.hero .quick{margin:0 0 14px}

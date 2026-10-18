@@ -1,7 +1,7 @@
 {
-  "name": "Carlos' Mobile Mechanic (demo)",
-  "short_name": "Carlos'",
-  "description": "Demo: tap your car, get a sample quote, book a slot and track the repair. Sample shop by SousShift AI.",
+  "name": "Your Auto Shop (demo)",
+  "short_name": "Your Shop",
+  "description": "Demo for any auto repair shop, mobile mechanic, tire shop, quick lube, body shop or detailer: say or tap what's wrong, get a sample quote, check tire stock, book, track and pay by QR. Sample shop by SousShift AI.",
   "start_url": "./?src=homescreen",
   "scope": "./",
   "id": "./",

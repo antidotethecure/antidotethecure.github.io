@@ -74,6 +74,11 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
 .pc{background:var(--card2);border:1px solid var(--edge);border-radius:16px;padding:14px;margin:10px 0}.pc.off{opacity:.75;border-style:dashed}.pc h3{margin:0;font-size:17px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .pc select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px;min-height:48px}.pc label{display:block;font-size:13px;color:var(--dim);margin:10px 0 4px}
 .pc .seg button{min-height:44px;padding:8px 16px}.pc .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+/* 🛒 online orders */
+.oc{background:var(--card2);border:1px solid var(--edge);border-radius:16px;padding:12px 14px;margin:10px 0}.oc.new{border:2px solid var(--gold);box-shadow:0 0 0 4px #f5c40022;animation:ocIn 1.2s ease-out 2}.oc.done{opacity:.6}
+.oc .oh{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.oc .oh b{font-size:17px;letter-spacing:.03em}.oc .ow{margin:6px 0 2px;font-size:15px}.oc .ol{margin:6px 0 10px;padding-left:20px;font-size:16px}.oc .ol li{margin:3px 0}.oc .ol i{color:var(--warn)}
+.oc .btn{min-height:48px}.ordnew{position:fixed;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top));z-index:70;border:0;border-radius:14px;padding:14px;font:800 16px/1.3 inherit;background:var(--gold);color:#1a1400;box-shadow:0 10px 30px #000c;cursor:pointer}
+@keyframes ocIn{0%{background:#f5c40033}100%{background:var(--card2)}}@media (prefers-reduced-motion:reduce){.oc.new{animation:none}}
 .login .lk{background:none;border:0;color:#8fc2ff;font-weight:700;padding:10px 0;cursor:pointer;font-size:15px;text-decoration:underline}
 </style></head><body><main>
 <div class="top"><img src="icon-192.png" alt=""><div><h1>Christian HQ</h1><small>Melody Bar &amp; Grill × Nalu Vida · back office</small></div><span class="sp"></span><button class="btn alt sm" id="out" hidden>Log out</button></div>
@@ -121,7 +126,7 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
   <p class="note" id="stamp"></p>
 </section>
 </main>
-<script src="../../demo/christian-live.js?v=mg2"></script>
+<script src="../../demo/christian-live.js?v=or1"></script>
 <script src="squares-hq.js?v=sq2"></script>
 <script src="../../demo/melody-lax/menu-data.js?v=mg2"></script>
 <script src="../../demo/listen.js?v=ls1"></script>
@@ -143,8 +148,9 @@ var JOBS=[["kitchen","Kitchen"],["marketing","Marketing / management"],["bar_man
 var PERMS_UI=[["rewards","Discounts, rewards & points","Discount %, dollars off, points costs, location bonus, receipt claims"],["prices","Raise / lower menu prices","What guests see in the app (Toast is changed in Toast)"],["specials","Specials & happy hour","Turn specials on/off, edit them and the happy-hour list"],
   ["photos","Menu photos go live","Their dish photos show in the app right away (off: each one waits for Christian's OK)"],
   ["members","See guest list & contacts","Guest names, phones, emails, birthdays + Scout flags"],["stats","See sales & visit charts","Overview, Visits and Games"],["earlybird","Early-bird gift","The founding-member gift setup"],["squares","Football Squares","Run the Squares boards"],
-  ["todo","To-do list","See, add and tick off to-dos"],["staff","Staff practice & quiz","Staff game scores and the training quiz"],["audit","See the Audit log","Who changed what, before → after"]];
-var JOBPRE={kitchen:"prices specials photos todo",marketing:"stats rewards specials photos earlybird squares todo audit",bar_manager:"stats prices specials photos squares todo staff",bartender:"todo staff",server:"todo staff",manager:"*",other:"todo"};
+  ["todo","To-do list","See, add and tick off to-dos"],["staff","Staff practice & quiz","Staff game scores and the training quiz"],["audit","See the Audit log","Who changed what, before → after"],
+  ["orders","Online orders (pickup)","Today's paid pickup orders with a new-order alert, and the Ready / Picked up buttons"]];
+var JOBPRE={kitchen:"prices specials photos todo orders",marketing:"stats rewards specials photos earlybird squares todo audit",bar_manager:"stats prices specials photos squares todo staff orders",bartender:"todo staff",server:"todo staff",manager:"*",other:"todo"};
 // 📖 ACCESS GUIDE (2026-10-18): what each switch unlocks, who usually gets it, and what is never handed out.
 function accessGuide(){ var who=function(k){ return JOBS.filter(function(j){ var p=JOBPRE[j[0]]; return p==="*"||(" "+p+" ").indexOf(" "+k+" ")>=0; }).map(function(j){ return j[1]; }).join(", "); };
   return "<div class='card help' style='margin-top:12px' id='accessGuide'><h2 style='margin-top:0'>📖 What each access does</h2><p class='note' style='margin:0 0 8px'>Give each person only what their job needs. Turn any switch on or off for one person in <b>👥 Team</b> below. It works on their next tap.</p>"+
@@ -157,7 +163,7 @@ function accessGuide(){ var who=function(k){ return JOBS.filter(function(j){ var
     "<h3>🔒 Never handed out</h3><ul style='margin:4px 0 0;padding-left:20px'><li><b>Team access</b> (adding people, switches): Christian and Antidote only.</li>"+
     "<li><b>OK-ing other people's photos</b>, Scout actions, Remove duplicates, both-restaurant to-dos: Christian and Antidote only.</li>"+
     "<li><b>🎮 The games</b> (building them, prizes inside the games, turning them on or off): Antidote only. That's not in HQ.</li></ul></div>"; }
-var TABPERM={overview:"stats",visits:"stats",games:"stats",members:"members",scout:"members",rewards:"rewards",discounts:"rewards",earlybird:"earlybird",staff:"staff",squares:"squares",audit:"audit",team:"owner"};
+var TABPERM={overview:"stats",visits:"stats",games:"stats",members:"members",scout:"members",rewards:"rewards",discounts:"rewards",earlybird:"earlybird",staff:"staff",squares:"squares",audit:"audit",team:"owner",orders:"orders"};
 function can(k){ return ROLE==="owner"||(k!=="owner"&&PERMS[k]===true); }
 function tabOk(t){ var k=TABPERM[t]; return !k||can(k); }
 function jobName(j){ var x=JOBS.filter(function(a){ return a[0]===j; })[0]; return x?x[1]:(j==="owner"?"Owner":"Staff"); }
@@ -174,7 +180,7 @@ function api(body){
   if(!API) return Promise.resolve({ok:false,reason:"Backend not connected yet."});
   return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(body)}).then(function(r){ return r.json(); }).catch(function(){ return {ok:false,reason:"Can't reach the backend. Check the connection."}; });
 }
-function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=tm3"; s.onload=cb; document.head.appendChild(s); }
+function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=tm4"; s.onload=cb; document.head.appendChild(s); }
 if(TEST) $("testBar").hidden=false; else if(!API) $("notConn").hidden=false;
 try{ TOKEN=sessionStorage.getItem(TKEY); }catch(e){}
 // Speed: wake the Apps Script backend as soon as the page opens (cold starts take 5-10 s), so it's warm by the time you tap Log in.
@@ -208,14 +214,14 @@ $("sf").onsubmit=function(ev){ ev.preventDefault(); var e=$("suErr"), b=$("sGo")
     if(!r||!r.ok){ e.textContent=(r&&r.reason)||"Didn't send. Try again."; return; }
     $("sPw").value=""; $("sPw2").value=""; $("sf").hidden=true; $("sDone").hidden=false; $("ue").value=em; setMode(true); try{ localStorage.setItem("christian-hq-staff",em); }catch(x){} }); }); };
 $("out").onclick=function(){ if(TOKEN) api({type:"bo_logout",token:TOKEN}); signOut(""); };
-function signOut(msg){ TOKEN=null; DATA=null; R="all"; TAB="overview"; document.querySelectorAll(".seg [data-r]").forEach(function(x){ x.hidden=false; x.setAttribute("aria-pressed",x.dataset.r==="all"?"true":"false"); }); if(window.SSAI_LISTEN) SSAI_LISTEN.stop(); $("todo").innerHTML=""; try{ sessionStorage.removeItem(TKEY); }catch(e){} $("app").hidden=true; $("out").hidden=true; $("signup").hidden=true; $("login").hidden=false; $("pane").innerHTML=""; $("lerr").textContent=msg||""; }
+function signOut(msg){ ordersStop(); var onb=$("ordNew"); if(onb) onb.hidden=true; TOKEN=null; DATA=null; R="all"; TAB="overview"; document.querySelectorAll(".seg [data-r]").forEach(function(x){ x.hidden=false; x.setAttribute("aria-pressed",x.dataset.r==="all"?"true":"false"); }); if(window.SSAI_LISTEN) SSAI_LISTEN.stop(); $("todo").innerHTML=""; try{ sessionStorage.removeItem(TKEY); }catch(e){} $("app").hidden=true; $("out").hidden=true; $("signup").hidden=true; $("login").hidden=false; $("pane").innerHTML=""; $("lerr").textContent=msg||""; }
 function load(){ loadMock(function(){ api({type:"bo_data",token:TOKEN}).then(function(r){
   stopTick(); var b=$("go"); b.disabled=false; b.textContent="Log in"; $("lerr").style.color="";
   if(!r||!r.ok){ signOut(r&&r.auth===false?"Signed out. Log in again.":(r&&r.reason)||"Couldn't load."); return; }
-  DATA=r; setRole(r); $("login").hidden=true; $("signup").hidden=true; $("app").hidden=false; $("out").hidden=false; $("stamp").textContent="Signed in as "+r.me+" · loaded "+new Date(r.now).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})+(MGR?" · "+jobName(JOB)+" view ("+MYSLUGS.map(function(x){ return x==="nalu-vida"?"Nalu Vida":"Melody"; }).join(" + ")+")":"")+(r.test?" · TEST DATA":""); drawTodo(); draw(); }); }); }
-$("refresh").onclick=load;
+  DATA=r; setRole(r); $("login").hidden=true; $("signup").hidden=true; $("app").hidden=false; $("out").hidden=false; $("stamp").textContent="Signed in as "+r.me+" · loaded "+new Date(r.now).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})+(MGR?" · "+jobName(JOB)+" view ("+MYSLUGS.map(function(x){ return x==="nalu-vida"?"Nalu Vida":"Melody"; }).join(" + ")+")":"")+(r.test?" · TEST DATA":""); drawTodo(); draw(); if(!OTIMER) ordersStart(); }); }); }
+$("refresh").onclick=function(){ load(); if(OTIMER) ordersFetch(); };
 document.querySelector(".seg").addEventListener("click",function(e){ var b=e.target.closest("[data-r]"); if(!b) return; R=b.dataset.r; document.querySelectorAll("[data-r]").forEach(function(x){ x.setAttribute("aria-pressed",x===b?"true":"false"); }); draw(); });
-var TABS=[["overview","📊 Overview"],["visits","📍 Visits"],["members","👥 Members"],["rewards","🎟️ Rewards & claims"],["scout","🛡️ Scout"],["games","🎮 Games"],["discounts","🏷️ Discounts"],["menu","💲 Prices & specials"],["earlybird","🎁 Early bird"],["staff","🧑‍🍳 Staff"],["squares","🏈 Squares"],["audit","🧾 Audit log"],["team","🔐 Team access"],["help","❓ Help"],["links","🔗 Links"]];
+var TABS=[["overview","📊 Overview"],["orders","🛒 Orders"],["visits","📍 Visits"],["members","👥 Members"],["rewards","🎟️ Rewards & claims"],["scout","🛡️ Scout"],["games","🎮 Games"],["discounts","🏷️ Discounts"],["menu","💲 Prices & specials"],["earlybird","🎁 Early bird"],["staff","🧑‍🍳 Staff"],["squares","🏈 Squares"],["audit","🧾 Audit log"],["team","🔐 Team access"],["help","❓ Help"],["links","🔗 Links"]];
 function drawTabs(){ if(!tabOk(TAB)){ var f1st=TABS.filter(function(t){ return tabOk(t[0]); })[0]; TAB=f1st?f1st[0]:"help"; }
   $("tabs").innerHTML=TABS.filter(function(t){ return tabOk(t[0]); }).map(function(t){ return "<button role='tab' data-t='"+t[0]+"' aria-selected='"+(t[0]===TAB)+"'>"+t[1]+"</button>"; }).join(""); }
 drawTabs();
@@ -535,7 +541,7 @@ function links(){ if(MGR) return "<div class='card links'>"+(MYSLUGS.indexOf("me
     h+="<h3>"+esc(NAMES[s])+" <span class='st "+(ts.state==="done"?"done":"tbd")+"'>"+(ts.state==="done"?"Set up ✓":"TBD")+"</span></h3><p class='note'>"+esc(ts.note)+"</p>"+table(["Button","Discount","Points"],rows); });
   return h; }
 function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY; if(!tabOk(TAB)) drawTabs();
-  p.innerHTML={overview:overview,visits:visits,members:members,rewards:rewards,scout:scout,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links,menu:menu,help:help,team:team,squares:function(){ return window.SquaresHQ?SquaresHQ.html({api:api,token:TOKEN,draw:draw}):"<div class='card'>Loading…</div>"; }}[TAB]();
+  p.innerHTML={overview:overview,visits:visits,members:members,rewards:rewards,scout:scout,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links,menu:menu,help:help,team:team,orders:ordersTab,squares:function(){ return window.SquaresHQ?SquaresHQ.html({api:api,token:TOKEN,draw:draw}):"<div class='card'>Loading…</div>"; }}[TAB]();
   if(TAB==="squares"&&window.SquaresHQ) SquaresHQ.bind(p);
   if(TAB==="members"){ var q=$("q"); q.oninput=function(){ Q=q.value; var pos=q.selectionStart; draw(); var q2=$("q"); q2.focus(); try{ q2.setSelectionRange(pos,pos); }catch(e){} }; $("csv").onclick=csv; var dd=$("dedupe"); if(dd) dd.onclick=function(){ if(DUPARM<Date.now()){ DUPARM=Date.now()+6000; draw(); setTimeout(function(){ if(DUPARM&&DUPARM<Date.now()){ DUPARM=0; draw(); } },6100); return; }
     DUPARM=0; dd.disabled=true; dd.textContent="Removing…"; api({type:"bo_dedupe",token:TOKEN}).then(function(r){ if(r&&r.ok){ $("dedupeOut").textContent="✅ Removed "+n(r.removed)+". Refreshing…"; load(); } else { dd.disabled=false; dd.textContent="🧹 Remove duplicates"; $("dedupeOut").textContent=(r&&r.reason)||"Didn't work. Try again."; } }); };
@@ -549,6 +555,7 @@ function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY; if(!tabOk(
   p.querySelectorAll("[data-cd]").forEach(function(b){ b.onclick=function(){ CDAYS=+b.dataset.cd; draw(); }; });
   p.querySelectorAll("[data-goto]").forEach(function(b){ b.onclick=function(e){ e.preventDefault(); goTab(b.dataset.goto); }; });
   if(TAB==="team") bindTeam(p);
+  if(TAB==="orders") bindOrders(p);
   if(TAB==="menu"){ var mq=$("mq"); if(mq) mq.oninput=function(){ MQ=mq.value; var pos=mq.selectionStart; draw(); var m2=$("mq"); m2.focus(); try{ m2.setSelectionRange(pos,pos); }catch(e){} }; }
   if(TAB==="visits"){ var vq=$("vq"); vq.oninput=function(){ VQ=vq.value; VMORE=100; var pos=vq.selectionStart; draw(); var v2=$("vq"); v2.focus(); try{ v2.setSelectionRange(pos,pos); }catch(e){} };
     var vc=$("vclr"); if(vc) vc.onclick=function(){ VQ=""; VDEV=""; draw(); };
@@ -556,12 +563,12 @@ function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY; if(!tabOk(
     var vm=$("vmore"); if(vm) vm.onclick=function(){ VMORE+=100; draw(); };
     p.querySelectorAll("[data-dev]").forEach(function(r){ var go=function(e){ if(e.target.closest("a")) return; VDEV=r.dataset.dev; draw(); var c=$("devcard"); if(c) c.scrollIntoView({behavior:"smooth",block:"start"}); };
       r.onclick=go; r.onkeydown=function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); go(e); } }; }); }
-  window.scrollTo(0,y); drawTodo(); }
+  window.scrollTo(0,y); drawTodo(); ordersTabLabel(); }
 // ---- ✅ TO-DO LIST (pinned at the top). Automatic items come from the data on screen; manual ones are saved on the
 // backend ("Todos" tab, bo_todo). Done on an automatic item is remembered by its key (kind:restaurant:fingerprint), so it
 // comes back by itself when the data behind it changes (e.g. a new receipt claim arrives). Managers only get Melody.
 var TODO_MORE=false, TODO_ADD=false;
-var TABNAME={team:"Team access",overview:"Overview",visits:"Visits",members:"Members",rewards:"Rewards & claims",scout:"Scout",games:"Games",discounts:"Discounts",menu:"Prices & specials",earlybird:"Early bird",staff:"Staff",squares:"Squares",audit:"Audit log",help:"Help",links:"Links"};
+var TABNAME={team:"Team access",overview:"Overview",orders:"Orders",visits:"Visits",members:"Members",rewards:"Rewards & claims",scout:"Scout",games:"Games",discounts:"Discounts",menu:"Prices & specials",earlybird:"Early bird",staff:"Staff",squares:"Squares",audit:"Audit log",help:"Help",links:"Links"};
 function effMenu(s){ var base=window.SSAI_MENU&&SSAI_MENU[s]; if(!base) return null; var M=JSON.parse(JSON.stringify(base)); delete M._base; return LIVE.applyMenu?LIVE.applyMenu(s,M,(DATA.menu||{})[s]||null):M; }
 // 🛠️ MENU FIXES: which items still need a real photo, a confirmed price, or have no picture file at all (menu-data.js:
 // realPhotos / unconfirmed; missing files are found by loading each picture once). Feeds the red to-do + the Prices tab.
@@ -634,8 +641,8 @@ function autoTodos(){ var d=DATA, out=[], done={}, now=Date.now(); (d.todoDone||
       if(N.wait.length&&!MGR) add("menu_phwait",s,N.wait.map(function(x){ return x.id.slice(-4); }).sort().join("."),1,now-3,N.wait.length+" menu photo"+(N.wait.length>1?"s":"")+" waiting for your OK",nm+" · "+listNames(N.wait.map(function(x){ return x.item; }),4),"menu",{anchor:"mneeds"});
       if(N.photo.length) add("menu_photo",s,N.photo.length+"|"+N.photo.join(".").length,1,now-6,N.photo.length+" menu item"+(N.photo.length>1?"s need":" needs")+" a real photo",nm+" · "+listNames(N.photo,4),"menu",{anchor:"mneeds"}); }
     var E=((d.eb||{})[s]||{}).cfg||{}; if(E.on==="on"&&E.mode==="raffle"&&E.drawDate&&!E.drawn&&ymd(now)>=E.drawDate) add("raffle_draw",s,E.drawDate,1,now,"Draw the early-bird raffle winners",nm+" · the draw date ("+E.drawDate+") is here","earlybird");
-    if(!MGR){ var ts=(LIVE.defaults[s]||{}).toastStatus||{}; if(ts.state==="tbd") add("toast_tbd",s,s==="nalu-vida"?"tbd2":"tbd",3,0,"Confirm the "+nm+" Toast discount buttons are set up",ts.note||"","links"); } });
-      if(!MGR) add("ordering_new",s,"v1",2,now,"New: online ordering + delivery for "+nm,"Guests order and pay by card in your app (pickup first), points on every order, live orders here in HQ. Delivery by DoorDash drivers once DoorDash approves. Tell Antidote yes or no, then tap Done.","links"); // 2026-10-18 offer
+    if(!MGR){ var ts=(LIVE.defaults[s]||{}).toastStatus||{}; if(ts.state==="tbd") add("toast_tbd",s,s==="nalu-vida"?"tbd2":"tbd",3,0,"Confirm the "+nm+" Toast discount buttons are set up",ts.note||"","links"); }
+      if(!MGR) add("ordering_new",s,"v1",2,now,"New: online ordering + delivery for "+nm,"Guests order and pay by card in your app (pickup first), points on every order, live orders here in HQ. Delivery by DoorDash drivers once DoorDash approves. Tell Antidote yes or no, then tap Done.","links"); /* 2026-10-18 offer (moved inside the per-restaurant loop: it uses s / nm, which threw for owners) */ });
   if(!MGR&&d.mgr&&d.mgr.length){ var ch=(d.audit||[]).filter(function(a){ return d.mgr.indexOf(a.who)>=0&&now-a.ts<7*DAY&&!/^To-do/.test(a.field); });
     if(ch.length){ var z=ch[ch.length-1], lt=mx(ch.map(function(a){ return a.ts; })); add("mgr_changes","all",ch.length+"|"+lt,2,lt,z.who+" made "+ch.length+" change"+(ch.length>1?"s":"")+" this week","Latest: "+z.reward+" · "+z.field+" "+z.before+" → "+z.after+". Take a look.","audit"); } }
   var fails={}; (d.trained||[]).forEach(function(t){ if(t[3]==="yes") delete fails[t[1]]; else fails[t[1]]=t[0]; }); var fk=Object.keys(fails).sort();
@@ -735,6 +742,49 @@ function bindTeam(p){
   p.querySelectorAll("[data-tmjob][data-act=job]").forEach(function(sel){ sel.onchange=function(){ var id=sel.dataset.tmjob, P=(DATA.team||[]).filter(function(x){ return x.id===id; })[0];
     if(P&&!confirm("Change "+P.name+"'s job to "+jobName(sel.value)+"? Their switches go back to that job's usual set.")){ sel.value=P.job; return; } teamCall({op:"job",id:id,job:sel.value},sel); }; }); }
 // ---- ❓ HELP: plain-English guide (with 🔊 Listen) for managers and owners
+// ---- 🛒 ORDERS: today's paid online pickup orders (Code.gs ordersHQ, switch "orders"). Checks every 30 s while signed in with
+// that switch (on any tab). A NEW paid order rings (once "Sound on" was tapped: phones only allow sound after a tap), vibrates,
+// shows a banner + NEW tag, and the tab shows how many are waiting. Ready / Picked up buttons save on the server.
+var ORDS={list:null,ts:0,seen:null,newIds:{},err:""}, OTIMER=null, OSOUND=false, OCTX=null;
+try{ OSOUND=localStorage.getItem("christian-hq-sound")==="1"; }catch(e){}
+document.addEventListener("pointerdown",function(){ if(OSOUND&&OCTX&&OCTX.state==="suspended") try{ OCTX.resume(); }catch(e){} },{passive:true});
+function ordersStart(){ ordersStop(); if(!DATA||!can("orders")) return; ordersFetch(); OTIMER=setInterval(function(){ if(!document.hidden) ordersFetch(); },30000); }
+function ordersStop(){ if(OTIMER){ clearInterval(OTIMER); OTIMER=null; } ORDS={list:null,ts:0,seen:null,newIds:{},err:""}; }
+function ordersFetch(extra){ if(!TOKEN||!can("orders")) return Promise.resolve(); var b={type:"bo_orders",token:TOKEN}; if(extra) for(var k in extra) b[k]=extra[k]; return api(b).then(ordersGot); }
+function ordersGot(r){ if(!r||!r.ok){ if(r&&r.auth===false) return signOut("Signed out. Log in again."); ORDS.err=(r&&r.reason)||"Couldn't load orders."; if(TAB==="orders") draw(); return; }
+  ORDS.err=""; ORDS.ts=Date.now(); var fresh=(r.orders||[]).filter(function(o){ return ORDS.seen&&!ORDS.seen[o.id]&&o.status==="paid"; });
+  ORDS.seen=ORDS.seen||{}; (r.orders||[]).forEach(function(o){ ORDS.seen[o.id]=1; }); fresh.forEach(function(o){ ORDS.newIds[o.id]=Date.now(); });
+  ORDS.list=r.orders||[]; if(fresh.length) ordersAlert(fresh); ordersTabLabel(); if(TAB==="orders") draw(); }
+function beep(){ if(!OSOUND) return; try{ OCTX=OCTX||new (window.AudioContext||window.webkitAudioContext)(); if(OCTX.state==="suspended") OCTX.resume(); var t=OCTX.currentTime;
+  [0,0.22,0.44].forEach(function(d,i){ var o=OCTX.createOscillator(), g=OCTX.createGain(); o.type="sine"; o.frequency.value=i===2?1175:880; g.gain.setValueAtTime(0.0001,t+d); g.gain.exponentialRampToValueAtTime(0.35,t+d+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+d+0.18); o.connect(g); g.connect(OCTX.destination); o.start(t+d); o.stop(t+d+0.2); }); }catch(e){} }
+function ordersAlert(list){ beep(); if(navigator.vibrate) try{ navigator.vibrate([200,100,200]); }catch(e){}
+  var k=list.length; document.title="🛒 "+k+" new order"+(k>1?"s":"")+" · Christian HQ"; clearTimeout(ordersAlert._t); ordersAlert._t=setTimeout(function(){ document.title="Christian HQ"; },20000);
+  var b=$("ordNew"); if(!b){ b=document.createElement("button"); b.id="ordNew"; b.type="button"; b.className="ordnew"; b.setAttribute("role","status"); document.body.appendChild(b); b.onclick=function(){ b.hidden=true; goTab("orders"); }; }
+  b.hidden=false; b.textContent="🛒 New order "+list[0].id+" · "+list[0].name+" · "+list[0].pickup+(k>1?" (+"+(k-1)+" more)":"")+" · tap to open"; clearTimeout(b._t); b._t=setTimeout(function(){ b.hidden=true; },20000); }
+function ordersTabLabel(){ var b=document.querySelector("#tabs [data-t=orders]"); if(!b) return; var w=(ORDS.list||[]).filter(function(o){ return o.status==="paid"&&inR(o.slug); }).length; b.textContent="🛒 Orders"+(w?" ("+w+")":""); }
+function ordTime(t){ return t?new Date(t).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):""; }
+function ordCard(o){ var nw=ORDS.newIds[o.id]&&Date.now()-ORDS.newIds[o.id]<120000, st=o.status, ph=String(o.phone||""),
+    tag=st==="paid"?"<span class='tag p'>To make</span>":st==="ready"?"<span class='tag ok'>Ready</span>":"<span class='tag lo'>Picked up</span>";
+  return "<div class='oc"+(nw?" new":"")+(st==="picked_up"?" done":"")+"'><div class='oh'><b>"+esc(o.id)+"</b>"+tag+(R==="all"?tagR(o.slug):"")+(nw?"<span class='tag hot'>NEW</span>":"")+"<span style='flex:1'></span><span class='note'>paid "+ordTime(o.paidAt)+"</span></div>"+
+    "<div class='ow'>"+esc(o.name)+(ph?" · "+(/^\+?\d{10,12}$/.test(ph)?"<a href='tel:"+esc(ph)+"'>"+esc(ph)+"</a>":esc(ph)):"")+" · <b>Pickup: "+esc(o.pickup)+(o.pickupAt?" ("+ordTime(o.pickupAt)+")":"")+"</b></div>"+
+    "<ul class='ol'>"+(o.items||[]).map(function(l){ return "<li><b>"+(+l.qty||0)+"×</b> "+esc(l.item)+(l.note?" <i>("+esc(l.note)+")</i>":"")+"</li>"; }).join("")+"</ul>"+
+    "<div class='row'><span class='note'>$"+(+o.total||0).toFixed(2)+" paid"+(o.readyAt?" · ready "+ordTime(o.readyAt):"")+(o.pickedAt?" · picked up "+ordTime(o.pickedAt):"")+(ROLE==="owner"&&o.ssai_fee!=null?" · SousShift fee $"+(+o.ssai_fee).toFixed(2)+" (owners only)":"")+"</span><span style='flex:1'></span>"+
+    (st==="paid"?"<button class='btn big' data-ost='ready' data-oid='"+esc(o.id)+"'>✅ Ready</button>":"")+(st!=="picked_up"?"<button class='btn alt big' data-ost='picked_up' data-oid='"+esc(o.id)+"'>🛍️ Picked up</button>":"")+"</div></div>"; }
+function ordersTab(){ if(ORDS.list===null) return "<div class='card'>"+(ORDS.err?esc(ORDS.err):"Loading today's orders…")+"</div>";
+  var L=ORDS.list.filter(function(o){ return inR(o.slug); }), wait=L.filter(function(o){ return o.status==="paid"; }).length, ready=L.filter(function(o){ return o.status==="ready"; }).length, tot=L.reduce(function(a,o){ return a+(+o.total||0); },0);
+  var h="<div class='kpis'>"+kpi(n(wait),"to make now")+kpi(n(ready),"ready, waiting for pickup")+kpi(n(L.length),"paid orders today")+kpi("$"+tot.toFixed(2),"paid today (with tax)")+
+    (ROLE==="owner"?kpi("$"+L.reduce(function(a,o){ return a+(+o.ssai_fee||0); },0).toFixed(2),"SousShift fee today (5% of food only, $200 plan; owners only)"):"")+"</div>";
+  h+="<div class='row' style='margin:10px 0'><button class='btn alt sm big' id='ordSound'>"+(OSOUND?"🔔 Sound on":"🔕 Sound off · tap to turn on")+"</button><button class='btn alt sm big' id='ordRef'>↻ Check now</button>"+(TEST?"<button class='btn alt sm big' id='ordFake'>🧪 Fake a new order</button>":"")+
+    "<span class='note'>Checks every 30 seconds · last "+(ORDS.ts?new Date(ORDS.ts).toLocaleTimeString([], {hour:"numeric",minute:"2-digit",second:"2-digit"}):"—")+"</span></div>";
+  if(ORDS.err) h+="<p class='err'>"+esc(ORDS.err)+"</p>";
+  h+=L.length?L.map(ordCard).join(""):"<div class='card'><p style='margin:0;font-size:16px'>No paid pickup orders yet today.</p><p class='note'>New ones show up here by themselves (with a sound once it's on). Guests pay by card before an order shows.</p></div>";
+  return h+"<p class='note'>Only paid orders show, newest first. Guests pay menu price + tax on Stripe's secure page, no fees. Phones show the last 4 digits unless your login can see guest contacts. Pickup only for now; delivery comes later.</p>"; }
+function bindOrders(p){ var s=$("ordSound"); if(s) s.onclick=function(){ OSOUND=!OSOUND; try{ localStorage.setItem("christian-hq-sound",OSOUND?"1":"0"); }catch(e){} beep(); draw(); };
+  var rf=$("ordRef"); if(rf) rf.onclick=function(){ rf.disabled=true; ordersFetch(); };
+  var fk=$("ordFake"); if(fk) fk.onclick=function(){ fk.disabled=true; ordersFetch({fake:true}); };
+  p.querySelectorAll("[data-ost]").forEach(function(b){ b.onclick=function(){ b.disabled=true; api({type:"bo_order_set",token:TOKEN,id:b.dataset.oid,status:b.dataset.ost}).then(function(r){
+    if(r&&r.ok) return ordersGot(r); if(r&&r.auth===false) return signOut("Signed out. Log in again."); alert((r&&r.reason)||"Didn't work. Try again."); b.disabled=false; }); }; });
+  if(!OTIMER) ordersStart(); }
 function help(){ var lb=window.SSAI_LISTEN?SSAI_LISTEN.button("helpText","🔊 Listen to this page"):"";
   return "<div class='card help' id='helpText' style='margin-top:12px'><h2 style='margin-top:0'>How to use "+(MGR?"Melody HQ":"Christian HQ")+"</h2><p data-noread>"+lb+"</p>"+
     "<h3>✅ The to-do list</h3><p>The list at the top shows what needs you, most important first. Tap an item to go straight to the page where you handle it. Tap <b>Done</b> when it's handled. If something new comes in later, it shows up again by itself. Use <b>＋ Add</b> to write your own reminder.</p>"+

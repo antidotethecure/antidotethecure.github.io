@@ -59,6 +59,8 @@ window.APP = {
       one: "Guests text your number and an AI texts back 24/7: hours, menu, specials, reservation requests, catering. 1,000 texts a month included." },
     { key: "voice", name: "AI Voice Host + Text", monthly: 150, setup: 0, includedIn: ["dfy"], replaces: "text",
       one: "A natural AI voice answers your phone, takes reservation requests, transfers to staff and texts links. Includes the Text Assistant. 750 minutes + 1,000 texts a month." },
+    { key: "ordering", name: "Online Ordering + Delivery", monthly: 0, setup: 0, includedIn: [], quote: true, soon: true,
+      one: "Guests order and pay by card right in your app (pickup first), with points on every order and live orders in your back office. Delivery by DoorDash drivers, with no marketplace commission. Coming soon: we're setting it up now." },
     { key: "social", name: "Social & SEO Growth", monthly: 1000, setup: 0, includedIn: [],
       one: "Content plan, short-form video edits from your food, posting on Instagram / TikTok / YouTube, Google Business Profile + local SEO, and a monthly report." }
   ],

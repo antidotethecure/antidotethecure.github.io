@@ -36,7 +36,7 @@
     "Espresso Martini": ["p_espresso.glb?v=fv2", "coaster"],
     // scan of the real @melodylax photo with its fries cup (Tripo v2, 2026-10-13; rotY turns the photographed side to the front). The game's p_burger.glb is a low-poly prop, so no fallback model:
     // the back and the top were invented from one photo, so the spin stays on the photographed front half
-    "Melody Burger": [null, "plate", "menu/melody-burger.glb?v=tr2", { rotY: -90, az: 75, minPolar: 0.5, fill: 1.55 }]
+    "Melody Burger": [null, "plate", "menu/melody-burger.glb?v=bf1", { rotY: -90, az: 75, minPolar: 0.5, fill: 1.55 }]
     // Michelada: there is no michelada model (p_mic.glb is the karaoke microphone).
   };
   var HERE = ((D.currentScript || {}).src || "").replace(/[^\/]*$/, "");

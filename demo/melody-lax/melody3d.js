@@ -250,7 +250,7 @@ async function boot() {
   const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
   const BASE = new URL("3d/", location.href).href, MODELS = {};
   const FILES = { plane: "plane.glb", jet: "jet.glb", ufo: "ufo.glb", cop0: "heli_blue.glb", cop1: "heli_black.glb",
-    p_wings: "p_wings.glb?v=st3", p_marg: "p_marg.glb?v=ag1", p_shots: "p_shots.glb?v=ag1", p_mic: "p_mic.glb", p_mac: "p_mac.glb", p_burger: "p_burger.glb?v=ag1",
+    p_wings: "p_wings.glb?v=st3", p_marg: "p_marg.glb?v=ag1", p_shots: "p_shots.glb?v=ag1", p_mic: "p_mic.glb", p_mac: "p_mac.glb", p_burger: "p_burger.glb?v=bf1",
     p_lobmac: "p_lobmac.glb?v=fv2", p_ribs: "p_ribs.glb?v=st3", p_tacos: "p_tacos.glb?v=st3", p_nachos: "p_nachos.glb?v=fv2", p_strips: "p_strips.glb?v=st3",
     p_espresso: "p_espresso.glb?v=fv2", p_mimosa: "p_mimosa.glb?v=fv2" };
   async function loadModel(k) {

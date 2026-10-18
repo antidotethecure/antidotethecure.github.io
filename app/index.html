@@ -285,7 +285,7 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
     <div class="cats" aria-label="Apps by business type">
       <a href="#apps" data-cat="rest"><span>🍽️</span><div>Restaurants<small>Menu, game, rewards</small></div></a>
       <a href="#trucks"><span>🚚</span><div>Trucks<small>Ice cream + food trucks</small></div></a>
-      <a href="#auto"><span>🔧</span><div>Automotive<small>Mechanics + auto shops</small></div></a>
+      <a href="#auto"><span>🔧</span><div>Automotive<small>Mechanics, tire shops, quick lube</small></div></a>
       <a href="#legal-apps"><span>⚖️</span><div>Legal<small>Court dates + clients</small></div></a>
     </div>
     <div class="xf" id="xFilter" role="group" aria-label="Filter apps">
@@ -305,7 +305,7 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
       <a class="xa" data-k="rest full" href="../demo/nalu-vida/"><div class="xa-m"><img src="../demo/nalu-vida/img/hero.jpg" alt="Nalu Vida beach bar" width="1200" height="1500" loading="lazy" decoding="async"><span class="xa-tag">🛠️ In the works</span></div><div class="xa-b"><b>🏄 Nalu Vida</b><small>Venice Pier · beach bar</small><span class="g">"Ride the Nalu" surf game</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="truck" href="../ice-cream/demo/"><div class="xa-m art ice" aria-hidden="true"><img class="xa-ic" src="../ice-cream/demo/icon-192.png?v=20261013a" alt="" width="92" height="92"><span class="xa-tag">Demo sample · Trucks</span></div><div class="xa-b"><b>🚚 Ice Cream Trucks</b><small>Live truck map + ETA</small><span class="g">"Truck's on your street" alerts</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="truck" href="../food-truck/demo/"><div class="xa-m art food" aria-hidden="true"><span>🌮</span><span class="xa-tag">Demo sample · Trucks</span></div><div class="xa-b"><b>🚚 Food Trucks</b><small>Live map + order ahead</small><span class="g">Food ready hot when you arrive</span><span class="xa-go">Open app →</span></div></a>
-      <a class="xa" data-k="auto" href="../demo/mechanic/"><div class="xa-m art auto" aria-hidden="true"><img class="xa-ic" src="../demo/mechanic/icon-192.png?v=20261013c" alt="" width="92" height="92"><span class="xa-tag">Demo sample · Automotive</span></div><div class="xa-b"><b>🔧 Carlos' Mobile Mechanic</b><small>Tap your car, get a quote</small><span class="g">OBD-II scan + recalls + booking</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa" data-k="auto" href="../demo/mechanic/"><div class="xa-m art auto" aria-hidden="true"><img class="xa-ic" src="../demo/mechanic/icon-192.png?v=20261013c" alt="" width="92" height="92"><span class="xa-tag">Demo sample · Automotive</span></div><div class="xa-b"><b>🔧 Your Auto Shop</b><small>Repair, tires, quick lube, body, detailing</small><span class="g">Quote finder + tire stock + QR pay</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="legal" href="https://antidotethecure.github.io/court-companion/"><div class="xa-m art law" aria-hidden="true"><span>⚖️</span><span class="xa-tag">Demo sample · Legal</span></div><div class="xa-b"><b>⚖️ Court Companion</b><small>Sample client · fake case</small><span class="g">Court dates, reminders, lawyer tasks</span><span class="xa-go">Open app →</span></div></a>
     </div>
 
@@ -319,7 +319,7 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
         <button type="button" data-src="../demo/nalu-vida/" aria-pressed="false">🏄 Nalu Vida</button>
         <button type="button" data-src="../ice-cream/demo/" aria-pressed="false">🍦 Ice cream truck</button>
         <button type="button" data-src="../food-truck/demo/" aria-pressed="false">🚚 Food truck</button>
-        <button type="button" data-src="../demo/mechanic/" aria-pressed="false">🔧 Mechanic</button>
+        <button type="button" data-src="../demo/mechanic/" aria-pressed="false">🔧 Auto shop</button>
       </div>
       <div class="xph"><div class="notch"></div><div class="scr"><iframe id="xPh" title="Demo app preview" src="../demo/storm-burger/" loading="lazy" allow="geolocation"></iframe></div></div>
     </div>
@@ -398,29 +398,38 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
     </div>
   </section>
 
-  <section class="s" id="auto"><header><p class="kick">Automotive · mechanics · auto shops</p><h2 class="chrome">Fix cars? Fill the bays.</h2><p class="lead">Customers tap the part of their car that's wrong, see a sample quote and book a time. You get the job with the year, make, model, VIN and trouble codes already filled in.</p></header>
+  <section class="s" id="auto"><header><p class="kick">Automotive · repair · tires · quick lube · body · detailing</p><h2 class="chrome">Fix cars? Fill the bays.</h2><p class="lead">One app for any vehicle business. Customers say or tap what's wrong, see a sample price or ask for a quote, check tire stock, book a time and pay by QR. You get the job with the year, make, model, VIN and trouble codes already filled in.</p></header>
     <div class="tks">
       <div class="card tk auto" id="mobile-mechanic">
-        <div class="hd"><span aria-hidden="true">🚐</span><div><h3>Mobile Mechanics</h3><p class="note" style="margin:2px 0 0">"Tap your car, get a quote"</p></div></div>
+        <div class="hd"><span aria-hidden="true">🔧</span><div><h3>Mechanics + Repair Shops</h3><p class="note" style="margin:2px 0 0">Mobile mechanics, auto repair, brake + muffler shops</p></div></div>
         <ul>
-          <li><i>🚗</i>Every year, make and model, or decode the VIN in one tap</li>
+          <li><i>🔎</i>"Type it or tap it": customers say what's wrong, the app suggests the likely repairs</li>
           <li><i>🩺</i>Scan my car: plug-in OBD-II reader or type the check-engine code</li>
           <li><i>⚠️</i>Recalls and the top known problems for that exact car</li>
-          <li><i>🧾</i>Sample quote: parts + labor, before you drive over</li>
-          <li><i>📅</i>Book a slot and track the repair: on the way, working, done</li>
+          <li><i>🧾</i>Sample quote or "Ask for a quote", then book and track the repair</li>
+          <li><i>🚐</i>Mobile mode: home, work or roadside call-outs</li>
         </ul>
-        <div class="btns"><a class="btn primary" href="../demo/mechanic/">🔧 Try the customer app</a><a class="btn ghost" href="../demo/mechanic/shop/">Shop view →</a></div>
+        <div class="btns"><a class="btn primary" href="../demo/mechanic/?type=repair">🔧 Repair shop app</a><a class="btn ghost" href="../demo/mechanic/?type=mobile">🚐 Mobile mechanic</a><a class="btn ghost" href="../demo/mechanic/shop/">Shop view →</a></div>
       </div>
       <div class="card tk shop" id="auto-shop">
-        <div class="hd"><span aria-hidden="true">🏁</span><div><h3>Auto Shops</h3><p class="note" style="margin:2px 0 0">Your shop's own app, your logo</p></div></div>
+        <div class="hd"><span aria-hidden="true">🛞</span><div><h3>Tire Shops + Quick Lube</h3><p class="note" style="margin:2px 0 0">Tires, alignment, oil change, fluids, inspections</p></div></div>
         <ul>
-          <li><i>👀</i>Shop view: every request with the car, codes and quote attached</li>
-          <li><i>🔩</i>Parts list per job, with a call script for your parts store</li>
-          <li><i>🧰</i>"My Garage": customers save their cars and service history</li>
-          <li><i>🌐</i>English + Español built in</li>
-          <li><i>📱</i>No download: scan the QR sticker and it opens</li>
+          <li><i>🛞</i>Tire size checker: type 225/45R17, see what's in stock, hold a set</li>
+          <li><i>📦</i>Your tire inventory from the back office, updated in seconds</li>
+          <li><i>🛢️</i>Oil, filters and fluids menu with what's due next</li>
+          <li><i>📱</i>Pay with QR at the counter or bay: Apple Pay, Google Pay, card, Cash App, Zelle and more</li>
+          <li><i>🌐</i>English + Español built in, no download</li>
         </ul>
-        <div class="btns"><a class="btn primary" href="../demo/mechanic/shop/">👀 See the shop view</a><a class="btn ghost" href="sms:+14243094068?&amp;body=Hi%20Antidote%2C%20I%20run%20an%20auto%20shop%20and%20want%20the%20mechanic%20app">💬 Text Antidote</a></div>
+        <div class="btns"><a class="btn primary" href="../demo/mechanic/?type=tire">🛞 Tire shop app</a><a class="btn ghost" href="../demo/mechanic/?type=lube">🛢️ Quick lube</a><a class="btn ghost" href="sms:+14243094068?&amp;body=Hi%20Antidote%2C%20I%20run%20an%20auto%20business%20and%20want%20the%20shop%20app">💬 Text Antidote</a></div>
+      </div>
+      <div class="card tk auto" id="body-detail">
+        <div class="hd"><span aria-hidden="true">🎨</span><div><h3>Body Shops + Detailing</h3><p class="note" style="margin:2px 0 0">Collision, paint, glass, detailing, tint</p></div></div>
+        <ul>
+          <li><i>📷</i>Customers tap the damage, add photos and their paint code</li>
+          <li><i>🧾</i>Estimate requests that land in your shop view</li>
+          <li><i>✨</i>Detail packages, coatings and tint with before/after sliders</li>
+        </ul>
+        <div class="btns"><a class="btn primary" href="../demo/mechanic/?type=body">🎨 Body shop app</a><a class="btn ghost" href="../demo/mechanic/?type=detail">✨ Detailing</a></div>
       </div>
     </div>
     <div class="card"><h3>📣 Marketing that brings cars back</h3>

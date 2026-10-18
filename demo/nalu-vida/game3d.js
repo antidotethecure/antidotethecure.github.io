@@ -110,7 +110,7 @@ async function init(A) {
   const oceanMat = new THREE.ShaderMaterial({
     lights: true,
     uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.lights, { uT: { value: 0 }, uScroll: { value: 0 }, uShore: { value: 0 }, uK: { value: K }, uHurt: { value: 0 },
-      uFoam: { value: null }, uRect: { value: new THREE.Vector4() }, uSun: { value: LIGHT.clone() }, uView: { value: VIEW.clone() } }]),
+      uFoam: { value: null }, uRect: { value: new THREE.Vector4() }, uSun: { value: LIGHT.clone() }, uView: { value: VIEW.clone() }, uWxDark: { value: 0 }, uRain: { value: 0 } }]),
     vertexShader: `
       #include <common>
       #include <shadowmap_pars_vertex>
@@ -136,7 +136,7 @@ async function init(A) {
       #include <lights_pars_begin>
       #include <shadowmap_pars_fragment>
       #include <shadowmask_pars_fragment>
-      uniform float uT,uHurt,uK;uniform sampler2D uFoam,uNz,uRip;uniform vec4 uRect,uRipO;uniform vec3 uSun,uView;varying float vR;
+      uniform float uT,uHurt,uK,uWxDark,uRain;uniform sampler2D uFoam,uNz,uRip;uniform vec4 uRect,uRipO;uniform vec3 uSun,uView;varying float vR;
       varying vec3 vW;varying vec3 vN;varying float vH;varying vec2 vQ;varying float vD;
       vec3 s2l(vec3 c){return pow(c,vec3(2.2));}
       void main(){
@@ -166,6 +166,10 @@ async function init(A) {
         c=mix(c,s2l(vec3(.95,.98,1.))*(.75+.25*sh),fo);
         if(d<0.){c=mix(s2l(vec3(.72,.62,.45)),sand,clamp(-d/30.,0.,1.))*(.6+.4*sh);}
         c*=1.+uHurt*.15;
+        // weather (nalu-life.js / engine3d): storms darken and grey the water; raindrops ring the surface
+        c=mix(c,c*vec3(.55,.6,.68)+vec3(.012,.014,.018),clamp(uWxDark,0.,1.));
+        if(uRain>.01&&d>0.){vec2 rg=vW.xz*.045;vec2 ci=floor(rg),cf=fract(rg)-.5;float hh=fract(sin(dot(ci,vec2(12.9898,78.233)))*43758.5453),ph=fract(uT*1.3+hh),rr=length(cf-vec2(hh-.5,fract(hh*7.)-.5)*.5);
+          c+=vec3(.16)*smoothstep(.05,0.,abs(rr-ph*.42))*(1.-ph)*uRain*step(hh,uRain*.9+.1);}
         gl_FragColor=vec4(c,1.);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -614,7 +618,7 @@ async function init(A) {
     for (let i = foams.length - 1; i >= 0; i--) { const f = foams[i]; f.t += dt; if (f.t > f.life) { foams.splice(i, 1); continue; } f.x += f.vx * dt; f.r = f.r0 * (1 + f.t * .9);
       foamDot(f.x, f.q - G.cam + G.wo, f.r, .55 * (1 - f.t / f.life)); }
     rStep(); stepParticles(dt); foamTex.needsUpdate = true;
-    R.render(scene, cam);
+    if (LIFE) { try { LIFE.frame(dt, { y0, gx, gy, near, shoreVisible: shore.visible, pier: stub.visible ? { x: A.PIER_X, h: deckH + 1.9, z0: sy(-60) * K - 12, len: stubLen - 40 } : null }); LIFE.hidePrev(); LIFE.render(dt); } catch (e) { console.warn("[nv3d] engine3d frame:", e); LIFE = null; R.render(scene, cam); } } else R.render(scene, cam);
   }
 
   function makeEnt(e) {
@@ -754,6 +758,11 @@ async function init(A) {
     else if (ph === "swim") { if (G.yw < 70 && G.duck <= 0) foamRing(x, y + 14, 16, 6, .7, 2.5); else foamDot(x, y - 40, 14, .5); }
   }
 
+  // engine3d: real people, the Nalu Vida patio, weather, time of day, cloud shadows, post-processing, ambience (nalu-life.js).
+  // Loads after the game is up; until then (or if it fails) the plain renderer keeps going.
+  let LIFE = null; const LOFF = new URLSearchParams(location.search).get("life") === "0";
+  if (!LOFF && R.capabilities.isWebGL2) import("./nalu-life.js?v=n7").then(m => m.makeNaluLife(THREE, { R, scene, cam, sun, hemi, A, G, K, loader, oceanMat, makeBoard, hide: [lady, guardM, staff1, staff2] }))
+    .then(L => { LIFE = L; window.__NVLIFE = L; }).catch(e => console.warn("[nv3d] engine3d off:", e));
   function dispose() { try { if (ro) ro.disconnect(); R.dispose(); scene.traverse(o => { if (o.geometry) o.geometry.dispose(); }); disposables.forEach(d => d.dispose && d.dispose()); } catch (e) {} }
   // warm-up: compile every shader now so the first frame of play doesn't hitch
   render(); try { R.compile(scene, cam); } catch (e) {}

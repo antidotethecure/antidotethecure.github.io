@@ -1,5 +1,5 @@
 {
-  "_readme": "Carlos's real before/after photo pairs. Put image paths (relative to demo/mechanic/, e.g. photos/windshield-before.jpg) in before + after. When BOTH are set, the photos replace the sample art on that card and the 'Sample art' tag goes away. Leave empty to keep the art. Use photos of the car work only: no faces, plates, house or address.",
+  "_readme": "The shop's real before/after photo pairs. Put image paths (relative to demo/mechanic/, e.g. photos/windshield-before.jpg) in before + after. When BOTH are set, the photos replace the sample art on that card and the 'Sample art' tag goes away. Leave empty to keep the art. Use photos of the car work only: no faces, plates, house or address.",
   "items": {
     "windshield": {
       "before": "",

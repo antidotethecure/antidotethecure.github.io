@@ -12,6 +12,7 @@ h1{font-size:28px;line-height:1.15;margin:14px 0 6px}h2{font-size:20px;margin:30
 .card{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px 16px;margin:10px 0}
 .card.ok{border-color:#2fbf7155;background:linear-gradient(180deg,#123024,#121c33)}
 .card.warn{border-color:#ff8a5b66;background:linear-gradient(180deg,#3a1d14,#121c33)}
+.card.lock .ck li.fixed i{background:#ffffff14;color:var(--gold)}
 .card.lock{border-color:#7fd6a666;background:linear-gradient(180deg,#14302a,#121c33)}
 .pill{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:#ffffff14;color:var(--gold)}
 .pill.g{color:#7dffb5}.pill.r{color:var(--warn)}
@@ -59,7 +60,8 @@ a.rkl{display:inline-block;margin:0 0 6px;font-size:14px;font-weight:700;color:v
 
 <div class="card ok"><span class="pill g">You're in ✅</span>
 <p class="big" style="margin:8px 0 2px">Kickoff: Monday, Oct 19 · 11:00 AM</p>
-<p style="margin:0">On Zoom (you're remote in Sacramento). The link will be texted to you before Monday.</p>
+<p style="margin:0">On Zoom (you're remote in Sacramento).</p>
+<a class="btn sm" id="zoomBtn" href="#" target="_blank" rel="noopener" style="display:none">🎥 Join the Zoom</a><p class="note" id="zoomNote" style="margin:6px 0 0">The Zoom link will be texted to you before Monday and will show up right here.</p>
 <div class="prog"><i id="bar" style="width:0"></i></div><p class="note" id="pct"></p>
 </div>
 
@@ -147,7 +149,7 @@ a.rkl{display:inline-block;margin:0 0 6px;font-size:14px;font-weight:700;color:v
 <li>Those details go only in the <a href="#intake">private info form</a>, which stays on your phone until you tap Send.</li></ul></div>
 </section>
 
-<nav class="toc" aria-label="Sections"><a href="#risks">⚠️ Warnings</a><a href="#tasks">🚀 Your 4 tasks</a><a href="#ads">📣 Ad rules</a><a href="#grants">📜 Grants</a><a href="#docs">🗂️ Documents</a><a href="#intake">🔒 Private info</a><a href="#agent">🤖 Your AI helper</a><a href="#updates">🗞️ Updates</a><a href="#faq">❓ FAQ</a><a href="#ask">💡 Questions &amp; ideas</a><a href="#issue">🛠️ Report a problem</a></nav>
+<nav class="toc" aria-label="Sections"><a href="#risks">⚠️ Warnings</a><a href="#tasks">🚀 Your 4 tasks</a><a href="#claude">🌟 What Claude can do</a><a href="#how">🧠 How Claude works</a><a href="#plans">🔓 Starter vs Build-Out</a><a href="#ads">📣 Ad rules</a><a href="#grants">📜 Grants</a><a href="#docs">🗂️ Documents</a><a href="#intake">🔒 Private info</a><a href="#agent">🤖 Your AI helper</a><a href="#updates">🗞️ Updates</a><a href="#faq">❓ FAQ</a><a href="#ask">💡 Questions &amp; ideas</a><a href="#issue">🛠️ Report a problem</a></nav>
 
 <h2>✅ Done so far</h2>
 <div class="card"><ul class="ck">
@@ -162,6 +164,65 @@ a.rkl{display:inline-block;margin:0 0 6px;font-size:14px;font-weight:700;color:v
 <h2 id="tasks">🚀 Your 4 tasks</h2>
 <p class="s" style="margin-top:0">Tap a task to open it. Each step has a checkbox and a <b>How</b> line.</p>
 <div id="projects"></div>
+
+<h2 id="claude">🌟 What Claude can do for each of your businesses</h2>
+<p class="s" style="margin-top:0">A preview. Claude is the AI Anthony uses to build every SousShift app, brand and marketing plan. Here's what it can build for each of your three businesses: brand, marketing, exposure and upkeep. Tap a business to open it.</p>
+<details class="pj"><summary><span class="em">🍄</span><span>Sunshine Mushroom Wellness</span><span class="ct">preview</span></summary>
+<p style="margin:0 0 6px">Claude can work like Sunshine's in-house creative team. It writes in the brand's voice, plans every week of content, and checks each ad against Meta's and TikTok's rules before it goes out, so the shop can grow without putting the ad account at risk.</p>
+<h3>🎨 Brand</h3><p style="margin:0 0 6px">A full brand book: the story, who it's for, voice, colors, fonts, label and packaging copy, and a description for every product in the shop, all written without health claims.</p>
+<h3>📣 Marketing</h3><p style="margin:0 0 6px">30-day content calendars, Reel and TikTok scripts with hooks, captions, email and text campaigns for new drops and restocks, and ad versions checked against the rules before you submit.</p>
+<h3>🌍 Exposure</h3><p style="margin:0 0 6px">A Google Business profile and shop pages written to be found in search, collaboration pitches to Sacramento farmers markets, cafés, chefs and food creators, and a one-page press kit.</p>
+<h3>🔧 Maintenance</h3><p style="margin:0 0 6px">A weekly routine: Claude reviews what posted and what sold, explains any rejected ad, refreshes product listings and keeps the calendar full, so the brand never goes quiet.</p>
+<p class="note" style="margin:8px 0 0">🔒 Built for you, and taught step by step, in the <a href="#plans">Business Build-Out</a>.</p></details>
+<details class="pj"><summary><span class="em">⛪</span><span>Green Light Sanctuary</span><span class="ct">preview</span></summary>
+<p style="margin:0 0 6px">For the church, Claude works like a communications director and a grants assistant. It keeps the messaging consistent and respectful, brings people to gatherings and service work, writes posts that pass Meta's review, and keeps the paperwork organized before a funder ever asks.</p>
+<h3>🎨 Brand</h3><p style="margin:0 0 6px">A mission statement, an About page, a visual identity, message themes and a tone guide that keep everything focused on community and service.</p>
+<h3>📣 Marketing</h3><p style="margin:0 0 6px">Event announcements, weekly posts, newsletters, volunteer and donation drives, and boosted posts in the right ad category.</p>
+<h3>🌍 Exposure</h3><p style="margin:0 0 6px">A clean website and Google listing, outreach letters to community partners, local press releases for events and service days, and program descriptions that work for grant applications and for public storytelling.</p>
+<h3>🔧 Maintenance</h3><p style="margin:0 0 6px">A weekly grant search, a monthly content calendar, a records checklist for every grant, and ready replies to common messages so nothing sits unanswered.</p>
+<p class="note" style="margin:8px 0 0">🔒 Built for you, and taught step by step, in the <a href="#plans">Business Build-Out</a>.</p></details>
+<details class="pj"><summary><span class="em">💐</span><span>iDesignEvents</span><span class="ct">preview</span></summary>
+<p style="margin:0 0 6px">Whatever you decide for iDesignEvents (sell, rent or rebrand), Claude can do the heavy lifting: catalog the inventory, price it, write the listings and build the marketing for the path you pick.</p>
+<h3>🎨 Brand</h3><p style="margin:0 0 6px">If you rebrand: name and domain checks, logo direction, colors and a new bio. If you sell: a clean listing brand that makes the collection look premium.</p>
+<h3>📣 Marketing</h3><p style="margin:0 0 6px">A shot list and listing copy for every décor item, rental packages with prices, Instagram and TikTok posts showing real setups, and wedding-season campaigns.</p>
+<h3>🌍 Exposure</h3><p style="margin:0 0 6px">Outreach to wedding planners, venues and rental companies, Facebook Marketplace and wedding directory listings, and a catalog site with a booking form.</p>
+<h3>🔧 Maintenance</h3><p style="margin:0 0 6px">An inventory and booking tracker, a follow-up for every inquiry, a review request after each event, and simple monthly numbers: cost, price, profit.</p>
+<p class="note" style="margin:8px 0 0">🔒 Built for you, and taught step by step, in the <a href="#plans">Business Build-Out</a>.</p></details>
+
+<h2 id="how">🧠 How Claude works (the basics)</h2>
+<div class="card"><ul class="rl">
+<li><b>You talk to it in plain English</b>, on your phone or computer (the Claude app or claude.ai). No code needed.</li>
+<li><b>One Project per business.</b> A Project remembers that business's files, brand kit and instructions, so you never start from zero.</li>
+<li><b>Better instructions, better work.</b> What you ask (your prompt) decides what you get. Your starter prompts are in <a href="#agent">🤖 Your AI helper</a>.</li>
+<li><b>You stay in charge.</b> Claude drafts; you check and approve. It doesn't post, send or spend anything on its own.</li>
+<li><b>Claude Code is the advanced side.</b> It's what Anthony builds with: apps, websites, and automations that run by themselves (like a weekly grant search). That's part of the Build-Out.</li>
+</ul>
+<p class="note" style="margin:8px 0 0">We set up your Claude account and your first Projects together at kickoff.</p></div>
+
+<h2 id="plans">🔓 Your Starter plan vs. the Business Build-Out</h2>
+<div class="card ok"><span class="pill g">Your plan · Starter</span>
+<p class="big" style="margin:8px 0 2px">$300 / month</p>
+<ul class="ck">
+<li class="fixed"><i>✓</i><label><b>Your Claude account set up</b><small>With a Project for each business, at kickoff</small></label></li>
+<li class="fixed"><i>✓</i><label><b>How to get around in Claude</b><small>Projects, files, prompts, and checking Claude's work</small></label></li>
+<li class="fixed"><i>✓</i><label><b>Your 4 tasks, step by step</b><small>Every step has a How line</small></label></li>
+<li class="fixed"><i>✓</i><label><b>Starter prompts</b><small>Brand kit, 30-day calendar, ad checker, grant scout and writer</small></label></li>
+<li class="fixed"><i>✓</i><label><b>Text support from Anthony</b></label></li>
+</ul>
+<p class="note" style="margin:8px 0 0">Starter gets you using Claude. Turning it into a full system for each business is the Build-Out.</p></div>
+
+<div class="card lock"><span class="pill">🔒 Business Build-Out · one business at a time</span>
+<p style="margin:8px 0 6px">Anthony builds the full system for a business with Claude, then teaches you exactly how Claude runs it, so it keeps working after we're done.</p>
+<ul class="ck">
+<li class="fixed"><i>🔒</i><label><b>The brand book</b><small>Story, voice, colors, fonts and copy for everything</small></label></li>
+<li class="fixed"><i>🔒</i><label><b>A Claude setup trained on that business</b><small>Its brand, products, rules and past posts, so every draft sounds like you and stays inside the ad rules</small></label></li>
+<li class="fixed"><i>🔒</i><label><b>A 90-day marketing plan, plus the first month of content made for you</b></label></li>
+<li class="fixed"><i>🔒</i><label><b>Exposure</b><small>Website and Google listing, outreach letters and a press kit</small></label></li>
+<li class="fixed"><i>🔒</i><label><b>Automations</b><small>Weekly grant search, content drafts, and an ad check before anything posts</small></label></li>
+<li class="fixed"><i>🔒</i><label><b>Hands-on sessions</b><small>How to run, maintain and grow it with Claude and Claude Code</small></label></li>
+</ul>
+<p class="note" style="margin:8px 0 0">Priced per business. Start with the one that matters most; add the others when you're ready.</p>
+<a class="btn" href="sms:+14243094068&amp;body=Hi%20Anthony%2C%20I%27d%20like%20to%20hear%20about%20the%20Build-Out%20for%20">🔓 Ask Anthony about the Build-Out</a></div>
 
 <h2 id="ads">📣 Ad rules: what Meta and TikTok allow</h2>
 <div class="card warn"><span class="pill r">Read this first</span>
@@ -337,10 +398,12 @@ var PROMPTS=[
  ["💐 iDesignEvents: rebrand or sell","iDesignEvents project","Here's my décor inventory: [paste or photos] and my answers to the 5 questions: [paste]. Compare three paths (sell everything, rent it out under a new brand, keep and rebrand) with rough numbers, time needed per week, and risks. Then give a step-by-step plan for the path that fits my answers."]
 ];
 var UPD=[
+ ["Oct 17","New: what Claude can do for each of your businesses, how Claude works, and the Business Build-Out"],
  ["Oct 13","Your plan is updated with your 4 tasks, the ad rules, a starter grant list and the documents checklist"],
  ["Oct 12","Payment received, kickoff booked for Mon Oct 19, 11:00 AM on Zoom"]
 ];
 var FAQ=[
+ ["What's the difference between Starter and the Build-Out?","Starter gets your Claude account set up and teaches you to use it, with your 4 tasks and starter prompts. In the Build-Out, Anthony builds a business's full brand, marketing, exposure and automations with Claude, then teaches you how to run them. It's priced per business: ask Anthony."],
  ["Can we advertise the mushroom products?","Culinary and functional mushrooms (like lion's mane), yes, with no health claims. Psilocybin or any psychedelic, no, on any platform, even with careful wording. See Ad rules."],
  ["What if an ad gets rejected?","Don't resubmit the same ad and don't argue it with a lot of appeals. Send Anthony a screenshot of the rejection. Repeated rejections can restrict the whole account."],
  ["Can an LLC get grants?","Rarely. Most grants require a nonprofit, a recognized church, or a tribe. The fast route is a fiscal sponsor: an existing nonprofit that takes the grant for your project for a small fee."],
@@ -348,6 +411,8 @@ var FAQ=[
  ["Does the Spotify shop work for us?","Only if the business is a music artist with a Spotify for Artists profile: Spotify sells artists' merch through Shopify. Otherwise we use a regular Shopify store."],
  ["How do I reach Anthony?","Text (424) 309-4068 or email secondshiftai@gmail.com. Kickoff is Monday Oct 19 at 11:00 AM on Zoom."]
 ];
+var ZOOM=""; /* kickoff Zoom link: paste it here and it appears on the kickoff card */
+(function(){ var b=document.getElementById("zoomBtn"), n=document.getElementById("zoomNote"); if(ZOOM){ b.href=ZOOM; b.style.display="inline-block"; n.textContent="Monday, Oct 19 at 11:00 AM (Pacific). Tap to join."; } })();
 var KEY="vv-plan-v2", st={}; try{ st=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){}
 function save(){ try{localStorage.setItem(KEY,JSON.stringify(st));}catch(err){} }
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}

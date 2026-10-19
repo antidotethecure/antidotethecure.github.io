@@ -35,7 +35,7 @@ window.SSAI_REWARDS={
      matching Toast discount button. See demo/interim.js and kit/toast-interim.html. */
   /* DIGITAL REWARDS CARD (demo/loyaltycard.js): "💳 My Rewards Card" with the member's permanent card ID (MLD-xxxxx, from the
      backend), points, next reward, QR and this visit's one-time code. Wallet buttons stay hidden until WALLET-SETUP.md is done. */
-  card:{prefix:"MLD", logo:"img/logo.png", theme:{a:"#0b1220",b:"#1c2a4d",c:"#77242e",gold:"#f0d375",ink:"#f6f1e4"},
+  card:{prefix:"MLD", logo:"img/logo.png", theme:{a:"#1a0a0c",b:"#3a1a1c",c:"#77242e",gold:"#f0d375",ink:"#f6f1e4"},
     wallet:{apple:false, google:false, appleUrl:"", googleUrl:""}},
   mode:"interim",
   interim:{passMinutes:10, codePrefix:"MEL", logo:"img/logo.png", kit:"../../melody/kit/toast-interim.html",
@@ -68,21 +68,21 @@ window.SSAI_REWARDS={
 <script src="../christian-live.js?v=mg2" data-slug="melody-bar-grill"></script>
 <script src="menu-data.js?v=mg1"></script>
 <meta name="description" content="Melody Bar & Grill by LAX: drinks and food menu, Melody Rewards points, the Just Landed deal, and the Melody flight game.">
-<meta name="theme-color" content="#0b1220">
+<meta name="theme-color" content="#1a0a0c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Barlow:wght@400;500;600;700;800&family=Anton&display=swap" rel="stylesheet">
 <style>
-/* Melody night: navy sky, gold, burgundy sign, pink awning, cream script logo */
+/* Melody night: dark burgundy + brown background (their colors, Antidote 2026-10-19), gold, burgundy sign, pink awning, cream script logo */
 :root{
-  --sky:#0b1220; --sky2:#121b30; --panel:#141e34; --edge:#27324d;
+  --sky:#1a0a0c; --sky2:#24100f; --panel:#2c1416; --edge:#5a2d2a;
   --gold:#d4af37; --gold2:#f0d375; --wine:#77242e; --wine2:#a33645; --pink:#e46b83; --cream:#efe4c9;
-  --ink:#f6f1e4; --dim:#9aa3b5; --go:#3fbf8f;
+  --ink:#f6f1e4; --dim:#c2a98f; --go:#3fbf8f;
   --display:"Playfair Display",Georgia,serif; --body:"Barlow",system-ui,-apple-system,sans-serif; --punch:"Anton",Impact,sans-serif;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{overflow-x:clip;margin:0;background:var(--sky);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
-body{background:radial-gradient(900px 520px at 50% -8%,#2a2445 0,transparent 62%),var(--sky);padding-bottom:84px}
+body{background:radial-gradient(900px 520px at 50% -8%,#4a1a20 0,transparent 62%),var(--sky);padding-bottom:84px}
 .wrap{max-width:720px;margin:0 auto;padding-inline:16px}
 a{color:var(--gold2)}
 /* hero */
@@ -98,51 +98,51 @@ h2{font-family:var(--display);font-weight:900;font-size:30px;margin:34px 0 4px;l
 h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
 .sub{color:var(--dim);margin:0 0 12px;font-size:15px}
 /* game */
-.gamebox{background:linear-gradient(180deg,#141e34,#0b1220);border:1px solid var(--edge);border-radius:18px;padding:12px;box-shadow:0 20px 60px #0008}
+.gamebox{background:linear-gradient(180deg,#2c1416,#1a0a0c);border:1px solid var(--edge);border-radius:18px;padding:12px;box-shadow:0 20px 60px #0008}
 .hud{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:2px 2px 10px;font-weight:800}
 .hud .sc{font-family:var(--punch);font-size:28px;color:var(--gold2);letter-spacing:.03em;font-weight:400}
 .hp{flex:1;max-width:170px;min-width:0}
 .hp .lbl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between}
-.hp .bar{position:relative;height:12px;border-radius:7px;background:#0a0f1c;border:1px solid var(--edge);overflow:hidden;margin-top:3px}
+.hp .bar{position:relative;height:12px;border-radius:7px;background:#140708;border:1px solid var(--edge);overflow:hidden;margin-top:3px}
 .hp .bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#3fbf8f,#9be15d);transition:width .25s,background .25s}
 .hp .bar i.mid{background:linear-gradient(90deg,#f0b429,#f0d375)}.hp .bar i.low{background:linear-gradient(90deg,#d64545,#ff7a59)}
-.hp .bar b{position:absolute;top:0;bottom:0;width:2px;background:#0b1220}
+.hp .bar b{position:absolute;top:0;bottom:0;width:2px;background:#1a0a0c}
 .hud2{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:-4px 2px 8px;font-size:12.5px;font-weight:800;color:var(--dim);min-width:0}
 .hud2 span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hud2 b{color:var(--ink)}
-.hud2 .pips{display:inline-flex;gap:2px;vertical-align:middle;margin-left:5px}.hud2 .pips i{width:7px;height:10px;border-radius:2px;background:#1c2540;border:1px solid #2a365a}
-#cv{display:block;width:100%;height:auto;aspect-ratio:400/600;border-radius:12px;background:#05081a;touch-action:pan-y pinch-zoom;cursor:pointer}
+.hud2 .pips{display:inline-flex;gap:2px;vertical-align:middle;margin-left:5px}.hud2 .pips i{width:7px;height:10px;border-radius:2px;background:#3a1a1c;border:1px solid #2a365a}
+#cv{display:block;width:100%;height:auto;aspect-ratio:400/600;border-radius:12px;background:#140708;touch-action:pan-y pinch-zoom;cursor:pointer}
 .cvwrap{position:relative}
-.gbtn{position:absolute;z-index:2;width:34px;height:34px;padding:0;border-radius:50%;border:1px solid #ffffff38;background:rgba(8,13,26,.62);color:#fff;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.gbtn{position:absolute;z-index:2;width:34px;height:34px;padding:0;border-radius:50%;border:1px solid #ffffff38;background:rgba(26,10,12,.62);color:#fff;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .gbtn.off{opacity:.6}
 .gbtn.songb{width:auto;max-width:56%;border-radius:17px;padding:0 11px;gap:5px;font:600 12px/1 Barlow,system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* speed boost button (2026-10-14): bottom-left above the gun button (the right edge holds the fixed Pause / music / full screen / lock column); a ring meter fills as it recharges */
 .bbtn{left:8px;bottom:60px;right:auto;top:auto;width:58px;height:58px;flex-direction:column;gap:0;border:0;background:conic-gradient(#5fd0ff var(--f,360deg),rgba(255,255,255,.14) 0);padding:3px}
-.bbtn::before{content:"";position:absolute;inset:3px;border-radius:50%;background:rgba(8,13,26,.86)}
+.bbtn::before{content:"";position:absolute;inset:3px;border-radius:50%;background:rgba(26,10,12,.86)}
 .bbtn i,.bbtn b{position:relative;font-style:normal}.bbtn i{font-size:20px;line-height:1}.bbtn b{font:800 9.5px Barlow,system-ui,sans-serif;letter-spacing:.04em;color:#bfeaff}
 .bbtn.on{background:conic-gradient(#ffe066 var(--f,360deg),rgba(255,255,255,.14) 0);box-shadow:0 0 18px rgba(95,208,255,.7)}.bbtn.on b{color:#ffe066}
 .bbtn.cd{opacity:.75}.bbtn.cd b{color:#8fa3c0}
 .cvwrap.slowmo canvas{filter:saturate(.55) brightness(1.04) hue-rotate(-8deg)}
-.wbtn{left:8px;bottom:8px;width:auto;height:auto;min-height:44px;max-width:62%;padding:5px 11px 5px 8px;border-radius:14px;gap:7px;justify-content:flex-start;background:rgba(8,13,26,.78);border-color:rgba(240,211,117,.45);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.wbtn{left:8px;bottom:8px;width:auto;height:auto;min-height:44px;max-width:62%;padding:5px 11px 5px 8px;border-radius:14px;gap:7px;justify-content:flex-start;background:rgba(26,10,12,.78);border-color:rgba(240,211,117,.45);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .wbtn i{font-style:normal;font-size:19px}.wbtn span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1;min-width:0}.wbtn b{font:800 12.5px Barlow,system-ui,sans-serif;white-space:nowrap}
-.wbtn small{font:700 11px Barlow,system-ui,sans-serif;color:#c9d2ee;white-space:nowrap}.wbtn small.em{color:#ff8a7a}.wbtn u{text-decoration:none;font:800 10.5px Barlow,system-ui,sans-serif;color:#f0d375;margin-left:2px;white-space:nowrap}
+.wbtn small{font:700 11px Barlow,system-ui,sans-serif;color:#e6d3bd;white-space:nowrap}.wbtn small.em{color:#ff8a7a}.wbtn u{text-decoration:none;font:800 10.5px Barlow,system-ui,sans-serif;color:#f0d375;margin-left:2px;white-space:nowrap}
 #over{display:none;text-align:center;padding:14px 0 4px}#over.on{display:block}
 #final{font-family:var(--punch);font-size:52px;color:var(--gold2);line-height:1}
 #won{display:none;margin:10px auto 4px;max-width:320px;background:#3fbf8f22;border:2px dashed #3fbf8f;border-radius:14px;padding:10px;font-weight:800}
 .pts{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:12px}
-.pts div{min-width:0;display:flex;align-items:center;gap:8px;background:#0b1220;border:1px solid var(--edge);border-radius:10px;padding:7px 9px;font-size:13px;color:var(--dim)}
+.pts div{min-width:0;display:flex;align-items:center;gap:8px;background:#1a0a0c;border:1px solid var(--edge);border-radius:10px;padding:7px 9px;font-size:13px;color:var(--dim)}
 .pts img{width:34px;height:34px;object-fit:contain;flex:none}.pts .e{width:34px;text-align:center;font-size:22px;flex:none}
 .pts b{color:var(--ink);display:block;font-size:13px;line-height:1.2;overflow-wrap:anywhere}.pts span{min-width:0}.pts .v{margin-left:auto;font-family:var(--punch);color:var(--gold2);font-size:17px;white-space:nowrap}
 .pts .bad .v{color:#ff7a59}
-.btabs{display:flex;gap:6px;margin:8px 0 2px}.btabs button{flex:1;min-height:40px;border-radius:10px;border:1px solid var(--edge);background:#0b1220;color:var(--ink);font:800 13.5px var(--body);cursor:pointer}
+.btabs{display:flex;gap:6px;margin:8px 0 2px}.btabs button{flex:1;min-height:40px;border-radius:10px;border:1px solid var(--edge);background:#1a0a0c;color:var(--ink);font:800 13.5px var(--body);cursor:pointer}
 .btabs button[aria-pressed=true]{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;border-color:var(--gold)}
 .ptsh{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:14px 2px 0}
 /* seat */
 .seat{background:var(--panel);border:1px solid var(--edge);border-radius:18px;padding:14px}
 .seat .big{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.seat .big button{border:1px solid var(--edge);background:#0b1220;color:var(--ink);border-radius:14px;padding:12px 6px;font:800 14px var(--body);cursor:pointer}
+.seat .big button{border:1px solid var(--edge);background:#1a0a0c;color:var(--ink);border-radius:14px;padding:12px 6px;font:800 14px var(--body);cursor:pointer}
 .seat .big button span{display:block;font-size:24px;margin-bottom:2px}
 .seat .tbls{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
-.seat .tbls button{border:1px solid var(--edge);background:#0b1220;color:var(--ink);border-radius:10px;padding:9px 0;font:800 15px var(--body);cursor:pointer}
+.seat .tbls button{border:1px solid var(--edge);background:#1a0a0c;color:var(--ink);border-radius:10px;padding:9px 0;font:800 15px var(--body);cursor:pointer}
 .seat button.on{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;border-color:var(--gold)}
 .seat .now{margin-top:10px;font-size:14px;color:var(--dim)}.seat .now b{color:var(--gold2)}
 /* menu */
@@ -154,7 +154,7 @@ h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;le
 .cat .note{color:var(--dim);font-size:13.5px;margin:-4px 0 10px}
 .items{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
 .item{position:relative;background:var(--panel);border:1px solid var(--edge);border-radius:16px;overflow:hidden;min-width:0;display:flex;flex-direction:column}
-.media{position:relative;aspect-ratio:1/1;overflow:hidden;background:#0a0f1c}
+.media{position:relative;aspect-ratio:1/1;overflow:hidden;background:#140708}
 .media img,.media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .media video{opacity:0;transition:opacity .2s}.media.playing video{opacity:1}
 .item .tx{padding:9px 11px 11px;display:flex;flex-direction:column;flex:1}
@@ -187,7 +187,7 @@ h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;le
 .media .poured{position:absolute;left:8px;top:8px;background:#0b1220cc;border:1px solid var(--gold);color:var(--gold2);border-radius:999px;padding:3px 9px;font-size:11.5px;font-weight:800;opacity:0;transition:opacity .3s}
 .media.done .poured{opacity:1}
 /* order bar + sheet */
-#obar{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#0b122000,#0b1220 30%);display:none}
+#obar{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#0b122000,#1a0a0c 30%);display:none}
 #obar.on{display:block}
 #obar button{width:100%;max-width:696px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;border:0;border-radius:16px;padding:14px 16px;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;font:800 15.5px var(--body);box-shadow:0 10px 30px #000a;cursor:pointer}
 #obar .n{background:#1a1405;color:var(--gold2);border-radius:999px;padding:2px 9px;font-size:13px}
@@ -245,7 +245,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 </header>
 
 <nav id="mtabs" aria-label="Sections"><div class="mt-row">
-  <a href="#sec-sports" data-tab="sports">📺 Sports</a><a href="#sec-games" data-tab="games">✈️ Games</a><a href="#sec-trivia" data-tab="trivia">🎤 Trivia</a><a href="#sec-members" data-tab="members">⭐ Members</a><a href="#sec-menu" data-tab="menu">🍽️ Menu</a>
+  <a href="#sec-sports" data-tab="sports">📺 Sports</a><a href="#sec-games" data-tab="games">✈️ Games</a><a href="#sec-trivia" data-tab="trivia">🎤 Trivia</a><a href="#sec-landed" data-tab="landed">🛬 Just Landed</a><a href="#sec-members" data-tab="members">⭐ Members</a><a href="#sec-menu" data-tab="menu">🍽️ Menu</a>
 </div></nav>
 
 <section class="msec" id="sec-sports" data-tab="sports">
@@ -273,8 +273,8 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
     <div id="won"></div>
     <div id="post" class="seat" style="margin:12px auto 0;max-width:360px;text-align:left">
       <b style="display:block;margin-bottom:6px">🏆 Put your score on the board</b>
-      <input id="bn" maxlength="16" placeholder="Name on the board" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--edge);background:#0b1220;color:var(--ink);font:600 15px var(--body)">
-      <input id="big" maxlength="31" placeholder="@instagram (optional, so people can follow you)" autocapitalize="none" style="width:100%;margin-top:8px;padding:11px;border-radius:10px;border:1px solid var(--edge);background:#0b1220;color:var(--ink);font:600 15px var(--body)">
+      <input id="bn" maxlength="16" placeholder="Name on the board" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--edge);background:#1a0a0c;color:var(--ink);font:600 15px var(--body)">
+      <input id="big" maxlength="31" placeholder="@instagram (optional, so people can follow you)" autocapitalize="none" style="width:100%;margin-top:8px;padding:11px;border-radius:10px;border:1px solid var(--edge);background:#1a0a0c;color:var(--ink);font:600 15px var(--body)">
       <button class="btn hot" type="button" id="bpost" style="width:100%;justify-content:center;margin-top:8px">Post my score</button>
       <div class="now" id="bmsg"></div>
     </div>
@@ -302,16 +302,10 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 
 <div id="fromnalu" style="display:none"></div>
 <script>(function(){ var q=new URLSearchParams(location.search); if(q.get("from")!=="nalu") return; var c=(q.get("deal")||"").replace(/[^A-Z0-9-]/gi,"").slice(0,16);
-  var d=document.createElement("div"); d.style.cssText="position:fixed;left:12px;right:12px;top:calc(56px + env(safe-area-inset-top,0px));z-index:90;max-width:520px;margin:0 auto;padding:12px 14px;border-radius:14px;background:#0b1220;border:1px solid #f0d375;color:#fbf1de;box-shadow:0 10px 40px #000a;font:600 14px/1.4 system-ui";
+  var d=document.createElement("div"); d.style.cssText="position:fixed;left:12px;right:12px;top:calc(56px + env(safe-area-inset-top,0px));z-index:90;max-width:520px;margin:0 auto;padding:12px 14px;border-radius:14px;background:#1a0a0c;border:1px solid #f0d375;color:#fbf1de;box-shadow:0 10px 40px #000a;font:600 14px/1.4 system-ui";
   d.innerHTML="✈️ <b>Welcome from Nalu Vida!</b> Same owners, right by LAX. Melody Rewards has its own points balance: join free below.<div style='font-size:12px;opacity:.8'>9132 S Sepulveda Blvd · tap to close</div>";
   d.onclick=function(){ d.remove(); }; document.body.appendChild(d); })();</script>
-<section class="msec" id="sec-members" data-tab="members">
-<h2 id="rewards"><small>Melody Rewards · free to join</small>Become a member, get your gold card</h2>
-<p class="sub">Join in 10 seconds: earn points on every check and from the games, and carry your gold Melody Rewards card on your phone.</p>
-<div id="rwhost"></div>
-<div id="lbhost"></div>
-
-
+<section class="msec" id="sec-landed" data-tab="landed">
 <h2 id="landed"><small>Melody's "Just Landed" deal</small>Just got off a flight? ✈️</h2>
 <p class="sub">Melody is 5 minutes from LAX. One simple offer for everyone who just flew in.</p>
 <div class="seat" id="landbox">
@@ -320,6 +314,14 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
     <button type="button" class="btn hot" id="landgo" style="justify-content:center">🛬 I just landed</button></div>
   <div class="now" id="landout"></div>
 </div>
+</section>
+
+<section class="msec" id="sec-members" data-tab="members">
+<h2 id="rewards"><small>Melody Rewards · free to join</small>Become a member, get your gold card</h2>
+<p class="sub">Join in 10 seconds: earn points on every check and from the games, and carry your gold Melody Rewards card on your phone.</p>
+<div id="rwhost"></div>
+<div id="lbhost"></div>
+
 
 </section>
 
@@ -696,7 +698,7 @@ function hud(){ $("score").textContent=G.score.toLocaleString(); var sv=G.runnin
   $("time").textContent=sv?"⏱ "+mmss(G.surv):G.landing?(G.touched?"🛬":"Landing"):G.home?"🏁":(G.boss||G.bossDie)?"BOSS":Math.ceil(Math.max(0,G.t)/1000)+"s";
   var hp=Math.max(0,Math.round(G.hp)), b=$("hpbar"); b.style.width=hp+"%"; b.className=hp>66?"":hp>33?"mid":"low"; $("hpn").textContent=hp+"%";
   wbtnSync(); var key=G.lvl+"|"+G.wpn+"|"+sv+"|"+CALM+"|"+G.unl+"|"+G.guns; if(key!==HK){ HK=key; var w=WPN[G.wpn], p=""; for(var i=0;i<WPN.length;i++) p+='<i'+(i<=G.unl?' style="background:'+WPN[i].c+';border-color:'+WPN[i].c+(i===G.wpn?';box-shadow:0 0 0 1.5px #fff':'')+'"':'')+'></i>';
-    $("lvl").innerHTML=sv?"⏱ "+esc(T("Survival"))+" · "+esc(T("Level"))+" <b>"+G.lvl+"</b>":esc(T(CALM?"Leg":"Level"))+" <b>"+G.lvl+"</b> "+esc(T("of"))+" "+NL(); if(CALM){ $("wpn").innerHTML=(G.streak>1?"🔥 "+esc(T("Streak"))+" <b>"+G.streak+"</b>":""); HK=""; } else if(!G.guns){ $("wpn").innerHTML='<b style="color:#9aa3b5">🔒 '+esc(T("No guns yet"))+'</b>'; HK=""; } else $("wpn").innerHTML='<b style="color:'+w.c+'">'+esc(T(w.n))+'</b><span class="pips" aria-label="'+(G.unl+1)+' of 6 guns unlocked">'+p+'</span>'; } }
+    $("lvl").innerHTML=sv?"⏱ "+esc(T("Survival"))+" · "+esc(T("Level"))+" <b>"+G.lvl+"</b>":esc(T(CALM?"Leg":"Level"))+" <b>"+G.lvl+"</b> "+esc(T("of"))+" "+NL(); if(CALM){ $("wpn").innerHTML=(G.streak>1?"🔥 "+esc(T("Streak"))+" <b>"+G.streak+"</b>":""); HK=""; } else if(!G.guns){ $("wpn").innerHTML='<b style="color:#c2a98f">🔒 '+esc(T("No guns yet"))+'</b>'; HK=""; } else $("wpn").innerHTML='<b style="color:'+w.c+'">'+esc(T(w.n))+'</b><span class="pips" aria-label="'+(G.unl+1)+' of 6 guns unlocked">'+p+'</span>'; } }
 function best(){ try{ return +localStorage.getItem("melody-best")||0; }catch(e){ return 0; } }
 var RUN=0;
 function start(){ if(RA){ RA.clear(); pickT=-1e9; radio("Tower to Captain: you're cleared for takeoff!",{tone:"info",ms:2200}); } var keep=G.clouds, posted=G.posted; G=fresh(); G.clouds=keep; G.posted=posted; G.runId=++RUN; G.running=true; G.mode=CALM?"campaign":MODE; ATT=0; G.last=performance.now(); seedGround(); $("over").classList.remove("on");
@@ -2261,7 +2263,7 @@ var TRF=(function(){
     p.bumped=1; p.wob=1; p.vx-=nx*70; p.vy-=ny*40;
     G.bumps++; G.inv=84; G.wob=1; G.mvx+=nx*300; G.mvy+=ny*220;
     G.tx=Math.max(30,Math.min(W-30,G.tx+nx*36)); G.ty=Math.max(H*.32,Math.min(H-50,G.ty+ny*28));
-    pop(G.x,G.y-50,T("Close call!"),"#ffd27a"); if(G.streak>0) pop(G.x,G.y-30,T("streak starts over"),"#9aa3b5"); G.streak=0;
+    pop(G.x,G.y-50,T("Close call!"),"#ffd27a"); if(G.streak>0) pop(G.x,G.y-30,T("streak starts over"),"#c2a98f"); G.streak=0;
     SND.play("bump"); buzz(25);
     if(G.bumps===1||performance.now()-pickT>25000){ pickT=performance.now(); radio(G.bumps===1?"Whoa, easy there! Give the traffic a little room, Captain.":"Close one! Plenty of sky out there, Captain.",{tone:"info",ms:2400}); } }
   function step(dt,run,takeoff,landing){ var s=dt/1000, i;
@@ -2365,7 +2367,7 @@ function frame(now){
         if(Math.random()<.45) G.fx.push({k:"e",x:it.x+(Math.random()-.5)*10,y:it.y+(Math.random()-.5)*10,vx:-mdx/(md||1)*.6,vy:-mdy/(md||1)*.6,s:2,g:0,a:.85});   // a little sparkle trail
         if(CH&&it.z3!=null) it.z3+=(G.alt3-it.z3)*Math.min(1,dt/1000*16); } }   /* (altitude never matters for pickups; hazards still use zOK) */
     if(it.y>H+60){ if(it.t==="crate"&&!G.gotCrate) G.crateT=9000;
-      if(run&&it.t==="food"){ if(G.streak>=3) pop(Math.max(50,Math.min(W-50,it.x)),H-36,T("Missed it · streak ends"),"#9aa3b5"); else pop(Math.max(40,Math.min(W-40,it.x)),H-36,T("missed it"),"#9aa3b5"); G.streak=0; }
+      if(run&&it.t==="food"){ if(G.streak>=3) pop(Math.max(50,Math.min(W-50,it.x)),H-36,T("Missed it · streak ends"),"#c2a98f"); else pop(Math.max(40,Math.min(W-40,it.x)),H-36,T("missed it"),"#c2a98f"); G.streak=0; }
       G.items.splice(i,1); continue; }
     if(CH&&(it.t==="slow"||it.t==="boost"||it.t==="crate"||it.t==="heal")) bb(it.x,it.y,it.z3,function(){ if(it.t==="slow") drawSlowItem(it,now); else if(it.t==="boost") drawBoostItem(it,now); else if(it.t==="crate") drawCrate(it,now); else drawHeal(it,now); });
     else if(it.t==="slow") drawSlowItem(it,now);
@@ -2561,9 +2563,9 @@ function end(){
   $("rank").textContent=G.debug?"Practice flight (test mode) · no points or board":sv?"Survival · reached level "+G.lvl+" · score "+G.score.toLocaleString()+" · best "+mmss(Math.max(bs,G.surv)):how+"Level "+G.lvl+" of "+NL()+" · best: "+Math.max(b,G.score).toLocaleString();
   var won=$("won"), GP=window.SSAI_GAMEPTS, cap=(GP&&GP.cfg.dailyCap)||50; won.style.display="none";
   $("bpost").textContent=sv?"Post my time to the Survival board":"Post my score to the Campaign board";
-  if(!G.debug&&!rewardsOn()){ won.innerHTML="🧪 BETA · Rewards from the game switch on soon"+'<br><span style="font-weight:600;font-size:13px;color:#c9d2ee">'+(sv?"Your time":"Your score")+" still ranks on this week's "+(sv?"Survival":"Campaign")+" board. No prizes are given out until Melody turns rewards on.</span>"; won.style.display="block"; }
+  if(!G.debug&&!rewardsOn()){ won.innerHTML="🧪 BETA · Rewards from the game switch on soon"+'<br><span style="font-weight:600;font-size:13px;color:#e6d3bd">'+(sv?"Your time":"Your score")+" still ranks on this week's "+(sv?"Survival":"Campaign")+" board. No prizes are given out until Melody turns rewards on.</span>"; won.style.display="block"; }
   else if(GP&&!G.debug){ var r=GP.award(G.score,"Melody Approach"), worth=GP.forScore(G.score);
-    var line=function(t){ return '<br><span style="font-weight:600;font-size:13px;color:#c9d2ee">'+t+'</span>'; };
+    var line=function(t){ return '<br><span style="font-weight:600;font-size:13px;color:#e6d3bd">'+t+'</span>'; };
     var paint=function(){
       if(r.saved) won.innerHTML="⭐ +"+r.pts+" Melody Rewards points"+line(r.capped?(r.pts?"You hit today's game limit ("+cap+" points a day). ":"Today's game limit is reached ("+cap+" points a day). ")+"Keep flying for fun and the board.":r.today+" of "+cap+" game points today · 1 point per "+GP.cfg.perScore+" score");
       else won.innerHTML="⭐ This flight is worth "+worth+" points"+(r.capped?line("Today's limit is "+cap+" game points: "+GP.held()+" are waiting for you."):"")+
@@ -2615,7 +2617,7 @@ function postScore(){
   }).catch(function(){ $("bmsg").textContent="No connection. Try again in a sec."; });
 }
 // weekly board = bragging rights only (no champion prize since Christian's 2026-10 feedback)
-function alertBox(t){ var d=document.createElement("div"); d.className="ok"; d.style.cssText="position:fixed;left:12px;right:12px;top:12px;z-index:80;max-width:520px;margin:0 auto;background:#0b1220;box-shadow:0 10px 40px #000a"; d.innerHTML='<b>'+esc(t)+'</b>'; document.body.appendChild(d); setTimeout(function(){ d.remove(); },7000); }
+function alertBox(t){ var d=document.createElement("div"); d.className="ok"; d.style.cssText="position:fixed;left:12px;right:12px;top:12px;z-index:80;max-width:520px;margin:0 auto;background:#1a0a0c;box-shadow:0 10px 40px #000a"; d.innerHTML='<b>'+esc(t)+'</b>'; document.body.appendChild(d); setTimeout(function(){ d.remove(); },7000); }
 
 window.__MG={get:function(){return G;},start:function(){start();},end:function(){ if(G.running) end(); },W:W,H:H,mode:function(m){ if(m) setMode(m); return MODE; },attract:function(on){ ATT=on?1:0; },LV:LV,BOSS_AT:BOSS_AT,ZONES:ZONES,zone:function(){ return ZONES[zoneIx()].id; },nextLevel:function(){ nextLevel(); }};   /* (zone + nextLevel: the route tests) */
 window.MELODY_MODE=function(m){ if(m) setMode(m); return MODE; };
@@ -2682,7 +2684,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}
-.gm-ov.gm-show{background:radial-gradient(120% 60% at 85% 0,rgba(212,175,55,.26),transparent 60%),radial-gradient(90% 50% at 0 100%,rgba(163,54,69,.32),transparent 70%),linear-gradient(180deg,#1c2547,#0b1220 70%);padding:12px 12px 16px;gap:9px}
+.gm-ov.gm-show{background:radial-gradient(120% 60% at 85% 0,rgba(212,175,55,.26),transparent 60%),radial-gradient(90% 50% at 0 100%,rgba(163,54,69,.32),transparent 70%),linear-gradient(180deg,#3a1a1c,#1a0a0c 70%);padding:12px 12px 16px;gap:9px}
 .ms-top{display:flex;gap:10px;align-items:flex-start}
 .ms-hd{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 .ms-by{margin:0;font:800 10px/1.2 Barlow,system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#f0d375}
@@ -2692,7 +2694,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 @keyframes msBlink{50%{opacity:.25}}
 .ms-h{margin:0;font:400 clamp(25px,8vw,34px)/1 Anton,Impact,sans-serif;letter-spacing:.01em;color:#fff;text-shadow:0 3px 0 #8a6d12,0 10px 24px rgba(0,0,0,.55)}
 .ms-pv{flex:none;position:relative;width:92px;border-radius:12px;padding:3px;background:linear-gradient(160deg,#f0d375,#77242e);box-shadow:0 8px 22px rgba(0,0,0,.55);transform:rotate(3deg)}
-.ms-pv canvas{display:block;width:100%;height:auto;aspect-ratio:2/3;border-radius:9px;background:#0c1220}
+.ms-pv canvas{display:block;width:100%;height:auto;aspect-ratio:2/3;border-radius:9px;background:#160809}
 .ms-pv i{position:absolute;left:8px;top:8px;font:900 9px/1 Barlow,system-ui,sans-serif;letter-spacing:.12em;font-style:normal;color:#fff;background:#e3262f;border-radius:4px;padding:3px 5px;box-shadow:0 2px 6px rgba(0,0,0,.4)}
 .ms-prize{display:flex;align-items:center;gap:12px;padding:9px 12px 9px 9px;border-radius:16px;background:linear-gradient(120deg,rgba(240,211,117,.18),rgba(240,211,117,.05));border:1px solid rgba(240,211,117,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
 .ms-prize img{flex:none;width:62px;height:62px;border-radius:50%;object-fit:cover;border:3px solid #f0d375;box-shadow:0 0 0 3px rgba(240,211,117,.18),0 8px 18px rgba(0,0,0,.45);animation:msSpin 9s ease-in-out infinite}
@@ -2700,7 +2702,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 .ms-prize div{min-width:0;display:flex;flex-direction:column;gap:1px}
 .ms-prize small{font:800 10px/1.2 Barlow,system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#f0d375}
 .ms-prize b{font:400 22px/1.05 Anton,Impact,sans-serif;letter-spacing:.02em;color:#fff}
-.ms-prize em{font:600 12px/1.3 Barlow,system-ui,sans-serif;font-style:normal;color:#c9d2ee}
+.ms-prize em{font:600 12px/1.3 Barlow,system-ui,sans-serif;font-style:normal;color:#e6d3bd}
 .ms-food{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:4px 0 0}
 .ms-f{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;animation:msBob 2.6s ease-in-out infinite;animation-delay:var(--d,0s)}
 .ms-f img{width:100%;max-width:58px;height:46px;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(0,0,0,.5)) drop-shadow(0 0 10px rgba(255,214,120,.35)) saturate(1.15) brightness(1.08);position:relative;z-index:1}
@@ -2711,22 +2713,22 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 @keyframes msSteam{0%{opacity:0;transform:translateY(8px) scale(.6)}30%{opacity:.85}100%{opacity:0;transform:translateY(-18px) scale(1.3) rotate(10deg)}}
 @keyframes msBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
 .ms-mode{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.ms-mode button{display:flex;align-items:center;gap:7px;min-height:48px;padding:6px 9px;border-radius:14px;border:2px solid #27324d;background:rgba(255,255,255,.05);color:#f6f1e4;font:900 15px/1.05 Barlow,system-ui,sans-serif;text-align:left;cursor:pointer;touch-action:manipulation}
-.ms-mode button i{font-style:normal;font-size:21px;line-height:1}.ms-mode button span{display:flex;flex-direction:column;min-width:0}.ms-mode button small{font:700 10.5px/1.15 Barlow,system-ui,sans-serif;color:#9aa3b5}
+.ms-mode button{display:flex;align-items:center;gap:7px;min-height:48px;padding:6px 9px;border-radius:14px;border:2px solid #5a2d2a;background:rgba(255,255,255,.05);color:#f6f1e4;font:900 15px/1.05 Barlow,system-ui,sans-serif;text-align:left;cursor:pointer;touch-action:manipulation}
+.ms-mode button i{font-style:normal;font-size:21px;line-height:1}.ms-mode button span{display:flex;flex-direction:column;min-width:0}.ms-mode button small{font:700 10.5px/1.15 Barlow,system-ui,sans-serif;color:#c2a98f}
 .ms-mode button[aria-pressed=true]{border-color:#f0d375;background:rgba(212,175,55,.2);box-shadow:0 0 0 3px rgba(240,211,117,.25)}
 .ms-fs{margin:0;padding:7px 10px;border-radius:12px;background:rgba(79,184,255,.1);border:1px solid rgba(79,184,255,.45);font:700 12.5px/1.3 Barlow,system-ui,sans-serif;color:#dfe8ff;text-align:center}.ms-fs b{color:#f0d375}
 .ms .gm-play{align-self:center;width:100%;max-width:320px;min-height:54px}
 .ms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .ms-grid .gm-b{flex-direction:column;gap:2px;min-height:52px;padding:6px 4px;font-size:10.5px;line-height:1.1;text-align:center;border-radius:12px}
 .ms-grid .gm-b i{font-size:18px}
-.ms-mvp{margin-top:4px;padding:11px 12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid #27324d}
+.ms-mvp{margin-top:4px;padding:11px 12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid #5a2d2a}
 .ms-k{margin:0 0 7px;font:800 11px/1.2 Barlow,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#f0d375}
 .ms-w{display:flex;align-items:center;gap:9px;padding:7px 9px;margin:5px 0;border-radius:12px;background:rgba(240,211,117,.07);border:1px solid rgba(240,211,117,.25)}
-.ms-w>span{font-size:20px}.ms-w div{flex:1;min-width:0}.ms-w small{display:block;font:700 10.5px/1.2 Barlow,system-ui,sans-serif;color:#9aa3b5;text-transform:uppercase;letter-spacing:.08em}
+.ms-w>span{font-size:20px}.ms-w div{flex:1;min-width:0}.ms-w small{display:block;font:700 10.5px/1.2 Barlow,system-ui,sans-serif;color:#c2a98f;text-transform:uppercase;letter-spacing:.08em}
 .ms-w b{display:block;font:800 15px/1.2 Barlow,system-ui,sans-serif;color:#fff;overflow-wrap:anywhere}.ms-w b a{color:#f0d375;text-decoration:none;font-weight:700;font-size:13px}
 .ms-w em{font:400 17px/1 Anton,Impact,sans-serif;font-style:normal;color:#f0d375;white-space:nowrap}
-.ms-past{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:3px}.ms-past li{display:flex;justify-content:space-between;gap:8px;font:600 12.5px/1.3 Barlow,system-ui,sans-serif;color:#c9d2ee}.ms-past em{font-style:normal;color:#f0d375;font-weight:800}
-.ms-cd{margin:8px 0 0;font:600 11.5px/1.3 Barlow,system-ui,sans-serif;color:#9aa3b5}
+.ms-past{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:3px}.ms-past li{display:flex;justify-content:space-between;gap:8px;font:600 12.5px/1.3 Barlow,system-ui,sans-serif;color:#e6d3bd}.ms-past em{font-style:normal;color:#f0d375;font-weight:800}
+.ms-cd{margin:8px 0 0;font:600 11.5px/1.3 Barlow,system-ui,sans-serif;color:#c2a98f}
 .gm-ov.gm-show.tight .ms-h{font-size:24px}
 @media (min-width:600px){.ms-pv{width:120px}.ms-food img{height:56px}}
 @media (prefers-reduced-motion:reduce){.ms-f,.ms-prize img,.ms-st i,.ms-beta:before{animation:none}.ms-st{display:none}}
@@ -2748,7 +2750,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-top"><div class="ms-hd"><p class="ms-by notranslate">Melody Bar &amp; Grill · Melody Approach</p>'+
       (live?'<span class="ms-beta on">'+esc(T("LIVE · Win this week"))+'</span>':'<span class="ms-beta">'+esc(T("BETA · Coming soon: win rewards"))+'</span>')+
       '<div class="ms-h" role="heading" aria-level="2">'+esc(T("Can you win the weekly challenge?"))+'</div></div>'+
-      '<div class="ms-pv" aria-hidden="true"><canvas id="mpv" width="120" height="180" style="background:#0c1220 url(img/game/card-3d-flight.webp?v=e3t) center/cover"></canvas><i>LIVE</i></div></div>'+
+      '<div class="ms-pv" aria-hidden="true"><canvas id="mpv" width="120" height="180" style="background:#160809 url(img/game/card-3d-flight.webp?v=e3t) center/cover"></canvas><i>LIVE</i></div></div>'+
     '<div class="ms-prize"><img src="'+esc(WK.img||"img/menu/melody-fries.jpg")+'" alt=""><div><small>'+esc(T(live?"This week's prize":"Weekly prize · coming soon"))+'</small><b>'+esc(T(prize))+'</b><em>'+esc(T(live?(WK.note||"Top score of the week wins"):"The boards are live now. Prizes switch on soon."))+'</em></div></div>'+
     '<div class="ms-food" aria-label="'+esc(T("Catch the food for points"))+'">'+FOOD.map(function(f){ return '<span class="ms-f" style="--d:'+f[4]+'" title="'+esc(T(f[1]))+'">'+(f[3]?'<span class="ms-st"><i></i><i></i><i></i></span>':'')+'<img src="'+g+f[0]+'.webp?v='+(f[5]||"ag1")+'" alt="'+esc(T(f[1]))+'"><b>'+f[2]+'</b></span>'; }).join("")+'</div>'+
     '<div class="ms-mode" role="group" aria-label="'+esc(T("Game mode"))+'">'+mbtn("campaign","🏆","Campaign","10 levels · 6 bosses",cur,T,esc)+mbtn("survival","⏱️","Survival","How long can you last?",cur,T,esc)+'</div>'+
@@ -2758,7 +2760,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
 document.addEventListener("click",function(e){ var b=e.target&&e.target.closest&&e.target.closest("[data-mel=mode]"); if(!b) return; e.preventDefault(); if(window.MELODY_MODE) MELODY_MODE(b.getAttribute("data-v")); if(window.GameMenu) GameMenu.refresh(); });
 window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill",tagline:"Night dogfight over LA: 10 levels and six bosses, or Survival. Catch the food, win the week.",
  hero:[g+"card-3d-flight.webp?v=e3t",g+"card-3d-boss.webp?v=e3t",g+"card-3d-beach.webp?v=e3t"],   // the 3D game (2026-10-16), not the old 2D sprites
- theme:{bg:"#0b1220",bg2:"#1c2547",card:"#141e34",edge:"#27324d",accent:"#d4af37",accent2:"#f0d375",label:"#f0d375",ink:"#f6f1e4",dim:"#9aa3b5",btnInk:"#1a1206",soft:"rgba(255,255,255,.06)",track:"#27324d",good:"#3fbf8f",bad:"#ff7a59",
+ theme:{bg:"#1a0a0c",bg2:"#3a1a1c",card:"#2c1416",edge:"#5a2d2a",accent:"#d4af37",accent2:"#f0d375",label:"#f0d375",ink:"#f6f1e4",dim:"#c2a98f",btnInk:"#1a1206",soft:"rgba(255,255,255,.06)",track:"#5a2d2a",good:"#3fbf8f",bad:"#ff7a59",
   display:"Anton,Impact,'Arial Narrow',sans-serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
  tokens:false, showcase:showcase, preview:function(v){ if(window.__MG&&__MG.attract) __MG.attract(v); },
  mount:"#cv",start:function(){ window.MELODY_START(); },vibrate:true,

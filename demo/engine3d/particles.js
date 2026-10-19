@@ -15,16 +15,16 @@ export function makeGPUFX(THREE, scene, O = {}) {
   gr = x.createRadialGradient(192, 64, 0, 192, 64, 63); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(.3, "rgba(255,255,255,.55)"); gr.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = gr; x.fillRect(128, 0, 128, 128);
   gr = x.createLinearGradient(256, 0, 384, 0); gr.addColorStop(0, "rgba(255,255,255,0)"); gr.addColorStop(.42, "rgba(255,255,255,.5)"); gr.addColorStop(.5, "#fff"); gr.addColorStop(.58, "rgba(255,255,255,.5)"); gr.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = gr; x.fillRect(256, 8, 128, 112);
   const tex = new THREE.CanvasTexture(c);
-  const UT = { value: 0 };
+  const UT = { value: 0 }, OFF = { value: new THREE.Vector3() };
   const VS = `#include <common>
     #include <fog_pars_vertex>
-    uniform float uT; attribute vec4 aP; attribute vec4 aV; attribute vec4 aS; attribute vec4 aC0; attribute vec4 aC1; attribute float aSlot;
+    uniform float uT; uniform vec3 uOff; attribute vec4 aP; attribute vec4 aV; attribute vec4 aS; attribute vec4 aC0; attribute vec4 aC1; attribute float aSlot;
     varying vec2 vUv; varying vec4 vC; varying float vSlot;
     float hash(float n){ return fract(sin(n) * 43758.5453); }
     void main(){
       float age = uT - aP.w, life = aV.w; if (age < 0.0 || age >= life || life <= 0.0) { gl_Position = vec4(0., 0., -2., 1.); return; }
       float u = age / life, k = aS.z, rise = aS.w, e = exp(-k * age), f = k > 1e-4 ? (1.0 - e) / k : age;
-      vec3 p = aP.xyz + aV.xyz * f; p.y += k > 1e-4 ? rise * (age - f) / k : 0.5 * rise * age * age;
+      vec3 p = aP.xyz + uOff + aV.xyz * f; p.y += k > 1e-4 ? rise * (age - f) / k : 0.5 * rise * age * age;
       vec3 vel = aV.xyz * e + vec3(0., k > 1e-4 ? rise * (1.0 - e) / k : rise * age, 0.);
       float size = mix(aS.x, aS.y, u), fade = min(1.0, u * 8.0) * (1.0 - u) * (1.0 - u) * 1.3;
       vC = vec4(mix(aC0.rgb, aC1.rgb, u), aC0.a * fade); vSlot = aSlot;
@@ -53,7 +53,7 @@ export function makeGPUFX(THREE, scene, O = {}) {
     const A = {}; [["aP", 4], ["aV", 4], ["aS", 4], ["aC0", 4], ["aC1", 4], ["aSlot", 1]].forEach(([k, n]) => { A[k] = new THREE.InstancedBufferAttribute(new Float32Array(MAX * n), n); A[k].setUsage(THREE.DynamicDrawUsage); g.setAttribute(k, A[k]); });
     g.instanceCount = MAX;
     const m = new THREE.ShaderMaterial({ uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { map: { value: tex } }]), vertexShader: VS, fragmentShader: FS(blending === THREE.AdditiveBlending), transparent: true, depthWrite: false, blending, fog: !!scene.fog });
-    m.uniforms.uT = UT; m.uniforms.map.value = tex;
+    m.uniforms.uT = UT; m.uniforms.uOff = OFF; m.uniforms.map.value = tex;
     const mesh = new THREE.Mesh(g, m); mesh.frustumCulled = false; mesh.renderOrder = order; scene.add(mesh);
     return { g, A, mesh, head: 0, d0: -1, d1: -1, wrap: false }; };
   const SM = mk(THREE.NormalBlending, 130), AD = mk(THREE.AdditiveBlending, 140);
@@ -62,7 +62,7 @@ export function makeGPUFX(THREE, scene, O = {}) {
     const B = add ? AD : SM, i = B.head; B.head = (B.head + 1) % MAX; if (B.head === 0) B.wrap = true; emitted++;
     if (B.d0 < 0) B.d0 = i; B.d1 = i;
     const A = B.A; c1 = c1 || c0;
-    A.aP.array.set([p.x, p.y, p.z, T], i * 4); A.aV.array.set([v.x, v.y, v.z, life], i * 4); A.aS.array.set([s0, s1, drag || 0, rise || 0], i * 4);
+    A.aP.array.set([p.x - OFF.value.x, p.y - OFF.value.y, p.z - OFF.value.z, T], i * 4);   // (stored relative to the world offset: shift() moves every live puff with the ground) A.aV.array.set([v.x, v.y, v.z, life], i * 4); A.aS.array.set([s0, s1, drag || 0, rise || 0], i * 4);
     A.aC0.array.set([c0[0], c0[1], c0[2], a], i * 4); A.aC1.array.set([c1[0], c1[1], c1[2], 0], i * 4); A.aSlot.array[i] = slot || 0; }
   function flush(B) { if (B.d0 < 0) return; const A = B.A;
     for (const k in A) { const a = A[k], n = a.itemSize;
@@ -109,5 +109,7 @@ export function makeGPUFX(THREE, scene, O = {}) {
       V.set(n.x + (Math.random() - .5) * 1.4, n.y + (Math.random() - .5) * 1.4, n.z + (Math.random() - .5) * 1.4).normalize().multiplyScalar(sp); if (w) V.add(w);
       emit(p, V, .18 + Math.random() * .35, (.5 + Math.random() * .6) * k, .15 * k, [1, .92, .6], [1, .45, .12], 1, true, 2, 1.5, -60 * k); }
     glow(p, 9 * k, [1, .8, .5], 1); }
-  return { emit, glow, dark, update, clear, boom, sparks, meshes: [SM.mesh, AD.mesh, GL.mesh, DK.mesh], stats: () => ({ emitted, max: MAX }), gpu: true };
+  // the ground slid sideways under the camera (Melody lateral roam): every live smoke/fire/dust puff slides with it, so it stays where it was emitted
+  function shift(dx, dz) { OFF.value.x += dx; OFF.value.z += dz || 0; }
+  return { emit, glow, dark, update, clear, boom, sparks, shift, meshes: [SM.mesh, AD.mesh, GL.mesh, DK.mesh], stats: () => ({ emitted, max: MAX }), gpu: true };
 }

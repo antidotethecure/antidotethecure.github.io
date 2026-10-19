@@ -221,7 +221,7 @@ export function makeBeachKit(THREE, K) {
       for (const c of list) { c.p.visible = near; if (!near) continue;
         if (c.tick) c.tick(c, t, dt); if (c.wave > 0) c.wave = Math.max(0, c.wave - dt * .45); if (c.duck > 0) c.duck -= dt;
         if (c.flee > 0) { c.flee -= dt; c.ox += c.fvx * dt; c.oz += c.fvz * dt; }
-        const [clip, dy] = clipOf(c, t), moving = c.flee > 0;
+        const moving = c.flee > 0, [clip, dy] = moving ? ["coverRun", 0] : clipOf(c, t);   // scattering people RUN (2026-10-19), they don't slide
         const yaw = moving ? Math.atan2(c.fvx, c.fvz) : c.ry;
         c.p.set(c.x + c.ox, c.y + dy, c.z + c.oz, yaw); c.p.play(clip);
         c.p.umbrella = RAIN.v > .35 && ((c.umb && c.pose === "walk") || c.pose === "stand") && !moving; } }

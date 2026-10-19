@@ -470,7 +470,7 @@ export function makeWorld(THREE, O = {}) {
     const blk = o.block || [], hitsBlk = (x0, x1, z0, z1) => blk.some(b => x1 > b[0] - b[2] / 2 && x0 < b[0] + b[2] / 2 && z1 > b[1] - b[3] / 2 && z0 < b[1] + b[3] / 2);
     const AV = AVE.filter(ax => !hitsBlk(ax - ROAD / 2 - SIDE, ax + ROAD / 2 + SIDE, -len / 2, len / 2) && !(o.reserve || []).includes(ax)), ST = streetsOf(len).filter(z => !hitsBlk(-XW / 2, XW / 2, z - ROAD / 2 - SIDE, z + ROAD / 2 + SIDE));
     if (seg.roads) seg.roads.push({ grid: 1, ox, aves: AVE, strs: streetsOf(len), x0: ox - XW / 2, x1: ox + XW / 2 });
-    if (seg.blocked) blk.forEach(b => seg.blocked.push([b[0] + ox, b[1], b[2], b[3]]));
+    if (seg.blocked && !o.noAuditBlock) blk.forEach(b => seg.blocked.push([b[0] + ox, b[1], b[2], b[3]]));
     // a review billboard beside the flight path on most city strips (in the lot between the 1st and 2nd avenue)
     let sd0; if (!o.noBillboard && (sd0 = bbDue())) { const sd = sd0, bx = sd * (196 + R() * 26), bz = (R() - .5) * len * .45; clear.push([bx, bz, 90, 60]); billboard(seg.group, bx, bz, -sd * .28); }
     const free = (x, z, w, d) => !clear.some(c => Math.abs(x - c[0]) < (w + c[2]) / 2 && Math.abs(z - c[1]) < (d + c[3]) / 2);
@@ -1210,6 +1210,42 @@ export function makeWorld(THREE, O = {}) {
         for (let k = 0; k < 2; k++) if (Math.random() < dt * 3 && fans.length) { const c = fans[(Math.random() * fans.length) | 0]; FX.glow(SMP.set(seg.group.position.x + c.x, 8, seg.group.position.z + c.z), 7, [.85, .9, 1], .9); } } });   // camera flashes + phone screens
     seg.premiere = { x: tx, z: vz }; seg.focus = { x: tx + 40, z: vz, y: 6, d: 200, h: 95 }; lmCount.walkOfFame = (lmCount.walkOfFame || 0) + (WARM ? 0 : 1); }
 
+  /* THE 105 (2026-10-19, Antidote's route part 2): the Glenn Anderson Freeway down the middle of the flight lane. Four lanes each way
+     with traffic both directions, the Metro C Line (Green Line) tracks + catenary + a train in the median, concrete median barriers,
+     sound walls, the cross streets carried over it on bridges, overhead "I-105" signs. The city grid either side keeps its avenues;
+     cross streets have no traffic (they bridge the freeway). Every freeway car is on a registered road (road audit). */
+  let FWY = null;
+  function freeway105(seg, R, len) { const FW = 112;
+    if (!FWY) { const sg = mkc(512, 160), x = sg.getContext("2d"); x.fillStyle = "#0f6b3a"; x.fillRect(0, 0, 512, 160); x.strokeStyle = "#fff"; x.lineWidth = 6; x.strokeRect(6, 6, 500, 148);
+        x.fillStyle = "#fff"; x.beginPath(); x.moveTo(40, 34); x.lineTo(140, 34); x.lineTo(140, 92); x.quadraticCurveTo(140, 140, 90, 150); x.quadraticCurveTo(40, 140, 40, 92); x.closePath(); x.fill();
+        x.fillStyle = "#1d3f9c"; x.beginPath(); x.moveTo(48, 58); x.lineTo(132, 58); x.lineTo(132, 92); x.quadraticCurveTo(132, 132, 90, 142); x.quadraticCurveTo(48, 132, 48, 92); x.closePath(); x.fill(); x.fillStyle = "#c8202c"; x.fillRect(48, 40, 84, 18);
+        x.fillStyle = "#fff"; x.font = "900 40px Arial,sans-serif"; x.textAlign = "center"; x.fillText("105", 90, 112); x.font = "800 50px Arial,sans-serif"; x.textAlign = "left"; x.fillText("I-105 WEST", 165, 72); x.font = "700 34px Arial,sans-serif"; x.fillText("LAX · El Segundo", 165, 124);
+        FWY = { sign: new THREE.MeshBasicMaterial({ map: tex(sg, false), toneMapped: false, color: new THREE.Color(.9, .9, .9) }), conc: new THREE.MeshLambertMaterial({ color: 0xb9b3a8 }), wall: new THREE.MeshLambertMaterial({ color: 0xc9b89a }), asph: new THREE.MeshLambertMaterial({ color: 0x2a2b30 }), ball: new THREE.MeshLambertMaterial({ color: 0x6b6258 }), rail: new THREE.MeshLambertMaterial({ color: 0x3a3a3e }), train: new THREE.MeshStandardMaterial({ color: 0xd8dade, roughness: .35, metalness: .5 }), stripe: new THREE.MeshBasicMaterial({ color: 0x2bb34a }) }; }
+    city(seg, R, len, { res: true, mixed: true, style: "res", cars: 22, hmul: .5, block: [[0, 0, FW + 30, len + 40]], noAuditBlock: true, noBillboard: true });
+    const G = new THREE.Group(); seg.group.add(G);
+    G.add(mesh(new THREE.PlaneGeometry(FW, len).rotateX(-Math.PI / 2), FWY.asph, 0, .45, 0));
+    const marks = []; for (const sd of [-1, 1]) { for (const lx of [14, 22, 30]) for (let z = -len / 2 + 6; z < len / 2; z += 22) marks.push([new THREE.PlaneGeometry(.8, 10).rotateX(-Math.PI / 2), T4(sd * lx, .5, z)]); marks.push([new THREE.PlaneGeometry(.8, len).rotateX(-Math.PI / 2), T4(sd * 39, .5, 0)], [new THREE.PlaneGeometry(.8, len).rotateX(-Math.PI / 2), T4(sd * 11, .5, 0)]); }
+    G.add(mesh(merge(marks), M.white));
+    G.add(mesh(new THREE.BoxGeometry(18, .6, len).translate(0, .6, 0), FWY.ball));   // the C Line's ballast in the median
+    G.add(mesh(merge([[new THREE.BoxGeometry(1.2, 3, len), T4(-9.5, 1.5, 0)], [new THREE.BoxGeometry(1.2, 3, len), T4(9.5, 1.5, 0)]]), FWY.conc));   // median barriers
+    G.add(mesh(merge([-5.5, -3.5, 3.5, 5.5].map(rx => [new THREE.BoxGeometry(.4, .5, len), T4(rx, 1.1, 0)])), FWY.rail));
+    const cat = []; for (let z = -len / 2 + 10; z < len / 2; z += 40) cat.push([new THREE.BoxGeometry(.6, 13, .6), T4(0, 6.5, z)], [new THREE.BoxGeometry(14, .5, .5), T4(0, 12.5, z)]); cat.push([new THREE.BoxGeometry(.15, .15, len), T4(-4.5, 11.8, 0)], [new THREE.BoxGeometry(.15, .15, len), T4(4.5, 11.8, 0)]); G.add(mesh(merge(cat), M.dark));
+    G.add(mesh(merge([[new THREE.BoxGeometry(1.4, 9, len), T4(-FW / 2 - 1, 4.5, 0)], [new THREE.BoxGeometry(1.4, 9, len), T4(FW / 2 + 1, 4.5, 0)]]), FWY.wall));   // sound walls
+    // bridges carrying the cross streets over the freeway
+    const br = []; streetsOf(len).forEach(z => { br.push([new THREE.BoxGeometry(FW + 30, 2.4, 34), T4(0, 13, z)], [new THREE.BoxGeometry(FW + 30, 2, .6), T4(0, 15, z - 16.6)], [new THREE.BoxGeometry(FW + 30, 2, .6), T4(0, 15, z + 16.6)]); for (const px of [-FW / 2 + 2, 0, FW / 2 - 2]) br.push([new THREE.BoxGeometry(2.6, 12, 10), T4(px, 6, z)]); });
+    if (br.length) G.add(mesh(merge(br), FWY.conc));
+    // an overhead sign gantry
+    const gz = -len * .3; G.add(mesh(merge([[new THREE.BoxGeometry(1.2, 22, 1.2), T4(-FW / 2 + 1, 11, gz)], [new THREE.BoxGeometry(1.2, 22, 1.2), T4(-2, 11, gz)], [new THREE.BoxGeometry(FW / 2, 1.2, 1.2), T4(-FW / 4, 21, gz)], [new THREE.BoxGeometry(1.2, 22, 1.2), T4(FW / 2 - 1, 11, gz)], [new THREE.BoxGeometry(1.2, 22, 1.2), T4(2, 11, gz)], [new THREE.BoxGeometry(FW / 2, 1.2, 1.2), T4(FW / 4, 21, gz)]]), M.dark));
+    for (const sx of [-1, 1]) G.add(mesh(new THREE.PlaneGeometry(40, 12.5), FWY.sign, sx * FW / 4, 26, gz + .8));
+    // traffic both ways (4 lanes each), on a registered road
+    seg.roads.push({ strip: [-FW / 2, FW / 2, -len / 2, len / 2] });
+    cars(seg, R, 34, len, [["z", -16, 1], ["z", -24, 1], ["z", -32, 1], ["z", 16, -1], ["z", 24, -1], ["z", 32, -1], ["z", 36, -1], ["z", -36, 1]]);
+    // a C Line train (3 cars, silver with the line's green stripe) running the median
+    const tr = new THREE.Group(); for (let k = 0; k < 3; k++) { tr.add(mesh(new THREE.BoxGeometry(5.6, 6, 27).translate(0, 4.6, k * 28.5), FWY.train), mesh(new THREE.BoxGeometry(5.7, .8, 27).translate(0, 3.2, k * 28.5), FWY.stripe)); } G.add(tr);
+    const dir = R() < .5 ? 1 : -1; tr.position.x = dir > 0 ? -4.5 : 4.5;
+    seg.tick.push((t) => { tr.position.z = dir * ((((t * 52) % (len + 120)) - len / 2 - 60)) - 28; });
+    seg.f105 = true; lmCount.f105 = (lmCount.f105 || 0) + (WARM ? 0 : 1); }
+
   // downtown signature towers (generic look-alikes): a stepped cylinder with a lit crown and a slim tower with a sail roof + spire
   function dtlaIcons(seg, side, zc) {   /* (both stand inside the block at zc: never on a street) */ const glass = new THREE.MeshStandardMaterial({ color: 0x5f7486, roughness: .2, metalness: .6, emissive: 0x1a2430, emissiveIntensity: .6 });
     const a = new THREE.Group(); a.position.set(side * 640, 0, zc); seg.group.add(a);
@@ -1242,6 +1278,7 @@ export function makeWorld(THREE, O = {}) {
     else if (kind === "longbeach" || kind === "harbor") longBeach(seg, R, len, kind);
     else if (kind === "compton") streetNames(seg, len, city(seg, R, len, { res: true, mixed: true, style: "res", cars: 22, hmul: .45, palmGap: 40, parked: 30, bstyle: (R2) => R2() < .7 ? 0 : 3 }));
     else if (kind === "civic") { const sb = superBlock(len); streetNames(seg, len, city(seg, R, len, { res: true, style: "res", cars: 22, palmGap: 40, block: [[0, sb.zc, 264, sb.depth - 2]], noBillboard: true })); civic(seg, R, len, sb.zc, sb.depth); }
+    else if (kind === "f105") freeway105(seg, R, len);
     else if (kind === "hwdblvd") { const vz = midBlock(len).zc, tx = HB_X - ROAD / 2 - SIDE - 38; hollywoodBlvd(seg, R, len, city(seg, R, len, { cars: 26, hmul: .85, reserve: [HB_X], noBillboard: true, clear: [[tx, vz, 90, 96]] }), vz); }
     else if (kind === "irvine") city(seg, R, len, { style: "oc", cars: 26, hmul: .5, hmin: 18, palmGap: 64, bstyle: (R2) => R2() < .55 ? 1 : R2() < .6 ? 3 : 0, tints: { 0: ["#f3eee4", "#efe6d6", "#e8dcc6"], 1: ["#b9c9d6", "#9fb4c4", "#cfd9e0"], 3: ["#e9e5dc", "#ddd7cc"] } });
     else if (kind === "dtla") { const mb = midBlock(len); city(seg, R, len, { tall: 2, hmul: 1.6, cars: 32, clear: [[side * 640, mb.zc, 110, 110], [-side * 650, mb.zc, 100, 80]], bstyle: (R2, h) => h > 90 ? (R2() < .7 ? 1 : 3) : FAC.pick(R2, h) }); dtlaIcons(seg, side, mb.zc); }

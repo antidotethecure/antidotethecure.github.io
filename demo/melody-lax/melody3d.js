@@ -54,7 +54,7 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=e3t") : null, WORLDM = CHASE ? await import("./world3d.js?v=dx1") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=e3t") : null, WORLDM = CHASE ? await import("./world3d.js?v=rt1") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
   const QM = await import("../engine3d/quality.js?v=e3t");
@@ -894,7 +894,7 @@ async function boot() {
   /* ---------------- chase view: the 3D ground, breaking buildings, the Easter egg, wounds ---------------- */
   const BBF = { f: new THREE.Frustum(), m: new THREE.Matrix4(), s: new THREE.Sphere() };
   const SEGS = new Map(), KIND = { runway: "runway", city: "city", towers: "towers", melody: "melody", stadium: "stadium", hills: "hills", coast: "coast", venice: "venice", pier: "pier",
-    oceanave: "oceanave", hollywood: "hollywood", longbeach: "longbeach", harbor: "harbor", compton: "compton", civic: "civic", mountains: "mountains", irvine: "irvine", ocstadium: "ocstadium", octown: "octown", dtla: "dtla", valley: "valley", hwdblvd: "hwdblvd" };   // the route's districts (index.html ZONES)
+    oceanave: "oceanave", hollywood: "hollywood", longbeach: "longbeach", harbor: "harbor", compton: "compton", civic: "civic", mountains: "mountains", irvine: "irvine", ocstadium: "ocstadium", octown: "octown", dtla: "dtla", valley: "valley", hwdblvd: "hwdblvd", f105: "f105" };   // the route's districts (index.html ZONES)
   const V2 = new THREE.Vector3(), WV = new THREE.Vector3();
   let segSeed = 1, eggRun = -1, eggSeg = null, clipCD = 0, lastHp = 100; const FLY = { seg: null, ok: false, hp: 100 };
   /* mountains on the horizon (the San Gabriels behind the Valley): one silhouette wall that rides ahead of the camera, shown in those districts */
@@ -1134,7 +1134,7 @@ async function boot() {
       [0, 1].forEach(pg => { try { front(birdGet(pg), i++); } catch (e) {} });
       if (APXM) try { front(apexMesh(), i++); BEAMM.forEach(m => { m.visible = true; m.position.set(0, 100, z0); tmp.push(m); }); } catch (e) {}
       if (BLIMP3) front(BLIMP3.node, i++); front(blimp, i++); if (PLY) { PLY.visible = true; tmp.push(PLY); }
-      ["city", "towers", "melody", "stadium", "hills", "coast", "venice", "pier", "runway", "compton", "civic", "longbeach", "hwdblvd"].forEach((k, j) => { try { const sg = WORLD.segment(k, 700, 9000 + j, { side: j % 2 ? 1 : -1, noStrip: true, warm: true }); sg.group.position.z = z0 - 300; scene.add(sg.group); sg.update(now / 1000, .016, true); segs.push(sg); } catch (e) {} });
+      ["city", "towers", "melody", "stadium", "hills", "coast", "venice", "pier", "runway", "compton", "civic", "longbeach", "hwdblvd", "f105"].forEach((k, j) => { try { const sg = WORLD.segment(k, 700, 9000 + j, { side: j % 2 ? 1 : -1, noStrip: true, warm: true }); sg.group.position.z = z0 - 300; scene.add(sg.group); sg.update(now / 1000, .016, true); segs.push(sg); } catch (e) {} });
       if (COMBAT && COMBAT._warm) COMBAT._warm(true, V.set(0, 100, z0));
       SM.makeTranslation(0, 100, z0); SLUG.body.setMatrixAt(0, SM); SLUG.tip.setMatrixAt(0, SM); SLUG.body.count = SLUG.tip.count = 1;   // (compile the slug shaders too)
       BATCHES.forEach(b => { b.begin(); b.w(0, 100, z0, 10, 10, 0, UV.dot, 1, 1, 1, .5); b.end(); });

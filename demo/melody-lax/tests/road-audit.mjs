@@ -8,7 +8,7 @@
 // every car (moving + parked, every ground strip in range) must be on a drawn street lane and outside every landmark footprint.
 import { chromium } from 'playwright-core';
 const [base, secs = '20'] = process.argv.slice(2);
-const zones = (process.env.ZONES || 'lax,venice,santamonica,hollywood,longbeach,compton,sangabriel,oc,dtla,valley').split(',');
+const zones = (process.env.ZONES || 'melody,lax105,venice,compton,longbeach,hollywood').split(',');
 const b = await chromium.launch({ executablePath: process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });
 let total = 0, totalBad = 0; const out = {}, errs = [];
 for (const z of zones) {

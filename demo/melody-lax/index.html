@@ -255,7 +255,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 
 <section class="msec" id="sec-games" data-tab="games">
 <h2 id="play"><small>Play &amp; earn points</small>Fly the Melody approach</h2>
-<p class="sub">A night dogfight over LA. <b>Campaign:</b> 10 levels that follow a real SoCal route: from LAX over Westchester, Venice and Santa Monica to Hollywood, then a loop back down to Long Beach, Compton, the San Gabriel Mountains, Orange County, downtown LA and the Valley, each a little harder, with six bosses (an Army gunship, the Super Jet, a big jet and its escorts, a rocket ship, an army base and a final flock of white birds), then land back at LAX. <b>Survival:</b> no finish line, it just keeps getting harder: how long can you last? Catch Melody's food as it floats by. Drag anywhere on the game and the plane glides to your finger; tap ⚡ for a speed boost and grab the hourglass for slow-mo. Prefer a calm flight? Pause and turn combat off. <b>BETA:</b> weekly prizes switch on soon; the boards are live now.</p>
+<p class="sub">A night dogfight over LA. <b>Campaign:</b> 10 levels that follow a real SoCal route in six parts: take off past Melody and over Inglewood, ride the 105 freeway to LAX, Nalu Vida on the Venice Pier, Compton, Long Beach and the Queen Mary, then Hollywood for the finale, each a little harder, with six bosses (an Army gunship, the Super Jet, a big jet and its escorts, a rocket ship, an army base and a final flock of white birds), then land back at LAX. <b>Survival:</b> no finish line, it just keeps getting harder: how long can you last? Catch Melody's food as it floats by. Drag anywhere on the game and the plane glides to your finger; tap ⚡ for a speed boost and grab the hourglass for slow-mo. Prefer a calm flight? Pause and turn combat off. <b>BETA:</b> weekly prizes switch on soon; the boards are live now.</p>
 <div class="gamebox">
   <div class="hud">
     <span>Score <span class="sc" id="score">0</span></span>
@@ -569,7 +569,7 @@ var CX0=cx, CH=0;
 /* MAGNET_R: pickups (food, coins, Drizzle tokens, mic, crates, health, power-ups) within this radius of the plane are pulled in —
    an accelerating zoom, altitude ignored — so you can't miss them because you couldn't tell if they were above or below you.
    Enemy fire and hazards are never in G.items, so they're never pulled. A magnet power-up (if one is added) can set G.magnetMul. */
-var MAGNET_R=PLANE_W*1.8;
+var MAGNET_R=PLANE_W*2.6;   // 2026-10-19 (Antidote: "make collectibles magnetic"): bigger reach, and in the chase view anything in your lane ahead is pulled in whatever your altitude
 var ALT_LO=9, ALT_HI=330, ALT_DEF=140, ALT_WARN=ALT_LO+32;   // chase view: fly right down to the street and high over the skyline (2026-10-19, Antidote: "fly higher and lower"); the lowest 32 units are the "too low" band
 /* the band things SPAWN in (UFO lanes, food heights) stays exactly where it was before the wider flight envelope, so the game itself is unchanged */
 var SPAWN_LO=16, SPAWN_HI=215;
@@ -731,18 +731,18 @@ var SEQ=["city","towers","city","melody","city","city","stadium","city","towers"
    LAX → Melody (Westchester) → Venice / Nalu Vida → Santa Monica → Hollywood, then a banking turn through the clouds back down
    the coast to Long Beach → Compton → the San Gabriels → Orange County → downtown LA → the San Fernando Valley, then home to LAX.
    seq: the ground strips of that district, looped while you're in it (kinds built by world3d.js). Survival keeps cycling the route. */
-var ZONES=[{id:"lax",name:"LAX · Westchester",seq:["city","melody","city","towers"]},
-  {id:"venice",name:"Venice Beach",seq:["coast","venice","coast","city"]},
-  {id:"santamonica",name:"Santa Monica",seq:["oceanave","pier","oceanave","coast"]},
-  {id:"hollywood",name:"Hollywood",seq:["hwdblvd","hollywood","hills","hwdblvd"]},
-  {id:"longbeach",name:"Long Beach",seq:["longbeach","harbor","harbor"],loop:1},
-  {id:"compton",name:"Compton",seq:["civic","compton","compton","compton","compton","compton"]},
-  {id:"sangabriel",name:"San Gabriel Mountains",seq:["mountains","mountains","mountains"]},
-  {id:"oc",name:"Orange County",seq:["irvine","ocstadium","irvine","octown"]},
-  {id:"dtla",name:"Downtown LA",seq:["towers","dtla","towers","dtla"]},
-  {id:"valley",name:"San Fernando Valley",seq:["valley","valley","valley"]}];
-var CALM_ZONE=[0,1,2,3,4];   // the calm flight's 5 legs
-function zoneIx(lv){ lv=lv||G.lvl||1; return CALM?CALM_ZONE[Math.max(0,Math.min(4,lv-1))]:(lv-1)%ZONES.length; }
+var ZONES=[{id:"melody",name:"Melody · Inglewood",seq:["melody","city","city","towers"]},
+  {id:"lax105",name:"The 105 · LAX",seq:["f105","f105","f105"]},
+  {id:"venice",name:"Nalu Vida · Venice Pier",seq:["coast","venice","coast","city"]},
+  {id:"compton",name:"Compton",seq:["civic","compton","compton","compton","compton","compton"],loop:1},
+  {id:"longbeach",name:"Long Beach",seq:["longbeach","harbor","harbor"]},
+  {id:"hollywood",name:"Hollywood",seq:["hwdblvd","hollywood","hills","hwdblvd"],loop:1}];
+/* ROUTE ORDER (2026-10-19, Antidote): 1 Melody + Inglewood · 2 LAX + the 105 · 3 Nalu Vida · 4 Compton · 5 Long Beach · 6 Hollywood
+   (the mountains are gone). Levels → parts: the 10-level campaign walks the 6 parts in order (ZONE_OF_LV); the 5-leg calm flight
+   uses CALM_ZONE; Survival keeps cycling the campaign table. Scenery only: rules, scores and the difficulty curve are untouched. */
+var ZONE_OF_LV=[0,0,1,1,2,2,3,4,4,5];
+var CALM_ZONE=[0,1,2,4,5];   // the calm flight's 5 legs (Compton is skipped in the short scenic version)
+function zoneIx(lv){ lv=lv||G.lvl||1; return CALM?CALM_ZONE[Math.max(0,Math.min(4,lv-1))]:ZONE_OF_LV[(lv-1)%ZONE_OF_LV.length]; }
 function zoneNow(){ var q=new URLSearchParams(location.search).get("zone"); if(q){ for(var i=0;i<ZONES.length;i++) if(ZONES[i].id===q) return i; } return zoneIx(); }   /* ?zone=compton (testing / screenshots) */
 var COAST={coast:1,venice:1,pier:1};
 // labels: only the owner's own two spots are named. No landmark, venue, sign or neighborhood-landmark names anywhere (2026-10 branding pass)
@@ -750,7 +750,7 @@ var LBL={venice:"★ NALU VIDA ★",melody:"★ MELODY BAR & GRILL ★"};
 function seedGround(){ G.ground=[]; G.gy=H+100; G.seq=0; G.ground.push({k:"runway",t:"city1",y:G.gy-520,h:520,side:1}); G.gy-=520; while(G.gy>-400) addSeg(); }
 // photoreal aerial ground (dusk): every segment is a full-width aerial tile; landmark sprites sit on top of a city tile
 var TILE_OF={city:["city1","city2"],towers:["city2"],melody:["city1"],stadium:["city1"],hills:["hills"],coast:["venicecoast"],venice:["nalu"],pier:["pier"],
-  oceanave:["venicecoast"],octown:["venicecoast"],hollywood:["hills"],mountains:["hills"],longbeach:["pier"],harbor:["venicecoast"],compton:["city1"],civic:["city1"],irvine:["city2"],ocstadium:["city1"],dtla:["city2"],valley:["city1"],hwdblvd:["city2"]};
+  oceanave:["venicecoast"],octown:["venicecoast"],hollywood:["hills"],mountains:["hills"],longbeach:["pier"],harbor:["venicecoast"],compton:["city1"],civic:["city1"],irvine:["city2"],ocstadium:["city1"],dtla:["city2"],valley:["city1"],hwdblvd:["city2"],f105:["city2"]};
 var TILES={}, TILE_FEATHER=56;
 ["city1","city2","hills","venicecoast","nalu","pier"].forEach(function(k){ var i=img("img/game/ground/"+k+".jpg"); i.onload=function(){ // pre-render once: the tile's own bottom edge fades out over the tile below
   var w=W*2, h=Math.round(w*i.naturalHeight/i.naturalWidth), F=TILE_FEATHER*2, c=document.createElement("canvas"); c.width=w; c.height=h; var x=c.getContext("2d"); x.drawImage(i,0,0,w,h);
@@ -2360,9 +2360,10 @@ function frame(now){
   // pickups
   for(var i=G.items.length-1;i>=0;i--){ var it=G.items[i]; if(CH&&it.z3==null) it.z3=it.ammo?G.alt3:SPAWN_LO+16+Math.random()*(SPAWN_HI-SPAWN_LO-36); if(run&&it.t==="slow"){ if(slowMove(it,k,dt)){ G.items.splice(i,1); continue; } } else if(run){ if(it.ammo){ it.y-=1.35*k; if(it.y<-70){ G.items.splice(i,1); continue; } } else it.y+=spd*(it.t==="crate"?.8:it.t==="driz"?.95:1.15)*k; if(it.rot!=null) it.rot+=(it.vr||0)*k; if(it.t==="driz"){ it.ph+=.03*k; it.x=it.x0+Math.sin(it.ph)*14; } }
     if(run&&!G.dying&&!it.ammo){ var mdx=G.x-it.x, mdy=G.y-it.y, md=Math.hypot(mdx,mdy), MR=MAGNET_R*(G.magnetMul||1);
-      if(md<MR||it.mag){ if(!it.mag){ it.mag=.001; SND.play("whoosh"); } it.mag+=dt/1000; var stp=Math.min(md,(1.5+it.mag*it.mag*260)*k);   // ease-in: slow start, then zooms in
+      if(md<MR||it.mag||(CH&&Math.abs(mdx)<MR*.8&&mdy>-50&&mdy<MR*1.5)){ if(!it.mag){ it.mag=.001; SND.play("whoosh"); } it.mag+=dt/1000; var stp=Math.min(md,(2.5+it.mag*it.mag*420)*k);   // ease-in: slow start, then zooms in
         if(md>.5){ it.x+=mdx/md*stp; it.y+=mdy/md*stp; if(it.x0!=null) it.x0+=mdx/md*stp; }
-        if(CH&&it.z3!=null) it.z3+=(G.alt3-it.z3)*Math.min(1,dt/1000*9); } }
+        if(Math.random()<.45) G.fx.push({k:"e",x:it.x+(Math.random()-.5)*10,y:it.y+(Math.random()-.5)*10,vx:-mdx/(md||1)*.6,vy:-mdy/(md||1)*.6,s:2,g:0,a:.85});   // a little sparkle trail
+        if(CH&&it.z3!=null) it.z3+=(G.alt3-it.z3)*Math.min(1,dt/1000*16); } }   /* (altitude never matters for pickups; hazards still use zOK) */
     if(it.y>H+60){ if(it.t==="crate"&&!G.gotCrate) G.crateT=9000;
       if(run&&it.t==="food"){ if(G.streak>=3) pop(Math.max(50,Math.min(W-50,it.x)),H-36,T("Missed it · streak ends"),"#9aa3b5"); else pop(Math.max(40,Math.min(W-40,it.x)),H-36,T("missed it"),"#9aa3b5"); G.streak=0; }
       G.items.splice(i,1); continue; }
@@ -2375,7 +2376,7 @@ function frame(now){
     else if(it.t==="heal") drawHeal(it,now);
     else if(!R3){ var P=it.t==="mic"?MIC:it.p, bob=Math.sin(now/260+it.x)*3; var gl=cx.createRadialGradient(it.x,it.y,4,it.x,it.y,P.w*.9); gl.addColorStop(0,it.t==="mic"?"rgba(228,107,131,.55)":"rgba(255,226,140,.6)"); gl.addColorStop(1,"rgba(0,0,0,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(it.x,it.y,P.w*.9,0,6.283); cx.fill(); sprite(P.im,it.x,it.y+bob,P.w,it.rot,false,P.e);
       if(it.t==="food"){ if(P.drink) drinkSheen(P,it.x,it.y+bob,now); else steam(it.x,it.y+bob,P.w,now); } }
-    if(run&&Math.abs(it.x-G.x)<it.r+26&&Math.abs(it.y-G.y)<it.r+28&&(it.mag||zOK(it,it.r+26))){   /* pulled-in pickups ignore altitude */
+    if(run&&Math.abs(it.x-G.x)<it.r+26&&Math.abs(it.y-G.y)<it.r+28){   /* pickups ignore altitude entirely (hazards keep zOK) */
       if((it.t==="crate"||it.t==="heal"||it.t==="mic")&&performance.now()-pickT>20000){ pickT=performance.now(); radio(it.t==="crate"?"Nice pickup! Ammo restocked.":it.t==="heal"?"Nice pickup! Patching you up.":"Nice pickup! Double score, sing it!",{tone:"info",ms:2200}); }
       if(it.t==="slow") slowOn();
       else if(it.t==="boost") boostOn(true);
@@ -2677,7 +2678,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=dx1"></script>
+<script type="module" src="melody3d.js?v=rt1"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}

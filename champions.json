@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-11T23:00:07-07:00",
-  "week": "2026-10-05",
+  "updated": "2026-10-18T23:00:10-07:00",
+  "week": "2026-10-12",
   "closes": "Sunday 11:00 PM (Los Angeles)",
   "games": {
     "melody": {
@@ -8,30 +8,35 @@
       "gameName": "Melody Flight",
       "restaurant": "Melody Bar & Grill",
       "slug": "melody-lax",
-      "week": "2026-10-05",
+      "week": "2026-10-12",
       "top3": [
         {
-          "name": "Antidote",
+          "name": "Anthony",
           "ig": "TheRealAntidote",
-          "score": 11372,
+          "score": 60726,
           "rank": 1,
           "prize": "Half off your meal"
         },
         {
-          "name": "hnm",
-          "ig": "",
-          "score": 5876,
+          "name": "Antidote",
+          "ig": "TheRealAntidote",
+          "score": 24995,
           "rank": 2,
-          "prize": "Free signature item"
-        },
-        {
-          "name": "Sami",
-          "ig": "",
-          "score": 1390,
-          "rank": 3,
           "prize": "Free signature item"
         }
       ],
+      "prize": {
+        "first": "Half off your meal",
+        "second_third": "Free signature item"
+      }
+    },
+    "melody-survival": {
+      "game": "melody-survival",
+      "gameName": "Melody Survival (seconds survived)",
+      "restaurant": "Melody Bar & Grill",
+      "slug": "melody-lax",
+      "week": "2026-10-12",
+      "top3": [],
       "prize": {
         "first": "Half off your meal",
         "second_third": "Free signature item"
@@ -42,16 +47,8 @@
       "gameName": "Ride the Nalu",
       "restaurant": "Nalu Vida",
       "slug": "nalu-vida",
-      "week": "2026-10-05",
-      "top3": [
-        {
-          "name": "Anthony",
-          "ig": "",
-          "score": 25860,
-          "rank": 1,
-          "prize": "Half off your meal"
-        }
-      ],
+      "week": "2026-10-12",
+      "top3": [],
       "prize": {
         "first": "Half off your meal",
         "second_third": "Free signature item"
@@ -62,7 +59,7 @@
       "gameName": "Storm Run",
       "restaurant": "StormBurger",
       "slug": "storm-burger",
-      "week": "2026-10-05",
+      "week": "2026-10-12",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -74,7 +71,7 @@
       "gameName": "Order Up!",
       "restaurant": "Gritz N Wafflez",
       "slug": "gritz-n-wafflez",
-      "week": "2026-10-05",
+      "week": "2026-10-12",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -86,7 +83,7 @@
       "gameName": "Loco Match",
       "restaurant": "Churrito Loco",
       "slug": "churrito-loco",
-      "week": "2026-10-05",
+      "week": "2026-10-12",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -98,7 +95,7 @@
       "gameName": "Hibachi Catch",
       "restaurant": "Lucky Dragon Hibachi",
       "slug": "lucky-dragon",
-      "week": "2026-10-05",
+      "week": "2026-10-12",
       "top3": [],
       "prize": {
         "first": "Half off your meal",

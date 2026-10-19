@@ -731,7 +731,7 @@ var SEQ=["city","towers","city","melody","city","city","stadium","city","towers"
    LAX → Melody (Westchester) → Venice / Nalu Vida → Santa Monica → Hollywood, then a banking turn through the clouds back down
    the coast to Long Beach → Compton → the San Gabriels → Orange County → downtown LA → the San Fernando Valley, then home to LAX.
    seq: the ground strips of that district, looped while you're in it (kinds built by world3d.js). Survival keeps cycling the route. */
-var ZONES=[{id:"melody",name:"Melody · Inglewood",seq:["melody","city","city","towers"]},
+var ZONES=[{id:"melody",name:"Melody · Inglewood",seq:["melody","city","sofi","inglewood","city"]},
   {id:"lax105",name:"The 105 · LAX",seq:["f105","f105","f105"]},
   {id:"venice",name:"Nalu Vida · Venice Pier",seq:["coast","venice","coast","city"]},
   {id:"compton",name:"Compton",seq:["civic","compton","compton","compton","compton","compton"],loop:1},
@@ -750,7 +750,7 @@ var LBL={venice:"★ NALU VIDA ★",melody:"★ MELODY BAR & GRILL ★"};
 function seedGround(){ G.ground=[]; G.gy=H+100; G.seq=0; G.ground.push({k:"runway",t:"city1",y:G.gy-520,h:520,side:1}); G.gy-=520; while(G.gy>-400) addSeg(); }
 // photoreal aerial ground (dusk): every segment is a full-width aerial tile; landmark sprites sit on top of a city tile
 var TILE_OF={city:["city1","city2"],towers:["city2"],melody:["city1"],stadium:["city1"],hills:["hills"],coast:["venicecoast"],venice:["nalu"],pier:["pier"],
-  oceanave:["venicecoast"],octown:["venicecoast"],hollywood:["hills"],mountains:["hills"],longbeach:["pier"],harbor:["venicecoast"],compton:["city1"],civic:["city1"],irvine:["city2"],ocstadium:["city1"],dtla:["city2"],valley:["city1"],hwdblvd:["city2"],f105:["city2"]};
+  oceanave:["venicecoast"],octown:["venicecoast"],hollywood:["hills"],mountains:["hills"],longbeach:["pier"],harbor:["venicecoast"],compton:["city1"],civic:["city1"],irvine:["city2"],ocstadium:["city1"],dtla:["city2"],valley:["city1"],hwdblvd:["city2"],f105:["city2"],sofi:["city1"],inglewood:["city1"]};
 var TILES={}, TILE_FEATHER=56;
 ["city1","city2","hills","venicecoast","nalu","pier"].forEach(function(k){ var i=img("img/game/ground/"+k+".jpg"); i.onload=function(){ // pre-render once: the tile's own bottom edge fades out over the tile below
   var w=W*2, h=Math.round(w*i.naturalHeight/i.naturalWidth), F=TILE_FEATHER*2, c=document.createElement("canvas"); c.width=w; c.height=h; var x=c.getContext("2d"); x.drawImage(i,0,0,w,h);
@@ -2678,7 +2678,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=ra1"></script>
+<script type="module" src="melody3d.js?v=ex2"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}

@@ -145,6 +145,7 @@ export function makeFX(THREE, scene, O = {}) {
     glows.length = 0; for (let i = 0; i < darks.length; i += 5) put(SM, darks[i], darks[i + 1], darks[i + 2], 0, .07, .05, .045, darks[i + 3], darks[i + 4], 1); darks.length = 0;
     [SM, AD].forEach(B => { B.g.instanceCount = B.n; [B.aP, B.aC, B.aA, B.aS].forEach(a => { a.needsUpdate = true; a.clearUpdateRanges && a.clearUpdateRanges(); }); }); }
   function clear() { parts.length = 0; glows.length = 0; }
+  function shift(dx, dz) { for (const o of parts) { o.x += dx; o.z += dz || 0; } }   // the ground slid sideways (Melody lateral roam): live puffs stay anchored
   // a full explosion at p (world units scale k): flash, fireballs, smoke column, embers
   const V = new THREE.Vector3(), P2 = new THREE.Vector3();
   function boom(p, k, wind) { const w = wind || V.set(0, 0, 0), wx = w.x, wy = w.y, wz = w.z;
@@ -154,7 +155,7 @@ export function makeFX(THREE, scene, O = {}) {
       emit(P2.copy(p).add(V.set(Math.cos(a) * 3 * k, Math.random() * 3 * k, Math.sin(a) * 3 * k)), V.set(wx + Math.cos(a) * sp, wy + e * sp, wz + Math.sin(a) * sp), .7 + Math.random() * .6, 14 * k, 40 * k, [1, .78, .35], [.9, .25, .05], 1, true, 0, 2.2, 6 * k);
       emit(P2, V.set(wx + Math.cos(a) * sp * .6, wy + e * sp * .5, wz + Math.sin(a) * sp * .6), 2.2 + Math.random() * 1.6, 12 * k, 46 * k, [.32, .29, .28], [.12, .11, .11], .6, false, 0, 1.3, 9 * k); }
     for (let i = 0; i < 26; i++) { const a = Math.random() * 6.283, sp = (30 + Math.random() * 60) * k; emit(p, V.set(wx + Math.cos(a) * sp, wy + (Math.random() * 1.4 - .2) * sp, wz + Math.sin(a) * sp), .6 + Math.random() * .8, 2.4 * k, .8 * k, [1, .85, .4], [1, .35, .1], 1, true, 1, .8, -40 * k); } }
-  return { emit, glow, dark, update, clear, boom, meshes: [SM.mesh, AD.mesh] };
+  return { shift, emit, glow, dark, update, clear, boom, meshes: [SM.mesh, AD.mesh] };
 }
 
 /* ---------- wounds on one aircraft ---------- */

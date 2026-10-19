@@ -1215,13 +1215,41 @@ export function makeWorld(THREE, O = {}) {
      sound walls, the cross streets carried over it on bridges, overhead "I-105" signs. The city grid either side keeps its avenues;
      cross streets have no traffic (they bridge the freeway). Every freeway car is on a registered road (road audit). */
   let FWY = null;
+  /* THE EXITS (2026-10-19, Antidote: "show every exit with real exit signs as you fly past, ending at LAX"). Westbound, in real order,
+     from Wikipedia's I-105 exit list (which cites Caltrans' numbered-exit system): https://en.wikipedia.org/wiki/Interstate_105_(California)
+     Exit 14 Garfield Ave is eastbound-only, so westbound it is not signed. One exit per freeway strip (EX.n carries the count across the
+     part's strips, per run); the I-605 / I-710 / I-110 / I-405 strips also get the interchange (the crossing freeway on a high deck plus
+     two flyover ramps). After the last exit (Sepulveda Blvd / LAX) the 105 ends at Imperial Hwy and the strips become the airport. */
+  const EXITS = [{ n: "18B", s: "I-605", i: "605", d: "NORTH · SOUTH" }, { n: "17", s: "Bellflower Blvd" }, { n: "16", s: "Lakewood Blvd" }, { n: "15", s: "Paramount Blvd" },
+    { n: "13", s: "I-710", i: "710", d: "Long Beach · Pasadena" }, { n: "12", s: "Long Beach Blvd" }, { n: "10", s: "Wilmington Ave" }, { n: "9", s: "Central Ave" },
+    { n: "7B", s: "I-110", i: "110", d: "Harbor Fwy" }, { n: "7A", s: "Vermont Ave" }, { n: "5", s: "Crenshaw Blvd" }, { n: "3", s: "Prairie Ave" },
+    { n: "2B", s: "I-405", i: "405", d: "Santa Monica · Long Beach" }, { n: "2A", s: "La Cienega Blvd" }, { n: "1D", s: "Nash St", d: "LAX Airport" }, { n: "1B", s: "Sepulveda Blvd", d: "LAX Airport" },
+    { end: 1, s: "Imperial Hwy", d: "END 105 · LAX" }];
+  const EX = { key: null, n: 0 }, EXSIGN = {};
+  const shield = (x, cx, cy, sc, num) => { x.save(); x.translate(cx, cy); x.scale(sc, sc); x.fillStyle = "#fff"; x.beginPath(); x.moveTo(-50, -56); x.lineTo(50, -56); x.lineTo(50, 2); x.quadraticCurveTo(50, 50, 0, 60); x.quadraticCurveTo(-50, 50, -50, 2); x.closePath(); x.fill();
+    x.fillStyle = "#1d3f9c"; x.beginPath(); x.moveTo(-42, -26); x.lineTo(42, -26); x.lineTo(42, 2); x.quadraticCurveTo(42, 42, 0, 52); x.quadraticCurveTo(-42, 42, -42, 2); x.closePath(); x.fill(); x.fillStyle = "#c8202c"; x.fillRect(-42, -48, 84, 20);
+    x.fillStyle = "#fff"; x.font = "900 40px Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(num, 0, 12); x.restore(); };
+  // a green exit sign (created once per exit): the yellow-on-green "EXIT n" tab on top, the destination big, a shield for freeways, an up-right arrow
+  const exitSign = (k) => EXSIGN[k] || (EXSIGN[k] = (() => { const e = EXITS[k], c = mkc(512, 300), x = c.getContext("2d");
+    x.fillStyle = "#0f6b3a"; if (!e.end) { x.fillRect(300, 0, 200, 62); x.strokeStyle = "#fff"; x.lineWidth = 5; x.strokeRect(303, 3, 194, 60); x.fillStyle = "#fff"; x.font = "800 40px Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("EXIT " + e.n, 400, 34); }
+    x.fillStyle = "#0f6b3a"; x.fillRect(0, 62, 512, 238); x.strokeStyle = "#fff"; x.lineWidth = 6; x.strokeRect(6, 68, 500, 226);
+    x.fillStyle = "#fff"; x.textAlign = "left"; x.textBaseline = "middle";
+    if (e.i) { shield(x, 90, 168, 1.1, e.i); x.font = "800 52px Arial,sans-serif"; x.fillText(e.s, 170, 140); x.font = "700 30px Arial,sans-serif"; x.fillText(e.d, 170, 200); }
+    else { x.font = "800 " + (e.s.length > 13 ? 50 : 58) + "px Arial,sans-serif"; x.fillText(e.s, 34, e.d ? 140 : 170); if (e.d) { x.font = "700 34px Arial,sans-serif"; x.fillText(e.d, 34, 206); } }
+    if (!e.end) { x.save(); x.translate(450, 252); x.rotate(Math.PI / 4); x.fillRect(-5, -26, 10, 40); x.beginPath(); x.moveTo(-18, -20); x.lineTo(18, -20); x.lineTo(0, -44); x.closePath(); x.fill(); x.restore(); }
+    const t = tex(c, false); t.anisotropy = 8; return new THREE.MeshBasicMaterial({ map: t, transparent: true, alphaTest: .5, toneMapped: false, color: new THREE.Color(.92, .92, .92) }); })());
+  const streetBlade = (txt) => EXSIGN["b" + txt] || (EXSIGN["b" + txt] = (() => { const c = mkc(512, 80), x = c.getContext("2d"); x.fillStyle = "#0f6b3a"; x.fillRect(0, 0, 512, 80); x.strokeStyle = "#fff"; x.lineWidth = 4; x.strokeRect(4, 4, 504, 72); x.fillStyle = "#fff"; x.font = "800 50px Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(txt, 256, 42); return new THREE.MeshBasicMaterial({ map: tex(c, false), toneMapped: false, color: new THREE.Color(.9, .9, .9) }); })());
   function freeway105(seg, R, len) { const FW = 112;
+    // which exit this strip shows (per run, across the whole part); past the last one the 105 is behind you: LAX
+    if (!WARM && O.zoneKey) { const zk = O.zoneKey().split("|"), k = zk[0] + "|" + zk[2]; if (k !== EX.key) { EX.key = k; EX.n = (O.exitStart || 0) * 2; } }   // (?exit=N starts the part at the Nth exit: testing / screenshots)
+    const kk = WARM ? 0 : EX.n++, ei = kk >> 1; if (ei >= EXITS.length) { laxAirport(seg, R, len); return; }   // (an exit every other strip: ~34 strips of freeway over the part's two levels)
+    const plain = kk % 2 === 1, ex = plain ? { s: "", plain: 1 } : EXITS[ei], ic = ex.i ? ex : null, icz = -len * .05;
     if (!FWY) { const sg = mkc(512, 160), x = sg.getContext("2d"); x.fillStyle = "#0f6b3a"; x.fillRect(0, 0, 512, 160); x.strokeStyle = "#fff"; x.lineWidth = 6; x.strokeRect(6, 6, 500, 148);
         x.fillStyle = "#fff"; x.beginPath(); x.moveTo(40, 34); x.lineTo(140, 34); x.lineTo(140, 92); x.quadraticCurveTo(140, 140, 90, 150); x.quadraticCurveTo(40, 140, 40, 92); x.closePath(); x.fill();
         x.fillStyle = "#1d3f9c"; x.beginPath(); x.moveTo(48, 58); x.lineTo(132, 58); x.lineTo(132, 92); x.quadraticCurveTo(132, 132, 90, 142); x.quadraticCurveTo(48, 132, 48, 92); x.closePath(); x.fill(); x.fillStyle = "#c8202c"; x.fillRect(48, 40, 84, 18);
         x.fillStyle = "#fff"; x.font = "900 40px Arial,sans-serif"; x.textAlign = "center"; x.fillText("105", 90, 112); x.font = "800 50px Arial,sans-serif"; x.textAlign = "left"; x.fillText("I-105 WEST", 165, 72); x.font = "700 34px Arial,sans-serif"; x.fillText("LAX · El Segundo", 165, 124);
         FWY = { sign: new THREE.MeshBasicMaterial({ map: tex(sg, false), toneMapped: false, color: new THREE.Color(.9, .9, .9) }), conc: new THREE.MeshLambertMaterial({ color: 0xb9b3a8 }), wall: new THREE.MeshLambertMaterial({ color: 0xc9b89a }), asph: new THREE.MeshLambertMaterial({ color: 0x2a2b30 }), ball: new THREE.MeshLambertMaterial({ color: 0x6b6258 }), rail: new THREE.MeshLambertMaterial({ color: 0x3a3a3e }), train: new THREE.MeshStandardMaterial({ color: 0xd8dade, roughness: .35, metalness: .5 }), stripe: new THREE.MeshBasicMaterial({ color: 0x2bb34a }) }; }
-    city(seg, R, len, { res: true, mixed: true, style: "res", cars: 22, hmul: .5, block: [[0, 0, FW + 30, len + 40]], noAuditBlock: true, noBillboard: true });
+    city(seg, R, len, { res: true, mixed: true, style: "res", cars: 22, hmul: .5, block: [[0, 0, FW + 30, len + 40]], clear: ic ? [[0, icz, XW, 110]] : [], noAuditBlock: true, noBillboard: true });
     const G = new THREE.Group(); seg.group.add(G);
     G.add(mesh(new THREE.PlaneGeometry(FW, len).rotateX(-Math.PI / 2), FWY.asph, 0, .45, 0));
     const marks = []; for (const sd of [-1, 1]) { for (const lx of [14, 22, 30]) for (let z = -len / 2 + 6; z < len / 2; z += 22) marks.push([new THREE.PlaneGeometry(.8, 10).rotateX(-Math.PI / 2), T4(sd * lx, .5, z)]); marks.push([new THREE.PlaneGeometry(.8, len).rotateX(-Math.PI / 2), T4(sd * 39, .5, 0)], [new THREE.PlaneGeometry(.8, len).rotateX(-Math.PI / 2), T4(sd * 11, .5, 0)]); }
@@ -1234,9 +1262,23 @@ export function makeWorld(THREE, O = {}) {
     // bridges carrying the cross streets over the freeway
     const br = []; streetsOf(len).forEach(z => { br.push([new THREE.BoxGeometry(FW + 30, 2.4, 34), T4(0, 13, z)], [new THREE.BoxGeometry(FW + 30, 2, .6), T4(0, 15, z - 16.6)], [new THREE.BoxGeometry(FW + 30, 2, .6), T4(0, 15, z + 16.6)]); for (const px of [-FW / 2 + 2, 0, FW / 2 - 2]) br.push([new THREE.BoxGeometry(2.6, 12, 10), T4(px, 6, z)]); });
     if (br.length) G.add(mesh(merge(br), FWY.conc));
-    // an overhead sign gantry
-    const gz = -len * .3; G.add(mesh(merge([[new THREE.BoxGeometry(1.2, 22, 1.2), T4(-FW / 2 + 1, 11, gz)], [new THREE.BoxGeometry(1.2, 22, 1.2), T4(-2, 11, gz)], [new THREE.BoxGeometry(FW / 2, 1.2, 1.2), T4(-FW / 4, 21, gz)], [new THREE.BoxGeometry(1.2, 22, 1.2), T4(FW / 2 - 1, 11, gz)], [new THREE.BoxGeometry(1.2, 22, 1.2), T4(2, 11, gz)], [new THREE.BoxGeometry(FW / 2, 1.2, 1.2), T4(FW / 4, 21, gz)]]), M.dark));
-    for (const sx of [-1, 1]) G.add(mesh(new THREE.PlaneGeometry(40, 12.5), FWY.sign, sx * FW / 4, 26, gz + .8));
+    // the exit: an overhead gantry over the westbound lanes (right side, you fly with them) with this exit's sign, the I-105 WEST sign over the
+    // left, and the exit's street named on its bridge; the off-ramp peels away to the right
+    const gz = len * .32; G.add(mesh(merge([[new THREE.BoxGeometry(1.2, 22, 1.2), T4(-FW / 2 + 1, 11, gz)], [new THREE.BoxGeometry(1.2, 22, 1.2), T4(-2, 11, gz)], [new THREE.BoxGeometry(FW / 2, 1.2, 1.2), T4(-FW / 4, 21, gz)], [new THREE.BoxGeometry(1.2, 22, 1.2), T4(FW / 2 - 1, 11, gz)], [new THREE.BoxGeometry(1.2, 22, 1.2), T4(2, 11, gz)], [new THREE.BoxGeometry(FW / 2, 1.2, 1.2), T4(FW / 4, 21, gz)]]), M.dark));
+    G.add(mesh(new THREE.PlaneGeometry(44, 13.75), FWY.sign, -FW / 4, 26, gz + .8)); if (plain) G.add(mesh(new THREE.PlaneGeometry(44, 13.75), FWY.sign, FW / 4, 26, gz + .8)); else G.add(mesh(new THREE.PlaneGeometry(46, 27), exitSign(ei), FW / 4, 30, gz + .8));
+    const sts = streetsOf(len).filter(z => z < gz - 40).sort((a, b) => b - a), bz = sts.length ? sts[0] : null;
+    if (bz != null && !ex.i && !plain) { const bl = mesh(new THREE.PlaneGeometry(60, 9.4), streetBlade(ex.s), 0, 19.6, bz + 17.2); G.add(bl); }
+    if (!ex.end && !plain) G.add(mesh(new THREE.PlaneGeometry(12, 120).rotateX(-Math.PI / 2).rotateY(-.12), FWY.asph, FW / 2 + 4, .44, gz - 70));   // off-ramp
+    if (ic) {   // the interchange: the crossing freeway on a high deck (with its shield on the side) + two flyover ramps
+      const IG = new THREE.Group(); IG.position.z = icz; G.add(IG);
+      IG.add(mesh(new THREE.BoxGeometry(XW, 3, 70).translate(0, 30, 0), FWY.conc), mesh(new THREE.PlaneGeometry(XW, 66).rotateX(-Math.PI / 2).translate(0, 31.6, 0), FWY.asph));
+      IG.add(mesh(merge([[new THREE.BoxGeometry(XW, 2.4, .8), T4(0, 32.8, -34.6)], [new THREE.BoxGeometry(XW, 2.4, .8), T4(0, 32.8, 34.6)]].concat([-900, -600, -300, -FW / 2 - 8, FW / 2 + 8, 300, 600, 900].map(px => [new THREE.BoxGeometry(5, 29, 14), T4(px, 14.5, 0)]))), FWY.conc));
+      for (const sd of [-1, 1]) { const rp = new THREE.TorusGeometry(110, 4.5, 4, 24, Math.PI / 2); rp.scale(1, 1, .35); const m = mesh(rp, FWY.conc, sd * 30, 20, sd * 60); m.rotation.set(Math.PI / 2, 0, sd > 0 ? 0 : Math.PI); IG.add(m); }
+      const sh = mkc(256, 256), sx = sh.getContext("2d"); shield(sx, 128, 128, 1.9, ic.i); const shm = new THREE.MeshBasicMaterial({ map: tex(sh, false), transparent: true, toneMapped: false });
+      for (const px of [-130, 130]) IG.add(mesh(new THREE.PlaneGeometry(22, 22), shm, px, 31, 35.4));
+      seg.interchange = ic.i; }
+    seg.cams = { sign: { p: [FW / 4 - 6, 34, gz + 80], t: [FW / 4, 28, gz], fov: 50 }, ic: { p: [180, 120, icz + 260], t: [0, 20, icz], fov: 60 }, fwy: { p: [0, 120, len / 2 + 120], t: [0, 0, -len / 4], fov: 60 } };
+    seg.exit = plain ? null : ex; if (!plain) lmCount.exits = (lmCount.exits || 0) + (WARM ? 0 : 1);
     // traffic both ways (4 lanes each), on a registered road
     seg.roads.push({ strip: [-FW / 2, FW / 2, -len / 2, len / 2] });
     cars(seg, R, 34, len, [["z", -16, 1], ["z", -24, 1], ["z", -32, 1], ["z", 16, -1], ["z", 24, -1], ["z", 32, -1], ["z", 36, -1], ["z", -36, 1]]);
@@ -1245,6 +1287,51 @@ export function makeWorld(THREE, O = {}) {
     const dir = R() < .5 ? 1 : -1; tr.position.x = dir > 0 ? -4.5 : 4.5;
     seg.tick.push((t) => { tr.position.z = dir * ((((t * 52) % (len + 120)) - len / 2 - 60)) - 28; });
     seg.f105 = true; lmCount.f105 = (lmCount.f105 || 0) + (WARM ? 0 : 1); }
+
+  /* LAX at the end of the 105: the runways run the way you fly (east-west), terminals and service roads (runway()), plus the
+     Theme Building look-alike (four white parabolic arches holding a saucer), the control tower and the row of tall colour-changing
+     light pylons along Century Blvd. first: the strip where the freeway ends at Imperial Hwy / Sepulveda Blvd (an END sign). */
+  let LAXM = null;
+  function laxAirport(seg, R, len) { runway(seg, R, len, {});
+    if (!LAXM) LAXM = { w: new THREE.MeshStandardMaterial({ color: 0xf4f2ec, roughness: .5, emissive: 0x2a2a30 }), glass: new THREE.MeshStandardMaterial({ color: 0x223040, roughness: .1, metalness: .6, emissive: 0x2a4a60, emissiveIntensity: .8 }) };
+    const th = new THREE.Group(); th.position.set(200, 0, -len * .15); seg.group.add(th);
+    for (let k = 0; k < 4; k++) { const a = k / 4 * TAU + Math.PI / 4, arch = new THREE.TorusGeometry(46, 1.6, 6, 24, Math.PI); const m = mesh(arch, LAXM.w); m.rotation.y = a; m.scale.set(1, 1.15, 1); th.add(m); }
+    th.add(mesh(new THREE.CylinderGeometry(24, 18, 7, 24).translate(0, 40, 0), LAXM.w), mesh(new THREE.CylinderGeometry(19, 19, 4, 24).translate(0, 36, 0), LAXM.glass), mesh(new THREE.CylinderGeometry(7, 8, 34, 12).translate(0, 17, 0), LAXM.w));
+    const tw = new THREE.Group(); tw.position.set(-200, 0, len * .2); seg.group.add(tw); tw.add(mesh(new THREE.CylinderGeometry(5, 9, 90, 10).translate(0, 45, 0), LAXM.w), mesh(new THREE.CylinderGeometry(13, 9, 12, 10).translate(0, 96, 0), LAXM.glass), mesh(new THREE.CylinderGeometry(14, 14, 2, 10).translate(0, 103, 0), M.dark));
+    const pyl = inst(new THREE.CylinderGeometry(2.6, 2.6, 36, 8).translate(0, 18, 0), M.lamp, 15, true); for (let k = 0; k < 15; k++) set(pyl, k, -190 + (k % 2) * 14, 0, -len / 2 + 30 + k * (len - 60) / 14, 0); seg.group.add(pyl);
+    seg.tick.push((t) => { for (let k = 0; k < 15; k++) { QC.setHSL(((t * .05 + k * .07) % 1), .9, .6); pyl.instanceColor.setXYZ(k, QC.r * 1.8, QC.g * 1.8, QC.b * 1.8); } pyl.instanceColor.needsUpdate = true; });
+    seg.lax = true; seg.cams = { lax: { p: [330, 130, len * .3], t: [120, 20, -len * .2], fov: 60 } }; lmCount.lax = (lmCount.lax || 0) + (WARM ? 0 : 1); }
+
+  /* INGLEWOOD (2026-10-19, route part 1, after Melody): generic look-alikes, no names or logos.
+     sofi: a huge stadium under a floating translucent canopy roof (pale panels, lit edge) with the bowl sunk below street level and its lot;
+     inglewood: the round arena with its ring of tall white columns, and a drive-in donut shop with a giant donut standing on its roof. */
+  let ING = null;
+  const ingM = () => ING || (ING = { can: new THREE.MeshStandardMaterial({ color: 0xeef2f6, roughness: .3, metalness: .2, transparent: true, opacity: .82, emissive: 0x30343c, side: THREE.DoubleSide }),
+    edge: new THREE.MeshBasicMaterial({ color: new THREE.Color(1.4, 1.5, 1.7), toneMapped: false }), bowl: new THREE.MeshLambertMaterial({ color: 0x9aa0a8, side: THREE.DoubleSide }), field: new THREE.MeshLambertMaterial({ color: 0x3f8a3a }),
+    col: new THREE.MeshLambertMaterial({ color: 0xf2efe8 }), drum: new THREE.MeshLambertMaterial({ color: 0xd8d2c6 }), roof: new THREE.MeshLambertMaterial({ color: 0x5a5c62 }), dough: new THREE.MeshStandardMaterial({ color: 0xb8742e, roughness: .7 }) });
+  function sofi(seg, R, len, side) { const M2 = ingM(), cx = side * 40; city(seg, R, len, { block: [[cx, 0, 380, 340]], cars: 22, style: "city" });
+    seg.group.add(mesh(new THREE.PlaneGeometry(390, 350).rotateX(-Math.PI / 2), lotMat(), cx, .15, 0));
+    const g = new THREE.Group(); g.position.set(cx, 0, 0); seg.group.add(g);
+    const bowl = new THREE.LatheGeometry([new THREE.Vector2(80, -12), new THREE.Vector2(140, 4), new THREE.Vector2(150, 10)], 40); bowl.scale(1, 1, .7); g.add(mesh(bowl, M2.bowl));
+    const fld = new THREE.CircleGeometry(80, 32).rotateX(-Math.PI / 2); fld.scale(1, 1, .7); g.add(mesh(fld, M2.field, 0, -11, 0));
+    const can = new THREE.SphereGeometry(1, 40, 8, 0, TAU, 0, .5); can.scale(178 / .479, 150, 138 / .479); g.add(mesh(can, M2.can, 0, 32 - .878 * 150, 0));   // the canopy, floating on slim posts
+    const rim = new THREE.TorusGeometry(1, .012, 4, 64).rotateX(Math.PI / 2); rim.scale(178, 1, 138); g.add(mesh(rim, M2.edge, 0, 32, 0));
+    const posts = []; for (let k = 0; k < 14; k++) { const a = k / 14 * TAU; posts.push([new THREE.CylinderGeometry(1.1, 1.1, 34, 5), T4(Math.cos(a) * 172, 16, Math.sin(a) * 132)]); } g.add(mesh(merge(posts), M.dark));
+    seg.focus = { x: cx, z: 0, y: 20, d: 420, h: 180 }; lmCount.stadiumRoof = (lmCount.stadiumRoof || 0) + (WARM ? 0 : 1); }
+  function inglewood(seg, R, len) { const M2 = ingM(), mb = midBlock(len), fx = 320, dx = -320;
+    city(seg, R, len, { res: true, mixed: true, style: "res", cars: 24, hmul: .5, clear: [[fx, mb.zc, 150, 150], [dx, mb.zc, 70, 70]] });
+    seg.blocked.push([fx, mb.zc, 136, 136], [dx, mb.zc, 60, 60]);
+    // the round arena: a drum, a dark flat roof, a ring of tall white columns standing off the wall, floodlit
+    const a = new THREE.Group(); a.position.set(fx, 0, mb.zc); seg.group.add(a);
+    a.add(mesh(new THREE.CylinderGeometry(52, 52, 26, 40).translate(0, 13, 0), M2.drum), mesh(new THREE.CylinderGeometry(60, 60, 3, 40).translate(0, 27.5, 0), M2.col), mesh(new THREE.CylinderGeometry(56, 56, 1, 40).translate(0, 29.4, 0), M2.roof));
+    const cols = []; for (let k = 0; k < 40; k++) { const t = k / 40 * TAU; cols.push([new THREE.CylinderGeometry(1.2, 1.4, 27, 6), T4(Math.cos(t) * 58, 13.5, Math.sin(t) * 58)]); } a.add(mesh(merge(cols), M2.col));
+    a.add(mesh(new THREE.PlaneGeometry(170, 170).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xfff0d8, opacity: .35, toneMapped: false }), 0, .6, 0));
+    // the donut shop: a small drive-in with a giant donut standing upright on the roof
+    const d = new THREE.Group(); d.position.set(dx, 0, mb.zc); seg.group.add(d);
+    d.add(mesh(new THREE.BoxGeometry(34, 9, 24).translate(0, 4.5, 0), M2.col), mesh(new THREE.BoxGeometry(36, 1.4, 26).translate(0, 9.7, 0), M.dark));
+    const dn = mesh(new THREE.TorusGeometry(13, 5.2, 12, 28), M2.dough, 0, 25, 0); d.add(dn, mesh(new THREE.BoxGeometry(2, 6, 2).translate(0, 12, 0), M.dark));
+    seg.tick.push((t) => { dn.rotation.y = Math.sin(t * .3) * .3; });
+    seg.inglewood = { arena: [fx, mb.zc], donut: [dx, mb.zc] }; seg.cams = { arena: { p: [fx - 40, 110, mb.zc + 190], t: [fx, 12, mb.zc], fov: 60 }, donut: { p: [dx + 30, 45, mb.zc + 80], t: [dx, 14, mb.zc], fov: 60 } }; seg.focus = { x: (fx + dx) / 2, z: mb.zc, y: 10, d: 520, h: 230 }; lmCount.arena = (lmCount.arena || 0) + (WARM ? 0 : 1); }
 
   // downtown signature towers (generic look-alikes): a stepped cylinder with a lit crown and a slim tower with a sail roof + spire
   function dtlaIcons(seg, side, zc) {   /* (both stand inside the block at zc: never on a street) */ const glass = new THREE.MeshStandardMaterial({ color: 0x5f7486, roughness: .2, metalness: .6, emissive: 0x1a2430, emissiveIntensity: .6 });
@@ -1279,6 +1366,8 @@ export function makeWorld(THREE, O = {}) {
     else if (kind === "compton") streetNames(seg, len, city(seg, R, len, { res: true, mixed: true, style: "res", cars: 22, hmul: .45, palmGap: 40, parked: 30, bstyle: (R2) => R2() < .7 ? 0 : 3 }));
     else if (kind === "civic") { const sb = superBlock(len); streetNames(seg, len, city(seg, R, len, { res: true, style: "res", cars: 22, palmGap: 40, block: [[0, sb.zc, 264, sb.depth - 2]], noBillboard: true })); civic(seg, R, len, sb.zc, sb.depth); }
     else if (kind === "f105") freeway105(seg, R, len);
+    else if (kind === "sofi") sofi(seg, R, len, side);
+    else if (kind === "inglewood") inglewood(seg, R, len);
     else if (kind === "hwdblvd") { const vz = midBlock(len).zc, tx = HB_X - ROAD / 2 - SIDE - 38; hollywoodBlvd(seg, R, len, city(seg, R, len, { cars: 26, hmul: .85, reserve: [HB_X], noBillboard: true, clear: [[tx, vz, 90, 96]] }), vz); }
     else if (kind === "irvine") city(seg, R, len, { style: "oc", cars: 26, hmul: .5, hmin: 18, palmGap: 64, bstyle: (R2) => R2() < .55 ? 1 : R2() < .6 ? 3 : 0, tints: { 0: ["#f3eee4", "#efe6d6", "#e8dcc6"], 1: ["#b9c9d6", "#9fb4c4", "#cfd9e0"], 3: ["#e9e5dc", "#ddd7cc"] } });
     else if (kind === "dtla") { const mb = midBlock(len); city(seg, R, len, { tall: 2, hmul: 1.6, cars: 32, clear: [[side * 640, mb.zc, 110, 110], [-side * 650, mb.zc, 100, 80]], bstyle: (R2, h) => h > 90 ? (R2() < .7 ? 1 : 3) : FAC.pick(R2, h) }); dtlaIcons(seg, side, mb.zc); }

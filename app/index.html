@@ -251,18 +251,77 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
 .xa.in{animation:xin .35s ease both}
 @keyframes xin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.xa.in{animation:none}}
+
+/* 2026-10-19: ROI hero, Melody partner spotlight, What's new, EN/ES switch */
+.lng{display:flex;border:1px solid var(--edge);border-radius:12px;overflow:hidden}.top .lng button{border:0;border-radius:0;min-height:38px;padding:0 10px;font:800 13px "Rajdhani",sans-serif;color:var(--dim)}.top .lng button[aria-pressed=true]{background:var(--blue);color:#fff}
+#dl-pill{display:none!important}
+.tabs i,.menu i{font-style:normal}
+.hero .logo{width:min(200px,52%);height:auto}
+.hero{padding-top:10px}
+.hero .roi-h{font-size:clamp(26px,7vw,38px);line-height:1.12;margin:6px 0 0}
+.roi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0 0}
+.roi-t{padding:16px 10px;border-radius:18px;border:1px solid rgba(63,169,255,.45);background:radial-gradient(120% 120% at 50% 0%,rgba(47,123,255,.28),rgba(10,22,49,.9));box-shadow:0 0 28px var(--glow) inset}
+.roi-t b{display:block;font-family:"Orbitron",sans-serif;font-size:clamp(18px,5.2vw,30px);color:var(--gold);text-shadow:0 0 18px rgba(255,209,102,.45)}
+.roi-t span{display:block;color:var(--silver);font-size:13px;margin-top:4px;line-height:1.25}
+.roi-t:first-child{grid-column:1/-1}.roi-t:first-child b{font-size:clamp(34px,10vw,52px);color:var(--good);text-shadow:0 0 22px rgba(52,211,153,.5)}
+.roi-n{margin-top:10px}
+.cta{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+.cta a{display:inline-flex;align-items:center;min-height:48px;padding:0 16px;border-radius:14px;font-weight:800;text-decoration:none}
+.btn-p{background:linear-gradient(180deg,#4f93ff,var(--blue));color:#fff;box-shadow:0 8px 26px var(--glow);animation:roiPulse 2.4s ease-in-out infinite}
+.btn-s{border:1px solid var(--edge);color:var(--ink);background:var(--panel)}
+@keyframes roiPulse{50%{box-shadow:0 8px 36px rgba(63,169,255,.75)}}
+@media (prefers-reduced-motion:reduce){.btn-p{animation:none}}
+.partner{display:flex;gap:14px;align-items:stretch;text-align:left;margin-top:20px;padding:12px;border-radius:20px;text-decoration:none;color:var(--ink);border:1px solid rgba(52,211,153,.55);background:linear-gradient(135deg,rgba(52,211,153,.14),rgba(10,22,49,.95))}
+.partner img{width:112px;height:150px;object-fit:cover;border-radius:14px;flex:none}
+.partner b{display:block;font-size:20px;margin-top:4px}.partner small{color:var(--dim)}
+.partner ul{margin:6px 0 0;padding-left:18px;font-size:14px;color:var(--silver)}.partner li{margin:2px 0}
+.ptag{display:inline-block;font-size:12px;font-weight:800;color:var(--good);border:1px solid rgba(52,211,153,.6);border-radius:99px;padding:2px 9px}
+.pgo{display:block;margin-top:6px;font-weight:800;color:var(--volt)}
+.nwg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:14px}
+.nw{display:flex;gap:12px;padding:14px;border-radius:16px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge)}
+.nw .ni{font-size:28px;flex:none}.nw b{font-size:16px}.nw p{margin:6px 0 0;color:var(--dim);font-size:14px;line-height:1.4}
+.nt{display:inline-block;margin-left:6px;font-size:11px;font-weight:800;color:var(--gold);border:1px solid rgba(255,209,102,.5);border-radius:99px;padding:1px 7px;vertical-align:2px}
 </style>
 </head>
 <body>
-<div class="top"><div class="wrap"><img src="icon-192.png" alt=""><b class="chrome">SOUSSHIFT</b><span class="sp"></span><button type="button" id="topask" aria-label="Open the AI guide">💬 Ask</button></div></div>
+<div class="top"><div class="wrap"><img src="icon-192.png" alt=""><b class="chrome">SOUSSHIFT</b><span class="sp"></span><div class="lng notranslate" translate="no" role="group" aria-label="Language"><button type="button" data-l="en" aria-pressed="true">EN</button><button type="button" data-l="es" aria-pressed="false">ES</button></div><button type="button" id="topask" aria-label="Open the AI guide">💬 Ask</button></div></div>
 
 <main class="wrap" id="main">
   <section class="hero" id="home">
     <img class="logo" src="../assets/ssai-lockup.jpg" alt="SousShift AI" width="640" height="392">
     <p class="forpill" id="forPill">Made for <b id="forName"></b></p>
-    <h1 class="chrome">Your restaurant's app, explained</h1>
-    <p class="lead">See the demo apps we've built, then plans, prices, what it would cost elsewhere, what you get back, printing and the contract. Everything to choose and sign, in one place.</p>
+    <p class="kick" data-es="Apps para restaurantes que se pagan solas">Restaurant apps that pay for themselves</p>
+    <h1 class="chrome roi-h" data-es="Convierte cada mesa en un cliente que regresa.">Turn every table into a repeat customer.</h1>
+    <p class="lead" data-es="Tus clientes escanean el QR, juegan tu juego, se unen a tus recompensas y vuelven. Esto es lo que vale para un restaurante típico:">Guests scan the QR, play your game, join your rewards and come back. Here's what that's worth for a typical restaurant:</p>
+    <div class="roi" id="roiHero" aria-live="polite">
+      <div class="roi-t"><b data-count="sales">$0</b><span data-es="más en ventas cada mes (desde el mes 3)">extra sales a month (month 3 on)</span></div>
+      <div class="roi-t"><b data-count="payback">0</b><span data-es="para recuperar la instalación">to earn back the setup</span></div>
+      <div class="roi-t"><b data-count="members">0</b><span data-es="miembros nuevos al mes">new members a month</span></div>
+      <div class="roi-t"><b data-count="times">0×</b><span data-es="lo que pagas al mes">your monthly plan</span></div>
+    </div>
+    <p class="note roi-n" id="roiNote"></p>
+    <div class="cta">
+      <a class="btn-p" href="#returns" data-es="📈 Calcula tus números">📈 See your numbers</a>
+      <a class="btn-s" href="../demo/melody-lax/" data-es="✈️ Prueba la app de Melody">✈️ Try Melody's live app</a>
+      <a class="btn-s" href="#plans" data-es="💳 Planes y precios">💳 Plans &amp; prices</a>
+    </div>
+    <a class="partner" href="../demo/melody-lax/">
+      <img src="../demo/melody-lax/img/cover.jpg" alt="Melody Bar &amp; Grill" width="720" height="956" loading="eager">
+      <div>
+        <span class="ptag" data-es="✅ Socio ya integrado">✅ Onboarded partner</span>
+        <b class="notranslate" translate="no">Melody Bar &amp; Grill</b>
+        <small data-es="Westchester, junto a LAX · lanzando ahora">Westchester by LAX · going live now</small>
+        <ul>
+          <li data-es="Juego de avión sobre LAX + premios semanales">Flight game over LAX + weekly prizes</li>
+          <li data-es="Recompensas, tarjeta dorada y menú en 4K">Rewards, gold card and a 4K menu</li>
+          <li data-es="App del personal en inglés y español">Staff app in English and Spanish</li>
+          <li data-es="Oficina del dueño con control de su equipo">Owner back office with team controls</li>
+        </ul>
+        <span class="pgo" data-es="Abrir la app de Melody →">Open Melody's app →</span>
+      </div>
+    </a>
     <nav class="menu" aria-label="Sections">
+      <a href="#new"><span>🆕</span>What's new</a>
       <a href="#apps"><span>🚀</span>Demo apps</a>
       <a href="#trucks"><span>🍦</span>Truck apps</a>
       <a href="#auto"><span>🔧</span>Auto apps</a>
@@ -270,7 +329,7 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
       <a href="#plans"><span>💳</span>Plans &amp; prices</a>
       <a href="#market"><span>⚖️</span>Cost elsewhere</a>
       <a href="#run"><span>🧰</span>Our running costs</a>
-      <a href="#returns"><span>📈</span>What you get back</a>
+      <a href="#returns"><span>📈</span><i data-es="Lo que ganas">What you get back</i></a>
       <a href="#print"><span>🖨️</span>Stickers &amp; printing</a>
       <a href="#contract"><span>📄</span>Contracts</a>
       <a href="#social"><span>🎬</span>Social &amp; SEO</a>
@@ -281,7 +340,9 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
     <p class="note" style="margin-top:12px">Already a client? Your signed deal stays exactly as agreed. These prices are for new restaurants.</p>
   </section>
 
-  <section class="s" id="apps"><header><p class="kick">Demo apps · sample builds</p><h2 class="chrome">Apps we've built</h2><p class="lead">Each one is built around the business's real menu, with a game themed to their food. Tap one and play. Yours gets the same treatment.</p><p class="note" style="margin-top:8px"><b>These are demo samples</b> made to show what we build. <b>Melody Bar &amp; Grill</b> is the first one getting ready to launch; Nalu Vida and the rest are still in the works and not live yet.</p></header>
+  <section class="s" id="new"><header><p class="kick" data-es="Todo lo nuevo">Everything new</p><h2 class="chrome" data-es="Lo que tu app puede hacer ahora">What your app can do now</h2><p class="lead" data-es="Todo lo que hemos construido para Melody y los demás, listo para tu restaurante.">Everything we've built for Melody and the others, ready for your restaurant.</p></header><div class="nwg"><div class="nw"><span class="ni">🛵</span><div><b data-es="Pedidos en línea + entrega">Online ordering + delivery</b><span class="nt" data-es="Muy pronto">Coming soon</span><p data-es="Pedidos para recoger con pago con tarjeta en tu app, puntos en cada pedido y pedidos en vivo en tu oficina. Entrega con DoorDash cuando DoorDash nos apruebe (solicitado).">Pickup ordering with card payments in your app, points on every order, live orders in your back office. DoorDash delivery once DoorDash approves (applied).</p></div></div><div class="nw"><span class="ni">🏈</span><div><b data-es="Paquete de bar deportivo">Sports Bar Package</b><span class="nt" data-es="Extra">Add-on</span><p data-es="Marcadores locales en vivo, sigue a tu equipo, Fan Test, Football Squares, noches de pelea y puntos por adivinar al ganador.">Live local scores, follow-your-team, Fan Test, Football Squares, fight nights and pick-the-winner points.</p></div></div><div class="nw"><span class="ni">🎮</span><div><b data-es="Juegos 3D realistas">Realistic 3D games</b><span class="nt" data-es="Incluido">Included</span><p data-es="Tu propio juego en 3D real: gente, tráfico, clima, día y noche, tu restaurante y tu vecindario.">Your own game in real 3D: crowds, traffic, weather, day and night, your restaurant and your neighborhood.</p></div></div><div class="nw"><span class="ni">🎲</span><div><b data-es="Paquete de juegos">Games Pack</b><span class="nt" data-es="Extra">Add-on</span><p data-es="Trivia, trivia deportiva, un juego de palabras diario y Verdad o Reto para bares. Puntos por jugar.">Trivia, sports trivia, a daily word game and bar-safe Truth or Dare. Points for playing.</p></div></div><div class="nw"><span class="ni">🔄</span><div><b data-es="Menú digital en 3D">3D digital menu</b><span class="nt" data-es="Extra">Add-on</span><p data-es="Tus clientes giran tus platillos en 3D, con clips en cámara lenta y fotos reales.">Guests spin your signature dishes in 3D, plus slow-motion food clips and real photos.</p></div></div><div class="nw"><span class="ni">🗂️</span><div><b data-es="Oficina del dueño + acceso del equipo">Owner back office + team access</b><span class="nt" data-es="Incluido">Included</span><p data-es="Miembros, visitas, recompensas y precios en un solo lugar. Tú decides qué ve y cambia cada empleado. Todo queda registrado.">Members, visits, rewards and prices in one place. You decide what each employee can see and change. Every change is logged.</p></div></div><div class="nw"><span class="ni">🧑‍🍳</span><div><b data-es="App del personal, inglés + español">Staff app, English + Spanish</b><span class="nt" data-es="Incluido">Included</span><p data-es="Capacitación paso a paso con capturas reales, botón para escuchar y un examen. Sin datos de clientes.">Step-by-step training with real screenshots, a Listen button and a quiz. No customer data.</p></div></div><div class="nw"><span class="ni">🛡️</span><div><b data-es="Scout contra fraudes">Scout fraud guard</b><span class="nt" data-es="Incluido">Included</span><p data-es="Detecta abuso de puntos, cuentas duplicadas y recibos falsos antes de dar recompensas.">Catches point farming, duplicate accounts and fake receipt claims before anyone gets rewarded.</p></div></div><div class="nw"><span class="ni">💳</span><div><b data-es="Tarjeta dorada + pase de recompensa en vivo">Gold loyalty card + live reward pass</b><span class="nt" data-es="Incluido">Included</span><p data-es="Cada miembro recibe una tarjeta que el personal escanea y un pase en movimiento que no sirve como captura de pantalla.">Each member gets a card ID staff can scan, and a moving pass that can't be screenshotted.</p></div></div><div class="nw"><span class="ni">🎁</span><div><b data-es="Regalo de bienvenida + rifas">Early-bird gift + raffles</b><span class="nt" data-es="Incluido">Included</span><p data-es="Premia a tus primeros miembros con un regalo o una rifa para llenar tu lista rápido.">Reward your first members with a founding gift or a raffle drawing to fill the list fast.</p></div></div><div class="nw"><span class="ni">🎃</span><div><b data-es="Temas de temporada">Holiday themes</b><span class="nt" data-es="Incluido">Included</span><p data-es="Halloween, Día de Acción de Gracias, Navidad y más se activan y desactivan solos.">Halloween, Thanksgiving, Christmas and more switch on and off by themselves.</p></div></div><div class="nw"><span class="ni">📞</span><div><b data-es="Anfitrión telefónico con IA + mensajes">AI phone host + texting</b><span class="nt" data-es="Extra">Add-on</span><p data-es="Una voz de IA natural contesta tu teléfono 24/7 y responde mensajes. $75 texto o $150 voz + texto al mes.">A natural AI voice answers your phone 24/7 and texts back. $75 text or $150 voice + text a month.</p></div></div></div></section>
+
+  <section class="s" id="apps"><header><p class="kick">Demo apps · sample builds</p><h2 class="chrome">Apps we've built</h2><p class="lead">Each one is built around the business's real menu, with a game themed to their food. Tap one and play. Yours gets the same treatment.</p><p class="note" style="margin-top:8px"><b>These are demo samples</b> made to show what we build. <b>Melody Bar &amp; Grill</b> is our first onboarded partner and is going live now; Nalu Vida and the rest are still in the works and not live yet.</p></header>
     <div class="cats" aria-label="Apps by business type">
       <a href="#apps" data-cat="rest"><span>🍽️</span><div>Restaurants<small>Menu, game, rewards</small></div></a>
       <a href="#trucks"><span>🚚</span><div>Trucks<small>Ice cream + food trucks</small></div></a>
@@ -300,7 +361,7 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
       <a class="xa" data-k="rest" href="../demo/storm-burger/"><div class="xa-m"><img src="../demo/storm-burger/img/classic.jpg" alt="StormBurger classic burger" width="720" height="720" loading="lazy" decoding="async"><span class="xa-tag">Demo sample</span></div><div class="xa-b"><b>⚡ StormBurger</b><small>Inglewood · Long Beach</small><span class="g">"Storm Run" driving game</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="rest" href="../demo/churrito-loco/"><div class="xa-m"><img src="../demo/churrito-loco/img/churros.jpg" alt="Churrito Loco churros" width="900" height="657" loading="lazy" decoding="async"><span class="xa-tag">Demo sample</span></div><div class="xa-b"><b>🌶️ Churrito Loco</b><small>South Gate</small><span class="g">"Loco Match" puzzle game</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="rest" href="../demo/lucky-dragon/"><div class="xa-m"><img src="../demo/lucky-dragon/img/shrimp.jpg" alt="Lucky Dragon hibachi shrimp" width="900" height="657" loading="lazy" decoding="async"><span class="xa-tag">Demo sample</span></div><div class="xa-b"><b>🐉 Lucky Dragon</b><small>Compton · hibachi</small><span class="g">"Hibachi Catch" dragon game</span><span class="xa-go">Open app →</span></div></a>
-      <a class="xa" data-k="rest full" href="../demo/melody-lax/"><div class="xa-m"><img src="../demo/melody-lax/img/cover.jpg" alt="Melody Bar &amp; Grill" width="720" height="956" loading="lazy" decoding="async"><span class="xa-tag">🟢 Launching first</span></div><div class="xa-b"><b>🍸 Melody Bar &amp; Grill</b><small>Westchester by LAX</small><span class="g">Table ordering + flight game</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa" data-k="rest full" href="../demo/melody-lax/"><div class="xa-m"><img src="../demo/melody-lax/img/cover.jpg" alt="Melody Bar &amp; Grill" width="720" height="956" loading="lazy" decoding="async"><span class="xa-tag">✅ Onboarded partner</span></div><div class="xa-b"><b>🍸 Melody Bar &amp; Grill</b><small>Westchester by LAX</small><span class="g">Table ordering + flight game</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="rest" href="../demo/gritz-n-wafflez/"><div class="xa-m"><img src="../demo/gritz-n-wafflez/img/wingz-wafflez.jpg" alt="Gritz N Wafflez wings and waffles" width="720" height="720" loading="lazy" decoding="async"><span class="xa-tag">🛠️ In the works</span></div><div class="xa-b"><b>🧇 Gritz N Wafflez</b><small>Wilshire Blvd · LA</small><span class="g">"Waffle Run" game while you wait</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="rest full" href="../demo/nalu-vida/"><div class="xa-m"><img src="../demo/nalu-vida/img/hero.jpg" alt="Nalu Vida beach bar" width="1200" height="1500" loading="lazy" decoding="async"><span class="xa-tag">🛠️ In the works</span></div><div class="xa-b"><b>🏄 Nalu Vida</b><small>Venice Pier · beach bar</small><span class="g">"Ride the Nalu" surf game</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="truck" href="../ice-cream/demo/"><div class="xa-m art ice" aria-hidden="true"><img class="xa-ic" src="../ice-cream/demo/icon-192.png?v=20261013a" alt="" width="92" height="92"><span class="xa-tag">Demo sample · Trucks</span></div><div class="xa-b"><b>🚚 Ice Cream Trucks</b><small>Live truck map + ETA</small><span class="g">"Truck's on your street" alerts</span><span class="xa-go">Open app →</span></div></a>
@@ -536,7 +597,7 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
   <a href="#plans" data-tab="plans"><span>💳</span>Plans</a>
   <a href="#market" data-tab="market"><span>⚖️</span>Compare</a>
   <button type="button" class="ask" data-ask aria-label="Ask the AI guide"><span>💬</span>Ask</button>
-  <a href="#returns" data-tab="returns"><span>📈</span>Returns</a>
+  <a href="#returns" data-tab="returns"><span>📈</span><i data-es="Ganancias">Returns</i></a>
   <a href="#contract" data-tab="contract"><span>📄</span>Contract</a>
 </div></nav>
 
@@ -548,9 +609,21 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
 </div></div>
 
 <script src="../value/value-data.js"></script>
-<script src="data.js"></script>
+<script src="data.js?v=20261019a"></script>
 <script>window.CONFIG = { name: "Your Restaurant" }; window.A2HS_CFG = { name: "SousShift", theme: { bg: "#07112a", card: "#0d1d40", edge: "#1c2f57", accent: "#2f7bff", ink: "#eef3ff", dim: "#9eadcc", btnInk: "#fff" } };</script>
-<script src="app.js"></script>
+<script src="app.js?v=20261019a"></script>
+<script>window.DEMO_LANGS=["en","es"];</script>
+<script src="../demo/lang-th.js?v=20261019a"></script>
+<script>/* EN/ES switch (top right). Hand-written Spanish for [data-es] (kept out of Google Translate); the rest of the page
+   is translated by ../demo/lang-th.js (Google Translate, same cookie + "demo_lang" key). */
+(function(){ var lang="en"; try{ lang=localStorage.getItem("demo_lang")||""; }catch(e){} if(!lang){ var m=document.cookie.match(/googtrans=\/en\/([A-Za-z-]+)/); lang=m?m[1]:"en"; }
+  if(lang!=="es") lang="en";
+  document.querySelectorAll(".lng button").forEach(function(b){ b.setAttribute("aria-pressed",String(b.dataset.l===lang));
+    b.onclick=function(){ if(b.dataset.l===lang) return; try{ localStorage.setItem("demo_lang",b.dataset.l); }catch(e){}
+      var h=location.hostname, x=b.dataset.l==="en"?"; expires=Thu, 01 Jan 1970 00:00:00 GMT":"", v=b.dataset.l==="en"?"":"/en/"+b.dataset.l;
+      document.cookie="googtrans="+v+"; path=/"+x; document.cookie="googtrans="+v+"; path=/; domain="+h+x; location.reload(); }; });
+  if(lang==="es") document.querySelectorAll("[data-es]").forEach(function(el){ el.classList.add("notranslate"); el.setAttribute("translate","no"); el.innerHTML=el.getAttribute("data-es"); });
+  window.SSAI_LANG=lang; })();</script>
 <script src="guide.js"></script>
 <script src="apps.js"></script>
 <script src="../assets/printspots.js"></script>

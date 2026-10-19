@@ -66,6 +66,8 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
 .mi .btn{min-height:48px}.chg{color:var(--gold);font-weight:800}.nf{border:2px solid var(--bad)}.nf h3{margin:14px 0 4px;font-size:16px}.nx{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #ffffff10;flex-wrap:wrap}.nx>div{flex:1;min-width:140px}.nx b{display:block;font-size:15px}.nx small{display:block;color:var(--dim);font-size:12.5px}.nx img{width:64px;height:64px;object-fit:cover;border-radius:10px}.nb{display:flex;gap:6px;align-items:center}.nb input{width:96px;padding:12px 8px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px;text-align:right}.nf h2{color:#ff8a8a;margin:0 0 6px}.nf ul{margin:4px 0 10px;padding-left:20px}.nf li{margin:3px 0}.nt{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;background:#ff4d4d26;color:#ffb3b3;font-size:12px;font-weight:800}
 .mf label{display:block;font-size:13px;color:var(--dim);margin:10px 0 4px}.mf textarea{min-height:120px;font-family:inherit}
 .help p,.help li{font-size:16px;line-height:1.55}.help h3{margin-top:18px}
+/* 🚀 launch plan (2026-10-19) */
+.lp .st{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #ffffff10}.lp .st b{display:block;font-size:16px;font-weight:800}.lp .st span.n{display:block;font-size:14px;font-weight:400;line-height:1.5;color:var(--dim)}.lp .chip{flex:none;font-size:12px;font-weight:800;border-radius:999px;padding:3px 9px;margin-top:2px;white-space:nowrap}.lp .ok{background:#2fbf7126;color:var(--ok)}.lp .wt{background:#ffb34726;color:var(--warn)}.lp .nw{background:#ff6b6b26;color:var(--bad)}.lp ol.steps{padding-left:22px}.lp ol.steps li{margin:12px 0;font-size:16px;line-height:1.5}.lp .who{font-size:12px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.04em}.lp .tour{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}.lp .tour button{text-align:left;min-height:48px;line-height:1.35}.lp .tour small{display:block;font-weight:400;color:var(--dim);font-size:13px}
 @media (max-width:420px){.mi{grid-template-columns:1fr 92px 70px}}
 /* 🔐 team access: big phone-friendly switches */
 .sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #ffffff10}.sw:last-child{border-bottom:0}.sw b{display:block;font-size:15.5px}.sw small{display:block;color:var(--dim);font-size:12.5px;margin-top:2px}
@@ -215,7 +217,7 @@ function load(){ loadMock(function(){ api({type:"bo_data",token:TOKEN}).then(fun
   DATA=r; setRole(r); $("login").hidden=true; $("signup").hidden=true; $("app").hidden=false; $("out").hidden=false; $("stamp").textContent="Signed in as "+r.me+" · loaded "+new Date(r.now).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})+(MGR?" · "+jobName(JOB)+" view ("+MYSLUGS.map(function(x){ return x==="nalu-vida"?"Nalu Vida":"Melody"; }).join(" + ")+")":"")+(r.test?" · TEST DATA":""); drawTodo(); draw(); }); }); }
 $("refresh").onclick=load;
 document.querySelector(".seg").addEventListener("click",function(e){ var b=e.target.closest("[data-r]"); if(!b) return; R=b.dataset.r; document.querySelectorAll("[data-r]").forEach(function(x){ x.setAttribute("aria-pressed",x===b?"true":"false"); }); draw(); });
-var TABS=[["overview","📊 Overview"],["visits","📍 Visits"],["members","👥 Members"],["rewards","🎟️ Rewards & claims"],["scout","🛡️ Scout"],["games","🎮 Games"],["discounts","🏷️ Discounts"],["menu","💲 Prices & specials"],["earlybird","🎁 Early bird"],["staff","🧑‍🍳 Staff"],["squares","🏈 Squares"],["audit","🧾 Audit log"],["team","🔐 Team access"],["help","❓ Help"],["links","🔗 Links"]];
+var TABS=[["launch","🚀 Launch plan"],["overview","📊 Overview"],["visits","📍 Visits"],["members","👥 Members"],["rewards","🎟️ Rewards & claims"],["scout","🛡️ Scout"],["games","🎮 Games"],["discounts","🏷️ Discounts"],["menu","💲 Prices & specials"],["earlybird","🎁 Early bird"],["staff","🧑‍🍳 Staff"],["squares","🏈 Squares"],["audit","🧾 Audit log"],["team","🔐 Team access"],["help","❓ Help"],["links","🔗 Links"]];
 function drawTabs(){ if(!tabOk(TAB)){ var f1st=TABS.filter(function(t){ return tabOk(t[0]); })[0]; TAB=f1st?f1st[0]:"help"; }
   $("tabs").innerHTML=TABS.filter(function(t){ return tabOk(t[0]); }).map(function(t){ return "<button role='tab' data-t='"+t[0]+"' aria-selected='"+(t[0]===TAB)+"'>"+t[1]+"</button>"; }).join(""); }
 drawTabs();
@@ -535,8 +537,9 @@ function links(){ if(MGR) return "<div class='card links'>"+(MYSLUGS.indexOf("me
     h+="<h3>"+esc(NAMES[s])+" <span class='st "+(ts.state==="done"?"done":"tbd")+"'>"+(ts.state==="done"?"Set up ✓":"TBD")+"</span></h3><p class='note'>"+esc(ts.note)+"</p>"+table(["Button","Discount","Points"],rows); });
   return h; }
 function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY; if(!tabOk(TAB)) drawTabs();
-  p.innerHTML={overview:overview,visits:visits,members:members,rewards:rewards,scout:scout,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links,menu:menu,help:help,team:team,squares:function(){ return window.SquaresHQ?SquaresHQ.html({api:api,token:TOKEN,draw:draw}):"<div class='card'>Loading…</div>"; }}[TAB]();
+  p.innerHTML={overview:overview,visits:visits,members:members,rewards:rewards,scout:scout,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links,menu:menu,help:help,launch:launch,team:team,squares:function(){ return window.SquaresHQ?SquaresHQ.html({api:api,token:TOKEN,draw:draw}):"<div class='card'>Loading…</div>"; }}[TAB]();
   if(TAB==="squares"&&window.SquaresHQ) SquaresHQ.bind(p);
+  p.querySelectorAll("[data-go]").forEach(function(b){ b.onclick=function(){ if(b.dataset.go==="todo-top"){ var t=$("todo"); if(t) t.scrollIntoView({behavior:"smooth"}); return; } goTab(b.dataset.go); }; });
   if(TAB==="members"){ var q=$("q"); q.oninput=function(){ Q=q.value; var pos=q.selectionStart; draw(); var q2=$("q"); q2.focus(); try{ q2.setSelectionRange(pos,pos); }catch(e){} }; $("csv").onclick=csv; var dd=$("dedupe"); if(dd) dd.onclick=function(){ if(DUPARM<Date.now()){ DUPARM=Date.now()+6000; draw(); setTimeout(function(){ if(DUPARM&&DUPARM<Date.now()){ DUPARM=0; draw(); } },6100); return; }
     DUPARM=0; dd.disabled=true; dd.textContent="Removing…"; api({type:"bo_dedupe",token:TOKEN}).then(function(r){ if(r&&r.ok){ $("dedupeOut").textContent="✅ Removed "+n(r.removed)+". Refreshing…"; load(); } else { dd.disabled=false; dd.textContent="🧹 Remove duplicates"; $("dedupeOut").textContent=(r&&r.reason)||"Didn't work. Try again."; } }); };
     p.querySelectorAll("[data-sort]").forEach(function(th){ th.onclick=function(){ var k=th.dataset.sort; SORT={k:k,d:SORT.k===k?-SORT.d:-1}; draw(); }; }); }
@@ -734,6 +737,46 @@ function bindTeam(p){
       if(!sl.length){ alert("Pick at least one restaurant. To stop all access, use the Can log in switch."); return; } return teamCall({op:"slugs",id:id,slugs:sl},b); } }; });
   p.querySelectorAll("[data-tmjob][data-act=job]").forEach(function(sel){ sel.onchange=function(){ var id=sel.dataset.tmjob, P=(DATA.team||[]).filter(function(x){ return x.id===id; })[0];
     if(P&&!confirm("Change "+P.name+"'s job to "+jobName(sel.value)+"? Their switches go back to that job's usual set.")){ sel.value=P.job; return; } teamCall({op:"job",id:id,job:sel.value},sel); }; }); }
+// ---- 🚀 LAUNCH PLAN (2026-10-19): one place to walk Christian / Sami through HQ and what happens next, from QR codes to
+// launch, Toast, ordering + delivery. Plain English, honest status. Update the STATUS rows as things connect.
+function launch(){ var F="../../files/christian-7045b2/";
+  var chip=function(k){ return "<span class='chip "+k+"'>"+({ok:"✅ Done",wt:"⏳ Waiting",nw:"👉 Next"})[k]+"</span>"; };
+  var row=function(k,t,n){ return "<div class='st'>"+chip(k)+"<div><b>"+t+"</b><span class='n'>"+n+"</span></div></div>"; };
+  var STATUS=[
+    ["ok","Melody app, game, rewards and 4K menu","Built. Guests play, earn points, use Just Landed, sign up and get rewards. The menu is view-only: guests order and pay with their server."],
+    ["ok","This HQ + team logins","Christian, Melody Management and Sami each have a login. Christian decides what each person can do in 🔐 Team access."],
+    ["ok","QR stickers, table cards 1–40 and the window poster","Designed and scan-tested. Ready to print."],
+    ["ok","Staff guide + training quiz","Safe to text to staff. It never shows guest info."],
+    ["nw","Sami's email","Needed so Sami's changes can save (each change is confirmed with a code sent to her email). Until then she can look at everything but can't save."],
+    ["nw","Toast reward buttons (for now)","5 discount buttons in Toast Web, about 10 minutes, done together. Staff ring app rewards with these until Toast connects."],
+    ["wt","Toast connection (automatic points)","We applied to Toast's partner program on Oct 12. Toast says the decision comes within 30 days (by about Nov 11). Not connected yet."],
+    ["wt","Online ordering + card payments","Optional add-on. The card payment account (Stripe) is set up in test mode. It goes live after our business details are verified. Each restaurant connects its own bank, so the money goes straight to you. We never hold it."],
+    ["wt","DoorDash delivery","We applied for DoorDash's delivery program (DoorDash Drive). DoorDash reviews requests every quarter and approves a limited number, so there's no date yet. Pickup ordering can start before delivery."],
+    ["wt","AI phone host + texts","Built and ready. Turns on for both restaurants after the Nalu Vida setup payment. Texting guests also needs phone-carrier approval."]];
+  var TOUR=[["todo-top","✅ To-do list","Top of every page. Tap an item to fix it, then Done."],["overview","📊 Overview","Sign-ups, visits and points at a glance"],["members","👥 Members","Guest list, contacts, birthdays, CSV export"],
+    ["rewards","🎟️ Rewards & claims","Rewards used + receipt claims to check against Toast"],["discounts","🏷️ Discounts","Change rewards, points and dollars off"],["menu","💲 Prices & specials","Prices, holiday specials, happy hour"],
+    ["earlybird","🎁 Early bird","The founding-member gift"],["staff","🧑‍🍳 Staff","Staff game scores + the training quiz"],["squares","🏈 Squares","Football Squares boards"],
+    ["scout","🛡️ Scout","Catches point farming and duplicates"],["audit","🧾 Audit log","Who changed what, before → after"],["team","🔐 Team access","Approve staff, switch access on or off"],["help","❓ Help","How-to with a Listen button"]];
+  var tour=TOUR.filter(function(t){ return t[0]==="todo-top"?can("todo"):tabOk(t[0]); }).map(function(t){ return "<button class='btn alt' data-go='"+t[0]+"'>"+t[1]+"<small>"+t[2]+"</small></button>"; }).join("");
+  var step=function(who,t,n){ return "<li><span class='who'>"+who+"</span><br><b>"+t+"</b><br>"+n+"</li>"; };
+  var STEPS=[
+    step("Today · Sami → Antidote","Send Antidote Sami's email","He adds it to her login (2 minutes, nothing to reinstall). After that she can save changes on her own."),
+    step("Today · Christian or Sami","Approve the deals","Open 🏷️ Discounts. Check each reward, the points it costs and the dollars off. Change anything, then Save. No free alcohol as a reward (California law). Drink discounts are fine."),
+    step("Today · Christian or Sami","Clear the red to-do list","Confirm menu prices, set prices for upcoming specials, and OK menu photos. Each item jumps you to the right spot."),
+    step("This week · Together, about 10 min","Add the 5 reward buttons in Toast","On a computer in Toast Web. Follow the <a href='../../melody/kit/toast-interim.html'>Toast button guide</a> (names, amounts, permissions). Staff then ring app rewards from the pass the guest shows."),
+    step("This week · Christian","Print the QR codes","Stickers, table cards 1–40 and the 24×36 window poster are in <a href='"+F+"'>your files</a>. <a href='../../onboarding/christian/placement/'>Where to put each one</a>. Check that each one scans after printing."),
+    step("This week · Sami or a manager, 15 min","Train the staff","Text them the <a href='../../staff/christian/'>staff guide</a>. They ask for their own login from the HQ login screen (“New staff? Request access”), and Christian approves it in 🔐 Team access. Everyone takes the quiz."),
+    step("Launch day · Everyone","Go live","QR codes on the tables and the window, the app link in the @melodylax bio, Sami posts it. Servers tell every table: “Scan to play and earn a free starter.”"),
+    step("Every day after launch · Manager, 2 min","Spot-check","Compare receipt claims and rewards used with Toast's daily report. Approve the ones that match and flag the rest. The to-do list reminds you."),
+    step("When you say yes · Christian","Online ordering + delivery","Tap Done on the to-do once you've told Antidote yes or no. If yes: pickup ordering with card payments goes first. You connect your own bank through Stripe in about 10 minutes (bank info + ID). DoorDash delivery is added once DoorDash approves."),
+    step("When Toast approves · Antidote","Connect Toast","Points then post automatically from each check, and the interim buttons stay as a backup. Guests keep all their points."),
+    step("After the Nalu Vida setup payment · Antidote","Turn on the AI phone host + texts","Kira answers missed and after-hours calls. Melody forwards calls to Kira's number. Birthday and win-back texts go on once carrier approval comes through."),
+    step("Next · Together","Nalu Vida, the same way","Same steps, with Nalu's own QR codes and Toast buttons.")];
+  return "<div class='card help lp' style='margin-top:12px'><h2 style='margin-top:0'>🚀 Melody launch plan</h2><p class='note'>Everything in one place: where we are, a 2-minute tour of this HQ, and each step from QR codes to launch, Toast, ordering and delivery.</p>"+
+    "<h3>Where we are</h3>"+STATUS.map(function(x){ return row(x[0],x[1],x[2]); }).join("")+
+    "<h3>Quick tour"+(MGR?" (what your login can open)":"")+"</h3><div class='tour'>"+tour+"</div>"+
+    "<h3>What's next, step by step</h3><ol class='steps'>"+STEPS.join("")+"</ol>"+
+    "<p class='note'>Questions? Text Antidote. Nothing goes live to guests without Christian's or Sami's OK.</p></div>"; }
 // ---- ❓ HELP: plain-English guide (with 🔊 Listen) for managers and owners
 function help(){ var lb=window.SSAI_LISTEN?SSAI_LISTEN.button("helpText","🔊 Listen to this page"):"";
   return "<div class='card help' id='helpText' style='margin-top:12px'><h2 style='margin-top:0'>How to use "+(MGR?"Melody HQ":"Christian HQ")+"</h2><p data-noread>"+lb+"</p>"+

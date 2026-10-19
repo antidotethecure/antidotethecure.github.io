@@ -141,12 +141,12 @@ var LOGINS=[["christian","Christian"],["antidote","Antidote"],["melody-manager",
 var ROLE="owner", MYSLUGS=["melody-bar-grill","nalu-vida"], MGR=false, PERMS={}, JOB="", STAFFMODE=false;
 // 🔐 TEAM ACCESS: keep JOBS + PERM keys in sync with Code.gs (JOBS / PERM_KEYS). The SERVER enforces every switch;
 // the page only hides what a login can't use. Owners (Christian, Antidote) always have everything.
-var JOBS=[["kitchen","Kitchen"],["marketing","Marketing / management"],["bar_manager","Bar manager"],["bartender","Bartender"],["server","Server / floor"],["manager","Manager (general)"],["other","Other employee"]];
+var JOBS=[["kitchen","Kitchen"],["marketing","Marketing / management"],["bar_manager","Bar manager"],["bartender","Bartender"],["server","Server / floor"],["runner","Food runner / barback"],["manager","Manager (general)"],["other","Other employee"]];
 var PERMS_UI=[["rewards","Discounts, rewards & points","Discount %, dollars off, points costs, location bonus, receipt claims"],["prices","Raise / lower menu prices","What guests see in the app (Toast is changed in Toast)"],["specials","Specials & happy hour","Turn specials on/off, edit them and the happy-hour list"],
   ["photos","Menu photos go live","Their dish photos show in the app right away (off: each one waits for Christian's OK)"],
   ["members","See guest list & contacts","Guest names, phones, emails, birthdays + Scout flags"],["stats","See sales & visit charts","Overview, Visits and Games"],["earlybird","Early-bird gift","The founding-member gift setup"],["squares","Football Squares","Run the Squares boards"],
   ["todo","To-do list","See, add and tick off to-dos"],["staff","Staff practice & quiz","Staff game scores and the training quiz"],["audit","See the Audit log","Who changed what, before → after"]];
-var JOBPRE={kitchen:"prices specials photos todo",marketing:"stats rewards specials photos earlybird squares todo audit",bar_manager:"stats prices specials photos squares todo staff",bartender:"todo staff",server:"todo staff",manager:"*",other:"todo"};
+var JOBPRE={kitchen:"prices specials photos todo",marketing:"stats rewards specials photos earlybird squares todo audit",bar_manager:"stats prices specials photos squares todo staff",bartender:"todo staff",server:"todo staff",runner:"todo staff",manager:"*",other:"todo"};
 // 📖 ACCESS GUIDE (2026-10-18): what each switch unlocks, who usually gets it, and what is never handed out.
 function accessGuide(){ var who=function(k){ return JOBS.filter(function(j){ var p=JOBPRE[j[0]]; return p==="*"||(" "+p+" ").indexOf(" "+k+" ")>=0; }).map(function(j){ return j[1]; }).join(", "); };
   return "<div class='card help' style='margin-top:12px' id='accessGuide'><h2 style='margin-top:0'>📖 What each access does</h2><p class='note' style='margin:0 0 8px'>Give each person only what their job needs. Turn any switch on or off for one person in <b>👥 Team</b> below. It works on their next tap.</p>"+

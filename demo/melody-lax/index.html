@@ -13,7 +13,7 @@
 <script src="../lang-th.js"></script>
 <script src="../gamepad.js?v=20261017gp3"></script>
 <script src="../songswitch.js?v=ms1"></script>
-<script src="../radio-avatar.js"></script>
+<script src="../radio-avatar.js?v=rs1"></script>
 <script>/* ===== MELODY REWARDS: the ONE place to change the program (Christian's feedback, 2026-10). =====
    One points balance for Melody (separate from Nalu Vida). The rewards card, the "How to earn" sheet, the game's
    end screen and Just Landed all read from here. Proposed defaults until Christian / Sami approve them. */
@@ -2714,6 +2714,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 .ms-mode button{display:flex;align-items:center;gap:7px;min-height:48px;padding:6px 9px;border-radius:14px;border:2px solid #27324d;background:rgba(255,255,255,.05);color:#f6f1e4;font:900 15px/1.05 Barlow,system-ui,sans-serif;text-align:left;cursor:pointer;touch-action:manipulation}
 .ms-mode button i{font-style:normal;font-size:21px;line-height:1}.ms-mode button span{display:flex;flex-direction:column;min-width:0}.ms-mode button small{font:700 10.5px/1.15 Barlow,system-ui,sans-serif;color:#9aa3b5}
 .ms-mode button[aria-pressed=true]{border-color:#f0d375;background:rgba(212,175,55,.2);box-shadow:0 0 0 3px rgba(240,211,117,.25)}
+.ms-fs{margin:0;padding:7px 10px;border-radius:12px;background:rgba(79,184,255,.1);border:1px solid rgba(79,184,255,.45);font:700 12.5px/1.3 Barlow,system-ui,sans-serif;color:#dfe8ff;text-align:center}.ms-fs b{color:#f0d375}
 .ms .gm-play{align-self:center;width:100%;max-width:320px;min-height:54px}
 .ms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .ms-grid .gm-b{flex-direction:column;gap:2px;min-height:52px;padding:6px 4px;font-size:10.5px;line-height:1.1;text-align:center;border-radius:12px}
@@ -2751,6 +2752,7 @@ function showcase(P){ var esc=P.esc, T=P.T, live=on(), cur=window.MELODY_MODE?ME
     '<div class="ms-prize"><img src="'+esc(WK.img||"img/menu/melody-fries.jpg")+'" alt=""><div><small>'+esc(T(live?"This week's prize":"Weekly prize · coming soon"))+'</small><b>'+esc(T(prize))+'</b><em>'+esc(T(live?(WK.note||"Top score of the week wins"):"The boards are live now. Prizes switch on soon."))+'</em></div></div>'+
     '<div class="ms-food" aria-label="'+esc(T("Catch the food for points"))+'">'+FOOD.map(function(f){ return '<span class="ms-f" style="--d:'+f[4]+'" title="'+esc(T(f[1]))+'">'+(f[3]?'<span class="ms-st"><i></i><i></i><i></i></span>':'')+'<img src="'+g+f[0]+'.webp?v='+(f[5]||"ag1")+'" alt="'+esc(T(f[1]))+'"><b>'+f[2]+'</b></span>'; }).join("")+'</div>'+
     '<div class="ms-mode" role="group" aria-label="'+esc(T("Game mode"))+'">'+mbtn("campaign","🏆","Campaign","10 levels · 6 bosses",cur,T,esc)+mbtn("survival","⏱️","Survival","How long can you last?",cur,T,esc)+'</div>'+
+    '<p class="ms-fs">📱 '+esc(T("Best view: tap"))+' <b>⛶ '+esc(T("Full screen"))+'</b> '+esc(T("below, then tap"))+' <b>🔒 '+esc(T("Lock"))+'</b> '+esc(T("on the right once you take off, so nothing scrolls or blocks your game."))+'</p>'+
     P.play+'<div class="ms-grid">'+P.buttons.join("")+'</div>'+
     '<div class="ms-mvp">'+mvp(esc,T)+'</div></div>'; }
 document.addEventListener("click",function(e){ var b=e.target&&e.target.closest&&e.target.closest("[data-mel=mode]"); if(!b) return; e.preventDefault(); if(window.MELODY_MODE) MELODY_MODE(b.getAttribute("data-v")); if(window.GameMenu) GameMenu.refresh(); });
@@ -2871,7 +2873,7 @@ window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",regio
     {id:"parsley",name:"Parsley",price:0,max:1,group:"Toppings"}]};</script>
 <script src="../builder.js"></script>
 <script src="dish3d.js?v=d3d5"></script>
-<script src="../gamelock.js?v=ml1"></script>
+<script src="../gamelock.js?v=fl1"></script>
 <script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
 window.SPECIALS=(window.SSAI_MENU["melody-bar-grill"].specials||[]).filter(function(s){ return s.on!==false; });   // from menu-data.js (+ saved changes)</script>
 <script src="../specials.js?v=co1"></script>

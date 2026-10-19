@@ -181,6 +181,20 @@
   $("iPlan").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) { I.plan = b.dataset.k; drawImp(); } });
   F.forEach(function (f) { $("im-" + f[0]).addEventListener("input", function (e) { I[f[0]] = +e.target.value; drawImp(); }); });
   drawImp();
+  /* 🚀 hero (2026-10-19): the same model's default estimate (Basic plan, typical restaurant), counted up on load */
+  (function () {
+    var box = $("roiHero"); if (!box) return;
+    var es = false; try { es = (localStorage.getItem("demo_lang") || (document.cookie.match(/googtrans=\/en\/([A-Za-z-]+)/) || [])[1]) === "es"; } catch (e) {}
+    var r = impact({ plan: "basic" }), mo = es ? " meses" : " months";
+    var V = { sales: [r.sales3, function (x) { return "+" + usd(x); }], payback: [r.payback || 12, function (x) { return Math.round(x) + (r.payback ? (Math.round(x) === 1 ? (es ? " mes" : " month") : mo) : "+" + mo); }],
+      members: [r.newMembers, function (x) { return "+" + n(x); }], times: [r.sales3 / r.fee, function (x) { return x.toFixed(1) + "×"; }] };
+    $("roiNote").textContent = (es ? "Estimado para un restaurante típico (" : "Estimate for a typical restaurant (") + n(I.crowd) + (es ? " clientes en una noche llena, " : " guests on a busy night, ") +
+      n(I.join) + (es ? "% se une, gasto promedio " : "% join, ") + usd(I.spend) + (es ? ") con el plan " : " average spend) on the ") + plan("basic").name + (es ? ". Pon tus propios números abajo." : " plan. Plug in your own numbers below.");
+    var els = box.querySelectorAll("[data-count]"), t0 = 0, D = 1400, still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function frame(t) { if (!t0) t0 = t; var k = still ? 1 : Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3);
+      els.forEach(function (el) { var v = V[el.dataset.count]; el.textContent = v[1](v[0] * e); }); if (k < 1) requestAnimationFrame(frame); }
+    requestAnimationFrame(frame);
+  })();
   $("promise").innerHTML = '<h3>🛡️ Our results promise</h3><p>' + esc(PROMISE) + '</p><p class="note">' + esc(PROMISE_FINE) +
     ' A “tracked return visit” is a guest identified through the app (an app order, their member QR or code, their phone number, or an app reward) coming back on a later day. You see the count in your owner view.</p>' +
     '<p class="note"><b>Not the same as break-even.</b> Break-even (above) is how many extra visits a month cover your monthly fee. The promise is our ' + R.returns + '-visit target for the app itself.</p>';

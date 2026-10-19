@@ -79,7 +79,7 @@
   var PERM_KEYS = ["stats", "members", "rewards", "prices", "specials", "photos", "earlybird", "squares", "todo", "staff", "audit"];
   var PERM_LABEL = { stats: "See sales & visit charts", members: "See guest list & contacts", rewards: "Discounts, rewards & points", prices: "Raise / lower menu prices", photos: "Menu photos go live", specials: "Specials & happy hour", earlybird: "Early-bird gift", squares: "Football Squares", todo: "To-do list", staff: "Staff practice & quiz", audit: "See the Audit log" };
   var JOBS = { kitchen: ["Kitchen", "prices specials photos todo"], marketing: ["Marketing / management", "stats rewards specials photos earlybird squares todo audit"], bar_manager: ["Bar manager", "stats prices specials photos squares todo staff"],
-    bartender: ["Bartender", "todo staff"], server: ["Server / floor", "todo staff"], manager: ["Manager (general)", PERM_KEYS.join(" ")], other: ["Other employee", "todo"] };
+    bartender: ["Bartender", "todo staff"], server: ["Server / floor", "todo staff"], runner: ["Food runner / barback", "todo staff"], manager: ["Manager (general)", PERM_KEYS.join(" ")], other: ["Other employee", "todo"] };
   function presetOf(j) { var on = {}, o = {}; (JOBS[j] || JOBS.other)[1].split(" ").forEach(function (k) { on[k] = 1; }); PERM_KEYS.forEach(function (k) { o[k] = !!on[k]; }); return o; }
   function effPerms(j, over) { var o = presetOf(j); Object.keys(over || {}).forEach(function (k) { if (PERM_KEYS.indexOf(k) >= 0) o[k] = over[k] === true; }); return o; }
   var PERMS = {}, TEAM = [   // TEAM = the "Team" sheet tab; PERMS = Script Property PERMS (approved / switched people)

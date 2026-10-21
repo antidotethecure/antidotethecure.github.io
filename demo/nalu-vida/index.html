@@ -11,6 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Nalu Vida — Menu, Drinks &amp; Surf Game</title>
 <script src="../lang-th.js"></script>
+<script src="../gamepad.js?v=20261017gp3"></script>
 <script>/* ===== NALU VIDA REWARDS: the ONE place to change the program (Christian's feedback, 2026-10). =====
    One points balance for Nalu Vida (separate from Melody). The rewards card, the "How to earn" sheet and the surf
    game's end screen all read from here. Proposed defaults until Christian approves them. */
@@ -38,7 +39,7 @@ window.SSAI_REWARDS={
     claimCap:150, claimsPerDay:1, claimDaysBack:1, redeemsPerDay:1, photoMaxPx:900,
     api:""}               // Apps Script /exec URL (same Code.gs as Melody). Empty = this phone only.
 };</script>
-<script src="../christian-live.js?v=lb2" data-slug="nalu-vida"></script>
+<script src="../christian-live.js?v=mg1" data-slug="nalu-vida"></script>
 <meta name="description" content="Nalu Vida at the foot of the Venice Pier: tropical bites, craft cocktails, order from your seat, surf the Nalu and earn Nalu Vida Rewards points.">
 <meta name="theme-color" content="#0a2540">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -330,37 +331,48 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
     <a class="btn hot" href="#play">🏄 Play &amp; win</a>
     <a class="btn" href="#drinks">🍹 Menu</a>
     <a class="btn" href="#rewards">⭐ Rewards</a>
+    <a class="btn" href="#scores" id="scoresbtn" onclick="if(window.SportsBar){event.preventDefault();SportsBar.open('teams');}">📺 Live scores</a>
     <a class="btn sea" href="https://resy.com/cities/los-angeles-ca/venues/nalu-vida" target="_blank" rel="noopener">📅 Book on Resy</a>
   </div>
+  <div id="sp-ticker" style="max-width:430px;margin:10px auto 0"></div>
 </header>
 
 <div class="wave" aria-hidden="true"></div>
 <section id="play">
 <h2><small>Play &amp; earn points</small>Ride the Nalu</h2>
-<p class="sub">5 levels on the Venice Pier loop: paddle out past the stingrays and a fisherman's stray harpoons, grab the tiki rafts, then ride the wave home and dodge the charging sharks. No sign-up needed to play: every 100 score is worth 1 Nalu Vida Rewards point, up to 50 a day.</p>
+<p class="sub">5 levels on the Venice Pier loop: paddle out past the stingrays and a fisherman's stray harpoons, grab the tiki rafts, then ride the wave home: stay off the white foam, launch off the lip and land your tricks. No sign-up needed to play: every 100 score is worth 1 Nalu Vida Rewards point, up to 50 a day.</p>
 <div id="nalu-game"></div>
 </section>
 <script>window.REVIEW_EGG={vid:"viJa3DOuFUw",restaurant:"Nalu Vida",short:"NALU VIDA",bonus:500,img:"img/review/cover.webp",find:"A billboard buoy floats by the pier once a run. Ride through it"};</script>
-<script src="../reviewegg.js"></script>
-<script src="../halftime.js"></script>
-<script src="../radio-avatar.js"></script>
-<script src="game.js?v=sh2"></script>
+<script src="../reviewegg.js?v=ht4k"></script>
+<script src="../halftime.js?v=ht4k"></script>
+<script src="../radio-avatar.js?v=rs1"></script>
+<script src="../songswitch.js?v=ms1"></script>
+<script src="game.js?v=ms1-e3n4.ht4k"></script>
 <script>(function(){ var gp=(window.SSAI_REWARDS&&window.SSAI_REWARDS.game)||{}, per=gp.perScore||100, cap=gp.dailyCap||50;
 window.GAME_MENU={id:"nalu-vida",name:"Ride the Nalu",by:"Nalu Vida",tagline:"Run in, paddle out, ride the wave home to Nalu Vida. 5 levels. Earn Rewards points.",
- logo:"img/logo.png",hero:["img/game/surfer_f.webp","img/game/raft_taco.webp","img/game/raft_fries.webp","img/game/surfer_m.webp"],
+ logo:"img/logo.png",hero:["img/game/card-3d-beach.webp?v=n3","img/game/card-3d-rain.webp?v=n3","img/game/surfer_m.webp"],
  theme:{bg:"#06182e",bg2:"#0b3b5e",card:"#0f3354",edge:"#1d4f78",accent:"#ff7a3d",accent2:"#ffd23f",label:"#ffd23f",ink:"#f4fbff",dim:"#a9c8de",btnInk:"#3a1600",soft:"rgba(127,227,242,.10)",track:"rgba(255,255,255,.22)",good:"#3ddc97",bad:"#ff6b6b",display:"'Alfa Slab One',Georgia,serif",body:"system-ui,-apple-system,sans-serif"},
  tokens:false,spinBadge:false,
+ selects:[{title:"Song",options:[["cheat","Cheat Code"],["xrp","Xtreme Rich Person"]],get:function(){ return window.GameMusic?GameMusic.cur().id:"cheat"; },set:function(v){ if(window.GameMusic) GameMusic.set(v); }}],
  mount:"#nalu-game .nv-wrap",hide:"#nv-start",start:function(){ window.__NV.pick(); },vibrate:true,
+ // engine3d look: graphics tier, weather and time of day (visual only; they never change the game)
+ selects:[{title:"Graphics",options:[["auto","Auto"],["low","Low"],["med","Medium"],["high","High"],["ultra","Ultra"]],note:"Auto picks for this phone and steps down if it gets choppy.",
+   get:function(){ return window.__E3Q?__E3Q.pref:"auto"; },set:function(v){ if(window.__E3Q) __E3Q.set(v); else try{ localStorage.setItem("e3-quality:nalu-vida",v); }catch(e){} }},
+  {title:"Weather",options:[["live","Live"],["sunny","Sunny"],["partly","Clouds"],["overcast","Overcast"],["fog","Fog"],["rain","Rain"],["storm","Storm"]],
+   get:function(){ return window.NALU_ENV?NALU_ENV.get().weather:"live"; },set:function(v){ if(window.NALU_ENV) NALU_ENV.weather(v); else try{ localStorage.setItem("nalu-weather",v); }catch(e){} }},
+  {title:"Time of day",options:[["live","Live"],["sunrise","Sunrise"],["day","Day"],["sunset","Sunset"],["night","Night"]],
+   get:function(){ return window.NALU_ENV?NALU_ENV.get().sky:"live"; },set:function(v){ if(window.NALU_ENV) NALU_ENV.sky(v); else try{ localStorage.setItem("nalu-sky",v); }catch(e){} }}],
  switches:[{label:"3D graphics (beta)",icon:"🧊",note:"On: a real 3D ocean, wave and surfer. Turns itself off on phones that can't keep it smooth.",get:function(){return !!(window.__NV3&&__NV3.pref());},set:function(on){window.__NV3&&__NV3.pref(on);}}],
  how:{goal:"Each level: run in from the sand, paddle out past the break, pop up and ride the wave back in to Nalu Vida. Ride all 5 levels for a big finish bonus. No sign-up needed to play.",time:"Level 1 is about 2 minutes (30 s paddle-out, 90 s ride); later levels have a 12–15 s paddle-out · 5 hearts, lost in halves",
-  steps:[["👆","Drag left and right to steer"],["🤿","Paddling out: tap DUCK DIVE (or the screen) as each breaking wave reaches you. Get caught = a wipeout, −1 ❤️"],["🎣","Paddling out you'll pass stingrays and a fisherman hunting a shark. When his orange aim line shows, get off it (or duck-dive): a stray harpoon is −1 ❤️, a dodge is +150. Sharks are rare out there"],["🌊","Riding back in it's a smooth ride: just the wave and a few sharks. The wave forms on one side and peels across. Ride the glowing pocket just ahead of the curl all the way to the exit for a bonus"],["⚠️","Behind the curl (whitewater) or under the falling lip = washed, −½ ❤️. Too far out in front = you slow down and the curl catches you"],["🏄","JUMP launches off the lip only at the top of the face inside the pocket: wait for ⬆ LIP — JUMP! (it still hops the pier and rocks)"],["🌀","In the air tap TRICK (or flick up/down) for a 360 or a flip. Finish the ring before you land, or you bail: −points and −1 ❤️"],["🦈","A shark powers up before it charges: it blinks red for about 2 seconds and the lifeguard calls \"Here comes a shark, be careful!\" Then it charges straight at you: steer out of its way"],[null,"Grab the food rafts on the paddle-out. 4 in a row = ×2, 8 = ×3 and it keeps climbing","img/game/raft_taco.webp"],[null,"Any hit is just a splash wipeout: you pop back up","img/game/shark.webp"],["🎁","At the end your score turns into Nalu Vida Rewards points: 1 point per "+per+" score, up to "+cap+" a day. Join free to save them"]],
+  steps:[["👆","Drag left and right to steer"],["🤿","Paddling out: tap DUCK DIVE (or the screen) as each breaking wave reaches you. Get caught = a wipeout, −1 ❤️"],["🎣","Paddling out you'll pass stingrays and a fisherman hunting a shark. When his orange aim line shows, get off it (or duck-dive): a stray harpoon is −1 ❤️, a dodge is +150. Sharks are rare out there"],["🌊","Riding back in it's just you and the wave, nothing else in the water. The wave forms on one side and peels across: white foam behind the curl, a clean face ahead of it and out along the shoulder"],["⚠️","Only the white foam can hurt you: touch it = a wipeout, −½ ❤️. Stay on the clean face, or go round to the side with no foam"],["🏄","Tap JUMP (or swipe up) anywhere on the clean face to ride up the lip and launch. Closer to the curl and carving fast = bigger air"],["🌀","In the air tap TRICK (or the screen) for a 360, grab or flip, or swipe: sideways = 360, down = grab, up = flip. Finish the ring and land it: NICE! Land mid-trick = a little bail (−150)"],["🩹","Hurt? Health kits float by every 20 to 30 seconds on the ride in. Ride through one: +1 ❤️"],[null,"Grab the food rafts on the paddle-out. 4 in a row = ×2, 8 = ×3 and it keeps climbing","img/game/raft_taco.webp"],["💦","Any hit is just a splash wipeout: you pop back up"],["🎁","At the end your score turns into Nalu Vida Rewards points: 1 point per "+per+" score, up to "+cap+" a day. Join free to save them"]],
   links:[["🌊 Replay the ride tutorial",function(){window.__NV&&__NV.tutorial();}]]},
- points:[{group:"Grab these",items:[{img:"img/game/raft_taco.webp",name:"Island Tacos raft",pts:"+100"},{img:"img/game/raft_mimosa.webp",name:"Mimosa raft",pts:"+120"},{img:"img/game/raft_fries.webp",name:"Jungle Fries raft",pts:"+120"},{img:"img/game/raft_burger.webp",name:"Smash-N-Stack raft",pts:"+150"},{img:"img/game/raft_shrimp.webp",name:"Coconut Shrimp raft",pts:"+150"},{img:"img/game/raft_oysters.webp",name:"$2 Oysters raft",pts:"+200"},{icon:"🌟",name:"Golden Poke Bowl",note:"Rare",pts:"+500",gold:true},{img:"img/game/fish_parrot.webp",name:"Parrotfish / Mahi-mahi",note:"Grab it while it's jumping",pts:"+300"},{img:"img/game/fish_gold.webp",name:"Golden Dorado",note:"Rare",pts:"+800",gold:true},{img:"img/game/buoy.webp",name:"Lifeguard rescue can",pts:"+1 ❤️"}]},
-  {group:"Surf",items:[{icon:"🤿",name:"Duck-dive under a wave",pts:"+100"},{icon:"🌊",name:"Every 3 s in the pocket",note:"Plus points the whole time you're in it",pts:"+250"},{icon:"🏄",name:"Ride the barrel out the exit",note:"Stay in the pocket until the curl reaches the far side",pts:"+200"},{icon:"⬆",name:"JUMP off the lip",note:"Only from the pocket, at ⬆ LIP",pts:"Big air"},{icon:"🌀",name:"360, landed clean",pts:"+400"},{icon:"🤸",name:"Flip, landed clean",pts:"+600"},{icon:"✖️",name:"Combo (2 tricks in one air)",pts:"× 2"},{icon:"🎣",name:"Dodge a stray harpoon",note:"Paddle-out",pts:"+150"},{icon:"😮",name:"Close call",note:"Shark, stingray, eel or jelly",pts:"+50"},{icon:"⭐",name:"Ride in to Nalu Vida",note:"Clears the level",pts:"+1,500 × level"},{icon:"🏆",name:"Finish level 5",pts:"+5,000",gold:true}]},
-  {group:"Steer around these (5 hearts, lost in halves)",items:[{icon:"🌊",name:"Washed by whitewater or the falling lip",note:"You tumble in the foam, then pop back up",pts:"−½ ❤️ −100",bad:true},{icon:"💦",name:"Bail mid-trick (wipeout)",pts:"−❤️ −300",bad:true},{img:"img/game/shark.webp",name:"Shark charge",note:"Riding in · blinks red ~2 s and the lifeguard warns you first",pts:"−❤️",bad:true},{icon:"🐟",name:"Stingray",note:"Paddle-out",pts:"−❤️",bad:true},{icon:"🎣",name:"Fisherman's stray harpoon",note:"Paddle-out · watch his orange aim line",pts:"−❤️",bad:true},{img:"img/game/jelly.webp",name:"Bump a jellyfish",pts:"−❤️",bad:true}]}],
+ points:[{group:"Grab these",items:[{img:"img/game/raft_taco.webp",name:"Island Tacos raft",pts:"+100"},{img:"img/game/raft_mimosa.webp",name:"Mimosa raft",pts:"+120"},{img:"img/game/raft_fries.webp",name:"Jungle Fries raft",pts:"+120"},{img:"img/game/raft_burger.webp",name:"Smash-N-Stack raft",pts:"+150"},{img:"img/game/raft_shrimp.webp",name:"Coconut Shrimp raft",pts:"+150"},{img:"img/game/raft_oysters.webp",name:"$2 Oysters raft",pts:"+200"},{icon:"🌟",name:"Golden Poke Bowl",note:"Rare",pts:"+500",gold:true},{img:"img/game/fish_parrot.webp",name:"Parrotfish / Mahi-mahi",note:"Grab it while it's jumping",pts:"+300"},{img:"img/game/fish_gold.webp",name:"Golden Dorado",note:"Rare",pts:"+800",gold:true},{img:"img/game/buoy.webp",name:"Lifeguard rescue can",pts:"+1 ❤️"},{icon:"🩹",name:"Health kit",note:"Ride in · floats by when you're hurt",pts:"+1 ❤️"}]},
+  {group:"Surf",items:[{icon:"🤿",name:"Duck-dive under a wave",pts:"+100"},{icon:"🌊",name:"Every 3 s in the pocket",note:"Plus points the whole time you're in it",pts:"+250"},{icon:"🏄",name:"Ride the barrel out the exit",note:"Stay in the pocket until the curl reaches the far side",pts:"+200"},{icon:"⬆",name:"JUMP off the lip",note:"Anywhere on the clean face · near the curl + fast = higher",pts:"Big air"},{icon:"🌀",name:"360, landed clean",pts:"+400"},{icon:"✋",name:"Grab, landed clean",pts:"+300"},{icon:"🤸",name:"Flip, landed clean",pts:"+600"},{icon:"✖️",name:"Combo (2+ tricks in one air)",pts:"× tricks"},{icon:"🔥",name:"Clean landings back to back",pts:"×1.25 … ×2"},{icon:"🎣",name:"Dodge a stray harpoon",note:"Paddle-out",pts:"+150"},{icon:"😮",name:"Close call",note:"Paddle-out · stingray or jelly",pts:"+50"},{icon:"⭐",name:"Ride in to Nalu Vida",note:"Clears the level",pts:"+1,500 × level"},{icon:"🏆",name:"Finish level 5",pts:"+5,000",gold:true}]},
+  {group:"Steer around these (5 hearts, lost in halves)",items:[{icon:"🌊",name:"Touch the white foam",note:"Riding in, it's the only thing that hurts",pts:"−½ ❤️ −100",bad:true},{icon:"💦",name:"Land mid-trick (light bail)",pts:"−150",bad:true},{icon:"🐟",name:"Stingray",note:"Paddle-out",pts:"−❤️",bad:true},{icon:"🎣",name:"Fisherman's stray harpoon",note:"Paddle-out · watch his orange aim line",pts:"−❤️",bad:true},{img:"img/game/jelly.webp",name:"Bump a jellyfish",pts:"−❤️",bad:true}]}],
  prizes:{title:"Rewards points",note:"Game points: 1 point per "+per+" score, up to "+cap+" points a day. They go to your Nalu Vida Rewards balance (join free to save them)."}};
 })();</script>
-<script src="../gamemenu.js?v=cf1"></script><script src="../a2hs.js"></script>
+<script src="../gamemenu.js?v=ms1"></script><script src="../a2hs.js"></script>
 <div class="prizes" id="prizes"></div>
 
 <div id="champs" data-game="naluvida" data-prizes="off" style="max-width:430px;margin:12px auto"></div><script src="../champs.js?v=cf1"></script>
@@ -1120,11 +1132,26 @@ $("evsub").textContent="Week of "+MON[new Date(monday).getUTCMonth()]+" "+new Da
 </script>
 <script>/* Simple program (Christian, 2026-10): one balance, the numbers live in window.SSAI_REWARDS at the top of this page.
    No split wallets, visit levels, tokens, daily spin or welcome voucher (see crm.js SIMPLE). */
-window.CRM_CFG={name:"Nalu Vida",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Ride the Nalu"};</script>
-<script src="../crm.js?v=rs2"></script><script src="../interim.js?v=op1"></script><script src="../earlybird.js?v=op1"></script><script src="../loyaltycard.js?v=lc1"></script>
+window.CRM_CFG={name:"Nalu Vida",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Ride the Nalu",customerOnly:true};
+/* CUSTOMER-ONLY (2026-10-13): live customer app, no owner view / manager log / sample players / "Demo:" notes. Owner tools = Christian HQ. */
+window.SSAI_CUSTOMER_ONLY=true;</script>
+<link rel="stylesheet" href="../sports/sports.css?v=gd1">
+<script>/* SPORTS BAR PACKAGE (demo/sports/README.md), install #2 (2026-10-15): live scores for LA teams + every game today,
+   Watch live (Nalu Vida, sister spot Melody, or each network's official app with your own subscription). Picks are just for fun
+   here (no points hook) until Christian turns rewards on. No watch-party deal text: owner-approved deals only. */
+window.SPORTS_CFG={client:"nalu-vida",name:"Nalu Vida",title:"Game Day at the Pier",region:"la",teamsTab:"LA teams",ticker:"#sp-ticker",
+  leagues:["nfl","cfb","nba","mlb","nhl","mls","wnba","cbb","ufc"],
+  theme:{bg:"var(--deep)",panel:"var(--panel)",edge:"var(--edge)",accent:"var(--sun2)",accent2:"var(--sun3)",ink:"var(--ink)",dim:"var(--dim)",onAccent:"#2a1205",display:"var(--display)",body:"var(--body)",punch:"var(--display)"},
+  fightNight:false,
+  watchAt:[{name:"Nalu Vida",note:"Every game on the TVs, at the foot of the Venice Pier.",address:"1 Washington Blvd, Venice, CA 90292",tel:"+13104370060",book:"https://resy.com/cities/los-angeles-ca/venues/nalu-vida"},
+           {name:"Melody Bar & Grill (sister spot)",note:"Every game on the TVs, 5 minutes from LAX.",address:"9132 S Sepulveda Blvd, Los Angeles, CA 90045",tel:"+13106701994",app:"../melody-lax/",appLabel:"✈️ Their app"}],
+  perks:{watchParty:{text:"",note:"",when:"local"},picks:{on:true,points:false}}
+};</script>
+<script src="../sports/teams.js?v=sb1"></script><script src="../sports/sports.js?v=gd1"></script>
+<script src="../crm.js?v=rs1"></script><script src="../claimscore.js?v=cs1"></script><script src="../interim.js?v=rs1"></script><script src="../earlybird.js?v=op1"></script><script src="../loyaltycard.js?v=lc1"></script>
 <script>window.NEARBY={name:"Nalu Vida",pin:"🏄",mount:"#rwhost",spots:[{label:"Venice Pier",lat:33.9779,lng:-118.4669,q:"1 Washington Blvd, Venice, CA 90292"}],offer:"Happy hour Mon–Fri 3–6 PM and 10 PM–close, dine-in."};</script>
-<script src="../nearby.js"></script>
-<script src="../gamelock.js"></script>
+<script src="../nearby.js?v=co1"></script>
+<script src="../gamelock.js?v=fl1"></script>
 <script>document.getElementById("arrive-play").addEventListener("click",function(){setTimeout(function(){var b=document.querySelector(".nv-pick button");if(b)b.animate&&b.animate([{transform:"scale(1)"},{transform:"scale(1.08)"},{transform:"scale(1)"}],{duration:600,iterations:2});},700);});</script>
 <script>
 /* living arrival scene: a dolphin in the water, distant gulls in the sky, a jet ski on the far water, and dishes appearing on the patio tables */
@@ -1248,8 +1275,10 @@ window.SPECIALS=[
  {id:"cinco",holiday:"cinco",title:"Cinco on the Pier",desc:"Baja Blaze Chicken Tacos + Tostadas de la Tierra, and 20% off Nalu Margaritas (21+).",item:"Baja Blaze Chicken Tacos",start:"05-01",end:"05-05"},
  {id:"july4",holiday:"july4",title:"Fourth on the Pier",desc:"Smash-N-Stack Burger + Jungle Fries, then fireworks over the water.",item:"Smash-N-Stack Burger",start:"07-01",end:"07-04"}
 ];</script>
-<script src="../specials.js"></script>
+<script src="../specials.js?v=co1"></script>
 <script src="../seasons/seasons.js?v=20261013a" defer></script>
+<script src="../poweredby.js?v=20261013a" defer></script>
+<script src="../faqbot.js?v=f1" defer></script>
 <script src="../ssai-track.js?v=t1" defer></script>
 </body>
 </html>

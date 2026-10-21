@@ -55,6 +55,21 @@ window.SPORTS_CFG = {
 - **Cache busters:** bump `?v=sb1` on every include when `sports.js`, `sports.css` or `teams.js` change (GitHub Pages caches for 10 minutes).
 - **Add-to-Home-Screen:** `demo/a2hs.js` waits while `#sp-ov` is open, so the prompt never covers the scoreboard.
 
+## All games + Watch live (2026-10-15)
+
+- **📅 All games tab** (on by default; `allGames: false` hides it): every game today in the enabled leagues, not only the region's teams, with league chips. `teamsTab` renames the first tab (e.g. "LA teams"). Picks stay on the region's games only.
+- **Watch button on every game that isn't final:** "▶ Watch live" while it's on, "📺 Where to watch" before. The sheet shows:
+  1. `watchAt` spots, the client's own place first, then sister spots. Each has Directions, Call, Book and "Their app".
+  2. The game's TV and streaming channels from ESPN, linked only to each network's **official** site or app. The viewer signs in with their own subscription. There are no unofficial streams, ever.
+- **Melody's carousel** (`layout.js`) gets an "📅 All games" chip, plus the same venues in its Where to watch sheet. **Nalu Vida** is install #2: ticker under the hero buttons, a "📺 Live scores" button, picks just for fun, no Fight Night.
+
+```js
+watchAt: [{ name: "Nalu Vida", note: "Every game on the TVs, …", address: "1 Washington Blvd, Venice, CA 90292",
+            tel: "+13104370060", book: "https://resy.com/…" },
+          { name: "Melody Bar & Grill (sister spot)", note: "…", address: "…", tel: "…", app: "../melody-lax/", appLabel: "✈️ Their app" }]
+```
+Notes must be the owner's own wording ("every game on the TVs" comes from each restaurant's page). Never promise a specific game is on.
+
 ## Rules the module keeps
 
 - Teams are matched by **ESPN team ID per league**, never by display name.
@@ -94,6 +109,39 @@ In `teams.js`, copy the `la` entry under a new key (e.g. `bay`). List each team 
 ```
 
 `clients` is optional. Leave it out, or use `["all"]`, to show the card at every client. A card hides itself 8 hours after its start time. Only enter real, confirmed events.
+
+## Perk: Football Squares (`squares.js`, server = Code.gs)
+
+A **promotional contest with a free way in**: no entry fee, **no purchase necessary** (every member gets 1 free square per board), and no cash or money prizes in or out. Purchases can add squares (see Entry), so the free square must always stay: purchase-only entry + prize + chance is an illegal lottery in California (Penal Code 319). Owner-set prizes are limited to:
+- food
+- merch
+- % off the check
+- a free **non-alcoholic** drink
+- % off a drink (21+)
+
+Never offer free alcohol (California ABC). The server refuses anything that reads like money (`$`, cash, gift card, credit…).
+
+How it works:
+- **Board:** one 10×10 board per NFL or college game, with up to `max` players (default 20) × `per` squares each (default 5).
+- **Entry:** players must be Rewards members with a name (the existing sign-in), with one entry per member. Each gets **1 free square** per board ("Get my free square", no purchase). Each purchase can add 1 more: staff scan the member's Rewards card in Christian HQ › 🏈 Squares › **+1 Squares ticket** (Code.gs `squares_admin` op `ticket`), 1 ticket = 1 square, up to the board's per-person cap. The board never holds more than 100 squares. They tap squares or use auto-pick.
+- **Kickoff:** entries lock, and the row (home) and column (away) digits are drawn and revealed.
+- **Winners:** at the end of Q1, halftime, Q3 and the final, the last digit of each score picks the winning square. Scores come from ESPN's `summary?event=` JSON on the server.
+- **Unclaimed squares:** the prize rolls to the next quarter if the owner turns rollover on.
+
+Client config:
+```js
+perks: { squares: { on: true, slug: "melody-bar-grill", owner: "Melody",
+  api: function () { return "<Apps Script /exec URL>"; },             // POST squares_get / squares_claim
+  member: function () { return { id: "...", name: "..." } || null; },  // the signed-in Rewards member
+  join: function (cb) { /* open the client's existing sign-up, then cb() */ } } }
+```
+Include `<script src="../sports/squares.js?v=sq1"></script>` after `sports.js`. It adds a "🏈 Squares" tab to the scoreboard. The tab appears only when the server returns at least one board, so it stays hidden until the endpoints are deployed.
+
+Owner controls are in the Christian HQ 🏈 Squares tab (`backoffice/christian/squares-hq.js`): create a board from upcoming games, set prizes per quarter, toggle rollover, lock and reveal, see entrants and winners, mark prizes redeemed, and delete. Destructive actions need two taps.
+
+`?test=1` on either page uses `squares-mock.js`, an offline copy of the server logic with made-up data, kept in that browser's localStorage.
+
+Server endpoints are in `command-center/clients/melody-lax/signup-sheet/Code.gs` (Squares tab): `squares_get`, `squares_claim` and `squares_admin` (bo token). Tests are in `tests/squares.test.mjs`.
 
 ## Follow-ups (not built)
 

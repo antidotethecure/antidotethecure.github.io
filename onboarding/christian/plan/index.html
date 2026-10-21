@@ -53,6 +53,13 @@ ul{margin:6px 0 0;padding-left:20px}li{margin:6px 0}
 .tst .sp{display:flex;gap:10px;align-items:flex-start;margin:9px 0}.tst .sp input{flex:none;width:22px;height:22px;margin-top:2px;accent-color:#2fbf71}
 .tst .sp label{font-size:14.5px}.tst .sp label b.t{display:block}
 .tst .done{color:#7dffb5;font-weight:800;font-size:13px}
+.ph{border:1px solid var(--edge);border-radius:18px;padding:14px 16px;margin:0 0 14px;background:var(--card)}
+.ph h2{margin:4px 0;font-size:20px}.ph .sec{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:14px 0 4px}
+.ph .row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--edge)}.ph .row:first-of-type{border-top:0}
+.ph .row span{flex:1;font-size:15px}.ph .row.ok span{color:var(--dim);text-decoration:line-through}
+.ph label.add{flex:none;display:inline-flex;align-items:center;gap:6px;background:#1e6fe0;color:#fff;font-weight:800;font-size:13.5px;border-radius:999px;padding:8px 12px;cursor:pointer}
+.ph .row.ok label.add{background:#2fbf71;color:#06210f}.ph input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+.ph .bar{height:8px;border-radius:99px;background:#ffffff14;overflow:hidden;margin:8px 0}.ph .bar i{display:block;height:100%;background:linear-gradient(90deg,#2fbf71,#f5c400)}
 </style></head><body><main>
 <div class="top"><img src="../../../assets/ssai-lockup.jpg" alt="SousShift AI"></div>
 <div class="split"><div class="h mel"><img src="../../../demo/melody-lax/img/logo.png" alt="Melody Bar &amp; Grill"><b>Melody · LAX</b></div><div class="h nal"><img src="../../../demo/nalu-vida/img/logo.png" alt="Nalu Vida"><b>Nalu Vida · Venice</b></div><span class="x">×</span></div>
@@ -70,6 +77,13 @@ ul{margin:6px 0 0;padding-left:20px}li{margin:6px 0}
 <p class="done" id="tsDone" hidden>✅ All set at <span id="tsDoneR"></span>. Tell Antidote and he'll switch the app's live passes on.</p>
 <a class="btn" id="tsPrint" href="../../../melody/kit/toast-interim.html">🖨️ Open the printable Toast sheet (staff steps included)</a>
 <a class="btn alt" href="sms:+14243094068?&amp;body=Ready%20to%20add%20the%20Toast%20reward%20buttons">💬 Text Antidote to do it together</a>
+</section>
+<section class="ph" id="photos" aria-labelledby="phh">
+<span class="pill b">Menu photos</span>
+<h2 id="phh">📸 Photos we still need</h2>
+<p class="s" style="margin:0">Tap <b>📷 Add photo</b> next to a dish, take or pick a picture, then send it to Antidote (Messages, AirDrop or email to secondshiftai@gmail.com). It's already named for the right dish, and it goes into your app within a day.</p>
+<div id="phList"><p class="s">Loading…</p></div>
+<p class="note">Tips: daylight or bright light, plate fills the frame, no hands or napkins. Phone photos are perfect.</p>
 </section>
 <h1>Christian, here's the game plan 🤝</h1>
 <p class="s">Melody Bar &amp; Grill + Nalu Vida · everything we've built, where the <b>Toast integration</b> stands, what it costs on our side, and what's next.</p>
@@ -189,6 +203,17 @@ ul{margin:6px 0 0;padding-left:20px}li{margin:6px 0}
 </ul>
 <p>You'll get both final playable versions to approve before launch.</p></div>
 
+<h2>🧾 Payments</h2>
+<div class="card ok"><span class="pill g">Thank you!</span>
+<table style="width:100%;border-collapse:collapse;font-size:14.5px;margin-top:8px">
+<tr><td style="padding:6px 0">✅ <b>Melody Bar LLC: setup</b><br><span class="s" style="font-size:13px">Received Oct 12, 2026 · Zelle</span></td><td style="text-align:right;font-weight:900;color:#7dffb5">$750 paid</td></tr>
+<tr><td style="padding:6px 0;border-top:1px solid var(--edge)">⏳ <b>Nalu Vida LLC: setup</b><br><span class="s" style="font-size:13px">Due when the Nalu Vida agreement is signed</span></td><td style="text-align:right;border-top:1px solid var(--edge);font-weight:800">$750</td></tr>
+<tr><td style="padding:6px 0;border-top:1px solid var(--edge)">🗓️ <b>Monthly: $150 per restaurant</b><br><span class="s" style="font-size:13px">Starts only after the Toast integration is approved in writing. $0 during interim mode.</span></td><td style="text-align:right;border-top:1px solid var(--edge)">not started</td></tr>
+<tr><td style="padding:8px 0;border-top:2px solid var(--gold)"><b>Setup paid so far</b></td><td style="text-align:right;border-top:2px solid var(--gold);font-weight:900;color:var(--gold)">$750 of $1,500</td></tr>
+</table>
+<p class="note">Two separate agreements: Melody Bar LLC and Nalu Vida LLC, each with its own billing. They're on their way to you by DocuSign.</p>
+</div>
+
 <h2>💰 What you're paying vs. what you're getting</h2>
 <div class="card">
 <div class="big">$1,500 one-time setup<small>+ $300/month that covers <b>both</b> restaurants: two separate agreements, $750 + $150/mo each</small></div>
@@ -229,6 +254,35 @@ ul{margin:6px 0 0;padding-left:20px}li{margin:6px 0}
 <p class="note">Questions anytime: text Antidote.</p>
 </main><script>
 (function(){
+var KEY="cw-photos-sent-v1", sent={}; try{ sent=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){}
+function esc(t){ return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+var host=document.getElementById("phList");
+fetch("photos.json",{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(D){
+  var html="";
+  Object.keys(D).forEach(function(rk){ var R=D[rk], need=R.items.filter(function(i){ return !i.has; }), done=need.filter(function(i){ return sent[rk+"__"+i.slug]; }).length;
+    html+="<div class='sec'>"+esc(R.name)+"</div>";
+    if(!need.length){ html+="<p style='margin:4px 0'>✅ All "+R.total+" items have photos. <span class='s'>Want to swap one for your own real photo? Tap Replace.</span></p><details><summary class='s' style='cursor:pointer'>Show "+R.total+" items</summary>"+R.items.map(function(i){ return row(rk,i,"Replace"); }).join("")+"</details>"; return; }
+    html+="<p style='margin:4px 0'><b>"+(need.length-done)+"</b> of "+R.total+" items still need a photo"+(done?" · "+done+" sent ✅":"")+"</p><div class='bar'><i style='width:"+Math.round(100*(R.total-need.length+done)/R.total)+"%'></i></div>";
+    var by={}; need.forEach(function(i){ (by[i.section]=by[i.section]||[]).push(i); });
+    Object.keys(by).forEach(function(s){ html+="<div class='s' style='font-size:13px;font-weight:700;margin-top:8px'>"+esc(s)+"</div>"+by[s].map(function(i){ return row(rk,i,"Add photo"); }).join(""); });
+  });
+  host.innerHTML=html;
+}).catch(function(){ host.innerHTML="<p class='s'>Couldn't load the photo list. Pull down to refresh.</p>"; });
+function row(rk,i,verb){ var k=rk+"__"+i.slug, ok=!!sent[k];
+  return "<div class='row"+(ok?" ok":"")+"' data-k='"+k+"' data-n='"+esc(i.name)+"'><span>"+esc(i.name)+"</span><label class='add'>"+(ok?"✅ Sent":"📷 "+verb)+"<input type='file' accept='image/*'></label></div>"; }
+host.addEventListener("change",function(e){
+  var inp=e.target; if(inp.type!=="file"||!inp.files[0]) return; var row=inp.closest(".row"), k=row.dataset.k, n=row.dataset.n, f=inp.files[0];
+  var ext=((f.name.split(".").pop()||"jpg").toLowerCase()).replace("jpeg","jpg"), nf=new File([f],k+"."+ext,{type:f.type||"image/jpeg"});
+  function mark(){ sent[k]=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(sent)); }catch(err){} row.classList.add("ok"); row.querySelector("label").firstChild.nodeValue="✅ Sent"; }
+  if(navigator.canShare&&navigator.canShare({files:[nf]})){ navigator.share({files:[nf],title:"Menu photo: "+n,text:"Menu photo for "+n+" ("+k+")"}).then(mark).catch(function(){}); }
+  else { var a=document.createElement("a"); a.href=URL.createObjectURL(nf); a.download=nf.name; document.body.appendChild(a); a.click(); a.remove(); mark();
+    alert("Saved as "+nf.name+". Send it to Antidote (secondshiftai@gmail.com)."); }
+  inp.value="";
+});
+})();
+</script>
+<script>
+(function(){
 var B={m:[["App Reward – Free Soft Drink or Melody Fries","100% off 1 item","250 pts"],["App Reward – Free Starter","100% off 1 item","500 pts"],["App Reward – $10 Off","$10 off check","1,000 pts"],["App Reward – Free Entrée","100% off 1 item","1,500 pts"],["App – Just Landed 10% Off","10% off check","first order"]],
 n:[["App Reward – Free Mocktail/Soft Drink/Jungle Fries","100% off 1 item","250 pts"],["App Reward – Free Shareable","100% off 1 item","500 pts"],["App Reward – $10 Off","$10 off check","1,000 pts"],["App Reward – Free Entrée","100% off 1 item","1,500 pts"]]};
 // Toast status per restaurant: Melody's 5 buttons are set up (Antidote confirmed 2026-10-12). Nalu Vida: not confirmed yet.
@@ -255,4 +309,5 @@ document.getElementById("tsSteps").addEventListener("change",function(e){ var k=
 draw(); try{ if(!location.hash) window.scrollTo(0,0); }catch(e){}
 })();
 </script>
+<script src="../../../demo/poweredby.js?v=20261013a" defer></script>
 </body></html>

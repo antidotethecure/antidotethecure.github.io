@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Venue Versus · Bar TV</title>
+<!-- SousShift AI — VENUE VERSUS bar-TV page. Open full screen on the bar TV (a Fire TV / Chromecast browser / any laptop on HDMI):
+       tv.html?slug=melody&tv=<TV key from the owner admin page>
+     Shows the lobby (who's here), the next battle + countdown, the live leaderboard while a battle runs, the winner, tonight's
+     "Who wins?" picks, emoji reactions, and the check-in 4-digit code + QR (both rotate; the QR is a 15-minute signed link).
+     Without ?tv= (or with an expired key) it still shows the boards but hides the code and QR, so the link can't be used to
+     check in from outside the bar. The restaurant's review poster stays on screen the whole time (house rule).
+     Test hook: ?vvapi=http://127.0.0.1:8787 (local Worker). -->
+<script src="venues.js?v=vv1"></script>
+<style>
+:root{--bg:#0b1220;--bg2:#121b30;--panel:#141e34;--edge:#27324d;--acc:#d4af37;--acc2:#f0d375;--wine:#a33645;--ink:#f6f1e4;--dim:#9aa3b5;--go:#3fbf8f;--disp:Georgia,serif;--body:system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--body);overflow:hidden}
+body{background:radial-gradient(1200px 700px at 15% -10%,color-mix(in srgb,var(--wine) 35%,transparent),transparent 60%),radial-gradient(900px 600px at 110% 110%,color-mix(in srgb,var(--acc) 18%,transparent),transparent 60%),var(--bg)}
+.wrap{display:grid;grid-template-columns:1fr minmax(300px,30vw);grid-template-rows:auto 1fr;gap:2vh 2vw;height:100vh;padding:3vh 3vw}
+header{grid-column:1/-1;display:flex;align-items:center;gap:2vw}
+header img{height:9vh;width:auto}
+header h1{margin:0;font:900 5.4vh/1 var(--disp);letter-spacing:.01em}
+header h1 small{display:block;font:800 1.9vh var(--body);letter-spacing:.3em;color:var(--acc2);text-transform:uppercase;margin-bottom:.6vh}
+.here{margin-left:auto;display:flex;align-items:center;gap:1vh;font:800 2.6vh var(--body);background:#0006;border:1px solid var(--edge);border-radius:99px;padding:1vh 2vh}
+.dot{width:1.6vh;height:1.6vh;border-radius:50%;background:var(--go);animation:p 1.6s infinite}.dot.off{background:#777;animation:none}
+@keyframes p{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--go) 70%,transparent)}70%{box-shadow:0 0 0 1.6vh transparent}100%{box-shadow:0 0 0 0 transparent}}
+main{min-height:0;display:flex;flex-direction:column;gap:2vh}
+.card{background:color-mix(in srgb,var(--panel) 88%,transparent);border:1px solid var(--edge);border-radius:2.4vh;padding:2.6vh 3vh;min-height:0}
+.k{font:800 1.8vh var(--body);letter-spacing:.22em;text-transform:uppercase;color:var(--acc2)}
+h2{margin:.6vh 0 1vh;font:900 4.6vh/1.05 var(--disp)}
+.big{font:900 15vh/1 var(--body);font-variant-numeric:tabular-nums;color:var(--acc2);text-shadow:0 1vh 4vh #000a}
+.sub{font:700 2.4vh/1.35 var(--body);color:var(--dim)}
+.board{list-style:none;margin:1.4vh 0 0;padding:0;display:grid;gap:.8vh}
+.board li{display:grid;grid-template-columns:6vh 1fr auto;align-items:center;gap:1.6vh;padding:1vh 1.6vh;border-radius:1.4vh;background:#ffffff08;font:800 3vh var(--body);position:relative;overflow:hidden;transition:transform .4s}
+.board li .bar{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,color-mix(in srgb,var(--acc) 28%,transparent),transparent);z-index:0;transition:width .8s}
+.board li>*{position:relative;z-index:1}.board li .r{color:var(--dim);text-align:center}.board li .v{color:var(--acc2);font-variant-numeric:tabular-nums}
+.board li.top{font-size:3.6vh;background:color-mix(in srgb,var(--acc) 16%,transparent)}
+.cols{display:grid;grid-template-columns:2fr 1fr;gap:2vw;min-height:0}
+.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(32vh,1fr));gap:1.4vh;margin-top:1.2vh}
+.g{background:#0004;border:1px solid var(--edge);border-radius:1.6vh;padding:1.4vh 1.6vh;font:800 2.2vh var(--body)}
+.g .split{display:flex;height:1.2vh;border-radius:99px;overflow:hidden;margin:1vh 0 .6vh;background:#fff1}.g .split i{display:block;background:var(--acc)}.g .split i+i{background:var(--wine)}
+.g .lab{display:flex;justify-content:space-between;color:var(--dim);font-size:1.8vh}
+aside{display:flex;flex-direction:column;gap:2vh;min-height:0}
+.join{text-align:center}
+.qr{background:#fff;border-radius:2vh;padding:1.6vh;width:min(100%,30vh);margin:1.4vh auto;aspect-ratio:1}
+.qr svg{width:100%;height:100%;display:block}
+.code{font:900 9vh/1 ui-monospace,Menlo,monospace;letter-spacing:.18em;color:var(--acc2);margin:.6vh 0}
+.poster{position:relative;border-radius:2vh;overflow:hidden;border:1px solid var(--edge);background:#000;flex:1;min-height:14vh;display:flex;align-items:center;justify-content:center}
+.poster img{width:100%;height:100%;object-fit:contain;display:block}
+.poster span{position:absolute;left:1.2vh;top:1.2vh;background:#000b;border-radius:99px;padding:.6vh 1.4vh;font:800 1.7vh var(--body)}
+.pw{font:600 1.5vh var(--body);color:var(--dim);text-align:center;margin-top:.8vh}
+.float{position:fixed;bottom:4vh;font-size:7vh;pointer-events:none;animation:f 3.2s ease-out forwards;z-index:9}
+.float small{display:block;font:800 2vh var(--body);text-align:center;color:#fff;text-shadow:0 .3vh 1vh #000}
+@keyframes f{0%{transform:translateY(0) scale(.5);opacity:0}12%{opacity:1;transform:translateY(-4vh) scale(1.15)}100%{transform:translateY(-60vh) scale(1);opacity:0}}
+.win{display:flex;align-items:center;gap:3vh}.win .crown{font-size:12vh}
+.empty{color:var(--dim);font:700 2.6vh var(--body);margin:1vh 0 0}
+@media (max-aspect-ratio:1/1){.wrap{grid-template-columns:1fr;overflow:auto;height:auto}html,body{overflow:auto}}
+@media (prefers-reduced-motion:reduce){.dot{animation:none}.float{animation-duration:.01s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><img id="logo" alt=""><h1><small>Venue Versus · live</small><span id="vname">Venue Versus</span></h1><div class="here"><i class="dot off" id="dot"></i><span id="here">connecting…</span></div></header>
+  <main id="main"><div class="card"><div class="k">Venue Versus</div><h2>Connecting to the lobby…</h2></div></main>
+  <aside>
+    <div class="card join" id="join"></div>
+    <div class="poster" id="poster"><img id="posterimg" alt="Antidote The Foodie's review of this restaurant"><span>▶ Antidote The Foodie reviewed us</span></div>
+  </aside>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  var q=new URLSearchParams(location.search), SLUG=(q.get("slug")||"melody").replace(/[^a-z0-9-]/g,""), TVK=q.get("tv")||"";
+  var V=(window.VERSUS_VENUES||{})[SLUG]||{name:"Venue Versus",theme:{}};
+  var BASE=(q.get("vvapi")||V.api||"https://drizzle-bowl-scores.higgsfield.app").replace(/\/+$/,""), API=BASE+"/api/versus";
+  var $=function(i){ return document.getElementById(i); };
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function fmt(n){ return Number(n||0).toLocaleString(); }
+  function mmss(ms){ var s=Math.max(0,Math.ceil(ms/1000)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+  function until(ms){ if(ms<=0) return "0:00"; var s=Math.ceil(ms/1000), h=Math.floor(s/3600), m=Math.floor(s%3600/60); return h?h+"h "+String(m).padStart(2,"0")+"m":mmss(ms); }
+  function clock(t){ try{ return new Date(t).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}); }catch(e){ return ""; } }
+  // theme + fonts
+  var T=V.theme||{}, r=document.documentElement.style;
+  [["bg","--bg"],["bg2","--bg2"],["panel","--panel"],["edge","--edge"],["accent","--acc"],["accent2","--acc2"],["wine","--wine"],["ink","--ink"],["dim","--dim"],["go","--go"],["display","--disp"],["body","--body"]].forEach(function(p){ if(T[p[0]]) r.setProperty(p[1],T[p[0]]); });
+  if(V.fonts){ var l=document.createElement("link"); l.rel="stylesheet"; l.href=V.fonts; document.head.appendChild(l); }
+  $("vname").textContent=V.name; document.title="Venue Versus · "+V.name;
+  if(V.logo) $("logo").src=V.logo; else $("logo").remove();
+  if(V.poster) $("posterimg").src=V.poster; else $("poster").remove();
+
+  var S=null, off=0, picks=null, ws=null, wsOk=false, pollT=null, tries=0;
+  function now(){ return Date.now()+off; }
+  function apply(m){ if(m.now) off=m.now-Date.now(); S=m; paint(); }
+  function connect(){
+    if(tries>=4){ poll(); return; } tries++;
+    try{ ws=new WebSocket(API.replace(/^http/,"ws")+"/ws?slug="+SLUG+(TVK?"&tv="+encodeURIComponent(TVK):"&tv=public")); }catch(e){ poll(); return; }
+    ws.onopen=function(){ wsOk=true; tries=0; $("dot").classList.remove("off"); };
+    ws.onmessage=function(ev){ var m; try{ m=JSON.parse(ev.data); }catch(e){ return; } if(m.t==="state") apply(m); else if(m.t==="react") float(m.e,m.n); };
+    ws.onclose=function(){ wsOk=false; $("dot").classList.add("off"); setTimeout(connect,3000); };
+  }
+  // the code + QR rotate on the server clock: refresh them every 30 s even when nothing else changes (and poll if no socket)
+  function poll(){
+    fetch(API+"/tv?slug="+SLUG+(TVK?"&tv="+encodeURIComponent(TVK):""),{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(j){ if(j&&j.t==="state") apply(j); }).catch(function(){});
+    clearTimeout(pollT); pollT=setTimeout(poll,wsOk?30000:3000);
+  }
+  function loadPicks(){ fetch(API+"/picks?slug="+SLUG,{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(j){ if(j&&j.ok){ picks=j; paint(); } }).catch(function(){}); }
+
+  function board(rows,n,from){
+    from=from||0;
+    if(!rows||rows.length<=from) return from?'':'<p class="empty">Scores show up here as soon as the planes take off.</p>';
+    var top=Math.max(1,rows[0].s);
+    return '<ol class="board">'+rows.slice(from,from+(n||10)).map(function(x,j){ var i=j+from; return '<li'+(i?'':' class="top"')+'><i class="bar" style="width:'+Math.round(100*Math.max(0,x.s)/top)+'%"></i><span class="r">'+(i?i+1:"👑")+'</span><span>'+esc(x.n)+(x.p?' 🧪':'')+(x.k?' 🧒':'')+'</span><span class="v">'+fmt(x.s)+'</span></li>'; }).join("")+'</ol>';
+  }
+  function picksCard(){
+    if(!picks||!picks.on||!picks.games||!picks.games.length) return "";
+    return '<div class="card"><div class="k">Who wins? · picks tonight</div><div class="games">'+picks.games.slice(0,6).map(function(g){
+      var a=g.counts[g.away.id]||0, h=g.counts[g.home.id]||0, t=a+h, pa=t?Math.round(100*a/t):50;
+      return '<div class="g">'+esc(g.away.abbr||g.away.name)+' @ '+esc(g.home.abbr||g.home.name)+' <span style="color:var(--dim);font-size:1.8vh">· '+(g.state==="pre"?clock(g.startsAt):esc(g.detail))+'</span><div class="split"><i style="width:'+pa+'%"></i><i style="width:'+(100-pa)+'%"></i></div><div class="lab"><span>'+pa+'% '+esc(g.away.abbr)+'</span><span>'+(t?(100-pa)+'% ':'')+esc(g.home.abbr)+'</span></div></div>';
+    }).join("")+'</div></div>';
+  }
+  function paint(){
+    if(!S) return;
+    $("here").textContent=fmt(S.here)+" here now";
+    var t=now(), h="", e=(S.events||[])[0];
+    if(S.live){
+      h+='<div class="card"><div class="k">🔴 Live · '+esc(S.live.title)+' · '+fmt(S.live.total)+' playing</div><div class="cols"><div><h2>Live leaderboard</h2>'+board(S.live.board,8)+'</div>'+
+        '<div><div class="big" id="clock" data-end="'+S.live.endsAt+'">'+mmss(S.live.endsAt-t)+'</div><p class="sub">left on the clock</p>'+(S.live.kids&&S.live.kids.length?'<div class="k" style="margin-top:2vh">🧒 Kids</div>'+board(S.live.kids,4):'')+'</div></div></div>';
+    } else {
+      if(S.last&&S.last.winner&&t-S.last.endedAt<15*60000) h+='<div class="card"><div class="k">🏁 Final · '+esc(S.last.title)+'</div><div class="win"><div class="crown">👑</div><div><h2>'+esc(S.last.winner.n)+' wins!</h2><p class="sub">'+fmt(S.last.winner.s)+' points · '+fmt(S.last.total)+' players'+(S.last.prize?' · 🎁 '+esc(S.last.prize.text):'')+'</p></div></div>'+board(S.last.board,4,1)+'</div>';
+      if(e) h+='<div class="card"><div class="k">'+(e.kind==="pickup"?"Quick battle":"Next battle")+' · '+clock(e.startsAt)+'</div><h2>'+esc(e.title)+'</h2><div class="big" id="clock" data-start="'+e.startsAt+'">'+until(e.startsAt-t)+'</div>'+
+        '<p class="sub">'+(e.status==="open"?'Joining is open: '+fmt(e.joined)+' in so far. ':'Joining opens 10 minutes before. ')+Math.round((e.endsAt-e.startsAt)/60000)+'-minute high-score flight · '+(e.prize?'🎁 '+esc(e.prize.text)+(e.prize.adult?' (21+)':''):'🏅 bragging rights')+' · free to play</p></div>';
+      else h+='<div class="card"><div class="k">Venue Versus</div><h2>Quick battles any time</h2><p class="sub">Open the app, tap ⚔️ Venue Versus and hit Ready. Two players ready = a 2-minute battle.</p></div>';
+    }
+    h+=picksCard();
+    $("main").innerHTML=h;
+    var tv=S.tv||{}, j="";
+    if(tv.keyed){
+      j='<div class="k">Play from your phone</div><div class="qr" id="qr"></div><div class="sub">Scan to join the lobby, or open the '+esc(V.short||V.name)+' app and enter</div><div class="code">'+esc(tv.code)+'</div><div class="sub">Code changes every 10 minutes</div><div class="pw">Powered by SousShift AI</div>';
+    } else j='<div class="k">Play from your phone</div><h2 style="font-size:3.4vh">Open the '+esc(V.short||V.name)+' app → ⚔️ Venue Versus</h2><p class="sub">Staff: open this screen with the TV link from the owner page to show the check-in code and QR.</p><div class="pw">Powered by SousShift AI</div>';
+    if($("join").getAttribute("data-k")!==(tv.qrUrl||"")+"|"+(tv.code||"")){ $("join").innerHTML=j; $("join").setAttribute("data-k",(tv.qrUrl||"")+"|"+(tv.code||""));
+      if(tv.keyed&&window.qrcode){ try{ var qq=window.qrcode(0,"M"); qq.addData(tv.qrUrl); qq.make(); $("qr").innerHTML=qq.createSvgTag({cellSize:4,margin:0,scalable:true}); }catch(x){ $("qr").textContent=tv.code; } } }
+  }
+  setInterval(function(){ var c=$("clock"); if(!c) return; var t=now(); if(c.dataset.end) c.textContent=mmss(+c.dataset.end-t); else if(c.dataset.start) c.textContent=until(+c.dataset.start-t); },250);
+  function float(e,n){ var f=document.createElement("div"); f.className="float"; f.innerHTML=esc(e)+(n?"<small>"+esc(n)+"</small>":""); f.style.left=(8+Math.random()*60)+"vw"; document.body.appendChild(f); setTimeout(function(){ f.remove(); },3400); }
+  connect(); poll(); loadPicks(); setInterval(loadPicks,60000);
+  // a TV never sleeps: keep the screen awake where the browser allows it
+  try{ if(navigator.wakeLock) navigator.wakeLock.request("screen").catch(function(){}); }catch(e){}
+})();
+</script>
+</body>
+</html>

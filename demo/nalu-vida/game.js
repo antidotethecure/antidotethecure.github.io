@@ -1,11 +1,15 @@
 /* Ride the Nalu — Nalu Vida's surf game. Every level is one trip out and back, like Melody's flight:
    1. SAND + SWIM: start on the sand in front of Nalu Vida, run into the water and paddle out through the break.
       Breaking waves roll in at you: tap JUMP to duck-dive under each one. Get caught = ENGULFED (−1 ❤️).
-   2. RIDE (~90 s on level 1): pop up and ride the wave in. Each wave forms on one side and peels across: ride the
-      glowing POCKET just ahead of the curl to the exit on the far side (bonus). Behind the curl or under the falling
-      lip = washed (−½ ❤️); too far out front = you slow down. JUMP only launches off the LIP (top of the face, in the
-      pocket); in the air tap TRICK (or swipe up/down) for a spin or flip; still mid-trick on landing = a bail (−1 ❤️).
-      The ride itself is just the wave and the odd shark (packs from level 4). Everything else lives on the paddle-out: the Nalu
+   2. RIDE (~90 s on level 1): pop up and ride the wave in. Each wave forms on one side and peels across. Behind the
+      curl is the breaking WHITE FOAM; ahead of it is the clean, unbroken face (and its shoulder, out to the side). The
+      foam is the ONLY thing on the ride that hurts (touch it = FOAM wipeout, −½ ❤️). Anywhere on the clean face is safe:
+      JUMP (or swipe up) carves up the face to the lip and launches you; the steeper face near the curl and a fast carve
+      = bigger air. In the air tap TRICK / tap the water / swipe (sideways = 360, down = grab, up = flip; keys R/G/F,
+      pad X/LB/RB) and land it: NICE! + trick points, and back-to-back clean landings build a small combo (×1.25 … ×2).
+      Still mid-trick on landing = a light bail (−150, no heart). Riding the pocket near the curl still scores extra.
+      Health kits float by on the ride every 20–30 s while you're hurt (+1 ❤️). No sharks or other clutter on the ride
+      (Antidote, 2026-10-14: nothing in the water to distract you). Everything else lives on the paddle-out: the Nalu
       Vida care boat (food rafts, a heart, a harpoon bundle), stingrays / eels / jellies ramping up by level, double sets from
       level 3, and from level 2 a submarine that surfaces ahead, locks a red aim line on you and fires a harpoon (dodge it or
       duck-dive; level 4+ fires twice). Boss fights bring pier sections (JUMP them, −1 ❤️) and rocks to ram the boss into.
@@ -19,7 +23,7 @@
    REWARDS: the run's score turns into Nalu Vida Rewards points through window.SSAI_GAMEPTS (crm.js): 1 pt per 100 score,
    capped per day (SSAI_REWARDS.game). Playing never needs an account; a guest is offered "Join to save your N points".
    Scoring has no ceiling: grab 4 in a row for ×2, 8 = ×3 … A hit resets it.
-   Test hooks: ?lvl=1-5 &boss=1 &god=1 &spd=1-8 &phase=swim|ride|ending &hits=0-4 &gore=0 &bot=1 (autopilot) &bot=wash &tut=1 &render=2d|3d &keep3d=1
+   Test hooks: ?wave=1 (start on the ride back in) ?lvl=1-5 &boss=1 &god=1 &spd=1-8 &phase=swim|ride|ending &hits=0-4 &gore=0 &bot=1 (autopilot) &bot=wash &tut=1 &render=2d|3d &keep3d=1
    Water = WebGL shader (falls back to a 2D gradient). Sprites live in img/game/*.webp; anything missing is drawn. */
 (function () {
   "use strict";
@@ -29,7 +33,7 @@
   var QS = (function () { try { return new URLSearchParams(location.search); } catch (e) { return { get: function () { return null; } }; } })();
   var DBG_LVL = Math.max(1, Math.min(5, +QS.get("lvl") || 1)), DBG_BOSS = QS.get("boss") === "1", DBG_GOD = QS.get("god") === "1", DBG_SPD = Math.max(1, Math.min(8, +QS.get("spd") || 1)),
     DBG_PHASE = QS.get("phase") || "", DBG_HITS = Math.max(0, Math.min(4, +QS.get("hits") || 0)), DBG_BOT = QS.get("bot") === "1",
-    DBG_WASH = QS.get("bot") === "wash", DBG_TUT = QS.get("tut") === "1";   // ?bot=wash: an autopilot that sits in the whitewater (tests the −½) · ?tut=1: always show the ride tutorial
+    DBG_WASH = QS.get("bot") === "wash", DBG_TUT = QS.get("tut") === "1", DBG_WAVE = QS.get("wave") === "1";   // ?wave=1: jump straight to the ride back in   // ?bot=wash: an autopilot that sits in the whitewater (tests the −½) · ?tut=1: always show the ride tutorial
   // ?rescue=1: test the lifeguard beer rescue (the run starts 2 hits down with the rescue queued; window.__NV.rescue() re-throws)
   var DBG_RESC = QS.get("rescue") === "1", REDUCE = false; try { REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
   /* ---------- levels: the arc timings, in seconds ----------
@@ -101,7 +105,7 @@
     '<div class="nv-ov" id="nv-start"><h3>Ride the Nalu</h3><p>Run in from the sand, paddle out past the break, ride the wave back to Nalu Vida. Earn Nalu Vida Rewards points.</p>' +
     '<div class="nv-pick"><button type="button" data-s="f"><img src="img/game/surfer_f.webp" alt="" onerror="this.outerHTML=\'<div class=ph style=font-size:64px;line-height:96px>🏄‍♀️</div>\'">She rides</button>' +
     '<button type="button" data-s="m"><img src="img/game/surfer_m.webp" alt="" onerror="this.outerHTML=\'<div class=ph style=font-size:64px;line-height:96px>🏄‍♂️</div>\'">He rides</button></div>' +
-    '<p class="nv-how">Drag to steer · <b>Paddle out:</b> tap JUMP to duck-dive under each breaking wave · <b>Ride:</b> the wave peels across the screen: ride the glowing pocket just ahead of the curl all the way to the exit. Behind the curl or under the lip = −½ ❤️; too far out front = you slow down · tap JUMP at <b>⬆ LIP</b> for big air, TRICK in the air, land it · JUMP the pier when it drifts across · Grab food, 4 in a row = ×2 · Steer around sharks, stingrays, eels &amp; jellies (a bump = a splash wipeout) · <b>5 levels</b> · Tap the banner plane 👀</p><p class="nv-how" id="nv-best"></p></div>' +
+    '<p class="nv-how">Drag to steer · <b>Paddle out:</b> tap JUMP to duck-dive under each breaking wave · <b>Ride in:</b> only the <b>white foam</b> behind the curl can hurt you (−½ ❤️). Stay on the clean face, or go round to the side with no foam · tap JUMP (or swipe up) to ride up the lip and launch, then TRICK / tap / swipe in the air (sideways = 360, down = grab, up = flip) and land it: NICE! · 🩹 health kits float by when you’re hurt (+1 ❤️) · Paddling out: grab food (4 in a row = ×2), steer around stingrays &amp; jellies · <b>5 levels</b> · Tap the banner plane 👀</p><p class="nv-how" id="nv-best"></p></div>' +
     '<div class="nv-ov" id="nv-end" data-scroll-ok style="display:none"></div>' +
     "</div>";
   var wrap = mount.firstChild, gl_c = document.getElementById("nv-water"), cv = document.getElementById("cv"), cx = cv.getContext("2d");
@@ -121,7 +125,7 @@
   /* ---------- images ---------- */
   var IM = {};
   ["surfer_m", "surfer_f", "shark", "eel", "jelly", "gull", "boat", "heli", "plane", "raft_taco", "raft_burger", "raft_oysters", "raft_mimosa", "raft_shrimp",
-    "drop", "buoy", "shore", "pier", "pierend", "lifeguard_f", "lifeguard_m", "staff", "palm", "storefront", "wave", "splash", "fish_gold", "fish_mahi", "fish_parrot", "raft_fries", "skeleton", "paddler_m", "paddler_f", "beachlady", "surfer_m_rider", "surfer_m_board", "surfer_f_rider", "surfer_f_board"].forEach(function (k) { var i = new Image(); i.decoding = "async"; i.src = "img/game/" + k + ".webp"; IM[k] = i; });
+    "drop", "buoy", "shore", "pier", "lifeguard_f", "lifeguard_m", "staff", "palm", "storefront", "wave", "splash", "fish_gold", "fish_mahi", "fish_parrot", "raft_fries", "skeleton", "paddler_m", "paddler_f", "beachlady", "surfer_m_rider", "surfer_m_board", "surfer_f_rider", "surfer_f_board"].forEach(function (k) { var i = new Image(); i.decoding = "async"; i.src = "img/game/" + k + ".webp"; IM[k] = i; });
   function ok(i) { return i && i.complete && i.naturalWidth > 0; }
   function spr(k, x, y, w, rot, alpha) {
     var i = IM[k]; if (!ok(i)) return false; var h = w * i.naturalHeight / i.naturalWidth;
@@ -187,6 +191,9 @@
   // buses: FX (surf ambience + effects) and MUSIC (his song "Cheat Code") both feed MASTER; 🔊 mutes MASTER,
   // the small 🎵 button pauses only the music. Nothing is created until the first tap (iOS audio unlock).
   var AC = null, MASTER = null, FX = null, MUSG = null, MUS = null, SURF = null, MUTED = false, SFX_ON = true, MUSIC_ON = true, HELI = null, MUSIC_VOL = 0.18;
+  /* two songs, switchable from the HUD 🎵 pill, the pause menu, Settings, the M key or controller B (../songswitch.js, short crossfade) */
+  var MSW = window.SongSwitch ? SongSwitch({ key: "nalu-song", vol: MUSIC_VOL, fade: .8, songs: [{ id: "cheat", name: "Cheat Code", src: "audio/cheat-code.m4a" }, { id: "xrp", name: "Xtreme Rich Person", src: "audio/xtreme-rich-person.m4a" }],
+    onTap: function () { audio(); if (AC && AC.state === "suspended") AC.resume(); musicSync(); } }) : null;
   try { MUTED = localStorage.getItem("nalu-mute") === "1"; SFX_ON = localStorage.getItem("nalu-sfx") !== "0"; MUSIC_ON = localStorage.getItem("nalu-music") !== "0"; } catch (e) {}
   function audio() {
     if (AC) return AC;
@@ -194,8 +201,8 @@
     MASTER = AC.createGain(); MASTER.gain.value = MUTED ? 0 : 0.8; MASTER.connect(AC.destination);
     FX = AC.createGain(); FX.gain.value = SFX_ON ? 1 : 0; FX.connect(MASTER);
     try {   // the song is streamed through WebAudio so its volume works on iPhone (HTMLAudio volume is read-only there)
-      MUS = new Audio(); MUS.src = "audio/cheat-code.m4a"; MUS.loop = true; MUS.preload = "auto"; MUS.setAttribute("playsinline", "");
-      MUSG = AC.createGain(); MUSG.gain.value = MUSIC_VOL * (MUSIC_ON ? 1 : 0); AC.createMediaElementSource(MUS).connect(MUSG); MUSG.connect(MASTER);
+      MUSG = AC.createGain(); MUSG.gain.value = MUSIC_VOL * (MUSIC_ON ? 1 : 0); MUSG.connect(MASTER);
+      if (MSW) { MSW.attach(AC, MUSG); MUS = MSW.el(); } else { MUS = new Audio(); MUS.src = "audio/cheat-code.m4a"; MUS.loop = true; MUS.preload = "auto"; MUS.setAttribute("playsinline", ""); AC.createMediaElementSource(MUS).connect(MUSG); }
     } catch (e) { MUS = null; }
     // surf: brown noise through a lowpass that swells like waves rolling in
     var len = AC.sampleRate * 4, b = AC.createBuffer(1, len, AC.sampleRate), d = b.getChannelData(0), l = 0;
@@ -238,6 +245,7 @@
   function sfx(k) {
     if (!AC) return;
     if (k === "grab") { tone("sine", 660, 990, .12, .18); tone("triangle", 990, 1320, .1, .08, .05); }
+    else if (k === "heal") { [523, 784, 1047, 1319].forEach(function (f, i) { tone("sine", f, f * 1.01, .22, .15, i * .06); }); tone("triangle", 1568, 2093, .25, .06, .24); }
     else if (k === "streak") { [523, 659, 784, 1047].forEach(function (f, i) { tone("triangle", f, f, .14, .14, i * .07); }); }
     else if (k === "hit") { noise(.35, .5, 300); tone("sine", 120, 45, .35, .4); }
     else if (k === "zap") { for (var i = 0; i < 6; i++) tone("square", 900 + Math.random() * 1600, 200, .05, .07, i * .04); }
@@ -258,7 +266,7 @@
   function setMute(m) { MUTED = m; try { localStorage.setItem("nalu-mute", m ? "1" : "0"); } catch (e) {} if (MASTER) MASTER.gain.value = m ? 0 : .8; var b = $("nv-mute"); if (b) b.textContent = m ? "🔇" : "🔊"; musicSync(); }
   function setSfx(on) { SFX_ON = !!on; try { localStorage.setItem("nalu-sfx", on ? "1" : "0"); } catch (e) {} if (FX) FX.gain.value = on ? 1 : 0; }
   function setMusic(on) { MUSIC_ON = !!on; try { localStorage.setItem("nalu-music", on ? "1" : "0"); } catch (e) {} if (MUSG && AC) MUSG.gain.setTargetAtTime(on ? MUSIC_VOL : 0, AC.currentTime, .05); musicSync(); }
-  function musicSync() { if (!MUS) return; if (MUSIC_ON && !MUTED && G && (G.running || G.over)) { var p = MUS.play(); if (p && p.catch) p.catch(function () {}); } else MUS.pause(); }
+  function musicSync() { if (!MUS) return; if (MSW) { MSW.sync(MUSIC_ON && !MUTED && G && (G.running || G.over)); return; } if (MUSIC_ON && !MUTED && G && (G.running || G.over)) { var p = MUS.play(); if (p && p.catch) p.catch(function () {}); } else MUS.pause(); }
   // shared start-menu hook (../gamemenu.js): music(false) only silences the song; nothing here creates audio before a tap
   window.GAME_AUDIO = { music: function (on) { setMusic(on); }, sfx: function (on) { setSfx(on); },
     state: function () { return { hasMusic: true, hasSfx: true, music: MUSIC_ON, sfx: SFX_ON, muted: MUTED, unlocked: !!AC }; } };
@@ -301,17 +309,18 @@
     if (DBG_RESC && !DBG_HITS) { G.hearts = 3; G.hitsRun = 2; G.rescPend = 1; }   // ?rescue=1&hits=1 instead tests the real 2nd-hit trigger
     levelStart(true);
     if (DBG_PHASE === "swim") { G.yw = 120; G.lvT = 4; toSwim(); }
-    else if (DBG_PHASE === "ride" || DBG_BOSS) { G.lvT = L().swim; G.yw = 2400; startRide(); if (DBG_BOSS && L().boss) G.rideT = L().ride - 2; }
+    else if (DBG_PHASE === "ride" || DBG_BOSS || DBG_WAVE) { G.lvT = L().swim; G.yw = 2400; startRide(); if (DBG_BOSS && L().boss) G.rideT = L().ride - 2; }
     else if (DBG_PHASE === "ending") { G.level = 5; G.won = 1; G.bossBeat = 1; G.finaleMsg = "🏆 All 5 levels ridden"; G.lvT = L().swim; G.yw = 520; startRide(); rideIn(true); G.banner = null; }
     zoomSnap();
   }
   // every level starts on the sand in front of Nalu Vida, a run away from the water
   function levelStart(first) {
     G.phase = "sand"; G.lvT = 0; G.rideT = 0; G.dir = 1; G.lead = LEAD; G.x = SHORE_X; G.yw = -230; G.vx = 0; G.ang = 0; G.cam = G.yw + G.lead; G.wo = 0;
-    G.ents = []; G.fx = []; G.wake = []; G.jump = 0; G.jumpDur = 0; G.jcd = 0; G.duck = 0; G.dcd = 0; G.trick = null; G.tricks = []; G.wave = 0; G.wipe = 0; G.eng = 0; G.wv = null;
+    G.ents = []; G.fx = []; RND.clear(); G.wake = []; G.jump = 0; G.jumpDur = 0; G.jcd = 0; G.duck = 0; G.dcd = 0; G.trick = null; G.tricks = []; G.wave = 0; G.wipe = 0; G.eng = 0; G.wv = null;
     G.pocket = 0; G.pocketT = 0; G.kick = 0; G.lip = 0; G.lipRise = 0; G.flat = 0; G.lipZone = 0; G.final = 0; G.beachT = 0; G.inv = 1; G.hint = 0; G.popT = 0;
+    G.climb = 0; G.airAmp = 1; G.airPow = 0; G.airCombo = 0; G.lastAirT = -99; G.lastJumpT = -99;
     if (G.beer) { G.beer = null; if (!G.resc || DBG_RESC) G.rescPend = 1; }
-    G.spawn = { food: 2.5, haz: 3.5, set: 2.6, hb: 9, boat: 12, heli: 20, plane: first ? 24 : 40, buoy: 28, harp: G.level > 1 ? 6 : 14, rock: 6, ski: 12, pier: 5, ray: 7, fish: 8 };
+    G.spawn = { food: 2.5, haz: 3.5, set: 2.6, hb: 9, boat: 12, heli: 20, plane: first ? 24 : 40, buoy: 28, harp: G.level > 1 ? 6 : 14, rock: 6, ski: 12, pier: 5, ray: 7, fish: 8, kit: 12 };
     banner("LEVEL " + G.level, L().sub, G.level === 1 ? "RUN IN · PADDLE OUT · RIDE IT HOME" : first ? "TEST START" : "BACK OUT FOR LEVEL " + G.level);
     sfx("level"); radio(first ? "Lifeguard on duty. Paddle out past the break!" : "Back out you go. Level " + G.level + "!", { tone: "info", ms: 2400 });
     zoomSnap();
@@ -385,6 +394,13 @@
   function harpPick(x, yw) { return add({ t: "harpoon", x: x, yw: yw, r: 20, bob: Math.random() * 6 }); }
   // lifeguard on a rescue jet ski: crosses the screen and tosses you a harpoon bundle
   function ski() { var fromL = G.x > W / 2; add({ t: "ski", x: fromL ? -50 : W + 50, yw: ahead(rnd(150, 230)), vx: fromL ? 160 : -160, tossed: 0, sky: 0 }); }
+  // 🩹 a floating first-aid kit on the ride back in, set on the clean side of the wave for when you reach it (+1 ❤️)
+  function healthKit() {
+    var w = G.wv, x = Math.max(40, Math.min(W - 40, G.x + rnd(-90, 90))), d = H * .55, t = d / Math.max(60, speed());
+    if (w) { var lo = w.px + w.pd * (w.sp * t + 60); if (w.pd > 0 ? x < lo : x > lo) x = Math.max(40, Math.min(W - 40, lo + w.pd * rnd(10, 60))); }
+    add({ t: "hkit", x: x, yw: ahead(d), r: 18, bob: Math.random() * 6 });
+    radioOnce("kit", "Health kit floating ahead — ride through it!", { tone: "info", ms: 2200 });
+  }
   function gull() { var fromL = Math.random() < .5; G.gulls.push({ x: fromL ? -30 : W + 30, y: rnd(40, H - 60), vx: (fromL ? 1 : -1) * rnd(60, 110), vy: rnd(-12, 12), f: Math.random() * 6 }); }
 
   /* ---------- scoring ---------- */
@@ -537,7 +553,7 @@
 
   /* ---------- update ---------- */
   function update(dt) {
-    G.t += dt; if (G.inv > 0) G.inv -= dt; if (G.hurt > 0) G.hurt -= dt; if (G.shake > 0) G.shake *= 0.86;
+    G.t += dt; if (G.inv > 0) G.inv -= dt; if (G.hurt > 0) G.hurt -= dt; if (G.heal > 0) G.heal -= dt; if (G.shake > 0) G.shake *= 0.86;
     if (G.fcd > 0) G.fcd -= dt; if (G.banner) { G.banner.t += dt; if (G.banner.t > G.banner.dur) G.banner = null; }
     if (G.phase === "cut" || G.phase === "cut0") return;
     if (G.phase === "sand") return sandStep(dt);
@@ -585,8 +601,9 @@
       if (S.buoy <= 0 && G.hearts < 4) { add({ t: "buoy", x: laneX(), yw: ahead(H * 0.75), r: 16 }); S.buoy = rnd(30, 45); }
       if (window.ReviewEgg && ReviewEgg.due(G.eggT * 1000)) add({ t: "rsign", x: Math.max(70, Math.min(W - 70, laneX())), yw: ahead(H * 0.75), r: 30, bob: Math.random() * 6 });
       if (S.plane <= 0) { plane(); S.plane = rnd(40, 55); }
-    } else if (riding) {   // the ride in: smooth, just the wave and now and then a shark
-      if (S.haz <= 0) { hazard(); S.haz = rnd(P.rh[0], P.rh[1]); }
+    } else if (riding) {   // the ride in: just you and the wave (Antidote: no objects in the water to distract you) + the odd health kit
+      if (G.hearts >= 5) S.kit = Math.max(S.kit, 10);   // only while you're hurt: ~10 s after a knock, then every 20–30 s
+      else if (S.kit <= 0) { if (!G.ents.some(function (e) { return e.t === "hkit"; })) healthKit(); S.kit = rnd(20, 30); }
     }
     if (Math.random() < dt * 0.35 && G.gulls.length < 5) gull();
     // entities
@@ -613,7 +630,7 @@
       else if (e.t === "boat" && e.hunt) { e.x += e.vx * dt; if (swim) e.yw = Math.max(e.yw, G.yw + 176);   // keeps out ahead of you while it crosses
         var q = e.q, on = e.x > 36 && e.x < W - 36;
         if (q && !q.leave && e.shots > 0 && on) { if (e.aim > 0) { e.aim -= dt; if (e.aim <= 0) { var hx = q.x - e.x, hy = q.yw - e.yw, hl = Math.hypot(hx, hy) || 1, hv = 235 + 12 * (G.level - 1);
-                add({ t: "sharp", x: e.x + hx / hl * 30, yw: e.yw + hy / hl * 30, vx: hx / hl * hv, vy: hy / hl * hv, r: 6 }); sfx("lunge"); buzz(12); e.shots--; e.cd = 1.15; } }
+                add({ t: "sharp", x: e.x + hx / hl * 30, yw: e.yw + hy / hl * 30, vx: hx / hl * hv, vy: hy / hl * hv, r: 6 }); RND.fire(e.x + hx / hl * 30, e.yw + hy / hl * 30, hx, hy); sfx("lunge"); buzz(12); e.shots--; e.cd = 1.15; } }
             else { e.cd -= dt; if (e.cd <= 0) { e.aim = .85; e.ax = q.x; e.ayw = q.yw; } } }
         if (e.aim > 0 && q) { e.ax = q.x; e.ayw = q.yw; }
         if (q && (e.shots <= 0 || !on && e.shots < (G.level >= 3 ? 3 : 2))) q.leave = 1; }
@@ -641,11 +658,16 @@
           if (first) toast("lifeguard_m", "Harpoons! Tap 🔱 FIRE to hit sharks"); G.ents.splice(i, 1); continue; }
         if (e.t === "rock") { if (d < e.r + 12 && G.jump <= .06) { var sd = G.x >= e.x ? 1 : -1; G.x = e.x + sd * (e.r + 14); G.vx = sd * 280; if (G.inv <= 0) { hurt("Hit the rocks!"); G.fx.push({ k: "wsplash", x: G.x, y: py, t: 0 }); } } continue; }
         if (e.t === "rsign" && d < e.r + 24) { var eb = ReviewEgg.collect(); G.score += eb; pop(e.x, sy(e.yw) - 40, "+" + eb + " 📺 ANTIDOTE'S REVIEW", "#ffd23f", 1); sfx("egg"); buzz([20, 40, 20]); G.fx.push({ k: "ring", x: e.x, y: sy(e.yw), t: 0 }); G.fx.push({ k: "wsplash", x: e.x, y: sy(e.yw), t: 0 }); G.ents.splice(i, 1); continue; }
+        if (e.t === "hkit" && d < hitR + 12) { var hb = G.hearts; G.hearts = Math.min(5, G.hearts + 1); G.dmg = Math.max(0, G.dmg - 1);
+          pop(e.x, sy(e.yw) - 20, hb >= 5 ? "Full health! +100" : "+1 ❤️ HEALTH KIT!", "#7dffb0", 1); if (hb >= 5) G.score += 100;
+          sfx("heal"); buzz([15, 30, 15]); G.heal = .45; G.fx.push({ k: "ring", x: e.x, y: sy(e.yw), t: 0 }); G.fx.push({ k: "heal", x: e.x, y: sy(e.yw), t: 0 }); G.ents.splice(i, 1); continue; }
         if (e.t === "buoy" && d < hitR + 6) { G.hearts = Math.min(5, G.hearts + 1); pop(e.x, sy(e.yw), "+1 ❤️ Lifeguard save!", "#ff9db0", 1); toast("lifeguard_f", "Rescue can! +1 heart"); G.ents.splice(i, 1); continue; }
         if (e.t === "boat" && e.hunt) { if (d < e.r + 14) { var bs2 = G.x >= e.x ? 1 : -1; G.vx = bs2 * 220; } continue; }
         if (e.t === "qfin") continue;
-        if (e.t === "sharp") { if (!e.done && d < 17 && G.duck <= 0 && hurt("HARPOONED!", "ray")) { e.done = 1; G.ents.splice(i, 1); if (G.phase === "death") return; continue; }
-          if (!e.done && !e.miss && (G.yw - e.yw) * G.dir > 26) { e.miss = 1; gain(150, G.x, py - 40, "DODGED!"); } continue; }
+        if (e.t === "sharp") { if (!e.done && d < 17 && G.duck <= 0 && hurt("HARPOONED!", "ray")) { e.done = 1; RND.hit(e.x, e.yw); G.ents.splice(i, 1); if (G.phase === "death") return; continue; }
+          if (!e.done && !e.miss && (G.yw - e.yw) * G.dir > 26) { e.miss = 1; gain(150, G.x, py - 40, "DODGED!"); }
+          if (e.miss && (G.yw - e.yw) * G.dir > 70) { RND.splash(e.x, e.yw); G.ents.splice(i, 1); }   // a miss drops into the water behind you (looks only)
+          continue; }
         var danger = e.t === "jelly" || e.t === "ray" || (e.t === "eel" && e.zap) || (e.t === "shark" && e.st === "lunge") || e.t === "boat";
         if (danger && d < hitR && G.duck <= 0) { hurt(e.t === "shark" ? "SHARK BUMP! Wipeout" : e.t === "eel" ? "EEL BUMP! Wipeout" : e.t === "jelly" ? "Jellyfish! Wipeout" : e.t === "ray" ? "STINGRAY! Wipeout" : "Boat wake!"); if (e.t === "shark") e.st = "gone"; if (G.phase === "death") return; continue; }
         if ((e.t === "jelly" || e.t === "eel" || e.t === "shark" || e.t === "ray") && !e.nm && d < hitR + 26 && d >= hitR && (e.t !== "shark" || e.st === "lunge")) { e.nm = 1; gain(50, G.x, py - 40, "close one!"); }
@@ -664,41 +686,44 @@
   function fish() { var fk = Math.random() < .2 ? "fish_gold" : Math.random() < .5 ? "fish_mahi" : "fish_parrot"; add({ t: "fish", k: fk, x: laneX(), yw: ahead(H * 0.7), r: 20, ph: Math.random() * 1.4, pts: fk === "fish_gold" ? 800 : 300 }); }
 
   /* ---------- the wave: it forms at one side and the break peels steadily across to the other ----------
-     wv.px = the curl (where the lip is throwing over and crashing down), wv.pd = the way it peels (+1 → right), wv.x0 = where
-     it started. Ahead of the curl is the open face; behind it is whitewater.
-       · 14–110 px ahead of the curl = the POCKET (the glowing band): points, and the only place JUMP launches off the lip.
-       · right at the curl (−4…14) = under the falling lip; behind it = the whitewater. Stay there too long = WASHED, −½ ❤️.
-       · more than ~130 px ahead = out on the flat: you slow down and drift back, and the curl catches you (no damage).
-     When the curl gets to the far side you shoot out of the barrel (EXIT bonus) and the next wave forms where you are.
-     Once a wave (about halfway across) the face stands up and, in the pocket, you rise to the lip: ⬆ LIP — JUMP! */
+     wv.px = the curl (where the lip is throwing over), wv.pd = the way it peels (+1 → right), wv.x0 = where it started.
+     Behind the curl (rel < FOAM_EDGE) is the breaking WHITE FOAM: the only thing on the ride that hurts (touch it for a
+     moment = FOAM wipeout, −½ ❤️, and you're shoved back out onto the clean face). Ahead of the curl is the clean,
+     unbroken face, all the way out along the shoulder to the side with no foam: ride anywhere on it.
+       · 14–110 px ahead of the curl = the POCKET (the glowing band, steepest part of the face): extra points.
+       · JUMP anywhere on the clean face: you carve up the face to the lip (~¼ s) and launch. The face is tallest at the
+         curl and tapers along the shoulder, and a fast carve sideways adds pop: closer + faster = bigger air.
+     When the curl gets to the far side you shoot out of the barrel (EXIT bonus) and the next wave forms where you are. */
+  var FOAM_EDGE = 4, CLIMB = .24;
   function newWave() {
-    var pd = G.x < W / 2 ? 1 : -1, px = pd > 0 ? Math.min(18, G.x - 60) : Math.max(W - 18, G.x + 60);
+    var pd = G.x < W / 2 ? 1 : -1, px = pd > 0 ? Math.min(18, G.x - 90) : Math.max(W - 18, G.x + 90);
     G.wv = { px: px, x0: px, pd: pd, sp: L().peel * rnd(.9, 1.15), st: "peel", t: 0, lipPh: 0 }; G.kick = 0; G.flat = 0; G.lip = 0; G.lipZone = 0;
   }
   function wvProg(w) { return Math.max(0, Math.min(1, (w.px - w.x0) * w.pd / (W - 70 - Math.min(w.x0, W - w.x0)))); }   // 0 at the start side → 1 at the exit
+  function wvRel() { var w = G.wv; return w ? (G.x - w.px) * w.pd : 999; }   // how far ahead of the curl you are (− = in the foam)
+  function faceH(rel) { return Math.max(.35, Math.min(1, 1 - (rel - 20) / 300)); }   // 1 = the steep face at the curl → .35 out on the shoulder
   function pocketStep(dt) {
     if (!G.wv) newWave(); var w = G.wv; w.t += dt;
     w.px += w.pd * w.sp * dt;
-    var rel = (G.x - w.px) * w.pd, air = G.jump > 0.06, coach = G.coach;
+    var rel = (G.x - w.px) * w.pd, air = G.jump > 0.06, coach = G.coach, foam = !air && rel < FOAM_EDGE;
     G.pocket = !air && rel >= 14 && rel <= 110 ? 1 : 0;
-    G.lipZone = !air && rel >= -4 && rel < 14 ? 1 : 0;
-    G.flat = !air && rel > 130 ? 1 : 0;
+    G.lipZone = 0; G.flat = 0;   // no "too far out" penalty any more: the whole clean face and shoulder is yours
     if (G.pocket) { G.wave = .6; G.pocketT += dt; G.score += 25 * dt; if (G.pocketT >= 3) { G.pocketT = 0; G.score += 150; pop(G.x, sy(G.yw) - 46, "+150 IN THE POCKET!", "#7fe3f2"); } }   // pocket points are flat (no streak multiplier) so a long ride can't snowball
     else G.pocketT = Math.max(0, G.pocketT - dt);
-    // the lip window: up at the top of the face, inside the pocket
-    if (G.pocket) w.lipPh += dt; else w.lipPh = 0;
-    var pr = wvProg(w), lip = G.pocket && pr > .5 && pr < .72 ? 1 : 0;   // once a wave, past halfway, the face stands up: the lip window
-    if (lip && !G.lip) { if (coach) radioOnce("lip", "Lip's coming — JUMP!", { tone: "info", ms: 1600 }); } G.lip = lip;
-    G.lipRise += ((lip ? 1 : 0) - G.lipRise) * Math.min(1, dt * 6);
-    // out on the flat: you slow down (speed()) and drift back toward the curl; no damage
-    if (G.flat) { G.x -= w.pd * 30 * dt; if (coach || G.flatT > 2) radioOnce("flat", "Too far out, cut back!", { tone: "warn" }); G.flatT = (G.flatT || 0) + dt; } else G.flatT = 0;
-    // behind the curl (whitewater) or under the falling lip: the wash meter fills, then −½ ❤️
-    if (!air && rel < 14 && G.inv <= 0) { G.eng += dt * (rel < -4 ? 1.45 : 1.1); if (G.eng > .3) radioOnce("pocket", "Stay ahead of the curl!", { tone: "warn" }); }
-    else G.eng = Math.max(0, G.eng - dt * 1.2);
-    if (G.eng >= 1) { G.eng = 0; var lipHit = rel >= -4; if (hurt(lipHit ? "LIP! −100 −½ ❤️" : "WASHED! −100 −½ ❤️", "wave", .5)) { G.score = Math.max(0, G.score - 100); G.x = Math.max(16, Math.min(W - 16, w.px + w.pd * 60)); G.fx.push({ k: "wsplash", x: G.x, y: sy(G.yw), t: 0 }); } }
+    // on the clean face, on the water: JUMP rides you up to the lip and launches
+    var lip = !air && !foam && G.climb <= 0 && G.jump <= 0 ? 1 : 0;
+    if (lip && !G.lip && coach) radioOnce("lip", "Clean face! Tap JUMP to ride up the lip and launch.", { tone: "info", ms: 2200 });
+    G.lip = lip;
+    if (G.climb > 0) { G.climb -= dt; if (G.climb <= 0) { G.climb = 0; launch(); } }
+    G.lipRise += ((G.climb > 0 ? 1 : 0) - G.lipRise) * Math.min(1, dt * 10);
+    // the white foam: the wash meter fills fast (~1/3 s), then FOAM wipeout −½ ❤️
+    if (foam && G.inv <= 0) { G.eng += dt * 3.2; if (G.eng > .15) radioOnce("pocket", "Off the white foam! Stay on the clean face.", { tone: "warn" }); }
+    else G.eng = Math.max(0, G.eng - dt * 2);
+    if (G.eng >= 1) { G.eng = 0; G.climb = 0; G.airCombo = 0; if (hurt("FOAM! −100 −½ ❤️", "wave", .5)) { G.score = Math.max(0, G.score - 100); G.x = Math.max(16, Math.min(W - 16, w.px + w.pd * 110)); G.vx = w.pd * 160; G.fx.push({ k: "wsplash", x: G.x, y: sy(G.yw), t: 0 }); } }
     // the curl reaches the far side: shoot out of the barrel, then the next wave forms
     if (w.pd > 0 ? w.px > W - 70 : w.px < 70) {
-      if (rel >= 4 && rel <= 140 || air) { G.score += 200; pop(G.x, sy(G.yw) - 50, "+200 BARREL EXIT!", "#7fe3f2", 1);   // flat (no streak multiplier), like the pocket points G.fx.push({ k: "spray", x: G.x, y: sy(G.yw), t: 0 }); sfx("streak"); G.exits = (G.exits || 0) + 1;
+      if (rel >= 4 && rel <= 140 || air) { G.score += 200; pop(G.x, sy(G.yw) - 50, "+200 BARREL EXIT!", "#7fe3f2", 1);   // flat (no streak multiplier), like the pocket points
+        G.fx.push({ k: "spray", x: G.x, y: sy(G.yw), t: 0 }); sfx("streak"); G.exits = (G.exits || 0) + 1;
         if (coach || G.exits === 1) radioOnce("exit", "Made it through the barrel! 🌊", { tone: "win", ms: 2200 }); }
       sfx("wbreak"); if (G.phase === "ride") newWave();
     }
@@ -725,36 +750,52 @@
     for (var j = 0; j < G.blobs.length; j++) if (Math.hypot(G.blobs[j].x - G.x, G.blobs[j].f) < 110) return 1;
     return 0;
   }
-  // riding: JUMP launches off the LIP (top of the face, inside the pocket) or hops an obstacle · paddling: JUMP = duck-dive
+  // riding: JUMP (anywhere on the clean face) carves up the face to the lip, then launch() throws you off it · paddling: JUMP = duck-dive
   function jump() {
     if (!G.running) return;
     if (G.phase === "swim") { if (G.duck > 0 || G.dcd > 0) return; G.duck = .8; G.dcd = 1.0; sfx("splash"); buzz(10); for (var k = 0; k < 6; k++) G.fx.push({ k: "bubble", x: G.x + rnd(-16, 16), y: sy(G.yw) + rnd(-20, 20), t: 0 }); return; }
-    if (G.phase !== "ride" || G.jump > 0 || G.jcd > 0) return;
-    var big = !!G.lip, hop = !big && hopNear();
-    if (!big && !hop) { G.jcd = .3; if (G.t - (G.jTip || -9) > 1.4) { G.jTip = G.t; pop(G.x, sy(G.yw) - 54, G.pocket ? "Wait for the lip ⬆" : "Jump from the lip ⬆", "#cfe8ff"); } return; }   // nothing to launch off
-    G.jumpDur = big ? 1.15 : .74; G.jump = G.jumpDur; G.jcd = .2; G.trick = null; G.tricks = [];
-    pop(G.x, sy(G.yw) - 54, big ? "OFF THE LIP!" : "HOP!", big ? "#7fe3f2" : "#cfe8ff"); sfx("air"); buzz(12);
+    if (G.phase !== "ride") return;
+    if (G.jump > .05) { trick(); return; }   // already up: JUMP again = a trick
+    if (G.jump > 0 || G.jcd > 0 || G.climb > 0) return;
+    if (wvRel() < FOAM_EDGE) { G.jcd = .3; if (G.t - (G.jTip || -9) > 1.2) { G.jTip = G.t; pop(G.x, sy(G.yw) - 54, "Get onto the clean face ➜", "#cfe8ff"); } return; }   // can't launch out of the foam
+    G.climb = CLIMB; G.jcd = .3; G.lastJumpT = G.t; sfx("air"); buzz(8);
     G.fx.push({ k: "spray", x: G.x, y: sy(G.yw), t: 0 });
-    if (big && !G.trickHint) { G.trickHint = 1; pop(G.x, sy(G.yw) + 64, "Tap TRICK!", "#ffd23f", 1); }
   }
-  // tricks: TRICK button (or swipe) while airborne: 360 spin or a flip. Land clean = bonus; mid-trick on landing = bail.
-  var TRICK = { spin: { dur: .42, pts: 400, name: "360!" }, flip: { dur: .52, pts: 600, name: "FLIP!" } };
+  // off the lip: how high = how steep the face is where you left it (near the curl) + how fast you were carving
+  function launch() {
+    if (G.phase !== "ride") return;
+    var rel = wvRel(), pow = .45 + .55 * faceH(rel) + .4 * Math.min(1, Math.abs(G.vx) / 320);   // ≈ .64 (slow, out on the shoulder) → 1.4 (fast, at the curl)
+    G.airPow = pow; G.airAmp = .55 + .6 * pow; G.jumpDur = .7 + .55 * pow; G.jump = G.jumpDur; G.jcd = .2; G.trick = null; G.tricks = [];
+    pop(G.x, sy(G.yw) - 58, pow > 1.2 ? "MAX AIR!" : "OFF THE LIP!", "#7fe3f2", pow > 1.2); sfx("air"); buzz(12);
+    G.fx.push({ k: "spray", x: G.x, y: sy(G.yw), t: 0 }); G.fx.push({ k: "wsplash", x: G.x, y: sy(G.yw) + 4, t: 0 });
+    if (!G.trickHint) { G.trickHint = 1; pop(G.x, sy(G.yw) + 64, "Tap TRICK!", "#ffd23f", 1); }
+  }
+  // the air height (0 → ~1.4 at the peak), shared by both renderers (game3d.js reads G.airAmp too)
+  function airF() { return G.jump > 0 ? Math.sin(Math.PI * (1 - G.jump / G.jumpDur)) * (G.airAmp || 1) : 0; }
+  // tricks while airborne: TRICK button / tap the water / JUMP again (cycles 360 → grab → flip), or pick one: swipe sideways
+  // = 360, swipe down = grab, swipe up = flip (keys R / G / F, pad X cycles, LB = grab, RB = flip). Chain them for a combo.
+  // Land clean = NICE! + points; still mid-trick when the board hits the water = a light bail (−150, no heart).
+  var TRICK = { spin: { dur: .42, pts: 400, name: "360!" }, grab: { dur: .36, pts: 300, name: "GRAB!" }, flip: { dur: .52, pts: 600, name: "FLIP!" } }, TORDER = ["spin", "grab", "flip"];
   function trick(kind) {
     if (!G.running || G.phase !== "ride" || G.jump <= 0.05 || G.trick) return;
-    kind = kind || (G.tricks.length % 2 ? "flip" : "spin");
+    kind = TRICK[kind] ? kind : TORDER[G.tricks.length % 3];
     G.trick = { k: kind, t: 0, dur: TRICK[kind].dur }; sfx("throw"); buzz(8);
   }
   function trickStep(dt) { var k = G.trick; if (!k) return; k.t += dt; if (k.t >= k.dur) { G.tricks.push(k.k); pop(G.x + rnd(-20, 20), sy(G.yw) - 76, TRICK[k.k].name, "#ffd23f"); G.trick = null; } }
   function land() {
     G.fx.push({ k: "splash", x: G.x, y: sy(G.yw), t: 0 }); sfx("splash");
-    if (G.trick) {   // still spinning when the board hits the water: bail
-      var lost = 300 + 200 * G.tricks.length; G.score = Math.max(0, G.score - lost); pop(G.x, sy(G.yw) - 70, "BAILED! −" + lost, "#ff6b6b", 1);
-      G.trick = null; G.tricks = []; radioOnce("bail", "Finish the trick before you land!", { tone: "warn" }); hurt("WIPEOUT!", "wave"); return; }
-    var n = G.tricks.length;
-    if (n) { var pts = 0; G.tricks.forEach(function (k) { pts += TRICK[k].pts; }); gain(pts * n, G.x, sy(G.yw) - 70, n > 1 ? "COMBO ×" + n + "!" : "CLEAN LANDING!"); G.fx.push({ k: "wsplash", x: G.x, y: sy(G.yw), t: 0 }); buzz(25); }
-    else if (G.jumpDur > 1) gain(150, G.x, sy(G.yw) - 40, "AIR!");
-    G.ents.forEach(function (e) { if (e.t === "pier" && e.over) { e.over = 0; var x = pierX(e, G.yw); if (x != null && Math.abs(G.x - x) > PIER_W / 2 + 6) { var s = G.x < x ? -1 : 1; if (e.side && s !== e.side) gain(500, G.x, sy(G.yw) - 40, "PIER JUMP!"); e.side = s; } else if (x == null) gain(500, G.x, sy(G.yw) - 40, "PIER JUMP!"); } });
-    G.tricks = [];
+    if (G.trick) {   // still mid-trick when the board hits the water: a light bail (splash + tumble, a few points, no heart)
+      var lost = 150; G.score = Math.max(0, G.score - lost); pop(G.x, sy(G.yw) - 70, "BAILED! −" + lost, "#ff9d9d", 1);
+      G.trick = null; G.tricks = []; G.airCombo = 0; G.streak = 0; G.mult = 1; G.wipe = .9; G.inv = Math.max(G.inv, .5); G.fx.push({ k: "wsplash", x: G.x, y: sy(G.yw), t: 0 }); buzz([30, 30, 40]);
+      radioOnce("bail", "Finish the trick before you land!", { tone: "warn" }); return; }
+    var n = G.tricks.length, pow = G.airPow || 1;
+    if (n) { var pts = 0; G.tricks.forEach(function (k) { pts += TRICK[k].pts; });
+      G.airCombo = G.t - G.lastAirT < 9 ? G.airCombo + 1 : 1; G.lastAirT = G.t; var cm = Math.min(2, 1 + .25 * (G.airCombo - 1));
+      gain(Math.round(pts * n * cm * (.8 + .2 * pow)), G.x, sy(G.yw) - 40, n > 1 ? "COMBO ×" + n + "!" : "CLEAN LANDING!");
+      pop(G.x, sy(G.yw) - 96, (n > 1 ? "SICK!" : "NICE!") + (cm > 1 ? " ×" + cm : ""), "#7dffb0", 1);
+      G.fx.push({ k: "wsplash", x: G.x, y: sy(G.yw), t: 0 }); buzz(25); }
+    else if (G.jumpDur > .6) gain(Math.round(100 * pow), G.x, sy(G.yw) - 40, "AIR!");
+    G.tricks = []; G.airPow = 0;
   }
   function tossTo(fx, fyw, tx, tyw, from, item) { add({ t: "toss", x: fx, yw: fyw, fx: fx, fyw: fyw, tx: tx, tyw: tyw, f: 0, dur: 0.75, from: from, item: item }); }
   function landToss(e) { if (e.item === "harpoon") harpPick(e.tx, e.tyw); else if (e.item === "buoy") add({ t: "buoy", x: e.tx, yw: e.tyw, r: 16 }); else food(e.tx, e.tyw, { from: e.from }); }
@@ -777,7 +818,7 @@
     tickEnts(dt);
     if (f >= 1) startRide();
   }
-  function startRide() { G.phase = "ride"; G.dir = -1; G.ang = Math.PI; G.lead = -RLEAD; G.cam = G.yw + G.lead; G.rideT = 0; G.inv = 1; G.hint = 5; newWave(); G.spawn.haz = 6; G.spawn.food = .6; G.spawn.pier = 6;
+  function startRide() { G.phase = "ride"; G.dir = -1; G.ang = Math.PI; G.lead = -RLEAD; G.cam = G.yw + G.lead; G.rideT = 0; G.inv = 1; G.hint = 5; newWave(); G.spawn.haz = 6; G.spawn.food = .6; G.spawn.pier = 6; G.spawn.kit = DBG_WAVE ? 4 : rnd(10, 16);
     G.coach = !G.rodeOnce; G.rodeOnce = 1;   // the lifeguard coaches the first ride of a run
     var seen = 0; try { seen = localStorage.getItem("nalu-ride-tut") === "1"; } catch (e) {}
     G.tutPend = G.coach && (DBG_TUT || (!seen && !DBG_BOT && !DBG_WASH)) ? 1 : 0; }   // shown on the first ride frame (update)
@@ -790,13 +831,13 @@
       "<linearGradient id='nvtp' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='#7fe3f2' stop-opacity='.15'/><stop offset='.5' stop-color='#7fe3f2' stop-opacity='.75'/><stop offset='1' stop-color='#7fe3f2' stop-opacity='.15'/></linearGradient></defs>" +
       "<rect x='0' y='0' width='300' height='150' rx='12' fill='#0b3b5e'/><path d='M0 40 Q150 20 300 40 L300 95 L0 95Z' fill='url(#nvtf)'/>" +
       "<g class='nvt-curl'><path d='M0 95 L0 30 Q40 18 70 30 Q92 40 84 62 Q78 74 66 70 Q74 56 64 48 Q50 92 0 95Z' fill='#f4fbff'/><circle cx='30' cy='70' r='9' fill='#fff' opacity='.8'/><circle cx='12' cy='82' r='7' fill='#ffd0d0' opacity='.9'/>" +
-      "<rect class='nvt-band' x='88' y='74' width='96' height='22' rx='11' fill='url(#nvtp)'/><text x='136' y='112' fill='#7fe3f2' font-size='12' font-weight='800' text-anchor='middle' font-family='system-ui'>POCKET</text>" +
-      "<text x='38' y='112' fill='#ff9d9d' font-size='11' font-weight='800' text-anchor='middle' font-family='system-ui'>WHITEWATER</text>" +
+      "<rect class='nvt-band' x='88' y='74' width='96' height='22' rx='11' fill='url(#nvtp)'/><text x='136' y='112' fill='#7dffd8' font-size='12' font-weight='800' text-anchor='middle' font-family='system-ui'>CLEAN FACE</text>" +
+      "<text x='38' y='112' fill='#ff9d9d' font-size='11' font-weight='800' text-anchor='middle' font-family='system-ui'>⚠ WHITE FOAM</text>" +
       "<g class='nvt-surf'><ellipse cx='126' cy='85' rx='14' ry='5' fill='#ffd23f'/><circle cx='126' cy='76' r='5' fill='#c98a5e'/></g></g>" +
       "<path d='M120 132 H270' stroke='#ffd23f' stroke-width='4' stroke-linecap='round'/><path d='M262 124 L274 132 L262 140' fill='none' stroke='#ffd23f' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/>" +
       "<text x='285' y='60' fill='#cfe8ff' font-size='11' font-weight='800' text-anchor='end' font-family='system-ui'>EXIT ➜</text></svg>" +
-      "<p style='font-weight:800'>Stay in the glowing pocket just ahead of the curl → ride it across to the exit → jump off the lip for tricks.</p>" +
-      "<p class='nv-how'>Behind the curl or under the falling lip = washed, −½ ❤️. Too far out in front = you slow down and the curl catches you. When you see <b>⬆ LIP — JUMP!</b>, tap JUMP, then TRICK in the air and land it.</p>" +
+      "<p style='font-weight:800'>Only the white foam can wipe you out. Ride anywhere on the clean face, or go round to the side with no foam.</p>" +
+      "<p class='nv-how'>Tap <b>JUMP</b> (or swipe up) to ride up the lip and launch: closer to the curl + carving fast = more air. In the air tap <b>TRICK</b> (or swipe: sideways 360, down grab, up flip), finish it, and land: <b>NICE!</b> Still mid-trick when you land = a little bail. Health kits 🩹 float by when you're hurt.</p>" +
       "<button class='nv-btn' type='button'>Got it 👍</button>";
     wrap.appendChild(o);
     o.querySelector("button").onclick = function (e) { e.stopPropagation(); o.remove(); try { localStorage.setItem("nalu-ride-tut", "1"); } catch (x) {} if (cb) cb(); else { G.running = was && !G.over; last = 0; }
@@ -854,7 +895,7 @@
     G.ents.forEach(function (e) { if (!/shark|jelly|ray|eel|rock/.test(e.t) || (e.t === "shark" && e.st !== "lunge" && e.st !== "warn")) return; var dy = (e.yw - G.yw) * G.dir; if (dy < -20 || dy > 170) return; var d = Math.abs(e.x - G.x); if (d < 46 && dy < td) { td = dy; threat = e; } });
     if (G.phase === "swim") { tx = SHORE_X; G.ents.forEach(function (e) { if (e.t === "brk" && !e.hit && (e.yw - G.yw) * G.dir < 34 && (e.yw - G.yw) * G.dir > 0) jump(); }); }
     else if (G.phase === "ride") {
-      if (G.wv) tx = G.wv.px + G.wv.pd * (DBG_WASH ? -30 : 55); if (G.lip && !DBG_WASH && Math.random() < dt * 3) jump();
+      if (G.wv) tx = G.wv.px + G.wv.pd * (DBG_WASH ? -30 : 55); if (G.lip && !DBG_WASH && Math.random() < dt * .8) jump();
       G.ents.forEach(function (e) { if (e.t !== "pier") return; var x = pierX(e, G.yw - 40); if (x != null && Math.abs(x - G.x) < 40) jump(); });
       if (G.jump > .62 && !G.trick && G.tricks.length < 1) trick();
       if (G.ammo && (G.boss || G.ents.some(function (e) { return e.t === "shark" && e.st !== "flee"; }))) fire();
@@ -1049,7 +1090,9 @@
     G.ents.forEach(function (e) { if (e.sky) drawEnt(e); });
     // effects
     G.fx.forEach(function (f) {
-      if (D3 && f.k !== "txt" && f.k !== "ring") return;   // splashes, spray, bubbles, debris: 3D particles
+      if (D3 && f.k !== "txt" && f.k !== "ring" && f.k !== "heal") return;
+      if (f.k === "heal") { var ha = 1 - f.t / .6; cx.save(); cx.globalAlpha = Math.max(0, ha); cx.fillStyle = "#7dffb0"; cx.font = "900 18px system-ui"; cx.textAlign = "center";
+        for (var hq = 0; hq < 6; hq++) { var han = hq / 6 * 6.283 + f.t * 3; cx.fillText("✚", f.x + Math.cos(han) * (16 + f.t * 70), f.y + Math.sin(han) * (10 + f.t * 40) - f.t * 30); } cx.restore(); return; }   // splashes, spray, bubbles, debris: 3D particles
       if (f.k === "txt") { var a = 1 - f.t / 1.1; cx.globalAlpha = Math.max(0, a); cx.font = (f.big ? "900 24px" : "800 15px") + " 'Alfa Slab One',Georgia,serif"; cx.textAlign = "center"; cx.lineWidth = 4; cx.strokeStyle = "rgba(0,20,40,.7)"; cx.strokeText(f.txt, f.x, f.y - f.t * 40); cx.fillStyle = f.col; cx.fillText(f.txt, f.x, f.y - f.t * 40); cx.globalAlpha = 1; }
       else if (f.k === "ring") { cx.strokeStyle = "rgba(255,210,63," + (1 - f.t / .6) + ")"; cx.lineWidth = 3; cx.beginPath(); cx.arc(f.x, f.y, 14 + f.t * 70, 0, 7); cx.stroke(); }
       else if (f.k === "washover") { var wf = f.t / .6; if (ok(IM.wave)) { var wh2 = 90, ww2 = wh2 * IM.wave.naturalWidth / IM.wave.naturalHeight; cx.save(); cx.globalAlpha = Math.max(0, 1 - wf * .8); cx.drawImage(IM.wave, f.x - ww2 / 2, f.y - 120 + wf * 130, ww2, wh2); cx.restore(); } }
@@ -1059,10 +1102,12 @@
       else if (f.k === "debris") { f.p.forEach(function (q) { var d = q[1] * f.t, a = 1 - f.t / .6; cx.fillStyle = "rgba(110,104,96," + a + ")"; cx.beginPath(); cx.arc(f.x + Math.cos(q[0]) * d, f.y + Math.sin(q[0]) * d * .8 - Math.sin(f.t / .6 * Math.PI) * 24, q[2] * (1 - f.t), 0, 7); cx.fill(); }); }
       else if (f.k === "spray") { for (var k = 0; k < 10; k++) { cx.fillStyle = "rgba(255,255,255," + (1 - f.t / .6) + ")"; cx.beginPath(); cx.arc(f.x + Math.cos(k) * f.t * 80, f.y + Math.sin(k * 2) * f.t * 50, 3, 0, 7); cx.fill(); } }
     });
+    RND.draw();   // the fisherman's rounds: flash, smoke, brass, sparks, splashes (2D overlay in both renderers)
     if (G.hint > 0 && (G.phase === "ride" || G.phase === "swim")) { cx.save(); cx.setTransform(DPR, 0, 0, DPR, 0, 0); cx.globalAlpha = Math.min(1, G.hint) * (.6 + .4 * Math.sin(G.t * 6));
-      label(G.phase === "swim" ? "🌊 Tap DUCK DIVE as each wave reaches you" : "🏄 Ride the glowing pocket ahead of the curl to the exit", W / 2, H - 132, "#fff"); cx.restore(); }
+      label(G.phase === "swim" ? "🌊 Tap DUCK DIVE as each wave reaches you" : "🏄 Stay on the clean face · JUMP to launch off the lip", W / 2, H - 132, "#fff"); cx.restore(); }
     if (G.phase === "death" && G.deathCause === "eel") eelScreen();
     if (G.hurt > 0) { cx.fillStyle = "rgba(255,40,60," + G.hurt * .9 + ")"; cx.fillRect(-20, -20, W + 40, H + 40); }
+    if (G.heal > 0) { cx.save(); cx.setTransform(DPR, 0, 0, DPR, 0, 0); var hg = cx.createRadialGradient(W / 2, H / 2, H * .2, W / 2, H / 2, H * .7); hg.addColorStop(0, "rgba(120,255,170,0)"); hg.addColorStop(1, "rgba(120,255,170," + (G.heal * 1.1) + ")"); cx.fillStyle = hg; cx.fillRect(0, 0, W, H); cx.restore(); }
     if (G.phase === "beach") drawNalu();
     drawConf(); drawBanner();
     hud(); jumpBtn();
@@ -1121,11 +1166,20 @@
     // danger: red-tinted spray kicking up off the whitewater behind the curl
     for (var q = 0; q < 9; q++) { var ph = (G.t * 1.7 + q * .113) % 1, sx = px - pd * (18 + q * 21 + ph * 10); if (sx < -20 || sx > W + 20) continue;
       cx.fillStyle = "rgba(255," + (120 + q * 8) + "," + (120 + q * 8) + "," + (.55 * (1 - ph)) + ")"; cx.beginPath(); cx.arc(sx, ry - 6 - ph * 26 + (q % 3) * 5, 2 + ph * 3, 0, 7); cx.fill(); }
-    // the falling lip: a shadow where it lands (at the curl, on your row), and a warning ring when you're close to it
-    var rel = (G.x - px) * pd, lipA = .22 + .1 * Math.sin(G.t * 9);
-    cx.fillStyle = "rgba(5,25,45," + lipA + ")"; cx.beginPath(); cx.ellipse(px + pd * 2, ry + 2, 26, 13, 0, 0, 7); cx.fill();
-    if (rel > -20 && rel < 50 && G.jump <= .06) { var rr = 18 + ((G.t * 2.5) % 1) * 16; cx.save(); cx.strokeStyle = "rgba(255,80,80," + (.9 - ((G.t * 2.5) % 1) * .6) + ")"; cx.lineWidth = 3; cx.setLineDash([6, 5]);
-      cx.beginPath(); cx.ellipse(px + pd * 2, ry + 2, rr + 10, rr * .5 + 5, 0, 0, 7); cx.stroke(); cx.restore(); if (rel < 20) label("LIP!", px + pd * 2, ry - 24, "#ff9d9d"); }
+    // FOAM vs CLEAN, unmistakable on your row: a churning white band (with a red-dashed edge) on the broken side of the curl,
+    // and a fresh teal lane on the unbroken face running out along the shoulder to the side with no foam
+    var fe = px + pd * 4, fl = pd > 0 ? -40 : fe, fr = pd > 0 ? fe : W + 40;
+    if (fr > fl) { var fgd = cx.createLinearGradient(0, ry - 30, 0, ry + 30); fgd.addColorStop(0, "rgba(255,255,255,0)"); fgd.addColorStop(.5, "rgba(250,253,255,.62)"); fgd.addColorStop(1, "rgba(255,255,255,0)");
+      cx.fillStyle = fgd; cx.fillRect(fl, ry - 30, fr - fl, 60);
+      for (var fb = 0; fb < 14; fb++) { var fph = (G.t * 1.3 + fb * .137) % 1, fbx = fe - pd * (6 + ((fb * 37 + G.t * 40) % Math.max(1, fr - fl))); if (fbx < fl || fbx > fr) continue;
+        cx.fillStyle = "rgba(255,255,255," + (.85 * (1 - fph)) + ")"; cx.beginPath(); cx.arc(fbx, ry - 18 + (fb % 5) * 9 + Math.sin(G.t * 4 + fb) * 3, 3 + (fb % 3) * 2.2, 0, 7); cx.fill(); }
+      if (Math.abs(fe - W / 2) < W / 2 + 10) { var fx0 = Math.max(46, Math.min(W - 46, fe - pd * 46)); if ((fx0 - fe) * pd < -20) label("⚠ FOAM", fx0, ry + 44, "#ff9d9d"); } }
+    var ca = .2 + .06 * Math.sin(G.t * 3), cl = pd > 0 ? fe : -40, cr = pd > 0 ? W + 40 : fe;
+    var cg = cx.createLinearGradient(fe, 0, pd > 0 ? W + 40 : -40, 0); cg.addColorStop(0, "rgba(61,220,190," + ca + ")"); cg.addColorStop(1, "rgba(61,220,190,0)");
+    cx.fillStyle = cg; cx.fillRect(cl, ry - 26, cr - cl, 52);
+    cx.save(); cx.setLineDash([7, 5]); cx.lineDashOffset = -G.t * 20; cx.strokeStyle = "rgba(255,90,90,.9)"; cx.lineWidth = 3; cx.beginPath(); cx.moveTo(fe, ry - 40); cx.lineTo(fe, ry + 36); cx.stroke(); cx.restore();   // the edge of the foam
+    var clx = px + pd * 150; if (clx > 60 && clx < W - 60 && (G.x - clx) * pd < 40 || G.hint > 0) label(pd > 0 ? "CLEAN FACE ➜" : "⬅ CLEAN FACE", Math.max(70, Math.min(W - 70, clx)), ry + 44, "#7dffd8");
+    var rel = (G.x - px) * pd;
     // the safe POCKET: a glowing lane on the face 14–110 px ahead of the curl, ripples running the way the wave peels
     var a = px + pd * 14, b = px + pd * 110, x1 = Math.min(a, b), x2 = Math.max(a, b), on = G.pocket, ga = on ? .5 + .12 * Math.sin(G.t * 8) : .32;
     var bg = cx.createLinearGradient(0, ry - 20, 0, ry + 20); bg.addColorStop(0, "rgba(127,227,242,0)"); bg.addColorStop(.5, "rgba(127,227,242," + ga + ")"); bg.addColorStop(1, "rgba(127,227,242,0)");
@@ -1135,8 +1189,8 @@
     for (var r = 0; r < 4; r++) { var f = ((G.t * .9 + r / 4) % 1), rx = pd > 0 ? x1 + f * (x2 - x1) : x2 - f * (x2 - x1); cx.globalAlpha = Math.sin(f * Math.PI); cx.beginPath(); cx.moveTo(rx, ry - 12); cx.quadraticCurveTo(rx + pd * 6, ry, rx, ry + 12); cx.stroke(); }
     cx.globalAlpha = 1;
     if (!on && G.jump <= 0) { cx.strokeStyle = "rgba(255,255,255,.5)"; cx.lineWidth = 2; cx.setLineDash([5, 6]); if (cx.roundRect) { cx.beginPath(); cx.roundRect(x1, ry - 16, x2 - x1, 32, 16); cx.stroke(); } cx.setLineDash([]); }
-    if (G.lip && G.jump <= 0) { cx.save(); cx.font = "900 17px 'Alfa Slab One',Georgia,serif"; cx.textAlign = "center"; cx.lineWidth = 5; cx.strokeStyle = "rgba(5,18,34,.85)"; var ly = ry + 58; cx.strokeText("⬆ LIP — JUMP!", G.x, ly); cx.fillStyle = Math.floor(G.t * 8) % 2 ? "#ffd23f" : "#fff"; cx.fillText("⬆ LIP — JUMP!", G.x, ly); cx.restore(); }
-    else if (G.flat) label("↩ CUT BACK TO THE POCKET", Math.max(90, Math.min(W - 90, G.x)), ry + 46, "#cfe8ff");
+    if (G.lip && G.jump <= 0 && G.t - G.lastJumpT > 6) { cx.save(); cx.setTransform(DPR, 0, 0, DPR, 0, 0); cx.font = "900 17px 'Alfa Slab One',Georgia,serif"; cx.textAlign = "center"; cx.lineWidth = 5; cx.strokeStyle = "rgba(5,18,34,.85)"; var ly = H - 172, lx = W / 2; cx.strokeText("⬆ JUMP OFF THE LIP!", lx, ly); cx.fillStyle = Math.floor(G.t * 8) % 2 ? "#ffd23f" : "#fff"; cx.fillText("⬆ JUMP OFF THE LIP!", lx, ly); cx.restore(); }
+    if (G.climb > 0) label("⬆ UP THE FACE", G.x, ry - 50, "#7dffd8");
     if (G.eng > .02) { cx.strokeStyle = "rgba(255,90,90,.95)"; cx.lineWidth = 4; cx.beginPath(); cx.arc(G.x, ry, 30, -Math.PI / 2, -Math.PI / 2 + G.eng * Math.PI * 2); cx.stroke(); }
   }
   function comicSplash(x, y, t, txt) {   // a cartoon splash: white starburst, droplets and a comic word
@@ -1387,7 +1441,7 @@
   }
   function drawSurfer() {
     var x = G.x, y = sy(G.yw), blink = G.inv > 0 && Math.floor(G.t * 12) % 2 && G.phase !== "death";
-    if (D3 && R3.rig(G.surfer)) { if (G.phase === "ride" || G.phase === "popup") { var air3 = G.jump > 0 ? Math.sin(Math.PI * (1 - G.jump / G.jumpDur)) * (G.jumpDur > .9 ? 1 : .6) : 0, y3 = y - air3 * 34;
+    if (D3 && R3.rig(G.surfer)) { if (G.phase === "ride" || G.phase === "popup") { var air3 = airF(), y3 = y - air3 * 34;
         if (G.pocket) { cx.strokeStyle = "rgba(127,227,242," + (.5 + .3 * Math.sin(G.t * 10)) + ")"; cx.lineWidth = 2.5; cx.beginPath(); cx.arc(x, y3, 38, 0, 7); cx.stroke(); }
         if (G.trick) { cx.strokeStyle = "rgba(255,210,63,.85)"; cx.lineWidth = 3; cx.beginPath(); cx.arc(x, y3, 40, -Math.PI / 2, -Math.PI / 2 + G.trick.t / G.trick.dur * Math.PI * 2); cx.stroke(); } }
       return; }
@@ -1405,7 +1459,7 @@
     if (blink && !(G.phase === "swim" && G.yw < 70)) return;   // (no blink while wading in: the invulnerability is unchanged, it just stays visible)
     if (G.phase === "swim" || (G.phase === "popup" && G.popT < .5) || (G.phase === "death" && G.deathPaddle)) { paddler(x, y, G.ang, G.phase === "death" ? sink : 0); return; }
     var pop0 = G.phase === "popup" ? Math.min(1, (G.popT - .5) / .5) : 1;
-    var air = G.jump > 0 ? Math.sin(Math.PI * (1 - G.jump / G.jumpDur)) * (G.jumpDur > .9 ? 1 : .6) : 0;
+    var air = airF();
     var bob = Math.sin(G.t * 2.3 + G.yw * .018) * 2.5, tilt = Math.sin(G.t * 1.7 + G.yw * .011) * .07;
     cx.fillStyle = "rgba(0,20,35," + (.25 - air * .1) + ")"; cx.beginPath(); cx.ellipse(x + 6 + air * 26, y + 8 + air * 34, 12 * (1 - air * .25), 30 * (1 - air * .25), G.ang, 0, 7); cx.fill();
     y = y + bob - air * 34 - (G.phase === "ride" ? (G.lipRise || 0) * 10 : 0);
@@ -1419,7 +1473,7 @@
     cx.save(); cx.filter = "brightness(1.2) contrast(1.08) saturate(1.12)";
     var drew = (function () { var k0 = G.surfer === "m" ? "surfer_m" : "surfer_f", i = IM[k0]; if (!ok(i)) return false; var w = 56 * (1 + air * .42) * (.75 + .25 * pop0), h = w * i.naturalHeight / i.naturalWidth;
       var spin = 0, flip = 1, tk = G.trick, wipe = G.wipe > 0 ? (1 - G.wipe / .9) : 0;
-      if (tk) { var f = tk.t / tk.dur; if (tk.k === "spin") spin = f * Math.PI * 2; else flip = Math.cos(f * Math.PI * 2); }
+      if (tk) { var f = tk.t / tk.dur; if (tk.k === "spin") spin = f * Math.PI * 2; else if (tk.k === "grab") { var gq = Math.sin(f * Math.PI); spin = gq * .55; w *= 1 - gq * .18; h = w * i.naturalHeight / i.naturalWidth; } else flip = Math.cos(f * Math.PI * 2); }
       if (wipe) { spin += wipe * Math.PI * 2.4; w *= 1 - Math.sin(wipe * Math.PI) * .25; h = w * i.naturalHeight / i.naturalWidth; }
       if (G.phase === "death") { var dd = G.deathT; spin += G.deathCause === "wave" ? dd * 6 : 0; w *= G.deathCause === "shark" || G.deathCause === "ray" ? Math.max(.2, 1 - dd * 1.6) : G.deathCause === "wave" ? Math.max(.2, 1 - dd * .7) : 1; h = w * i.naturalHeight / i.naturalWidth; }
       cx.translate(x + shift, y); cx.rotate(G.ang + (G.surfer === "m" ? Math.PI : 0) + tilt * .6 + air * .25 * (G.vx > 0 ? 1 : -1) + spin); cx.transform(1, 0, -lean * .35, 1, 0, 0); cx.scale(1 - Math.abs(lean) * .1, flip);
@@ -1452,15 +1506,12 @@
       cx.fillStyle = "rgba(0,25,40,.2)"; cx.beginPath(); cx.ellipse(x, y + 4, 14, 5, 0, 0, 7); cx.fill();
       if (e.k === "fish_gold") { cx.save(); cx.globalCompositeOperation = "lighter"; var gg = cx.createRadialGradient(x, y - hgt, 2, x, y - hgt, 40); gg.addColorStop(0, "rgba(255,215,90,.6)"); gg.addColorStop(1, "rgba(255,215,90,0)"); cx.fillStyle = gg; cx.beginPath(); cx.arc(x, y - hgt, 40, 0, 7); cx.fill(); cx.restore(); }
       spr(e.k, x, y - hgt, 54 + a * 10, rot); return; }
+    if (e.t === "hkit") { drawKit(e, x, y); return; }
     if (e.t === "rock") { drawRock(e, x, y); return; }
     if (e.t === "rsign") { drawRSign(e, x, y); return; }
     if (e.t === "harpoon") { drawHarpPick(e, x, y); return; }
     if (e.t === "qfin") { qfin(e, x, y); return; }
-    if (e.t === "sharp") { var ha = Math.atan2(e.vx, e.vy);
-      cx.fillStyle = "rgba(0,20,35,.25)"; cx.beginPath(); cx.ellipse(x + 5, y + 6, 4, 16, ha, 0, 7); cx.fill();
-      cx.save(); cx.translate(x, y); cx.rotate(ha); cx.strokeStyle = "#cfd6dc"; cx.lineWidth = 3; cx.lineCap = "round"; cx.beginPath(); cx.moveTo(0, 22); cx.lineTo(0, -12); cx.stroke();
-      cx.fillStyle = "#eef3f6"; cx.beginPath(); cx.moveTo(0, -24); cx.lineTo(-5, -11); cx.lineTo(5, -11); cx.closePath(); cx.fill();
-      cx.strokeStyle = "rgba(255,255,255,.55)"; cx.lineWidth = 1; cx.setLineDash([3, 4]); cx.beginPath(); cx.moveTo(0, 22); cx.lineTo(Math.sin(G.t * 9) * 3, 70); cx.stroke(); cx.setLineDash([]); cx.restore(); return; }
+    if (e.t === "sharp") { RND.bullet(e, x, y); return; }
     if (e.t === "ski") { drawSki(e, x, y); return; }
     if (e.t === "food") {
       var b = Math.sin(G.t * 3 + e.bob) * 2.5;
@@ -1581,6 +1632,19 @@
     x.globalCompositeOperation = "source-atop"; x.globalAlpha = a; x.fillStyle = col; x.fillRect(0, 0, c.width, c.height); TINT[key] = c; return c;
   }
   function img(c, x, y, w, rot, alpha, sx) { if (!c) return; var h = w * c.height / c.width; cx.save(); cx.translate(x, y); if (rot) cx.rotate(rot); if (sx) cx.scale(sx, 1); if (alpha != null) cx.globalAlpha = alpha; cx.drawImage(c, -w / 2, -h / 2, w, h); cx.restore(); }
+  // the health kit: a white first-aid box with a green cross on a little orange float ring, a soft green glow so it reads at a glance
+  function drawKit(e, x, y) {
+    var b = Math.sin(G.t * 3 + e.bob) * 2.5, gl = .35 + .2 * Math.sin(G.t * 5 + e.bob);
+    cx.save(); cx.globalCompositeOperation = "lighter"; var g = cx.createRadialGradient(x, y + b, 4, x, y + b, 46); g.addColorStop(0, "rgba(120,255,170," + gl + ")"); g.addColorStop(1, "rgba(120,255,170,0)"); cx.fillStyle = g; cx.beginPath(); cx.arc(x, y + b, 46, 0, 7); cx.fill(); cx.restore();
+    cx.fillStyle = "rgba(0,20,35,.25)"; cx.beginPath(); cx.ellipse(x + 4, y + 7, 25, 13, 0, 0, 7); cx.fill();
+    cx.lineWidth = 7; cx.strokeStyle = "#ff8a2a"; cx.beginPath(); cx.ellipse(x, y + b + 3, 24, 13, 0, 0, 7); cx.stroke();   // float ring
+    cx.lineWidth = 2; cx.strokeStyle = "#fff"; cx.setLineDash([6, 8]); cx.beginPath(); cx.ellipse(x, y + b + 3, 24, 13, 0, 0, 7); cx.stroke(); cx.setLineDash([]);
+    var bx = x - 15, by = y + b - 17; cx.fillStyle = "#fff"; cx.strokeStyle = "#1d6b3f"; cx.lineWidth = 2;
+    if (cx.roundRect) { cx.beginPath(); cx.roundRect(bx, by, 30, 24, 5); cx.fill(); cx.stroke(); } else { cx.fillRect(bx, by, 30, 24); cx.strokeRect(bx, by, 30, 24); }
+    cx.fillStyle = "#1d6b3f"; cx.fillRect(x - 6, by - 4, 12, 4);   // handle
+    cx.fillStyle = "#22b45a"; cx.fillRect(x - 3.5, by + 4, 7, 16); cx.fillRect(x - 8, by + 8.5, 16, 7);   // the green cross
+    label("+1 ❤️", x, y + b - 28, "#7dffb0");
+  }
   function drawRock(e, x, y) {
     // foam collar that breathes with the swell, then wet boulders with a sunlit top edge
     var fo = .5 + .25 * Math.sin(G.t * 2.4 + e.ph);
@@ -1605,6 +1669,99 @@
     cx.fillStyle = "#ff7a3d"; cx.fillRect(-2.6, -len / 2, 5.2, 4); cx.strokeStyle = "#f4e2b8"; cx.lineWidth = 1.2; cx.beginPath(); cx.arc(0, -len / 2 - 3, 3, 0, 7); cx.stroke();
     cx.restore();
   }
+  /* ---------- the fisherman's rounds: a real copper-jacketed bullet + tracer, muzzle flash, brass, sparks, splashes ----------
+     Looks only: the hitbox, speed and "DODGED!" logic are the same as before. Every sprite is pre-rendered once into a small
+     canvas, and the effects come from a fixed pool of 48 particles (nothing is allocated per frame; a full pool just skips). */
+  var RND = (function () {
+    var SC = 3, SP = null, P = [], N = 48, last = 0;
+    for (var i = 0; i < N; i++) P.push({ on: 0, k: 0, x: 0, yw: 0, z: 0, vx: 0, vy: 0, vz: 0, t: 0, life: 1, a: 0, va: 0, s: 1 });
+    function mk(w, h, fn) { var c = document.createElement("canvas"); c.width = Math.ceil(w * SC); c.height = Math.ceil(h * SC); var g = c.getContext("2d"); g.scale(SC, SC); fn(g, w, h); return c; }
+    function build() {
+      SP = {};
+      // the round, nose along +x: boat-tail base, cylindrical copper jacket with a cannelure, pointed ogive, top-lit specular
+      SP.bul = mk(16, 6, function (g) {
+        var m = 3, L = 15.5, r = 2.5, cyl = 8.6;
+        g.beginPath(); g.moveTo(.4, m - r * .78); g.lineTo(1.4, m - r); g.lineTo(cyl, m - r);
+        g.bezierCurveTo(cyl + 3.4, m - r, L - 1.8, m - .9, L, m); g.bezierCurveTo(L - 1.8, m + .9, cyl + 3.4, m + r, cyl, m + r);
+        g.lineTo(1.4, m + r); g.lineTo(.4, m + r * .78); g.closePath();
+        var gr = g.createLinearGradient(0, m - r, 0, m + r);
+        gr.addColorStop(0, "#5e2a10"); gr.addColorStop(.18, "#c26a33"); gr.addColorStop(.34, "#ffd8b0"); gr.addColorStop(.5, "#e08e52");
+        gr.addColorStop(.78, "#94461f"); gr.addColorStop(1, "#3f1a08"); g.fillStyle = gr; g.fill();
+        g.lineWidth = .35; g.strokeStyle = "rgba(40,14,4,.75)"; g.stroke();
+        g.strokeStyle = "rgba(55,20,6,.7)"; g.lineWidth = .5; g.beginPath(); g.moveTo(6.4, m - r + .15); g.lineTo(6.4, m + r - .15); g.stroke();   // cannelure
+        g.strokeStyle = "rgba(255,240,220,.85)"; g.lineWidth = .45; g.beginPath(); g.moveTo(1.6, m - 1.25); g.lineTo(cyl + 1.2, m - 1.25); g.quadraticCurveTo(cyl + 4, m - 1.1, L - 1.6, m - .35); g.stroke();   // specular streak
+        g.fillStyle = "rgba(255,255,255,.9)"; g.beginPath(); g.ellipse(cyl + 1.6, m - 1.1, 1.3, .35, -.1, 0, 7); g.fill();
+      });
+      // tracer / motion streak: warm, faint at the tail, brighter at the round
+      SP.trc = mk(64, 6, function (g, w, h) {
+        var gr = g.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, "rgba(255,170,80,0)"); gr.addColorStop(.65, "rgba(255,190,110,.35)"); gr.addColorStop(1, "rgba(255,236,190,.95)");
+        g.fillStyle = gr; g.beginPath(); g.moveTo(0, h / 2 - .2); g.lineTo(w - 2, h / 2 - 1.5); g.quadraticCurveTo(w, h / 2, w - 2, h / 2 + 1.5); g.lineTo(0, h / 2 + .2); g.closePath(); g.fill();
+      });
+      // muzzle flash, firing along +x from (6, 16): hot core + a 3-petal cone + side jets
+      SP.fl = mk(48, 32, function (g) {
+        var gr = g.createRadialGradient(8, 16, 0, 8, 16, 34); gr.addColorStop(0, "rgba(255,255,235,1)"); gr.addColorStop(.18, "rgba(255,226,120,.95)"); gr.addColorStop(.5, "rgba(255,140,40,.6)"); gr.addColorStop(1, "rgba(255,90,20,0)");
+        g.fillStyle = gr; g.beginPath();
+        g.moveTo(4, 16); g.quadraticCurveTo(20, 11, 46, 16); g.quadraticCurveTo(20, 21, 4, 16);
+        g.moveTo(6, 15); g.quadraticCurveTo(18, 6, 34, 4); g.quadraticCurveTo(18, 11, 8, 16);
+        g.moveTo(6, 17); g.quadraticCurveTo(18, 26, 34, 28); g.quadraticCurveTo(18, 21, 8, 16);
+        g.moveTo(8, 15); g.lineTo(11, 3); g.lineTo(10, 15); g.moveTo(8, 17); g.lineTo(11, 29); g.lineTo(10, 17);
+        g.fill(); g.beginPath(); g.arc(8, 16, 5, 0, 7); g.fill();
+      });
+      SP.pf = mk(32, 32, function (g) { var gr = g.createRadialGradient(16, 16, 0, 16, 16, 16); gr.addColorStop(0, "rgba(225,228,232,.75)"); gr.addColorStop(.6, "rgba(200,205,212,.35)"); gr.addColorStop(1, "rgba(200,205,212,0)"); g.fillStyle = gr; g.fillRect(0, 0, 32, 32); });
+      SP.ca = mk(7, 3, function (g) {   // a spent brass case, mouth to the right
+        var gr = g.createLinearGradient(0, 0, 0, 3); gr.addColorStop(0, "#8a6418"); gr.addColorStop(.35, "#f6dc8c"); gr.addColorStop(.6, "#cf9f3e"); gr.addColorStop(1, "#6d4c10");
+        g.fillStyle = gr; g.fillRect(.6, .3, 6.2, 2.4); g.fillStyle = "#7a5512"; g.fillRect(0, .15, .8, 2.7); g.fillStyle = "#3a2706"; g.fillRect(6.4, .7, .5, 1.6);
+      });
+    }
+    function get() { for (var i = 0; i < N; i++) if (!P[i].on) return P[i]; return null; }
+    function emit(k, x, yw, vx, vy, life, a, va, s, z, vz) { var p = get(); if (!p) return null;
+      p.on = 1; p.k = k; p.x = x; p.yw = yw; p.vx = vx; p.vy = vy; p.life = life; p.t = 0; p.a = a || 0; p.va = va || 0; p.s = s || 1; p.z = z || 0; p.vz = vz || 0; return p; }
+    // vx/vy below are SCREEN px/s (x right, y down); world yw runs opposite to screen y (sy = HC - (yw - cam))
+    function fire(x, yw, wvx, wvy) {
+      var l = Math.hypot(wvx, wvy) || 1, dx = wvx / l, dy = -wvy / l, a = Math.atan2(dy, dx), side = dx >= 0 ? 1 : -1;
+      emit(1, x, yw, 0, 0, .085, a, 0, 1);                                         // the flash (2-3 frames)
+      emit(2, x + dx * 10, yw - dy * 10, dx * 26, dy * 26 - 6, .55, 0, 0, .7);    // a little powder smoke drifting off the muzzle
+      if (!REDUCE) emit(3, x - dx * 22, yw + dy * 22, -dy * side * rnd(55, 85) - dx * 15, dx * side * rnd(55, 85) - dy * 15, .9, rnd(0, 6), rnd(-24, 24) || 14, 1, 6, rnd(70, 95));   // one ejected case, tumbling
+    }
+    function sparks(x, yw) { for (var i = 0; i < 9; i++) { var an = rnd(0, 6.283), v = rnd(140, 260); emit(4, x, yw, Math.cos(an) * v, Math.sin(an) * v * .75, rnd(.16, .28), an, 0, 1); } }
+    function splash(x, yw, big) {
+      emit(6, x, yw, 0, 0, .55, 0, 0, big ? 1.3 : 1);
+      for (var i = 0; i < (big ? 7 : 5); i++) emit(5, x + rnd(-3, 3), yw, rnd(-45, 45), rnd(-14, 14), rnd(.4, .6), 0, 0, rnd(1.4, 2.4), 0, rnd(60, 110));
+    }
+    function hit(x, yw) { sparks(x, yw); splash(x, yw, 1); }
+    function clear() { for (var i = 0; i < N; i++) P[i].on = 0; }
+    function step(dt) {
+      for (var i = 0; i < N; i++) { var p = P[i]; if (!p.on) continue; p.t += dt; if (p.t >= p.life) { p.on = 0; continue; }
+        p.x += p.vx * dt; p.yw -= p.vy * dt; p.a += p.va * dt;
+        if (p.k === 4) { p.vx *= .9; p.vy *= .9; }
+        else if (p.k === 2) { p.vx *= .96; p.vy *= .96; }
+        else if (p.k === 3 || p.k === 5) { p.vz -= 320 * dt; p.z += p.vz * dt;
+          if (p.z <= 0) { p.z = 0; if (p.k === 3) { p.on = 0; emit(6, p.x, p.yw, 0, 0, .35, 0, 0, .4); } else p.on = 0; } } }
+    }
+    // the round itself, drawn where the old harpoon was. Points along its screen velocity.
+    function bullet(e, x, y) {
+      if (!SP) build(); var a = Math.atan2(-e.vy, e.vx), sp = Math.hypot(e.vx, e.vy), tl = Math.min(70, 26 + sp * .14);
+      cx.globalAlpha = .22; cx.fillStyle = "#001423"; cx.beginPath(); cx.ellipse(x + 5, y + 7, 9, 2.4, a, 0, 7); cx.fill();   // its shadow on the water
+      cx.save(); cx.translate(x, y); cx.rotate(a);
+      cx.globalCompositeOperation = "lighter"; cx.globalAlpha = .75; cx.drawImage(SP.trc, -tl + 5, -3.6, tl, 7.2);
+      cx.globalCompositeOperation = "source-over"; cx.globalAlpha = 1; cx.drawImage(SP.bul, -10, -3.75, 20, 7.5);   // ~1.25x real-to-screen so it reads on a phone
+      cx.restore(); cx.globalAlpha = 1;
+    }
+    function draw() {
+      var now = performance.now(), dt = last ? Math.min(.05, (now - last) / 1000) : 0; last = now; step(dt);
+      if (!SP) build(); var any = 0;
+      for (var i = 0; i < N; i++) { var p = P[i]; if (!p.on) continue; any = 1; var f = p.t / p.life, x = p.x, y = sy(p.yw) - p.z;
+        if (p.k === 1) { cx.save(); cx.globalCompositeOperation = "lighter"; cx.globalAlpha = 1 - f * .6; cx.translate(x, y); cx.rotate(p.a); var k = .85 + .3 * (1 - f); cx.drawImage(SP.fl, -8 * k, -16 * k, 48 * k, 32 * k); cx.restore(); }
+        else if (p.k === 2) { var r = 8 + f * 18; cx.globalAlpha = .55 * (1 - f); cx.drawImage(SP.pf, x - r, y - r, r * 2, r * 2); }
+        else if (p.k === 3) { cx.globalAlpha = f > .7 ? (1 - f) / .3 : 1; cx.fillStyle = "#001423"; cx.save(); cx.globalAlpha *= .25; cx.beginPath(); cx.ellipse(x + 2, sy(p.yw) + 2, 3, 1.2, 0, 0, 7); cx.fill(); cx.restore(); cx.save(); cx.translate(x, y); cx.rotate(p.a); cx.drawImage(SP.ca, -3.5, -1.5, 7, 3); cx.restore(); }
+        else if (p.k === 4) { var ln = 10 * (1 - f) + 3, cs = Math.cos(p.a), sn = Math.sin(p.a); cx.globalCompositeOperation = "lighter"; cx.globalAlpha = 1 - f; cx.strokeStyle = "#ffd27a"; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(x, y); cx.lineTo(x - cs * ln, y - sn * ln * .75); cx.stroke(); cx.globalCompositeOperation = "source-over"; }
+        else if (p.k === 5) { cx.globalAlpha = .85 * (1 - f); cx.fillStyle = "#f4fbff"; cx.beginPath(); cx.arc(x, y, p.s, 0, 7); cx.fill(); }
+        else if (p.k === 6) { cx.globalAlpha = .7 * (1 - f); cx.strokeStyle = "#eaf8ff"; cx.lineWidth = 1.6; cx.beginPath(); cx.ellipse(x, y, (4 + f * 22) * p.s, (2 + f * 9) * p.s, 0, 0, 7); cx.stroke(); }
+      }
+      if (any) cx.globalAlpha = 1;
+    }
+    return { fire: fire, hit: hit, splash: splash, bullet: bullet, draw: draw, clear: clear };
+  })();
   function drawHarpPick(e, x, y) {
     var b = Math.sin(G.t * 3 + e.bob) * 2.5, pul = .5 + .5 * Math.sin(G.t * 5 + e.bob);
     cx.save(); cx.globalCompositeOperation = "lighter"; var gg = cx.createRadialGradient(x, y + b, 3, x, y + b, 38); gg.addColorStop(0, "rgba(255,170,80," + (.35 + pul * .25) + ")"); gg.addColorStop(1, "rgba(255,170,80,0)"); cx.fillStyle = gg; cx.beginPath(); cx.arc(x, y + b, 38, 0, 7); cx.fill(); cx.restore();
@@ -1730,7 +1887,7 @@
     var rd = on && ride && !!(G.lip || G.warnPier), air = ride && G.jump > .05 && !G.trick, k = [on, sw, near, rd, air, ride, G.lip].join();
     if (k === lastJ) return; lastJ = k;
     b.classList.toggle("on", on); b.classList.toggle("ready", rd); b.classList.toggle("duck", !!(sw && near));
-    b.innerHTML = sw ? "DUCK<br>DIVE" : rd && G.lip ? "⬆ LIP<br>JUMP" : rd ? "JUMP<br>🌊" : "JUMP";
+    b.innerHTML = sw ? "DUCK<br>DIVE" : air ? "TRICK" : rd && G.lip ? "⬆ LIP<br>JUMP" : rd ? "JUMP<br>🌊" : "JUMP";
     if (tb) { tb.classList.toggle("on", G.running && ride); tb.classList.toggle("air", air); } }
   function heartsHTML(h) { var o = "", i; for (i = 1; i <= 5; i++) o += h >= i ? "❤️" : h >= i - .5 ? '<span class="nv-hh">🤍<i>❤️</i></span>' : "🤍"; return o; }   // ½ = a heart cut in half
   function mmss(s) { s = Math.max(0, Math.ceil(s)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
@@ -1798,6 +1955,11 @@
     var jb = $("nv-join"); if (jb && GP && GP.join) jb.onclick = function () { GP.join(function (r) { var m = (r && r.member) || (GP.member && GP.member());
         var got = r && r.pts != null ? r.pts : (aw ? aw.pts : 0); $("nv-pts").innerHTML = "Score " + sc.toLocaleString() + " → <b>" + worth + " points</b><br>✅ +" + got + " points saved to your Nalu Vida Rewards";
         if (m && !$("nv-n").value) $("nv-n").value = (m.name || "").split(" ")[0]; }); };
+    // PLAY FIRST, CLAIM AFTER (demo/claimscore.js): a guest's rank on this week's board + the "save your score" sheet (same SSAI_GATE
+    // "score" sheet as Post my score). Saving posts this ride with the same post() and saves the held Rewards points. No weekly prize here.
+    if (window.SSAI_CLAIM) SSAI_CLAIM.show({ key: BGAME, score: sc, board: { api: BAPI, game: BGAME, week: wkey() }, prize: false, fame: "ig", reason: "score", mount: $("nv-order"),
+      after: function (m) { if (m && !$("nv-n").value) $("nv-n").value = (m.name || "").split(" ")[0]; post(); var j = $("nv-join"); if (j) j.click(); },
+      again: function () { start(); }, alive: function () { return G.over && !G.running; } });
   }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function wkey(off) { var d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7) - 7 * (off || 0)); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
@@ -1834,21 +1996,28 @@
     var pl = G.ents.filter(function (x) { return x.t === "plane" && x.hit; })[0];
     if (pl && p.x > pl.hit.x && p.x < pl.hit.x + pl.hit.w && p.y > pl.hit.y && p.y < pl.hit.y + pl.hit.h) { melodyEgg(); return; }
     if (!G.running) return;
-    drag = { id: e.pointerId, x: p0.x, y: p0.y, y0: p0.y, t0: performance.now(), moved: 0, sw: 0 }; try { cv.setPointerCapture(e.pointerId); } catch (x) {}
+    drag = { id: e.pointerId, x: p0.x, x0: p0.x, y: p0.y, y0: p0.y, t0: performance.now(), moved: 0, sw: 0 }; try { cv.setPointerCapture(e.pointerId); } catch (x) {}
   });
-  // drag sideways = steer · a quick flick up or down while airborne = a trick (up = flip, down = 360) · a tap = JUMP / duck-dive
-  cv.addEventListener("pointermove", function (e) { if (!drag || e.pointerId !== drag.id) return; var p = local(e), dx = p.x - drag.x, dy = p.y - drag.y0; drag.x = p.x; drag.moved += Math.abs(dx);
-    if (!drag.sw && G.jump > .05 && Math.abs(dy) > 34 && Math.abs(dy) > drag.moved && performance.now() - drag.t0 < 400) { drag.sw = 1; trick(dy < 0 ? "flip" : "spin"); return; }
+  // drag sideways = steer · riding: a quick flick UP on the clean face = ride up the lip and launch · airborne: flick up = flip,
+  // flick down = grab, a fast flick sideways = 360 · a tap = JUMP / duck-dive (in the air a tap = the next trick)
+  cv.addEventListener("pointermove", function (e) { if (!drag || e.pointerId !== drag.id) return; var p = local(e), dx = p.x - drag.x, dy = p.y - drag.y0, ddx = p.x - drag.x0; drag.x = p.x; drag.moved += Math.abs(dx);
+    var quick = performance.now() - drag.t0 < 400;
+    if (!drag.sw && G.phase === "ride" && G.jump > .05 && quick) {
+      if (Math.abs(dy) > 34 && Math.abs(dy) > Math.abs(ddx)) { drag.sw = 1; trick(dy < 0 ? "flip" : "grab"); return; }
+      if (Math.abs(ddx) > 60 && Math.abs(ddx) > Math.abs(dy) * 1.5 && performance.now() - drag.t0 < 220) { drag.sw = 1; trick("spin"); } }
+    if (!drag.sw && G.phase === "ride" && G.jump <= 0 && quick && dy < -40 && -dy > Math.abs(ddx) * 1.2) { drag.sw = 1; jump(); return; }
     if (G.phase === "sand" || G.phase === "swim" || G.phase === "ride") { G.x += dx * 1.15 / ZB * 1.2; G.vx = dx * 60; } });
   cv.addEventListener("pointerup", function (e) { if (drag && !drag.sw && drag.moved < 10 && performance.now() - drag.t0 < 280) { var p = local(e); if (Math.abs(p.y - drag.y0) < 20) jump(); } drag = null; });
   cv.addEventListener("pointercancel", function () { drag = null; });
   var keys = {};
   window.addEventListener("keydown", function (e) { if (!G.running) return; if (e.key === " " || e.key === "ArrowUp") { jump(); e.preventDefault(); return; }
-    if (e.key === "t" || e.key === "T" || e.key === "ArrowDown") { trick(); e.preventDefault(); return; } if (e.key === "ArrowLeft" || e.key === "ArrowRight") { keys[e.key] = 1; e.preventDefault(); } });
+    if (e.key === "t" || e.key === "T" || e.key === "ArrowDown") { trick(); e.preventDefault(); return; }
+    var tk = { r: "spin", R: "spin", g: "grab", G: "grab", f: "flip", F: "flip", "1": "spin", "2": "grab", "3": "flip" }[e.key]; if (tk) { trick(tk); e.preventDefault(); return; } if (e.key === "ArrowLeft" || e.key === "ArrowRight") { keys[e.key] = 1; e.preventDefault(); } });
   window.addEventListener("keyup", function (e) { keys[e.key] = 0; });
   setInterval(function () { if (keys.ArrowLeft) G.vx = Math.max(-380, G.vx - 90); if (keys.ArrowRight) G.vx = Math.min(380, G.vx + 90); }, 50);
   $("nv-jump").addEventListener("pointerdown", function (e) { e.preventDefault(); e.stopPropagation(); jump(); buzz(8); });
   $("nv-trick").addEventListener("pointerdown", function (e) { e.preventDefault(); e.stopPropagation(); trick(); });
+  if (MSW) MSW.button($("nv-mute").parentNode, "nv-songb", "pointer-events:auto;margin:6px 6px 0 0;float:right;border:0;border-radius:999px;padding:6px 10px;background:rgba(6,24,46,.55);color:#fff;font:600 12px/1.2 system-ui,-apple-system,sans-serif;cursor:pointer;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis");
   $("nv-mute").onclick = function () { audio(); if (AC && AC.state === "suspended") AC.resume(); setMute(!MUTED); }; setMute(MUTED);
   [].forEach.call(wrap.querySelectorAll(".nv-pick button"), function (b) { b.onclick = function () { start(b.getAttribute("data-s")); }; });
 
@@ -1856,10 +2025,11 @@
   (function () {
     var rows = [["raft_taco", "Island Tacos raft", "+100"], ["raft_mimosa", "Mimosa raft", "+120"], ["raft_burger", "Smash-N-Stack raft", "+150"], ["raft_shrimp", "Coconut Shrimp raft", "+150"],
       ["raft_oysters", "$2 Oysters raft", "+200"], ["", "🌟 Golden Poke Bowl (rare)", "+500"], ["", "🎣 Dodge a stray harpoon (paddle-out)", "+150"],
-      ["", "🤿 Duck-dive under a wave (paddle-out)", "+100"], ["", "🌊 Every 3 s in the pocket", "+250 (and points while you're in it)"], ["", "🏄 Ride the barrel out the exit", "+200"], ["", "⬆ JUMP off the lip (in the pocket)", "big air"],
-      ["", "🌀 360 / 🤸 flip, landed clean", "+400 / +600 (×2 for a combo)"], ["", "🪵 Jump the pier", "+500"], ["", "✈️ Big air off the lip", "+150"], ["", "😮 Close call with a shark/ray/jelly", "+50"],
+      ["", "🤿 Duck-dive under a wave (paddle-out)", "+100"], ["", "🌊 Every 3 s in the pocket", "+250 (and points while you're in it)"], ["", "🏄 Ride the barrel out the exit", "+200"], ["", "⬆ JUMP off the lip (anywhere on the clean face)", "big air"],
+      ["", "🌀 360 / ✋ grab / 🤸 flip, landed clean (NICE!)", "+400 / +300 / +600 (×tricks for a combo)"], ["", "🔥 Clean landings back to back", "×1.25 … ×2"], ["", "✈️ Big air off the lip, no trick", "+65–140"], ["", "😮 Close call with a ray/jelly (paddle-out)", "+50"],
+      ["", "🩹 Health kit (ride in, when you're hurt)", "+1 ❤️"],
       ["", "⭐ Ride in to Nalu Vida (clear a level)", "+1,500 × level"], ["", "🏆 Finish level 5", "+5,000"], ["plane", "Tap the Melody banner plane", "+500"], ["", "📺 Ride through Antidote's review billboard (secret)", "+500"], ["buoy", "Lifeguard rescue can", "+1 ❤️"],
-      ["", "🌊 Washed: whitewater or the falling lip", "−½ ❤️ −100", 1], ["", "💥 Bail mid-trick (wipeout)", "−❤️ −300", 1], ["", "🪵 Hit the pier", "−❤️ −200", 1], ["shark", "Shark charge (it blinks red ~2 s first, the lifeguard warns you)", "−❤️", 1], ["", "🐟 Stingray (paddle-out)", "−❤️", 1],
+      ["", "🌊 Touch the white foam (the only thing on the ride in that hurts)", "−½ ❤️ −100", 1], ["", "💥 Land mid-trick (a light bail)", "−150", 1], ["", "🌊 Engulfed by a wave (paddle-out)", "−½ ❤️", 1], ["", "🐟 Stingray (paddle-out)", "−❤️", 1],
       ["", "🎣 Hit by a fisherman's stray harpoon (paddle-out)", "−❤️", 1], ["jelly", "Bump a jellyfish", "−❤️", 1]];
     var st = document.createElement("style");
     st.textContent = ".nv-pts{max-width:430px;margin:14px auto 0;color:inherit}.nv-pts h4{margin:0 0 4px;font:900 18px 'Alfa Slab One',Georgia,serif}.nv-pts p{margin:0 0 8px;font-size:13px;opacity:.85}" +
@@ -1867,7 +2037,7 @@
       ".nv-pts .r img,.nv-pts .r .e{width:38px;height:38px;flex:none;object-fit:contain;text-align:center;font-size:22px;line-height:38px}.nv-pts .r div.t{min-width:0;display:flex;flex-direction:column;gap:2px}.nv-pts .r b{color:#ff8a3d;font-weight:900}.nv-pts .r.bad b{color:#d33}";
     document.head.appendChild(st);
     var box = document.createElement("div"); box.className = "nv-pts";
-    box.innerHTML = "<h4>What everything's worth</h4><p>5 levels. Each one: run in from the sand, paddle out through the break (duck-dive the waves), pop up and ride the wave back in to Nalu Vida. Level 1 is about 2 minutes; later levels have a shorter paddle-out. Paddling out, watch for stingrays and a fisherman's stray harpoons (sharks are rare out there). Riding back in it's just you, the wave and a few sharks: each one blinks red for about 2 seconds and the lifeguard warns you before it charges, so steer out of its way. A hit is a splash wipeout, and 5 hearts end the run. Grab 4 in a row without getting hit and every point doubles (×2); 8 in a row = ×3 and it keeps climbing. One hit resets the streak. Your score turns into Nalu Vida Rewards points: " + (function () { var g = (window.SSAI_REWARDS && window.SSAI_REWARDS.game) || {}; return "1 point per " + (g.perScore || 100) + " score, up to " + (g.dailyCap || 50) + " a day"; })() + ".</p><div class='g'>" +
+    box.innerHTML = "<h4>What everything's worth</h4><p>5 levels. Each one: run in from the sand, paddle out through the break (duck-dive the waves), pop up and ride the wave back in to Nalu Vida. Level 1 is about 2 minutes; later levels have a shorter paddle-out. Paddling out, watch for stingrays and a fisherman's stray harpoons (sharks are rare out there). Riding back in it's just you and the wave: nothing else in the water. Only the white foam behind the curl can hurt you, so stay on the clean face, launch off the lip, throw tricks and land them. Health kits float by every now and then when you're hurt. A hit is a splash wipeout, and 5 hearts end the run. Grab 4 in a row without getting hit and every point doubles (×2); 8 in a row = ×3 and it keeps climbing. One hit resets the streak. Your score turns into Nalu Vida Rewards points: " + (function () { var g = (window.SSAI_REWARDS && window.SSAI_REWARDS.game) || {}; return "1 point per " + (g.perScore || 100) + " score, up to " + (g.dailyCap || 50) + " a day"; })() + ".</p><div class='g'>" +
       rows.map(function (r) { var em = r[1].match(/^(\S+)\s/); return "<div class='r" + (r[3] ? " bad" : "") + "'>" + (r[0] ? "<img src='img/game/" + r[0] + ".webp' alt='' loading='lazy'>" : "<div class='e'>" + (em ? em[1] : "") + "</div>") + "<div class='t'><span>" + (r[0] ? r[1] : r[1].replace(/^\S+\s/, "")) + "</span><b>" + r[2] + "</b></div></div>"; }).join("") + "</div>";
     mount.appendChild(box);
   })();
@@ -1880,7 +2050,8 @@
   var RQ = QS.get("render"), KEEP3 = QS.get("keep3d") === "1", FPSM = { n: 0, acc: 0, low: 0, last: 0 }, gen3 = 0, PREF3 = false;
   PREF3 = true; try { PREF3 = localStorage.getItem("nalu-3d") !== "0"; } catch (e) {}   // 3D (realistic ocean) is the default; Settings can turn it off
   var API3 = { G: G, W: W, H: H, HC: HC, PIER_X: PIER_X, PIER_W: PIER_W, STUB: STUB, SHORE_X: SHORE_X, CAM: CAM, SHK: SHK, IM: IM, reduce: REDUCE, wrap: wrap,
-    zoom: function () { return ZOOM; }, sy: sy, pierX: pierX, bossYw: bossYw, gore: function () { return GORE; }, speed: speed };
+    zoom: function () { return ZOOM; }, sy: sy, pierX: pierX, bossYw: bossYw, gore: function () { return GORE; }, speed: speed,
+    audioOut: function () { return (typeof AC !== "undefined" && AC && FX) ? FX : null; } };   // engine3d ambience plays through the sound-effects bus (mute + Settings still rule)
   function off3D(why) {
     gen3++; var was = D3 || R3; D3 = false; try { if (R3) R3.dispose(); } catch (e) {} R3 = null;
     var c = $("nv-3d"); if (c) c.remove(); gl_c.style.display = ""; if (was || why) try { console.warn("[nv3d] 2D renderer: " + why); } catch (e) {}
@@ -1889,6 +2060,7 @@
     var now = performance.now(); if (!D3 || !G.running || document.hidden) { FPSM.n = FPSM.acc = 0; FPSM.t = now; return; }
     FPSM.n++; FPSM.acc = (now - (FPSM.t || now)) / 1000; if (FPSM.acc < 1) return; FPSM.t = now;
     FPSM.last = FPSM.n / FPSM.acc; FPSM.n = FPSM.acc = 0; FPSM.low = FPSM.last < 40 ? FPSM.low + 1 : 0;
+    if (window.__NVLIFE) { try { window.__NVLIFE.sample(FPSM.last); if (window.__E3Q && window.__E3Q.tier !== "low") FPSM.low = 0; } catch (e) {} }   // engine3d steps the quality tier down first; 2D only after LOW fails
     if (FPSM.low >= 5 && !KEEP3) off3D("slow (" + Math.round(FPSM.last) + " fps)");
   }
   function on3D() {
@@ -1896,7 +2068,7 @@
     var c = document.createElement("canvas"); c.id = "nv-3d"; c.setAttribute("aria-hidden", "true"); wrap.insertBefore(c, cv); API3.canvas = c;
     var boot = function (M) { if (my !== gen3) return; M.init(API3).then(function (r) { if (my !== gen3) { r.dispose(); return; } R3 = r; D3 = true; gl_c.style.display = "none"; }, function (e) { if (my === gen3) off3D("init: " + (e && e.message || e)); }); };
     if (window.NV3D) boot(window.NV3D);
-    else { window.__NV3boot = boot; var s = document.createElement("script"); s.type = "module"; s.src = "game3d.js?v=sh2"; s.onerror = function () { if (my === gen3) off3D("game3d.js failed to load"); }; document.head.appendChild(s); }
+    else { window.__NV3boot = boot; var s = document.createElement("script"); s.type = "module"; s.src = "game3d.js?v=e3n3.ht4k"; s.onerror = function () { if (my === gen3) off3D("game3d.js failed to load"); }; document.head.appendChild(s); }
     setTimeout(function () { if (my === gen3 && !D3) off3D("3D took too long to load"); }, 25000);
   }
   if (RQ === "3d" || (RQ !== "2d" && PREF3)) on3D();
@@ -1906,6 +2078,7 @@
 
   window.__NV = { zoom: function () { return ZOOM; }, radio: function (t, o) { radio(t, o); }, get: function () { return G; }, start: start, end: function () { if (G.running) showEnd(); }, W: W, H: H, PIER_X: PIER_X, fire: fire, boss: function () {},   /* boss fights removed (Christian, 2026-10) */ levelUp: function () { if (G.running) rideIn(false); }, jump: jump, trick: trick,
     gore: function () { return false; },   // red effects removed for good
+    kit: function () { if (G.phase === "ride") healthKit(); }, wave: function () { return G.wv ? { px: G.wv.px, pd: G.wv.pd, rel: wvRel(), lip: G.lip, climb: G.climb, air: G.jump, pow: G.airPow, amp: G.airAmp } : null; },   // test hooks (ride leg)
     // the start menu's PLAY: show the surfer pick (character select) instead of the old full start screen
     rescue: function () { G.resc = 0; G.beer = null; G.rescPend = 1; return true; },   // test hook (?rescue=1): queue another throw
     rescueInfo: function () { return { spots: RESC_SPOTS.slice(), beer: G.beer ? { st: G.beer.st, x: G.beer.x, y: G.beer.y, tx: G.beer.tx, sx: G.beer.sx } : null, used: G.resc, pending: G.rescPend, hits: G.hitsRun, hearts: G.hearts, dmg: G.dmg, phase: G.phase }; },

@@ -1,4 +1,4 @@
-/* SousShift AI — Mobile Mechanic demo: the mechanic's side (/demo/mechanic/shop/). Needs ../config.js + ../core.js.
+/* SousShift AI — Auto shop demo: the owner's side (/demo/mechanic/shop/). Needs ../config.js + ../core.js.
    DEMO ONLY gate: the PIN is printed on the page. Writes go to the same localStorage key the customer page reads,
    so advancing a stage here moves the customer's tracker in another tab of the same browser. Nothing is sent. */
 (function () {
@@ -12,8 +12,38 @@
   $("bName").textContent = C.brand.name;
   $("logo").src = (/^(https?:)?\//.test(C.brand.logo) ? "" : "../") + C.brand.logo;
   $("demoPin").textContent = C.demoPin;
+  D.title = t("_title", { name: C.brand.name });
+  $("qrLink").href = "../" + (location.search ? location.search + "&" : "?") + "print=qr#pay";
 
-  function gate() { var u = unlocked(); $("gate").hidden = u; $("app").hidden = !u; if (u) { M.seedSamples(); render(); sources(); } }
+  function gate() { var u = unlocked(); $("gate").hidden = u; $("app").hidden = !u; if (u) { M.seedSamples(); render(); sources(); tires(); } }
+  /* tire inventory editor (DEMO: localStorage via MECH.tires / saveTires) */
+  function tires() {
+    D.querySelectorAll("#taType option").forEach(function (o) { o.textContent = M.tireType(o.value); });
+    var list = M.tires();
+    $("tiRows").innerHTML = list.map(function (x, i) {
+      return '<div class="trow' + (x.qty > 0 ? "" : " out") + '"><div><b>' + esc(x.size) + '</b> <span class="pill">' + esc(M.tireType(x.type)) + "</span><small>" + esc(x.brand + (x.line ? " · " + x.line : "")) + "</small></div>" +
+        '<label class="tiq"><span class="sr">' + t("tiQtyL") + '</span><input data-tq="' + i + '" inputmode="numeric" maxlength="3" value="' + (+x.qty || 0) + '"></label>' +
+        '<label class="tiq"><span class="sr">' + t("taPrice") + '</span><input data-tp="' + i + '" inputmode="decimal" maxlength="7" placeholder="' + esc(t("askQ")) + '" value="' + (x.price > 0 ? x.price : "") + '"></label>' +
+        '<button class="x" type="button" data-td="' + i + '" aria-label="' + esc(t("tiDel")) + '">✕</button></div>';
+    }).join("");
+  }
+  $("tiRows").addEventListener("change", function (e) {
+    var el = e.target, list = M.tires(), i;
+    if (el.hasAttribute("data-tq")) { i = +el.getAttribute("data-tq"); list[i].qty = Math.max(0, parseInt(el.value, 10) || 0); }
+    else if (el.hasAttribute("data-tp")) { i = +el.getAttribute("data-tp"); var v = parseFloat(String(el.value).replace(/[^\d.]/g, "")); list[i].price = v > 0 ? v : null; }
+    else return;
+    M.saveTires(list); M.toast(t("taOk", { s: esc(list[i].size) })); tires();
+  });
+  $("tiRows").addEventListener("click", function (e) { var b = e.target.closest("[data-td]"); if (!b) return; var list = M.tires(); list.splice(+b.getAttribute("data-td"), 1); M.saveTires(list); tires(); });
+  $("tiAdd").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var n = M.normSize($("taSize").value); if (!n) { $("taMsg").textContent = t("taBad"); return; }
+    var bl = $("taBrand").value.trim().split("·"), pr = parseFloat(String($("taPrice").value).replace(/[^\d.]/g, ""));
+    var list = M.tires(), x = { id: "u" + Date.now().toString(36), brand: (bl[0] || "").trim() || "—", line: (bl[1] || "").trim(), size: n.size, type: $("taType").value, qty: Math.max(0, parseInt($("taQty").value, 10) || 0), price: pr > 0 ? pr : null };
+    list.unshift(x); M.saveTires(list);
+    $("taMsg").textContent = t("taOk", { s: n.size }); ["taSize", "taBrand", "taQty", "taPrice"].forEach(function (id) { $(id).value = ""; }); tires();
+  });
+  $("tiReset").addEventListener("click", function () { if (confirm(t("tiResetQ"))) { M.resetTires(); tires(); } });
   /* parts sources (config.suppliers): business info only, call for price & availability */
   function sources() {
     var list = C.suppliers || []; $("srcCard").hidden = !list.length;
@@ -58,7 +88,7 @@
             (sup && sup.tel ? '<a class="btn primary small" href="tel:' + esc(sup.tel) + '">📞 ' + esc(t("callN", { n: sup.short || sup.name })) + "</a>" : "") + "</div></div>";
         }).join("");
       }
-      return "<li>" + esc(M.itemName(it)) + ' <small style="color:var(--dim)">' + M.range(pr.lo, pr.hi) + "</small>" + (it.codes && it.codes.length ? ' <span class="pill acc">' + esc(it.codes.join(", ")) + "</span>" : "") +
+      return "<li>" + esc(M.itemName(it)) + ' <small style="color:var(--dim)">' + esc(M.prTxt(pr)) + "</small>" + (it.codes && it.codes.length ? ' <span class="pill acc">' + esc(it.codes.join(", ")) + "</span>" : "") +
         (say ? '<details class="more" style="margin:6px 0"><summary>🔩 ' + esc(t("whatToAsk", { n: sup ? sup.short || sup.name : t("theStore") })) + "</summary>" + say + "</details>" : "") + "</li>";
     }).join("");
     var pct = r.stage >= 0 ? M.STAGES[r.stage].pct : 0;
@@ -71,7 +101,7 @@
       (r.car && r.car.miles ? '<span class="pill">' + esc(r.car.miles) + " mi</span>" : "") + '<span class="pill">' + t("alertsL") + " " + esc(chs(r).join(" + ")) + "</span></div>" +
       (r.problem ? '<div class="prob">“' + esc(r.problem) + "”</div>" : "") + "<ul>" + items + "</ul>" +
       (anyParts ? '<button type="button" class="btn ghost small w100" style="margin:6px 0" data-copyall="' + r.id + '">📋 ' + t("copyAll") + "</button>" : "") +
-      '<div class="meta"><span class="pill acc">' + t("est") + " " + M.range(r.est.lo, r.est.hi) + "</span>" + (r.quote ? '<span class="pill ok">' + t("quote") + " " + M.money(r.quote) + "</span>" : "") +
+      '<div class="meta"><span class="pill acc">' + t("est") + " " + esc(M.totTxt(r.est)) + "</span>" + (r.quote ? '<span class="pill ok">' + t("quote") + " " + M.money(r.quote) + "</span>" : "") +
       '<span class="pill">' + t("arrival") + " " + esc(r.slot ? M.fSlot(r.slot) : t("noSlot")) + "</span>" + (r.readyBy ? '<span class="pill">' + t("ready") + " " + esc(M.fWhen(r.readyBy)) + "</span>" : "") + "</div>" +
       (r.status === "accepted" ? '<div class="mini"><i style="width:' + pct + '%"></i></div><small style="color:var(--dim)">' + pct + "% · " + esc(M.stageName(r.stage)) + "</small>" : "") +
       (acts ? '<div class="acts">' + acts + "</div>" : "") + "</article>";
@@ -95,7 +125,7 @@
     var r = M.get(b.getAttribute("data-id")); if (!r) return; cur = r.id;
     var a = b.getAttribute("data-act");
     if (a === "accept") {
-      $("accS").textContent = carOf(r) + " · " + M.range(r.est.lo, r.est.hi);
+      $("accS").textContent = carOf(r) + " · " + M.totTxt(r.est);
       $("accQ").value = Math.round((r.est.lo + r.est.hi) / 2 / 5) * 5;
       $("accN").value = t("accNote", { w: r.slot ? M.fWhen(r.slot.start) : "soon" });
       open("acc");
@@ -157,7 +187,7 @@
   D.addEventListener("keydown", function (e) { if (e.key === "Escape") D.querySelectorAll(".sheet.on").forEach(function (s) { close(s.id); }); });
 
   M.onChange(function () { if (unlocked()) render(); });
-  M.onLang(function () { if (unlocked()) { render(); sources(); } });
+  M.onLang(function () { if (unlocked()) { render(); sources(); tires(); } });
   M.applyLang();
   gate();
 })();

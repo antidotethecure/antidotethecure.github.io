@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow"><title>Veronika · Your Plan · SousShift AI</title>
-<link rel="manifest" href="manifest.webmanifest?v=2"><link rel="apple-touch-icon" sizes="180x180" href="icon-180.png?v=2"><link rel="icon" type="image/svg+xml" href="icon.svg?v=2"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2"><link rel="icon" sizes="48x48" href="favicon.ico?v=2"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b1220">
+<link rel="manifest" href="manifest.webmanifest?v=3"><link rel="apple-touch-icon" sizes="180x180" href="icon-180.png?v=3"><link rel="icon" type="image/svg+xml" href="icon.svg?v=3"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=3"><link rel="icon" sizes="48x48" href="favicon.ico?v=3"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b1220">
 <style>
 :root{--bg:#0b1220;--card:#121c33;--edge:#24345c;--ink:#f3f6ff;--dim:#a9b6d6;--gold:#f5c400;--ok:#2fbf71;--sage:#7fd6a6;--warn:#ff8a5b;--bad:#ff5b6e}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,system-ui,Segoe UI,Roboto,sans-serif}
@@ -12,6 +12,7 @@ h1{font-size:28px;line-height:1.15;margin:14px 0 6px}h2{font-size:20px;margin:30
 .card{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px 16px;margin:10px 0}
 .card.ok{border-color:#2fbf7155;background:linear-gradient(180deg,#123024,#121c33)}
 .card.warn{border-color:#ff8a5b66;background:linear-gradient(180deg,#3a1d14,#121c33)}
+.card.lock .ck li.fixed i{background:#ffffff14;color:var(--gold)}
 .card.lock{border-color:#7fd6a666;background:linear-gradient(180deg,#14302a,#121c33)}
 .pill{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:#ffffff14;color:var(--gold)}
 .pill.g{color:#7dffb5}.pill.r{color:var(--warn)}
@@ -42,7 +43,15 @@ details.rk{border-color:#ff8a5b55}
 .rg{border-radius:12px;padding:8px 12px;margin:8px 0;background:#0b1426;border-left:4px solid var(--edge)}.rg h3{margin:2px 0 4px;font-size:15px}.rg ul{margin:0;padding-left:20px}.rg li{margin:4px 0;font-size:14.5px}
 .rg.ry{border-left-color:var(--ok)}.rg.ry h3{color:#7dffb5}.rg.rn{border-left-color:var(--bad)}.rg.rn h3{color:var(--bad)}.rg.rw{border-left-color:var(--warn)}.rg.rw h3{color:var(--warn)}
 a.rkl{display:inline-block;margin:0 0 6px;font-size:14px;font-weight:700;color:var(--warn)}
-@media print{body{background:#fff;color:#111}.card,details.pj{background:#fff;border-color:#ccc}.btn,.save,.toc,#intake{display:none}details.pj{display:block}details.pj>*{display:block}.s,.note,.ck small{color:#444}}
+.ask{border-color:#f5c40055;background:linear-gradient(180deg,#2a2510,#121c33)}
+.ask .row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--dim);margin-top:4px}
+.ask .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.ask .btn[disabled]{opacity:.55;cursor:default}
+.ask .err{display:none;margin:8px 0 0;padding:10px 12px;border-radius:12px;background:#3a1418;border:1px solid #ff5b6e66;color:#ffd0d6;font-size:14px}
+.ask .err.on{display:block}.ask .err button{margin-left:8px}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,30px);opacity:0;pointer-events:none;background:var(--ok);color:#06210f;font-weight:900;padding:12px 18px;border-radius:999px;box-shadow:0 8px 30px #0008;transition:.25s;z-index:50;white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media print{body{background:#fff;color:#111}.card,details.pj{background:#fff;border-color:#ccc}.btn,.save,.toc,#intake,#ask,.toast{display:none}details.pj{display:block}details.pj>*{display:block}.s,.note,.ck small{color:#444}}
 </style></head><body><main>
 <div class="top"><img src="../../assets/ssai-lockup.jpg" alt="SousShift AI"></div>
 <p class="save note">📲 Save this: tap Share → <b>Add to Home Screen</b>. It works like an app.</p>
@@ -51,7 +60,8 @@ a.rkl{display:inline-block;margin:0 0 6px;font-size:14px;font-weight:700;color:v
 
 <div class="card ok"><span class="pill g">You're in ✅</span>
 <p class="big" style="margin:8px 0 2px">Kickoff: Monday, Oct 19 · 11:00 AM</p>
-<p style="margin:0">On Zoom (you're remote in Sacramento). The link will be texted to you before Monday.</p>
+<p style="margin:0">On Zoom (you're remote in Sacramento).</p>
+<a class="btn sm" id="zoomBtn" href="#" target="_blank" rel="noopener" style="display:none">🎥 Join the Zoom</a><p class="note" id="zoomNote" style="margin:6px 0 0">The Zoom link will be texted to you before Monday and will show up right here.</p>
 <div class="prog"><i id="bar" style="width:0"></i></div><p class="note" id="pct"></p>
 </div>
 
@@ -139,7 +149,7 @@ a.rkl{display:inline-block;margin:0 0 6px;font-size:14px;font-weight:700;color:v
 <li>Those details go only in the <a href="#intake">private info form</a>, which stays on your phone until you tap Send.</li></ul></div>
 </section>
 
-<nav class="toc" aria-label="Sections"><a href="#risks">⚠️ Warnings</a><a href="#tasks">🚀 Your 4 tasks</a><a href="#ads">📣 Ad rules</a><a href="#grants">📜 Grants</a><a href="#docs">🗂️ Documents</a><a href="#intake">🔒 Private info</a><a href="#agent">🤖 Your AI helper</a><a href="#updates">🗞️ Updates</a><a href="#faq">❓ FAQ</a><a href="#issue">🛠️ Report a problem</a></nav>
+<nav class="toc" aria-label="Sections"><a href="#risks">⚠️ Warnings</a><a href="#tasks">🚀 Your 4 tasks</a><a href="#claude">🌟 What Claude can do</a><a href="#how">🧠 How Claude works</a><a href="#plans">🔓 Starter vs Build-Out</a><a href="#ads">📣 Ad rules</a><a href="#grants">📜 Grants</a><a href="#docs">🗂️ Documents</a><a href="#intake">🔒 Private info</a><a href="#agent">🤖 Your AI helper</a><a href="#updates">🗞️ Updates</a><a href="#faq">❓ FAQ</a><a href="#ask">💡 Questions &amp; ideas</a><a href="#issue">🛠️ Report a problem</a></nav>
 
 <h2>✅ Done so far</h2>
 <div class="card"><ul class="ck">
@@ -154,6 +164,65 @@ a.rkl{display:inline-block;margin:0 0 6px;font-size:14px;font-weight:700;color:v
 <h2 id="tasks">🚀 Your 4 tasks</h2>
 <p class="s" style="margin-top:0">Tap a task to open it. Each step has a checkbox and a <b>How</b> line.</p>
 <div id="projects"></div>
+
+<h2 id="claude">🌟 What Claude can do for each of your businesses</h2>
+<p class="s" style="margin-top:0">A preview. Claude is the AI Anthony uses to build every SousShift app, brand and marketing plan. Here's what it can build for each of your three businesses: brand, marketing, exposure and upkeep. Tap a business to open it.</p>
+<details class="pj"><summary><span class="em">🍄</span><span>Sunshine Mushroom Wellness</span><span class="ct">preview</span></summary>
+<p style="margin:0 0 6px">Claude can work like Sunshine's in-house creative team. It writes in the brand's voice, plans every week of content, and checks each ad against Meta's and TikTok's rules before it goes out, so the shop can grow without putting the ad account at risk.</p>
+<h3>🎨 Brand</h3><p style="margin:0 0 6px">A full brand book: the story, who it's for, voice, colors, fonts, label and packaging copy, and a description for every product in the shop, all written without health claims.</p>
+<h3>📣 Marketing</h3><p style="margin:0 0 6px">30-day content calendars, Reel and TikTok scripts with hooks, captions, email and text campaigns for new drops and restocks, and ad versions checked against the rules before you submit.</p>
+<h3>🌍 Exposure</h3><p style="margin:0 0 6px">A Google Business profile and shop pages written to be found in search, collaboration pitches to Sacramento farmers markets, cafés, chefs and food creators, and a one-page press kit.</p>
+<h3>🔧 Maintenance</h3><p style="margin:0 0 6px">A weekly routine: Claude reviews what posted and what sold, explains any rejected ad, refreshes product listings and keeps the calendar full, so the brand never goes quiet.</p>
+<p class="note" style="margin:8px 0 0">🔒 Built for you, and taught step by step, in the <a href="#plans">Business Build-Out</a>.</p></details>
+<details class="pj"><summary><span class="em">⛪</span><span>Green Light Sanctuary</span><span class="ct">preview</span></summary>
+<p style="margin:0 0 6px">For the church, Claude works like a communications director and a grants assistant. It keeps the messaging consistent and respectful, brings people to gatherings and service work, writes posts that pass Meta's review, and keeps the paperwork organized before a funder ever asks.</p>
+<h3>🎨 Brand</h3><p style="margin:0 0 6px">A mission statement, an About page, a visual identity, message themes and a tone guide that keep everything focused on community and service.</p>
+<h3>📣 Marketing</h3><p style="margin:0 0 6px">Event announcements, weekly posts, newsletters, volunteer and donation drives, and boosted posts in the right ad category.</p>
+<h3>🌍 Exposure</h3><p style="margin:0 0 6px">A clean website and Google listing, outreach letters to community partners, local press releases for events and service days, and program descriptions that work for grant applications and for public storytelling.</p>
+<h3>🔧 Maintenance</h3><p style="margin:0 0 6px">A weekly grant search, a monthly content calendar, a records checklist for every grant, and ready replies to common messages so nothing sits unanswered.</p>
+<p class="note" style="margin:8px 0 0">🔒 Built for you, and taught step by step, in the <a href="#plans">Business Build-Out</a>.</p></details>
+<details class="pj"><summary><span class="em">💐</span><span>iDesignEvents</span><span class="ct">preview</span></summary>
+<p style="margin:0 0 6px">Whatever you decide for iDesignEvents (sell, rent or rebrand), Claude can do the heavy lifting: catalog the inventory, price it, write the listings and build the marketing for the path you pick.</p>
+<h3>🎨 Brand</h3><p style="margin:0 0 6px">If you rebrand: name and domain checks, logo direction, colors and a new bio. If you sell: a clean listing brand that makes the collection look premium.</p>
+<h3>📣 Marketing</h3><p style="margin:0 0 6px">A shot list and listing copy for every décor item, rental packages with prices, Instagram and TikTok posts showing real setups, and wedding-season campaigns.</p>
+<h3>🌍 Exposure</h3><p style="margin:0 0 6px">Outreach to wedding planners, venues and rental companies, Facebook Marketplace and wedding directory listings, and a catalog site with a booking form.</p>
+<h3>🔧 Maintenance</h3><p style="margin:0 0 6px">An inventory and booking tracker, a follow-up for every inquiry, a review request after each event, and simple monthly numbers: cost, price, profit.</p>
+<p class="note" style="margin:8px 0 0">🔒 Built for you, and taught step by step, in the <a href="#plans">Business Build-Out</a>.</p></details>
+
+<h2 id="how">🧠 How Claude works (the basics)</h2>
+<div class="card"><ul class="rl">
+<li><b>You talk to it in plain English</b>, on your phone or computer (the Claude app or claude.ai). No code needed.</li>
+<li><b>One Project per business.</b> A Project remembers that business's files, brand kit and instructions, so you never start from zero.</li>
+<li><b>Better instructions, better work.</b> What you ask (your prompt) decides what you get. Your starter prompts are in <a href="#agent">🤖 Your AI helper</a>.</li>
+<li><b>You stay in charge.</b> Claude drafts; you check and approve. It doesn't post, send or spend anything on its own.</li>
+<li><b>Claude Code is the advanced side.</b> It's what Anthony builds with: apps, websites, and automations that run by themselves (like a weekly grant search). That's part of the Build-Out.</li>
+</ul>
+<p class="note" style="margin:8px 0 0">We set up your Claude account and your first Projects together at kickoff.</p></div>
+
+<h2 id="plans">🔓 Your Starter plan vs. the Business Build-Out</h2>
+<div class="card ok"><span class="pill g">Your plan · Starter</span>
+<p class="big" style="margin:8px 0 2px">$300 / month</p>
+<ul class="ck">
+<li class="fixed"><i>✓</i><label><b>Your Claude account set up</b><small>With a Project for each business, at kickoff</small></label></li>
+<li class="fixed"><i>✓</i><label><b>How to get around in Claude</b><small>Projects, files, prompts, and checking Claude's work</small></label></li>
+<li class="fixed"><i>✓</i><label><b>Your 4 tasks, step by step</b><small>Every step has a How line</small></label></li>
+<li class="fixed"><i>✓</i><label><b>Starter prompts</b><small>Brand kit, 30-day calendar, ad checker, grant scout and writer</small></label></li>
+<li class="fixed"><i>✓</i><label><b>Text support from Anthony</b></label></li>
+</ul>
+<p class="note" style="margin:8px 0 0">Starter gets you using Claude. Turning it into a full system for each business is the Build-Out.</p></div>
+
+<div class="card lock"><span class="pill">🔒 Business Build-Out · one business at a time</span>
+<p style="margin:8px 0 6px">Anthony builds the full system for a business with Claude, then teaches you exactly how Claude runs it, so it keeps working after we're done.</p>
+<ul class="ck">
+<li class="fixed"><i>🔒</i><label><b>The brand book</b><small>Story, voice, colors, fonts and copy for everything</small></label></li>
+<li class="fixed"><i>🔒</i><label><b>A Claude setup trained on that business</b><small>Its brand, products, rules and past posts, so every draft sounds like you and stays inside the ad rules</small></label></li>
+<li class="fixed"><i>🔒</i><label><b>A 90-day marketing plan, plus the first month of content made for you</b></label></li>
+<li class="fixed"><i>🔒</i><label><b>Exposure</b><small>Website and Google listing, outreach letters and a press kit</small></label></li>
+<li class="fixed"><i>🔒</i><label><b>Automations</b><small>Weekly grant search, content drafts, and an ad check before anything posts</small></label></li>
+<li class="fixed"><i>🔒</i><label><b>Hands-on sessions</b><small>How to run, maintain and grow it with Claude and Claude Code</small></label></li>
+</ul>
+<p class="note" style="margin:8px 0 0">Priced per business. Start with the one that matters most; add the others when you're ready.</p>
+<a class="btn" href="sms:+14243094068&amp;body=Hi%20Anthony%2C%20I%27d%20like%20to%20hear%20about%20the%20Build-Out%20for%20">🔓 Ask Anthony about the Build-Out</a></div>
 
 <h2 id="ads">📣 Ad rules: what Meta and TikTok allow</h2>
 <div class="card warn"><span class="pill r">Read this first</span>
@@ -228,6 +297,22 @@ a.rkl{display:inline-block;margin:0 0 6px;font-size:14px;font-weight:700;color:v
 
 <h2 id="faq">❓ Questions</h2>
 <div class="card faq" id="faqs"></div>
+
+<h2 id="askH">💡 Questions, ideas or info? Type here</h2>
+<div class="card ask" id="ask"><span class="pill">Goes straight to Anthony</span>
+<p class="s" style="margin:8px 0 0">A question, an idea, a link, something you learned. Type it and tap Send. Anthony gets it right away and looks into it.</p>
+<form id="askF" autocomplete="off">
+<label class="fld"><span>Your message</span><textarea id="askT" maxlength="2000" rows="4" placeholder="Type your question, idea or info…"></textarea></label>
+<div class="row"><span id="askC">0 / 2,000</span><span id="askW"></span></div>
+<label class="fld"><span>Your name (optional)</span><input id="askN" type="text" maxlength="60" value="Veronika" autocomplete="name"></label>
+<label class="hp" aria-hidden="true">Leave this empty<input id="askHp" type="text" tabindex="-1" autocomplete="off"></label>
+<button class="btn" type="submit" id="askB">Send to Anthony</button>
+<div class="err" id="askE" role="alert">Couldn't send. Check your signal and try again.<button class="btn alt sm" type="button" id="askR">Retry</button></div>
+</form>
+<h3 id="askHH" style="display:none">Sent from this phone</h3>
+<ul class="ck" id="askL"></ul>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite">Sent to Antidote ✓</div>
 
 <h2 id="issue">🛠️ Report a problem or ask for a change</h2>
 <div class="card"><p class="s" style="margin-top:0">Something not working, not right, or not what you wanted? Tell us here. It opens a text to Anthony, and your note is also kept in the list below on this phone.</p>
@@ -313,10 +398,12 @@ var PROMPTS=[
  ["💐 iDesignEvents: rebrand or sell","iDesignEvents project","Here's my décor inventory: [paste or photos] and my answers to the 5 questions: [paste]. Compare three paths (sell everything, rent it out under a new brand, keep and rebrand) with rough numbers, time needed per week, and risks. Then give a step-by-step plan for the path that fits my answers."]
 ];
 var UPD=[
+ ["Oct 17","New: what Claude can do for each of your businesses, how Claude works, and the Business Build-Out"],
  ["Oct 13","Your plan is updated with your 4 tasks, the ad rules, a starter grant list and the documents checklist"],
  ["Oct 12","Payment received, kickoff booked for Mon Oct 19, 11:00 AM on Zoom"]
 ];
 var FAQ=[
+ ["What's the difference between Starter and the Build-Out?","Starter gets your Claude account set up and teaches you to use it, with your 4 tasks and starter prompts. In the Build-Out, Anthony builds a business's full brand, marketing, exposure and automations with Claude, then teaches you how to run them. It's priced per business: ask Anthony."],
  ["Can we advertise the mushroom products?","Culinary and functional mushrooms (like lion's mane), yes, with no health claims. Psilocybin or any psychedelic, no, on any platform, even with careful wording. See Ad rules."],
  ["What if an ad gets rejected?","Don't resubmit the same ad and don't argue it with a lot of appeals. Send Anthony a screenshot of the rejection. Repeated rejections can restrict the whole account."],
  ["Can an LLC get grants?","Rarely. Most grants require a nonprofit, a recognized church, or a tribe. The fast route is a fiscal sponsor: an existing nonprofit that takes the grant for your project for a small fee."],
@@ -324,6 +411,8 @@ var FAQ=[
  ["Does the Spotify shop work for us?","Only if the business is a music artist with a Spotify for Artists profile: Spotify sells artists' merch through Shopify. Otherwise we use a regular Shopify store."],
  ["How do I reach Anthony?","Text (424) 309-4068 or email secondshiftai@gmail.com. Kickoff is Monday Oct 19 at 11:00 AM on Zoom."]
 ];
+var ZOOM=""; /* kickoff Zoom link: paste it here and it appears on the kickoff card */
+(function(){ var b=document.getElementById("zoomBtn"), n=document.getElementById("zoomNote"); if(ZOOM){ b.href=ZOOM; b.style.display="inline-block"; n.textContent="Monday, Oct 19 at 11:00 AM (Pacific). Tap to join."; } })();
 var KEY="vv-plan-v2", st={}; try{ st=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){}
 function save(){ try{localStorage.setItem(KEY,JSON.stringify(st));}catch(err){} }
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
@@ -365,4 +454,45 @@ document.getElementById("isSend").onclick=function(){ var k=document.getElementB
  iss.unshift({k:k,t:t,d:new Date().toLocaleDateString()}); try{localStorage.setItem(IK,JSON.stringify(iss));}catch(e){} paintIs(); document.getElementById("isT").value="";
  location.href="sms:+14243094068"+(/iPhone|iPad|iPod/.test(navigator.userAgent)?"&":"?")+"body="+encodeURIComponent("Veronika: "+k+"\n"+t); };
 paintIs();
-</script></body></html>
+// questions / ideas box: POSTs to the private pitch-pipeline Apps Script, which emails Anthony. Only a copy stays on this phone.
+(function(){
+ var API="https://script.google.com/macros/s/AKfycbwEYjZoJOWxu4oUwYWMXJdx_GmSJ4rEnXJ7oczl1fS05gWRDf-C2tFx_ZEVlFV52FvRkQ/exec";
+ var F=document.getElementById("askF"),T=document.getElementById("askT"),N=document.getElementById("askN"),HP=document.getElementById("askHp"),
+  B=document.getElementById("askB"),E=document.getElementById("askE"),C=document.getElementById("askC"),W=document.getElementById("askW"),L=document.getElementById("askL"),TO=document.getElementById("toast");
+ var AK="vv-asks-v1",MAX=2000,GAP=10000,hist=[],last=0,busy=false,tt;
+ try{ hist=JSON.parse(localStorage.getItem(AK))||[]; }catch(e){ hist=[]; }
+ try{ last=+localStorage.getItem(AK+"-last")||0; }catch(e){}
+ function keep(){ try{ localStorage.setItem(AK,JSON.stringify(hist.slice(0,30))); localStorage.setItem(AK+"-last",String(last)); }catch(e){} }
+ function paint(){ document.getElementById("askHH").style.display=hist.length?"":"none";
+  L.innerHTML=hist.map(function(x){ return "<li class='fixed'><i>✓</i><label><b>Sent</b><small>"+esc(x.d)+"</small><small style='color:var(--ink);white-space:pre-wrap'>"+esc(x.t)+"</small></label></li>"; }).join(""); }
+ function count(){ C.textContent=T.value.length.toLocaleString()+" / 2,000"; }
+ function toast(){ TO.classList.add("on"); clearTimeout(tt); tt=setTimeout(function(){ TO.classList.remove("on"); },2600); }
+ function send(){
+  var t=T.value.trim(); E.classList.remove("on"); W.textContent="";
+  if(!t){ T.focus(); return; }
+  if(busy) return;
+  if(HP.value){ T.value=""; count(); toast(); return; }               // bot filled the hidden field
+  var wait=GAP-(Date.now()-last); if(wait>0){ W.textContent="Wait "+Math.ceil(wait/1000)+"s"; setTimeout(function(){ W.textContent=""; },wait); return; }
+  t=t.slice(0,MAX);
+  var who=(N.value.trim()||"Veronika").slice(0,60), now=new Date(), stamp=now.toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+  var page=location.href.split("#")[0];
+  var body=new URLSearchParams({type:"note",from:who,text:t,page:page,sent:now.toISOString(),hp:"",
+   // older deployment of the same script only knows these fields; they keep the email coming until it is updated
+   name:"📝 "+who+" (app)",phone:"",email:"",lanes:t,quote:t.replace(/\s+/g," ").slice(0,80),submitted:now.toISOString()+" · "+page});
+  busy=true; last=Date.now(); B.disabled=true; B.textContent="Sending…";
+  fetch(API,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:body.toString()})
+   .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+   .then(function(j){ if(!j||!j.ok) throw new Error((j&&j.error)||"failed");
+     hist.unshift({t:t,d:stamp}); keep(); paint(); T.value=""; count(); toast(); })
+   .catch(function(){ last=0; keep(); E.classList.add("on"); })
+   .then(function(){ busy=false; B.disabled=false; B.textContent="Send to Anthony"; });
+  keep();
+ }
+ F.addEventListener("submit",function(ev){ ev.preventDefault(); send(); });
+ document.getElementById("askR").onclick=send;
+ T.addEventListener("input",function(){ if(T.value.length>MAX) T.value=T.value.slice(0,MAX); count(); });
+ count(); paint();
+})();
+</script>
+<script src="../../demo/poweredby.js?v=20261013a" defer></script>
+</body></html>

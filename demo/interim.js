@@ -170,7 +170,7 @@
     el.innerHTML = '<img src="' + e(I.logo) + '" alt="' + e(NAME) + '" onerror="this.style.display=\'none\'"><div class="ir-k">' + e(NAME) + ' · live reward</div>' +
       '<div class="ir-rw">' + e(rec.reward) + '</div><div class="ir-clock" data-ir="clock"></div><div class="ir-k" style="margin-top:4px">One-time code · expires in</div><div class="ir-cd" data-ir="cd"></div><div class="ir-stamp">USED / EXPIRED</div>' +
       '<div class="ir-code">' + e(rec.code) + '</div>' +
-      '<div class="ir-srv">Server: ring the Toast button <b>‘' + e(rec.button) + '’</b>' + (rec.button.indexOf("$") < 0 ? ' on the item' : '') + ' and type code <b>' + e(rec.code) + '</b> as the reason.</div>' +
+      '<div class="ir-srv">Server: ring the Toast button <b>‘' + e(rec.button) + '’</b>' + (rec.button.indexOf("$") < 0 && !rec.whole ? ' on the item' : '') + ' and type code <b>' + e(rec.code) + '</b> as the reason.</div>' +
       '<div class="ir-k" style="opacity:.85;letter-spacing:.06em;text-transform:none">Works once, this visit only · next prize available tomorrow</div>' +
       '<button type="button" class="ir-hide">Hide pass</button>';
     document.body.appendChild(el); passEl = el;
@@ -263,6 +263,7 @@
   function toastButtons() {
     var out = CRM.tiers().map(function (t) { var b = t[2] || {}; return { pts: t[0], reward: t[1], button: b.button || "App Reward", how: b.type === "fixed" ? "$" + Number(b.amount || 0).toFixed(2) + " off the check" : "100% off one item" + (b.max ? " (up to $" + Number(b.max).toFixed(2) + ")" : "") }; });
     var jl = R.justLanded && R.justLanded.toast; if (jl) out.push({ pts: 0, reward: "Just Landed: " + R.justLanded.offer, button: jl.button, how: (jl.percent || 10) + "% off the check" });
+    var ss = window.SSAI_SCORE && window.SSAI_SCORE.toast(); if (ss) out.push({ pts: 0, reward: ss.reward, button: ss.button, how: ss.how });   // demo/scorespecial.js
     return out;
   }
   // ================= live-pass button on the rewards card =================
@@ -322,7 +323,34 @@
     var now = Date.now(), rec = { type: "eb", code: code, tier: -1, reward: "Early bird: " + item, button: button, pts: 0, ts: now, exp: now + I.passMinutes * 60000, member: m.id, memberName: m.name, status: "live", day: day(now), synced: true };
     var l = load(); l.redeems.unshift(rec); store(l); markPrize(m); openPass(code); if (cb) cb(); return true;
   }
-  window.SSAI_INTERIM = { redeem: redeem, giftPass: giftPass, tomorrow: tomorrowSheet, newCode: code, usedToday: function () { var m = CRM.member(); return m ? memberRedeems(m, day()).length >= I.redeemsPerDay : false; }, claim: claim, openPass: openPass, closePass: closePass, cardHTML: cardHTML, explainerHTML: explainerHTML, toastButtons: toastButtons, log: drawLog,
+  // same-day promo (demo/scorespecial.js, e.g. the Rams Score Special): no points, the same confirm sheet + live pass, logged
+  // like a reward (interim_redeem, pts 0) and counted as that visit's ONE reward, so it never stacks with another one.
+  // o = {reward, button, kind, whole (entire-check discount), fine, test (demo only: stays on this phone, never uploaded)}
+  function specialPass(o, cb) {
+    var m = CRM.member(); if (!m) return false; sweep();
+    var live = activePass(); if (live) { openPass(live.code); return false; }
+    var used = memberRedeems(m, day());
+    if (used.length >= I.redeemsPerDay) { tomorrowSheet(used[0].reward, used[0].code); return false; }
+    if (CRM.prizeUsedToday && CRM.prizeUsedToday()) { tomorrowSheet(""); return false; }
+    var ov = sheet('<h3>Use ' + e(o.reward) + '?</h3><p style="font-size:17px"><b>Show this to your server. It can only be used once and expires in ' + I.passMinutes + ' minutes.</b></p>' +
+      '<p class="ir-fine">' + e(o.fine || "Counts as today's one reward. Open it when you're ready to order or pay, with your server at the table.") + '</p>' +
+      '<button type="button" class="ir-go" data-ir="go">🎟️ Show my pass now</button><div class="ir-err"></div><button type="button" class="ir-x" data-ir="x">Not yet</button>');
+    ov.querySelector("[data-ir=go]").onclick = function () {
+      var btn = this; btn.disabled = true; btn.textContent = "One moment…";
+      var c = code(), now = Date.now(), rec = { type: "interim_redeem", code: c, eid: c, dev: devId(), tier: -2, kind: o.kind || "special", reward: o.reward, button: o.button, whole: !!o.whole, pts: 0, ts: now, exp: now + I.passMinutes * 60000,
+        member: m.id, memberName: m.name, phone: m.phone || "", status: "live", day: day(now), test: !!o.test };
+      (o.test ? Promise.resolve(null) : api(JSON.parse(JSON.stringify(rec)))).then(function (r) {
+        if (r && r.prizeDay) { ov.remove(); markPrize(CRM.member()); tomorrowSheet(r.had || ""); return; }
+        if (r && !r.ok) { btn.disabled = false; btn.textContent = "🎟️ Show my pass now"; ov.querySelector(".ir-err").textContent = why(r, "That special can't be used right now."); return; }
+        if (r && r.code) c = rec.code = r.code;
+        var l = load(); rec.synced = !!r || !!o.test; if (!r && !o.test) queue(l, { type: "interim_redeem", code: c, eid: c, dev: rec.dev, tier: -2, kind: rec.kind, reward: rec.reward, button: rec.button, pts: 0, ts: now, member: m.id, memberName: m.name, day: rec.day });
+        l.redeems.unshift(rec); store(l); markPrize(CRM.member());
+        ov.remove(); openPass(c); if (cb) cb(rec);
+      });
+    };
+    return true;
+  }
+  window.SSAI_INTERIM = { redeem: redeem, giftPass: giftPass, specialPass: specialPass, tomorrow: tomorrowSheet, newCode: code, usedToday: function () { var m = CRM.member(); return m ? memberRedeems(m, day()).length >= I.redeemsPerDay : false; }, claim: claim, openPass: openPass, closePass: closePass, cardHTML: cardHTML, explainerHTML: explainerHTML, toastButtons: toastButtons, log: drawLog,
     data: load, cfg: I,
     // test hooks
     expireNow: function () { var l = load(); l.redeems.forEach(function (r) { if (r.status === "live") r.exp = Date.now(); }); store(l); } };

@@ -194,6 +194,7 @@
     var h = document.documentElement;
     if (h.classList.contains("ssai-locked") || document.fullscreenElement || document.webkitFullscreenElement) return true;
     if (document.querySelector(".a2hs.on")) return true;
+    if (window.SSAI_GAME_ON) return true;                                            // a run is going: keep the bubble off the game
     if (document.querySelector(".ssai-lockpill.on:not(.free)")) return true;       // a game has the screen locked
     return false;
   }

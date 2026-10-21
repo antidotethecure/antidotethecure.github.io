@@ -22,7 +22,7 @@ if (S && REQ !== "2d" && (REQ === "3d" || pref() !== "2d")) {
 
 async function boot() {
   const THREE = await import("three");
-  const [QM, WXM, PM] = await Promise.all(["quality", "weather", "particles"].map(n => import("../engine3d/" + n + ".js?v=e3t")));
+  const [QM, WXM, PM, BBMOD] = await Promise.all(["quality", "weather", "particles", "billboard"].map(n => import("../engine3d/" + n + ".js?v=e3t")));
   const game = document.getElementById("game"), host = game.parentNode;
   const W = S.W, H = S.H, PY = S.PY, KF = 3.2, TAU = Math.PI * 2;
   const wx = x => x - W / 2;
@@ -529,6 +529,17 @@ async function boot() {
     add(armL, CYL6, shm, 2, 15, 2, 0, -7, 0); add(armR, CYL6, shm, 2, 15, 2, 0, -7, 0); box(armR, wrenchM, 2, 9, 1.4, 0, -16, 0);
     return { g, armL, armR, ph: Math.random() * 6 }; }
 
+  /* ---------- Antidote's review on roadside LED billboards (like Melody): one rolls by every ~60 s of driving, alternating
+     right / left, each playing the next clip of his StormBurger review (the CLAMP, the drizzle, everybody on that bus…).
+     A second review is a second entry in window.SB_REVIEWS ({dir, clips}); the boards take turns between them. ---------- */
+  const REVIEWS = window.SB_REVIEWS || [{ dir: "img/review/clips/", clips: ["c14", "c13", "c16", "c12", "c15", "c10", "c11"] }];
+  let BBM = null, bbT = 25, bbSide = 1, bbN = 0; const bbC = REVIEWS.map(() => 0);
+  function spawnBoard() { const r = bbN++ % REVIEWS.length, R = REVIEWS[r], src = R.dir + R.clips[bbC[r]++ % R.clips.length];
+    if (!BBM) BBM = BBMOD.makeVideoBoards(THREE, { src: src + ".mp4", poster: src + ".jpg" }); else { BBM.video.src = src + ".mp4"; const pl = BBM.video.play(); if (pl && pl.catch) pl.catch(() => {}); }
+    const b = BBM.create({ w: 140, pole: 110, caption: "ANTIDOTE FOOD REVIEW · STORMBURGER" }), g = new THREE.Group(); b.position.x = bbSide * 262; b.rotation.y = -bbSide * .42; g.add(b);
+    place(g, front[bbSide > 0 ? 1 : 0] + 40); bbSide = -bbSide; }
+  const drizTex = img("img/game/antidote-logo.webp"), drizMat = new THREE.SpriteMaterial({ map: drizTex, transparent: true, depthWrite: false });
+
   /* ---------- per-object views ---------- */
   const views = new Map(); let frameNo = 0; const ghosts = [];
   function viewFor(o, kind) { let v = views.get(o); if (v) return v; v = { kind, n: 0 };
@@ -541,6 +552,7 @@ async function boot() {
       add(v.o, PLANE, basic(0xffffff, { map: coverTex }), 168, 96, 1, 0, 160, .5); const gl = new THREE.Sprite(glowMat(0xffd23f, .35)); gl.scale.set(300, 190, 1); gl.position.set(0, 160, -4); v.o.add(gl);
       v.m = new THREE.Mesh(coinGeo, [coinMats[0], std(0xe3262f, { emissive: 0xe3262f, emissiveIntensity: .8 }), coinMats[0]]); v.m.scale.setScalar(1.3); v.m.position.y = 24; v.o.add(v.m); }
     else if (kind === "cop") { const C = makeCop(city); v.o = C.g; v.C = C; }
+    else if (kind === "driz") { v.o = new THREE.Group(); v.m = new THREE.Sprite(drizMat); v.m.scale.set(54, 54, 1); v.o.add(v.m); const gl = new THREE.Sprite(goldGlow); gl.scale.set(120, 120, 1); v.o.add(gl); }
     else if (kind === "queue") { v.o = new THREE.Group(); v.cars = []; for (let i = 0; i < o.n; i++) { const c = makeCar(i + o.q * 4); v.o.add(c); v.cars.push(c); }   // the drive-thru line, with its StormBurger at the front
       const st2 = store(1, storeFor(o.q), false); v.st = st2.o; v.o.add(v.st); }
     else if (kind === "pit") { v.o = new THREE.Group(); const J = jordan(1, false); J.o.position.z = -260; v.o.add(J.o);   // Jordan High School behind its pit bay (the bay lines up with the truck when you pull in)
@@ -583,6 +595,7 @@ async function boot() {
     const dz = (pitting ? 0 : run ? st.speed * KF : st.dying ? Math.max(0, st.speed * KF * (1 - (now - st.dying) / 900)) : 2.5) * k;
     const dzw = dz + warp; warp = 0; odo += dzw; roadTex.offset.y += dzw / RT; roadRough.offset.y = roadTex.offset.y;
     for (let i = live.length - 1; i >= 0; i--) { const L = live[i]; L.o.position.z += dzw; if (L.upd && L.o.position.z > -1900) L.upd(L.o, t, dt); if (L.o.position.z > 900) { world.remove(L.o); live.splice(i, 1); } }
+    if (run && !pitting) { bbT -= dt; if (bbT <= 0) { spawnBoard(); bbT = 60; } } if (BBM) BBM.update(t);
     front[0] += dzw; front[1] += dzw; evtIn -= dz; if (evtIn <= 0) { event(); evtIn = SPACING; } fill();
 
     /* truck */
@@ -628,6 +641,7 @@ async function boot() {
       else if (it.type === "food") v.o.position.set(x, 40 + Math.sin(now / 260 + it.x) * 4, z);
       else if (it.type === "debris") { const hgt = .75 + .25 * Math.sin(now / 300 + it.ph); v.o.position.set(x, 0, z); v.m.position.y = 60 + 50 * hgt; v.mat.rotation = it.rot; v.sh.scale.setScalar(.7 + .3 * (1 - hgt)); }
       else if (it.type === "twister") { v.o.position.set(x, 0, z); v.upd(t + it.ph, 1); }
+      else if (it.type === "driz") { v.o.position.set(x, 42 + Math.sin(now / 220 + it.x) * 5, z); v.m.scale.x = 54 * Math.abs(Math.cos(now / 380)); }
       else if (it.type === "queue") { v.o.position.set(0, 0, 0); const sp = it.len / it.n;
         v.cars.forEach((c, i) => { const y = it.y - it.len / 2 + sp * (i + .5); c.position.set(LANEX[2] + Math.sin(i * 1.7) * 5, 0, (y - PY) * KF); c.rotation.y = Math.sin(i * 2.3) * .04; });
         v.st.position.z = (it.y - it.len / 2 - PY) * KF - 60; }
@@ -647,7 +661,7 @@ async function boot() {
         v.strip.visible = v.disc.visible = v.beam.visible = v.ic.visible = true; v.ic.material.opacity = .6 + a * .4; v.ic.position.y = 150 + Math.sin(bo.age / 90) * 8; }
       else { v.strip.visible = v.disc.visible = v.beam.visible = v.ic.visible = false; if (!v.bolt) { v.bolt = makeBolt(0, -10); v.o.add(v.bolt); flashLight.position.set(LANEX[bo.lane], 200, -10); flashK = 1; fx.sparks(V.set(LANEX[bo.lane], 4, -10), V2.set(0, 1, 0), null, 3, 30); fx.boom(V.set(LANEX[bo.lane], 6, -10), .6); } v.bolt.visible = Math.random() > .25; } }
     for (const [o, v] of views) if (v.n !== frameNo) {   // gone from the game: picked up / hit (animate it into the truck) or scrolled away
-      if ((v.kind === "coin" || v.kind === "food" || v.kind === "egg" || v.kind === "debris" || v.kind === "twister") && v.z > -320 && Math.abs(v.x - tx) < 90) {
+      if ((v.kind === "coin" || v.kind === "food" || v.kind === "driz" || v.kind === "egg" || v.kind === "debris" || v.kind === "twister") && v.z > -320 && Math.abs(v.x - tx) < 90) {
         ghosts.push({ v, o, t: 0, x0: v.o.position.x, z0: v.o.position.z, bad: v.kind === "debris" || v.kind === "twister" }); views.delete(o); }
       else drop(o, v); }
     for (let i = ghosts.length - 1; i >= 0; i--) { const G = ghosts[i]; G.t += dt; const u = Math.min(1, G.t / .16);
@@ -663,7 +677,7 @@ async function boot() {
     renderer.render(scene, cam);
     if (!S.r3 && !failed && pref() !== "2d") { STATUS.enable(true); S.proj = proj; }
   };
-  STATUS.warp = d => { warp += d; };
+  STATUS.warp = d => { warp += d; }; STATUS.board = () => { bbT = 0; };
   STATUS.jump = (i, r) => { if (r) ROUTE = routeOf(r); ri = i; evtIn = 0; };   // test hook: put route stop i on the road ahead now
   STATUS.booted = true;
 }

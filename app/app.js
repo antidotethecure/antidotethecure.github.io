@@ -31,7 +31,7 @@
   $("addonList").innerHTML = A.addons.map(function (a) {
     var inc = a.includedIn.map(function (k) { return plan(k).name; });
     return '<div class="addon"><div><b>' + esc(a.name) + '</b><div class="note">' + esc(a.one) + (inc.length ? " <b>Included in " + esc(inc.join(" and ")) + ".</b>" : "") +
-      (a.key === "social" ? ' <a href="#social">Details →</a>' : a.quote ? "" : ' <a href="../agents/">Demos →</a>') + '</div></div><b class="p">' + (a.quote ? (a.soon ? "Soon · Ask us" : "Ask us") : usd(a.monthly) + '/mo') + '</b></div>';
+      (a.key === "social" ? ' <a href="#social">Details →</a>' : a.quote ? "" : ' <a href="../agents/">Demos →</a>') + '</div></div><b class="p">' + (a.quote ? (a.soon ? "Soon · Ask us" : "Ask us") : (a.soon ? "Soon · " : "") + usd(a.monthly) + '/mo') + '</b></div>';
   }).join("") + '<div class="addon"><div><b>' + esc(A.bundle.name) + ' bundle</b><div class="note">' + esc(A.bundle.one) + '</div></div><b class="p">' + usd(bundleMonthly()) + '/mo</b></div>';
 
   function bundleMonthly() { return plan(A.bundle.plan).monthly + addon(A.bundle.addon).monthly - A.bundle.discountMonthly; }

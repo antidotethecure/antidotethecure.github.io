@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#070B1E">
 <title>StormBurger — Menu & Game</title>
 <script src="../lang-th.js"></script>
+<script src="../gamepad.js?v=20261013gp1"></script>
 <meta name="description" content="StormBurger's menu, Storm Run game and weekly prizes. Demo by SousShift AI.">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,7 +52,7 @@ h2::before{content:"";width:22px;height:22px;background:var(--bolt);clip-path:po
 .hud{display:flex;justify-content:space-between;align-items:center;font-weight:800;padding:2px 4px 10px;gap:8px;flex-wrap:wrap}
 .hud .sc{font-family:var(--display);font-size:30px;color:var(--gold);letter-spacing:.04em;font-weight:400}
 .hud .lv{letter-spacing:2px}
-#game{display:block;width:100%;height:auto;aspect-ratio:400/560;border-radius:12px;background:#05081a;touch-action:none;cursor:pointer}
+#game{display:block;width:100%;height:auto;aspect-ratio:400/560;border-radius:12px;background:#05081a;touch-action:pan-y pinch-zoom;cursor:pointer}
 .keys{display:flex;justify-content:center;gap:10px;margin-top:10px}
 .keys button{flex:1;max-width:170px;font:800 22px var(--body);background:#1a2656;color:#fff;border:1px solid var(--edge);border-radius:12px;padding:12px 0;cursor:pointer}
 .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px;font-size:13.5px;color:var(--dim)}
@@ -114,9 +115,9 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 </header>
 
 <h2>Play for prizes</h2>
-<p class="sub">Drive through the storm. Grab coins and StormBurger food. Dodge the lightning and everything the tornado throws at you.</p>
+<p class="sub">Drive through the storm. Grab coins and StormBurger food. Dodge the lightning, the cops and the tornadoes, from Inglewood to Long Beach.</p>
 <div class="gamebox">
-  <div class="hud"><span>Score <span class="sc" id="score">0</span></span><span class="lv" id="lives" aria-label="Lives">⚡⚡⚡</span><span id="time">45s</span></div>
+  <div class="hud"><span>Score <span class="sc" id="score">0</span></span><span class="lv" id="lives" aria-label="Lives">⚡⚡⚡⚡⚡</span><span id="time">45s</span></div>
   <canvas id="game" width="400" height="560" aria-label="Storm Run game. Tap the left or right side to change lanes."></canvas>
   <div class="keys"><button type="button" id="kl" aria-label="Move left">◀</button><button type="button" id="kr" aria-label="Move right">▶</button></div>
   <div id="over">
@@ -163,10 +164,10 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <footer><a href="rules.html">Game &amp; daily spin official rules (draft)</a><br>Demo built for StormBurger by SousShift AI · menu and prices from stormburger.com · prizes are samples · food images are AI-generated previews</footer>
 </div>
 
-<script>window.REVIEW_EGG={vid:"xZG8xJRGy9U",restaurant:"StormBurger",short:"STORMBURGER",bonus:500,img:"img/review/cover.webp",find:"A roadside billboard rolls by once a run. Drive through its golden ▶ token"};</script>
-<script src="../reviewegg.js"></script>
+<script>window.REVIEW_EGG={vid:"xZG8xJRGy9U",restaurant:"StormBurger",short:"STORMBURGER",bonus:500,img:"img/review/cover.webp",find:"Catch 5 Antidote Drizzle emblems and his review rolls by on a billboard. Drive through its golden ▶ token"};</script>
+<script src="../reviewegg.js?v=ht4k"></script>
 <script>window.HALFTIME={min:85,max:95};</script>
-<script src="../halftime.js"></script>
+<script src="../halftime.js?v=ht4k"></script>
 <script>
 window.CONFIG={name:"StormBurger",address:"1500 N La Brea Ave, Inglewood, CA 90302"};
 (function(){
@@ -260,34 +261,43 @@ if(!reduce) setInterval(function(){ if(Math.random()<.35) sky(.07+Math.random()*
 /* ---------------- GAME: Storm Run ---------------- */
 var cv=$("game"), cx=cv.getContext("2d"), W=400, H=560, DPR=Math.min(2,window.devicePixelRatio||1);
 cv.width=W*DPR; cv.height=H*DPR; cx.scale(DPR,DPR);
-var LANES=3, LX=function(i){return W*(0.2+0.3*i);};
+var LANES=4, LX=function(i){return W*(0.125+0.25*i);};   // 4 lanes (Antidote 2026-10-21: more room to dodge)
+var BOLT_WARN=1300, TW_WARN=3200;   // ms of warning before lightning lands / a tornado touches down
 // cut-out sprites: StormBurger's own menu photos + a real cow, stop sign, flame and smoke
-var SPR={}; ["burger","fries","shake","chicken","cow","stop","flame","smoke"].forEach(function(k){var im=new Image(); im.src="img/game/"+k+".webp"; SPR[k]=im;});
+var SPR={}; ["burger","fries","shake","chicken","sandwich","strips","rings","turkey","lemonade","cow","stop","flame","smoke"].forEach(function(k){var im=new Image(); im.src="img/game/"+k+".webp"; SPR[k]=im;});
 var LOGO=new Image(); LOGO.src="img/logo.png";
 function ready(im){ return im&&im.complete&&im.naturalWidth; }
-var FOOD=[{k:"burger",p:60,n:"Classic StormBurger",w:64},{k:"fries",p:30,n:"Fries",w:60},{k:"shake",p:40,n:"Shake",w:30},{k:"chicken",p:50,n:"Spicy Chicken",w:62}];
+// StormBurger's own menu photos, cut out: the main things to grab are the burger, chicken sandwich, strips, fries and onion rings
+var FOOD=[{k:"burger",p:60,n:"Classic StormBurger",w:64},{k:"turkey",p:60,n:"Turkey Burger",w:52},{k:"sandwich",p:50,n:"Chicken Sandwich",w:64},{k:"strips",p:50,n:"Chicken Strips",w:66},{k:"fries",p:30,n:"Fries",w:60},{k:"rings",p:30,n:"Onion Rings",w:60},{k:"shake",p:40,n:"Vanilla Shake",w:50},{k:"lemonade",p:40,n:"Lemonade",w:46}];
 var DEBRIS=[{k:"cow",w:104,r:30,why:"🐄 MOO!"},{k:"stop",w:70,r:24,why:"🛑 STOP!"}];
+var MAXL=5;   // 5 lives per truck; every hit takes half a life, so it takes 10 hits to lose (Antidote 2026-10-21)
+function dmgFor(l){ return l>=MAXL?0:l>2.5?1:2; }   // truck damage look: smoking/burning after the first hit, cracked glass at half health
+function livesStr(l){ l=Math.max(0,l); var f=Math.floor(l), h=l-f>=.5; return "⚡".repeat(f)+(h?"½":"")+"·".repeat(Math.max(0,MAXL-f-(h?1:0))); }
+window.SB_LIVES={max:function(){return MAXL;},str:livesStr,dmg:dmgFor};
+var DRIZ_N=5;   // like Melody: catch this many Antidote Drizzle emblems to unlock his StormBurger review on a roadside billboard
+var DRIZ_IM=new Image(); DRIZ_IM.src="img/game/antidote-logo.webp";
 var st; // game state
 var htPlayed=0;   // ms of play across this visit's runs (halftime)
-function fresh(){ return {running:false,over:false,lane:1,x:LX(1),score:0,lives:3,t:45000,items:[],bolts:[],rain:[],pops:[],speed:3.2,shake:0,inv:0,flash:0,last:0,spawnT:0,boltT:2500,coins:0,dmg:0,flames:[],smoke:[],cracks:[],dying:0,spin:0,rot:0,skids:[],rear:null}; }
+function fresh(){ return {running:false,over:false,lane:1,x:LX(1),score:0,lives:MAXL,t:45000,items:[],bolts:[],rain:[],pops:[],speed:3.2,shake:0,inv:0,flash:0,last:0,spawnT:0,boltT:2500,coins:0,dmg:0,flames:[],smoke:[],cracks:[],dying:0,spin:0,rot:0,skids:[],rear:null,cops:[],copT:9000,dz:0,dzT:3000,twT:13000}; }
 st=fresh();
 for(var i=0;i<90;i++) st.rain.push({x:Math.random()*W,y:Math.random()*H,l:8+Math.random()*14,v:9+Math.random()*7});
 var road=0;
-function hud(){ $("score").textContent=st.score.toLocaleString(); $("lives").textContent="⚡".repeat(Math.max(0,st.lives))+"·".repeat(3-Math.max(0,st.lives)); $("time").textContent=Math.ceil(Math.max(0,st.t)/1000)+"s"; }
+function hud(){ $("score").textContent=st.score.toLocaleString(); $("lives").textContent=livesStr(st.lives); $("time").textContent=Math.ceil(Math.max(0,st.t)/1000)+"s"; }
 function best(){ try{ var b=+localStorage.getItem("sb-best")||0; $("best").textContent="Your best: "+(b?b.toLocaleString()+" pts":"—"); return b; }catch(e){ return 0; } }
 best();
 function setLane(n){ if(!st.running||st.dying) return; st.lane=Math.max(0,Math.min(LANES-1,n)); }
-window.__S={get:function(){return st;},setLane:function(n){st.lane=Math.max(0,Math.min(LANES-1,n));},LX:LX,start:function(){start();}};
+window.__S={get:function(){return st;},setLane:function(n){st.lane=Math.max(0,Math.min(LANES-1,n));},LX:LX,start:function(){start();},W:W,H:H,PY:H-80,SPR:SPR,LOGO:LOGO,FOOD:FOOD,
+  r3:false,proj:null};   // r3/proj are set by storm3d.js (the 3D chase view): the canvas then only draws text over the WebGL road
 function start(){
   // HALFTIME: no levels here, so the break plays between runs: the first new run after ~90 s of total play opens with Antidote's review reel
   if(window.Halftime&&Halftime.tick(htPlayed,null,start)) return;
-  var keep=st.rain; st=fresh(); st.rain=keep; st.running=true; st.last=performance.now();
+  var keep=st.rain; st=fresh(); st.rain=keep; st.running=true; st.last=performance.now(); window.SSAI_GAME_ON=true;
   if(window.ReviewEgg) ReviewEgg.reset(18,30); // Antidote's review billboard: once a run, 18-30 s in
   $("over").classList.remove("on"); hud();
 }
 function end(){
   if(st.running) htPlayed+=Math.max(0,Math.min(45000,45000-st.t));
-  st.running=false; st.over=true;
+  st.running=false; st.over=true; window.SSAI_GAME_ON=false;
   var b=best(); if(st.score>b){ try{localStorage.setItem("sb-best",st.score);}catch(e){} }
   best();
   $("final").textContent=st.score.toLocaleString()+" pts";
@@ -305,23 +315,29 @@ function end(){
       $("wsave").onclick=function(){ window.SSAI_GATE("prize",showWin); }; } }
   if(window.ReviewEgg) ReviewEgg.endCard($("over"),$("over").querySelector(".btns"));
   $("over").classList.add("on");
+  // PLAY FIRST, CLAIM AFTER (demo/claimscore.js): rank vs the weekly champions board, then the same member sheet the old PLAY gate used
+  if(window.SSAI_CLAIM) SSAI_CLAIM.show({key:"storm-burger",score:st.score,champs:"storm-burger",boardName:"the weekly board",reason:"play",mount:$("over").querySelector(".btns"),
+    after:function(){ var b=$("wsave"); if(b) b.click(); },again:function(){ $("again").click(); },alive:function(){ return st.over&&!st.running; }});
 }
 function spawn(){
   var lane=(Math.random()*LANES)|0, r=Math.random();
-  if(r<0.42) st.items.push({type:"coin",lane:lane,x:LX(lane),y:-30,r:15,spin:Math.random()*6});
-  else if(r<0.66){ var f=FOOD[(Math.random()*FOOD.length)|0]; st.items.push({type:"food",f:f,lane:lane,x:LX(lane),y:-40,r:26}); }
+  // small tornadoes (from 6 s in): they weave across the lanes on their way down; getting caught costs 200 points + a life
+  if(r<0.44) st.items.push({type:"coin",lane:lane,x:LX(lane),y:-30,r:15,spin:Math.random()*6});
+  else if(r<0.72){ var f=FOOD[(Math.random()*FOOD.length)|0]; st.items.push({type:"food",f:f,lane:lane,x:LX(lane),y:-40,r:26}); }
   else { var tl=(Math.random()*LANES)|0, d=DEBRIS[Math.random()<.55?0:1];
-    st.items.push({type:"debris",d:d,x:LX(lane),y:-70,tx:LX(tl),r:d.r,rot:(Math.random()-.5)*.8,vr:d.k==="stop"?(Math.random()<.5?-1:1)*(0.07+Math.random()*0.07):(Math.random()-.5)*0.05,ph:Math.random()*6}); }
+    st.items.push({type:"debris",d:d,x:LX(lane),y:-150,tx:LX(tl),r:d.r,rot:(Math.random()-.5)*.8,vr:d.k==="stop"?(Math.random()<.5?-1:1)*(0.07+Math.random()*0.07):(Math.random()-.5)*0.05,ph:Math.random()*6}); }
 }
-function pop(x,y,txt,col){ st.pops.push({x:x,y:y,txt:txt,col:col,a:1}); }
-function hit(x,y,why){
+function pop(x,y,txt,col){ if(window.__S.r3&&window.__S.proj){ var q=window.__S.proj(x,y); x=Math.max(60,Math.min(W-60,q[0])); y=q[1]; } st.pops.push({x:x,y:y,txt:txt,col:col,a:1}); }
+function hit(x,y,why,pen){
   if(st.inv>0) return;
   if(st.dying) return;
-  st.lives--; st.dmg++; st.score=Math.max(0,st.score-100); st.inv=60; st.shake=14; st.flash=0.5;
-  pop(x,y-20,why+" −100","#ff6b5b"); if(navigator.vibrate) try{navigator.vibrate(st.lives<=0?[90,60,200]:60);}catch(e){}
+  pen=pen||100;
+  var d0=st.dmg; st.lives=Math.max(0,st.lives-.5); st.dmg=dmgFor(st.lives); st.score=Math.max(0,st.score-pen); st.inv=60; st.shake=pen>100?20:14; st.flash=0.5;
+  pop(x,y-20,why+" −"+pen,"#ff6b5b"); if(navigator.vibrate) try{navigator.vibrate(st.lives<=0?[90,60,200]:60);}catch(e){}
   var py=H-80;
-  if(st.dmg===1) pop(st.x,py-70,T("🔥 Engine on fire!"),"#ffb347");
-  if(st.dmg===2){ st.cracks=crackSet(); pop(st.x,py-70,T("💥 Windows cracked!"),"#ff6b5b"); }
+  if(st.dmg===1&&d0<1) pop(st.x,py-70,T("🔥 Engine on fire!"),"#ffb347");
+  if(st.dmg===2&&d0<2){ st.cracks=crackSet(); pop(st.x,py-70,T("💥 Windows cracked!"),"#ff6b5b"); }
+  if(st.lives>0&&!st.flat&&Math.random()<0.18){ st.flat=Math.random()<.5?-1:1; pop(st.x,py-100,T("💥 Tire blew out!"),"#ff6b5b"); }   // 18% per hit: a blown tire makes the truck weave until the pit stop
   if(st.lives<=0){ st.dying=performance.now(); st.inv=1e9; st.shake=22; st.flash=0.9; st.dx=st.x; st.items=[]; st.bolts=[]; }
 }
 /* ---- car damage: 1 hit = smoking, burning hood · 2 hits = cracked glass, bigger fire · 3 hits = totaled, tornado takes it ---- */
@@ -414,7 +430,7 @@ function drawRoad(){
   for(var i=0;i<6;i++){ cx.fillStyle="rgba(120,160,255,.035)"; cx.fillRect(W*0.08+i*W*0.15,0,W*0.05,H); }
   cx.fillStyle="#E8582A"; cx.fillRect(W*0.05,0,5,H); cx.fillRect(W*0.95-5,0,5,H);
   cx.fillStyle="rgba(255,255,255,.75)";
-  for(var l=1;l<LANES;l++){ var x=W*(0.05+0.3*l); for(var y=(road%60)-60;y<H;y+=60) cx.fillRect(x-2,y,4,32); }
+  for(var l=1;l<LANES;l++){ var x=W*0.25*l; for(var y=(road%60)-60;y<H;y+=60) cx.fillRect(x-2,y,4,32); }
 }
 function drawCar(x,y,rot,sc,now){ // the StormBurger food truck, top-down, front = up
   cx.save(); cx.translate(x,y); if(rot) cx.rotate(rot); if(sc&&sc!==1) cx.scale(sc,sc);
@@ -470,6 +486,11 @@ function drawEgg(it,now){ // Antidote's review: an overhead billboard with the c
 }
 function drawItem(it,now){
   if(it.type==="egg") return drawEgg(it,now);
+  if(it.type==="twister") return drawTwister(it,now);
+  if(it.type==="pit") return drawPit(it,now);
+  if(it.type==="queue") return drawQueue(it,now);
+  if(it.type==="driz"){ var dr=it.r*(1+.08*Math.sin(now/120)), gd=cx.createRadialGradient(it.x,it.y,2,it.x,it.y,dr*2.2); gd.addColorStop(0,"rgba(255,210,63,.7)"); gd.addColorStop(1,"rgba(255,210,63,0)"); cx.fillStyle=gd; cx.beginPath(); cx.arc(it.x,it.y,dr*2.2,0,6.283); cx.fill();
+    if(ready(DRIZ_IM)){ var dh=dr*2.2, dw=dh*DRIZ_IM.naturalWidth/DRIZ_IM.naturalHeight; cx.drawImage(DRIZ_IM,it.x-dw/2,it.y-dh/2,dw,dh); } return; }
   if(it.type==="coin") return drawCoin(it,now);
   if(it.type==="food"){
     var im=SPR[it.f.k], bob=Math.sin(now/260+it.x)*3, w=it.f.w;
@@ -483,92 +504,192 @@ function drawItem(it,now){
   cx.fillStyle="rgba(0,0,0,.32)"; cx.beginPath(); cx.ellipse(it.x+14*hgt,it.y+22*hgt,d.w*0.36,d.w*0.14,0,0,6.283); cx.fill();
   if(ready(sp)){ var dw=d.w*(0.92+0.08*hgt), dh=dw*sp.naturalHeight/sp.naturalWidth; cx.save(); cx.translate(it.x,it.y); cx.rotate(it.rot); cx.drawImage(sp,-dw/2,-dh/2,dw,dh); cx.restore(); }
 }
-function boltPath(x){ var pts=[[x,-10]], y=-10; while(y<H){ y+=30+Math.random()*40; pts.push([x+(Math.random()-.5)*46,y]); } return pts; }
+function drawTwister(it,now){ // small tornado: a spinning funnel of real smoke, dust kicked up where it touches the road
+  var sm=SPR.smoke;
+  cx.fillStyle="rgba(0,0,0,.28)"; cx.beginPath(); cx.ellipse(it.x+6,it.y+8,30,10,0,0,6.283); cx.fill();
+  for(var i=0;i<12;i++){ var y=it.y-i*10, w=8+i*i*0.32, wob=Math.sin(now/150+i*0.7+it.ph)*(3+i*0.8);
+    if(ready(sm)){ cx.save(); cx.globalAlpha=0.7; cx.translate(it.x+wob,y); cx.rotate((i%2?1:-1)*now/200+i); cx.scale(1,0.45); cx.drawImage(sm,-w*1.2,-w*1.2,w*2.4,w*2.4); cx.restore(); }
+    cx.fillStyle="rgba("+(80+i*6)+","+(88+i*6)+","+(110+i*6)+",.32)"; cx.beginPath(); cx.ellipse(it.x+wob,y,w,4+i*0.5,0,0,6.283); cx.fill(); }
+  cx.fillStyle="rgba(50,40,32,.8)"; for(var j=0;j<9;j++){ var a=now/90+j*2.4, rr=12+(j%3)*9; cx.fillRect(it.x+Math.cos(a)*rr,it.y-j*9+Math.sin(a)*4,3,3); }
+}
+function drawCop(c,now){ // police cruiser, top-down, front = up; light bar flashes red/blue
+  var on=Math.floor(now/110)%2;
+  cx.save(); cx.translate(c.x,c.y); cx.rotate((LX(c.tl)-c.x)*0.004);
+  var bg=cx.createLinearGradient(0,-44,0,-200); bg.addColorStop(0,"rgba(255,240,200,.3)"); bg.addColorStop(1,"rgba(255,240,200,0)"); cx.fillStyle=bg; cx.beginPath(); cx.moveTo(-12,-44); cx.lineTo(-40,-200); cx.lineTo(40,-200); cx.lineTo(12,-44); cx.fill();
+  cx.fillStyle="rgba(0,0,0,.35)"; cx.beginPath(); cx.ellipse(3,5,25,46,0,0,6.283); cx.fill();
+  cx.fillStyle="#0d0d10"; [[-24,-30],[18,-30],[-24,18],[18,18]].forEach(function(w){ roundRect(w[0],w[1],6,13,2); cx.fill(); });
+  cx.fillStyle="#111520"; roundRect(-20,-44,40,88,10); cx.fill();
+  cx.fillStyle="#f2f4f8"; cx.fillRect(-20,-12,40,30);
+  cx.fillStyle="#6d8bc4"; cx.beginPath(); cx.moveTo(-15,-22); cx.lineTo(15,-22); cx.lineTo(13,-12); cx.lineTo(-13,-12); cx.closePath(); cx.fill();
+  cx.fillStyle="#3b4c72"; cx.fillRect(-14,18,28,9);
+  cx.fillStyle=on?"#ff2a2a":"#3a0c0c"; cx.fillRect(-14,-5,14,6); cx.fillStyle=on?"#1e3b6a":"#2a7bff"; cx.fillRect(0,-5,14,6);
+  cx.globalCompositeOperation="lighter"; var gr=cx.createRadialGradient(on?-7:7,-2,0,on?-7:7,-2,46); gr.addColorStop(0,on?"rgba(255,40,40,.55)":"rgba(40,120,255,.55)"); gr.addColorStop(1,"rgba(0,0,0,0)"); cx.fillStyle=gr; cx.beginPath(); cx.arc(on?-7:7,-2,46,0,6.283); cx.fill(); cx.globalCompositeOperation="source-over";
+  cx.fillStyle="#fff3c4"; cx.fillRect(-16,-45,8,3); cx.fillRect(8,-45,8,3);
+  cx.restore();
+}
+function drawPit(it,now){ // Jordan High School pit stop: a bay on the right with cones and a sign; pull in (right lane) to get fixed
+  var x=it.x, y=it.y;
+  cx.fillStyle="rgba(31,70,184,.28)"; cx.fillRect(x-58,y-70,116,140);
+  cx.fillStyle="#ff8a2a"; for(var c=-1;c<=1;c+=2) for(var j=0;j<3;j++){ cx.beginPath(); cx.moveTo(x+c*56,y-60+j*55); cx.lineTo(x+c*50,y-44+j*55); cx.lineTo(x+c*62,y-44+j*55); cx.closePath(); cx.fill(); }
+  cx.fillStyle="#1f46b8"; roundRect(x-54,y-34,108,52,8); cx.fill(); cx.strokeStyle="#fff"; cx.lineWidth=2; cx.stroke();
+  cx.fillStyle="#fff"; cx.font="900 16px Archivo,system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText(it.used?"✔ "+T("FIXED"):"🔧 "+T("PIT STOP"),x,y-16);
+  cx.font="800 10px Archivo,system-ui"; cx.fillText(T("JORDAN HIGH · PANTHERS"),x,y+4);
+}
+function drawQueue(it,now){ // cars lined up for the StormBurger drive-thru, blocking the right lane: swerve around them
+  var sp=it.len/it.n, cols=["#e9e9ee","#1d1d22","#8a9099","#7a1f1f","#2b4b8a","#c9ccd2","#3a3a40","#b8b0a0","#1f3a2a"];
+  for(var i=0;i<it.n;i++){ var y=it.y-it.len/2+sp*(i+.5), x=it.x+Math.sin(i*1.7)*4;
+    cx.fillStyle="rgba(0,0,0,.3)"; cx.beginPath(); cx.ellipse(x+3,y+3,20,18,0,0,6.283); cx.fill();
+    cx.fillStyle=cols[i%cols.length]; roundRect(x-17,y-16,34,32,7); cx.fill(); cx.fillStyle="rgba(30,40,60,.85)"; cx.fillRect(x-13,y-9,26,7); cx.fillRect(x-13,y+5,26,5);
+    cx.fillStyle="#ff2a2a"; cx.fillRect(x-15,y+14,7,3); cx.fillRect(x+8,y+14,7,3); }
+  cx.fillStyle="#f4f6f8"; roundRect(it.x+30,it.y-30,52,30,4); cx.fill(); cx.fillStyle="#1d43b5"; cx.font="900 9px Archivo,system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText("STORMBURGER",it.x+56,it.y-20);
+  cx.fillStyle="#d9262f"; cx.fillRect(it.x+34,it.y-12,44,10); cx.fillStyle="#fff"; cx.font="900 7px Archivo,system-ui"; cx.fillText(T("DRIVE THRU"),it.x+56,it.y-7);
+}
+function pitStart(it){ // pulled into Jordan High: the run pauses for the kitchen stop (kitchen.js): build burgers for the kids, they fix the truck
+  it.used=1; st.inv=1e9;
+  if(window.SB_KITCHEN){ st.pitT=1e9; SB_KITCHEN.open(function(n){ st.pitT=480; st.inv=90; st.last=performance.now(); hud();   // 480 ms = pull back out onto the road
+      pop(st.x,H-150,n?"🍔 "+n+" "+T(n>1?"burgers served":"burger served"):T("Back on the road"),"#FFD23F"); });
+    if(navigator.vibrate) try{navigator.vibrate([30,40,30]);}catch(e){} return; }
+  st.pitT=2600; var healed=st.lives<MAXL; if(healed){ st.lives=Math.min(MAXL,st.lives+1); } st.dmg=dmgFor(st.lives); if(st.dmg<2) st.cracks=[]; if(!st.dmg) st.flames=[]; st.flat=0;
+  st.score+=100; pop(st.x,H-150,"🍔 "+T("Fed the Panthers")+" +100","#FFD23F"); pop(st.x,H-120,healed?"🔧 "+T("Truck repaired! +1 life"):"🔧 "+T("Tune-up done"),"#7CFF9B");
+}
+function copStep(dt,k,py){ // cops come up from behind, then either blow past or swerve into your lane to ram you
+  if(st.running&&!st.dying&&!(st.pitT>0)){ st.copT-=dt; if(st.copT<=0){ var el=45000-st.t, ln=Math.random()<.5?st.lane:(Math.random()*LANES)|0;
+      st.cops.push({lane:ln,tl:ln,x:LX(ln),y:H+130,warn:1700,ram:Math.random()<.6});
+      st.copT=Math.max(6000,10000-el/12)+Math.random()*2500; } }
+  for(var i=st.cops.length-1;i>=0;i--){ var c=st.cops[i];
+    if(st.running&&!st.dying&&!(st.pitT>0)){
+      if(c.warn>0){ c.warn-=dt; continue; }
+      c.y-=(1.7+st.speed*0.42)*k;
+      if(!c.go&&c.y<py+150){ c.go=1; c.tl=c.ram?st.lane:c.lane; }
+      c.x+=(LX(c.tl)-c.x)*Math.min(1,0.06*k);
+      if(!c.hitDone&&Math.abs(c.x-st.x)<44&&Math.abs(c.y-py)<84){ c.hitDone=1; hit(st.x,py,T("🚓 RAMMED!")); c.tl=Math.max(0,Math.min(LANES-1,c.tl+(c.tl===LANES-1?-1:1))); }
+    }
+    if(c.y<-150){ st.cops.splice(i,1); continue; }
+  }
+}
+function boltPath(x){ var pts=[[x,-10]], y=-10; while(y<H-80){ y+=30+Math.random()*40; pts.push([x+(Math.random()-.5)*46,y]); } return pts; }
 function drawBolt(b){
   var lx=LX(b.lane);
   if(b.phase==="warn"){
     var a=0.25+0.25*Math.sin(b.age/60);
-    cx.fillStyle="rgba(191,230,255,"+(a*0.4)+")"; cx.fillRect(lx-W*0.15+3,0,W*0.3-6,H);
-    cx.strokeStyle="rgba(191,230,255,"+(0.5+a)+")"; cx.setLineDash([10,8]); cx.lineWidth=2; cx.strokeRect(lx-W*0.15+3,2,W*0.3-6,H-4); cx.setLineDash([]);
-    cx.font="34px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.globalAlpha=0.6+a; cx.fillText("⚡",lx,70); cx.globalAlpha=1;
+    var ty=H-80, rr=44+8*Math.sin(b.age/60), shrink=1-Math.min(1,b.age/BOLT_WARN)*0.45;   // target on the road where the bolt will land, closing in
+    cx.fillStyle="rgba(191,230,255,"+(a*0.35)+")"; cx.beginPath(); cx.ellipse(lx,ty,rr*shrink*1.2,rr*shrink*0.75,0,0,6.283); cx.fill();
+    cx.strokeStyle="rgba(191,230,255,"+(0.55+a)+")"; cx.lineWidth=3; cx.setLineDash([8,6]); cx.beginPath(); cx.ellipse(lx,ty,rr*1.25,rr*0.8,0,0,6.283); cx.stroke(); cx.setLineDash([]);
+    cx.beginPath(); cx.moveTo(lx-14,ty); cx.lineTo(lx+14,ty); cx.moveTo(lx,ty-10); cx.lineTo(lx,ty+10); cx.stroke();
+    cx.font="34px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.globalAlpha=0.6+a; cx.fillText("⚡",lx,ty-70); cx.globalAlpha=1;
   } else if(b.phase==="strike"){
     var p=b.pts; cx.save(); cx.lineJoin="miter";
     cx.strokeStyle="rgba(150,210,255,.45)"; cx.lineWidth=14; cx.beginPath(); p.forEach(function(q,i){ i?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1]); }); cx.stroke();
     cx.strokeStyle="#ffffff"; cx.lineWidth=4; cx.shadowColor="#9fd8ff"; cx.shadowBlur=24; cx.stroke(); cx.restore();
-    cx.fillStyle="rgba(255,255,255,.25)"; cx.beginPath(); cx.arc(p[p.length-1][0],H-40,40+Math.random()*12,0,6.283); cx.fill();
+    cx.fillStyle="rgba(255,255,255,.25)"; cx.beginPath(); cx.arc(p[p.length-1][0],H-80,40+Math.random()*12,0,6.283); cx.fill();
   }
 }
 function frame(now){
   requestAnimationFrame(frame);
   var dt=Math.min(50,now-(st.last||now)); st.last=now; var k=dt/16.67;
-  road+= (st.running?st.speed*2.2:1.2)*k;
+  road+= (st.pitT>0?0:st.running?st.speed*2.2:1.2)*k;
   cx.save();
   if(st.shake>0){ cx.translate((Math.random()-.5)*st.shake,(Math.random()-.5)*st.shake); st.shake*=0.85; if(st.shake<0.5) st.shake=0; }
-  drawRoad();
-  drawSkids(k);
-  if(st.running&&!st.dying){
-    st.t-=dt; st.speed=Math.min(7.5,3.2+(45000-st.t)/9000);
-    st.spawnT-=dt; if(st.spawnT<=0){ spawn(); st.spawnT=Math.max(330,700-(45000-st.t)/90); }
-    if(window.ReviewEgg&&ReviewEgg.due(45000-st.t)){ var el=(Math.random()*LANES)|0; st.items.push({type:"egg",lane:el,x:LX(el),y:-40,r:20}); }
-    st.boltT-=dt; if(st.boltT<=0){ st.bolts.push({lane:(Math.random()*LANES)|0,phase:"warn",age:0}); st.boltT=Math.max(1400,3200-(45000-st.t)/25); }
+  var r3=window.__S.r3;   // 3D chase view on: storm3d.js draws the world under this canvas, which keeps only text + flashes
+  if(r3) cx.clearRect(-40,-40,W+80,H+80); else { drawRoad(); drawSkids(k); }
+  var pit=st.pitT>0;
+  if(st.running&&!st.dying&&pit){ st.pitT-=dt; st.x+=(LX(LANES-1)-st.x)*Math.min(1,0.2*k); st.rot*=0.85; if(st.pitT<=0){ st.pitT=0; st.inv=60; } }
+  else if(st.running&&!st.dying){
+    if((st.qN||0)<2&&45000-st.t>(st.qN?31000:11000)){ st.items.push({type:"queue",lane:LANES-1,x:LX(LANES-1),y:-200,len:340,n:9,q:st.qN||0}); st.qN=(st.qN||0)+1; }   // the StormBurger drive-thru line
+    if(!st.pitDone&&45000-st.t>19000){ st.pitDone=1; st.items.push({type:"pit",lane:LANES-1,x:LX(LANES-1),y:-90,r:30}); }
+    st.t-=dt; st.speed=Math.min(5.2,3+(45000-st.t)/18000);
+    st.spawnT-=dt; if(st.spawnT<=0){ spawn(); st.spawnT=Math.max(420,700-(45000-st.t)/140); }
+    st.twT-=dt; if(st.twT<=0){ var tl=(Math.random()*LANES)|0; st.items.push({type:"twister",x:LX(tl),x0:W/2,y:-140,r:28,ph:Math.random()*6.283,sw:0.0008+Math.random()*0.0005,lane:tl}); st.twT=17000+Math.random()*7000; }   // tornadoes: every ~20 s, always announced (TORNADO WARNING) first
+    if(window.ReviewEgg&&st.dz<DRIZ_N){ st.dzT-=dt; if(st.dzT<=0){ var dl=(Math.random()*LANES)|0; st.items.push({type:"driz",lane:dl,x:LX(dl),y:-40,r:20}); st.dzT=3200+Math.random()*1500; } }
+    if(window.ReviewEgg&&st.dz>=DRIZ_N&&ReviewEgg.due(45000-st.t)){ var el=(Math.random()*LANES)|0; st.items.push({type:"egg",lane:el,x:LX(el),y:-40,r:20}); }
+    st.boltT-=dt; if(st.boltT<=0){ st.bolts.push({lane:Math.random()<.7?st.lane:(Math.random()*LANES)|0,phase:"warn",age:0}); st.boltT=Math.max(2400,3800-(45000-st.t)/30); }   // like Melody: it targets where the truck is, so you have to move in time
     var dxl=LX(st.lane)-st.x; st.x+=dxl*Math.min(1,0.2*k);
-    st.rot+=(Math.max(-0.5,Math.min(0.5,dxl*0.012))-st.rot)*Math.min(1,0.32*k); // nose swings into the lane change
+    if(st.flat){ st.x+=(Math.sin(now/170)*2.4+Math.sin(now/410)*1.6+st.flat*0.9)*k; if(Math.random()<.5) tireSmoke(st.x+st.flat*22,H-80+30); }
+    st.rot+=(Math.max(-0.5,Math.min(0.5,dxl*0.012+(st.flat?Math.sin(now/150)*0.09+st.flat*0.04:0)))-st.rot)*Math.min(1,0.32*k); // nose swings into the lane change (and fishtails on a blown tire)
     if(st.inv>0) st.inv-=k;
     if(Math.floor(now/250)!==Math.floor((now-dt)/250)) st.score+=1;
   }
   var py=H-80;
   // bolts
-  for(var b=st.bolts.length-1;b>=0;b--){ var bo=st.bolts[b]; bo.age+=dt;
-    if(bo.phase==="warn"&&bo.age>950){ bo.phase="strike"; bo.age=0; bo.pts=boltPath(LX(bo.lane)); st.flash=0.6; st.shake=8; if(st.running&&st.lane===bo.lane&&Math.abs(st.x-LX(bo.lane))<40) hit(st.x,py,T("LIGHTNING!")); }
+  for(var b=st.bolts.length-1;b>=0;b--){ var bo=st.bolts[b]; bo.age+=pit?0:dt;
+    if(bo.phase==="warn"&&bo.age>BOLT_WARN){ bo.phase="strike"; bo.age=0; bo.pts=boltPath(LX(bo.lane)); st.flash=0.6; st.shake=8; if(st.running&&st.lane===bo.lane&&Math.abs(st.x-LX(bo.lane))<40) hit(st.x,py,T("LIGHTNING!")); }
     else if(bo.phase==="strike"&&bo.age>260){ st.bolts.splice(b,1); continue; }
-    drawBolt(bo); }
+    if(!r3) drawBolt(bo); }
   // items
   for(var i=st.items.length-1;i>=0;i--){ var it=st.items[i];
-    if(st.running){ it.y+=(it.type==="debris"?st.speed*1.25:st.speed)*k; if(it.type==="debris"){ it.x+=(it.tx-it.x)*0.012*k; it.rot+=it.vr*k; } }
-    if(it.y>H+60){ st.items.splice(i,1); continue; }
-    drawItem(it,now);
-    if(st.running&&Math.abs(it.x-st.x)<it.r+18&&Math.abs(it.y-py)<it.r+28){
+    if(st.running&&!pit){ it.y+=(it.type==="debris"?st.speed*0.6:it.type==="twister"?st.speed*0.7:st.speed)*k; if(it.type==="debris"){ it.rot+=it.vr*k; }   /* stays in its own lane: never slides toward the truck */ else if(it.type==="twister"){ it.x=it.x0+Math.sin(now*it.sw+it.ph)*W*0.32; } }
+    if(it.y-(it.len||0)/2>H+60){ st.items.splice(i,1); continue; }
+    if(!r3) drawItem(it,now);
+    if(it.type==="queue"){ if(st.running&&!pit&&!st.dying&&Math.abs(st.x-it.x)<50&&Math.abs(it.y-py)<it.len/2+40){ hit(st.x,py,T("🚗 DRIVE-THRU LINE!")); if(st.dying) break; } continue; }
+    if(it.type==="pit"){ if(st.running&&!pit&&!it.used&&!st.dying&&st.lane===LANES-1&&Math.abs(it.y-py)<it.r+28) pitStart(it); continue; }
+    if(st.running&&!pit&&Math.abs(it.x-st.x)<it.r+18&&Math.abs(it.y-py)<it.r+28){
       if(it.type==="egg"){ var eb=ReviewEgg.collect(); st.score+=eb; pop(it.x,it.y-20,"+"+eb+" 📺 "+T("Antidote's review"),"#FFD23F"); }
+      else if(it.type==="driz"){ st.dz++; st.score+=25; pop(it.x,it.y,"✦ "+Math.min(st.dz,DRIZ_N)+"/"+DRIZ_N+" "+T("Antidote Drizzle"),"#FFD23F");
+        if(st.dz===DRIZ_N&&window.ReviewEgg) ReviewEgg.toast("✦ "+T("Review unlocked!"),T("Antidote's StormBurger review is on a billboard up ahead. Drive through its golden ▶")); }
       else if(it.type==="coin"){ st.score+=10; st.coins++; pop(it.x,it.y,"+10","#FFD23F"); }
       else if(it.type==="food"){ st.score+=it.f.p; pop(it.x,it.y,"+"+it.f.p+" "+T(it.f.n),"#FFD23F"); }
+      else if(it.type==="twister"){ hit(it.x,it.y,T("🌪️ TWISTER!"),200); if(st.dying) break; }
       else { hit(it.x,it.y,T(it.d.why)); if(st.dying) break; }
       st.items.splice(i,1);
     }
   }
+  copStep(dt,k,py);
+  if(!r3) st.cops.forEach(function(c){ if(c.warn<=0) drawCop(c,now); });
+  st.cops.forEach(function(c){ if(c.y>py+40&&!st.dying&&st.running){ var a=0.55+0.45*Math.sin(now/70); cx.globalAlpha=a; cx.font="800 15px Archivo,system-ui"; cx.textAlign="center"; cx.textBaseline="middle";
+    cx.fillStyle=Math.floor(now/110)%2?"#ff4a4a":"#5aa0ff"; cx.fillText("🚨 "+T("COP BEHIND"),LX(c.lane),H-16); cx.globalAlpha=1; } });
+  if(st.running&&!st.dying&&!pit&&st.twT<TW_WARN){ var tw=0.6+0.4*Math.sin(now/90), tb=Math.min(1,(TW_WARN-st.twT)/300);   // tornado warning, ~3 s before it touches down
+    cx.save(); cx.globalAlpha=tb; cx.fillStyle="rgba(120,8,14,.82)"; roundRect(W/2-158,118,316,58,12); cx.fill(); cx.strokeStyle="rgba(255,210,63,"+tw+")"; cx.lineWidth=3; cx.stroke();
+    cx.textAlign="center"; cx.textBaseline="middle"; cx.fillStyle="rgba(255,255,255,"+(0.7+0.3*tw)+")"; cx.font="400 30px 'Bebas Neue',Impact,sans-serif"; cx.fillText("🌪️ "+T("TORNADO WARNING")+" 🌪️",W/2,140);
+    cx.fillStyle="#FFD23F"; cx.font="800 12px Archivo,system-ui"; cx.fillText(T("A twister is touching down ahead. Get ready to swerve")+" · "+Math.ceil(st.twT/1000)+"s",W/2,163); cx.restore(); }
+  st.items.forEach(function(it){ if(it.type==="queue"&&st.running&&!st.dying&&it.y+it.len/2<py-40){ var a=0.65+0.35*Math.sin(now/120);
+    cx.globalAlpha=a; cx.font="900 16px Archivo,system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillStyle="#FFD23F"; cx.strokeStyle="#0a1030"; cx.lineWidth=4;
+    var tq=T("🍔 STORMBURGER LINE AHEAD · MOVE LEFT ◀"); cx.strokeText(tq,W/2,88); cx.fillText(tq,W/2,88); cx.globalAlpha=1; } });
+  st.items.forEach(function(it){ if(it.type==="pit"&&!it.used&&st.running&&!st.dying&&it.y<py-60){ var a=0.65+0.35*Math.sin(now/120);
+    cx.globalAlpha=a; cx.font="900 17px Archivo,system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillStyle="#7CFF9B"; cx.strokeStyle="#0a1030"; cx.lineWidth=4;
+    var tx2=T("🔧 PIT STOP AHEAD · KEEP RIGHT ▶"); cx.strokeText(tx2,W/2,64); cx.fillText(tx2,W/2,64); cx.globalAlpha=1; } });
+  if(st.running&&!st.dying&&window.ReviewEgg&&st.dz<DRIZ_N&&st.dz>0){ cx.font="800 13px Archivo,system-ui"; cx.textAlign="left"; cx.textBaseline="middle"; cx.fillStyle="#FFD23F"; cx.strokeStyle="#0a1030"; cx.lineWidth=3; var dt3="✦ "+st.dz+"/"+DRIZ_N+" "+T("Antidote Drizzle"); cx.strokeText(dt3,10,22); cx.fillText(dt3,10,22); }
+  if(pit&&st.running&&st.pitT<3000){ var pp=1-st.pitT/2600;
+    cx.fillStyle="rgba(10,16,48,.78)"; roundRect(W/2-150,56,300,74,12); cx.fill(); cx.strokeStyle="#1f46b8"; cx.lineWidth=3; cx.stroke();
+    cx.fillStyle="#fff"; cx.font="900 18px Archivo,system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText("🔧 "+T("JORDAN HIGH PIT STOP"),W/2,76);
+    cx.fillStyle="#C9D2EE"; cx.font="700 12px Archivo,system-ui"; cx.fillText(T("You fed the Panthers 🍔 · they're fixing your truck"),W/2,96);
+    cx.fillStyle="rgba(255,255,255,.15)"; cx.fillRect(W/2-120,110,240,8); cx.fillStyle="#7CFF9B"; cx.fillRect(W/2-120,110,240*pp,8);
+    if(!r3){ cx.font="26px system-ui"; ["🧑🏾‍🔧","🧑🏽‍🔧","👩🏿‍🔧","🧑🏻‍🔧"].forEach(function(e,i){ var a=i/4*6.283+now/600; cx.fillText(e,st.x+Math.cos(a)*48,py+Math.sin(a)*40); }); } }
   if(st.dying){ // totaled: spin out, then the tornado swoops in and carries the car off the screen
     var dt2=(now-st.dying)/1000, tx=st.dx+(1-Math.min(1,dt2/0.7))*(st.dx<W/2?W*0.7:-W*0.7);
     st.spin+=(dt2<0.7?0.32:0.45)*k;
     var lift=dt2<0.7?0:Math.pow((dt2-0.7)/1.5,1.6), cyy=py-lift*(H+120), cxx=st.dx+(dt2<0.7?Math.sin(dt2*9)*18:Math.sin(dt2*5)*30*(1-lift));
-    if(dt2>0.15) drawTornado(cxx*0.6+tx*0.4,dt2-0.15,now);
+    if(!r3){ if(dt2>0.15) drawTornado(cxx*0.6+tx*0.4,dt2-0.15,now);
     drawSmoke(k); for(var q=0;q<2;q++) emitSmoke(cxx+Math.sin(st.spin)*40,cyy-Math.cos(st.spin)*40,true);
-    if(cyy>-80) drawCar(cxx,cyy,st.spin,Math.max(0.35,1-lift*0.65),now);
+    if(cyy>-80) drawCar(cxx,cyy,st.spin,Math.max(0.35,1-lift*0.65),now); }
     var ta=Math.min(1,dt2/0.35); cx.save(); cx.globalAlpha=ta; cx.translate(W/2,H*0.36); cx.scale(0.8+ta*0.2,0.8+ta*0.2);
     cx.font="400 64px 'Bebas Neue',Impact,sans-serif"; cx.textAlign="center"; cx.textBaseline="middle"; cx.lineWidth=6; cx.strokeStyle="#111"; cx.strokeText(T("TOTALED!"),0,0); cx.fillStyle="#ff4a3a"; cx.fillText(T("TOTALED!"),0,0);
     cx.font="800 18px Archivo,system-ui"; cx.fillStyle="#FFD23F"; cx.fillText(T("The storm took your ride"),0,40); cx.restore();
     if(dt2>2.6){ st.dying=0; end(); }
   } else {
+  if(!r3){
     if(st.running) skid(py,k);
     if(st.dmg&&st.running) emitSmoke(st.x+Math.sin(st.rot)*42,py-Math.cos(st.rot)*42,st.dmg>1);
     drawSmoke(k);
-    if((st.inv<=0||Math.floor(st.inv/6)%2===0)&&!(st.over&&st.dmg>=3)) drawCar(st.x,py,st.rot,1,now);
-  }
+    if((st.inv<=0||Math.floor(st.inv/6)%2===0)&&!(st.over&&st.lives<=0)) drawCar(st.x,py,st.rot,1,now);
+  } }
   // rain
-  cx.strokeStyle="rgba(170,200,255,.35)"; cx.lineWidth=1.2; cx.beginPath();
-  st.rain.forEach(function(r){ r.y+=r.v*k; r.x-=1.2*k; if(r.y>H){r.y=-20;r.x=Math.random()*W+40;} cx.moveTo(r.x,r.y); cx.lineTo(r.x-3,r.y+r.l); }); cx.stroke();
+  if(!r3){ cx.strokeStyle="rgba(170,200,255,.35)"; cx.lineWidth=1.2; cx.beginPath();
+  st.rain.forEach(function(r){ r.y+=r.v*k; r.x-=1.2*k; if(r.y>H){r.y=-20;r.x=Math.random()*W+40;} cx.moveTo(r.x,r.y); cx.lineTo(r.x-3,r.y+r.l); }); cx.stroke(); }
   // pops
   for(var p=st.pops.length-1;p>=0;p--){ var po=st.pops[p]; po.y-=1.2*k; po.a-=0.02*k; if(po.a<=0){st.pops.splice(p,1);continue;}
     cx.globalAlpha=po.a; cx.fillStyle=po.col; cx.font="bold 18px Archivo,system-ui"; cx.textAlign="center"; cx.fillText(po.txt,po.x,po.y); cx.globalAlpha=1; }
   // sky flash
   if(Math.random()<0.004) st.flash=Math.max(st.flash,0.25);
-  if(st.flash>0){ cx.fillStyle="rgba(225,240,255,"+st.flash+")"; cx.fillRect(0,0,W,H); st.flash-=0.05*k; }
+  if(st.flash>0){ cx.fillStyle="rgba(225,240,255,"+(r3?st.flash*0.5:st.flash)+")"; cx.fillRect(0,0,W,H); st.flash-=0.05*k; }
   cx.restore();
   if(!st.running){
-    cx.fillStyle="rgba(5,8,26,.55)"; cx.fillRect(0,0,W,H);
+    cx.fillStyle=r3?"rgba(5,8,26,.35)":"rgba(5,8,26,.55)"; cx.fillRect(0,0,W,H);
     cx.fillStyle="#fff"; cx.font="400 52px 'Bebas Neue',Impact,sans-serif"; cx.textAlign="center"; cx.textBaseline="middle";
     cx.fillText(st.over?T("STORM OVER"):T("STORM RUN"),W/2,H/2-40);
     cx.fillStyle="#FFD23F"; cx.font="800 22px Archivo,system-ui"; cx.fillText(T("TAP TO PLAY"),W/2,H/2+12);
   }
   if(st.running){ hud(); if(st.t<=0&&!st.dying) end(); }
+  if(window.__S.render) try{ window.__S.render(now,dt); }catch(e){ console.warn("[storm3d]",e); }   // the 3D layer draws the same frame this loop just stepped
 }
 requestAnimationFrame(frame);
 function replay(){ var t=window.SSAI_TOKENS; if(t&&t.account) t.play(function(){ start(); }); else start(); }   // replays go through the member gate / token cost too (crm.js)
@@ -586,16 +707,19 @@ hud();
 })();
 </script>
 <script src="fx.js"></script>
+<script src="kitchen.js?v=k1"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
+<script type="module" src="storm3d.js?v=sb3d3"></script>
 <script src="../contract.js"></script>
 <script>window.CRM_CFG={name:"StormBurger",offer:"Free fries with your next burger",perDollar:20,tiers:[[1000,"Free fries"],[1800,"Free shake"],[3000,"Free Classic StormBurger"],[4500,"Free combo"]],referral:{gift:"Free Classic StormBurger"},earn:{checkin:50,firstOrder:100,birthday:200,review:{pts:250,platform:"app"},referral:{join:150,friend:50,friendGift:"Free fries",first:100,every:25}},
- // Storm Run access. PHASE 1 (live default): free to play for members (name + phone + email, one account per phone).
+ // Storm Run access. PHASE 1 (live default): free to play, no sign-up first; guests save their score + prize after the run with a member account (name + phone + email, one account per phone).
  // PHASE 2 (built, off): enabled:true → a play costs 10 tokens; tokens come with food purchases (1 per $1), +10 free every week and
  // +10 free on request once a day (no purchase necessary). ?tokens=1 previews Phase 2. Legal notes: see crm.js TOKENS block.
  game:"Storm Run",tokens:{enabled:false,perDollar:1,perOrder:0,playCost:10,weeklyFree:10,freeDaily:10},
  // FREE daily spin: one per member per day (LA time), never sold, never costs tokens. Odds = w / 100 and must match rules.html. Never alcohol.
  spin:{rules:"rules.html",hub:"⚡",colors:["#FFD23F","#2547B8","#BFE6FF","#E8582A","#EEF2FF","#121C40"],prizes:[{t:"+100 points",pts:100,w:30},{t:"+200 points",pts:200,w:20},{t:"+5 tokens",tok:5,alt:{t:"+150 points",pts:150},w:15},
   {t:"Free house sauce",code:true,w:15},{t:"$2 off any burger",code:true,w:8},{t:"Free fries",code:true,w:7},{t:"10% off order",code:true,w:5}]}};</script>
-<script src="../crm.js"></script>
+<script src="../crm.js?v=rs1"></script><script src="../claimscore.js?v=cs1"></script>
 <script>window.NEARBY={name:"StormBurger",pin:"⚡",spots:[{label:"Inglewood",lat:33.981203,lng:-118.358312,q:"1500 N La Brea Ave, Inglewood, CA 90302"},{label:"Long Beach",lat:33.860251,lng:-118.168688,q:"5801 Cherry Ave, Long Beach, CA 90805"}],offer:"Show this at the counter for double stars on today's order."};</script>
 <script src="../nearby.js"></script>
 <script>window.MENU3D={stack:{img:"img/build/",models:{bun_top:"img/3d/bun_top.glb",bun_bottom:"img/3d/bun_bottom.glb",bacon:"img/3d/bacon.glb",lettuce:"img/3d/lettuce.glb",onion_straws:"img/3d/onion_straws.glb",chicken:"img/3d/chicken.glb"},recipes:{
@@ -645,18 +769,27 @@ hud();
     {id:"bacon",name:"Bacon",price:2,max:2,w:.78,ar:.407,top:.4,sink:.2,group:"Extras"},
     {id:"jalapeno",name:"Jalapeños",price:1,max:1,w:.72,ar:.373,top:.4,sink:.2,group:"Extras"}]}]};</script>
 <script src="../builder.js"></script>
-<script>window.GAME_MENU={id:"storm-burger",name:"Storm Run",by:"StormBurger",tagline:"Drive the food truck through the storm. 45 seconds, 3 lives.",
+<script>window.GAME_MENU={id:"storm-burger",name:"Storm Run",by:"StormBurger",tagline:"Drive the food truck through the storm. 45 seconds, 5 lives.",
  hero:["img/game/fries.webp","img/game/burger.webp","img/game/shake.webp","img/game/chicken.webp"],
  theme:{bg:"#070B1E",bg2:"#121C40",card:"#1a2656",edge:"#25336A",accent:"#E8582A",accent2:"#FFD23F",ink:"#EEF2FF",dim:"#9AA6CC",btnInk:"#141a33",display:"'Bebas Neue','Arial Narrow',Impact,sans-serif",body:"Archivo,system-ui,sans-serif"},
  tokens:true,spinBadge:true,
  mount:"#game",start:function(){ window.__S.start(); },vibrate:true,
- how:{goal:"Stay on the road for 45 seconds and rack up points: grab coins and StormBurger food, dodge everything the storm throws at you.",time:"45 seconds · 3 lives · 3 hits and the truck is totaled",
-  steps:[["👆","Tap the left or right side of the road to change lanes"],["◀▶","Or use the ◀ ▶ buttons under the game (arrow keys on a computer)"],["⚡","A lane that glows is about to get hit by lightning. Get out of it!"],["🐄","Flying cows and stop signs drift across lanes. Dodge them"],["🔥","Each hit sets the truck on fire and costs a life"]]},
- points:[{group:"Grab these",items:[{img:"img/game/burger.webp",name:"Classic StormBurger",pts:"+60"},{img:"img/game/chicken.webp",name:"Spicy Chicken",pts:"+50"},{img:"img/game/shake.webp",name:"Shake",pts:"+40"},{img:"img/game/fries.webp",name:"Fries",pts:"+30"},{img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='17' fill='%23ffd23f' stroke='%238a5a06' stroke-width='3'/%3E%3Cpath d='M23 9l-9 12h6l-3 10 9-12h-6z' fill='%23b46f05'/%3E%3C/svg%3E",name:"Coin",note:"Spinning gold coins",pts:"+10"},{icon:"🛣️",name:"Staying alive",note:"+1 every quarter second you're on the road",pts:"+4/sec"}]},
-  {group:"Dodge these",items:[{img:"img/game/cow.webp",name:"Flying cow",note:"Costs a life",pts:"−100",bad:true},{img:"img/game/stop.webp",name:"Stop sign",note:"Costs a life",pts:"−100",bad:true},{icon:"⚡",name:"Lightning strike",note:"Costs a life. Watch for the glowing lane",pts:"−100",bad:true}]}],
+ // 3D chase view (storm3d.js): visual only, never changes the game
+ selects:[{title:"View",options:[["3d","3D chase cam"],["2d","Classic 2D"]],note:"3D drives the real streets behind the truck. Classic 2D is the original top-down game.",
+   get:function(){ try{ return localStorage.getItem("sb-render")||"3d"; }catch(e){ return "3d"; } },
+   set:function(v){ try{ localStorage.setItem("sb-render",v); }catch(e){} var B=window.__SB3; if(B&&B.booted) B.enable(v!=="2d"); else if(v!=="2d") location.reload(); }},
+  {title:"Route",options:[["both","Inglewood → Long Beach"],["lb","Long Beach · Cherry Ave"],["ing","Inglewood · La Brea Ave"]],note:"The streets and landmarks you drive past in 3D. Both StormBurger spots are on the way.",
+   get:function(){ try{ return localStorage.getItem("sb-route")||"both"; }catch(e){ return "both"; } },
+   set:function(v){ try{ localStorage.setItem("sb-route",v); }catch(e){} if(window.__SB3ROUTE) __SB3ROUTE(v); }},
+  {title:"Graphics",options:[["smooth","Smooth (recommended)"],["auto","Auto"],["low","Low"],["med","Medium"],["high","High"],["ultra","Ultra"]],note:"Smooth keeps a steady frame rate on phones and cars. Auto only ever steps down.",
+   get:function(){ return window.__E3Q?__E3Q.pref:"auto"; },set:function(v){ if(window.__E3Q) __E3Q.set(v); }}],
+ how:{goal:"Stay on the road for 45 seconds and rack up points: grab coins and StormBurger food, dodge everything the storm throws at you.",time:"45 seconds · 5 lives · every hit takes half a life, 10 hits and the truck is totaled",
+  steps:[["👆","Tap the left or right side of the road to change lanes"],["◀▶","Or use the ◀ ▶ buttons under the game (arrow keys on a computer)"],["⚡","A glowing target on the road means lightning is about to come down right there, usually where your truck is. Change lanes in time!"],["🐄","Flying cows and stop signs spin down their own lane. Move out of that lane"],["🚓","Cops come up behind you (watch for 🚨 COP BEHIND) and swerve into your lane to ram you. Change lanes!"],["🌪️","Watch for 🌪️ TORNADO WARNING: about 3 seconds later a small tornado touches down and weaves slowly across the road. Getting caught costs 200 points and half a life"],["✦","Catch 5 Antidote Drizzle emblems to unlock Antidote's StormBurger review: it shows up on a billboard, drive through its golden ▶ for the bonus"],["🚗","Passing StormBurger? The drive-thru line blocks the right lane. Swerve left around the cars"],["🔧","About 20 seconds in, Jordan High shows up on the right. Be in the right lane to pull into the kitchen: you get 20 seconds to build as many burgers as you can for the kids (tap the ingredients in order). Every burger is +75 and the kids repair the truck (+1 life each, up to 5)"],["🔥","You get 5 lives. Each hit costs half a life and sets the truck on fire, 10 hits and it's totaled"]]},
+ points:[{group:"Grab these",items:[{img:"img/game/burger.webp",name:"Classic StormBurger",pts:"+60"},{img:"img/game/antidote-logo.webp",name:"Antidote Drizzle (catch 5)",pts:"+25"},{img:"img/game/turkey.webp",name:"Turkey Burger",pts:"+60"},{img:"img/game/sandwich.webp",name:"Chicken Sandwich",pts:"+50"},{img:"img/game/strips.webp",name:"Chicken Strips",pts:"+50"},{img:"img/game/rings.webp",name:"Onion Rings",pts:"+30"},{img:"img/game/shake.webp",name:"Shake",pts:"+40"},{img:"img/game/lemonade.webp",name:"Lemonade",pts:"+40"},{img:"img/game/fries.webp",name:"Fries",pts:"+30"},{img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='17' fill='%23ffd23f' stroke='%238a5a06' stroke-width='3'/%3E%3Cpath d='M23 9l-9 12h6l-3 10 9-12h-6z' fill='%23b46f05'/%3E%3C/svg%3E",name:"Coin",note:"Spinning gold coins",pts:"+10"},{icon:"🛣️",name:"Staying alive",note:"+1 every quarter second you're on the road",pts:"+4/sec"}]},
+  {group:"Dodge these",items:[{img:"img/game/cow.webp",name:"Flying cow",note:"Costs half a life",pts:"−100",bad:true},{img:"img/game/stop.webp",name:"Stop sign",note:"Costs half a life",pts:"−100",bad:true},{icon:"⚡",name:"Lightning strike",note:"Costs half a life. Move off the glowing target",pts:"−100",bad:true},{icon:"🚗",name:"Drive-thru line",note:"Cars waiting for StormBurger block the right lane",pts:"−100",bad:true},{icon:"🚓",name:"Police ram",note:"Costs half a life. They swerve into your lane",pts:"−100",bad:true},{icon:"🌪️",name:"Small tornado",note:"Costs half a life + 200 points",pts:"−200",bad:true}]},{group:"Pit stop",items:[{icon:"🔧",name:"Jordan High pit stop",note:"Right lane, about 20 s in. Build burgers for 20 s: each one +75 and +1 life",pts:"+75 each"}]}],
  prizes:{champion:"Free Double Classic StormBurger Combo for the top score by Sunday close",tiers:[["1,000","Free Classic StormBurger","One run over 1,000 points","img/game/burger.webp"],["800","Free milkshake","Vanilla, chocolate or mix","img/game/shake.webp"],["600","Free fries or onion rings","With any order","img/game/fries.webp"],["400","Free house sauce","Storm, Thunder, Ranch… your pick","🥫"]],note:"Sample prizes. StormBurger picks the real ones and the board resets every Monday."}};</script>
 <script src="../gamemenu.js"></script><script src="../a2hs.js"></script>
-<script src="../gamelock.js"></script>
+<script src="../gamelock.js?v=ml1"></script>
 <script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
 window.SPECIALS=[
  {id:"halloween",holiday:"halloween",title:"Thunder Night Combo",desc:"Jalapeño Lightning Burger Combo with Thunder sauce on the side. Spooky-spicy.",item:"Jalapeño Lightning Burger Combo",start:"10-20",end:"10-31",code:"BOO"},
@@ -669,7 +802,9 @@ window.SPECIALS=[
  {id:"july4",holiday:"july4",title:"Fourth of July Classic",desc:"Classic StormBurger Combo + a Vanilla Shake, all-American.",item:"Classic StormBurger Combo",start:"07-01",end:"07-04"}
 ];</script>
 <script src="../specials.js"></script>
-<script src="../seasons/seasons.js?v=20261013a" defer></script>
+<script src="../seasons/seasons.js?v=20261021a" defer></script>
 <script src="../poweredby.js?v=20261013a" defer></script>
+<script src="../faqbot.js?v=f1" defer></script>
+<script src="../ssai-track.js?v=t1" defer></script>
 </body>
 </html>

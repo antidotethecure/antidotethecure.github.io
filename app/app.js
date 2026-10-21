@@ -31,7 +31,7 @@
   $("addonList").innerHTML = A.addons.map(function (a) {
     var inc = a.includedIn.map(function (k) { return plan(k).name; });
     return '<div class="addon"><div><b>' + esc(a.name) + '</b><div class="note">' + esc(a.one) + (inc.length ? " <b>Included in " + esc(inc.join(" and ")) + ".</b>" : "") +
-      (a.key === "social" ? ' <a href="#social">Details →</a>' : a.key !== "social" ? ' <a href="../agents/">Demos →</a>' : "") + '</div></div><b class="p">' + usd(a.monthly) + '/mo</b></div>';
+      (a.key === "social" ? ' <a href="#social">Details →</a>' : a.quote ? "" : ' <a href="../agents/">Demos →</a>') + '</div></div><b class="p">' + (a.quote ? (a.soon ? "Soon · Ask us" : "Ask us") : (a.soon ? "Soon · " : "") + usd(a.monthly) + '/mo') + '</b></div>';
   }).join("") + '<div class="addon"><div><b>' + esc(A.bundle.name) + ' bundle</b><div class="note">' + esc(A.bundle.one) + '</div></div><b class="p">' + usd(bundleMonthly()) + '/mo</b></div>';
 
   function bundleMonthly() { return plan(A.bundle.plan).monthly + addon(A.bundle.addon).monthly - A.bundle.discountMonthly; }
@@ -46,6 +46,7 @@
     if (add.voice) add.text = false;
     A.addons.forEach(function (a) {
       if (!add[a.key] || a.includedIn.indexOf(st.plan) >= 0) return;
+      if (a.quote) { lines.push(a.name + ": quoted separately"); return; }   // no published price yet (Antidote sets it)
       var price = a.monthly;
       if (a.replaces && addon(a.replaces).includedIn.indexOf(st.plan) >= 0) price = a.monthly - addon(a.replaces).monthly;
       m += price; s += a.setup || 0; lines.push(a.name + " +" + usd(price) + "/mo");
@@ -56,7 +57,7 @@
     return { setup: s * N, monthly: m * N, year: (s + 12 * m) * N, perSetup: s, perMonthly: m, n: N, lines: lines, bundled: !!bundled };
   }
   $("bPlan").innerHTML = A.plans.map(function (p) { return '<button type="button" data-k="' + p.key + '" aria-pressed="false">' + esc(p.name) + '</button>'; }).join("");
-  $("bAdd").innerHTML = A.addons.map(function (a) { return '<div class="ck"><input type="checkbox" id="ba-' + a.key + '" data-k="' + a.key + '"><label for="ba-' + a.key + '"><b>' + esc(a.name) + '</b> <span class="note">' + usd(a.monthly) + '/mo</span><small id="bn-' + a.key + '"></small></label></div>'; }).join("");
+  $("bAdd").innerHTML = A.addons.map(function (a) { return '<div class="ck"><input type="checkbox" id="ba-' + a.key + '" data-k="' + a.key + '"><label for="ba-' + a.key + '"><b>' + esc(a.name) + '</b> <span class="note">' + (a.quote ? "Ask us" : usd(a.monthly) + '/mo') + '</span><small id="bn-' + a.key + '"></small></label></div>'; }).join("");
   $("bBundleNote").textContent = plan(A.bundle.plan).name + " + " + addon(A.bundle.addon).name + ": " + usd(plan(A.bundle.plan).setup) + " setup + " + usd(bundleMonthly()) + "/mo (saves " + usd(A.bundle.discountMonthly) + " a month).";
   function draw() {
     [].forEach.call($("bPlan").children, function (b) { b.setAttribute("aria-pressed", String(b.dataset.k === B.plan)); });
@@ -180,6 +181,20 @@
   $("iPlan").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) { I.plan = b.dataset.k; drawImp(); } });
   F.forEach(function (f) { $("im-" + f[0]).addEventListener("input", function (e) { I[f[0]] = +e.target.value; drawImp(); }); });
   drawImp();
+  /* 🚀 hero (2026-10-19): the same model's default estimate (Basic plan, typical restaurant), counted up on load */
+  (function () {
+    var box = $("roiHero"); if (!box) return;
+    var es = false; try { es = (localStorage.getItem("demo_lang") || (document.cookie.match(/googtrans=\/en\/([A-Za-z-]+)/) || [])[1]) === "es"; } catch (e) {}
+    var r = impact({ plan: "basic" }), mo = es ? " meses" : " months";
+    var V = { sales: [r.sales3, function (x) { return "+" + usd(x); }], payback: [r.payback || 12, function (x) { return Math.round(x) + (r.payback ? (Math.round(x) === 1 ? (es ? " mes" : " month") : mo) : "+" + mo); }],
+      members: [r.newMembers, function (x) { return "+" + n(x); }], times: [r.sales3 / r.fee, function (x) { return x.toFixed(1) + "×"; }] };
+    $("roiNote").textContent = (es ? "Estimado para un restaurante típico (" : "Estimate for a typical restaurant (") + n(I.crowd) + (es ? " clientes en una noche llena, " : " guests on a busy night, ") +
+      n(I.join) + (es ? "% se une, gasto promedio " : "% join, ") + usd(I.spend) + (es ? ") con el plan " : " average spend) on the ") + plan("basic").name + (es ? ". Pon tus propios números abajo." : " plan. Plug in your own numbers below.");
+    var els = box.querySelectorAll("[data-count]"), t0 = 0, D = 1400, still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function frame(t) { if (!t0) t0 = t; var k = still ? 1 : Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3);
+      els.forEach(function (el) { var v = V[el.dataset.count]; el.textContent = v[1](v[0] * e); }); if (k < 1) requestAnimationFrame(frame); }
+    requestAnimationFrame(frame);
+  })();
   $("promise").innerHTML = '<h3>🛡️ Our results promise</h3><p>' + esc(PROMISE) + '</p><p class="note">' + esc(PROMISE_FINE) +
     ' A “tracked return visit” is a guest identified through the app (an app order, their member QR or code, their phone number, or an app reward) coming back on a later day. You see the count in your owner view.</p>' +
     '<p class="note"><b>Not the same as break-even.</b> Break-even (above) is how many extra visits a month cover your monthly fee. The promise is our ' + R.returns + '-visit target for the app itself.</p>';

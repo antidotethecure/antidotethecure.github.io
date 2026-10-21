@@ -88,13 +88,14 @@
     if (D.fullscreenElement || D.webkitFullscreenElement) return "fullscreen";
     var h = D.documentElement;
     if (h.classList.contains("ssai-fs") || h.classList.contains("ssai-locked")) return "game-lock";
+    if (W.SSAI_GAME_ON) return "game";   // a run is going: no theme at all (Antidote 2026-10-21: "no ghost in the game at all")
     var o = D.querySelectorAll(OVERLAYS);
     for (var i = 0; i < o.length; i++) if (shown(o[i]) && o[i].getBoundingClientRect().height > innerHeight * 0.5) return "overlay";
     var g = D.querySelectorAll(GAME_AREAS), vh = innerHeight;
     for (var j = 0; j < g.length; j++) {
       var r = g[j].getBoundingClientRect();
       var vis = Math.min(r.bottom, vh) - Math.max(r.top, 0);
-      if (r.width > 40 && vis > Math.min(vh * 0.3, r.height * 0.6)) return "game";
+      if (r.width > 40 && vis > (g[j].tagName === "CANVAS" ? 24 : Math.min(vh * 0.3, r.height * 0.6))) return "game";   // any bit of the play area on screen hides the theme: ghosts only on the home screen, never over a game
     }
     return "";
   }
@@ -297,7 +298,7 @@
     };
     D.addEventListener("visibilitychange", function () { if (D.hidden && actx) try { actx.suspend(); } catch (e) {} if (!D.hidden && actx && !prefs.mute) unlock(); tick(); });
     setInterval(tick, 400);
-    W.addEventListener("scroll", function () { if (!running) tick(); }, { passive: true });
+    W.addEventListener("scroll", tick, { passive: true });   // hide the moment a game scrolls into view
 
     D.head.appendChild(css);
     toggle = buildToggle(theme, api);

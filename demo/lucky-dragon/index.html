@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#0D0404">
 <title>Lucky Dragon Hibachi — Menu & Game</title>
 <script src="../lang-th.js"></script>
+<script src="../gamepad.js?v=20261013gp1"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Cinzel:wght@700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
 <style>
@@ -103,7 +104,7 @@ h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--ac
 .gamehead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .gamehead b{font-size:17px}
 .gamehead .hud{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--gold)}
-canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#140707 0%,#241008 100%);touch-action:none;margin-top:10px}
+canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#140707 0%,#241008 100%);touch-action:pan-y pinch-zoom;margin-top:10px}
 .gamemsg{text-align:center;color:var(--dim);font-size:13px;margin:10px 0 2px}
 .gamemsg b{color:var(--ink)}
 .bigscore{text-align:center;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:30px;color:var(--gold);margin:6px 0 2px}
@@ -228,9 +229,9 @@ footer a{color:var(--ink)}
 </div>
 
 <script>window.REVIEW_EGG={vid:"ZBqEoDMO_jU",restaurant:"Lucky Dragon Hibachi",short:"LUCKY DRAGON",kind:"clip",bonus:300,img:"img/review/cover.webp",find:"A paper lantern drifts down once a run. Catch it on your tray"};</script>
-<script src="../reviewegg.js"></script>
+<script src="../reviewegg.js?v=ht4k"></script>
 <script>window.HALFTIME={min:85,max:95};</script>
-<script src="../halftime.js"></script>
+<script src="../halftime.js?v=ht4k"></script>
 <script>
 "use strict";
 /* ================= CONFIG — the only block that changes per client ================= */
@@ -684,6 +685,9 @@ var CONFIG = {
         : "<b>"+CONFIG.game.prizeAt+" makes the board.</b> Tap to run it back.");
     saveBest(score); renderBoard();
     if(window.ReviewEgg) ReviewEgg.endCard(cv.parentNode,null);
+    // PLAY FIRST, CLAIM AFTER (demo/claimscore.js): rank vs the page's weekly board, then the same member sheet the old PLAY gate used
+    if(window.SSAI_CLAIM) SSAI_CLAIM.show({key:"lucky-dragon",score:score,rows:CONFIG.promo.sample.map(function(r){ return {name:r[0],score:r[1]}; }),boardName:"the weekly board",
+      reason:"play",mount:$("gmsg"),where:"afterend",again:function(){ replay(); },alive:function(){ return !running; }});
   }
   window.__LD={get:function(){return {running:running,score:score,drops:drops,bowlX:bowlX,W:W,H:H};},set:function(x){bowlX=Math.max(30,Math.min(W-30,x));},start:function(){start();},end:function(){ if(running) end(); }};
   function pointer(e){
@@ -703,14 +707,14 @@ var CONFIG = {
 </script>
 <script src="../contract.js"></script>
 <script>window.CRM_CFG={name:"Lucky Dragon Hibachi",offer:"Free Extra Yum-Yum + 10% off your next plate",tiers:[[250,"Free extra Yum-Yum"],[500,"Free fried rice"],[800,"Free hibachi plate"],[1300,"Dinner for two"]],referral:{gift:"Free fried rice"},
- // Hibachi Catch access. PHASE 1 (live default): free to play for members (name + phone + email, one account per phone).
+ // Hibachi Catch access. PHASE 1 (live default): free to play, no sign-up first; guests save their score + prize after the run with a member account (name + phone + email, one account per phone).
  // PHASE 2 (built, off): enabled:true → a play costs 10 tokens; tokens come with food purchases (1 per $1), +10 free every week and
  // +10 free on request once a day (no purchase necessary). ?tokens=1 previews Phase 2. Legal notes: see crm.js TOKENS block.
  game:"Hibachi Catch",tokens:{enabled:false,perDollar:1,perOrder:0,playCost:10,weeklyFree:10,freeDaily:10},
  // FREE daily spin: one per member per day (LA time), never sold, never costs tokens. Odds = w / 100 and must match rules.html. Never alcohol.
  spin:{rules:"rules.html",hub:"🐉",colors:["#FFC82E","#E6483D","#F7EFE6","#4A1F1C","#FFE08A","#8E1E16"],prizes:[{t:"+50 points",pts:50,w:30},{t:"+100 points",pts:100,w:20},{t:"+5 tokens",tok:5,alt:{t:"+75 points",pts:75},w:15},
   {t:"$2 off a hibachi plate",code:true,w:15},{t:"Free extra Yum-Yum",code:true,w:8},{t:"Free fried rice",code:true,w:7},{t:"10% off order",code:true,w:5}]}};</script>
-<script src="../crm.js"></script>
+<script src="../crm.js?v=rs1"></script><script src="../claimscore.js?v=cs1"></script>
 <script>window.NEARBY={name:"Lucky Dragon Hibachi",pin:"🐉",approx:true,spots:[{label:"Compton",lat:33.8958,lng:-118.2201,q:"Compton CA"}],offer:"Show this at the counter for double stars on today's order."};</script>
 <script src="../nearby.js"></script>
 <script src="../menu3d.js"></script>
@@ -743,7 +747,7 @@ window.GAME_MENU={id:"lucky-dragon",name:"Hibachi Catch",by:"Lucky Dragon Hibach
   {group:"Dodge these",items:[{icon:"🔥",name:"Flame",note:"Resets your streak",pts:"−20",bad:true},{icon:"🍭",name:"Candy",note:"Resets your streak",pts:"−20",bad:true},{icon:"🧊",name:"Ice",note:"Resets your streak",pts:"−20",bad:true},{img:S.dragon,name:"Dragon fire",note:"Resets your streak. 3 hits burns the food and ends the run",pts:"−30",bad:true}]}],
  prizes:{champion:"1st place this week: 50% OFF your next meal",tiers:[["2nd","20% OFF next meal","2nd place on the weekly board","🥈"],["650+","15% OFF next meal","Puts you on the weekly board","🏆"]],note:"Sample prizes. The owner sets the real ones and the board resets every Monday."}}; })();</script>
 <script src="../gamemenu.js"></script><script src="../a2hs.js"></script>
-<script src="../gamelock.js"></script>
+<script src="../gamelock.js?v=ml1"></script>
 <script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
 window.SPECIALS=[
  {id:"halloween",holiday:"halloween",title:"Dragon Fire Night",desc:"Hibachi Steak with Extra Yum-Yum, straight off the flames.",item:"Hibachi Steak",start:"10-20",end:"10-31",code:"BOO"},
@@ -758,5 +762,7 @@ window.SPECIALS=[
 <script src="../specials.js"></script>
 <script src="../seasons/seasons.js?v=20261013a" defer></script>
 <script src="../poweredby.js?v=20261013a" defer></script>
+<script src="../faqbot.js?v=f1" defer></script>
+<script src="../ssai-track.js?v=t1" defer></script>
 </body>
 </html>

@@ -9,7 +9,7 @@
    - setup-kit/build_launch.py AGENTS + agents/index.html (AI add-on prices $75 / $150)
    - ~/command-center/clients/concierge/kb/13-pricing-playbook.md (what the onboarding concierge quotes) */
 window.APP = {
-  updated: "2026-10-11",
+  updated: "2026-10-19",
   contact: { email: "secondshiftai@gmail.com", sms: "", name: "Antidote" },
 
   /* ---------------- 1 · Plans ---------------- */
@@ -59,6 +59,14 @@ window.APP = {
       one: "Guests text your number and an AI texts back 24/7: hours, menu, specials, reservation requests, catering. 1,000 texts a month included." },
     { key: "voice", name: "AI Voice Host + Text", monthly: 150, setup: 0, includedIn: ["dfy"], replaces: "text",
       one: "A natural AI voice answers your phone, takes reservation requests, transfers to staff and texts links. Includes the Text Assistant. 750 minutes + 1,000 texts a month." },
+    { key: "ordering", name: "Online Ordering + Delivery", monthly: 300, setup: 0, includedIn: [], soon: true,
+      one: "Guests order and pay by card right in your app (pickup first), with points on every order and live orders in your back office. Delivery by DoorDash drivers, with no marketplace commission, once DoorDash approves our access (applied, under review). $300/mo flat with no per-order fee, or $200/mo + 5% of the food on each order (never on delivery fees, tips or tax). Example: a $40 order = $2. No fee added to your guests' checks. Flat is cheaper once you do over $2,000 a month in app orders. Coming soon: pickup ordering first." },
+    { key: "sports", name: "Sports Bar Package", monthly: 0, setup: 0, includedIn: [], quote: true,
+      one: "Live local scores up top, follow-your-team alerts, the Fan Test, Football Squares (1 free square per member, prizes you set), fight nights and pick-the-winner points. Score specials: when the home team scores, a same-day deal unlocks. Built for game days." },
+    { key: "games", name: "Games Pack", monthly: 0, setup: 0, includedIn: [], quote: true,
+      one: "Trivia, sports trivia, the daily word game, a word scramble and bar-safe Truth or Dare. Guests earn points for playing while they wait." },
+    { key: "menu3d", name: "3D Digital Menu", monthly: 0, setup: 0, includedIn: [], quote: true,
+      one: "Guests spin a real 3D model of your signature dishes, plus slow-motion food clips and a real-photo mode. Optional: dishes that rise off the menu in a short cinematic video." },
     { key: "social", name: "Social & SEO Growth", monthly: 1000, setup: 0, includedIn: [],
       one: "Content plan, short-form video edits from your food, posting on Instagram / TikTok / YouTube, Google Business Profile + local SEO, and a monthly report." }
   ],

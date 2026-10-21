@@ -258,7 +258,7 @@ function rain(){
 /* ---------- scheduler ---------- */
 var MAKE={lightning:lightning,tornado:tornado,rain:rain}, ev=null, lastType="", next=rnd(10000,15000), prev=0, wasRunning=false;
 function trigger(type){ if(!MAKE[type]) type=["lightning","tornado","rain"][(Math.random()*3)|0]; ev=MAKE[type](); ev.t=0; ev.type=type; lastType=type; return type; }
-function pick(){ var o=["lightning","tornado","rain"].filter(function(k){ return k!==lastType; }); return o[(Math.random()*o.length)|0]; }
+function pick(){ var o=["lightning","rain"].filter(function(k){ return k!==lastType; }); return o[(Math.random()*o.length)|0]; }
 function loop(now){
   requestAnimationFrame(loop);
   var dt=Math.min(50,now-(prev||now)); prev=now;

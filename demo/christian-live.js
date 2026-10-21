@@ -56,18 +56,46 @@
     if (j && jl && jl.toast) { var pc = int(j.percent, 1, 90); if (pc != null) { jl.toast.percent = pc; jl.offer = jl.offer.replace(/\d+%/, function () { return pc + "%"; }); } }
     return R;
   }
+  // MENU (2026-10-14): saved price / special / happy-hour changes from Christian HQ ({p:{name:price}, s:{id:{on,title,desc,price}},
+  // hh:"line\nline"}) laid over a restaurant's menu data (demo/<page>/menu-data.js) IN PLACE. Always starts from the file's own
+  // values (kept in M._base), so a change that is reset goes back to the menu price. Only names / ids on the page are touched.
+  function applyMenu(slug, M, o) {
+    if (!M) return M;
+    if (o === undefined) { var c = cached(); o = c && c.m ? c.m[slug] : null; }
+    if (!M._base) M._base = JSON.stringify({ food: M.food, drinks: M.drinks, specials: M.specials, weekly: M.weekly });
+    var B = JSON.parse(M._base);
+    // write back into the SAME arrays/objects (the page holds references to them)
+    (M.food || []).forEach(function (c, i) { c.items.forEach(function (it, j) { it[1] = B.food[i].items[j][1]; if (it.length > 5) it.length = 5; }); });
+    (M.drinks || []).forEach(function (d, i) { d[1] = B.drinks[i][1]; if (d.length > 5) d.length = 5; });
+    (M.specials || []).forEach(function (sp, i) { var b = B.specials[i]; ["title", "desc", "price"].forEach(function (k) { if (b[k] == null) delete sp[k]; else sp[k] = b[k]; }); sp.on = b.on !== false; });
+    if (M.weekly) { M.weekly.length = 0; (B.weekly || []).forEach(function (l) { M.weekly.push(l); }); }
+    if (!o) return M;
+    var P = o.p || {}, pr = function (v) { v = Math.round(+v * 100) / 100; return isFinite(v) && v >= 0.5 && v <= 500 ? v : null; };
+    (M.food || []).forEach(function (c) { c.items.forEach(function (it) { var v = pr(P[it[0]]); if (P[it[0]] != null && v != null) it[1] = v; }); });
+    (M.drinks || []).forEach(function (d) { var v = pr(P[d[0]]); if (P[d[0]] != null && v != null) d[1] = v; });
+    (M.specials || []).forEach(function (sp) { var x = (o.s || {})[sp.id]; if (!x) return;
+      if (x.on === "off") sp.on = false; else if (x.on === "on") sp.on = true;
+      var t = txt(x.title); if (t) sp.title = t; if (x.desc) { var d = String(x.desc).replace(/[<>]/g, "").trim().slice(0, 200); if (d.length >= 3) sp.desc = d; }
+      var v = pr(x.price); if (v != null) sp.price = "$" + v.toFixed(2); });
+    // 📸 real photos added in Christian HQ (o.ph = {item: Drive file id}) → it[5] = picture URL, shown instead of the standard one
+    var PH = o.ph || {}, pu = function (n) { var f = PH[n]; return typeof f === "string" && /^[A-Za-z0-9_-]{20,80}$/.test(f) ? "https://lh3.googleusercontent.com/d/" + f + "=w1080" : null; };
+    (M.food || []).forEach(function (c) { c.items.forEach(function (it) { var u = pu(it[0]); if (u) it[5] = u; }); });
+    (M.drinks || []).forEach(function (d) { var u = pu(d[0]); if (u) d[5] = u; });
+    if (o.hh && M.weekly) { var ls = String(o.hh).split("\n").map(function (l) { return l.replace(/[<>]/g, "").trim().slice(0, 70); }).filter(Boolean).slice(0, 8); if (ls.length) { M.weekly.length = 0; ls.forEach(function (l) { M.weekly.push(l); }); } }
+    return M;
+  }
   function slugOf(el) { var s = el && el.getAttribute && el.getAttribute("data-slug"); if (s) return s; return /nalu/.test(location.pathname) ? "nalu-vida" : /melody/.test(location.pathname) ? "melody-bar-grill" : ""; }
   var me = document.currentScript, SLUG = slugOf(me), listeners = [];
   function fetchLive(cb) {
     if (!API) { if (cb) cb(null); return; }
     fetch(API + (API.indexOf("?") < 0 ? "?" : "&") + "discounts=1&t=" + Math.floor(Date.now() / 6e4), { cache: "no-store" })
       .then(function (r) { return r.json(); })
-      .then(function (j) { if (!j || !j.ok || !j.d) throw 0; var c = { ts: Date.now(), rev: j.rev || 0, d: j.d }; try { localStorage.setItem(CKEY, JSON.stringify(c)); } catch (x) {} if (cb) cb(c); listeners.forEach(function (f) { try { f(c); } catch (x) {} }); })
+      .then(function (j) { if (!j || !j.ok || !j.d) throw 0; var c = { ts: Date.now(), rev: j.rev || 0, d: j.d, mrev: j.mrev || 0, m: j.m || {}, o: j.ord || {} /* restaurants with 🛒 online ordering on (demo/ordering.js) */ }; try { localStorage.setItem(CKEY, JSON.stringify(c)); } catch (x) {} if (cb) cb(c); listeners.forEach(function (f) { try { f(c); } catch (x) {} }); })
       .catch(function () { if (cb) cb(null); });
   }
   // live values for one restaurant: defaults + cached overrides (sync), then fresh ones via onChange
   function rewards(slug) { var c = cached(), R = clone(DEFAULTS[slug] || {}); return c ? apply(R, c.d[slug]) : R; }
-  window.SSAI_CHRISTIAN = { api: API, defaults: DEFAULTS, rewards: rewards, apply: apply, fetch: fetchLive, cached: cached,
+  window.SSAI_CHRISTIAN = { api: API, defaults: DEFAULTS, rewards: rewards, apply: apply, applyMenu: applyMenu, fetch: fetchLive, cached: cached,
     onChange: function (f) { listeners.push(f); }, slugs: ["melody-bar-grill", "nalu-vida"] };
   // on a restaurant page: the backend URL goes to interim.js / crm.js, and the live values onto SSAI_REWARDS
   var R = window.SSAI_REWARDS;
@@ -76,6 +104,9 @@
     var c = cached(); if (c) apply(R, c.d[SLUG]);
     fetchLive(function (fresh) {
       if (!fresh) return;
+      var MM = window.SSAI_MENU && window.SSAI_MENU[SLUG];   // saved menu changes: re-apply + refresh the prices on screen
+      if (MM) { var mb = JSON.stringify([MM.food, MM.drinks, MM.weekly]); applyMenu(SLUG, MM, fresh.m ? fresh.m[SLUG] || null : null);
+        if (JSON.stringify([MM.food, MM.drinks, MM.weekly]) !== mb && window.SSAI_MENU_REDRAW) try { SSAI_MENU_REDRAW(); } catch (x) {} }
       var before = JSON.stringify([R.tiers, R.justLanded, R.locationBonus]); apply(R, fresh.d[SLUG]);
       if (JSON.stringify([R.tiers, R.justLanded, R.locationBonus]) === before) return;
       if (window.SSAI_CRM && SSAI_CRM.redraw) SSAI_CRM.redraw();

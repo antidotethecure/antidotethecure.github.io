@@ -110,7 +110,7 @@ async function init(A) {
   const oceanMat = new THREE.ShaderMaterial({
     lights: true,
     uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.lights, { uT: { value: 0 }, uScroll: { value: 0 }, uShore: { value: 0 }, uK: { value: K }, uHurt: { value: 0 },
-      uFoam: { value: null }, uRect: { value: new THREE.Vector4() }, uSun: { value: LIGHT.clone() }, uView: { value: VIEW.clone() } }]),
+      uFoam: { value: null }, uRect: { value: new THREE.Vector4() }, uSun: { value: LIGHT.clone() }, uView: { value: VIEW.clone() }, uWxDark: { value: 0 }, uRain: { value: 0 } }]),
     vertexShader: `
       #include <common>
       #include <shadowmap_pars_vertex>
@@ -136,7 +136,7 @@ async function init(A) {
       #include <lights_pars_begin>
       #include <shadowmap_pars_fragment>
       #include <shadowmask_pars_fragment>
-      uniform float uT,uHurt,uK;uniform sampler2D uFoam,uNz,uRip;uniform vec4 uRect,uRipO;uniform vec3 uSun,uView;varying float vR;
+      uniform float uT,uHurt,uK,uWxDark,uRain;uniform sampler2D uFoam,uNz,uRip;uniform vec4 uRect,uRipO;uniform vec3 uSun,uView;varying float vR;
       varying vec3 vW;varying vec3 vN;varying float vH;varying vec2 vQ;varying float vD;
       vec3 s2l(vec3 c){return pow(c,vec3(2.2));}
       void main(){
@@ -166,6 +166,10 @@ async function init(A) {
         c=mix(c,s2l(vec3(.95,.98,1.))*(.75+.25*sh),fo);
         if(d<0.){c=mix(s2l(vec3(.72,.62,.45)),sand,clamp(-d/30.,0.,1.))*(.6+.4*sh);}
         c*=1.+uHurt*.15;
+        // weather (nalu-life.js / engine3d): storms darken and grey the water; raindrops ring the surface
+        c=mix(c,c*vec3(.55,.6,.68)+vec3(.012,.014,.018),clamp(uWxDark,0.,1.));
+        if(uRain>.01&&d>0.){vec2 rg=vW.xz*.045;vec2 ci=floor(rg),cf=fract(rg)-.5;float hh=fract(sin(dot(ci,vec2(12.9898,78.233)))*43758.5453),ph=fract(uT*1.3+hh),rr=length(cf-vec2(hh-.5,fract(hh*7.)-.5)*.5);
+          c+=vec3(.16)*smoothstep(.05,0.,abs(rr-ph*.42))*(1.-ph)*uRain*step(hh,uRain*.9+.1);}
         gl_FragColor=vec4(c,1.);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -571,7 +575,8 @@ async function init(A) {
     // ---- entities ----
     const seen = new Set();
     G.ents.forEach(e => {
-      if (e.t === "pier" || e.t === "brk" || e.t === "plane" || e.t === "toss" || e.t === "fish" || e.t === "drop" || e.t === "harpoon" || e.t === "ski" || e.t === "sub" || e.t === "sharp" || e.t === "qfin") {   // (drawn on the 2D overlay)
+      if (e.t === "pier" || e.t === "brk" || e.t === "plane" || e.t === "toss" || e.t === "fish" || e.t === "drop" || e.t === "harpoon" || e.t === "ski" || e.t === "sub" || e.t === "sharp" || e.t === "qfin" || e.t === "hkit") {   // (drawn on the 2D overlay)
+        if (e.t === "hkit") { foamRing(e.x, sy(e.yw) + 3, 28, 14, .45, 2); poke(e.x, sy(e.yw), -.4, 8); }
         if (e.t === "qfin") { foamDot(e.x, sy(e.yw), 16, .5); poke(e.x, sy(e.yw), -.4, 6); }
         if (e.t === "sub" && e.st !== "peri") { foamDot(e.x, sy(e.yw), 40, .45); poke(e.x, sy(e.yw), -1.2, 22); }
         if (e.t === "sharp") foamDot(e.x, sy(e.yw) + 10, 5, .5);
@@ -613,7 +618,7 @@ async function init(A) {
     for (let i = foams.length - 1; i >= 0; i--) { const f = foams[i]; f.t += dt; if (f.t > f.life) { foams.splice(i, 1); continue; } f.x += f.vx * dt; f.r = f.r0 * (1 + f.t * .9);
       foamDot(f.x, f.q - G.cam + G.wo, f.r, .55 * (1 - f.t / f.life)); }
     rStep(); stepParticles(dt); foamTex.needsUpdate = true;
-    R.render(scene, cam);
+    if (LIFE) { try { LIFE.frame(dt, { y0, gx, gy, near, shoreVisible: shore.visible, pier: stub.visible ? { x: A.PIER_X, h: deckH + 1.9, z0: sy(-60) * K - 12, len: stubLen - 40 } : null }); LIFE.hidePrev(); LIFE.render(dt); } catch (e) { console.warn("[nv3d] engine3d frame:", e); LIFE = null; R.render(scene, cam); } } else R.render(scene, cam);
   }
 
   function makeEnt(e) {
@@ -690,7 +695,7 @@ async function init(A) {
       else { swim = 1; prone = 1; } }
     else if (ph === "popup") { const f = Math.min(1, (G.popT - .5) / .5); swim = 1 - f; bal = f; prone = 1 - f; }
     else { bal = 1; }
-    const airF = G.jump > 0 ? Math.sin(Math.PI * (1 - G.jump / G.jumpDur)) * (G.jumpDur > .9 ? 1 : .6) : 0;
+    const airF = G.jump > 0 ? Math.sin(Math.PI * (1 - G.jump / G.jumpDur)) * (G.airAmp || (G.jumpDur > .9 ? 1 : .6)) : 0;   // G.airAmp: launch height off the lip (game.js launch())
     if (ph === "ride" && airF > 0) { air = 1; bal = 0; h = airF * 34 / SIN; }
     if (ph === "ride") h += (G.lipRise || 0) * 18;   // up at the top of the face in the lip window
     if (G.wipe > 0) { const w = 1 - G.wipe / .9; fall = Math.sin(w * Math.PI); bal *= 1 - fall; }
@@ -720,10 +725,10 @@ async function init(A) {
     const lean = Math.max(-.55, Math.min(.55, G.vx / 380)), bob = ph === "ride" ? Math.sin(G.t * 2.3 + G.yw * .018) * 1.2 : 0;
     const sw = swellH(x, y), sinkB = sink * (prone ? 1 : .6);
     P(rig, x, y, h - Math.min(sink, sinkB) + bob + sw + 1.2); rig.rotation.set(0, yaw, 0);   // feet on the deck (+1.2 = deck thickness), never under it
-    let spin = 0, flip = 0; const tk = G.trick; if (tk) { const f = tk.t / tk.dur; if (tk.k === "spin") spin = f * Math.PI * 2; else flip = f * Math.PI * 2; }
+    let spin = 0, flip = 0, grab = 0; const tk = G.trick; if (tk) { const f = tk.t / tk.dur; if (tk.k === "spin") spin = f * Math.PI * 2; else if (tk.k === "grab") { grab = Math.sin(f * Math.PI); spin = grab * .5; } else flip = f * Math.PI * 2; }
     let wipeSpin = 0; if (G.wipe > 0) wipeSpin = (1 - G.wipe / .9) * Math.PI * 2.4;
     if (ph === "death" && G.deathCause === "wave") wipeSpin = G.deathT * 6;
-    lift.rotation.set(flip, spin + wipeSpin, lean * (ph === "ride" ? 1.05 : 0));   // riding: rolls well onto the rail, carving the face
+    lift.rotation.set(flip + grab * .35, spin + wipeSpin, lean * (ph === "ride" ? 1.05 : 0) + grab * .9);   // grab: tweaked out sideways, nose tipped up   // riding: rolls well onto the rail, carving the face
     body.position.set(0, 3.4 - 9.5 * prone, 9 * (1 - prone) * (1 - carry) - 4 * prone); body.rotation.set(0, 0, 0);
     // the board: under the chest (paddling), under the feet (riding), under the arm (running), tumbling away (wipeout)
     if (carry > .5) {   // tucked under the right arm, nose forward, deck against the body
@@ -753,6 +758,11 @@ async function init(A) {
     else if (ph === "swim") { if (G.yw < 70 && G.duck <= 0) foamRing(x, y + 14, 16, 6, .7, 2.5); else foamDot(x, y - 40, 14, .5); }
   }
 
+  // engine3d: real people, the Nalu Vida patio, weather, time of day, cloud shadows, post-processing, ambience (nalu-life.js).
+  // Loads after the game is up; until then (or if it fails) the plain renderer keeps going.
+  let LIFE = null; const LOFF = new URLSearchParams(location.search).get("life") === "0";
+  if (!LOFF && R.capabilities.isWebGL2) import("./nalu-life.js?v=n7.ht4k").then(m => m.makeNaluLife(THREE, { R, scene, cam, sun, hemi, A, G, K, loader, oceanMat, makeBoard, hide: [lady, guardM, staff1, staff2] }))
+    .then(L => { LIFE = L; window.__NVLIFE = L; }).catch(e => console.warn("[nv3d] engine3d off:", e));
   function dispose() { try { if (ro) ro.disconnect(); R.dispose(); scene.traverse(o => { if (o.geometry) o.geometry.dispose(); }); disposables.forEach(d => d.dispose && d.dispose()); } catch (e) {} }
   // warm-up: compile every shader now so the first frame of play doesn't hitch
   render(); try { R.compile(scene, cam); } catch (e) {}

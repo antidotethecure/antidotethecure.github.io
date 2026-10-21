@@ -60,5 +60,7 @@ footer.f img{width:120px;margin:0 auto 8px;display:block;border-radius:12px}
 .ring small{display:block;font-size:11.5px;color:#5a6785;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
 @keyframes shake{0%,100%{transform:rotate(0)}10%,30%,50%{transform:rotate(-14deg)}20%,40%,60%{transform:rotate(14deg)}70%{transform:rotate(0)}}
 .ring.on .ic{animation:shake 1s ease-in-out infinite}
+.ring .ic.app{background:none;overflow:hidden}
+.ring .ic.app img{width:100%;height:100%;display:block}
 .top img.brand{width:66px;height:40px;border-radius:9px;object-fit:cover;object-position:50% 45%}
 footer.f img{width:180px}

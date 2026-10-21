@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#F57A1A">
 <title>Churrito Loco — Menu & Game</title>
 <script src="../lang-th.js"></script>
+<script src="../gamepad.js?v=20261013gp1"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@500;700&display=swap">
 <style>
 /* ============================================================
@@ -65,7 +66,7 @@ h2::after{content:"";flex:1;height:1px;background:var(--edge)}
 .gamehead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .gamehead b{font-size:17px}
 .gamehead .hud{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--gold)}
-canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#FFF2E0 0%,#FFE6C7 100%);border:1px solid var(--edge);touch-action:none;margin-top:10px}
+canvas{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#FFF2E0 0%,#FFE6C7 100%);border:1px solid var(--edge);touch-action:pan-y pinch-zoom;margin-top:10px}
 .gamemsg{text-align:center;color:var(--dim);font-size:13px;margin:10px 0 2px}
 .gamemsg b{color:var(--ink)}
 .bigscore{text-align:center;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:30px;color:var(--gold);margin:6px 0 2px}
@@ -555,6 +556,9 @@ var CONFIG = {
       : "<b>"+CONFIG.game.prizeAt+" makes the board.</b> Tap to run it back.";
     saveBest(score); renderBoard();
     if(window.ReviewEgg) ReviewEgg.endCard(cv.parentNode,null);
+    // PLAY FIRST, CLAIM AFTER (demo/claimscore.js): rank vs the page's weekly board, then the same member sheet the old PLAY gate used
+    if(window.SSAI_CLAIM) SSAI_CLAIM.show({key:"churrito-loco",score:score,rows:CONFIG.promo.sample.map(function(r){ return {name:r[0],score:r[1]}; }),boardName:"the weekly board",
+      reason:"play",mount:$("gmsg"),where:"afterend",again:function(){ replay(); },alive:function(){ return state==="over"; }});
   }
   function cellAt(e){
     var rct=cv.getBoundingClientRect();
@@ -592,14 +596,14 @@ var CONFIG = {
 </script>
 <script src="../contract.js"></script>
 <script>window.CRM_CFG={name:"Churrito Loco",offer:"A free churro with your next order",tiers:[[200,"Free churro"],[400,"Free horchata"],[700,"Free loaded churro"],[1100,"Churros for the table"]],referral:{gift:"Free churro"},
- // Loco Match access. PHASE 1 (live default): free to play for members (name + phone + email, one account per phone).
+ // Loco Match access. PHASE 1 (live default): free to play, no sign-up first; guests save their score + prize after the run with a member account (name + phone + email, one account per phone).
  // PHASE 2 (built, off): enabled:true → a play costs 10 tokens; tokens come with food purchases (1 per $1), +10 free every week and
  // +10 free on request once a day (no purchase necessary). ?tokens=1 previews Phase 2. Legal notes: see crm.js TOKENS block.
  game:"Loco Match",tokens:{enabled:false,perDollar:1,perOrder:0,playCost:10,weeklyFree:10,freeDaily:10},
  // FREE daily spin: one per member per day (LA time), never sold, never costs tokens. Odds = w / 100 and must match rules.html. Never alcohol.
  spin:{rules:"rules.html",hub:"🌶️",colors:["#F57A1A","#2B1A0E","#FFB347","#1F8A43","#FFE9CF","#C2560A"],prizes:[{t:"+50 points",pts:50,w:30},{t:"+100 points",pts:100,w:20},{t:"+5 tokens",tok:5,alt:{t:"+75 points",pts:75},w:15},
   {t:"$1 off any churro",code:true,w:15},{t:"Free churro",code:true,w:8},{t:"Free horchata",code:true,w:7},{t:"10% off order",code:true,w:5}]}};</script>
-<script src="../crm.js"></script>
+<script src="../crm.js?v=rs1"></script><script src="../claimscore.js?v=cs1"></script>
 <script>window.NEARBY={name:"Churrito Loco",pin:"🌶️",spots:[{label:"South Gate",lat:33.955939,lng:-118.222585,q:"2801 Firestone Blvd, South Gate, CA"}],offer:"Show this at the counter for double stars on today's churros."};</script>
 <script src="../nearby.js"></script>
 <script src="../menu3d.js"></script>
@@ -616,7 +620,7 @@ window.GAME_MENU={id:"churrito-loco",name:"Loco Match",by:"Churrito Loco",taglin
   {group:"Watch out",items:[{img:ic(6),name:"Grilled Serrano",note:"Swiping it burns you. It burns out on its own",pts:"−25",bad:true}]}],
  prizes:{champion:"1st place this week: 50% OFF your next order",tiers:[["2nd","20% OFF next order","2nd place on the weekly board","🥈"],["4,150+","15% OFF next order","Puts you on the weekly board (test players averaged 3,913)","🏆"]],note:"Sample prizes. The owner sets the real ones and the board resets every Monday."}}; })();</script>
 <script src="../gamemenu.js"></script><script src="../a2hs.js"></script>
-<script src="../gamelock.js"></script>
+<script src="../gamelock.js?v=ml1"></script>
 <script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
 window.SPECIALS=[
  {id:"halloween",holiday:"halloween",title:"Hot Cheetos Spooky Combo",desc:"Hot Cheetos Corn + Filled Churros (2pc). Trick or treat yourself.",item:"Hot Cheetos Corn",start:"10-20",end:"10-31",code:"BOO"},
@@ -629,5 +633,8 @@ window.SPECIALS=[
  {id:"july4",holiday:"july4",title:"Fourth of July Churro Dog",desc:"Churro Dog + a Watermelon Paleta Energy.",item:"Churro Dog",start:"07-01",end:"07-04"}
 ];</script>
 <script src="../specials.js"></script>
+<script src="../seasons/seasons.js?v=20261013a" defer></script>
+<script src="../poweredby.js?v=20261013a" defer></script>
+<script src="../faqbot.js?v=f1" defer></script>
 </body>
 </html>

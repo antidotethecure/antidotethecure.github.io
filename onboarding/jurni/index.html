@@ -66,6 +66,7 @@ details.built{margin-top:10px}details.built summary{cursor:pointer;color:var(--d
 
 <h2>3 · Launch week</h2>
 <div id="launch"></div>
+<div class="step" style="border-color:var(--gold)"><div class="num" style="background:var(--gold);color:#241a00">📱</div><div><h3>📱 Open the SousShift app</h3><p>Plans, what it costs elsewhere, what you get back, printing, the contract in plain English, FAQ and an AI guide. Add it to your Home Screen.</p><a class="go" style="background:var(--gold);color:#241a00" href="../../app/">📱 Open the SousShift app →</a></div></div>
 <div class="step" style="border-color:var(--gold)"><div class="num" style="background:var(--gold);color:#241a00">$</div><div><h3>💡 What all of this would cost elsewhere</h3><p>Every tool in your package, what other companies charge for it on its own, and your price next to it.</p><a class="go" style="background:var(--gold);color:#241a00" href="../../value/?o=jurni">See the comparison →</a></div></div>
 <h2>4 · AI agents (optional add-on)</h2>
 <p class="note"><b>Everything else is already in your package:</b> the app, the 4K menu, the game, rewards and referrals, QR stickers and posters, your setup and updates. The AI agents below are optional and have their own monthly fee, because they use phone lines, texts and AI minutes every month. There are two tiers: the <b>AI Text Assistant</b> ($75/mo) and the <b>AI Voice Host + Text Assistant</b> ($150/mo, everything). You pick per restaurant, and you can change or turn it off anytime. <a href="../../agents/" style="color:var(--gold);font-weight:800">See the AI tiers, FAQ and live demos &rarr;</a></p>
@@ -74,7 +75,7 @@ details.built{margin-top:10px}details.built summary{cursor:pointer;color:var(--d
 
 <p class="prog" id="prog"></p>
 </main>
-<div class="q" id="smsopt"><label style="display:flex;gap:10px;align-items:flex-start;font-size:14px"><input type="checkbox" id="smsok" style="width:22px;height:22px;flex:none;margin-top:2px"> <span>Text me SousShift AI Owner Support messages (support replies, setup steps, launch updates and billing reminders) at <b>(424) 296-3303</b>. Message frequency varies. Message &amp; data rates may apply. Reply HELP for help, STOP to opt out. Consent is not a condition of purchase. <a href="../../sousshift/sms/" style="color:inherit">Terms</a> · <a href="../../sousshift/privacy/" style="color:inherit">Privacy</a></span></label></div>
+<div class="q" id="smsopt"><label style="display:flex;gap:10px;align-items:flex-start;font-size:14px"><input type="checkbox" id="smsok" style="width:22px;height:22px;flex:none;margin-top:2px"> <span>Text me SousShift AI Owner Support messages (support replies, setup steps, launch updates and billing reminders) at <b>(424) 296-3303</b>. Message frequency varies. Message &amp; data rates may apply. Reply HELP for help, STOP to opt out. Consent is not a condition of purchase. <a href="https://antidotethefoodie.com/sousshift/sms/" style="color:inherit">Terms</a> · <a href="https://antidotethefoodie.com/sousshift/privacy/" style="color:inherit">Privacy</a></span></label></div>
 <script>document.addEventListener("DOMContentLoaded",function(){var c=document.getElementById("smsok");try{c.checked=!!S.sms_optin;}catch(e){}c.onchange=function(){S.sms_optin=c.checked?new Date().toISOString():"";save();};});</script>
 <div class="bar"><div class="prog" id="prog2"></div><button id="send" type="button">✅ Send everything to Antidote</button></div>
 <script>
@@ -272,4 +273,6 @@ document.getElementById("send").onclick=function(){
     if(navigator.share){ navigator.share({title:"Launch checklist",text:txt}).catch(function(){}); } else { location.href="sms:&body="+encodeURIComponent(txt); }
   })();
 };
-</script></body></html>
+</script>
+<script src="../../demo/poweredby.js?v=20261013a" defer></script>
+</body></html>

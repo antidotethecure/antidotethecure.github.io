@@ -234,6 +234,7 @@ def build(slug):
         "{{LOGO}}": logo_html(cfg, out_dir),
         "{{BADGE}}": badge,
         "{{CONFIG_JSON}}": data,
+        "{{POWEREDBY_SRC}}": rel("demo/poweredby.js", out_dir),  # shared "Powered by SousShift AI" footer
     }
     for k, v in repl.items():
         t = t.replace(k, v)

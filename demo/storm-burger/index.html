@@ -291,13 +291,13 @@ window.__S={get:function(){return st;},setLane:function(n){st.lane=Math.max(0,Ma
 function start(){
   // HALFTIME: no levels here, so the break plays between runs: the first new run after ~90 s of total play opens with Antidote's review reel
   if(window.Halftime&&Halftime.tick(htPlayed,null,start)) return;
-  var keep=st.rain; st=fresh(); st.rain=keep; st.running=true; st.last=performance.now();
+  var keep=st.rain; st=fresh(); st.rain=keep; st.running=true; st.last=performance.now(); window.SSAI_GAME_ON=true;
   if(window.ReviewEgg) ReviewEgg.reset(18,30); // Antidote's review billboard: once a run, 18-30 s in
   $("over").classList.remove("on"); hud();
 }
 function end(){
   if(st.running) htPlayed+=Math.max(0,Math.min(45000,45000-st.t));
-  st.running=false; st.over=true;
+  st.running=false; st.over=true; window.SSAI_GAME_ON=false;
   var b=best(); if(st.score>b){ try{localStorage.setItem("sb-best",st.score);}catch(e){} }
   best();
   $("final").textContent=st.score.toLocaleString()+" pts";
@@ -800,7 +800,7 @@ window.SPECIALS=[
  {id:"july4",holiday:"july4",title:"Fourth of July Classic",desc:"Classic StormBurger Combo + a Vanilla Shake, all-American.",item:"Classic StormBurger Combo",start:"07-01",end:"07-04"}
 ];</script>
 <script src="../specials.js"></script>
-<script src="../seasons/seasons.js?v=20261013a" defer></script>
+<script src="../seasons/seasons.js?v=20261021a" defer></script>
 <script src="../poweredby.js?v=20261013a" defer></script>
 </body>
 </html>

@@ -14,6 +14,11 @@
   var host = document.getElementById("gameshost");
   if (!D || !host || window.MelodyGames) return;
 
+  /* NAMES: universal product, so the word game and scramble names are per-restaurant config:
+     window.SSAI_GAMES = { wordName: "Melody Word", mixName: "Melody Mix", shareTag: "Melody Bar & Grill ✈️" } (Melody sets it in games-data.js). */
+  var GCFG = window.SSAI_GAMES || {};
+  function cfgName(k, d) { var v = GCFG[k]; return typeof v === "string" && v.trim() ? v.trim() : d; }
+  var WORD_NAME = cfgName("wordName", "House Word"), MIX_NAME = cfgName("mixName", "Word Scramble"), SHARE_TAG = cfgName("shareTag", "");
   var PACK_CAP = 10;            // Games Pack points per phone per day (inside the shared game cap)
   var Q_SECS = 15;              // seconds per trivia question
   var MIX_SECS = 60;            // Melody Mix round length
@@ -81,6 +86,10 @@
   ".mw-row.shake{animation:mwshake .35s}@keyframes mwshake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}" +
   ".mw-kb{display:grid;gap:6px;margin-top:6px}.mw-kr{display:flex;gap:5px;justify-content:center}.mw-k{flex:1 1 0;min-width:0;max-width:44px;height:52px;border-radius:9px;border:1px solid var(--edge);background:#2a3658;color:var(--ink);font:800 15px var(--body);cursor:pointer;padding:0}" +
   ".mw-k.wd{flex:1.6 1 0;max-width:68px;font-size:12px}.mw-k.hit{background:var(--gold);color:#1a1405;border-color:var(--gold)}.mw-k.near{background:var(--wine2);border-color:var(--pink)}.mw-k.miss{background:#121a2e;color:#5d6780}" +
+  ".mw-hb{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 12px;width:min(100%,330px);margin:0 auto 10px}.mw-hb .mg-btn{width:auto;margin:0;min-height:40px;padding:6px 14px;font-size:14px;border-color:var(--gold);color:var(--gold2)}.mw-hb .mg-btn:disabled{opacity:.5;cursor:default;border-color:var(--edge);color:var(--dim)}" +
+  ".mw-hrow{display:flex;align-items:center;gap:4px;font:800 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}.mw-hrow span{margin-right:2px}" +
+  ".mw-ht{width:24px;height:28px;border-radius:6px;border:1px dashed #3a4566;display:grid;place-items:center;font:400 17px/1 var(--punch);color:var(--gold2)}.mw-ht.on{border:2px solid var(--gold);background:#d4af3718}" +
+  ".mw-clue{flex:1 1 100%;text-align:center;font-weight:800;font-size:14px;color:var(--cream);background:#d4af3712;border:1px dashed var(--gold);border-radius:12px;padding:7px 10px}.mw-k.hint{box-shadow:inset 0 0 0 2px var(--gold)}" +
   ".mg-msg{min-height:22px;text-align:center;font-weight:800;color:var(--gold2);margin:0 0 6px}" +
   ".mg-legend{display:flex;justify-content:center;gap:12px;font-size:12px;color:var(--dim);margin-top:8px}.mg-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}" +
   /* Melody Mix */
@@ -279,11 +288,14 @@
     var day = laDay(), ans = practice ? WORDS[Math.floor(Math.random() * WORDS.length)] : wordOfDay(day);
     var st = practice ? { day: day, guesses: [], done: false, won: false, t0: Date.now() } : lsGet("mg-word", null);
     if (!st || st.day !== day) st = { day: day, guesses: [], done: false, won: false, t0: Date.now() };
-    var cur = "", busy = false, num = dayNum(day) + 1, CLS = ["miss", "near", "hit"];
-    var w = screen("Melody Word", '<div class="mg-h" style="text-align:center"><small>' + (practice ? "Practice word · no points" : "Daily word #" + num + " · same for everyone today") + '</small>Melody Word</div>' +
-      '<div class="mg-msg" id="mw-msg" aria-live="polite"></div><div class="mw-grid" id="mw-grid"></div><div class="mw-kb" id="mw-kb"></div>' +
+    if (!Array.isArray(st.hints)) st.hints = [];   // HINTS: max 2 per word. Hint 1 = the clue (if the word has one), else a letter; hint 2 = a letter.
+    var cur = "", busy = false, num = dayNum(day) + 1, CLS = ["miss", "near", "hit"], HINT_MAX = 2;
+    var clue = (D.WORD_CLUES || {})[ans] || "";
+    var hintOrder = shuffle([0, 1, 2, 3, 4], practice ? Math.random : rng(dayNum(day) * 7919 + 1952));   // daily word: same reveal order for everyone
+    var w = screen(WORD_NAME, '<div class="mg-h" style="text-align:center"><small>' + (practice ? "Practice word · no points" : "Daily word #" + num + " · same for everyone today") + '</small>' + esc(WORD_NAME) + '</div>' +
+      '<div class="mg-msg" id="mw-msg" aria-live="polite"></div><div class="mw-grid" id="mw-grid"></div><div class="mw-hb" id="mw-hb"></div><div class="mw-kb" id="mw-kb"></div>' +
       '<div class="mg-legend"><span><i style="background:var(--gold)"></i>Right spot</span><span><i style="background:var(--wine2)"></i>In the word</span><span><i style="background:#1c2540"></i>Not in it</span></div><div id="mw-end"></div>');
-    var grid = w.querySelector("#mw-grid"), kb = w.querySelector("#mw-kb"), msg = w.querySelector("#mw-msg"), end = w.querySelector("#mw-end");
+    var grid = w.querySelector("#mw-grid"), kb = w.querySelector("#mw-kb"), msg = w.querySelector("#mw-msg"), end = w.querySelector("#mw-end"), hb = w.querySelector("#mw-hb");
     grid.innerHTML = [0, 1, 2, 3, 4, 5].map(function () { return '<div class="mw-row">' + "<div class=mw-t></div>".repeat(5) + '</div>'; }).join("");
     var rows = grid.querySelectorAll(".mw-row");
     kb.innerHTML = ["QWERTYUIOP", "ASDFGHJKL", "+ZXCVBNM-"].map(function (r) {
@@ -296,12 +308,36 @@
     function paintKeys() {
       var best = {};
       st.guesses.forEach(function (g) { var r = scoreGuess(g, ans); for (var i = 0; i < 5; i++) best[g[i]] = Math.max(best[g[i]] == null ? -1 : best[g[i]], r[i]); });
-      [].forEach.call(kb.querySelectorAll("[data-k]"), function (b) { var k = b.getAttribute("data-k"); b.classList.remove("hit", "near", "miss"); if (best[k] != null) b.classList.add(CLS[best[k]]); });
+      [].forEach.call(kb.querySelectorAll("[data-k]"), function (b) { var k = b.getAttribute("data-k"); b.classList.remove("hit", "near", "miss", "hint"); if (best[k] != null) b.classList.add(CLS[best[k]]); });
+      st.hints.forEach(function (h) { if (h.i != null) { var b = kb.querySelector('[data-k="' + ans[h.i] + '"]'); if (b) b.classList.add("hint"); } });
+    }
+    function hintTxt() { var h = st.hints.length; return h ? h + " hint" + (h === 1 ? "" : "s") : "no hints"; }
+    function paintHints() {
+      var left = HINT_MAX - st.hints.length, shown = {}, hasClue = false;
+      st.hints.forEach(function (h) { if (h.i != null) shown[h.i] = 1; else hasClue = true; });
+      var html = '<button type="button" class="mg-btn" id="mw-hint"' + (left <= 0 || st.done ? " disabled" : "") + '>' + (left > 0 ? "💡 Hint (" + left + " left)" : "No hints left") + '</button>';
+      if (Object.keys(shown).length) html += '<div class="mw-hrow" aria-label="Hint letters"><span>Hint:</span>' + [0, 1, 2, 3, 4].map(function (i) { return shown[i] ? '<div class="mw-ht on">' + ans[i] + '</div>' : '<div class="mw-ht"></div>'; }).join("") + '</div>';
+      if (hasClue) html += '<div class="mw-clue">💡 ' + esc(clue) + '</div>';
+      hb.innerHTML = html;
+      hb.querySelector("#mw-hint").onclick = useHint;
+    }
+    function useHint() {
+      if (st.done || busy || st.hints.length >= HINT_MAX) return;
+      if (!st.hints.length && clue) { st.hints.push({ c: 1 }); msg.textContent = "Clue unlocked"; }
+      else {
+        var found = {};
+        st.guesses.forEach(function (g) { scoreGuess(g, ans).forEach(function (x, i) { if (x === 2) found[i] = 1; }); });
+        st.hints.forEach(function (h) { if (h.i != null) found[h.i] = 1; });
+        var pos = hintOrder.filter(function (i) { return !found[i]; })[0];
+        if (pos == null) { msg.textContent = "You've already found every letter spot"; return; }
+        st.hints.push({ i: pos }); msg.textContent = "Letter " + (pos + 1) + " is " + ans[pos];
+      }
+      save(); paintHints(); paintKeys();
     }
     function save() { if (!practice) lsSet("mg-word", st); }
     function tickClock() { var s = Math.floor(((st.t1 || Date.now()) - st.t0) / 1000); ovH.textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
     st.guesses.forEach(function (g, r) { paintRow(r, g, scoreGuess(g, ans), false); });
-    paintKeys(); tickClock(); if (!st.done) every(tickClock, 1000);
+    paintKeys(); paintHints(); tickClock(); if (!st.done) every(tickClock, 1000);
     if (st.done) finish(false);
     function press(k) {
       if (st.done || busy) return;
@@ -319,7 +355,7 @@
       paintRow(st.guesses.length, cur, null, false);
     }
     function finish(fresh) {
-      clearTimers(); tickClock(); paintKeys();
+      clearTimers(); tickClock(); paintKeys(); paintHints();
       var n = st.guesses.length;
       msg.textContent = st.won ? ["Genius!", "Magnificent!", "Impressive!", "Splendid!", "Great!", "Phew!"][n - 1] : "The word was " + ans;
       var stats = lsGet("mg-word-stats", { played: 0, wins: 0, streak: 0, last: "" }) || { played: 0, wins: 0, streak: 0, last: "" };
@@ -327,15 +363,16 @@
       var grid = st.guesses.map(function (g) { return scoreGuess(g, ans).map(function (x) { return ["⬛", "🟥", "🟨"][x]; }).join(""); }).join("\n");
       end.innerHTML = '<div class="mg-card" style="margin-top:12px;text-align:center">' + (practice ? '<div class="mg-p" style="margin:0">Practice word</div>' :
         '<div class="mg-meta" style="justify-content:space-around"><span><b>' + stats.played + '</b> played</span><span><b>' + (stats.played ? Math.round(stats.wins / stats.played * 100) : 0) + '%</b> wins</span><span><b>' + stats.streak + '</b> streak</span></div>') +
-        '<div id="mw-pts"></div>' + (practice ? '' : '<button type="button" class="mg-btn" id="mw-share">📤 Share my result</button><div class="mg-p" style="margin:8px 0 0">New Melody Word every day at midnight (LA time).</div>') + '</div>' +
+        '<div class="mg-p" id="mw-sum" style="margin:10px 0 0;color:var(--ink);font-weight:800">' + (st.won ? "Solved in " + n : "Not solved") + " · " + hintTxt() + '</div>' +
+        '<div id="mw-pts"></div>' + (practice ? '' : '<button type="button" class="mg-btn" id="mw-share">📤 Share my result</button><div class="mg-p" style="margin:8px 0 0">New ' + esc(WORD_NAME) + ' every day at midnight (LA time).</div>') + '</div>' +
         '<button type="button" class="mg-btn hot" id="mw-again">🔁 Play again (practice word)</button><button type="button" class="mg-btn" id="mw-all">🎲 All games</button>';
       if (!practice && st.won) {
-        if (!st.awarded) { st.awarded = 1; save(); end.querySelector("#mw-pts").appendChild(award(3, "Melody Word")); }
+        if (!st.awarded) { st.awarded = 1; save(); end.querySelector("#mw-pts").appendChild(award(Math.max(1, 3 - st.hints.length), WORD_NAME)); /* 3 pts, 2 with 1 hint, 1 with 2 hints */ }
         else end.querySelector("#mw-pts").innerHTML = '<div class="mg-won">✅ Solved today<small>Points for today\'s word are already counted.</small></div>';
       }
       var sh = end.querySelector("#mw-share");
       if (sh) sh.onclick = function () {
-        var txt = "Melody Word #" + num + " " + (st.won ? n : "X") + "/6\n" + grid + "\nMelody Bar & Grill ✈️";
+        var txt = WORD_NAME + " #" + num + " " + (st.won ? n : "X") + "/6 · " + hintTxt() + "\n" + grid + (SHARE_TAG ? "\n" + SHARE_TAG : "");
         if (navigator.share) navigator.share({ text: txt }).catch(function () {});
         else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () { sh.textContent = "✅ Copied"; }, function () {});
       };
@@ -352,7 +389,7 @@
     var list = shuffle(D.SCRAMBLE, first ? rng(dayNum(laDay()) + 7) : null);   // today's set first, random after that
     lsSet("mg-mix-day", laDay());
     var S = { i: 0, solved: 0, score: 0, skips: 3, left: MIX_SECS }, pick = [], word, hint, tiles;
-    var w = screen("Melody Mix", '<div class="mg-meta"><span>Solved <b id="mx-n">0</b></span><span>Score <b id="mx-sc">0</b></span><span>Skips <b id="mx-sk">3</b></span></div>' +
+    var w = screen(MIX_NAME, '<div class="mg-meta"><span>Solved <b id="mx-n">0</b></span><span>Score <b id="mx-sc">0</b></span><span>Skips <b id="mx-sk">3</b></span></div>' +
       '<div class="mg-tbar"><i style="width:100%"></i></div><div class="mg-p" style="text-align:center;margin:0">Hint: <b id="mx-h" style="color:var(--gold2)"></b></div>' +
       '<div class="mx-slots" id="mx-sl"></div><div class="mx-tiles" id="mx-t"></div>' +
       '<div class="mx-row"><button type="button" class="mg-btn" id="mx-bk">⌫</button><button type="button" class="mg-btn" id="mx-cl">Clear</button><button type="button" class="mg-btn" id="mx-sh">🔀 Mix</button><button type="button" class="mg-btn" id="mx-skp">Skip ⏭</button></div>' +
@@ -387,9 +424,9 @@
     every(function () { S.left = Math.max(0, MIX_SECS - (Date.now() - t0) / 1000); bar.style.width = (S.left / MIX_SECS * 100) + "%"; bar.classList.toggle("low", S.left < 10); ovH.textContent = Math.ceil(S.left) + "s"; if (S.left <= 0) done(); }, 200);
     function done() {
       var best = +lsGet("mg-best-mix", 0) || 0; if (S.score > best) lsSet("mg-best-mix", S.score);
-      var w2 = screen("Melody Mix", '<div class="mg-card" style="text-align:center"><div class="mg-p" style="margin:0">Time! You unscrambled</div><div class="mg-big">' + S.solved + '</div><div class="mg-p" style="margin:0">words · score ' + S.score + ' · best ' + Math.max(best, S.score) + '</div><div class="mg-p" style="margin:8px 0 0">Last one was <b style="color:var(--gold2)">' + esc(word) + '</b></div><div id="mg-pts"></div></div>' +
+      var w2 = screen(MIX_NAME, '<div class="mg-card" style="text-align:center"><div class="mg-p" style="margin:0">Time! You unscrambled</div><div class="mg-big">' + S.solved + '</div><div class="mg-p" style="margin:0">words · score ' + S.score + ' · best ' + Math.max(best, S.score) + '</div><div class="mg-p" style="margin:8px 0 0">Last one was <b style="color:var(--gold2)">' + esc(word) + '</b></div><div id="mg-pts"></div></div>' +
         '<button type="button" class="mg-btn hot" id="mg-again">🔁 Play again</button><button type="button" class="mg-btn" id="mg-all">🎲 All games</button>');
-      w2.querySelector("#mg-pts").appendChild(award(Math.min(3, Math.floor(S.solved / 2)), "Melody Mix"));
+      w2.querySelector("#mg-pts").appendChild(award(Math.min(3, Math.floor(S.solved / 2)), MIX_NAME));
       w2.querySelector("#mg-again").onclick = melodyMix; w2.querySelector("#mg-all").onclick = closeOv;
     }
   }
@@ -447,8 +484,8 @@
   /* ---------- register the games ---------- */
   register({ id: "trivia", order: 20, icon: "🎤", title: "Melody Trivia", sub: "Music, food & drink, pop culture, LA. Solo or pass the phone.", tag: "+pts", start: triviaGame("trivia") });
   register({ id: "sports", order: 30, icon: "🏆", title: "Sports Trivia", sub: "NBA, NFL, MLB, soccer. Heavy on LA teams.", tag: "+pts", start: triviaGame("sports") });
-  register({ id: "word", order: 40, icon: "🔤", title: "Melody Word", sub: "Today's 5-letter word. 6 tries.", tag: "Daily", start: function () { melodyWord(false); } });
-  register({ id: "mix", order: 50, icon: "🔀", title: "Melody Mix", sub: "Unscramble as many words as you can in 60s.", start: melodyMix });
+  register({ id: "word", order: 40, icon: "🔤", title: WORD_NAME, sub: "Today's 5-letter word. 6 tries.", tag: "Daily", start: function () { melodyWord(false); } });
+  register({ id: "mix", order: 50, icon: "🔀", title: MIX_NAME, sub: "Unscramble as many words as you can in 60s.", start: melodyMix });
   register({ id: "truthdare", order: 60, adult: true, icon: "🎭", title: "Truth or Dare", sub: "Light truths, fun table dares. No drinking dares.", start: truthOrDare });
 
   window.MelodyGames = { register: register, open: open, close: closeOv, screen: screen, every: every, later: later, esc: esc, lsGet: lsGet, lsSet: lsSet, laDay: laDay, refresh: drawTiles,

@@ -1,3 +1,7 @@
+/* Game names are a per-restaurant setting (the games themselves are the universal SousShift product: defaults "House Word" and
+   "Word Scramble" live in games.js). Melody keeps its own names. A page can still override any key by setting window.SSAI_GAMES
+   before this file loads. shareTag = the sign-off line on the shared word result. */
+window.SSAI_GAMES = Object.assign({ wordName: "Melody Word", mixName: "Melody Mix", shareTag: "Melody Bar & Grill ✈️" }, window.SSAI_GAMES || {});
 /* Melody Games Pack: built-in question banks (no network, no AI). Used by games.js.
    TRIVIA / SPORTS rows: [question, correct answer, wrong, wrong, wrong, category]. The correct answer is always 2nd here;
    games.js shuffles the choices. SPORTS rows can end with 1 = an LA team question (LA questions are favored).
@@ -325,6 +329,55 @@ WORDS: ("MUSIC DANCE TACOS CHEER SALSA LEMON MANGO FRIES GRILL HONEY APPLE BEACH
 "BANJO CELLO OPERA ALBUM BEATS LYRIC VERSE SOLOS NOTES CHOIR BRASS BEANS SWISS WRAPS SQUID PANKO CAJUN CRUST SOUPS BEERS "+
 "SHOTS SPICY AIOLI ANGUS MULES VODKA HERBS SALTY PATTY TAJIN SAUCY").split(" ")
   .filter(function (w, i, a) { return /^[A-Z]{5}$/.test(w) && a.indexOf(w) === i; }),
+/* Melody Word clues (optional): hint 1 shows the clue; words without one get a letter reveal instead. Never put the answer in its clue. */
+WORD_CLUES: {MUSIC:"What the band plays",DANCE:"Moves on the floor",TACOS:"Shrimp or salmon in a tortilla",CHEER:"What fans do for the home team",
+SALSA:"Chip dip, or a dance",LEMON:"Sour yellow citrus",MANGO:"Sweet tropical fruit",FRIES:"Side with a burger",
+GRILL:"Where burgers get their marks",HONEY:"Bees make it",APPLE:"Fruit that keeps the doctor away",BEACH:"Sand and waves",
+BLUES:"Sad-song music style",BREAD:"Grilled cheese starts with it",CHAIR:"Have a seat",CHORD:"A few notes played together",
+CLOUD:"Floats in the sky",COAST:"Where land meets sea",CRISP:"Fresh and crunchy",CROWN:"Worn by a king",DREAM:"Happens while you sleep",
+DRUMS:"The band's beat",EAGLE:"Bird with a big wingspan",FEAST:"A huge meal",FIELD:"Where the game is played",FLAME:"Fire's tip",
+FLASH:"Camera burst of light",FLUTE:"Woodwind held sideways",FRESH:"Just made",FROST:"Icy morning coating",GIANT:"Very, very big",
+GLASS:"Drink from it",GUEST:"Someone you host",HAPPY:"___ hour, 3 to 6",HEART:"Love symbol",HOTEL:"Where travelers check in",
+HOUSE:"Home sweet ___",JUICE:"Fresh-squeezed drink",LASER:"Concentrated beam of light",LIGHT:"Opposite of dark",LUCKY:"Feeling fortunate",
+LUNCH:"Midday meal",MIXER:"Soda in your drink, or a DJ tool",NACHO:"Cheesy chip",NIGHT:"After sunset",OCEAN:"The Pacific is one",
+OLIVE:"Martini garnish",ONION:"Caramelized on the mac, or fried into strings",PARTY:"A celebration",PIANO:"Instrument with 88 keys",
+PILOT:"Flies the plane",PLANE:"Takes off from LAX",PLATE:"Your food sits on it",PRIZE:"What winners get",RADIO:"Tune in to a station",
+RANCH:"Dressing for wings",RHYME:"Cat and hat do this",ROYAL:"Fit for a king",SAUCE:"Wings get tossed in it",SCORE:"Points on the board",
+SHINE:"Rise and ___",SKATE:"Venice boardwalk ride",SLICE:"A lime ___ on the rim",SMILE:"Say cheese!",SOLAR:"Powered by the sun",
+SOUND:"What speakers make",SPICE:"Adds heat to food",SPOON:"Soup utensil",STAGE:"Where the band plays",STEAK:"Philly cheese ___ fries",
+STORM:"Thunder and rain",SUGAR:"Sweet white crystals",SUNNY:"Typical LA weather",SWEET:"Like dessert",TABLE:"Where you eat",
+TEMPO:"Speed of a song",TOAST:"Raise a glass",TOWER:"LAX control ___",TRACK:"A song on an album",TRAIN:"Rides the rails",TRUCK:"Food ___",
+TULIP:"Spring flower",TUNES:"Songs",VOCAL:"The singing part",WATER:"Free with your meal",WHEAT:"Grain for flour",WORLD:"The whole planet",
+YOUTH:"Being young",ZESTY:"Full of tangy flavor",ANGEL:"Heavenly being with a halo",BACON:"Crispy add-in for the mac",
+BLEND:"Mix together smoothly",BOOTH:"Cozy restaurant seat",BRAVE:"Fearless",BURST:"Pop suddenly",CABIN:"Plane passengers sit here",
+CAMEO:"A quick celebrity appearance",CHILI:"___-lime rim on the mango margarita",CLASS:"Style, or a school group",CLOCK:"Tells time",
+CORAL:"Reef builder",COUCH:"Living-room sofa",CREAM:"The rich top of the milk",DAILY:"Every day",DELTA:"Airline at LAX, or a river mouth",
+DINER:"Classic all-day eatery",DISCO:"70s dance music",EARTH:"Our planet",ELBOW:"Arm's bendy joint",FAIRY:"Tiny winged storybook figure",
+FANCY:"Dressed up, upscale",FIBER:"A single thread",FLOAT:"Stay on top of the water",FOCUS:"Pay attention",FRAME:"Holds a picture",
+GLOVE:"Baseball catcher's gear",GREEN:"Color of limes",HALLS:"Hallways",HUMOR:"What makes you laugh",IVORY:"Off-white piano key color",
+JOLLY:"Cheerful and merry",LAYER:"One level of a stack",LEVEL:"Video game stage",LIMES:"Margarita fruit",LINEN:"Tablecloth fabric",
+LOCAL:"From the neighborhood",LOYAL:"Faithful, like rewards members",MAGIC:"Abracadabra",MARCH:"Band walks in step",
+MEDAL:"Gold, silver or bronze",METRO:"City train",MINTY:"Fresh like gum",MOTOR:"Engine",NOVEL:"A long book",
+OASIS:"Green spot in the desert",ORBIT:"Path around a planet",PALMS:"LA's tall trees",PANEL:"Flat board, or a group of judges",
+PASTA:"Fusilli, for one",PATIO:"Outdoor seating",PEARL:"Gem from an oyster",PEPPY:"Full of energy",PIXEL:"Tiny dot on a screen",
+PLAZA:"Open town square",POINT:"Rewards earn these",POLAR:"Like the North Pole",POWER:"Energy, electricity",
+PRIME:"Top quality, or ___ time",QUEST:"An epic journey",QUIET:"Opposite of loud",RAPID:"Very fast",REIGN:"A king's rule",
+RIDGE:"Top line of a hill",RIVER:"Flows to the sea",ROAST:"Slow-cooked meat, or a comedy burn",ROBIN:"Red-breasted bird",
+ROUTE:"Path you take",RUMBA:"Latin ballroom dance",SANDY:"Like a beach",SHAKE:"What the bartender does to a margarita",
+SHORE:"Edge of the ocean",SKIES:"Up above, where planes fly",SLIDE:"Playground ride down",SNACK:"Small bite",SPARK:"Tiny flash of fire",
+SPRAY:"Mist from a bottle",SQUAD:"Your crew",STARS:"Twinkle at night",STEEL:"Strong metal",STEER:"Turn the wheel",STONE:"A rock",
+SWING:"Batter's move, or a jazz style",TANGO:"Dance for two",TIGER:"Striped big cat",TITAN:"A giant",TOPAZ:"Golden gemstone",
+TORCH:"Olympic flame holder",TOTAL:"The full sum",TREAT:"Something special",TREND:"What's popular right now",TWIRL:"Spin around",
+ULTRA:"Extreme, beyond",UNITY:"Being together as one",URBAN:"City life",VALUE:"Good bang for your buck",VENUE:"Where the show happens",
+VIDEO:"Watch it on a screen",VINYL:"Records are made of it",VIVID:"Bright and bold",WAGON:"Little red pull cart",WAVES:"Surfers ride them",
+WHALE:"Giant of the sea",WHEEL:"Round part of a car",WINGS:"Buffalo bar food",WOVEN:"Like a basket",YACHT:"Fancy boat",
+ZEBRA:"Striped animal",BANJO:"Twangy string instrument",CELLO:"Big violin",OPERA:"Sung drama",ALBUM:"A collection of songs",
+BEATS:"Drum patterns",LYRIC:"A line from a song",VERSE:"Comes before the chorus",SOLOS:"One player shines",NOTES:"Do re mi",
+CHOIR:"Group of singers",BRASS:"Trumpet section",BEANS:"Fried green ___ starter",SWISS:"Cheese with holes",WRAPS:"Lettuce ___ on the menu",
+SQUID:"Calamari, by another name",PANKO:"Japanese breadcrumbs",CAJUN:"Louisiana-style seasoning",CRUST:"Parmesan ___ on the mac",
+SOUPS:"Bisque and friends",BEERS:"What's on draft",SHOTS:"A round of ___",SPICY:"Like a jalapeño",AIOLI:"Garlicky mayo dip",
+ANGUS:"Beef on the pretzel-bun burger",MULES:"Moscow ___ come in copper mugs",VODKA:"Spirit in a Moscow Mule",HERBS:"Parsley is one",
+SALTY:"Like a margarita rim",PATTY:"The burger's beef",TAJIN:"Chili-lime seasoning",SAUCY:"Tossed in plenty of wing sauce"},
 /* Melody Mix (word scramble): [word, hint] */
 SCRAMBLE: [["GUITAR","Music"],["KARAOKE","Melody night"],["RUNWAY","LAX"],["AIRPORT","Next door"],["BURGER","Food"],["NACHOS","Food"],
 ["WINGS","Food"],["PALOMA","Drink"],["MICHELADA","Drink"],["MIMOSA","Bubbles + OJ"],["MARGARITA","Drink"],["ESPRESSO","Martini"],

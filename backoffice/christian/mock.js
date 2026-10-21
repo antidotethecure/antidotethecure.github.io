@@ -6,7 +6,9 @@
    🔐 Team access (2026-10-14): fake "sammy" (Melody manager, NO email, so her saves stop at "No email on file" like the
    real backend), a fake approved Melody cook (kitchen@example.com) and a fake PENDING Nalu Vida bartender
    (nalu-bartender@example.com), all with password "test-mode-only". New sign-ups (team_signup) keep their own password
-   in this page's memory only. Switches, job presets and every check mirror Code.gs (JOBS / permCut / needPerm). */
+   in this page's memory only. Switches, job presets and every check mirror Code.gs (JOBS / permCut / needPerm).
+   🛒 Online orders (2026-10-18): 4 made-up paid pickup orders today (Test G. 61…, 555 phones); the Orders tab's
+   "🧪 Fake a new order" button adds one so the new-order alert can be tried. Same rules as Code.gs ordersHQ. */
 (function () {
   "use strict";
   var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
@@ -74,12 +76,12 @@
   scout.flags.push({ id: "dup_tries:0718293a4b5c6d7e", kind: "dup_tries", slug: "melody-bar-grill", sev: "low", title: "3 duplicate tries in 7 days", reason: M(4).name + " sent 3 things that were already counted this week.", members: [M(4).id], evidence: ["game points · Daily game cap reached", "receipt claim · Same check # + date", "redemption · Double tap"], pts: 0, claims: [], status: "open" });
   var USERS = { christian: { name: "Christian", email: "christian@example.com" }, antidote: { name: "Antidote", email: "antidote@example.com" },
     "melody-manager": { name: "Melody Management", email: "melody-team@example.com", role: "manager", slugs: ["melody-bar-grill"] },
-    sammy: { name: "Sammy", email: "", role: "manager", slugs: ["melody-bar-grill"], job: "manager" } }, TOK = {}, PEND = {}, fails = 0;
+    sammy: { name: "Sami", email: "", role: "manager", slugs: ["melody-bar-grill"], job: "manager" } }, TOK = {}, PEND = {}, fails = 0;
   // 🔐 same presets as Code.gs JOBS
-  var PERM_KEYS = ["stats", "members", "rewards", "prices", "specials", "earlybird", "squares", "todo", "staff", "audit"];
-  var PERM_LABEL = { stats: "See sales & visit charts", members: "See guest list & contacts", rewards: "Change rewards & points", prices: "Raise / lower menu prices", specials: "Specials & happy hour", earlybird: "Early-bird gift", squares: "Football Squares", todo: "To-do list", staff: "Staff practice & quiz", audit: "See the Audit log" };
-  var JOBS = { kitchen: ["Kitchen", "prices specials todo"], marketing: ["Marketing / management", "stats rewards specials earlybird squares todo audit"], bar_manager: ["Bar manager", "stats prices specials squares todo staff"],
-    bartender: ["Bartender", "todo staff"], server: ["Server / floor", "todo staff"], manager: ["Manager (general)", PERM_KEYS.join(" ")], other: ["Other employee", "todo"] };
+  var PERM_KEYS = ["stats", "members", "rewards", "prices", "specials", "photos", "earlybird", "squares", "todo", "staff", "audit", "orders"];
+  var PERM_LABEL = { stats: "See sales & visit charts", members: "See guest list & contacts", rewards: "Discounts, rewards & points", prices: "Raise / lower menu prices", photos: "Menu photos go live", specials: "Specials & happy hour", earlybird: "Early-bird gift", squares: "Football Squares", todo: "To-do list", staff: "Staff practice & quiz", audit: "See the Audit log", orders: "Online orders (pickup)" };
+  var JOBS = { kitchen: ["Kitchen", "prices specials photos todo orders"], marketing: ["Marketing / management", "stats rewards specials photos earlybird squares todo audit"], bar_manager: ["Bar manager", "stats prices specials photos squares todo staff orders"],
+    bartender: ["Bartender", "todo staff"], server: ["Server / floor", "todo staff"], runner: ["Food runner / barback", "todo staff"], manager: ["Manager (general)", PERM_KEYS.join(" ")], other: ["Other employee", "todo"] };
   function presetOf(j) { var on = {}, o = {}; (JOBS[j] || JOBS.other)[1].split(" ").forEach(function (k) { on[k] = 1; }); PERM_KEYS.forEach(function (k) { o[k] = !!on[k]; }); return o; }
   function effPerms(j, over) { var o = presetOf(j); Object.keys(over || {}).forEach(function (k) { if (PERM_KEYS.indexOf(k) >= 0) o[k] = over[k] === true; }); return o; }
   var PERMS = {}, TEAM = [   // TEAM = the "Team" sheet tab; PERMS = Script Property PERMS (approved / switched people)
@@ -199,6 +201,7 @@
     var SC = scopeOf(u), NOPE = { ok: false, reason: "Your login can't do that. Ask Christian." };
     if (d.type === "squares_admin" && (!may(u, "squares") || (SC.role !== "owner" && d.slug && !can(u, d.slug)))) return NOPE;
     if (d.type === "bo_team") return teamAct(d, u);
+    if (d.type === "bo_orders" || d.type === "bo_order_set") return ordersAct(d, u);   // 🛒 same rules as Code.gs ordersHQ
     if (d.type === "bo_todo" && !may(u, "todo")) return NOPE;
     if (d.type === "squares_admin") return window.SQUARES_MOCK ? window.SQUARES_MOCK(Object.assign({}, d, { by: rec(u).name })) : { ok: false, reason: "Test squares backend missing" };   // demo/sports/squares-mock.js
     if (d.type === "bo_dedupe") return SC.role === "owner" ? { ok: true, removed: 0 } : NOPE;
@@ -213,13 +216,13 @@
         audit.push({ ts: Date.now(), who: rec(u).name, slug: tsl === "all" ? "Both" : tsl === "nalu-vida" ? "Nalu Vida" : "Melody Bar & Grill", reward: "To-do", field: "To-do done", before: title, after: "done", status: "applied" }); return todoOut(u); }
       return { ok: false, reason: "Unknown action." }; }
     if (d.type === "bo_photo") {   // 📸 same rules as Code.gs photoAct; the "file" is the picture itself (data URL), nothing is uploaded
-      var own = SC.role === "owner", phOut = function () { return { ok: true, photos: PHOTOS.filter(function (x) { return (x.status === "pending" || x.status === "live") && (own || can(u, x.slug)); }), menu: MENU }; },
+      var own = SC.role === "owner", golive = own || rec(u).perms.photos === true, phOut = function () { return { ok: true, photos: PHOTOS.filter(function (x) { return (x.status === "pending" || x.status === "live") && (own || can(u, x.slug)); }), menu: MENU }; },
         phSet = function (sl, it, f) { var M = MENU[sl] = MENU[sl] || {}; M.ph = M.ph || {}; if (f) M.ph[it] = f; else delete M.ph[it]; },
         logp = function (sl, it, v) { audit.push({ ts: Date.now(), who: rec(u).name, slug: sl === "nalu-vida" ? "Nalu Vida" : "Melody Bar & Grill", reward: it, field: "Menu photo", before: "", after: v, status: "applied" }); };
       if (d.op === "add") { var it2 = String(d.item || "").replace(/[<>]/g, "").trim(); if (!can(u, d.slug) || !it2) return NOPE; if (!/^data:image\/jpeg;base64,/.test(String(d.photo || ""))) return { ok: false, reason: "That picture didn't come through. Try another photo." };
-        PHOTOS.forEach(function (x) { if (x.slug === d.slug && x.item === it2 && (x.status === "pending" || (own && x.status === "live"))) x.status = "replaced"; }); if (own) phSet(d.slug, it2, d.photo);
-        PHOTOS.push({ ts: Date.now(), id: "P" + Math.random().toString(36).slice(2, 12), slug: d.slug, item: it2, file: d.photo, by: rec(u).name, status: own ? "live" : "pending" }); logp(d.slug, it2, own ? "added (live)" : "added (waiting for Christian's OK)");
-        var out = phOut(); out.testNotice = own ? "" : "TEST MODE: no email sent. Live, Christian would get an email to OK it."; return out; }
+        PHOTOS.forEach(function (x) { if (x.slug === d.slug && x.item === it2 && (x.status === "pending" || (golive && x.status === "live"))) x.status = "replaced"; }); if (golive) phSet(d.slug, it2, d.photo);
+        PHOTOS.push({ ts: Date.now(), id: "P" + Math.random().toString(36).slice(2, 12), slug: d.slug, item: it2, file: d.photo, by: rec(u).name, status: golive ? "live" : "pending" }); logp(d.slug, it2, golive ? "added (live)" : "added (waiting for Christian's OK)");
+        var out = phOut(); out.testNotice = golive ? "" : "TEST MODE: no email sent. Live, Christian would get an email to OK it."; return out; }
       if (!own) return { ok: false, reason: "Christian OKs the photos. Tell him it's there." };
       if (d.op === "remove") { PHOTOS.forEach(function (x) { if (x.slug === d.slug && x.item === d.item && x.status === "live") x.status = "removed"; }); phSet(d.slug, d.item, ""); logp(d.slug, d.item, "standard picture"); return phOut(); }
       var px = PHOTOS.filter(function (x) { return x.id === d.id && x.status === "pending"; })[0]; if (!px) return { ok: false, reason: "That photo was already handled. Tap Refresh." };
@@ -287,6 +290,26 @@
     }
     return { ok: false };
   }
+  // 🛒 ONLINE ORDERS (made-up, today only): same shape as Code.gs ordStaff(). Phones are 555 numbers; full number only with
+  // the guest-contacts switch, like the real backend. {type:"bo_orders", fake:true} (test mode only) adds a new paid order.
+  var FOODS = [["Lemon Pepper Wings", 16], ["Lobster Mac & Cheese", 21.5], ["Melody Burger", 19.25], ["Gilroy Garlic Fries", 6.75], ["Shrimp Tacos", 16], ["Nachos", 15], ["Chicken Burrito", 17.25], ["House Mac", 15]],
+    NOTES = ["", "", "extra ranch", "no onions", "sauce on the side", ""], ORDERS = [], oseq = 0;
+  function fakeOrder(minsAgo, st) { var t = Date.now() - minsAgo * 6e4, it = [], k = 1 + Math.floor(rnd() * 3), sub = 0, ABC = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", id = "MEL-O";
+    for (var q = 0; q < 5; q++) id += ABC[Math.floor(rnd() * ABC.length)];
+    for (var j = 0; j < k; j++) { var f = pick(FOODS), qn = 1 + Math.floor(rnd() * 2); it.push({ item: f[0], qty: qn, note: pick(NOTES) }); sub += f[1] * qn; }
+    sub = Math.round(sub * 100) / 100; var tax = Math.round(sub * 9.75) / 100, pk = pick([["ASAP", 0], ["In 15 min", 15], ["In 30 min", 30]]); oseq++;
+    ORDERS.push({ id: id, slug: "melody-bar-grill", status: st || "paid", name: "Test G. " + (60 + oseq), phone: "+1555010" + ("0" + (60 + oseq)).slice(-2) + "0" + (oseq % 10), pickup: pk[0], pickupAt: pk[1] ? t + pk[1] * 6e4 : 0,
+      items: it, subtotal: sub, food_subtotal: sub, tax: tax, tip: 0, delivery_fee: 0, total: Math.round((sub + tax) * 100) / 100, ssai_fee: Math.round(sub * 5) / 100, created: t - 6e4, paidAt: t, readyAt: st === "ready" || st === "picked_up" ? t + 9e5 : 0, pickedAt: st === "picked_up" ? t + 15e5 : 0 }); }
+  fakeOrder(95, "picked_up"); fakeOrder(52, "ready"); fakeOrder(18, "paid"); fakeOrder(4, "paid");
+  function ordersAct(d, u) { var r = rec(u); if (!may(u, "orders")) return { ok: false, reason: "Your login can't do that. Ask Christian." };
+    if (d.type === "bo_order_set") { var o = ORDERS.filter(function (x) { return x.id === d.id; })[0], st = d.status === "ready" || d.status === "picked_up" ? d.status : "";
+      if (!o || !can(u, o.slug)) return { ok: false, reason: "Order not found." }; if (!st) return { ok: false, reason: "Pick Ready or Picked up." };
+      if (o.status === "picked_up" || o.status === st) return { ok: false, reason: "Already marked. Tap Refresh." };
+      o.status = st; if (st === "ready") o.readyAt = Date.now(); else o.pickedAt = Date.now(); }
+    if (d.fake) fakeOrder(0, "paid");
+    var list = ORDERS.filter(function (o) { return can(u, o.slug); }).map(function (o) { var c = JSON.parse(JSON.stringify(o)); if (!r.perms.members && r.role !== "owner") c.phone = "•••" + c.phone.slice(-4); if (r.role !== "owner") delete c.ssai_fee; return c; })
+      .sort(function (a, b) { return b.paidAt - a.paidAt; });
+    return { ok: true, test: true, orders: list, now: Date.now(), day: ymd(Date.now()) }; }
   window.HQ_MOCK = function (body) { return new Promise(function (res) { setTimeout(function () { Promise.resolve(handle(JSON.parse(JSON.stringify(body)))).then(function (r) { res(JSON.parse(JSON.stringify(r))); }); }, 120); }); };
   // Football Squares test backend (shared with the guest app's ?test=1 through this browser's localStorage)
   if (!window.SQUARES_MOCK) { var sqs = document.createElement("script"); sqs.src = "../../demo/sports/squares-mock.js?v=sq2"; document.head.appendChild(sqs); }

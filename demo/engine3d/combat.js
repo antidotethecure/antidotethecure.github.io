@@ -124,5 +124,8 @@ export function makeCombat(THREE, O) {
     for (let i = pilots.length - 1; i >= 0; i--) if (!updPilot(pilots[i], s, t, scroll)) pilots.splice(i, 1); }
   // warm-up hook: show one of each pooled effect mesh for a frame so their shaders compile before the fight
   const _warm = (on, p) => { RG.slice(0, 1).concat([]).forEach(R => { R.m.visible = on; if (on) R.m.position.copy(p); }); const f = FL[0]; f.s.visible = on; if (on) f.s.position.copy(p); };
-  return { muzzle, crash, update, _warm, _c: crashes, _p: pilots, stats: () => ({ crashes: crashes.length, pilots: pilots.length }) };
+  // the ground slid sideways under the camera (Melody's lateral roam): wrecks, scorch marks, ejected pilots + their gear slide with it
+  function shift(dx) { for (const c of crashes) { c.obj.position.x += dx; if (c.tgt) c.tgt.x += dx; } for (const S of scorches) S.m.position.x += dx; RG.forEach(R => { R.m.position.x += dx; });
+    for (const P of pilots) { P.pos.x += dx; [P.canopy, P.seat].forEach(m => { if (m) m.position.x += dx; }); } }
+  return { muzzle, crash, update, shift, _warm, _c: crashes, _p: pilots, stats: () => ({ crashes: crashes.length, pilots: pilots.length }) };
 }

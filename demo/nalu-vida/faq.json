@@ -1,0 +1,1395 @@
+{
+ "name": "Nalu Vida",
+ "phone": "(310) 437-0060",
+ "facts": [
+  "Nalu Vida is at 1 Washington Blvd, Venice, CA 90292, at the foot of the Venice Pier.",
+  "Phone: (310) 437-0060. Email: info@naluvida.com. Instagram: @naluvidavenice.",
+  "Hours: Mon–Thu 11 AM–12 AM, Fri 10 AM–2 AM, Sat 9 AM–2 AM, Sun 9 AM–12 AM.",
+  "Brunch is served daily until 4 PM, with $24 bottomless mimosas (60 minutes).",
+  "Happy hour is Mon–Fri 3–6 PM and 10 PM–close, dine-in only.",
+  "Parking: public beach lot next to the pier, plus street parking.",
+  "Book a table on Resy. 20% gratuity is added for parties of 6 or more.",
+  "Private events: parties of 10 to 100. The tour is free and so is your drink.",
+  "Nalu Vida Rewards is free to join. One account per person.",
+  "You earn 10 points per $1 on eligible purchases, before tip.",
+  "Join bonus: +100 points once. Birthday bonus: +250 once a year.",
+  "Referral: +100 points for each friend who joins with your code and makes a first visit.",
+  "Ride the Nalu: every 100 game score = 1 reward point, up to 50 game points a day.",
+  "Rewards: 250 pts, 500 pts, 1,000 pts and 1,500 pts.",
+  "Use a reward by tapping Use reward and showing the live pass to your server. It works once and expires in 10 minutes.",
+  "One reward per visit and one prize per day. Rewards never include free alcohol.",
+  "The weekly game leaderboard is for bragging rights only. The game gives no prizes, codes or discounts.",
+  "Nalu Vida points are separate from Melody Bar & Grill points.",
+  "Order from your phone by picking Patio, Bar, Dining room or Rooftop. Pay your server or bartender like normal.",
+  "The app has a 🌐 language menu with 12 languages."
+ ],
+ "suggested": [
+  "What are your hours?",
+  "When is happy hour?",
+  "How do I earn points?",
+  "What can I get with my points?",
+  "How do I play Ride the Nalu?",
+  "Where do I park?"
+ ],
+ "qa": [
+  {
+   "q": "What are your hours?",
+   "a": "Mon–Thu 11 AM–12 AM, Fri 10 AM–2 AM, Sat 9 AM–2 AM, and Sun 9 AM–12 AM. Brunch runs daily until 4 PM.",
+   "tags": [
+    "hours",
+    "open",
+    "close",
+    "time",
+    "when"
+   ]
+  },
+  {
+   "q": "Are you open right now?",
+   "a": "The app's home screen shows 'Open now' or when we open next, using Los Angeles time. You can also call (310) 437-0060.",
+   "tags": [
+    "open",
+    "now",
+    "today",
+    "hours",
+    "close"
+   ]
+  },
+  {
+   "q": "What time do you open on weekends?",
+   "a": "Saturday and Sunday we open at 9 AM. Saturday closes at 2 AM and Sunday at 12 AM (midnight).",
+   "tags": [
+    "weekend",
+    "saturday",
+    "sunday",
+    "open",
+    "hours"
+   ]
+  },
+  {
+   "q": "How late are you open?",
+   "a": "Mon–Thu until 12 AM, Friday and Saturday until 2 AM, and Sunday until 12 AM.",
+   "tags": [
+    "late",
+    "close",
+    "closing",
+    "hours",
+    "midnight"
+   ]
+  },
+  {
+   "q": "What time does Friday open?",
+   "a": "Fridays we open at 10 AM and stay open until 2 AM.",
+   "tags": [
+    "friday",
+    "open",
+    "hours",
+    "time"
+   ]
+  },
+  {
+   "q": "Where are you located?",
+   "a": "1 Washington Blvd, Venice, CA 90292, at the foot of the Venice Pier. Tap Directions in the app for a map.",
+   "tags": [
+    "address",
+    "location",
+    "where",
+    "directions",
+    "map"
+   ]
+  },
+  {
+   "q": "What is your phone number?",
+   "a": "Call us at (310) 437-0060.",
+   "tags": [
+    "phone",
+    "call",
+    "number",
+    "contact"
+   ]
+  },
+  {
+   "q": "Is there parking?",
+   "a": "Yes. There's a public beach lot right next to the pier, plus street parking.",
+   "tags": [
+    "parking",
+    "park",
+    "lot",
+    "car",
+    "street"
+   ]
+  },
+  {
+   "q": "How do I contact you by email or Instagram?",
+   "a": "Email info@naluvida.com or find us on Instagram at @naluvidavenice.",
+   "tags": [
+    "email",
+    "instagram",
+    "contact",
+    "social"
+   ]
+  },
+  {
+   "q": "Do you have a patio?",
+   "a": "Yes, we have a heated patio steps from the sand. You can also choose Bar, Dining room or Rooftop when you order.",
+   "tags": [
+    "patio",
+    "outdoor",
+    "heated",
+    "seating",
+    "rooftop"
+   ]
+  },
+  {
+   "q": "Can I make a reservation?",
+   "a": "Yes, book your table on Resy using the Book on Resy button in the app.",
+   "tags": [
+    "reservation",
+    "book",
+    "resy",
+    "table",
+    "reserve"
+   ]
+  },
+  {
+   "q": "Do you add a tip or gratuity automatically?",
+   "a": "A 20% gratuity is added for parties of 6 or more.",
+   "tags": [
+    "gratuity",
+    "tip",
+    "party",
+    "large",
+    "6"
+   ]
+  },
+  {
+   "q": "Can I host a private event?",
+   "a": "Yes, we host parties of 10 to 100 people. Come see the space: the tour is free and so is your drink. Tap Plan an event in the app.",
+   "tags": [
+    "private",
+    "event",
+    "party",
+    "book",
+    "tour"
+   ]
+  },
+  {
+   "q": "How many people can a private event have?",
+   "a": "Private events are for parties of 10 to 100 people.",
+   "tags": [
+    "private",
+    "capacity",
+    "party",
+    "size",
+    "event"
+   ]
+  },
+  {
+   "q": "Is the private event tour really free?",
+   "a": "Yes. The tour is free and so is your drink.",
+   "tags": [
+    "tour",
+    "free",
+    "private",
+    "event",
+    "drink"
+   ]
+  },
+  {
+   "q": "When is happy hour?",
+   "a": "Mon–Fri 3–6 PM and again from 10 PM to close. It's dine-in only.",
+   "tags": [
+    "happy hour",
+    "hh",
+    "deals",
+    "time",
+    "when"
+   ]
+  },
+  {
+   "q": "What are the happy hour drink deals?",
+   "a": "$10 house margarita, wells, house red and white, and Prosecco. Drafts are $2 off.",
+   "tags": [
+    "happy hour",
+    "drinks",
+    "margarita",
+    "wine",
+    "beer",
+    "draft"
+   ]
+  },
+  {
+   "q": "What food is on happy hour?",
+   "a": "Smash-N-Stack $15, Vegan Burger $16, Spicy Tuna Crispy Rice $16, Tostadas $14, Hula Wings (6) $14, South American Caesar $15, Buffalo Chicken Strips $10, Fries $5 and Sweet Potato Fries $6.",
+   "tags": [
+    "happy hour",
+    "food",
+    "burger",
+    "wings",
+    "fries",
+    "prices"
+   ]
+  },
+  {
+   "q": "Is happy hour on weekends?",
+   "a": "No, happy hour is Monday through Friday only.",
+   "tags": [
+    "happy hour",
+    "weekend",
+    "saturday",
+    "sunday"
+   ]
+  },
+  {
+   "q": "Is happy hour available for takeout?",
+   "a": "No, happy hour is dine-in only.",
+   "tags": [
+    "happy hour",
+    "takeout",
+    "dine-in",
+    "togo"
+   ]
+  },
+  {
+   "q": "What is today's special?",
+   "a": "The app's home screen shows today's special. Mon: Burger Mondays. Tue: Taco Tuesday. Wed: Shuckin' Good Wednesday. Sun: NFL Sunday. Brunch deals run daily.",
+   "tags": [
+    "special",
+    "today",
+    "daily",
+    "deal",
+    "specials"
+   ]
+  },
+  {
+   "q": "What is Burger Monday?",
+   "a": "Mondays are $9 burgers plus a $5 draft beer special, from 5 PM to close.",
+   "tags": [
+    "monday",
+    "burger",
+    "special",
+    "draft",
+    "beer"
+   ]
+  },
+  {
+   "q": "What is Taco Tuesday?",
+   "a": "Tuesdays you get 50% off signature tacos all day, plus $10 house margaritas.",
+   "tags": [
+    "tuesday",
+    "taco",
+    "special",
+    "margarita",
+    "50% off"
+   ]
+  },
+  {
+   "q": "What are the Wednesday specials?",
+   "a": "Shuckin' Good Wednesday: $2 oysters (minimum 6) while supplies last.",
+   "tags": [
+    "wednesday",
+    "oysters",
+    "special",
+    "$2"
+   ]
+  },
+  {
+   "q": "What happens on Sundays?",
+   "a": "NFL Sunday: every NFL game on the TVs, plus bottomless mimosas. Hours are 9 AM–12 AM.",
+   "tags": [
+    "sunday",
+    "nfl",
+    "football",
+    "mimosa",
+    "special"
+   ]
+  },
+  {
+   "q": "Do you have bottomless mimosas?",
+   "a": "Yes. Brunch runs daily until 4 PM with $24 bottomless mimosas for 60 minutes. 21+ with ID.",
+   "tags": [
+    "bottomless",
+    "mimosa",
+    "brunch",
+    "$24",
+    "drinks"
+   ]
+  },
+  {
+   "q": "How long does bottomless mimosa last?",
+   "a": "Bottomless mimosas run 60 minutes and cost $24.",
+   "tags": [
+    "bottomless",
+    "mimosa",
+    "60",
+    "minutes",
+    "time"
+   ]
+  },
+  {
+   "q": "Do you serve brunch?",
+   "a": "Yes, brunch is served daily until 4 PM.",
+   "tags": [
+    "brunch",
+    "morning",
+    "breakfast",
+    "until 4",
+    "daily"
+   ]
+  },
+  {
+   "q": "What events do you have this week?",
+   "a": "The Events this week section in the app shows each day. Mon: trivia and Monday Night Football. Tue: acoustic. Thu: live jazz and Thursday Night Football. Fri: karaoke. Sun: NFL.",
+   "tags": [
+    "events",
+    "music",
+    "live",
+    "week",
+    "entertainment"
+   ]
+  },
+  {
+   "q": "When is trivia?",
+   "a": "Trivia is Mondays 7–9 PM.",
+   "tags": [
+    "trivia",
+    "monday",
+    "quiz",
+    "night",
+    "time"
+   ]
+  },
+  {
+   "q": "When is live music?",
+   "a": "Acoustic Tuesday 8–11 PM, live jazz Thursday 6–9 PM, and live blues on the 4th Saturday 3–6 PM.",
+   "tags": [
+    "music",
+    "live",
+    "jazz",
+    "acoustic",
+    "blues"
+   ]
+  },
+  {
+   "q": "When is karaoke?",
+   "a": "Karaoke is Fridays from 9 PM to close.",
+   "tags": [
+    "karaoke",
+    "friday",
+    "sing",
+    "night"
+   ]
+  },
+  {
+   "q": "Do you show football games?",
+   "a": "Yes. Monday Night Football, Thursday Night Football, and every NFL game on the TVs on Sundays.",
+   "tags": [
+    "football",
+    "nfl",
+    "sports",
+    "tv",
+    "game"
+   ]
+  },
+  {
+   "q": "Do you have salsa nights or block parties?",
+   "a": "Salsa is on the 2nd and 4th Wednesdays, and the Block Party is the 2nd Saturday of the month. I don't have start times, so please call (310) 437-0060.",
+   "tags": [
+    "salsa",
+    "block party",
+    "saturday",
+    "wednesday",
+    "events"
+   ]
+  },
+  {
+   "q": "Do you have halftime or sports features in the app?",
+   "a": "The app doesn't have a sports feature. In Ride the Nalu, there's a short 'halftime' break between levels that plays clips of a food reviewer's visit to Nalu Vida.",
+   "tags": [
+    "halftime",
+    "sports",
+    "review",
+    "clips",
+    "game"
+   ]
+  },
+  {
+   "q": "Is there a trivia game in the app?",
+   "a": "No, there's no trivia game in the app. Live trivia is at the restaurant on Mondays 7–9 PM.",
+   "tags": [
+    "trivia",
+    "app",
+    "quiz",
+    "game"
+   ]
+  },
+  {
+   "q": "What is Nalu Vida Rewards?",
+   "a": "It's our free points program. You earn points on your purchases and by playing Ride the Nalu, then trade them for rewards.",
+   "tags": [
+    "rewards",
+    "points",
+    "program",
+    "loyalty",
+    "stars"
+   ]
+  },
+  {
+   "q": "How do I sign up or join?",
+   "a": "Joining is free. Use the Nalu Vida Rewards section in the app. It's one account per person.",
+   "tags": [
+    "join",
+    "sign up",
+    "signup",
+    "register",
+    "membership"
+   ]
+  },
+  {
+   "q": "Does it cost anything to join?",
+   "a": "No, joining Nalu Vida Rewards is free.",
+   "tags": [
+    "free",
+    "join",
+    "cost",
+    "price",
+    "membership"
+   ]
+  },
+  {
+   "q": "How many points do I earn per dollar?",
+   "a": "10 points per $1 on eligible purchases, before tip.",
+   "tags": [
+    "ratio",
+    "per dollar",
+    "points",
+    "how many",
+    "earn",
+    "pts"
+   ]
+  },
+  {
+   "q": "What counts as an eligible purchase?",
+   "a": "Points are 10 per $1 before tip. I don't have a list of what is excluded, so ask staff or call (310) 437-0060.",
+   "tags": [
+    "eligible",
+    "exclude",
+    "purchase",
+    "tax",
+    "gift card"
+   ]
+  },
+  {
+   "q": "How do I get my points after I eat?",
+   "a": "Tap Add my visit in the app. Snap your receipt or type the check number, total and date (today or yesterday).",
+   "tags": [
+    "add my visit",
+    "receipt",
+    "earn",
+    "claim",
+    "check number"
+   ]
+  },
+  {
+   "q": "How many receipts can I add per day?",
+   "a": "One receipt per member per day, and each check can only be used once.",
+   "tags": [
+    "receipt",
+    "limit",
+    "daily",
+    "claim",
+    "once"
+   ]
+  },
+  {
+   "q": "Is there a limit per check?",
+   "a": "Yes, up to $150 per check.",
+   "tags": [
+    "limit",
+    "$150",
+    "check",
+    "cap",
+    "receipt"
+   ]
+  },
+  {
+   "q": "Can I add a receipt from last week?",
+   "a": "No. You can add a visit from today or yesterday only.",
+   "tags": [
+    "old receipt",
+    "yesterday",
+    "date",
+    "late",
+    "claim"
+   ]
+  },
+  {
+   "q": "Are visit claims checked?",
+   "a": "Yes. Claims are checked against the restaurant's sales report, and points from made-up checks are removed.",
+   "tags": [
+    "verify",
+    "checked",
+    "fake",
+    "receipt",
+    "claim"
+   ]
+  },
+  {
+   "q": "Will points be automatic later?",
+   "a": "Once our register system is connected, it will happen automatically and your points will carry over.",
+   "tags": [
+    "automatic",
+    "toast",
+    "pos",
+    "points",
+    "carry over"
+   ]
+  },
+  {
+   "q": "How many points do I get for joining?",
+   "a": "+100 points once, when you join.",
+   "tags": [
+    "join bonus",
+    "welcome",
+    "100",
+    "points",
+    "sign up"
+   ]
+  },
+  {
+   "q": "What is the birthday club?",
+   "a": "There's a birthday bonus of +250 points, once a year on your birthday. I don't have more details on claiming it, so ask staff.",
+   "tags": [
+    "birthday",
+    "bonus",
+    "250",
+    "club",
+    "bday"
+   ]
+  },
+  {
+   "q": "How does the referral program work?",
+   "a": "Share your code. You get +100 points for each friend who joins with it and makes a first visit.",
+   "tags": [
+    "referral",
+    "refer",
+    "friend",
+    "share",
+    "code",
+    "invite"
+   ]
+  },
+  {
+   "q": "Can I use my own referral code?",
+   "a": "No. You can't use your own code.",
+   "tags": [
+    "referral",
+    "own code",
+    "friend",
+    "rules"
+   ]
+  },
+  {
+   "q": "Can I enter more than one friend's code?",
+   "a": "No. Each member enters one friend's code, once, when joining. It can't be changed or swapped later.",
+   "tags": [
+    "referral",
+    "code",
+    "one",
+    "change",
+    "friend"
+   ]
+  },
+  {
+   "q": "Does a referral stack with other rewards?",
+   "a": "No. A referral never stacks with another reward on the same visit.",
+   "tags": [
+    "referral",
+    "stack",
+    "combine",
+    "reward"
+   ]
+  },
+  {
+   "q": "Is there a daily spin, prize wheel or tokens?",
+   "a": "No. There is no daily spin, prize wheel, lucky draw, tokens or second currency. It's just one points balance.",
+   "tags": [
+    "spin",
+    "wheel",
+    "tokens",
+    "draw",
+    "currency"
+   ]
+  },
+  {
+   "q": "Are there levels or tiers?",
+   "a": "There are no member levels. You work up a reward ladder: 250, 500, 1,000 and 1,500 points.",
+   "tags": [
+    "levels",
+    "tiers",
+    "vip",
+    "status",
+    "ladder"
+   ]
+  },
+  {
+   "q": "What rewards can I get?",
+   "a": "250 pts: free mocktail, soft drink or Jungle Fries. 500 pts: free shareable (Chips, Salsa & Guac, Calamari or Wings). 1,000 pts: $10 off your check. 1,500 pts: free entrée (any Signature Island Tacos or the Poke Bowl).",
+   "tags": [
+    "rewards",
+    "prizes",
+    "free",
+    "cost",
+    "points",
+    "ladder"
+   ]
+  },
+  {
+   "q": "How many points for a free drink?",
+   "a": "250 points gets a free mocktail, soft drink or Jungle Fries.",
+   "tags": [
+    "250",
+    "free drink",
+    "mocktail",
+    "soft drink",
+    "jungle fries"
+   ]
+  },
+  {
+   "q": "How many points for a free appetizer?",
+   "a": "500 points gets a free shareable: Chips, Salsa & Guac, Calamari or Wings.",
+   "tags": [
+    "500",
+    "shareable",
+    "appetizer",
+    "free",
+    "wings",
+    "calamari"
+   ]
+  },
+  {
+   "q": "How many points for $10 off?",
+   "a": "1,000 points gets $10 off your check.",
+   "tags": [
+    "1000",
+    "$10 off",
+    "discount",
+    "check"
+   ]
+  },
+  {
+   "q": "How many points for a free entrée?",
+   "a": "1,500 points gets a free entrée: any Signature Island Tacos or the Poke Bowl.",
+   "tags": [
+    "1500",
+    "entree",
+    "tacos",
+    "poke",
+    "free meal"
+   ]
+  },
+  {
+   "q": "How do I redeem a reward?",
+   "a": "Tap Use reward, confirm, and show the live pass to your server, who applies it. The points come off when you open the pass.",
+   "tags": [
+    "redeem",
+    "use reward",
+    "pass",
+    "server",
+    "claim"
+   ]
+  },
+  {
+   "q": "How long does a reward pass last?",
+   "a": "It works once and expires 10 minutes after it opens. Each pass has a fresh one-time code.",
+   "tags": [
+    "pass",
+    "10 minutes",
+    "expire",
+    "code",
+    "timer"
+   ]
+  },
+  {
+   "q": "Can I use more than one reward per visit?",
+   "a": "No. It's one reward per visit and one prize per day, with no stacking.",
+   "tags": [
+    "limit",
+    "one per day",
+    "stack",
+    "reward",
+    "visit"
+   ]
+  },
+  {
+   "q": "What does 'Come back tomorrow' mean?",
+   "a": "You've already had a prize today. It could be a reward, a gift or a game win. Your next one is available tomorrow, and your points stay in your balance.",
+   "tags": [
+    "come back tomorrow",
+    "one prize",
+    "daily",
+    "limit"
+   ]
+  },
+  {
+   "q": "Can I get a free alcoholic drink as a reward?",
+   "a": "No. Rewards never include free alcohol.",
+   "tags": [
+    "alcohol",
+    "free drink",
+    "beer",
+    "cocktail",
+    "reward"
+   ]
+  },
+  {
+   "q": "Can I give my reward to someone else or cash it out?",
+   "a": "No. Rewards have no cash value and can't be transferred.",
+   "tags": [
+    "transfer",
+    "cash",
+    "gift",
+    "share",
+    "reward"
+   ]
+  },
+  {
+   "q": "Do my points expire?",
+   "a": "I don't have expiry details. Points already earned stay in your balance unless the program ends. Ask staff or call (310) 437-0060.",
+   "tags": [
+    "expire",
+    "expiry",
+    "points",
+    "balance"
+   ]
+  },
+  {
+   "q": "Can the program change?",
+   "a": "Yes. Nalu Vida can change or end the program, point values or rewards with notice in the app.",
+   "tags": [
+    "change",
+    "rules",
+    "program",
+    "notice"
+   ]
+  },
+  {
+   "q": "Do my Melody Bar & Grill points work here?",
+   "a": "No. Nalu Vida has its own balance, and points don't move between restaurants.",
+   "tags": [
+    "melody",
+    "sister",
+    "points",
+    "transfer",
+    "balance"
+   ]
+  },
+  {
+   "q": "What is Melody Bar & Grill?",
+   "a": "It's our sister spot by LAX in Westchester, from the same owners. It has its own game and Melody Rewards points.",
+   "tags": [
+    "melody",
+    "lax",
+    "sister",
+    "westchester"
+   ]
+  },
+  {
+   "q": "What is my Rewards Card?",
+   "a": "It's a digital member card in the app with your name, card ID, points and a QR code. You can add the app to your Home Screen to keep it handy.",
+   "tags": [
+    "card",
+    "qr",
+    "wallet",
+    "member",
+    "id"
+   ]
+  },
+  {
+   "q": "Can I add the card to Apple or Google Wallet?",
+   "a": "Not right now. For quick access, add the app to your Home Screen.",
+   "tags": [
+    "wallet",
+    "apple",
+    "google",
+    "card",
+    "pass"
+   ]
+  },
+  {
+   "q": "How do I add the app to my phone?",
+   "a": "On iPhone, tap Share then Add to Home Screen. On Android, open the browser menu and tap Add to Home screen or Install app.",
+   "tags": [
+    "install",
+    "home screen",
+    "app",
+    "add",
+    "iphone",
+    "android"
+   ]
+  },
+  {
+   "q": "What is Ride the Nalu?",
+   "a": "A free surfing game on the Venice Pier loop with 5 levels. You paddle out, grab food rafts and ride the wave back to Nalu Vida.",
+   "tags": [
+    "game",
+    "ride the nalu",
+    "surf",
+    "play",
+    "arcade"
+   ]
+  },
+  {
+   "q": "Do I need an account to play?",
+   "a": "No. It's free to play with or without an account, and no purchase is necessary.",
+   "tags": [
+    "play",
+    "account",
+    "free",
+    "sign up",
+    "game"
+   ]
+  },
+  {
+   "q": "How do I play Ride the Nalu?",
+   "a": "Drag left and right to steer. Paddling out, tap DUCK DIVE (or the screen) as each breaking wave reaches you. Riding in, stay in the glowing pocket just ahead of the curl all the way to the exit.",
+   "tags": [
+    "how to play",
+    "controls",
+    "steer",
+    "duck dive",
+    "game"
+   ]
+  },
+  {
+   "q": "What are the game controls?",
+   "a": "Drag to steer. JUMP button is for duck-diving under waves and for big air at the ⬆ LIP. TRICK button is for tricks while in the air.",
+   "tags": [
+    "controls",
+    "jump",
+    "trick",
+    "drag",
+    "buttons"
+   ]
+  },
+  {
+   "q": "How do I score points in the game?",
+   "a": "Grab food rafts: Island Tacos +100, Mimosa +120, Jungle Fries +120, Smash-N-Stack +150, Coconut Shrimp +150. Duck-diving a wave is +100 and riding the barrel out the exit is +200.",
+   "tags": [
+    "score",
+    "points",
+    "rafts",
+    "scoring",
+    "game"
+   ]
+  },
+  {
+   "q": "What are the food rafts?",
+   "a": "They're floating rafts you grab for points, themed to Nalu Vida food like Island Tacos, Mimosa, Jungle Fries, Smash-N-Stack and Coconut Shrimp.",
+   "tags": [
+    "rafts",
+    "food",
+    "grab",
+    "tacos",
+    "fries"
+   ]
+  },
+  {
+   "q": "How many lives do I have in the game?",
+   "a": "You have 5 hearts, and they're lost in halves. Bumping into things is a mild wipeout: a splash, then you pop back up.",
+   "tags": [
+    "hearts",
+    "lives",
+    "wipeout",
+    "health",
+    "game"
+   ]
+  },
+  {
+   "q": "What should I avoid in the game?",
+   "a": "Steer around sea life like sharks, stingrays and jellyfish, rocks, the pier, whitewater and the falling lip. There are no weapons or boss fights.",
+   "tags": [
+    "avoid",
+    "sharks",
+    "stingrays",
+    "hazards",
+    "game"
+   ]
+  },
+  {
+   "q": "How long is a game?",
+   "a": "Level 1 takes about 2 minutes. Later levels have a shorter paddle-out of 12–15 seconds. Ride all 5 levels for a big finish bonus.",
+   "tags": [
+    "length",
+    "time",
+    "levels",
+    "long",
+    "game"
+   ]
+  },
+  {
+   "q": "What is the pocket?",
+   "a": "It's the glowing spot just ahead of the curl on the wave. Staying in it keeps scoring points. Behind the curl or under the lip washes you out for −½ heart.",
+   "tags": [
+    "pocket",
+    "wave",
+    "curl",
+    "ride",
+    "game"
+   ]
+  },
+  {
+   "q": "How do I do tricks?",
+   "a": "Tap JUMP at the ⬆ LIP for big air, then tap TRICK in the air and land it. If you're still spinning when you land, you bail.",
+   "tags": [
+    "trick",
+    "jump",
+    "lip",
+    "air",
+    "bail"
+   ]
+  },
+  {
+   "q": "How do game points turn into rewards points?",
+   "a": "Every 100 game score is worth 1 Nalu Vida Rewards point, up to 50 game points a day (Los Angeles date).",
+   "tags": [
+    "ratio",
+    "game points",
+    "per score",
+    "100",
+    "50",
+    "daily cap"
+   ]
+  },
+  {
+   "q": "Is there a daily limit on game points?",
+   "a": "Yes, at most 50 game points a day. You can keep playing for fun after that.",
+   "tags": [
+    "cap",
+    "limit",
+    "50",
+    "daily",
+    "game"
+   ]
+  },
+  {
+   "q": "I'm not a member. Do I lose my game points?",
+   "a": "Your points from today are held on your phone. Join the same day to save them.",
+   "tags": [
+    "not member",
+    "save points",
+    "join",
+    "game",
+    "hold"
+   ]
+  },
+  {
+   "q": "How often can I play?",
+   "a": "As often as you like. Only the points you can earn are limited, to 50 a day.",
+   "tags": [
+    "how often",
+    "limit",
+    "play",
+    "unlimited",
+    "daily"
+   ]
+  },
+  {
+   "q": "Is there a weekly leaderboard?",
+   "a": "Yes, a weekly board with a champion card. This week's board closes Sunday 11:00 PM and resets Monday. It's for bragging rights only.",
+   "tags": [
+    "leaderboard",
+    "weekly",
+    "champion",
+    "board",
+    "top score"
+   ]
+  },
+  {
+   "q": "What do I win for being weekly champion?",
+   "a": "Nothing but bragging rights. The weekly board has no prizes, and the game gives no prizes, codes or discounts.",
+   "tags": [
+    "champion",
+    "prize",
+    "win",
+    "weekly",
+    "reward"
+   ]
+  },
+  {
+   "q": "Is there a weekly prize pickup?",
+   "a": "No. The weekly board doesn't give prizes, so there's nothing to pick up.",
+   "tags": [
+    "prize",
+    "pickup",
+    "weekly",
+    "contest",
+    "collect"
+   ]
+  },
+  {
+   "q": "What is the billboard buoy in the game?",
+   "a": "A hidden billboard buoy floats by the pier once a run. Ride through it for a +500 bonus and a link to a food reviewer's video of Nalu Vida.",
+   "tags": [
+    "buoy",
+    "review",
+    "bonus",
+    "hidden",
+    "egg"
+   ]
+  },
+  {
+   "q": "Is there a lifeguard in the game?",
+   "a": "Yes, a lifeguard gives tips and warnings during your run.",
+   "tags": [
+    "lifeguard",
+    "tips",
+    "help",
+    "game",
+    "coach"
+   ]
+  },
+  {
+   "q": "Can I turn off the sound or music?",
+   "a": "Yes. Use the 🔊 sound button in the game, and the small music button to pause just the music. The start menu also has Settings.",
+   "tags": [
+    "sound",
+    "music",
+    "mute",
+    "settings",
+    "audio"
+   ]
+  },
+  {
+   "q": "What is the 3D graphics option?",
+   "a": "It's a beta setting in the game's Settings. It shows a real 3D ocean, wave and surfer, and turns itself off on phones that can't keep it smooth.",
+   "tags": [
+    "3d",
+    "graphics",
+    "settings",
+    "beta",
+    "phone"
+   ]
+  },
+  {
+   "q": "Can cheats or bots count?",
+   "a": "No. Scores made with cheats, scripts, bots or multiple accounts don't count.",
+   "tags": [
+    "cheat",
+    "bot",
+    "rules",
+    "fair",
+    "multiple accounts"
+   ]
+  },
+  {
+   "q": "Is there a kid mode?",
+   "a": "I don't have a kid mode in the app. The game has no weapons or boss fights. Ask staff if you have questions.",
+   "tags": [
+    "kid",
+    "kids",
+    "children",
+    "family",
+    "mode"
+   ]
+  },
+  {
+   "q": "Can I order from my table?",
+   "a": "Yes. Pick where you're sitting (Patio, Bar, Dining room or Rooftop), add items, and send your order.",
+   "tags": [
+    "order",
+    "table",
+    "phone",
+    "mobile",
+    "qr"
+   ]
+  },
+  {
+   "q": "What if I scanned a table QR code?",
+   "a": "Then your spot is already picked for you. If you picked a table zone, tap your table number (1–20) so your server finds you.",
+   "tags": [
+    "qr",
+    "scan",
+    "table",
+    "code",
+    "number"
+   ]
+  },
+  {
+   "q": "How do I pay?",
+   "a": "Pay your server or bartender like normal. The app doesn't take payment.",
+   "tags": [
+    "pay",
+    "payment",
+    "check",
+    "bill",
+    "server"
+   ]
+  },
+  {
+   "q": "Do I earn points when I order in the app?",
+   "a": "Members earn 10 points per $1 on eligible purchases. Join Rewards to start saving them.",
+   "tags": [
+    "order",
+    "points",
+    "earn",
+    "member",
+    "app"
+   ]
+  },
+  {
+   "q": "What does MP mean on the menu?",
+   "a": "MP means market price. Ask your server for the price.",
+   "tags": [
+    "mp",
+    "market price",
+    "oysters",
+    "price"
+   ]
+  },
+  {
+   "q": "What shareables do you have?",
+   "a": "Oysters on the Half Shell (MP), Spicy Tuna Crispy Rice $22, Coconut Shrimp $21, Bang Bang Shrimp $18, Jungle Fries $12, Chips, Salsa & Guac $14, Wings $17, Tostadas de la Tierra $18, 12-Hr Smoked Pork Sliders $19, Calamari $15, Sticky Tiki Ribs $18.",
+   "tags": [
+    "shareables",
+    "appetizers",
+    "starters",
+    "menu",
+    "prices"
+   ]
+  },
+  {
+   "q": "What tacos do you have?",
+   "a": "Signature Island Tacos: Tamarind Glazed Gulf Shrimp $18, Blackened Salmon $21, Vegan Chorizo $19, Baja Blaze Chicken $17, Beer Battered Fish $20.",
+   "tags": [
+    "tacos",
+    "menu",
+    "island",
+    "prices",
+    "fish"
+   ]
+  },
+  {
+   "q": "What burgers and sandwiches do you have?",
+   "a": "Breakwater Bites: Poke Bowl $24, Vegan Burger $22, BBQ Smoke Wave $22, Smash-N-Stack Burger $18, Chipotle Chicken Sandwich $20, Cheesesteak $16, Veggie Burrito $19.",
+   "tags": [
+    "burger",
+    "sandwich",
+    "breakwater",
+    "menu",
+    "prices"
+   ]
+  },
+  {
+   "q": "What entrées do you have?",
+   "a": "Blackened Salmon $32, Shrimp Scampi Skewers $31, Chili-Kissed Sesame Seared Ahi $32, Adobo Grilled Chicken $29, Crispy Chicken Milanese $30, Steak & Fries $33, Fish N' Chips $24, Tiki Ribs $31.",
+   "tags": [
+    "entree",
+    "dinner",
+    "mains",
+    "menu",
+    "prices"
+   ]
+  },
+  {
+   "q": "Do you have pizza, pasta or salads?",
+   "a": "Flatbreads: Margherita $15, Pepperoni $16, Elote $17, In-N-Out Style $17, BBQ Chicken $17. Pasta: Build-Your-Own $18. Salads: Citrus Bomb $15, South American Caesar $18, Sesame Chicken $21.",
+   "tags": [
+    "pizza",
+    "flatbread",
+    "pasta",
+    "salad",
+    "menu"
+   ]
+  },
+  {
+   "q": "What's on the brunch menu?",
+   "a": "Served until 4 PM: Huevos con Gallo Pinto $19, Avocado Toast $14, French Toast $18, Breakfast Burrito $18, Steak & Eggs $29, Breakfast Burger $15.",
+   "tags": [
+    "brunch",
+    "breakfast",
+    "menu",
+    "eggs",
+    "prices"
+   ]
+  },
+  {
+   "q": "What cocktails do you have?",
+   "a": "Nalu Margarita $17, Makai $17, Frozen Cocoa De Rasta $18, Frozen Blackberry Luau $18, Pura Vida $18, Lost in Sayulita $19, Sunset Sour $20, Barrel-Aged Old Fashioned $19, Pau Hana Punch $18. 21+ with ID.",
+   "tags": [
+    "cocktails",
+    "drinks",
+    "menu",
+    "margarita",
+    "prices"
+   ]
+  },
+  {
+   "q": "Do you have non-alcoholic drinks?",
+   "a": "Mocktails: Wish You Were Here $15 and Put the Lime in the Coconut $15. There's also Coco Cold Brew coffee for $11.",
+   "tags": [
+    "mocktail",
+    "non-alcoholic",
+    "coffee",
+    "drinks",
+    "menu"
+   ]
+  },
+  {
+   "q": "What beer do you have?",
+   "a": "Nalu Vida Blonde Ale is $9.50 on the app menu. Drafts are $2 off at happy hour.",
+   "tags": [
+    "beer",
+    "draft",
+    "blonde ale",
+    "menu",
+    "price"
+   ]
+  },
+  {
+   "q": "Do you have vegan options?",
+   "a": "Yes. The menu includes Vegan Chorizo Tacos, the Vegan Burger and the BBQ Smoke Wave. Ask your server about other vegan or allergy needs.",
+   "tags": [
+    "vegan",
+    "vegetarian",
+    "plant-based",
+    "menu",
+    "diet"
+   ]
+  },
+  {
+   "q": "Do you have gluten-free or allergy info?",
+   "a": "I don't have allergy or gluten-free details. Please ask your server or call (310) 437-0060.",
+   "tags": [
+    "allergy",
+    "gluten",
+    "dietary",
+    "allergen",
+    "food"
+   ]
+  },
+  {
+   "q": "Can I see photos of the food?",
+   "a": "Yes. Tap a menu photo to zoom in.",
+   "tags": [
+    "photos",
+    "pictures",
+    "menu",
+    "zoom",
+    "images"
+   ]
+  },
+  {
+   "q": "Are there holiday specials?",
+   "a": "The app shows holiday specials during their dates, with a banner and a Specials card. I don't have details outside what the app shows.",
+   "tags": [
+    "holiday",
+    "seasonal",
+    "special",
+    "banner",
+    "event"
+   ]
+  },
+  {
+   "q": "What languages does the app support?",
+   "a": "Tap the 🌐 menu for English, Español, 简体中文, 繁體中文, 한국어, Tagalog, Tiếng Việt, Հայերեն, فارسی, 日本語, ไทย and Русский. Restaurant and game names stay in English.",
+   "tags": [
+    "language",
+    "translate",
+    "spanish",
+    "español",
+    "korean",
+    "chinese"
+   ]
+  },
+  {
+   "q": "Does the app show Thai baht prices?",
+   "a": "Yes. If you choose Thai, prices show an approximate baht amount next to the dollar price.",
+   "tags": [
+    "thai",
+    "baht",
+    "currency",
+    "language",
+    "price"
+   ]
+  },
+  {
+   "q": "How do I get help from staff?",
+   "a": "Flag your server or bartender, or call (310) 437-0060.",
+   "tags": [
+    "staff",
+    "help",
+    "server",
+    "support",
+    "contact"
+   ]
+  },
+  {
+   "q": "I have a problem with my points or reward. Who can help?",
+   "a": "Ask your server, or call (310) 437-0060.",
+   "tags": [
+    "problem",
+    "help",
+    "points",
+    "reward",
+    "issue"
+   ]
+  },
+  {
+   "q": "Is there a bonus for being at the location or arriving early?",
+   "a": "I don't have an early-bird or location bonus for Nalu Vida. Ask staff or call (310) 437-0060.",
+   "tags": [
+    "early bird",
+    "location",
+    "bonus",
+    "check-in",
+    "nearby"
+   ]
+  },
+  {
+   "q": "Do I get points for leaving a review?",
+   "a": "No. Nobody gets points or prizes for reviewing. The app has a button to write an honest Google review if you want.",
+   "tags": [
+    "review",
+    "google",
+    "points",
+    "feedback"
+   ]
+  },
+  {
+   "q": "How is my information used?",
+   "a": "We ask for contact info only when needed, such as sending an order, and you can play the game without an account. Texts about deals are optional. Ask staff for more details.",
+   "tags": [
+    "privacy",
+    "data",
+    "phone",
+    "info",
+    "text"
+   ]
+  },
+  {
+   "q": "Can I get texts from you?",
+   "a": "Texts about deals are optional and off unless you check the box when you join. Reply STOP to opt out.",
+   "tags": [
+    "text",
+    "sms",
+    "deals",
+    "stop",
+    "marketing"
+   ]
+  },
+  {
+   "q": "Why can't I use the same reward twice in a day?",
+   "a": "The rules are one code per visit and one prize per day. These limits are checked by our server, so a second phone or a cleared browser doesn't get around them.",
+   "tags": [
+    "limit",
+    "server",
+    "one per day",
+    "rules",
+    "code"
+   ]
+  }
+ ],
+ "updated": "2026-10-14T04:14:34+00:00",
+ "source_commit": "b7f36be",
+ "app": "nalu-vida"
+}

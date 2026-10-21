@@ -1,6 +1,8 @@
 {
  "restaurant": "nalu-vida",
  "outro": "outro.mp4",
+ "lite": "1080/",
+ "v": "4k1",
  "clips": [
   {
    "file": "c01.mp4",

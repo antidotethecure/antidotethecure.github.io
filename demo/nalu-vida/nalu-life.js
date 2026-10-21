@@ -82,7 +82,7 @@ export async function makeNaluLife(THREE, O) {
   }
   hide.forEach(o => { if (o) o.visible = false; });
   // a big LED screen on the boardwalk by Nalu Vida playing Antidote's review (muted, inline, looping; poster if autoplay is blocked)
-  const VB = BBM.makeVideoBoards(THREE, { src: new URL("img/review/billboard.mp4", location.href).href, poster: new URL("img/review/billboard.jpg", location.href).href });
+  const VB = BBM.makeVideoBoards(THREE, { src: new URL("img/review/billboard.mp4?v=4k1", location.href).href, poster: new URL("img/review/billboard.jpg?v=4k1", location.href).href });
   const board = VB.create({ w: 46, pole: 24, caption: "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" }); board.scale.setScalar(1); scene.add(board);
   const _v = new THREE.Vector3();
 

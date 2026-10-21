@@ -1,0 +1,37 @@
+/* "Where to get it for less" (stores.js) — lives inside the parts sheet. Uses the app's tokens from app.css. */
+.st-wrap{margin:14px 0 4px;padding:12px;border:1px solid color-mix(in srgb,var(--accent2) 45%,transparent);border-radius:16px;background:linear-gradient(160deg,color-mix(in srgb,var(--accent2) 9%,#0b1120),#0b1120 65%)}
+.st-head small{display:block;color:var(--dim);font-size:13.5px;margin-top:2px}
+.st-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:10px}
+.st-filter button{min-width:64px;min-height:36px;font-size:13.5px}
+.st-geo{cursor:pointer;min-height:34px;font-family:inherit}
+.st-geo[disabled]{opacity:.7;cursor:wait}
+.st-from{font-size:13px;margin-top:6px}
+.st-say{margin:10px 0}
+.st-parts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 6px;font-size:13px;color:var(--dim)}
+.st-parts .pill{cursor:pointer;font-family:inherit;min-height:32px;text-align:left}
+.st-parts .pill.acc{color:#fff;border-color:var(--accent)}
+.st-script{word-break:break-word}
+.st-bring{border:1px dashed color-mix(in srgb,var(--gold) 55%,transparent);border-radius:14px;padding:8px 12px;margin:10px 0;background:#ffffff05}
+.st-bring summary{cursor:pointer;font-weight:800;min-height:32px;display:flex;align-items:center}
+.st-bring ul{margin:6px 0 0;padding-left:20px;font-size:14.5px;line-height:1.45}
+.st-card{border:1px solid var(--edge);border-radius:14px;padding:10px 12px;margin:8px 0;background:#ffffff05}
+.st-card.st-self,.st-card.st-full{border-left:3px solid var(--good)}
+.st-card.st-new{border-left:3px solid var(--gold)}
+.st-card.st-chain{border-left:3px solid var(--accent2)}
+.st-top{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+.st-top b{display:block;font-size:16px;line-height:1.25}
+.st-top small{display:block;color:var(--dim);font-size:13px;margin-top:2px}
+.st-dist{flex:none;font:800 13px "Rajdhani",sans-serif;color:#fff;background:#ffffff12;border:1px solid var(--edge);border-radius:99px;padding:2px 9px;white-space:nowrap}
+.st-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.st-tags span{font:800 10.5px "Rajdhani",sans-serif;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;padding:2px 8px}
+.st-used{background:var(--good);color:#04140d}
+.st-type{background:#ffffff10;color:var(--dim);border:1px solid var(--edge)}
+.st-good{margin:6px 0 0;font-size:14.5px;line-height:1.4}
+.st-hrs{margin:4px 0 0;font-size:13.5px;color:var(--dim)}
+.st-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.st-btns .btn{flex:1 1 40%;text-align:center}
+.st-inv{display:block;margin-top:8px;font-size:14px;font-weight:700;color:var(--accent2)}
+.st-src{display:block;margin-top:6px;font-size:11.5px;color:var(--dim)}
+.st-src a{color:var(--dim)}
+.st-carlos{margin:12px 0 0}
+.st-carlos small{display:block;color:var(--dim);font-size:13px;margin-top:6px;text-align:center}

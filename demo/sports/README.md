@@ -55,6 +55,21 @@ window.SPORTS_CFG = {
 - **Cache busters:** bump `?v=sb1` on every include when `sports.js`, `sports.css` or `teams.js` change (GitHub Pages caches for 10 minutes).
 - **Add-to-Home-Screen:** `demo/a2hs.js` waits while `#sp-ov` is open, so the prompt never covers the scoreboard.
 
+## All games + Watch live (2026-10-15)
+
+- **📅 All games tab** (on by default; `allGames: false` hides it): every game today in the enabled leagues, not only the region's teams, with league chips. `teamsTab` renames the first tab (e.g. "LA teams"). Picks stay on the region's games only.
+- **Watch button on every game that isn't final:** "▶ Watch live" while it's on, "📺 Where to watch" before. The sheet shows:
+  1. `watchAt` spots, the client's own place first, then sister spots. Each has Directions, Call, Book and "Their app".
+  2. The game's TV and streaming channels from ESPN, linked only to each network's **official** site or app. The viewer signs in with their own subscription. There are no unofficial streams, ever.
+- **Melody's carousel** (`layout.js`) gets an "📅 All games" chip, plus the same venues in its Where to watch sheet. **Nalu Vida** is install #2: ticker under the hero buttons, a "📺 Live scores" button, picks just for fun, no Fight Night.
+
+```js
+watchAt: [{ name: "Nalu Vida", note: "Every game on the TVs, …", address: "1 Washington Blvd, Venice, CA 90292",
+            tel: "+13104370060", book: "https://resy.com/…" },
+          { name: "Melody Bar & Grill (sister spot)", note: "…", address: "…", tel: "…", app: "../melody-lax/", appLabel: "✈️ Their app" }]
+```
+Notes must be the owner's own wording ("every game on the TVs" comes from each restaurant's page). Never promise a specific game is on.
+
 ## Rules the module keeps
 
 - Teams are matched by **ESPN team ID per league**, never by display name.

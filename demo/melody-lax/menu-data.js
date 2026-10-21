@@ -45,7 +45,7 @@ food: [
   ["Tomato Bisque Soup (Cup)",11.00,"Served with 1/2 grilled cheese dunker.","tomato-bisque","steam"],
   ["Black Bean Soup (Bowl)",14.00,"Olive oil garlic toast.","black-bean-soup","steam"],
   ["Black Bean Soup (Cup)",9.75,"Olive oil garlic toast.","black-bean-soup","steam"]]},
- {id:"tacos",name:"Tacos & Burritos",note:"Tuesdays: $3 tacos.",items:[
+ {id:"tacos",name:"Tacos & Burritos",note:"Taco Tuesday: every taco on the menu is $4.",items:[
   ["Shrimp Tacos",16.00,"2 tacos, cajun spiced shrimp sautéed with butter, garlic & onions, cabbage, cilantro, sweet honey jalapeños & spicy aioli.","shrimp-tacos","herbs"],
   ["Salmon Tacos",16.00,"2 blackened salmon with onions, cilantro, lettuce, & creme de lemon.","salmon-tacos","herbs"],
   ["Carnitas Tacos",14.00,"2 slow roasted pork topped with onions, cilantro & lettuce.","carnitas-tacos","herbs"],
@@ -83,5 +83,10 @@ specials: [
  {id:"cinco",holiday:"cinco",title:"Cinco Taco Fiesta",desc:"Carnitas Tacos + Nachos to share, and 20% off House Margaritas (21+).",item:"Carnitas Tacos",start:"05-01",end:"05-05"},
  {id:"july4",holiday:"july4",title:"Fourth of July Ribs",desc:"Baby Back Ribs & Fries with a side of Onion Strings for the fireworks crew.",item:"Baby Back Ribs & Fries",start:"07-01",end:"07-04"}
 ],
-weekly: ["Happy hour 3–6 daily","Mon: half off burgers 11–3","Tue: $3 tacos & $6 margaritas","Thu: half off sandwiches 11–3","Fri: $3 sliders 11–3"]
+// What still needs fixing (shows on Christian HQ's red to-do list + the Prices tab). Update when it's fixed:
+//   realPhotos = dishes that already have a REAL photo (keep in step with realphotos.js); every other item needs one.
+//   unconfirmed = "drinks" while the drink prices are still samples, plus any item name whose price/description Melody must check.
+realPhotos: ["Lemon Pepper Wings","Lobster Mac & Cheese","Melody Burger Mac & Cheese","Chicken Parmesan Mac & Cheese","Mango Margarita"],
+unconfirmed: ["drinks"],
+weekly: ["Happy hour 3–6 daily","Mon: half off burgers 11–3","Tue: $4 tacos (every taco) & $6 margaritas","Thu: half off sandwiches 11–3","Fri: $3 sliders 11–3"]
 };

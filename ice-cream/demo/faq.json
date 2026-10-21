@@ -1,0 +1,867 @@
+{
+ "name": "Paletas El Sol",
+ "phone": "",
+ "facts": [
+  "Paletas El Sol is a sample ice cream truck with live truck alerts in its app.",
+  "Join with your first name and get 10 free points.",
+  "Turn on truck alerts and the app rings your phone when the truck is close.",
+  "Check in at the truck by scanning the QR on it, once per truck visit.",
+  "5 visits = a treat on us: 10% off or an extra scoop free.",
+  "Alerts on = +5 bonus points every visit.",
+  "Rewards: 50¢ off (30 pts), $1 off (50 pts), free chili cheese Fritos (80 pts), free paleta (100 pts).",
+  "Ring distance options: 0.15, 0.25 or 0.5 miles.",
+  "Quiet after 8 PM can be turned on in Settings.",
+  "Your house pin is saved only on your phone.",
+  "Your info is never sold.",
+  "The app is in English and Español.",
+  "Menu: paletas, ice cream bars, raspados, chili cheese Fritos, elote en vaso, elote on the cob."
+ ],
+ "suggested": [
+  "How do I join?",
+  "How do I earn points?",
+  "What rewards can I get?",
+  "How do truck alerts work?",
+  "What's on the menu?",
+  "How do I get the app on my iPhone?"
+ ],
+ "qa": [
+  {
+   "q": "What is this app?",
+   "a": "It's the Paletas El Sol truck app. It shows the truck on a live map, tells you when it's close, and lets you collect points and rewards.",
+   "tags": [
+    "app",
+    "about",
+    "truck",
+    "what is",
+    "alerts"
+   ]
+  },
+  {
+   "q": "How do I join?",
+   "a": "Type your first name and tap \"Join + get 10 free points.\" It takes about 10 seconds.",
+   "tags": [
+    "join",
+    "sign up",
+    "signup",
+    "register",
+    "account",
+    "free points"
+   ]
+  },
+  {
+   "q": "Do I get anything for joining?",
+   "a": "Yes, you get 10 free points when you join.",
+   "tags": [
+    "join",
+    "free points",
+    "welcome",
+    "bonus",
+    "sign up"
+   ]
+  },
+  {
+   "q": "Do I need to give my full name?",
+   "a": "No, the app only asks for your first name.",
+   "tags": [
+    "name",
+    "join",
+    "privacy",
+    "sign up"
+   ]
+  },
+  {
+   "q": "Does it cost anything to join?",
+   "a": "Joining is free, and you get 10 free points.",
+   "tags": [
+    "free",
+    "cost",
+    "join",
+    "price",
+    "sign up"
+   ]
+  },
+  {
+   "q": "How do truck alerts work?",
+   "a": "The app rings your phone when the truck is close to your street. You get one alert per truck visit.",
+   "tags": [
+    "alerts",
+    "notification",
+    "ring",
+    "close",
+    "truck",
+    "jingle"
+   ]
+  },
+  {
+   "q": "How do I see where the truck is?",
+   "a": "Open the app and look at the live map at the top. It shows your house pin and the truck driving toward you.",
+   "tags": [
+    "map",
+    "where",
+    "truck",
+    "live",
+    "track",
+    "location"
+   ]
+  },
+  {
+   "q": "How do I know when the truck will get to me?",
+   "a": "The app shows a countdown like \"Arriving in ~10 min\" along with how many miles away the truck is.",
+   "tags": [
+    "eta",
+    "arrival",
+    "time",
+    "how long",
+    "minutes",
+    "when"
+   ]
+  },
+  {
+   "q": "What do the truck status messages mean?",
+   "a": "The app tells you if the truck is on the way, stopped to sell, almost here, on your street, or has left.",
+   "tags": [
+    "status",
+    "on the way",
+    "almost here",
+    "stopped",
+    "left"
+   ]
+  },
+  {
+   "q": "How fast does the truck drive?",
+   "a": "The truck drives at about 10 mph. It stops to sell every few blocks, and sits on your street for about a minute and a half.",
+   "tags": [
+    "speed",
+    "mph",
+    "stops",
+    "how fast",
+    "truck",
+    "eta"
+   ]
+  },
+  {
+   "q": "What's the ice cream blimp on the map?",
+   "a": "It's a little ice cream sign above the truck. It gets more scoops as the truck gets closer, and melts when the truck leaves your area.",
+   "tags": [
+    "blimp",
+    "scoops",
+    "map",
+    "truck",
+    "melting"
+   ]
+  },
+  {
+   "q": "What does the \"I'm coming!\" button do?",
+   "a": "When the alert rings, tapping \"I'm coming!\" lets the driver see that 1 person is on the way.",
+   "tags": [
+    "coming",
+    "alert",
+    "driver",
+    "button",
+    "on my way"
+   ]
+  },
+  {
+   "q": "How do I stop the alert sound?",
+   "a": "Tap \"Silence\" on the alert.",
+   "tags": [
+    "silence",
+    "stop",
+    "sound",
+    "alert",
+    "mute"
+   ]
+  },
+  {
+   "q": "Can I test the alert?",
+   "a": "Yes, tap \"Test the alert\" to hear the jingle that rings when the truck is close.",
+   "tags": [
+    "test",
+    "alert",
+    "jingle",
+    "sound",
+    "ring"
+   ]
+  },
+  {
+   "q": "What is the jingle?",
+   "a": "It's the music-box tune that plays when the truck is near. You can turn it off in Settings with \"Play the jingle.\"",
+   "tags": [
+    "jingle",
+    "music",
+    "sound",
+    "song",
+    "ring"
+   ]
+  },
+  {
+   "q": "How do I tell the app which street I'm on?",
+   "a": "Tap \"Allow location\" or \"Type my street\" and enter your street and city. The app uses it to know which street to ring.",
+   "tags": [
+    "location",
+    "street",
+    "address",
+    "pin",
+    "house",
+    "gps"
+   ]
+  },
+  {
+   "q": "Do you follow my location?",
+   "a": "No. Your location is only used to know which street to ring when the truck is close, and you can turn it off any time.",
+   "tags": [
+    "location",
+    "privacy",
+    "tracking",
+    "gps",
+    "follow"
+   ]
+  },
+  {
+   "q": "Does the truck see my address?",
+   "a": "No. Your house pin is saved only on your phone, and the truck never sees your address.",
+   "tags": [
+    "privacy",
+    "address",
+    "pin",
+    "house",
+    "phone"
+   ]
+  },
+  {
+   "q": "What if the street I typed isn't found?",
+   "a": "The app will say it couldn't find that street, and the map keeps showing your last pin. Try typing the street and city again.",
+   "tags": [
+    "street",
+    "not found",
+    "address",
+    "map",
+    "error"
+   ]
+  },
+  {
+   "q": "How do I turn on alerts on iPhone?",
+   "a": "Tap Share (the square with the arrow), then Add to Home Screen. Open the app from your Home Screen and allow notifications. That's Apple's rule for alerts.",
+   "tags": [
+    "iphone",
+    "ios",
+    "alerts",
+    "install",
+    "home screen",
+    "notifications"
+   ]
+  },
+  {
+   "q": "How do I turn on alerts on Android?",
+   "a": "Just tap \"Allow\" when the app asks.",
+   "tags": [
+    "android",
+    "alerts",
+    "notifications",
+    "allow"
+   ]
+  },
+  {
+   "q": "How do I add the app to my home screen?",
+   "a": "On iPhone, tap Share, then Add to Home Screen, and open it from there. On Android, just tap \"Allow\" when asked about alerts.",
+   "tags": [
+    "install",
+    "home screen",
+    "add",
+    "app",
+    "iphone",
+    "android"
+   ]
+  },
+  {
+   "q": "How far away will the truck ring me?",
+   "a": "You choose in Settings: when the truck is within 0.15, 0.25 or 0.5 miles.",
+   "tags": [
+    "distance",
+    "ring",
+    "settings",
+    "miles",
+    "alert",
+    "range"
+   ]
+  },
+  {
+   "q": "Can I turn alerts off?",
+   "a": "Yes. Switch \"Alerts on\" off in Settings any time. Note you'd miss the +5 bonus points per visit.",
+   "tags": [
+    "alerts",
+    "off",
+    "turn off",
+    "settings",
+    "stop",
+    "notifications"
+   ]
+  },
+  {
+   "q": "Can I stop alerts at night?",
+   "a": "Yes, there's a \"Quiet after 8 PM\" switch in Settings.",
+   "tags": [
+    "quiet",
+    "night",
+    "8 pm",
+    "settings",
+    "alerts",
+    "sleep"
+   ]
+  },
+  {
+   "q": "How many alerts will I get?",
+   "a": "One alert per truck visit.",
+   "tags": [
+    "alerts",
+    "how many",
+    "once",
+    "visit",
+    "spam"
+   ]
+  },
+  {
+   "q": "How do I earn points?",
+   "a": "You get 10 free points when you join, and +5 bonus points every visit if your truck alerts are on. The driver also scans your code at the window when you buy.",
+   "tags": [
+    "points",
+    "earn",
+    "pts",
+    "how to",
+    "collect",
+    "stars"
+   ]
+  },
+  {
+   "q": "How many points do I get per purchase?",
+   "a": "The app's demo adds 10 points per purchase. For the exact amount on the real truck, ask the driver.",
+   "tags": [
+    "points",
+    "per dollar",
+    "ratio",
+    "purchase",
+    "how many points",
+    "buy"
+   ]
+  },
+  {
+   "q": "Is there a points-per-dollar ratio?",
+   "a": "The app doesn't show a per-dollar ratio. It shows 10 points per purchase in the demo, so ask the driver for the real truck's rate.",
+   "tags": [
+    "ratio",
+    "per dollar",
+    "points",
+    "how many points",
+    "spend"
+   ]
+  },
+  {
+   "q": "What are the alert bonus points?",
+   "a": "If you keep truck alerts on, you get +5 bonus points every visit.",
+   "tags": [
+    "bonus",
+    "alerts",
+    "5 points",
+    "extra points",
+    "visit"
+   ]
+  },
+  {
+   "q": "How do I earn points when I buy something?",
+   "a": "At the window, the driver scans your code in the app. Open the Points section to show it.",
+   "tags": [
+    "points",
+    "scan",
+    "code",
+    "driver",
+    "window",
+    "buy"
+   ]
+  },
+  {
+   "q": "Where do I see my points?",
+   "a": "In the \"Points + rewards\" section of the app, which shows your total and how far you are from the next reward.",
+   "tags": [
+    "points",
+    "balance",
+    "total",
+    "check",
+    "rewards"
+   ]
+  },
+  {
+   "q": "What rewards can I get?",
+   "a": "50¢ off (30 pts), $1 off (50 pts), free chili cheese Fritos (80 pts), and a free paleta (100 pts).",
+   "tags": [
+    "rewards",
+    "prizes",
+    "free",
+    "redeem",
+    "points",
+    "cost"
+   ]
+  },
+  {
+   "q": "How many points for 50¢ off?",
+   "a": "50¢ off costs 30 points.",
+   "tags": [
+    "50 cents",
+    "discount",
+    "points",
+    "reward",
+    "30"
+   ]
+  },
+  {
+   "q": "How many points for $1 off?",
+   "a": "$1 off costs 50 points.",
+   "tags": [
+    "$1 off",
+    "dollar off",
+    "discount",
+    "points",
+    "reward",
+    "50"
+   ]
+  },
+  {
+   "q": "How many points for free chili cheese Fritos?",
+   "a": "Free chili cheese Fritos cost 80 points.",
+   "tags": [
+    "fritos",
+    "chili cheese",
+    "free",
+    "points",
+    "reward",
+    "80"
+   ]
+  },
+  {
+   "q": "How many points for a free paleta?",
+   "a": "A free paleta costs 100 points.",
+   "tags": [
+    "paleta",
+    "free",
+    "points",
+    "reward",
+    "100"
+   ]
+  },
+  {
+   "q": "How do I redeem a reward?",
+   "a": "Tap \"Use\" next to the reward once you have enough points. You'll get a code to show the driver.",
+   "tags": [
+    "redeem",
+    "use",
+    "reward",
+    "code",
+    "driver",
+    "how to"
+   ]
+  },
+  {
+   "q": "Why is the Use button grayed out?",
+   "a": "You don't have enough points for that reward yet. The app shows how many more points you need for the next one.",
+   "tags": [
+    "use",
+    "disabled",
+    "points",
+    "reward",
+    "not enough"
+   ]
+  },
+  {
+   "q": "Do my points get used up when I redeem?",
+   "a": "Yes, redeeming a reward takes its point cost off your total.",
+   "tags": [
+    "redeem",
+    "points",
+    "spend",
+    "deduct",
+    "reward"
+   ]
+  },
+  {
+   "q": "What is the visit card?",
+   "a": "It's a 5-visit card. Check in on 5 visits and you get a treat on us.",
+   "tags": [
+    "visit card",
+    "punch card",
+    "5 visits",
+    "loyalty",
+    "treat"
+   ]
+  },
+  {
+   "q": "What do I get on my 5th visit?",
+   "a": "You pick a treat: 10% off or an extra scoop free.",
+   "tags": [
+    "5th visit",
+    "treat",
+    "10% off",
+    "extra scoop",
+    "free",
+    "reward"
+   ]
+  },
+  {
+   "q": "How do I check in at the truck?",
+   "a": "Scan the QR code on the truck. You can check in once per truck visit.",
+   "tags": [
+    "check in",
+    "qr",
+    "scan",
+    "visit",
+    "truck"
+   ]
+  },
+  {
+   "q": "Can I check in more than once per visit?",
+   "a": "No, it's one check-in per truck visit.",
+   "tags": [
+    "check in",
+    "limit",
+    "once",
+    "visit",
+    "qr"
+   ]
+  },
+  {
+   "q": "What happens to my visit card after I pick a treat?",
+   "a": "Your card starts over from zero.",
+   "tags": [
+    "visit card",
+    "reset",
+    "start over",
+    "treat",
+    "5 visits"
+   ]
+  },
+  {
+   "q": "How do I use my treat?",
+   "a": "After picking it, show the code to the driver.",
+   "tags": [
+    "treat",
+    "redeem",
+    "code",
+    "driver",
+    "10% off",
+    "extra scoop"
+   ]
+  },
+  {
+   "q": "What's on the menu?",
+   "a": "Paletas, ice cream bars, raspados, chili cheese Fritos, elote en vaso, and elote on the cob.",
+   "tags": [
+    "menu",
+    "food",
+    "items",
+    "what do you sell",
+    "ice cream"
+   ]
+  },
+  {
+   "q": "What flavors do the paletas come in?",
+   "a": "Strawberry, mango con chile, lime and coconut.",
+   "tags": [
+    "paletas",
+    "flavors",
+    "strawberry",
+    "mango",
+    "lime",
+    "coconut"
+   ]
+  },
+  {
+   "q": "What ice cream bars do you have?",
+   "a": "Cookies & cream, strawberry shortcake and chocolate.",
+   "tags": [
+    "ice cream bars",
+    "flavors",
+    "cookies and cream",
+    "strawberry shortcake",
+    "chocolate"
+   ]
+  },
+  {
+   "q": "What are raspados?",
+   "a": "Shaved ice in tamarind, mango or strawberry.",
+   "tags": [
+    "raspados",
+    "shaved ice",
+    "flavors",
+    "tamarind",
+    "mango",
+    "strawberry"
+   ]
+  },
+  {
+   "q": "What are the chili cheese Fritos?",
+   "a": "Fritos with warm chili and nacho cheese.",
+   "tags": [
+    "fritos",
+    "chili cheese",
+    "nacho",
+    "snack",
+    "menu"
+   ]
+  },
+  {
+   "q": "What is elote en vaso?",
+   "a": "Corn in a cup with mayo, cheese, chile and lime.",
+   "tags": [
+    "elote",
+    "corn",
+    "cup",
+    "vaso",
+    "menu"
+   ]
+  },
+  {
+   "q": "What is elote on the cob?",
+   "a": "It has the same toppings as the cup, but on a stick.",
+   "tags": [
+    "elote",
+    "cob",
+    "corn",
+    "stick",
+    "menu"
+   ]
+  },
+  {
+   "q": "How much do things cost?",
+   "a": "The app shows sample prices: paletas $2.50, ice cream bars $3.00, raspados $4.00, chili cheese Fritos $5.00, elote en vaso $5.00, elote on the cob $4.50. The real truck sets its own, so check with the driver.",
+   "tags": [
+    "price",
+    "cost",
+    "menu",
+    "how much",
+    "prices"
+   ]
+  },
+  {
+   "q": "Can I order ahead in the app?",
+   "a": "The app doesn't have ordering or payment. You buy from the driver at the truck window.",
+   "tags": [
+    "order",
+    "pay",
+    "payment",
+    "ahead",
+    "online",
+    "window"
+   ]
+  },
+  {
+   "q": "How do I pay?",
+   "a": "The app doesn't take payments. Ask the driver at the window how they accept payment.",
+   "tags": [
+    "pay",
+    "payment",
+    "cash",
+    "card",
+    "how to pay"
+   ]
+  },
+  {
+   "q": "What are your hours?",
+   "a": "I don't have hours listed. The truck follows a route, so watch the live map or ask staff.",
+   "tags": [
+    "hours",
+    "open",
+    "close",
+    "time",
+    "schedule"
+   ]
+  },
+  {
+   "q": "What's the truck's phone number?",
+   "a": "I don't have a phone number for the truck. Ask the driver at the window.",
+   "tags": [
+    "phone",
+    "number",
+    "call",
+    "contact"
+   ]
+  },
+  {
+   "q": "Where is the truck located?",
+   "a": "It drives a route, so there's no fixed address. Check the live map to see where it is.",
+   "tags": [
+    "address",
+    "location",
+    "where",
+    "find",
+    "truck",
+    "map"
+   ]
+  },
+  {
+   "q": "Where can I park?",
+   "a": "I don't have any parking info, since the truck comes to your street. Ask the driver if you need help.",
+   "tags": [
+    "parking",
+    "park",
+    "where",
+    "street"
+   ]
+  },
+  {
+   "q": "Are there games in the app?",
+   "a": "There are no games in this app. It has truck alerts, points, a visit card and a menu.",
+   "tags": [
+    "games",
+    "play",
+    "fun",
+    "arcade",
+    "leaderboard"
+   ]
+  },
+  {
+   "q": "Is there a weekly contest or leaderboard?",
+   "a": "No, there are no contests or leaderboards in this app.",
+   "tags": [
+    "contest",
+    "leaderboard",
+    "weekly",
+    "prize",
+    "champion"
+   ]
+  },
+  {
+   "q": "Is there a birthday club or referral bonus?",
+   "a": "I don't see a birthday club or referral bonus in the app. Ask the driver about special deals.",
+   "tags": [
+    "birthday",
+    "referral",
+    "share",
+    "friends",
+    "bonus",
+    "deal"
+   ]
+  },
+  {
+   "q": "Are there levels or tiers?",
+   "a": "No, the app has points, rewards and the 5-visit card. There are no levels or tiers.",
+   "tags": [
+    "levels",
+    "tiers",
+    "vip",
+    "status",
+    "rank"
+   ]
+  },
+  {
+   "q": "Is there a happy hour or daily special?",
+   "a": "I don't have any happy hour or specials listed. Ask the driver what's available today.",
+   "tags": [
+    "happy hour",
+    "special",
+    "deal",
+    "daily",
+    "discount"
+   ]
+  },
+  {
+   "q": "Is the app available in Spanish?",
+   "a": "Yes, you can switch between English and Español.",
+   "tags": [
+    "spanish",
+    "español",
+    "language",
+    "english",
+    "translate"
+   ]
+  },
+  {
+   "q": "Is there a kids mode?",
+   "a": "The app doesn't have a kids mode.",
+   "tags": [
+    "kids",
+    "children",
+    "kid mode",
+    "family"
+   ]
+  },
+  {
+   "q": "Is my info sold?",
+   "a": "No, your info is never sold.",
+   "tags": [
+    "privacy",
+    "sold",
+    "data",
+    "info",
+    "safe"
+   ]
+  },
+  {
+   "q": "How do I delete my info?",
+   "a": "Tap \"Leave + delete my info\" in Settings.",
+   "tags": [
+    "delete",
+    "leave",
+    "remove",
+    "privacy",
+    "data",
+    "account"
+   ]
+  },
+  {
+   "q": "Can I change my settings later?",
+   "a": "Yes. In Settings you can change your ring distance, alerts, jingle and quiet hours.",
+   "tags": [
+    "settings",
+    "change",
+    "alerts",
+    "jingle",
+    "distance"
+   ]
+  },
+  {
+   "q": "The map isn't loading. What should I do?",
+   "a": "The arrival time still works even if the map doesn't load. If routing is down, the path may look approximate.",
+   "tags": [
+    "map",
+    "not loading",
+    "problem",
+    "error",
+    "eta"
+   ]
+  },
+  {
+   "q": "I didn't get an alert. Why?",
+   "a": "Check that \"Alerts on\" is on in Settings, you allowed notifications, and it's not after 8 PM if Quiet is on. On iPhone, open the app from your Home Screen.",
+   "tags": [
+    "alert",
+    "no alert",
+    "not working",
+    "notifications",
+    "help",
+    "problem"
+   ]
+  },
+  {
+   "q": "How can I talk to someone for help?",
+   "a": "I don't have a staff contact listed. Ask the driver at the truck window.",
+   "tags": [
+    "help",
+    "staff",
+    "contact",
+    "support",
+    "driver"
+   ]
+  },
+  {
+   "q": "Who makes this app?",
+   "a": "The app is made by SousShift AI.",
+   "tags": [
+    "made by",
+    "sousshift",
+    "app",
+    "developer"
+   ]
+  }
+ ],
+ "updated": "2026-10-14T04:23:30+00:00",
+ "source_commit": "b7f36be",
+ "app": "ice-cream"
+}

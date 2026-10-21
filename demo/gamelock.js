@@ -13,7 +13,7 @@
      · The lock lets go by itself (never the other way round) on game over / the start menu coming back, switching
        apps/tabs or leaving the page, and leaving full screen.
      · When a run starts (PLAY on the start menu, or the first tap on a game without one) a short hint points at the button:
-       "Tip: tap 🔒 to lock the screen so it doesn't scroll while you play." It hides after ~3 s or on tap, at most once per
+       "Tip: tap ⛶ Full screen and 🔒 Lock …" (Antidote, 2026-10-19: tell them to tap both). It hides after ~5 s or on tap, at most once per
        session, and never blocks the game.
    Full screen (fullscreen.js) keeps its own no-scroll behavior; it does not set the lock.
    "Run is live" (used for game over + the hint) comes from, in order: window.GameLock.playing(true|false|null),
@@ -187,7 +187,7 @@
       hint.type = "button";
       hint.className = "ssai-lockhint";
       hint.setAttribute("role", "status");
-      hint.textContent = "Tip: tap 🔒 to lock the screen so it doesn't scroll while you play.";
+      hint.textContent = (W.__T || String)("Tip: tap ⛶ Full screen and 🔒 Lock so the screen doesn't scroll and nothing blocks your game.");
       hint.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); hideHint(); });
       ["pointerdown", "pointerup", "touchstart", "touchend", "mousedown", "mouseup"].forEach(function (ev) {
         hint.addEventListener(ev, function (e) { e.stopPropagation(); }, { passive: true });
@@ -196,7 +196,7 @@
     }
     void hint.offsetWidth;
     hint.classList.add("on");
-    unlater(hintT); hintT = later(hideHint, 3200);
+    unlater(hintT); hintT = later(hideHint, 5000);
   }
   function hideHint() { if (hint) hint.classList.remove("on"); unlater(hintT); }
 

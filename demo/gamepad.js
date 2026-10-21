@@ -165,6 +165,7 @@
       "<tr><td>" + gl("A") + "</td><td>Play / select / tap what's in the gold box</td></tr>" +
       "<tr><td>" + gl("B") + "</td><td>Back (closes a panel)</td></tr>" +
       "<tr><td>" + gl("Y") + "</td><td>Full screen on / off</td></tr>" +
+      (W.GameMusic ? "<tr><td>" + gl("B") + " (while playing)</td><td>Switch song</td></tr>" : "") +
       "<tr><td>" + gl("start") + "</td><td>Pause and resume</td></tr>" +
       "<tr><td>" + gl("select") + "</td><td>Restart after game over (otherwise opens this help)</td></tr>" +
       "<tr><td>Triggers</td><td>Scroll menus and long pages</td></tr>" +
@@ -520,6 +521,7 @@
     if (e.start) onStart();
     else if (e.select) onSelect();
     else if (e.Y && W.GameFS) { W.GameFS.toggle(); if (W.GameMenu && W.GameMenu.refresh) W.GameMenu.refresh(); }
+    else if (e.B && mode !== "nav" && W.GameMusic) { W.GameMusic.next(); toast("🎵 " + W.GameMusic.cur().name, 1600); }   /* in play: B switches the song (games with ../songswitch.js) */
     else if (mode === "keys") gameKeys(s, e, P);
     else if (mode === "pointer") gamePointer(s, e, P, dt);
     else if (mode === "grid") gameGrid(s, e, P, rp);

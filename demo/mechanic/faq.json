@@ -1,0 +1,990 @@
+{
+ "name": "Carlos' Mobile Mechanic",
+ "phone": "(555) 010-0000",
+ "facts": [
+  "Carlos' Mobile Mechanic is a mobile mechanic: bring your car to Carlos, or he comes to you.",
+  "Service area shown in the app: Bellflower area.",
+  "The exact address is sent after your booking is confirmed.",
+  "Phone and text number shown in the app: (555) 010-0000.",
+  "Hours shown in the app: Mon-Fri 8 AM-6 PM, Sat 9 AM-3 PM, Sun closed.",
+  "Arrival windows are 2 hours long, and you can book up to 7 days ahead.",
+  "Labor rate shown in the app: $95/hr (sample).",
+  "Trip fee shown in the app: free (free inside about 15 miles).",
+  "All prices in the app are sample prices; the final quote comes after inspection.",
+  "The app builds an instant price range when you tap the car or pick services.",
+  "You can pick year/make/model or decode your VIN.",
+  "The Scan feature reads check-engine codes with a Bluetooth OBD-II adapter or a typed code.",
+  "The scan is read-only and never clears codes.",
+  "My Garage saves your cars, recalls, scan history and service history on your phone only.",
+  "The job tracker shows 7 stages from Received to Ready for pickup.",
+  "The app is available in English and Spanish.",
+  "Text and email alerts are demo-only for now.",
+  "Parts supplier shown: Clark's Discount Auto Parts, 16511 Lakewood Blvd, Bellflower, (562) 630-1811."
+ ],
+ "suggested": [
+  "What are your hours?",
+  "How do I get a quote?",
+  "What services do you offer?",
+  "How do I book a time?",
+  "Do you come to me?",
+  "How do I scan my check-engine light?"
+ ],
+ "qa": [
+  {
+   "q": "What are your hours?",
+   "a": "The app shows Mon-Fri 8 AM-6 PM, Sat 9 AM-3 PM, and closed Sunday. These hours are placeholders in the demo, so call or text (555) 010-0000 to confirm.",
+   "tags": [
+    "hours",
+    "open",
+    "close",
+    "time",
+    "when",
+    "schedule"
+   ]
+  },
+  {
+   "q": "Are you open on Sunday?",
+   "a": "The app shows Sunday as closed. Call or text (555) 010-0000 to confirm.",
+   "tags": [
+    "sunday",
+    "open",
+    "hours",
+    "weekend",
+    "closed"
+   ]
+  },
+  {
+   "q": "Are you open on Saturday?",
+   "a": "Yes, the app shows Saturday 9 AM-3 PM. Hours are placeholders in the demo, so confirm by phone.",
+   "tags": [
+    "saturday",
+    "hours",
+    "open",
+    "weekend"
+   ]
+  },
+  {
+   "q": "Are you open right now?",
+   "a": "The top of the app shows 'Open now' with a closing time, or when Carlos opens next. Check that bar for the latest.",
+   "tags": [
+    "open now",
+    "hours",
+    "today",
+    "closed"
+   ]
+  },
+  {
+   "q": "What's your address?",
+   "a": "The exact address is sent after your booking is confirmed. The app only shows the Bellflower area.",
+   "tags": [
+    "address",
+    "location",
+    "where",
+    "directions",
+    "find"
+   ]
+  },
+  {
+   "q": "Where are you located?",
+   "a": "Carlos works in the Bellflower area. He comes to you, or you can bring the car to him. The exact address comes after booking.",
+   "tags": [
+    "location",
+    "where",
+    "area",
+    "bellflower"
+   ]
+  },
+  {
+   "q": "Is there parking?",
+   "a": "I don't have parking details. Call or text (555) 010-0000 and ask.",
+   "tags": [
+    "parking",
+    "park",
+    "lot"
+   ]
+  },
+  {
+   "q": "What's your phone number?",
+   "a": "The app shows (555) 010-0000. You can call or text from the 'Call / text' button.",
+   "tags": [
+    "phone",
+    "number",
+    "call",
+    "contact",
+    "text"
+   ]
+  },
+  {
+   "q": "Can I text you?",
+   "a": "Yes, tap 'Call / text' in the app to message Carlos at (555) 010-0000.",
+   "tags": [
+    "text",
+    "sms",
+    "message",
+    "contact"
+   ]
+  },
+  {
+   "q": "Do you come to me?",
+   "a": "Yes. The app says 'Bring it to Carlos. Or he comes to you.'",
+   "tags": [
+    "mobile",
+    "come to me",
+    "house call",
+    "on site",
+    "travel"
+   ]
+  },
+  {
+   "q": "Is there a trip fee?",
+   "a": "The app shows the trip fee as free (inside about 15 miles). Sample pricing only; the final quote comes after inspection.",
+   "tags": [
+    "trip fee",
+    "travel",
+    "fee",
+    "free",
+    "miles",
+    "distance"
+   ]
+  },
+  {
+   "q": "What areas do you serve?",
+   "a": "The app lists the Bellflower area. For a specific address outside it, call or text (555) 010-0000.",
+   "tags": [
+    "area",
+    "serve",
+    "service area",
+    "bellflower",
+    "distance"
+   ]
+  },
+  {
+   "q": "How does the app work?",
+   "a": "Pick your car, tap the car or a service to build your job, see a price range, pick a time, and send the request. Then track it in the app.",
+   "tags": [
+    "how",
+    "steps",
+    "start",
+    "use",
+    "work"
+   ]
+  },
+  {
+   "q": "How do I get a quote?",
+   "a": "Tap the car or pick services, and the Quote section shows your estimated total with parts, labor and trip fee. Prices are samples; the final quote comes after inspection.",
+   "tags": [
+    "quote",
+    "price",
+    "estimate",
+    "cost",
+    "how much"
+   ]
+  },
+  {
+   "q": "Are the prices final?",
+   "a": "No. The app says 'Sample prices, final quote after inspection.'",
+   "tags": [
+    "price",
+    "final",
+    "estimate",
+    "quote",
+    "cost"
+   ]
+  },
+  {
+   "q": "What is your labor rate?",
+   "a": "The app uses a sample labor rate of $95 per hour. The final quote comes after inspection.",
+   "tags": [
+    "labor",
+    "rate",
+    "hourly",
+    "price",
+    "cost"
+   ]
+  },
+  {
+   "q": "What services do you offer?",
+   "a": "Diagnostics, oil change, brakes, tires, headlights and bulbs, taillights, battery, engine and tune-up, suspension, A/C, sound system install, window tint, windshield and wipers, doors and windows, exhaust, body parts, and a detailing add-on.",
+   "tags": [
+    "services",
+    "menu",
+    "what do you do",
+    "list",
+    "offer"
+   ]
+  },
+  {
+   "q": "Do you do oil changes?",
+   "a": "Yes: conventional or full synthetic, with oil, filter and fluid top-off.",
+   "tags": [
+    "oil",
+    "oil change",
+    "synthetic",
+    "conventional"
+   ]
+  },
+  {
+   "q": "Do you do brake work?",
+   "a": "Yes: brake pads, pads plus rotors, and brake fluid flush. Pads and rotors are quoted per axle (front or rear).",
+   "tags": [
+    "brakes",
+    "pads",
+    "rotors",
+    "brake fluid",
+    "stop"
+   ]
+  },
+  {
+   "q": "Can you fix a flat tire?",
+   "a": "Yes, there's a flat repair for a single tire. If the damage can't be patched safely, the tire gets replaced.",
+   "tags": [
+    "flat",
+    "tire",
+    "puncture",
+    "repair"
+   ]
+  },
+  {
+   "q": "Do you replace tires?",
+   "a": "Yes: replace one tire or all four. You can also rotate all four.",
+   "tags": [
+    "tires",
+    "replace",
+    "rotate",
+    "new tires"
+   ]
+  },
+  {
+   "q": "Do you do diagnostics or check-engine lights?",
+   "a": "Yes: code scan plus inspection, deep diagnosis (electrical or no-start), and an EVAP leak (smoke) test.",
+   "tags": [
+    "diagnostics",
+    "check engine",
+    "scan",
+    "no start",
+    "light"
+   ]
+  },
+  {
+   "q": "Do you replace batteries?",
+   "a": "Yes: battery and charging test, replace battery, and clean terminals.",
+   "tags": [
+    "battery",
+    "dead",
+    "jump",
+    "replace",
+    "terminals"
+   ]
+  },
+  {
+   "q": "Can you do a tune-up?",
+   "a": "Yes. Engine and tune-up covers spark plugs, serpentine belt, coolant flush, ignition coil and thermostat.",
+   "tags": [
+    "tune-up",
+    "spark plugs",
+    "belt",
+    "coolant",
+    "engine",
+    "thermostat"
+   ]
+  },
+  {
+   "q": "Do you work on suspension?",
+   "a": "Yes: inspect clunks or noises, shocks/struts (pair), and sway bar links (pair).",
+   "tags": [
+    "suspension",
+    "struts",
+    "shocks",
+    "noise",
+    "clunk"
+   ]
+  },
+  {
+   "q": "Do you fix A/C?",
+   "a": "Yes: A/C recharge, leak check with UV dye, and cabin air filter.",
+   "tags": [
+    "ac",
+    "a/c",
+    "air conditioning",
+    "cold",
+    "recharge",
+    "cabin filter"
+   ]
+  },
+  {
+   "q": "Do you install car stereos?",
+   "a": "Yes. Sound system install covers head units (CarPlay / Android Auto), speakers, and a sub plus amp.",
+   "tags": [
+    "stereo",
+    "sound",
+    "speakers",
+    "subwoofer",
+    "carplay",
+    "audio"
+   ]
+  },
+  {
+   "q": "Do you do window tint?",
+   "a": "Yes: front 2 windows, full car (sides and back), or a windshield sun strip, in legal-shade film.",
+   "tags": [
+    "tint",
+    "window tint",
+    "windows",
+    "film"
+   ]
+  },
+  {
+   "q": "Can you replace headlights or bulbs?",
+   "a": "Yes: bulb replacement, LED upgrade (pair), and headlight restoration (pair). Taillight bulbs and housings are a separate service.",
+   "tags": [
+    "headlight",
+    "bulb",
+    "led",
+    "lights",
+    "restoration"
+   ]
+  },
+  {
+   "q": "Do you fix taillights?",
+   "a": "Yes: bulb replacement or replacing the whole taillight housing.",
+   "tags": [
+    "taillight",
+    "brake light",
+    "bulb",
+    "housing"
+   ]
+  },
+  {
+   "q": "Do you do wipers or windshield work?",
+   "a": "Yes: wiper blades (pair) and washer pump.",
+   "tags": [
+    "wipers",
+    "windshield",
+    "washer",
+    "blades"
+   ]
+  },
+  {
+   "q": "Can you fix car doors and windows?",
+   "a": "Yes: window regulator/motor and door lock actuator, priced per door.",
+   "tags": [
+    "door",
+    "window",
+    "lock",
+    "regulator",
+    "actuator"
+   ]
+  },
+  {
+   "q": "Do you do exhaust work?",
+   "a": "Yes: inspect leak/noise, muffler or pipe repair, O2 sensor, and catalytic converter.",
+   "tags": [
+    "exhaust",
+    "muffler",
+    "o2 sensor",
+    "catalytic converter",
+    "noise"
+   ]
+  },
+  {
+   "q": "Do you replace body parts like bumpers and mirrors?",
+   "a": "Yes: fenders, bumper covers, side mirrors, hood, grille and outside door handles. Parts arrive primed, and paint matching is quoted separately.",
+   "tags": [
+    "body",
+    "bumper",
+    "fender",
+    "mirror",
+    "hood",
+    "grille",
+    "paint"
+   ]
+  },
+  {
+   "q": "Do you do detailing?",
+   "a": "Yes, as an add-on: interior detail, wash and wax, or full detail.",
+   "tags": [
+    "detail",
+    "wash",
+    "wax",
+    "clean",
+    "interior"
+   ]
+  },
+  {
+   "q": "Does the body work include paint?",
+   "a": "Body parts arrive primed or unpainted. Paint matching is quoted separately after Carlos sees the car.",
+   "tags": [
+    "paint",
+    "body",
+    "match",
+    "color"
+   ]
+  },
+  {
+   "q": "How do I tap the car to add a repair?",
+   "a": "In Step 2, tap a glowing spot on the car to add that repair to your job. Use Side, Front and Back for other spots like the battery, A/C, other tires and trunk.",
+   "tags": [
+    "tap",
+    "car",
+    "diagram",
+    "add",
+    "repair",
+    "hotspot"
+   ]
+  },
+  {
+   "q": "How do I add a service to my job?",
+   "a": "Tap any service in the Services list, or tap the car. Pick the options you need and tap Save to job.",
+   "tags": [
+    "add",
+    "job",
+    "service",
+    "select"
+   ]
+  },
+  {
+   "q": "How do I remove something from my job?",
+   "a": "In your quote, tap Remove next to the item.",
+   "tags": [
+    "remove",
+    "delete",
+    "job",
+    "quote"
+   ]
+  },
+  {
+   "q": "How do I book a time?",
+   "a": "Tap 'Pick a time', choose a day and an open arrival window, then tap 'Request this job'.",
+   "tags": [
+    "book",
+    "appointment",
+    "schedule",
+    "time",
+    "reserve"
+   ]
+  },
+  {
+   "q": "How long are the arrival windows?",
+   "a": "They're 2-hour windows (like 8-10, 10-12), shown in the Availability section.",
+   "tags": [
+    "arrival",
+    "window",
+    "slot",
+    "time",
+    "hours"
+   ]
+  },
+  {
+   "q": "How far ahead can I book?",
+   "a": "Up to 7 days ahead. The Availability section shows open arrival windows for the week.",
+   "tags": [
+    "book ahead",
+    "week",
+    "days",
+    "availability"
+   ]
+  },
+  {
+   "q": "What do Open, Your pick and Booked mean?",
+   "a": "Open windows can be picked, Your pick is held for your job, and Booked is already taken.",
+   "tags": [
+    "open",
+    "booked",
+    "slot",
+    "legend",
+    "availability"
+   ]
+  },
+  {
+   "q": "Do I need an account to book?",
+   "a": "The app doesn't ask for an account. Your first name is optional when you send a request.",
+   "tags": [
+    "account",
+    "sign up",
+    "login",
+    "join",
+    "register"
+   ]
+  },
+  {
+   "q": "How do I send a request?",
+   "a": "Tap 'Request this job', add your first name if you like, and tap Send request. Carlos accepts it with a final quote.",
+   "tags": [
+    "request",
+    "send",
+    "submit",
+    "job"
+   ]
+  },
+  {
+   "q": "What happens after I send a request?",
+   "a": "Carlos accepts it with a final quote. You'll get an alert, and you can follow it in the Track section.",
+   "tags": [
+    "after",
+    "request",
+    "accepted",
+    "quote",
+    "next"
+   ]
+  },
+  {
+   "q": "Is the booking real or just a demo?",
+   "a": "This is a demo app. Requests are saved on your phone and nothing is sent anywhere. To really book, call or text (555) 010-0000.",
+   "tags": [
+    "demo",
+    "real",
+    "book",
+    "sent",
+    "test"
+   ]
+  },
+  {
+   "q": "Can my request be declined?",
+   "a": "Yes. If Carlos can't take it, the tracker says so and suggests trying another time.",
+   "tags": [
+    "declined",
+    "denied",
+    "reject",
+    "request"
+   ]
+  },
+  {
+   "q": "How do I track my repair?",
+   "a": "Open the Track section. Every update from the mechanic shows up there, with a progress gauge and timeline.",
+   "tags": [
+    "track",
+    "status",
+    "progress",
+    "job",
+    "update"
+   ]
+  },
+  {
+   "q": "What are the repair stages?",
+   "a": "Received, Diagnosing, Waiting on parts, Being worked on, Halfway, Almost done, and Ready for pickup.",
+   "tags": [
+    "stages",
+    "status",
+    "progress",
+    "timeline"
+   ]
+  },
+  {
+   "q": "Can I see a sample of the tracker?",
+   "a": "Yes. If you have no requests yet, the Track section shows a sample job with a Play the sample button.",
+   "tags": [
+    "sample",
+    "tracker",
+    "demo",
+    "example"
+   ]
+  },
+  {
+   "q": "How will I know when my car is almost done?",
+   "a": "Turn on alerts. In-app alerts pop up and go to the bell inbox, and you can switch on text or email for 'almost done' and 'ready'.",
+   "tags": [
+    "alerts",
+    "notify",
+    "almost done",
+    "ready",
+    "notification"
+   ]
+  },
+  {
+   "q": "Do text alerts work?",
+   "a": "Not yet. Text alerts are demo-only until the business's texting number is approved by carriers.",
+   "tags": [
+    "text",
+    "sms",
+    "alerts",
+    "notifications"
+   ]
+  },
+  {
+   "q": "Do email alerts work?",
+   "a": "Not yet. Email alerts are demo-only for now.",
+   "tags": [
+    "email",
+    "alerts",
+    "notifications"
+   ]
+  },
+  {
+   "q": "Where is the alerts inbox?",
+   "a": "Tap the bell icon at the top of the app.",
+   "tags": [
+    "bell",
+    "inbox",
+    "alerts",
+    "notifications"
+   ]
+  },
+  {
+   "q": "How do I pick my car?",
+   "a": "In Step 1, pick year, make and model. You can also type your make and model, or decode your VIN.",
+   "tags": [
+    "car",
+    "year",
+    "make",
+    "model",
+    "pick",
+    "vehicle"
+   ]
+  },
+  {
+   "q": "What is the VIN decode for?",
+   "a": "Enter your 17-character VIN and tap Decode to fill in your car and details like engine and drivetrain. VINs have no I, O or Q.",
+   "tags": [
+    "vin",
+    "decode",
+    "car",
+    "details"
+   ]
+  },
+  {
+   "q": "Where do I find my paint code?",
+   "a": "It's on the sticker in the driver's door jamb (look for PAINT, C/TR or EXT). Body shops use it to match paint.",
+   "tags": [
+    "paint code",
+    "color",
+    "sticker",
+    "door jamb"
+   ]
+  },
+  {
+   "q": "Can I upload a photo of my car?",
+   "a": "Yes, you can take or upload a photo, saved only on your phone. Identifying your car from a photo and 3D models are coming soon.",
+   "tags": [
+    "photo",
+    "picture",
+    "upload",
+    "3d",
+    "identify"
+   ]
+  },
+  {
+   "q": "What is My Garage?",
+   "a": "It saves your cars, their recalls, scan history, service history and what's due next. It's stored only on your phone, with no account.",
+   "tags": [
+    "garage",
+    "save",
+    "cars",
+    "history",
+    "reminders"
+   ]
+  },
+  {
+   "q": "What maintenance reminders does My Garage show?",
+   "a": "It shows oil change, tire rotation and brake check as simple rules of thumb. Your owner's manual wins.",
+   "tags": [
+    "reminders",
+    "maintenance",
+    "due",
+    "oil",
+    "rotation",
+    "brake check"
+   ]
+  },
+  {
+   "q": "Will I lose my garage if I clear my browser?",
+   "a": "Yes. My Garage lives only on your phone, so clearing the browser's site data erases it.",
+   "tags": [
+    "garage",
+    "delete",
+    "clear",
+    "data",
+    "lost"
+   ]
+  },
+  {
+   "q": "Does the app show recalls?",
+   "a": "Yes. Once you pick year, make and model, it shows safety recalls and top owner complaints from NHTSA. Recall repairs are a free fix at a dealer.",
+   "tags": [
+    "recall",
+    "nhtsa",
+    "safety",
+    "complaints",
+    "issues"
+   ]
+  },
+  {
+   "q": "How do I scan my check-engine light?",
+   "a": "Open 'Scan my car'. Plug a Bluetooth LE OBD-II adapter into the port under the dash, turn the key to ON, and tap Connect & read codes. Or type a code you already have.",
+   "tags": [
+    "scan",
+    "check engine",
+    "obd",
+    "codes",
+    "bluetooth"
+   ]
+  },
+  {
+   "q": "Which Bluetooth adapters work?",
+   "a": "The app lists Veepeak OBDCheck BLE+, Vgate iCar Pro BLE 4.0, and OBDLink CX. Get a BLE / Bluetooth 4.0 model; classic Bluetooth and Wi-Fi adapters don't work.",
+   "tags": [
+    "adapter",
+    "obd",
+    "bluetooth",
+    "ble",
+    "reader"
+   ]
+  },
+  {
+   "q": "Does scanning work on iPhone?",
+   "a": "Safari on iPhone can't use Bluetooth. Open the page in the free Bluefy browser, or type the code instead.",
+   "tags": [
+    "iphone",
+    "ios",
+    "safari",
+    "bluefy",
+    "bluetooth"
+   ]
+  },
+  {
+   "q": "Can I scan with Android or a computer?",
+   "a": "Yes, Chrome on Android or on a computer can talk to Bluetooth adapters.",
+   "tags": [
+    "android",
+    "chrome",
+    "computer",
+    "bluetooth"
+   ]
+  },
+  {
+   "q": "Can I type a trouble code?",
+   "a": "Yes. Type a code like P0420 in 'Option B' and tap Look up to see what it means and the likely fix.",
+   "tags": [
+    "code",
+    "type",
+    "p0420",
+    "lookup",
+    "dtc"
+   ]
+  },
+  {
+   "q": "Can I try the scan without an adapter?",
+   "a": "Yes, tap 'Try a demo scan'. It uses sample data, not your car.",
+   "tags": [
+    "demo scan",
+    "no adapter",
+    "sample",
+    "try"
+   ]
+  },
+  {
+   "q": "Will the scan clear my codes?",
+   "a": "No. It's read-only and never clears codes.",
+   "tags": [
+    "clear codes",
+    "read only",
+    "erase",
+    "scan"
+   ]
+  },
+  {
+   "q": "Does a code tell me exactly what part is bad?",
+   "a": "No. Codes point to a system, not a guaranteed part. Carlos makes the final diagnosis.",
+   "tags": [
+    "code",
+    "diagnosis",
+    "part",
+    "accurate"
+   ]
+  },
+  {
+   "q": "Can I add the fix from a scan to my quote?",
+   "a": "Yes, tap 'Add to my job' on a code card to add the likely fix.",
+   "tags": [
+    "add",
+    "code",
+    "job",
+    "fix",
+    "quote"
+   ]
+  },
+  {
+   "q": "Does the app handle Tesla or electric cars?",
+   "a": "Yes, some. Tesla owners get software-update links and tips. Teslas don't use the standard OBD-II port for owner scans, so write down screen alerts (Controls > Service) and type them in or tell Carlos.",
+   "tags": [
+    "tesla",
+    "electric",
+    "ev",
+    "scan",
+    "software"
+   ]
+  },
+  {
+   "q": "Does the app ask for my Tesla password?",
+   "a": "No. Live Tesla data needs Tesla's official sign-in, which is coming later, and the app never asks for your Tesla password.",
+   "tags": [
+    "tesla",
+    "password",
+    "privacy",
+    "login"
+   ]
+  },
+  {
+   "q": "What parts will my job need?",
+   "a": "Tap the Parts button on a job item to see typical parts, what to ask a parts counter, and search links. Carlos confirms exact part numbers after inspection.",
+   "tags": [
+    "parts",
+    "part numbers",
+    "what to buy",
+    "counter"
+   ]
+  },
+  {
+   "q": "Where can I buy parts?",
+   "a": "The app suggests Clark's Discount Auto Parts, 16511 Lakewood Blvd, Bellflower, (562) 630-1811. Call for price and availability; no special pricing is implied.",
+   "tags": [
+    "parts",
+    "store",
+    "clark's",
+    "supplier",
+    "buy"
+   ]
+  },
+  {
+   "q": "What are Clark's hours?",
+   "a": "The app lists Clark's as Mon-Sat 8 AM-8 PM and Sun 9 AM-5 PM.",
+   "tags": [
+    "clark's",
+    "parts store",
+    "hours"
+   ]
+  },
+  {
+   "q": "What languages does the app support?",
+   "a": "English and Spanish. Tap EN or ES at the top to switch.",
+   "tags": [
+    "language",
+    "spanish",
+    "english",
+    "español",
+    "translate"
+   ]
+  },
+  {
+   "q": "How do I add the app to my phone?",
+   "a": "Use 'Add to Home Screen' (in the footer, or the prompt that appears). On iPhone Safari tap Share then Add to Home Screen. On Android Chrome tap the menu then Install app or Add to Home screen.",
+   "tags": [
+    "install",
+    "home screen",
+    "app",
+    "add",
+    "pwa"
+   ]
+  },
+  {
+   "q": "Is my information private?",
+   "a": "In the demo, your cars, garage and requests are saved only on your phone, and nothing is sent anywhere.",
+   "tags": [
+    "privacy",
+    "data",
+    "safe",
+    "stored"
+   ]
+  },
+  {
+   "q": "How do I pay?",
+   "a": "I don't have payment details in the app. Ask Carlos by calling or texting (555) 010-0000.",
+   "tags": [
+    "pay",
+    "payment",
+    "cash",
+    "card",
+    "price"
+   ]
+  },
+  {
+   "q": "Do you offer warranties?",
+   "a": "I don't have warranty details. Call or text (555) 010-0000 to ask.",
+   "tags": [
+    "warranty",
+    "guarantee"
+   ]
+  },
+  {
+   "q": "Do you have a rewards or points program?",
+   "a": "I don't see a rewards or points program in this app. Ask Carlos by calling or texting (555) 010-0000.",
+   "tags": [
+    "points",
+    "rewards",
+    "loyalty",
+    "stars",
+    "free",
+    "ratio"
+   ]
+  },
+  {
+   "q": "Are there games or contests?",
+   "a": "No games or contests are in this app.",
+   "tags": [
+    "game",
+    "games",
+    "contest",
+    "leaderboard",
+    "prize",
+    "play"
+   ]
+  },
+  {
+   "q": "Do you have specials or discounts?",
+   "a": "I don't have specials in the app. Ask Carlos by calling or texting (555) 010-0000.",
+   "tags": [
+    "special",
+    "discount",
+    "deal",
+    "coupon",
+    "promo"
+   ]
+  },
+  {
+   "q": "Do you have a referral program or birthday club?",
+   "a": "I don't see either in this app. Ask Carlos by calling or texting (555) 010-0000.",
+   "tags": [
+    "referral",
+    "birthday",
+    "club",
+    "share",
+    "invite"
+   ]
+  },
+  {
+   "q": "Can I order or buy from the app?",
+   "a": "You can request a repair job, not buy items. There's no table ordering or checkout.",
+   "tags": [
+    "order",
+    "buy",
+    "checkout",
+    "qr",
+    "table"
+   ]
+  },
+  {
+   "q": "Is there a before and after gallery?",
+   "a": "Yes, a slider shows before/after examples. In the demo these are placeholder art, with Carlos' real photos to come.",
+   "tags": [
+    "before",
+    "after",
+    "photos",
+    "gallery",
+    "slider"
+   ]
+  },
+  {
+   "q": "How do I talk to a real person?",
+   "a": "Call or text Carlos at (555) 010-0000 using the 'Call / text' button.",
+   "tags": [
+    "help",
+    "staff",
+    "human",
+    "contact",
+    "call"
+   ]
+  }
+ ],
+ "updated": "2026-10-14T04:22:47+00:00",
+ "source_commit": "b7f36be",
+ "app": "mechanic"
+}

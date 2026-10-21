@@ -535,12 +535,13 @@ function drawQueue(it,now){ // cars lined up for the StormBurger drive-thru, blo
   cx.fillStyle="#f4f6f8"; roundRect(it.x+30,it.y-30,52,30,4); cx.fill(); cx.fillStyle="#1d43b5"; cx.font="900 9px Archivo,system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText("STORMBURGER",it.x+56,it.y-20);
   cx.fillStyle="#d9262f"; cx.fillRect(it.x+34,it.y-12,44,10); cx.fillStyle="#fff"; cx.font="900 7px Archivo,system-ui"; cx.fillText(T("DRIVE THRU"),it.x+56,it.y-7);
 }
-function pitStart(it){ // fed the Jordan High kids: they fix the truck (one life back, fire out) while the run pauses
-  it.used=1; st.pitT=2600; st.inv=1e9;
-  var healed=st.lives<3; if(healed){ st.lives++; } st.dmg=Math.max(0,3-st.lives); if(st.dmg<2) st.cracks=[]; if(!st.dmg) st.flames=[];
-  st.score+=100; pop(st.x,H-150,"🍔 "+T("Fed the Panthers")+" +100","#FFD23F");
-  pop(st.x,H-120,healed?"🔧 "+T("Truck repaired! +1 life"):"🔧 "+T("Tune-up done"),"#7CFF9B");
-  if(navigator.vibrate) try{navigator.vibrate([30,40,30]);}catch(e){}
+function pitStart(it){ // pulled into Jordan High: the run pauses for the kitchen stop (kitchen.js): build burgers for the kids, they fix the truck
+  it.used=1; st.inv=1e9;
+  if(window.SB_KITCHEN){ st.pitT=1e9; SB_KITCHEN.open(function(n){ st.pitT=480; st.inv=90; st.last=performance.now(); hud();   // 480 ms = pull back out onto the road
+      pop(st.x,H-150,n?"🍔 "+n+" "+T(n>1?"burgers served":"burger served"):T("Back on the road"),"#FFD23F"); });
+    if(navigator.vibrate) try{navigator.vibrate([30,40,30]);}catch(e){} return; }
+  st.pitT=2600; var healed=st.lives<3; if(healed){ st.lives++; } st.dmg=Math.max(0,3-st.lives); if(st.dmg<2) st.cracks=[]; if(!st.dmg) st.flames=[];
+  st.score+=100; pop(st.x,H-150,"🍔 "+T("Fed the Panthers")+" +100","#FFD23F"); pop(st.x,H-120,healed?"🔧 "+T("Truck repaired! +1 life"):"🔧 "+T("Tune-up done"),"#7CFF9B");
 }
 function copStep(dt,k,py){ // cops come up from behind, then either blow past or swerve into your lane to ram you
   if(st.running&&!st.dying&&!(st.pitT>0)){ st.copT-=dt; if(st.copT<=0){ var el=45000-st.t, ln=Math.random()<.5?st.lane:(Math.random()*LANES)|0;
@@ -628,7 +629,7 @@ function frame(now){
   st.items.forEach(function(it){ if(it.type==="pit"&&!it.used&&st.running&&!st.dying&&it.y<py-60){ var a=0.65+0.35*Math.sin(now/120);
     cx.globalAlpha=a; cx.font="900 17px Archivo,system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillStyle="#7CFF9B"; cx.strokeStyle="#0a1030"; cx.lineWidth=4;
     var tx2=T("🔧 PIT STOP AHEAD · KEEP RIGHT ▶"); cx.strokeText(tx2,W/2,64); cx.fillText(tx2,W/2,64); cx.globalAlpha=1; } });
-  if(pit&&st.running){ var pp=1-st.pitT/2600;
+  if(pit&&st.running&&st.pitT<3000){ var pp=1-st.pitT/2600;
     cx.fillStyle="rgba(10,16,48,.78)"; roundRect(W/2-150,56,300,74,12); cx.fill(); cx.strokeStyle="#1f46b8"; cx.lineWidth=3; cx.stroke();
     cx.fillStyle="#fff"; cx.font="900 18px Archivo,system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText("🔧 "+T("JORDAN HIGH PIT STOP"),W/2,76);
     cx.fillStyle="#C9D2EE"; cx.font="700 12px Archivo,system-ui"; cx.fillText(T("You fed the Panthers 🍔 · they're fixing your truck"),W/2,96);
@@ -687,6 +688,7 @@ hud();
 })();
 </script>
 <script src="fx.js"></script>
+<script src="kitchen.js?v=k1"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
 <script type="module" src="storm3d.js?v=sb3d1"></script>
 <script src="../contract.js"></script>
@@ -763,9 +765,9 @@ hud();
   {title:"Graphics",options:[["smooth","Smooth (recommended)"],["auto","Auto"],["low","Low"],["med","Medium"],["high","High"],["ultra","Ultra"]],note:"Smooth keeps a steady frame rate on phones and cars. Auto only ever steps down.",
    get:function(){ return window.__E3Q?__E3Q.pref:"auto"; },set:function(v){ if(window.__E3Q) __E3Q.set(v); }}],
  how:{goal:"Stay on the road for 45 seconds and rack up points: grab coins and StormBurger food, dodge everything the storm throws at you.",time:"45 seconds · 3 lives · 3 hits and the truck is totaled",
-  steps:[["👆","Tap the left or right side of the road to change lanes"],["◀▶","Or use the ◀ ▶ buttons under the game (arrow keys on a computer)"],["⚡","A glowing target on the road means lightning is about to come down right there, usually where your truck is. Change lanes in time!"],["🐄","Flying cows and stop signs drift across lanes. Dodge them"],["🚓","Cops come up behind you (watch for 🚨 COP BEHIND) and swerve into your lane to ram you. Change lanes!"],["🌪️","Small tornadoes weave across the road. Getting caught costs 200 points and a life"],["🚗","Passing StormBurger? The drive-thru line blocks the right lane. Swerve left around the cars"],["🔧","About 20 seconds in, a pit stop at Jordan High School shows up on the right. Be in the right lane: you feed the kids and they fix your truck (+1 life, fire out, +100)"],["🔥","Each hit sets the truck on fire and costs a life"]]},
+  steps:[["👆","Tap the left or right side of the road to change lanes"],["◀▶","Or use the ◀ ▶ buttons under the game (arrow keys on a computer)"],["⚡","A glowing target on the road means lightning is about to come down right there, usually where your truck is. Change lanes in time!"],["🐄","Flying cows and stop signs drift across lanes. Dodge them"],["🚓","Cops come up behind you (watch for 🚨 COP BEHIND) and swerve into your lane to ram you. Change lanes!"],["🌪️","Small tornadoes weave across the road. Getting caught costs 200 points and a life"],["🚗","Passing StormBurger? The drive-thru line blocks the right lane. Swerve left around the cars"],["🔧","About 20 seconds in, Jordan High shows up on the right. Be in the right lane to pull into the kitchen: you get 20 seconds to build as many burgers as you can for the kids (tap the ingredients in order). Every burger is +75 and the kids repair the truck (+1 life each, up to 3)"],["🔥","Each hit sets the truck on fire and costs a life"]]},
  points:[{group:"Grab these",items:[{img:"img/game/burger.webp",name:"Classic StormBurger",pts:"+60"},{img:"img/game/turkey.webp",name:"Turkey Burger",pts:"+60"},{img:"img/game/sandwich.webp",name:"Chicken Sandwich",pts:"+50"},{img:"img/game/strips.webp",name:"Chicken Strips",pts:"+50"},{img:"img/game/rings.webp",name:"Onion Rings",pts:"+30"},{img:"img/game/shake.webp",name:"Shake",pts:"+40"},{img:"img/game/fries.webp",name:"Fries",pts:"+30"},{img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='17' fill='%23ffd23f' stroke='%238a5a06' stroke-width='3'/%3E%3Cpath d='M23 9l-9 12h6l-3 10 9-12h-6z' fill='%23b46f05'/%3E%3C/svg%3E",name:"Coin",note:"Spinning gold coins",pts:"+10"},{icon:"🛣️",name:"Staying alive",note:"+1 every quarter second you're on the road",pts:"+4/sec"}]},
-  {group:"Dodge these",items:[{img:"img/game/cow.webp",name:"Flying cow",note:"Costs a life",pts:"−100",bad:true},{img:"img/game/stop.webp",name:"Stop sign",note:"Costs a life",pts:"−100",bad:true},{icon:"⚡",name:"Lightning strike",note:"Costs a life. Move off the glowing target",pts:"−100",bad:true},{icon:"🚗",name:"Drive-thru line",note:"Cars waiting for StormBurger block the right lane",pts:"−100",bad:true},{icon:"🚓",name:"Police ram",note:"Costs a life. They swerve into your lane",pts:"−100",bad:true},{icon:"🌪️",name:"Small tornado",note:"Costs a life + 200 points",pts:"−200",bad:true}]},{group:"Pit stop",items:[{icon:"🔧",name:"Jordan High pit stop",note:"Right lane, about 20 s in. Feed the kids, they repair the truck: +1 life",pts:"+100"}]}],
+  {group:"Dodge these",items:[{img:"img/game/cow.webp",name:"Flying cow",note:"Costs a life",pts:"−100",bad:true},{img:"img/game/stop.webp",name:"Stop sign",note:"Costs a life",pts:"−100",bad:true},{icon:"⚡",name:"Lightning strike",note:"Costs a life. Move off the glowing target",pts:"−100",bad:true},{icon:"🚗",name:"Drive-thru line",note:"Cars waiting for StormBurger block the right lane",pts:"−100",bad:true},{icon:"🚓",name:"Police ram",note:"Costs a life. They swerve into your lane",pts:"−100",bad:true},{icon:"🌪️",name:"Small tornado",note:"Costs a life + 200 points",pts:"−200",bad:true}]},{group:"Pit stop",items:[{icon:"🔧",name:"Jordan High pit stop",note:"Right lane, about 20 s in. Build burgers for 20 s: each one +75 and +1 life",pts:"+75 each"}]}],
  prizes:{champion:"Free Double Classic StormBurger Combo for the top score by Sunday close",tiers:[["1,000","Free Classic StormBurger","One run over 1,000 points","img/game/burger.webp"],["800","Free milkshake","Vanilla, chocolate or mix","img/game/shake.webp"],["600","Free fries or onion rings","With any order","img/game/fries.webp"],["400","Free house sauce","Storm, Thunder, Ranch… your pick","🥫"]],note:"Sample prizes. StormBurger picks the real ones and the board resets every Monday."}};</script>
 <script src="../gamemenu.js"></script><script src="../a2hs.js"></script>
 <script src="../gamelock.js?v=ml1"></script>

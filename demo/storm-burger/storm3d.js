@@ -579,7 +579,7 @@ async function boot() {
     if (st.running && !wasRun) { ROUTE = routeOf(routePref()); ri = 0; evtIn = 900; city = routePref() === "lb" ? "lb" : "ing"; }
     wasRun = st.running;
     // ground speed: the stretched 2D speed, so pickups sit still on the road; a slow cruise under the menu
-    const pitting = st.pitT > 0, pp = pitting ? 1 - st.pitT / 2600 : 0;
+    const pitting = st.pitT > 0, pp = pitting ? (st.pitT > 3000 ? .5 : 1 - st.pitT / 2600) : 0;   // > 3000 = parked in the Jordan kitchen stop
     const dz = (pitting ? 0 : run ? st.speed * KF : st.dying ? Math.max(0, st.speed * KF * (1 - (now - st.dying) / 900)) : 2.5) * k;
     const dzw = dz + warp; warp = 0; odo += dzw; roadTex.offset.y += dzw / RT; roadRough.offset.y = roadTex.offset.y;
     for (let i = live.length - 1; i >= 0; i--) { const L = live[i]; L.o.position.z += dzw; if (L.upd && L.o.position.z > -1900) L.upd(L.o, t, dt); if (L.o.position.z > 900) { world.remove(L.o); live.splice(i, 1); } }

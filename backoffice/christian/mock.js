@@ -6,7 +6,11 @@
    🔐 Team access (2026-10-14): fake "sammy" (Melody manager, NO email, so her saves stop at "No email on file" like the
    real backend), a fake approved Melody cook (kitchen@example.com) and a fake PENDING Nalu Vida bartender
    (nalu-bartender@example.com), all with password "test-mode-only". New sign-ups (team_signup) keep their own password
-   in this page's memory only. Switches, job presets and every check mirror Code.gs (JOBS / permCut / needPerm). */
+   in this page's memory only. Switches, job presets and every check mirror Code.gs (JOBS / permCut / needPerm).
+   📲 Shift deal texts (2026-10-19): 4 fake staff sign-ups (555 numbers): one waiting for an OK, one ON (Spanish, with email),
+   one OFF and one STOP. bo_shift ops mirror Code.gs shiftAct; "Send test now" and the 15-minute sends never send anything here.
+   🛒 Online orders (2026-10-18): 4 made-up paid pickup orders today (Test G. 61…, 555 phones); the Orders tab's
+   "🧪 Fake a new order" button adds one so the new-order alert can be tried. Same rules as Code.gs ordersHQ. */
 (function () {
   "use strict";
   var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
@@ -76,9 +80,9 @@
     "melody-manager": { name: "Melody Management", email: "melody-team@example.com", role: "manager", slugs: ["melody-bar-grill"] },
     sammy: { name: "Sami", email: "", role: "manager", slugs: ["melody-bar-grill"], job: "manager" } }, TOK = {}, PEND = {}, fails = 0;
   // 🔐 same presets as Code.gs JOBS
-  var PERM_KEYS = ["stats", "members", "rewards", "prices", "specials", "photos", "earlybird", "squares", "todo", "staff", "audit"];
-  var PERM_LABEL = { stats: "See sales & visit charts", members: "See guest list & contacts", rewards: "Discounts, rewards & points", prices: "Raise / lower menu prices", photos: "Menu photos go live", specials: "Specials & happy hour", earlybird: "Early-bird gift", squares: "Football Squares", todo: "To-do list", staff: "Staff practice & quiz", audit: "See the Audit log" };
-  var JOBS = { kitchen: ["Kitchen", "prices specials photos todo"], marketing: ["Marketing / management", "stats rewards specials photos earlybird squares todo audit"], bar_manager: ["Bar manager", "stats prices specials photos squares todo staff"],
+  var PERM_KEYS = ["stats", "members", "rewards", "prices", "specials", "photos", "earlybird", "squares", "todo", "staff", "audit", "orders", "shifttexts"];
+  var PERM_LABEL = { stats: "See sales & visit charts", members: "See guest list & contacts", rewards: "Discounts, rewards & points", prices: "Raise / lower menu prices", photos: "Menu photos go live", specials: "Specials & happy hour", earlybird: "Early-bird gift", squares: "Football Squares", todo: "To-do list", staff: "Staff practice & quiz", audit: "See the Audit log", orders: "Online orders (pickup)", shifttexts: "Shift deal texts (staff sign-ups)" };
+  var JOBS = { kitchen: ["Kitchen", "prices specials photos todo orders"], marketing: ["Marketing / management", "stats rewards specials photos earlybird squares todo audit"], bar_manager: ["Bar manager", "stats prices specials photos squares todo staff orders"],
     bartender: ["Bartender", "todo staff"], server: ["Server / floor", "todo staff"], runner: ["Food runner / barback", "todo staff"], manager: ["Manager (general)", PERM_KEYS.join(" ")], other: ["Other employee", "todo"] };
   function presetOf(j) { var on = {}, o = {}; (JOBS[j] || JOBS.other)[1].split(" ").forEach(function (k) { on[k] = 1; }); PERM_KEYS.forEach(function (k) { o[k] = !!on[k]; }); return o; }
   function effPerms(j, over) { var o = presetOf(j); Object.keys(over || {}).forEach(function (k) { if (PERM_KEYS.indexOf(k) >= 0) o[k] = over[k] === true; }); return o; }
@@ -107,6 +111,7 @@
     if (!p.stats) { o.games = []; o.opens = []; o.oneprize = {}; o.restores7 = {}; }
     if (!p.rewards) { o.redeems = []; o.claims = []; o.disc = {}; o.lb = {}; }
     if (!p.earlybird) o.eb = {}; if (!p.staff) { o.staff = []; o.trained = []; } if (!p.audit) o.audit = []; if (!p.todo) { o.todos = []; o.todoDone = []; }
+    if (!p.shifttexts) { o.shift = []; o.shiftCfg = {}; }
     return o; }
   function teamAct(d, u) {
     if (rec(u).role !== "owner") return { ok: false, reason: "Your login can't do that. Ask Christian." };
@@ -185,7 +190,52 @@
     c.redeems = c.redeems.filter(function (x) { return ok(x.slug); }); c.claims = c.claims.filter(function (x) { return ok(x.slug); }); c.staff = c.staff.filter(function (x) { return ok(x[0]); });
     var nm = {}; sc.slugs.forEach(function (x) { nm[x === "nalu-vida" ? "Nalu Vida" : "Melody Bar & Grill"] = 1; }); c.audit = c.audit.filter(function (a) { return nm[a.slug]; }); ["eb", "lb", "oneprize", "restores7", "disc", "menu"].forEach(function (k) { c[k] = sm(u, c[k]); });
     c.scout = { flags: c.scout.flags.filter(function (f) { return ok(f.slug); }), rejected: c.scout.rejected.filter(function (x) { return ok(x.slug); }), adjustments: c.scout.adjustments.filter(function (x) { return ok(x.slug); }) };
+    c.shift = (c.shift || []).filter(function (x) { return ok(x.slug); });
     c.team = []; return permCut(rec(u), c); }
+  // ---- 📲 shift deal texts (fake): same fields + rules as Code.gs (shiftList / shiftAct / shMessage), numbers are 555
+  var SHIFT_CFG = { sms: false, installed: now - 2 * DAY, lastRun: now - 6 * 60000 };
+  var SHIFT = [
+    { id: "STESTPEND01", slug: "melody-bar-grill", name: "Test Server Maya", phone: "+13105550141", email: "", job: "server", lang: "en", shifts: { mon: "16:00", tue: "16:00", fri: "17:00", sat: "17:00" }, status: "pending", ts: now - 3 * 36e5, lastAt: 0, last: "" },
+    { id: "STESTON0002", slug: "nalu-vida", name: "Test Bartender Luis", phone: "+13105550142", email: "luis.test@example.com", job: "bartender", lang: "es", shifts: { wed: "11:30", thu: "11:30", sun: "09:30" }, status: "on", ts: now - 4 * DAY, lastAt: now - DAY + 36e5, last: "email: emailed (texting not on yet)" },
+    { id: "STESTOFF003", slug: "melody-bar-grill", name: "Test Cook Andre", phone: "+13105550143", email: "", job: "kitchen", lang: "en", shifts: { mon: "10:00", wed: "10:00" }, status: "off", ts: now - 6 * DAY, lastAt: 0, last: "" },
+    { id: "STESTSTOP04", slug: "melody-bar-grill", name: "Test Host Jade", phone: "+13105550144", email: "", job: "other", lang: "en", shifts: { sat: "18:00" }, status: "stop", ts: now - 8 * DAY, lastAt: now - 5 * DAY, last: "text: STOP: they're on Twilio's opt-out list, switched to STOP" }];
+  var SH_DN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], SH_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  function shMask(p) { return "•••" + String(p).slice(-4); }
+  function shPub(x) { return { id: x.id, slug: x.slug, name: x.name, phone: shMask(x.phone), email: x.email ? x.email.charAt(0) + "•••@" + x.email.split("@")[1] : "", job: x.job, jobName: jobName(x.job), lang: x.lang, shifts: x.shifts, status: x.status, ts: x.ts, lastAt: x.lastAt, last: x.last }; }
+  function shiftList(u) { return may(u, "shifttexts") ? SHIFT.filter(function (x) { return x.status !== "deleted" && can(u, x.slug); }).map(shPub) : []; }
+  function shClock(t) { var p = t.split(":"), h = +p[0]; return (h % 12 || 12) + ":" + p[1] + " " + (h < 12 ? "AM" : "PM"); }
+  function shDays(s) { return SH_KEYS.filter(function (k) { return s[k]; }).map(function (k) { return SH_DN[SH_KEYS.indexOf(k)] + " " + shClock(s[k]); }).join(", "); }
+  function shText(slug, es) {   // a sample in the same shape as Code.gs shMessage (today's weekday lines; no specials / game day in test mode)
+    var dow = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })).getDay(), mel = slug === "melody-bar-grill", dn = SH_DN[dow];
+    var W = mel ? { all: ["Happy hour 3-6 daily"], 1: ["half off burgers 11-3"], 2: ["$3 tacos & $6 margaritas"], 4: ["half off sandwiches 11-3"], 5: ["$3 sliders 11-3"] }
+      : { all: (dow >= 1 && dow <= 5 ? ["Happy hour Mon-Fri 3-6 PM and 10 PM-close"] : []).concat(["Brunch daily until 4 PM, $24 bottomless mimosas (60 min)"]), 1: ["$9 burgers + $5 draft beer, 5 PM-close"], 2: ["50% off signature tacos, $10 house margaritas"], 3: ["$2 oysters (min 6)"], 0: ["NFL on every TV + bottomless mimosas"] };
+    var lines = W.all.concat(W[dow] || []).map(function (l) { return "- " + l; });
+    if (mel) lines.push(es ? "- Just Landed: 10% con pase de abordar de LAX (24 h)" : "- Just Landed: 10% off with a LAX boarding pass (24h)");
+    var tiers = mel ? "250 Free soft drink or Melody Fries; 500 Free starter; 1,000 $10 off; 1,500 Free entree" : "250 Free mocktail, soft drink or Jungle Fries; 500 Free shareable; 1,000 $10 off; 1,500 Free entree";
+    var nm = mel ? "Melody" : "Nalu Vida", d = new Date(), mo = d.toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short" }), dd = d.toLocaleString("en-US", { timeZone: "America/Los_Angeles", day: "numeric" });
+    return (es ? "Ofertas de hoy en " + nm + " (" + ["dom", "lun", "mar", "mie", "jue", "vie", "sab"][dow] + " " + dd + " " + mo.toLowerCase() + "):" : nm + " deals today (" + dn + " " + mo + " " + dd + "):") + "\n" + lines.join("\n") + "\n" +
+      (es ? "Recompensas (puntos): " : "Rewards (points): ") + tiers + "\n" + (es ? "Responde STOP para no recibir mas. Guia: " : "Reply STOP to stop. Guide: ") + "https://antidotethecure.github.io/staff/christian/"; }
+  function segs(t) { return t.length <= 160 ? 1 : Math.ceil(t.length / 153); }
+  function shiftAct(d, u) { var NOPE = { ok: false, reason: "Your login can't do that. Ask Christian." }, own = rec(u).role === "owner";
+    if (!may(u, "shifttexts")) return NOPE;
+    var res = function (x) { var o = { ok: true, shift: shiftList(u), shiftCfg: SHIFT_CFG }; Object.keys(x || {}).forEach(function (k) { o[k] = x[k]; }); return o; };
+    if (d.op === "preview") { if (!can(u, d.slug)) return NOPE; var en = shText(d.slug, false), es = shText(d.slug, true); return { ok: true, slug: d.slug, text: en, segs: segs(en), textEs: es, segsEs: segs(es) }; }
+    var x = SHIFT.filter(function (r) { return r.id === d.id && r.status !== "deleted"; })[0]; if (!x) return { ok: false, reason: "That sign-up is gone. Refresh." }; if (!can(u, x.slug)) return NOPE;
+    var st = x.status, msg = null, extra = null;
+    if (d.op === "get") return own ? { ok: true, id: x.id, phone: x.phone, email: x.email } : NOPE;
+    if (d.op === "approve" || d.op === "on") { if (st === "stop") return { ok: false, reason: x.name + " said STOP. Only they can restart it: they sign up again in the staff guide (and text START if Twilio blocked them)." }; if (st === "on") return res(); x.status = "on"; msg = [st === "pending" ? "Deal texts approved" : "Deal texts turned on", st, "on"]; }
+    else if (d.op === "off") { if (st === "stop") return { ok: false, reason: "Already STOP." }; x.status = "off"; msg = ["Deal texts turned off", st, "off"]; }
+    else if (d.op === "stop") { x.status = "stop"; msg = ["Marked STOP (asked not to get texts)", st, "stop"]; }
+    else if (d.op === "shifts") { var ns = {}, bad = false; Object.keys(d.shifts || {}).forEach(function (k) { if (SH_KEYS.indexOf(k) < 0 || !/^([01]\d|2[0-3]):[0-5]\d$/.test(d.shifts[k])) bad = true; else ns[k] = d.shifts[k]; });
+      if (bad || !Object.keys(ns).length) return { ok: false, reason: "Add at least one start time (blank = day off)." }; msg = ["Shift times", shDays(x.shifts), shDays(ns)]; x.shifts = ns; }
+    else if (d.op === "lang") { var lg = d.lang === "es" ? "es" : "en"; if (lg === x.lang) return res(); msg = ["Text language", x.lang === "es" ? "Español" : "English", lg === "es" ? "Español" : "English"]; x.lang = lg; }
+    else if (d.op === "contact") { if (!own) return NOPE; var ph = String(d.phone || "").replace(/\D/g, "").replace(/^1(?=\d{10}$)/, ""); if (!/^[2-9]\d{9}$/.test(ph)) return { ok: false, reason: "Type a 10-digit mobile number." };
+      msg = ["Contact changed", shMask(x.phone), shMask(ph)]; x.phone = "+1" + ph; x.email = String(d.email || "").trim().toLowerCase(); }
+    else if (d.op === "delete") { msg = ["Deal texts sign-up deleted (phone + email wiped)", st, "deleted"]; x.status = "deleted"; x.phone = ""; x.email = ""; }
+    else if (d.op === "test") { if (!own) return NOPE; if (st !== "on") return { ok: false, reason: "Turn them on first." }; msg = ["Test deal text sent", "", x.email ? "email: TEST MODE, nothing sent" : "none: TEST MODE, nothing sent"]; extra = { sentVia: msg[2] }; x.lastAt = Date.now(); x.last = msg[2]; }
+    else return { ok: false, reason: "Unknown action." };
+    audit.push({ ts: Date.now(), who: rec(u).name, slug: x.slug === "nalu-vida" ? "Nalu Vida" : "Melody Bar & Grill", reward: "Shift texts · " + x.name, field: msg[0], before: msg[1], after: msg[2], status: "applied" });
+    var o = res(extra); if (d.op === "approve" || d.op === "on") o.testNotice = "TEST MODE: nothing is texted or emailed. Live, " + x.name + " gets one text with the day's deals 15-30 minutes before each shift."; return o; }
   function handle(d) {
     if (d.type === "team_signup") return signup(d);
     if (d.type === "bo_login") {
@@ -199,6 +249,8 @@
     var SC = scopeOf(u), NOPE = { ok: false, reason: "Your login can't do that. Ask Christian." };
     if (d.type === "squares_admin" && (!may(u, "squares") || (SC.role !== "owner" && d.slug && !can(u, d.slug)))) return NOPE;
     if (d.type === "bo_team") return teamAct(d, u);
+    if (d.type === "bo_shift") return shiftAct(d, u);
+    if (d.type === "bo_orders" || d.type === "bo_order_set") return ordersAct(d, u);   // 🛒 same rules as Code.gs ordersHQ
     if (d.type === "bo_todo" && !may(u, "todo")) return NOPE;
     if (d.type === "squares_admin") return window.SQUARES_MOCK ? window.SQUARES_MOCK(Object.assign({}, d, { by: rec(u).name })) : { ok: false, reason: "Test squares backend missing" };   // demo/sports/squares-mock.js
     if (d.type === "bo_dedupe") return SC.role === "owner" ? { ok: true, removed: 0 } : NOPE;
@@ -229,7 +281,7 @@
     if (d.type === "bo_summary" && SC.role !== "owner") return NOPE;
     if (d.type === "bo_summary") return { ok: true, members: members.length, joined7: members.filter(function (m) { return m.joined > now - 7 * DAY; }).length, plays7: games.length, redeems7: redeems.length, pendingClaims: claims.filter(function (x) { return x.status === "pending"; }).length };
     if (d.type === "bo_data") return scopeData(u, { ok: true, test: true, role: SC.role, slugs: SC.slugs, job: rec(u).job, perms: rec(u).perms, team: SC.role === "owner" ? teamList() : [], menu: MENU, photos: PHOTOS.filter(function (x) { return (x.status === "pending" || x.status === "live") && (SC.role === "owner" || can(u, x.slug)); }), todos: todoOut(u).todos, todoDone: todoOut(u).todoDone,
-      mgr: SC.role === "owner" ? Object.keys(USERS).filter(function (k) { return USERS[k].role === "manager"; }).map(function (k) { return USERS[k].name; }) : [], scout: scout, restores7: { "melody-bar-grill": 2, "nalu-vida": 1 }, oneprize: { "melody-bar-grill": { codes: 7, used: 5, expired: 2, refused: 3, mins: 10 }, "nalu-vida": { codes: 4, used: 4, expired: 0, refused: 1, mins: 10 } }, eb: ebStats(), me: rec(u).name, now: Date.now(), members: members, games: games, opens: opens, redeems: redeems, claims: claims, staff: staff, trained: trained, audit: audit, disc: disc, lb: { "melody-bar-grill": { credited: 3, devices: 11 } } });
+      mgr: SC.role === "owner" ? Object.keys(USERS).filter(function (k) { return USERS[k].role === "manager"; }).map(function (k) { return USERS[k].name; }) : [], scout: scout, restores7: { "melody-bar-grill": 2, "nalu-vida": 1 }, oneprize: { "melody-bar-grill": { codes: 7, used: 5, expired: 2, refused: 3, mins: 10 }, "nalu-vida": { codes: 4, used: 4, expired: 0, refused: 1, mins: 10 } }, eb: ebStats(), shift: shiftList(u), shiftCfg: SHIFT_CFG, me: rec(u).name, now: Date.now(), members: members, games: games, opens: opens, redeems: redeems, claims: claims, staff: staff, trained: trained, audit: audit, disc: disc, lb: { "melody-bar-grill": { credited: 3, devices: 11 } } });
     if (d.type === "disc_propose") {
       if (!can(u, d.slug)) return NOPE;
       if (d.key === "scout" && SC.role !== "owner") return { ok: false, reason: "Scout actions are for Christian. Tell him what you saw." };
@@ -287,6 +339,26 @@
     }
     return { ok: false };
   }
+  // 🛒 ONLINE ORDERS (made-up, today only): same shape as Code.gs ordStaff(). Phones are 555 numbers; full number only with
+  // the guest-contacts switch, like the real backend. {type:"bo_orders", fake:true} (test mode only) adds a new paid order.
+  var FOODS = [["Lemon Pepper Wings", 16], ["Lobster Mac & Cheese", 21.5], ["Melody Burger", 19.25], ["Gilroy Garlic Fries", 6.75], ["Shrimp Tacos", 16], ["Nachos", 15], ["Chicken Burrito", 17.25], ["House Mac", 15]],
+    NOTES = ["", "", "extra ranch", "no onions", "sauce on the side", ""], ORDERS = [], oseq = 0;
+  function fakeOrder(minsAgo, st) { var t = Date.now() - minsAgo * 6e4, it = [], k = 1 + Math.floor(rnd() * 3), sub = 0, ABC = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", id = "MEL-O";
+    for (var q = 0; q < 5; q++) id += ABC[Math.floor(rnd() * ABC.length)];
+    for (var j = 0; j < k; j++) { var f = pick(FOODS), qn = 1 + Math.floor(rnd() * 2); it.push({ item: f[0], qty: qn, note: pick(NOTES) }); sub += f[1] * qn; }
+    sub = Math.round(sub * 100) / 100; var tax = Math.round(sub * 9.75) / 100, pk = pick([["ASAP", 0], ["In 15 min", 15], ["In 30 min", 30]]); oseq++;
+    ORDERS.push({ id: id, slug: "melody-bar-grill", status: st || "paid", name: "Test G. " + (60 + oseq), phone: "+1555010" + ("0" + (60 + oseq)).slice(-2) + "0" + (oseq % 10), pickup: pk[0], pickupAt: pk[1] ? t + pk[1] * 6e4 : 0,
+      items: it, subtotal: sub, food_subtotal: sub, tax: tax, tip: 0, delivery_fee: 0, total: Math.round((sub + tax) * 100) / 100, ssai_fee: Math.round(sub * 5) / 100, created: t - 6e4, paidAt: t, readyAt: st === "ready" || st === "picked_up" ? t + 9e5 : 0, pickedAt: st === "picked_up" ? t + 15e5 : 0 }); }
+  fakeOrder(95, "picked_up"); fakeOrder(52, "ready"); fakeOrder(18, "paid"); fakeOrder(4, "paid");
+  function ordersAct(d, u) { var r = rec(u); if (!may(u, "orders")) return { ok: false, reason: "Your login can't do that. Ask Christian." };
+    if (d.type === "bo_order_set") { var o = ORDERS.filter(function (x) { return x.id === d.id; })[0], st = d.status === "ready" || d.status === "picked_up" ? d.status : "";
+      if (!o || !can(u, o.slug)) return { ok: false, reason: "Order not found." }; if (!st) return { ok: false, reason: "Pick Ready or Picked up." };
+      if (o.status === "picked_up" || o.status === st) return { ok: false, reason: "Already marked. Tap Refresh." };
+      o.status = st; if (st === "ready") o.readyAt = Date.now(); else o.pickedAt = Date.now(); }
+    if (d.fake) fakeOrder(0, "paid");
+    var list = ORDERS.filter(function (o) { return can(u, o.slug); }).map(function (o) { var c = JSON.parse(JSON.stringify(o)); if (!r.perms.members && r.role !== "owner") c.phone = "•••" + c.phone.slice(-4); if (r.role !== "owner") delete c.ssai_fee; return c; })
+      .sort(function (a, b) { return b.paidAt - a.paidAt; });
+    return { ok: true, test: true, orders: list, now: Date.now(), day: ymd(Date.now()) }; }
   window.HQ_MOCK = function (body) { return new Promise(function (res) { setTimeout(function () { Promise.resolve(handle(JSON.parse(JSON.stringify(body)))).then(function (r) { res(JSON.parse(JSON.stringify(r))); }); }, 120); }); };
   // Football Squares test backend (shared with the guest app's ?test=1 through this browser's localStorage)
   if (!window.SQUARES_MOCK) { var sqs = document.createElement("script"); sqs.src = "../../demo/sports/squares-mock.js?v=sq2"; document.head.appendChild(sqs); }

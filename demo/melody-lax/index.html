@@ -65,7 +65,7 @@ window.SSAI_REWARDS={
   window.MELODY_REWARDS_ON=function(){ return on; };
   if(wk.flagUrl&&q.get("rewards")==null) fetch(wk.flagUrl,{cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(!j) return; if(typeof j.rewardsActive==="boolean") on=j.rewardsActive; if(j.prize) wk.prize=String(j.prize).slice(0,60); if(window.GameMenu) GameMenu.refresh(); }).catch(function(){});
 })();</script>
-<script src="../christian-live.js?v=mg2" data-slug="melody-bar-grill"></script>
+<script src="../christian-live.js?v=or1" data-slug="melody-bar-grill"></script>
 <script src="menu-data.js?v=mg1"></script>
 <meta name="description" content="Melody Bar & Grill by LAX: drinks and food menu, Melody Rewards points, the Just Landed deal, and the Melody flight game.">
 <meta name="theme-color" content="#1a0a0c">
@@ -256,6 +256,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 <section class="msec" id="sec-games" data-tab="games">
 <h2 id="play"><small>Play &amp; earn points</small>Fly the Melody approach</h2>
 <p class="sub">A night dogfight over LA. <b>Campaign:</b> 10 levels that follow a real SoCal route in six parts: take off past Melody and over Inglewood, ride the 105 freeway to LAX, Nalu Vida on the Venice Pier, Compton, Long Beach and the Queen Mary, then Hollywood for the finale, each a little harder, with six bosses (an Army gunship, the Super Jet, a big jet and its escorts, a rocket ship, an army base and a final flock of white birds), then land back at LAX. <b>Survival:</b> no finish line, it just keeps getting harder: how long can you last? Catch Melody's food as it floats by. Drag anywhere on the game and the plane glides to your finger; tap ⚡ for a speed boost and grab the hourglass for slow-mo. Prefer a calm flight? Pause and turn combat off. <b>BETA:</b> weekly prizes switch on soon; the boards are live now.</p>
+<div id="versushost"></div>
 <div class="gamebox">
   <div class="hud">
     <span>Score <span class="sc" id="score">0</span></span>
@@ -600,6 +601,14 @@ function img(src){ var i=new Image(); i.src=src; return i; }
 function ready(i){ return i&&i.complete&&i.naturalWidth; }
 var S={plane:img("img/game/plane.webp"),ufo:img("img/game/ufo.webp"),jet:img("img/game/jet.webp"),kami:img("img/game/plane.webp"),
   stadium:img("img/game/stadium.webp"),towers:img("img/game/towers.webp"),mar0:img("img/game/marshal0.webp"),cop0:img("img/game/lapd_blue.webp"),cop1:img("img/game/lapd_black.webp"),mar1:img("img/game/marshal1.webp"),mar2:img("img/game/marshal2.webp"),cone:img("img/game/cone.webp"),melody:img("img/game/melody.webp"),flame:img("img/game/flame.webp"),smoke:img("img/game/smoke.webp")};
+/* VENUE VERSUS (../versus.js, 2026-10-15): a shared-seed path for live battles between guests at the bar. RS(k) is plain
+   Math.random() in normal play, so nothing about a normal flight changes. While a Versus run is up (window.__MG.versus) it is a
+   seeded stream per kind k ("it" food/coins/mic, "sl"/"bo"/"hl"/"am" slow-mo/boost/heal/ammo, "en" enemy spawns), so everyone in the battle
+   gets the same food, enemies and power-ups in the same order. Cosmetic randomness (sparks, smoke, shake) stays Math.random. */
+var VS=null, VS_R=null;
+function mb32(a){ return function(){ a=(a+0x6D2B79F5)>>>0; var t=a; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
+function RS(k){ if(!VS_R) return Math.random(); var r=VS_R[k]; if(!r){ var h=(VS.seed>>>0)^2166136261; for(var i=0;i<k.length;i++) h=Math.imul(h^k.charCodeAt(i),16777619)>>>0; r=VS_R[k]=mb32(h||1); } return r(); }
+function vsId(k){ return VS?k+"-"+(VS.n[k]=(VS.n[k]||0)+1):""; }   // power-up ids line up across phones (same seed, same order)
 // pickups: only items on the app's own FOOD/DRINKS menu (Antidote, 2026-10-13: nothing off-menu in the game or the app). e = emoji fallback while the photo loads,
 // v = cache-bust per sprite/GLB, wt = spawn weight (default 1; the burger is doubled so it still shows up often with the bigger list)
 var PICK=[{k:"p_mac",n:"Mac & Cheese",p:80,e:"🧀",w:58},{k:"p_wings",n:"Lemon Pepper Wings",p:70,e:"🍗",w:60},
@@ -612,7 +621,7 @@ var PICK=[{k:"p_mac",n:"Mac & Cheese",p:80,e:"🧀",w:58},{k:"p_wings",n:"Lemon 
   {k:"p_mimosa",n:"Mimosa",p:45,e:"🥂",w:22,w3:50,drink:1,v:"fv2"}];
 PICK.forEach(function(p){ p.im=img("img/game/"+p.k+".webp?v="+(p.v||"ag1")); });
 var PICK_WT=PICK.reduce(function(a,p){ return a+(p.wt||1); },0);
-function pickOne(){ var r=Math.random()*PICK_WT; for(var i=0;i<PICK.length;i++){ r-=PICK[i].wt||1; if(r<0) return PICK[i]; } return PICK[0]; }
+function pickOne(){ var r=RS("it")*PICK_WT; for(var i=0;i<PICK.length;i++){ r-=PICK[i].wt||1; if(r<0) return PICK[i]; } return PICK[0]; }
 var MIC={k:"p_mic",n:"Karaoke mic",e:"🎤",w:36}; MIC.im=img("img/game/p_mic.webp");
 var PLANE_W=86;
 var G={running:false,over:false};
@@ -701,7 +710,8 @@ function hud(){ $("score").textContent=G.score.toLocaleString(); var sv=G.runnin
     $("lvl").innerHTML=sv?"⏱ "+esc(T("Survival"))+" · "+esc(T("Level"))+" <b>"+G.lvl+"</b>":esc(T(CALM?"Leg":"Level"))+" <b>"+G.lvl+"</b> "+esc(T("of"))+" "+NL(); if(CALM){ $("wpn").innerHTML=(G.streak>1?"🔥 "+esc(T("Streak"))+" <b>"+G.streak+"</b>":""); HK=""; } else if(!G.guns){ $("wpn").innerHTML='<b style="color:#c2a98f">🔒 '+esc(T("No guns yet"))+'</b>'; HK=""; } else $("wpn").innerHTML='<b style="color:'+w.c+'">'+esc(T(w.n))+'</b><span class="pips" aria-label="'+(G.unl+1)+' of 6 guns unlocked">'+p+'</span>'; } }
 function best(){ try{ return +localStorage.getItem("melody-best")||0; }catch(e){ return 0; } }
 var RUN=0;
-function start(){ if(RA){ RA.clear(); pickT=-1e9; radio("Tower to Captain: you're cleared for takeoff!",{tone:"info",ms:2200}); } var keep=G.clouds, posted=G.posted; G=fresh(); G.clouds=keep; G.posted=posted; G.runId=++RUN; G.running=true; G.mode=CALM?"campaign":MODE; ATT=0; G.last=performance.now(); seedGround(); $("over").classList.remove("on");
+function start(){ if(RA){ RA.clear(); pickT=-1e9; radio(VS?"Tower to Captain: Venue Versus is live. Fly!":"Tower to Captain: you're cleared for takeoff!",{tone:"info",ms:2200}); } var keep=G.clouds, posted=G.posted; G=fresh(); G.clouds=keep; G.posted=posted; G.runId=++RUN; G.running=true; G.mode=CALM?"campaign":MODE; ATT=0; G.last=performance.now(); seedGround(); $("over").classList.remove("on");
+  if(VS){ G.vs=1; G.mode="survival"; VS_R={}; VS.n={}; } else { VS_R=null; if(VS_CALM!=null){ CALM=VS_CALM; VS_CALM=null; } }   // a Versus run is always combat Survival on the shared seed
   if(window.ReviewEgg) ReviewEgg.reset(24,40);   // Antidote's review quest: catch DRIZ_N drizzle emblems → his review plane → shoot it down
   if(window.Halftime) Halftime.reset();           // halftime: his Melody review reel, once a flight, at a level-up after ~90 s
   var etl=window.ReviewEgg?ReviewEgg.testLevel:0; if(etl===1) G.dz=DRIZ_N-1; if(etl===2){ G.dz=DRIZ_N; G.rpT=4800; }
@@ -851,22 +861,22 @@ function drawClouds(dy){ var sm=S.smoke; if(!ready(sm)) return;
 
 /* ---- spawning ---- */
 function spawnPick(){
-  var r=Math.random(), x=40+Math.random()*(W-80);
+  var r=RS("it"), x=40+RS("it")*(W-80);
   if(r<0.38) G.items.push({t:"coin",x:x,y:-30,r:14,spin:Math.random()*6});
   else if(r<0.94) { var p=pickOne(); G.items.push({t:"food",p:p,x:x,y:-40,r:24,rot:(Math.random()-.5)*.5,vr:(Math.random()-.5)*.03}); }
-  else G.items.push({t:"mic",x:x,y:-40,r:20,rot:0,vr:.04});
+  else G.items.push({t:"mic",x:x,y:-40,r:20,rot:0,vr:.04,id:vsId("mic")});
   // health kits: rare, only when hurt, at most two a flight
-  if(G.hp<100&&G.heals<2+Math.floor(G.lvl/4)&&G.el-G.lastHeal>Math.max(7000,12000-G.lvl*500)&&G.lel>9000&&Math.random()<0.12+G.lvl*.008){ G.heals++; G.lastHeal=G.el; G.items.push({t:"heal",x:40+Math.random()*(W-80),y:-40,r:20}); }
+  if(G.hp<100&&G.heals<2+Math.floor(G.lvl/4)&&G.el-G.lastHeal>Math.max(7000,12000-G.lvl*500)&&G.lel>9000&&RS("hl")<0.12+G.lvl*.008){ G.heals++; G.lastHeal=G.el; G.items.push({t:"heal",x:40+RS("hl")*(W-80),y:-40,r:20}); }
 }
-function spawnUfo(){ var h=L().ufo, x0=80+Math.random()*(W-160); G.ens.push({t:"ufo",x:x0,x0:x0,amp:60+Math.random()*60,y:-50,r:28,hp:h,mhp:h,ph:Math.random()*6,fire:(900+Math.random()*700)*L().pace,w:84,zl:SPAWN_LO+46+Math.random()*(SPAWN_HI-SPAWN_LO-70)}); }   // UFOs patrol their OWN lane + height: they never follow you
+function spawnUfo(){ var h=L().ufo, x0=80+RS("en")*(W-160); G.ens.push({t:"ufo",x:x0,x0:x0,amp:60+RS("en")*60,y:-50,r:28,hp:h,mhp:h,ph:RS("en")*6,fire:(900+RS("en")*700)*L().pace,w:84,zl:SPAWN_LO+46+RS("en")*(SPAWN_HI-SPAWN_LO-70)}); }   // UFOs patrol their OWN lane + height: they never follow you
 /* ---- JETS (2026-10-14 rework, Antidote): they come as a back-to-back PAIR. Jet 1 drops in and hangs at the top, sliding after you
    slowly, and fires single aimed shots (2 per jet, 3 from level 4): each one has a red aim line for 650 ms first and flies at
    4.2 px/frame, aimed where you are when it fires (no homing). After 5 s a red lane shows its dive (600 ms), it dives straight
    down that lane (no steering) and leaves. Jet 2 drops in as Jet 1 starts its dive (or right away if Jet 1 is shot down) and
    does the same. Then the wave ends and the next pair is timed from there. Times are enemy time (slow-mo stretches them). ---- */
 var JW={wait:900,aim:5000,shotsAt:[1300,2700,4100],tel:650,bul:4.2,diveTel:600,dive0:3,dive1:8};
-function spawnJet(pair){ pair=pair||1; var x=60+Math.random()*(W-120), h=L().jet; G.warn.push({x:x,t:900,k:"jet"});
-  var en={t:"jet",x:x,y:-70,r:24,hp:h,mhp:h,w:70,pair:pair,st:"wait",stT:0,shots:G.lvl>=4?3:2,fired:0,hangY:95+Math.random()*30,ra:0};
+function spawnJet(pair){ pair=pair||1; var x=60+RS("en")*(W-120), h=L().jet; G.warn.push({x:x,t:900,k:"jet"});
+  var en={t:"jet",x:x,y:-70,r:24,hp:h,mhp:h,w:70,pair:pair,st:"wait",stT:0,shots:G.lvl>=4?3:2,fired:0,hangY:95+RS("en")*30,ra:0};
   G.ens.push(en); if(pair===1) G.jw={e1:en,e2:null}; else if(G.jw) G.jw.e2=en; return en; }
 function jetWaveTick(){ var w=G.jw; if(!w) return; if(!w.e2){ if(G.ens.indexOf(w.e1)<0) spawnJet(2); } else if(G.ens.indexOf(w.e2)<0){ G.jw=null; } }
 function jetStep(en,dt,k){ en.stT+=dt; var st=en.st;
@@ -890,10 +900,10 @@ function jetStep(en,dt,k){ en.stT+=dt; var st=en.st;
 var SLOW={ms:5000,scale:.33,max:2,life:12000,sp:2.3};
 function slowRoundKey(){ return G.lvl+(G.boss?"b":""); }
 function slowSpawnTick(dt,takeoff,landing){ if(CALM||G.home||G.won||takeoff||landing||G.dying) return; var key=slowRoundKey();
-  if(G.slowK!==key){ G.slowK=key; G.slowN=0; G.slowNT=DBG.slowmo?4000:10000+Math.random()*6000; }
+  if(G.slowK!==key){ G.slowK=key; G.slowN=0; G.slowNT=DBG.slowmo?4000:10000+RS("sl")*6000; }
   if(G.slowN>=SLOW.max||G.slowT>0||G.items.some(function(i){ return i.t==="slow"; })) return;
-  G.slowNT-=dt; if(G.slowNT>0) return; G.slowN++; G.slowNT=DBG.slowmo?4000:14000+Math.random()*8000;
-  var x=60+Math.random()*(W-120); G.items.push({t:"slow",x:x,y:-24,r:10,ang:Math.PI/2+(Math.random()-.5)*.8,ph:Math.random()*6,age:0}); }
+  G.slowNT-=dt; if(G.slowNT>0) return; G.slowN++; G.slowNT=DBG.slowmo?4000:14000+RS("sl")*8000;
+  var x=60+RS("sl")*(W-120); G.items.push({t:"slow",x:x,y:-24,r:10,ang:Math.PI/2+(RS("sl")-.5)*.8,ph:RS("sl")*6,age:0,id:vsId("slow")}); }
 function slowMove(it,k,dt){ it.age+=dt; it.ph+=.035*k; var leave=it.age>SLOW.life;
   var turn=Math.sin(it.ph)*.05+Math.sin(it.ph*2.7+1)*.03, dx=it.x-G.x, dy=it.y-G.y, d=Math.hypot(dx,dy);
   if(!leave){ if(d<110){ var away=Math.atan2(dy,dx); turn+=angTo(it.ang,away)*.045; }   // shies away from the plane (you are still ~4x faster)
@@ -916,20 +926,20 @@ function slowHud(now){ if(!(G.slowT>0)&&G.ts>.97) return; var f=Math.max(0,G.slo
   cx.strokeStyle="rgba(255,255,255,.15)"; cx.lineWidth=3.5; cx.beginPath(); cx.arc(rx-40,ry,9,0,6.283); cx.stroke(); cx.strokeStyle="#9fd8ff"; cx.beginPath(); cx.arc(rx-40,ry,9,-Math.PI/2,-Math.PI/2+6.283*f); cx.stroke();
   cx.font="900 13px Barlow,system-ui"; cx.textAlign="left"; cx.textBaseline="middle"; cx.fillStyle="#cfeaff"; cx.fillText(T("SLOW-MO")+" "+Math.ceil(G.slowT/1000)+"s",rx-26,ry+.5); cx.restore(); }
 /* ⚡ boost pickup: drifts down now and then (every ~25-35 s in combat), fly through it for an instant boost + full recharge */
-function boostItemTick(dt,takeoff,landing){ if(G.home||G.won||takeoff||landing||G.dying) return; G.bpT=(G.bpT==null?18000:G.bpT)-dt; if(G.bpT>0) return; G.bpT=25000+Math.random()*10000;
-  if(!G.items.some(function(i){ return i.t==="boost"; })) G.items.push({t:"boost",x:50+Math.random()*(W-100),y:-30,r:16}); }
+function boostItemTick(dt,takeoff,landing){ if(G.home||G.won||takeoff||landing||G.dying) return; G.bpT=(G.bpT==null?18000:G.bpT)-dt; if(G.bpT>0) return; G.bpT=25000+RS("bo")*10000;
+  if(!G.items.some(function(i){ return i.t==="boost"; })) G.items.push({t:"boost",x:50+RS("bo")*(W-100),y:-30,r:16,id:vsId("boost")}); }
 function drawBoostItem(it,now){ var p=.5+.5*Math.sin(now/150); cx.save(); cx.globalCompositeOperation="lighter"; var g=cx.createRadialGradient(it.x,it.y,2,it.x,it.y,32); g.addColorStop(0,"rgba(120,220,255,"+(.5+.3*p)+")"); g.addColorStop(1,"rgba(60,140,255,0)"); cx.fillStyle=g; cx.beginPath(); cx.arc(it.x,it.y,32,0,6.283); cx.fill(); cx.restore();
   cx.save(); cx.fillStyle="rgba(8,13,26,.85)"; cx.beginPath(); cx.arc(it.x,it.y,15,0,6.283); cx.fill(); cx.strokeStyle="#5fd0ff"; cx.lineWidth=2; cx.stroke(); cx.font="17px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText("⚡",it.x,it.y+1); cx.restore(); }
 var JET_V=2.4, KAMI_V=3.4;   // px per 60 Hz frame (was 7.5 and 5.2): jets come down slowly, steering at you; easy to see, possible to dodge
 function spawnKami(){ // an airliner coming head-on, aimed at where you are: red flash + buzz first
   var x=Math.max(60,Math.min(W-60,G.x+(Math.random()-.5)*60)); G.red=1; G.warn.push({x:x,t:1100,k:"kami"}); buzz([60,60,60,60,120]);
   setTimeout(function(){ if(G.running&&!G.dying&&!G.boss&&!G.won){ var h=L().kami; G.ens.push({t:"kami",x:x,y:-110,r:34,hp:h,mhp:h,w:120,vx:(G.x-x)/(140*5.2/KAMI_V)}); SND.play("jet"); } },1100); }
-function spawnBolt(){ var x=40+Math.random()*(W-80); if(Math.random()<.5) x=Math.max(40,Math.min(W-40,G.x)); G.bolts.push({x:x,ph:"warn",age:0}); }
+function spawnBolt(){ var x=40+RS("en")*(W-80); if(RS("en")<.5) x=Math.max(40,Math.min(W-40,G.x)); G.bolts.push({x:x,ph:"warn",age:0}); }
 /* LAPD air unit: drops in, tracks you, fires 5-round bursts (pop-pop-pop-pop-pop), pauses, repeats 3x, peels off */
 var COPA=[{hub:[.42,.52],bar:[.47,.72],gun:[.92,.74]},{hub:[.60,.516],bar:[.60,.425],gun:[.10,.62]}], COP_LEN=150;
 function copPt(en,key){ var im=en.v?S.cop1:S.cop0, h=COP_LEN, w=ready(im)?h*im.naturalWidth/im.naturalHeight:60, a=COPA[en.v][key]; return [en.x+(a[0]-.5)*w, en.y+(a[1]-.5)*h, w]; }
-function spawnCop(){ var x=70+Math.random()*(W-140); G.warn.push({x:x,t:1100,k:"cop"});
-  setTimeout(function(){ if(!G.running||G.dying||G.boss||G.won) return; var vv=(G.copN++)%2, h=L().cop; G.ens.push({t:"cop",v:vv,x:x,y:-90,r:36,hp:h,mhp:h,w:88,hoverY:95+Math.random()*45,burst:0,bursts:0,shot:0,fireT:900,side:vv?-1:1}); },1100); }
+function spawnCop(){ var x=70+RS("en")*(W-140); G.warn.push({x:x,t:1100,k:"cop"});
+  setTimeout(function(){ if(!G.running||G.dying||G.boss||G.won) return; var vv=(G.copN++)%2, h=L().cop; G.ens.push({t:"cop",v:vv,x:x,y:-90,r:36,hp:h,mhp:h,w:88,hoverY:95+RS("ai")*45,burst:0,bursts:0,shot:0,fireT:900,side:vv?-1:1}); },1100); }
 var AC=null;
 function rotorFX(c,x,y,r,t,dir){ // fast rotor illusion: streaky blur disc + 4 tapered blades turning slowly with motion-blur trails
   dir=dir||1; var a=t*2.6*dir;
@@ -2335,11 +2345,11 @@ function frame(now){
     var edt=dt*G.ts; G.ufoT-=edt; if(G.ufoT<=0){ spawnUfo(); G.ufoT=Math.max(4200,8000-G.lel/20)*pc*DENS; }
     jetWaveTick(); if(!G.jw){ G.jetT-=edt; if(G.jetT<=0){ spawnJet(1); G.jetT=DBG.jets?2500:Math.max(5200,9500-G.lel/18)*pc*DENS; } }   // the next pair is timed from the end of the last one
     G.boltT-=edt; if(G.boltT<=0){ spawnBolt(); G.boltT=Math.max(3800,7000-G.lel/25)*pc*DENS; }
-    G.kamiT-=edt; if(G.kamiT<=0){ spawnKami(); G.kamiT=(14000+Math.random()*6000)*pc*DENS; }
-    G.copT-=edt; if(G.copT<=0){ spawnCop(); if(G.lvl>=4) setTimeout(spawnCop,1600); G.copT=(18000+Math.random()*8000)*pc*DENS; } }
+    G.kamiT-=edt; if(G.kamiT<=0){ spawnKami(); G.kamiT=(14000+RS("en")*6000)*pc*DENS; }
+    G.copT-=edt; if(G.copT<=0){ spawnCop(); if(G.lvl>=4) setTimeout(spawnCop,1600); G.copT=(18000+RS("en")*8000)*pc*DENS; } }
     if(CALM) TRF.spawnTick(dt);
     if(window.ReviewEgg&&!G.home&&G.dz<DRIZ_N){ G.dzT-=dt; if(G.dzT<=0) G.dzT=spawnDriz()?DRIZ_GAP+Math.random()*2000:1500; }
-    G.ammoT-=dt; if(!CALM&&G.guns&&G.unl>0&&G.ammoT<=0){ G.ammoT=11000+Math.random()*5000; if(ammoLow()&&!G.items.some(function(x){ return x.ammo; })) G.items.push({t:"crate",ammo:1,x:60+Math.random()*(W-120),y:H+50,r:26,sw:Math.random()*6}); }
+    G.ammoT-=dt; if(!CALM&&G.guns&&G.unl>0&&G.ammoT<=0){ G.ammoT=11000+RS("am")*5000; if(ammoLow()&&!G.items.some(function(x){ return x.ammo; })) G.items.push({t:"crate",ammo:1,x:60+RS("am")*(W-120),y:H+50,r:26,sw:Math.random()*6}); }
     } }
     boostStep(dt); slowStep(dt); if(!CALM){ slowSpawnTick(dt,takeoff,landing); boostItemTick(dt,takeoff,landing); } lowAltTick(dt,takeoff,landing,now);
     steer(dt,takeoff||landing);
@@ -2379,6 +2389,7 @@ function frame(now){
     else if(!R3){ var P=it.t==="mic"?MIC:it.p, bob=Math.sin(now/260+it.x)*3; var gl=cx.createRadialGradient(it.x,it.y,4,it.x,it.y,P.w*.9); gl.addColorStop(0,it.t==="mic"?"rgba(228,107,131,.55)":"rgba(255,226,140,.6)"); gl.addColorStop(1,"rgba(0,0,0,0)"); cx.fillStyle=gl; cx.beginPath(); cx.arc(it.x,it.y,P.w*.9,0,6.283); cx.fill(); sprite(P.im,it.x,it.y+bob,P.w,it.rot,false,P.e);
       if(it.t==="food"){ if(P.drink) drinkSheen(P,it.x,it.y+bob,now); else steam(it.x,it.y+bob,P.w,now); } }
     if(run&&Math.abs(it.x-G.x)<it.r+26&&Math.abs(it.y-G.y)<it.r+28){   /* pickups ignore altitude entirely (hazards keep zOK) */
+      if(it.id&&VS&&VS.pu) try{ VS.pu(it.id); }catch(e){}
       if((it.t==="crate"||it.t==="heal"||it.t==="mic")&&performance.now()-pickT>20000){ pickT=performance.now(); radio(it.t==="crate"?"Nice pickup! Ammo restocked.":it.t==="heal"?"Nice pickup! Patching you up.":"Nice pickup! Double score, sing it!",{tone:"info",ms:2200}); }
       if(it.t==="slow") slowOn();
       else if(it.t==="boost") boostOn(true);
@@ -2504,6 +2515,7 @@ function frame(now){
   else {
     drawFx(k);
     if(!G.crashed){ var proll=Math.max(-1,Math.min(1,G.vx*.12)), palt=G.alt==null?(G.running?1:0):G.alt, pw=PLANE_W*(0.74+0.26*palt);
+      if(G.vs&&VS&&VS.ghost) vsGhost(now);
       var vis=G.inv<=0||G.landing||Math.floor(G.inv/6)%2===0; boostDraw(now); if(vis) drawPlane(G.x,G.y,proll,1,palt);
       if(G.sev>.15) FX.planeFire(G.x,G.y,pw,pw*524/520,proll*.35,Math.max(.72,1-Math.abs(proll)*.5),1,G.sev,dt,k,now,G.running,!vis||R3); }
     if(run&&!CALM){ muzzle(); beamDraw(now); }
@@ -2523,7 +2535,7 @@ function frame(now){
     cx.fillStyle="#efe4c9"; cx.font="italic 900 40px 'Playfair Display',Georgia,serif"; cx.fillText(G.over?(G.won?T("Mission complete"):G.landed?T("Landed at LAX"):T("Flight over")):T("Melody Approach"),W/2,H/2-46);
     cx.fillStyle="#f0d375"; cx.font="800 22px Barlow,system-ui"; cx.fillText(T("TAP TO FLY"),W/2,H/2+4);
     cx.fillStyle="#c9d2ee"; cx.font="600 14px Barlow,system-ui"; cx.fillText(CALM?T("5 scenic legs · catch the food · land at LAX"):MODE==="survival"?T("Survival · how long can you last?"):T("10 levels · 6 bosses · land back at LAX"),W/2,H/2+34); }
-  if(G.running){ hud(); if(!G.dying&&((G.touched&&G.roll<0.06)||(G.home&&G.t<-9000))) end(); }
+  if(G.running){ hud(); if(!G.dying&&((G.touched&&G.roll<0.06)||(G.home&&G.t<-9000)||(G.vs&&VS&&G.el>=VS.ms))) end(); }
   var F1=performance.now(); if(window.__M3PT) __M3PT.game2d=(__M3PT.game2d||0)+(F1-F0); if(R3&&M3.render) M3.render(now,dt,spd); if(F1-F0>12&&window.__M3SPK&&__M3SPK.length<60) __M3SPK.push({at:(now/1000).toFixed(1),game2d:+(F1-F0).toFixed(1)});   // the WebGL world under this overlay, from the same state this frame just stepped
   if(ATT&&!G.running) previewCopy(now);
 }
@@ -2553,6 +2565,8 @@ var M3=window.__M3={render:null,NL:function(){ return NL(); },zoneId:function(){
    at most 50 game points a day. No prizes, no codes, no discounts from the game. Guests can play first: their points are
    held on this phone for the day and saved when they tap "Join to save your N points". */
 function end(){
+  if(G.vs) return vsEnd();
+  $("post").style.display="";
   G.running=false; G.over=true; G.landed=!!G.touched; hud();
   if(G.won) radio("Smooth landing! Welcome to Melody Bar & Grill.",{tone:"win",ms:3600});
   var sv=G.mode==="survival", b=best(), bs=0; try{ bs=+localStorage.getItem("melody-best-surv")||0; }catch(e){}
@@ -2619,7 +2633,30 @@ function postScore(){
 // weekly board = bragging rights only (no champion prize since Christian's 2026-10 feedback)
 function alertBox(t){ var d=document.createElement("div"); d.className="ok"; d.style.cssText="position:fixed;left:12px;right:12px;top:12px;z-index:80;max-width:520px;margin:0 auto;background:#1a0a0c;box-shadow:0 10px 40px #000a"; d.innerHTML='<b>'+esc(t)+'</b>'; document.body.appendChild(d); setTimeout(function(){ d.remove(); },7000); }
 
-window.__MG={get:function(){return G;},start:function(){start();},end:function(){ if(G.running) end(); },W:W,H:H,mode:function(m){ if(m) setMode(m); return MODE; },attract:function(on){ ATT=on?1:0; },LV:LV,BOSS_AT:BOSS_AT,ZONES:ZONES,zone:function(){ return ZONES[zoneIx()].id; },nextLevel:function(){ nextLevel(); }};   /* (zone + nextLevel: the route tests) */
+/* ---- VENUE VERSUS bridge (../versus.js drives it; normal play never touches any of this) ----
+   __MG.versus({seed, ms, label, onEnd(res), ghost(now) → {x,y,a,n,down}|null, pu(id)}) starts a combat Survival flight on the
+   shared seed that ends after ms (or when you go down) and reports {score, surv, lvl, crashed, timeUp} to onEnd instead of the
+   weekly board / Rewards points. vsTake(id) removes a power-up a rival grabbed first (Sky Duel). vsStop() = the server's horn. */
+var VS_CALM=null;
+function vsEnd(){ var v=VS, res={score:G.score,surv:Math.floor(G.surv),lvl:G.lvl,crashed:!!(G.crashed||G.hp<=0),timeUp:!!(v&&G.el>=v.ms)};
+  G.running=false; G.over=true; G.vs=0; VS=null; VS_R=null; if(VS_CALM!=null){ CALM=VS_CALM; VS_CALM=null; } hud();
+  $("final").textContent=res.score.toLocaleString()+" score";
+  $("rank").textContent=(v&&v.label||"Venue Versus")+" · "+(res.timeUp?"time's up":"you went down at "+mmss(res.surv))+" · results in the lobby";
+  $("won").style.display="none"; $("post").style.display="none"; var ex=$("over").querySelector(".ir-endx"); if(ex) ex.remove();
+  $("over").classList.add("on");
+  if(v&&v.onEnd) try{ v.onEnd(res); }catch(e){} }
+function vsGhost(now){ var g=null; try{ g=VS.ghost(now); }catch(e){} if(!g||!isFinite(g.x)||!isFinite(g.y)) return; var im=S.plane, w=PLANE_W*.9;
+  cx.save(); cx.globalAlpha=g.down?.22:.5; cx.translate(g.x,g.y); cx.rotate(Math.max(-1,Math.min(1,g.a||0))*.35);
+  if(ready(im)){ var h=w*im.naturalHeight/im.naturalWidth; cx.filter="hue-rotate(150deg) saturate(1.5)"; cx.drawImage(im,-w/2,-h/2,w,h); cx.filter="none"; }
+  else { cx.font="44px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText("✈️",0,0); }
+  cx.restore();
+  var t=String(g.n||"Rival").slice(0,16)+(g.down?" 💥":""); cx.save(); cx.font="800 12px Barlow,system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; var tw=cx.measureText(t).width+16, ty=g.y-w*.62-6;
+  cx.globalAlpha=.9; cx.fillStyle="rgba(119,36,46,.92)"; roundRect(g.x-tw/2,ty-9,tw,18,9); cx.fill(); cx.fillStyle="#fff"; cx.fillText(t,g.x,ty+.5); cx.restore(); }
+window.__MG={get:function(){return G;},start:function(){start();},end:function(){ if(G.running) end(); },W:W,H:H,mode:function(m){ if(m) setMode(m); return MODE; },attract:function(on){ ATT=on?1:0; },LV:LV,BOSS_AT:BOSS_AT,ZONES:ZONES,zone:function(){ return ZONES[zoneIx()].id; },nextLevel:function(){ nextLevel(); },
+  versus:function(o){ if(!o) return false; VS={seed:(o.seed>>>0)||1,ms:Math.max(5000,+o.ms||120000),onEnd:o.onEnd||null,ghost:o.ghost||null,pu:o.pu||null,label:o.label||"Venue Versus",n:{}};
+    if(VS_CALM==null) VS_CALM=CALM; CALM=false; try{ SND.unlock(); }catch(e){} start(); return true; },
+  vsTake:function(id){ for(var i=G.items.length-1;i>=0;i--) if(G.items[i].id===id){ var it=G.items[i]; G.items.splice(i,1); pop(it.x,it.y,T("Rival grabbed it!"),"#ff9db0"); return true; } return false; },
+  vsStop:function(){ if(G.running&&G.vs) end(); }, vsOn:function(){ return !!(G.running&&G.vs); }, unlock:function(){ try{ SND.unlock(); }catch(e){} }};   /* (zone + nextLevel: the route tests) */
 window.MELODY_MODE=function(m){ if(m) setMode(m); return MODE; };
 window.MELODY_START=function(){ SND.unlock(); if(!G.running) start(); try{ cv.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); }catch(e){} };   // the shared start menu's PLAY
 requestAnimationFrame(frame);
@@ -2827,11 +2864,14 @@ window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REW
 /* CUSTOMER-ONLY (2026-10-13): this is Melody's live customer app. No owner view, manager log, sales numbers, sample
    players or "Demo:" notes (crm.js, interim.js, nearby.js, specials.js read this flag). Owner tools = Christian HQ. */
 window.SSAI_CUSTOMER_ONLY=true;</script>
-<script src="../crm.js?v=rs1"></script><script src="../claimscore.js?v=cs1"></script><script src="games-data.js?v=ft3"></script><script src="games.js?v=ft3"></script>
-<link rel="stylesheet" href="../sports/sports.css?v=sb2">
+<script src="../crm.js?v=rs1"></script><script src="../claimscore.js?v=cs1"></script><script src="games-data.js?v=ft4"></script><script src="games.js?v=ft4"></script>
+<link rel="stylesheet" href="../sports/sports.css?v=gd1">
 <script>/* SPORTS BAR PACKAGE (demo/sports/README.md): Melody = install #1, LA/California teams. Perks text stays empty until
    Christian sets a real deal: an empty watchParty.text hides the banner (no made-up deals). */
-window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",region:"la",   /* no ticker: the Today's games carousel (layout.js) replaces it */
+window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",region:"la",teamsTab:"LA teams",
+  /* Watch it here: Melody first, sister spot Nalu Vida after. Notes = each page's own wording ("every game on the TVs"). */
+  watchAt:[{name:"Melody Bar & Grill",note:"Every game on the TVs, 5 minutes from LAX.",address:"9132 S Sepulveda Blvd, Los Angeles, CA 90045",tel:"+13106701994"},
+           {name:"Nalu Vida (sister spot)",note:"Venice Pier. The game's on the TVs there too.",address:"1 Washington Blvd, Venice, CA 90292",tel:"+13104370060",app:"../nalu-vida/",appLabel:"🏄 Their app"}],   /* no ticker: the Today's games carousel (layout.js) replaces it */
   leagues:["mlb","nfl","nba","nhl","mls","wnba","cfb","cbb","ufc"],
   theme:{bg:"var(--sky)",panel:"var(--panel)",edge:"var(--edge)",accent:"var(--gold)",accent2:"var(--gold2)",ink:"var(--ink)",dim:"var(--dim)",onAccent:"#1a1405",display:"var(--display)",body:"var(--body)",punch:"var(--punch)"},
   fightNight:{url:"../sports/events.json"},
@@ -2851,7 +2891,26 @@ window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",regio
     award:function(n,label){ var GP=window.SSAI_GAMEPTS; return GP.award(n*GP.cfg.perScore,label); },
     offNote:"🧪 BETA: pick points switch on when Melody turns game rewards on. Picks are just for fun until then."}
 };</script>
-<script src="../sports/teams.js?v=sb1"></script><script src="../sports/sports.js?v=sq2"></script><script src="../sports/squares.js?v=sq2"></script><script src="layout.js?v=ml1"></script><script src="../interim.js?v=rs1"></script><script src="../earlybird.js?v=op1"></script><script src="../loyaltycard.js?v=lc1"></script><script src="../locbonus.js?v=lb1"></script>
+<script src="../sports/teams.js?v=sb1"></script><script src="../sports/sports.js?v=gd1"></script><script src="../sports/squares.js?v=sq2"></script><script src="layout.js?v=gd1"></script><script src="../interim.js?v=rs1"></script><script src="../earlybird.js?v=op1"></script><script src="../loyaltycard.js?v=lc1"></script><script src="../locbonus.js?v=lb1"></script>
+<script>/* VENUE VERSUS (demo/versus.js): live battles against everyone at Melody. The server (Cloudflare Durable Object behind
+   /api/versus on the scores site) owns the clock, seed, start, end and results. Nightly 9:00 PM high-score battle + quick battles,
+   "Who wins?" picks, Sky Duel and the Menu Dash race. Prizes stay bragging rights until Christian sets a menu perk (owner admin). */
+window.VERSUS={slug:"melody",name:"Melody Bar & Grill",api:"https://drizzle-bowl-scores.higgsfield.app",mount:"#versushost",ticker:".cvwrap",
+  games:["battle","picks","duel","race"],venue:{lat:33.95418,lng:-118.39602,radiusM:150},
+  theme:{bg:"#0b1220",panel:"#141e34",edge:"#27324d",accent:"#d4af37",accent2:"#f0d375",ink:"#f6f1e4",dim:"#9aa3b5",wine:"#a33645",go:"#3fbf8f",display:"'Playfair Display',Georgia,serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
+  play:{battle:function(o){ return !!(window.__MG&&__MG.versus(o)); },
+    score:function(){ var g=window.__MG&&__MG.get(); return g&&g.vs?g.score:0; },
+    pos:function(){ var g=window.__MG&&__MG.get(); return g&&g.vs?{x:Math.round(g.x),y:Math.round(g.y),a:Math.max(-1,Math.min(1,(g.vx||0)*.12))}:null; },
+    take:function(id){ if(window.__MG) __MG.vsTake(id); }, stop:function(){ if(window.__MG) __MG.vsStop(); }, unlock:function(){ if(window.__MG&&__MG.unlock) __MG.unlock(); },
+    focus:function(){ var c=document.getElementById("cv"); if(c) try{ c.scrollIntoView({block:"center",behavior:"smooth"}); }catch(e){} }},
+  // claiming a perk needs a Rewards member; 21+ comes from the birthday on the account (staff still check ID for drink perks)
+  member:function(){ var m=window.SSAI_GAMEPTS&&SSAI_GAMEPTS.member(); if(!m||!m.id) return null; var adult=false;
+    if(m.bday>=0&&m.bdy&&m.bdd){ var t=new Date(), a=t.getFullYear()-(+m.bdy)-((t.getMonth()<+m.bday||(t.getMonth()===+m.bday&&t.getDate()<+m.bdd))?1:0); adult=a>=21; }
+    return {id:m.id,name:m.name||"",adult:adult}; },
+  join:function(cb){ if(window.SSAI_GATE) SSAI_GATE("prize",function(){ if(cb) cb(); }); },
+  kid:function(){ var k=window.SSAI_KID_MODE; return typeof k==="function"?!!k():!!k; },
+  raceUrl:"../versus/race.html",tvUrl:"../versus/tv.html"};</script>
+<script src="../versus.js?v=vv1"></script>
 <script>window.NEARBY={name:"Melody Bar & Grill",pin:"✈️",mount:"#rwhost",spots:[{label:"Westchester",lat:33.9487,lng:-118.3918,q:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"}],offer:"Happy hour is 3–6 daily."};</script>
 <script src="../nearby.js?v=co1"></script>
 <script src="../menu3d.js"></script>
@@ -2889,6 +2948,8 @@ window.SCORE_SPECIAL={on:false, league:"nfl", team:"LAR", label:"Rams", phrase:"
   offer:"side", sideMax:7.75, button:"App – Rams Score Special", pollSec:90};</script>
 <script src="../scorespecial.js?v=rs1"></script>
 <script src="../seasons/seasons.js?v=20261013a" defer></script>
+<!-- 🛒 Online ordering (pickup, Stripe Checkout). Hidden until the backend turns it on for Melody (ORDERING, Code.gs) or the link has ?ordering=1. -->
+<script src="../ordering.js?v=or1" data-slug="melody-bar-grill" defer></script>
 <script src="../poweredby.js?v=20261013a" defer></script>
 <script src="../faqbot.js?v=f1" defer></script>
 </body>

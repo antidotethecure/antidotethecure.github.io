@@ -609,7 +609,7 @@ async function boot() {
     if (pitting) { const e = u => u * u * (3 - 2 * u), o = e(Math.min(1, pp / .22)) * e(Math.min(1, (1 - pp) / .18)); tx += 112 * o; yaw = -Math.sin(pp * Math.PI * 4.5) * .18 * o * (pp < .22 || pp > .82 ? 1 : 0);
       if (Math.random() < .35) fx.sparks(V.set(tx + (Math.random() < .5 ? -27 : 27), 14 + Math.random() * 20, (Math.random() - .5) * 70), V2.set(0, 1, 0), null, .8, 6); }
     T.position.set(tx, ty, 0); T.rotation.set(0, yaw, roll); T.scale.setScalar(sc);
-    T.visible = !(st.over && st.dmg >= 3) && (st.inv <= 0 || st.inv > 1e8 || Math.floor(st.inv / 6) % 2 === 0);
+    T.visible = !(st.over && st.lives <= 0) && (st.inv <= 0 || st.inv > 1e8 || Math.floor(st.inv / 6) % 2 === 0);
     truck.wheels.forEach(w => { w.rotation.x -= dz / 9.5; });
     for (const m of SK) m.z += dz;
     if (run && T.visible && ty < 5 && Math.abs(st.rot) > .06) { const c = Math.cos(yaw), sn = Math.sin(yaw);

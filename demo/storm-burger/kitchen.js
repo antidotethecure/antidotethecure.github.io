@@ -1,7 +1,7 @@
 /* Storm Run · Jordan High kitchen stop (Antidote 2026-10-21). Pull into the Jordan High pit bay and the run pauses: you get
    20 seconds to build as many StormBurger orders as you can for the Panthers. Tap the ingredients in the order the ticket
    shows; the burger stacks up tight (no gaps between layers). Every finished burger feeds a kid (+75) and the kids repair
-   the truck (+1 life, up to 3). Then you're back on the road into the storm.
+   the truck (+1 life, up to 5). Then you're back on the road into the storm.
    Works over both renderers (2D canvas and the 3D chase view): a DOM overlay on the game box. index.html pitStart() calls
    SB_KITCHEN.open(done); done() fires when the time is up or the player taps "Back on the road". */
 (function () {
@@ -47,7 +47,7 @@
   function draw() {
     tk.querySelector("h4").textContent = kid + " " + T(order[0]);
     tk.querySelector("ol").innerHTML = order[1].map(function (k, i) { return '<li class="' + (i < step ? "ok" : i === step ? "nx" : "") + '">' + T(ING[k]) + "</li>"; }).join("");
-    var s = window.__S.get(); $(".lv").textContent = "⚡".repeat(Math.max(0, s.lives)) + "·".repeat(Math.max(0, 3 - s.lives)); $(".n").textContent = served; $(".pt").textContent = pts;
+    var s = window.__S.get(); $(".lv").textContent = window.SB_LIVES ? SB_LIVES.str(s.lives) : s.lives; $(".n").textContent = served; $(".pt").textContent = pts;
   }
   // tight stack: every layer sits down into the one under it, so there's never a gap between patties
   function addLayer(k) { var W = stack.clientWidth || 150, im = new Image(), wide = /bun|patty|chicken|lettuce|cheese/.test(k) ? .92 : .82;
@@ -64,7 +64,7 @@
     b.classList.add("hit"); setTimeout(function () { b.classList.remove("hit"); }, 150);
     addLayer(k); step++;
     if (step >= order[1].length) { var s = window.__S.get(); served++; pts += 75; s.score += 75;
-      var fixed = s.lives < 3; if (fixed) { s.lives++; s.dmg = Math.max(0, 3 - s.lives); if (s.dmg < 2) s.cracks = []; if (!s.dmg) s.flames = []; }
+      var L = window.SB_LIVES, mx = L ? L.max() : 5, fixed = s.lives < mx; if (fixed) { s.lives = Math.min(mx, s.lives + 1); s.dmg = L ? L.dmg(s.lives) : 0; if (s.dmg < 2) s.cracks = []; if (!s.dmg) s.flames = []; }
       pop(fixed ? T("🔧 Truck repaired! +1 life") : "+75 " + T("Fed a Panther")); draw(); setTimeout(function () { if (on) newOrder(); }, 420); }
     else draw(); });
   function tick() { if (!on) return; var left = Math.max(0, TIME - (performance.now() - t0)); $(".tm").textContent = (left / 1000).toFixed(1);

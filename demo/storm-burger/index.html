@@ -337,6 +337,7 @@ function hit(x,y,why,pen){
   var py=H-80;
   if(st.dmg===1&&d0<1) pop(st.x,py-70,T("🔥 Engine on fire!"),"#ffb347");
   if(st.dmg===2&&d0<2){ st.cracks=crackSet(); pop(st.x,py-70,T("💥 Windows cracked!"),"#ff6b5b"); }
+  if(st.lives>0&&!st.flat&&Math.random()<0.18){ st.flat=Math.random()<.5?-1:1; pop(st.x,py-100,T("💥 Tire blew out!"),"#ff6b5b"); }   // 18% per hit: a blown tire makes the truck weave until the pit stop
   if(st.lives<=0){ st.dying=performance.now(); st.inv=1e9; st.shake=22; st.flash=0.9; st.dx=st.x; st.items=[]; st.bolts=[]; }
 }
 /* ---- car damage: 1 hit = smoking, burning hood · 2 hits = cracked glass, bigger fire · 3 hits = totaled, tornado takes it ---- */
@@ -548,7 +549,7 @@ function pitStart(it){ // pulled into Jordan High: the run pauses for the kitche
   if(window.SB_KITCHEN){ st.pitT=1e9; SB_KITCHEN.open(function(n){ st.pitT=480; st.inv=90; st.last=performance.now(); hud();   // 480 ms = pull back out onto the road
       pop(st.x,H-150,n?"🍔 "+n+" "+T(n>1?"burgers served":"burger served"):T("Back on the road"),"#FFD23F"); });
     if(navigator.vibrate) try{navigator.vibrate([30,40,30]);}catch(e){} return; }
-  st.pitT=2600; var healed=st.lives<MAXL; if(healed){ st.lives=Math.min(MAXL,st.lives+1); } st.dmg=dmgFor(st.lives); if(st.dmg<2) st.cracks=[]; if(!st.dmg) st.flames=[];
+  st.pitT=2600; var healed=st.lives<MAXL; if(healed){ st.lives=Math.min(MAXL,st.lives+1); } st.dmg=dmgFor(st.lives); if(st.dmg<2) st.cracks=[]; if(!st.dmg) st.flames=[]; st.flat=0;
   st.score+=100; pop(st.x,H-150,"🍔 "+T("Fed the Panthers")+" +100","#FFD23F"); pop(st.x,H-120,healed?"🔧 "+T("Truck repaired! +1 life"):"🔧 "+T("Tune-up done"),"#7CFF9B");
 }
 function copStep(dt,k,py){ // cops come up from behind, then either blow past or swerve into your lane to ram you
@@ -603,7 +604,8 @@ function frame(now){
     if(window.ReviewEgg&&st.dz>=DRIZ_N&&ReviewEgg.due(45000-st.t)){ var el=(Math.random()*LANES)|0; st.items.push({type:"egg",lane:el,x:LX(el),y:-40,r:20}); }
     st.boltT-=dt; if(st.boltT<=0){ st.bolts.push({lane:Math.random()<.7?st.lane:(Math.random()*LANES)|0,phase:"warn",age:0}); st.boltT=Math.max(2400,3800-(45000-st.t)/30); }   // like Melody: it targets where the truck is, so you have to move in time
     var dxl=LX(st.lane)-st.x; st.x+=dxl*Math.min(1,0.2*k);
-    st.rot+=(Math.max(-0.5,Math.min(0.5,dxl*0.012))-st.rot)*Math.min(1,0.32*k); // nose swings into the lane change
+    if(st.flat){ st.x+=(Math.sin(now/170)*2.4+Math.sin(now/410)*1.6+st.flat*0.9)*k; if(Math.random()<.5) tireSmoke(st.x+st.flat*22,H-80+30); }
+    st.rot+=(Math.max(-0.5,Math.min(0.5,dxl*0.012+(st.flat?Math.sin(now/150)*0.09+st.flat*0.04:0)))-st.rot)*Math.min(1,0.32*k); // nose swings into the lane change (and fishtails on a blown tire)
     if(st.inv>0) st.inv-=k;
     if(Math.floor(now/250)!==Math.floor((now-dt)/250)) st.score+=1;
   }
@@ -615,7 +617,7 @@ function frame(now){
     if(!r3) drawBolt(bo); }
   // items
   for(var i=st.items.length-1;i>=0;i--){ var it=st.items[i];
-    if(st.running&&!pit){ it.y+=(it.type==="debris"?st.speed*0.85:it.type==="twister"?st.speed*0.7:st.speed)*k; if(it.type==="debris"){ it.x+=(it.tx-it.x)*0.005*k; it.rot+=it.vr*k; } else if(it.type==="twister"){ it.x=it.x0+Math.sin(now*it.sw+it.ph)*W*0.32; } }
+    if(st.running&&!pit){ it.y+=(it.type==="debris"?st.speed*0.6:it.type==="twister"?st.speed*0.7:st.speed)*k; if(it.type==="debris"){ it.rot+=it.vr*k; }   /* stays in its own lane: never slides toward the truck */ else if(it.type==="twister"){ it.x=it.x0+Math.sin(now*it.sw+it.ph)*W*0.32; } }
     if(it.y-(it.len||0)/2>H+60){ st.items.splice(i,1); continue; }
     if(!r3) drawItem(it,now);
     if(it.type==="queue"){ if(st.running&&!pit&&!st.dying&&Math.abs(st.x-it.x)<50&&Math.abs(it.y-py)<it.len/2+40){ hit(st.x,py,T("🚗 DRIVE-THRU LINE!")); if(st.dying) break; } continue; }
@@ -707,7 +709,7 @@ hud();
 <script src="fx.js"></script>
 <script src="kitchen.js?v=k1"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="storm3d.js?v=sb3d2"></script>
+<script type="module" src="storm3d.js?v=sb3d3"></script>
 <script src="../contract.js"></script>
 <script>window.CRM_CFG={name:"StormBurger",offer:"Free fries with your next burger",perDollar:20,tiers:[[1000,"Free fries"],[1800,"Free shake"],[3000,"Free Classic StormBurger"],[4500,"Free combo"]],referral:{gift:"Free Classic StormBurger"},earn:{checkin:50,firstOrder:100,birthday:200,review:{pts:250,platform:"app"},referral:{join:150,friend:50,friendGift:"Free fries",first:100,every:25}},
  // Storm Run access. PHASE 1 (live default): free to play, no sign-up first; guests save their score + prize after the run with a member account (name + phone + email, one account per phone).
@@ -782,7 +784,7 @@ hud();
   {title:"Graphics",options:[["smooth","Smooth (recommended)"],["auto","Auto"],["low","Low"],["med","Medium"],["high","High"],["ultra","Ultra"]],note:"Smooth keeps a steady frame rate on phones and cars. Auto only ever steps down.",
    get:function(){ return window.__E3Q?__E3Q.pref:"auto"; },set:function(v){ if(window.__E3Q) __E3Q.set(v); }}],
  how:{goal:"Stay on the road for 45 seconds and rack up points: grab coins and StormBurger food, dodge everything the storm throws at you.",time:"45 seconds · 5 lives · every hit takes half a life, 10 hits and the truck is totaled",
-  steps:[["👆","Tap the left or right side of the road to change lanes"],["◀▶","Or use the ◀ ▶ buttons under the game (arrow keys on a computer)"],["⚡","A glowing target on the road means lightning is about to come down right there, usually where your truck is. Change lanes in time!"],["🐄","Flying cows and stop signs drift across lanes. Dodge them"],["🚓","Cops come up behind you (watch for 🚨 COP BEHIND) and swerve into your lane to ram you. Change lanes!"],["🌪️","Watch for 🌪️ TORNADO WARNING: about 3 seconds later a small tornado touches down and weaves slowly across the road. Getting caught costs 200 points and half a life"],["✦","Catch 5 Antidote Drizzle emblems to unlock Antidote's StormBurger review: it shows up on a billboard, drive through its golden ▶ for the bonus"],["🚗","Passing StormBurger? The drive-thru line blocks the right lane. Swerve left around the cars"],["🔧","About 20 seconds in, Jordan High shows up on the right. Be in the right lane to pull into the kitchen: you get 20 seconds to build as many burgers as you can for the kids (tap the ingredients in order). Every burger is +75 and the kids repair the truck (+1 life each, up to 5)"],["🔥","You get 5 lives. Each hit costs half a life and sets the truck on fire, 10 hits and it's totaled"]]},
+  steps:[["👆","Tap the left or right side of the road to change lanes"],["◀▶","Or use the ◀ ▶ buttons under the game (arrow keys on a computer)"],["⚡","A glowing target on the road means lightning is about to come down right there, usually where your truck is. Change lanes in time!"],["🐄","Flying cows and stop signs spin down their own lane. Move out of that lane"],["🚓","Cops come up behind you (watch for 🚨 COP BEHIND) and swerve into your lane to ram you. Change lanes!"],["🌪️","Watch for 🌪️ TORNADO WARNING: about 3 seconds later a small tornado touches down and weaves slowly across the road. Getting caught costs 200 points and half a life"],["✦","Catch 5 Antidote Drizzle emblems to unlock Antidote's StormBurger review: it shows up on a billboard, drive through its golden ▶ for the bonus"],["🚗","Passing StormBurger? The drive-thru line blocks the right lane. Swerve left around the cars"],["🔧","About 20 seconds in, Jordan High shows up on the right. Be in the right lane to pull into the kitchen: you get 20 seconds to build as many burgers as you can for the kids (tap the ingredients in order). Every burger is +75 and the kids repair the truck (+1 life each, up to 5)"],["🔥","You get 5 lives. Each hit costs half a life and sets the truck on fire, 10 hits and it's totaled"]]},
  points:[{group:"Grab these",items:[{img:"img/game/burger.webp",name:"Classic StormBurger",pts:"+60"},{img:"img/game/antidote-logo.webp",name:"Antidote Drizzle (catch 5)",pts:"+25"},{img:"img/game/turkey.webp",name:"Turkey Burger",pts:"+60"},{img:"img/game/sandwich.webp",name:"Chicken Sandwich",pts:"+50"},{img:"img/game/strips.webp",name:"Chicken Strips",pts:"+50"},{img:"img/game/rings.webp",name:"Onion Rings",pts:"+30"},{img:"img/game/shake.webp",name:"Shake",pts:"+40"},{img:"img/game/lemonade.webp",name:"Lemonade",pts:"+40"},{img:"img/game/fries.webp",name:"Fries",pts:"+30"},{img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='17' fill='%23ffd23f' stroke='%238a5a06' stroke-width='3'/%3E%3Cpath d='M23 9l-9 12h6l-3 10 9-12h-6z' fill='%23b46f05'/%3E%3C/svg%3E",name:"Coin",note:"Spinning gold coins",pts:"+10"},{icon:"🛣️",name:"Staying alive",note:"+1 every quarter second you're on the road",pts:"+4/sec"}]},
   {group:"Dodge these",items:[{img:"img/game/cow.webp",name:"Flying cow",note:"Costs half a life",pts:"−100",bad:true},{img:"img/game/stop.webp",name:"Stop sign",note:"Costs half a life",pts:"−100",bad:true},{icon:"⚡",name:"Lightning strike",note:"Costs half a life. Move off the glowing target",pts:"−100",bad:true},{icon:"🚗",name:"Drive-thru line",note:"Cars waiting for StormBurger block the right lane",pts:"−100",bad:true},{icon:"🚓",name:"Police ram",note:"Costs half a life. They swerve into your lane",pts:"−100",bad:true},{icon:"🌪️",name:"Small tornado",note:"Costs half a life + 200 points",pts:"−200",bad:true}]},{group:"Pit stop",items:[{icon:"🔧",name:"Jordan High pit stop",note:"Right lane, about 20 s in. Build burgers for 20 s: each one +75 and +1 life",pts:"+75 each"}]}],
  prizes:{champion:"Free Double Classic StormBurger Combo for the top score by Sunday close",tiers:[["1,000","Free Classic StormBurger","One run over 1,000 points","img/game/burger.webp"],["800","Free milkshake","Vanilla, chocolate or mix","img/game/shake.webp"],["600","Free fries or onion rings","With any order","img/game/fries.webp"],["400","Free house sauce","Storm, Thunder, Ranch… your pick","🥫"]],note:"Sample prizes. StormBurger picks the real ones and the board resets every Monday."}};</script>

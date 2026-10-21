@@ -155,5 +155,5 @@ export function makeProps(THREE, opt = {}) {
     const g = new THREE.CylinderGeometry(w / 2, w / 2, w * .09, 40); g.rotateX(Math.PI / 2); g.rotateZ(Math.PI / 2);   // faces toward ±z, logo upright
     const m = new THREE.Mesh(g, [M.gold, face, face]); const o = new THREE.Group(); o.add(m); return o; }
 
-  return { fit, model, driz, M, kinds: Object.keys(BUILD) };
+  return { fit, model, driz, M, kinds: Object.keys(BUILD), setModel: (k, o) => { cache[k] = o; } };
 }

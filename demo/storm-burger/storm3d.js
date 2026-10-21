@@ -22,7 +22,7 @@ if (S && REQ !== "2d" && (REQ === "3d" || pref() !== "2d")) {
 
 async function boot() {
   const THREE = await import("three");
-  const [QM, WXM, PM, BBMOD] = await Promise.all(["quality", "weather", "particles", "billboard"].map(n => import("../engine3d/" + n + ".js?v=e3t")));
+  const [QM, WXM, PM, BBMOD] = await Promise.all(["quality", "weather", "particles", "billboard"].map(n => import("../engine3d/" + n + ".js?v=e3u")));
   const game = document.getElementById("game"), host = game.parentNode;
   const W = S.W, H = S.H, PY = S.PY, KF = 3.2, TAU = Math.PI * 2;
   const wx = x => x - W / 2;
@@ -74,6 +74,8 @@ async function boot() {
   const TL = new THREE.TextureLoader(), img = (src, srgb = true) => { const t = TL.load(src); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = ANISO; return t; };
   const LOGO = new Image(); LOGO.src = "img/logo.png"; const logoTex = [];   // canvases that draw the logo redraw once it loads
   LOGO.onload = () => logoTex.forEach(redraw);
+  const pic = src => { const i = new Image(); i.onload = () => logoTex.forEach(redraw); i.src = src; return i; }, ok = i => i.complete && i.naturalWidth;
+  const P_ROAD = pic("img/world/road.webp"), P_SHOP = [pic("img/world/shops-a.webp"), pic("img/world/shops-b.webp")], P_SB = pic("img/world/stormburger.webp");   /* Higgsfield photo textures (10-21) */
   const BOX = new THREE.BoxGeometry(1, 1, 1), PLANE = new THREE.PlaneGeometry(1, 1), CYL = new THREE.CylinderGeometry(1, 1, 1, 10), CYL6 = new THREE.CylinderGeometry(1, 1, 1, 6);
   const std = (color, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: .8, metalness: 0 }, o));
   const basic = (color, o = {}) => new THREE.MeshBasicMaterial(Object.assign({ color }, o));
@@ -93,14 +95,15 @@ async function boot() {
 
   /* ---------- road ---------- */
   const RT = 800;   // units per road texture tile
-  const roadTex = ctex(512, 1024, (x, w, h) => { const k = w / 400;
+  const roadTex = ctex(1024, 2048, (x, w, h) => { const k = w / 400;
     x.fillStyle = "#21263a"; x.fillRect(0, 0, w, h);
-    for (let i = 0; i < 9000; i++) { const v = 26 + rnd() * 30 | 0; x.fillStyle = "rgb(" + v + "," + (v + 3) + "," + (v + 14) + ")"; x.fillRect(rnd() * w, rnd() * h, 1.4, 1.4); }
+    if (ok(P_ROAD)) { x.filter = "brightness(.8) saturate(.85)"; x.drawImage(P_ROAD, 0, 0, w, h / 2); x.save(); x.translate(0, h); x.scale(1, -1); x.drawImage(P_ROAD, 0, 0, w, h / 2); x.restore(); x.filter = "none"; }
+    else for (let i = 0; i < 9000; i++) { const v = 26 + rnd() * 30 | 0; x.fillStyle = "rgb(" + v + "," + (v + 3) + "," + (v + 14) + ")"; x.fillRect(rnd() * w, rnd() * h, 1.4, 1.4); }
     LANEX.forEach(l => [-24, 24].forEach(o => { x.fillStyle = "rgba(10,12,20,.35)"; x.fillRect((200 + l + o - 7) * k, 0, 14 * k, h); }));   // darker tire tracks
-    for (let i = 0; i < 14; i++) { x.fillStyle = "rgba(8,10,18,.45)"; x.beginPath(); x.ellipse(rnd() * w, rnd() * h, 20 + rnd() * 50, 40 + rnd() * 110, 0, 0, TAU); x.fill(); }   // puddles
+    if (!ok(P_ROAD)) for (let i = 0; i < 14; i++) { x.fillStyle = "rgba(8,10,18,.45)"; x.beginPath(); x.ellipse(rnd() * w, rnd() * h, 20 + rnd() * 50, 40 + rnd() * 110, 0, 0, TAU); x.fill(); }   // puddles
     x.fillStyle = "#e9ecf2"; for (let z = 0; z < 5; z++) [-100, 0, 100].forEach(l => x.fillRect((200 + l - 2.5) * k, (z * 160 + 20) * (h / RT), 5 * k, 72 * (h / RT)));
     x.fillStyle = "#E8582A"; [-196, 196].forEach(l => x.fillRect((200 + l - 3) * k, 0, 6 * k, h));
-  });
+  }); logoTex.push(roadTex);
   const roadRough = ctex(256, 512, (x, w, h) => { const k = w / 400; x.fillStyle = "rgb(150,150,150)"; x.fillRect(0, 0, w, h);
     LANEX.forEach(l => [-24, 24].forEach(o => { x.fillStyle = "rgb(105,105,105)"; x.fillRect((200 + l + o - 7) * k, 0, 14 * k, h); }));
     seed = 7; for (let i = 0; i < 9000; i++) rnd(); LANEX.forEach(() => {});   // same puddle positions as the colour map
@@ -125,16 +128,12 @@ async function boot() {
   const frondMat = std(0xffffff, { map: frondTex, alphaTest: .4, side: THREE.DoubleSide, roughness: .9 });
   const SHOPS = ["TACOS", "DONUTS", "LIQUOR", "TIRES", "LAUNDRY", "BEAUTY SUPPLY", "PHONE REPAIR", "CHECKS CASHED", "BARBER", "PIZZA", "AUTO PARTS", "MARKET", "DENTAL", "WINGS", "SMOG CHECK", "NAILS", "BBQ", "PHO"];
   const PAINT = ["#3b3f52", "#5a4636", "#2e4a52", "#523a4a", "#45503a", "#5c5544", "#3a3a3a", "#6b4a3a"];
-  const facade = (word, paint, neon) => { const lit = [];
-    const map = ctex(512, 256, (x, w, h) => { x.fillStyle = paint; x.fillRect(0, 0, w, h); for (let i = 0; i < 1500; i++) { x.fillStyle = "rgba(0,0,0," + (rnd() * .08) + ")"; x.fillRect(rnd() * w, rnd() * h, 3, 3); }
-      x.fillStyle = "#14161e"; x.fillRect(0, h * .62, w, h * .38); x.fillStyle = "#222"; x.fillRect(0, h * .18, w, h * .2);
-      for (let i = 0; i < 4; i++) { const on = rnd() < .75; lit.push(on); x.fillStyle = on ? "#e7c98a" : "#2a2f3a"; x.fillRect(16 + i * 124, h * .66, 100, h * .3); x.fillStyle = "rgba(0,0,0,.4)"; x.fillRect(16 + i * 124 + 48, h * .66, 4, h * .3); }
-      x.fillStyle = neon; x.font = "900 " + (word.length > 9 ? 40 : 54) + "px Arial Black,Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(word, w / 2, h * .28); });
-    const em = ctex(256, 128, (x, w, h) => { x.fillStyle = "#000"; x.fillRect(0, 0, w, h); for (let i = 0; i < 4; i++) if (lit[i]) { x.fillStyle = "#b08a50"; x.fillRect((16 + i * 124) / 2, h * .66, 50, h * .3); }
-      x.fillStyle = neon; x.font = "900 " + (word.length > 9 ? 20 : 27) + "px Arial Black,Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(word, w / 2, h * .28); });
-    return std(0xffffff, { map, emissive: 0xffffff, emissiveMap: em, emissiveIntensity: 1.3, roughness: .85 }); };
+  const facade = (word, paint, neon, n) => { { const ph = P_SHOP[n % 2], by = n % 2 ? .205 : .16;
+      const t = ctex(1024, 512, (x, w, h) => { x.fillStyle = paint; x.fillRect(0, 0, w, h); if (ok(ph)) x.drawImage(ph, 0, 0, w, h);
+        x.font = "900 " + (word.length > 9 ? 52 : 70) + "px Arial Black,Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.shadowColor = neon; x.shadowBlur = 24; x.fillStyle = neon; x.fillText(word, w / 2, h * by); x.shadowBlur = 0; x.fillStyle = "rgba(255,255,255,.75)"; x.fillText(word, w / 2, h * by); }); logoTex.push(t);
+      return std(0xffffff, { map: t, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: .6, roughness: .8 }); } };
   const NEON = ["#ff5a5a", "#ffd23f", "#5affc8", "#62b6ff", "#ff7ae0", "#ffffff"];
-  const FACADES = []; for (let i = 0; i < (LITE ? 8 : 14); i++) FACADES.push(facade(SHOPS[i % SHOPS.length], PAINT[i % PAINT.length], NEON[i % NEON.length]));
+  const FACADES = []; for (let i = 0; i < (LITE ? 8 : 14); i++) FACADES.push(facade(SHOPS[i % SHOPS.length], PAINT[i % PAINT.length], NEON[i % NEON.length], i));
 
   /* ---------- scrolling world ---------- */
   const world = new THREE.Group(); scene.add(world);
@@ -193,23 +192,29 @@ async function boot() {
       x.fillStyle = "#eef2ee"; x.textAlign = "left"; x.font = "900 40px Arial,sans-serif"; x.fillText(text, 162, 80); x.font = "900 54px Arial,sans-serif"; x.fillText(sub, 40, 186); x.font = "900 54px Arial,sans-serif"; x.fillText("↑", w - 70, 186); });
     add(g, PLANE, basic(0xffffff, { map: t, side: THREE.DoubleSide }), 210, 90, 1, 70, 260, 4);
     return { o: g, len: 60 }; }
-  const storeFace = (addr) => { const t = ctex(1024, 384, (x, w, h) => { x.fillStyle = "#d6c4a4"; x.fillRect(0, 0, w, h); x.fillStyle = "#1d43b5"; for (let i = 0; i < 5; i++) x.fillRect(i * 250 - 10, 0, 22, h * .62); x.fillStyle = "#f2f3f5"; x.fillRect(0, h * .02, w, h * .05);
+  const storeFace = (addr) => { const t = ctex(1024, 424, (x, w, h) => { x.fillStyle = "#d6c4a4"; x.fillRect(0, 0, w, h);
+      if (ok(P_SB)) { x.drawImage(P_SB, 0, 0, w, h); const sx = w * .32, sy = h * .173, sw = w * .357, sh = h * .2; x.fillStyle = "#fbfcff"; x.shadowColor = "#cfe0ff"; x.shadowBlur = 30; x.fillRect(sx, sy, sw, sh); x.shadowBlur = 0;
+        if (ok(LOGO)) { const lw = sw * .9, lh = Math.min(sh * .88, lw * LOGO.naturalHeight / LOGO.naturalWidth), lw2 = lh * LOGO.naturalWidth / LOGO.naturalHeight; x.drawImage(LOGO, sx + (sw - lw2) / 2, sy + (sh - lh) / 2, lw2, lh); }
+        x.fillStyle = "#fff"; x.font = "800 22px Arial,sans-serif"; x.textAlign = "right"; x.fillText(addr, w - 24, h * .1); return; } x.fillStyle = "#1d43b5"; for (let i = 0; i < 5; i++) x.fillRect(i * 250 - 10, 0, 22, h * .62); x.fillStyle = "#f2f3f5"; x.fillRect(0, h * .02, w, h * .05);
       x.fillStyle = "#E8582A"; x.beginPath(); x.moveTo(0, h * .44); x.lineTo(w * .55, h * .44); x.lineTo(w * .5, h * .52); x.lineTo(w, h * .52); x.lineTo(w, h * .58); x.lineTo(w * .45, h * .58); x.lineTo(w * .5, h * .5); x.lineTo(0, h * .5); x.closePath(); x.fill();
       x.fillStyle = "#f2d9a6"; for (let i = 0; i < 4; i++) x.fillRect(40 + i * 245, h * .64, 205, h * .3); x.fillStyle = "rgba(0,0,0,.35)"; for (let i = 0; i < 4; i++) x.fillRect(40 + i * 245 + 100, h * .64, 5, h * .3);
       if (LOGO.complete && LOGO.naturalWidth) { const lw = w * .62, lh = lw * LOGO.naturalHeight / LOGO.naturalWidth; x.drawImage(LOGO, (w - lw) / 2, h * .06, lw, lh); }
       x.fillStyle = "#FFD23F"; x.font = "800 30px Arial,sans-serif"; x.textAlign = "right"; x.fillText(addr, w - 30, h * .41); }); logoTex.push(t);
-    return std(0xffffff, { map: t, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: .75, roughness: .7 }); };
+    return std(0xffffff, { map: t, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: .95, roughness: .7 }); };
   function store(s, addr, walk) { const g = new THREE.Group(), len = 320; if (walk) sidewalk(g, s, len);   // walk=false: drawn on top of the street, which already has its sidewalk
     const mats = [MAT.wall, MAT.wall, MAT.roof, MAT.wall, MAT.wall, MAT.wall]; mats[s < 0 ? 0 : 1] = storeFace(addr);
     box(g, mats, 150, 95, 230, s * 390, 47.5, -30); box(g, std(0xE8582A), 4, 8, 232, s * 314, 95, -30);
-    // the real pylon: a white box sign with the logo and a red edge, on two white posts, with the red DRIVE THRU sign under it
+    // the real pylon (his 10-21 photo): rounded white face with a thick red rim + red sides, the logo, one white pole, red DRIVE THRU box under it
     const px = s * 272, pz = 110, P = new THREE.Group(); P.position.set(px, 0, pz); P.rotation.y = -s * .45; g.add(P);
-    const wpost = std(0xf2f3f5, { roughness: .5 }); [-16, 16].forEach(x => box(P, wpost, 9, 190, 9, x, 95, 0));
-    const pt = ctex(512, 192, (x, w, h) => { x.fillStyle = "#f7f8fa"; x.fillRect(0, 0, w, h); x.fillStyle = "#d9262f"; x.fillRect(w - 26, 0, 26, h); if (LOGO.complete && LOGO.naturalWidth) { const lw = w * .86, lh = lw * LOGO.naturalHeight / LOGO.naturalWidth; x.drawImage(LOGO, (w - 26 - lw) / 2, (h - lh) / 2, lw, lh); } }); logoTex.push(pt);
+    const wpost = std(0xf2f3f5, { roughness: .5 }); add(P, CYL6, wpost, 7, 200, 7, 0, 100, 0);
+    const pt = ctex(1024, 384, (x, w, h) => { const rr = (a, b, c, d, r) => { x.beginPath(); x.roundRect(a, b, c, d, r); x.fill(); };
+      x.fillStyle = "#d9262f"; x.fillRect(0, 0, w, h); x.fillStyle = "#e33a36"; rr(6, 6, w - 12, h - 12, 70); x.fillStyle = "#f7f8fa"; rr(34, 30, w - 68, h - 60, 54);
+      if (ok(LOGO)) { const lw = w * .8, lh = lw * LOGO.naturalHeight / LOGO.naturalWidth; x.drawImage(LOGO, (w - lw) / 2, (h - lh) / 2, lw, lh); } }); logoTex.push(pt);
     const pm = std(0xffffff, { map: pt, emissive: 0xffffff, emissiveMap: pt, emissiveIntensity: .9 }), red = std(0xd9262f, { emissive: 0x5a0a0a });
-    box(P, [red, red, red, red, pm, pm], 120, 45, 12, 0, 215, 0);
-    const dt = textTex("drivethru", 256, 64, (x, w, h) => { x.fillStyle = "#d9262f"; x.fillRect(0, 0, w, h); x.strokeStyle = "#fff"; x.lineWidth = 4; x.strokeRect(4, 4, w - 8, h - 8); x.fillStyle = "#fff"; x.font = "900 36px Arial Narrow,Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("DRIVE THRU", w / 2, h / 2 + 2); });
-    const dm = std(0xffffff, { map: dt, emissive: 0xffffff, emissiveMap: dt, emissiveIntensity: .8 }); box(P, [red, red, red, red, dm, dm], 56, 14, 4, 0, 150, 0);
+    box(P, [red, red, red, red, pm, pm], 150, 56, 18, 0, 222, 0);
+    const dt = textTex("drivethru", 256, 64, (x, w, h) => { x.fillStyle = "#d9262f"; x.fillRect(0, 0, w, h); x.strokeStyle = "#fff"; x.lineWidth = 4; x.strokeRect(4, 4, w - 8, h - 8); x.fillStyle = "#fff"; x.font = "800 38px Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("DRIVE THRU", w / 2, h / 2 + 2); });
+    const dm = std(0xffffff, { map: dt, emissive: 0xffffff, emissiveMap: dt, emissiveIntensity: .8 }); box(P, [red, red, red, red, dm, dm], 64, 17, 10, -14, 158, 0); box(P, red, 70, 21, 4, -12, 156, -7);
+    const sg = new THREE.Sprite(glowMat(0xeaf0ff, .5)); sg.scale.set(150, 70, 1); sg.position.set(s * 318, 70, -30); g.add(sg);
     const gl = new THREE.Sprite(glowMat(0xdfe8ff, .45)); gl.scale.set(240, 140, 1); gl.position.set(px, 215, pz); g.add(gl);
     // the StormBurger truck parked out front (it really sat outside the Long Beach spot while the restaurant was built)
     const tk = makeTruck(true); tk.g.position.set(s * 245, 6, -120); tk.g.rotation.y = s > 0 ? 0 : Math.PI; tk.g.scale.setScalar(.9); g.add(tk.g);
@@ -450,7 +455,10 @@ async function boot() {
     const tails = [-22, 22].map(x => box(g, M.tail, 6, 8, 1, x, 24, 50.6));
     [[-37], [29]].forEach(([z]) => [-24, 24].forEach(x => { const w = new THREE.Group(); w.position.set(x, 10.5, z); g.add(w); add(w, CYL, M.tire, 10.5, 9, 10.5, 0, 0, 0).rotation.z = Math.PI / 2;
       add(w, CYL, M.rim, 6.8, 9.6, 6.8, 0, 0, 0).rotation.z = Math.PI / 2; add(w, CYL6, MAT.dark, 2.4, 10, 2.4, 0, 0, 0).rotation.z = Math.PI / 2; wheels.push(w); }));
-    return { g, wheels, body, tails }; }
+    /* parts that break off one per hit, in this order (mirrors, window flap, bumpers, A/C, hood, tail light) */
+    const C = g.children, parts = [C[13], C[11], aw, C[9], C[8], C[22], C[21], C[20], C[19], tails[0], C[12], C[10]];
+    parts.forEach(p => p.userData.home = { p: p.position.clone(), r: p.rotation.clone() });
+    return { g, wheels, body, tails, parts }; }
   const truck = makeTruck(false); scene.add(truck.g); spots.forEach(s => { truck.g.add(s); truck.g.add(s.target); });
   const SKN = 260, skid = new THREE.InstancedMesh(PLANE, new THREE.MeshBasicMaterial({ color: 0x040405, transparent: true, opacity: .62, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), SKN);
   skid.frustumCulled = false; skid.count = 0; scene.add(skid); const SK = []; let skI = 0; const SKM = new THREE.Matrix4(), SKQ = new THREE.Quaternion(), SKE = new THREE.Euler(), SKS = new THREE.Vector3(), SKP = new THREE.Vector3();
@@ -495,7 +503,9 @@ async function boot() {
   /* ---------- pickups, hazards ---------- */
   const SPRT = {}; S.FOOD.map(f => f.k).concat(["cow", "stop", "smoke"]).forEach(k => SPRT[k] = img("img/game/" + k + ".webp"));
   // StormBurger's menu, the cow, the stop sign and the drizzle coin as real 3D models (food3d.js); built + compiled up front so nothing hitches mid-run
-  const PROPS = (await import("./food3d.js?v=f1")).makeProps(THREE, { aniso: ANISO });
+  const PROPS = (await import("./food3d.js?v=f2")).makeProps(THREE, { aniso: ANISO });
+  try { const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js"), gl = await new GLTFLoader().loadAsync("img/3d/cow.glb");   /* photoreal cow mesh (Higgsfield, 10-21); the drawn cow stays as fallback */
+    gl.scene.traverse(m => { if (m.isMesh) { m.geometry.computeVertexNormals(); m.material.roughness = .85; if (m.material.map) m.material.map.anisotropy = ANISO; } }); PROPS.setModel("cow", gl.scene); } catch (e) { console.warn("cow.glb", e); }
   { const warm = new THREE.Group(); PROPS.kinds.forEach((k, i) => { const o = PROPS.fit(k, 50); o.position.set((i - 5) * 30, 20, -200); warm.add(o); }); const dz0 = PROPS.driz(40); dz0.position.set(0, 30, -220); warm.add(dz0);
     scene.add(warm); renderer.compile(scene, cam); scene.remove(warm); }
   const FOODM = {}; S.FOOD.forEach(f => FOODM[f.k] = new THREE.SpriteMaterial({ map: SPRT[f.k], transparent: true, depthWrite: false }));
@@ -627,7 +637,7 @@ async function boot() {
   })();
 
   /* ---------- frame ---------- */
-  let warp = 0, last = 0, t = 0, odo = 0, wasRun = false, frames = 0, fpsT = 0, odd = 0, camX = 0, camShake = 0, flashK = 0, failed = false;
+  let brokeN = 0; const flying = []; let warp = 0, last = 0, t = 0, odo = 0, wasRun = false, frames = 0, fpsT = 0, odd = 0, camX = 0, camShake = 0, flashK = 0, failed = false;
   const off2d = () => { S.r3 = false; S.render = null; cv.remove(); game.style.background = ""; STATUS.on = false; };
   STATUS.enable = on => { if (!on) { S.r3 = false; cv.style.visibility = "hidden"; game.style.background = ""; STATUS.on = false; } else if (!failed) { S.r3 = true; cv.style.visibility = "visible"; game.style.background = "transparent"; STATUS.on = true; } };
   const proj = (x, y) => { V.set(wx(x), 50, wz(y)).project(cam); return [(V.x + 1) / 2 * W, (1 - V.y) / 2 * H]; };
@@ -670,22 +680,35 @@ async function boot() {
         if (Math.random() < .5) fx.emit(V.set(px, 4, pz), V2.set((Math.random() - .5) * 30, 20 + Math.random() * 20, st.speed * KF * 18), .9, 8, 50, [.86, .87, .9], [.6, .62, .66], .4, false, 0, 1.6, 10); } }   // + white tire smoke
     skid.count = SK.length; SK.forEach((m, i) => { SKE.set(-Math.PI / 2, 0, m.y); SKQ.setFromEuler(SKE); SKS.set(7, m.l, 1); SKP.set(m.x, .9, m.z); SKM.compose(SKP, SKQ, SKS); skid.setMatrixAt(i, SKM); }); skid.instanceMatrix.needsUpdate = true;
     tShadow.position.set(tx, .8, 0); tShadow.visible = T.visible && ty < 40;
-    const scorchK = Math.min(1, st.dmg * .3); [TRUCKM.wrapR, TRUCKM.wrapL, TRUCKM.rear, TRUCKM.cab].forEach(m => m.color.setHex(0xffffff).lerp(scorch, scorchK * .6));
+    const heat = Math.max(0, Math.min(1, 1 - st.lives / (window.SB_LIVES ? SB_LIVES.max() : 5)));   /* fire grows slowly with every hit */
+    const scorchK = Math.min(1, heat * 1.2); [TRUCKM.wrapR, TRUCKM.wrapL, TRUCKM.rear, TRUCKM.cab].forEach(m => m.color.setHex(0xffffff).lerp(scorch, scorchK * .6));
     // spray off the wet road behind the rear wheels, and smoke + fire from the engine once it's hit
     const gs = run ? st.speed * KF * 60 : 120;
     if (T.visible && ty < 10 && run) for (const x of [-24, 24]) if (Math.random() < .7) fx.emit(V.set(tx + x * Math.cos(yaw), 4, 44), V2.set((Math.random() - .5) * 30, 18 + Math.random() * 20, gs * .35), .55, 6, 36, [.62, .68, .8], [.4, .44, .55], .22, false, 0, 2, 4);
     if (T.visible && ty < 10 && Math.random() < .55) fx.emit(V.set(tx + (Math.random() - .5) * 10, 104, 18), V2.set((Math.random() - .5) * 12, 55 + Math.random() * 25, gs * .5), 1.6, 10, 70, [.72, .72, .74], [.42, .42, .46], .34, false, 0, 1.2, 30);   // grill smoke: they're cooking burgers in there
-    if (st.dmg && T.visible) { const hx = tx - Math.sin(yaw) * 46, hy = ty + 40, hz = -Math.cos(yaw) * 46; const heavy = st.dmg > 1 || st.dying;
-      for (let i = 0; i < (heavy ? 2 : 1); i++) fx.emit(V.set(hx + (Math.random() - .5) * 14, hy, hz), V2.set((Math.random() - .5) * 16, 30 + Math.random() * 20, gs * .55), 1.3, 14, heavy ? 90 : 60, [.22, .21, .22], [.09, .09, .1], heavy ? .6 : .45, false, 0, 1.4, 18);
-      if (Math.random() < (heavy ? .9 : .5)) fx.emit(V.set(hx + (Math.random() - .5) * 18, hy - 4, hz), V2.set((Math.random() - .5) * 20, 40, gs * .25), .35, 14, 4, [1, .62, .2], [.9, .2, .05], 1, true, 1, 1, 20);
-      fireLight.position.set(hx, hy + 10, hz); fireLight.intensity = (heavy ? 260 : 150) * (.75 + Math.random() * .5); } else fireLight.intensity = 0;
+    if (heat > 0 && T.visible) { const hx = tx - Math.sin(yaw) * 46, hy = ty + 40, hz = -Math.cos(yaw) * 46, hh = st.dying ? 1 : heat;
+      if (Math.random() < .4 + hh) fx.emit(V.set(hx + (Math.random() - .5) * 14, hy, hz), V2.set((Math.random() - .5) * 16, 30 + Math.random() * 20, gs * .55), 1.3, 8 + hh * 10, 40 + hh * 60, [.22, .21, .22], [.09, .09, .1], .18 + hh * .22, false, 0, 1.4, 18);
+      if (hh > .15) for (let i = 0; i < 1 + hh * 2; i++) if (Math.random() < hh * 1.2) fx.emit(V.set(hx + (Math.random() - .5) * 26 * hh, hy - 4, hz + (Math.random() - .5) * 20 * hh), V2.set((Math.random() - .5) * 20, 40, gs * .25), .25 + hh * .2, 6 + hh * 14, 3, [1, .62, .2], [.9, .2, .05], 1, true, 1, 1, 20);
+      if (hh > .35 && Math.random() < (hh - .3) * 1.4) { const rx = tx + (Math.random() - .5) * 44 * Math.min(1, hh * 1.3), rz = -30 + Math.random() * 60 * hh; fx.emit(V.set(rx, ty + 93, rz), V2.set((Math.random() - .5) * 14, 46, gs * .3), .3 + hh * .25, 6 + hh * 16, 3, [1, .62, .2], [.9, .2, .05], 1, true, 1, 1, 20); }   /* past ~a third of the damage the fire spreads onto the roof, so you see it from behind */
+      fireLight.position.set(hx, hy + 10, hz); fireLight.intensity = (hh > .15 ? 60 + hh * 240 : 0) * (.75 + Math.random() * .5); } else fireLight.intensity = 0;
+    /* broken parts: one more falls off per half-life lost, and the kids' repairs put them back */
+    const want = st.dying ? truck.parts.length : Math.min(truck.parts.length, Math.round(((window.SB_LIVES ? SB_LIVES.max() : 5) - st.lives) * 2));
+    while (brokeN < want) { const p = truck.parts[brokeN++]; T.updateMatrixWorld(); p.updateMatrixWorld(); p.matrixWorld.decompose(p.position, p.quaternion, p.scale); scene.add(p);
+      flying.push({ p, vx: (Math.random() - .5) * 120, vy: 90 + Math.random() * 60, vz: 160 + Math.random() * 120, sx: Math.random() * 8 - 4, sz: Math.random() * 8 - 4, t: 0 });
+      fx.sparks(V.copy(p.position), V2.set(0, 1, 0), null, 1, 10); }
+    while (brokeN > want) { const p = truck.parts[--brokeN]; const f = flying.findIndex(q => q.p === p); if (f >= 0) flying.splice(f, 1); T.add(p); p.position.copy(p.userData.home.p); p.rotation.copy(p.userData.home.r); p.scale.setScalar(1); p.visible = true; }
+    for (const f of flying) { f.t += dt; f.vy -= 400 * dt; f.p.position.x += f.vx * dt; f.p.position.y = Math.max(1, f.p.position.y + f.vy * dt); f.p.position.z += (f.vz + dz / Math.max(dt, 1e-3)) * dt; f.p.rotation.x += f.sx * dt; f.p.rotation.z += f.sz * dt; f.p.visible = f.p.position.z < 900; }
+    /* blown tire: that rear wheel sags, the truck leans on it, sparks + rubber smoke */
+    truck.wheels.forEach((w, i) => { const fl = st.flat && i === (st.flat > 0 ? 3 : 2); w.position.y = fl ? 7 : 10.5; w.scale.set(1, fl ? .8 : 1, fl ? 1.1 : 1); });
+    if (st.flat && T.visible && run) { T.rotation.z += st.flat * -.05; const wx2 = tx + st.flat * 24 * Math.cos(yaw); if (Math.random() < .6) fx.sparks(V.set(wx2, 2, 29), V2.set(0, 1, .4), null, .7, 4);
+      if (Math.random() < .5) fx.emit(V.set(wx2, 4, 32), V2.set((Math.random() - .5) * 20, 16, gs * .4), .9, 8, 46, [.8, .8, .84], [.55, .56, .6], .35, false, 0, 1.6, 10); }
 
     /* camera: behind and above, leaning into lane changes */
-    const camT = st.dying ? camX : tx * (pitting ? .85 : .55); camX += (camT - camX) * Math.min(1, dt * 5);
+    const camT = st.dying ? camX : tx * (pitting ? .85 : .42); camX += (camT - camX) * Math.min(1, dt * 5);
     if (st.shake > 0) camShake = Math.max(camShake, st.shake);
     camShake *= Math.pow(.02, dt);
     cam.position.set(camX + (Math.random() - .5) * camShake * 1.2, 116 + (Math.random() - .5) * camShake + (st.dying ? Math.min(160, ty * .3) : 0), 238);
-    V.set(camX * 1.15 + tx * .1, st.dying ? 40 + ty * .7 : 20, -320); cam.lookAt(V); cam.rotation.z += -st.rot * .05;
+    V.set(camX + tx * .2, st.dying ? 40 + ty * .7 : 20, -320); cam.lookAt(V); cam.rotation.z += -st.rot * .05;
     if (STATUS.camO) { const c = STATUS.camO; cam.position.set(tx + c[0], c[1], c[2]); cam.lookAt(tx + c[3], c[4], c[5]); }   // test hook: look at the truck from anywhere
 
     /* things on the road */
@@ -693,7 +716,7 @@ async function boot() {
     for (const it of st.items) { const v = viewFor(it, it.type); v.n = frameNo; const z = wz(it.y), x = wx(it.x);
       if (it.type === "coin") { v.o.position.set(x, 24, z); v.m.rotation.y = it.spin; }
       else if (it.type === "food") { v.o.position.set(x, 18 + Math.sin(now / 260 + it.x) * 4, z); v.m.rotation.y = now / 650 + it.x; }
-      else if (it.type === "debris") { const hgt = .75 + .25 * Math.sin(now / 300 + it.ph); v.o.position.set(x, 0, z); v.m.position.y = 60 + 50 * hgt; v.m.rotation.set(it.d.k === "cow" ? Math.sin(now / 500 + it.ph) * .5 : 0, (now / (it.d.k === "cow" ? 1400 : 700) + it.ph) * (it.vr < 0 ? -1 : 1), it.rot); v.sh.scale.setScalar(.7 + .3 * (1 - hgt)); }
+      else if (it.type === "debris") { const hgt = .75 + .25 * Math.sin(now / 300 + it.ph); const orb = now / 650 + it.ph, cr = it.d.k === "cow" ? 16 : 6; v.o.position.set(x + Math.cos(orb) * cr, 0, z + Math.sin(orb) * cr); v.m.position.y = 60 + 50 * hgt;   /* cows loop in a small circle inside their lane */ v.m.rotation.set(it.d.k === "cow" ? Math.sin(now / 500 + it.ph) * .5 : 0, (now / (it.d.k === "cow" ? 1400 : 700) + it.ph) * (it.vr < 0 ? -1 : 1), it.rot); v.sh.scale.setScalar(.7 + .3 * (1 - hgt)); }
       else if (it.type === "twister") { v.o.position.set(x, 0, z); v.upd(t + it.ph, 1); }
       else if (it.type === "driz") { v.o.position.set(x, 42 + Math.sin(now / 220 + it.x) * 5, z); v.m.rotation.y = now / 380; }
       else if (it.type === "queue") { v.o.position.set(0, 0, 0); const sp = it.len / it.n;
@@ -732,6 +755,7 @@ async function boot() {
     if (!S.r3 && !failed && pref() !== "2d") { STATUS.enable(true); S.proj = proj; }
   };
   STATUS.warp = d => { warp += d; }; STATUS.board = () => { bbT = 0; };
+  STATUS.store = z => { const o = store(1, "1500 N LA BREA AVE", true).o; o.position.z = z; scene.add(o); return o; };   // test hook: drop the StormBurger stop beside the road
   STATUS.jump = (i, r) => { if (r) ROUTE = routeOf(r); ri = i; evtIn = 0; };   // test hook: put route stop i on the road ahead now
   STATUS.booted = true;
 }

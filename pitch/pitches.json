@@ -1,5 +1,32 @@
 [
  {
+  "slug": "legend-hot-chicken-lakewood",
+  "title": "Legend Hot Chicken Lakewood",
+  "type": "restaurant · pitch pack",
+  "area": "",
+  "lang": "en",
+  "date": "2026-10-17",
+  "url": "https://antidotethecure.github.io/pitch/legend-hot-chicken-lakewood/"
+ },
+ {
+  "slug": "habachihana-grill",
+  "title": "Habachihana Grill",
+  "type": "restaurant · pitch pack",
+  "area": "9 locations across Orange County & LA",
+  "lang": "en",
+  "date": "2026-10-18",
+  "url": "https://antidotethecure.github.io/pitch/habachihana-grill/"
+ },
+ {
+  "slug": "road-to-seoul-western",
+  "title": "Road To Seoul Western",
+  "type": "restaurant · pitch pack",
+  "area": "",
+  "lang": "en",
+  "date": "2026-10-17",
+  "url": "https://antidotethecure.github.io/pitch/road-to-seoul-western/"
+ },
+ {
   "slug": "world-famous-eggroll-truck",
   "title": "World Famous Eggroll Truck",
   "type": "restaurant · pitch pack",
@@ -7,6 +34,33 @@
   "lang": "en",
   "date": "2026-10-14",
   "url": "https://antidotethecure.github.io/pitch/world-famous-eggroll-truck/"
+ },
+ {
+  "slug": "sonoratown",
+  "title": "Sonoratown",
+  "type": "restaurant · pitch pack",
+  "area": "",
+  "lang": "en",
+  "date": "2026-10-14",
+  "url": "https://antidotethecure.github.io/pitch/sonoratown/"
+ },
+ {
+  "slug": "rdbla",
+  "title": "RDBLA",
+  "type": "dealership · pitch drafter",
+  "area": "Hollywood, Los Angeles",
+  "lang": "en",
+  "date": "2026-10-14",
+  "url": "https://antidotethecure.github.io/pitch/rdbla/"
+ },
+ {
+  "slug": "alberts-mobile-ice-cream",
+  "title": "Albert's Mobile Ice Cream",
+  "type": "ice cream · pitch drafter",
+  "area": "Sun Valley (serves LA County)",
+  "lang": "en",
+  "date": "2026-10-14",
+  "url": "https://antidotethecure.github.io/pitch/alberts-mobile-ice-cream/"
  },
  {
   "slug": "fresh-brothers",

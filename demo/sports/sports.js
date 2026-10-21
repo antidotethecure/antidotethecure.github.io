@@ -398,6 +398,8 @@
   }
 
   /* ---------- the sheet ---------- */
+  var EXTRA = [];   // perk modules add their own tabs: SportsBar.addTab({id, label, render(box, helpers), visible?()})
+  function extraTabs() { return EXTRA.filter(function (t) { try { return !t.visible || t.visible(); } catch (e) { return false; } }); }
   var ov = null, box = null, tab = "teams", busy = false, again = 0, poll = null, prevOverflow = "";
   function sheet() {
     if (ov) return ov;
@@ -411,7 +413,7 @@
   function screen(title, html) { sheet(); ov.querySelector(".t").textContent = title; var i = ov.querySelector(".sp-in"); i.innerHTML = html; ov.querySelector(".sp-body").scrollTop = 0; return i; }
   function open(which) {
     sheet(); if (!ov.classList.contains("on")) { prevOverflow = document.documentElement.style.overflow; document.documentElement.style.overflow = "hidden"; ov.classList.add("on"); }
-    if (which === "fights" || which === "teams") tab = which;
+    if (which === "fights" || which === "teams" || EXTRA.some(function (t) { return t.id === which; })) tab = which;
     board();
     if (!poll) poll = setInterval(function () { if (!document.hidden && ov.classList.contains("on")) refresh(true); }, 30000);
   }
@@ -420,7 +422,9 @@
   function hasFights() { return LORDER.indexOf("ufc") >= 0 || !!CFG.fightNight; }
   function board() {
     var w = screen(CFG.title || "Scoreboard", '<div class="sp-h"><small>' + esc(RNAME) + ' teams' + (hasFights() ? ' · fights' : '') + '</small>' + esc(CFG.title || "Scoreboard") + '</div>' +
-      (hasFights() ? '<div class="sp-tabs" role="group" aria-label="Section"><button type="button" data-tab="teams" aria-pressed="' + (tab === "teams") + '">🏟️ Teams</button><button type="button" data-tab="fights" aria-pressed="' + (tab === "fights") + '">🥊 Fights</button></div>' : '') +
+      (hasFights() || extraTabs().length ? '<div class="sp-tabs" role="group" aria-label="Section"><button type="button" data-tab="teams" aria-pressed="' + (tab === "teams") + '">🏟️ Teams</button>' +
+        (hasFights() ? '<button type="button" data-tab="fights" aria-pressed="' + (tab === "fights") + '">🥊 Fights</button>' : '') +
+        extraTabs().map(function (t) { return '<button type="button" data-tab="' + esc(t.id) + '" aria-pressed="' + (tab === t.id) + '">' + esc(t.label) + '</button>'; }).join("") + '</div>' : '') +
       '<div class="sp-bar"><button type="button" id="sp-pickbtn">★ My teams' + (follows().length ? " (" + follows().length + ")" : "") + '</button><button type="button" id="sp-rf">↻ Refresh</button></div><div id="sp-box"></div>');
     box = w.querySelector("#sp-box");
     [].forEach.call(w.querySelectorAll("[data-tab]"), function (b) { b.onclick = function () { tab = b.getAttribute("data-tab"); board(); }; });
@@ -430,7 +434,8 @@
   }
   function render() {
     if (!box || !document.body.contains(box)) return;
-    var m = collect(), f = follows(), h = "";
+    var m = collect(), f = follows(), h = "", ex = extraTabs().filter(function (t) { return t.id === tab; })[0];
+    if (ex) { try { ex.render(box, { esc: esc, toast: toast, close: close, open: open, rerender: render, fmtTime: fmtTime, day: day }); } catch (e) { box.innerHTML = '<div class="sp-empty"><b>Unavailable right now</b></div>'; } return; }
     if (tab === "fights" && hasFights()) h = fightNightHTML() + (LORDER.indexOf("ufc") >= 0 ? '<div class="sp-sec">UFC</div>' + (lastOk || SBerr.ufc ? ufcHTML() : '<div class="sp-empty"><b>Loading…</b></div>') : "");
     else {
       h += watchPartyHTML(m);
@@ -452,29 +457,34 @@
     var y = box.closest(".sp-body"), sc = y ? y.scrollTop : 0;
     box.innerHTML = h; if (y) y.scrollTop = sc;
     [].forEach.call(box.querySelectorAll("[data-pk]"), function (b) {
-      b.onclick = function () {
-        var p = picks(), id = b.getAttribute("data-pk"), tm = b.getAttribute("data-tm");
-        var ev = m.all.filter(function (r) { return String(r.e.id) === id; })[0]; if (!ev || state(ev.e) !== "pre" || new Date(ev.e.date) <= Date.now()) { toast("Picks lock when the game starts."); return; }
-        if (p[id] && String(p[id].team) === tm) delete p[id]; else p[id] = { team: tm, ts: Date.now() };
-        var ks = Object.keys(p); if (ks.length > 200) delete p[ks[0]]; lsSet(K("picks"), p); render();
-      };
+      b.onclick = function () { setPick(b.getAttribute("data-pk"), b.getAttribute("data-tm")); };
     });
     [].forEach.call(box.querySelectorAll("[data-rsvp]"), function (a) {
       a.onclick = function (e) { var rs = PERKS.rsvp; if (rs && typeof rs.action === "function") { e.preventDefault(); close(); try { rs.action(FN.d[+a.getAttribute("data-rsvp")]); } catch (x) {} } else close(); };
     });
   }
+  // one pick per game, only before it starts (same store + points as the scoreboard sheet); returns false when locked
+  function setPick(id, tm) {
+    id = String(id); tm = String(tm);
+    var p = picks(), ev = collect().all.filter(function (r) { return String(r.e.id) === id; })[0];
+    if (!ev || state(ev.e) !== "pre" || new Date(ev.e.date) <= Date.now()) { toast("Picks lock when the game starts."); return false; }
+    if (p[id] && String(p[id].team) === tm) delete p[id]; else p[id] = { team: tm, ts: Date.now() };
+    var ks = Object.keys(p); if (ks.length > 200) delete p[ks[0]]; lsSet(K("picks"), p); render(); notify(); return true;
+  }
+  // page widgets (e.g. Melody's sports carousel) listen for this after every data refresh; read data via SportsBar.api
+  function notify() { try { document.dispatchEvent(new CustomEvent("sportsbar:update")); } catch (e) {} }
   function refresh(full) {
     if (busy) { again = Math.max(again, full ? 2 : 1); return Promise.resolve(); } busy = true;
     var after = function () { busy = false; if (again) { var a = again; again = 0; refresh(a === 2); } };
     return Promise.all([loadScoreboards(), full ? loadFightNight() : null]).then(function () {
-      var m = collect(); settlePicks(m.fin); render(); drawTicker(); after();
+      var m = collect(); settlePicks(m.fin); render(); drawTicker(); notify(); after();
       if (!full) return;
       var keys = {}, lgs = {};
       m.all.forEach(function (r) { r.keys.forEach(function (k) { keys[k] = 1; lgs[r.lg] = 1; }); });
       follows().forEach(function (k) { keys[k] = 1; lgs[TK[k][0]] = 1; });
       if (!m.all.length) TEAMS.forEach(function (t) { keys[t[0] + ":" + t[1]] = 1; });   // to find the next scheduled game
-      return Promise.all(Object.keys(keys).map(loadSched).concat(Object.keys(lgs).map(loadStand))).then(render);
-    }, function () { after(); render(); });
+      return Promise.all(Object.keys(keys).map(loadSched).concat(Object.keys(lgs).map(loadStand))).then(function () { render(); notify(); });
+    }, function () { after(); render(); notify(); });
   }
   function picker() {
     box = null;
@@ -527,6 +537,9 @@
     window.MelodyGames.register({ id: "scores", order: 10, wide: true, icon: "📺", title: CFG.title || "Scoreboard", sub: CFG.tileSub || "Live scores for every " + RNAME + " team. Follow your teams" + (hasFights() ? ", plus fight nights." : "."), tag: "Live",
       start: function () { window.MelodyGames.close(); open("teams"); } });
   }
-  window.SportsBar = { open: open, close: close, refresh: refresh, config: CFG, teams: TEAMS, leagues: L, render: render,
+  function addTab(def) { if (def && def.id && def.render && !EXTRA.some(function (t) { return t.id === def.id; })) { EXTRA.push(def); if (isOpen()) board(); } }
+  window.SportsBar = { open: open, close: close, refresh: refresh, config: CFG, teams: TEAMS, leagues: L, render: render, addTab: addTab, isOpen: isOpen, toast: toast, esc: esc, picker: function () { open("teams"); picker(); },
+    api: { collect: collect, allErr: allErr, follows: follows, teamInfo: teamInfo, nextEv: nextEv, comp: comp, state: state, statusText: statusText, score: score, nm: nm, fmtTime: fmtTime, headline: headline, tv: tv, logoFor: logoFor, TK: TK, esc: esc, L: L, BASE: BASE, getJSON: getJSON, loadSched: loadSched, loadStand: loadStand, SCHED: SCHED,
+      pickHTML: pickHTML, setPick: setPick, picks: picks, toast: toast },
     _state: { SB: SB, SBerr: SBerr, SCHED: SCHED, STAND: STAND, LEAGUE: LEAGUE } };
 })();

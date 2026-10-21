@@ -65,7 +65,7 @@ window.SSAI_REWARDS={
   window.MELODY_REWARDS_ON=function(){ return on; };
   if(wk.flagUrl&&q.get("rewards")==null) fetch(wk.flagUrl,{cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(!j) return; if(typeof j.rewardsActive==="boolean") on=j.rewardsActive; if(j.prize) wk.prize=String(j.prize).slice(0,60); if(window.GameMenu) GameMenu.refresh(); }).catch(function(){});
 })();</script>
-<script src="../christian-live.js?v=mg2" data-slug="melody-bar-grill"></script>
+<script src="../christian-live.js?v=or1" data-slug="melody-bar-grill"></script>
 <script src="menu-data.js?v=mg1"></script>
 <meta name="description" content="Melody Bar & Grill by LAX: drinks and food menu, Melody Rewards points, the Just Landed deal, and the Melody flight game.">
 <meta name="theme-color" content="#1a0a0c">
@@ -2889,6 +2889,8 @@ window.SCORE_SPECIAL={on:false, league:"nfl", team:"LAR", label:"Rams", phrase:"
   offer:"side", sideMax:7.75, button:"App – Rams Score Special", pollSec:90};</script>
 <script src="../scorespecial.js?v=rs1"></script>
 <script src="../seasons/seasons.js?v=20261013a" defer></script>
+<!-- 🛒 Online ordering (pickup, Stripe Checkout). Hidden until the backend turns it on for Melody (ORDERING, Code.gs) or the link has ?ordering=1. -->
+<script src="../ordering.js?v=or1" data-slug="melody-bar-grill" defer></script>
 <script src="../poweredby.js?v=20261013a" defer></script>
 <script src="../faqbot.js?v=f1" defer></script>
 </body>

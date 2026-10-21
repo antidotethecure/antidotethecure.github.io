@@ -90,7 +90,7 @@
     if (!API) { if (cb) cb(null); return; }
     fetch(API + (API.indexOf("?") < 0 ? "?" : "&") + "discounts=1&t=" + Math.floor(Date.now() / 6e4), { cache: "no-store" })
       .then(function (r) { return r.json(); })
-      .then(function (j) { if (!j || !j.ok || !j.d) throw 0; var c = { ts: Date.now(), rev: j.rev || 0, d: j.d, mrev: j.mrev || 0, m: j.m || {} }; try { localStorage.setItem(CKEY, JSON.stringify(c)); } catch (x) {} if (cb) cb(c); listeners.forEach(function (f) { try { f(c); } catch (x) {} }); })
+      .then(function (j) { if (!j || !j.ok || !j.d) throw 0; var c = { ts: Date.now(), rev: j.rev || 0, d: j.d, mrev: j.mrev || 0, m: j.m || {}, o: j.ord || {} /* restaurants with 🛒 online ordering on (demo/ordering.js) */ }; try { localStorage.setItem(CKEY, JSON.stringify(c)); } catch (x) {} if (cb) cb(c); listeners.forEach(function (f) { try { f(c); } catch (x) {} }); })
       .catch(function () { if (cb) cb(null); });
   }
   // live values for one restaurant: defaults + cached overrides (sync), then fresh ones via onChange

@@ -6,7 +6,9 @@
    🔐 Team access (2026-10-14): fake "sammy" (Melody manager, NO email, so her saves stop at "No email on file" like the
    real backend), a fake approved Melody cook (kitchen@example.com) and a fake PENDING Nalu Vida bartender
    (nalu-bartender@example.com), all with password "test-mode-only". New sign-ups (team_signup) keep their own password
-   in this page's memory only. Switches, job presets and every check mirror Code.gs (JOBS / permCut / needPerm). */
+   in this page's memory only. Switches, job presets and every check mirror Code.gs (JOBS / permCut / needPerm).
+   🛒 Online orders (2026-10-18): 4 made-up paid pickup orders today (Test G. 61…, 555 phones); the Orders tab's
+   "🧪 Fake a new order" button adds one so the new-order alert can be tried. Same rules as Code.gs ordersHQ. */
 (function () {
   "use strict";
   var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
@@ -76,9 +78,9 @@
     "melody-manager": { name: "Melody Management", email: "melody-team@example.com", role: "manager", slugs: ["melody-bar-grill"] },
     sammy: { name: "Sami", email: "", role: "manager", slugs: ["melody-bar-grill"], job: "manager" } }, TOK = {}, PEND = {}, fails = 0;
   // 🔐 same presets as Code.gs JOBS
-  var PERM_KEYS = ["stats", "members", "rewards", "prices", "specials", "photos", "earlybird", "squares", "todo", "staff", "audit"];
-  var PERM_LABEL = { stats: "See sales & visit charts", members: "See guest list & contacts", rewards: "Discounts, rewards & points", prices: "Raise / lower menu prices", photos: "Menu photos go live", specials: "Specials & happy hour", earlybird: "Early-bird gift", squares: "Football Squares", todo: "To-do list", staff: "Staff practice & quiz", audit: "See the Audit log" };
-  var JOBS = { kitchen: ["Kitchen", "prices specials photos todo"], marketing: ["Marketing / management", "stats rewards specials photos earlybird squares todo audit"], bar_manager: ["Bar manager", "stats prices specials photos squares todo staff"],
+  var PERM_KEYS = ["stats", "members", "rewards", "prices", "specials", "photos", "earlybird", "squares", "todo", "staff", "audit", "orders"];
+  var PERM_LABEL = { stats: "See sales & visit charts", members: "See guest list & contacts", rewards: "Discounts, rewards & points", prices: "Raise / lower menu prices", photos: "Menu photos go live", specials: "Specials & happy hour", earlybird: "Early-bird gift", squares: "Football Squares", todo: "To-do list", staff: "Staff practice & quiz", audit: "See the Audit log", orders: "Online orders (pickup)" };
+  var JOBS = { kitchen: ["Kitchen", "prices specials photos todo orders"], marketing: ["Marketing / management", "stats rewards specials photos earlybird squares todo audit"], bar_manager: ["Bar manager", "stats prices specials photos squares todo staff orders"],
     bartender: ["Bartender", "todo staff"], server: ["Server / floor", "todo staff"], runner: ["Food runner / barback", "todo staff"], manager: ["Manager (general)", PERM_KEYS.join(" ")], other: ["Other employee", "todo"] };
   function presetOf(j) { var on = {}, o = {}; (JOBS[j] || JOBS.other)[1].split(" ").forEach(function (k) { on[k] = 1; }); PERM_KEYS.forEach(function (k) { o[k] = !!on[k]; }); return o; }
   function effPerms(j, over) { var o = presetOf(j); Object.keys(over || {}).forEach(function (k) { if (PERM_KEYS.indexOf(k) >= 0) o[k] = over[k] === true; }); return o; }
@@ -199,6 +201,7 @@
     var SC = scopeOf(u), NOPE = { ok: false, reason: "Your login can't do that. Ask Christian." };
     if (d.type === "squares_admin" && (!may(u, "squares") || (SC.role !== "owner" && d.slug && !can(u, d.slug)))) return NOPE;
     if (d.type === "bo_team") return teamAct(d, u);
+    if (d.type === "bo_orders" || d.type === "bo_order_set") return ordersAct(d, u);   // 🛒 same rules as Code.gs ordersHQ
     if (d.type === "bo_todo" && !may(u, "todo")) return NOPE;
     if (d.type === "squares_admin") return window.SQUARES_MOCK ? window.SQUARES_MOCK(Object.assign({}, d, { by: rec(u).name })) : { ok: false, reason: "Test squares backend missing" };   // demo/sports/squares-mock.js
     if (d.type === "bo_dedupe") return SC.role === "owner" ? { ok: true, removed: 0 } : NOPE;
@@ -287,6 +290,26 @@
     }
     return { ok: false };
   }
+  // 🛒 ONLINE ORDERS (made-up, today only): same shape as Code.gs ordStaff(). Phones are 555 numbers; full number only with
+  // the guest-contacts switch, like the real backend. {type:"bo_orders", fake:true} (test mode only) adds a new paid order.
+  var FOODS = [["Lemon Pepper Wings", 16], ["Lobster Mac & Cheese", 21.5], ["Melody Burger", 19.25], ["Gilroy Garlic Fries", 6.75], ["Shrimp Tacos", 16], ["Nachos", 15], ["Chicken Burrito", 17.25], ["House Mac", 15]],
+    NOTES = ["", "", "extra ranch", "no onions", "sauce on the side", ""], ORDERS = [], oseq = 0;
+  function fakeOrder(minsAgo, st) { var t = Date.now() - minsAgo * 6e4, it = [], k = 1 + Math.floor(rnd() * 3), sub = 0, ABC = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", id = "MEL-O";
+    for (var q = 0; q < 5; q++) id += ABC[Math.floor(rnd() * ABC.length)];
+    for (var j = 0; j < k; j++) { var f = pick(FOODS), qn = 1 + Math.floor(rnd() * 2); it.push({ item: f[0], qty: qn, note: pick(NOTES) }); sub += f[1] * qn; }
+    sub = Math.round(sub * 100) / 100; var tax = Math.round(sub * 9.75) / 100, pk = pick([["ASAP", 0], ["In 15 min", 15], ["In 30 min", 30]]); oseq++;
+    ORDERS.push({ id: id, slug: "melody-bar-grill", status: st || "paid", name: "Test G. " + (60 + oseq), phone: "+1555010" + ("0" + (60 + oseq)).slice(-2) + "0" + (oseq % 10), pickup: pk[0], pickupAt: pk[1] ? t + pk[1] * 6e4 : 0,
+      items: it, subtotal: sub, food_subtotal: sub, tax: tax, tip: 0, delivery_fee: 0, total: Math.round((sub + tax) * 100) / 100, ssai_fee: Math.round(sub * 5) / 100, created: t - 6e4, paidAt: t, readyAt: st === "ready" || st === "picked_up" ? t + 9e5 : 0, pickedAt: st === "picked_up" ? t + 15e5 : 0 }); }
+  fakeOrder(95, "picked_up"); fakeOrder(52, "ready"); fakeOrder(18, "paid"); fakeOrder(4, "paid");
+  function ordersAct(d, u) { var r = rec(u); if (!may(u, "orders")) return { ok: false, reason: "Your login can't do that. Ask Christian." };
+    if (d.type === "bo_order_set") { var o = ORDERS.filter(function (x) { return x.id === d.id; })[0], st = d.status === "ready" || d.status === "picked_up" ? d.status : "";
+      if (!o || !can(u, o.slug)) return { ok: false, reason: "Order not found." }; if (!st) return { ok: false, reason: "Pick Ready or Picked up." };
+      if (o.status === "picked_up" || o.status === st) return { ok: false, reason: "Already marked. Tap Refresh." };
+      o.status = st; if (st === "ready") o.readyAt = Date.now(); else o.pickedAt = Date.now(); }
+    if (d.fake) fakeOrder(0, "paid");
+    var list = ORDERS.filter(function (o) { return can(u, o.slug); }).map(function (o) { var c = JSON.parse(JSON.stringify(o)); if (!r.perms.members && r.role !== "owner") c.phone = "•••" + c.phone.slice(-4); if (r.role !== "owner") delete c.ssai_fee; return c; })
+      .sort(function (a, b) { return b.paidAt - a.paidAt; });
+    return { ok: true, test: true, orders: list, now: Date.now(), day: ymd(Date.now()) }; }
   window.HQ_MOCK = function (body) { return new Promise(function (res) { setTimeout(function () { Promise.resolve(handle(JSON.parse(JSON.stringify(body)))).then(function (r) { res(JSON.parse(JSON.stringify(r))); }); }, 120); }); };
   // Football Squares test backend (shared with the guest app's ?test=1 through this browser's localStorage)
   if (!window.SQUARES_MOCK) { var sqs = document.createElement("script"); sqs.src = "../../demo/sports/squares-mock.js?v=sq2"; document.head.appendChild(sqs); }

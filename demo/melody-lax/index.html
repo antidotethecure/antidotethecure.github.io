@@ -2865,10 +2865,13 @@ window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REW
    players or "Demo:" notes (crm.js, interim.js, nearby.js, specials.js read this flag). Owner tools = Christian HQ. */
 window.SSAI_CUSTOMER_ONLY=true;</script>
 <script src="../crm.js?v=rs1"></script><script src="../claimscore.js?v=cs1"></script><script src="games-data.js?v=wh2"></script><script src="games.js?v=wh2"></script>
-<link rel="stylesheet" href="../sports/sports.css?v=sb2">
+<link rel="stylesheet" href="../sports/sports.css?v=gd1">
 <script>/* SPORTS BAR PACKAGE (demo/sports/README.md): Melody = install #1, LA/California teams. Perks text stays empty until
    Christian sets a real deal: an empty watchParty.text hides the banner (no made-up deals). */
-window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",region:"la",   /* no ticker: the Today's games carousel (layout.js) replaces it */
+window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",region:"la",teamsTab:"LA teams",
+  /* Watch it here: Melody first, sister spot Nalu Vida after. Notes = each page's own wording ("every game on the TVs"). */
+  watchAt:[{name:"Melody Bar & Grill",note:"Every game on the TVs, 5 minutes from LAX.",address:"9132 S Sepulveda Blvd, Los Angeles, CA 90045",tel:"+13106701994"},
+           {name:"Nalu Vida (sister spot)",note:"Venice Pier. The game's on the TVs there too.",address:"1 Washington Blvd, Venice, CA 90292",tel:"+13104370060",app:"../nalu-vida/",appLabel:"🏄 Their app"}],   /* no ticker: the Today's games carousel (layout.js) replaces it */
   leagues:["mlb","nfl","nba","nhl","mls","wnba","cfb","cbb","ufc"],
   theme:{bg:"var(--sky)",panel:"var(--panel)",edge:"var(--edge)",accent:"var(--gold)",accent2:"var(--gold2)",ink:"var(--ink)",dim:"var(--dim)",onAccent:"#1a1405",display:"var(--display)",body:"var(--body)",punch:"var(--punch)"},
   fightNight:{url:"../sports/events.json"},
@@ -2888,7 +2891,7 @@ window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",regio
     award:function(n,label){ var GP=window.SSAI_GAMEPTS; return GP.award(n*GP.cfg.perScore,label); },
     offNote:"🧪 BETA: pick points switch on when Melody turns game rewards on. Picks are just for fun until then."}
 };</script>
-<script src="../sports/teams.js?v=sb1"></script><script src="../sports/sports.js?v=sq2"></script><script src="../sports/squares.js?v=sq2"></script><script src="layout.js?v=ml1"></script><script src="../interim.js?v=rs1"></script><script src="../earlybird.js?v=op1"></script><script src="../loyaltycard.js?v=lc1"></script><script src="../locbonus.js?v=lb1"></script>
+<script src="../sports/teams.js?v=sb1"></script><script src="../sports/sports.js?v=gd1"></script><script src="../sports/squares.js?v=sq2"></script><script src="layout.js?v=gd1"></script><script src="../interim.js?v=rs1"></script><script src="../earlybird.js?v=op1"></script><script src="../loyaltycard.js?v=lc1"></script><script src="../locbonus.js?v=lb1"></script>
 <script>/* VENUE VERSUS (demo/versus.js): live battles against everyone at Melody. The server (Cloudflare Durable Object behind
    /api/versus on the scores site) owns the clock, seed, start, end and results. Nightly 9:00 PM high-score battle + quick battles,
    "Who wins?" picks, Sky Duel and the Menu Dash race. Prizes stay bragging rights until Christian sets a menu perk (owner admin). */

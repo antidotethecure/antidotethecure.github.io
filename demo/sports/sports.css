@@ -80,3 +80,16 @@
 .sq-act{display:grid;grid-template-columns:1.3fr 1fr;gap:8px}.sq-act .sp-btn:disabled{opacity:.45;cursor:default}.sq-alt{background:var(--sp-panel)!important;color:var(--sp-ink)!important;border-color:var(--sp-edge)!important}
 .sq-wr{display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--sp-edge);padding:8px 2px;font-size:13px;line-height:1.4}.sq-wr>b{flex:none;width:68px;color:var(--sp-accent);font-size:12px;text-transform:uppercase;letter-spacing:.08em}.sq-wr.me{background:color-mix(in srgb,var(--sp-accent) 12%,transparent);border-radius:10px}
 @media (prefers-reduced-motion:reduce){.sq-s.win{animation:none}}
+/* All games + where to watch (2026-10-15) */
+.sp-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:10px 0 2px;padding-bottom:2px}.sp-chips::-webkit-scrollbar{display:none}
+.sp-chips button{flex:none;min-height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--sp-edge);background:var(--sp-panel);color:var(--sp-ink);font:800 13px var(--sp-body);cursor:pointer}
+.sp-chips button[aria-pressed=true]{background:linear-gradient(180deg,var(--sp-accent2),var(--sp-accent));border-color:var(--sp-accent);color:var(--sp-on-accent)}
+.sp-wt{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:42px;margin-top:10px;border-radius:12px;border:1px solid var(--sp-accent);background:transparent;color:var(--sp-accent2);font:800 14px var(--sp-body);cursor:pointer}
+.sp-wt.lv{background:linear-gradient(180deg,var(--sp-accent2),var(--sp-accent));color:var(--sp-on-accent)}
+.sp-w{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--sp-edge)}.sp-w:last-child{border-bottom:0}.sp-w b{flex:1;min-width:0}
+.sp-w a{flex:none;text-decoration:none;border-radius:10px;padding:8px 12px;font:800 13px var(--sp-body);background:linear-gradient(180deg,var(--sp-accent2),var(--sp-accent));color:var(--sp-on-accent)}
+.sp-wsub{display:inline-block;margin-left:8px;padding:2px 7px;border-radius:999px;border:1px solid var(--sp-edge);color:var(--sp-dim);font:700 11px var(--sp-body);vertical-align:middle}
+.sp-venue{margin-top:8px;padding:12px;border-radius:14px;border:1px solid var(--sp-edge);background:var(--sp-panel)}.sp-venue.me{border-color:var(--sp-accent)}
+.sp-venue b{display:block;font:900 16px var(--sp-display)}.sp-venue small{display:block;color:var(--sp-dim);font:600 13px var(--sp-body);margin-top:2px}
+.sp-vact{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}.sp-vact a{flex:1 1 auto;text-align:center;text-decoration:none;min-height:38px;line-height:38px;padding:0 10px;border-radius:10px;border:1px solid var(--sp-edge);color:var(--sp-ink);font:800 13px var(--sp-body)}
+.sp-venue.me .sp-vact a:first-child{background:linear-gradient(180deg,var(--sp-accent2),var(--sp-accent));color:var(--sp-on-accent);border-color:var(--sp-accent)}

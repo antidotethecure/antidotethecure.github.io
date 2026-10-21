@@ -2,218 +2,31 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>SousShift AI — Your Business App</title>
-<meta name="description" content="Your menu, a rewards game, a customer list you own, reviews and 12 languages, built around your business. See live apps and get a free sample.">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SousShift AI — Demo Apps</title>
+<link rel="canonical" href="https://antidotethecure.github.io/app/#apps">
+<meta name="robots" content="noindex,follow">
 <meta property="og:title" content="SousShift AI: your business, in your customers' pocket">
-<meta property="og:description" content="See live apps built for LA restaurants, then get a free sample built for yours.">
+<meta property="og:description" content="See demo apps built for LA restaurants and trucks, then get a free sample built for yours.">
 <meta property="og:image" content="https://antidotethecure.github.io/demo/storm-burger/img/classic.jpg">
-<script>window.DEMO_LANG_BAR = true;</script>
-<script src="../lang-th.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;600;800;900&display=swap">
-<style>
-:root{
-  --bg:#070B1E; --card:#121C40; --edge:#25336A; --ink:#EEF2FF; --dim:#9AA6CC;
-  --bolt:#E8582A; --gold:#FFD23F; --zap:#BFE6FF; --good:#3DDC97;
-  --display:"Bebas Neue","Arial Narrow",Impact,sans-serif; --body:"Archivo",system-ui,-apple-system,sans-serif;
-  color-scheme:dark;
-}
-*{box-sizing:border-box}
-html,body{margin:0}
-html{-webkit-text-size-adjust:100%}
-body{background:radial-gradient(900px 600px at 50% -10%,#24357a 0,transparent 60%),var(--bg);color:var(--ink);font-family:var(--body);line-height:1.45;padding-inline:16px;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px));overflow-x:hidden}
-.wrap{max-width:720px;margin:0 auto}
-a{color:var(--zap)}
-.flash{position:fixed;inset:0;pointer-events:none;background:#dff3ff;opacity:0;z-index:50}
-.k{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:800;margin:0}
-h1{font-family:var(--display);font-weight:400;font-size:clamp(46px,13vw,76px);letter-spacing:.03em;line-height:.92;margin:10px 0 10px}
-h1 em{font-style:normal;color:var(--bolt);text-shadow:0 0 24px #e8582a66}
-h2{font-family:var(--display);font-weight:400;font-size:clamp(32px,8.5vw,44px);letter-spacing:.04em;line-height:1;margin:6px 0 6px}
-h2::before{content:"";display:inline-block;vertical-align:-2px;margin-right:10px;width:22px;height:22px;background:var(--bolt);clip-path:polygon(55% 0,10% 58%,45% 58%,30% 100%,90% 38%,55% 38%,75% 0)}
-.lead{color:var(--dim);margin:0 0 16px;font-size:15.5px}
-section{margin-top:52px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;font-weight:900;font-size:16px;border-radius:14px;padding:15px 20px;border:1px solid var(--edge);background:var(--card);color:var(--ink);cursor:pointer}
-.btn.hot{background:var(--bolt);border-color:var(--bolt);color:#fff;box-shadow:0 8px 28px #e8582a66}
-.cta{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px}
-
-/* hero */
-header{text-align:center;padding-top:22px}
-.logo{height:84px;width:auto;border-radius:20px;display:block;margin:0 auto 10px;box-shadow:0 0 40px #2547b866}
-.for{display:none;font-size:13px;color:var(--ink);background:var(--card);border:1px solid var(--edge);border-radius:99px;padding:6px 14px;margin:0 auto 12px;width:max-content;max-width:100%}
-.for b{color:var(--gold)}
-.sub{color:#cfd7f2;margin:0 auto;max-width:42ch;font-size:16.5px}
-.strip{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
-.strip span{font-size:12.5px;font-weight:800;color:var(--dim);border:1px solid var(--edge);border-radius:99px;padding:6px 11px;background:#0b1230}
-
-/* showcase */
-.apps{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.app{position:relative;display:block;text-decoration:none;color:#fff;border-radius:20px;overflow:hidden;aspect-ratio:3/4;border:1px solid var(--edge);background:var(--card) center/cover no-repeat;box-shadow:0 18px 40px #0008;transition:transform .2s}
-.app:active{transform:scale(.98)}
-.app::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,#05081aee 88%)}
-.app .in{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:12px}
-.app .em{font-size:26px;line-height:1}
-.app b{display:block;font-family:var(--display);font-weight:400;font-size:26px;letter-spacing:.03em;line-height:1;margin-top:4px}
-.app small{display:block;color:#d5dcf5;font-size:12px;margin-top:3px}
-.app .go{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:900;letter-spacing:.06em;color:#1a1200;background:var(--gold);border-radius:99px;padding:5px 10px}
-.app .tag{position:absolute;top:10px;left:10px;z-index:1;font-size:10.5px;font-weight:900;letter-spacing:.08em;background:#e8582a;color:#fff;border-radius:99px;padding:4px 9px}
-.app.ml{background:linear-gradient(160deg,#77242e,#f0d37555 70%),var(--card)}
-.app.ml .big{position:absolute;inset:0;display:grid;place-items:center;font-size:84px;padding-bottom:30%}
-
-/* phone */
-.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
-.chips button{font-weight:800;font-size:13px;padding:9px 13px;border-radius:99px;border:1px solid var(--edge);background:var(--card);color:var(--dim);cursor:pointer}
-.chips button[aria-pressed=true]{border-color:var(--bolt);color:#fff;background:var(--bolt)}
-.phone{position:relative;width:300px;height:610px;margin:0 auto;border-radius:46px;padding:12px;background:linear-gradient(145deg,#2a3566,#0a0f24);box-shadow:0 0 0 2px #3a4a8a,0 30px 80px #000c,0 0 60px #2547b855}
-.phone .scr{position:relative;width:276px;height:586px;border-radius:36px;overflow:hidden;background:#000}
-.phone iframe{width:390px;height:828px;border:0;transform:scale(.7077);transform-origin:0 0;display:block}
-.phone .notch{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:92px;height:24px;border-radius:99px;background:#000;z-index:2}
-.tapnote{text-align:center;color:var(--dim);font-size:12.5px;margin-top:12px}
-
-/* features */
-.feats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.feat{background:var(--card);border:1px solid var(--edge);border-radius:18px;padding:14px}
-.feat .em{font-size:28px;line-height:1}
-.feat b{display:block;font-size:15.5px;margin:8px 0 3px}
-.feat span{color:var(--dim);font-size:13.5px;line-height:1.4;display:block}
-
-/* steps */
-.steps{display:grid;gap:10px}
-.st{display:grid;grid-template-columns:46px 1fr;gap:12px;align-items:center;background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px}
-.st i{font-style:normal;display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--bolt);font-family:var(--display);font-size:26px;color:#fff}
-.st b{display:block;font-size:16px}.st span{color:var(--dim);font-size:13.5px}
-
-/* price */
-.price{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.pp{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:12px 8px;text-align:center}
-.pp.best{border-color:var(--bolt);box-shadow:0 0 30px #e8582a33}
-.pp small{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--dim);text-transform:uppercase}
-.pp b{display:block;font-family:var(--display);font-weight:400;font-size:34px;color:var(--gold);letter-spacing:.03em;line-height:1.05;margin-top:4px}
-.pp span{font-size:12px;color:var(--dim)}
-
-.final{text-align:center;background:linear-gradient(180deg,#1a2656,var(--bg));border:1px solid var(--bolt);border-radius:24px;padding:28px 18px}
-.sticky{position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:40;max-width:520px;margin:0 auto;display:none}
-.sticky.on{display:block}
-.sticky .btn{width:100%}
-footer{text-align:center;color:var(--dim);font-size:12px;margin-top:30px;line-height:1.7}
-@media (max-width:360px){.price{grid-template-columns:1fr}.feats{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-<div class="flash" id="flash"></div>
-<div class="wrap">
-
-<header>
-  <img class="logo" src="../../assets/sousshift-lockup.jpg" alt="SousShift AI">
-  <p class="for" id="for">Made for <b id="forName"></b></p>
-  <p class="k">SousShift AI</p>
-  <h1>Your business, in your customers' <em>pocket</em>.</h1>
-  <p class="sub">Your menu, a game made around your food, rewards that bring people back, a customer list you own, and every language your neighborhood speaks. All in one tap from a QR on the table.</p>
-  <div class="cta">
-    <a class="btn hot" href="../start/" id="ctaTop">⚡ Build my free sample</a>
-    <a class="btn" href="#apps">See live apps ↓</a>
-  </div>
-  <div class="strip"><span>🎮 Custom game</span><span>🎁 Rewards</span><span>📇 Your customer list</span><span>⭐ Google reviews</span><span>🌐 12 languages</span></div>
-</header>
-
-<section id="apps">
-  <p class="k">Real apps · real LA spots</p>
-  <h2>Tap one and play</h2>
-  <p class="lead">Each one was built around the restaurant's real menu, with a game themed to their food. Yours gets the same treatment.</p>
-  <div class="apps">
-    <a class="app" href="../storm-burger/" style="background-image:url(../storm-burger/img/classic.jpg)"><span class="tag">⚡ FAN FAVORITE</span><div class="in"><div class="em">⚡</div><b>StormBurger</b><small>Inglewood · Long Beach<br>"Storm Run" driving game</small><span class="go">OPEN APP →</span></div></a>
-    <a class="app" href="../churrito-loco/" style="background-image:url(../churrito-loco/img/churros.jpg)"><div class="in"><div class="em">🌶️</div><b>Churrito Loco</b><small>South Gate<br>"Loco Match" puzzle game</small><span class="go">OPEN APP →</span></div></a>
-    <a class="app" href="../lucky-dragon/" style="background-image:url(../lucky-dragon/img/shrimp.jpg)"><div class="in"><div class="em">🐉</div><b>Lucky Dragon</b><small>Compton · hibachi<br>"Hibachi Catch" dragon game</small><span class="go">OPEN APP →</span></div></a>
-    <a class="app" href="../melody-lax/" style="background-image:url(../melody-lax/img/cover.jpg)"><span class="tag">✈️ FULL PACKAGE</span><div class="in"><div class="em">🍸</div><b>Melody Bar &amp; Grill</b><small>Westchester by LAX<br>Table ordering + flight game</small><span class="go">OPEN APP →</span></div></a>
-    <a class="app" href="../gritz-n-wafflez/" style="background-image:url(../gritz-n-wafflez/img/wingz-wafflez.jpg)"><span class="tag">💛 WOMAN-OWNED</span><div class="in"><div class="em">🧇</div><b>Gritz N Wafflez</b><small>Wilshire Blvd · LA<br>"Waffle Run" game while you wait</small><span class="go">OPEN APP →</span></div></a>
-    <a class="app" href="../nalu-vida/" style="background-image:url(../nalu-vida/img/hero.jpg)"><span class="tag">🌊 FULL PACKAGE</span><div class="in"><div class="em">🏄</div><b>Nalu Vida</b><small>Venice Pier · beach bar<br>"Ride the Nalu" surf game</small><span class="go">OPEN APP →</span></div></a>
-  </div>
-</section>
-
-<section>
-  <p class="k">Try it right here</p>
-  <h2>Swipe through a real one</h2>
-  <div class="chips" id="chips">
-    <button type="button" data-d="storm-burger" aria-pressed="true">⚡ StormBurger</button>
-    <button type="button" data-d="churrito-loco" aria-pressed="false">🌶️ Churrito Loco</button>
-    <button type="button" data-d="lucky-dragon" aria-pressed="false">🐉 Lucky Dragon</button>
-    <button type="button" data-d="melody-lax" aria-pressed="false">✈️ Melody</button>
-    <button type="button" data-d="gritz-n-wafflez" aria-pressed="false">🧇 Gritz N Wafflez</button>
-  </div>
-  <div class="phone"><div class="notch"></div><div class="scr"><iframe id="ph" title="Live app" src="../storm-burger/" loading="lazy"></iframe></div></div>
-  <p class="tapnote">It's live: scroll it, play the game, join the club.</p>
-</section>
-
-<section>
-  <p class="k">What's inside</p>
-  <h2>Everything your app does</h2>
-  <div class="feats">
-    <div class="feat"><div class="em">🍔</div><b>Your menu in 3D</b><span>Real items, real prices, photos that spin like they're on the plate.</span></div>
-    <div class="feat"><div class="em">🎮</div><b>A game made for you</b><span>Themed to your food. Weekly prize board keeps people coming back.</span></div>
-    <div class="feat"><div class="em">🎁</div><b>Instant rewards</b><span>Customers drop their phone or email and get a reward on the spot.</span></div>
-    <div class="feat"><div class="em">📇</div><b>Your customer list</b><span>Every signup saved for you: VIPs, birthdays, who hasn't been back. It's your data.</span></div>
-    <div class="feat"><div class="em">💬</div><b>Bring them back</b><span>Text a group in one tap: slow-day specials, birthday treats, "we miss you".</span></div>
-    <div class="feat"><div class="em">⭐</div><b>More Google reviews</b><span>One-tap review button plus a map that shows you're close by.</span></div>
-    <div class="feat"><div class="em">🌐</div><b>12 languages</b><span>Español, 中文, 한국어, Հայերեն, Русский and more, one tap away.</span></div>
-    <div class="feat"><div class="em">📱</div><b>No download</b><span>Scan the QR on the table and it opens. Nothing to install.</span></div>
-  </div>
-</section>
-
-<section>
-  <p class="k">How to start</p>
-  <h2>Free sample in 3 steps</h2>
-  <div class="steps">
-    <div class="st"><i>1</i><div><b>Tell us about your business</b><span>Pick your type, add a few items and prices, drop 2–6 photos. About 3 minutes.</span></div></div>
-    <div class="st"><i>2</i><div><b>We build your sample</b><span>Antidote reviews it personally and builds your app with your name and photos.</span></div></div>
-    <div class="st"><i>3</i><div><b>You see it on your phone</b><span>Play it, show your staff, then decide. No card, no pressure.</span></div></div>
-  </div>
-  <div class="cta"><a class="btn hot" href="../start/">⚡ Start my free sample</a></div>
-</section>
-
-<section>
-  <p class="k">When you're ready</p>
-  <h2>Start with as little as $500</h2>
-  <div class="price">
-    <div class="pp best"><small>Pay in full</small><b>$2,500</b><span>then $400/mo</span></div>
-    <div class="pp"><small>Half down</small><b>$1,250</b><span>$525/mo × 12, then $400</span></div>
-    <div class="pp"><small>Starter</small><b>$500</b><span>$600/mo × 12, then $400</span></div>
-  </div>
-  <p style="text-align:center;color:var(--dim);font-size:13px;margin:10px 0 0">Full package shown. Core package: $2,000 + $300/mo.</p>
-  <div>
-  </div>
-  <div class="cta"><a class="btn" id="growthLink" href="../growth/">See the growth math →</a></div>
-</section>
-
-<section class="final">
-  <p class="k">Your turn</p>
-  <h2>Let's build yours</h2>
-  <p class="lead" style="margin-bottom:0">Free sample, built around your menu and your photos.</p>
-  <div class="cta"><a class="btn hot" href="../start/">⚡ Build my free sample</a><a class="btn" href="https://instagram.com/second.shiftai" target="_blank" rel="noopener">DM @second.shiftai</a></div>
-</section>
-
-<footer><b style="color:var(--gold)">SOUSSHIFT AI</b> · menus · games · rewards · customer lists · reviews · outreach<br>Demo apps use sample prizes; games run as free-entry promotions.</footer>
-</div>
-<div class="sticky" id="sticky"><a class="btn hot" href="../start/">⚡ Build my free sample</a></div>
-
+<meta http-equiv="refresh" content="0; url=../../app/#apps">
 <script>
-(function(){
-  var $ = function(i){ return document.getElementById(i); };
-  var who = new URLSearchParams(location.search).get("for");
-  if (who) {
-    who = who.slice(0, 60);
-    $("forName").textContent = who; $("for").style.display = "block";
-    $("growthLink").href = "../growth/?for=" + encodeURIComponent(who);
-  }
-  var chips = document.querySelectorAll("#chips button"), ph = $("ph");
-  chips.forEach(function(b){ b.addEventListener("click", function(){
-    chips.forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); ph.src = "../" + b.dataset.d + "/";
-  }); });
-  // sticky CTA once the top button scrolls away
-  if ("IntersectionObserver" in window) new IntersectionObserver(function(en){ $("sticky").classList.toggle("on", !en[0].isIntersecting); }).observe($("ctaTop"));
-  var fl = $("flash");
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches && fl.animate) setInterval(function(){
-    if (Math.random() < .5) fl.animate([{opacity:0},{opacity:.2},{opacity:0},{opacity:.1},{opacity:0}], {duration:520});
-  }, 6500);
+/* /demo/setup/ moved into the SousShift app (/app/#apps). Keeps ?for= and truck links working. */
+(function () {
+  var q = new URLSearchParams(location.search), out = new URLSearchParams();
+  var who = q.get("for"), type = (q.get("type") || "").toLowerCase();
+  if (who) out.set("for", who.slice(0, 60));
+  var truck = /^(truck|trucks|icecream|ice-cream|foodtruck|food-truck)$/.test(type);
+  if (truck) out.set("type", "truck");
+  var h = location.hash;
+  var hash = /^#(apps|trucks|ice-cream|food-truck)$/.test(h) ? h : (truck ? "#trucks" : "#apps");
+  var s = out.toString();
+  location.replace("../../app/" + (s ? "?" + s : "") + hash);
 })();
 </script>
+<style>body{margin:0;background:#03060e;color:#eef3ff;font:17px/1.5 system-ui,-apple-system,sans-serif;display:grid;place-items:center;min-height:100vh;padding:16px;box-sizing:border-box;text-align:center}a{color:#3fa9ff}</style>
+</head>
+<body>
+<p>The demo apps moved into the SousShift app.<br><a href="../../app/#apps">Open the demo apps →</a></p>
 </body>
 </html>

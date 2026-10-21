@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ice Cream Owner Kit</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Antidote's package for ice cream truck owners: send links, plans, and the go-live checklist.">
+<meta name="theme-color" content="#03060e">
+<link rel="icon" href="../../second-shift/img/ssai-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="../ice.css?v=20261011d">
+<style>
+.hero{padding:22px 0 0}
+.hero h1{font-size:clamp(24px,6.6vw,36px)}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:14px;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{flex:none;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--edge);border-radius:99px;padding:7px 13px;font-weight:700;font-size:15px}
+.fill{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.fill label{display:block;font:800 11px "Orbitron",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.fill input{width:100%;margin-top:5px;padding:11px;border-radius:12px;border:1px solid var(--edge);background:#060d22;color:var(--ink);font:600 16px "Rajdhani",sans-serif}
+.msg{white-space:pre-wrap;background:#060d22;border:1px solid var(--edge);border-radius:14px;padding:12px;margin:10px 0;font-size:15.5px;color:var(--silver);overflow-wrap:anywhere}
+.hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.hd small{color:var(--dim);font-size:14px}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.acts .btn{flex:1 1 130px;padding:10px 12px;min-height:44px;font-size:11.5px}
+.btn.done{background:var(--good);color:#04140e}
+.lk{display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:start;padding:12px 0;border-top:1px solid var(--edge)}
+.lk:first-child{border-top:0;padding-top:2px}
+.lk .ic{font-size:28px;line-height:1.1;text-align:center}
+.lk b{display:block;font-size:17px}
+.lk p{margin:0;color:var(--dim);font-size:14.5px;line-height:1.35}
+.lk code{display:block;font:600 13px ui-monospace,monospace;color:var(--volt);overflow-wrap:anywhere;margin:3px 0 8px}
+.lk .acts .btn{flex:0 1 auto}
+.tiers{display:grid;gap:10px}
+@media(min-width:640px){.tiers{grid-template-columns:repeat(3,1fr)}}
+.tier{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);border-radius:18px;padding:14px}
+.tier.best{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,209,102,.25)}
+.tier .nm{font:800 15px "Orbitron",sans-serif}
+.tier .mo{font:900 30px "Orbitron",sans-serif;color:var(--gold);margin-top:4px}
+.tier .mo small{font:700 14px "Rajdhani",sans-serif;color:var(--dim)}
+.tier .su{color:var(--silver);font-size:14.5px}
+.tier ul{margin:8px 0 0;padding-left:18px;color:var(--dim);font-size:14.5px}
+.pill{display:inline-block;font:800 10px "Orbitron",sans-serif;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;padding:2px 8px;vertical-align:2px}
+.pill.done{color:#04140e;background:var(--good)}
+.pill.todo{color:#2a1a00;background:var(--warn)}
+.pill.pop{color:#2a1a00;background:var(--gold)}
+.check{display:grid;grid-template-columns:32px 1fr;gap:10px;padding:14px 0;border-top:1px solid var(--edge)}
+.check:first-of-type{border-top:0}
+.check input{width:26px;height:26px;margin:2px 0 0;accent-color:var(--good)}
+.check b{font-size:17px}
+.check .cost{display:inline-block;font:800 12px "Orbitron",sans-serif;color:var(--gold);margin-left:4px}
+.check p{margin:4px 0 0;color:var(--silver);font-size:15px;line-height:1.4}
+.check ol{margin:6px 0 0;padding-left:20px;color:var(--dim);font-size:14.5px}
+.check.ok>div>b{text-decoration:line-through;text-decoration-color:var(--good);color:var(--dim)}
+.prog{height:10px;border-radius:99px;background:var(--panel);border:1px solid var(--edge);overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--good),var(--mint));transition:width .3s}
+.doneList{display:grid;gap:6px;margin:8px 0 0;padding:0;list-style:none}
+.doneList li{display:flex;gap:8px;align-items:baseline;color:var(--silver);font-size:15.5px}
+.qrs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qrs figure{margin:0;text-align:center;background:#fff;border-radius:16px;padding:10px;color:#0b1630}
+.qrs img{width:100%;height:auto;display:block;border-radius:8px}
+.qrs figcaption{font:700 14px "Rajdhani",sans-serif;margin-top:6px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--good);color:#04140e;font-weight:800;padding:10px 18px;border-radius:99px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
+.toast.on{opacity:1}
+#qrPrint{display:none}
+@media print{
+  html.pq body>*:not(#qrPrint){display:none!important}
+  html.pq #qrPrint{display:block;text-align:center;color:#000;font-family:Arial,sans-serif;padding-top:40px}
+  html.pq #qrPrint img{width:12cm;height:12cm}
+  html.pq body{background:#fff}
+  html.pq body::before{display:none}
+}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <img class="brand" src="../../assets/sousshift-lockup-800w.png" alt="SousShift AI">
+  <b><span data-t="topT">Owner kit</span><small data-t="topS">Just for Antidote</small></b>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">English</button><button data-lang="es" aria-pressed="false" lang="es">Español</button></div>
+</div></div>
+
+<main class="wrap">
+<section class="hero">
+  <p class="kick" data-t="kick">Ice cream trucks · everything in one place</p>
+  <h1 class="chrome" data-t="h1">Send it, price it, take it live.</h1>
+  <p class="lead" data-t="lead">Open this page, or forward it to yourself. Owners never see it.</p>
+  <nav class="tabs" aria-label="Sections">
+    <a href="#send" data-t="tabSend">💬 Send</a><a href="#links" data-t="tabLinks">🔗 All the links</a><a href="#plans" data-t="tabPlans">💲 Plans</a><a href="#live" data-t="tabLive">✅ Go live</a>
+  </nav>
+</section>
+
+<section class="s" id="send">
+  <header><p class="kick" data-t="k1">Step 1</p><h2 data-t="h2send">Send to an owner</h2>
+  <p class="lead" data-t="sendLead">Type their names once. The messages fill in by themselves (saved on this phone).</p></header>
+  <div class="card fill">
+    <div><label for="f_owner" data-t="fOwner">Owner first name</label><input id="f_owner" autocomplete="off" placeholder="Rosa"></div>
+    <div><label for="f_truck" data-t="fTruck">Truck name</label><input id="f_truck" autocomplete="off" placeholder="Paletas El Sol"></div>
+    <div><label for="f_phone" data-t="fPhone">Their cell (optional)</label><input id="f_phone" type="tel" autocomplete="off" placeholder="(323) 555-0100"></div>
+    <div><label for="f_email" data-t="fEmail">Their email (optional)</label><input id="f_email" type="email" autocomplete="off" placeholder="owner@email.com"></div>
+  </div>
+  <div id="msghost"></div>
+  <p class="note" data-t="mailNote">Email: send it from <b>secondshiftai@gmail.com</b> (never the personal address). The Email button opens your mail app with the subject and message ready.</p>
+
+  <div class="card">
+    <div class="hd"><h3 data-t="qrH">QR codes</h3><small data-t="qrS">Print, or show it on your phone</small></div>
+    <div class="qrs" style="margin-top:10px">
+      <figure><img src="../qr-sticker.png?v=20261011d" width="340" height="340" alt="" data-t-alt="qrStickerAlt"><figcaption data-t="qrSticker">Truck sticker</figcaption></figure>
+      <figure><img src="qr-tour.png?v=20261011d" width="340" height="340" alt="" data-t-alt="qrTourAlt"><figcaption data-t="qrTour">Owner tour link</figcaption></figure>
+    </div>
+    <div class="acts" style="margin-top:12px">
+      <a class="btn gold" href="../qr-sticker.png" download="ice-cream-qr-sticker.png" data-t="dlSticker">⬇ Sticker PNG</a>
+      <a class="btn ghost" href="qr-tour.png" download="ice-cream-tour-qr.png" data-t="dlTour">⬇ Tour QR PNG</a>
+      <button class="btn primary" type="button" id="printQr" data-t="printQr">🖨 Print tour QR</button>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="links">
+  <header><p class="kick" data-t="k2">Step 2</p><h2 data-t="h2links">All the links</h2>
+  <p class="lead" data-t="linksLead">Every ice cream page. Add <b>?lang=es</b> to any link and it opens in Spanish.</p></header>
+  <div class="card" id="linkhost"></div>
+</section>
+
+<section class="s" id="plans">
+  <header><p class="kick" data-t="k3">Step 3</p><h2 data-t="h2plans">Plans</h2>
+  <p class="lead" data-t="plansLead">Same prices as the owner tour (one file sets them all). No contract.</p></header>
+  <div class="tiers" id="tierhost"></div>
+</section>
+
+<section class="s" id="live">
+  <header><p class="kick" data-t="k4">Step 4</p><h2 data-t="h2live">Go live checklist</h2>
+  <p class="lead" data-t="liveLead">What's already built, and what's left before a real truck goes live. Tick each one; it saves on this phone.</p></header>
+  <div class="card">
+    <div class="hd"><h3><span class="pill done" data-t="pDone">Done</span> <span data-t="doneH">Built and live now</span></h3></div>
+    <ul class="doneList" id="donehost"></ul>
+  </div>
+  <div class="card">
+    <div class="hd"><h3><span class="pill todo" data-t="pTodo">To do</span> <span data-t="todoH">Before the first truck goes live</span></h3><small id="progTxt"></small></div>
+    <div class="prog"><i id="progBar"></i></div>
+    <div id="checkhost" style="margin-top:6px"></div>
+  </div>
+  <p class="note" data-t="costNote">Your monthly cost to run it: about $5/mo (Railway) no matter how many trucks. Payment fees are paid by the owner to Square, Venmo or Cash App, not by you.</p>
+</section>
+
+<footer class="f"><img src="../../assets/sousshift-lockup-800w.png" alt="SousShift AI"><span data-t="foot">Private page for Antidote · not linked from the owner pages</span></footer>
+</main>
+
+<div id="qrPrint"><h1>Scan to see how it works</h1><img src="qr-tour.png?v=20261011d" alt="QR code for the ice cream owner tour"><p>antidotethecure.github.io/ice-cream/</p><p>SousShift AI · Ice Cream Trucks · English y Español</p></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+window.T = {
+ en: {
+  _title: "Ice Cream Owner Kit",
+  topT: "Owner kit", topS: "Just for Antidote",
+  kick: "Ice cream trucks · everything in one place", h1: "Send it, price it, take it live.",
+  lead: "Open this page, or forward it to yourself. Owners never see it.",
+  tabSend: "💬 Send", tabLinks: "🔗 All the links", tabPlans: "💲 Plans", tabLive: "✅ Go live",
+  k1: "Step 1", h2send: "Send to an owner", sendLead: "Type their names once. The messages fill in by themselves (saved on this phone).",
+  fOwner: "Owner first name", fTruck: "Truck name", fPhone: "Their cell (optional)", fEmail: "Their email (optional)",
+  mailNote: "Email: send it from <b>secondshiftai@gmail.com</b> (never the personal address). The Email button opens your mail app with the subject and message ready.",
+  qrH: "QR codes", qrS: "Print, or show it on your phone", qrSticker: "Truck sticker", qrTour: "Owner tour link",
+  qrStickerAlt: "Designer ice cream QR sticker for the truck", qrTourAlt: "QR code that opens the owner tour",
+  dlSticker: "⬇ Sticker PNG", dlTour: "⬇ Tour QR PNG", printQr: "🖨 Print tour QR",
+  k2: "Step 2", h2links: "All the links", linksLead: "Every ice cream page. Add <b>?lang=es</b> to any link and it opens in Spanish.",
+  k3: "Step 3", h2plans: "Plans", plansLead: "Same prices as the owner tour (one file sets them all). No contract.",
+  k4: "Step 4", h2live: "Go live checklist", liveLead: "What's already built, and what's left before a real truck goes live. Tick each one; it saves on this phone.",
+  pDone: "Done", doneH: "Built and live now", pTodo: "To do", todoH: "Before the first truck goes live",
+  costNote: "Your monthly cost to run it: about $5/mo (Railway) no matter how many trucks. Payment fees are paid by the owner to Square, Venmo or Cash App, not by you.",
+  foot: "Private page for Antidote · not linked from the owner pages",
+  copy: "Copy", copied: "Copied ✓", copyLink: "Copy link", open: "Open ↗", textIt: "💬 Text it", email: "✉️ Email",
+  mEn: "Text message · English", mEs: "Text message · Spanish", mShort: "Short version · just the tour", mShortS: "When they only want one link",
+  mSub: "Paste in a text, DM or email",
+  subj: "Your ice cream truck app ({truck})",
+  progress: "{d} of {n} done",
+  tSetup: "setup", tMo: "/mo", tFound: "founding price, first {n} trucks", tTrucks: "up to {n} trucks · {p} each", tPopular: "Most popular",
+  t_single: "Single Scoop", t_double: "Double Scoop", t_sundae: "Sundae",
+  f_single: ["Designer ice cream QR sticker", "Phones ring when your truck is close", "Live truck map", "Points + 5-visit reward"],
+  f_double: ["Everything in Single Scoop", "Take cards, Apple Pay, Venmo, Cash App, Zelle (we set it up)", "Route house counter", "Monthly money report"],
+  f_sundae: ["Everything in Double Scoop, for up to 3 trucks", "Slow-day blast: send a deal to all your members (2 a month)", "Parties + events booking page", "Priority help"]
+ },
+ es: {
+  _title: "Kit para dueños de troques de helado",
+  topT: "Kit del dueño", topS: "Solo para Antidote",
+  kick: "Troques de helado · todo en un lugar", h1: "Mándalo, ponle precio, ponlo en vivo.",
+  lead: "Abre esta página o mándatela a ti mismo. Los dueños nunca la ven.",
+  tabSend: "💬 Mandar", tabLinks: "🔗 Todos los links", tabPlans: "💲 Planes", tabLive: "✅ En vivo",
+  k1: "Paso 1", h2send: "Mándaselo a un dueño", sendLead: "Escribe los nombres una vez. Los mensajes se llenan solos (se guarda en este cel).",
+  fOwner: "Nombre del dueño", fTruck: "Nombre del troque", fPhone: "Su cel (opcional)", fEmail: "Su email (opcional)",
+  mailNote: "Email: mándalo desde <b>secondshiftai@gmail.com</b> (nunca el correo personal). El botón Email abre tu app de correo con el asunto y el mensaje listos.",
+  qrH: "Códigos QR", qrS: "Imprímelo o enséñalo en tu cel", qrSticker: "Calcomanía del troque", qrTour: "Link del tour para el dueño",
+  qrStickerAlt: "Calcomanía QR de diseñador con un helado para el troque", qrTourAlt: "Código QR que abre el tour para el dueño",
+  dlSticker: "⬇ Calcomanía PNG", dlTour: "⬇ QR del tour PNG", printQr: "🖨 Imprimir QR del tour",
+  k2: "Paso 2", h2links: "Todos los links", linksLead: "Todas las páginas de helados. Agrega <b>?lang=es</b> a cualquier link y abre en español.",
+  k3: "Paso 3", h2plans: "Planes", plansLead: "Los mismos precios del tour (un solo archivo los pone todos). Sin contrato.",
+  k4: "Paso 4", h2live: "Lista para salir en vivo", liveLead: "Lo que ya está hecho y lo que falta antes de que un troque real salga en vivo. Marca cada uno; se guarda en este cel.",
+  pDone: "Hecho", doneH: "Ya hecho y en vivo", pTodo: "Pendiente", todoH: "Antes de que salga el primer troque",
+  costNote: "Lo que te cuesta a ti cada mes: como $5 (Railway), sin importar cuántos troques. Las comisiones de pago las paga el dueño a Square, Venmo o Cash App, no tú.",
+  foot: "Página privada para Antidote · no está ligada a las páginas de los dueños",
+  copy: "Copiar", copied: "Copiado ✓", copyLink: "Copiar link", open: "Abrir ↗", textIt: "💬 Mandar texto", email: "✉️ Email",
+  mEn: "Mensaje de texto · inglés", mEs: "Mensaje de texto · español", mShort: "Versión corta · solo el tour", mShortS: "Cuando solo quieren un link",
+  mSub: "Pégalo en un texto, DM o email",
+  subj: "La app para tu troque de helados ({truck})",
+  progress: "{d} de {n} hechos",
+  tSetup: "instalación", tMo: "/mes", tFound: "precio de fundador, primeros {n} troques", tTrucks: "hasta {n} troques · {p} c/u", tPopular: "El más popular",
+  t_single: "Una Bola", t_double: "Doble Bola", t_sundae: "Sundae",
+  f_single: ["Calcomanía QR de diseñador con un helado", "Les suena el cel cuando tu troque está cerca", "Mapa del troque en vivo", "Puntos + premio a las 5 visitas"],
+  f_double: ["Todo lo de Una Bola", "Acepta tarjetas, Apple Pay, Venmo, Cash App, Zelle (te lo dejamos listo)", "Contador de casas en tu ruta", "Reporte de dinero cada mes"],
+  f_sundae: ["Todo lo de Doble Bola, para hasta 3 troques", "Oferta para días flojos: manda una promo a todos tus clientes (2 al mes)", "Página para reservar fiestas y eventos", "Ayuda prioritaria"]
+ }
+};
+</script>
+<script src="../lang.js?v=20261011d"></script>
+<script src="../model.js?v=20261011d"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (i) { return document.getElementById(i); };
+  var SITE = "https://antidotethecure.github.io/ice-cream/";
+  var L = { tour: SITE, demo: SITE + "demo/", details: SITE + "details/", route: SITE + "route/" };
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]; }); }
+  function fill(s, o) { return s.replace(/\{(\w+)\}/g, function (m, k) { return o[k] != null ? o[k] : m; }); }
+  function t(k) { return ICE.t(k); }
+
+  /* owner fields, saved per phone */
+  var F = { owner: "", truck: "", phone: "", email: "" }, FK = "ssai:ice:kit";
+  try { var saved = JSON.parse(localStorage.getItem(FK) || "{}"); for (var k in saved) F[k] = saved[k]; } catch (e) {}
+  ["owner", "truck", "phone", "email"].forEach(function (k) {
+    var el = $("f_" + k); el.value = F[k] || "";
+    el.addEventListener("input", function () { F[k] = el.value.trim(); try { localStorage.setItem(FK, JSON.stringify(F)); } catch (e) {} renderMsgs(); });
+  });
+
+  function msgs() {
+    var o = F.owner, tr = F.truck;
+    var hiEn = "Hey" + (o ? " " + o : "") + "! It's Antidote from SousShift AI.", hiEs = "¡Hola" + (o ? " " + o : "") + "! Soy Antidote de SousShift AI.";
+    var trEn = tr ? tr : "your truck", trEs = tr ? tr : "tu troque";
+    return [
+      { id: "en", h: t("mEn"), s: t("mSub"), subj: "Your ice cream truck app" + (tr ? " (" + tr + ")" : ""),
+        body: hiEn + " I built an app for ice cream trucks: when " + trEn + " is close, your customers' phones ring with the truck music, they see you coming on a live map, and they earn points to come back.\n\n" +
+          "1. Quick tour (2 min): " + L.tour + "\n" +
+          "2. Try it like a customer: " + L.demo + "\n" +
+          "3. All the details + the money math: " + L.details + "\n" +
+          "4. Count the homes on your route: " + L.route + "\n\n" +
+          "Founding trucks get setup for $" + IceModel.PRICING.founding + " instead of $" + IceModel.PRICING.setup + ". Want me to set " + trEn + " up?" },
+      { id: "es", h: t("mEs"), s: t("mSub"), subj: "La app para tu troque de helados" + (tr ? " (" + tr + ")" : ""),
+        body: hiEs + " Hice una app para troques de helado: cuando " + trEs + " está cerca, a tus clientes les suena el cel con la música del troque, te ven llegar en un mapa en vivo y ganan puntos para volver.\n\n" +
+          "1. Tour rápido (2 min): " + L.tour + "?lang=es\n" +
+          "2. Pruébala como cliente: " + L.demo + "?lang=es\n" +
+          "3. Todos los detalles y las cuentas: " + L.details + "?lang=es\n" +
+          "4. Cuenta las casas de tu ruta: " + L.route + "?lang=es\n\n" +
+          "Los primeros troques pagan $" + IceModel.PRICING.founding + " de instalación en vez de $" + IceModel.PRICING.setup + ". ¿Te lo dejo listo?" },
+      { id: "short", h: t("mShort"), s: t("mShortS"), subj: "Ice cream truck app / App para troques de helado",
+        body: hiEn + " Your customers' phones ring when " + trEn + " is close. 2-min tour: " + L.tour + "\n\n" + hiEs + " Les suena el cel a tus clientes cuando " + trEs + " está cerca. Tour: " + L.tour + "?lang=es" }
+    ];
+  }
+  function smsHref(body) { var n = (F.phone || "").replace(/[^\d+]/g, ""); return "sms:" + n + "?&body=" + encodeURIComponent(body); }
+  function mailHref(subj, body) { return "mailto:" + encodeURIComponent(F.email || "") + "?subject=" + encodeURIComponent(subj) + "&body=" + encodeURIComponent(body + "\n\nAntidote\nSousShift AI · secondshiftai@gmail.com"); }
+  function renderMsgs() {
+    $("msghost").innerHTML = msgs().map(function (m) {
+      return '<div class="card"><div class="hd"><h3>' + esc(m.h) + '</h3><small>' + esc(m.s) + '</small></div>' +
+        '<div class="msg" id="msg-' + m.id + '">' + esc(m.body) + '</div><div class="acts">' +
+        '<button class="btn gold" type="button" data-copy="msg-' + m.id + '">' + esc(t("copy")) + '</button>' +
+        '<a class="btn primary" href="' + esc(smsHref(m.body)) + '">' + esc(t("textIt")) + '</a>' +
+        '<a class="btn ghost" href="' + esc(mailHref(m.subj, m.body)) + '">' + esc(t("email")) + '</a></div></div>';
+    }).join("");
+  }
+
+  var LINKS = [
+    { ic: "🍦", url: L.tour, en: ["Owner tour", "Swipe tour for the owner: phones ring, take every payment, rewards, plans. Start here."], es: ["Tour para el dueño", "Tour para deslizar: suena el cel, acepta todos los pagos, premios, planes. Empieza aquí."] },
+    { ic: "🚚", url: L.demo, en: ["Customer app (demo)", "What their customers see: live truck map with an ETA, \"truck on your street\" alerts, points + rewards."], es: ["App del cliente (demo)", "Lo que ven sus clientes: mapa del troque en vivo con hora de llegada, alertas y puntos + premios."] },
+    { ic: "📋", url: L.details, en: ["Details + money math", "Full breakdown, the calculator, payment fees and sources."], es: ["Detalles + las cuentas", "Todo explicado, la calculadora, comisiones de pago y fuentes."] },
+    { ic: "📍", url: L.route, en: ["Route house counter", "The owner draws their real route and it counts the homes."], es: ["Contador de casas de la ruta", "El dueño marca su ruta real y cuenta las casas."] },
+    { ic: "🔲", url: SITE + "qr-sticker.png", en: ["QR sticker image", "The designer ice cream sticker for the truck window."], es: ["Imagen de la calcomanía QR", "La calcomanía de helado para la ventana del troque."] },
+    { ic: "🧰", url: SITE + "kit/", en: ["This kit", "Private. For you only, never send it to an owner."], es: ["Este kit", "Privado. Solo para ti, nunca se lo mandes a un dueño."] }
+  ];
+  function renderLinks(lang) {
+    $("linkhost").innerHTML = LINKS.map(function (x, i) {
+      var d = x[lang] || x.en;
+      return '<div class="lk"><div class="ic" aria-hidden="true">' + x.ic + '</div><div><b>' + esc(d[0]) + '</b><p>' + esc(d[1]) + '</p><code id="lk' + i + '">' + esc(x.url) + '</code>' +
+        '<div class="acts"><button class="btn gold" type="button" data-copy="lk' + i + '">' + esc(t("copyLink")) + '</button><a class="btn ghost" href="' + esc(x.url) + '" target="_blank" rel="noopener">' + esc(t("open")) + '</a></div></div></div>';
+    }).join("");
+  }
+
+  function renderTiers(lang) {
+    var M = function (n) { return IceModel.money(n, lang); };
+    $("tierhost").innerHTML = IceModel.TIERS.map(function (x) {
+      var setup = x.founding ? '<s>' + M(x.setup) + '</s> <b>' + M(x.founding) + '</b> ' + esc(t("tSetup")) + '<br><small>' + esc(fill(t("tFound"), { n: x.foundingSlots })) + '</small>' : M(x.setup) + ' ' + esc(t("tSetup"));
+      var trucks = x.trucks > 1 ? '<div class="su">' + esc(fill(t("tTrucks"), { n: x.trucks, p: IceModel.money(x.monthly / x.trucks, lang, true) + t("tMo") })) + '</div>' : "";
+      var feats = (t("f_" + x.id) || []).map(function (f) { return "<li>" + esc(f) + "</li>"; }).join("");
+      return '<div class="tier' + (x.best ? " best" : "") + '"><div class="nm">' + x.emoji + " " + esc(t("t_" + x.id)) + (x.best ? ' <span class="pill pop">' + esc(t("tPopular")) + '</span>' : "") + '</div>' +
+        '<div class="mo">' + M(x.monthly) + '<small>' + esc(t("tMo")) + '</small></div><div class="su">' + setup + '</div>' + trucks + '<ul>' + feats + '</ul></div>';
+    }).join("");
+  }
+
+  var DONE = {
+    en: ["Owner tour, EN + ES, with the plans and a read-aloud", "Customer demo app: live map + ETA, alerts, points and rewards", "Details page with the money calculator and sources", "Route house counter", "Designer QR sticker artwork", "This kit, plus Ice Cream Trucks in the demo hub and Pitch Kit"],
+    es: ["Tour para el dueño, inglés + español, con los planes y lectura en voz alta", "App demo para clientes: mapa en vivo + hora de llegada, alertas, puntos y premios", "Página de detalles con la calculadora y las fuentes", "Contador de casas de la ruta", "Diseño de la calcomanía QR", "Este kit, y Troques de Helado en el centro de demos y el Pitch Kit"]
+  };
+  var TODO = [
+    { id: "railway", cost: "$5/mo",
+      en: ["Railway Hobby plan", "Your Railway account already runs Antidote Cloud. The live truck-location service (the truck's phone sends GPS, customers' maps update) gets added there. <b>Claude builds this when the first truck signs.</b>", ["Make sure the Hobby plan ($5/mo) is active at railway.com", "Tell Claude \"first ice cream truck signed\" and it builds + deploys the service"]],
+      es: ["Plan Hobby de Railway", "Tu cuenta de Railway ya corre Antidote Cloud. El servicio de ubicación en vivo del troque (el cel del troque manda el GPS y los mapas se actualizan) se agrega ahí. <b>Claude lo construye cuando firme el primer troque.</b>", ["Revisa que el plan Hobby ($5/mes) esté activo en railway.com", "Dile a Claude \"firmó el primer troque\" y lo construye y lo sube"]] },
+    { id: "push", cost: "Free",
+      en: ["Phone alerts (web push)", "Free. Claude makes the VAPID keys (the pair that lets the site send alerts) with the Railway service.", ["Android: works right away in Chrome", "iPhone: iOS 16.4 or newer, and the customer must tap Share → Add to Home Screen first, then allow alerts"]],
+      es: ["Alertas al cel (web push)", "Gratis. Claude hace las llaves VAPID (el par que deja al sitio mandar alertas) junto con el servicio de Railway.", ["Android: funciona de una vez en Chrome", "iPhone: iOS 16.4 o más nuevo, y el cliente primero toca Compartir → Agregar a inicio, luego permite las alertas"]] },
+    { id: "pay", cost: "Free to open · fees paid by owner",
+      en: ["Owner payments (Double Scoop and Sundae)", "Sit with the owner and open these in their name. The owner pays the fees, not you.", ["Square account + Tap to Pay on their phone: free, 2.6% + 15¢ per card sale", "Venmo business profile (QR)", "Cash App for Business", "Zelle through their business bank account"]],
+      es: ["Pagos del dueño (Doble Bola y Sundae)", "Siéntate con el dueño y ábranlas a su nombre. El dueño paga las comisiones, no tú.", ["Cuenta de Square + Tap to Pay en su cel: gratis, 2.6% + 15¢ por venta con tarjeta", "Perfil de negocio de Venmo (QR)", "Cash App for Business", "Zelle con su cuenta de banco del negocio"]] },
+    { id: "sticker", cost: "~$10–25",
+      en: ["Print the QR sticker", "Download the sticker above. Vinyl, outdoor, about 12 in, at a local print shop or Sticker Mule.", ["Put the truck's name on it first if they want (ask Claude)", "Stick it on the serving window at eye level"]],
+      es: ["Imprime la calcomanía QR", "Descarga la calcomanía de arriba. Vinil para exterior, como de 12 pulgadas, en una imprenta local o Sticker Mule.", ["Si quieren, primero ponle el nombre del troque (pídeselo a Claude)", "Pégala en la ventana de servicio a la altura de los ojos"]] },
+    { id: "bill", cost: "Setup + monthly",
+      en: ["Collect the setup fee, then the monthly", "Take the setup first. Then add the truck to your client billing (clients.json) so the monthly reminder runs.", ["Setup: Double Scoop $" + IceModel.PRICING.founding + " founding / $" + IceModel.PRICING.setup, "Add to client billing with the monthly amount and due day"]],
+      es: ["Cobra la instalación y luego la mensualidad", "Cobra primero la instalación. Luego agrega el troque a tu cobranza de clientes (clients.json) para que salga el recordatorio mensual.", ["Instalación: Doble Bola $" + IceModel.PRICING.founding + " de fundador / $" + IceModel.PRICING.setup, "Agrégalo a la cobranza con el monto mensual y el día de pago"]] },
+    { id: "driver", cost: "Free",
+      en: ["Driver keeps the route screen open", "The truck's location comes from the driver's phone, so it stays on the route screen while driving.", ["Phone on a dash mount and plugged in to charge", "Screen stays on (the route screen keeps it awake)", "Driver never taps the phone while the truck is moving"]],
+      es: ["El chofer deja abierta la pantalla de ruta", "La ubicación del troque sale del cel del chofer, así que se queda en la pantalla de ruta mientras maneja.", ["Cel en un soporte en el tablero y cargando", "La pantalla se queda prendida (la pantalla de ruta no la deja apagarse)", "El chofer nunca toca el cel con el troque en movimiento"]] }
+  ];
+  var CK = "ssai:ice:kit:check", C = {};
+  try { C = JSON.parse(localStorage.getItem(CK) || "{}"); } catch (e) {}
+  function renderLive(lang) {
+    $("donehost").innerHTML = (DONE[lang] || DONE.en).map(function (d) { return '<li><span aria-hidden="true">✅</span><span>' + esc(d) + '</span></li>'; }).join("");
+    $("checkhost").innerHTML = TODO.map(function (x, i) {
+      var d = x[lang] || x.en, cost = lang === "es" ? ({ "Free": "Gratis", "Setup + monthly": "Instalación + mensual", "Free to open · fees paid by owner": "Gratis abrir · comisiones las paga el dueño" }[x.cost] || x.cost.replace("/mo", "/mes")) : x.cost;
+      return '<label class="check' + (C[x.id] ? " ok" : "") + '"><input type="checkbox" data-ck="' + x.id + '"' + (C[x.id] ? " checked" : "") + '><div><b>' + String.fromCharCode(97 + i) + '. ' + esc(d[0]) + '</b><span class="cost">' + esc(cost) + '</span><p>' + d[1] + '</p><ol>' + d[2].map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + '</ol></div></label>';
+    }).join("");
+    prog();
+  }
+  function prog() {
+    var n = TODO.length, d = TODO.filter(function (x) { return C[x.id]; }).length;
+    $("progBar").style.width = (d / n * 100) + "%"; $("progTxt").textContent = fill(t("progress"), { d: d, n: n });
+  }
+  document.addEventListener("change", function (e) {
+    var id = e.target.getAttribute && e.target.getAttribute("data-ck"); if (!id) return;
+    C[id] = e.target.checked; try { localStorage.setItem(CK, JSON.stringify(C)); } catch (er) {}
+    e.target.closest(".check").classList.toggle("ok", e.target.checked); prog();
+  });
+
+  /* copy */
+  var toastT;
+  function toast(s) { var ts = $("toast"); ts.textContent = s; ts.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(function () { ts.classList.remove("on"); }, 1300); }
+  function fallback(s) { var ta = document.createElement("textarea"); ta.value = s; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (e) {} ta.remove(); }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-copy]"); if (!b) return;
+    var s = $(b.getAttribute("data-copy")).textContent;
+    function ok() { b.classList.add("done"); toast(t("copied")); setTimeout(function () { b.classList.remove("done"); }, 1300); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(s).then(ok, function () { fallback(s); ok(); }); else { fallback(s); ok(); }
+  });
+
+  $("printQr").addEventListener("click", function () { document.documentElement.classList.add("pq"); window.print(); });
+  window.addEventListener("afterprint", function () { document.documentElement.classList.remove("pq"); });
+
+  function all(lang) { renderMsgs(); renderLinks(lang); renderTiers(lang); renderLive(lang); }
+  ICE.on(all); all(ICE.lang);
+})();
+</script>
+<script src="../../demo/poweredby.js?v=20261013a" defer></script>
+</body>
+</html>

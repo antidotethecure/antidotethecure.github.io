@@ -3,7 +3,13 @@
    Reads /champions.json (written every Sunday 11 PM LA by the weekly champions job) and shows last week's
    top 3 + a live countdown to this week's close. Colors come from the page: --gold/--accent, --ink, --dim, --edge.
    Optional data-me="<localStorage key>" ({n:name} as saved by the page's board form): if this phone was #2 or #3,
-   their prize is dropped into the app once through window.SSAI_WIN (the page itself handles #1). */
+   their prize is dropped into the app once through window.SSAI_WIN (the page itself handles #1).
+   Optional data-prizes="off": a bragging-rights board only. No "won …" lines, no prizes dropped into the app, and the
+   number reads as the game "score" (so it is never confused with rewards points). Used by Melody + Nalu Vida.
+   MULTIPLE BOARDS: one game can have several weekly boards, each its own key in champions.json (e.g. Melody: "melody" =
+   campaign score, "melody-survival" = longest time survived). Add one card per board. Optional data-unit="time": the
+   number is seconds and shows as m:ss; optional data-title="Survival" names the board on the card.
+   window.SSAI_CHAMPS.load(cb) hands any page script the same champions.json (one fetch), plus .fmt(score, unit). */
 (function () {
   "use strict";
   var me = document.currentScript, base = me && me.src ? me.src : location.href;
@@ -40,6 +46,7 @@
   function esc(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function ig(h) { return h ? ' <a href="https://instagram.com/' + encodeURIComponent(h) + '" target="_blank" rel="noopener">@' + esc(h) + "</a>" : ""; }
   function num(n) { return Number(n || 0).toLocaleString("en-US"); }
+  function fmt(n, unit) { if (unit !== "time") return num(n); n = Math.max(0, Math.floor(Number(n) || 0)); return Math.floor(n / 60) + ":" + String(n % 60).padStart(2, "0"); }
 
   // ---- countdown to Sunday 23:00 America/Los_Angeles, whatever the viewer's own time zone ----
   var TZ = "America/Los_Angeles";
@@ -58,19 +65,22 @@
   }
 
   function render(el, data) {
-    var g = data && data.games && data.games[el.getAttribute("data-game")], top = g && g.top3 || [], html = "";
+    var g = data && data.games && data.games[el.getAttribute("data-game")], top = g && g.top3 || [], html = "", np = el.getAttribute("data-prizes") === "off", unit = np ? " score" : " pts";
+    var tu = el.getAttribute("data-unit") === "time" ? "time" : "", ttl = el.getAttribute("data-title"), F = function (n) { return fmt(n, tu); };
+    if (tu) unit = " survived";
+    if (ttl) html += '<p class="ch-k">' + esc(ttl) + "</p>";
     if (data === undefined) {
-      html += '<p class="ch-k">Weekly champion</p>';
+      if (!ttl) html += '<p class="ch-k">Weekly champion</p>';
     } else if (top.length) {
       var c = top[0];
       html += '<div class="ch-1"><div class="ch-who">' +
         '<div class="ch-name">👑 Last week\'s champion: ' + esc(c.name) + ig(c.ig) + '</div>' +
-        '<div><span class="ch-sc">' + num(c.score) + '</span> pts · <span class="ch-won">won ' + esc(c.prize) + "</span></div></div></div>";
+        '<div><span class="ch-sc">' + F(c.score) + '</span>' + unit + (np ? '' : ' · <span class="ch-won">won ' + esc(c.prize) + "</span>") + "</div></div></div>";
       if (top.length > 1) html += '<ol class="ch-rest">' + top.slice(1).map(function (r) {
-        return '<li class="ch-row"><b>#' + r.rank + " " + esc(r.name) + "</b>" + ig(r.ig) + '<span class="ch-sc">' + num(r.score) + "</span><small>won " + esc(r.prize) + "</small></li>";
+        return '<li class="ch-row"><b>#' + r.rank + " " + esc(r.name) + "</b>" + ig(r.ig) + '<span class="ch-sc">' + F(r.score) + "</span>" + (np ? "" : "<small>won " + esc(r.prize) + "</small>") + "</li>";
       }).join("") + "</ol>";
     } else {
-      html += '<p class="ch-k">Weekly champion</p><div class="ch-empty">👑 Be the first champion — board closes Sunday 11 PM</div>';
+      html += (ttl ? '' : '<p class="ch-k">Weekly champion</p>') + '<div class="ch-empty">👑 Be the first champion — board closes Sunday 11 PM</div>';
     }
     html += '<div class="ch-cd"><span>This week\'s board closes Sunday 11:00 PM</span><div class="ch-t" aria-live="off"><i data-u="d">–<small>days</small></i><i data-u="h">–<small>hrs</small></i><i data-u="m">–<small>min</small></i></div></div>';
     el.innerHTML = html;
@@ -84,7 +94,7 @@
   }
   function runnerUpPrize(el, data) {
     var key = el.getAttribute("data-me"), g = data && data.games && data.games[el.getAttribute("data-game")];
-    if (!key || !g || !window.SSAI_WIN) return;
+    if (!key || !g || !window.SSAI_WIN || el.getAttribute("data-prizes") === "off") return;
     var sv = {}; try { sv = JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) { return; }
     if (!sv.n) return;
     (g.top3 || []).slice(1).forEach(function (r) {
@@ -94,15 +104,16 @@
     });
   }
 
+  var loadP = null;
+  function load() { if (!loadP) loadP = fetch(URL_JSON + "?t=" + Math.floor(Date.now() / 3e5), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); return loadP; }
+  window.SSAI_CHAMPS = { load: function (cb) { load().then(function (d) { try { cb(d || null); } catch (e) {} }); }, fmt: fmt };
   function init() {
     css();
     var els = document.querySelectorAll("#champs,[data-champs]");
     if (!els.length) return;
     [].forEach.call(els, function (el) { el.classList.add("champs"); render(el, undefined); });
     setInterval(function () { [].forEach.call(els, tick); }, 30000);
-    fetch(URL_JSON + "?t=" + Math.floor(Date.now() / 3e5), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (d) { [].forEach.call(els, function (el) { render(el, d || null); if (d) runnerUpPrize(el, d); }); })
-      .catch(function () { [].forEach.call(els, function (el) { render(el, null); }); });
+    load().then(function (d) { [].forEach.call(els, function (el) { render(el, d || null); if (d) runnerUpPrize(el, d); }); });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();

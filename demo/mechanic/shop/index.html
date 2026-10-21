@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Your Auto Shop: Shop (Demo)</title>
+<meta name="description" content="Demo: the owner's side of the SousShift AI auto shop app. Requests, quotes, job stages, customer alerts, tire inventory and the pay QR card.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#04060c">
+<link rel="icon" href="../favicon.svg?v=20261013c" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png?v=20261013c">
+<meta name="apple-mobile-web-app-title" content="Shop">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="../app.css?v=20261017a">
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <img id="logo" src="../icon-192.png?v=20261013c" alt="" width="40" height="40">
+  <b><span id="bName">Your Auto Shop</span><small><span data-t="topSub">Shop view</span> <span class="demo-tag">Demo</span></small></b>
+  <span class="sp"></span>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">EN</button><button data-lang="es" aria-pressed="false" lang="es">ES</button></div>
+</div></div>
+
+<main class="wrap">
+  <section id="gate" class="pinbox">
+    <p class="kick" data-t="gKick">Owner + staff only</p>
+    <h2 class="chrome" data-t="gH">Shop sign-in</h2>
+    <form id="pinForm" autocomplete="off">
+      <label class="fld"><span class="sr" data-t="gPin">PIN</span><input id="pin" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="••••"></label>
+      <button class="btn primary w100" type="submit" data-t="gGo">Unlock</button>
+    </form>
+    <p class="demopin"><span data-t="gDemo">DEMO ONLY · PIN:</span> <span id="demoPin"></span></p>
+    <p class="note" id="pinMsg" aria-live="polite"></p>
+    <p class="note" data-t="gNote">In the live app this is the owner's own login. The demo PIN is shown so anyone can try it.</p>
+  </section>
+
+  <section id="app" hidden>
+    <section class="s" style="margin-top:18px">
+      <div class="kpis">
+        <div class="kpi"><b id="kNew">0</b><small data-t="kNew">New</small></div>
+        <div class="kpi"><b id="kAct">0</b><small data-t="kAct">In progress</small></div>
+        <div class="kpi"><b id="kDone">0</b><small data-t="kDone">Ready</small></div>
+      </div>
+      <div class="tabs" role="group" data-t-aria="tabsAria" aria-label="Filter">
+        <button type="button" data-tab="new" aria-pressed="true" data-t="tNew">New</button>
+        <button type="button" data-tab="act" aria-pressed="false" data-t="tAct">Active</button>
+        <button type="button" data-tab="done" aria-pressed="false" data-t="tDone">Done</button>
+        <button type="button" data-tab="all" aria-pressed="false" data-t="tAll">All</button>
+      </div>
+      <div id="list"></div>
+      <div class="card" id="tireCard">
+        <p class="kick" data-t="tiKick">Tire inventory</p>
+        <h3 data-t="tiH">What's in stock</h3>
+        <p class="note" data-t="tiNote">Customers see this list in the app's tire size checker. Price empty = "Ask for a quote".</p>
+        <div id="tiRows"></div>
+        <form id="tiAdd" class="tiadd" autocomplete="off">
+          <input id="taSize" maxlength="16" placeholder="225/45R17" data-t-aria="taSize" aria-label="Size" autocapitalize="characters">
+          <input id="taBrand" maxlength="24" data-t-ph="taBrandPh" placeholder="Brand · line" data-t-aria="taBrand" aria-label="Brand">
+          <select id="taType" data-t-aria="taType" aria-label="Type"><option value="allseason"></option><option value="perf"></option><option value="truck"></option><option value="winter"></option></select>
+          <input id="taQty" inputmode="numeric" maxlength="3" placeholder="4" data-t-aria="taQty" aria-label="Qty">
+          <input id="taPrice" inputmode="decimal" maxlength="7" data-t-ph="taPricePh" placeholder="$ (opt.)" data-t-aria="taPrice" aria-label="Price">
+          <button class="btn primary small" type="submit" data-t="taGo">＋ Add</button>
+        </form>
+        <p class="note" id="taMsg" aria-live="polite"></p>
+        <div class="row"><button class="btn ghost small" id="tiReset" type="button" data-t="tiReset">↺ Back to sample stock</button></div>
+        <p class="fine" data-t="tiDemo">Demo: saved in this browser only. Sample brands and quantities.</p>
+      </div>
+      <div class="card" id="qrCard">
+        <p class="kick" data-t="qrKick">Pay with QR</p>
+        <h3 data-t="qrH">Counter / bay QR card</h3>
+        <p class="note" data-t="qrNote">Customers scan, pick how they pay (Apple Pay, Google Pay, card, Cash App, Zelle, Venmo, PayPal or pay over time), done. Faster checkout, no waiting at the counter.</p>
+        <a class="btn primary small" id="qrLink" href="../?print=qr#pay" data-t="qrGo">🖨️ Open the printable card</a>
+        <p class="fine" data-t="qrDemo">Demo: sample QR and placeholder handles. No payments are processed.</p>
+      </div>
+      <div class="card" id="srcCard" hidden>
+        <p class="kick" data-t="srcKick">Parts sources</p>
+        <div id="srcList"></div>
+      </div>
+      <div class="demo-note"><i aria-hidden="true">🧪</i><span data-t="sDemo"><b>Demo:</b> requests live only in this browser. Open the customer page in another tab of the same browser and watch its tracker move when you advance a stage. "Notify" never sends a real text or email: texting goes live after Twilio A2P approval (pending); email later through the Apps Script mailer.</span></div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn ghost" id="reset" type="button" data-t="reset">↺ Reset demo data</button>
+        <button class="btn ghost" id="lock" type="button" data-t="lockBtn">🔒 Lock</button>
+      </div>
+    </section>
+  </section>
+</main>
+
+<footer class="f wrap">
+  <span data-t="foot">Demo shop view for any auto shop. Sample customers only.</span>
+  <span class="pw"><b>Powered by SousShift AI</b> · Demo</span>
+</footer>
+
+<div class="sheet" id="acc" role="dialog" aria-modal="true" aria-labelledby="accT"><div class="sc">
+  <div class="grab"></div>
+  <div class="hd"><span class="e">✅</span><div><h3 id="accT" data-t="accT">Accept with quote</h3><small id="accS"></small></div><button class="x" type="button" data-close aria-label="Close">✕</button></div>
+  <label class="fld"><span data-t="accQ">Final quote ($)</span><input id="accQ" inputmode="decimal" maxlength="7"></label>
+  <label class="fld"><span data-t="accN">Note to customer</span><textarea id="accN" maxlength="200"></textarea></label>
+  <button class="btn primary w100" id="accGo" type="button" data-t="accGo">Accept + notify</button>
+</div></div>
+
+<div class="sheet" id="adv" role="dialog" aria-modal="true" aria-labelledby="advT"><div class="sc">
+  <div class="grab"></div>
+  <div class="hd"><span class="e">⏩</span><div><h3 id="advT" data-t="advT">Update the stage</h3><small id="advS"></small></div><button class="x" type="button" data-close aria-label="Close">✕</button></div>
+  <label class="fld"><span data-t="advTo">Move to</span><select id="advTo"></select></label>
+  <label class="fld"><span data-t="advN">Mechanic note (customer sees it)</span><textarea id="advN" maxlength="200"></textarea></label>
+  <p class="note" style="margin:4px 0" data-t="advP">Photo (placeholder in the demo)</p>
+  <div class="photos" id="advP" role="group"><button type="button" data-ph="0" aria-pressed="true">🚫</button><button type="button" data-ph="1" aria-pressed="false">📷</button></div>
+  <label class="sw" style="margin-top:8px"><span><span data-t="advNotify">Notify customer</span><small data-t="advNotifyS">"Almost done" + "Ready" also text / email if they opted in (simulated)</small></span><input type="checkbox" id="advNotify" checked></label>
+  <button class="btn primary w100" id="advGo" type="button" data-t="advGo">Update tracker</button>
+</div></div>
+
+<div class="sheet" id="ntf" role="dialog" aria-modal="true" aria-labelledby="ntfT"><div class="sc">
+  <div class="grab"></div>
+  <div class="hd"><span class="e">📣</span><div><h3 id="ntfT" data-t="ntfT">Notify customer</h3><small id="ntfS"></small></div><button class="x" type="button" data-close aria-label="Close">✕</button></div>
+  <div class="opts" id="ntfTpl"></div>
+  <label class="fld"><span data-t="ntfM">Message</span><textarea id="ntfM" maxlength="240"></textarea></label>
+  <p class="note" id="ntfCh"></p>
+  <button class="btn primary w100" id="ntfGo" type="button" data-t="ntfGo">Send (simulated)</button>
+</div></div>
+
+<div id="toast" role="status"></div>
+
+<script>
+window.T = {
+en: {
+  _title: "{name}: Shop (Demo)", topSub: "Shop view", gKick: "Owner + staff only", gH: "Shop sign-in", gPin: "PIN", gGo: "Unlock", gDemo: "DEMO ONLY · PIN:",
+  gNote: "In the live app this is the owner's own login. The demo PIN is shown so anyone can try it.", gBad: "Wrong PIN. (Demo PIN is shown above.)",
+  kNew: "New", kAct: "In progress", kDone: "Ready", tabsAria: "Filter", tNew: "New", tAct: "Active", tDone: "Done", tAll: "All",
+  sDemo: "<b>Demo:</b> requests live only in this browser. Open the customer page in another tab of the same browser and watch its tracker move when you advance a stage. \"Notify\" never sends a real text or email: texting goes live after Twilio A2P approval (pending); email later through the Apps Script mailer.",
+  reset: "↺ Reset demo data", lockBtn: "🔒 Lock", foot: "Demo shop view for any auto shop. Sample customers only.",
+  srcKick: "Parts sources", prefSupp: "Preferred parts supplier", directions: "Directions", website: "Website", call: "Call", callN: "Call {n}", copy: "Copy", copied: "📋 Copied", copiedAll: "📋 Parts list copied", copyFail: "Couldn't copy.",
+  copyAll: "Copy all parts for this job", whatToAsk: "What to ask {n}", theStore: "the store",
+  srcHonest: "Business info from the store's own website. Call for price & availability: no partnership, discount, live inventory or ordering is set up.",
+  empty: "Nothing here yet. New requests from the customer page land here.", customer: "Customer (demo)", sampleTag: "Sample", fromPage: "From the customer page",
+  est: "Est.", quote: "Quote", arrival: "Arrival", ready: "Ready by", noSlot: "No slot", alertsL: "Alerts:", aApp: "In-app", aText: "Text", aEmail: "Email",
+  accept: "✅ Accept with quote", decline: "Decline", advance: "⏩ Next: {s}", notify: "📣 Notify customer", done: "🏁 Ready for pickup", reopen: "Reopen",
+  accT: "Accept with quote", accQ: "Final quote ($)", accN: "Note to customer", accGo: "Accept + notify", accNote: "Got it! I'll see you {w}.",
+  advT: "Update the stage", advTo: "Move to", advN: "Mechanic note (customer sees it)", advP: "Photo (placeholder in the demo)", advNotify: "Notify customer",
+  advNotifyS: "\"Almost done\" + \"Ready\" also text / email if they opted in (simulated)", advGo: "Update tracker",
+  ntfT: "Notify customer", ntfM: "Message", ntfGo: "Send (simulated)", ntfCh: "Goes to: {c}. Demo: nothing is really sent.",
+  tpl: ["Running about 15 minutes late. Sorry!", "Found something else while I was in there. Call me when you can.", "Parts are here. Starting now.", "All done! Ready when you are."],
+  accepted: "Accepted ✅", acceptedB: "Your {c} is booked. Final quote: {q}.", declinedT: "Request declined", declinedB: "Sorry, I can't take this one. Please pick another time.",
+  stageB: "Update on your {c}.", almostB: "Your {c} is almost done. About 20–30 more minutes.", readyB: "Your {c} is ready for pickup! Final: {q}.",
+  msgT: "Message from {n}", toastAcc: "Accepted. Customer notified (in-app).", toastAdv: "Tracker updated: {s}", toastNtf: "Sent (simulated): {c}", toastReset: "Demo data reset",
+  resetQ: "Reset all demo requests in this browser?", decQ: "Decline this request?",
+  tiKick: "Tire inventory", tiH: "What's in stock", tiNote: "Customers see this list in the app's tire size checker. Price empty = \"Ask for a quote\".",
+  taSize: "Size", taBrand: "Brand", taBrandPh: "Brand · line", taType: "Type", taQty: "Qty", taPrice: "Price", taPricePh: "$ (opt.)", taGo: "＋ Add",
+  taBad: "Size not recognized. Use 225/45R17.", taOk: "Saved {s}", tiReset: "↺ Back to sample stock", tiResetQ: "Replace your list with the sample stock?",
+  tiDemo: "Demo: saved in this browser only. Sample brands and quantities.", tiDel: "Remove", tiEach: "each", tiQtyL: "Qty",
+  qrKick: "Pay with QR", qrH: "Counter / bay QR card", qrNote: "Customers scan, pick how they pay (Apple Pay, Google Pay, card, Cash App, Zelle, Venmo, PayPal or pay over time), done. Faster checkout, no waiting at the counter.",
+  qrGo: "🖨️ Open the printable card", qrDemo: "Demo: sample QR and placeholder handles. No payments are processed."
+},
+es: {
+  _title: "{name}: Taller (Demo)", topSub: "Vista del taller", gKick: "Solo dueño y empleados", gH: "Entrada del taller", gPin: "PIN", gGo: "Entrar", gDemo: "SOLO DEMO · PIN:",
+  gNote: "En la app real es el inicio de sesión del dueño. El PIN del demo se muestra para que cualquiera lo pruebe.", gBad: "PIN incorrecto. (El PIN del demo está arriba.)",
+  kNew: "Nuevos", kAct: "En proceso", kDone: "Listos", tabsAria: "Filtro", tNew: "Nuevos", tAct: "Activos", tDone: "Listos", tAll: "Todos",
+  sDemo: "<b>Demo:</b> los pedidos viven solo en este navegador. Abre la página del cliente en otra pestaña del mismo navegador y mira cómo avanza el seguimiento. \"Avisar\" nunca manda texto ni correo real: los textos se activan con la aprobación A2P de Twilio (pendiente); el correo después por el Apps Script.",
+  reset: "↺ Borrar datos del demo", lockBtn: "🔒 Bloquear", foot: "Vista de taller demo para cualquier taller. Solo clientes de muestra.",
+  srcKick: "Dónde comprar piezas", prefSupp: "Proveedor de piezas preferido", directions: "Cómo llegar", website: "Sitio web", call: "Llamar", callN: "Llamar a {n}", copy: "Copiar", copied: "📋 Copiado", copiedAll: "📋 Lista de piezas copiada", copyFail: "No se pudo copiar.",
+  copyAll: "Copiar todas las piezas de este trabajo", whatToAsk: "Qué pedir en {n}", theStore: "la tienda",
+  srcHonest: "Datos del negocio tomados de su propio sitio web. Llama para precio y existencia: no hay sociedad, descuento, inventario en vivo ni pedidos conectados.",
+  empty: "Aún no hay nada. Los pedidos nuevos de la página del cliente llegan aquí.", customer: "Cliente (demo)", sampleTag: "Muestra", fromPage: "De la página del cliente",
+  est: "Est.", quote: "Cotización", arrival: "Llegada", ready: "Listo", noSlot: "Sin hora", alertsL: "Alertas:", aApp: "App", aText: "Texto", aEmail: "Correo",
+  accept: "✅ Aceptar con cotización", decline: "Rechazar", advance: "⏩ Siguiente: {s}", notify: "📣 Avisar al cliente", done: "🏁 Listo para recoger", reopen: "Reabrir",
+  accT: "Aceptar con cotización", accQ: "Cotización final ($)", accN: "Nota al cliente", accGo: "Aceptar + avisar", accNote: "¡Listo! Nos vemos {w}.",
+  advT: "Actualizar etapa", advTo: "Pasar a", advN: "Nota del mecánico (el cliente la ve)", advP: "Foto (de muestra en el demo)", advNotify: "Avisar al cliente",
+  advNotifyS: "\"Casi listo\" + \"Listo\" también mandan texto / correo si el cliente aceptó (simulado)", advGo: "Actualizar",
+  ntfT: "Avisar al cliente", ntfM: "Mensaje", ntfGo: "Enviar (simulado)", ntfCh: "Va por: {c}. Demo: no se envía nada de verdad.",
+  tpl: ["Voy unos 15 minutos tarde. ¡Perdón!", "Encontré otra cosa. Llámame cuando puedas.", "Ya llegaron las piezas. Empiezo ahora.", "¡Todo listo! Cuando quieras."],
+  accepted: "Aceptado ✅", acceptedB: "Tu {c} quedó agendado. Cotización final: {q}.", declinedT: "Pedido rechazado", declinedB: "Perdón, no puedo tomar este. Escoge otra hora.",
+  stageB: "Novedad de tu {c}.", almostB: "Tu {c} está casi listo. Unos 20–30 minutos más.", readyB: "¡Tu {c} está listo para recoger! Total: {q}.",
+  msgT: "Mensaje de {n}", toastAcc: "Aceptado. Cliente avisado (app).", toastAdv: "Seguimiento actualizado: {s}", toastNtf: "Enviado (simulado): {c}", toastReset: "Datos del demo borrados",
+  resetQ: "¿Borrar todos los pedidos del demo en este navegador?", decQ: "¿Rechazar este pedido?",
+  tiKick: "Inventario de llantas", tiH: "Qué hay en existencia", tiNote: "Los clientes ven esta lista en el buscador de medida de la app. Sin precio = \"Pide cotización\".",
+  taSize: "Medida", taBrand: "Marca", taBrandPh: "Marca · línea", taType: "Tipo", taQty: "Cant.", taPrice: "Precio", taPricePh: "$ (opc.)", taGo: "＋ Agregar",
+  taBad: "No se reconoce la medida. Usa 225/45R17.", taOk: "Guardado {s}", tiReset: "↺ Volver al inventario de muestra", tiResetQ: "¿Cambiar tu lista por el inventario de muestra?",
+  tiDemo: "Demo: se guarda solo en este navegador. Marcas y cantidades de muestra.", tiDel: "Quitar", tiEach: "c/u", tiQtyL: "Cant.",
+  qrKick: "Pagar con QR", qrH: "Tarjeta QR de mostrador / bahía", qrNote: "El cliente escanea, escoge cómo pagar (Apple Pay, Google Pay, tarjeta, Cash App, Zelle, Venmo, PayPal o a plazos) y listo. Cobro más rápido, sin esperar en el mostrador.",
+  qrGo: "🖨️ Abrir la tarjeta para imprimir", qrDemo: "Demo: QR de muestra y usuarios de ejemplo. No se procesan pagos."
+}
+};
+</script>
+<script src="../config.js?v=20261017a"></script>
+<script src="../core.js?v=20261017a"></script>
+<script src="../parts.js?v=20261015a"></script>
+<script src="shop.js?v=20261017a"></script>
+<script src="../../poweredby.js?v=20261013a" defer></script>
+</body>
+</html>

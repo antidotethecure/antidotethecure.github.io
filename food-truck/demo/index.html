@@ -1,0 +1,1375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Taco Titan: Where's the Truck?</title>
+<meta name="description" content="Demo: see where Taco Titan is parked today, how far it is from you, when it parks in your area, and order ahead so your food comes off the grill as you walk up. Sample truck by SousShift AI.">
+<meta name="theme-color" content="#0a0605">
+<link rel="manifest" href="manifest.webmanifest?v=20261012a">
+<link rel="icon" href="icon.svg?v=20261012a" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png?v=20261012a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Taco Titan">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="../ft.css?v=20261012a">
+<style>
+body{padding-bottom:30px}
+[hidden]{display:none!important}
+.top .logo{width:40px;height:40px;border-radius:12px;background:radial-gradient(circle at 50% 40%,#ffd23f 0 38%,#ff6a2b 39% 100%);display:grid;place-items:center;font-size:22px;flex:none}
+.top b{min-width:0}
+.tag{font:800 10px "Rajdhani",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#2a1a00;background:var(--gold);border-radius:99px;padding:1px 7px;margin-left:4px;vertical-align:2px}
+
+/* hero / live status */
+.live{margin-top:14px;text-align:center}
+.pulse{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--good)}
+.pulse::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(61,220,151,.7);animation:pl 1.6s infinite}
+.pulse.off{color:var(--dim)}.pulse.off::before{background:var(--dim);animation:none}
+@keyframes pl{to{box-shadow:0 0 0 12px rgba(61,220,151,0)}}
+
+/* ETA panel */
+.eta{margin-top:10px;border-radius:18px;border:1px solid var(--edge);background:linear-gradient(180deg,#2a1a12,#1a110d);padding:12px 14px;text-align:center}
+.eta .chip{display:inline-flex;align-items:center;gap:6px;font:800 12.5px "Rajdhani",sans-serif;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;padding:3px 10px;background:rgba(255,154,60,.14);color:var(--volt);border:1px solid rgba(255,154,60,.45)}
+.eta[data-s=serve] .chip{background:rgba(255,106,43,.18);color:#ffb08a;border-color:rgba(255,106,43,.6)}
+.eta[data-s=almost] .chip{background:rgba(255,210,63,.16);color:var(--gold);border-color:rgba(255,210,63,.55)}
+.eta[data-s=here] .chip{background:rgba(61,220,151,.16);color:var(--good);border-color:rgba(61,220,151,.55)}
+.eta[data-s=closed] .chip,.eta[data-s=prep] .chip{background:rgba(187,164,147,.12);color:var(--dim);border-color:var(--edge)}
+.eta[data-s=here]{border-color:rgba(61,220,151,.6);box-shadow:0 0 0 3px rgba(61,220,151,.12)}
+.eta[data-s=almost]{border-color:rgba(255,210,63,.6)}
+.eta .big{font-family:"Orbitron",sans-serif;font-weight:900;font-size:clamp(20px,6.2vw,28px);line-height:1.18;margin:6px 0 2px}
+.eta .big b{color:var(--gold)}
+.eta .dist{font-weight:700;font-size:16.5px;color:var(--silver);line-height:1.3}
+.eta .dist span{color:var(--dim);font-weight:600}
+
+/* "when in my area" */
+.area{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:10px 12px;border-radius:16px;border:1px solid rgba(255,210,63,.45);background:rgba(255,210,63,.07);text-align:left;font-weight:700;font-size:15.5px;line-height:1.3;color:var(--silver)}
+.area i{font-style:normal;font-size:24px;flex:none}
+.area b{color:var(--gold)}
+.area[data-s=now]{border-color:rgba(61,220,151,.55);background:rgba(61,220,151,.08)}
+.area[data-s=now] b{color:var(--good)}
+
+/* distance tiles */
+.trip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.trip div{border-radius:14px;border:1px solid var(--edge);background:var(--panel);padding:8px 6px;text-align:center;line-height:1.15;min-width:0}
+.trip b{display:block;font-family:"Orbitron",sans-serif;font-size:clamp(15px,4.6vw,19px);color:var(--ink)}
+.trip small{display:block;color:var(--dim);font-weight:700;font-size:13px;margin-top:3px}
+.trip-l{margin:12px 0 0;font-weight:700;font-size:14.5px;color:var(--silver);text-align:left}
+.trip-l span{color:var(--dim);font-weight:600}
+
+/* live map */
+.map{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--edge);background:#241d1a;margin-top:12px;height:clamp(300px,58vh,400px)}
+#lmap{position:absolute;inset:0}
+.mapchip{position:absolute;left:10px;top:10px;z-index:500;background:rgba(10,6,5,.84);border:1px solid var(--edge);border-radius:12px;padding:5px 10px;font:800 15px "Rajdhani",sans-serif;color:var(--ink);pointer-events:none;max-width:calc(100% - 130px)}
+.mapchip b{color:var(--gold)}
+#recenter{position:absolute;right:10px;top:10px;z-index:500;min-height:40px;border-radius:12px;border:1px solid var(--edge);background:rgba(10,6,5,.84);color:var(--ink);font:800 14px "Rajdhani",sans-serif;padding:6px 12px;cursor:pointer}
+.mapmsg{position:absolute;left:10px;right:10px;top:58px;z-index:500;background:rgba(10,6,5,.86);border:1px solid rgba(255,184,107,.5);color:#ffe0bd;border-radius:12px;padding:6px 10px;font-size:13.5px;font-weight:700;text-align:center}
+.mapnone{position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;color:var(--dim);font-weight:700}
+.truckpin .tk{position:relative;width:56px;height:44px}
+.truckpin .tk svg{display:block;width:56px;height:44px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
+.truckpin .tk.flip svg{transform:scaleX(-1)}
+.truckpin .tk::before{content:"";position:absolute;left:50%;top:62%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;box-shadow:0 0 0 0 rgba(255,106,43,.7);animation:tp 1.8s infinite}
+.truckpin .tk.parked::after{content:"🔥";position:absolute;right:-6px;top:-10px;font-size:16px}
+@keyframes tp{to{box-shadow:0 0 0 28px rgba(255,106,43,0)}}
+.homepin .hp{position:relative;width:40px;height:40px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:#2f7bff;border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.55)}
+.homepin .hp span{position:absolute;inset:0;display:grid;place-items:center;transform:rotate(45deg);font-size:19px}
+.homepin .hl{position:absolute;left:50%;top:44px;transform:translateX(-50%);white-space:nowrap;background:#fff;color:#1a0f08;border-radius:99px;padding:0 8px;font:800 12.5px "Rajdhani",sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.stoppin .sp{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:900 13px "Orbitron",sans-serif;color:#2a1a00;background:#8a7565;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.stoppin .sp.open{background:#ff6a2b;color:#fff;box-shadow:0 0 0 4px rgba(255,106,43,.35),0 2px 6px rgba(0,0,0,.5)}
+.stoppin .sp.next{background:var(--gold)}
+.stoppin .sp.done{opacity:.45}
+.mapctl{display:flex;gap:8px;margin-top:10px}
+.mapctl .btn{flex:1;min-height:44px;font-size:11.5px;padding:10px}
+.spd{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+.spd>span{font-weight:700;font-size:14.5px;color:var(--silver);flex:none}
+.spd .seg{flex:1;min-width:200px}
+.spd .seg button{min-height:40px;font-size:14px}
+.clock{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;font-weight:700;font-size:14.5px;color:var(--dim)}
+.clock b{font-family:"Orbitron",sans-serif;color:var(--ink);font-size:15px}
+.privacy{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;font-size:14.5px;color:var(--silver);font-weight:600}
+.privacy i{font-style:normal}
+.credits{color:var(--dim);font-size:12px;margin:6px 0 0;line-height:1.35}
+
+/* stops */
+.stops{display:grid;gap:8px}
+.stop{all:unset;box-sizing:border-box;display:flex;gap:12px;align-items:center;width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--edge);background:rgba(255,255,255,.03);cursor:pointer}
+.stop:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.stop .n{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font:900 14px "Orbitron",sans-serif;background:#4a3a30;color:var(--ink)}
+.stop .tx{flex:1;min-width:0;line-height:1.25}
+.stop .tx b{display:block;font-size:17px}
+.stop .tx small{display:block;color:var(--dim);font-weight:700;font-size:14px}
+.stop .tm{font-family:"Orbitron",sans-serif;font-size:12.5px;color:var(--silver);white-space:nowrap;text-align:right;line-height:1.35}
+.badge{display:inline-block;font:800 11px "Rajdhani",sans-serif;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;padding:1px 8px;margin-top:3px}
+.badge.open{background:var(--blue);color:#fff}.badge.next{background:var(--gold);color:#2a1a00}.badge.later{background:#3b281d;color:var(--silver)}.badge.done{background:transparent;color:var(--dim);border:1px solid var(--edge)}
+.stop.open{border-color:rgba(255,106,43,.7);box-shadow:0 0 0 2px rgba(255,106,43,.15)}
+.stop.open .n{background:var(--blue);color:#fff}.stop.next .n{background:var(--gold);color:#2a1a00}.stop.done{opacity:.6}
+.stop .near{color:var(--good)}
+
+/* order ahead */
+.menu{display:grid;gap:8px}
+.mi{display:flex;gap:10px;align-items:center;padding:10px 10px 10px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--edge)}
+.mi.has{border-color:rgba(255,154,60,.6);background:rgba(255,154,60,.06)}
+.mi .e{font-size:28px;flex:none;width:36px;text-align:center}
+.mi .tx{flex:1;line-height:1.22;min-width:0}
+.mi b{font-size:16.5px;display:block}
+.mi small{display:block;color:var(--dim);font-size:13.5px}
+.mi .p{font-family:"Orbitron",sans-serif;font-size:13px;color:var(--gold);white-space:nowrap}
+.qty{display:flex;align-items:center;gap:4px;flex:none}
+.qty button{width:40px;height:40px;border-radius:12px;border:1px solid var(--edge);background:#2a1c15;color:var(--ink);font:800 20px "Rajdhani",sans-serif;cursor:pointer;line-height:1}
+.qty button.add{background:var(--blue);border-color:var(--blue);color:#fff}
+.qty output{min-width:18px;text-align:center;font:900 15px "Orbitron",sans-serif}
+.sum{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:4px;font-weight:700}
+.sum b{font-family:"Orbitron",sans-serif;color:var(--gold);font-size:18px}
+.prep{margin:8px 0 0;font-size:14.5px;color:var(--silver);font-weight:600;line-height:1.35}
+.prep b{color:var(--ink)}
+.plan{margin-top:12px;border-radius:16px;border:1px solid rgba(255,210,63,.55);background:rgba(255,210,63,.07);padding:12px 14px}
+.plan .pk{font-weight:700;font-size:14px;color:var(--dim);margin:0 0 4px}
+.plan .pm{font-family:"Orbitron",sans-serif;font-weight:800;font-size:clamp(16px,4.8vw,19px);line-height:1.3;margin:0}
+.plan .pm b{color:var(--gold)}
+.plan .cd{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:6px 12px;border-radius:99px;background:var(--gold);color:#2a1a00;font:900 14px "Orbitron",sans-serif}
+.plan .cd.now{background:var(--good);color:#002b18}
+.plan .ps{margin:8px 0 0;font-size:14px;color:var(--silver);font-weight:600}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;min-height:44px;border-radius:12px;border:1px solid var(--edge);background:rgba(255,255,255,.03);color:var(--ink);font:700 15px "Rajdhani",sans-serif;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff}
+#send{width:100%;min-height:60px;font-size:14px;margin-top:12px}
+.payat{margin-top:12px;padding-top:10px;border-top:1px solid var(--edge)}
+.payat p{margin:0 0 6px;font-weight:700;font-size:15px}
+.trk{margin-top:12px}
+.trk .oc{font-family:"Orbitron",sans-serif;font-size:22px;letter-spacing:.14em;background:#fff;color:#1a0f08;border-radius:12px;padding:8px;text-align:center}
+.steps{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:0}
+.steps li{position:relative;padding:4px 0 14px 40px;font-weight:700;font-size:16px;line-height:1.25;color:var(--dim)}
+.steps li::before{content:"";position:absolute;left:9px;top:4px;width:18px;height:18px;border-radius:50%;border:2px solid #5a4537;background:var(--panel)}
+.steps li::after{content:"";position:absolute;left:18px;top:26px;bottom:2px;width:2px;background:#5a4537}
+.steps li:last-child::after{display:none}
+.steps li small{display:block;font-weight:600;font-size:13.5px;color:var(--dim)}
+.steps li.done{color:var(--silver)}
+.steps li.done::before{background:var(--good);border-color:var(--good)}
+.steps li.done::after{background:var(--good)}
+.steps li.cur{color:var(--ink)}
+.steps li.cur::before{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 0 rgba(255,210,63,.7);animation:pl2 1.4s infinite}
+@keyframes pl2{to{box-shadow:0 0 0 10px rgba(255,210,63,0)}}
+.chef{display:flex;gap:10px;align-items:flex-start;margin-top:4px;padding:10px 12px;border-radius:14px;background:rgba(61,220,151,.08);border:1px solid rgba(61,220,151,.45);font-weight:700;font-size:15px;color:#cdf6e5;line-height:1.3}
+.chef i{font-style:normal;font-size:22px}
+.chef b{color:var(--good)}
+.trk .row{margin-top:10px}
+
+/* forms */
+.fld{display:block;margin:10px 0}
+.fld span{display:block;font-weight:700;font-size:15px;margin-bottom:4px}
+.fld input{width:100%;min-height:48px;border-radius:12px;border:1px solid var(--edge);background:#140c09;color:var(--ink);font:600 17px "Rajdhani",sans-serif;padding:8px 12px}
+.ok{color:var(--good);font-weight:700}
+.why{display:flex;gap:10px;background:rgba(255,154,60,.08);border:1px solid rgba(255,154,60,.35);border-radius:14px;padding:10px 12px;font-size:14.5px;color:var(--silver);margin:10px 0}
+.why i{font-style:normal;font-size:20px}
+
+/* points */
+.pts{display:flex;align-items:baseline;gap:8px}
+.pts b{font-family:"Orbitron",sans-serif;font-size:44px;color:var(--gold);line-height:1}
+.bar{height:12px;border-radius:99px;background:#3b281d;overflow:hidden;margin:10px 0 4px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--blue));transition:width .5s}
+.rwl{margin-top:12px;display:grid;gap:8px}
+.rwi{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;border:1px solid var(--edge);background:rgba(255,255,255,.03)}
+.rwi .e{font-size:26px}
+.rwi div{flex:1;line-height:1.2}
+.rwi div small{display:block;color:var(--dim);font-weight:700}
+.rwi button{min-height:42px;padding:8px 12px;font-size:11px}
+.code{font-family:"Orbitron",sans-serif;font-size:20px;letter-spacing:.12em;background:#fff;color:#1a0f08;border-radius:12px;padding:10px;text-align:center;margin-top:10px}
+.punch{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0 6px}
+.punch span{aspect-ratio:1;border-radius:50%;border:2px dashed #6a4a36;display:grid;place-items:center;font:900 15px "Orbitron",sans-serif;color:#8a6a52;background:rgba(255,255,255,.02)}
+.punch span.on{border:2px solid var(--gold);background:radial-gradient(circle at 40% 35%,#fff3c4,#ffd23f 45%,#ff9a3c);color:#3a1500;font-size:clamp(22px,7vw,30px)}
+.punch span.gift{border-color:var(--blue);color:var(--blue);font-size:20px}
+.bonus{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;margin-top:12px;font-weight:700;font-size:15px;line-height:1.25}
+.bonus.on{background:rgba(61,220,151,.1);border:1px solid rgba(61,220,151,.45);color:#c9f5e4}
+.bonus.off{background:rgba(255,184,107,.1);border:1px solid rgba(255,184,107,.55);color:#ffe0bd}
+.bonus i{font-style:normal;font-size:22px}
+.bonus span{flex:1}
+.bonus button{min-height:40px;padding:6px 12px;font-size:11px}
+.pick{margin-top:12px;padding:12px;border-radius:16px;border:1px solid var(--blue);background:rgba(255,106,43,.08);text-align:center}
+.pick p{margin:0 0 10px;font-weight:800;font-size:17px}
+.pick .row .btn{min-height:56px;font-size:13px}
+
+/* settings */
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--edge);font-weight:700}
+.sw:first-of-type{border-top:0}
+.sw input{width:52px;height:30px;accent-color:var(--blue);flex:none}
+
+/* ringing overlay */
+#ringer{position:fixed;left:0;right:0;top:0;z-index:1100;padding:calc(10px + env(safe-area-inset-top)) 12px 0;transform:translateY(-130%);transition:transform .35s cubic-bezier(.2,.9,.3,1.2);pointer-events:none}
+#ringer.show{transform:none;pointer-events:auto}
+#ringer .ring{max-width:520px;margin:0 auto;flex-wrap:wrap}
+#ringer .ring>div:nth-child(2){flex:1;min-width:0}
+#ringer .acts{flex-basis:100%;display:flex;gap:8px;margin-top:8px}
+#ringer .acts button{flex:1;min-height:46px;border-radius:12px;border:0;font:800 15px "Rajdhani",sans-serif;cursor:pointer}
+#ringer .go{background:#e8401f;color:#fff}
+#ringer .no{background:#efe2d6;color:#3a2416}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,140%);background:#2a1a12;border:1px solid var(--edge);color:var(--ink);padding:12px 16px;border-radius:14px;font-weight:700;z-index:1090;transition:transform .3s;max-width:calc(100% - 32px);text-align:center}
+#toast.show{transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <div class="logo" aria-hidden="true">🌮</div>
+  <b>Taco Titan<small><span data-t="topSub">Truck tracker</span> <span class="tag">demo</span></small></b>
+  <span class="sp"></span>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">English</button><button data-lang="es" aria-pressed="false" lang="es">Español</button></div>
+</div></div>
+
+<main class="wrap">
+  <section class="live" aria-live="polite">
+    <span class="pulse" id="pulse" data-t="liveToday">Live today</span>
+    <div class="eta" id="eta" data-s="serve">
+      <span class="chip" id="etaState">Parked &amp; serving</span>
+      <div class="big" id="etaBig">…</div>
+      <div class="dist" id="etaDist"></div>
+    </div>
+    <div class="area" id="area" data-s="later"><i aria-hidden="true">📍</i><span id="areaTx">…</span></div>
+    <div style="margin-top:10px"><button class="spk-btn" type="button" id="explain" aria-pressed="false" data-t="explain">🔊 What is this demo?</button></div>
+  </section>
+
+  <div class="map" data-t-aria="mapAria" aria-label="Live map: you, the truck and today's stops">
+    <div id="lmap"></div>
+    <div class="mapchip" id="mapChip" aria-hidden="true">🚚</div>
+    <button type="button" id="recenter" data-t="recenter">◎ Recenter</button>
+    <div class="mapmsg" id="mapMsg" hidden></div>
+  </div>
+  <p class="trip-l"><span data-t="tripL">From you to the truck</span> <span id="tripNote"></span></p>
+  <div class="trip" aria-live="polite">
+    <div><b id="tMi">–</b><small data-t="tMiL">miles</small></div>
+    <div><b id="tWalk">–</b><small data-t="tWalkL">🚶 walking</small></div>
+    <div><b id="tDrive">–</b><small data-t="tDriveL">🚗 driving</small></div>
+  </div>
+  <p class="privacy"><i aria-hidden="true">🔒</i><span data-t="privacyMap">Your location is saved only on your phone. The truck never sees your address. (A free map service draws the route.)</span></p>
+  <p class="note" id="homeMsg" aria-live="polite"></p>
+  <div class="clock"><span><span data-t="clockL">Demo clock</span> <b id="clk">–</b></span><span id="feedMode" data-t="simMode">Simulated truck</span></div>
+  <div class="mapctl">
+    <button class="btn ghost" id="skip" type="button" data-t="skip">⏩ Skip ahead</button>
+    <button class="btn ghost" id="restart" type="button" data-t="restart">↺ Restart the day</button>
+  </div>
+  <div class="spd">
+    <span data-t="speedL">Demo speed</span>
+    <div class="seg" id="speed" role="group"><button type="button" data-x="1" aria-pressed="false" data-t="speed1">1x real time</button><button type="button" data-x="10" aria-pressed="true" data-t="speed10">10x (demo)</button></div>
+  </div>
+  <p class="credits" data-t="mapCredits">Map © OpenStreetMap contributors (ODbL). Street routing: OSRM. Address search: Nominatim.</p>
+
+  <section class="s" id="today">
+    <header><p class="kick" data-t="stopsKick">Today</p><h2 class="chrome" data-t="stopsH">Today's stops</h2><p class="lead" data-t="stopsLead">Tap a stop to see it on the map.</p></header>
+    <div class="stops" id="stopList"></div>
+  </section>
+
+  <section class="s" id="order">
+    <header><p class="kick" data-t="ordKick">Order ahead</p><h2 class="chrome" data-t="ordH">Hot when you get there</h2><p class="lead" data-t="ordLead">Pick your food. We tell you when to leave so it comes off the grill as you walk up.</p></header>
+    <div class="card">
+      <div class="menu" id="menuList"></div>
+      <div class="sum" style="margin-top:12px"><span id="cartN" data-t="cartEmpty">Nothing picked yet</span><b id="cartTotal">$0.00</b></div>
+      <p class="prep" id="prepTx"></p>
+      <p style="margin:12px 0 6px;font-weight:700" data-t="modeL">How are you getting there?</p>
+      <div class="seg" id="mode" role="group"><button type="button" data-m="walk" aria-pressed="true" data-t="modeWalk">🚶 Walk</button><button type="button" data-m="drive" aria-pressed="false" data-t="modeDrive">🚗 Drive</button></div>
+      <div class="plan" id="plan" hidden>
+        <p class="pk" id="planWhere"></p>
+        <p class="pm" id="planMsg"></p>
+        <span class="cd" id="planCd"></span>
+        <p class="ps" id="planSub"></p>
+      </div>
+      <button class="btn primary" id="send" type="button" data-t="send">🔥 Send order (demo)</button>
+      <div class="payat">
+        <p data-t="payAt">You pay at the window when you pick up:</p>
+        <div class="pays" aria-label="Cash, cards, Apple Pay, Google Pay, Venmo, Cash App, Zelle"><span class="cash" data-t="payCash">💵 Cash</span><span data-t="payCard">💳 Cards</span><span class="ap">Apple Pay</span><span>Google Pay</span><span class="vm">venmo</span><span class="ca">$ Cash App</span><span class="ze">Zelle</span></div>
+        <p class="note" data-t="payNote">Demo only: nothing is charged and no order is really sent.</p>
+      </div>
+      <div class="trk" id="trk" hidden aria-live="polite">
+        <p class="kick" style="margin-top:6px" data-t="yourOrder">Your order</p>
+        <div class="oc" id="oCode">TT-0000</div>
+        <ol class="steps" id="oSteps"></ol>
+        <div class="chef" id="oChef" hidden><i aria-hidden="true">🧑‍🍳</i><span id="oChefTx"></span></div>
+        <div class="row">
+          <button class="btn gold" id="onWay" type="button" data-t="onWay">🏃 I'm on my way</button>
+          <button class="btn ghost" id="pickedUp" type="button" data-t="pickedUp">✅ I picked it up</button>
+        </div>
+        <button class="btn ghost" id="newOrder" type="button" style="width:100%;margin-top:10px" data-t="newOrder">+ Start a new order</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="join">
+    <header><p class="kick" data-t="joinKick">Step 1</p><h2 class="chrome" data-t="joinH">Join in 10 seconds</h2></header>
+    <div class="card">
+      <form id="joinForm" autocomplete="off">
+        <label class="fld"><span data-t="nameL">Your first name</span><input id="name" maxlength="30" data-t-ph="namePh" placeholder="Maria"></label>
+        <button class="btn primary" type="submit" style="width:100%" data-t="joinBtn">Join + get 10 free points</button>
+        <p class="note" data-t="joinNote">Demo only: nothing is sent anywhere. It stays on this phone.</p>
+      </form>
+      <div id="joined" hidden><p class="ok" id="hello"></p></div>
+    </div>
+    <div class="card">
+      <p class="kick" data-t="locKick">Step 2</p>
+      <h3 data-t="locH">Where are you?</h3>
+      <div class="why"><i aria-hidden="true">📍</i><span data-t="locWhy">We only use your location to show <b>how far the truck is</b> and to ping you when it <b>parks near you</b>. We don't follow you around, and you can turn it off any time.</span></div>
+      <div class="row">
+        <button class="btn primary" id="locBtn" type="button" data-t="locBtn">📍 Use my location</button>
+        <button class="btn ghost" id="typeBtn" type="button" data-t="typeBtn">⌨️ Type my address</button>
+      </div>
+      <label class="fld" id="streetFld" hidden><span data-t="streetL">Your street and city</span><input id="street" maxlength="80" data-t-ph="streetPh" placeholder="Tweedy Blvd, South Gate"></label>
+      <p class="note" id="locMsg" aria-live="polite"></p>
+    </div>
+    <div class="card">
+      <p class="kick" data-t="iosKick">Step 3 · iPhone</p>
+      <h3 data-t="iosH">Turn on alerts</h3>
+      <p class="note" data-t="iosP">On iPhone, tap <b>Share</b> (the square with the arrow) → <b>Add to Home Screen</b> → open it from your Home Screen and allow notifications. That's Apple's rule for alerts. On Android, just tap "Allow" when it asks.</p>
+      <button class="btn gold" id="test" type="button" style="width:100%" data-t="testBtn">🔔 Test the "parked near you" alert</button>
+    </div>
+  </section>
+
+  <section class="s" id="points">
+    <header><p class="kick" data-t="ptsKick">Your points</p><h2 class="chrome" data-t="ptsH">Points + rewards</h2></header>
+    <div class="card">
+      <p class="kick" data-t="vKick">Visit card</p>
+      <h3 data-t="vH">5 visits = a treat on us</h3>
+      <div class="punch" id="punch" aria-hidden="true"></div>
+      <p class="note" id="vNext" aria-live="polite"></p>
+      <button class="btn gold" id="checkin" type="button" style="width:100%" data-t="checkBtn">📍 Check in at the truck</button>
+      <p class="note" data-t="checkNote">For real, you scan the QR on the truck window: one check-in per visit. In this demo you can tap as much as you like.</p>
+      <div class="pick" id="pick" hidden>
+        <p data-t="pickH">🎉 5th visit! Pick your treat:</p>
+        <div class="row"><button class="btn primary" id="pick10" type="button" data-t="pick10">🏷️ 10% off</button><button class="btn primary" id="pickDrink" type="button" data-t="pickDrink">🥤 Free drink</button></div>
+      </div>
+      <div id="vCodeBox" hidden><p class="note" data-t="codeL" style="margin:10px 0 0">Show this at the window:</p><div class="code" id="vCode"></div></div>
+      <div class="bonus" id="bonus" aria-live="polite"></div>
+    </div>
+    <div class="card">
+      <div class="pts"><b id="ptsN">0</b><span data-t="ptsL">points</span></div>
+      <div class="bar"><i id="ptsBar"></i></div>
+      <p class="note" id="ptsNext"></p>
+      <button class="btn gold" id="buy" type="button" style="width:100%" data-t="buyBtn">🧾 Pretend I bought something (+10)</button>
+      <p class="note" data-t="buyNote">For real, the cashier scans your code at the window.</p>
+      <div class="rwl" id="rwl"></div>
+      <div id="codeBox" hidden><p class="note" data-t="codeL" style="margin:10px 0 0">Show this at the window:</p><div class="code" id="code"></div></div>
+    </div>
+  </section>
+
+  <section class="s" id="settings">
+    <header><p class="kick" data-t="setKick">Settings</p><h2 class="chrome" data-t="setH">Your alerts, your rules</h2></header>
+    <div class="card">
+      <p style="margin:0 0 6px;font-weight:700" data-t="distL">Ping me when the truck parks within</p>
+      <div class="seg" id="dist"><button type="button" data-d="0.25">0.25 mi</button><button type="button" data-d="0.5">0.5 mi</button><button type="button" data-d="1">1 mi</button></div>
+      <label class="sw" style="margin-top:10px"><span data-t="swAlerts">"Parked near you" alerts</span><input type="checkbox" id="alertsOn" checked></label>
+      <label class="sw"><span data-t="swReady">Ping me when my order is ready</span><input type="checkbox" id="readyOn" checked></label>
+      <label class="sw"><span data-t="swSound">Alert sound</span><input type="checkbox" id="soundOn" checked></label>
+      <button class="btn ghost" id="reset" type="button" style="width:100%;margin-top:10px" data-t="resetBtn">Leave + delete my info</button>
+      <p class="note" data-t="privacy">Your info is never sold. One alert per stop. Turn it off any time.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="f wrap">
+  <span data-t="foot">"Taco Titan" is a made-up sample truck. Demo by SousShift AI.</span><br>
+  <a href="../" data-t="footLink">For truck owners: get this for your truck →</a>
+</footer>
+
+<div id="ringer" role="alertdialog" aria-live="assertive" aria-hidden="true">
+  <div class="ring on">
+    <div class="ic">🌮</div>
+    <div><small data-t="nApp">Taco Titan · now</small><b id="nTitle"></b><span id="nBody"></span></div>
+    <div class="acts"><button class="go" id="nGo" type="button" data-t="nGo">🛒 Order ahead</button><button class="no" id="silence" type="button" data-t="silence">Close</button></div>
+  </div>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+window.T = {
+en: {
+  _title: "Taco Titan: Where's the Truck?", you: "You",
+  topSub: "Truck tracker", liveToday: "Live today", closedToday: "Closed now",
+  /* status panel */
+  stServe: "🔥 Parked &amp; serving", stPack: "📦 Packing up", stWay: "🚚 On the way to next stop", stAlmost: "⏰ Almost here", stHere: "📍 Here now",
+  stSetup: "🧑‍🍳 Setting up", stPrep: "🌅 Not open yet", stClosed: "🌙 Closed for today",
+  bigServe: "Open until <b>{t}</b>", bigHere: "<b>{d} mi</b> from you right now", bigPack: "Leaving at <b>{t}</b>",
+  bigWay: "Parks at stop {n} in <b>~{m}</b>", bigAlmost: "Parks near you in <b>~{m}</b>", bigSetup: "Opens at <b>{t}</b>",
+  bigPrep: "First stop opens at <b>{t}</b>", bigClosed: "See you <b>tomorrow</b>",
+  dServe: "at {s} · {d} mi from you", dHere: "at {s} · open until {t}. Walk over! 🌮", dPack: "Next: {s} at {t}",
+  dWay: "Heading to {s} · opens {t}", dSetup: "at {s} · {d} mi from you", dClosed: "Tomorrow from 11:00 AM. Turn on alerts and we'll ping you.",
+  chipServe: "🔥 <b>Open</b> · {d} mi", chipWay: "🚚 <b>~{m}</b> to stop {n}", chipSetup: "🧑‍🍳 Opens {t}", chipClosed: "🌙 Closed", chipPack: "📦 Leaving {t}",
+  /* area */
+  areaLater: "Taco Titan will be <b>{d} mi</b> from you at <b>{t}</b> (in {in}).",
+  areaWay: "On its way to you now. Parks <b>{d} mi</b> away in <b>~{m}</b>.",
+  areaSetup: "Setting up <b>{d} mi</b> from you. Opens at <b>{t}</b> (in {in}).",
+  areaNow: "Taco Titan is <b>{d} mi</b> from you right now, until <b>{t}</b>. Order ahead below 👇",
+  areaDone: "Done near you for today. Tomorrow's stops show up here by 9 AM.",
+  areaNone: "No stop within 0.5 mi of you today. Closest: <b>{d} mi</b> at <b>{t}</b>.",
+  /* trip */
+  tripL: "From you to the truck", tripRoad: "(by road)", tripApprox: "(estimate while it drives)", tripClosed: "(where it parked last)",
+  tMiL: "miles", tWalkL: "🚶 walking", tDriveL: "🚗 driving",
+  mapAria: "Live map: you, the truck and today's stops", recenter: "◎ Recenter", homeLbl: "You",
+  privacyMap: "Your location is saved only on your phone. The truck never sees your address. (A free map service draws the route.)",
+  homeSample: "📍 Showing a sample spot in South Gate. Tap <b>Use my location</b> or <b>Type my address</b> below to see the truck from where you are.",
+  homeGps: "📍 Using your location (saved on this phone only).", homeTyped: "📍 Pin set: {s}", homeFinding: "Finding {s} on the map…",
+  homeNotFound: "Couldn't find that address. The map still shows your last pin.",
+  routeStraight: "Street routing is offline, so paths and times are approximate.", mapOff: "The map couldn't load, but the times still work.",
+  clockL: "Demo clock", simMode: "Simulated truck", liveMode: "Live GPS",
+  skip: "⏩ Skip ahead", restart: "↺ Restart the day", toastSkip: "Skipped to {t}", toastRestart: "Back to {t}",
+  speedL: "Demo speed", speed1: "1x real time", speed10: "10x (demo)",
+  toastSpeed1: "Real time: 1 minute is 1 minute.", toastSpeed10: "10x demo speed: 1 minute passes in 6 seconds.",
+  mapCredits: "Map © OpenStreetMap contributors (ODbL). Street routing: OSRM. Address search: Nominatim.",
+  explain: "🔊 What is this demo?", explainStop: "⏹ Stop",
+  explainSay: "This is a demo of what your customers see on their phone. Taco Titan is a made-up taco truck. At the top, they see if the truck is parked and serving, or driving to the next stop, and exactly how far it is from them: miles, walking time and driving time. The map shows today's stops, and the app tells them when the truck will park in their area, with a countdown. Scroll down to order ahead. They pick their food, pick walk or drive, and the app tells them when to leave so the food comes off the grill right when they walk up. When they tap I'm on my way, the chef times the cook to their arrival. They pay at the window. They also get a ping when the truck parks near them, points on every purchase, and a free drink or ten percent off every fifth visit. Your truck gets its own name, colors, menu and stops.",
+  /* stops */
+  stopsKick: "Today", stopsH: "Today's stops", stopsLead: "Tap a stop to see it on the map.",
+  s0: "Lunch at the business park", s1: "By the park", s2: "Your neighborhood",
+  sNear: "near {r}", sFrom: "{d} mi from you", sFromNear: "{d} mi from you · in your area",
+  bOpen: "Open now", bNext: "Next", bLater: "Later", bDone: "Done", stopN: "stop {n}",
+  /* order */
+  ordKick: "Order ahead", ordH: "Hot when you get there", ordLead: "Pick your food. We tell you when to leave so it comes off the grill as you walk up.",
+  m_asada: "Carne asada tacos (3)", m_asadaS: "Grilled steak, onion, cilantro, salsa verde",
+  m_pastor: "Al pastor tacos (3)", m_pastorS: "Marinated pork, pineapple, onion, cilantro",
+  m_burrito: "Titan burrito", m_burritoS: "Asada, rice, beans, guac, salsa roja",
+  m_quesa: "Quesadilla", m_quesaS: "Flour tortilla, Oaxaca cheese, your choice of meat",
+  m_elote: "Elote", m_eloteS: "Corn on the cob, mayo, cotija, chile, lime",
+  m_horchata: "Horchata", m_horchataS: "Rice, cinnamon, vanilla. Large cup",
+  m_jamaica: "Agua de jamaica", m_jamaicaS: "Hibiscus agua fresca. Large cup",
+  prepMin: "{m} min", add: "Add", less: "Remove one",
+  cartEmpty: "Nothing picked yet", cartN: "{n} items", cartN1: "1 item",
+  prepTx: "Cook time <b>{p} min</b> + line <b>{q} min</b> ({o} orders ahead of you)",
+  prepTxNo: "Cook time <b>{p} min</b>. No line right now.",
+  modeL: "How are you getting there?", modeWalk: "🚶 Walk", modeDrive: "🚗 Drive",
+  planWhere: "Pick up at stop {n}: {s} · {w}",
+  planWhereLater: "Pick up at stop {n}: {s} (opens {t}) · {w}",
+  wWalk: "{m} walk", wDrive: "{m} drive",
+  planLeave: "Ready at <b>{r}</b>. Leave at <b>{l}</b> so it's hot when you get there.",
+  planLeaveNow: "Ready at <b>{r}</b>. It's a {m} trip, so <b>leave now</b> and tap \"I'm on my way\". The chef times it to you.",
+  cdLeave: "⏱ Leave in {m}", cdNow: "🏃 Leave now",
+  planSub: "Food sits on the grill, not in a bag: we start it so it's done when you arrive.",
+  planClosed: "Taco Titan is closed for today. Ordering opens tomorrow at 10:30 AM.",
+  planPick: "Pick something above to see when to leave.",
+  send: "🔥 Send order (demo)", toastPick: "Pick some food first 🌮", toastSent: "Order {c} sent! (demo)",
+  payAt: "You pay at the window when you pick up:", payCash: "💵 Cash", payCard: "💳 Cards",
+  payNote: "Demo only: nothing is charged and no order is really sent.",
+  yourOrder: "Your order",
+  o1: "Received", o2: "Cooking", o3: "Ready (hot) 🔥", o4: "Picked up",
+  o1s: "{o} orders ahead · {t}", o2s: "on the grill at {t}", o3s: "comes off the grill at {t}", o3hot: "off the grill {m} ago. Come get it!", o4s: "enjoy! +10 points",
+  chefWait: "Chef starts your order in <b>{m}</b> so it comes off the grill when you arrive (<b>{t}</b>).",
+  chefNow: "Chef is cooking it now. It comes off the grill right when you arrive (<b>{t}</b>).",
+  chefEarly: "Your trip is longer than the cook, so the chef starts it now. It'll be ready about <b>{m}</b> before you arrive.",
+  chefLate: "There's a line, so it comes off the grill at <b>{t}</b>, about <b>{m}</b> after you arrive. Still fresh, straight to you.",
+  chefDone: "Hot and ready at the window. Show code <b>{c}</b>.",
+  onWay: "🏃 I'm on my way", onWayOn: "✓ On my way", pickedUp: "✅ I picked it up", newOrder: "+ Start a new order",
+  toastOnWay: "The truck got it: they'll time your cook to your arrival. 🔥", toastPicked: "Enjoy! +10 points 🌮",
+  /* join */
+  joinKick: "Step 1", joinH: "Join in 10 seconds", nameL: "Your first name", namePh: "Maria",
+  joinBtn: "Join + get 10 free points", joinNote: "Demo only: nothing is sent anywhere. It stays on this phone.",
+  hello: "Welcome, {n}! You got 10 free points. 🎉", helloAnon: "Welcome! You got 10 free points. 🎉",
+  locKick: "Step 2", locH: "Where are you?",
+  locWhy: "We only use your location to show <b>how far the truck is</b> and to ping you when it <b>parks near you</b>. We don't follow you around, and you can turn it off any time.",
+  locBtn: "📍 Use my location", typeBtn: "⌨️ Type my address", streetL: "Your street and city", streetPh: "Tweedy Blvd, South Gate",
+  locAsking: "Your phone will ask. Tap \"Allow\".", locOk: "✅ Got it. Your spot is saved (in this demo it stays on your phone).",
+  locNo: "No problem. The demo uses a sample spot. You can type your address instead.", locNA: "This browser can't share location. Type your address instead.",
+  streetOk: "✅ Saved: {s}",
+  iosKick: "Step 3 · iPhone", iosH: "Turn on alerts",
+  iosP: "On iPhone, tap <b>Share</b> (the square with the arrow) → <b>Add to Home Screen</b> → open it from your Home Screen and allow notifications. That's Apple's rule for alerts. On Android, just tap \"Allow\" when it asks.",
+  testBtn: "🔔 Test the \"parked near you\" alert",
+  /* points */
+  vKick: "Visit card", vH: "5 visits = a treat on us",
+  vNext: "{n} more visits to your treat", vLast: "1 more visit to your treat!", vReady: "Your 5th visit is in. Pick your treat below 👇",
+  checkBtn: "📍 Check in at the truck", checkNote: "For real, you scan the QR on the truck window: one check-in per visit. In this demo you can tap as much as you like.",
+  pickH: "🎉 5th visit! Pick your treat:", pick10: "🏷️ 10% off", pickDrink: "🥤 Free drink",
+  t10: "10% off", tDrink: "Free drink",
+  toastVisit: "Visit {v} of 5 checked in! ✅", toastVisitBonus: "Visit {v} of 5 checked in! +5 alerts bonus 🔔", toastPickT: "Treat unlocked. Show the code at the window. Your card starts over.",
+  bonusOn: "<b>Alerts on:</b> +5 bonus points every visit", bonusOff: "<b>Alerts off:</b> you're missing +5 bonus points every visit", bonusFix: "Turn on",
+  toastAlertsOff: "Alerts off: no more +5 bonus per visit.", toastAlertsOn: "Alerts on: +5 bonus every visit 🔔",
+  ptsKick: "Your points", ptsH: "Points + rewards", ptsL: "points",
+  ptsNext: "{n} more points to {r}", ptsAll: "You can get every reward. Nice!",
+  buyBtn: "🧾 Pretend I bought something (+10)", buyNote: "For real, the cashier scans your code at the window.",
+  redeem: "Use", need: "{n} pts", codeL: "Show this at the window:",
+  r1: "$1 off", r2: "Free horchata", r3: "Free elote", r4: "Free Titan burrito",
+  toastBuy: "+10 points! 🌮", toastJoin: "Join first (Step 1) to collect points.", toastRedeem: "Reward ready. Show the code at the window.",
+  /* settings */
+  setKick: "Settings", setH: "Your alerts, your rules", distL: "Ping me when the truck parks within",
+  swAlerts: "\"Parked near you\" alerts", swReady: "Ping me when my order is ready", swSound: "Alert sound",
+  resetBtn: "Leave + delete my info", resetDone: "Done. Your info was deleted from this phone.",
+  privacy: "Your info is never sold. One alert per stop. Turn it off any time.",
+  /* alerts */
+  nApp: "Taco Titan · now", nGo: "🛒 Order ahead", silence: "Close",
+  nParkT: "Taco Titan just parked near you!", nParkB: "{d} mi away at {s}. Open until {t}. 🌮",
+  nSoonT: "Taco Titan is almost in your area", nSoonB: "Parks {d} mi from you in ~{m}. Order ahead so it's hot.",
+  nReadyT: "Your order is coming off the grill 🔥", nReadyB: "Code {c} · ready at the window.",
+  alertsOff: "Alerts are off in Settings, so the real app wouldn't ping.",
+  foot: "\"Taco Titan\" is a made-up sample truck. Demo by SousShift AI.",
+  footLink: "For truck owners: get this for your truck →"
+},
+es: {
+  _title: "Taco Titan: ¿Dónde está el troque?", you: "Tú",
+  topSub: "Rastreador del troque", liveToday: "En vivo hoy", closedToday: "Cerrado ahorita",
+  stServe: "🔥 Estacionado y vendiendo", stPack: "📦 Recogiendo", stWay: "🚚 Va a la siguiente parada", stAlmost: "⏰ Ya casi llega", stHere: "📍 Aquí cerca",
+  stSetup: "🧑‍🍳 Preparándose", stPrep: "🌅 Todavía no abre", stClosed: "🌙 Cerrado por hoy",
+  bigServe: "Abierto hasta las <b>{t}</b>", bigHere: "A <b>{d} mi</b> de ti ahorita", bigPack: "Sale a las <b>{t}</b>",
+  bigWay: "Llega a la parada {n} en <b>~{m}</b>", bigAlmost: "Se estaciona cerca de ti en <b>~{m}</b>", bigSetup: "Abre a las <b>{t}</b>",
+  bigPrep: "La primera parada abre a las <b>{t}</b>", bigClosed: "Nos vemos <b>mañana</b>",
+  dServe: "en {s} · a {d} mi de ti", dHere: "en {s} · abierto hasta las {t} · ¡Vente caminando! 🌮", dPack: "Sigue: {s} a las {t}",
+  dWay: "Va a {s} · abre a las {t}", dSetup: "en {s} · a {d} mi de ti", dClosed: "Mañana desde las 11:00 AM. Prende las alertas y te avisamos.",
+  chipServe: "🔥 <b>Abierto</b> · {d} mi", chipWay: "🚚 <b>~{m}</b> a la parada {n}", chipSetup: "🧑‍🍳 Abre {t}", chipClosed: "🌙 Cerrado", chipPack: "📦 Sale {t}",
+  areaLater: "Taco Titan va a estar a <b>{d} mi</b> de ti a las <b>{t}</b> (en {in}).",
+  areaWay: "Ya va para tu zona. Se estaciona a <b>{d} mi</b> en <b>~{m}</b>.",
+  areaSetup: "Preparándose a <b>{d} mi</b> de ti. Abre a las <b>{t}</b> (en {in}).",
+  areaNow: "Taco Titan está a <b>{d} mi</b> de ti ahorita, hasta las <b>{t}</b> · Ordena abajo 👇",
+  areaDone: "Ya terminó cerca de ti por hoy. Las paradas de mañana salen aquí antes de las 9 AM.",
+  areaNone: "Hoy no hay parada a menos de 0.5 mi de ti. La más cerca: <b>{d} mi</b> a las <b>{t}</b>.",
+  tripL: "De ti al troque", tripRoad: "(por calle)", tripApprox: "(estimado mientras maneja)", tripClosed: "(donde se estacionó al último)",
+  tMiL: "millas", tWalkL: "🚶 caminando", tDriveL: "🚗 en carro",
+  mapAria: "Mapa en vivo: tú, el troque y las paradas de hoy", recenter: "◎ Centrar", homeLbl: "Tú",
+  privacyMap: "Tu ubicación solo se guarda en tu celular. El troque nunca ve tu dirección. (Un servicio de mapas gratis dibuja la ruta.)",
+  homeSample: "📍 Mostrando un punto de muestra en South Gate. Toca <b>Usar mi ubicación</b> o <b>Escribir mi dirección</b> abajo para ver el troque desde donde estás.",
+  homeGps: "📍 Usando tu ubicación (guardada solo en este celular).", homeTyped: "📍 Pin puesto: {s}", homeFinding: "Buscando {s} en el mapa…",
+  homeNotFound: "No encontramos esa dirección. El mapa sigue mostrando tu último pin.",
+  routeStraight: "Las calles no cargaron, así que los caminos y tiempos son aproximados.", mapOff: "El mapa no cargó, pero los tiempos siguen funcionando.",
+  clockL: "Reloj del demo", simMode: "Troque simulado", liveMode: "GPS en vivo",
+  skip: "⏩ Adelantar", restart: "↺ Empezar el día", toastSkip: "Adelantado a las {t}", toastRestart: "De vuelta a las {t}",
+  speedL: "Velocidad del demo", speed1: "1x tiempo real", speed10: "10x (demo)",
+  toastSpeed1: "Tiempo real: 1 minuto es 1 minuto.", toastSpeed10: "Velocidad 10x: 1 minuto pasa en 6 segundos.",
+  mapCredits: "Mapa © colaboradores de OpenStreetMap (ODbL). Calles: OSRM. Búsqueda de direcciones: Nominatim.",
+  explain: "🔊 ¿Qué es este demo?", explainStop: "⏹ Parar",
+  explainSay: "Este es un demo de lo que tus clientes ven en su celular. Taco Titan es un troque de tacos inventado. Arriba ven si el troque está estacionado vendiendo, o manejando a la siguiente parada, y exactamente qué tan lejos está: millas, tiempo caminando y tiempo en carro. El mapa enseña las paradas de hoy, y la app les dice cuándo se va a estacionar en su zona, con cuenta regresiva. Baja para ordenar por adelantado. Escogen su comida, escogen si van caminando o en carro, y la app les dice cuándo salir para que la comida salga de la plancha justo cuando llegan. Cuando tocan Ya voy en camino, el cocinero calcula la cocción para su llegada. Pagan en la ventanilla. También les llega un aviso cuando el troque se estaciona cerca, puntos en cada compra, y una bebida gratis o diez por ciento de descuento cada quinta visita. Tu troque lleva su propio nombre, colores, menú y paradas.",
+  stopsKick: "Hoy", stopsH: "Las paradas de hoy", stopsLead: "Toca una parada para verla en el mapa.",
+  s0: "Almuerzo en el parque de oficinas", s1: "Junto al parque", s2: "Tu vecindario",
+  sNear: "cerca de {r}", sFrom: "a {d} mi de ti", sFromNear: "a {d} mi de ti · en tu zona",
+  bOpen: "Abierto", bNext: "Sigue", bLater: "Más tarde", bDone: "Ya pasó", stopN: "parada {n}",
+  ordKick: "Ordena antes", ordH: "Calientito cuando llegues", ordLead: "Escoge tu comida. Te decimos cuándo salir para que salga de la plancha justo cuando llegas.",
+  m_asada: "Tacos de carne asada (3)", m_asadaS: "Carne asada, cebolla, cilantro, salsa verde",
+  m_pastor: "Tacos al pastor (3)", m_pastorS: "Puerco adobado, piña, cebolla, cilantro",
+  m_burrito: "Burrito Titán", m_burritoS: "Asada, arroz, frijoles, guacamole, salsa roja",
+  m_quesa: "Quesadilla", m_quesaS: "Tortilla de harina, queso Oaxaca, la carne que quieras",
+  m_elote: "Elote", m_eloteS: "Elote entero, mayonesa, cotija, chile, limón",
+  m_horchata: "Horchata", m_horchataS: "Arroz, canela, vainilla. Vaso grande",
+  m_jamaica: "Agua de jamaica", m_jamaicaS: "Agua fresca de jamaica. Vaso grande",
+  prepMin: "{m} min", add: "Agregar", less: "Quitar uno",
+  cartEmpty: "Todavía no escoges nada", cartN: "{n} cosas", cartN1: "1 cosa",
+  prepTx: "Cocción <b>{p} min</b> + fila <b>{q} min</b> ({o} órdenes antes que tú)",
+  prepTxNo: "Cocción <b>{p} min</b>. No hay fila ahorita.",
+  modeL: "¿Cómo vas a llegar?", modeWalk: "🚶 Caminando", modeDrive: "🚗 En carro",
+  planWhere: "Recoges en la parada {n}: {s} · {w}",
+  planWhereLater: "Recoges en la parada {n}: {s} (abre {t}) · {w}",
+  wWalk: "{m} caminando", wDrive: "{m} en carro",
+  planLeave: "Lista a las <b>{r}</b>. Sal a las <b>{l}</b> para que esté calientita cuando llegues.",
+  planLeaveNow: "Lista a las <b>{r}</b>. Es un viaje de {m}, así que <b>sal ahorita</b> y toca \"Ya voy en camino\". El cocinero la calcula para ti.",
+  cdLeave: "⏱ Sal en {m}", cdNow: "🏃 Sal ahorita",
+  planSub: "La comida se queda en la plancha, no en una bolsa: la empezamos para que esté lista cuando llegues.",
+  planClosed: "Taco Titan ya cerró por hoy. Las órdenes abren mañana a las 10:30 AM.",
+  planPick: "Escoge algo arriba para ver cuándo salir.",
+  send: "🔥 Mandar orden (demo)", toastPick: "Primero escoge tu comida 🌮", toastSent: "¡Orden {c} enviada! (demo)",
+  payAt: "Pagas en la ventanilla cuando recoges:", payCash: "💵 Efectivo", payCard: "💳 Tarjetas",
+  payNote: "Solo es demo: no se cobra nada y no se manda ninguna orden de verdad.",
+  yourOrder: "Tu orden",
+  o1: "Recibida", o2: "Cocinando", o3: "Lista (calientita) 🔥", o4: "Recogida",
+  o1s: "{o} órdenes antes · {t}", o2s: "a la plancha a las {t}", o3s: "sale de la plancha a las {t}", o3hot: "salió de la plancha hace {m}. ¡Ven por ella!", o4s: "¡buen provecho! +10 puntos",
+  chefWait: "El cocinero empieza tu orden en <b>{m}</b> para que salga de la plancha cuando llegues (<b>{t}</b>).",
+  chefNow: "El cocinero ya la está haciendo. Sale de la plancha justo cuando llegas (<b>{t}</b>).",
+  chefEarly: "Tu viaje es más largo que la cocción, así que el cocinero la empieza ya. Va a estar lista como <b>{m}</b> antes de que llegues.",
+  chefLate: "Hay fila, así que sale de la plancha a las <b>{t}</b>, como <b>{m}</b> después de que llegues. Recién hecha, directo a ti.",
+  chefDone: "Calientita y lista en la ventanilla. Enseña el código <b>{c}</b>.",
+  onWay: "🏃 Ya voy en camino", onWayOn: "✓ Voy en camino", pickedUp: "✅ Ya la recogí", newOrder: "+ Nueva orden",
+  toastOnWay: "El troque ya sabe: calculan tu cocción para tu llegada. 🔥", toastPicked: "¡Buen provecho! +10 puntos 🌮",
+  joinKick: "Paso 1", joinH: "Únete en 10 segundos", nameL: "Tu nombre", namePh: "María",
+  joinBtn: "Unirme + 10 puntos gratis", joinNote: "Solo es demo: no se manda nada a ningún lado. Se queda en este celular.",
+  hello: "¡Bienvenido(a), {n}! Ya tienes 10 puntos gratis. 🎉", helloAnon: "¡Bienvenido(a)! Ya tienes 10 puntos gratis. 🎉",
+  locKick: "Paso 2", locH: "¿Dónde estás?",
+  locWhy: "Solo usamos tu ubicación para enseñarte <b>qué tan lejos está el troque</b> y avisarte cuando <b>se estacione cerca</b>. No te andamos siguiendo, y lo puedes apagar cuando quieras.",
+  locBtn: "📍 Usar mi ubicación", typeBtn: "⌨️ Escribir mi dirección", streetL: "Tu calle y ciudad", streetPh: "Tweedy Blvd, South Gate",
+  locAsking: "Tu celular te va a preguntar. Toca \"Permitir\".", locOk: "✅ Listo. Ya quedó guardado tu punto (en este demo se queda en tu celular).",
+  locNo: "No hay problema. El demo usa un punto de muestra. También puedes escribir tu dirección.", locNA: "Este navegador no puede compartir la ubicación. Escribe tu dirección.",
+  streetOk: "✅ Guardado: {s}",
+  iosKick: "Paso 3 · iPhone", iosH: "Activa las alertas",
+  iosP: "En iPhone, toca <b>Compartir</b> (el cuadrito con la flecha) → <b>Agregar a pantalla de inicio</b> → ábrela desde tu pantalla de inicio y permite las notificaciones. Es regla de Apple para las alertas. En Android, nomás toca \"Permitir\" cuando te pregunte.",
+  testBtn: "🔔 Probar el aviso \"se estacionó cerca\"",
+  vKick: "Tarjeta de visitas", vH: "5 visitas = un antojo de regalo",
+  vNext: "Te faltan {n} visitas para tu premio", vLast: "¡Te falta 1 visita para tu premio!", vReady: "Ya llevas 5 visitas. Escoge tu premio abajo 👇",
+  checkBtn: "📍 Registrar visita al troque", checkNote: "En la vida real, escaneas el QR de la ventanilla: una visita por cada vez que vas. En este demo puedes tocar las veces que quieras.",
+  pickH: "🎉 ¡Quinta visita! Escoge tu premio:", pick10: "🏷️ 10% de descuento", pickDrink: "🥤 Bebida gratis",
+  t10: "10% de descuento", tDrink: "Bebida gratis",
+  toastVisit: "¡Visita {v} de 5 registrada! ✅", toastVisitBonus: "¡Visita {v} de 5 registrada! +5 puntos por alertas 🔔", toastPickT: "Premio listo. Enséñalo en la ventanilla. Tu tarjeta empieza de nuevo.",
+  bonusOn: "<b>Alertas prendidas:</b> +5 puntos extra en cada visita", bonusOff: "<b>Alertas apagadas:</b> te estás perdiendo +5 puntos extra en cada visita", bonusFix: "Prender",
+  toastAlertsOff: "Alertas apagadas: ya no ganas +5 puntos por visita.", toastAlertsOn: "Alertas prendidas: +5 puntos extra en cada visita 🔔",
+  ptsKick: "Tus puntos", ptsH: "Puntos + premios", ptsL: "puntos",
+  ptsNext: "Te faltan {n} puntos para {r}", ptsAll: "Ya te alcanza para todos los premios. ¡Bien!",
+  buyBtn: "🧾 Hacer como que compré algo (+10)", buyNote: "En la vida real, el cajero escanea tu código en la ventanilla.",
+  redeem: "Usar", need: "{n} pts", codeL: "Enseña esto en la ventanilla:",
+  r1: "$1 de descuento", r2: "Horchata gratis", r3: "Elote gratis", r4: "Burrito Titán gratis",
+  toastBuy: "¡+10 puntos! 🌮", toastJoin: "Primero únete (Paso 1) para juntar puntos.", toastRedeem: "Premio listo. Enséñalo en la ventanilla.",
+  setKick: "Ajustes", setH: "Tus alertas, tus reglas", distL: "Avísame cuando el troque se estacione a menos de",
+  swAlerts: "Avisos de \"se estacionó cerca\"", swReady: "Avísame cuando mi orden esté lista", swSound: "Sonido del aviso",
+  resetBtn: "Salirme + borrar mis datos", resetDone: "Listo. Se borraron tus datos de este celular.",
+  privacy: "Nunca vendemos tus datos. Un aviso por parada. Apágalo cuando quieras.",
+  nApp: "Taco Titan · ahora", nGo: "🛒 Ordenar", silence: "Cerrar",
+  nParkT: "¡Taco Titan se estacionó cerca de ti!", nParkB: "A {d} mi en {s}. Abierto hasta las {t}. 🌮",
+  nSoonT: "Taco Titan ya casi llega a tu zona", nSoonB: "Se estaciona a {d} mi de ti en ~{m}. Ordena antes para que esté calientito.",
+  nReadyT: "Tu orden está saliendo de la plancha 🔥", nReadyB: "Código {c} · lista en la ventanilla.",
+  alertsOff: "Las alertas están apagadas en Ajustes, así que la app de verdad no avisaría.",
+  foot: "\"Taco Titan\" es un troque de muestra inventado. Demo de SousShift AI.",
+  footLink: "Para dueños de troques: tenlo en tu troque →"
+}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="../lang.js?v=20261012a"></script>
+<script src="../speak.js?v=20261012a"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = "ssai:ft:demo";
+  var DEF = { joined: false, name: "", pts: 0, radius: 0.5, alerts: true, ready: true, sound: true, visits: 0, mode: "walk" };
+  var S = JSON.parse(JSON.stringify(DEF));
+  try { var saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved) for (var k in saved) S[k] = saved[k]; } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  var t = function (k) { return ICE.t(k); };
+  var fmt = function (s, o) { return String(s).replace(/\{(\w+)\}/g, function (_, k) { return o[k] != null ? o[k] : ""; }); };
+  var loc = function () { return ICE.lang === "es" ? "es-US" : "en-US"; };
+  var dec = function (n) { return n.toLocaleString(loc(), { minimumFractionDigits: 1, maximumFractionDigits: 1 }); };
+  var esc = function (x) { return String(x).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); };
+  var money = function (n) { return "$" + n.toFixed(2); };
+
+  /* ---------- time helpers: the demo runs on its own clock (minutes since midnight) ---------- */
+  function hm(m) { var d = new Date(); d.setHours(0, 0, 0, 0); d.setMinutes(Math.round(m)); return d.toLocaleTimeString(loc(), { hour: "numeric", minute: "2-digit" }); }
+  function dur(min) { // "2 h 10 min" · "45 min" · "1 min"
+    min = Math.max(0, Math.round(min));
+    if (min < 1) return "<1 min";
+    if (min < 60) return min + " min";
+    var h = Math.floor(min / 60), r = min % 60; return h + " h" + (r ? " " + r + " min" : "");
+  }
+
+  /* ---------- toast + alert banner ---------- */
+  var toastT;
+  function toast(msg) { var el = $("toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(function () { el.classList.remove("show"); }, 2800); }
+  var ringT, unlocked = false, AC = null;
+  function beep() { // a short two-tone "order up" chime, made on the phone (no sound file)
+    try {
+      AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+      [0, 0.22, 0.44].forEach(function (d, i) {
+        var o = AC.createOscillator(), g = AC.createGain(), at = AC.currentTime + d;
+        o.type = "triangle"; o.frequency.value = i === 1 ? 784 : 1047;
+        g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.35, at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.2);
+        o.connect(g); g.connect(AC.destination); o.start(at); o.stop(at + 0.22);
+      });
+    } catch (e) {}
+  }
+  var ringGo = "order";
+  // o.test = the "Test" button (always shows) · o.order = order-ready ping (own setting) · o.go = where the banner button scrolls
+  function ring(title, body, o) {
+    o = o || {};
+    if (!o.order && !S.alerts && !o.test) return;
+    if (!o.order && !S.alerts && o.test) toast(t("alertsOff"));
+    if (!unlocked && !o.test) { toast(title + " " + body); return; }
+    ringGo = o.go || "order";
+    $("nTitle").textContent = title; $("nBody").textContent = body;
+    var r = $("ringer"); r.classList.add("show"); r.setAttribute("aria-hidden", "false");
+    if (navigator.vibrate) try { navigator.vibrate([300, 150, 300]); } catch (e) {}
+    if (S.sound) beep();
+    clearTimeout(ringT); ringT = setTimeout(hide, 7000);
+  }
+  function hide() { clearTimeout(ringT); var r = $("ringer"); r.classList.remove("show"); r.setAttribute("aria-hidden", "true"); }
+  $("silence").addEventListener("click", hide);
+  $("nGo").addEventListener("click", function () { hide(); $(ringGo === "track" ? "trk" : "order").scrollIntoView({ behavior: "smooth", block: "start" }); });
+  document.addEventListener("pointerdown", function () { unlocked = true; }, { once: true });
+
+  /* ---------- geometry + routing ---------- */
+  var MI = 1609.344, WALK_MPH = 3, NEAR_MI = 0.5;
+  var SAMPLE_HOME = { lat: 33.95155, lng: -118.20330 }; // sample block in South Gate, CA
+  var OSRM = "https://router.project-osrm.org/";
+  var NOMINATIM = "https://nominatim.openstreetmap.org/";
+  function hav(a, b) {
+    var r = Math.PI / 180, dLa = (b[0] - a[0]) * r, dLo = (b[1] - a[1]) * r;
+    var x = Math.sin(dLa / 2) * Math.sin(dLa / 2) + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLo / 2) * Math.sin(dLo / 2);
+    return 12742000 * Math.asin(Math.min(1, Math.sqrt(x)));
+  }
+  function timedFetch(url, ms) {
+    var ctl = window.AbortController ? new AbortController() : null, id, o = { headers: { "Accept": "application/json" } };
+    if (ctl) { o.signal = ctl.signal; id = setTimeout(function () { ctl.abort(); }, ms); }
+    return fetch(url, o).then(function (r) { clearTimeout(id); if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); },
+      function (e) { clearTimeout(id); throw e; });
+  }
+  var ll = function (p) { return p[1].toFixed(6) + "," + p[0].toFixed(6); };
+  function mkLine(line) { var cum = [0]; for (var i = 1; i < line.length; i++) cum.push(cum[i - 1] + hav(line[i - 1], line[i])); return { line: line, cum: cum, total: cum[cum.length - 1] }; }
+  function pointAt(r, s) {
+    s = Math.max(0, Math.min(r.total, s));
+    var lo = 0, hi = r.cum.length - 1;
+    if (hi < 1) return r.line[0];
+    while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (r.cum[mid] <= s) lo = mid; else hi = mid; }
+    var a = r.line[lo], b = r.line[hi], seg = r.cum[hi] - r.cum[lo], u = seg ? (s - r.cum[lo]) / seg : 0;
+    return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u];
+  }
+  function slice(r, s0, s1) { // the part of a line between two distances along it
+    var out = [pointAt(r, s0)];
+    for (var i = 0; i < r.line.length; i++) if (r.cum[i] > s0 && r.cum[i] < s1) out.push(r.line[i]);
+    out.push(pointAt(r, s1)); return out;
+  }
+  function curve(a, b, bend, n) { // offline fallback: a gently curved path, never a broken demo
+    var mx = (a[0] + b[0]) / 2 - (b[1] - a[1]) * bend, my = (a[1] + b[1]) / 2 + (b[0] - a[0]) * bend, line = [];
+    for (var i = 0; i <= n; i++) { var u = i / n, q = 1 - u; line.push([q * q * a[0] + 2 * q * u * mx + u * u * b[0], q * q * a[1] + 2 * q * u * my + u * u * b[1]]); }
+    return line;
+  }
+
+  /* ---------- today's plan: 3 stops placed around the customer, so the demo works anywhere ----------
+     A real truck types its stops into the owner app; here we generate them relative to your pin. */
+  var SCHED = [
+    { open: 660, close: 840, off: [0.0175, 0.0150], icon: "🏢" },   // 11:00–2:00 business park, ~1.5 mi
+    { open: 870, close: 1020, off: [-0.0105, -0.0135], icon: "🌳" }, // 2:30–5:00 by a park, ~1 mi
+    { open: 1050, close: 1260, off: [0.0030, -0.0034], icon: "🏠" }  // 5:30–9:00 near you, ~0.3 mi
+  ];
+  var PACK = 5; // minutes to pack up before driving off
+  function planBase(h) {
+    return {
+      stops: SCHED.map(function (s, i) { return { i: i, open: s.open, close: s.close, icon: s.icon, lat: h.lat + s.off[0], lng: h.lng + s.off[1], road: "" }; }),
+      legs: [], snapped: false
+    };
+  }
+  function finishPlan(P, legLines, legSecs) {
+    P.legs = [];
+    for (var i = 0; i < P.stops.length - 1; i++) {
+      var a = P.stops[i], b = P.stops[i + 1], gap = b.open - a.close;
+      var drive = Math.max(6, Math.min(gap - PACK - 4, (legSecs[i] || 600) / 60 * 1.4 + 2)); // trucks drive slow + park
+      P.legs.push({ from: i, to: i + 1, r: mkLine(legLines[i]), depart: a.close + PACK, arrive: a.close + PACK + drive });
+    }
+    return P;
+  }
+  function offlinePlan(h) {
+    var P = planBase(h), lines = [], secs = [];
+    for (var i = 0; i < P.stops.length - 1; i++) {
+      var a = [P.stops[i].lat, P.stops[i].lng], b = [P.stops[i + 1].lat, P.stops[i + 1].lng];
+      lines.push(curve(a, b, i ? -0.15 : 0.15, 40)); secs.push(hav(a, b) * 1.3 / (22 * MI / 3600));
+    }
+    P.toYou = P.stops.map(function (s) { var d = hav([h.lat, h.lng], [s.lat, s.lng]) * 1.3; return { dist: d, dur: d / (22 * MI / 3600) }; });
+    return finishPlan(P, lines, secs);
+  }
+  function buildPlan(h) {
+    if (!window.fetch) return Promise.resolve(offlinePlan(h));
+    var P = planBase(h), pts = P.stops.map(function (s) { return [s.lat, s.lng]; });
+    // 1 call: the truck's drive A → B → C on real streets (also snaps each stop onto a street)
+    return timedFetch(OSRM + "route/v1/driving/" + pts.map(ll).join(";") + "?overview=full&geometries=geojson", 12000).then(function (j) {
+      if (!j || j.code !== "Ok" || !j.routes || !j.routes[0]) throw new Error("no route");
+      var R = j.routes[0], full = mkLine(R.geometry.coordinates.map(function (c) { return [c[1], c[0]]; }));
+      (j.waypoints || []).forEach(function (w, i) { if (P.stops[i] && w.location) { P.stops[i].lat = w.location[1]; P.stops[i].lng = w.location[0]; } });
+      var legs = R.legs || [], lines = [], secs = [], s0 = 0;
+      for (var i = 0; i < P.stops.length - 1; i++) {
+        var L = legs[i] || { distance: full.total / 2, duration: 600 }, s1 = Math.min(full.total, s0 + L.distance);
+        lines.push(slice(full, s0, s1)); secs.push(L.duration); s0 = s1;
+      }
+      if (full.total > 12 * MI) throw new Error("odd route");
+      finishPlan(P, lines, secs); P.snapped = true;
+      // 2nd call: road distance + drive time from you to each stop
+      var all = [[h.lat, h.lng]].concat(P.stops.map(function (s) { return [s.lat, s.lng]; }));
+      return timedFetch(OSRM + "table/v1/driving/" + all.map(ll).join(";") + "?sources=0&annotations=duration,distance", 12000).then(function (tb) {
+        P.toYou = P.stops.map(function (s, i) { return { dist: tb.distances[0][i + 1], dur: tb.durations[0][i + 1] }; });
+        if (P.toYou.some(function (x) { return !isFinite(x.dist) || !isFinite(x.dur); })) throw new Error("table");
+        return P;
+      }).catch(function () {
+        P.toYou = P.stops.map(function (s) { var d = hav([h.lat, h.lng], [s.lat, s.lng]) * 1.3; return { dist: d, dur: d / (22 * MI / 3600) }; });
+        return P;
+      });
+    }).catch(function () { return offlinePlan(h); });
+  }
+  // the street name next to each stop ("near Tweedy Blvd"), one gentle request at a time (Nominatim asks for ≤ 1/sec)
+  function nameStops(P, my) {
+    if (!window.fetch) return;
+    P.stops.forEach(function (s, i) {
+      setTimeout(function () {
+        if (my !== planSeq) return;
+        timedFetch(NOMINATIM + "reverse?format=jsonv2&zoom=17&accept-language=" + ICE.lang + "&lat=" + s.lat.toFixed(5) + "&lon=" + s.lng.toFixed(5), 10000).then(function (j) {
+          if (my !== planSeq || !j || !j.address) return;
+          s.road = j.address.road || j.address.pedestrian || j.address.neighbourhood || "";
+          renderStops(); if (lastU) render(lastU);
+        }).catch(function () {});
+      }, 400 + i * 1200);
+    });
+  }
+
+  /* where the truck is at minute m of the day (pure function of the plan) */
+  function stateAt(P, m) {
+    var st = P.stops, n = st.length;
+    if (m < st[0].open) return { phase: "prep", at: 0 };
+    for (var i = 0; i < n; i++) {
+      var s = st[i], leg = P.legs[i];
+      if (m < s.close && m >= s.open) return { phase: "serve", at: i };
+      if (i === n - 1) { if (m >= s.close) return { phase: "closed", at: i }; continue; }
+      if (m >= s.close && m < leg.depart) return { phase: "pack", at: i };
+      if (m >= leg.depart && m < leg.arrive) return { phase: "drive", leg: i, to: i + 1, f: (m - leg.depart) / (leg.arrive - leg.depart), left: leg.arrive - m };
+      if (m >= leg.arrive && m < st[i + 1].open) return { phase: "setup", at: i + 1 };
+    }
+    return { phase: "closed", at: n - 1 };
+  }
+  function ease(f) { return f < 0.5 ? 2 * f * f : 1 - Math.pow(-2 * f + 2, 2) / 2; } // pull out slow, cruise, park slow
+
+  /* ---------- TruckFeed: the ONLY source of truck positions. The UI just listens. ----------
+     TruckFeed.on(fn) → fn({ lat, lng, t, m, phase, at?, leg?, to?, left?, lap }) on every update.
+     • simulate (used now): runs today's stop plan on a demo clock (1x or 10x) — parked for hours, then drives to the next stop.
+     • live (stub, not wired yet): see TruckFeed.live below. Going live = TruckFeed.live.start(id) instead of
+       TruckFeed.simulate.start(plan, minute). Nothing in the UI changes. */
+  var TruckFeed = {
+    mode: "simulate", subs: [], last: null,
+    on: function (fn) { this.subs.push(fn); },
+    emit: function (u) { this.last = u; for (var i = 0; i < this.subs.length; i++) this.subs[i](u); },
+
+    simulate: {
+      plan: null, m: 0, m0: 0, x: 10, timer: 0, ts: 0, lap: 0,
+      start: function (plan, m0) {
+        var self = this; this.plan = plan; this.m0 = m0; TruckFeed.mode = "simulate"; this.reset();
+        if (!this.timer) this.timer = setInterval(function () { self.tick(); }, 250);
+      },
+      stop: function () { clearInterval(this.timer); this.timer = 0; },
+      reset: function () { this.m = this.m0; this.lap++; this.ts = Date.now(); this.send(); },
+      setSpeed: function (x) { this.x = x; },
+      jumpTo: function (m) { this.m = Math.max(this.m, m); this.ts = Date.now(); this.send(); },
+      tick: function () {
+        var now = Date.now(), real = Math.min(2, (now - this.ts) / 1000); this.ts = now;
+        this.m = Math.min(1439, this.m + real * this.x / 60); this.send();
+      },
+      send: function () {
+        var P = this.plan, s = stateAt(P, this.m), p;
+        if (s.phase === "drive") { var L = P.legs[s.leg]; p = pointAt(L.r, L.r.total * ease(s.f)); s.dir = pointAt(L.r, L.r.total * Math.min(1, ease(s.f) + 0.01)); }
+        else p = [P.stops[s.at].lat, P.stops[s.at].lng];
+        s.lat = p[0]; s.lng = p[1]; s.t = Date.now(); s.m = this.m; s.lap = this.lap;
+        TruckFeed.emit(s);
+      },
+      // the next moment worth seeing: a minute before the truck leaves, parks or opens
+      nextEvent: function () {
+        var P = this.plan, ev = [];
+        P.stops.forEach(function (s) { ev.push(s.open - 1, s.close - 1); });
+        P.legs.forEach(function (l) { ev.push(l.depart - 0.5, l.arrive - 2); });
+        ev.sort(function (a, b) { return a - b; });
+        for (var i = 0; i < ev.length; i++) if (ev[i] > this.m + 0.3) return ev[i];
+        return null;
+      }
+    },
+
+    /* LIVE MODE (stub — no backend yet, so it is never started):
+       1. Driver's phone (owner app): navigator.geolocation.watchPosition → POST {lat, lng, t, parked} every 10–20 s
+          to a backend, e.g. ~/dev/antidote-cloud on Railway (POST /api/trucks/:id/ping) or Firebase trucks/:id.
+          Parked for 3+ min within 150 m of a scheduled stop = "parked & serving" (sends the "parked near you" pings).
+       2. The owner types today's stops once (or repeats last week's): GET /api/trucks/:id/today → [{lat,lng,open,close}].
+       3. Customer app (this page): poll GET /api/trucks/:id/latest every 10 s (or SSE / Firebase onValue)
+          and pass each fix to TruckFeed.emit({ lat, lng, t, phase, at, to, left }). Distances re-run OSRM every ~60 s. */
+    live: {
+      url: null, timer: 0, // e.g. "https://<antidote-cloud>.up.railway.app/api/trucks/" (set when the backend exists)
+      start: function (truckId) {
+        if (!this.url) return false; // no backend yet: keep the simulation
+        var self = this; TruckFeed.mode = "live"; TruckFeed.simulate.stop();
+        this.timer = setInterval(function () {
+          timedFetch(self.url + encodeURIComponent(truckId) + "/latest", 8000).then(function (p) {
+            if (p && isFinite(p.lat) && isFinite(p.lng)) TruckFeed.emit({ lat: +p.lat, lng: +p.lng, t: +p.t || Date.now(), phase: p.phase || "serve", at: p.at, to: p.to, left: p.left, m: nowMin() });
+          }).catch(function () {});
+        }, 10000);
+        return true;
+      },
+      stop: function () { clearInterval(this.timer); this.timer = 0; }
+    }
+  };
+  function nowMin() { var d = new Date(); return d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60; }
+  // demo clock starts at your real time during service hours, otherwise at 12:35 PM (lunch, truck parked)
+  function startMin() { var m = nowMin(); return m >= 660 && m < 1245 ? m : 755; }
+
+  /* ---------- the customer's map (only consumes TruckFeed updates) ---------- */
+  var home = S.home && isFinite(S.home.lat) ? { lat: S.home.lat, lng: S.home.lng } : { lat: SAMPLE_HOME.lat, lng: SAMPLE_HOME.lng };
+  var P = null, planSeq = 0, lastU = null, prevLng = null, lap = -1, rung = {}, shown = {};
+  var map = null, homeMk = null, truckMk = null, zoneC = null, dayLine = null, legLine = null, youLine = null, stopMks = [], userMoved = false, lastFit = 0;
+  var youRoutes = {}; // stop index → OSRM line from you to that stop (drawn as the gold path)
+
+  function truckHtml(parked) {
+    return '<div class="tk' + (parked ? " parked" : "") + '"><svg viewBox="0 0 56 44" aria-hidden="true">' +
+      '<path d="M4 12h30l-2-5H6z" fill="#ffd23f" stroke="#2a160b" stroke-width="1.2"/>' +
+      '<path d="M6 12h4v3H6zm8 0h4v3h-4zm8 0h4v3h-4z" fill="#ff4d3d"/>' +
+      '<rect x="3" y="12" width="34" height="22" rx="3" fill="#ff6a2b" stroke="#2a160b" stroke-width="1.5"/>' +
+      '<rect x="8" y="16" width="20" height="9" rx="1.5" fill="#2a160b"/><rect x="9.5" y="17.5" width="17" height="6" rx="1" fill="#ffd23f" opacity=".9"/>' +
+      '<rect x="3" y="28" width="34" height="3" fill="#ff4d3d"/>' +
+      '<path d="M37 18h8l7 7.5V34H37z" fill="#ffe2c4" stroke="#2a160b" stroke-width="1.5"/><path d="M39.5 20.5h4.8l4.6 5h-9.4z" fill="#9fd8ff"/>' +
+      '<circle cx="12" cy="35" r="4.2" fill="#2a160b" stroke="#ead8c8" stroke-width="1.5"/><circle cx="44" cy="35" r="4.2" fill="#2a160b" stroke="#ead8c8" stroke-width="1.5"/>' +
+      '<text x="20" y="9" font-size="7" text-anchor="middle">🌮</text></svg></div>';
+  }
+  function homeIcon() {
+    return L.divIcon({ className: "homepin", iconSize: [40, 40], iconAnchor: [20, 48],
+      html: '<div class="hp"><span>📍</span></div><div class="hl">' + esc(t("homeLbl")) + '</div>' });
+  }
+  function stopIcon(i, cls) { return L.divIcon({ className: "stoppin", iconSize: [30, 30], iconAnchor: [15, 15], html: '<div class="sp ' + cls + '">' + (i + 1) + '</div>' }); }
+  function mapMsg(k) { var m = $("mapMsg"); if (!k) { m.hidden = true; return; } m.textContent = t(k); m.hidden = false; m.setAttribute("data-k", k); }
+  function initMap() {
+    if (!window.L) { var n = document.createElement("div"); n.className = "mapnone"; n.setAttribute("data-t", "mapOff"); n.textContent = t("mapOff"); $("lmap").appendChild(n); $("recenter").hidden = true; return; }
+    map = L.map("lmap", { zoomControl: false, attributionControl: true }).setView([home.lat, home.lng], 14);
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
+    // OpenStreetMap tiles, darkened with a CSS filter (.osmdark) to match the page
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, className: "osmdark",
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).addTo(map);
+    zoneC = L.circle([home.lat, home.lng], { radius: S.radius * MI, color: "#ffd23f", weight: 1.5, opacity: .6, dashArray: "4 6", fillColor: "#ffd23f", fillOpacity: .05, interactive: false }).addTo(map);
+    dayLine = L.polyline([], { color: "#ff9a3c", weight: 4, opacity: .22, interactive: false }).addTo(map);
+    legLine = L.polyline([], { color: "#ff6a2b", weight: 5, opacity: .9, interactive: false }).addTo(map);
+    youLine = L.polyline([], { color: "#ffd23f", weight: 4, opacity: .95, dashArray: "1 9", lineCap: "round", interactive: false }).addTo(map);
+    homeMk = L.marker([home.lat, home.lng], { icon: homeIcon(), keyboard: false, interactive: false, zIndexOffset: 500 }).addTo(map);
+    map.on("dragstart", function () { userMoved = true; });
+  }
+  function fit(anim) {
+    if (!map) return;
+    var pts = [[home.lat, home.lng]];
+    if (lastU) { pts.push([lastU.lat, lastU.lng]); if (lastU.phase === "drive" && P) pts.push([P.stops[lastU.to].lat, P.stops[lastU.to].lng]); }
+    lastFit = Date.now();
+    if (pts.length < 2 || hav(pts[0], pts[1]) < 120) { map.setView(pts[0], 16, { animate: !!anim }); return; }
+    map.fitBounds(L.latLngBounds(pts), { paddingTopLeft: [40, $("mapMsg").hidden ? 70 : 120], paddingBottomRight: [40, 50], maxZoom: 16, animate: !!anim });
+  }
+  $("recenter").addEventListener("click", function () { userMoved = false; fit(true); });
+
+  function drawPlan() {
+    if (!map || !P) return;
+    stopMks.forEach(function (m) { map.removeLayer(m); }); stopMks = [];
+    P.stops.forEach(function (s, i) {
+      var mk = L.marker([s.lat, s.lng], { icon: stopIcon(i, ""), keyboard: false, zIndexOffset: 200 }).addTo(map);
+      mk.on("click", function () { focusStop(i); }); stopMks.push(mk);
+    });
+    var all = []; P.legs.forEach(function (l) { all = all.concat(l.r.line); }); dayLine.setLatLngs(all);
+  }
+  // the gold path from you to a stop (real streets when the router answers, straight otherwise)
+  function youRoute(i) {
+    if (youRoutes[i]) return youRoutes[i];
+    var s = P.stops[i], my = planSeq;
+    youRoutes[i] = [[home.lat, home.lng], [s.lat, s.lng]];
+    if (window.fetch && P.snapped) timedFetch(OSRM + "route/v1/driving/" + ll([home.lat, home.lng]) + ";" + ll([s.lat, s.lng]) + "?overview=full&geometries=geojson", 12000).then(function (j) {
+      if (my !== planSeq || !j || j.code !== "Ok") return;
+      youRoutes[i] = j.routes[0].geometry.coordinates.map(function (c) { return [c[1], c[0]]; });
+      if (lastU) render(lastU);
+    }).catch(function () {});
+    return youRoutes[i];
+  }
+  function focusStop(i) {
+    if (!map || !P) return;
+    userMoved = true; var s = P.stops[i];
+    map.fitBounds(L.latLngBounds([[home.lat, home.lng], [s.lat, s.lng]]), { padding: [50, 50], maxZoom: 16, animate: true });
+    $("lmap").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  function loadPlan() {
+    var my = ++planSeq; youRoutes = {};
+    return buildPlan(home).then(function (p) {
+      if (my !== planSeq) return;
+      P = p; lap = -1; rung = {};
+      mapMsg(P.snapped ? "" : "routeStraight");
+      drawPlan(); renderStops();
+      TruckFeed.simulate.start(P, TruckFeed.simulate.plan ? TruckFeed.simulate.m : startMin());
+      userMoved = false; fit(false); nameStops(P, my);
+    });
+  }
+  function renderHomeMsg() {
+    var m = $("homeMsg"), h = S.home;
+    if (!h || !isFinite(h.lat)) m.innerHTML = t("homeSample");
+    else if (h.src === "typed") m.textContent = fmt(t("homeTyped"), { s: h.label || "" });
+    else m.textContent = t("homeGps");
+  }
+  function setHome(lat, lng, src, label) {
+    home = { lat: +(+lat).toFixed(5), lng: +(+lng).toFixed(5) };
+    S.home = { lat: home.lat, lng: home.lng, src: src, label: label || "" }; save(); // saved on this phone only
+    renderHomeMsg();
+    if (homeMk) { homeMk.setLatLng([home.lat, home.lng]); zoneC.setLatLng([home.lat, home.lng]); }
+    return loadPlan();
+  }
+
+  /* ---------- distances: crow-flies for "in your area", road distance for the trip tiles ---------- */
+  function crowMi(i) { var s = P.stops[i]; return hav([home.lat, home.lng], [s.lat, s.lng]) / MI; }
+  function nearStop() { // the stop that brings the truck into "your area" (≤ 0.5 mi)
+    var best = -1; P.stops.forEach(function (s, i) { if (crowMi(i) <= NEAR_MI && (best < 0 || crowMi(i) < crowMi(best))) best = i; });
+    return best;
+  }
+  function closestStop() { var b = 0; P.stops.forEach(function (s, i) { if (crowMi(i) < crowMi(b)) b = i; }); return b; }
+  function tripTo(i) { // road miles, walk minutes, drive minutes from you to stop i
+    var y = P.toYou[i]; return { mi: y.dist / MI, walk: y.dist / MI / WALK_MPH * 60, drive: Math.max(1, y.dur / 60) };
+  }
+  function stopName(i) { return t("s" + i); }
+  function stopLabel(i) { var s = P.stops[i]; return stopName(i) + (s.road ? " (" + fmt(t("sNear"), { r: s.road }) + ")" : ""); }
+  function miles(m) { return dec(Math.max(0.1, m)); }
+
+  function setHTML(id, html) { if (shown[id] !== html) { $(id).innerHTML = html; shown[id] = html; } }
+  function render(u) {
+    if (!P) return;
+    var m = u.m, st = P.stops, near = nearStop(), state, label, big, dist, chip;
+    $("clk").textContent = hm(m);
+    var ph = u.phase, i = u.at != null ? u.at : u.to;
+    if (ph === "serve") {
+      var dmi = crowMi(i);
+      if (i === near) { state = "here"; label = "stHere"; big = fmt(t("bigHere"), { d: miles(dmi) }); dist = fmt(t("dHere"), { s: esc(stopLabel(i)), t: hm(st[i].close) }); }
+      else { state = "serve"; label = "stServe"; big = fmt(t("bigServe"), { t: hm(st[i].close) }); dist = fmt(t("dServe"), { s: esc(stopLabel(i)), d: miles(dmi) }); }
+      chip = fmt(t("chipServe"), { d: miles(dmi) });
+    } else if (ph === "pack") {
+      state = "way"; label = "stPack"; big = fmt(t("bigPack"), { t: hm(P.legs[i].depart) });
+      dist = fmt(t("dPack"), { s: esc(stopName(i + 1)), t: hm(st[i + 1].open) }); chip = fmt(t("chipPack"), { t: hm(P.legs[i].depart) });
+    } else if (ph === "drive") {
+      var toNear = u.to === near, mins = dur(u.left);
+      state = toNear && u.left <= 10 ? "almost" : "way"; label = state === "almost" ? "stAlmost" : "stWay";
+      big = fmt(t(toNear ? "bigAlmost" : "bigWay"), { m: mins, n: u.to + 1 });
+      dist = fmt(t("dWay"), { s: esc(stopName(u.to)), t: hm(st[u.to].open) }); chip = fmt(t("chipWay"), { m: mins, n: u.to + 1 });
+    } else if (ph === "setup") {
+      state = i === near ? "almost" : "way"; label = "stSetup"; big = fmt(t("bigSetup"), { t: hm(st[i].open) });
+      dist = fmt(t("dSetup"), { s: esc(stopLabel(i)), d: miles(crowMi(i)) }); chip = fmt(t("chipSetup"), { t: hm(st[i].open) });
+    } else if (ph === "prep") {
+      state = "prep"; label = "stPrep"; big = fmt(t("bigPrep"), { t: hm(st[0].open) }); dist = fmt(t("dSetup"), { s: esc(stopLabel(0)), d: miles(crowMi(0)) }); chip = fmt(t("chipSetup"), { t: hm(st[0].open) });
+    } else { state = "closed"; label = "stClosed"; big = t("bigClosed"); dist = t("dClosed"); chip = t("chipClosed"); }
+    $("eta").setAttribute("data-s", state);
+    setHTML("etaState", t(label)); setHTML("etaBig", big); setHTML("etaDist", dist); setHTML("mapChip", chip);
+    var open = ph === "serve"; $("pulse").classList.toggle("off", !open && ph !== "drive"); setHTML("pulse", t(ph === "closed" || ph === "prep" ? "closedToday" : "liveToday"));
+
+    // "when will it be in my area"
+    var ax, as = "later";
+    if (near < 0) { var c = closestStop(); ax = fmt(t("areaNone"), { d: miles(crowMi(c)), t: hm(st[c].open) }); }
+    else {
+      var ns = st[near], dn = miles(crowMi(near));
+      if (ph === "serve" && i === near) { as = "now"; ax = fmt(t("areaNow"), { d: dn, t: hm(ns.close) }); }
+      else if (ph === "drive" && u.to === near) ax = fmt(t("areaWay"), { d: dn, m: dur(u.left) });
+      else if (ph === "setup" && i === near) ax = fmt(t("areaSetup"), { d: dn, t: hm(ns.open), "in": dur(ns.open - m) });
+      else if (m < ns.open) ax = fmt(t("areaLater"), { d: dn, t: hm(ns.open), "in": dur(ns.open - m) });
+      else ax = t("areaDone");
+    }
+    $("area").setAttribute("data-s", as); setHTML("areaTx", ax);
+
+    // trip tiles: road distance when parked; estimate while driving
+    var tr, note;
+    if (ph === "drive") { var dm = hav([home.lat, home.lng], [u.lat, u.lng]) * 1.3 / MI; tr = { mi: dm, walk: dm / WALK_MPH * 60, drive: Math.max(1, dm / 22 * 60) }; note = "tripApprox"; }
+    else { tr = tripTo(i); note = ph === "closed" ? "tripClosed" : "tripRoad"; }
+    setHTML("tMi", (ph === "drive" ? "~" : "") + miles(tr.mi)); setHTML("tWalk", dur(tr.walk)); setHTML("tDrive", dur(tr.drive)); setHTML("tripNote", t(note));
+
+    // stop badges change with the clock
+    var sig = ph + ":" + i; if (shown._stops !== sig) { shown._stops = sig; renderStops(); }
+
+    // pings: "parked near you" (once per stop) + "almost in your area" while it drives there
+    if (ph === "serve" && crowMi(i) <= S.radius && !rung["p" + i]) {
+      rung["p" + i] = 1; ring(t("nParkT"), fmt(t("nParkB"), { d: miles(crowMi(i)), s: stopName(i), t: hm(st[i].close) }));
+    }
+    if (ph === "drive" && crowMi(u.to) <= S.radius && u.left <= 10 && !rung["s" + u.to]) {
+      rung["s" + u.to] = 1; ring(t("nSoonT"), fmt(t("nSoonB"), { d: miles(crowMi(u.to)), m: dur(u.left) }));
+    }
+    tickOrder(m);
+    if (!map) return;
+
+    var p = [u.lat, u.lng], parked = ph !== "drive";
+    if (!truckMk) truckMk = L.marker(p, { icon: L.divIcon({ className: "truckpin", html: truckHtml(parked), iconSize: [56, 44], iconAnchor: [28, 34] }), keyboard: false, interactive: false, zIndexOffset: 1000 }).addTo(map);
+    else truckMk.setLatLng(p);
+    var el = truckMk.getElement();
+    if (el && el.firstChild) {
+      el.firstChild.classList.toggle("parked", ph === "serve");
+      if (ph === "drive" && u.dir) el.firstChild.classList.toggle("flip", u.dir[1] < u.lng - 1e-7);
+    }
+    prevLng = u.lng;
+    if (ph === "drive") { var Lg = P.legs[u.leg]; legLine.setLatLngs(slice(Lg.r, Lg.r.total * ease(u.f), Lg.r.total)); youLine.setLatLngs(youRoute(u.to)); }
+    else { legLine.setLatLngs([]); youLine.setLatLngs(ph === "closed" ? [] : youRoute(i)); }
+    if (!userMoved && Date.now() - lastFit > 4000) {
+      var b = map.getBounds();
+      if (!b.contains(p) || Date.now() - lastFit > 9000) fit(true);
+    }
+  }
+  TruckFeed.on(function (u) {
+    if (u.lap != null && u.lap !== lap) { lap = u.lap; rung = {}; }
+    lastU = u; render(u);
+  });
+
+  /* ---------- today's stops list ---------- */
+  function stopStatus(i) {
+    if (!lastU) return "later";
+    var u = lastU, m = u.m, s = P.stops[i];
+    if (u.phase === "serve" && u.at === i) return "open";
+    if (m >= s.close) return "done";
+    var nextI = -1; for (var k = 0; k < P.stops.length; k++) if (P.stops[k].open > m || (u.phase !== "serve" && m < P.stops[k].close && m >= P.stops[k].open)) { nextI = k; break; }
+    return i === nextI ? "next" : "later";
+  }
+  function renderStops() {
+    if (!P) return;
+    var box = $("stopList"), near = nearStop(); box.innerHTML = "";
+    P.stops.forEach(function (s, i) {
+      var cls = stopStatus(i), b = document.createElement("button");
+      b.type = "button"; b.className = "stop " + cls;
+      var d = miles(crowMi(i));
+      b.innerHTML = '<span class="n">' + (i + 1) + '</span><span class="tx"><b>' + s.icon + " " + esc(stopName(i)) + '</b><small>' +
+        (s.road ? esc(fmt(t("sNear"), { r: s.road })) + " · " : "") + '<span class="' + (i === near ? "near" : "") + '">' + esc(fmt(t(i === near ? "sFromNear" : "sFrom"), { d: d })) + '</span></small></span>' +
+        '<span class="tm">' + hm(s.open) + "–<br>" + hm(s.close) + '<br><span class="badge ' + cls + '">' + t({ open: "bOpen", next: "bNext", later: "bLater", done: "bDone" }[cls]) + "</span></span>";
+      b.addEventListener("click", function () { focusStop(i); });
+      box.appendChild(b);
+      if (stopMks[i]) stopMks[i].setIcon(stopIcon(i, cls));
+    });
+  }
+
+  /* ---------- demo controls ---------- */
+  $("skip").addEventListener("click", function () {
+    unlocked = true; var sim = TruckFeed.simulate; if (!sim.plan) return;
+    var e = sim.nextEvent(); if (e == null) return;
+    sim.jumpTo(e); userMoved = false; fit(true); toast(fmt(t("toastSkip"), { t: hm(e) }));
+  });
+  $("restart").addEventListener("click", function () {
+    unlocked = true; var sim = TruckFeed.simulate; if (!sim.plan) return;
+    sim.m0 = 655; sim.reset(); userMoved = false; fit(true); toast(fmt(t("toastRestart"), { t: hm(655) }));
+  });
+  function renderSpeed() { [].forEach.call($("speed").children, function (b) { b.setAttribute("aria-pressed", +b.getAttribute("data-x") === TruckFeed.simulate.x ? "true" : "false"); }); }
+  $("speed").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    var x = +b.getAttribute("data-x"); TruckFeed.simulate.setSpeed(x); renderSpeed(); toast(t(x === 1 ? "toastSpeed1" : "toastSpeed10"));
+  });
+  $("test").addEventListener("click", function () {
+    unlocked = true; var i = P ? (nearStop() >= 0 ? nearStop() : closestStop()) : 2;
+    ring(t("nParkT"), P ? fmt(t("nParkB"), { d: miles(crowMi(i)), s: stopName(i), t: hm(P.stops[i].close) }) : "", { test: true });
+  });
+
+  /* ---------- order ahead, timed to be hot ---------- */
+  var MENU = [
+    { id: "asada", e: "🌮", p: 9, prep: 6 }, { id: "pastor", e: "🌮", p: 9, prep: 6 }, { id: "burrito", e: "🌯", p: 12, prep: 8 },
+    { id: "quesa", e: "🧀", p: 10, prep: 7 }, { id: "elote", e: "🌽", p: 5, prep: 4 }, { id: "horchata", e: "🥛", p: 4, prep: 1 }, { id: "jamaica", e: "🌺", p: 4, prep: 1 }
+  ];
+  var cart = {}, order = null;
+  function cartItems() { return MENU.filter(function (x) { return cart[x.id] > 0; }); }
+  function cartCount() { var n = 0; for (var k in cart) n += cart[k]; return n; }
+  function cookMin() { // longest item + 1 min for every 2 extra items, capped at +6
+    var it = cartItems(); if (!it.length) return 0;
+    var mx = Math.max.apply(null, it.map(function (x) { return x.prep; }));
+    return mx + Math.min(6, Math.floor((cartCount() - 1) / 2));
+  }
+  function ordersAhead(m) { // simulated line at the window: busier at lunch and dinner
+    var rush = (m >= 690 && m <= 800) || (m >= 1080 && m <= 1170) ? 2 : 0;
+    return Math.max(0, Math.round(1 + rush + 1.5 * Math.sin(m / 23)));
+  }
+  var PER_ORDER = 2; // minutes each order ahead adds
+  function travelMin(i) { var tr = tripTo(i); return S.mode === "drive" ? Math.ceil(tr.drive) + 2 : Math.ceil(tr.walk); } // +2 to park
+  // pick-up stop = the first stop where the food is ready AND you can get there before it closes
+  function quote(m) {
+    if (!P) return { i: -1 };
+    var cook = cookMin() || 6;
+    for (var i = 0; i < P.stops.length; i++) {
+      var s = P.stops[i]; if (m >= s.close) continue;
+      var start = Math.max(m, s.open), q = s.open > m ? 0 : ordersAhead(m), ready = start + q * PER_ORDER + cook, travel = travelMin(i);
+      if (Math.max(ready, m + travel) > s.close - 2) continue;
+      if (!cartCount()) return { i: i };
+      return { i: i, q: q, cook: cook, ready: ready, travel: travel, leave: ready - travel, opensLater: s.open > m };
+    }
+    return { i: -1 };
+  }
+  function renderMenu() {
+    var box = $("menuList"); box.innerHTML = "";
+    MENU.forEach(function (x) {
+      var n = cart[x.id] || 0, d = document.createElement("div"); d.className = "mi" + (n ? " has" : "");
+      d.innerHTML = '<span class="e" aria-hidden="true">' + x.e + '</span><div class="tx"><b></b><small></small><span class="p"></span></div>' +
+        '<div class="qty">' + (n ? '<button type="button" data-a="-" aria-label="">−</button><output>' + n + '</output>' : "") + '<button type="button" class="add" data-a="+" aria-label="">+</button></div>';
+      d.querySelector("b").textContent = t("m_" + x.id); d.querySelector("small").textContent = t("m_" + x.id + "S");
+      d.querySelector(".p").textContent = money(x.p) + " · 🔥 " + fmt(t("prepMin"), { m: x.prep });
+      [].forEach.call(d.querySelectorAll("button"), function (b) {
+        var plus = b.getAttribute("data-a") === "+";
+        b.setAttribute("aria-label", t(plus ? "add" : "less") + ": " + t("m_" + x.id));
+        b.addEventListener("click", function () { cart[x.id] = Math.max(0, Math.min(9, (cart[x.id] || 0) + (plus ? 1 : -1))); renderMenu(); renderPlan(); });
+      });
+      box.appendChild(d);
+    });
+    var n = cartCount(), tot = 0; cartItems().forEach(function (x) { tot += x.p * cart[x.id]; });
+    $("cartN").textContent = n ? (n === 1 ? t("cartN1") : fmt(t("cartN"), { n: n })) : t("cartEmpty");
+    $("cartTotal").textContent = money(tot);
+  }
+  function renderMode() { [].forEach.call($("mode").children, function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-m") === S.mode ? "true" : "false"); }); }
+  $("mode").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return; S.mode = b.getAttribute("data-m"); save(); renderMode(); renderPlan();
+    if (order && !order.picked) { order.mode = S.mode; order.travel = travelMin(order.i); if (order.onWay) retime(curMin()); renderOrder(curMin()); }
+  });
+  function curMin() { return lastU ? lastU.m : startMin(); }
+  function renderPlan() {
+    var m = curMin(), q = quote(m), box = $("plan"), prep = $("prepTx");
+    if (!P) { box.hidden = true; prep.textContent = ""; return; }
+    if (q.i < 0) { box.hidden = false; $("planWhere").textContent = ""; setHTML("planMsg", t("planClosed")); $("planCd").hidden = true; $("planSub").textContent = ""; prep.textContent = ""; $("send").classList.add("off"); return; }
+    $("send").classList.toggle("off", !cartCount());
+    if (!cartCount()) { box.hidden = true; prep.innerHTML = t("planPick"); return; }
+    box.hidden = false;
+    prep.innerHTML = q.q ? fmt(t("prepTx"), { p: q.cook, q: q.q * PER_ORDER, o: q.q }) : fmt(t("prepTxNo"), { p: q.cook });
+    var w = fmt(t(S.mode === "drive" ? "wDrive" : "wWalk"), { m: dur(q.travel) }), s = P.stops[q.i];
+    $("planWhere").textContent = fmt(t(q.opensLater ? "planWhereLater" : "planWhere"), { n: q.i + 1, s: stopLabel(q.i), t: hm(s.open), w: w });
+    var cd = $("planCd"); cd.hidden = false;
+    if (q.leave - m > 0.5) {
+      setHTML("planMsg", fmt(t("planLeave"), { r: hm(q.ready), l: hm(q.leave) }));
+      cd.className = "cd"; cd.textContent = fmt(t("cdLeave"), { m: dur(q.leave - m) });
+    } else {
+      setHTML("planMsg", fmt(t("planLeaveNow"), { r: hm(q.ready), m: dur(q.travel) }));
+      cd.className = "cd now"; cd.textContent = t("cdNow");
+    }
+    $("planSub").textContent = t("planSub");
+  }
+  $("send").addEventListener("click", function () {
+    unlocked = true;
+    var m = curMin(), q = quote(m);
+    if (q.i < 0) return;
+    if (!cartCount()) { toast(t("toastPick")); return; }
+    order = { code: "TT-" + Math.floor(1000 + Math.random() * 9000), i: q.i, placed: m, q: q.q, cook: q.cook, mode: S.mode, travel: q.travel,
+      cookStart: Math.max(m, P.stops[q.i].open) + q.q * PER_ORDER, onWay: false, arrive: null, picked: false, pingd: false };
+    order.ready = order.cookStart + order.cook;
+    $("trk").hidden = false; $("oCode").textContent = order.code;
+    renderOrder(m); toast(fmt(t("toastSent"), { c: order.code }));
+    $("trk").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+  // "I'm on my way": the truck times the cook so it finishes as you arrive
+  function retime(m) {
+    var o = order; o.arrive = Math.max(m + o.travel, P.stops[o.i].open);
+    var earliest = Math.max(m, P.stops[o.i].open) + o.q * PER_ORDER; // can't jump the line
+    o.cookStart = Math.max(earliest, o.arrive - o.cook); o.ready = o.cookStart + o.cook;
+  }
+  $("onWay").addEventListener("click", function () {
+    if (!order || order.onWay || order.picked) return;
+    var m = curMin(); order.onWay = true; order.travel = travelMin(order.i);
+    if (m < order.cookStart) retime(m); else order.arrive = Math.max(m + order.travel, P.stops[order.i].open);
+    renderOrder(m); toast(t("toastOnWay"));
+  });
+  function pickUp() {
+    if (!order || order.picked) return;
+    order.picked = true; if (S.joined) { S.pts += 10; save(); renderPts(); }
+    renderOrder(curMin()); toast(t("toastPicked"));
+  }
+  $("pickedUp").addEventListener("click", pickUp);
+  $("newOrder").addEventListener("click", function () { order = null; cart = {}; $("trk").hidden = true; renderMenu(); renderPlan(); $("order").scrollIntoView({ behavior: "smooth" }); });
+  function renderOrder(m) {
+    var o = order; if (!o) return;
+    var stage = o.picked ? 4 : m >= o.ready ? 3 : m >= o.cookStart ? 2 : 1;
+    var subs = [fmt(t("o1s"), { o: o.q, t: hm(o.placed) }), fmt(t("o2s"), { t: hm(o.cookStart) }),
+      stage === 3 ? fmt(t("o3hot"), { m: dur(m - o.ready) }) : fmt(t("o3s"), { t: hm(o.ready) }), t("o4s")];
+    var html = ["o1", "o2", "o3", "o4"].map(function (k, n) {
+      var c = n + 1 < stage || (stage === 4 && n === 3) ? "done" : n + 1 === stage ? "cur" : "";
+      return '<li class="' + c + '">' + t(k) + "<small>" + (n === 3 && stage < 4 ? "" : subs[n]) + "</small></li>";
+    }).join("");
+    setHTML("oSteps", html);
+    var chef = $("oChef"), tx;
+    if (stage >= 3) tx = fmt(t("chefDone"), { c: o.code });
+    else if (o.onWay) {
+      if (o.ready < o.arrive - 0.5) tx = fmt(t("chefEarly"), { m: dur(o.arrive - o.ready) });
+      else if (o.ready > o.arrive + 0.5) tx = fmt(t("chefLate"), { t: hm(o.ready), m: dur(o.ready - o.arrive) });
+      else if (m < o.cookStart) tx = fmt(t("chefWait"), { m: dur(o.cookStart - m), t: hm(o.ready) });
+      else tx = fmt(t("chefNow"), { t: hm(o.ready) });
+    }
+    chef.hidden = !tx; if (tx) setHTML("oChefTx", tx);
+    var ow = $("onWay"); ow.textContent = t(o.onWay ? "onWayOn" : "onWay"); ow.classList.toggle("off", o.onWay || o.picked);
+    $("pickedUp").classList.toggle("off", o.picked || stage < 3);
+  }
+  function tickOrder(m) {
+    renderPlan();
+    if (!order) return;
+    if (!order.picked && m >= order.ready && !order.pingd) {
+      order.pingd = true; if (S.ready) ring(t("nReadyT"), fmt(t("nReadyB"), { c: order.code }), { order: true, go: "track" });
+    }
+    // the demo picks it up for you a couple of minutes after you arrive
+    if (!order.picked && order.onWay && order.arrive != null && m >= Math.max(order.arrive, order.ready) + 2) pickUp();
+    renderOrder(m);
+  }
+
+  /* ---------- join + location ---------- */
+  function showJoin() {
+    $("joinForm").hidden = S.joined; $("joined").hidden = !S.joined;
+    if (S.joined) $("hello").textContent = S.name ? fmt(t("hello"), { n: S.name }) : t("helloAnon");
+  }
+  $("joinForm").addEventListener("submit", function (e) {
+    e.preventDefault(); S.name = $("name").value.trim().slice(0, 30); if (!S.joined) { S.joined = true; S.pts += 10; } save(); showJoin(); renderPts(); toast(t("toastBuy"));
+  });
+  $("locBtn").addEventListener("click", function () {
+    var m = $("locMsg");
+    if (!navigator.geolocation) { m.textContent = t("locNA"); $("streetFld").hidden = false; return; }
+    m.textContent = t("locAsking");
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      m.textContent = t("locOk"); setHome(pos.coords.latitude, pos.coords.longitude, "gps");
+    }, function () { m.textContent = t("locNo"); }, { timeout: 12000, maximumAge: 600000 });
+  });
+  $("typeBtn").addEventListener("click", function () { $("streetFld").hidden = false; $("street").focus(); });
+  var geoBusy = false;
+  $("street").addEventListener("change", function () {
+    var v = this.value.trim(); if (!v || geoBusy) return;
+    $("locMsg").textContent = fmt(t("streetOk"), { s: v });
+    if (!window.fetch) return;
+    geoBusy = true; $("homeMsg").textContent = fmt(t("homeFinding"), { s: v });
+    timedFetch(NOMINATIM + "search?format=jsonv2&limit=1&countrycodes=us&accept-language=" + ICE.lang + "&q=" + encodeURIComponent(v), 12000).then(function (j) {
+      geoBusy = false;
+      if (j && j[0] && isFinite(+j[0].lat)) { setHome(+j[0].lat, +j[0].lon, "typed", v); $("lmap").scrollIntoView({ behavior: "smooth", block: "center" }); }
+      else $("homeMsg").textContent = t("homeNotFound");
+    }).catch(function () { geoBusy = false; $("homeMsg").textContent = t("homeNotFound"); });
+  });
+
+  /* ---------- points + visit card (same rules as the ice cream app) ---------- */
+  var REW = [{ k: "r1", c: 30, e: "🪙" }, { k: "r2", c: 50, e: "🥛" }, { k: "r3", c: 80, e: "🌽" }, { k: "r4", c: 150, e: "🌯" }];
+  var code = function () { return "TT-" + Math.floor(1000 + Math.random() * 9000); };
+  function renderPts() {
+    $("ptsN").textContent = S.pts;
+    var next = REW.filter(function (r) { return r.c > S.pts; })[0];
+    $("ptsBar").style.width = Math.min(100, S.pts / (next ? next.c : S.pts || 1) * 100) + "%";
+    $("ptsNext").textContent = next ? fmt(t("ptsNext"), { n: next.c - S.pts, r: t(next.k) }) : t("ptsAll");
+    var box = $("rwl"); box.innerHTML = "";
+    REW.forEach(function (r) {
+      var row = document.createElement("div"), ok = S.pts >= r.c; row.className = "rwi";
+      row.innerHTML = '<span class="e" aria-hidden="true">' + r.e + '</span><div><b></b><small></small></div><button type="button" class="btn ' + (ok ? "primary" : "ghost off") + '"></button>';
+      row.querySelector("b").textContent = t(r.k); row.querySelector("small").textContent = fmt(t("need"), { n: r.c });
+      var b = row.querySelector("button"); b.textContent = t("redeem"); b.disabled = !ok;
+      b.addEventListener("click", function () {
+        if (S.pts < r.c) return; S.pts -= r.c; save(); renderPts();
+        $("codeBox").hidden = false; $("code").textContent = code() + " · " + t(r.k); toast(t("toastRedeem"));
+      });
+      box.appendChild(row);
+    });
+  }
+  $("buy").addEventListener("click", function () {
+    if (!S.joined) { toast(t("toastJoin")); $("join").scrollIntoView({ behavior: "smooth" }); return; }
+    S.pts += 10; save(); renderPts(); toast(t("toastBuy"));
+  });
+  function renderVisits() {
+    var v = Math.min(5, S.visits || 0), box = $("punch"); box.innerHTML = "";
+    for (var n = 1; n <= 5; n++) {
+      var c = document.createElement("span");
+      if (n <= v) { c.className = "on"; c.textContent = "🌮"; } else if (n === 5) { c.className = "gift"; c.textContent = "🎁"; } else c.textContent = n;
+      box.appendChild(c);
+    }
+    $("vNext").textContent = v >= 5 ? t("vReady") : (5 - v === 1 ? t("vLast") : fmt(t("vNext"), { n: 5 - v }));
+    $("pick").hidden = v < 5; $("checkin").style.display = v >= 5 ? "none" : "";
+    var b = $("bonus");
+    b.className = "bonus " + (S.alerts ? "on" : "off");
+    b.innerHTML = '<i aria-hidden="true">' + (S.alerts ? "🔔" : "🔕") + '</i><span>' + t(S.alerts ? "bonusOn" : "bonusOff") + '</span>' +
+      (S.alerts ? "" : '<button type="button" class="btn gold" id="bonusFix">' + t("bonusFix") + '</button>');
+    if (!S.alerts) $("bonusFix").addEventListener("click", function () { setAlerts(true); });
+  }
+  function setAlerts(on) { S.alerts = on; save(); renderSet(); renderVisits(); toast(t(on ? "toastAlertsOn" : "toastAlertsOff")); }
+  $("checkin").addEventListener("click", function () {
+    if (!S.joined) { toast(t("toastJoin")); $("join").scrollIntoView({ behavior: "smooth" }); return; }
+    if ((S.visits || 0) >= 5) return;
+    S.visits = (S.visits || 0) + 1; if (S.alerts) S.pts += 5;
+    save(); renderVisits(); renderPts(); $("vCodeBox").hidden = true;
+    toast(fmt(t(S.alerts ? "toastVisitBonus" : "toastVisit"), { v: S.visits }));
+  });
+  function pickTreat(k) {
+    if ((S.visits || 0) < 5) return;
+    S.visits = 0; save(); renderVisits();
+    $("vCodeBox").hidden = false; $("vCode").textContent = code() + " · " + t(k); toast(t("toastPickT"));
+  }
+  $("pick10").addEventListener("click", function () { pickTreat("t10"); });
+  $("pickDrink").addEventListener("click", function () { pickTreat("tDrink"); });
+
+  /* ---------- settings ---------- */
+  function renderSet() {
+    [].forEach.call($("dist").children, function (b) { b.setAttribute("aria-pressed", +b.getAttribute("data-d") === S.radius ? "true" : "false"); });
+    $("alertsOn").checked = S.alerts; $("readyOn").checked = S.ready; $("soundOn").checked = S.sound;
+    if (zoneC) zoneC.setRadius(S.radius * MI);
+  }
+  $("dist").addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b) return; S.radius = +b.getAttribute("data-d"); save(); renderSet(); });
+  $("alertsOn").addEventListener("change", function () { setAlerts(this.checked); });
+  $("readyOn").addEventListener("change", function () { S.ready = this.checked; save(); });
+  $("soundOn").addEventListener("change", function () { S.sound = this.checked; save(); });
+  $("reset").addEventListener("click", function () {
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    S = JSON.parse(JSON.stringify(DEF)); order = null; cart = {}; $("trk").hidden = true;
+    $("name").value = ""; $("street").value = ""; $("locMsg").textContent = ""; $("codeBox").hidden = true; $("vCodeBox").hidden = true;
+    home = { lat: SAMPLE_HOME.lat, lng: SAMPLE_HOME.lng }; renderHomeMsg();
+    if (homeMk) { homeMk.setLatLng([home.lat, home.lng]); zoneC.setLatLng([home.lat, home.lng]); }
+    loadPlan(); showJoin(); renderPts(); renderVisits(); renderSet(); renderMode(); renderMenu(); toast(t("resetDone"));
+  });
+
+  (function () { // read-aloud explainer
+    var b = $("explain");
+    function ui() { b.textContent = ICE.t(Speak.speaking ? "explainStop" : "explain"); b.setAttribute("aria-pressed", Speak.speaking ? "true" : "false"); }
+    b.addEventListener("click", function () { if (Speak.speaking) Speak.stop(); else Speak.say(ICE.t("explainSay")); ui(); });
+    Speak.on(ui); Speak.css(); ICE.on(ui);
+  })();
+  ICE.on(function () {
+    showJoin(); renderPts(); renderVisits(); renderMenu(); renderHomeMsg(); renderStops();
+    if (homeMk) homeMk.setIcon(homeIcon());
+    var mk = $("mapMsg"); if (!mk.hidden) mk.textContent = t(mk.getAttribute("data-k"));
+    shown = {}; if (lastU) render(lastU);
+  });
+  // handy for testing: FTDemo.jump(17*60+25) → 5:25 PM
+  window.FTDemo = { feed: TruckFeed, get plan() { return P; }, get order() { return order; }, jump: function (m) { TruckFeed.simulate.m = m; TruckFeed.simulate.send(); }, addToCart: function (id, n) { cart[id] = n; renderMenu(); renderPlan(); } };
+
+  initMap(); renderHomeMsg(); renderSpeed(); renderMode(); renderMenu(); showJoin(); renderPts(); renderVisits(); renderSet();
+  loadPlan();
+})();
+</script>
+<script src="../../demo/poweredby.js?v=20261013a" defer></script>
+</body>
+</html>

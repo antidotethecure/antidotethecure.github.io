@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+<title>Mobile mechanic app icon: car up on jack stands, hood open, wrench in the engine bay</title>
+<defs>
+<radialGradient id="bg" cx=".5" cy=".2" r=".95"><stop offset="0" stop-color="#22324f"/><stop offset=".5" stop-color="#0b1222"/><stop offset="1" stop-color="#04060c"/></radialGradient>
+<linearGradient id="or" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb36b"/><stop offset=".55" stop-color="#ff7a1a"/><stop offset="1" stop-color="#d9520a"/></linearGradient>
+<linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fe6ff"/><stop offset=".55" stop-color="#14a9d6"/><stop offset="1" stop-color="#0b5f88"/></linearGradient>
+<linearGradient id="gl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9f6ff" stop-opacity=".9"/><stop offset="1" stop-color="#7fb8d6" stop-opacity=".55"/></linearGradient>
+<linearGradient id="st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#b9c4da"/></linearGradient>
+<radialGradient id="bay" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#ffb36b"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></radialGradient>
+<filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="12" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity=".55"/></filter>
+<clipPath id="sq"><rect width="1024" height="1024" rx="228"/></clipPath>
+<mask id="jaw"><rect width="1024" height="1024" fill="#fff"/><rect x="-26" y="-118" width="52" height="92" rx="8" fill="#000"/></mask>
+</defs>
+<g clip-path="url(#sq)">
+<rect width="1024" height="1024" fill="url(#bg)"/>
+<g stroke="#2de2ff" stroke-opacity=".07" stroke-width="4"><path d="M0 256H1024M0 512H1024M0 768H1024M256 0V1024M512 0V1024M768 0V1024"/></g>
+<!-- shop floor -->
+<ellipse cx="470" cy="792" rx="400" ry="26" fill="#000" opacity=".45"/>
+<path d="M70 792H900" stroke="#2de2ff" stroke-opacity=".35" stroke-width="6" stroke-linecap="round"/>
+<!-- jack stands -->
+<g filter="url(#sh)"><g stroke="#ff8a2a" stroke-linecap="round" fill="none"><path d="M400 700V728" stroke-width="20"/><path d="M400 724L350 786M400 724L450 786" stroke-width="16"/><path d="M338 788H462" stroke-width="14"/></g><path d="M370 660V676Q370 700 400 700Q430 700 430 676V660" fill="none" stroke="#ff8a2a" stroke-width="14" stroke-linecap="round"/><g stroke="#ff8a2a" stroke-linecap="round" fill="none"><path d="M540 700V728" stroke-width="20"/><path d="M540 724L490 786M540 724L590 786" stroke-width="16"/><path d="M478 788H602" stroke-width="14"/></g><path d="M510 660V676Q510 700 540 700Q570 700 570 676V660" fill="none" stroke="#ff8a2a" stroke-width="14" stroke-linecap="round"/></g>
+<!-- car body (raised) -->
+<g filter="url(#sh)">
+<path d="M120 640V574Q124 540 162 532L272 520L362 432Q384 412 414 412H580Q606 412 626 432L702 508L792 516Q814 520 814 546V640Q814 660 794 660H140Q120 660 120 640Z" fill="url(#body)"/>
+<path d="M302 516L372 448Q386 436 404 436H478V516Z" fill="url(#gl)"/>
+<path d="M496 436H572Q592 436 606 450L668 512L496 516Z" fill="url(#gl)"/>
+<path d="M130 590H806" stroke="#0b1222" stroke-opacity=".35" stroke-width="6"/>
+<rect x="128" y="560" width="26" height="16" rx="6" fill="#ff4b4b"/>
+<rect x="786" y="550" width="24" height="16" rx="6" fill="#fff6c9"/>
+</g>
+<!-- engine bay glow + engine -->
+<ellipse cx="760" cy="508" rx="70" ry="34" fill="url(#bay)" opacity=".9"/>
+<rect x="718" y="486" width="76" height="30" rx="7" fill="#1b2740" stroke="#ff7a1a" stroke-width="5"/>
+<!-- open hood + strut -->
+<path d="M770 518L806 446" stroke="#cfe3f2" stroke-width="7" stroke-linecap="round"/>
+<path d="M698 506L716 520L866 398Q872 386 858 380L846 376Z" fill="url(#st)" filter="url(#sh)"/>
+<!-- wheels -->
+<g>
+<circle cx="242" cy="660" r="84" fill="#04060c"/><circle cx="242" cy="660" r="70" fill="#141a26"/><circle cx="242" cy="660" r="38" fill="url(#st)"/><circle cx="242" cy="660" r="12" fill="#0b1222"/>
+<circle cx="690" cy="660" r="84" fill="#04060c"/><circle cx="690" cy="660" r="70" fill="#141a26"/><circle cx="690" cy="660" r="38" fill="url(#st)"/><circle cx="690" cy="660" r="12" fill="#0b1222"/>
+</g>
+<!-- wrench working in the bay -->
+<g transform="translate(752 470) rotate(140)" filter="url(#sh)">
+<rect x="-20" y="40" width="40" height="240" rx="15" fill="url(#st)"/>
+<circle cx="0" cy="0" r="70" fill="url(#or)" mask="url(#jaw)"/>
+<circle cx="0" cy="292" r="48" fill="url(#or)"/><circle cx="0" cy="292" r="19" fill="#0b1222"/>
+</g>
+<!-- sparks -->
+<g stroke="#ffd27a" stroke-width="7" stroke-linecap="round" filter="url(#glow)">
+<path d="M800 474l30-14M806 498l36 2M786 458l14-26"/>
+</g>
+<text x="512" y="910" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="96" letter-spacing="10" fill="#eef3ff" opacity=".92">DEMO</text>
+</g>
+</svg>

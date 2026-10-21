@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ice Cream Trucks: Route House Counter</title>
+<meta name="description" content="Draw your ice cream truck route and count the houses and apartments you drive past: the homes that could get a 'truck nearby' alert. English and Spanish.">
+<meta name="theme-color" content="#03060e">
+<link rel="canonical" href="https://antidotethecure.github.io/ice-cream/route/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SousShift AI">
+<meta property="og:title" content="How many homes are on your ice cream truck route?">
+<meta property="og:description" content="Draw your route, count the homes, see who you're missing. English y español.">
+<meta property="og:url" content="https://antidotethecure.github.io/ice-cream/route/">
+<meta property="og:image" content="https://antidotethecure.github.io/sousshift/img/og.jpg">
+<link rel="icon" href="../../second-shift/img/ssai-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="../ice.css">
+<style>
+.hero{text-align:center;padding:22px 0 0}
+.hero h1{font-size:clamp(24px,6.6vw,38px)}
+.hero .lead{max-width:600px;margin:10px auto 0;font-size:17.5px}
+.hero .row{max-width:520px;margin:16px auto 0}
+.top .back{font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap}
+@media(max-width:420px){.top b small{display:none}}
+@media(max-width:480px){.top b{display:none}}
+
+.mapcard{padding:0;overflow:hidden}
+#map{height:min(58vh,480px);min-height:300px;background:#cfd9e6;cursor:crosshair}
+.maphint{padding:10px 14px 0;font-size:14.5px;color:var(--dim)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px 14px}
+.tools .btn{flex:1 1 90px;min-height:44px;padding:10px 12px;font-size:11.5px}
+.sw{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;flex:1 1 100%;min-height:40px;cursor:pointer}
+.sw input{width:22px;height:22px;accent-color:var(--blue);margin:0}
+.stats{display:flex;flex-wrap:wrap;gap:6px 16px;padding:0 14px 12px;font-size:15px;color:var(--silver)}
+.stats b{font-family:"Orbitron",sans-serif;color:var(--ink);font-size:15px}
+.flash{margin:0 14px 12px;padding:9px 12px;border-radius:12px;font-size:14.5px;line-height:1.3;border:1px solid rgba(255,184,107,.5);background:rgba(255,184,107,.08);color:var(--warn)}
+.flash[hidden]{display:none}
+.flash.ok{border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.08);color:var(--good)}
+
+.fld{margin:10px 0}
+.fld label{display:block;font-weight:700;font-size:15px;margin-bottom:4px}
+.fld input[type=text],.fld input[type=search]{width:100%;min-height:46px;border-radius:12px;border:1px solid var(--edge);background:#061024;color:var(--ink);font:600 16px "Rajdhani",sans-serif;padding:8px 12px}
+.stop{display:flex;gap:8px;margin-top:8px}
+.stop input{flex:1}
+.stop button{flex:none;width:46px;min-height:46px;border-radius:12px;border:1px solid var(--edge);background:none;color:var(--dim);font-size:18px;cursor:pointer}
+.slider label{display:flex;justify-content:space-between;gap:10px;font-weight:700;font-size:15.5px}
+.slider output{font-family:"Orbitron",sans-serif;color:var(--gold);font-size:14px;white-space:nowrap}
+.slider small{display:block;color:var(--dim);font-size:13px}
+.slider input{width:100%;accent-color:var(--blue);height:32px;margin:4px 0 0}
+
+.bar{height:10px;border-radius:99px;background:#0a1631;border:1px solid var(--edge);overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--gold));transition:width .3s}
+.prog[hidden]{display:none}
+.prog p{margin:6px 0 0;font-size:14.5px;color:var(--dim)}
+
+.big3{display:grid;gap:8px;margin-top:4px}
+.big3 div{background:rgba(255,255,255,.04);border:1px solid var(--edge);border-radius:14px;padding:12px;font-size:15px;color:var(--dim);line-height:1.25;text-align:center}
+.big3 b{display:block;font-family:"Orbitron",sans-serif;font-size:clamp(26px,8vw,38px);color:var(--ink);line-height:1.1;margin-bottom:2px}
+.big3 .hl{border-color:rgba(255,209,102,.6);background:rgba(255,209,102,.08)}
+.big3 .hl b{color:var(--gold)}
+.big3 .gd{border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.08)}
+.big3 .gd b{color:var(--good)}
+@media(min-width:620px){.big3{grid-template-columns:1fr 1fr}.big3 .wide{grid-column:1/-1}}
+.stale{color:var(--warn);font-weight:700;font-size:14.5px;margin:8px 0 0}
+.stale[hidden]{display:none}
+#results[hidden]{display:none}
+
+.saved{list-style:none;margin:10px 0 0;padding:0}
+.saved li{display:flex;gap:8px;align-items:center;border-top:1px solid var(--edge);padding:8px 0}
+.saved li:first-child{border-top:0}
+.saved li span{flex:1;min-width:0;font-weight:700;line-height:1.2;overflow-wrap:anywhere}
+.saved li small{display:block;color:var(--dim);font-weight:600;font-size:13px}
+.saved li button{flex:none;min-height:40px;border-radius:10px;border:1px solid var(--edge);background:none;color:var(--volt);font:700 14px "Rajdhani",sans-serif;padding:0 12px;cursor:pointer}
+.saved li button.del{color:var(--dim)}
+.leaflet-container{font-family:"Rajdhani",system-ui,sans-serif}
+.leaflet-control-attribution{font-size:11px}
+.wpt{background:var(--blue);color:#fff;border:2px solid #fff;border-radius:50%;font:800 11px/18px "Rajdhani",sans-serif;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <img class="brand" src="../../assets/sousshift-lockup-800w.png" alt="SousShift AI">
+  <b>SousShift AI<small data-t="topSub">for Ice Cream Trucks</small></b>
+  <a href="../details/" class="back" data-t="back">← Details</a><span class="sp"></span>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">English</button><button data-lang="es" aria-pressed="false" lang="es">Español</button></div>
+</div></div>
+
+<main class="wrap">
+  <header class="hero">
+    <p class="kick" data-t="kick">Route house counter</p>
+    <h1 class="chrome" data-t="h1">How many homes are on your route?</h1>
+    <p class="lead" data-t="lead">Draw the route you drive. We count every house and apartment along it. That's how many homes could get your "truck nearby" alert, and how many you're missing today.</p>
+    <div class="row">
+      <button class="btn gold" type="button" id="sample" data-t="sampleBtn">🍦 Try a sample route</button>
+      <a class="btn ghost" href="#addr" data-t="typeBtn">⌨️ Type addresses</a>
+    </div>
+  </header>
+
+  <section class="s" style="margin-top:22px">
+    <div class="card mapcard">
+      <p class="maphint" data-t="hint">Tap the map to drop points along your route, in the order you drive.</p>
+      <div id="map" role="application" aria-label="Map: tap to add route points"></div>
+      <div class="tools">
+        <label class="sw"><input type="checkbox" id="follow" checked> <span data-t="follow">Follow the streets</span></label>
+        <button class="btn ghost" type="button" id="undo" data-t="undo">↶ Undo</button>
+        <button class="btn ghost" type="button" id="clear" data-t="clear">✕ Clear</button>
+      </div>
+      <div class="stats" aria-live="polite"><span><span data-t="miles">Route</span> <b id="mi">0.0 mi</b></span><span><span data-t="drive">Drive time</span> <b id="tm">—</b></span></div>
+      <p class="flash" id="flash" hidden></p>
+    </div>
+  </section>
+
+  <section class="s" id="addr" style="margin-top:18px">
+    <div class="card">
+      <h3 data-t="addrH">Or type your route</h3>
+      <div class="fld"><label for="a0" data-t="startL">Start address</label><input type="search" id="a0" autocomplete="street-address" data-t-ph="startPh" placeholder="e.g. 400 W Spruce St, Compton"></div>
+      <div id="stops"></div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn ghost" type="button" id="addstop" data-t="addStop">+ Add a stop</button>
+        <button class="btn primary" type="button" id="snap" data-t="snap">Snap to streets</button>
+      </div>
+      <p class="note" id="geostat" aria-live="polite" style="margin:8px 0 0"></p>
+    </div>
+  </section>
+
+  <section class="s" style="margin-top:18px">
+    <div class="card">
+      <div class="slider">
+        <label><span data-t="bufL">How far the music carries</span><output id="o-buf"></output></label>
+        <small data-t="bufS">Each side of the street. 45 m (about 150 ft) is the houses facing the street. Go wider to include the next row back.</small>
+        <input type="range" id="buf" min="30" max="150" step="5" value="45">
+      </div>
+      <div class="row" style="margin-top:12px"><button class="btn gold" type="button" id="count" data-t="countBtn">🏠 Count the homes</button></div>
+      <div class="prog" id="prog" hidden><div class="bar"><i id="bar"></i></div><p id="progt"></p></div>
+    </div>
+  </section>
+
+  <section class="s" id="results" hidden style="margin-top:18px">
+    <header><p class="kick" data-t="resKick">Your route</p><h2 class="chrome" id="resName"></h2></header>
+    <div class="card">
+      <div class="big3" aria-live="polite">
+        <div class="hl"><b id="r-homes">0</b><span data-t="rHomes">🏠 homes on your route</span></div>
+        <div><b id="r-apts">0</b><span id="r-apts-l"></span></div>
+        <div class="wide"><b id="r-total">0</b><span data-t="rTotal">homes could get your "truck nearby" alert</span></div>
+        <div class="wide gd"><b id="r-ring">0</b><span id="r-ring-l"></span></div>
+        <div class="wide gd"><b id="r-money">$0</b><span id="r-money-l"></span></div>
+      </div>
+      <p class="stale" id="stale" hidden data-t="stale">You widened the range past what we loaded. Tap "Count the homes" again for the new number.</p>
+      <div class="row" style="margin-top:14px"><a class="btn primary" id="tocalc" href="../details/#numbers" data-t="toCalc">Use these homes in the calculator →</a></div>
+      <p class="note" data-t="missing" style="margin-top:12px"></p>
+      <p class="note" data-t="honest"></p>
+    </div>
+  </section>
+
+  <section class="s" style="margin-top:18px">
+    <div class="card">
+      <h3 data-t="saveH">Save and share</h3>
+      <div class="fld"><label for="rname" data-t="nameL">Route name</label><input type="text" id="rname" maxlength="60" data-t-ph="namePh" placeholder="Saturday – Compton loop"></div>
+      <div class="row">
+        <button class="btn ghost" type="button" id="save" data-t="saveBtn">💾 Save route</button>
+        <button class="btn ghost" type="button" id="share" data-t="shareBtn">🔗 Copy share link</button>
+      </div>
+      <p class="note" id="savestat" aria-live="polite" style="margin:8px 0 0"></p>
+      <ul class="saved" id="saved"></ul>
+    </div>
+  </section>
+</main>
+
+<footer class="f wrap">
+  <img src="../../assets/sousshift-lockup-800w.png" alt="SousShift AI">
+  <span data-t="foot">SousShift AI · built by Antidote</span><br>
+  <small data-t="credits">Map and building data © OpenStreetMap contributors (ODbL). Street routing: OSRM. Address search: Nominatim. Building counts: Overpass API.</small>
+</footer>
+
+<script>
+window.T = {
+en: {
+  _title: "Ice Cream Trucks: Route House Counter",
+  topSub: "for Ice Cream Trucks", back: "← Details",
+  kick: "Route house counter", h1: "How many homes are on your route?",
+  lead: "Draw the route you drive. We count every house and apartment along it. That's how many homes could get your \"truck nearby\" alert, and how many you're missing today.",
+  sampleBtn: "🍦 Try a sample route", typeBtn: "⌨️ Type addresses",
+  hint: "Tap the map to drop points along your route, in the order you drive.",
+  follow: "Follow the streets", undo: "↶ Undo", clear: "✕ Clear", miles: "Route", drive: "Drive time",
+  driveV: "{a}–{b} <span class=\"est\">estimate</span>", driveS: "at 8–10 mph with stops",
+  addrH: "Or type your route", startL: "Start address", startPh: "e.g. 400 W Spruce St, Compton",
+  stopL: "Stop {n}", stopPh: "Street address or cross streets", addStop: "+ Add a stop", snap: "Snap to streets", rmStop: "Remove stop",
+  bufL: "How far the music carries", bufS: "Each side of the street. 45 m (about 150 ft) is the houses facing the street. Go wider to include the next row back.",
+  bufV: "{m} m · {ft} ft",
+  countBtn: "🏠 Count the homes",
+  resKick: "Your route", rHomes: "🏠 homes on your route",
+  rApts: "🏢 apartment buildings (~{u} units <span class=\"est\">estimate</span>)",
+  rTotal: "homes could get your \"truck nearby\" alert",
+  rRing: "families get a ring when you're on their street (if {j}% join, same as the calculator)",
+  rMoney: "extra per month for THIS route, if you drive it on each of your {d} work days <span class=\"est\">estimate</span>",
+  toCalc: "Use these homes in the calculator →",
+  missing: "Today about half of these homes never hear your music (our estimate). The alert reaches the ones who join, even with the TV on.",
+  honest: "<b>Straight talk:</b> buildings come from OpenStreetMap. In most of LA County it's very good (it comes from the county's own building data), but it can miss some, and it's thinner outside LA. It counts buildings and units, not people. Apartment units are estimated when the map doesn't list them.",
+  stale: "You widened the range past what we loaded. Tap \"Count the homes\" again for the new number.",
+  saveH: "Save and share", nameL: "Route name", namePh: "Saturday – Compton loop",
+  saveBtn: "💾 Save route", shareBtn: "🔗 Copy share link",
+  open: "Open", del: "Delete", savedOk: "Saved on this phone.", copied: "Link copied. Text it to anyone.", copyFail: "Copy this link:",
+  needPts: "Add at least 2 points first.", noSaved: "",
+  untitled: "My route", sampleName: "Sample – West Compton loop",
+  fRouting: "Finding the streets…", fStraight: "Couldn't reach the street router, so we connected your points with straight lines. Counts still work; miles may be a little short.",
+  fOffStreets: "Straight lines between your points (Follow the streets is off).",
+  fSampleOk: "Sample route loaded from saved data, no waiting. Count from OpenStreetMap, built {d}.",
+  geoLooking: "Looking up {n} of {t}…", geoMiss: "Couldn't find: {a}. Try adding the city, or tap the map instead.", geoNeed: "Type a start address and at least one stop.",
+  geoDone: "Found {n} places. Snapped to streets.", geoFail: "Address search is busy. Try again in a minute, or tap the map.",
+  pLoading: "Counting homes… part {i} of {n}", pRetry: "Map server is busy. Trying again in {s} s…",
+  pPartial: "Part of the route didn't load (the free map server is busy), so this count is a little low. Try again in a minute.",
+  pFail: "The free map server is busy right now. Wait a minute and tap \"Count the homes\" again.",
+  pTooLong: "That route is very long. Split it into routes under 25 miles so the free map server can handle it.",
+  pDone: "Done. Counted {n} homes along {mi} miles.",
+  foot: "SousShift AI · built by Antidote",
+  credits: "Map and building data © OpenStreetMap contributors (ODbL). Street routing: OSRM. Address search: Nominatim. Building counts: Overpass API."
+},
+es: {
+  _title: "Troques de Helados: Contador de Casas en tu Ruta",
+  topSub: "para Troques de Helados", back: "← Detalles",
+  kick: "Contador de casas en tu ruta", h1: "¿Cuántas casas hay en tu ruta?",
+  lead: "Dibuja la ruta que manejas. Contamos cada casa y apartamento a lo largo de ella. Son las casas que podrían recibir tu alerta de \"el troque está cerca\", y las que hoy te estás perdiendo.",
+  sampleBtn: "🍦 Ver una ruta de ejemplo", typeBtn: "⌨️ Escribir direcciones",
+  hint: "Toca el mapa para poner puntos a lo largo de tu ruta, en el orden en que manejas.",
+  follow: "Seguir las calles", undo: "↶ Deshacer", clear: "✕ Borrar", miles: "Ruta", drive: "Tiempo manejando",
+  driveV: "{a}–{b} <span class=\"est\">estimado</span>", driveS: "a 8–10 mph con paradas",
+  addrH: "O escribe tu ruta", startL: "Dirección de salida", startPh: "ej. 400 W Spruce St, Compton",
+  stopL: "Parada {n}", stopPh: "Dirección o calles que cruzan", addStop: "+ Agregar parada", snap: "Ajustar a las calles", rmStop: "Quitar parada",
+  bufL: "Hasta dónde se oye la música", bufS: "De cada lado de la calle. 45 m (unos 150 pies) son las casas que dan a la calle. Súbele para incluir la siguiente fila de casas.",
+  bufV: "{m} m · {ft} pies",
+  countBtn: "🏠 Contar las casas",
+  resKick: "Tu ruta", rHomes: "🏠 casas en tu ruta",
+  rApts: "🏢 edificios de apartamentos (~{u} departamentos <span class=\"est\">estimado</span>)",
+  rTotal: "hogares podrían recibir tu alerta de \"el troque está cerca\"",
+  rRing: "familias reciben un timbrazo cuando estás en su calle (si se une el {j}%, igual que en la calculadora)",
+  rMoney: "extra al mes por ESTA ruta, si la manejas en cada uno de tus {d} días de trabajo <span class=\"est\">estimado</span>",
+  toCalc: "Usar estas casas en la calculadora →",
+  missing: "Hoy como la mitad de estas casas nunca oye tu música (nuestro estimado). La alerta les llega a los que se unen, aunque tengan la tele prendida.",
+  honest: "<b>Hablando claro:</b> los edificios vienen de OpenStreetMap. En casi todo el condado de LA son muy buenos (vienen de los datos de edificios del propio condado), pero se le pueden pasar algunos, y fuera de LA hay menos datos. Cuenta edificios y viviendas, no personas. Los departamentos se estiman cuando el mapa no dice cuántos hay.",
+  stale: "Subiste el rango más de lo que cargamos. Toca \"Contar las casas\" otra vez para ver el número nuevo.",
+  saveH: "Guardar y compartir", nameL: "Nombre de la ruta", namePh: "Sábado – vuelta por Compton",
+  saveBtn: "💾 Guardar ruta", shareBtn: "🔗 Copiar link para compartir",
+  open: "Abrir", del: "Borrar", savedOk: "Guardada en este celular.", copied: "Link copiado. Mándalo por texto a quien quieras.", copyFail: "Copia este link:",
+  needPts: "Primero pon al menos 2 puntos.", noSaved: "",
+  untitled: "Mi ruta", sampleName: "Ejemplo – vuelta en West Compton",
+  fRouting: "Buscando las calles…", fStraight: "No pudimos conectar con el buscador de calles, así que unimos tus puntos con líneas rectas. El conteo sí funciona; las millas pueden salir un poco cortas.",
+  fOffStreets: "Líneas rectas entre tus puntos (\"Seguir las calles\" está apagado).",
+  fSampleOk: "Ruta de ejemplo cargada de datos guardados, sin esperar. Conteo de OpenStreetMap, hecho el {d}.",
+  geoLooking: "Buscando {n} de {t}…", geoMiss: "No encontramos: {a}. Agrega la ciudad, o toca el mapa.", geoNeed: "Escribe una dirección de salida y al menos una parada.",
+  geoDone: "Encontramos {n} lugares. Ajustado a las calles.", geoFail: "El buscador de direcciones está ocupado. Intenta en un minuto, o toca el mapa.",
+  pLoading: "Contando casas… parte {i} de {n}", pRetry: "El servidor del mapa está ocupado. Reintentando en {s} s…",
+  pPartial: "Una parte de la ruta no cargó (el servidor gratis del mapa está ocupado), así que el conteo sale un poco bajo. Intenta en un minuto.",
+  pFail: "El servidor gratis del mapa está ocupado ahorita. Espera un minuto y toca \"Contar las casas\" otra vez.",
+  pTooLong: "Esa ruta es muy larga. Divídela en rutas de menos de 25 millas para que el servidor gratis del mapa pueda con ella.",
+  pDone: "Listo. Contamos {n} casas en {mi} millas.",
+  foot: "SousShift AI · hecho por Antidote",
+  credits: "Datos del mapa y edificios © colaboradores de OpenStreetMap (ODbL). Calles: OSRM. Búsqueda de direcciones: Nominatim. Conteo de edificios: Overpass API."
+}};
+</script>
+<script src="../lang.js"></script>
+<script src="../model.js"></script>
+<script src="route-core.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var C = window.RouteCore, M = window.IceModel;
+  var OSRM = "https://router.project-osrm.org/route/v1/driving/";
+  var NOMINATIM = "https://nominatim.openstreetmap.org/search";
+  var OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter", "https://overpass.private.coffee/api/interpreter"];
+  var SAVE_KEY = "ssai:ice:routes";
+  var MAX_MILES = 25;
+
+  var st = {
+    pts: [],          // waypoints the owner placed [lat,lon]
+    line: [],         // drawn route (snapped to streets or straight)
+    snapped: false,
+    name: "",
+    lots: null,       // lots near the route (from Overpass or the cached sample)
+    lotsBuf: 0,       // buffer (m) those lots were loaded for
+    lineKey: "",      // which line the lots belong to
+    sample: null,     // the cached sample, once loaded
+    isSample: false,
+    partial: false
+  };
+
+  function L_() { return ICE.lang === "es" ? "es-US" : "en-US"; }
+  function num(n) { return Math.round(n).toLocaleString(L_()); }
+  function t(k, o) { var s = ICE.t(k); for (var x in (o || {})) s = s.split("{" + x + "}").join(o[x]); return s; }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function key(line) { return line.length + ":" + (line.length ? line[0].join() + ":" + line[line.length - 1].join() + ":" + Math.round(C.lineLength(line)) : ""); }
+  function flash(msg, ok) { var f = $("flash"); if (!msg) { f.hidden = true; return; } f.textContent = msg; f.className = "flash" + (ok ? " ok" : ""); f.hidden = false; }
+
+  /* ---------- map ---------- */
+  var map = L.map("map", { preferCanvas: true, zoomControl: true, doubleClickZoom: false }).setView([33.97, -118.26], 12);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  var canvas = L.canvas({ padding: 0.3 });
+  var lotLayer = L.layerGroup().addTo(map), routeLayer = L.layerGroup().addTo(map), ptLayer = L.layerGroup().addTo(map);
+
+  function drawRoute() {
+    routeLayer.clearLayers(); ptLayer.clearLayers();
+    if (st.line.length > 1) {
+      L.polyline(st.line, { color: "#03060e", weight: 9, opacity: .35, interactive: false }).addTo(routeLayer);
+      L.polyline(st.line, { color: "#2f7bff", weight: 5, opacity: .95, interactive: false, dashArray: st.snapped ? null : "8 8" }).addTo(routeLayer);
+    }
+    st.pts.forEach(function (p, i) {
+      L.marker(p, { icon: L.divIcon({ className: "wpt", html: String(i + 1), iconSize: [20, 20] }), keyboard: false, interactive: false }).addTo(ptLayer);
+    });
+    var m = C.lineLength(st.line) / 1609.344;
+    $("mi").textContent = m.toFixed(1) + " mi";
+    if (m > 0.05) {
+      var a = m / 10 * 60, b = m / 8 * 60;
+      var fa = fmtMin(a), fb = fmtMin(b);
+      if (b < 60) { fa = String(Math.round(a)); }
+      $("tm").innerHTML = t("driveV", { a: fa, b: fb });
+      $("tm").title = ICE.t("driveS");
+    } else $("tm").textContent = "—";
+  }
+  function fmtMin(min) {
+    min = Math.round(min);
+    if (min < 60) return min + " min";
+    return Math.floor(min / 60) + " h " + String(min % 60).padStart(2, "0");
+  }
+  function drawLots() {
+    lotLayer.clearLayers();
+    if (!st.lots || st.lineKey !== key(st.line)) return;
+    var b = buf();
+    st.lots.forEach(function (l) {
+      if (l.d > b) return;
+      L.circleMarker(l.c, { renderer: canvas, radius: l.k === "a" ? 6 : 3.5, color: l.k === "a" ? "#b07a00" : "#8a6a00", weight: 1,
+        fillColor: l.k === "a" ? "#ffb703" : "#ffd166", fillOpacity: .95, interactive: false }).addTo(lotLayer);
+    });
+  }
+
+  /* ---------- routing (OSRM, straight-line fallback) ---------- */
+  var routeSeq = 0, routeTimer = 0;
+  function reroute(now) {
+    clearTimeout(routeTimer);
+    if (now) return doRoute(); routeTimer = setTimeout(doRoute, 350);
+    return Promise.resolve();
+  }
+  function doRoute() {
+    var my = ++routeSeq, pts = st.pts.slice();
+    invalidate();
+    if (pts.length < 2) { st.line = pts; st.snapped = false; drawRoute(); flash(""); return Promise.resolve(); }
+    if (!$("follow").checked) { st.line = pts; st.snapped = false; drawRoute(); flash(ICE.t("fOffStreets")); return Promise.resolve(); }
+    st.line = pts; st.snapped = false; drawRoute(); flash(ICE.t("fRouting"), true);
+    var url = OSRM + pts.map(function (p) { return p[1].toFixed(6) + "," + p[0].toFixed(6); }).join(";") + "?overview=full&geometries=geojson";
+    return timedFetch(url, {}, 15000).then(function (r) { return r.json(); }).then(function (j) {
+      if (my !== routeSeq) return;
+      if (j.code !== "Ok" || !j.routes || !j.routes[0]) throw new Error(j.code || "no route");
+      st.line = j.routes[0].geometry.coordinates.map(function (c) { return [c[1], c[0]]; });
+      st.snapped = true; drawRoute(); flash("");
+    }).catch(function () {
+      if (my !== routeSeq) return;
+      st.line = pts; st.snapped = false; drawRoute(); flash(ICE.t("fStraight"));
+    });
+  }
+  function timedFetch(url, opts, ms) {
+    var ctl = window.AbortController ? new AbortController() : null, id;
+    if (ctl) { opts.signal = ctl.signal; id = setTimeout(function () { ctl.abort(); }, ms); }
+    return fetch(url, opts).finally(function () { clearTimeout(id); });
+  }
+  function invalidate() {
+    st.isSample = false; st.partial = false;
+    $("results").hidden = true; lotLayer.clearLayers();
+  }
+
+  map.on("click", function (e) {
+    st.pts.push([+e.latlng.lat.toFixed(6), +e.latlng.lng.toFixed(6)]);
+    reroute();
+  });
+  $("undo").addEventListener("click", function () { st.pts.pop(); reroute(true); });
+  $("clear").addEventListener("click", function () { st.pts = []; st.line = []; st.name = ""; $("rname").value = ""; reroute(true); history.replaceState(null, "", location.pathname); });
+  $("follow").addEventListener("change", function () { reroute(true); });
+
+  /* ---------- addresses (Nominatim: one request at a time, ≥1.1 s apart, cached) ---------- */
+  var geoCache = {}, lastGeo = 0, geoBusy = false;
+  function addStop(val) {
+    var n = $("stops").children.length + 1, d = document.createElement("div");
+    d.className = "fld";
+    d.innerHTML = '<label></label><div class="stop"><input type="search" autocomplete="off"><button type="button">✕</button></div>';
+    d.querySelector("input").value = val || "";
+    d.querySelector("button").addEventListener("click", function () { d.remove(); labelStops(); });
+    $("stops").appendChild(d); labelStops();
+    return d.querySelector("input");
+  }
+  function labelStops() {
+    [].forEach.call($("stops").children, function (d, i) {
+      var id = "a" + (i + 1), inp = d.querySelector("input"), lab = d.querySelector("label"), b = d.querySelector("button");
+      inp.id = id; lab.htmlFor = id; lab.textContent = t("stopL", { n: i + 1 }); inp.placeholder = ICE.t("stopPh");
+      b.setAttribute("aria-label", ICE.t("rmStop"));
+    });
+  }
+  async function geocode(q) {
+    var k = q.trim().toLowerCase();
+    if (geoCache[k]) return geoCache[k];
+    var wait = lastGeo + 1100 - Date.now(); if (wait > 0) await sleep(wait);
+    lastGeo = Date.now();
+    var url = NOMINATIM + "?format=jsonv2&limit=1&countrycodes=us&viewbox=-118.95,34.35,-117.6,33.65&accept-language=" + ICE.lang + "&q=" + encodeURIComponent(q);
+    var r = await timedFetch(url, { headers: { "Accept": "application/json" } }, 12000);
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    var j = await r.json();
+    var hit = j && j[0] ? [+(+j[0].lat).toFixed(6), +(+j[0].lon).toFixed(6)] : null;
+    geoCache[k] = hit; return hit;
+  }
+  $("addstop").addEventListener("click", function () { addStop("").focus(); });
+  $("snap").addEventListener("click", async function () {
+    if (geoBusy) return;
+    var qs = [$("a0").value].concat([].map.call($("stops").querySelectorAll("input"), function (i) { return i.value; }))
+      .map(function (s) { return s.trim(); }).filter(Boolean);
+    if (qs.length < 2) { $("geostat").textContent = ICE.t("geoNeed"); return; }
+    geoBusy = true; $("snap").disabled = true;
+    var pts = [], miss = [];
+    try {
+      for (var i = 0; i < qs.length; i++) {
+        $("geostat").textContent = t("geoLooking", { n: i + 1, t: qs.length });
+        var p = await geocode(qs[i]);
+        if (p) pts.push(p); else miss.push(qs[i]);
+      }
+      if (miss.length) { $("geostat").textContent = t("geoMiss", { a: miss.join("; ") }); }
+      if (pts.length >= 2) {
+        st.pts = pts; $("follow").checked = true;
+        await reroute(true);
+        map.fitBounds(L.latLngBounds(st.line), { padding: [24, 24] });
+        if (!miss.length) $("geostat").textContent = t("geoDone", { n: pts.length });
+        document.querySelector(".mapcard").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } catch (e) {
+      $("geostat").textContent = ICE.t("geoFail");
+    } finally { geoBusy = false; $("snap").disabled = false; }
+  });
+
+  /* ---------- buffer slider ---------- */
+  function buf() { return +$("buf").value; }
+  function showBuf() { $("o-buf").textContent = t("bufV", { m: buf(), ft: Math.round(buf() * 3.281 / 5) * 5 }); }
+  $("buf").addEventListener("input", function () {
+    showBuf();
+    if (st.lots && st.lineKey === key(st.line)) { render(); drawLots(); }
+  });
+
+  /* ---------- counting (Overpass, small chunks, one at a time, retries + mirror fallback) ---------- */
+  var counting = false;
+  async function overpass(q, onWait) {
+    var delay = 3000;
+    for (var attempt = 0; attempt < 6; attempt++) {
+      var url = attempt % 2 === 0 ? OVERPASS[0] : OVERPASS[1 + ((attempt - 1) / 2) % (OVERPASS.length - 1)]; // main server, mirrors in between
+      try {
+        var r = await timedFetch(url, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "data=" + encodeURIComponent(q) }, 40000);
+        var txt = await r.text();
+        if (r.ok && txt.trim().charAt(0) === "{") {
+          var j = JSON.parse(txt);
+          if (j.remark && /runtime error|timed out|out of memory/i.test(j.remark)) throw new Error(j.remark);
+          return j.elements || [];
+        }
+        throw new Error("HTTP " + r.status);
+      } catch (e) {
+        if (attempt === 5) break;
+        onWait(Math.round(delay / 1000));
+        await sleep(delay); delay = Math.min(delay * 2, 24000);
+      }
+    }
+    return null;
+  }
+  async function countHomes() {
+    if (counting) return;
+    if (st.line.length < 2) { flash(ICE.t("needPts")); return; }
+    var miles = C.lineLength(st.line) / 1609.344;
+    if (miles > MAX_MILES) { flash(ICE.t("pTooLong")); return; }
+    counting = true; $("count").disabled = true;
+    var b = buf(), boxes0 = C.chunkBoxes(st.line, b + 20, 700), boxes = [], els = [], failed = 0, line = st.line.slice(), lk = key(line);
+    for (var g = 0; g < boxes0.length; g += 2) boxes.push(boxes0.slice(g, g + 2)); // 2 small boxes per request
+    $("prog").hidden = false; $("bar").style.width = "4%";
+    for (var i = 0; i < boxes.length; i++) {
+      $("progt").textContent = t("pLoading", { i: i + 1, n: boxes.length });
+      var got = await overpass(C.overpassQuery(boxes[i]), function (s) { $("progt").textContent = t("pRetry", { s: s }); });
+      if (key(st.line) !== lk) { counting = false; $("count").disabled = false; $("prog").hidden = true; return; } // route changed meanwhile
+      if (got) els = els.concat(got); else failed++;
+      $("bar").style.width = Math.round((i + 1) / boxes.length * 100) + "%";
+      if (i < boxes.length - 1) await sleep(800);
+    }
+    counting = false; $("count").disabled = false;
+    if (failed === boxes.length) { $("progt").textContent = ICE.t("pFail"); return; }
+    st.lots = C.lots(els, C.makeDist(line), b);
+    st.lotsBuf = b; st.lineKey = lk; st.partial = failed > 0; st.isSample = false;
+    var c = C.count(st.lots, b);
+    $("progt").textContent = failed ? ICE.t("pPartial") : t("pDone", { n: num(c.total), mi: miles.toFixed(1) });
+    render(); drawLots();
+    $("results").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  $("count").addEventListener("click", countHomes);
+
+  /* ---------- results + money ---------- */
+  function render() {
+    if (!st.lots || st.lineKey !== key(st.line)) { $("results").hidden = true; return; }
+    var b = buf(), c = C.count(st.lots, Math.min(b, st.lotsBuf)), D = M.DEFAULTS;
+    $("results").hidden = false;
+    $("resName").textContent = st.name || (st.isSample ? ICE.t("sampleName") : ICE.t("untitled"));
+    $("r-homes").textContent = num(c.homes);
+    $("r-apts").textContent = num(c.aptBldgs);
+    $("r-apts-l").innerHTML = t("rApts", { u: num(c.aptUnits) });
+    $("r-total").textContent = num(c.total);
+    $("r-ring").textContent = "~" + num(c.total * D.join / 100);
+    $("r-ring-l").textContent = t("rRing", { j: D.join });
+    var r = M.run({ routeHomes: c.total });
+    $("r-money").textContent = "+" + M.money(c.total ? r.extraMo : 0, ICE.lang);
+    $("r-money-l").innerHTML = t("rMoney", { d: D.days });
+    $("stale").hidden = b <= st.lotsBuf;
+    var q = new URLSearchParams({ rh: c.total, rn: st.name || (st.isSample ? ICE.t("sampleName") : ICE.t("untitled")) });
+    $("tocalc").href = "../details/?" + q.toString() + "#numbers";
+    return c;
+  }
+
+  /* ---------- sample route (cached JSON, never waits on Overpass) ---------- */
+  async function loadSample() {
+    if (!st.sample) {
+      var r = await fetch("sample.json", { cache: "no-cache" });
+      st.sample = await r.json();
+    }
+    var s = st.sample;
+    routeSeq++; clearTimeout(routeTimer);
+    st.pts = s.waypoints.map(function (p) { return p.slice(); });
+    st.line = s.line.map(function (p) { return p.slice(); });
+    st.snapped = true;
+    st.lots = s.lots.map(function (a) { return { c: [a[0], a[1]], k: a[2], u: a[3], d: a[4], e: !!a[5] }; });
+    st.lotsBuf = s.maxBuf; st.lineKey = key(st.line); st.isSample = true; st.partial = false;
+    st.name = ""; $("rname").value = "";
+    $("buf").value = 45; showBuf();
+    drawRoute(); drawLots(); render();
+    map.fitBounds(L.latLngBounds(st.line), { padding: [20, 20] });
+    flash(t("fSampleOk", { d: s.built }), true);
+  }
+  $("sample").addEventListener("click", function () {
+    loadSample().then(function () { document.querySelector(".mapcard").scrollIntoView({ behavior: "smooth", block: "start" }); })
+      .catch(function (e) { console.error(e); });
+  });
+
+  /* ---------- save + share ---------- */
+  function readSaved() { try { return JSON.parse(localStorage.getItem(SAVE_KEY) || "[]") || []; } catch (e) { return []; } }
+  function writeSaved(a) { try { localStorage.setItem(SAVE_KEY, JSON.stringify(a)); return true; } catch (e) { return false; } }
+  function shareURL() {
+    var q = new URLSearchParams();
+    q.set("r", C.encode(st.pts)); q.set("s", $("follow").checked ? "1" : "0"); q.set("b", String(buf()));
+    var n = $("rname").value.trim(); if (n) q.set("n", n);
+    return location.origin + location.pathname + "?" + q.toString();
+  }
+  function listSaved() {
+    var a = readSaved(), ul = $("saved");
+    ul.innerHTML = "";
+    a.forEach(function (r, i) {
+      var li = document.createElement("li");
+      var meta = r.miles.toFixed(1) + " mi" + (r.total != null ? " · " + num(r.total) + " 🏠" : "");
+      li.innerHTML = "<span>" + esc(r.name) + "<small>" + esc(meta) + "</small></span>";
+      var o = document.createElement("button"); o.type = "button"; o.textContent = ICE.t("open");
+      o.addEventListener("click", function () { openRoute(r, true); document.querySelector(".mapcard").scrollIntoView({ behavior: "smooth" }); });
+      var d = document.createElement("button"); d.type = "button"; d.className = "del"; d.textContent = ICE.t("del");
+      d.setAttribute("aria-label", ICE.t("del") + " " + r.name);
+      d.addEventListener("click", function () { var b = readSaved(); b.splice(i, 1); writeSaved(b); listSaved(); });
+      li.appendChild(o); li.appendChild(d); ul.appendChild(li);
+    });
+  }
+  $("save").addEventListener("click", function () {
+    if (st.pts.length < 2) { $("savestat").textContent = ICE.t("needPts"); return; }
+    var name = $("rname").value.trim() || (st.isSample ? ICE.t("sampleName") : ICE.t("untitled"));
+    st.name = name;
+    var c = st.lots && st.lineKey === key(st.line) ? C.count(st.lots, Math.min(buf(), st.lotsBuf)) : null;
+    var a = readSaved().filter(function (r) { return r.name !== name; });
+    a.unshift({ name: name, r: C.encode(st.pts), s: $("follow").checked ? 1 : 0, b: buf(), miles: C.lineLength(st.line) / 1609.344,
+      total: c ? c.total : null, saved: new Date().toISOString().slice(0, 10) });
+    $("savestat").textContent = writeSaved(a.slice(0, 50)) ? ICE.t("savedOk") : "";
+    listSaved(); render();
+  });
+  $("share").addEventListener("click", function () {
+    if (st.pts.length < 2) { $("savestat").textContent = ICE.t("needPts"); return; }
+    var u = shareURL();
+    try { history.replaceState(null, "", u); } catch (e) {}
+    var done = function () { $("savestat").textContent = ICE.t("copied"); };
+    var fail = function () { $("savestat").textContent = ICE.t("copyFail") + " " + u; };
+    if (navigator.share && /Mobi|Android|iPhone/i.test(navigator.userAgent)) { navigator.share({ title: document.title, url: u }).then(done, function () {}); return; }
+    if (navigator.clipboard) navigator.clipboard.writeText(u).then(done, fail); else fail();
+  });
+  async function openRoute(r, autoCount) {
+    var pts = C.decode(r.r || "");
+    if (pts.length < 2) return;
+    st.pts = pts; st.name = r.name || ""; $("rname").value = st.name;
+    $("follow").checked = String(r.s) !== "0";
+    var b = +r.b; if (b >= 30 && b <= 150) { $("buf").value = b; } showBuf();
+    await reroute(true);
+    map.fitBounds(L.latLngBounds(st.line), { padding: [24, 24] });
+    if (autoCount) countHomes();
+  }
+
+  /* ---------- language ---------- */
+  ICE.on(function () { showBuf(); labelStops(); drawRoute(); render(); listSaved(); });
+
+  /* ---------- start ---------- */
+  showBuf(); listSaved(); drawRoute();
+  var q = new URLSearchParams(location.search);
+  if (q.get("sample") === "1") loadSample().catch(function (e) { console.error(e); });
+  else if (q.get("r")) openRoute({ r: q.get("r"), s: q.get("s"), b: q.get("b"), name: (q.get("n") || "").slice(0, 60) }, true);
+})();
+</script>
+<script src="../../demo/poweredby.js?v=20261013a" defer></script>
+</body>
+</html>

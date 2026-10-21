@@ -39,13 +39,114 @@ ul{margin:6px 0 0;padding-left:20px}li{margin:6px 0}
 .tabs2 .m{background:#7a1a2c;border:1px solid #e6c25a}.tabs2 .n{background:#1673c4;border:1px solid #7fe3f2}
 .save{font-size:13px;color:var(--dim);text-align:center;margin:4px 0 0}
 .posg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.posg a{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:14px;background:#1e6fe0;color:#fff;font-weight:800;text-decoration:none;font-size:16px}.posg a:last-child{grid-column:1/-1;background:transparent;border:1px solid var(--edge)}
+.chk{list-style:none;padding:0;margin:8px 0 0}.chk li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--edge);margin:0}.chk li:first-child{border-top:0}
+.chk i{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:900;font-size:14px;background:#ffffff14;color:var(--dim)}
+.chk li.done i{background:var(--ok);color:#06210f}.chk li.wait i{background:#f5c40033;color:var(--gold)}
+.chk small{display:block;color:var(--dim);font-size:13px}
+.upd{font-size:12px;color:var(--dim);text-align:right;margin-top:6px}
+.tst{border:2px solid var(--gold);border-radius:18px;padding:14px 16px;margin:4px 0 14px;background:linear-gradient(180deg,#2a2208,#121c33 60%);box-shadow:0 10px 30px #0007}
+.tst h2{margin:6px 0 4px;font-size:22px}.tst .rt{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}
+.tst .rt button{font:800 14px system-ui;padding:10px;border-radius:12px;border:1px solid var(--edge);background:#ffffff0d;color:var(--ink);cursor:pointer}
+.tst .rt button[aria-pressed=true].m{background:#7a1a2c;border-color:#e6c25a}.tst .rt button[aria-pressed=true].n{background:#1673c4;border-color:#7fe3f2}
+.tst table{width:100%;border-collapse:collapse;font-size:13.5px;margin:6px 0}.tst td{padding:6px 4px;border-top:1px solid var(--edge);vertical-align:top}
+.tst code{font:700 12.5px ui-monospace,Menlo,monospace;background:#ffffff14;padding:1px 5px;border-radius:5px;color:#ffe680}
+.tst .sp{display:flex;gap:10px;align-items:flex-start;margin:9px 0}.tst .sp input{flex:none;width:22px;height:22px;margin-top:2px;accent-color:#2fbf71}
+.tst .sp label{font-size:14.5px}.tst .sp label b.t{display:block}
+.tst .done{color:#7dffb5;font-weight:800;font-size:13px}
+.ph{border:1px solid var(--edge);border-radius:18px;padding:14px 16px;margin:0 0 14px;background:var(--card)}
+.ph h2{margin:4px 0;font-size:20px}.ph .sec{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:14px 0 4px}
+.ph .row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--edge)}.ph .row:first-of-type{border-top:0}
+.ph .row span{flex:1;font-size:15px}.ph .row.ok span{color:var(--dim);text-decoration:line-through}
+.ph label.add{flex:none;display:inline-flex;align-items:center;gap:6px;background:#1e6fe0;color:#fff;font-weight:800;font-size:13.5px;border-radius:999px;padding:8px 12px;cursor:pointer}
+.ph .row.ok label.add{background:#2fbf71;color:#06210f}.ph input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+.ph .bar{height:8px;border-radius:99px;background:#ffffff14;overflow:hidden;margin:8px 0}.ph .bar i{display:block;height:100%;background:linear-gradient(90deg,#2fbf71,#f5c400)}
 </style></head><body><main>
 <div class="top"><img src="../../../assets/ssai-lockup.jpg" alt="SousShift AI"></div>
 <div class="split"><div class="h mel"><img src="../../../demo/melody-lax/img/logo.png" alt="Melody Bar &amp; Grill"><b>Melody · LAX</b></div><div class="h nal"><img src="../../../demo/nalu-vida/img/logo.png" alt="Nalu Vida"><b>Nalu Vida · Venice</b></div><span class="x">×</span></div>
 <div class="tabs2"><a class="m" href="../../../demo/melody-lax/">✈️ Open Melody app</a><a class="n" href="../../../demo/nalu-vida/">🏄 Open Nalu Vida app</a></div>
 <p class="save">📲 Save this page: tap Share → <b>Add to Home Screen</b></p>
+<section class="tst" id="toast-setup" aria-labelledby="tsh">
+<span class="pill">Start here · about 10 minutes</span>
+<h2 id="tsh">🍞 Set up your reward buttons in Toast</h2>
+<p class="s" style="margin:0">Until Toast approves the full connection (about 30 days), guests redeem with a live pass on their phone and your server taps one of these buttons in Toast. Antidote can do it with you on a call.</p>
+<div class="rt" role="group" aria-label="Restaurant"><button type="button" class="m" data-r="m" aria-pressed="true">✈️ Melody · 5 buttons ✅</button><button type="button" class="n" data-r="n" aria-pressed="false">🏄 Nalu Vida · 4 buttons</button></div>
+<p id="tsStat" style="margin:8px 0;font-weight:800"></p>
+<table id="tsBtns"></table>
+<p class="note" style="margin-top:2px">Free-item buttons take 100% off <b>one</b> item: the server picks the item on the check first, then taps the button. Never use them for alcohol (California ABC).</p>
+<div id="tsSteps"></div>
+<p class="done" id="tsDone" hidden>✅ All set at <span id="tsDoneR"></span>. Tell Antidote and he'll switch the app's live passes on.</p>
+<a class="btn" id="tsPrint" href="../../../melody/kit/toast-interim.html">🖨️ Open the printable Toast sheet (staff steps included)</a>
+<a class="btn alt" href="sms:+14243094068?&amp;body=Ready%20to%20add%20the%20Toast%20reward%20buttons">💬 Text Antidote to do it together</a>
+</section>
+<section class="ph" id="photos" aria-labelledby="phh">
+<span class="pill b">Menu photos</span>
+<h2 id="phh">📸 Photos we still need</h2>
+<p class="s" style="margin:0">Tap <b>📷 Add photo</b> next to a dish, take or pick a picture, then send it to Antidote (Messages, AirDrop or email to secondshiftai@gmail.com). It's already named for the right dish, and it goes into your app within a day.</p>
+<div id="phList"><p class="s">Loading…</p></div>
+<p class="note">Tips: daylight or bright light, plate fills the frame, no hands or napkins. Phone photos are perfect.</p>
+</section>
 <h1>Christian, here's the game plan 🤝</h1>
-<p class="s">Melody Bar &amp; Grill + Nalu Vida · everything we've built, what's left, and the two things you asked about: <b>stickers</b> and <b>your register</b>.</p>
+<p class="s">Melody Bar &amp; Grill + Nalu Vida · everything we've built, where the <b>Toast integration</b> stands, what it costs on our side, and what's next.</p>
+
+<h2>🔌 Toast integration: started ✅</h2>
+<div class="card ok"><span class="pill g">Submitted · pending Toast review</span>
+<p style="margin-top:8px">You asked for full Toast integration before launch, so no manual steps for your staff. We've started it. This is the official Toast <b>Loyalty Program Integration</b>:</p>
+<ul>
+<li>Guests earn points automatically on every eligible Toast check</li>
+<li>Game, sign-up, birthday and referral points go to the <b>same</b> balance</li>
+<li>Staff look up the guest on the Toast POS and tap <b>Redeem</b></li>
+<li>Points come off automatically, and each reward can only be used once</li>
+</ul>
+<ul class="chk">
+<li class="done"><i>✓</i><div><b>Toast API Documentation License Agreement signed</b><small>Oct 12, 2026 · SousShift AI (Antidote Enterprises LLC)</small></div></li>
+<li class="done"><i>✓</i><div><b>Toast Integration Request Application submitted</b><small>Oct 12, 2026 · names Melody Bar &amp; Grill and Nalu Vida as the restaurants asking for it</small></div></li>
+<li class="wait"><i>⏳</i><div><b>Toast review &amp; partner approval</b><small>Pending. Toast says up to 30 days. A quick note from you to your Toast rep saying you want SousShift loyalty connected helps move it up.</small></div></li>
+<li><i>4</i><div><b>Build the loyalty connection</b><small>About 2–3 weeks after Toast approves</small></div></li>
+<li><i>5</i><div><b>Toast testing &amp; certification</b><small>About 1–3 weeks, run by Toast</small></div></li>
+<li><i>6</i><div><b>Demo the full Toast workflow for you, then a staff test at Melody during normal service</b><small>Nothing launches until you approve it</small></div></li>
+<li><i>7</i><div><b>Launch → 90-day pilot at each restaurant</b><small>Monthly billing starts only after your written approval</small></div></li>
+</ul>
+<p class="note">Phase 2: app orders going straight into Toast and the kitchen use a separate Toast API (Orders) that needs its own approval. It doesn't hold up launch.</p>
+<p class="upd">Updated Oct 12, 2026</p>
+</div>
+
+<h2>⏱️ While we wait for Toast: interim mode</h2>
+<div class="card ok"><span class="pill g">About 30 days · no staff phones</span>
+<p style="margin-top:8px">Guests can <b>download the app, play the game, earn points and redeem rewards</b> starting now. Your staff never pick up their own phones.</p>
+<div class="step"><b class="n">1</b><div><b>Redeeming: "show &amp; tap."</b> The guest taps <b>Use reward</b> on <i>their</i> phone. A live reward pass appears with a moving background, a ticking clock and a 10-minute countdown, so screenshots don't work. The points come off right away and it can only be used once. Your server looks at it and taps the matching <b>preset discount button in Toast</b> (for example "App Reward – Free Fries").</div></div>
+<div class="step"><b class="n">2</b><div><b>Earning: "snap the receipt."</b> After paying, the guest taps <b>Add my visit</b> and takes a photo of the Toast receipt, or types the check # and total. They get 10 points per $1 right away. Limits: one claim per check, one per day, and a cap per claim.</div></div>
+<div class="step"><b class="n">3</b><div><b>You stay in control.</b> A manager log shows every reward used and every receipt claim, with Approve and Flag buttons, so you or Sami can spot-check against Toast's daily sales report.</div></div>
+<div class="step"><b class="n">4</b><div><b>One-time setup, about 10 minutes:</b> we add 4–5 reward discount buttons in Toast Web with you.</div></div>
+<p class="note">When Toast approves, earning becomes automatic and Redeem moves into Toast. Every guest's points and membership carry over. Interim mode costs nothing per month: your monthly billing still starts only after the Toast integration is approved, and the 90-day pilot starts then too.</p>
+</div>
+
+<h2>🧾 What SousShift is covering for the Toast integration</h2>
+<div class="card">
+<p><b>No extra cost to you.</b> Toast integration is included in your pricing. To be a Toast partner, though, SousShift has to carry insurance that Toast requires in its API terms, and pay for the build and hosting. <b>We cover all of it:</b></p>
+<table style="width:100%;border-collapse:collapse;font-size:14.5px;margin-top:6px">
+<tr><td style="padding:6px 0">🛡️ <b>General liability insurance</b> · $1M per claim / $2M total, Toast named on the policy</td><td style="text-align:right;font-weight:800;white-space:nowrap">required</td></tr>
+<tr><td style="padding:6px 0;border-top:1px solid var(--edge)">🛡️ <b>Professional (E&amp;O) insurance</b> · $2M</td><td style="text-align:right;border-top:1px solid var(--edge);font-weight:800">required</td></tr>
+<tr><td style="padding:6px 0;border-top:1px solid var(--edge)">🛡️ <b>Cyber liability insurance</b> · $5M</td><td style="text-align:right;border-top:1px solid var(--edge);font-weight:800">required</td></tr>
+<tr><td style="padding:6px 0;border-top:1px solid var(--edge)">☁️ <b>Secure server</b> that talks to Toast 24/7</td><td style="text-align:right;border-top:1px solid var(--edge)">monthly</td></tr>
+<tr><td style="padding:6px 0;border-top:1px solid var(--edge)">🛠️ <b>Building, testing &amp; certifying</b> the connection with Toast</td><td style="text-align:right;border-top:1px solid var(--edge)">4–6 weeks of work</td></tr>
+<tr><td style="padding:8px 0;border-top:2px solid var(--gold)"><b>Insurance alone (estimate)</b></td><td style="text-align:right;border-top:2px solid var(--gold);font-weight:900;color:var(--gold);white-space:nowrap">≈ $2,500–$7,000/yr</td></tr>
+</table>
+<p class="note">Insurance figure is an estimate for a small software company; quotes are being requested. If Toast itself charges the restaurant anything to turn on a partner integration, we'll tell you in writing before it's switched on, and you decide.</p>
+</div>
+
+<h2>💸 What Antidote has already put in</h2>
+<div class="card">
+<p>Before any payment, Antidote has built and paid for all of this himself:</p>
+<ul>
+<li><b>81 updates</b> shipped to your two apps (Oct 2 → Oct 12): <b>288 files</b>, about <b>60 MB</b> of custom game art, menus, photos and video</li>
+<li><b>AI art &amp; 3D credits</b> (Higgsfield) for your menu photos, 3D food, game characters and scenes: about 580 credits in Oct 10–11 alone, plus a <b>2,000-credit top-up</b> bought Oct 12 to keep building</li>
+<li><b>Two AI phone hosts</b> (Kira for Melody, Kai for Nalu Vida) on ElevenLabs voice credits</li>
+<li><b>Claude</b> to build and update everything, plus hosting, domains, DocuSign and Twilio (table below)</li>
+<li><b>Print kits</b> for both restaurants: stickers, posters and numbered table cards, all designed and scan-tested</li>
+<li><b>Two promo videos</b> and Antidote's food reviews built into the games</li>
+</ul>
+<p class="note">For scale: an agency typically quotes $60k–$150k to build one app like this. You're paying $1,500 setup + $300/month for both.</p>
+</div>
 
 <h2>🏷️ Stickers &amp; print: done for you</h2>
 <div class="card ok"><span class="pill g">Designed &amp; scan-tested</span>
@@ -64,15 +165,15 @@ ul{margin:6px 0 0;padding-left:20px}li{margin:6px 0}
 </div>
 <p style="margin-top:12px"><b>How it gets on your tables:</b> you tell us how many tables and which pieces you want, Antidote places the print order with a local LA print shop (same-day or next-day), and we set them out with you. Matte vinyl, so the codes scan even under bar lighting.</p>
 </div>
+<a class="btn" href="../placement/">📍 Where to put the QR pieces</a>
 <a class="btn alt" href="../../../melody/kit/">See the full Melody print kit →</a>
 <a class="btn alt" href="../../../nalu-vida/kit/">See the full Nalu Vida print kit →</a>
 
 <h2>💳 Your register (POS): no headache</h2>
 <div class="card ok"><span class="pill g">Nothing to install · no downtime</span>
 <p style="margin-top:8px">The app works <b>with</b> whatever register you already use (Toast, Square, Clover, SpotOn, anything). We don't replace it, rewire it, or shut anything down.</p>
-<div class="step"><b class="n">1</b><div><b>Day one: zero setup.</b> When a member pays, staff tap <b>"Ring up a member"</b> on any phone or tablet: scan the guest's code (or type their phone), enter the check total. Points, rewards and your sales numbers all log automatically.</div></div>
-<div class="step"><b class="n">2</b><div><b>Optional: discount buttons on your register (about 10 minutes, we do it with you).</b> We add 2–3 buttons like "App reward" so rewards ring up cleanly. Step-by-step guides are ready for every major register.</div></div>
-<div class="step"><b class="n">3</b><div><b>Later, if you want it: a direct connection</b> so app guests are matched to checks automatically. We handle it end to end; your staff keeps working the same way.</div></div>
+<div class="step"><b class="n">1</b><div><b>Your choice: direct Toast connection before launch.</b> Staff stay in Toast the whole time: look up the guest, tap Redeem, done. No second screen, no typing codes. (Status above.)</div></div>
+<div class="step"><b class="n">2</b><div><b>Until Toast approves (about 30 days): interim mode.</b> Guests still download the app, play, earn and redeem. Staff never use their phones and only tap a preset button in Toast. Details below.</div></div>
 </div>
 <div class="card" id="register"><b style="font-size:17px">👆 Tap your register for step-by-step setup</b><p class="s" style="margin:4px 0 0">One tap. It opens the exact steps for your system, about 10 minutes, and we can do it with you.</p><div class="posg"><a href="../../../pos/?pos=toast&amp;r=Melody%20%2B%20Nalu%20Vida">Toast</a><a href="../../../pos/?pos=square&amp;r=Melody%20%2B%20Nalu%20Vida">Square</a><a href="../../../pos/?pos=clover&amp;r=Melody%20%2B%20Nalu%20Vida">Clover</a><a href="../../../pos/?pos=spoton&amp;r=Melody%20%2B%20Nalu%20Vida">SpotOn</a><a href="../../../pos/?pos=lightspeed&amp;r=Melody%20%2B%20Nalu%20Vida">Lightspeed</a><a href="../../../pos/?pos=revel&amp;r=Melody%20%2B%20Nalu%20Vida">Revel</a><a href="../../../pos/?pos=other&amp;r=Melody%20%2B%20Nalu%20Vida">Other / not sure</a></div></div>
 
@@ -82,7 +183,7 @@ ul{margin:6px 0 0;padding-left:20px}li{margin:6px 0}
 <li><b>Two branded apps</b>, no download: photo menus, 12 languages, rewards, ordering by table</li>
 <li><b>Two custom games:</b> the Melody LAX flight game and the Nalu Vida surf game, with prizes from your menu</li>
 <li><b>You're in the games:</b> the control-tower captain at Melody and the lifeguard at Nalu Vida, talking to players and throwing them a med kit or a cold one when they're hurt</li>
-<li><b>Free daily spin, points, birthday treats, refer-a-friend</b>, plus your customer list with phone and email (yours to keep)</li>
+<li><b>Simple rewards:</b> 10 points per eligible $1 plus capped bonuses for the game, sign-up, birthdays and referrals, with one points balance per restaurant. Your customer list (phone and email) is yours to keep and export.</li>
 <li><b>Your Instagram inside the app</b>, holiday specials, Home Screen icons, full-screen mode</li>
 <li><b>Antidote's food reviews</b> of Melody and Nalu Vida playing as halftime ads inside the games</li>
 <li><b>Owner setup pages</b> with a live "what the app does for you" calculator</li>
@@ -90,23 +191,37 @@ ul{margin:6px 0 0;padding-left:20px}li{margin:6px 0}
 <div class="who"><img src="../../../demo/melody-lax/img/game/captain-closed.webp" alt="Captain"><img src="../../../demo/nalu-vida/img/game/guard-closed.webp" alt="Lifeguard"></div>
 </div>
 
-<h2>🎮 Coming now: the games go 3D</h2>
+<h2>🎮 Game updates from your feedback</h2>
 <div class="card"><span class="pill b">In progress</span>
-<p style="margin-top:8px">Both games are being upgraded to <b>real 3D</b>:</p>
 <ul>
-<li><b>Melody:</b> a real 3D plane, helicopters and blimps over a lit-up LA, with real smoke, fire and crash effects</li>
-<li><b>Nalu Vida:</b> a fully animated 3D surfer running, paddling and riding real 3D waves, with sharks, stingrays and boats</li>
+<li>Guests can <b>play before registering</b></li>
+<li><b>Melody:</b> no gunships, missiles, crashes or fire. It's a clean scenic flight over LA</li>
+<li><b>No daily prize wheel</b>, no stacked discounts, <b>one</b> points currency</li>
+<li>Game points capped per day, so the program stays under control</li>
+<li><b>Just Landed</b> is now one consistent offer</li>
+<li>Third-party logos and branding reviewed and removed</li>
 </ul>
-<p>Same games, same prizes, just a lot better looking. Everything already live keeps working while we upgrade.</p></div>
+<p>You'll get both final playable versions to approve before launch.</p></div>
+
+<h2>🧾 Payments</h2>
+<div class="card ok"><span class="pill g">Thank you!</span>
+<table style="width:100%;border-collapse:collapse;font-size:14.5px;margin-top:8px">
+<tr><td style="padding:6px 0">✅ <b>Melody Bar LLC: setup</b><br><span class="s" style="font-size:13px">Received Oct 12, 2026 · Zelle</span></td><td style="text-align:right;font-weight:900;color:#7dffb5">$750 paid</td></tr>
+<tr><td style="padding:6px 0;border-top:1px solid var(--edge)">⏳ <b>Nalu Vida LLC: setup</b><br><span class="s" style="font-size:13px">Due when the Nalu Vida agreement is signed</span></td><td style="text-align:right;border-top:1px solid var(--edge);font-weight:800">$750</td></tr>
+<tr><td style="padding:6px 0;border-top:1px solid var(--edge)">🗓️ <b>Monthly: $150 per restaurant</b><br><span class="s" style="font-size:13px">Starts only after the Toast integration is approved in writing. $0 during interim mode.</span></td><td style="text-align:right;border-top:1px solid var(--edge)">not started</td></tr>
+<tr><td style="padding:8px 0;border-top:2px solid var(--gold)"><b>Setup paid so far</b></td><td style="text-align:right;border-top:2px solid var(--gold);font-weight:900;color:var(--gold)">$750 of $1,500</td></tr>
+</table>
+<p class="note">Two separate agreements: Melody Bar LLC and Nalu Vida LLC, each with its own billing. They're on their way to you by DocuSign.</p>
+</div>
 
 <h2>💰 What you're paying vs. what you're getting</h2>
 <div class="card">
-<div class="big">$1,500 one-time setup<small>+ $300/month that covers <b>both</b> restaurants</small></div>
+<div class="big">$1,500 one-time setup<small>+ $300/month that covers <b>both</b> restaurants: two separate agreements, $750 + $150/mo each</small></div>
 <div class="cmp">
 <div><b>~$26k–$54k</b><span>first year to piece this together yourself: ordering site, loyalty, texting, reviews, a custom game, photos, design, videos (typical published prices)</span></div>
 <div class="us"><b>$5,100</b><span>first year with SousShift, both restaurants, one person for everything</span></div>
 </div>
-<p style="margin-top:12px">It pays for itself with about <b>7–9 extra visits a month</b> across both spots. Plus the 90-day results check, and your customer list is always yours.</p>
+<p style="margin-top:12px">It pays for itself with about <b>7–9 extra visits a month</b> across both spots. Each restaurant has its own agreement, billing, customer list and cancellation rights, with no cross-liability and no personal guarantee. Monthly billing starts only after launch is approved.</p>
 <p class="note">Estimates, not promises. Real numbers show up in your owner view as guests join.</p>
 </div>
 <a class="btn" href="../../../value/?o=christian">See the full cost comparison →</a>
@@ -130,11 +245,69 @@ ul{margin:6px 0 0;padding-left:20px}li{margin:6px 0}
 
 <h2>📋 Next steps</h2>
 <div class="card">
-<div class="step"><b class="n">1</b><div>Tell us your table count and which stickers you want → we place the print order.</div></div>
-<div class="step"><b class="n">2</b><div>Tell us your register → we add the reward buttons with you (about 10 minutes).</div></div>
-<div class="step"><b class="n">3</b><div>Fill in your deals on the setup pages (all taps, about 15 minutes).</div></div>
-<div class="step"><b class="n">4</b><div>Pick a go-live date.</div></div>
+<div class="step"><b class="n">1</b><div>Review the <b>two separate agreements</b> (Melody and Nalu Vida) and send each LLC's legal name.</div></div>
+<div class="step"><b class="n">2</b><div>OK interim mode by email, and we add the reward buttons in Toast with you (about 10 minutes). Optional: tell your Toast rep you want SousShift loyalty connected.</div></div>
+<div class="step"><b class="n">3</b><div>Play and approve the updated games.</div></div>
+<div class="step"><b class="n">4</b><div>Once Toast approves: watch the full Toast demo, run the staff test at Melody, then pick a go-live date.</div></div>
 </div>
 <a class="btn" href="../">Open your onboarding page →</a>
 <p class="note">Questions anytime: text Antidote.</p>
-</main></body></html>
+</main><script>
+(function(){
+var KEY="cw-photos-sent-v1", sent={}; try{ sent=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){}
+function esc(t){ return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+var host=document.getElementById("phList");
+fetch("photos.json",{cache:"no-store"}).then(function(r){ return r.json(); }).then(function(D){
+  var html="";
+  Object.keys(D).forEach(function(rk){ var R=D[rk], need=R.items.filter(function(i){ return !i.has; }), done=need.filter(function(i){ return sent[rk+"__"+i.slug]; }).length;
+    html+="<div class='sec'>"+esc(R.name)+"</div>";
+    if(!need.length){ html+="<p style='margin:4px 0'>✅ All "+R.total+" items have photos. <span class='s'>Want to swap one for your own real photo? Tap Replace.</span></p><details><summary class='s' style='cursor:pointer'>Show "+R.total+" items</summary>"+R.items.map(function(i){ return row(rk,i,"Replace"); }).join("")+"</details>"; return; }
+    html+="<p style='margin:4px 0'><b>"+(need.length-done)+"</b> of "+R.total+" items still need a photo"+(done?" · "+done+" sent ✅":"")+"</p><div class='bar'><i style='width:"+Math.round(100*(R.total-need.length+done)/R.total)+"%'></i></div>";
+    var by={}; need.forEach(function(i){ (by[i.section]=by[i.section]||[]).push(i); });
+    Object.keys(by).forEach(function(s){ html+="<div class='s' style='font-size:13px;font-weight:700;margin-top:8px'>"+esc(s)+"</div>"+by[s].map(function(i){ return row(rk,i,"Add photo"); }).join(""); });
+  });
+  host.innerHTML=html;
+}).catch(function(){ host.innerHTML="<p class='s'>Couldn't load the photo list. Pull down to refresh.</p>"; });
+function row(rk,i,verb){ var k=rk+"__"+i.slug, ok=!!sent[k];
+  return "<div class='row"+(ok?" ok":"")+"' data-k='"+k+"' data-n='"+esc(i.name)+"'><span>"+esc(i.name)+"</span><label class='add'>"+(ok?"✅ Sent":"📷 "+verb)+"<input type='file' accept='image/*'></label></div>"; }
+host.addEventListener("change",function(e){
+  var inp=e.target; if(inp.type!=="file"||!inp.files[0]) return; var row=inp.closest(".row"), k=row.dataset.k, n=row.dataset.n, f=inp.files[0];
+  var ext=((f.name.split(".").pop()||"jpg").toLowerCase()).replace("jpeg","jpg"), nf=new File([f],k+"."+ext,{type:f.type||"image/jpeg"});
+  function mark(){ sent[k]=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(sent)); }catch(err){} row.classList.add("ok"); row.querySelector("label").firstChild.nodeValue="✅ Sent"; }
+  if(navigator.canShare&&navigator.canShare({files:[nf]})){ navigator.share({files:[nf],title:"Menu photo: "+n,text:"Menu photo for "+n+" ("+k+")"}).then(mark).catch(function(){}); }
+  else { var a=document.createElement("a"); a.href=URL.createObjectURL(nf); a.download=nf.name; document.body.appendChild(a); a.click(); a.remove(); mark();
+    alert("Saved as "+nf.name+". Send it to Antidote (secondshiftai@gmail.com)."); }
+  inp.value="";
+});
+})();
+</script>
+<script>
+(function(){
+var B={m:[["App Reward – Free Soft Drink or Melody Fries","100% off 1 item","250 pts"],["App Reward – Free Starter","100% off 1 item","500 pts"],["App Reward – $10 Off","$10 off check","1,000 pts"],["App Reward – Free Entrée","100% off 1 item","1,500 pts"],["App – Just Landed 10% Off","10% off check","first order"]],
+n:[["App Reward – Free Mocktail/Soft Drink/Jungle Fries","100% off 1 item","250 pts"],["App Reward – Free Shareable","100% off 1 item","500 pts"],["App Reward – $10 Off","$10 off check","1,000 pts"],["App Reward – Free Entrée","100% off 1 item","1,500 pts"]]};
+// Toast status per restaurant: Melody's 5 buttons are set up (Antidote confirmed 2026-10-12). Nalu Vida: not confirmed yet.
+var TS={m:["done","✅ Done: all 5 buttons are set up in Melody's Toast (confirmed Oct 12, 2026)."],n:["tbd","⏳ TBD: not confirmed yet that Nalu Vida's 4 buttons are in Toast."]};
+var NAME={m:"Melody",n:"Nalu Vida"}, PR={m:"../../../melody/kit/toast-interim.html",n:"../../../nalu-vida/kit/toast-interim.html"};
+var STEPS=[["Sign in to Toast Web","On a computer, go to toasttab.com and log in with a manager or owner account."],
+["Open Discounts & promo codes","Finance › Related › Settings › <b>Discounts &amp; promo codes</b> (on some accounts: Payments › Comps and promos › Discounts and promo codes)."],
+["Add each button","Tap <b>+ Add a Discount</b>, type the name <b>exactly</b> as in the list above, set the type and amount, and set Applies to (Item or Entire check)."],
+["One reward per check","Under Advanced Settings, leave <b>Allow with other discounts</b> off. If Toast offers a required reason, turn it on so staff type the pass code (like MEL-7K3P)."],
+["Save, then publish","Publish so the buttons reach every POS device. Repeat for each button."],
+["Give servers permission","Server and bartender jobs need Toast's <b>Discounts</b> permission (3.1). Nobody needs the app on their own phone."],
+["Test one at the table","Open the app, tap <b>Use reward</b>, and ring the button named on the live pass. A gray or still pass means expired or a screenshot, so don't accept it."]];
+var cur="m", KEY="cw-toast-setup-v1", st={}; try{ st=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){}
+function esc(t){ return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+function draw(){
+  document.getElementById("tsBtns").innerHTML=B[cur].map(function(b,i){ return "<tr><td style='width:22px;font-weight:900'>"+(i+1)+"</td><td><code>"+esc(b[0])+"</code></td><td style='white-space:nowrap;color:var(--dim)'>"+b[1]+"<br>"+b[2]+"</td></tr>"; }).join("");
+  document.getElementById("tsSteps").innerHTML=STEPS.map(function(x,i){ var k=cur+i; return "<div class='sp'><input type='checkbox' id='ts"+k+"' data-k='"+k+"'"+(st[k]?" checked":"")+"><label for='ts"+k+"'><b class='t'>"+(i+1)+". "+x[0]+"</b>"+x[1]+"</label></div>"; }).join("");
+  document.getElementById("tsPrint").href=PR[cur];
+  var ts=document.getElementById("tsStat"); ts.textContent=TS[cur][1]; ts.style.color=TS[cur][0]==="done"?"#7dffb5":"#ffd79a";
+  var all=TS[cur][0]==="done"||STEPS.every(function(x,i){ return st[cur+i]; }); document.getElementById("tsDone").hidden=!all; document.getElementById("tsDoneR").textContent=NAME[cur];
+}
+document.querySelectorAll("#toast-setup .rt button").forEach(function(b){ b.onclick=function(){ cur=b.dataset.r; document.querySelectorAll("#toast-setup .rt button").forEach(function(x){ x.setAttribute("aria-pressed",x===b?"true":"false"); }); draw(); }; });
+document.getElementById("tsSteps").addEventListener("change",function(e){ var k=e.target.dataset.k; if(!k) return; st[k]=e.target.checked; try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(err){} draw(); });
+draw(); try{ if(!location.hash) window.scrollTo(0,0); }catch(e){}
+})();
+</script>
+<script src="../../../demo/poweredby.js?v=20261013a" defer></script>
+</body></html>

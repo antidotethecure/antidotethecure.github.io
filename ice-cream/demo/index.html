@@ -1,0 +1,1145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Paletas El Sol: Truck Alerts</title>
+<meta name="description" content="Demo: get a ring with an ice-cream-truck jingle when Paletas El Sol is on your street. Points, rewards and the menu. Sample truck by SousShift AI.">
+<meta name="theme-color" content="#03060e">
+<link rel="manifest" href="manifest.webmanifest?v=20261013b">
+<link rel="icon" href="favicon.svg?v=20261013b" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png?v=20261013b" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261013b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="El Sol">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="../ice.css?v=20261013b">
+<style>
+[hidden]{display:none!important}
+body{padding-bottom:30px}
+.top img.logo{width:40px;height:40px;border-radius:10px;flex:none;display:block;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(255,77,151,.35))}
+.tag{font:800 10px "Rajdhani",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#2a1a00;background:var(--gold);border-radius:99px;padding:1px 7px;margin-left:4px;vertical-align:2px}
+
+/* hero / live status */
+.live{margin-top:14px;text-align:center}
+.live .st{font-family:"Orbitron",sans-serif;font-weight:900;font-size:clamp(22px,6.6vw,30px);line-height:1.15;margin:4px 0}
+.live .st em{font-style:normal;color:var(--gold)}
+.live .sub{color:var(--dim);font-size:15px}
+.pulse{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--good)}
+.pulse::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(52,211,153,.7);animation:pl 1.6s infinite}
+@keyframes pl{to{box-shadow:0 0 0 12px rgba(52,211,153,0)}}
+#test{width:100%;min-height:64px;font-size:16px;margin-top:12px}
+
+/* ETA panel */
+.eta{margin-top:12px;border-radius:18px;border:1px solid var(--edge);background:linear-gradient(180deg,#0d1d40,#0a1631);padding:12px 14px;text-align:center}
+.eta .chip{display:inline-flex;align-items:center;gap:6px;font:800 12.5px "Rajdhani",sans-serif;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;padding:3px 10px;background:rgba(63,169,255,.14);color:var(--volt);border:1px solid rgba(63,169,255,.4)}
+.eta[data-s=almost] .chip{background:rgba(255,209,102,.16);color:var(--gold);border-color:rgba(255,209,102,.55)}
+.eta[data-s=here] .chip{background:rgba(52,211,153,.16);color:var(--good);border-color:rgba(52,211,153,.55)}
+.eta[data-s=gone] .chip{background:rgba(158,173,204,.12);color:var(--dim);border-color:var(--edge)}
+.eta[data-s=here]{border-color:rgba(52,211,153,.6);box-shadow:0 0 0 3px rgba(52,211,153,.12)}
+.eta[data-s=almost]{border-color:rgba(255,209,102,.6)}
+.eta .big{font-family:"Orbitron",sans-serif;font-weight:900;font-size:clamp(22px,6.6vw,30px);line-height:1.15;margin:6px 0 2px}
+.eta .big b{color:var(--gold)}
+.eta .dist{font-weight:700;font-size:17px;color:var(--silver)}
+.eta .dist span{color:var(--dim);font-weight:600}
+
+/* live map */
+.map{position:relative;isolation:isolate;border-radius:18px;overflow:hidden;border:1px solid var(--edge);background:#0b1733;margin-top:12px;height:clamp(300px,58vh,380px)}
+#lmap{position:absolute;inset:0;background:#2a2a2b}
+.map .leaflet-container{font-family:"Rajdhani",system-ui,sans-serif;background:#2a2a2b}
+.map .osmdark{filter:invert(1) hue-rotate(195deg) brightness(.92) contrast(.88) saturate(.7)}
+.map .leaflet-control-attribution{font-size:10.5px;background:rgba(3,6,14,.7);color:var(--dim)}
+.map .leaflet-control-attribution a{color:var(--silver)}
+.mapchip{position:absolute;left:10px;top:10px;z-index:500;background:rgba(3,6,14,.82);border:1px solid var(--edge);border-radius:12px;padding:5px 10px;font:800 15px "Rajdhani",sans-serif;color:var(--ink);pointer-events:none;max-width:calc(100% - 130px)}
+.mapchip b{color:var(--gold)}
+#recenter{position:absolute;right:10px;top:10px;z-index:500;min-height:40px;border-radius:12px;border:1px solid var(--edge);background:rgba(3,6,14,.82);color:var(--ink);font:800 14px "Rajdhani",sans-serif;padding:6px 12px;cursor:pointer}
+.mapmsg{position:absolute;left:10px;right:10px;top:58px;z-index:500;background:rgba(3,6,14,.85);border:1px solid rgba(255,184,107,.5);color:#ffe0bd;border-radius:12px;padding:6px 10px;font-size:13.5px;font-weight:700;text-align:center}
+.mapnone{position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;color:var(--dim);font-weight:700}
+.homepin .hp{position:relative;width:40px;height:40px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:#2f7bff;border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.55)}
+.homepin .hp span{position:absolute;inset:0;display:grid;place-items:center;transform:rotate(45deg);font-size:19px}
+.homepin .hl{position:absolute;left:50%;top:44px;transform:translateX(-50%);white-space:nowrap;background:#fff;color:#0b1630;border-radius:99px;padding:0 8px;font:800 12.5px "Rajdhani",sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.mapctl{display:flex;gap:8px;margin-top:10px}
+.mapctl .btn{flex:1;min-height:44px;font-size:11.5px;padding:10px}
+.spd{display:flex;align-items:center;gap:10px;margin-top:8px}
+.spd>span{font-weight:700;font-size:14.5px;color:var(--silver);flex:none}
+.spd .seg{flex:1}
+.spd .seg button{min-height:40px;font-size:14px}
+.privacy{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;font-size:14.5px;color:var(--silver);font-weight:600}
+.privacy i{font-style:normal}
+.credits{color:var(--dim);font-size:12px;margin:6px 0 0;line-height:1.35}
+
+/* forms */
+.fld{display:block;margin:10px 0}
+.fld span{display:block;font-weight:700;font-size:15px;margin-bottom:4px}
+.fld input,.fld select{width:100%;min-height:48px;border-radius:12px;border:1px solid var(--edge);background:#081330;color:var(--ink);font:600 17px "Rajdhani",sans-serif;padding:8px 12px}
+.ok{color:var(--good);font-weight:700}
+.why{display:flex;gap:10px;background:rgba(63,169,255,.08);border:1px solid rgba(63,169,255,.35);border-radius:14px;padding:10px 12px;font-size:14.5px;color:var(--silver);margin:10px 0}
+.why i{font-style:normal;font-size:20px}
+
+/* points */
+.pts{display:flex;align-items:baseline;gap:8px}
+.pts b{font-family:"Orbitron",sans-serif;font-size:44px;color:var(--gold);line-height:1}
+.bar{height:12px;border-radius:99px;background:#13244d;overflow:hidden;margin:10px 0 4px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--pink));transition:width .5s}
+.rwl{margin-top:12px;display:grid;gap:8px}
+.rwi{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;border:1px solid var(--edge);background:rgba(255,255,255,.03)}
+.rwi .e{font-size:26px}
+.rwi div{flex:1;line-height:1.2}
+.rwi div small{display:block;color:var(--dim);font-weight:700}
+.rwi button{min-height:42px;padding:8px 12px;font-size:11px}
+.code{font-family:"Orbitron",sans-serif;font-size:20px;letter-spacing:.12em;background:#fff;color:#0b1630;border-radius:12px;padding:10px;text-align:center;margin-top:10px}
+
+/* visit punch card */
+.punch{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0 6px}
+.punch span{aspect-ratio:1;border-radius:50%;border:2px dashed #2f4a86;display:grid;place-items:center;font:900 15px "Orbitron",sans-serif;color:#4a6399;background:rgba(255,255,255,.02);transition:transform .3s,background .3s}
+.punch span.on{border:2px solid var(--gold);background:radial-gradient(circle at 40% 35%,#fff3c4,#ffd166 45%,#f2a93b);color:#3a1500;font-size:clamp(22px,7vw,30px);transform:scale(1.04)}
+.punch span.gift{border-color:var(--pink);color:var(--pink);font-size:20px}
+.bonus{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;margin-top:12px;font-weight:700;font-size:15px;line-height:1.25}
+.bonus.on{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.45);color:#c9f5e4}
+.bonus.off{background:rgba(255,184,107,.1);border:1px solid rgba(255,184,107,.55);color:#ffe0bd}
+.bonus i{font-style:normal;font-size:22px}
+.bonus span{flex:1}
+.bonus button{min-height:40px;padding:6px 12px;font-size:11px}
+.pick{margin-top:12px;padding:12px;border-radius:16px;border:1px solid var(--pink);background:rgba(255,143,196,.08);text-align:center}
+.pick p{margin:0 0 10px;font-weight:800;font-size:17px}
+.pick .row .btn{min-height:56px;font-size:13px}
+
+/* menu: specials carousel + category chips + item cards + cart (../menu.js has the items and the deal math) */
+.nudge{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;min-height:52px;border-radius:14px;border:1.5px solid rgba(255,143,196,.7);background:linear-gradient(90deg,rgba(255,143,196,.16),rgba(255,209,102,.16));color:var(--ink);font:800 16px "Rajdhani",sans-serif;cursor:pointer;padding:8px 12px;line-height:1.2}
+.nudge[data-s=here],.nudge[data-s=almost]{border-color:var(--gold);background:linear-gradient(90deg,#ffd166,#ff8fc4);color:#2a1000;animation:nb 1.2s ease-in-out infinite}
+@keyframes nb{50%{transform:scale(1.02)}}
+#menu h2{display:flex;align-items:center;gap:4px}
+.deals{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 8px;margin:0 -2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.deals::-webkit-scrollbar{display:none}
+.deal{flex:0 0 86%;max-width:340px;scroll-snap-align:start;border-radius:18px;padding:14px;position:relative;overflow:hidden;color:#170a1e;background:linear-gradient(135deg,var(--c),#fff 180%);box-shadow:0 10px 26px rgba(0,0,0,.35)}
+.deal::after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.28)}
+.deal .de{font-size:34px;line-height:1}
+.deal h3{font-family:"Orbitron",sans-serif;font-size:16.5px;font-weight:900;margin:6px 0 2px;line-height:1.2;position:relative;z-index:1}
+.deal p{margin:0;font-weight:700;font-size:15px;line-height:1.25;color:#2c1838;position:relative;z-index:1}
+.deal .when{position:absolute;right:10px;top:10px;z-index:2;font:800 11px "Rajdhani",sans-serif;letter-spacing:.08em;text-transform:uppercase;background:#170a1e;color:#fff;border-radius:99px;padding:2px 8px}
+.deal .when.on{background:#0f7a4f}
+.deal button{margin-top:10px;min-height:44px;border-radius:12px;border:0;background:#170a1e;color:#fff;font:800 15px "Rajdhani",sans-serif;padding:0 14px;cursor:pointer;position:relative;z-index:1}
+.dots{display:flex;justify-content:center;gap:6px;margin:2px 0 4px}
+.dots i{width:7px;height:7px;border-radius:50%;background:#2f4a86;transition:background .2s,width .2s}
+.dots i.on{background:var(--gold);width:18px;border-radius:99px}
+.demo-sw{border:1px dashed var(--edge);border-radius:12px;padding:6px 12px;margin:8px 0 0;font-size:15px;color:var(--silver)}
+.cats{position:sticky;top:calc(56px + env(safe-area-inset-top));z-index:20;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 0;margin-top:6px;background:linear-gradient(180deg,var(--bg) 82%,rgba(3,6,14,0))}
+.cats::-webkit-scrollbar{display:none}
+.cats button{flex:1 1 0;min-width:0;min-height:58px;border-radius:14px;border:1px solid var(--edge);background:#0a1631;color:var(--ink);font:800 14px "Rajdhani",sans-serif;padding:4px 2px;cursor:pointer;white-space:nowrap;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;gap:2px}
+.cats button i{font-style:normal;font-size:20px}
+.cats button[aria-selected=true]{background:var(--gold);color:#2a1a00;border-color:var(--gold)}
+.items{display:grid;gap:8px}
+@media(min-width:620px){.items{grid-template-columns:1fr 1fr}}
+.it{display:flex;gap:10px;align-items:center;padding:10px;border-radius:16px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);min-width:0}
+.it.in{border-color:rgba(255,209,102,.7);box-shadow:inset 0 0 0 1px rgba(255,209,102,.35)}
+.it .ie{flex:none;width:54px;height:54px;border-radius:14px;display:grid;place-items:center;font-size:30px;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.35),var(--c) 70%)}
+.it .ib{flex:1;min-width:0;line-height:1.2}
+.it .ib b{display:block;font-size:16.5px}
+.it .ib small{display:block;color:var(--dim);font-size:14px;margin-top:1px}
+.bdg{display:inline-block;margin:4px 4px 0 0;font:800 11px "Rajdhani",sans-serif;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:1px 7px;color:#1d0f24;background:var(--c)}
+.it .ia{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.it .p{font-family:"Orbitron",sans-serif;font-size:14.5px;color:var(--gold);white-space:nowrap}
+.add{min-width:64px;min-height:44px;border-radius:12px;border:0;background:linear-gradient(180deg,#4a90ff,#1f5fe0);color:#fff;font:800 15px "Rajdhani",sans-serif;cursor:pointer}
+.qty{display:flex;align-items:center;border:1px solid var(--gold);border-radius:12px;overflow:hidden}
+.qty button{width:38px;min-height:42px;border:0;background:rgba(255,209,102,.14);color:var(--gold);font:900 20px "Rajdhani",sans-serif;cursor:pointer}
+.qty output{min-width:24px;text-align:center;font:800 16px "Orbitron",sans-serif}
+#cartBar{position:fixed;left:0;right:0;bottom:0;z-index:70;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:rgba(3,6,14,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--edge)}
+#cartBar .in{max-width:760px;margin:0 auto}
+#cartBar .hint{font-weight:700;font-size:13.5px;color:var(--gold);text-align:center;margin:0 0 6px;line-height:1.2}
+#cartOpen{width:100%;display:flex;align-items:center;gap:10px;min-height:54px;border-radius:14px;border:0;background:linear-gradient(180deg,#ffe08f,#ffbf3f);color:#2a1a00;font:800 16px "Rajdhani",sans-serif;padding:0 14px;cursor:pointer;text-align:left}
+#cartOpen .n{display:grid;place-items:center;min-width:28px;height:28px;border-radius:99px;background:#2a1a00;color:#ffd166;font:900 13px "Orbitron",sans-serif}
+#cartOpen .sv{flex:1;font-size:14.5px;color:#0f6a44}
+#cartOpen .tt{font:900 16px "Orbitron",sans-serif}
+#cartBar.pop{animation:pop .45s}
+@keyframes pop{40%{transform:translateY(-6px)}}
+body.has-cart{padding-bottom:120px}
+body.has-cart #toast{bottom:calc(110px + env(safe-area-inset-bottom))}
+.sheet{position:fixed;inset:0;z-index:110;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+.sheet .pn{width:100%;max-width:560px;max-height:88vh;overflow-y:auto;background:var(--navy);border:1px solid var(--edge);border-radius:22px 22px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.sheet .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.sheet .x{min-width:44px;min-height:44px;border-radius:12px;border:1px solid var(--edge);background:none;color:var(--ink);font-size:20px;cursor:pointer}
+.ln{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--edge)}
+.ln .e{font-size:24px;flex:none}
+.ln div{flex:1;min-width:0;line-height:1.2;font-weight:700}
+.ln div small{display:block;color:var(--dim);font-weight:600}
+.ln .p{font-family:"Orbitron",sans-serif;font-size:14px;white-space:nowrap}
+.dl{display:flex;justify-content:space-between;gap:10px;padding:6px 10px;border-radius:10px;background:rgba(52,211,153,.1);color:#c9f5e4;font-weight:800;margin-top:6px}
+.dl span:last-child{font-family:"Orbitron",sans-serif;font-size:14px;color:var(--good);white-space:nowrap}
+.tot{display:grid;grid-template-columns:1fr auto;gap:2px 10px;margin-top:12px;font-weight:700;font-size:16px}
+.tot .big{font:900 22px "Orbitron",sans-serif;color:var(--gold)}
+.saved{margin-top:10px;text-align:center;font:900 clamp(18px,5.4vw,22px) "Orbitron",sans-serif;color:var(--good)}
+#ticket{position:fixed;inset:0;z-index:120;background:#ffd166;color:#170a1e;overflow-y:auto;padding:calc(16px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom))}
+#ticket .tk{max-width:460px;margin:0 auto;background:#fff;border-radius:22px;padding:18px;box-shadow:0 18px 40px rgba(80,40,0,.25)}
+#ticket h2{font-size:20px;text-align:center}
+#ticket .tc{font:900 clamp(26px,8vw,34px) "Orbitron",sans-serif;letter-spacing:.1em;text-align:center;border:3px dashed #170a1e;border-radius:14px;padding:10px;margin:12px 0}
+#ticket .ln{border-color:#e6e0ef}
+#ticket .ln div small{color:#5c4f6b}
+#ticket .dl{background:#e3f8ee;color:#0b5a3a}
+#ticket .dl span:last-child{color:#0b7a4f}
+#ticket .tot .big{color:#170a1e}
+#ticket .saved{color:#0b7a4f}
+#ticket p{text-align:center;font-weight:700;margin:10px 0 0;color:#3a2c48}
+#ticket .btn{width:100%;margin-top:14px}
+
+/* switch */
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--edge);font-weight:700}
+.sw:first-of-type{border-top:0}
+.sw input{width:52px;height:30px;accent-color:var(--blue)}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;min-height:44px;border-radius:12px;border:1px solid var(--edge);background:rgba(255,255,255,.03);color:var(--ink);font:700 15px "Rajdhani",sans-serif}
+.seg button[aria-pressed=true]{background:var(--blue);border-color:var(--blue)}
+
+/* ringing overlay */
+#ringer{position:fixed;left:0;right:0;top:0;z-index:100;padding:calc(10px + env(safe-area-inset-top)) 12px 0;transform:translateY(-130%);transition:transform .35s cubic-bezier(.2,.9,.3,1.2);pointer-events:none}
+#ringer.show{transform:none;pointer-events:auto}
+#ringer .ring{max-width:520px;margin:0 auto;flex-wrap:wrap}
+#ringer .ring>div:nth-child(2){flex:1;min-width:0}
+#ringer .acts{flex-basis:100%;display:flex;gap:8px;margin-top:8px}
+#ringer .acts button{flex:1;min-height:46px;border-radius:12px;border:0;font:800 15px "Rajdhani",sans-serif;cursor:pointer}
+#ringer .go{background:#1f5fe0;color:#fff}
+#ringer .no{background:#dfe5f2;color:#24324f}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,140%);background:#0f1f45;border:1px solid var(--edge);color:var(--ink);padding:12px 16px;border-radius:14px;font-weight:700;z-index:90;transition:transform .3s;max-width:calc(100% - 32px);text-align:center}
+#toast.show{transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <img class="logo" src="icon-192.png?v=20261013b" alt="" width="40" height="40">
+  <b>Paletas El Sol<small><span data-t="topSub">Truck alerts</span> <span class="tag">demo</span></small></b>
+  <span class="sp"></span>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">English</button><button data-lang="es" aria-pressed="false" lang="es">Español</button></div>
+</div></div>
+
+<main class="wrap">
+  <section class="live" aria-live="polite">
+    <span class="pulse" data-t="onRoute">On route now</span>
+    <div class="eta" id="eta" data-s="way">
+      <span class="chip" id="etaState">On the way</span>
+      <div class="big" id="etaBig">Arriving in <b>~10 min</b></div>
+      <div class="dist" id="etaDist">1.2 mi away</div>
+    </div>
+    <button type="button" class="nudge" id="nudge" data-s="way">🍦 See the menu + today's deals</button>
+    <div class="sub" id="substatus" data-t="subStatus">We'll ring your phone when it's close.</div>
+    <button class="btn gold" id="test" type="button" data-t="testBtn">🔔 Test the alert</button>
+    <div style="margin-top:10px"><button class="spk-btn" type="button" id="explain" aria-pressed="false" data-t="explain">🔊 What is this demo?</button></div>
+  </section>
+
+  <div class="map" data-t-aria="mapAria" aria-label="Live map: your house and the ice cream truck">
+    <div id="lmap"></div>
+    <div class="mapchip" id="mapChip" aria-hidden="true">🚚 <b>~10 min</b> · 1.2 mi</div>
+    <button type="button" id="recenter" data-t="recenter">◎ Recenter</button>
+    <div class="mapmsg" id="mapMsg" hidden></div>
+  </div>
+  <p class="privacy"><i aria-hidden="true">🔒</i><span data-t="privacyMap">Your house pin is saved only on your phone. The truck never sees your address. (A free map service draws the route.)</span></p>
+  <p class="note" id="homeMsg" aria-live="polite"></p>
+  <div class="mapctl">
+    <button class="btn ghost" id="replay" type="button" data-t="replay">↺ Replay the route</button>
+    <button class="btn ghost" id="faster" type="button" data-t="faster">⏩ Bring it closer</button>
+  </div>
+  <div class="spd">
+    <span data-t="speedL">Demo speed</span>
+    <div class="seg" id="speed" role="group"><button type="button" data-x="1" aria-pressed="false" data-t="speed1">1x real time</button><button type="button" data-x="10" aria-pressed="true" data-t="speed10">10x (demo)</button></div>
+  </div>
+  <p class="credits" data-t="mapCredits">Map © OpenStreetMap contributors (ODbL). Street routing: OSRM. Address search: Nominatim.</p>
+
+  <section class="s" id="join">
+    <header><p class="kick" data-t="joinKick">Step 1</p><h2 class="chrome" data-t="joinH">Join in 10 seconds</h2></header>
+    <div class="card" id="joinCard">
+      <form id="joinForm" autocomplete="off">
+        <label class="fld"><span data-t="nameL">Your first name</span><input id="name" maxlength="30" data-t-ph="namePh" placeholder="Maria"></label>
+        <button class="btn primary" type="submit" style="width:100%" data-t="joinBtn">Join + get 10 free points</button>
+        <p class="note" data-t="joinNote">Demo only: nothing is sent anywhere. It stays on this phone.</p>
+      </form>
+      <div id="joined" hidden><p class="ok" id="hello"></p></div>
+    </div>
+
+    <div class="card">
+      <p class="kick" data-t="locKick">Step 2</p>
+      <h3 data-t="locH">Let us know your street</h3>
+      <div class="why"><i aria-hidden="true">📍</i><span data-t="locWhy">We only use your location to know <b>which street to ring</b> when the truck is close. We don't follow you around, and you can turn it off any time.</span></div>
+      <div class="row">
+        <button class="btn primary" id="locBtn" type="button" data-t="locBtn">📍 Allow location</button>
+        <button class="btn ghost" id="typeBtn" type="button" data-t="typeBtn">⌨️ Type my street</button>
+      </div>
+      <label class="fld" id="streetFld" hidden><span data-t="streetL">Your street and city</span><input id="street" maxlength="60" data-t-ph="streetPh" placeholder="Maple Ave, Santa Ana"></label>
+      <p class="note" id="locMsg" aria-live="polite"></p>
+    </div>
+
+    <div class="card">
+      <p class="kick" data-t="iosKick">Step 3 · iPhone</p>
+      <h3 data-t="iosH">Turn on alerts</h3>
+      <p class="note" data-t="iosP">On iPhone, tap <b>Share</b> (the square with the arrow) → <b>Add to Home Screen</b> → open it from your Home Screen and allow notifications. That's Apple's rule for alerts. On Android, just tap "Allow" when it asks.</p>
+    </div>
+  </section>
+
+  <section class="s" id="points">
+    <header><p class="kick" data-t="ptsKick">Your points</p><h2 class="chrome" data-t="ptsH">Points + rewards</h2></header>
+    <div class="card" id="visitCard">
+      <p class="kick" data-t="vKick">Visit card</p>
+      <h3 data-t="vH">5 visits = a treat on us</h3>
+      <div class="punch" id="punch" aria-hidden="true"></div>
+      <p class="note" id="vNext" aria-live="polite"></p>
+      <button class="btn gold" id="checkin" type="button" style="width:100%" data-t="checkBtn">📍 Check in at the truck</button>
+      <p class="note" data-t="checkNote">For real, you scan the QR on the truck: one check-in per truck visit. In this demo you can tap as much as you like.</p>
+      <div class="pick" id="pick" hidden>
+        <p data-t="pickH">🎉 5th visit! Pick your treat:</p>
+        <div class="row"><button class="btn primary" id="pick10" type="button" data-t="pick10">🏷️ 10% off</button><button class="btn primary" id="pickScoop" type="button" data-t="pickScoop">🍦 Extra scoop free</button></div>
+      </div>
+      <div id="vCodeBox" hidden><p class="note" data-t="codeL" style="margin:10px 0 0">Show this to the driver:</p><div class="code" id="vCode"></div></div>
+      <div class="bonus" id="bonus" aria-live="polite"></div>
+    </div>
+    <div class="card">
+      <div class="pts"><b id="ptsN">0</b><span data-t="ptsL">points</span></div>
+      <div class="bar"><i id="ptsBar"></i></div>
+      <p class="note" id="ptsNext"></p>
+      <button class="btn gold" id="buy" type="button" style="width:100%" data-t="buyBtn">🧾 Pretend I bought something (+10)</button>
+      <p class="note" data-t="buyNote">For real, the driver scans your code at the window.</p>
+      <div class="rwl" id="rwl"></div>
+      <div id="codeBox" hidden><p class="note" data-t="codeL" style="margin:10px 0 0">Show this to the driver:</p><div class="code" id="code"></div></div>
+    </div>
+  </section>
+
+  <section class="s" id="menu">
+    <header><p class="kick" data-t="menuKick">Menu</p><h2><span class="chrome" data-t="menuH">What's on the truck</span><button type="button" class="spk-mini" id="menuSay" data-t-aria="menuSayA" aria-label="Read today's deals out loud">🔊</button></h2><p class="lead" data-t="menuLead">Ice cream, paletas, drinks, candy and toys. Tap + to build your order: deals apply by themselves.</p></header>
+    <p class="kick" data-t="dealsKick" style="margin-top:4px">🔥 Today's deals</p>
+    <div class="deals" id="deals"></div>
+    <div class="dots" id="dealDots" aria-hidden="true"></div>
+    <label class="sw demo-sw"><span data-t="fakeTime">Demo: pretend it's Friday at 3:30 PM (turns on Happy Hour + Toy Friday)</span><input type="checkbox" id="fakeTime" checked></label>
+    <div class="cats" id="cats" role="tablist" data-t-aria="catsA" aria-label="Menu categories"></div>
+    <div class="items" id="items" role="tabpanel"></div>
+    <p class="note" data-t="menuNote">Sample truck prices. Every truck sets its own menu, prices and deals.</p>
+  </section>
+
+  <section class="s" id="settings">
+    <header><p class="kick" data-t="setKick">Settings</p><h2 class="chrome" data-t="setH">Your alerts, your rules</h2></header>
+    <div class="card">
+      <p style="margin:0 0 6px;font-weight:700" data-t="distL">Ring me when the truck is within</p>
+      <div class="seg" id="dist">
+        <button type="button" data-d="0.15">0.15 mi</button><button type="button" data-d="0.25">0.25 mi</button><button type="button" data-d="0.5">0.5 mi</button>
+      </div>
+      <label class="sw" style="margin-top:10px"><span data-t="swAlerts">Alerts on</span><input type="checkbox" id="alertsOn" checked></label>
+      <label class="sw"><span data-t="swSound">Play the jingle</span><input type="checkbox" id="soundOn" checked></label>
+      <label class="sw"><span data-t="swQuiet">Quiet after 8 PM</span><input type="checkbox" id="quietOn" checked></label>
+      <button class="btn ghost" id="reset" type="button" style="width:100%;margin-top:10px" data-t="resetBtn">Leave + delete my info</button>
+      <p class="note" data-t="privacy">Your info is never sold. One alert per truck visit. Turn it off any time.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="f wrap">
+  <span data-t="foot">"Paletas El Sol" is a made-up sample truck. Demo by SousShift AI.</span><br>
+  <a href="../" data-t="footLink">For truck owners: get this for your truck →</a>
+</footer>
+
+<div id="ringer" role="alertdialog" aria-live="assertive" aria-hidden="true">
+  <div class="ring on">
+    <div class="ic app"><img src="icon-192.png?v=20261013b" alt=""></div>
+    <div><small data-t="nApp">Paletas El Sol · now</small><b data-t="nTitle">The truck is on your street!</b><span id="nBody"></span></div>
+    <div class="acts"><button class="go" id="coming" type="button" data-t="coming">🏃 I'm coming!</button><button class="no" id="silence" type="button" data-t="silence">Silence</button></div>
+  </div>
+</div>
+<div id="cartBar" hidden><div class="in">
+  <p class="hint" id="cartHint" hidden></p>
+  <button type="button" id="cartOpen"><span class="n" id="cbN">0</span><span class="sv" id="cbSave"></span><span class="tt" id="cbT">$0.00</span></button>
+</div></div>
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetH">
+  <div class="pn">
+    <div class="hd"><h2 id="sheetH" data-t="cartH">Your order</h2><button type="button" class="x" id="sheetX" data-t-aria="close" aria-label="Close">✕</button></div>
+    <div id="cartLines"></div>
+    <div id="cartDeals"></div>
+    <p class="hint note" id="sheetHint" hidden style="color:var(--gold);font-weight:700"></p>
+    <div class="tot" id="cartTot"></div>
+    <div class="saved" id="cartSaved"></div>
+    <button type="button" class="btn gold" id="showDriver" style="width:100%;margin-top:12px" data-t="showDriver">🧾 Show this to the driver</button>
+    <button type="button" class="btn ghost" id="cartClear" style="width:100%;margin-top:8px" data-t="cartClear">Clear order</button>
+    <p class="note" data-t="cartNote">Demo: no payment and nothing is sent. You pay at the window, cash or card.</p>
+  </div>
+</div>
+<div id="ticket" hidden role="dialog" aria-modal="true" aria-labelledby="tkH">
+  <div class="tk">
+    <h2 id="tkH" data-t="tkH">Show this to the driver 👋</h2>
+    <div class="tc" id="tkCode">SOL-0000</div>
+    <div id="tkLines"></div>
+    <div id="tkDeals"></div>
+    <div class="tot" id="tkTot"></div>
+    <div class="saved" id="tkSaved"></div>
+    <p data-t="tkPay">Pay at the window: cash, card, Apple Pay or Google Pay. +10 points when the driver scans your code.</p>
+    <button type="button" class="btn primary" id="tkDone" data-t="tkDone">Done</button>
+  </div>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+window.T = {
+en: {
+  _title: "Paletas El Sol: Truck Alerts", you: "You",
+  topSub: "Truck alerts", onRoute: "On route now",
+  stWay: "🚚 On the way", stStop: "🍦 Stopped to sell", stAlmost: "⏰ Almost here", stHere: "🎶 On your street", stGone: "👋 Truck has left",
+  etaIn: "Arriving in <b>~{m} min</b>", etaSoon: "Arriving in <b>under 1 min</b>", etaHere: "Truck is <b>here!</b>", etaGone: "Next round <b>soon</b>",
+  etaDist: "{d} mi away", etaDistStop: "{d} mi away <span>· selling at a stop</span>", etaDistHere: "Truck is on your street! Walk out now 🏃", etaDistGone: "{d} mi past your house",
+  chip: "🚚 <b>~{m} min</b> · {d} mi", chipSoon: "🚚 <b>&lt;1 min</b> · {d} mi", chipHere: "🚚 <b>Here!</b>", chipGone: "🚚 Left",
+  blFar: "On its way 🍦", blMid: "Getting closer 🍦🍦", blNear: "Right around the corner!", blHere: "It's here! 🍦🍦🍦",
+  blMelt: "Leaving your area… it's melting!", blNoLoc: "Ice cream truck 🍦",
+  mapAria: "Live map: your house and the ice cream truck", recenter: "◎ Recenter", homeLbl: "Your house",
+  privacyMap: "Your house pin is saved only on your phone. The truck never sees your address. (A free map service draws the route.)",
+  homeSample: "📍 Showing a sample street in South Gate. Tap <b>Allow location</b> or <b>Type my street</b> below to put the pin on your house.",
+  homeGps: "🏠 Pin set from your location (saved on this phone only).", homeTyped: "🏠 Pin set: {s}", homeFinding: "Finding {s} on the map…",
+  homeNotFound: "Couldn't find that street. The map still shows your last pin.",
+  routeStraight: "Street routing is offline, so the path is approximate.", mapOff: "The map couldn't load, but the arrival time still works.",
+  speedL: "Demo speed", speed1: "1x real time", speed10: "10x (demo)",
+  toastSpeed1: "Real time: the truck drives at about 10 mph.", toastSpeed10: "10x demo speed: 1 minute passes in 6 seconds.",
+  mapCredits: "Map © OpenStreetMap contributors (ODbL). Street routing: OSRM. Address search: Nominatim.",
+  subStatus: "We'll ring your phone when it's close.",
+  explain: "🔊 What is this demo?", explainStop: "⏹ Stop",
+  explainSay: "This is a demo of what your customers see on their phone. Paletas El Sol is a made-up truck. At the top is a live map with a GPS pin on their house and the ice cream truck driving toward it on real streets, with the arrival time, like arriving in six minutes, counting down so they know exactly when to walk out. Tap Test the alert to hear the jingle that rings their phone when the truck is close. Scroll down to see how they join in ten seconds and check in at your truck. Every fifth visit, they pick ten percent off or an extra scoop free. If they keep their truck alerts on, they get five bonus points every visit, so they keep the alerts on and you keep ringing their phone. They also collect points, and browse your full menu with ice cream, paletas, drinks, candy and toys, with your specials, like buy two and the third is half off, adding up by themselves in their order. They control their alerts too. Your truck gets its own name, colors and menu.",
+  testBtn: "🔔 Test the alert", replay: "↺ Replay the route", faster: "⏩ Bring it closer",
+  joinKick: "Step 1", joinH: "Join in 10 seconds", nameL: "Your first name", namePh: "Maria",
+  joinBtn: "Join + get 10 free points", joinNote: "Demo only: nothing is sent anywhere. It stays on this phone.",
+  hello: "Welcome, {n}! You got 10 free points. 🎉", helloAnon: "Welcome! You got 10 free points. 🎉",
+  locKick: "Step 2", locH: "Let us know your street",
+  locWhy: "We only use your location to know <b>which street to ring</b> when the truck is close. We don't follow you around, and you can turn it off any time.",
+  locBtn: "📍 Allow location", typeBtn: "⌨️ Type my street", streetL: "Your street and city", streetPh: "Maple Ave, Santa Ana",
+  locAsking: "Your phone will ask. Tap \"Allow\".", locOk: "✅ Got it. Your street is saved (in this demo it stays on your phone).",
+  locNo: "No problem. The demo uses a sample street. You can type yours instead.", locNA: "This browser can't share location. Type your street instead.",
+  streetOk: "✅ Saved: {s}",
+  iosKick: "Step 3 · iPhone", iosH: "Turn on alerts",
+  iosP: "On iPhone, tap <b>Share</b> (the square with the arrow) → <b>Add to Home Screen</b> → open it from your Home Screen and allow notifications. That's Apple's rule for alerts. On Android, just tap \"Allow\" when it asks.",
+  vKick: "Visit card", vH: "5 visits = a treat on us",
+  vNext: "{n} more visits to your treat", vLast: "1 more visit to your treat!", vReady: "Your 5th visit is in. Pick your treat below 👇",
+  checkBtn: "📍 Check in at the truck", checkNote: "For real, you scan the QR on the truck: one check-in per truck visit. In this demo you can tap as much as you like.",
+  pickH: "🎉 5th visit! Pick your treat:", pick10: "🏷️ 10% off", pickScoop: "🍦 Extra scoop free",
+  t10: "10% off", tScoop: "Extra scoop free",
+  toastVisit: "Visit {v} of 5 checked in! ✅", toastVisitBonus: "Visit {v} of 5 checked in! +5 alerts bonus 🔔", toastPick: "Treat unlocked. Show the code to the driver. Your card starts over.",
+  bonusOn: "<b>Alerts on:</b> +5 bonus points every visit", bonusOff: "<b>Alerts off:</b> you're missing +5 bonus points every visit", bonusFix: "Turn on",
+  toastAlertsOff: "Alerts off: no more +5 bonus per visit.", toastAlertsOn: "Alerts on: +5 bonus every visit 🔔",
+  ptsKick: "Your points", ptsH: "Points + rewards", ptsL: "points",
+  ptsNext: "{n} more points to {r}", ptsAll: "You can get every reward. Nice!",
+  buyBtn: "🧾 Pretend I bought something (+10)", buyNote: "For real, the driver scans your code at the window.",
+  redeem: "Use", need: "{n} pts", codeL: "Show this to the driver:",
+  r1: "50¢ off", r2: "$1 off", r3: "Free chili cheese chips", r4: "Free paleta",
+  toastBuy: "+10 points! 🍦", toastJoin: "Join first (Step 1) to collect points.", toastRedeem: "Reward ready. Show the code to the driver.",
+  menuKick: "Menu", menuH: "What's on the truck", menuLead: "Ice cream, paletas, drinks, candy and toys. Tap + to build your order: deals apply by themselves.",
+  menuSayA: "Read today's deals out loud", dealsKick: "🔥 Today's deals", catsA: "Menu categories",
+  fakeTime: "Demo: pretend it's Friday at 3:30 PM (turns on Happy Hour + Toy Friday)",
+  menuNote: "Sample truck prices. Every truck sets its own menu, prices and deals.",
+  nudgeWay: "🍦 See the menu + today's deals", nudgeAlmost: "⏰ Almost here! Pick your treats now →", nudgeHere: "🎶 Truck's on your street! Tap to see the menu",
+  add: "+ Add", tryIt: "Try it →", seeCard: "See my visit card →", onNow: "On now", friOnly: "Fridays", hhOnly: "3–4 PM",
+  bdg_b2: "3rd ½ off", bdg_kid: "Kid combo", bdg_fam: "Family pack", bdg_hh: "−$1 at 3 PM", bdg_toy: "3rd free Fri",
+  cartItems: "{n} items", cartSaveBar: "You saved {s}!", cartH: "Your order", close: "Close", each: "{p} each",
+  sub: "Subtotal", deals: "Deals", total: "Total", saved: "🎉 You saved {s}!", dealX: "{d} ×{n}",
+  hint: "💡 Add 1 more from {c} and save {s} more", showDriver: "🧾 Show this to the driver", cartClear: "Clear order",
+  cartNote: "Demo: no payment and nothing is sent. You pay at the window, cash or card.",
+  tkH: "Show this to the driver 👋", tkPay: "Pay at the window: cash, card, Apple Pay or Google Pay. +10 points when the driver scans your code.", tkDone: "Done",
+  toastAdd: "Added: {i}", toastTry: "{d}: deal applied ✅", toastCleared: "Order cleared.", toastTimeOn: "Happy Hour + Toy Friday are on (demo).", toastTimeOff: "Back to the real clock.",
+  menuSay: "Today's deals at Paletas El Sol. ",
+  setKick: "Settings", setH: "Your alerts, your rules", distL: "Ring me when the truck is within",
+  swAlerts: "Alerts on", swSound: "Play the jingle", swQuiet: "Quiet after 8 PM",
+  resetBtn: "Leave + delete my info", resetDone: "Done. Your info was deleted from this phone.",
+  privacy: "Your info is never sold. One alert per truck visit. Turn it off any time.",
+  nApp: "Paletas El Sol · now", nTitle: "The truck is on your street!", nBody: "{d} mi away, about {m} min. Walk out now 🎶",
+  coming: "🏃 I'm coming!", silence: "Silence", toastComing: "The driver can see 1 person is on the way. 🙌",
+  alertsOff: "Alerts are off in Settings, so the real app wouldn't ring.",
+  foot: "\"Paletas El Sol\" is a made-up sample truck. Demo by SousShift AI.",
+  footLink: "For truck owners: get this for your truck →"
+},
+es: {
+  _title: "Paletas El Sol: Alertas del Troque", you: "Tú",
+  topSub: "Alertas del troque", onRoute: "En ruta ahorita",
+  stWay: "🚚 En camino", stStop: "🍦 Parado vendiendo", stAlmost: "⏰ Ya casi llega", stHere: "🎶 En tu calle", stGone: "👋 Ya se fue el troque",
+  etaIn: "Llega en <b>~{m} min</b>", etaSoon: "Llega en <b>menos de 1 min</b>", etaHere: "¡Ya <b>llegó!</b>", etaGone: "Pronto <b>vuelve</b>",
+  etaDist: "A {d} mi", etaDistStop: "A {d} mi <span>· vendiendo en una parada</span>", etaDistHere: "¡El troque está en tu calle! Sal ahorita 🏃", etaDistGone: "{d} mi después de tu casa",
+  chip: "🚚 <b>~{m} min</b> · {d} mi", chipSoon: "🚚 <b>&lt;1 min</b> · {d} mi", chipHere: "🚚 <b>¡Aquí!</b>", chipGone: "🚚 Se fue",
+  blFar: "Ya viene 🍦", blMid: "Cada vez más cerca 🍦🍦", blNear: "¡Ya está a la vuelta!", blHere: "¡Ya llegó! 🍦🍦🍦",
+  blMelt: "Se va de tu zona… ¡se está derritiendo!", blNoLoc: "Troque de helados 🍦",
+  mapAria: "Mapa en vivo: tu casa y el troque de helados", recenter: "◎ Centrar", homeLbl: "Tu casa",
+  privacyMap: "El pin de tu casa solo se guarda en tu celular. El troque nunca ve tu dirección. (Un servicio de mapas gratis dibuja la ruta.)",
+  homeSample: "📍 Mostrando una calle de muestra en South Gate. Toca <b>Permitir ubicación</b> o <b>Escribir mi calle</b> abajo para poner el pin en tu casa.",
+  homeGps: "🏠 Pin puesto con tu ubicación (guardado solo en este celular).", homeTyped: "🏠 Pin puesto: {s}", homeFinding: "Buscando {s} en el mapa…",
+  homeNotFound: "No encontramos esa calle. El mapa sigue mostrando tu último pin.",
+  routeStraight: "Las calles no cargaron, así que el camino es aproximado.", mapOff: "El mapa no cargó, pero la hora de llegada sigue funcionando.",
+  speedL: "Velocidad del demo", speed1: "1x tiempo real", speed10: "10x (demo)",
+  toastSpeed1: "Tiempo real: el troque va a unas 10 millas por hora.", toastSpeed10: "Velocidad 10x: 1 minuto pasa en 6 segundos.",
+  mapCredits: "Mapa © colaboradores de OpenStreetMap (ODbL). Calles: OSRM. Búsqueda de direcciones: Nominatim.",
+  subStatus: "Te sonamos el celular cuando esté cerca.",
+  explain: "🔊 ¿Qué es este demo?", explainStop: "⏹ Parar",
+  explainSay: "Este es un demo de lo que tus clientes ven en su celular. Paletas El Sol es un troque inventado. Arriba hay un mapa en vivo con un pin GPS en su casa y el troque de helados manejando hacia ella por calles reales, con la hora de llegada, como llega en seis minutos, contando para atrás para que sepan exactamente cuándo salir. Toca Probar la alerta para oír la musiquita que les suena en el celular cuando el troque está cerca. Baja para ver cómo se unen en diez segundos y registran su visita en tu troque. Cada quinta visita escogen diez por ciento de descuento o una bola extra gratis. Si dejan las alertas prendidas, ganan cinco puntos extra en cada visita, así que las dejan prendidas y tú les sigues sonando el celular. También juntan puntos y ven tu menú completo con helados, paletas, bebidas, dulces y juguetes, con tus ofertas, como compra dos y el tercero a mitad de precio, que se suman solitas en su pedido. Y controlan sus alertas. Tu troque lleva su propio nombre, colores y menú.",
+  testBtn: "🔔 Probar la alerta", replay: "↺ Repetir la ruta", faster: "⏩ Acercar el troque",
+  joinKick: "Paso 1", joinH: "Únete en 10 segundos", nameL: "Tu nombre", namePh: "María",
+  joinBtn: "Unirme + 10 puntos gratis", joinNote: "Solo es demo: no se manda nada a ningún lado. Se queda en este celular.",
+  hello: "¡Bienvenido(a), {n}! Ya tienes 10 puntos gratis. 🎉", helloAnon: "¡Bienvenido(a)! Ya tienes 10 puntos gratis. 🎉",
+  locKick: "Paso 2", locH: "Dinos cuál es tu calle",
+  locWhy: "Solo usamos tu ubicación para saber <b>en qué calle sonarte</b> cuando el troque esté cerca. No te andamos siguiendo, y lo puedes apagar cuando quieras.",
+  locBtn: "📍 Permitir ubicación", typeBtn: "⌨️ Escribir mi calle", streetL: "Tu calle y ciudad", streetPh: "Maple Ave, Santa Ana",
+  locAsking: "Tu celular te va a preguntar. Toca \"Permitir\".", locOk: "✅ Listo. Ya quedó guardada tu calle (en este demo se queda en tu celular).",
+  locNo: "No hay problema. El demo usa una calle de muestra. También puedes escribir la tuya.", locNA: "Este navegador no puede compartir la ubicación. Escribe tu calle.",
+  streetOk: "✅ Guardado: {s}",
+  iosKick: "Paso 3 · iPhone", iosH: "Activa las alertas",
+  iosP: "En iPhone, toca <b>Compartir</b> (el cuadrito con la flecha) → <b>Agregar a pantalla de inicio</b> → ábrela desde tu pantalla de inicio y permite las notificaciones. Es regla de Apple para las alertas. En Android, nomás toca \"Permitir\" cuando te pregunte.",
+  vKick: "Tarjeta de visitas", vH: "5 visitas = un antojo de regalo",
+  vNext: "Te faltan {n} visitas para tu premio", vLast: "¡Te falta 1 visita para tu premio!", vReady: "Ya llevas 5 visitas. Escoge tu premio abajo 👇",
+  checkBtn: "📍 Registrar visita al troque", checkNote: "En la vida real, escaneas el QR del troque: una visita por cada pasada del troque. En este demo puedes tocar las veces que quieras.",
+  pickH: "🎉 ¡Quinta visita! Escoge tu premio:", pick10: "🏷️ 10% de descuento", pickScoop: "🍦 Bola extra gratis",
+  t10: "10% de descuento", tScoop: "Bola extra gratis",
+  toastVisit: "¡Visita {v} de 5 registrada! ✅", toastVisitBonus: "¡Visita {v} de 5 registrada! +5 puntos por alertas 🔔", toastPick: "Premio listo. Enséñale el código al chofer. Tu tarjeta empieza de nuevo.",
+  bonusOn: "<b>Alertas prendidas:</b> +5 puntos extra en cada visita", bonusOff: "<b>Alertas apagadas:</b> te estás perdiendo +5 puntos extra en cada visita", bonusFix: "Prender",
+  toastAlertsOff: "Alertas apagadas: ya no ganas +5 puntos por visita.", toastAlertsOn: "Alertas prendidas: +5 puntos extra en cada visita 🔔",
+  ptsKick: "Tus puntos", ptsH: "Puntos + premios", ptsL: "puntos",
+  ptsNext: "Te faltan {n} puntos para {r}", ptsAll: "Ya te alcanza para todos los premios. ¡Bien!",
+  buyBtn: "🧾 Hacer como que compré algo (+10)", buyNote: "En la vida real, el chofer escanea tu código en la ventanilla.",
+  redeem: "Usar", need: "{n} pts", codeL: "Enséñale esto al chofer:",
+  r1: "50¢ de descuento", r2: "$1 de descuento", r3: "Chips con chili y queso gratis", r4: "Paleta gratis",
+  toastBuy: "¡+10 puntos! 🍦", toastJoin: "Primero únete (Paso 1) para juntar puntos.", toastRedeem: "Premio listo. Enséñale el código al chofer.",
+  menuKick: "Menú", menuH: "Lo que trae el troque", menuLead: "Helados, paletas, bebidas, dulces y juguetes. Toca + para armar tu pedido: las ofertas se aplican solas.",
+  menuSayA: "Leer las ofertas de hoy en voz alta", dealsKick: "🔥 Ofertas de hoy", catsA: "Categorías del menú",
+  fakeTime: "Demo: haz como que es viernes a las 3:30 PM (prende Hora Feliz + Viernes de Juguetes)",
+  menuNote: "Precios de muestra del troque. Cada troque pone su propio menú, precios y ofertas.",
+  nudgeWay: "🍦 Ver el menú + ofertas de hoy", nudgeAlmost: "⏰ ¡Ya casi llega! Escoge tus antojos →", nudgeHere: "🎶 ¡El troque está en tu calle! Toca para ver el menú",
+  add: "+ Agregar", tryIt: "Pruébalo →", seeCard: "Ver mi tarjeta →", onNow: "Ahorita", friOnly: "Viernes", hhOnly: "3–4 PM",
+  bdg_b2: "3º a ½", bdg_kid: "Combo niño", bdg_fam: "Paquete familiar", bdg_hh: "−$1 a las 3", bdg_toy: "3º gratis vie",
+  cartItems: "{n} cosas", cartSaveBar: "¡Ahorraste {s}!", cartH: "Tu pedido", close: "Cerrar", each: "{p} c/u",
+  sub: "Subtotal", deals: "Ofertas", total: "Total", saved: "🎉 ¡Ahorraste {s}!", dealX: "{d} ×{n}",
+  hint: "💡 Agrega 1 más de {c} y ahorras {s} más", showDriver: "🧾 Enséñale esto al chofer", cartClear: "Borrar pedido",
+  cartNote: "Demo: no se cobra ni se manda nada. Pagas en la ventanilla, efectivo o tarjeta.",
+  tkH: "Enséñale esto al chofer 👋", tkPay: "Paga en la ventanilla: efectivo, tarjeta, Apple Pay o Google Pay. +10 puntos cuando el chofer escanee tu código.", tkDone: "Listo",
+  toastAdd: "Agregado: {i}", toastTry: "{d}: oferta aplicada ✅", toastCleared: "Pedido borrado.", toastTimeOn: "Hora Feliz + Viernes de Juguetes prendidos (demo).", toastTimeOff: "De vuelta al reloj de verdad.",
+  menuSay: "Las ofertas de hoy en Paletas El Sol. ",
+  setKick: "Ajustes", setH: "Tus alertas, tus reglas", distL: "Suéname cuando el troque esté a menos de",
+  swAlerts: "Alertas prendidas", swSound: "Tocar la melodía", swQuiet: "Silencio después de las 8 PM",
+  resetBtn: "Salirme + borrar mis datos", resetDone: "Listo. Se borraron tus datos de este celular.",
+  privacy: "Nunca vendemos tus datos. Una alerta por cada pasada del troque. Apágalo cuando quieras.",
+  nApp: "Paletas El Sol · ahora", nTitle: "¡El troque está en tu calle!", nBody: "A {d} mi, como {m} min. Sal ahorita 🎶",
+  coming: "🏃 ¡Ya voy!", silence: "Silenciar", toastComing: "El chofer ve que 1 persona va en camino. 🙌",
+  alertsOff: "Las alertas están apagadas en Ajustes, así que la app de verdad no sonaría.",
+  foot: "\"Paletas El Sol\" es un troque de muestra inventado. Demo de SousShift AI.",
+  footLink: "Para dueños de troques: tenlo en tu troque →"
+}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="../lang.js?v=20261013b"></script>
+<script src="../jingle.js?v=20261013b"></script>
+<script src="../speak.js?v=20261013b"></script>
+<script src="../truck.js?v=20261013b"></script>
+<script src="../menu.js?v=20261018a"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = "ssai:ice:demo";
+  var S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "", visits: 0 };
+  try { var saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved) for (var k in saved) S[k] = saved[k]; } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  var t = function (k) { return ICE.t(k); };
+  var fmt = function (s, o) { return s.replace(/\{(\w+)\}/g, function (_, k) { return o[k]; }); };
+  var dec = function (n) { return n.toLocaleString(ICE.lang === "es" ? "es-US" : "en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); };
+
+  /* ---------- toast ---------- */
+  var toastT;
+  function toast(msg) { var el = $("toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(function () { el.classList.remove("show"); }, 2600); }
+
+  /* ---------- ring ---------- */
+  var ringT, lastD = 0.2, lastM = 3;
+  function ring(d, m, manual) {
+    if (!S.alerts && !manual) return;
+    if (!S.alerts && manual) toast(t("alertsOff"));
+    lastD = d; lastM = m;
+    $("nBody").textContent = fmt(t("nBody"), { d: dec(d), m: m });
+    var r = $("ringer"); r.classList.add("show"); r.setAttribute("aria-hidden", "false");
+    if (navigator.vibrate) try { navigator.vibrate([400, 200, 400, 200, 400]); } catch (e) {}
+    if (S.sound) Jingle.play(2).then(hide); else { clearTimeout(ringT); ringT = setTimeout(hide, 6000); }
+  }
+  function hide() { Jingle.stop(); clearTimeout(ringT); var r = $("ringer"); r.classList.remove("show"); r.setAttribute("aria-hidden", "true"); if (navigator.vibrate) try { navigator.vibrate(0); } catch (e) {} }
+  $("test").addEventListener("click", function () { unlocked = true; ring(0.2, 3, true); });
+  $("silence").addEventListener("click", hide);
+  $("coming").addEventListener("click", function () { hide(); toast(t("toastComing")); goMenu(); });
+
+  /* ---------- live map: house pin + truck on real streets + arrival time ---------- */
+  var MI = 1609.344;
+  var AVG_MPH = 10;             // ice cream trucks crawl: ~8–12 mph while rolling
+  var STOP_EVERY = 0.2 * MI;    // they pull over to sell every few blocks…
+  var STOP_SEC = 20;            // …for about 20 seconds
+  var HOME_STOP_SEC = 90;       // and sit on your street for ~1.5 min
+  /* ?sim=1 test path: a longer drive that starts ~1.6 mi out and leaves ~1.5 mi past the house, short stops and
+     30x speed, so one lap shows every blimp state: 1 scoop → 2 → 3 → melting while it drives away. ?loc=0 = no location. */
+  var QS = location.search;
+  var SIM = /[?&]sim=1\b/.test(QS), NO_LOC = /[?&]loc=0\b/.test(QS);
+  if (SIM) { STOP_SEC = 6; HOME_STOP_SEC = 12; }
+  function qnum(k, d) { var m = QS.match(new RegExp("[?&]" + k + "=([0-9.]+)")); return m && +m[1] > 0 ? +m[1] : d; }
+  // blimp scoops by distance from your location (miles). Tweak here, or test with ?near=0.3&mid=1.2
+  var BLIMP = { near: qnum("near", 0.25), mid: qnum("mid", 1.0) };
+  var HERE_M = 60, GONE_M = 110; // "on your street" window around the house (meters along the route)
+  var SAMPLE_HOME = { lat: 33.95155, lng: -118.20330 }; // sample residential block in South Gate, CA
+  var OSRM = "https://router.project-osrm.org/route/v1/driving/";
+  var NOMINATIM = "https://nominatim.openstreetmap.org/search";
+  var esc = function (x) { return String(x).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); };
+
+  function hav(a, b) {
+    var r = Math.PI / 180, dLa = (b[0] - a[0]) * r, dLo = (b[1] - a[1]) * r;
+    var x = Math.sin(dLa / 2) * Math.sin(dLa / 2) + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLo / 2) * Math.sin(dLo / 2);
+    return 12742000 * Math.asin(Math.min(1, Math.sqrt(x)));
+  }
+  function timedFetch(url, ms) {
+    var ctl = window.AbortController ? new AbortController() : null, id, o = { headers: { "Accept": "application/json" } };
+    if (ctl) { o.signal = ctl.signal; id = setTimeout(function () { ctl.abort(); }, ms); }
+    return fetch(url, o).then(function (r) { clearTimeout(id); if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); },
+      function (e) { clearTimeout(id); throw e; });
+  }
+
+  /* route = { line:[[lat,lng]…], cum:[meters…], total, homeAt (meters from start to the house), snapped } */
+  function mkRoute(line, snapped, homePt, hint) {
+    var cum = [0];
+    for (var i = 1; i < line.length; i++) cum.push(cum[i - 1] + hav(line[i - 1], line[i]));
+    var r = { line: line, cum: cum, total: cum[cum.length - 1], snapped: snapped, homeAt: 0 };
+    r.homeAt = project(r, homePt, hint).along;
+    return r;
+  }
+  // nearest point on the route to p; "hint" keeps it from jumping to a far part of the route that doubles back
+  function project(r, p, hint) {
+    var k = Math.cos(p[0] * Math.PI / 180) * 111320, best = null;
+    for (var i = 1; i < r.line.length; i++) {
+      var a = r.line[i - 1], b = r.line[i];
+      var ax = (a[1] - p[1]) * k, ay = (a[0] - p[0]) * 110540, bx = (b[1] - p[1]) * k, by = (b[0] - p[0]) * 110540;
+      var dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy, u = L2 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / L2)) : 0;
+      var cx = ax + u * dx, cy = ay + u * dy, d = Math.sqrt(cx * cx + cy * cy), along = r.cum[i - 1] + u * (r.cum[i] - r.cum[i - 1]);
+      var score = d + (hint != null ? Math.abs(along - hint) * 0.15 : 0);
+      if (!best || score < best.score) best = { score: score, d: d, along: along };
+    }
+    return best || { d: 0, along: 0 };
+  }
+  function pointAt(r, s) {
+    s = Math.max(0, Math.min(r.total, s));
+    var lo = 0, hi = r.cum.length - 1;
+    while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (r.cum[mid] <= s) lo = mid; else hi = mid; }
+    var a = r.line[lo], b = r.line[hi], seg = r.cum[hi] - r.cum[lo], u = seg ? (s - r.cum[lo]) / seg : 0;
+    return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u];
+  }
+  // the truck starts ~1 mi away (by road) and keeps going ~0.7 mi past the house, so you see the blimp melt as it leaves
+  // (?sim=1: ~1.6 mi out, ~1.5 mi past, so one lap shows 1, 2 and 3 scoops and then the melt)
+  function ends(h) {
+    if (SIM) return { s: [h.lat + 0.0235, h.lng - 0.003], e: [h.lat - 0.0132, h.lng + 0.0108] };
+    return { s: [h.lat + 0.0105, h.lng - 0.0085], e: [h.lat - 0.008, h.lng + 0.002] };
+  }
+  // offline fallback: a gently curved path, never a broken demo
+  function curvedRoute(h) {
+    var E = ends(h), H = [h.lat, h.lng], line = [];
+    function bez(a, b, bend, n, skipFirst) {
+      var mx = (a[0] + b[0]) / 2 - (b[1] - a[1]) * bend, my = (a[1] + b[1]) / 2 + (b[0] - a[0]) * bend;
+      for (var i = skipFirst ? 1 : 0; i <= n; i++) { var t = i / n, q = 1 - t; line.push([q * q * a[0] + 2 * q * t * mx + t * t * b[0], q * q * a[1] + 2 * q * t * my + t * t * b[1]]); }
+    }
+    bez(E.s, H, 0.18, 48, false); bez(H, E.e, -0.12, 16, true);
+    return mkRoute(line, false, H, null);
+  }
+  function buildRoute(h) {
+    var E = ends(h), H = [h.lat, h.lng];
+    var url = OSRM + [E.s, H, E.e].map(function (p) { return p[1].toFixed(6) + "," + p[0].toFixed(6); }).join(";") + "?overview=full&geometries=geojson";
+    if (!window.fetch) return Promise.resolve(curvedRoute(h));
+    return timedFetch(url, 12000).then(function (j) {
+      if (!j || j.code !== "Ok" || !j.routes || !j.routes[0] || !j.routes[0].geometry) throw new Error("no route");
+      var line = j.routes[0].geometry.coordinates.map(function (c) { return [c[1], c[0]]; });
+      var wp = j.waypoints && j.waypoints[1] ? [j.waypoints[1].location[1], j.waypoints[1].location[0]] : H;
+      var legs = j.routes[0].legs || [], r = mkRoute(line, true, wp, legs[0] ? legs[0].distance : null);
+      if (line.length < 2 || r.total > (SIM ? 8 : 6) * MI || r.homeAt < 0.25 * MI) throw new Error("odd route");
+      return r;
+    }).catch(function () { return curvedRoute(h); });
+  }
+
+  /* ---------- TruckFeed: the ONLY source of truck positions. The UI just listens. ----------
+     TruckFeed.on(fn) → fn({ lat, lng, t, stopped?, stopLeft?, lap? }) on every update.
+     • simulate (used now): drives a truck along a planned street route at ice-cream-truck speed, with selling stops.
+     • live (stub, not wired yet): see TruckFeed.live below. Going live = call TruckFeed.live.start(id) instead of
+       TruckFeed.simulate.start(route). Nothing in the UI changes. */
+  var TruckFeed = {
+    mode: "simulate", subs: [], last: null,
+    on: function (fn) { this.subs.push(fn); },
+    emit: function (u) { this.last = u; for (var i = 0; i < this.subs.length; i++) this.subs[i](u); },
+
+    simulate: {
+      route: null, s: 0, x: SIM ? 30 : 10, stopLeft: 0, stops: [], next: 0, lap: 0, endWait: 0, timer: 0, ts: 0, clock: 0,
+      start: function (route) {
+        var self = this; this.route = route; TruckFeed.mode = "simulate"; this.reset();
+        if (!this.timer) this.timer = setInterval(function () { self.tick(); }, 100);
+      },
+      stop: function () { clearInterval(this.timer); this.timer = 0; },
+      reset: function () {
+        var r = this.route, st = [];
+        for (var d = STOP_EVERY; d < r.total; d += STOP_EVERY) if (Math.abs(d - r.homeAt) > 0.08 * MI) st.push({ at: d, dur: STOP_SEC });
+        st.push({ at: r.homeAt, dur: HOME_STOP_SEC });
+        st.sort(function (a, b) { return a.at - b.at; });
+        this.stops = st; this.next = 0; this.s = 0; this.stopLeft = 0; this.endWait = 0; this.lap++; this.ts = Date.now(); this.send();
+      },
+      setSpeed: function (x) { this.x = x; },
+      jumpTo: function (s) {
+        if (s <= this.s) return;
+        this.s = s; this.stopLeft = 0;
+        while (this.next < this.stops.length && this.stops[this.next].at <= s) this.next++;
+        this.send();
+      },
+      mph: function (s) { return AVG_MPH + 2 * Math.sin(s / 140); }, // wobbles between 8 and 12 mph
+      tick: function () {
+        var now = Date.now(), real = Math.min(1, (now - this.ts) / 1000), dt = real * this.x, r = this.route;
+        this.ts = now; this.clock += dt; // feed-time clock (seconds), so trend math works at any demo speed
+        if (this.endWait > 0) { this.endWait -= real; if (this.endWait <= 0) this.reset(); return; }
+        while (dt > 0 && this.s < r.total) {
+          if (this.stopLeft > 0) { var w = Math.min(dt, this.stopLeft); this.stopLeft -= w; dt -= w; continue; }
+          var v = this.mph(this.s) * MI / 3600, go = v * dt, nx = this.stops[this.next];
+          if (nx && this.s + go >= nx.at) { dt -= (nx.at - this.s) / v; this.s = nx.at; this.stopLeft = nx.dur; this.next++; }
+          else { this.s += go; dt = 0; }
+        }
+        if (this.s >= r.total) { this.s = r.total; this.endWait = 6; }
+        this.send();
+      },
+      send: function () {
+        var p = pointAt(this.route, this.s);
+        TruckFeed.emit({ lat: p[0], lng: p[1], t: Date.now(), clock: this.clock, stopped: this.stopLeft > 0, stopLeft: this.stopLeft, lap: this.lap });
+      }
+    },
+
+    /* LIVE MODE (stub — no backend yet, so it is never started):
+       1. Driver's phone (driver app): navigator.geolocation.watchPosition → POST {lat, lng, t} every 5–10 s to a backend,
+          e.g. ~/dev/antidote-cloud on Railway (POST /api/trucks/:id/ping) or a Firebase Realtime DB path trucks/:id.
+       2. Customer app (this page): poll GET /api/trucks/:id/latest every 5 s (or subscribe with SSE / Firebase onValue)
+          and pass each fix to TruckFeed.emit({ lat, lng, t }).
+       3. The UI's ETA math already works from lat/lng alone; with a live truck, refresh the truck→house OSRM route every ~30 s. */
+    live: {
+      url: null, timer: 0, // e.g. "https://<antidote-cloud>.up.railway.app/api/trucks/" (set when the backend exists)
+      start: function (truckId) {
+        if (!this.url) return false; // no backend yet: keep the simulation
+        var self = this; TruckFeed.mode = "live"; TruckFeed.simulate.stop();
+        this.timer = setInterval(function () {
+          timedFetch(self.url + encodeURIComponent(truckId) + "/latest", 8000).then(function (p) {
+            if (p && isFinite(p.lat) && isFinite(p.lng)) TruckFeed.emit({ lat: +p.lat, lng: +p.lng, t: +p.t || Date.now() });
+          }).catch(function () {});
+        }, 5000);
+        return true;
+      },
+      stop: function () { clearInterval(this.timer); this.timer = 0; }
+    }
+  };
+
+  /* ---------- the customer's map (only consumes TruckFeed updates) ---------- */
+  var home = S.home && isFinite(S.home.lat) ? { lat: S.home.lat, lng: S.home.lng } : { lat: SAMPLE_HOME.lat, lng: SAMPLE_HOME.lng };
+  var R = null, prog = 0, lap = -1, rung = false, unlocked = false, lastU = null, prevLng = null, routeSeq = 0;
+  var map = null, homeMk = null, truckMk = null, zoneC = null, fullLine = null, leftLine = null, userMoved = false, lastFit = 0;
+  var blimp = new IceTruck.Blimp(null, { near: BLIMP.near, mid: BLIMP.mid, t: t });
+  // Is there a "you" to measure from? A pin from GPS or a typed street, or (demo only) the sample house that the
+  // simulation drives to. No location (?loc=0, or a live truck with no pin) → neutral 1-scoop blimp, no melting.
+  function haveLoc() { return !NO_LOC && (!!(S.home && isFinite(S.home.lat)) || TruckFeed.mode === "simulate"); }
+
+  function truckHtml() { return IceTruck.html(); } // realistic step-van + ice cream blimp (../truck.js)
+  function homeIcon() {
+    return L.divIcon({ className: "homepin", iconSize: [40, 40], iconAnchor: [20, 48],
+      html: '<div class="hp"><span>🏠</span></div><div class="hl">' + esc(t("homeLbl")) + '</div>' });
+  }
+  function mapMsg(k) { var m = $("mapMsg"); if (!k) { m.hidden = true; return; } m.textContent = t(k); m.hidden = false; m.setAttribute("data-k", k); }
+  function initMap() {
+    if (!window.L) { var n = document.createElement("div"); n.className = "mapnone"; n.setAttribute("data-t", "mapOff"); n.textContent = t("mapOff"); $("lmap").appendChild(n); $("recenter").hidden = true; return; }
+    map = L.map("lmap", { zoomControl: false, attributionControl: true }).setView([home.lat, home.lng], 15);
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
+    // OpenStreetMap tiles, darkened with a CSS filter (.osmdark) to match the page
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, className: "osmdark",
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).addTo(map);
+    zoneC = L.circle([home.lat, home.lng], { radius: S.dist * MI, color: "#ffd166", weight: 1.5, opacity: .6, dashArray: "4 6", fillColor: "#ffd166", fillOpacity: .06, interactive: false }).addTo(map);
+    fullLine = L.polyline([], { color: "#3fa9ff", weight: 5, opacity: .25, interactive: false }).addTo(map);
+    leftLine = L.polyline([], { color: "#ffd166", weight: 4, opacity: .95, dashArray: "1 9", lineCap: "round", interactive: false }).addTo(map);
+    homeMk = L.marker([home.lat, home.lng], { icon: homeIcon(), keyboard: false, interactive: false, zIndexOffset: 500 }).addTo(map);
+    map.on("dragstart", function () { userMoved = true; });
+  }
+  function fit(anim) {
+    if (!map) return;
+    var pts = [[home.lat, home.lng]];
+    if (lastU) pts.push([lastU.lat, lastU.lng]);
+    lastFit = Date.now();
+    if (pts.length < 2 || hav(pts[0], pts[1]) < 120) { map.setView(pts[0], 17, { animate: !!anim }); return; }
+    map.fitBounds(L.latLngBounds(pts), { paddingTopLeft: [40, $("mapMsg").hidden ? 150 : 190], paddingBottomRight: [40, 40], maxZoom: 17, animate: !!anim });
+  }
+  $("recenter").addEventListener("click", function () { userMoved = false; fit(true); });
+
+  function placeHome() {
+    if (!map) return;
+    homeMk.setLatLng([home.lat, home.lng]); zoneC.setLatLng([home.lat, home.lng]);
+  }
+  function loadRoute() {
+    var my = ++routeSeq;
+    return buildRoute(home).then(function (r) {
+      if (my !== routeSeq) return;
+      R = r; prog = 0; lap = -1;
+      mapMsg(r.snapped ? "" : "routeStraight");
+      if (fullLine) fullLine.setLatLngs(r.line);
+      TruckFeed.simulate.start(r);
+      userMoved = false; fit(false);
+    });
+  }
+  function renderHomeMsg() {
+    var m = $("homeMsg"), h = S.home;
+    if (!h || !isFinite(h.lat)) m.innerHTML = t("homeSample");
+    else if (h.src === "typed") m.textContent = fmt(t("homeTyped"), { s: h.label || "" });
+    else m.textContent = t("homeGps");
+  }
+  function setHome(lat, lng, src, label) {
+    home = { lat: +(+lat).toFixed(5), lng: +(+lng).toFixed(5) };
+    S.home = { lat: home.lat, lng: home.lng, src: src, label: label || "" }; save(); // saved on this phone only
+    renderHomeMsg(); placeHome(); return loadRoute();
+  }
+
+  function etaSec(leftM, u) { // remaining road distance ÷ average speed + the selling stops still ahead
+    var stops = Math.floor(Math.max(0, leftM - 1) / STOP_EVERY);
+    return leftM / MI / AVG_MPH * 3600 + stops * STOP_SEC + (u.stopped ? (u.stopLeft != null ? u.stopLeft : STOP_SEC / 2) : 0);
+  }
+  function miles(m) { return dec(Math.max(0.1, Math.abs(m) / MI)); }
+  var shown = {};
+  function setHTML(id, html) { if (shown[id] !== html) { $(id).innerHTML = html; shown[id] = html; } }
+
+  function render(u) {
+    var p = [u.lat, u.lng], left;
+    if (R) { var pr = project(R, p, prog); prog = pr.along; left = R.homeAt - prog; }
+    else left = hav(p, [home.lat, home.lng]) * 1.3; // live truck before a route exists: straight line × road factor
+    var eta = etaSec(Math.max(0, left), u), mins = Math.max(1, Math.round(eta / 60)), state, big, dist, chip, label;
+    if (left > HERE_M) {
+      state = eta <= 120 ? "almost" : "way";
+      label = state === "almost" ? "stAlmost" : (u.stopped ? "stStop" : "stWay");
+      big = eta < 60 ? t("etaSoon") : fmt(t("etaIn"), { m: mins });
+      dist = fmt(t(u.stopped ? "etaDistStop" : "etaDist"), { d: miles(left) });
+      chip = fmt(t(eta < 60 ? "chipSoon" : "chip"), { m: mins, d: miles(left) });
+    } else if (left > -GONE_M) { state = "here"; label = "stHere"; big = t("etaHere"); dist = t("etaDistHere"); chip = t("chipHere"); }
+    else { state = "gone"; label = "stGone"; big = t("etaGone"); dist = fmt(t("etaDistGone"), { d: miles(left) }); chip = t("chipGone"); }
+    $("eta").setAttribute("data-s", state);
+    var nd = $("nudge"); if (nd.getAttribute("data-s") !== state) { nd.setAttribute("data-s", state); nd.textContent = t(state === "here" ? "nudgeHere" : state === "almost" ? "nudgeAlmost" : "nudgeWay"); }
+    setHTML("etaState", t(label)); setHTML("etaBig", big); setHTML("etaDist", dist); setHTML("mapChip", chip);
+    // ring once per pass: at "almost here" (≤ 2 min) or inside the distance picked in Settings
+    if (!rung && left > -GONE_M && (state === "almost" || state === "here" || left <= S.dist * MI)) {
+      rung = true;
+      var dm = Math.max(0, left) / MI;
+      if (unlocked) ring(dm, mins); else toast(fmt(t("nBody"), { d: dec(dm), m: mins }));
+    }
+    if (!map) return;
+    if (!truckMk) {
+      truckMk = L.marker(p, { icon: L.divIcon({ className: "truckpin", html: truckHtml(), iconSize: [64, 46], iconAnchor: [32, 40] }), keyboard: false, interactive: false, zIndexOffset: 1000 }).addTo(map);
+      blimp.root = truckMk.getElement().querySelector(".itk");
+    } else truckMk.setLatLng(p);
+    // face the direction of travel (the van is drawn facing east); ignore sub-meter GPS jitter
+    if (prevLng != null && Math.abs(u.lng - prevLng) > 2e-6) { var el = truckMk.getElement(); if (el) el.firstChild.classList.toggle("flip", u.lng < prevLng); }
+    // the ice cream blimp: scoops = how close, melting = driving away from you
+    blimp.update({ d: haveLoc() ? hav(p, [home.lat, home.lng]) : null, clock: u.clock });
+    prevLng = u.lng;
+    if (R && left > 0) { // dashed: the part of the route still to drive to your house
+      var pts = [p];
+      for (var i = 0; i < R.line.length; i++) if (R.cum[i] > prog && R.cum[i] < R.homeAt) pts.push(R.line[i]);
+      pts.push(pointAt(R, R.homeAt)); leftLine.setLatLngs(pts);
+    } else leftLine.setLatLngs([]);
+    if (!userMoved && Date.now() - lastFit > 4000) {
+      var b = map.getBounds();
+      if (!b.contains(p) || Date.now() - lastFit > 8000) fit(true);
+    }
+  }
+  TruckFeed.on(function (u) {
+    if (u.lap != null && u.lap !== lap) { lap = u.lap; rung = false; prog = 0; blimp.reset(); if (lap > 1 && !userMoved) setTimeout(function () { fit(true); }, 50); }
+    lastU = u; render(u);
+  });
+
+  $("replay").addEventListener("click", function () { unlocked = true; if (!R) return; userMoved = false; TruckFeed.simulate.reset(); fit(true); });
+  $("faster").addEventListener("click", function () {
+    unlocked = true; if (!R) return;
+    var target = R.homeAt - Math.max(S.dist * MI + 100, 0.3 * MI);
+    if (prog < target) { rung = false; TruckFeed.simulate.jumpTo(target); }
+    userMoved = false; fit(true);
+  });
+  function renderSpeed() { [].forEach.call($("speed").children, function (b) { b.setAttribute("aria-pressed", +b.getAttribute("data-x") === TruckFeed.simulate.x ? "true" : "false"); }); }
+  $("speed").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    var x = +b.getAttribute("data-x"); TruckFeed.simulate.setSpeed(x); renderSpeed(); toast(t(x === 1 ? "toastSpeed1" : "toastSpeed10"));
+  });
+  document.addEventListener("pointerdown", function () { unlocked = true; }, { once: true });
+  window.IceDemo = { feed: TruckFeed, blimp: blimp, BLIMP: BLIMP, get map() { return map; }, get route() { return R; }, get progress() { return prog; } }; // handy for testing
+
+  initMap(); renderHomeMsg(); renderSpeed(); loadRoute();
+
+  /* ---------- join ---------- */
+  function showJoin() {
+    $("joinForm").hidden = S.joined; $("joined").hidden = !S.joined;
+    if (S.joined) $("hello").textContent = S.name ? fmt(t("hello"), { n: S.name }) : t("helloAnon");
+  }
+  $("joinForm").addEventListener("submit", function (e) {
+    e.preventDefault(); S.name = $("name").value.trim().slice(0, 30); if (!S.joined) { S.joined = true; S.pts += 10; } save(); showJoin(); renderPts(); toast(t("toastBuy"));
+  });
+
+  /* ---------- location → the house pin (saved on this phone only) ---------- */
+  $("locBtn").addEventListener("click", function () {
+    var m = $("locMsg");
+    if (!navigator.geolocation) { m.textContent = t("locNA"); $("streetFld").hidden = false; return; }
+    m.textContent = t("locAsking");
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      m.textContent = t("locOk"); S.street = "gps"; setHome(pos.coords.latitude, pos.coords.longitude, "gps");
+    }, function () { m.textContent = t("locNo"); }, { timeout: 12000, maximumAge: 600000 });
+  });
+  $("typeBtn").addEventListener("click", function () { $("streetFld").hidden = false; $("street").focus(); });
+  var geoBusy = false;
+  $("street").addEventListener("change", function () {
+    var v = this.value.trim(); if (!v || geoBusy) return;
+    S.street = v; save(); $("locMsg").textContent = fmt(t("streetOk"), { s: v });
+    if (!window.fetch) return;
+    geoBusy = true; $("homeMsg").textContent = fmt(t("homeFinding"), { s: v });
+    var url = NOMINATIM + "?format=jsonv2&limit=1&countrycodes=us&viewbox=-118.95,34.35,-117.6,33.65&accept-language=" + ICE.lang + "&q=" + encodeURIComponent(v);
+    timedFetch(url, 12000).then(function (j) {
+      geoBusy = false;
+      if (j && j[0] && isFinite(+j[0].lat)) { setHome(+j[0].lat, +j[0].lon, "typed", v); location.hash = ""; $("lmap").scrollIntoView({ behavior: "smooth", block: "center" }); }
+      else $("homeMsg").textContent = t("homeNotFound");
+    }).catch(function () { geoBusy = false; $("homeMsg").textContent = t("homeNotFound"); });
+  });
+
+  /* ---------- points ---------- */
+  var REW = [{ k: "r1", c: 30, e: "🪙" }, { k: "r2", c: 50, e: "💵" }, { k: "r3", c: 80, e: "🌶️" }, { k: "r4", c: 100, e: "🍓" }];
+  function renderPts() {
+    $("ptsN").textContent = S.pts;
+    var next = REW.filter(function (r) { return r.c > S.pts; })[0];
+    $("ptsBar").style.width = Math.min(100, S.pts / (next ? next.c : S.pts || 1) * 100) + "%";
+    $("ptsNext").textContent = next ? fmt(t("ptsNext"), { n: next.c - S.pts, r: t(next.k) }) : t("ptsAll");
+    var box = $("rwl"); box.innerHTML = "";
+    REW.forEach(function (r) {
+      var row = document.createElement("div"); row.className = "rwi";
+      var ok = S.pts >= r.c;
+      row.innerHTML = '<span class="e" aria-hidden="true">' + r.e + '</span><div><b></b><small></small></div><button type="button" class="btn ' + (ok ? "primary" : "ghost off") + '"></button>';
+      row.querySelector("b").textContent = t(r.k);
+      row.querySelector("small").textContent = fmt(t("need"), { n: r.c });
+      var b = row.querySelector("button"); b.textContent = t("redeem"); b.disabled = !ok;
+      b.addEventListener("click", function () {
+        if (S.pts < r.c) return; S.pts -= r.c; save(); renderPts();
+        $("codeBox").hidden = false; $("code").textContent = "SOL-" + String(Math.floor(1000 + Math.random() * 9000)) + " · " + t(r.k);
+        toast(t("toastRedeem"));
+      });
+      box.appendChild(row);
+    });
+  }
+  $("buy").addEventListener("click", function () {
+    if (!S.joined) { toast(t("toastJoin")); location.hash = "join"; return; }
+    S.pts += 10; save(); renderPts(); toast(t("toastBuy"));
+  });
+
+  /* ---------- visit card: 5 check-ins -> 10% off or an extra scoop; alerts on = +5 bonus per visit ---------- */
+  function renderVisits() {
+    var v = Math.min(5, S.visits || 0), box = $("punch"); box.innerHTML = "";
+    for (var n = 1; n <= 5; n++) {
+      var c = document.createElement("span");
+      if (n <= v) { c.className = "on"; c.textContent = "🍦"; } else if (n === 5) { c.className = "gift"; c.textContent = "🎁"; } else c.textContent = n;
+      box.appendChild(c);
+    }
+    $("vNext").textContent = v >= 5 ? t("vReady") : (5 - v === 1 ? t("vLast") : fmt(t("vNext"), { n: 5 - v }));
+    $("pick").hidden = v < 5; $("checkin").style.display = v >= 5 ? "none" : "";
+    var b = $("bonus");
+    b.className = "bonus " + (S.alerts ? "on" : "off");
+    b.innerHTML = '<i aria-hidden="true">' + (S.alerts ? "🔔" : "🔕") + '</i><span>' + t(S.alerts ? "bonusOn" : "bonusOff") + '</span>' +
+      (S.alerts ? "" : '<button type="button" class="btn gold" id="bonusFix">' + t("bonusFix") + '</button>');
+    if (!S.alerts) $("bonusFix").addEventListener("click", function () { setAlerts(true); });
+  }
+  function setAlerts(on) { S.alerts = on; save(); renderSet(); renderVisits(); toast(t(on ? "toastAlertsOn" : "toastAlertsOff")); }
+  $("checkin").addEventListener("click", function () {
+    if (!S.joined) { toast(t("toastJoin")); location.hash = "join"; return; }
+    if ((S.visits || 0) >= 5) return;
+    S.visits = (S.visits || 0) + 1;
+    if (S.alerts) S.pts += 5;
+    save(); renderVisits(); renderPts(); $("vCodeBox").hidden = true;
+    toast(fmt(t(S.alerts ? "toastVisitBonus" : "toastVisit"), { v: S.visits }));
+  });
+  function pickTreat(k) {
+    if ((S.visits || 0) < 5) return;
+    S.visits = 0; save(); renderVisits();
+    $("vCodeBox").hidden = false; $("vCode").textContent = "SOL-" + String(Math.floor(1000 + Math.random() * 9000)) + " · " + t(k);
+    toast(t("toastPick"));
+  }
+  $("pick10").addEventListener("click", function () { pickTreat("t10"); });
+  $("pickScoop").addEventListener("click", function () { pickTreat("tScoop"); });
+
+  /* ---------- menu: specials carousel, category chips, item cards, cart that applies the deals (../menu.js) ---------- */
+  var MK = "ssai:ice:menu", M = { cat: "ice", cart: {}, fake: true };
+  try { var ms = JSON.parse(localStorage.getItem(MK) || "null"); if (ms) for (var mk in ms) M[mk] = ms[mk]; } catch (e) {}
+  function msave() { try { localStorage.setItem(MK, JSON.stringify(M)); } catch (e) {} }
+  var CAT_C = { ice: "#ff8fc4", pal: "#ffb86b", drk: "#3fa9ff", cnd: "#ffd166", toy: "#b79bff" };
+  var BADGES = { ice: ["b2", "kid"], drk: ["fam", "kid"], cnd: ["kid"], toy: ["toy"] };
+  var DC = {}; IceMenu.DEALS.forEach(function (d) { DC[d.id] = d; });
+  var L2 = function (o) { return o[ICE.lang] || o.en; };
+  var usd = function (n) { return "$" + n.toLocaleString(ICE.lang === "es" ? "es-US" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  function timed() { var d = new Date(); return { friday: M.fake || d.getDay() === 5, happyHour: M.fake || d.getHours() === 15 }; }
+  function quote() { return IceMenu.price(M.cart, timed()); }
+  function goMenu() { var m = $("menu"); if (m) m.scrollIntoView({ behavior: "smooth", block: "start" }); }
+  $("nudge").addEventListener("click", function () { unlocked = true; goMenu(); });
+
+  function renderDeals() {
+    var box = $("deals"), tm = timed(), dots = $("dealDots"); box.innerHTML = ""; dots.innerHTML = "";
+    IceMenu.DEALS.forEach(function (d) {
+      var c = document.createElement("div"); c.className = "deal"; c.style.setProperty("--c", d.c);
+      var on = !d.when || (d.when === "fri" ? tm.friday : tm.happyHour), w = L2(d);
+      c.innerHTML = '<span class="when' + (on && d.when ? " on" : "") + '"' + (d.when ? "" : " hidden") + '></span><div class="de" aria-hidden="true">' + d.e + '</div><h3></h3><p></p><button type="button"></button>';
+      c.querySelector(".when").textContent = on ? t("onNow") : t(d.when === "fri" ? "friOnly" : "hhOnly");
+      c.querySelector("h3").textContent = w[0]; c.querySelector("p").textContent = w[1];
+      var b = c.querySelector("button"); b.textContent = t(d.try ? "tryIt" : "seeCard");
+      b.addEventListener("click", function () {
+        if (!d.try) { $("points").scrollIntoView({ behavior: "smooth" }); return; }
+        if (d.when && !on) { M.fake = true; $("fakeTime").checked = true; renderDeals(); }
+        d.try.forEach(function (id) { M.cart[id] = (M.cart[id] || 0) + 1; });
+        msave(); renderItems(); renderCart(true); openSheet(); toast(fmt(t("toastTry"), { d: w[0] }));
+      });
+      box.appendChild(c); dots.appendChild(document.createElement("i"));
+    });
+    dotSync();
+  }
+  function dotSync() {
+    var box = $("deals"), cards = box.children, i = 0, best = 1e9;
+    for (var k = 0; k < cards.length; k++) { var dx = Math.abs(cards[k].offsetLeft - box.offsetLeft - box.scrollLeft); if (dx < best) { best = dx; i = k; } }
+    [].forEach.call($("dealDots").children, function (d, k) { d.className = k === i ? "on" : ""; });
+    return i;
+  }
+  $("deals").addEventListener("scroll", function () { dotSync(); }, { passive: true });
+  (function autoSlide() { // gentle auto-advance until they touch it
+    var stop = false, box = $("deals");
+    ["pointerdown", "touchstart", "wheel"].forEach(function (ev) { box.addEventListener(ev, function () { stop = true; }, { passive: true }); });
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setInterval(function () {
+      if (stop || document.hidden) return;
+      var i = dotSync(), n = box.children[i + 1] || box.children[0];
+      if (n) box.scrollTo({ left: n.offsetLeft - box.offsetLeft, behavior: "smooth" });
+    }, 4500);
+  })();
+
+  function renderCats() {
+    var box = $("cats"); box.innerHTML = "";
+    IceMenu.CATS.forEach(function (c) {
+      var b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab");
+      b.setAttribute("aria-selected", c.id === M.cat ? "true" : "false"); b.innerHTML = '<i aria-hidden="true">' + c.e + "</i>" + esc(L2(c));
+      b.addEventListener("click", function () { M.cat = c.id; msave(); renderCats(); renderItems(); });
+      box.appendChild(b);
+    });
+  }
+  function setQty(id, q) { if (q > 0) M.cart[id] = Math.min(20, q); else delete M.cart[id]; msave(); renderItems(); renderCart(true); if (!$("sheet").hidden) renderSheet(); }
+  function renderItems() {
+    var box = $("items"); box.innerHTML = "";
+    IceMenu.ITEMS.filter(function (x) { return x.cat === M.cat; }).forEach(function (x) {
+      var q = M.cart[x.id] || 0, w = L2(x), d = document.createElement("div");
+      d.className = "it" + (q ? " in" : ""); d.style.setProperty("--c", CAT_C[x.cat]);
+      var bd = (x.hh ? ["hh"] : (BADGES[x.cat] || [])).map(function (k) { return '<span class="bdg" style="--c:' + DC[k].c + '">' + esc(t("bdg_" + k)) + "</span>"; }).join("");
+      d.innerHTML = '<span class="ie" aria-hidden="true">' + x.e + '</span><div class="ib"><b></b><small></small>' + bd + '</div><div class="ia"><span class="p">' + usd(x.p) + "</span>" +
+        (q ? '<div class="qty"><button type="button" data-d="-1" aria-label="−">−</button><output>' + q + '</output><button type="button" data-d="1" aria-label="+">+</button></div>'
+           : '<button type="button" class="add"></button>') + "</div>";
+      d.querySelector("b").textContent = w[0]; d.querySelector("small").textContent = w[1];
+      var a = d.querySelector(".add");
+      if (a) { a.textContent = t("add"); a.setAttribute("aria-label", t("add") + ": " + w[0]); a.addEventListener("click", function () { setQty(x.id, 1); toast(fmt(t("toastAdd"), { i: w[0] })); }); }
+      [].forEach.call(d.querySelectorAll(".qty button"), function (b) { b.addEventListener("click", function () { setQty(x.id, (M.cart[x.id] || 0) + +b.getAttribute("data-d")); }); });
+      box.appendChild(d);
+    });
+  }
+  /* the upsell line: which ONE more item (cheapest in a category) would unlock the most extra savings */
+  function nextHint(r) {
+    var best = null, tm = timed();
+    IceMenu.CATS.forEach(function (c) {
+      var cheap = IceMenu.ITEMS.filter(function (x) { return x.cat === c.id; }).sort(function (a, b) { return a.p - b.p; })[0], cart = {};
+      for (var k in M.cart) cart[k] = M.cart[k]; cart[cheap.id] = (cart[cheap.id] || 0) + 1;
+      var gain = IceMenu.price(cart, tm).save - r.save;
+      if (gain > 0.001 && (!best || gain > best.g)) best = { g: gain, c: c };
+    });
+    return best ? fmt(t("hint"), { c: best.c.e + " " + L2(best.c), s: usd(best.g) }) : "";
+  }
+  function renderCart(bump) {
+    var r = quote(), bar = $("cartBar"), has = r.count > 0;
+    bar.hidden = !has; document.body.classList.toggle("has-cart", has);
+    if (!has) return;
+    $("cbN").textContent = r.count; $("cbT").textContent = usd(r.total);
+    $("cbSave").textContent = r.save > 0 ? fmt(t("cartSaveBar"), { s: usd(r.save) }) : fmt(t("cartItems"), { n: r.count });
+    var h = nextHint(r), hi = $("cartHint"); hi.hidden = !h; hi.textContent = h;
+    if (bump) { bar.classList.remove("pop"); void bar.offsetWidth; bar.classList.add("pop"); }
+  }
+  function linesHtml(r, withQty) {
+    return r.lines.map(function (l) {
+      var x = IceMenu.BY[l.id], w = L2(x);
+      return '<div class="ln"><span class="e" aria-hidden="true">' + x.e + '</span><div>' + (withQty ? "" : l.q + "× ") + esc(w[0]) + '<small>' + esc(fmt(t("each"), { p: usd(l.each) })) + '</small></div>' +
+        (withQty ? '<div class="qty" style="flex:none"><button type="button" data-id="' + l.id + '" data-d="-1" aria-label="−">−</button><output>' + l.q + '</output><button type="button" data-id="' + l.id + '" data-d="1" aria-label="+">+</button></div>' : "") +
+        '<span class="p">' + usd(l.total) + "</span></div>";
+    }).join("");
+  }
+  function dealsHtml(r) {
+    return r.deals.map(function (d) { var w = L2(DC[d.id]); return '<div class="dl"><span>' + DC[d.id].e + " " + esc(d.n > 1 ? fmt(t("dealX"), { d: w[0], n: d.n }) : w[0]) + "</span><span>−" + usd(d.save) + "</span></div>"; }).join("");
+  }
+  function totHtml(r) {
+    return "<span>" + t("sub") + "</span><span>" + usd(r.sub) + "</span>" + (r.save > 0 ? "<span>" + t("deals") + "</span><span>−" + usd(r.save) + "</span>" : "") +
+      '<span class="big">' + t("total") + '</span><span class="big">' + usd(r.total) + "</span>";
+  }
+  function renderSheet() {
+    var r = quote();
+    if (!r.count) { closeSheet(); return; }
+    $("cartLines").innerHTML = linesHtml(r, true); $("cartDeals").innerHTML = dealsHtml(r); $("cartTot").innerHTML = totHtml(r);
+    $("cartSaved").textContent = r.save > 0 ? fmt(t("saved"), { s: usd(r.save) }) : "";
+    var h = nextHint(r), sh = $("sheetHint"); sh.hidden = !h; sh.textContent = h;
+    [].forEach.call($("cartLines").querySelectorAll(".qty button"), function (b) {
+      b.addEventListener("click", function () { var id = b.getAttribute("data-id"); setQty(id, (M.cart[id] || 0) + +b.getAttribute("data-d")); });
+    });
+  }
+  function openSheet() { renderSheet(); $("sheet").hidden = false; document.body.style.overflow = "hidden"; $("sheetX").focus(); }
+  function closeSheet() { $("sheet").hidden = true; document.body.style.overflow = ""; }
+  $("cartOpen").addEventListener("click", openSheet);
+  $("sheetX").addEventListener("click", closeSheet);
+  $("sheet").addEventListener("click", function (e) { if (e.target === this) closeSheet(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { if (!$("ticket").hidden) $("tkDone").click(); else if (!$("sheet").hidden) closeSheet(); } });
+  $("cartClear").addEventListener("click", function () { M.cart = {}; msave(); closeSheet(); renderItems(); renderCart(); toast(t("toastCleared")); });
+  var tkCode = "";
+  function renderTicket() {
+    var r = quote();
+    $("tkCode").textContent = tkCode; $("tkLines").innerHTML = linesHtml(r, false); $("tkDeals").innerHTML = dealsHtml(r); $("tkTot").innerHTML = totHtml(r);
+    $("tkSaved").textContent = r.save > 0 ? fmt(t("saved"), { s: usd(r.save) }) : "";
+  }
+  $("showDriver").addEventListener("click", function () {
+    tkCode = "SOL-" + String(Math.floor(1000 + Math.random() * 9000)); renderTicket();
+    closeSheet(); $("ticket").hidden = false; document.body.style.overflow = "hidden"; $("tkDone").focus();
+  });
+  $("tkDone").addEventListener("click", function () { $("ticket").hidden = true; document.body.style.overflow = ""; });
+  $("fakeTime").checked = !!M.fake;
+  $("fakeTime").addEventListener("change", function () { M.fake = this.checked; msave(); renderDeals(); renderCart(); if (!$("sheet").hidden) renderSheet(); toast(t(M.fake ? "toastTimeOn" : "toastTimeOff")); });
+  (function () { // read the deals out loud
+    var b = $("menuSay");
+    b.addEventListener("click", function () {
+      if (Speak.speaking) { Speak.stop(); return; }
+      Speak.say(t("menuSay") + IceMenu.DEALS.map(function (d) { var w = L2(d); return w[0].replace(/–/g, " to ").replace(/:/g, ".") + ". " + w[1]; }).join(" "));
+    });
+  })();
+  function renderMenu() { renderDeals(); renderCats(); renderItems(); renderCart(); if (!$("sheet").hidden) renderSheet(); if (!$("ticket").hidden) renderTicket(); }
+
+  /* ---------- settings ---------- */
+  function renderSet() {
+    [].forEach.call($("dist").children, function (b) { b.setAttribute("aria-pressed", +b.getAttribute("data-d") === S.dist ? "true" : "false"); });
+    $("alertsOn").checked = S.alerts; $("soundOn").checked = S.sound; $("quietOn").checked = S.quiet;
+    if (zoneC) zoneC.setRadius(S.dist * MI);
+  }
+  $("dist").addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b) return; S.dist = +b.getAttribute("data-d"); save(); renderSet(); });
+  $("alertsOn").addEventListener("change", function () { setAlerts(this.checked); });
+  $("soundOn").addEventListener("change", function () { S.sound = this.checked; save(); });
+  $("quietOn").addEventListener("change", function () { S.quiet = this.checked; save(); });
+  $("reset").addEventListener("click", function () {
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "", visits: 0 };
+    M.cart = {}; msave(); renderItems(); renderCart();
+    $("name").value = ""; $("street").value = ""; $("locMsg").textContent = ""; $("codeBox").hidden = true; $("vCodeBox").hidden = true;
+    home = { lat: SAMPLE_HOME.lat, lng: SAMPLE_HOME.lng }; renderHomeMsg(); placeHome(); loadRoute();
+    showJoin(); renderPts(); renderVisits(); renderSet(); toast(t("resetDone"));
+  });
+
+  (function () { // read-aloud explainer
+    var b = $("explain");
+    function ui() { b.textContent = ICE.t(Speak.speaking ? "explainStop" : "explain"); b.setAttribute("aria-pressed", Speak.speaking ? "true" : "false"); }
+    b.addEventListener("click", function () { if (Speak.speaking) Speak.stop(); else Speak.say(ICE.t("explainSay")); ui(); });
+    Speak.on(ui); Speak.css(); ICE.on(ui);
+  })();
+  ICE.on(function () {
+    showJoin(); renderPts(); renderVisits(); renderMenu(); renderHomeMsg();
+    if (homeMk) homeMk.setIcon(homeIcon());
+    var mk = $("mapMsg"); if (!mk.hidden) mk.textContent = t(mk.getAttribute("data-k"));
+    shown = {}; $("nudge").setAttribute("data-s", ""); if (lastU) render(lastU); blimp.relabel();
+    if ($("ringer").classList.contains("show")) $("nBody").textContent = fmt(t("nBody"), { d: dec(lastD), m: lastM }); });
+  showJoin(); renderPts(); renderVisits(); renderMenu(); renderSet();
+})();
+</script>
+<script src="../../demo/seasons/seasons.js?v=20261013a" defer></script>
+<script src="../../demo/poweredby.js?v=20261013a" defer></script>
+<script src="../../demo/faqbot.js?v=f1" defer></script>
+<script src="../../demo/ssai-track.js?v=t1" defer></script>
+</body>
+</html>

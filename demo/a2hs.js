@@ -108,6 +108,8 @@
         esc(T(iPad ? "at the top of Safari" : "at the bottom of Safari")) + "</span></li>" +
         '<li><span class="gl">' + PLUS + "</span><span>" + esc(T("Scroll and tap")) + " <b>" + esc(T("Add to Home Screen")) + "</b></span></li>" +
         '<li><span class="gl" style="color:#0a84ff;font-size:15px">' + esc(T("Add")) + "</span><span>" + esc(T("Tap")) + " <b>" + esc(T("Add")) + "</b> " + esc(T("(top right)")) + "</span></li></ol>";
+      // Safari can clear a site's saved data after ~7 days without a visit; a Home Screen app keeps it (and the rewards sign-in)
+      h += '<p class="a2hs-note">🔒 ' + esc(T("Keeps you signed in to your rewards. Safari can clear a website's saved data after about a week without a visit; the Home Screen app keeps it.")) + "</p>";
       h += '<div class="a2hs-row"><button type="button" class="a2hs-go" data-a="close">' + esc(T("Got it")) + '</button><button type="button" class="a2hs-no" data-a="later">' + esc(T("Not now")) + "</button></div>";
     } else {
       h += hd("📲 " + esc(T("Add")) + " " + n + " " + esc(T("to your Home Screen")), esc(T(PITCH)));
@@ -170,7 +172,7 @@
   function due() { var l = +lsGet(LAST) || 0; return Date.now() - l > WEEK; }
   function busy() {
     return inRun || !!(W.Halftime && W.Halftime.active) || !!(W.GamePause && W.GamePause.paused) ||
-      !!D.querySelector(".gm-sheet.on, .a2hs.on, .ht.on, .crm-ov.on") || D.visibilityState === "hidden";
+      !!D.querySelector(".gm-sheet.on, .a2hs.on, .ht.on, .crm-ov.on, #mg-ov.on, #sp-ov.on") || D.visibilityState === "hidden";
   }
   function auto(reason, delay) {
     if (!available() || !due() || pending) return;

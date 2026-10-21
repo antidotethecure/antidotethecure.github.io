@@ -1,6 +1,7 @@
 /* Talking owner avatar for the restaurant mini-games ("📻 TOWER" in Melody, "🛟 LIFEGUARD" in Nalu Vida).
-   A round badge pops into a top corner of the game, a speech bubble types the line out while the mouth flaps
-   (closed/talk frames), then it slides away. Never blocks taps (pointer-events:none).
+   A small round face pops into a top corner of the game, one line of small see-through text types out while the mouth
+   flaps (closed/talk frames), then it slides away. Kept small on purpose so it hides as little of the game as possible
+   (Antidote, 2026-10-19). Never blocks taps (pointer-events:none).
 
    Setup (once, after the game area exists):
      RadioAvatar.mount({ host: el, base: "img/game/", who: "captain"|"guard", top: "28px", left: "6px", right: "48px",
@@ -27,27 +28,27 @@
 
   var css = D.createElement("style");
   css.textContent =
-    ".ra{position:absolute;z-index:4;display:flex;align-items:flex-start;gap:9px;pointer-events:none;opacity:0;visibility:hidden;transform:translate(-120%,0) scale(.8);transform-origin:left top;" +
+    /* COMPACT (Antidote, 2026-10-19): "the blimp blocks a lot of the screen ... make it smaller, just a small text".
+       A small face + one see-through line of small text, so as much of the game as possible stays visible. */
+    ".ra{position:absolute;z-index:4;display:flex;align-items:center;gap:5px;pointer-events:none;opacity:0;visibility:hidden;transform:translate(-120%,0) scale(.8);transform-origin:left top;" +
     "transition:transform .34s cubic-bezier(.2,1.5,.45,1),opacity .2s,visibility 0s .34s;-webkit-user-select:none;user-select:none}" +
-    ".ra.on{opacity:1;visibility:visible;transform:none;transition:transform .34s cubic-bezier(.2,1.5,.45,1),opacity .2s,visibility 0s}" +
-    ".ra.out{transition:transform .28s ease-in,opacity .28s,visibility 0s .28s}.ra.on.dim{opacity:.45}" +
-    ".ra-badge{position:relative;flex:none;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#2d4170,#0a1226 72%);" +
-    "box-shadow:0 0 0 3px var(--ra-ring,#4fb8ff),0 0 14px 2px var(--ra-ring,#4fb8ff),0 6px 16px rgba(0,0,0,.5);transition:box-shadow .25s}" +
+    ".ra.on{opacity:.92;visibility:visible;transform:none;transition:transform .34s cubic-bezier(.2,1.5,.45,1),opacity .2s,visibility 0s}" +
+    ".ra.out{transition:transform .28s ease-in,opacity .28s,visibility 0s .28s}.ra.on.dim{opacity:.25}" +
+    ".ra-badge{position:relative;flex:none;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#2d4170,#0a1226 72%);" +
+    "box-shadow:0 0 0 2px var(--ra-ring,#4fb8ff),0 2px 6px rgba(0,0,0,.5);transition:box-shadow .25s}" +
     ".ra-badge img{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 12%}" +
     ".ra-badge .t{visibility:hidden}.ra.talk .ra-badge .t{visibility:visible}.ra.talk .ra-badge .c{visibility:hidden}" +
-    ".ra-lbl{position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);white-space:nowrap;font:900 9.5px/1 system-ui,-apple-system,sans-serif;letter-spacing:.06em;" +
-    "padding:4px 7px 3px;border-radius:999px;background:#0b1224;color:var(--ra-tag,#f0d375);border:1.5px solid var(--ra-ring,#4fb8ff);box-shadow:0 2px 6px rgba(0,0,0,.4)}" +
-    ".ra-bub{position:relative;min-width:0;margin-top:12px;padding:8px 11px;border-radius:14px;background:#fff;color:#10162a;" +
-    "font:800 13.5px/1.28 system-ui,-apple-system,sans-serif;border:2px solid var(--ra-ring,#4fb8ff);box-shadow:0 6px 18px rgba(0,0,0,.4);overflow-wrap:break-word}" +
-    ".ra-bub:before{content:'';position:absolute;left:-9px;top:14px;border:7px solid transparent;border-right:9px solid var(--ra-ring,#4fb8ff);border-left:0}" +
-    ".ra-bub .g{visibility:hidden}.ra-bub .x{position:absolute;left:11px;right:11px;top:8px}" +
-    "@media (min-width:600px){.ra-badge{width:92px;height:92px}.ra-bub{font-size:14.5px}}" +
+    ".ra-lbl{display:none}" +
+    ".ra-bub{position:relative;min-width:0;max-width:min(240px,100%);padding:3px 8px;border-radius:9px;background:rgba(8,12,26,.62);color:#fff;" +
+    "font:700 11px/1.25 system-ui,-apple-system,sans-serif;border:1px solid var(--ra-ring,#4fb8ff);text-shadow:0 1px 2px #000;overflow-wrap:break-word}" +
+    ".ra-bub .g{visibility:hidden}.ra-bub .x{position:absolute;left:8px;right:8px;top:3px}" +
+    "@media (min-width:600px){.ra-badge{width:34px;height:34px}.ra-bub{font-size:12px;max-width:min(300px,100%)}}" +
     "@media (prefers-reduced-motion:reduce){.ra,.ra.on,.ra.out{transform:none!important;transition:opacity .2s,visibility 0s .2s}.ra.on{transition:opacity .2s}}";
   D.head.appendChild(css);
 
   var C = null, el, badge, imC, imT, lbl, ghost, typed, Q = [], cur = null, timers = [], flapT = 0, seq = 0;
   function later(fn, ms) { var id = setTimeout(fn, ms); timers.push(id); return id; }
-  function src(who, f) { return (C.base || "") + who + "-" + f + ".webp"; }
+  function src(who, f) { return (C.base || "") + who + "-" + f + ".webp?v=cs1"; }
   function preload(who) { ["closed", "talk"].forEach(function (f) { var i = new Image(); i.decoding = "async"; i.src = src(who, f); }); }
 
   function mount(cfg) {

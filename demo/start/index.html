@@ -72,7 +72,7 @@ details{margin-top:10px}summary{cursor:pointer;color:var(--dim);font-size:13.5px
 <body>
 <div class="wrap">
 <header>
-  <a href="../setup/" style="display:block;text-align:left;color:var(--gold);font-size:13px;font-weight:800;text-decoration:none;margin-bottom:6px">← See the live apps</a>
+  <a href="../../app/#apps" style="display:block;text-align:left;color:var(--gold);font-size:13px;font-weight:800;text-decoration:none;margin-bottom:6px">← See the live apps</a>
   <img src="../../assets/sousshift-lockup.jpg" alt="SousShift AI">
   <h1>Your free <span>sample app</span></h1>
   <p class="sub">Tell us about your business and drop a few photos. We'll build a working preview with your name, your <span id="listWord">menu</span>, a rewards game and more. Free, no card.</p>
@@ -141,7 +141,7 @@ details{margin-top:10px}summary{cursor:pointer;color:var(--dim);font-size:13.5px
   <a class="go" id="openLink" href="#">Open my sample</a>
 </section>
 
-<p class="small">SousShift AI · menus · games · rewards · reviews · outreach<br>Questions? DM <a href="https://instagram.com/second.shiftai" style="color:var(--gold)">@second.shiftai</a></p>
+<p class="small">SousShift AI · menus · games · rewards · reviews · outreach<br>Questions? DM <a href="https://instagram.com/sousshiftai" style="color:var(--gold)">@SousShiftAi</a></p>
 </div>
 
 <script src="types.js"></script>
@@ -150,6 +150,9 @@ details{margin-top:10px}summary{cursor:pointer;color:var(--dim);font-size:13.5px
   "use strict";
   var T = window.SSAI_TYPES, $ = function(id){ return document.getElementById(id); };
   var type = "restaurant", photos = [];
+  var qt = new URLSearchParams(location.search).get("type");
+  if (qt === "icecream" || qt === "ice-cream") qt = "foodtruck";
+  if (qt && Object.prototype.hasOwnProperty.call(T, qt)) type = qt;
 
   // 1. type chips
   $("types").innerHTML = Object.keys(T).map(function(k){
@@ -253,7 +256,7 @@ details{margin-top:10px}summary{cursor:pointer;color:var(--dim);font-size:13.5px
         $("f").style.display = "none"; $("done").style.display = "block"; window.scrollTo(0, 0);
       })
       .catch(function(err){
-        $("err").textContent = "Couldn't send (" + err.message + "). Check your connection and try again, or DM @second.shiftai.";
+        $("err").textContent = "Couldn't send (" + err.message + "). Check your connection and try again, or DM @SousShiftAi.";
         $("send").disabled = false; $("send").textContent = "Build my free sample ⚡";
       });
   });
@@ -261,5 +264,6 @@ details{margin-top:10px}summary{cursor:pointer;color:var(--dim);font-size:13.5px
   applyType();
 })();
 </script>
+<script src="../faqbot.js?v=f1" data-kb="../../app/faq.json" data-mode="sales" defer></script>
 </body>
 </html>

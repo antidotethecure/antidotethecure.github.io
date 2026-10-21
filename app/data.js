@@ -9,7 +9,7 @@
    - setup-kit/build_launch.py AGENTS + agents/index.html (AI add-on prices $75 / $150)
    - ~/command-center/clients/concierge/kb/13-pricing-playbook.md (what the onboarding concierge quotes) */
 window.APP = {
-  updated: "2026-10-11",
+  updated: "2026-10-19",
   contact: { email: "secondshiftai@gmail.com", sms: "", name: "Antidote" },
 
   /* ---------------- 1 · Plans ---------------- */
@@ -59,6 +59,14 @@ window.APP = {
       one: "Guests text your number and an AI texts back 24/7: hours, menu, specials, reservation requests, catering. 1,000 texts a month included." },
     { key: "voice", name: "AI Voice Host + Text", monthly: 150, setup: 0, includedIn: ["dfy"], replaces: "text",
       one: "A natural AI voice answers your phone, takes reservation requests, transfers to staff and texts links. Includes the Text Assistant. 750 minutes + 1,000 texts a month." },
+    { key: "ordering", name: "Online Ordering + Delivery", monthly: 0, setup: 0, includedIn: [], quote: true, soon: true,
+      one: "Guests order and pay by card right in your app (pickup first), with points on every order and live orders in your back office. Delivery by DoorDash drivers, with no marketplace commission, once DoorDash approves our access (applied, under review). Coming soon: pickup ordering first." },
+    { key: "sports", name: "Sports Bar Package", monthly: 0, setup: 0, includedIn: [], quote: true,
+      one: "Live local scores up top, follow-your-team alerts, the Fan Test, Football Squares (1 free square per member, prizes you set), fight nights and pick-the-winner points. Score specials: when the home team scores, a same-day deal unlocks. Built for game days." },
+    { key: "games", name: "Games Pack", monthly: 0, setup: 0, includedIn: [], quote: true,
+      one: "Trivia, sports trivia, the daily word game, a word scramble and bar-safe Truth or Dare. Guests earn points for playing while they wait." },
+    { key: "menu3d", name: "3D Digital Menu", monthly: 0, setup: 0, includedIn: [], quote: true,
+      one: "Guests spin a real 3D model of your signature dishes, plus slow-motion food clips and a real-photo mode. Optional: dishes that rise off the menu in a short cinematic video." },
     { key: "social", name: "Social & SEO Growth", monthly: 1000, setup: 0, includedIn: [],
       one: "Content plan, short-form video edits from your food, posting on Instagram / TikTok / YouTube, Google Business Profile + local SEO, and a monthly report." }
   ],
@@ -68,10 +76,18 @@ window.APP = {
 
   /* Contract terms on every NEW agreement (already in the contract generator) */
   terms: {
-    perf: { pct: 10, threshold: 3000 },
+    perf: { pct: 10, threshold: 3000 },   // 2026-10-13: pct% of the amount OVER threshold only ($5,000 in app sales -> $200)
     results: { returns: 30, day: 30, windowMonths: 3, freeMonths: 2 },
     discount: { graceBusinessDays: 3, perDay: 100 },
-    minimumMonths: 3
+    minimumMonths: 3,
+    /* How the owner can pay the setup (Antidote, 2026-10-12). Same numbers in demo/contract.js + make_contract.py.
+       split: % of setup at signing, the rest at Go-Live (app delivered).
+       flex:  pay at least minDown (per restaurant) at signing; the unpaid setup balance is spread over `months` equal
+              installments added to the monthly fee, then the monthly drops back to normal. Exact cents: each installment
+              is the balance / months rounded to the cent and the last one absorbs the rounding.
+              feePct = OPTIONAL flexible-plan fee as a % of the unpaid balance. 0 = plain math, nothing extra (default).
+              Only change it if Antidote approves a fee; never call it interest, a loan or financing. */
+    payment: { split: 50, flex: { minDown: 750, months: 12, feePct: 0 } }
   },
 
   /* ---------------- 2 · What it costs elsewhere ----------------

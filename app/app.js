@@ -7,6 +7,8 @@
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var n = function (x) { return Math.round(x).toLocaleString("en-US"); };
   var usd = function (x) { return "$" + n(x); };
+  var usd2 = function (x) { return "$" + (Math.round(x * 100) / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var usdc = function (x) { return Math.round(x * 100) % 100 ? usd2(x) : usd(x); };
   var plan = function (k) { return A.plans.filter(function (p) { return p.key === k; })[0]; };
   var addon = function (k) { return A.addons.filter(function (a) { return a.key === k; })[0]; };
   var ORDER = ["basic", "growth", "dfy"];
@@ -23,12 +25,13 @@
       '<p class="note" style="margin:0">' + esc(p.pitch) + '</p>' +
       '<details open><summary>What\'s included</summary><ul>' + p.includes.map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") + '</ul></details>' +
       '<div class="who"><b>Who does what:</b> ' + esc(p.who) + '</div>' +
-      '<p class="note" style="margin:10px 0 0">Results promise: ' + R.returns + ' tracked return visits in a ' + R.day + '-day period within your first ' + R.windowMonths + ' months, or ' + R.freeMonths + ' months free.</p></article>';
+      '<p class="note" style="margin:10px 0 0">Results promise: ' + R.returns + ' tracked return visits in a ' + R.day + '-day period within your first ' + R.windowMonths + ' months, or ' + R.freeMonths + ' months free.</p>' +
+      '<p class="note" style="margin:4px 0 0">Performance share: ' + T.perf.pct + '% of only the app sales over ' + usd(T.perf.threshold) + ' in a month ($5,000 in app sales = $200; see 2A). Pay setup in full, 50/50, or from ' + usd(T.payment.flex.minDown) + ' down.</p></article>';
   }).join("");
   $("addonList").innerHTML = A.addons.map(function (a) {
     var inc = a.includedIn.map(function (k) { return plan(k).name; });
     return '<div class="addon"><div><b>' + esc(a.name) + '</b><div class="note">' + esc(a.one) + (inc.length ? " <b>Included in " + esc(inc.join(" and ")) + ".</b>" : "") +
-      (a.key === "social" ? ' <a href="#social">Details →</a>' : a.key !== "social" ? ' <a href="../agents/">Demos →</a>' : "") + '</div></div><b class="p">' + usd(a.monthly) + '/mo</b></div>';
+      (a.key === "social" ? ' <a href="#social">Details →</a>' : a.quote ? "" : ' <a href="../agents/">Demos →</a>') + '</div></div><b class="p">' + (a.quote ? (a.soon ? "Soon · Ask us" : "Ask us") : usd(a.monthly) + '/mo') + '</b></div>';
   }).join("") + '<div class="addon"><div><b>' + esc(A.bundle.name) + ' bundle</b><div class="note">' + esc(A.bundle.one) + '</div></div><b class="p">' + usd(bundleMonthly()) + '/mo</b></div>';
 
   function bundleMonthly() { return plan(A.bundle.plan).monthly + addon(A.bundle.addon).monthly - A.bundle.discountMonthly; }
@@ -43,6 +46,7 @@
     if (add.voice) add.text = false;
     A.addons.forEach(function (a) {
       if (!add[a.key] || a.includedIn.indexOf(st.plan) >= 0) return;
+      if (a.quote) { lines.push(a.name + ": quoted separately"); return; }   // no published price yet (Antidote sets it)
       var price = a.monthly;
       if (a.replaces && addon(a.replaces).includedIn.indexOf(st.plan) >= 0) price = a.monthly - addon(a.replaces).monthly;
       m += price; s += a.setup || 0; lines.push(a.name + " +" + usd(price) + "/mo");
@@ -53,7 +57,7 @@
     return { setup: s * N, monthly: m * N, year: (s + 12 * m) * N, perSetup: s, perMonthly: m, n: N, lines: lines, bundled: !!bundled };
   }
   $("bPlan").innerHTML = A.plans.map(function (p) { return '<button type="button" data-k="' + p.key + '" aria-pressed="false">' + esc(p.name) + '</button>'; }).join("");
-  $("bAdd").innerHTML = A.addons.map(function (a) { return '<div class="ck"><input type="checkbox" id="ba-' + a.key + '" data-k="' + a.key + '"><label for="ba-' + a.key + '"><b>' + esc(a.name) + '</b> <span class="note">' + usd(a.monthly) + '/mo</span><small id="bn-' + a.key + '"></small></label></div>'; }).join("");
+  $("bAdd").innerHTML = A.addons.map(function (a) { return '<div class="ck"><input type="checkbox" id="ba-' + a.key + '" data-k="' + a.key + '"><label for="ba-' + a.key + '"><b>' + esc(a.name) + '</b> <span class="note">' + (a.quote ? "Ask us" : usd(a.monthly) + '/mo') + '</span><small id="bn-' + a.key + '"></small></label></div>'; }).join("");
   $("bBundleNote").textContent = plan(A.bundle.plan).name + " + " + addon(A.bundle.addon).name + ": " + usd(plan(A.bundle.plan).setup) + " setup + " + usd(bundleMonthly()) + "/mo (saves " + usd(A.bundle.discountMonthly) + " a month).";
   function draw() {
     [].forEach.call($("bPlan").children, function (b) { b.setAttribute("aria-pressed", String(b.dataset.k === B.plan)); });
@@ -72,6 +76,46 @@
   $("bBundle").addEventListener("change", function (e) { if (e.target.checked) { B.plan = A.bundle.plan; B.add[A.bundle.addon] = true; } else B.add[A.bundle.addon] = false; draw(); });
   $("bMinus").onclick = function () { B.n = Math.max(1, B.n - 1); draw(); };
   $("bPlus").onclick = function () { B.n = Math.min(20, B.n + 1); draw(); };
+
+  /* ---------- 1b · how to pay the setup (full · 50/50 · flexible) ----------
+     flexPlan = plain math in cents: installment = (setup − down) × (1 + feePct%) / months, rounded to the cent;
+     the last installment absorbs the rounding so the setup comes to exactly what's owed. Same rule in demo/contract.js
+     and make_contract.py (flex_plan). feePct is 0 unless Antidote approves a fee (data.js terms.payment.flex). */
+  var PF = T.payment.flex;
+  function flexPlan(setup, monthly, down, nRest) {
+    var c = function (x) { return Math.round(x * 100); }, min = PF.minDown * Math.max(1, nRest | 0);
+    var sC = c(setup), want = isFinite(down) ? c(down) : c(min), dC = Math.min(sC, Math.max(c(min), want));
+    var balC = sC - dC, feeC = Math.round(balC * PF.feePct / 100), finC = balC + feeC;
+    var instC = Math.round(finC / PF.months), lastC = finC - instC * (PF.months - 1), mC = c(monthly);
+    return { setup: setup, down: dC / 100, min: min, belowMin: want < c(min), aboveSetup: want > sC, balance: balC / 100, fee: feeC / 100,
+      months: PF.months, inst: instC / 100, last: lastC / 100, base: monthly, monthly: (mC + instC) / 100, lastMonthly: (mC + lastC) / 100,
+      setupTotal: (dC + finC) / 100, firstYear: (dC + finC + mC * PF.months) / 100 };
+  }
+  var P = { down: null };
+  function drawPay() {
+    var t = totals(), half = t.setup * T.payment.split / 100, f = flexPlan(t.setup, t.monthly, P.down == null ? PF.minDown * t.n : P.down, t.n);
+    var lo = flexPlan(t.setup, t.monthly, 0, t.n);
+    $("pFor").textContent = "For the plan above: " + t.lines[0] + (t.n > 1 ? " × " + t.n + " restaurants" : "") + (t.lines.length > 1 ? " + add-ons" : "") + " = " + usd(t.setup) + " setup + " + usd(t.monthly) + "/mo.";
+    $("payOpts").innerHTML =
+      '<div><small>Pay in full</small><b>' + usd(t.setup) + '</b><span>at signing, then ' + usd(t.monthly) + '/mo</span></div>' +
+      '<div><small>Split 50/50</small><b>' + usdc(half) + ' + ' + usdc(t.setup - half) + '</b><span>' + T.payment.split + '% when you sign, ' + (100 - T.payment.split) + '% when your app is delivered (Go-Live). ' + usd(t.monthly) + '/mo</span></div>' +
+      '<div class="on"><small>Flexible</small><b>' + usd(lo.down) + ' down</b><span>then ' + usd2(lo.monthly) + '/mo × ' + PF.months + ', then ' + usd(t.monthly) + '/mo</span></div>';
+    var inp = $("pDown"), rng = $("pRange");
+    inp.min = rng.min = f.min; inp.max = rng.max = t.setup; rng.value = f.down;
+    if (document.activeElement !== inp) inp.value = f.down;
+    $("pErr").textContent = f.belowMin ? "The minimum down payment is " + usd(f.min) + (t.n > 1 ? " (" + usd(PF.minDown) + " per restaurant)" : "") + ". Showing " + usd(f.min) + " down."
+      : f.aboveSetup ? "That's more than the setup. Showing the whole setup paid up front." : "";
+    $("pOut").innerHTML = '<div><b id="pOutDown">' + usdc(f.down) + '</b>down today</div><div><b id="pOutMonthly">' + usd2(f.monthly) + '</b>a month for ' + f.months + ' months</div><div><b id="pOutAfter">' + usd(t.monthly) + '</b>a month after that</div>';
+    $("pFine").textContent = f.balance > 0
+      ? "That's your " + usd(t.monthly) + " monthly + " + usd2(f.inst) + " toward the setup (the " + usd2(f.balance) + " left ÷ " + f.months + (f.last !== f.inst ? "; payment " + f.months + " is " + usd2(f.lastMonthly) + " so the setup comes to exactly " + usd2(f.setupTotal) : "") + "). " +
+        (f.fee ? "Includes a " + PF.feePct + "% flexible-plan fee of " + usd2(f.fee) + ". " : "No extra charge for the flexible plan: the setup still totals " + usd2(f.setupTotal) + ". ") +
+        "After " + f.months + " months the setup is paid off and it drops back to " + usd(t.monthly) + "/mo. Each monthly payment includes that month's setup piece; if one is more than 15 days late, service can pause until it's paid, and if the agreement ends early the setup still left is due. First year: " + usd2(f.firstYear) + "."
+      : "That covers the whole setup up front, the same as paying in full: " + usd(t.monthly) + "/mo from the day you sign.";
+  }
+  $("pDown").addEventListener("input", function (e) { var x = parseFloat(e.target.value); P.down = isFinite(x) ? x : 0; drawPay(); });
+  $("pDown").addEventListener("change", function () { var t = totals(); P.down = flexPlan(t.setup, t.monthly, P.down == null ? 0 : P.down, t.n).down; drawPay(); $("pDown").value = P.down; });
+  $("pRange").addEventListener("input", function (e) { P.down = parseFloat(e.target.value); drawPay(); });
+  var draw0 = draw; draw = function () { draw0(); drawPay(); };
   draw();
 
   /* ---------- 2 · market ---------- */
@@ -137,6 +181,20 @@
   $("iPlan").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) { I.plan = b.dataset.k; drawImp(); } });
   F.forEach(function (f) { $("im-" + f[0]).addEventListener("input", function (e) { I[f[0]] = +e.target.value; drawImp(); }); });
   drawImp();
+  /* 🚀 hero (2026-10-19): the same model's default estimate (Basic plan, typical restaurant), counted up on load */
+  (function () {
+    var box = $("roiHero"); if (!box) return;
+    var es = false; try { es = (localStorage.getItem("demo_lang") || (document.cookie.match(/googtrans=\/en\/([A-Za-z-]+)/) || [])[1]) === "es"; } catch (e) {}
+    var r = impact({ plan: "basic" }), mo = es ? " meses" : " months";
+    var V = { sales: [r.sales3, function (x) { return "+" + usd(x); }], payback: [r.payback || 12, function (x) { return Math.round(x) + (r.payback ? (Math.round(x) === 1 ? (es ? " mes" : " month") : mo) : "+" + mo); }],
+      members: [r.newMembers, function (x) { return "+" + n(x); }], times: [r.sales3 / r.fee, function (x) { return x.toFixed(1) + "×"; }] };
+    $("roiNote").textContent = (es ? "Estimado para un restaurante típico (" : "Estimate for a typical restaurant (") + n(I.crowd) + (es ? " clientes en una noche llena, " : " guests on a busy night, ") +
+      n(I.join) + (es ? "% se une, gasto promedio " : "% join, ") + usd(I.spend) + (es ? ") con el plan " : " average spend) on the ") + plan("basic").name + (es ? ". Pon tus propios números abajo." : " plan. Plug in your own numbers below.");
+    var els = box.querySelectorAll("[data-count]"), t0 = 0, D = 1400, still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function frame(t) { if (!t0) t0 = t; var k = still ? 1 : Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3);
+      els.forEach(function (el) { var v = V[el.dataset.count]; el.textContent = v[1](v[0] * e); }); if (k < 1) requestAnimationFrame(frame); }
+    requestAnimationFrame(frame);
+  })();
   $("promise").innerHTML = '<h3>🛡️ Our results promise</h3><p>' + esc(PROMISE) + '</p><p class="note">' + esc(PROMISE_FINE) +
     ' A “tracked return visit” is a guest identified through the app (an app order, their member QR or code, their phone number, or an app reward) coming back on a later day. You see the count in your owner view.</p>' +
     '<p class="note"><b>Not the same as break-even.</b> Break-even (above) is how many extra visits a month cover your monthly fee. The promise is our ' + R.returns + '-visit target for the app itself.</p>';
@@ -153,9 +211,9 @@
   var DX = T.discount;
   var CL = [
     ["What we build", "Your branded app, menu, game, rewards and print-kit designs for the plan you pick, plus hosting, updates and support while you're on the plan."],
-    ["Fees", "A one-time setup fee and a monthly fee per restaurant. Setup is split 50% when you sign and 50% at Go-Live. The monthly starts the day you sign. Basic " + usd(plan("basic").setup) + " + " + usd(plan("basic").monthly) + ", Growth " + usd(plan("growth").setup) + " + " + usd(plan("growth").monthly) + ", Done-for-you " + usd(plan("dfy").setup) + " + " + usd(plan("dfy").monthly) + "."],
+    ["Fees", "A one-time setup fee and a monthly fee per restaurant. Pick how to pay the setup: in full at signing; split 50% when you sign and 50% at Go-Live (when your app is delivered); or the flexible plan, at least " + usd(PF.minDown) + " down with the rest of the setup spread over " + PF.months + " months and added to your monthly, which then drops back to the normal monthly. " + (PF.feePct ? "The flexible plan adds a " + PF.feePct + "% fee on the setup left. " : "No extra charge for the flexible plan. ") + "The monthly starts the day you sign. If any payment is more than 15 days late, service can pause until it's paid; on the flexible plan, any setup still owed is due if the agreement ends early. Basic " + usd(plan("basic").setup) + " + " + usd(plan("basic").monthly) + ", Growth " + usd(plan("growth").setup) + " + " + usd(plan("growth").monthly) + ", Done-for-you " + usd(plan("dfy").setup) + " + " + usd(plan("dfy").monthly) + "."],
     ["Founding discount (if you got one)", "A discount holds for " + DX.graceBusinessDays + " business days after signing. If the setup payment isn't in by then, the discount shrinks by " + usd(DX.perDay) + " a day until it's back at the regular price. It never goes above the regular price, and money already paid is credited."],
-    ["2A · Performance share", "On top of the monthly: in any month your app customers spend more than " + usd(T.perf.threshold) + " on food and non-alcoholic drinks, we get " + T.perf.pct + "% of that month's app-attributed sales. Never alcohol, tax or tips, never your overall sales. Under " + usd(T.perf.threshold) + " that month, nothing is owed. You get a statement by the 5th and 10 days to dispute it against your register reports."],
+    ["2A · Performance share", "On top of the monthly: in any month your app customers spend more than " + usd(T.perf.threshold) + " on food and non-alcoholic drinks, we get " + T.perf.pct + "% of the amount OVER " + usd(T.perf.threshold) + " (example: $5,000 in app sales = " + T.perf.pct + "% of $2,000 = $200). Never alcohol, tax or tips, never your overall sales. Under " + usd(T.perf.threshold) + " that month, nothing is owed. You get a statement by the 5th and 10 days to dispute it against your register reports."],
     ["3A · Results promise", PROMISE + " " + PROMISE_FINE],
     ["Term and cancelling", "A " + T.minimumMonths + "-month minimum, then month to month. Either side can cancel with 30 days' written notice (email counts)."],
     ["5A · Your customer data", "Your customer list is yours. Full access and CSV export while you're paying. If you stop, you get a complete export within 10 days. We never sell it or use it for another business, and we delete it after the hand-off unless the law says to keep it."],
@@ -181,12 +239,14 @@
     { id: "f-which", q: "Which plan should I pick?", a: "Basic if you're happy to send your own texts and print your own stickers. Growth if you want guests brought back automatically (birthday and \"we miss you\" texts, review prompts, nearby alerts, AI texting). Done-for-you if you want to sit back while we run the marketing and answer the phone with an AI voice host.", go: "plans" },
     { id: "f-footwork", q: "What do I have to do on each plan?", a: "Basic: you send your own texts and promotions, print and place the stickers, and keep deals updated on your setup page. Growth: the bring-back texts run themselves and we order your printing; you send any extra promotions. Done-for-you: we run the texting and marketing, you approve.", go: "plans" },
     { id: "f-results", q: "What if it doesn't bring customers back?", a: PROMISE + " " + PROMISE_FINE, go: "returns" },
-    { id: "f-perf", q: "What is the 10% performance share?", a: "Only in a month your app customers spend more than " + usd(T.perf.threshold) + " on food and non-alcoholic drinks, we get " + T.perf.pct + "% of that month's app sales. Never alcohol, tax or tips, never your overall sales. Under " + usd(T.perf.threshold) + ", nothing extra is owed.", go: "contract" },
+    { id: "f-perf", q: "What is the 10% performance share?", a: "Only in a month your app customers spend more than " + usd(T.perf.threshold) + " on food and non-alcoholic drinks, we get " + T.perf.pct + "% of only the amount over " + usd(T.perf.threshold) + " ($5,000 in app sales = $200). Never alcohol, tax or tips, never your overall sales. Under " + usd(T.perf.threshold) + ", nothing extra is owed.", go: "contract" },
     { id: "f-data", q: "Who owns the customer list?", a: "You do. Full access and CSV export anytime while you're on the plan, and a complete export within 10 days if you ever stop. We never sell it or use it for another business.", go: "contract" },
     { id: "f-cancel", q: "Can I cancel?", a: "There's a " + T.minimumMonths + "-month minimum, then it's month to month with 30 days' written notice (email counts). AI add-ons are month to month from day one. Your customer list goes with you.", go: "contract" },
-    { id: "f-contract", q: "What's in the contract?", a: "Fees, a " + T.minimumMonths + "-month minimum, the 10% performance share (only over " + usd(T.perf.threshold) + " a month), the results promise, your customer-data rights, and the expiring founding discount. Open the plain-English summary or the sample agreement.", go: "contract" },
+    { id: "f-contract", q: "What's in the contract?", a: "Fees, a " + T.minimumMonths + "-month minimum, the 10% performance share (10% of only the app sales over " + usd(T.perf.threshold) + " a month), the results promise, your customer-data rights, and the expiring founding discount. Open the plain-English summary or the sample agreement.", go: "contract" },
     { id: "f-discount", q: "How does the discount deadline work?", a: "If you got a discount on setup, it holds for " + DX.graceBusinessDays + " business days after you sign. If the setup payment isn't in by then, it drops by " + usd(DX.perDay) + " a day until it's back at the regular price. Never above the regular price.", go: "contract" },
-    { id: "f-pay", q: "When do I pay?", a: "Setup is 50% when you sign and 50% at Go-Live. The monthly starts the day you sign.", go: "contract" },
+    { id: "f-pay", q: "When do I pay?", a: "Three ways to pay the setup: all at signing; 50% when you sign and 50% when your app is delivered (Go-Live); or the flexible plan, from " + usd(PF.minDown) + " down with the rest spread over " + PF.months + " months on top of your monthly. The monthly starts the day you sign.", go: "payCalc" },
+    { id: "f-flex", q: "Can I put less down?", a: (function () { var b = flexPlan(plan("basic").setup, plan("basic").monthly, PF.minDown, 1), g = flexPlan(plan("growth").setup, plan("growth").monthly, PF.minDown, 1), d = flexPlan(plan("dfy").setup, plan("dfy").monthly, PF.minDown, 1);
+      return "Yes. The flexible plan starts at " + usd(PF.minDown) + " down. The setup left is split into " + PF.months + " equal pieces added to your monthly" + (PF.feePct ? " (plus a " + PF.feePct + "% plan fee)" : ", with no extra charge") + ". With " + usd(PF.minDown) + " down: Basic " + usd2(b.monthly) + "/mo, Growth " + usd2(g.monthly) + "/mo, Done-for-you " + usd2(d.monthly) + "/mo for " + PF.months + " months, then back to " + usd(plan("basic").monthly) + ", " + usd(plan("growth").monthly) + " or " + usd(plan("dfy").monthly) + ". Put more down and the monthly drops: try the calculator."; })(), go: "payCalc" },
     { id: "f-print", q: "How much do stickers and printing cost?", a: P.typical + " Basic: you order with our files. Growth and Done-for-you: we place the order and bill the print cost at cost.", go: "print" },
     { id: "f-pos", q: "Does it work with my register / POS?", a: "Yes. It works with any register (Toast, Square, Clover, anything). Nothing to install. Staff look up a member by phone or scan their code, and app orders show up for your team.", go: "faq" },
     { id: "f-ai", q: "What are the AI agents?", a: "The AI Text Assistant ($75/mo, included in Growth and Done-for-you) texts guests back 24/7. The AI Voice Host + Text ($150/mo, included in Done-for-you) answers your phone, takes reservation requests and transfers to staff. Anything it can't answer goes to you.", go: "plans" },
@@ -210,7 +270,7 @@
 
   function openPlan(k) { var el = $("plan-" + k); if (!el) return; var d = el.querySelector("details"); if (d) d.open = true; go(el); }
   function go(el) { if (typeof el === "string") el = $(el); if (!el) return; el.scrollIntoView({ behavior: "smooth", block: "start" }); el.classList.remove("hl"); void el.offsetWidth; el.classList.add("hl"); }
-  window.SSAPP = { totals: totals, market: market, impact: impact, openPlan: openPlan, go: go, state: B, draw: draw };
+  window.SSAPP = { flex: flexPlan, drawPay: drawPay, pay: P, totals: totals, market: market, impact: impact, openPlan: openPlan, go: go, state: B, draw: draw };
 
   window.addEventListener("load", function () { var k = document.querySelector("#ssai-k button.go"); if (k) k.textContent = "📝 Draft my agreement"; });
 })();

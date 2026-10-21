@@ -26,8 +26,6 @@ a{color:#8fc2ff}button,input,select{font:inherit}
 .tabs button{flex:none;background:none;border:0;color:var(--dim);padding:9px 10px;font-weight:800;cursor:pointer;border-bottom:3px solid transparent}.tabs button[aria-selected=true]{color:var(--ink);border-color:var(--gold)}
 .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}.kpi{background:var(--card2);border:1px solid var(--edge);border-radius:14px;padding:10px}.kpi b{display:block;font-size:24px;line-height:1.1}.kpi span{font-size:12.5px;color:var(--dim)}
 h2{font-size:17px;margin:18px 0 8px}h3{font-size:15px;margin:12px 0 6px}
-.bars{display:flex;align-items:flex-end;gap:2px;height:90px;padding-top:6px}.bars i{flex:1;background:linear-gradient(180deg,var(--gold),#b38f00);border-radius:3px 3px 0 0;min-height:1px;position:relative}
-.axis{display:flex;justify-content:space-between;font-size:11px;color:var(--dim)}
 .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--edge);border-radius:12px;max-width:100%}
 table{border-collapse:collapse;width:100%;font-size:13.5px}th,td{padding:7px 9px;text-align:left;border-bottom:1px solid #ffffff10;white-space:nowrap}th{position:sticky;top:0;background:#16213d;cursor:pointer;font-size:12px;color:var(--dim)}
 td.n,th.n{text-align:right}.tag{display:inline-block;font-size:11px;font-weight:800;padding:1px 7px;border-radius:99px}.tag.m{background:#b3263a33;color:#ffb3bd}.tag.v{background:#1673c433;color:#a9d3ff}
@@ -47,38 +45,126 @@ td.n,th.n{text-align:right}.tag{display:inline-block;font-size:11px;font-weight:
 .tag.lo{background:#ffffff1a;color:var(--dim)}.ev{margin:6px 0 10px;padding-left:18px;font-size:13px;color:var(--dim)}.ev li{margin:2px 0;word-break:break-word}
 .sheet select,.sheet .pts{width:100%;padding:10px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px;letter-spacing:0;text-align:left;margin:4px 0 8px}
 [hidden]{display:none!important}
+/* 3D charts (inline SVG, no libraries): bars + candlesticks with front / side / top faces, floor and shadows */
+.ch{margin:4px 0 14px}.ch svg{display:block;width:100%;height:auto;overflow:visible}.ch svg text{fill:var(--dim);font:11px -apple-system,system-ui,sans-serif}
+.ch svg .hit{fill:transparent;cursor:pointer}.ch svg .hit:hover,.ch svg .hit:focus{fill:#ffffff0c;outline:none}.ch svg .vl{fill:var(--ink);font-weight:800}
+.lg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--dim);margin:2px 0 6px}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+#tip{position:fixed;z-index:60;pointer-events:none;background:#0a1430f2;border:1px solid var(--edge);border-radius:10px;padding:7px 10px;font-size:12.5px;line-height:1.4;color:var(--ink);box-shadow:0 8px 24px #000a;max-width:260px}
+#tip b{color:var(--gold)}
+tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{background:#f5c40014}.devid{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#ffffff10;border-radius:6px;padding:1px 5px;color:var(--ink);border:0;cursor:pointer}
+.tag.hot{background:#ff6b6b33;color:#ffb3b3}.tag.pw{background:#2fbf7126;color:#8ff0bd}.tag.br{background:#ffffff14;color:var(--dim)}
+.dim{color:var(--dim)}
+/* ✅ to-do list, pinned at the top (owner + manager) */
+.todo{border:2px solid var(--bad);background:linear-gradient(#ff4d4d14,#ff4d4d05)}.todo h2{margin:0;color:#ff8a8a;display:flex;align-items:center;gap:8px}.badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 8px;border-radius:99px;background:var(--bad);color:#fff;font-size:14px;font-weight:900}.badge.z{background:var(--ok)}
+.ti{display:flex;align-items:stretch;gap:8px;margin:8px 0}.ti .go{flex:1;min-width:0;display:flex;gap:10px;align-items:center;text-align:left;background:var(--card2);border:1px solid var(--edge);border-radius:14px;padding:12px;color:var(--ink);cursor:pointer;min-height:56px;font:inherit}
+.ti .go:active{background:#ffffff14}.ti .go b{display:block;font-size:15px;line-height:1.3}.ti .go small{display:block;color:var(--dim);font-size:12.5px;margin-top:2px}.ti .dot{flex:none;width:12px;height:12px;border-radius:50%}.ti .p1{background:var(--bad)}.ti .p2{background:var(--warn)}.ti .p3{background:var(--gold)}.ti .p4,.ti .p5{background:var(--dim)}
+.ti .dn{flex:none;min-width:76px;border-radius:14px;border:1px solid var(--edge);background:#2fbf7122;color:#8ff0bd;cursor:pointer;font:inherit;font-weight:800}
+.todo .add{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.todo .add input,.todo .add select,.mf input,.mf select,.mf textarea{width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px}
+.big{min-height:48px;font-size:16px}
+/* 💲 prices & specials */
+.mi{display:grid;grid-template-columns:1fr 110px 76px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #ffffff10}.mi b{font-size:15px}.mi small{display:block;color:var(--dim);font-size:12.5px}.mi input{width:100%;padding:12px 8px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px;text-align:right}
+.mi .btn{min-height:48px}.chg{color:var(--gold);font-weight:800}.nf{border:2px solid var(--bad)}.nf h3{margin:14px 0 4px;font-size:16px}.nx{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #ffffff10;flex-wrap:wrap}.nx>div{flex:1;min-width:140px}.nx b{display:block;font-size:15px}.nx small{display:block;color:var(--dim);font-size:12.5px}.nx img{width:64px;height:64px;object-fit:cover;border-radius:10px}.nb{display:flex;gap:6px;align-items:center}.nb input{width:96px;padding:12px 8px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px;text-align:right}.nf h2{color:#ff8a8a;margin:0 0 6px}.nf ul{margin:4px 0 10px;padding-left:20px}.nf li{margin:3px 0}.nt{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;background:#ff4d4d26;color:#ffb3b3;font-size:12px;font-weight:800}
+.mf label{display:block;font-size:13px;color:var(--dim);margin:10px 0 4px}.mf textarea{min-height:120px;font-family:inherit}
+.help p,.help li{font-size:16px;line-height:1.55}.help h3{margin-top:18px}
+/* 🚀 launch plan (2026-10-19) */
+.lp .st{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #ffffff10}.lp .st b{display:block;font-size:16px;font-weight:800}.lp .st span.n{display:block;font-size:14px;font-weight:400;line-height:1.5;color:var(--dim)}.lp .chip{flex:none;font-size:12px;font-weight:800;border-radius:999px;padding:3px 9px;margin-top:2px;white-space:nowrap}.lp .ok{background:#2fbf7126;color:var(--ok)}.lp .wt{background:#ffb34726;color:var(--warn)}.lp .nw{background:#ff6b6b26;color:var(--bad)}.lp ol.steps{padding-left:22px}.lp ol.steps li{margin:12px 0;font-size:16px;line-height:1.5}.lp .who{font-size:12px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.04em}.lp .tour{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}.lp .tour button{text-align:left;min-height:48px;line-height:1.35}.lp .tour small{display:block;font-weight:400;color:var(--dim);font-size:13px}
+@media (max-width:420px){.mi{grid-template-columns:1fr 92px 70px}}
+/* 🔐 team access: big phone-friendly switches */
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #ffffff10}.sw:last-child{border-bottom:0}.sw b{display:block;font-size:15.5px}.sw small{display:block;color:var(--dim);font-size:12.5px;margin-top:2px}
+.tg{flex:none;width:66px;height:38px;border-radius:99px;border:1px solid var(--edge);background:#ffffff14;position:relative;cursor:pointer;padding:0}.tg::after{content:"";position:absolute;top:4px;left:4px;width:28px;height:28px;border-radius:50%;background:var(--dim);transition:left .15s}
+.tg[aria-checked=true]{background:var(--ok);border-color:var(--ok)}.tg[aria-checked=true]::after{left:32px;background:#fff}.tg:disabled{opacity:.5;cursor:wait}
+.pc{background:var(--card2);border:1px solid var(--edge);border-radius:16px;padding:14px;margin:10px 0}.pc.off{opacity:.75;border-style:dashed}.pc h3{margin:0;font-size:17px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pc select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);font-size:16px;min-height:48px}.pc label{display:block;font-size:13px;color:var(--dim);margin:10px 0 4px}
+.pc .seg button{min-height:44px;padding:8px 16px}.pc .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.login .lk{background:none;border:0;color:#8fc2ff;font-weight:700;padding:10px 0;cursor:pointer;font-size:15px;text-decoration:underline}
 </style></head><body><main>
 <div class="top"><img src="icon-192.png" alt=""><div><h1>Christian HQ</h1><small>Melody Bar &amp; Grill × Nalu Vida · back office</small></div><span class="sp"></span><button class="btn alt sm" id="out" hidden>Log out</button></div>
-<div class="test" id="testBar" hidden>🧪 <b>TEST MODE</b>: fake guests and a fake backend. Nothing is real, nothing is sent. Log in as <b>christian</b> or <b>antidote</b> with password <b>test-mode-only</b>.</div>
+<div class="test" id="testBar" hidden>🧪 <b>TEST MODE</b>: fake guests and a fake backend. Nothing is real, nothing is sent. Log in as <b>Christian</b>, <b>Antidote</b>, <b>Melody Management</b> or <b>Sami</b> (managers, Melody only) with password <b>test-mode-only</b>. Staff: tap “Staff: log in with your email” and use <b>kitchen@example.com</b> (Melody kitchen) with the same password. A fake Nalu Vida bartender is waiting in 🔐 Team access.</div>
 
 <section class="card login" id="login">
   <h2 style="margin-top:0">🔒 Log in</h2>
-  <p class="note" style="margin:0">Only Christian and Antidote. Each person has their own login, so changes show who made them.</p>
+  <p class="note" style="margin:0">For Christian, Antidote, the managers and staff Christian turned on. Every change shows who made it.</p>
   <form id="lf" autocomplete="on">
-    <label for="u">Who are you?</label><select id="u" name="username" autocomplete="username"><option value="christian">Christian</option><option value="antidote">Antidote</option></select>
+    <div id="ownerPick"><label for="u">Who are you?</label><select id="u" name="username" autocomplete="username"></select></div>
+    <div id="staffPick" hidden><label for="ue">Your email</label><input id="ue" type="email" inputmode="email" autocapitalize="none" autocomplete="username" maxlength="120" placeholder="you@example.com"></div>
+    <button type="button" class="lk" id="modeBtn">✉️ Staff: log in with your email</button>
     <label for="p">Password</label><input id="p" name="password" type="password" autocomplete="current-password" required minlength="4">
     <button class="btn" style="width:100%;margin-top:14px" id="go">Log in</button>
     <div class="err" id="lerr" role="alert"></div>
   </form>
+  <button class="btn alt big" style="width:100%;margin-top:6px" id="suOpen" type="button">🙋 New staff? Request access</button>
   <p class="note" id="notConn" hidden>⚠️ The backend isn't connected yet (Antidote deploys it). Until then guest data stays on each guest's own phone, so there is nothing to show here. <a href="?test=1">Open test mode</a> to see how it works.</p>
   <p class="note">📲 Save this app: Share → Add to Home Screen. It shows as “Christian HQ”.</p>
+</section>
+
+<section class="card login" id="signup" hidden>
+  <h2 style="margin-top:0">🙋 Request HQ access</h2>
+  <p class="note" style="margin:0">For Melody and Nalu Vida staff. Christian decides what you can see and change, then turns your access on. You'll get an email when it's on.</p>
+  <form id="sf" autocomplete="on">
+    <label for="sName">Your name</label><input id="sName" autocomplete="name" maxlength="40" required placeholder="First and last name">
+    <label for="sEmail">Your email (you log in with it)</label><input id="sEmail" type="email" inputmode="email" autocapitalize="none" autocomplete="email" maxlength="120" required>
+    <label for="sRest">Where do you work?</label><select id="sRest"><option value="melody">✈️ Melody Bar &amp; Grill</option><option value="nalu">🏄 Nalu Vida</option><option value="both">Both</option></select>
+    <label for="sJob">What part of the job do you work?</label><select id="sJob"></select>
+    <label for="sPw">Pick a password (10+ characters)</label><input id="sPw" type="password" autocomplete="new-password" minlength="10" maxlength="128" required>
+    <label for="sPw2">Same password again</label><input id="sPw2" type="password" autocomplete="new-password" minlength="10" maxlength="128" required>
+    <button class="btn big" style="width:100%;margin-top:14px" id="sGo">Send my request</button>
+    <div class="err" id="suErr" role="alert"></div>
+  </form>
+  <div id="sDone" hidden><p style="font-size:18px;margin:14px 0 6px">✅ <b>Sent: Christian will turn on your access.</b></p><p class="note">You'll get an email when it's on. Then come back here, tap “Staff: log in with your email”, and use your email + the password you just picked.</p></div>
+  <button class="lk" id="suBack" type="button">← Back to log in</button>
 </section>
 
 <section id="app" hidden>
   <div class="seg" role="group" aria-label="Restaurant"><button data-r="all" aria-pressed="true">Both</button><button class="m" data-r="melody-bar-grill" aria-pressed="false">✈️ Melody</button><button class="n" data-r="nalu-vida" aria-pressed="false">🏄 Nalu Vida</button>
     <span style="flex:1"></span><button class="btn alt sm" id="refresh">↻ Refresh</button></div>
+  <section class="card todo" id="todo" aria-label="To-do list"></section>
   <div class="tabs" role="tablist" id="tabs"></div>
   <div id="pane"></div>
   <p class="note" id="stamp"></p>
 </section>
 </main>
-<script src="../../demo/christian-live.js?v=lb2"></script>
+<script src="../../demo/christian-live.js?v=mg2"></script>
+<script src="squares-hq.js?v=sq2"></script>
+<script src="../../demo/melody-lax/menu-data.js?v=mg2"></script>
+<script src="../../demo/listen.js?v=ls1"></script>
 <script>
 (function(){
 "use strict";
 var TEST=/[?&]test=1(&|$)/.test(location.search), LIVE=window.SSAI_CHRISTIAN||{defaults:{},apply:function(r){return r;}}, API=LIVE.api||"";
 var TKEY="christian-hq-token"+(TEST?"-test":""), TOKEN=null, DATA=null, R="all", TAB="overview", SORT={k:"earned",d:-1}, Q="";
 var DAY=864e5, NAMES={"melody-bar-grill":"Melody Bar & Grill","nalu-vida":"Nalu Vida"};
+// LOGINS: [user id, what the login list shows]. The name in the Audit log comes from the backend (BO_USERS "name").
+// "melody-manager" is ONE login shared by Melody's management team (manager role: Melody only, enforced by Code.gs).
+// "sammy": Sami's own manager login (login id stays "sammy"; display name Sami since 10-18) (Melody only, job Manager (general)); her switches are set in 🔐 Team access.
+// Staff who requested access themselves log in with their email ("Staff: log in with your email"), not from this list.
+var LOGINS=[["christian","Christian"],["antidote","Antidote"],["melody-manager","Melody Management (manager)"],["sammy","Sami (Melody manager)"]];
+var ROLE="owner", MYSLUGS=["melody-bar-grill","nalu-vida"], MGR=false, PERMS={}, JOB="", STAFFMODE=false;
+// 🔐 TEAM ACCESS: keep JOBS + PERM keys in sync with Code.gs (JOBS / PERM_KEYS). The SERVER enforces every switch;
+// the page only hides what a login can't use. Owners (Christian, Antidote) always have everything.
+var JOBS=[["kitchen","Kitchen"],["marketing","Marketing / management"],["bar_manager","Bar manager"],["bartender","Bartender"],["server","Server / floor"],["runner","Food runner / barback"],["manager","Manager (general)"],["other","Other employee"]];
+var PERMS_UI=[["rewards","Discounts, rewards & points","Discount %, dollars off, points costs, location bonus, receipt claims"],["prices","Raise / lower menu prices","What guests see in the app (Toast is changed in Toast)"],["specials","Specials & happy hour","Turn specials on/off, edit them and the happy-hour list"],
+  ["photos","Menu photos go live","Their dish photos show in the app right away (off: each one waits for Christian's OK)"],
+  ["members","See guest list & contacts","Guest names, phones, emails, birthdays + Scout flags"],["stats","See sales & visit charts","Overview, Visits and Games"],["earlybird","Early-bird gift","The founding-member gift setup"],["squares","Football Squares","Run the Squares boards"],
+  ["todo","To-do list","See, add and tick off to-dos"],["staff","Staff practice & quiz","Staff game scores and the training quiz"],["audit","See the Audit log","Who changed what, before → after"]];
+var JOBPRE={kitchen:"prices specials photos todo",marketing:"stats rewards specials photos earlybird squares todo audit",bar_manager:"stats prices specials photos squares todo staff",bartender:"todo staff",server:"todo staff",runner:"todo staff",manager:"*",other:"todo"};
+// 📖 ACCESS GUIDE (2026-10-18): what each switch unlocks, who usually gets it, and what is never handed out.
+function accessGuide(){ var who=function(k){ return JOBS.filter(function(j){ var p=JOBPRE[j[0]]; return p==="*"||(" "+p+" ").indexOf(" "+k+" ")>=0; }).map(function(j){ return j[1]; }).join(", "); };
+  return "<div class='card help' style='margin-top:12px' id='accessGuide'><h2 style='margin-top:0'>📖 What each access does</h2><p class='note' style='margin:0 0 8px'>Give each person only what their job needs. Turn any switch on or off for one person in <b>👥 Team</b> below. It works on their next tap.</p>"+
+    PERMS_UI.map(function(x){ return "<div style='border-top:1px solid var(--edge,#2a3550);padding:8px 0'><b>"+esc(x[1])+"</b><div class='note' style='margin:2px 0 0'>"+esc(x[2])+"</div><div class='note' style='margin:2px 0 0'>Usually on for: <b>"+esc(who(x[0]))+"</b></div></div>"; }).join("")+
+    "<h3>🙋 Who to add for what</h3><ul style='margin:4px 0 0;padding-left:20px'>"+
+    "<li><b>Marketing (e.g. Sami):</b> Discounts, rewards &amp; points · Specials &amp; happy hour · Menu photos go live · Early bird · charts. Add <b>Raise / lower menu prices</b> if she fixes prices too.</li>"+
+    "<li><b>Kitchen lead:</b> menu prices, specials, menu photos.</li><li><b>Bar manager:</b> prices, specials &amp; happy hour, photos, staff quiz.</li>"+
+    "<li><b>Bartenders / servers:</b> to-do list and the staff quiz only. They read the menu but change nothing.</li>"+
+    "<li><b>Guest names, phones and emails</b> (See guest list &amp; contacts): only someone you fully trust.</li></ul>"+
+    "<h3>🔒 Never handed out</h3><ul style='margin:4px 0 0;padding-left:20px'><li><b>Team access</b> (adding people, switches): Christian and Antidote only.</li>"+
+    "<li><b>OK-ing other people's photos</b>, Scout actions, Remove duplicates, both-restaurant to-dos: Christian and Antidote only.</li>"+
+    "<li><b>🎮 The games</b> (building them, prizes inside the games, turning them on or off): Antidote only. That's not in HQ.</li></ul></div>"; }
+var TABPERM={overview:"stats",visits:"stats",games:"stats",members:"members",scout:"members",rewards:"rewards",discounts:"rewards",earlybird:"earlybird",staff:"staff",squares:"squares",audit:"audit",team:"owner"};
+function can(k){ return ROLE==="owner"||(k!=="owner"&&PERMS[k]===true); }
+function tabOk(t){ var k=TABPERM[t]; return !k||can(k); }
+function jobName(j){ var x=JOBS.filter(function(a){ return a[0]===j; })[0]; return x?x[1]:(j==="owner"?"Owner":"Staff"); }
+$("u").innerHTML=LOGINS.map(function(x){ return "<option value='"+esc(x[0])+"'>"+esc(x[1])+"</option>"; }).join("");
+try{ var lastU=localStorage.getItem("christian-hq-user"); if(lastU) $("u").value=lastU; var lastE=localStorage.getItem("christian-hq-staff"); if(lastE){ $("ue").value=lastE; setMode(true); } }catch(e){}
 function $(id){ return document.getElementById(id); }
 function esc(t){ return String(t==null?"":t).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
 function n(x){ return (+x||0).toLocaleString("en-US"); }
@@ -90,28 +176,136 @@ function api(body){
   if(!API) return Promise.resolve({ok:false,reason:"Backend not connected yet."});
   return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(body)}).then(function(r){ return r.json(); }).catch(function(){ return {ok:false,reason:"Can't reach the backend. Check the connection."}; });
 }
-function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=dd1"; s.onload=cb; document.head.appendChild(s); }
+function loadMock(cb){ if(!TEST||window.HQ_MOCK) return cb(); var s=document.createElement("script"); s.src="mock.js?v=tm3"; s.onload=cb; document.head.appendChild(s); }
 if(TEST) $("testBar").hidden=false; else if(!API) $("notConn").hidden=false;
 try{ TOKEN=sessionStorage.getItem(TKEY); }catch(e){}
-$("lf").onsubmit=function(ev){ ev.preventDefault(); var b=$("go"); b.disabled=true; b.textContent="Checking…"; $("lerr").textContent="";
-  loadMock(function(){ api({type:"bo_login",user:$("u").value,pw:$("p").value}).then(function(r){ b.disabled=false; b.textContent="Log in"; $("p").value="";
-    if(!r||!r.ok){ $("lerr").textContent=(r&&r.reason)||"Wrong name or password."; return; }
-    TOKEN=r.token; try{ sessionStorage.setItem(TKEY,TOKEN); }catch(e){} load(); }); }); };
+// Speed: wake the Apps Script backend as soon as the page opens (cold starts take 5-10 s), so it's warm by the time you tap Log in.
+function warm(){ if(TEST||!API) return; try{ fetch(API+"?discounts=1",{cache:"no-store"}).catch(function(){}); }catch(e){} }
+warm(); $("u").addEventListener("focus",warm,{once:true});
+// Live status under the button so you always know what's happening (and that the password was right).
+var TICK=null; function status(t,ok){ var el=$("lerr"); el.style.color=ok?"#3ddc84":""; el.textContent=t; }
+function stopTick(){ if(TICK){ clearInterval(TICK); TICK=null; } }
+function ticking(label){ stopTick(); var t0=Date.now(); status(label+"…",true); TICK=setInterval(function(){ status(label+"… "+Math.round((Date.now()-t0)/1000)+"s",true); },1000); }
+$("lf").onsubmit=function(ev){ ev.preventDefault(); var b=$("go"); b.disabled=true; b.textContent="Checking…"; ticking("Checking your password");
+  var who=STAFFMODE?$("ue").value.trim().toLowerCase():$("u").value;
+  if(STAFFMODE&&!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(who)){ stopTick(); b.disabled=false; b.textContent="Log in"; status("Type the email you asked for access with."); return; }
+  loadMock(function(){ api({type:"bo_login",user:who,pw:$("p").value}).then(function(r){ $("p").value="";
+    if(!r||!r.ok){ stopTick(); b.disabled=false; b.textContent="Log in"; status((r&&r.reason)||"Wrong name or password."); return; }
+    b.textContent="✓ Password correct"; ticking("✓ Password correct. Loading your members and stats");
+    TOKEN=r.token; try{ sessionStorage.setItem(TKEY,TOKEN); if(STAFFMODE) localStorage.setItem("christian-hq-staff",who); else { localStorage.setItem("christian-hq-user",who); localStorage.removeItem("christian-hq-staff"); } }catch(e){} load(); }); }); };
+// login modes: owners/managers pick their name; staff who signed up type their email. "New staff?" opens the request form.
+function setMode(staff){ STAFFMODE=staff; $("ownerPick").hidden=staff; $("staffPick").hidden=!staff; $("u").name=staff?"":"username"; $("ue").name=staff?"username":""; $("modeBtn").textContent=staff?"← Christian, Antidote or a manager? Pick your name":"✉️ Staff: log in with your email"; $("lerr").textContent=""; }
+$("modeBtn").onclick=function(){ setMode(!STAFFMODE); if(STAFFMODE) $("ue").focus(); };
+$("sJob").innerHTML="<option value=''>Pick one…</option>"+JOBS.map(function(j){ return "<option value='"+j[0]+"'>"+esc(j[1])+"</option>"; }).join("");
+$("suOpen").onclick=function(){ $("login").hidden=true; $("signup").hidden=false; $("sf").hidden=false; $("sDone").hidden=true; $("suErr").textContent=""; $("sName").focus(); };
+$("suBack").onclick=function(){ $("signup").hidden=true; $("login").hidden=false; };
+$("sf").onsubmit=function(ev){ ev.preventDefault(); var e=$("suErr"), b=$("sGo"), pw=$("sPw").value, em=$("sEmail").value.trim().toLowerCase();
+  if($("sName").value.trim().length<2){ e.textContent="Type your name."; return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(em)){ e.textContent="Type a real email address (you log in with it)."; return; }
+  if(!$("sJob").value){ e.textContent="Pick the part of the job you work."; return; }
+  if(pw.length<10){ e.textContent="Password: at least 10 characters."; return; }
+  if(pw!==$("sPw2").value){ e.textContent="The two passwords don't match."; return; }
+  b.disabled=true; b.textContent="Sending…"; e.textContent="";
+  loadMock(function(){ api({type:"team_signup",name:$("sName").value.trim(),email:em,restaurant:$("sRest").value,job:$("sJob").value,pw:pw}).then(function(r){ b.disabled=false; b.textContent="Send my request";
+    if(!r||!r.ok){ e.textContent=(r&&r.reason)||"Didn't send. Try again."; return; }
+    $("sPw").value=""; $("sPw2").value=""; $("sf").hidden=true; $("sDone").hidden=false; $("ue").value=em; setMode(true); try{ localStorage.setItem("christian-hq-staff",em); }catch(x){} }); }); };
 $("out").onclick=function(){ if(TOKEN) api({type:"bo_logout",token:TOKEN}); signOut(""); };
-function signOut(msg){ TOKEN=null; DATA=null; try{ sessionStorage.removeItem(TKEY); }catch(e){} $("app").hidden=true; $("out").hidden=true; $("login").hidden=false; $("pane").innerHTML=""; $("lerr").textContent=msg||""; }
+function signOut(msg){ TOKEN=null; DATA=null; R="all"; TAB="overview"; document.querySelectorAll(".seg [data-r]").forEach(function(x){ x.hidden=false; x.setAttribute("aria-pressed",x.dataset.r==="all"?"true":"false"); }); if(window.SSAI_LISTEN) SSAI_LISTEN.stop(); $("todo").innerHTML=""; try{ sessionStorage.removeItem(TKEY); }catch(e){} $("app").hidden=true; $("out").hidden=true; $("signup").hidden=true; $("login").hidden=false; $("pane").innerHTML=""; $("lerr").textContent=msg||""; }
 function load(){ loadMock(function(){ api({type:"bo_data",token:TOKEN}).then(function(r){
+  stopTick(); var b=$("go"); b.disabled=false; b.textContent="Log in"; $("lerr").style.color="";
   if(!r||!r.ok){ signOut(r&&r.auth===false?"Signed out. Log in again.":(r&&r.reason)||"Couldn't load."); return; }
-  DATA=r; $("login").hidden=true; $("app").hidden=false; $("out").hidden=false; $("stamp").textContent="Signed in as "+r.me+" · loaded "+new Date(r.now).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})+(r.test?" · TEST DATA":""); draw(); }); }); }
+  DATA=r; setRole(r); $("login").hidden=true; $("signup").hidden=true; $("app").hidden=false; $("out").hidden=false; $("stamp").textContent="Signed in as "+r.me+" · loaded "+new Date(r.now).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})+(MGR?" · "+jobName(JOB)+" view ("+MYSLUGS.map(function(x){ return x==="nalu-vida"?"Nalu Vida":"Melody"; }).join(" + ")+")":"")+(r.test?" · TEST DATA":""); drawTodo(); draw(); }); }); }
 $("refresh").onclick=load;
 document.querySelector(".seg").addEventListener("click",function(e){ var b=e.target.closest("[data-r]"); if(!b) return; R=b.dataset.r; document.querySelectorAll("[data-r]").forEach(function(x){ x.setAttribute("aria-pressed",x===b?"true":"false"); }); draw(); });
-var TABS=[["overview","📊 Overview"],["members","👥 Members"],["rewards","🎟️ Rewards & claims"],["scout","🛡️ Scout"],["games","🎮 Games"],["discounts","🏷️ Discounts"],["earlybird","🎁 Early bird"],["staff","🧑‍🍳 Staff"],["audit","🧾 Audit log"],["links","🔗 Links"]];
-$("tabs").innerHTML=TABS.map(function(t){ return "<button role='tab' data-t='"+t[0]+"' aria-selected='"+(t[0]===TAB)+"'>"+t[1]+"</button>"; }).join("");
+var TABS=[["launch","🚀 Launch plan"],["overview","📊 Overview"],["visits","📍 Visits"],["members","👥 Members"],["rewards","🎟️ Rewards & claims"],["scout","🛡️ Scout"],["games","🎮 Games"],["discounts","🏷️ Discounts"],["menu","💲 Prices & specials"],["earlybird","🎁 Early bird"],["staff","🧑‍🍳 Staff"],["squares","🏈 Squares"],["audit","🧾 Audit log"],["team","🔐 Team access"],["help","❓ Help"],["links","🔗 Links"]];
+function drawTabs(){ if(!tabOk(TAB)){ var f1st=TABS.filter(function(t){ return tabOk(t[0]); })[0]; TAB=f1st?f1st[0]:"help"; }
+  $("tabs").innerHTML=TABS.filter(function(t){ return tabOk(t[0]); }).map(function(t){ return "<button role='tab' data-t='"+t[0]+"' aria-selected='"+(t[0]===TAB)+"'>"+t[1]+"</button>"; }).join(""); }
+drawTabs();
+// role from the backend (bo_data). Managers: Melody only (the server already sends nothing else), no restaurant switch,
+// no Scout actions / Remove duplicates. Owners: unchanged.
+// Non-owners (managers + staff): only their restaurant(s) (the server sends nothing else), only the tabs their 🔐 switches
+// allow, no Scout actions / Remove duplicates / Team access. Owners: unchanged.
+function setRole(r){ ROLE=r.role==="manager"?"manager":"owner"; MGR=ROLE==="manager"; MYSLUGS=MGR?(r.slugs||[]):["melody-bar-grill","nalu-vida"]; PERMS=r.perms||{}; JOB=r.job||"";
+  if(!r.perms){ PERMS={}; PERMS_UI.forEach(function(x){ PERMS[x[0]]=true; }); JOB="manager"; }   // backend from before Team access (no perms sent): same view as before; the server still decides
+  document.querySelectorAll(".seg [data-r]").forEach(function(b){ b.hidden=MGR&&b.dataset.r!=="all"&&MYSLUGS.indexOf(b.dataset.r)<0; });
+  var allB=document.querySelector(".seg [data-r=all]"); if(allB) allB.hidden=MGR&&MYSLUGS.length<2;
+  if(MGR&&(R==="all"?MYSLUGS.length<2:MYSLUGS.indexOf(R)<0)){ R=MYSLUGS.length>1?"all":(MYSLUGS[0]||"none"); document.querySelectorAll("[data-r]").forEach(function(x){ x.setAttribute("aria-pressed",x.dataset.r===R?"true":"false"); }); }
+  var one=MYSLUGS.length===1?(MYSLUGS[0]==="nalu-vida"?"Nalu Vida":"Melody"):"";
+  document.querySelector("h1").textContent=MGR?(one?one+" HQ":"Christian HQ"):"Christian HQ";
+  document.querySelector(".top small").textContent=MGR?(one?NAMES[MYSLUGS[0]]:"Melody Bar & Grill × Nalu Vida")+" · "+(r.me||"")+" · "+jobName(JOB):"Melody Bar & Grill × Nalu Vida · back office";
+  $("todo").hidden=!can("todo"); drawTabs(); }
 $("tabs").addEventListener("click",function(e){ var b=e.target.closest("[data-t]"); if(!b) return; TAB=b.dataset.t; document.querySelectorAll("#tabs button").forEach(function(x){ x.setAttribute("aria-selected",x===b?"true":"false"); }); draw(); });
 function inR(s){ return R==="all"||s===R; }
 function F(){ var d=DATA; return { mem:d.members.filter(function(m){ return inR(m.slug); }), games:d.games.filter(function(g){ return inR(g[0]); }), opens:d.opens.filter(function(o){ return inR(o[0]); }),
   red:d.redeems.filter(function(x){ return inR(x.slug); }), clm:d.claims.filter(function(x){ return inR(x.slug); }), staff:d.staff.filter(function(x){ return inR(x[0]); }) }; }
-function bars(map,days,label){ var keys=[],t=Date.now(); for(var i=days-1;i>=0;i--) keys.push(ymd(t-i*DAY)); var mx=Math.max.apply(null,keys.map(function(k){ return map[k]||0; }).concat([1]));
-  return "<h3>"+label+"</h3><div class='bars' role='img' aria-label='"+esc(label)+"'>"+keys.map(function(k){ return "<i title='"+k+": "+(map[k]||0)+"' style='height:"+Math.round(100*(map[k]||0)/mx)+"%'></i>"; }).join("")+"</div><div class='axis'><span>"+dt(t-(days-1)*DAY)+"</span><span>today</span></div>"; }
+// ---- 3D CHARTS (inline SVG): every bar / candle body is a box with a lit front, a darker side, a bright top, a soft floor
+// shadow and a back-wall grid. Sized to the real width (re-drawn on resize) so text stays 11px on a phone. Tooltips: hover or tap.
+(function(){ var g=function(id,a,b,c,d){ return "<linearGradient id='"+id+"' x1='0' y1='0' x2='"+(d?0:1)+"' y2='"+(d?1:0)+"'><stop offset='0' stop-color='"+a+"'/><stop offset='.5' stop-color='"+b+"'/><stop offset='1' stop-color='"+c+"'/></linearGradient>"; };
+  var s=document.createElementNS("http://www.w3.org/2000/svg","svg"); s.setAttribute("width","0"); s.setAttribute("height","0"); s.setAttribute("aria-hidden","true"); s.style.position="absolute";
+  s.innerHTML="<defs>"+g("gGF","#ffe76e","#f5c400","#a88600")+g("gGS","#a07f00","#7d6300","#4d3d00",1)+g("gGT","#fff6b8","#ffe36b","#f5c400")+
+    g("gUF","#7ff5b4","#2fbf71","#167043")+g("gUS","#1a7446","#125632","#0a3320",1)+g("gUT","#c8ffe0","#8ff0bd","#4fd690")+
+    g("gDF","#ffaaaa","#ff6b6b","#a83434")+g("gDS","#962c2c","#742020","#451212",1)+g("gDT","#ffdada","#ffb0b0","#ff7d7d")+
+    g("gWk","#f3f6ff","#a9b6d6","#4a5a80")+"<linearGradient id='gFl' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#1d2c52'/><stop offset='1' stop-color='#0e1730'/></linearGradient>"+
+    "<filter id='fSh' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='2.2'/></filter></defs>";
+  document.body.appendChild(s); })();
+function chartW(){ var p=$("pane"); return Math.max(300,Math.min(940,((p&&p.clientWidth)||360)-2)); }
+function f1(x){ return Math.round(x*10)/10; }
+function poly(pts,fill,extra){ return "<polygon points='"+pts.map(function(p){ return f1(p[0])+","+f1(p[1]); }).join(" ")+"' fill='"+fill+"'"+(extra||"")+"/>"; }
+// a 3D box: front face x..x+w, y..y+h; depth (dx, dy) goes up-right. c = "G" gold, "U" up/green, "D" down/red
+function box3(x,y,w,h,dx,dy,c,op){ var o=op?" opacity='"+op+"'":"";
+  return "<ellipse cx='"+f1(x+w/2+dx/2)+"' cy='"+f1(y+h+dy/2)+"' rx='"+f1(w*0.75+2)+"' ry='3' fill='#000' opacity='.5' filter='url(#fSh)'/>"+
+    poly([[x+w,y],[x+w+dx,y+dy],[x+w+dx,y+h+dy],[x+w,y+h]],"url(#g"+c+"S)",o)+"<rect x='"+f1(x)+"' y='"+f1(y)+"' width='"+f1(w)+"' height='"+f1(Math.max(h,0.5))+"' fill='url(#g"+c+"F)'"+o+"/>"+
+    poly([[x,y],[x+dx,y+dy],[x+w+dx,y+dy],[x+w,y]],"url(#g"+c+"T)",o)+(h>6?"<rect x='"+f1(x+1)+"' y='"+f1(y+1)+"' width='1.2' height='"+f1(h-2)+"' fill='#fff' opacity='.35'/>":""); }
+function floor3(L,R,base,dx,dy){ return poly([[L,base],[L+dx,base+dy],[R+dx,base+dy],[R,base]],"url(#gFl)")+"<line x1='"+L+"' y1='"+base+"' x2='"+f1(R)+"' y2='"+base+"' stroke='#3a4f80'/>"; }
+function niceMax(v){ if(v<=4) return 4; var p=Math.pow(10,Math.floor(Math.log10(v))), m=v/p; return (m<=1?1:m<=2?2:m<=5?5:10)*p; }
+function dayKeys(days){ var keys=[],t=Date.now(); for(var i=days-1;i>=0;i--) keys.push(ymd(t-i*DAY)); return keys; }
+function dayLbl(k){ return new Date(k+"T12:00:00").toLocaleDateString([], {weekday:"short",month:"short",day:"numeric"}); }
+// 3D bar chart: map {YYYY-MM-DD: count}
+function bars(map,days,label,unit){ var keys=dayKeys(days), vals=keys.map(function(k){ return map[k]||0; }), top=Math.max.apply(null,vals), mx=niceMax(Math.max(top,1)), nb=keys.length;
+  var W=chartW(), H=170, L=32, T=18, B=22, slot=(W-L-16)/nb, dx=Math.max(3,Math.min(9,slot*0.42)), dy=-dx*0.7, R=L+slot*nb, base=H-B, ph=base-T+dy-4, bw=Math.min(slot*0.58,34), off=(slot-bw-dx*0.5)/2, h="", hit="";
+  [0,0.5,1].forEach(function(gv){ var y=base-gv*ph; h+="<line x1='"+f1(L+dx)+"' y1='"+f1(y+dy)+"' x2='"+f1(R+dx)+"' y2='"+f1(y+dy)+"' stroke='#ffffff"+(gv?"14":"00")+"'/><text x='"+(L-5)+"' y='"+f1(y+dy+4)+"' text-anchor='end'>"+n2(gv*mx)+"</text>"; });
+  h+=floor3(L,R,base,dx,dy);
+  var lab=-1; vals.forEach(function(v,i){ if(v===top&&top>0) lab=i; });
+  vals.forEach(function(v,i){ var x=L+i*slot+off, bh=v/mx*ph, y=base-bh;
+    h+=v>0?box3(x,y,bw,bh,dx,dy,"G",i===nb-1?null:".93"):poly([[x,base],[x+dx,base+dy],[x+bw+dx,base+dy],[x+bw,base]],"#ffffff14");
+    if(v>0&&(i===lab||i===nb-1)) h+="<text class='vl' x='"+f1(x+bw/2+dx/2)+"' y='"+f1(y+dy-4)+"' text-anchor='middle'>"+n2(v)+"</text>";
+    hit+="<rect class='hit' tabindex='0' x='"+f1(L+i*slot)+"' y='"+(T-14)+"' width='"+f1(slot)+"' height='"+f1(base-T+14)+"' data-tip='"+esc("<b>"+esc(dayLbl(keys[i]))+"</b><br>"+n(v)+" "+esc(unit||label.toLowerCase()))+"'/>"; });
+  h+="<text x='"+L+"' y='"+(H-4)+"'>"+esc(dt(Date.now()-(days-1)*DAY))+"</text><text x='"+f1(L+(R-L)/2)+"' y='"+(H-4)+"' text-anchor='middle'>"+esc(dt(Date.now()-Math.floor(days/2)*DAY))+"</text><text x='"+f1(R+dx)+"' y='"+(H-4)+"' text-anchor='end'>today</text>";
+  return "<h3>"+esc(label)+"</h3><div class='ch'><svg viewBox='0 0 "+f1(W)+" "+H+"' width='"+f1(W)+"' height='"+H+"' role='img' aria-label='"+esc(label+": "+n(vals.reduce(function(a,b){ return a+b; },0))+" in "+days+" days, most in one day "+n(top))+"'>"+h+hit+"</svg></div>"; }
+function n2(v){ v=Math.round(v); return v>=1000?(Math.round(v/100)/10)+"k":String(v); }
+// LA clock time (decimal hours) for a timestamp
+var LAF=new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",hour:"numeric",minute:"numeric",hour12:false});
+function laHour(t){ var p={}; LAF.formatToParts(new Date(t)).forEach(function(x){ p[x.type]=x.value; }); return (+p.hour%24)+(+p.minute)/60; }
+function hm(h){ var hh=Math.floor(h), mm=Math.round((h-hh)*60); if(mm===60){ hh++; mm=0; } var ap=hh%24<12?"AM":"PM", h12=hh%12||12; return h12+":"+(mm<10?"0":"")+mm+" "+ap; }
+function hShort(h){ h=Math.round(h)%24; return (h%12||12)+(h<12?"a":"p"); }
+function pct(a,p){ if(!a.length) return 0; var i=(a.length-1)*p, lo=Math.floor(i), hi=Math.ceil(i); return a[lo]+(a[hi]-a[lo])*(i-lo); }
+// 🕯️ 3D candlestick: one candle per day of app opens (LA time). Wick = first → last open, box = the middle half of opens
+// (the busy window), green = more opens than the day before, red = fewer. Under it: 3D volume bars = number of opens.
+var CDAYS=14;
+function candles(list,label){ var days=CDAYS, keys=dayKeys(days+1), by={}; keys.forEach(function(k){ by[k]=[]; });
+  list.forEach(function(o){ if(o[4]&&by[o[1]]) by[o[1]].push(laHour(o[4])); });
+  var D=keys.map(function(k,i){ var a=by[k].sort(function(x,y){ return x-y; }); return {k:k,n:a.length,lo:a[0],hi:a[a.length-1],q1:pct(a,0.25),q3:pct(a,0.75),med:pct(a,0.5)}; });
+  var prev=D.shift(); D.forEach(function(d){ d.up=d.n>=prev.n; d.dn=d.n-prev.n; prev=d; });
+  var withT=D.filter(function(d){ return d.n; }), sel="<div class='seg' style='margin:4px 0'><button data-cd='14' aria-pressed='"+(days===14)+"'>14 days</button><button data-cd='30' aria-pressed='"+(days===30)+"'>30 days</button></div>";
+  if(!withT.length) return "<h3>"+esc(label)+"</h3>"+sel+"<p class='note'>No open times yet. Open times start showing once the backend update is deployed and guests open the app.</p>";
+  var lo=Math.floor(Math.min.apply(null,withT.map(function(d){ return d.lo; }))), hi=Math.ceil(Math.max.apply(null,withT.map(function(d){ return d.hi; })));
+  lo=Math.max(0,Math.floor(lo/3)*3); hi=Math.min(24,Math.ceil(hi/3)*3); if(hi-lo<6) hi=Math.min(24,lo+6);
+  var vmax=niceMax(Math.max.apply(null,D.map(function(d){ return d.n; }))), nc=D.length;
+  var W=chartW(), H=250, L=36, T=16, base=162, vTop=186, vBase=228, slot=(W-L-16)/nc, dx=Math.max(3,Math.min(9,slot*0.42)), dy=-dx*0.7, R=L+slot*nc, bw=Math.min(slot*0.56,30), off=(slot-bw-dx*0.5)/2, ph=base-T+dy;
+  var Y=function(hh){ return base-(hh-lo)/(hi-lo)*(ph); }, h="", hit="";
+  for(var gh=lo; gh<=hi; gh+=3){ var y=Y(gh); h+="<line x1='"+f1(L+dx)+"' y1='"+f1(y+dy)+"' x2='"+f1(R+dx)+"' y2='"+f1(y+dy)+"' stroke='#ffffff12'/><text x='"+(L-5)+"' y='"+f1(y+dy+4)+"' text-anchor='end'>"+hShort(gh)+"</text>"; }
+  h+=poly([[L,base],[L+dx,base+dy],[L+dx,T+dy],[L,T]],"#ffffff06")+floor3(L,R,base,dx,dy)+floor3(L,R,vBase,dx,dy);
+  h+="<text x='"+(L-5)+"' y='"+(vTop+8)+"' text-anchor='end'>"+n2(vmax)+"</text><text x='"+(L-5)+"' y='"+(vBase+dy+4)+"' text-anchor='end'>0</text>";
+  D.forEach(function(d,i){ var x=L+i*slot+off, c=d.up?"U":"D", cx=x+bw/2+dx/2;
+    if(d.n){ var wt=Y(d.hi), wb=Y(d.lo); h+="<rect x='"+f1(cx-1.1)+"' y='"+f1(wt+dy/2)+"' width='2.2' height='"+f1(Math.max(1,wb-wt))+"' rx='1' fill='url(#gWk)'/>";
+      var yt=Y(d.q3), yb=Y(d.q1); if(yb-yt<3){ yt=(yt+yb)/2-1.5; yb=yt+3; } h+=box3(x,yt,bw,yb-yt,dx,dy,c); }
+    var vh=d.n/vmax*(vBase-vTop); if(d.n) h+=box3(x,vBase-vh,bw,vh,dx*0.8,dy*0.8,c,".8");
+    var tip="<b>"+esc(dayLbl(d.k))+"</b><br>"+n(d.n)+" open"+(d.n===1?"":"s")+" "+(d.dn>0?"▲ +"+d.dn:d.dn<0?"▼ "+d.dn:"= same")+" vs. day before"+
+      (d.n?"<br>First "+hm(d.lo)+" · last "+hm(d.hi)+"<br>Busy window "+hm(d.q1)+" – "+hm(d.q3):"");
+    hit+="<rect class='hit' tabindex='0' x='"+f1(L+i*slot)+"' y='"+(T-12)+"' width='"+f1(slot)+"' height='"+f1(vBase-T+12)+"' data-tip='"+esc(tip)+"'/>"; });
+  h+="<text x='"+L+"' y='"+(H-4)+"'>"+esc(dt(Date.now()-(days-1)*DAY))+"</text><text x='"+f1(R+dx)+"' y='"+(H-4)+"' text-anchor='end'>today</text>";
+  return "<h3>"+esc(label)+"</h3>"+sel+"<div class='ch'><svg viewBox='0 0 "+f1(W)+" "+H+"' width='"+f1(W)+"' height='"+H+"' role='img' aria-label='"+esc(label+", last "+days+" days")+"'>"+h+hit+"</svg></div>"+
+    "<div class='lg'><span><i style='background:#2fbf71'></i>more opens than the day before</span><span><i style='background:#ff6b6b'></i>fewer</span><span>│ wick = first → last open</span><span>▮ box = busiest half of opens</span><span>bottom bars = opens per day</span></div>"; }
 function count(arr,f){ var m={}; arr.forEach(function(x){ var k=f(x); if(k) m[k]=(m[k]||0)+1; }); return m; }
 function distinct(arr,f){ var s={}; arr.forEach(function(x){ s[f(x)]=1; }); return Object.keys(s).length; }
 function kpi(v,l){ return "<div class='kpi'><b>"+v+"</b><span>"+l+"</span></div>"; }
@@ -124,7 +318,8 @@ function overview(){ var f=F(), t=Date.now(), td=ymd(t), w=t-7*DAY, mo=t-30*DAY,
     kpi(scores.length?n(Math.round(scores.reduce(function(a,b){ return a+b; },0)/scores.length)):"—","average score")+kpi(scores.length?n(Math.max.apply(null,scores)):"—","best score")+
     kpi(n(earned),"points earned")+kpi(n(spent),"points used on rewards")+kpi(n(bal),"points still in wallets")+kpi(n(f.red.length),"rewards used (live passes)")+
     kpi(n(f.clm.length),"receipt claims")+kpi(n(f.clm.filter(function(c){ return c.status==="pending"; }).length),"claims to spot-check")+kpi(n(refd),"joined with a friend's code")+kpi(n(f.mem.filter(function(m){ return m.sms==="yes"; }).length),"OK'd deal texts")+"</div>";
-  h+="<div class='card'>"+bars(count(f.mem,function(m){ return ymd(m.joined); }),30,"Joins per day (30 days)")+bars(count(f.games,function(g){ return g[1]; }),30,"Game plays per day")+bars((function(){ var m={}, s={}; f.opens.forEach(function(o){ var k=o[1]+o[0]+o[2]; if(!s[k]){ s[k]=1; m[o[1]]=(m[o[1]]||0)+1; } }); return m; })(),30,"Phones opening the app per day")+"</div>";
+  h+="<div class='card'>"+bars(count(f.mem,function(m){ return ymd(m.joined); }),30,"Joins per day (30 days)","joined")+bars(count(f.games,function(g){ return g[1]; }),30,"Game plays per day","game plays")+bars((function(){ var m={}, s={}; f.opens.forEach(function(o){ var k=o[1]+o[0]+o[2]; if(!s[k]){ s[k]=1; m[o[1]]=(m[o[1]]||0)+1; } }); return m; })(),30,"Phones opening the app per day","phones opened the app")+"</div>";
+  h+="<div class='card'>"+candles(f.opens,"🕯️ When guests open the app (LA time)")+"<p class='note' style='margin:0'>Every open, who and where: <a href='#' data-goto='visits'>📍 Visits</a>.</p></div>";
   var top=f.mem.slice().sort(function(a,b){ return b.earned-a.earned; }).slice(0,10);
   h+="<h2>🏆 Top members (points earned)</h2>"+table(["Name","","Earned","Balance","Visits"],top.map(function(m){ return [esc(m.name),tagR(m.slug),n(m.earned),n(m.stars),n(m.visits)]; }),[2,3,4]);
   var refs={}; f.mem.forEach(function(m){ if(m.refBy) refs[m.slug+"|"+m.refBy]=(refs[m.slug+"|"+m.refBy]||0)+1; });
@@ -141,7 +336,7 @@ var DUPARM=0;
 function members(){ var f=F(), q=Q.toLowerCase(), list=f.mem.filter(function(m){ return !q||(m.name+" "+m.email+" "+m.phone+" "+m.ref+" "+(m.card||"")).toLowerCase().indexOf(q)>=0; });
   list.sort(function(a,b){ var x=a[SORT.k],y=b[SORT.k]; return (x>y?1:x<y?-1:0)*SORT.d; });
   return "<div class='row' style='margin:10px 0'><input type='search' id='q' placeholder='Search name, card ID (MLD-…), email, phone' value='"+esc(Q)+"' aria-label='Search members'><button class='btn sm' id='csv'>⬇︎ CSV</button></div>"+
-    (dupCount()?"<div class='card' style='margin:0 0 10px;border-color:#f5c518'><b>⚠️ "+n(dupCount())+" duplicate membership"+(dupCount()>1?"s":"")+"</b><p class='note' style='margin:4px 0 8px'>Same restaurant + same phone or email. Keeps each guest's FIRST sign-up (their card ID stays), removes the newer copies. The member list is backed up first and it's logged in the audit log.</p><button class='btn sm' id='dedupe'>"+(DUPARM>Date.now()?"Tap again to remove "+n(dupCount()):"🧹 Remove duplicates")+"</button> <span class='note' id='dedupeOut'></span></div>":"")+
+    (dupCount()&&!MGR?"<div class='card' style='margin:0 0 10px;border-color:#f5c518'><b>⚠️ "+n(dupCount())+" duplicate membership"+(dupCount()>1?"s":"")+"</b><p class='note' style='margin:4px 0 8px'>Same restaurant + same phone or email. Keeps each guest's FIRST sign-up (their card ID stays), removes the newer copies. The member list is backed up first and it's logged in the audit log.</p><button class='btn sm' id='dedupe'>"+(DUPARM>Date.now()?"Tap again to remove "+n(dupCount()):"🧹 Remove duplicates")+"</button> <span class='note' id='dedupeOut'></span></div>":"")+
     "<p class='note'>"+n(list.length)+" members"+(R==="all"?" at both restaurants":"")+". Tap a column to sort. Private: don't share screenshots of this list.</p>"+
     "<div class='tw'><table><thead><tr>"+MCOL.map(function(c){ return "<th data-sort='"+c[0]+"'"+(c[2]?" class='n'":"")+">"+c[1]+(SORT.k===c[0]?(SORT.d>0?" ▲":" ▼"):"")+"</th>"; }).join("")+"</tr></thead><tbody>"+
     list.map(function(m){ return "<tr><td>"+esc(m.name)+(m.signupOnly?" <span class='tag p'>sign-up only</span>":"")+"</td><td class='cid'>"+(m.card?"<code>"+esc(m.card)+"</code>":"<span class='note'>next sync</span>")+"</td><td>"+tagR(m.slug)+"</td><td>"+(m.email?"<a href='mailto:"+esc(m.email)+"'>"+esc(m.email)+"</a>":"—")+"</td><td>"+(m.phone?"<a href='tel:"+esc(String(m.phone).replace(/[^\d+]/g,""))+"'>"+esc(m.phone)+"</a>":"—")+"</td>"+
@@ -155,15 +350,63 @@ function onePrize(){ var o=(DATA&&DATA.oneprize)||null; if(!o) return ""; var t=
   return "<div class='kpis' id='oneprize'>"+kpi(n(t.codes),"pass codes issued today")+kpi(n(t.used),"checked &amp; used at the register")+kpi(n(t.expired),"expired unused ("+t.mins+" min)")+kpi(n(t.refused),"2nd prizes refused today")+(rs7==null?"":kpi(n(rs7),"signed back in on a new phone (7 days)"))+"</div>"+
    "<p class='note'><b>One code per visit, one prize per day</b> (server-enforced, LA date): every pass code works once and expires "+t.mins+" minutes after it opens. A member or phone gets one prize a day (a reward, an early-bird gift, a game or spin win); a 2nd one is refused with “Come back tomorrow”. Referral codes are applied once at sign-up and never stack with a reward the same visit.</p>"; }
 function rewards(){ var f=F(), h="<h2>🎟️ Rewards used ("+f.red.length+")</h2>"+onePrize()+table(["When","","Code","Member","Reward","Toast button","Points"],f.red.slice().sort(function(a,b){ return b.ts-a.ts; }).map(function(x){ return [dt(x.ts),tagR(x.slug),esc(x.code),esc(x.name),esc(x.reward),"<span class='toastbtn'>"+esc(x.button)+"</span>",n(x.pts)]; }),[6]);
-  h+="<h2>🧾 Receipt claims, “Add my visit” ("+f.clm.length+")</h2><p class='note'>Interim mode. Spot-check against Toast's daily sales report (check # + total). Approve / Flag from the manager log in each restaurant app.</p>"+
+  h+="<h2 id='claims'>🧾 Receipt claims, “Add my visit” ("+f.clm.length+")</h2><p class='note'>Interim mode. Spot-check against Toast's daily sales report (check # + total). Approve / Flag from the manager log in each restaurant app.</p>"+
     table(["When","","Check #","Check date","Total","Points","Member","Photo","Status"],f.clm.slice().sort(function(a,b){ return b.ts-a.ts; }).map(function(c){ return [dt(c.ts),tagR(c.slug),"#"+esc(c.check),esc(c.date),"$"+(+c.total).toFixed(2),n(c.pts),esc(c.name),c.photo?"📷":"—","<span class='tag "+(c.status==="approved"?"ok":c.status==="flagged"?"f":"p")+"'>"+esc(c.status)+"</span>"]; }),[4,5]);
   var ready=[]; LIVE.slugs&&LIVE.slugs.forEach(function(s){ if(!inR(s)) return; var t=cur(s).tiers||[]; f.mem.filter(function(m){ return m.slug===s&&t.length&&m.stars>=t[0][0]; }).forEach(function(m){ var best=t.filter(function(x){ return m.stars>=x[0]; }).pop(); ready.push([esc(m.name),tagR(s),n(m.stars),esc(best[1])]); }); });
   h+="<h2>🎁 Members with a reward ready ("+ready.length+")</h2>"+table(["Member","","Balance","Best reward they can use"],ready,[2]);
   return h; }
-function games(){ var f=F(), h=bars(count(f.games,function(g){ return g[1]; }),30,"Plays per day"), byDay={};
+function games(){ var f=F(), h=bars(count(f.games,function(g){ return g[1]; }),30,"Plays per day","plays"), byDay={};
   var top=f.games.slice().sort(function(a,b){ return b[4]-a[4]; }).slice(0,15), mem={}; DATA.members.forEach(function(m){ mem[m.id]=m.name; });
   h+="<div class='kpis' style='margin-top:10px'>"+kpi(n(f.games.length),"plays (120 days)")+kpi(n(f.games.filter(function(g){ return !g[2]; }).length),"plays by guests who hadn't joined")+kpi(n(distinct(f.games,function(g){ return g[0]+(g[2]||g[3]); })),"different players")+kpi(n(f.mem.reduce(function(a,m){ return a+m.gamePts; },0)),"game points credited")+"</div>";
   h+="<h2>🏅 Top scores</h2>"+table(["Day","","Player","Score","Points worth"],top.map(function(g){ return [esc(g[1]),tagR(g[0]),g[2]?esc(mem[g[2]]||g[2]):"guest (not joined)",n(g[4]),n(g[5])]; }),[3,4]);
+  return h; }
+// ---- 📍 VISITS: every app open (time, who, device, Home Screen or browser, approximate location if the guest had location on) ----
+// opens rows: [slug, day, device id, home screen 1/0, server ms, member id, local time, device summary, lat, lng, accuracy m]
+// (rows from before the backend update only have the first 4: they show the day with "—" for the rest)
+var VQ="", VDEV="", VMORE=100;
+function rel(t){ var s=(Date.now()-t)/1000; if(s<90) return "just now"; if(s<3600) return Math.round(s/60)+" min ago"; if(s<86400) return Math.round(s/3600)+" h ago"; var d=Math.round(s/86400); return d+" day"+(d>1?"s":"")+" ago"; }
+function laWhen(t){ return new Date(t).toLocaleString("en-US",{timeZone:"America/Los_Angeles",weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}); }
+function devKey(o){ return o[0]+"|"+o[2]; }
+function whoMaps(){ var byId={}, byDev={}; DATA.members.forEach(function(m){ byId[m.slug+"|"+m.id]=m; if(m.dev) (byDev[m.slug+"|"+m.dev]=byDev[m.slug+"|"+m.dev]||[]).push(m); }); return {id:byId,dev:byDev}; }
+function devNames(M,k,extraIds){ var s={}, out=[]; (M.dev[k]||[]).forEach(function(m){ s[m.id]=m.name; }); (extraIds||[]).forEach(function(id){ var m=M.id[k.split("|")[0]+"|"+id]; s[id]=m?m.name:id; }); Object.keys(s).forEach(function(id){ out.push(s[id]); }); return out; }
+function locCell(o){ if(o[8]==null||o[9]==null||!isFinite(o[8])||!isFinite(o[9])) return o[4]&&(o[6]||o[7])?"<span class='dim'>Location off</span>":"<span class='dim'>—</span>";
+  var q=(+o[8]).toFixed(2)+","+(+o[9]).toFixed(2); return "<a href='https://www.google.com/maps?q="+q+"' target='_blank' rel='noopener noreferrer'>📍 "+q.replace(",",", ")+"</a> <span class='dim'>~1 km area"+(o[10]?" · GPS ±"+n(o[10])+" m":"")+"</span>"; }
+function modeTag(o){ return o[3]?"<span class='tag pw'>🏠 Home Screen</span>":"<span class='tag br'>🌐 Browser</span>"; }
+function devRollup(list,M){ var R={}, wk=Date.now()-7*DAY;
+  list.forEach(function(o){ var k=devKey(o), r=R[k]=R[k]||{k:k,slug:o[0],dev:o[2],n:0,n7:0,days:{},first:Infinity,last:0,firstDay:o[1],lastDay:o[1],ua:"",pwa:0,loc:0,ids:{}};
+    r.n++; r.days[o[1]]=1; if(o[1]<r.firstDay) r.firstDay=o[1]; if(o[1]>r.lastDay) r.lastDay=o[1];
+    if(o[4]){ if(o[4]<r.first) r.first=o[4]; if(o[4]>r.last){ r.last=o[4]; if(o[7]) r.ua=o[7]; } if(o[4]>=wk) r.n7++; } else if(o[1]>=ymd(wk)) r.n7++;
+    if(!r.ua&&o[7]) r.ua=o[7]; if(o[3]) r.pwa=1; if(o[8]!=null) r.loc++; if(o[5]) r.ids[o[5]]=1; });
+  var arr=Object.keys(R).map(function(k){ var r=R[k]; r.names=devNames(M,k,Object.keys(r.ids)); r.nd=Object.keys(r.days).length; return r; });
+  var act=arr.map(function(r){ return r.n7; }).filter(function(x){ return x>0; }).sort(function(a,b){ return a-b; }), med=act.length?act[Math.floor(act.length/2)]:0;
+  arr.forEach(function(r){ r.hot=r.n7>=Math.max(15,med*4); });
+  return arr.sort(function(a,b){ return b.n7-a.n7||b.n-a.n||b.last-a.last; }); }
+function whoCell(o,M){ var k=devKey(o), m=o[5]&&M.id[o[0]+"|"+o[5]], nm=m?[m.name]:devNames(M,k); return (nm.length?esc(nm.join(", ")):"<span class='dim'>Guest</span>")+" <button class='devid' data-dev='"+esc(k)+"' title='See this phone'>"+esc(o[2])+"</button>"; }
+function visits(){ var f=F(), M=whoMaps(), q=VQ.toLowerCase(), t=Date.now(), td=ymd(t), w7=ymd(t-7*DAY);
+  var all=f.opens.slice().sort(function(a,b){ return (b[4]||0)-(a[4]||0)||(b[1]>a[1]?1:b[1]<a[1]?-1:0); });
+  var hasNew=all.some(function(o){ return o[4]&&(o[6]||o[7]); }), o7=all.filter(function(o){ return o[1]>=w7; });
+  var match=function(o){ if(!q) return true; var k=devKey(o), m=o[5]&&M.id[o[0]+"|"+o[5]]; return ((m?m.name:"")+" "+devNames(M,k).join(" ")+" "+o[2]+" "+(o[7]||"")+" "+(o[5]||"")).toLowerCase().indexOf(q)>=0; };
+  var h="<p class='note' style='margin-top:12px'>Every time a guest opens the Melody or Nalu Vida app (at most one entry per phone per 10 minutes): when, who (member name, or <b>Guest</b> + the phone's random ID), the device, Home Screen app or browser, and an <b>approximate</b> spot (about 1 km) only when the guest already allowed location for the app. Private: don't share screenshots.</p>";
+  if(!hasNew) h+="<div class='test'>⏳ Times, devices and locations start showing after Antidote deploys the backend update (Code.gs) and guests open the updated app. Until then you only see the day of each open.</div>";
+  h+="<div class='kpis'>"+kpi(n(all.filter(function(o){ return o[1]===td; }).length),"opens today")+kpi(n(o7.length),"opens, 7 days")+kpi(n(distinct(o7,devKey)),"different phones, 7 days")+
+    kpi(o7.length?Math.round(100*o7.filter(function(o){ return o[3]; }).length/o7.length)+"%":"—","from the Home Screen app, 7 days")+kpi(o7.length?Math.round(100*o7.filter(function(o){ return o[8]!=null; }).length/o7.length)+"%":"—","with location on, 7 days")+"</div>";
+  h+="<div class='card'>"+candles(f.opens,"🕯️ When guests open the app (LA time)")+bars(count(f.opens,function(o){ return o[1]; }),30,"App opens per day (30 days)","opens")+"</div>";
+  h+="<div class='row' style='margin:10px 0'><input type='search' id='vq' placeholder='Search member name, phone ID (DEV…), device' value='"+esc(VQ)+"' aria-label='Search visits'>"+(VQ||VDEV?"<button class='btn alt sm' id='vclr'>Clear</button>":"")+"</div>";
+  var roll=devRollup(all,M);
+  if(VDEV){ var r=roll.filter(function(x){ return x.k===VDEV; })[0], hist=all.filter(function(o){ return devKey(o)===VDEV; });
+    if(r) h+="<div class='card' id='devcard' style='border-color:var(--gold)'><div class='row'><b>📱 "+esc(r.dev)+"</b>"+tagR(r.slug)+(r.hot?"<span class='tag hot'>🔥 heavy opener</span>":"")+"<span style='flex:1'></span><button class='btn alt sm' id='vdx'>✕ Close</button></div>"+
+      "<p style='margin:6px 0'>"+(r.names.length?"Member: <b>"+esc(r.names.join(", "))+"</b>"+(r.names.length>1?" <span class='tag f'>"+r.names.length+" accounts on one phone</span>":""):"<span class='dim'>Not linked to a member (never joined on this phone)</span>")+"<br><span class='dim'>"+esc(r.ua||"device not reported yet")+" · "+(r.pwa?"has the Home Screen app":"browser only")+"</span></p>"+
+      "<div class='kpis'>"+kpi(n(r.n),"opens (120 days)")+kpi(n(r.n7),"opens, 7 days")+kpi(n(r.nd),"different days")+kpi(r.last?esc(rel(r.last)):esc(r.lastDay),"last seen")+kpi(r.first<Infinity?esc(dt(r.first)):esc(r.firstDay),"first seen")+kpi(n(r.loc),"opens with location")+"</div>"+
+      bars(count(hist,function(o){ return o[1]; }),30,"This phone: opens per day","opens")+
+      "<h3>History ("+n(hist.length)+")</h3>"+table(["When","","Device","App","Location"],hist.slice(0,200).map(function(o){ return [o[4]?esc(laWhen(o[4]))+" <span class='dim'>· "+esc(rel(o[4]))+"</span>":esc(o[1]),tagR(o[0]),esc(o[7]||"—"),modeTag(o),locCell(o)]; }))+"</div>"; }
+  var rl=roll.filter(function(r){ return !q||(r.dev+" "+r.names.join(" ")+" "+r.ua).toLowerCase().indexOf(q)>=0; });
+  h+="<h2>📱 Phones, most opens first ("+n(rl.length)+")</h2><p class='note'>One row per phone. <span class='tag hot'>🔥 heavy opener</span> = 15+ opens in 7 days and at least 4× a typical phone. Tap a row to see that phone's history.</p>"+
+    "<div class='tw'><table><thead><tr><th>Phone</th><th></th><th>Member</th><th class='n'>7 days</th><th class='n'>Opens</th><th class='n'>Days</th><th>First seen</th><th>Last seen</th><th>Device</th><th>App</th><th class='n'>📍</th></tr></thead><tbody>"+
+    (rl.length?rl.slice(0,60).map(function(r){ return "<tr class='dev"+(r.k===VDEV?" sel":"")+"' data-dev='"+esc(r.k)+"' tabindex='0'><td><span class='devid'>"+esc(r.dev)+"</span>"+(r.hot?" <span class='tag hot'>🔥</span>":"")+"</td><td>"+tagR(r.slug)+"</td><td>"+(r.names.length?esc(r.names.join(", ")):"<span class='dim'>Guest</span>")+"</td>"+
+      "<td class='n'><b>"+n(r.n7)+"</b></td><td class='n'>"+n(r.n)+"</td><td class='n'>"+n(r.nd)+"</td><td>"+(r.first<Infinity?esc(dt(r.first)):esc(r.firstDay))+"</td><td>"+(r.last?esc(rel(r.last)):esc(r.lastDay))+"</td><td>"+esc(r.ua||"—")+"</td><td>"+(r.pwa?"🏠":"🌐")+"</td><td class='n'>"+(r.loc?n(r.loc):"—")+"</td></tr>"; }).join(""):"<tr><td colspan='11' class='note'>Nothing yet.</td></tr>")+"</tbody></table></div>"+(rl.length>60?"<p class='note'>Top 60 shown. Search to find another phone.</p>":"");
+  var rec=all.filter(match);
+  h+="<h2>🕒 Recent opens ("+n(rec.length)+")</h2>"+table(["When","Who","","Device","App","Location"],rec.slice(0,VMORE).map(function(o){ return [o[4]?esc(laWhen(o[4]))+"<br><span class='dim'>"+esc(rel(o[4]))+"</span>":esc(o[1])+" <span class='dim'>(time not recorded)</span>",whoCell(o,M),tagR(o[0]),esc(o[7]||"—"),modeTag(o),locCell(o)]; }))+
+    (rec.length>VMORE?"<p><button class='btn alt sm' id='vmore'>Show "+n(Math.min(100,rec.length-VMORE))+" more</button></p>":"");
   return h; }
 function cur(slug){ var d=JSON.parse(JSON.stringify(LIVE.defaults[slug]||{})); return LIVE.apply(d,(DATA&&DATA.disc&&DATA.disc[slug])||{}); }
 var TOASTPATH="Toast Web (toasttab.com) › Finance › Related › Settings › Discounts &amp; promo codes";
@@ -184,7 +427,10 @@ function discounts(){ var h="<p class='note' style='margin-top:12px'>Change a po
     h+="</div>"; });
   return h; }
 function fld(s,k,f,label,val,type,reward){ var id="d_"+s+"_"+k+"_"+f; return "<div class='f'><div><label for='"+id+"'>"+label+"</label><input id='"+id+"' type='"+type+"'"+(type==="number"?" inputmode='decimal' step='any'":" maxlength='80'")+" value='"+esc(val)+"' data-orig='"+esc(val)+"'></div><button class='btn sm' data-save='"+esc(JSON.stringify([s,k,f,reward]))+"' data-for='"+id+"'>Save</button></div>"; }
-function toastStep(s,k,f,before,after){ if(k==="eb") return f==="gift"||f==="slices"||f==="items"||(f==="on"&&after==="on")?"<p><b>Toast:</b> guests redeem with the live pass and your server taps <span class='toastbtn'>App Reward – Early Bird Gift</span> (100% off one item). If that button isn't in Toast yet, add it: "+TOASTPATH+" › + Add a Discount › that exact name › % Off 100 · Applies to Item › Save › Publish.</p>":"<p><b>Toast: nothing to change.</b></p>";
+function toastStep(s,k,f,before,after){
+  if(k==="menu") return f==="price"?"<p><b>Now change it in Toast too.</b> The app only shows prices: guests pay what Toast charges. In Toast, open this item in your menu, set the price to <b>$"+esc(after)+"</b>, save, then <b>Publish</b>. (If you're not sure where, ask Christian or Antidote.)</p>":
+    "<p><b>Toast: nothing to change</b>, unless this special has its own price or discount button in Toast. Then change it there too so the check matches.</p>";
+  if(k==="eb") return f==="gift"||f==="slices"||f==="items"||(f==="on"&&after==="on")?"<p><b>Toast:</b> guests redeem with the live pass and your server taps <span class='toastbtn'>App Reward – Early Bird Gift</span> (100% off one item). If that button isn't in Toast yet, add it: "+TOASTPATH+" › + Add a Discount › that exact name › % Off 100 · Applies to Item › Save › Publish.</p>":"<p><b>Toast: nothing to change.</b></p>";
   if(k==="lb") return "<p><b>Toast: nothing to change.</b> The location bonus is app points only (no Toast button). "+(f==="on"&&after==="off"?"Guests who already earned it keep their points; nobody new earns it while it's off.":"Guests who already earned it don't get it again.")+"</p>";
   var c=cur(s), t=k==="jl"?null:c.tiers[+k.slice(1)], b=k==="jl"?c.justLanded.toast.button:(t[2]||{}).button;
   if(f==="pts") return "<p><b>Toast: nothing to change.</b> Points costs live only in the app. The Toast button <span class='toastbtn'>"+esc(b)+"</span> stays the same.</p>";
@@ -195,7 +441,7 @@ function saveFlow(btn){ var a=JSON.parse(btn.dataset.save), inp=$(btn.dataset.fo
   if(v===before){ if(inp.type!=="hidden") inp.focus(); return; }
   if(a[2]==="draw"&&!confirm("Draw the raffle winners now? This can only be done once.")) return;
   btn.disabled=true; btn.textContent="…";
-  api({type:"disc_propose",token:TOKEN,slug:a[0],key:a[1],field:a[2],value:v,before:before,reward:a[3]}).then(function(r){ btn.disabled=false; btn.textContent="Save";
+  api({type:"disc_propose",token:TOKEN,slug:a[0],key:a[1],field:a[2],value:v,before:before,reward:a[3],item:a[4]||""}).then(function(r){ btn.disabled=false; btn.textContent="Save";
     if(!r||!r.ok){ if(r&&r.auth===false) return signOut("Signed out. Log in again."); alert((r&&r.reason)||"Couldn't save."); return; }
     var ov=document.createElement("div"); ov.className="ov"; ov.setAttribute("role","dialog"); ov.setAttribute("aria-modal","true");
     ov.innerHTML="<div class='sheet'><h3 style='margin-top:0'>Confirm the change</h3><div class='note'>"+esc(NAMES[a[0]])+" · "+esc(a[3])+"</div><div class='ba'><div><small>Before</small><b>"+esc(r.before)+"</b></div><span>→</span><div><small>After</small><b>"+esc(r.after)+"</b></div></div>"+
@@ -205,7 +451,7 @@ function saveFlow(btn){ var a=JSON.parse(btn.dataset.save), inp=$(btn.dataset.fo
     $("ocan").onclick=function(){ ov.remove(); };
     $("oconf").onclick=function(){ var cb=this; cb.disabled=true; api({type:"disc_confirm",token:TOKEN,id:r.id,code:$("otp").value.trim()}).then(function(c){ cb.disabled=false;
       if(!c||!c.ok){ $("oerr").textContent=(c&&c.reason)||"Couldn't apply."; return; }
-      DATA.disc=c.disc||DATA.disc; load();
+      DATA.disc=c.disc||DATA.disc; if(c.menu) DATA.menu=c.menu; load();
       ov.querySelector(".sheet").innerHTML="<h3 style='margin-top:0'>✅ Saved</h3><div class='ba'><div><small>Before</small><b>"+esc(c.before)+"</b></div><span>→</span><div><small>After</small><b>"+esc(c.after)+"</b></div></div><p class='note'>The guest apps show the new value now (within a minute). The other login holder was emailed and the Audit log has it.</p>"+
         (c.testNotice?"<div class='test'>"+esc(c.testNotice)+"</div>":"")+toastStep(a[0],a[1],a[2],c.before,c.after)+"<button class='btn' style='width:100%' id='odone'>Done</button>";
       $("odone").onclick=function(){ ov.remove(); draw(); }; }); };
@@ -250,7 +496,7 @@ function scout(){ var S=scoutD(), fl=S.flags.filter(function(f){ return inR(f.sl
   h+="<h2>🚩 Open flags ("+open.length+")</h2>"+(open.length?"<div class='dl'>"+open.map(function(f){
     return "<div class='dc' data-flag='"+esc(f.id)+"'><div class='row'>"+sevTag(f.sev)+tagR(f.slug)+"<b>"+esc(f.title)+"</b></div><p style='margin:6px 0'>"+esc(f.reason)+"</p>"+
       "<ul class='ev'>"+(f.evidence||[]).map(function(e){ return "<li>"+esc(e)+"</li>"; }).join("")+"</ul>"+
-      "<div class='row'><button class='btn sm' data-scout='reverse' data-fid='"+esc(f.id)+"'>↩︎ Reverse points</button><button class='btn alt sm' data-scout='ok' data-fid='"+esc(f.id)+"'>✓ Mark OK</button></div></div>"; }).join("")+"</div>":"<p class='note'>Nothing suspicious right now. ✅</p>");
+      (MGR?"<p class='note'>Only Christian can reverse points or close a flag. Tell him what you saw.</p>":"<div class='row'><button class='btn sm' data-scout='reverse' data-fid='"+esc(f.id)+"'>↩︎ Reverse points</button><button class='btn alt sm' data-scout='ok' data-fid='"+esc(f.id)+"'>✓ Mark OK</button></div>")+"</div>"; }).join("")+"</div>":"<p class='note'>Nothing suspicious right now. ✅</p>");
   h+="<h2>⛔ Rejected duplicates ("+rej.length+", last 30 days)</h2><p class='note'>Caught and refused at the moment they arrived. Nothing here was credited.</p>"+
     table(["When","","Who","What","Why"],rej.map(function(x){ return [when2(x.ts),tagR(x.slug),esc(x.name||mname(x.slug,x.member)),"<b>"+esc(x.kind)+"</b> · "+esc(x.what),esc(x.why)]; }));
   if(adj.length) h+="<h2>↩︎ Points taken back ("+adj.length+")</h2>"+table(["When","","Member","Points","Why","By"],adj.map(function(a){ return [when2(a.ts),tagR(a.slug),esc(a.name||mname(a.slug,a.member)),n(a.pts),esc(a.why),esc(a.by)]; }),[3]);
@@ -281,15 +527,19 @@ function scoutPropose(f,field,value,what,before,after){
       if(c.scout) DATA.scout=c.scout;
       ov.querySelector(".sheet").innerHTML="<h3 style='margin-top:0'>✅ Done</h3><p>"+esc(c.after)+"</p><p class='note'>Written to the Audit log. The other login holder was emailed.</p>"+(c.testNotice?"<div class='test'>"+esc(c.testNotice)+"</div>":"")+"<button class='btn' style='width:100%' id='odone'>Done</button>";
       $("odone").onclick=function(){ ov.remove(); load(); }; }); }; }); }
-function audit(){ return "<p class='note' style='margin-top:12px'>Every discount change and Scout action: who, what, before → after, when.</p>"+table(["When","Who","Restaurant","Reward","Field","Before","After","Status"],(DATA.audit||[]).slice().reverse().map(function(a){ return [new Date(a.ts).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}),esc(a.who),esc(a.slug),esc(a.reward),esc(a.field),esc(a.before),esc(a.after),esc(a.status)]; })); }
-function links(){ var h="<div class='card links'><a href='../../onboarding/christian/plan/'>📲 Game plan app</a><a href='../../onboarding/christian/'>Onboarding</a><a href='../../demo/melody-lax/'>✈️ Melody app</a><a href='../../demo/nalu-vida/'>🏄 Nalu Vida app</a><a href='../../staff/christian/'>🧑‍🍳 Staff app</a><a href='../../melody/kit/'>Melody print kit</a><a href='../../nalu-vida/kit/'>Nalu print kit</a><a href='../../onboarding/christian/placement/'>📍 Where to put the QR pieces</a><a href='../../melody/kit/toast-interim.html'>Melody Toast sheet</a><a href='../../nalu-vida/kit/toast-interim.html'>Nalu Toast sheet</a></div>";
+function audit(){ return "<p class='note' style='margin-top:12px'>Every discount, price, special, to-do and Scout change: who, what, before → after, when. Melody Management's changes show as “Melody Management”.</p>"+table(["When","Who","Restaurant","Reward","Field","Before","After","Status"],(DATA.audit||[]).slice().reverse().map(function(a){ return [new Date(a.ts).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}),esc(a.who),esc(a.slug),esc(a.reward),esc(a.field),esc(a.before),esc(a.after),esc(a.status)]; })); }
+function links(){ if(MGR) return "<div class='card links'>"+(MYSLUGS.indexOf("melody-bar-grill")>=0?"<a href='../../demo/melody-lax/'>✈️ Melody app</a>":"")+(MYSLUGS.indexOf("nalu-vida")>=0?"<a href='../../demo/nalu-vida/'>🏄 Nalu Vida app</a>":"")+"<a href='../../staff/christian/'>🧑‍🍳 Staff guide</a>"+
+    (MYSLUGS.indexOf("melody-bar-grill")>=0?"<a href='../../melody/kit/'>Melody print kit</a><a href='../../melody/kit/toast-interim.html'>Melody Toast sheet</a>":"")+(MYSLUGS.indexOf("nalu-vida")>=0?"<a href='../../nalu-vida/kit/'>Nalu print kit</a><a href='../../nalu-vida/kit/toast-interim.html'>Nalu Toast sheet</a>":"")+"</div>";
+  var h="<div class='card links'><a href='../../onboarding/christian/plan/'>📲 Game plan app</a><a href='../../onboarding/christian/'>Onboarding</a><a href='../../demo/melody-lax/'>✈️ Melody app</a><a href='../../demo/nalu-vida/'>🏄 Nalu Vida app</a><a href='../../staff/christian/'>🧑‍🍳 Staff app</a><a href='../../melody/kit/'>Melody print kit</a><a href='../../nalu-vida/kit/'>Nalu print kit</a><a href='../../onboarding/christian/placement/'>📍 Where to put the QR pieces</a><a href='../../melody/kit/toast-interim.html'>Melody Toast sheet</a><a href='../../nalu-vida/kit/toast-interim.html'>Nalu Toast sheet</a></div>";
   h+="<h2>🍞 Toast discount buttons</h2>"; (LIVE.slugs||[]).filter(inR).forEach(function(s){ var c=cur(s), ts=LIVE.defaults[s].toastStatus||{};
     var rows=c.tiers.map(function(t){ var b=t[2]||{}; return ["<span class='toastbtn'>"+esc(b.button)+"</span>",b.type==="fixed"?"$"+b.amount+" off check":"100% off 1 item"+(b.max?" (≤ $"+(+b.max).toFixed(2)+")":""),n(t[0])+" pts"]; });
     if(c.justLanded&&c.justLanded.toast) rows.push(["<span class='toastbtn'>"+esc(c.justLanded.toast.button)+"</span>",c.justLanded.toast.percent+"% off check","no points"]);
     h+="<h3>"+esc(NAMES[s])+" <span class='st "+(ts.state==="done"?"done":"tbd")+"'>"+(ts.state==="done"?"Set up ✓":"TBD")+"</span></h3><p class='note'>"+esc(ts.note)+"</p>"+table(["Button","Discount","Points"],rows); });
   return h; }
-function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY;
-  p.innerHTML={overview:overview,members:members,rewards:rewards,scout:scout,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links}[TAB]();
+function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY; if(!tabOk(TAB)) drawTabs();
+  p.innerHTML={overview:overview,visits:visits,members:members,rewards:rewards,scout:scout,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links,menu:menu,help:help,launch:launch,team:team,squares:function(){ return window.SquaresHQ?SquaresHQ.html({api:api,token:TOKEN,draw:draw}):"<div class='card'>Loading…</div>"; }}[TAB]();
+  if(TAB==="squares"&&window.SquaresHQ) SquaresHQ.bind(p);
+  p.querySelectorAll("[data-go]").forEach(function(b){ b.onclick=function(){ if(b.dataset.go==="todo-top"){ var t=$("todo"); if(t) t.scrollIntoView({behavior:"smooth"}); return; } goTab(b.dataset.go); }; });
   if(TAB==="members"){ var q=$("q"); q.oninput=function(){ Q=q.value; var pos=q.selectionStart; draw(); var q2=$("q"); q2.focus(); try{ q2.setSelectionRange(pos,pos); }catch(e){} }; $("csv").onclick=csv; var dd=$("dedupe"); if(dd) dd.onclick=function(){ if(DUPARM<Date.now()){ DUPARM=Date.now()+6000; draw(); setTimeout(function(){ if(DUPARM&&DUPARM<Date.now()){ DUPARM=0; draw(); } },6100); return; }
     DUPARM=0; dd.disabled=true; dd.textContent="Removing…"; api({type:"bo_dedupe",token:TOKEN}).then(function(r){ if(r&&r.ok){ $("dedupeOut").textContent="✅ Removed "+n(r.removed)+". Refreshing…"; load(); } else { dd.disabled=false; dd.textContent="🧹 Remove duplicates"; $("dedupeOut").textContent=(r&&r.reason)||"Didn't work. Try again."; } }); };
     p.querySelectorAll("[data-sort]").forEach(function(th){ th.onclick=function(){ var k=th.dataset.sort; SORT={k:k,d:SORT.k===k?-SORT.d:-1}; draw(); }; }); }
@@ -297,8 +547,257 @@ function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY;
     hid.value=JSON.stringify(a); var su=box.querySelector("[data-sum]"); if(su) su.textContent=/slices/.test(box.dataset.led)?"Total: "+sum+"%"+(sum===100?" ✓":" (must be 100)"):a.reduce(function(x,y){ return x+y[1]; },0)+" winner(s) in all"; };
     box.addEventListener("input",up); up(); });
   p.querySelectorAll("[data-save]").forEach(function(b){ b.onclick=function(){ saveFlow(b); }; });
+  bindNeeds(p);
   p.querySelectorAll("[data-scout]").forEach(function(b){ b.onclick=function(){ scoutAsk(b); }; });
-  window.scrollTo(0,y); }
+  p.querySelectorAll("[data-cd]").forEach(function(b){ b.onclick=function(){ CDAYS=+b.dataset.cd; draw(); }; });
+  p.querySelectorAll("[data-goto]").forEach(function(b){ b.onclick=function(e){ e.preventDefault(); goTab(b.dataset.goto); }; });
+  if(TAB==="team") bindTeam(p);
+  if(TAB==="menu"){ var mq=$("mq"); if(mq) mq.oninput=function(){ MQ=mq.value; var pos=mq.selectionStart; draw(); var m2=$("mq"); m2.focus(); try{ m2.setSelectionRange(pos,pos); }catch(e){} }; }
+  if(TAB==="visits"){ var vq=$("vq"); vq.oninput=function(){ VQ=vq.value; VMORE=100; var pos=vq.selectionStart; draw(); var v2=$("vq"); v2.focus(); try{ v2.setSelectionRange(pos,pos); }catch(e){} };
+    var vc=$("vclr"); if(vc) vc.onclick=function(){ VQ=""; VDEV=""; draw(); };
+    var vx=$("vdx"); if(vx) vx.onclick=function(){ VDEV=""; draw(); };
+    var vm=$("vmore"); if(vm) vm.onclick=function(){ VMORE+=100; draw(); };
+    p.querySelectorAll("[data-dev]").forEach(function(r){ var go=function(e){ if(e.target.closest("a")) return; VDEV=r.dataset.dev; draw(); var c=$("devcard"); if(c) c.scrollIntoView({behavior:"smooth",block:"start"}); };
+      r.onclick=go; r.onkeydown=function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); go(e); } }; }); }
+  window.scrollTo(0,y); drawTodo(); }
+// ---- ✅ TO-DO LIST (pinned at the top). Automatic items come from the data on screen; manual ones are saved on the
+// backend ("Todos" tab, bo_todo). Done on an automatic item is remembered by its key (kind:restaurant:fingerprint), so it
+// comes back by itself when the data behind it changes (e.g. a new receipt claim arrives). Managers only get Melody.
+var TODO_MORE=false, TODO_ADD=false;
+var TABNAME={team:"Team access",overview:"Overview",visits:"Visits",members:"Members",rewards:"Rewards & claims",scout:"Scout",games:"Games",discounts:"Discounts",menu:"Prices & specials",earlybird:"Early bird",staff:"Staff",squares:"Squares",audit:"Audit log",help:"Help",links:"Links"};
+function effMenu(s){ var base=window.SSAI_MENU&&SSAI_MENU[s]; if(!base) return null; var M=JSON.parse(JSON.stringify(base)); delete M._base; return LIVE.applyMenu?LIVE.applyMenu(s,M,(DATA.menu||{})[s]||null):M; }
+// 🛠️ MENU FIXES: which items still need a real photo, a confirmed price, or have no picture file at all (menu-data.js:
+// realPhotos / unconfirmed; missing files are found by loading each picture once). Feeds the red to-do + the Prices tab.
+var NOPIC={}, PICCHK={};
+function picCheck(s){ var B=window.SSAI_MENU&&SSAI_MENU[s]; if(!B||PICCHK[s]||s!=="melody-bar-grill") return; PICCHK[s]=1; NOPIC[s]={};
+  var all=[]; B.food.forEach(function(c){ c.items.forEach(function(it){ all.push(it); }); }); B.drinks.forEach(function(it){ all.push(it); });
+  all.forEach(function(it){ if(!it[3]) { NOPIC[s][it[0]]=1; return; } var im=new Image(); im.onerror=function(){ NOPIC[s][it[0]]=1; if(DATA){ drawTodo(); if(TAB==="menu") draw(); } }; im.src="../../demo/melody-lax/img/menu/"+it[3]+".jpg"; }); }
+function menuNeeds(s){ var B=window.SSAI_MENU&&SSAI_MENU[s]; if(!B) return null; picCheck(s);
+  var real={}, unc=B.unconfirmed||[], sv=(DATA&&DATA.menu&&DATA.menu[s])||{}, P=sv.p||{}, PH=sv.ph||{}, o={photo:[],price:[],nopic:[],wait:[],live:[]}; (B.realPhotos||[]).forEach(function(n){ real[n]=1; });
+  var W={}; ((DATA&&DATA.photos)||[]).forEach(function(x){ if(x.slug===s&&x.status==="pending"){ W[x.item]=1; o.wait.push(x); } });
+  Object.keys(PH).forEach(function(n){ o.live.push(n); });
+  var one=function(it,isDrink){ var nm=it[0]; if(PH[nm]){} else if(W[nm]){} else if(NOPIC[s]&&NOPIC[s][nm]) o.nopic.push(nm); else if(B.realPhotos&&!real[nm]) o.photo.push(nm);
+    if(((isDrink&&unc.indexOf("drinks")>=0)||unc.indexOf(nm)>=0)&&!(nm in P)) o.price.push(nm); };
+  B.food.forEach(function(c){ c.items.forEach(function(it){ one(it,false); }); }); B.drinks.forEach(function(it){ one(it,true); }); return o; }
+function needTags(o,name){ if(!o) return ""; if(o.wait.some(function(x){ return x.item===name; })) return "<span class='nt' style='background:#f5c40026;color:#ffe08a'>⏳ photo waiting for OK</span>"+(o.price.indexOf(name)>=0?"<span class='nt'>💲 confirm price</span>":""); return (o.nopic.indexOf(name)>=0?"<span class='nt'>🚫 no picture</span>":o.photo.indexOf(name)>=0?"<span class='nt'>📸 needs real photo</span>":"")+(o.price.indexOf(name)>=0?"<span class='nt'>💲 confirm price</span>":""); }
+function listNames(a,max){ return a.slice(0,max).join(", ")+(a.length>max?" + "+(a.length-max)+" more":""); }
+function phUrl(f){ if(/^data:image\//.test(f)) return f; return "https://lh3.googleusercontent.com/d/"+encodeURIComponent(f)+"=w400"; }
+function priceOf(s,name){ var M=effMenu(s), v=null; if(!M) return ""; M.food.forEach(function(c){ c.items.forEach(function(it){ if(it[0]===name) v=it[1]; }); }); M.drinks.forEach(function(it){ if(it[0]===name) v=it[1]; }); return v==null?"":(+v).toFixed(2); }
+// 🛠️ the "needs fixing" card: every line is tappable. 💲 = type the right price (or keep it) → Save → emailed code (same as
+// Prices). 📸 = take or pick a photo → it's shrunk on the phone and sent (bo_photo); Christian's go live at once, others wait for his OK.
+function needsCard(s){ var o=menuNeeds(s); if(!o||!(o.photo.length+o.price.length+o.nopic.length+o.wait.length+(isOwnerUI()?o.live.length:0))) return "";
+  var cP=can("prices"), add=function(n,miss){ return "<div class='nx'><div><b>"+esc(n)+"</b>"+(miss?"<small>No picture at all right now</small>":"<small>Shows a made-up picture now</small>")+"</div><button class='btn sm big' data-addph='"+esc(JSON.stringify([s,n]))+"'>📷 Add photo</button></div>"; };
+  var h="<div class='card nf' id='mneeds' style='margin-top:12px'><h2>🛠️ "+esc(NAMES[s])+" menu: needs fixing</h2><p class='note' style='margin:0 0 6px'>Tap an item to fix it right here.</p>";
+  if(o.wait.length) h+="<h3>⏳ Photos waiting for Christian's OK ("+o.wait.length+")</h3>"+o.wait.map(function(x){ return "<div class='nx'><img src='"+phUrl(x.file)+"' alt='Photo of "+esc(x.item)+"' loading='lazy'><div><b>"+esc(x.item)+"</b><small>from "+esc(x.by)+" · "+when2(x.ts)+"</small></div>"+
+      (isOwnerUI()?"<span class='nb'><button class='btn sm big' data-phok='"+esc(x.id)+"'>✓ Use it</button><button class='btn alt sm big' data-phno='"+esc(x.id)+"'>✗ Not this one</button></span>":"<small class='dim'>Christian will look at it</small>")+"</div>"; }).join("");
+  if(o.nopic.length) h+="<h3>🚫 No picture at all ("+o.nopic.length+")</h3>"+o.nopic.map(function(n){ return add(n,1); }).join("");
+  if(o.price.length) h+="<h3>💲 Price to confirm ("+o.price.length+")</h3><p class='note'>Sample prices. Type the real price from Toast (or keep it if it's right) and tap <b>Save</b>. We email you a code to finish.</p>"+
+    (cP?o.price.map(function(n){ var id="fx_"+mid(s,n).slice(2), pr=priceOf(s,n); return "<div class='nx'><div><b>"+esc(n)+"</b><small>now $"+esc(pr)+"</small></div><span class='nb'><input id='"+id+"' inputmode='decimal' value='"+esc(pr)+"' data-orig='' aria-label='Real price of "+esc(n)+"'><button class='btn sm big' "+mBtn(s,"price",n,n)+" data-for='"+id+"'>Save</button></span></div>"; }).join("")
+      :"<p class='note'>Your login can't change prices. Tell Christian (or ask him to turn Prices on for you).</p><ul>"+o.price.map(function(n){ return "<li>"+esc(n)+" · $"+esc(priceOf(s,n))+"</li>"; }).join("")+"</ul>");
+  if(o.photo.length) h+="<h3>📸 Needs a real photo ("+o.photo.length+")</h3><p class='note'>Good light, plate fills the picture, no people. Tap <b>📷 Add photo</b> to take one or pick it from your photos.</p>"+o.photo.map(function(n){ return add(n,0); }).join("");
+  if(isOwnerUI()&&o.live.length) h+="<h3>✅ Photos added here, live in the app ("+o.live.length+")</h3>"+o.live.map(function(n){ return "<div class='nx'><img src='"+phUrl(((DATA.menu[s]||{}).ph||{})[n])+"' alt='Photo of "+esc(n)+"' loading='lazy'><div><b>"+esc(n)+"</b></div><span class='nb'><button class='btn alt sm big' data-addph='"+esc(JSON.stringify([s,n]))+"'>📷 Replace</button><button class='btn alt sm big' data-phrm='"+esc(JSON.stringify([s,n]))+"'>↩︎ Remove</button></span></div>"; }).join("");
+  return h+"<input type='file' id='phFile' accept='image/*' hidden></div>"; }
+function isOwnerUI(){ return !MGR; }
+// shrink to ≤1350 px JPEG on the phone before sending (keeps uploads small and fast)
+function shrink(file){ return new Promise(function(res,rej){ var u=URL.createObjectURL(file), im=new Image(); im.onload=function(){ var k=Math.min(1,1350/Math.max(im.width,im.height)), c=document.createElement("canvas"); c.width=Math.round(im.width*k); c.height=Math.round(im.height*k);
+  c.getContext("2d").drawImage(im,0,0,c.width,c.height); URL.revokeObjectURL(u); res(c.toDataURL("image/jpeg",0.85)); }; im.onerror=function(){ URL.revokeObjectURL(u); rej(); }; im.src=u; }); }
+function photoReply(r,msg){ if(!r||!r.ok){ if(r&&r.auth===false) return signOut("Signed out. Log in again."); alert((r&&r.reason)||"Didn't work. Try again."); return; } DATA.photos=r.photos||[]; if(r.menu) DATA.menu=r.menu; draw(); drawTodo(); if(msg) alert(msg); }
+function bindNeeds(p){ var f=$("phFile"), want=null; if(!f) return;
+  p.querySelectorAll("[data-addph]").forEach(function(b){ b.onclick=function(){ want={a:JSON.parse(b.dataset.addph),b:b}; f.value=""; f.click(); }; });
+  f.onchange=function(){ var file=f.files&&f.files[0]; if(!file||!want) return; var w=want; w.b.disabled=true; w.b.textContent="Sending…";
+    shrink(file).then(function(d){ return api({type:"bo_photo",token:TOKEN,op:"add",slug:w.a[0],item:w.a[1],photo:d}); }).then(function(r){ photoReply(r,r&&r.ok?(isOwnerUI()||can("photos")?"✅ Photo of "+w.a[1]+" is live in the app.":"✅ Sent. Christian will OK it, then it shows in the app."):""); })
+      .catch(function(){ w.b.disabled=false; w.b.textContent="📷 Add photo"; alert("That photo couldn't be read. Try another one."); }); };
+  p.querySelectorAll("[data-phok],[data-phno]").forEach(function(b){ b.onclick=function(){ b.disabled=true; api({type:"bo_photo",token:TOKEN,op:b.dataset.phok?"ok":"no",id:b.dataset.phok||b.dataset.phno}).then(function(r){ photoReply(r); }); }; });
+  p.querySelectorAll("[data-phrm]").forEach(function(b){ b.onclick=function(){ var a=JSON.parse(b.dataset.phrm); if(!confirm("Go back to the standard picture for "+a[1]+"?")) return; b.disabled=true; api({type:"bo_photo",token:TOKEN,op:"remove",slug:a[0],item:a[1]}).then(function(r){ photoReply(r); }); }; }); }
+function mdDays(md){ var y=new Date().getFullYear(), t=new Date(ymd(Date.now())+"T12:00:00"), d=new Date(y+"-"+md+"T12:00:00"); if(d<t) d=new Date((y+1)+"-"+md+"T12:00:00"); return Math.round((d-t)/DAY); }   // days until the NEXT time it's that date (0 = today)
+function mdLive(sp){ var td=ymd(Date.now()).slice(5); return sp.start<=sp.end?td>=sp.start&&td<=sp.end:td>=sp.start||td<=sp.end; }
+function autoTodos(){ var d=DATA, out=[], done={}, now=Date.now(); (d.todoDone||[]).forEach(function(k){ done[k]=1; });
+  var add=function(kind,slug,fp,pri,ts,text,sub,go,extra){ var key=kind+":"+slug+":"+String(fp).replace(/[^A-Za-z0-9:._|-]/g,"").slice(0,90); if(done[key]) return; out.push({key:key,slug:slug,pri:pri,ts:ts||0,text:text,sub:sub,go:go,extra:extra||null}); };
+  var mx=function(a){ return Math.max.apply(null,[0].concat(a)); };
+  var mine=(LIVE.slugs||[]).filter(function(s){ return MYSLUGS.indexOf(s)>=0; });
+  mine.forEach(function(s){ var nm=s==="nalu-vida"?"Nalu Vida":"Melody";
+    var pend=d.claims.filter(function(c){ return c.slug===s&&c.status==="pending"; }), last=mx(pend.map(function(c){ return c.ts; }));
+    if(pend.length) add("claims_pending",s,pend.length+"|"+last,pend.some(function(c){ return now-c.ts>DAY; })?1:2,last,pend.length+" receipt claim"+(pend.length>1?"s":"")+" waiting",nm+" · spot-check against the Toast report (check # + total)","rewards",{anchor:"claims"});
+    var fl=d.claims.filter(function(c){ return c.slug===s&&c.status==="flagged"; }), lf=mx(fl.map(function(c){ return c.ts; }));
+    if(fl.length) add("claims_flagged",s,fl.length+"|"+lf,1,lf,fl.length+" flagged receipt claim"+(fl.length>1?"s":""),nm+" · compare with Toast before anyone gets points","rewards",{anchor:"claims"});
+    var S=d.scout||{flags:[],rejected:[]}, of=(S.flags||[]).filter(function(f){ return f.slug===s&&f.status==="open"; }), hi=of.filter(function(f){ return f.sev==="high"; });
+    if(hi.length) add("scout_high",s,hi.map(function(f){ return f.id.slice(-6); }).sort().join("."),1,now,hi.length+" serious Scout flag"+(hi.length>1?"s":"")+": "+hi[0].title,nm+(MGR?" · take a look, then tell Christian":" · Reverse points or Mark OK"),"scout");
+    var lo=of.length-hi.length; if(lo) add("scout_flags",s,of.filter(function(f){ return f.sev!=="high"; }).map(function(f){ return f.id.slice(-4); }).sort().join("."),3,now-1,lo+" other Scout flag"+(lo>1?"s":"")+" to look at",nm+" · patterns worth a look, nothing is blocked","scout");
+    var rj=(S.rejected||[]).filter(function(x){ return x.slug===s&&now-x.ts<DAY; }), lr=mx(rj.map(function(x){ return x.ts; }));
+    if(rj.length) add("dupes",s,rj.length+"|"+lr,4,lr,rj.length+" duplicate"+(rj.length>1?"s":"")+" blocked in the last 24 hours",nm+" · already refused, nothing credited. Just so you know.","scout");
+    var per={}, d3=ymd(now-2*DAY); d.opens.forEach(function(o){ if(o[0]!==s||o[1]<d3) return; var k=o[2]+"|"+o[1]; per[k]=(per[k]||0)+1; });
+    var heavy={}; Object.keys(per).forEach(function(k){ var dv=k.split("|")[0]; if(per[k]>=10) heavy[dv]=Math.max(heavy[dv]||0,per[k]); });
+    var hk=Object.keys(heavy).sort(function(a,b){ return heavy[b]-heavy[a]; });
+    if(hk.length) add("heavy_open",s,hk.slice().sort().join("."),3,now-2,hk.length+" phone"+(hk.length>1?"s":"")+" opening the app 10+ times a day",nm+" · could be a fan or someone farming points: tap to see "+(hk.length>1?"the busiest one":"it"),"visits",{dev:s+"|"+hk[0]});
+    var M=effMenu(s); if(M) (M.specials||[]).forEach(function(sp){ if(sp.on===false||sp.price) return; var live=mdLive(sp), dd=live?0:mdDays(sp.start);
+      if(live||dd<=21) add("special_price",s,sp.id+"|"+new Date().getFullYear(),live?1:2,now-3-dd,"Set a price for “"+sp.title+"”",nm+" · "+(live?"on now":"starts in "+dd+" day"+(dd===1?"":"s"))+": guests see it without a price","menu",{anchor:"sp-"+sp.id}); });
+    var N=menuNeeds(s); if(N){
+      if(N.nopic.length) add("menu_nopic",s,N.nopic.length+"|"+N.nopic.join(".").length,1,now-4,N.nopic.length+" menu item"+(N.nopic.length>1?"s have":" has")+" no picture",nm+" · "+listNames(N.nopic,4),"menu",{anchor:"mneeds"});
+      if(N.price.length) add("menu_price",s,N.price.length+"|"+N.price.join(".").length,1,now-5,N.price.length+" menu price"+(N.price.length>1?"s":"")+" to confirm",nm+" · sample prices: "+listNames(N.price,4),"menu",{anchor:"mneeds"});
+      if(N.wait.length&&!MGR) add("menu_phwait",s,N.wait.map(function(x){ return x.id.slice(-4); }).sort().join("."),1,now-3,N.wait.length+" menu photo"+(N.wait.length>1?"s":"")+" waiting for your OK",nm+" · "+listNames(N.wait.map(function(x){ return x.item; }),4),"menu",{anchor:"mneeds"});
+      if(N.photo.length) add("menu_photo",s,N.photo.length+"|"+N.photo.join(".").length,1,now-6,N.photo.length+" menu item"+(N.photo.length>1?"s need":" needs")+" a real photo",nm+" · "+listNames(N.photo,4),"menu",{anchor:"mneeds"}); }
+    var E=((d.eb||{})[s]||{}).cfg||{}; if(E.on==="on"&&E.mode==="raffle"&&E.drawDate&&!E.drawn&&ymd(now)>=E.drawDate) add("raffle_draw",s,E.drawDate,1,now,"Draw the early-bird raffle winners",nm+" · the draw date ("+E.drawDate+") is here","earlybird");
+    if(!MGR){ var ts=(LIVE.defaults[s]||{}).toastStatus||{}; if(ts.state==="tbd") add("toast_tbd",s,s==="nalu-vida"?"tbd2":"tbd",3,0,"Confirm the "+nm+" Toast discount buttons are set up",ts.note||"","links"); }
+      if(!MGR) add("ordering_new",s,"v1",2,now,"New: online ordering + delivery for "+nm,"Guests order and pay by card in your app (pickup first), points on every order, live orders here in HQ. Delivery by DoorDash drivers once DoorDash approves. Tell Antidote yes or no, then tap Done.","links"); });   // ordering offer (2026-10-18), inside the per-restaurant loop
+  if(!MGR&&d.mgr&&d.mgr.length){ var ch=(d.audit||[]).filter(function(a){ return d.mgr.indexOf(a.who)>=0&&now-a.ts<7*DAY&&!/^To-do/.test(a.field); });
+    if(ch.length){ var z=ch[ch.length-1], lt=mx(ch.map(function(a){ return a.ts; })); add("mgr_changes","all",ch.length+"|"+lt,2,lt,z.who+" made "+ch.length+" change"+(ch.length>1?"s":"")+" this week","Latest: "+z.reward+" · "+z.field+" "+z.before+" → "+z.after+". Take a look.","audit"); } }
+  var fails={}; (d.trained||[]).forEach(function(t){ if(t[3]==="yes") delete fails[t[1]]; else fails[t[1]]=t[0]; }); var fk=Object.keys(fails).sort();
+  if(fk.length) add("staff_quiz",MGR?MYSLUGS[0]:"all",fk.join("."),5,0,fk.length+" employee"+(fk.length>1?"s":"")+" still need to pass the staff quiz",fk.join(", ")+" · send them the staff guide","staff");
+  return out; }
+function allTodos(){ var man=(DATA.todos||[]).map(function(t){ return {id:t.id,slug:t.slug,pri:2,ts:t.ts,text:t.text,sub:(t.slug==="all"?"Both":t.slug==="nalu-vida"?"Nalu Vida":"Melody")+" · added by "+t.by+" · "+when2(t.ts),go:t.go,manual:1}; });
+  return man.concat(autoTodos()).sort(function(a,b){ return a.pri-b.pri||b.ts-a.ts; }); }
+function drawTodo(){ var box=$("todo"); if(!box||!DATA) return; box.hidden=!can("todo"); if(box.hidden){ box.innerHTML=""; return; } var L=allTodos(), shown=TODO_MORE?L:L.slice(0,3);
+  var h="<h2>✅ To-do <span class='badge"+(L.length?"":" z")+"' aria-label='"+L.length+" open'>"+L.length+"</span><span style='flex:1'></span><button class='btn alt sm big' id='tdAdd'>＋ Add</button></h2>";
+  h+=L.length?shown.map(function(t,i){ return "<div class='ti'><button class='go' data-tgo='"+i+"'><span class='dot p"+t.pri+"' aria-hidden='true'></span><span><b>"+esc(t.text)+"</b><small>"+esc(t.sub||"")+(t.go?" · tap to open "+esc(TABNAME[t.go]||t.go):"")+"</small></span></button><button class='dn' data-tdone='"+i+"' aria-label='Mark done: "+esc(t.text)+"'>✓ Done</button></div>"; }).join("")
+    :"<p style='margin:10px 0 0;font-size:16px'>🎉 <b>All caught up.</b> Nothing needs you right now.</p>";
+  if(L.length>3) h+="<button class='btn alt sm big' id='tdMore' style='width:100%'>"+(TODO_MORE?"Show less":"Show all "+L.length)+"</button>";
+  if(TODO_ADD) h+="<div class='add'><label class='note' for='tdText'>New to-do</label><input id='tdText' maxlength='140' placeholder='e.g. Order new table tents'>"+
+    (MGR?(MYSLUGS.length>1?"<select id='tdSlug' aria-label='Restaurant'>"+MYSLUGS.map(function(x){ return "<option value='"+x+"'>"+(x==="nalu-vida"?"Nalu Vida":"Melody")+"</option>"; }).join("")+"</select>":""):"<select id='tdSlug' aria-label='Restaurant'><option value='all'>Both restaurants</option><option value='melody-bar-grill'>Melody</option><option value='nalu-vida'>Nalu Vida</option></select>")+
+    "<select id='tdGo' aria-label='Where it gets done'><option value=''>No page</option>"+Object.keys(TABNAME).filter(tabOk).map(function(k){ return "<option value='"+k+"'>"+esc(TABNAME[k])+"</option>"; }).join("")+"</select>"+
+    "<button class='btn big' id='tdSave'>Save to-do</button><div class='err' id='tdErr'></div></div>";
+  box.innerHTML=h; box._list=shown; }
+function todoReply(r){ if(!r||!r.ok){ if(r&&r.auth===false) return signOut("Signed out. Log in again."); alert((r&&r.reason)||"Didn't work. Try again."); return false; } DATA.todos=r.todos||[]; DATA.todoDone=r.todoDone||[]; drawTodo(); return true; }
+$("todo").addEventListener("click",function(e){ var box=$("todo"), b=e.target.closest("button"); if(!b||!DATA) return;
+  if(b.id==="tdMore"){ TODO_MORE=!TODO_MORE; drawTodo(); return; }
+  if(b.id==="tdAdd"){ TODO_ADD=!TODO_ADD; drawTodo(); if(TODO_ADD) $("tdText").focus(); return; }
+  if(b.id==="tdSave"){ var tx=$("tdText").value.trim(); if(tx.length<3){ $("tdErr").textContent="Type at least 3 characters."; return; } b.disabled=true;
+    api({type:"bo_todo",token:TOKEN,op:"add",text:tx,slug:$("tdSlug")?$("tdSlug").value:MYSLUGS[0],go:$("tdGo").value}).then(function(r){ if(todoReply(r)){ TODO_ADD=false; drawTodo(); } else b.disabled=false; }); return; }
+  var t=box._list&&box._list[+(b.dataset.tgo!=null?b.dataset.tgo:b.dataset.tdone)]; if(!t) return;
+  if(b.dataset.tdone!=null){ b.disabled=true; b.textContent="…"; api(t.manual?{type:"bo_todo",token:TOKEN,op:"done",id:t.id}:{type:"bo_todo",token:TOKEN,op:"done",key:t.key,text:t.text}).then(function(r){ if(!todoReply(r)){ b.disabled=false; b.textContent="✓ Done"; } }); return; }
+  if(t.go){ if(t.extra&&t.extra.dev) VDEV=t.extra.dev;
+    goTab(t.go); var a=t.extra&&(t.extra.anchor||(t.extra.dev&&"devcard")); if(a) setTimeout(function(){ var el=$(a); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },60); } });
+// ---- 💲 PRICES & SPECIALS: what guests SEE in the app (menu-data.js + saved changes). Same Save → emailed code → Audit flow.
+var MQ="";
+function mBtn(s,f,item,reward){ return "data-save='"+esc(JSON.stringify([s,"menu",f,reward,item]))+"'"; }
+function mid(s,name){ var h=0; for(var i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))>>>0; return "m_"+s+"_"+h.toString(36); }
+function menu(){ var cP=can("prices"), cS=can("specials");
+  if(!cP&&!cS) return menuView();
+  var h="<div class='card help' id='menuHelp' style='margin-top:12px'><p style='margin:0'>"+(!cP?"<b>Your login can change specials and happy hour, not prices.</b> ":!cS?"<b>Your login can change prices, not specials or happy hour.</b> ":"")+"Change a price, a special or the happy-hour list that guests see in the app. Tap <b>Save</b>, then type the 6-digit code we email you. It shows in the app within a minute and is written to the Audit log. "+
+    "<b>Toast doesn't change by itself</b>: change the same price in Toast too, so the check matches. To go back to the menu's own price, clear the box and tap Save.</p><p style='margin:10px 0 0' data-noread>"+(window.SSAI_LISTEN?SSAI_LISTEN.button("menuHelp","🔊 Listen"):"")+"</p></div>";
+  var any=false;
+  (LIVE.slugs||[]).filter(inR).forEach(function(s){ var M=effMenu(s), B=window.SSAI_MENU&&SSAI_MENU[s]; if(!M){ if(!MGR) h+="<h2>🏄 "+esc(NAMES[s])+"</h2><p class='note'>Nalu Vida's menu isn't set up for editing here yet. Ask Antidote.</p>"; return; } any=true;
+    var q=MQ.toLowerCase(), row=function(it,base,cat){ if(q&&(it[0]+" "+cat).toLowerCase().indexOf(q)<0) return ""; var id=mid(s,it[0]), chg=+it[1]!==+base[1];
+      return "<div class='mi'><div><b>"+esc(it[0])+"</b><small>"+esc(cat)+needTags(NO,it[0])+(chg?" · <span class='chg'>changed</span> (menu: $"+(+base[1]).toFixed(2)+")":"")+"</small></div><input id='"+id+"' inputmode='decimal' aria-label='Price of "+esc(it[0])+"' value='"+(+it[1]).toFixed(2)+"' data-orig='"+(+it[1]).toFixed(2)+"'><button class='btn sm' "+mBtn(s,"price",it[0],it[0])+" data-for='"+id+"'>Save</button></div>"; };
+    h+=needsCard(s); var NO=menuNeeds(s);
+    if(cP){ h+="<h2>✈️ "+esc(NAMES[s])+" · prices</h2><div class='row' style='margin:6px 0'><input type='search' id='mq' placeholder='Find an item (e.g. wings, margarita)' value='"+esc(MQ)+"' aria-label='Find a menu item' style='min-height:48px;font-size:16px'></div><div class='card' style='padding:4px 12px'>";
+    M.food.forEach(function(c,ci){ c.items.forEach(function(it,ii){ h+=row(it,B.food[ci].items[ii],c.name); }); });
+    M.drinks.forEach(function(it,i){ h+=row(it,B.drinks[i],"Drinks"); });
+    h+="</div>"; }
+    if(!cS){ h+=specialsView(M); return; }
+    h+="<h2>🎉 Holiday & seasonal specials</h2><p class='note'>They show at the top of the app during their dates. No free alcohol (California): drink specials are discounts only.</p><div class='dl'>";
+    M.specials.forEach(function(sp){ var on=sp.on!==false, pid="m_"+s+"_sp_"+sp.id, pr=String(sp.price||"").replace("$","");
+      h+="<div class='dc mf' id='sp-"+esc(sp.id)+"'><b>"+esc(sp.title)+"</b> <span class='st "+(on?"done":"tbd")+"'>"+(on?"ON":"OFF")+"</span><div class='note'>"+esc(sp.start)+" → "+esc(sp.end)+(sp.price?" · "+esc(sp.price):" · <span class='chg'>no price yet</span>")+"</div>"+
+        "<div class='f'><div><label for='"+pid+"_on'>Show it in the app</label><select id='"+pid+"_on' data-orig='"+(on?"on":"off")+"'><option value='on'"+(on?" selected":"")+">On</option><option value='off'"+(on?"":" selected")+">Off</option></select></div><button class='btn sm big' "+mBtn(s,"sp_on",sp.id,sp.title)+" data-for='"+pid+"_on'>Save</button></div>"+
+        "<div class='f'><div><label for='"+pid+"_price'>Price ($, blank = no price)</label><input id='"+pid+"_price' inputmode='decimal' value='"+esc(pr)+"' data-orig='"+esc(pr)+"' placeholder='e.g. 14.99'></div><button class='btn sm big' "+mBtn(s,"sp_price",sp.id,sp.title)+" data-for='"+pid+"_price'>Save</button></div>"+
+        "<div class='f'><div><label for='"+pid+"_title'>Name</label><input id='"+pid+"_title' maxlength='60' value='"+esc(sp.title)+"' data-orig='"+esc(sp.title)+"'></div><button class='btn sm big' "+mBtn(s,"sp_title",sp.id,sp.title)+" data-for='"+pid+"_title'>Save</button></div>"+
+        "<div class='f'><div><label for='"+pid+"_desc'>What it is</label><textarea id='"+pid+"_desc' maxlength='200' rows='3' data-orig='"+esc(sp.desc)+"'>"+esc(sp.desc)+"</textarea></div><button class='btn sm big' "+mBtn(s,"sp_desc",sp.id,sp.title)+" data-for='"+pid+"_desc'>Save</button></div></div>"; });
+    h+="</div><h2>🍻 Happy hour & weekly specials</h2><div class='dc mf'><label for='m_"+s+"_hh'>One per line (up to 8 lines). Shows on the “Visit Melody” card.</label><textarea id='m_"+s+"_hh' maxlength='600' data-orig='"+esc(M.weekly.join("\n"))+"'>"+esc(M.weekly.join("\n"))+"</textarea><button class='btn big' style='width:100%;margin-top:8px' "+mBtn(s,"hh","weekly","Happy hour & weekly specials")+" data-for='m_"+s+"_hh'>Save happy hour</button></div>"; });
+  if(!any&&MGR) h+="<p class='note'>Nothing to edit here.</p>";
+  return h; }
+// read-only menu for logins without the "prices" / "specials" switches (bartenders, servers…): the same things guests see
+function specialsView(M){ var h="<h2>🎉 Specials</h2><div class='dl'>"+M.specials.map(function(sp){ var on=sp.on!==false; return "<div class='dc'><b>"+esc(sp.title)+"</b> <span class='st "+(on?"done":"tbd")+"'>"+(on?"ON":"OFF")+"</span><div class='note'>"+esc(sp.start)+" → "+esc(sp.end)+(sp.price?" · "+esc(sp.price):"")+"</div><p style='margin:6px 0 0'>"+esc(sp.desc)+"</p></div>"; }).join("")+"</div>";
+  return h+"<h2>🍻 Happy hour &amp; weekly specials</h2><div class='dc'>"+(M.weekly.length?M.weekly.map(function(l){ return "<p style='margin:4px 0;font-size:16px'>"+esc(l)+"</p>"; }).join(""):"<p class='note'>Nothing set.</p>")+"</div>"; }
+function menuView(){ var h="<div class='card help' style='margin-top:12px'><p style='margin:0'>What guests see in the app right now. Your login can <b>look</b> at the menu, specials and happy hour. To change them, ask Christian to turn it on for you.</p></div>", any=false;
+  (LIVE.slugs||[]).filter(inR).forEach(function(s){ var M=effMenu(s); if(!M) return; any=true; h+="<h2>"+(s==="nalu-vida"?"🏄 ":"✈️ ")+esc(NAMES[s])+"</h2>"+needsCard(s)+specialsView(M); var NO=menuNeeds(s);
+    h+="<h2>💲 Prices</h2><div class='card' style='padding:4px 12px'>"+M.food.map(function(c){ return c.items.map(function(it){ return "<div class='mi' style='grid-template-columns:1fr auto'><div><b>"+esc(it[0])+"</b><small>"+esc(c.name)+needTags(NO,it[0])+"</small></div><b>$"+(+it[1]).toFixed(2)+"</b></div>"; }).join(""); }).join("")+
+      M.drinks.map(function(it){ return "<div class='mi' style='grid-template-columns:1fr auto'><div><b>"+esc(it[0])+"</b><small>Drinks"+needTags(NO,it[0])+"</small></div><b>$"+(+it[1]).toFixed(2)+"</b></div>"; }).join("")+"</div>"; });
+  return any?h:h+"<p class='note'>This restaurant's menu isn't in HQ yet.</p>"; }
+// ---- 🔐 TEAM ACCESS (owners only): approve / decline staff requests, turn people on/off, job, restaurants, one switch per
+// thing they can do. Every tap goes to the server (bo_team), which saves it, logs it in the Audit log and emails the person.
+function rTags(sl){ return (sl||[]).map(function(x){ return tagR(x); }).join(" "); }
+function team(){ var L=(DATA.team||[]), pend=L.filter(function(p){ return p.status==="pending"; }), ppl=L.filter(function(p){ return p.status!=="pending"; });
+  var jobSel=function(id,cur,act){ return "<select data-tmjob='"+esc(id)+"' data-act='"+act+"' aria-label='Job'>"+JOBS.map(function(j){ return "<option value='"+j[0]+"'"+(j[0]===cur?" selected":"")+">"+esc(j[1])+"</option>"; }).join("")+"</select>"; };
+  var h="<div class='card help' style='margin-top:12px'><p style='margin:0'>Who can use HQ besides you and Antidote, and what each person can do. <b>It works right away</b>: switch something off and it stops on their very next tap. Every change is written to the Audit log, and the person gets an email (if we have their email).</p>"+
+    "<p class='note' style='margin:8px 0 0'>New staff ask from the login screen: <b>“New staff? Request access”</b>. They pick their job, and that job's switches are turned on when you approve. Change any switch after.</p></div>"+accessGuide();
+  h+="<h2>🙋 Waiting for you ("+pend.length+")</h2>"+(pend.length?pend.map(function(p){
+    return "<div class='pc' style='border-color:var(--gold)'><h3>"+esc(p.name)+" "+rTags(p.slugs)+"</h3><div class='note'>"+esc(p.email)+(p.asked?" · asked "+esc(when2(p.asked)):"")+"</div>"+
+      "<label>Their job (you can change it)</label>"+jobSel(p.id,p.job,"approve")+
+      "<p class='note' style='margin:8px 0 0'>Approving turns on: <b>"+esc(PERMS_UI.filter(function(x){ return p.perms[x[0]]; }).map(function(x){ return x[1]; }).join(" · ")||"nothing yet")+"</b> (plus reading the menu). You can change it after.</p>"+
+      "<div class='acts'><button class='btn big' data-tm='approve' data-id='"+esc(p.id)+"'>✓ Approve</button><button class='btn alt big' data-tm='decline' data-id='"+esc(p.id)+"'>✕ Decline</button></div></div>"; }).join(""):"<p class='note'>No requests waiting.</p>");
+  h+="<h2>👥 Team ("+ppl.length+")</h2>"+(ppl.length?ppl.map(function(p){ var on=p.status==="active", id=esc(p.id);
+    return "<div class='pc"+(on?"":" off")+"'><h3>"+esc(p.name)+" <span class='tag "+(on?"ok":"f")+"'>"+(on?"ON":"OFF")+"</span> "+rTags(p.slugs)+"</h3>"+
+      "<div class='note'>"+esc(jobName(p.job))+" · "+(p.email?esc(p.email):"no email yet: can't save changes (the 6-digit code goes to email)")+(p.src==="bo"?" · login: "+id:"")+"</div>"+
+      "<div class='sw'><span><b>Can log in</b><small>"+(on?"On. Off ends their session at once.":"Off: they can't log in.")+"</small></span><button class='tg' role='switch' aria-checked='"+on+"' aria-label='"+esc(p.name)+" can log in' data-tm='status' data-id='"+id+"' data-on='"+(!on)+"'></button></div>"+
+      "<label>Job</label>"+jobSel(p.id,p.job,"job")+"<p class='note' style='margin:4px 0 0'>Changing the job resets the switches below to that job's usual set.</p>"+
+      "<label>Restaurants</label><div class='seg' style='margin:4px 0'>"+[["melody-bar-grill","✈️ Melody","m"],["nalu-vida","🏄 Nalu Vida","n"]].map(function(r){ var has=(p.slugs||[]).indexOf(r[0])>=0;
+        return "<button class='"+r[2]+"' aria-pressed='"+has+"' data-tm='slugs' data-id='"+id+"' data-slug='"+r[0]+"'>"+r[1]+"</button>"; }).join("")+"</div>"+
+      "<label>What "+esc(p.name)+" can do</label><div>"+PERMS_UI.map(function(x){ var v=!!(p.perms||{})[x[0]], ch=(p.over||[]).indexOf(x[0])>=0;
+        return "<div class='sw'><span><b>"+esc(x[1])+(ch?" <span class='tag p'>changed</span>":"")+"</b><small>"+esc(x[2])+"</small></span><button class='tg' role='switch' aria-checked='"+v+"' aria-label='"+esc(p.name+": "+x[1])+"' data-tm='perm' data-id='"+id+"' data-key='"+x[0]+"' data-on='"+(!v)+"'></button></div>"; }).join("")+"</div></div>"; }).join(""):"<p class='note'>Nobody yet.</p>");
+  return h; }
+function teamCall(body,btn){ if(btn) btn.disabled=true; body.type="bo_team"; body.token=TOKEN;
+  api(body).then(function(r){ if(btn) btn.disabled=false; if(!r||!r.ok){ if(r&&r.auth===false) return signOut("Signed out. Log in again."); alert((r&&r.reason)||"Didn't work. Try again."); draw(); return; }
+    DATA.team=r.team||DATA.team; if(r.testNotice) setTimeout(function(){ alert(r.testNotice); },30); draw(); }); }
+function bindTeam(p){
+  p.querySelectorAll("[data-tm]").forEach(function(b){ b.onclick=function(){ var op=b.dataset.tm, id=b.dataset.id, P=(DATA.team||[]).filter(function(x){ return x.id===id; })[0]; if(!P) return;
+    if(op==="approve"){ var js=p.querySelector("[data-tmjob='"+id.replace(/'/g,"")+"'][data-act=approve]"); return teamCall({op:"approve",id:id,job:js?js.value:P.job},b); }
+    if(op==="decline"){ if(!confirm("Decline "+P.name+"? They won't get access (they can ask again later).")) return; return teamCall({op:"decline",id:id},b); }
+    if(op==="status"){ var on=b.dataset.on==="true"; if(!on&&!confirm("Turn "+P.name+" off? They're signed out right away.")) return; return teamCall({op:"status",id:id,on:on},b); }
+    if(op==="perm") return teamCall({op:"perm",id:id,key:b.dataset.key,on:b.dataset.on==="true"},b);
+    if(op==="slugs"){ var sl=(P.slugs||[]).slice(), s=b.dataset.slug, i=sl.indexOf(s); if(i>=0) sl.splice(i,1); else sl.push(s);
+      if(!sl.length){ alert("Pick at least one restaurant. To stop all access, use the Can log in switch."); return; } return teamCall({op:"slugs",id:id,slugs:sl},b); } }; });
+  p.querySelectorAll("[data-tmjob][data-act=job]").forEach(function(sel){ sel.onchange=function(){ var id=sel.dataset.tmjob, P=(DATA.team||[]).filter(function(x){ return x.id===id; })[0];
+    if(P&&!confirm("Change "+P.name+"'s job to "+jobName(sel.value)+"? Their switches go back to that job's usual set.")){ sel.value=P.job; return; } teamCall({op:"job",id:id,job:sel.value},sel); }; }); }
+// ---- 🚀 LAUNCH PLAN (2026-10-19): one place to walk Christian / Sami through HQ and what happens next, from QR codes to
+// launch, Toast, ordering + delivery. Plain English, honest status. Update the STATUS rows as things connect.
+function launch(){ var F="../../files/christian-7045b2/";
+  var chip=function(k){ return "<span class='chip "+k+"'>"+({ok:"✅ Done",wt:"⏳ Waiting",nw:"👉 Next"})[k]+"</span>"; };
+  var row=function(k,t,n){ return "<div class='st'>"+chip(k)+"<div><b>"+t+"</b><span class='n'>"+n+"</span></div></div>"; };
+  var STATUS=[
+    ["ok","Melody app, game, rewards and 4K menu","Built. Guests play, earn points, use Just Landed, sign up and get rewards. The menu is view-only: guests order and pay with their server."],
+    ["ok","This HQ + team logins","Christian, Melody Management and Sami each have a login. Christian decides what each person can do in 🔐 Team access."],
+    ["ok","QR stickers, table cards 1–40 and the window poster","Designed and scan-tested. Ready to print."],
+    ["ok","Staff guide + training quiz","Safe to text to staff. It never shows guest info."],
+    ["nw","Sami's email","Needed so Sami's changes can save (each change is confirmed with a code sent to her email). Until then she can look at everything but can't save."],
+    ["nw","Toast reward buttons (for now)","5 discount buttons in Toast Web, about 10 minutes, done together. Staff ring app rewards with these until Toast connects."],
+    ["wt","Toast connection (automatic points)","We applied to Toast's partner program on Oct 12. Toast says the decision comes within 30 days (by about Nov 11). Not connected yet."],
+    ["wt","Online ordering + card payments","Optional add-on. The card payment account (Stripe) is set up in test mode. It goes live after our business details are verified. Each restaurant connects its own bank, so the money goes straight to you. We never hold it."],
+    ["wt","DoorDash delivery","We applied for DoorDash's delivery program (DoorDash Drive). DoorDash reviews requests every quarter and approves a limited number, so there's no date yet. Pickup ordering can start before delivery."],
+    ["wt","AI phone host + texts","Built and ready. Turns on for both restaurants after the Nalu Vida setup payment. Texting guests also needs phone-carrier approval."]];
+  var TOUR=[["todo-top","✅ To-do list","Top of every page. Tap an item to fix it, then Done."],["overview","📊 Overview","Sign-ups, visits and points at a glance"],["members","👥 Members","Guest list, contacts, birthdays, CSV export"],
+    ["rewards","🎟️ Rewards & claims","Rewards used + receipt claims to check against Toast"],["discounts","🏷️ Discounts","Change rewards, points and dollars off"],["menu","💲 Prices & specials","Prices, holiday specials, happy hour"],
+    ["earlybird","🎁 Early bird","The founding-member gift"],["staff","🧑‍🍳 Staff","Staff game scores + the training quiz"],["squares","🏈 Squares","Football Squares boards"],
+    ["scout","🛡️ Scout","Catches point farming and duplicates"],["audit","🧾 Audit log","Who changed what, before → after"],["team","🔐 Team access","Approve staff, switch access on or off"],["help","❓ Help","How-to with a Listen button"]];
+  var tour=TOUR.filter(function(t){ return t[0]==="todo-top"?can("todo"):tabOk(t[0]); }).map(function(t){ return "<button class='btn alt' data-go='"+t[0]+"'>"+t[1]+"<small>"+t[2]+"</small></button>"; }).join("");
+  var step=function(who,t,n){ return "<li><span class='who'>"+who+"</span><br><b>"+t+"</b><br>"+n+"</li>"; };
+  var STEPS=[
+    step("Today · Sami → Antidote","Send Antidote Sami's email","He adds it to her login (2 minutes, nothing to reinstall). After that she can save changes on her own."),
+    step("Today · Christian or Sami","Approve the deals","Open 🏷️ Discounts. Check each reward, the points it costs and the dollars off. Change anything, then Save. No free alcohol as a reward (California law). Drink discounts are fine."),
+    step("Today · Christian or Sami","Clear the red to-do list","Confirm menu prices, set prices for upcoming specials, and OK menu photos. Each item jumps you to the right spot."),
+    step("This week · Together, about 10 min","Add the 5 reward buttons in Toast","On a computer in Toast Web. Follow the <a href='../../melody/kit/toast-interim.html'>Toast button guide</a> (names, amounts, permissions). Staff then ring app rewards from the pass the guest shows."),
+    step("This week · Christian","Print the QR codes","Stickers, table cards 1–40 and the 24×36 window poster are in <a href='"+F+"'>your files</a>. <a href='../../onboarding/christian/placement/'>Where to put each one</a>. Check that each one scans after printing."),
+    step("This week · Sami or a manager, 15 min","Train the staff","Text them the <a href='../../staff/christian/'>staff guide</a>. They ask for their own login from the HQ login screen (“New staff? Request access”), and Christian approves it in 🔐 Team access. Everyone takes the quiz."),
+    step("Launch day · Everyone","Go live","QR codes on the tables and the window, the app link in the @melodylax bio, Sami posts it. Servers tell every table: “Scan to play and earn a free starter.”"),
+    step("Every day after launch · Manager, 2 min","Spot-check","Compare receipt claims and rewards used with Toast's daily report. Approve the ones that match and flag the rest. The to-do list reminds you."),
+    step("When you say yes · Christian","Online ordering + delivery","Tap Done on the to-do once you've told Antidote yes or no. If yes: pickup ordering with card payments goes first. You connect your own bank through Stripe in about 10 minutes (bank info + ID). DoorDash delivery is added once DoorDash approves."),
+    step("When Toast approves · Antidote","Connect Toast","Points then post automatically from each check, and the interim buttons stay as a backup. Guests keep all their points."),
+    step("After the Nalu Vida setup payment · Antidote","Turn on the AI phone host + texts","Kira answers missed and after-hours calls. Melody forwards calls to Kira's number. Birthday and win-back texts go on once carrier approval comes through."),
+    step("Next · Together","Nalu Vida, the same way","Same steps, with Nalu's own QR codes and Toast buttons.")];
+  return "<div class='card help lp' style='margin-top:12px'><h2 style='margin-top:0'>🚀 Melody launch plan</h2><p class='note'>Everything in one place: where we are, a 2-minute tour of this HQ, and each step from QR codes to launch, Toast, ordering and delivery.</p>"+
+    "<h3>Where we are</h3>"+STATUS.map(function(x){ return row(x[0],x[1],x[2]); }).join("")+
+    "<h3>Quick tour"+(MGR?" (what your login can open)":"")+"</h3><div class='tour'>"+tour+"</div>"+
+    "<h3>What's next, step by step</h3><ol class='steps'>"+STEPS.join("")+"</ol>"+
+    "<p class='note'>Questions? Text Antidote. Nothing goes live to guests without Christian's or Sami's OK.</p></div>"; }
+// ---- ❓ HELP: plain-English guide (with 🔊 Listen) for managers and owners
+function help(){ var lb=window.SSAI_LISTEN?SSAI_LISTEN.button("helpText","🔊 Listen to this page"):"";
+  return "<div class='card help' id='helpText' style='margin-top:12px'><h2 style='margin-top:0'>How to use "+(MGR?"Melody HQ":"Christian HQ")+"</h2><p data-noread>"+lb+"</p>"+
+    "<h3>✅ The to-do list</h3><p>The list at the top shows what needs you, most important first. Tap an item to go straight to the page where you handle it. Tap <b>Done</b> when it's handled. If something new comes in later, it shows up again by itself. Use <b>＋ Add</b> to write your own reminder.</p>"+
+    "<h3>🏷️ Changing a discount or reward</h3><p>Open <b>Discounts</b>. Change the points, the reward name or the dollars off, then tap <b>Save</b>. We email a 6-digit code to your login's email. Type it in and tap <b>Apply change</b>. The guest app updates within a minute.</p>"+
+    "<h3>💲 Changing a price or a special</h3><p>Open <b>Prices &amp; specials</b>. Type the new price and tap <b>Save</b>, then the emailed code. This changes what guests see in the app. Toast does not change by itself, so change the same price in Toast too. To go back to the menu's own price, clear the box and tap Save.</p>"+
+    "<h3>🧾 Everything is logged</h3><p>Every change is written to the <b>Audit log</b> with who made it and what it was before and after."+(MGR?" Your changes show under your login's name, and Christian gets an email about each one.":"")+"</p>"+
+    "<h3>🍞 Toast</h3><p>The app is not connected to Toast, and there's no Toast partnership. Staff check the guest's pass code, ring the reward in Toast as a discount by hand, and guests add their points with the check number from their Toast receipt.</p>"+
+    (MGR?"<h3>🔐 What this login can do</h3><p>Christian picks what each person can see and change. Yours: "+PERMS_UI.filter(function(x){ return PERMS[x[0]]; }).map(function(x){ return esc(x[1]); }).join(" · ")+(PERMS_UI.some(function(x){ return PERMS[x[0]]; })?"":"to-dos and Help only")+". Anyone can look at the menu, specials and happy hour. Tabs you can't use don't show. It only shows "+esc(MYSLUGS.map(function(x){ return NAMES[x]; }).join(" and "))+". Reversing a guest's points, removing duplicates and team access are Christian's. Need more? Ask Christian.</p>":
+      "<h3>🔐 Team access</h3><p>Open <b>Team access</b> to approve staff who asked for a login, turn a person off or on, change their job, and switch each thing they can do on or off. It works right away, it's in the Audit log, and the person gets an email. New staff ask from the login screen: “New staff? Request access”.</p>")+
+    "<h3>🧑‍🍳 Staff</h3><p>Your team's guide is the <a href='../../staff/christian/'>staff guide</a>: how guests sign up, how to check a pass and ring it in Toast, receipt points, what to say and common problems. It has a Listen button too. It never shows guest info, so it's safe to text the link to staff.</p></div>"; }
+function goTab(t){ if(!tabOk(t)) return; TAB=t; document.querySelectorAll("#tabs button").forEach(function(x){ x.setAttribute("aria-selected",x.dataset.t===t?"true":"false"); }); draw(); window.scrollTo(0,0); }
+// chart tooltips: hover (mouse) or tap (touch) any [data-tip]; content was escaped when the chart was built
+var TIP=document.createElement("div"); TIP.id="tip"; TIP.hidden=true; TIP.setAttribute("role","tooltip"); document.body.appendChild(TIP);
+function tipAt(el,x,y){ TIP.innerHTML=el.getAttribute("data-tip"); TIP.hidden=false; var w=TIP.offsetWidth, hh=TIP.offsetHeight, vw=document.documentElement.clientWidth;
+  TIP.style.left=Math.max(6,Math.min(vw-w-6,x-w/2))+"px"; TIP.style.top=(y-hh-14<6?y+18:y-hh-14)+"px"; }
+document.addEventListener("pointermove",function(e){ if(e.pointerType==="touch") return; var el=e.target.closest&&e.target.closest("[data-tip]"); if(el) tipAt(el,e.clientX,e.clientY); else TIP.hidden=true; });
+document.addEventListener("click",function(e){ var el=e.target.closest&&e.target.closest("[data-tip]"); if(el) tipAt(el,e.clientX,e.clientY); else TIP.hidden=true; });
+document.addEventListener("focusin",function(e){ var el=e.target.closest&&e.target.closest("[data-tip]"); if(el){ var b=el.getBoundingClientRect(); tipAt(el,b.left+b.width/2,b.top); } });
+window.addEventListener("scroll",function(){ TIP.hidden=true; },{passive:true});
+var RSZ=0, LASTW=0; window.addEventListener("resize",function(){ clearTimeout(RSZ); RSZ=setTimeout(function(){ var w=chartW(); if(DATA&&Math.abs(w-LASTW)>8&&(TAB==="overview"||TAB==="visits"||TAB==="games")){ draw(); } LASTW=w; },200); });
 if(TOKEN) load();
 if("serviceWorker" in navigator && !TEST) navigator.serviceWorker.register("sw.js").catch(function(){});
 })();

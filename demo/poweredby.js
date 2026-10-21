@@ -10,7 +10,7 @@
    - Keeps clear of fixed/sticky bottom bars by reserving their height under the footer. */
 (function () {
   "use strict";
-  var IG = "https://instagram.com/second.shiftai";
+  var IG = "https://instagram.com/sousshiftai";
   var MAIL = "mailto:secondshiftai@gmail.com?subject=" + encodeURIComponent("App for my business");
   var ID = "ssai-pw";
   var me = document.currentScript;
@@ -70,7 +70,7 @@
     f.id = ID; f.setAttribute("role", "contentinfo"); f.setAttribute("translate", "no");
     var c = muted(); if (c) f.style.color = c;
     f.innerHTML = '<span class="pw">Powered by SousShift AI</span><span class="ct">' +
-      '<a href="' + IG + '" target="_blank" rel="noopener">' + ICON_IG + '<span>@second.shiftai</span></a>' +
+      '<a href="' + IG + '" target="_blank" rel="noopener">' + ICON_IG + '<span>@SousShiftAi</span></a>' +
       '<a href="' + MAIL + '">' + ICON_MAIL + '<span>secondshiftai@gmail.com</span></a></span>';
     var host = null, sel = me && me.getAttribute("data-into");
     if (sel) { try { host = document.querySelector(sel); } catch (e) {} }

@@ -1,4 +1,4 @@
-/* SousShift AI — Mobile Mechanic demo: shared engine for the customer page (/demo/mechanic/) and the shop page (/shop/).
+/* SousShift AI — Auto shop demo (any vehicle business): shared engine for the customer page (/demo/mechanic/) and the shop page (/shop/).
    Reads window.SHOP_CFG (config.js). Exposes window.MECH.
    DEMO MODE (same idea as demo/crm.js): every request lives ONLY in this browser's localStorage, next to a few
    clearly-labelled sample requests. Nothing is sent anywhere. MECH.api is a mock that resolves after a short delay and
@@ -29,10 +29,14 @@
   var BASE = {
     en: { today: "Today", tomorrow: "Tomorrow", closed: "Closed", yourCar: "Your car", photoPh: "Mechanic photo goes here",
       sampleA: "Sample customer A", sampleB: "Sample customer B", sampleAP: "Grinding noise when braking, front end.",
-      sampleBP: "A/C blows warm air.", sampleN0: "Got it. I'll come by this afternoon.", sampleN1: "Low on refrigerant. Checking for leaks." },
+      sampleBP: "A/C blows warm air.", sampleN0: "Got it. We'll take a look this afternoon.", sampleN1: "Low on refrigerant. Checking for leaks.",
+      askQ: "Ask for a quote", plusQ: "+ {n} to quote", qNote: "Priced by the shop after a look",
+      ty_allseason: "All-season", ty_perf: "Performance", ty_truck: "Truck / SUV", ty_winter: "Winter" },
     es: { today: "Hoy", tomorrow: "Mañana", closed: "Cerrado", yourCar: "Tu carro", photoPh: "Aquí va la foto del mecánico",
       sampleA: "Cliente de muestra A", sampleB: "Cliente de muestra B", sampleAP: "Rechina al frenar, parte delantera.",
-      sampleBP: "El A/C echa aire caliente.", sampleN0: "Listo. Paso esta tarde.", sampleN1: "Le falta gas. Revisando fugas." }
+      sampleBP: "El A/C echa aire caliente.", sampleN0: "Listo. Lo revisamos esta tarde.", sampleN1: "Le falta gas. Revisando fugas.",
+      askQ: "Pide cotización", plusQ: "+ {n} por cotizar", qNote: "El taller da el precio después de revisarlo",
+      ty_allseason: "Todo clima", ty_perf: "Deportiva", ty_truck: "Camioneta / SUV", ty_winter: "Invierno" }
   };
   var PT = W.T || { en: {}, es: {} }, T = { en: Object.assign({}, BASE.en, PT.en), es: Object.assign({}, BASE.es, PT.es) }, lsubs = [];
   var q = (location.search.match(/[?&]lang=(en|es)\b/) || [])[1];
@@ -76,14 +80,22 @@
   function r5(n) { return Math.round(n / 5) * 5; }
   function price(it) {
     var o = opt(it.svc, it.opt); if (!o) return { lo: 0, hi: 0, hLo: 0, hHi: 0, pLo: 0, pHi: 0, lLo: 0, lHi: 0 };
+    if (it.fixed > 0) return { pLo: it.fixed, pHi: it.fixed, lLo: 0, lHi: 0, lo: it.fixed, hi: it.fixed, hLo: 0, hHi: 0 };   // owner-set tire price × qty
+    if (o.quote) return { q: 1, lo: 0, hi: 0, hLo: 0, hHi: 0, pLo: 0, pHi: 0, lLo: 0, lHi: 0 };                             // "Ask for a quote": no invented price
     var lLo = o.hrs[0] * C.laborRate, lHi = o.hrs[1] * C.laborRate;
-    return { pLo: o.parts[0], pHi: o.parts[1], lLo: r5(lLo), lHi: r5(lHi), lo: r5(o.parts[0] + lLo), hi: r5(o.parts[1] + lHi), hLo: o.hrs[0], hHi: o.hrs[1] };
+    var m = +it.mult > 0 ? +it.mult : 1, pLo = m === 1 ? o.parts[0] : r5(o.parts[0] * m), pHi = m === 1 ? o.parts[1] : r5(o.parts[1] * m);   // mult = parts price tier (config.partsTiers)
+    return { pLo: pLo, pHi: pHi, lLo: r5(lLo), lHi: r5(lHi), lo: r5(pLo + lLo), hi: r5(pHi + lHi), hLo: o.hrs[0], hHi: o.hrs[1] };
   }
   function total(items) {
-    var s = { lo: 0, hi: 0, hLo: 0, hHi: 0, pLo: 0, pHi: 0, lLo: 0, lHi: 0 };
-    items.forEach(function (it) { var x = price(it); Object.keys(s).forEach(function (k) { s[k] += x[k]; }); });
-    s.lo += C.tripFee; s.hi += C.tripFee; return s;
+    var s = { lo: 0, hi: 0, hLo: 0, hHi: 0, pLo: 0, pHi: 0, lLo: 0, lHi: 0 }, q = 0, n = 0;
+    items.forEach(function (it) { var x = price(it); if (x.q) { q++; return; } n++; Object.keys(s).forEach(function (k) { s[k] += x[k]; }); });
+    s.q = q; s.n = n;
+    if (n) { s.lo += C.tripFee; s.hi += C.tripFee; }
+    return s;
   }
+  /* price text that knows about quote-only items */
+  function prTxt(x) { return x.q ? t("askQ") : range(x.lo, x.hi); }
+  function totTxt(x) { return x.q && !x.n ? t("askQ") : range(x.lo, x.hi) + (x.q ? " " + t("plusQ", { n: x.q }) : ""); }
   function money(n) { return C.currency + Math.round(n).toLocaleString("en-US"); }
   function range(a, b) { return a === b ? money(a) : money(a) + "–" + money(b); }
   function hrs(a, b) {
@@ -91,7 +103,22 @@
     return a === b ? f(a) : (a < 1 && b < 1 ? Math.round(a * 60) + "–" + Math.round(b * 60) + " min" : f(a) + "–" + f(b));
   }
   var POS = { FL: { en: "front-left", es: "delantera izq." }, FR: { en: "front-right", es: "delantera der." }, RL: { en: "rear-left", es: "trasera izq." }, RR: { en: "rear-right", es: "trasera der." }, F: { en: "front axle", es: "eje delantero" }, R: { en: "rear axle", es: "eje trasero" } };
-  function itemName(it) { var s = SV[it.svc], o = opt(it.svc, it.opt); if (!s || !o) return "?"; return p(s.name) + " · " + p(o.name) + (it.pos && POS[it.pos] ? " (" + p(POS[it.pos]) + ")" : ""); }
+  function itemName(it) { var s = SV[it.svc], o = opt(it.svc, it.opt); if (!s || !o) return "?"; return p(s.name) + " · " + p(o.name) + (it.pos && POS[it.pos] ? " (" + p(POS[it.pos]) + ")" : "") + (it.note ? " (" + it.note + ")" : ""); }
+
+  /* ---------- tire stock (sample list in config; the owner's edits live in this browser) ---------- */
+  var TKEY = "ssai:mech:tires";
+  function tires() { var a = lsGet(TKEY, null); return Array.isArray(a) ? a : (C.tireStock || []).map(function (x) { return Object.assign({}, x); }); }
+  function saveTires(a) { lsSet(TKEY, a); fire(); }
+  function resetTires() { try { localStorage.removeItem(TKEY); } catch (e) {} fire(); }
+  /* any common way of writing a size -> "225/45R17" (P225/45ZR17, 225 45 17, LT265/70R17, 2254517) */
+  function normSize(s) {
+    var u = String(s || "").toUpperCase().replace(/\s+/g, " ").trim(), m = u.match(/^(P|LT|ST|T)?\s*(\d{3})\s*[\/\-\s]?\s*(\d{2})\s*[\/\-\s]?\s*(Z?R|ZR|D|B|-)?\s*F?\s*(\d{2}(?:\.5)?)\b/);
+    if (!m) return null;
+    var w = +m[2], a = +m[3], r = +m[5];
+    if (w < 125 || w > 395 || a < 20 || a > 90 || r < 12 || r > 26) return null;
+    return { size: w + "/" + a + "R" + m[5], lt: m[1] === "LT" };
+  }
+  function tireType(k) { return t("ty_" + k) || k; }
 
   /* ---------- hours + slots ---------- */
   function hm(s) { var a = s.split(":"); return +a[0] * 60 + +a[1]; }
@@ -251,7 +278,7 @@
   W.MECH = {
     C: C, RM: RM, t: t, p: p, lang: function () { return lang; }, setLang: setLang, applyLang: applyLang, onLang: function (f) { lsubs.push(f); },
     all: all, get: get, put: put, uid: uid, onChange: onChange, fire: fire, lsGet: lsGet, lsSet: lsSet, PKEY: PKEY, KEY: KEY,
-    svc: svc, opt: opt, services: C.services.filter(function (s) { return s.on !== false; }), price: price, total: total, money: money, range: range, hrs: hrs, itemName: itemName, POS: POS,
+    svc: svc, opt: opt, prTxt: prTxt, totTxt: totTxt, tires: tires, saveTires: saveTires, resetTires: resetTires, normSize: normSize, tireType: tireType, TKEY: TKEY, services: C.services.filter(function (s) { return s.on !== false; }), price: price, total: total, money: money, range: range, hrs: hrs, itemName: itemName, POS: POS,
     days: days, nextOpen: nextOpen, readyBy: readyBy, fDay: fDay, fTime: fTime, fWhen: fWhen, fSlot: fSlot, hoursList: hoursList,
     STAGES: STAGES, stageName: stageName, carName: carName, notify: notify, api: api, seedSamples: seedSamples,
     esc: esc, toast: toast, art: art, stageArt: stageArt

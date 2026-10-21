@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Street Cars Bench</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
+<style>body{margin:0;background:#9aa}</style></head><body><script type="module">
+import * as THREE from "three"; import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js"; import { buildCars } from "../carmodels.js";
+const q = new URLSearchParams(location.search), r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(innerWidth, innerHeight); r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace; document.body.appendChild(r.domElement);
+const s = new THREE.Scene(); s.background = new THREE.Color(0xa9b4bf); s.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), .04).texture;
+s.add(new THREE.HemisphereLight(0xdfefff, 0x806040, 1.0)); const d = new THREE.DirectionalLight(0xfff0dd, 2.4); d.position.set(-8, 14, 10); s.add(d);
+s.add(new THREE.Mesh(new THREE.PlaneGeometry(100, 100).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x55565a, roughness: .9 })));
+const cars = buildCars(THREE); const tris = [];
+cars.forEach((c, i) => { const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .35, metalness: .2, flatShading: true });
+  const geo = c.geo.clone(); const col = geo.attributes.color, part = geo.attributes._part, pc = new THREE.Color(c.pal[i % c.pal.length]);
+  for (let k = 0; k < col.count; k++) if (part.getX(k) === 1) col.setXYZ(k, pc.r, pc.g, pc.b); else if (part.getX(k) === 3) col.setXYZ(k, 3, 3, 2.7); else if (part.getX(k) === 4) col.setXYZ(k, 3, .2, .1);
+  const o = new THREE.Mesh(geo, m); o.position.set((i % 4 - 1.5) * +(q.get("sp") || 3.2), 0, (i < 4 ? 1 : -1) * +(q.get("sz") || 3.5)); o.rotation.y = +(q.get("ry") || .6); s.add(o); tris.push(c.name + ":" + geo.attributes.position.count / 3); });
+const c = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, .1, 200), a = +(q.get("a") || .7), e = +(q.get("e") || .3); c.position.set(Math.sin(a) * 24, Math.sin(e) * 24, Math.cos(a) * 24); c.lookAt(0, .6, 0); r.render(s, c); window.__tris = tris.join(" ");
+</script></body></html>

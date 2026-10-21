@@ -1,4 +1,4 @@
-/* SousShift AI — Mobile Mechanic demo: customer page. Needs config.js, core.js, car.js.
+/* SousShift AI — Auto shop demo (any vehicle business): customer page. Needs config.js, core.js, car.js.
    No owner tools on this page (house rule). The mechanic side lives at ./shop/. */
 (function () {
   "use strict";
@@ -8,13 +8,21 @@
 
   /* ---------- state (this phone only) ---------- */
   var job = M.lsGet(JKEY, []); if (!Array.isArray(job)) job = [];
+  job = job.filter(function (it) { return it && M.opt(it.svc, it.opt); });   // drop items this business type doesn't offer
   var car = M.lsGet(CKEY, {}) || {};
   var slot = M.lsGet(SKEY, null);
   var mine = M.lsGet(MKEY, []); if (!Array.isArray(mine)) mine = [];
   var prefs = M.lsGet(M.PKEY, { app: true, text: false, email: false, phone: "", email_: "" }) || {};
   var view = "side", dayIdx = 0, curReq = null;
-  function saveJob() { M.lsSet(JKEY, job); renderJob(); renderHotspots(); renderSvcs(); }
-  function key(it) { return it.svc + "|" + it.opt + "|" + (it.pos || ""); }
+  function saveJob() { stampTier(); M.lsSet(JKEY, job); renderJob(); renderHotspots(); renderSvcs(); }
+  /* parts price tier (performance trim / luxury make, config.partsTiers) rides on each job item as mult, so the shop page prices it the same */
+  function curTier() { return W.SYMPTOMS ? W.SYMPTOMS.tier(car, [car.problem, $("fdIn") ? $("fdIn").value : ""].join(" ")) : null; }
+  function stampTier() { var tr = curTier(); job.forEach(function (it) { if (tr) { it.mult = tr.mult; it.tier = tr.id; } else { delete it.mult; delete it.tier; } }); }
+  function withTier(it) { var tr = curTier(); if (tr) { it.mult = tr.mult; it.tier = tr.id; } return it; }
+  function key(it) { return it.svc + "|" + it.opt + "|" + (it.pos || "") + (it.tid ? "|" + it.tid : ""); }
+  /* used by extras.js (tire stock hold / pay screen) */
+  M.addItem = function (it) { var k = key(it); job = job.filter(function (j) { return key(j) !== k; }); job.push(withTier(it)); saveJob(); };
+  M.curJob = function () { return job; };
 
   /* ---------- brand ---------- */
   var heroSc = null;
@@ -27,6 +35,7 @@
     $("bName").textContent = C.brand.name;
     $("logo").src = C.brand.logo + (C.brand.logo.indexOf("?") < 0 ? "?v=20261013b" : "");
     $("stCity").textContent = "📍 " + C.brand.city;
+    D.title = t("_title", { name: C.brand.name });
     $("callBtn").href = "sms:" + C.brand.sms;
     var now = new Date(), h = C.hours[now.getDay()], mins = now.getHours() * 60 + now.getMinutes(), ob = $("openbar");
     function hm(s) { var a = s.split(":"); return +a[0] * 60 + +a[1]; }
@@ -41,20 +50,20 @@
   }
 
   /* ---------- services ---------- */
-  function minPrice(s) { return Math.min.apply(null, s.options.map(function (o) { return M.price({ svc: s.id, opt: o.id }).lo; })); }
+  function minPrice(s) { var pr = s.options.filter(function (o) { return !o.quote; }); return pr.length ? Math.min.apply(null, pr.map(function (o) { return M.price({ svc: s.id, opt: o.id }).lo; })) : -1; }
   function renderSvcs() {
     $("svcList").innerHTML = M.services.map(function (s) {
       var n = job.filter(function (j) { return j.svc === s.id; }).length;
       return '<button type="button" class="sv' + (n ? " in" : "") + '" data-svc="' + s.id + '"><span class="ic" aria-hidden="true">' + s.icon + "</span>" +
         (s.addon ? '<span class="tagx">' + t("addon") + "</span>" : "") +
-        '<span class="add" aria-hidden="true">' + (n ? "✓" : "+") + "</span><b>" + esc(p(s.name)) + "</b><small>" + esc(p(s.desc)) + '</small><span class="fr">' + t("from", { p: M.money(Math.max(minPrice(s), 0)) }) + "</span></button>";
+        '<span class="add" aria-hidden="true">' + (n ? "✓" : "+") + "</span><b>" + esc(p(s.name)) + "</b><small>" + esc(p(s.desc)) + '</small><span class="fr">' + (minPrice(s) < 0 ? t("askQ") : t("from", { p: M.money(minPrice(s)) })) + "</span></button>";
     }).join("");
   }
   $("svcList").addEventListener("click", function (e) { var b = e.target.closest("[data-svc]"); if (b) openSheet(b.getAttribute("data-svc"), null); });
 
   /* before / after carousel lives in beforeafter.js (+ .css); "Book this" opens the service sheet with the option preselected */
   M.openSvc = function (svcId, h) { openSheet(svcId, h || null); };
-  function renderBA() { if (W.BA) W.BA.render($("baList")); }
+  function renderBA() { if (W.BA) W.BA.render($("baList")); var c = $("baList").closest(".card"); if (c) c.hidden = !$("baList").querySelector(".bax"); }
 
   /* ---------- your car: Year -> Make -> Model (+ optional engine / drivetrain / trim), or a VIN ----------
      Data: NHTSA vPIC via vehicle.js (cached in localStorage). vPIC model lists have no trims, so trim / engine / drivetrain
@@ -187,7 +196,7 @@
   var issuesKey = "";
   function carChanged(identity, fromGarage) {
     if (identity && !fromGarage && car.gid) { var g = gFind(car.gid); if (g && (g.year !== car.year || g.make !== car.make || g.model !== car.model)) { car.gid = ""; car.scans = []; delete car.pid; car.nick = ""; renderPhoto(); } }
-    saveCar(); fillDetails(); renderCar(false); renderTesla(); renderDiagram();
+    saveCar(); fillDetails(); renderCar(false); renderTesla(); renderDiagram(); saveJob(); renderFinder();
     if (identity) loadIssues();
   }
   function resetSpecs() { ["trim", "engine", "cyl", "fuel", "drive", "lights", "abs", "vin", "vinModel", "paint"].forEach(function (k) { car[k] = ""; }); car.bodyManual = false; $("vin").value = ""; $("vinMsg").textContent = ""; }
@@ -335,10 +344,10 @@
       ph = '<p class="note" style="margin:6px 0 4px">' + t("posL") + '</p><div class="views" role="group">' + opts.map(function (o) { return '<button type="button" data-pos="' + o + '" aria-pressed="' + (o === cur) + '">' + esc(p(M.POS[o])) + "</button>"; }).join("") + "</div>";
     }
     $("shPos").innerHTML = ph;
-    $("shOpts").innerHTML = s.options.map(function (o) {
-      var pr = M.price({ svc: sh.svc, opt: o.id }), it = { svc: sh.svc, opt: o.id, pos: posFor(o, sh.pos) }, inj = job.some(function (j) { return key(j) === key(it); });
-      return '<button type="button" class="op" data-op="' + o.id + '" aria-pressed="' + (!!sh.sel[o.id]) + '"><span class="r"></span><div><b>' + esc(p(o.name)) + "</b><small>" + t("parts") + " " + M.range(pr.pLo, pr.pHi) + " · " + M.hrs(pr.hLo, pr.hHi) + "</small>" +
-        (inj ? '<span class="in">' + t("inJobTag") + "</span>" : "") + '</div><span class="pr">' + M.range(pr.lo, pr.hi) + "</span></button>";
+    $("shOpts").innerHTML = s.options.filter(function (o) { return !o.hidden; }).map(function (o) {
+      var pr = M.price(withTier({ svc: sh.svc, opt: o.id })), it = { svc: sh.svc, opt: o.id, pos: posFor(o, sh.pos) }, inj = job.some(function (j) { return key(j) === key(it); });
+      return '<button type="button" class="op" data-op="' + o.id + '" aria-pressed="' + (!!sh.sel[o.id]) + '"><span class="r"></span><div><b>' + esc(p(o.name)) + "</b><small>" + (pr.q ? t("qNote") : t("parts") + " " + M.range(pr.pLo, pr.pHi) + " · " + M.hrs(pr.hLo, pr.hHi)) + "</small>" +
+        (inj ? '<span class="in">' + t("inJobTag") + "</span>" : "") + '</div><span class="pr' + (pr.q ? " q" : "") + '">' + M.prTxt(pr) + "</span></button>";
     }).join("");
     var any = Object.keys(sh.sel).some(function (k) { return sh.sel[k]; });
     var had = job.some(function (j) { return j.svc === sh.svc; });
@@ -363,6 +372,7 @@
   $("shSave").addEventListener("click", function () {
     var s = M.svc(sh.svc), before = job.length, addN = 0;
     s.options.forEach(function (o) {
+      if (o.hidden) return;
       var it = { svc: sh.svc, opt: o.id }, ps = posFor(o, sh.pos); if (ps) it.pos = ps;
       var k = key(it), has = job.some(function (j) { return key(j) === k; });
       if (sh.sel[o.id] && !has) { job.push(it); addN++; }
@@ -381,31 +391,108 @@
   }
   function renderJob() {
     var L = $("jobList");
+    $("qShare").hidden = !job.length;
     if (!job.length) { L.innerHTML = '<div class="empty">' + t("emptyJob") + "</div>"; $("tot").hidden = true; pill(); return; }
     L.innerHTML = job.map(function (it, i) {
       var s = M.svc(it.svc), o = M.opt(it.svc, it.opt); if (!s || !o) return "";
       var pr = M.price(it);
-      return '<div class="ji"><span class="e" aria-hidden="true">' + s.icon + "</span><b>" + esc(p(s.name)) + '</b><span class="pr">' + M.range(pr.lo, pr.hi) + "</span><small>" + esc(p(o.name)) + (it.pos ? " · " + esc(p(M.POS[it.pos])) : "") + " · " + M.hrs(pr.hLo, pr.hHi) +
+      return '<div class="ji"><span class="e" aria-hidden="true">' + s.icon + "</span><b>" + esc(p(s.name)) + '</b><span class="pr' + (pr.q ? " q" : "") + '">' + M.prTxt(pr) + "</span><small>" + esc(p(o.name)) + (it.pos ? " · " + esc(p(M.POS[it.pos])) : "") + (it.note ? " · " + esc(it.note) : "") + (pr.q ? "" : " · " + M.hrs(pr.hLo, pr.hHi)) +
         (it.codes && it.codes.length ? '<span class="codes">' + t("fromCode", { c: it.codes.map(esc).join(", ") }) + "</span>" : "") +
+        (it.tier ? '<span class="codes">' + esc(t("tierTag", { t: tierName(it.tier) })) + "</span>" : "") +
         '</small><span class="jact"><button class="pbtn2" type="button" data-pi="' + i + '">🔩 ' + t("partsBtn") + '</button><button class="x" type="button" data-rm="' + i + '">' + t("remove") + "</button></span></div>";
     }).join("");
     var tt = M.total(job), cs = chosenSlot();
     $("tot").hidden = false;
-    $("totBig").textContent = M.range(tt.lo, tt.hi);
+    $("totBig").textContent = M.totTxt(tt);
     $("tParts").textContent = M.range(tt.pLo, tt.pHi);
     $("tLabL").textContent = t("labor", { h: M.hrs(tt.hLo, tt.hHi), r: M.money(C.laborRate) });
     $("tLab").textContent = M.range(tt.lLo, tt.lHi);
     $("tTrip").textContent = C.tripFee ? M.money(C.tripFee) : t("free");
+    $("tTrip").hidden = $("tTripL").hidden = !C.mobile;
     $("tTime").textContent = M.hrs(tt.hLo, tt.hHi);
     $("tArr").textContent = cs ? (cs.auto ? t("nextOpen", { s: M.fWhen(cs.s.start) }) : M.fWhen(cs.s.start)) : "—";
     $("tReady").textContent = cs ? M.fWhen(M.readyBy(cs.s.start, tt.hHi)) : "—";
+    $("qText").href = "sms:" + (C.brand.sms || "") + (/iPhone|iPad|iPod/.test(navigator.userAgent) ? "&" : "?") + "body=" + encodeURIComponent(quoteText());
     pill();
   }
+  function tierName(id) { var x = (C.partsTiers || []).filter(function (y) { return y.id === id; })[0]; return x ? p(x.name) : ""; }
+  /* plain-text quote to copy or text (same numbers as the screen) */
+  function quoteText() {
+    var tt = M.total(job), L = [t("qTxtHead", { b: p(C.brand.name) })];
+    if (carLabel()) L.push(t("qTxtCar", { c: carLabel() }));
+    var pr0 = car.problem || ($("fdIn") ? $("fdIn").value.trim() : ""); if (pr0) L.push(t("qTxtProb", { p: pr0 }));
+    L.push("");
+    job.forEach(function (it) { var x = M.price(it); L.push("• " + M.itemName(it) + ": " + M.prTxt(x)); });
+    L.push("", t("qTxtTot", { t: M.totTxt(tt) }));
+    if (tt.n) L.push(t("qTxtSplit", { p: M.range(tt.pLo, tt.pHi), l: M.range(tt.lLo, tt.lHi), h: M.hrs(tt.hLo, tt.hHi), r: M.money(C.laborRate) }));
+    var tr = job[0] && job[0].tier ? tierName(job[0].tier) : ""; if (tr) L.push(t("tierTag", { t: tr }));
+    L.push(t("qTxtFoot"));
+    return L.join("\n");
+  }
+  $("qCopy").addEventListener("click", function () { copyText(quoteText()).then(function (ok) { M.toast(ok ? t("copied") : t("copyFail")); }); });
+
+  /* ---------- type what's wrong (symptoms.js) ---------- */
+  var fd = { groups: [], sel: {}, text: "" };
+  function fdKey(f) { return f.svc + "." + f.opt; }
+  function fdItem(f) { var o = M.opt(f.svc, f.opt), it = { svc: f.svc, opt: f.opt }, ps = o ? posFor(o, null) : undefined; if (ps) it.pos = ps; return withTier(it); }
+  function runFinder() {
+    fd.text = $("fdIn").value.trim(); fd.groups = W.SYMPTOMS ? W.SYMPTOMS.match(fd.text) : []; fd.sel = {};
+    fd.groups.forEach(function (g) { g.fix.forEach(function (f) { if (f.sel) fd.sel[fdKey(f)] = true; }); });
+    if (fd.text && !fd.groups.length && M.opt("diag", "scan")) fd.sel["diag.scan"] = true;
+    stampTier(); renderJob(); renderFinder();
+  }
+  function fdRow(f) {
+    var s = M.svc(f.svc), o = M.opt(f.svc, f.opt); if (!s || !o) return "";
+    var it = fdItem(f), pr = M.price(it), k = fdKey(f), inj = job.some(function (j) { return j.svc === f.svc && j.opt === f.opt; });
+    return '<button type="button" class="op" data-fd="' + k + '" aria-pressed="' + (!!fd.sel[k]) + '"><span class="r"></span><div><b>' + esc(p(o.name)) + "</b><small>" + s.icon + " " + esc(p(s.name)) + " · " + (pr.q ? t("qNote") : t("parts") + " " + M.range(pr.pLo, pr.pHi) + " · " + M.hrs(pr.hLo, pr.hHi)) + "</small>" +
+      (inj ? '<span class="in">' + t("inJobTag") + "</span>" : "") + '</div><span class="pr' + (pr.q ? " q" : "") + '">' + M.prTxt(pr) + "</span></button>";
+  }
+  function renderFinder() {
+    if (!$("fdOut")) return;
+    var lbl = carLabel(), tr = curTier();
+    $("fdFor").innerHTML = (lbl ? esc(t("fdFor", { c: lbl })) : esc(t("fdForNone"))) + (tr ? '<br><span class="pill acc" style="margin-top:6px">' + esc(t("fdTier", { t: p(tr.name), p: Math.round((tr.mult - 1) * 100) })) + "</span>" : "");
+    if (!fd.text) { $("fdOut").innerHTML = ""; return; }
+    var h = "";
+    if (!fd.groups.length) h = '<p class="note">' + t("fdNone") + '</p><div class="fdlist">' + (M.opt("diag", "scan") ? fdRow({ svc: "diag", opt: "scan" }) : fdRow({ svc: "inspect", opt: "multi" })) + "</div>";
+    else h = '<p class="kick" style="margin:12px 0 4px">' + t("fdSome") + "</p>" + fd.groups.map(function (g) {
+      return '<div class="fdg"><h4><span aria-hidden="true">' + g.icon + "</span> " + esc(p(g.title)) + '</h4><p class="note">' + esc(p(g.why)) + '</p><div class="fdlist">' + g.fix.map(fdRow).join("") + "</div></div>";
+    }).join("");
+    var n = Object.keys(fd.sel).filter(function (k) { return fd.sel[k]; }).length, tot = { lo: 0, hi: 0, q: 0, n: 0 };
+    Object.keys(fd.sel).forEach(function (k) { if (!fd.sel[k]) return; var a = k.split("."), x = M.price(fdItem({ svc: a[0], opt: a[1] })); if (x.q) { tot.q++; return; } tot.n++; tot.lo += x.lo; tot.hi += x.hi; });
+    h += '<button class="btn primary w100" id="fdAdd" type="button" style="margin-top:12px"' + (n ? "" : " disabled") + ">" + (n ? t("fdAdd", { n: n }) + " · " + M.totTxt(tot) : t("fdAddNone")) + "</button>" +
+      '<p class="disc" style="margin-top:8px">' + t("fdNote") + "</p>";
+    $("fdOut").innerHTML = h;
+  }
+  $("fdForm").addEventListener("submit", function (e) { e.preventDefault(); if (!$("fdIn").value.trim()) { M.toast(t("fdEmpty")); return; } runFinder(); });
+  function probGo() {                                    // "What's going on?" box: same finder, then jump to the results
+    var v = $("problem").value.trim(); if (!v) { M.toast(t("fdEmpty")); $("problem").focus(); return; }
+    $("fdIn").value = v; runFinder(); setTimeout(function () { $("finder").scrollIntoView({ behavior: M.RM ? "auto" : "smooth", block: "start" }); }, 80);
+  }
+  $("probGo").addEventListener("click", probGo);
+  function enterGo(el, fn) { el.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); fn(); } }); }
+  enterGo($("problem"), probGo);
+  enterGo($("fdIn"), function () { $("fdForm").requestSubmit ? $("fdForm").requestSubmit() : $("fdForm").dispatchEvent(new Event("submit", { cancelable: true })); });
+  var fdT = null;
+  $("fdIn").addEventListener("input", function () { clearTimeout(fdT); fdT = setTimeout(runFinder, 450); });
+  $("fdOut").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-fd]");
+    if (b) { var k = b.getAttribute("data-fd"); fd.sel[k] = !fd.sel[k]; renderFinder(); return; }
+    if (!e.target.closest("#fdAdd")) return;
+    var addN = 0;
+    Object.keys(fd.sel).forEach(function (k) {
+      if (!fd.sel[k]) return; var a = k.split("."), it = fdItem({ svc: a[0], opt: a[1] });
+      if (!job.some(function (j) { return key(j) === key(it); })) { job.push(it); addN++; }
+    });
+    if (!car.problem && fd.text) { car.problem = fd.text; $("problem").value = fd.text; saveCar(); }
+    saveJob(); renderFinder();
+    M.toast(addN ? t("fdAdded", { n: addN }) : t("updated"));
+    setTimeout(function () { $("quote").scrollIntoView({ behavior: M.RM ? "auto" : "smooth" }); }, 150);
+  });
   $("jobList").addEventListener("click", function (e) { var pb = e.target.closest("[data-pi]"); if (pb) { openParts(job[+pb.getAttribute("data-pi")]); return; } var b = e.target.closest("[data-rm]"); if (!b) return; job.splice(+b.getAttribute("data-rm"), 1); saveJob(); M.toast(t("removed")); });
   function pill() {
     var el = $("jobpill"), tt = M.total(job);
-    $("pillTot").textContent = job.length ? M.range(tt.lo, tt.hi) : "";
-    $("pillN").textContent = t("pillN", { n: job.length, h: M.hrs(tt.hLo, tt.hHi) });
+    $("pillTot").textContent = job.length ? M.totTxt(tt) : "";
+    $("pillN").textContent = tt.n ? t("pillN", { n: job.length, h: M.hrs(tt.hLo, tt.hHi) }) : t("pillN", { n: job.length, h: "" }).replace(/\s*·\s*$/, "");
     var q = $("quote").getBoundingClientRect(), inQuote = q.top < W.innerHeight && q.bottom > 0;
     el.classList.toggle("show", job.length > 0 && !inQuote);
   }
@@ -447,7 +534,7 @@
     $("cfBody").innerHTML = '<div class="tot" style="margin:8px 0 6px"><dl style="margin:0">' +
       "<dt>" + t("cfCar") + "</dt><dd>" + esc(carLabel() || t("carUnknown")) + "</dd>" +
       "<dt>" + t("cfItems") + "</dt><dd>" + job.length + " · " + M.hrs(tt.hLo, tt.hHi) + "</dd>" +
-      "<dt>" + t("cfEst") + "</dt><dd>" + M.range(tt.lo, tt.hi) + "</dd>" +
+      "<dt>" + t("cfEst") + "</dt><dd>" + esc(M.totTxt(tt)) + "</dd>" +
       "<dt>" + t("cfSlot") + "</dt><dd>" + (cs ? esc(M.fSlot(cs.s)) : "—") + "</dd>" +
       "<dt>" + t("cfAlerts") + "</dt><dd>" + esc(ch.join(" + ")) + "</dd></dl></div>";
     open("confirm");
@@ -491,9 +578,9 @@
       ticks + '<g class="needle" id="gneedle" style="transform:rotate(-90deg)"><path d="M150 150 L146 146 L150 52 L154 146 Z" fill="#fff"/><circle cx="150" cy="150" r="10" fill="#1a2440" stroke="var(--accent)" stroke-width="3"/></g></svg>';
   }
   var VROOM = '<svg viewBox="0 0 44 22" aria-hidden="true"><path d="M2 16 L2 11 Q3 8 7 8 L12 7 Q16 2 22 2 L29 2 Q33 3 36 7 L40 8 Q43 9 43 12 L43 16 Z" fill="var(--accent)"/><path d="M15 7 Q18 4 22 4 L24 4 L24 7 Z M26 4 L29 4 Q31 5 33 7 L26 7 Z" fill="#0b1730"/><circle cx="11" cy="16.5" r="4" fill="#0b0e15" stroke="#cfd8ea" stroke-width="1.5"/><circle cx="34" cy="16.5" r="4" fill="#0b0e15" stroke="#cfd8ea" stroke-width="1.5"/></svg>';
-  /* ---------- the animated scene: the customer's car moves through Carlos' place with the stage ---------- */
+  /* ---------- the animated scene: the customer's car moves through the shop with the stage ---------- */
   var GK = ["g_rec", "g_diag", "g_parts", "g_work", "g_half", "g_almost", "g_ready"], lastSt = {};
-  function mech() { return C.brand.mechanic || C.brand.short || C.brand.name; }
+  function mech() { return C.brand.mechanic || C.brand.name; }
   function suppName() { var s = PT.supplier(); return s ? s.short || s.name : ""; }
   function greet(st) { return t(st < 0 ? "g_req" : GK[st], { m: esc(mech()), s: esc(suppName()) }); }
   function carColor(r) { return car.color || (r && r.car && r.car.color) || "#c8242b"; }
@@ -549,7 +636,7 @@
     stopSample();
     var head = '<div class="jobhead"><div><b>' + esc(M.carName(r.car) || t("carUnknown")) + "</b><small>" + t("jobId", { id: r.id }) + (r.slot ? " · " + t("slotL") + " " + esc(M.fSlot(r.slot)) : "") + "</small></div>" + statusPill(r) + "</div>";
     var money = r.quote ? '<div class="chipline"><span class="pill ok">' + t("quote") + ": " + M.money(r.quote) + '</span><span class="pill">' + t("readyBy") + " " + esc(r.readyBy ? M.fWhen(r.readyBy) : "—") + "</span></div>"
-      : '<div class="chipline"><span class="pill acc">' + t("estimate") + ": " + M.range(r.est.lo, r.est.hi) + "</span>" + (r.readyBy ? '<span class="pill">' + t("readyBy") + " " + esc(M.fWhen(r.readyBy)) + "</span>" : "") + "</div>";
+      : '<div class="chipline"><span class="pill acc">' + t("estimate") + ": " + esc(M.totTxt(r.est)) + "</span>" + (r.readyBy ? '<span class="pill">' + t("readyBy") + " " + esc(M.fWhen(r.readyBy)) + "</span>" : "") + "</div>";
     if (r.status === "requested") { card.innerHTML = head + money + sceneBlock(-1) + '<div class="wait"><div class="spin"></div><b>' + t("waitH") + '</b><p class="note">' + t("waitP") + "</p></div>"; mountScene(r.id, r.car && r.car.body, -1); return; }
     if (r.status === "declined") { card.innerHTML = head + '<p class="note">' + t("declined") + "</p>"; return; }
     card.innerHTML = head + money + trackerHTML(r, false);
@@ -1021,7 +1108,7 @@
       (g.scans || []).forEach(function (s) { s.codes.forEach(function (c) { if (codeStatus(id, c.c) === "open") open[c.c] = 1; }); });
       var codes = Object.keys(open);
       codes.forEach(function (code) { addCodeJobs(code); });
-      if (!job.length) job.push({ svc: "diag", opt: "scan" });
+      if (!job.length && M.opt("diag", "scan")) job.push({ svc: "diag", opt: "scan" });
       saveJob();
       var last = (g.scans || [])[g.scans ? g.scans.length - 1 : 0];
       $("problem").value = codes.length ? t("fixProblem", { c: codes.join(", "), d: last ? M.fDay(last.at) : "" }) : "";
@@ -1136,7 +1223,7 @@
   /* ---------- boot ---------- */
   function renderAll() {
     brand(); heroScene(); renderSvcs(); renderBA(); fillYearMake(); fillDetails(); badge(); renderCar(false); renderJob(); renderDays(); renderHours(); renderTrack(); bell();
-    modelC.placeholder(t("pickModel")); if (modelMsg) $("modelMsg").textContent = t(modelMsg[0], modelMsg[1]); renderIssues(); renderScan(); renderPaint(); renderGarage(); renderTesla(); renderDiagram(); if (partsIt && $("partsSh").classList.contains("on")) drawParts();
+    renderFinder(); modelC.placeholder(t("pickModel")); if (modelMsg) $("modelMsg").textContent = t(modelMsg[0], modelMsg[1]); renderIssues(); renderScan(); renderPaint(); renderGarage(); renderTesla(); renderDiagram(); if (partsIt && $("partsSh").classList.contains("on")) drawParts();
   }
   M.onLang(function () { if (booted) renderAll(); });
   var booted = false;

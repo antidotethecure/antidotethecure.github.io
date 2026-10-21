@@ -6,7 +6,10 @@
       "make": "Tesla",
       "model": "Model Y",
       "aliases": [],
-      "years": [2020, 2024],
+      "years": [
+        2020,
+        2024
+      ],
       "drawn": "2023 Model Y, Pearl White",
       "ev": true,
       "file": "tesla-model-y-full.webp",
@@ -17,22 +20,2277 @@
       "imageHasSpecTable": true,
       "added": "2026-10-13",
       "hotspots": [
-        { "g": "roof", "x": 47.7, "y": 19.3 },
-        { "g": "hatch", "x": 29.7, "y": 21.6 },
-        { "g": "interior", "x": 49.7, "y": 27.6 },
-        { "g": "dash", "x": 63.5, "y": 28.5 },
-        { "g": "tail", "x": 24.5, "y": 34.5 },
-        { "g": "doors", "x": 42.8, "y": 38.7 },
-        { "g": "hood", "x": 75.3, "y": 41.0 },
-        { "g": "suspR", "x": 28.0, "y": 44.2 },
-        { "g": "lights", "x": 80.5, "y": 50.5 },
-        { "g": "brakesR", "x": 25.9, "y": 53.4 },
-        { "g": "suspF", "x": 69.1, "y": 54.3 },
-        { "g": "battery", "x": 47.0, "y": 54.3 },
-        { "g": "bumperF", "x": 84.9, "y": 58.0 },
-        { "g": "motor", "x": 64.6, "y": 59.4 },
-        { "g": "brakesF", "x": 66.3, "y": 69.1 },
-        { "g": "wheels", "x": 55.9, "y": 71.8 }
+        {
+          "g": "roof",
+          "x": 47.7,
+          "y": 19.3
+        },
+        {
+          "g": "hatch",
+          "x": 29.7,
+          "y": 21.6
+        },
+        {
+          "g": "interior",
+          "x": 49.7,
+          "y": 27.6
+        },
+        {
+          "g": "dash",
+          "x": 63.5,
+          "y": 28.5
+        },
+        {
+          "g": "tail",
+          "x": 24.5,
+          "y": 34.5
+        },
+        {
+          "g": "doors",
+          "x": 42.8,
+          "y": 38.7
+        },
+        {
+          "g": "hood",
+          "x": 75.3,
+          "y": 41.0
+        },
+        {
+          "g": "suspR",
+          "x": 28.0,
+          "y": 44.2
+        },
+        {
+          "g": "lights",
+          "x": 80.5,
+          "y": 50.5
+        },
+        {
+          "g": "brakesR",
+          "x": 25.9,
+          "y": 53.4
+        },
+        {
+          "g": "suspF",
+          "x": 69.1,
+          "y": 54.3
+        },
+        {
+          "g": "battery",
+          "x": 47.0,
+          "y": 54.3
+        },
+        {
+          "g": "bumperF",
+          "x": 84.9,
+          "y": 58.0
+        },
+        {
+          "g": "motor",
+          "x": 64.6,
+          "y": 59.4
+        },
+        {
+          "g": "brakesF",
+          "x": 66.3,
+          "y": 69.1
+        },
+        {
+          "g": "wheels",
+          "x": 55.9,
+          "y": 71.8
+        }
+      ]
+    },
+    {
+      "id": "toyota-camry",
+      "make": "Toyota",
+      "model": "Camry",
+      "aliases": [],
+      "years": [
+        2018,
+        2024
+      ],
+      "drawn": "2022 Camry, Celestial Silver",
+      "ev": false,
+      "file": "toyota-camry-full.webp",
+      "small": "toyota-camry-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-13",
+      "hotspots": [
+        {
+          "g": "roof",
+          "x": 54.6,
+          "y": 26.7
+        },
+        {
+          "g": "hatch",
+          "x": 80.8,
+          "y": 29.5
+        },
+        {
+          "g": "hood",
+          "x": 22.8,
+          "y": 33.1
+        },
+        {
+          "g": "tail",
+          "x": 89.8,
+          "y": 35.9
+        },
+        {
+          "g": "interior",
+          "x": 53.2,
+          "y": 38.7
+        },
+        {
+          "g": "lights",
+          "x": 11.7,
+          "y": 40.5
+        },
+        {
+          "g": "bumperR",
+          "x": 91.9,
+          "y": 43.3
+        },
+        {
+          "g": "motor",
+          "x": 21.4,
+          "y": 47.9
+        },
+        {
+          "g": "doors",
+          "x": 64.9,
+          "y": 47.9
+        },
+        {
+          "g": "bumperF",
+          "x": 7.6,
+          "y": 51.6
+        },
+        {
+          "g": "trans",
+          "x": 34.5,
+          "y": 51.6
+        },
+        {
+          "g": "exhaust",
+          "x": 79.4,
+          "y": 53.4
+        },
+        {
+          "g": "fuel",
+          "x": 53.2,
+          "y": 54.3
+        },
+        {
+          "g": "suspF",
+          "x": 26.2,
+          "y": 62.6
+        },
+        {
+          "g": "suspR",
+          "x": 62.2,
+          "y": 62.6
+        },
+        {
+          "g": "brakesF",
+          "x": 11.7,
+          "y": 66.3
+        },
+        {
+          "g": "wheels",
+          "x": 42.1,
+          "y": 66.3
+        },
+        {
+          "g": "brakesR",
+          "x": 80.8,
+          "y": 66.3
+        }
+      ]
+    },
+    {
+      "id": "honda-civic",
+      "make": "Honda",
+      "model": "Civic",
+      "aliases": [],
+      "years": [
+        2022,
+        2025
+      ],
+      "drawn": "2022 Civic, Sonic Gray",
+      "ev": false,
+      "file": "honda-civic-full.webp",
+      "small": "honda-civic-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-13",
+      "hotspots": [
+        {
+          "g": "roof",
+          "x": 54.6,
+          "y": 26.7
+        },
+        {
+          "g": "hatch",
+          "x": 80.8,
+          "y": 29.5
+        },
+        {
+          "g": "hood",
+          "x": 22.8,
+          "y": 33.1
+        },
+        {
+          "g": "tail",
+          "x": 89.8,
+          "y": 35.9
+        },
+        {
+          "g": "interior",
+          "x": 53.2,
+          "y": 38.7
+        },
+        {
+          "g": "lights",
+          "x": 11.7,
+          "y": 40.5
+        },
+        {
+          "g": "bumperR",
+          "x": 91.9,
+          "y": 43.3
+        },
+        {
+          "g": "motor",
+          "x": 21.4,
+          "y": 47.9
+        },
+        {
+          "g": "doors",
+          "x": 64.9,
+          "y": 47.9
+        },
+        {
+          "g": "bumperF",
+          "x": 7.6,
+          "y": 51.6
+        },
+        {
+          "g": "trans",
+          "x": 34.5,
+          "y": 51.6
+        },
+        {
+          "g": "exhaust",
+          "x": 79.4,
+          "y": 55.2
+        },
+        {
+          "g": "fuel",
+          "x": 53.2,
+          "y": 54.3
+        },
+        {
+          "g": "suspF",
+          "x": 26.2,
+          "y": 62.6
+        },
+        {
+          "g": "suspR",
+          "x": 62.2,
+          "y": 62.6
+        },
+        {
+          "g": "brakesF",
+          "x": 11.7,
+          "y": 66.3
+        },
+        {
+          "g": "wheels",
+          "x": 42.1,
+          "y": 66.3
+        },
+        {
+          "g": "brakesR",
+          "x": 80.8,
+          "y": 66.3
+        }
+      ]
+    },
+    {
+      "id": "honda-accord",
+      "make": "Honda",
+      "model": "Accord",
+      "aliases": [],
+      "years": [
+        2018,
+        2022
+      ],
+      "drawn": "2021 Accord, Platinum White",
+      "ev": false,
+      "file": "honda-accord-full.webp",
+      "small": "honda-accord-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-14",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 33.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 26.0
+        },
+        {
+          "g": "bumperF",
+          "x": 6.0,
+          "y": 53.0
+        },
+        {
+          "g": "bumperR",
+          "x": 91.0,
+          "y": 43.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 41.0
+        },
+        {
+          "g": "tail",
+          "x": 89.0,
+          "y": 35.0
+        },
+        {
+          "g": "motor",
+          "x": 21.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 35.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 53.0,
+          "y": 54.0
+        },
+        {
+          "g": "exhaust",
+          "x": 86.0,
+          "y": 53.0
+        },
+        {
+          "g": "suspF",
+          "x": 26.0,
+          "y": 63.0
+        },
+        {
+          "g": "suspR",
+          "x": 62.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesF",
+          "x": 8.0,
+          "y": 66.0
+        },
+        {
+          "g": "brakesR",
+          "x": 77.0,
+          "y": 66.0
+        },
+        {
+          "g": "wheels",
+          "x": 41.0,
+          "y": 66.0
+        },
+        {
+          "g": "doors",
+          "x": 64.0,
+          "y": 47.0
+        },
+        {
+          "g": "interior",
+          "x": 50.0,
+          "y": 43.0
+        },
+        {
+          "g": "hatch",
+          "x": 80.0,
+          "y": 28.0
+        },
+        {
+          "g": "dash",
+          "x": 16.0,
+          "y": 83.0
+        }
+      ]
+    },
+    {
+      "id": "ford-f-150",
+      "make": "Ford",
+      "model": "F-150",
+      "aliases": [],
+      "years": [
+        2021,
+        2025
+      ],
+      "drawn": "2022 F-150, Oxford White",
+      "ev": false,
+      "file": "ford-f-150-full.webp",
+      "small": "ford-f-150-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-14",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 22.0,
+          "y": 33.0
+        },
+        {
+          "g": "roof",
+          "x": 54.0,
+          "y": 27.0
+        },
+        {
+          "g": "bumperF",
+          "x": 8.0,
+          "y": 50.0
+        },
+        {
+          "g": "bumperR",
+          "x": 89.0,
+          "y": 49.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 40.0
+        },
+        {
+          "g": "tail",
+          "x": 89.0,
+          "y": 41.0
+        },
+        {
+          "g": "motor",
+          "x": 20.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 34.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 53.0,
+          "y": 55.0
+        },
+        {
+          "g": "exhaust",
+          "x": 80.0,
+          "y": 56.0
+        },
+        {
+          "g": "suspF",
+          "x": 25.0,
+          "y": 63.0
+        },
+        {
+          "g": "suspR",
+          "x": 60.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesF",
+          "x": 8.0,
+          "y": 66.0
+        },
+        {
+          "g": "brakesR",
+          "x": 78.0,
+          "y": 66.0
+        },
+        {
+          "g": "wheels",
+          "x": 42.0,
+          "y": 66.0
+        },
+        {
+          "g": "doors",
+          "x": 64.0,
+          "y": 49.0
+        },
+        {
+          "g": "interior",
+          "x": 51.0,
+          "y": 38.0
+        },
+        {
+          "g": "hatch",
+          "x": 77.0,
+          "y": 30.0
+        },
+        {
+          "g": "dash",
+          "x": 18.0,
+          "y": 83.0
+        }
+      ]
+    },
+    {
+      "id": "chevrolet-silverado-1500",
+      "make": "Chevrolet",
+      "model": "Silverado 1500",
+      "aliases": [
+        "Silverado"
+      ],
+      "years": [
+        2019,
+        2025
+      ],
+      "drawn": "2022 Silverado 1500, Summit White",
+      "ev": false,
+      "file": "chevrolet-silverado-1500-full.webp",
+      "small": "chevrolet-silverado-1500-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-14",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 32.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 27.0
+        },
+        {
+          "g": "bumperF",
+          "x": 7.0,
+          "y": 52.0
+        },
+        {
+          "g": "bumperR",
+          "x": 90.0,
+          "y": 48.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 40.0
+        },
+        {
+          "g": "tail",
+          "x": 90.0,
+          "y": 42.0
+        },
+        {
+          "g": "motor",
+          "x": 20.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 34.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 51.0,
+          "y": 55.0
+        },
+        {
+          "g": "exhaust",
+          "x": 86.0,
+          "y": 56.0
+        },
+        {
+          "g": "suspF",
+          "x": 25.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 64.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesF",
+          "x": 8.0,
+          "y": 66.0
+        },
+        {
+          "g": "brakesR",
+          "x": 79.0,
+          "y": 68.0
+        },
+        {
+          "g": "wheels",
+          "x": 42.0,
+          "y": 67.0
+        },
+        {
+          "g": "doors",
+          "x": 65.0,
+          "y": 48.0
+        },
+        {
+          "g": "interior",
+          "x": 50.0,
+          "y": 40.0
+        },
+        {
+          "g": "hatch",
+          "x": 79.0,
+          "y": 30.0
+        },
+        {
+          "g": "dash",
+          "x": 18.0,
+          "y": 81.0
+        }
+      ]
+    },
+    {
+      "id": "toyota-rav4",
+      "make": "Toyota",
+      "model": "RAV4",
+      "aliases": [],
+      "years": [
+        2019,
+        2025
+      ],
+      "drawn": "2022 RAV4, Silver Sky",
+      "ev": false,
+      "file": "toyota-rav4-full.webp",
+      "small": "toyota-rav4-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-14",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 33.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 27.0
+        },
+        {
+          "g": "bumperF",
+          "x": 8.0,
+          "y": 52.0
+        },
+        {
+          "g": "bumperR",
+          "x": 91.0,
+          "y": 42.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 41.0
+        },
+        {
+          "g": "tail",
+          "x": 89.0,
+          "y": 35.0
+        },
+        {
+          "g": "motor",
+          "x": 21.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 34.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 53.0,
+          "y": 54.0
+        },
+        {
+          "g": "exhaust",
+          "x": 86.0,
+          "y": 53.0
+        },
+        {
+          "g": "suspF",
+          "x": 25.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 63.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesF",
+          "x": 7.0,
+          "y": 66.0
+        },
+        {
+          "g": "brakesR",
+          "x": 77.0,
+          "y": 67.0
+        },
+        {
+          "g": "wheels",
+          "x": 42.0,
+          "y": 67.0
+        },
+        {
+          "g": "doors",
+          "x": 65.0,
+          "y": 47.0
+        },
+        {
+          "g": "interior",
+          "x": 50.0,
+          "y": 41.0
+        },
+        {
+          "g": "hatch",
+          "x": 82.0,
+          "y": 29.0
+        },
+        {
+          "g": "dash",
+          "x": 19.0,
+          "y": 81.0
+        }
+      ]
+    },
+    {
+      "id": "honda-cr-v",
+      "make": "Honda",
+      "model": "CR-V",
+      "aliases": [],
+      "years": [
+        2017,
+        2022
+      ],
+      "drawn": "2021 CR-V, Modern Steel gray",
+      "ev": false,
+      "file": "honda-cr-v-full.webp",
+      "small": "honda-cr-v-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-14",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 33.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 27.0
+        },
+        {
+          "g": "bumperF",
+          "x": 7.0,
+          "y": 52.0
+        },
+        {
+          "g": "bumperR",
+          "x": 92.0,
+          "y": 43.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 40.0
+        },
+        {
+          "g": "tail",
+          "x": 89.0,
+          "y": 35.0
+        },
+        {
+          "g": "motor",
+          "x": 21.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 34.0,
+          "y": 53.0
+        },
+        {
+          "g": "fuel",
+          "x": 53.0,
+          "y": 55.0
+        },
+        {
+          "g": "exhaust",
+          "x": 86.0,
+          "y": 54.0
+        },
+        {
+          "g": "suspF",
+          "x": 26.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 64.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesF",
+          "x": 7.0,
+          "y": 67.0
+        },
+        {
+          "g": "brakesR",
+          "x": 78.0,
+          "y": 68.0
+        },
+        {
+          "g": "wheels",
+          "x": 42.0,
+          "y": 67.0
+        },
+        {
+          "g": "doors",
+          "x": 66.0,
+          "y": 48.0
+        },
+        {
+          "g": "interior",
+          "x": 51.0,
+          "y": 41.0
+        },
+        {
+          "g": "hatch",
+          "x": 82.0,
+          "y": 29.0
+        },
+        {
+          "g": "dash",
+          "x": 19.0,
+          "y": 80.0
+        }
+      ]
+    },
+    {
+      "id": "toyota-corolla",
+      "make": "Toyota",
+      "model": "Corolla",
+      "aliases": [],
+      "years": [
+        2019,
+        2025
+      ],
+      "drawn": "2022 Corolla, Super White",
+      "ev": false,
+      "file": "toyota-corolla-full.webp",
+      "small": "toyota-corolla-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-14",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 32.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 27.0
+        },
+        {
+          "g": "bumperF",
+          "x": 7.0,
+          "y": 52.0
+        },
+        {
+          "g": "bumperR",
+          "x": 93.0,
+          "y": 44.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 40.0
+        },
+        {
+          "g": "tail",
+          "x": 90.0,
+          "y": 35.0
+        },
+        {
+          "g": "motor",
+          "x": 20.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 34.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 52.0,
+          "y": 54.0
+        },
+        {
+          "g": "exhaust",
+          "x": 88.0,
+          "y": 53.0
+        },
+        {
+          "g": "suspF",
+          "x": 26.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 64.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesF",
+          "x": 7.0,
+          "y": 66.0
+        },
+        {
+          "g": "brakesR",
+          "x": 78.0,
+          "y": 68.0
+        },
+        {
+          "g": "wheels",
+          "x": 42.0,
+          "y": 67.0
+        },
+        {
+          "g": "doors",
+          "x": 66.0,
+          "y": 48.0
+        },
+        {
+          "g": "interior",
+          "x": 50.0,
+          "y": 41.0
+        },
+        {
+          "g": "hatch",
+          "x": 83.0,
+          "y": 29.0
+        },
+        {
+          "g": "dash",
+          "x": 19.0,
+          "y": 80.0
+        }
+      ]
+    },
+    {
+      "id": "nissan-altima",
+      "make": "Nissan",
+      "model": "Altima",
+      "aliases": [],
+      "years": [
+        2019,
+        2025
+      ],
+      "drawn": "2021 Altima, Gun Metallic gray",
+      "ev": false,
+      "file": "nissan-altima-full.webp",
+      "small": "nissan-altima-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-14",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 32.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 27.0
+        },
+        {
+          "g": "bumperF",
+          "x": 7.0,
+          "y": 50.0
+        },
+        {
+          "g": "bumperR",
+          "x": 92.0,
+          "y": 43.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 40.0
+        },
+        {
+          "g": "tail",
+          "x": 90.0,
+          "y": 35.0
+        },
+        {
+          "g": "motor",
+          "x": 20.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 34.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 52.0,
+          "y": 54.0
+        },
+        {
+          "g": "exhaust",
+          "x": 86.0,
+          "y": 53.0
+        },
+        {
+          "g": "suspF",
+          "x": 26.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 64.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesF",
+          "x": 7.0,
+          "y": 66.0
+        },
+        {
+          "g": "brakesR",
+          "x": 77.0,
+          "y": 68.0
+        },
+        {
+          "g": "wheels",
+          "x": 42.0,
+          "y": 67.0
+        },
+        {
+          "g": "doors",
+          "x": 66.0,
+          "y": 48.0
+        },
+        {
+          "g": "interior",
+          "x": 50.0,
+          "y": 41.0
+        },
+        {
+          "g": "hatch",
+          "x": 82.0,
+          "y": 29.0
+        },
+        {
+          "g": "dash",
+          "x": 19.0,
+          "y": 80.0
+        }
+      ]
+    },
+    {
+      "id": "tesla-model-3",
+      "make": "Tesla",
+      "model": "Model 3",
+      "aliases": [],
+      "years": [
+        2017,
+        2023
+      ],
+      "drawn": "2022 Model 3, Pearl White",
+      "ev": true,
+      "file": "tesla-model-3-full.webp",
+      "small": "tesla-model-3-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-14",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 32.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 26.0
+        },
+        {
+          "g": "bumperF",
+          "x": 6.0,
+          "y": 48.0
+        },
+        {
+          "g": "bumperR",
+          "x": 92.0,
+          "y": 41.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 39.0
+        },
+        {
+          "g": "tail",
+          "x": 90.0,
+          "y": 35.0
+        },
+        {
+          "g": "motor",
+          "x": 20.0,
+          "y": 47.0
+        },
+        {
+          "g": "trans",
+          "x": 32.0,
+          "y": 52.0
+        },
+        {
+          "g": "battery",
+          "x": 50.0,
+          "y": 55.0
+        },
+        {
+          "g": "suspF",
+          "x": 26.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 66.0,
+          "y": 66.0
+        },
+        {
+          "g": "brakesF",
+          "x": 7.0,
+          "y": 67.0
+        },
+        {
+          "g": "brakesR",
+          "x": 78.0,
+          "y": 68.0
+        },
+        {
+          "g": "wheels",
+          "x": 41.0,
+          "y": 67.0
+        },
+        {
+          "g": "doors",
+          "x": 66.0,
+          "y": 48.0
+        },
+        {
+          "g": "interior",
+          "x": 50.0,
+          "y": 40.0
+        },
+        {
+          "g": "hatch",
+          "x": 83.0,
+          "y": 28.0
+        },
+        {
+          "g": "dash",
+          "x": 19.0,
+          "y": 80.0
+        }
+      ]
+    },
+    {
+      "id": "toyota-tacoma",
+      "make": "Toyota",
+      "model": "Tacoma",
+      "aliases": [],
+      "years": [
+        2016,
+        2023
+      ],
+      "drawn": "2021 Tacoma, Silver Sky",
+      "ev": false,
+      "file": "toyota-tacoma-full.webp",
+      "small": "toyota-tacoma-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-15",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 22.0,
+          "y": 32.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 39.0
+        },
+        {
+          "g": "bumperF",
+          "x": 6.0,
+          "y": 48.0
+        },
+        {
+          "g": "motor",
+          "x": 20.0,
+          "y": 46.0
+        },
+        {
+          "g": "trans",
+          "x": 32.0,
+          "y": 50.0
+        },
+        {
+          "g": "fuel",
+          "x": 51.0,
+          "y": 55.0
+        },
+        {
+          "g": "exhaust",
+          "x": 76.0,
+          "y": 55.0
+        },
+        {
+          "g": "suspF",
+          "x": 26.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 61.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesF",
+          "x": 8.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesR",
+          "x": 77.0,
+          "y": 65.0
+        },
+        {
+          "g": "wheels",
+          "x": 41.0,
+          "y": 66.0
+        },
+        {
+          "g": "doors",
+          "x": 64.0,
+          "y": 48.0
+        },
+        {
+          "g": "roof",
+          "x": 54.0,
+          "y": 26.0
+        },
+        {
+          "g": "tail",
+          "x": 90.0,
+          "y": 36.0
+        },
+        {
+          "g": "hatch",
+          "x": 82.0,
+          "y": 30.0
+        }
+      ]
+    },
+    {
+      "id": "jeep-wrangler",
+      "make": "Jeep",
+      "model": "Wrangler",
+      "aliases": [],
+      "years": [
+        2018,
+        2025
+      ],
+      "drawn": "2021 Wrangler, Black",
+      "ev": false,
+      "file": "jeep-wrangler-full.webp",
+      "small": "jeep-wrangler-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-15",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 32.0
+        },
+        {
+          "g": "lights",
+          "x": 10.0,
+          "y": 40.0
+        },
+        {
+          "g": "bumperF",
+          "x": 6.0,
+          "y": 53.0
+        },
+        {
+          "g": "motor",
+          "x": 21.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 34.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 51.0,
+          "y": 55.0
+        },
+        {
+          "g": "exhaust",
+          "x": 81.0,
+          "y": 53.0
+        },
+        {
+          "g": "suspF",
+          "x": 23.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 64.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesF",
+          "x": 6.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesR",
+          "x": 77.0,
+          "y": 66.0
+        },
+        {
+          "g": "wheels",
+          "x": 41.0,
+          "y": 65.0
+        },
+        {
+          "g": "doors",
+          "x": 64.0,
+          "y": 47.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 27.0
+        },
+        {
+          "g": "hatch",
+          "x": 90.0,
+          "y": 36.0
+        },
+        {
+          "g": "bumperR",
+          "x": 91.0,
+          "y": 45.0
+        }
+      ]
+    },
+    {
+      "id": "jeep-grand-cherokee",
+      "make": "Jeep",
+      "model": "Grand Cherokee",
+      "aliases": [],
+      "years": [
+        2014,
+        2021
+      ],
+      "drawn": "2019 Grand Cherokee, Billet Silver",
+      "ev": false,
+      "file": "jeep-grand-cherokee-full.webp",
+      "small": "jeep-grand-cherokee-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-15",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 22.0,
+          "y": 32.0
+        },
+        {
+          "g": "lights",
+          "x": 10.0,
+          "y": 39.0
+        },
+        {
+          "g": "bumperF",
+          "x": 6.0,
+          "y": 48.0
+        },
+        {
+          "g": "motor",
+          "x": 21.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 34.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 51.0,
+          "y": 55.0
+        },
+        {
+          "g": "exhaust",
+          "x": 81.0,
+          "y": 55.0
+        },
+        {
+          "g": "suspF",
+          "x": 23.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 62.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesF",
+          "x": 7.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesR",
+          "x": 78.0,
+          "y": 67.0
+        },
+        {
+          "g": "wheels",
+          "x": 41.0,
+          "y": 66.0
+        },
+        {
+          "g": "doors",
+          "x": 64.0,
+          "y": 48.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 27.0
+        },
+        {
+          "g": "hatch",
+          "x": 89.0,
+          "y": 35.0
+        },
+        {
+          "g": "bumperR",
+          "x": 91.0,
+          "y": 45.0
+        }
+      ]
+    },
+    {
+      "id": "ram-1500",
+      "make": "Ram",
+      "model": "1500",
+      "aliases": [
+        "Ram 1500"
+      ],
+      "years": [
+        2019,
+        2025
+      ],
+      "drawn": "2021 1500, Bright White",
+      "ev": false,
+      "file": "ram-1500-full.webp",
+      "small": "ram-1500-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-15",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 21.0,
+          "y": 32.0
+        },
+        {
+          "g": "lights",
+          "x": 10.0,
+          "y": 39.0
+        },
+        {
+          "g": "bumperF",
+          "x": 6.0,
+          "y": 50.0
+        },
+        {
+          "g": "motor",
+          "x": 21.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 35.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 51.0,
+          "y": 55.0
+        },
+        {
+          "g": "exhaust",
+          "x": 87.0,
+          "y": 55.0
+        },
+        {
+          "g": "suspF",
+          "x": 23.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 61.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesF",
+          "x": 7.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesR",
+          "x": 78.0,
+          "y": 67.0
+        },
+        {
+          "g": "wheels",
+          "x": 41.0,
+          "y": 66.0
+        },
+        {
+          "g": "doors",
+          "x": 64.0,
+          "y": 48.0
+        },
+        {
+          "g": "roof",
+          "x": 54.0,
+          "y": 26.0
+        },
+        {
+          "g": "hatch",
+          "x": 82.0,
+          "y": 30.0
+        },
+        {
+          "g": "bumperR",
+          "x": 91.0,
+          "y": 45.0
+        }
+      ]
+    },
+    {
+      "id": "nissan-rogue",
+      "make": "Nissan",
+      "model": "Rogue",
+      "aliases": [],
+      "years": [
+        2014,
+        2020
+      ],
+      "drawn": "2019 Rogue, Brilliant Silver",
+      "ev": false,
+      "file": "nissan-rogue-full.webp",
+      "small": "nissan-rogue-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-15",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 32.0
+        },
+        {
+          "g": "lights",
+          "x": 11.0,
+          "y": 39.0
+        },
+        {
+          "g": "bumperF",
+          "x": 6.0,
+          "y": 48.0
+        },
+        {
+          "g": "motor",
+          "x": 21.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 34.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 51.0,
+          "y": 56.0
+        },
+        {
+          "g": "exhaust",
+          "x": 84.0,
+          "y": 54.0
+        },
+        {
+          "g": "suspF",
+          "x": 23.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 64.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesF",
+          "x": 7.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesR",
+          "x": 78.0,
+          "y": 67.0
+        },
+        {
+          "g": "wheels",
+          "x": 40.0,
+          "y": 66.0
+        },
+        {
+          "g": "doors",
+          "x": 64.0,
+          "y": 48.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 26.0
+        },
+        {
+          "g": "hatch",
+          "x": 89.0,
+          "y": 35.0
+        },
+        {
+          "g": "bumperR",
+          "x": 91.0,
+          "y": 46.0
+        }
+      ]
+    },
+    {
+      "id": "hyundai-elantra",
+      "make": "Hyundai",
+      "model": "Elantra",
+      "aliases": [],
+      "years": [
+        2021,
+        2025
+      ],
+      "drawn": "2022 Elantra, Quartz White",
+      "ev": false,
+      "file": "hyundai-elantra-full.webp",
+      "small": "hyundai-elantra-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-15",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 22.0,
+          "y": 32.0
+        },
+        {
+          "g": "lights",
+          "x": 10.0,
+          "y": 39.0
+        },
+        {
+          "g": "bumperF",
+          "x": 6.0,
+          "y": 48.0
+        },
+        {
+          "g": "motor",
+          "x": 21.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 35.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 51.0,
+          "y": 56.0
+        },
+        {
+          "g": "exhaust",
+          "x": 84.0,
+          "y": 55.0
+        },
+        {
+          "g": "suspF",
+          "x": 23.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 64.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesF",
+          "x": 7.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesR",
+          "x": 78.0,
+          "y": 67.0
+        },
+        {
+          "g": "wheels",
+          "x": 40.0,
+          "y": 66.0
+        },
+        {
+          "g": "doors",
+          "x": 64.0,
+          "y": 48.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 26.0
+        },
+        {
+          "g": "hatch",
+          "x": 86.0,
+          "y": 29.0
+        },
+        {
+          "g": "bumperR",
+          "x": 89.0,
+          "y": 46.0
+        }
+      ]
+    },
+    {
+      "id": "chevrolet-equinox",
+      "make": "Chevrolet",
+      "model": "Equinox",
+      "aliases": [],
+      "years": [
+        2018,
+        2024
+      ],
+      "drawn": "2021 Equinox, Silver Ice",
+      "ev": false,
+      "file": "chevrolet-equinox-full.webp",
+      "small": "chevrolet-equinox-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-15",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 31.0
+        },
+        {
+          "g": "lights",
+          "x": 10.0,
+          "y": 39.0
+        },
+        {
+          "g": "bumperF",
+          "x": 6.0,
+          "y": 46.0
+        },
+        {
+          "g": "motor",
+          "x": 20.0,
+          "y": 47.0
+        },
+        {
+          "g": "trans",
+          "x": 33.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 51.0,
+          "y": 55.0
+        },
+        {
+          "g": "exhaust",
+          "x": 83.0,
+          "y": 53.0
+        },
+        {
+          "g": "suspF",
+          "x": 23.0,
+          "y": 63.0
+        },
+        {
+          "g": "suspR",
+          "x": 64.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesF",
+          "x": 6.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesR",
+          "x": 78.0,
+          "y": 66.0
+        },
+        {
+          "g": "wheels",
+          "x": 41.0,
+          "y": 64.0
+        },
+        {
+          "g": "doors",
+          "x": 62.0,
+          "y": 48.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 27.0
+        },
+        {
+          "g": "hatch",
+          "x": 88.0,
+          "y": 34.0
+        },
+        {
+          "g": "bumperR",
+          "x": 90.0,
+          "y": 45.0
+        }
+      ]
+    },
+    {
+      "id": "ford-explorer",
+      "make": "Ford",
+      "model": "Explorer",
+      "aliases": [],
+      "years": [
+        2020,
+        2025
+      ],
+      "drawn": "2021 Explorer, Carbonized Gray",
+      "ev": false,
+      "file": "ford-explorer-full.webp",
+      "small": "ford-explorer-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-15",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 32.0
+        },
+        {
+          "g": "lights",
+          "x": 10.0,
+          "y": 39.0
+        },
+        {
+          "g": "bumperF",
+          "x": 6.0,
+          "y": 48.0
+        },
+        {
+          "g": "motor",
+          "x": 21.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 34.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 51.0,
+          "y": 55.0
+        },
+        {
+          "g": "exhaust",
+          "x": 85.0,
+          "y": 54.0
+        },
+        {
+          "g": "suspF",
+          "x": 23.0,
+          "y": 64.0
+        },
+        {
+          "g": "suspR",
+          "x": 64.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesF",
+          "x": 6.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesR",
+          "x": 78.0,
+          "y": 67.0
+        },
+        {
+          "g": "wheels",
+          "x": 41.0,
+          "y": 66.0
+        },
+        {
+          "g": "doors",
+          "x": 64.0,
+          "y": 48.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 26.0
+        },
+        {
+          "g": "hatch",
+          "x": 88.0,
+          "y": 34.0
+        },
+        {
+          "g": "bumperR",
+          "x": 90.0,
+          "y": 46.0
+        }
+      ]
+    },
+    {
+      "id": "dodge-charger",
+      "make": "Dodge",
+      "model": "Charger Scat Pack",
+      "aliases": [
+        "Charger"
+      ],
+      "years": [
+        2015,
+        2023
+      ],
+      "drawn": "2021 Charger Scat Pack, Pitch Black",
+      "ev": false,
+      "file": "dodge-charger-full.webp",
+      "small": "dodge-charger-1100.webp",
+      "w": 2000,
+      "h": 1493,
+      "source": "AI illustration (GPT Image via Higgsfield)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-15",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 19.4,
+          "y": 17.1
+        },
+        {
+          "g": "bumperF",
+          "x": 13.8,
+          "y": 36.7
+        },
+        {
+          "g": "bumperR",
+          "x": 83.8,
+          "y": 24.2
+        },
+        {
+          "g": "lights",
+          "x": 9.7,
+          "y": 28.3
+        },
+        {
+          "g": "tail",
+          "x": 82.5,
+          "y": 17.1
+        },
+        {
+          "g": "motor",
+          "x": 27.5,
+          "y": 35.0
+        },
+        {
+          "g": "trans",
+          "x": 38.1,
+          "y": 39.2
+        },
+        {
+          "g": "fuel",
+          "x": 53.1,
+          "y": 47.9
+        },
+        {
+          "g": "exhaust",
+          "x": 85.0,
+          "y": 40.8
+        },
+        {
+          "g": "suspF",
+          "x": 18.8,
+          "y": 49.2
+        },
+        {
+          "g": "suspR",
+          "x": 73.1,
+          "y": 49.2
+        },
+        {
+          "g": "brakesF",
+          "x": 38.8,
+          "y": 55.0
+        },
+        {
+          "g": "brakesR",
+          "x": 76.3,
+          "y": 53.3
+        },
+        {
+          "g": "wheels",
+          "x": 30.6,
+          "y": 56.7
+        },
+        {
+          "g": "interior",
+          "x": 53.8,
+          "y": 32.5
+        },
+        {
+          "g": "dash",
+          "x": 38.8,
+          "y": 31.7
+        },
+        {
+          "g": "doors",
+          "x": 70.0,
+          "y": 31.7
+        },
+        {
+          "g": "hatch",
+          "x": 78.8,
+          "y": 10.0
+        },
+        {
+          "g": "roof",
+          "x": 51.3,
+          "y": 6.3
+        }
+      ]
+    },
+    {
+      "id": "toyota-highlander",
+      "make": "Toyota",
+      "model": "Highlander",
+      "aliases": [],
+      "years": [
+        2020,
+        2025
+      ],
+      "drawn": "2021 Highlander, Celestial Silver",
+      "ev": false,
+      "file": "toyota-highlander-full.webp",
+      "small": "toyota-highlander-1100.webp",
+      "w": 1448,
+      "h": 1086,
+      "source": "AI illustration (ChatGPT)",
+      "imageHasSpecTable": false,
+      "added": "2026-10-18",
+      "hotspots": [
+        {
+          "g": "hood",
+          "x": 23.0,
+          "y": 32.0
+        },
+        {
+          "g": "roof",
+          "x": 55.0,
+          "y": 27.0
+        },
+        {
+          "g": "bumperF",
+          "x": 6.0,
+          "y": 50.0
+        },
+        {
+          "g": "lights",
+          "x": 10.0,
+          "y": 39.0
+        },
+        {
+          "g": "hatch",
+          "x": 88.0,
+          "y": 35.0
+        },
+        {
+          "g": "tail",
+          "x": 97.0,
+          "y": 36.0
+        },
+        {
+          "g": "bumperR",
+          "x": 90.0,
+          "y": 45.0
+        },
+        {
+          "g": "motor",
+          "x": 21.0,
+          "y": 48.0
+        },
+        {
+          "g": "trans",
+          "x": 35.0,
+          "y": 52.0
+        },
+        {
+          "g": "fuel",
+          "x": 51.0,
+          "y": 55.0
+        },
+        {
+          "g": "exhaust",
+          "x": 79.0,
+          "y": 56.0
+        },
+        {
+          "g": "suspF",
+          "x": 23.0,
+          "y": 63.0
+        },
+        {
+          "g": "suspR",
+          "x": 64.0,
+          "y": 64.0
+        },
+        {
+          "g": "brakesF",
+          "x": 8.0,
+          "y": 65.0
+        },
+        {
+          "g": "brakesR",
+          "x": 78.0,
+          "y": 67.0
+        },
+        {
+          "g": "wheels",
+          "x": 40.0,
+          "y": 65.0
+        },
+        {
+          "g": "doors",
+          "x": 64.0,
+          "y": 48.0
+        },
+        {
+          "g": "interior",
+          "x": 58.0,
+          "y": 37.0
+        },
+        {
+          "g": "dash",
+          "x": 16.0,
+          "y": 80.0
+        }
       ]
     }
   ]

@@ -1597,6 +1597,10 @@
     }
     if (W.ReviewEgg && !og.sim) W.ReviewEgg.endCard($("over"), $("over").querySelector(".btns"));
     $("over").classList.add("on");
+    // PLAY FIRST, CLAIM AFTER (demo/claimscore.js): adult runs only (Kid mode already plays on the parent's account)
+    if (W.SSAI_CLAIM && !og.sim) W.SSAI_CLAIM.show({ key: "gritz-n-wafflez", score: Math.round(og.score), champs: "gritz-n-wafflez", boardName: "the weekly board", reason: "play",
+      skip: MODE === "kid", mount: $("over").querySelector(".btns"), after: function () { var b = $("wsave"); if (b) b.click(); },
+      again: function () { var a = $("again"); if (a) a.click(); }, alive: function () { return !og.running; } });
     if (!og.sim) $("og").scrollIntoView({ block: "end", behavior: RM ? "auto" : "smooth" });
   }
 

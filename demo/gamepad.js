@@ -49,8 +49,8 @@
     { id: "melody", test: function () { return W.__MG; }, kind: "keys", canvas: "canvas#cv",
       running: function () { return g(W.__MG, function (m) { return !!m.get().running; }); },
       hp: function () { return g(W.__MG, function (m) { return m.get().hp; }); },
-      X: ["e", "KeyE"], LB: ["q", "KeyQ"], RB: ["e", "KeyE"],
-      hint: "Stick or D-pad: fly. Your guns fire on their own. X, LB or RB: switch gun." },
+      A: ["b", "KeyB"], X: ["e", "KeyE"], LB: ["q", "KeyQ"], RB: ["e", "KeyE"],
+      hint: "Stick or D-pad: fly. Your guns fire on their own. A: speed boost. X, LB or RB: switch gun." },
     { id: "storm", test: function () { return W.__S; }, kind: "keys", canvas: "canvas#game", repeat: { ArrowLeft: 1, ArrowRight: 1 },
       running: function () { return g(W.__S, function (s) { return !!s.get().running; }); },
       hp: function () { return g(W.__S, function (s) { return -(s.get().dmg || 0); }); },
@@ -58,8 +58,8 @@
     { id: "nalu", test: function () { return W.__NV; }, kind: "keys", canvas: "canvas#cv", first: ".nv-pick button",
       running: function () { return g(W.__NV, function (n) { return !!n.get().running; }); },
       hp: function () { return g(W.__NV, function (n) { return n.get().hearts; }); },
-      A: [" ", "Space"], X: ["t", "KeyT"],
-      hint: "Left / right: steer. A or up: jump / duck-dive. X or down: trick." },
+      A: [" ", "Space"], X: ["t", "KeyT"], LB: ["g", "KeyG"], RB: ["f", "KeyF"],
+      hint: "Left / right: steer. A or up: duck-dive / launch off the lip. In the air: X or down = trick, LB = grab, RB = flip." },
     { id: "dragon", test: function () { return W.__LD; }, kind: "pointer", canvas: "canvas#game",
       running: function () { return g(W.__LD, function (l) { return !!l.get().running; }); },
       hp: function () { return g(W.__LD, function (l) { return l.get().score; }); },
@@ -165,6 +165,7 @@
       "<tr><td>" + gl("A") + "</td><td>Play / select / tap what's in the gold box</td></tr>" +
       "<tr><td>" + gl("B") + "</td><td>Back (closes a panel)</td></tr>" +
       "<tr><td>" + gl("Y") + "</td><td>Full screen on / off</td></tr>" +
+      (W.GameMusic ? "<tr><td>" + gl("B") + " (while playing)</td><td>Switch song</td></tr>" : "") +
       "<tr><td>" + gl("start") + "</td><td>Pause and resume</td></tr>" +
       "<tr><td>" + gl("select") + "</td><td>Restart after game over (otherwise opens this help)</td></tr>" +
       "<tr><td>Triggers</td><td>Scroll menus and long pages</td></tr>" +
@@ -520,6 +521,7 @@
     if (e.start) onStart();
     else if (e.select) onSelect();
     else if (e.Y && W.GameFS) { W.GameFS.toggle(); if (W.GameMenu && W.GameMenu.refresh) W.GameMenu.refresh(); }
+    else if (e.B && mode !== "nav" && W.GameMusic) { W.GameMusic.next(); toast("🎵 " + W.GameMusic.cur().name, 1600); }   /* in play: B switches the song (games with ../songswitch.js) */
     else if (mode === "keys") gameKeys(s, e, P);
     else if (mode === "pointer") gamePointer(s, e, P, dt);
     else if (mode === "grid") gameGrid(s, e, P, rp);

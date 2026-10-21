@@ -1,0 +1,4 @@
+{
+  "_help": "Fight Night cards for the Sports Bar Package (BKFC and other promotions ESPN doesn't cover). The owner or Antidote edits this list; nothing here is fetched from anywhere else. Fields: name, date (ISO with offset, e.g. 2026-11-14T18:00:00-08:00), promotion (e.g. BKFC), venue, mainEvent, watchParty (the bar's own watch-party info), clients (optional list of client slugs, e.g. [\"melody-lax\"]; leave out or use [\"all\"] for every client). Past events hide themselves 8 hours after the start time. Info only: no streams, no scraped data.",
+  "events": []
+}

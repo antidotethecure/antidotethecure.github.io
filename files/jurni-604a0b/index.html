@@ -71,4 +71,6 @@ document.addEventListener("click",function(ev){ var b=ev.target.closest("button[
 document.getElementById("shareAll").onclick=function(){
   if(navigator.share) navigator.share({title:"Gritz N Wafflez files",text:MSG}).catch(function(){}); else location.href="sms:&body="+encodeURIComponent(MSG); };
 document.getElementById("copyMsg").onclick=function(){ (navigator.clipboard?navigator.clipboard.writeText(MSG):Promise.reject()).then(function(){ toast("Copied — paste it in your text to Jurni"); },function(){ prompt("Copy this:",MSG); }); };
-</script></body></html>
+</script>
+<script src="../../demo/poweredby.js?v=20261013a" defer></script>
+</body></html>

@@ -54,7 +54,9 @@
   function pickPreview() {   // → {src, poster, fallback}
     if (!pool) return { src: PREVIEW, poster: PREVIEW_POSTER };
     var c = pool.clips[deal(DECK_KEY, pool.clips.length, 1)[0]];
-    return { src: CLIPS + c.file, poster: CLIPS + (c.poster || c.file.replace(/\.mp4$/, ".jpg")), fallback: PREVIEW, label: c.label };
+    /* the end card is small: when the pool ships 1080p copies (clips.json "lite"), use them instead of the 4K masters; "v" busts caches */
+    var q = pool.v ? "?v=" + encodeURIComponent(pool.v) : "";
+    return { src: CLIPS + (pool.lite || "") + c.file + q, poster: CLIPS + (c.poster || c.file.replace(/\.mp4$/, ".jpg")) + q, fallback: PREVIEW, label: c.label };
   }
   var BONUS = C.bonus || 500, SHORT = C.short || C.restaurant.toUpperCase(), CLIP = C.kind === "clip";
   var me = D.currentScript, base = me && me.src ? me.src.replace(/reviewegg\.js(\?.*)?$/, "") : "../";

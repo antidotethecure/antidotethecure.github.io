@@ -58,8 +58,15 @@ details.built{margin-top:10px}details.built summary{cursor:pointer;color:var(--d
 <p class="note">Tap the system you use (Toast, Square, Clover…) and a step-by-step guide opens for it. You can start today with discount buttons on any register; the full connection syncs points automatically later.</p>
 <div id="pos"></div>
 
+<section id="interimSec" hidden>
+<h2>2b · Agreements + until Toast is connected</h2>
+<p class="note">Toast's partner approval takes about 30 days. Until then guests can still download the app, play, earn and redeem, and your staff never use their own phones. Two quick to-dos per restaurant:</p>
+<div id="interim"></div>
+</section>
+
 <h2>3 · Launch week</h2>
 <div id="launch"></div>
+<div class="step" style="border-color:var(--gold)"><div class="num" style="background:var(--gold);color:#241a00">📱</div><div><h3>📱 Open the SousShift app</h3><p>Plans, what it costs elsewhere, what you get back, printing, the contract in plain English, FAQ and an AI guide. Add it to your Home Screen.</p><a class="go" style="background:var(--gold);color:#241a00" href="../../app/">📱 Open the SousShift app →</a></div></div>
 <div class="step" style="border-color:var(--gold)"><div class="num" style="background:var(--gold);color:#241a00">$</div><div><h3>💡 What all of this would cost elsewhere</h3><p>Every tool in your package, what other companies charge for it on its own, and your price next to it.</p><a class="go" style="background:var(--gold);color:#241a00" href="../../value/?o=jurni">See the comparison →</a></div></div>
 <h2>4 · AI agents (optional add-on)</h2>
 <p class="note"><b>Everything else is already in your package:</b> the app, the 4K menu, the game, rewards and referrals, QR stickers and posters, your setup and updates. The AI agents below are optional and have their own monthly fee, because they use phone lines, texts and AI minutes every month. There are two tiers: the <b>AI Text Assistant</b> ($75/mo) and the <b>AI Voice Host + Text Assistant</b> ($150/mo, everything). You pick per restaurant, and you can change or turn it off anytime. <a href="../../agents/" style="color:var(--gold);font-weight:800">See the AI tiers, FAQ and live demos &rarr;</a></p>
@@ -68,6 +75,8 @@ details.built{margin-top:10px}details.built summary{cursor:pointer;color:var(--d
 
 <p class="prog" id="prog"></p>
 </main>
+<div class="q" id="smsopt"><label style="display:flex;gap:10px;align-items:flex-start;font-size:14px"><input type="checkbox" id="smsok" style="width:22px;height:22px;flex:none;margin-top:2px"> <span>Text me SousShift AI Owner Support messages (support replies, setup steps, launch updates and billing reminders) at <b>(424) 296-3303</b>. Message frequency varies. Message &amp; data rates may apply. Reply HELP for help, STOP to opt out. Consent is not a condition of purchase. <a href="https://antidotethefoodie.com/sousshift/sms/" style="color:inherit">Terms</a> · <a href="https://antidotethefoodie.com/sousshift/privacy/" style="color:inherit">Privacy</a></span></label></div>
+<script>document.addEventListener("DOMContentLoaded",function(){var c=document.getElementById("smsok");try{c.checked=!!S.sms_optin;}catch(e){}c.onchange=function(){S.sms_optin=c.checked?new Date().toISOString():"";save();};});</script>
 <div class="bar"><div class="prog" id="prog2"></div><button id="send" type="button">✅ Send everything to Antidote</button></div>
 <script>
 var REST=[{"key": "gritz_n_wafflez", "name": "Gritz N Wafflez", "short": "Gritz N Wafflez", "tag": "", "setup": "gritz-n-wafflez/setup/", "color": "#fbe9b8", "ink": "#3B1F5C", "storageKey": "gritz-n-wafflez-setup-v1", "logo": null, "ambient": ["steam"], "status": {"name": "Gritz N Wafflez", "paid": false, "overall": 60, "build": 75, "built": [["App page live", true], ["Game in the app", true], ["Menu photos", false], ["Owner setup page", true], ["Owner onboarding page", true], ["QR print kit", true], ["QR short link", true], ["AI phone host", false], ["Desktop folder", true], ["Billing entry", true], ["Drive folder + customer sheet", false]], "owner": [["deals", "Pick deals, discounts & weekly giveaway", false], ["prices", "Check every menu price", false], ["menu_ok", "Approve the menu (photos + descriptions)", false], ["pos", "Pick the register (Toast, Square\u2026)", false], ["launch", "Answer the launch-week questions", false]]}, "menu": [["Let's Get Started", "Original Collard Green Dip", ""], ["Let's Get Started", "Fried Green Tomatoes", ""], ["Let's Get Started", "Celestial Eggs", ""], ["Let's Get Started", "Spicy Fried Pickles", ""], ["Let's Get Started", "Fried Cheese Gritz", ""], ["N' Gritz", "Shrimp N' Gritz", ""], ["N' Gritz", "Tenderz N' Gritz", ""], ["N' Gritz", "Catfish N' Gritz", ""], ["N' Gritz", "Wingz N' Gritz", ""], ["N' Wafflez", "Wingz N' Wafflez", ""], ["N' Wafflez", "Tenderz N' Wafflez", ""], ["N' Wafflez", "Catfish N' Wafflez", ""], ["N' Wafflez", "Shrimp N' Wafflez", ""], ["Break Your Fast", "BET+ Breakfast Plate", ""], ["Break Your Fast", "Da Baddest Chick Sandwich", ""], ["Break Your Fast", "French Toast Sandwich/Plate", ""], ["Break Your Fast", "BET Breakfast Plate", ""], ["Break Your Fast", "Waffle Sandwich/Plate", ""], ["Break Your Fast", "Cinnatoast Sandwich/Plate", ""], ["Break Your Fast", "Breakfast Quesadilla", ""], ["Break Your Fast", "Breakfast Scramble", ""], ["Feelin' Toasty???", "Crunchy Cinnamon Toast", ""], ["Feelin' Toasty???", "Classic French Toast", ""]]}], OWNER="Jurni", AMB=["steam"];
@@ -121,6 +130,20 @@ REST.map(function(r){ return [r.key,r.name,r.short]; }).forEach(function(r){
   d.onpick=link; link(S["pos_"+r[0]]);
   q(pos,"posway_"+r[0],"How do you want to start at "+r[2]+"?",["Discount buttons now (10 min)","Full connection","Walk me through it"],"Discount buttons work today on any system. The full connection syncs points automatically later.");
 });
+var INTERIM=null;
+if(INTERIM){ var IS=document.getElementById("interimSec"), IB=document.getElementById("interim"); IS.hidden=false;
+  var ag=h("div","q"); ag.innerHTML='<b>📝 For your two separate agreements: each restaurant&#39;s LLC legal name</b><div style="color:var(--dim);font-size:13px;margin-top:4px">Exactly as it&#39;s registered with the CA Secretary of State (e.g. "Melody LAX Holdings LLC"). '+OWNER+' signs both agreements. As soon as both names are in, Antidote sends the agreements.</div>'; IB.appendChild(ag);
+  REST.forEach(function(r){ var w=h("div"); w.style.marginTop="10px"; w.appendChild(h("div",null,"<span style='font-size:14px;font-weight:700'>"+r.name+"</span>"));
+    var t=h("input"); t.type="text"; t.autocomplete="organization"; t.placeholder="Legal name, e.g. ____ LLC"; t.value=S["llc_"+r.key]||""; t.style.cssText="width:100%;font-size:17px;margin-top:6px";
+    t.oninput=function(){ S["llc_"+r.key]=t.value.trim(); save(); }; w.appendChild(t); ag.appendChild(w); });
+  var how=h("div","q"); how.innerHTML='<b>How rewards work until we flip the switch on Toast</b><ul style="margin:6px 0 0;padding-left:20px;font-size:14.5px"><li><b>Earning:</b> after paying, the guest taps <b>Add my visit</b> in the app and snaps the Toast receipt (or types the check # and total) and gets 10 points per $1. Limits: one claim per check, one per day, a cap per claim.</li><li><b>Redeeming:</b> the guest taps <b>Use reward</b> on <i>their</i> phone. A live pass shows a moving background, a ticking clock and a 10-minute countdown, and it can only be used once. Your server taps the matching <b>reward button in Toast</b>.</li><li><b>Spot-check:</b> a manager log lists every reward used and every receipt claim, with Approve and Flag buttons.</li><li><b>When Toast approves:</b> earning becomes automatic and Redeem moves into Toast. Everyone keeps their points. No monthly fee until then.</li></ul>'; IB.appendChild(how);
+  REST.forEach(function(r){ var cfg=INTERIM[r.key]||{}; var btns=cfg.buttons||[];
+    var box=h("div","q"); box.innerHTML='<b>'+r.name+': '+btns.length+' reward buttons to add in Toast (about 10 minutes, Antidote does it with you)</b><ol style="margin:6px 0 0;padding-left:22px;font-size:14px">'+btns.map(function(b){ return '<li><b>'+b[0]+'</b> <span style="color:var(--dim)">· '+b[1]+'</span></li>'; }).join("")+'</ol><div style="color:var(--dim);font-size:13px;margin-top:6px">In Toast Web: Menus › Discounts › Add discount. Staff who redeem need the Discounts permission.</div>'; IB.appendChild(box);
+    q(IB,"interim_ok_"+r.key,"OK to start interim mode at "+r.short+"?",["Yes, start interim mode","Wait for Toast","Call me first"],"Guests earn with receipt photos and redeem with the live pass until Toast is connected.");
+    q(IB,"toastbtn_"+r.key,"Add the "+btns.length+" reward buttons in "+r.short+"'s Toast (about 10 minutes)",["Book 10 minutes with Antidote","Already added them","I need help"],"We sit with you in Toast Web and add them together.");
+  });
+  q(IB,"toastrep","Tell your Toast rep you want SousShift loyalty connected?",["I'll message them","Already did","Skip"],"Optional. Toast approves integrations faster when restaurants ask for them.");
+}
 var L=document.getElementById("launch");
 q(L,"date","When should we go live?",["This coming Monday","Wednesday","Friday","Next weekend"]);
 REST.forEach(function(r){ var d=h("div","q"); d.appendChild(h("b",null,"How many tables at "+r.short+"? (include the patio and bar seats)"));
@@ -223,7 +246,7 @@ drawAgents();
 function setupDone(path,cb){ var f=document.createElement("iframe"); f.style.display="none"; f.src=path; document.body.appendChild(f);
   f.onload=function(){ var t=""; try{ t=f.contentWindow.SETUP_SUMMARY(); }catch(e){ t="(couldn't read this page's answers)"; } var ls=0; try{ ls=Object.keys(f.contentWindow.localStorage).filter(function(k){ return /setup/.test(k); }).length; }catch(e){} cb(t); setTimeout(function(){ f.remove(); },50); }; }
 function progress(){
-  var keys=[].concat.apply([],REST.map(function(r){ return ["pos_"+r.key,"posway_"+r.key,"tables_"+r.key]; })).concat(["date","ig","msghow","fwd","staff","assets","ready"]), n=keys.filter(function(k){ return S[k]; }).length;
+  var keys=[].concat.apply([],REST.map(function(r){ return ["pos_"+r.key,"posway_"+r.key,"tables_"+r.key].concat(typeof INTERIM!=="undefined"&&INTERIM?["llc_"+r.key,"interim_ok_"+r.key,"toastbtn_"+r.key]:[]); })).concat(["date","ig","msghow","fwd","staff","assets","ready"]), n=keys.filter(function(k){ return S[k]; }).length;
   var t=n+" of "+keys.length+" launch questions answered"; document.getElementById("prog").textContent=t; document.getElementById("prog2").textContent=t;
   if(typeof draw==="function") REST.forEach(function(r){ draw(r); });
   if(typeof drawAgents==="function") drawAgents();
@@ -237,6 +260,9 @@ document.getElementById("send").onclick=function(){
   (function next(){ if(i<REST.length){ var r=REST[i++]; setupDone("../../"+r.setup+"index.html",function(t){ sums.push(t); next(); }); return; }
     var out=["LAUNCH CHECKLIST — "+OWNER+" ("+REST.map(function(r){ return r.short; }).join(" + ")+")",""];
     out.push("REGISTERS"); REST.forEach(function(r){ out.push("• "+r.short+": "+(S["pos_"+r.key]||"(no answer)")+" — "+(S["posway_"+r.key]||"(no answer)")); });
+    if(INTERIM){ out.push("","AGREEMENTS (signer: "+OWNER+")"); REST.forEach(function(r){ out.push("• "+r.short+" LLC legal name: "+(S["llc_"+r.key]||"(missing)")); });
+      out.push("","INTERIM MODE (until Toast is connected)"); REST.forEach(function(r){ out.push("• "+r.short+": "+(S["interim_ok_"+r.key]||"(no answer)")+" · Toast buttons: "+(S["toastbtn_"+r.key]||"(no answer)")); }); out.push("• Toast rep: "+(S["toastrep"]||"(no answer)")); }
+    out.push("","OWNER SUPPORT TEXTS: "+(S.sms_optin?"opted in "+S.sms_optin:"not opted in"));
     out.push("","LAUNCH WEEK");
     var rows=[["date","Go live"]].concat(REST.map(function(r){ return ["tables_"+r.key,r.short+" tables"]; })).concat([["print","Print"],["ig","IG bio links"],["msgs","Messages go to"],["msghow","Message by"],["fwd","Call forwarding"],["staff","Staff walkthrough"],["assets","Logos & prices"],["gmail","Google email"],["ready","Before launch"]]);
     rows.forEach(function(p){ var v=S[p[0]]; out.push("• "+p[1]+": "+(Array.isArray(v)?v.join(", "):(v||"(no answer)"))); });
@@ -247,4 +273,6 @@ document.getElementById("send").onclick=function(){
     if(navigator.share){ navigator.share({title:"Launch checklist",text:txt}).catch(function(){}); } else { location.href="sms:&body="+encodeURIComponent(txt); }
   })();
 };
-</script></body></html>
+</script>
+<script src="../../demo/poweredby.js?v=20261013a" defer></script>
+</body></html>

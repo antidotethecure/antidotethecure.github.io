@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="ice.css?v=20261011b">
+<link rel="stylesheet" href="ice.css?v=20261013a">
 <style>
 html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 body{display:flex;flex-direction:column;height:100dvh}
@@ -35,6 +35,7 @@ body{display:flex;flex-direction:column;height:100dvh}
 .inner{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;max-width:560px;width:100%;margin:0 auto;padding:18px 16px 8px;opacity:.25;transform:scale(.97);transition:opacity .45s,transform .45s}
 .card-s.on .inner{opacity:1;transform:none}
 .big-emoji{font-size:64px;line-height:1;margin-bottom:10px}
+img.app-icon{display:block;width:96px;height:96px;margin:0 auto 12px;filter:drop-shadow(0 10px 26px rgba(255,77,151,.4))}
 .t1{font-family:"Orbitron",sans-serif;font-weight:900;font-size:clamp(28px,8.4vw,44px);line-height:1.12;margin:0}
 .t2{font-size:clamp(19px,5vw,23px);color:var(--silver);margin:12px 0 0;line-height:1.3;font-weight:600}
 .t2 b{color:var(--gold)}
@@ -147,7 +148,7 @@ body{display:flex;flex-direction:column;height:100dvh}
 .tier .est-l b{color:var(--good);font-family:"Orbitron",sans-serif}
 .tiers-note{margin-top:10px;font-size:14px;color:var(--dim);font-weight:700}
 
-@media (max-height:640px){.big-emoji{font-size:48px}.homes span{font-size:28px}.how3 .i div{width:64px;height:64px;font-size:32px}.phone{padding-top:34px}}
+@media (max-height:640px){.big-emoji{font-size:48px}img.app-icon{width:72px;height:72px}.homes span{font-size:28px}.how3 .i div{width:64px;height:64px;font-size:32px}.phone{padding-top:34px}}
 @media (prefers-reduced-motion:reduce){.track,.inner{transition:none}}
 </style>
 </head>
@@ -175,7 +176,7 @@ body{display:flex;flex-direction:column;height:100dvh}
       <div class="inner">
         <p class="kick" data-t="k2">How it works</p>
         <h1 class="t1 chrome" data-t="h2">Now their phone rings.</h1>
-        <img class="qr-art" src="img/qr-designer.png?v=20261012c" onerror="this.onerror=null;this.src='qr-sticker.png'" alt="" data-t-alt="qrAlt" width="340" height="340">
+        <img class="qr-art" src="img/qr-designer.png?v=20261021a" onerror="this.onerror=null;this.src='qr-sticker.png'" alt="" data-t-alt="qrAlt" width="340" height="340">
         <div class="how3">
           <div class="i"><div aria-hidden="true">🔲</div><b data-t="i1">Scan the QR on your truck</b></div>
           <div class="ar" aria-hidden="true">→</div>
@@ -244,7 +245,7 @@ body{display:flex;flex-direction:column;height:100dvh}
         <h1 class="t1 chrome" data-t="h5">Try it yourself.</h1>
         <div class="phone" aria-hidden="true">
           <div class="clock">4:12</div>
-          <div class="ring on"><div class="ic">🍦</div><div><small data-t="phApp">Paletas El Sol · now</small><b data-t="phTitle">The truck is on your street!</b><span data-t="phBody">0.2 mi away, about 3 min 🎶</span></div></div>
+          <div class="ring on"><div class="ic app"><img src="demo/icon-192.png?v=20261013a" alt=""></div><div><small data-t="phApp">Paletas El Sol · now</small><b data-t="phTitle">The truck is on your street!</b><span data-t="phBody">0.2 mi away, about 3 min 🎶</span></div></div>
         </div>
         <a class="btn primary" href="demo/" style="margin-top:20px;min-height:58px;font-size:15px" data-t="demo">Open the demo →</a>
       </div>
@@ -261,7 +262,7 @@ body{display:flex;flex-direction:column;height:100dvh}
 
     <section class="card-s" aria-roledescription="slide">
       <div class="inner">
-        <div class="big-emoji" aria-hidden="true">🍦</div>
+        <img class="big-emoji app-icon" src="demo/icon-192.png?v=20261013a" alt="" width="96" height="96">
         <h1 class="t1 chrome" data-t="h6">Let's set you up.</h1>
         <p class="t2" data-t="p6">Your truck's name. Your menu. <b>Your customers' phones ringing.</b></p>
         <div class="cta">
@@ -365,10 +366,10 @@ es: {
   subject: "App para troque de helados", body: "Hola Antidote, tengo un troque de helados y quiero el plan {plan}. Nombre de mi troque: "
 }};
 </script>
-<script src="lang.js?v=20261011b"></script>
-<script src="jingle.js?v=20261011b"></script>
-<script src="model.js?v=20261011b"></script>
-<script src="speak.js?v=20261011b"></script>
+<script src="lang.js?v=20261013a"></script>
+<script src="jingle.js?v=20261013a"></script>
+<script src="model.js?v=20261013a"></script>
+<script src="speak.js?v=20261013a"></script>
 <script>
 (function () {
   "use strict";

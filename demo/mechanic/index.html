@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Your Auto Shop (Demo)</title>
+<meta name="description" content="Demo: an app for any auto repair shop, mobile mechanic, tire shop, quick lube, body shop or detailer. Say or tap what's wrong, get a sample quote, check tire stock, book, track the job and pay by QR. Sample shop by SousShift AI.">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#04060c">
+<link rel="manifest" href="manifest.webmanifest?v=20261017a">
+<link rel="icon" href="favicon.svg?v=20261013c" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png?v=20261013c" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261013c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Your Shop">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="preconnect" href="https://vpic.nhtsa.dot.gov">
+<link rel="preconnect" href="https://api.nhtsa.gov">
+<link rel="stylesheet" href="app.css?v=20261017a">
+<link rel="stylesheet" href="beforeafter.css?v=20261013a">
+<link rel="stylesheet" href="stores.css?v=20261013s">
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <img id="logo" src="icon-192.png?v=20261013c" alt="" width="40" height="40">
+  <b><span id="bName">Your Auto Shop</span><small><span data-brand="tagline">Auto Repair</span> <span class="demo-tag">Demo</span></small></b>
+  <span class="sp"></span>
+  <button class="bell" id="bell" type="button" data-t-aria="bellAria" aria-label="Alerts">🔔<i id="bellN" hidden>0</i></button>
+  <div class="lt" role="group" aria-label="Language / Idioma"><button data-lang="en" aria-pressed="true" lang="en">EN</button><button data-lang="es" aria-pressed="false" lang="es">ES</button></div>
+</div></div>
+<nav class="snav" aria-label="Sections"><div class="wrap">
+  <a href="#services" data-t="navSvc">Services</a><a href="#tires" data-t="navTires">Tires</a><a href="#pay" data-t="navPay">Pay</a><a href="#garage" data-t="navGarage">My Garage</a><a href="#car" data-t="navCar">Your car</a><a href="#diagram" data-t="navTap">What's wrong</a><a href="#scan" data-t="navScan">Scan</a><a href="#quote" data-t="navQuote">Quote</a><a href="#book" data-t="navBook">Book</a><a href="#track" data-t="navTrack">Track</a><a href="#alerts" data-t="navAlerts">Alerts</a>
+</div></nav>
+
+<main class="wrap">
+  <section class="hero" aria-labelledby="h1">
+    <div class="bizsw" role="group" data-t-aria="bizAria" aria-label="Business type"><span class="bizk" data-t="bizK">Demo · show it as</span><div class="bizb" id="bizSw"></div></div>
+    <div id="heroScene"></div>
+    <div class="openbar" id="openbar"><i></i><span id="openTxt"></span></div>
+    <h1 id="h1" class="chrome" data-t="heroH">Fixed right. <em>Priced up front.</em></h1>
+    <p data-t="heroP">Tap your car, get a price range in seconds, pick a time, and watch the repair move along, right here on your phone.</p>
+    <div class="stat"><span id="stArea" data-brand="area"></span><span id="stCity"></span></div>
+    <p class="privacy" data-t="addrPriv">📍 Exact address is sent after your booking is confirmed.</p>
+    <div class="row">
+      <a class="btn primary" href="#diagram" data-t="heroGo">🔧 Build my quote</a>
+      <a class="btn ghost" id="callBtn" href="tel:+15550100000" data-t="heroCall">📞 Call / text</a>
+    </div>
+    <nav class="quick" aria-label="Quick actions" id="quick">
+      <a href="#diagram"><span aria-hidden="true">🔎</span><b data-t="qkFix">What's wrong?</b></a>
+      <a href="#tires" id="qkTires"><span aria-hidden="true">🛞</span><b data-t="qkTires">Tire size + stock</b></a>
+      <a href="#pay"><span aria-hidden="true">📱</span><b data-t="qkPay">Pay with QR</b></a>
+      <a href="#book"><span aria-hidden="true">🗓️</span><b data-t="qkBook">Book a time</b></a>
+      <a href="#track"><span aria-hidden="true">📍</span><b data-t="qkTrack">Track my car</b></a>
+    </nav>
+  </section>
+
+  <section class="s" id="services">
+    <header><p class="kick" data-t="svcKick">What we do</p><h2 class="chrome" data-t="svcH">Services</h2><p class="lead" data-t="svcLead">Tap any service to add it to your job. Sample prices, final quote after inspection.</p></header>
+    <div class="svcs" id="svcList"></div>
+    <div class="card" style="margin-top:16px">
+      <p class="kick" data-t="baKick">Before / after</p>
+      <h3 data-t="baH">Drag the slider</h3>
+      <p class="note" data-t="baNote">Placeholder art for the demo. The shop's real before/after photos go here.</p>
+      <div class="bas" id="baList" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+
+  <section class="s" id="tires">
+    <header><p class="kick" data-t="tiKick">Tire stock</p><h2 class="chrome" data-t="tiH">Check my tire size</h2><p class="lead" data-t="tiLead">Type the size from your tire's sidewall. See right away if it's in stock and hold a set.</p></header>
+    <div class="card">
+      <form id="tiForm" autocomplete="off">
+        <label class="fld"><span data-t="tiL">Tire size (any format)</span><input id="tiIn" maxlength="24" placeholder="225/45R17" autocapitalize="characters" spellcheck="false" enterkeyhint="search"></label>
+        <div class="tirow">
+          <label class="fld"><span data-t="tiQty">How many?</span><select id="tiQty"><option value="1">1</option><option value="2">2</option><option value="4" selected>4</option><option value="5">5</option><option value="6">6</option></select></label>
+          <button class="btn cyan" type="submit" data-t="tiGo">🔎 Check stock</button>
+        </div>
+      </form>
+      <p class="note" data-t="tiEx">Works with 225/45R17, 225 45 17 or P225/45ZR17.</p>
+      <div id="tiOut" aria-live="polite"></div>
+      <details class="more tiwhere"><summary data-t="tiWhere">Where to find your size</summary>
+        <svg class="sidewall" viewBox="0 0 320 150" role="img" aria-label="P225/45R17 94V"><defs><path id="swArc" d="M28 150 A132 132 0 0 1 292 150"/></defs>
+          <path d="M10 150 A150 150 0 0 1 310 150" fill="none" stroke="#1d2b4a" stroke-width="34"/><path d="M58 150 A102 102 0 0 1 262 150" fill="none" stroke="#2b3a63" stroke-width="3"/>
+          <text font-family="Orbitron,sans-serif" font-size="19" font-weight="800" fill="#eef3ff" letter-spacing="1"><textPath href="#swArc" startOffset="50%" text-anchor="middle">P225/45R17 94V</textPath></text>
+          <g font-family="Rajdhani,sans-serif" font-size="14" font-weight="700" fill="#2de2ff"><text x="160" y="84" text-anchor="middle" data-t="swW">225 = width (mm)</text><text x="160" y="104" text-anchor="middle" data-t="swA">45 = height (% of width)</text><text x="160" y="124" text-anchor="middle" data-t="swR">R17 = 17" wheel</text></g></svg>
+        <p class="note" data-t="tiWhereP">It's printed on the side of every tire.</p>
+      </details>
+    </div>
+    <div class="card">
+      <p class="kick" data-t="tiListK">In stock now</p>
+      <div class="tfil" id="tiFil" role="group" data-t-aria="tiFilA" aria-label="Tire type"></div>
+      <div class="tlist" id="tiList"></div>
+      <p class="note" data-t="tiSample">Sample inventory and sample brands for the demo.</p>
+    </div>
+  </section>
+
+  <section class="s" id="garage">
+    <header><p class="kick" data-t="garKick">Saved on this phone</p><h2 class="chrome" data-t="garH">My Garage</h2><p class="lead" data-t="garLead">Your cars, their recalls, scan history, service history and what's due next.</p></header>
+    <div id="garageList"></div>
+  </section>
+
+  <section class="s" id="car">
+    <header><p class="kick" data-t="carKick">Step 1</p><h2 class="chrome" data-t="carH">Your car</h2><p class="lead" data-t="carLead">Pick year, make and model, or decode your VIN.</p></header>
+    <div class="card">
+      <div class="grid2">
+        <div class="fld cbx"><span id="yearLbl" data-t="yearL">Year</span><div class="cb" id="yearC"><input id="yearI" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="yearList" aria-labelledby="yearLbl" inputmode="numeric" autocomplete="off" spellcheck="false"><button class="cbt" type="button" tabindex="-1" aria-hidden="true">▾</button><ul id="yearList" role="listbox" hidden></ul></div></div>
+        <div class="fld cbx"><span id="makeLbl" data-t="makeL">Make</span><div class="cb" id="makeC"><input id="makeI" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="makeList" aria-labelledby="makeLbl" autocomplete="off" spellcheck="false" autocapitalize="words"><button class="cbt" type="button" tabindex="-1" aria-hidden="true">▾</button><ul id="makeList" role="listbox" hidden></ul></div></div>
+      </div>
+      <div class="fld cbx"><span id="modelLbl" data-t="modelL">Model</span><div class="cb" id="modelC"><input id="modelI" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="modelList" aria-labelledby="modelLbl" autocomplete="off" spellcheck="false" disabled><button class="cbt" type="button" tabindex="-1" aria-hidden="true">▾</button><ul id="modelList" role="listbox" hidden></ul></div></div>
+      <label class="fld" id="modelTxtF" hidden><span data-t="modelTxtL">Type your make + model</span><input id="modelTxt" maxlength="40" autocomplete="off"></label>
+      <p class="note" id="modelMsg" aria-live="polite"></p>
+      <div class="vinrow">
+        <label class="fld"><span data-t="vinL">VIN (optional)</span><input id="vin" maxlength="17" autocomplete="off" autocapitalize="characters" spellcheck="false" data-t-ph="vinPh" placeholder="17 characters"></label>
+        <button class="btn ghost" id="vinBtn" type="button" data-t="vinBtn">Decode</button>
+      </div>
+      <p class="note" id="vinMsg" aria-live="polite"></p>
+      <details class="more" id="moreD"><summary data-t="moreSum">Engine, drivetrain, trim (optional)</summary>
+        <p class="note" style="margin-top:0" data-t="moreNote">A VIN fills these in. Otherwise pick what you know: it makes the parts list and the "what to ask" script more exact.</p>
+        <div class="grid2">
+          <label class="fld"><span data-t="engL">Engine size</span><select id="eng"></select></label>
+          <label class="fld" id="fuelF"><span data-t="fuelL">Fuel</span><select id="fuel"><option value="" data-t="notSure">Not sure</option><option value="gas" data-t="f_gas">Gas</option><option value="hybrid" data-t="f_hybrid">Hybrid</option><option value="diesel" data-t="f_diesel">Diesel</option></select></label>
+          <label class="fld"><span data-t="driveL">Drivetrain</span><select id="drive"><option value="" data-t="notSure">Not sure</option><option value="FWD">FWD</option><option value="RWD">RWD</option><option value="AWD">AWD</option><option value="4WD">4WD / 4x4</option></select></label>
+          <label class="fld"><span data-t="trimL">Trim</span><input id="trim" maxlength="24" autocomplete="off" data-t-ph="trimPh" placeholder="EX, XLT, Sport…"></label>
+          <label class="fld"><span data-t="lightsL">Headlights</span><select id="lights"><option value="" data-t="notSure">Not sure</option><option value="halogen" data-t="l_halogen">Halogen</option><option value="hid" data-t="l_hid">HID / xenon</option><option value="led" data-t="l_led">LED</option></select></label>
+          <label class="fld"><span data-t="absL">ABS brakes</span><select id="abs"><option value="" data-t="notSure">Not sure</option><option value="yes" data-t="yes">Yes</option><option value="no" data-t="no">No</option></select></label>
+        </div>
+        <p class="note" style="margin:4px 0" data-t="bodyL">Body style</p>
+        <div class="bodypick" id="bodyPick" role="group" aria-label="Body style">
+          <button type="button" data-body="sedan" data-t="b_sedan">Sedan</button><button type="button" data-body="hatch" data-t="b_hatch">Hatchback</button><button type="button" data-body="coupe" data-t="b_coupe">Coupe</button>
+          <button type="button" data-body="suv" data-t="b_suv">SUV</button><button type="button" data-body="van" data-t="b_van">Van</button><button type="button" data-body="truck" data-t="b_truck">Pickup</button>
+        </div>
+      </details>
+      <div class="paintbox">
+        <p class="fldl" data-t="paintL">Paint color</p>
+        <div class="swatches" id="paintPick" role="group" data-t-aria="paintL" aria-label="Paint color"></div>
+        <label class="fld"><span data-t="paintCodeL">Paint code (optional)</span><input id="paintCode" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="NH-731P, 1G3, PSW…"></label>
+        <p class="note" style="margin-top:-4px" data-t="paintCodeHint">It's on the sticker in the driver's door jamb (look for PAINT, C/TR or EXT). Body shops use it to match paint.</p>
+        <div class="photorow">
+          <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
+          <button class="btn ghost small" id="photoBtn" type="button" data-t="photoBtn">📷 Take or upload a photo of your car</button>
+          <div id="photoPrev"></div>
+        </div>
+        <p class="note" id="photoMsg" aria-live="polite"></p>
+        <p class="soon"><span aria-hidden="true">🔒</span> <span data-t="soonId">Identify my car from a photo: coming soon.</span><br><span aria-hidden="true">🔒</span> <span data-t="soon3d">3D model of your car from a photo: premium add-on, coming soon.</span></p>
+      </div>
+      <div class="grid2">
+        <label class="fld"><span data-t="milesL">Mileage</span><input id="miles" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="85,000"></label>
+        <span></span>
+      </div>
+      <label class="fld"><span data-t="probL">What's going on?</span><textarea id="problem" maxlength="400" enterkeyhint="search" data-t-ph="probPh" placeholder="Squeaks when I brake, check-engine light came on…"></textarea></label>
+      <button class="btn cyan w100" id="probGo" type="button" style="margin-top:8px" data-t="fdGo">🔎 Find the fix + price</button>
+      <div class="carbadge" id="carBadge" hidden><span id="carMini"></span><div><b id="carName"></b><small id="carSub"></small></div></div>
+      <button class="btn cyan w100" id="saveGarage" type="button" style="margin-top:10px" hidden data-t="saveGarage">🏠 Save to My Garage</button>
+      <p class="src" data-t="vpicSrc">Make / model / VIN data: NHTSA vPIC (free public U.S. government database). Saved on this phone only.</p>
+    </div>
+    <div class="card issues" id="issues" hidden aria-live="polite">
+      <p class="kick" data-t="issKick">Known issues for your car</p>
+      <h3 id="issuesCar"></h3>
+      <p class="sub" data-t="recallsH">Safety recalls</p>
+      <div id="recalls"></div>
+      <p class="sub" data-t="complaintsH">What owners report most</p>
+      <div id="complaints"></div>
+      <p class="src" id="issuesSrc"></p>
+    </div>
+    <div class="card tesla" id="teslaCard" hidden>
+      <p class="kick" data-t="tsKick">Tesla owners</p>
+      <h3 data-t="tsH">Your Tesla</h3>
+      <p id="tsOta" class="note"></p>
+      <p class="sub" data-t="tsSwH">Latest software updates</p>
+      <ul class="tslinks">
+        <li data-t="tsSw1">In the car: <b>Controls › Software</b> shows your version and the release notes.</li>
+        <li><a href="https://www.notateslaapp.com/software-updates/" target="_blank" rel="noopener">Not a Tesla App: software updates ↗</a> <small data-t="tsSw2">(independent news site, release notes per version)</small></li>
+        <li><a href="https://www.teslafi.com/firmware.php" target="_blank" rel="noopener">TeslaFi firmware tracker ↗</a> <small data-t="tsSw3">(which versions are rolling out right now)</small></li>
+      </ul>
+      <p class="sub" data-t="tsTipsH">Tips</p>
+      <ul class="tslinks">
+        <li data-t="tsTip1">Many Tesla recalls are fixed with a free over-the-air update: keep the car on Wi-Fi and install updates.</li>
+        <li data-t="tsTip2">Tesla's manual: rotate tires every 6,250 mi (10,000 km) or at a 2/32" tread difference, cabin air filter every 2 years, brake fluid checked every 4 years.</li>
+        <li data-t="tsTip3">Alerts on the screen (Controls › Service) tell the mechanic more than a generic scanner can.</li>
+      </ul>
+      <p class="src"><span data-t="tsSrc">Intervals: Tesla Model 3 service manual,</span> <a href="https://service.tesla.com/docs/Model3/ServiceManual/en-us/GUID-B8F74731-ACEA-4CEC-9516-EF6DF9AB9D9A.html" target="_blank" rel="noopener">service.tesla.com ↗</a></p>
+      <p class="soon"><span aria-hidden="true">🔒</span> <span data-t="tsLive">Live battery, software version and service alerts need Tesla's official Fleet API sign-in: coming later. This app never asks for your Tesla password.</span></p>
+    </div>
+    <div class="card dgm" id="dgmCard" hidden>
+      <p class="kick" data-t="dgKick">Exploded view</p>
+      <h3 id="dgH"></h3>
+      <button class="dgimg" id="dgOpen" type="button"><img id="dgImg" alt="" width="1100" height="825" decoding="async"><span class="dgzoom" data-t="dgZoom">⤢ Tap to zoom</span></button>
+      <p class="dglbl"><span aria-hidden="true">ⓘ</span> <span data-t="dgLabel">Illustration — for reference, not a factory diagram.</span> <span id="dgTable" data-t="dgTable">Numbers drawn in the picture are not checked: use the verified specs below.</span></p>
+      <p class="note" id="dgYear" hidden></p>
+      <p class="sub" data-t="dgSpecH">Verified specs</p>
+      <div class="dgspec" id="dgSpec"></div>
+      <p class="sub" data-t="dgJump">Tap a part to add it to your job</p>
+      <div class="chipline" id="dgChips"></div>
+    </div>
+    <p class="soon" id="dgSoon" hidden><span aria-hidden="true">🔩</span> <span data-t="dgSoon">Exploded-view diagram for this model: coming soon.</span></p>
+  </section>
+
+  <section class="s" id="diagram">
+    <header><p class="kick" data-t="tapKick">Step 2</p><h2 class="chrome" data-t="tapH">Type it or tap it</h2><p class="lead" data-t="tapLead">Say what's wrong in your own words, or tap a glowing spot on the car.</p></header>
+    <div class="card finder" id="finder">
+      <form id="fdForm" autocomplete="off">
+        <label class="fld"><span data-t="fdL">What's wrong with it?</span><textarea id="fdIn" maxlength="300" enterkeyhint="search" rows="2" data-t-ph="fdPh" placeholder="Electrical is acting up, steering feels loose, control arm…"></textarea></label>
+        <button class="btn cyan w100" type="submit" style="margin-top:8px" data-t="fdGo">🔎 Find the fix + price</button>
+      </form>
+      <p class="note" id="fdFor" aria-live="polite"></p>
+      <div id="fdOut" aria-live="polite"></div>
+    </div>
+    <div class="views" role="group" data-t-aria="viewAria" aria-label="Car view">
+      <button type="button" data-view="side" aria-pressed="true" data-t="vSide">Side</button>
+      <button type="button" data-view="front" aria-pressed="false" data-t="vFront">Front</button>
+      <button type="button" data-view="back" aria-pressed="false" data-t="vBack">Back</button>
+    </div>
+    <div class="stage"><div class="grid"></div>
+      <div class="carwrap" id="carwrap"></div>
+      <div class="legend"><span id="viewLbl"></span><span><b id="hsCount">0</b> <span data-t="inJob">in your job</span></span></div>
+    </div>
+    <p class="hint"><span aria-hidden="true">👆</span><span data-t="tapHint">Flip to Front / Back for the battery, A/C, the other tires and the trunk.</span></p>
+  </section>
+
+  <section class="s" id="scan">
+    <header><p class="kick" data-t="scKick">Check-engine light?</p><h2 class="chrome" data-t="scH">Scan my car</h2><p class="lead" data-t="scLead">Read the trouble codes yourself, see what they mean and add the likely fix to your quote.</p></header>
+    <div class="scanwarn"><span aria-hidden="true">⚠️</span><span data-t="scDisc">Codes point to a system, not a guaranteed part. Final diagnosis by the mechanic.</span></div>
+    <div class="card evnote" id="evNote" hidden><p class="kick" data-t="evKick">Electric car</p><p id="evNoteTxt" style="margin:0"></p></div>
+    <p class="note" id="scanFor"></p>
+    <div class="card" id="btCard">
+      <p class="kick" data-t="btKick">Option A · Bluetooth adapter</p>
+      <h3 data-t="btH">Plug in a Bluetooth OBD-II reader</h3>
+      <p class="note" data-t="btP">Plug a Bluetooth LE (BLE) ELM327 adapter into the port under the dash, turn the key to ON, then tap Connect. Read-only: this app never clears codes.</p>
+      <p class="note" id="btSupport"></p>
+      <button class="btn cyan w100" id="btGo" type="button" style="margin-top:8px" data-t="btGo">🔌 Connect &amp; read codes</button>
+      <p class="note" id="btMsg" aria-live="polite"></p>
+      <details class="more"><summary data-t="adH">Which adapter works?</summary>
+        <ul class="adapters">
+          <li data-t="ad1"><b>Veepeak OBDCheck BLE+</b> (Bluetooth LE, budget)</li>
+          <li data-t="ad2"><b>Vgate iCar Pro BLE 4.0</b> (Bluetooth LE, budget)</li>
+          <li data-t="ad3"><b>OBDLink CX</b> (Bluetooth LE, premium, very reliable)</li>
+        </ul>
+        <p class="note" data-t="adNote">Get a "BLE" / "Bluetooth 4.0" model. Classic-Bluetooth and Wi-Fi adapters can't talk to a web page. Works in Chrome on Android, Chrome on a computer, and the Bluefy browser on iPhone (Safari on iPhone can't use Bluetooth).</p>
+      </details>
+    </div>
+    <div class="card">
+      <p class="kick" data-t="mKick">Option B · Type the code</p>
+      <form class="codeform" id="codeForm" autocomplete="off">
+        <label class="fld"><span data-t="codeL">Code from any scanner or the parts-store check</span><input id="codeIn" maxlength="6" placeholder="P0420" autocapitalize="characters" spellcheck="false"></label>
+        <button class="btn primary" type="submit" data-t="codeGo">Look up</button>
+      </form>
+      <p class="note" id="codeMsg" aria-live="polite"></p>
+      <button class="btn ghost w100" id="simBtn" type="button" style="margin-top:10px" data-t="simBtn">🧪 Try a demo scan (no adapter)</button>
+    </div>
+    <div id="scanOut" aria-live="polite"></div>
+    <p class="src" data-t="obdSrc">Code meanings: standard SAE J2012 generic codes (2,128 built in). Manufacturer-specific codes are looked up by the mechanic.</p>
+  </section>
+
+  <section class="s" id="quote">
+    <header><p class="kick" data-t="qKick">Step 3</p><h2 class="chrome" data-t="qH">Instant quote</h2></header>
+    <div class="card">
+      <div class="job" id="jobList"></div>
+      <div class="tot" id="tot" hidden>
+        <p class="kick" style="margin:0" data-t="estTotal">Estimated total</p>
+        <div class="big" id="totBig"></div>
+        <dl>
+          <dt data-t="parts">Parts</dt><dd id="tParts"></dd>
+          <dt id="tLabL">Labor</dt><dd id="tLab"></dd>
+          <dt data-t="trip" id="tTripL">Trip fee</dt><dd id="tTrip"></dd>
+          <dt data-t="time">Time on the car</dt><dd id="tTime"></dd>
+          <dt data-t="arrive">We arrive</dt><dd id="tArr"></dd>
+          <dt data-t="readyBy">Ready by about</dt><dd class="rb" id="tReady"></dd>
+        </dl>
+        <p class="disc" data-t="disc">⚠️ Sample prices, final quote after inspection.</p>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <a class="btn ghost" href="#book" data-t="pickTime">🗓️ Pick a time</a>
+        <button class="btn primary" id="reqBtn" type="button" data-t="reqBtn">Request this job</button>
+      </div>
+      <div class="row qshare" id="qShare" hidden>
+        <button class="btn ghost small" id="qCopy" type="button" data-t="qCopy">📋 Copy quote</button>
+        <a class="btn ghost small" id="qText" href="sms:" data-t="qText">💬 Text quote</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="book">
+    <header><p class="kick" data-t="bKick">Step 4</p><h2 class="chrome" data-t="bH">Availability</h2><p class="lead" data-t="bLead">Open arrival windows this week. Tap one to hold it for your job.</p></header>
+    <div class="card">
+      <div class="days" id="days" role="group" data-t-aria="daysAria" aria-label="Pick a day"></div>
+      <div class="slots" id="slots"></div>
+      <div class="legend2"><span><i style="background:color-mix(in srgb,var(--good) 35%,transparent)"></i><span data-t="lgOpen">Open</span></span><span><i style="background:var(--accent)"></i><span data-t="lgPick">Your pick</span></span><span><i style="background:#ffffff14"></i><span data-t="lgBooked">Booked</span></span></div>
+      <p class="note" id="slotMsg" aria-live="polite"></p>
+    </div>
+    <div class="card">
+      <p class="kick" data-t="hKick">Hours</p>
+      <div class="hrs" id="hours"></div>
+    </div>
+  </section>
+
+  <section class="s" id="track">
+    <header><p class="kick" data-t="tKick">In your pocket</p><h2 class="chrome" data-t="tH">Job tracker</h2><p class="lead" data-t="tLead">Every update from the mechanic shows up here.</p></header>
+    <div class="card" id="reqCard">
+      <p class="kick" data-t="myReq">My requests</p>
+      <div class="reqs" id="reqs"></div>
+    </div>
+    <div class="card" id="trackCard"></div>
+  </section>
+
+
+  <section class="s" id="pay">
+    <header><p class="kick" data-t="payKick">Checkout</p><h2 class="chrome" data-t="payH">Pay with QR</h2><p class="lead" data-t="payLead">Customers scan, pick how they pay, done. Faster checkout, no waiting at the counter.</p></header>
+    <div class="card paycard">
+      <div class="payrow">
+        <div class="qrbox" id="payQr" aria-label="Sample pay QR code" role="img"></div>
+        <div class="paytx"><p class="kick" style="margin:0" data-t="payScan">Scan to pay</p><b id="payName"></b><small id="payAmt"></small></div>
+      </div>
+      <p class="sub" data-t="payAcc">We accept</p>
+      <div class="paym" id="payMethods"></div>
+      <ol class="paysteps"><li data-t="payS1">Scan the code with your phone's camera</li><li data-t="payS2">Pick how you want to pay</li><li data-t="payS3">Done. Your receipt is texted to you</li></ol>
+      <div class="row">
+        <button class="btn primary" id="payTry" type="button" data-t="payTry">📱 Try the pay screen</button>
+        <button class="btn ghost" id="payPrint" type="button" data-t="payPrint">🖨️ Counter / bay QR card</button>
+      </div>
+      <div class="demo-note"><i aria-hidden="true">🧪</i><span data-t="payDemo"><b>Demo:</b> no real payment is processed.</span></div>
+    </div>
+  </section>
+
+  <section class="s" id="alerts">
+    <header><p class="kick" data-t="aKick">Alerts</p><h2 class="chrome" data-t="aH">Tell me when it's almost done</h2></header>
+    <div class="card">
+      <label class="sw"><span><span data-t="aApp">In-app alerts</span><small data-t="aAppS">Pop-ups + the 🔔 inbox on this page</small></span><input type="checkbox" id="aApp" checked></label>
+      <label class="sw"><span><span data-t="aText">📲 Text me when it's almost done</span><small data-t="aTextS">And when it's ready</small></span><input type="checkbox" id="aText"></label>
+      <label class="fld" id="aPhoneF" hidden><span data-t="aPhone">Mobile number</span><input id="aPhone" type="tel" inputmode="tel" maxlength="20" autocomplete="off" placeholder="(555) 010-0199"></label>
+      <label class="sw"><span><span data-t="aEmail">✉️ Email me when it's almost done</span><small data-t="aEmailS">And when it's ready</small></span><input type="checkbox" id="aEmail"></label>
+      <label class="fld" id="aMailF" hidden><span data-t="aMail">Email</span><input id="aMail" type="email" maxlength="60" autocomplete="off" placeholder="you@example.com"></label>
+      <button class="btn cyan w100" id="testAlert" type="button" style="margin-top:8px" data-t="testAlert">🔔 Show me a sample alert</button>
+      <div class="demo-note"><i aria-hidden="true">🧪</i><span data-t="aDemo"><b>Demo:</b> nothing is sent and nothing leaves this phone. Real texts go live once the business's texting number is approved by the carriers (Twilio A2P 10DLC, pending). Email will go out through the shop's own Google Apps Script mailer later.</span></div>
+    </div>
+  </section>
+</main>
+
+<footer class="f wrap">
+  <span data-t="foot">Demo app for any auto shop. Shop name, phone, prices and hours are placeholders.</span>
+  <span class="pw"><b>Powered by SousShift AI</b> · <span data-t="pwDemo">Demo</span></span>
+</footer>
+
+<div id="jobpill" aria-live="polite"><div><b id="pillTot"></b><small id="pillN"></small></div><a class="btn primary" href="#quote" data-t="pillGo">Quote →</a></div>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shT"><div class="sc">
+  <div class="grab"></div>
+  <div class="hd"><span class="e" id="shE"></span><div><h3 id="shT"></h3><small id="shS"></small></div><button class="x" type="button" data-close data-t-aria="close" aria-label="Close">✕</button></div>
+  <div id="shPos"></div>
+  <div class="opts" id="shOpts"></div>
+  <div id="shParts"></div>
+  <p class="disc" data-t="disc">⚠️ Sample prices, final quote after inspection.</p>
+  <button class="btn primary w100" id="shSave" type="button" style="margin-top:10px" data-t="shSave">Save to job</button>
+</div></div>
+
+<div class="sheet" id="partsSh" role="dialog" aria-modal="true" aria-labelledby="psT"><div class="sc">
+  <div class="grab"></div>
+  <div class="hd"><span class="e" id="psE">🔩</span><div><h3 id="psT"></h3><small id="psS"></small></div><button class="x" type="button" data-close data-t-aria="close" aria-label="Close">✕</button></div>
+  <div id="psBody"></div>
+</div></div>
+
+<div class="sheet" id="confirm" role="dialog" aria-modal="true" aria-labelledby="cfT"><div class="sc">
+  <div class="grab"></div>
+  <div class="hd"><span class="e">📝</span><div><h3 id="cfT" data-t="cfT">Send this request?</h3><small data-t="cfS">The shop accepts it with a final quote.</small></div><button class="x" type="button" data-close data-t-aria="close" aria-label="Close">✕</button></div>
+  <div id="cfBody"></div>
+  <label class="fld"><span data-t="cfName">First name (optional)</span><input id="cfName" maxlength="30" autocomplete="off" data-t-ph="cfNamePh" placeholder="Alex"></label>
+  <button class="btn primary w100" id="cfSend" type="button" data-t="cfSend">Send request (demo)</button>
+  <p class="note" data-t="cfNote">Demo only: saved on this phone, nothing is sent anywhere.</p>
+</div></div>
+
+<div class="sheet" id="inbox" role="dialog" aria-modal="true" aria-labelledby="ibT"><div class="sc">
+  <div class="grab"></div>
+  <div class="hd"><span class="e">🔔</span><div><h3 id="ibT" data-t="ibT">Alerts</h3><small data-t="ibS">Updates on your jobs</small></div><button class="x" type="button" data-close data-t-aria="close" aria-label="Close">✕</button></div>
+  <div class="inbox" id="ibList"></div>
+</div></div>
+
+
+<div class="sheet" id="paySh" role="dialog" aria-modal="true" aria-labelledby="pyT"><div class="sc">
+  <div class="grab"></div>
+  <div class="hd"><span class="e">📱</span><div><h3 id="pyT" data-t="pyT">Pay your shop</h3><small id="pyS"></small></div><button class="x" type="button" data-close data-t-aria="close" aria-label="Close">✕</button></div>
+  <div class="paytot"><small data-t="pyAmt">Amount</small><b id="pyAmt"></b></div>
+  <p class="note" data-t="pyPick">How do you want to pay?</p>
+  <div class="paypick" id="pyMethods"></div>
+  <p class="note" id="pyMsg" aria-live="polite"></p>
+  <p class="disc" data-t="pyDemo">Demo: nothing is charged and no account is connected.</p>
+</div></div>
+
+<div class="sheet" id="qrSh" role="dialog" aria-modal="true" aria-labelledby="qcT"><div class="sc">
+  <div class="grab"></div>
+  <div class="hd"><span class="e">🖨️</span><div><h3 id="qcT" data-t="qcT">Counter / bay QR card</h3><small data-t="qcS">Print it, tape it at the counter or in each bay</small></div><button class="x" type="button" data-close data-t-aria="close" aria-label="Close">✕</button></div>
+  <label class="fld"><span data-t="qcBay">Label (optional)</span><input id="qcBayIn" maxlength="20" data-t-ph="qcBayPh" placeholder="Bay 1"></label>
+  <div class="qpc" id="qpc">
+    <img id="qpcLogo" src="icon-192.png?v=20261013c" alt="" width="56" height="56">
+    <b class="qpc-n" id="qpcName"></b>
+    <span class="qpc-bay" id="qpcBay" hidden></span>
+    <p class="qpc-k" data-t="payScan">Scan to pay</p>
+    <div class="qpc-qr" id="qpcQr"></div>
+    <div class="qpc-m" id="qpcM"></div>
+    <p class="qpc-x" data-t="payLead">Customers scan, pick how they pay, done. Faster checkout, no waiting at the counter.</p>
+    <p class="qpc-demo" data-t="qcDemo">Sample card · demo link · no real payments</p>
+    <small class="qpc-pby">Powered by SousShift AI · @SousShiftAi</small>
+  </div>
+  <button class="btn primary w100" id="qcPrint" type="button" style="margin-top:12px" data-t="qcPrint">🖨️ Print card</button>
+</div></div>
+
+<div id="banner" role="status" aria-live="assertive"><div class="bn"><div class="ic" id="bnIc"></div><div><small id="bnApp"></small><b id="bnT"></b><span id="bnB"></span><em id="bnD"></em></div></div></div>
+<div id="toast" role="status"></div>
+
+<script>
+window.T = {
+en: {
+  _title: "{name} (Demo)",
+  dgKick: "Exploded view", dgH: "Every part of your {c}", dgZoom: "⤢ Tap to zoom", dgLabel: "Illustration — for reference, not a factory diagram.",
+  dgTable: "Numbers drawn in the picture are not checked: use the verified specs below.", dgSpecH: "Verified specs", dgJump: "Tap a part to add it to your job",
+  dgSoon: "Exploded-view diagram for this model: coming soon.", dgYear: "Drawn from a {d}. Your {y} may look a little different.",
+  dgSpecLoad: "Loading official specs…", dgSpecErr: "Couldn't reach fueleconomy.gov right now.", dgSpecNone: "No EPA listing for this exact year and model. Check the sticker in the driver's door jamb.",
+  dgSpecPick: "Pick the year to see official specs.", dgSrc: "Specs: U.S. EPA / DOE, fueleconomy.gov", dgParts: "Show parts", dgClose: "Close diagram",
+  dgFoot: "Pinch or double-tap to zoom, drag to move. Tap a dot to add that part to your job. AI illustration, not a factory diagram.",
+  dgAlt: "Exploded-view illustration of a {c} showing its major parts", dgTitle: "{c}: exploded view",
+  sp_range: "{v} mi EPA range", sp_mpge: "{v} MPGe", sp_mpg: "{v} MPG combined ({c} city / {h} hwy)", sp_hybrid: "Hybrid",
+  bellAria: "Alerts", close: "Close", navSvc: "Services", navCar: "Your car", navTap: "What's wrong", navQuote: "Quote", navBook: "Book", navTrack: "Track", navAlerts: "Alerts",
+  openNow: "Open now · until {t}", openLater: "Closed now · opens {d} {t}", heroH: "Fixed right. <em>Priced up front.</em>",
+  heroP: "Pick your car, say what's wrong or tap it on the car, see a price range or ask for a quote, book a time and track the job from your phone.",
+  heroGo: "🔧 Build my quote", heroCall: "📞 Call / text",
+  svcKick: "What we do", svcH: "Services", svcLead: "Tap any service to add it to your job. Sample prices, final quote after inspection.",
+  from: "from {p}", addon: "Add-on", baKick: "Before / after", baH: "Drag the slider", baNote: "Placeholder art for the demo. The shop's real before/after photos go here.", before: "Before", after: "After", baDemo: "Sample art",
+  carKick: "Step 1", carH: "Your car", carLead: "Pick year, make and model, or decode your VIN.",
+  yearL: "Year", makeL: "Make", modelL: "Model", pickYear: "Year…", pickMake: "Make…", pickModel: "Model…", otherMake: "Other (type it)", modelTxtL: "Type your make + model",
+  loadingModels: "Loading models from NHTSA…", modelsOk: "{n} models for {y} {m}.", modelsNone: "No models listed for that year. Type it below.", modelsErr: "Couldn't reach the model list. Type it below.",
+  vinL: "VIN (optional)", vinPh: "17 characters", vinBtn: "Decode", vinBad: "A VIN is 17 letters and numbers (no I, O or Q).", vinLoading: "Decoding your VIN…",
+  vinOk: "✅ Decoded: {c}", vinErr: "Couldn't decode that VIN. Check it, or pick the car above.", milesL: "Mileage", probL: "What's going on?", probPh: "Squeaks when I brake, check-engine light came on…",
+  vpicSrc: "Make / model / VIN data: NHTSA vPIC (free public U.S. government database). Saved on this phone only.", milesSub: "{m} miles",
+    fdL: "What's wrong with it?", fdPh: "Electrical is acting up, steering feels loose, control arm…", fdGo: "🔎 Find the fix + price",
+  fdFor: "Prices for: {c}", fdForNone: "Pick your car in Step 1 for a closer price.", fdTier: "{t}: parts priced about {p}% higher", fdNone: "No match yet. Try other words (noise, light, leak, steering…), or start with a diagnosis:",
+  fdEmpty: "Type what you feel, hear or see.", fdAdd: "➕ Add {n} to my quote", fdAddNone: "Tick at least one repair", fdAdded: "✅ {n} added to your quote", fdSome: "Likely fixes: tick what you want quoted",
+  fdNote: "Sample prices, or \"Ask for a quote\" where the shop sets the price. The real fix is confirmed after the shop looks at it.", qCopy: "📋 Copy quote", qText: "💬 Text quote",
+  qTxtHead: "{b} · Quote (sample)", qTxtCar: "Car: {c}", qTxtProb: "Problem: {p}", qTxtTot: "Estimated total: {t}", qTxtSplit: "Parts {p} + labor {l} ({h} at {r}/h)", qTxtFoot: "Sample prices, final quote after inspection.", tierTag: "{t} parts pricing",
+  tapKick: "Step 2", tapH: "Type it or tap it", tapLead: "Say what's wrong in your own words, or tap a glowing spot on the car.", viewAria: "Car view", vSide: "Side", vFront: "Front", vBack: "Back",
+  vSideL: "Driver side", vFrontL: "Front", vBackL: "Back", inJob: "in your job", tapHint: "Flip to Front / Back for the battery, A/C, the other tires and the trunk.",
+  qKick: "Step 3", qH: "Instant quote", estTotal: "Estimated total", parts: "Parts", labor: "Labor ({h} × {r}/hr)", trip: "Trip fee", free: "Free", time: "Time on the car",
+  arrive: "We arrive", readyBy: "Ready by about", disc: "⚠️ Sample prices, final quote after inspection.", pickTime: "🗓️ Pick a time", reqBtn: "Request this job",
+  emptyJob: "Your job is empty. Tap the car or a service to add repairs.", remove: "Remove", nextOpen: "{s} (next open)",
+  bKick: "Step 4", bH: "Availability", bLead: "Open arrival windows this week. Tap one to hold it for your job.", daysAria: "Pick a day",
+  nOpen: "{n} open", lgOpen: "Open", lgPick: "Your pick", lgBooked: "Booked", slotOpen: "Open", slotBooked: "Booked", slotPast: "Passed", slotYours: "Picked",
+  dayClosed: "Closed this day. Pick another day.", dayFull: "Fully booked. Pick another day.", slotPicked: "✅ Held for your job: {s}", hKick: "Hours",
+  tKick: "In your pocket", tH: "Job tracker", tLead: "Every update from the shop shows up here.", myReq: "My requests",
+  noReq: "No requests yet. Here's a <b>sample job</b> so you can see how tracking works.",
+  stReq: "Requested", stGo: "In progress", stDone: "Ready", stNo: "Declined",
+  waitH: "Waiting for the shop", waitP: "Your request is in. You'll get an alert when it's accepted with a final quote.",
+  declined: "The shop can't take this one. Try another time.", estimate: "Estimate", quote: "Quote", slotL: "Arrival", jobId: "Job {id}",
+  skipped: "Skipped", sample: "Sample job", playSample: "▶ Play the sample", replay: "↺ Replay", sampleCar: "2016 Sample Sedan",
+  sampleNotes: ["Got your request. On my way at 10.", "Scan shows worn front pads. Rotors are grooved.", "Pads + rotors ordered, here in about an hour.", "Wheels off, starting the front axle.", "Driver side done. Doing the passenger side.", "Bedding in the brakes on a test drive.", "All done. Brakes feel great. Ready when you are."],
+  aKick: "Alerts", aH: "Tell me when it's almost done", aApp: "In-app alerts", aAppS: "Pop-ups + the 🔔 inbox on this page",
+  aText: "📲 Text me when it's almost done", aTextS: "And when it's ready", aPhone: "Mobile number", aEmail: "✉️ Email me when it's almost done", aEmailS: "And when it's ready", aMail: "Email",
+  testAlert: "🔔 Show me a sample alert",
+  aDemo: "<b>Demo:</b> nothing is sent and nothing leaves this phone. Real texts go live once the business's texting number is approved by the carriers (Twilio A2P 10DLC, pending). Email will go out through the shop's own Google Apps Script mailer later.",
+  foot: "Demo app for any auto shop. Shop name, phone, prices and hours are placeholders. The scene is an illustration, not a real shop.", pwDemo: "Demo",
+  pillN: "{n} item(s) · {h}", pillGo: "Quote →",
+  shSave: "Save to job", shNone: "Remove from job", shS: "Pick what you need", posL: "Which one?", inJobTag: "In job", added: "✅ Added to your job", removed: "Removed from your job", updated: "Job updated",
+  cfT: "Send this request?", cfS: "The shop accepts it with a final quote.", cfName: "First name (optional)", cfNamePh: "Alex", cfSend: "Send request (demo)",
+  cfNote: "Demo only: saved on this phone, nothing is sent anywhere.", cfCar: "Car", cfItems: "Job", cfEst: "Estimate", cfSlot: "Arrival", cfAlerts: "Alerts",
+  noItems: "Tap the car or a service first.", sending: "Sending…", sent: "✅ Request sent (demo). Track it below.",
+  ibT: "Alerts", ibS: "Updates on your jobs", ibEmpty: "No alerts yet.",
+  chApp: "In-app", chText: "Text (simulated)", chEmail: "Email (simulated)", bnText: "Messages · now", bnMail: "Mail · now", bnApp: "{n} · now",
+  bnDemo: "Simulated: demo, nothing was sent", sampleAlertT: "Almost done! ⏳", sampleAlertB: "Your {c} is almost done. About 20 more minutes. Reply here with any questions.",
+  nAccepted: "Accepted ✅", nAcceptedB: "Your {c} is booked. Final quote: {q}.", nStage: "{s}", nStageB: "Update on your {c}.", nDeclined: "Request declined",
+  carUnknown: "Car not picked yet", alertsOff: "In-app only"
+,
+  navScan: "Scan", addrPriv: "📍 Exact address is sent after your booking is confirmed.",
+  keepTyping: "Keep typing to narrow down ({n} more)", noMatch: "No match. Try fewer letters.", pickMakeN: "Search {n} makes…", popular: "Popular", allMakes: "All makes",
+  makesErr: "Couldn't load the full make list. Showing common makes.", notSure: "Not sure", engEV: "Electric (no engine)",
+  moreSum: "Engine, drivetrain, trim (optional)", moreNote: "A VIN fills these in. Otherwise pick what you know: it makes the parts list and the \"what to ask\" script more exact.",
+  engL: "Engine size", fuelL: "Fuel", f_gas: "Gas", f_hybrid: "Hybrid", f_diesel: "Diesel", driveL: "Drivetrain", trimL: "Trim", trimPh: "EX, XLT, Sport…",
+  lightsL: "Headlights", l_halogen: "Halogen", l_hid: "HID / xenon", l_led: "LED", absL: "ABS brakes", yes: "Yes", no: "No", bodyL: "Body style",
+  b_sedan: "Sedan", b_hatch: "Hatchback", b_coupe: "Coupe", b_suv: "SUV", b_van: "Van", b_truck: "Pickup",
+  issKick: "Known issues for your car", recallsH: "Safety recalls", complaintsH: "What owners report most", loadingIssues: "Checking NHTSA recalls + owner complaints…",
+  issuesSrc: "Source: NHTSA (U.S. government) <a href=\"{r}\" target=\"_blank\" rel=\"noopener\">recalls data</a> · <a href=\"{c}\" target=\"_blank\" rel=\"noopener\">complaints data</a> · <a href=\"https://www.nhtsa.gov/recalls\" target=\"_blank\" rel=\"noopener\">nhtsa.gov/recalls</a>",
+  recallsErr: "Couldn't reach NHTSA recalls right now.", noRecalls: "No safety recalls on file for this model year.", parkIt: "Park it: don't drive", parkOut: "Park outside", otaFix: "Over-the-air fix",
+  remedy: "Fix:", onNhtsa: "See it on NHTSA", showLess: "Show fewer", showAll: "Show all {n}",
+  recallFree: "{n} recall(s) for this model. Recall repairs are a <b>free fix at a dealer</b>.", recallCheck: "Not every car is affected, and yours may already be fixed. Enter your VIN at nhtsa.gov/recalls to see if one is still open on your car.",
+  complaintsErr: "Couldn't reach NHTSA complaints right now.", noComplaints: "No owner complaints on file for this model year.", mostReported: "Most reported:", checkIt: "Check it",
+  complaintsOf: "Based on {n} owner complaints filed with NHTSA. Complaints are owner reports, not confirmed defects.",
+  partsFor: "Parts + where to buy:", fromCode: "From code {c}", partsBtn: "Parts",
+  prefSupp: "Preferred parts supplier", checkFirst: "Check {n} first", callN: "Call {n}", directions: "Directions", website: "Website",
+  suppHonest: "Call for price & availability. No partnership or special pricing is implied; prices and stock are set by the store.",
+  pickCarFirst: "Pick your car above for an exact list.", pickCarGo: "Pick car ↑",
+  counterAsks: "The parts counter will ask", qLights: "Halogen, HID or LED headlights?", qAbs: "Does it have ABS?", qBody: "Body style?", qMore: "Not set yet: {w}", w_engine: "engine size", w_drive: "drivetrain", w_trim: "trim", addIt: "Add it ↑",
+  whatToAsk: "What to ask {n}", theStore: "the store", copy: "Copy", text: "Text", findExact: "Find exact part:", copied: "📋 Copied", copyFail: "Couldn't copy. Press and hold the text instead.",
+  partsHonest: "Parts shown are typical for this job. Your mechanic confirms exact part numbers after inspection.",
+  scKick: "Check-engine light?", scH: "Scan my car", scLead: "Read the trouble codes yourself, see what they mean and add the likely fix to your quote.",
+  scDisc: "Codes point to a system, not a guaranteed part. Final diagnosis by the mechanic.",
+  btKick: "Option A · Bluetooth adapter", btH: "Plug in a Bluetooth OBD-II reader", btGo: "🔌 Connect &amp; read codes",
+  btP: "Plug a Bluetooth LE (BLE) ELM327 adapter into the port under the dash, turn the key to ON, then tap Connect. Read-only: this app never clears codes.",
+  btOk: "✅ This browser can talk to Bluetooth adapters.", btIos: "Safari on iPhone can't use Bluetooth. Open this page in the free <b>Bluefy</b> browser, or type the code below (any parts store can read it for free).",
+  btNo: "This browser can't use Bluetooth. Use Chrome (Android or computer), or type the code below.",
+  adH: "Which adapter works?", ad1: "<b>Veepeak OBDCheck BLE+</b> (Bluetooth LE, budget)", ad2: "<b>Vgate iCar Pro BLE 4.0</b> (Bluetooth LE, budget)", ad3: "<b>OBDLink CX</b> (Bluetooth LE, premium, very reliable)",
+  adNote: "Get a \"BLE\" / \"Bluetooth 4.0\" model. Classic-Bluetooth and Wi-Fi adapters can't talk to a web page. Works in Chrome on Android, Chrome on a computer, and the Bluefy browser on iPhone (Safari on iPhone can't use Bluetooth).",
+  mKick: "Option B · Type the code", codeL: "Code from any scanner or the parts-store check", codeGo: "Look up", codeBad: "Codes look like P0420: a letter (P, C, B, U) and 4 characters.",
+  simBtn: "🧪 Try a demo scan (no adapter)", simRunning: "Running a demo scan…", simDone: "Demo scan done (sample data, not your car).",
+  obdSrc: "Code meanings: standard SAE J2012 generic codes (2,128 built in). Manufacturer-specific codes are looked up by the mechanic.",
+  btPick: "Pick your adapter in the Bluetooth list…", btPaired: "Connected to {n}. Reading…", btReading: "Reading… ({n})", btDone: "✅ Scan done.",
+  btCancel: "No adapter picked.", btNoUart: "That device isn't an OBD-II adapter we can talk to. Pick the BLE adapter.", btDenied: "Bluetooth permission was blocked.", btFail: "Lost the adapter. Check the key is ON and try again.",
+  mfrCode: "Manufacturer-specific code: your mechanic will look this one up for your make.", unlisted: "Not in our generic list. System: {s}. Your mechanic will look it up.",
+  pendingTag: "Pending (not confirmed yet)", typedTag: "Typed in", system: "System", causes: "Common causes", likelyJob: "Likely job", inYourJob: "In your job", addToJob: "Add to my job",
+  milOn: "Check-engine light ON", milOff: "Check-engine light off", coolantT: "{c} °C / {f} °F coolant", simTitle: "Demo scan (sample data)", scanTitle: "Your scan", noCodes: "No trouble codes stored.",
+  codeAdded: "✅ {c}: likely job added to your quote",
+  g_req: "Request sent. {m} will confirm soon.", g_rec: "{m} has your car 🙌", g_diag: "{m} is checking it out", g_parts: "Parts on the way from {s} 🚚", g_work: "{m} is on it 🔧",
+  g_half: "Halfway there. {m} is on it", g_almost: "{m} says it's almost ready ✨", g_ready: "Ready! Come get it 🎉", colorL: "Your car's color", readyTxt: "Ready! 🎉", partsFrom: "Parts from {s}",
+  navGarage: "My Garage", garKick: "Saved on this phone", garH: "My Garage", garLead: "Your cars, their recalls, scan history, service history and what's due next.",
+  customColor: "Custom color", customShort: "Custom", paintL: "Paint color", paintCodeL: "Paint code (optional)",
+  paintCodeHint: "It's on the sticker in the driver's door jamb (look for PAINT, C/TR or EXT). Body shops use it to match paint.",
+  photoBtn: "📷 Take or upload a photo of your car", soonId: "Identify my car from a photo: coming soon.", soon3d: "3D model of your car from a photo: premium add-on, coming soon.",
+  photoWorking: "Saving your photo on this phone…", photoSaved: "✅ Photo saved on this phone only.", photoLooks: "Looks {c}: use it?", photoFail: "Couldn't read that photo. Try another one.",
+  photoColorSet: "Paint color set to {c}.", photoAlt: "Your car", storageFull: "This phone's storage for the app is full. Remove a car or photo.",
+  saveGarage: "🏠 Save to My Garage", savedGarage: "🏠 Saved \"{n}\" to My Garage", gEmpty: "No cars saved yet. Pick your car below and tap <b>Save to My Garage</b>.",
+  gActive: "Selected", getFixed: "Get it fixed", useCar: "Use this car", photoShort: "Photo", gDelete: "Remove car", gIssuesH: "Known issues + recalls",
+  gScansH: "Scan history ({n})", gSvcH: "Service history ({n})", remH: "What's due", nickL: "Nickname",
+  gPrivacy: "My Garage lives only on this phone (no account, nothing uploaded). Clearing the browser's site data erases it.",
+  usingCar: "Using {n}", gDelConfirm: "Remove \"{n}\" and its history from this phone?",
+  fixProblem: "Check-engine codes {c} (from my scan on {d}).", fixFilled: "🔧 Job filled in from {n} code(s). Check it and send.", fixBasic: "🔧 Started a job with a code scan + inspection.",
+  srcDemo: "Demo scan", srcBt: "Bluetooth scan", srcTyped: "Typed code", stFixed: "fixed", stInJob: "in a job", stInQuote: "in your quote", stOpen: "open",
+  noCodesShort: "No codes", noScans: "No scans yet. Use Scan my car with this car selected.", noService: "No finished jobs yet.",
+  rem_oil: "🛢️ Oil change", rem_rotate: "🛞 Tire rotation", rem_brake: "🛑 Brake check",
+  remLast: "Last: {d}", remOverMi: "{n} mi overdue", remInMi: "due in {n} mi", remBy: "by {d}", remNone: "Not logged here yet · every {e}", remMo: "{n} months", remOr: " or ",
+  tsKick: "Tesla owners", tsH: "Your Tesla", tsOta: "NHTSA lists <b>{n}</b> recall(s) for this model; <b>{o}</b> of them were fixed with a free over-the-air software update. Recall fixes are always free.",
+  tsOtaWait: "Checking NHTSA recalls…", tsSwH: "Latest software updates", tsSw1: "In the car: <b>Controls › Software</b> shows your version and the release notes.",
+  tsSw2: "(independent news site, release notes per version)", tsSw3: "(which versions are rolling out right now)", tsTipsH: "Tips",
+  tsTip1: "Many Tesla recalls are fixed with a free over-the-air update: keep the car on Wi-Fi and install updates.",
+  tsTip2: "Tesla's manual: rotate tires every 6,250 mi (10,000 km) or at a 2/32\" tread difference, cabin air filter every 2 years, brake fluid checked every 4 years.",
+  tsTip3: "Alerts on the screen (Controls › Service) tell the mechanic more than a generic scanner can.", tsSrc: "Intervals: Tesla Model 3 service manual,",
+  tsLive: "Live battery, software version and service alerts need Tesla's official Fleet API sign-in: coming later. This app never asks for your Tesla password.",
+  evKick: "Electric car", evTesla: "Teslas don't use the standard OBD-II port for owner scans, so a Bluetooth reader won't show useful codes. Write down any alert on the touchscreen (<b>Controls › Service</b>) and type it below, or tell the shop.",
+  evOther: "EVs report few generic engine codes. A reader can still show some chassis/body codes, but alerts on the dash or screen matter more. Type any code you see below.",
+  scanFor: "Scanning for: {c}.", scanSaveHint: "Save it to My Garage to keep the scan history.",
+  navTires: "Tires", navPay: "Pay", bizK: "Demo · show it as", bizAria: "Business type",
+  qkFix: "What's wrong?", qkTires: "Tire size + stock", qkPay: "Pay with QR", qkBook: "Book a time", qkTrack: "Track my car",
+  tiKick: "Tire stock", tiH: "Check my tire size", tiLead: "Type the size from your tire's sidewall. See right away if it's in stock and hold a set.",
+  tiL: "Tire size (any format)", tiQty: "How many?", tiGo: "🔎 Check stock", tiEx: "Works with 225/45R17, 225 45 17 or P225/45ZR17.",
+  tiWhere: "Where to find your size", tiWhereP: "It's printed on the side of every tire, like <b>P225/45R17 94V</b>. 225 is the width in millimeters, 45 is the sidewall height (% of the width), R17 means it fits a 17-inch wheel. The same size is on the sticker inside the driver's door jamb. Not sure? Snap a photo of the sidewall and text it to us.",
+  swW: "225 = width (mm)", swA: "45 = height (% of width)", swR: "R17 = 17\" wheel",
+  tiListK: "In stock now", tiFilA: "Tire type", tiAll: "All", tiSample: "Sample inventory and sample brands for the demo. The shop keeps the real list up to date from its back office.",
+  tiBad: "Couldn't read that size. Try it like 225/45R17 (it's on the tire's sidewall).", tiEmpty: "Type your tire size first.",
+  tiIn: "✅ In stock: {n}", tiInSub: "{s} · {k} option(s) ready to go", tiLow: "Only {n} left in this one, we can order the rest",
+  tiOut: "Not in stock right now", tiOutSub: "We can order {s}, usually within {d}.", tiOrderBy: "{n} business days (sample)",
+  tiHold: "Hold {q}", tiReq: "📦 Request {q} × {s}", tiHeld: "✅ Added to your quote: {n}", tiQ: "{q} in stock", tiNone: "Nothing in stock for this type yet.",
+  tiPrice: "{p} each (shop's price)", tiNoteHold: "{q} × {s} · {b} {l}", tiNoteOrder: "order {q} × {s}", tiMatch: "Your size",
+  payKick: "Checkout", payH: "Pay with QR", payLead: "Customers scan, pick how they pay, done. Faster checkout, no waiting at the counter.",
+  payScan: "Scan to pay", payAcc: "We accept", payS1: "Scan the code with your phone's camera", payS2: "Pick how you want to pay", payS3: "Done. Your receipt is texted to you",
+  payTry: "📱 Try the pay screen", payPrint: "🖨️ Counter / bay QR card",
+  payDemo: "<b>Demo:</b> no real payment is processed and no real accounts are connected. The sample QR opens a demo link, and handles like <b>$yourshop</b> are placeholders.",
+  payAmtQ: "Your quote: {t}", payAmtNone: "Amount comes from your final invoice",
+  pyT: "Pay your shop", pyAmt: "Amount", pyPick: "How do you want to pay?", pyDemo: "Demo: nothing is charged and no account is connected.", pyInv: "Final invoice amount",
+  pyWould: "Demo: this is where {m} would open to pay {b}. Nothing was charged.", pyHandle: "Sample handle: {h}",
+  qcT: "Counter / bay QR card", qcS: "Print it, tape it at the counter or in each bay", qcBay: "Label (optional)", qcBayPh: "Bay 1", qcPrint: "🖨️ Print card", qcDemo: "Sample card · demo link · no real payments"
+},
+es: {
+  _title: "{name} (Demo)",
+  dgKick: "Vista despiezada", dgH: "Todas las partes de tu {c}", dgZoom: "⤢ Toca para ampliar", dgLabel: "Ilustración: solo de referencia, no es un diagrama de fábrica.",
+  dgTable: "Los números dibujados en la imagen no están verificados: usa los datos verificados de abajo.", dgSpecH: "Datos verificados", dgJump: "Toca una parte para agregarla a tu trabajo",
+  dgSoon: "Diagrama despiezado para este modelo: próximamente.", dgYear: "Dibujado de un {d}. Tu {y} puede verse un poco diferente.",
+  dgSpecLoad: "Cargando datos oficiales…", dgSpecErr: "No se pudo consultar fueleconomy.gov.", dgSpecNone: "No hay ficha de la EPA para este año y modelo. Revisa la etiqueta en el marco de la puerta del conductor.",
+  dgSpecPick: "Escoge el año para ver los datos oficiales.", dgSrc: "Datos: EPA / DOE de EE. UU., fueleconomy.gov", dgParts: "Ver partes", dgClose: "Cerrar diagrama",
+  dgFoot: "Pellizca o toca dos veces para ampliar, arrastra para mover. Toca un punto para agregar esa parte. Ilustración con IA, no es diagrama de fábrica.",
+  dgAlt: "Ilustración despiezada de un {c} con sus partes principales", dgTitle: "{c}: vista despiezada",
+  sp_range: "{v} mi de autonomía EPA", sp_mpge: "{v} MPGe", sp_mpg: "{v} MPG combinado ({c} ciudad / {h} carretera)", sp_hybrid: "Híbrido",
+  bellAria: "Alertas", close: "Cerrar", navSvc: "Servicios", navCar: "Tu carro", navTap: "Qué tiene", navQuote: "Cotización", navBook: "Agendar", navTrack: "Seguimiento", navAlerts: "Alertas",
+  openNow: "Abierto · hasta las {t}", openLater: "Cerrado · abre {d} {t}", heroH: "Bien reparado. <em>Precio por adelantado.</em>",
+  heroP: "Escoge tu carro, dinos qué tiene o tócalo en el carro, ve un rango de precio o pide cotización, agenda y sigue el trabajo desde tu teléfono.",
+  heroGo: "🔧 Armar mi cotización", heroCall: "📞 Llamar / mensaje",
+  svcKick: "Lo que hacemos", svcH: "Servicios", svcLead: "Toca un servicio para agregarlo a tu trabajo. Precios de muestra, cotización final después de revisar.",
+  from: "desde {p}", addon: "Extra", baKick: "Antes / después", baH: "Desliza", baNote: "Arte de muestra para el demo. Aquí van las fotos reales de antes y después del taller.", before: "Antes", after: "Después", baDemo: "Arte de muestra",
+  carKick: "Paso 1", carH: "Tu carro", carLead: "Escoge año, marca y modelo, o decodifica tu VIN.",
+  yearL: "Año", makeL: "Marca", modelL: "Modelo", pickYear: "Año…", pickMake: "Marca…", pickModel: "Modelo…", otherMake: "Otra (escríbela)", modelTxtL: "Escribe marca y modelo",
+  loadingModels: "Cargando modelos de NHTSA…", modelsOk: "{n} modelos para {m} {y}.", modelsNone: "No hay modelos para ese año. Escríbelo abajo.", modelsErr: "No se pudo cargar la lista. Escríbelo abajo.",
+  vinL: "VIN (opcional)", vinPh: "17 caracteres", vinBtn: "Decodificar", vinBad: "El VIN tiene 17 letras y números (sin I, O ni Q).", vinLoading: "Decodificando tu VIN…",
+  vinOk: "✅ Decodificado: {c}", vinErr: "No se pudo decodificar. Revísalo o escoge el carro arriba.", milesL: "Millaje", probL: "¿Qué le pasa?", probPh: "Rechina al frenar, se prendió la luz del motor…",
+  vpicSrc: "Datos de marca / modelo / VIN: NHTSA vPIC (base de datos pública y gratuita del gobierno de EE. UU.). Se guarda solo en este teléfono.", milesSub: "{m} millas",
+    fdL: "¿Qué tiene tu carro?", fdPh: "Falla lo eléctrico, la dirección está floja, la horquilla…", fdGo: "🔎 Buscar la reparación + precio",
+  fdFor: "Precios para: {c}", fdForNone: "Escoge tu carro en el Paso 1 para un precio más exacto.", fdTier: "{t}: piezas como {p}% más caras", fdNone: "Todavía no encontramos nada. Prueba otras palabras (ruido, luz, fuga, dirección…), o empieza con un diagnóstico:",
+  fdEmpty: "Escribe lo que sientes, oyes o ves.", fdAdd: "➕ Agregar {n} a mi cotización", fdAddNone: "Marca al menos una reparación", fdAdded: "✅ {n} agregadas a tu cotización", fdSome: "Reparaciones probables: marca lo que quieres cotizar",
+  fdNote: "Precios de muestra, o \"Pide cotización\" donde el taller pone el precio. La reparación real se confirma cuando el taller lo revise.", qCopy: "📋 Copiar cotización", qText: "💬 Mandar por texto",
+  qTxtHead: "{b} · Cotización (muestra)", qTxtCar: "Carro: {c}", qTxtProb: "Problema: {p}", qTxtTot: "Total estimado: {t}", qTxtSplit: "Piezas {p} + mano de obra {l} ({h} a {r}/h)", qTxtFoot: "Precios de muestra, cotización final después de revisar.", tierTag: "Precio de piezas: {t}",
+  tapKick: "Paso 2", tapH: "Escríbelo o tócalo", tapLead: "Di qué tiene con tus palabras, o toca un punto brillante del carro.", viewAria: "Vista del carro", vSide: "Lado", vFront: "Frente", vBack: "Atrás",
+  vSideL: "Lado del conductor", vFrontL: "Frente", vBackL: "Atrás", inJob: "en tu trabajo", tapHint: "Cambia a Frente / Atrás para la batería, el A/C, las otras llantas y la cajuela.",
+  qKick: "Paso 3", qH: "Cotización al instante", estTotal: "Total estimado", parts: "Piezas", labor: "Mano de obra ({h} × {r}/h)", trip: "Visita", free: "Gratis", time: "Tiempo en el carro",
+  arrive: "Llegamos", readyBy: "Listo aprox.", disc: "⚠️ Precios de muestra, cotización final después de revisar.", pickTime: "🗓️ Escoger hora", reqBtn: "Pedir este trabajo",
+  emptyJob: "Tu trabajo está vacío. Toca el carro o un servicio.", remove: "Quitar", nextOpen: "{s} (siguiente libre)",
+  bKick: "Paso 4", bH: "Disponibilidad", bLead: "Horarios libres esta semana. Toca uno para apartarlo.", daysAria: "Escoge un día",
+  nOpen: "{n} libres", lgOpen: "Libre", lgPick: "Tu hora", lgBooked: "Ocupado", slotOpen: "Libre", slotBooked: "Ocupado", slotPast: "Ya pasó", slotYours: "Apartado",
+  dayClosed: "Cerrado ese día. Escoge otro.", dayFull: "Todo ocupado. Escoge otro día.", slotPicked: "✅ Apartado para tu trabajo: {s}", hKick: "Horario",
+  tKick: "En tu bolsillo", tH: "Seguimiento", tLead: "Cada novedad del taller aparece aquí.", myReq: "Mis pedidos",
+  noReq: "Aún no hay pedidos. Aquí hay un <b>trabajo de muestra</b> para que veas cómo funciona.",
+  stReq: "Pedido", stGo: "En proceso", stDone: "Listo", stNo: "Rechazado",
+  waitH: "Esperando al taller", waitP: "Tu pedido llegó. Te avisamos cuando lo acepte con la cotización final.",
+  declined: "El taller no puede tomar este. Prueba otra hora.", estimate: "Estimado", quote: "Cotización", slotL: "Llegada", jobId: "Trabajo {id}",
+  skipped: "Saltado", sample: "Trabajo de muestra", playSample: "▶ Ver la muestra", replay: "↺ Repetir", sampleCar: "Sedán de muestra 2016",
+  sampleNotes: ["Recibí tu pedido. Llego a las 10.", "El escaneo muestra balatas gastadas. Los discos están rayados.", "Balatas + discos pedidos, llegan en una hora.", "Llantas fuera, empezando el eje delantero.", "Lado del conductor listo. Sigo con el otro.", "Asentando los frenos en una prueba.", "Todo listo. Los frenos se sienten muy bien."],
+  aKick: "Alertas", aH: "Avísame cuando esté casi listo", aApp: "Alertas en la app", aAppS: "Avisos + la bandeja 🔔 de esta página",
+  aText: "📲 Mándame texto cuando esté casi listo", aTextS: "Y cuando esté listo", aPhone: "Número de celular", aEmail: "✉️ Mándame correo cuando esté casi listo", aEmailS: "Y cuando esté listo", aMail: "Correo",
+  testAlert: "🔔 Ver una alerta de muestra",
+  aDemo: "<b>Demo:</b> no se envía nada y nada sale de este teléfono. Los textos reales se activan cuando las compañías aprueben el número del negocio (Twilio A2P 10DLC, pendiente). El correo saldrá después por el Google Apps Script del taller.",
+  foot: "App demo para cualquier taller. Nombre, teléfono, precios y horarios son de ejemplo. La escena es una ilustración, no un taller real.", pwDemo: "Demo",
+  pillN: "{n} servicio(s) · {h}", pillGo: "Cotizar →",
+  shSave: "Guardar en el trabajo", shNone: "Quitar del trabajo", shS: "Escoge lo que necesitas", posL: "¿Cuál?", inJobTag: "En el trabajo", added: "✅ Agregado a tu trabajo", removed: "Quitado de tu trabajo", updated: "Trabajo actualizado",
+  cfT: "¿Enviar este pedido?", cfS: "El taller lo acepta con la cotización final.", cfName: "Nombre (opcional)", cfNamePh: "Alex", cfSend: "Enviar pedido (demo)",
+  cfNote: "Solo demo: se guarda en este teléfono, no se envía nada.", cfCar: "Carro", cfItems: "Trabajo", cfEst: "Estimado", cfSlot: "Llegada", cfAlerts: "Alertas",
+  noItems: "Primero toca el carro o un servicio.", sending: "Enviando…", sent: "✅ Pedido enviado (demo). Síguelo abajo.",
+  ibT: "Alertas", ibS: "Novedades de tus trabajos", ibEmpty: "Aún no hay alertas.",
+  chApp: "En la app", chText: "Texto (simulado)", chEmail: "Correo (simulado)", bnText: "Mensajes · ahora", bnMail: "Correo · ahora", bnApp: "{n} · ahora",
+  bnDemo: "Simulado: es demo, no se envió nada", sampleAlertT: "¡Casi listo! ⏳", sampleAlertB: "Tu {c} está casi listo. Unos 20 minutos más. Responde aquí si tienes dudas.",
+  nAccepted: "Aceptado ✅", nAcceptedB: "Tu {c} quedó agendado. Cotización final: {q}.", nStage: "{s}", nStageB: "Novedad de tu {c}.", nDeclined: "Pedido rechazado",
+  carUnknown: "Carro sin escoger", alertsOff: "Solo en la app"
+,
+  navScan: "Escanear", addrPriv: "📍 La dirección exacta se envía cuando se confirma tu cita.",
+  keepTyping: "Sigue escribiendo para filtrar ({n} más)", noMatch: "Sin resultados. Escribe menos letras.", pickMakeN: "Busca entre {n} marcas…", popular: "Populares", allMakes: "Todas las marcas",
+  makesErr: "No se pudo cargar la lista completa. Mostrando marcas comunes.", notSure: "No sé", engEV: "Eléctrico (sin motor)",
+  moreSum: "Motor, tracción, versión (opcional)", moreNote: "El VIN llena esto. Si no, escoge lo que sepas: así la lista de piezas y el guion \"qué pedir\" salen más exactos.",
+  engL: "Tamaño del motor", fuelL: "Combustible", f_gas: "Gasolina", f_hybrid: "Híbrido", f_diesel: "Diésel", driveL: "Tracción", trimL: "Versión", trimPh: "EX, XLT, Sport…",
+  lightsL: "Faros", l_halogen: "Halógeno", l_hid: "HID / xenón", l_led: "LED", absL: "Frenos ABS", yes: "Sí", no: "No", bodyL: "Carrocería",
+  b_sedan: "Sedán", b_hatch: "Hatchback", b_coupe: "Coupé", b_suv: "SUV", b_van: "Van", b_truck: "Pickup",
+  issKick: "Problemas conocidos de tu carro", recallsH: "Llamados a revisión (recalls)", complaintsH: "Lo que más reportan los dueños", loadingIssues: "Revisando recalls y quejas en NHTSA…",
+  issuesSrc: "Fuente: NHTSA (gobierno de EE. UU.) <a href=\"{r}\" target=\"_blank\" rel=\"noopener\">datos de recalls</a> · <a href=\"{c}\" target=\"_blank\" rel=\"noopener\">datos de quejas</a> · <a href=\"https://www.nhtsa.gov/recalls\" target=\"_blank\" rel=\"noopener\">nhtsa.gov/recalls</a>",
+  recallsErr: "No se pudo consultar los recalls de NHTSA.", noRecalls: "No hay recalls registrados para este modelo y año.", parkIt: "No lo manejes", parkOut: "Estaciónalo afuera", otaFix: "Arreglo por actualización",
+  remedy: "Arreglo:", onNhtsa: "Ver en NHTSA", showLess: "Ver menos", showAll: "Ver los {n}",
+  recallFree: "{n} recall(s) para este modelo. Las reparaciones de recall son <b>gratis en la agencia</b>.", recallCheck: "No todos los carros están afectados y el tuyo quizá ya se arregló. Pon tu VIN en nhtsa.gov/recalls para ver si alguno sigue abierto.",
+  complaintsErr: "No se pudo consultar las quejas de NHTSA.", noComplaints: "No hay quejas de dueños para este modelo y año.", mostReported: "Más reportado:", checkIt: "Revisar",
+  complaintsOf: "Según {n} quejas de dueños en NHTSA. Son reportes de dueños, no defectos confirmados.",
+  partsFor: "Piezas + dónde comprar:", fromCode: "Del código {c}", partsBtn: "Piezas",
+  prefSupp: "Proveedor de piezas preferido", checkFirst: "Pregunta primero en {n}", callN: "Llamar a {n}", directions: "Cómo llegar", website: "Sitio web",
+  suppHonest: "Llama para precio y existencia. No implica sociedad ni precio especial; la tienda pone sus precios y su inventario.",
+  pickCarFirst: "Escoge tu carro arriba para una lista exacta.", pickCarGo: "Escoger carro ↑",
+  counterAsks: "En el mostrador te van a preguntar", qLights: "¿Faros de halógeno, HID o LED?", qAbs: "¿Tiene ABS?", qBody: "¿Tipo de carrocería?", qMore: "Falta: {w}", w_engine: "tamaño del motor", w_drive: "tracción", w_trim: "versión", addIt: "Agregar ↑",
+  whatToAsk: "Qué pedir en {n}", theStore: "la tienda", copy: "Copiar", text: "Texto", findExact: "Buscar la pieza exacta:", copied: "📋 Copiado", copyFail: "No se pudo copiar. Mantén presionado el texto.",
+  partsHonest: "Las piezas son las típicas para este trabajo. Tu mecánico confirma los números de parte exactos después de revisar.",
+  scKick: "¿Luz del motor?", scH: "Escanear mi carro", scLead: "Lee los códigos tú mismo, ve qué significan y agrega el arreglo probable a tu cotización.",
+  scDisc: "Los códigos señalan un sistema, no una pieza segura. El diagnóstico final lo da el mecánico.",
+  btKick: "Opción A · Adaptador Bluetooth", btH: "Conecta un lector OBD-II Bluetooth", btGo: "🔌 Conectar y leer códigos",
+  btP: "Conecta un adaptador ELM327 Bluetooth LE (BLE) en el puerto bajo el tablero, pon la llave en ON y toca Conectar. Solo lectura: esta app nunca borra códigos.",
+  btOk: "✅ Este navegador puede usar adaptadores Bluetooth.", btIos: "Safari en iPhone no puede usar Bluetooth. Abre esta página en el navegador gratis <b>Bluefy</b>, o escribe el código abajo (cualquier tienda de autopartes lo lee gratis).",
+  btNo: "Este navegador no puede usar Bluetooth. Usa Chrome (Android o computadora), o escribe el código abajo.",
+  adH: "¿Qué adaptador sirve?", ad1: "<b>Veepeak OBDCheck BLE+</b> (Bluetooth LE, económico)", ad2: "<b>Vgate iCar Pro BLE 4.0</b> (Bluetooth LE, económico)", ad3: "<b>OBDLink CX</b> (Bluetooth LE, premium, muy confiable)",
+  adNote: "Compra uno \"BLE\" / \"Bluetooth 4.0\". Los de Bluetooth clásico o Wi-Fi no se conectan a una página web. Funciona en Chrome en Android, Chrome en computadora y el navegador Bluefy en iPhone (Safari en iPhone no puede usar Bluetooth).",
+  mKick: "Opción B · Escribe el código", codeL: "Código de cualquier escáner o de la tienda de autopartes", codeGo: "Buscar", codeBad: "Los códigos son como P0420: una letra (P, C, B, U) y 4 caracteres.",
+  simBtn: "🧪 Probar un escaneo demo (sin adaptador)", simRunning: "Haciendo un escaneo demo…", simDone: "Escaneo demo listo (datos de muestra, no de tu carro).",
+  obdSrc: "Significados: códigos genéricos estándar SAE J2012 (2,128 incluidos). Los códigos del fabricante los busca el mecánico.",
+  btPick: "Escoge tu adaptador en la lista de Bluetooth…", btPaired: "Conectado a {n}. Leyendo…", btReading: "Leyendo… ({n})", btDone: "✅ Escaneo listo.",
+  btCancel: "No se escogió adaptador.", btNoUart: "Ese aparato no es un adaptador OBD-II compatible. Escoge el adaptador BLE.", btDenied: "Se bloqueó el permiso de Bluetooth.", btFail: "Se perdió el adaptador. Revisa que la llave esté en ON e intenta de nuevo.",
+  mfrCode: "Código del fabricante: tu mecánico lo busca para tu marca.", unlisted: "No está en nuestra lista genérica. Sistema: {s}. Tu mecánico lo busca.",
+  pendingTag: "Pendiente (aún sin confirmar)", typedTag: "Escrito", system: "Sistema", causes: "Causas comunes", likelyJob: "Trabajo probable", inYourJob: "En tu trabajo", addToJob: "Agregar a mi trabajo",
+  milOn: "Luz del motor ENCENDIDA", milOff: "Luz del motor apagada", coolantT: "Anticongelante {c} °C / {f} °F", simTitle: "Escaneo demo (datos de muestra)", scanTitle: "Tu escaneo", noCodes: "No hay códigos guardados.",
+  codeAdded: "✅ {c}: trabajo probable agregado a tu cotización",
+  g_req: "Pedido enviado. {m} confirma pronto.", g_rec: "{m} ya tiene tu carro 🙌", g_diag: "{m} lo está revisando", g_parts: "Las piezas vienen de {s} 🚚", g_work: "{m} ya está en eso 🔧",
+  g_half: "A la mitad. {m} sigue en eso", g_almost: "{m} dice que ya casi está ✨", g_ready: "¡Listo! Ven por él 🎉", colorL: "Color de tu carro", readyTxt: "¡Listo! 🎉", partsFrom: "Piezas de {s}",
+  navGarage: "Mi garaje", garKick: "Guardado en este teléfono", garH: "Mi garaje", garLead: "Tus carros, sus recalls, historial de escaneos, de servicios y lo que toca.",
+  customColor: "Color personalizado", customShort: "Otro", paintL: "Color de pintura", paintCodeL: "Código de pintura (opcional)",
+  paintCodeHint: "Está en la etiqueta del marco de la puerta del conductor (busca PAINT, C/TR o EXT). Los talleres lo usan para igualar la pintura.",
+  photoBtn: "📷 Toma o sube una foto de tu carro", soonId: "Identificar mi carro con una foto: próximamente.", soon3d: "Modelo 3D de tu carro con una foto: extra premium, próximamente.",
+  photoWorking: "Guardando tu foto en este teléfono…", photoSaved: "✅ Foto guardada solo en este teléfono.", photoLooks: "Parece {c}: ¿usarlo?", photoFail: "No se pudo leer esa foto. Prueba otra.",
+  photoColorSet: "Color de pintura: {c}.", photoAlt: "Tu carro", storageFull: "Se llenó el espacio de la app en este teléfono. Quita un carro o una foto.",
+  saveGarage: "🏠 Guardar en Mi garaje", savedGarage: "🏠 \"{n}\" guardado en Mi garaje", gEmpty: "Aún no hay carros guardados. Escoge tu carro abajo y toca <b>Guardar en Mi garaje</b>.",
+  gActive: "Seleccionado", getFixed: "Arreglarlo", useCar: "Usar este carro", photoShort: "Foto", gDelete: "Quitar carro", gIssuesH: "Problemas conocidos + recalls",
+  gScansH: "Historial de escaneos ({n})", gSvcH: "Historial de servicios ({n})", remH: "Lo que toca", nickL: "Apodo",
+  gPrivacy: "Mi garaje vive solo en este teléfono (sin cuenta, no se sube nada). Si borras los datos del sitio en el navegador, se borra.",
+  usingCar: "Usando {n}", gDelConfirm: "¿Quitar \"{n}\" y su historial de este teléfono?",
+  fixProblem: "Códigos de la luz del motor {c} (de mi escaneo del {d}).", fixFilled: "🔧 Trabajo llenado con {n} código(s). Revísalo y envíalo.", fixBasic: "🔧 Se empezó un trabajo con escaneo + inspección.",
+  srcDemo: "Escaneo demo", srcBt: "Escaneo Bluetooth", srcTyped: "Código escrito", stFixed: "arreglado", stInJob: "en un trabajo", stInQuote: "en tu cotización", stOpen: "abierto",
+  noCodesShort: "Sin códigos", noScans: "Aún no hay escaneos. Usa Escanear mi carro con este carro seleccionado.", noService: "Aún no hay trabajos terminados.",
+  rem_oil: "🛢️ Cambio de aceite", rem_rotate: "🛞 Rotación de llantas", rem_brake: "🛑 Revisión de frenos",
+  remLast: "Último: {d}", remOverMi: "{n} mi atrasado", remInMi: "toca en {n} mi", remBy: "antes del {d}", remNone: "Aún sin registro aquí · cada {e}", remMo: "{n} meses", remOr: " o ",
+  tsKick: "Dueños de Tesla", tsH: "Tu Tesla", tsOta: "NHTSA tiene <b>{n}</b> recall(s) para este modelo; <b>{o}</b> se arreglaron con una actualización de software gratis por internet. Los arreglos de recall siempre son gratis.",
+  tsOtaWait: "Revisando recalls en NHTSA…", tsSwH: "Últimas actualizaciones de software", tsSw1: "En el carro: <b>Controls › Software</b> muestra tu versión y las notas de la versión.",
+  tsSw2: "(sitio de noticias independiente, notas de cada versión)", tsSw3: "(qué versiones están saliendo ahora)", tsTipsH: "Consejos",
+  tsTip1: "Muchos recalls de Tesla se arreglan con una actualización gratis por internet: deja el carro en Wi-Fi e instala las actualizaciones.",
+  tsTip2: "Manual de Tesla: rotar llantas cada 6,250 mi (10,000 km) o con 2/32\" de diferencia, filtro de cabina cada 2 años, revisar líquido de frenos cada 4 años.",
+  tsTip3: "Las alertas de la pantalla (Controls › Service) le dicen más al mecánico que un escáner genérico.", tsSrc: "Intervalos: manual de servicio Tesla Model 3,",
+  tsLive: "Batería, versión de software y alertas en vivo necesitan el inicio de sesión oficial de Tesla (Fleet API): más adelante. Esta app nunca pide tu contraseña de Tesla.",
+  evKick: "Carro eléctrico", evTesla: "Los Tesla no usan el puerto OBD-II normal para escaneos, así que un lector Bluetooth no muestra códigos útiles. Anota cualquier alerta de la pantalla (<b>Controls › Service</b>) y escríbela abajo, o díselo al taller.",
+  evOther: "Los eléctricos reportan pocos códigos genéricos de motor. Un lector puede mostrar algunos de chasis/carrocería, pero las alertas del tablero o pantalla importan más. Escribe abajo cualquier código que veas.",
+  scanFor: "Escaneando: {c}.", scanSaveHint: "Guárdalo en Mi garaje para conservar el historial.",
+  navTires: "Llantas", navPay: "Pagar", bizK: "Demo · verla como", bizAria: "Tipo de negocio",
+  qkFix: "¿Qué tiene?", qkTires: "Medida + existencia", qkPay: "Pagar con QR", qkBook: "Agendar", qkTrack: "Seguir mi carro",
+  tiKick: "Llantas en existencia", tiH: "Revisa tu medida", tiLead: "Escribe la medida que viene en el costado de tu llanta. Ve al momento si hay y aparta un juego.",
+  tiL: "Medida de llanta (como sea)", tiQty: "¿Cuántas?", tiGo: "🔎 Ver existencia", tiEx: "Sirve 225/45R17, 225 45 17 o P225/45ZR17.",
+  tiWhere: "Dónde ver tu medida", tiWhereP: "Viene impresa en el costado de cada llanta, como <b>P225/45R17 94V</b>. 225 es el ancho en milímetros, 45 es la altura del costado (% del ancho), R17 quiere decir que es para rin de 17 pulgadas. La misma medida está en la etiqueta del marco de la puerta del conductor. ¿No sabes? Tómale foto al costado y mándanosla.",
+  swW: "225 = ancho (mm)", swA: "45 = altura (% del ancho)", swR: "R17 = rin de 17\"",
+  tiListK: "En existencia", tiFilA: "Tipo de llanta", tiAll: "Todas", tiSample: "Inventario y marcas de muestra para el demo. El taller mantiene la lista real desde su oficina.",
+  tiBad: "No pudimos leer esa medida. Escríbela como 225/45R17 (viene en el costado de la llanta).", tiEmpty: "Primero escribe tu medida.",
+  tiIn: "✅ En existencia: {n}", tiInSub: "{s} · {k} opción(es) listas", tiLow: "Solo quedan {n} de esta, pedimos las demás",
+  tiOut: "No hay en existencia ahorita", tiOutSub: "Podemos pedir {s}, normalmente en {d}.", tiOrderBy: "{n} días hábiles (muestra)",
+  tiHold: "Apartar {q}", tiReq: "📦 Pedir {q} × {s}", tiHeld: "✅ Agregado a tu cotización: {n}", tiQ: "{q} en existencia", tiNone: "Aún no hay de este tipo.",
+  tiPrice: "{p} c/u (precio del taller)", tiNoteHold: "{q} × {s} · {b} {l}", tiNoteOrder: "pedir {q} × {s}", tiMatch: "Tu medida",
+  payKick: "Pago", payH: "Pagar con QR", payLead: "El cliente escanea, escoge cómo pagar y listo. Cobro más rápido, sin esperar en el mostrador.",
+  payScan: "Escanea para pagar", payAcc: "Aceptamos", payS1: "Escanea el código con la cámara del teléfono", payS2: "Escoge cómo quieres pagar", payS3: "Listo. Te llega el recibo por texto",
+  payTry: "📱 Probar la pantalla de pago", payPrint: "🖨️ Tarjeta QR para mostrador / bahía",
+  payDemo: "<b>Demo:</b> no se procesa ningún pago y no hay cuentas reales conectadas. El QR de muestra abre un enlace demo y nombres como <b>$yourshop</b> son de ejemplo.",
+  payAmtQ: "Tu cotización: {t}", payAmtNone: "El monto sale de tu factura final",
+  pyT: "Paga a tu taller", pyAmt: "Monto", pyPick: "¿Cómo quieres pagar?", pyDemo: "Demo: no se cobra nada y no hay cuenta conectada.", pyInv: "Monto de la factura final",
+  pyWould: "Demo: aquí se abriría {m} para pagarle a {b}. No se cobró nada.", pyHandle: "Usuario de muestra: {h}",
+  qcT: "Tarjeta QR de mostrador / bahía", qcS: "Imprímela y pégala en el mostrador o en cada bahía", qcBay: "Etiqueta (opcional)", qcBayPh: "Bahía 1", qcPrint: "🖨️ Imprimir tarjeta", qcDemo: "Tarjeta de muestra · enlace demo · sin pagos reales"
+}
+};
+</script>
+<script src="config.js?v=20261017a"></script>
+<script src="core.js?v=20261017a"></script>
+<script src="beforeafter.js?v=20261013a"></script>
+<script src="car.js?v=20261013b"></script>
+<script src="vehicle.js?v=20261013b"></script>
+<script src="parts.js?v=20261015a"></script>
+<script src="symptoms.js?v=20261015a"></script>
+<script src="obd.js?v=20261013b"></script>
+<script src="scene.js?v=20261013b"></script>
+<script src="diagrams.js?v=20261013e"></script>
+<script src="stores.js?v=20261013s"></script>
+<script src="app.js?v=20261021m"></script>
+<script src="extras.js?v=20261017a"></script>
+<script>(function(){var c=SHOP_CFG.colors;window.A2HS_CFG={name:SHOP_CFG.brand.name,theme:{bg:c.bg,bg2:c.panel2,edge:c.edge,accent:c.accent,accent2:c.accent2,ink:c.ink,dim:c.dim,btnInk:"#1d0b00",display:"Orbitron,sans-serif",body:"Rajdhani,system-ui,sans-serif"}};})();</script>
+<script src="../a2hs.js"></script>
+<script src="../seasons/seasons.js?v=20261013a" defer></script>
+<script src="../poweredby.js?v=20261013a" defer></script>
+<script src="../faqbot.js?v=f1" defer></script>
+<script src="../ssai-track.js?v=t1" defer></script>
+</body>
+</html>

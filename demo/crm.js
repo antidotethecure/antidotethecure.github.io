@@ -60,9 +60,65 @@
   // demo/interim.js, which this file hands the member store to through window.SSAI_CRM. The QR / ring-up / receipt-code
   // demo controls are hidden and the ladder buttons read "Use reward".
   var INTERIM = !!(SIMPLE && SIMPLE.mode === "interim");
+  // CUSTOMER-ONLY (opt-in: window.SSAI_CUSTOMER_ONLY or CRM_CFG.customerOnly; Melody since 2026-10-13): the page is a live
+  // customer app, so the owner view (customer list, holiday blast, ring-up, app sales, performance share, top referrers,
+  // and interim.js's manager log that mounts next to it) is never put on the page, and every "Demo:" button / note is hidden.
+  // Owner tools live in the back office. Pitch/demo pages leave this unset and keep the full owner view.
+  var CUST = !!(window.SSAI_CUSTOMER_ONLY || C.customerOnly);
   var NAME = C.name || (window.NEARBY && window.NEARBY.name) || document.title.split(" — ")[0];
   var OFFER = SIMPLE ? SIMPLE.join + " welcome points" : C.offer || "10% off your next visit";
   var SLUG = NAME.toLowerCase().replace(/[^a-z0-9]+/g, "-"), KEY = "ssai_crm_" + SLUG;
+  // ---- BACK OFFICE SYNC (simple program, Christian's restaurants, 2026-10-12) ----
+  // The owner's back office (/backoffice/christian/, "Christian HQ") reads members, points, game plays and app opens from
+  // the Apps Script web app (command-center/clients/melody-lax/signup-sheet/Code.gs). Its /exec URL lives in
+  // SSAI_REWARDS.interim.api (filled from demo/christian-live.js). EMPTY = nothing leaves the phone (today's state).
+  // What is sent: a member snapshot whenever the member changes (name, phone, email, birthday, points balance / earned /
+  // used, visits, referral code + who referred them, text consent), one "game" row per finished run, and one "open" per
+  // app open (max 1 per 10 min: time, device summary, Home Screen or not, approximate location only if already allowed;
+  // see logOpen below). Nothing is sent from staff practice mode.
+  var API = C.sheet || (SIMPLE && SIMPLE.interim && SIMPLE.interim.api) || "";
+  if (API && !C.sheet) C.sheet = API;
+  // STAFF PRACTICE (?staff=1, opened from the staff app /staff/christian/): game runs go to the employee's practice tally
+  // (this phone + the backend's StaffPractice tab), never to a member, real rewards or the customer leaderboard.
+  var STAFF = null;
+  try { if (SIMPLE && /[?&]staff=1(&|$)/.test(location.search)) STAFF = { name: String(localStorage.getItem("ssai_staff_name") || "Staff").slice(0, 24) }; } catch (x) { if (SIMPLE && /[?&]staff=1(&|$)/.test(location.search)) STAFF = { name: "Staff" }; }
+  function boPost(o) {
+    if (!API || STAFF && o.type !== "staff_practice") return;
+    o.slug = SLUG; o.restaurant = NAME;
+    try { fetch(API, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }).catch(function () {}); } catch (x) {}
+  }
+  // SCOUT (Code.gs): every points event carries a unique event id (eid). The server rejects duplicates and over-cap awards
+  // ("Already counted") and writes an adjustment for points this phone showed but the server refused; pullAdj() applies it once.
+  function evId(p) { return p + Date.now().toString(36) + code4(6); }
+  var syncT = 0, syncM = null;
+  // like boPost, but the answer is readable (text/plain = a "simple" CORS request): the server hands back the card ID
+  function memberPost(o) {
+    o.slug = SLUG; o.restaurant = NAME;
+    try { fetch(API, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }).then(function (x) { return x.json(); }).then(function (j) {
+      if (j && j.dup) {   // server: this phone number / email / phone already has a membership here (one per person, one per phone)
+        var dl = mine(), dm = dl[0]; if (!dm || dm.id !== o.id) return;
+        if (j.same && j.member) { rsApply(j); toast("✅ You're already a member here. We kept your original card and points."); }
+        else { toast("📱 That number is already a member. Sign back in to use it on this phone."); openRestore(); }
+        return;
+      }
+      if (!j || !j.card || !/^[A-Z]{2,4}-[A-Z0-9]{5}$/.test(j.card)) return;
+      var l = mine(), m = l[0]; if (!m || m.id !== o.id || m.card === j.card) return;
+      m.card = j.card; save(l); drawJoin(); if (window.SSAI_CARD && SSAI_CARD.refresh) SSAI_CARD.refresh();
+    }).catch(function () {}); } catch (x) {}
+  }
+  function syncLater(m) {
+    if (!API || STAFF || !SIMPLE || !m || !m.id || m.sample) return;
+    syncM = m; clearTimeout(syncT);
+    syncT = setTimeout(function () {
+      var r = syncM; if (!r) return;
+      // the reply carries the member's permanent card ID (assigned server-side, e.g. MLD-4K7Q2): keep it on the phone
+      memberPost({ type: "member", id: r.id, name: r.name, phone: r.phone || "", email: r.email || "",
+        bday: r.bday >= 0 ? (r.bday + 1) + "/" + (r.bdd || "") + "/" + (r.bdy || "") : "", joined: r.joined || 0, last: r.last || 0,
+        stars: r.stars || 0, earned: r.earned != null ? r.earned : (r.stars || 0), spent: r.spent || 0, visits: r.visits || 0,
+        ref: r.ref || "", refBy: r.refBy || "", friends: (r.friends || []).length, gameTotal: r.gtot || 0, redeems: r.nred || 0,
+        sms: r.sms && !r.stop ? "yes" : "no", smsAt: r.smsAt ? new Date(r.smsAt).toISOString() : "", src: r.src || "", dev: devId() });
+    }, 1200);
+  }
   // contact gate: guests only give their info when they order or save a game prize / score (see gate() below).
   // Exposed right away so game and order code can call it: SSAI_GATE("order" | "prize" | "score", function (member) { ... })
   window.SSAI_GATE = gate;
@@ -149,8 +205,13 @@
   }
   function reviewUrl() { var N = window.NEARBY, sp = N && N.spots && N.spots[0]; return EARN.review.url || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(NAME + (sp && sp.q ? " " + sp.q : "")); }
   var lastBonus = 0;   // bonus pts added by the last visit() call, for the toast
-  function earnOnce(m, key, pts, why) { m.earned = m.earned || {}; if (m.earned[key] || !pts) return 0; m.earned[key] = Date.now(); addPts(m, pts, why); tag(m, key.replace(/_\d+$/, "") + "_bonus"); return pts; }
-  function tag(m, k) { m.ledger[0].k = k; (m.ec = m.ec || {})[k] = (m.ec[k] || 0) + 1; }
+  // one-time bonus keys live in m.once (m.earned is the lifetime points NUMBER from addPts; older builds kept the keys in m.earned)
+  function onceMap(m) { if (!m.once) m.once = (m.earned && typeof m.earned === "object") ? m.earned : {}; if (typeof m.earned === "object") m.earned = null; return m.once; }
+  function earnOnce(m, key, pts, why) { var o = onceMap(m); if (o[key] || !pts) return 0; o[key] = Date.now(); addPts(m, pts, why); tag(m, key.replace(/_\d+$/, "") + "_bonus"); return pts; }
+  function tag(m, k) { m.ledger[0].k = k; (m.ec = m.ec || {})[k] = (m.ec[k] || 0) + 1;
+    // bonus points (join, birthday, referral, spin, check-in…) go to the server ledger; game points and interim claims have their own events
+    if (SIMPLE && API && !STAFF && m.id && !m.sample && m.ledger[0].pts > 0 && k !== "game_bonus" && /_bonus$|^referral_/.test(k))
+      boPost({ type: "award", source: k, pts: m.ledger[0].pts, member: m.id, dev: devId(), eid: evId("A") }); }
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   var MONTHS_L = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   // birthday: full date so the treat lands on the real day; staff check a photo ID with the same date before giving it out
@@ -221,6 +282,7 @@
     ".crm-qr small{display:block;color:#555;font-size:12.5px;margin-top:4px}",
     ".crm-demo{display:block;width:100%;margin-top:8px;border:1px dashed #3DDC97;background:transparent;color:#3DDC97;border-radius:12px;padding:10px;font-size:13.5px;font-weight:800;cursor:pointer}",
     ".crm-demo:disabled{opacity:.4;cursor:default}",
+    CUST ? ".crm-demo{display:none!important}" : "",
     ".crm-tier{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:9px 0;border-top:1px solid #25336A;font-size:14px}",
     ".crm-tier:first-of-type{border-top:0}.crm-tier .bar{grid-column:1/3;height:6px;border-radius:9px;background:#1a2656;overflow:hidden}.crm-tier .bar i{display:block;height:100%;background:linear-gradient(90deg,#E8582A,#FFD23F)}",
     ".crm-tier button{border:0;border-radius:10px;padding:8px 12px;font-weight:900;font-size:13px;background:#E8582A;color:#fff;cursor:pointer}.crm-tier button:disabled{background:#1a2656;color:#7F8AAA;cursor:default}",
@@ -313,12 +375,16 @@
   function refCode(first) { return (first.replace(/[^A-Za-z]/g, "").slice(0, 6).toUpperCase() || "FRIEND") + "-" + code4(3); }
   // the 4-digit "give this to the cashier" code changes every 5 minutes, like the big chains' apps
   function regCode(m) { var w = Math.floor(Date.now() / 3e5), h = 7; String(m.id + ":" + w).split("").forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) % 1000003; }); return String(h % 10000).padStart(4, "0"); }
-  function put(m) { var l = mine(); l[0] = m; save(l); }
+  function put(m) { var l = mine(); l[0] = m; save(l); syncLater(m); }
   // wk ("bar" | "food") only matters with split wallets; anything without one (bonuses) goes to the bonusTo wallet
   function addPts(m, n, why, wk) {
     var l = { ts: Date.now(), pts: n, t: why };
     if (WAL) { migrate(m); wk = W[wk] ? wk : BONUS; m.w[wk] = Math.max(0, (m.w[wk] || 0) + n); m.stars = m.w.bar + m.w.food; l.w = wk; }
     else m.stars = Math.max(0, (m.stars || 0) + n);
+    // lifetime counters for the back office (the ledger keeps only the last 40 lines)
+    if (m.earned != null && typeof m.earned === "object") onceMap(m);
+    if (m.earned == null) { m.earned = Math.max(0, (m.stars || 0) - (n > 0 ? n : 0)); m.spent = m.spent || 0; }
+    if (n > 0) m.earned += n; else if (n < 0) { m.spent = (m.spent || 0) - n; m.nred = (m.nred || 0) + 1; }
     (m.ledger = m.ledger || []).unshift(l); m.ledger = m.ledger.slice(0, 40);
   }
   // split wallets: one purchase with separate food and bar dollars → kitchen points and bar points, each at its own rate.
@@ -335,7 +401,7 @@
   var qs = new URLSearchParams(location.search), INVITE = (qs.get("ref") || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 16);
   // missed-call text-back: the auto-text after an unanswered or after-hours call links here with ?missed=1
   var MISSED = (qs.get("missed") === "1" || qs.get("src") === "call") && (!SIMPLE || !!C.missed), MC = C.missed || { offer: "10% off your order", days: 7 };
-  var FRIENDS = ["Jasmine", "Carlos", "Devon", "Mia", "Andre", "Lily", "Marco", "Keisha", "Tran", "Gabby"];
+  var FRIENDS = ["Jasmine", "Mateo", "Devon", "Mia", "Andre", "Lily", "Marco", "Keisha", "Tran", "Gabby"];
   function shareLink(m) { return location.origin + location.pathname + "?ref=" + encodeURIComponent(m.ref) + "#crm-join"; }
 
   // a game calls SSAI_WIN("Free fries") when a player wins: the prize lands in their wallet with a code to redeem in store
@@ -350,12 +416,18 @@
   var KID_RULE = "Kid prize — redeemable with the young player at the table, one per kid per visit.";
   window.SSAI_KID_RULE = KID_RULE;
   function kidTag(w) { return w && w.kid ? '<div style="display:inline-block;margin:4px 0 2px;background:#FFD23F;color:#1a0d00;font:900 12px system-ui;letter-spacing:.06em;border-radius:99px;padding:3px 10px">🧒 KID PRIZE</div>' : ''; }
+  // ONE PRIZE PER DAY (2026-10-13, standard; McDonald's-style): a member wins / uses at most one prize per LA day: game win,
+  // daily draw, spin, ladder reward or early-bird gift (m.pday = that day). A 2nd win the same day is "Come back tomorrow"
+  // (the game still plays for fun and score). The real check is server-side (Code.gs prize_win / PrizeDay tab).
+  function pdKey() { return new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); }
+  function prizeUsedToday(m) { return !!(m && m.pday === pdKey()); }
   window.SSAI_WIN = function (prize, opt) {
     var w = { t: prize, c: "WIN-" + code4(4), ts: Date.now() }, m = mine()[0], held = activeWin(m);
     if (opt && opt.kid) { w.kid = 1; w.c = "KID-" + code4(4); }
     if (held) return { prize: held, saved: !!m, blocked: true, until: until(held) };
+    if (prizeUsedToday(m)) { toast("🏆 One prize per day: come back tomorrow for your next prize. Your score still counts."); return { prize: { t: prize, c: "", ts: w.ts, until: "tomorrow" }, saved: false, blocked: true, tomorrow: true, until: "tomorrow" }; }
     w.until = until(w);
-    if (m) { (m.wins = m.wins || []).unshift(w); m.wins = m.wins.slice(0, 5); (m.ledger = m.ledger || []).unshift({ ts: w.ts, pts: 0, t: "🏆 Won " + prize + " in the game" }); put(m); }
+    if (m) { m.pday = pdKey(); boPost({ type: "prize_win", member: m.id, dev: devId(), source: "game", prize: prize, eid: "W" + w.ts.toString(36) + code4(4) }); (m.wins = m.wins || []).unshift(w); m.wins = m.wins.slice(0, 5); (m.ledger = m.ledger || []).unshift({ ts: w.ts, pts: 0, t: "🏆 Won " + prize + " in the game" }); put(m); }
     else { try { localStorage.setItem(PEND, JSON.stringify(w)); } catch (x) {} }
     drawJoin(); return { prize: w, saved: !!m };
   };
@@ -366,7 +438,7 @@
     var D = C.draw; if (!D || !D.odds || !(D.prizes || []).length) return;
     var m = mine()[0]; if (!m || m.sample) return;
     var day = new Date().toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" });
-    if (m.drawDay === day || activeWin(m) || document.querySelector(".crm-draw")) return;
+    if (m.drawDay === day || activeWin(m) || prizeUsedToday(m) || document.querySelector(".crm-draw")) return;
     var won = Math.random() < 1 / D.odds, prize = D.prizes[(Math.random() * D.prizes.length) | 0];
     var ov = document.createElement("div"); ov.className = "crm-draw";
     ov.innerHTML = '<div class="crm-draw-card"><div class="crm-draw-h">🎟️ Your daily lucky draw</div><div class="crm-draw-s">' + e(NAME) + ' picks a winner every day. Tap to scratch.</div>' +
@@ -379,7 +451,7 @@
       m = mine()[0]; m.drawDay = day;
       setTimeout(function () {
         if (won) {
-          var w = { t: prize, c: "LUCKY-" + code4(4), ts: Date.now(), k: "draw" }; w.until = until(w);
+          var w = { t: prize, c: "LUCKY-" + code4(4), ts: Date.now(), k: "draw" }; w.until = until(w); m.pday = pdKey();
           (m.wins = m.wins || []).unshift(w); m.wins = m.wins.slice(0, 5); (m.ledger = m.ledger || []).unshift({ ts: w.ts, pts: 0, t: "🎟️ Won the daily lucky draw: " + prize }); put(m);
           t.innerHTML = "<span>🎉 WINNER</span>"; t.classList.add("win");
           r.innerHTML = "You won <b>" + e(prize) + "</b>!<div class='crm-draw-c'>" + w.c + "</div>Show this code at " + e(NAME) + " · good until " + e(w.until) + " (3 days)";
@@ -433,7 +505,17 @@
   function gpHeld() { try { var h = JSON.parse(localStorage.getItem(GPKEY) || "null"); return h && h.day === gpDay() ? h : null; } catch (x) { return null; } }
   function gpUsed(m) { return m && m.gday === gpDay() ? m.gpts || 0 : 0; }
   function gpFor(score) { var g = SIMPLE.game; return Math.max(0, Math.min(g.dailyCap, Math.floor((+score || 0) / g.perScore))); }
-  function gpAdd(m, n, why) { if (m.gday !== gpDay()) { m.gday = gpDay(); m.gpts = 0; } n = Math.max(0, Math.min(n, SIMPLE.game.dailyCap - m.gpts)); if (n) { addPts(m, n, why); tag(m, "game_bonus"); m.gpts += n; } return n; }
+  function gpAdd(m, n, why) { if (m.gday !== gpDay()) { m.gday = gpDay(); m.gpts = 0; } n = Math.max(0, Math.min(n, SIMPLE.game.dailyCap - m.gpts)); if (n) { addPts(m, n, why); tag(m, "game_bonus"); m.gpts += n; m.gtot = (m.gtot || 0) + n; } return n; }
+  // staff practice: practice points only (no daily cap), kept apart from members and rewards
+  function staffAward(score, label) {
+    var sc = Math.max(0, Math.round(+score || 0)), p = Math.floor(sc / SIMPLE.game.perScore), k = "ssai_staff_practice", t = {};
+    try { t = JSON.parse(localStorage.getItem(k) || "{}") || {}; } catch (x) {}
+    t.runs = (t.runs || []); t.runs.unshift({ ts: Date.now(), slug: SLUG, game: C.game || "Game", score: sc, pts: p, name: STAFF.name }); t.runs = t.runs.slice(0, 300);
+    try { localStorage.setItem(k, JSON.stringify(t)); } catch (x) {}
+    boPost({ type: "staff_practice", name: STAFF.name, game: C.game || "Game", score: sc, pts: p, dev: devId() });
+    toast("🧑‍🍳 +" + p + " practice points for " + STAFF.name + " (practice only, not Rewards)");
+    return { pts: p, want: p, saved: true, capped: false, today: p, cap: SIMPLE.game.dailyCap, practice: true };
+  }
   function gpCredit(m) { var h = gpHeld(); m.lastGame = 0; if (!h || !h.pts) return 0; try { localStorage.removeItem(GPKEY); } catch (x) {} m.lastGame = gpAdd(m, h.pts, "🎮 " + (C.game || "Game") + " points (played before joining)"); return m.lastGame; }
   // member store for demo/interim.js (interim mode only): read / change the member on this phone, then redraw
   if (INTERIM) window.SSAI_CRM = {
@@ -442,8 +524,10 @@
     add: function (m, n, why, k) { addPts(m, n, why); if (k) tag(m, k); },
     save: function (m) { put(m); drawJoin(); drawOwn(); },
     redraw: function () { drawJoin(); drawOwn(); },
-    join: function (cb) { GATE_TXT.interim = ["Join " + NAME + " Rewards first", "Free. Add your name and a phone or email, then add your visit.", "🎁 Join free"]; return gate("interim", cb); },
-    toast: toast, esc: e, code4: code4
+    join: function (cb, opts) { GATE_TXT.interim = ["Join " + NAME + " Rewards first", "Free. Add your name and a phone or email, then add your visit.", "🎁 Join free"]; return gate("interim", cb, opts); },   // opts {title, sub, btn}: custom sheet wording (scorespecial.js)
+    toast: toast, esc: e, code4: code4,
+    dev: function () { return devId(); }, pday: pdKey, prizeUsedToday: function () { return prizeUsedToday(mine()[0]); },
+    sync: function () { var m = mine()[0]; if (m) syncLater(m); }, api: API, perDollar: PER
   };
   if (SIMPLE) window.SSAI_GAMEPTS = {
     cfg: SIMPLE.game,
@@ -451,9 +535,11 @@
     member: function () { return mine()[0] || null; },
     // call ONCE per finished run. Returns {pts, saved, capped, today, cap}: pts actually credited (member) or held (guest)
     award: function (score, label) {
+      if (STAFF) return staffAward(score, label);
       var want = gpFor(score), cap = SIMPLE.game.dailyCap, m = mine()[0], got, today;
       if (m) { got = gpAdd(m, want, "🎮 " + (label || C.game || "Game") + " · score " + Math.round(+score || 0).toLocaleString()); today = gpUsed(m); put(m); drawJoin(); drawOwn(); }
       else { var h = gpHeld() || { day: gpDay(), pts: 0 }; got = Math.max(0, Math.min(want, cap - h.pts)); h.pts += got; today = h.pts; try { localStorage.setItem(GPKEY, JSON.stringify(h)); } catch (x) {} drawJoin(); }
+      if (API) boPost({ type: "game", member: m ? m.id : "", dev: devId(), score: Math.max(0, Math.round(+score || 0)), pts: got, eid: evId("G") });   // pts = what this phone credited
       return { pts: got, want: want, saved: !!m, capped: got < want, today: today, cap: cap };
     },
     held: function () { var h = gpHeld(); return h ? h.pts : 0; },
@@ -514,7 +600,8 @@
         // points + scan to earn
         (WAL ? '<div class="crm-box">' + walTiles(me) + '<button type="button" class="crm-scan" data-a="scan" style="width:100%;margin-top:10px">📲 Scan to earn</button>'
           : '<div class="crm-box"><div class="crm-pts"><div><div class="k" style="font-size:10px">Your points</div><div class="n">' + pts.toLocaleString() + '<small>pts</small></div></div>' +
-          (INTERIM ? '<button type="button" class="crm-scan" data-a="visit">🧾 Add my visit</button></div>' : '<button type="button" class="crm-scan" data-a="scan">📲 Scan to earn</button></div>')) +
+          (INTERIM ? '<button type="button" class="crm-scan" data-a="visit">🧾 Add my visit</button></div>' : '<button type="button" class="crm-scan" data-a="scan">📲 Scan to earn</button></div>') +
+          (window.SSAI_CARD ? SSAI_CARD.buttonHTML(me) : '')) +
           '<div class="crm-qr"><div class="qr"></div><div class="d4">' + regCode(me) + '</div><small>Show this to the cashier or bartender, or scan it at the register.<br>They ring you up and your points land here. Code refreshes every 5 min.</small></div>' +
           (WAL ? '<p style="margin:10px 0 0;font-size:13px">' + walEarnLine() + ' <b>They never mix:</b> bar points only buy bar rewards, kitchen points only buy food rewards.</p>'
             : SIMPLE ? '<p style="margin:10px 0 0;font-size:13px">Earn <b style="color:#FFD23F">' + PER + ' points per $1</b> on eligible purchases: ' + (INTERIM ? 'tap <b>Add my visit</b> after you pay and snap your receipt.' : 'show this code when staff ring you up.') + (window.SSAI_GAMEPTS ? ' 🎮 Game points today: <b>' + gpUsed(me) + ' of ' + SIMPLE.game.dailyCap + '</b>.' : '') + '</p>'
@@ -563,9 +650,10 @@
         // activity
         '<div class="crm-box"><h4>📜 Points activity</h4><div class="crm-feed">' + ((me.ledger || []).map(function (l) {
           return '<div><span>' + (WAL && W[l.w] ? '<i class="crm-wt">' + wname(l.w) + '</i>' : '') + e(l.t) + '</span><b class="' + (l.pts >= 0 ? 'plus' : 'minus') + '">' + (l.pts >= 0 ? '+' : '') + l.pts.toLocaleString() + '</b></div>'; }).join("") || '<div><span>Nothing yet. Scan at the register to start earning.</span></div>') + '</div></div>' +
-        '<button type="button" class="go" style="background:#1a2656;box-shadow:none" data-a="owner">👀 See what the owner sees ↓</button>' +
+        (CUST ? '' : '<button type="button" class="go" style="background:#1a2656;box-shadow:none" data-a="owner">👀 See what the owner sees ↓</button>') +
+        (STAFF ? '' : '<button type="button" class="crm-gx" data-a="restore">📱 Not you? Sign back in to your account</button>') +
         (TC ? '<button type="button" class="crm-gx" data-a="signout">🚪 Sign out of this phone' + (me.guardian ? ' (parent check)' : '') + '</button>' : '') +
-        '<p class="crm-fine">Demo: points and friends here are saved on this phone only. Live, they\'re in the business\'s database, so they follow the customer to any phone.</p>';
+        (CUST ? '' : '<p class="crm-fine">Demo: points and friends here are saved on this phone only. Live, they\'re in the business\'s database, so they follow the customer to any phone.</p>');
       var qr = join.querySelector(".crm-qr");
       function showQR() {
         qr.style.display = "block";
@@ -645,6 +733,7 @@
           if (window.GameMenu) setTimeout(function () { window.GameMenu.open(); }, 400); return;
         }
         if (a === "earn") { openEarn(); return; }
+        if (a === "restore") { openRestore(); return; }
         if (a === "owner") own.scrollIntoView({ behavior: "smooth", block: "start" });
       };
       return;
@@ -659,6 +748,7 @@
       '<div class="crm-gift"><b>🎁</b><span>Join now and get <u>' + e(OFFER) + '</u> instantly</span></div>' +
       (SIMPLE ? '<h3>One simple rewards program</h3><p>Earn ' + PER + ' points per $1 on eligible purchases, +' + EARN.birthday + ' on your birthday, +' + REF.first + ' for every friend who joins and visits, and up to ' + SIMPLE.game.dailyCap + ' a day from the game. Takes 10 seconds.</p>' :
       '<h3>Unlock your reward</h3><p>Plus ' + (WAL ? W.bar.per + ' ' + wname("bar") + ' pts per $1 on drinks, ' + W.food.per + ' ' + wname("food") + ' pts per $1 on food' : PER + ' points for every $1') + ', a birthday treat, and your own code to invite friends. Takes 10 seconds.</p>') +
+      '<button type="button" class="crm-elink" data-a="restore" style="margin:-4px 0 0">📱 Already a member? Sign back in</button>' +
       '<button type="button" class="crm-elink" data-a="earn" style="margin:-4px 0 4px">✨ See every way to earn →</button>' +
       '<form autocomplete="on" novalidate><label>First name</label><input name="name" maxlength="40" autocomplete="given-name">' +
       '<div class="two"><div><label>Phone</label><input name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="(310) 555-0123"></div>' +
@@ -671,7 +761,7 @@
       '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Send my rewards (points, prize and birthday codes) from ' + e(NAME) + ' to me by text or email. Msg & data rates may apply. Reply STOP anytime.</span></label>' + smsBox() +
       '<button class="go" type="submit">🎁 Get my reward</button><div class="err"></div></form>' +
       '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + '</p>';
-    join.onclick = function (ev) { var b = ev.target.closest("[data-a=earn]"); if (b) openEarn(); };
+    join.onclick = function (ev) { var b = ev.target.closest("[data-a=earn],[data-a=restore]"); if (!b) return; if (b.dataset.a === "restore") openRestore(); else openEarn(); };
     join.querySelector("form").onsubmit = function (ev) {
       ev.preventDefault();
       var res = createMember(this);
@@ -706,10 +796,10 @@
       else if (MISSED) { r.wins = [{ t: MC.offer, c: "CALL-" + code4(4), ts: Date.now(), ttl: (MC.days || 7) * 864e5, k: "missed" }]; r.ledger.unshift({ ts: Date.now(), pts: 0, t: "📞 Sorry we missed your call: " + MC.offer }); r.src = "missed call"; }
       // game accounts (CRM_CFG.tokens): ONE member per device, bound to it (live: server-side + SMS verification)
       if (TC) { r.dev = devId(); r.bound = Date.now(); }
-      var list = mine(); list.unshift(r); save(TC ? [r] : list.slice(0, 5));
+      var list = mine(); list.unshift(r); save(TC ? [r] : list.slice(0, 5)); syncLater(r);
       // live restaurants: send the sign-up to the owner's Google Sheet (Apps Script web app in CRM_CFG.sheet)
       if (C.sheet) try { fetch(C.sheet, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({
-        name: r.name, phone: r.phone, email: r.email, bday: r.bday >= 0 ? (r.bday + 1) + "/" + r.bdd + "/" + r.bdy : "",
+        slug: SLUG, restaurant: NAME, memberId: r.id, name: r.name, phone: r.phone, email: r.email, bday: r.bday >= 0 ? (r.bday + 1) + "/" + r.bdd + "/" + r.bdy : "",
         src: r.src || qs.get("s") || qs.get("src") || (rc ? "referral " + rc : "app"), code: r.code, prize: (r.wins && r.wins[0] && r.wins[0].t) || "", prizeCode: (r.wins && r.wins[0] && r.wins[0].c) || "", ref: r.ref,
         smsConsent: r.sms ? "yes" : "no", smsConsentAt: r.sms ? new Date(r.smsAt).toISOString() : "", smsConsentText: r.sms ? SMS_TEXT : "" }) }); } catch (x) {}
     return { member: r };
@@ -720,13 +810,19 @@
   // Otherwise a short sign-up sheet opens (name, phone or email, opt-in, optional birthday); on submit the member is
   // created through createMember() (welcome points, referral, Google Sheet, any pending game prize), then cb(member).
   // "Not now" closes it without calling cb. Returns true when cb already ran.
+  // opts (optional, used by demo/claimscore.js "claim your score after the game"): {title, sub, btn} override the sheet's
+  // wording, lead = extra HTML under it (rank / prize), later = the "Not now" label, onLater() runs after "Not now",
+  // onOpen(overlay) / onClose() hooks, noFocus = don't focus the first field (the glove pointer shows it instead), cls = extra
+  // overlay class. The fields, consent boxes, createMember() and where the info goes are exactly the same as without opts.
   var GATE_TXT = {
     order: ["Finish your order", "Add your name and a phone or email so " + NAME + " can reach you about this order.", "Send my order"],
     prize: ["Save your prize & score", "Add your name and a phone or email to save your prize to your " + NAME + " Rewards. Your code shows right after.", "🎁 Save my prize"],
     score: ["Save your prize & score", "Add your name and a phone or email to put your score on the weekly board. If you win, that's how we reach you.", "🏆 Post my score"]
   };
   var gateEl = null;
-  function gate(reason, cb) {
+  function gate(reason, cb, opts) {
+    opts = opts || {};
+    if (STAFF) { toast("🧑‍🍳 Staff practice: no sign-ups, orders or leaderboard posts here."); return; }
     // KIDS' PRIVACY (COPPA): Kid mode only unlocks through a PARENT/GUARDIAN account on this phone. Reasons "kidunlock" /
     // "kidprize" word the sheet for the parent, require the "I'm the parent/guardian (18+) and this is my own phone and
     // email" box, and mark the account m.guardian. The account and every contact detail belong to the parent; the child
@@ -738,9 +834,10 @@
     if (m && (!both || hasBoth(m)) && (!kidg || m.guardian)) { if (cb) cb(m); return true; }
     if (gateEl) gateEl.close();
     var T = GATE_TXT[reason] || GATE_TXT.order, rid = "crm-g" + code4(4), pre = function (k) { return m && m[k] ? ' value="' + e(m[k]) + '"' : ''; };
+    if (opts.title) T = [opts.title, opts.sub || T[1], opts.btn || T[2]];
     if (m && !kidg) T = [T[0], "Add your " + (okPhone(m.phone) ? "email" : okEmail(m.email) ? "phone number" : "phone number and email") + " to finish your free account. It's tied to this phone.", T[2]];
-    var ov = document.createElement("div"); ov.className = "crm-gate"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", rid); ov.setAttribute("data-scroll-ok", "");
-    ov.innerHTML = '<section class="crm-card"><span class="k">' + e(NAME) + ' Rewards · free</span><h3 id="' + rid + '">' + e(T[0]) + '</h3><p>' + e(T[1]) + '</p>' +
+    var ov = document.createElement("div"); ov.className = "crm-gate" + (opts.cls ? " " + opts.cls : ""); ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", rid); ov.setAttribute("data-scroll-ok", "");
+    ov.innerHTML = '<section class="crm-card"><span class="k">' + e(NAME) + ' Rewards · free</span><h3 id="' + rid + '">' + e(T[0]) + '</h3><p>' + e(T[1]) + '</p>' + (opts.lead || '') +
       (m ? '' : SIMPLE ? '<div class="crm-gift"><b>🎁</b><span>You also get <u>' + SIMPLE.join + ' welcome points</u> on joining</span></div>' : '<div class="crm-gift"><b>🎁</b><span>You also get <u>' + e(OFFER) + '</u> + 100 ' + (WAL ? W[BONUS].label.toLowerCase() + ' ' : '') + 'points' + (both && ON ? ' + ' + TOK.weeklyFree + ' free tokens a week' : '') + '</span></div>') +
       (INVITE && !m && SIMPLE ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: your friend earns ' + REF.first + ' points after your first visit.</div>' : '') + (INVITE && !m && !SIMPLE ? '<div class="crm-invited">🤝 Joining with code <b>' + e(INVITE) + '</b>: ' + e(REF.friendGift) + ' with your first order + ' + REF.friend + ' bonus points.</div>' : '') +
       '<form autocomplete="on" novalidate>' + (kidg ? '<div class="crm-invited" style="border-color:#FFD23F;background:#FFD23F22;color:#FFE9A3">🧒 Kids: hand the phone to a parent or guardian for this part.</div>' : '') + '<label>' + (kidg ? "Parent or guardian's first name" : "First name") + '</label><input name="name" maxlength="40" autocomplete="given-name" enterkeyhint="next"' + pre("name") + '>' +
@@ -754,7 +851,8 @@
         '<div class="crm-idnote">🪪 Bring a photo ID that matches this birthday to claim your treat.</div></details>') +
       '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Send my rewards (points, prize and birthday codes) from ' + e(NAME) + ' to me by text or email. Msg & data rates may apply. Reply STOP anytime.</span></label>' + smsBox() +
       '<button class="go" type="submit">' + e(T[2]) + '</button><div class="err" role="alert"></div>' +
-      '<button type="button" class="crm-gx">Not now</button></form>' +
+      (m ? '' : '<button type="button" class="crm-elink" data-a="restore" style="text-align:center">📱 Already a member? Sign back in</button>') +
+      '<button type="button" class="crm-gx">' + e(opts.later || "Not now") + '</button></form>' +
       '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + '</p></section>';
     var html = document.documentElement, prevOv = html.style.overflow, vv = window.visualViewport;
     function fit() { if (vv) { ov.style.height = vv.height + "px"; ov.style.top = vv.offsetTop + "px"; } }
@@ -762,10 +860,12 @@
     function close() {
       if (!ov.parentNode) return; ov.remove(); gateEl = null; html.style.overflow = prevOv;
       document.removeEventListener("keydown", key); if (vv) { vv.removeEventListener("resize", fit); vv.removeEventListener("scroll", fit); }
+      if (opts.onClose) try { opts.onClose(); } catch (x) {}
     }
     ov.close = close; gateEl = ov;
     var f = ov.querySelector("form");
-    ov.querySelector(".crm-gx").onclick = close;
+    ov.querySelector(".crm-gx").onclick = function () { close(); if (opts.onLater) try { opts.onLater(); } catch (x) {} };
+    var rsb = ov.querySelector("[data-a=restore]"); if (rsb) rsb.onclick = function () { close(); openRestore(cb); };
     ov.addEventListener("click", function (ev) { if (ev.target === ov) close(); });
     f.onsubmit = function (ev) {
       ev.preventDefault();
@@ -786,10 +886,129 @@
     };
     document.body.appendChild(ov); html.style.overflow = "hidden";
     document.addEventListener("keydown", key); if (vv) { vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); fit(); }
-    setTimeout(function () { try { f.elements.name.focus({ preventScroll: true }); } catch (x) { f.elements.name.focus(); } }, 60);
+    if (opts.onOpen) try { opts.onOpen(ov); } catch (x) {}
+    if (!opts.noFocus) setTimeout(function () { try { f.elements.name.focus({ preventScroll: true }); } catch (x) { f.elements.name.focus(); } }, 60);
     return false;
   }
   gate.member = function () { return mine()[0] || null; };
+  gate.offer = OFFER;   // what joining gets you (CRM_CFG.offer, or "N welcome points" on the simple program): claimscore.js quotes it
+
+  // ---- SIGN BACK IN: restore my account on a new phone (2026-10-13, standard for every restaurant) ----
+  // A guest on a new phone (or after Safari cleared the site) types the phone OR email they joined with, gets a 6-digit code
+  // (text via Twilio Verify, or email) and types it. Code.gs restore_start / restore_check never says whether a contact is
+  // a member, sends the code, and on a match returns THAT member's server record and moves the member to this phone's
+  // device id. The phone writes the server's numbers (points, card ID, ledger, today's prize + game points, unused wins,
+  // best score, location bonus) into the usual member store and never sends its own points up first. One member per
+  // phone: if this phone holds someone else, the guest confirms the switch and that member is signed out HERE only (their
+  // account stays safe on the server). Staff can't do this for a guest and never see codes.
+  // No API (demo): a friendly "works once the app is live" note. ?test=1 without an API = a mock (any contact, code 123456).
+  var RS_TEST = !API && /[?&]test=1(&|$)/.test(location.search);
+  var BESTK = C.bestKey || { "melody-bar-grill": "melody-best" }[SLUG] || "";
+  function rsPost(o, cb) {
+    o.slug = SLUG; o.dev = devId();
+    if (RS_TEST) { setTimeout(function () { cb(rsMock(o)); }, 350); return; }
+    var done = false, fin = function (j) { if (!done) { done = true; cb(j); } };
+    try { fetch(API, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }).then(function (x) { return x.json(); })
+      .then(function (j) { if (j && !j.ok && j.reason === "unknown type") j = { ok: false, reason: "Signing back in isn't switched on yet. Your points are safe: try again in a day or two." }; fin(j || { ok: false }); }, function () { fin({ ok: false, reason: "No connection. Check your signal and try again." }); }); }
+    catch (x) { fin({ ok: false, reason: "No connection. Check your signal and try again." }); }
+  }
+  function rsMock(o) {   // ?test=1 only: lets the flow be clicked through without a backend
+    if (o.type === "restore_start") return /@/.test(o.contact) || /\d{10}/.test(String(o.contact).replace(/\D/g, "")) ? { ok: true, sent: true, masked: /@/.test(o.contact) ? String(o.contact).charAt(0) + "•••@" + String(o.contact).split("@")[1] : "•••" + String(o.contact).replace(/\D/g, "").slice(-4), msg: "Test mode: the code is 123456." } : { ok: false, reason: "Type the phone number or email you joined with." };
+    if (String(o.code) !== "123456") return { ok: false, wrong: true, reason: "Wrong code. (Test mode: it's 123456.)" };
+    var now = Date.now();
+    return { ok: true, member: { id: "TESTRSTR", name: "Test Guest", phone: /@/.test(o.contact) ? "" : o.contact, email: /@/.test(o.contact) ? o.contact : "", bday: "", joined: now - 30 * 864e5, last: now - 2 * 864e5,
+      stars: 1234, earned: 1500, spent: 266, visits: 5, ref: "TEST-R2D", refBy: "", friends: 0, gameTotal: 40, redeems: 1, sms: false, smsAt: "", src: "test", card: "" },
+      ledger: [{ ts: now, pts: 0, t: "📱 Signed back in on a new phone" }, { ts: now - 2 * 864e5, pts: 40, t: "🎮 Game points · score 4,000" }, { ts: now - 30 * 864e5, pts: 100, t: "🎉 Welcome bonus" }],
+      ec: {}, friendIds: {}, best: 4000, gameToday: 0, wins: [], prizeToday: false, adjDone: [], eb: { state: "none" }, locBonus: false };
+  }
+  // server record → the member object this file already uses (same fields createMember / syncLater use)
+  function rsApply(j) {
+    var s = j.member || {}, old = mine()[0], same = old && old.id === s.id, now = Date.now(), bd = String(s.bday || "").split("/");
+    var refBy = String(s.refBy || "").replace(/^Referral code /i, "").trim();
+    var r = { id: String(s.id), name: String(s.name || "Member"), phone: String(s.phone || ""), email: String(s.email || ""),
+      bday: +bd[0] >= 1 && +bd[0] <= 12 ? +bd[0] - 1 : -1, bdd: +bd[1] || 0, bdy: +bd[2] || 0,
+      visits: +s.visits || 0, stars: +s.stars || 0, earned: +s.earned || 0, spent: +s.spent || 0, nred: +s.redeems || 0, gtot: +s.gameTotal || 0,
+      last: +s.last || now, joined: +s.joined || now, code: same && old.code || code(), offer: OFFER, ref: String(s.ref || "") || refCode(String(s.name || "")),
+      refBy: refBy, refByName: refBy ? "code " + refBy : "", friends: [], card: /^[A-Z]{2,4}-[A-Z0-9]{5}$/.test(s.card || "") ? s.card : "",
+      ledger: (j.ledger || []).slice(0, 40).map(function (l) { var x = { ts: +l.ts || now, pts: Math.round(+l.pts || 0), t: String(l.t || "") }; if (l.k) x.k = String(l.k); return x; }),
+      ec: j.ec || {}, adjDone: (j.adjDone || []).map(String), dev: devId(), bound: now, restored: now, src: String(s.src || "") };
+    var fid = j.friendIds || {}; Object.keys(fid).forEach(function (k) { r.friends.push({ name: "Friend", id: k, orders: fid[k] ? 1 : 0 }); });
+    while (r.friends.length < (+s.friends || 0)) r.friends.push({ name: "Friend", orders: 0 });
+    if (s.sms) { r.sms = true; r.smsAt = Date.parse(s.smsAt) || now; r.smsSrc = "restored with the account"; }
+    if (j.prizeToday) r.pday = pdKey();
+    if (SIMPLE && +j.gameToday) { r.gday = gpDay(); r.gpts = Math.min(+j.gameToday, SIMPLE.game.dailyCap); }
+    r.wins = (j.wins || []).slice(0, 5).map(function (w) { var x = { t: String(w.t), c: "WIN-" + code4(4), ts: +w.ts || now, k: String(w.k || "game") }; x.until = until(x); return x; });
+    if (j.locBonus) r.locBuddy = now;
+    if (+j.best) { r.best = +j.best; if (BESTK) try { if ((+localStorage.getItem(BESTK) || 0) < r.best) localStorage.setItem(BESTK, String(r.best)); } catch (x) {} }
+    if (!r.ledger.some(function (l) { return /Signed back in/.test(l.t); })) r.ledger.unshift({ ts: now, pts: 0, t: "📱 Signed back in on a new phone" });
+    if (same && old.guardian) r.guardian = old.guardian;
+    save([r]);   // one member per phone: anyone else on this phone is signed out here (their account stays on the server)
+    if (!RS_TEST) syncLater(r);
+    return r;
+  }
+  var rsEl = null;
+  function openRestore(cb) {
+    if (STAFF) { toast("🧑‍🍳 Staff practice: guests sign back in on their own phone."); return; }
+    if (rsEl) rsEl.close();
+    var m = mine()[0], rid = "crm-r" + code4(4), live = !!(API || RS_TEST), contact = "";
+    var ov = document.createElement("div"); ov.className = "crm-gate"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", rid); ov.setAttribute("data-scroll-ok", "");
+    var html = document.documentElement, prevOv = html.style.overflow;
+    function close() { if (!ov.parentNode) return; ov.remove(); rsEl = null; html.style.overflow = prevOv; document.removeEventListener("keydown", key); }
+    function key(ev) { if (ev.key === "Escape") close(); }
+    ov.close = close; rsEl = ov;
+    function head(sub) { return '<section class="crm-card"><span class="k">' + e(NAME) + ' Rewards · sign back in</span><h3 id="' + rid + '">📱 Sign back in</h3><p>' + sub + '</p>'; }
+    var foot = '<p class="crm-fine">Staff can\'t sign in for you and never see your code. Tip: add this app to your Home Screen so you stay signed in.</p></section>';
+    function step1(err) {
+      if (!live) { ov.innerHTML = head("Signing back in on a new phone works once " + e(NAME) + "'s app is live. Your points are safe: nothing is lost.") +
+        '<button type="button" class="go" data-a="x">OK</button>' + foot; return; }
+      ov.innerHTML = head("New phone? Type the <b>phone number or email you joined with</b>. We'll send you a 6-digit code.") +
+        (m ? '<div class="crm-invited" style="border-color:#FFD23F;background:#FFD23F22;color:#FFE9A3">This phone has <b>' + e(m.name.split(" ")[0]) + '\'s</b> rewards. If you sign in to a different account, ' + e(m.name.split(" ")[0]) + ' is signed out on this phone only (their points stay on their account).</div>' : '') +
+        '<form novalidate autocomplete="on"><label>Phone or email</label><input name="c" maxlength="120" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="(310) 555-0123 or you@email.com" value="' + e(contact) + '">' +
+        (m ? '<label class="crm-optin"><input type="checkbox" name="sw"> <span>Yes, switch this phone to my account.</span></label>' : '') +
+        '<button class="go" type="submit">Send my code</button><div class="err" role="alert">' + e(err || "") + '</div><button type="button" class="crm-gx" data-a="x">Not now</button></form>' + foot;
+      var f = ov.querySelector("form");
+      f.onsubmit = function (ev) {
+        ev.preventDefault(); var v = f.elements.c.value.trim(), er = f.querySelector(".err");
+        if (!okEmail(v) && String(v).replace(/\D/g, "").length < 10) { er.textContent = "Type the phone number (with area code) or email you joined with."; return; }
+        if (m && f.elements.sw && !f.elements.sw.checked) { er.textContent = "Tick the box to switch this phone to your account."; return; }
+        contact = v; var b = f.querySelector(".go"); b.disabled = true; b.textContent = "Sending…";
+        rsPost({ type: "restore_start", contact: v }, function (j) { if (!ov.parentNode) return; if (!j.ok) { step1(j.reason || "Something went wrong. Try again."); return; } step2(j); });
+      };
+      setTimeout(function () { try { f.elements.c.focus({ preventScroll: true }); } catch (x) {} }, 60);
+    }
+    function step2(j, err) {
+      ov.innerHTML = head(e(j.msg || "If that's a member, we sent a code.") + (j.masked ? ' Sent to <b>' + e(j.masked) + '</b>.' : '') + ' It works once and expires in ' + (j.mins || 10) + ' minutes.') +
+        '<form novalidate><label>6-digit code</label><input name="code" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="6" placeholder="123456" style="letter-spacing:.3em;font-size:22px;text-align:center">' +
+        '<button class="go" type="submit">Sign me back in</button><div class="err" role="alert">' + e(err || "") + '</div>' +
+        '<button type="button" class="crm-gx" data-a="again">Send a new code</button><button type="button" class="crm-gx" data-a="back">Use a different phone or email</button></form>' + foot;
+      var f = ov.querySelector("form");
+      f.onsubmit = function (ev) {
+        ev.preventDefault(); var c = f.elements.code.value.replace(/\D/g, ""), er = f.querySelector(".err");
+        if (c.length !== 6) { er.textContent = "Type the 6 digits from your text or email."; return; }
+        var b = f.querySelector(".go"); b.disabled = true; b.textContent = "Checking…";
+        rsPost({ type: "restore_check", contact: contact, code: c }, function (k) {
+          if (!ov.parentNode) return;
+          if (!k.ok || !k.member) { if (k.locked || k.expired) step1(k.reason); else step2(j, k.reason || "That didn't work. Try again."); return; }
+          var r = rsApply(k); close(); drawJoin(); drawOwn();
+          try { if (window.SSAI_CARD && SSAI_CARD.refresh) SSAI_CARD.refresh(); } catch (x) {}
+          try { window.dispatchEvent(new CustomEvent("ssai:restored", { detail: { member: r } })); } catch (x) {}
+          refreshMenu(); toast("👋 Welcome back, " + r.name.split(" ")[0] + "! " + (r.stars || 0).toLocaleString() + " points restored");
+          if (cb) cb(r);
+        });
+      };
+      setTimeout(function () { try { f.elements.code.focus({ preventScroll: true }); } catch (x) {} }, 60);
+    }
+    ov.addEventListener("click", function (ev) {
+      if (ev.target === ov) { close(); return; }
+      var b = ev.target.closest("[data-a]"); if (!b) return;
+      if (b.dataset.a === "x") close();
+      else if (b.dataset.a === "back") step1();
+      else if (b.dataset.a === "again") { b.disabled = true; rsPost({ type: "restore_start", contact: contact }, function (j) { if (!ov.parentNode) return; if (!j.ok) { if (j.locked) step1(j.reason); else step2(j.msg ? j : { msg: "" }, j.reason); return; } step2(j); toast("New code sent"); }); }
+    });
+    step1(); document.body.appendChild(ov); html.style.overflow = "hidden"; document.addEventListener("keydown", key);
+    return false;
+  }
+  window.SSAI_RESTORE = openRestore;
 
   // ======================= GAME ACCESS · TOKENS · FREE DAILY SPIN (opt-in: CRM_CFG.tokens / CRM_CFG.spin) =======================
   // LEGAL STRUCTURE (California). Draft for the restaurant's attorney to review before launch; this is not legal advice.
@@ -863,7 +1082,13 @@
     if (!bound(m)) return { err: "Token codes only go into the account bound to this phone." };
     hit.used = Date.now(); hit.by = m.id; tcSave(l); tokAdd(m, hit.n, "🧾 Code " + v + " · $" + hit.amt.toFixed(2) + " order", "purchase"); put(m); return { n: hit.n };
   }
-  // the game's PLAY button calls this. Phase 1: members play free. Phase 2: costs playCost tokens.
+  // Phase 1 adult play: no gate. A member on this phone still gets the play counted on their account.
+  function guestPlay(go) {
+    var m = mine()[0];
+    if (m && hasBoth(m) && bound(m)) { m.plays = (m.plays || 0) + 1; put(m); drawJoin(); drawOwn(); refreshMenu(); }
+    go();
+  }
+  // the game's PLAY button calls this. Phase 1: everyone plays free (guestPlay; Kid mode still needs the parent). Phase 2: costs playCost tokens.
   function playGate(go, kid) {
     // Kid mode plays on the signed-in parent's account (gate "kidunlock" passes straight through once it exists)
     return gate(kid ? "kidunlock" : "play", function () {
@@ -935,7 +1160,7 @@
     });
   }
   // ---- FREE DAILY SPIN: one per member per day (LA date). Never costs tokens, never needs a purchase, never for sale. ----
-  function spinReady(m) { return !!(SPIN && m && m.spinDay !== laDay()); }
+  function spinReady(m) { return !!(SPIN && m && m.spinDay !== laDay() && !prizeUsedToday(m)); }
   function darkHex(c) { var h = String(c).replace("#", ""); if (h.length === 3) h = h.replace(/./g, "$&$&"); var n = parseInt(h, 16); if (!(n >= 0)) return false; return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 < 140; }
   function pickSpin(P) { var tot = P.reduce(function (a, p) { return a + (p.w || 1); }, 0), r = Math.random() * tot; for (var i = 0; i < P.length; i++) { r -= P[i].w || 1; if (r < 0) return i; } return P.length - 1; }
   function openSpin() {
@@ -949,7 +1174,7 @@
         '<div class="spin-w"><div class="pin"></div><div class="wh" style="background:conic-gradient(' + grad + ')">' + P.map(function (p, i) {
           var c = COL[i % COL.length], dk = darkHex(c);
           return '<span class="' + (dk ? 'dk' : '') + '" style="transform:rotate(' + ((i + 0.5) * seg - 90) + 'deg)">' + e(p.t) + '</span>'; }).join("") + '</div><div class="hub">' + e(SPIN.hub || "🧇") + '</div></div>' +
-        '<div class="spin-r" aria-live="polite">' + (ready ? '' : 'You already spun today. Come back tomorrow for another free spin!') + '</div>' +
+        '<div class="spin-r" aria-live="polite">' + (ready ? '' : 'One prize per day: today\'s is used. Come back tomorrow for another free spin!') + '</div>' +
         '<button type="button" class="go" data-t="go"' + (ready ? '' : ' disabled style="opacity:.5"') + '>' + (ready ? '🎡 Spin (free)' : 'Next free spin tomorrow') + '</button>' +
         '<button type="button" class="crm-gx" data-t="x">Close</button>' +
         '<details class="spin-odds"><summary>Odds & prizes</summary><ul style="list-style:none;padding:0;margin:6px 0 0">' + P.map(function (p) { return '<li><span>' + e(p.t) + '</span><b>' + Math.round((p.w || 1) / tot * 1000) / 10 + '%</b></li>'; }).join("") + '</ul></details>' +
@@ -957,7 +1182,7 @@
       var wh = ov.querySelector(".wh"), res = ov.querySelector(".spin-r"), btn = ov.querySelector("[data-t=go]");
       btn.onclick = function () {
         var mm = mine()[0]; if (!spinReady(mm) || btn.disabled) return; btn.disabled = true; btn.style.opacity = ".5";
-        var i = pickSpin(P), p = P[i]; mm.spinDay = laDay(); mm.spins = (mm.spins || 0) + 1;
+        var i = pickSpin(P), p = P[i]; mm.spinDay = laDay(); mm.pday = pdKey(); mm.spins = (mm.spins || 0) + 1;
         // award first, then animate: closing the sheet mid-spin can't lose (or re-roll) the prize
         var line = "🎡 Daily spin: " + p.t, code = "";
         if (p.pts) { addPts(mm, p.pts, line); tag(mm, "spin_bonus"); }
@@ -1026,7 +1251,10 @@
     spinReady: function () { return spinReady(mine()[0]) || (!!SPIN && !mine()[0]); },
     // ms until the next free spin (midnight, Los Angeles time)
     nextSpinMs: function () { var t = new Date().toLocaleTimeString("en-US", { timeZone: "America/Los_Angeles", hour12: false }).split(":"); return Math.max(60000, (86400 - ((+t[0] % 24) * 3600 + +t[1] * 60 + +t[2])) * 1000); },
-    play: function (go, opt) { if (!TC) { go(); return; } playGate(go, !!(opt && opt.kid)); },
+    // PLAY FIRST (2026-10-14, Antidote): guests start right away, no sign-up sheet before the game. They save their score and any
+    // prize after the run (demo/claimscore.js -> SSAI_GATE, same fields, consent and destination). Still gated: Kid mode (a signed-in
+    // parent/guardian account, 18+) and Phase 2 tokens (a play costs tokens, which live on an account).
+    play: function (go, opt) { if (!TC) { go(); return; } var kid = !!(opt && opt.kid); if (kid || ON) { playGate(go, kid); return; } guestPlay(go); },
     isParent: function () { return isParent(mine()[0]); }, kidUnlock: kidUnlock, parentCheck: parentCheck, signOut: signOut,
     kidBest: function (score) { var m = mine()[0]; if (!isParent(m)) return 0; if (score > (m.kidBest || 0)) { m.kidBest = Math.round(score); (m.ledger = m.ledger || []).unshift({ ts: Date.now(), pts: 0, t: "🧒 New kid best in " + (C.game || "the game") + ": " + m.kidBest.toLocaleString() }); put(m); drawJoin(); } return m.kidBest || 0; },
     openSpin: openSpin, openTokens: function () { if (ON) tokSheet(); }, issueCode: function (a) { return ON ? issueCode(a) : null; },
@@ -1037,7 +1265,7 @@
     statusHTML: function (kid) {
       var m = this.member();
       if (kid) return isParent(m) ? "🧒 Kid mode · playing on " + e(String(m.name || "").split(" ")[0]) + "'s account" + (ON ? " · 🪙 " + (m.tok || 0) : "") : "🔒 Kid mode needs a parent or guardian signed in";
-      if (!ON) return m && hasBoth(m) ? "✅ Free to play for members" : "🎮 Free to play · free member account (phone + email)";
+      if (!ON) return m && hasBoth(m) ? "✅ Free to play · your scores save to your account" : "🎮 Free to play · no sign-up · save your score after";
       if (!m) return "🪙 Free account → " + TOK.weeklyFree + " free tokens every week";
       var b = m.tok || 0; return "🪙 <b>" + b + "</b> token" + (b === 1 ? "" : "s") + (b < TOK.playCost ? " · 🔒 need " + TOK.playCost + " to play" : " · a play costs " + TOK.playCost);
     },
@@ -1048,11 +1276,11 @@
           row({ icon: "🎁", name: "Weekly free tokens", note: "Every member, every week, added automatically", pts: "+" + TOK.weeklyFree }) +
           row({ icon: "🙋", name: "Free tokens on request", note: "Once a day, no purchase necessary", pts: "+" + TOK.freeDaily }) +
           row({ icon: "🧾", name: "Buy food", note: (TOK.perDollar ? TOK.perDollar + " token per $1" : "") + (TOK.perOrder ? " + " + TOK.perOrder + " per order" : "") + ": staff ring-up, receipt / staff code or app order" + (TOK.noAlc ? ". Never on alcohol" : ""), pts: "+" + (TOK.perDollar || TOK.perOrder) + (TOK.perDollar ? "/$1" : "") });
-        else if (TC) h += G("Free to play") + row({ icon: "🎮", name: (C.game || "The game") + " is free for members", note: "Free account with phone + email, tied to this phone. Points and prizes save to it", pts: "Free", gold: true });
+        else if (TC) h += G("Free to play") + row({ icon: "🎮", name: (C.game || "The game") + " is free to play", note: "No sign-up to play. After a run, save your score and prizes to a free account (phone + email, tied to this phone)", pts: "Free", gold: true });
         if (SPIN) h += G("Daily spin") + row({ icon: "🎡", name: "Free daily spin", note: "One per member per day. Wins " + (ON ? "tokens, " : "") + "points or food discounts. No purchase necessary", pts: "Free", gold: true });
       } else if (p === "how") {
         if (TC) h += G(ON ? "Tokens" : "Who can play") + (ON ? row({ icon: "🪙", name: "Each play costs " + TOK.playCost + " tokens", note: "+" + TOK.weeklyFree + " free every week, +" + TOK.freeDaily + " free on request once a day, and more with food you buy" }) :
-          row({ icon: "🎮", name: "Free to play for members", note: "Make a free account with your phone + email once. It stays bound to this phone" }));
+          row({ icon: "🎮", name: "Free to play, no sign-up", note: "Tap PLAY and go. To keep a score or prize, make a free account with your phone + email after the run. It stays bound to this phone" }));
         if (SPIN) h += row({ icon: "🎡", name: "Free daily spin", note: "Tap 🎡 on the start screen once a day. Always free" });
       }
       return h;
@@ -1090,7 +1318,7 @@
   function copyRef(m) { var L = shareLink(m); (navigator.clipboard ? navigator.clipboard.writeText(L) : Promise.reject()).then(function () { toast("Referral link copied"); }, function () { prompt("Copy your referral link:", L); }); }
   function openEarn() {
     if (earnEl || document.querySelector(".crm-gate,.crm-draw")) return false;
-    var m = mine()[0], T0 = TIERS[0], R = EARN.review, IG = EARN.instagram, app = (R.platform || "app") === "app", ed = (m && m.earned) || {}, yr = new Date().getFullYear();
+    var m = mine()[0], T0 = TIERS[0], R = EARN.review, IG = EARN.instagram, app = (R.platform || "app") === "app", ed = m ? onceMap(m) : {}, yr = new Date().getFullYear();
     earnMark(m ? "m" : "g");
     function B(a, label, hot) { return '<button type="button" data-e="' + a + '"' + (hot ? ' class="hot"' : '') + '>' + label + '</button>'; }
     function row(ic, t, p, sub, btn, done) { return '<div class="crm-er' + (done ? ' done' : '') + '"><span class="ic">' + ic + '</span><span class="tx"><b>' + t + '</b><small>' + sub + '</small></span><span class="pp">' + (done ? '✓ Earned' : p) + '</span>' + (btn && !done ? '<span class="bt">' + btn + '</span>' : '') + '</div>'; }
@@ -1256,8 +1484,8 @@
   // how identified, staff initials, and visit "first" | "return". A RETURN = the member had already been in on an earlier
   // day (an earlier attributed sale, an earlier app visit, or joined on an earlier day). Same-day repeats keep that day's type.
   // PERFORMANCE SHARE (CRM_CFG.perfShare = {threshold:3000, pct:10, returns:12}; billed ONLY when the signed agreement has it):
-  // in a calendar month (LA time) where app-attributed food & non-alc sales EXCEED the threshold, the share is pct% of ALL
-  // of that month's app-attributed food & non-alc sales (not only the part above it), on top of the monthly fee. Statement
+  // in a calendar month (LA time) where app-attributed food & non-alc sales EXCEED the threshold, the share is pct% of ONLY
+  // the amount OVER the threshold (2026-10-13: $5,000 -> 10% of $2,000 = $200), on top of the monthly fee. Statement
   // by the 5th of the next month; the client may dispute within 10 days (reconciled against register reports); payment is
   // due 15 days after the statement. returns = the 90-day results check (tracked return visits a month).
   // STORAGE: localStorage on this device (KEY_sales) AND a POST of every sale to CRM_CFG.sheet when set (Apps Script web
@@ -1359,7 +1587,7 @@
     var food = sum(l, "food"), over = food > PS.threshold;
     return { ym: ym, rows: l, n: l.length, food: food, alcohol: sum(l, "alcohol"), total: sum(l, "total"), retFood: sum(ret, "food"), fstFood: sum(fst, "food"), retN: ret.length, fstN: fst.length,
       visits: Object.keys(vis).length, retVisits: Object.keys(rv).length, members: Object.keys(l.reduce(function (o, x) { o[x.mid] = 1; return o; }, {})).length,
-      appN: l.filter(function (x) { return x.how === "app"; }).length, over: over, share: over ? r2(food * PS.pct / 100) : 0 };
+      appN: l.filter(function (x) { return x.how === "app"; }).length, over: over, excess: over ? r2(food - PS.threshold) : 0, share: over ? r2((food - PS.threshold) * PS.pct / 100) : 0 };
   }
   function salesBox() {
     var ym = laYMD(Date.now()).slice(0, 7), S = monthStats(ym), pct = Math.min(100, S.food / PS.threshold * 100);
@@ -1372,7 +1600,7 @@
       '<div class="crm-stats" style="grid-template-columns:repeat(2,1fr)"><div><b>' + usd(S.retFood) + '</b>🔁 returning members (' + S.retN + ')</div><div><b>' + usd(S.fstFood) + '</b>🆕 first visits (' + S.fstN + ')</div>' +
       '<div><b>' + S.visits + '</b>member visits · ' + S.members + ' members</div><div><b>' + S.retVisits + '</b>return visits (' + PS.returns + '/mo check)</div></div>' +
       '<div class="crm-as-share"><span>Performance share estimate</span><b>' + (S.over ? usd(S.share) : '$0.00') + '</b></div>' +
-      '<p class="crm-fine" style="margin:4px 0 0">Only if your agreement includes it: in a month where app sales pass ' + usd(PS.threshold).replace(".00", "") + ', it\'s ' + PS.pct + '% of that month\'s app sales (' + PS.pct + '% × ' + usd(S.food) + '), on top of the monthly fee. Alcohol excluded this month: ' + usd(S.alcohol) + '.</p>' +
+      '<p class="crm-fine" style="margin:4px 0 0">Only if your agreement includes it: in a month where app sales pass ' + usd(PS.threshold).replace(".00", "") + ', it\'s ' + PS.pct + '% of only the amount over ' + usd(PS.threshold).replace(".00", "") + ' (' + PS.pct + '% × ' + usd(S.excess) + '), on top of the monthly fee. Alcohol excluded this month: ' + usd(S.alcohol) + '.</p>' +
       '<div class="crm-feed" style="max-height:170px;margin-top:8px">' + (S.rows.slice(0, 12).map(function (x) { return '<div><span>' + e(x.day.slice(5)) + ' · #' + e(x.receipt) + ' · ' + e(x.member) + '<br><span style="color:#9AA6CC">' + e(HOW[x.how] || x.how) + ' · ' + (x.visit === "return" ? "🔁 return" : "🆕 first") + (x.staff ? ' · ' + e(x.staff) : '') + '</span></span><b class="plus">' + usd(x.food) + '</b></div>'; }).join("") || '<div><span>No app sales yet this month. Ring up a member above.</span></div>') + '</div>' +
       '<div class="crm-acts"><button type="button" data-a="scsv">⬇️ Sales CSV</button><button type="button" class="hot" data-a="stmt">🧾 Statement</button></div>' +
       '<label style="margin-top:8px">Statement month</label><select data-r="sym">' + yms.map(function (x) { return '<option value="' + x + '">' + ymLabel(x) + (x === ym ? ' (so far)' : '') + '</option>'; }).join("") + '</select>' +
@@ -1395,7 +1623,7 @@
       '<tr><td>Returning members / first visits</td><td>' + usd(S.retFood) + ' / ' + usd(S.fstFood) + '</td></tr><tr><td>Member visits / return visits</td><td>' + S.visits + ' / ' + S.retVisits + '</td></tr>' +
       '<tr><td>Alcohol on those checks (excluded)</td><td>' + usd(S.alcohol) + '</td></tr>' +
       '<tr><td>Threshold check</td><td>' + (S.over ? 'Met: ' + usd(S.food) + ' is over ' + usd(PS.threshold) : 'Not met: ' + usd(S.food) + ' is not over ' + usd(PS.threshold) + '. No share is due.') + '</td></tr>' +
-      '<tr class="st-tot"><td>Performance share (' + PS.pct + '% of ' + usd(S.food) + ')</td><td>' + usd(S.share) + '</td></tr>' +
+      '<tr class="st-tot"><td>Performance share (' + PS.pct + '% of ' + usd(S.excess) + ', the amount over ' + usd(PS.threshold) + ')</td><td>' + usd(S.share) + '</td></tr>' +
       '<tr><td>Dispute window</td><td>Until ' + longDate(addDays(sd, 10)) + ' (10 days). Reconciled against Client\'s register reports.</td></tr>' +
       '<tr><td>Payment due</td><td>' + (S.share ? longDate(addDays(sd, 15)) + ' (15 days after the statement)' : 'Nothing due') + '</td></tr></table>' +
       '<h4>Line items</h4><div class="st-sc"><table class="st-li"><tr><th>Date</th><th>Check #</th><th>Member</th><th>How identified</th><th>Visit</th><th>Food & non-alc</th><th>Alcohol (excl.)</th></tr>' +
@@ -1543,11 +1771,72 @@
   }
 
   var mount = C.mount && document.querySelector(C.mount);
-  if (mount) { mount.appendChild(join); mount.appendChild(own); }
+  if (mount) { mount.appendChild(join); if (!CUST) mount.appendChild(own); }
   else {
     var ref = document.querySelector("#ssai-n") || document.querySelector("#ssai-k") || document.querySelector("footer");
-    if (ref && ref.parentNode) { ref.parentNode.insertBefore(join, ref); ref.parentNode.insertBefore(own, ref); }
-    else { document.body.appendChild(join); document.body.appendChild(own); }
+    if (ref && ref.parentNode) { ref.parentNode.insertBefore(join, ref); if (!CUST) ref.parentNode.insertBefore(own, ref); }
+    else { document.body.appendChild(join); if (!CUST) document.body.appendChild(own); }
   }
   drawJoin(); drawOwn("all");
+  // VISIT LOG for the back office (Christian HQ › Visits): one "open" each time the app is opened or brought back to the
+  // screen (max 1 per 10 min per phone), with the phone's local time, a short device summary from the user agent
+  // ("iPhone · iOS 18.6 · Safari") and Home Screen vs browser. Location: ONLY if this person ALREADY allowed location for
+  // the app (Permissions API says "granted"); we never ask for it here. Then one coarse reading, rounded to 2 decimals
+  // (about 1 km) + its accuracy. No tracking: nothing runs in the background. Disclosed in rules.html.
+  function devSummary() {
+    var ua = navigator.userAgent || "", m, kind, os = "", br;
+    var iPad = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    if (/iPhone|iPod/.test(ua) || iPad) { kind = iPad ? "iPad" : "iPhone"; m = ua.match(/OS (\d+)[_.](\d+)/); os = m ? "iOS " + m[1] + (m[2] !== "0" ? "." + m[2] : "") : "iOS"; }
+    else if (/Android/.test(ua)) { m = ua.match(/Android (\d+)/); os = "Android" + (m ? " " + m[1] : "");
+      kind = /SM-|Samsung/i.test(ua) ? "Samsung" : /Pixel/.test(ua) ? "Pixel" : /moto/i.test(ua) ? "Motorola" : /OnePlus/i.test(ua) ? "OnePlus" : /LG-|LM-/.test(ua) ? "LG" : /Redmi|Xiaomi|MI /.test(ua) ? "Xiaomi" : "Android phone";
+      if (!/Mobile/.test(ua)) kind += " tablet"; }
+    else { kind = "Desktop"; os = /Windows/.test(ua) ? "Windows" : /CrOS/.test(ua) ? "ChromeOS" : /Mac OS X|Macintosh/.test(ua) ? "Mac" : /Linux/.test(ua) ? "Linux" : "other"; }
+    br = /Instagram/.test(ua) ? "Instagram app" : /FBAN|FBAV/.test(ua) ? "Facebook app" : /TikTok|musical_ly/i.test(ua) ? "TikTok app" : /SamsungBrowser/.test(ua) ? "Samsung Internet" :
+      /EdgiOS|EdgA|Edg\//.test(ua) ? "Edge" : /OPR\/|OPiOS/.test(ua) ? "Opera" : /FxiOS|Firefox\//.test(ua) ? "Firefox" : /CriOS|Chrome\//.test(ua) ? "Chrome" : /Safari\//.test(ua) ? "Safari" : "browser";
+    return (kind + " · " + os + " · " + br).slice(0, 60);
+  }
+  function localIso() { var d = new Date(), p = function (n) { return (n < 10 ? "0" : "") + n; }, o = -d.getTimezoneOffset(), a = Math.abs(o);
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()) + (o < 0 ? "-" : "+") + p(Math.floor(a / 60)) + ":" + p(a % 60); }
+  function logOpen() {
+    var ok = KEY + "_open", lk = KEY + "_openAt", td = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    try {
+      if (Date.now() - (+localStorage.getItem(lk) || 0) < 6e5) return; localStorage.setItem(lk, String(Date.now()));
+      if (localStorage.getItem(ok) !== td) { localStorage.setItem(ok, td); if (mine()[0]) syncLater(mine()[0]); }   // daily re-sync: members who joined before the backend existed get counted too
+    } catch (x) {}
+    var o = { type: "open", dev: devId(), member: (mine()[0] || {}).id || "", standalone: (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone ? 1 : 0, local: localIso(), device: devSummary() };
+    var sent = false, send = function () { if (!sent) { sent = true; boPost(o); } };
+    try {
+      if (!navigator.permissions || !navigator.permissions.query || !navigator.geolocation) return send();
+      navigator.permissions.query({ name: "geolocation" }).then(function (st) {
+        if (!st || st.state !== "granted") return send();   // never prompt: only when location was already allowed
+        setTimeout(send, 5000);   // no fix in 5 s → send without it
+        navigator.geolocation.getCurrentPosition(function (p) { var c = p.coords;
+          o.lat = Math.round(c.latitude * 100) / 100; o.lng = Math.round(c.longitude * 100) / 100; o.acc = Math.round(c.accuracy) || ""; send();
+        }, send, { enableHighAccuracy: false, maximumAge: 6e5, timeout: 4500 });
+      }, send);
+    } catch (x) { send(); }
+  }
+  if (SIMPLE && API && !STAFF) {
+    try { logOpen(); } catch (x) {}
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") try { logOpen(); } catch (x) {} });   // a Home Screen app brought back = another open
+  }
+  // Scout adjustments: points the server refused as duplicates / over a cap, or that Christian HQ reversed. Each applies once.
+  function pullAdj() {
+    var m = mine()[0]; if (!SIMPLE || !API || STAFF || !m || !m.id || m.sample) return;
+    fetch(API + (API.indexOf("?") < 0 ? "?" : "&") + "adj=1&slug=" + encodeURIComponent(SLUG) + "&member=" + encodeURIComponent(m.id) + "&dev=" + encodeURIComponent(devId()) + "&t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.json(); }).then(function (j) {
+        var mm = mine()[0]; if (!j || !j.ok || !j.adj || !j.adj.length || !mm || mm.id !== m.id) return;
+        var done = mm.adjDone = mm.adjDone || [], tot = 0;
+        j.adj.forEach(function (a) { var p = Math.round(+a.pts || 0); if (!a.id || !p || done.indexOf(a.id) >= 0) return; done.push(a.id); tot += p;
+          if (WAL) addPts(mm, p, "🛡️ " + a.why); else { mm.stars = Math.max(0, (mm.stars || 0) + p); if (p < 0 && mm.earned != null) mm.earned = Math.max(0, mm.earned + p); (mm.ledger = mm.ledger || []).unshift({ ts: Date.now(), pts: p, t: "🛡️ " + (p < 0 ? "Already counted: " : "") + a.why, k: "scout_adj" }); mm.ledger = mm.ledger.slice(0, 40); } });
+        if (tot) { put(mm); drawJoin(); drawOwn(); toast(tot < 0 ? "🛡️ " + tot + " points: those were already counted" : "🛡️ +" + tot + " points added by " + NAME); }
+      }).catch(function () {});
+  }
+  try { pullAdj(); } catch (x) {}
+  if (STAFF) {
+    var sb = document.createElement("div"); sb.id = "ssai-staff-bar"; sb.setAttribute("role", "status");
+    sb.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:2147483600;background:#FFD23F;color:#1a1206;font:800 13px/1.3 system-ui,sans-serif;padding:7px 12px;padding-top:calc(7px + env(safe-area-inset-top));display:flex;gap:8px;align-items:center;justify-content:space-between;box-shadow:0 2px 10px #0006";
+    sb.innerHTML = '<span>🧑‍🍳 STAFF PRACTICE · ' + e(STAFF.name) + ' · practice points only, never real Rewards</span><a href="../../staff/christian/#games" style="color:#1a1206;white-space:nowrap">‹ Staff app</a>';
+    document.body.appendChild(sb);
+  }
 })();

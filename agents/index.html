@@ -158,6 +158,7 @@ footer{margin-top:46px;text-align:center;color:var(--dim);font-size:14px;line-he
   <div class="cta">
     <a class="btn primary" href="#tiers">See the 2 tiers</a>
     <a class="btn ghost" href="#try">▶ Talk to a demo</a>
+    <a class="btn ghost" href="../app/">📱 Open the SousShift app</a>
   </div>
 </header>
 
@@ -332,5 +333,6 @@ form.addEventListener("submit", function(e){
   else go("mailto:secondshiftai@gmail.com?subject=" + encodeURIComponent("Add AI agents: " + (v("f-rest") || "my restaurant")) + "&body=" + encodeURIComponent(body));
 });
 </script>
+<script src="../demo/faqbot.js?v=f1" data-kb="../app/faq.json" data-mode="sales" defer></script>
 </body>
 </html>

@@ -15,20 +15,35 @@
      · games without levels: Halftime.tick(playMs, pauseGame, resume) at natural pause points (between rounds, after a
        match…). Once playMs passes the run's 90–120 s mark it calls pauseGame(), plays, then resume(). Returns true if it took over.
      · Halftime.reset() at the start of every run. Halftime.active → true while it is on screen.
-   Test: ?half=1 → it takes over at the next level-up, or at the first tick() after 5 s of play. */
+   Test: ?half=1 → it takes over at the next level-up, or at the first tick() after 5 s of play.
+
+   Picture quality: the pool is cut from the 4K master (2160×3840 H.264 High). When clips.json has "lite":"1080/", every clip and
+   the outro also exist as 1080×1920 copies there. The break plays the 4K files, and uses the 1080p copies on the Tesla, on
+   data-saver / 2G-3G connections, on low-memory devices, with ?hd=0 or HALFTIME.hd=false, and for the rest of the session as soon
+   as a 4K clip stalls (it switches mid-clip at the same moment). ?hd=1 forces 4K. clips.json "v" is the cache tag on every file. */
 (function () {
   "use strict";
   if (window.Halftime) return;
   var W = window, D = document, C = W.HALFTIME || {}, E = W.REVIEW_EGG || {};
   var VID = C.vid || E.vid || "";
   var URL_ = VID ? "https://www.youtube.com/watch?v=" + encodeURIComponent(VID) : "https://www.youtube.com/@therealantidote";
-  var SRC = C.src || "img/review/halftime.mp4", POSTER = C.poster || "img/review/halftime.jpg";
+  var SRC = C.src || "img/review/halftime.mp4?v=4k1", POSTER = C.poster || "img/review/halftime.jpg?v=4k1";   // ?v = cache tag (4K re-cut 2026-10-17)
   /* clip pool: img/review/clips/clips.json lists ~7 s cuts from all over the review (+ outro.mp4). Each break deals 2–3 of them
      from a per-device shuffled deck (shared with reviewegg.js, so nothing repeats until the whole pool has played), then the outro.
      No manifest → the old single halftime.mp4 reel. */
   var CLIPS = C.clips || "img/review/clips/", DECK_KEY = "rv-deck:" + (VID || location.pathname);
   var SHORT = (C.short || E.short || E.restaurant || "").toUpperCase();
   var TEST = /[?&]half=1(?:&|$)/.test(location.search);
+  var LITE_KEY = "ht-lite";
+  function liteWanted() {   // 1080p instead of 4K: weak decoders, slow or metered data, an earlier 4K stall this session
+    var q = location.search, n = W.navigator || {}, c = n.connection || {};
+    if (/[?&]hd=1(?:&|$)/.test(q)) return false;
+    if (/[?&]hd=0(?:&|$)/.test(q) || C.hd === false) return true;
+    try { if (W.sessionStorage.getItem(LITE_KEY) === "1") return true; } catch (e) {}
+    if (/Tesla|QtCarBrowser/i.test(n.userAgent || "")) return true;
+    if (c.saveData || /(^|-)(2g|3g)$/.test(c.effectiveType || "")) return true;
+    return !!(n.deviceMemory && n.deviceMemory <= 2);
+  }
   var T = function (s) { return (W.__T || String)(s); };
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]; }); };
   /* real timers: gamepause.js wraps setTimeout/setInterval later; the break keeps its own clock either way */
@@ -168,7 +183,7 @@
     later(function () { skip.classList.add("on"); }, 3000);                       // SKIP after ~3 s
     /* the playlist: 2–3 dealt clips + the outro (or the legacy single reel). Only these files are fetched; the next one is
        pulled into a blob while the current one plays, so the cut to it is instant. */
-    var list = null, idx = 0, legacyTried = false;
+    var list = null, idx = 0, legacyTried = false, lite = liteWanted();
     function soundOn(e) { e.stopPropagation(); wantSound = true; v.muted = false; tap.hidden = true; var p3 = v.play(); if (p3 && p3.catch) p3.catch(function () {}); }
     function playIt() {
       var p = v.play();
@@ -183,8 +198,21 @@
       });
     }
     function preload(i) {
-      var it = list && list[i]; if (!it || it.pre || !W.fetch || !W.URL || !URL.createObjectURL) return; it.pre = 1;
-      W.fetch(it.src).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function (b) { if (!done) { it.blob = URL.createObjectURL(b); blobs.push(it.blob); } }, function () {});
+      var it = list && list[i]; if (!it || it.pre || !W.fetch || !W.URL || !URL.createObjectURL) return; it.pre = 1;   // only ever the NEXT file
+      var want = it.src;
+      W.fetch(want).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function (b) { if (!done && it.src === want) { it.blob = URL.createObjectURL(b); blobs.push(it.blob); } }, function () { if (it.src === want) it.pre = 0; });
+    }
+    /* a 4K file that can't keep up: this clip (from the same moment) and everything after it switch to the 1080p copies,
+       and so do later breaks this session */
+    function goLite() {
+      if (lite || !list) return false;
+      var cur = list[idx]; if (!cur || !cur.lite) return false;
+      lite = true; try { W.sessionStorage.setItem(LITE_KEY, "1"); } catch (e) {}
+      list.forEach(function (it, k) { if (k >= idx && it.lite && !it.blob) { it.src = it.lite; it.pre = 0; } });
+      var t = v.currentTime || 0; lastT = -1; stuck = 0; noData = 0;
+      v.src = cur.lite; try { v.load(); } catch (e) {}
+      if (t > 0.2) { var seek = function () { v.removeEventListener("loadedmetadata", seek); try { v.currentTime = t; } catch (e) {} }; v.addEventListener("loadedmetadata", seek); }
+      playIt(); preload(idx + 1); return true;
     }
     function playItem(i) {
       if (done || ended) return;
@@ -193,14 +221,27 @@
       playIt(); preload(i + 1);
     }
     function next() { if (list && idx + 1 < list.length) playItem(idx + 1); else if (!started && !legacyTried) legacy(); else if (started) endPanel(); else finish(); }
-    function legacy() { legacyTried = true; list = [{ src: SRC, legacy: true }]; playItem(0); }
+    function legacy() {   // the single reel; its 1080p copy (halftime-1080.mp4) is tried on lite devices and falls back to the reel itself
+      legacyTried = true; var lt = SRC.replace(/\.mp4(\?|$)/, "-1080.mp4$1");
+      list = [lite && lt !== SRC ? { src: lt, alt: SRC, legacy: true } : { src: SRC, legacy: true }]; playItem(0);
+    }
     v.onended = next;
-    v.onerror = function () { if (!done && !ended) next(); };                   // a clip that won't load is skipped; nothing loads at all: back to the game
+    v.onerror = function () {                                                   // a clip that won't load is skipped; nothing loads at all: back to the game
+      if (done || ended) return;
+      var cur = list && list[idx];
+      if (cur && cur.alt && !cur.altTried) { cur.altTried = 1; cur.src = cur.alt; cur.blob = null; playItem(idx); return; }
+      next();
+    };
     manifest().then(function (j) {
       if (done || ended) return;
       var picks = deal(DECK_KEY, j.clips.length, Math.random() < 0.5 ? 2 : 3);
-      list = picks.map(function (i) { return { src: CLIPS + j.clips[i].file, file: j.clips[i].file }; });
-      if (j.outro) list.push({ src: CLIPS + j.outro, outro: true });
+      var q = j.v ? "?v=" + encodeURIComponent(j.v) : "", L = j.lite ? CLIPS + j.lite : null;
+      var item = function (f, extra) {
+        var hd = CLIPS + f + q, lo = L ? L + f + q : null, it = { src: lite && lo ? lo : hd, lite: lo, alt: lo ? (lite ? hd : lo) : null, file: f };
+        for (var k in extra) it[k] = extra[k]; return it;
+      };
+      list = picks.map(function (i) { return item(j.clips[i].file); });
+      if (j.outro) list.push(item(j.outro, { outro: true }));
       S.played = picks.map(function (i) { return j.clips[i].file; });
       playItem(0);
     }, function () { if (!done && !ended) legacy(); });
@@ -215,6 +256,7 @@
       if (v.paused && !v.ended) { try { v.muted = !wantSound; var pw = v.play(); if (pw && pw.catch) pw.catch(function () { v.muted = true; v.play().catch(function () {}); }); } catch (e) {} }
       if (v.currentTime > lastT + 0.05) { lastT = v.currentTime; stuck = 0; started = true; return; }
       stuck++;
+      if (!lite && stuck >= (lastT < 0 ? 5 : 3) && v.readyState < 3 && goLite()) return;   // 4K not arriving (2.5 s to start / 1.5 s mid-clip): 1080p copy
       if (v.readyState < 2 && stuck >= 20) { next(); return; }                  // 10 s and no data: next clip (or out)
       if (stuck >= 30) endPanel();
     }, 500);

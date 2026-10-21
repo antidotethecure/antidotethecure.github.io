@@ -104,6 +104,15 @@
   ".td-card{min-height:200px;display:flex;flex-direction:column;justify-content:center;text-align:center;animation:tdin .45s cubic-bezier(.2,1.4,.4,1)}@keyframes tdin{from{transform:rotateY(80deg) scale(.9);opacity:0}to{transform:none;opacity:1}}" +
   ".td-card .k{font:800 12px var(--body);letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}.td-card p{font-family:var(--display);font-weight:700;font-size:24px;line-height:1.3;margin:10px 0 0;overflow-wrap:anywhere}" +
   ".td-safe{margin:14px 0 0;padding:9px 12px;border-radius:12px;border:1px dashed var(--gold);color:var(--gold2);font-size:13px;font-weight:700;text-align:center}" +
+  /* Sports Trivia: Fan Test (team picker + Fan Rating) */
+  ".ft-all{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;border-radius:14px;border:1px solid var(--edge);background:var(--panel);color:var(--ink);font:800 15px var(--body);padding:8px 12px;cursor:pointer;text-align:left}.ft-all .e{font-size:24px}" +
+  ".ft-all small{display:block;font:600 12px var(--body);color:var(--dim)}.ft-all[aria-pressed=true],.ft-grid button[aria-pressed=true]{border-color:var(--gold);background:#d4af3722;box-shadow:inset 0 0 0 1px var(--gold)}" +
+  ".ft-lg{font:800 10.5px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:10px 2px 5px}" +
+  ".ft-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.ft-grid button{min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;border-radius:13px;border:1px solid var(--edge);background:var(--panel);color:var(--ink);font:700 12.5px/1.15 var(--body);padding:8px 4px 7px;cursor:pointer}" +
+  ".ft-grid img,.ft-hd img{width:36px;height:36px;object-fit:contain}.ft-grid span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
+  ".ft-hd{display:flex;align-items:center;justify-content:center;gap:8px;font:800 12px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}" +
+  ".ft-stars{font-size:38px;letter-spacing:4px;line-height:1;margin:10px 0 4px;color:var(--gold2)}.ft-stars i{font-style:normal;color:#3a4566}" +
+  ".ft-tier{font-family:var(--punch);font-size:30px;line-height:1.05;color:var(--cream);letter-spacing:.02em}.ft-line{font-family:var(--display);font-weight:700;font-size:19px;line-height:1.3;margin:8px 0 6px;overflow-wrap:anywhere}" +
   "@media (prefers-reduced-motion:reduce){.mw-t.flip,.mw-row.shake,.td-card,.mx-ok,.mx-shake{animation:none}}";
   document.head.appendChild(css);
 
@@ -187,40 +196,89 @@
   }
 
   /* ================= TRIVIA + SPORTS TRIVIA ================= */
+  /* FAN TEST (Sports Trivia): before a round the player picks a favorite team (D.FAN_TEAMS, the same LA/CA list as the Sports
+     module) or "All LA sports" (the mixed category mode). A team round asks 10 questions from D.FAN[team] (5 each when passing
+     the phone), then shows a 1–5★ Fan Rating with a random line from D.FAN_LINES. Points use the normal Sports Trivia rule below. */
+  var FAN_LG = { nfl: "NFL", mlb: "MLB", nba: "NBA", nhl: "NHL", mls: "MLS", wnba: "WNBA", cfb: "College" };
+  var FAN_CUP = { nfl: "Super Bowl", mlb: "World Series", nba: "NBA Finals", nhl: "Stanley Cup Final", mls: "MLS Cup", wnba: "WNBA Finals", cfb: "Rose Bowl" };
+  var FAN_TIER = ["", "Fair-Weather Fan", "Bandwagon Fan", "Solid Fan", "Die-Hard Fan", "Super Fan"];
+  var FAN_TEAMS = (D.FAN_TEAMS || []).filter(function (t) { return (D.FAN && D.FAN[t[0]] || []).length >= 10; });
+  var FAN_BY = {}; FAN_TEAMS.forEach(function (t) { FAN_BY[t[0]] = t; });
+  function fanLg(t) { return t[0].split(":")[0]; }
+  function fanName(t) { return t[4] || t[2]; }
+  function fanLogo(t) {   // same ESPN logo paths as ../sports/sports.js
+    var lg = fanLg(t), id = t[0].split(":")[1];
+    if (lg === "mls") return "https://a.espncdn.com/i/teamlogos/soccer/500/" + id + ".png";
+    if (lg === "cfb") return "https://a.espncdn.com/i/teamlogos/ncaa/500/" + id + ".png";
+    return "https://a.espncdn.com/i/teamlogos/" + lg + "/500/" + t[1].toLowerCase() + ".png";
+  }
+  function fanImg(t) { return '<img src="' + esc(fanLogo(t)) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">'; }
+  function followedTeam() {   // first team the guest follows in the LA Scoreboard (sp:<client>:follow), if it has a Fan Test
+    var f = lsGet("sp:" + ((window.SPORTS_CFG || {}).client || "melody-lax") + ":follow", []);
+    if (!Array.isArray(f)) return "";
+    for (var i = 0; i < f.length; i++) { var k = String(f[i]).replace(/^cbb:/, "cfb:"); if (FAN_BY[k]) return k; }
+    return "";
+  }
+  function fanStars(c, n) { var p = n ? c / n : 0; return p >= 0.9 ? 5 : p >= 0.7 ? 4 : p >= 0.5 ? 3 : p >= 0.3 ? 2 : 1; }
+  function fanLine(stars, t) {
+    var L = (D.FAN_LINES || {})[stars] || [""], s = L[Math.floor(Math.random() * L.length)];
+    return s.replace(/\{team\}/g, fanName(t)).replace(/\{cup\}/g, FAN_CUP[fanLg(t)] || "championship");
+  }
+
   function triviaGame(kind) {
-    var bank = kind === "sports" ? D.SPORTS : D.TRIVIA;
-    var cats = kind === "sports" ? [["all", "🏆 All sports"], ["la", "🌴 LA teams"], ["nba", "🏀 NBA"], ["nfl", "🏈 NFL & college"], ["mlb", "⚾ MLB"], ["soccer", "⚽ Soccer"], ["more", "🏒 More"]]
-                                 : [["all", "🎲 Everything"], ["music", "🎤 Music"], ["food", "🍔 Food & drink"], ["pop", "🎬 Pop culture"], ["la", "🌴 LA"]];
-    var title = kind === "sports" ? "Sports Trivia" : "Melody Trivia";
+    var bank = kind === "sports" ? D.SPORTS : D.TRIVIA, isSports = kind === "sports";
+    var cats = isSports ? [["all", "🏆 All sports"], ["la", "🌴 LA teams"], ["nba", "🏀 NBA"], ["nfl", "🏈 NFL & college"], ["mlb", "⚾ MLB"], ["soccer", "⚽ Soccer"], ["more", "🏒 More"]]
+                        : [["all", "🎲 Everything"], ["music", "🎤 Music"], ["food", "🍔 Food & drink"], ["pop", "🎬 Pop culture"], ["la", "🌴 LA"]];
+    var baseTitle = isSports ? "Sports Trivia" : "Melody Trivia";
     var cfg = lsGet("mg-cfg-" + kind, { cat: "all", table: false }) || { cat: "all", table: false };
     var getNames = null;
+    function team() { return isSports && cfg.fan && FAN_BY[cfg.fan] || null; }
+    function title() { var t = team(); return t ? fanName(t) + " Fan Test" : baseTitle; }
 
     function setup() {
-      var w = screen(title, '<div class="mg-h"><small>' + (kind === "sports" ? "NBA · NFL · MLB · soccer · LA teams" : "Music · food & drink · pop culture · LA") + '</small>' + title + '</div>' +
-        '<p class="mg-p">' + Q_SECS + ' seconds a question. Faster right answers score more.</p>' +
-        '<div class="mg-lbl">Category</div><div class="mg-chips" id="mg-cat"></div>' +
+      if (isSports && FAN_TEAMS.length && !(cfg.fan === "all" || FAN_BY[cfg.fan])) cfg.fan = followedTeam() || "all";   // first visit: their followed team
+      var w = screen(baseTitle, '<div class="mg-h"><small>' + (isSports ? "Fan Test · NBA · NFL · MLB · NHL · soccer" : "Music · food & drink · pop culture · LA") + '</small>' + baseTitle + '</div>' +
+        '<p class="mg-p">' + (isSports && FAN_TEAMS.length ? "Pick your team for a 10-question Fan Test and get your Fan Rating, or play all LA sports. " : "") + Q_SECS + ' seconds a question. Faster right answers score more.</p>' +
+        (isSports && FAN_TEAMS.length ? '<div class="mg-lbl">Your team</div><div id="ft-pick"></div>' : '') +
+        '<div id="mg-catbox"><div class="mg-lbl">Category</div><div class="mg-chips" id="mg-cat"></div></div>' +
         '<div class="mg-lbl">Who\'s playing?</div><div class="mg-chips" id="mg-mode"></div>' +
         '<div class="mg-names" id="mg-names" style="display:none"></div>' +
         '<button type="button" class="mg-btn hot" id="mg-go">▶ Start</button>');
       chips(w.querySelector("#mg-cat"), cats, cfg.cat, function (v) { cfg.cat = v; });
+      var go = w.querySelector("#mg-go"), catbox = w.querySelector("#mg-catbox"), pick = w.querySelector("#ft-pick");
+      function syncPick() {
+        var t = team();
+        catbox.style.display = t ? "none" : "";
+        go.textContent = t ? "▶ Start " + fanName(t) + " Fan Test" : "▶ Start";
+        if (pick) [].forEach.call(pick.querySelectorAll("[data-ft]"), function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-ft") === (cfg.fan || "all") ? "true" : "false"); });
+      }
+      if (pick) {
+        var groups = {}, order = [];
+        FAN_TEAMS.forEach(function (t) { var lg = fanLg(t); if (!groups[lg]) { groups[lg] = []; order.push(lg); } groups[lg].push(t); });
+        pick.innerHTML = '<button type="button" class="ft-all" data-ft="all"><span class="e" aria-hidden="true">🌴</span><span>All LA sports<small>Mixed questions, pick a category</small></span></button>' +
+          order.map(function (lg) { return '<div class="ft-lg">' + esc(FAN_LG[lg] || lg) + '</div><div class="ft-grid">' + groups[lg].map(function (t) { return '<button type="button" data-ft="' + t[0] + '" aria-label="' + esc(fanName(t)) + '">' + fanImg(t) + '<span>' + esc(t[2]) + '</span></button>'; }).join("") + '</div>'; }).join("");
+        [].forEach.call(pick.querySelectorAll("[data-ft]"), function (b) { b.onclick = function () { cfg.fan = b.getAttribute("data-ft"); syncPick(); }; });
+      }
+      syncPick();
       var nm = w.querySelector("#mg-names");
       var showNames = function () { nm.style.display = cfg.table ? "block" : "none"; if (cfg.table && !getNames) getNames = namesEditor(nm, 2, 6); };
       chips(w.querySelector("#mg-mode"), [["solo", "🙋 Just me (10 questions)"], ["table", "📱 Table: pass the phone (2–6)"]], cfg.table ? "table" : "solo", function (v) { cfg.table = v === "table"; showNames(); });
       getNames = null; showNames();
-      w.querySelector("#mg-go").onclick = function () { lsSet("mg-cfg-" + kind, cfg); begin(cfg.table && getNames ? getNames() : ["You"]); };
+      go.onclick = function () { lsSet("mg-cfg-" + kind, cfg); begin(cfg.table && getNames ? getNames() : ["You"]); };
     }
 
     function pickQuestions(n) {
-      var pool = bank.filter(function (r) { return cfg.cat === "all" || (cfg.cat === "la" ? (kind === "sports" ? !!r[6] : r[5] === "la") : r[5] === cfg.cat); });
-      var seenKey = "mg-seen-" + kind, seen = lsGet(seenKey, []) || [];
+      var t = team(), src = t ? D.FAN[t[0]] : bank;
+      var pool = t ? src : bank.filter(function (r) { return cfg.cat === "all" || (cfg.cat === "la" ? (isSports ? !!r[6] : r[5] === "la") : r[5] === cfg.cat); });
+      var seenKey = t ? "mg-seen-fan-" + t[0] : "mg-seen-" + kind, seen = lsGet(seenKey, []) || [];
       var order = function (arr) { var fresh = shuffle(arr.filter(function (r) { return seen.indexOf(r[0]) < 0; })), old = shuffle(arr.filter(function (r) { return seen.indexOf(r[0]) >= 0; })); return fresh.concat(old); };
       var out;
-      if (kind === "sports" && cfg.cat === "all") {   // LA emphasized: about 60% LA-team questions
+      if (!t && isSports && cfg.cat === "all") {   // LA emphasized: about 60% LA-team questions
         var la = order(pool.filter(function (r) { return r[6]; })), rest = order(pool.filter(function (r) { return !r[6]; })), nLa = Math.round(n * 0.6);
         out = shuffle(la.slice(0, nLa).concat(rest.slice(0, n - Math.min(nLa, la.length))));
         if (out.length < n) out = out.concat(la.slice(nLa, nLa + n - out.length));
       } else out = order(pool).slice(0, n);
-      seen = out.map(function (r) { return r[0]; }).concat(seen).slice(0, Math.min(80, Math.floor(bank.length * 0.7)));
+      seen = out.map(function (r) { return r[0]; }).concat(seen).slice(0, Math.min(80, Math.floor(src.length * 0.7)));
       lsSet(seenKey, seen);
       return out.map(function (r) { return { q: r[0], right: r[1], choices: shuffle(r.slice(1, 5)) }; });
     }
@@ -230,17 +288,17 @@
       var players = names.map(function (n) { return { name: n, score: 0, correct: 0 }; });
       var per = players.length > 1 ? 5 : 10, qs = pickQuestions(per * players.length);
       if (qs.length < per * players.length) per = Math.floor(qs.length / players.length);
-      S = { players: players, qs: qs.slice(0, per * players.length), i: 0, table: players.length > 1 };
+      S = { players: players, qs: qs.slice(0, per * players.length), i: 0, table: players.length > 1, team: team() };
       if (S.table) handoff(); else ask();
     }
     function who() { return S.players[S.i % S.players.length]; }
     function handoff() {
-      var p = who(), w = screen(title, '<div class="mg-pass"><div class="ph">📱</div><span class="mg-p">Question ' + (S.i + 1) + ' of ' + S.qs.length + '</span><b>Pass to ' + esc(p.name) + '</b><p class="mg-p">Everyone else, no peeking 👀</p><button type="button" class="mg-btn hot" id="mg-rdy">I\'m ' + esc(p.name) + ', ready!</button></div>');
+      var p = who(), w = screen(title(), '<div class="mg-pass"><div class="ph">📱</div><span class="mg-p">Question ' + (S.i + 1) + ' of ' + S.qs.length + '</span><b>Pass to ' + esc(p.name) + '</b><p class="mg-p">Everyone else, no peeking 👀</p><button type="button" class="mg-btn hot" id="mg-rdy">I\'m ' + esc(p.name) + ', ready!</button></div>');
       w.querySelector("#mg-rdy").onclick = ask;
     }
     function ask() {
       var q = S.qs[S.i], p = who(), left = Q_SECS * 10, done = false;
-      var w = screen(title, '<div class="mg-meta"><span>Question <b>' + (S.i + 1) + '</b> of ' + S.qs.length + '</span><span>' + (S.table ? esc(p.name) + ' · ' : '') + '<b>' + p.score.toLocaleString() + '</b> pts</span></div>' +
+      var w = screen(title(), (S.team ? '<div class="ft-hd" style="margin-bottom:8px">' + fanImg(S.team) + 'Fan Test</div>' : '') + '<div class="mg-meta"><span>Question <b>' + (S.i + 1) + '</b> of ' + S.qs.length + '</span><span>' + (S.table ? esc(p.name) + ' · ' : '') + '<b>' + p.score.toLocaleString() + '</b> pts</span></div>' +
         '<div class="mg-tbar"><i style="width:100%"></i></div><div class="mg-q">' + esc(q.q) + '</div><div class="mg-ans">' +
         q.choices.map(function (c, i) { return '<button type="button" data-i="' + i + '">' + esc(c) + '</button>'; }).join("") + '</div>');
       var bar = w.querySelector(".mg-tbar i"), btns = w.querySelectorAll(".mg-ans button");
@@ -257,21 +315,46 @@
       [].forEach.call(btns, function (b) { b.onclick = function () { answer(+b.getAttribute("data-i")); }; });
       keyHandler = function (e) { var k = "1234".indexOf(e.key); if (k >= 0 && btns[k]) answer(k); };
     }
-    function results() {
-      var top = S.players.slice().sort(function (a, b) { return b.score - a.score; })[0], per = S.qs.length / S.players.length;
-      var bestKey = "mg-best-" + kind, best = +lsGet(bestKey, 0) || 0, solo = !S.table;
-      if (solo && top.score > best) lsSet(bestKey, top.score);
-      var w = screen(title, '<div class="mg-card" style="text-align:center"><div class="mg-p" style="margin:0">' + (solo ? "Your score" : "🏆 " + esc(top.name) + " wins!") + '</div><div class="mg-big">' + top.score.toLocaleString() + '</div>' +
-        '<div class="mg-p" style="margin:0">' + top.correct + ' of ' + per + ' right' + (solo ? ' · best ' + Math.max(best, top.score).toLocaleString() : '') + '</div>' +
-        (S.table ? rankList(S.players, "score", function (p) { return p.score.toLocaleString() + " · " + p.correct + "/" + per; }) : '') + '<div id="mg-pts"></div></div>' +
-        '<button type="button" class="mg-btn hot" id="mg-again">🔁 Play again</button><div class="mg-row2" style="margin-top:10px"><button type="button" class="mg-btn" id="mg-set">⚙️ Change setup</button><button type="button" class="mg-btn" id="mg-all">🎲 All games</button></div>');
-      // points: 1 per 2 right answers of the best player at this phone, max 5 a round (Games Pack cap 10/day on top)
-      w.querySelector("#mg-pts").appendChild(award(Math.min(5, Math.floor(top.correct / 2)), title));
+    function results(preview) {
+      var top = S.players.slice().sort(function (a, b) { return b.score - a.score; })[0], per = S.qs.length / S.players.length, t = S.team;
+      var bestKey = t ? "mg-best-fan-" + t[0] : "mg-best-" + kind, best = +lsGet(bestKey, 0) || 0, solo = !S.table;
+      if (solo && !preview && top.score > best) lsSet(bestKey, top.score);
+      var head;
+      if (t) {   // Fan Rating for the best player at this phone
+        var st = fanStars(top.correct, per);
+        head = '<div class="ft-hd">' + fanImg(t) + esc(fanName(t)) + ' Fan Rating</div>' +
+          '<div class="ft-stars" aria-label="' + st + ' out of 5 stars">' + "★".repeat(st) + '<i>' + "★".repeat(5 - st) + '</i></div>' +
+          '<div class="ft-tier" id="ft-tier">' + (st === 5 ? "SUPER FAN" : esc(FAN_TIER[st])) + '</div>' +
+          '<div class="ft-line" id="ft-line">' + esc(fanLine(st, t)) + '</div>' +
+          '<div class="mg-p" style="margin:0">' + (solo ? "" : "🏆 " + esc(top.name) + " · ") + top.correct + ' of ' + per + ' right · ' + top.score.toLocaleString() + ' pts' + (solo ? ' · best ' + Math.max(best, top.score).toLocaleString() : '') + '</div>';
+      } else head = '<div class="mg-p" style="margin:0">' + (solo ? "Your score" : "🏆 " + esc(top.name) + " wins!") + '</div><div class="mg-big">' + top.score.toLocaleString() + '</div>' +
+        '<div class="mg-p" style="margin:0">' + top.correct + ' of ' + per + ' right' + (solo ? ' · best ' + Math.max(best, top.score).toLocaleString() : '') + '</div>';
+      var w = screen(title(), '<div class="mg-card" style="text-align:center">' + head +
+        (S.table ? rankList(S.players, "score", function (p) { return (t ? fanStars(p.correct, per) + "★ · " : "") + p.score.toLocaleString() + " · " + p.correct + "/" + per; }) : '') + '<div id="mg-pts"></div>' +
+        (t ? '<button type="button" class="mg-btn" id="ft-share">📤 Share my Fan Rating</button>' : '') + '</div>' +
+        '<button type="button" class="mg-btn hot" id="mg-again">🔁 Play again</button><div class="mg-row2" style="margin-top:10px"><button type="button" class="mg-btn" id="mg-set">' + (t ? "🏟️ Change team" : "⚙️ Change setup") + '</button><button type="button" class="mg-btn" id="mg-all">🎲 All games</button></div>');
+      // points: 1 per 2 right answers of the best player at this phone, max 5 a round (Games Pack cap 10/day on top). Same for Fan Test.
+      if (!preview) w.querySelector("#mg-pts").appendChild(award(Math.min(5, Math.floor(top.correct / 2)), title()));
+      var sh = w.querySelector("#ft-share");
+      if (sh) sh.onclick = function () {
+        var stars = fanStars(top.correct, per);
+        var txt = "I'm a " + stars + "★ " + fanName(t) + " " + FAN_TIER[stars] + (SHARE_TAG ? " at " + SHARE_TAG : "") + " (" + top.correct + "/" + per + " on the Fan Test). Think you know the " + fanName(t) + "?";
+        if (navigator.share) navigator.share({ text: txt }).catch(function () {});
+        else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () { sh.textContent = "✅ Copied"; }, function () {});
+        sh.setAttribute("data-share", txt);
+      };
       var names = S.players.map(function (p) { return p.name; });
       w.querySelector("#mg-again").onclick = function () { begin(names); };
       w.querySelector("#mg-set").onclick = setup;
       w.querySelector("#mg-all").onclick = closeOv;
     }
+    // TEST HOOK (no points, no saved best): MelodyGames.fanPreview("nfl:14", 9, 10) opens the Fan Rating for 9 of 10 right.
+    setup.fanPreview = function (key, correct, of) {
+      if (!FAN_BY[key]) return false;
+      cfg.fan = key; current = GAMES.filter(function (g) { return g.id === kind; })[0] || current; openOv();
+      S = { players: [{ name: "You", score: correct * 125, correct: correct }], qs: new Array(of || 10), i: 0, table: false, team: FAN_BY[key] };
+      results(true); return true;
+    };
     return setup;
   }
 
@@ -483,12 +566,14 @@
 
   /* ---------- register the games ---------- */
   register({ id: "trivia", order: 20, icon: "🎤", title: "Melody Trivia", sub: "Music, food & drink, pop culture, LA. Solo or pass the phone.", tag: "+pts", start: triviaGame("trivia") });
-  register({ id: "sports", order: 30, icon: "🏆", title: "Sports Trivia", sub: "NBA, NFL, MLB, soccer. Heavy on LA teams.", tag: "+pts", start: triviaGame("sports") });
+  var sportsStart = triviaGame("sports");
+  register({ id: "sports", order: 30, icon: "🏆", title: "Sports Trivia", sub: FAN_TEAMS.length ? "Fan Test: pick your team, get your Fan Rating." : "NBA, NFL, MLB, soccer. Heavy on LA teams.", tag: "+pts", start: sportsStart });
   register({ id: "word", order: 40, icon: "🔤", title: WORD_NAME, sub: "Today's 5-letter word. 6 tries.", tag: "Daily", start: function () { melodyWord(false); } });
   register({ id: "mix", order: 50, icon: "🔀", title: MIX_NAME, sub: "Unscramble as many words as you can in 60s.", start: melodyMix });
   register({ id: "truthdare", order: 60, adult: true, icon: "🎭", title: "Truth or Dare", sub: "Light truths, fun table dares. No drinking dares.", start: truthOrDare });
 
   window.MelodyGames = { register: register, open: open, close: closeOv, screen: screen, every: every, later: later, esc: esc, lsGet: lsGet, lsSet: lsSet, laDay: laDay, refresh: drawTiles,
+    fanPreview: sportsStart.fanPreview,
     setHud: function (t) { ovH.textContent = t; }, isOpen: function (id) { return ov.classList.contains("on") && current && current.id === id; }, kidMode: kidMode };
   // deep link: #games/<id> opens a game (e.g. a table card QR)
   var m = /^#games\/([a-z]+)/.exec(location.hash || ""); if (m) setTimeout(function () { open(m[1]); }, 300);

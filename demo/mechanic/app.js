@@ -795,6 +795,8 @@
     if (r.note) h += '<p class="note">ℹ️ ' + esc(p(r.note)) + "</p>";
     h += '<p class="disc">' + t("partsHonest") + "</p>";
     $("psBody").innerHTML = h;
+    /* "Where to get it for less" (stores.js): nearby parts stores + used yards, call script, or have the mechanic do it */
+    if (W.STORES && !r.na) W.STORES.mount($("psBody"), { car: car, it: it, parts: r.parts, lang: scriptLang, book: function () { if (!job.some(function (j) { return key(j) === key(it); })) { var n = { svc: it.svc, opt: it.opt }; if (it.pos) n.pos = it.pos; job.push(n); saveJob(); } } });
   }
   function copyText(s) {
     function fb() { var ta = D.createElement("textarea"); ta.value = s; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0"; D.body.appendChild(ta); ta.select(); var ok = false; try { ok = D.execCommand("copy"); } catch (e) {} D.body.removeChild(ta); return ok; }

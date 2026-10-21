@@ -62,7 +62,7 @@ window.APP = {
     { key: "ordering", name: "Online Ordering + Delivery", monthly: 0, setup: 0, includedIn: [], quote: true, soon: true,
       one: "Guests order and pay by card right in your app (pickup first), with points on every order and live orders in your back office. Delivery by DoorDash drivers, with no marketplace commission, once DoorDash approves our access (applied, under review). Coming soon: pickup ordering first." },
     { key: "sports", name: "Sports Bar Package", monthly: 0, setup: 0, includedIn: [], quote: true,
-      one: "Live local scores up top, follow-your-team alerts, the Fan Test, Football Squares (1 free square per member, prizes you set), fight nights and pick-the-winner points. Built for game days." },
+      one: "Live local scores up top, follow-your-team alerts, the Fan Test, Football Squares (1 free square per member, prizes you set), fight nights and pick-the-winner points. Score specials: when the home team scores, a same-day deal unlocks. Built for game days." },
     { key: "games", name: "Games Pack", monthly: 0, setup: 0, includedIn: [], quote: true,
       one: "Trivia, sports trivia, the daily word game, a word scramble and bar-safe Truth or Dare. Guests earn points for playing while they wait." },
     { key: "menu3d", name: "3D Digital Menu", monthly: 0, setup: 0, includedIn: [], quote: true,

@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="../lang-th.js"></script>
+<script src="../gamepad.js?v=20261015vv1"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b1220">
+<title>Menu Dash · Venue Versus</title>
+<!-- SousShift AI — MENU DASH: the Venue Versus runner race (2–4 players, about 90 seconds). An ORIGINAL game: our own names, art,
+     obstacles and power-ups (nothing from any other runner game). One thumb: tap = jump, tap again in the air = double jump,
+     swipe down = slide. Keys: Space / ↑ jump, ↓ slide. Controller: A jump, X or down slide (gamepad.js).
+     Opened by ../versus.js when the lobby matches you (#m=<match>), or ?practice=1 to race three practice bots.
+     The server (match room) owns the start, checks every runner's distance against the top speed and the finish time against its
+     own clock, and decides the order. House rules: gamepad.js right after lang-th.js + window.__MD, Full screen (fullscreen.js) +
+     manual 🔒 lock (gamelock.js), the restaurant's review poster always on screen (reviewegg.js + the poster card), halftime only
+     between practice races (never mid-race), holiday themes pause while you run (seasons.js), "Powered by SousShift AI". -->
+<script src="venues.js?v=vv1"></script>
+<style>
+:root{--bg:#0b1220;--panel:#141e34;--edge:#27324d;--acc:#d4af37;--acc2:#f0d375;--wine:#a33645;--ink:#f6f1e4;--dim:#9aa3b5;--go:#3fbf8f;--disp:Georgia,serif;--body:system-ui,-apple-system,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);min-height:100vh}
+.wrap{max-width:980px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 16px 24px}
+.top{display:flex;align-items:center;gap:10px;margin:0 0 10px}
+.top a{color:var(--ink);text-decoration:none;border:1px solid var(--edge);border-radius:12px;padding:9px 12px;font:800 14px var(--body);min-height:44px;display:inline-flex;align-items:center}
+.top h1{margin:0;font:900 24px var(--disp);flex:1}.top h1 small{display:block;font:800 11px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--acc2)}
+.gamebox{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--edge);background:#000}
+canvas#game{display:block;width:100%;height:auto;aspect-ratio:16/9;touch-action:pan-y;background:#101626}
+.ov{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px;background:rgba(6,10,22,.82);z-index:5}
+.ov.on{display:flex}
+.ov h2{margin:0 0 6px;font:900 clamp(24px,5vw,40px) var(--disp)}.ov p{margin:0 0 12px;color:var(--dim);max-width:520px;line-height:1.45;font-size:14px}
+.btn{appearance:none;border:0;border-radius:12px;padding:12px 18px;font:800 15px var(--body);background:var(--acc);color:#1a1405;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.btn.alt{background:#0000;color:var(--ink);border:1px solid var(--edge)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.btn:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+.big{font:900 clamp(60px,14vw,120px)/1 var(--body);color:var(--acc2)}
+.res{list-style:none;margin:6px 0 12px;padding:0;min-width:min(420px,90%)}.res li{display:flex;gap:10px;justify-content:space-between;padding:8px 12px;border-radius:10px;font-weight:800}.res li:nth-child(odd){background:#ffffff0c}.res li.me{outline:1px solid var(--acc);background:color-mix(in srgb,var(--acc) 20%,transparent)}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:14px 0}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.45}
+.card b{color:var(--acc2)}.card img{width:38px;height:38px;object-fit:contain;vertical-align:middle;margin-right:6px}
+.poster{display:flex;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:10px;margin-top:12px;color:var(--ink);text-decoration:none}
+.poster img{width:150px;aspect-ratio:16/9;object-fit:contain;background:#000;border-radius:10px}
+.react{display:flex;gap:6px;justify-content:center;margin-top:8px}.react button{appearance:none;border:1px solid var(--edge);background:#0000;border-radius:12px;font-size:22px;width:46px;height:46px;cursor:pointer}
+.fsb{position:absolute;right:8px;top:48px;z-index:6;appearance:none;border:1px solid var(--edge);background:rgba(6,10,22,.7);color:var(--ink);border-radius:10px;width:40px;height:40px;font-size:18px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a id="back" href="#">← Lobby</a><h1><small id="vname">Venue Versus</small>Menu Dash</h1></div>
+  <div class="gamebox" id="box">
+    <canvas id="game" width="720" height="405" data-game aria-label="Menu Dash runner race. Tap to jump, tap again to double jump, swipe down to slide."></canvas>
+    <button type="button" class="fsb" id="fsb" aria-label="Full screen">⛶</button>
+    <div class="ov on" id="ov"></div>
+  </div>
+  <div class="how">
+    <div class="card"><b>Tap</b> to jump · <b>tap again</b> in the air to double-jump · <b>swipe down</b> to slide under hanging skillets. Keys: Space / ↑ / ↓.</div>
+    <div class="card" id="pucards"></div>
+  </div>
+  <a class="poster" id="poster" target="_blank" rel="noopener"><img id="posterimg" alt="Antidote The Foodie's review of this restaurant"><span><b>Antidote The Foodie reviewed us</b><br><small style="color:var(--dim)">Watch the review ▶</small></span></a>
+</div>
+<script>
+/* ===================== MENU DASH ===================== */
+(function(){
+"use strict";
+var q=new URLSearchParams(location.search), SLUG=(q.get("slug")||"melody").replace(/[^a-z0-9-]/g,"");
+var V=(window.VERSUS_VENUES||{})[SLUG]||{name:"Venue Versus",theme:{},dash:{}}, DASH=V.dash||{};
+var T=V.theme||{}, rs=document.documentElement.style;
+[["bg","--bg"],["panel","--panel"],["edge","--edge"],["accent","--acc"],["accent2","--acc2"],["wine","--wine"],["ink","--ink"],["dim","--dim"],["go","--go"],["display","--disp"],["body","--body"]].forEach(function(p){ if(T[p[0]]) rs.setProperty(p[1],T[p[0]]); });
+if(V.fonts){ var lk=document.createElement("link"); lk.rel="stylesheet"; lk.href=V.fonts; document.head.appendChild(lk); }
+var $=function(i){ return document.getElementById(i); };
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+$("vname").textContent="Venue Versus · "+(V.name||"");
+if(V.poster){ $("posterimg").src=V.poster; $("poster").href=V.review||"#"; } else $("poster").remove();
+var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---- match info from the lobby (#m=…) or practice ---- */
+var M=null; try{ var mh=location.hash.match(/#m=(.+)$/); if(mh) M=JSON.parse(decodeURIComponent(mh[1])); }catch(e){ M=null; }
+if(M&&!/^[a-z0-9]{6,12}$/.test(String(M.id||""))) M=null;
+var BACK=(M&&M.back&&/^https?:\/\//.test(M.back))?M.back:(V.app?V.app+"#versus":"../");
+$("back").href=BACK;
+var API=M?String(M.api||V.api||"").replace(/\/+$/,"")+"/api/versus":"";
+var off=M?(+M.off||0):0; function now(){ return Date.now()+off; }
+var AUTO=q.get("autopilot")==="1"&&(!M||/^(127\.0\.0\.1|localhost)$/.test(location.hostname));   // test hook: your runner plays itself (practice, or a local test server only)
+
+/* ---- the course: identical for every racer (same seed) ---- */
+var W=720, H=405, GY=338, PX=170, TRACK=26000, VBASE=300, VTOP=330, VMAX=480, G=2400, J1=820, J2=720;
+function mb32(a){ return function(){ a=(a+0x6D2B79F5)>>>0; var t=a; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
+var OBS_K=["plates","meatball","skillets","flames","soda"];
+var OBS_N={plates:"Plate Stack",meatball:"Rolling Meatball",skillets:"Hanging Skillets",flames:"Grill Flames",soda:"Soda Spill"};
+var PU=[["boost","⚡",(DASH.boost||{}).name||"Fries","Speed boost for 2.5 s"],["shield","🛡️",(DASH.shield||{}).name||"Mac & Cheese","Blocks the next hit"],["wings","🪽",(DASH.magnet||{}).name||"Wings","Triple jump for 6 s"],["blast","💥",(DASH.rocket||{}).name||"Burger","Trips up the racer just ahead"]];
+function course(seed){
+  var r=mb32(seed||1), gaps=[], obs=[], crates=[], x=900;
+  while(x<TRACK-600){
+    var k=r();
+    if(k<.22){ var w=90+Math.round(r()*70); gaps.push([x,x+w]); x+=w+260+r()*160; }
+    else { var t=OBS_K[Math.floor(r()*OBS_K.length)]; obs.push({k:t,x:x,w:t==="flames"?70:t==="soda"?80:t==="skillets"?56:40}); x+=300+r()*260; }
+    if(r()<.3){ crates.push({x:x-120,y:GY-110-r()*40,k:PU[Math.floor(r()*PU.length)][0]}); }
+  }
+  return {gaps:gaps,obs:obs,crates:crates};
+}
+function onGround(d){ for(var i=0;i<C.gaps.length;i++){ var g=C.gaps[i]; if(d>g[0]+6&&d<g[1]-6) return false; } return true; }
+function gapAt(d){ for(var i=0;i<C.gaps.length;i++){ var g=C.gaps[i]; if(d>g[0]+6&&d<g[1]-6) return g; } return null; }
+
+/* ---- art ---- */
+var IM={}; function img(k,src){ if(!src) return; var i=new Image(); i.src=src; IM[k]=i; }
+img("boost",(DASH.boost||{}).img); img("shield",(DASH.shield||{}).img); img("wings",(DASH.magnet||{}).img); img("blast",(DASH.rocket||{}).img); img("logo",V.logo); img("poster",V.poster);
+(DASH.coins||[]).forEach(function(s,i){ img("deco"+i,s); });
+function ok(i){ return i&&i.complete&&i.naturalWidth; }
+$("pucards").innerHTML="<b>Menu power-ups</b> (crates): "+PU.map(function(p){ return (ok(IM[p[0]])||IM[p[0]]?'<img alt="" src="'+esc(IM[p[0]].src)+'">':p[1])+esc(p[2])+": "+esc(p[3]); }).join(" · ");
+var COLS=["#f0d375","#5fd0ff","#ff7aa2","#7dff9a"];
+
+var cv=$("game"), cx=cv.getContext("2d"), DPR=Math.min(2,window.devicePixelRatio||1); cv.width=W*DPR; cv.height=H*DPR; cx.scale(DPR,DPR);
+
+/* ---- state ---- */
+var C=null, ME=null, RIV=[], S={running:false,over:false,mode:M?"race":"practice"}, startAt=0, raf=0, last=0, ws=null, sendT=0, result=null, myIdx=-1;
+function runner(n,col,bot){ return {n:n,col:col,bot:!!bot,d:0,y:GY,vy:0,v:VBASE,air:0,jumps:0,slide:0,stun:0,inv:0,boost:0,shield:0,wings:0,fall:0,fin:0,flash:0,anim:0,ai:bot?mb32(Math.floor(Math.random()*1e9)):null,buf:[]}; }
+function reset(seed){ C=course(seed); ME=runner("You",COLS[0]); if(AUTO) ME.ai=mb32(7); RIV=RIV.filter(function(r){ return r.remote; }); result=null; }   // remote racers (from the match room) survive the reset
+
+/* ---- input: one thumb ---- */
+var tStart=null;
+function jump(){ if(!S.running||ME.fin||ME.fall||ME.stun>0) return; var max=ME.wings>0?3:2;
+  if(!ME.air){ ME.vy=-J1; ME.air=1; ME.jumps=1; ME.slide=0; snd("jump"); } else if(ME.jumps<max){ ME.vy=-J2; ME.jumps++; snd("jump2"); } }
+function slide(){ if(!S.running||ME.fin||ME.fall) return; if(ME.air){ ME.vy=Math.max(ME.vy,900); } ME.slide=.6; snd("slide"); }
+cv.addEventListener("pointerdown",function(e){ if(!S.running) return; tStart={x:e.clientX,y:e.clientY,t:performance.now(),did:0}; });
+cv.addEventListener("pointermove",function(e){ if(!tStart||tStart.did) return; if(e.clientY-tStart.y>28&&Math.abs(e.clientY-tStart.y)>Math.abs(e.clientX-tStart.x)){ tStart.did=1; slide(); } });
+cv.addEventListener("pointerup",function(){ if(tStart&&!tStart.did) jump(); tStart=null; });
+cv.addEventListener("pointercancel",function(){ tStart=null; });
+document.addEventListener("keydown",function(e){ if(!S.running) return; if(e.key===" "||e.key==="ArrowUp"||e.key==="w"){ e.preventDefault(); if(!e.repeat) jump(); } else if(e.key==="ArrowDown"||e.key==="s"){ e.preventDefault(); if(!e.repeat) slide(); } });
+
+/* ---- sound (tiny WebAudio blips, created on the first tap) ---- */
+var AC=null; function snd(k){ try{ if(!AC){ var A=window.AudioContext||window.webkitAudioContext; if(!A) return; AC=new A(); } if(AC.state==="suspended") AC.resume();
+  var o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime, f={jump:520,jump2:700,slide:220,hit:120,pu:880,fin:990,fall:160}[k]||440;
+  o.type=k==="hit"||k==="fall"?"sawtooth":"triangle"; o.frequency.setValueAtTime(f,t); o.frequency.exponentialRampToValueAtTime(k==="fall"?60:f*1.5,t+.12); g.gain.setValueAtTime(.06,t); g.gain.exponentialRampToValueAtTime(.001,t+.18); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+.2); }catch(e){} }
+
+/* ---- physics ---- */
+function hitBox(r){ var h=r.slide>0&&!r.air?26:52; return {x0:r.d-14,x1:r.d+14,y0:r.y-h,y1:r.y}; }
+function stumble(r,why){ if(r.inv>0||r.fin) return; if(r.shield>0){ r.shield=0; r.inv=.8; r.flash=.5; if(r===ME){ toast("🛡️ "+PU[1][2]+" blocked it!"); snd("pu"); } return; }
+  r.stun=.75; r.inv=1.6; r.boost=0; if(r===ME){ snd("hit"); toast(why); if(navigator.vibrate) try{ navigator.vibrate(40); }catch(e){} } }
+function step(r,dt){
+  r.anim+=dt*(r.v/VBASE);
+  if(r.fin){ r.v=Math.max(0,r.v-400*dt); r.d+=r.v*dt; return; }
+  if(r.fall){ r.fall-=dt; r.y+=500*dt; if(r.fall<=0){ var g=gapAt(r.d)||[r.d,r.d]; r.d=g[0]-30; r.y=GY; r.vy=0; r.air=0; r.jumps=0; r.fall=0; r.inv=1.2; r.v=VBASE*.7; } return; }
+  if(r.stun>0){ r.stun-=dt; r.v=110; } else { var tgt=r.boost>0?VMAX:Math.min(VTOP,VBASE+r.d/TRACK*60)*(r.skill||1); r.v+=(tgt-r.v)*Math.min(1,dt*(r.boost>0?6:1.6)); }
+  ["boost","shield","wings","inv","flash","slide"].forEach(function(k){ if(r[k]>0) r[k]=Math.max(0,r[k]-dt); });
+  r.d+=Math.min(VMAX,r.v)*dt;
+  // vertical
+  r.vy+=G*dt; r.y+=r.vy*dt;
+  var solid=onGround(r.d);
+  if(r.y>=GY&&solid){ r.y=GY; r.vy=0; if(r.air){ r.air=0; r.jumps=0; } }
+  else if(r.y>=GY&&!solid){ r.air=1; if(r.y>GY+40){ r.fall=.9; if(r===ME){ snd("fall"); toast("💦 Into the dish pit! Back in a sec…"); } } }
+  else if(r.y<GY) r.air=1;
+  // obstacles
+  var b=hitBox(r);
+  for(var i=0;i<C.obs.length;i++){ var o=C.obs[i], ox=o.k==="meatball"?o.x-((now()-startAt)/1000)*90:o.x; if(ox>r.d+40) break; if(ox+o.w<r.d-40) continue;
+    var y0,y1; if(o.k==="skillets"){ y0=GY-130; y1=GY-34; } else if(o.k==="soda"){ y0=GY-6; y1=GY; } else if(o.k==="flames"){ y0=GY-34; y1=GY; } else if(o.k==="meatball"){ y0=GY-40; y1=GY; } else { y0=GY-48; y1=GY; }
+    if(b.x1>ox&&b.x0<ox+o.w&&b.y1>y0&&b.y0<y1){ if(o.k==="soda"){ if(!r.air){ r.v=Math.min(r.v,190); } } else stumble(r,"💥 "+OBS_N[o.k]+"!"); } }
+  // crates (everyone sees the same crates; each racer can grab each crate once)
+  for(var c=0;c<C.crates.length;c++){ var cr=C.crates[c]; if((r.got||(r.got={}))[c]) continue; if(Math.abs(cr.x-r.d)<26&&Math.abs(cr.y-(r.y-26))<40){ r.got[c]=1; power(r,cr.k); } }
+  if(r.d>=TRACK&&!r.fin){ r.fin=now()-startAt; if(r===ME) finish(); }
+}
+function power(r,k){
+  if(k==="boost") r.boost=2.5; else if(k==="shield") r.shield=10; else if(k==="wings") r.wings=6;
+  else if(k==="blast"){ var ahead=leader(r); if(ahead){ if(S.mode==="race"&&ahead.idx!=null&&r===ME) net({t:"fx",to:ahead.idx,k:"blast"}); else stumble(ahead,"🍔 Burger Blast from "+r.n+"!"); } }
+  if(r===ME){ var p=PU.filter(function(x){ return x[0]===k; })[0]; snd("pu"); toast(p[1]+" "+p[2]+": "+p[3]+(k==="blast"&&!leader(r)?" (nobody ahead!)":"")); }
+}
+function leader(r){ var best=null; RIV.concat([ME]).forEach(function(x){ if(x!==r&&x.d>r.d&&!x.fin&&(!best||x.d<best.d)) best=x; }); return best; }
+
+/* ---- practice bots ---- */
+function botThink(b){
+  if(b.fin||b.fall||b.stun>0) return;
+  var look=b.d+70+b.v*.12, err=b.ai()<(b===ME?.004:.03);
+  for(var i=0;i<C.obs.length;i++){ var o=C.obs[i]; if(o.x>look) break; if(o.x+o.w<b.d) continue; if(o.x-b.d<90&&!b.air&&!b.slide){ if(err) return; if(o.k==="skillets") b.slide=.6; else if(o.k!=="soda"){ b.vy=-J1; b.air=1; b.jumps=1; } } }
+  var g=null; for(var j=0;j<C.gaps.length;j++){ var gg=C.gaps[j]; if(gg[0]>b.d&&gg[0]-b.d<60){ g=gg; break; } }
+  if(g&&!b.air&&!err){ b.vy=-J1; b.air=1; b.jumps=1; }
+}
+
+/* ---- networking (race mode) ---- */
+function net(o){ if(ws&&ws.readyState===1) try{ ws.send(JSON.stringify(o)); }catch(e){} }
+function connect(){
+  var u=API.replace(/^http/,"ws")+"/match/ws?slug="+encodeURIComponent(SLUG)+"&game=race&id="+M.id+"&dev="+encodeURIComponent(M.dev)+"&tok="+encodeURIComponent(M.tok);
+  try{ ws=new WebSocket(u); }catch(e){ ws=null; return; }
+  ws.onmessage=function(ev){ var m; try{ m=JSON.parse(ev.data); }catch(e){ return; }
+    if(m.t==="mstate"){ if(m.you>=0) myIdx=m.you; off=m.now-Date.now(); m.players.forEach(function(p){ if(p.i===myIdx) return; var r=RIV.filter(function(x){ return x.idx===p.i; })[0]; if(!r){ r=runner(p.n,COLS[(p.i%4)||1]); r.idx=p.i; r.remote=1; RIV.push(r); } if(p.pos){ r.buf.push({t:m.now-Math.max(0,p.age),d:p.pos.d||0,y:p.pos.y||GY,st:p.pos.st||0}); } if(p.finishMs) r.fin=p.finishMs; }); if(m.result) showResult(m.result); }
+    else if(m.t==="pos"){ var r=RIV.filter(function(x){ return x.idx===m.i; })[0]; if(r){ r.buf.push({t:m.at,d:m.p.d||0,y:m.p.y||GY,st:m.p.st||0}); if(r.buf.length>40) r.buf.splice(0,20); } }
+    else if(m.t==="fx"&&m.to===myIdx&&m.k==="blast"){ var from=RIV.filter(function(x){ return x.idx===m.i; })[0]; stumble(ME,"🍔 Burger Blast from "+(from?from.n:"a rival")+"!"); }
+    else if(m.t==="react"){ floatE(m.e); }
+    else if(m.t==="result") showResult(m.result); };
+  ws.onclose=function(){ if(!result&&S.mode==="race") setTimeout(function(){ if(!result) connect(); },1500); };
+}
+function remotePos(r,t){ var b=r.buf; if(!b.length) return; var a=b[0], c=b[b.length-1]; for(var i=b.length-1;i>0;i--) if(b[i-1].t<=t){ a=b[i-1]; c=b[i]; break; } var k=c.t>a.t?Math.max(0,Math.min(1.3,(t-a.t)/(c.t-a.t))):1; r.d=a.d+(c.d-a.d)*k; r.y=a.y+(c.y-a.y)*k; r.slide=c.st===2?.1:0; r.fall=c.st===3?.1:0; r.stun=c.st===4?.1:0; r.v=Math.max(0,(c.d-a.d)/Math.max(.05,(c.t-a.t)/1000)); r.anim+=.016*(r.v/VBASE); }
+
+/* ---- drawing ---- */
+function drawBg(cam){
+  var g=cx.createLinearGradient(0,0,0,H); g.addColorStop(0,"#1b2440"); g.addColorStop(1,"#0e1426"); cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  // tiled kitchen wall (parallax .3)
+  var p=cam*.3; cx.fillStyle="#232f52"; for(var y=40;y<GY-40;y+=22){ var o=((y/22)%2)*20; for(var x=-((p+o)%40)-40;x<W;x+=40){ cx.fillRect(x+1,y+1,38,20); } }
+  // shelves with pans + the venue's own menu photos + banners (parallax .5)
+  var p2=cam*.5;
+  for(var s=Math.floor(p2/520)-1;s<Math.floor(p2/520)+3;s++){ var sx=s*520-p2;
+    cx.fillStyle="#3a2a1e"; cx.fillRect(sx+40,120,220,10);
+    var d=IM["deco"+(((s%4)+4)%4)]; if(ok(d)) cx.drawImage(d,sx+60,62,58,58); if(ok(d)) cx.drawImage(IM["deco"+((((s+1)%4)+4)%4)]||d,sx+150,66,52,52);
+    if(s%3===0&&ok(IM.logo)){ cx.save(); cx.globalAlpha=.85; var lw=150, lh=lw*IM.logo.naturalHeight/IM.logo.naturalWidth; cx.fillStyle="rgba(0,0,0,.35)"; cx.fillRect(sx+300,50,lw+20,lh+20); cx.drawImage(IM.logo,sx+310,60,lw,lh); cx.restore(); }
+    // the review poster on the wall (house rule: always on screen; also the corner thumbnail below)
+    if(s%3===1&&ok(IM.poster)){ var pw=170, ph=pw*9/16; cx.fillStyle="#000"; cx.fillRect(sx+300,40,pw+10,ph+28); cx.drawImage(IM.poster,sx+305,45,pw,ph); cx.fillStyle="#f0d375"; cx.font="800 11px Barlow,system-ui"; cx.textAlign="center"; cx.fillText("ANTIDOTE THE FOODIE REVIEWED US",sx+305+pw/2,45+ph+16); }
+  }
+  // counter / floor
+  for(var gx=-(cam%60)-60;gx<W;gx+=60){ if(!onGround(cam+gx+30)) continue; cx.fillStyle=(Math.floor((cam+gx)/60)%2)?"#d9d4c7":"#2a2f3d"; cx.fillRect(gx,GY,60,14); }
+  cx.fillStyle="#141824"; cx.fillRect(0,GY+14,W,H-GY-14);
+  // dish pits
+  C.gaps.forEach(function(gp){ var lx=gp[0]-cam, rx=gp[1]-cam; if(rx<-20||lx>W+20) return;
+    cx.fillStyle="#05070d"; cx.fillRect(lx,GY,rx-lx,H-GY); cx.fillStyle="rgba(120,190,255,.25)";
+    for(var b=0;b<6;b++){ var bx=lx+((b*37+performance.now()/20)%(rx-lx)), by=GY+30+((b*53)%40); cx.beginPath(); cx.arc(bx,by,3+b%3,0,6.283); cx.fill(); }
+    cx.fillStyle="#9aa3b5"; cx.font="800 10px Barlow,system-ui"; cx.textAlign="center"; cx.fillText("DISH PIT",(lx+rx)/2,GY+20); });
+}
+var CAM=0; function camX(){ return CAM-PX; }
+function drawObs(){
+  var t=(now()-startAt)/1000, cam=camX();
+  C.obs.forEach(function(o){ var x=(o.k==="meatball"?o.x-t*90:o.x)-cam; if(x<-80||x>W+80) return;
+    if(o.k==="plates"){ for(var i=0;i<6;i++){ cx.fillStyle=i%2?"#f4f1ea":"#dcd6c8"; cx.beginPath(); cx.ellipse(x+20,GY-6-i*8,22,5,0,0,6.283); cx.fill(); cx.strokeStyle="#9aa3b5"; cx.stroke(); } }
+    else if(o.k==="meatball"){ var rr=20, a=-t*4; cx.save(); cx.translate(x+20,GY-rr); cx.rotate(a); var g=cx.createRadialGradient(-6,-6,4,0,0,rr); g.addColorStop(0,"#a2552e"); g.addColorStop(1,"#5a2a14"); cx.fillStyle=g; cx.beginPath(); cx.arc(0,0,rr,0,6.283); cx.fill(); cx.fillStyle="#3c7a2a"; cx.fillRect(-3,-rr+2,6,4); cx.restore(); cx.fillStyle="rgba(200,40,20,.6)"; cx.fillRect(x+40,GY-3,30,3); }
+    else if(o.k==="skillets"){ cx.strokeStyle="#9aa3b5"; cx.lineWidth=2; cx.beginPath(); cx.moveTo(x+28,0); cx.lineTo(x+28,GY-80); cx.stroke(); cx.fillStyle="#2b2b2b"; cx.beginPath(); cx.ellipse(x+28,GY-56,30,22,0,0,6.283); cx.fill(); cx.fillStyle="#444"; cx.fillRect(x+24,GY-104,8,26); cx.fillStyle="#ff5a3c"; cx.font="900 10px Barlow,system-ui"; cx.textAlign="center"; cx.fillText("SLIDE ↓",x+28,GY-18); }
+    else if(o.k==="flames"){ cx.fillStyle="#555"; cx.fillRect(x,GY-10,o.w,10); for(var f=0;f<5;f++){ var fh=18+Math.sin(t*12+f)*8; var g2=cx.createLinearGradient(0,GY-10-fh,0,GY-10); g2.addColorStop(0,"rgba(255,220,80,.9)"); g2.addColorStop(1,"rgba(255,80,20,.95)"); cx.fillStyle=g2; cx.beginPath(); cx.moveTo(x+6+f*13,GY-10); cx.quadraticCurveTo(x+12+f*13,GY-10-fh*1.4,x+18+f*13,GY-10); cx.fill(); } }
+    else if(o.k==="soda"){ cx.fillStyle="rgba(120,60,20,.75)"; cx.beginPath(); cx.ellipse(x+40,GY-2,42,6,0,0,6.283); cx.fill(); cx.fillStyle="#c33"; cx.fillRect(x+70,GY-22,12,20); }
+  });
+  C.crates.forEach(function(cr,i){ if(ME.got&&ME.got[i]) return; var x=cr.x-cam; if(x<-40||x>W+40) return; var bob=Math.sin(performance.now()/300+i)*4;
+    cx.fillStyle="rgba(240,211,117,.25)"; cx.beginPath(); cx.arc(x,cr.y+bob,26,0,6.283); cx.fill(); cx.fillStyle="#7a4b22"; cx.fillRect(x-17,cr.y+bob-17,34,34); cx.strokeStyle="#f0d375"; cx.lineWidth=2; cx.strokeRect(x-17,cr.y+bob-17,34,34);
+    var im=IM[cr.k]; if(ok(im)) cx.drawImage(im,x-15,cr.y+bob-15,30,30); else { cx.font="20px system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText((PU.filter(function(p){ return p[0]===cr.k; })[0]||["","❓"])[1],x,cr.y+bob); } });
+  // finish line
+  var fx=TRACK-cam; if(fx>-20&&fx<W+20){ for(var y=GY-160;y<GY;y+=16) for(var c=0;c<2;c++){ cx.fillStyle=((y/16+c)%2)?"#fff":"#111"; cx.fillRect(fx+c*8,y,8,16); } cx.fillStyle="#f0d375"; cx.font="900 18px Barlow,system-ui"; cx.textAlign="center"; cx.fillText("FINISH",fx+8,GY-170); }
+}
+function drawRunner(r,ghost){
+  var x=r.d-camX(), y=r.y; if(x<-60||x>W+60) return;
+  cx.save(); if(ghost) cx.globalAlpha=.55; if(r.inv>0&&Math.floor(r.inv*12)%2) cx.globalAlpha*=.4;
+  var sl=r.slide>0&&!r.air, legs=Math.sin(r.anim*12)*(r.air?0:9);
+  if(r.boost>0){ cx.fillStyle="rgba(95,208,255,.35)"; cx.fillRect(x-48,y-44,34,6); cx.fillRect(x-58,y-28,40,6); }
+  if(r.shield>0){ cx.strokeStyle="rgba(240,211,117,.8)"; cx.lineWidth=3; cx.beginPath(); cx.arc(x,y-26,34,0,6.283); cx.stroke(); }
+  if(sl){ cx.fillStyle=r.col; cx.fillRect(x-20,y-22,40,16); cx.fillStyle="#fff"; cx.fillRect(x+10,y-30,14,10); cx.fillStyle="#f4d3b0"; cx.beginPath(); cx.arc(x+16,y-14,7,0,6.283); cx.fill(); }
+  else {
+    cx.strokeStyle="#1d1d1d"; cx.lineWidth=6; cx.lineCap="round"; cx.beginPath(); cx.moveTo(x-3,y-16); cx.lineTo(x-3+legs,y-1); cx.moveTo(x+3,y-16); cx.lineTo(x+3-legs,y-1); cx.stroke();
+    cx.fillStyle=r.col; cx.beginPath(); cx.moveTo(x-12,y-16); cx.lineTo(x+12,y-16); cx.lineTo(x+10,y-38); cx.lineTo(x-10,y-38); cx.closePath(); cx.fill();
+    cx.fillStyle="#fff"; cx.fillRect(x-9,y-34,18,4);
+    cx.strokeStyle=r.col; cx.lineWidth=5; cx.beginPath(); cx.moveTo(x+8,y-34); cx.lineTo(x+16+legs*.5,y-24); cx.moveTo(x-8,y-34); cx.lineTo(x-16-legs*.5,y-24); cx.stroke();
+    cx.fillStyle="#f4d3b0"; cx.beginPath(); cx.arc(x,y-45,8,0,6.283); cx.fill();
+    cx.fillStyle="#fff"; cx.beginPath(); cx.arc(x-5,y-56,6,0,6.283); cx.arc(x,y-59,7,0,6.283); cx.arc(x+5,y-56,6,0,6.283); cx.fill(); cx.fillRect(x-7,y-55,14,5);
+  }
+  if(r.stun>0){ cx.font="16px system-ui"; cx.textAlign="center"; cx.fillText("💫",x,y-70); }
+  cx.restore();
+  var tag=r===ME?"You":r.n; cx.font="800 11px Barlow,system-ui"; cx.textAlign="center"; var tw=cx.measureText(tag).width+12; cx.fillStyle=r===ME?"rgba(240,211,117,.92)":"rgba(10,14,26,.8)"; cx.beginPath(); cx.roundRect?cx.roundRect(x-tw/2,y-(sl?50:86),tw,16,8):cx.rect(x-tw/2,y-(sl?50:86),tw,16); cx.fill(); cx.fillStyle=r===ME?"#1a1405":"#fff"; cx.fillText(tag,x,y-(sl?38:74));
+}
+function drawHud(){
+  var t=S.running?(now()-startAt):0, all=RIV.concat([ME]);
+  // progress bar with every racer
+  cx.fillStyle="rgba(6,10,22,.75)"; cx.fillRect(12,10,W-24,26); cx.fillStyle="#27324d"; cx.fillRect(24,22,W-130,4);
+  all.forEach(function(r){ var px=24+(W-130)*Math.max(0,Math.min(1,r.d/TRACK)); cx.fillStyle=r.col; cx.beginPath(); cx.arc(px,24,r===ME?7:5,0,6.283); cx.fill(); if(r===ME){ cx.strokeStyle="#fff"; cx.lineWidth=2; cx.stroke(); } });
+  cx.fillStyle="#f0d375"; cx.font="900 15px Barlow,system-ui"; cx.textAlign="right"; cx.fillText("🏁 "+fmtT(Math.max(0,t)),W-20,29);
+  var place=1+RIV.filter(function(r){ return r.fin?(!ME.fin||r.fin<ME.fin):r.d>ME.d; }).length;
+  cx.fillStyle="rgba(6,10,22,.7)"; cx.fillRect(10,44,ac0()?150:74,ac0()?58:36); cx.textAlign="left"; cx.font="900 28px Barlow,system-ui"; cx.fillStyle="#fff"; cx.fillText(["1st","2nd","3rd","4th"][place-1]||place+"th",16,72);
+  var ac=[]; if(ME.boost>0) ac.push("⚡"+ME.boost.toFixed(1)); if(ME.shield>0) ac.push("🛡️"); if(ME.wings>0) ac.push("🪽"+ME.wings.toFixed(0)); if(ac.length){ cx.font="800 15px Barlow,system-ui"; cx.fillText(ac.join("  "),16,94); }
+  if(ok(IM.poster)){ cx.globalAlpha=.9; cx.fillStyle="#000"; cx.fillRect(W-104,H-64,92,54); cx.drawImage(IM.poster,W-102,H-62,88,49.5); cx.globalAlpha=1; }
+  if(TOAST&&TOAST.t>0){ cx.globalAlpha=Math.min(1,TOAST.t*2); cx.fillStyle="rgba(6,10,22,.85)"; cx.font="800 15px Barlow,system-ui"; var tw=cx.measureText(TOAST.s).width+24; cx.fillRect(W/2-tw/2,H-52,tw,30); cx.fillStyle="#fff"; cx.textAlign="center"; cx.fillText(TOAST.s,W/2,H-32); cx.globalAlpha=1; }
+}
+var TOAST=null; function toast(s){ TOAST={s:s,t:2}; }
+function ac0(){ return ME&&(ME.boost>0||ME.shield>0||ME.wings>0); }
+function fmtT(ms){ var s=ms/1000; return Math.floor(s/60)+":"+(s%60).toFixed(1).padStart(4,"0"); }
+
+/* ---- loop ---- */
+function frame(ts){
+  raf=requestAnimationFrame(frame);
+  var dt=Math.min(.05,Math.max(0,(ts-(last||ts))/1000)); last=ts;
+  if(S.running){
+    if(AUTO) botThink(ME);
+    step(ME,dt);
+    RIV.forEach(function(r){ if(r.remote) remotePos(r,now()-140); else { botThink(r); step(r,dt); } });
+    if(S.mode==="race"&&ts-sendT>100){ sendT=ts; net({t:"pos",d:Math.round(ME.d),y:Math.round(ME.y),st:ME.fall?3:ME.stun>0?4:ME.slide>0?2:ME.air?1:0,v:Math.round(ME.v)}); }
+    if(S.mode==="race"&&now()-startAt>(M.durMs||120000)&&!ME.fin){ ME.fin=0; S.running=false; net({t:"done",d:Math.round(ME.d),finishMs:0}); waitResult(); }
+    if(S.mode==="practice"&&ME.fin&&RIV.every(function(r){ return r.fin||now()-startAt>ME.fin+15000; })) practiceDone();
+  }
+  if(TOAST) TOAST.t-=dt;
+  CAM+=((ME?ME.d:0)-CAM)*Math.min(1,dt*8); if(Math.abs(CAM-ME.d)>400) CAM=ME.d;
+  cx.clearRect(0,0,W,H); drawBg(camX()); drawObs();
+  RIV.forEach(function(r){ drawRunner(r,true); }); drawRunner(ME,false); drawHud();
+  if(S.cd){ var left=startAt-now(); cx.fillStyle="rgba(6,10,22,.5)"; cx.fillRect(0,0,W,H); cx.fillStyle="#f0d375"; cx.font="900 120px Barlow,system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText(left>0?String(Math.ceil(left/1000)):"GO!",W/2,H/2); cx.textBaseline="alphabetic"; if(left<=0){ S.cd=0; S.running=true; if(window.GameFS) GameFS.playing(true); } }
+}
+
+/* ---- flow ---- */
+function ovShow(h){ $("ov").innerHTML=h; $("ov").classList.add("on"); }
+function ovHide(){ $("ov").classList.remove("on"); }
+function begin(seed,at){ reset(seed); startAt=at; S.cd=1; S.running=false; S.over=false; CAM=0; ovHide(); if(window.Halftime) Halftime.reset(); if(window.ReviewEgg) ReviewEgg.reset && ReviewEgg.reset(); playMs0=performance.now(); }
+var playMs0=0, practiceTotal=0;
+function practice(){
+  begin(Math.floor(Math.random()*1e9)+1,Date.now()+3500);
+  ["Rival Rosa","Chef Bo","Speedy Sal"].forEach(function(n,i){ var b=runner(n,COLS[i+1],true); b.skill=[.97,.94,1][i]; RIV.push(b); });
+}
+function finish(){ snd("fin"); toast("🏁 Finished in "+fmtT(ME.fin)+"!"); if(S.mode==="race"){ net({t:"done",finishMs:Math.round(ME.fin),d:Math.round(ME.d)}); waitResult(); } }
+function waitResult(){ setTimeout(function(){ if(!result) ovShow('<h2>🏁 '+(ME.fin?"Finished · "+fmtT(ME.fin):"Time!")+'</h2><p>Waiting for the other racers…</p>'); },1800); }
+function practiceDone(){
+  if(S.over) return; S.over=true; S.running=false; if(window.GameFS) GameFS.playing(false);
+  practiceTotal+=performance.now()-playMs0;
+  var all=RIV.concat([ME]).slice().sort(function(a,b){ return (a.fin&&b.fin)?a.fin-b.fin:a.fin?-1:b.fin?1:b.d-a.d; });
+  var go=function(){ resultsOv(all.map(function(r){ return {n:r===ME?"You":r.n,me:r===ME,fin:r.fin,d:r.d}; }),true); };
+  // halftime only BETWEEN races (never mid-race): Antidote's review clips once enough practice has been run
+  if(window.Halftime&&Halftime.tick&&Halftime.tick(practiceTotal,function(){},go)) return;
+  go();
+}
+function showResult(r){
+  if(result) return; result=r; S.running=false; S.over=true; if(window.GameFS) GameFS.playing(false);
+  resultsOv((r.board||[]).map(function(x){ return {n:x.n,me:x.i===myIdx,fin:x.finishMs,d:x.dist,dnf:x.dnf}; }),false);
+}
+function resultsOv(rows,prac){
+  var me=rows.filter(function(x){ return x.me; })[0], place=rows.indexOf(me)+1;
+  ovShow('<h2>'+(place===1?"🏆 You won!":"🏁 You finished "+(["1st","2nd","3rd","4th"][place-1]||place+"th"))+'</h2>'+(prac?'<p>Practice race vs bots. Race real people at '+esc(V.name)+' from the lobby.</p>':'')+
+    '<ol class="res">'+rows.map(function(x,i){ return '<li class="'+(x.me?"me":"")+'"><span>'+(i===0?"👑 ":i+1+". ")+esc(x.n)+'</span><span>'+(x.fin?fmtT(x.fin):"DNF · "+Math.round(100*Math.min(1,(x.d||0)/TRACK))+"%")+'</span></li>'; }).join("")+'</ol>'+
+    (prac?'':'<div class="react">'+["🔥","👏","😂","💪","🏆"].map(function(e){ return '<button type="button" data-e="'+e+'" aria-label="Send '+e+'">'+e+'</button>'; }).join("")+'</div>')+
+    '<div class="btns" style="margin-top:10px">'+(prac?'<button type="button" class="btn" id="again">🏃 Race again</button>':'')+'<a class="btn '+(prac?"alt":"")+'" href="'+esc(BACK)+'">⚔️ Back to the lobby</a></div>');
+  var a=$("again"); if(a) a.onclick=function(){ practice(); };
+  [].forEach.call($("ov").querySelectorAll("[data-e]"),function(b){ b.onclick=function(){ net({t:"react",e:b.getAttribute("data-e")}); floatE(b.getAttribute("data-e")); }; });
+  if(V.poster) $("ov").insertAdjacentHTML("beforeend",'<a class="poster" style="margin-top:12px" href="'+esc(V.review||"#")+'" target="_blank" rel="noopener"><img src="'+esc(V.poster)+'" alt=""><span><b>Antidote The Foodie reviewed '+esc(V.name)+'</b><br><small style="color:var(--dim)">Watch the review ▶</small></span></a>');
+}
+function floatE(e){ toast(e+" "+e+" "+e); }
+
+/* ---- full screen + lock + gamepad hooks ---- */
+window.GAME_FS={box:"#box",hide:".how",bg:"#0b1220"};
+$("fsb").onclick=function(){ if(window.GameFS){ GameFS.toggle(); $("fsb").textContent=GameFS.active?"✕":"⛶"; } };
+window.GAMELOCK_RUNNING=function(){ return !!S.running; };
+window.__MD={get:function(){ return {running:S.running||!!S.cd,over:S.over,mode:S.mode,d:ME?ME.d:0,place:0}; },start:function(){ if(!M&&!S.running) practice(); },end:function(){ if(S.running&&S.mode==="practice"){ ME.fin=ME.fin||now()-startAt; practiceDone(); } },jump:jump,slide:slide};
+
+/* ---- boot ---- */
+reset(1); raf=requestAnimationFrame(frame);
+if(M){
+  connect();
+  ovShow('<h2>🏃 Menu Dash</h2><p>'+(M.players||[]).map(function(p){ return esc(p.n); }).join(" · ")+'</p><p>Tap to jump, tap again to double-jump, swipe down to slide. First to the finish wins.</p><button type="button" class="btn" id="fsgo">⛶ Full screen</button>');
+  $("fsgo").onclick=function(){ if(window.GameFS){ GameFS.enter(true); $("fsb").textContent="✕"; } };
+  var wait=setInterval(function(){ if(now()>=M.startsAt-3500){ clearInterval(wait); begin(M.seed,M.startsAt); } },100);
+} else {
+  ovShow('<h2>🏃 Menu Dash</h2><p>A one-thumb race across the kitchen at '+esc(V.name)+'. Tap to jump, tap again in the air to double-jump, swipe down to slide. Dodge the dishes, grab menu crates, beat the bots to the finish.</p><div class="btns"><button type="button" class="btn" id="go">▶ Practice race</button><button type="button" class="btn alt" id="fsgo">⛶ Full screen</button><a class="btn alt" href="'+esc(BACK)+'">⚔️ Race people in the lobby</a></div>');
+  $("go").onclick=function(){ snd("pu"); practice(); };
+  $("fsgo").onclick=function(){ if(window.GameFS){ GameFS.enter(true); $("fsb").textContent="✕"; } };
+}
+})();
+</script>
+<script>window.REVIEW_EGG=(function(){ var v=(window.VERSUS_VENUES||{})[(new URLSearchParams(location.search).get("slug")||"melody")]||{}; var id=(String(v.review||"").match(/[?&]v=([\w-]{6,})/)||[])[1]; return id?{vid:id,restaurant:v.name,short:v.short,bonus:0,img:v.poster,toast:false}:null; })();
+window.HALFTIME=(((window.VERSUS_VENUES||{})[(new URLSearchParams(location.search).get("slug")||"melody")]||{}).halftime)||null;</script>
+<script src="../reviewegg.js"></script>
+<script src="../halftime.js"></script>
+<script src="../fullscreen.js"></script>
+<script src="../gamelock.js?v=vv1"></script>
+<script src="../seasons/seasons.js?v=20261013a" defer></script>
+<script src="../poweredby.js?v=20261013a" defer></script>
+</body>
+</html>

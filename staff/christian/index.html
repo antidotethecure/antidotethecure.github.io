@@ -7,7 +7,9 @@
 <!-- Staff training app for Melody Bar & Grill + Nalu Vida (English / Español). It holds NO customer data and never
      fetches any: only the public reward values (demo/christian-live.js) and the employee's own practice points + quiz,
      which stay on this phone (and are copied to the backend's StaffPractice / StaffTraining tabs once it's deployed).
-     Pictures: real screenshots made with scripts/christian-staff-shots.cjs from the guest apps with a fake guest. -->
+     Pictures: real screenshots made with scripts/christian-staff-shots.cjs from the guest apps with a fake guest.
+     📲 Deal texts (2026-10-19): the "Get today's deals by text" card sends the employee's OWN name, mobile, start times and
+     consent to the backend (shift_signup) and keeps nothing: no number is stored on this phone or shown here. ?test=1 = nothing sent. -->
 <style>
 :root{--bg:#0b1220;--card:#121c33;--card2:#0f1830;--edge:#24345c;--ink:#f3f6ff;--dim:#a9b6d6;--gold:#f5c400;--mel:#b3263a;--nal:#1673c4;--ok:#2fbf71;--bad:#ff6b6b;--acc:var(--mel)}
 body.n{--acc:var(--nal)}
@@ -53,6 +55,9 @@ figcaption{font-size:12.5px;color:var(--dim);padding:6px 10px;background:var(--c
 .toast .badge{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:11px;background:#ff2d55;color:#fff;font-weight:900;font-size:12px;margin-right:6px;vertical-align:middle}
 details{border-top:1px solid var(--edge);padding:9px 0}details:first-of-type{border-top:0}summary{cursor:pointer;font-weight:700}details p{margin:6px 0 0;color:var(--dim)}
 .say{border-left:4px solid var(--gold);padding:6px 12px;margin:8px 0;background:#ffffff08;border-radius:0 10px 10px 0}
+.acct label{display:block;font-weight:800;margin:8px 0 0}.acct input,.acct select{display:block;width:100%;box-sizing:border-box;margin-top:4px;font-size:17px;padding:10px;border-radius:12px;border:1px solid #bbb}.acct form .btn{margin-top:12px}.atab{display:flex;margin-bottom:4px}.atab button{flex:1}.aerr{color:#c62828;font-weight:700;margin:8px 0 0;min-height:1em}.arow{display:flex;gap:8px;flex-wrap:wrap}.arow .btn{flex:1;text-align:center;text-decoration:none}
+.oapp{display:block;text-decoration:none;color:#fff;border-radius:18px;padding:16px;font-weight:900;font-size:19px;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,.25)}.oapp small{display:block;font-weight:700;font-size:12.5px;opacity:.9;margin-top:3px}body.m .oapp{background:linear-gradient(135deg,#5a1420,#b3263a)}body.n .oapp{background:linear-gradient(135deg,#ff8a2b,#1673c4)}
+.ojump{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.ojump a{display:block;text-decoration:none;text-align:center;padding:10px 4px;border-radius:12px;border:1.5px solid currentColor;font-weight:800;font-size:13px;color:inherit}
 .games{display:grid;grid-template-columns:1fr 1fr;gap:10px}.games a{display:block;text-decoration:none;color:#fff;border-radius:16px;padding:14px;font-weight:900;text-align:center}.games .m{background:linear-gradient(135deg,#5a1420,#b3263a)}.games .n{background:linear-gradient(135deg,#ff8a2b,#1673c4)}
 .tally{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.tally div{background:var(--card2);border:1px solid var(--edge);border-radius:12px;padding:8px;text-align:center}.tally b{display:block;font-size:22px}.tally span{font-size:12px;color:var(--dim)}
 .q{background:var(--card2);border:1px solid var(--edge);border-radius:14px;padding:12px;margin:10px 0}.q .opts{display:grid;gap:6px;margin-top:8px}.q button.o{text-align:left;background:#ffffff0d;border:1px solid var(--edge);color:var(--ink);border-radius:10px;padding:10px;cursor:pointer}
@@ -61,6 +66,10 @@ details{border-top:1px solid var(--edge);padding:9px 0}details:first-of-type{bor
 .note{font-size:13px;color:var(--dim)}
 [hidden]{display:none!important}
 .lsr{margin:2px 0 10px}
+.sf label{display:block;font-weight:800;margin:12px 0 4px}.sf input,.sf select{display:block;width:100%;font-size:16px;padding:11px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);min-height:46px}
+.sf .days{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sf .days label{font-weight:700;margin:0 0 3px;font-size:14px}
+.sf .ck2{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;margin-top:14px;font-size:14.5px;line-height:1.45}.sf .ck2 input{width:24px;height:24px;min-height:0;margin:2px 0 0;accent-color:var(--gold)}
+.sf .err{color:var(--bad);font-weight:700;margin-top:8px}.sf .okmsg{background:#2fbf7122;border:1px solid #2fbf7188;border-radius:12px;padding:12px;margin-top:6px}
 </style></head><body class="m"><main id="app"></main>
 <script src="../../demo/christian-live.js?v=mg1"></script>
 <script src="voice/lines.js?v=1"></script>
@@ -85,7 +94,8 @@ var W={
  yourName:{en:"Your first name or nickname",es:"Tu nombre o apodo"},
  nameHint:{en:"For your practice points and your Trained badge. It stays on this phone.",es:"Para tus puntos de práctica y tu insignia de Capacitado. Se queda en este teléfono."},
  save:{en:"Save",es:"Guardar"},
- nav:[["guests",{en:"For guests",es:"Para clientes"}],["t-pos",{en:"With Toast",es:"Con Toast"}],["deals",{en:"Deals",es:"Ofertas"}],["tut",{en:"Step by step",es:"Paso a paso"}],["t-oneprize",{en:"One prize a day",es:"Un premio al día"}],["t-card",{en:"Rewards card",es:"Tarjeta"}],["say",{en:"What to say",es:"Qué decir"}],["faq",{en:"Problems & FAQ",es:"Problemas y preguntas"}],["games",{en:"Practice games",es:"Juegos de práctica"}],["quiz",{en:"Test yourself",es:"Ponte a prueba"}]],
+ nav:[["app",{en:"Open the app",es:"Abrir la app"}],["duties",{en:"My job",es:"Mi trabajo"}],["guests",{en:"For guests",es:"Para clientes"}],["t-pos",{en:"With Toast",es:"Con Toast"}],["deals",{en:"Deals",es:"Ofertas"}],["tut",{en:"Step by step",es:"Paso a paso"}],["t-oneprize",{en:"One prize a day",es:"Un premio al día"}],["t-card",{en:"Rewards card",es:"Tarjeta"}],["say",{en:"What to say",es:"Qué decir"}],["faq",{en:"Problems & FAQ",es:"Problemas y preguntas"}],["games",{en:"Practice games",es:"Juegos de práctica"}],["quiz",{en:"Test yourself",es:"Ponte a prueba"}]],
+ sfTitle:{en:"📲 Get today's deals by text when your shift starts",es:"📲 Recibe las ofertas del día por texto al empezar tu turno"},
  install:{en:"📲 Save this guide: Share → Add to Home Screen (“Staff Rewards”). Works offline after the first visit.",es:"📲 Guarda esta guía: Compartir → Agregar a inicio (“Staff Rewards”). Funciona sin internet después de la primera vez."}
 };
 function guests(){ var R=rw(), jl=R.justLanded;
@@ -285,23 +295,178 @@ function quiz(){ var B=bank(), b=quizBadge(), h="<h2 id='quiz'>✅ "+L({en:"Opti
 function finishQuiz(){ var right=QZ.qs.filter(function(x){ return QZ.ans[x.i]===0; }).length, pct=Math.round(100*right/QZ.qs.length), pass=pct>=80, day=new Date().toLocaleDateString("en-CA");
  if(pass) set(LS.quiz,JSON.stringify({passed:true,name:nm()||"",day:day,score:pct}));
  if(LIVE.api) try{ fetch(LIVE.api,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({type:"staff_trained",name:(nm()||"Staff").slice(0,24),score:pct,passed:pass,dev:get("ssai_staff_dev","")})}); }catch(e){} }
+// ---------------- 🎯 YOUR OBJECTIVE & DUTIES (2026-10-18): pick your job, see your goal + duties. Saved on this phone only. ----------------
+// Same job list as Christian HQ › 🔐 Team access. What you can CHANGE in HQ is set by Christian there, not here.
+var DUTY={
+ kitchen:[{en:"Kitchen",es:"Cocina"},{en:"Every plate looks like the photo in the app, comes out fast, and matches the menu.",es:"Cada plato se ve como la foto de la app, sale rápido y coincide con el menú."},[
+  {en:"Cook every dish to the recipe and plate it like the app photo.",es:"Cocina cada platillo según la receta y emplátalo como la foto de la app."},
+  {en:"Tell your lead (or Christian) when an item runs out, so it can come off the app or the special.",es:"Avisa a tu encargado (o a Christian) cuando se acabe algo, para quitarlo de la app o del especial."},
+  {en:"If Christian turned it on for you: snap a real photo of a new or fixed dish in HQ (good light, plate fills the picture, no people).",es:"Si Christian te lo activó: toma una foto real de un platillo nuevo o corregido en HQ (buena luz, el plato llena la foto, sin personas)."},
+  {en:"Rewards rung in Toast (free fries, burger…) are made exactly like a paid order.",es:"Las recompensas marcadas en Toast (papas gratis, hamburguesa…) se preparan igual que una orden pagada."},
+  {en:"Keep your station clean and food safe every shift.",es:"Mantén tu estación limpia y la comida segura en cada turno."}]],
+ bartender:[{en:"Bartender",es:"Bartender"},{en:"Great drinks, fast, and every guest leaves knowing about the app and its rewards.",es:"Bebidas excelentes y rápidas, y cada cliente se va sabiendo de la app y sus recompensas."},[
+  {en:"Make drinks to spec and know tonight's specials and happy hour (see Deals below).",es:"Prepara las bebidas según la receta y conoce los especiales y el happy hour de hoy (ver Ofertas abajo)."},
+  {en:"Tell every new guest about the app: free to join, games, points, rewards.",es:"Cuéntale a cada cliente nuevo de la app: es gratis, tiene juegos, puntos y recompensas."},
+  {en:"Check the live pass and ring the matching Toast button for rewards (Step by step 2–4).",es:"Revisa el pase en vivo y marca el botón correcto de Toast para las recompensas (Paso a paso 2–4)."},
+  {en:"Remind guests to add their visit with the receipt check number.",es:"Recuérdales agregar su visita con el número de cheque del recibo."},
+  {en:"Never ask for or write down a guest's phone or email.",es:"Nunca pidas ni anotes el teléfono o correo de un cliente."}]],
+ server:[{en:"Server / floor",es:"Mesero / piso"},{en:"Every table is happy, served on time, and knows how to earn rewards.",es:"Cada mesa está contenta, bien atendida y sabe cómo ganar recompensas."},[
+  {en:"Greet the table, know the specials, and mention the app with the menu.",es:"Saluda a la mesa, conoce los especiales y menciona la app con el menú."},
+  {en:"Help a guest join if they ask (Step by step 1). It takes under a minute.",es:"Ayuda a un cliente a unirse si lo pide (Paso a paso 1). Toma menos de un minuto."},
+  {en:"Check the live pass before ringing any reward in Toast.",es:"Revisa el pase en vivo antes de marcar cualquier recompensa en Toast."},
+  {en:"At the check: \"Add your visit with this receipt to earn points.\"",es:"Con la cuenta: \"Agrega tu visita con este recibo para ganar puntos.\""},
+  {en:"Problems you can't fix: tell the manager on shift.",es:"Problemas que no puedes resolver: díselo al gerente de turno."}]],
+ runner:[{en:"Food runner / barback",es:"Corredor de comida / barback"},{en:"Food reaches the right table hot and fast, the bar never runs out, and guests know about the app.",es:"La comida llega caliente y rápido a la mesa correcta, al bar nunca le falta nada y los clientes conocen la app."},[
+  {en:"Run food to the right table fast, and check the ticket matches the plate (reward items too).",es:"Lleva la comida rápido a la mesa correcta y revisa que el ticket coincida con el plato (también los artículos de recompensa)."},
+  {en:"Barback: keep the bar stocked (ice, glassware, garnishes, beer, liquor) and empty the trash before it's full.",es:"Barback: mantén surtido el bar (hielo, vasos, adornos, cerveza, licor) y saca la basura antes de que se llene."},
+  {en:"Clear and reset tables and the bar top quickly so the next guest can sit.",es:"Limpia y prepara las mesas y la barra rápido para que el siguiente cliente se siente."},
+  {en:"If a guest asks about the app or a reward, say \"It's free to join, ask your server or bartender\" and point them to the QR code.",es:"Si un cliente pregunta por la app o una recompensa, di \"Es gratis unirse, pregúntale a tu mesero o bartender\" y muéstrale el código QR."},
+  {en:"You never ring rewards in Toast and never ask for a guest's phone or email.",es:"Nunca marcas recompensas en Toast y nunca pides el teléfono o correo de un cliente."}]],
+ bar_manager:[{en:"Bar manager",es:"Gerente de bar"},{en:"The bar runs smooth, specials and happy hour are right in the app, and the team knows the rewards.",es:"El bar funciona bien, los especiales y el happy hour están correctos en la app y el equipo conoce las recompensas."},[
+  {en:"Keep drink prices, specials and happy hour correct in HQ (if Christian turned those on for you).",es:"Mantén correctos en HQ los precios de bebidas, especiales y happy hour (si Christian te lo activó)."},
+  {en:"When a price changes in the app, change it in Toast too.",es:"Cuando cambie un precio en la app, cámbialo también en Toast."},
+  {en:"Make sure every bartender has passed the quiz below.",es:"Asegúrate de que cada bartender haya pasado el quiz de abajo."},
+  {en:"Check the HQ to-do list at the start of every shift.",es:"Revisa la lista de pendientes de HQ al inicio de cada turno."}]],
+ marketing:[{en:"Marketing / management",es:"Marketing / gerencia"},{en:"More guests join, come back, and use their rewards. The app always shows the right deals, prices and photos.",es:"Más clientes se unen, regresan y usan sus recompensas. La app siempre muestra las ofertas, precios y fotos correctos."},[
+  {en:"Set and update discounts, reward points and promo deals in HQ › Discounts.",es:"Configura y actualiza descuentos, puntos y promociones en HQ › Discounts."},
+  {en:"Keep specials, happy hour and the early-bird gift current.",es:"Mantén al día los especiales, el happy hour y el regalo early bird."},
+  {en:"Fix the app's menu: real dish photos, prices that match Toast (only what Christian turned on for you).",es:"Corrige el menú de la app: fotos reales y precios iguales a Toast (solo lo que Christian te activó)."},
+  {en:"Watch the charts each week: sign-ups, visits, rewards used. Tell Christian what's working.",es:"Revisa las gráficas cada semana: registros, visitas, recompensas usadas. Dile a Christian qué funciona."},
+  {en:"Every change gets an emailed code and goes in the Audit log, so double-check before you Save.",es:"Cada cambio pide un código por correo y queda en el registro, así que revisa antes de guardar."},
+  {en:"The games themselves are run by Antidote. Ideas for the games? Send them to Christian.",es:"Los juegos los maneja Antidote. ¿Ideas para los juegos? Envíaselas a Christian."}]],
+ manager:[{en:"Manager (general)",es:"Gerente (general)"},{en:"Every shift runs right: staff trained, app correct, guests happy.",es:"Cada turno funciona bien: personal capacitado, app correcta, clientes contentos."},[
+  {en:"Check the HQ to-do list first thing and clear what's yours.",es:"Revisa primero la lista de pendientes de HQ y resuelve lo tuyo."},
+  {en:"Keep prices, specials, discounts and photos right in the app (whatever Christian turned on for you).",es:"Mantén correctos en la app precios, especiales, descuentos y fotos (lo que Christian te activó)."},
+  {en:"Make sure every new hire reads this guide and passes the quiz.",es:"Asegúrate de que cada persona nueva lea esta guía y pase el quiz."},
+  {en:"Handle reward problems the team can't (FAQ below), and tell Christian about anything odd.",es:"Resuelve los problemas de recompensas que el equipo no pueda (FAQ abajo) y avísale a Christian de cualquier cosa rara."}]],
+ other:[{en:"Other employee",es:"Otro empleado"},{en:"Help guests have a great visit and know about the app.",es:"Ayuda a que los clientes tengan una gran visita y conozcan la app."},[
+  {en:"Know how the app and rewards work (read Step by step).",es:"Conoce cómo funcionan la app y las recompensas (lee Paso a paso)."},
+  {en:"Send reward questions to the bartender or manager on shift.",es:"Pasa las preguntas de recompensas al bartender o gerente de turno."},
+  {en:"Never share a guest's personal info.",es:"Nunca compartas información personal de un cliente."}]]};
+function duties(){ var j=get("ssai_staff_job",""), d=DUTY[j];
+ var h="<h2 id='duties'>🎯 "+L({en:"My objective & duties",es:"Mi objetivo y mis tareas"})+"</h2><div class='card'><label for='job' style='font-weight:800'>"+L({en:"My job",es:"Mi puesto"})+"</label>"+
+  "<select id='job' style='display:block;width:100%;margin-top:6px;font-size:17px;padding:10px;border-radius:12px'><option value=''>"+L({en:"Pick your job…",es:"Elige tu puesto…"})+"</option>"+
+  Object.keys(DUTY).map(function(k){ return "<option value='"+k+"'"+(k===j?" selected":"")+">"+L(DUTY[k][0])+"</option>"; }).join("")+"</select>";
+ if(d) h+="<p style='margin:12px 0 4px'><b>🎯 "+L({en:"Objective",es:"Objetivo"})+":</b> "+L(d[1])+"</p><b>📋 "+L({en:"Duties",es:"Tareas"})+"</b><ul class='ck'>"+d[2].map(function(x){ return "<li>"+L(x)+"</li>"; }).join("")+"</ul>";
+ return h+"<p class='note' style='margin-top:8px'>"+L({en:"What you can change in Christian HQ (prices, discounts, photos…) is turned on by Christian. Need more? Ask him.",es:"Lo que puedes cambiar en Christian HQ (precios, descuentos, fotos…) lo activa Christian. ¿Necesitas más? Pídeselo."})+"</p></div>"; }
 // ---------------- 🔊 Listen (demo/listen.js: the phone's own free voice reads a section, paragraph by paragraph) ----------------
 // every h2 section (guests, deals, tut, say, faq) is wrapped so it can be read, and every step section gets its own button
 function listenify(h){ if(!window.SSAI_LISTEN) return h; var lb=L({en:"🔊 Listen",es:"🔊 Escuchar"});
  h=h.replace(/<h2 id='([a-z-]+)'>([\s\S]*?)<\/h2>/g,function(m,id,t){ return "</div-wrap><div class='lsw' id='ls-"+id+"'><h2 id='"+id+"'>"+t+"</h2><p class='lsr' data-noread>"+SSAI_LISTEN.button("ls-"+id,lb)+"</p>"; });
  h=h.replace(/<section class='tut' id='(t-[a-z]+)'><h3>([\s\S]*?)<\/h3>/g,function(m,id,t){ return m+"<p class='lsr' data-noread>"+SSAI_LISTEN.button(id,lb)+"</p>"; });
  return h.replace("</div-wrap>","").replace(/<\/div-wrap>/g,"</div>")+"</div>"; }
+document.addEventListener("change",function(e){ if(e.target&&e.target.id==="job"){ set("ssai_staff_job",e.target.value); render(); var d=document.getElementById("duties"); if(d) d.scrollIntoView(); } });
+// ---------------- 📲 DEAL TEXTS SIGN-UP (2026-10-19) ----------------
+// Staff add their own mobile + usual start times; a manager OKs it in Christian HQ; then about 15-30 minutes before each shift
+// they get ONE text with that day's deals (Code.gs shiftTick). Values live in SF (this page's memory) only, so a re-render
+// (language / restaurant switch) keeps what they typed; nothing is saved on the phone and no number is ever shown here.
+var TESTSF=/[?&]test=1(&|$)/.test(location.search);
+var SF={name:"",phone:"",email:"",rest:"",job:"",days:{},consent:false,sent:false,err:"",busy:false};
+var SFD=[["mon",{en:"Monday",es:"Lunes"}],["tue",{en:"Tuesday",es:"Martes"}],["wed",{en:"Wednesday",es:"Miércoles"}],["thu",{en:"Thursday",es:"Jueves"}],["fri",{en:"Friday",es:"Viernes"}],["sat",{en:"Saturday",es:"Sábado"}],["sun",{en:"Sunday",es:"Domingo"}]];
+function sfRest(){ return SF.rest||REST; }
+function sfConsent(){ var r=NAME[sfRest()];
+ return L({en:"I agree to get automated work texts from SousShift AI for "+r+" about the day's deals before my shifts (about 1 per shift). Reply STOP to stop and HELP for help. Message and data rates may apply. This isn't a condition of employment.",
+  es:"Acepto recibir mensajes de texto automáticos de trabajo de SousShift AI para "+r+" con las ofertas del día, antes de mis turnos (más o menos 1 por turno). Responde STOP para dejar de recibirlos y HELP para ayuda. Pueden aplicar tarifas de mensajes y datos. No es una condición de empleo."}); }
+function shiftCard(){ var h="<h2 id='dealtexts'>"+L(W.sfTitle)+"</h2><div class='card sf'>";
+ if(SF.sent) return h+"<div class='okmsg' role='status'><b>✅ "+L({en:"Sent!",es:"¡Enviado!"})+"</b> "+L({en:"A manager turns your texts on. After that, about 15 to 30 minutes before each shift you get one text with that day's deals. Reply STOP any time to stop.",es:"Un gerente activa tus mensajes. Después, unos 15 a 30 minutos antes de cada turno recibes un texto con las ofertas del día. Responde STOP cuando quieras para dejar de recibirlos."})+(TESTSF?"<br><small>🧪 TEST MODE: "+L({en:"nothing was sent.",es:"no se envió nada."})+"</small>":"")+"</div><p style='margin-top:10px'><button class='btn alt' id='sfAgain'>"+L({en:"Sign up someone else on this phone",es:"Registrar a otra persona en este teléfono"})+"</button></p></div>";
+ var job=SF.job||get("ssai_staff_job",""), rs=sfRest();
+ h+="<p style='margin:0'>"+L({en:"So when a guest mentions a deal, you already know it. Add your number and the time you usually start each day. A manager turns it on.",es:"Así, cuando un cliente mencione una oferta, ya la conoces. Pon tu número y la hora en que sueles entrar cada día. Un gerente lo activa."})+"</p>"+
+  "<label for='sfName'>"+L({en:"Your name",es:"Tu nombre"})+"</label><input id='sfName' data-sf='name' maxlength='40' autocomplete='name' value='"+esc(SF.name||nm())+"'>"+
+  "<label for='sfPhone'>"+L({en:"Your mobile number",es:"Tu número de celular"})+"</label><input id='sfPhone' data-sf='phone' type='tel' inputmode='tel' autocomplete='tel' maxlength='20' placeholder='(310) 555-0123' value='"+esc(SF.phone)+"'>"+
+  "<label for='sfRest'>"+L({en:"Restaurant",es:"Restaurante"})+"</label><select id='sfRest' data-sf='rest'><option value='m'"+(rs==="m"?" selected":"")+">✈️ Melody Bar &amp; Grill</option><option value='n'"+(rs==="n"?" selected":"")+">🏄 Nalu Vida</option></select>"+
+  "<label for='sfJob'>"+L({en:"Your job",es:"Tu puesto"})+"</label><select id='sfJob' data-sf='job'><option value=''>"+L({en:"Pick your job…",es:"Elige tu puesto…"})+"</option>"+Object.keys(DUTY).map(function(k){ return "<option value='"+k+"'"+(k===job?" selected":"")+">"+L(DUTY[k][0])+"</option>"; }).join("")+"</select>"+
+  "<label>"+L({en:"When do you usually start? (leave days off blank)",es:"¿A qué hora sueles entrar? (deja en blanco tus días libres)"})+"</label><div class='days'>"+SFD.map(function(d){ return "<div><label for='sf_"+d[0]+"'>"+L(d[1])+"</label><input id='sf_"+d[0]+"' data-sf='day:"+d[0]+"' type='time' value='"+esc(SF.days[d[0]]||"")+"' aria-label='"+esc(L(d[1]))+"'></div>"; }).join("")+"</div>"+
+  "<label for='sfEmail'>"+L({en:"Email (optional, used until texts are switched on)",es:"Correo (opcional, se usa mientras se activan los textos)"})+"</label><input id='sfEmail' data-sf='email' type='email' inputmode='email' autocapitalize='none' autocomplete='email' maxlength='120' value='"+esc(SF.email)+"'>"+
+  "<p class='note' style='margin:6px 0 0'>"+L({en:"Texts come in "+(LANG==="es"?"Spanish":"English")+" (switch EN / ES at the top to change).",es:"Los textos llegan en "+(LANG==="es"?"español":"inglés")+" (cambia EN / ES arriba)."})+"</p>"+
+  "<div class='ck2'><input id='sfOk' data-sf='consent' type='checkbox'"+(SF.consent?" checked":"")+"><label for='sfOk' style='font-weight:400;margin:0'>"+esc(sfConsent())+"</label></div>"+
+  "<button class='btn' id='sfGo' style='width:100%;margin-top:14px'"+(SF.busy?" disabled":"")+">"+(SF.busy?L({en:"Sending…",es:"Enviando…"}):L({en:"Send me the daily deals",es:"Envíenme las ofertas del día"}))+"</button>"+
+  "<div class='err' id='sfErr' role='alert'>"+esc(SF.err)+"</div>"+
+  "<p class='note' style='margin-top:10px'>🔒 "+L({en:"Your number goes only to the restaurant's private back office. It's never shown in this guide or to guests, and this phone doesn't keep it.",es:"Tu número va solo a la oficina privada del restaurante. Nunca se muestra en esta guía ni a los clientes, y este teléfono no lo guarda."})+"</p></div>";
+ return h; }
+function sfField(e){ var t=e.target, k=t&&t.getAttribute&&t.getAttribute("data-sf"); if(!k) return; if(k.indexOf("day:")===0) SF.days[k.slice(4)]=t.value; else if(k==="consent") SF.consent=t.checked; else SF[k]=t.value; }
+document.addEventListener("input",sfField); document.addEventListener("change",function(e){ sfField(e); var k=e.target&&e.target.getAttribute&&e.target.getAttribute("data-sf"); if(k==="rest") render(); });
+function sfSend(){ var es=LANG==="es", d10=String(SF.phone||"").replace(/\D/g,"").replace(/^1(?=\d{10}$)/,""), name=(SF.name||nm()).replace(/[<>]/g,"").trim(), job=SF.job||get("ssai_staff_job",""), em=String(SF.email||"").trim(), sh={};
+ SFD.forEach(function(d){ if(SF.days[d[0]]) sh[d[0]]=SF.days[d[0]]; });
+ var bad=name.length<2?L({en:"Type your name.",es:"Escribe tu nombre."}):!/^[2-9]\d{9}$/.test(d10)?L({en:"Type your 10-digit mobile number.",es:"Escribe tu celular de 10 dígitos."}):!job?L({en:"Pick your job.",es:"Elige tu puesto."}):!Object.keys(sh).length?L({en:"Add your start time for at least one day.",es:"Pon la hora de entrada de al menos un día."}):em&&!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(em)?L({en:"That email doesn't look right (or leave it blank).",es:"Ese correo no se ve bien (o déjalo en blanco)."}):!SF.consent?L({en:"Tick the box to agree to the texts.",es:"Marca la casilla para aceptar los mensajes."}):"";
+ if(bad){ SF.err=bad; render(); var el=document.getElementById("sfErr"); if(el) el.scrollIntoView({block:"center"}); return; }
+ var done=function(r){ SF.busy=false; if(r&&r.ok){ SF={name:"",phone:"",email:"",rest:"",job:"",days:{},consent:false,sent:true,err:"",busy:false}; } else SF.err=(r&&r.reason)||L({en:"Didn't send. Check your connection and try again.",es:"No se envió. Revisa tu conexión e inténtalo otra vez."}); render(); var c=document.getElementById("dealtexts"); if(c) c.scrollIntoView(); };
+ SF.err=""; SF.busy=true; render();
+ if(TESTSF) return setTimeout(function(){ done({ok:true}); },500);
+ if(!LIVE.api) return done({ok:false,reason:L({en:"Not connected yet. Ask your manager.",es:"Aún no conectado. Pregúntale a tu gerente."})});
+ fetch(LIVE.api,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({type:"shift_signup",name:name,phone:d10,email:em,restaurant:sfRest()==="n"?"nalu":"melody",job:job,lang:es?"es":"en",shifts:sh,consent:true,dev:get("ssai_staff_dev","")})})
+  .then(function(r){ return r.json(); }).then(done).catch(function(){ done(null); }); }
+// ---------------- open the guest app (Antidote, 2026-10-19): staff tap in and see exactly what guests see ----------------
+// ?staff=1 = practice mode (demo/crm.js): nothing they do there joins, earns or redeems for real, game runs go to their practice tally
+function openApp(){ var u=REST==="m"?"../../demo/melody-lax/?staff=1":"../../demo/nalu-vida/?staff=1",
+  J=REST==="m"?[["#menu",{en:"🍔 Menu",es:"🍔 Menú"}],["#rewards",{en:"💳 Rewards card",es:"💳 Tarjeta"}],["#play",{en:"✈️ Game",es:"✈️ Juego"}]]
+              :[["#food",{en:"🍤 Menu",es:"🍤 Menú"}],["#prizes",{en:"🎁 Rewards",es:"🎁 Premios"}],["#play",{en:"🏄 Game",es:"🏄 Juego"}]];
+ return "<h2 id='app'>📲 "+L({en:"Open the guest app",es:"Abre la app de clientes"})+"</h2><div class='card'>"+
+  "<p>"+L({en:"Tap below to open the real "+SHORT[REST]+" app, the same one guests use. Look around: the menu, the specials, the rewards card, the games. That way you know exactly what guests are looking at when they ask you.",es:"Toca abajo para abrir la app real de "+SHORT[REST]+", la misma que usan los clientes. Recórrela: el menú, los especiales, la tarjeta de recompensas y los juegos. Así sabes exactamente lo que ven los clientes cuando te preguntan."})+"</p>"+
+  "<a class='oapp' href='"+u+"'>"+L({en:"Open the "+SHORT[REST]+" app",es:"Abrir la app de "+SHORT[REST]})+" →<small>"+L({en:"Practice mode: nothing you tap counts for real",es:"Modo práctica: nada de lo que toques cuenta de verdad"})+"</small></a>"+
+  "<div class='ojump'>"+J.map(function(j){ return "<a href='"+u+j[0]+"'>"+L(j[1])+"</a>"; }).join("")+"</div>"+
+  "<p class='note' style='margin-top:8px'>"+L({en:"In practice mode you don't join, earn or redeem anything, and nothing reaches a guest's account or the leaderboard. Use your phone's Back button to come back here.",es:"En modo práctica no te unes, no ganas ni canjeas nada, y nada llega a la cuenta de un cliente ni a la tabla. Usa el botón Atrás de tu teléfono para volver aquí."})+"</p></div>"; }
+// ---------------- 👤 staff account (Antidote, 2026-10-19: "log in and make an account for whatever position they work, with a
+// password like any other website"). Same accounts as Christian HQ (backend team_signup / bo_login): a new account waits until
+// Christian approves it in HQ › 🔐 Team access; then the same email + password works here AND in Christian HQ.
+// This page keeps only the person's name, email and job on the phone (never the password or a login token).
+var ACCT_K="ssai_staff_acct", AM="in", AMSG="";
+function acct(){ try{ var a=JSON.parse(get(ACCT_K,"null")); return a&&a.email?a:null; }catch(e){ return null; } }
+function api(o){ return fetch(LIVE.api,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(o)}).then(function(r){ return r.json(); }).catch(function(){ return {ok:false,reason:L({en:"Can't reach the server. Check your signal and try again.",es:"No hay conexión con el servidor. Revisa tu señal e intenta de nuevo."})}; }); }
+function account(){ var a=acct(), h="<div class='card acct' id='acct'>";
+ if(a){ var d=DUTY[a.job];
+  return h+"<p style='margin:0'>👤 "+L({en:"Signed in as",es:"Sesión iniciada como"})+" <b>"+esc(a.name)+"</b>"+(d?" · "+L(d[0]):"")+"</p><p class='note' style='margin:4px 0 8px'>"+esc(a.email)+"</p>"+
+   "<div class='arow'><a class='btn' href='../../backoffice/christian/'>"+L({en:"Open Christian HQ",es:"Abrir Christian HQ"})+"</a><button class='btn alt' type='button' data-acct='out'>"+L({en:"Log out",es:"Cerrar sesión"})+"</button></div></div>"; }
+ var jobs=Object.keys(DUTY).map(function(k){ return "<option value='"+k+"'"+(k===get("ssai_staff_job","")?" selected":"")+">"+L(DUTY[k][0])+"</option>"; }).join("");
+ h+="<div class='seg atab' role='tablist'><button type='button' data-acct='in' aria-pressed='"+(AM==="in")+"'>"+L({en:"Log in",es:"Iniciar sesión"})+"</button><button type='button' data-acct='new' aria-pressed='"+(AM==="new")+"'>"+L({en:"Create account",es:"Crear cuenta"})+"</button></div>";
+ if(AM==="done") return h+"<p style='margin:10px 0 0'>✅ <b>"+L({en:"Account created.",es:"Cuenta creada."})+"</b> "+L({en:"Christian (or a manager) approves it in Christian HQ. Once it's approved, log in here with your email and password.",es:"Christian (o un gerente) la aprueba en Christian HQ. Cuando esté aprobada, inicia sesión aquí con tu correo y contraseña."})+"</p></div>";
+ if(AM==="in") h+="<form id='aIn' autocomplete='on'><label>"+L({en:"Email",es:"Correo"})+"<input name='email' type='email' autocomplete='username' required></label>"+
+   "<label>"+L({en:"Password",es:"Contraseña"})+"<input name='pw' type='password' autocomplete='current-password' minlength='10' required></label>"+
+   "<button class='btn' type='submit' style='width:100%'>"+L({en:"Log in",es:"Iniciar sesión"})+"</button></form>";
+ else h+="<form id='aNew' autocomplete='on'><label>"+L({en:"Your name",es:"Tu nombre"})+"<input name='name' maxlength='40' autocomplete='name' required></label>"+
+   "<label>"+L({en:"Email (you log in with it)",es:"Correo (con él inicias sesión)"})+"<input name='email' type='email' autocomplete='username' required></label>"+
+   "<label>"+L({en:"Where you work",es:"Dónde trabajas"})+"<select name='rest'><option value='melody'"+(REST==="m"?" selected":"")+">Melody</option><option value='nalu'"+(REST==="n"?" selected":"")+">Nalu Vida</option><option value='both'>"+L({en:"Both",es:"Ambos"})+"</option></select></label>"+
+   "<label>"+L({en:"Your position",es:"Tu puesto"})+"<select name='job' required><option value=''>"+L({en:"Pick your job…",es:"Elige tu puesto…"})+"</option>"+jobs+"</select></label>"+
+   "<label>"+L({en:"Password (10+ characters)",es:"Contraseña (10+ caracteres)"})+"<input name='pw' type='password' autocomplete='new-password' minlength='10' required></label>"+
+   "<label>"+L({en:"Type the password again",es:"Escribe la contraseña otra vez"})+"<input name='pw2' type='password' autocomplete='new-password' minlength='10' required></label>"+
+   "<button class='btn' type='submit' style='width:100%'>"+L({en:"Create my account",es:"Crear mi cuenta"})+"</button></form>";
+ return h+"<p class='aerr' id='aErr' role='alert'>"+esc(AMSG)+"</p><p class='note' style='margin:6px 0 0'>"+L({en:"Same login as Christian HQ. New accounts start once Christian approves them. Never share your password.",es:"El mismo acceso que Christian HQ. Las cuentas nuevas empiezan cuando Christian las aprueba. Nunca compartas tu contraseña."})+"</p></div>"; }
+document.addEventListener("submit",function(e){ var f=e.target; if(!f||(f.id!=="aIn"&&f.id!=="aNew")) return; e.preventDefault();
+ var v=function(n){ return (f.elements[n]&&f.elements[n].value||"").trim(); }, em=v("email").toLowerCase(), pw=f.elements.pw.value, err=document.getElementById("aErr"), b=f.querySelector("button[type=submit]");
+ function fail(m){ AMSG=m; err.textContent=m; b.disabled=false; }
+ if(!LIVE.api) return fail(L({en:"Not connected yet.",es:"Aún no conectado."}));
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(em)) return fail(L({en:"Type a real email address.",es:"Escribe un correo real."}));
+ if(pw.length<10) return fail(L({en:"Password: at least 10 characters.",es:"Contraseña: al menos 10 caracteres."}));
+ b.disabled=true; err.textContent="…";
+ if(f.id==="aIn") return api({type:"bo_login",user:em,pw:pw}).then(function(r){
+   if(!r||!r.ok) return fail((r&&r.reason)||L({en:"Didn't work. Try again.",es:"No funcionó. Intenta de nuevo."}));
+   if(r.token) api({type:"bo_logout",token:r.token});   // this page doesn't keep a login token; Christian HQ asks for its own login
+   var job=DUTY[r.job]?r.job:(r.role==="owner"?"manager":"other");
+   set(ACCT_K,JSON.stringify({name:r.name,email:em,job:job})); set(LS.name,String(r.name||"").slice(0,24)); set("ssai_staff_job",job);
+   if(r.slugs&&r.slugs.length===1){ REST=r.slugs[0]==="nalu-vida"?"n":"m"; set(LS.rest,REST); }
+   AMSG=""; render(); });
+ var name=v("name"), job=v("job");
+ if(name.length<2) return fail(L({en:"Type your name.",es:"Escribe tu nombre."}));
+ if(!job) return fail(L({en:"Pick your position.",es:"Elige tu puesto."}));
+ if(pw!==f.elements.pw2.value) return fail(L({en:"The two passwords don't match.",es:"Las dos contraseñas no coinciden."}));
+ var o={type:"team_signup",name:name,email:em,restaurant:v("rest"),job:job,pw:pw};
+ api(o).then(function(r){   // a job the server doesn't know yet (new positions before the backend update) falls back to "Other"; Christian can change it on approval
+   if(r&&!r.ok&&/part of the job/.test(r.reason||"")&&job!=="other"){ o.job="other"; return api(o); } return r; }).then(function(r){
+   if(!r||!r.ok) return fail((r&&r.reason)||L({en:"Didn't send. Try again.",es:"No se envió. Intenta de nuevo."}));
+   set(LS.name,name.slice(0,24)); set("ssai_staff_job",job); AM="done"; AMSG=""; render(); }); });
+document.addEventListener("click",function(e){ var b=e.target.closest&&e.target.closest("[data-acct]"); if(!b) return; var k=b.getAttribute("data-acct");
+ if(k==="out"){ try{ localStorage.removeItem(ACCT_K); }catch(x){} AM="in"; }
+ else AM=k; AMSG=""; render(); var c=document.getElementById("acct"); if(c) c.scrollIntoView({block:"nearest"}); });
 // ---------------- page ----------------
-function render(){ var y=window.scrollY; document.documentElement.lang=LANG; document.body.className=REST;
+function render(){ var y=window.scrollY, fid=document.activeElement&&document.activeElement.getAttribute&&document.activeElement.getAttribute("data-sf")?document.activeElement.id:""; document.documentElement.lang=LANG; document.body.className=REST;
  document.title=LANG==="es"?"Guía del personal · Melody × Nalu Vida":"Staff Rewards · Melody × Nalu Vida";
  $app.innerHTML="<div class='split'><div class='m'><img src='../../demo/melody-lax/img/logo.png' alt='Melody Bar &amp; Grill'></div><div class='n'><img src='../../demo/nalu-vida/img/logo.png' alt='Nalu Vida'></div></div>"+
   "<div class='bar'><div class='seg r' role='group' aria-label='Restaurant'><button class='m' data-rest='m' aria-pressed='"+(REST==="m")+"'>✈️ Melody</button><button class='n' data-rest='n' aria-pressed='"+(REST==="n")+"'>🏄 Nalu Vida</button></div>"+
   "<div class='seg' role='group' aria-label='Language / Idioma'><button data-lang='en' aria-pressed='"+(LANG==="en")+"'>EN</button><button data-lang='es' aria-pressed='"+(LANG==="es")+"'>ES</button></div></div>"+
   "<h1>"+L(W.title)+"</h1><p class='s'>"+L(W.intro)+"</p>"+
-  "<div class='card'><label for='nm' style='font-weight:800'>"+L(W.yourName)+"</label><div class='name' style='margin-top:6px'><input id='nm' maxlength='24' autocomplete='given-name' value='"+esc(nm())+"'><button class='btn' id='nmSave'>"+L(W.save)+"</button></div><p class='note' style='margin:6px 0 0'>"+L(W.nameHint)+"</p></div>"+
-  "<nav class='nav' aria-label='Sections'>"+W.nav.map(function(x){ return "<a href='#"+x[0]+"'>"+L(x[1])+"</a>"; }).join("")+"</nav>"+
-  listenify(guests()+deals()+tutorials()+say()+faq())+games()+quiz()+"<p class='note' style='margin-top:24px'>"+L(W.install)+"</p>";
- window.scrollTo(0,y); tickDemo(); showLk(); if(window.StaffVoice) StaffVoice.decorate(LANG); }
+  account()+(acct()?"":"<div class='card'><label for='nm' style='font-weight:800'>"+L(W.yourName)+"</label><div class='name' style='margin-top:6px'><input id='nm' maxlength='24' autocomplete='given-name' value='"+esc(nm())+"'><button class='btn' id='nmSave'>"+L(W.save)+"</button></div><p class='note' style='margin:6px 0 0'>"+L(W.nameHint)+"</p></div>")+
+  "<nav class='nav' aria-label='Sections'>"+[["dealtexts",{en:"Deal texts",es:"Ofertas por texto"}]].concat(W.nav).map(function(x){ return "<a href='#"+x[0]+"'>"+L(x[1])+"</a>"; }).join("")+"</nav>"+
+  shiftCard()+listenify(openApp()+duties()+guests()+deals()+tutorials()+say()+faq())+games()+quiz()+"<p class='note' style='margin-top:24px'>"+L(W.install)+"</p>";
+ window.scrollTo(0,y); if(fid){ var fe=document.getElementById(fid); if(fe) try{ fe.focus({preventScroll:true}); }catch(e){} } tickDemo(); showLk(); if(window.StaffVoice) StaffVoice.decorate(LANG); }
 var $app=document.getElementById("app"), dpEnd=0;
 function tickDemo(){ var c=document.getElementById("dpClock"), d=document.getElementById("dpCd"), p=document.getElementById("demoPass"); if(!c) return;
  var now=new Date(); c.textContent=now.toLocaleDateString(LANG==="es"?"es-US":"en-US",{weekday:"short",month:"short",day:"numeric"})+" · "+now.toLocaleTimeString(LANG==="es"?"es-US":"en-US",{hour:"numeric",minute:"2-digit",second:"2-digit"});
@@ -309,7 +474,9 @@ function tickDemo(){ var c=document.getElementById("dpClock"), d=document.getEle
 setInterval(tickDemo,250);
 document.addEventListener("click",function(e){ var t=e.target;
  var r=t.closest("[data-rest]"); if(r){ if(window.SSAI_LISTEN) SSAI_LISTEN.stop(); REST=r.dataset.rest; set(LS.rest,REST); if(QZ) newQuiz(); render(); return; }
- var l=t.closest("[data-lang]"); if(l){ LANG=l.dataset.lang; set(LS.lang,LANG); if(window.SSAI_LISTEN) SSAI_LISTEN.stop(); render(); return; }
+ var l=t.closest("[data-lang]"); if(l){ LANG=l.dataset.lang; set(LS.lang,LANG); SF.err=""; if(window.SSAI_LISTEN) SSAI_LISTEN.stop(); render(); return; }
+ if(t.id==="sfGo"){ sfSend(); return; }
+ if(t.id==="sfAgain"){ SF.sent=false; render(); return; }
  if(t.id==="nmSave"){ var v=document.getElementById("nm").value.replace(/[<>]/g,"").trim().slice(0,24); set(LS.name,v); render(); return; }
  if(t.id==="ccGo"){ codeCheck(); return; }
  if(t.id==="lkGo"){ lookup(); return; }

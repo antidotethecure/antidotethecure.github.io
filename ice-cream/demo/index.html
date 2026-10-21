@@ -49,7 +49,7 @@ body{padding-bottom:30px}
 .eta .dist span{color:var(--dim);font-weight:600}
 
 /* live map */
-.map{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--edge);background:#0b1733;margin-top:12px;height:clamp(300px,58vh,380px)}
+.map{position:relative;isolation:isolate;border-radius:18px;overflow:hidden;border:1px solid var(--edge);background:#0b1733;margin-top:12px;height:clamp(300px,58vh,380px)}
 #lmap{position:absolute;inset:0;background:#2a2a2b}
 .map .leaflet-container{font-family:"Rajdhani",system-ui,sans-serif;background:#2a2a2b}
 .map .osmdark{filter:invert(1) hue-rotate(195deg) brightness(.92) contrast(.88) saturate(.7)}
@@ -109,14 +109,82 @@ body{padding-bottom:30px}
 .pick p{margin:0 0 10px;font-weight:800;font-size:17px}
 .pick .row .btn{min-height:56px;font-size:13px}
 
-/* menu */
-.menu{display:grid;gap:8px}
-.mi{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--edge)}
-.mi .e{font-size:30px;flex:none;width:40px;text-align:center}
-.mi div{flex:1;line-height:1.25}
-.mi b{font-size:17px}
-.mi small{display:block;color:var(--dim);font-size:14px}
-.mi .p{font-family:"Orbitron",sans-serif;font-size:15px;color:var(--gold);white-space:nowrap}
+/* menu: specials carousel + category chips + item cards + cart (../menu.js has the items and the deal math) */
+.nudge{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;min-height:52px;border-radius:14px;border:1.5px solid rgba(255,143,196,.7);background:linear-gradient(90deg,rgba(255,143,196,.16),rgba(255,209,102,.16));color:var(--ink);font:800 16px "Rajdhani",sans-serif;cursor:pointer;padding:8px 12px;line-height:1.2}
+.nudge[data-s=here],.nudge[data-s=almost]{border-color:var(--gold);background:linear-gradient(90deg,#ffd166,#ff8fc4);color:#2a1000;animation:nb 1.2s ease-in-out infinite}
+@keyframes nb{50%{transform:scale(1.02)}}
+#menu h2{display:flex;align-items:center;gap:4px}
+.deals{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 8px;margin:0 -2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.deals::-webkit-scrollbar{display:none}
+.deal{flex:0 0 86%;max-width:340px;scroll-snap-align:start;border-radius:18px;padding:14px;position:relative;overflow:hidden;color:#170a1e;background:linear-gradient(135deg,var(--c),#fff 180%);box-shadow:0 10px 26px rgba(0,0,0,.35)}
+.deal::after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.28)}
+.deal .de{font-size:34px;line-height:1}
+.deal h3{font-family:"Orbitron",sans-serif;font-size:16.5px;font-weight:900;margin:6px 0 2px;line-height:1.2;position:relative;z-index:1}
+.deal p{margin:0;font-weight:700;font-size:15px;line-height:1.25;color:#2c1838;position:relative;z-index:1}
+.deal .when{position:absolute;right:10px;top:10px;z-index:2;font:800 11px "Rajdhani",sans-serif;letter-spacing:.08em;text-transform:uppercase;background:#170a1e;color:#fff;border-radius:99px;padding:2px 8px}
+.deal .when.on{background:#0f7a4f}
+.deal button{margin-top:10px;min-height:44px;border-radius:12px;border:0;background:#170a1e;color:#fff;font:800 15px "Rajdhani",sans-serif;padding:0 14px;cursor:pointer;position:relative;z-index:1}
+.dots{display:flex;justify-content:center;gap:6px;margin:2px 0 4px}
+.dots i{width:7px;height:7px;border-radius:50%;background:#2f4a86;transition:background .2s,width .2s}
+.dots i.on{background:var(--gold);width:18px;border-radius:99px}
+.demo-sw{border:1px dashed var(--edge);border-radius:12px;padding:6px 12px;margin:8px 0 0;font-size:15px;color:var(--silver)}
+.cats{position:sticky;top:calc(56px + env(safe-area-inset-top));z-index:20;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 0;margin-top:6px;background:linear-gradient(180deg,var(--bg) 82%,rgba(3,6,14,0))}
+.cats::-webkit-scrollbar{display:none}
+.cats button{flex:1 1 0;min-width:0;min-height:58px;border-radius:14px;border:1px solid var(--edge);background:#0a1631;color:var(--ink);font:800 14px "Rajdhani",sans-serif;padding:4px 2px;cursor:pointer;white-space:nowrap;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;gap:2px}
+.cats button i{font-style:normal;font-size:20px}
+.cats button[aria-selected=true]{background:var(--gold);color:#2a1a00;border-color:var(--gold)}
+.items{display:grid;gap:8px}
+@media(min-width:620px){.items{grid-template-columns:1fr 1fr}}
+.it{display:flex;gap:10px;align-items:center;padding:10px;border-radius:16px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);min-width:0}
+.it.in{border-color:rgba(255,209,102,.7);box-shadow:inset 0 0 0 1px rgba(255,209,102,.35)}
+.it .ie{flex:none;width:54px;height:54px;border-radius:14px;display:grid;place-items:center;font-size:30px;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.35),var(--c) 70%)}
+.it .ib{flex:1;min-width:0;line-height:1.2}
+.it .ib b{display:block;font-size:16.5px}
+.it .ib small{display:block;color:var(--dim);font-size:14px;margin-top:1px}
+.bdg{display:inline-block;margin:4px 4px 0 0;font:800 11px "Rajdhani",sans-serif;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:1px 7px;color:#1d0f24;background:var(--c)}
+.it .ia{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.it .p{font-family:"Orbitron",sans-serif;font-size:14.5px;color:var(--gold);white-space:nowrap}
+.add{min-width:64px;min-height:44px;border-radius:12px;border:0;background:linear-gradient(180deg,#4a90ff,#1f5fe0);color:#fff;font:800 15px "Rajdhani",sans-serif;cursor:pointer}
+.qty{display:flex;align-items:center;border:1px solid var(--gold);border-radius:12px;overflow:hidden}
+.qty button{width:38px;min-height:42px;border:0;background:rgba(255,209,102,.14);color:var(--gold);font:900 20px "Rajdhani",sans-serif;cursor:pointer}
+.qty output{min-width:24px;text-align:center;font:800 16px "Orbitron",sans-serif}
+#cartBar{position:fixed;left:0;right:0;bottom:0;z-index:70;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:rgba(3,6,14,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--edge)}
+#cartBar .in{max-width:760px;margin:0 auto}
+#cartBar .hint{font-weight:700;font-size:13.5px;color:var(--gold);text-align:center;margin:0 0 6px;line-height:1.2}
+#cartOpen{width:100%;display:flex;align-items:center;gap:10px;min-height:54px;border-radius:14px;border:0;background:linear-gradient(180deg,#ffe08f,#ffbf3f);color:#2a1a00;font:800 16px "Rajdhani",sans-serif;padding:0 14px;cursor:pointer;text-align:left}
+#cartOpen .n{display:grid;place-items:center;min-width:28px;height:28px;border-radius:99px;background:#2a1a00;color:#ffd166;font:900 13px "Orbitron",sans-serif}
+#cartOpen .sv{flex:1;font-size:14.5px;color:#0f6a44}
+#cartOpen .tt{font:900 16px "Orbitron",sans-serif}
+#cartBar.pop{animation:pop .45s}
+@keyframes pop{40%{transform:translateY(-6px)}}
+body.has-cart{padding-bottom:120px}
+body.has-cart #toast{bottom:calc(110px + env(safe-area-inset-bottom))}
+.sheet{position:fixed;inset:0;z-index:110;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+.sheet .pn{width:100%;max-width:560px;max-height:88vh;overflow-y:auto;background:var(--navy);border:1px solid var(--edge);border-radius:22px 22px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.sheet .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.sheet .x{min-width:44px;min-height:44px;border-radius:12px;border:1px solid var(--edge);background:none;color:var(--ink);font-size:20px;cursor:pointer}
+.ln{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--edge)}
+.ln .e{font-size:24px;flex:none}
+.ln div{flex:1;min-width:0;line-height:1.2;font-weight:700}
+.ln div small{display:block;color:var(--dim);font-weight:600}
+.ln .p{font-family:"Orbitron",sans-serif;font-size:14px;white-space:nowrap}
+.dl{display:flex;justify-content:space-between;gap:10px;padding:6px 10px;border-radius:10px;background:rgba(52,211,153,.1);color:#c9f5e4;font-weight:800;margin-top:6px}
+.dl span:last-child{font-family:"Orbitron",sans-serif;font-size:14px;color:var(--good);white-space:nowrap}
+.tot{display:grid;grid-template-columns:1fr auto;gap:2px 10px;margin-top:12px;font-weight:700;font-size:16px}
+.tot .big{font:900 22px "Orbitron",sans-serif;color:var(--gold)}
+.saved{margin-top:10px;text-align:center;font:900 clamp(18px,5.4vw,22px) "Orbitron",sans-serif;color:var(--good)}
+#ticket{position:fixed;inset:0;z-index:120;background:#ffd166;color:#170a1e;overflow-y:auto;padding:calc(16px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom))}
+#ticket .tk{max-width:460px;margin:0 auto;background:#fff;border-radius:22px;padding:18px;box-shadow:0 18px 40px rgba(80,40,0,.25)}
+#ticket h2{font-size:20px;text-align:center}
+#ticket .tc{font:900 clamp(26px,8vw,34px) "Orbitron",sans-serif;letter-spacing:.1em;text-align:center;border:3px dashed #170a1e;border-radius:14px;padding:10px;margin:12px 0}
+#ticket .ln{border-color:#e6e0ef}
+#ticket .ln div small{color:#5c4f6b}
+#ticket .dl{background:#e3f8ee;color:#0b5a3a}
+#ticket .dl span:last-child{color:#0b7a4f}
+#ticket .tot .big{color:#170a1e}
+#ticket .saved{color:#0b7a4f}
+#ticket p{text-align:center;font-weight:700;margin:10px 0 0;color:#3a2c48}
+#ticket .btn{width:100%;margin-top:14px}
 
 /* switch */
 .sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--edge);font-weight:700}
@@ -155,6 +223,7 @@ body{padding-bottom:30px}
       <div class="big" id="etaBig">Arriving in <b>~10 min</b></div>
       <div class="dist" id="etaDist">1.2 mi away</div>
     </div>
+    <button type="button" class="nudge" id="nudge" data-s="way">🍦 See the menu + today's deals</button>
     <div class="sub" id="substatus" data-t="subStatus">We'll ring your phone when it's close.</div>
     <button class="btn gold" id="test" type="button" data-t="testBtn">🔔 Test the alert</button>
     <div style="margin-top:10px"><button class="spk-btn" type="button" id="explain" aria-pressed="false" data-t="explain">🔊 What is this demo?</button></div>
@@ -236,8 +305,14 @@ body{padding-bottom:30px}
   </section>
 
   <section class="s" id="menu">
-    <header><p class="kick" data-t="menuKick">Menu</p><h2 class="chrome" data-t="menuH">What's on the truck</h2><p class="lead" data-t="menuLead">Sample prices. The real truck sets its own.</p></header>
-    <div class="menu" id="menuList"></div>
+    <header><p class="kick" data-t="menuKick">Menu</p><h2><span class="chrome" data-t="menuH">What's on the truck</span><button type="button" class="spk-mini" id="menuSay" data-t-aria="menuSayA" aria-label="Read today's deals out loud">🔊</button></h2><p class="lead" data-t="menuLead">Ice cream, paletas, drinks, candy and toys. Tap + to build your order: deals apply by themselves.</p></header>
+    <p class="kick" data-t="dealsKick" style="margin-top:4px">🔥 Today's deals</p>
+    <div class="deals" id="deals"></div>
+    <div class="dots" id="dealDots" aria-hidden="true"></div>
+    <label class="sw demo-sw"><span data-t="fakeTime">Demo: pretend it's Friday at 3:30 PM (turns on Happy Hour + Toy Friday)</span><input type="checkbox" id="fakeTime" checked></label>
+    <div class="cats" id="cats" role="tablist" data-t-aria="catsA" aria-label="Menu categories"></div>
+    <div class="items" id="items" role="tabpanel"></div>
+    <p class="note" data-t="menuNote">Sample truck prices. Every truck sets its own menu, prices and deals.</p>
   </section>
 
   <section class="s" id="settings">
@@ -268,6 +343,35 @@ body{padding-bottom:30px}
     <div class="acts"><button class="go" id="coming" type="button" data-t="coming">🏃 I'm coming!</button><button class="no" id="silence" type="button" data-t="silence">Silence</button></div>
   </div>
 </div>
+<div id="cartBar" hidden><div class="in">
+  <p class="hint" id="cartHint" hidden></p>
+  <button type="button" id="cartOpen"><span class="n" id="cbN">0</span><span class="sv" id="cbSave"></span><span class="tt" id="cbT">$0.00</span></button>
+</div></div>
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetH">
+  <div class="pn">
+    <div class="hd"><h2 id="sheetH" data-t="cartH">Your order</h2><button type="button" class="x" id="sheetX" data-t-aria="close" aria-label="Close">✕</button></div>
+    <div id="cartLines"></div>
+    <div id="cartDeals"></div>
+    <p class="hint note" id="sheetHint" hidden style="color:var(--gold);font-weight:700"></p>
+    <div class="tot" id="cartTot"></div>
+    <div class="saved" id="cartSaved"></div>
+    <button type="button" class="btn gold" id="showDriver" style="width:100%;margin-top:12px" data-t="showDriver">🧾 Show this to the driver</button>
+    <button type="button" class="btn ghost" id="cartClear" style="width:100%;margin-top:8px" data-t="cartClear">Clear order</button>
+    <p class="note" data-t="cartNote">Demo: no payment and nothing is sent. You pay at the window, cash or card.</p>
+  </div>
+</div>
+<div id="ticket" hidden role="dialog" aria-modal="true" aria-labelledby="tkH">
+  <div class="tk">
+    <h2 id="tkH" data-t="tkH">Show this to the driver 👋</h2>
+    <div class="tc" id="tkCode">SOL-0000</div>
+    <div id="tkLines"></div>
+    <div id="tkDeals"></div>
+    <div class="tot" id="tkTot"></div>
+    <div class="saved" id="tkSaved"></div>
+    <p data-t="tkPay">Pay at the window: cash, card, Apple Pay or Google Pay. +10 points when the driver scans your code.</p>
+    <button type="button" class="btn primary" id="tkDone" data-t="tkDone">Done</button>
+  </div>
+</div>
 <div id="toast" role="status"></div>
 
 <script>
@@ -292,7 +396,7 @@ en: {
   mapCredits: "Map © OpenStreetMap contributors (ODbL). Street routing: OSRM. Address search: Nominatim.",
   subStatus: "We'll ring your phone when it's close.",
   explain: "🔊 What is this demo?", explainStop: "⏹ Stop",
-  explainSay: "This is a demo of what your customers see on their phone. Paletas El Sol is a made-up truck. At the top is a live map with a GPS pin on their house and the ice cream truck driving toward it on real streets, with the arrival time, like arriving in six minutes, counting down so they know exactly when to walk out. Tap Test the alert to hear the jingle that rings their phone when the truck is close. Scroll down to see how they join in ten seconds and check in at your truck. Every fifth visit, they pick ten percent off or an extra scoop free. If they keep their truck alerts on, they get five bonus points every visit, so they keep the alerts on and you keep ringing their phone. They also collect points, check your menu, and control their alerts. Your truck gets its own name, colors and menu.",
+  explainSay: "This is a demo of what your customers see on their phone. Paletas El Sol is a made-up truck. At the top is a live map with a GPS pin on their house and the ice cream truck driving toward it on real streets, with the arrival time, like arriving in six minutes, counting down so they know exactly when to walk out. Tap Test the alert to hear the jingle that rings their phone when the truck is close. Scroll down to see how they join in ten seconds and check in at your truck. Every fifth visit, they pick ten percent off or an extra scoop free. If they keep their truck alerts on, they get five bonus points every visit, so they keep the alerts on and you keep ringing their phone. They also collect points, and browse your full menu with ice cream, paletas, drinks, candy and toys, with your specials, like buy two and the third is half off, adding up by themselves in their order. They control their alerts too. Your truck gets its own name, colors and menu.",
   testBtn: "🔔 Test the alert", replay: "↺ Replay the route", faster: "⏩ Bring it closer",
   joinKick: "Step 1", joinH: "Join in 10 seconds", nameL: "Your first name", namePh: "Maria",
   joinBtn: "Join + get 10 free points", joinNote: "Demo only: nothing is sent anywhere. It stays on this phone.",
@@ -317,15 +421,22 @@ en: {
   ptsNext: "{n} more points to {r}", ptsAll: "You can get every reward. Nice!",
   buyBtn: "🧾 Pretend I bought something (+10)", buyNote: "For real, the driver scans your code at the window.",
   redeem: "Use", need: "{n} pts", codeL: "Show this to the driver:",
-  r1: "50¢ off", r2: "$1 off", r3: "Free chili cheese Fritos", r4: "Free paleta",
+  r1: "50¢ off", r2: "$1 off", r3: "Free chili cheese chips", r4: "Free paleta",
   toastBuy: "+10 points! 🍦", toastJoin: "Join first (Step 1) to collect points.", toastRedeem: "Reward ready. Show the code to the driver.",
-  menuKick: "Menu", menuH: "What's on the truck", menuLead: "Sample prices. The real truck sets its own.",
-  m1: "Paletas", m1s: "Strawberry, mango con chile, lime, coconut",
-  m2: "Ice cream bars", m2s: "Cookies & cream, strawberry shortcake, chocolate",
-  m3: "Raspados", m3s: "Shaved ice: tamarind, mango, strawberry",
-  m4: "Chili cheese Fritos", m4s: "Fritos, warm chili and nacho cheese",
-  m5: "Elote en vaso", m5s: "Corn in a cup with mayo, cheese, chile and lime",
-  m6: "Elote on the cob", m6s: "Same toppings, on a stick",
+  menuKick: "Menu", menuH: "What's on the truck", menuLead: "Ice cream, paletas, drinks, candy and toys. Tap + to build your order: deals apply by themselves.",
+  menuSayA: "Read today's deals out loud", dealsKick: "🔥 Today's deals", catsA: "Menu categories",
+  fakeTime: "Demo: pretend it's Friday at 3:30 PM (turns on Happy Hour + Toy Friday)",
+  menuNote: "Sample truck prices. Every truck sets its own menu, prices and deals.",
+  nudgeWay: "🍦 See the menu + today's deals", nudgeAlmost: "⏰ Almost here! Pick your treats now →", nudgeHere: "🎶 Truck's on your street! Tap to see the menu",
+  add: "+ Add", tryIt: "Try it →", seeCard: "See my visit card →", onNow: "On now", friOnly: "Fridays", hhOnly: "3–4 PM",
+  bdg_b2: "3rd ½ off", bdg_kid: "Kid combo", bdg_fam: "Family pack", bdg_hh: "−$1 at 3 PM", bdg_toy: "3rd free Fri",
+  cartItems: "{n} items", cartSaveBar: "You saved {s}!", cartH: "Your order", close: "Close", each: "{p} each",
+  sub: "Subtotal", deals: "Deals", total: "Total", saved: "🎉 You saved {s}!", dealX: "{d} ×{n}",
+  hint: "💡 Add 1 more from {c} and save {s} more", showDriver: "🧾 Show this to the driver", cartClear: "Clear order",
+  cartNote: "Demo: no payment and nothing is sent. You pay at the window, cash or card.",
+  tkH: "Show this to the driver 👋", tkPay: "Pay at the window: cash, card, Apple Pay or Google Pay. +10 points when the driver scans your code.", tkDone: "Done",
+  toastAdd: "Added: {i}", toastTry: "{d}: deal applied ✅", toastCleared: "Order cleared.", toastTimeOn: "Happy Hour + Toy Friday are on (demo).", toastTimeOff: "Back to the real clock.",
+  menuSay: "Today's deals at Paletas El Sol. ",
   setKick: "Settings", setH: "Your alerts, your rules", distL: "Ring me when the truck is within",
   swAlerts: "Alerts on", swSound: "Play the jingle", swQuiet: "Quiet after 8 PM",
   resetBtn: "Leave + delete my info", resetDone: "Done. Your info was deleted from this phone.",
@@ -356,7 +467,7 @@ es: {
   mapCredits: "Mapa © colaboradores de OpenStreetMap (ODbL). Calles: OSRM. Búsqueda de direcciones: Nominatim.",
   subStatus: "Te sonamos el celular cuando esté cerca.",
   explain: "🔊 ¿Qué es este demo?", explainStop: "⏹ Parar",
-  explainSay: "Este es un demo de lo que tus clientes ven en su celular. Paletas El Sol es un troque inventado. Arriba hay un mapa en vivo con un pin GPS en su casa y el troque de helados manejando hacia ella por calles reales, con la hora de llegada, como llega en seis minutos, contando para atrás para que sepan exactamente cuándo salir. Toca Probar la alerta para oír la musiquita que les suena en el celular cuando el troque está cerca. Baja para ver cómo se unen en diez segundos y registran su visita en tu troque. Cada quinta visita escogen diez por ciento de descuento o una bola extra gratis. Si dejan las alertas prendidas, ganan cinco puntos extra en cada visita, así que las dejan prendidas y tú les sigues sonando el celular. También juntan puntos, ven tu menú, y controlan sus alertas. Tu troque lleva su propio nombre, colores y menú.",
+  explainSay: "Este es un demo de lo que tus clientes ven en su celular. Paletas El Sol es un troque inventado. Arriba hay un mapa en vivo con un pin GPS en su casa y el troque de helados manejando hacia ella por calles reales, con la hora de llegada, como llega en seis minutos, contando para atrás para que sepan exactamente cuándo salir. Toca Probar la alerta para oír la musiquita que les suena en el celular cuando el troque está cerca. Baja para ver cómo se unen en diez segundos y registran su visita en tu troque. Cada quinta visita escogen diez por ciento de descuento o una bola extra gratis. Si dejan las alertas prendidas, ganan cinco puntos extra en cada visita, así que las dejan prendidas y tú les sigues sonando el celular. También juntan puntos y ven tu menú completo con helados, paletas, bebidas, dulces y juguetes, con tus ofertas, como compra dos y el tercero a mitad de precio, que se suman solitas en su pedido. Y controlan sus alertas. Tu troque lleva su propio nombre, colores y menú.",
   testBtn: "🔔 Probar la alerta", replay: "↺ Repetir la ruta", faster: "⏩ Acercar el troque",
   joinKick: "Paso 1", joinH: "Únete en 10 segundos", nameL: "Tu nombre", namePh: "María",
   joinBtn: "Unirme + 10 puntos gratis", joinNote: "Solo es demo: no se manda nada a ningún lado. Se queda en este celular.",
@@ -381,15 +492,22 @@ es: {
   ptsNext: "Te faltan {n} puntos para {r}", ptsAll: "Ya te alcanza para todos los premios. ¡Bien!",
   buyBtn: "🧾 Hacer como que compré algo (+10)", buyNote: "En la vida real, el chofer escanea tu código en la ventanilla.",
   redeem: "Usar", need: "{n} pts", codeL: "Enséñale esto al chofer:",
-  r1: "50¢ de descuento", r2: "$1 de descuento", r3: "Fritos con chili y queso gratis", r4: "Paleta gratis",
+  r1: "50¢ de descuento", r2: "$1 de descuento", r3: "Chips con chili y queso gratis", r4: "Paleta gratis",
   toastBuy: "¡+10 puntos! 🍦", toastJoin: "Primero únete (Paso 1) para juntar puntos.", toastRedeem: "Premio listo. Enséñale el código al chofer.",
-  menuKick: "Menú", menuH: "Lo que trae el troque", menuLead: "Precios de muestra. Cada troque pone los suyos.",
-  m1: "Paletas", m1s: "Fresa, mango con chile, limón, coco",
-  m2: "Paletas de helado", m2s: "Galleta con crema, fresa, chocolate",
-  m3: "Raspados", m3s: "Tamarindo, mango, fresa",
-  m4: "Fritos con chili y queso", m4s: "Fritos con chili calientito y queso nacho",
-  m5: "Elote en vaso", m5s: "Con mayonesa, queso, chile y limón",
-  m6: "Elote entero", m6s: "Los mismos toppings, en palito",
+  menuKick: "Menú", menuH: "Lo que trae el troque", menuLead: "Helados, paletas, bebidas, dulces y juguetes. Toca + para armar tu pedido: las ofertas se aplican solas.",
+  menuSayA: "Leer las ofertas de hoy en voz alta", dealsKick: "🔥 Ofertas de hoy", catsA: "Categorías del menú",
+  fakeTime: "Demo: haz como que es viernes a las 3:30 PM (prende Hora Feliz + Viernes de Juguetes)",
+  menuNote: "Precios de muestra del troque. Cada troque pone su propio menú, precios y ofertas.",
+  nudgeWay: "🍦 Ver el menú + ofertas de hoy", nudgeAlmost: "⏰ ¡Ya casi llega! Escoge tus antojos →", nudgeHere: "🎶 ¡El troque está en tu calle! Toca para ver el menú",
+  add: "+ Agregar", tryIt: "Pruébalo →", seeCard: "Ver mi tarjeta →", onNow: "Ahorita", friOnly: "Viernes", hhOnly: "3–4 PM",
+  bdg_b2: "3º a ½", bdg_kid: "Combo niño", bdg_fam: "Paquete familiar", bdg_hh: "−$1 a las 3", bdg_toy: "3º gratis vie",
+  cartItems: "{n} cosas", cartSaveBar: "¡Ahorraste {s}!", cartH: "Tu pedido", close: "Cerrar", each: "{p} c/u",
+  sub: "Subtotal", deals: "Ofertas", total: "Total", saved: "🎉 ¡Ahorraste {s}!", dealX: "{d} ×{n}",
+  hint: "💡 Agrega 1 más de {c} y ahorras {s} más", showDriver: "🧾 Enséñale esto al chofer", cartClear: "Borrar pedido",
+  cartNote: "Demo: no se cobra ni se manda nada. Pagas en la ventanilla, efectivo o tarjeta.",
+  tkH: "Enséñale esto al chofer 👋", tkPay: "Paga en la ventanilla: efectivo, tarjeta, Apple Pay o Google Pay. +10 puntos cuando el chofer escanee tu código.", tkDone: "Listo",
+  toastAdd: "Agregado: {i}", toastTry: "{d}: oferta aplicada ✅", toastCleared: "Pedido borrado.", toastTimeOn: "Hora Feliz + Viernes de Juguetes prendidos (demo).", toastTimeOff: "De vuelta al reloj de verdad.",
+  menuSay: "Las ofertas de hoy en Paletas El Sol. ",
   setKick: "Ajustes", setH: "Tus alertas, tus reglas", distL: "Suéname cuando el troque esté a menos de",
   swAlerts: "Alertas prendidas", swSound: "Tocar la melodía", swQuiet: "Silencio después de las 8 PM",
   resetBtn: "Salirme + borrar mis datos", resetDone: "Listo. Se borraron tus datos de este celular.",
@@ -406,6 +524,7 @@ es: {
 <script src="../jingle.js?v=20261013b"></script>
 <script src="../speak.js?v=20261013b"></script>
 <script src="../truck.js?v=20261013b"></script>
+<script src="../menu.js?v=20261018a"></script>
 <script>
 (function () {
   "use strict";
@@ -436,7 +555,7 @@ es: {
   function hide() { Jingle.stop(); clearTimeout(ringT); var r = $("ringer"); r.classList.remove("show"); r.setAttribute("aria-hidden", "true"); if (navigator.vibrate) try { navigator.vibrate(0); } catch (e) {} }
   $("test").addEventListener("click", function () { unlocked = true; ring(0.2, 3, true); });
   $("silence").addEventListener("click", hide);
-  $("coming").addEventListener("click", function () { hide(); toast(t("toastComing")); });
+  $("coming").addEventListener("click", function () { hide(); toast(t("toastComing")); goMenu(); });
 
   /* ---------- live map: house pin + truck on real streets + arrival time ---------- */
   var MI = 1609.344;
@@ -688,6 +807,7 @@ es: {
     } else if (left > -GONE_M) { state = "here"; label = "stHere"; big = t("etaHere"); dist = t("etaDistHere"); chip = t("chipHere"); }
     else { state = "gone"; label = "stGone"; big = t("etaGone"); dist = fmt(t("etaDistGone"), { d: miles(left) }); chip = t("chipGone"); }
     $("eta").setAttribute("data-s", state);
+    var nd = $("nudge"); if (nd.getAttribute("data-s") !== state) { nd.setAttribute("data-s", state); nd.textContent = t(state === "here" ? "nudgeHere" : state === "almost" ? "nudgeAlmost" : "nudgeWay"); }
     setHTML("etaState", t(label)); setHTML("etaBig", big); setHTML("etaDist", dist); setHTML("mapChip", chip);
     // ring once per pass: at "almost here" (≤ 2 min) or inside the distance picked in Settings
     if (!rung && left > -GONE_M && (state === "almost" || state === "here" || left <= S.dist * MI)) {
@@ -832,18 +952,156 @@ es: {
   $("pick10").addEventListener("click", function () { pickTreat("t10"); });
   $("pickScoop").addEventListener("click", function () { pickTreat("tScoop"); });
 
-  /* ---------- menu ---------- */
-  var MENU = [["🍓", "m1", 2.5], ["🍫", "m2", 3], ["🍧", "m3", 4], ["🌶️", "m4", 5], ["🌽", "m5", 5], ["🌽", "m6", 4.5]];
-  function renderMenu() {
-    var box = $("menuList"); box.innerHTML = "";
-    MENU.forEach(function (m) {
-      var d = document.createElement("div"); d.className = "mi";
-      d.innerHTML = '<span class="e" aria-hidden="true">' + m[0] + '</span><div><b></b><small></small></div><span class="p"></span>';
-      d.querySelector("b").textContent = t(m[1]); d.querySelector("small").textContent = t(m[1] + "s");
-      d.querySelector(".p").textContent = "$" + m[2].toFixed(2);
+  /* ---------- menu: specials carousel, category chips, item cards, cart that applies the deals (../menu.js) ---------- */
+  var MK = "ssai:ice:menu", M = { cat: "ice", cart: {}, fake: true };
+  try { var ms = JSON.parse(localStorage.getItem(MK) || "null"); if (ms) for (var mk in ms) M[mk] = ms[mk]; } catch (e) {}
+  function msave() { try { localStorage.setItem(MK, JSON.stringify(M)); } catch (e) {} }
+  var CAT_C = { ice: "#ff8fc4", pal: "#ffb86b", drk: "#3fa9ff", cnd: "#ffd166", toy: "#b79bff" };
+  var BADGES = { ice: ["b2", "kid"], drk: ["fam", "kid"], cnd: ["kid"], toy: ["toy"] };
+  var DC = {}; IceMenu.DEALS.forEach(function (d) { DC[d.id] = d; });
+  var L2 = function (o) { return o[ICE.lang] || o.en; };
+  var usd = function (n) { return "$" + n.toLocaleString(ICE.lang === "es" ? "es-US" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  function timed() { var d = new Date(); return { friday: M.fake || d.getDay() === 5, happyHour: M.fake || d.getHours() === 15 }; }
+  function quote() { return IceMenu.price(M.cart, timed()); }
+  function goMenu() { var m = $("menu"); if (m) m.scrollIntoView({ behavior: "smooth", block: "start" }); }
+  $("nudge").addEventListener("click", function () { unlocked = true; goMenu(); });
+
+  function renderDeals() {
+    var box = $("deals"), tm = timed(), dots = $("dealDots"); box.innerHTML = ""; dots.innerHTML = "";
+    IceMenu.DEALS.forEach(function (d) {
+      var c = document.createElement("div"); c.className = "deal"; c.style.setProperty("--c", d.c);
+      var on = !d.when || (d.when === "fri" ? tm.friday : tm.happyHour), w = L2(d);
+      c.innerHTML = '<span class="when' + (on && d.when ? " on" : "") + '"' + (d.when ? "" : " hidden") + '></span><div class="de" aria-hidden="true">' + d.e + '</div><h3></h3><p></p><button type="button"></button>';
+      c.querySelector(".when").textContent = on ? t("onNow") : t(d.when === "fri" ? "friOnly" : "hhOnly");
+      c.querySelector("h3").textContent = w[0]; c.querySelector("p").textContent = w[1];
+      var b = c.querySelector("button"); b.textContent = t(d.try ? "tryIt" : "seeCard");
+      b.addEventListener("click", function () {
+        if (!d.try) { $("points").scrollIntoView({ behavior: "smooth" }); return; }
+        if (d.when && !on) { M.fake = true; $("fakeTime").checked = true; renderDeals(); }
+        d.try.forEach(function (id) { M.cart[id] = (M.cart[id] || 0) + 1; });
+        msave(); renderItems(); renderCart(true); openSheet(); toast(fmt(t("toastTry"), { d: w[0] }));
+      });
+      box.appendChild(c); dots.appendChild(document.createElement("i"));
+    });
+    dotSync();
+  }
+  function dotSync() {
+    var box = $("deals"), cards = box.children, i = 0, best = 1e9;
+    for (var k = 0; k < cards.length; k++) { var dx = Math.abs(cards[k].offsetLeft - box.offsetLeft - box.scrollLeft); if (dx < best) { best = dx; i = k; } }
+    [].forEach.call($("dealDots").children, function (d, k) { d.className = k === i ? "on" : ""; });
+    return i;
+  }
+  $("deals").addEventListener("scroll", function () { dotSync(); }, { passive: true });
+  (function autoSlide() { // gentle auto-advance until they touch it
+    var stop = false, box = $("deals");
+    ["pointerdown", "touchstart", "wheel"].forEach(function (ev) { box.addEventListener(ev, function () { stop = true; }, { passive: true }); });
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setInterval(function () {
+      if (stop || document.hidden) return;
+      var i = dotSync(), n = box.children[i + 1] || box.children[0];
+      if (n) box.scrollTo({ left: n.offsetLeft - box.offsetLeft, behavior: "smooth" });
+    }, 4500);
+  })();
+
+  function renderCats() {
+    var box = $("cats"); box.innerHTML = "";
+    IceMenu.CATS.forEach(function (c) {
+      var b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab");
+      b.setAttribute("aria-selected", c.id === M.cat ? "true" : "false"); b.innerHTML = '<i aria-hidden="true">' + c.e + "</i>" + esc(L2(c));
+      b.addEventListener("click", function () { M.cat = c.id; msave(); renderCats(); renderItems(); });
+      box.appendChild(b);
+    });
+  }
+  function setQty(id, q) { if (q > 0) M.cart[id] = Math.min(20, q); else delete M.cart[id]; msave(); renderItems(); renderCart(true); if (!$("sheet").hidden) renderSheet(); }
+  function renderItems() {
+    var box = $("items"); box.innerHTML = "";
+    IceMenu.ITEMS.filter(function (x) { return x.cat === M.cat; }).forEach(function (x) {
+      var q = M.cart[x.id] || 0, w = L2(x), d = document.createElement("div");
+      d.className = "it" + (q ? " in" : ""); d.style.setProperty("--c", CAT_C[x.cat]);
+      var bd = (x.hh ? ["hh"] : (BADGES[x.cat] || [])).map(function (k) { return '<span class="bdg" style="--c:' + DC[k].c + '">' + esc(t("bdg_" + k)) + "</span>"; }).join("");
+      d.innerHTML = '<span class="ie" aria-hidden="true">' + x.e + '</span><div class="ib"><b></b><small></small>' + bd + '</div><div class="ia"><span class="p">' + usd(x.p) + "</span>" +
+        (q ? '<div class="qty"><button type="button" data-d="-1" aria-label="−">−</button><output>' + q + '</output><button type="button" data-d="1" aria-label="+">+</button></div>'
+           : '<button type="button" class="add"></button>') + "</div>";
+      d.querySelector("b").textContent = w[0]; d.querySelector("small").textContent = w[1];
+      var a = d.querySelector(".add");
+      if (a) { a.textContent = t("add"); a.setAttribute("aria-label", t("add") + ": " + w[0]); a.addEventListener("click", function () { setQty(x.id, 1); toast(fmt(t("toastAdd"), { i: w[0] })); }); }
+      [].forEach.call(d.querySelectorAll(".qty button"), function (b) { b.addEventListener("click", function () { setQty(x.id, (M.cart[x.id] || 0) + +b.getAttribute("data-d")); }); });
       box.appendChild(d);
     });
   }
+  /* the upsell line: which ONE more item (cheapest in a category) would unlock the most extra savings */
+  function nextHint(r) {
+    var best = null, tm = timed();
+    IceMenu.CATS.forEach(function (c) {
+      var cheap = IceMenu.ITEMS.filter(function (x) { return x.cat === c.id; }).sort(function (a, b) { return a.p - b.p; })[0], cart = {};
+      for (var k in M.cart) cart[k] = M.cart[k]; cart[cheap.id] = (cart[cheap.id] || 0) + 1;
+      var gain = IceMenu.price(cart, tm).save - r.save;
+      if (gain > 0.001 && (!best || gain > best.g)) best = { g: gain, c: c };
+    });
+    return best ? fmt(t("hint"), { c: best.c.e + " " + L2(best.c), s: usd(best.g) }) : "";
+  }
+  function renderCart(bump) {
+    var r = quote(), bar = $("cartBar"), has = r.count > 0;
+    bar.hidden = !has; document.body.classList.toggle("has-cart", has);
+    if (!has) return;
+    $("cbN").textContent = r.count; $("cbT").textContent = usd(r.total);
+    $("cbSave").textContent = r.save > 0 ? fmt(t("cartSaveBar"), { s: usd(r.save) }) : fmt(t("cartItems"), { n: r.count });
+    var h = nextHint(r), hi = $("cartHint"); hi.hidden = !h; hi.textContent = h;
+    if (bump) { bar.classList.remove("pop"); void bar.offsetWidth; bar.classList.add("pop"); }
+  }
+  function linesHtml(r, withQty) {
+    return r.lines.map(function (l) {
+      var x = IceMenu.BY[l.id], w = L2(x);
+      return '<div class="ln"><span class="e" aria-hidden="true">' + x.e + '</span><div>' + (withQty ? "" : l.q + "× ") + esc(w[0]) + '<small>' + esc(fmt(t("each"), { p: usd(l.each) })) + '</small></div>' +
+        (withQty ? '<div class="qty" style="flex:none"><button type="button" data-id="' + l.id + '" data-d="-1" aria-label="−">−</button><output>' + l.q + '</output><button type="button" data-id="' + l.id + '" data-d="1" aria-label="+">+</button></div>' : "") +
+        '<span class="p">' + usd(l.total) + "</span></div>";
+    }).join("");
+  }
+  function dealsHtml(r) {
+    return r.deals.map(function (d) { var w = L2(DC[d.id]); return '<div class="dl"><span>' + DC[d.id].e + " " + esc(d.n > 1 ? fmt(t("dealX"), { d: w[0], n: d.n }) : w[0]) + "</span><span>−" + usd(d.save) + "</span></div>"; }).join("");
+  }
+  function totHtml(r) {
+    return "<span>" + t("sub") + "</span><span>" + usd(r.sub) + "</span>" + (r.save > 0 ? "<span>" + t("deals") + "</span><span>−" + usd(r.save) + "</span>" : "") +
+      '<span class="big">' + t("total") + '</span><span class="big">' + usd(r.total) + "</span>";
+  }
+  function renderSheet() {
+    var r = quote();
+    if (!r.count) { closeSheet(); return; }
+    $("cartLines").innerHTML = linesHtml(r, true); $("cartDeals").innerHTML = dealsHtml(r); $("cartTot").innerHTML = totHtml(r);
+    $("cartSaved").textContent = r.save > 0 ? fmt(t("saved"), { s: usd(r.save) }) : "";
+    var h = nextHint(r), sh = $("sheetHint"); sh.hidden = !h; sh.textContent = h;
+    [].forEach.call($("cartLines").querySelectorAll(".qty button"), function (b) {
+      b.addEventListener("click", function () { var id = b.getAttribute("data-id"); setQty(id, (M.cart[id] || 0) + +b.getAttribute("data-d")); });
+    });
+  }
+  function openSheet() { renderSheet(); $("sheet").hidden = false; document.body.style.overflow = "hidden"; $("sheetX").focus(); }
+  function closeSheet() { $("sheet").hidden = true; document.body.style.overflow = ""; }
+  $("cartOpen").addEventListener("click", openSheet);
+  $("sheetX").addEventListener("click", closeSheet);
+  $("sheet").addEventListener("click", function (e) { if (e.target === this) closeSheet(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { if (!$("ticket").hidden) $("tkDone").click(); else if (!$("sheet").hidden) closeSheet(); } });
+  $("cartClear").addEventListener("click", function () { M.cart = {}; msave(); closeSheet(); renderItems(); renderCart(); toast(t("toastCleared")); });
+  var tkCode = "";
+  function renderTicket() {
+    var r = quote();
+    $("tkCode").textContent = tkCode; $("tkLines").innerHTML = linesHtml(r, false); $("tkDeals").innerHTML = dealsHtml(r); $("tkTot").innerHTML = totHtml(r);
+    $("tkSaved").textContent = r.save > 0 ? fmt(t("saved"), { s: usd(r.save) }) : "";
+  }
+  $("showDriver").addEventListener("click", function () {
+    tkCode = "SOL-" + String(Math.floor(1000 + Math.random() * 9000)); renderTicket();
+    closeSheet(); $("ticket").hidden = false; document.body.style.overflow = "hidden"; $("tkDone").focus();
+  });
+  $("tkDone").addEventListener("click", function () { $("ticket").hidden = true; document.body.style.overflow = ""; });
+  $("fakeTime").checked = !!M.fake;
+  $("fakeTime").addEventListener("change", function () { M.fake = this.checked; msave(); renderDeals(); renderCart(); if (!$("sheet").hidden) renderSheet(); toast(t(M.fake ? "toastTimeOn" : "toastTimeOff")); });
+  (function () { // read the deals out loud
+    var b = $("menuSay");
+    b.addEventListener("click", function () {
+      if (Speak.speaking) { Speak.stop(); return; }
+      Speak.say(t("menuSay") + IceMenu.DEALS.map(function (d) { var w = L2(d); return w[0].replace(/–/g, " to ").replace(/:/g, ".") + ". " + w[1]; }).join(" "));
+    });
+  })();
+  function renderMenu() { renderDeals(); renderCats(); renderItems(); renderCart(); if (!$("sheet").hidden) renderSheet(); if (!$("ticket").hidden) renderTicket(); }
 
   /* ---------- settings ---------- */
   function renderSet() {
@@ -858,6 +1116,7 @@ es: {
   $("reset").addEventListener("click", function () {
     try { localStorage.removeItem(KEY); } catch (e) {}
     S = { joined: false, name: "", pts: 0, dist: 0.25, alerts: true, sound: true, quiet: true, street: "", visits: 0 };
+    M.cart = {}; msave(); renderItems(); renderCart();
     $("name").value = ""; $("street").value = ""; $("locMsg").textContent = ""; $("codeBox").hidden = true; $("vCodeBox").hidden = true;
     home = { lat: SAMPLE_HOME.lat, lng: SAMPLE_HOME.lng }; renderHomeMsg(); placeHome(); loadRoute();
     showJoin(); renderPts(); renderVisits(); renderSet(); toast(t("resetDone"));
@@ -873,7 +1132,7 @@ es: {
     showJoin(); renderPts(); renderVisits(); renderMenu(); renderHomeMsg();
     if (homeMk) homeMk.setIcon(homeIcon());
     var mk = $("mapMsg"); if (!mk.hidden) mk.textContent = t(mk.getAttribute("data-k"));
-    shown = {}; if (lastU) render(lastU); blimp.relabel();
+    shown = {}; $("nudge").setAttribute("data-s", ""); if (lastU) render(lastU); blimp.relabel();
     if ($("ringer").classList.contains("show")) $("nBody").textContent = fmt(t("nBody"), { d: dec(lastD), m: lastM }); });
   showJoin(); renderPts(); renderVisits(); renderMenu(); renderSet();
 })();

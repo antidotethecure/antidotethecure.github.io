@@ -62,7 +62,7 @@ export function makeGPUFX(THREE, scene, O = {}) {
     const B = add ? AD : SM, i = B.head; B.head = (B.head + 1) % MAX; if (B.head === 0) B.wrap = true; emitted++;
     if (B.d0 < 0) B.d0 = i; B.d1 = i;
     const A = B.A; c1 = c1 || c0;
-    A.aP.array.set([p.x - OFF.value.x, p.y - OFF.value.y, p.z - OFF.value.z, T], i * 4);   // (stored relative to the world offset: shift() moves every live puff with the ground) A.aV.array.set([v.x, v.y, v.z, life], i * 4); A.aS.array.set([s0, s1, drag || 0, rise || 0], i * 4);
+    A.aP.array.set([p.x - OFF.value.x, p.y - OFF.value.y, p.z - OFF.value.z, T], i * 4); A.aV.array.set([v.x, v.y, v.z, life], i * 4); A.aS.array.set([s0, s1, drag || 0, rise || 0], i * 4);   // position is stored relative to the world offset: shift() moves every live puff with the ground
     A.aC0.array.set([c0[0], c0[1], c0[2], a], i * 4); A.aC1.array.set([c1[0], c1[1], c1[2], 0], i * 4); A.aSlot.array[i] = slot || 0; }
   function flush(B) { if (B.d0 < 0) return; const A = B.A;
     for (const k in A) { const a = A[k], n = a.itemSize;

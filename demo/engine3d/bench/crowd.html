@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crowd Bench</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
+<style>body{margin:0;background:#9fb3c8;font:12px system-ui}canvas{display:block}#i{position:fixed;left:8px;top:8px;background:#0008;color:#fff;padding:6px 8px;border-radius:6px;white-space:pre}</style></head><body><div id="i">loading…</div>
+<script type="module">
+/* engine3d crowd bench: every clip on both bodies. ?mode=near|lod1|lod2 · ?clip=walk · ?n=200 (stress) · ?t=1.3 (freeze time) */
+import * as THREE from "three"; import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"; import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+import { createCrowd } from "../crowd.js";
+const q = new URLSearchParams(location.search), mode = q.get("mode") || "lod1";
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setPixelRatio(Math.min(2, devicePixelRatio)); r.setSize(innerWidth, innerHeight); document.body.appendChild(r.domElement);
+r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace; r.shadowMap.enabled = true;
+const s = new THREE.Scene(); s.background = new THREE.Color(0x9fb3c8); s.add(new THREE.HemisphereLight(0xdfefff, 0x8a7350, 1.3)); const d = new THREE.DirectionalLight(0xfff0dd, 2.6); d.position.set(-30, 60, 40); d.castShadow = true; d.shadow.mapSize.set(2048, 2048); Object.assign(d.shadow.camera, { left: -80, right: 80, top: 80, bottom: -80 }); s.add(d);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xd8c09a, roughness: 1 })); ground.receiveShadow = true; s.add(ground);
+const L = new GLTFLoader(); L.setMeshoptDecoder(MeshoptDecoder);
+const t0 = performance.now();
+const crowd = await createCrowd(THREE, { base: "../assets/humans/", loader: L, scene: s, renderer: r, height: 8.6, quality: { near: mode === "near" ? 12 : 0, lod1: mode !== "lod2", nearDist: 1e9, lod1Dist: 1e9, shadows: true } });
+const names = q.get("clip") ? q.get("clip").split(",") : crowd.clipNames, N = +q.get("n") || 0, ppl = [];
+if (N) { for (let i = 0; i < N; i++) { const p = crowd.add({ seed: i + 1, style: i % 3 ? "beach" : "street" }); p.set((i % 20 - 10) * 9, 0, -(i / 20 | 0) * 9, Math.random() * 6); p.play(names[i % names.length]); ppl.push(p); } }
+else names.forEach((n, i) => ["m", "f"].forEach((b, k) => { const p = crowd.add({ body: b, seed: i * 2 + k + 3, style: i % 2 ? "street" : "beach" }); p.set((i % 8 - 3.5) * 22 + k * 9, 0, -(i / 8 | 0) * 26, 0); p.play(n, { offset: 0 }); p.label = n; ppl.push(p); }));
+const cam = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 1, 2000);
+const rows = Math.ceil(names.length / 8); cam.position.set(0, 40 + rows * 10, 60 + rows * 8); cam.lookAt(0, 4, -rows * 13 + 10); if (q.get("close")) { ppl.forEach((p, j) => p.set((j - (ppl.length - 1) / 2) * 7.5, 0, 0, +(q.get("yaw") || 0))); cam.position.set(0, +(q.get("cy") || 6), ppl.length * 4.2 + 8); cam.lookAt(0, 3.6, 0); }
+const info = document.getElementById("i"); let frames = 0, ft = performance.now(), fps = 0; const T = q.get("t");
+// labels
+const lc = document.createElement("canvas"); lc.width = innerWidth; lc.height = innerHeight; lc.style.cssText = "position:fixed;left:0;top:0;pointer-events:none"; document.body.appendChild(lc); const lx = lc.getContext("2d");
+function frame(now) { const t = T != null ? +T : now / 1000; crowd.update(cam, t, 1 / 60); r.render(s, cam); frames++;
+  if (now - ft > 1000) { fps = Math.round(frames * 1000 / (now - ft)); frames = 0; ft = now; }
+  lx.clearRect(0, 0, lc.width, lc.height); lx.font = "11px system-ui"; lx.fillStyle = "#123"; if (!N) for (const p of ppl) if (p.body === "m") { const v = new THREE.Vector3(p.x + 4, -1.5, p.z).project(cam); lx.fillText(p.label, (v.x + 1) / 2 * innerWidth - 20, (1 - v.y) / 2 * innerHeight + 12); }
+  info.textContent = `crowd bench (${mode}) · load+bake ${Math.round(performance.now() - t0)}ms · fps ${fps}\n` + JSON.stringify(crowd.stats()); window.__E3 = { crowd, stats: () => Object.assign({ fps }, crowd.stats()) };
+  requestAnimationFrame(frame); }
+requestAnimationFrame(frame);
+</script></body></html>

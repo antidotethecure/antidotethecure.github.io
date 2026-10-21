@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><title>GLB viewer</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
+<style>body{margin:0;background:#888}canvas{display:block}</style></head><body>
+<script type="module">
+import * as THREE from "three"; import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"; import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+const q = new URLSearchParams(location.search), r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(innerWidth, innerHeight); document.body.appendChild(r.domElement);
+const s = new THREE.Scene(); s.background = new THREE.Color(0x8899aa); if (q.get('grid')) { const gh = new THREE.GridHelper(2, 40, 0xff0000, 0x333333); gh.rotation.x = Math.PI/2; gh.position.set(0,1,-0.3); s.add(gh); } s.add(new THREE.HemisphereLight(0xffffff, 0x444444, 2)); const d = new THREE.DirectionalLight(0xffffff, 2); d.position.set(1, 2, 3); s.add(d);
+const files = (q.get("f") || "").split(","), c = new THREE.PerspectiveCamera(35, innerWidth / innerHeight, .01, 100);
+const L = new GLTFLoader(); L.setMeshoptDecoder(MeshoptDecoder); let x = 0;
+for (const f of files) { const g = await L.loadAsync(f); const o = g.scene; o.updateMatrixWorld(true); const b = new THREE.Box3().setFromObject(o, true), sz = b.getSize(new THREE.Vector3()); const k = 1.8 / sz.y; o.scale.setScalar(k); o.position.set(x - (b.min.x+b.max.x)/2*k, -b.min.y * k, -(b.min.z+b.max.z)/2*k); o.traverse(n=>{ if(n.isMesh && !n.geometry.attributes.normal) n.geometry.computeVertexNormals(); if(n.isMesh && q.get('flat')) n.material = new THREE.MeshStandardMaterial({map:n.material.map}); }); x += 1.6; s.add(o);
+  if (q.get("a") && g.animations.length) { const m = new THREE.AnimationMixer(o); m.clipAction(g.animations.find(a => a.name === q.get("a")) || g.animations[0]).play(); m.update(+q.get("t") || .3); }
+  console.log(f, JSON.stringify(sz.toArray().map(v => +v.toFixed(3)))); }
+c.position.set((x - 1.6) / 2, 1, 4.5 + x * .6); c.lookAt((x - 1.6) / 2, .9, 0); if (q.get('ortho')) { const oc = new THREE.OrthographicCamera(-1.1*innerWidth/innerHeight, 1.1*innerWidth/innerHeight, 1.1, -1.1, .01, 100); oc.position.set(0, 1, 5); oc.lookAt(0,1,0); if(q.get('side')){oc.position.set(5,1,0); oc.lookAt(0,1,0);} r.render(s, oc); window.DONE=1; throw 0; } if (q.get("side")) { c.position.set(6, 1, 0); c.lookAt(0, .9, 0); }
+r.render(s, c); window.DONE = 1;
+</script></body></html>

@@ -401,7 +401,7 @@
   var qs = new URLSearchParams(location.search), INVITE = (qs.get("ref") || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 16);
   // missed-call text-back: the auto-text after an unanswered or after-hours call links here with ?missed=1
   var MISSED = (qs.get("missed") === "1" || qs.get("src") === "call") && (!SIMPLE || !!C.missed), MC = C.missed || { offer: "10% off your order", days: 7 };
-  var FRIENDS = ["Jasmine", "Carlos", "Devon", "Mia", "Andre", "Lily", "Marco", "Keisha", "Tran", "Gabby"];
+  var FRIENDS = ["Jasmine", "Mateo", "Devon", "Mia", "Andre", "Lily", "Marco", "Keisha", "Tran", "Gabby"];
   function shareLink(m) { return location.origin + location.pathname + "?ref=" + encodeURIComponent(m.ref) + "#crm-join"; }
 
   // a game calls SSAI_WIN("Free fries") when a player wins: the prize lands in their wallet with a code to redeem in store
@@ -524,7 +524,7 @@
     add: function (m, n, why, k) { addPts(m, n, why); if (k) tag(m, k); },
     save: function (m) { put(m); drawJoin(); drawOwn(); },
     redraw: function () { drawJoin(); drawOwn(); },
-    join: function (cb) { GATE_TXT.interim = ["Join " + NAME + " Rewards first", "Free. Add your name and a phone or email, then add your visit.", "🎁 Join free"]; return gate("interim", cb); },
+    join: function (cb, opts) { GATE_TXT.interim = ["Join " + NAME + " Rewards first", "Free. Add your name and a phone or email, then add your visit.", "🎁 Join free"]; return gate("interim", cb, opts); },   // opts {title, sub, btn}: custom sheet wording (scorespecial.js)
     toast: toast, esc: e, code4: code4,
     dev: function () { return devId(); }, pday: pdKey, prizeUsedToday: function () { return prizeUsedToday(mine()[0]); },
     sync: function () { var m = mine()[0]; if (m) syncLater(m); }, api: API, perDollar: PER

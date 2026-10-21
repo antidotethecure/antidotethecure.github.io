@@ -10,7 +10,7 @@
      const cl = makeClouds(THREE, { renderer, sky, quality: { scale, steps, light } })
      cl.render(camera, depthTexture|null, t, dt, params)   params: { cover, density, base, top, wind: Vector3, puffs: [[x,y,z,r]...], sunCol, sunI, fogCol, fogFar, wet }
      cl.full / cl.front (textures) · cl.compositeShader (for postfx.js) · cl.mist (0..1, how deep the camera is inside a cloud) */
-import { SKY_GLSL } from "./sky.js?v=e3r";
+import { SKY_GLSL } from "./sky.js?v=e3t";
 
 const NOISE_GLSL = `
   vec3 hash33(vec3 p){ p = vec3(dot(p, vec3(127.1, 311.7, 74.7)), dot(p, vec3(269.5, 183.3, 246.1)), dot(p, vec3(113.5, 271.9, 124.6))); return -1.0 + 2.0 * fract(sin(p) * 43758.5453123); }

@@ -825,7 +825,7 @@ async function boot() {
     if (st.running && !wasRun) { lvShown = 0; city = "ing"; }
     if (st.running && st.lvl && st.lvl !== lvShown) { lvShown = st.lvl; midDone = 0; event(LVL[Math.min(LVL.length, st.lvl) - 1]); evtIn = SPACING; }
     if (st.running && st.lvl < 10 && midDone === 0 && st.t < 60000) { midDone = 1; event({ R: s2 => store(s2, st.lvl >= 5 ? "5801 CHERRY AVE · LONG BEACH" : "1500 N LA BREA AVE · INGLEWOOD", true) }); evtIn = SPACING; }   // StormBurger with its drive-thru line, every level
-    if (st.running && st.lvl % 3 && midDone === 1 && st.t < 30000) { midDone = 2; event({ R: jordan }); evtIn = SPACING; }   // Jordan High every level (levels 3/6/9 show it at the pit stop)   // each new level puts its landmark on the road ahead right away
+    if (st.running && ![2, 6, 9].includes(st.lvl) && midDone === 1 && st.t < 30000) { midDone = 2; event({ R: jordan }); evtIn = SPACING; }   // Jordan High every level (levels 3/6/9 show it at the pit stop)   // each new level puts its landmark on the road ahead right away
     wasRun = st.running;
     // ground speed: the stretched 2D speed, so pickups sit still on the road; a slow cruise under the menu
     const pitting = st.pitT > 0, pp = pitting ? (st.pitT > 3000 ? .5 : 1 - st.pitT / 2600) : 0;   // > 3000 = parked in the Jordan kitchen stop

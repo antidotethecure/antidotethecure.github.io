@@ -71,6 +71,6 @@
     if (left <= 0) return close(); raf = requestAnimationFrame(tick); }
   function close() { if (!on) return; on = false; cancelAnimationFrame(raf); el.classList.remove("on"); var d = done; done = null; if (d) d(served); }
   $(".go").addEventListener("click", close);
-  window.SB_KITCHEN = { open: function (cb) { if (on) return; on = true; done = cb; served = 0; pts = 0; t0 = performance.now(); newOrder(); el.classList.add("on"); tick(); },
+  window.SB_KITCHEN = { open: function (cb, ms) { if (on) return; on = true; done = cb; TIME = ms || 20000; served = 0; pts = 0; t0 = performance.now(); newOrder(); el.classList.add("on"); tick(); },
     get on() { return on; }, close: close };
 })();

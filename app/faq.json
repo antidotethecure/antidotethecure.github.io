@@ -1,29 +1,31 @@
 {
  "name": "SousShift AI",
- "phone": "",
- "_note": "PRICING CONFLICT TO CHECK BEFORE PUBLISHING: plans below follow the pitch/config.json you pointed to (Menu $750+$99, Rewards $2,000+$300, Full Show $2,500+$400, Everything $3,500+$600). The newer app/data.js (v5, 2026-10-11, 'for new restaurants') lists Basic $3,000+$350, Growth $3,500+$650, Done-for-you $4,000+$950. The payment options and contract terms in the qa come from data.js. Confirm which price list is current.",
+ "phone": "(424) 296-3303",
  "facts": [
-  "SousShift AI builds branded apps, custom games and rewards for restaurants and local businesses. Say it SOO-shift, like sous chef.",
-  "Every app is built around the business's real menu or services, with a game themed to what they sell and a weekly prize board.",
-  "Customers scan a QR code and the app opens in their phone browser. There is no download, app store or account.",
-  "Contact: secondshiftai@gmail.com or Instagram @second.shiftai.",
-  "A free sample app is built from your business details, your menu and 2 to 6 photos. No card and no pressure.",
-  "Antidote reviews every sample request personally and usually builds the sample the same day.",
-  "The app menu runs in 12 languages, including Español, 中文, 한국어, Հայերեն and Русский.",
-  "Rewards: points, scan-to-earn, visit levels (Regular, VIP, Legend), a birthday treat, invite-a-friend referrals, a weekly leaderboard, a free daily spin and a weekly giveaway.",
-  "The AI agents are optional add-ons, billed per location and month to month: AI Text Assistant $75/mo, AI Voice Host + Text $150/mo.",
-  "The Everything plan includes an AI agent that answers your phone 24/7.",
-  "Works alongside any register (Toast, Square, Clover). SousShift sits on top of it and does not replace it.",
-  "Truck plans (ice cream and food trucks): Single Scoop $99 setup + $29/mo, Double Scoop $299 setup ($199 for the first 10 trucks) + $50/mo, Sundae $599 setup + $129/mo for up to 3 trucks. No contract.",
-  "Every plan includes the print designs: QR table stickers, a 24x36 window poster and numbered table cards."
+  "SousShift AI builds branded no-download apps, custom games and rewards for restaurants and local businesses. Say it 'SOO-shift', like sous chef.",
+  "Guests scan a QR code at the table, window or receipt. The app opens in their phone's browser with no app store and no account. They can add it to their Home Screen.",
+  "Plans, setup then monthly: Menu $750 + $99/mo, Rewards $2,000 + $300/mo, Full Show $2,500 + $400/mo (most popular), Everything $3,500 + $600/mo.",
+  "AI agent add-ons are per location, per month, with no contract: AI Text Assistant $75/mo, AI Voice Host + Text Assistant $150/mo. Pick one tier.",
+  "Setup can be paid in full, split 50/50 (half at signing, half when the app is delivered), or on a flexible plan from $750 down. The flexible plan spreads the rest over 12 months on top of the monthly, with no extra charge.",
+  "Contract: a 3-month minimum, then month to month. Either side can cancel with 30 days' written notice, and email counts. AI add-ons are month to month from day one.",
+  "Your customer list is yours. You get full access and a CSV export anytime, and we never sell it or use it for another business.",
+  "Contact: secondshiftai@gmail.com, Instagram @SousShiftAi, or the 24/7 AI sales line (424) 296-3303.",
+  "The call line is answered by Nia, SousShift's AI guide. She explains the plans and add-ons, answers questions about SousShift and connects callers to Antidote. It is calls only, and texts to that number don't work yet.",
+  "Live demos: Melody Bar & Grill (flight game over LAX), Nalu Vida (Ride the Nalu surf game), Gritz N Wafflez (Order Up!), StormBurger (Storm Run), Churrito Loco (Loco Match puzzle), Lucky Dragon (Hibachi Catch), plus an ice cream truck app, a food truck app and a mechanic app.",
+  "Melody Bar & Grill in Westchester by LAX is the first onboarded partner and is going live now. Nalu Vida and Gritz N Wafflez are in the works and not live yet. The other apps are demo samples.",
+  "A free sample app is built with your real name, menu and photos. Antidote reviews each request personally, usually the same day. No card and no pressure.",
+  "The app menu is available in 12 languages, and the staff app is in English and Spanish.",
+  "The app works with any register (Toast, Square, Clover and others). It sits on top of your register and doesn't replace it.",
+  "Results are not guaranteed. Calculators on the site are estimates, not promises of sales.",
+  "Existing clients keep their signed deals exactly as agreed. The prices here are for new restaurants."
  ],
  "suggested": [
   "How much does it cost?",
+  "What's included in each plan?",
   "Can I see a demo?",
-  "What games do you build?",
+  "What do the AI phone agents cost?",
   "How do rewards and the weekly contest work?",
-  "Do you work with Toast or Square?",
-  "How do I get started?"
+  "Can I just talk to someone?"
  ],
  "plans": [
   {
@@ -56,8 +58,7 @@
     "Everything in Rewards",
     "Referrals + text blasts to your list",
     "Special deals + build-your-meal",
-    "Motion menu (drinks pour, food steams)",
-    "Most popular plan"
+    "Motion menu (drinks pour, food steams)"
    ]
   },
   {
@@ -76,7 +77,7 @@
   {
    "name": "AI Text Assistant",
    "monthly": 75,
-   "note": "Per location, month to month. Guests text your number and an AI texts back 24/7 with hours, menu, specials, reservation requests, catering and the app. Missed calls get a text back, and anything it can't answer goes to you. 1,000 texts a month included, then $0.03 a text."
+   "note": "Per location, month to month. Guests text your number and an AI texts back 24/7 with hours, menu, specials, reservation requests and catering. Missed calls get a text back. 1,000 texts a month included, then $0.03 a text."
   },
   {
    "name": "AI Voice Host + Text Assistant",
@@ -84,9 +85,14 @@
    "note": "Per location, month to month. A natural AI voice answers your phone 24/7 or after hours, takes reservation requests, transfers to staff and texts links during the call. Includes the Text Assistant. 750 minutes + 1,000 texts a month included, then $0.15 a minute and $0.03 a text."
   },
   {
+   "name": "Online Ordering + Delivery (coming soon)",
+   "monthly": 300,
+   "note": "Pickup ordering with card payments in your app comes first. It's $300/mo flat with no per-order fee, or $200/mo + 5% of the food on each order. Delivery waits on DoorDash approval (applied, under review)."
+  },
+  {
    "name": "Social & SEO Growth",
    "monthly": 1000,
-   "note": "Optional. Content plan, short-form video edits from your food, posting on Instagram, TikTok and YouTube, Google Business Profile + local SEO, and a monthly report. No guaranteed follower or view counts."
+   "note": "Optional. Content plan, short-form video edits, posting on Instagram, TikTok and YouTube, Google Business Profile + local SEO, and a monthly report. Results vary and follower or view counts are not guaranteed."
   }
  ],
  "types": [
@@ -97,10 +103,11 @@
     "dining",
     "grill",
     "diner",
-    "eatery",
-    "full service"
+    "full service",
+    "american",
+    "soul food"
    ],
-   "a": "A restaurant gets a branded app with a 4K photo menu, table ordering and a custom game themed to your food. Our live example is Melody Bar & Grill (flight game), and StormBurger (Storm Run driving game) is a good fast-casual sample. Customers earn points on every visit, earn rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "A restaurant gets a branded app with a 4K photo menu, table ordering and a custom game themed to your food. The closest demos are Melody Bar & Grill (flight game over LAX), StormBurger (Storm Run) and Gritz N Wafflez. Customers earn points on visits, get rewards for sharing with friends, and the weekly high score wins a prize."
   },
   {
    "type": "bar / sports bar",
@@ -110,14 +117,14 @@
     "pub",
     "cocktails",
     "drinks",
-    "beer",
-    "tavern",
-    "nightlife"
+    "nightlife",
+    "beach bar",
+    "lounge"
    ],
-   "a": "A bar gets table or bar ordering, drinks that pour in a motion menu, and a game built around your place. Melody Bar & Grill (land the plane at LAX) and Nalu Vida (Ride the Nalu surf game) are the demos to try. Customers earn points on visits, earn rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "Bars get the Melody Bar & Grill flight-game app (land the plane at LAX for prizes) or the Nalu Vida surf game. Both come with a drinks menu, rewards and a weekly champion board. The Sports Bar Package add-on (live scores, Football Squares, fight nights) is quoted separately. Customers earn points on visits, share with friends for rewards, and the weekly top score wins a prize."
   },
   {
-   "type": "cafe / breakfast",
+   "type": "café / breakfast",
    "keywords": [
     "cafe",
     "café",
@@ -125,20 +132,21 @@
     "brunch",
     "waffles",
     "diner",
-    "coffee shop"
+    "coffee shop",
+    "grits"
    ],
-   "a": "A café or breakfast spot gets a photo menu, table ordering and a plate-building game. The matching demo is Gritz N Wafflez (Order Up!, where guests run the kitchen and serve plates). Customers earn points on visits, earn rewards for sharing with friends, and the weekly high score wins a prize, like a karaoke shoutout at Gritz."
+   "a": "Gritz N Wafflez is the matching demo. Its game is Order Up!, where you run the kitchen and serve the plates while you wait. It has a real menu with photos, a weekly prize board and reward codes. Customers earn points on visits, get rewards for sharing, and the weekly high score wins a prize. Gritz is still in the works, not live."
   },
   {
    "type": "food truck",
    "keywords": [
     "food truck",
-    "taco truck",
     "truck",
-    "street food",
-    "catering truck"
+    "taco truck",
+    "mobile kitchen",
+    "street food"
    ],
-   "a": "The food truck app has a live map, today's stops and times, deals, parked-nearby alerts and order-ahead timed so the food comes off the grill as the customer walks up. It also has your own game with your logo and menu. Customers earn points on orders, earn rewards for sharing with friends, and the weekly top score wins a free item. See the Food Truck demo."
+   "a": "The food truck demo has a live map, 'we're parked' alerts and order-ahead timed so food comes off the grill as customers walk up. A quick game with your truck logo and menu items is part of the app, with a weekly top score winning a free item. Customers earn points on every order and get rewards for sharing."
   },
   {
    "type": "ice cream truck",
@@ -146,11 +154,10 @@
     "ice cream truck",
     "ice cream",
     "paletas",
-    "paleteros",
-    "scoop",
-    "truck music"
+    "popsicle",
+    "truck on your street"
    ],
-   "a": "The ice cream truck app puts the truck on a live map and rings customers' phones when you're close. It also shows an ETA and gives a 5-check-in reward. Customers earn 10 points on every purchase and bonus points for keeping alerts on, and referrals earn rewards. A weekly high-score game with a prize would be a custom build like a scoop-stacking game, not an existing demo."
+   "a": "The ice cream truck demo shows customers a live map and an ETA, and rings their phone when you're close. Rewards include 5 check-ins for 10% off or an extra scoop, and 10 points per purchase. A branded scoop-stacking game with a weekly prize would be a custom build, not an existing demo. Customers earn points, get rewards for sharing, and the weekly high score wins a prize."
   },
   {
    "type": "dessert shop",
@@ -158,12 +165,12 @@
     "dessert",
     "sweets",
     "churros",
+    "snacks",
     "candy",
-    "ice cream shop",
     "frozen yogurt",
-    "snacks"
+    "treats"
    ],
-   "a": "A dessert shop gets a photo menu, ordering and a puzzle game like Churrito Loco's Loco Match, a Candy-Crush style game with the mascot. Churrito Loco is the matching demo. Customers earn points on visits, earn rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "Churrito Loco is the matching demo, with Loco Match, a Candy-Crush style puzzle game featuring their mascot. Your version would use your own treats and mascot. Customers earn points on visits, get rewards for sharing with friends, and the weekly high score wins a prize."
   },
   {
    "type": "bakery",
@@ -171,25 +178,27 @@
     "bakery",
     "pastry",
     "bread",
-    "cakes",
     "cupcakes",
+    "cakes",
     "donuts"
    ],
-   "a": "A bakery gets a photo menu and a game built around your treats. Churrito Loco's match puzzle is the closest demo. A custom concept would be a decorate-the-cake or fill-the-box game, which is a custom build and not an existing demo. Customers earn points on visits, earn rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "The closest demo is Churrito Loco's Loco Match puzzle. A bakery version matching your pastries and cakes would be a custom build, not an existing demo. Customers earn points on visits, get rewards for sharing, and the weekly high score wins a prize."
   },
   {
    "type": "mechanic / auto shop",
    "keywords": [
     "mechanic",
     "auto",
-    "car repair",
     "auto shop",
-    "garage",
-    "mobile mechanic",
+    "car repair",
+    "tires",
+    "tire shop",
+    "quick lube",
     "oil change",
-    "brakes"
+    "body shop",
+    "detailing"
    ],
-   "a": "The mechanic app lets customers tap the part of their car that's wrong and get a sample quote. They can scan the car with an OBD-II reader or code, see recalls and book a time. Carlos' Mobile Mechanic is the demo, and a shop-view app exists too. Customers earn credit when a friend books. A weekly high-score game, like a pit-stop tire-change challenge with a prize, would be a custom build, not an existing demo."
+   "a": "The mechanic app demo lets customers say or tap what's wrong, see a sample price or ask for a quote, check tire stock, book a time and pay by QR. Service reminders, recall alerts, review requests and referral rewards bring cars back. A pit-stop style game (swap the tire fastest) with a weekly prize board would be a custom build, not an existing demo. Mechanic pricing is set per shop, so ask for a quote."
   },
   {
    "type": "barbershop",
@@ -199,22 +208,24 @@
     "fade",
     "haircut",
     "cut",
-    "line up",
-    "lineup"
+    "lineup",
+    "shave"
    ],
-   "a": "A barbershop gets an app for services, booking and rewards. A custom game could have you cut the fade the right way to score. That's a custom build, not an existing demo. Customers earn points on every visit and rewards for sharing with friends, and the weekly high score wins a prize like a free cut."
+   "a": "This would be a custom build, not an existing demo. Think of a game where you cut the fade the right way to score, with your shop's logo and services in the app. Customers earn points on visits, get rewards for sharing with friends, and the weekly high score wins a prize such as a free cut."
   },
   {
    "type": "nail salon",
    "keywords": [
     "nail",
     "nails",
+    "nail salon",
     "manicure",
     "pedicure",
     "lashes",
-    "nail salon"
+    "gel",
+    "polish"
    ],
-   "a": "A nail salon gets a services and booking app. A custom game idea is matching polish colors to paint a perfect set, a custom build and not an existing demo. Customers earn points on every visit and rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "This would be a custom build, not an existing demo. Think of a game where you match the polish colors and designs to a client's order, with your services and photos in the app. Customers earn points on visits, get rewards for sharing, and the weekly high score wins a prize."
   },
   {
    "type": "braider / hair salon",
@@ -224,11 +235,11 @@
     "hair salon",
     "hair",
     "stylist",
-    "salon",
     "locs",
-    "weave"
+    "weave",
+    "beauty"
    ],
-   "a": "A braider or hair salon gets a services and booking app with your best work shown off. A custom game idea is a braid-pattern challenge, a custom build and not an existing demo. Customers earn points on visits and rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "This would be a custom build, not an existing demo. Think of a game where you braid the pattern the right way to score, with your styles and work photos in the app. Customers earn points on visits, get rewards for sharing with friends, and the weekly high score wins a prize."
   },
   {
    "type": "gym",
@@ -238,22 +249,21 @@
     "workout",
     "crossfit",
     "yoga",
-    "training",
-    "studio",
-    "membership"
+    "pilates",
+    "trainer"
    ],
-   "a": "A gym gets an app for classes, memberships and check-ins. A custom game idea is a rep-counting lift challenge, a custom build and not an existing demo. Members earn points on visits, a friend sharing earns rewards like a free day pass, and the weekly high score wins a prize."
+   "a": "This would be a custom build, not an existing demo. Think of a rep-timing game where you tap on the beat to lift, with your classes and memberships in the app. Customers earn points on check-ins, get rewards for sharing with friends, and the weekly high score wins a prize."
   },
   {
    "type": "car wash",
    "keywords": [
     "car wash",
-    "carwash",
-    "detailing",
+    "wash",
     "detail",
-    "wash"
+    "carwash",
+    "auto spa"
    ],
-   "a": "A car wash gets a services app with points on every wash. A custom game idea is scrubbing a car spotless before time runs out, a custom build and not an existing demo. Customers earn points on visits and rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "This would be a custom build, not an existing demo. Think of a game where you drive through the wash and scrub the car clean to score, with your wash packages in the app. Customers earn points on visits, get rewards for sharing, and the weekly high score wins a prize."
   },
   {
    "type": "retail store",
@@ -263,10 +273,10 @@
     "shop",
     "boutique",
     "clothing",
-    "merch",
-    "gift shop"
+    "products",
+    "merch"
    ],
-   "a": "A retail store gets a product app with rewards. A custom game idea is a catch-the-products shopping dash, a custom build and not an existing demo. Customers earn points on visits and purchases and rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "This would be a custom build, not an existing demo. Think of a catch-the-items game themed to your products, with your catalog in the app. Customers earn points on purchases, get rewards for sharing with friends, and the weekly high score wins a prize."
   },
   {
    "type": "boba / coffee",
@@ -277,9 +287,9 @@
     "tea",
     "espresso",
     "latte",
-    "smoothie"
+    "drinks shop"
    ],
-   "a": "A boba or coffee shop gets a drink menu, ordering and a game built around your drinks. Churrito Loco's match puzzle is the closest demo style. A custom idea is a stack-the-boba-cup game, which would be a custom build, not an existing demo. Customers earn points on visits, earn rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "Churrito Loco's Loco Match puzzle is the closest demo for drink and snack shops. A boba game where you catch the tapioca pearls would be a custom build, not an existing demo. Customers earn points on visits, get rewards for sharing, and the weekly high score wins a prize."
   },
   {
    "type": "pizza",
@@ -287,9 +297,10 @@
     "pizza",
     "pizzeria",
     "slice",
-    "pie"
+    "pie",
+    "italian"
    ],
-   "a": "A pizza shop gets a photo menu, ordering and a game. A custom idea is a top-the-pizza topping game, which would be a custom build and not an existing demo. StormBurger, with build-your-burger, is the closest demo style. Customers earn points on visits, earn rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "The closest style is Gritz N Wafflez's Order Up!, where guests build real dishes. A pizza-topping builder game would be a custom build, not an existing demo. Customers earn points on visits, get rewards for sharing with friends, and the weekly high score wins a prize."
   },
   {
    "type": "taco shop",
@@ -302,7 +313,7 @@
     "latin",
     "antojitos"
    ],
-   "a": "A taco shop gets a photo menu, ordering and a match puzzle game. Churrito Loco (Loco Match) is the closest demo, and the food truck app suits taco trucks. Customers earn points on visits, earn rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "Churrito Loco (South Gate) is the closest demo, with its Loco Match puzzle game. If you're a taco truck, see the food truck app. A taco-stacking game would be a custom build. Customers earn points on visits, get rewards for sharing with friends, and the weekly high score wins a prize."
   },
   {
    "type": "BBQ",
@@ -312,650 +323,448 @@
     "smokehouse",
     "ribs",
     "brisket",
-    "grill"
+    "grill",
+    "wings"
    ],
-   "a": "A BBQ spot gets a photo menu, ordering and a game. A custom idea is a pitmaster game where you pull the ribs off the smoker at the right moment, a custom build and not an existing demo. Lucky Dragon's catch game is the closest demo style. Customers earn points on visits, earn rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "The Lucky Dragon demo is tagged for BBQ and grill spots, and Melody covers wings and burgers. A smoke-pit game where you flip ribs before they burn would be a custom build, not an existing demo. Customers earn points on visits, get rewards for sharing, and the weekly high score wins a prize."
   },
   {
    "type": "hibachi / asian",
    "keywords": [
     "hibachi",
-    "asian",
     "japanese",
-    "teriyaki",
+    "asian",
+    "chinese",
+    "korean",
+    "thai",
+    "vietnamese",
     "sushi",
     "ramen",
     "pho",
-    "korean",
-    "chinese",
-    "thai",
-    "noodles"
+    "teriyaki",
+    "noodles",
+    "fried rice"
    ],
-   "a": "Hibachi and Asian restaurants get a photo menu, a build-your-plate feature and a catch game. Lucky Dragon Hibachi (Hibachi Catch, a dragon game) is the matching demo. Customers earn points on visits, earn rewards for sharing with friends, and the weekly high score wins a prize."
+   "a": "Lucky Dragon Hibachi (Compton) is the matching demo. Its game is Hibachi Catch, a dragon game, plus a build-your-hibachi-plate feature. It also fits Japanese, Chinese, Korean, Thai and Vietnamese spots. Customers earn points on visits, get rewards for sharing, and the weekly high score wins a prize."
   }
  ],
  "qa": [
   {
    "q": "What is SousShift AI?",
-   "a": "We build branded apps, custom games and rewards for restaurants and local businesses. Guests scan a QR code, play a game made for your place, and earn rewards that bring them back.",
+   "a": "SousShift AI builds your business its own branded app with a custom game, rewards and a menu, so customers come back. It's made for restaurants and local businesses.",
    "tags": [
     "what is",
     "about",
     "sousshift",
     "who are you",
-    "what do you do",
-    "company"
+    "company",
+    "overview"
    ]
   },
   {
-   "q": "How do you say SousShift?",
-   "a": "It's SOO-shift, like sous chef.",
+   "q": "How does it work for my customers?",
+   "a": "Guests scan a QR code on the table, window or receipt and the app opens in their phone's browser. They play your game, join your rewards and come back.",
    "tags": [
-    "pronounce",
-    "name",
-    "say",
-    "sous",
-    "sous shift"
+    "how it works",
+    "customers",
+    "guests",
+    "scan",
+    "qr"
    ]
   },
   {
    "q": "How much does it cost?",
-   "a": "Menu is $750 setup + $99/mo, Rewards $2,000 + $300/mo, Full Show $2,500 + $400/mo, and Everything $3,500 + $600/mo. Want me to explain which fits you best?",
+   "a": "There are four plans: Menu $750 setup + $99/mo, Rewards $2,000 + $300/mo, Full Show $2,500 + $400/mo, and Everything $3,500 + $600/mo. Setup is one-time and the monthly is per business.",
    "tags": [
     "price",
     "cost",
     "how much",
     "pricing",
     "plans",
-    "fee",
-    "rates",
-    "prices"
-   ]
-  },
-  {
-   "q": "What plans do you have?",
-   "a": "Four: Menu, Rewards, Full Show (most popular) and Everything. Each one builds on the one before it.",
-   "tags": [
-    "plans",
-    "packages",
-    "tiers",
-    "options",
-    "which plan"
+    "fee"
    ]
   },
   {
    "q": "What's in the Menu plan?",
-   "a": "Menu is $750 setup + $99/mo. You get your own app with no download, a 4K photo menu with table ordering, 12 languages, a map and Google reviews button, and QR table tents.",
+   "a": "Menu is $750 setup + $99/mo. It includes your own app with no download, a 4K photo menu with table ordering, 12 languages, a map and Google reviews button, and QR table tents.",
    "tags": [
     "menu plan",
     "cheapest",
     "basic",
     "starter",
-    "$99",
-    "750"
+    "99"
    ]
   },
   {
    "q": "What's in the Rewards plan?",
-   "a": "Rewards is $2,000 setup + $300/mo. It adds your own custom game with a weekly leaderboard, points with scan-to-earn and visit levels, a birthday club and your customer list, on top of everything in Menu.",
+   "a": "Rewards is $2,000 setup + $300/mo. It includes everything in Menu plus your own custom game with a weekly leaderboard, points with scan-to-earn and visit levels, a birthday club and your customer list.",
    "tags": [
     "rewards plan",
+    "300",
     "game",
-    "points",
-    "$300",
-    "2000",
-    "leaderboard"
+    "leaderboard",
+    "points"
    ]
   },
   {
    "q": "What's in the Full Show plan?",
-   "a": "Full Show is $2,500 setup + $400/mo, and it's our most popular plan. It adds referrals, text blasts to your list, special deals, build-your-meal and a motion menu where drinks pour and food steams, on top of Rewards.",
+   "a": "Full Show is $2,500 setup + $400/mo and is the most popular. It includes everything in Rewards plus referrals, text blasts to your list, special deals, build-your-meal and a motion menu where drinks pour and food steams.",
    "tags": [
     "full show",
     "popular",
-    "$400",
-    "2500",
+    "400",
     "referrals",
     "text blasts",
-    "best"
+    "motion menu"
    ]
   },
   {
    "q": "What's in the Everything plan?",
-   "a": "Everything is $3,500 setup + $600/mo. It adds an AI agent that answers your phone 24/7, AI email and win-back campaigns, and a promo video ad, on top of Full Show.",
+   "a": "Everything is $3,500 setup + $600/mo. It includes everything in Full Show plus an AI agent that answers your phone 24/7, AI email and win-back campaigns, and a promo video ad.",
    "tags": [
-    "everything",
+    "everything plan",
+    "600",
     "top plan",
-    "$600",
-    "3500",
-    "premium",
-    "all in"
+    "ai agent",
+    "promo video",
+    "win-back"
    ]
   },
   {
    "q": "Which plan should I pick?",
-   "a": "Menu if you just want a great ordering menu, Rewards if you want the game and rewards, and Full Show if you also want referrals and text blasts. Choose Everything if you want an AI phone agent too. Most owners pick Full Show.",
+   "a": "Menu if you just want a polished ordering menu. Rewards if you want the game and points. Full Show if you want referrals and text blasts, which is our most popular. Everything if you also want the AI phone agent and win-back campaigns.",
    "tags": [
     "which plan",
     "recommend",
     "best plan",
     "choose",
-    "pick",
-    "what plan"
+    "compare"
+   ]
+  },
+  {
+   "q": "What's the most popular plan?",
+   "a": "Full Show at $2,500 setup + $400/mo is the most popular plan.",
+   "tags": [
+    "popular",
+    "most popular",
+    "best seller"
    ]
   },
   {
    "q": "Is there a setup fee?",
-   "a": "Yes, each plan has a one-time setup fee: Menu $750, Rewards $2,000, Full Show $2,500, Everything $3,500. After that it's the monthly price.",
+   "a": "Yes. Setup is one-time: $750 for Menu, $2,000 for Rewards, $2,500 for Full Show and $3,500 for Everything. Then you pay the monthly price.",
    "tags": [
-    "setup fee",
     "setup",
-    "one time",
-    "upfront",
-    "startup"
+    "setup fee",
+    "one-time",
+    "upfront"
    ]
   },
   {
-   "q": "What is the monthly fee for?",
-   "a": "The monthly covers your app and everything in your plan. Per the source, that includes hosting, updates and support.",
-   "tags": [
-    "monthly",
-    "per month",
-    "recurring",
-    "what do i pay monthly",
-    "hosting",
-    "support"
-   ]
-  },
-  {
-   "q": "What's included versus add-ons?",
-   "a": "Everything listed in your plan is included. The AI Text Assistant ($75/mo) and AI Voice Host + Text ($150/mo) are optional add-ons, and the Everything plan already includes an AI phone agent. Social & SEO Growth is a separate optional add-on at $1,000/mo.",
+   "q": "What's included in every app?",
+   "a": "Every app has your menu, a game made for you, instant rewards, your customer list, one-tap Google review button, 12 languages and no download. Some tools come with specific plans, so check the plan details.",
    "tags": [
     "included",
-    "add-ons",
-    "addons",
-    "extras",
-    "optional",
-    "what's extra"
+    "what do i get",
+    "features",
+    "every app"
    ]
   },
   {
-   "q": "Do you offer AI agents?",
-   "a": "Yes, two optional tiers per location: the AI Text Assistant at $75/mo and the AI Voice Host + Text at $150/mo. Both are month to month.",
+   "q": "What's an add-on and what's included?",
+   "a": "The plan features are included. The AI Text Assistant ($75/mo), AI Voice Host + Text ($150/mo), Social & SEO Growth ($1,000/mo), Online Ordering and some extras are add-ons. The Everything plan already includes an AI phone agent.",
+   "tags": [
+    "add-on",
+    "addon",
+    "included",
+    "extra",
+    "optional"
+   ]
+  },
+  {
+   "q": "How much do the AI agents cost?",
+   "a": "The AI Text Assistant is $75/mo and the AI Voice Host + Text is $150/mo. Both are per location, month to month.",
    "tags": [
     "ai agent",
-    "ai",
+    "price",
+    "75",
+    "150",
+    "ai cost",
     "phone",
-    "receptionist",
     "voice",
-    "text assistant",
-    "chatbot",
-    "answer calls"
+    "receptionist"
    ]
   },
   {
-   "q": "How much is the AI Text Assistant?",
-   "a": "$75 a month per location. Guests text your number and an AI replies 24/7 with your hours, menu, specials, reservation requests and catering info. It also texts back missed calls.",
+   "q": "What is the AI Text Assistant?",
+   "a": "For $75/mo per location, guests text your number and an AI texts back 24/7 about hours, menu, specials, reservation requests and catering. Missed calls get a text back, and anything it can't answer goes to you. 1,000 texts a month are included.",
    "tags": [
     "ai text",
     "text assistant",
-    "$75",
-    "texting",
     "sms",
+    "75",
+    "texting",
     "missed call"
    ]
   },
   {
-   "q": "How much is the AI Voice Host?",
-   "a": "$150 a month per location, and it includes the Text Assistant. A natural AI voice answers your phone 24/7 or after hours, takes reservation requests, transfers to staff and texts links during the call.",
+   "q": "What is the AI Voice Host?",
+   "a": "For $150/mo per location, a natural AI voice answers your phone 24/7 or only after hours. It takes reservation requests, transfers to staff and texts links during the call. It includes the Text Assistant, plus 750 minutes and 1,000 texts a month.",
    "tags": [
-    "voice host",
     "ai voice",
-    "$150",
+    "voice host",
     "phone",
-    "answer phone",
     "receptionist",
+    "answers phone",
+    "150",
     "calls"
    ]
   },
   {
-   "q": "How many texts and minutes are included in the AI agents?",
-   "a": "The Text Assistant includes 1,000 texts a month, then $0.03 a text. The Voice Host + Text includes 750 call minutes and 1,000 texts, then $0.15 a minute and $0.03 a text. We tell you before you ever go over.",
-   "tags": [
-    "minutes",
-    "texts included",
-    "limit",
-    "overage",
-    "usage",
-    "how many texts"
-   ]
-  },
-  {
-   "q": "Is the AI agent price per location?",
-   "a": "Yes. Both AI tiers are priced per location, per month, and you pick one tier.",
-   "tags": [
-    "per location",
-    "multiple locations",
-    "ai agent price",
-    "locations"
-   ]
-  },
-  {
-   "q": "Does the AI voice sound like a robot?",
-   "a": "It uses a natural, modern AI voice and handles back-and-forth questions. You can try it yourself on the agents demo page. It says it's an AI if asked and never pretends to be a person.",
+   "q": "Does the AI sound like a robot?",
+   "a": "It uses a natural, modern AI voice that handles back-and-forth questions. Some callers may notice it's an AI, and it says so if asked. It never pretends to be a person.",
    "tags": [
     "robot",
-    "sounds like",
     "natural",
-    "human",
+    "sounds like",
     "voice quality",
     "ai voice"
    ]
   },
   {
-   "q": "Can I hear the AI phone host?",
-   "a": "Yes. There are two demo voice hosts: Kira for Melody Bar & Grill and Kai for Nalu Vida. Tap one, allow your microphone and ask about hours, the menu or a table for six. Demos don't take real orders or reservations.",
-   "tags": [
-    "demo voice",
-    "kira",
-    "kai",
-    "try ai",
-    "talk to ai",
-    "hear",
-    "agents demo"
-   ]
-  },
-  {
    "q": "What if the AI doesn't know the answer?",
-   "a": "It doesn't guess. It tells the customer it will get a person, then texts you or your manager the question with the customer's name and number.",
+   "a": "It doesn't guess. It tells the customer it'll get a person, then texts the question to you or your manager with the customer's name and number.",
    "tags": [
-    "doesn't know",
-    "hand off",
+    "doesnt know",
+    "handoff",
     "escalate",
-    "wrong answer",
-    "human",
-    "fallback"
+    "unknown question"
    ]
   },
   {
    "q": "Can the AI take reservations?",
-   "a": "It collects reservation requests (name, party size, date, time and phone) and sends them to your staff to confirm. It doesn't book into your system or promise a table on its own.",
+   "a": "It collects reservation requests (name, party size, date, time, phone) and sends them to your staff to confirm. It doesn't book into your system or promise a table on its own.",
    "tags": [
     "reservations",
-    "book table",
     "booking",
-    "reserve",
     "table",
-    "ai reservations"
+    "ai"
    ]
   },
   {
-   "q": "What phone number does the AI use?",
-   "a": "Your existing number through call forwarding, which usually takes a few minutes in your phone settings, or a new local number we set up for you. We walk you through it.",
+   "q": "What number does the AI use?",
+   "a": "It uses your existing number through call forwarding, which we walk you through, or a new local number we set up for you. For texting on your existing number, we register it with the carriers.",
    "tags": [
     "phone number",
-    "call forwarding",
-    "number",
-    "forward",
-    "existing number"
-   ]
-  },
-  {
-   "q": "How long does it take to set up the AI agent?",
-   "a": "We load your hours, menu, specials and FAQs, then test it with you. Texting needs carrier registration (A2P 10DLC), which usually takes a few days, and the voice host needs call forwarding turned on. We handle both and tell you when it's live.",
-   "tags": [
-    "ai setup",
+    "forwarding",
+    "existing number",
     "a2p",
-    "10dlc",
-    "carrier",
-    "how long ai",
-    "go live ai"
+    "carrier"
    ]
   },
   {
-   "q": "Are there texting rules I need to worry about?",
-   "a": "We handle them. Replying to customers who texted first is fine, promotional texts only go to people who opted in, every one says who it's from and honors STOP, and we send only between 8 AM and 9 PM.",
+   "q": "Are there limits on AI texts and minutes?",
+   "a": "The Text Assistant includes 1,000 texts a month, then $0.03 a text. The Voice Host + Text includes 750 call minutes and 1,000 texts, then $0.15 a minute and $0.03 a text. We tell you before you go over.",
    "tags": [
-    "texting rules",
-    "opt in",
-    "stop",
-    "compliance",
-    "legal",
-    "spam",
-    "tcpa"
+    "limits",
+    "minutes",
+    "texts included",
+    "overage",
+    "usage"
    ]
   },
   {
    "q": "Is there a contract for the AI agents?",
-   "a": "No long contract. It's month to month per location, and you can switch tiers or cancel anytime.",
+   "a": "No long contract. The AI agents are month to month per location, and you can switch tiers or cancel anytime.",
    "tags": [
     "ai contract",
     "cancel ai",
     "month to month",
-    "switch tier"
+    "ai agent"
    ]
   },
   {
-   "q": "Does the AI guarantee more orders?",
-   "a": "No. The AI is very good but not perfect, and we don't promise a set number of extra orders. It makes sure every text and call gets an answer.",
+   "q": "How long does the AI take to set up?",
+   "a": "We load your hours, menu, specials and FAQs, then test it with you. Texting needs carrier registration, which usually takes a few days. Voice needs call forwarding on your number, and we handle both.",
    "tags": [
-    "guarantee",
-    "promise",
-    "results ai",
-    "more orders",
-    "perfect"
+    "ai setup",
+    "how long",
+    "timeline",
+    "a2p",
+    "forwarding"
    ]
   },
   {
-   "q": "What would the AI agents cost elsewhere?",
-   "a": "Roughly, AI phone answering runs about $199 to $399 a month and AI texting about $69, while ours are $75 and $150. Those are ballpark published prices as of Oct 2026, not quotes.",
+   "q": "Can I try the AI voice?",
+   "a": "Yes. There are demo voice hosts: Kira for Melody Bar & Grill and Kai for Nalu Vida. You can talk to them in your browser on the agents page. They don't take real reservations or orders.",
    "tags": [
-    "compare ai",
-    "elsewhere",
-    "competitor",
-    "slang",
-    "loman",
-    "cheaper"
+    "demo ai",
+    "kira",
+    "kai",
+    "try voice",
+    "talk to ai"
    ]
   },
   {
-   "q": "What is Social & SEO Growth?",
-   "a": "An optional add-on at $1,000 a month. It covers a content plan, short videos from your food, posting on Instagram, TikTok and YouTube, Google Business Profile and local SEO, and a monthly report. We don't guarantee follower or view counts.",
+   "q": "Can I just talk to someone?",
+   "a": "Yes. Call (424) 296-3303, any time, 24/7. Nia, SousShift's AI guide, explains the plans and add-ons, answers your questions and connects you to Antidote. It's calls only, so please don't text that number.",
    "tags": [
-    "social",
-    "seo",
+    "talk to someone",
+    "call",
+    "phone number",
+    "contact",
+    "human",
+    "speak",
+    "nia",
+    "sales line",
+    "person"
+   ]
+  },
+  {
+   "q": "Who is Nia?",
+   "a": "Nia is SousShift's AI guide on our 24/7 sales line, (424) 296-3303. She explains the plans and add-ons, answers questions about SousShift and connects callers to Antidote.",
+   "tags": [
+    "nia",
+    "ai guide",
+    "sales line",
+    "who answers"
+   ]
+  },
+  {
+   "q": "Can I text the phone number?",
+   "a": "Not yet. The line at (424) 296-3303 is calls only. For written messages, email secondshiftai@gmail.com or DM @SousShiftAi on Instagram.",
+   "tags": [
+    "text",
+    "sms",
+    "texting number",
+    "message"
+   ]
+  },
+  {
+   "q": "What's your email?",
+   "a": "Our email is secondshiftai@gmail.com.",
+   "tags": [
+    "email",
+    "contact",
+    "write",
+    "mail"
+   ]
+  },
+  {
+   "q": "What's your Instagram?",
+   "a": "Find us on Instagram at @SousShiftAi and send a DM anytime.",
+   "tags": [
     "instagram",
-    "tiktok",
-    "followers",
-    "google business",
-    "marketing",
-    "content"
+    "ig",
+    "dm",
+    "social",
+    "handle"
    ]
   },
   {
-   "q": "Do you offer payment plans for the setup?",
-   "a": "Yes, three ways: pay in full at signing, split 50/50 (half at signing, half when your app is delivered), or the flexible plan, which starts at $750 down.",
+   "q": "How do I book a call or get a demo?",
+   "a": "Call (424) 296-3303 any time, email secondshiftai@gmail.com or DM @SousShiftAi. You can also ask for a free sample app built with your own menu.",
    "tags": [
-    "payment plan",
-    "financing",
-    "pay over time",
-    "installments",
-    "split",
-    "down payment",
-    "afford"
-   ]
-  },
-  {
-   "q": "How does the flexible payment plan work?",
-   "a": "You put at least $750 down per restaurant. The rest of the setup is split into 12 equal pieces added to your monthly, with no extra charge, and then your monthly drops back to normal.",
-   "tags": [
-    "flexible",
-    "down payment",
-    "$750",
-    "12 months",
-    "spread out",
-    "less down"
-   ]
-  },
-  {
-   "q": "Is there interest or a fee on the flexible plan?",
-   "a": "No extra charge. The setup still totals the same amount. It's simple math spread over 12 months, not a loan.",
-   "tags": [
-    "interest",
-    "fee",
-    "extra charge",
-    "loan",
-    "apr",
-    "financing fee"
-   ]
-  },
-  {
-   "q": "Can I split the setup 50/50?",
-   "a": "Yes. Pay 50% when you sign and 50% when your app is delivered (Go-Live). The monthly starts the day you sign.",
-   "tags": [
-    "50/50",
-    "split",
-    "half",
-    "go live payment",
-    "two payments"
-   ]
-  },
-  {
-   "q": "When does the monthly fee start?",
-   "a": "The monthly starts the day you sign.",
-   "tags": [
-    "monthly start",
-    "billing",
-    "when charged",
-    "first payment"
-   ]
-  },
-  {
-   "q": "Is there a contract? Can I cancel?",
-   "a": "New agreements have a 3-month minimum, then it's month to month, and either side can cancel with 30 days' written notice (email counts). AI add-ons are month to month from day one.",
-   "tags": [
-    "cancel",
-    "contract",
-    "month to month",
-    "minimum",
-    "commitment",
-    "lock in",
-    "terminate"
-   ]
-  },
-  {
-   "q": "What if the app doesn't bring customers back?",
-   "a": "New agreements include a results promise: if in the first 3 months after Go-Live there's no 30-day period where the app brought back at least 30 tracked return visits, your next 2 monthly payments are waived. It's a results promise, not a sales guarantee.",
-   "tags": [
-    "results",
-    "guarantee",
-    "promise",
-    "doesn't work",
-    "refund",
-    "risk",
-    "free months"
-   ]
-  },
-  {
-   "q": "Is there a percentage of my sales?",
-   "a": "New agreements include a performance share: in a month your app customers spend more than $3,000 on food and non-alcoholic drinks, we get 10% of only the amount over $3,000. For example, $5,000 in app sales is $200. Under $3,000 nothing extra is owed, and it never counts alcohol, tax, tips or your total sales.",
-   "tags": [
-    "percentage",
-    "10%",
-    "performance share",
-    "commission",
-    "cut",
-    "revenue share",
-    "royalty"
-   ]
-  },
-  {
-   "q": "Who owns my customer list?",
-   "a": "You do. You get full access and CSV export anytime, and a complete export if you ever leave. We never sell it or use it for another business.",
-   "tags": [
-    "customer list",
-    "data",
-    "own",
-    "export",
-    "csv",
-    "privacy",
-    "crm"
-   ]
-  },
-  {
-   "q": "Do I keep my data if I cancel?",
-   "a": "Yes. You get a complete export of your customers within 10 days after the service ends.",
-   "tags": [
-    "cancel data",
-    "leave",
-    "export",
-    "keep list"
-   ]
-  },
-  {
-   "q": "I'm already a client. Do my prices change?",
-   "a": "No. Signed deals keep their terms. Current prices are for new restaurants.",
-   "tags": [
-    "existing client",
-    "already a client",
-    "price change",
-    "current customer"
+    "book",
+    "schedule",
+    "demo",
+    "call",
+    "appointment",
+    "get started"
    ]
   },
   {
    "q": "How do I get started?",
-   "a": "Start with the free sample: tell us about your business, add a few menu items and 2 to 6 photos. It takes about 3 minutes. Or DM @second.shiftai or email secondshiftai@gmail.com.",
+   "a": "Request your free sample: tell us about your business, then Antidote builds it and you see it on your phone. If you like it, we move to your plan and build the full app. You can also call (424) 296-3303.",
    "tags": [
     "get started",
     "start",
     "sign up",
     "begin",
-    "how do i",
-    "onboard"
+    "next step"
    ]
   },
   {
    "q": "What is the free sample?",
-   "a": "A working preview of your own app with your name, menu, photos and a rewards game. It's free, with no card and no pressure.",
+   "a": "A working preview of your app with your name, menu, photos and a rewards game. It's free with no card and no pressure.",
    "tags": [
     "free sample",
     "free demo",
-    "sample app",
     "preview",
-    "free trial",
-    "try"
+    "trial",
+    "free"
    ]
   },
   {
-   "q": "How does the free sample work?",
-   "a": "Three steps: tell us about your business (about 3 minutes), Antidote reviews and builds it personally, then you see it on your phone. Play it, show your staff, then decide.",
+   "q": "How do I get the free sample?",
+   "a": "Fill out the short form (about 3 minutes): pick your business type, add a few items and prices, and drop 2 to 6 photos. Antidote reviews it personally and builds it, usually the same day.",
    "tags": [
     "sample steps",
-    "how sample works",
-    "process",
-    "steps"
-   ]
-  },
-  {
-   "q": "How fast do I get the sample?",
-   "a": "Antidote usually builds your sample the same day.",
-   "tags": [
-    "how fast",
-    "sample time",
-    "same day",
-    "turnaround",
-    "how long sample"
-   ]
-  },
-  {
-   "q": "What do you need from me for the sample?",
-   "a": "Your business type, name and a phone or email, a few menu items with prices, and 2 to 6 photos, starting with your logo or storefront. You can paste your whole menu list instead.",
-   "tags": [
-    "what do you need",
-    "requirements",
+    "form",
     "photos",
-    "menu",
-    "information",
-    "materials"
+    "how to",
+    "free sample"
    ]
   },
   {
-   "q": "How do I book a call or get a demo?",
-   "a": "DM @second.shiftai on Instagram or email secondshiftai@gmail.com and we'll set it up. You can also build a free sample first.",
+   "q": "Does the free sample cost anything?",
+   "a": "No. It's free, with no card needed. You see it on your phone, show your staff, and then decide.",
    "tags": [
-    "book call",
-    "demo",
-    "schedule",
-    "call",
-    "meeting",
-    "talk to someone",
-    "appointment"
-   ]
-  },
-  {
-   "q": "How do I contact you?",
-   "a": "Email secondshiftai@gmail.com or DM @second.shiftai on Instagram.",
-   "tags": [
-    "contact",
-    "email",
-    "instagram",
-    "reach",
-    "dm",
-    "get in touch"
-   ]
-  },
-  {
-   "q": "What's your Instagram?",
-   "a": "@second.shiftai.",
-   "tags": [
-    "instagram",
-    "ig",
-    "social",
-    "handle",
-    "dm"
-   ]
-  },
-  {
-   "q": "What's your email?",
-   "a": "secondshiftai@gmail.com.",
-   "tags": [
-    "email",
-    "mail",
-    "address",
-    "contact"
-   ]
-  },
-  {
-   "q": "What's your phone number?",
-   "a": "We're best reached by Instagram DM @second.shiftai or email at secondshiftai@gmail.com.",
-   "tags": [
-    "phone number",
-    "call you",
-    "text you",
-    "number"
-   ]
-  },
-  {
-   "q": "How long does it take to build my app?",
-   "a": "The sample is usually same day. For the full app, most restaurants go live within a couple of weeks of getting us the menu, photos and logo.",
-   "tags": [
-    "timeline",
-    "how long",
-    "build time",
-    "go live",
-    "weeks",
-    "when ready",
-    "launch"
+    "free",
+    "no card",
+    "no pressure",
+    "sample cost"
    ]
   },
   {
    "q": "What are the onboarding steps?",
-   "a": "1) Free demo or sample built from your real menu. 2) We build your app with your logo, colors, a game made for your food and the rewards you choose. 3) QR codes go on tables and the window, and guests scan, play, earn and come back.",
+   "a": "1. A free demo with your real menu on your phone. 2. We build your app with your logo, colors, a game made for your food and rewards you choose. 3. QR codes go on tables and the window, and guests play, earn rewards and return.",
    "tags": [
     "onboarding",
     "steps",
     "process",
     "how it works",
-    "what happens"
+    "timeline"
    ]
   },
   {
-   "q": "How do my customers get the app?",
-   "a": "They scan your QR code on a table, window or receipt and it opens in their browser. Then they can add it to their home screen. No app store or account.",
+   "q": "How long until my app is live?",
+   "a": "Most restaurants go live within a couple of weeks of getting us the menu, photos and logo. Your onboarding page tracks every step.",
+   "tags": [
+    "timeline",
+    "how long",
+    "go live",
+    "launch",
+    "weeks",
+    "fast"
+   ]
+  },
+  {
+   "q": "What do you need from me?",
+   "a": "Your menu, photos, logo and deals. You keep the setup page current, and we build the rest.",
+   "tags": [
+    "what do you need",
+    "requirements",
+    "menu",
+    "photos",
+    "logo"
+   ]
+  },
+  {
+   "q": "Do customers have to download anything?",
+   "a": "No. They scan the QR code and the app opens in their browser. They can add it to their Home Screen so it sits on their phone like any other app.",
    "tags": [
     "download",
     "app store",
-    "how customers get",
     "install",
-    "scan",
-    "no download"
+    "no download",
+    "home screen"
    ]
   },
   {
-   "q": "How do customers add it to their phone's home screen?",
-   "a": "On iPhone, tap Share then Add to Home Screen. On Android, tap the menu (three dots) then Install app.",
+   "q": "How do customers add it to their phone?",
+   "a": "On iPhone, tap Share then Add to Home Screen. On Android, tap the menu then Install app.",
    "tags": [
-    "home screen",
     "add to home screen",
     "iphone",
     "android",
@@ -963,574 +772,681 @@
    ]
   },
   {
-   "q": "Do customers need to download anything?",
-   "a": "No. It's a web link that opens when they scan the QR code. No download, no password.",
+   "q": "How do rewards and points work?",
+   "a": "Customers earn points on visits and scan-to-earn, and level up through visit levels. They get a gold loyalty card and a live reward pass, and birthdays get a treat. Points unlock rewards you choose.",
    "tags": [
-    "download",
-    "install",
-    "app store",
-    "password",
-    "account"
+    "rewards",
+    "points",
+    "loyalty",
+    "visit levels",
+    "birthday",
+    "how rewards work"
    ]
   },
   {
-   "q": "How do points and rewards work?",
-   "a": "Customers earn points on every visit, with scan-to-earn, and level up through Regular, VIP and Legend. They get a birthday treat and can redeem rewards you choose.",
+   "q": "What are the visit levels?",
+   "a": "Members level up from Regular to VIP to Legend as they visit, and get a birthday treat.",
    "tags": [
-    "points",
-    "rewards",
-    "loyalty",
     "levels",
     "vip",
     "legend",
-    "birthday",
-    "earn"
+    "regular",
+    "tiers"
    ]
   },
   {
    "q": "How does the weekly contest work?",
-   "a": "The game has a weekly leaderboard. The top score each week wins a prize you choose, like a free item, and the board resets weekly. There's also a free daily spin and a weekly giveaway.",
+   "a": "Your custom game has a weekly leaderboard, and the top score wins a prize that you choose. It resets each week, which gives guests a reason to come back. Gritz N Wafflez, for example, gives a karaoke shoutout to the top score.",
    "tags": [
     "weekly contest",
     "weekly prize",
-    "contest",
-    "winner",
     "high score",
+    "winner",
     "giveaway",
-    "champion",
-    "daily spin"
+    "prize"
    ]
   },
   {
-   "q": "How does the leaderboard work?",
-   "a": "Guests play your game, their scores post to a weekly leaderboard, and the weekly champion wins a prize. It gives people a reason to come back every week.",
+   "q": "What is the leaderboard?",
+   "a": "A weekly leaderboard shows the top scores in your game, with a weekly champion. It's included from the Rewards plan up.",
    "tags": [
     "leaderboard",
-    "scores",
     "champion",
-    "ranking",
-    "top score",
-    "prize board"
+    "scores",
+    "ranking"
    ]
   },
   {
-   "q": "What kind of prizes can the winner get?",
-   "a": "Prizes are chosen by you, like free menu items. At Gritz N Wafflez, the top score gets a karaoke shoutout, and reward codes are good for 3 days.",
+   "q": "Do you have a daily spin?",
+   "a": "The app includes a free daily spin, a weekly leaderboard and a weekly giveaway. That gives guests a reason to open it every day.",
    "tags": [
-    "prizes",
-    "prize",
-    "what do winners get",
-    "free item",
-    "reward",
-    "karaoke"
+    "daily spin",
+    "spin",
+    "giveaway",
+    "daily"
    ]
   },
   {
    "q": "How do referrals work?",
-   "a": "A customer shares their invite code with a friend. When the friend joins, both get something, and you can see who brings in the most people. Referrals come with the Full Show plan and up.",
+   "a": "Customers invite friends with an invite code. When a friend joins, both get a reward, and you can see who brings in the most. Referrals are included from the Full Show plan.",
    "tags": [
     "referral",
     "refer a friend",
     "invite",
     "share",
-    "friends",
-    "invite a friend",
-    "word of mouth"
+    "friends"
    ]
   },
   {
-   "q": "Can I text my customers?",
-   "a": "Yes, with Full Show and up you can send text blasts to your list, only to people who opted in. Birthday and we-miss-you messages are part of the bring-back tools.",
+   "q": "How do customers redeem a reward?",
+   "a": "They show a reward code or their gold card to staff. At Gritz N Wafflez, the reward codes are good for 3 days. Staff can look up a member by phone or scan their code.",
    "tags": [
-    "text blasts",
-    "sms",
-    "text customers",
-    "marketing",
-    "promotions",
-    "birthday",
-    "win-back"
+    "redeem",
+    "reward code",
+    "gold card",
+    "staff scan",
+    "claim"
    ]
   },
   {
-   "q": "Do customers get a birthday reward?",
-   "a": "Yes. The Rewards plan includes a birthday club and a birthday treat.",
+   "q": "What is the custom game?",
+   "a": "A game themed to your business that guests play while they wait, such as a flight game for Melody and a surf game for Nalu Vida. Hitting the prize score wins something from your menu.",
    "tags": [
-    "birthday",
-    "birthday club",
-    "birthday treat",
-    "bday"
-   ]
-  },
-  {
-   "q": "What is the customer list?",
-   "a": "Every signup is saved for you with name, phone, birthday and visits, so you can see VIPs, birthdays and who hasn't been back. You can export it anytime.",
-   "tags": [
-    "customer list",
-    "crm",
-    "signups",
-    "database",
-    "contacts",
-    "vip"
-   ]
-  },
-  {
-   "q": "What games do you build?",
-   "a": "Every game is custom to your business. Our demos include a flight game, a surf game, Order Up!, Storm Run, a match puzzle and a hibachi catch game. Yours gets your food, logo and brand.",
-   "tags": [
-    "games",
     "game",
-    "what games",
     "custom game",
     "arcade",
-    "play"
+    "play",
+    "themed"
    ]
   },
   {
-   "q": "Can the game feature me as a character?",
-   "a": "Yes. The game can be themed with your food and logo, and can feature you as a cartoon character.",
-   "tags": [
-    "character",
-    "cartoon",
-    "owner",
-    "mascot",
-    "me in game"
-   ]
-  },
-  {
-   "q": "Are the games for kids too?",
-   "a": "The games include Kid and Adult modes.",
-   "tags": [
-    "kids",
-    "adult mode",
-    "family",
-    "kid mode"
-   ]
-  },
-  {
-   "q": "What demos can I try?",
-   "a": "Melody Bar & Grill, Nalu Vida, Gritz N Wafflez, StormBurger, Churrito Loco, Lucky Dragon Hibachi, an ice cream truck app, a food truck app and a mechanic app. You can open and play them.",
-   "tags": [
-    "demos",
-    "examples",
-    "samples",
-    "live demos",
-    "try",
-    "see apps",
-    "portfolio",
-    "clients"
-   ]
-  },
-  {
-   "q": "What's the Melody Bar & Grill demo?",
-   "a": "Melody Bar & Grill is in Westchester by LAX. It has a flight game where you land the plane at LAX for prizes, table and bar ordering, star rewards, a weekly champion and a Just Landed deal for travelers.",
+   "q": "What is the Melody Bar & Grill demo?",
+   "a": "Melody Bar & Grill, in Westchester by LAX, is our first onboarded partner and is going live now. Its game is a flight game where you land the plane at LAX for prizes. It has table ordering, drinks that pour, a Just Landed deal and a leaderboard.",
    "tags": [
     "melody",
-    "melody bar",
     "lax",
     "flight game",
-    "airport",
     "westchester",
-    "plane"
+    "bar and grill",
+    "demo"
    ]
   },
   {
-   "q": "What's the Nalu Vida demo?",
-   "a": "Nalu Vida is a beach bar at the foot of the Venice Pier. Its game is Ride the Nalu, a surf game, with a 4K menu, ordering from your seat, live happy-hour and brunch status, and a weekly champion.",
+   "q": "What is the Nalu Vida demo?",
+   "a": "Nalu Vida is a Venice Pier beach bar, with the surf game 'Ride the Nalu', a 4K menu, live happy-hour and brunch status, and a weekly champion. It's still in the works, not live yet.",
    "tags": [
     "nalu vida",
-    "nalu",
-    "venice",
     "surf",
-    "surf game",
+    "venice pier",
     "beach bar",
-    "pier"
+    "demo",
+    "ride the nalu"
    ]
   },
   {
-   "q": "What's the Gritz N Wafflez demo?",
-   "a": "Gritz N Wafflez in Koreatown has Order Up!, where guests run the kitchen and serve plates while they wait. It has their real menu with photos, a weekly prize board with a karaoke shoutout, and reward codes good for 3 days.",
+   "q": "What is the Gritz N Wafflez demo?",
+   "a": "Gritz N Wafflez (Koreatown, 3183 Wilshire Blvd) has the 'Order Up!' game where you run the kitchen and serve plates. It has a real photo menu, a weekly prize board with a karaoke shoutout, and reward codes. It's still in the works, not live yet.",
    "tags": [
     "gritz",
     "wafflez",
-    "gritz n wafflez",
     "order up",
+    "waffle run",
     "koreatown",
-    "waffles",
-    "breakfast"
+    "breakfast",
+    "demo"
    ]
   },
   {
-   "q": "What's the StormBurger demo?",
-   "a": "StormBurger (Inglewood and Long Beach) has Storm Run, a driving game, plus build-your-burger and rewards.",
+   "q": "What is the StormBurger demo?",
+   "a": "StormBurger (Inglewood and Long Beach) is a demo sample with the 'Storm Run' driving game, build-your-burger and rewards.",
    "tags": [
     "stormburger",
-    "storm burger",
     "storm run",
-    "driving game",
     "burger",
-    "inglewood",
-    "long beach"
+    "driving game",
+    "demo"
    ]
   },
   {
-   "q": "What's the Churrito Loco demo?",
-   "a": "Churrito Loco in South Gate has Loco Match, a Candy-Crush style puzzle game featuring their mascot.",
+   "q": "What is the Churrito Loco demo?",
+   "a": "Churrito Loco (South Gate) is a demo sample with 'Loco Match', a Candy-Crush style puzzle game featuring their mascot.",
    "tags": [
     "churrito loco",
     "loco match",
     "puzzle",
     "churros",
-    "south gate",
-    "candy crush",
-    "match game"
+    "dessert",
+    "demo"
    ]
   },
   {
-   "q": "What's the Lucky Dragon demo?",
-   "a": "Lucky Dragon Hibachi in Compton has Hibachi Catch, a dragon game, plus a build-your-hibachi-plate feature.",
+   "q": "What is the Lucky Dragon demo?",
+   "a": "Lucky Dragon (Compton) is a hibachi demo sample with the 'Hibachi Catch' dragon game and a build-your-hibachi-plate feature.",
    "tags": [
     "lucky dragon",
-    "hibachi",
     "hibachi catch",
+    "hibachi",
     "dragon",
     "compton",
-    "build plate"
+    "demo"
    ]
   },
   {
-   "q": "What's the mechanic app demo?",
-   "a": "Carlos' Mobile Mechanic lets customers tap the part of their car that's wrong, get a sample quote, scan with an OBD-II reader, see recalls and book a time. It also has a shop view where each request shows the car, codes and quote.",
+   "q": "Do you have a mechanic app demo?",
+   "a": "Yes. The Your Auto Shop demo covers repair, tires, quick lube, body and detailing. Customers type or tap what's wrong, see a sample price or ask for a quote, check tire stock, book a time and pay by QR.",
    "tags": [
-    "mechanic",
-    "carlos",
-    "mobile mechanic",
+    "mechanic demo",
+    "auto demo",
     "auto shop",
     "car repair",
-    "obd",
-    "quote",
-    "garage"
+    "tire",
+    "demo"
    ]
   },
   {
-   "q": "What's the ice cream truck app?",
-   "a": "Customers scan a QR sticker once, then see the truck on a live map. Their phone rings when the truck is close and they get an ETA. There's a 5-check-in reward and 10 points per purchase.",
+   "q": "Do you have an ice cream truck app?",
+   "a": "Yes, there's a demo. Customers see the truck on a live map with an ETA, and their phone rings when you're close. Rewards include 5 check-ins for 10% off or an extra scoop.",
    "tags": [
     "ice cream truck",
-    "ice cream",
-    "truck alerts",
     "truck app",
-    "jingle",
-    "ring",
+    "ice cream demo",
+    "truck alerts",
     "live map"
    ]
   },
   {
-   "q": "What's the food truck app?",
-   "a": "Customers see a live map, today's stops and hours, and get parked-nearby alerts. They can order ahead, timed so food comes off the grill as they arrive. You also get an owner live view with a cook queue.",
+   "q": "Do you have a food truck app?",
+   "a": "Yes. Customers see a live map, today's stops, distance and a countdown, and can order ahead timed so food comes off the grill as they walk up. You get a live view with a cook queue.",
    "tags": [
     "food truck",
     "truck",
     "order ahead",
     "live map",
-    "taco truck",
-    "parked",
-    "cook queue"
+    "demo"
+   ]
+  },
+  {
+   "q": "Which demos are live?",
+   "a": "Melody Bar & Grill is our first onboarded partner and is going live now. Nalu Vida and Gritz N Wafflez are in the works, and the other apps are demo samples built to show what we build. All of them are playable.",
+   "tags": [
+    "live",
+    "demos",
+    "which demos",
+    "real",
+    "onboarded",
+    "client"
+   ]
+  },
+  {
+   "q": "Can I play the demos?",
+   "a": "Yes. Every demo is a working app you can scroll, play and try. They are on the SousShift website.",
+   "tags": [
+    "try",
+    "play",
+    "demo",
+    "see examples",
+    "examples"
    ]
   },
   {
    "q": "What do the truck plans cost?",
-   "a": "Ice cream and food truck plans are the same: Single Scoop is $99 setup + $29/mo for 1 truck, Double Scoop is $299 ($199 for the first 10 trucks) + $50/mo, and Sundae is $599 + $129/mo for up to 3 trucks. No contract.",
+   "a": "Single Scoop is $99 setup + $29/mo for 1 truck. Double Scoop is $299 setup ($199 for the first 10 trucks) + $50/mo. Sundae is $599 + $129/mo for up to 3 trucks. The same plans apply to ice cream and food trucks.",
    "tags": [
     "truck price",
+    "ice cream truck price",
+    "food truck price",
+    "single scoop",
+    "double scoop",
+    "sundae",
+    "cost"
+   ]
+  },
+  {
+   "q": "What's the difference between the truck plans?",
+   "a": "Single Scoop has the QR sticker, alerts, live map and points. Double Scoop adds payments setup and the route counter or, for food trucks, order-ahead and the cook queue. Sundae covers up to 3 trucks with slow-day blasts and a booking page.",
+   "tags": [
     "truck plans",
     "single scoop",
     "double scoop",
     "sundae",
-    "truck cost",
-    "$29",
-    "$50"
+    "street taco",
+    "combo plate",
+    "full fleet"
    ]
   },
   {
-   "q": "Does ordering ahead come with the truck plans?",
-   "a": "Ordering ahead is included from Double Scoop up.",
+   "q": "Is ordering ahead included for trucks?",
+   "a": "Yes, ordering ahead comes with Double Scoop and up.",
    "tags": [
     "order ahead",
-    "truck ordering",
+    "truck",
     "double scoop",
-    "pre-order"
+    "pickup"
    ]
   },
   {
-   "q": "Is there a legal app?",
-   "a": "Yes, a Court Companion demo app for lawyers and bail bonds. It shows court dates with reminders, courthouse directions and a lawyer task checklist. It can carry a firm's brand.",
+   "q": "Do trucks have a contract?",
+   "a": "No contract. You can move up or down a plan any time.",
    "tags": [
-    "legal",
-    "lawyer",
-    "court",
-    "bail bonds",
-    "attorney",
-    "court companion"
+    "truck contract",
+    "cancel",
+    "no contract",
+    "truck"
    ]
   },
   {
-   "q": "Can customers order from the table?",
-   "a": "Yes. Guests scan the table QR and send their order from their seat, and the app knows which table they're at.",
+   "q": "Can guests order from the table?",
+   "a": "Yes. Menu and up includes a 4K photo menu with ordering from the table, and Melody and Nalu Vida guests can order from their seat or the bar.",
    "tags": [
     "ordering",
     "table ordering",
     "order from table",
-    "qr ordering",
     "order from seat",
-    "mobile order"
+    "qr order"
    ]
   },
   {
-   "q": "How do QR codes and table cards work?",
-   "a": "Your plan includes designs for QR table stickers, a 24x36 window poster and numbered table cards. Guests scan any of them to open your app.",
+   "q": "Do you offer online ordering and delivery?",
+   "a": "Online ordering is coming soon. Pickup ordering with card payments in your app comes first, for $300/mo flat or $200/mo + 5% of the food. DoorDash delivery waits on DoorDash approval, so we don't run delivery today.",
    "tags": [
-    "qr",
-    "qr code",
-    "table cards",
-    "table tents",
-    "stickers",
-    "poster",
-    "window poster",
-    "print"
-   ]
-  },
-  {
-   "q": "Who prints the stickers and how much does printing cost?",
-   "a": "We give you print-ready files and tell you where to print. Typical print costs run about $100 to $165 per restaurant for 50 to 100 stickers, one poster and 50 table cards.",
-   "tags": [
-    "printing",
-    "print cost",
-    "stickers cost",
-    "where to print",
-    "who prints",
-    "poster"
+    "online ordering",
+    "delivery",
+    "doordash",
+    "pickup",
+    "takeout",
+    "coming soon"
    ]
   },
   {
    "q": "Does it work with Toast or Square?",
-   "a": "Yes. It works with any register, including Toast, Square and Clover. Nothing to install, and staff look up a member by phone or scan their code. We don't replace your register.",
+   "a": "Yes. It works with any register (Toast, Square, Clover and others), and nothing is installed. We connect with discount buttons today, and the onboarding page has a step-by-step guide for Toast and Square.",
    "tags": [
     "toast",
     "square",
     "pos",
     "register",
     "clover",
-    "integration",
-    "connect",
-    "work with"
+    "integration"
    ]
   },
   {
-   "q": "How does it connect to my register?",
-   "a": "It sits on top of your register. Staff can look up a member by phone number or scan their code, and app orders show up for your team. There's a step-by-step guide for Toast or Square on your onboarding page.",
+   "q": "Does it replace my register?",
+   "a": "No. It sits on top of your register. Keep Toast or Square, and add your app, game and rewards.",
    "tags": [
-    "register connection",
-    "pos connect",
-    "discount button",
-    "staff lookup",
-    "member code",
-    "rewards at register"
+    "replace",
+    "pos",
+    "register",
+    "toast",
+    "square"
    ]
   },
   {
-   "q": "What languages does the app support?",
-   "a": "The menu works in 12 languages, including Español, 中文, 한국어, Հայերեն and Русский, one tap away.",
+   "q": "I already have an app or Owner.com. Do I need this?",
+   "a": "Keep it. Your ordering app handles online orders, and we're the reason guests open your app when they're not ordering. We add the game, dine-in rewards and no per-order fees to guests.",
+   "tags": [
+    "owner.com",
+    "already have app",
+    "chownow",
+    "existing app",
+    "ordering site"
+   ]
+  },
+  {
+   "q": "What languages are supported?",
+   "a": "The menu is available in 12 languages, including Spanish, Chinese, Korean, Armenian and Russian. The staff app is in English and Spanish.",
    "tags": [
     "languages",
     "spanish",
+    "translate",
     "korean",
     "chinese",
-    "translate",
-    "multilingual",
-    "12 languages",
-    "español"
+    "multilingual"
    ]
   },
   {
-   "q": "Is the menu in 4K?",
-   "a": "Yes. You get a 4K photo menu with sharp photos of every dish that's easy to update, and signature dishes can pop in 3D.",
+   "q": "What is the staff app?",
+   "a": "A step-by-step training app in English and Spanish with real screenshots, a Listen button and a quiz. It holds no customer data.",
    "tags": [
-    "4k",
-    "photos",
-    "menu",
-    "3d",
-    "dishes",
-    "photo menu"
+    "staff app",
+    "training",
+    "employees",
+    "spanish",
+    "staff"
    ]
   },
   {
-   "q": "What's the motion menu?",
-   "a": "With Full Show and up, drinks pour and food steams right in your menu. Melody's app uses drinks that pour.",
+   "q": "What can I see in the owner back office?",
+   "a": "Members, visits, rewards and prices in one place. You decide what each employee can see and change, and every change is logged.",
    "tags": [
-    "motion menu",
-    "animated",
-    "steam",
-    "pour",
-    "animation"
+    "back office",
+    "owner view",
+    "dashboard",
+    "team access",
+    "admin"
    ]
   },
   {
-   "q": "Can I change my menu and prices?",
-   "a": "Yes. Menu and price updates are part of support, so you can just text or message us.",
+   "q": "Do I get my customer list?",
+   "a": "Yes. Every signup is saved with name, phone, birthday and visits, and you can export it as a CSV anytime. It's yours, and we never sell it.",
    "tags": [
-    "update menu",
-    "change prices",
-    "edit menu",
-    "specials",
-    "updates"
+    "customer list",
+    "crm",
+    "export",
+    "csv",
+    "data",
+    "own"
    ]
   },
   {
-   "q": "Does the app help with Google reviews?",
-   "a": "Yes. The Menu plan includes a Google reviews button and a map. Happy guests who win a reward can be nudged to leave a review.",
+   "q": "Can I text my customers?",
+   "a": "Yes. Full Show and up include text blasts to your list, such as slow-day specials, birthday treats and 'we miss you' messages. Texts only go to people who opted in, and STOP is honored automatically.",
+   "tags": [
+    "text blast",
+    "sms",
+    "marketing",
+    "win-back",
+    "birthday text",
+    "opt in"
+   ]
+  },
+  {
+   "q": "Do you help me get Google reviews?",
+   "a": "Yes. The app has a one-tap Google review button and a map showing you're nearby.",
    "tags": [
     "google reviews",
     "reviews",
-    "yelp",
-    "five star",
-    "rating"
+    "review button",
+    "map",
+    "stars"
    ]
   },
   {
-   "q": "Can I get a promo video?",
-   "a": "The Everything plan includes a promo video ad.",
+   "q": "What about QR codes and table cards?",
+   "a": "We design the QR table stickers, a 24x36 window poster and numbered table cards. The Menu plan includes QR table tents.",
    "tags": [
-    "promo video",
-    "video",
-    "commercial",
-    "ad",
-    "reel"
+    "qr",
+    "qr codes",
+    "stickers",
+    "poster",
+    "table cards",
+    "table tents",
+    "print kit"
    ]
   },
   {
-   "q": "What would this cost if I bought the tools separately?",
-   "a": "Doing it piece by piece across 15+ vendors typically runs about $600 to $1,000 a month plus several thousand dollars up front, based on published prices as of Oct 2026. Those are estimates, not quotes.",
+   "q": "Who prints the stickers and how much does it cost?",
+   "a": "Printing is done at a print shop. Typical cost is about $100 to $165 per restaurant for 50 to 100 stickers, one poster and 50 table cards. Depending on your plan, we can place the order at cost.",
    "tags": [
-    "compare",
-    "elsewhere",
-    "separately",
-    "cost elsewhere",
-    "worth it",
-    "competitors",
-    "value",
-    "owner.com",
-    "chownow"
+    "printing",
+    "print cost",
+    "stickers cost",
+    "poster",
+    "who prints"
    ]
   },
   {
-   "q": "Will it pay for itself?",
-   "a": "It's an estimate, not a promise. For example, at a $25 average visit, about 12 extra visits a month cover a $300 monthly. The owner page has sliders to try your own numbers.",
+   "q": "What payment options are there for setup?",
+   "a": "Three: pay in full at signing, split 50/50 (half at signing, half when your app is delivered), or the flexible plan from $750 down. The monthly starts the day you sign.",
    "tags": [
-    "roi",
-    "pay for itself",
-    "break even",
-    "worth",
-    "return",
-    "profit",
-    "payback"
+    "payment plan",
+    "pay",
+    "financing",
+    "split",
+    "installments",
+    "deposit",
+    "how to pay"
+   ]
+  },
+  {
+   "q": "How does the flexible payment plan work?",
+   "a": "Pay at least $750 down at signing, and the rest of the setup is spread over 12 equal pieces added to your monthly. After 12 months it drops back to your normal monthly. There's no extra charge for the flexible plan.",
+   "tags": [
+    "flexible",
+    "down payment",
+    "750",
+    "12 months",
+    "pay over time",
+    "afford"
+   ]
+  },
+  {
+   "q": "Can I put less down?",
+   "a": "The flexible plan starts at $750 down. More down means a lower monthly during the 12 months.",
+   "tags": [
+    "less down",
+    "minimum down",
+    "750",
+    "cant afford",
+    "low down"
+   ]
+  },
+  {
+   "q": "Can I cancel?",
+   "a": "Yes. There's a 3-month minimum, then it's month to month, and either side can cancel with 30 days' written notice (email counts). AI add-ons are month to month from day one.",
+   "tags": [
+    "cancel",
+    "cancellation",
+    "month to month",
+    "contract",
+    "minimum",
+    "commitment"
+   ]
+  },
+  {
+   "q": "Is there a long-term contract?",
+   "a": "No long lock-in. It's a 3-month minimum, then month to month with 30 days' notice.",
+   "tags": [
+    "long term",
+    "lock in",
+    "contract length",
+    "term"
+   ]
+  },
+  {
+   "q": "What if it doesn't bring customers back?",
+   "a": "There's a results promise. If in the first 3 months after going live there's no 30-day period where the app brought back at least 30 tracked return visits, your next 2 monthly payments are waived. It isn't a promise of sales.",
+   "tags": [
+    "results promise",
+    "guarantee",
+    "doesnt work",
+    "free months",
+    "risk"
    ]
   },
   {
    "q": "Do you guarantee sales?",
-   "a": "No. We don't guarantee sales or customer numbers. What we promise is the results check in the agreement for new clients.",
+   "a": "No. Estimates on the site are not promises. The results promise covers tracked return visits, not revenue.",
    "tags": [
-    "guarantee sales",
-    "promise",
+    "guarantee",
     "guaranteed",
-    "results",
-    "sales"
+    "promise",
+    "sales",
+    "results"
+   ]
+  },
+  {
+   "q": "Is there a performance share or percentage?",
+   "a": "On new agreements, in any month your app customers spend more than $3,000 on food and non-alcoholic drinks, we get 10% of only the amount over $3,000. For example, $5,000 in app sales is $200. Under $3,000, nothing extra is owed.",
+   "tags": [
+    "10%",
+    "percentage",
+    "performance share",
+    "commission",
+    "cut",
+    "fee on sales"
+   ]
+  },
+  {
+   "q": "Are there other plan names like Basic, Growth and Done-for-you?",
+   "a": "Yes, the SousShift app page also shows Basic ($3,000 setup + $350/mo), Growth ($3,500 + $650/mo) and Done-for-you ($4,000 + $950/mo) for new restaurants. For help choosing between plan sets, call (424) 296-3303.",
+   "tags": [
+    "basic",
+    "growth",
+    "done for you",
+    "dfy",
+    "other plans",
+    "app page"
+   ]
+  },
+  {
+   "q": "What does Social & SEO Growth include?",
+   "a": "It's an optional add-on at $1,000/mo. It includes a content plan, short-form video edits, posting on Instagram, TikTok and YouTube, Google Business Profile and local SEO, and a monthly report. Results vary and follower or view counts aren't guaranteed.",
+   "tags": [
+    "social media",
+    "seo",
+    "instagram",
+    "tiktok",
+    "google business",
+    "followers",
+    "marketing"
+   ]
+  },
+  {
+   "q": "What are the Sports Bar, Games Pack and 3D menu add-ons?",
+   "a": "The Sports Bar Package (live scores, Football Squares, fight nights), the Games Pack (trivia, word game, Truth or Dare) and the 3D digital menu are add-ons quoted separately. Ask us for a price.",
+   "tags": [
+    "sports bar package",
+    "games pack",
+    "3d menu",
+    "trivia",
+    "football squares",
+    "add-on quote"
+   ]
+  },
+  {
+   "q": "Is there a 3D menu?",
+   "a": "The 4K photo menu is included. The 3D digital menu, where guests spin your signature dishes, is an add-on quoted separately, and Full Show includes a motion menu.",
+   "tags": [
+    "3d menu",
+    "4k menu",
+    "spin dishes",
+    "motion menu",
+    "photos"
+   ]
+  },
+  {
+   "q": "What is the Scout fraud guard?",
+   "a": "It catches point farming, duplicate accounts and fake receipt claims before anyone gets a reward.",
+   "tags": [
+    "fraud",
+    "scout",
+    "cheating",
+    "fake",
+    "security"
+   ]
+  },
+  {
+   "q": "Are there holiday themes?",
+   "a": "Yes. Halloween, Thanksgiving, Christmas and more switch on and off by themselves.",
+   "tags": [
+    "holiday",
+    "themes",
+    "seasonal",
+    "christmas",
+    "halloween"
+   ]
+  },
+  {
+   "q": "What would this cost to build myself?",
+   "a": "Source figures suggest building something like this from scratch costs about $60,000 to $150,000 over 3 to 5 months, plus $1,500 to $4,000 a month to maintain. Those are typical estimates, not quotes.",
+   "tags": [
+    "build myself",
+    "diy",
+    "compare",
+    "worth it",
+    "cost elsewhere",
+    "value"
+   ]
+  },
+  {
+   "q": "What does it cost elsewhere?",
+   "a": "Piece by piece, the same tools (ordering, loyalty, referrals, texting, review prompts, custom game, photos, translation, print design, video) typically run hundreds a month plus thousands up front. Prices are published estimates as of Oct 2026, not quotes.",
+   "tags": [
+    "cost elsewhere",
+    "competitors",
+    "separately",
+    "compare",
+    "savings"
+   ]
+  },
+  {
+   "q": "Does it pay for itself?",
+   "a": "The site has a calculator where you set your own numbers. Break-even is the extra visits a month that cover your monthly fee. Results are estimates, not promises.",
+   "tags": [
+    "roi",
+    "pay for itself",
+    "break even",
+    "calculator",
+    "return"
    ]
   },
   {
    "q": "Can I use it for more than one location?",
-   "a": "Yes. Plans are per restaurant, and AI agents are per location.",
+   "a": "Yes. Prices are per restaurant, and the AI agents are priced per location. Call (424) 296-3303 for a multi-location quote.",
    "tags": [
     "multiple locations",
     "two restaurants",
     "chain",
-    "more than one",
-    "locations"
+    "multi location"
+   ]
+  },
+  {
+   "q": "I'm already a client. Do my prices change?",
+   "a": "No. Signed deals keep their terms exactly as agreed. These prices are for new restaurants.",
+   "tags": [
+    "existing client",
+    "already a client",
+    "prices change",
+    "my deal"
    ]
   },
   {
    "q": "Do you work with businesses other than restaurants?",
-   "a": "Yes: food trucks, ice cream trucks, mechanics, barbershops, salons, gyms, car washes, retail, coffee and boba shops, and legal. Types without a live demo get a custom-built game and app.",
+   "a": "Yes. We build apps for bars, cafés, trucks, bakeries, mechanics, barbershops, salons, gyms, car washes, retail, boba shops and more. Ask about your business type.",
    "tags": [
     "other businesses",
     "not a restaurant",
-    "barbershop",
     "salon",
     "gym",
     "retail",
-    "car wash",
-    "industries"
+    "local business"
    ]
   },
   {
-   "q": "Can you build a custom game for my business type?",
-   "a": "Yes. If we don't have a demo for your type, we design a custom game in the same style, themed to what you do. It's a custom build, not an existing demo.",
+   "q": "Do you have a legal app?",
+   "a": "We have two demos for law firms and bail bond companies: Courtroom Practice and Court Companion, which shows court dates and reminders. They can carry the firm's brand.",
    "tags": [
-    "custom game",
-    "custom build",
-    "my business",
-    "no demo",
-    "something else"
+    "legal",
+    "lawyer",
+    "bail bonds",
+    "court",
+    "law firm"
    ]
   },
   {
-   "q": "Do you take a cut of orders?",
-   "a": "No per-order fee. The only extra is the performance share in new agreements: 10% of app sales over $3,000 a month, food and non-alcoholic only.",
+   "q": "Who owns the app and the game?",
+   "a": "Your app, game and menu are built around your brand and food. Your customer list is yours, with a full export if you ever leave.",
    "tags": [
-    "per order",
-    "cut of orders",
-    "fees",
-    "transaction fee",
-    "commission"
+    "ownership",
+    "own",
+    "brand",
+    "who owns",
+    "export"
    ]
   },
   {
-   "q": "Is it really no download?",
-   "a": "Yes. It's a web app that opens from the QR code in the phone's browser. It can sit on the home screen like any app.",
+   "q": "Is the app on the App Store?",
+   "a": "No, and it doesn't need to be. It's a web app that opens from a QR code, with no download. Guests can add it to their Home Screen.",
    "tags": [
-    "web app",
-    "pwa",
-    "no app store",
-    "browser",
-    "really"
-   ]
-  },
-  {
-   "q": "Can I try it before I pay?",
-   "a": "Yes. The free sample is built with your menu and photos and you can see it on your phone before deciding.",
-   "tags": [
-    "try before",
-    "free",
-    "sample",
-    "no card",
-    "test",
-    "preview"
-   ]
-  },
-  {
-   "q": "How do I sign up?",
-   "a": "Contact us at secondshiftai@gmail.com or @second.shiftai, and we'll send an agreement for you to sign. Before that you can play your free sample.",
-   "tags": [
-    "sign up",
-    "sign",
-    "agreement",
-    "docusign",
-    "buy",
-    "purchase",
-    "hire"
+    "app store",
+    "google play",
+    "ios",
+    "android",
+    "native app"
    ]
   }
  ],
- "updated": "2026-10-14T04:16:28+00:00",
- "source_commit": "b7f36be",
+ "updated": "2026-10-22T00:14:21+00:00",
+ "source_commit": "973464f",
  "app": "sales"
 }

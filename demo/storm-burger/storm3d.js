@@ -223,18 +223,18 @@ async function boot() {
     const mats = [MAT.wall, MAT.wall, MAT.roof, MAT.wall, MAT.wall, MAT.wall]; mats[s < 0 ? 0 : 1] = storeFace(addr);
     box(g, mats, 200, 140, 320, s * 520, 70, -60); box(g, std(0xE8582A, { emissive: 0xE8582A, emissiveIntensity: .8 }), 6, 12, 322, s * 419, 140, -60);
     // the real pylon (his 10-21 photo): rounded white face with a thick red rim + red sides, the logo, one white pole, red DRIVE THRU box under it
-    const px = s * 300, pz = 170, P = new THREE.Group(); P.position.set(px, 0, pz); P.rotation.y = -s * .45; P.scale.setScalar(1.7); g.add(P);   // big enough to read from far up the road
-    const wpost = std(0xf2f3f5, { roughness: .5 }); add(P, CYL6, wpost, 7, 200, 7, 0, 100, 0);
+    const px = s * 300, pz = 170, P = new THREE.Group(); P.position.set(px, 0, pz); P.rotation.y = -s * .45; P.scale.setScalar(1.9); g.add(P);   // low + big: sits in the camera view (10-22: he only saw DRIVE THRU)
+    const wpost = std(0xf2f3f5, { roughness: .5 }); add(P, CYL6, wpost, 7, 72, 7, 0, 36, 0);
     const pt = ctex(1024, 384, (x, w, h) => { const rr = (a, b, c, d, r) => { x.beginPath(); x.roundRect(a, b, c, d, r); x.fill(); };
       x.fillStyle = "#d9262f"; x.fillRect(0, 0, w, h); x.fillStyle = "#e33a36"; rr(6, 6, w - 12, h - 12, 70); x.fillStyle = "#f7f8fa"; rr(34, 30, w - 68, h - 60, 54);
       if (ok(LOGO)) { const lw = w * .8, lh = lw * LOGO.naturalHeight / LOGO.naturalWidth; x.drawImage(LOGO, (w - lw) / 2, (h - lh) / 2, lw, lh); } }); logoTex.push(pt);
     const pm = std(0xffffff, { map: pt, emissive: 0xffffff, emissiveMap: pt, emissiveIntensity: 1.7 }), red = std(0xd9262f, { emissive: 0x5a0a0a });
-    box(P, [red, red, red, red, pm, pm], 150, 56, 18, 0, 222, 0);
+    box(P, [red, red, red, red, pm, pm], 150, 56, 18, 0, 92, 0);
     const dt = textTex("drivethru", 256, 64, (x, w, h) => { x.fillStyle = "#d9262f"; x.fillRect(0, 0, w, h); x.strokeStyle = "#fff"; x.lineWidth = 4; x.strokeRect(4, 4, w - 8, h - 8); x.fillStyle = "#fff"; x.font = "800 38px Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("DRIVE THRU", w / 2, h / 2 + 2); });
-    const dm = std(0xffffff, { map: dt, emissive: 0xffffff, emissiveMap: dt, emissiveIntensity: 1.5 }); box(P, [red, red, red, red, dm, dm], 64, 17, 10, -14, 158, 0); box(P, red, 70, 21, 4, -12, 156, -7);
+    const dm = std(0xffffff, { map: dt, emissive: 0xffffff, emissiveMap: dt, emissiveIntensity: 1.5 }); box(P, [red, red, red, red, dm, dm], 64, 17, 10, -14, 45, 0); box(P, red, 70, 21, 4, -12, 43, -7);
     const sg = new THREE.Sprite(glowMat(0xeaf0ff, .7)); sg.scale.set(260, 130, 1); sg.position.set(s * 415, 90, -60); g.add(sg);
-    const gl = new THREE.Sprite(glowMat(0xdfe8ff, .9)); gl.scale.set(560, 330, 1); gl.position.set(px, 378, pz); g.add(gl);
-    const sl = new THREE.PointLight(0xfff2e0, 2.2, 700, 1.2); sl.position.set(px, 300, pz + 60); g.add(sl);
+    const gl = new THREE.Sprite(glowMat(0xdfe8ff, .35)); gl.scale.set(420, 200, 1); gl.position.set(px, 175, pz - 40); g.add(gl);
+    const sl = new THREE.PointLight(0xfff2e0, 2.2, 700, 1.2); sl.position.set(px, 175, pz + 60); g.add(sl);
     for (let i = 0; i < 6; i++) { const c = makeCar(i + (addr.includes("LONG") ? 3 : 0)); c.position.set(s * 360, 0, -200 + i * 72); c.rotation.y = s * .04; g.add(c); }   // the drive-thru line, in their lot
     // the StormBurger truck parked out front (it really sat outside the Long Beach spot while the restaurant was built)
     const tk = makeTruck(true); tk.g.position.set(s * 420, 6, 250); tk.g.rotation.y = s > 0 ? 0 : Math.PI; tk.g.scale.setScalar(.9); g.add(tk.g);
@@ -388,17 +388,54 @@ async function boot() {
 
   const water = std(0x0b2236, { roughness: .1, metalness: .5 }), litWin = basic(new THREE.Color(2.2, 1.7, .9));
   const winTex = (base, lit) => ctex(256, 512, (x, w, h) => { x.fillStyle = base; x.fillRect(0, 0, w, h); for (let r = 0; r < 26; r++) for (let c = 0; c < 8; c++) { x.fillStyle = rnd() < lit ? "#ffd98a" : "#1a2030"; x.fillRect(10 + c * 30, 12 + r * 19, 16, 11); } });
-  function queenMary(s) { const g = new THREE.Group(), len = 760; sidewalk(g, s, len);   // the ocean liner docked in the harbor: black hull, white decks, three red funnels
+  /* THE QUEEN MARY: the same liner as the Melody game (demo/melody-lax/world3d.js linerParts), ported 1:1 and drawn at 2x: lofted
+     black hull with sheer, red boot-top, white sheer line, two rows of lit portholes, tiered white superstructure with windows,
+     24 lifeboats, three raked Cunard-red funnels with black tops + bands, two masts, cowls, and steam from the funnels. */
+  let LINER_G = null;
+  function linerParts() { if (LINER_G) return LINER_G; const Lz = 300, N = 44, pos = [], idx = [];
+    const T4 = (x, y, z, rx, ry, rz, sx, sy, sz) => new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromEuler(new THREE.Euler(rx || 0, ry || 0, rz || 0)), new THREE.Vector3(sx || 1, sy || 1, sz || 1));
+    const merge = (parts) => { const P = [], Nn = []; parts.forEach(([g, m]) => { const q = (g.index ? g.toNonIndexed() : g.clone()).applyMatrix4(m); q.computeVertexNormals(); P.push(...q.attributes.position.array); Nn.push(...q.attributes.normal.array); });
+      const o = new THREE.BufferGeometry(); o.setAttribute("position", new THREE.Float32BufferAttribute(P, 3)); o.setAttribute("normal", new THREE.Float32BufferAttribute(Nn, 3)); return o; };
+    const bAt = (u) => { const f = u > .72 ? Math.cos((u - .72) / .28 * Math.PI / 2) ** .8 : u < .08 ? .55 + .45 * Math.sin(u / .08 * Math.PI / 2) : 1; return 17.5 * Math.max(.02, f); };
+    const hAt = (u) => 26 + 7 * Math.max(0, u - .55) ** 2 * 4 + 2.2 * Math.max(0, .12 - u) * 8;
+    for (let i = 0; i <= N; i++) { const u = i / N, z = -Lz / 2 + u * Lz, b = bAt(u), h = hAt(u), bl = b * (u > .8 ? .55 : .86); pos.push(-bl, 0, z, -b, h * .45, z, -b, h, z, b, h, z, b, h * .45, z, bl, 0, z); }
+    for (let i = 0; i < N; i++) for (const k of [0, 1, 3, 4]) { const a = i * 6 + k, b2 = a + 6; idx.push(a, b2, a + 1, a + 1, b2, b2 + 1); }
+    idx.push(0, 1, 5, 1, 4, 5, 1, 2, 4, 2, 3, 4); const e = N * 6; idx.push(e, e + 5, e + 1, e + 1, e + 5, e + 4, e + 1, e + 4, e + 2, e + 2, e + 4, e + 3);
+    const hull = new THREE.BufferGeometry(); hull.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); hull.setIndex(idx); hull.computeVertexNormals();
+    const dk = []; for (let i = 0; i < N; i++) { const u0 = i / N, u1 = (i + 1) / N, z0 = -Lz / 2 + u0 * Lz, z1 = -Lz / 2 + u1 * Lz, b0 = bAt(u0) - .3, b1 = bAt(u1) - .3, h0 = hAt(u0) - .1, h1 = hAt(u1) - .1; dk.push(-b0, h0, z0, b0, h0, z0, -b1, h1, z1, b0, h0, z0, b1, h1, z1, -b1, h1, z1); }
+    const deck = new THREE.BufferGeometry(); deck.setAttribute("position", new THREE.Float32BufferAttribute(dk, 3)); deck.computeVertexNormals();
+    const wt = ctex(256, 64, (x) => { x.fillStyle = "#f1eee6"; x.fillRect(0, 0, 256, 64); for (let r = 0; r < 2; r++) for (let q = 0; q < 32; q++) { x.fillStyle = "#2a3038"; x.fillRect(2 + q * 8, 14 + r * 26, 5, 8); } });
+    const we = ctex(256, 64, (x) => { x.fillStyle = "#000"; x.fillRect(0, 0, 256, 64); for (let r = 0; r < 2; r++) for (let q = 0; q < 32; q++) { x.fillStyle = Math.random() < .75 ? "#ffd9a0" : "#5a4a30"; x.fillRect(2 + q * 8, 14 + r * 26, 5, 8); } });
+    [wt, we].forEach(t => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(6, 1); });
+    const winM = new THREE.MeshLambertMaterial({ map: wt, emissiveMap: we, emissive: 0xffffff, emissiveIntensity: .85 });
+    const sup = [], white = [];
+    [[196, 30, 8, 25, -4], [150, 26, 7, 33, 0], [96, 22, 6, 40, 6], [34, 28, 6, 25, -116], [22, 24, 5, 31, -104]].forEach(t => sup.push([new THREE.BoxGeometry(t[1], t[2], t[0]), T4(0, t[3] + t[2] / 2, t[4])]));
+    white.push([new THREE.BoxGeometry(40, 3, 6), T4(0, 47.5, 64)], [new THREE.BoxGeometry(18, 5, 9), T4(0, 44.5, 62)]);
+    white.push([new THREE.BoxGeometry(35.2, 1.1, 230), T4(0, 23.6, 0)]);
+    for (let k = 0; k < 6; k++) white.push([new THREE.BoxGeometry(1.4, 3.2, 1.4), T4((k % 2 ? 1 : -1) * 6, 49.5, 30 - k * 16)], [new THREE.CylinderGeometry(1.6, 1.2, 1.4, 8).rotateX(-1.2), T4((k % 2 ? 1 : -1) * 6, 51.6, 31 - k * 16)]);
+    const red = [], blk = [], FZ = [38, -6, -50];
+    FZ.forEach((z, k) => { const H = k === 2 ? 30 : 33, m = T4(0, 46, z, -.16, 0, 0, 1.0, 1, 1.32);
+      red.push([new THREE.CylinderGeometry(5.6, 6.1, H, 18).translate(0, H / 2, 0), m]);
+      blk.push([new THREE.CylinderGeometry(5.7, 5.7, 6, 18).translate(0, H - 3, 0), m], [new THREE.CylinderGeometry(5.75, 5.75, 1.1, 18).translate(0, H - 9, 0), m], [new THREE.CylinderGeometry(5.8, 5.8, 1.1, 18).translate(0, H - 12, 0), m]);
+      FZ[k] = [z - H * .16, 46 + H]; });
+    blk.push([new THREE.CylinderGeometry(.55, .9, 62, 6).translate(0, 31, 0), T4(0, 26, 112, -.1)], [new THREE.CylinderGeometry(.5, .8, 56, 6).translate(0, 28, 0), T4(0, 40, -82, -.1)]);
+    const boats = []; for (const sd of [-1, 1]) for (let k = 0; k < 12; k++) boats.push([sd * 14.2, 41.5, 46 - k * 9.2]);
+    return (LINER_G = { hull, deck, sup: merge(sup), winM, white: merge(white), red: merge(red), blk: merge(blk), boatG: new THREE.CapsuleGeometry(1.5, 5.2, 3, 8).rotateX(Math.PI / 2).scale(1, .75, 1), boats, funnels: FZ,
+      hullM: new THREE.MeshStandardMaterial({ color: 0x121316, roughness: .55, metalness: .1, side: THREE.DoubleSide }), deckM: new THREE.MeshLambertMaterial({ color: 0x9a7a55 }),
+      redM: new THREE.MeshStandardMaterial({ color: 0xc8401e, roughness: .55 }), blkM: new THREE.MeshLambertMaterial({ color: 0x141416 }), whiteM: new THREE.MeshLambertMaterial({ color: 0xf2efe8 }), bootM: new THREE.MeshLambertMaterial({ color: 0x8e2a22 }),
+      lampM: new THREE.MeshBasicMaterial({ color: 0xffd9a0, toneMapped: false }) }); }
+  function queenMary(s) { const g = new THREE.Group(), len = 760; sidewalk(g, s, len);   // docked in the harbor
     add(g, PLANE, water, 1600, len, 1, s * 1000, .4, 0).rotation.x = -Math.PI / 2; box(g, concrete, 40, 8, len - 40, s * 330, 4, 0);
-    const sh = new THREE.Group(); sh.position.set(s * 560, 0, -20); g.add(sh);
-    box(sh, std(0x101115, { roughness: .45 }), 96, 66, 600, 0, 33, 0); box(sh, std(0x9c1b1b), 98, 8, 602, 0, 4, 0);
-    add(sh, new THREE.ConeGeometry(1, 1, 4), std(0x101115), 68, 120, 66, 0, 40, -340).rotation.set(-Math.PI / 2, Math.PI / 4, 0);   // the bow
-    box(sh, std(0xf1efe8, { roughness: .5 }), 88, 34, 470, 0, 83, 20); box(sh, std(0xf1efe8, { roughness: .5 }), 72, 24, 330, 0, 112, 30);
-    [72, 88, 104].forEach(y => box(sh, litWin, 89, 2.5, 440, 0, y, 20));
-    [-80, 20, 120].forEach(z => { const f = add(sh, CYL, std(0xd22a1e, { roughness: .5 }), 26, 78, 34, 0, 160, z); f.rotation.x = .12; const t = add(sh, CYL, MAT.dark, 27, 14, 35, 0, 200, z - 5); t.rotation.x = .12; });
-    [-250, 260].forEach(z => box(sh, MAT.pole, 3, 150, 3, 0, 170, z));
-    const gl = new THREE.Sprite(glowMat(0xffe0b0, .5)); gl.scale.set(700, 260, 1); gl.position.set(s * 560, 110, -20); g.add(gl);
-    return { o: g, len }; }
+    const P = linerParts(), sh = new THREE.Group(), SC = 2.6; sh.position.set(s * 470, .4 - 6 * SC, -20); sh.rotation.y = Math.PI; sh.scale.setScalar(SC); g.add(sh);   // bow points up the road
+    const M3 = (geo, mat) => sh.add(new THREE.Mesh(geo, mat));
+    M3(P.hull, P.hullM); M3(P.deck, P.deckM); M3(P.sup, P.winM); M3(P.white, P.whiteM); M3(P.red, P.redM); M3(P.blk, P.blkM);
+    const bt = new THREE.Mesh(BOX, P.bootM); bt.scale.set(36.2, 2.2, 300); bt.position.y = 6.6; sh.add(bt);
+    const IM = new THREE.Matrix4(), boats = new THREE.InstancedMesh(P.boatG, P.whiteM, P.boats.length); P.boats.forEach((b, i) => boats.setMatrixAt(i, IM.makeTranslation(b[0], b[1], b[2]))); sh.add(boats);
+    const ph = new THREE.InstancedMesh(new THREE.SphereGeometry(.75, 4, 3), P.lampM, 140); for (let k = 0; k < 140; k++) { const sd = k % 2 ? 1 : -1, row = (k >> 1) % 2; ph.setMatrixAt(k, IM.makeTranslation(sd * (row ? 17.3 : 16.4), 15 + row * 5, -120 + ((k >> 2) * 7) % 240)); } sh.add(ph);
+    const gl = new THREE.Sprite(glowMat(0xffe0b0, .4)); gl.scale.set(800, 220, 1); gl.position.set(s * 470, 70, -20); g.add(gl);
+    const WP = new THREE.Vector3(), FP = new THREE.Vector3(), FV = new THREE.Vector3();
+    return { o: g, len, upd: (o, t, dt) => { if (!dt) return; sh.getWorldPosition(WP);   // steam drifting off all three funnels
+      for (const f of P.funnels) if (Math.random() < dt * 5) fx.emit(FP.set(WP.x + (Math.random() - .5) * 6, WP.y + (f[1] + 1) * SC, WP.z - f[0] * SC), FV.set((Math.random() - .5) * 10, 36 + Math.random() * 16, 14), 6.8, 12, 60, Math.random() < .25 ? [.42, .41, .4] : [.9, .89, .88], [.62, .62, .64], .5, false, 0, .45, 3); } }; }
   function villa(s) { const g = new THREE.Group(), len = 380; sidewalk(g, s, len);   // the tall gothic apartment tower with the steep green roof and spire
     const wt = winTex("#d9cfbf", .35), wm = std(0xffffff, { map: wt, emissive: 0xffffff, emissiveMap: wt, emissiveIntensity: .35, roughness: .8 }), green = std(0x4e8a5e, { roughness: .6, metalness: .2 });
     box(g, wm, 150, 380, 220, s * 480, 190, -20); box(g, wm, 70, 330, 120, s * 420, 165, 90);

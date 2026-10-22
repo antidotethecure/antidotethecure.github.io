@@ -3,47 +3,60 @@
  "phone": "",
  "facts": [
   "Churrito Loco is at 2801 Firestone Blvd, South Gate, CA.",
-  "Open Mon–Thu 12:00p–10:00p, Fri–Sat 12:00p–11:00p, Sun 12:00p–10:00p.",
-  "The app has a free 90-second game called Loco Match.",
-  "Weekly board: 1st place gets 50% off your next order, 2nd gets 20% off.",
-  "Score 4,150+ in one run for 15% off your next order.",
-  "The weekly board resets every Monday.",
-  "A free Daily Spin is available once per member per day (Los Angeles time).",
-  "Reward ladder: 200 pts Free churro, 400 pts Free horchata, 700 pts Free loaded churro, 1,100 pts Churros for the table.",
-  "Referral gift: a free churro.",
-  "Joining offer: a free churro with your next order.",
-  "Members need a name, phone number and email. One account per person and per phone.",
-  "You must be 13+ to play. Under 18 needs a parent or guardian's OK.",
-  "Spin food prizes and discounts last 3 days at the South Gate location.",
-  "One reward per visit. Rewards can't be combined.",
-  "No purchase is needed to play or win.",
-  "Loco Match scoring: 10 pts per snack matched, 4 in a row +40, 5 in a row +100, Churrito Man +150, Serrano -25.",
-  "A golden Antidote tile appears once per run. Match next to it for +300.",
-  "Menu prices come from the restaurant's public Yelp menu (Sep 2026) and may change, so confirm in store.",
-  "Menu has churros, street corn and fries, dogs and drinks.",
-  "Prizes shown in the app are samples, so confirm with staff.",
-  "Follow @churritoloco on Instagram.",
-  "The app has a language menu with 12 languages.",
-  "No phone number is shown in the app yet."
+  "Hours: Mon–Thu 12:00p–10:00p, Fri–Sat 12:00p–11:00p, Sun 12:00p–10:00p.",
+  "The app has a free 90-second match-3 game called Loco Match.",
+  "Loco Match is free to play as often as you like, with no account needed.",
+  "A free account (name, phone, email) is needed only to save a score or claim a prize.",
+  "Weekly board runs Monday through Sunday and resets every Monday.",
+  "Sample prizes: 1st place 50% off your next order, 2nd place 20% off, a 4,150+ run 15% off.",
+  "Free Daily Spin: one spin per member per day, every slice wins something.",
+  "Rewards ladder: 200 pts Free churro, 400 pts Free horchata, 700 pts Free loaded churro, 1,100 pts Churros for the table.",
+  "Spin food prizes are good for 3 days at the South Gate location, one reward per visit.",
+  "Menu has Churros, Street Corn & Fries, Dogs and Drinks.",
+  "No purchase is necessary to play, spin or win.",
+  "One account per person and per phone.",
+  "You must be 13 or older; under 18 needs a parent's or guardian's permission.",
+  "Your info is used only for your rewards account and is never sold."
  ],
  "suggested": [
   "What are your hours?",
   "How do I play Loco Match?",
-  "What do rewards cost in points?",
-  "How does the Daily Spin work?",
+  "What do I win on the weekly board?",
+  "How do I earn points and what do rewards cost?",
   "What's on the menu?",
-  "Where are you located?"
+  "How does the Daily Spin work?"
  ],
  "qa": [
   {
    "q": "What are your hours?",
-   "a": "We're open Mon–Thu 12:00p–10:00p, Fri–Sat 12:00p–11:00p, and Sunday 12:00p–10:00p.",
+   "a": "Mon–Thu 12:00p–10:00p, Fri–Sat 12:00p–11:00p, and Sun 12:00p–10:00p.",
    "tags": [
     "hours",
     "open",
     "close",
     "time",
-    "schedule"
+    "when"
+   ]
+  },
+  {
+   "q": "Are you open on Sunday?",
+   "a": "Yes, Sundays are 12:00p–10:00p.",
+   "tags": [
+    "sunday",
+    "hours",
+    "open",
+    "weekend"
+   ]
+  },
+  {
+   "q": "How late are you open on Friday and Saturday?",
+   "a": "Fri and Sat we're open until 11:00p, starting at 12:00p.",
+   "tags": [
+    "late",
+    "friday",
+    "saturday",
+    "close",
+    "hours"
    ]
   },
   {
@@ -52,100 +65,36 @@
    "tags": [
     "open",
     "opening",
+    "noon",
     "hours",
-    "time",
-    "noon"
-   ]
-  },
-  {
-   "q": "What time do you close?",
-   "a": "Mon–Thu and Sunday we close at 10:00p. Friday and Saturday we close at 11:00p.",
-   "tags": [
-    "close",
-    "closing",
-    "hours",
-    "late",
     "time"
    ]
   },
   {
-   "q": "Are you open on weekends?",
-   "a": "Yes! Saturday is 12:00p–11:00p and Sunday is 12:00p–10:00p.",
-   "tags": [
-    "weekend",
-    "saturday",
-    "sunday",
-    "hours",
-    "open"
-   ]
-  },
-  {
-   "q": "Are you open on Fridays and Saturdays late?",
-   "a": "Yes, Friday and Saturday we stay open until 11:00p.",
-   "tags": [
-    "friday",
-    "saturday",
-    "late",
-    "hours",
-    "close"
-   ]
-  },
-  {
-   "q": "Are you open on holidays?",
-   "a": "I don't have holiday hours. Please ask staff before you come.",
-   "tags": [
-    "holiday",
-    "hours",
-    "open",
-    "closed"
-   ]
-  },
-  {
    "q": "Where are you located?",
-   "a": "We're at 2801 Firestone Blvd, South Gate, CA.",
+   "a": "2801 Firestone Blvd, South Gate, CA. Tap Directions in the app to open Google Maps.",
    "tags": [
     "address",
     "location",
     "where",
-    "find us",
-    "south gate"
+    "directions",
+    "map"
    ]
   },
   {
    "q": "How do I get directions?",
-   "a": "Tap the Directions button in the app. It opens us in Google Maps.",
+   "a": "Tap the Directions button in the app and it opens Google Maps to our address.",
    "tags": [
     "directions",
     "map",
+    "gps",
     "navigate",
-    "google maps",
-    "address"
-   ]
-  },
-  {
-   "q": "What's your phone number?",
-   "a": "I don't have a phone number to show yet. Please ask staff at the counter.",
-   "tags": [
-    "phone",
-    "call",
-    "number",
-    "contact"
-   ]
-  },
-  {
-   "q": "Can I call to order?",
-   "a": "The app has a Call to order button, but our number isn't hooked up yet. Please ask staff at the counter.",
-   "tags": [
-    "call",
-    "order",
-    "phone",
-    "takeout",
-    "pickup"
+    "location"
    ]
   },
   {
    "q": "Is there parking?",
-   "a": "I don't have parking details. Please ask staff when you visit.",
+   "a": "I don't have parking details. Please ask staff when you get here.",
    "tags": [
     "parking",
     "park",
@@ -154,8 +103,63 @@
    ]
   },
   {
+   "q": "What's your phone number?",
+   "a": "I don't have a phone number to show here. Please ask staff at the counter.",
+   "tags": [
+    "phone",
+    "call",
+    "number",
+    "contact"
+   ]
+  },
+  {
+   "q": "Can I call in an order?",
+   "a": "The app has a Call to order button, but I don't have the number to share here. Ask staff at the counter for ordering help.",
+   "tags": [
+    "call",
+    "order",
+    "phone",
+    "takeout",
+    "to go"
+   ]
+  },
+  {
+   "q": "Can I order from my table or by QR code?",
+   "a": "I don't have details on table ordering. The full menu is in the app, so ask staff how to place your order.",
+   "tags": [
+    "order",
+    "table",
+    "qr",
+    "scan",
+    "pay",
+    "paying"
+   ]
+  },
+  {
+   "q": "How do I pay?",
+   "a": "I don't have payment details. Please ask staff at the counter.",
+   "tags": [
+    "pay",
+    "payment",
+    "card",
+    "cash",
+    "checkout"
+   ]
+  },
+  {
+   "q": "Do you have a happy hour?",
+   "a": "I don't have any happy hour info. Please ask staff.",
+   "tags": [
+    "happy hour",
+    "deal",
+    "discount",
+    "specials",
+    "time"
+   ]
+  },
+  {
    "q": "Do you take reservations?",
-   "a": "I don't have anything about reservations. Please ask staff.",
+   "a": "I don't have reservation info. Please ask staff at the counter.",
    "tags": [
     "reservation",
     "reserve",
@@ -164,62 +168,54 @@
    ]
   },
   {
-   "q": "Do you have an Instagram?",
-   "a": "Yes, we're @churritoloco. Our latest posts and reels show up inside the app too.",
-   "tags": [
-    "instagram",
-    "social",
-    "follow",
-    "reels",
-    "posts"
-   ]
-  },
-  {
-   "q": "What is on the menu?",
-   "a": "We have churros, street corn and fries, dogs, and drinks. Scroll the menu in the app to see everything.",
+   "q": "What's on the menu?",
+   "a": "We have Churros, Street Corn & Fries, Dogs and Drinks. Scroll the Menu in the app to see everything.",
    "tags": [
     "menu",
     "food",
-    "what do you sell",
-    "items"
+    "eat",
+    "items",
+    "what do you have"
    ]
   },
   {
    "q": "What churros do you have?",
-   "a": "Filled Churros (2pc) $6.99, Plain Signature Churros (4pc) $7.99, Churro Bites Filled (10pc) $9.49, and the Churro Ice Cream Cone $9.49.",
+   "a": "Filled Churros (2pc) $6.99, Plain Signature Churros (4pc) $7.99, Churro Bites Filled (10pc) $9.49 and the Churro Ice Cream Cone $9.49.",
    "tags": [
     "churros",
     "churro",
     "menu",
     "price",
+    "sweet",
     "dessert"
    ]
   },
   {
    "q": "What fillings can I get in the filled churros?",
-   "a": "Strawberry, lechera, Nutella, guava, cheesecake, dulce de leche, raspberry, or chocolate. You pick.",
+   "a": "Strawberry, lechera, Nutella, guava, cheesecake, dulce de leche, raspberry or chocolate.",
    "tags": [
     "filling",
     "filled",
     "churros",
-    "flavors",
-    "nutella"
+    "nutella",
+    "guava",
+    "flavors"
    ]
   },
   {
    "q": "What are the plain churros like?",
-   "a": "The Plain Signature Churros come as 4 pieces rolled in cinnamon sugar for $7.99.",
+   "a": "Plain Signature Churros come 4 to an order, rolled in cinnamon sugar, for $7.99.",
    "tags": [
     "plain",
     "signature",
     "cinnamon",
-    "churros",
-    "price"
+    "sugar",
+    "churros"
    ]
   },
   {
    "q": "What are Churro Bites?",
-   "a": "Churro Bites Filled are 10 mini filled churros with your choice of fillings, $9.49.",
+   "a": "Churro Bites Filled (10pc) are mini filled churros with your choice of fillings, $9.49.",
    "tags": [
     "bites",
     "mini",
@@ -230,18 +226,17 @@
   },
   {
    "q": "What is the Churro Ice Cream Cone?",
-   "a": "It's a cone made out of churro, with ice cream, drizzle and topping. It's $9.49.",
+   "a": "It's a cone made out of churro with ice cream, drizzle and topping. $9.49.",
    "tags": [
     "ice cream",
     "cone",
     "churro",
-    "dessert",
-    "price"
+    "dessert"
    ]
   },
   {
    "q": "What street corn do you have?",
-   "a": "Original Corn is a whole corn with mayo, cheese, butter and chili powder ($7.49). Hot Cheetos Corn has mayo, butter and hot Cheeto crumbs ($7.49).",
+   "a": "Original Corn (whole corn, mayo, cheese, butter, chili powder) is $7.49. Hot Cheetos Corn (mayo, butter, hot Cheeto crumbs) is $7.49.",
    "tags": [
     "corn",
     "elote",
@@ -252,18 +247,18 @@
   },
   {
    "q": "What fries do you have?",
-   "a": "Original Elote Fries are fries topped with corn, mayo, cheese and butter ($11.49). XL Chili Cheese Fries have chili, cheese and grilled onions ($16.49).",
+   "a": "Original Elote Fries are $11.49, topped with corn mixed in mayo, cheese and butter. XL Chili Cheese Fries are $16.49, with chili, cheese and grilled onions.",
    "tags": [
     "fries",
     "elote fries",
     "chili cheese",
-    "menu",
-    "price"
+    "loaded",
+    "menu"
    ]
   },
   {
-   "q": "What dogs do you have?",
-   "a": "The Flamin Dog is an all-beef dog with bacon, nacho cheese and hot Cheeto crumbs ($9.49). The Churro Dog is an all-beef dog wrapped in a churro with nacho cheese ($9.49).",
+   "q": "What hot dogs do you have?",
+   "a": "Flamin Dog ($9.49) is an all-beef dog with bacon, nacho cheese and hot Cheeto crumbs. Churro Dog ($9.49) is an all-beef dog wrapped in a churro with nacho cheese.",
    "tags": [
     "dog",
     "hot dog",
@@ -274,18 +269,19 @@
   },
   {
    "q": "What drinks do you have?",
-   "a": "Abuelita Chocolate Horchata Iced Coffee ($6.49), Watermelon Paleta Energy ($7.99), Jamaica Agua Fresca ($5.49), and Pumpkin Spice Horchata ($8.49).",
+   "a": "Abuelita Chocolate Horchata Iced Coffee $6.49, Watermelon Paleta Energy $7.99, Jamaica Agua Fresca $5.49 and Pumpkin Spice Horchata $8.49.",
    "tags": [
     "drinks",
     "beverage",
     "horchata",
     "coffee",
+    "agua fresca",
     "menu"
    ]
   },
   {
-   "q": "What's in the Watermelon Paleta Energy?",
-   "a": "It's watermelon, chamoy and tajín mixed with Red Bull. It's $7.99.",
+   "q": "What is the Watermelon Paleta Energy?",
+   "a": "It's a watermelon, chamoy and tajín mix with Red Bull. $7.99.",
    "tags": [
     "watermelon",
     "paleta",
@@ -295,262 +291,139 @@
    ]
   },
   {
-   "q": "What's the Jamaica Agua Fresca?",
-   "a": "It's a hibiscus flavored drink, $5.49.",
+   "q": "What is the Jamaica Agua Fresca?",
+   "a": "A hibiscus-flavored drink, $5.49.",
    "tags": [
     "jamaica",
-    "agua fresca",
     "hibiscus",
-    "drink",
-    "price"
-   ]
-  },
-  {
-   "q": "What's the Abuelita Chocolate Horchata Iced Coffee?",
-   "a": "It's fresh brewed coffee, chilled, with Abuelita chocolate. It's $6.49.",
-   "tags": [
-    "abuelita",
-    "chocolate",
-    "horchata",
-    "iced coffee",
+    "agua fresca",
     "drink"
    ]
   },
   {
-   "q": "What's the Pumpkin Spice Horchata?",
-   "a": "It's a horchata drizzled and topped with whipped cream, $8.49.",
-   "tags": [
-    "pumpkin spice",
-    "horchata",
-    "seasonal",
-    "drink",
-    "price"
-   ]
-  },
-  {
-   "q": "How much is the XL Chili Cheese Fries?",
-   "a": "$16.49. It has crispy fries, savory chili, cheese and grilled onions.",
-   "tags": [
-    "xl",
-    "chili cheese fries",
-    "price",
-    "cost",
-    "fries"
-   ]
-  },
-  {
-   "q": "Are the menu prices up to date?",
-   "a": "Prices in the app come from our public Yelp menu (Sep 2026) and may change. Please confirm in store.",
-   "tags": [
-    "price",
-    "prices",
-    "cost",
-    "menu",
-    "update"
-   ]
-  },
-  {
-   "q": "Do you serve alcohol?",
-   "a": "Nothing on the app menu has alcohol, and no app prize includes alcohol.",
+   "q": "Do you have alcohol?",
+   "a": "No alcohol is shown on our menu in the app.",
    "tags": [
     "alcohol",
     "beer",
     "drinks",
-    "menu"
+    "bar"
    ]
   },
   {
-   "q": "Are there vegetarian options?",
-   "a": "The menu has churros and corn that don't list meat. I don't have full ingredient details, so please ask staff.",
+   "q": "Are the menu prices final?",
+   "a": "The prices come from our public menu and may change. Confirm in store.",
    "tags": [
-    "vegetarian",
-    "veggie",
-    "meat free",
-    "menu"
+    "price",
+    "cost",
+    "menu",
+    "how much"
    ]
   },
   {
-   "q": "Do you have allergy information?",
-   "a": "I don't have allergy details. Please ask staff before ordering.",
+   "q": "Do you have holiday specials?",
+   "a": "Yes, the app shows seasonal specials built from our menu. Open the Specials card to see what's on now and what's coming.",
    "tags": [
-    "allergy",
-    "allergen",
-    "nuts",
-    "gluten",
-    "dairy"
-   ]
-  },
-  {
-   "q": "Are there any specials right now?",
-   "a": "The app shows seasonal specials by date. Check the Specials card in the menu to see what's on now and what's coming up.",
-   "tags": [
-    "special",
     "specials",
+    "holiday",
+    "seasonal",
     "deal",
-    "promo",
-    "seasonal"
+    "combo"
    ]
   },
   {
-   "q": "What is the Halloween special?",
-   "a": "The Hot Cheetos Spooky Combo is Hot Cheetos Corn plus Filled Churros (2pc). It runs Oct 20–31, with code BOO. Sample special, so confirm price in store.",
+   "q": "What's the Halloween special?",
+   "a": "The Hot Cheetos Spooky Combo: Hot Cheetos Corn + Filled Churros (2pc), shown Oct 20–31 with code BOO.",
    "tags": [
     "halloween",
-    "spooky",
     "special",
     "combo",
-    "boo"
+    "boo",
+    "spooky"
    ]
   },
   {
-   "q": "What is the Thanksgiving special?",
-   "a": "The Pumpkin Spice Pair is a Pumpkin Spice Horchata plus Plain Signature Churros (4pc). It runs Nov 20–28.",
+   "q": "What's the Thanksgiving special?",
+   "a": "The Pumpkin Spice Pair: Pumpkin Spice Horchata + Plain Signature Churros (4pc), shown Nov 20–28.",
    "tags": [
     "thanksgiving",
     "pumpkin",
     "special",
-    "pair",
-    "november"
+    "pair"
    ]
   },
   {
-   "q": "What is the Christmas special?",
-   "a": "The Holiday Churro Box is Churro Bites Filled (10pc) plus an Abuelita Chocolate Horchata Iced Coffee. It runs Dec 15–25.",
+   "q": "What's the Christmas special?",
+   "a": "The Holiday Churro Box: Churro Bites Filled (10pc) + an Abuelita Chocolate Horchata Iced Coffee, shown Dec 15–25.",
    "tags": [
     "christmas",
     "holiday",
     "box",
-    "special",
-    "december"
+    "special"
    ]
   },
   {
-   "q": "What is the New Year's special?",
-   "a": "The New Year's Loaded Share is XL Chili Cheese Fries plus Churro Bites Filled (10pc). It runs Dec 29–Jan 1.",
+   "q": "What's the New Year's special?",
+   "a": "New Year's Loaded Share: XL Chili Cheese Fries + Churro Bites Filled (10pc), shown Dec 29–Jan 1.",
    "tags": [
     "new year",
     "special",
     "share",
-    "fries",
-    "december"
+    "fries"
    ]
   },
   {
-   "q": "What is the Valentine's special?",
-   "a": "The Churro Date is two Churro Ice Cream Cones, one for you and one for your date. It runs Feb 7–14.",
+   "q": "What's the Valentine's special?",
+   "a": "Churro Date: two Churro Ice Cream Cones, shown Feb 7–14.",
    "tags": [
     "valentine",
     "date",
     "special",
-    "ice cream",
-    "february"
+    "ice cream cone"
    ]
   },
   {
-   "q": "What is the St. Patrick's Day special?",
-   "a": "Lucky Elote Fries is Original Elote Fries plus a Watermelon Paleta Energy. It runs Mar 14–17.",
+   "q": "What are the St. Patrick's, Cinco and Fourth of July specials?",
+   "a": "Lucky Elote Fries (Original Elote Fries + Watermelon Paleta Energy, Mar 14–17), Cinco Street Combo (Flamin Dog + Original Corn + Jamaica Agua Fresca, May 1–5) and Fourth of July Churro Dog (Churro Dog + Watermelon Paleta Energy, Jul 1–4).",
    "tags": [
     "st patricks",
-    "lucky",
-    "elote fries",
-    "special",
-    "march"
-   ]
-  },
-  {
-   "q": "What is the Cinco de Mayo special?",
-   "a": "The Cinco Street Combo is a Flamin Dog, Original Corn and a Jamaica Agua Fresca. It runs May 1–5.",
-   "tags": [
-    "cinco",
     "cinco de mayo",
-    "combo",
-    "special",
-    "may"
-   ]
-  },
-  {
-   "q": "What is the Fourth of July special?",
-   "a": "The Fourth of July Churro Dog is a Churro Dog plus a Watermelon Paleta Energy. It runs Jul 1–4.",
-   "tags": [
     "july 4",
-    "fourth of july",
-    "churro dog",
     "special",
-    "july"
+    "combo"
    ]
   },
   {
-   "q": "Do the specials have prices?",
-   "a": "The app doesn't show prices for specials. Please ask staff for the price.",
+   "q": "What do the specials cost?",
+   "a": "The app doesn't show special prices. Ask staff for the price.",
    "tags": [
     "special",
     "price",
     "cost",
-    "deal"
-   ]
-  },
-  {
-   "q": "Is there a happy hour?",
-   "a": "I don't have a happy hour listed. Please ask staff.",
-   "tags": [
-    "happy hour",
-    "deal",
-    "discount",
-    "drinks"
+    "combo"
    ]
   },
   {
    "q": "What is Loco Match?",
-   "a": "It's our free 90-second match-3 game. Line up 3 or more of the same snack to score, and see where you land on the weekly prize board.",
+   "a": "It's our free 90-second match-3 puzzle game. Line up 3 or more of the same snack to score, and a high score can win a prize.",
    "tags": [
     "loco match",
     "game",
     "play",
     "match 3",
-    "arcade"
+    "puzzle"
    ]
   },
   {
    "q": "How do I play Loco Match?",
-   "a": "Tap a snack, then tap the one next to it to swap. Or swipe a snack toward its neighbor. Line up 3 or more of the same snack before 90 seconds run out.",
+   "a": "Tap a snack, then tap the one next to it to swap, or swipe a snack toward its neighbor. Swaps only stick if they make a match of 3 or more.",
    "tags": [
     "how to play",
-    "loco match",
     "controls",
     "swap",
-    "swipe"
-   ]
-  },
-  {
-   "q": "How do I start the game?",
-   "a": "Tap the game board (it says TAP TO PLAY) or press PLAY on the start screen.",
-   "tags": [
-    "start",
-    "play",
-    "game",
-    "tap to play"
-   ]
-  },
-  {
-   "q": "What are the game controls?",
-   "a": "Tap one snack, then tap its neighbor to swap them. You can also swipe a snack toward its neighbor.",
-   "tags": [
-    "controls",
-    "tap",
     "swipe",
-    "swap",
-    "game"
-   ]
-  },
-  {
-   "q": "Why won't my swap work?",
-   "a": "Swaps only stick if they make a match of 3 or more. If not, the snacks swap back.",
-   "tags": [
-    "swap",
-    "match",
-    "rules",
-    "game",
-    "not working"
+    "tap",
+    "loco match"
    ]
   },
   {
@@ -560,343 +433,335 @@
     "time",
     "90 seconds",
     "timer",
-    "game",
-    "length"
+    "length",
+    "game"
    ]
   },
   {
-   "q": "How does scoring work in Loco Match?",
-   "a": "Each snack in a match is worth +10. A 4-in-a-row bonus is +40, a 5-in-a-row bonus is +100, and clearing the Churrito Man is +150.",
+   "q": "How does scoring work?",
+   "a": "Each snack in a match is worth +10. A 4-in-a-row adds +40, a 5-in-a-row adds +100, and clearing the Churrito Man adds +150.",
    "tags": [
     "score",
-    "scoring",
     "points",
-    "loco match",
-    "bonus"
+    "scoring",
+    "bonus",
+    "game"
    ]
   },
   {
    "q": "What are chain reactions?",
-   "a": "When falling snacks make new matches, you get a chain bonus of +15, +30, +45 and so on for each step.",
+   "a": "When falling snacks match again on their own, you get bonus points: +15, +30, +45 and so on for each step.",
    "tags": [
     "chain",
     "combo",
-    "bonus",
     "reaction",
-    "score"
+    "bonus",
+    "game"
    ]
   },
   {
    "q": "Who is the Churrito Man?",
-   "a": "He's our churro mascot on the board. Make a match right next to him to clear him for +150.",
+   "a": "He's our churro mascot in the game. Make a match right next to him to clear him for +150.",
    "tags": [
     "churrito man",
     "mascot",
     "bonus",
     "150",
-    "wild"
+    "game"
    ]
   },
   {
-   "q": "What is the Serrano and what does it do?",
-   "a": "The grilled Serrano is a hot pepper. Swipe or swap it and you lose 25 points. Leave it alone and it burns out by itself.",
+   "q": "What is the Serrano and why avoid it?",
+   "a": "The grilled Serrano is a hazard. Swiping it costs you 25 points. Leave it alone, it burns out by itself.",
    "tags": [
     "serrano",
     "pepper",
-    "penalty",
-    "minus 25",
-    "avoid"
-   ]
-  },
-  {
-   "q": "How many points is each snack worth?",
-   "a": "Each snack in a match is +10: elote, XL chili cheese fries, filled churros, Abuelita choco horchata, and the sandía drink.",
-   "tags": [
-    "snack",
-    "10 points",
-    "score",
-    "match",
-    "value"
+    "hazard",
+    "minus",
+    "25",
+    "game"
    ]
   },
   {
    "q": "What is the golden Antidote tile?",
-   "a": "Once per run a golden Antidote tile pops up. Make a match right next to it for +300. It's from Antidote's review of Churrito Loco.",
+   "a": "Once per run, a golden Antidote tile appears. Make a match right next to it for +300.",
    "tags": [
     "antidote",
     "golden tile",
     "bonus",
     "300",
-    "easter egg"
+    "easter egg",
+    "review"
    ]
   },
   {
-   "q": "When does the golden Antidote tile appear?",
-   "a": "Once per run, somewhere between 20 and 40 seconds in.",
+   "q": "Who is Antidote?",
+   "a": "Antidote The Foodie reviewed Churrito Loco on YouTube. After a run where you find his tile, the app links to his review.",
    "tags": [
     "antidote",
-    "golden tile",
-    "when",
-    "bonus",
-    "timing"
-   ]
-  },
-  {
-   "q": "What is the halftime video?",
-   "a": "After about 80–90 seconds of total play, your next run opens with a short break showing Antidote The Foodie's review of Churrito Loco. You can skip it or go back to the game.",
-   "tags": [
-    "halftime",
-    "video",
     "review",
-    "antidote",
-    "break"
+    "youtube",
+    "foodie",
+    "video"
    ]
   },
   {
-   "q": "How often can I play Loco Match?",
-   "a": "As often as you like. It's free for members.",
+   "q": "Which snacks are in the game?",
+   "a": "Elote, XL Chili Cheese Fries, Filled Churros, Abuelita Choco Horchata and a Sandía (watermelon) drink. Each is +10 in a match.",
+   "tags": [
+    "snacks",
+    "tiles",
+    "items",
+    "game",
+    "elote"
+   ]
+  },
+  {
+   "q": "Do I need an account to play?",
+   "a": "No. Loco Match is free for anyone, with no account needed. You only need one to save a score or claim a prize.",
+   "tags": [
+    "account",
+    "sign up",
+    "free",
+    "play",
+    "login"
+   ]
+  },
+  {
+   "q": "Does it cost anything to play?",
+   "a": "No. No purchase or payment of any kind is needed to play, and buying food doesn't improve your chances.",
+   "tags": [
+    "free",
+    "cost",
+    "purchase",
+    "pay",
+    "play"
+   ]
+  },
+  {
+   "q": "How often can I play?",
+   "a": "As often as you like. The game is free with no daily limit.",
    "tags": [
     "how often",
     "limit",
-    "free",
-    "play",
+    "daily",
+    "play again",
     "unlimited"
    ]
   },
   {
-   "q": "Do I need tokens to play?",
-   "a": "No. Right now Loco Match is free for members. If tokens are turned on later, a play would cost 10 tokens, with free tokens every week and day.",
-   "tags": [
-    "tokens",
-    "free",
-    "play",
-    "cost",
-    "game"
-   ]
-  },
-  {
-   "q": "What does the weekly prize board do?",
-   "a": "It ranks the top scores of the week. 1st place wins 50% off their next order and 2nd wins 20% off.",
-   "tags": [
-    "leaderboard",
-    "weekly",
-    "prize",
-    "board",
-    "champion"
-   ]
-  },
-  {
-   "q": "What do I win for 1st place?",
-   "a": "50% off your next order for the highest score of the week.",
-   "tags": [
-    "first place",
-    "winner",
-    "champion",
-    "50%",
-    "prize"
-   ]
-  },
-  {
-   "q": "What do I win for 2nd place?",
-   "a": "20% off your next order.",
-   "tags": [
-    "second place",
-    "20%",
-    "prize",
-    "weekly",
-    "discount"
-   ]
-  },
-  {
-   "q": "What score gets me a prize?",
-   "a": "One run of 4,150 points or more earns 15% off your next order and a spot on the weekly board. Test players averaged 3,913.",
-   "tags": [
-    "4150",
-    "score",
-    "prize",
-    "15%",
-    "discount"
-   ]
-  },
-  {
-   "q": "When does the weekly board reset?",
-   "a": "Every Monday. The week runs Monday through Sunday close.",
-   "tags": [
-    "reset",
-    "monday",
-    "weekly",
-    "board",
-    "week"
-   ]
-  },
-  {
-   "q": "What happens if two players tie?",
-   "a": "The score posted first wins the tie.",
-   "tags": [
-    "tie",
-    "tied",
-    "same score",
-    "winner",
-    "rules"
-   ]
-  },
-  {
-   "q": "When do I get my weekly prize?",
-   "a": "I don't have a pickup schedule. Winners may be asked to show their code and account on their phone at the counter, so ask staff.",
-   "tags": [
-    "claim",
-    "pickup",
-    "prize",
-    "winner",
-    "redeem"
-   ]
-  },
-  {
-   "q": "Are the game prizes real?",
-   "a": "The prizes shown in the app are samples and the owner sets the real ones. Ask staff to confirm.",
-   "tags": [
-    "prizes",
-    "sample",
-    "real",
-    "confirm",
-    "game"
-   ]
-  },
-  {
-   "q": "Do I have to buy something to play or win?",
-   "a": "No. No purchase or payment is needed to play, spin, or win, and buying doesn't improve your chances.",
-   "tags": [
-    "purchase",
-    "free",
-    "no purchase",
-    "fair",
-    "win"
-   ]
-  },
-  {
    "q": "Is Loco Match luck or skill?",
-   "a": "It's a game of skill. Prizes depend only on your score and your rank on the weekly board.",
+   "a": "It's a game of skill. Prizes depend only on your score and your rank on the weekly board, not on chance.",
    "tags": [
     "skill",
     "luck",
     "fair",
     "rules",
-    "game"
+    "chance"
    ]
   },
   {
-   "q": "Can I cheat or use multiple accounts?",
-   "a": "No. Scores made with cheats, scripts, bots or multiple accounts are disqualified.",
+   "q": "How does the weekly leaderboard work?",
+   "a": "The highest score from Monday through Sunday close wins. The board resets every Monday, so there are new winners each week.",
+   "tags": [
+    "leaderboard",
+    "weekly",
+    "board",
+    "champion",
+    "reset",
+    "monday"
+   ]
+  },
+  {
+   "q": "What do I win on the weekly board?",
+   "a": "Sample prizes: 1st place gets 50% off your next order and 2nd place gets 20% off. The real prizes are set by the restaurant.",
+   "tags": [
+    "prize",
+    "weekly",
+    "winner",
+    "50%",
+    "20%",
+    "reward"
+   ]
+  },
+  {
+   "q": "What score do I need for a prize?",
+   "a": "A single run of 4,150 points or more earns 15% off your next order and a spot on the weekly board. Test players averaged 3,913.",
+   "tags": [
+    "4150",
+    "prize",
+    "15%",
+    "score",
+    "target"
+   ]
+  },
+  {
+   "q": "What happens if two people tie?",
+   "a": "Ties go to the score that was posted first.",
+   "tags": [
+    "tie",
+    "tied",
+    "same score",
+    "leaderboard"
+   ]
+  },
+  {
+   "q": "When are weekly prizes decided?",
+   "a": "The week runs Monday through Sunday close, and the board resets every Monday. I don't have an exact pickup time, so ask staff.",
+   "tags": [
+    "when",
+    "prize",
+    "pick up",
+    "winner",
+    "sunday",
+    "monday"
+   ]
+  },
+  {
+   "q": "How do I claim a prize?",
+   "a": "Join with a free account to save your score, then show the code on your phone and your matching account at the counter.",
+   "tags": [
+    "claim",
+    "redeem",
+    "prize",
+    "counter",
+    "code"
+   ]
+  },
+  {
+   "q": "How long do prizes last?",
+   "a": "Food prizes and discounts from the spin are good for 3 days at our South Gate location, one reward per visit. I don't have an expiry for game discounts, so ask staff.",
+   "tags": [
+    "expire",
+    "expiration",
+    "valid",
+    "days",
+    "prize"
+   ]
+  },
+  {
+   "q": "Can I combine rewards?",
+   "a": "No. Food prizes and discounts can't be combined with other rewards, and it's one reward per visit.",
+   "tags": [
+    "combine",
+    "stack",
+    "one per visit",
+    "reward",
+    "rules"
+   ]
+  },
+  {
+   "q": "Can employees win prizes?",
+   "a": "Employees and their household members can play but can't win prizes.",
+   "tags": [
+    "employees",
+    "staff",
+    "eligible",
+    "rules"
+   ]
+  },
+  {
+   "q": "What counts as cheating?",
+   "a": "Scores made with cheats, scripts, bots or multiple accounts are disqualified.",
    "tags": [
     "cheat",
-    "bots",
-    "rules",
+    "bot",
     "disqualified",
+    "rules",
     "multiple accounts"
    ]
   },
   {
+   "q": "Can I use a game controller?",
+   "a": "Yes. Controllers like Xbox, PlayStation and Switch Pro work in most browsers. Pair it, press any button, then use the Help link in the game.",
+   "tags": [
+    "controller",
+    "gamepad",
+    "xbox",
+    "playstation",
+    "tesla"
+   ]
+  },
+  {
+   "q": "What is halftime?",
+   "a": "After about 80–90 seconds of total play, the next run opens with a short break showing Antidote's review reel. You can skip it or go back to the game.",
+   "tags": [
+    "halftime",
+    "break",
+    "video",
+    "review",
+    "skip"
+   ]
+  },
+  {
    "q": "What is the Daily Spin?",
-   "a": "A free wheel you can spin once a day. Every slice wins something.",
+   "a": "A free wheel you can spin once a day. Every slice wins something, from reward points to free food.",
    "tags": [
     "spin",
-    "daily spin",
     "wheel",
+    "daily",
     "free",
     "prize"
    ]
   },
   {
    "q": "How often can I spin?",
-   "a": "Once per member per day, based on Los Angeles time. Spins are never sold and never cost tokens.",
+   "a": "One spin per member per day, on Los Angeles time. Spins are never sold and can't be earned by buying.",
    "tags": [
     "spin",
-    "once a day",
     "daily",
-    "limit",
-    "free"
+    "once a day",
+    "how often",
+    "limit"
    ]
   },
   {
-   "q": "What can I win on the Daily Spin?",
-   "a": "+50 pts, +100 pts, +75 pts, $1 off any churro, a free churro, a free horchata, or 10% off your order.",
+   "q": "What can I win on the spin?",
+   "a": "+50 points (30%), +100 points (20%), +75 points (15%), $1 off any churro (15%), Free churro (8%), Free horchata (7%) or 10% off your order (5%).",
    "tags": [
     "spin",
-    "prizes",
-    "wheel",
-    "win",
-    "odds"
-   ]
-  },
-  {
-   "q": "What are the odds on the Daily Spin?",
-   "a": "+50 pts 30%, +100 pts 20%, +75 pts 15%, $1 off any churro 15%, free churro 8%, free horchata 7%, 10% off your order 5%.",
-   "tags": [
     "odds",
+    "prizes",
     "chance",
-    "spin",
-    "percent",
-    "probability"
+    "wheel",
+    "points"
    ]
   },
   {
-   "q": "How long do spin prizes last?",
-   "a": "Food prizes and discounts are good for 3 days at our South Gate location.",
+   "q": "Are spin prizes alcohol?",
+   "a": "No. No prize includes alcohol. The free horchata is non-alcoholic.",
    "tags": [
-    "expire",
-    "3 days",
+    "alcohol",
+    "horchata",
     "spin",
-    "prize",
-    "redeem"
+    "prize"
    ]
   },
   {
-   "q": "Are there limits on using spin prizes?",
-   "a": "One reward per visit. They can't be combined with other rewards, have no cash value, and can't be transferred.",
+   "q": "Do I need an account to spin?",
+   "a": "The spin is for members. Join with a free account to use it.",
    "tags": [
-    "limits",
-    "combine",
-    "one per visit",
     "spin",
-    "rules"
+    "account",
+    "member",
+    "join"
    ]
   },
   {
-   "q": "How do I join the rewards club?",
-   "a": "Create a free member account with your name, phone number and email. The live app confirms your phone with a text code.",
+   "q": "How do I join Churrito Loco Rewards?",
+   "a": "Sign up free with your name, phone number and email. It takes a minute, and the app also invites you to join after a game run.",
    "tags": [
     "join",
     "sign up",
     "register",
     "account",
-    "member"
+    "member",
+    "rewards"
    ]
   },
   {
-   "q": "Is it free to join?",
-   "a": "Yes, member accounts are free.",
-   "tags": [
-    "free",
-    "join",
-    "cost",
-    "membership",
-    "sign up"
-   ]
-  },
-  {
-   "q": "Can I have more than one account?",
-   "a": "No. It's one free account per person and per phone, tied to the phone you made it on.",
-   "tags": [
-    "multiple",
-    "one account",
-    "phone",
-    "limit",
-    "member"
-   ]
-  },
-  {
-   "q": "What's the welcome offer for joining?",
-   "a": "A free churro with your next order.",
+   "q": "What do I get for joining?",
+   "a": "The app shows a welcome offer of a free churro with your next order. Ask staff how to use it.",
    "tags": [
     "welcome",
     "join",
@@ -906,140 +771,100 @@
    ]
   },
   {
-   "q": "How old do I need to be to play?",
-   "a": "You must be 13 or older. Players under 18 need a parent or guardian's permission.",
+   "q": "Who can sign up?",
+   "a": "Legal U.S. residents 13 or older. Players under 18 need a parent's or guardian's permission. One free account per person and per phone.",
    "tags": [
     "age",
+    "eligible",
     "kids",
+    "sign up",
     "13",
-    "parent",
-    "minimum"
+    "parent"
    ]
   },
   {
-   "q": "Do you have a kid mode?",
-   "a": "I don't have a kid mode in the app. Players under 18 need a parent or guardian's permission.",
-   "tags": [
-    "kid",
-    "kids",
-    "child",
-    "mode",
-    "age"
-   ]
-  },
-  {
-   "q": "How do reward points work?",
-   "a": "Points from the spin and from purchases go into your Churrito Loco Rewards account. You trade them for rewards listed in the app. Points have no cash value.",
+   "q": "How do I earn points?",
+   "a": "You earn points from Daily Spin wins and from purchases. I don't have the exact points-per-dollar ratio, so ask staff.",
    "tags": [
     "points",
-    "stars",
-    "rewards",
     "earn",
-    "pts"
+    "stars",
+    "pts",
+    "how many",
+    "ratio",
+    "per dollar"
    ]
   },
   {
-   "q": "How many points do I earn per dollar?",
-   "a": "I don't have a points-per-dollar number. Please ask staff.",
+   "q": "How many points do I get per dollar?",
+   "a": "I don't have a points-per-dollar number. Please ask staff at the counter.",
    "tags": [
     "ratio",
     "per dollar",
     "points",
     "how many points",
-    "earn"
+    "stars"
    ]
   },
   {
-   "q": "How many points do I get per game?",
-   "a": "Your game score doesn't turn into reward points. The game earns weekly board prizes. The Daily Spin can give +50, +75 or +100 points.",
+   "q": "Do I get points for playing the game?",
+   "a": "I don't have game points listed. Game prizes are discounts based on your score and weekly rank.",
    "tags": [
     "points",
     "game",
-    "per game",
-    "score",
-    "earn"
+    "play",
+    "earn",
+    "score"
    ]
   },
   {
    "q": "What rewards can I get with points?",
-   "a": "200 pts Free churro, 400 pts Free horchata, 700 pts Free loaded churro, and 1,100 pts Churros for the table.",
+   "a": "200 pts Free churro, 400 pts Free horchata, 700 pts Free loaded churro and 1,100 pts Churros for the table.",
    "tags": [
     "rewards",
-    "redeem",
     "free",
-    "points cost",
-    "ladder"
-   ]
-  },
-  {
-   "q": "How many points for a free churro?",
-   "a": "200 points.",
-   "tags": [
-    "free churro",
-    "200",
     "points",
-    "reward",
-    "cost"
-   ]
-  },
-  {
-   "q": "How many points for a free horchata?",
-   "a": "400 points.",
-   "tags": [
-    "free horchata",
-    "400",
-    "points",
-    "reward",
-    "cost"
-   ]
-  },
-  {
-   "q": "How many points for a free loaded churro?",
-   "a": "700 points.",
-   "tags": [
-    "loaded churro",
-    "700",
-    "points",
-    "reward",
-    "cost"
-   ]
-  },
-  {
-   "q": "How many points for churros for the table?",
-   "a": "1,100 points.",
-   "tags": [
-    "churros for the table",
-    "1100",
-    "points",
-    "reward",
-    "share"
+    "cost",
+    "tiers",
+    "redeem",
+    "prizes"
    ]
   },
   {
    "q": "How do I redeem a reward?",
-   "a": "Pick a reward in the app once you have enough points, then show the code on your phone at the counter.",
+   "a": "Open your rewards in the app and show the code on your phone and your matching account at the counter.",
    "tags": [
     "redeem",
-    "reward",
     "use",
+    "reward",
     "counter",
     "code"
    ]
   },
   {
+   "q": "Do points expire or have cash value?",
+   "a": "Points have no cash value. I don't have an expiry rule, so ask staff.",
+   "tags": [
+    "points",
+    "expire",
+    "cash",
+    "value"
+   ]
+  },
+  {
    "q": "Do you have levels or tiers?",
-   "a": "I don't have level or tier details. Please ask staff.",
+   "a": "I don't have level details for Churrito Loco. Ask staff.",
    "tags": [
     "levels",
     "tiers",
     "vip",
     "status",
-    "rank"
+    "member"
    ]
   },
   {
    "q": "Is there a birthday club?",
-   "a": "I don't have birthday reward details. Please ask staff.",
+   "a": "I don't have birthday reward details. Ask staff.",
    "tags": [
     "birthday",
     "bday",
@@ -1049,107 +874,101 @@
    ]
   },
   {
-   "q": "Can I refer a friend?",
-   "a": "Yes, the referral gift is a free churro. I don't have the exact steps, so ask staff.",
+   "q": "Is there a referral program?",
+   "a": "Yes, the app has a referral reward: a free churro. I don't have the exact steps, so ask staff or check Ways to earn in the app.",
    "tags": [
     "referral",
     "refer",
     "friend",
     "share",
+    "invite",
     "free churro"
    ]
   },
   {
-   "q": "Is there a bonus for showing up?",
-   "a": "Show the nearby offer at the counter for double stars on today's churros.",
+   "q": "Is there a bonus for showing the app at the counter?",
+   "a": "The app shows an offer for double stars on today's churros when you show it at the counter. Confirm with staff that it's running.",
    "tags": [
-    "bonus",
     "double stars",
+    "bonus",
+    "counter",
     "churros",
+    "offer",
+    "check-in"
+   ]
+  },
+  {
+   "q": "Do I get anything for visiting nearby?",
+   "a": "If you turn on location, the app shows how far you are and may give a heads-up when you're within 2 miles. Your location stays on your phone.",
+   "tags": [
     "nearby",
-    "counter"
+    "location",
+    "alert",
+    "distance",
+    "bonus"
    ]
   },
   {
-   "q": "Can I order from my table with a QR code?",
-   "a": "I don't have table ordering details. Please ask staff, or use Call to order once the number is live.",
+   "q": "What are game tokens?",
+   "a": "Tokens are not turned on right now, and Loco Match is free. If they're added later, a play would cost 10 tokens, with free tokens weekly and daily.",
    "tags": [
-    "qr",
-    "table",
-    "order",
-    "scan",
-    "pay"
+    "tokens",
+    "play cost",
+    "free tokens",
+    "game"
    ]
   },
   {
-   "q": "Can I pay in the app?",
-   "a": "I don't see payment in the app. Please ask staff how to pay.",
-   "tags": [
-    "pay",
-    "payment",
-    "checkout",
-    "card",
-    "order"
-   ]
-  },
-  {
-   "q": "Can I change the language?",
-   "a": "Yes. Tap the 🌐 button at the top right and pick a language like Español, 中文, 한국어, Tagalog, Tiếng Việt and more.",
+   "q": "What languages does the app support?",
+   "a": "Tap the 🌐 button for English, Español, 简体中文, 繁體中文, 한국어, Tagalog, Tiếng Việt, Հայերեն, فارسی, 日本語, ไทย and Русский.",
    "tags": [
     "language",
     "spanish",
     "translate",
     "español",
-    "languages"
+    "chinese",
+    "korean"
    ]
   },
   {
-   "q": "Can I add the app to my phone's home screen?",
-   "a": "Yes. On iPhone in Safari tap Share, then Add to Home Screen, then Add. On Android in Chrome tap Install app, or the ⋮ menu and Add to Home screen.",
+   "q": "Is there a kids mode?",
+   "a": "I don't have a kids mode. Players under 18 need a parent's or guardian's permission to have an account.",
+   "tags": [
+    "kids",
+    "kid mode",
+    "children",
+    "age",
+    "parent"
+   ]
+  },
+  {
+   "q": "How do I add the app to my phone?",
+   "a": "On iPhone Safari tap Share, then Add to Home Screen, then Add. On Android Chrome tap the ⋮ menu, then Add to Home screen or Install. There's also an Add to Home Screen link in the app.",
    "tags": [
     "install",
     "home screen",
-    "app",
     "add",
-    "iphone"
+    "app",
+    "wallet",
+    "download",
+    "iphone",
+    "android"
    ]
   },
   {
-   "q": "Does the game lock my screen?",
-   "a": "Touching the game locks the page so it won't scroll while you play. Tap the pill on screen to unlock or lock it again.",
+   "q": "Do I need to download anything?",
+   "a": "No. It works in your phone's browser, and you can add it to your Home Screen to open like an app.",
    "tags": [
-    "lock",
-    "screen",
-    "scroll",
-    "game",
-    "unlock"
+    "download",
+    "install",
+    "app",
+    "browser",
+    "store"
    ]
   },
   {
-   "q": "Can I pause the game?",
-   "a": "Yes, there's a Pause button during play. The menu also has settings, how to play, and points and prizes.",
-   "tags": [
-    "pause",
-    "settings",
-    "how to play",
-    "game",
-    "menu"
-   ]
-  },
-  {
-   "q": "What is the 3D button on food photos?",
-   "a": "Tap the 3D badge on a menu photo to see the dish on a spinning plate. Drag to spin it.",
-   "tags": [
-    "3d",
-    "plate",
-    "photo",
-    "menu",
-    "view"
-   ]
-  },
-  {
-   "q": "Can I leave a Google review?",
-   "a": "Yes, the app has a Write a Google review button. No points or prizes are given for reviews. Honest reviews only.",
+   "q": "Can I leave a review?",
+   "a": "Yes, the app has a Google review button. Honest reviews only, and no points or prizes are given for reviewing.",
    "tags": [
     "review",
     "google",
@@ -1159,84 +978,76 @@
    ]
   },
   {
-   "q": "Will the app tell me when I'm nearby?",
-   "a": "If you turn on location and opt in, it can give you a heads-up when you're within a couple of miles. Your location stays on your phone.",
+   "q": "Where can I follow you?",
+   "a": "Our Instagram is @churritoloco, and the app shows our latest posts and reels.",
    "tags": [
-    "nearby",
-    "location",
-    "alert",
-    "map",
-    "notifications"
+    "instagram",
+    "social",
+    "follow",
+    "reels",
+    "posts"
    ]
   },
   {
-   "q": "Who do I ask if I need help?",
-   "a": "Ask staff at the counter. Questions about the game or rules can be asked there too.",
-   "tags": [
-    "help",
-    "staff",
-    "support",
-    "question",
-    "counter"
-   ]
-  },
-  {
-   "q": "Do employees get prizes?",
-   "a": "Employees and their household members can play but can't win prizes.",
-   "tags": [
-    "employee",
-    "staff",
-    "prizes",
-    "rules",
-    "eligible"
-   ]
-  },
-  {
-   "q": "What happens with my personal info?",
-   "a": "It's used only for your rewards account and is never sold. Opt-in texts and emails can be stopped anytime by replying STOP or unsubscribing.",
+   "q": "What do you do with my information?",
+   "a": "Your info is used only for your rewards account and is never sold. Texts and emails are opt-in, and you can stop them anytime by replying STOP or unsubscribing.",
    "tags": [
     "privacy",
     "data",
     "info",
+    "text",
     "stop",
-    "texts"
+    "email",
+    "sold"
    ]
   },
   {
-   "q": "Will I get marketing texts?",
-   "a": "Only if you opt in. You can stop anytime by replying STOP.",
+   "q": "Why do you ask for my phone number?",
+   "a": "An account is tied to the phone it was made on, and the live app confirms your number with a text code. That keeps it to one account per person and phone.",
    "tags": [
-    "texts",
+    "phone",
+    "verify",
+    "text code",
+    "account",
+    "privacy"
+   ]
+  },
+  {
+   "q": "Will you text me deals?",
+   "a": "Only if you opt in. Marketing texts are optional, and you can stop them anytime by replying STOP.",
+   "tags": [
+    "text",
     "sms",
     "marketing",
+    "opt in",
     "stop",
-    "opt in"
+    "deals"
    ]
   },
   {
-   "q": "Do the rules or prizes ever change?",
-   "a": "Yes, we may change or end the game, spin, prizes or rules, with notice in the app.",
+   "q": "I need help, who do I ask?",
+   "a": "Ask any staff member at the counter. I don't have a phone number to share here.",
    "tags": [
-    "rules",
-    "change",
-    "terms",
-    "prizes",
-    "official rules"
+    "help",
+    "staff",
+    "support",
+    "contact",
+    "question"
    ]
   },
   {
-   "q": "Where can I read the official rules?",
-   "a": "Open the Official Rules link in the app. They are marked as a draft for now.",
+   "q": "Can I change my order or have a problem fixed?",
+   "a": "I can't see orders. Please ask staff at the counter.",
    "tags": [
-    "rules",
-    "official rules",
-    "terms",
-    "legal",
-    "draft"
+    "problem",
+    "order",
+    "complaint",
+    "refund",
+    "help"
    ]
   }
  ],
- "updated": "2026-10-14T04:20:40+00:00",
- "source_commit": "b7f36be",
+ "updated": "2026-10-22T00:09:12+00:00",
+ "source_commit": "973464f",
  "app": "churrito-loco"
 }

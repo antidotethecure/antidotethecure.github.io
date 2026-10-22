@@ -275,6 +275,7 @@ var FOOD=[{k:"burger",p:60,n:"Classic StormBurger",w:64},{k:"turkey",p:60,n:"Tur
 var DEBRIS=[{k:"cow",w:104,r:30,why:"🐄 MOO!"},{k:"stop",w:70,r:24,why:"🛑 STOP!"}];
 /* 10 levels, ~30 s each (Antidote 2026-10-21): the drive from Inglewood to the Long Beach StormBurger, one landmark per level.
    Each level is a bit faster, hazards come more often and their hitboxes grow; roadblocks from level 3, spike strips from level 4. */
+window.SB_HELI=function(l){ return l%2===0; };   // police helicopter + searchlight on levels 2,4,6,8,10
 var LEVEL_MS=30000, NLEV=10, LVNAME=["Welcome to Inglewood","Inglewood · The Stadium","Inglewood · The Forum","Inglewood · Florence Ave","Welcome to Long Beach","Long Beach · The Shore","Signal Hill","Long Beach Airport","Jordan High · Home of the Panthers","StormBurger · Cherry Ave"];
 function lvEl(){ return LEVEL_MS-st.t; }                       // ms into the current level
 function hb(){ return 1+(st.lvl-1)*0.035; }                    // hazard hitboxes grow a little every level
@@ -816,7 +817,7 @@ function siren(){ if(!ctx||!was||!fxOn){ if(sir) sir.g.gain.setTargetAtTime(0,ct
 setInterval(siren,80);
 window.__SBA={ctx:function(){return ctx;},out:function(){return out;},siren:function(){return sir?sir.g.gain.value:0;}};   // test hook
 function apply(){ var p=on&&!!S.get().running&&!document.hidden; if(p===was) return; was=p;
-  MS.sync(p&&musOn); if(storm){ storm.gain.setTargetAtTime(p&&fxOn?.12:0,ctx.currentTime,.6); heli.gain.setTargetAtTime(p&&fxOn?.09:0,ctx.currentTime,1.2); } }   // .12 = storm stays well under the music
+  MS.sync(p&&musOn); if(storm){ storm.gain.setTargetAtTime(p&&fxOn?.12:0,ctx.currentTime,.6); } }   // .12 = storm stays well under the music
 window.GAME_AUDIO={music:function(v){ musOn=v!==false; was=null; apply(); }, sfx:function(v){ fxOn=v!==false; was=null; apply(); },
   sound:function(v){ on=v!==false; was=null; lbl(); apply(); }, state:function(){ return {hasMusic:true,hasSfx:true,sound:on,music:musOn,sfx:fxOn,unlocked:!!(ctx&&ctx.state==="running")}; }};
 /* iPhone Safari only lets sound start on a finished tap (touchend / click), and the start menu swallows its click,
@@ -824,7 +825,9 @@ window.GAME_AUDIO={music:function(v){ musOn=v!==false; was=null; apply(); }, sfx
 function tap(){ unlock(); var a=MS.el(); if(on&&musOn&&a.paused){ var q=a.play(); if(q&&q.then) q.then(function(){ if(!was||!musOn) a.pause(); },function(){}); } setTimeout(function(){ was=null; apply(); },0); }
 ["pointerdown","touchend","click","keydown"].forEach(function(k){ addEventListener(k,tap,{capture:true,passive:true}); });
 try{ if(navigator.audioSession) navigator.audioSession.type="playback"; }catch(e){}   // iPhone: play even with the ring/silent switch on
-setInterval(apply,300); document.addEventListener("visibilitychange",apply);
+setInterval(apply,300);
+setInterval(function(){ if(heli) heli.gain.setTargetAtTime(was&&fxOn&&SB_HELI(S.get().lvl)?.09:0,ctx.currentTime,1.2); },300);   // rotor only on helicopter levels
+document.addEventListener("visibilitychange",apply);
 var mb=document.getElementById("sbmute");
 function lbl(){ mb.textContent=on?"🔊 Sound on":"🔇 Sound off"; mb.setAttribute("aria-pressed",on?"true":"false"); }
 mb.addEventListener("click",function(e){ e.stopPropagation(); on=!on; try{ localStorage.setItem("sb-sound",on?"1":"0"); }catch(x){} lbl(); unlock(); was=null; apply(); });
@@ -834,7 +837,7 @@ lbl(); MS.button(document.getElementById("sbaud"),"","");
 <script src="fx.js"></script>
 <script src="kitchen.js?v=k1"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="storm3d.js?v=sb3d5"></script>
+<script type="module" src="storm3d.js?v=sb3d6"></script>
 <script src="../contract.js"></script>
 <script>window.CRM_CFG={name:"StormBurger",offer:"Free fries with your next burger",perDollar:20,tiers:[[1000,"Free fries"],[1800,"Free shake"],[3000,"Free Classic StormBurger"],[4500,"Free combo"]],referral:{gift:"Free Classic StormBurger"},earn:{checkin:50,firstOrder:100,birthday:200,review:{pts:250,platform:"app"},referral:{join:150,friend:50,friendGift:"Free fries",first:100,every:25}},
  // Storm Run access. PHASE 1 (live default): free to play, no sign-up first; guests save their score + prize after the run with a member account (name + phone + email, one account per phone).

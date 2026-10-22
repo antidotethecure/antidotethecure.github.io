@@ -39,7 +39,7 @@
    Audio convention (games that have sound expose it; the menu wires to it):
      window.GAME_AUDIO={ music:function(on){}, sfx:function(on){}, state:function(){ return {hasMusic:true,hasSfx:true,music:true,sfx:true}; } }
      music(false) must silence ONLY the music (gain 0 / pause the <audio>), never suspend the shared AudioContext.
-     fullscreen:{hide:".how", maxWidth:520}   (optional) passed to fullscreen.js: what to hide in full screen, layout width cap
+     fullscreen:{hide:".how", maxWidth:520, fill:true}   (optional) passed to fullscreen.js: what to hide in full screen, layout width cap; fill = the box takes the whole screen (the game must lay itself out to fill it)
    FULL SCREEN (every game, standing rule): this file loads fullscreen.js next to it. The menu gets ⛶ Full screen (and 📲 Add to
    Home Screen when a2hs.js is on the page); PLAY re-enters full screen automatically when the guest chose it last time
    (PLAY is a user gesture, which the Fullscreen API needs). In-game there is a small ⛶ / ✕ corner button.
@@ -58,7 +58,7 @@
   }
   function FS() { return W.GameFS || null; }
   function AH() { return (W.A2HS && W.A2HS.available && W.A2HS.available()) ? W.A2HS : null; }
-  function fsAttach() { var f = FS(); if (!f || !box) return; var o = C.fullscreen || {}; f.attach({ box: box, hide: o.hide, maxWidth: o.maxWidth, minWidth: o.minWidth, bg: o.bg || th.bg }); }
+  function fsAttach() { var f = FS(); if (!f || !box) return; var o = C.fullscreen || {}; f.attach({ box: box, hide: o.hide, maxWidth: o.maxWidth, minWidth: o.minWidth, bg: o.bg || th.bg, fill: o.fill }); }
   var T = function (s) { return (W.__T || String)(s); };
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]; }); };
   var th = C.theme || {};

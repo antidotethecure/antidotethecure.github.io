@@ -52,6 +52,13 @@ h2::before{content:"";width:22px;height:22px;background:var(--bolt);clip-path:po
 .hud{display:flex;justify-content:space-between;align-items:center;font-weight:800;padding:2px 4px 10px;gap:8px;flex-wrap:wrap}
 .hud .sc{font-family:var(--display);font-size:30px;color:var(--gold);letter-spacing:.04em;font-weight:400}
 .hud .lv{letter-spacing:2px}
+/* full screen = the whole screen (10-22): the 3D road fills it edge to edge, score and arrows float on top */
+.gamebox.ssai-fsfill{padding:0!important;border:0!important;border-radius:0!important;overflow:hidden!important}
+.gamebox.ssai-fsfill .sfx-wrap{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important}
+.gamebox.ssai-fsfill #game{position:absolute!important;inset:0;width:100%!important;height:100%!important;aspect-ratio:auto!important;object-fit:contain;border-radius:0!important}
+.gamebox.ssai-fsfill .hud{position:absolute;top:8px;left:10px;right:56px;z-index:3;margin:0;text-shadow:0 1px 3px #000}
+.gamebox.ssai-fsfill .sbaud{position:absolute;top:38px;left:10px;z-index:3}
+.gamebox.ssai-fsfill .keys{position:absolute;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:3;margin:0;opacity:.8}
 #game{display:block;width:100%;height:auto;aspect-ratio:400/560;border-radius:12px;background:#05081a;touch-action:pan-y pinch-zoom;cursor:pointer}
 .keys{display:flex;justify-content:center;gap:10px;margin-top:10px}
 .sbaud{display:flex;justify-content:center;gap:8px;margin:0 0 8px}
@@ -290,7 +297,7 @@ var st; // game state
 var htPlayed=0;   // ms of play across this visit's runs (halftime)
 function fresh(){ return {running:false,over:false,lane:1,x:LX(1),score:0,lives:MAXL,t:LEVEL_MS,lvl:1,played:0,banner:null,blkT:7000,spkT:6000,spinT:0,spinA:0,items:[],bolts:[],rain:[],pops:[],speed:3.2,shake:0,inv:0,flash:0,last:0,spawnT:0,boltT:10000,coins:0,dmg:0,flames:[],smoke:[],cracks:[],dying:0,spin:0,rot:0,skids:[],rear:null,cops:[],copT:16000,dz:0,dzT:3000,twT:15000,twLane:(Math.random()*4)|0,cowT:12000,stopT:18000,sfx:null}; }
 st=fresh();
-for(var i=0;i<90;i++) st.rain.push({x:Math.random()*W,y:Math.random()*H,l:8+Math.random()*14,v:9+Math.random()*7});
+for(var i=0;i<50;i++) st.rain.push({x:Math.random()*W,y:Math.random()*H,l:8+Math.random()*14,v:9+Math.random()*7});
 var road=0;
 function hud(){ $("score").textContent=st.score.toLocaleString(); $("lives").textContent=livesStr(st.lives); $("time").textContent=T("Lv")+" "+st.lvl+" · "+Math.ceil(Math.max(0,st.t)/1000)+"s"; }
 function best(){ try{ var b=+localStorage.getItem("sb-best")||0; $("best").textContent="Your best: "+(b?b.toLocaleString()+" pts":"—"); return b; }catch(e){ return 0; } }
@@ -857,7 +864,7 @@ lbl(); MS.button(document.getElementById("sbaud"),"","");
 <script src="fx.js"></script>
 <script src="kitchen.js?v=k3"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="storm3d.js?v=sb3d16"></script>
+<script type="module" src="storm3d.js?v=sb3d17"></script>
 <script src="../contract.js"></script>
 <script>window.CRM_CFG={name:"StormBurger",offer:"Free fries with your next burger",perDollar:20,tiers:[[1000,"Free fries"],[1800,"Free shake"],[3000,"Free Classic StormBurger"],[4500,"Free combo"]],referral:{gift:"Free Classic StormBurger"},earn:{checkin:50,firstOrder:100,birthday:200,review:{pts:250,platform:"app"},referral:{join:150,friend:50,friendGift:"Free fries",first:100,every:25}},
  // Storm Run access. PHASE 1 (live default): free to play, no sign-up first; guests save their score + prize after the run with a member account (name + phone + email, one account per phone).
@@ -921,7 +928,7 @@ lbl(); MS.button(document.getElementById("sbaud"),"","");
  hero:["img/game/fries.webp","img/game/burger.webp","img/game/shake.webp","img/game/chicken.webp"],
  theme:{bg:"#070B1E",bg2:"#121C40",card:"#1a2656",edge:"#25336A",accent:"#E8582A",accent2:"#FFD23F",ink:"#EEF2FF",dim:"#9AA6CC",btnInk:"#141a33",display:"'Bebas Neue','Arial Narrow',Impact,sans-serif",body:"Archivo,system-ui,sans-serif"},
  tokens:true,spinBadge:true,
- mount:"#game",start:function(){ window.__S.start(); },vibrate:true,
+ mount:"#game",start:function(){ window.__S.start(); },vibrate:true,fullscreen:{fill:true},
  // 3D chase view (storm3d.js): visual only, never changes the game
  selects:[{title:"View",options:[["3d","3D chase cam"],["2d","Classic 2D"]],note:"3D drives the real streets behind the truck. Classic 2D is the original top-down game.",
    get:function(){ try{ return localStorage.getItem("sb-render")||"3d"; }catch(e){ return "3d"; } },

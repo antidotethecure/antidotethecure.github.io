@@ -44,8 +44,12 @@ async function boot() {
   const BG = new THREE.Color(0x0c1330), BGF = new THREE.Color(0x5a6890);
   scene.background = BG.clone(); scene.fog = new THREE.Fog(0x141d3c, 900, 2900);
   const cam = new THREE.PerspectiveCamera(72, W / H, 4, 4600);
-  const size = () => { const w = game.clientWidth || W, h = game.clientHeight || H; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, cfg.pr)); renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); };
-  size(); new ResizeObserver(size).observe(game);
+  const BASEA = W / H, BASEV = 72;   // keep the side-to-side view of the 400x560 game; a taller screen (full screen on a phone) shows more road + sky, never less width
+  const size = () => { const w = cv.clientWidth || game.clientWidth || W, h = cv.clientHeight || game.clientHeight || H; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, cfg.pr)); renderer.setSize(w, h, false); cam.aspect = w / h;
+    const bh = w / BASEA, ex = h - bh;   // taller than the game: the extra goes on TOP (more road ahead + sky), the truck keeps its spot near the bottom
+    if (ex > 1) { const fh = bh + 1.2 * ex; cam.fov = 2 * Math.atan(Math.tan(BASEV * Math.PI / 360) * fh / bh) * 180 / Math.PI; cam.setViewOffset(w, fh, 0, 0, w, h); }
+    else { cam.clearViewOffset(); cam.fov = BASEV; } cam.updateProjectionMatrix(); };
+  size(); { const ro = new ResizeObserver(size); ro.observe(game); ro.observe(cv); }
   q.onChange((t, c) => { cfg = c; STATUS.tier = q.smooth ? "smooth" : t; size(); });
   let visible = true; new IntersectionObserver(e => { visible = e[0].isIntersecting; }).observe(game);
 
@@ -161,12 +165,38 @@ async function boot() {
     add(g, PLANE, concrete, 50, 26, 1, s * 322, .35, z + w * .38).rotation.x = -Math.PI / 2;
     box(g, MAT.fence, 1.2, 12, w - 30, s * 297, 6, z - 12);
     for (let i = 0; i < 3; i++) add(g, new THREE.SphereGeometry(1, 8, 6), std(0x1f4a24, { roughness: 1 }), 9, 7, 9, s * 343, 5, z - w * .35 + i * 14); }
+  /* real-looking Long Beach storefronts (Higgsfield, 10-22): barbershop, nail salon, market, the 11-7, laundromat, taco shop, donut shop */
+  const LBN = ["barber", "nails", "market", "eleven7", "laundry", "tacos", "donuts"], LBM = [];
+  const lbMat = i => LBM[i] || (LBM[i] = (() => { const t = new THREE.TextureLoader().load("img/world/lb-" + LBN[i] + ".webp"); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = ANISO;
+    return std(0xffffff, { map: t, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: .6, roughness: .8 }); })());
+  let lbK = (Math.random() * 7) | 0;
+  const PEDC = [[0x6b4423, 0x2a3a5a], [0x8d5524, 0x7a1f24], [0x3d2314, 0x1d1d1f], [0xc68642, 0x2f6a3a], [0xe0ac69, 0xd9d4c8], [0x5a3a22, 0x1f46b8]], UMB = [0x1d1d1f, 0x1f46b8, 0x8e1f24, 0x2f6a3a, 0xd9262f];
+  function makePed(k) { const [skin, shirt] = PEDC[k % PEDC.length], g = new THREE.Group(), sm = std(skin), shm = std(shirt), pm = std(pick([0x22252b, 0x3a3f4a, 0x2b2f3a]));   // a grown-up walking the sidewalk, some under an umbrella
+    const legs = [-2.6, 2.6].map(x => { const l = new THREE.Group(); l.position.set(x, 16, 0); g.add(l); add(l, CYL6, pm, 3.2, 16, 3.2, 0, -8, 0); return l; });
+    add(g, CYL6, shm, 6.5, 17, 4.5, 0, 24.5, 0); add(g, new THREE.SphereGeometry(1, 10, 8), sm, 5, 5.6, 5, 0, 37.5, 0);
+    const arms = [-7.5, 7.5].map(x => { const a = new THREE.Group(); a.position.set(x, 31, 0); g.add(a); add(a, CYL6, shm, 2, 15, 2, 0, -7, 0); return a; });
+    if (Math.random() < .55) { add(g, CYL6, MAT.pole, .6, 26, .6, 5, 42, 0); const u = add(g, new THREE.ConeGeometry(1, 1, 10), std(pick(UMB), { roughness: .5, side: THREE.DoubleSide }), 17, 6, 17, 5, 56, 0); arms[1].rotation.x = -1.2; }
+    g.scale.setScalar(1.12); return { g, legs, arms, ph: Math.random() * 6 }; }
+  function storefronts(g, s, len, peds) {   // a row of separate little shops on the sidewalk, each its own height, with life out front
+    const n = Math.max(1, Math.round((len - 14) / 175)), w = (len - 14) / n;
+    for (let i = 0; i < n; i++) { const z = -len / 2 + 7 + w * (i + .5), hgt = w / 1.87, dep = 90 + rnd() * 40, back = rnd() * 10, mats = [MAT.wall, MAT.wall, MAT.roof, MAT.wall, MAT.wall, MAT.wall];
+      mats[s < 0 ? 0 : 1] = lbMat(lbK++ % LBN.length); box(g, mats, dep, hgt, w - 3, s * (296 + back + dep / 2), hgt / 2, z);
+      box(g, MAT.wall, dep + 2, 6 + rnd() * 10, w - 1, s * (296 + back + dep / 2), hgt + 3, z);   // parapet
+      const gl = add(g, PLANE, glowPlaneMat(0xffd9a0, .22), 60, w * .8, 1, s * 270, .8, z); gl.rotation.x = -Math.PI / 2; }   // shop light spilling on the wet sidewalk
+    if (rnd() < .5) { add(g, CYL6, std(0xd9b21f), 3.2, 9, 3.2, s * 212, 4.5, -len * .3); add(g, new THREE.SphereGeometry(1, 8, 6), std(0xd9b21f), 3, 2.6, 3, s * 212, 9, -len * .3); }   // fire hydrant
+    if (rnd() < .6) add(g, CYL6, std(0x2a3a2e), 7, 13, 7, s * 280, 6.5, len * .15);   // trash can
+    if (rnd() < .3) { box(g, std(0x3a5a8a), 6, 4, 40, s * 270, 9, len * .35); box(g, std(0x3a5a8a), 2, 14, 40, s * 280, 14, len * .35); }   // bus bench
+    const np = LITE ? (rnd() < .5 ? 1 : 0) : (rnd() * 3) | 0;
+    for (let i = 0; i < np; i++) { const P = makePed((rnd() * 99) | 0); P.x = s * (232 + rnd() * 40); P.z = (rnd() - .5) * len; P.v = (rnd() < .5 ? -1 : 1) * (14 + rnd() * 10); P.g.rotation.y = P.v > 0 ? 0 : Math.PI; P.len = len; g.add(P.g); peds.push(P); } }
+  function walkPeds(peds, t, dt) { for (const P of peds) { P.z += P.v * dt; if (Math.abs(P.z) > P.len / 2) { P.v = -P.v; P.g.rotation.y = P.v > 0 ? 0 : Math.PI; P.z = Math.sign(P.z) * P.len / 2; }
+      const w = Math.sin(t * 7 + P.ph); P.g.position.set(P.x, Math.abs(w) * 1.2, P.z); P.legs[0].rotation.x = w * .5; P.legs[1].rotation.x = -w * .5; P.arms[0].rotation.x = -w * .4; } }
   function lot(s) {   // a generic block on side s (-1 left, 1 right), mixed like the real boulevards
-    const g = new THREE.Group(), r = rnd(), len = 170 + rnd() * 150; let upd = null; const crowns = [];
+    const g = new THREE.Group(), r = rnd(), len = 170 + rnd() * 150; let upd = null; const crowns = [], peds = [];
     sidewalk(g, s, len);
     if (rnd() < .62) streetlight(g, s, -len / 2 + 20);
-    const pShop = city === "lb" ? .32 : .42, pHouse = city === "lb" ? .36 : .24;
-    if (r < pShop) { const hgt = 36 + rnd() * 38, dep = 100 + rnd() * 50, mats = [MAT.wall, MAT.wall, MAT.roof, MAT.wall, MAT.wall, MAT.wall]; mats[s < 0 ? 0 : 1] = pick(FACADES);   // 1-2 story shop row on the sidewalk
+    const pShop = city === "lb" ? .44 : .48, pHouse = city === "lb" ? .36 : .24;
+    if (r < pShop && rnd() < .75) storefronts(g, s, len, peds);   // the Long Beach storefront rows
+    else if (r < pShop) { const hgt = 36 + rnd() * 38, dep = 100 + rnd() * 50, mats = [MAT.wall, MAT.wall, MAT.roof, MAT.wall, MAT.wall, MAT.wall]; mats[s < 0 ? 0 : 1] = pick(FACADES);   // 1-2 story shop row on the sidewalk
       box(g, mats, dep, hgt, len - 14, s * (300 + dep / 2), hgt / 2, 0); box(g, MAT.dark, 4, 6, len - 14, s * 301, hgt, 0);
       box(g, std(pick(AWN), { roughness: .7 }), 12, 3, len - 30, s * 295, hgt * .55, 0).rotation.z = s * .35; }   // awning
     else if (r < pShop + pHouse) { if (len > 250) { house(g, s, -len / 4, len / 2 - 16); house(g, s, len / 4, len / 2 - 16); } else house(g, s, 0, Math.min(len - 30, 130));
@@ -181,7 +211,7 @@ async function boot() {
     else { add(g, PLANE, asph2, 200, len - 10, 1, s * 395, .3, 0).rotation.x = -Math.PI / 2; box(g, MAT.fence, 1.5, 22, len - 20, s * 298, 11, 0);   // fenced lot
       for (let i = 0; i < 3; i++) if (rnd() < .6) box(g, std(pick([0x6b1f1f, 0x2a3a5a, 0xbfc4cc, 0x1d1d1f, 0x5a5a40])), 46, 26, 90, s * (330 + i * 60), 13, (rnd() - .5) * 40); }
     if (rnd() < .4) crowns.push(palm(g, s * 222, len * .2, 230 + rnd() * 120));
-    if (crowns.length) { const ph = rnd() * 6; upd = (o, t) => crowns.forEach((c, i) => { c.rotation.z = Math.sin(t * 1.7 + ph + i) * .12; c.rotation.x = Math.sin(t * 1.3 + ph) * .06; }); }
+    if (crowns.length || peds.length) { const ph = rnd() * 6; upd = (o, t, dt) => { crowns.forEach((c, i) => { c.rotation.z = Math.sin(t * 1.7 + ph + i) * .12; c.rotation.x = Math.sin(t * 1.3 + ph) * .06; }); if (dt) walkPeds(peds, t, dt); }; }
     return { o: g, len, upd };
   }
 
@@ -778,40 +808,52 @@ async function boot() {
     const dtex = new THREE.CanvasTexture(dc); dtex.minFilter = dtex.magFilter = THREE.LinearFilter; dtex.generateMipmaps = false;
     const rt = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: LITE ? 0 : 4 });
     const mat = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false,
-      uniforms: { tScene: { value: rt.texture }, tDrops: { value: dtex }, px: { value: new THREE.Vector2(1 / DW, 1 / DH) }, glint: { value: 0 } },
+      uniforms: { tScene: { value: rt.texture }, tDrops: { value: dtex }, px: { value: new THREE.Vector2(1 / DW, 1 / DH) }, glint: { value: 0 }, wipe: { value: -1.45 }, piv: { value: new THREE.Vector2(DW / 2, DH * 1.04) }, dsz: { value: new THREE.Vector2(DW, DH) }, bw: { value: 5.5 * u } },
       vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }",
-      fragmentShader: `uniform sampler2D tScene, tDrops; uniform vec2 px; uniform float glint; varying vec2 vUv;
+      fragmentShader: `uniform sampler2D tScene, tDrops; uniform vec2 px, piv, dsz; uniform float glint, wipe, bw; varying vec2 vUv;
         void main(){ float h = texture2D(tDrops, vUv).r;
           vec2 g = vec2(texture2D(tDrops, vUv + vec2(px.x, 0.)).r - texture2D(tDrops, vUv - vec2(px.x, 0.)).r, texture2D(tDrops, vUv + vec2(0., px.y)).r - texture2D(tDrops, vUv - vec2(0., px.y)).r);
           vec2 off = -g * .07 - (vUv - .5) * h * .06;                      // a drop is a little lens: it bends + flips what's behind it
           vec3 c = texture2D(tScene, vUv + off).rgb;
           c *= 1. - smoothstep(.08, .5, length(g)) * .18;                   // dark rim
           c += vec3(.8, .88, 1.) * pow(max(0., dot(normalize(vec3(g * 5., 1.)), normalize(vec3(-.4, .55, .73)))), 28.) * h * (.35 + glint * 1.6);   // glint, brighter in a lightning flash
+          vec2 q = vec2(vUv.x * dsz.x, (1. - vUv.y) * dsz.y) - piv; float dist = length(q), a = atan(q.x, -q.y), dd = abs(sin(a - wipe)) * dist;   // the wiper blade
+          float blade = (1. - smoothstep(bw * .55, bw, dd)) * step(dsz.y * .2, dist) * step(0., cos(a - wipe));
+          c = mix(c, vec3(.02, .022, .028), blade * .95); c += vec3(.25) * (1. - smoothstep(0., bw * .25, abs(dd - bw * .5))) * blade * .35;   // rubber blade with a wet highlight
           gl_FragColor = vec4(c, 1.);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
         }` });
     const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); quad.frustumCulled = false; const ls = new THREE.Scene(); ls.add(quad);
-    const drops = [], bs = new THREE.Vector2(); let acc = 0;
+    const drops = [], bs = new THREE.Vector2(); let acc = 0, wT = 0, wA = -1.45, wC = -1.45;
+    // windshield wipers (Antidote 10-22: "wiping the screen ... so you can see clearly"): a sweep across and back every 2.2 s, clearing every drop it passes
+    const WX = DW / 2, WY = DH * 1.04, WR = Math.hypot(DW / 2, WY) * 1.05, ease = v => v * v * (3 - 2 * v);
+    function wiper(dt) { wT += dt; const ph = wT % 2.2, A = 1.45; wA = ph < .5 ? -A + 2 * A * ease(ph / .5) : ph < 1 ? A - 2 * A * ease((ph - .5) / .5) : -A; }
+    function wipeClear() { const a0 = Math.min(wC, wA), a1 = Math.max(wC, wA); wC = wA; if (a1 - a0 < .001) return;
+      dx.fillStyle = "#000"; dx.beginPath(); dx.moveTo(WX, WY); dx.arc(WX, WY, WR, -Math.PI / 2 + a0 - .03, -Math.PI / 2 + a1 + .03); dx.closePath(); dx.fill();
+      for (let i = drops.length - 1; i >= 0; i--) { const p = drops[i], a = Math.atan2(p.x - WX, WY - p.y); if (a >= a0 - .05 && a <= a1 + .05) drops.splice(i, 1); } }
     function dot(x, y, r, a, sy = 1) { const g = dx.createRadialGradient(x, y - r * .25, 0, x, y, r); g.addColorStop(0, "rgba(255,255,255," + a + ")"); g.addColorStop(.55, "rgba(190,190,190," + a * .85 + ")"); g.addColorStop(1, "rgba(0,0,0,0)");
       dx.fillStyle = g; dx.beginPath(); dx.ellipse(x, y, r, r * sy, 0, 0, TAU); dx.fill(); }
     function step(dt, rain) { acc += dt; if (acc < 1 / 30) return; const d = acc; acc = 0;
       dx.fillStyle = "rgba(0,0,0," + Math.min(1, d * 1.6) + ")"; dx.fillRect(0, 0, DW, DH);   // trails dry up
-      const n = rain * d * 16; for (let i = 0; i < n || (i < 1 && Math.random() < n); i++) if (drops.length < (LITE ? 34 : 52)) drops.push({ x: Math.random() * DW, y: Math.random() * DH, r: (1.2 + Math.pow(Math.random(), 2.2) * 5.5) * u, v: 0, life: 4 + Math.random() * 6 });
+      wipeClear();
+      const n = rain * d * 6; for (let i = 0; i < n || (i < 1 && Math.random() < n); i++) if (drops.length < (LITE ? 12 : 18)) drops.push({ x: Math.random() * DW, y: Math.random() * DH, r: (1.2 + Math.pow(Math.random(), 2.2) * 5.5) * u, v: 0, life: 4 + Math.random() * 6 });
       for (let i = drops.length - 1; i >= 0; i--) { const p = drops[i]; p.life -= d; p.r += d * .25 * u * rain;   // drops collect more rain, then run
         if (p.r > 4.2 * u) { p.v = Math.min(110 * u, p.v + 220 * u * d); const y0 = p.y; p.y += p.v * d; p.x += (Math.random() - .5) * 1.4 * u; if (Math.random() < .22) dot(p.x, (y0 + p.y) / 2, p.r * .24, .45); p.r -= d * .7 * u; }
         if (p.y - p.r > DH || p.life <= 0 || p.r < .8 * u) { drops.splice(i, 1); continue; }
         dot(p.x, p.y, p.r, 1, p.v > 0 ? 1.25 : 1); }
       dtex.needsUpdate = true; }
     return { render(dt, fl) { renderer.getDrawingBufferSize(bs); if (rt.width !== bs.x || rt.height !== bs.y) rt.setSize(bs.x, bs.y);
-      renderer.setRenderTarget(rt); renderer.render(scene, cam); renderer.setRenderTarget(null); step(dt, 1); mat.uniforms.glint.value = fl; renderer.render(ls, cam); } };
+      renderer.setRenderTarget(rt); renderer.render(scene, cam); renderer.setRenderTarget(null); wiper(dt); step(dt, 1); mat.uniforms.glint.value = fl; mat.uniforms.wipe.value = wA; renderer.render(ls, cam); } };
   })();
 
   /* ---------- frame ---------- */
   let brokeN = 0; const flying = []; let warp = 0, last = 0, t = 0, odo = 0, wasRun = false, frames = 0, fpsT = 0, odd = 0, camX = 0, camShake = 0, flashK = 0, failed = false;
   const off2d = () => { S.r3 = false; S.render = null; cv.remove(); game.style.background = ""; STATUS.on = false; };
   STATUS.enable = on => { if (!on) { S.r3 = false; cv.style.visibility = "hidden"; game.style.background = ""; STATUS.on = false; } else if (!failed) { S.r3 = true; cv.style.visibility = "visible"; game.style.background = "transparent"; STATUS.on = true; } };
-  const proj = (x, y) => { V.set(wx(x), 50, wz(y)).project(cam); return [(V.x + 1) / 2 * W, (1 - V.y) / 2 * H]; };
+  const proj = (x, y) => { V.set(wx(x), 50, wz(y)).project(cam); const cr = cv.getBoundingClientRect(), gr = game.getBoundingClientRect();   // 3D point -> the 2D game canvas (which may be letterboxed inside a bigger 3D view)
+    const k = Math.min(gr.width / W, gr.height / H) || 1, l = gr.left + (gr.width - W * k) / 2, tp = gr.top + (gr.height - H * k) / 2;
+    return [(cr.left + (V.x + 1) / 2 * cr.width - l) / k, (cr.top + (1 - V.y) / 2 * cr.height - tp) / k]; };
   // prime the street so the first frame already has blocks on both sides
   fill();
 
@@ -937,6 +979,7 @@ async function boot() {
   STATUS.warp = d => { warp += d; }; STATUS.board = () => { bbT = 0; };
   STATUS.store = z => { const o = store(1, "1500 N LA BREA AVE", true).o; o.position.z = z; scene.add(o); return o; };   // test hook: drop the StormBurger stop beside the road
   STATUS.jump = n => event(LVL[n - 1]);
+  STATUS.sfTest = z => { const g = new THREE.Group(), P = []; storefronts(g, 1, 500, P); g.position.z = z; scene.add(g); return g; };   // test hook: a storefront row beside the road
   STATUS.lmTest = n => event({ R: { queenMary, villa, parkers, dome, jordan }[n] });   // test hook: put one of the new landmarks on the road ahead   // test hook: put the landmark of level n on the road ahead now
   STATUS.booted = true;
 }

@@ -278,6 +278,7 @@ var DEBRIS=[{k:"cow",w:104,r:30,why:"🐄 MOO!"},{k:"stop",w:70,r:24,why:"🛑 S
 window.SB_HELI=function(l){ return l%2===0; };   // police helicopter + searchlight on levels 2,4,6,8,10
 var LEVEL_MS=60000, NLEV=10, LVNAME=["Welcome to Inglewood","Inglewood · The Stadium","Inglewood · The Forum","Inglewood · Florence Ave","Welcome to Long Beach","Long Beach · The Shore","Signal Hill","Long Beach Airport","Jordan High · Home of the Panthers","StormBurger · Cherry Ave"];
 function lvEl(){ return LEVEL_MS-st.t; }                       // ms into the current level
+function near(dy,r){ return dy<0?-dy<r*(window.__S&&window.__S.r3?0.4:1):dy<r; }   // 3D view: ahead of the truck only counts when it really touches the nose
 function hb(){ return 1+(st.lvl-1)*0.035; }                    // hazard hitboxes grow a little every level
 var MAXL=5;   // 5 lives per truck; every hit takes half a life, so it takes 10 hits to lose (Antidote 2026-10-21)
 function dmgFor(l){ return l>=MAXL?0:l>2.5?1:2; }   // truck damage look: smoking/burning after the first hit, cracked glass at half health
@@ -365,7 +366,7 @@ function hit(x,y,why,pen){
   pop(x,y-20,why+" −"+pen,"#ff6b5b"); if(navigator.vibrate) try{navigator.vibrate(st.lives<=0?[90,60,200]:60);}catch(e){}
   var py=H-80;
   if(st.dmg===1&&d0<1) pop(st.x,py-70,T("🔥 Engine on fire!"),"#ffb347");
-  if(st.dmg===2&&d0<2){ st.cracks=crackSet(); pop(st.x,py-70,T("💥 Windows cracked!"),"#ff6b5b"); }
+  if(st.dmg===2&&d0<2) pop(st.x,py-70,T("🔥 Truck badly damaged!"),"#ff6b5b");
   if(st.lives>0&&!st.flat&&Math.random()<0.18){ st.flat=Math.random()<.5?-1:1; pop(st.x,py-100,T("💥 Tire blew out!"),"#ff6b5b"); }   // 18% per hit: a blown tire makes the truck weave until the pit stop
   if(st.lives<=0){ st.dying=performance.now(); st.inv=1e9; st.shake=22; st.flash=0.9; st.dx=st.x; st.items=[]; st.bolts=[]; }
 }
@@ -603,7 +604,7 @@ function copStep(dt,k,py){ // cops come up from behind, then either blow past or
       
       if(qOut&&c.tl===LANES-1) c.tl=LANES-2;   /* steer clear of the cars lined up at StormBurger */
       c.x+=(LX(c.tl)-c.x)*Math.min(1,0.06*k);
-      if(!c.hitDone&&Math.abs(c.x-st.x)<44*hb()&&Math.abs(c.y-py)<84){ c.hitDone=1; hit(st.x,py,T("🚓 RAMMED!")); c.tl=Math.max(0,Math.min(LANES-1,c.tl+(c.tl===LANES-1?-1:1))); }
+      if(!c.hitDone&&Math.abs(c.x-st.x)<44*hb()&&near(c.y-py,84)){ c.hitDone=1; hit(st.x,py,T("🚓 RAMMED!")); c.tl=Math.max(0,Math.min(LANES-1,c.tl+(c.tl===LANES-1?-1:1))); }
     }
     if(c.y<-150){ st.cops.splice(i,1); continue; }
   }
@@ -669,17 +670,17 @@ function frame(now){
     if(!r3) drawItem(it,now);
     if(it.type==="queue"){ if(st.running&&!pit&&!st.dying&&Math.abs(st.x-it.x)<50&&Math.abs(it.y-py)<it.len/2+40){ hit(st.x,py,T("🚗 DRIVE-THRU LINE!")); if(st.dying) break; } continue; }
     if(it.type==="pit"){ if(st.running&&!pit&&!it.used&&!st.dying&&st.lane===LANES-1&&Math.abs(it.y-py)<it.r+28) pitStart(it); continue; }
-    if(it.type==="block"){ if(st.running&&!pit&&!it.done&&!st.dying&&Math.abs(it.y-py)<34*hb()){ if(Math.abs(st.x-LX(it.gap))>44){ it.done=1; hit(st.x,py,T("🚓 ROADBLOCK!"),150); if(st.dying) break; } } if(it.y>py+60) it.done=1; continue; }
-    if(it.type==="spike"){ if(st.running&&!pit&&!it.done&&!st.dying&&Math.abs(it.x-st.x)<(it.r+16)*hb()&&Math.abs(it.y-py)<26){ it.done=1; var s0=st.lives; hit(st.x,py,T("⚠️ SPIKE STRIP!"));
+    if(it.type==="block"){ if(st.running&&!pit&&!it.done&&!st.dying&&near(it.y-py,34*hb())){ if(Math.abs(st.x-LX(it.gap))>44){ it.done=1; hit(st.x,py,T("🚓 ROADBLOCK!"),150); if(st.dying) break; } } if(it.y>py+60) it.done=1; continue; }
+    if(it.type==="spike"){ if(st.running&&!pit&&!it.done&&!st.dying&&Math.abs(it.x-st.x)<(it.r+16)*hb()&&near(it.y-py,26)){ it.done=1; var s0=st.lives; hit(st.x,py,T("⚠️ SPIKE STRIP!"));
         if(st.lives<s0&&!st.dying){ if(!st.flat) st.flat=Math.random()<.5?-1:1; st.spinT=1200; st.spinDir=st.flat; pop(st.x,py-100,T("💥 Tires popped! Spinning out!"),"#ff6b5b"); } if(st.dying) break; } continue; }
-    var hk=(it.type==="debris"||it.type==="twister")?hb():1; if(st.running&&!pit&&Math.abs(it.x-st.x)<(it.r+18)*hk&&Math.abs(it.y-py)<(it.r+28)*hk){
+    var hk=(it.type==="debris"||it.type==="twister")?hb():1; if(st.running&&!pit&&Math.abs(it.x-st.x)<(it.r+18)*hk&&near(it.y-py,(it.r+28)*hk)){
       if(it.type==="egg"){ var eb=ReviewEgg.collect(); st.score+=eb; pop(it.x,it.y-20,"+"+eb+" 📺 "+T("Antidote's review"),"#FFD23F"); }
       else if(it.type==="driz"){ st.dz++; st.score+=25; pop(it.x,it.y,"✦ "+Math.min(st.dz,DRIZ_N)+"/"+DRIZ_N+" "+T("Antidote Drizzle"),"#FFD23F");
         if(st.dz===DRIZ_N&&window.ReviewEgg) ReviewEgg.toast("✦ "+T("Review unlocked!"),T("Antidote's StormBurger review is on a billboard up ahead. Drive through its golden ▶")); }
       else if(it.type==="coin"){ st.score+=10; st.coins++; pop(it.x,it.y,"+10","#FFD23F"); }
       else if(it.type==="food"){ st.score+=it.f.p; pop(it.x,it.y,"+"+it.f.p+" "+T(it.f.n),"#FFD23F"); }
       else if(it.type==="twister"){ hit(it.x,it.y,T("🌪️ TWISTER!"),Math.max(200,Math.round(st.score*0.25))); if(st.dying) break; }
-      else { var l0=st.lives; hit(it.x,it.y,T(it.d.why)); if(st.lives<l0) screenHit(it.d.k==="cow"?"milk":"crack"); if(st.dying) break; }
+      else { var l0=st.lives; hit(it.x,it.y,T(it.d.why)); if(st.lives<l0){ screenHit(it.d.k==="cow"?"milk":"crack"); if(it.d.k==="stop"&&!st.cracks.length) st.cracks=crackSet(); } if(st.dying) break; }
       st.items.splice(i,1);
     }
   }
@@ -842,9 +843,9 @@ lbl(); MS.button(document.getElementById("sbaud"),"","");
 })();
 </script>
 <script src="fx.js"></script>
-<script src="kitchen.js?v=k1"></script>
+<script src="kitchen.js?v=k2"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="storm3d.js?v=sb3d7"></script>
+<script type="module" src="storm3d.js?v=sb3d8"></script>
 <script src="../contract.js"></script>
 <script>window.CRM_CFG={name:"StormBurger",offer:"Free fries with your next burger",perDollar:20,tiers:[[1000,"Free fries"],[1800,"Free shake"],[3000,"Free Classic StormBurger"],[4500,"Free combo"]],referral:{gift:"Free Classic StormBurger"},earn:{checkin:50,firstOrder:100,birthday:200,review:{pts:250,platform:"app"},referral:{join:150,friend:50,friendGift:"Free fries",first:100,every:25}},
  // Storm Run access. PHASE 1 (live default): free to play, no sign-up first; guests save their score + prize after the run with a member account (name + phone + email, one account per phone).

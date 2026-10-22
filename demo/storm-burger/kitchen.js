@@ -10,12 +10,12 @@
   var T = function (s) { return (window.__T || String)(s); };
   var IMG = "img/build/", TIME = 20000;
   var ING = { bun_bottom: "Bottom bun", bun_top: "Top bun", patty: "Patty", cheese: "Cheese", lettuce: "Lettuce", tomato: "Tomato", onion: "Onion",
-    pickles: "Pickles", pickles_crinkle: "Crinkle pickles", bacon: "Bacon", onion_straws: "Onion straws", chicken: "Chicken" };
+    pickles: "Pickles", pickles_crinkle: "Crinkle pickles", bacon: "Bacon", onion_straws: "Onion straws", chicken: "Chicken", slaw: "Coleslaw" };
   var ORDERS = [
     ["Classic StormBurger", ["bun_bottom", "patty", "cheese", "pickles", "onion", "tomato", "lettuce", "bun_top"]],
     ["Kids Burger", ["bun_bottom", "patty", "cheese", "bun_top"]],
     ["Bacon BBQ Burger", ["bun_bottom", "patty", "cheese", "bacon", "onion_straws", "bun_top"]],
-    ["Chicken Sandwich", ["bun_bottom", "pickles_crinkle", "chicken", "bun_top"]],
+    ["Chicken Sandwich", ["bun_bottom", "pickles_crinkle", "chicken", "slaw", "lettuce", "bun_top"]],
     ["Turkey Burger", ["bun_bottom", "onion", "patty", "cheese", "tomato", "lettuce", "bun_top"]],
     ["Double Classic", ["bun_bottom", "patty", "cheese", "patty", "cheese", "bun_top"]]];
   var KIDS = ["🧑🏾", "👦🏽", "👧🏿", "🧒🏻", "👩🏾", "👦🏿"];
@@ -26,7 +26,7 @@
     ".sbk .tk h4{margin:0 0 4px;font:900 14px Archivo,system-ui}.sbk .tk ol{margin:0;padding-left:18px;font-size:11.5px;line-height:1.45}.sbk .tk li.ok{color:#1e9a52;text-decoration:line-through}.sbk .tk li.nx{font-weight:900;color:#d9262f}" +
     ".sbk .st{position:relative;width:46%;min-height:150px}.sbk .st img{position:absolute;left:50%;transform:translateX(-50%);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45));transition:bottom .12s}" +
     ".sbk .sc{display:flex;justify-content:space-around;padding:6px 10px;font-weight:800}.sbk .sc span b{color:#FFD23F}" +
-    ".sbk .gr{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:4px 10px 6px;flex:1;align-content:start}" +
+    ".sbk .gr{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:4px 10px 6px;flex:1;align-content:start}" +
     ".sbk .gr button{background:#1a2656;border:1px solid #33437f;border-radius:10px;color:#EEF2FF;padding:3px 2px 4px;font:700 10px Archivo,system-ui;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}" +
     ".sbk .gr button img{width:100%;height:34px;object-fit:contain}.sbk .gr button.bad{animation:sbkx .3s}.sbk .gr button.hit{background:#1e6b3e}" +
     "@keyframes sbkx{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}" +
@@ -54,7 +54,7 @@
     im.src = IMG + k + ".webp"; im.style.width = (W * wide) + "px";
     var prev = stack.lastChild, base = prev ? parseFloat(prev.dataset.top) : 4;
     im.style.bottom = base + "px"; im.style.zIndex = stack.children.length + 1; stack.appendChild(im);
-    var fit = function () { var h = im.getBoundingClientRect().height || W * .3, sink = /cheese|pickles|onion|tomato|lettuce/.test(k) ? .62 : /patty|chicken|bacon/.test(k) ? .5 : .45;
+    var fit = function () { var h = im.getBoundingClientRect().height || W * .3, sink = /cheese|pickles|onion|tomato|lettuce|slaw/.test(k) ? .62 : /patty|chicken|bacon/.test(k) ? .5 : .45;
       im.dataset.top = base + h * (1 - sink); };
     if (im.complete) fit(); else im.onload = fit; im.dataset.top = base + W * .12; }
   function pop(txt) { var p = $(".pop"); p.textContent = txt; p.style.opacity = 1; setTimeout(function () { p.style.opacity = 0; }, 650); }

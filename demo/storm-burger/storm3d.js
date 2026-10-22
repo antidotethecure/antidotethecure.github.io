@@ -36,7 +36,7 @@ async function boot() {
   if (getComputedStyle(game).position === "static") { game.style.position = "relative"; game.style.zIndex = "1"; }   // the 2D canvas (HUD text, warnings, +points) stays on top of the 3D view
   host.insertBefore(cv, game);
   const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: !QM.isHandheld(), powerPreference: "high-performance" });
-  renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.18;
+  renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.45;
   const q = window.__E3Q = QM.makeQuality({ id: "storm-burger", renderer, target: 50, minFps: 30, calm: () => !S.get().running });
   let cfg = q.cfg; STATUS.tier = q.smooth ? "smooth" : q.tier;
   const LITE = q.smooth || q.tier === "low";
@@ -551,7 +551,7 @@ async function boot() {
   /* ---------- pickups, hazards ---------- */
   const SPRT = {}; S.FOOD.map(f => f.k).concat(["cow", "stop", "smoke"]).forEach(k => SPRT[k] = img("img/game/" + k + ".webp"));
   // StormBurger's menu, the cow, the stop sign and the drizzle coin as real 3D models (food3d.js); built + compiled up front so nothing hitches mid-run
-  const PROPS = (await import("./food3d.js?v=f2")).makeProps(THREE, { aniso: ANISO });
+  const PROPS = (await import("./food3d.js?v=f3")).makeProps(THREE, { aniso: ANISO });
   try { const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js"), gl = await new GLTFLoader().loadAsync("img/3d/cow.glb");   /* photoreal cow mesh (Higgsfield, 10-21); the drawn cow stays as fallback */
     gl.scene.traverse(m => { if (m.isMesh) { m.geometry.computeVertexNormals(); m.material.roughness = .85; if (m.material.map) m.material.map.anisotropy = ANISO; } }); PROPS.setModel("cow", gl.scene); } catch (e) { console.warn("cow.glb", e); }
   { const warm = new THREE.Group(); PROPS.kinds.forEach((k, i) => { const o = PROPS.fit(k, 50); o.position.set((i - 5) * 30, 20, -200); warm.add(o); }); const dz0 = PROPS.driz(40); dz0.position.set(0, 30, -220); warm.add(dz0);
@@ -812,7 +812,7 @@ async function boot() {
     /* storm: flashes from the game's own lightning + the sky's */
     wx3.update(dt, t, cam);
     flashK = Math.max(flashK * Math.pow(.004, dt), st.flash * .9); const fl = Math.max(flashK, wx3.flash);
-    flashLight.intensity = flashK * 3000; hemi.intensity = 1.15 + fl * 3.2; scene.background.copy(BG).lerp(BGF, Math.min(1, fl * .8)); scene.fog.color.copy(BG).lerp(BGF, Math.min(1, fl * .6)).multiplyScalar(1.2);
+    flashLight.intensity = flashK * 3000; hemi.intensity = 1.55 + fl * 3.2; scene.background.copy(BG).lerp(BGF, Math.min(1, fl * .8)); scene.fog.color.copy(BG).lerp(BGF, Math.min(1, fl * .6)).multiplyScalar(1.2);
     fx.update(dt);
     if (LENS) LENS.render(dt, fl); else renderer.render(scene, cam);
     if (!S.r3 && !failed && pref() !== "2d") { STATUS.enable(true); S.proj = proj; }

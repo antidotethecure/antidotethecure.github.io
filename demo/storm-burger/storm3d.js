@@ -465,6 +465,11 @@ async function boot() {
   const shadowM = new THREE.MeshBasicMaterial({ map: glowTex, color: 0x000000, transparent: true, opacity: .55, depthWrite: false });
   const tShadow = add(scene, PLANE, shadowM, 80, 130, 1, 0, .8, 0); tShadow.rotation.x = -Math.PI / 2;
   const scorch = new THREE.Color(0x3a3530);
+  /* TORNADO WARNING: the lane it will come down glows red on the road */
+  const twTex = ctex(64, 512, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "rgba(255,40,30,0)"); g.addColorStop(.25, "rgba(255,40,30,.9)"); g.addColorStop(1, "rgba(255,60,40,.55)"); x.fillStyle = g; x.fillRect(0, 0, w, h);
+    x.fillStyle = "rgba(255,230,200,.9)"; for (let y = 40; y < h; y += 64) { x.beginPath(); x.moveTo(w * .2, y); x.lineTo(w * .5, y + 26); x.lineTo(w * .8, y); x.lineTo(w * .8, y + 12); x.lineTo(w * .5, y + 38); x.lineTo(w * .2, y + 12); x.fill(); } });
+  const twLaneM = new THREE.MeshBasicMaterial({ map: twTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -3 });
+  const twLane = add(scene, PLANE, twLaneM, 84, 1500, 1, 0, 1.2, -760); twLane.rotation.x = -Math.PI / 2; twLane.visible = false;
 
   /* ---------- cops ---------- */
   /* police SUVs, black with white doors, styled per city: Long Beach (small gold POLICE + round badge) and Inglewood
@@ -679,6 +684,7 @@ async function boot() {
       for (const lx of [-24, 24]) { const px = tx + c * lx + sn * 29, pz = -sn * lx + c * 29; const m = SK[skI] || (SK[skI] = {}); Object.assign(m, { x: px, z: pz, y: yaw, l: dz + 5 }); skI = (skI + 1) % SKN;
         if (Math.random() < .5) fx.emit(V.set(px, 4, pz), V2.set((Math.random() - .5) * 30, 20 + Math.random() * 20, st.speed * KF * 18), .9, 8, 50, [.86, .87, .9], [.6, .62, .66], .4, false, 0, 1.6, 10); } }   // + white tire smoke
     skid.count = SK.length; SK.forEach((m, i) => { SKE.set(-Math.PI / 2, 0, m.y); SKQ.setFromEuler(SKE); SKS.set(7, m.l, 1); SKP.set(m.x, .9, m.z); SKM.compose(SKP, SKQ, SKS); skid.setMatrixAt(i, SKM); }); skid.instanceMatrix.needsUpdate = true;
+    twLane.visible = run && !st.dying && !pitting && st.twT < 3200; if (twLane.visible) { twLane.position.x = wx(S.LX(st.twLane)); twLaneM.opacity = .55 + .45 * Math.sin(t * 14); }
     tShadow.position.set(tx, .8, 0); tShadow.visible = T.visible && ty < 40;
     const heat = Math.max(0, Math.min(1, 1 - st.lives / (window.SB_LIVES ? SB_LIVES.max() : 5)));   /* fire grows slowly with every hit */
     const scorchK = Math.min(1, heat * 1.2); [TRUCKM.wrapR, TRUCKM.wrapL, TRUCKM.rear, TRUCKM.cab].forEach(m => m.color.setHex(0xffffff).lerp(scorch, scorchK * .6));

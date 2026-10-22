@@ -635,7 +635,7 @@ function frame(now){
   var r3=window.__S.r3;   // 3D chase view on: storm3d.js draws the world under this canvas, which keeps only text + flashes
   if(r3) cx.clearRect(-40,-40,W+80,H+80); else { drawRoad(); drawSkids(k); }
   var pit=st.pitT>0;
-  if(st.running&&!st.dying&&pit){ st.pitT-=dt; st.x+=(LX(LANES-1)-st.x)*Math.min(1,0.2*k); st.rot*=0.85; if(st.pitT<=0){ st.pitT=0; st.inv=60; } }
+  if(st.running&&!st.dying&&pit){ st.pitT-=dt; st.vx=0; st.x+=(LX(LANES-1)-st.x)*Math.min(1,0.2*k); st.rot*=0.85; if(st.pitT<=0){ st.pitT=0; st.inv=60; } }
   else if(st.running&&!st.dying){
     var el=lvEl(), blkNear=st.items.some(function(q){ return (q.type==="block"||q.type==="queue")&&q.y>-500&&q.y<H; });
     if(false){   // the drive-thru line now waits in the StormBurger lot (storm3d), not on the road
@@ -652,9 +652,9 @@ function frame(now){
     if(window.ReviewEgg&&st.dz>=DRIZ_N&&ReviewEgg.due(st.played)){ var el=(Math.random()*LANES)|0; st.items.push({type:"egg",lane:el,x:LX(el),y:-40,r:20}); }
     st.boltT-=dt; if(st.boltT<=0){ st.bolts.push({lane:Math.random()<.7?st.lane:(Math.random()*LANES)|0,phase:"warn",age:0}); st.boltT=Math.max(3800,7200-st.lvl*300); }   // like Melody: it targets where the truck is, so you have to move in time
     if(st.spinT>0){ st.spinT-=dt; var su=1-Math.max(0,st.spinT)/1200; st.spinA=(st.spinDir||1)*6.283*(1-Math.pow(1-su,2.2)); if(st.spinT<=0){ st.spinT=0; st.spinA=0; } }   // spike strip spin-out
-    var dxl=LX(st.lane)-st.x; st.x+=dxl*Math.min(1,0.2*k);
+    var dxl=LX(st.lane)-st.x, w=0.21; st.vx=(st.vx||0)+(dxl*w*w-2*w*(st.vx||0))*Math.min(1.5,k); st.x+=st.vx*Math.min(1.5,k);   // critically damped spring: eases out of the lane and settles into the next one like a real swerve (10-22)
     if(st.flat){ st.x+=(Math.sin(now/170)*2.4+Math.sin(now/410)*1.6+st.flat*0.9)*k; if(Math.random()<.5) tireSmoke(st.x+st.flat*22,H-80+30); }
-    st.rot+=(Math.max(-0.5,Math.min(0.5,dxl*0.012+(st.flat?Math.sin(now/150)*0.09+st.flat*0.04:0)))-st.rot)*Math.min(1,0.32*k); // nose swings into the lane change (and fishtails on a blown tire)
+    st.rot+=(Math.max(-0.5,Math.min(0.5,(st.vx||0)*0.045+(st.flat?Math.sin(now/150)*0.09+st.flat*0.04:0)))-st.rot)*Math.min(1,0.32*k); // nose swings into the lane change (and fishtails on a blown tire)
     if(st.inv>0) st.inv-=k;
     if(Math.floor(now/250)!==Math.floor((now-dt)/250)) st.score+=1;
   }
@@ -803,8 +803,10 @@ function unlock(){
   src(.45).connect(rl).connect(g(.9)).connect(storm);                         // slow deep rumble / wind
   heli=g(0); heli.connect(out); var am=g(.5), hl=ctx.createOscillator(), hd=g(.5); hl.type="square"; hl.frequency.value=10.5; hl.connect(hd); hd.connect(am.gain); hl.start();
   src(.6).connect(flt("lowpass",360,.8)).connect(am).connect(heli);            // the helicopter overhead: low rotor thwop
+  tire=g(0); tire.connect(out); tbp=flt("bandpass",1400,1.1); src(1.25).connect(tbp).connect(tire); src(.5).connect(flt("lowpass",260,.7)).connect(g(.5)).connect(tire);   // wet tires skirting across the lane
 }
-var wb=null, sir=null;
+var wb=null, sir=null, tire=null, tbp=null;
+setInterval(function(){ if(!tire) return; var s2=S.get(), v=Math.min(1,Math.abs(s2.vx||0)/9); tire.gain.setTargetAtTime(was&&fxOn&&s2.running?v*v*.5:0,ctx.currentTime,.05); tbp.frequency.setTargetAtTime(1100+v*1500,ctx.currentTime,.06); },40);   // swish rises with how fast the truck slides sideways
 function white(){ if(wb) return wb; var sr=ctx.sampleRate; wb=ctx.createBuffer(1,sr,sr); var d=wb.getChannelData(0); for(var i=0;i<d.length;i++) d[i]=Math.random()*2-1; return wb; }
 function burst(buf,t,rate,type,f0,f1,peak,len,off){ var x=ctx.createBufferSource(), lp=ctx.createBiquadFilter(), gg=ctx.createGain();
   x.buffer=buf; x.playbackRate.value=rate; lp.type=type; lp.frequency.setValueAtTime(f0,t); lp.frequency.exponentialRampToValueAtTime(f1,t+len);
@@ -846,7 +848,7 @@ lbl(); MS.button(document.getElementById("sbaud"),"","");
 <script src="fx.js"></script>
 <script src="kitchen.js?v=k2"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="storm3d.js?v=sb3d13"></script>
+<script type="module" src="storm3d.js?v=sb3d14"></script>
 <script src="../contract.js"></script>
 <script>window.CRM_CFG={name:"StormBurger",offer:"Free fries with your next burger",perDollar:20,tiers:[[1000,"Free fries"],[1800,"Free shake"],[3000,"Free Classic StormBurger"],[4500,"Free combo"]],referral:{gift:"Free Classic StormBurger"},earn:{checkin:50,firstOrder:100,birthday:200,review:{pts:250,platform:"app"},referral:{join:150,friend:50,friendGift:"Free fries",first:100,every:25}},
  // Storm Run access. PHASE 1 (live default): free to play, no sign-up first; guests save their score + prize after the run with a member account (name + phone + email, one account per phone).

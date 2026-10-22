@@ -76,6 +76,7 @@ async function boot() {
   const LOGO = new Image(); LOGO.src = "img/logo.png"; const logoTex = [];   // canvases that draw the logo redraw once it loads
   LOGO.onload = () => logoTex.forEach(redraw);
   const pic = src => { const i = new Image(); i.onload = () => logoTex.forEach(redraw); i.src = src; return i; }, ok = i => i.complete && i.naturalWidth;
+  const JMURAL = pic("img/world/jordan-mural.jpg");   // the real JORDAN + panther mural off the tower, redrawn flat (Higgsfield, from his 10-22 photo)
   const P_ROAD = pic("img/world/road.webp"), P_SHOP = [pic("img/world/shops-a.webp"), pic("img/world/shops-b.webp")], P_SB = pic("img/world/stormburger.webp");   /* Higgsfield photo textures (10-21) */
   const BOX = new THREE.BoxGeometry(1, 1, 1), PLANE = new THREE.PlaneGeometry(1, 1), CYL = new THREE.CylinderGeometry(1, 1, 1, 10), CYL6 = new THREE.CylinderGeometry(1, 1, 1, 6);
   const std = (color, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: .8, metalness: 0 }, o));
@@ -282,13 +283,14 @@ async function boot() {
     x.restore(); }
   function jordan(s, walk = true) { const g = new THREE.Group(), len = 720; if (walk) sidewalk(g, s, len);
     const tan = std(0xcdb38f, { roughness: .9 }), tanD = std(0xb79c78, { roughness: .9 });
-    const mural = textTex("jordanmural", 512, 1024, (x, w, h) => { x.fillStyle = "#cdb38f"; x.fillRect(0, 0, w, h); for (let i = 0; i < 2500; i++) { x.fillStyle = "rgba(0,0,0," + (rnd() * .05) + ")"; x.fillRect(rnd() * w, rnd() * h, 3, 3); }
+    const mural = textTex("jordanmural2", 512, 843, (x, w, h) => { x.fillStyle = "#cdb38f"; x.fillRect(0, 0, w, h); for (let i = 0; i < 2500; i++) { x.fillStyle = "rgba(0,0,0," + (rnd() * .05) + ")"; x.fillRect(rnd() * w, rnd() * h, 3, 3); }
+      if (ok(JMURAL)) { x.drawImage(JMURAL, 0, 0, w, w * JMURAL.naturalHeight / JMURAL.naturalWidth); return; }
       x.font = "900 150px Arial Black,Impact,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.lineJoin = "round"; x.lineWidth = 22; x.strokeStyle = "#ffffff"; x.save(); x.translate(w / 2, 150); x.scale(.62, 1); x.strokeText("JORDAN", 0, 0); x.fillStyle = "#2346b5"; x.fillText("JORDAN", 0, 0); x.restore();
-      panther(x, w * .55, 470, 190); });
+      panther(x, w * .55, 470, 190); }); if (!logoTex.includes(mural)) logoTex.push(mural);
     const stripes = textTex("jordanstripes", 256, 1024, (x, w, h) => { x.fillStyle = "#cdb38f"; x.fillRect(0, 0, w, h); x.save(); x.translate(w / 2, h * .4); x.rotate(-.5); [["#c8202f", 0], ["#ffffff", 1], ["#2346b5", 2], ["#ffffff", 3], ["#c8202f", 4]].forEach(([c, i]) => { x.fillStyle = c; x.fillRect(-300, -120 + i * 48, 600, 44); }); x.restore(); });
     // tower: the mural faces the road, the red-white-blue stripes face oncoming traffic
-    const tw = [tan, tan, tanD, tanD, basic(0xffffff, { map: stripes }), tan]; tw[s < 0 ? 0 : 1] = std(0xffffff, { map: mural, emissive: 0xffffff, emissiveMap: mural, emissiveIntensity: 1, roughness: .9 });
-    box(g, tw, 100, 250, 120, s * 380, 125, -40);
+    const tw = [tan, tan, tanD, tanD, std(0xffffff, { map: mural, emissive: 0xffffff, emissiveMap: mural, emissiveIntensity: 1, roughness: .9 }), tan]; tw[s < 0 ? 0 : 1] = basic(0xffffff, { map: stripes });   // mural faces you as you drive up, stripes on the road side (like the photo)
+    box(g, tw, 170, 280, 110, s * 400, 140, -40);   // mural face 170 wide x 280 tall, like the photo
     const up = new THREE.Sprite(glowMat(0xffe2b0, .5)); up.scale.set(300, 340, 1); up.position.set(s * 330, 150, -40); g.add(up);
     // the "2000" building: tan block with a blue-green window grid
     const f2 = textTex("jordan2000", 1024, 256, (x, w, h) => { x.fillStyle = "#cdb38f"; x.fillRect(0, 0, w, h); x.fillStyle = "#1d2a33"; x.fillRect(w * .32, h * .38, w * .62, h * .5);
@@ -298,9 +300,9 @@ async function boot() {
     box(g, bm, 130, 95, 340, s * 395, 47.5, 210);
     box(g, MAT.fence, 2, 34, 300, s * 304, 17, 210); box(g, std(0x2346b5), 4, 30, 60, s * 330, 15, 90);   // blue roll-up door
     // the school sign by the road (Antidote 10-21: "a Panther under Jordan"): JORDAN HIGH SCHOOL, the panther head under it, lit up
-    const mono = textTex("jordanmono2", 512, 680, (x, w, h) => { x.fillStyle = "#0d1a4a"; x.fillRect(0, 0, w, h); x.fillStyle = "#1f46b8"; x.fillRect(12, 12, w - 24, h - 24); x.strokeStyle = "#fff"; x.lineWidth = 8; x.strokeRect(24, 24, w - 48, h - 48);
+    const mono = textTex("jordanmono3", 512, 680, (x, w, h) => { x.fillStyle = "#0d1a4a"; x.fillRect(0, 0, w, h); x.fillStyle = "#1f46b8"; x.fillRect(12, 12, w - 24, h - 24); x.strokeStyle = "#fff"; x.lineWidth = 8; x.strokeRect(24, 24, w - 48, h - 48);
       x.fillStyle = "#fff"; x.textAlign = "center"; x.textBaseline = "middle"; x.font = "900 112px Arial Black,Arial,sans-serif"; x.fillText("JORDAN", w / 2, 100); x.font = "800 44px Arial,sans-serif"; x.fillText("HIGH SCHOOL", w / 2, 172);
-      panther(x, w / 2, 400, 160); x.font = "800 34px Arial,sans-serif"; x.fillStyle = "#fff"; x.fillText("HOME OF THE PANTHERS", w / 2, 628); });
+      if (ok(JMURAL)) { const k = JMURAL.naturalWidth / 768; x.drawImage(JMURAL, 110 * k, 235 * k, 640 * k, 520 * k, w / 2 - 190, 248, 380, 309); } else panther(x, w / 2, 400, 160); x.font = "800 34px Arial,sans-serif"; x.fillStyle = "#fff"; x.fillText("HOME OF THE PANTHERS", w / 2, 628); }); if (!logoTex.includes(mono)) logoTex.push(mono);
     const SG = new THREE.Group(); SG.position.set(s * 292, 0, -170); SG.rotation.y = -s * .5; g.add(SG);
     [-52, 52].forEach(px => add(SG, CYL6, MAT.pole, 5, 70, 5, px, 35, 0));
     const signM = basic(0xffffff, { map: mono, toneMapped: false }); signM.color.setScalar(1.08);
@@ -752,6 +754,11 @@ async function boot() {
       const ar = textTex("pitarch", 1024, 160, (x, w, h) => { x.fillStyle = "#121318"; x.fillRect(0, 0, w, h); x.fillStyle = "#1f46b8"; x.fillRect(6, 6, w - 12, h - 12); x.fillStyle = "#fff"; x.font = "900 70px Arial Black,Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("🔧 PIT STOP · JORDAN HIGH", w / 2, h / 2 + 4); });
       add(v.o, PLANE, basic(0xffffff, { map: ar, side: THREE.DoubleSide }), 140, 22, 1, 251, 146, PITZ - 110);
       const gl = new THREE.Sprite(glowMat(0x6a9cff, .45)); gl.scale.set(260, 120, 1); gl.position.set(251, 140, PITZ - 110); v.o.add(gl);
+      const dw = add(v.o, PLANE, std(0xa9a49a, { roughness: .85 }), 150, 420, 1, 250, 4, PITZ - 40); dw.rotation.x = -Math.PI / 2;   // the concrete driveway into the school lot
+      [178, 324].forEach(x => { box(v.o, std(0xf2f3f5, { roughness: .5 }), 3, 34, 150, x, 17, PITZ - 170); for (let i = 0; i < 10; i++) box(v.o, std(0xf2f3f5), 1.6, 32, 1.6, x, 16, PITZ - 240 + i * 15); });   // the white steel gates, like the photo
+      const at = textTex("pullin", 256, 320, (x, w, h) => { x.fillStyle = "#ffd23f"; x.strokeStyle = "#121318"; x.lineWidth = 10; x.lineJoin = "round"; x.beginPath(); x.moveTo(w * .3, 96); x.lineTo(w * .7, 96); x.lineTo(w * .7, 190); x.lineTo(w * .92, 190); x.lineTo(w / 2, 300); x.lineTo(w * .08, 190); x.lineTo(w * .3, 190); x.closePath(); x.stroke(); x.fill();
+        x.font = "900 66px Arial Black,Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.lineWidth = 12; x.strokeText("PULL IN", w / 2, 46); x.fillStyle = "#fff"; x.fillText("PULL IN", w / 2, 46); });
+      v.arw = new THREE.Sprite(new THREE.SpriteMaterial({ map: at, transparent: true, depthWrite: false, toneMapped: false, fog: false })); v.arw.scale.set(110, 138, 1); v.arw.position.set(251, 120, PITZ - 20); v.o.add(v.arw);
       v.kids = KIDS.map((K, i) => { const k = makeKid(K); k.home = new THREE.Vector3(205 + (i % 3) * 45, 0, PITZ - 60 + (i >> 1) * 40); k.g.position.copy(k.home); v.o.add(k.g); return k; }); }
     else if (kind === "bolt") { v.o = new THREE.Group();   // like Melody: a target lights up on the road where the truck is, then the bolt comes down from the sky right onto it
       v.strip = new THREE.Mesh(TARGET_RING, new THREE.MeshBasicMaterial({ color: 0xbfe6ff, transparent: true, opacity: .8, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); v.strip.rotation.x = -Math.PI / 2; v.strip.position.set(0, 1.6, -10); v.o.add(v.strip);
@@ -893,7 +900,7 @@ async function boot() {
       else if (it.type === "queue") { v.o.position.set(0, 0, 0); const sp = it.len / it.n;
         v.cars.forEach((c, i) => { const y = it.y - it.len / 2 + sp * (i + .5); c.position.set(LANEX[LANEX.length - 1] + Math.sin(i * 1.7) * 5, 0, (y - PY) * KF); c.rotation.y = Math.sin(i * 2.3) * .04; });
         v.st.position.z = (it.y - it.len / 2 - PY) * KF - 60; }
-      else if (it.type === "pit") { v.o.position.set(0, 0, z);
+      else if (it.type === "pit") { v.o.position.set(0, 0, z); v.arw.visible = !pitting; v.arw.position.y = 120 + Math.abs(Math.sin(t * 4)) * 22;   // bouncing PULL IN arrow over the driveway
         v.kids.forEach((K, i) => { const g = K.g; let tgt = K.home;
           if (pitting && it.used) { const a = i / v.kids.length * TAU + t * .6; V2.set(tx + Math.cos(a) * 48, 0, Math.sin(a) * 66 - z); tgt = V2; K.armR.rotation.x = -1.2 + Math.sin(t * 14 + K.ph) * .7; K.armL.rotation.x = -.6 + Math.sin(t * 9 + K.ph) * .3; }
           else { K.armR.rotation.x = 0; K.armR.rotation.z = 2.6 + Math.sin(t * 8 + K.ph) * .4; K.armL.rotation.x = 0; }
@@ -930,6 +937,6 @@ async function boot() {
   STATUS.warp = d => { warp += d; }; STATUS.board = () => { bbT = 0; };
   STATUS.store = z => { const o = store(1, "1500 N LA BREA AVE", true).o; o.position.z = z; scene.add(o); return o; };   // test hook: drop the StormBurger stop beside the road
   STATUS.jump = n => event(LVL[n - 1]);
-  STATUS.lmTest = n => event({ R: { queenMary, villa, parkers, dome }[n] });   // test hook: put one of the new landmarks on the road ahead   // test hook: put the landmark of level n on the road ahead now
+  STATUS.lmTest = n => event({ R: { queenMary, villa, parkers, dome, jordan }[n] });   // test hook: put one of the new landmarks on the road ahead   // test hook: put the landmark of level n on the road ahead now
   STATUS.booted = true;
 }

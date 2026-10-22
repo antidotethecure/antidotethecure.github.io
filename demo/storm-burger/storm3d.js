@@ -149,22 +149,37 @@ async function boot() {
     const crown = new THREE.Group(); crown.position.y = hgt; t.add(crown);
     for (let i = 0; i < 8; i++) { const f = add(crown, PLANE, frondMat, 26, 70, 1, 0, 0, 0); f.geometry = PLANE; f.rotation.set(-1.0 - rnd() * .5, i / 8 * TAU, 0, "YXZ"); f.translateY(30); }
     return crown; }
-  function lot(s) {   // a generic block on side s (-1 left, 1 right)
-    const g = new THREE.Group(), r = rnd(), len = 160 + rnd() * 160; let upd = null; const crowns = [];
+  const STUCCO = ["#d8c9ae", "#c9b59a", "#e2d6c2", "#b9c2b0", "#d6b7a4", "#c7c9c4", "#e6dcc6", "#a9b6bf"], AWN = [0x8e1f24, 0x1f4f8a, 0x2f6a3a, 0x6b2a6b, 0x9a6a1a];
+  const ROOFS = [std(0x6b3b2a, { roughness: .9 }), std(0x4a4d55, { roughness: .9 }), std(0x7a5a44, { roughness: .9 })], concrete = std(0x5d6066, { roughness: .8 }), asph2 = std(0x23252e, { roughness: .4 });
+  function house(g, s, z, w) {   // one-story stucco house: hip roof, lit window, lawn, driveway, low chain-link fence, shrubs
+    const hw = 78 + rnd() * 26, hh = 30 + rnd() * 8, x0 = s * (350 + hw / 2);
+    box(g, std(pick(STUCCO), { roughness: .95 }), hw, hh, w, x0, hh / 2, z);
+    const rf = add(g, new THREE.ConeGeometry(1, 1, 4), pick(ROOFS), hw * .82, 22, w * .82, x0, hh + 11, z); rf.rotation.y = Math.PI / 4;
+    box(g, basic(new THREE.Color(1.7, 1.25, .65)), 1, 10, 16, s * (349.4), hh * .55, z - w * .2); box(g, basic(new THREE.Color(1.5, 1.1, .6)), 1, 10, 12, s * 349.4, hh * .55, z + w * .25);
+    add(g, PLANE, MAT.grass, 56, w, 1, s * 322, .25, z).rotation.x = -Math.PI / 2;
+    add(g, PLANE, concrete, 50, 26, 1, s * 322, .35, z + w * .38).rotation.x = -Math.PI / 2;
+    box(g, MAT.fence, 1.2, 12, w - 30, s * 297, 6, z - 12);
+    for (let i = 0; i < 3; i++) add(g, new THREE.SphereGeometry(1, 8, 6), std(0x1f4a24, { roughness: 1 }), 9, 7, 9, s * 343, 5, z - w * .35 + i * 14); }
+  function lot(s) {   // a generic block on side s (-1 left, 1 right), mixed like the real boulevards
+    const g = new THREE.Group(), r = rnd(), len = 170 + rnd() * 150; let upd = null; const crowns = [];
     sidewalk(g, s, len);
     if (rnd() < .62) streetlight(g, s, -len / 2 + 20);
-    if (r < .55) { const hgt = 55 + rnd() * 70, dep = 110 + rnd() * 60, mats = [MAT.wall, MAT.wall, MAT.roof, MAT.wall, MAT.wall, MAT.wall]; mats[s < 0 ? 0 : 1] = pick(FACADES);
-      box(g, mats, dep, hgt, len - 14, s * (300 + dep / 2), hgt / 2, 0); box(g, MAT.dark, 4, 6, len - 14, s * 301, hgt, 0); }
-    else if (r < .82) { const hw = 80 + rnd() * 30, hh = 34 + rnd() * 10, x0 = s * (340 + hw / 2);
-      box(g, std(pick(["#b9a88a", "#9fb0b8", "#c2a6a0", "#a8b49a", "#d2c7b0"])), hw, hh, Math.min(len - 30, 120), x0, hh / 2, 0);
-      const rf = add(g, new THREE.ConeGeometry(1, 1, 4), MAT.roof, hw * .8, 26, Math.min(len - 30, 120) * .8, x0, hh + 13, 0); rf.rotation.y = Math.PI / 4;
-      box(g, basic(new THREE.Color(1.6, 1.2, .6)), 1, 10, 16, s * 339.4, hh * .5, -12);
-      add(g, PLANE, MAT.grass, 40, len, 1, s * 316, .2, 0).rotation.x = -Math.PI / 2;
+    const pShop = city === "lb" ? .32 : .42, pHouse = city === "lb" ? .36 : .24;
+    if (r < pShop) { const hgt = 36 + rnd() * 38, dep = 100 + rnd() * 50, mats = [MAT.wall, MAT.wall, MAT.roof, MAT.wall, MAT.wall, MAT.wall]; mats[s < 0 ? 0 : 1] = pick(FACADES);   // 1-2 story shop row on the sidewalk
+      box(g, mats, dep, hgt, len - 14, s * (300 + dep / 2), hgt / 2, 0); box(g, MAT.dark, 4, 6, len - 14, s * 301, hgt, 0);
+      box(g, std(pick(AWN), { roughness: .7 }), 12, 3, len - 30, s * 295, hgt * .55, 0).rotation.z = s * .35; }   // awning
+    else if (r < pShop + pHouse) { if (len > 250) { house(g, s, -len / 4, len / 2 - 16); house(g, s, len / 4, len / 2 - 16); } else house(g, s, 0, Math.min(len - 30, 130));
       crowns.push(palm(g, s * 318, -len * .3, 210 + rnd() * 110)); }
-    else { add(g, PLANE, std(0x23252e, { roughness: .4 }), 200, len - 10, 1, s * 395, .3, 0).rotation.x = -Math.PI / 2;
-      for (let i = 0; i < 3; i++) if (rnd() < .6) box(g, std(pick([0x6b1f1f, 0x2a3a5a, 0xbfc4cc, 0x1d1d1f, 0x5a5a40])), 46, 26, 90, s * (330 + i * 60), 13, (rnd() - .5) * 40);
-      if (rnd() < .5) crowns.push(palm(g, s * 300, len * .35, 240 + rnd() * 90)); }
-    if (rnd() < .35) crowns.push(palm(g, s * 222, len * .2, 230 + rnd() * 120));
+    else if (r < .9) { add(g, PLANE, asph2, 230, len - 10, 1, s * 410, .3, 0).rotation.x = -Math.PI / 2;   // strip mall: parking out front, the shops set back
+      for (let i = 0; i < Math.floor(len / 34); i++) box(g, basic(0xcfd3da), 30, .4, 2, s * 470, .9, -len / 2 + 20 + i * 34);
+      const hgt = 34 + rnd() * 12, mats = [MAT.wall, MAT.wall, MAT.roof, MAT.wall, MAT.wall, MAT.wall]; mats[s < 0 ? 0 : 1] = pick(FACADES);
+      box(g, mats, 110, hgt, len - 20, s * 580, hgt / 2, 0); box(g, std(pick(AWN)), 10, 3, len - 30, s * 522, hgt * .6, 0);
+      for (let i = 0; i < 3; i++) if (rnd() < .6) box(g, std(pick([0x6b1f1f, 0x2a3a5a, 0xbfc4cc, 0x1d1d1f, 0x5a5a40])), 46, 24, 86, s * (380 + i * 56), 12, (rnd() - .5) * 60);
+      const pole = s * 300; add(g, CYL6, MAT.pole, 3, 120, 3, pole, 60, len * .3); box(g, std(0xffffff, { map: pick(FACADES).map, emissive: 0xffffff, emissiveMap: pick(FACADES).map, emissiveIntensity: .6 }), 4, 30, 60, pole, 130, len * .3);   // the plaza's sign on a pole
+      if (rnd() < .5) crowns.push(palm(g, s * 300, -len * .35, 240 + rnd() * 90)); }
+    else { add(g, PLANE, asph2, 200, len - 10, 1, s * 395, .3, 0).rotation.x = -Math.PI / 2; box(g, MAT.fence, 1.5, 22, len - 20, s * 298, 11, 0);   // fenced lot
+      for (let i = 0; i < 3; i++) if (rnd() < .6) box(g, std(pick([0x6b1f1f, 0x2a3a5a, 0xbfc4cc, 0x1d1d1f, 0x5a5a40])), 46, 26, 90, s * (330 + i * 60), 13, (rnd() - .5) * 40); }
+    if (rnd() < .4) crowns.push(palm(g, s * 222, len * .2, 230 + rnd() * 120));
     if (crowns.length) { const ph = rnd() * 6; upd = (o, t) => crowns.forEach((c, i) => { c.rotation.z = Math.sin(t * 1.7 + ph + i) * .12; c.rotation.x = Math.sin(t * 1.3 + ph) * .06; }); }
     return { o: g, len, upd };
   }
@@ -371,17 +386,55 @@ async function boot() {
     const gl = new THREE.Sprite(glowMat(0x9ab8ff, .35)); gl.scale.set(1600, 380, 1); gl.position.set(s * 720, 120, 0); g.add(gl);
     return { o: g, len }; }
 
+  const water = std(0x0b2236, { roughness: .1, metalness: .5 }), litWin = basic(new THREE.Color(2.2, 1.7, .9));
+  const winTex = (base, lit) => ctex(256, 512, (x, w, h) => { x.fillStyle = base; x.fillRect(0, 0, w, h); for (let r = 0; r < 26; r++) for (let c = 0; c < 8; c++) { x.fillStyle = rnd() < lit ? "#ffd98a" : "#1a2030"; x.fillRect(10 + c * 30, 12 + r * 19, 16, 11); } });
+  function queenMary(s) { const g = new THREE.Group(), len = 760; sidewalk(g, s, len);   // the ocean liner docked in the harbor: black hull, white decks, three red funnels
+    add(g, PLANE, water, 1600, len, 1, s * 1000, .4, 0).rotation.x = -Math.PI / 2; box(g, concrete, 40, 8, len - 40, s * 330, 4, 0);
+    const sh = new THREE.Group(); sh.position.set(s * 560, 0, -20); g.add(sh);
+    box(sh, std(0x101115, { roughness: .45 }), 96, 66, 600, 0, 33, 0); box(sh, std(0x9c1b1b), 98, 8, 602, 0, 4, 0);
+    add(sh, new THREE.ConeGeometry(1, 1, 4), std(0x101115), 68, 120, 66, 0, 40, -340).rotation.set(-Math.PI / 2, Math.PI / 4, 0);   // the bow
+    box(sh, std(0xf1efe8, { roughness: .5 }), 88, 34, 470, 0, 83, 20); box(sh, std(0xf1efe8, { roughness: .5 }), 72, 24, 330, 0, 112, 30);
+    [72, 88, 104].forEach(y => box(sh, litWin, 89, 2.5, 440, 0, y, 20));
+    [-80, 20, 120].forEach(z => { const f = add(sh, CYL, std(0xd22a1e, { roughness: .5 }), 26, 78, 34, 0, 160, z); f.rotation.x = .12; const t = add(sh, CYL, MAT.dark, 27, 14, 35, 0, 200, z - 5); t.rotation.x = .12; });
+    [-250, 260].forEach(z => box(sh, MAT.pole, 3, 150, 3, 0, 170, z));
+    const gl = new THREE.Sprite(glowMat(0xffe0b0, .5)); gl.scale.set(700, 260, 1); gl.position.set(s * 560, 110, -20); g.add(gl);
+    return { o: g, len }; }
+  function villa(s) { const g = new THREE.Group(), len = 380; sidewalk(g, s, len);   // the tall gothic apartment tower with the steep green roof and spire
+    const wt = winTex("#d9cfbf", .35), wm = std(0xffffff, { map: wt, emissive: 0xffffff, emissiveMap: wt, emissiveIntensity: .35, roughness: .8 }), green = std(0x4e8a5e, { roughness: .6, metalness: .2 });
+    box(g, wm, 150, 380, 220, s * 480, 190, -20); box(g, wm, 70, 330, 120, s * 420, 165, 90);
+    const rf = add(g, new THREE.ConeGeometry(1, 1, 4), green, 150, 90, 225, s * 480, 425, -20); rf.rotation.y = Math.PI / 4;
+    box(g, std(0xd9cfbf), 34, 90, 34, s * 430, 425, -100); add(g, new THREE.ConeGeometry(1, 1, 8), green, 26, 110, 26, s * 430, 525, -100);
+    const gl = new THREE.Sprite(glowMat(0xfff0d0, .45)); gl.scale.set(320, 520, 1); gl.position.set(s * 470, 220, -20); g.add(gl);
+    crownsOf(g, s); return { o: g, len }; }
+  function parkers(s) { const g = new THREE.Group(), len = 420; sidewalk(g, s, len);   // the white octagon lighthouse restaurant with the red roofs, out on the rocks
+    add(g, PLANE, water, 1400, len, 1, s * 900, .4, 0).rotation.x = -Math.PI / 2;
+    add(g, new THREE.SphereGeometry(1, 12, 8), std(0x4a4640, { roughness: 1 }), 180, 26, 160, s * 520, 0, 0);
+    const oct = (r, h) => new THREE.CylinderGeometry(r, r, h, 8), cone = (r, h) => new THREE.ConeGeometry(r, h, 8), red = std(0xb8321f, { roughness: .6 }), wht = std(0xf4f2ec, { roughness: .6 });
+    add(g, oct(62, 48), wht, 1, 1, 1, s * 520, 46, 0); add(g, cone(78, 34), red, 1, 1, 1, s * 520, 87, 0); add(g, oct(63, 6), litWin, 1, 1, 1, s * 520, 46, 0);
+    add(g, oct(34, 30), wht, 1, 1, 1, s * 520, 115, 0); add(g, cone(44, 26), red, 1, 1, 1, s * 520, 140, 0);
+    add(g, oct(12, 26), wht, 1, 1, 1, s * 520, 165, 0); add(g, oct(12.5, 8), basic(new THREE.Color(4, 3.2, 1.6)), 1, 1, 1, s * 520, 170, 0); add(g, cone(16, 22), red, 1, 1, 1, s * 520, 189, 0);
+    const gl = new THREE.Sprite(glowMat(0xffe6b0, .6)); gl.scale.set(260, 200, 1); gl.position.set(s * 520, 90, 0); g.add(gl);
+    [palm(g, s * 400, -140, 250), palm(g, s * 420, 140, 280)]; return { o: g, len }; }
+  function dome(s) { const g = new THREE.Group(), len = 720; sidewalk(g, s, len);   // the new basketball arena: a sleek low dome wrapped in a glowing halo (shape only, no name)
+    add(g, PLANE, asph2, 800, len, 1, s * 700, .3, 0).rotation.x = -Math.PI / 2;
+    add(g, new THREE.SphereGeometry(1, 40, 18, 0, TAU, 0, Math.PI / 2), std(0x8d96a6, { metalness: .7, roughness: .3 }), 300, 110, 270, s * 640, 40, -40);
+    add(g, new THREE.CylinderGeometry(300, 300, 40, 48, 1, true), std(0x10131c, { emissive: 0x2a4a7a, emissiveIntensity: .9, side: THREE.DoubleSide }), 1, 1, .9, s * 640, 20, -40);
+    const halo = add(g, new THREE.TorusGeometry(1, .02, 8, 72), basic(new THREE.Color(1.4, 2.6, 4.5)), 330, 330, 300, s * 640, 70, -40); halo.rotation.x = Math.PI / 2;
+    const gl = new THREE.Sprite(glowMat(0x9fd0ff, .55)); gl.scale.set(900, 300, 1); gl.position.set(s * 640, 90, -40); g.add(gl);
+    return { o: g, len, upd: (o, t) => { halo.material.color.setRGB(1.4 + Math.sin(t * 1.3) * .6, 2.6, 4.5); } }; }
+  function crownsOf(g, s) { palm(g, s * 330, 150, 260); palm(g, s * 340, -160, 240); }
   /* one landmark stop per level (index.html LVNAME), Inglewood to Long Beach; plain intersections of that city in between */
   const sbLB = s => store(s, "5801 CHERRY AVE · LONG BEACH", true);
   const LVL = [{ R: welcome, city: "ing" }, { cross: ["LA BREA AV", "CENTURY BL"], L: stadium }, { cross: ["LA BREA AV", "MANCHESTER BL"], L: forum, R: donut },
-    { cross: ["LA BREA AV", "FLORENCE AV"], L: academy }, { gantry: ["710", "SOUTH", "LONG BEACH"], R: lbsign, city: "lb" }, { cross: ["SHORELINE DR", "PINE AV"], L: ferris, R: lighthouse },
+    { cross: ["LA BREA AV", "FLORENCE AV"], L: academy }, { gantry: ["710", "SOUTH", "LONG BEACH"], R: lbsign, city: "lb" }, { cross: ["SHORELINE DR", "PINE AV"], L: ferris, R: queenMary },
     { cross: ["CHERRY AV", "HILL ST"], L: pumpjacks, R: pumpjacks }, { cross: ["CHERRY AV", "CARSON ST"], R: airport }, { R: jordan }, { cross: ["CHERRY AV", "SOUTH ST"], R: sbLB }];
   const FILL = { ing: [["LA BREA AV", "ARBOR VITAE ST"], ["LA BREA AV", "HYDE PARK BL"]], lb: [["CHERRY AV", "WARDLOW RD"], ["CHERRY AV", "DEL AMO BL"], ["CHERRY AV", "ARTESIA BL"]] };
-  let city = "ing", lvShown = 0, midDone = 0, fi = 0, evtIn = 900; const SPACING = 2700;
+  let city = "ing", lvShown = 0, midDone = 0, fi = 0, fe = 0, evtIn = 900; const li = { ing: 0, lb: 0 };
+  const CITYLM = { ing: [{ L: stadium }, { L: forum, R: donut }, { R: dome }, { L: academy }], lb: [{ L: ferris, R: lighthouse }, { R: queenMary }, { L: villa }, { R: parkers }, { L: pumpjacks, R: pumpjacks }] }; const SPACING = 2700;
   function fill() {
     for (let s = 0; s < 2; s++) while (front[s] > FAR) { const L = lot(s ? 1 : -1); place(L.o, front[s] - L.len / 2, L.upd); front[s] -= L.len; }
   }
-  function event(E) { E = E || { cross: FILL[city][fi++ % FILL[city].length] }; if (E.city) city = E.city;
+  function event(E) { if (!E) E = fe++ % 2 === 0 ? CITYLM[city][li[city]++ % CITYLM[city].length] : { cross: FILL[city][fi++ % FILL[city].length] }; if (E.city) city = E.city;
     const z = Math.min(front[0], front[1]);
     if (E.cross) { place(intersection(E), z - 85); front[0] = front[1] = z - 170; }
     if (E.gantry) { const G = gantry(E.gantry[0], E.gantry[1], E.gantry[2]); place(G.o, z - 30); }
@@ -544,12 +597,15 @@ async function boot() {
   function carMesh(name, paint, door) { const m = new THREE.Mesh(paintGeo(name, paint, door), carBodyM); m.scale.setScalar(SPU); m.rotation.y = Math.PI; return m; }   // nose toward -z like everything on the road
   /* police cruiser: Ford Police Interceptor Utility look (his LB + Inglewood photos): black body, white doors with the city's POLICE decal,
      push bar, low light bar, spot lamp, steel wheels */
+  let COPG = null; const COPYAW = Math.PI;   // photoreal cruiser mesh (Higgsfield sam_3_3d from a generated Explorer-style photo, 10-22); the lofted SUV below is the fallback
+  import("three/addons/loaders/GLTFLoader.js").then(({ GLTFLoader }) => new GLTFLoader().loadAsync("img/3d/cop.glb")).then(gl => { gl.scene.traverse(m => { if (m.isMesh) { m.geometry.computeVertexNormals(); m.material.roughness = .45; m.material.metalness = .25; if (m.material.map) m.material.map.anisotropy = ANISO; } }); COPG = gl.scene; }).catch(e => console.warn("cop.glb", e));
   function makeCop(city) { const g = new THREE.Group(), M = COPM, D = copDoorM[city] || copDoorM.lb;
-    g.add(carMesh("suv", 0x0b0c10, 0xf2f4f8));
-    [-1, 1].forEach(sd => { const d = add(g, PLANE, D, 37, 11, 1, sd * 19.4, 14.5, 1); d.rotation.y = sd * Math.PI / 2; });   // POLICE door decals both sides
-    box(g, M.push, 40, 3, 3, 0, 20, -51); box(g, M.push, 34, 3, 3, 0, 12, -51); [-12, 12].forEach(x => box(g, M.push, 3, 16, 3, x, 15, -51)); box(g, M.push, 26, 2, 6, 0, 8, -49);   // push bar
-    box(g, M.black, 30, 2.2, 7, 0, 35, -2); const r = box(g, M.red, 13, 3, 6.5, -7.5, 37, -2), b = box(g, M.blue, 13, 3, 6.5, 7.5, 37, -2);   // light bar on the roof
-    box(g, M.push, 2, 3, 3, -18, 27, -14);   // A-pillar spot lamp
+    if (COPG) { const m = COPG.clone(); m.scale.setScalar(96); m.position.y = 20.2; m.rotation.y = COPYAW; g.add(m);
+      [-1, 1].forEach(sd => { const d = add(g, PLANE, D, 38, 13, 1, sd * 24.6, 18, 8); d.rotation.y = sd * Math.PI / 2; }); }   // crisp POLICE doors (the mesh texture mirrors the hidden side)
+    else { g.add(carMesh("suv", 0x0b0c10, 0xf2f4f8));
+      [-1, 1].forEach(sd => { const d = add(g, PLANE, D, 37, 11, 1, sd * 19.4, 14.5, 1); d.rotation.y = sd * Math.PI / 2; });   // POLICE door decals both sides
+      box(g, M.push, 40, 3, 3, 0, 20, -51); box(g, M.push, 34, 3, 3, 0, 12, -51); [-12, 12].forEach(x => box(g, M.push, 3, 16, 3, x, 15, -51)); box(g, M.push, 26, 2, 6, 0, 8, -49); }   // push bar
+    const ly = COPG ? 41 : 35; box(g, M.black, 30, 2.2, 7, 0, ly, -2); const r = box(g, M.red, 13, 3, 6.5, -7.5, ly + 2, -2), b = box(g, M.blue, 13, 3, 6.5, 7.5, ly + 2, -2);   // flashing light bar on the roof
     [-13, 13].forEach(x => box(g, TRUCKM.head, 8, 2.6, 1, x, 17.5, -48)); [-15, 15].forEach(x => box(g, TRUCKM.tail, 5, 8, 1, x, 19, 48));
     const glow = new THREE.Sprite(glowMat(0xff3030, .9)); glow.scale.set(100, 64, 1); glow.position.set(0, 40, -2); g.add(glow);
     return { g, r, b, glow }; }
@@ -620,10 +676,10 @@ async function boot() {
      right / left, each playing the next clip of his StormBurger review (the CLAMP, the drizzle, everybody on that bus…).
      A second review is a second entry in window.SB_REVIEWS ({dir, clips}); the boards take turns between them. ---------- */
   const REVIEWS = window.SB_REVIEWS || [{ dir: "img/review/clips/", clips: ["c14", "c13", "c16", "c12", "c15", "c10", "c11"] }];
-  let BBM = null, bbT = 25, bbSide = 1, bbN = 0; const bbC = REVIEWS.map(() => 0);
+  let BBM = null, bbT = 8, bbSide = 1, bbN = 0; const bbC = REVIEWS.map(() => 0);
   function spawnBoard() { const r = bbN++ % REVIEWS.length, R = REVIEWS[r], src = R.dir + R.clips[bbC[r]++ % R.clips.length];
     if (!BBM) BBM = BBMOD.makeVideoBoards(THREE, { src: src + ".mp4", poster: src + ".jpg" }); else { BBM.video.src = src + ".mp4"; const pl = BBM.video.play(); if (pl && pl.catch) pl.catch(() => {}); }
-    const b = BBM.create({ w: 140, pole: 110, caption: "ANTIDOTE FOOD REVIEW · STORMBURGER" }), g = new THREE.Group(); b.position.x = bbSide * 262; b.rotation.y = -bbSide * .42; g.add(b);
+    const b = BBM.create({ w: 190, pole: 130, caption: "ANTIDOTE FOOD REVIEW · STORMBURGER" }), g = new THREE.Group(); b.position.x = bbSide * 262; b.rotation.y = -bbSide * .42; g.add(b);
     place(g, front[bbSide > 0 ? 1 : 0] + 40); bbSide = -bbSide; }
   
   /* ---------- per-object views ---------- */
@@ -732,7 +788,7 @@ async function boot() {
     const dz = (pitting ? 0 : run ? st.speed * KF : st.dying ? Math.max(0, st.speed * KF * (1 - (now - st.dying) / 900)) : 2.5) * k;
     const dzw = dz + warp; warp = 0; odo += dzw; roadTex.offset.y += dzw / RT; roadRough.offset.y = roadTex.offset.y;
     for (let i = live.length - 1; i >= 0; i--) { const L = live[i]; L.o.position.z += dzw; if (L.upd && L.o.position.z > -1900) L.upd(L.o, t, dt); if (L.o.position.z > 900) { world.remove(L.o); live.splice(i, 1); } }
-    if (run && !pitting) { bbT -= dt; if (bbT <= 0) { spawnBoard(); bbT = 60; } } if (BBM) BBM.update(t);
+    if (run && !pitting) { bbT -= dt; if (bbT <= 0) { spawnBoard(); bbT = 24; } } if (BBM) BBM.update(t);
     front[0] += dzw; front[1] += dzw; evtIn -= dz; if (evtIn <= 0) { event(); evtIn = SPACING; } fill();
 
     /* truck */
@@ -836,6 +892,7 @@ async function boot() {
   };
   STATUS.warp = d => { warp += d; }; STATUS.board = () => { bbT = 0; };
   STATUS.store = z => { const o = store(1, "1500 N LA BREA AVE", true).o; o.position.z = z; scene.add(o); return o; };   // test hook: drop the StormBurger stop beside the road
-  STATUS.jump = n => event(LVL[n - 1]);   // test hook: put the landmark of level n on the road ahead now
+  STATUS.jump = n => event(LVL[n - 1]);
+  STATUS.lmTest = n => event({ R: { queenMary, villa, parkers, dome }[n] });   // test hook: put one of the new landmarks on the road ahead   // test hook: put the landmark of level n on the road ahead now
   STATUS.booted = true;
 }

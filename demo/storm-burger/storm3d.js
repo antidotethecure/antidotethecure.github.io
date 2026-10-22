@@ -221,18 +221,18 @@ async function boot() {
   function store(s, addr, walk) { const g = new THREE.Group(), len = 620; if (walk) sidewalk(g, s, len);
     const lot = add(g, PLANE, std(0x23262d, { roughness: .55, metalness: .1 }), 420, len, 1, s * 500, .5, 0); lot.rotation.x = -Math.PI / 2;   // their parking lot
     for (let i = 0; i < 6; i++) box(g, basic(0xd8dbe0), 40, .4, 2.5, s * 640, 1, -230 + i * 60);   // walk=false: drawn on top of the street, which already has its sidewalk
-    const mats = [MAT.wall, MAT.wall, MAT.roof, MAT.wall, MAT.wall, MAT.wall]; mats[s < 0 ? 0 : 1] = storeFace(addr);
+    const mats = [MAT.wall, MAT.wall, MAT.roof, MAT.wall, MAT.wall, MAT.wall]; mats[s < 0 ? 0 : 1] = mats[4] = storeFace(addr);   // storefront on the road side AND the end facing oncoming traffic (10-22: the end wall read as black)
     box(g, mats, 200, 140, 320, s * 520, 70, -60); box(g, std(0xE8582A, { emissive: 0xE8582A, emissiveIntensity: .8 }), 6, 12, 322, s * 419, 140, -60);
     // the real pylon (his 10-21 photo): rounded white face with a thick red rim + red sides, the logo, one white pole, red DRIVE THRU box under it
-    const px = s * 300, pz = 170, P = new THREE.Group(); P.position.set(px, 0, pz); P.rotation.y = -s * .45; P.scale.setScalar(1.9); g.add(P);   // low + big: sits in the camera view (10-22: he only saw DRIVE THRU)
+    const px = s * 300, pz = 170, P = new THREE.Group(); P.position.set(px, 0, pz); P.rotation.y = -s * .2; P.scale.setScalar(2.1); g.add(P);   // low + big: sits in the camera view (10-22: he only saw DRIVE THRU)
     const wpost = std(0xf2f3f5, { roughness: .5 }); add(P, CYL6, wpost, 7, 72, 7, 0, 36, 0);
     const pt = ctex(1024, 384, (x, w, h) => { const rr = (a, b, c, d, r) => { x.beginPath(); x.roundRect(a, b, c, d, r); x.fill(); };
       x.fillStyle = "#d9262f"; x.fillRect(0, 0, w, h); x.fillStyle = "#e33a36"; rr(6, 6, w - 12, h - 12, 70); x.fillStyle = "#f7f8fa"; rr(34, 30, w - 68, h - 60, 54);
       if (ok(LOGO)) { const lw = w * .8, lh = lw * LOGO.naturalHeight / LOGO.naturalWidth; x.drawImage(LOGO, (w - lw) / 2, (h - lh) / 2, lw, lh); } }); logoTex.push(pt);
-    const pm = std(0xffffff, { map: pt, emissive: 0xffffff, emissiveMap: pt, emissiveIntensity: 1.7 }), red = std(0xd9262f, { emissive: 0x5a0a0a });
+    const pm = basic(0xffffff, { map: pt, fog: false, toneMapped: false }), red = basic(0xd9262f, { fog: false });   // self-lit: always bright through rain, fog and night
     box(P, [red, red, red, red, pm, pm], 150, 56, 18, 0, 92, 0);
     const dt = textTex("drivethru", 256, 64, (x, w, h) => { x.fillStyle = "#d9262f"; x.fillRect(0, 0, w, h); x.strokeStyle = "#fff"; x.lineWidth = 4; x.strokeRect(4, 4, w - 8, h - 8); x.fillStyle = "#fff"; x.font = "800 38px Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("DRIVE THRU", w / 2, h / 2 + 2); });
-    const dm = std(0xffffff, { map: dt, emissive: 0xffffff, emissiveMap: dt, emissiveIntensity: 1.5 }); box(P, [red, red, red, red, dm, dm], 64, 17, 10, -14, 45, 0); box(P, red, 70, 21, 4, -12, 43, -7);
+    const dm = basic(0xffffff, { map: dt, fog: false, toneMapped: false }); box(P, [red, red, red, red, dm, dm], 64, 17, 10, -14, 45, 0); box(P, red, 70, 21, 4, -12, 43, -7);
     const sg = new THREE.Sprite(glowMat(0xeaf0ff, .7)); sg.scale.set(260, 130, 1); sg.position.set(s * 415, 90, -60); g.add(sg);
     const gl = new THREE.Sprite(glowMat(0xdfe8ff, .35)); gl.scale.set(420, 200, 1); gl.position.set(px, 175, pz - 40); g.add(gl);
     const sl = new THREE.PointLight(0xfff2e0, 2.2, 700, 1.2); sl.position.set(px, 175, pz + 60); g.add(sl);

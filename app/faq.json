@@ -9,7 +9,7 @@
   "Setup can be paid in full, split 50/50 (half at signing, half when the app is delivered), or on a flexible plan from $750 down. The flexible plan spreads the rest over 12 months on top of the monthly, with no extra charge.",
   "Contract: a 3-month minimum, then month to month. Either side can cancel with 30 days' written notice, and email counts. AI add-ons are month to month from day one.",
   "Your customer list is yours. You get full access and a CSV export anytime, and we never sell it or use it for another business.",
-  "Contact: secondshiftai@gmail.com, Instagram @second.shiftai, or the 24/7 AI sales line (424) 296-3303.",
+  "Contact: secondshiftai@gmail.com, Instagram @SousShiftAi, or the 24/7 AI sales line (424) 296-3303.",
   "The call line is answered by Nia, SousShift's AI guide. She explains the plans and add-ons, answers questions about SousShift and connects callers to Antidote. It is calls only, and texts to that number don't work yet.",
   "Live demos: Melody Bar & Grill (flight game over LAX), Nalu Vida (Ride the Nalu surf game), Gritz N Wafflez (Order Up!), StormBurger (Storm Run), Churrito Loco (Loco Match puzzle), Lucky Dragon (Hibachi Catch), plus an ice cream truck app, a food truck app and a mechanic app.",
   "Melody Bar & Grill in Westchester by LAX is the first onboarded partner and is going live now. Nalu Vida and Gritz N Wafflez are in the works and not live yet. The other apps are demo samples.",
@@ -632,7 +632,7 @@
   },
   {
    "q": "Can I text the phone number?",
-   "a": "Not yet. The line at (424) 296-3303 is calls only. For written messages, email secondshiftai@gmail.com or DM @second.shiftai on Instagram.",
+   "a": "Not yet. The line at (424) 296-3303 is calls only. For written messages, email secondshiftai@gmail.com or DM @SousShiftAi on Instagram.",
    "tags": [
     "text",
     "sms",
@@ -652,7 +652,7 @@
   },
   {
    "q": "What's your Instagram?",
-   "a": "Find us on Instagram at @second.shiftai and send a DM anytime.",
+   "a": "Find us on Instagram at @SousShiftAi and send a DM anytime.",
    "tags": [
     "instagram",
     "ig",
@@ -663,7 +663,7 @@
   },
   {
    "q": "How do I book a call or get a demo?",
-   "a": "Call (424) 296-3303 any time, email secondshiftai@gmail.com or DM @second.shiftai. You can also ask for a free sample app built with your own menu.",
+   "a": "Call (424) 296-3303 any time, email secondshiftai@gmail.com or DM @SousShiftAi. You can also ask for a free sample app built with your own menu.",
    "tags": [
     "book",
     "schedule",

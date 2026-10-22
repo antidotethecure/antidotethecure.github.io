@@ -735,7 +735,7 @@ $("again").addEventListener("click",function(){ replay(); $("game").scrollIntoVi
 hud();
 })();
 </script>
-<script src="../songswitch.js?v=ms1"></script>
+<script src="../songswitch.js?v=ms2"></script>
 <script>
 /* Storm Run sound (2026-10-21): his songs Energy + Cheat Code (🎵 pill or M key switches) over a low storm bed
    (rain hiss, patter, a slow deep rumble) and a soft thunder roll on each lightning strike. Plays only during a run;
@@ -744,7 +744,9 @@ hud();
 var S=window.__S; if(!S) return;
 var on=true; try{ on=localStorage.getItem("sb-sound")!=="0"; }catch(e){}
 var ctx=null, out, storm, nb, was=null, musOn=true, fxOn=true, mus;
-var MS=SongSwitch({key:"sb-song",vol:.5,fade:.8,songs:[{id:"energy",name:"Energy",src:"audio/energy.m4a"},{id:"cheat",name:"Cheat Code",src:"audio/cheat-code.m4a"}],onTap:unlock});
+/* shortcut: raw.githack previews refuse audio files (403), so a preview loads the songs from jsDelivr at the same commit; the live site uses the relative path */
+var gh=/^\/antidotethecure\/antidotethecure\.github\.io\/([^\/]+)\//.exec(location.hostname.indexOf("githack")>=0?location.pathname:""), AU=gh?"https://cdn.jsdelivr.net/gh/antidotethecure/antidotethecure.github.io@"+gh[1]+"/demo/storm-burger/audio/":"audio/";
+var MS=SongSwitch({key:"sb-song",vol:.5,fade:.8,songs:[{id:"energy",name:"Energy",src:AU+"energy.m4a"},{id:"cheat",name:"Cheat Code",src:AU+"cheat-code.m4a"}],onTap:unlock});
 function unlock(){
   if(ctx){ if(ctx.state!=="running") ctx.resume(); return; }
   var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
@@ -786,8 +788,11 @@ function apply(){ var p=on&&!!S.get().running&&!document.hidden; if(p===was) ret
   MS.sync(p&&musOn); if(storm) storm.gain.setTargetAtTime(p&&fxOn?.12:0,ctx.currentTime,.6); }   // .12 = storm stays well under the music
 window.GAME_AUDIO={music:function(v){ musOn=v!==false; was=null; apply(); }, sfx:function(v){ fxOn=v!==false; was=null; apply(); },
   sound:function(v){ on=v!==false; was=null; lbl(); apply(); }, state:function(){ return {hasMusic:true,hasSfx:true,sound:on,music:musOn,sfx:fxOn,unlocked:!!(ctx&&ctx.state==="running")}; }};
-function tap(){ unlock(); if(on&&musOn&&!was){ var a=MS.el(), q=a.play(); if(q&&q.then) q.then(function(){ if(!was) a.pause(); },function(){}); } setTimeout(apply,0); }   // primes the song inside the tap for iOS
-["pointerdown","click","keydown"].forEach(function(k){ addEventListener(k,tap); });
+/* iPhone Safari only lets sound start on a finished tap (touchend / click), and the start menu swallows its click,
+   so listen in the capture phase (before anything can stop it) and keep re-priming the song until it really plays */
+function tap(){ unlock(); var a=MS.el(); if(on&&musOn&&a.paused){ var q=a.play(); if(q&&q.then) q.then(function(){ if(!was||!musOn) a.pause(); },function(){}); } setTimeout(function(){ was=null; apply(); },0); }
+["pointerdown","touchend","click","keydown"].forEach(function(k){ addEventListener(k,tap,{capture:true,passive:true}); });
+try{ if(navigator.audioSession) navigator.audioSession.type="playback"; }catch(e){}   // iPhone: play even with the ring/silent switch on
 setInterval(apply,300); document.addEventListener("visibilitychange",apply);
 var mb=document.getElementById("sbmute");
 function lbl(){ mb.textContent=on?"🔊 Sound on":"🔇 Sound off"; mb.setAttribute("aria-pressed",on?"true":"false"); }

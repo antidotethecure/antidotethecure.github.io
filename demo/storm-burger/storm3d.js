@@ -42,8 +42,8 @@ async function boot() {
   const LITE = q.smooth || q.tier === "low";
   const scene = new THREE.Scene();
   const BG = new THREE.Color(0x0c1330), BGF = new THREE.Color(0x5a6890);
-  scene.background = BG.clone(); scene.fog = new THREE.Fog(0x141d3c, 700, 2500);
-  const cam = new THREE.PerspectiveCamera(68, W / H, 4, 4200);
+  scene.background = BG.clone(); scene.fog = new THREE.Fog(0x141d3c, 900, 2900);
+  const cam = new THREE.PerspectiveCamera(72, W / H, 4, 4600);
   const size = () => { const w = game.clientWidth || W, h = game.clientHeight || H; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, cfg.pr)); renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); };
   size(); new ResizeObserver(size).observe(game);
   q.onChange((t, c) => { cfg = c; STATUS.tier = q.smooth ? "smooth" : t; size(); });
@@ -501,14 +501,16 @@ async function boot() {
     const pool = add(scene, PLANE, glowPlaneMat(0xf2f6ff, .5), 150, 190, 1, 0, 1.6, 0); pool.rotation.x = -Math.PI / 2;
     scene.add(g); scene.add(cone);
     const P = new THREE.Vector3(0, 600, 500), Lp = new THREE.Vector3(), D = new THREE.Vector3(), UP = new THREE.Vector3(0, -1, 0);
-    return { update(dt, t, tx, run) {
-      const tgt = run ? V2.set(tx * .7 + Math.sin(t * .35) * 26, 232 + Math.sin(t * .9) * 6, -250 + Math.sin(t * .27) * 22) : V2.set(Math.sin(t * .2) * 120, 300, -420);
+    return { update(dt, t, tx, run, on) {
+      const away = run && !on;   // not a helicopter level: it peels off into the clouds and its light goes out
+      const tgt = away ? V2.set(tx + 400, 900, -1900) : run ? V2.set(tx * .7 + Math.sin(t * .35) * 26, 232 + Math.sin(t * .9) * 6, -250 + Math.sin(t * .27) * 22) : V2.set(Math.sin(t * .2) * 120, 300, -420);
       const vx = (tgt.x - P.x); P.lerp(tgt, Math.min(1, dt * (run ? 1.4 : .5)));
       g.position.copy(P); g.rotation.set(-.14, Math.sin(t * .3) * .08, Math.max(-.3, Math.min(.3, -vx * .004)));
       rotor.rotation.y += dt * 31; tr.rotation.x += dt * 44; strobe.visible = (t * 1.3 % 1) < .08; navR.visible = navG.visible = (t * .9 % 1) < .6;
       g.updateMatrixWorld(); lamp.getWorldPosition(Lp); D.set(tx, 0, 0).sub(Lp); const len = D.length(); D.normalize();
       cone.position.copy(Lp); cone.quaternion.setFromUnitVectors(UP, D); const r = len * Math.tan(.15); cone.scale.set(r, len, r);
-      heliSpot.position.copy(Lp); heliSpot.target.position.set(tx, 0, 0); heliSpot.intensity = LITE ? 900 : 1500;
+      const lit = !away || P.y < 500; g.visible = !away || P.y < 860; cone.visible = pool.visible = lit;
+      heliSpot.position.copy(Lp); heliSpot.target.position.set(tx, 0, 0); heliSpot.intensity = lit ? (LITE ? 900 : 1500) : 0;
       pool.position.set(tx + Math.sin(t * 1.7) * 6, 1.6, Math.cos(t * 1.3) * 6); pool.material.opacity = .42 + Math.sin(t * 9) * .03; } };
   })();
 
@@ -737,7 +739,7 @@ async function boot() {
     twLane.visible = run && !st.dying && !pitting && st.twT < 3200; if (twLane.visible) { twLane.position.x = wx(S.LX(st.twLane)); twLaneM.opacity = .55 + .45 * Math.sin(t * 14); }
     const wc = run && !pitting ? st.cops.find(c => c.warn > 0 || c.y > PY + 30) : null; cpLane.visible = cpGlow.visible = !!wc;
     if (wc) { cpLane.position.x = cpGlow.position.x = LANEX[wc.lane]; cpTex.offset.y -= dt * 1.6; cpLaneM.opacity = .6 + .4 * Math.sin(t * 16); cpGlow.material.color.setHex(Math.floor(now / 110) % 2 ? 0xff3030 : 0x3a6bff); }
-    HELI.update(dt, t, tx, st.running);
+    HELI.update(dt, t, tx, st.running, !window.SB_HELI || SB_HELI(st.lvl));
     tShadow.position.set(tx, .8, 0); tShadow.visible = T.visible && ty < 40;
     const heat = Math.max(0, Math.min(1, 1 - st.lives / (window.SB_LIVES ? SB_LIVES.max() : 5)));   /* fire grows slowly with every hit */
     const scorchK = Math.min(1, heat * 1.2); [TRUCKM.wrapR, TRUCKM.wrapL, TRUCKM.rear, TRUCKM.cab].forEach(m => m.color.setHex(0xffffff).lerp(scorch, scorchK * .6));
@@ -766,7 +768,7 @@ async function boot() {
     const camT = st.dying ? camX : tx * (pitting ? .85 : .42); camX += (camT - camX) * Math.min(1, dt * 5);
     if (st.shake > 0) camShake = Math.max(camShake, st.shake);
     camShake *= Math.pow(.02, dt);
-    cam.position.set(camX + (Math.random() - .5) * camShake * 1.2, 116 + (Math.random() - .5) * camShake + (st.dying ? Math.min(160, ty * .3) : 0), 238);
+    cam.position.set(camX + (Math.random() - .5) * camShake * 1.2, 150 + (Math.random() - .5) * camShake + (st.dying ? Math.min(160, ty * .3) : 0), 330);   // pulled back to show more of the city
     V.set(camX + tx * .2, st.dying ? 40 + ty * .7 : 20, -320); cam.lookAt(V); cam.rotation.z += -st.rot * .05;
     if (STATUS.camO) { const c = STATUS.camO; cam.position.set(tx + c[0], c[1], c[2]); cam.lookAt(tx + c[3], c[4], c[5]); }   // test hook: look at the truck from anywhere
 

@@ -22,7 +22,7 @@ if (S && REQ !== "2d" && (REQ === "3d" || pref() !== "2d")) {
 
 async function boot() {
   const THREE = await import("three");
-  const [QM, WXM, PM, BBMOD] = await Promise.all(["quality", "weather", "particles", "billboard"].map(n => import("../engine3d/" + n + ".js?v=e3u")));
+  const [QM, WXM, PM, BBMOD, CMOD] = await Promise.all(["quality", "weather", "particles", "billboard", "carmodels"].map(n => import("../engine3d/" + n + ".js?v=e3u")));
   const game = document.getElementById("game"), host = game.parentNode;
   const W = S.W, H = S.H, PY = S.PY, KF = 3.2, TAU = Math.PI * 2;
   const wx = x => x - W / 2;
@@ -202,11 +202,13 @@ async function boot() {
       if (LOGO.complete && LOGO.naturalWidth) { const lw = w * .62, lh = lw * LOGO.naturalHeight / LOGO.naturalWidth; x.drawImage(LOGO, (w - lw) / 2, h * .06, lw, lh); }
       x.fillStyle = "#FFD23F"; x.font = "800 30px Arial,sans-serif"; x.textAlign = "right"; x.fillText(addr, w - 30, h * .41); }); logoTex.push(t);
     return std(0xffffff, { map: t, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: 1.25, roughness: .7 }); };
-  function store(s, addr, walk) { const g = new THREE.Group(), len = 320; if (walk) sidewalk(g, s, len);   // walk=false: drawn on top of the street, which already has its sidewalk
+  function store(s, addr, walk) { const g = new THREE.Group(), len = 620; if (walk) sidewalk(g, s, len);
+    const lot = add(g, PLANE, std(0x23262d, { roughness: .55, metalness: .1 }), 420, len, 1, s * 500, .5, 0); lot.rotation.x = -Math.PI / 2;   // their parking lot
+    for (let i = 0; i < 6; i++) box(g, basic(0xd8dbe0), 40, .4, 2.5, s * 640, 1, -230 + i * 60);   // walk=false: drawn on top of the street, which already has its sidewalk
     const mats = [MAT.wall, MAT.wall, MAT.roof, MAT.wall, MAT.wall, MAT.wall]; mats[s < 0 ? 0 : 1] = storeFace(addr);
-    box(g, mats, 150, 95, 230, s * 390, 47.5, -30); box(g, std(0xE8582A), 4, 8, 232, s * 314, 95, -30);
+    box(g, mats, 200, 140, 320, s * 520, 70, -60); box(g, std(0xE8582A, { emissive: 0xE8582A, emissiveIntensity: .8 }), 6, 12, 322, s * 419, 140, -60);
     // the real pylon (his 10-21 photo): rounded white face with a thick red rim + red sides, the logo, one white pole, red DRIVE THRU box under it
-    const px = s * 272, pz = 110, P = new THREE.Group(); P.position.set(px, 0, pz); P.rotation.y = -s * .45; g.add(P);
+    const px = s * 300, pz = 170, P = new THREE.Group(); P.position.set(px, 0, pz); P.rotation.y = -s * .45; P.scale.setScalar(1.7); g.add(P);   // big enough to read from far up the road
     const wpost = std(0xf2f3f5, { roughness: .5 }); add(P, CYL6, wpost, 7, 200, 7, 0, 100, 0);
     const pt = ctex(1024, 384, (x, w, h) => { const rr = (a, b, c, d, r) => { x.beginPath(); x.roundRect(a, b, c, d, r); x.fill(); };
       x.fillStyle = "#d9262f"; x.fillRect(0, 0, w, h); x.fillStyle = "#e33a36"; rr(6, 6, w - 12, h - 12, 70); x.fillStyle = "#f7f8fa"; rr(34, 30, w - 68, h - 60, 54);
@@ -215,10 +217,12 @@ async function boot() {
     box(P, [red, red, red, red, pm, pm], 150, 56, 18, 0, 222, 0);
     const dt = textTex("drivethru", 256, 64, (x, w, h) => { x.fillStyle = "#d9262f"; x.fillRect(0, 0, w, h); x.strokeStyle = "#fff"; x.lineWidth = 4; x.strokeRect(4, 4, w - 8, h - 8); x.fillStyle = "#fff"; x.font = "800 38px Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("DRIVE THRU", w / 2, h / 2 + 2); });
     const dm = std(0xffffff, { map: dt, emissive: 0xffffff, emissiveMap: dt, emissiveIntensity: 1.5 }); box(P, [red, red, red, red, dm, dm], 64, 17, 10, -14, 158, 0); box(P, red, 70, 21, 4, -12, 156, -7);
-    const sg = new THREE.Sprite(glowMat(0xeaf0ff, .7)); sg.scale.set(190, 90, 1); sg.position.set(s * 318, 70, -30); g.add(sg);
-    const gl = new THREE.Sprite(glowMat(0xdfe8ff, .8)); gl.scale.set(320, 190, 1); gl.position.set(px, 215, pz); g.add(gl);
+    const sg = new THREE.Sprite(glowMat(0xeaf0ff, .7)); sg.scale.set(260, 130, 1); sg.position.set(s * 415, 90, -60); g.add(sg);
+    const gl = new THREE.Sprite(glowMat(0xdfe8ff, .9)); gl.scale.set(560, 330, 1); gl.position.set(px, 378, pz); g.add(gl);
+    const sl = new THREE.PointLight(0xfff2e0, 2.2, 700, 1.2); sl.position.set(px, 300, pz + 60); g.add(sl);
+    for (let i = 0; i < 6; i++) { const c = makeCar(i + (addr.includes("LONG") ? 3 : 0)); c.position.set(s * 360, 0, -200 + i * 72); c.rotation.y = s * .04; g.add(c); }   // the drive-thru line, in their lot
     // the StormBurger truck parked out front (it really sat outside the Long Beach spot while the restaurant was built)
-    const tk = makeTruck(true); tk.g.position.set(s * 245, 6, -120); tk.g.rotation.y = s > 0 ? 0 : Math.PI; tk.g.scale.setScalar(.9); g.add(tk.g);
+    const tk = makeTruck(true); tk.g.position.set(s * 420, 6, 250); tk.g.rotation.y = s > 0 ? 0 : Math.PI; tk.g.scale.setScalar(.9); g.add(tk.g);
     return { o: g, len }; }
   function pumpjacks(s) { const g = new THREE.Group(), len = 440, js = [];
     sidewalk(g, s, len); add(g, PLANE, std(0x3a3226, { roughness: 1 }), 520, len, 1, s * 560, .3, 0).rotation.x = -Math.PI / 2;
@@ -373,7 +377,7 @@ async function boot() {
     { cross: ["LA BREA AV", "FLORENCE AV"], L: academy }, { gantry: ["710", "SOUTH", "LONG BEACH"], R: lbsign, city: "lb" }, { cross: ["SHORELINE DR", "PINE AV"], L: ferris, R: lighthouse },
     { cross: ["CHERRY AV", "HILL ST"], L: pumpjacks, R: pumpjacks }, { cross: ["CHERRY AV", "CARSON ST"], R: airport }, { R: jordan }, { cross: ["CHERRY AV", "SOUTH ST"], R: sbLB }];
   const FILL = { ing: [["LA BREA AV", "ARBOR VITAE ST"], ["LA BREA AV", "HYDE PARK BL"]], lb: [["CHERRY AV", "WARDLOW RD"], ["CHERRY AV", "DEL AMO BL"], ["CHERRY AV", "ARTESIA BL"]] };
-  let city = "ing", lvShown = 0, fi = 0, evtIn = 900; const SPACING = 2700;
+  let city = "ing", lvShown = 0, midDone = 0, fi = 0, evtIn = 900; const SPACING = 2700;
   function fill() {
     for (let s = 0; s < 2; s++) while (front[s] > FAR) { const L = lot(s ? 1 : -1); place(L.o, front[s] - L.len / 2, L.upd); front[s] -= L.len; }
   }
@@ -527,22 +531,33 @@ async function boot() {
   const COPM = { black: new THREE.MeshPhysicalMaterial({ color: 0x0c0d12, metalness: .5, roughness: .3, clearcoat: 1 }), white: std(0xf2f4f8, { roughness: .35 }), push: std(0x121318, { metalness: .6, roughness: .4 }),
     red: basic(new THREE.Color(4, .2, .2)), redOff: basic(0x3a0c0c), blue: basic(new THREE.Color(.3, .8, 5)), blueOff: basic(0x0c1a3a) };
   const copDoorM = { lb: std(0xffffff, { map: doorTex("lb"), roughness: .35, metalness: .1 }), ing: std(0xffffff, { map: doorTex("ing"), roughness: .35, metalness: .1 }) };
+  /* bodies from engine3d/carmodels.js (lofted from real cross-sections), in metres with the nose at +z: SPU game units per metre */
+  const CARS3 = CMOD.buildCars(THREE), SPU = 19.5, geoCache = new Map();
+  function paintGeo(name, paint, door) {   // copy a car body and bake its paint (door = white front + rear doors, the cruiser look)
+    const key = name + paint + (door || ""); if (geoCache.has(key)) return geoCache.get(key);
+    const src = (CARS3.find(c => c.name === name) || CARS3[0]).geo, g = src.clone(), col = g.attributes.color, part = g.attributes._part, pos = g.attributes.position;
+    const P = new THREE.Color(paint), Dc = new THREE.Color(door || paint);
+    for (let i = 0; i < col.count; i += 3) { if (part.getX(i) !== 1) continue; const z = (pos.getZ(i) + pos.getZ(i + 1) + pos.getZ(i + 2)) / 3, y = (pos.getY(i) + pos.getY(i + 1) + pos.getY(i + 2)) / 3;
+      const c = door && z > -1.05 && z < .95 && y > .3 && y < 1.03 ? Dc : P; for (let k = 0; k < 3; k++) col.setXYZ(i + k, c.r, c.g, c.b); }
+    col.needsUpdate = true; geoCache.set(key, g); return g; }
+  const carBodyM = new THREE.MeshPhysicalMaterial({ vertexColors: true, metalness: .45, roughness: .3, clearcoat: 1, clearcoatRoughness: .15 });
+  function carMesh(name, paint, door) { const m = new THREE.Mesh(paintGeo(name, paint, door), carBodyM); m.scale.setScalar(SPU); m.rotation.y = Math.PI; return m; }   // nose toward -z like everything on the road
+  /* police cruiser: Ford Police Interceptor Utility look (his LB + Inglewood photos): black body, white doors with the city's POLICE decal,
+     push bar, low light bar, spot lamp, steel wheels */
   function makeCop(city) { const g = new THREE.Group(), M = COPM, D = copDoorM[city] || copDoorM.lb;
-    box(g, M.black, 46, 20, 94, 0, 18, 0);                                                     // body: black hood, tailgate, fenders
-    box(g, [D, D, M.white, M.white, M.white, M.white], 46.6, 18, 48, 0, 19, -2);                // white front + rear doors
-    box(g, TRUCKM.glass, 42, 15, 58, 0, 35.5, 6); box(g, M.black, 42, 3, 56, 0, 44.5, 6);       // greenhouse + black roof
-    box(g, M.push, 38, 16, 4, 0, 19, -49); box(g, M.push, 4, 12, 6, -14, 19, -46); box(g, M.push, 4, 12, 6, 14, 19, -46);   // push bar
-    box(g, M.black, 34, 3, 9, 0, 47.5, -6); const r = box(g, M.red, 15, 4, 8, -8, 49.5, -6), b = box(g, M.blue, 15, 4, 8, 8, 49.5, -6);
-    [-15, 15].forEach(x => box(g, TRUCKM.head, 9, 4, 1, x, 24, -47.6)); [-17, 17].forEach(x => box(g, TRUCKM.tail, 6, 9, 1, x, 27, 47.6));
-    [[-31], [30]].forEach(([z]) => [-23, 23].forEach(x => { add(g, CYL, TRUCKM.tire, 10, 8, 10, x, 10, z).rotation.z = Math.PI / 2; add(g, CYL6, M.push, 6, 8.4, 6, x, 10, z).rotation.z = Math.PI / 2; }));
-    const glow = new THREE.Sprite(glowMat(0xff3030, .9)); glow.scale.set(100, 64, 1); glow.position.set(0, 52, -6); g.add(glow);
+    g.add(carMesh("suv", 0x0b0c10, 0xf2f4f8));
+    [-1, 1].forEach(sd => { const d = add(g, PLANE, D, 37, 11, 1, sd * 19.4, 14.5, 1); d.rotation.y = sd * Math.PI / 2; });   // POLICE door decals both sides
+    box(g, M.push, 40, 3, 3, 0, 20, -51); box(g, M.push, 34, 3, 3, 0, 12, -51); [-12, 12].forEach(x => box(g, M.push, 3, 16, 3, x, 15, -51)); box(g, M.push, 26, 2, 6, 0, 8, -49);   // push bar
+    box(g, M.black, 30, 2.2, 7, 0, 35, -2); const r = box(g, M.red, 13, 3, 6.5, -7.5, 37, -2), b = box(g, M.blue, 13, 3, 6.5, 7.5, 37, -2);   // light bar on the roof
+    box(g, M.push, 2, 3, 3, -18, 27, -14);   // A-pillar spot lamp
+    [-13, 13].forEach(x => box(g, TRUCKM.head, 8, 2.6, 1, x, 17.5, -48)); [-15, 15].forEach(x => box(g, TRUCKM.tail, 5, 8, 1, x, 19, 48));
+    const glow = new THREE.Sprite(glowMat(0xff3030, .9)); glow.scale.set(100, 64, 1); glow.position.set(0, 40, -2); g.add(glow);
     return { g, r, b, glow }; }
   const CARC = [0xe9e9ee, 0x1d1d22, 0x8a9099, 0x7a1f1f, 0x2b4b8a, 0xc9ccd2, 0x3a3a40, 0xb8b0a0, 0x1f3a2a], carMats = CARC.map(c => new THREE.MeshPhysicalMaterial({ color: c, metalness: .5, roughness: .32, clearcoat: 1 }));
   const brake = basic(new THREE.Color(4.5, .25, .15));
-  function makeCar(i) { const g = new THREE.Group(), m = carMats[i % carMats.length], suv = i % 3 === 0;
-    box(g, m, 44, suv ? 18 : 14, 88, 0, suv ? 17 : 15, 0); box(g, TRUCKM.glass, 38, suv ? 15 : 13, suv ? 52 : 42, 0, suv ? 33 : 28, suv ? 8 : 4); box(g, m, 36, 2, suv ? 46 : 32, 0, suv ? 41 : 35, suv ? 8 : 6);
-    [-15, 15].forEach(x => box(g, brake, 9, 4, 1, x, suv ? 22 : 19, 44.6)); [-14, 14].forEach(x => box(g, TRUCKM.head, 8, 4, 1, x, 17, -44.6));
-    [[-28], [28]].forEach(([z]) => [-22, 22].forEach(x => add(g, CYL, TRUCKM.tire, 8.5, 7, 8.5, x, 8.5, z).rotation.z = Math.PI / 2));
+  const CAR_NAMES = ["suv", "ev-sedan", "pickup", "ev-suv", "suv", "ev-sedan"];
+  function makeCar(i) { const g = new THREE.Group(); g.add(carMesh(CAR_NAMES[i % CAR_NAMES.length], CARC[(i * 4 + 1) % CARC.length]));
+    [-15, 15].forEach(x => box(g, brake, 7, 3, 1, x, 18, 46.5));
     const bg = add(g, PLANE, glowPlaneMat(0xff2a1a, .35), 60, 70, 1, 0, .8, 70); bg.rotation.x = -Math.PI / 2;
     return g; }
   const STORES = { lb: ["5801 CHERRY AVE · LONG BEACH"], ing: ["1500 N LA BREA AVE · INGLEWOOD"] };
@@ -708,7 +723,9 @@ async function boot() {
     if (fpsT >= 1) { STATUS.fps = Math.round(frames / fpsT); const r = q.sample(STATUS.fps); frames = 0; fpsT = 0; if (r === "fail" && !st.running) { failed = true; STATUS.reason = "low fps → 2D"; off2d(); return; } }
     const run = st.running && !st.dying;
     if (st.running && !wasRun) { lvShown = 0; city = "ing"; }
-    if (st.running && st.lvl && st.lvl !== lvShown) { lvShown = st.lvl; event(LVL[Math.min(LVL.length, st.lvl) - 1]); evtIn = SPACING; }   // each new level puts its landmark on the road ahead right away
+    if (st.running && st.lvl && st.lvl !== lvShown) { lvShown = st.lvl; midDone = 0; event(LVL[Math.min(LVL.length, st.lvl) - 1]); evtIn = SPACING; }
+    if (st.running && st.lvl < 10 && midDone === 0 && st.t < 44000) { midDone = 1; event({ R: s2 => store(s2, st.lvl >= 5 ? "5801 CHERRY AVE · LONG BEACH" : "1500 N LA BREA AVE · INGLEWOOD", true) }); evtIn = SPACING; }   // StormBurger with its drive-thru line, every level
+    if (st.running && st.lvl % 3 && midDone === 1 && st.t < 22000) { midDone = 2; event({ R: jordan }); evtIn = SPACING; }   // Jordan High every level (levels 3/6/9 show it at the pit stop)   // each new level puts its landmark on the road ahead right away
     wasRun = st.running;
     // ground speed: the stretched 2D speed, so pickups sit still on the road; a slow cruise under the menu
     const pitting = st.pitT > 0, pp = pitting ? (st.pitT > 3000 ? .5 : 1 - st.pitT / 2600) : 0;   // > 3000 = parked in the Jordan kitchen stop

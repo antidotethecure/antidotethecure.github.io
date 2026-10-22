@@ -577,8 +577,8 @@ async function boot() {
   function makeBolt(x, z) { const pts = []; let px = x, y = 950; while (y > 0) { pts.push([px, y]); y -= 50 + Math.random() * 70; px += (Math.random() - .5) * 70; } pts.push([x + (Math.random() - .5) * 20, 0]);
     const rib = (w) => { const pos = []; for (let i = 0; i < pts.length - 1; i++) { const [ax, ay] = pts[i], [bx, by] = pts[i + 1]; pos.push(ax - w, ay, z, ax + w, ay, z, bx + w, by, z, ax - w, ay, z, bx + w, by, z, bx - w, by, z); }
       const gm = new THREE.BufferGeometry(); gm.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); return gm; };
-    const g = new THREE.Group(); g.add(new THREE.Mesh(rib(3.5), basic(new THREE.Color(6, 6.5, 8), { transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })));
-    g.add(new THREE.Mesh(rib(18), basic(0x7fb6ff, { transparent: true, opacity: .35, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })));
+    const g = new THREE.Group(); g.add(new THREE.Mesh(rib(4.5), basic(new THREE.Color(9, 9.5, 12), { transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, side: THREE.DoubleSide })));
+    g.add(new THREE.Mesh(rib(24), basic(0x7fb6ff, { transparent: true, opacity: .45, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, side: THREE.DoubleSide })));
     const pool = add(g, PLANE, glowPlaneMat(0xbfe0ff, .9), 260, 260, 1, x, 1.5, z); pool.rotation.x = -Math.PI / 2;
     return g; }
   const TARGET_RING = new THREE.RingGeometry(52, 60, 48);
@@ -799,7 +799,7 @@ async function boot() {
     for (const bo of st.bolts) { const v = viewFor(bo, "bolt"); v.n = frameNo; v.o.position.x = LANEX[bo.lane];
       if (bo.phase === "warn") { const a = .5 + .5 * Math.sin(bo.age / 50), k2 = 1 - Math.min(1, bo.age / 1300) * .45; v.strip.scale.setScalar(k2); v.strip.material.opacity = .45 + a * .5; v.disc.material.opacity = .2 + a * .35; v.beam.material.opacity = .04 + .08 * Math.min(1, bo.age / 1300);
         v.strip.visible = v.disc.visible = v.beam.visible = v.ic.visible = true; v.ic.material.opacity = .6 + a * .4; v.ic.position.y = 150 + Math.sin(bo.age / 90) * 8; }
-      else { v.strip.visible = v.disc.visible = v.beam.visible = v.ic.visible = false; if (!v.bolt) { v.bolt = makeBolt(0, -10); v.o.add(v.bolt); flashLight.position.set(LANEX[bo.lane], 200, -10); flashK = 1; fx.sparks(V.set(LANEX[bo.lane], 4, -10), V2.set(0, 1, 0), null, 3, 30); fx.boom(V.set(LANEX[bo.lane], 6, -10), .6); } v.bolt.visible = Math.random() > .25; } }
+      else { v.strip.visible = v.disc.visible = v.beam.visible = v.ic.visible = false; if (!v.bolt) { v.bolt = makeBolt(0, -60); v.o.add(v.bolt); flashLight.position.set(LANEX[bo.lane], 200, -10); flashK = 1; fx.sparks(V.set(LANEX[bo.lane], 4, -10), V2.set(0, 1, 0), null, 3, 30); fx.boom(V.set(LANEX[bo.lane], 6, -10), .6); } v.bolt.visible = bo.age < 160 || Math.random() > .3; } }
     for (const [o, v] of views) if (v.n !== frameNo) {   // gone from the game: picked up / hit (animate it into the truck) or scrolled away
       if ((v.kind === "coin" || v.kind === "food" || v.kind === "driz" || v.kind === "egg" || v.kind === "debris" || v.kind === "twister") && v.z > -320 && Math.abs(v.x - tx) < 90) {
         ghosts.push({ v, o, t: 0, x0: v.o.position.x, z0: v.o.position.z, bad: v.kind === "debris" || v.kind === "twister" }); views.delete(o); }

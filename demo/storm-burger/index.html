@@ -54,6 +54,8 @@ h2::before{content:"";width:22px;height:22px;background:var(--bolt);clip-path:po
 .hud .lv{letter-spacing:2px}
 #game{display:block;width:100%;height:auto;aspect-ratio:400/560;border-radius:12px;background:#05081a;touch-action:pan-y pinch-zoom;cursor:pointer}
 .keys{display:flex;justify-content:center;gap:10px;margin-top:10px}
+.sbaud{display:flex;justify-content:center;gap:8px;margin:0 0 8px}
+.sbaud button{font:800 13px var(--body);background:#1a2656;color:#fff;border:1px solid var(--edge);border-radius:999px;padding:7px 14px;cursor:pointer}
 .keys button{flex:1;max-width:170px;font:800 22px var(--body);background:#1a2656;color:#fff;border:1px solid var(--edge);border-radius:12px;padding:12px 0;cursor:pointer}
 .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px;font-size:13.5px;color:var(--dim)}
 .how div{background:#0b1230;border:1px solid var(--edge);border-radius:10px;padding:8px 10px}
@@ -118,6 +120,7 @@ footer{margin-top:36px;color:var(--dim);font-size:12.5px;text-align:center;line-
 <p class="sub">Drive through the storm. Grab coins and StormBurger food. Dodge the lightning, the cops and the tornadoes, from Inglewood to Long Beach.</p>
 <div class="gamebox">
   <div class="hud"><span>Score <span class="sc" id="score">0</span></span><span class="lv" id="lives" aria-label="Lives">⚡⚡⚡⚡⚡</span><span id="time">45s</span></div>
+  <div class="sbaud" id="sbaud"><button type="button" id="sbmute" aria-pressed="true">🔊 Sound on</button></div>
   <canvas id="game" width="400" height="560" aria-label="Storm Run game. Tap the left or right side to change lanes."></canvas>
   <div class="keys"><button type="button" id="kl" aria-label="Move left">◀</button><button type="button" id="kr" aria-label="Move right">▶</button></div>
   <div id="over">
@@ -636,7 +639,7 @@ function frame(now){
   var py=H-80;
   // bolts
   for(var b=st.bolts.length-1;b>=0;b--){ var bo=st.bolts[b]; bo.age+=pit?0:dt;
-    if(bo.phase==="warn"&&bo.age>BOLT_WARN){ bo.phase="strike"; bo.age=0; bo.pts=boltPath(LX(bo.lane)); st.flash=0.6; st.shake=8; if(st.running&&st.lane===bo.lane&&Math.abs(st.x-LX(bo.lane))<40) hit(st.x,py,T("LIGHTNING!")); }
+    if(bo.phase==="warn"&&bo.age>BOLT_WARN){ bo.phase="strike"; bo.age=0; bo.pts=boltPath(LX(bo.lane)); st.flash=0.6; st.shake=8; if(window.SB_THUNDER) SB_THUNDER(); if(st.running&&st.lane===bo.lane&&Math.abs(st.x-LX(bo.lane))<40) hit(st.x,py,T("LIGHTNING!")); }
     else if(bo.phase==="strike"&&bo.age>260){ st.bolts.splice(b,1); continue; }
     if(!r3) drawBolt(bo); }
   // items
@@ -730,6 +733,66 @@ $("kr").addEventListener("click",function(){ if(!st.running) replay(); else setL
 addEventListener("keydown",function(e){ if(!st.running) return; if(e.key==="ArrowLeft"){setLane(st.lane-1);e.preventDefault();} if(e.key==="ArrowRight"){setLane(st.lane+1);e.preventDefault();} });
 $("again").addEventListener("click",function(){ replay(); $("game").scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"}); });
 hud();
+})();
+</script>
+<script src="../songswitch.js?v=ms1"></script>
+<script>
+/* Storm Run sound (2026-10-21): his songs Energy + Cheat Code (🎵 pill or M key switches) over a low storm bed
+   (rain hiss, patter, a slow deep rumble) and a soft thunder roll on each lightning strike. Plays only during a run;
+   🔊 mutes and is remembered. Nothing starts before a tap (iOS). */
+(function(){
+var S=window.__S; if(!S) return;
+var on=true; try{ on=localStorage.getItem("sb-sound")!=="0"; }catch(e){}
+var ctx=null, out, storm, nb, was=null, musOn=true, fxOn=true, mus;
+var MS=SongSwitch({key:"sb-song",vol:.5,fade:.8,songs:[{id:"energy",name:"Energy",src:"audio/energy.m4a"},{id:"cheat",name:"Cheat Code",src:"audio/cheat-code.m4a"}],onTap:unlock});
+function unlock(){
+  if(ctx){ if(ctx.state!=="running") ctx.resume(); return; }
+  var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+  ctx=new AC(); out=ctx.createGain(); out.connect(ctx.destination);
+  mus=ctx.createGain(); mus.gain.value=.55; mus.connect(out); MS.attach(ctx,mus);
+  var sr=ctx.sampleRate, d, b=0; nb=ctx.createBuffer(1,sr*4,sr); d=nb.getChannelData(0);
+  for(var i=0;i<d.length;i++){ var w=Math.random()*2-1; b=(b+.02*w)/1.02; d[i]=w*.4+b*3.5; }   // white + brown noise
+  function src(r){ var x=ctx.createBufferSource(); x.buffer=nb; x.loop=true; x.playbackRate.value=r; x.start(0,Math.random()*3); return x; }
+  function flt(type,fr,q){ var x=ctx.createBiquadFilter(); x.type=type; x.frequency.value=fr; x.Q.value=q; return x; }
+  function g(v){ var x=ctx.createGain(); x.gain.value=v; return x; }
+  storm=g(0); storm.connect(out);
+  src(1).connect(flt("highpass",1500,.4)).connect(g(.35)).connect(storm);    // rain hiss
+  src(.8).connect(flt("bandpass",650,.8)).connect(g(.2)).connect(storm);     // patter on the truck
+  var rl=flt("lowpass",110,.6), lfo=ctx.createOscillator(), ld=g(50); lfo.frequency.value=.07; lfo.connect(ld); ld.connect(rl.frequency); lfo.start();
+  src(.45).connect(rl).connect(g(.9)).connect(storm);                         // slow deep rumble / wind
+}
+var wb=null, sir=null;
+function white(){ if(wb) return wb; var sr=ctx.sampleRate; wb=ctx.createBuffer(1,sr,sr); var d=wb.getChannelData(0); for(var i=0;i<d.length;i++) d[i]=Math.random()*2-1; return wb; }
+function burst(buf,t,rate,type,f0,f1,peak,len,off){ var x=ctx.createBufferSource(), lp=ctx.createBiquadFilter(), gg=ctx.createGain();
+  x.buffer=buf; x.playbackRate.value=rate; lp.type=type; lp.frequency.setValueAtTime(f0,t); lp.frequency.exponentialRampToValueAtTime(f1,t+len);
+  gg.gain.setValueAtTime(0,t); gg.gain.linearRampToValueAtTime(peak,t+.004); gg.gain.exponentialRampToValueAtTime(.001,t+len);
+  x.connect(lp).connect(gg).connect(out); x.start(t,off||0); x.stop(t+len+.1); }
+/* the bolt lands: a sharp crack (two snaps of white noise) right away, then the low roll of thunder */
+window.SB_THUNDER=function(){ if(!ctx||!was||!fxOn) return; var t=ctx.currentTime;
+  burst(white(),t,1,"highpass",900,300,.42,.28); burst(white(),t+.05,.8,"bandpass",2400,500,.28,.22,.3);
+  burst(nb,t+.08,.3+Math.random()*.15,"lowpass",900,80,.4,3.2,Math.random()*2); };
+/* police siren: a wailing tone that gets loud as a cop comes up behind and fades out once it is past (pitch drops a bit past you) */
+function siren(){ if(!ctx||!was||!fxOn){ if(sir) sir.g.gain.setTargetAtTime(0,ctx.currentTime,.1); return; }
+  if(!sir){ var o=ctx.createOscillator(), o2=ctx.createOscillator(), lp=ctx.createBiquadFilter(), g=ctx.createGain(), l=ctx.createOscillator(), ld=ctx.createGain();
+    o.type="sawtooth"; o2.type="square"; o.frequency.value=950; o2.frequency.value=953; lp.type="lowpass"; lp.frequency.value=2200;
+    l.type="triangle"; l.frequency.value=.32; ld.gain.value=330; l.connect(ld); ld.connect(o.frequency); ld.connect(o2.frequency);
+    var g2=ctx.createGain(); g2.gain.value=.35; o.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(g); g.gain.value=0; g.connect(out); o.start(); o2.start(); l.start(); sir={g:g,o:o,o2:o2}; }
+  var S2=S.get(), PY=S.PY, v=0, ahead=false;
+  (S2.cops||[]).forEach(function(c){ var d=c.y-PY, k=c.warn>0?.6*(1-c.warn/1700):Math.max(0,1-Math.abs(d)/(d>0?420:300)); if(k>v){ v=k; ahead=d<0; } });
+  var t=ctx.currentTime; sir.g.gain.setTargetAtTime(v*.16,t,.12); var c0=ahead?880:960; sir.o.frequency.setTargetAtTime(c0,t,.3); sir.o2.frequency.setTargetAtTime(c0+3,t,.3); }
+setInterval(siren,80);
+window.__SBA={ctx:function(){return ctx;},out:function(){return out;},siren:function(){return sir?sir.g.gain.value:0;}};   // test hook
+function apply(){ var p=on&&!!S.get().running&&!document.hidden; if(p===was) return; was=p;
+  MS.sync(p&&musOn); if(storm) storm.gain.setTargetAtTime(p&&fxOn?.12:0,ctx.currentTime,.6); }   // .12 = storm stays well under the music
+window.GAME_AUDIO={music:function(v){ musOn=v!==false; was=null; apply(); }, sfx:function(v){ fxOn=v!==false; was=null; apply(); },
+  sound:function(v){ on=v!==false; was=null; lbl(); apply(); }, state:function(){ return {hasMusic:true,hasSfx:true,sound:on,music:musOn,sfx:fxOn,unlocked:!!(ctx&&ctx.state==="running")}; }};
+function tap(){ unlock(); if(on&&musOn&&!was){ var a=MS.el(), q=a.play(); if(q&&q.then) q.then(function(){ if(!was) a.pause(); },function(){}); } setTimeout(apply,0); }   // primes the song inside the tap for iOS
+["pointerdown","click","keydown"].forEach(function(k){ addEventListener(k,tap); });
+setInterval(apply,300); document.addEventListener("visibilitychange",apply);
+var mb=document.getElementById("sbmute");
+function lbl(){ mb.textContent=on?"🔊 Sound on":"🔇 Sound off"; mb.setAttribute("aria-pressed",on?"true":"false"); }
+mb.addEventListener("click",function(e){ e.stopPropagation(); on=!on; try{ localStorage.setItem("sb-sound",on?"1":"0"); }catch(x){} lbl(); unlock(); was=null; apply(); });
+lbl(); MS.button(document.getElementById("sbaud"),"","");
 })();
 </script>
 <script src="fx.js"></script>

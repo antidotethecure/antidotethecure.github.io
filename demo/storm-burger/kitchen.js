@@ -60,7 +60,7 @@
   function pop(txt) { var p = $(".pop"); p.textContent = txt; p.style.opacity = 1; setTimeout(function () { p.style.opacity = 0; }, 650); }
   grid.addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b || !on) return;
     var k = b.dataset.k;
-    if (k !== order[1][step]) { b.classList.remove("bad"); void b.offsetWidth; b.classList.add("bad"); t0 -= 600; if (navigator.vibrate) try { navigator.vibrate(30); } catch (x) {} return; }   // wrong one costs 0.6 s
+    if (k !== order[1][step]) { b.classList.remove("bad"); void b.offsetWidth; b.classList.add("bad"); t0 -= 600; return; }   // wrong one costs 0.6 s
     b.classList.add("hit"); setTimeout(function () { b.classList.remove("hit"); }, 150);
     addLayer(k); step++;
     if (step >= order[1].length) { var s = window.__S.get(); served++; pts += 75; s.score += 75;

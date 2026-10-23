@@ -377,7 +377,7 @@ function hit(x,y,why,pen){
   if(st.dying) return;
   pen=pen||100;
   var d0=st.dmg; st.lives=Math.max(0,st.lives-.5); st.dmg=dmgFor(st.lives); st.score=Math.max(0,st.score-pen); st.inv=60; st.shake=pen>100?20:14; st.flash=0.5;
-  pop(x,y-20,why+" −"+pen,"#ff6b5b"); if(navigator.vibrate) try{navigator.vibrate(st.lives<=0?[90,60,200]:60);}catch(e){}
+  pop(x,y-20,why+" −"+pen,"#ff6b5b");   // phone buzz only for stop signs (stopBuzz)
   var py=H-80;
   if(st.dmg===1&&d0<1) pop(st.x,py-70,T("🔥 Engine on fire!"),"#ffb347");
   if(st.dmg===2&&d0<2) pop(st.x,py-70,T("🔥 Truck badly damaged!"),"#ff6b5b");
@@ -385,6 +385,7 @@ function hit(x,y,why,pen){
   if(st.lives<=0){ st.dying=performance.now(); st.inv=1e9; st.shake=22; st.flash=0.9; st.dx=st.x; st.items=[]; st.bolts=[]; }
 }
 /* ---- car damage: 1 hit = smoking, burning hood · 2 hits = cracked glass, bigger fire · 3 hits = totaled, tornado takes it ---- */
+function stopBuzz(){ if(navigator.vibrate) try{navigator.vibrate(st.lives<=0?[90,60,200]:[60,40,90]);}catch(e){} }   // the only phone buzz in the game
 function crackSet(){ // a spiderweb on the windshield + one on the back glass, built once so it doesn't flicker
   function web(cx0,cy0,w,h){ var L=[]; for(var a=0;a<7;a++){ var ang=a/7*6.283+Math.random()*.5, x=cx0, y=cy0, seg=[[x,y]];
       for(var j=0;j<3;j++){ x+=Math.cos(ang+(Math.random()-.5)*.6)*(w/5); y+=Math.sin(ang+(Math.random()-.5)*.6)*(h/4); seg.push([Math.max(-w/2,Math.min(w/2,x)),Math.max(cy0-h,Math.min(cy0+h,y))]); } L.push(seg); }
@@ -438,7 +439,7 @@ function drawDamage(now){ // runs inside drawCar's transform (truck front = up)
   if(d>1){ // shattered windshield, dead headlight, dented box
     cx.strokeStyle="rgba(255,255,255,.9)"; cx.lineWidth=0.9;
     st.cracks.forEach(function(seg){ cx.beginPath(); seg.forEach(function(q,j){ j?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1]); }); cx.stroke(); });
-    cx.fillStyle="rgba(255,255,255,.45)"; cx.beginPath(); cx.arc(st.cracks[0][0][0],-30,2.5,0,6.283); cx.arc(st.cracks[7][0][0],-29,2,0,6.283); cx.fill();
+    if(st.cracks.length){ cx.fillStyle="rgba(255,255,255,.45)"; cx.beginPath(); cx.arc(st.cracks[0][0][0],-30,2.5,0,6.283); cx.arc(st.cracks[7][0][0],-29,2,0,6.283); cx.fill(); }
     cx.fillStyle="#2a2a2a"; cx.fillRect(10,-51,9,4);
     cx.strokeStyle="rgba(40,40,60,.55)"; cx.lineWidth=1.2; cx.beginPath(); cx.moveTo(-24,4); cx.quadraticCurveTo(-18,10,-24,18); cx.moveTo(24,24); cx.quadraticCurveTo(18,30,24,36); cx.stroke();
   }
@@ -606,7 +607,7 @@ function pitStart(it){ // pulled into Jordan High: the run pauses for the kitche
   it.used=1; st.inv=1e9;
   if(window.SB_KITCHEN){ st.pitT=1e9; SB_KITCHEN.open(function(n){ st.pitT=480; st.inv=90; st.last=performance.now(); hud();   // 480 ms = pull back out onto the road
       pop(st.x,H-150,n?"🍔 "+n+" "+T(n>1?"burgers served":"burger served"):T("Back on the road"),"#FFD23F"); }, st.lvl===2?60000:30000);   // level 2: a full minute serving the students; levels 6 and 9: 30 s
-    if(navigator.vibrate) try{navigator.vibrate([30,40,30]);}catch(e){} return; }
+    return; }
   st.pitT=2600; var healed=st.lives<MAXL; if(healed){ st.lives=Math.min(MAXL,st.lives+1); } st.dmg=dmgFor(st.lives); if(st.dmg<2) st.cracks=[]; if(!st.dmg) st.flames=[]; st.flat=0;
   st.score+=100; pop(st.x,H-150,"🍔 "+T("Fed the Panthers")+" +100","#FFD23F"); pop(st.x,H-120,healed?"🔧 "+T("Truck repaired! +1 life"):"🔧 "+T("Tune-up done"),"#7CFF9B");
 }
@@ -703,7 +704,7 @@ function frame(now){
     if(it.type==="spike"){ if(st.running&&!pit&&!it.done&&!st.dying&&Math.abs(it.x-st.x)<(it.r+16)*hb()&&near(it.y-py,26)){ it.done=1; var s0=st.lives; hit(st.x,py,T("⚠️ SPIKE STRIP!"));
         if(st.lives<s0&&!st.dying){ if(!st.flat) st.flat=Math.random()<.5?-1:1; st.spinT=1200; st.spinDir=st.flat; pop(st.x,py-100,T("💥 Tires popped! Spinning out!"),"#ff6b5b"); } if(st.dying) break; } continue; }
     if(it.type==="twister"&&st.running&&!pit&&!st.dying){ var hitO=0; for(var oi=0;oi<it.orb.length;oi++){ var o=it.orb[oi]; if(o.hit) continue; var op=orbPos(it,o);
-        if(Math.abs(op.x-st.x)<(o.d.r+14)*hb()&&near(op.y-py,(o.d.r+22)*hb())){ o.hit=1; var l1=st.lives; hit(op.x,op.y,T(o.d.why)); if(st.lives<l1){ screenHit(o.d.k==="cow"?"milk":"crack"); if(o.d.k==="stop"&&!st.cracks.length) st.cracks=crackSet(); } if(st.dying){ hitO=1; break; } } }
+        if(Math.abs(op.x-st.x)<(o.d.r+14)*hb()&&near(op.y-py,(o.d.r+22)*hb())){ o.hit=1; var l1=st.lives; hit(op.x,op.y,T(o.d.why)); if(st.lives<l1){ if(o.d.k==="cow") screenHit("milk"); if(o.d.k==="stop"){ screenHit("crack"); stopBuzz(); if(!st.cracks.length) st.cracks=crackSet(); } } if(st.dying){ hitO=1; break; } } }
       if(hitO) break; }
     var hk=(it.type==="debris"||it.type==="twister")?hb():1; if(st.running&&!pit&&Math.abs(it.x-st.x)<(it.r+18)*hk&&near(it.y-py,(it.r+28)*hk)){
       if(it.type==="egg"){ var eb=ReviewEgg.collect(); st.score+=eb; pop(it.x,it.y-20,"+"+eb+" 📺 "+T("Antidote's review"),"#FFD23F"); }
@@ -712,7 +713,7 @@ function frame(now){
       else if(it.type==="coin"){ st.score+=10; st.coins++; pop(it.x,it.y,"+10","#FFD23F"); }
       else if(it.type==="food"){ st.score+=it.f.p; pop(it.x,it.y,"+"+it.f.p+" "+T(it.f.n),"#FFD23F"); }
       else if(it.type==="twister"){ hit(it.x,it.y,T("🌪️ TWISTER!"),Math.max(200,Math.round(st.score*0.25))); if(st.dying) break; }
-      else { var l0=st.lives; hit(it.x,it.y,T(it.d.why)); if(st.lives<l0){ screenHit(it.d.k==="cow"?"milk":"crack"); if(it.d.k==="stop"&&!st.cracks.length) st.cracks=crackSet(); } if(st.dying) break; }
+      else { var l0=st.lives; hit(it.x,it.y,T(it.d.why)); if(st.lives<l0){ if(it.d.k==="cow") screenHit("milk"); if(it.d.k==="stop"){ screenHit("crack"); stopBuzz(); if(!st.cracks.length) st.cracks=crackSet(); } } if(st.dying) break; }
       st.items.splice(i,1);
     }
   }
@@ -779,7 +780,7 @@ function frame(now){
   if(window.__S.render) try{ window.__S.render(now,dt); }catch(e){ console.warn("[storm3d]",e); }   // the 3D layer draws the same frame this loop just stepped
 }
 requestAnimationFrame(frame);
-function levelUp(){ st.lvl++; st.t=LEVEL_MS; st.twT=Math.max(st.twT,6500);   /* no TORNADO WARNING on top of the level banner */ var bonus=100*st.lvl; st.score+=bonus; st.banner={n:st.lvl,t:2600}; pop(W/2,H*0.62,"+"+bonus+" "+T("level bonus"),"#7CFF9B"); if(navigator.vibrate) try{navigator.vibrate([20,30,20]);}catch(e){} }
+function levelUp(){ st.lvl++; st.t=LEVEL_MS; st.twT=Math.max(st.twT,6500);   /* no TORNADO WARNING on top of the level banner */ var bonus=100*st.lvl; st.score+=bonus; st.banner={n:st.lvl,t:2600}; pop(W/2,H*0.62,"+"+bonus+" "+T("level bonus"),"#7CFF9B"); }
 function drawBanner(dt){ var b=st.banner; b.t-=dt; if(b.t<=0){ st.banner=null; return; } var a=Math.min(1,b.t/500,(2600-b.t)/250);
   cx.save(); cx.globalAlpha=a; cx.fillStyle="rgba(5,8,26,.55)"; cx.fillRect(0,H*0.04,W,92); cx.textAlign="center"; cx.textBaseline="middle";
   cx.font="400 46px 'Bebas Neue',Impact,sans-serif"; cx.lineWidth=5; cx.strokeStyle="#111"; var tt=T("LEVEL")+" "+b.n+(b.n===NLEV?" · "+T("FINAL"):""); cx.strokeText(tt,W/2,H*0.04+34); cx.fillStyle="#FFD23F"; cx.fillText(tt,W/2,H*0.04+34);
@@ -876,8 +877,8 @@ mb.addEventListener("click",function(e){ e.stopPropagation(); on=!on; try{ local
 lbl(); MS.button(document.getElementById("sbaud"),"","");
 })();
 </script>
-<script src="fx.js"></script>
-<script src="kitchen.js?v=k3"></script>
+<script src="fx.js?v=fx2"></script>
+<script src="kitchen.js?v=k4"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
 <script type="module" src="storm3d.js?v=sb3d18"></script>
 <script src="../contract.js"></script>

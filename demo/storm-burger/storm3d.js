@@ -705,14 +705,22 @@ async function boot() {
   const coverTex = img("img/review/cover.webp");
   const boltTex = ctex(128, 128, (x) => { x.font = "96px system-ui,Apple Color Emoji,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("⚡", 64, 70); });
   const smokeMats = [0, 1, 2].map(i => new THREE.SpriteMaterial({ map: SPRT.smoke, color: new THREE.Color().setRGB(.42 + i * .1, .45 + i * .1, .55 + i * .1), transparent: true, opacity: .62 - i * .1, depthWrite: false }));
-  const dirtM = std(0x2a2118);
+  const dirtM = std(0x2a2118), boardM = std(0x7a5a3a, { roughness: .95 }), shingleM = std(0x3b3f46, { roughness: .9 }), paperM = std(0xe9e4d6, { side: THREE.DoubleSide }),
+    trashM = [std(0x2f6b3a), std(0x9aa1ab, { metalness: .6, roughness: .4 }), std(0xc23b2a)],
+    dustM = new THREE.SpriteMaterial({ map: SPRT.smoke, color: new THREE.Color(.55, .48, .38), transparent: true, opacity: .45, depthWrite: false });
   function makeTwister(k = 1) { const g = new THREE.Group(), parts = [], bits = [];
     for (let i = 0; i < 12; i++) for (let j = 0; j < 2; j++) { const m = new THREE.Sprite(smokeMats[Math.min(2, i >> 2)]); g.add(m); parts.push({ m, i, a: j * Math.PI + i * .7, r: (8 + i * i * .55) * k, y: i * 20 * k, s: (30 + i * 8) * k }); }
     for (let i = 0; i < 4; i++) { const m = new THREE.Sprite(smokeMats[0]); g.add(m); parts.push({ m, i: -1, a: i * 1.6, r: 26 * k, y: 6 * k, s: 70 * k }); }
     for (let i = 0; i < 12; i++) { const m = box(g, dirtM, 3 * k, 3 * k, 3 * k, 0, 0, 0); bits.push({ m, a: i * .53, y: (i * 19) * k, r: (14 + (i % 3) * 14) * k }); }
+    // torn-up stuff whipping around (10-22, Victorville gustnado): fence boards, paper, roof shingles, trash; slower + wider than the dirt
+    for (let i = 0; i < 26; i++) { const kind = i % 4, m = kind === 0 ? box(g, boardM, 5 * k, 34 * k, 1.6 * k, 0, 0, 0) : kind === 1 ? add(g, PLANE, paperM, 9 * k, 12 * k, 1, 0, 0, 0)
+        : kind === 2 ? box(g, shingleM, 14 * k, 1.4 * k, 9 * k, 0, 0, 0) : box(g, trashM[i % trashM.length], 6 * k, 7 * k, 4 * k, 0, 0, 0);
+      bits.push({ m, a: i * .9, y: (i * 11) % 230 * k, r: (34 + (i * 17) % 80) * k, sp: 2.2 + (i % 5) * .45, rise: 34 + (i % 3) * 22, tum: [1 + i % 3, 2 + i % 2] }); }
+    for (let i = 0; i < 6; i++) { const m = new THREE.Sprite(dustM); g.add(m); parts.push({ m, i: -1, a: i * 1.05, r: 58 * k, y: 2 * k, s: 110 * k }); }
     const upd = (t, sway) => { for (const p of parts) { const a = p.a + t * (p.i < 0 ? 1.4 : 5 - p.i * .2), wob = p.i < 0 ? 0 : Math.sin(t * 2.2 + p.i * .6) * (3 + p.i * 1.4) * k * sway;
         p.m.position.set(Math.cos(a) * p.r + wob, p.y + 10 * k, Math.sin(a) * p.r * .6); p.m.scale.set(p.s, p.i < 0 ? p.s * .45 : p.s * .7, 1); }
-      for (const b of bits) { const a = b.a + t * 6; b.m.position.set(Math.cos(a) * b.r, (b.y + t * 90 * k) % (240 * k), Math.sin(a) * b.r * .6); b.m.rotation.set(t * 3, t * 2, 0); } };
+      for (const b of bits) { const a = b.a + t * (b.sp || 6), h = (b.y + t * (b.rise || 90) * k) % (240 * k); b.m.position.set(Math.cos(a) * b.r * (1 + h / (600 * k)), h, Math.sin(a) * b.r * .6);
+        b.m.rotation.set(t * (b.tum ? b.tum[0] * 2 : 3), t * (b.tum ? b.tum[1] * 1.6 : 2), b.tum ? t * 1.3 : 0); } };
     return { g, upd }; }
   function makeBolt(x, z) { const pts = []; let px = x, y = 950; while (y > 0) { pts.push([px, y]); y -= 50 + Math.random() * 70; px += (Math.random() - .5) * 70; } pts.push([x + (Math.random() - .5) * 20, 0]);
     const rib = (w) => { const pos = []; for (let i = 0; i < pts.length - 1; i++) { const [ax, ay] = pts[i], [bx, by] = pts[i + 1]; pos.push(ax - w, ay, z, ax + w, ay, z, bx + w, by, z, ax - w, ay, z, bx + w, by, z, bx - w, by, z); }
@@ -759,7 +767,10 @@ async function boot() {
       v.o.add(v.m); const gl = new THREE.Sprite(goldGlow); gl.scale.set(f.w * 1.8, f.w * 1.8, 1); gl.position.y = f.w * .3; gl.renderOrder = -1; v.o.add(gl); }
     else if (kind === "debris") { v.o = new THREE.Group(); v.m = new THREE.Group(); const P3 = PROPS.fit(o.d.k, o.d.k === "cow" ? o.d.w * 1.05 : o.d.w * .62); P3.position.y = o.d.k === "cow" ? -22 : -40; v.m.add(P3); v.o.add(v.m);   // pivot at the middle so it tumbles
       v.sh = add(v.o, PLANE, shadowM, o.d.w * 1.1, o.d.w * .6, 1, 0, .9, 0); v.sh.rotation.x = -Math.PI / 2; }
-    else if (kind === "twister") { const T = makeTwister(1); v.o = T.g; v.upd = T.upd; }
+    else if (kind === "twister") { const T = makeTwister(1); v.o = new THREE.Group(); v.o.add(T.g); v.upd = T.upd; v.orbs = [];
+      (o.orb || []).forEach(ob => { const g = new THREE.Group(), m = new THREE.Group(), P3 = PROPS.fit(ob.d.k, ob.d.k === "cow" ? ob.d.w * 1.05 : ob.d.w * .62); P3.position.y = ob.d.k === "cow" ? -22 : -40; m.add(P3); g.add(m);
+        const sh = add(g, PLANE, shadowM, ob.d.w * 1.1, ob.d.w * .6, 1, 0, .9, 0); sh.rotation.x = -Math.PI / 2; scene.add(g); v.orbs.push({ ob, g, m, sh }); });
+      v.car = makeCar((Math.random() * 6) | 0); v.car.scale.setScalar(.55); v.o.add(v.car); }   // a car sucked up and spinning in the funnel
     else if (kind === "egg") { v.o = new THREE.Group(); [-80, 80].forEach(x => add(v.o, CYL6, MAT.pole, 3, 150, 3, x, 75, 0)); box(v.o, MAT.dark, 176, 104, 4, 0, 160, -2);
       add(v.o, PLANE, basic(0xffffff, { map: coverTex }), 168, 96, 1, 0, 160, .5); const gl = new THREE.Sprite(glowMat(0xffd23f, .35)); gl.scale.set(300, 190, 1); gl.position.set(0, 160, -4); v.o.add(gl);
       v.m = new THREE.Mesh(coinGeo, [coinMats[0], std(0xe3262f, { emissive: 0xe3262f, emissiveIntensity: .8 }), coinMats[0]]); v.m.scale.setScalar(1.3); v.m.position.y = 24; v.o.add(v.m); }
@@ -796,7 +807,7 @@ async function boot() {
       v.beam = new THREE.Mesh(new THREE.CylinderGeometry(40, 55, 900, 16, 1, true), new THREE.MeshBasicMaterial({ color: 0x9fd4ff, transparent: true, opacity: .08, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false })); v.beam.position.set(0, 450, -10); v.o.add(v.beam);
       v.ic = new THREE.Sprite(new THREE.SpriteMaterial({ map: boltTex, transparent: true, depthWrite: false })); v.ic.scale.set(56, 56, 1); v.ic.position.set(0, 150, -10); v.o.add(v.ic); }
     scene.add(v.o); views.set(o, v); return v; }
-  function drop(o, v) { scene.remove(v.o); views.delete(o); if (v.mat) v.mat.dispose(); if (v.ic) v.ic.material.dispose(); if (v.bolt) v.bolt.traverse(m => { if (m.geometry && m.geometry !== PLANE) m.geometry.dispose(); }); }
+  function drop(o, v) { scene.remove(v.o); if (v.orbs) v.orbs.forEach(q => scene.remove(q.g)); views.delete(o); if (v.mat) v.mat.dispose(); if (v.ic) v.ic.material.dispose(); if (v.bolt) v.bolt.traverse(m => { if (m.geometry && m.geometry !== PLANE) m.geometry.dispose(); }); }
 
 
   /* ---------- rain on the screen (Antidote 2026-10-21): drops land on the "lens", grow, the big ones run down and leave
@@ -937,7 +948,11 @@ async function boot() {
       if (it.type === "coin") { v.o.position.set(x, 24, z); v.m.rotation.y = it.spin; }
       else if (it.type === "food") { v.o.position.set(x, 18 + Math.sin(now / 260 + it.x) * 4, z); v.m.rotation.y = now / 650 + it.x; }
       else if (it.type === "debris") { const hgt = .75 + .25 * Math.sin(now / 300 + it.ph); const orb = now / 650 + it.ph, cr = it.d.k === "cow" ? 16 : 6; v.o.position.set(x + Math.cos(orb) * cr, 0, z + Math.sin(orb) * cr); v.m.position.y = 60 + 50 * hgt;   /* cows loop in a small circle inside their lane */ v.m.rotation.set(it.d.k === "cow" ? Math.sin(now / 500 + it.ph) * .5 : 0, (now / (it.d.k === "cow" ? 1400 : 700) + it.ph) * (it.vr < 0 ? -1 : 1), it.rot); v.sh.scale.setScalar(.7 + .3 * (1 - hgt)); }
-      else if (it.type === "twister") { v.o.position.set(x, 0, z); v.upd(t + it.ph, 1); }
+      else if (it.type === "twister") { v.o.position.set(x, 0, z); v.upd(t + it.ph, 1);
+        const ca = t * 2.1 * (it.spin || 1) + it.ph; v.car.position.set(Math.cos(ca) * 62, 120 + Math.sin(t * 1.3 + it.ph) * 50, Math.sin(ca) * 38); v.car.rotation.set(t * 1.7, t * 2.4, t * .9);
+        v.orbs.forEach(q => { const a = q.ob.a, ox = it.x + Math.cos(a) * S.ORB_R, oy = it.y + Math.sin(a) * S.ORB_R * S.ORB_SQ, hgt = .5 + .5 * Math.sin(a * 2 + it.ph);   // same orbit the hit test uses (index.html orbPos)
+          q.g.position.set(wx(ox), 0, wz(oy)); q.m.position.y = 55 + 60 * hgt; q.m.rotation.set(q.ob.d.k === "cow" ? Math.sin(t * 2 + it.ph) * .6 : 0, -a * (it.spin || 1) + Math.PI / 2, q.ob.d.k === "stop" ? t * 3 : Math.sin(t * 3) * .3);
+          q.g.visible = !q.ob.hit || (now % 200 < 100); q.sh.scale.setScalar(.6 + .4 * (1 - hgt)); }); }
       else if (it.type === "driz") { v.o.position.set(x, 42 + Math.sin(now / 220 + it.x) * 5, z); v.m.rotation.y = now / 380; }
       else if (it.type === "queue") { v.o.position.set(0, 0, 0); const sp = it.len / it.n;
         v.cars.forEach((c, i) => { const y = it.y - it.len / 2 + sp * (i + .5); c.position.set(LANEX[LANEX.length - 1] + Math.sin(i * 1.7) * 5, 0, (y - PY) * KF); c.rotation.y = Math.sin(i * 2.3) * .04; });
@@ -961,6 +976,7 @@ async function boot() {
       else { v.strip.visible = v.disc.visible = v.beam.visible = v.ic.visible = false; if (!v.bolt) { v.bolt = makeBolt(0, -60); v.o.add(v.bolt); flashLight.position.set(LANEX[bo.lane], 200, -10); flashK = 1; fx.sparks(V.set(LANEX[bo.lane], 4, -10), V2.set(0, 1, 0), null, 3, 30); fx.boom(V.set(LANEX[bo.lane], 6, -10), .6); } v.bolt.visible = bo.age < 160 || Math.random() > .3; } }
     for (const [o, v] of views) if (v.n !== frameNo) {   // gone from the game: picked up / hit (animate it into the truck) or scrolled away
       if ((v.kind === "coin" || v.kind === "food" || v.kind === "driz" || v.kind === "egg" || v.kind === "debris" || v.kind === "twister") && v.z > -320 && Math.abs(v.x - tx) < 90) {
+        if (v.orbs) v.orbs.forEach(q => q.g.visible = false);
         ghosts.push({ v, o, t: 0, x0: v.o.position.x, z0: v.o.position.z, bad: v.kind === "debris" || v.kind === "twister" }); views.delete(o); }
       else drop(o, v); }
     for (let i = ghosts.length - 1; i >= 0; i--) { const G = ghosts[i]; G.t += dt; const u = Math.min(1, G.t / .16);

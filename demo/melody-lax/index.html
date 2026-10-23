@@ -205,6 +205,27 @@ h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;le
 .check svg{width:40px;height:40px;stroke:#fff;stroke-width:5;fill:none;stroke-dasharray:60;stroke-dashoffset:60;animation:draw .5s .25s forwards}
 @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}@keyframes draw{to{stroke-dashoffset:0}}
 .ok .code{font-family:var(--punch);font-size:34px;letter-spacing:.06em;color:#fff}
+/* LA Times feature (Oct 21, 2026): newspaper clipping under the hero + the first flyover tows an "as seen in" banner */
+#press{position:relative;margin:4px auto 22px;max-width:440px;scroll-margin-top:80px}
+#press .clip{position:relative;display:block;text-decoration:none;color:#1b1712;background:#f3ecdc;background-image:repeating-linear-gradient(0deg,#0000 0 3px,#0000000a 3px 4px),radial-gradient(120% 90% at 30% 0,#fffaf0,#e9dfc8);padding:16px 18px 14px;transform:rotate(-1.6deg);box-shadow:0 14px 30px #0008,0 2px 0 #fff6 inset;clip-path:polygon(0 3%,4% 0,11% 2%,19% 0,27% 1.5%,36% 0,45% 2%,55% 0,63% 1.8%,72% 0,81% 2%,90% 0,96% 1.5%,100% 0,99% 22%,100% 48%,98.6% 74%,100% 100%,92% 98.4%,83% 100%,74% 98%,64% 100%,55% 98.2%,45% 100%,36% 98%,26% 100%,17% 98.5%,8% 100%,0 98%,1.2% 70%,0 44%,1.4% 20%)}
+#press .tape{position:absolute;top:-9px;left:50%;width:86px;height:24px;margin-left:-43px;background:#fff3c4b3;transform:rotate(3deg);box-shadow:0 1px 3px #0003;z-index:2}
+#press .mast{display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px double #1b1712;padding-bottom:5px;font:700 10.5px/1.2 Georgia,"Times New Roman",serif;letter-spacing:.14em;text-transform:uppercase}
+#press .mast b{font:700 21px/1 Georgia,"Times New Roman",serif;letter-spacing:.01em;text-transform:none}
+#press .kick{margin:9px 0 2px;font:800 10px/1.2 Barlow,system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#9b1c1c}
+#press h3{margin:0;font:700 21px/1.15 Georgia,"Times New Roman",serif;color:#14110d}
+#press .by{margin:5px 0 8px;font:italic 12.5px/1.3 Georgia,serif;color:#5a5044}
+#press blockquote{margin:0;padding:8px 70px 8px 12px;border-left:3px solid #9b1c1c;font:italic 17px/1.3 Georgia,serif;color:#211b14}
+#press blockquote small{display:block;margin-top:4px;font:600 11.5px/1.3 Barlow,system-ui,sans-serif;font-style:normal;letter-spacing:.04em;color:#6b6152}
+#press .more{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;padding-top:8px;border-top:1px solid #1b171233;font:700 13px/1.2 Barlow,system-ui,sans-serif}
+#press .more span{background:#14110d;color:#f3ecdc;border-radius:99px;padding:7px 12px;white-space:nowrap}
+#press .stamp{position:absolute;right:12px;bottom:60px;width:64px;height:64px;border-radius:50%;border:2px solid #9b1c1cb0;color:#9b1c1cc0;display:grid;place-items:center;text-align:center;font:800 7.5px/1.15 Barlow,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;transform:rotate(14deg);pointer-events:none}
+#press .stamp i{display:block;font-style:normal;font-size:20px;letter-spacing:0}
+@media (max-width:340px){#press .stamp{display:none}#press blockquote{padding-right:0}}
+#press.in .clip{animation:presin .9s cubic-bezier(.2,.9,.25,1.2) both}
+@keyframes presin{from{opacity:0;transform:translateY(18px) rotate(-7deg) scale(.94)}to{opacity:1;transform:rotate(-1.6deg)}}
+#tow.lat .flag{background:linear-gradient(180deg,#fbf6ea,#e9dfc8);border-color:#1b1712;color:#1b1712;font-family:Georgia,serif}
+#tow.lat .flag b{font:700 15px/1.1 Georgia,"Times New Roman",serif;color:#9b1c1c;letter-spacing:.02em}
+@media (prefers-reduced-motion:reduce){#press.in .clip{animation:none}}
 /* flyover */
 #fly{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:30;overflow:hidden}
 #fly img{position:absolute;width:min(560px,120vw);height:auto;filter:drop-shadow(0 18px 18px #0006);will-change:transform}
@@ -243,6 +264,19 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
   <div class="tag" id="greet">The closest bar to LAX</div>
   <p>9132 S Sepulveda Blvd · Westchester · since 1952</p>
 </header>
+
+<section id="press" aria-label="Featured in the Los Angeles Times">
+  <i class="tape" aria-hidden="true"></i>
+  <a class="clip" href="https://www.latimes.com/food/newsletter/2026-10-21/lax-culinary-cultural-orbit-omnivore-daniel-hernandez-melody-bar" target="_blank" rel="noopener">
+    <div class="mast"><b>Los Angeles Times</b><span>Oct. 21, 2026</span></div>
+    <div class="kick">As featured in · Food</div>
+    <h3>How I fell in love with the culinary and cultural orbit of LAX</h3>
+    <div class="by">By Daniel Hernandez, Staff Writer</div>
+    <blockquote>&ldquo;It&rsquo;s our version of &lsquo;Cheers.&rsquo;&rdquo;<small>LaMonica Chatman, Melody regular since she was a kid</small></blockquote>
+    <div class="more"><em style="font-style:normal">Melody, the anchor of the LAX food scene</em><span>Read the story &rarr;</span></div>
+    <div class="stamp" aria-hidden="true"><div><i>&#9733;</i>Featured<br>in the<br>L.A. Times</div></div>
+  </a>
+</section>
 
 <nav id="mtabs" aria-label="Sections"><div class="mt-row">
   <a href="#sec-sports" data-tab="sports">📺 Sports</a><a href="#sec-games" data-tab="games">✈️ Games</a><a href="#sec-trivia" data-tab="trivia">🎤 Trivia</a><a href="#sec-landed" data-tab="landed">🛬 Just Landed</a><a href="#sec-members" data-tab="members">⭐ Members</a><a href="#sec-menu" data-tab="menu">🍽️ Menu</a>
@@ -524,8 +558,9 @@ function flyover(promo){
   var vw=innerWidth, vh=innerHeight, w=Math.min(560,vw*1.2), y0=vh*(0.06+Math.random()*0.12), dir=Math.random()<.5?1:-1;
   var tow=null, tw=0, extra=0, dur=5200;
   if(promo){ // banner rides behind the tail; slower pass so it can be read and tapped
-    tow=document.createElement("div"); tow.id="tow"; if(dir>0) tow.className="rt";
-    tow.innerHTML='<i class="rope"></i><a href="../nalu-vida/?from=melody" aria-label="Take a flight to Venice Beach: open Nalu Vida"><span class="flag">✈ Take a flight to Venice Beach<b>→ NALU VIDA 🏄</b></span>'+
+    tow=document.createElement("div"); tow.id="tow"; tow.className=(dir>0?"rt":"")+(promo==="lat"?" lat":"");
+    if(promo==="lat") tow.innerHTML='<i class="rope"></i><a href="#press" aria-label="Melody was featured in the Los Angeles Times: see the story"><span class="flag">★ As seen in the<b>LOS ANGELES TIMES →</b></span></a>';
+    else tow.innerHTML='<i class="rope"></i><a href="../nalu-vida/?from=melody" aria-label="Take a flight to Venice Beach: open Nalu Vida"><span class="flag">✈ Take a flight to Venice Beach<b>→ NALU VIDA 🏄</b></span>'+
       '<svg viewBox="0 0 84 40" aria-hidden="true"><path d="M30 0 L22 16 M54 0 L62 16" stroke="#efe4c9" stroke-width="1.2" fill="none"/>'+
       '<g transform="rotate(-6 42 24)"><ellipse cx="42" cy="24" rx="40" ry="8.5" fill="#ffd34d" stroke="#0b2a3a" stroke-width="1.4"/><path d="M4 24 Q42 19 80 24" stroke="#e8505b" stroke-width="2.4" fill="none"/><path d="M8 26 Q42 30 76 26" stroke="#1aa3c4" stroke-width="1.6" fill="none"/><path d="M74 28 l6 7 l-9 -3z" fill="#0b2a3a"/></g></svg></a>';
     document.body.appendChild(tow); tw=tow.offsetWidth; extra=tw+40; dur=10500;
@@ -540,7 +575,12 @@ function flyover(promo){
     if(p<1) requestAnimationFrame(step); else { im.remove(); sh.remove(); if(tow) tow.remove(); flying=0; } })(t0);
   return true;
 }
-setTimeout(flyover,4000); setInterval(flyover,20000);
+/* first pass of each visit tows the LA Times banner (once per session), then the regular flyovers */
+var latDone=0; try{ latDone=+sessionStorage.getItem("melodyLATow")||0; }catch(e){}
+setTimeout(function first(){ if(latDone){ flyover(); return; } if(flyover("lat")){ try{ sessionStorage.setItem("melodyLATow",1); }catch(e){} } else setTimeout(first,1500); },4000);
+setInterval(flyover,20000);
+document.addEventListener("click",function(e){ var a=e.target.closest&&e.target.closest('#tow.lat a'); if(!a) return; e.preventDefault(); var pr=$("press"); pr.scrollIntoView({behavior:reduce?"auto":"smooth",block:"center"}); pr.classList.remove("in"); void pr.offsetWidth; pr.classList.add("in"); });
+(function(){ var pr=$("press"); if(!pr||!("IntersectionObserver" in window)) return; var io=new IntersectionObserver(function(es){ es.forEach(function(x){ if(x.isIntersecting){ pr.classList.add("in"); io.disconnect(); } }); },{threshold:.3}); io.observe(pr); })();
 
 /* the Nalu Vida banner flight only happens once the guest has scrolled down to the bottom of the page; at most twice a visit */
 var promoN=0, promoLast=-1e9, promoT=0;

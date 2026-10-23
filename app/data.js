@@ -14,7 +14,7 @@ window.APP = {
 
   /* ---------------- 1 · Plans ---------------- */
   plans: [
-    { key: "basic", name: "Basic", setup: 3000, monthly: 350, tag: "Start here",
+    { key: "basic", buy: "https://buy.stripe.com/8x27sD8lGcpLcWYbYa2Ry00", name: "Basic", setup: 3000, monthly: 350, tag: "Start here",
       pitch: "Your own app, game and rewards. You run the promotions.",
       includes: [
         "Branded app + ordering + a QR at every table",
@@ -32,7 +32,7 @@ window.APP = {
         "Hosting, updates and support"],
       who: "You do some footwork: you send your own texts and promotions, print and place the stickers (we give you the files), and keep your deals updated on your setup page.",
       footwork: "some" },
-    { key: "growth", name: "Growth", setup: 3500, monthly: 650, tag: "Most popular", flag: true,
+    { key: "growth", buy: "https://buy.stripe.com/4gM14f31m0H37CEaU62Ry02", name: "Growth", setup: 3500, monthly: 650, tag: "Most popular", flag: true,
       pitch: "Everything in Basic, plus the tools that bring guests back on their own.",
       includes: [
         "Everything in Basic",
@@ -44,7 +44,7 @@ window.APP = {
         "We place your print order (print cost billed at cost)"],
       who: "Less footwork: the bring-back texts run on their own and we order your printing. You still send any one-off promotions you want.",
       footwork: "less" },
-    { key: "dfy", name: "Done-for-you", setup: 4000, monthly: 950, tag: "Sit back",
+    { key: "dfy", buy: "https://buy.stripe.com/5kQdR1eK43Tfe12e6i2Ry03", name: "Done-for-you", setup: 4000, monthly: 950, tag: "Sit back",
       pitch: "Everything in Growth, plus a voice host and we run your marketing.",
       includes: [
         "Everything in Growth",

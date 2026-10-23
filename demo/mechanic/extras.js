@@ -23,7 +23,7 @@
     else { svcs.after(tires); }
     /* quick actions up top, right under the business switch, so customers see everything first */
     var bz = D.querySelector(".bizsw"); bz.after($("quick"));
-    if (/[?&]shop=/.test(location.search)) bz.hidden = true;   // personalized pitch link: no demo switch
+    if (/[?&]shop=/.test(location.search) || C.client) bz.hidden = true;   // personalized pitch link / client app: no demo switch
     if (C.type === "tire") { var q = $("quick"), a = $("qkTires"), pl = q.querySelector('a[href="#pay"]'); q.prepend(pl); q.prepend(a); }
     D.body.setAttribute("data-biz", C.type);
   })();
@@ -41,7 +41,8 @@
   }
   function row(x, hold) {
     return '<div class="trow' + (x.qty > 0 ? "" : " out") + '"><div><b>' + esc(x.size) + "</b> <span class=\"pill\">" + esc(M.tireType(x.type)) + "</span><small>" + esc(x.brand + " · " + x.line) + " · " + esc(priceLine(x)) + "</small></div>" +
-      '<span class="tq">' + esc(t("tiQ", { q: x.qty })) + "</span>" + (hold ? '<button class="btn primary small" type="button" data-hold="' + esc(x.id) + '">' + esc(t("tiHold", { q: Math.min(hold, x.qty) })) + "</button>" : "") + "</div>";
+      '<span class="tq">' + esc(t("tiQ", { q: x.qty })) + "</span>" + (hold ? '<button class="btn primary small" type="button" data-hold="' + esc(x.id) + '">' + esc(t("tiHold", { q: Math.min(hold, x.qty) })) + "</button>" : "") +
+      (x.pay && x.qty > 0 && /^https:\/\/buy\.stripe\.com\//.test(x.pay) ? '<a class="btn cyan small" href="' + esc(x.pay) + '" target="_blank" rel="noopener">' + esc(t("tiPayOn")) + "</a>" : "") + "</div>";
   }
   function renderList() {
     renderFil();
@@ -60,7 +61,8 @@
         hits.map(function (x) { return row(x, want); }).join("") + (tot < want ? '<p class="note">' + esc(t("tiLow", { n: tot })) + "</p>" : "") + "</div>";
     } else {
       out.innerHTML = '<div class="tires-res no"><p class="big">' + esc(t("tiOut")) + '</p><p class="note">' + esc(t("tiOutSub", { s: n.size, d: t("tiOrderBy", { n: C.tireOrderDays || "2–3" }) })) + "</p>" +
-        '<button class="btn primary w100" type="button" data-order="1">' + esc(t("tiReq", { q: want, s: n.size })) + "</button></div>";
+        '<button class="btn primary w100" type="button" data-order="1">' + esc(t("tiReq", { q: want, s: n.size })) + "</button>" +
+        (C.orderLink ? '<a class="btn cyan w100" style="margin-top:8px" href="' + esc(C.orderLink) + '" target="_blank" rel="noopener">' + esc(t("tiDep")) + "</a>" : "") + "</div>";
     }
   }
   $("tiForm").addEventListener("submit", function (e) { e.preventDefault(); check(); });
@@ -77,6 +79,40 @@
     var o = e.target.closest("[data-order]");
     if (o && last) { M.addItem({ svc: "tires", opt: "hold", tid: "O" + last.size, note: t("tiNoteOrder", { q: last.want, s: last.size }) }); M.toast(esc(t("tiHeld", { n: last.want + " × " + last.size }))); }
   });
+
+  /* ---------- factory tire size for the customer's car (tiresizes.js) ---------- */
+  function sizesFor(c) {
+    var TS = W.TIRE_SIZES || {}, mk = (c.make || "").toLowerCase().trim(), md = (c.model || "").toLowerCase().trim(), y = +c.year || 0;
+    if (!mk || !md) return null;
+    var rows = TS[mk + "|" + md] || TS[mk + "|" + md.split(/[\s-]/)[0]];
+    if (!rows) return [];
+    return rows.filter(function (r) { return !y || (y >= r.y[0] && y <= r.y[1]); });
+  }
+  function renderCarSize() {
+    var c = M.curCar ? M.curCar() : {}, rows = sizesFor(c), html = "";
+    if (rows) {
+      var nm = [c.year, c.make, c.model].filter(Boolean).join(" ");
+      html = '<div class="card tisz"><p class="kick">' + esc(t("tzK")) + "</p><b>" + esc(nm) + "</b>" +
+        (rows.length ? '<div class="chipline">' + rows.map(function (r) {
+          var lbl = r.s + (r.r ? " / " + r.r : "");
+          return '<button type="button" class="chip" data-tz="' + esc(r.s) + '">' + esc(lbl) + (r.t ? " <small>" + esc(r.t) + "</small>" : "") + "</button>";
+        }).join("") + '</div><p class="note">' + esc(t("tzNote")) + "</p>"
+        : '<p class="note">' + esc(t("tzNone")) + "</p>") + "</div>";
+    }
+    ["tiCar", "carTires"].forEach(function (id) { var el = $(id); if (el) el.innerHTML = html; });
+  }
+  D.addEventListener("mech:car", renderCarSize);
+  D.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-tz]"); if (!b) return;
+    $("tiIn").value = b.getAttribute("data-tz"); check();
+    $("tires").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  /* back from Stripe checkout */
+  (function paid() {
+    var m = location.search.match(/[?&]paid=([a-z0-9]+)/i); if (!m) return;
+    var x = stock().filter(function (y) { return y.id === m[1]; })[0];
+    setTimeout(function () { M.toast(esc(t("tiPaid", { n: x ? x.size : t("tiOrderW") }))); }, 600);
+  })();
 
   /* ---------- QR pay ---------- */
   var PAY = C.pay || { url: "https://pay.example.com/yourshop?demo=1", handle: "yourshop", methods: [] };
@@ -112,14 +148,18 @@
     var m = (PAY.methods || []).filter(function (x) { return x.id === b.getAttribute("data-pm"); })[0]; if (!m) return;
     D.querySelectorAll("#pyMethods [data-pm]").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
     var h = { cashapp: "$" + PAY.handle, venmo: "@" + PAY.handle, paypal: "paypal.me/" + PAY.handle, zelle: "pay@example.com" }[m.id];
-    $("pyMsg").textContent = t("pyWould", { m: p(m), b: C.brand.name }) + (h ? " " + t("pyHandle", { h: h }) : "");
+    $("pyMsg").textContent = PAY.stripe ? t("pyStripe", { m: p(m) }) : t("pyWould", { m: p(m), b: C.brand.name }) + (h ? " " + t("pyHandle", { h: h }) : "");
   });
   $("payPrint").addEventListener("click", function () { renderPay(); openSh("qrSh"); });
   $("qcBayIn").addEventListener("input", function () { var v = $("qcBayIn").value.trim(); $("qpcBay").textContent = v; $("qpcBay").hidden = !v; });
   $("qcPrint").addEventListener("click", function () { D.body.classList.add("printqr"); W.print(); setTimeout(function () { D.body.classList.remove("printqr"); }, 500); });
   W.addEventListener("afterprint", function () { D.body.classList.remove("printqr"); });
 
-  function all() { renderBiz(); renderList(); renderPay(); if (last) check(); }
+  function notes() {   // a client's app: their stock note + the Stripe test-card hint while it's in test mode
+    var n = D.querySelector('[data-t="tiSample"]'); if (!n || !C.client) return;
+    n.textContent = t("tiSampleC") + (C.stripeTest ? " " + t("tiTest") : "");
+  }
+  function all() { renderBiz(); renderList(); renderPay(); renderCarSize(); notes(); if (last) check(); }
   M.onLang(all);
   M.onChange(function () { renderList(); renderPay(); });
   W.addEventListener("storage", function (e) { if (e.key === M.TKEY) renderList(); });

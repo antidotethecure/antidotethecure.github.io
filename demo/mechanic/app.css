@@ -635,3 +635,10 @@ body[data-biz=tire] .quick a:nth-child(-n+2){border-color:color-mix(in srgb,var(
 .tiq{flex:none;width:76px}
 .trow .x{flex:none}
 .hero .quick{margin:0 0 14px}
+
+/* factory tire size card (2026-10-23) */
+.tisz{margin-bottom:12px}.tisz b{display:block;font-size:18px;margin:2px 0 4px}
+.chip{background:var(--panel2,#101a30);border:1px solid var(--edge,#1d2b4a);color:inherit;border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer;min-height:44px}
+.chip small{opacity:.7;font-weight:500;margin-left:4px}.chip:hover,.chip:focus-visible{border-color:var(--accent,#ff7a1a)}
+.tifind{margin:0 0 10px}.tifind a{color:var(--accent2,#2de2ff)}
+.trow .btn.cyan.small{margin-left:6px;text-decoration:none}

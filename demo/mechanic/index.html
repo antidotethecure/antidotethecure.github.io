@@ -72,6 +72,8 @@
 
   <section class="s" id="tires">
     <header><p class="kick" data-t="tiKick">Tire stock</p><h2 class="chrome" data-t="tiH">Check my tire size</h2><p class="lead" data-t="tiLead">Type the size from your tire's sidewall. See right away if it's in stock and hold a set.</p></header>
+    <div id="tiCar"></div>
+    <p class="note tifind" id="tiFind"><a href="#car" data-t="tzFind">🚗 Don't know your size? Pick your car and we'll show it.</a></p>
     <div class="card">
       <form id="tiForm" autocomplete="off">
         <label class="fld"><span data-t="tiL">Tire size (any format)</span><input id="tiIn" maxlength="24" placeholder="225/45R17" autocapitalize="characters" spellcheck="false" enterkeyhint="search"></label>
@@ -154,6 +156,7 @@
       <label class="fld"><span data-t="probL">What's going on?</span><textarea id="problem" maxlength="400" enterkeyhint="search" data-t-ph="probPh" placeholder="Squeaks when I brake, check-engine light came on…"></textarea></label>
       <button class="btn cyan w100" id="probGo" type="button" style="margin-top:8px" data-t="fdGo">🔎 Find the fix + price</button>
       <div class="carbadge" id="carBadge" hidden><span id="carMini"></span><div><b id="carName"></b><small id="carSub"></small></div></div>
+      <div id="carTires"></div>
       <button class="btn cyan w100" id="saveGarage" type="button" style="margin-top:10px" hidden data-t="saveGarage">🏠 Save to My Garage</button>
       <p class="src" data-t="vpicSrc">Make / model / VIN data: NHTSA vPIC (free public U.S. government database). Saved on this phone only.</p>
     </div>
@@ -545,6 +548,10 @@ en: {
   tiBad: "Couldn't read that size. Try it like 225/45R17 (it's on the tire's sidewall).", tiEmpty: "Type your tire size first.",
   tiIn: "✅ In stock: {n}", tiInSub: "{s} · {k} option(s) ready to go", tiLow: "Only {n} left in this one, we can order the rest",
   tiOut: "Not in stock right now", tiOutSub: "We can order {s}, usually within {d}.", tiOrderBy: "{n} business days (sample)",
+  tiPayOn: "💳 Pay online", tiDep: "💳 Pay a deposit to order them", tiPaid: "✅ Paid: {n}. We'll text you to set your install time.", tiOrderW: "order deposit",
+  tzK: "Your factory tire size", tzNote: "Tap a size to check stock. Double-check the sticker inside your driver's door.", tzNone: "We don't have this model's size on file yet. Check the sticker inside your driver's door or the tire's sidewall.",
+  tzFind: "🚗 Don't know your size? Pick your car and we'll show it.", tiSampleC: "Sample stock + prices for this preview.",
+  pyStripe: "{m} works at checkout. Tap 💳 Pay online on your tires above: secure Stripe checkout, no Zelle needed.", tiTest: "Test checkout: use card 4242 4242 4242 4242, any date + code. Nothing is charged.",
   tiHold: "Hold {q}", tiReq: "📦 Request {q} × {s}", tiHeld: "✅ Added to your quote: {n}", tiQ: "{q} in stock", tiNone: "Nothing in stock for this type yet.",
   tiPrice: "{p} each (shop's price)", tiNoteHold: "{q} × {s} · {b} {l}", tiNoteOrder: "order {q} × {s}", tiMatch: "Your size",
   payKick: "Checkout", payH: "Pay with QR", payLead: "Customers scan, pick how they pay, done. Faster checkout, no waiting at the counter.",
@@ -690,6 +697,10 @@ es: {
   tiBad: "No pudimos leer esa medida. Escríbela como 225/45R17 (viene en el costado de la llanta).", tiEmpty: "Primero escribe tu medida.",
   tiIn: "✅ En existencia: {n}", tiInSub: "{s} · {k} opción(es) listas", tiLow: "Solo quedan {n} de esta, pedimos las demás",
   tiOut: "No hay en existencia ahorita", tiOutSub: "Podemos pedir {s}, normalmente en {d}.", tiOrderBy: "{n} días hábiles (muestra)",
+  tiPayOn: "💳 Pagar en línea", tiDep: "💳 Paga un depósito para pedirlas", tiPaid: "✅ Pagado: {n}. Te mandamos texto para la hora de instalación.", tiOrderW: "depósito de pedido",
+  tzK: "Medida de fábrica de tu carro", tzNote: "Toca una medida para ver existencia. Confirma con la etiqueta en la puerta del conductor.", tzNone: "Aún no tenemos la medida de este modelo. Revisa la etiqueta en la puerta del conductor o el costado de la llanta.",
+  tzFind: "🚗 ¿No sabes tu medida? Escoge tu carro y te la mostramos.", tiSampleC: "Existencia y precios de muestra para esta vista previa.",
+  pyStripe: "{m} funciona al pagar. Toca 💳 Pagar en línea en tus llantas arriba: pago seguro con Stripe, sin Zelle.", tiTest: "Pago de prueba: usa la tarjeta 4242 4242 4242 4242, cualquier fecha y código. No se cobra nada.",
   tiHold: "Apartar {q}", tiReq: "📦 Pedir {q} × {s}", tiHeld: "✅ Agregado a tu cotización: {n}", tiQ: "{q} en existencia", tiNone: "Aún no hay de este tipo.",
   tiPrice: "{p} c/u (precio del taller)", tiNoteHold: "{q} × {s} · {b} {l}", tiNoteOrder: "pedir {q} × {s}", tiMatch: "Tu medida",
   payKick: "Pago", payH: "Pagar con QR", payLead: "El cliente escanea, escoge cómo pagar y listo. Cobro más rápido, sin esperar en el mostrador.",
@@ -703,8 +714,8 @@ es: {
 }
 };
 </script>
-<script src="config.js?v=20261017a"></script>
-<script src="core.js?v=20261017a"></script>
+<script src="config.js?v=20261023a"></script>
+<script src="core.js?v=20261023a"></script>
 <script src="beforeafter.js?v=20261013a"></script>
 <script src="car.js?v=20261013b"></script>
 <script src="vehicle.js?v=20261013b"></script>
@@ -714,8 +725,9 @@ es: {
 <script src="scene.js?v=20261013b"></script>
 <script src="diagrams.js?v=20261013e"></script>
 <script src="stores.js?v=20261013s"></script>
-<script src="app.js?v=20261021m"></script>
-<script src="extras.js?v=20261017a"></script>
+<script src="app.js?v=20261023a"></script>
+<script src="tiresizes.js?v=20261023a"></script>
+<script src="extras.js?v=20261023a"></script>
 <script>(function(){var c=SHOP_CFG.colors;window.A2HS_CFG={name:SHOP_CFG.brand.name,theme:{bg:c.bg,bg2:c.panel2,edge:c.edge,accent:c.accent,accent2:c.accent2,ink:c.ink,dim:c.dim,btnInk:"#1d0b00",display:"Orbitron,sans-serif",body:"Rajdhani,system-ui,sans-serif"}};})();</script>
 <script src="../a2hs.js"></script>
 <script src="../seasons/seasons.js?v=20261013a" defer></script>

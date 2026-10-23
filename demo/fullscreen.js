@@ -99,6 +99,10 @@
     if (!on || !box) return;
     var vw = W.innerWidth, vh = W.innerHeight, i = insets();
     var aw = Math.max(200, vw - i.l - i.r), ah = Math.max(200, vh - i.t - i.b);
+    if (cfg.fill) {   // fill mode (cfg.fill): the game box IS the screen, no letterbox; the game itself lays out to fill it (Storm Run, 10-22)
+      box.style.setProperty("width", aw + "px", "important"); box.style.setProperty("height", ah + "px", "important");
+      var tf = "translate(" + i.l + "px," + i.t + "px)"; if (tf !== lastFit) { lastFit = tf; box.style.setProperty("transform", tf, "important"); }
+      H.style.setProperty("--ssai-fs-scale", "1"); return; }
     // lay the game out at the screen width (phones) or its normal page width (desktop/tablet), then scale to fit
     var lw = Math.round(Math.min(aw <= 700 ? aw : Math.min(aw, Math.max(saved.w, cfg.minWidth || 340)), cfg.maxWidth || 1e9));
     box.style.setProperty("width", lw + "px", "important");
@@ -141,7 +145,7 @@
       saved.style = box.getAttribute("style");
       back = D.createElement("div"); back.className = "ssai-fsback"; back.style.background = bgOf(box); back.setAttribute("aria-hidden", "true");
       D.body.appendChild(back);
-      box.classList.add("ssai-fsbox");
+      box.classList.add("ssai-fsbox"); if (cfg.fill) box.classList.add("ssai-fsfill");
       // long how-to / point lists under the game stay on the page; full screen is for playing
       hidden = [].slice.call(box.querySelectorAll(".how, #points" + (cfg.hide ? ", " + cfg.hide : "")));
       hidden.forEach(function (h) { h.classList.add("ssai-fshide"); });
@@ -163,7 +167,7 @@
     if (!on) return;
     on = false;
     if (box && !cfg.page) {
-      box.classList.remove("ssai-fsbox");
+      box.classList.remove("ssai-fsbox", "ssai-fsfill");
       if (saved.style == null) box.removeAttribute("style"); else box.setAttribute("style", saved.style);
       hidden.forEach(function (h) { h.classList.remove("ssai-fshide"); }); hidden = [];
     }

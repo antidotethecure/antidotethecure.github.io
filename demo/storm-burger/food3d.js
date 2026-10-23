@@ -59,7 +59,7 @@ export function makeProps(THREE, opt = {}) {
     patty: std({ map: seared, bumpMap: crust, bumpScale: 2.2, roughness: .78 }),
     turkey: std({ map: turkeyTex, bumpMap: crust, bumpScale: 1.8, roughness: .8 }),
     cheese: new THREE.MeshPhysicalMaterial({ color: 0xffae12, roughness: .32, sheen: .4, emissive: 0x3a1c00, side: THREE.DoubleSide }),
-    lettuce: std({ color: 0x8fd052, roughness: .55, side: THREE.DoubleSide }), tomSide: std({ color: 0xb8201a, roughness: .4 }), tomTop: std({ map: tomTop, roughness: .35 }),
+    lettuce: std({ color: 0x8fd052, roughness: .55, side: THREE.DoubleSide }), slaw: std({ color: 0xe4ecc8, roughness: .75, side: THREE.DoubleSide }), tomSide: std({ color: 0xb8201a, roughness: .4 }), tomTop: std({ map: tomTop, roughness: .35 }),
     onion: std({ color: 0xf4efe2, roughness: .5 }), pickle: std({ color: 0x5f7d24, roughness: .45 }), pickTop: std({ map: pickTop, roughness: .4 }),
     sauce: std({ color: 0xf0a560, roughness: .3 }), mayo: std({ color: 0xf5efd8, roughness: .3 }),
     fried: std({ map: fried, bumpMap: crust, bumpScale: 3, roughness: .7 }),
@@ -88,8 +88,8 @@ export function makeProps(THREE, opt = {}) {
   function patty(y, r = 26.5, h = 7.5, mat = M.patty) { const g = cyl(r, r - .6, h, 56, 3); const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setX(i, uv.getX(i) * 18);   /* tile the sear around the edge so it isn't stretched */ warp(g, .3, (v, n) => { const rr = Math.hypot(v.x, v.z) || 1, k = 1 + n * 3.4 / rr; v.x *= k; v.z *= k; v.y += n * 1.4; }); put(g, mat, 0, y + h / 2 - .4); return y + h - .8; }
   function cheese(y, s = 40, drape = .3) { const g = new THREE.PlaneGeometry(s, s, 16, 16); g.rotateX(-Math.PI / 2); g.rotateY(Math.PI / 4 + (rnd() - .5) * .4);
     warp(g, .2, (v, n) => { const rr = Math.hypot(v.x, v.z); if (rr > 15) v.y -= Math.min(6.5, Math.pow(rr - 15, 1.4) * drape); v.y += n * .6; }); put(g, M.cheese, 0, y + .4); return y + .8; }
-  function lettuce(y, r = 29) { const g = cyl(r, r - 1, 2.2, 72, 1); warp(g, .35, (v, n) => { const a = Math.atan2(v.z, v.x), rr = Math.hypot(v.x, v.z), q = rr / r; v.y += (Math.sin(a * 11) * 1.8 + n * 2.4) * q; const k = 1 + (Math.sin(a * 7) * .06 + n * .1) * q; v.x *= k; v.z *= k; });
-    put(g, M.lettuce, 0, y + 1); return y + 2.6; }
+  function lettuce(y, r = 29, mat = M.lettuce) { const g = cyl(r, r - 1, 2.2, 72, 1); warp(g, .35, (v, n) => { const a = Math.atan2(v.z, v.x), rr = Math.hypot(v.x, v.z), q = rr / r; v.y += (Math.sin(a * 11) * 1.8 + n * 2.4) * q; const k = 1 + (Math.sin(a * 7) * .06 + n * .1) * q; v.x *= k; v.z *= k; });
+    put(g, mat, 0, y + 1); return y + 2.6; }
   function tomato(y, n = 1) { for (let i = 0; i < n; i++) { const g = cyl(19, 19, 3.2, 32); parts.push([g.translate(-6 + i * 12, y + 1.6, (i - .5) * 6), [M.tomSide, M.tomTop, M.tomTop]]); } return y + 3.2; }
   function onion(y) { [[-6, 3, 12], [7, -4, 10], [0, 8, 9]].forEach(([x, z, r]) => put(new THREE.TorusGeometry(r, 1.3, 6, 28), M.onion, x, y + 1, z, Math.PI / 2)); return y + 2.2; }
   function pickles(y, n = 5, r0 = 13) { for (let i = 0; i < n; i++) { const a = i / n * TAU + .3, g = cyl(6, 6, 1.4, 28); warp(g, .9, (v) => { const rr = Math.hypot(v.x, v.z); if (rr > 3) { const aa = Math.atan2(v.z, v.x), k = 1 + Math.sin(aa * 14) * .07; v.x *= k; v.z *= k; } });
@@ -106,7 +106,7 @@ export function makeProps(THREE, opt = {}) {
   const BUILD = {
     burger() { let y = botBun(0); y = sauce(y); y = patty(y); y = cheese(y); y = patty(y); y = cheese(y, 42, .36); y = pickles(y); y = onion(y); y = tomato(y, 2); y = lettuce(y); topBun(y - .6); },   // double smash, cheese melted over both, no gaps
     turkey() { let y = botBun(0); y = sauce(y, 24, M.mayo); y = patty(y, 25, 11, M.turkey); y = cheese(y); y = tomato(y, 2); y = onion(y); y = lettuce(y, 28); topBun(y - .6); },
-    sandwich() { let y = botBun(0); y = sauce(y, 19, M.mayo); y = fillet(y); y = pickles(y - 2, 4, 11); y = sauce(y, 19, M.mayo); topBun(y - .6); },
+    sandwich() { let y = botBun(0); y = sauce(y, 19, M.mayo); y = fillet(y); y = lettuce(y - 1, 27, M.slaw); y = lettuce(y, 26, M.slaw); y = pickles(y - 1, 4, 11); y = lettuce(y, 29); topBun(y - .6); },   // chicken sandwich: kale slaw + lettuce (Antidote 10-21),
     chicken() { BUILD.sandwich(); },
     strips() { const b = basket(); tender(-4, b + 11, -8, .25, 34); tender(2, b + 14, 3, -.12, 36); tender(-5, b + 18, 10, .5, 30); put(cyl(8, 6.5, 7, 24), M.steel, 18, b + 9, 13); put(cyl(7.2, 7.2, .6, 24), M.dip, 18, b + 12.4, 13); },
     fries() { const b = basket(46, 40, 12); sd = 21; for (let i = 0; i < 30; i++) { const len = 20 + rnd() * 12, g = new THREE.BoxGeometry(3, len, 3); const a = rnd() * TAU, r = rnd() * 13;

@@ -106,7 +106,7 @@
   function itemName(it) { var s = SV[it.svc], o = opt(it.svc, it.opt); if (!s || !o) return "?"; return p(s.name) + " · " + p(o.name) + (it.pos && POS[it.pos] ? " (" + p(POS[it.pos]) + ")" : "") + (it.note ? " (" + it.note + ")" : ""); }
 
   /* ---------- tire stock (sample list in config; the owner's edits live in this browser) ---------- */
-  var TKEY = "ssai:mech:tires";
+  var TKEY = "ssai:mech:tires" + (C.client ? ":" + C.client : "");   // each client app keeps its own stock on the phone
   function tires() { var a = lsGet(TKEY, null); return Array.isArray(a) ? a : (C.tireStock || []).map(function (x) { return Object.assign({}, x); }); }
   function saveTires(a) { lsSet(TKEY, a); fire(); }
   function resetTires() { try { localStorage.removeItem(TKEY); } catch (e) {} fire(); }

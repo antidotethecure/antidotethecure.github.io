@@ -355,6 +355,46 @@ window.SHOP_CFG = {
   }
 };
 
+
+/* ---------- client presets: ?client=<id> turns the universal demo into one shop's app ----------
+   alex-tires (2026-10-23): tire shop pitch. Stock + prices are SAMPLES (Alex sets his own on the shop page / in Stripe).
+   pay links = Stripe TEST mode (sandbox, card 4242 4242 4242 4242), made by ~/command-center/clients/alex-tires/make_stripe_links.py.
+   Going live = Alex's own Stripe account: re-run that script with --live <his key file>, paste links_live.json here. */
+window.SHOP_PRESETS = {
+  "alex-tires": {
+    type: "tire",
+    brand: { name: "Alex Tires", short: "Alex Tires", tagline: { en: "Tires · Wheels · Alignment", es: "Llantas · Rines · Alineación" } },
+    stripeTest: true,
+    t: { en: { heroH: "Your tires. <em>Paid online, on today.</em>", heroP: "Pick your car to see your tire size, check what's in stock, pay online with card or Apple Pay and we'll have them ready to mount." },
+         es: { heroH: "Tus llantas. <em>Pagadas en línea, puestas hoy.</em>", heroP: "Escoge tu carro para ver tu medida, revisa qué hay en existencia, paga en línea con tarjeta o Apple Pay y te las tenemos listas para montar." } },
+    tireStock: [
+      {"id": "a1", "brand": "Michelin", "line": "Defender2", "size": "215/55R17", "type": "allseason", "qty": 8, "price": 189, "pay": "https://buy.stripe.com/test_eVqbITfBU9cs2vmfMo5J600"},
+      {"id": "a2", "brand": "Hankook", "line": "Kinergy PT", "size": "215/55R17", "type": "allseason", "qty": 12, "price": 119, "pay": "https://buy.stripe.com/test_dRm28j3TcbkA1ri1Vy5J601"},
+      {"id": "a3", "brand": "Pirelli", "line": "P Zero AS Plus 3", "size": "235/45R18", "type": "perf", "qty": 4, "price": 209, "pay": "https://buy.stripe.com/test_eVq4gr89scoE0nebw85J602"},
+      {"id": "a4", "brand": "Goodyear", "line": "Assurance WeatherReady 2", "size": "235/40R18", "type": "allseason", "qty": 8, "price": 179, "pay": "https://buy.stripe.com/test_14A14f3TcbkAfi8eIk5J603"},
+      {"id": "a5", "brand": "Michelin", "line": "Primacy Tour A/S", "size": "235/45R18", "type": "allseason", "qty": 4, "price": 229, "pay": "https://buy.stripe.com/test_aFafZ9exQ0FW0ne9o05J604"},
+      {"id": "a6", "brand": "Continental", "line": "PureContact LS", "size": "225/50R17", "type": "allseason", "qty": 8, "price": 159, "pay": "https://buy.stripe.com/test_8x200b2P8fAQ4Du57K5J605"},
+      {"id": "a7", "brand": "Bridgestone", "line": "Alenza AS Ultra", "size": "235/60R18", "type": "allseason", "qty": 8, "price": 199, "pay": "https://buy.stripe.com/test_eVq6oz1L488o0nedEg5J606"},
+      {"id": "a8", "brand": "Hankook", "line": "Dynapro HT", "size": "225/65R17", "type": "allseason", "qty": 8, "price": 139, "pay": "https://buy.stripe.com/test_4gM9AL75o1K0fi8as45J607"},
+      {"id": "a9", "brand": "BFGoodrich", "line": "All-Terrain T/A KO2", "size": "LT275/65R18", "type": "truck", "qty": 8, "price": 289, "pay": "https://buy.stripe.com/test_fZu00bblE0FW1rias45J608"},
+      {"id": "a10", "brand": "Nitto", "line": "Ridge Grappler", "size": "275/60R20", "type": "truck", "qty": 4, "price": 319, "pay": "https://buy.stripe.com/test_9B6fZ9fBUfAQ2vmdEg5J609"},
+      {"id": "a11", "brand": "Michelin", "line": "Pilot Sport All Season 4", "size": "255/45R19", "type": "perf", "qty": 8, "price": 259, "pay": "https://buy.stripe.com/test_fZu6oz3Tc0FWc5Wbw85J60a"},
+      {"id": "a12", "brand": "Firestone", "line": "Firehawk Indy 500", "size": "245/45R20", "type": "perf", "qty": 4, "price": 209, "pay": "https://buy.stripe.com/test_dRm4grexQcoEee49o05J60b"}
+    ],
+    orderLink: "https://buy.stripe.com/test_eVq28jgFYbkAb1S57K5J60c",
+    pay: {
+      url: "https://antidotethecure.github.io/demo/alex-tires/#tires",
+      handle: "alextires",
+      stripe: true,
+      methods: [
+        { id: "card", icon: "💳", en: "Card", es: "Tarjeta" },
+        { id: "apple", icon: "A", en: "Apple Pay", es: "Apple Pay" },
+        { id: "google", icon: "G", en: "Google Pay", es: "Google Pay" },
+        { id: "link", icon: "⚡", en: "Link (1-tap)", es: "Link (1 toque)" }
+      ]
+    }
+  }
+};
 /* ---------- business types: one demo, pitched to any vehicle business ----------
    services = which service ids show (in this order). t = copy overrides (keys from the page's window.T). */
 window.BIZ_TYPES = {
@@ -394,7 +434,12 @@ window.BIZ_TYPES = {
      ?type=tire|mobile|repair|lube|body|detail   ?shop=Alex%27s%20Tire%20Shop (display name, plain text, max 40 chars) */
   var C = window.SHOP_CFG, B = window.BIZ_TYPES, qs = location.search;
   var ALIAS = { mobile: "mobile", mechanic: "mobile", repair: "repair", auto: "repair", shop: "repair", tire: "tire", tires: "tire", lube: "lube", oil: "lube", body: "body", collision: "body", detail: "detail", detailing: "detail" };
-  var q = (qs.match(/[?&]type=([a-z]+)/i) || [])[1];
+  var cl = (qs.match(/[?&]client=([a-z0-9-]+)/i) || [])[1], PRE = cl && (window.SHOP_PRESETS || {})[cl.toLowerCase()];
+  if (PRE) {   // a real client's app: their brand, stock and pay links; no demo switch
+    C.client = cl.toLowerCase(); Object.assign(C.brand, PRE.brand);
+    ["tireStock", "orderLink", "pay", "stripeTest"].forEach(function (k) { if (PRE[k] != null) C[k] = PRE[k]; });
+  }
+  var q = (qs.match(/[?&]type=([a-z]+)/i) || [])[1] || (PRE && PRE.type);
   var type = (q && ALIAS[q.toLowerCase()]) || "repair";
   var nm = qs.match(/[?&]shop=([^&#]*)/), custom = "";
   if (nm) { try { custom = decodeURIComponent(nm[1].replace(/\+/g, " ")); } catch (e) { custom = ""; } custom = custom.replace(/[\u0000-\u001f<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 40); }
@@ -410,5 +455,5 @@ window.BIZ_TYPES = {
   C.beforeAfter = (C.beforeAfter || []).filter(function (x) { return order[x.svc] != null; });
   /* copy overrides go into the page's strings before core.js reads them */
   var T = window.T = window.T || { en: {}, es: {} };
-  ["en", "es"].forEach(function (l) { T[l] = T[l] || {}; Object.assign(T[l], (bt.t && bt.t[l]) || {}); });
+  ["en", "es"].forEach(function (l) { T[l] = T[l] || {}; Object.assign(T[l], (bt.t && bt.t[l]) || {}, (PRE && PRE.t && PRE.t[l]) || {}); });
 })();

@@ -23,6 +23,7 @@
   /* used by extras.js (tire stock hold / pay screen) */
   M.addItem = function (it) { var k = key(it); job = job.filter(function (j) { return key(j) !== k; }); job.push(withTier(it)); saveJob(); };
   M.curJob = function () { return job; };
+  M.curCar = function () { return car; };
 
   /* ---------- brand ---------- */
   var heroSc = null;
@@ -198,6 +199,7 @@
     if (identity && !fromGarage && car.gid) { var g = gFind(car.gid); if (g && (g.year !== car.year || g.make !== car.make || g.model !== car.model)) { car.gid = ""; car.scans = []; delete car.pid; car.nick = ""; renderPhoto(); } }
     saveCar(); fillDetails(); renderCar(false); renderTesla(); renderDiagram(); saveJob(); renderFinder();
     if (identity) loadIssues();
+    D.dispatchEvent(new CustomEvent("mech:car"));   // extras.js: factory tire size
   }
   function resetSpecs() { ["trim", "engine", "cyl", "fuel", "drive", "lights", "abs", "vin", "vinModel", "paint"].forEach(function (k) { car[k] = ""; }); car.bodyManual = false; $("vin").value = ""; $("vinMsg").textContent = ""; }
   function carLabel(c) { return PT.label(c || car); }

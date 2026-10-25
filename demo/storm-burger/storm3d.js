@@ -195,8 +195,12 @@ async function boot() {
       const w = Math.sin(t * 7 + P.ph); P.g.position.set(P.x, Math.abs(w) * 1.2, P.z); P.legs[0].rotation.x = w * .5; P.legs[1].rotation.x = -w * .5; P.arms[0].rotation.x = -w * .4; } }
   /* ---------- roadside billboards (Antidote 10-23: "more alive"): StormBurger's real menu photos and combos, plus one for
      Antidote's food reviews; floodlit, with a pulsing LED border. One every few blocks, alternating sides. ---------- */
-  const PROMOS = [["classic", "CLASSIC STORMBURGER COMBO", "Fries + a soft drink · $11.99"], ["chicken", "CHICKEN SANDWICH COMBO", "Fries + a soft drink · $12.99"], ["review"],
-    ["double", "DOUBLE CLASSIC COMBO", "Two patties · fries · drink · $14.49"], ["spicy-chicken", "SPICY CHICKEN SANDWICH", "Combo $12.99 · it bites back"], ["vanilla", "THICK MILKSHAKES", "Vanilla · Chocolate · Mix"], ["review"]];
+  /* StormBurger's own promos (their Instagram + stormburger.com, checked 2026-10-24): the items and lines they actually push.
+     No prices: their site lists none. */
+  const PROMOS = [["jalapeno", "JALAPEÑO LIGHTNING BURGER", "Put a lid on it · it's no joke"], ["bacon-bbq", "BACON BBQ SMASH BURGER", "Stacked · fresh onion straws"], ["review"],
+    ["double", "DOUBLE CLASSIC COMBO", "+ a Storm shake, of course"], ["turkey", "THE TURKEY BURGER", "Best turkey burger you can find"], ["sauces", "THUNDER SAUCE", "Fresh apricot habanero"],
+    ["classic", "VOTED BEST BURGER IN LA", "Now nominated: Best Burger in America"], ["onion-rings", "HANDMADE ONION RINGS", "Whatever you do, don't skip them"], ["review"],
+    ["spicy-chicken", "SPICY CHICKEN SANDWICH", "Chicken · strips · sandwiches"], ["vanilla", "STORM SHAKES", "Vanilla · Chocolate · Mix"], ["fries", "LONG BEACH: OPEN 'TIL MIDNIGHT", "Fridays + Saturdays · 5801 Cherry Ave"]];
   const NEONC = [[3.2, .5, .5], [3.2, 2.4, .3], [.4, 3.2, 2.2], [.6, 1.8, 3.4], [3.2, .8, 2.8]];
   const promoTex = new Map();
   const cover = (x, im, X, Y, W2, H2) => { if (!ok(im)) return; const k = Math.max(W2 / im.naturalWidth, H2 / im.naturalHeight), w = im.naturalWidth * k, h = im.naturalHeight * k; x.save(); x.beginPath(); x.rect(X, Y, W2, H2); x.clip(); x.drawImage(im, X + (W2 - w) / 2, Y + (H2 - h) / 2, w, h); x.restore(); };
@@ -210,9 +214,11 @@ async function boot() {
         else { x.fillStyle = "#1d43b5"; x.fillRect(0, 0, w, h); cover(x, ph, 0, 0, w * .56, h); const g = x.createLinearGradient(w * .48, 0, w * .58, 0); g.addColorStop(0, "rgba(29,67,181,0)"); g.addColorStop(1, "#1d43b5"); x.fillStyle = g; x.fillRect(w * .48, 0, w * .1, h);
           x.fillStyle = "#E8582A"; x.fillRect(w * .56, h * .9, w * .44, h * .1);
           if (ok(LOGO)) { const lw = w * .3; x.drawImage(LOGO, w * .63, h * .05, lw, lw * LOGO.naturalHeight / LOGO.naturalWidth); }
-          x.textAlign = "center"; x.fillStyle = "#fff"; const words = P[1].split(" "), mid = Math.ceil(words.length / 2); x.font = "900 " + 52 * u + "px Arial Black,Arial,sans-serif";
-          x.fillText(words.slice(0, mid).join(" "), w * .78, h * .5); x.fillText(words.slice(mid).join(" "), w * .78, h * .62);
-          x.fillStyle = "#FFD23F"; x.font = "800 " + 30 * u + "px Arial,sans-serif"; x.fillText(P[2], w * .78, h * .77);
+          x.textAlign = "center"; x.fillStyle = "#fff"; const words = P[1].split(" "), mid = Math.ceil(words.length / 2), l1 = words.slice(0, mid).join(" "), l2 = words.slice(mid).join(" ");
+          const fit = (txt, px, wt, fam, max) => { let f = px; x.font = wt + " " + f + "px " + fam; while (f > 12 && x.measureText(txt).width > max) { f -= 2; x.font = wt + " " + f + "px " + fam; } return f; };   // long names shrink to fit the board
+          const tf = Math.min(fit(l1, 52 * u, "900", "Arial Black,Arial,sans-serif", w * .4), fit(l2, 52 * u, "900", "Arial Black,Arial,sans-serif", w * .4)); x.font = "900 " + tf + "px Arial Black,Arial,sans-serif";
+          x.fillText(l1, w * .78, h * .5); x.fillText(l2, w * .78, h * .62);
+          x.fillStyle = "#FFD23F"; fit(P[2], 30 * u, "800", "Arial,sans-serif", w * .42); x.fillText(P[2], w * .78, h * .77);
           x.fillStyle = "#fff"; x.font = "900 " + 26 * u + "px Arial,sans-serif"; x.fillText("STORMBURGER · DRIVE THRU", w * .78, h * .95); } });
       logoTex.push(t); promoTex.set(k, std(0xffffff, { map: t, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: .85, roughness: .5 })); }
     return promoTex.get(k); }
@@ -1002,7 +1008,7 @@ async function boot() {
     const dz = (pitting ? 0 : run ? st.speed * KF : st.dying ? Math.max(0, st.speed * KF * (1 - (now - st.dying) / 900)) : 2.5) * k;
     const dzw = dz + warp; warp = 0; odo += dzw; roadTex.offset.y += dzw / RT; roadRough.offset.y = roadTex.offset.y;
     for (let i = live.length - 1; i >= 0; i--) { const L = live[i]; L.o.position.z += dzw; if (L.upd && L.o.position.z > -1900) L.upd(L.o, t, dt); if (L.o.position.z > 900) { world.remove(L.o); live.splice(i, 1); } }
-    neonTick(t); if (run && !pitting) { bbT -= dt; if (bbT <= 0) { spawnBoard(); bbT = 24; } } if (BBM) BBM.update(t);
+    neonTick(t); if (run && !pitting) { bbT -= dt; if (bbT <= 0) { spawnBoard(); bbT = 10 + Math.random() * 5; }   /* his review rolls by every 10-15 s (10-24) */ } if (BBM) BBM.update(t);
     front[0] += dzw; front[1] += dzw; evtIn -= dz; if (evtIn <= 0) { event(); evtIn = SPACING; } fill();
 
     /* truck */

@@ -1,7 +1,8 @@
 /* songswitch.js: a small two-song (or more) music switcher shared by the games.
    One <audio> per song, each through its own gain into the game's music bus, so a switch is a short crossfade.
    Nothing plays until the game calls attach()/sync() from a user tap (iOS audio unlock). The pick is saved per game.
-     var MS = SongSwitch({ key: "melody-song", songs: [{ id, name, src }, ...], fade: .8, vol: .22 });   (vol = element volume if WebAudio routing fails)
+     var MS = SongSwitch({ key: "melody-song", songs: [{ id, name, src }, ...], fade: .8, vol: .22 });   (vol = element volume if WebAudio routing fails;
+       playlist: true = when a song ends the next one starts, instead of looping the same song)
      MS.attach(audioContext, musicBusGainNode)   // from the first tap; falls back to element volume if routing fails
      MS.sync(shouldPlay)                         // play the current song or pause everything
      MS.next()                                   // switch to the next song (crossfade)
@@ -13,7 +14,8 @@
   W.SongSwitch = function (O) {
     var songs = O.songs || [], key = O.key || "game-song", fade = O.fade || .8, i = 0, els = [], gains = [], ctx = null, bus = null, playing = false, btns = [], subs = [];
     try { var s = localStorage.getItem(key); for (var k = 0; k < songs.length; k++) if (songs[k].id === s) i = k; } catch (e) {}
-    function el(n) { if (els[n]) return els[n]; var a = new Audio(); if (/^https?:/.test(songs[n].src)) a.crossOrigin = "anonymous"; a.src = songs[n].src; a.loop = true; a.preload = n === i ? "auto" : "none"; a.setAttribute("playsinline", ""); try { a.volume = O.vol || 1; } catch (e) {} els[n] = a;
+    function el(n) { if (els[n]) return els[n]; var a = new Audio(); if (/^https?:/.test(songs[n].src)) a.crossOrigin = "anonymous"; a.src = songs[n].src; a.loop = !O.playlist;   /* playlist: true = play the songs in order (Storm Run 10-24: Energy kept repeating) */
+      if (O.playlist) a.addEventListener("ended", function () { if (playing && n === i) set(i + 1); }); a.preload = n === i ? "auto" : "none"; a.setAttribute("playsinline", ""); try { a.volume = O.vol || 1; } catch (e) {} els[n] = a;
       if (ctx && bus) route(n); return a; }
     function route(n) { if (gains[n] !== undefined) return; try { var g = ctx.createGain(); g.gain.value = n === i ? 1 : 0; ctx.createMediaElementSource(els[n]).connect(g); g.connect(bus); gains[n] = g; els[n].volume = 1; } catch (e) { gains[n] = null; } }
     function level(n, v, now) { var g = gains[n]; if (g && ctx) { var t = ctx.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); if (now) g.gain.setValueAtTime(v, t); else g.gain.linearRampToValueAtTime(v, t + fade); }

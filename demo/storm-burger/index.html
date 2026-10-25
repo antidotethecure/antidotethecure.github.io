@@ -295,7 +295,7 @@ var DRIZ_N=5;   // like Melody: catch this many Antidote Drizzle emblems to unlo
 var DRIZ_IM=new Image(); DRIZ_IM.src="img/game/antidote-logo.webp";
 var st; // game state
 var htPlayed=0;   // ms of play across this visit's runs (halftime)
-function fresh(){ return {running:false,over:false,lane:1,x:LX(1),score:0,lives:MAXL,t:LEVEL_MS,lvl:1,played:0,banner:null,blkT:7000,spkT:6000,spinT:0,spinA:0,items:[],bolts:[],rain:[],pops:[],speed:3.2,shake:0,inv:0,flash:0,last:0,spawnT:0,boltT:10000,coins:0,dmg:0,flames:[],smoke:[],cracks:[],dying:0,spin:0,rot:0,skids:[],rear:null,cops:[],copT:16000,dz:0,dzT:3000,twT:15000,twLane:(Math.random()*4)|0,cowT:12000,stopT:18000,sfx:null}; }
+function fresh(){ return {running:false,over:false,lane:1,x:LX(1),score:0,lives:MAXL,t:LEVEL_MS,lvl:1,played:0,banner:null,blkT:7000,spkT:6000,spinT:0,spinA:0,items:[],bolts:[],rain:[],pops:[],speed:3.2,shake:0,inv:0,flash:0,storm:0,stormAt:5000+Math.random()*5000,stormW:0,last:0,spawnT:0,boltT:10000,coins:0,dmg:0,flames:[],smoke:[],cracks:[],dying:0,spin:0,rot:0,skids:[],rear:null,cops:[],copT:16000,dz:0,dzT:3000,twT:15000,twLane:(Math.random()*4)|0,cowT:12000,stopT:18000,sfx:null}; }
 st=fresh();
 for(var i=0;i<50;i++) st.rain.push({x:Math.random()*W,y:Math.random()*H,l:8+Math.random()*14,v:9+Math.random()*7});
 var road=0;
@@ -661,6 +661,8 @@ function frame(now){
     if(false){   // the drive-thru line now waits in the StormBurger lot (storm3d), not on the road
      st.qL=st.lvl; st.items.push({type:"queue",lane:LANES-1,x:LX(LANES-1),y:-200,len:340,n:9,q:st.lvl>=5?1:0}); }   // the StormBurger drive-thru line (Inglewood spot on levels 1-4, Long Beach after)
     if(st.pitL!==st.lvl&&(st.lvl===2||st.lvl===6||st.lvl===9)&&el>(st.lvl===2?15000:40000)){ st.pitL=st.lvl; st.items.push({type:"pit",lane:LANES-1,x:LX(LANES-1),y:-90,r:30}); }   // Jordan High pit stop on levels 2 (a full minute in the kitchen), 6 and 9
+    if(st.played>=st.stormAt){ if(!st.stormOn){ st.stormOn=1; st.stormW=3200; if(window.SB_THUNDER) setTimeout(function(){ if(st.running) SB_THUNDER(); },2200); } st.storm=Math.min(1,st.storm+dt/6000); }   // sunny start, then the storm rolls in over ~6 s (Antidote 10-24)
+    if(st.stormW>0) st.stormW-=dt;
     st.t-=dt; st.played+=dt; st.speed=Math.min(4.8,2.2+(st.lvl-1)*0.26+el/LEVEL_MS*0.15);   // every level drives noticeably faster (10-22): ~2.2 on level 1 up to ~4.7 on level 10
     st.spawnT-=dt; if(st.spawnT<=0){ spawn(); st.spawnT=Math.max(420,760-st.lvl*25); }
     // ONE hazard at a time (Antidote 10-22: "every 10 seconds throw one of those things out"): every other hazard timer is parked;
@@ -668,7 +670,7 @@ function frame(now){
     // Levels 1-3 = one every 10 s; from level 4 they come faster and the roadblocks/spikes join in.
     ["boltT","cowT","stopT","twT","blkT","spkT","copT"].forEach(function(n){ if(st.hzArm===n){ if(st[n]>st.hzV+1) st.hzArm=null; else st.hzV=st[n]; } if(st.hzArm!==n) st[n]=1e9; });
     if(st.hzArm&&st.played-st.hzAt>6000) st.hzArm=null;   // safety: a hazard that could not fire (e.g. a roadblock already on screen) frees the slot
-    st.hzT=(st.hzT==null?10000:st.hzT)-dt;
+    st.hzT=(st.hzT==null?st.stormAt+8000:st.hzT)-dt;   /* nothing from the sky until the storm is in */
     if(st.hzT<=0&&!st.hzArm){ var HZ=["boltT","twT","copT"];   /* cow + stop sign only ride the tornado now (10-22) */ if(st.lvl>=5) HZ.push("blkT"); if(st.lvl>=6) HZ.push("spkT");
       HZ=HZ.filter(function(n){ return n!==st.hzLast; }); var pk=HZ[(Math.random()*HZ.length)|0]; st.hzLast=st.hzArm=pk; st.hzAt=st.played; st[pk]=pk==="twT"?TW_WARN:0; st.hzV=st[pk];
       st.hzT=st.lvl<=3?10000:Math.max(3500,10000-(st.lvl-3)*1100); }
@@ -727,6 +729,10 @@ function frame(now){
     cx.save(); cx.globalAlpha=tb; cx.fillStyle="rgba(120,8,14,.82)"; roundRect(W/2-158,118,316,58,12); cx.fill(); cx.strokeStyle="rgba(255,210,63,"+tw+")"; cx.lineWidth=3; cx.stroke();
     cx.textAlign="center"; cx.textBaseline="middle"; cx.fillStyle="rgba(255,255,255,"+(0.7+0.3*tw)+")"; cx.font="400 30px 'Bebas Neue',Impact,sans-serif"; cx.fillText("🌪️ "+T("TORNADO WARNING")+" 🌪️",W/2,140);
     cx.fillStyle="#FFD23F"; cx.font="800 12px Archivo,system-ui"; cx.fillText(T("A twister is touching down ahead. Get ready to swerve")+" · "+Math.ceil(st.twT/1000)+"s",W/2,163); cx.restore(); }
+  if(st.running&&!st.dying&&st.stormW>0&&!(st.twT<TW_WARN)){ var sw=0.6+0.4*Math.sin(now/110), sa=Math.min(1,Math.min(st.stormW,3200-st.stormW)/300);
+    cx.save(); cx.globalAlpha=sa; cx.fillStyle="rgba(12,30,90,.85)"; roundRect(W/2-158,118,316,58,12); cx.fill(); cx.strokeStyle="rgba(255,210,63,"+sw+")"; cx.lineWidth=3; cx.stroke();
+    cx.textAlign="center"; cx.textBaseline="middle"; cx.fillStyle="rgba(255,255,255,"+(0.75+0.25*sw)+")"; cx.font="400 30px 'Bebas Neue',Impact,sans-serif"; cx.fillText("⛈️ "+T("STORM WARNING")+" ⛈️",W/2,140);
+    cx.fillStyle="#FFD23F"; cx.font="800 12px Archivo,system-ui"; cx.fillText(T("Clouds rolling in. Rain and lightning ahead"),W/2,163); cx.restore(); }
   st.items.forEach(function(it){ if(it.type==="queue"&&st.running&&!st.dying&&it.y+it.len/2<py-40){ var a=0.65+0.35*Math.sin(now/120);
     cx.globalAlpha=a; cx.font="900 16px Archivo,system-ui"; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillStyle="#FFD23F"; cx.strokeStyle="#0a1030"; cx.lineWidth=4;
     var tq=T("🍔 STORMBURGER LINE AHEAD · MOVE LEFT ◀"); cx.strokeText(tq,W/2,88); cx.fillText(tq,W/2,88); cx.globalAlpha=1; } });
@@ -759,13 +765,13 @@ function frame(now){
     if((st.inv<=0||Math.floor(st.inv/6)%2===0)&&!(st.over&&st.lives<=0)) drawCar(st.x,py,st.rot+st.spinA,1,now);
   } }
   // rain
-  if(!r3){ cx.strokeStyle="rgba(170,200,255,.35)"; cx.lineWidth=1.2; cx.beginPath();
+  if(!r3&&st.storm>0){ cx.strokeStyle="rgba(170,200,255,"+(.35*st.storm)+")"; cx.lineWidth=1.2; cx.beginPath();
   st.rain.forEach(function(r){ r.y+=r.v*k; r.x-=1.2*k; if(r.y>H){r.y=-20;r.x=Math.random()*W+40;} cx.moveTo(r.x,r.y); cx.lineTo(r.x-3,r.y+r.l); }); cx.stroke(); }
   // pops
   for(var p=st.pops.length-1;p>=0;p--){ var po=st.pops[p]; po.y-=1.2*k; po.a-=0.02*k; if(po.a<=0){st.pops.splice(p,1);continue;}
     cx.globalAlpha=po.a; cx.fillStyle=po.col; cx.font="bold 18px Archivo,system-ui"; cx.textAlign="center"; cx.fillText(po.txt,po.x,po.y); cx.globalAlpha=1; }
   // sky flash
-  if(Math.random()<0.004) st.flash=Math.max(st.flash,0.25);
+  if(st.storm>.8&&Math.random()<0.004) st.flash=Math.max(st.flash,0.25);
   if(st.flash>0){ cx.fillStyle="rgba(225,240,255,"+(r3?st.flash*0.5:st.flash)+")"; cx.fillRect(0,0,W,H); st.flash-=0.05*k; }
   drawScreenHit(now);
   cx.restore();
@@ -806,7 +812,7 @@ $("again").addEventListener("click",function(){ replay(); $("game").scrollIntoVi
 hud();
 })();
 </script>
-<script src="../songswitch.js?v=ms2"></script>
+<script src="../songswitch.js?v=ms3"></script>
 <script>
 /* Storm Run sound (2026-10-21): his songs Energy + Cheat Code (🎵 pill or M key switches) over a low storm bed
    (rain hiss, patter, a slow deep rumble) and a soft thunder roll on each lightning strike. Plays only during a run;
@@ -817,7 +823,7 @@ var on=true; try{ on=localStorage.getItem("sb-sound")!=="0"; }catch(e){}
 var ctx=null, out, storm, heli, nb, was=null, musOn=true, fxOn=true, mus;
 /* shortcut: raw.githack previews refuse audio files (403), so a preview loads the songs from jsDelivr at the same commit; the live site uses the relative path */
 var gh=/^\/antidotethecure\/antidotethecure\.github\.io\/([^\/]+)\//.exec(location.hostname.indexOf("githack")>=0?location.pathname:""), AU=gh?"https://cdn.jsdelivr.net/gh/antidotethecure/antidotethecure.github.io@"+gh[1]+"/demo/storm-burger/audio/":"audio/";
-var MS=SongSwitch({key:"sb-song",vol:.5,fade:.8,songs:[{id:"energy",name:"Energy",src:AU+"energy.m4a"},{id:"cheat",name:"Cheat Code",src:AU+"cheat-code.m4a"}],onTap:unlock});
+var MS=SongSwitch({key:"sb-song",vol:.5,fade:.8,playlist:true,songs:[{id:"energy",name:"Energy",src:AU+"energy.m4a"},{id:"cheat",name:"Cheat Code",src:AU+"cheat-code.m4a"}],onTap:unlock});
 function unlock(){
   if(ctx){ if(ctx.state!=="running") ctx.resume(); return; }
   var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
@@ -880,7 +886,7 @@ lbl(); MS.button(document.getElementById("sbaud"),"","");
 <script src="fx.js?v=fx2"></script>
 <script src="kitchen.js?v=k4"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="storm3d.js?v=sb3d19"></script>
+<script type="module" src="storm3d.js?v=sb3d20"></script>
 <script src="../contract.js"></script>
 <script>window.CRM_CFG={name:"StormBurger",offer:"Free fries with your next burger",perDollar:20,tiers:[[1000,"Free fries"],[1800,"Free shake"],[3000,"Free Classic StormBurger"],[4500,"Free combo"]],referral:{gift:"Free Classic StormBurger"},earn:{checkin:50,firstOrder:100,birthday:200,review:{pts:250,platform:"app"},referral:{join:150,friend:50,friendGift:"Free fries",first:100,every:25}},
  // Storm Run access. PHASE 1 (live default): free to play, no sign-up first; guests save their score + prize after the run with a member account (name + phone + email, one account per phone).

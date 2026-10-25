@@ -720,6 +720,7 @@ function frame(now){
     var hk=(it.type==="debris"||it.type==="twister")?hb():1; if(st.running&&!pit&&Math.abs(it.x-st.x)<(it.r+18)*hk&&near(it.y-py,(it.r+28)*hk)){
       if(it.type==="egg"){ var eb=ReviewEgg.collect(); st.score+=eb; pop(it.x,it.y-20,"+"+eb+" 📺 "+T("Antidote's review"),"#FFD23F"); }
       else if(it.type==="driz"){ st.dz++; st.score+=25; pop(it.x,it.y,"✦ "+Math.min(st.dz,DRIZ_N)+"/"+DRIZ_N+" "+T("Antidote Drizzle"),"#FFD23F");
+        if(st.dz===DRIZ_N&&window.SB_CLAMP) SB_CLAMP();   // 5 of 5: CLAMP! in his voice
         if(st.dz===DRIZ_N&&window.ReviewEgg) ReviewEgg.toast("✦ "+T("Review unlocked!"),T("Antidote's StormBurger review is on a billboard up ahead. Drive through its golden ▶")); }
       else if(it.type==="coin"){ st.score+=10; st.coins++; pop(it.x,it.y,"+10","#FFD23F"); }
       else if(it.type==="food"){ st.score+=it.f.p; pop(it.x,it.y,"+"+it.f.p+" "+T(it.f.n),"#FFD23F"); }
@@ -846,6 +847,7 @@ function unlock(){
   src(.45).connect(rl).connect(g(.9)).connect(storm);                         // slow deep rumble / wind
   heli=g(0); heli.connect(out); var am=g(.5), hl=ctx.createOscillator(), hd=g(.5); hl.type="square"; hl.frequency.value=10.5; hl.connect(hd); hd.connect(am.gain); hl.start();
   src(.6).connect(flt("lowpass",360,.8)).connect(am).connect(heli);            // the helicopter overhead: low rotor thwop
+  loadClamp();
   tire=g(0); tire.connect(out); tbp=flt("bandpass",1400,1.1); src(1.25).connect(tbp).connect(tire); src(.5).connect(flt("lowpass",260,.7)).connect(g(.5)).connect(tire);   // wet tires skirting across the lane
 }
 var wb=null, sir=null, tire=null, tbp=null;
@@ -856,6 +858,9 @@ function burst(buf,t,rate,type,f0,f1,peak,len,off){ var x=ctx.createBufferSource
   gg.gain.setValueAtTime(0,t); gg.gain.linearRampToValueAtTime(peak,t+.004); gg.gain.exponentialRampToValueAtTime(.001,t+len);
   x.connect(lp).connect(gg).connect(out); x.start(t,off||0); x.stop(t+len+.1); }
 /* the bolt lands: a sharp crack (two snaps of white noise) right away, then the low roll of thunder */
+/* his "CLAMP!" (the same recording as the Drizzle Bowl strike), played when the 5th Antidote Drizzle is caught (10-25) */
+var clampBuf=null; function loadClamp(){ if(clampBuf||!ctx||!window.fetch) return; fetch(AU+"clamp.mp3").then(function(r){ return r.arrayBuffer(); }).then(function(b){ return new Promise(function(ok,no){ ctx.decodeAudioData(b,ok,no); }); }).then(function(d){ clampBuf=d; }).catch(function(){}); }
+window.SB_CLAMP=function(){ if(!ctx||!on||!fxOn||!clampBuf) return; var x=ctx.createBufferSource(), gg=ctx.createGain(); x.buffer=clampBuf; gg.gain.value=1.45; x.connect(gg).connect(out); x.start(); };
 window.SB_THUNDER=function(){ if(!ctx||!was||!fxOn) return; var t=ctx.currentTime;
   burst(white(),t,1,"highpass",900,300,.42,.28); burst(white(),t+.05,.8,"bandpass",2400,500,.28,.22,.3);
   burst(nb,t+.08,.3+Math.random()*.15,"lowpass",900,80,.4,3.2,Math.random()*2); };

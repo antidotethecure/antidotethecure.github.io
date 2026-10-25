@@ -3006,8 +3006,11 @@ function shadowTier(n){
   const cores=navigator.hardwareConcurrency||0;   /* 0 means it would not say, not that it is slow */
   shadowTier(mob?(cores>=6?2:1):(cores&&cores<=2?1:2));
 })();
-let _qSum=0,_qN=0,_qT=0,_qBad=0;
+let _qSum=0,_qN=0,_qT=0,_qBad=0,_qPend=null;
 function qualWatch(dt,nw){
+  /* a tier change recompiles every shader (a long freeze on an iPhone), so it waits for a calm moment:
+     pins settled, no replay running (10-25: "make sure nothing freezes") */
+  if(_qPend!=null){ if(settled()&&!RPL.on){ const n=_qPend;_qPend=null; if(shadowTier(n)<=0){SHAD.locked=true;try{localStorage.setItem('adbShad2','0');}catch(e){}} } return; }
   if(SHAD.locked||SHAD.tier<=0)return;
   if(!_qT){_qT=nw+4;return;}          /* the first seconds are loading, not drawing */
   if(nw<_qT)return;
@@ -3015,9 +3018,7 @@ function qualWatch(dt,nw){
   if(_qN<40)return;
   const avg=_qSum/_qN;_qSum=0;_qN=0;
   if(avg>0.034){                       /* under 30 fps two windows running: give some frames back */
-    if(++_qBad>=3){_qBad=0;
-      if(shadowTier(SHAD.tier-1)<=0){SHAD.locked=true;try{localStorage.setItem('adbShad2','0');}catch(e){}}
-    }
+    if(++_qBad>=3){_qBad=0;_qPend=SHAD.tier-1;}
   }else _qBad=0;
 }
 
@@ -4985,6 +4986,24 @@ function makeTruck(){const g2=new THREE.Group();
   g2.visible=false;scene.add(g2);
   return {grp:g2,wheels,lRed,lBlue,lightR,lightB,gun,tip,gR,gB,headL};}
 let truck=null,dept=null,hoseCamOn=false;
+/* smooth (10-25): a light inside a group that gets hidden/shown changes the scene's light count, and three recompiles EVERY
+   shader when that happens -- a freeze the first time the fire ball rolls or the fire truck pulls up. These lights now live in
+   the scene for good and follow an anchor in their old group; hidden group = light at 0. The truck is built while loading. */
+const LIGHTPIN=[];
+function anchorLight(L){if(!L||!L.parent||L.parent===scene)return;const a=new THREE.Object3D();a.position.copy(L.position);L.parent.add(a);scene.add(L);L.userData.anchor=a;LIGHTPIN.push(L);}
+function visChain(o){let n=0;while(o&&n++<20){if(!o.visible)return false;if(o===scene)return true;o=o.parent;}return false;}
+function lightPinTick(){for(const L of LIGHTPIN){const a=L.userData.anchor;a.getWorldPosition(L.position);
+  if(!visChain(a)){if(!L.userData.off){L.userData.keep=L.intensity;L.userData.off=1;}L.intensity=0;}
+  else if(L.userData.off){L.userData.off=0;if(L.intensity===0)L.intensity=L.userData.keep||0;}}}
+try{truck=makeTruck();anchorLight(truck.headL);anchorLight(truck.lightR);anchorLight(truck.lightB);}catch(e){console.warn('truck preload',e);}
+anchorLight(fireL);
+/* warm-up: while the lane is idle after loading, compile every hidden thing (fire ball, fire truck, flames, bonus props) and
+   upload its textures, so the first fire ball / truck / replay doesn't freeze the frame */
+function warmAll(){try{const hid=[],cull=[];scene.traverse(o=>{if(!o.visible){hid.push(o);o.visible=true;}if(o.frustumCulled){cull.push(o);o.frustumCulled=false;}});
+  renderer.compile(scene,cam);
+  scene.traverse(o=>{const ms=o.material?[].concat(o.material):[];ms.forEach(m=>{if(!m)return;for(const k of ['map','emissiveMap','alphaMap','normalMap','roughnessMap','bumpMap','metalnessMap'])if(m[k]&&m[k].isTexture&&!m[k].isVideoTexture&&m[k].image)try{renderer.initTexture(m[k]);}catch(e){}});});
+  hid.forEach(o=>o.visible=false);cull.forEach(o=>o.frustumCulled=true);}catch(e){console.warn('warm',e);}}
+setTimeout(warmAll,2500);setTimeout(warmAll,9000);   /* again once late images have arrived (only new things cost anything) */
 const D_IN=1.7,D_FIRE=5.3,D_BOWL=6.7,D_OUT=8.6,P0=[3.3,-10.0],P1=[0.42,-14.05];
 function fireDept(){if(!truck)truck=makeTruck();dept={t:0,tgt:null,tT:0,ballT:0,soaked:false};truck.grp.visible=true;hoseCamOn=false;}
 function easeIO(u){return u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;}
@@ -6901,7 +6920,7 @@ function render(gs){
     if(ballShadow){ballShadow.visible=ballMesh.visible&&ballBody.position.y<0.5;ballShadow.position.set(bI.x,0.003,bI.z);
       ballShadow.scale.setScalar(SHAD.dk);ballShadow.material.opacity=0.46*SHAD.da;}}
   if(!RPL.on)rplSnap(nw);
-  qualWatch(dt,nw);shadowSchedule(gs);
+  lightPinTick();qualWatch(dt,nw);shadowSchedule(gs);
   ambient(dt,gs);cosmicApply(dt,gs);skyTick(dt);tickPuddles(dt);
   renderer.setViewport(0,0,LW,VH);renderer.setScissor(0,0,LW,VH);
   renderer.render(scene,cam);

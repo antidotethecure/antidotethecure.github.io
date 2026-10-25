@@ -148,10 +148,11 @@ export function makeProps(THREE, opt = {}) {
 
   // Antidote Drizzle coin: gold rim, his logo on both faces
   const DRIZ = new Image(); let drizTex = null;
-  function driz(w = 46) { if (!drizTex) { drizTex = ctex(256, 256, (x, W2, H2) => { const g = x.createRadialGradient(128, 110, 10, 128, 128, 128); g.addColorStop(0, "#2b2f6e"); g.addColorStop(1, "#0c0e2a"); x.fillStyle = g; x.fillRect(0, 0, W2, H2);
-        x.strokeStyle = "#ffd23f"; x.lineWidth = 14; x.beginPath(); x.arc(128, 128, 118, 0, TAU); x.stroke(); if (DRIZ.complete && DRIZ.naturalWidth) { const a = DRIZ.naturalHeight / DRIZ.naturalWidth, dw = 190; x.drawImage(DRIZ, 128 - dw / 2, 128 - dw * a / 2, dw, dw * a); } });
+  function driz(w = 46) { if (!drizTex) { drizTex = ctex(256, 256, (x, W2, H2) => { const g = x.createRadialGradient(100, 80, 8, 128, 128, 132); g.addColorStop(0, "#fff6c2"); g.addColorStop(.35, "#ffd23f"); g.addColorStop(.75, "#e09a12"); g.addColorStop(1, "#9a5a06"); x.fillStyle = g; x.fillRect(0, 0, W2, H2);   // solid gold coin face (10-24: "spinning in gold, very noticeable")
+        x.strokeStyle = "#7a4604"; x.lineWidth = 12; x.beginPath(); x.arc(128, 128, 116, 0, TAU); x.stroke(); x.strokeStyle = "#fff3b0"; x.lineWidth = 4; x.beginPath(); x.arc(128, 128, 104, 0, TAU); x.stroke();
+        if (DRIZ.complete && DRIZ.naturalWidth) { const a = DRIZ.naturalHeight / DRIZ.naturalWidth, dh = 176, dw = dh / a; x.shadowColor = "rgba(90,50,0,.85)"; x.shadowBlur = 10; x.shadowOffsetY = 3; x.drawImage(DRIZ, 128 - dw / 2, 128 - dh / 2, dw, dh); x.shadowColor = "transparent"; } });
       DRIZ.onload = () => drizTex.userData.redraw(); DRIZ.src = opt.drizzle || "img/game/antidote-logo.webp"; }
-    const face = new THREE.MeshStandardMaterial({ map: drizTex, roughness: .35, metalness: .3, emissive: 0xffffff, emissiveMap: drizTex, emissiveIntensity: .35 });
+    const face = new THREE.MeshStandardMaterial({ map: drizTex, roughness: .25, metalness: .55, emissive: 0xffffff, emissiveMap: drizTex, emissiveIntensity: .75 });
     const g = new THREE.CylinderGeometry(w / 2, w / 2, w * .09, 40); g.rotateX(Math.PI / 2); g.rotateZ(Math.PI / 2);   // faces toward ±z, logo upright
     const m = new THREE.Mesh(g, [M.gold, face, face]); const o = new THREE.Group(); o.add(m); return o; }
 

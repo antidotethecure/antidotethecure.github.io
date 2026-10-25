@@ -746,7 +746,7 @@ async function boot() {
   /* ---------- pickups, hazards ---------- */
   const SPRT = {}; S.FOOD.map(f => f.k).concat(["cow", "stop", "smoke"]).forEach(k => SPRT[k] = img("img/game/" + k + ".webp"));
   // StormBurger's menu, the cow, the stop sign and the drizzle coin as real 3D models (food3d.js); built + compiled up front so nothing hitches mid-run
-  const PROPS = (await import("./food3d.js?v=f3")).makeProps(THREE, { aniso: ANISO });
+  const PROPS = (await import("./food3d.js?v=f4")).makeProps(THREE, { aniso: ANISO });
   try { const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js"), gl = await new GLTFLoader().loadAsync("img/3d/cow.glb");   /* photoreal cow mesh (Higgsfield, 10-21); the drawn cow stays as fallback */
     gl.scene.traverse(m => { if (m.isMesh) { m.geometry.computeVertexNormals(); m.material.roughness = .85; if (m.material.map) m.material.map.anisotropy = ANISO; } }); PROPS.setModel("cow", gl.scene); } catch (e) { console.warn("cow.glb", e); }
   { const warm = new THREE.Group(); PROPS.kinds.forEach((k, i) => { const o = PROPS.fit(k, 50); o.position.set((i - 5) * 30, 20, -200); warm.add(o); }); const dz0 = PROPS.driz(40); dz0.position.set(0, 30, -220); warm.add(dz0);
@@ -848,9 +848,31 @@ async function boot() {
      A second review is a second entry in window.SB_REVIEWS ({dir, clips}); the boards take turns between them. ---------- */
   const REVIEWS = window.SB_REVIEWS || [{ dir: "img/review/clips/", clips: ["c14", "c13", "c16", "c12", "c15", "c10", "c11"] }];
   let BBM = null, bbT = 8, bbSide = 1, bbN = 0; const bbC = REVIEWS.map(() => 0);
+  /* LED sign over his review board (10-24): "ANTIDOTETHEFOODIE.COM" in dot-matrix LEDs, gold letters on black, chasing border
+     lights; drawn once (crisp, 2048 wide on bigger screens), one shared material that pulses. */
+  const LEDTX = (() => { const W2 = LITE ? 1024 : 2048, H2 = W2 * .13, c = document.createElement("canvas"); c.width = W2; c.height = H2; const x = c.getContext("2d");
+    const m = document.createElement("canvas"), cols = 200, rows = Math.round(cols * H2 / W2) - 2; m.width = cols; m.height = rows; const y = m.getContext("2d");
+    y.fillStyle = "#fff"; y.textAlign = "center"; y.textBaseline = "middle"; let fz = rows; y.font = "900 " + fz + "px Arial Black,Arial,sans-serif"; while (y.measureText("ANTIDOTETHEFOODIE.COM").width > cols - 6 && fz > 6) y.font = "900 " + (--fz) + "px Arial Black,Arial,sans-serif";
+    y.fillText("ANTIDOTETHEFOODIE.COM", cols / 2, rows / 2 + 1); const px = y.getImageData(0, 0, cols, rows).data, cs = W2 / cols, oy = (H2 - rows * cs) / 2;
+    x.fillStyle = "#050507"; x.fillRect(0, 0, W2, H2);
+    for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) { const on = px[(j * cols + i) * 4 + 3] > 110, cx = (i + .5) * cs, cy = oy + (j + .5) * cs;
+      if (on) { const g = x.createRadialGradient(cx, cy, 0, cx, cy, cs * .62); g.addColorStop(0, "#fffbe0"); g.addColorStop(.45, "#ffd23f"); g.addColorStop(1, "rgba(255,150,20,0)"); x.fillStyle = g; x.fillRect(cx - cs, cy - cs, cs * 2, cs * 2); }
+      else { x.fillStyle = "#16130c"; x.beginPath(); x.arc(cx, cy, cs * .3, 0, TAU); x.fill(); } }   // unlit LEDs, like a real board
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = ANISO; return t; })();
+  const ledM = new THREE.MeshBasicMaterial({ map: LEDTX, toneMapped: false }), ledDotM = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, .5, .4), toneMapped: false }), ledDotOff = new THREE.MeshBasicMaterial({ color: 0x2a0a08 });
+  function ledSign(b, w, y) { const g = new THREE.Group(); g.position.y = y; b.add(g);
+    add(g, BOX, MAT.dark, w + 10, w * .13 + 10, 4, 0, 0, -2.5);   // housing
+    add(g, PLANE, ledM, w, w * .13, 1, 0, 0, .2);
+    const dots = []; for (let i = 0; i < 36; i++) { const u = i / 36, per = 2 * (w + 6) + 2 * (w * .13 + 6), d = u * per, hw = (w + 6) / 2, hh = (w * .13 + 6) / 2;   // chasing bulbs around the frame
+      const p = d < w + 6 ? [-hw + d, hh] : d < w + 6 + 2 * hh ? [hw, hh - (d - w - 6)] : d < 2 * (w + 6) + 2 * hh ? [hw - (d - w - 6 - 2 * hh), -hh] : [-hw, -hh + (d - 2 * (w + 6) - 2 * hh)];
+      dots.push(add(g, GEO("Sphere", 1, 6, 4), ledDotM, 1.6, 1.6, 1.6, p[0], p[1], 1.2)); }
+    LEDS.push(dots); }
+  const LEDS = [];
+  function ledTick(t) { ledM.color.setScalar(1.05 + .18 * Math.sin(t * 5)); const k = Math.floor(t * 14);
+    for (let s = LEDS.length - 1; s >= 0; s--) { const dots = LEDS[s]; if (!dots[0].parent || !dots[0].parent.parent || !dots[0].parent.parent.parent) { LEDS.splice(s, 1); continue; } dots.forEach((d, i) => d.material = (i + k) % 4 === 0 ? ledDotOff : ledDotM); } }
   function spawnBoard() { const r = bbN++ % REVIEWS.length, R = REVIEWS[r], src = R.dir + R.clips[bbC[r]++ % R.clips.length];
     if (!BBM) BBM = BBMOD.makeVideoBoards(THREE, { src: src + ".mp4", poster: src + ".jpg" }); else { BBM.video.src = src + ".mp4"; const pl = BBM.video.play(); if (pl && pl.catch) pl.catch(() => {}); }
-    const b = BBM.create({ w: 190, pole: 130, caption: "ANTIDOTE FOOD REVIEW · STORMBURGER" }), g = new THREE.Group(); b.position.x = bbSide * 262; b.rotation.y = -bbSide * .42; g.add(b);
+    const b = BBM.create({ w: 190, pole: 130, caption: "ANTIDOTE FOOD REVIEW · STORMBURGER" }), g = new THREE.Group(); ledSign(b, 210, 130 + 190 * 16 / 9 + 26); b.position.x = bbSide * 262; b.rotation.y = -bbSide * .42; g.add(b);
     place(g, front[bbSide > 0 ? 1 : 0] + 40); bbSide = -bbSide; }
   
   /* ---------- per-object views ---------- */
@@ -877,7 +899,7 @@ async function boot() {
       box(v.o, std(0x23262c, { roughness: .6 }), 92, 2.4, 9, 0, 1.4, 0); [-48, 48].forEach(x => box(v.o, std(0xffd23f, { emissive: 0x5a4a00 }), 8, 4, 11, x, 2, 0));
       const sm = std(0xd9dde3, { metalness: .9, roughness: .25 }), cg = GEO("Cone", 1, 1, 5); for (let i = 0; i < 15; i++) [-2.5, 2.5].forEach(z => add(v.o, cg, sm, 1.6, 6, 1.6, -42 + i * 6, 5.5, z));
       const sg = add(v.o, PLANE, glowPlaneMat(0xffd23f, .25), 120, 40, 1, 0, 1.2, 0); sg.rotation.x = -Math.PI / 2; }
-    else if (kind === "driz") { v.o = new THREE.Group(); v.m = PROPS.driz(50); v.o.add(v.m); const gl = new THREE.Sprite(goldGlow); gl.scale.set(120, 120, 1); v.o.add(gl); }
+    else if (kind === "driz") { v.o = new THREE.Group(); v.m = PROPS.driz(82); v.o.add(v.m); const gl = new THREE.Sprite(goldGlow); gl.scale.set(230, 230, 1); v.o.add(gl); v.gl = gl; }   // big gold Antidote Drizzle, hard to miss
     else if (kind === "queue") { v.o = new THREE.Group(); v.cars = []; for (let i = 0; i < o.n; i++) { const c = makeCar(i + o.q * 4); v.o.add(c); v.cars.push(c); }   // the drive-thru line, with its StormBurger at the front
       const st2 = store(1, storeFor(o.q), false); v.st = st2.o; v.o.add(v.st); }
     else if (kind === "pit") { v.o = new THREE.Group(); const J = jordan(1, false); J.o.position.z = -260; v.o.add(J.o);   // Jordan High School behind its pit bay (the bay lines up with the truck when you pull in)
@@ -978,7 +1000,7 @@ async function boot() {
         ["twister", { orb: [{ d: D("cow"), a: 0 }, { d: D("stop"), a: 3 }] }]].forEach(([k, o]) => fake.push([o, viewFor(o, k)]));
       ["ing", "lb"].forEach(cy => { city = cy; const o = {}; fake.push([o, viewFor(o, "cop")]); });
       S.FOOD.forEach(f => { const o = { f }; fake.push([o, viewFor(o, "food")]); });
-      g.add(makeStrike(0).g, makeTwister(2.8).g); CLOUDS.update(0, .5, 0);
+      g.add(makeStrike(0).g, makeTwister(2.8).g); ledSign(g, 210, 0); CLOUDS.update(0, .5, 0);
       g.position.z = 6000; scene.add(g);   // behind the camera: drawn (frustum culling off) but never seen
       const hid = []; scene.traverse(o => { if (first && !o.visible) { hid.push(o); o.visible = true; } if (o.frustumCulled) { o.frustumCulled = false; o.userData.fc = 1; } });   // hidden bits (heli, lane glows, fire) need programs too
       // draw exactly the way a game frame does (through the rain-lens target when it's on), so the compiled shader variants match
@@ -1008,7 +1030,7 @@ async function boot() {
     const dz = (pitting ? 0 : run ? st.speed * KF : st.dying ? Math.max(0, st.speed * KF * (1 - (now - st.dying) / 900)) : 2.5) * k;
     const dzw = dz + warp; warp = 0; odo += dzw; roadTex.offset.y += dzw / RT; roadRough.offset.y = roadTex.offset.y;
     for (let i = live.length - 1; i >= 0; i--) { const L = live[i]; L.o.position.z += dzw; if (L.upd && L.o.position.z > -1900) L.upd(L.o, t, dt); if (L.o.position.z > 900) { world.remove(L.o); live.splice(i, 1); } }
-    neonTick(t); if (run && !pitting) { bbT -= dt; if (bbT <= 0) { spawnBoard(); bbT = 10 + Math.random() * 5; }   /* his review rolls by every 10-15 s (10-24) */ } if (BBM) BBM.update(t);
+    neonTick(t); if (run && !pitting) { bbT -= dt; if (bbT <= 0) { spawnBoard(); bbT = 10 + Math.random() * 5; }   /* his review rolls by every 10-15 s (10-24) */ } if (BBM) BBM.update(t); ledTick(t);
     front[0] += dzw; front[1] += dzw; evtIn -= dz; if (evtIn <= 0) { event(); evtIn = SPACING; } fill();
 
     /* truck */
@@ -1077,7 +1099,7 @@ async function boot() {
         v.orbs.forEach(q => { const a = q.ob.a, ox = it.x + Math.cos(a) * S.ORB_R, oy = it.y + Math.sin(a) * S.ORB_R * S.ORB_SQ, hgt = .5 + .5 * Math.sin(a * 2 + it.ph);   // same orbit the hit test uses (index.html orbPos)
           q.g.position.set(wx(ox), 0, wz(oy)); q.m.position.y = 55 + 60 * hgt; q.m.rotation.set(q.ob.d.k === "cow" ? Math.sin(t * 2 + it.ph) * .6 : 0, -a * (it.spin || 1) + Math.PI / 2, q.ob.d.k === "stop" ? t * 3 : Math.sin(t * 3) * .3);
           q.g.visible = !q.ob.hit || (now % 200 < 100); q.sh.scale.setScalar(.6 + .4 * (1 - hgt)); }); }
-      else if (it.type === "driz") { v.o.position.set(x, 42 + Math.sin(now / 220 + it.x) * 5, z); v.m.rotation.y = now / 380; }
+      else if (it.type === "driz") { v.o.position.set(x, 64 + Math.sin(now / 220 + it.x) * 8, z); v.m.rotation.y = now / 240; const pu = 1 + .18 * Math.sin(now / 140); v.gl.scale.set(230 * pu, 230 * pu, 1); if (Math.random() < .25) fx.emit(V.set(x + (Math.random() - .5) * 70, 64 + (Math.random() - .5) * 70, z), V2.set(0, 20, 0), .5, 6, 1, [1, .95, .6], [1, .75, .2], 1, true, 2, 1, 0); }   // spins fast + gold sparkles
       else if (it.type === "queue") { v.o.position.set(0, 0, 0); const sp = it.len / it.n;
         v.cars.forEach((c, i) => { const y = it.y - it.len / 2 + sp * (i + .5); c.position.set(LANEX[LANEX.length - 1] + Math.sin(i * 1.7) * 5, 0, (y - PY) * KF); c.rotation.y = Math.sin(i * 2.3) * .04; });
         v.st.position.z = (it.y - it.len / 2 - PY) * KF - 60; }
@@ -1134,5 +1156,6 @@ async function boot() {
   STATUS.sfTest = z => { const g = new THREE.Group(), P = []; storefronts(g, 1, 500, P); g.position.z = z; scene.add(g); return g; };   // test hook: a storefront row beside the road
   STATUS.lmTest = n => event({ R: { queenMary, villa, parkers, dome, jordan }[n] });   // test hook: put one of the new landmarks on the road ahead   // test hook: put the landmark of level n on the road ahead now
   STATUS.mem = () => Object.assign({ programs: renderer.info.programs.length }, renderer.info.memory);   // debug: GPU objects alive
+  STATUS.ledImg = () => LEDTX.image.toDataURL("image/png");   // debug: the LED sign artwork
   STATUS.booted = true;
 }

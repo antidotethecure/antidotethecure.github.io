@@ -59,6 +59,11 @@
     "box-shadow:0 6px 20px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}" +
     ".ssai-lockbtn i{font-style:normal;font-size:20px;line-height:1}.ssai-lockbtn.on{display:flex}" +
     ".ssai-lockbtn.lk{background:#ffd23f;color:#14171c;border-color:rgba(0,0,0,.2)}" +
+    // locked = just the game (Antidote 10-25): the side buttons slide off to the right; only a slim yellow tab of the lock stays
+    // at the edge, tap it to unlock and everything slides back
+    ".ssai-fsbtn,.gm-mbtn,.ssai-pausebtn,.ssai-lockbtn{transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s}" +
+    "html.ssai-locked .ssai-fsbtn,html.ssai-locked .gm-mbtn,html.ssai-locked .ssai-pausebtn,html.ssai-locked .ssai-lockhint{transform:translateX(calc(100% + 48px))!important;opacity:0!important;pointer-events:none!important}" +
+    "html.ssai-locked .ssai-lockbtn{transform:translateX(32px);opacity:.75;border-radius:12px 0 0 12px}" +
     ".ssai-lockhint{position:fixed;right:calc(70px + env(safe-area-inset-right,0px));bottom:calc(166px + env(safe-area-inset-bottom,0px));z-index:2147483001;" +
     "max-width:min(240px,calc(100vw - 96px));padding:9px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(14,17,30,.94);color:#fff;" +
     "font:700 13px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;text-align:left;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.35);" +

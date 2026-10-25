@@ -87,7 +87,7 @@ export function makeSky(THREE, O) {
     if (O.sun) { O.sun.color.copy(info.sunCol); O.sun.intensity = info.sunI; const L = info.night > .5 ? U.uMoonDir.value : sd; O.sun.position.copy(O.sunTarget || new THREE.Vector3()).addScaledVector(L, 900); if (info.night > .5) { O.sun.color.setRGB(.55, .65, 1); O.sun.intensity = .35 * (1 - (weather ? weather.overcast : 0) * .8); } }
     if (O.hemi) { O.hemi.color.copy(info.zenith).lerp(new THREE.Color(1, 1, 1), .35).multiplyScalar(info.night > .5 ? .55 : 1); O.hemi.groundColor.copy(info.horizon).multiplyScalar(.45); O.hemi.intensity = Math.max(.12, .22 + 1.1 * (1 - info.night) - (weather ? weather.dark * .4 : 0)); }
     // environment map: re-render the sky into a PMREM when the sun has moved or the weather changed
-    const now = performance.now(); if (O.env !== false && (envSun.distanceTo(sd) > .03 || Math.abs((weather ? weather.overcast : 0) - (envSun.ov || 0)) > .08) && now - envT > (O.envEvery || 1500)) {
+    const now = performance.now(); if (O.env !== false && (envSun.distanceTo(sd) > .03 || Math.abs((weather ? weather.overcast : 0) - (envSun.ov || 0)) > .08) && now - envT > (O.envEvery || 1500) && (!O.envOK || O.envOK())) {   // envOK: the game can hold the re-bake (a PMREM bake is a frame hitch on phones) until it's not mid-run
       envT = now; envSun.copy(sd); envSun.ov = weather ? weather.overcast : 0; mat.uniforms.uDisc.value = 0;
       const rt = pm.fromScene(envScene, 0, .1, 1000); if (envRT) envRT.dispose(); envRT = rt; scene.environment = rt.texture; mat.uniforms.uDisc.value = 1; }
   }

@@ -131,7 +131,7 @@ async function boot() {
   let SKY = null, CLOUDS = null, WX = null, POST = null, MIRROR = null, AMB = null, FLYN = 0, todH = Q.get("tod") ? +Q.get("tod") : TOD[SKYPREF()] || 18.35;
   if (CHASE) {
     const RT = CAPS.half ? THREE.HalfFloatType : THREE.UnsignedByteType;
-    SKY = SKYM && safe("sky", () => SKYM.makeSky(THREE, { renderer, scene, sun, hemi, hours: todH, azimuth: -.42, envEvery: SMOOTH ? 90000 : QUAL.tier === "low" ? 30000 : 1500 }));   // re-baking the sky reflections is a hitch on phones: rarely on low
+    SKY = SKYM && safe("sky", () => SKYM.makeSky(THREE, { renderer, scene, sun, hemi, hours: todH, azimuth: -.42, envEvery: SMOOTH ? 90000 : QUAL.tier === "low" ? 30000 : 1500, envOK: SMOOTH ? () => !M.G().running : null }));   // re-baking the sky reflections is a hitch on phones: rarely on low
     CLOUDS = SKY && CLDM && CAPS.gl2 && CAPS.half && QUAL.cfg.clouds && QUAL.tier !== "low" ? safe("clouds", () => CLDM.makeClouds(THREE, { renderer, sky: SKY, quality: QUAL.cfg.clouds, rtType: RT })) : null;
     const wp = WXPREF(); WX = WXM && safe("weather", () => WXM.makeWeather(THREE, { scene, state: wp === "live" ? "partly" : wp, auto: wp === "live", quality: { rain: QUAL.cfg.rain }, airflow: () => (M.G().gsp || 0) * 60 }));
     POST = CLOUDS && POSTM ? await safeA("post", () => POSTM.makePost(THREE, { renderer, scene, camera: cam, clouds: CLOUDS, quality: Object.assign({}, QUAL.cfg.post, CAPS.half ? {} : { ssao: false, bloom: false }), width: W, height: H, pixelRatio: renderer.getPixelRatio(), rtType: RT })) : null;

@@ -10,12 +10,12 @@
   var T = function (s) { return (window.__T || String)(s); };
   var IMG = "img/build/", TIME = 20000;
   var ING = { bun_bottom: "Bottom bun", bun_top: "Top bun", patty: "Patty", cheese: "Cheese", lettuce: "Lettuce", tomato: "Tomato", onion: "Onion",
-    pickles: "Pickles", pickles_crinkle: "Crinkle pickles", bacon: "Bacon", onion_straws: "Onion straws", chicken: "Chicken" };
+    pickles: "Pickles", pickles_crinkle: "Crinkle pickles", bacon: "Bacon", onion_straws: "Onion straws", chicken: "Chicken", slaw: "Coleslaw" };
   var ORDERS = [
     ["Classic StormBurger", ["bun_bottom", "patty", "cheese", "pickles", "onion", "tomato", "lettuce", "bun_top"]],
     ["Kids Burger", ["bun_bottom", "patty", "cheese", "bun_top"]],
     ["Bacon BBQ Burger", ["bun_bottom", "patty", "cheese", "bacon", "onion_straws", "bun_top"]],
-    ["Chicken Sandwich", ["bun_bottom", "pickles_crinkle", "chicken", "bun_top"]],
+    ["Chicken Sandwich", ["bun_bottom", "pickles_crinkle", "chicken", "slaw", "lettuce", "bun_top"]],
     ["Turkey Burger", ["bun_bottom", "onion", "patty", "cheese", "tomato", "lettuce", "bun_top"]],
     ["Double Classic", ["bun_bottom", "patty", "cheese", "patty", "cheese", "bun_top"]]];
   var KIDS = ["🧑🏾", "👦🏽", "👧🏿", "🧒🏻", "👩🏾", "👦🏿"];
@@ -26,7 +26,7 @@
     ".sbk .tk h4{margin:0 0 4px;font:900 14px Archivo,system-ui}.sbk .tk ol{margin:0;padding-left:18px;font-size:11.5px;line-height:1.45}.sbk .tk li.ok{color:#1e9a52;text-decoration:line-through}.sbk .tk li.nx{font-weight:900;color:#d9262f}" +
     ".sbk .st{position:relative;width:46%;min-height:150px}.sbk .st img{position:absolute;left:50%;transform:translateX(-50%);filter:drop-shadow(0 3px 3px rgba(0,0,0,.45));transition:bottom .12s}" +
     ".sbk .sc{display:flex;justify-content:space-around;padding:6px 10px;font-weight:800}.sbk .sc span b{color:#FFD23F}" +
-    ".sbk .gr{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:4px 10px 6px;flex:1;align-content:start}" +
+    ".sbk .gr{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:4px 10px 6px;flex:1;align-content:start}" +
     ".sbk .gr button{background:#1a2656;border:1px solid #33437f;border-radius:10px;color:#EEF2FF;padding:3px 2px 4px;font:700 10px Archivo,system-ui;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}" +
     ".sbk .gr button img{width:100%;height:34px;object-fit:contain}.sbk .gr button.bad{animation:sbkx .3s}.sbk .gr button.hit{background:#1e6b3e}" +
     "@keyframes sbkx{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}" +
@@ -54,13 +54,13 @@
     im.src = IMG + k + ".webp"; im.style.width = (W * wide) + "px";
     var prev = stack.lastChild, base = prev ? parseFloat(prev.dataset.top) : 4;
     im.style.bottom = base + "px"; im.style.zIndex = stack.children.length + 1; stack.appendChild(im);
-    var fit = function () { var h = im.getBoundingClientRect().height || W * .3, sink = /cheese|pickles|onion|tomato|lettuce/.test(k) ? .62 : /patty|chicken|bacon/.test(k) ? .5 : .45;
+    var fit = function () { var h = im.getBoundingClientRect().height || W * .3, sink = /cheese|pickles|onion|tomato|lettuce|slaw/.test(k) ? .62 : /patty|chicken|bacon/.test(k) ? .5 : .45;
       im.dataset.top = base + h * (1 - sink); };
     if (im.complete) fit(); else im.onload = fit; im.dataset.top = base + W * .12; }
   function pop(txt) { var p = $(".pop"); p.textContent = txt; p.style.opacity = 1; setTimeout(function () { p.style.opacity = 0; }, 650); }
   grid.addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b || !on) return;
     var k = b.dataset.k;
-    if (k !== order[1][step]) { b.classList.remove("bad"); void b.offsetWidth; b.classList.add("bad"); t0 -= 600; if (navigator.vibrate) try { navigator.vibrate(30); } catch (x) {} return; }   // wrong one costs 0.6 s
+    if (k !== order[1][step]) { b.classList.remove("bad"); void b.offsetWidth; b.classList.add("bad"); t0 -= 600; return; }   // wrong one costs 0.6 s
     b.classList.add("hit"); setTimeout(function () { b.classList.remove("hit"); }, 150);
     addLayer(k); step++;
     if (step >= order[1].length) { var s = window.__S.get(); served++; pts += 75; s.score += 75;
@@ -71,6 +71,6 @@
     if (left <= 0) return close(); raf = requestAnimationFrame(tick); }
   function close() { if (!on) return; on = false; cancelAnimationFrame(raf); el.classList.remove("on"); var d = done; done = null; if (d) d(served); }
   $(".go").addEventListener("click", close);
-  window.SB_KITCHEN = { open: function (cb) { if (on) return; on = true; done = cb; served = 0; pts = 0; t0 = performance.now(); newOrder(); el.classList.add("on"); tick(); },
+  window.SB_KITCHEN = { open: function (cb, ms) { if (on) return; on = true; done = cb; TIME = ms || 20000; served = 0; pts = 0; t0 = performance.now(); newOrder(); el.classList.add("on"); tick(); },
     get on() { return on; }, close: close };
 })();

@@ -1,5 +1,5 @@
 /* StormBurger storm FX: every 10–15s during a run the sky does something big.
-   1) Lightning strike: branching bolt, 2–3 white flickers, camera shake, cracked glass that heals.
+   1) Lightning strike: branching bolt, 2–3 white flickers, camera shake (no glass crack: only stop signs break the window).
    2) Tornado pass: dark funnel of spinning particle rings sweeps across, StormBurger junk orbiting it.
    3) Rainstorm: heavy rain, lens-like drops bead up on the glass, merge and slide, then a wiper clears them.
    Visual only: a pointer-events:none canvas on top of #game. It reads window.__S and never writes to it,
@@ -121,17 +121,15 @@ function drawCracks(C,grow,heal){
   c.restore();
 }
 function lightning(){
-  var S=makeStrike(), buzzed=false;
+  var S=makeStrike();
   return {dur:1.5,draw:function(t){
-    if(!buzzed){ buzzed=true; if(navigator.vibrate) try{ navigator.vibrate([40,30,60]); }catch(e){} }
     var fl=reduce?[[0,.12,.4]]:[[0,.06,.95],[.12,.18,.7],[.27,.34,.5]], on=0;
     fl.forEach(function(f){ if(t>=f[0]&&t<f[1]) on=f[2]; });
     var tail=t<.6?Math.max(0,.25*(1-t/.6)):0;
     flash(Math.max(on*0.75,tail),"#eef6ff");
     var ba=on>0?1:(t<.42?.35:clamp(1-(t-.42)/.15,0,1)*.35);
     if(ba>0) drawBolt(S,ba);
-    var grow=ease(t/.09), heal=clamp((t-.55)/.9,0,1); heal=heal*heal*(3-2*heal);
-    drawCracks(S.cr,grow,heal);
+    // no cracked glass or buzz on lightning: only a stop sign breaks the window (Antidote 10-23)
     if(t<.55){ var m=12*(1-t/.55); shake(rnd(-m,m),rnd(-m,m),rnd(-m,m)*.12); } else shake(0,0,0);
     return t>=1.5; }};
 }

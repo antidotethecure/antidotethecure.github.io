@@ -25,6 +25,8 @@
       '<p class="note" style="margin:0">' + esc(p.pitch) + '</p>' +
       '<details open><summary>What\'s included</summary><ul>' + p.includes.map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") + '</ul></details>' +
       '<div class="who"><b>Who does what:</b> ' + esc(p.who) + '</div>' +
+      (p.buy ? '<div class="btns"><a class="btn primary" href="' + p.buy + '" target="_blank" rel="noopener">Buy ' + esc(p.name) + ' · ' + usd(p.setup + p.monthly) + ' today</a></div>' +
+        '<p class="note" style="margin:6px 0 0">Pay in full by card through Stripe: ' + usd(p.setup) + ' setup + your first ' + usd(p.monthly) + ' month today, then ' + usd(p.monthly) + '/mo automatically. Want 50/50 or the flexible plan? Ask us and we\'ll send your own link.</p>' : '') +
       '<p class="note" style="margin:10px 0 0">Results promise: ' + R.returns + ' tracked return visits in a ' + R.day + '-day period within your first ' + R.windowMonths + ' months, or ' + R.freeMonths + ' months free.</p>' +
       '<p class="note" style="margin:4px 0 0">Performance share: ' + T.perf.pct + '% of only the app sales over ' + usd(T.perf.threshold) + ' in a month ($5,000 in app sales = $200; see 2A). Pay setup in full, 50/50, or from ' + usd(T.payment.flex.minDown) + ' down.</p></article>';
   }).join("");

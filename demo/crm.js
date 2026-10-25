@@ -760,7 +760,7 @@
       '<label>Friend\'s referral code (optional)</label><input name="ref" maxlength="16" autocapitalize="characters" value="' + e(INVITE) + '" placeholder="e.g. MARIA-21">' +
       '<label class="crm-optin"><input type="checkbox" name="ok"> <span>Send my rewards (points, prize and birthday codes) from ' + e(NAME) + ' to me by text or email. Msg & data rates may apply. Reply STOP anytime.</span></label>' + smsBox() +
       '<button class="go" type="submit">🎁 Get my reward</button><div class="err"></div></form>' +
-      '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + '</p>';
+      '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + ' <a href="' + e(privacyUrl()) + '" target="_blank" rel="noopener" style="color:#7FB3FF">Privacy</a>' + '</p>';
     join.onclick = function (ev) { var b = ev.target.closest("[data-a=earn],[data-a=restore]"); if (!b) return; if (b.dataset.a === "restore") openRestore(); else openEarn(); };
     join.querySelector("form").onsubmit = function (ev) {
       ev.preventDefault();
@@ -853,7 +853,7 @@
       '<button class="go" type="submit">' + e(T[2]) + '</button><div class="err" role="alert"></div>' +
       (m ? '' : '<button type="button" class="crm-elink" data-a="restore" style="text-align:center">📱 Already a member? Sign back in</button>') +
       '<button type="button" class="crm-gx">' + e(opts.later || "Not now") + '</button></form>' +
-      '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + '</p></section>';
+      '<p class="crm-fine">' + (C.sheet ? 'Your info goes only to ' + e(NAME) + ' for your rewards. Never sold.' : 'Demo: what you type stays on this phone only.') + ' <a href="' + e(privacyUrl()) + '" target="_blank" rel="noopener" style="color:#7FB3FF">Privacy</a>' + '</p></section>';
     var html = document.documentElement, prevOv = html.style.overflow, vv = window.visualViewport;
     function fit() { if (vv) { ov.style.height = vv.height + "px"; ov.style.top = vv.offsetTop + "px"; } }
     function key(ev) { if (ev.key === "Escape") close(); }
@@ -1127,6 +1127,10 @@
     return ov;
   }
   function rulesUrl() { return (SPIN && SPIN.rules) || (TC && TC.rules) || "rules.html"; }
+  // Privacy policy for the guest apps. CCPA/CPRA wants it reachable AT collection, and the fine print below
+  // makes a promise about the data, so the promise has to be readable. Shown in demo mode too: the policy
+  // covers what the restaurant's own sheet stores either way. Override per app with CRM_CFG.privacy.
+  function privacyUrl() { return C.privacy || "/legal/app-privacy.html"; }
   // "How to get tokens" sheet (Phase 2): balance, every free way, code box
   function tokSheet() {
     if (!ON || document.querySelector(".tok-ov")) return;

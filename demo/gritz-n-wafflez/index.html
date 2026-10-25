@@ -252,7 +252,13 @@ $("menuhost").innerHTML=MENU.map(function(c){
 </script>
 <script src="orderup.js?v=cs1"></script>
 <script>document.getElementById("again").addEventListener("click",function(){ document.getElementById("og").scrollIntoView({block:"start",behavior:"smooth"}); if(window.GameMenu) window.GameMenu.open(); else window.__OG.start(); });</script>
-<script>window.CRM_CFG={name:"Gritz N Wafflez",offer:"A free Kiki Palmer with your next N' Wafflez plate",tiers:[[250,"Free Kiki Palmer"],[450,"Free side of Smackin' Mac"],[700,"Free Original Collard Green Dip"],[1100,"Free N' Wafflez plate"]],referral:{gift:"Free Original Collard Green Dip"},
+<script>window.CRM_CFG={name:"Gritz N Wafflez",offer:"A free Kiki Palmer with your next N' Wafflez plate",tiers:[[250,"Free Kiki Palmer"],[450,"Free side of Smackin' Mac"],[700,"Free Original Collard Green Dip"],[1100,"Free N' Wafflez plate"]],
+  /* $ value of each reward, for the owner sheet's "rewards given" totals (retention-sheet/Code.gs). ALL ESTIMATES: gritznwafflez.com
+     publishes no prices. Confirm with Jurni, then edit here or in the sheet's Settings tab. */
+  rewardValues:{"A free Kiki Palmer with your next N' Wafflez plate":5,"Free Kiki Palmer":5,"Free side of Smackin' Mac":6,"Free Mac side":6,"Free Original Collard Green Dip":12,
+    "Free N' Wafflez plate":18,"Free Fried Cheese Gritz":8,"Free Sweet Gritz":8,"Free Chocolate Chip Waffle":10,"Free Fresh Squeezed OJ":6,"Free side of French Friez":5,
+    "$2 off a plate":2,"10% off order":2.5,"Free soft drink":3,"Weekly champion: half off your meal":12},
+  referral:{gift:"Free Original Collard Green Dip"},
  // Order Up! access. PHASE 1 (live default): free to play, no sign-up first; guests save their score + prize after the run with a member account (phone + email, one account per phone).
  // PHASE 2 (built, off): enabled:true → a play costs 10 tokens; tokens come with food purchases, +10 free every week and
  // +10 free on request once a day (no purchase necessary). ?tokens=1 previews Phase 2. Legal notes: see crm.js TOKENS block.

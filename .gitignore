@@ -15,3 +15,6 @@ __pycache__/
 
 # Keep the §36 directory skeleton itself under version control.
 !ANTIDOTE_PREDICTION_OS/*/.gitkeep
+
+# Claude Code worktrees (19 GB of checkout copies; never publish these).
+.claude/

@@ -153,7 +153,25 @@
     if (old) (m.ledger = m.ledger || []).unshift({ ts: Date.now(), pts: 0, t: "↪ Your " + old.toLocaleString() + " earlier points moved to your " + wname("food") + " balance", w: "food" });
     return true;
   }
-  var TIERS = WAL ? W.food.tiers : (C.tiers || TIERS0);
+  // ---- MAX REWARD VALUE (Christian, 2026-10-27) ----
+  // No reward may be worth more than ONE FULL MEAL: maxValue is the priciest entree on that restaurant's own menu
+  // (SSAI_REWARDS.maxValue, or CRM_CFG.maxValue on a page without the simple program). A guest can take that and
+  // anything under it, one a day (see the redeem handler below). A tier over the cap is not put on the ladder and the
+  // console names it, so whoever edited the config sees why. A tier with no declared dollar value can't be judged, so
+  // it stays: toast.max is the priciest item the reward covers, toast.amount the $ off the check.
+  function tierValue(t) { var b = (t && t[2]) || {}; return +(b.max != null ? b.max : b.amount) || 0; }
+  function capTiers(tiers, cap) {
+    if (!(cap > 0) || !tiers) return tiers;
+    return tiers.filter(function (t) {
+      var v = tierValue(t); if (v <= cap) return true;
+      try { console.warn('[rewards] "' + t[1] + '" is worth $' + v.toFixed(2) + ', over the $' + cap.toFixed(2) + ' max reward (one full meal) - not offered'); } catch (x) {}
+      return false;
+    });
+  }
+  var MAXV = +((SIMPLE && SIMPLE.maxValue) || C.maxValue) || 0;
+  var TIERS = capTiers(WAL ? W.food.tiers : (C.tiers || TIERS0), MAXV);
+  // the page's "How to earn" sheet and the game end screens read SSAI_REWARDS.tiers, so they show the same capped ladder
+  if (SIMPLE && SIMPLE.tiers && !WAL) SIMPLE.tiers = C.tiers = TIERS;
   var REF = { join: 50, first: 100, every: 20, goal: 3, gift: TIERS[0][1] };
   // visit levels: the more visits in a calendar month, the higher the level (bigger perk + points multiplier).
   // The numbers are samples; each restaurant sets its own in CRM_CFG.levels: [{visits, name, perk, mult}]
@@ -631,7 +649,7 @@
         '<div class="crm-box"><h4>🏆 Use your points</h4>' + TIERS.map(function (t, i) {
           return '<div class="crm-tier"><span><b>' + t[0].toLocaleString() + '</b> pts · ' + e(t[1]) + '</span><button type="button" data-redeem="' + i + '"' + (pts >= t[0] ? '' : ' disabled') + '>' + (pts >= t[0] ? (INTERIM ? 'Use reward' : 'Redeem') : (t[0] - pts).toLocaleString() + ' to go') + '</button>' +
             '<span class="bar"><i style="width:' + Math.min(100, pts / t[0] * 100) + '%"></i></span></div>'; }).join("") +
-          (me.redeem ? '<div class="crm-win" style="margin-top:10px"><b>' + e(me.redeem.t) + '</b><div class="code">' + e(me.redeem.c) + '</div><small>Show this code when you order. One reward per order.</small></div>' : '') + '</div>') +
+          (me.redeem ? '<div class="crm-win" style="margin-top:10px"><b>' + e(me.redeem.t) + '</b><div class="code">' + e(me.redeem.c) + '</div><small>Show this code when you order. One reward a day.</small></div>' : '') + '</div>') +
         // referrals
         (SIMPLE ? '<div class="crm-box" id="crm-ref"><h4>🤝 Invite friends</h4><div class="crm-refcode">' + e(me.ref) + '</div>' +
           '<div class="crm-acts" style="margin-top:0"><button type="button" class="hot" data-a="text">💬 Text a friend</button><button type="button" data-a="copy">📋 Copy invite link</button></div>' +
@@ -677,7 +695,8 @@
         if (a === "visit" && window.SSAI_INTERIM) { SSAI_INTERIM.claim(); return; }
         if (b.dataset.redeem != null) {
           var t = TIERS[+b.dataset.redeem]; if (m.stars < t[0]) return;
-          addPts(m, -t[0], "🎟️ Redeemed: " + t[1]); m.redeem = { t: t[1], c: "R-" + code4(4) }; put(m); drawJoin(); drawOwn(); toast("🎟️ " + t[1] + " is ready. Show your code."); return;
+          if (prizeUsedToday(m)) { toast("🎟️ One reward a day: come back tomorrow for your next one."); return; }
+          addPts(m, -t[0], "🎟️ Redeemed: " + t[1]); m.redeem = { t: t[1], c: "R-" + code4(4) }; m.pday = pdKey(); put(m); drawJoin(); drawOwn(); toast("🎟️ " + t[1] + " is ready. Show your code."); return;
         }
         if (a === "bday") { m.bdemo = true; m.bcode = "BDAY-" + code4(4); m.ledger = m.ledger || []; m.ledger.unshift({ ts: Date.now(), pts: 0, t: "🎂 Birthday treat unlocked (text sent)" }); earnOnce(m, "birthday_" + new Date().getFullYear(), EARN.birthday, "🎂 Birthday bonus"); put(m); drawJoin(); toast("💬 Text sent: Happy birthday " + m.name.split(" ")[0] + "! Your treat is waiting 🎂"); return; }
         if (a === "scan") { if (qr.style.display === "block") qr.style.display = "none"; else showQR(); return; }

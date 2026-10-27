@@ -21,6 +21,10 @@ window.SSAI_REWARDS={
   birthday:250,                       // once a year, on their birthday
   referral:100,                       // per friend who joins with your code AND makes a first visit
   game:{perScore:100,dailyCap:50},    // Ride the Nalu: 1 point per 100 score, at most 50 points a day
+  // ONE REWARD A DAY, MAX ONE FULL MEAL (Christian, 2026-10-27): a member takes at most one reward per day and nothing
+  // worth more than the priciest entree on the menu. Nalu Vida's is Steak & Fries $33.00 (Tiki Ribs $31.00).
+  // crm.js drops any tier over this and the interim pass already allows one redemption a day (interim.redeemsPerDay).
+  maxValue:33.00,
   // [points, reward, Toast button]. toast.type: "item" = 100% off ONE item (server selects it first), "fixed" = $ off the check.
   // toast.max = the priciest item that reward covers (for the Toast setup sheet). Never free alcohol (California ABC).
   tiers:[[250,"Free mocktail, soft drink or Jungle Fries",{button:"App Reward – Free Mocktail/Soft Drink/Jungle Fries",type:"item",max:15.00}],

@@ -16,22 +16,26 @@
   var DEFAULTS = {
     "melody-bar-grill": { name: "Melody Bar & Grill", short: "Melody", prefix: "MEL", page: "demo/melody-lax/", game: "Melody Approach",
       perDollar: 10, join: 100, birthday: 250, referral: 100, game_: { perScore: 100, dailyCap: 50 },
+      maxValue: 21.50,   // one full meal: Lobster Mac & Cheese, the priciest plate on the menu. crm.js drops any tier over this.
       tiers: [[250, "Free soft drink or Melody Fries", { button: "App Reward – Free Soft Drink or Melody Fries", type: "item", max: 5.75 }],
-        [500, "Free starter: Fried Green Beans, Avocado Toast or Chicken Pot Stickers", { button: "App Reward – Free Starter", type: "item", max: 15.00 }],
-        [1000, "$10 off your check", { button: "App Reward – $10 Off", type: "fixed", amount: 10 }],
-        [1500, "Free entrée: any Mac & Cheese or burrito", { button: "App Reward – Free Entrée", type: "item", max: 21.50 }]],
+        [500, "$10 off your check", { button: "App Reward – $10 Off", type: "fixed", amount: 10 }],
+        [1000, "Free starter: Fried Green Beans, Avocado Toast or Chicken Pot Stickers", { button: "App Reward – Free Starter", type: "item", max: 15.00 }],
+        [1500, "Free meal: any entrée up to $21.50 — Mac & Cheese, Melody Burger, burrito, tacos or Baby Back Ribs & Fries", { button: "App Reward – Free Entrée", type: "item", max: 21.50 }]],
       justLanded: { offer: "10% off your first order today", toast: { button: "App – Just Landed 10% Off", type: "percent", percent: 10 }, note: "Landed at LAX in the last 24 hours? Show your boarding pass to your server. One per guest, can't be combined with other offers." },
-      toastStatus: { state: "done", when: "2026-10-12", note: "All 5 buttons set up in Toast (confirmed by Antidote, Oct 12, 2026)" },
+      toastStatus: { state: "done", when: "2026-10-12", note: "All 5 buttons set up in Toast (confirmed by Antidote, Oct 12, 2026). The Oct 27 reward change swapped the points on two buttons that already exist — nothing to change in Toast." },
       // one-time "Location buddy" bonus (demo/locbonus.js). Melody only for now; give Nalu Vida the same line to turn it on there.
       locationBonus: { on: true, pts: 100, minDays: 3, spanDays: 7 } },
     "nalu-vida": { name: "Nalu Vida", short: "Nalu Vida", prefix: "NV", page: "demo/nalu-vida/", game: "Ride the Nalu",
       perDollar: 10, join: 100, birthday: 250, referral: 100, game_: { perScore: 100, dailyCap: 50 },
-      tiers: [[250, "Free mocktail, soft drink or Jungle Fries", { button: "App Reward – Free Mocktail/Soft Drink/Jungle Fries", type: "item", max: 15.00 }],
-        [500, "Free shareable: Chips, Salsa & Guac, Calamari or Wings", { button: "App Reward – Free Shareable", type: "item", max: 17.00 }],
-        [1000, "$10 off your check", { button: "App Reward – $10 Off", type: "fixed", amount: 10 }],
-        [1500, "Free entrée: any Signature Island Tacos or the Poke Bowl", { button: "App Reward – Free Entrée", type: "item", max: 24.00 }]],
+      maxValue: 33.00,   // one full meal: Steak & Fries, the priciest entree on the menu. crm.js drops any tier over this.
+      tiers: [[250, "Free mocktail, soft drink or Jungle Fries", { button: "App Reward – Free Mocktail/Soft Drink/Jungle Fries", type: "item", max: 12.00 }],
+        [500, "Free shareable: Chips Salsa & Guac, Calamari, Wings or Sticky Tiki Ribs", { button: "App Reward – Free Shareable", type: "item", max: 18.00 }],
+        [1000, "$20 off your check", { button: "App Reward – $20 Off", type: "fixed", amount: 20 }],
+        [1500, "Free meal: any entrée up to $33 — Steak & Fries, Tiki Ribs, Blackened Salmon, Seared Ahi, Chicken Milanese, Scampi Skewers, Adobo Chicken or Fish N' Chips", { button: "App Reward – Free Entrée", type: "item", max: 33.00 }]],
       justLanded: null,
-      toastStatus: { state: "tbd", when: "", note: "TBD: not confirmed yet that the 4 buttons are set up in Nalu Vida's Toast" } }
+      toastStatus: { state: "tbd", when: "", fp: "2026-10-27-20off", pri: 1,
+        todo: "Nalu Vida Toast: rename the $10 Off button to $20 Off",
+        note: "In Toast Web › Finance › Settings › Discounts & promo codes, open “App Reward – $10 Off”, rename it to “App Reward – $20 Off” and set the amount to $20.00. The other 3 buttons keep their names. Then confirm all 4 are set up." } }
   };
   var CKEY = "ssai_christian_disc_v1";
   function cached() { try { var c = JSON.parse(localStorage.getItem(CKEY) || "null"); return c && c.d ? c : null; } catch (x) { return null; } }

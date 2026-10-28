@@ -211,7 +211,7 @@
       : { all: (dow >= 1 && dow <= 5 ? ["Happy hour Mon-Fri 3-6 PM and 10 PM-close"] : []).concat(["Brunch daily until 4 PM, $24 bottomless mimosas (60 min)"]), 1: ["$9 burgers + $5 draft beer, 5 PM-close"], 2: ["50% off signature tacos, $10 house margaritas"], 3: ["$2 oysters (min 6)"], 0: ["NFL on every TV + bottomless mimosas"] };
     var lines = W.all.concat(W[dow] || []).map(function (l) { return "- " + l; });
     if (mel) lines.push(es ? "- Just Landed: 10% con pase de abordar de LAX (24 h)" : "- Just Landed: 10% off with a LAX boarding pass (24h)");
-    var tiers = mel ? "250 Free soft drink or Melody Fries; 500 Free starter; 1,000 $10 off; 1,500 Free entree" : "250 Free mocktail, soft drink or Jungle Fries; 500 Free shareable; 1,000 $10 off; 1,500 Free entree";
+    var tiers = mel ? "250 Free soft drink or Melody Fries; 500 $10 off; 1,000 Free starter; 1,500 Free meal (entree up to $21.50)" : "250 Free mocktail, soft drink or Jungle Fries; 500 Free shareable; 1,000 $20 off; 1,500 Free meal (entree up to $33)";
     var nm = mel ? "Melody" : "Nalu Vida", d = new Date(), mo = d.toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short" }), dd = d.toLocaleString("en-US", { timeZone: "America/Los_Angeles", day: "numeric" });
     return (es ? "Ofertas de hoy en " + nm + " (" + ["dom", "lun", "mar", "mie", "jue", "vie", "sab"][dow] + " " + dd + " " + mo.toLowerCase() + "):" : nm + " deals today (" + dn + " " + mo + " " + dd + "):") + "\n" + lines.join("\n") + "\n" +
       (es ? "Recompensas (puntos): " : "Rewards (points): ") + tiers + "\n" + (es ? "Responde STOP para no recibir mas. Guia: " : "Reply STOP to stop. Guide: ") + "https://antidotethecure.github.io/staff/christian/"; }

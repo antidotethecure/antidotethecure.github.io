@@ -123,7 +123,7 @@
   function dirUrl(s) { return "https://www.google.com/maps/dir/?api=1&destination=" + s.lat + "," + s.lng; }
   function loadCss(h) { var l = document.createElement("link"); l.rel = "stylesheet"; l.href = h; document.head.appendChild(l); }
   loadCss("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css");
-  var ls = document.createElement("script"); ls.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"; ls.onload = initMap; document.head.appendChild(ls);
+  var ls = document.createElement("script"); ls.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"; ls.integrity = "sha384-NElt3Op+9NBMCYaef5HxeJmU4Xeard/Lku8ek6hoPTvYkQPh3zLIrJP7KiRocsxO"; ls.crossOrigin = "anonymous"; ls.onload = initMap; document.head.appendChild(ls);
 
   // seeded so the demo players sit in the same places every load
   var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script src="../../js/frame-guard.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Venue Versus · Bar TV</title>
@@ -69,13 +70,13 @@ aside{display:flex;flex-direction:column;gap:2vh;min-height:0}
     <div class="poster" id="poster"><img id="posterimg" alt="Antidote The Foodie's review of this restaurant"><span>▶ Antidote The Foodie reviewed us</span></div>
   </aside>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" integrity="sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1" crossorigin="anonymous"></script>
 <script>
 (function(){
   "use strict";
   var q=new URLSearchParams(location.search), SLUG=(q.get("slug")||"melody").replace(/[^a-z0-9-]/g,""), TVK=q.get("tv")||"";
   var V=(window.VERSUS_VENUES||{})[SLUG]||{name:"Venue Versus",theme:{}};
-  var BASE=(q.get("vvapi")||V.api||"https://drizzle-bowl-scores.higgsfield.app").replace(/\/+$/,""), API=BASE+"/api/versus";
+  var BASE=(q.get("vvapi")||V.api||"https://drizzle-bowl-scores.higgsfield.app").replace(/\/+$/,""); if(!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$|^https:\/\/drizzle-bowl-scores\.higgsfield\.app$/.test(BASE)) BASE="https://drizzle-bowl-scores.higgsfield.app"; var API=BASE+"/api/versus";   // ?vvapi= = local testing only (the TV key must never go to a stranger's server)
   var $=function(i){ return document.getElementById(i); };
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
   function fmt(n){ return Number(n||0).toLocaleString(); }

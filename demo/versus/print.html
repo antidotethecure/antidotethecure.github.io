@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script src="../../js/frame-guard.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Venue Versus · Table QR</title>
@@ -22,7 +23,7 @@
 <body>
 <div class="bar"><button type="button" onclick="print()">🖨️ Print</button><span id="note"></span></div>
 <div class="sheet" id="sheet"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" integrity="sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1" crossorigin="anonymous"></script>
 <script>
 (function(){
   var q=new URLSearchParams(location.search), h=new URLSearchParams(location.hash.slice(1)), SLUG=(q.get("slug")||"melody").replace(/[^a-z0-9-]/g,""), V=(window.VERSUS_VENUES||{})[SLUG]||{name:SLUG};

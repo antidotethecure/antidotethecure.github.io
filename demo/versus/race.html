@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script src="../../js/frame-guard.js"></script>
 <script src="../lang-th.js"></script>
 <script src="../gamepad.js?v=20261015vv1"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -78,9 +79,10 @@ var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 /* ---- match info from the lobby (#m=…) or practice ---- */
 var M=null; try{ var mh=location.hash.match(/#m=(.+)$/); if(mh) M=JSON.parse(decodeURIComponent(mh[1])); }catch(e){ M=null; }
 if(M&&!/^[a-z0-9]{6,12}$/.test(String(M.id||""))) M=null;
-var BACK=(M&&M.back&&/^https?:\/\//.test(M.back))?M.back:(V.app?V.app+"#versus":"../");
+var BACK=(M&&M.back&&/^https?:\/\//.test(M.back)&&(function(){ try{ return new URL(M.back).origin===location.origin; }catch(e){ return false; } })())?M.back:(V.app?V.app+"#versus":"../");   // same-site only: no open redirect
 $("back").href=BACK;
-var API=M?String(M.api||V.api||"").replace(/\/+$/,"")+"/api/versus":"";
+var VB=M?String(M.api||V.api||"").replace(/\/+$/,""):""; if(M&&!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$|^https:\/\/drizzle-bowl-scores\.higgsfield\.app$/.test(VB)) VB=String(V.api||"https://drizzle-bowl-scores.higgsfield.app").replace(/\/+$/,"");   // the #m= link can't point the race at a stranger's server
+var API=M?VB+"/api/versus":"";
 var off=M?(+M.off||0):0; function now(){ return Date.now()+off; }
 var AUTO=q.get("autopilot")==="1"&&(!M||/^(127\.0\.0\.1|localhost)$/.test(location.hostname));   // test hook: your runner plays itself (practice, or a local test server only)
 

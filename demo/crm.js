@@ -678,7 +678,7 @@
         var box = qr.querySelector(".qr"), data = "SSAI:" + SLUG + ":" + me.id;
         function paint() { try { var q = window.qrcode(0, "M"); q.addData(data); q.make(); box.innerHTML = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch (x) { box.innerHTML = ""; } }
         if (window.qrcode) paint();
-        else { var sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"; sc.onload = paint; document.head.appendChild(sc); }
+        else { var sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"; sc.integrity = "sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1"; sc.crossOrigin = "anonymous"; sc.onload = paint; document.head.appendChild(sc); }
       }
       if (keepQR) showQR();
       join.onclick = function (ev) {

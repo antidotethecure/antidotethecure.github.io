@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script src="../../js/frame-guard.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title>Venue Versus · Owner</title>
@@ -67,7 +68,8 @@ a{color:var(--acc2)}
 (function(){
   "use strict";
   var q=new URLSearchParams(location.search), SLUG=(q.get("slug")||"melody").replace(/[^a-z0-9-]/g,""), V=(window.VERSUS_VENUES||{})[SLUG]||{name:SLUG};
-  var API=(q.get("vvapi")||V.api||"https://drizzle-bowl-scores.higgsfield.app").replace(/\/+$/,"")+"/api/versus", KK="vv-admin:"+SLUG;
+  var VB=(q.get("vvapi")||V.api||"https://drizzle-bowl-scores.higgsfield.app").replace(/\/+$/,""); if(!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$|^https:\/\/drizzle-bowl-scores\.higgsfield\.app$/.test(VB)) VB="https://drizzle-bowl-scores.higgsfield.app";   // ?vvapi= = local testing only: the admin key must never go to a stranger's server
+  var API=VB+"/api/versus", KK="vv-admin:"+SLUG;
   var $=function(i){ return document.getElementById(i); };
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
   function key(){ try{ return localStorage.getItem(KK)||""; }catch(e){ return ""; } }

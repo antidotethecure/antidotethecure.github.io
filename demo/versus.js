@@ -27,7 +27,7 @@
   var W = window, D = document;
   var q0 = new URLSearchParams(location.search);
   var BASE = (q0.get("vvapi") || C.api || "https://drizzle-bowl-scores.higgsfield.app").replace(/\/+$/, "");
-  if (!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$|^https:\/\//.test(BASE)) BASE = "https://drizzle-bowl-scores.higgsfield.app";
+  if (!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$|^https:\/\/drizzle-bowl-scores\.higgsfield\.app$/.test(BASE)) BASE = "https://drizzle-bowl-scores.higgsfield.app";   // ?vvapi= = local testing only: never a stranger's server
   var API = BASE + "/api/versus", SLUG = C.slug, NAME = C.name || "the bar", GAMES = C.games || ["battle", "picks"];
   var TH = C.theme || {};
   var PLAY = C.play || {};

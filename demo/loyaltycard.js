@@ -65,7 +65,7 @@
   function qrPaint(box, id) {
     function paint() { try { var q = window.qrcode(0, "M"); q.addData(qrData(id)); q.make(); box.innerHTML = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true }); } catch (x) { box.textContent = id; } }
     if (window.qrcode) paint();
-    else { var sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"; sc.onload = paint; sc.onerror = function () { box.innerHTML = "<div style='font:900 14px ui-monospace,monospace;text-align:center;padding-top:44px'>" + e(id) + "</div>"; }; document.head.appendChild(sc); }
+    else { var sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"; sc.integrity = "sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1"; sc.crossOrigin = "anonymous"; sc.onload = paint; sc.onerror = function () { box.innerHTML = "<div style='font:900 14px ui-monospace,monospace;text-align:center;padding-top:44px'>" + e(id) + "</div>"; }; document.head.appendChild(sc); }
   }
   function livePass() { var I = window.SSAI_INTERIM, m = CRM.member(); if (!I || !m) return null; var now = Date.now();
     return (I.data().redeems || []).filter(function (r) { return r.member === m.id && r.status === "live" && r.exp > now; })[0] || null; }

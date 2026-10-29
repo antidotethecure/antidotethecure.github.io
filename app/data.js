@@ -5,7 +5,7 @@
    KEEP IN SYNC:
    - value/value-data.js .......... market prices + sources (the "What it costs elsewhere" rows reuse its numbers: mid = (low + typ) / 2)
    - ~/plugin/skills/second-shift-contract/SKILL.md + make_contract.py (setup_list / monthly_list defaults, clauses 2A/3A/5A, discount_expiry)
-   - demo/contract.js ............. on-the-spot agreement builder (presets + the 3A results-promise wording)
+   - demo/contract.js ............. on-the-spot agreement builder (presets + the 3A results-promise + 2B loyalty-price wording)
    - setup-kit/build_launch.py AGENTS + agents/index.html (AI add-on prices $75 / $150)
    - ~/command-center/clients/concierge/kb/13-pricing-playbook.md (what the onboarding concierge quotes) */
 window.APP = {
@@ -80,6 +80,9 @@ window.APP = {
     results: { returns: 30, day: 30, windowMonths: 3, freeMonths: 2 },
     discount: { graceBusinessDays: 3, perDay: 100 },
     minimumMonths: 3,
+    /* 2B Loyalty price (Antidote, 2026-10-29): the monthly drops `drop` every month they stay, up to `cap` off;
+       cancel (or 30+ days late) and it starts over at full price. Same numbers in demo/contract.js + make_contract.py. */
+    loyalty: { drop: 2, cap: 50 },
     /* How the owner can pay the setup (Antidote, 2026-10-12). Same numbers in demo/contract.js + make_contract.py.
        split: % of setup at signing, the rest at Go-Live (app delivered).
        flex:  pay at least minDown (per restaurant) at signing; the unpaid setup balance is spread over `months` equal

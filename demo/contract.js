@@ -10,6 +10,8 @@
         food + non-alcoholic only, no tax, tips or alcohol. Tracked by demo/crm.js ("Ring up a member" + "App sales").
      3A Results promise (2026-10-11): if in the first 3 months after Go-Live there's no 30-day period with N (30) tracked
         return visits, the next 2 monthly payments are waived. Same text as clauses() in make_contract.py.
+     2B Loyalty price (2026-10-29): the monthly fee drops $2 (lp_drop) for every month Client stays, up to $50 (lp_cap) off;
+        resets to the full price if the agreement ends or a payment is 30+ days late. Idea: Money Mind reel (IG DdcbiG5AUjd).
      5A Customer data: full access while paying, complete export within 10 days of termination, no collection after.
    Payment options (2026-10-12), "How the setup is paid" in the form, same wording as payment_text() in make_contract.py:
      split (default) = 50% at signing, 50% at Go-Live (app delivered); full = 100% at signing;
@@ -118,6 +120,8 @@
     '<div class="row"><div><label>Share %</label><input name="ps_pct" type="number" min="0" max="100" value="10"></div><div><label>Over $ / month</label><input name="ps_th" type="number" min="0" value="3000"></div></div>' +
     '<label class="ck"><input type="checkbox" name="rc" checked> 3A Results promise (2 months free if not met)</label>' +
     '<label>Tracked return visits in a 30-day period</label><input name="rc_n" type="number" min="0" value="30">' +
+    '<label class="ck"><input type="checkbox" name="lp" checked> 2B Loyalty price (drops every month they stay)</label>' +
+    '<div class="row"><div><label>Drop $ / month</label><input name="lp_drop" type="number" min="0" step="0.5" value="2"></div><div><label>Max off $</label><input name="lp_cap" type="number" min="0" value="50"></div></div>' +
     '<label class="ck"><input type="checkbox" name="cd" checked> 5A Customer data</label>' +
     '<label class="ck"><input type="checkbox" name="dx" checked> Founding discount expires if setup not paid in 3 business days (−$100/day to regular)</label>' +
     '<label>Special terms</label><textarea name="special" rows="3" placeholder="Anything you agreed that is not above"></textarea>' +
@@ -139,6 +143,18 @@
 
   function andList(xs) { return xs.length === 1 ? xs[0] : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1]; }
   // Sections 2A / 3A / 5A + the fee-table row. Same wording as clauses() in make_contract.py.
+  // Section 2B + fee-table row. Same wording as loyalty() in make_contract.py. base = Client's monthly fee.
+  function loyalty(base) {
+    var drop = num("lp_drop"), cap = num("lp_cap");
+    if (!F.lp.checked || !(drop > 0) || !(cap > 0)) return { row: "", sec: "", sum: "" };
+    var n = Math.ceil(cap / drop) + 1, D2 = money(drop), C2 = money(cap);
+    return {
+      row: '<tr><td>Loyalty price</td><td>None</td><td><b>&minus;' + D2 + ' / month for every month Client stays</b><br><span class="sm">up to ' + C2 + ' off (' + money(base) + ' &rarr; ' + money(Math.max(0, base - cap)) + ' by payment ' + n + '); resets if the Agreement ends; see Section 2B</span></td></tr>',
+      sec: '<h2>2B. Loyalty price</h2><p>For every month Client stays continuously on the monthly service, the monthly fee goes down by ' + D2 + '. This loyalty credit comes off the monthly fee in Section 2: ' + D2 + ' off the 2nd monthly payment, ' + money(drop * 2) + ' off the 3rd, and so on, until the credit reaches ' + C2 + '. The credit then stays at ' + C2 + ' for as long as Client stays continuously subscribed. For example, a monthly fee of ' + money(base) + ' becomes ' + money(Math.max(0, base - drop)) + ', then ' + money(Math.max(0, base - 2 * drop)) + ', and reaches ' + money(Math.max(0, base - cap)) + ' at monthly payment ' + n + '. The credit applies to the monthly fee only, not to setup installments, the performance share or any other charge, and never lowers the monthly fee below $0. Months waived under Section 3A count as months of continuous service. Each invoice shows the current monthly fee and the next month\'s fee.</p>' +
+        '<p><b>Restart rule.</b> The loyalty credit resets to $0 if this Agreement ends for any reason, including cancellation by Client, or if a monthly payment is more than 30 days late. If Client signs up again later, the monthly fee starts over at the full price with no loyalty credit.</p>',
+      sum: ' · loyalty price −' + D2 + '/mo, up to ' + C2 + ' off (payment ' + n + '), resets on cancel'
+    };
+  }
   function clauses() {
     var ps = F.ps.checked, rc = F.rc.checked, cd = F.cd.checked, th = money(num("ps_th")), pct = num("ps_pct") + "%", n = Math.round(num("rc_n"));
     var locs = (CFG.locations || []).filter(Boolean), many = locs.length > 1, c = { row: "", s2a: "", s3a: "", s5a: "",
@@ -203,7 +219,7 @@
       : "This Agreement continues month to month with no minimum term. Either party may cancel by giving 30 days' written notice; email counts.";
     if (fx) term += " If this Agreement ends for any reason before all " + fx.months + " setup installments are paid, the unpaid setup balance is due within 15 days after the end date. Client was also offered paying the setup in full at signing, or 50% at signing and 50% at Go-Live.";
     if (minimum > 0 && (sd || md)) term += " The minimum term is a condition of the founding-partner discount only. Client was offered the regular plan instead: " + money(sl) + " setup paid in full up front and " + money(ml) + " per month, month to month, with no minimum term.";
-    var CL = clauses(), DX = discountExpiry(sl, sn);
+    var CL = clauses(), DX = discountExpiry(sl, sn), LP = loyalty(mn);
     var sigBlock = function (who, title, name, tt, email) {
       return '<div><b>' + title + '</b><canvas data-sig="' + who + '"></canvas><button type="button" class="clr" data-clear="' + who + '">Clear signature</button><br>' +
         'Name: ' + name + '<br>Title: ' + tt + '<br>Email: ' + email + '<br>Date: <span data-date="' + who + '"></span></div>';
@@ -215,10 +231,10 @@
       '<p>"Go-Live" means the day the Client\'s page and game are published and the table QR codes point to them. Provider will ask Client to approve the build before Go-Live. Changes outside this list are quoted and billed separately.</p>' +
       '<h2>2. Fees</h2><table class="f"><tr><th>Item</th><th>Regular price</th><th>Client\'s price</th></tr>' +
       '<tr><td>Setup (one time)</td><td>' + money(sl) + '</td><td><b>' + money(sn) + '</b>' + (fx ? '<br><span class="sm">Flexible plan: ' + money(fx.down) + ' at signing + ' + fx.months + ' monthly installments of ' + money(fx.inst) + (fx.last !== fx.inst ? ' (last ' + money(fx.last) + ')' : '') + (fx.fee ? ', incl. ' + money(fx.fee) + ' plan fee' : '') + '</span>' : mode === "split" ? '<br><span class="sm">50% at signing, 50% at Go-Live</span>' : "") + (sd ? '<br><span class="sm">' + sd + '% founding-partner discount</span>' : "") + DX.note + '</td></tr>' +
-      '<tr><td>Monthly service</td><td>' + money(ml) + ' / month</td><td><b>' + money(mn) + ' / month</b>' + (fx ? '<br><span class="sm">months 1–' + fx.months + ': <b>' + money(fx.monthly) + '</b> with the setup installment' + (fx.last !== fx.inst ? ' (payment ' + fx.months + ': ' + money(fx.lastMonthly) + ')' : '') + ', then ' + money(mn) + '</span>' : '') + (mNote ? '<br><span class="sm">' + mNote + '</span>' : "") + '</td></tr>' + CL.row + '</table>' +
+      '<tr><td>Monthly service</td><td>' + money(ml) + ' / month</td><td><b>' + money(mn) + ' / month</b>' + (fx ? '<br><span class="sm">months 1–' + fx.months + ': <b>' + money(fx.monthly) + '</b> with the setup installment' + (fx.last !== fx.inst ? ' (payment ' + fx.months + ': ' + money(fx.lastMonthly) + ')' : '') + ', then ' + money(mn) + '</span>' : '') + (mNote ? '<br><span class="sm">' + mNote + '</span>' : "") + '</td></tr>' + CL.row + LP.row + '</table>' +
       '<p><b>Setup payment:</b> ' + pay + '</p>' + DX.sec +
       '<p><b>Monthly payment:</b> The monthly fee starts on the Effective Date (the day this Agreement is signed) and is billed each month in advance on that date. ' + mAfter + '</p>' +
-      '<p>If a payment is more than 15 days late, Provider may pause the service until it is paid. Prices do not include any third-party costs Client chooses to add (for example printing beyond the included QR table tents, paid advertising, or prizes).</p>' + CL.s2a +
+      '<p>If a payment is more than 15 days late, Provider may pause the service until it is paid. Prices do not include any third-party costs Client chooses to add (for example printing beyond the included QR table tents, paid advertising, or prizes).</p>' + CL.s2a + LP.sec +
       '<h2>3. Term and cancellation</h2><p>' + term + ' The setup fee is non-refundable once Provider has delivered the build for Client\'s review. ' + CL.cancel + '</p>' + CL.s3a +
       '<h2>4. Client responsibilities</h2><ul><li>Provide accurate menu items, prices, hours and photos, and tell Provider about changes.</li><li>Choose, fund and honor any prizes, discounts or rewards published in the game. Provider does not pay for prizes.</li><li>Run any prize promotion as a free-to-enter promotion with official rules, and follow the laws that apply to Client\'s business and promotions. Provider will supply standard official-rules text for Client to approve.</li></ul>' +
       '<h2>5. Ownership and data</h2><p>Client owns its business name, logo, menu content, photos it provides, and its customer data. Provider owns the software, game code and design system, and gives Client the right to use them for as long as this Agreement is active. Provider will not sell Client\'s customer data.</p>' + CL.s5a +
@@ -233,7 +249,7 @@
     S.innerHTML = "Setup <b>" + money(sn) + "</b>" + (sd ? " (was " + money(sl) + ")" : "") + " · " + (fx ? "flexible: <b>" + money(fx.down) + "</b> down today" : up + "% today = <b>" + money(sn * up / 100) + "</b>" + (up < 100 ? ", " + money(sn - sn * up / 100) + " at Go-Live" : "")) + "<br>" +
       "Monthly <b>" + (fx ? money(fx.monthly) + "</b> × " + fx.months + ", then <b>" + money(mn) + "</b>" : money(mn) + "</b>") + (md && months ? " × " + months + ", then " + money(ml) : "") + (minimum ? " · " + minimum + "-month minimum" : "") +
       (F.ps.checked ? "<br>Performance share <b>" + num("ps_pct") + "%</b> of app sales over <b>" + money(num("ps_th")) + "</b> in a month" : "") +
-      (F.rc.checked ? " · results promise (" + Math.round(num("rc_n")) + " returns in 30 days, else 2 months free)" : "") + (F.cd.checked ? " · customer-data clause" : "") + (DX.sec ? " · discount expires after 3 business days unpaid" : "");
+      (F.rc.checked ? " · results promise (" + Math.round(num("rc_n")) + " returns in 30 days, else 2 months free)" : "") + (F.cd.checked ? " · customer-data clause" : "") + (DX.sec ? " · discount expires after 3 business days unpaid" : "") + LP.sum;
     D.querySelectorAll("canvas[data-sig]").forEach(pad);
   }
 

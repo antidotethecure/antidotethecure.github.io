@@ -20,6 +20,10 @@ h2{font-size:20px;margin-top:34px;color:var(--gold)}
 .lead{color:var(--dim);font-size:19px;margin:0 0 18px}
 .offer{background:linear-gradient(135deg,#0b2a6b,#07112a);border:2px solid var(--gold);border-radius:16px;padding:16px 18px;margin:18px 0}
 .offer b{color:var(--gold);font-size:22px}
+.slots{display:flex;gap:6px;margin:10px 0 4px}.slots span{flex:1;height:12px;border-radius:6px;background:var(--good)}.slots .taken{background:var(--red)}
+#left{color:var(--good);font-size:18px}
+.loyal{border-color:var(--good)}
+.loyal b{color:var(--good)}
 .offer small{display:block;color:var(--dim);margin-top:6px}
 .btn{display:block;text-align:center;background:var(--blue);color:#fff;text-decoration:none;font-weight:700;font-size:19px;padding:15px 18px;border-radius:12px;margin:12px 0}
 .btn.red{background:var(--red)}
@@ -49,7 +53,12 @@ h2{font-size:20px;margin-top:34px;color:var(--gold)}
   <p class="lead">McDonald's, Chipotle and Domino's all have their own app. That's where their regulars order, earn rewards and keep coming back. We build that for local restaurants.</p>
 
   <div class="offer" id="offer"><b>$500 off setup</b> for our first 10 founding businesses.
-    <small>Melody Bar &amp; Grill is first, and 4 more are lined up behind them. Founding spots are first come, first served.</small></div>
+    <div class="slots" aria-label="8 of 10 founding spots left"><span class="taken"></span><span class="taken"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <strong id="left">8 of 10 spots left</strong>
+    <small>Taken: Melody Bar &amp; Grill and Nalu Vida. 4 more are lined up behind them. Founding spots are first come, first served.</small></div>
+
+  <div class="offer loyal"><b>Your price drops every month you stay.</b>
+    <small style="color:var(--ink)">Your monthly goes down $2 every month you're with us, up to $50 off. Basic goes from $350 all the way down to $300 a month. It's built into your agreement.</small></div>
 
   <h2>See Melody's app live</h2>
   <div class="melody">
@@ -75,24 +84,27 @@ h2{font-size:20px;margin-top:34px;color:var(--gold)}
   <a class="btn red" href="tel:+14242963303">Call Nia, our AI assistant: (424) 296-3303</a>
   <a class="btn" href="../app/">See every sample app we've built</a>
 
-  <p class="foot">Prices in USD. The $500 founding discount comes off the setup fee on your signed agreement. 3-month minimum. SousShift AI is a DBA of Antidote Enterprises LLC, 3031 W Olympic Blvd #290, Los Angeles, CA 90006.</p>
+  <p class="foot">Prices in USD. The $500 founding discount comes off the setup fee on your signed agreement. 3-month minimum. The monthly drop resets if you cancel or pay 30+ days late. SousShift AI is a DBA of Antidote Enterprises LLC, 3031 W Olympic Blvd #290, Los Angeles, CA 90006.</p>
 </main>
 <script src="../app/data.js"></script>
 <script>
 // Every number comes from app/data.js so this page never drifts from the price list.
+// loyalty: $2/month off for every month stayed, capped at $50 (agreement section 2B)
+const LOYAL_MAX = 50;
 const A = window.APP, OFF = 500, $ = n => "$" + n.toLocaleString("en-US");
 const P = A.plans, dfy = P.find(p => p.key === A.bundle.plan), social = A.addons.find(a => a.key === A.bundle.addon);
 const lo = P.reduce((a, b) => a.setup + a.monthly <= b.setup + b.monthly ? a : b);
 const maxMonthly = dfy.monthly + social.monthly - A.bundle.discountMonthly;
 const minDown = A.terms.payment.flex.minDown;
 document.getElementById("low").textContent = $(lo.monthly) + "/mo";
-document.getElementById("lowNote").textContent = `${lo.name}: ${$(lo.setup - OFF)} setup (was ${$(lo.setup)}). Start with as little as ${$(minDown)} down.`;
+document.getElementById("lowNote").textContent = `${lo.name}: ${$(lo.setup - OFF)} setup (was ${$(lo.setup)}). Start with as little as ${$(minDown)} down. Drops to ${$(lo.monthly - LOYAL_MAX)}/mo the longer you stay.`;
 document.getElementById("high").textContent = $(maxMonthly) + "/mo";
 document.getElementById("highNote").textContent = `${dfy.name} + ${social.name}: ${$(dfy.setup - OFF)} setup (was ${$(dfy.setup)}).`;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 document.getElementById("plans").innerHTML = P.map(p => `<div class="plan${p.flag ? " flag" : ""}">
   <h3>${esc(p.name)} <small style="color:var(--gold)">${esc(p.tag || "")}</small></h3>
   <div class="price">${$(p.monthly)}/mo · ${$(p.setup - OFF)} setup <s>${$(p.setup)}</s></div>
+  <div style="color:var(--good)">Drops $2 a month you stay, down to ${$(p.monthly - LOYAL_MAX)}/mo</div>
   <div>${esc(p.pitch)}</div><ul>${p.includes.map(i => `<li>${esc(i)}</li>`).join("")}</ul></div>`).join("");
 document.getElementById("addons").innerHTML = A.addons.map(a => {
   const inc = a.includedIn.length ? ` · included in ${a.includedIn.map(k => P.find(p => p.key === k).name).join(" & ")}` : "";

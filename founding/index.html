@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SousShift AI · Founding Offer</title>
+<meta name="description" content="Your own restaurant app. See Melody Bar & Grill's app live, every plan and add-on, and $500 off setup for the first 10 businesses.">
+<link rel="icon" href="../app/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#03060e;--navy:#07112a;--panel:#0a1631;--edge:#1c2f57;--ink:#eef3ff;--dim:#9eadcc;--blue:#2f7bff;--gold:#ffd166;--red:#ff3b3b;--good:#34d399}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 "Rajdhani",system-ui,-apple-system,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1,h2{font-family:"Orbitron",sans-serif;line-height:1.15;margin:0 0 10px}
+h1{font-size:clamp(26px,7vw,40px)}
+h2{font-size:20px;margin-top:34px;color:var(--gold)}
+.logo{display:block;width:180px;max-width:60%;margin:0 0 18px}
+.lead{color:var(--dim);font-size:19px;margin:0 0 18px}
+.offer{background:linear-gradient(135deg,#0b2a6b,#07112a);border:2px solid var(--gold);border-radius:16px;padding:16px 18px;margin:18px 0}
+.offer b{color:var(--gold);font-size:22px}
+.offer small{display:block;color:var(--dim);margin-top:6px}
+.btn{display:block;text-align:center;background:var(--blue);color:#fff;text-decoration:none;font-weight:700;font-size:19px;padding:15px 18px;border-radius:12px;margin:12px 0}
+.btn.red{background:var(--red)}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.melody{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--edge);border-radius:16px;padding:14px}
+.melody img{width:96px;height:96px;border-radius:18px;object-fit:cover}
+.tag{display:inline-block;background:var(--good);color:#032;font-weight:700;border-radius:99px;padding:1px 10px;font-size:14px}
+.range{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.range div{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:12px}
+.range b{display:block;font-family:"Orbitron",sans-serif;font-size:20px;color:var(--gold)}
+.plan{background:var(--panel);border:1px solid var(--edge);border-radius:16px;padding:16px;margin:12px 0}
+.plan.flag{border-color:var(--gold)}
+.plan h3{margin:0;font-family:"Orbitron",sans-serif;font-size:18px}
+.price{font-size:20px;font-weight:700;margin:6px 0}
+.price s{color:var(--dim);font-weight:500}
+.plan ul{margin:8px 0 0;padding-left:20px;color:var(--dim)}
+.addon{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--edge);padding:10px 0}
+.addon span:last-child{white-space:nowrap;color:var(--gold);font-weight:700}
+.addon small{display:block;color:var(--dim)}
+.foot{color:var(--dim);font-size:14px;margin-top:30px}
+</style>
+</head>
+<body>
+<main>
+  <img class="logo" src="../assets/sousshift-lockup-800w.png" alt="SousShift AI">
+  <h1>Your own app, like the big chains.</h1>
+  <p class="lead">McDonald's, Chipotle and Domino's all have their own app. That's where their regulars order, earn rewards and keep coming back. We build that for local restaurants.</p>
+
+  <div class="offer" id="offer"><b>$500 off setup</b> for our first 10 founding businesses.
+    <small>Melody Bar &amp; Grill is first, and 4 more are lined up behind them. Founding spots are first come, first served.</small></div>
+
+  <h2>See Melody's app live</h2>
+  <div class="melody">
+    <img src="../demo/melody-lax/img/logo.png" alt="Melody Bar &amp; Grill logo">
+    <div><span class="tag">Launching soon</span>
+      <p style="margin:6px 0 0">Melody Bar &amp; Grill by LAX: menu, rewards and a flight game guests play at the table. Tap through it like a customer would.</p></div>
+  </div>
+  <a class="btn" href="../demo/melody-lax/">Open the Melody app</a>
+
+  <h2>What it costs</h2>
+  <div class="range">
+    <div>Lowest<b id="low"></b><span id="lowNote"></span></div>
+    <div>Everything<b id="high"></b><span id="highNote"></span></div>
+  </div>
+
+  <h2>Plans</h2>
+  <div id="plans"></div>
+
+  <h2>Add-ons (only if you want them)</h2>
+  <div id="addons"></div>
+
+  <h2>Want one for your place?</h2>
+  <a class="btn red" href="tel:+14242963303">Call Nia, our AI assistant: (424) 296-3303</a>
+  <a class="btn" href="../app/">See every sample app we've built</a>
+
+  <p class="foot">Prices in USD. The $500 founding discount comes off the setup fee on your signed agreement. 3-month minimum. SousShift AI is a DBA of Antidote Enterprises LLC, 3031 W Olympic Blvd #290, Los Angeles, CA 90006.</p>
+</main>
+<script src="../app/data.js"></script>
+<script>
+// Every number comes from app/data.js so this page never drifts from the price list.
+const A = window.APP, OFF = 500, $ = n => "$" + n.toLocaleString("en-US");
+const P = A.plans, dfy = P.find(p => p.key === A.bundle.plan), social = A.addons.find(a => a.key === A.bundle.addon);
+const lo = P.reduce((a, b) => a.setup + a.monthly <= b.setup + b.monthly ? a : b);
+const maxMonthly = dfy.monthly + social.monthly - A.bundle.discountMonthly;
+const minDown = A.terms.payment.flex.minDown;
+document.getElementById("low").textContent = $(lo.monthly) + "/mo";
+document.getElementById("lowNote").textContent = `${lo.name}: ${$(lo.setup - OFF)} setup (was ${$(lo.setup)}). Start with as little as ${$(minDown)} down.`;
+document.getElementById("high").textContent = $(maxMonthly) + "/mo";
+document.getElementById("highNote").textContent = `${dfy.name} + ${social.name}: ${$(dfy.setup - OFF)} setup (was ${$(dfy.setup)}).`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+document.getElementById("plans").innerHTML = P.map(p => `<div class="plan${p.flag ? " flag" : ""}">
+  <h3>${esc(p.name)} <small style="color:var(--gold)">${esc(p.tag || "")}</small></h3>
+  <div class="price">${$(p.monthly)}/mo · ${$(p.setup - OFF)} setup <s>${$(p.setup)}</s></div>
+  <div>${esc(p.pitch)}</div><ul>${p.includes.map(i => `<li>${esc(i)}</li>`).join("")}</ul></div>`).join("");
+document.getElementById("addons").innerHTML = A.addons.map(a => {
+  const inc = a.includedIn.length ? ` · included in ${a.includedIn.map(k => P.find(p => p.key === k).name).join(" & ")}` : "";
+  const price = a.quote ? "Ask for a quote" : (a.monthly ? $(a.monthly) + "/mo" : "Free");
+  return `<div class="addon"><span>${esc(a.name)}${a.soon ? " (coming soon)" : ""}<small>${esc((a.one || "").split(". ")[0])}${inc}</small></span><span>${price}</span></div>`;
+}).join("");
+console.assert(lo.key === "basic" && maxMonthly === 1800, "price check: lowest should be Basic, max $1,800/mo");
+</script>
+</body>
+</html>

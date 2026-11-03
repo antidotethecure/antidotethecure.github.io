@@ -18,7 +18,8 @@ demo/seasons/
   seasons.js        loader + shared helpers (canvas overlay, frame loop, game/overlay pause, idle/scroll/shake bus,
                     reduced-motion + low-end fallbacks, 👻-style toggle, audio unlock)
   calendar.json     which theme runs when (America/Los_Angeles dates)
-  halloween/        halloween.js  (3D jack-o'-lanterns + sheet ghosts, three.js, all procedural)
+  halloween/        halloween.js     (3D jack-o'-lanterns + sheet ghosts, three.js, all procedural)
+  thanksgiving/     thanksgiving.js  (3D roast turkey, glazed ham, pumpkin pie + autumn leaves, all procedural)
   <next theme>/     <id>.js
 ```
 
@@ -30,6 +31,8 @@ demo/seasons/
 * The **first** matching entry wins, so put a short theme above a long one it overlaps (new-year sits above christmas).
 * `"ready": false` = not built yet; the loader skips it. Flip it (or delete the key) when the theme ships.
 * **Easter moves every year.** Update its dates each spring (2027: Sun 03-28; 2028: Sun 04-16).
+* Thanksgiving runs the whole of November (11-01..11-30) rather than stopping the day after the holiday, so there is
+  no bare gap before Christmas picks up on 12-01. If Christmas is ever moved earlier, shorten Thanksgiving to match.
 
 ## Switches
 
@@ -66,11 +69,13 @@ SSAISeason.define({
 });
 ```
 
-2. Useful `ctx` fields: `reduced`, `lowEnd`, `pointer` ({x,y} 0..1, last finger), `isIdle()`, `audio()` (an unlocked
+2. While a 3D theme is running it sets `SSAISeason.__dbg` to its live objects (Thanksgiving: `{leaves, dishes, scene,
+   renderer}`). That is what the checklist below reads; nothing in the apps uses it. Set it in `setup()` before returning.
+3. Useful `ctx` fields: `reduced`, `lowEnd`, `pointer` ({x,y} 0..1, last finger), `isIdle()`, `audio()` (an unlocked
    AudioContext after the first tap, or `null` when muted/off/hidden: always check), `size()`, `store(key[, value])`.
-3. Model everything procedurally (geometry + canvas textures). No paid credits, no big downloads. Any sound is synthesized
+4. Model everything procedurally (geometry + canvas textures). No paid credits, no big downloads. Any sound is synthesized
    with WebAudio, or a tiny CC0 file whose license is noted in the theme's header comment.
-4. Add/flip its `calendar.json` entry. **No page edits.** Bump `?v=` on the loader tag only if `seasons.js` itself changed
+5. Add/flip its `calendar.json` entry. **No page edits.** Bump `?v=` on the loader tag only if `seasons.js` itself changed
    (theme scripts and the calendar are fetched with the loader's `?v=`).
 
 ## Quality bar

@@ -82,7 +82,8 @@
     if (window.THREE && window.BURGER3D) return cb();
     if (b3wait) return b3wait.push(cb); b3wait = [cb];
     var go = function () { var q = b3wait; b3wait = null; q.forEach(function (f) { f(); }); };
-    var add = function (src, next) { var sc = document.createElement("script"); sc.src = src; sc.onload = next; sc.onerror = go; document.head.appendChild(sc); };
+    var SRI = { "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js": "sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu", "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js": "sha384-fljlqkjWlmSFjkESkQvm77heIZpoWmXEOzlCA7kOpGUH+95Zk0yGfQieWM2q136E" };   // pinned CDN files: the browser refuses them if the CDN serves anything else
+    var add = function (src, next) { var sc = document.createElement("script"); sc.src = src; if (SRI[src]) { sc.integrity = SRI[src]; sc.crossOrigin = "anonymous"; } sc.onload = next; sc.onerror = go; document.head.appendChild(sc); };
     add("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js", function () {
       var rest = function () { add(HERE + "burger3d.js", go); };
       if (SK.models) add("https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js", rest); else rest();

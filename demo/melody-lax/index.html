@@ -120,7 +120,18 @@ h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;le
 .hud2 span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hud2 b{color:var(--ink)}
 .hud2 .pips{display:inline-flex;gap:2px;vertical-align:middle;margin-left:5px}.hud2 .pips i{width:7px;height:10px;border-radius:2px;background:#3a1a1c;border:1px solid #2a365a}
 #cv{display:block;width:100%;height:auto;aspect-ratio:400/600;border-radius:12px;background:#140708;touch-action:pan-y pinch-zoom;cursor:pointer}
-.cvwrap{position:relative}
+.cvwrap{position:relative;touch-action:pan-y pinch-zoom}
+/* FULL SCREEN (2026-11-02, Antidote: "I need it for the whole screen, like Storm Run"): the box IS the screen. The 3D city fills
+   it edge to edge, the 400x600 play field stays centred on top of it (so the plane keeps its shape and the drag keeps its feel),
+   the score and level float over the top, and the canvas covers the whole box so a drag anywhere on the screen still steers. */
+.gamebox.ssai-fsfill{padding:0!important;border:0!important;border-radius:0!important;overflow:hidden!important;display:flex;flex-direction:column;background:#0c1220}
+.gamebox.ssai-fsfill .cvwrap{flex:1;min-height:0;touch-action:none}
+.gamebox.ssai-fsfill canvas.m3d{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;aspect-ratio:auto!important;border-radius:0!important}
+.gamebox.ssai-fsfill #cv{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;object-fit:contain;border-radius:0;background:transparent;touch-action:none}
+.gamebox.ssai-fsfill .hud{position:absolute;top:calc(6px + env(safe-area-inset-top,0px));left:12px;right:62px;z-index:4;margin:0;padding:0;text-shadow:0 1px 3px #000}
+.gamebox.ssai-fsfill .hud2{position:absolute;top:calc(40px + env(safe-area-inset-top,0px));left:12px;right:62px;z-index:4;margin:0;text-shadow:0 1px 3px #000}
+.gamebox.ssai-fsfill #points{display:none!important}
+.gamebox.ssai-fsfill #over.on{position:absolute;left:0;right:0;bottom:0;z-index:6;max-height:66%;overflow:auto;margin:0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(26,10,12,.82),rgba(26,10,12,.97))}
 .gbtn{position:absolute;z-index:2;width:34px;height:34px;padding:0;border-radius:50%;border:1px solid #ffffff38;background:rgba(26,10,12,.62);color:#fff;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .gbtn.off{opacity:.6}
 .gbtn.songb{width:auto;max-width:56%;border-radius:17px;padding:0 11px;gap:5px;font:600 12px/1 Barlow,system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -419,7 +430,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 
 <script>window.REVIEW_EGG={vid:"AhJGIPsywm0",restaurant:"Melody Bar & Grill",short:"MELODY",bonus:500,img:"img/review/cover.webp",find:"Catch 7 Antidote Drizzle emblems to call in the review plane, then fly through its banner"};</script>
 <script src="../reviewegg.js?v=ht4k"></script>
-<script src="../halftime.js?v=ht4k"></script>
+<script src="../halftime.js?v=ht5"></script>
 <script>window.MELODY_CLIPS={"bacon-mac":"img/clips/bacon-mac.mp4","burger-mac":"img/clips/burger-mac.mp4","espresso-martini":"img/clips/espresso-martini.mp4","house-mac":"img/clips/house-mac.mp4","lobster-mac":"img/clips/lobster-mac.mp4","mango-marg":"img/clips/mango-marg.mp4","margarita":"img/clips/margarita.mp4","moscow-mule":"img/clips/moscow-mule.mp4","nachos":"img/clips/nachos.mp4","old-fashioned":"img/clips/old-fashioned.mp4","paloma":"img/clips/paloma.mp4","philly-fries":"img/clips/philly-fries.mp4","ribs":"img/clips/ribs.mp4","wings":"img/clips/wings.mp4"};</script>
 <script>
 window.CONFIG={name:"Melody Bar & Grill",address:"9132 S Sepulveda Blvd, Los Angeles, CA 90045"};
@@ -2601,7 +2612,7 @@ function previewCopy(now){ if(now-PVT<33) return; PVT=now; var pv=document.getEl
 function rewardsOn(){ return !!(window.MELODY_REWARDS_ON&&window.MELODY_REWARDS_ON()); }
 /* ---- bridge for the optional 3D renderer (melody3d.js). Read-only views of the game state + visual hooks; it never changes the game. ---- */
 var SHK=[0,0];
-var M3=window.__M3={render:null,NL:function(){ return NL(); },zoneId:function(){ return ZONES[G.zi!=null?G.zi:zoneNow()].id; },apexDirs:function(b){ return apexBeamDirs(b); },audioOut:function(){ try{ return SND.out(); }catch(e){ return null; } },egg:null,EGG_SCORE:EGG_SCORE,G:function(){ return G; },S:S,W:W,H:H,PLANE_W:PLANE_W,COP_LEN:COP_LEN,GS_LEN:GS_LEN,SJ_W:SJ_W,DRIZ_N:DRIZ_N,RP_HITS:RP_HITS,WPN:WPN,NAV:NAV,PICK:PICK,MIC:MIC,TILES:TILES,LBL:LBL,LMW:LMW,TRF_COLS:TRF.COLS,DRIZ_IM:DRIZ_IM,FX:FX,CARS:CARS,SHK:SHK,reduce:reduce,
+var M3=window.__M3={render:null,NL:function(){ return NL(); },zoneId:function(){ return ZONES[G.zi!=null?G.zi:zoneNow()].id; },apexDirs:function(b){ return apexBeamDirs(b); },audioOut:function(){ try{ return SND.out(); }catch(e){ return null; } },egg:null,EGG_SCORE:EGG_SCORE,G:function(){ return G; },field:function(){ return fieldRect(); },S:S,W:W,H:H,PLANE_W:PLANE_W,COP_LEN:COP_LEN,GS_LEN:GS_LEN,SJ_W:SJ_W,DRIZ_N:DRIZ_N,RP_HITS:RP_HITS,WPN:WPN,NAV:NAV,PICK:PICK,MIC:MIC,TILES:TILES,LBL:LBL,LMW:LMW,TRF_COLS:TRF.COLS,DRIZ_IM:DRIZ_IM,FX:FX,CARS:CARS,SHK:SHK,reduce:reduce,
   copPt:copPt,gsPt:gsPt,gunshipIm:gunshipIm,superjetIm:superjetIm,ready:ready,
   BJ_W:BJ_W,ESC_W:ESC_W,RK_L:RK_CH*RK_K,BASE_W:BASE_W,BASE_H:BASE_H,BASE_L:BASE_L,BIRD_W:BIRD_W,rkPod:rkPod,LITE:LITE,baseIm:baseIm,
   rpBanner:function(c,x,y,p,a,r){ rpBanner(c,x,y,p,a,r); },
@@ -2713,7 +2724,12 @@ requestAnimationFrame(frame);
 // you can see it). Arrow keys / WASD accelerate and coast smoothly. The motion itself lives in steer() (dt-based, 60 fps or not)
 var drag=null;
 function replay(){ start(); }   // play before registering: no member gate, no tokens (Christian, 2026-10)
-function aim(e,first){ var r=cv.getBoundingClientRect(), x=(e.clientX-r.left)*W/r.width, y=(e.clientY-r.top)*H/r.height, off=e.pointerType==="mouse"?0:-70;
+/* FULL SCREEN: the canvas element covers the whole screen, but its 400x600 picture is letterboxed inside it (object-fit:contain),
+   so everything that turns screen pixels into game pixels has to measure the picture, not the element. On the page the two are
+   the same rectangle and nothing changes. melody3d.js reads this through M3.field to line its 3D view up with the overlay. */
+function fieldRect(){ var r=cv.getBoundingClientRect(), k=Math.min(r.width/W,r.height/H)||1;
+  return {left:r.left+(r.width-W*k)/2, top:r.top+(r.height-H*k)/2, w:W*k, h:H*k, k:k}; }
+function aim(e,first){ var r=fieldRect(), x=(e.clientX-r.left)/r.k, y=(e.clientY-r.top)/r.k, off=e.pointerType==="mouse"?0:-70;
   if(CH){ if(first||!drag.a) drag.a={x:x,y:y,tx:G.x,ta:G.alt3}; var a=drag.a; G.tx=Math.max(30,Math.min(W-30,a.tx+(x-a.x)*1.5)); G.ta=Math.max(ALT_LO,Math.min(ALT_HI,a.ta+(a.y-y)*1.15)); G.ty=H-130; return; }   // chase view: drag sideways to steer, up/down to climb/dive (relative: the camera follows you)
   G.tx=Math.max(30,Math.min(W-30,x)); G.ty=Math.max(H*.32,Math.min(H-50,y+off)); }
 cv.addEventListener("pointerdown",function(e){ e.preventDefault(); SND.unlock(); if(!G.running){ replay(); return; }
@@ -2766,7 +2782,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=ex2.ht4k"></script>
+<script type="module" src="melody3d.js?v=fs1"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}
@@ -2849,7 +2865,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
  theme:{bg:"#1a0a0c",bg2:"#3a1a1c",card:"#2c1416",edge:"#5a2d2a",accent:"#d4af37",accent2:"#f0d375",label:"#f0d375",ink:"#f6f1e4",dim:"#c2a98f",btnInk:"#1a1206",soft:"rgba(255,255,255,.06)",track:"#5a2d2a",good:"#3fbf8f",bad:"#ff7a59",
   display:"Anton,Impact,'Arial Narrow',sans-serif",body:"Barlow,system-ui,-apple-system,sans-serif"},
  tokens:false, showcase:showcase, preview:function(v){ if(window.__MG&&__MG.attract) __MG.attract(v); },
- mount:"#cv",start:function(){ window.MELODY_START(); },vibrate:true,
+ mount:"#cv",start:function(){ window.MELODY_START(); },vibrate:true,fullscreen:{fill:true},
  // 3D look (engine3d): graphics tier, weather and time of day. Visual only; they never change the game.
  selects:[{title:"Graphics",options:[["smooth","Smooth (recommended)"],["auto","Auto"],["low","Low"],["med","Medium"],["high","High"],["ultra","Ultra"]],note:"Smooth keeps a steady 60 (or a locked 30) on phones and cars. Auto picks for this device and only ever steps down. Clouds/post effects switch on or off on the next visit.",
    get:function(){ return window.__E3Q?__E3Q.pref:"auto"; },set:function(v){ if(window.__E3Q) __E3Q.set(v); }},

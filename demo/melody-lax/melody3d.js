@@ -93,7 +93,7 @@ async function boot() {
   STATUS.caps = (CAPS.gl2 ? "gl2" : "gl1") + (CAPS.half ? "" : " no-halfRT") + (CAPS.floatLin ? "" : " no-floatLin");
   renderer.setPixelRatio(Math.min(QUAL.cfg.pr, window.devicePixelRatio || 1)); STATUS.tier = tierName();
   // a tier change only recompiles materials when the shadow switch actually flips (that rebuild is the visible hitch)
-  QUAL.onChange((t, cfg) => { STATUS.tier = tierName(); renderer.setPixelRatio(Math.min(cfg.pr, window.devicePixelRatio || 1)); renderer.setSize(W, H, false); const sh = cfg.shadows > 0; if (renderer.shadowMap.enabled !== sh) { renderer.shadowMap.enabled = sh; scene.traverse(o => { if (o.material) [].concat(o.material).forEach(m => m.needsUpdate = true); }); } });
+  QUAL.onChange((t, cfg) => { STATUS.tier = tierName(); size(); const sh = cfg.shadows > 0; if (renderer.shadowMap.enabled !== sh) { renderer.shadowMap.enabled = sh; scene.traverse(o => { if (o.material) [].concat(o.material).forEach(m => m.needsUpdate = true); }); } });
   renderer.setSize(W, H, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.shadowMap.enabled = QUAL.cfg.shadows > 0; renderer.shadowMap.type = MOBILE ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
@@ -113,6 +113,26 @@ async function boot() {
     const st = new THREE.CanvasTexture(sc); st.colorSpace = THREE.SRGBColorSpace; scene.background = st;   // (replaced by the physical sky below; kept as the first-frame fallback)
     scene.fog = new THREE.Fog(0xd89068, 900, 3100); cam.fov = 61;   // a touch wider for portrait phones cam.updateProjectionMatrix();
     renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+  }
+  /* FULL SCREEN (2026-11-02, Antidote: "I need it for the whole screen, like Storm Run"): in full screen the 3D view is the whole
+     screen while the 400x600 HUD canvas stays centred on top of it, so the controls, the drag and every label are where they always
+     were. The camera keeps the vertical framing and only widens sideways, so a wider screen shows MORE city and never less than the
+     page view does; a narrower one (a tall phone) opens the lens so the field still fits across. VIEW is where the 3D view sits in
+     the HUD canvas's own 400x600 coordinates, which is what proj() needs to put a billboard on the thing it points at. */
+  const BASEA = W / H, BASEFOV = cam.fov;
+  const VIEW = { x: 0, y: 0, w: W, h: H }; let TF = Math.tan(cam.fov * Math.PI / 360);
+  function size() {
+    const r = gl.getBoundingClientRect(), w = Math.round(r.width) || W, h = Math.round(r.height) || H;
+    renderer.setPixelRatio(Math.min(QUAL.cfg.pr, window.devicePixelRatio || 1));
+    renderer.setSize(w, h, false);
+    const a = w / h;
+    cam.aspect = a; cam.fov = a >= BASEA ? BASEFOV : 2 * Math.atan(Math.tan(BASEFOV * Math.PI / 360) * BASEA / a) * 180 / Math.PI;
+    cam.updateProjectionMatrix(); TF = Math.tan(cam.fov * Math.PI / 360);
+    // the overlay's 400x600 picture, which in full screen is letterboxed inside a canvas that covers the whole screen
+    const f = M.field ? M.field() : null;
+    if (f && f.w > 2 && f.h > 2) { VIEW.x = (r.left - f.left) * W / f.w; VIEW.y = (r.top - f.top) * H / f.h; VIEW.w = r.width * W / f.w; VIEW.h = r.height * H / f.h; }
+    else { VIEW.x = 0; VIEW.y = 0; VIEW.w = W; VIEW.h = H; }
+    if (POST) try { POST.setSize(w, h, renderer.getPixelRatio()); } catch (e) {}
   }
   const hemi = new THREE.HemisphereLight(0xc4d0ff, 0x3a2c22, 1.25);   // r160 lights are physical (÷π): these sum to ~1.05× on the flat ground so the aerial photo keeps its 2D brightness scene.add(hemi);
   if (CHASE) scene.add(hemi);   // chase view: the sky's ambient (driven by engine3d/sky.js)
@@ -139,7 +159,7 @@ async function boot() {
     rim.intensity = .35;
     MIRROR = WATM && CAPS.gl2 && !SMOOTH ? safe("reflections", () => WATM.makeMirror(THREE, renderer, { y: 0, scale: .5, rtType: RT })) : null;
     AMB = AUDM && safe("audio", () => AUDM.makeAmbience({ out: () => M.audioOut && M.audioOut() })); if (WX && AMB) WX.onThunder((d, k) => { try { AMB.thunder(d, k); } catch (e) {} });
-    QUAL.onChange((t, cfg) => { safe("tier-change", () => { if (CLOUDS && cfg.clouds) CLOUDS.setQuality(cfg.clouds); if (WX) WX.setQuality({ rain: cfg.rain }); if (POST) { POST.setQuality(Object.assign({}, cfg.post, CAPS.half ? {} : { ssao: false, bloom: false })); POST.setSize(W, H, renderer.getPixelRatio()); } sun.shadow.mapSize.set(cfg.shadowSize, cfg.shadowSize); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }); });
+    QUAL.onChange((t, cfg) => { safe("tier-change", () => { if (CLOUDS && cfg.clouds) CLOUDS.setQuality(cfg.clouds); if (WX) WX.setQuality({ rain: cfg.rain }); if (POST) { POST.setQuality(Object.assign({}, cfg.post, CAPS.half ? {} : { ssao: false, bloom: false })); size(); } sun.shadow.mapSize.set(cfg.shadowSize, cfg.shadowSize); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }); });
     // the game menu's Settings → Sky / Weather (gamemenu.js selects) talk to these
     window.MELODY_ENV = { sky(v) { try { localStorage.setItem("melody-sky", v); } catch (e) {} if (TOD[v]) todH = TOD[v]; }, weather(v) { try { localStorage.setItem("melody-weather", v); } catch (e) {} if (!WX) return; if (v === "live") WX.auto(true); else { WX.auto(false); WX.set(v, 8); } },
       get: () => ({ sky: SKYPREF(), weather: WXPREF(), hours: todH, state: WX ? WX.state : "-" }) };
@@ -183,9 +203,14 @@ async function boot() {
       vUv=vec2(mix(iUV.x,iUV.z,uv.x), mix(iUV.y,iUV.w,uv.y)); vCol=iCol;
       gl_Position=projectionMatrix*viewMatrix*vec4(p,1.0); }`;
   const FS = `uniform sampler2D map; varying vec2 vUv; varying vec4 vCol; void main(){ vec4 t=texture2D(map,vUv); gl_FragColor=vec4(t.rgb*vCol.rgb, t.a*vCol.a); if(gl_FragColor.a<.003) discard; }`;
-  /* QOFF: the game's own ground FX (crash sites, smoke, fire, debris, rings) are anchored where they happened: each remembers the lateral
-     roam at birth (p.rx) and is drawn shifted by how far the ground has slid since (2026-10-19 fix: they used to slide along with the plane) */
-  let QOFF = 0; const rOff = (p) => { if (p.rx === undefined) p.rx = ROAM.x; return p.rx - ROAM.x; };
+  /* QOFF: the game's own ground FX (crash sites, smoke, fire, debris, rings) are anchored where they happened: each remembers the
+     lateral roam at birth and is drawn shifted by how far the ground has slid since (2026-10-19 fix: they used to slide with the plane).
+     2026-11-02, two things were wrong with that and both of them are "the smoke and the crashes move when I swipe":
+       · it kept the anchor in p.rx, which on a crash SITE is already taken - that is the scorch's X radius - so every site was
+         anchored to its own radius instead of to the roam it was born at, and sat at a fixed offset from the crash;
+       · index.html recycles these objects through a pool (np()/add()), so a fresh particle arrived carrying the LAST one's anchor.
+     The anchor now has its own name and is re-taken whenever the game marks the object new (n3); callers clear n3 after this runs. */
+  let QOFF = 0; const rOff = (p) => { if (p.n3 || p.rx3 === undefined) p.rx3 = ROAM.x; return p.rx3 - ROAM.x; };
   class Batch {
     constructor(max, blending, order, tex) {
       const base = new THREE.PlaneGeometry(1, 1); base.rotateX(-Math.PI / 2);
@@ -244,7 +269,7 @@ async function boot() {
     [body, tip].forEach(m => { m.count = 0; m.frustumCulled = false; m.renderOrder = 131; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); });
     return { body, tip, n: 0, MX }; })();
   const SQ = new THREE.Quaternion(), SZ = new THREE.Vector3(0, 0, 1), SD = new THREE.Vector3(), SS = new THREE.Vector3(), SM = new THREE.Matrix4();
-  const TRG = new THREE.Vector3(), TRH = new THREE.Vector3(), TRA = new THREE.Vector3(), TRB = new THREE.Vector3(), MZL = [new THREE.Vector3(), new THREE.Vector3()], BEAMT = { t: -1e9, a: [0, 0], far: [new THREE.Vector3(), new THREE.Vector3()] };
+  const TRG = new THREE.Vector3(), TRH = new THREE.Vector3(), TRA = new THREE.Vector3(), TRB = new THREE.Vector3(), TRO = new THREE.Vector3(), MZL = [new THREE.Vector3(), new THREE.Vector3()], BEAMT = { t: -1e9, a: [0, 0], far: [new THREE.Vector3(), new THREE.Vector3()] };
   if (CHASE) [Bn, Ba].forEach(b => { b.mesh.material.uniforms.uBill.value = 1; });
   const hex = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255]; };
   const rgbaCache = {}; function rgb(s) { if (rgbaCache[s]) return rgbaCache[s]; let v; if (s[0] === "#") v = hex(s); else { const m = s.match(/[\d.]+/g).map(Number); v = [m[0] / 255, m[1] / 255, m[2] / 255]; } return rgbaCache[s] = v; }
@@ -554,7 +579,7 @@ async function boot() {
     const { SM, FI, DB, RG, SITES, WR, LITE } = FXI;
     // ground sites: scorch decal, rubble, skid, glow, flames
     for (let i = 0; i < SITES.length; i++) { const s = SITES[i];
-      s.n3 = 0; QOFF = rOff(s);
+      QOFF = rOff(s); s.n3 = 0;
       const fa = Math.min(1, s.age / 180) * (s.age > s.life - 1500 ? Math.max(0, (s.life - s.age) / 1500) : 1);
       Bg.q(s.x, s.y, 1.2, s.rx * 2, s.ry * 2, 0, UV.scorch, 1, 1, 1, .88 * fa);
       // (a crashed building no longer gets dark slab/wall-stub boxes: from straight above they read as black squares over the fire)
@@ -568,27 +593,27 @@ async function boot() {
         flamesAt(Ba, s.x + f.dx, s.y + f.dy, 8 + j * .3, sz * 1.5, -Math.PI / 2 + .45, now, f.ph, s.lite || LITE ? 1 : 3, UV.tongue);
         const fk = .75 + .25 * Math.sin(now * .031 + f.ph * 5) * Math.sin(now * .017 + f.ph), cr = sz * .42 * fk; Ba.q(s.x + f.dx, s.y + f.dy, 9 + j * .3, cr * 2, cr * 2, 0, UV.fball, 1, 1, 1, .5 * fi * fk); } }
     // smoke (normal blend, the game's own 4-shade puffs), rising off ground fires toward the camera
-    for (let i = 0; i < SM.length; i++) { const p = SM[i]; if (p.n3) { p.n3 = 0; p.alt = birthAlt(p); } QOFF = rOff(p);
+    for (let i = 0; i < SM.length; i++) { const p = SM[i]; QOFF = rOff(p); if (p.n3) { p.n3 = 0; p.alt = birthAlt(p); }
       if (p.alt === -2) continue; const u = p.age / p.life, al = p.a * (u < .1 ? u / .1 : 1) * Math.pow(1 - u, 1.5); if (al < .01) continue;
       const Y = p.alt < 0 ? 10 + 70 * u : p.alt; Bn.q(p.x, p.y, Y, p.s * 2, p.s * 2, 0, UV["sm" + p.sh + p.v], 1, 1, 1, al);
       if (p.hot && u < .3) Ba.q(p.x, p.y, Y + .5, p.s * 1.6, p.s * 1.6, 0, UV.glow, 1, 1, 1, .3 * (1 - u / .3) * p.a); }
     // debris: 3D tumbling shards that fall away toward the ground, burning ones glow
     let dn = 0;
-    for (let i = 0; i < DB.length && dn < 80; i++) { const p = DB[i]; if (p.n3) { p.n3 = 0; p.alt = birthAlt(p); if (p.alt === -2) p.alt = Math.max(3, playerAlt - 8); else if (p.alt < 0) p.alt = 18; p.tilt = Math.random() * 6.3; }
+    for (let i = 0; i < DB.length && dn < 80; i++) { const p = DB[i]; QOFF = rOff(p); if (p.n3) { p.n3 = 0; p.alt = birthAlt(p); if (p.alt === -2) p.alt = Math.max(3, playerAlt - 8); else if (p.alt < 0) p.alt = 18; p.tilt = Math.random() * 6.3; }
       const u = p.age / p.life, sc = (1 - .6 * u) * p.sz * (p.sx || 1), Y = Math.max(2, p.alt * (1 - u * .9)), k = ws(Y);
-      QOFF = rOff(p); DM.compose(DP.set(wx(p.x, Y) + QOFF, Y, wz(p.y, Y)), DQ.setFromEuler(DE.set(p.tilt + p.rot * 1.3, -p.rot, p.rot * .7)), DS.set(sc * 2 * k, sc * 2 * k, sc * 2 * k / (p.sx || 1)));
+      DM.compose(DP.set(wx(p.x, Y) + QOFF, Y, wz(p.y, Y)), DQ.setFromEuler(DE.set(p.tilt + p.rot * 1.3, -p.rot, p.rot * .7)), DS.set(sc * 2 * k, sc * 2 * k, sc * 2 * k / (p.sx || 1)));
       DC.set(p.col); if (p.burn) DC.lerp(HOT, Math.max(0, 1 - u * 1.6)); debrisMesh.setMatrixAt(dn, DM); debrisMesh.setColorAt(dn, DC); dn++;
       if (p.burn) { const g = 5 + p.sz; Ba.q(p.x, p.y, Y + 2, g * 2, g * 2, 0, UV.glow, 1, 1, 1, .7 * (1 - u)); } }
     debrisMesh.count = dn; debrisMesh.instanceMatrix.needsUpdate = true; if (debrisMesh.instanceColor) debrisMesh.instanceColor.needsUpdate = true;
     // fire: embers, fireballs, flame licks (additive)
-    for (let i = 0; i < FI.length; i++) { const p = FI[i]; if (p.n3) { p.n3 = 0; p.alt = birthAlt(p); } QOFF = rOff(p);
+    for (let i = 0; i < FI.length; i++) { const p = FI[i]; QOFF = rOff(p); if (p.n3) { p.n3 = 0; p.alt = birthAlt(p); }
       if (p.alt === -2) continue; const u = p.age / p.life, Y = p.alt < 0 ? 12 + 30 * u : p.alt + 4;
       if (p.k === "em") { if (UV.spark) streak(Ba, p.x, p.y, Y, p.vx, p.vy, p.s * 1.8, p.s * 2 + Math.hypot(p.vx, p.vy) * 3.2, 1 - u);
         else { const c = u < .3 ? [1, .95, .77] : u < .6 ? [1, .7, .28] : [1, .35, .12]; Ba.q(p.x, p.y, Y, p.s * 1.6, p.s * 1.6, 0, UV.dot, c[0], c[1], c[2], 1 - u); } }
       else if (p.k === "fb") { const r = u < .22 ? p.s * (.3 + .7 * u / .22) : p.s * (1 - .45 * (u - .22) / .78); Ba.q(p.x, p.y, Y + 2, r * 2, r * 2, 0, UV.fball, 1, 1, 1, u < .22 ? 1 : Math.max(0, 1 - (u - .22) / .78)); }
       else { const s2 = p.s * (1 - .4 * u); tongueQ(Ba, p.x, p.y, Y, s2, p.ang + Math.PI / 2, UV.tongue, 1, 1, 1, 1 - u); } }
     // shock rings + dust rings
-    for (let i = 0; i < RG.length; i++) { const p = RG[i], u = p.age / p.life, r = p.s * (1 - Math.pow(1 - u, 2)); QOFF = rOff(p); if (r < 1) continue;
+    for (let i = 0; i < RG.length; i++) { const p = RG[i], u = p.age / p.life, r = p.s * (1 - Math.pow(1 - u, 2)); QOFF = rOff(p); p.n3 = 0; if (r < 1) continue;
       if (p.dust) Bn.q(p.x, p.y, 3, r * 2.3, r * 2.3, 0, UV.ring, .61, .58, .54, .45 * (1 - u)); else Ba.q(p.x, p.y, A.air - 10, r * 2.3, r * 2.3, 0, UV.ring, 1, .81, .54, .85 * (1 - u)); }
     QOFF = 0;
     // wrecks: the shot-down aircraft spin down to the ground as real models
@@ -808,15 +833,23 @@ async function boot() {
       TRC.U.uRes.value.set(W * pr, H * pr); PLY.updateMatrixWorld(true); AIR.pts.muzzle.forEach((q, i) => AIR.node.localToWorld(MZL[i].copy(q)));
       const fired = G.mfl > 0 && run; if (fired) BEAMT.t = now; const ba = Math.max(0, 1 - (now - BEAMT.t) / 150);
       const far = [null, null];
-      for (let s = 0; s < G.shots.length; s++) { const sh = G.shots[s], Y = alt3(sh, A.shot) + 2; TRA.set(wx(sh.x, Y), Y, wz(sh.y, Y)); const gi = MZL.length > 1 && Math.abs(TRA.x - MZL[1].x) < Math.abs(TRA.x - MZL[0].x) ? 1 : 0, M0 = MZL[gi];   /* the gun on the round's own side */ const d = TRA.distanceTo(M0), seg = Math.min(d, (46 + sh.w * 8) * LC); TRB.copy(M0).sub(TRA).setLength(seg).add(TRA);
+      /* EVERY ROUND TRAILS BACK TO WHERE IT WAS FIRED, not to where the gun is right now (2026-11-02, Antidote: "when the bullet is
+         shot out of the plane, I don't want it to move when I swipe to the left or right. The bullet should still go straight from
+         where it was shot from, or the laser"). The streak, the ghost round, the slug's nose and the gun's glow beam all used to be
+         aimed at the live muzzle, so the moment you steered, every round already in the air swung sideways with the plane. The round
+         itself never moved - its streak did. Each round now remembers its own muzzle the first frame it is seen and keeps it. */
+      for (let s = 0; s < G.shots.length; s++) { const sh = G.shots[s], Y = alt3(sh, A.shot) + 2; TRA.set(wx(sh.x, Y), Y, wz(sh.y, Y)); const gi = MZL.length > 1 && Math.abs(TRA.x - MZL[1].x) < Math.abs(TRA.x - MZL[0].x) ? 1 : 0;   /* the gun on the round's own side */
+        if (sh.o3x === undefined) { const mz = MZL[gi]; sh.o3x = mz.x; sh.o3y = mz.y; sh.o3z = mz.z; }
+        const M0 = TRO.set(sh.o3x, sh.o3y, sh.o3z);
+        const d = TRA.distanceTo(M0), seg = Math.min(d, (46 + sh.w * 8) * LC); TRB.copy(M0).sub(TRA).setLength(seg).add(TRA);
         const c = sh.w === 1 ? [.55, 1.25, .5] : sh.w === 3 ? [.4, .85, 1.3] : sh.w === 4 ? [1.3, .3, .25] : [1.35, .8, .25];
         TRC.add(TRA, TRB, c[0], c[1], c[2], 1, (3.2 + sh.w * .5) * WC * DP, (7 + sh.w) * WC * DP);
         if (d > 60) { TRG.copy(TRA).lerp(M0, .5); TRH.copy(TRG).lerp(M0, Math.min(.9, seg * .55 / Math.max(1, d * .5))); TRC.add(TRG, TRH, c[0], c[1], c[2], .75, (2.6 + sh.w * .4) * WC * DP, (6 + sh.w) * WC * DP); }   // the ghost round
         if (SLUG.n < SLUG.MX) { const i = SLUG.n++, k = (MOBILE ? 3.1 : 2.4) * (1 + sh.w * .15); SD.copy(TRA).sub(M0).normalize(); SQ.setFromUnitVectors(SZ, SD);   // the slug, nose first
           SM.compose(TRA, SQ, SS.set(k, k, k)); SLUG.body.setMatrixAt(i, SM); SM.compose(SS.copy(TRA).addScaledVector(SD, 4.2 * k), SQ, SD.set(k, k, k)); SLUG.tip.setMatrixAt(i, SM); }
-        if (!far[gi] || d > far[gi].d) far[gi] = { d, p: far[gi] ? far[gi].p.copy(TRA) : TRA.clone() }; }
+        if (!far[gi] || d > far[gi].d) far[gi] = { d, p: far[gi] ? far[gi].p.copy(TRA) : TRA.clone(), o: far[gi] ? far[gi].o.copy(M0) : M0.clone() }; }
       // a faint glowing beam along each gun's stream, fading ~150 ms after the last shot (reads as a strip even at 30 fps)
-      if (ba > 0) for (let i = 0; i < 2; i++) if (far[i]) TRC.add(far[i].p, MZL[i % MZL.length], 1, .55, .15, .35 * ba, 1.2 * WC * DP, 6 * WC * DP);
+      if (ba > 0) for (let i = 0; i < 2; i++) if (far[i]) TRC.add(far[i].p, far[i].o, 1, .55, .15, .35 * ba, 1.2 * WC * DP, 6 * WC * DP);   // the glow runs back down the stream to where that burst left the gun, so it stays put when you steer
     }
     for (let s = 0; s < G.shots.length; s++) { const sh = G.shots[s], x = sh.x, y = sh.y, Y = alt3(sh, A.shot) + 2;
       if (CHASE) { const fl = .75 + Math.random() * .5; Ba.q(x, y, Y, 15 * BK * fl, 15 * BK * fl, 0, UV.dot, 1.8, .8, .25, .7); Ba.q(x, y, Y + .3, 8 * BK, 8 * BK, 0, UV.dot, 2.6, 2.2, 1.6, 1); continue; }   // flickering heat glow + hot core   // (the stream above draws the rest)
@@ -889,10 +922,10 @@ async function boot() {
   }
   function drawClouds(G) { if (!smokeOK || !G.clouds) return;   // the game's drifting cloud wisps, now at different heights so you fly past and through them
     for (let i = 0; i < G.clouds.length; i++) { const c = G.clouds[i]; Bn.q(c.x, c.y, A.player + [-60, 45, 95][i % 3], c.s * 2.6, c.s * 1.5, 0, UV.smoke, .78, .82, .98, .2); } }
-  const PV = new THREE.Vector3(), TF = Math.tan(cam.fov * Math.PI / 360);
+  const PV = new THREE.Vector3();
   // game px (x, y) at altitude Y (default: your flight level) → [x, y, scale] on the 400x600 overlay, or null if behind the camera
   function proj(x, y, Y) { PV.set(x - W / 2, Y == null ? PL.Y : Y, (Y === 0 ? y : far(y)) - H / 2).applyMatrix4(cam.matrixWorldInverse); const vz = -PV.z; if (vz < 8) return null;
-    PV.applyMatrix4(cam.projectionMatrix); return [(PV.x + 1) / 2 * W, (1 - PV.y) / 2 * H, (H / 2) / (vz * TF)]; }
+    PV.applyMatrix4(cam.projectionMatrix); return [VIEW.x + (PV.x + 1) / 2 * VIEW.w, VIEW.y + (1 - PV.y) / 2 * VIEW.h, (VIEW.h / 2) / (vz * TF)]; }
 
 
   /* ---------------- chase view: the 3D ground, breaking buildings, the Easter egg, wounds ---------------- */
@@ -1123,6 +1156,9 @@ async function boot() {
     if (FXA.sparks) FXA.sparks(V, V2.set(0, 1, 0), null, 1.2, 18); if (FXA.boom) FXA.boom(V, .5); if (WORLD && WORLD.debris) WORLD.debris(V.clone(), 14, "#a0703f", 110, .7); };
   M.onBoom = (x, y, n) => { if (!CHASE || !WORLD) return; const X = x - W / 2, Z = far(y) - H / 2, r = 60 + n * 3; for (const sg of SEGS.values()) if (Math.abs(Z - sg.group.position.z) < sg.len / 2 + r && sg.scatter) sg.scatter(X, Z, r); };
   if (CHASE) { M.wcx = wcx; M.proj = proj; M.chase = 1; chaseCam(M.G(), 0); cam.updateMatrixWorld(); }
+  // the view follows its box: entering or leaving full screen, a rotation, a window resize, the keyboard opening
+  size(); window.addEventListener("resize", size); window.addEventListener("orientationchange", size);
+  if (window.ResizeObserver) { const ro = new ResizeObserver(size); ro.observe(gl); const cv0 = document.getElementById("cv"); if (cv0) ro.observe(cv0); }
   /* ---- warm-up: compile every shader and upload every texture BEFORE you fly ----
      One hidden frame with one of everything in front of the camera (each enemy/pickup model, both bosses, birds, APEX, the
      blimp, one ground strip of every kind with its people/cars, every sprite batch) through the real pipeline, so nothing

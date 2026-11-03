@@ -23,6 +23,11 @@ window.SSAI_REWARDS={
   birthday:250,                       // once a year, on their birthday
   referral:100,                       // per friend who joins with your code AND makes a first visit
   game:{perScore:100,dailyCap:50},    // Melody Approach: 1 point per 100 score, at most 50 points a day
+  /* REVIEW BONUS (Antidote, 2026-11-02): +50 once per member for telling us how we did, then the Google review link is
+     offered to everyone with no points on it. platform stays "app": Google removes reviews that were paid for and can
+     flag the listing, Yelp bans asking outright, and 16 CFR 465 bans rewards tied to a rating. Switching platform to
+     "google" pays for the act of reviewing instead — same points at any rating — but puts Melody's listing at risk. */
+  review:{pts:50, platform:"app", url:""},
   // ONE REWARD A DAY, MAX ONE FULL MEAL (Christian, 2026-10-27): a member takes at most one reward per day and nothing
   // worth more than the priciest plate on the menu. Melody's is Lobster Mac & Cheese $21.50 (Baby Back Ribs & Fries $20.25).
   // crm.js drops any tier over this and the interim pass already allows one redemption a day (interim.redeemsPerDay).
@@ -2908,7 +2913,7 @@ window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REW
 /* CUSTOMER-ONLY (2026-10-13): this is Melody's live customer app. No owner view, manager log, sales numbers, sample
    players or "Demo:" notes (crm.js, interim.js, nearby.js, specials.js read this flag). Owner tools = Christian HQ. */
 window.SSAI_CUSTOMER_ONLY=true;</script>
-<script src="../crm.js?v=rs1"></script><script src="../claimscore.js?v=cs1"></script><script src="games-data.js?v=ft4"></script><script src="games.js?v=ft4"></script>
+<script src="../crm.js?v=rs2"></script><script src="../claimscore.js?v=cs1"></script><script src="games-data.js?v=ft4"></script><script src="games.js?v=ft4"></script>
 <link rel="stylesheet" href="../sports/sports.css?v=gd1">
 <script>/* SPORTS BAR PACKAGE (demo/sports/README.md): Melody = install #1, LA/California teams. Perks text stays empty until
    Christian sets a real deal: an empty watchParty.text hides the banner (no made-up deals). */
@@ -2981,7 +2986,7 @@ window.VERSUS={slug:"melody",name:"Melody Bar & Grill",api:"https://drizzle-bowl
 <script src="../gamelock.js?v=ml2"></script>
 <script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
 window.SPECIALS=(window.SSAI_MENU["melody-bar-grill"].specials||[]).filter(function(s){ return s.on!==false; });   // from menu-data.js (+ saved changes)</script>
-<script src="../specials.js?v=co1"></script>
+<script src="../specials.js?v=co2"></script>
 <script>/* RAMS SCORE SPECIAL (demo/scorespecial.js, 2026-10-19): when the Rams score in today's game (ESPN, team LAR), members unlock
    ONE same-day deal until 11:59 PM, redeemed with the live reward pass (counts as that visit's one reward, no stacking).
    on:false = OFF for real guests until Christian or Sami approve it. Demo: ?scoretest=1 (and &offer=half|25off|side|drink).

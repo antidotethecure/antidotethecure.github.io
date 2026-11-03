@@ -211,6 +211,7 @@
   //               friendGift = what the friend gets free with their first order, first = referrer's pts on that friend's
   //               first order, every = referrer's pts EVERY time that friend orders after that. friendGift is never alcohol
   //               (California ABC: no free alcoholic drinks as a promotion).
+  function int0(v) { v = Math.round(+v); return isFinite(v) && v > 0 && v <= 1000 ? v : 0; }
   var EARN = { checkin: 50, firstOrder: 100, birthday: 100, review: { pts: 250, platform: "app", url: "" }, instagram: { pts: 50, url: "" }, referral: {} };
   (function (x) { for (var k in x) { var a = EARN[k], b = x[k]; if (a && b && typeof a === "object" && typeof b === "object") { for (var j in b) a[j] = b[j]; } else EARN[k] = b; } })(C.earn || {});
   if (!(C.referral && C.referral.join)) REF.join = 150;
@@ -218,7 +219,9 @@
   if (!REF.friendGift) REF.friendGift = "Free soft drink";
   for (rk in EARN.referral) REF[rk] = EARN.referral[rk];
   if (SIMPLE) {   // only the bonuses the owner chose: join, birthday, referral (on the friend's first visit), game (capped)
-    EARN.checkin = 0; EARN.firstOrder = 0; EARN.review = { pts: 0, platform: "app", url: "" }; EARN.instagram = { pts: 0, url: "" }; EARN.birthday = SIMPLE.birthday;
+    EARN.checkin = 0; EARN.firstOrder = 0; EARN.instagram = { pts: 0, url: "" }; EARN.birthday = SIMPLE.birthday;
+    var sr = SIMPLE.review || {};   // the one way-to-earn the simple program keeps, when the owner sets it (Melody, 2026-11-02)
+    EARN.review = { pts: int0(sr.pts), platform: sr.platform || "app", url: sr.url || "" };
     REF.join = 0; REF.friend = 0; REF.first = SIMPLE.referral; REF.every = 0; REF.goal = 0; REF.gift = ""; REF.friendGift = "";
   }
   function reviewUrl() { var N = window.NEARBY, sp = N && N.spots && N.spots[0]; return EARN.review.url || "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(NAME + (sp && sp.q ? " " + sp.q : "")); }
@@ -1345,17 +1348,22 @@
     earnMark(m ? "m" : "g");
     function B(a, label, hot) { return '<button type="button" data-e="' + a + '"' + (hot ? ' class="hot"' : '') + '>' + label + '</button>'; }
     function row(ic, t, p, sub, btn, done) { return '<div class="crm-er' + (done ? ' done' : '') + '"><span class="ic">' + ic + '</span><span class="tx"><b>' + t + '</b><small>' + sub + '</small></span><span class="pp">' + (done ? '✓ Earned' : p) + '</span>' + (btn && !done ? '<span class="bt">' + btn + '</span>' : '') + '</div>'; }
+    var reviewRow = R.pts ? row("⭐", app ? "Tell us how we did" : "Leave a review", "+" + R.pts,
+      app ? "Honest feedback in the app. Any star rating counts the same: your rating never changes your points. Once per member."
+          : "Once per member, honor system. Your rating never changes your points.",
+      m ? B("review", app ? "⭐ Leave feedback" : "⭐ Leave a review") : "", ed.review) : "";
     var gp = SIMPLE && SIMPLE.game, rows = SIMPLE ?
       (INTERIM ? row("🧾", "Add my visit", PER + "/$1", PER + " points for every $1 (before tip). After you pay, tap Add my visit and snap your receipt or type the check number.", m ? B("visit", "🧾 Add my visit", 1) : "")
         : row("🧾", "Eligible purchases", PER + "/$1", PER + " points for every $1 on eligible purchases. Show your code when staff ring you up.", m ? B("qr", "📲 Show my code", 1) : "")) +
       row("👋", "Join", "+" + SIMPLE.join, "Once, when you join. Free.", "", !!m) +
       row("🎂", "Your birthday", "+" + EARN.birthday, "Once a year, on your birthday.", m && !(m.bday >= 0) ? B("bday", "🎂 Add my birthday") : "", ed["birthday_" + yr]) +
       row("🤝", "Refer a friend", "+" + REF.first, "Per friend who joins with your code and makes their first visit.", m ? B("ref", "📋 Copy my referral link") : "") +
+      reviewRow +
       (C.game ? row("🎮", "Play " + e(C.game), "≤" + gp.dailyCap + "/day", "1 point per " + gp.perScore.toLocaleString() + " score, up to " + gp.dailyCap + " points a day. You can play before you join; join to save them.", "") : "") +
       '<div class="crm-egoal" style="margin-top:10px"><span><b>Rewards</b></span><b></b></div>' + TIERS.map(function (t) { return '<div class="crm-egoal"><span>' + e(t[1]) + '</span><b>' + t[0].toLocaleString() + ' pts</b></div>'; }).join("")
       : row("📲", "Show your QR every visit", "+" + EARN.checkin, "+" + EARN.checkin + " once a day when staff scan your code, plus " + (WAL ? W.bar.per + " bar pts per $1 on drinks and " + W.food.per + " kitchen pts per $1 on food." : PER + " pts for every $1 you spend."), m ? B("qr", "📲 Show my QR", 1) : "") +
       (EARN.firstOrder ? row("🥇", "Your first order", "+" + EARN.firstOrder, "One-time bonus on top of your order points.", "", ed.first_order) : "") +
-      (R.pts ? row("⭐", app ? "Tell us how we did" : "Leave a review", "+" + R.pts, app ? "Honest feedback in the app. Any star rating counts the same: your rating never changes your points. Once per member." : "Once per member, honor system. Your rating never changes your points.", m ? B("review", app ? "⭐ Leave feedback" : "⭐ Leave a review") : "", ed.review) : "") +
+      reviewRow +
       row("🤝", "Refer a friend", "+" + REF.join, "Per friend who joins. They get " + e(REF.friendGift) + " with their first order + " + REF.friend + " pts. You get +" + REF.first + " on their first order, then +" + REF.every + " every time they order.", m ? B("ref", "📋 Copy my referral link") : "") +
       (IG.pts && IG.url ? row("📸", "Follow us on Instagram", "+" + IG.pts, "Once, honor system.", m ? B("ig", "📸 Follow") : "", ed.ig) : "") +
       (EARN.birthday ? row("🎂", "Your birthday", "+" + EARN.birthday, "Bonus points on your birthday, plus your birthday treat (bring a photo ID with the date).",m && !(m.bday >= 0) ? B("bday", "🎂 Add my birthday") : "", ed["birthday_" + yr]) : "") +

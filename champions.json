@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-25T23:00:11-07:00",
-  "week": "2026-10-19",
+  "updated": "2026-11-01T23:00:10-08:00",
+  "week": "2026-10-26",
   "closes": "Sunday 11:00 PM (Los Angeles)",
   "games": {
     "melody": {
@@ -8,16 +8,8 @@
       "gameName": "Melody Flight",
       "restaurant": "Melody Bar & Grill",
       "slug": "melody-lax",
-      "week": "2026-10-19",
-      "top3": [
-        {
-          "name": "Anthony",
-          "ig": "",
-          "score": 93217,
-          "rank": 1,
-          "prize": "Half off your meal"
-        }
-      ],
+      "week": "2026-10-26",
+      "top3": [],
       "prize": {
         "first": "Half off your meal",
         "second_third": "Free signature item"
@@ -28,7 +20,7 @@
       "gameName": "Melody Survival (seconds survived)",
       "restaurant": "Melody Bar & Grill",
       "slug": "melody-lax",
-      "week": "2026-10-19",
+      "week": "2026-10-26",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -40,7 +32,7 @@
       "gameName": "Ride the Nalu",
       "restaurant": "Nalu Vida",
       "slug": "nalu-vida",
-      "week": "2026-10-19",
+      "week": "2026-10-26",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -52,7 +44,7 @@
       "gameName": "Storm Run",
       "restaurant": "StormBurger",
       "slug": "storm-burger",
-      "week": "2026-10-19",
+      "week": "2026-10-26",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -64,7 +56,7 @@
       "gameName": "Order Up!",
       "restaurant": "Gritz N Wafflez",
       "slug": "gritz-n-wafflez",
-      "week": "2026-10-19",
+      "week": "2026-10-26",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -76,7 +68,7 @@
       "gameName": "Loco Match",
       "restaurant": "Churrito Loco",
       "slug": "churrito-loco",
-      "week": "2026-10-19",
+      "week": "2026-10-26",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -88,7 +80,7 @@
       "gameName": "Hibachi Catch",
       "restaurant": "Lucky Dragon Hibachi",
       "slug": "lucky-dragon",
-      "week": "2026-10-19",
+      "week": "2026-10-26",
       "top3": [],
       "prize": {
         "first": "Half off your meal",

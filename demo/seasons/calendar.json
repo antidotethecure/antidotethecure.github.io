@@ -2,7 +2,7 @@
   "_note": "Dates are MM-DD in America/Los_Angeles, both ends inclusive. end < start wraps the new year. First match wins, so list overlapping themes in priority order. ready:false entries are skipped until their script exists (?season=<id> still forces them for testing). Easter moves every year: update its start/end each spring (2027: Easter Sunday is 03-28).",
   "themes": [
     { "id": "halloween",     "start": "10-01", "end": "10-31", "script": "halloween/halloween.js" },
-    { "id": "thanksgiving",  "start": "11-01", "end": "11-30", "script": "thanksgiving/thanksgiving.js", "ready": false },
+    { "id": "thanksgiving",  "start": "11-01", "end": "11-30", "script": "thanksgiving/thanksgiving.js" },
     { "id": "new-year",      "start": "12-31", "end": "01-02", "script": "new-year/new-year.js", "ready": false },
     { "id": "christmas",     "start": "12-01", "end": "12-31", "script": "christmas/christmas.js", "ready": false },
     { "id": "valentines",    "start": "02-01", "end": "02-14", "script": "valentines/valentines.js", "ready": false },

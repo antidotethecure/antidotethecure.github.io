@@ -105,8 +105,9 @@
   function on(ev, fn) { (listeners[ev] = listeners[ev] || []).push(fn); }
   function emit(ev, a) { (listeners[ev] || []).forEach(function (fn) { try { fn(a); } catch (e) { console.warn("[seasons]", e); } }); }
   var IDLE_MS = W.SSAI_SEASONS_IDLE_MS || 5000;
-  var lastAct = Date.now(), idle = false, pointer = { x: 0.5, y: 0.62, at: 0 };
+  var lastAct = Date.now(), idle = false, pointer = { x: 0.5, y: 0.62, at: 0 }, lastInput = 0;
   function activity(type) {
+    if (type !== "scroll") lastInput = Date.now();   // a real finger, mouse, key or shake
     lastAct = Date.now();
     if (idle) { idle = false; emit("wake", type); } else emit("activity", type);
   }
@@ -123,7 +124,7 @@
     lastMove = [e.clientX, e.clientY];
   }, opt);
   W.addEventListener("wheel", function () { activity("scroll"); }, opt);
-  W.addEventListener("scroll", function () { activity("scroll"); }, opt);
+  W.addEventListener("scroll", function () { if (Date.now() - lastInput <= 1500) activity("scroll"); }, opt);
   W.addEventListener("keydown", function () { activity("key"); }, opt);
   setInterval(function () { if (!idle && !D.hidden && Date.now() - lastAct >= IDLE_MS) { idle = true; emit("idle"); } }, 250);
 

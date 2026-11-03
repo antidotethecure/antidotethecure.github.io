@@ -1,0 +1,153 @@
+{
+ "name": "ALL-ONE GYM",
+ "phone": "(562) 483-8129",
+ "facts": [
+  "Private gym in Lakewood, CA at 5436 Woodruff Ave.",
+  "Hours: Mon-Fri 5 AM-12 AM, Sat-Sun 5 AM-10 PM; ALL ACCESS 24/5.",
+  "Go 10 for 10 each week to win a prize."
+ ],
+ "suggested": [
+  "What are your hours?",
+  "How does 10 for 10 work?",
+  "How do I check in?",
+  "Does it work with my Apple Watch?"
+ ],
+ "qa": [
+  {
+   "q": "What are your hours?",
+   "a": "Monday to Friday 5 AM to midnight, Saturday and Sunday 5 AM to 10 PM. ALL ACCESS members get 24 hours Monday to Friday (24/5, not 24/7).",
+   "tags": [
+    "hours",
+    "what",
+    "your"
+   ]
+  },
+  {
+   "q": "How do I check in?",
+   "a": "Tap the QR button at the bottom of the app and show your pass at the front desk.",
+   "tags": [
+    "check"
+   ]
+  },
+  {
+   "q": "How does 10 for 10 work?",
+   "a": "Your plan has 10 workouts each week (Monday to Sunday). Finish all 10 in the app and you unlock one spin for a prize, like free creatine, 15% off next month, a free PT session or a free month.",
+   "tags": [
+    "does",
+    "work"
+   ]
+  },
+  {
+   "q": "Does it work with my Apple Watch?",
+   "a": "The App Store version reads heart rate and workouts from Apple Watch through Apple Health. In this web preview you can connect a Bluetooth heart-rate strap (Android / Chrome) or watch a demo heart rate.",
+   "tags": [
+    "apple",
+    "does",
+    "watch",
+    "with",
+    "work"
+   ]
+  },
+  {
+   "q": "What memberships do you have?",
+   "a": "ALL ACCESS, Standard and Restricted, all month to month, plus day passes. Ask the front desk or see all-onegym.com/pricing.",
+   "tags": [
+    "have",
+    "memberships",
+    "what"
+   ]
+  },
+  {
+   "q": "Do you have personal trainers?",
+   "a": "Yes. You can book a free training session with one of our trainers through the front desk.",
+   "tags": [
+    "have",
+    "personal",
+    "trainers"
+   ]
+  },
+  {
+   "q": "Is there a sauna?",
+   "a": "Yes, plus towel service, a big stretching area, boxing bags and an outdoor gym.",
+   "tags": [
+    "sauna",
+    "there"
+   ]
+  },
+  {
+   "q": "Do you sell protein or creatine?",
+   "a": "Yes, at the front desk: RAW, Isopure, Optimum Nutrition and more, plus energy drinks and ALL-ONE merch.",
+   "tags": [
+    "creatine",
+    "protein",
+    "sell"
+   ]
+  },
+  {
+   "q": "Where is my data stored?",
+   "a": "In this preview, only on this phone. Nothing is sent anywhere. The live app stores it securely with your gym account.",
+   "tags": [
+    "data",
+    "stored",
+    "where"
+   ]
+  },
+  {
+   "q": "Where are you located?",
+   "a": "5436 Woodruff Ave., Lakewood, CA 90713.",
+   "tags": [
+    "address",
+    "where",
+    "location",
+    "located",
+    "directions"
+   ]
+  },
+  {
+   "q": "What's your phone number?",
+   "a": "Call or text (562) 483-8129, or email allonegymteam@gmail.com.",
+   "tags": [
+    "phone",
+    "number",
+    "call",
+    "contact",
+    "email",
+    "text"
+   ]
+  },
+  {
+   "q": "How do I track my weight?",
+   "a": "Open Progress, type today's weight and tap Log. The chart shows your start, now, total lost and this week.",
+   "tags": [
+    "weight",
+    "track",
+    "progress",
+    "lost",
+    "pounds",
+    "scale"
+   ]
+  },
+  {
+   "q": "How do I start a workout?",
+   "a": "Open Train, pick a plan (Burn, Build or Starter) and tap Start. Log each set; the rest timer runs between sets.",
+   "tags": [
+    "workout",
+    "start",
+    "train",
+    "plan",
+    "program",
+    "sets"
+   ]
+  },
+  {
+   "q": "Is there an age limit?",
+   "a": "ALL ACCESS membership is for ages 21 and up.",
+   "tags": [
+    "age",
+    "21",
+    "old"
+   ]
+  }
+ ],
+ "app": "all-one-gym"
+}

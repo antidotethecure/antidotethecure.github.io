@@ -228,7 +228,7 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
 .cats a{display:flex;gap:10px;align-items:center;border:1px solid var(--edge);border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.03);color:var(--ink);text-decoration:none;font-weight:800;font-size:14px;line-height:1.2}
 .cats a span{font-size:26px;line-height:1}
 .cats a small{display:block;font-weight:500;color:var(--dim);font-size:12px}
-@media (min-width:640px){.cats{grid-template-columns:repeat(4,1fr)}}
+@media (min-width:640px){.cats{grid-template-columns:repeat(3,1fr)}}
 .tk ul{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:6px}
 .tk li{position:relative;padding-left:28px;font-size:15px;line-height:1.35}
 .tk li i{position:absolute;left:0;top:0;font-style:normal}
@@ -271,6 +271,8 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
 .btn-s{border:1px solid var(--edge);color:var(--ink);background:var(--panel)}
 @keyframes roiPulse{50%{box-shadow:0 8px 36px rgba(63,169,255,.75)}}
 @media (prefers-reduced-motion:reduce){.btn-p{animation:none}}
+.partner.feat{border-color:rgba(255,196,61,.6);background:linear-gradient(135deg,rgba(255,196,61,.14),rgba(10,22,49,.95))}
+.xa.feat{outline:2px solid rgba(255,196,61,.75);outline-offset:-2px}
 .partner{display:flex;gap:14px;align-items:stretch;text-align:left;margin-top:20px;padding:12px;border-radius:20px;text-decoration:none;color:var(--ink);border:1px solid rgba(52,211,153,.55);background:linear-gradient(135deg,rgba(52,211,153,.14),rgba(10,22,49,.95))}
 .partner img{width:112px;height:150px;object-fit:cover;border-radius:14px;flex:none}
 .partner b{display:block;font-size:20px;margin-top:4px}.partner small{color:var(--dim)}
@@ -305,10 +307,24 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
       <a class="btn-s" href="../demo/melody-lax/" data-es="✈️ Prueba la app de Melody">✈️ Try Melody's live app</a>
       <a class="btn-s" href="#plans" data-es="💳 Planes y precios">💳 Plans &amp; prices</a>
     </div>
+    <a class="partner feat" href="../demo/storm-burger/">
+      <img src="../demo/storm-burger/img/classic.jpg" alt="StormBurger classic burger" width="720" height="720" loading="eager">
+      <div>
+        <span class="ptag" data-es="⭐ Vista previa destacada">⭐ Featured preview</span>
+        <b class="notranslate" translate="no">StormBurger</b>
+        <small data-es="Inglewood · Long Beach">Inglewood · Long Beach</small>
+        <ul>
+          <li data-es="Juego de manejo &quot;Storm Run&quot; en 3D + premios semanales">"Storm Run" 3D driving game + weekly prizes</li>
+          <li data-es="Menú con fotos reales y comida en 3D">Menu with real photos and food in 3D</li>
+          <li data-es="Recompensas y lista de clientes">Rewards and your own customer list</li>
+        </ul>
+        <span class="pgo" data-es="Abrir la app de StormBurger →">Open StormBurger's app →</span>
+      </div>
+    </a>
     <a class="partner" href="../demo/melody-lax/">
       <img src="../demo/melody-lax/img/cover.jpg" alt="Melody Bar &amp; Grill" width="720" height="956" loading="eager">
       <div>
-        <span class="ptag" data-es="✅ Socio ya integrado">✅ Onboarded partner</span>
+        <span class="ptag" data-es="⭐ Destacado · ✅ Socio ya integrado">⭐ Featured · ✅ Onboarded partner</span>
         <b class="notranslate" translate="no">Melody Bar &amp; Grill</b>
         <small data-es="Westchester, junto a LAX · lanzando ahora">Westchester by LAX · going live now</small>
         <ul>
@@ -344,29 +360,35 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
 
   <section class="s" id="apps"><header><p class="kick">Demo apps · sample builds</p><h2 class="chrome">Apps we've built</h2><p class="lead">Each one is built around the business's real menu, with a game themed to their food. Tap one and play. Yours gets the same treatment.</p><p class="note" style="margin-top:8px"><b>These are demo samples</b> made to show what we build. <b>Melody Bar &amp; Grill</b> is our first onboarded partner and is going live now; Nalu Vida and the rest are still in the works and not live yet.</p></header>
     <div class="cats" aria-label="Apps by business type">
-      <a href="#apps" data-cat="rest"><span>🍽️</span><div>Restaurants<small>Menu, game, rewards</small></div></a>
-      <a href="#trucks"><span>🚚</span><div>Trucks<small>Ice cream + food trucks</small></div></a>
-      <a href="#auto"><span>🔧</span><div>Automotive<small>Mechanics, tire shops, quick lube</small></div></a>
-      <a href="#legal-apps"><span>⚖️</span><div>Legal<small>Court dates + clients</small></div></a>
+      <a href="#apps" data-cat="rest"><span>🍽️</span><div>Restaurants + Food<small>Menu, game, rewards, ordering</small></div></a>
+      <a href="#apps" data-cat="truck"><span>🚚</span><div>Food + Ice Cream Trucks<small>Live map, alerts, order ahead</small></div></a>
+      <a href="#apps" data-cat="auto"><span>🔧</span><div>Mechanics + Auto<small>Repair, tires, quick lube, body</small></div></a>
+      <a href="#apps" data-cat="gym"><span>💪</span><div>Gyms + Memberships<small>QR check-in, workouts, prizes</small></div></a>
+      <a href="#apps" data-cat="legal"><span>⚖️</span><div>Legal<small>Court dates + clients</small></div></a>
+      <a href="#apps" data-cat="game"><span>🎮</span><div>Games<small>Play, score, win prizes</small></div></a>
     </div>
     <div class="xf" id="xFilter" role="group" aria-label="Filter apps">
-      <button type="button" data-f="all" aria-pressed="true">All<i>11</i></button>
+      <button type="button" data-f="all" aria-pressed="true">All<i>12</i></button>
+      <button type="button" data-f="feat" aria-pressed="false">⭐ Featured<i>2</i></button>
       <button type="button" data-f="rest" aria-pressed="false">🍽️ Restaurants<i>6</i></button>
       <button type="button" data-f="full" aria-pressed="false">✨ Full package<i>2</i></button>
       <button type="button" data-f="truck" aria-pressed="false">🚚 Trucks<i>2</i></button>
       <button type="button" data-f="auto" aria-pressed="false">🔧 Automotive<i>1</i></button>
+      <button type="button" data-f="gym" aria-pressed="false">💪 Gyms<i>1</i></button>
       <button type="button" data-f="legal" aria-pressed="false">⚖️ Legal<i>2</i></button>
+      <button type="button" data-f="game" aria-pressed="false">🎮 Games<i>1</i></button>
     </div>
     <div class="xg" id="xGrid">
-      <a class="xa" data-k="rest" href="../demo/storm-burger/"><div class="xa-m"><img src="../demo/storm-burger/img/classic.jpg" alt="StormBurger classic burger" width="720" height="720" loading="lazy" decoding="async"><span class="xa-tag">Demo sample</span></div><div class="xa-b"><b>⚡ StormBurger</b><small>Inglewood · Long Beach</small><span class="g">"Storm Run" driving game</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa feat" data-k="feat rest" href="../demo/storm-burger/"><div class="xa-m"><img src="../demo/storm-burger/img/classic.jpg" alt="StormBurger classic burger" width="720" height="720" loading="lazy" decoding="async"><span class="xa-tag">⭐ Featured · Demo</span></div><div class="xa-b"><b>⚡ StormBurger</b><small>Inglewood · Long Beach</small><span class="g">"Storm Run" driving game</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa feat" data-k="feat rest full" href="../demo/melody-lax/"><div class="xa-m"><img src="../demo/melody-lax/img/cover.jpg" alt="Melody Bar &amp; Grill" width="720" height="956" loading="lazy" decoding="async"><span class="xa-tag">⭐ Featured · Partner</span></div><div class="xa-b"><b>🍸 Melody Bar &amp; Grill</b><small>Westchester by LAX</small><span class="g">Table ordering + flight game</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="rest" href="../demo/churrito-loco/"><div class="xa-m"><img src="../demo/churrito-loco/img/churros.jpg" alt="Churrito Loco churros" width="900" height="657" loading="lazy" decoding="async"><span class="xa-tag">Demo sample</span></div><div class="xa-b"><b>🌶️ Churrito Loco</b><small>South Gate</small><span class="g">"Loco Match" puzzle game</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="rest" href="../demo/lucky-dragon/"><div class="xa-m"><img src="../demo/lucky-dragon/img/shrimp.jpg" alt="Lucky Dragon hibachi shrimp" width="900" height="657" loading="lazy" decoding="async"><span class="xa-tag">Demo sample</span></div><div class="xa-b"><b>🐉 Lucky Dragon</b><small>Compton · hibachi</small><span class="g">"Hibachi Catch" dragon game</span><span class="xa-go">Open app →</span></div></a>
-      <a class="xa" data-k="rest full" href="../demo/melody-lax/"><div class="xa-m"><img src="../demo/melody-lax/img/cover.jpg" alt="Melody Bar &amp; Grill" width="720" height="956" loading="lazy" decoding="async"><span class="xa-tag">✅ Onboarded partner</span></div><div class="xa-b"><b>🍸 Melody Bar &amp; Grill</b><small>Westchester by LAX</small><span class="g">Table ordering + flight game</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="rest" href="../demo/gritz-n-wafflez/"><div class="xa-m"><img src="../demo/gritz-n-wafflez/img/wingz-wafflez.jpg" alt="Gritz N Wafflez wings and waffles" width="720" height="720" loading="lazy" decoding="async"><span class="xa-tag">🛠️ In the works</span></div><div class="xa-b"><b>🧇 Gritz N Wafflez</b><small>Wilshire Blvd · LA</small><span class="g">"Waffle Run" game while you wait</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="rest full" href="../demo/nalu-vida/"><div class="xa-m"><img src="../demo/nalu-vida/img/hero.jpg" alt="Nalu Vida beach bar" width="1200" height="1500" loading="lazy" decoding="async"><span class="xa-tag">🛠️ In the works</span></div><div class="xa-b"><b>🏄 Nalu Vida</b><small>Venice Pier · beach bar</small><span class="g">"Ride the Nalu" surf game</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="truck" href="../ice-cream/demo/"><div class="xa-m art ice" aria-hidden="true"><img class="xa-ic" src="../ice-cream/demo/icon-192.png?v=20261013a" alt="" width="92" height="92"><span class="xa-tag">Demo sample · Trucks</span></div><div class="xa-b"><b>🚚 Ice Cream Trucks</b><small>Live truck map + ETA</small><span class="g">"Truck's on your street" alerts</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="truck" href="../food-truck/demo/"><div class="xa-m art food" aria-hidden="true"><span>🌮</span><span class="xa-tag">Demo sample · Trucks</span></div><div class="xa-b"><b>🚚 Food Trucks</b><small>Live map + order ahead</small><span class="g">Food ready hot when you arrive</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="auto" href="../demo/mechanic/"><div class="xa-m art auto" aria-hidden="true"><img class="xa-ic" src="../demo/mechanic/icon-192.png?v=20261013c" alt="" width="92" height="92"><span class="xa-tag">Demo sample · Automotive</span></div><div class="xa-b"><b>🔧 Your Auto Shop</b><small>Repair, tires, quick lube, body, detailing</small><span class="g">Quote finder + tire stock + QR pay</span><span class="xa-go">Open app →</span></div></a>
+      <a class="xa" data-k="gym" href="../demo/all-one-gym/"><div class="xa-m"><img src="../demo/all-one-gym/intro-poster.jpg" alt="ALL-ONE GYM member app" width="800" height="600" loading="lazy" decoding="async"><span class="xa-tag">Demo sample · Gyms</span></div><div class="xa-b"><b>💪 ALL-ONE GYM</b><small>Lakewood · member app</small><span class="g">QR check-in, workout plan, 10-for-10 prizes</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="legal" href="https://antidotethecure.github.io/court-companion/practice/"><div class="xa-m"><img src="img/courtroom-practice.webp" alt="Judge at the bench in the Courtroom Practice game" width="1200" height="900" loading="lazy" decoding="async"><span class="xa-tag">🆕 Demo · Legal</span></div><div class="xa-b"><b>🎯 Courtroom Practice</b><small>Real cases · real courtroom</small><span class="g">Say it the way the court needs to hear it</span><span class="xa-go">Play the demo →</span></div></a>
       <a class="xa" data-k="legal" href="https://antidotethecure.github.io/court-companion/"><div class="xa-m art law" aria-hidden="true"><span>⚖️</span><span class="xa-tag">Demo sample · Legal</span></div><div class="xa-b"><b>⚖️ Court Companion</b><small>Sample client · fake case</small><span class="g">Court dates, reminders, lawyer tasks</span><span class="xa-go">Open app →</span></div></a>
       <a class="xa" data-k="game" href="../drizzle-bowl/"><div class="xa-m"><img src="../drizzle-bowl/cover.jpg" alt="Antidote Drizzle Bowl game" loading="lazy" decoding="async"><span class="xa-tag">🎳 Game</span></div><div class="xa-b"><b>🎳 Antidote Drizzle Bowl</b><small>From Antidote the Foodie</small><span class="g">Bowl the drizzle, top the leaderboard</span><span class="xa-go">Play →</span></div></a>
@@ -375,19 +397,20 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
     <div class="card" id="try"><h3>📱 Try one right here</h3><p class="note" style="margin:4px 0 10px">It's a working demo: scroll it, play the game, try the club.</p>
       <div class="xdc" id="xDemo" role="group" aria-label="Pick an app to preview">
         <button type="button" data-src="../demo/storm-burger/" aria-pressed="true">⚡ StormBurger</button>
+        <button type="button" data-src="../demo/melody-lax/" aria-pressed="false">✈️ Melody</button>
         <button type="button" data-src="../demo/churrito-loco/" aria-pressed="false">🌶️ Churrito Loco</button>
         <button type="button" data-src="../demo/lucky-dragon/" aria-pressed="false">🐉 Lucky Dragon</button>
-        <button type="button" data-src="../demo/melody-lax/" aria-pressed="false">✈️ Melody</button>
         <button type="button" data-src="../demo/gritz-n-wafflez/" aria-pressed="false">🧇 Gritz N Wafflez</button>
         <button type="button" data-src="../demo/nalu-vida/" aria-pressed="false">🏄 Nalu Vida</button>
         <button type="button" data-src="../ice-cream/demo/" aria-pressed="false">🍦 Ice cream truck</button>
         <button type="button" data-src="../food-truck/demo/" aria-pressed="false">🚚 Food truck</button>
         <button type="button" data-src="../demo/mechanic/" aria-pressed="false">🔧 Auto shop</button>
+        <button type="button" data-src="../demo/all-one-gym/" aria-pressed="false">💪 Gym</button>
       </div>
       <div class="xph"><div class="notch"></div><div class="scr"><iframe id="xPh" title="Demo app preview" src="../demo/storm-burger/" loading="lazy" allow="geolocation"></iframe></div></div>
     </div>
 
-    <div class="card"><h3>What's inside every app</h3>
+    <div class="card" id="everything"><h3>Everything you can get through SousShift</h3>
       <div class="xin">
         <div><b>🍔 Your menu in 3D</b>Real items, real prices, photos that spin like they're on the plate.</div>
         <div><b>🎮 A game made for you</b>Themed to your food. Weekly prize board keeps people coming back.</div>
@@ -397,6 +420,17 @@ footer{margin:40px 0 10px;text-align:center;color:var(--dim);font-size:14px}
         <div><b>⭐ More Google reviews</b>One-tap review button plus a map that shows you're close by.</div>
         <div><b>🌐 12 languages</b>Español, 中文, 한국어, Հայերեն, Русский and more, one tap away.</div>
         <div><b>📱 No download</b>Scan the QR on the table and it opens. Nothing to install.</div>
+        <div><b>📞 AI phone host</b>A natural AI voice answers your phone 24/7 and texts back. $150/mo voice + text.</div>
+        <div><b>💬 AI text assistant</b>Answers customer texts for you, day and night. $75/mo.</div>
+        <div><b>💳 Gold loyalty card</b>Points, visit levels and a live reward pass staff can scan.</div>
+        <div><b>🏷️ Discounts + deals</b>Happy hour with a live countdown, holiday specials you approve, early-bird gifts and raffles.</div>
+        <div><b>🛵 Ordering, pay + delivery</b>Order ahead and pay by card in the app, points on every order, DoorDash delivery. Coming soon.</div>
+        <div><b>🔧 QR pay</b>Customers scan and pay at the counter (auto shops today).</div>
+        <div><b>🗂️ Owner back office</b>Members, visits, rewards and prices in one place, with team access you control.</div>
+        <div><b>🧑‍🍳 Staff app</b>English + Spanish training with a quiz. No customer data.</div>
+        <div><b>🏈 Sports bar + Games Pack</b>Live scores, squares, trivia and pick-the-winner points. Add-on.</div>
+        <div><b>🎬 Social + SEO growth</b>We run your posts and get you found on Google. Add-on.</div>
+        <div><b>🖨️ Print kit</b>QR stickers, table cards and posters ready to print.</div>
       </div>
       <p class="note" style="margin:10px 0 0">Some tools come with specific plans. See <a href="#plans">Plans &amp; prices</a> for what's in each.</p>
     </div>

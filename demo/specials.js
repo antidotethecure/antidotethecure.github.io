@@ -17,7 +17,12 @@
    - window.SSAI_SPECIALS exposes today(), active(), upcoming(), theme(), link() for crm.js (owner "Holiday blast"). */
 (function () {
   "use strict";
-  var LIST = (window.SPECIALS || []).filter(function (s) { return s && s.start && s.end; });
+  /* NOT APPROVED = NOT SHOWN (Antidote, 2026-11-02). The holiday specials in every app are SAMPLES built from the real
+     menu, and guests were seeing them as "coming up" before any owner signed off. A special only reaches a guest, or the
+     owner's Holiday blast, once it carries ok:true. The full sample list stays on SSAI_SPECIALS.all for the setup page
+     and Christian HQ › Prices & specials, which is where one gets approved. */
+  var ALL = (window.SPECIALS || []).filter(function (s) { return s && s.start && s.end; });
+  var LIST = ALL.filter(function (s) { return s.ok === true; });
   var CFG = window.SPECIALS_CFG || {};
   var NAME = CFG.name || (window.CRM_CFG && window.CRM_CFG.name) || (window.NEARBY && window.NEARBY.name) || document.title.split(/ [—·|-] /)[0];
   var SLUG = NAME.toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -56,7 +61,7 @@
   function link(sp) { return location.host + location.pathname.replace(/index\.html$/, "") + "#sp-" + sp.id; }
   function nextStart(sp) { var y = LA.y; if (dayNum(sp.start, y) < dayNum(TODAY, y)) y++; return y + "-" + sp.start; }   // YYYY-MM-DD
   function todayISO() { return LA.y + "-" + TODAY; }
-  window.SSAI_SPECIALS = { list: LIST, today: function () { return TODAY; }, year: LA.y, active: active, upcoming: upcoming, theme: theme, link: link, fmt: fmt, nextStart: nextStart, todayISO: todayISO, name: NAME };
+  window.SSAI_SPECIALS = { list: LIST, all: ALL, today: function () { return TODAY; }, year: LA.y, active: active, upcoming: upcoming, theme: theme, link: link, fmt: fmt, nextStart: nextStart, todayISO: todayISO, name: NAME };
 
   var css = [
     "#ssai-sp-banner{all:initial;display:block;position:relative;z-index:50;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;width:100%;box-sizing:border-box}",

@@ -2986,6 +2986,9 @@ window.VERSUS={slug:"melody",name:"Melody Bar & Grill",api:"https://drizzle-bowl
 <script src="../gamelock.js?v=ml2"></script>
 <script>/* Holiday & seasonal specials: SAMPLES from the real menu (no prices invented; the owner sets them on the setup page). See demo/specials.js */
 window.SPECIALS=(window.SSAI_MENU["melody-bar-grill"].specials||[]).filter(function(s){ return s.on!==false; });   // from menu-data.js (+ saved changes)</script>
+<script>/* Happy hour 3-6 daily (Christian). The strip + countdown only exist between 3 and 6 PM in Westchester. */
+window.SSAI_HAPPY={start:"15:00",end:"18:00",label:"Happy hour",note:"Ask your server \u2014 happy hour pricing at the bar and the tables."};</script>
+<script src="../happyhour.js?v=hh1"></script>
 <script src="../specials.js?v=co2"></script>
 <script>/* RAMS SCORE SPECIAL (demo/scorespecial.js, 2026-10-19): when the Rams score in today's game (ESPN, team LAR), members unlock
    ONE same-day deal until 11:59 PM, redeemed with the live reward pass (counts as that visit's one reward, no stacking).

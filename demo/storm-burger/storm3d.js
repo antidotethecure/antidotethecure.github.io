@@ -22,7 +22,7 @@ if (S && REQ !== "2d" && (REQ === "3d" || pref() !== "2d")) {
 
 async function boot() {
   const THREE = await import("three");
-  const [QM, WXM, PM, BBMOD, CMOD] = await Promise.all(["quality", "weather", "particles", "billboard", "carmodels"].map(n => import("../engine3d/" + n + ".js?v=e3u")));
+  const [QM, WXM, PM, BBMOD, CMOD] = await Promise.all(["quality", "weather", "particles", "billboard", "carmodels"].map(n => import("../engine3d/" + n + ".js?v=e3v")));
   const game = document.getElementById("game"), host = game.parentNode;
   const W = S.W, H = S.H, PY = S.PY, KF = 3.2, TAU = Math.PI * 2;
   const wx = x => x - W / 2;
@@ -232,7 +232,7 @@ async function boot() {
     const wash = new THREE.Sprite(glowMat(0xbcd0ff, .18)); wash.scale.set(W2 * 1.5, H2 * 1.6, 1); wash.position.set(0, Y + H2 / 2, 6); b.add(wash); }
   // shared materials (lots come and go; a few materials animated in neonTick instead of one per strip)
   const NEONM = NEONC.map((c, i) => ({ m: basic(new THREE.Color(...c)), c, ph: i * 1.7 })).concat(NEONC.map((c, i) => ({ m: basic(new THREE.Color(...c)), c, ph: i * 2.3, flick: 1 })));
-  const LEDN = { m: basic(new THREE.Color(3, .6, .3)), c: [3, .6, .3], ph: 0, pulse: 1 }, LEDM = LEDN.m; NEONM.push(LEDN);
+  const LEDN = { m: basic(new THREE.Color(3, .6, .3)), c: [3, .6, .3], ph: 0 }, LEDM = LEDN.m; NEONM.push(LEDN);
   const NGLOW = NEONC.map(c => glowMat(new THREE.Color(c[0] / 3.4, c[1] / 3.4, c[2] / 3.4), .22));
   function neonStrip(g, s, x, y, len, hz) { const i = (rnd() * NEONC.length) | 0, m = NEONM[i + (rnd() < .15 ? NEONC.length : 0)].m;
     box(g, m, 2.5, 2.5, len, x, y, hz || 0); const gl = new THREE.Sprite(NGLOW[i]); gl.scale.set(Math.min(len, 260), 26, 1); gl.position.set(x - s * 4, y, hz || 0); g.add(gl); }
@@ -556,7 +556,9 @@ async function boot() {
   function pooled(f, sd) { const k = POOL.get(f) || new Map(); POOL.set(f, k); const a = k.get(sd) || []; k.set(sd, a);
     let L = a.find(x => !x.o.parent); if (!L) { L = f(sd); a.push(L); } return L; }
   function fill() {
-    for (let s = 0; s < 2; s++) while (front[s] > FAR) { const L = lot(s ? 1 : -1); place(L.o, front[s] - L.len / 2, L.upd); front[s] -= L.len; }
+    for (let s = 0; s < 2; s++) while (front[s] > FAR) { const L = lot(s ? 1 : -1); place(L.o, front[s] - L.len / 2, L.upd);
+      if (Math.random() < .35) place(parkedCar(s ? 1 : -1), front[s] - 30 - Math.random() * (L.len - 60));   // a car parked at the curb every couple of blocks (11-02)
+      front[s] -= L.len; }
   }
   function event(E) { if (!E) E = fe++ % 2 === 0 ? CITYLM[city][li[city]++ % CITYLM[city].length] : { cross: FILL[city][fi++ % FILL[city].length] }; if (E.city) city = E.city;
     const z = Math.min(front[0], front[1]);
@@ -740,6 +742,23 @@ async function boot() {
     [-15, 15].forEach(x => box(g, brake, 7, 3, 1, x, 18, 46.5));
     const bg = add(g, PLANE, glowPlaneMat(0xff2a1a, .35), 60, 70, 1, 0, .8, 70); bg.rotation.x = -Math.PI / 2;
     return g; }
+  /* ---------- street traffic (Antidote 11-02): cars parked at the curb, and cars that come up from behind and swerve past.
+     Looks only: they never use the lane the truck is in (they swerve out of it), so they can't hit you. ---------- */
+  function parkedCar(s) { const g = makeCar((Math.random() * 6) | 0); g.children.slice(1).forEach(m => m.visible = false);   // parked: brake lights off
+    g.position.x = s * 196; g.rotation.y = (Math.random() - .5) * .06; return g; }
+  const TRAF = STATUS.traffic = []; let trT = 5;
+  function trafficTick(st, run, pitting, dt, tx) {
+    const mine = st.lane, busy = st.items.some(q => (q.type === "block" || q.type === "queue" || q.type === "pit" || q.type === "spike") && q.y > -1200 && q.y < H + 200);
+    if (run && !pitting && !busy && (trT -= dt) <= 0 && TRAF.length < 3) { trT = 4 + Math.random() * 5;
+      const opts = [0, 1, 2, 3].filter(l => Math.abs(l - mine) >= 1), ln = opts[(Math.random() * opts.length) | 0], c = makeCar((Math.random() * 6) | 0);
+      c.position.set(LANEX[ln], 0, 520); scene.add(c); TRAF.push({ c, ln, v: 650 + Math.random() * 450, sw: .6 + Math.random() * 1.2 }); }
+    for (let i = TRAF.length - 1; i >= 0; i--) { const C = TRAF[i], p = C.c.position;
+      if (!st.running || p.z < -2600) { scene.remove(C.c); TRAF.splice(i, 1); continue; }
+      p.z -= C.v * dt;
+      const near = p.z > -420 && p.z < 420, inMine = Math.abs(LANEX[C.ln] - tx) < 70;
+      if ((C.sw -= dt) <= 0 || (near && inMine)) { C.sw = 1 + Math.random() * 1.6;   // swerve to the next lane over, never into the truck
+        const nx = [C.ln - 1, C.ln + 1].filter(l => l >= 0 && l < 4 && Math.abs(LANEX[l] - tx) >= 70); if (nx.length) C.ln = nx[(Math.random() * nx.length) | 0]; }
+      const d = LANEX[C.ln] - p.x; p.x += d * Math.min(1, dt * 3.2); C.c.rotation.y = Math.max(-.32, Math.min(.32, -d * .006)); } }
   const STORES = { lb: ["5801 CHERRY AVE · LONG BEACH"], ing: ["1500 N LA BREA AVE · INGLEWOOD"] };
   const storeFor = q => q ? STORES.lb[0] : STORES.ing[0];
 
@@ -859,7 +878,7 @@ async function boot() {
       if (on) { const g = x.createRadialGradient(cx, cy, 0, cx, cy, cs * .62); g.addColorStop(0, "#fffbe0"); g.addColorStop(.45, "#ffd23f"); g.addColorStop(1, "rgba(255,150,20,0)"); x.fillStyle = g; x.fillRect(cx - cs, cy - cs, cs * 2, cs * 2); }
       else { x.fillStyle = "#16130c"; x.beginPath(); x.arc(cx, cy, cs * .3, 0, TAU); x.fill(); } }   // unlit LEDs, like a real board
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = ANISO; return t; })();
-  const ledM = new THREE.MeshBasicMaterial({ map: LEDTX, toneMapped: false }), ledDotM = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, .5, .4), toneMapped: false }), ledDotOff = new THREE.MeshBasicMaterial({ color: 0x2a0a08 });
+  const ledM = new THREE.MeshBasicMaterial({ map: LEDTX, toneMapped: false }), ledDotM = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, .5, .4), toneMapped: false });
   function ledSign(b, w, y) { const g = new THREE.Group(); g.position.y = y; b.add(g);
     add(g, BOX, MAT.dark, w + 10, w * .13 + 10, 4, 0, 0, -2.5);   // housing
     add(g, PLANE, ledM, w, w * .13, 1, 0, 0, .2);
@@ -868,10 +887,9 @@ async function boot() {
       dots.push(add(g, GEO("Sphere", 1, 6, 4), ledDotM, 1.6, 1.6, 1.6, p[0], p[1], 1.2)); }
     LEDS.push(dots); }
   const LEDS = [];
-  function ledTick(t) { ledM.color.setScalar(1.05 + .18 * Math.sin(t * 5)); const k = Math.floor(t * 14);
-    for (let s = LEDS.length - 1; s >= 0; s--) { const dots = LEDS[s]; if (!dots[0].parent || !dots[0].parent.parent || !dots[0].parent.parent.parent) { LEDS.splice(s, 1); continue; } dots.forEach((d, i) => d.material = (i + k) % 4 === 0 ? ledDotOff : ledDotM); } }
+  ledM.color.setScalar(1.1);   // steady (Antidote 11-02: "no flash, no glitching"): the sign and its bulbs stay lit, no pulse or chase
   function spawnBoard() { const r = bbN++ % REVIEWS.length, R = REVIEWS[r], src = R.dir + R.clips[bbC[r]++ % R.clips.length];
-    if (!BBM) BBM = BBMOD.makeVideoBoards(THREE, { src: src + ".mp4", poster: src + ".jpg" }); else { BBM.video.src = src + ".mp4"; const pl = BBM.video.play(); if (pl && pl.catch) pl.catch(() => {}); }
+    if (!BBM) BBM = BBMOD.makeVideoBoards(THREE, { src: src + ".mp4", poster: src + ".jpg", steady: true }); else BBM.setSrc(src + ".mp4", src + ".jpg");   // steady: no blink or glitch on his board (11-02)
     const b = BBM.create({ w: 190, pole: 130, caption: "ANTIDOTE FOOD REVIEW · STORMBURGER" }), g = new THREE.Group(); ledSign(b, 210, 130 + 190 * 16 / 9 + 26); b.position.x = bbSide * 262; b.rotation.y = -bbSide * .42; g.add(b);
     place(g, front[bbSide > 0 ? 1 : 0] + 40); bbSide = -bbSide; }
   
@@ -1030,7 +1048,7 @@ async function boot() {
     const dz = (pitting ? 0 : run ? st.speed * KF : st.dying ? Math.max(0, st.speed * KF * (1 - (now - st.dying) / 900)) : 2.5) * k;
     const dzw = dz + warp; warp = 0; odo += dzw; roadTex.offset.y += dzw / RT; roadRough.offset.y = roadTex.offset.y;
     for (let i = live.length - 1; i >= 0; i--) { const L = live[i]; L.o.position.z += dzw; if (L.upd && L.o.position.z > -1900) L.upd(L.o, t, dt); if (L.o.position.z > 900) { world.remove(L.o); live.splice(i, 1); } }
-    neonTick(t); if (run && !pitting) { bbT -= dt; if (bbT <= 0) { spawnBoard(); bbT = 10 + Math.random() * 5; }   /* his review rolls by every 10-15 s (10-24) */ } if (BBM) BBM.update(t); ledTick(t);
+    neonTick(t); if (run && !pitting) { bbT -= dt; if (bbT <= 0) { spawnBoard(); bbT = 10 + Math.random() * 5; }   /* his review rolls by every 10-15 s (10-24) */ } if (BBM) BBM.update(t);
     front[0] += dzw; front[1] += dzw; evtIn -= dz; if (evtIn <= 0) { event(); evtIn = SPACING; } fill();
 
     /* truck */
@@ -1043,6 +1061,7 @@ async function boot() {
     else if (st._tw) { scene.remove(st._tw.g); st._tw = null; }
     if (pitting) { const e = u => u * u * (3 - 2 * u), o = e(Math.min(1, pp / .22)) * e(Math.min(1, (1 - pp) / .18)); tx += 112 * o; yaw = -Math.sin(pp * Math.PI * 4.5) * .18 * o * (pp < .22 || pp > .82 ? 1 : 0);
       if (Math.random() < .35) fx.sparks(V.set(tx + (Math.random() < .5 ? -27 : 27), 14 + Math.random() * 20, (Math.random() - .5) * 70), V2.set(0, 1, 0), null, .8, 6); }
+    trafficTick(st, run, pitting, dt, tx);
     T.position.set(tx, ty, 0); T.rotation.set(0, yaw, roll); T.scale.setScalar(sc);
     T.visible = !(st.over && st.lives <= 0) && (st.inv <= 0 || st.inv > 1e8 || Math.floor(st.inv / 6) % 2 === 0);
     rig.position.copy(T.position); rig.rotation.copy(T.rotation); rig.scale.copy(T.scale); spots.forEach(sp => sp.intensity = T.visible ? (LITE ? 900 : 520) : 0);

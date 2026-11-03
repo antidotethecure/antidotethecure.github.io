@@ -12,7 +12,7 @@ export function makeVideoBoards(THREE, O) {
   video.style.cssText = "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none";
   const vtex = new THREE.VideoTexture(video); vtex.colorSpace = THREE.SRGBColorSpace; vtex.minFilter = THREE.LinearFilter; vtex.magFilter = THREE.LinearFilter; vtex.generateMipmaps = false; vtex.anisotropy = 1;   // crisp: no mip blur, no re-scaling (the file is 640×1138 H.264 High)
   const ptex = new THREE.TextureLoader().load(O.poster); ptex.colorSpace = THREE.SRGBColorSpace;
-  const U = { uVid: { value: vtex }, uPoster: { value: ptex }, uLive: { value: 0 }, uT: { value: 0 }, uGrid: { value: new THREE.Vector2(O.cols || 216, O.rows || 384) }, uBright: { value: O.bright || 1.6 } };
+  const U = { uVid: { value: vtex }, uPoster: { value: ptex }, uLive: { value: 0 }, uT: { value: 0 }, uGrid: { value: new THREE.Vector2(O.cols || 216, O.rows || 384) }, uBright: { value: O.bright || 1.6 }, uSteady: { value: O.steady ? 1 : 0 } };
   let tried = 0; const tryPlay = () => { tried++; const p = video.play(); if (p && p.catch) p.catch(() => {}); };
   video.addEventListener("playing", () => { U.uLive.value = 1; api.playing = true; });
   ["pointerdown", "touchstart", "keydown"].forEach(ev => window.addEventListener(ev, () => { if (video.paused) tryPlay(); }, { passive: true }));
@@ -20,11 +20,12 @@ export function makeVideoBoards(THREE, O) {
   (document.body || document.documentElement).appendChild(video); tryPlay();
   const screenMat = new THREE.ShaderMaterial({ uniforms: U, toneMapped: false, fog: false,
     vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
-    fragmentShader: `uniform sampler2D uVid; uniform sampler2D uPoster; uniform float uLive; uniform float uT; uniform vec2 uGrid; uniform float uBright; varying vec2 vUv;
+    fragmentShader: `uniform sampler2D uVid; uniform sampler2D uPoster; uniform float uLive; uniform float uT; uniform vec2 uGrid; uniform float uBright; uniform float uSteady; varying vec2 vUv;
       void main(){ vec3 c = mix(texture2D(uPoster, vUv).rgb, texture2D(uVid, vUv).rgb, uLive);
         c = pow(c, vec3(2.2));                                            // video is sRGB; the bright LED value lives in linear space
         vec2 g = fract(vUv * uGrid) - .5; float led = smoothstep(.5, .28, max(abs(g.x), abs(g.y)));   // the LED pixel grid
         float scan = .96 + .04 * sin(uT * 40.0 + vUv.y * 600.0);
+        if (uSteady > .5) { led = 1.0; scan = 1.0; }                     // steady: no scan shimmer, no pixel grid (it shimmers at a distance)
         gl_FragColor = vec4(c * (.86 + .14 * led) * uBright * scan + c * .04, 1.0); }   // a fine, faint LED pitch: the review stays sharp (no visible boxes)` });
   const bezel = new THREE.MeshStandardMaterial({ color: 0x0c0d10, roughness: .5, metalness: .6 }), steel = new THREE.MeshStandardMaterial({ color: 0x5d636c, roughness: .45, metalness: .8 });
   const glowTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 64; const x = c.getContext("2d"), g = x.createRadialGradient(32, 32, 0, 32, 32, 32); g.addColorStop(0, "rgba(255,255,255,.9)"); g.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = g; x.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
@@ -42,6 +43,9 @@ export function makeVideoBoards(THREE, O) {
       const halo = new THREE.Mesh(new THREE.PlaneGeometry(w * 2.2, h * 1.7), new THREE.MeshBasicMaterial({ map: glowTex, color: 0x9fb8ff, transparent: true, opacity: .22, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); halo.position.set(0, pole + h / 2, -.8); g.add(halo);
       const pool = new THREE.Mesh(new THREE.PlaneGeometry(w * 2, w * 1.6).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, color: 0xb0c4ff, transparent: true, opacity: .28, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); pool.position.set(0, .6, w * .6); g.add(pool);
       g.userData.halo = halo; g.userData.pool = pool; return g; },
+    // next clip: hold its poster until the new video is really playing, so the screen never flashes black between clips
+    setSrc(src, poster) { U.uLive.value = 0; api.playing = false; if (poster) { const nt = new THREE.TextureLoader().load(poster, () => { const old = U.uPoster.value; U.uPoster.value = nt; if (old !== ptex) old.dispose(); }); nt.colorSpace = THREE.SRGBColorSpace; }
+      video.src = src; tryPlay(); },
     // the video only decodes while a board is actually in the scene (no board around → paused: no decode, no texture uploads)
     update(t) { U.uT.value = t; if (!api.playing && video.readyState >= 2 && !video.paused) { U.uLive.value = 1; api.playing = true; }
       if (++chk % 20 === 0) { for (let i = boards.length - 1; i >= 0; i--) if (!inScene(boards[i])) boards.splice(i, 1); const want = boards.length > 0;

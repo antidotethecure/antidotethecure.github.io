@@ -267,7 +267,11 @@
   function levelUp(newLevel, resume, playMs) {
     if (S.shown || S.active || !canPlay()) return false;
     var n = +newLevel || 0, ms = played(playMs); warm(ms);
-    if (!TEST) { if (n < 3 || n > 5) return false; if (ms < (C.min || 90) * 1000 && n !== 5) return false; }
+    /* NOT BEFORE THE THIRD LEVEL IS BEATEN (2026-11-02, Antidote: "the halftime ad only comes after you beat like the third
+       level, once the level's beat, so it's not stopping them in the middle of the game"). newLevel is the level you are about
+       to START, so n = 4 is the moment level 3 ended. Window 4-6: if the break is skipped at 4 (not enough flown yet) it still
+       gets its chance at 5, and at 6 it goes whatever the clock says. */
+    if (!TEST) { if (n < 4 || n > 6) return false; if (ms < (C.min || 90) * 1000 && n !== 6) return false; }
     show(resume); return true;
   }
   function tick(playMs, pauseGame, resume) {

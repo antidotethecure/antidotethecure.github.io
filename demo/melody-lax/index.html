@@ -130,6 +130,8 @@ h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;le
 .gamebox.ssai-fsfill #cv{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;object-fit:contain;border-radius:0;background:transparent;touch-action:none}
 .gamebox.ssai-fsfill .hud{position:absolute;top:calc(6px + env(safe-area-inset-top,0px));left:12px;right:62px;z-index:4;margin:0;padding:0;text-shadow:0 1px 3px #000}
 .gamebox.ssai-fsfill .hud2{position:absolute;top:calc(40px + env(safe-area-inset-top,0px));left:12px;right:62px;z-index:4;margin:0;text-shadow:0 1px 3px #000}
+/* the score/level rows now run across the top of the screen, so the two round canvas buttons and the renderer badge drop below them */
+.gamebox.ssai-fsfill #sndb,.gamebox.ssai-fsfill .gbtn.songb,.gamebox.ssai-fsfill .m3dbadge{top:68px!important}
 .gamebox.ssai-fsfill #points{display:none!important}
 .gamebox.ssai-fsfill #over.on{position:absolute;left:0;right:0;bottom:0;z-index:6;max-height:66%;overflow:auto;margin:0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(26,10,12,.82),rgba(26,10,12,.97))}
 .gbtn{position:absolute;z-index:2;width:34px;height:34px;padding:0;border-radius:50%;border:1px solid #ffffff38;background:rgba(26,10,12,.62);color:#fff;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
@@ -2782,7 +2784,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=fs1"></script>
+<script type="module" src="melody3d.js?v=fs2"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}

@@ -32,6 +32,7 @@ if (M && MODE !== "off") {
    themselves off. On during the preview phase; ?debug=0 hides it, ?debug=1 forces it. Tap it to copy the text. */
 const SHOW_BADGE = Q.get("debug") !== "0";
 const BADGE = (() => { if (!SHOW_BADGE || !M) return null; const cv0 = document.getElementById("cv"); if (!cv0) return null; const el = document.createElement("div");
+  el.className = "m3dbadge";   // full screen moves it clear of the Level line (index.html .ssai-fsfill)
   el.style.cssText = "position:absolute;left:6px;top:34px;z-index:6;max-width:62%;padding:3px 7px;border-radius:7px;background:rgba(5,8,20,.72);color:#cfe3ff;font:600 9px/1.3 ui-monospace,Menlo,monospace;pointer-events:auto;white-space:pre-wrap;word-break:break-word;opacity:.85";
   el.addEventListener("click", () => { try { navigator.clipboard.writeText(el.textContent); } catch (e) {} });
   cv0.parentNode.appendChild(el);

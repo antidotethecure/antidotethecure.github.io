@@ -45,6 +45,7 @@ window.GYM_CFG = {
       { id: "celsius", name: "Celsius", price: 3.5, icon: "⚡" }, { id: "ghost", name: "Ghost Energy", price: 3.5, icon: "👻" }, { id: "alani", name: "Alani Nu", price: 3.5, icon: "🥤" },
       { id: "bum", name: "Bum Energy", price: 3.5, icon: "🥤" }, { id: "rawdrink", name: "RAW protein drink", price: 5, icon: "🥛" }, { id: "lll", name: "L&L Complete Cookie", price: 3, icon: "🍪" } ] },
     { cat: "Protein + supplements", items: [
+      { id: "gorilla", name: "Gorilla Mode pre-workout, Watermelon", price: null, icon: "🦍", img: "gorilla-mode.jpg", desk: 1 },
       { id: "rawcre", name: "RAW Nutrition creatine", price: 16, icon: "⚡" }, { id: "optcre", name: "Optimum creatine", price: 30, icon: "⚡" }, { id: "isocre", name: "Isopure Perfect Creatine", price: 38, icon: "⚡" },
       { id: "cbum-mc", name: "RAW CBUM protein, Milk & Cookies", price: 55, icon: "🥤" }, { id: "cbum-cc", name: "RAW CBUM protein, Cinnamon Crunch", price: 55, icon: "🥤" },
       { id: "iso-ch", name: "Isopure protein, chocolate", price: 80, icon: "🥤" }, { id: "ryse-bm", name: "Ryse Loaded Protein, Blueberry Muffin", price: 45, icon: "🥤" },

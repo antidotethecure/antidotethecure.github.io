@@ -52,6 +52,7 @@
     $("#shopCats").innerHTML = C.catalog.map(function (c) {
       return "<h3>" + esc(c.cat) + '</h3><div class="grid">' + c.items.map(function (i) {
         var q = cart[i.id] || 0;
+        if (i.desk) return '<div class="prod feat"><img src="' + i.img + '?v=1" alt="' + esc(i.name) + ' held by a flexing arm" width="720" height="900" loading="lazy"><b>' + esc(i.name) + '</b><small>Price at the front desk</small><span class="dim">Ask the desk to grab you a tub.</span></div>';
         return '<div class="prod' + (i.soon ? " soon" : "") + '"><span class="pi">' + i.icon + "</span><b>" + esc(i.name) + "</b><small>" + (i.soon ? "Coming soon" : money(i.price)) + "</small>" +
           (i.soon ? '<button class="btn sm ghost" type="button" disabled>Notify me</button>' : q ? '<div class="qty"><button type="button" data-dec="' + i.id + '" aria-label="One less">−</button><b>' + q + '</b><button type="button" data-inc="' + i.id + '" aria-label="One more">+</button></div>' : '<button class="btn sm primary" type="button" data-inc="' + i.id + '">Add</button>') + "</div>";
       }).join("") + "</div>";
@@ -62,7 +63,7 @@
   D.addEventListener("click", function (e) {
     var b = e.target.closest("[data-inc],[data-dec],[data-plan],[data-extra],#cartGo,#vipBtn,#payNow,[data-pay],#payCancel,#rcptClose");
     if (!b || busy) return;
-    if (b.dataset.inc) { var i = items[b.dataset.inc]; if (i && !i.soon) cart[i.id] = Math.min(20, (cart[i.id] || 0) + 1); renderShop(); return; }
+    if (b.dataset.inc) { var i = items[b.dataset.inc]; if (i && !i.soon && !i.desk) cart[i.id] = Math.min(20, (cart[i.id] || 0) + 1); renderShop(); return; }
     if (b.dataset.dec) { if (cart[b.dataset.dec] > 1) cart[b.dataset.dec]--; else delete cart[b.dataset.dec]; renderShop(); return; }
     var s = ensure(), m = s.membership;
     if (b.dataset.plan) { var p = planBy(b.dataset.plan); return checkout({ kind: "plan", title: "Switch to " + p.name, lines: [{ name: p.name + " · first month at the new rate", q: 1, price: p.price }], note: "Your " + p.name + " rate starts today. Your old plan stops at the same time.", plan: p.key }); }

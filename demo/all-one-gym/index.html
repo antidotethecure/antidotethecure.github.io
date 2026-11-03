@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ALL-ONE GYM · Member App</title>
+<meta name="description" content="ALL-ONE GYM member app (sample): check in with your QR pass, follow a weekly plan, log every set, track your weight and heart rate, and go 10 for 10 to win prizes.">
+<meta name="robots" content="noindex,follow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<script>if (top !== self) { try { top.location = self.location; } catch (e) { document.documentElement.style.display = "none"; } }</script>
+<meta name="theme-color" content="#080808">
+<link rel="manifest" href="manifest.webmanifest?v=1">
+<link rel="icon" href="favicon-32.png?v=1" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ALL-ONE">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="app.css?v=1">
+</head>
+<body>
+
+<!-- ============ SIGN IN / JOIN ============ -->
+<section id="auth" class="auth" hidden>
+  <div class="auth-in">
+    <img class="auth-logo" src="mark.png" alt="ALL-ONE GYM" width="150" height="194">
+    <p class="kick">Private Club · Lakewood</p>
+    <h1>Set the standard.</h1>
+    <p class="sub">Your pass, your plan, your progress. Go 10 for 10 every week and win.</p>
+    <form id="joinForm" class="card form" autocomplete="on">
+      <label>First name<input name="name" required maxlength="40" autocomplete="given-name"></label>
+      <div class="two">
+        <label>Phone<input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16"></label>
+        <label>Email <small>(optional)</small><input name="email" type="email" autocomplete="email" maxlength="80"></label>
+      </div>
+      <label>Main goal
+        <select name="goal"><option value="lose">Lose weight</option><option value="build">Build muscle</option><option value="strong">Get started / back in shape</option></select>
+      </label>
+      <div class="two">
+        <label>Starting weight (lb)<input name="startWeight" type="number" inputmode="decimal" step="0.1" min="70" max="700" required></label>
+        <label>Goal weight (lb)<input name="goalWeight" type="number" inputmode="decimal" step="0.1" min="70" max="700"></label>
+      </div>
+      <button class="btn primary big" type="submit">Join the club</button>
+      <p class="fine">Preview: your info stays on this phone only. The live app signs you in with your gym membership.</p>
+    </form>
+    <button class="btn ghost big" id="demoBtn" type="button">👀 Look around as a demo member</button>
+  </div>
+</section>
+
+<!-- ============ APP ============ -->
+<div id="app" hidden>
+  <header class="top">
+    <img src="mark.png" alt="" width="26" height="34">
+    <b data-name>ALL-ONE GYM</b>
+    <span class="demo-tag" id="demoTag" hidden>Demo member</span>
+    <span class="sp"></span>
+    <button class="hrpill hrConnect" type="button" aria-label="Connect heart rate"><span aria-hidden="true">❤️</span> <span class="hrv">--</span></button>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section class="tab" id="t-home">
+      <p class="hi"><small id="hiDate"></small>What's up, <span id="hiName"></span>.</p>
+      <div class="card chal">
+        <div class="ringbox" id="homeRing"></div>
+        <div><small class="k">This week · 10 for 10</small><p id="homeChal"></p></div>
+      </div>
+      <div class="card today" id="todayCard"></div>
+      <div class="stats">
+        <div class="card"><small>Lost total</small><b id="statLost"></b></div>
+        <div class="card"><small>This week</small><b id="statWeek"></b></div>
+        <div class="card"><small>Streak</small><b id="statStreak"></b></div>
+        <div class="card"><small>Visits this month</small><b id="statVisits"></b></div>
+      </div>
+      <div class="card hrcard">
+        <div><small class="k">Heart rate</small><b class="hrbig"><span class="hrv">--</span> <small>bpm</small></b><span class="hrz"></span><small class="hrsrc">Not connected</small></div>
+        <button class="btn ghost sm hrConnect" type="button">⌚ Connect</button>
+      </div>
+      <button class="btn ghost big" type="button" data-go="club">💳 Membership, hours, call, Q&amp;A</button>
+    </section>
+
+    <!-- TRAIN -->
+    <section class="tab" id="t-train" hidden>
+      <h2>Your plan</h2>
+      <div class="pills" id="progPick" role="group" aria-label="Pick a plan"></div>
+      <p class="note" id="progAbout"></p>
+      <div class="rowh"><h3>This week</h3><span class="badge" id="trainCount"></span></div>
+      <ol class="week" id="weekList"></ol>
+      <h3>Recent workouts</h3>
+      <ul class="list" id="history"></ul>
+    </section>
+
+    <!-- PROGRESS -->
+    <section class="tab" id="t-progress" hidden>
+      <h2>Progress</h2>
+      <div class="stats">
+        <div class="card"><small>Started</small><b id="pStart"></b></div>
+        <div class="card"><small>Now</small><b id="pNow"></b></div>
+        <div class="card"><small>Total</small><b id="pLost"></b></div>
+        <div class="card"><small>Goal</small><b id="pGoal"></b></div>
+      </div>
+      <div class="card"><div class="gbar"><i id="goalBar"></i></div><small class="note" id="goalPct"></small></div>
+      <div class="card chart" id="chart"></div>
+      <form class="card inline" id="weighForm"><label>Today's weight (lb)<input name="lb" type="number" inputmode="decimal" step="0.1" min="70" max="700" required></label><button class="btn primary" type="submit">Log</button></form>
+      <h3>Weigh-ins</h3>
+      <ul class="list wl" id="wlog"></ul>
+      <h3>Measurements</h3>
+      <div class="meas" id="measures"></div>
+      <form class="card inline three" id="measForm"><label>Waist"<input name="waist" type="number" inputmode="decimal" step="0.25"></label><label>Chest"<input name="chest" type="number" inputmode="decimal" step="0.25"></label><label>Arm"<input name="arm" type="number" inputmode="decimal" step="0.25"></label><button class="btn ghost" type="submit">Save</button></form>
+      <h3>Best lifts</h3>
+      <ul class="list wl" id="prs"></ul>
+      <form class="card inline" id="goalForm"><label>New goal weight (lb)<input name="goal" type="number" inputmode="decimal" step="0.1"></label><button class="btn ghost" type="submit">Set</button></form>
+      <p class="note center" id="lifetime"></p>
+    </section>
+
+    <!-- REWARDS -->
+    <section class="tab" id="t-rewards" hidden>
+      <h2>10 for 10</h2>
+      <div class="card rwtop"><div class="ringbox big" id="rwRing"></div><h3 id="rwHead"></h3><p class="note" id="rwSub"></p><div id="rwClaim"></div></div>
+      <h3>What you can win</h3>
+      <ul class="list prize" id="rwPrizes"></ul>
+      <p class="fine">Sample prizes. ALL-ONE GYM sets the real ones. One spin per member per week.</p>
+      <h3>Your wins</h3>
+      <ul class="list prize" id="rwPast"></ul>
+    </section>
+
+    <!-- SHOP -->
+    <section class="tab" id="t-shop" hidden>
+      <p class="kick left">Members only</p>
+      <h2>The club shop</h2>
+      <p class="note">Order from your phone, skip the line, pick it up at the front desk.</p>
+      <div id="shopCats"></div>
+      <div class="cartbar" id="cartBar" hidden><span><b id="cartN"></b> · <span id="cartT"></span></span><button class="btn primary" type="button" id="cartGo">Checkout →</button></div>
+    </section>
+
+    <!-- CLUB: membership + gym info -->
+    <section class="tab" id="t-club" hidden>
+      <div class="mcard" id="mcard">
+        <div class="mc-top"><img src="mark.png" alt="" width="30" height="39"><span id="mcTier"></span></div>
+        <b id="mcName"></b>
+        <div class="mc-bot"><span><small>Plan</small><span id="mcPlan"></span></span><span><small>Member no.</small><code id="mcNo"></code></span></div>
+        <small id="mcSince"></small>
+      </div>
+      <div class="card bill">
+        <div><small class="k">Next payment</small><b id="billAmt"></b><small id="billDue"></small></div>
+        <button class="btn primary" type="button" id="payNow">Pay now</button>
+      </div>
+      <label class="switch card"><span>Autopay every month</span><input type="checkbox" id="autopay"><i aria-hidden="true"></i></label>
+      <h3>Memberships</h3>
+      <ul class="list plans" id="planList"></ul>
+      <h3>Add-ons</h3>
+      <ul class="list plans" id="extraList"></ul>
+      <div class="card vip"><small class="k">By invitation</small><h3>👑 VIP Transformation</h3><p class="note" id="vipNote"></p><button class="btn ghost" type="button" id="vipBtn">Request VIP</button></div>
+      <p class="fine" id="feeNote"></p>
+      <h3>Payments</h3>
+      <ul class="list wl" id="payList"></ul>
+      <h3>Shop orders</h3>
+      <ul class="list wl" id="orderList"></ul>
+
+      <h3>The club</h3>
+      <img class="gymlogo" src="mark.png" alt="ALL-ONE GYM" width="110" height="142">
+      <p class="note center" id="gymAbout"></p>
+      <div class="btns">
+        <a class="btn primary" id="gymCall" href="#">📞 Call</a>
+        <a class="btn ghost" id="gymText" href="#">💬 Text</a>
+        <a class="btn ghost" id="gymMap" href="#" target="_blank" rel="noopener">📍 Directions</a>
+        <a class="btn ghost" id="gymIg" href="#" target="_blank" rel="noopener">📸 Instagram</a>
+      </div>
+      <p class="addr" id="gymAddr"></p>
+      <h3>Hours</h3>
+      <ul class="list wl" id="gymHours"></ul>
+      <h3>In the club</h3>
+      <ul class="tags" id="gymPerks"></ul>
+      <h3>Front-desk shop</h3>
+      <ul class="list prize" id="gymShop"></ul>
+      <h3>Questions</h3>
+      <div class="qa" id="gymQa"></div>
+      <h3>Account</h3>
+      <button class="btn ghost" id="signOut" type="button">Sign out</button>
+    </section>
+  </main>
+
+  <nav class="tbar" aria-label="App">
+    <a href="#" data-go="home" aria-current="page"><span aria-hidden="true">🏠</span>Home</a>
+    <a href="#" data-go="train"><span aria-hidden="true">💪</span>Train</a>
+    <a href="#" data-go="progress"><span aria-hidden="true">📈</span>Progress</a>
+    <button type="button" class="qrfab" id="passBtn" aria-label="Show my check-in pass"><span aria-hidden="true">▦</span><small>Check in</small></button>
+    <a href="#" data-go="rewards"><span aria-hidden="true">🏆</span>Rewards</a>
+    <a href="#" data-go="shop"><span aria-hidden="true">🛍️</span>Shop</a>
+    <a href="#" data-go="club"><span aria-hidden="true">💳</span>Club</a>
+  </nav>
+</div>
+
+<!-- check-in pass -->
+<div class="sheet" id="pass" hidden tabindex="-1" role="dialog" aria-modal="true" aria-label="Check-in pass">
+  <div class="passcard">
+    <img src="mark.png" alt="" width="54" height="70">
+    <b id="passName"></b><code id="passId"></code>
+    <div class="qr big" id="passQr"></div>
+    <p>Show this at the front desk</p>
+    <small id="passToday"></small>
+    <small id="passSince"></small>
+  </div>
+  <button class="btn ghost" id="simScan" type="button">🧪 Demo: pretend the front desk scanned it</button>
+  <h3>Recent visits</h3>
+  <ul class="list" id="passVisits"></ul>
+  <button class="btn primary" id="passClose" type="button">Close</button>
+</div>
+
+<!-- workout player -->
+<div class="player" id="player" hidden role="dialog" aria-modal="true" aria-labelledby="plTitle">
+  <div class="plhead"><button class="x" id="plQuit" type="button">✕ End</button><div><b id="plTitle"></b><small id="plStep"></small></div><span class="pltime" id="plTime">0:00</span></div>
+  <div class="plbar"><i id="plBar"></i></div>
+  <div class="plhr"><div><span aria-hidden="true">❤️</span><b class="hrv">--</b><small>bpm</small></div><div><b class="hrz"></b><small class="hrsrc"></small></div><div><b id="plCal">0</b><small>cal</small></div></div>
+  <div class="plex" id="plEx"></div>
+  <p class="plset" id="plSet"></p>
+  <form id="plLog" class="pllog">
+    <label>Weight (lb)<input name="lb" type="number" inputmode="decimal" step="2.5" min="0" max="1500"></label>
+    <label><span>Reps</span><input name="reps" type="number" inputmode="numeric" min="0" max="5000"></label>
+    <button class="btn primary big" type="submit">✓ Set done</button>
+  </form>
+  <div class="rest" id="plRest" hidden>
+    <svg viewBox="0 0 120 120" width="170" height="170" aria-hidden="true"><circle cx="60" cy="60" r="54" class="rbg"/><circle id="restArc" cx="60" cy="60" r="54" class="rfg" stroke-dasharray="339.3" stroke-dashoffset="0" transform="rotate(-90 60 60)"/></svg>
+    <div class="restn"><b id="restN">0</b><small>rest</small></div>
+    <div class="btns"><button class="btn ghost" id="restAdd" type="button">+15 s</button><button class="btn primary" id="restSkip" type="button">Skip rest</button></div>
+  </div>
+  <button class="btn ghost sm skip" id="plSkip" type="button">Skip this move →</button>
+</div>
+
+<div class="sheet small" id="pay" hidden role="dialog" aria-modal="true" aria-label="Checkout"><div id="payBody" class="paybox"></div></div>
+
+<div class="sheet small" id="done" hidden role="dialog" aria-modal="true"><div id="doneBox" class="donebox"></div></div>
+
+<div class="sheet small" id="watchInfo" hidden role="dialog" aria-modal="true" aria-labelledby="wiH">
+  <h3 id="wiH">⌚ Apple Watch + heart rate</h3>
+  <p>In the <b>App Store version</b>, the app reads your heart rate, workouts and weight from your Apple Watch through Apple Health, with your OK.</p>
+  <p>This web preview can't reach Apple Health, so it's showing a <b>demo heart rate</b> that rises during sets and drops during rest. On Android / Chrome you can connect a real Bluetooth heart-rate strap.</p>
+  <button class="btn primary" id="watchClose" type="button">Got it</button>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js?v=1"></script>
+<script src="app.js?v=1"></script>
+<script src="shop.js?v=1"></script>
+<script src="sweat.js?v=1"></script>
+<script>window.A2HS_CFG={name:"ALL-ONE GYM",theme:{bg:"#080808",bg2:"#151515",edge:"#383838",accent:"#f5f5f0",accent2:"#bdbdbd",ink:"#ffffff",dim:"#bdbdbd",btnInk:"#080808",display:"Oswald,sans-serif",body:"Inter,system-ui,sans-serif"}};</script>
+<script src="../a2hs.js"></script>
+<script src="../poweredby.js?v=20261013a" defer></script>
+<script src="../faqbot.js?v=f1" defer></script>
+</body>
+</html>

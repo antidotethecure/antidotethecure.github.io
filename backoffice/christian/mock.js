@@ -214,7 +214,7 @@
     var tiers = mel ? "250 Free soft drink or Melody Fries; 500 $10 off; 1,000 Free starter; 1,500 Free meal (entree up to $21.50)" : "250 Free mocktail, soft drink or Jungle Fries; 500 Free shareable; 1,000 $20 off; 1,500 Free meal (entree up to $33)";
     var nm = mel ? "Melody" : "Nalu Vida", d = new Date(), mo = d.toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short" }), dd = d.toLocaleString("en-US", { timeZone: "America/Los_Angeles", day: "numeric" });
     return (es ? "Ofertas de hoy en " + nm + " (" + ["dom", "lun", "mar", "mie", "jue", "vie", "sab"][dow] + " " + dd + " " + mo.toLowerCase() + "):" : nm + " deals today (" + dn + " " + mo + " " + dd + "):") + "\n" + lines.join("\n") + "\n" +
-      (es ? "Recompensas (puntos): " : "Rewards (points): ") + tiers + "\n" + (es ? "Responde STOP para no recibir mas. Guia: " : "Reply STOP to stop. Guide: ") + "https://antidotethecure.github.io/staff/christian/"; }
+      (es ? "Recompensas (puntos): " : "Rewards (points): ") + tiers + "\n" + (es ? "Responde STOP para no recibir mas. Guia: " : "Reply STOP to stop. Guide: ") + "https://sousshift.com/staff/christian/"; }
   function segs(t) { return t.length <= 160 ? 1 : Math.ceil(t.length / 153); }
   function shiftAct(d, u) { var NOPE = { ok: false, reason: "Your login can't do that. Ask Christian." }, own = rec(u).role === "owner";
     if (!may(u, "shifttexts")) return NOPE;

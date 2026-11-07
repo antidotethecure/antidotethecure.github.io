@@ -18,6 +18,22 @@
   var PROMISE_FINE = "It's a results promise, not a promise of sales or revenue. The free months are the only remedy under that clause, and fees already paid (including setup) aren't refunded.";
   A.promise = PROMISE; A.promiseFine = PROMISE_FINE;
 
+  /* ---------- websites ---------- */
+  var WS = A.websites;
+  $("webBuild").innerHTML = WS.build.map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") + '<li class="note">' + esc(WS.extra) + '</li>';
+  $("webCards").innerHTML = WS.options.map(function (o) {
+    return '<article class="card plan' + (o.flag ? " flag" : "") + '" id="web-' + o.key + '"><span class="tag">' + esc(o.tag) + '</span><h3>' + esc(o.name) + '</h3>' +
+      '<div class="price"><div><b>' + usd(o.setup) + '</b>' + (o.monthly ? 'build, once' : 'one time') + '</div><div><b>' + (o.monthly ? usd(o.monthly) : "$0") + '</b>per month</div></div>' +
+      '<p class="note" style="margin:0">' + esc(o.pitch) + '</p>' +
+      '<details open><summary>What\'s included</summary><ul>' + o.includes.map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") + '</ul></details>' +
+      '<div class="who">' + esc(o.who) + '</div>' +
+      (o.monthly ? '<p class="note" style="margin:10px 0 0">' + WS.minimumMonths + '-month minimum, then month to month.</p>' : '') + '</article>';
+  }).join("");
+  $("webAddons").innerHTML = WS.addons.map(function (a) {
+    var p = [a.setup ? usd(a.setup) + " once" : "", a.monthly ? usd(a.monthly) + "/mo" : ""].filter(Boolean).join(" + ");
+    return '<div class="addon"><div><b>' + esc(a.name) + '</b><div class="note">' + esc(a.one) + '</div></div><b class="p">' + p + '</b></div>';
+  }).join("");
+
   /* ---------- 1 · plans ---------- */
   $("planCards").innerHTML = A.plans.map(function (p) {
     return '<article class="card plan' + (p.flag ? " flag" : "") + '" id="plan-' + p.key + '"><span class="tag">' + esc(p.tag) + '</span><h3>' + esc(p.name) + '</h3>' +

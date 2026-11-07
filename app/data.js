@@ -70,6 +70,45 @@ window.APP = {
     { key: "social", name: "Social & SEO Growth", monthly: 1000, setup: 0, includedIn: [],
       one: "Content plan, short-form video edits from your food, posting on Instagram / TikTok / YouTube, Google Business Profile + local SEO, and a monthly report." }
   ],
+  /* Websites (approved by Antidote 2026-11-06). Separate from the app plans; any business, not only restaurants.
+     Market check 2026: freelancers $1,500–$5,000, agencies $5,000–$10,000+, upkeep plans $50–$500/mo. */
+  websites: {
+    build: ["Up to 5 pages: Home, Menu or Services, About, Gallery, Contact + map", "Built for phones first, fast and secure (https)",
+      "Contact form + tap-to-call + directions", "Basic Google search setup", "Links to your SousShift app if you have one",
+      "Ready in 7–10 days, 2 rounds of changes"],
+    extra: "Online stores, booking systems or more than 5 pages get a custom quote.",
+    fix: 150, minimumMonths: 3,
+    options: [
+      { key: "care", name: "Basic Care", setup: 1500, monthly: 99, tag: "Keep it running",
+        pitch: "We build it and keep it online, safe and up to date.",
+        includes: ["Hosting, domain renewal and the security lock (https)", "Backups + security updates", "We watch that it stays online",
+          "Up to 2 small edits a month (hours, menu, photos, prices)", "Email support, reply within 2 business days"],
+        who: "Other fixes or changes are $150 each, or move up to Full Care any time." },
+      { key: "fullcare", name: "Full Care", setup: 1500, monthly: 199, tag: "We fix everything", flag: true,
+        pitch: "Everything in Basic Care, plus: something's wrong or needs changing? Contact Antidote and it gets fixed.",
+        includes: ["Everything in Basic Care", "Any problem fixed: just text or email us", "Unlimited small edits: menu, hours, specials, photos, prices",
+          "Priority: we start the same or next business day", "Monthly Google listing check", "Holiday + seasonal homepage updates"],
+        who: "You tell us; we do the work. New pages or a full redesign are quoted separately." },
+      { key: "own", name: "Own It", setup: 2500, monthly: 0, tag: "Pay once",
+        pitch: "One payment. The site and the domain are yours, with no monthly fee.",
+        includes: ["The full website files, yours to keep", "The domain in your name", "Host it anywhere you like", "30 days of fixes after launch"],
+        who: "After 30 days, fixes are $150 each, or join Basic Care or Full Care any time." }
+    ],
+    /* add-ons on top of any website option; setup = one-time, monthly = per month */
+    addons: [
+      { name: "AI chat box", setup: 0, monthly: 49, one: "A chat bubble on every page answers questions 24/7 (hours, menu, prices, parking, catering) and sends each visitor to the right page: order, book, call or directions." },
+      { name: "Menu + site search", setup: 150, monthly: 0, one: "A search bar so visitors type \"tacos\" or \"oil change\" and jump straight to it." },
+      { name: "Booking / reservation requests", setup: 250, monthly: 0, one: "A form for reservations, appointments or catering. Each request goes to your phone and email." },
+      { name: "12 languages", setup: 250, monthly: 0, one: "A language button: Spanish, Korean, Thai, Chinese and more." },
+      { name: "Google reviews on your site", setup: 100, monthly: 0, one: "Your best Google reviews and star rating shown on the home page, plus a Leave a review button." },
+      { name: "Email + text signup", setup: 150, monthly: 0, one: "A signup box that builds your customer list for deals and announcements." },
+      { name: "Photo gallery + promo video", setup: 200, monthly: 0, one: "A swipeable gallery and a short video at the top of the home page." },
+      { name: "Extra page", setup: 150, monthly: 0, one: "Each page past 5: catering, events, careers, a second location." },
+      { name: "Logo design", setup: 300, monthly: 0, one: "A new logo in 3 options, with files for print, signs and social." },
+      { name: "AI phone host + texting", setup: 0, monthly: 150, one: "A natural AI voice answers your phone 24/7 and texts back. Text-only version $75/mo." }
+    ]
+  },
+
   /* "Everything" bundle = Done-for-you + Social & SEO Growth, minus this discount. Change the numbers here only. */
   bundle: { name: "Everything", plan: "dfy", addon: "social", discountMonthly: 150, discountSetup: 0,
     one: "Done-for-you + Social & SEO Growth in one plan, with a bundle discount." },

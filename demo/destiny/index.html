@@ -114,9 +114,6 @@ main{position:relative;z-index:1}
 .mirror{position:relative;aspect-ratio:3/4.4;border-radius:200px 200px 14px 14px;overflow:hidden;border:1px solid var(--gold);background:radial-gradient(70% 50% at 50% 30%,rgba(217,180,106,.18),transparent 70%),linear-gradient(180deg,#0e0b12,#07060a);touch-action:none}
 .mirror::before{content:"";position:absolute;inset:8px;border:1px solid var(--line);border-radius:inherit;pointer-events:none;z-index:3}
 .side .you{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.side .mannequin{position:absolute;inset:6% 18% 0;width:64%;height:94%}
-.layer{position:absolute;z-index:2;cursor:grab;filter:drop-shadow(0 18px 24px rgba(0,0,0,.6));-webkit-mask-image:radial-gradient(closest-side,#000 72%,transparent 100%);mask-image:radial-gradient(closest-side,#000 72%,transparent 100%);background-repeat:no-repeat}
-.layer:active{cursor:grabbing}
 .tag{position:absolute;left:14px;bottom:14px;z-index:4;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2);background:rgba(5,4,7,.7);border:1px solid var(--line);border-radius:99px;padding:6px 10px}
 .panel{display:grid;gap:14px}
 .step{border:1px solid var(--line);border-radius:14px;padding:14px;background:rgba(11,9,16,.7)}
@@ -124,13 +121,6 @@ main{position:relative;z-index:1}
 .snap{display:flex;gap:10px;flex-wrap:wrap}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:99px;border:1px solid var(--gold);color:var(--gold2);background:transparent;font:500 13px "Space Grotesk",sans-serif;letter-spacing:.08em;cursor:pointer}
 .btn.solid{background:var(--gold);color:#140f05}
-.rail{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.item{border:1px solid var(--line);border-radius:12px;background:#0b0910;padding:0;overflow:hidden;cursor:pointer;color:var(--ink);text-align:left}
-.item[aria-pressed="true"]{border-color:var(--gold2);box-shadow:0 0 0 2px rgba(245,223,163,.35)}
-.item i{display:block;aspect-ratio:1;background-repeat:no-repeat}
-.item span{display:block;padding:7px 8px;font-size:11px;line-height:1.25}
-.sizer{display:flex;align-items:center;gap:10px;color:var(--dim);font-size:13px}
-.sizer input{flex:1;accent-color:#d9b46a}
 
 .mirror{perspective:1400px;background:none!important;border:0!important;border-radius:0!important;overflow:visible!important}
 .mirror::before{display:none}
@@ -139,11 +129,20 @@ main{position:relative;z-index:1}
 .side{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:200px 200px 14px 14px;overflow:hidden;border:1px solid var(--gold);background:radial-gradient(70% 50% at 50% 30%,rgba(217,180,106,.18),transparent 70%),linear-gradient(180deg,#0e0b12,#07060a)}
 .side::before{content:"";position:absolute;inset:8px;border:1px solid var(--line);border-radius:inherit;pointer-events:none;z-index:3}
 .side.back{transform:rotateY(180deg)}
-.side.back .layer{filter:drop-shadow(0 18px 24px rgba(0,0,0,.6)) brightness(.8);pointer-events:none}
 .hint{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:5;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2);opacity:.75;pointer-events:none}
 .turn{display:flex;justify-content:center;margin-top:12px}
-.mannequin{position:absolute;inset:6% 18% 0;width:64%;height:94%}
-.you[hidden]{display:none!important}
+.face[hidden]{display:none!important}
+.side .body{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.face{position:absolute;z-index:2;aspect-ratio:3/3.7;object-fit:cover;border-radius:50% 50% 46% 46%;box-shadow:0 0 0 2px rgba(217,180,106,.6);-webkit-mask-image:radial-gradient(closest-side,#000 82%,transparent 100%);mask-image:radial-gradient(closest-side,#000 82%,transparent 100%)}
+.seg{display:flex;gap:8px}.seg .btn[aria-pressed="true"]{background:var(--gold);color:#140f05}
+.sizes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sizes label{display:grid;gap:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.sizes select{min-height:44px;border-radius:10px;border:1px solid var(--line);background:#0b0910;color:var(--ink);font:500 15px "Space Grotesk",sans-serif;padding:0 8px}
+.stock{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
+.stock li{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:9px 12px;border-radius:10px;border:1px solid var(--line)}
+.stock li.ok b{color:#7fc4a6}.stock li.no b{color:#ff8a7a}
+.stock b{font-weight:500;white-space:nowrap}
+
 .fine{color:var(--dim);font-size:12px;line-height:1.5;margin:0}
 
 /* marquee */
@@ -288,36 +287,39 @@ main{position:relative;z-index:1}
   <section class="fit" id="fit" aria-label="Fitting room">
     <div class="kick">The Fitting Room</div>
     <h3>See it on you<br>before you pull up.</h3>
-    <p class="sub">Snap a head-to-toe photo, tap anything in the store, and see your fit before you ever walk in.</p>
+    <p class="sub">Pick your build, add your face, and see the whole fit, front and back. Then check if your size is on the rack.</p>
     <div class="room">
       <div>
       <div class="mirror" id="mirror" aria-label="Fitting mirror. Swipe to turn around.">
         <div class="spin" id="spin">
-          <div class="side front" id="sideF"><svg class="mannequin" viewBox="0 0 200 420" aria-hidden="true"><g fill="none" stroke="#d9b46a" stroke-width="1.4" opacity=".8"><ellipse cx="100" cy="38" rx="22" ry="27"/><path d="M90 64 L90 78 M110 64 L110 78"/><path d="M90 78 C60 80 44 92 40 118 L30 210 M110 78 C140 80 156 92 160 118 L170 210"/><path d="M58 112 C60 150 64 180 66 205 L60 300 L66 410 M142 112 C140 150 136 180 134 205 L140 300 L134 410"/><path d="M66 205 C90 214 110 214 134 205"/><path d="M100 214 L98 410"/><circle cx="100" cy="38" r="40" stroke-dasharray="2 5" opacity=".5"/></g></svg><img class="you" alt="Your front photo" hidden><div class="tag">Front</div></div>
-          <div class="side back" id="sideB"><svg class="mannequin" viewBox="0 0 200 420" aria-hidden="true"><g fill="none" stroke="#d9b46a" stroke-width="1.4" opacity=".8"><ellipse cx="100" cy="38" rx="22" ry="27"/><path d="M90 64 L90 78 M110 64 L110 78"/><path d="M90 78 C60 80 44 92 40 118 L30 210 M110 78 C140 80 156 92 160 118 L170 210"/><path d="M58 112 C60 150 64 180 66 205 L60 300 L66 410 M142 112 C140 150 136 180 134 205 L140 300 L134 410"/><path d="M100 82 L100 205"/><path d="M70 120 C85 112 115 112 130 120"/><path d="M100 214 L98 410"/><circle cx="100" cy="38" r="40" stroke-dasharray="2 5" opacity=".5"/></g></svg><img class="you" alt="Your back photo" hidden><div class="tag">Back</div></div>
+          <div class="side front"><img class="body" id="bodyF" src="img/fit-2xl.jpg" alt="Mannequin wearing the Champions varsity, stacked denim and Ewing high-tops, front view"><img class="face" id="face" alt="Your face" hidden><div class="tag" id="tagF">2XL · Front</div></div>
+          <div class="side back"><img class="body" src="img/fit-back.jpg" alt="The same outfit from the back"><div class="tag">Back</div></div>
         </div>
         <div class="hint" id="hint">⟵ swipe to turn ⟶</div>
       </div>
       <div class="turn"><button class="btn" type="button" id="turnBtn">⟲ Turn around</button></div>
       </div>
       <div class="panel">
-        <div class="step"><b>1 · Your photos, head to toe</b>
-          <div class="snap">
-            <label class="btn solid" for="shotF">Front photo</label>
-            <input id="shotF" type="file" accept="image/*" hidden>
-            <label class="btn solid" for="shotB">Back photo</label>
-            <input id="shotB" type="file" accept="image/*" hidden>
-            <button class="btn" type="button" id="useMannequin">Use mannequin</button>
+        <div class="step"><b>1 · Your build</b>
+          <div class="seg" id="build" role="group" aria-label="Body size">
+            <button class="btn" type="button" data-b="2xl" aria-pressed="true">2XL</button>
+            <button class="btn" type="button" data-b="3xl" aria-pressed="false">3XL</button>
           </div>
+          <p class="fine" style="margin-top:8px">The full version renders every size from S to 5XL.</p>
         </div>
-        <div class="step"><b>2 · Pick from the store</b>
-          <div class="rail" id="rail"></div>
+        <div class="step"><b>2 · Your face</b>
+          <div class="snap"><label class="btn solid" for="selfie">Add a selfie</label><input id="selfie" type="file" accept="image/*" hidden><button class="btn" type="button" id="noFace">Mannequin head</button></div>
+          <p class="fine" style="margin-top:8px">Your photo stays on your phone; nothing is uploaded.</p>
         </div>
-        <div class="step"><b>3 · Adjust</b>
-          <div class="sizer"><span>Size</span><input id="size" type="range" min="30" max="110" value="62" aria-label="Item size"></div>
-          <p class="fine" style="margin-top:10px">Drag the item to line it up, then swipe the mirror to see the back. Your photos stay on your phone; nothing is uploaded.</p>
+        <div class="step"><b>3 · Your sizes</b>
+          <div class="sizes">
+            <label>Top / bottom<select id="szTop"><option>S</option><option>M</option><option>L</option><option>XL</option><option selected>2XL</option><option>3XL</option><option>4XL</option></select></label>
+            <label>Waist<select id="szWaist"><option>30</option><option>32</option><option>34</option><option selected>36</option><option>38</option><option>40</option><option>42</option></select></label>
+            <label>Shoe<select id="szShoe"><option>8</option><option>9</option><option>10</option><option selected>11</option><option>12</option><option>13</option><option>14</option></select></label>
+          </div>
+          <ul class="stock" id="stock" aria-live="polite"></ul>
         </div>
-        <p class="fine">Sample preview. In the full version, AI dresses your photos for real, front and back, with the right fit, folds and lighting.</p>
+        <p class="fine">Sample preview with sample stock. In the full version, AI renders the fit on your real body and face, and sizes come from the store's live inventory.</p>
       </div>
     </div>
   </section>
@@ -408,95 +410,43 @@ main{position:relative;z-index:1}
   document.querySelectorAll(".pic,.txt").forEach(function(el){ io.observe(el); });
 
 
-  // fitting room: crops of real store photos (fractions of each photo)
-  var items = [
-    {n:"Skull bomber", img:"img/2.jpg", x:[.526,.826], y:[.04,.30], at:"top"},
-    {n:"Champions varsity", img:"img/2.jpg", x:[.346,.50], y:[.295,.52], at:"top"},
-    {n:"Rhinestone hoodie", img:"img/4.jpg", x:[0,.31], y:[.04,.32], at:"top"},
-    {n:"Fur-collar coat", img:"img/1.jpg", x:[.52,.70], y:[.11,.37], at:"long"},
-    {n:"Ewing high-tops", img:"img/9.jpg", x:[.40,.79], y:[.29,.61], at:"feet"},
-    {n:"Cross trucker", img:"img/6.jpg", x:[.80,.99], y:[.335,.475], at:"head"}
-  ];
-  var spots = {top:{x:.5,y:.36,w:.62}, long:{x:.5,y:.45,w:.66}, feet:{x:.5,y:.9,w:.34}, head:{x:.5,y:.1,w:.28}};
-  function crop(el, it){
-    var w = it.x[1]-it.x[0], h = it.y[1]-it.y[0];
-    el.style.backgroundImage = "url(" + it.img + ")";
-    el.style.backgroundSize = (100/w) + "% " + (100/h) + "%";
-    el.style.backgroundPosition = (w<1 ? it.x[0]/(1-w)*100 : 0) + "% " + (h<1 ? it.y[0]/(1-h)*100 : 0) + "%";
-    return (w*3)/(h*4);   // photos are 3:4
-  }
-  var mirror = document.getElementById("mirror"), spin = document.getElementById("spin"), sideF = document.getElementById("sideF"), sideB = document.getElementById("sideB");
-  var rail = document.getElementById("rail"), size = document.getElementById("size");
-  var layers = {}, active = null;
-  items.forEach(function(it, i){
-    var b = document.createElement("button");
-    b.className = "item"; b.type = "button"; b.setAttribute("aria-pressed","false");
-    b.innerHTML = '<i></i><span>' + it.n + '</span>';
-    crop(b.querySelector("i"), it);
+  // fitting room: AI renders of the outfit on different builds (made with Higgsfield)
+  var spin = document.getElementById("spin"), bodyF = document.getElementById("bodyF"), face = document.getElementById("face"), tagF = document.getElementById("tagF");
+  var heads = {"2xl": {x: .5, y: .095, w: .14}, "3xl": {x: .495, y: .09, w: .15}}, build = "2xl";
+  function setFace(){ var h = heads[build]; face.style.left = (h.x - h.w/2)*100 + "%"; face.style.top = (h.y - h.w*.62)*100 + "%"; face.style.width = h.w*100 + "%"; }
+  document.querySelectorAll("#build button").forEach(function(b){
     b.addEventListener("click", function(){
-      var on = b.getAttribute("aria-pressed") !== "true";
-      b.setAttribute("aria-pressed", on);
-      if (!on){ layers[i].remove(); delete layers[i]; active = null; syncBack(); return; }
-      Object.keys(layers).forEach(function(k){ if (items[k].at === it.at){ layers[k].remove(); delete layers[k]; rail.children[k].setAttribute("aria-pressed","false"); } });
-      var L = document.createElement("div"); L.className = "layer"; L.dataset.i = i;
-      var ratio = crop(L, it), sp = spots[it.at];
-      L.dataset.ratio = ratio; L.dataset.w = sp.w;
-      place(L, sp.x, sp.y);
-      sideF.appendChild(L); layers[i] = L; active = L;
-      size.value = Math.round(sp.w*100);
-      drag(L); syncBack();
-      if (spin.classList.contains("turned")) turn();
+      build = b.dataset.b; bodyF.src = "img/fit-" + build + ".jpg"; tagF.textContent = build.toUpperCase() + " · Front";
+      document.querySelectorAll("#build button").forEach(function(o){ o.setAttribute("aria-pressed", o === b); });
+      setFace(); if (spin.classList.contains("turned")) turn();
     });
-    rail.appendChild(b);
   });
-  function place(L, cx, cy){
-    var W = sideF.clientWidth, H = sideF.clientHeight, w = W*L.dataset.w, h = w/L.dataset.ratio;
-    L.style.width = w+"px"; L.style.height = h+"px";
-    L.style.left = (cx*W - w/2)+"px"; L.style.top = (cy*H - h/2)+"px";
-  }
-  // back view = the front outfit mirrored (the full version renders the real back with AI)
-  function syncBack(){
-    sideB.querySelectorAll(".layer").forEach(function(n){ n.remove(); });
-    Object.keys(layers).forEach(function(k){
-      var f = layers[k], c = f.cloneNode(true), W = sideF.clientWidth;
-      c.style.left = (W - f.offsetLeft - f.offsetWidth) + "px";
-      c.style.transform = "scaleX(-1)";
-      sideB.appendChild(c);
-    });
-  }
-  size.addEventListener("input", function(){
-    if (!active) return;
-    var W = sideF.clientWidth, H = sideF.clientHeight;
-    var cx = (active.offsetLeft + active.offsetWidth/2)/W, cy = (active.offsetTop + active.offsetHeight/2)/H;
-    active.dataset.w = size.value/100; place(active, cx, cy); syncBack();
+  setFace();
+  document.getElementById("selfie").addEventListener("change", function(e){
+    var f = e.target.files && e.target.files[0]; if (!f || !/^image\//.test(f.type)) return;
+    if (face.src) URL.revokeObjectURL(face.src);
+    face.src = URL.createObjectURL(f); face.hidden = false; if (spin.classList.contains("turned")) turn();
   });
-  function drag(L){
-    var sx, sy, ox, oy;
-    L.addEventListener("pointerdown", function(e){ e.stopPropagation(); active = L; size.value = Math.round(L.dataset.w*100); L.setPointerCapture(e.pointerId); sx = e.clientX; sy = e.clientY; ox = L.offsetLeft; oy = L.offsetTop; });
-    L.addEventListener("pointermove", function(e){ if (!L.hasPointerCapture(e.pointerId)) return; L.style.left = (ox + e.clientX - sx)+"px"; L.style.top = (oy + e.clientY - sy)+"px"; });
-    L.addEventListener("pointerup", syncBack);
-  }
-  // swipe the mirror (or tap the button) to turn around
+  document.getElementById("noFace").addEventListener("click", function(){ face.hidden = true; });
   function turn(){ spin.classList.toggle("turned"); document.getElementById("hint").style.opacity = 0; }
   document.getElementById("turnBtn").addEventListener("click", turn);
-  var swX = null;
+  var swX = null, mirror = document.getElementById("mirror");
   mirror.addEventListener("pointerdown", function(e){ swX = e.clientX; });
   mirror.addEventListener("pointerup", function(e){ if (swX !== null && Math.abs(e.clientX - swX) > 40) turn(); swX = null; });
-  function photo(input, side){
-    input.addEventListener("change", function(e){
-      var f = e.target.files && e.target.files[0]; if (!f || !/^image\//.test(f.type)) return;
-      var img = side.querySelector(".you");
-      if (img.src) URL.revokeObjectURL(img.src);
-      img.src = URL.createObjectURL(f); img.hidden = false; side.querySelector(".mannequin").style.display = "none";
-      if ((side === sideB) !== spin.classList.contains("turned")) turn();
-    });
+  // sample stock (the full version reads the store's real inventory)
+  var stock = [
+    {n: "Champions varsity", el: "szTop", have: ["M","L","XL","2XL","3XL"]},
+    {n: "Stacked denim", el: "szWaist", have: ["30","32","34","36","38"]},
+    {n: "Ewing high-tops", el: "szShoe", have: ["9","10","11","12"]}
+  ];
+  function check(){
+    document.getElementById("stock").innerHTML = stock.map(function(it){
+      var sz = document.getElementById(it.el).value, ok = it.have.indexOf(sz) > -1;
+      return '<li class="' + (ok ? "ok" : "no") + '"><span>' + it.n + ' · ' + sz + '</span><b>' + (ok ? "In stock" : "Not in your size") + '</b></li>';
+    }).join("");
   }
-  photo(document.getElementById("shotF"), sideF); photo(document.getElementById("shotB"), sideB);
-  document.getElementById("useMannequin").addEventListener("click", function(){
-    [sideF, sideB].forEach(function(sd){ sd.querySelector(".you").hidden = true; sd.querySelector(".mannequin").style.display = ""; });
-  });
-  rail.children[1].click(); rail.children[4].click();
-
+  ["szTop","szWaist","szShoe"].forEach(function(id){ document.getElementById(id).addEventListener("change", check); });
+  check();
   // the oracle
   var fates = [
     {img: "img/2.jpg", name: "The Varsity", line: "Your destiny is a varsity jacket. Wear the crown on your chest."},

@@ -74,8 +74,24 @@ body.locked{overflow:hidden}
 .s3{background:#000;z-index:5}
 .s3 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 @media (min-aspect-ratio:1/1){.s3 video{object-fit:contain}}
-.s3 .welcome{position:absolute;left:0;right:0;bottom:12%;text-align:center;font:italic 500 clamp(30px,8vw,60px) "Cormorant Garamond",serif;color:var(--gold2);text-shadow:0 4px 30px rgba(0,0,0,.8);opacity:0;transition:opacity 1.2s}
-.s3.end .welcome{opacity:1}
+.s3 video{filter:contrast(1.06) saturate(.9)}
+.s3 .hud{position:absolute;inset:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));pointer-events:none}
+.s3 .c{position:absolute;width:26px;height:26px;border:1.5px solid var(--gold)}
+.s3 .c1{left:0;top:0;border-right:0;border-bottom:0}.s3 .c2{right:0;top:0;border-left:0;border-bottom:0}.s3 .c3{left:0;bottom:0;border-right:0;border-top:0}.s3 .c4{right:0;bottom:0;border-left:0;border-top:0}
+.s3 .tl,.s3 .tr{position:absolute;top:36px;font:500 11px/1.6 "Space Grotesk",sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--gold2);text-shadow:0 1px 4px #000}
+.s3 .tl{left:12px}.s3 .tr{right:12px;top:64px;text-align:right}
+.s3 .rec{display:inline-block;width:7px;height:7px;border-radius:50%;background:#ff4a4a;margin-right:7px;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.s3 .cue{position:absolute;left:12px;bottom:74px;padding:8px 16px 10px;border-left:2px solid var(--gold);background:linear-gradient(90deg,rgba(5,4,7,.75),transparent);opacity:0;transform:translateX(-14px);transition:opacity .25s,transform .3s}
+.s3 .cue.on{opacity:1;transform:none}
+.s3 .cue b{display:block;font:500 clamp(30px,8vw,44px)/1 "Cormorant Garamond",serif;color:var(--ink)}
+.s3 .cue i{font:500 11px "Space Grotesk",sans-serif;font-style:normal;letter-spacing:.2em;text-transform:uppercase;color:var(--gold2)}
+.s3 .bar{position:absolute;left:12px;right:12px;bottom:46px;height:1.5px;background:rgba(217,180,106,.25)}.s3 .bar span{display:block;height:100%;width:0;background:var(--gold2)}
+.s3 .land{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;background:radial-gradient(circle,rgba(5,4,7,.35),rgba(5,4,7,.9));opacity:0;transition:opacity .8s}
+.s3 .land.on{opacity:1}
+.s3 .land .lw{font:600 clamp(44px,12vw,96px)/1 "Cormorant Garamond",serif;letter-spacing:.18em;padding-left:.18em;color:var(--gold2);text-shadow:0 0 30px rgba(217,180,106,.45)}
+.s3 .land b{font:italic 500 clamp(24px,6vw,40px) "Cormorant Garamond",serif;color:var(--ink)}
+.s3 .land i{font:500 11px "Space Grotesk",sans-serif;font-style:normal;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
 @keyframes fade{to{opacity:1}}
 
 /* sample ribbon */
@@ -216,7 +232,11 @@ body.locked{overflow:hidden}
     <div class="cap"><div class="kick">Los Angeles · No. 1459</div><h2>You've arrived.</h2></div>
     <button class="cta" id="enter" type="button">Step inside <span aria-hidden="true">✦</span></button>
   </div>
-  <div class="sc s3" id="s3"><video id="walk" src="img/walk.mp4" poster="img/walk.jpg" muted playsinline preload="auto" aria-label="Walking into Destiny"></video><div class="welcome">Welcome to Destiny.</div></div>
+  <div class="sc s3" id="s3"><video id="walk" src="img/walk.mp4" poster="img/walk.jpg" muted playsinline preload="auto" aria-label="Walking into Destiny"></video><div class="hud" aria-hidden="true"><i class="c c1"></i><i class="c c2"></i><i class="c c3"></i><i class="c c4"></i>
+      <div class="tl"><span class="rec"></span>Live · Los Angeles<br><span id="hudT">00:00</span></div>
+      <div class="tr">No. 1459<br>Destiny</div>
+      <div class="cue" id="cue"><b></b><i></i></div><div class="bar"><span id="bar"></span></div></div>
+    <div class="land" id="land"><div class="lw">DESTINY</div><b>It was always yours.</b><i>Los Angeles · No. 1459</i></div></div>
   <button id="skip" type="button">Skip</button>
 </div>
 
@@ -418,8 +438,22 @@ body.locked{overflow:hidden}
     if (p && p.catch) p.catch(function(){ setTimeout(lift, 900); });
     setTimeout(function(){ s3.classList.add("on"); }, 700);
   });
-  walk.addEventListener("timeupdate", function(){ if (walk.duration && walk.currentTime > walk.duration - 2.2) s3.classList.add("end"); });
-  walk.addEventListener("ended", function(){ setTimeout(lift, 400); });
+  // HUD over the walk-in, like the gym's drone tour: timed labels, progress bar, landing card
+  var CUES = [[0, 2.0, "Destiny", "No. 1459 · Los Angeles"], [2.0, 3.6, "The window", "Fits on display"], [3.6, 4.8, "The door", "Step inside"], [4.8, 6.6, "The floor", "Rack after rack"]];
+  var LAND = 6.6, cue = document.getElementById("cue"), bar = document.getElementById("bar"), hudT = document.getElementById("hudT"), land = document.getElementById("land"), cur = -1;
+  function hud(){
+    if (veil.classList.contains("gone")) return;
+    var t = walk.currentTime || 0, d = walk.duration || 8, i = -1;
+    bar.style.width = (100 * t / d) + "%";
+    hudT.textContent = "00:0" + Math.floor(t);
+    for (var k = 0; k < CUES.length; k++) if (t >= CUES[k][0] && t < CUES[k][1]) i = k;
+    if (i !== cur){ cur = i; cue.classList.remove("on"); if (i >= 0) setTimeout(function(){ cue.firstChild.textContent = CUES[i][2]; cue.lastChild.textContent = CUES[i][3]; cue.classList.add("on"); }, 140); }
+    land.classList.toggle("on", t >= LAND);
+    requestAnimationFrame(hud);
+  }
+  walk.addEventListener("play", function(){ requestAnimationFrame(hud); });
+  walk.addEventListener("ended", function(){ setTimeout(lift, 1100); });
+  walk.addEventListener("error", lift);
   document.getElementById("skip").addEventListener("click", lift);
 
   // starfield + constellation near the finger/cursor

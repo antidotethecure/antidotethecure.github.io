@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Destiny · Los Angeles</title>
+<meta name="description" content="Destiny: streetwear, outerwear, sneakers and fur. Sample site by SousShift AI.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#050407">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Space+Grotesk:wght@400;500;700&display=swap">
+<style>
+:root{--ink:#f3ead8;--dim:#a99d86;--gold:#d9b46a;--gold2:#f5dfa3;--bg:#050407;--green:#1e4a3b;--sun:#ff8a4c;--line:rgba(217,180,106,.28)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit}
+.serif{font-family:"Cormorant Garamond",Georgia,serif}
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none}
+body::before{content:"";position:fixed;inset:auto 0 0 0;height:60vh;z-index:0;pointer-events:none;background:radial-gradient(90% 70% at 50% 120%,rgba(255,138,76,.18),rgba(196,70,120,.08) 45%,transparent 75%)}
+.palms{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:clamp(140px,26vw,260px);z-index:2;pointer-events:none}
+.sunset{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,transparent 35%,rgba(255,138,76,.22) 70%,rgba(196,70,120,.25) 85%,transparent);mix-blend-mode:screen}
+.sign{padding:14vh 20px;text-align:center;position:relative}
+.sign .big{font:600 clamp(110px,30vw,300px)/.8 "Cormorant Garamond",serif;color:transparent;-webkit-text-stroke:1px var(--gold);opacity:.35;letter-spacing:-.02em}
+.sign .pic{max-width:560px;margin:-12vw auto 0;aspect-ratio:3/4}
+.sign h3{font:500 clamp(40px,9vw,80px)/.95 "Cormorant Garamond",serif;margin:30px 0 12px}
+.sign p{color:var(--dim);max-width:34ch;margin:0 auto;line-height:1.6}
+.green{color:#7fc4a6}
+main{position:relative;z-index:1}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+/* opening */
+#veil{position:fixed;inset:0;z-index:50;background:#07040a;overflow:hidden;transition:opacity 1s ease,visibility 1s}
+#veil.gone{opacity:0;visibility:hidden}
+.sc{position:absolute;inset:0;opacity:0;transition:opacity .9s ease}
+.sc.on{opacity:1}
+/* scene 1: clothes swipe */
+.strip{position:absolute;top:50%;left:0;display:flex;gap:14px;transform:translateY(-50%);will-change:transform}
+.sc.s1.on .strip{animation:swipe 3.2s cubic-bezier(.55,.05,.35,1) forwards}
+.strip img{height:min(56vh,420px);aspect-ratio:3/4;object-fit:cover;border-radius:10px;border:1px solid rgba(217,180,106,.35);filter:saturate(.9) brightness(.8)}
+@keyframes swipe{from{transform:translate(10vw,-50%)}to{transform:translate(calc(-100% + 90vw),-50%)}}
+.s1 .word{position:absolute;inset:0;display:grid;place-items:center;text-align:center;background:radial-gradient(60% 50% at 50% 50%,rgba(7,4,10,.15),rgba(7,4,10,.75))}
+.s1 h1{font:500 clamp(54px,16vw,150px)/1 "Cormorant Garamond",serif;letter-spacing:.18em;margin:0;padding-left:.18em;color:var(--gold2);text-shadow:0 6px 40px rgba(0,0,0,.8)}
+.s1 h1 span{display:inline-block;opacity:0;transform:translateY(30px);filter:blur(10px)}
+.sc.s1.on h1 span{animation:rise 1s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes rise{to{opacity:1;transform:none;filter:none}}
+/* scene 2: LA drive-by, full-screen storefront at sunset */
+.s2{background:#0b0709}
+.s2 .bg{position:absolute;inset:0;overflow:hidden;transform-origin:50% 72%}
+.s2 .bg img{width:100%;height:100%;object-fit:cover;object-position:50% 36%;transform:translateX(22%) scale(1.3);filter:saturate(1.12) contrast(1.06) brightness(.92)}
+.sc.s2.on .bg img{animation:track 4.4s cubic-bezier(.12,.7,.2,1) forwards}
+@keyframes track{to{transform:translateX(0) scale(1)}}
+.s2 .grade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(24,10,40,.94) 0%,rgba(70,24,72,.62) 20%,rgba(194,69,106,.26) 42%,rgba(255,150,80,.16) 64%,rgba(20,8,12,.55) 84%,rgba(8,5,8,.95) 100%)}
+.s2 .flare{position:absolute;right:-12%;top:-8%;width:70vmax;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,214,150,.55) 0%,rgba(255,150,80,.22) 30%,rgba(255,120,80,0) 62%);mix-blend-mode:screen;pointer-events:none}
+.s2 canvas{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+.s2 .bg.enter{transition:transform 1.4s cubic-bezier(.6,0,.2,1),filter 1.4s;transform:scale(5);filter:brightness(1.7) blur(3px)}
+.s2 .cap{position:absolute;left:0;right:0;bottom:calc(4.5% + 76px);text-align:center;z-index:4}
+.s2 .cap .kick{opacity:0;transition:opacity 1s}
+.s2 .cap h2{font:500 clamp(40px,9vw,88px)/1 "Cormorant Garamond",serif;margin:10px 0 0;opacity:0;transform:translateY(16px);transition:opacity 1s,transform 1s;text-shadow:0 4px 30px rgba(0,0,0,.7)}
+.s2.parked .cap .kick,.s2.parked .cap h2{opacity:1;transform:none}
+#enter{position:absolute;left:50%;bottom:4.5%;transform:translate(-50%,0);z-index:7;background:rgba(5,4,7,.55);animation:fadein .8s .4s both}
+@keyframes fadein{from{opacity:0;transform:translate(-50%,16px)}}
+#veil.inside #enter{opacity:0;pointer-events:none;transition:opacity .4s}
+#skip{position:absolute;top:max(14px,env(safe-area-inset-top));right:16px;z-index:6;background:none;border:1px solid rgba(217,180,106,.4);color:var(--dim);border-radius:99px;padding:8px 14px;font:500 11px "Space Grotesk",sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+body.locked{overflow:hidden}
+.s3{background:#000;z-index:5}
+.s3 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+@media (min-aspect-ratio:1/1){.s3 video{object-fit:contain}}
+.s3 video{filter:contrast(1.06) saturate(.9)}
+.s3 .hud{position:absolute;inset:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));pointer-events:none}
+.s3 .c{position:absolute;width:26px;height:26px;border:1.5px solid var(--gold)}
+.s3 .c1{left:0;top:0;border-right:0;border-bottom:0}.s3 .c2{right:0;top:0;border-left:0;border-bottom:0}.s3 .c3{left:0;bottom:0;border-right:0;border-top:0}.s3 .c4{right:0;bottom:0;border-left:0;border-top:0}
+.s3 .tl,.s3 .tr{position:absolute;top:36px;font:500 11px/1.6 "Space Grotesk",sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--gold2);text-shadow:0 1px 4px #000}
+.s3 .tl{left:12px}.s3 .tr{right:12px;top:64px;text-align:right}
+.s3 .rec{display:inline-block;width:7px;height:7px;border-radius:50%;background:#ff4a4a;margin-right:7px;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.s3 .cue{position:absolute;left:12px;bottom:74px;padding:8px 16px 10px;border-left:2px solid var(--gold);background:linear-gradient(90deg,rgba(5,4,7,.75),transparent);opacity:0;transform:translateX(-14px);transition:opacity .25s,transform .3s}
+.s3 .cue.on{opacity:1;transform:none}
+.s3 .cue b{display:block;font:500 clamp(30px,8vw,44px)/1 "Cormorant Garamond",serif;color:var(--ink)}
+.s3 .cue i{font:500 11px "Space Grotesk",sans-serif;font-style:normal;letter-spacing:.2em;text-transform:uppercase;color:var(--gold2)}
+.s3 .bar{position:absolute;left:12px;right:12px;bottom:46px;height:1.5px;background:rgba(217,180,106,.25)}.s3 .bar span{display:block;height:100%;width:0;background:var(--gold2)}
+.s3 .land{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;background:radial-gradient(circle,rgba(5,4,7,.35),rgba(5,4,7,.9));opacity:0;transition:opacity .8s}
+.s3 .land.on{opacity:1}
+.s3 .land .lw{font:600 clamp(44px,12vw,96px)/1 "Cormorant Garamond",serif;letter-spacing:.18em;padding-left:.18em;color:var(--gold2);text-shadow:0 0 30px rgba(217,180,106,.45)}
+.s3 .land b{font:italic 500 clamp(24px,6vw,40px) "Cormorant Garamond",serif;color:var(--ink)}
+.s3 .land i{font:500 11px "Space Grotesk",sans-serif;font-style:normal;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+@keyframes fade{to{opacity:1}}
+
+/* sample ribbon */
+.ribbon{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top));font-size:11px;letter-spacing:.24em;text-transform:uppercase;background:linear-gradient(180deg,rgba(5,4,7,.85),rgba(5,4,7,0))}
+.ribbon b{font:600 18px "Cormorant Garamond",serif;letter-spacing:.32em;color:var(--gold2)}
+.ribbon a{text-decoration:none;color:var(--dim);border:1px solid var(--line);border-radius:99px;padding:6px 12px}
+
+/* hero */
+.hero{position:relative;min-height:100svh;display:grid;align-items:end;overflow:hidden}
+.hero img{position:absolute;inset:0;width:100%;height:115%;object-fit:cover;filter:saturate(.85) contrast(1.05);will-change:transform}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 30%,transparent 20%,rgba(5,4,7,.55) 60%,var(--bg) 100%),linear-gradient(180deg,rgba(5,4,7,.3),var(--bg) 92%)}
+.hero .copy{position:relative;z-index:3;padding:0 20px 13vh;max-width:900px;margin:0 auto;width:100%}
+.kick{font-size:11px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold)}
+.hero h2{font:500 clamp(56px,15vw,150px)/.88 "Cormorant Garamond",serif;margin:14px 0 0;letter-spacing:-.01em}
+.hero h2 em{color:var(--gold2)}
+.hero p{max-width:30ch;color:var(--dim);font-size:17px;line-height:1.55;margin:18px 0 26px}
+.cta{display:inline-flex;align-items:center;gap:12px;min-height:52px;padding:0 26px;border-radius:99px;border:1px solid var(--gold);color:var(--gold2);text-decoration:none;font-weight:500;letter-spacing:.14em;text-transform:uppercase;font-size:13px;background:rgba(217,180,106,.08);backdrop-filter:blur(6px);cursor:pointer;transition:background .3s,color .3s}
+.cta:hover{background:var(--gold);color:#140f05}
+.scrollcue{position:absolute;z-index:2;left:50%;bottom:22px;transform:translateX(-50%);width:1px;height:46px;background:linear-gradient(var(--gold),transparent);animation:cue 2.4s ease-in-out infinite}
+@keyframes cue{0%,100%{opacity:.2;transform:translate(-50%,-8px)}50%{opacity:1;transform:translate(-50%,0)}}
+
+/* prophecy line */
+.prophecy{padding:22vh 20px;text-align:center}
+.prophecy p{font:italic 500 clamp(30px,7vw,64px)/1.15 "Cormorant Garamond",serif;max-width:16ch;margin:0 auto}
+.prophecy p span{opacity:.12;transition:opacity .6s}
+.prophecy p span.on{opacity:1}
+
+/* chapters */
+.chapter{position:relative;min-height:100svh;display:grid;align-items:center;padding:10vh 20px}
+.chapter .frame{position:relative;max-width:1100px;margin:0 auto;width:100%;display:grid;gap:28px}
+@media(min-width:860px){.chapter .frame{grid-template-columns:1.15fr .85fr;align-items:center}.chapter.flip .frame{grid-template-columns:.85fr 1.15fr}.chapter.flip .pic{order:2}}
+.pic{position:relative;overflow:hidden;border-radius:2px;aspect-ratio:4/5;clip-path:inset(12% 12% 12% 12% round 220px 220px 2px 2px);transition:clip-path 1.4s cubic-bezier(.2,.7,.1,1)}
+.pic.in{clip-path:inset(0 0 0 0 round 260px 260px 2px 2px)}
+.pic img{width:100%;height:100%;object-fit:cover;transform:scale(1.18);transition:transform 2.6s cubic-bezier(.2,.7,.1,1)}
+.pic.in img{transform:scale(1.02)}
+.pic::after{content:"";position:absolute;inset:0;border:1px solid var(--line);border-radius:inherit;pointer-events:none}
+.num{font:italic 500 clamp(80px,18vw,190px)/.8 "Cormorant Garamond",serif;color:transparent;-webkit-text-stroke:1px var(--gold);opacity:.55}
+.chapter h3{font:500 clamp(40px,8vw,74px)/.95 "Cormorant Garamond",serif;margin:6px 0 14px}
+.chapter p{color:var(--dim);line-height:1.65;font-size:16px;max-width:38ch;margin:0}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.tags span{font-size:11px;letter-spacing:.2em;text-transform:uppercase;border:1px solid var(--line);border-radius:99px;padding:7px 12px;color:var(--gold2)}
+.txt{opacity:0;transform:translateY(40px);transition:opacity 1.2s .2s,transform 1.2s .2s cubic-bezier(.2,.7,.1,1)}
+.txt.in{opacity:1;transform:none}
+
+/* kicks duo */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.duo .pic{aspect-ratio:3/4}
+.duo .pic:nth-child(2){margin-top:14%}
+
+/* oracle */
+.oracle{padding:16vh 20px;text-align:center}
+.oracle h3{font:500 clamp(40px,9vw,80px)/1 "Cormorant Garamond",serif;margin:10px 0}
+.oracle .sub{color:var(--dim);margin:0 auto 34px;max-width:34ch;line-height:1.6}
+.cards{display:flex;justify-content:center;gap:clamp(10px,3vw,24px);perspective:1200px;flex-wrap:wrap}
+.card{width:min(30vw,190px);aspect-ratio:2/3.3;position:relative;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.2,.7,.1,1);cursor:pointer;border:0;padding:0;background:none;color:inherit}
+.card:hover{transform:translateY(-8px)}
+.card.open{transform:rotateY(180deg)}
+.card .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;border:1px solid var(--gold);overflow:hidden}
+.card .back{background:radial-gradient(circle at 50% 40%,rgba(217,180,106,.25),transparent 60%),repeating-conic-gradient(from 0deg,rgba(217,180,106,.08) 0 6deg,transparent 6deg 12deg),#0b0910;display:grid;place-items:center}
+.card .back svg{width:56%;opacity:.9}
+.card .front{transform:rotateY(180deg);background:#0b0910}
+.card .front img{width:100%;height:72%;object-fit:cover}
+.card .front div{padding:10px 8px;font:italic 600 clamp(15px,3.6vw,20px)/1.1 "Cormorant Garamond",serif;color:var(--gold2)}
+.verdict{min-height:3em;margin-top:28px;font:italic 500 clamp(22px,5vw,32px) "Cormorant Garamond",serif;color:var(--ink);opacity:0;transition:opacity .8s}
+.verdict.on{opacity:1}
+
+
+/* fitting room */
+.fit{padding:14vh 20px;text-align:center}
+.fit h3{font:500 clamp(40px,9vw,80px)/1 "Cormorant Garamond",serif;margin:10px 0}
+.fit .sub{color:var(--dim);margin:0 auto 26px;max-width:36ch;line-height:1.6}
+.room{max-width:960px;margin:0 auto;display:grid;gap:18px;text-align:left}
+@media(min-width:820px){.room{grid-template-columns:1.1fr .9fr;align-items:start}}
+.mirror{position:relative;aspect-ratio:3/4.4;border-radius:200px 200px 14px 14px;overflow:hidden;border:1px solid var(--gold);background:radial-gradient(70% 50% at 50% 30%,rgba(217,180,106,.18),transparent 70%),linear-gradient(180deg,#0e0b12,#07060a);touch-action:none}
+.mirror::before{content:"";position:absolute;inset:8px;border:1px solid var(--line);border-radius:inherit;pointer-events:none;z-index:3}
+.side .you{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tag{position:absolute;left:14px;bottom:14px;z-index:4;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2);background:rgba(5,4,7,.7);border:1px solid var(--line);border-radius:99px;padding:6px 10px}
+.panel{display:grid;gap:14px}
+.step{border:1px solid var(--line);border-radius:14px;padding:14px;background:rgba(11,9,16,.7)}
+.step b{display:block;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.snap{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:99px;border:1px solid var(--gold);color:var(--gold2);background:transparent;font:500 13px "Space Grotesk",sans-serif;letter-spacing:.08em;cursor:pointer}
+.btn.solid{background:var(--gold);color:#140f05}
+
+.mirror{perspective:1400px;background:none!important;border:0!important;border-radius:0!important;overflow:visible!important}
+.mirror::before{display:none}
+.spin{position:absolute;inset:0;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.2,.7,.1,1)}
+.spin.turned{transform:rotateY(180deg)}
+.side{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:200px 200px 14px 14px;overflow:hidden;border:1px solid var(--gold);background:radial-gradient(70% 50% at 50% 30%,rgba(217,180,106,.18),transparent 70%),linear-gradient(180deg,#0e0b12,#07060a)}
+.side::before{content:"";position:absolute;inset:8px;border:1px solid var(--line);border-radius:inherit;pointer-events:none;z-index:3}
+.side.back{transform:rotateY(180deg)}
+.hint{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:5;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2);opacity:.75;pointer-events:none}
+.turn{display:flex;justify-content:center;margin-top:12px}
+.face[hidden]{display:none!important}
+.side .body{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.face{position:absolute;z-index:2;aspect-ratio:3/3.7;object-fit:cover;border-radius:50% 50% 46% 46%;box-shadow:0 0 0 2px rgba(217,180,106,.6);-webkit-mask-image:radial-gradient(closest-side,#000 82%,transparent 100%);mask-image:radial-gradient(closest-side,#000 82%,transparent 100%)}
+.seg{display:flex;gap:8px}.seg .btn[aria-pressed="true"]{background:var(--gold);color:#140f05}
+.sizes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sizes label{display:grid;gap:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.sizes select{min-height:44px;border-radius:10px;border:1px solid var(--line);background:#0b0910;color:var(--ink);font:500 15px "Space Grotesk",sans-serif;padding:0 8px}
+.stock{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
+.stock li{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:9px 12px;border-radius:10px;border:1px solid var(--line)}
+.stock li.ok b{color:#7fc4a6}.stock li.no b{color:#ff8a7a}
+.stock b{font-weight:500;white-space:nowrap}
+
+.fine{color:var(--dim);font-size:12px;line-height:1.5;margin:0}
+
+/* marquee */
+.marquee{overflow:hidden;border-block:1px solid var(--line);padding:18px 0;white-space:nowrap}
+.marquee div{display:inline-block;animation:slide 38s linear infinite;font:italic 500 clamp(26px,6vw,46px) "Cormorant Garamond",serif;color:var(--gold2)}
+.marquee i{font-style:normal;color:var(--dim);margin:0 22px}
+@keyframes slide{to{transform:translateX(-50%)}}
+
+/* visit */
+.visit{padding:16vh 20px 10vh;text-align:center}
+.visit h3{font:500 clamp(44px,10vw,96px)/.95 "Cormorant Garamond",serif;margin:12px 0 20px}
+.facts{display:grid;gap:10px;max-width:520px;margin:28px auto;text-align:left}
+.facts div{display:flex;gap:14px;align-items:baseline;border-top:1px solid var(--line);padding:14px 2px;color:var(--dim)}
+.facts b{color:var(--gold2);font-weight:500;min-width:110px;letter-spacing:.16em;text-transform:uppercase;font-size:11px}
+.note{color:var(--dim);font-size:12px;letter-spacing:.08em;margin-top:40px;opacity:.7}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.pic,.pic.in{clip-path:none}.txt{opacity:1;transform:none}#veil{display:none}.prophecy p span{opacity:1}}
+
+/* the racks: every piece in the store */
+.shop{padding:12vh 16px 4vh;text-align:center}
+.shop h3{font:500 clamp(40px,9vw,80px)/1 "Cormorant Garamond",serif;margin:10px 0}
+.shop .sub{color:var(--dim);margin:0 auto 22px;max-width:36ch;line-height:1.6}
+.cats{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 14px;justify-content:flex-start;scrollbar-width:none;max-width:1100px;margin:0 auto}
+.cats::-webkit-scrollbar{display:none}
+.cats .btn{min-height:40px;white-space:nowrap;flex:none}.cats .btn[aria-pressed="true"]{background:var(--gold);color:#140f05}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;max-width:1100px;margin:0 auto;text-align:left}
+.card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0b090e;display:flex;flex-direction:column}
+.card .ph{position:relative;aspect-ratio:3/4;background:#111}
+.card .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.card .flip{position:absolute;right:8px;top:8px;min-height:32px;padding:0 10px;font-size:11px;background:rgba(5,4,7,.7)}
+.card .in{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card b{font:600 19px/1.1 "Cormorant Garamond",serif;color:var(--gold2)}
+.card small{color:var(--dim);font-size:12px;line-height:1.4}
+.card .sz{display:flex;flex-wrap:wrap;gap:4px}.card .sz i{font-style:normal;font-size:11px;border:1px solid var(--line);border-radius:6px;padding:2px 6px;color:var(--ink)}
+.card .btn{margin-top:auto;min-height:40px;font-size:12px}
+.wear{display:flex;align-items:center;gap:12px;margin:14px auto 0;max-width:340px;padding:8px;border:1px solid var(--line);border-radius:12px;text-align:left}
+.wear img{width:56px;height:72px;object-fit:cover;border-radius:8px}.wear span{font-size:13px;color:var(--dim);line-height:1.4}.wear b{color:var(--gold2);display:block;font-weight:500}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<div id="veil" aria-label="Intro">
+  <div class="sc s1" id="s1">
+    <div class="strip"><img src="img/2.jpg" alt=""><img src="img/4.jpg" alt=""><img src="img/9.jpg" alt=""><img src="img/6.jpg" alt=""><img src="img/7.jpg" alt=""><img src="img/8.jpg" alt=""><img src="img/5.jpg" alt=""><img src="img/2.jpg" alt=""><img src="img/4.jpg" alt=""></div>
+    <div class="word"><h1 aria-label="Destiny"><span style="animation-delay:.05s">D</span><span style="animation-delay:.15s">E</span><span style="animation-delay:.25s">S</span><span style="animation-delay:.35s">T</span><span style="animation-delay:.45s">I</span><span style="animation-delay:.55s">N</span><span style="animation-delay:.65s">Y</span></h1></div>
+  </div>
+  <div class="sc s2" id="s2">
+    <div class="bg" id="front"><img src="img/front-hi.jpg" alt="The gold DESTINY sign over number 1459 and the green awning, at sunset"></div>
+    <div class="grade" aria-hidden="true"></div><div class="flare" aria-hidden="true"></div>
+    <canvas id="palms" aria-hidden="true"></canvas>
+    <div class="cap"><div class="kick">Los Angeles · No. 1459</div><h2>You've arrived.</h2></div>
+  </div>
+  <div class="sc s3" id="s3"><video id="walk" src="img/walk.mp4" poster="img/walk.jpg" muted playsinline preload="auto" aria-label="Walking into Destiny"></video><div class="hud" aria-hidden="true"><i class="c c1"></i><i class="c c2"></i><i class="c c3"></i><i class="c c4"></i>
+      <div class="tl"><span class="rec"></span>Live · Los Angeles<br><span id="hudT">00:00</span></div>
+      <div class="tr">No. 1459<br>Destiny</div>
+      <div class="cue" id="cue"><b></b><i></i></div><div class="bar"><span id="bar"></span></div></div>
+    <div class="land" id="land"><div class="lw">DESTINY</div><b>It was always yours.</b><i>Los Angeles · No. 1459</i></div></div>
+  <button class="cta" id="enter" type="button">Step inside <span aria-hidden="true">✦</span></button>
+  <button id="skip" type="button">Skip</button>
+</div>
+
+<div class="ribbon"><b>DESTINY</b><span style="display:flex;gap:8px"><a href="#shop">Shop</a><a href="#fit">Try it on</a><a href="https://instagram.com/destinydt1459" target="_blank" rel="noopener">@destinydt1459</a></span></div>
+
+<main>
+  <section class="hero" aria-label="Welcome">
+    <img id="heroImg" src="img/1.jpg" alt="Destiny storefront window with jackets, a fur-collar coat and a red puffer hanging in the light">
+    <div class="copy">
+      <div class="kick">Los Angeles · Streetwear · Kicks · Fur</div>
+      <h2>Written in<br>the <em>LA stars.</em></h2>
+      <p>Some fits you find. Others find you. Under the City of Angels sky, the one meant for you is already on the wall.</p>
+      <a class="cta" href="#fit">Try it on you <span aria-hidden="true">✦</span></a>
+    </div>
+    <div class="sunset" aria-hidden="true"></div>
+    <svg class="palms" viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g fill="#050407"><g transform="translate(150 0)"><path d="M150 260 C152 190 158 130 170 70 L174 70 C164 130 160 190 162 260Z"/><path d="M172 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M172 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M172 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M172 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M172 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(-130 0)"><path d="M1010 260 C1012 170 1020 100 1036 30 L1040 30 C1028 100 1022 170 1024 260Z"/><path d="M1038 32 c-44-22-88-16-120 8 c38-10 76-8 114 2z M1038 32 c32-36 76-46 112-38 c-36 6-76 20-106 42z M1038 32 c-12-40-36-62-66-68 c24 16 42 42 58 72z M1038 32 c44-6 82 12 104 40 c-32-18-68-26-102-34z"/></g><g transform="translate(-240 0)"><path d="M880 260 C882 210 886 170 894 130 L897 130 C891 170 889 210 890 260Z"/><path d="M896 132 c-30-14-60-10-82 4 c26-6 52-4 78 2z M896 132 c22-26 52-32 78-26 c-26 4-52 14-72 30z M896 132 c32-4 56 8 72 26 c-22-12-46-18-70-22z"/></g><rect x="0" y="236" width="1200" height="24"/></g></svg>
+    <div class="scrollcue" aria-hidden="true"></div>
+  </section>
+
+  <section class="prophecy" aria-label="Prophecy">
+    <p id="proph">Before you ever walked through the door, your jacket was already waiting.</p>
+  </section>
+
+  <section class="sign" aria-label="The store">
+    <div class="big" aria-hidden="true">1459</div>
+    <div class="pic"><img src="img/10.jpg" alt="Gold DESTINY letters on a black sign above the number 1459 and a green awning" loading="lazy"></div>
+    <div class="txt">
+      <div class="kick">Los Angeles, California</div>
+      <h3>Gold letters.<br><span class="green">Green awning.</span><br>Your address.</h3>
+      <p>In a city of a million stars, look for the one spelled out in gold. Number 1459. That's where it happens.</p>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <div class="frame">
+      <div class="pic"><img src="img/2.jpg" alt="Wall of varsity and bomber jackets with embroidered patches" loading="lazy"></div>
+      <div class="txt">
+        <div class="num" aria-hidden="true">I</div>
+        <div class="kick">Chapter One</div>
+        <h3>The Outerwear</h3>
+        <p>Varsities stitched with crowns and eagles. Satin bombers. Puffers in colors that announce you before you speak.</p>
+        <div class="tags"><span>Varsity</span><span>Bomber</span><span>Puffer</span><span>Racing</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter flip">
+    <div class="frame">
+      <div class="pic"><img src="img/4.jpg" alt="Rhinestone hoodies, matching sets and stacked distressed denim" loading="lazy"></div>
+      <div class="txt">
+        <div class="num" aria-hidden="true">II</div>
+        <div class="kick">Chapter Two</div>
+        <h3>Sets &amp; Denim</h3>
+        <p>Rhinestone hoodies, matching sets and stacked, frayed denim, cut for the ones who were never meant to blend in.</p>
+        <div class="tags"><span>Hoodies</span><span>Sets</span><span>Stacked Denim</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true"><div>Los Angeles<i>✦</i>Varsity<i>✦</i>Fur<i>✦</i>Denim<i>✦</i>Kicks<i>✦</i>Fitted<i>✦</i>Sets<i>✦</i>Racing<i>✦</i>Los Angeles<i>✦</i>Varsity<i>✦</i>Fur<i>✦</i>Denim<i>✦</i>Kicks<i>✦</i>Fitted<i>✦</i>Sets<i>✦</i>Racing<i>✦</i></div></div>
+
+  <section class="chapter">
+    <div class="frame">
+      <div class="duo">
+        <div class="pic"><img src="img/9.jpg" alt="Row of Ewing high-top sneakers in blue, black, white and red" loading="lazy"></div>
+        <div class="pic"><img src="img/8.jpg" alt="Shelf of sneakers in green, blue, orange and white" loading="lazy"></div>
+      </div>
+      <div class="txt">
+        <div class="num" aria-hidden="true">III</div>
+        <div class="kick">Chapter Three</div>
+        <h3>The Kicks</h3>
+        <p>High-tops with history. Colorways that hit like a headline. The last piece of the fit, and the first thing they notice.</p>
+        <div class="tags"><span>High-tops</span><span>Runners</span><span>Slides</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter flip">
+    <div class="frame">
+      <div class="pic"><img src="img/6.jpg" alt="Glass case of embellished trucker caps with eagles, flags and crosses" loading="lazy"></div>
+      <div class="txt">
+        <div class="num" aria-hidden="true">IV</div>
+        <div class="kick">Chapter Four</div>
+        <h3>The Crown</h3>
+        <p>Fitteds, studded truckers and team caps behind glass. Every story needs a crown.</p>
+        <div class="tags"><span>Fitted</span><span>Trucker</span><span>Team caps</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <div class="frame">
+      <div class="pic"><img src="img/7.jpg" alt="Faux fur coat beside graphic boxers and sneakers" loading="lazy"></div>
+      <div class="txt">
+        <div class="num" aria-hidden="true">V</div>
+        <div class="kick">Chapter Five</div>
+        <h3>Fur &amp; Details</h3>
+        <p>Statement fur for the cold nights, and the little things underneath that only you know about.</p>
+        <div class="tags"><span>Faux fur</span><span>Graphic boxers</span><span>Accessories</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter flip">
+    <div class="frame">
+      <div class="pic"><img src="img/5.jpg" alt="Long store wall lined top to bottom with jackets, hoodies, sneakers and denim" loading="lazy"></div>
+      <div class="txt">
+        <div class="num" aria-hidden="true">VI</div>
+        <div class="kick">The Floor</div>
+        <h3>Every wall,<br>a sign.</h3>
+        <p>Floor to ceiling, rack after rack. Take your time. The right piece will make itself known.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="shop" id="shop" aria-label="The racks">
+    <div class="kick">The Racks</div>
+    <h3>Every piece<br>on the wall.</h3>
+    <p class="sub">Straight off the racks at No. 1459. Tap any piece to try it on you.</p>
+    <div class="cats" id="cats" role="group" aria-label="Filter by category"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="fit" id="fit" aria-label="Fitting room">
+    <div class="kick">The Fitting Room</div>
+    <h3>See it on you<br>before you pull up.</h3>
+    <p class="sub">Pick your build, add your face, and see the whole fit, front and back. Then check if your size is on the rack.</p>
+    <div class="room">
+      <div>
+      <div class="mirror" id="mirror" aria-label="Fitting mirror. Swipe to turn around.">
+        <div class="spin" id="spin">
+          <div class="side front"><img class="body" id="bodyF" src="img/fit-2xl.jpg" alt="Mannequin wearing the Champions varsity, stacked denim and Ewing high-tops, front view"><img class="face" id="face" alt="Your face" hidden><div class="tag" id="tagF">2XL · Front</div></div>
+          <div class="side back"><img class="body" src="img/fit-back.jpg" alt="The same outfit from the back"><div class="tag">Back</div></div>
+        </div>
+        <div class="hint" id="hint">⟵ swipe to turn ⟶</div>
+      </div>
+      <div class="turn"><button class="btn" type="button" id="turnBtn">⟲ Turn around</button></div>
+      <div class="wear" id="wear" hidden><img id="wearImg" alt=""><span><b id="wearName"></b>Added to your fit. The full version renders it on your body.</span></div>
+      </div>
+      <div class="panel">
+        <div class="step"><b>1 · Your build</b>
+          <div class="seg" id="build" role="group" aria-label="Body size">
+            <button class="btn" type="button" data-b="2xl" aria-pressed="true">2XL</button>
+            <button class="btn" type="button" data-b="3xl" aria-pressed="false">3XL</button>
+          </div>
+          <p class="fine" style="margin-top:8px">The full version renders every size from S to 5XL.</p>
+        </div>
+        <div class="step"><b>2 · Your face</b>
+          <div class="snap"><label class="btn solid" for="selfie">Add a selfie</label><input id="selfie" type="file" accept="image/*" hidden><button class="btn" type="button" id="noFace">Mannequin head</button></div>
+          <p class="fine" style="margin-top:8px">Your photo stays on your phone; nothing is uploaded.</p>
+        </div>
+        <div class="step"><b>3 · Your sizes</b>
+          <div class="sizes">
+            <label>Top / bottom<select id="szTop"><option>S</option><option>M</option><option>L</option><option>XL</option><option selected>2XL</option><option>3XL</option><option>4XL</option></select></label>
+            <label>Waist<select id="szWaist"><option>30</option><option>32</option><option>34</option><option selected>36</option><option>38</option><option>40</option><option>42</option></select></label>
+            <label>Shoe<select id="szShoe"><option>8</option><option>9</option><option>10</option><option selected>11</option><option>12</option><option>13</option><option>14</option></select></label>
+          </div>
+          <ul class="stock" id="stock" aria-live="polite"></ul>
+        </div>
+        <p class="fine">Sample preview with sample stock. In the full version, AI renders the fit on your real body and face, and sizes come from the store's live inventory.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="oracle" id="oracle" aria-label="Reveal your fit">
+    <div class="kick">The Oracle</div>
+    <h3>Pick a card.</h3>
+    <p class="sub">Three cards. One is your destiny. Tap the one that calls you.</p>
+    <div class="cards" id="cards"></div>
+    <p class="verdict" id="verdict" aria-live="polite"></p>
+    <a class="cta" href="https://instagram.com/destinydt1459" target="_blank" rel="noopener" style="margin-top:10px">Claim it on Instagram <span aria-hidden="true">✦</span></a>
+  </section>
+
+  <section class="visit" aria-label="Visit" style="position:relative;padding-bottom:calc(10vh + 200px)">
+    <div class="kick">Come find it · City of Angels</div>
+    <h3>Your fit<br>is waiting.</h3>
+    <div class="facts">
+      <div><b>Find us</b><span>The gold DESTINY sign, number 1459, Los Angeles</span></div>
+      <div><b>Instagram</b><a href="https://instagram.com/destinydt1459" target="_blank" rel="noopener">@destinydt1459</a></div>
+      <div><b>Pay</b><span>Card, Cash App and Apple Pay</span></div>
+      <div><b>Policy</b><span>Exchanges only, no cash refunds</span></div>
+    </div>
+    <a class="cta" href="https://instagram.com/destinydt1459" target="_blank" rel="noopener">DM the shop <span aria-hidden="true">✦</span></a>
+    <p class="note">Sample website by SousShift AI · photos taken in store</p>
+    <svg class="palms" viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g fill="#050407"><g transform="translate(150 0)"><path d="M150 260 C152 190 158 130 170 70 L174 70 C164 130 160 190 162 260Z"/><path d="M172 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M172 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M172 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M172 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M172 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(-130 0)"><path d="M1010 260 C1012 170 1020 100 1036 30 L1040 30 C1028 100 1022 170 1024 260Z"/><path d="M1038 32 c-44-22-88-16-120 8 c38-10 76-8 114 2z M1038 32 c32-36 76-46 112-38 c-36 6-76 20-106 42z M1038 32 c-12-40-36-62-66-68 c24 16 42 42 58 72z M1038 32 c44-6 82 12 104 40 c-32-18-68-26-102-34z"/></g><g transform="translate(-240 0)"><path d="M880 260 C882 210 886 170 894 130 L897 130 C891 170 889 210 890 260Z"/><path d="M896 132 c-30-14-60-10-82 4 c26-6 52-4 78 2z M896 132 c22-26 52-32 78-26 c-26 4-52 14-72 30z M896 132 c32-4 56 8 72 26 c-22-12-46-18-70-22z"/></g><rect x="0" y="236" width="1200" height="24"/></g></svg>
+  </section>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // opening: clothes swipe -> LA drive-by -> step inside
+  var veil = document.getElementById("veil"), s1 = document.getElementById("s1"), s2 = document.getElementById("s2"), front = document.getElementById("front"), timers = [];
+  function lift(){ timers.forEach(clearTimeout); veil.classList.add("gone"); document.body.classList.remove("locked"); scrollTo(0, 0); }
+  if (reduce){ lift(); } else {
+    document.body.classList.add("locked");
+    s1.classList.add("on");
+    timers.push(setTimeout(function(){ s1.classList.remove("on"); s2.classList.add("on"); }, 3300));
+    timers.push(setTimeout(function(){ s2.classList.add("parked"); }, 3300 + 4200));
+  }
+  // drive-by palms: LA fan palms in the back, feather palms up front, drawn leaf by leaf
+  (function(){
+    var cv = document.getElementById("palms"), ctx = cv.getContext("2d"), W, H, R = Math.min(2, devicePixelRatio || 1), t0 = null, DUR = 4400, items = [];
+    var seed = 1459; function rnd(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    function sprite(h, kind, col){
+      var w = Math.ceil(h * (kind === "fan" ? .42 : .95)), c = document.createElement("canvas"); c.width = w; c.height = Math.ceil(h);
+      var g = c.getContext("2d"); g.fillStyle = g.strokeStyle = col; g.lineCap = "round"; g.lineJoin = "round";
+      var lean = (rnd() - .5) * h * (kind === "fan" ? .1 : .05), cx = w / 2 + lean, cy = h * (kind === "fan" ? .12 : .32), bx = w / 2;
+      var tb = h * (kind === "fan" ? .02 : .032), tt = h * (kind === "fan" ? .011 : .026), bend = (rnd() - .5) * h * .05;
+      // trunk: slightly bent, with a rough bark edge
+      var L = [], Rr = [], n = 60;
+      for (var i = 0; i <= n; i++){ var k = i / n, y = h + (cy - h) * k, x = bx + (cx - bx) * k + bend * Math.sin(Math.PI * k), r = tb + (tt - tb) * k + (rnd() - .5) * h * .0015 + (kind === "feather" && k > .9 ? h * .012 * (k - .9) * 10 : 0); L.push([x - r, y]); Rr.push([x + r, y]); }
+      g.beginPath(); g.moveTo(L[0][0], L[0][1]); L.forEach(function(q){ g.lineTo(q[0], q[1]); }); Rr.reverse().forEach(function(q){ g.lineTo(q[0], q[1]); }); g.fill();
+      function leaf(x0, y0, ang, len, wd, droop){ var x1 = x0 + Math.cos(ang) * len, y1 = y0 + Math.sin(ang) * len + droop * len; g.lineWidth = wd; g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(x0 + Math.cos(ang) * len * .55, y0 + Math.sin(ang) * len * .55, x1, y1); g.stroke(); }
+      if (kind === "fan"){
+        // Mexican fan palm: shaggy skirt of dead fronds under a ragged head
+        for (var d = 0; d < 110; d++){ var sx = cx + (rnd() - .5) * h * .045, sy = cy + rnd() * h * .02; leaf(sx, sy, Math.PI / 2 + (rnd() - .5) * .5, h * (.03 + rnd() * .08), h * (.0015 + rnd() * .002), 0); }
+        for (var f = 0; f < 15; f++){
+          var a = Math.PI * (-1.1 + 1.2 * rnd()), pl = h * (.02 + rnd() * .035), ex = cx + Math.cos(a) * pl, ey = cy + Math.sin(a) * pl * .8 + (Math.sin(a) > 0 ? pl * .4 : 0), sl = h * (.035 + rnd() * .03), spread = .6 + rnd() * .5;
+          g.lineWidth = h * .0025; g.beginPath(); g.moveTo(cx, cy); g.lineTo(ex, ey); g.stroke();
+          for (var j = 0; j < 26; j++){ var bb = a + (j / 25 - .5) * 2 * spread + (rnd() - .5) * .12, ln = sl * (.75 + rnd() * .35); leaf(ex, ey, bb, ln, h * (.0012 + rnd() * .0016), .25 + rnd() * .35); }
+        }
+      } else {
+        // Canary date palm: long arching fronds, uneven drooping leaflets
+        for (var f2 = 0; f2 < 19; f2++){
+          var a2 = Math.PI * (-1.05 + 1.1 * f2 / 18) + (rnd() - .5) * .25, Lf = h * (.24 + rnd() * .16), droop = .35 + rnd() * .75, px = cx, py = cy, step = .028;
+          for (var t2 = step; t2 <= 1; t2 += step){
+            var nx = cx + Math.cos(a2) * Lf * t2, ny = cy + Math.sin(a2) * Lf * t2 + droop * Lf * t2 * t2 * (.35 + .65 * Math.abs(Math.cos(a2)));
+            g.lineWidth = h * .005 * (1 - t2 * .85); g.beginPath(); g.moveTo(px, py); g.lineTo(nx, ny); g.stroke();
+            var dir = Math.atan2(ny - py, nx - px), ll = h * (.05 + rnd() * .05) * Math.pow(Math.sin(Math.PI * Math.min(1, t2 * 1.08)), .6);
+            if (t2 > .06) for (var sd = -1; sd <= 1; sd += 2) if (rnd() > .08) leaf(nx, ny, dir + sd * (.7 + rnd() * .55), ll, h * (.0022 + rnd() * .0022), .35 + rnd() * .5);
+            px = nx; py = ny;
+          }
+        }
+      }
+      return c;
+    }
+    function build(){
+      W = innerWidth; H = innerHeight; cv.width = W * R; cv.height = H * R; items = []; seed = 1459;
+      var far = [], near = [], x, i;
+      for (i = 0; i < 4; i++) far.push(sprite(H * R * (.62 + i * .08), "fan", "rgba(24,10,26,.92)"));
+      for (i = 0; i < 3; i++) near.push(sprite(H * R * (1.05 + i * .1), "feather", "#060306"));
+      // far fan palms: keep the middle of the final frame clear for the sign
+      for (x = -3.2 * W; x < W * 1.05; x += W * (.09 + rnd() * .12)) if (x < .3 * W || x > .7 * W) items.push({s: far[(rnd() * 4) | 0], x: x, p: .45, S: 1});
+      for (x = -6 * W; x < -.2 * W; x += W * (.5 + rnd() * .4)) items.push({s: near[(rnd() * 3) | 0], x: x, p: 1, S: 1.25});
+      items.push({s: near[0], x: -.02 * W, p: 1, S: 1.25}, {s: near[2], x: 1.02 * W, p: 1, S: 1.25});
+    }
+    function frame(ts){
+      if (veil.classList.contains("gone")) return;
+      if (s2.classList.contains("on")){
+        if (t0 === null) t0 = ts;
+        var k = Math.min(1, (ts - t0) / DUR), e = 1 - Math.pow(1 - k, 3), off = (1 - e) * 5.4 * W;
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        items.forEach(function(it){ ctx.filter = it.p < 1 ? "blur(" + (R * .8) + "px)" : "none"; var sw = it.s.width / R, x = it.x + off * it.p; if (x + sw < -50 || x - sw > W + 50) return; ctx.drawImage(it.s, (x - sw / 2) * R, cv.height - it.s.height + (it.S > 1 ? H * R * .06 : 0)); });
+      }
+      requestAnimationFrame(frame);
+    }
+    build(); addEventListener("resize", function(){ build(); }); requestAnimationFrame(frame);
+  })();
+  // step inside: zoom into the storefront, then play the real walk-in clip, then open the site
+  var s3 = document.getElementById("s3"), walk = document.getElementById("walk");
+  document.getElementById("enter").addEventListener("click", function(){
+    if (veil.classList.contains("inside")) return;
+    timers.forEach(clearTimeout); veil.classList.add("inside"); s1.classList.remove("on"); s2.classList.add("on");
+    s2.classList.remove("parked"); front.classList.add("enter");
+    var p = walk.play();   // started inside the tap so phones allow it
+    if (p && p.catch) p.catch(function(){ setTimeout(lift, 900); });
+    setTimeout(function(){ s3.classList.add("on"); }, 700);
+  });
+  // HUD over the walk-in, like the gym's drone tour: timed labels, progress bar, landing card
+  var CUES = [[0, 2.0, "Destiny", "No. 1459 · Los Angeles"], [2.0, 3.6, "The window", "Fits on display"], [3.6, 4.8, "The door", "Step inside"], [4.8, 6.6, "The floor", "Rack after rack"]];
+  var LAND = 6.6, cue = document.getElementById("cue"), bar = document.getElementById("bar"), hudT = document.getElementById("hudT"), land = document.getElementById("land"), cur = -1;
+  function hud(){
+    if (veil.classList.contains("gone")) return;
+    var t = walk.currentTime || 0, d = walk.duration || 8, i = -1;
+    bar.style.width = (100 * t / d) + "%";
+    hudT.textContent = "00:0" + Math.floor(t);
+    for (var k = 0; k < CUES.length; k++) if (t >= CUES[k][0] && t < CUES[k][1]) i = k;
+    if (i !== cur){ cur = i; cue.classList.remove("on"); if (i >= 0) setTimeout(function(){ cue.firstChild.textContent = CUES[i][2]; cue.lastChild.textContent = CUES[i][3]; cue.classList.add("on"); }, 140); }
+    land.classList.toggle("on", t >= LAND);
+    requestAnimationFrame(hud);
+  }
+  walk.addEventListener("play", function(){ requestAnimationFrame(hud); });
+  walk.addEventListener("ended", function(){ setTimeout(lift, 1100); });
+  walk.addEventListener("error", lift);
+  document.getElementById("skip").addEventListener("click", lift);
+  s3.addEventListener("click", lift);   // tap the walk-in to go straight to the site
+
+  // starfield + constellation near the finger/cursor
+  var c = document.getElementById("sky"), x = c.getContext("2d"), W, H, stars = [], px = -999, py = -999, DPR = Math.min(2, devicePixelRatio || 1);
+  function size(){
+    W = innerWidth; H = innerHeight; c.width = W * DPR; c.height = H * DPR; c.style.width = W + "px"; c.style.height = H + "px";
+    x.setTransform(DPR, 0, 0, DPR, 0, 0);
+    var n = Math.round(W * H / 5200); stars = [];
+    for (var i = 0; i < n; i++) stars.push({x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.3 + .2, t: Math.random() * 6.3, s: Math.random() * .02 + .005, v: Math.random() * .12 + .02});
+  }
+  size(); addEventListener("resize", size);
+  addEventListener("pointermove", function(e){ px = e.clientX; py = e.clientY; }, {passive: true});
+  var scrollY0 = 0;
+  function draw(){
+    x.clearRect(0, 0, W, H);
+    var dy = (scrollY - scrollY0) * .15; scrollY0 = scrollY;
+    var near = [];
+    for (var i = 0; i < stars.length; i++){
+      var s = stars[i]; s.t += s.s;
+      if (!reduce){ s.y -= s.v + dy * s.v * 4; if (s.y < -2) s.y = H + 2; if (s.y > H + 2) s.y = -2; }
+      var a = .35 + Math.sin(s.t) * .35;
+      x.fillStyle = "rgba(245,223,163," + a + ")";
+      x.beginPath(); x.arc(s.x, s.y, s.r, 0, 6.283); x.fill();
+      var d = Math.hypot(s.x - px, s.y - py); if (d < 140) near.push(s);
+    }
+    x.strokeStyle = "rgba(217,180,106,.22)"; x.lineWidth = .6;
+    for (var a1 = 0; a1 < near.length; a1++) for (var b = a1 + 1; b < near.length; b++){
+      if (Math.hypot(near[a1].x - near[b].x, near[a1].y - near[b].y) < 70){ x.beginPath(); x.moveTo(near[a1].x, near[a1].y); x.lineTo(near[b].x, near[b].y); x.stroke(); }
+    }
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  draw();
+
+  // hero parallax
+  var hero = document.getElementById("heroImg");
+  if (!reduce) addEventListener("scroll", function(){ hero.style.transform = "translateY(" + (scrollY * .25) + "px)"; }, {passive: true});
+
+  // prophecy words light up as you scroll
+  var p = document.getElementById("proph");
+  p.innerHTML = p.textContent.split(" ").map(function(w){ return "<span>" + w + "</span>"; }).join(" ");
+  var words = p.querySelectorAll("span");
+  function lightWords(){
+    var r = p.getBoundingClientRect(), prog = (innerHeight * .85 - r.top) / (r.height + innerHeight * .4);
+    var n = Math.round(Math.max(0, Math.min(1, prog)) * words.length);
+    for (var i = 0; i < words.length; i++) words[i].classList.toggle("on", i < n);
+  }
+  addEventListener("scroll", lightWords, {passive: true}); lightWords();
+
+  // reveal pictures + text
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }); }, {threshold: .25});
+  document.querySelectorAll(".pic,.txt").forEach(function(el){ io.observe(el); });
+
+
+  // fitting room: AI renders of the outfit on different builds (made with Higgsfield)
+  var spin = document.getElementById("spin"), bodyF = document.getElementById("bodyF"), face = document.getElementById("face"), tagF = document.getElementById("tagF");
+  var heads = {"2xl": {x: .5, y: .095, w: .14}, "3xl": {x: .495, y: .09, w: .15}}, build = "2xl";
+  function setFace(){ var h = heads[build]; face.style.left = (h.x - h.w/2)*100 + "%"; face.style.top = (h.y - h.w*.62)*100 + "%"; face.style.width = h.w*100 + "%"; }
+  document.querySelectorAll("#build button").forEach(function(b){
+    b.addEventListener("click", function(){
+      build = b.dataset.b; bodyF.src = "img/fit-" + build + ".jpg"; tagF.textContent = build.toUpperCase() + " · Front";
+      document.querySelectorAll("#build button").forEach(function(o){ o.setAttribute("aria-pressed", o === b); });
+      setFace(); if (spin.classList.contains("turned")) turn();
+    });
+  });
+  setFace();
+  document.getElementById("selfie").addEventListener("change", function(e){
+    var f = e.target.files && e.target.files[0]; if (!f || !/^image\//.test(f.type)) return;
+    if (face.src) URL.revokeObjectURL(face.src);
+    face.src = URL.createObjectURL(f); face.hidden = false; if (spin.classList.contains("turned")) turn();
+  });
+  document.getElementById("noFace").addEventListener("click", function(){ face.hidden = true; });
+  function turn(){ spin.classList.toggle("turned"); if (worn && worn.back) document.getElementById("wearImg").src = "img/shop/" + (spin.classList.contains("turned") ? worn.back : worn.img) + ".jpg"; document.getElementById("hint").style.opacity = 0; }
+  document.getElementById("turnBtn").addEventListener("click", turn);
+  var swX = null, mirror = document.getElementById("mirror");
+  mirror.addEventListener("pointerdown", function(e){ swX = e.clientX; });
+  mirror.addEventListener("pointerup", function(e){ if (swX !== null && Math.abs(e.clientX - swX) > 40) turn(); swX = null; });
+  // sample stock (the full version reads the store's real inventory)
+  var stock = [
+    {n: "Champions varsity", el: "szTop", have: ["M","L","XL","2XL","3XL"]},
+    {n: "Stacked denim", el: "szWaist", have: ["30","32","34","36","38"]},
+    {n: "Ewing high-tops", el: "szShoe", have: ["9","10","11","12"]}
+  ];
+  function check(){
+    document.getElementById("stock").innerHTML = (worn ? [worn] : []).concat(stock).map(function(it){
+      var sz = document.getElementById(it.el).value, ok = it.have.indexOf(sz) > -1;
+      return '<li class="' + (ok ? "ok" : "no") + '"><span>' + it.n + ' · ' + sz + '</span><b>' + (ok ? "In stock" : "Not in your size") + '</b></li>';
+    }).join("");
+  }
+  ["szTop","szWaist","szShoe"].forEach(function(id){ document.getElementById(id).addEventListener("change", check); });
+  check();
+  // the racks (sample sizes; the full version reads the store's live inventory)
+  var T = ["S","M","L","XL","2XL","3XL"], WST = ["30","32","34","36","38","40"];
+  var shop = [
+    {id:"wc", n:"World Class flannel, white", c:"Tops", d:"Rhinestone plaid, ICONIC on the back", img:"wc-front", back:"wc-back", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"wcg", n:"World Class flannel, gold", c:"Tops", d:"Olive plaid, gold ICONIC on the back", img:"wcg-front", back:"wcg-back", el:"szTop", have:["M","L","XL","2XL","3XL"]},
+    {id:"motel", n:"Reason Motel tapestry jacket", c:"Outerwear", d:"Woven tapestry, MOTEL sign on the back", img:"motel", back:"motel-back", el:"szTop", have:["S","M","L","XL","2XL"]},
+    {id:"j1", n:"Rebel Minds varsity, olive", c:"Outerwear", d:"Wool body, mustard leather sleeves", img:"j1", el:"szTop", have:["L","XL","2XL","3XL"]},
+    {id:"j2", n:"Rebel Minds varsity, olive & black", c:"Outerwear", d:"Black leather sleeves", img:"j2", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"j3", n:"Rebel Minds varsity, black & cream", c:"Outerwear", d:"Cream leather sleeves", img:"j3", el:"szTop", have:["L","XL","2XL","3XL"]},
+    {id:"champb", n:"Champions varsity, brown", c:"Outerwear", d:"FEARLESS bulldog on the back", img:"champ-brown", back:"champ-brown-back", el:"szTop", have:["M","L","XL","2XL","3XL"]},
+    {id:"basq", n:"Basquiat varsity", c:"Outerwear", d:"Black, art panels, crown", img:"basquiat", el:"szTop", have:["L","XL","2XL"]},
+    {id:"puff", n:"Metallic puffer, red", c:"Outerwear", d:"Cropped, same look front and back", img:"red-puffer", back:"red-puffer", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"varsity", n:"Champions varsity, green", c:"Outerwear", d:"Chenille patches, script sleeve", img:"varsity", el:"szTop", have:["M","L","XL","2XL","3XL"]},
+    {id:"skull", n:"Skull & rose bomber", c:"Outerwear", d:"Satin mustard, embroidered", img:"skull-bomber", el:"szTop", have:["L","XL","2XL"]},
+    {id:"duck", n:"Duck varsity", c:"Outerwear", d:"Black & cream, striped sleeves", img:"duck", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"bee", n:"Super Bee 1320 racer", c:"Outerwear", d:"Moto racing jacket", img:"superbee", el:"szTop", have:["L","XL","2XL","3XL"]},
+    {id:"moto", n:"Studded graffiti moto", c:"Outerwear", d:"Leather, palm-tree print, studs", img:"moto-studded", el:"szTop", have:["M","L","XL"]},
+    {id:"reason", n:"Reason work jacket", c:"Outerwear", d:"Canvas, sherpa collar", img:"reason-work", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"tmrw", n:"Create Tomorrow track jacket", c:"Outerwear", d:"Black & grey, sleeve type", img:"create-tmrw", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"setc", n:"Textured denim set, cream", c:"Denim", d:"Waffle-stitch jacket + matching pants", img:"set-cream", back:"set-cream-back", el:"szTop", have:["S","M","L","XL","2XL"]},
+    {id:"tex", n:"Textured denim jacket", c:"Outerwear", d:"Waffle weave, cream or black", img:"textured", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"crest", n:"Crest corduroy puffer vest", c:"Vests", d:"Tan, burgundy, white, black, mustard", img:"crest-vests", alt2:"vest-black", el:"szTop", have:T},
+    {id:"blue", n:"Cargo vest, royal blue", c:"Vests", d:"Utility pockets", img:"blue-vest", el:"szTop", have:["M","L","XL"]},
+    {id:"splat", n:"Splatter denim shirt", c:"Tops", d:"Black fade or light wash", img:"splatter", el:"szTop", have:["M","L","XL","2XL","3XL"]},
+    {id:"hood", n:"Graphic hoodies", c:"Tops", d:"Conquer, panther and more", img:"hoodies", el:"szTop", have:T},
+    {id:"tee", n:"FWRD Denim graphic tee", c:"Tops", d:"Rhinestone character front, plain black back", img:"tee-cartoon", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"stc", n:"Stacked jeans, color", c:"Denim", d:"Purple, blue, yellow, black, orange, tan", img:"stacked-color", el:"szWaist", have:WST},
+    {id:"stw", n:"Stacked jeans, washes", c:"Denim", d:"Ice, light, smoke and dark", img:"stacked-wash", el:"szWaist", have:WST},
+    {id:"sdn", n:"Statement denim", c:"Denim", d:"Camo, purple, hickory stripe, ripped", img:"statement-denim", el:"szWaist", have:["30","32","34","36"]},
+    {id:"den", n:"Stacked denim", c:"Denim", d:"Frayed panels", img:"denim", el:"szWaist", have:["30","32","34","36","38"]},
+    {id:"shred", n:"Shredded denim set", c:"Denim", d:"Jacket + jeans, all black", img:"shred-set", el:"szWaist", have:["32","34","36"]},
+    {id:"overt", n:"Smoke Rise overalls, tan", c:"Bottoms", d:"Tapered cargo overalls, one-strap look", img:"overall-tan", back:"overall-tan-back", el:"szWaist", have:["30","32","34","36"]},
+    {id:"smoke", n:"Smoke Rise stacked overalls", c:"Bottoms", d:"Black with tan panels, flare fit", img:"smoke-rise", el:"szWaist", have:["32","34","36","38"]},
+    {id:"flare", n:"Stacked fleece flares", c:"Bottoms", d:"Navy, ribbed knees", img:"flare-navy", el:"szWaist", have:["30","32","34","36","38"]},
+    {id:"jog", n:"Joggers & cargos", c:"Bottoms", d:"Nylon cargo, tech, track stripes", img:"joggers", el:"szWaist", have:WST},
+    {id:"vel", n:"Velocity cargo short set", c:"Bottoms", d:"Olive, shirt + shorts", img:"velocity-set", el:"szWaist", have:["32","34","36"]},
+    {id:"ewing", n:"Ewing high-tops", c:"Shoes", d:"Black, white and royal", img:"ewing", el:"szShoe", have:["9","10","11","12"]},
+    {id:"hats", n:"Tropical bucket hats", c:"Hats", d:"M, L and XL on the shelf", img:"hats", el:"szTop", have:["M","L","XL"]}
+  ];
+  var grid = document.getElementById("grid"), cats = document.getElementById("cats"), worn = null;
+  function esc(t){ return String(t).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  grid.innerHTML = shop.map(function(p){
+    return '<article class="card" data-c="' + p.c + '"><div class="ph"><img loading="lazy" src="img/shop/' + p.img + '.jpg" alt="' + esc(p.n) + '">' +
+      (p.back ? '<button class="btn flip" type="button" data-a="img/shop/' + p.img + '.jpg" data-b="img/shop/' + p.back + '.jpg">Back ⟲</button>' : '') +
+      '</div><div class="in"><b>' + esc(p.n) + '</b><small>' + esc(p.d) + '</small><div class="sz">' + p.have.map(function(z){ return "<i>" + z + "</i>"; }).join("") +
+      '</div><button class="btn solid" type="button" data-try="' + p.id + '">Try it on</button></div></article>';
+  }).join("");
+  ["All"].concat(shop.map(function(p){ return p.c; }).filter(function(c, i, a){ return a.indexOf(c) === i; })).forEach(function(c){
+    var b = document.createElement("button"); b.className = "btn"; b.type = "button"; b.textContent = c; b.setAttribute("aria-pressed", c === "All");
+    b.addEventListener("click", function(){
+      cats.querySelectorAll(".btn").forEach(function(o){ o.setAttribute("aria-pressed", o === b); });
+      grid.querySelectorAll(".card").forEach(function(k){ k.hidden = c !== "All" && k.dataset.c !== c; });
+    });
+    cats.appendChild(b);
+  });
+  grid.addEventListener("click", function(e){
+    var f = e.target.closest(".flip");
+    if (f){ var im = f.parentNode.querySelector("img"), back = im.getAttribute("src") === f.dataset.a; im.src = back ? f.dataset.b : f.dataset.a; f.textContent = back ? "Front ⟲" : "Back ⟲"; return; }
+    var t = e.target.closest("[data-try]"); if (!t) return;
+    worn = shop.filter(function(p){ return p.id === t.dataset.try; })[0];
+    document.getElementById("wearImg").src = "img/shop/" + (worn.back && spin.classList.contains("turned") ? worn.back : worn.img) + ".jpg";
+    document.getElementById("wearName").textContent = worn.n;
+    document.getElementById("wear").hidden = false; check();
+    document.getElementById("fit").scrollIntoView({behavior: reduce ? "auto" : "smooth"});
+  });
+  // the oracle
+  var fates = [
+    {img: "img/2.jpg", name: "The Varsity", line: "Your destiny is a varsity jacket. Wear the crown on your chest."},
+    {img: "img/9.jpg", name: "The High-Top", line: "Your destiny is on your feet. A high-top with history."},
+    {img: "img/7.jpg", name: "The Fur", line: "Your destiny is fur. Cold nights will never touch you again."},
+    {img: "img/4.jpg", name: "The Set", line: "Your destiny is a matching set. Head to toe, no notes."},
+    {img: "img/6.jpg", name: "The Crown", line: "Your destiny is a fitted. Every story needs a crown."},
+    {img: "img/1.jpg", name: "The Coat", line: "Your destiny is the coat in the window. It was always yours."},
+    {img: "img/5.jpg", name: "The Wall", line: "Your destiny is somewhere on that wall. LA is waiting on you to find it."}
+  ];
+  var star = '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="34" fill="none" stroke="#d9b46a" stroke-width="1"/><circle cx="50" cy="50" r="44" fill="none" stroke="#d9b46a" stroke-width=".5" stroke-dasharray="2 4"/><path d="M50 18 L56 44 L82 50 L56 56 L50 82 L44 56 L18 50 L44 44 Z" fill="#f5dfa3"/></svg>';
+  var cards = document.getElementById("cards"), verdict = document.getElementById("verdict"), picked = false;
+  var deck = fates.slice().sort(function(){ return Math.random() - .5; }).slice(0, 3);
+  deck.forEach(function(f){
+    var b = document.createElement("button");
+    b.className = "card"; b.type = "button"; b.setAttribute("aria-label", "Turn over a card");
+    b.innerHTML = '<div class="face back">' + star + '</div><div class="face front"><img src="' + f.img + '" alt=""><div>' + f.name + '</div></div>';
+    b.addEventListener("click", function(){
+      if (picked) return; picked = true;
+      b.classList.add("open"); b.setAttribute("aria-label", f.name);
+      verdict.textContent = f.line;
+      setTimeout(function(){ verdict.classList.add("on"); }, 500);
+      cards.querySelectorAll(".card").forEach(function(o){ if (o !== b) o.style.opacity = ".25"; });
+    });
+    cards.appendChild(b);
+  });
+})();
+</script>
+<script src="../poweredby.js?v=20261013a" defer></script>
+</body>
+</html>

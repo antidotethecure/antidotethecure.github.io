@@ -71,6 +71,11 @@ main{position:relative;z-index:1}
 .s2.parked #enter{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
 #skip{position:absolute;top:max(14px,env(safe-area-inset-top));right:16px;z-index:6;background:none;border:1px solid rgba(217,180,106,.4);color:var(--dim);border-radius:99px;padding:8px 14px;font:500 11px "Space Grotesk",sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
 body.locked{overflow:hidden}
+.s3{background:#000;z-index:5}
+.s3 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+@media (min-aspect-ratio:1/1){.s3 video{object-fit:contain}}
+.s3 .welcome{position:absolute;left:0;right:0;bottom:12%;text-align:center;font:italic 500 clamp(30px,8vw,60px) "Cormorant Garamond",serif;color:var(--gold2);text-shadow:0 4px 30px rgba(0,0,0,.8);opacity:0;transition:opacity 1.2s}
+.s3.end .welcome{opacity:1}
 @keyframes fade{to{opacity:1}}
 
 /* sample ribbon */
@@ -211,6 +216,7 @@ body.locked{overflow:hidden}
     <div class="cap"><div class="kick">Los Angeles · No. 1459</div><h2>You've arrived.</h2></div>
     <button class="cta" id="enter" type="button">Step inside <span aria-hidden="true">✦</span></button>
   </div>
+  <div class="sc s3" id="s3"><video id="walk" src="img/walk.mp4" poster="img/walk.jpg" muted playsinline preload="auto" aria-label="Walking into Destiny"></video><div class="welcome">Welcome to Destiny.</div></div>
   <button id="skip" type="button">Skip</button>
 </div>
 
@@ -404,10 +410,16 @@ body.locked{overflow:hidden}
     timers.push(setTimeout(function(){ s1.classList.remove("on"); s2.classList.add("on"); }, 3300));
     timers.push(setTimeout(function(){ s2.classList.add("parked"); }, 3300 + 3700));
   }
+  // step inside: zoom into the storefront, then play the real walk-in clip, then open the site
+  var s3 = document.getElementById("s3"), walk = document.getElementById("walk");
   document.getElementById("enter").addEventListener("click", function(){
     s2.classList.remove("parked"); front.classList.add("enter");
-    setTimeout(lift, 1100);
+    var p = walk.play();   // started inside the tap so phones allow it
+    if (p && p.catch) p.catch(function(){ setTimeout(lift, 900); });
+    setTimeout(function(){ s3.classList.add("on"); }, 700);
   });
+  walk.addEventListener("timeupdate", function(){ if (walk.duration && walk.currentTime > walk.duration - 2.2) s3.classList.add("end"); });
+  walk.addEventListener("ended", function(){ setTimeout(lift, 400); });
   document.getElementById("skip").addEventListener("click", lift);
 
   // starfield + constellation near the finger/cursor

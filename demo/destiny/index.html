@@ -46,26 +46,19 @@ main{position:relative;z-index:1}
 .s1 h1 span{display:inline-block;opacity:0;transform:translateY(30px);filter:blur(10px)}
 .sc.s1.on h1 span{animation:rise 1s cubic-bezier(.2,.7,.2,1) forwards}
 @keyframes rise{to{opacity:1;transform:none;filter:none}}
-/* scene 2: LA drive-by */
-.s2{background:linear-gradient(180deg,#120a24 0%,#3b1640 38%,#c2456a 62%,#ff8a4c 78%,#ffc06a 86%,#1a0f12 86.2%,#0b0709 100%)}
-.sunball{position:absolute;left:50%;top:60%;width:min(46vw,300px);aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,#ffe2a0 0%,#ffb35a 45%,rgba(255,138,76,0) 70%)}
-.prow{position:absolute;left:0;bottom:14%;width:200%;display:flex;will-change:transform}
-.prow svg{width:50%;height:auto;flex:none}
-.prow.far{opacity:.75;bottom:13.8%}.prow.far svg{height:min(26vh,220px)}
-.prow.near svg{height:min(48vh,420px)}
-.prow.near{bottom:0;z-index:3}
-.sc.s2.on .far{animation:roll 9s linear infinite}
-.sc.s2.on .near{animation:roll 4.5s linear infinite}
-@keyframes roll{to{transform:translateX(-50%)}}
-.sc.s2.parked .far,.sc.s2.parked .near{animation-play-state:paused}
-.front{position:absolute;left:50%;bottom:12%;width:min(64vw,360px);aspect-ratio:3/4;transform:translateX(120vw);z-index:2;border-radius:6px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 0 1px rgba(217,180,106,.5);transform-origin:50% 80%}
-.front img{width:100%;height:100%;object-fit:cover}
-.sc.s2.on .front{animation:pull 3.4s cubic-bezier(.15,.75,.2,1) .3s forwards}
-@keyframes pull{to{transform:translateX(-50%)}}
-.front.enter{transition:transform 1.4s cubic-bezier(.6,0,.2,1),filter 1.4s;transform:translateX(-50%) scale(7)!important;filter:brightness(1.6) blur(2px)}
-.s2 .cap{position:absolute;left:0;right:0;top:9%;text-align:center;z-index:4}
+/* scene 2: LA drive-by, full-screen storefront at sunset */
+.s2{background:#0b0709}
+.s2 .bg{position:absolute;inset:0;overflow:hidden;transform-origin:50% 72%}
+.s2 .bg img{width:100%;height:100%;object-fit:cover;object-position:50% 36%;transform:translateX(22%) scale(1.3);filter:saturate(1.12) contrast(1.06) brightness(.92)}
+.sc.s2.on .bg img{animation:track 4.4s cubic-bezier(.12,.7,.2,1) forwards}
+@keyframes track{to{transform:translateX(0) scale(1)}}
+.s2 .grade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(24,10,40,.94) 0%,rgba(70,24,72,.62) 20%,rgba(194,69,106,.26) 42%,rgba(255,150,80,.16) 64%,rgba(20,8,12,.55) 84%,rgba(8,5,8,.95) 100%)}
+.s2 .flare{position:absolute;right:-12%;top:-8%;width:70vmax;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,214,150,.55) 0%,rgba(255,150,80,.22) 30%,rgba(255,120,80,0) 62%);mix-blend-mode:screen;pointer-events:none}
+.s2 canvas{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+.s2 .bg.enter{transition:transform 1.4s cubic-bezier(.6,0,.2,1),filter 1.4s;transform:scale(5);filter:brightness(1.7) blur(3px)}
+.s2 .cap{position:absolute;left:0;right:0;bottom:calc(4.5% + 76px);text-align:center;z-index:4}
 .s2 .cap .kick{opacity:0;transition:opacity 1s}
-.s2 .cap h2{font:500 clamp(36px,9vw,72px)/1 "Cormorant Garamond",serif;margin:10px 0 0;opacity:0;transform:translateY(16px);transition:opacity 1s,transform 1s;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+.s2 .cap h2{font:500 clamp(40px,9vw,88px)/1 "Cormorant Garamond",serif;margin:10px 0 0;opacity:0;transform:translateY(16px);transition:opacity 1s,transform 1s;text-shadow:0 4px 30px rgba(0,0,0,.7)}
 .s2.parked .cap .kick,.s2.parked .cap h2{opacity:1;transform:none}
 #enter{position:absolute;left:50%;bottom:4.5%;transform:translate(-50%,20px);z-index:5;opacity:0;pointer-events:none;transition:opacity .8s,transform .8s;background:rgba(5,4,7,.55)}
 .s2.parked #enter{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
@@ -245,10 +238,9 @@ body.locked{overflow:hidden}
     <div class="word"><h1 aria-label="Destiny"><span style="animation-delay:.05s">D</span><span style="animation-delay:.15s">E</span><span style="animation-delay:.25s">S</span><span style="animation-delay:.35s">T</span><span style="animation-delay:.45s">I</span><span style="animation-delay:.55s">N</span><span style="animation-delay:.65s">Y</span></h1></div>
   </div>
   <div class="sc s2" id="s2">
-    <div class="sunball" aria-hidden="true"></div>
-    <div class="prow far"><svg viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g fill="#0a0609"><g transform="translate(40 90) scale(0.6538461538461539)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(260 90) scale(0.6538461538461539)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(430 90) scale(0.6538461538461539)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(610 90) scale(0.6538461538461539)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(820 90) scale(0.6538461538461539)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(1010 90) scale(0.6538461538461539)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g></g></svg><svg viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g fill="#0a0609"><g transform="translate(40 90) scale(0.6538461538461539)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(260 90) scale(0.6538461538461539)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(430 90) scale(0.6538461538461539)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(610 90) scale(0.6538461538461539)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(820 90) scale(0.6538461538461539)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(1010 90) scale(0.6538461538461539)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g></g></svg></div>
-    <div class="front" id="front"><img src="img/10.jpg" alt="The gold DESTINY sign over number 1459 and the green awning"></div>
-    <div class="prow near"><svg viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g fill="#0a0609"><g transform="translate(120 10) scale(0.9615384615384616)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(560 10) scale(0.9615384615384616)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(900 10) scale(0.9615384615384616)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g></g></svg><svg viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g fill="#0a0609"><g transform="translate(120 10) scale(0.9615384615384616)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(560 10) scale(0.9615384615384616)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g><g transform="translate(900 10) scale(0.9615384615384616)"><path d="M48 260 C50 190 55 130 66 70 L70 70 C60 130 57 190 59 260Z"/><path d="M68 72 c-40-20-80-14-110 6 c34-8 70-6 104 2z M68 72 c30-34 70-44 104-36 c-34 4-70 18-98 40z M68 72 c-10-38-34-60-62-66 c22 16 40 40 54 70z M68 72 c40-6 76 10 98 36 c-30-16-64-24-96-30z M68 72 c-44 6-70 30-82 58 c20-24 48-42 80-52z"/></g></g></svg></div>
+    <div class="bg" id="front"><img src="img/front-hi.jpg" alt="The gold DESTINY sign over number 1459 and the green awning, at sunset"></div>
+    <div class="grade" aria-hidden="true"></div><div class="flare" aria-hidden="true"></div>
+    <canvas id="palms" aria-hidden="true"></canvas>
     <div class="cap"><div class="kick">Los Angeles · No. 1459</div><h2>You've arrived.</h2></div>
     <button class="cta" id="enter" type="button">Step inside <span aria-hidden="true">✦</span></button>
   </div>
@@ -457,8 +449,67 @@ body.locked{overflow:hidden}
     document.body.classList.add("locked");
     s1.classList.add("on");
     timers.push(setTimeout(function(){ s1.classList.remove("on"); s2.classList.add("on"); }, 3300));
-    timers.push(setTimeout(function(){ s2.classList.add("parked"); }, 3300 + 3700));
+    timers.push(setTimeout(function(){ s2.classList.add("parked"); }, 3300 + 4200));
   }
+  // drive-by palms: LA fan palms in the back, feather palms up front, drawn leaf by leaf
+  (function(){
+    var cv = document.getElementById("palms"), ctx = cv.getContext("2d"), W, H, R = Math.min(2, devicePixelRatio || 1), t0 = null, DUR = 4400, items = [];
+    var seed = 1459; function rnd(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    function sprite(h, kind, col){
+      var w = Math.ceil(h * (kind === "fan" ? .42 : .95)), c = document.createElement("canvas"); c.width = w; c.height = Math.ceil(h);
+      var g = c.getContext("2d"); g.fillStyle = g.strokeStyle = col; g.lineCap = "round"; g.lineJoin = "round";
+      var lean = (rnd() - .5) * h * (kind === "fan" ? .1 : .05), cx = w / 2 + lean, cy = h * (kind === "fan" ? .12 : .32), bx = w / 2;
+      var tb = h * (kind === "fan" ? .02 : .032), tt = h * (kind === "fan" ? .011 : .026), bend = (rnd() - .5) * h * .05;
+      // trunk: slightly bent, with a rough bark edge
+      var L = [], Rr = [], n = 60;
+      for (var i = 0; i <= n; i++){ var k = i / n, y = h + (cy - h) * k, x = bx + (cx - bx) * k + bend * Math.sin(Math.PI * k), r = tb + (tt - tb) * k + (rnd() - .5) * h * .0015 + (kind === "feather" && k > .9 ? h * .012 * (k - .9) * 10 : 0); L.push([x - r, y]); Rr.push([x + r, y]); }
+      g.beginPath(); g.moveTo(L[0][0], L[0][1]); L.forEach(function(q){ g.lineTo(q[0], q[1]); }); Rr.reverse().forEach(function(q){ g.lineTo(q[0], q[1]); }); g.fill();
+      function leaf(x0, y0, ang, len, wd, droop){ var x1 = x0 + Math.cos(ang) * len, y1 = y0 + Math.sin(ang) * len + droop * len; g.lineWidth = wd; g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(x0 + Math.cos(ang) * len * .55, y0 + Math.sin(ang) * len * .55, x1, y1); g.stroke(); }
+      if (kind === "fan"){
+        // Mexican fan palm: shaggy skirt of dead fronds under a ragged head
+        for (var d = 0; d < 110; d++){ var sx = cx + (rnd() - .5) * h * .045, sy = cy + rnd() * h * .02; leaf(sx, sy, Math.PI / 2 + (rnd() - .5) * .5, h * (.03 + rnd() * .08), h * (.0015 + rnd() * .002), 0); }
+        for (var f = 0; f < 15; f++){
+          var a = Math.PI * (-1.1 + 1.2 * rnd()), pl = h * (.02 + rnd() * .035), ex = cx + Math.cos(a) * pl, ey = cy + Math.sin(a) * pl * .8 + (Math.sin(a) > 0 ? pl * .4 : 0), sl = h * (.035 + rnd() * .03), spread = .6 + rnd() * .5;
+          g.lineWidth = h * .0025; g.beginPath(); g.moveTo(cx, cy); g.lineTo(ex, ey); g.stroke();
+          for (var j = 0; j < 26; j++){ var bb = a + (j / 25 - .5) * 2 * spread + (rnd() - .5) * .12, ln = sl * (.75 + rnd() * .35); leaf(ex, ey, bb, ln, h * (.0012 + rnd() * .0016), .25 + rnd() * .35); }
+        }
+      } else {
+        // Canary date palm: long arching fronds, uneven drooping leaflets
+        for (var f2 = 0; f2 < 19; f2++){
+          var a2 = Math.PI * (-1.05 + 1.1 * f2 / 18) + (rnd() - .5) * .25, Lf = h * (.24 + rnd() * .16), droop = .35 + rnd() * .75, px = cx, py = cy, step = .028;
+          for (var t2 = step; t2 <= 1; t2 += step){
+            var nx = cx + Math.cos(a2) * Lf * t2, ny = cy + Math.sin(a2) * Lf * t2 + droop * Lf * t2 * t2 * (.35 + .65 * Math.abs(Math.cos(a2)));
+            g.lineWidth = h * .005 * (1 - t2 * .85); g.beginPath(); g.moveTo(px, py); g.lineTo(nx, ny); g.stroke();
+            var dir = Math.atan2(ny - py, nx - px), ll = h * (.05 + rnd() * .05) * Math.pow(Math.sin(Math.PI * Math.min(1, t2 * 1.08)), .6);
+            if (t2 > .06) for (var sd = -1; sd <= 1; sd += 2) if (rnd() > .08) leaf(nx, ny, dir + sd * (.7 + rnd() * .55), ll, h * (.0022 + rnd() * .0022), .35 + rnd() * .5);
+            px = nx; py = ny;
+          }
+        }
+      }
+      return c;
+    }
+    function build(){
+      W = innerWidth; H = innerHeight; cv.width = W * R; cv.height = H * R; items = []; seed = 1459;
+      var far = [], near = [], x, i;
+      for (i = 0; i < 4; i++) far.push(sprite(H * R * (.62 + i * .08), "fan", "rgba(24,10,26,.92)"));
+      for (i = 0; i < 3; i++) near.push(sprite(H * R * (1.05 + i * .1), "feather", "#060306"));
+      // far fan palms: keep the middle of the final frame clear for the sign
+      for (x = -3.2 * W; x < W * 1.05; x += W * (.09 + rnd() * .12)) if (x < .3 * W || x > .7 * W) items.push({s: far[(rnd() * 4) | 0], x: x, p: .45, S: 1});
+      for (x = -6 * W; x < -.2 * W; x += W * (.5 + rnd() * .4)) items.push({s: near[(rnd() * 3) | 0], x: x, p: 1, S: 1.25});
+      items.push({s: near[0], x: -.02 * W, p: 1, S: 1.25}, {s: near[2], x: 1.02 * W, p: 1, S: 1.25});
+    }
+    function frame(ts){
+      if (veil.classList.contains("gone")) return;
+      if (s2.classList.contains("on")){
+        if (t0 === null) t0 = ts;
+        var k = Math.min(1, (ts - t0) / DUR), e = 1 - Math.pow(1 - k, 3), off = (1 - e) * 5.4 * W;
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        items.forEach(function(it){ ctx.filter = it.p < 1 ? "blur(" + (R * .8) + "px)" : "none"; var sw = it.s.width / R, x = it.x + off * it.p; if (x + sw < -50 || x - sw > W + 50) return; ctx.drawImage(it.s, (x - sw / 2) * R, cv.height - it.s.height + (it.S > 1 ? H * R * .06 : 0)); });
+      }
+      requestAnimationFrame(frame);
+    }
+    build(); addEventListener("resize", function(){ build(); }); requestAnimationFrame(frame);
+  })();
   // step inside: zoom into the storefront, then play the real walk-in clip, then open the site
   var s3 = document.getElementById("s3"), walk = document.getElementById("walk");
   document.getElementById("enter").addEventListener("click", function(){
@@ -592,6 +643,7 @@ body.locked{overflow:hidden}
     {id:"moto", n:"Studded graffiti moto", c:"Outerwear", d:"Leather, palm-tree print, studs", img:"moto-studded", el:"szTop", have:["M","L","XL"]},
     {id:"reason", n:"Reason work jacket", c:"Outerwear", d:"Canvas, sherpa collar", img:"reason-work", el:"szTop", have:["M","L","XL","2XL"]},
     {id:"tmrw", n:"Create Tomorrow track jacket", c:"Outerwear", d:"Black & grey, sleeve type", img:"create-tmrw", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"setc", n:"Textured denim set, cream", c:"Denim", d:"Waffle-stitch jacket + matching pants", img:"set-cream", back:"set-cream-back", el:"szTop", have:["S","M","L","XL","2XL"]},
     {id:"tex", n:"Textured denim jacket", c:"Outerwear", d:"Waffle weave, cream or black", img:"textured", el:"szTop", have:["M","L","XL","2XL"]},
     {id:"crest", n:"Crest corduroy puffer vest", c:"Vests", d:"Tan, burgundy, white, black, mustard", img:"crest-vests", alt2:"vest-black", el:"szTop", have:T},
     {id:"blue", n:"Cargo vest, royal blue", c:"Vests", d:"Utility pockets", img:"blue-vest", el:"szTop", have:["M","L","XL"]},

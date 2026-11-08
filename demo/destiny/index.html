@@ -214,6 +214,26 @@ body.locked{overflow:hidden}
 .note{color:var(--dim);font-size:12px;letter-spacing:.08em;margin-top:40px;opacity:.7}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.pic,.pic.in{clip-path:none}.txt{opacity:1;transform:none}#veil{display:none}.prophecy p span{opacity:1}}
+
+/* the racks: every piece in the store */
+.shop{padding:12vh 16px 4vh;text-align:center}
+.shop h3{font:500 clamp(40px,9vw,80px)/1 "Cormorant Garamond",serif;margin:10px 0}
+.shop .sub{color:var(--dim);margin:0 auto 22px;max-width:36ch;line-height:1.6}
+.cats{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 14px;justify-content:flex-start;scrollbar-width:none;max-width:1100px;margin:0 auto}
+.cats::-webkit-scrollbar{display:none}
+.cats .btn{min-height:40px;white-space:nowrap;flex:none}.cats .btn[aria-pressed="true"]{background:var(--gold);color:#140f05}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;max-width:1100px;margin:0 auto;text-align:left}
+.card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0b090e;display:flex;flex-direction:column}
+.card .ph{position:relative;aspect-ratio:3/4;background:#111}
+.card .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.card .flip{position:absolute;right:8px;top:8px;min-height:32px;padding:0 10px;font-size:11px;background:rgba(5,4,7,.7)}
+.card .in{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card b{font:600 19px/1.1 "Cormorant Garamond",serif;color:var(--gold2)}
+.card small{color:var(--dim);font-size:12px;line-height:1.4}
+.card .sz{display:flex;flex-wrap:wrap;gap:4px}.card .sz i{font-style:normal;font-size:11px;border:1px solid var(--line);border-radius:6px;padding:2px 6px;color:var(--ink)}
+.card .btn{margin-top:auto;min-height:40px;font-size:12px}
+.wear{display:flex;align-items:center;gap:12px;margin:14px auto 0;max-width:340px;padding:8px;border:1px solid var(--line);border-radius:12px;text-align:left}
+.wear img{width:56px;height:72px;object-fit:cover;border-radius:8px}.wear span{font-size:13px;color:var(--dim);line-height:1.4}.wear b{color:var(--gold2);display:block;font-weight:500}
 </style>
 </head>
 <body>
@@ -240,7 +260,7 @@ body.locked{overflow:hidden}
   <button id="skip" type="button">Skip</button>
 </div>
 
-<div class="ribbon"><b>DESTINY</b><span style="display:flex;gap:8px"><a href="#fit">Try it on</a><a href="https://instagram.com/destinydt1459" target="_blank" rel="noopener">@destinydt1459</a></span></div>
+<div class="ribbon"><b>DESTINY</b><span style="display:flex;gap:8px"><a href="#shop">Shop</a><a href="#fit">Try it on</a><a href="https://instagram.com/destinydt1459" target="_blank" rel="noopener">@destinydt1459</a></span></div>
 
 <main>
   <section class="hero" aria-label="Welcome">
@@ -352,6 +372,14 @@ body.locked{overflow:hidden}
     </div>
   </section>
 
+  <section class="shop" id="shop" aria-label="The racks">
+    <div class="kick">The Racks</div>
+    <h3>Every piece<br>on the wall.</h3>
+    <p class="sub">Straight off the racks at No. 1459. Tap any piece to try it on you.</p>
+    <div class="cats" id="cats" role="group" aria-label="Filter by category"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
   <section class="fit" id="fit" aria-label="Fitting room">
     <div class="kick">The Fitting Room</div>
     <h3>See it on you<br>before you pull up.</h3>
@@ -366,6 +394,7 @@ body.locked{overflow:hidden}
         <div class="hint" id="hint">⟵ swipe to turn ⟶</div>
       </div>
       <div class="turn"><button class="btn" type="button" id="turnBtn">⟲ Turn around</button></div>
+      <div class="wear" id="wear" hidden><img id="wearImg" alt=""><span><b id="wearName"></b>Added to your fit. The full version renders it on your body.</span></div>
       </div>
       <div class="panel">
         <div class="step"><b>1 · Your build</b>
@@ -537,13 +566,75 @@ body.locked{overflow:hidden}
     {n: "Ewing high-tops", el: "szShoe", have: ["9","10","11","12"]}
   ];
   function check(){
-    document.getElementById("stock").innerHTML = stock.map(function(it){
+    document.getElementById("stock").innerHTML = (worn ? [worn] : []).concat(stock).map(function(it){
       var sz = document.getElementById(it.el).value, ok = it.have.indexOf(sz) > -1;
       return '<li class="' + (ok ? "ok" : "no") + '"><span>' + it.n + ' · ' + sz + '</span><b>' + (ok ? "In stock" : "Not in your size") + '</b></li>';
     }).join("");
   }
   ["szTop","szWaist","szShoe"].forEach(function(id){ document.getElementById(id).addEventListener("change", check); });
   check();
+  // the racks (sample sizes; the full version reads the store's live inventory)
+  var T = ["S","M","L","XL","2XL","3XL"], WST = ["30","32","34","36","38","40"];
+  var shop = [
+    {id:"wc", n:"World Class flannel", c:"Tops", d:"Rhinestone plaid, ICONIC on the back", img:"wc-front", back:"wc-back", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"motel", n:"Reason Motel tapestry jacket", c:"Outerwear", d:"Woven tapestry, MOTEL sign on the back", img:"motel", back:"motel-back", el:"szTop", have:["S","M","L","XL","2XL"]},
+    {id:"j1", n:"Rebel Minds varsity, olive", c:"Outerwear", d:"Wool body, mustard leather sleeves", img:"j1", el:"szTop", have:["L","XL","2XL","3XL"]},
+    {id:"j2", n:"Rebel Minds varsity, olive & black", c:"Outerwear", d:"Black leather sleeves", img:"j2", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"j3", n:"Rebel Minds varsity, black & cream", c:"Outerwear", d:"Cream leather sleeves", img:"j3", el:"szTop", have:["L","XL","2XL","3XL"]},
+    {id:"champb", n:"Champions varsity, brown", c:"Outerwear", d:"FEARLESS bulldog on the back", img:"champ-brown", back:"champ-brown-back", el:"szTop", have:["M","L","XL","2XL","3XL"]},
+    {id:"basq", n:"Basquiat varsity", c:"Outerwear", d:"Black, art panels, crown", img:"basquiat", el:"szTop", have:["L","XL","2XL"]},
+    {id:"puff", n:"Metallic puffer, red", c:"Outerwear", d:"Cropped, same look front and back", img:"red-puffer", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"varsity", n:"Champions varsity, green", c:"Outerwear", d:"Chenille patches, script sleeve", img:"varsity", el:"szTop", have:["M","L","XL","2XL","3XL"]},
+    {id:"skull", n:"Skull & rose bomber", c:"Outerwear", d:"Satin mustard, embroidered", img:"skull-bomber", el:"szTop", have:["L","XL","2XL"]},
+    {id:"duck", n:"Duck varsity", c:"Outerwear", d:"Black & cream, striped sleeves", img:"duck", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"bee", n:"Super Bee 1320 racer", c:"Outerwear", d:"Moto racing jacket", img:"superbee", el:"szTop", have:["L","XL","2XL","3XL"]},
+    {id:"moto", n:"Studded graffiti moto", c:"Outerwear", d:"Leather, palm-tree print, studs", img:"moto-studded", el:"szTop", have:["M","L","XL"]},
+    {id:"reason", n:"Reason work jacket", c:"Outerwear", d:"Canvas, sherpa collar", img:"reason-work", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"tmrw", n:"Create Tomorrow track jacket", c:"Outerwear", d:"Black & grey, sleeve type", img:"create-tmrw", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"tex", n:"Textured denim jacket", c:"Outerwear", d:"Waffle weave, cream or black", img:"textured", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"crest", n:"Crest corduroy puffer vest", c:"Vests", d:"Tan, burgundy, white, black, mustard", img:"crest-vests", alt2:"vest-black", el:"szTop", have:T},
+    {id:"blue", n:"Cargo vest, royal blue", c:"Vests", d:"Utility pockets", img:"blue-vest", el:"szTop", have:["M","L","XL"]},
+    {id:"splat", n:"Splatter denim shirt", c:"Tops", d:"Black fade or light wash", img:"splatter", el:"szTop", have:["M","L","XL","2XL","3XL"]},
+    {id:"hood", n:"Graphic hoodies", c:"Tops", d:"Conquer, panther and more", img:"hoodies", el:"szTop", have:T},
+    {id:"tee", n:"FWRD Denim graphic tee", c:"Tops", d:"Rhinestone character front, plain black back", img:"tee-cartoon", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"stc", n:"Stacked jeans, color", c:"Denim", d:"Purple, blue, yellow, black, orange, tan", img:"stacked-color", el:"szWaist", have:WST},
+    {id:"stw", n:"Stacked jeans, washes", c:"Denim", d:"Ice, light, smoke and dark", img:"stacked-wash", el:"szWaist", have:WST},
+    {id:"sdn", n:"Statement denim", c:"Denim", d:"Camo, purple, hickory stripe, ripped", img:"statement-denim", el:"szWaist", have:["30","32","34","36"]},
+    {id:"den", n:"Stacked denim", c:"Denim", d:"Frayed panels", img:"denim", el:"szWaist", have:["30","32","34","36","38"]},
+    {id:"shred", n:"Shredded denim set", c:"Denim", d:"Jacket + jeans, all black", img:"shred-set", el:"szWaist", have:["32","34","36"]},
+    {id:"smoke", n:"Smoke Rise stacked overalls", c:"Bottoms", d:"Black with tan panels, flare fit", img:"smoke-rise", el:"szWaist", have:["32","34","36","38"]},
+    {id:"flare", n:"Stacked fleece flares", c:"Bottoms", d:"Navy, ribbed knees", img:"flare-navy", el:"szWaist", have:["30","32","34","36","38"]},
+    {id:"jog", n:"Joggers & cargos", c:"Bottoms", d:"Nylon cargo, tech, track stripes", img:"joggers", el:"szWaist", have:WST},
+    {id:"vel", n:"Velocity cargo short set", c:"Bottoms", d:"Olive, shirt + shorts", img:"velocity-set", el:"szWaist", have:["32","34","36"]},
+    {id:"ewing", n:"Ewing high-tops", c:"Shoes", d:"Black, white and royal", img:"ewing", el:"szShoe", have:["9","10","11","12"]},
+    {id:"hats", n:"Tropical bucket hats", c:"Hats", d:"M, L and XL on the shelf", img:"hats", el:"szTop", have:["M","L","XL"]}
+  ];
+  var grid = document.getElementById("grid"), cats = document.getElementById("cats"), worn = null;
+  function esc(t){ return String(t).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  grid.innerHTML = shop.map(function(p){
+    return '<article class="card" data-c="' + p.c + '"><div class="ph"><img loading="lazy" src="img/shop/' + p.img + '.jpg" alt="' + esc(p.n) + '">' +
+      (p.back ? '<button class="btn flip" type="button" data-a="img/shop/' + p.img + '.jpg" data-b="img/shop/' + p.back + '.jpg">Back ⟲</button>' : '') +
+      '</div><div class="in"><b>' + esc(p.n) + '</b><small>' + esc(p.d) + '</small><div class="sz">' + p.have.map(function(z){ return "<i>" + z + "</i>"; }).join("") +
+      '</div><button class="btn solid" type="button" data-try="' + p.id + '">Try it on</button></div></article>';
+  }).join("");
+  ["All"].concat(shop.map(function(p){ return p.c; }).filter(function(c, i, a){ return a.indexOf(c) === i; })).forEach(function(c){
+    var b = document.createElement("button"); b.className = "btn"; b.type = "button"; b.textContent = c; b.setAttribute("aria-pressed", c === "All");
+    b.addEventListener("click", function(){
+      cats.querySelectorAll(".btn").forEach(function(o){ o.setAttribute("aria-pressed", o === b); });
+      grid.querySelectorAll(".card").forEach(function(k){ k.hidden = c !== "All" && k.dataset.c !== c; });
+    });
+    cats.appendChild(b);
+  });
+  grid.addEventListener("click", function(e){
+    var f = e.target.closest(".flip");
+    if (f){ var im = f.parentNode.querySelector("img"), back = im.getAttribute("src") === f.dataset.a; im.src = back ? f.dataset.b : f.dataset.a; f.textContent = back ? "Front ⟲" : "Back ⟲"; return; }
+    var t = e.target.closest("[data-try]"); if (!t) return;
+    worn = shop.filter(function(p){ return p.id === t.dataset.try; })[0];
+    document.getElementById("wearImg").src = "img/shop/" + worn.img + ".jpg";
+    document.getElementById("wearName").textContent = worn.n;
+    document.getElementById("wear").hidden = false; check();
+    document.getElementById("fit").scrollIntoView({behavior: reduce ? "auto" : "smooth"});
+  });
   // the oracle
   var fates = [
     {img: "img/2.jpg", name: "The Varsity", line: "Your destiny is a varsity jacket. Wear the crown on your chest."},

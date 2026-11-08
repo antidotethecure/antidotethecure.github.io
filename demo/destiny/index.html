@@ -554,7 +554,7 @@ body.locked{overflow:hidden}
     face.src = URL.createObjectURL(f); face.hidden = false; if (spin.classList.contains("turned")) turn();
   });
   document.getElementById("noFace").addEventListener("click", function(){ face.hidden = true; });
-  function turn(){ spin.classList.toggle("turned"); document.getElementById("hint").style.opacity = 0; }
+  function turn(){ spin.classList.toggle("turned"); if (worn && worn.back) document.getElementById("wearImg").src = "img/shop/" + (spin.classList.contains("turned") ? worn.back : worn.img) + ".jpg"; document.getElementById("hint").style.opacity = 0; }
   document.getElementById("turnBtn").addEventListener("click", turn);
   var swX = null, mirror = document.getElementById("mirror");
   mirror.addEventListener("pointerdown", function(e){ swX = e.clientX; });
@@ -576,14 +576,15 @@ body.locked{overflow:hidden}
   // the racks (sample sizes; the full version reads the store's live inventory)
   var T = ["S","M","L","XL","2XL","3XL"], WST = ["30","32","34","36","38","40"];
   var shop = [
-    {id:"wc", n:"World Class flannel", c:"Tops", d:"Rhinestone plaid, ICONIC on the back", img:"wc-front", back:"wc-back", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"wc", n:"World Class flannel, white", c:"Tops", d:"Rhinestone plaid, ICONIC on the back", img:"wc-front", back:"wc-back", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"wcg", n:"World Class flannel, gold", c:"Tops", d:"Olive plaid, gold ICONIC on the back", img:"wcg-front", back:"wcg-back", el:"szTop", have:["M","L","XL","2XL","3XL"]},
     {id:"motel", n:"Reason Motel tapestry jacket", c:"Outerwear", d:"Woven tapestry, MOTEL sign on the back", img:"motel", back:"motel-back", el:"szTop", have:["S","M","L","XL","2XL"]},
     {id:"j1", n:"Rebel Minds varsity, olive", c:"Outerwear", d:"Wool body, mustard leather sleeves", img:"j1", el:"szTop", have:["L","XL","2XL","3XL"]},
     {id:"j2", n:"Rebel Minds varsity, olive & black", c:"Outerwear", d:"Black leather sleeves", img:"j2", el:"szTop", have:["M","L","XL","2XL"]},
     {id:"j3", n:"Rebel Minds varsity, black & cream", c:"Outerwear", d:"Cream leather sleeves", img:"j3", el:"szTop", have:["L","XL","2XL","3XL"]},
     {id:"champb", n:"Champions varsity, brown", c:"Outerwear", d:"FEARLESS bulldog on the back", img:"champ-brown", back:"champ-brown-back", el:"szTop", have:["M","L","XL","2XL","3XL"]},
     {id:"basq", n:"Basquiat varsity", c:"Outerwear", d:"Black, art panels, crown", img:"basquiat", el:"szTop", have:["L","XL","2XL"]},
-    {id:"puff", n:"Metallic puffer, red", c:"Outerwear", d:"Cropped, same look front and back", img:"red-puffer", el:"szTop", have:["M","L","XL","2XL"]},
+    {id:"puff", n:"Metallic puffer, red", c:"Outerwear", d:"Cropped, same look front and back", img:"red-puffer", back:"red-puffer", el:"szTop", have:["M","L","XL","2XL"]},
     {id:"varsity", n:"Champions varsity, green", c:"Outerwear", d:"Chenille patches, script sleeve", img:"varsity", el:"szTop", have:["M","L","XL","2XL","3XL"]},
     {id:"skull", n:"Skull & rose bomber", c:"Outerwear", d:"Satin mustard, embroidered", img:"skull-bomber", el:"szTop", have:["L","XL","2XL"]},
     {id:"duck", n:"Duck varsity", c:"Outerwear", d:"Black & cream, striped sleeves", img:"duck", el:"szTop", have:["M","L","XL","2XL"]},
@@ -602,6 +603,7 @@ body.locked{overflow:hidden}
     {id:"sdn", n:"Statement denim", c:"Denim", d:"Camo, purple, hickory stripe, ripped", img:"statement-denim", el:"szWaist", have:["30","32","34","36"]},
     {id:"den", n:"Stacked denim", c:"Denim", d:"Frayed panels", img:"denim", el:"szWaist", have:["30","32","34","36","38"]},
     {id:"shred", n:"Shredded denim set", c:"Denim", d:"Jacket + jeans, all black", img:"shred-set", el:"szWaist", have:["32","34","36"]},
+    {id:"overt", n:"Smoke Rise overalls, tan", c:"Bottoms", d:"Tapered cargo overalls, one-strap look", img:"overall-tan", back:"overall-tan-back", el:"szWaist", have:["30","32","34","36"]},
     {id:"smoke", n:"Smoke Rise stacked overalls", c:"Bottoms", d:"Black with tan panels, flare fit", img:"smoke-rise", el:"szWaist", have:["32","34","36","38"]},
     {id:"flare", n:"Stacked fleece flares", c:"Bottoms", d:"Navy, ribbed knees", img:"flare-navy", el:"szWaist", have:["30","32","34","36","38"]},
     {id:"jog", n:"Joggers & cargos", c:"Bottoms", d:"Nylon cargo, tech, track stripes", img:"joggers", el:"szWaist", have:WST},
@@ -630,7 +632,7 @@ body.locked{overflow:hidden}
     if (f){ var im = f.parentNode.querySelector("img"), back = im.getAttribute("src") === f.dataset.a; im.src = back ? f.dataset.b : f.dataset.a; f.textContent = back ? "Front ⟲" : "Back ⟲"; return; }
     var t = e.target.closest("[data-try]"); if (!t) return;
     worn = shop.filter(function(p){ return p.id === t.dataset.try; })[0];
-    document.getElementById("wearImg").src = "img/shop/" + worn.img + ".jpg";
+    document.getElementById("wearImg").src = "img/shop/" + (worn.back && spin.classList.contains("turned") ? worn.back : worn.img) + ".jpg";
     document.getElementById("wearName").textContent = worn.n;
     document.getElementById("wear").hidden = false; check();
     document.getElementById("fit").scrollIntoView({behavior: reduce ? "auto" : "smooth"});

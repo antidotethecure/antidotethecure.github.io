@@ -60,8 +60,9 @@ main{position:relative;z-index:1}
 .s2 .cap .kick{opacity:0;transition:opacity 1s}
 .s2 .cap h2{font:500 clamp(40px,9vw,88px)/1 "Cormorant Garamond",serif;margin:10px 0 0;opacity:0;transform:translateY(16px);transition:opacity 1s,transform 1s;text-shadow:0 4px 30px rgba(0,0,0,.7)}
 .s2.parked .cap .kick,.s2.parked .cap h2{opacity:1;transform:none}
-#enter{position:absolute;left:50%;bottom:4.5%;transform:translate(-50%,20px);z-index:5;opacity:0;pointer-events:none;transition:opacity .8s,transform .8s;background:rgba(5,4,7,.55)}
-.s2.parked #enter{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+#enter{position:absolute;left:50%;bottom:4.5%;transform:translate(-50%,0);z-index:7;background:rgba(5,4,7,.55);animation:fadein .8s .4s both}
+@keyframes fadein{from{opacity:0;transform:translate(-50%,16px)}}
+#veil.inside #enter{opacity:0;pointer-events:none;transition:opacity .4s}
 #skip{position:absolute;top:max(14px,env(safe-area-inset-top));right:16px;z-index:6;background:none;border:1px solid rgba(217,180,106,.4);color:var(--dim);border-radius:99px;padding:8px 14px;font:500 11px "Space Grotesk",sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
 body.locked{overflow:hidden}
 .s3{background:#000;z-index:5}
@@ -242,13 +243,13 @@ body.locked{overflow:hidden}
     <div class="grade" aria-hidden="true"></div><div class="flare" aria-hidden="true"></div>
     <canvas id="palms" aria-hidden="true"></canvas>
     <div class="cap"><div class="kick">Los Angeles · No. 1459</div><h2>You've arrived.</h2></div>
-    <button class="cta" id="enter" type="button">Step inside <span aria-hidden="true">✦</span></button>
   </div>
   <div class="sc s3" id="s3"><video id="walk" src="img/walk.mp4" poster="img/walk.jpg" muted playsinline preload="auto" aria-label="Walking into Destiny"></video><div class="hud" aria-hidden="true"><i class="c c1"></i><i class="c c2"></i><i class="c c3"></i><i class="c c4"></i>
       <div class="tl"><span class="rec"></span>Live · Los Angeles<br><span id="hudT">00:00</span></div>
       <div class="tr">No. 1459<br>Destiny</div>
       <div class="cue" id="cue"><b></b><i></i></div><div class="bar"><span id="bar"></span></div></div>
     <div class="land" id="land"><div class="lw">DESTINY</div><b>It was always yours.</b><i>Los Angeles · No. 1459</i></div></div>
+  <button class="cta" id="enter" type="button">Step inside <span aria-hidden="true">✦</span></button>
   <button id="skip" type="button">Skip</button>
 </div>
 
@@ -513,6 +514,8 @@ body.locked{overflow:hidden}
   // step inside: zoom into the storefront, then play the real walk-in clip, then open the site
   var s3 = document.getElementById("s3"), walk = document.getElementById("walk");
   document.getElementById("enter").addEventListener("click", function(){
+    if (veil.classList.contains("inside")) return;
+    timers.forEach(clearTimeout); veil.classList.add("inside"); s1.classList.remove("on"); s2.classList.add("on");
     s2.classList.remove("parked"); front.classList.add("enter");
     var p = walk.play();   // started inside the tap so phones allow it
     if (p && p.catch) p.catch(function(){ setTimeout(lift, 900); });
@@ -535,6 +538,7 @@ body.locked{overflow:hidden}
   walk.addEventListener("ended", function(){ setTimeout(lift, 1100); });
   walk.addEventListener("error", lift);
   document.getElementById("skip").addEventListener("click", lift);
+  s3.addEventListener("click", lift);   // tap the walk-in to go straight to the site
 
   // starfield + constellation near the finger/cursor
   var c = document.getElementById("sky"), x = c.getContext("2d"), W, H, stars = [], px = -999, py = -999, DPR = Math.min(2, devicePixelRatio || 1);

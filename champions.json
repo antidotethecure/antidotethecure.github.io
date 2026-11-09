@@ -1,6 +1,6 @@
 {
-  "updated": "2026-11-01T23:00:10-08:00",
-  "week": "2026-10-26",
+  "updated": "2026-11-08T23:00:25-08:00",
+  "week": "2026-11-02",
   "closes": "Sunday 11:00 PM (Los Angeles)",
   "games": {
     "melody": {
@@ -8,7 +8,7 @@
       "gameName": "Melody Flight",
       "restaurant": "Melody Bar & Grill",
       "slug": "melody-lax",
-      "week": "2026-10-26",
+      "week": "2026-11-02",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -20,7 +20,7 @@
       "gameName": "Melody Survival (seconds survived)",
       "restaurant": "Melody Bar & Grill",
       "slug": "melody-lax",
-      "week": "2026-10-26",
+      "week": "2026-11-02",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -32,7 +32,7 @@
       "gameName": "Ride the Nalu",
       "restaurant": "Nalu Vida",
       "slug": "nalu-vida",
-      "week": "2026-10-26",
+      "week": "2026-11-02",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -44,7 +44,7 @@
       "gameName": "Storm Run",
       "restaurant": "StormBurger",
       "slug": "storm-burger",
-      "week": "2026-10-26",
+      "week": "2026-11-02",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -56,7 +56,7 @@
       "gameName": "Order Up!",
       "restaurant": "Gritz N Wafflez",
       "slug": "gritz-n-wafflez",
-      "week": "2026-10-26",
+      "week": "2026-11-02",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -68,7 +68,7 @@
       "gameName": "Loco Match",
       "restaurant": "Churrito Loco",
       "slug": "churrito-loco",
-      "week": "2026-10-26",
+      "week": "2026-11-02",
       "top3": [],
       "prize": {
         "first": "Half off your meal",
@@ -80,7 +80,7 @@
       "gameName": "Hibachi Catch",
       "restaurant": "Lucky Dragon Hibachi",
       "slug": "lucky-dragon",
-      "week": "2026-10-26",
+      "week": "2026-11-02",
       "top3": [],
       "prize": {
         "first": "Half off your meal",

@@ -3,7 +3,7 @@
 <meta name="description" content="What Harry&#x27;s Oklahoma Style Smokehouse BBQ gets with SousShift AI, shown on the live Melody Bar &amp; Grill app.">
 <meta property="og:title" content="Harry&#x27;s Oklahoma Style Smokehouse BBQ × SousShift AI"><meta property="og:image" content="https://antidotethecure.github.io/pitch/harrys-smokehouse-bbq/img/c02-flight-game.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Monoton&family=Tilt+Neon&family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--red:#c8232c;--red2:#823e2d;--yel:#d1902a;--cream:#f3e6c8;--ink:#1e140c;--card:#fffaf0;--edge:#e3d6b5;--dim:#5d5550;--good:#1f7a4d;--bad:#b81e1d}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
@@ -87,6 +87,206 @@ table.sc thead th{background:var(--ink);color:var(--yel)}
 <p class="lead">This is the live system we run for Melody Bar &amp; Grill (LAX / Westchester). Below: what guests see, how the staff learns it, what the owner sees, what each add-on does, and an estimate of what it could add for Harry&#x27;s Oklahoma Style Smokehouse BBQ.</p>
 <div class="btns"><a class="btn hot" href="https://antidotethecure.github.io/demo/melody-lax/" target="_blank" rel="noopener">✈️ Open the live Melody app</a><a class="btn" href="https://antidotethecure.github.io/sousshift/" target="_blank" rel="noopener">SousShift AI</a></div></div>
 <div class="trio"><img src="img/c11-gold-card.webp" alt=""><img src="img/c02-flight-game.webp" alt=""><img src="img/c14-3d-burger.webp" alt=""></div></section>
+<!-- harrys-showcase: animated chimney fire, neon menu, Route 66 game stills (added 2026-11-09) -->
+<style>
+.hx{background:radial-gradient(120% 60% at 50% 0,#2a160c 0,#120a06 60%,#0b0604 100%);color:#f3e6c8;margin:40px 0 0;padding:28px 0 48px;overflow:hidden}
+.hx .h-k{color:#d1902a}.hx h2{color:#f3e6c8}.hx .lead{color:#cdbb98}
+.neo{font-family:'Tilt Neon','Archivo',sans-serif}
+.glow-r{color:#ffe3e0;text-shadow:0 0 3px #fff,0 0 8px #ff3b45,0 0 18px #c8232c,0 0 38px #c8232c}
+.glow-y{color:#fff3d6;text-shadow:0 0 3px #fff,0 0 8px #ffb84a,0 0 18px #d1902a,0 0 38px #d1902a}
+.glow-c{color:#fff;text-shadow:0 0 4px #fff,0 0 12px #f3e6c8,0 0 26px #d1902a}
+@keyframes flick{0%,19%,21%,23%,55%,57%,100%{opacity:1}20%,22%,56%{opacity:.35}}
+.flick{animation:flick 6s infinite}
+/* logo stage */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center}
+@media(max-width:760px){.stage{grid-template-columns:1fr}}
+.firelogo{position:relative;width:min(420px,86vw);margin:70px auto 0;aspect-ratio:1}
+.firelogo img{width:100%;height:100%;display:block;border-radius:22px}
+.firelogo canvas{position:absolute;left:0;top:-48%;width:100%;height:148%;pointer-events:none}
+/* neon menu */
+.nm{margin-top:46px;border:1px solid #ffffff14;border-radius:24px;padding:22px 16px 18px;background:
+ linear-gradient(#0d0705cc,#0d0705ee),repeating-linear-gradient(0deg,#2b1810 0 22px,#1a0e09 22px 24px),repeating-linear-gradient(90deg,transparent 0 46px,#1a0e09 46px 48px)}
+.nm-t{font-family:Monoton,'Bebas Neue',sans-serif;font-size:clamp(34px,8vw,62px);text-align:center;margin:4px 0 2px;letter-spacing:.04em}
+.nm-s{text-align:center;color:#cdbb98;font-size:14px;margin:0 0 16px}
+.h-tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:none}.h-tabs::-webkit-scrollbar{display:none}
+.h-tabs button{flex:0 0 auto;font:600 15px 'Tilt Neon',Archivo,sans-serif;background:transparent;color:#cdbb98;border:2px solid #5a3a22;border-radius:999px;padding:8px 15px;cursor:pointer;transition:.2s}
+.h-tabs button[aria-selected=true]{color:#fff3d6;border-color:#d1902a;box-shadow:0 0 10px #d1902a,inset 0 0 10px #d1902a88;text-shadow:0 0 8px #ffb84a}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.it{position:relative;background:#1a0f0a;border:1px solid #ffffff12;border-radius:18px;overflow:hidden;cursor:pointer;transition:transform .25s,box-shadow .25s;text-align:left;color:inherit;font:inherit;padding:0}
+.it:hover,.it:focus-visible{transform:translateY(-3px);box-shadow:0 0 0 2px #d1902a,0 0 26px #d1902a66;outline:none}
+.it .h-ph{aspect-ratio:4/5;background-size:cover;background-position:center;transition:transform 6s ease}
+.it:hover .h-ph{transform:scale(1.08)}
+.it .h-ph:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,#0b0604f2)}
+.it .tx{padding:14px 14px 12px;position:relative}
+.it.p .tx{position:absolute;left:0;right:0;bottom:0}
+.it .nm1{font:600 21px/1.15 'Tilt Neon',Archivo,sans-serif;margin:0}
+.it .h-pr{font:700 18px 'Tilt Neon',Archivo,sans-serif;margin-top:4px}
+.it .ds{max-height:0;overflow:hidden;color:#e6d6b6;font-size:14px;transition:max-height .35s ease;margin:0}
+.it.open .ds{max-height:160px;margin-top:6px}
+.it .add{display:none;margin-top:10px;font:700 14px Archivo,sans-serif;background:#c8232c;color:#fff;border:0;border-radius:999px;padding:8px 14px;box-shadow:0 0 14px #c8232caa;cursor:pointer}
+.it.open .add{display:inline-block}
+.cart{position:sticky;bottom:10px;margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:#120a06f2;border:2px solid #d1902a;border-radius:16px;padding:10px 14px;box-shadow:0 0 18px #d1902a55;font:600 15px 'Tilt Neon',Archivo,sans-serif}
+.cart b{color:#fff3d6}.cart .st{color:#ffd27a}
+.cart.bump{animation:bump .35s}@media(max-width:760px){.cart{bottom:128px}}@media(min-width:761px){.cart{bottom:84px}}@keyframes bump{50%{transform:scale(1.04)}}
+.fine{color:#9c8a6c;font-size:12.5px;margin:10px 2px 0}
+/* game stills */
+.gm{margin-top:56px}
+.gm-t{font-family:Monoton,'Bebas Neue',sans-serif;font-size:clamp(28px,6.4vw,52px);line-height:1.1;margin:4px 0 6px}
+.phones{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.phone{position:relative;width:min(300px,82vw);aspect-ratio:9/19.2;border-radius:42px;padding:10px;background:linear-gradient(145deg,#3a2a20,#0c0705);box-shadow:0 0 0 2px #5a3a22,0 20px 50px #000a,0 0 40px #d1902a33}
+.scr{position:relative;width:100%;height:100%;border-radius:33px;overflow:hidden;background:#000 center/cover}
+.hud{position:absolute;left:10px;right:10px;font:700 12px Archivo,sans-serif;color:#fff;text-shadow:0 1px 3px #000}
+.hud.t{top:12px}.hud.b{bottom:14px}
+.pill{display:inline-flex;align-items:center;gap:5px;background:#0b0604c4;border:1px solid #ffffff2a;border-radius:999px;padding:5px 9px;backdrop-filter:blur(3px)}
+.row{display:flex;justify-content:space-between;gap:6px;align-items:center;flex-wrap:wrap}
+.route{margin-top:8px;background:#0b0604c4;border:1px solid #ffffff2a;border-radius:12px;padding:7px 9px}
+.route .ln{position:relative;height:6px;border-radius:9px;background:#ffffff33;margin:6px 0 4px}
+.route .fill{position:absolute;inset:0 auto 0 0;width:52%;border-radius:9px;background:linear-gradient(90deg,#c8232c,#d1902a);box-shadow:0 0 8px #d1902a;animation:drive 9s linear infinite}
+@keyframes drive{0%{width:44%}100%{width:60%}}
+.route .st5{display:flex;justify-content:space-between;font-size:10px;color:#e6d6b6}
+.route .st5 .h-on{color:#ffd27a;text-shadow:0 0 6px #d1902a}
+.lvl{display:block;text-align:center;font:400 26px 'Bebas Neue',sans-serif;letter-spacing:.05em}
+.boss{position:absolute;left:0;right:0;top:34%;text-align:center}
+.boss .bt{font:400 34px 'Bebas Neue',sans-serif;letter-spacing:.06em}
+.meter{height:12px;border-radius:9px;background:linear-gradient(90deg,#3b6ef5 0,#1f7a4d 40%,#1f7a4d 60%,#c8232c 100%);position:relative;margin:6px 4px}
+.meter i{position:absolute;top:-4px;width:6px;height:20px;border-radius:3px;background:#fff;box-shadow:0 0 8px #fff;animation:needle 2.6s ease-in-out infinite alternate}
+@keyframes needle{0%{left:30%}100%{left:66%}}
+.perfect{display:inline-block;margin-top:8px;font:400 22px 'Bebas Neue',sans-serif;animation:pop 2.6s infinite}
+@keyframes pop{0%,60%{transform:scale(.6);opacity:0}70%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}
+.cap{text-align:center;color:#cdbb98;font-size:14px;margin-top:10px}
+.loop{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:16px 0 0;counter-reset:l}
+.loop li{counter-increment:l;background:#1a0f0a;border:1px solid #d1902a55;border-radius:999px;padding:7px 14px 7px 8px;color:#e6d6b6;font-size:14.5px}
+.loop li:before{content:counter(l);display:inline-grid;place-items:center;width:22px;height:22px;margin-right:7px;border-radius:50%;background:#c8232c;color:#fff;font-weight:800;font-size:12px;box-shadow:0 0 8px #c8232c}
+.tix{position:absolute;left:12px;right:12px;top:58px;display:grid;gap:8px}
+.tk{background:#fff8e8;color:#1e140c;border-radius:10px;padding:8px 10px;font:600 12.5px Archivo,sans-serif;box-shadow:0 4px 14px #0008;border-top:5px solid #d1902a}
+.tk.h-hot{border-top-color:#c8232c;animation:shake 1.6s infinite}
+.tk .tm{font-weight:800;color:#c8232c}.tk span{display:block;margin-top:2px;font-weight:500}
+.tk .bar{height:5px;background:#e3d6b5;border-radius:5px;margin-top:6px;overflow:hidden}.tk .bar i{display:block;height:100%;background:linear-gradient(90deg,#1f7a4d,#d1902a,#c8232c)}
+@keyframes shake{0%,90%,100%{transform:none}93%{transform:rotate(-1.5deg)}96%{transform:rotate(1.5deg)}}
+.served{position:absolute;left:0;right:0;bottom:64px;text-align:center;animation:pop 3s infinite}
+.served span{display:block;font:400 40px 'Bebas Neue',sans-serif;letter-spacing:.06em}.served small{display:block;color:#fff;font-size:12px}.served b{font:400 30px 'Bebas Neue',sans-serif}
+.better{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:22px}
+.better div{background:#1a0f0a;border:1px solid #d1902a44;border-radius:14px;padding:12px 14px;color:#e6d6b6;font-size:15px}
+.better b{display:block;color:#fff3d6;font:600 18px 'Tilt Neon',Archivo,sans-serif;margin-bottom:2px}
+@media (prefers-reduced-motion:reduce){.flick,.route .fill,.meter i,.perfect,.cart.bump,.tk.h-hot,.served{animation:none}}
+</style>
+<section class="hx" id="harrys"><div class="w">
+ <div class="stage">
+  <div><p class="h-k">Made for Harry's</p><h2 style="margin-top:0">Your smokehouse, <span class="glow-y neo">fired up</span></h2>
+  <p class="lead">Slow and low since Tulsa. Your logo's chimney stays lit in the app, the menu glows like your sign out front, and guests drive Route 66 to get to you.</p></div>
+  <div class="firelogo" id="firelogo"><img src="img/harrys-smokehouse-bbq-logo.png" alt="Harry's Oklahoma Style Smokehouse BBQ logo"><canvas aria-hidden="true"></canvas></div>
+ </div>
+
+ <div class="nm" id="menu">
+  <p class="nm-t glow-r flick">HARRY'S MENU</p>
+  <p class="nm-s">Tap a dish to open it. This is how your menu would look in the app.</p>
+  <div class="h-tabs" role="tablist" id="nmTabs"></div>
+  <div class="grid" id="nmGrid"></div>
+  <div class="cart" id="nmCart" aria-live="polite"><span>🛒 <b id="nmN">0</b> items · <b id="nmT">$0.00</b></span><span class="st" id="nmS">⭐ Earn rewards stars on every order</span></div>
+  <p class="fine">Prices from Harry's online menu (homeofharrysbbq.com, Nov 9, 2026). Dish photos are AI-styled samples for this preview. In the real app, your own photos go here. This sample cart doesn't place orders.</p>
+ </div>
+
+ <div class="gm" id="route66">
+  <p class="h-k">The game (sample stills)</p>
+  <p class="gm-t glow-y flick">ROUTE 66<br><span class="glow-r">TULSA ➜ LOMITA</span></p>
+  <p class="lead">Harry's story, played. Drive the smoker trailer down Route 66 from Tulsa to Lomita. On the road you grab brisket, ribs, hickory logs, dry rub and sauce. Then you <b>pull up to a stop</b>, take the customers' orders and <b>cook the meat right</b> on the smoker. Serve it fast and perfectly done for big points, then get back on the road to the next state.</p>
+  <ol class="loop"><li><b>Drive</b> and collect ingredients</li><li><b>Pull up</b> to a roadside stop</li><li><b>Cook</b> it slow and low, to perfect bark</li><li><b>Serve</b>: faster and more perfect means more points</li></ol>
+  <div class="phones">
+   <div><div class="phone"><div class="scr" style="background-image:url(img/h-route66.webp)">
+    <div class="hud t"><div class="row"><span class="pill">⭐ <span id="g1s">12,480</span></span><span class="pill">🪵 14 · 🍶 6 · 🧂 9</span></div>
+     <div class="route"><div class="row"><span>Tulsa</span><span>Lomita</span></div><div class="ln"><div class="fill"></div></div>
+      <div class="st5"><span class="h-on">OK</span><span class="h-on">TX</span><span class="h-on">NM</span><span>AZ</span><span>CA</span></div></div></div>
+    <div class="hud b"><span class="lvl glow-y">LEVEL 3 · NEW MEXICO</span></div>
+   </div></div><p class="cap">Drive and collect</p></div>
+   <div><div class="phone"><div class="scr" style="background-image:url(img/h-boss.webp)">
+    <div class="hud t"><div class="row"><span class="pill">🔥 BOSS LEVEL</span><span class="pill">⏱ 6h ➜ 14h</span></div></div>
+    <div class="boss"><div class="bt glow-r">SLOW &amp; LOW</div><div style="font-size:12px">Hold the needle in the green</div><div class="meter"><i></i></div><span class="perfect glow-y">PERFECT BARK +500</span></div>
+    <div class="hud b"><div class="row"><span class="pill">Bark ▰▰▰▰▱</span><span class="pill">Smoke ring ✓</span></div></div>
+   </div></div><p class="cap">Cook it right (Slow &amp; Low)</p></div>
+   <div><div class="phone"><div class="scr" style="background-image:linear-gradient(#0b0604aa,#0b0604ee),url(img/h-route66.webp)">
+    <div class="hud t"><div class="row"><span class="pill">📍 Stop: Amarillo, TX</span><span class="pill">⭐ <span id="g3s">18,920</span></span></div></div>
+    <div class="tix">
+     <div class="tk h-hot"><div class="row"><b>Table 1 · Rosa</b><span class="tm">0:12</span></div><span>Brisket Sandwich + Mac</span><div class="bar"><i style="width:82%"></i></div></div>
+     <div class="tk"><div class="row"><b>Truck stop · Big Mike</b><span class="tm">0:31</span></div><span>Beef Ribs ×2 + Cornbread</span><div class="bar"><i style="width:45%"></i></div></div>
+     <div class="tk"><div class="row"><b>Biker · Jay</b><span class="tm">0:48</span></div><span>Burnt Ends + Waffle Fries</span><div class="bar"><i style="width:20%"></i></div></div>
+    </div>
+    <div class="served"><span class="glow-y">SERVED!</span><small>Perfect bark ×2 · Speed bonus</small><b class="glow-r">+850</b></div>
+    <div class="hud b"><div class="row"><span class="pill">🍖 Ready: 2</span><span class="pill">🔥 Combo ×3</span></div></div>
+   </div></div><p class="cap">Pull up, take orders, serve</p></div>
+  </div>
+  <div class="better">
+   <div><b>5 levels, one real road</b>Oklahoma, Texas, New Mexico, Arizona, California, with a busier stop in every state. Your story is the map.</div>
+   <div><b>Speed + perfection = points</b>Every order has a timer. Pull meat too early or too late and you lose the bark bonus.</div>
+   <div><b>Your arcade, connected</b>The weekly top score shows on the dining-room arcade TV. Come in to defend your spot.</div>
+   <div><b>Wins that bring them back</b>Free waffle fries, a peach cobbler, a burnt-ends taste. You choose the rewards.</div>
+   <div><b>Upgrade the smoker</b>Logs, rub and sauce upgrade the trailer. Every item is a real Harry's thing.</div>
+  </div>
+ </div>
+</div></section>
+<script>
+(function(){
+/* ---- chimney fire + smoke ---- */
+var box=document.getElementById('firelogo'),cv=box.querySelector('canvas'),cx=cv.getContext('2d');
+var RM=matchMedia('(prefers-reduced-motion: reduce)').matches,P=[],S=[],E=[],on=true,W,H,ex,ey,dpr=Math.min(devicePixelRatio||1,2);
+function size(){var r=cv.getBoundingClientRect();W=cv.width=r.width*dpr;H=cv.height=r.height*dpr;
+ /* chimney top in logo = (0.765, 0.165); canvas starts 48% of logo height above it */
+ var lh=box.clientHeight*dpr;ex=W*.765;ey=lh*.48+lh*.155;}
+size();addEventListener('resize',size);
+if('IntersectionObserver'in window)new IntersectionObserver(function(e){on=e[0].isIntersecting},{}).observe(box);
+function fire(){var s=W/420;P.push({x:ex+(Math.random()-.5)*20*s,y:ey,vx:(Math.random()-.5)*.5*s,vy:-(1.8+Math.random()*2.2)*s,r:(7+Math.random()*7)*s,l:0,m:26+Math.random()*20});}
+function smoke(){var s=W/420;S.push({x:ex+(Math.random()-.5)*14*s,y:ey-50*s,vx:(.25+Math.random()*.45)*s,vy:-(.7+Math.random()*.6)*s,r:(10+Math.random()*8)*s,l:0,m:150+Math.random()*90,g:.16+Math.random()*.1});}
+function ember(){var s=W/420;E.push({x:ex+(Math.random()-.5)*20*s,y:ey-10*s,vx:(Math.random()-.5)*1.4*s,vy:-(2+Math.random()*2.5)*s,l:0,m:40+Math.random()*40});}
+var t=0;
+function step(){requestAnimationFrame(step);if(!on)return;t++;
+ cx.clearRect(0,0,W,H);
+ for(var i=0;i<4;i++)fire(); if(t%3==0)smoke(); if(Math.random()<.18)ember();
+ /* smoke: soft grey puffs drifting up and right */
+ cx.globalCompositeOperation='source-over';
+ for(i=S.length-1;i>=0;i--){var p=S[i];p.l++;p.x+=p.vx+Math.sin((p.l+p.y)*.02)*.35;p.y+=p.vy;p.r+=.32*(W/420);
+  var k=p.l/p.m,a=(k<.15?k/.15:1-k)*p.g;if(k>=1){S.splice(i,1);continue}
+  var gr=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);gr.addColorStop(0,'rgba(150,140,130,'+a+')');gr.addColorStop(1,'rgba(90,80,75,0)');
+  cx.fillStyle=gr;cx.beginPath();cx.arc(p.x,p.y,p.r,0,7);cx.fill();}
+ /* fire: additive white→yellow→orange→red */
+ cx.globalCompositeOperation='lighter';
+ for(i=P.length-1;i>=0;i--){p=P[i];p.l++;var k2=p.l/p.m;if(k2>=1){P.splice(i,1);continue}
+  p.x+=p.vx+Math.sin(t*.25+p.l*.3)*.6*(W/420);p.y+=p.vy;p.vy*=.985;var r=p.r*(1-k2*.85);
+  var c=k2<.12?'255,230,150':k2<.4?'255,150,40':k2<.7?'235,75,15':'140,25,8',al=(1-k2)*.3;
+  var g2=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,r);g2.addColorStop(0,'rgba('+c+','+al+')');g2.addColorStop(1,'rgba('+c+',0)');
+  cx.fillStyle=g2;cx.beginPath();cx.arc(p.x,p.y,r,0,7);cx.fill();}
+ for(i=E.length-1;i>=0;i--){p=E[i];p.l++;if(p.l>p.m){E.splice(i,1);continue}p.x+=p.vx;p.y+=p.vy;p.vy*=.99;
+  cx.fillStyle='rgba(255,'+(160+Math.random()*80|0)+',60,'+(1-p.l/p.m)+')';cx.fillRect(p.x,p.y,2*dpr,2*dpr);}
+}
+if(!RM)step();
+
+/* ---- neon menu ---- */
+var M={
+ "Smoked Meats":[["Baby Back Ribs",33.99,"Fall-off-the-bone tender, hickory smoked low and slow, glazed with Harry's Original sauce.","h-ribs.webp"],["Beef Ribs",35.99,"Meaty, tender beef ribs smoked low and slow over hickory.","h-beef-ribs.webp"],["Brisket Burnt Ends",31.99,"The bark-heavy brisket ends, caramelized in Harry's sauce."],["Brisket",34.99,"The heart of Oklahoma-style BBQ: hand-rubbed, smoked 6 to 14 hours."],["Tri-Tip",37.99,"A West Coast favorite: Harry's rub, slow-smoked over hickory."],["Pulled Pork or Pulled Chicken",30.99,"Smoked until it falls apart, then hand-pulled."],["Hot Link Sausage (3 links)",18.99,"All-beef, hickory-smoked, with just the right heat."],["Chicken Wings (12)",19.99,"Hickory-smoked wings."]],
+ "Sandwiches":[["Brisket Sandwich",18.95,"Hand-sliced hickory brisket piled high on a fresh bun with Harry's Original."],["Tri-Tip Sandwich",19.95,"Thick-cut smoked tri-tip, carved fresh."],["Pulled Pork Sandwich",16.95,"Hand-shredded, slow-smoked pork on a fresh bun."],["Pulled Chicken Sandwich",16.95,"Hickory pulled chicken drizzled with Harry's sauce."],["Sliders (3)",19.95,"Three buns, your choice of Harry's smoked meats."]],
+ "Plates for Two":[["Three Meat Dinner Plate",52.95,"Any three smoked meats, two sides and a roll with butter."],["Baby Back Rib Dinner Plate (8)",49.95,"Hickory-smoked baby backs with two sides."],["Beef Rib Dinner Plate (5)",51.95,"Meaty beef ribs with two sides."],["Brisket Dinner Plate (¾ lb)",47.95,"Hand-sliced brisket with two sides."],["2 Meat Combo + 1 Side",27.99,"The daily special: any two meats with a homestyle side."]],
+ "Sides":[["Mac & Cheese",8.99,"Creamy, cheesy and downright comforting."],["Mashed Potatoes",8.99,"Fluffy, buttery and homestyle."],["Molasses Baked Beans",8.99,"Slow-simmered with molasses and bits of pork."],["Cornbread w/ Honey Butter",5.99,"Baked fresh, with whipped honey butter."],["Waffle Fries",8.99,"Crispy waffle-cut fries."],["Oklahoma Red Dirt Potato Wedges",8.75,"Daily special side."],["Sassy Slaw",7.99,"Cabbage and carrots in a sweet vinaigrette."],["Fried Okra",8.99,"Golden-battered, a Southern favorite."]],
+ "Sweets":[["Aunt Cheryl's Peach Cobbler",9.99,"A family favorite: juicy peaches under a buttery crust, served warm.","h-cobbler.webp"],["Homemade Bread Pudding",9.99,"Croissant bread baked with warm spices."],["Margot Dean's Homemade Cookie",3.49,"Baked in-house."]],
+ "Feasts":[["Harry's Tailgate Feast (3-4)",94.77,"6 baby backs, 1 lb pulled pork, 2 hot links, 2 large sides, cornbread."],["Game Day MVP Combo (2)",42.77,"½ lb brisket or pulled pork plus 2 Oklahoma hot links."],["Family Feast Platter 1 (up to 5)",225.99,"Ribs, brisket or tri-tip, chicken and sides."]]
+};
+var tabs=document.getElementById('nmTabs'),grid=document.getElementById('nmGrid'),n=0,tot=0,cart=document.getElementById('nmCart');
+function money(v){return '$'+v.toFixed(2)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function show(cat){[].forEach.call(tabs.children,function(b){b.setAttribute('aria-selected',b.textContent==cat)});
+ grid.innerHTML=M[cat].map(function(d,i){var glow=['glow-y','glow-c','glow-r'][i%3];
+  return '<div class="it'+(d[3]?' p':'')+'" role="button" tabindex="0" aria-expanded="false" data-p="'+d[1]+'">'+(d[3]?'<div class="h-ph" role="img" aria-label="'+esc(d[0])+' (AI-styled sample)" style="background-image:url(img/'+d[3]+')"></div>':'')+
+  '<div class="tx"><p class="nm1 '+glow+'">'+esc(d[0])+'</p><div class="h-pr glow-y">'+money(d[1])+'</div><p class="ds">'+esc(d[2])+'</p><button class="add" type="button">+ Add to order</button></div></div>'}).join('');}
+Object.keys(M).forEach(function(c){var b=document.createElement('button');b.type='button';b.role='tab';b.textContent=c;b.onclick=function(){show(c)};tabs.appendChild(b)});
+grid.addEventListener('click',function(e){var it=e.target.closest('.it');if(!it)return;
+ if(e.target.classList.contains('add')){n++;tot+=+it.dataset.p;document.getElementById('nmN').textContent=n;document.getElementById('nmT').textContent=money(tot);
+  document.getElementById('nmS').textContent='⭐ +'+Math.round(tot)+' stars toward free waffle fries';cart.classList.remove('bump');void cart.offsetWidth;cart.classList.add('bump');return}
+ var o=it.classList.toggle('open');it.setAttribute('aria-expanded',o)});
+grid.addEventListener('keydown',function(e){if((e.key=='Enter'||e.key==' ')&&e.target.classList.contains('it')){e.preventDefault();e.target.click()}});
+show('Smoked Meats');
+/* score ticker on the game still */
+var sc=12480,el=document.getElementById('g1s');if(!RM)var s3=18920,e3=document.getElementById('g3s');if(!RM)setInterval(function(){s3+=850;e3.textContent=s3.toLocaleString()},3000);
+if(!RM)setInterval(function(){sc+=[50,100,250][Math.random()*3|0];el.textContent=sc.toLocaleString()},900);
+})();
+</script>
+
 <section class="vid" id="video"><div><p class="k">1-minute video</p><h2 style="margin-top:0">See SousShift AI in action</h2><p class="lead">The apps we built for Melody Bar &amp; Grill, Nalu Vida and Gritz N Wafflez: scan the QR, the menu opens, guests play, earn and come back.</p></div><video controls playsinline preload="none" poster="../assets/commercial-poster.jpg" width="720" height="1280" aria-label="SousShift AI commercial"><source src="../assets/commercial.mp4" type="video/mp4"></video></section>
 
 <h2>How it works at Melody</h2>

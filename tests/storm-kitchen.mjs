@@ -6,6 +6,8 @@
    Needs playwright-core and the site on a local server:
      npm i playwright-core && python3 -m http.server 8000     (from the repo root)
      BASE=http://localhost:8000 node tests/storm-kitchen.mjs
+   Since 11-02 the middle is see-through (the kids around the truck show) with a live order-window PIP top-right; the burger
+   sits under or beside the PIP, never behind it.
    CHROME= overrides the browser path, SHOTS= a directory to drop screenshots in. */
 import { chromium } from 'playwright-core';
 import fs from 'fs';
@@ -44,24 +46,24 @@ for (const [name,w,h,dpr,mob] of SIZES){
     }
     await sleep(150);   // the fit-to-box scale transition is .12s; the order clears at 420 ms
     const st=el.querySelector('.st'), sr=st.getBoundingClientRect();
-    const imgs=[...st.querySelectorAll('img')].map(i=>i.getBoundingClientRect());
+    const imgs=[...st.querySelectorAll('.pl img')].map(i=>i.getBoundingClientRect());
     if(!imgs.length) return {err:'no layers'};
     const top=Math.min(...imgs.map(r=>r.top)), bot=Math.max(...imgs.map(r=>r.bottom));
     const l=Math.min(...imgs.map(r=>r.left)), r=Math.max(...imgs.map(r=>r.right));
     return {layers:imgs.length, order:el.querySelector('.tk h4').textContent.trim(),
       stack:{t:Math.round(sr.top),b:Math.round(sr.bottom),w:Math.round(sr.width),h:Math.round(sr.height)},
       pile:{t:Math.round(top),b:Math.round(bot),w:Math.round(r-l),h:Math.round(bot-top)},
-      vw:innerWidth, grOver: (()=>{const g=el.querySelector('.gr'); return Math.round(g.scrollWidth-g.clientWidth);})(), centreOff:Math.round((l+r)/2 - innerWidth/2), scrollX: document.documentElement.scrollWidth-innerWidth};
+      vw:innerWidth, grOver: (()=>{const g=el.querySelector('.gr'); return Math.round(g.scrollWidth-g.clientWidth);})(), pipHit:(()=>{const q=el.querySelector('.pip').getBoundingClientRect(); return l<q.right&&r>q.left&&top<q.bottom&&bot>q.top;})(), kid:!!el.querySelector('.pip .kd'), scrollX: document.documentElement.scrollWidth-innerWidth};
   });
   if(m.err){ console.log(name,'FAIL',m.err); bad++; await ctx.close(); continue; }
   if(OUT) await p.locator('.sbk').screenshot({path:OUT+'/'+name+'-01-built.png'});
   const fits = m.pile.t >= m.stack.t-1 && m.pile.b <= m.stack.b+1;
   // the burger should use the room it has: fill the build area, or be capped by the 340px width ceiling
   const big = m.pile.h >= m.stack.h*0.82 || m.pile.w >= 230;
-  const centred = Math.abs(m.centreOff) <= 2;
+  const centred = !m.pipHit && m.kid;   // the burger never goes behind the live order-window PIP, and a kid is at the window
   console.log(name, JSON.stringify(m));
   console.log(name, fits?'ok   burger inside the build area':'FAIL burger spills out of the build area',
-              '|', centred?'ok   centred':'FAIL off-centre',
+              '|', centred?'ok   clear of the PIP, kid at the window':'FAIL burger behind the PIP or no kid',
               '|', big?'ok   burger fills the box ('+m.pile.w+'x'+m.pile.h+')':'FAIL burger too small ('+m.pile.w+'x'+m.pile.h+' in '+m.stack.h+')',
               '|', m.grOver<=0?'ok   chips fit':'FAIL chips overflow '+m.grOver, '|', m.scrollX<=0?'ok   no h-scroll':'FAIL h-scroll '+m.scrollX,
               '|', errs.length?('FAIL errors '+errs.join('; ')):'ok   no errors');

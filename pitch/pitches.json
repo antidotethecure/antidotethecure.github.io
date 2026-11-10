@@ -1,12 +1,12 @@
 [
  {
-  "slug": "legend-hot-chicken-lakewood",
-  "title": "Legend Hot Chicken Lakewood",
+  "slug": "harrys-smokehouse-bbq",
+  "title": "Harry's Oklahoma Style Smokehouse BBQ",
   "type": "restaurant · pitch pack",
   "area": "",
   "lang": "en",
-  "date": "2026-10-17",
-  "url": "https://antidotethecure.github.io/pitch/legend-hot-chicken-lakewood/"
+  "date": "2026-11-09",
+  "url": "https://antidotethecure.github.io/pitch/harrys-smokehouse-bbq/"
  },
  {
   "slug": "habachihana-grill",
@@ -16,6 +16,15 @@
   "lang": "en",
   "date": "2026-10-18",
   "url": "https://antidotethecure.github.io/pitch/habachihana-grill/"
+ },
+ {
+  "slug": "legend-hot-chicken-lakewood",
+  "title": "Legend Hot Chicken Lakewood",
+  "type": "restaurant · pitch pack",
+  "area": "",
+  "lang": "en",
+  "date": "2026-10-17",
+  "url": "https://antidotethecure.github.io/pitch/legend-hot-chicken-lakewood/"
  },
  {
   "slug": "road-to-seoul-western",

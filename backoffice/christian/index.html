@@ -144,9 +144,10 @@ var TKEY="christian-hq-token"+(TEST?"-test":""), TOKEN=null, DATA=null, R="all",
 var DAY=864e5, NAMES={"melody-bar-grill":"Melody Bar & Grill","nalu-vida":"Nalu Vida"};
 // LOGINS: [user id, what the login list shows]. The name in the Audit log comes from the backend (BO_USERS "name").
 // "melody-manager" is ONE login shared by Melody's management team (manager role: Melody only, enforced by Code.gs).
+// "noe": Noe's own staff login (2026-11-09, Melody only, job Manager (general) like Sami; Christian narrows it in 🔐 Team access).
 // "sammy": Sami's own manager login (login id stays "sammy"; display name Sami since 10-18) (Melody only, job Manager (general)); her switches are set in 🔐 Team access.
 // Staff who requested access themselves log in with their email ("Staff: log in with your email"), not from this list.
-var LOGINS=[["christian","Christian"],["antidote","Antidote"],["melody-manager","Melody Management (manager)"],["sammy","Sami (Melody manager)"]];
+var LOGINS=[["christian","Christian"],["antidote","Antidote"],["melody-manager","Melody Management (manager)"],["sammy","Sami (Melody manager)"],["noe","Noe (Melody staff)"]];
 var ROLE="owner", MYSLUGS=["melody-bar-grill","nalu-vida"], MGR=false, PERMS={}, JOB="", STAFFMODE=false;
 // 🔐 TEAM ACCESS: keep JOBS + PERM keys in sync with Code.gs (JOBS / PERM_KEYS). The SERVER enforces every switch;
 // the page only hides what a login can't use. Owners (Christian, Antidote) always have everything.
@@ -820,13 +821,13 @@ function launch(){ var F="../../files/christian-7045b2/";
   var row=function(k,t,n){ return "<div class='st'>"+chip(k)+"<div><b>"+t+"</b><span class='n'>"+n+"</span></div></div>"; };
   var STATUS=[
     ["ok","Melody app, game, rewards and 4K menu","Built. Guests play, earn points, use Just Landed, sign up and get rewards. The menu is view-only: guests order and pay with their server."],
-    ["ok","This HQ + team logins","Christian, Melody Management and Sami each have a login. Christian decides what each person can do in 🔐 Team access."],
+    ["ok","This HQ + team logins","Christian, Melody Management, Sami and Noe each have a login. Christian decides what each person can do in 🔐 Team access."],
     ["ok","QR stickers, table cards 1–40 and the window poster","Designed and scan-tested. Ready to print."],
     ["ok","Staff guide + training quiz","Safe to text to staff. It never shows guest info."],
     ["wt","Shift deal texts for staff","Built. Staff add their number and start times in the staff guide, and you approve them in 🔐 Team access. Texts start once the phone carriers approve the business number. Until then, people who add an email get it by email."],
     ["nw","Sami's email","Needed so Sami's changes can save (each change is confirmed with a code sent to her email). Until then she can look at everything but can't save."],
     ["nw","Toast reward buttons (for now)","5 discount buttons in Toast Web, about 10 minutes, done together. Staff ring app rewards with these until Toast connects."],
-    ["wt","Toast connection (automatic points)","We applied to Toast's partner program on Oct 12. Toast says the decision comes within 30 days (by about Nov 11). Not connected yet."],
+    ["wt","Toast connection (automatic points)","We applied to Toast's partner program on Oct 12. Toast's Nov 9 email: still under review, decision within 30 days (about Nov 11). Until then, see “Connect Toast before approval” below."],
     ["wt","Online ordering + card payments","Optional add-on. The card payment account (Stripe) is set up in test mode. It goes live after our business details are verified. Each restaurant connects its own bank, so the money goes straight to you. We never hold it."],
     ["wt","DoorDash delivery","We applied for DoorDash's delivery program (DoorDash Drive). DoorDash reviews requests every quarter and approves a limited number, so there's no date yet. Pickup ordering can start before delivery."],
     ["wt","AI phone host + texts","Built and ready. Turns on for both restaurants after the Nalu Vida setup payment. Texting guests also needs phone-carrier approval."]];
@@ -850,11 +851,31 @@ function launch(){ var F="../../files/christian-7045b2/";
     step("When Toast approves · Antidote","Connect Toast","Points then post automatically from each check, and the interim buttons stay as a backup. Guests keep all their points."),
     step("After the Nalu Vida setup payment · Antidote","Turn on the AI phone host + texts","Kira answers missed and after-hours calls. Melody forwards calls to Kira's number. Birthday and win-back texts go on once carrier approval comes through."),
     step("Next · Together","Nalu Vida, the same way","Same steps, with Nalu's own QR codes and Toast buttons.")];
-  return "<div class='card help lp' style='margin-top:12px'><h2 style='margin-top:0'>🚀 Melody launch plan</h2><p class='note'>Everything in one place: where we are, a 2-minute tour of this HQ, and each step from QR codes to launch, Toast, ordering and delivery.</p>"+
+  return billing()+toastNow()+"<div class='card help lp' style='margin-top:12px'><h2 style='margin-top:0'>🚀 Melody launch plan</h2><p class='note'>Everything in one place: where we are, a 2-minute tour of this HQ, and each step from QR codes to launch, Toast, ordering and delivery.</p>"+
     "<h3>Where we are</h3>"+STATUS.map(function(x){ return row(x[0],x[1],x[2]); }).join("")+
     "<h3>Quick tour"+(MGR?" (what your login can open)":"")+"</h3><div class='tour'>"+tour+"</div>"+
     "<h3>What's next, step by step</h3><ol class='steps'>"+STEPS.join("")+"</ol>"+
     "<p class='note'>Questions? Text Antidote. Nothing goes live to guests without Christian's or Sami's OK.</p></div>"; }
+// ---- 💳 BILLING (2026-11-09, owners only): agreements + what's due. Update BILL when a payment lands (also clients/billing/clients.json).
+var BILL={next:"2026-11-12",monthly:300,setupNalu:{amount:750,paid:false},pay:"https://buy.stripe.com/aFa28j1Xi1L75uw0fs2Ry01",
+  docs:[["Melody Bar & Grill agreement (Oct 22)","melody-agreement-2026-10-22.pdf"],["Nalu Vida agreement (Oct 22)","nalu-vida-agreement-2026-10-22.pdf"]]};
+function billing(){ if(MGR) return ""; var F="../../files/christian-7045b2/", d=Math.ceil((new Date(BILL.next+"T00:00:00")-new Date(new Date().toDateString()))/864e5);
+  var when=d>1?"in "+d+" days":d===1?"tomorrow":d===0?"today":(-d)+" day"+(d<-1?"s":"")+" ago";
+  return "<div class='card help lp' style='margin-top:12px'><h2 style='margin-top:0'>💳 Billing &amp; agreements</h2>"+
+    "<div class='st'><span class='chip "+(d<=3?"nw":"wt")+"'>"+(d<=3?"👉 Due "+when:"⏳ "+when)+"</span><div><b>Monthly service: $"+BILL.monthly+" on "+new Date(BILL.next+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"})+"</b><span class='n'>$150 Melody + $150 Nalu Vida, billed on the 12th each month (counted from Melody's setup payment on Oct 12, so both locations share one date).</span></div></div>"+
+    (BILL.setupNalu.paid?"":"<div class='st'><span class='chip wt'>⏳ Open</span><div><b>Nalu Vida setup: $"+BILL.setupNalu.amount+"</b><span class='n'>Still open. Pay when you're ready. The AI phone host + texts for both restaurants turn on after this payment.</span></div></div>")+
+    "<p><a class='btn' style='display:block;text-align:center' href='"+BILL.pay+"' target='_blank' rel='noopener'>Pay securely with Stripe</a></p>"+
+    "<p class='note'>Card payments go through Stripe. We never see or store your card number.</p>"+
+    "<h3>Your agreements</h3><div class='links'>"+BILL.docs.map(function(x){ return "<a href='"+F+x[1]+"' target='_blank' rel='noopener'>📄 "+x[0]+"</a>"; }).join("")+"</div></div>"; }
+// ---- 🍞 TOAST BEFORE APPROVAL (2026-11-09): what works today without Toast's partner approval. Sources: Toast's own docs
+// (doc.toasttab.com devApiAccessRequirements / devApiAccessUserGuide). Read-only Standard API access needs RMS Essentials+.
+function toastNow(){ return "<div class='card help lp' style='margin-top:12px'><h2 style='margin-top:0'>🍞 Connect Toast before approval</h2>"+
+  "<p class='note'>Toast's partner approval is only needed for the full two-way connection (redeeming inside Toast, app orders straight to the kitchen). Three things work now:</p>"+
+  "<ol class='steps'>"+
+  "<li><b>Reward buttons (no approval, no cost, ~10 min).</b> Add the 5 discount buttons in Toast Web with the <a href='../../melody/kit/toast-interim.html'>Toast button guide</a>. Guests show their live pass, staff tap the matching button and type the pass code as the reason. This is how rewards work until Toast connects.</li>"+
+  "<li><b>Read-only connection (no approval, needs Toast RMS Essentials or higher).</b> It lets the app read paid checks (automatic points when the guest's phone or email is on the check) and keep menu prices in sync. It can't write anything into Toast.<br>On a computer: Toast Web (toasttab.com) › <b>Integrations</b> › <b>Manage credentials</b> › create <b>Standard API access</b> credentials for Melody (and Nalu Vida). You need the <i>Manage Integrations</i> permission. If you don't see Manage credentials, the location doesn't have RMS: ask your Toast rep for the price of RMS Essentials. Send the Client ID and secret to Antidote privately (in person or a call, never in a group chat), and he connects them.</li>"+
+  "<li><b>Full connection sooner: ask your Toast rep.</b> Ask for a <i>custom integration</i> with SousShift AI for Melody and Nalu Vida (write access for loyalty redemptions and orders). Toast's integrations team issues those credentials. A request from the restaurant itself often moves faster than our partner application.</li></ol>"+
+  "<p class='note'>Either way, guests keep all their points when the full connection goes live.</p></div>"; }
 // ---- ❓ HELP: plain-English guide (with 🔊 Listen) for managers and owners
 // ---- 🛒 ORDERS: today's paid online pickup orders (Code.gs ordersHQ, switch "orders"). Checks every 30 s while signed in with
 // that switch (on any tab). A NEW paid order rings (once "Sound on" was tapped: phones only allow sound after a tap), vibrates,

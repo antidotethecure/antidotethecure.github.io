@@ -6348,8 +6348,11 @@ function placeFeet(gs,dt,slide,tp){
        +x, the same side as the swinging arm, which is the one shape a bowler never makes. */
     const lead=feet.L,trail=feet.R;lead.sw=-1;trail.sw=-1;lead.lock=false;trail.lock=false;
     const kl=1-Math.exp(-dt*9*slide),kt=1-Math.exp(-dt*7*slide),R=LEG.reach;
-    lead.x+=(bx-R*0.09-lead.x)*kl;lead.z+=(bz-R*0.24-lead.z)*kl;lead.y=0;
-    trail.x+=((bx-R*0.28)-trail.x)*kt;trail.z+=(bz+R*0.52-trail.z)*kt;trail.y=R*0.20*slide;
+    /* 10-28: the trail foot used to sit only half a leg behind him and float 14 cm up, so the trail
+       knee had to fold as far as the slide knee and he looked like he was sitting down. A real trail
+       leg reaches long and nearly straight behind him, toe brushing the floor. */
+    lead.x+=(bx-R*0.09-lead.x)*kl;lead.z+=(bz-R*0.32-lead.z)*kl;lead.y=0;
+    trail.x+=((bx-R*0.22)-trail.x)*kt;trail.z+=(bz+R*0.66-trail.z)*kt;trail.y=R*0.03*slide;
     return;
   }
   stepGait(dt,bx,bz,_fvx,_fvz);
@@ -6471,7 +6474,7 @@ function keyed(K,u){
    the quick part -- so the peak moves to 0.62 and the drop to the ankle happens in 0.25 instead
    of 0.37. The release tangent stays at 7.5: it is what the follow-through's opening tangent is
    scaled from, and changing it would put a corner back in the swing. */
-const SW_ARM=[[0,0.55,0.3],[0.18,0.98,0],[0.62,-1.85,0],[0.87,0,7.5]];
+const SW_ARM=[[0,0.55,0.3],[0.18,0.98,0],[0.62,-1.30,0],[0.87,0,7.5]];  /* 10-28: was -1.85; with his forward lean that put the ball over his head. -1.30 tops out about shoulder height behind him */
 const SW_ELB=[[0,1.15,0],[0.18,0.32,0],[0.62,0.06,0],[0.87,0.04,0.3]];
 const SW_WRI=[[0,-0.30,0],[0.18,-0.55,0],[0.62,-0.62,0],[0.87,0.10,2.0]];
 /* The throw hands over to the roll the instant the ball leaves, at u=0.87 -- u never reaches 1 --
@@ -6555,7 +6558,7 @@ function poseBowler(gs,dt,nw){
     t={lean:-0.10-0.34*lf-0.03*fol+settle,spine:-0.05-0.09*lf-settle*0.6-0.045*kSho,
        /* he finishes DEEP: 0.27 of a 0.71m leg, which is the chin-over-the-knee the coaching
           books ask for. At 0.185 he was barely crouching. */
-       bob:-Math.abs(Math.sin(P))*0.022*(1-lg)-0.055*pw*(1-lg)-0.27*lg-0.013*load,
+       bob:-Math.abs(Math.sin(P))*0.022*(1-lg)-0.055*pw*(1-lg)-0.21*lg-0.013*load,
        hz:-0.74*sstep(0.02,0.80,u)-0.05*fol,
        /* THE BALANCE ARM. It used to open to z=-1.65 -- ninety-four degrees, dead horizontal --
           while the elbow straightened to 0.22, about twelve degrees. A limb held out at a right

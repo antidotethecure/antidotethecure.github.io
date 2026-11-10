@@ -122,7 +122,7 @@
     else {
       var pend = W.__qrPend = W.__qrPend || [];
       pend.push(paint);
-      if (pend.length === 1) { var sc = D.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"; sc.onload = function () { pend.splice(0).forEach(function (f) { f(); }); }; sc.onerror = function () { pend.splice(0); D.querySelectorAll(".qrbox,.qpc-qr").forEach(function (b) { b.textContent = PAY.url; }); }; D.head.appendChild(sc); }
+      if (pend.length === 1) { var sc = D.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"; sc.integrity = "sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1"; sc.crossOrigin = "anonymous"; sc.onload = function () { pend.splice(0).forEach(function (f) { f(); }); }; sc.onerror = function () { pend.splice(0); D.querySelectorAll(".qrbox,.qpc-qr").forEach(function (b) { b.textContent = PAY.url; }); }; D.head.appendChild(sc); }
     }
   }
   function chips() { return (PAY.methods || []).map(function (m) { return '<span class="pm"><i aria-hidden="true">' + esc(m.icon) + "</i>" + esc(p(m)) + "</span>"; }).join(""); }

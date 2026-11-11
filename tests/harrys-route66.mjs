@@ -14,6 +14,7 @@ await p.goto(URL, { waitUntil: 'load' }); await p.waitForTimeout(1500);
 const r = await p.evaluate(() => {
   const R = __R66, out = {};
   out.profile = window.GamePad && GamePad.profile;
+  out.photo = !!(R.SP.truck && R.SP.truck.naturalWidth);   // the Higgsfield art in img/r66/ replaced the vector sprites
   function cook(good) {   // one order at the first stop; good = hold the gold band and pull on the gold
     R.setMode('adult'); R.start(); R.jump(0, 'stop'); const s = R.get(); s.inv.logs = 9;
     const s0 = s.score;
@@ -37,6 +38,7 @@ const r = await p.evaluate(() => {
 let bad = 0;
 const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!ok) bad++; };
 check(r.profile === 'route66', 'gamepad profile = ' + r.profile);
+check(r.photo, 'photo-real sprites loaded (img/r66/)');
 check(r.good > r.bad, `perfect cook (${r.good}) beats sloppy cook (${r.bad})`);
 check(r.walk === 1, 'a walk-out costs one heart');
 check(r.reachedStop, 'a drive leg ends at a stop');

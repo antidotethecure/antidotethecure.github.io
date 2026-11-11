@@ -29,7 +29,7 @@
   var LEGS = [
     { from: "Tulsa, OK", to: "Oklahoma City", st: "OK", stop: "OKC", sky: ["#5d8fd0", "#f4c58a"], sun: "#ffe7a8", far: "#6d7f5a", near: "#4f6b3c", g1: "#5b8a3a", g2: "#55823a", sh: "#a2472c", props: ["derrick", "silo", "shield", "fence"], hills: "rolling", orders: 2 },
     { from: "Oklahoma City", to: "Amarillo", st: "TX", stop: "AMARILLO", sky: ["#4a86d4", "#f7d79a"], sun: "#fff1bf", far: "#a99a6a", near: "#8c7c4c", g1: "#b8a35a", g2: "#ae9a53", sh: "#9a6b3a", props: ["windmill", "caddy", "shield", "fence"], hills: "flat", orders: 2 },
-    { from: "Amarillo", to: "Albuquerque", st: "NM", stop: "ALBUQUERQUE", sky: ["#3f6fc0", "#f3a86a"], sun: "#ffd28a", far: "#b0583a", near: "#8e3f2a", g1: "#c48f58", g2: "#bb8752", sh: "#8e3f2a", props: ["mesa", "yucca", "shield", "sign"], hills: "mesa", orders: 3 },
+    { from: "Amarillo", to: "Albuquerque", st: "NM", stop: "ALBUQUERQUE", sky: ["#3f6fc0", "#f3a86a"], sun: "#ffd28a", far: "#b0583a", near: "#8e3f2a", g1: "#c48f58", g2: "#bb8752", sh: "#8e3f2a", props: ["yucca", "yucca", "fence", "shield", "sign"], hills: "mesa", orders: 3 },
     { from: "Albuquerque", to: "Flagstaff", st: "AZ", stop: "FLAGSTAFF", sky: ["#5a5fb8", "#f59a6a"], sun: "#ffc27a", far: "#9a4b3b", near: "#6f3a30", g1: "#cfa166", g2: "#c6995f", sh: "#7a3d2a", props: ["saguaro", "saguaro", "shield", "pine"], hills: "butte", orders: 3 },
     { from: "Flagstaff", to: "Barstow", st: "CA", stop: "BARSTOW", sky: ["#4d8ad8", "#fbe0a6"], sun: "#fff4c8", far: "#b9a07a", near: "#9b845e", g1: "#d8bf8b", g2: "#d0b783", sh: "#a07a4a", props: ["joshua", "joshua", "shield", "sign"], hills: "desert", orders: 3 },
     { from: "Barstow", to: "Lomita", st: "CA", stop: "LOMITA", sky: ["#6a5bb0", "#ff9d6e"], sun: "#ffd08a", far: "#5a4a78", near: "#3e3558", g1: "#6f8f4e", g2: "#688a48", sh: "#9a5a3a", props: ["palm", "palm", "shield", "sign"], hills: "city", orders: 4, final: true }
@@ -172,6 +172,26 @@
     }));
   })(gi);
   var LOGO = new Image(); LOGO.src = "img/logo.webp";
+  /* photo-real art (Higgsfield, img/r66/): each one replaces its vector sprite above once it loads; the vector stays the fallback */
+  ["truck", "log", "rub", "sauce", "brisket", "ribs", "link", "wing", "cone", "weed", "hole", "car1", "car2", "car3", "saguaro", "joshua", "palm", "pine", "yucca", "derrick", "silo", "windmill", "fence"].forEach(function (n) {
+    var im = new Image(); im.onload = function () { im.w = im.naturalWidth; im.h = im.naturalHeight; SP[n] = im; }; im.src = "img/r66/" + n + ".webp";
+  });
+  var BGI = [], STOPI = new Image(); STOPI.src = "img/r66/stop.webp";
+  function bgLoad(i) { if (i < 6 && !BGI[i]) { BGI[i] = new Image(); BGI[i].src = "img/r66/bg" + i + ".webp"; } }
+  function ready(im) { return im && im.complete && im.naturalWidth > 0; }
+  // on-screen width per road object (photo sprites keep their own aspect; height follows)
+  var OW = { car: 104, hole: 92, cone: 44, weed: 50, log: 68, rub: 36, sauce: 32, brisket: 72, ribs: 68, link: 66, wing: 62, shield: 46 };
+  // the render's touch: a glowing gold ring under every pickup
+  SP.ring = mk(120, 40, function (g) {
+    g.save(); g.translate(60, 20); g.scale(1, 0.33); var r = g.createRadialGradient(0, 0, 8, 0, 0, 60); r.addColorStop(0, "rgba(255,215,130,.55)"); r.addColorStop(1, "rgba(255,190,80,0)"); g.fillStyle = r; g.fillRect(-60, -60, 120, 120); g.restore();
+    g.strokeStyle = "rgba(255,220,120,.95)"; g.lineWidth = 3; g.beginPath(); g.ellipse(60, 20, 50, 13, 0, 0, 7); g.stroke();
+    g.strokeStyle = "rgba(255,245,200,.7)"; g.lineWidth = 1; g.beginPath(); g.ellipse(60, 20, 42, 10, 0, 0, 7); g.stroke();
+  });
+  // asphalt / dirt grain: one noise strip row per scanline, built once
+  var NOISE = (function () { var c = D.createElement("canvas"); c.width = 512; c.height = 256; var g = c.getContext("2d"), id = g.createImageData(512, 256), d = id.data; for (var i = 0; i < d.length; i += 4) { var v = (90 + Math.random() * 110) | 0; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 58; } g.putImageData(id, 0, 0); return c; })();
+  var GND = cx.createLinearGradient(0, HZ, 0, VH); GND.addColorStop(0, "rgba(255,215,160,.5)"); GND.addColorStop(0.22, "rgba(255,200,140,0)"); GND.addColorStop(1, "rgba(30,12,0,.38)");
+  // golden-hour grade + vignette, one drawImage per frame
+  var GRADE = mk(VW, VH, function (g) { g.fillStyle = "rgba(255,170,60,.09)"; g.fillRect(0, 0, VW, VH); var v = g.createRadialGradient(VW / 2, VH * 0.55, VW * 0.45, VW / 2, VH * 0.55, VW * 1.05); v.addColorStop(0, "rgba(40,15,0,0)"); v.addColorStop(1, "rgba(40,15,0,.5)"); g.fillStyle = v; g.fillRect(0, 0, VW, VH); });
 
   /* ---------------- per-leg sky + far hills (prerendered, scrolls with the bends) ---------------- */
   var BG = [];
@@ -300,6 +320,7 @@
   function legStart() {
     st.phase = "drive"; st.legT = 0; st.objs = []; st.bbDone = false; st.speed = st.speed || 0; st.spawnD = 200; st.propD = 0;
     if (!BG[st.leg]) BG[st.leg] = skyFor(LEGS[st.leg]);
+    bgLoad(st.leg); bgLoad(st.leg + 1);
     var L = LEGS[st.leg]; banner(L.from.split(",")[0].toUpperCase() + " → " + L.to.toUpperCase(), T("Leg") + " " + (st.leg + 1) + " / 6 · " + T("grab hickory, rub, sauce + meat"), 2600);
   }
   function start() {
@@ -452,20 +473,27 @@
     cx.restore();
   }
   function drawSky() {
+    var ph = BGI[st.leg];
+    if (ready(ph)) {   // photo backdrop, cover-fit to the sky band, horizon on HZ; the bends pan it back and forth (no seam)
+      var ih = HZ + 4, iw = ih * ph.naturalWidth / ph.naturalHeight, k = st.bgX < 400 ? st.bgX / 400 : (800 - st.bgX) / 400;
+      cx.drawImage(ph, -k * (iw - VW), 0, iw, ih); return;
+    }
     var bg = BG[st.leg] || (BG[st.leg] = skyFor(LEGS[st.leg])), x = -st.bgX;
     cx.drawImage(bg, x, 0, 800, HZ + 4); cx.drawImage(bg, x + 800, 0, 800, HZ + 4);
   }
   function drawRoad() {
     var L = LEGS[st.leg]; drawSky();
     for (var y = HZ; y < VH; y += 2) {
-      var s = (y - HZ + 1) / (PY - HZ), z = ZC / s - ZC, c = VW / 2 + (off(z) - st.camX) * s, hw = 165 * s, str = (((st.dist + z) / 52) | 0) & 1;
+      var s = (y - HZ + 1) / (PY - HZ), z = ZC / s - ZC, c = VW / 2 + (off(z) - st.camX) * s, hw = 165 * s, str = (((st.dist + z) / 52) | 0) & 1, ny = ((st.dist + z) / 7 + (y >> 1)) & 255;
       cx.fillStyle = str ? L.g1 : L.g2; cx.fillRect(0, y, VW, 2);
-      cx.fillStyle = str ? L.sh : "#3a2a20"; cx.fillRect(c - hw - 26 * s, y, hw * 2 + 52 * s, 2);
-      cx.fillStyle = str ? RED : CREAM; cx.fillRect(c - hw - 9 * s, y, hw * 2 + 18 * s, 2);
-      cx.fillStyle = str ? "#3b3836" : "#363331"; cx.fillRect(c - hw, y, hw * 2, 2);
-      cx.fillStyle = "#e9e1cc"; cx.fillRect(c - hw + 6 * s, y, 3 * s + 0.5, 2); cx.fillRect(c + hw - 9 * s, y, 3 * s + 0.5, 2);
-      if (!((((st.dist + z) / 70) | 0) & 1)) { cx.fillStyle = "#f2e7c8"; cx.fillRect(c - 50 * s - 2 * s, y, 4 * s + 0.4, 2); cx.fillRect(c + 50 * s - 2 * s, y, 4 * s + 0.4, 2); }
+      cx.drawImage(NOISE, 0, ny, 512, 1, 0, y, VW, 2);
+      cx.fillStyle = L.sh; cx.fillRect(c - hw - 14 * s, y, hw * 2 + 28 * s, 2);   // dirt shoulder
+      cx.fillStyle = str ? "#2f2d2b" : "#2b2927"; cx.fillRect(c - hw, y, hw * 2, 2);   // asphalt + grain
+      cx.drawImage(NOISE, 0, 255 - ny, 512, 1, c - hw, y, hw * 2, 2);
+      cx.fillStyle = "rgba(230,222,205,.8)"; cx.fillRect(c - hw + 6 * s, y, 3 * s + 0.5, 2); cx.fillRect(c + hw - 9 * s, y, 3 * s + 0.5, 2);
+      if (!((((st.dist + z) / 70) | 0) & 1)) { cx.fillStyle = "rgba(222,186,80,.85)"; cx.fillRect(c - 50 * s - 2 * s, y, 4 * s + 0.4, 2); cx.fillRect(c + 50 * s - 2 * s, y, 4 * s + 0.4, 2); }
     }
+    cx.fillStyle = GND; cx.fillRect(0, HZ, VW, VH - HZ);   // haze at the horizon, darker ground up close
     var hz = cx.createLinearGradient(0, HZ - 6, 0, HZ + 40); hz.addColorStop(0, L.sky[1]); hz.addColorStop(1, "rgba(0,0,0,0)"); cx.fillStyle = hz; cx.globalAlpha = 0.55; cx.fillRect(0, HZ - 6, VW, 46); cx.globalAlpha = 1;
     // props + objects back to front
     var list = st.props.map(function (p) { return { z: p.z, p: p }; }).concat(st.objs.map(function (o) { return { z: o.z, o: o }; }));
@@ -479,25 +507,30 @@
         cx.drawImage(p.spr, x2 - w / 2, y2 - h, w, h);
         if (p.k === "billboard" && h > 30) st.bbRect = [x2 - w / 2, y2 - h, w, h * 0.66]; }
       else { var o = it.o; if (o.z < -900) { cx.globalAlpha = 1; continue; } var spr = o.bad ? (o.kind === "car" ? o.spr : SP[o.kind]) : SP[o.kind];
-        var ow = (o.kind === "car" ? 104 : o.kind === "hole" ? 92 : o.bad ? 58 : 68) * s2 * 1.15, oh = ow * spr.h / spr.w, ox = sx(o.wx, it.z, s2);
-        if (!o.bad) { cx.fillStyle = "rgba(0,0,0,.25)"; cx.beginPath(); cx.ellipse(ox, y2, ow * 0.45, ow * 0.12, 0, 0, 7); cx.fill();
+        var ow = (OW[o.kind] || 60) * s2 * 1.15, oh = ow * spr.h / spr.w, ox = sx(o.wx, it.z, s2);
+        if (!o.bad) { var rw = Math.max(ow, 56 * s2 * 1.15) * 1.7; cx.drawImage(SP.ring, ox - rw / 2, y2 - rw / 6, rw, rw / 3);
           var bob = Math.sin(st.t / 220 + o.bob) * 6 * s2; cx.save(); cx.translate(ox, y2 - oh * 0.6 - 10 * s2 + bob);
-          if (!RM) { cx.globalAlpha = a * 0.35; cx.fillStyle = "#ffd27a"; cx.beginPath(); cx.ellipse(0, oh * 0.55 + 10 * s2, ow * 0.55, ow * 0.16, 0, 0, 7); cx.fill(); cx.globalAlpha = a; }
-          cx.drawImage(spr, -ow / 2, -oh / 2, ow, oh); cx.restore(); }
+          cx.drawImage(spr, -ow / 2, -oh / 2, ow, oh);
+          if (!RM) { cx.fillStyle = "#fff0b0"; for (var sp = 0; sp < 3; sp++) { var sa = st.t / 260 + sp * 2.1 + o.bob, sr = (0.6 + 0.4 * Math.sin(sa * 1.7)) * 1.8 * s2 + 0.3; cx.beginPath(); cx.arc(Math.cos(sa) * rw * 0.33, Math.sin(sa * 1.3) * oh * 0.5, sr, 0, 7); cx.fill(); } }
+          cx.restore(); }
         else if (o.kind === "weed") { cx.save(); cx.translate(ox, y2 - ow / 2); cx.rotate(o.rot); cx.drawImage(spr, -ow / 2, -ow / 2, ow, ow); cx.restore(); }
         else if (o.kind === "hole") cx.drawImage(spr, ox - ow / 2, y2 - oh * 0.7, ow, oh);
         else cx.drawImage(spr, ox - ow / 2, y2 - oh, ow, oh); }
       cx.globalAlpha = 1;
     }
     if (!truckDrawn) drawTruck();
+    cx.drawImage(GRADE, 0, 0, VW, VH);
     // tap hint for the billboard
     if (st.bbRect && st.bbRect[3] > 50) { cx.fillStyle = "rgba(0,0,0,.6)"; rr(cx, st.bbRect[0] + st.bbRect[2] / 2 - 34, st.bbRect[1] + st.bbRect[3] + 4, 68, 16, 8); cx.fill(); cx.fillStyle = "#ffd23f"; cx.font = "800 10px " + BODY; cx.textAlign = "center"; cx.fillText("TAP ▶", st.bbRect[0] + st.bbRect[2] / 2, st.bbRect[1] + st.bbRect[3] + 16); }
     if (st.phase === "drive" && st.legT < 5000 && st.leg === 0) hint(T("Swipe or tap a side to change lanes"));
   }
   function hint(t) { cx.font = "800 14px " + BODY; var w = cx.measureText(t).width + 28; cx.fillStyle = "rgba(20,10,6,.7)"; rr(cx, VW / 2 - w / 2, VH - 44, w, 30, 15); cx.fill(); cx.fillStyle = CREAM; cx.textAlign = "center"; cx.fillText(t, VW / 2, VH - 24); }
   function drawTruck() {
-    var x = sx(st.px, 0, 1), y = PY; cx.save(); cx.translate(x, y); cx.rotate(st.tilt * 0.35);
+    var x = sx(st.px, 0, 1), y = PY, smx = 35, smy = -38; cx.save(); cx.translate(x, y); cx.rotate(st.tilt * 0.35);
     cx.fillStyle = "rgba(0,0,0,.35)"; cx.beginPath(); cx.ellipse(0, 46, 82, 12, 0, 0, 7); cx.fill();
+    if (SP.truck) {   // the photo rig: chimney smoke comes off the stack near the top centre
+      var tw = 136, th = tw * SP.truck.h / SP.truck.w; cx.drawImage(SP.truck, -tw / 2, 48 - th, tw, th); smx = -1; smy = 48 - th * 0.93;
+    } else {
     // pickup (ahead of the trailer)
     cx.fillStyle = "#1a1a1a"; rr(cx, -64, -20, 18, 26, 5); cx.fill(); rr(cx, 46, -20, 18, 26, 5); cx.fill();
     cx.fillStyle = "#a81c24"; rr(cx, -60, -62, 120, 52, 10); cx.fill();
@@ -515,16 +548,23 @@
     var glow = 0.35 + Math.sin(st.t / 90) * 0.15; cx.fillStyle = "rgba(255,120,30," + glow + ")"; rr(cx, -46, 30, 20, 7, 3); cx.fill();
     cx.fillStyle = "#3a3a3a"; rr(cx, 30, -34, 10, 32, 3); cx.fill(); cx.fillStyle = "#555"; cx.fillRect(28, -36, 14, 4);
     cx.fillStyle = "#ff3b3b"; cx.fillRect(-54, 36, 8, 5); cx.fillRect(46, 36, 8, 5);
+    }
     // chimney smoke
-    for (var i = 0; i < st.smoke.length; i++) { var p = st.smoke[i], k = p.t / p.m; cx.fillStyle = "rgba(200,195,188," + (0.42 * (1 - k)) + ")"; cx.beginPath(); cx.arc(35 + p.x, -38 + p.y, p.r, 0, 7); cx.fill(); }
+    for (var i = 0; i < st.smoke.length; i++) { var p = st.smoke[i], k = p.t / p.m; cx.fillStyle = "rgba(200,195,188," + (0.42 * (1 - k)) + ")"; cx.beginPath(); cx.arc(smx + p.x, smy + p.y, p.r, 0, 7); cx.fill(); }
     cx.restore();
   }
   function drawStop() {
-    var L = LEGS[st.leg], c = st.cook;
+    var L = LEGS[st.leg], c = st.cook, bx = 30, by = 128, bw = 340, bh = 170;
+    if (ready(STOPI)) {   // photo stand: cover-fit so its blank sign board sits at (200..368, 124..196); name / logo go on the board
+      var sh = VW * STOPI.naturalHeight / STOPI.naturalWidth; cx.drawImage(STOPI, 0, -72, VW, sh);
+      if (L.final && LOGO.complete && LOGO.naturalWidth) cx.drawImage(LOGO, 284 - 34, 126, 68, 68);
+      else { cx.fillStyle = "#ffe3a0"; cx.shadowColor = GOLD; cx.shadowBlur = 10; cx.font = "400 16px " + DISP; cx.textAlign = "center"; cx.fillText(L.stop + " BBQ STOP", 284, 156); cx.shadowBlur = 0;
+        cx.fillStyle = CREAM; cx.font = "800 9px " + BODY; cx.fillText("HISTORIC ROUTE 66 · " + L.st, 284, 172); }
+      cx.fillStyle = "rgba(0,0,0,.28)"; cx.fillRect(0, 296, VW, 10);
+    } else {
     drawSky(); cx.fillStyle = L.g2; cx.fillRect(0, HZ, VW, VH - HZ);
     cx.fillStyle = "#3b3836"; cx.fillRect(0, 300, VW, 26);
     // the roadside stand
-    var bx = 30, by = 128, bw = 340, bh = 170;
     cx.fillStyle = "#6b3e1f"; cx.fillRect(bx, by, bw, bh);
     cx.fillStyle = "#5a3418"; for (var x = bx; x < bx + bw; x += 17) cx.fillRect(x, by, 2, bh);
     cx.fillStyle = RED_D; cx.beginPath(); cx.moveTo(bx - 14, by + 4); cx.lineTo(bx + bw / 2, by - 30); cx.lineTo(bx + bw + 14, by + 4); cx.closePath(); cx.fill();
@@ -535,6 +575,7 @@
     else { cx.fillStyle = "#1e140c"; rr(cx, bx + 70, by + 10, 200, 46, 8); cx.fill(); cx.strokeStyle = GOLD; cx.lineWidth = 2; rr(cx, bx + 73, by + 13, 194, 40, 6); cx.stroke();
       cx.fillStyle = "#ffe3a0"; cx.shadowColor = GOLD; cx.shadowBlur = 10; cx.font = "400 17px " + DISP; cx.textAlign = "center"; cx.fillText(L.stop + " BBQ STOP", bx + bw / 2, by + 34); cx.shadowBlur = 0;
       cx.fillStyle = CREAM; cx.font = "800 9px " + BODY; cx.fillText("HISTORIC ROUTE 66 · " + L.st, bx + bw / 2, by + 48); }
+    }
     // Antidote's review poster on the wall (always visible here; tap = review card)
     var pw = 92, ph = 56, ppx = bx + bw - pw - 10, ppy = by + 98; cx.drawImage(SP.review, ppx, ppy, pw, ph); st.posterRect = [ppx, ppy, pw, ph];
     cx.drawImage(SP.shield, bx + 12, by + 100, 36, 40);
@@ -546,7 +587,7 @@
       if (tk.done) { cx.font = "18px system-ui"; cx.textAlign = "center"; cx.fillText("😋", gx, gy - 2); }
       else if (tk.mood < 0.3) { cx.font = "16px system-ui"; cx.textAlign = "center"; cx.fillText("😠", gx, gy - 2); }
     });
-    cx.fillStyle = "#3a2010"; cx.fillRect(bx, by + 150, bw, 20); cx.fillStyle = "#8a5a2a"; cx.fillRect(bx, by + 148, bw, 5);
+    if (!ready(STOPI)) { cx.fillStyle = "#3a2010"; cx.fillRect(bx, by + 150, bw, 20); cx.fillStyle = "#8a5a2a"; cx.fillRect(bx, by + 148, bw, 5); }
     // tickets
     var tw = Math.min(92, (VW - 20) / Math.max(1, st.tickets.length) - 6);
     st.tickets.forEach(function (tk, i) {
@@ -562,7 +603,7 @@
       cx.restore();
     });
     // the smoker + gauge
-    drawSmoker(c); drawGauge(c);
+    drawSmoker(c); cx.drawImage(GRADE, 0, 0, VW, VH); drawGauge(c);
     if (c && c.phase === "pull") drawPull(c);
     if (c && c.phase === "smoke") hint(st.inv.logs <= 0 ? T("Out of hickory! Grab logs on the road") : st.hold ? T("Feeding hickory… let go to cool") : T("HOLD to feed the fire · let go to cool"));
     if (st.phase === "finish") { cx.fillStyle = "rgba(20,10,6," + Math.min(0.7, st.finT * 0.4) + ")"; cx.fillRect(0, 0, VW, VH); }
@@ -668,7 +709,7 @@
     else if (st.over) { /* keep the last frame */ }
     if (AC) syncAudio();
   }
-  BG[0] = skyFor(LEGS[0]);
+  BG[0] = skyFor(LEGS[0]); bgLoad(0);
   requestAnimationFrame(frame);
 
   /* ---------------- input ---------------- */
@@ -726,6 +767,6 @@
   W.__R66 = { get: function () { return st; }, start: start, end: end, mode: function () { return MODE; }, requestMode: requestMode, setMode: setMode,
     sound: function (v) { sndOn = v !== false; try { localStorage.setItem("r66-sound", sndOn ? "1" : "0"); } catch (e) {} syncAudio(); return sndOn; }, isSound: function () { return sndOn; },
     // test hooks
-    jump: function (leg, phase) { st.leg = clamp(leg, 0, 5); BG[st.leg] = BG[st.leg] || skyFor(LEGS[st.leg]); if (phase === "stop") stopStart(); else legStart(); },
+    jump: function (leg, phase) { st.leg = clamp(leg, 0, 5); BG[st.leg] = BG[st.leg] || skyFor(LEGS[st.leg]); bgLoad(st.leg); if (phase === "stop") stopStart(); else legStart(); },
     pull: doPull, review: reviewCard, LEGS: LEGS, SP: SP, step: function (dt) { update(dt); }, hold: function (v) { st.hold = !!v; }, lane: function (n) { setLane(n); } };
 })();

@@ -427,7 +427,7 @@
           if (g[0] === "rub") st.inv.rub = Math.min(9, st.inv.rub + 1); if (g[0] === "sauce") st.inv.sauce = Math.min(9, st.inv.sauce + 1);
           pop(sx(o.wx, o.z, sAt(o.z)), PY - 90, "+" + g[1] + " " + T(g[2]), g[0] === "shield" ? CREAM : "#ffd27a"); o.z = -999; }
       }
-      if (o.z < -80) st.objs.splice(i, 1);
+      if (o.z < (R3.on ? -180 : -80)) st.objs.splice(i, 1);   // 3D cars are long: let them pass the camera
     }
   }
   function stop(dt) {

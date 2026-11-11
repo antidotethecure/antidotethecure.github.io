@@ -245,6 +245,7 @@ export function makeWorld(THREE, O = {}) {
     for (const sg of LIVE) { if (Math.abs(p.z - sg.group.position.z) > sg.len / 2 + r) continue;
       for (const B of sg.blds || []) { const gp = B.im.parent ? B.im.parent.getWorldPosition(IW) : sg.group.position; for (const o of B.L) { const dx = Math.max(0, Math.abs(gp.x + o.x - p.x) - o.w / 2), dz = Math.max(0, Math.abs(gp.z + o.z - p.z) - o.d / 2), d = Math.hypot(dx, dz); if (d < r * .75) B.ignite(o, 1 - d / (r * .75), p.x, p.z); } }
       for (const net of sg.nets || []) { const gp = net.group.getWorldPosition(IW);
+        if (p.y < 12 && net.blocks) { net.blocks.push({ x: p.x - gp.x, z: p.z - gp.z, r: 12 * k }); if (net.blocks.length > 6) net.blocks.shift(); }   // a wreck on the street: traffic stops at it (roof hits don't block the road)
         for (const car of net.cars.concat(net.parked)) { if (car.burnt || BURN.length >= 10) continue; let x, z; if (car.L) { if (car.turn) continue; x = car.L.ax === "z" ? car.L.c : car.s; z = car.L.ax === "z" ? car.s : car.L.c; } else { x = car.x; z = car.z; }
           const d = Math.hypot(gp.x + x - p.x, gp.z + z - p.z); if (d > r * .7) continue;
           car.burnt = 1; if (car.L) { car.v = 0; car.v0 = .01; } const ch = .05 + Math.random() * .03; car.paint = new THREE.Color(ch, ch * .92, ch * .85); car.gpaint = car.paint;   // stops dead, paint scorched black

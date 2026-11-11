@@ -123,7 +123,10 @@ export function makeCombat(THREE, O) {
     for (let i = scorches.length - 1; i >= 0; i--) { const S = scorches[i]; S.t += s; S.m.position.z += scroll * s; if (S.t > 14 || S.m.position.z > (env.cullZ || 1e9)) { scene.remove(S.m); S.m.geometry.dispose(); scorches.splice(i, 1); } }
     for (let i = pilots.length - 1; i >= 0; i--) if (!updPilot(pilots[i], s, t, scroll)) pilots.splice(i, 1); }
   // warm-up hook: show one of each pooled effect mesh for a frame so their shaders compile before the fight
-  const _warm = (on, p) => { RG.slice(0, 1).concat([]).forEach(R => { R.m.visible = on; if (on) R.m.position.copy(p); }); const f = FL[0]; f.s.visible = on; if (on) f.s.position.copy(p); };
+  let WCH = null;   // one parachute + its lines, only ever shown for the warm-up frame (same materials as a real ejection, so that shader is compiled before the first pilot bails out)
+  const _warm = (on, p) => { RG.slice(0, 1).concat([]).forEach(R => { R.m.visible = on; if (on) R.m.position.copy(p); }); const f = FL[0]; f.s.visible = on; if (on) f.s.position.copy(p);
+    if (on && !WCH) { WCH = [new THREE.Mesh(new THREE.SphereGeometry(14, 6, 3, 0, 6.28, 0, 1.15), new THREE.MeshStandardMaterial({ map: chuteT, side: THREE.DoubleSide, roughness: .8 })), new THREE.LineSegments(new THREE.BufferGeometry().setAttribute("position", new THREE.Float32BufferAttribute(new Float32Array(6), 3)), new THREE.LineBasicMaterial({ color: 0x333333 }))]; WCH.forEach(m => { m.frustumCulled = false; scene.add(m); }); }
+    if (WCH) WCH.forEach(m => { m.visible = on; if (on) m.position.copy(p); }); };
   // the ground slid sideways under the camera (Melody's lateral roam): wrecks, scorch marks, ejected pilots + their gear slide with it
   function shift(dx) { for (const c of crashes) { c.obj.position.x += dx; if (c.tgt) c.tgt.x += dx; } for (const S of scorches) S.m.position.x += dx; RG.forEach(R => { R.m.position.x += dx; });
     for (const P of pilots) { P.pos.x += dx; [P.canopy, P.seat].forEach(m => { if (m) m.position.x += dx; }); } }

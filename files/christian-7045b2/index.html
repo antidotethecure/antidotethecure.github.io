@@ -66,9 +66,9 @@ function share(url,name){
     location.href=url; }).catch(function(err){ if(!err||err.name!=="AbortError") location.href=url; });
 }
 ["melody","nalu"].forEach(function(k){ document.getElementById(k).innerHTML=FILES[k].map(function(f){
-  var main=f[1]+"."+f[3], thumb=f[1]+".thumb."+(f[4]?"jpg":"png"), name=f[1].split("/")[1];
+  var V="?v=neon", main=f[1]+"."+f[3], thumb=f[1]+".thumb."+(f[4]?"jpg":"png")+V, name=f[1].split("/")[1];
   return '<div class="f"><div class="im"><img loading="lazy" src="'+thumb+'" alt=""></div><b>'+e(f[0])+'</b><small>'+f[2].map(function(x){ return x.toUpperCase(); }).join(" + ")+'</small>'+
-    f[2].map(function(x){ var fb=f[5]||f[1], fn=fb.split("/")[1]; return '<div class="act"><a href="'+fb+"."+x+'" download>⬇ '+x.toUpperCase()+'</a><button type="button" data-u="'+fb+"."+x+'" data-n="'+fn+"."+x+'">Share</button></div>'; }).join("")+'</div>'; }).join(""); });
+    f[2].map(function(x){ var fb=f[5]||f[1], fn=fb.split("/")[1]; return '<div class="act"><a href="'+fb+"."+x+V+'" download>⬇ '+x.toUpperCase()+'</a><button type="button" data-u="'+fb+"."+x+V+'" data-n="'+fn+"."+x+'">Share</button></div>'; }).join("")+'</div>'; }).join(""); });
 document.getElementById("video").innerHTML=FILES.video.map(function(v){ var n=v[1].split("/")[1];
   return '<div class="f"><video src="'+v[1]+'" controls playsinline preload="metadata"></video><b>'+e(v[0])+'</b><div class="act"><a href="'+v[1]+'" download>⬇ Save</a><button type="button" data-u="'+v[1]+'" data-n="'+n+'">Share</button></div></div>'; }).join("");
 document.addEventListener("click",function(ev){ var b=ev.target.closest("button[data-u]"); if(b) share(b.dataset.u,b.dataset.n); });

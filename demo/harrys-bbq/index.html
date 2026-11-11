@@ -266,8 +266,8 @@ h+='<div class="tier"><span class="pts">Best</span><div><b id="best">Your best: 
 document.getElementById("tiers").innerHTML=h;
 })();
 </script>
-<script src="route66.js?v=8"></script>
-<script type="module" src="route66-3d.js?v=8"></script>
+<script src="route66.js?v=9"></script>
+<script type="module" src="route66-3d.js?v=9"></script>
 <script>
 /* end of a run → prize (crm.js SSAI_WIN, Kid prizes go to the parent's account) */
 (function(){
@@ -279,6 +279,7 @@ window.R66_END=function(o){
   $("final").textContent=o.score.toLocaleString()+" pts";
   var P=window.R66_PRIZES[o.kid?"kid":"adult"], prize="";
   for(var i=0;i<P.length;i++) if(o.score>=P[i][0]){ prize=P[i][1]; break; }
+  if(o.score>b){ try{localStorage.setItem("r66-best-prize",prize);}catch(e){} }   // the roadside high-score board shows what the top run won
   $("rank").textContent=(o.finished?"🏁 You made it to Harry's in Lomita! ":"Made it to leg "+o.leg+" of 6 · ")+o.served+(o.served===1?" plate":" plates")+" served, "+o.perfect+" perfect";
   var won=$("won"); won.style.display="none";
   if(prize&&window.SSAI_WIN){

@@ -354,7 +354,7 @@ async function boot() {
     st.bbRect = null;
     for (let i = 0; i < st.props.length; i++) {
       const p = st.props[i], spr = p.spr; if (!spr || !(spr.w > 0)) continue;
-      const v = view(p), h = p.h * 2.3, w = h * spr.w / spr.h, x = p.wx * (p.k === "billboard" ? 1.36 : 1.5) + off(p.z), z = -p.z * KZ;   // the review board hugs the shoulder so phones see all of it
+      const v = view(p), h = p.h * 2.3, w = h * spr.w / spr.h, x = p.wx * (p.k === "billboard" || p.k === "dish" ? 1.36 : 1.5) + off(p.z), z = -p.z * KZ;   // the review board hugs the shoulder so phones see all of it
       if (!v.a) { v.a = mesh(UP, spr, 0, true); if (p.k === "sign") v.own = spr; }
       put(v.a, x, 0, z, w, h);
       if (p.k === "billboard") { const a = toGame(x - w / 2, h, z), b = toGame(x + w / 2, 0, z), bh = b[1] - a[1]; if (bh > 30 && p.z > 0) st.bbRect = [a[0], a[1], b[0] - a[0], bh * 0.66]; }   // the review poster: route66.js opens the card when this is tapped

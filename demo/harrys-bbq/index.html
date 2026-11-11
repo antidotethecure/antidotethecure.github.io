@@ -17,6 +17,7 @@
 <title>Harry's Smokehouse BBQ — Menu, Rewards &amp; Route 66</title>
 <script src="../lang-th.js"></script>
 <script src="../gamepad.js?v=20261110r66"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
 <meta name="description" content="Harry's Oklahoma Style Smokehouse BBQ in Lomita: the menu, Harry's Rewards and the Route 66: Tulsa to Lomita game. Sample demo by SousShift AI.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Bebas+Neue&family=Tilt+Neon&family=Archivo:wght@400;600;800;900&display=swap" rel="stylesheet">
@@ -258,7 +259,8 @@ h+='<div class="tier"><span class="pts">Best</span><div><b id="best">Your best: 
 document.getElementById("tiers").innerHTML=h;
 })();
 </script>
-<script src="route66.js?v=1"></script>
+<script src="route66.js?v=3"></script>
+<script type="module" src="route66-3d.js?v=2"></script>
 <script>
 /* end of a run → prize (crm.js SSAI_WIN, Kid prizes go to the parent's account) */
 (function(){

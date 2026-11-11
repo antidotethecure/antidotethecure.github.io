@@ -176,15 +176,32 @@ async function boot() {
   /* ---------- the 3D models: the rig, the traffic, the cones ---------- */
   const M = makeModels(THREE, RoundedBoxGeometry, mergeGeometries);
   /* photo-real meshes we generated (engine3d/CREDITS.md), each turned, sized and set down like the code-built model it replaces; one that is slow or fails to load keeps that stand-in */
-  const GLB = { truck: [5.5], trailer: [4.0, 1.0], car1: [5.1], car2: [4.9], car3: [4.9] }, G = {};   // length in metres; a second number = measured from its front, which sits that far ahead of z 0 (the smoker's tongue reaches under the bumper to the hitch)
+  const GLB = { truck: [5.5], trailer: [4.0, 1.0], car1: [5.1], car2: [4.9], car3: [4.9], deer: [1.9, 0.95, Math.PI] }, G = {};   // length in metres; a second number = measured from its front, which sits that far ahead of z 0 (the smoker's tongue reaches under the bumper to the hitch); a third = the turn that points it up the road
+  /* the deer's legs: the model is one solid piece frozen mid-leap, so its vertex shader swings each leg about its shoulder or hip in step with the hop
+     (uGait 0..1, 0 = hooves on the road): legs gather under the body as it lands and pushes off, and stretch out in the air. q = metres in the model's own space, z toward the head */
+  const gait = { value: 0 };   // shortcut: one stride clock for every deer on screen, give each mesh its own uniform if two ever have to be out of step
+  function legs(root) { root.traverse(o => { if (!o.isMesh) return;
+    const glsl = `uniform float uGait;
+      vec3 gaitTurn(vec3 v, float pt) {   // pt 1 = a point (turns about the joint), 0 = a normal
+        const float S = ${o.scale.x.toFixed(5)}; const vec3 T = vec3(${o.position.toArray().map(n => n.toFixed(5))});
+        vec3 m = position * S + T; vec2 q = m.zy, jf = vec2(0.5, -0.12), jh = vec2(-0.38, 0.0);
+        float u = uGait + (m.x > 0.0 ? 0.04 : -0.04), g = 0.5 + 0.5 * cos(6.2832 * u), gf = 0.5 + 0.5 * cos(6.2832 * (u - 0.12));
+        float wf = smoothstep(0.02, 0.18, dot(q - jf, vec2(0.3, -0.954))), wh = smoothstep(0.0, 0.2, dot(q - jh, vec2(-0.894, -0.447))) * (1.0 - smoothstep(-0.02, 0.12, q.y));   // never smoothstep with its edges reversed: Apple GPUs return NaN and the whole deer vanishes
+        float a = wf * (0.87 * gf - 0.35 * (1.0 - gf)) - wh * 1.15 * g, c = cos(a), s = sin(a);
+        vec2 j = ((wf > wh ? jf : jh) - T.zy) / S * pt, d = v.zy - j;
+        return vec3(v.x, d.y * c - d.x * s + j.y, d.y * s + d.x * c + j.x);
+      }`;
+    o.material.onBeforeCompile = sh => { sh.uniforms.uGait = gait; sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\n" + glsl).replace("#include <beginnormal_vertex>", "#include <beginnormal_vertex>\nobjectNormal = gaitTurn(objectNormal, 0.0);").replace("#include <begin_vertex>", "#include <begin_vertex>\ntransformed = gaitTurn(transformed, 1.0);"); };
+  }); }
   try {
     const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js"), { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js"), ld = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder), box = new THREE.Box3(), v = new THREE.Vector3();
     await Promise.all(Object.keys(GLB).map(k => Promise.race([ld.loadAsync(new URL("./models/" + k + ".glb", import.meta.url).href), new Promise((_, no) => setTimeout(no, 25000))]).then(gl => {
       const s = gl.scene, g = new THREE.Group(), top = new THREE.Vector3(0, -1, 0);
-      s.rotation.y = -Math.PI / 2; s.updateMatrixWorld(true); box.setFromObject(s);   // they come lying along x
+      s.rotation.y = GLB[k][2] ?? -Math.PI / 2; s.updateMatrixWorld(true); box.setFromObject(s);   // the vehicles come lying along x
       const f = GLB[k][0] / (box.max.z - box.min.z);
       s.scale.setScalar(f); s.position.set(-f * (box.min.x + box.max.x) / 2, -f * box.min.y, GLB[k][1] ? -f * box.min.z - GLB[k][1] : -f * box.max.z); s.updateMatrixWorld(true);
       s.traverse(o => { if (!o.isMesh) return; o.castShadow = o.receiveShadow = true; const p = o.geometry.attributes.position; for (let i = 0; i < p.count; i++) if (v.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld).y > top.y) top.copy(v); });
+      if (k === "deer") legs(s);
       g.userData.top = top; g.add(s); G[k] = g;   // top = its highest point, where the smoker's stack ends
     }, () => {})));
   } catch (e) {}
@@ -193,6 +210,7 @@ async function boot() {
   const glowM = c => new THREE.SpriteMaterial({ map: tex(glowC), color: c, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, fog: false, opacity: 0.85 }), RED = glowM(0xff3018), EMBER = glowM(0xff8a2a);
   function glow(g, m, x, y, z, s) { const sp = new THREE.Sprite(m); sp.position.set(x, y, z); sp.scale.set(s, s, 1); g.add(sp); }   // lamp glow: light added on top, in the model's own metres
   const protos = { car1: G.car1 || M.sedan(0x4fb3b0), car2: G.car2 || M.pickup(0xefe2c0), car3: G.car3 || M.wagon(0xa8231c), cone: M.cone() }, vpool = { car1: [], car2: [], car3: [], cone: [] };
+  if (G.deer) { protos.deer = G.deer; vpool.deer = []; G.deer.rotation.order = "YXZ"; }   // turn to its heading first, then tip nose up or down
   [["car1", 0.9, 1.0], ["car2", 0.9, 1.06], ["car3", 0.84, 0.78]].forEach(a => [-1, 1].forEach(s => glow(protos[a[0]], RED, s * a[1], a[2], 0.14, 0.55)));
   Object.keys(protos).forEach(k => protos[k].scale.setScalar(k === "cone" ? U * 1.8 : U));
   function veh(key) { const g = vpool[key].pop() || protos[key].clone(); g.visible = true; g.rotation.set(0, 0, 0); if (!g.parent) scene.add(g); return g; }   // clones share geometry and materials
@@ -327,9 +345,10 @@ async function boot() {
         put(v.a, x, 16 + Math.sin(st.t / 220 + o.bob) * 7, z, ow, oh); const rw = Math.max(ow, 64) * 1.7; v.b.position.set(x, 0, z); v.b.scale.set(rw, 1, rw * 1.5);
       } else if (o.kind === "hole") { if (!v.a) v.a = mesh(FLAT, spr, -1); v.a.position.set(x, 0, z); v.a.scale.set(ow * 1.15, 1, ow * 1.9); }
       else if (o.kind === "weed") { if (!v.a) v.a = mesh(MID, spr, 0, true); put(v.a, x, ow / 2, z, ow, ow); v.a.rotation.z = -o.rot; shadow(v, x, z, ow * 1.2, ow * 1.3); }
-      else if (o.kind === "deer") {   // the photo faces left and is mid-leap: it bounds across in arcs, nose up then down, its shadow shrinking under it, dust where it lands
+      else if (o.kind === "deer") {   // a solid deer whose legs gather and stretch with each bound (the photo, which faces left, if the model did not load): it bounds across in arcs, nose up then down, its shadow shrinking under it, dust where it lands
         const u = Math.abs(o.wx + 4000) / 75 % 1, hop = 4 * u * (1 - u), dir = o.vx > 0 ? -1 : 1, dh = oh * 1.25;
-        if (!v.a) v.a = mesh(MID, spr, 0, true); put(v.a, x, dh / 2 + hop * 34, z, dir * ow * 1.25, dh); v.a.rotation.z = -dir * (0.5 - u) * 0.5;
+        if (protos.deer) { if (!v.g) { v.g = veh("deer"); v.gk = "deer"; } v.g.position.set(x, hop * 34 + 6, z); v.g.rotation.set((0.5 - u) * 0.5, dir * Math.PI / 2, 0); gait.value = u; }
+        else { if (!v.a) v.a = mesh(MID, spr, 0, true); put(v.a, x, dh / 2 + hop * 34, z, dir * ow * 1.25, dh); v.a.rotation.z = -dir * (0.5 - u) * 0.5; }
         shadow(v, x, z, ow * 1.3 * (1 - hop * 0.35), ow * 0.9 * (1 - hop * 0.35));
         if (v.u > u + 0.5) puff(x, 5, z, 0xc9b08a, 1.6, 12, 50, 0.5, 0.4, rs(24), 14, st.speed * KZ);
         v.u = u;

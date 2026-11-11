@@ -720,7 +720,7 @@
       cx.drawImage(s, ix + 8 + j * 42, iy + 13 - h / 2, w, h); cx.fillStyle = p[1] ? CREAM : "#8a7a6a"; cx.font = "800 12px " + BODY; cx.textAlign = "left"; cx.fillText("×" + p[1], ix + 8 + j * 42 + w + 2, iy + 18);
     });
     // says so on screen when the road is not the full 3D one, so a phone that falls back can be reported
-    var s3 = W.__R663, why = s3 ? (!R3.on ? s3.reason : s3.models && s3.models.length < 5 ? s3.models.length + "/5 3D models loaded" : "") : (performance.now() > 8000 && !/[?&]render=2d/i.test(location.search) ? "3D script did not load" : "");
+    var s3 = W.__R663, why = s3 ? (!R3.on ? s3.reason : s3.models && s3.models.length < 6 ? s3.models.length + "/6 3D models loaded" : "") : (performance.now() > 8000 && !/[?&]render=2d/i.test(location.search) ? "3D script did not load" : "");
     if (why) { cx.textAlign = "left"; cx.font = "700 10px " + BODY; cx.fillStyle = "rgba(255,255,255,.6)"; cx.fillText((R3.on ? "" : "2D road · ") + why, 8, VH - 8); }
     if (kid()) { cx.fillStyle = "#ffd23f"; rr(cx, VW - 74, iy, 66, 22, 11); cx.fill(); cx.fillStyle = INK; cx.font = "900 11px " + BODY; cx.textAlign = "center"; cx.fillText("🧒 KID", VW - 41, iy + 15); }
   }

@@ -1,0 +1,2 @@
+{"name":"Harry's HQ","short_name":"Harry's HQ","start_url":"./","scope":"./","display":"standalone","background_color":"#120a06","theme_color":"#120a06",
+ "icons":[{"src":"../../demo/harrys-bbq/img/icon-192.png","sizes":"192x192","type":"image/png"},{"src":"../../demo/harrys-bbq/img/icon-512.png","sizes":"512x512","type":"image/png"}]}

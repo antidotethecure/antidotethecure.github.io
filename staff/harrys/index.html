@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<script src="../../js/frame-guard.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>Harry's Staff Guide</title><meta name="theme-color" content="#120a06">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="../../demo/harrys-bbq/img/icon-180.png"><link rel="icon" href="../../demo/harrys-bbq/img/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Harry's Staff">
+<!-- Harry's Staff Guide (EN/ES), modeled on staff/christian/. Teaches the rewards + game step by step.
+     Staff never see numbers, stats or guest contact info here (house rule). SAMPLE for the pitch: deals are samples. -->
+<style>
+:root{--bg:#120a06;--card:#1e120b;--edge:#4a2e1c;--ink:#f3e6c8;--dim:#c9b694;--muted:#a8916c;--gold:#d1902a;--red:#c8232c}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,system-ui,Segoe UI,Roboto,sans-serif;overflow-x:hidden}
+main{max-width:760px;margin:0 auto;padding:14px 16px 80px}a{color:#ffd27a}
+.top{display:flex;align-items:center;gap:10px}.top img{width:46px;height:46px;border-radius:10px}.top h1{margin:0;font-size:19px;line-height:1.15}.top small{display:block;color:var(--dim);font-size:12.5px}.sp{flex:1}
+.lang{flex:none;display:flex;border:1px solid var(--edge);border-radius:999px;overflow:hidden}.lang button{border:0;background:transparent;color:var(--ink);padding:8px 12px;font-weight:800;cursor:pointer}.lang button[aria-pressed=true]{background:var(--gold);color:#1e140c}
+.jump{display:flex;gap:6px;overflow-x:auto;padding:10px 0;position:sticky;top:0;background:var(--bg);z-index:4;scrollbar-width:none}.jump::-webkit-scrollbar{display:none}
+.jump a{flex:none;text-decoration:none;color:var(--ink);border:1px solid var(--edge);background:var(--card);border-radius:999px;padding:6px 11px;font-weight:700;font-size:13.5px}
+h2{font-size:21px;margin:26px 0 8px}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px;margin:10px 0}
+.steps{display:grid;gap:12px}.step{display:grid;grid-template-columns:1fr;gap:10px;background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px}
+@media(min-width:640px){.step{grid-template-columns:200px 1fr}}
+.step img{width:100%;max-width:220px;border-radius:12px;border:1px solid var(--edge);display:block}
+.step .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-weight:900;margin-right:6px}
+.code{display:grid;place-items:center;gap:6px;max-width:220px;background:#140b06;border:2px dashed #5ad08a;border-radius:14px;padding:14px;text-align:center}
+.code b{font:900 24px ui-monospace,Menlo,monospace;letter-spacing:.1em;color:#ffd27a}.code small{color:var(--dim)}
+.say{border-left:4px solid var(--gold);padding:8px 12px;background:#2a170d;border-radius:0 12px 12px 0;margin:8px 0;font-size:15.5px}
+details{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:10px 12px;margin:8px 0}summary{font-weight:800;cursor:pointer}
+.q{margin:10px 0}.q button{display:block;width:100%;text-align:left;margin:6px 0;border:1px solid var(--edge);background:#140b06;color:var(--ink);border-radius:10px;padding:10px;cursor:pointer;font:inherit}
+.q button.ok{border-color:#2fbf71;background:#2fbf7122}.q button.no{border-color:var(--red);background:#c8232c22}
+.btn{display:inline-block;background:var(--red);color:#fff;text-decoration:none;font-weight:800;border-radius:12px;padding:12px 16px}
+.tag{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px;background:#ffd23f;color:#1e140c}
+ul{padding-left:20px}li{margin:4px 0}
+.note{background:#ffb34722;border:1px solid #ffb34766;color:#ffe0b0;border-radius:12px;padding:8px 12px;font-size:13.5px}
+</style></head>
+<body><main>
+<div class="top"><img src="../../demo/harrys-bbq/img/icon-192.png" alt=""><div><h1 data-l="title"></h1><small data-l="sub"></small></div><span class="sp"></span>
+<div class="lang" role="group" aria-label="Language"><button type="button" data-lang="en">EN</button><button type="button" data-lang="es">ES</button></div></div>
+<nav class="jump" id="jump"></nav>
+<div id="body"></div>
+</main>
+<script>
+(function(){
+"use strict";
+var LANG=(function(){ try{ return localStorage.getItem("harrys-staff-lang")||((navigator.language||"").indexOf("es")===0?"es":"en"); }catch(e){ return "en"; } })();
+function L(o){ return o[LANG]||o.en; }
+var APP="../../demo/harrys-bbq/";
+var T={
+ title:{en:"Harry's Staff Guide",es:"Guía para el equipo de Harry's"},
+ sub:{en:"How the Harry's app, rewards and Route 66 game work",es:"Cómo funcionan la app de Harry's, las recompensas y el juego Route 66"}
+};
+var NAV=[["app",{en:"📲 App",es:"📲 App"}],["guests",{en:"📱 What it does",es:"📱 Qué hace"}],["deals",{en:"🏷️ Rewards",es:"🏷️ Recompensas"}],["tut",{en:"🧭 Step by step",es:"🧭 Paso a paso"}],["say",{en:"💬 What to say",es:"💬 Qué decir"}],["faq",{en:"❓ Problems",es:"❓ Problemas"}],["games",{en:"🎮 Practice",es:"🎮 Practicar"}],["quiz",{en:"✅ Quiz",es:"✅ Prueba"}],["duties",{en:"🎯 My job",es:"🎯 Mi trabajo"}]];
+var QZ=[
+ {q:{en:"A guest shows a prize code. What do you check?",es:"Un cliente muestra un código de premio. ¿Qué revisas?"},a:[{en:"That the code is on their phone, not expired (3 days), and it's their only reward this visit",es:"Que el código esté en su teléfono, que no haya vencido (3 días) y que sea su única recompensa en esta visita"},{en:"Nothing, just give the food",es:"Nada, solo das la comida"},{en:"Their score on the leaderboard",es:"Su puntaje en la tabla"}],ok:0},
+ {q:{en:"A kid prize (🧒 KID PRIZE) is shown. When can you honor it?",es:"Muestran un premio infantil (🧒 KID PRIZE). ¿Cuándo lo puedes dar?"},a:[{en:"Anytime, to anyone",es:"Siempre, a cualquiera"},{en:"Only with the young player at the table",es:"Solo con el niño que jugó en la mesa"},{en:"Only on weekends",es:"Solo los fines de semana"}],ok:1},
+ {q:{en:"Can a reward be free alcohol?",es:"¿Una recompensa puede ser alcohol gratis?"},a:[{en:"Yes, if the guest won it",es:"Sí, si el cliente lo ganó"},{en:"No. Never in California",es:"No. Nunca en California"}],ok:1}
+];
+function render(){
+  document.documentElement.lang=LANG;
+  [].forEach.call(document.querySelectorAll("[data-l]"),function(e){ e.textContent=L(T[e.dataset.l]); });
+  [].forEach.call(document.querySelectorAll("[data-lang]"),function(b){ b.setAttribute("aria-pressed",b.dataset.lang===LANG); });
+  document.getElementById("jump").innerHTML=NAV.map(function(n){ return '<a href="#'+n[0]+'">'+L(n[1])+'</a>'; }).join("");
+  var h='';
+  h+='<p class="note">'+L({en:"🧪 Sample guide made for Harry's. The rewards and prizes below are samples until Harry's picks the real ones.",es:"🧪 Guía de muestra hecha para Harry's. Las recompensas y premios son ejemplos hasta que Harry's elija los reales."})+'</p>';
+  h+="<h2 id='app'>📲 "+L({en:"Open the guest app",es:"Abre la app de clientes"})+"</h2><div class='card'>"+L({en:"This is what guests see when they scan the QR on the table, the window or a to-go bag.",es:"Esto es lo que ven los clientes cuando escanean el QR de la mesa, la ventana o la bolsa para llevar."})+"<p><a class='btn' href='"+APP+"'>"+L({en:"Open the Harry's app",es:"Abrir la app de Harry's"})+"</a></p></div>";
+  h+="<h2 id='guests'>📱 "+L({en:"What the app does for guests",es:"Qué hace la app por los clientes"})+"</h2><div class='card'><ul>"+
+    [{en:"Shows Harry's menu with prices and photos",es:"Muestra el menú de Harry's con precios y fotos"},{en:"Route 66: a free game. Drive from Tulsa to Lomita, then smoke the meat slow & low. Good scores win real Harry's food",es:"Route 66: un juego gratis. Manejan de Tulsa a Lomita y ahúman la carne lento y bajo. Los buenos puntajes ganan comida real de Harry's"},{en:"Harry's Rewards: guests earn points every visit and trade them for food",es:"Harry's Rewards: los clientes ganan puntos en cada visita y los cambian por comida"},{en:"A free daily spin for members",es:"Una ruleta gratis al día para miembros"},{en:"Kid mode: kids play only through a parent's account. Kid prizes go to the parent",es:"Modo niño: los niños juegan solo con la cuenta de un padre. Los premios infantiles van al padre"}].map(function(x){ return "<li>"+L(x)+"</li>"; }).join("")+"</ul></div>";
+  h+="<h2 id='deals'>🏷️ "+L({en:"Current deals and rewards",es:"Ofertas y recompensas actuales"})+" <span class='tag'>"+L({en:"SAMPLE",es:"MUESTRA"})+"</span></h2><div class='card'><ul>"+
+    [{en:"Points ladder: Cookie → Cornbread → a side → Aunt Cheryl's Peach Cobbler → Brisket Sandwich",es:"Escalera de puntos: Galleta → Cornbread → un acompañante → Peach Cobbler de Aunt Cheryl → Sándwich de Brisket"},{en:"Game prizes: Cornbread, a side of Mac & Cheese, Peach Cobbler, Brisket Sandwich",es:"Premios del juego: Cornbread, Mac & Cheese, Peach Cobbler, Sándwich de Brisket"},{en:"Kid prizes: Margot Dean's Homemade Cookie, Cornbread",es:"Premios infantiles: Galleta casera de Margot Dean, Cornbread"},{en:"Rules: good for 3 days, one reward per visit, no stacking, never alcohol",es:"Reglas: válido 3 días, una recompensa por visita, no se combinan, nunca alcohol"},{en:"Dine-in waffle fries stay free, like always",es:"Las waffle fries siguen gratis para comer aquí, como siempre"}].map(function(x){ return "<li>"+L(x)+"</li>"; }).join("")+"</ul></div>";
+  h+="<h2 id='tut'>🧭 "+L({en:"Step by step, with pictures",es:"Paso a paso, con imágenes"})+"</h2><div class='steps'>"+
+    step(1,"img/step-1-play.webp",{en:"Guest scans the QR and taps PLAY",es:"El cliente escanea el QR y toca PLAY"},{en:"They pick Kid or Adult, then PLAY. No sign-up needed to play.",es:"Eligen Niño o Adulto y luego PLAY. No necesitan registrarse para jugar."})+
+    step(2,"img/step-2-cook.webp",{en:"Drive, then cook slow & low",es:"Manejar y luego cocinar lento y bajo"},{en:"On the road they grab hickory, rub and sauce. At each stop they hold the screen to keep the smoker between 225 and 250°F, then tap to pull the meat.",es:"En el camino agarran leña, especias y salsa. En cada parada mantienen el dedo en la pantalla para dejar el ahumador entre 225 y 250°F y luego tocan para sacar la carne."})+
+    step(3,"img/step-3-save.webp",{en:"They win and save the prize",es:"Ganan y guardan el premio"},{en:"To keep a prize they add a name and phone or email. Then a code shows up.",es:"Para guardar el premio ponen su nombre y teléfono o correo. Luego aparece un código."})+
+    "<div class='step'><div class='code'><span>🏆</span><b>R66-4KX2</b><small>"+L({en:"Free Cornbread w/ Honey Butter · use by Thu",es:"Cornbread gratis · usar antes del jueves"})+"</small></div><div><p style='margin:0'><span class='n'>4</span><b>"+L({en:"They show you the code",es:"Te muestran el código"})+"</b></p><p>"+L({en:"Check it's on their phone and not expired. The manager marks it Used in Harry's HQ. One reward per visit.",es:"Revisa que esté en su teléfono y no haya vencido. El gerente lo marca como Usado en Harry's HQ. Una recompensa por visita."})+"</p></div></div></div>";
+  h+="<h2 id='say'>💬 "+L({en:"What to say",es:"Qué decir"})+"</h2>"+
+    say({en:"\"Scan the code on your table while you wait. It's a free game, Route 66. Good scores win real Harry's food.\"",es:"\"Escanee el código de la mesa mientras espera. Es un juego gratis, Route 66. Los buenos puntajes ganan comida de Harry's.\""})+
+    say({en:"\"Join Harry's Rewards and you get points every time you come in. It's free.\"",es:"\"Únase a Harry's Rewards y gana puntos cada vez que viene. Es gratis.\""})+
+    say({en:"For kids: \"Mom or dad signs in first, then the kids can play Kid mode.\"",es:"Para niños: \"Mamá o papá se registran primero y luego los niños juegan en modo niño.\""});
+  h+="<h2 id='faq'>❓ "+L({en:"Problems and FAQ",es:"Problemas y preguntas frecuentes"})+"</h2>"+
+    faq({en:"The QR won't open",es:"El QR no abre"},{en:"Open the phone camera, point at the code and tap the link. Still stuck? Type the Harry's web address from the table card.",es:"Abra la cámara, apunte al código y toque el enlace. ¿Sigue sin abrir? Escriba la dirección de Harry's de la tarjeta de mesa."})+
+    faq({en:"The code says it expired",es:"El código dice que venció"},{en:"Prizes last 3 days. Kindly say they can win another one next game.",es:"Los premios duran 3 días. Dígale con amabilidad que puede ganar otro en el siguiente juego."})+
+    faq({en:"They want two rewards at once",es:"Quieren dos recompensas a la vez"},{en:"One reward per visit. The next one saves for their next visit.",es:"Una recompensa por visita. La siguiente queda para la próxima visita."})+
+    faq({en:"Someone asks how many members we have or for a guest's number",es:"Alguien pregunta cuántos miembros hay o el número de un cliente"},{en:"Staff don't see that. Send them to the manager.",es:"El equipo no ve esa información. Mándelos con el gerente."})+
+    faq({en:"The game is stuck or the sound is off",es:"El juego se trabó o no tiene sonido"},{en:"Pull down to refresh the page. Sound turns on after the first tap; check the phone isn't on silent.",es:"Deslice hacia abajo para recargar. El sonido se activa al primer toque; revise que el teléfono no esté en silencio."});
+  h+="<h2 id='games'>🎮 "+L({en:"Practice the game",es:"Practica el juego"})+"</h2><div class='card'>"+L({en:"Play one run on your break so you can explain it. Tip: tap and hold to heat, let go to cool, and watch for wind gusts.",es:"Juegue una vez en su descanso para poder explicarlo. Consejo: mantenga presionado para calentar, suelte para enfriar y cuidado con el viento."})+"<p><a class='btn' href='"+APP+"#play'>🛻 "+L({en:"Play Route 66",es:"Jugar Route 66"})+"</a></p></div>";
+  h+="<h2 id='quiz'>✅ "+L({en:"Optional: check what you know",es:"Opcional: comprueba lo que sabes"})+"</h2><div class='card'>"+QZ.map(function(q,i){ return "<div class='q'><b>"+L(q.q)+"</b>"+q.a.map(function(a,j){ return "<button type='button' data-q='"+i+"' data-a='"+j+"'>"+L(a)+"</button>"; }).join("")+"</div>"; }).join("")+"</div>";
+  h+="<h2 id='duties'>🎯 "+L({en:"My objective & duties",es:"Mi objetivo y mis tareas"})+"</h2><div class='card'><ul>"+
+    [{en:"Mention the QR at every table once",es:"Mencionar el QR una vez en cada mesa"},{en:"Check prize codes, one per visit",es:"Revisar códigos de premio, uno por visita"},{en:"Keep table cards and stickers clean and in place",es:"Mantener limpias y en su lugar las tarjetas y calcomanías"},{en:"Tell the manager if a QR is damaged or missing",es:"Avisar al gerente si un QR está dañado o falta"}].map(function(x){ return "<li>"+L(x)+"</li>"; }).join("")+"</ul></div>";
+  document.getElementById("body").innerHTML=h;
+}
+function step(n,img,t,d){ return "<div class='step'><img src='"+img+"' alt='"+L(t).replace(/'/g,"&#39;")+"' loading='lazy' width='520'><div><p style='margin:0'><span class='n'>"+n+"</span><b>"+L(t)+"</b></p><p>"+L(d)+"</p></div></div>"; }
+function say(t){ return "<div class='say'>"+L(t)+"</div>"; }
+function faq(q,a){ return "<details><summary>"+L(q)+"</summary><p>"+L(a)+"</p></details>"; }
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-lang]"); if(b){ LANG=b.dataset.lang; try{ localStorage.setItem("harrys-staff-lang",LANG); }catch(x){} render(); return; }
+  var q=e.target.closest("[data-q]"); if(q){ var Q=QZ[+q.dataset.q]; q.classList.add(+q.dataset.a===Q.ok?"ok":"no"); }
+});
+render();
+})();
+</script>
+<script src="../../demo/poweredby.js?v=20261013a" defer></script>
+</body></html>

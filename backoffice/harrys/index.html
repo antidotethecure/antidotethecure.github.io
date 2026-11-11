@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<script src="../../js/frame-guard.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>Harry's HQ</title><meta name="theme-color" content="#120a06">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="../../demo/harrys-bbq/img/icon-180.png"><link rel="icon" href="../../demo/harrys-bbq/img/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Harry's HQ">
+<!-- Harry's HQ: the owner back office for Harry's Oklahoma Style Smokehouse BBQ, modeled on Christian HQ (backoffice/christian/).
+     SALES DEMO ONLY. Harry's is a prospect, not a client: there is NO backend and NO real data on this page. Every guest, order,
+     claim and number below is generated in the browser from made-up samples ("Test Guest 01", 555 numbers, example.com).
+     Edits stay in this tab's memory and vanish on reload. The live version (after Harry's signs) uses per-person logins against
+     the server like Christian HQ; customer data never lives in this repo. -->
+<style>
+:root{--bg:#120a06;--card:#1e120b;--card2:#170d08;--edge:#4a2e1c;--ink:#f3e6c8;--dim:#c9b694;--muted:#a8916c;--gold:#d1902a;--red:#c8232c;--ok:#2fbf71;--bad:#ff6b6b;--warn:#ffb347}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:15.5px/1.45 -apple-system,system-ui,Segoe UI,Roboto,sans-serif;overflow-x:hidden}
+main{max-width:980px;margin:0 auto;padding:14px 16px 80px}
+a{color:#ffd27a}button,input,select{font:inherit}
+.top{display:flex;align-items:center;gap:10px}.top img{width:46px;height:46px;border-radius:10px}.top h1{font-size:21px;margin:0}.top small{color:var(--dim);display:block;font-size:12.5px}.top .sp{flex:1}
+.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;background:var(--gold);color:#1e140c}.btn.alt{background:#ffffff12;color:var(--ink);border:1px solid var(--edge)}.btn.red{background:var(--red);color:#fff}.btn.sm{padding:6px 10px;font-size:13px;border-radius:10px}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:14px;margin:12px 0}
+.login{max-width:440px;margin:30px auto;text-align:center}.login img{width:120px;border-radius:18px}
+.test{background:#ffb34722;border:1px solid #ffb34766;color:#ffe0b0;border-radius:12px;padding:8px 12px;font-size:13.5px;margin:10px 0}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:8px 0;position:sticky;top:0;background:var(--bg);z-index:5;padding:6px 0}.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;border:1px solid var(--edge);background:#ffffff0a;color:var(--ink);border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:14px}
+.tabs button[aria-selected=true]{background:var(--gold);color:#1e140c;border-color:var(--gold)}
+.todo h2{margin:0 0 6px;font-size:17px;display:flex;align-items:center;gap:8px}.todo h2 .n{background:var(--red);color:#fff;border-radius:999px;font-size:12px;padding:1px 8px}
+.todo{border-color:var(--red);background:linear-gradient(180deg,#2a120d,var(--card))}
+.ti{display:flex;align-items:center;gap:10px;padding:9px 6px;border-top:1px solid #ffffff10;cursor:pointer;border-radius:8px}.ti:hover{background:#ffffff08}
+.ti .ic{font-size:20px;width:26px;text-align:center}.ti .tx{flex:1;min-width:0}.ti .tx b{display:block;font-size:14.5px}.ti .tx small{color:var(--dim)}
+.ti .pr{font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px;background:#ffffff14}.ti .pr.hi{background:var(--red);color:#fff}
+.add{display:flex;gap:6px;margin-top:8px}.add input{flex:1;min-width:0;padding:9px 10px;border-radius:10px;border:1px solid var(--edge);background:#0d0704;color:var(--ink)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kpi{background:var(--card2);border:1px solid var(--edge);border-radius:14px;padding:12px}.kpi b{display:block;font-size:26px;color:#ffd27a}.kpi small{color:var(--dim)}
+.bars{display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:10px}.bars div{flex:1;background:linear-gradient(var(--gold),var(--red));border-radius:6px 6px 2px 2px;position:relative}.bars span{position:absolute;bottom:-18px;left:0;right:0;text-align:center;font-size:11px;color:var(--dim)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid #ffffff12;vertical-align:top}th{color:var(--dim);font-size:12.5px;font-weight:700}
+.tag{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px;background:#ffffff14}.tag.ok{background:#2fbf7133;color:#8ff0b9}.tag.warn{background:#ffb34733;color:#ffd79a}.tag.bad{background:#ff6b6b33;color:#ffb3b3}.tag.kid{background:#ffd23f;color:#1e140c}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.sp{flex:1}
+input.pr{width:86px;padding:6px 8px;border-radius:8px;border:1px solid var(--edge);background:#0d0704;color:var(--ink)}input.pr.ch{border-color:var(--gold);box-shadow:0 0 0 2px #d1902a55}
+input.srch{width:100%;padding:10px;border-radius:10px;border:1px solid var(--edge);background:#0d0704;color:var(--ink);margin-bottom:8px}
+.sw{position:relative;width:46px;height:26px;border-radius:999px;background:#ffffff22;border:0;cursor:pointer;flex:none}.sw:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}.sw[aria-pressed=true]{background:var(--ok)}.sw[aria-pressed=true]:after{left:23px}
+.order{display:grid;gap:4px;background:var(--card2);border:1px solid var(--edge);border-radius:12px;padding:10px 12px;margin:8px 0}
+.flash{animation:fl 1.2s}@keyframes fl{0%,40%{box-shadow:0 0 0 3px var(--gold)}100%{box-shadow:none}}
+h3{margin:4px 0 8px;font-size:17px}.dim{color:var(--dim)}.small{font-size:13px}
+@media(max-width:520px){.top h1{font-size:18px}}
+</style></head>
+<body><main>
+<div class="top"><img src="../../demo/harrys-bbq/img/icon-192.png" alt=""><div><h1>Harry's HQ</h1><small>Owner back office · Harry's Oklahoma Style Smokehouse BBQ</small></div><span class="sp"></span><button class="btn alt sm" id="out" hidden>Lock</button></div>
+
+<section class="card login" id="login">
+  <img src="../../demo/harrys-bbq/img/icon-512.png" alt="Harry's Smokehouse BBQ">
+  <h2 style="margin:10px 0 4px">Owner &amp; manager back office</h2>
+  <p class="dim">Your guests, rewards, orders, prices and deals in one place. Only Jon, Margot and the people you approve can get in.</p>
+  <div class="test">🧪 <b>Sample demo.</b> Every guest, order and number here is made up so you can see how it works. Nothing is live, nothing is saved, nothing is sent.</div>
+  <button class="btn" id="enter" style="width:100%;margin-top:6px">Open the demo</button>
+  <p class="small dim" style="margin-top:12px">Live version: each person signs in with their own email and password, plus a one-time code. Wrong tries lock the login for a while.</p>
+</section>
+
+<section id="app" hidden>
+  <div class="test">🧪 Sample demo: made-up guests (Test Guest 01…, 555 numbers, example.com emails). Changes stay on this screen and reset when you reload.</div>
+  <section class="card todo" id="todo" aria-label="To-do list"></section>
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+  <div id="view"></div>
+</section>
+</main>
+<script src="../../demo/harrys-bbq/menu-data.js?v=1"></script>
+<script>
+(function(){
+"use strict";
+var $=function(i){return document.getElementById(i);};
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+// ---------- sample data (seeded, so every demo looks the same) ----------
+var seed=6629; function R(){ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; }
+function pick(a){ return a[(R()*a.length)|0]; }
+var MENU=window.HARRYS_MENU, ITEMS=[]; MENU.forEach(function(c){ c.items.forEach(function(it){ ITEMS.push({cat:c.name,name:it[0],price:it[1],orig:it[1]}); }); });
+var DAY=864e5, NOW=Date.now();
+var members=[]; for(var i=1;i<=28;i++){ var n=(i<10?"0":"")+i, visits=1+((R()*9)|0);
+  members.push({id:i,name:"Test Guest "+n,phone:"(555) 010-"+(1000+i),email:"guest"+n+"@example.com",joined:NOW-((R()*40)|0)*DAY,pts:((R()*3200)|0),visits:visits,last:NOW-((R()*12)|0)*DAY,plays:((R()*14)|0),best:((R()*11000)|0),parent:i%7===0,sms:R()<0.6}); }
+var claims=[{id:1,who:"Test Guest 04",what:"Free Cornbread w/ Honey Butter",code:"R66-4KX2",how:"Route 66 score 5,240",when:NOW-35*60e3,st:"pending"},
+ {id:2,who:"Test Guest 14 (parent)",what:"🧒 Free Margot Dean's Homemade Cookie",code:"KID-7Q2M",how:"Kid mode score 8,310",when:NOW-80*60e3,st:"pending",kid:true},
+ {id:3,who:"Test Guest 11",what:"Free side of Mac & Cheese",code:"R66-9PL3",how:"Route 66 score 7,920",when:NOW-3*3600e3,st:"pending"},
+ {id:4,who:"Test Guest 02",what:"Free Aunt Cheryl's Peach Cobbler",code:"PTS-2800",how:"2,800 points",when:NOW-DAY,st:"used"},
+ {id:5,who:"Test Guest 19",what:"$2 off any sandwich",code:"SPN-55TT",how:"Daily spin",when:NOW-2*DAY,st:"used"}];
+var deals=[{id:"join",t:"Welcome points",v:"100 points when a guest joins",on:true,ok:true},{id:"bday",t:"Birthday",v:"200 points on their birthday",on:true,ok:true},
+ {id:"ref",t:"Bring a friend",v:"150 points to you, Free Cornbread for your friend",on:true,ok:false},{id:"slow",t:"Slow-day boost (Mon–Wed)",v:"Double points before 4 PM",on:false,ok:false},
+ {id:"holiday",t:"Holiday pre-orders",v:"First dibs on turkey & ham pre-orders by text",on:true,ok:false},{id:"waffle",t:"Dine-in waffle fries",v:"Free waffle fries when you dine in (already your house rule)",on:true,ok:true}];
+var specials=[{t:"Game Day MVP Combo",d:"½ lb brisket or pulled pork + 2 Oklahoma hot links",when:"Sundays during football",on:true},{t:"Tailgate Feast weekend",d:"Harry's Tailgate Feast for 3–4",when:"Fri–Sun",on:true},{t:"Thanksgiving pre-orders",d:"Holiday turkey & ham, order by text",when:"Nov 15 – Nov 25",on:false}];
+var oseq=60, orders=[]; function fakeOrder(min){ oseq++; var lines=[],n=1+((R()*3)|0),tot=0; for(var k=0;k<n;k++){ var it=pick(ITEMS.filter(function(x){return x.price<60;})), q=1+((R()*2)|0); lines.push(q+"× "+it.name); tot+=q*it.price; }
+  return {id:oseq,who:"Test G. "+oseq,phone:"(555) 010-"+(2000+oseq),lines:lines,total:tot,at:NOW-(min||0)*60e3,st:"new",pick:pick(["5:30 PM","6:00 PM","6:15 PM","ASAP"])}; }
+for(var o=0;o<4;o++){ var x=fakeOrder(10+o*25); x.st=["new","cooking","ready","done"][o]; orders.push(x); }
+var team=[{n:"Jon Harry Bayouth",r:"Owner",e:"(owner email)",st:"ok",all:true},{n:"Margot Dean",r:"Owner",e:"(owner email)",st:"ok",all:true},
+ {n:"Sample Manager",r:"Manager",e:"manager@example.com",st:"ok",perm:{deals:true,prices:true,members:false,orders:true}},{n:"Sample Cook",r:"Kitchen",e:"kitchen@example.com",st:"pending",perm:{deals:false,prices:false,members:false,orders:true}}];
+var staff=[{n:"Sample Server A",lang:"EN",done:true},{n:"Sample Server B",lang:"ES",done:true},{n:"Sample Cashier",lang:"EN",done:false},{n:"Sample Host",lang:"ES",done:false}];
+var manual=[], doneTodo={}, showAll=false;
+var board=[["T.G. 07",10920],["T.G. 22",10610],["T.G. 03",10200],["T.G. 18",9875],["T.G. 11",7920]];
+
+// ---------- tabs ----------
+var TABS=[["overview","📊 Overview"],["orders","🛒 Orders"],["members","👥 Members"],["rewards","🎟️ Rewards & claims"],["games","🎮 Games"],["discounts","🏷️ Discounts"],["menu","💲 Prices & specials"],["staff","🧑‍🍳 Staff"],["team","🔐 Team access"],["help","❓ Help"]];
+var cur="overview";
+$("tabs").innerHTML=TABS.map(function(t){ return '<button type="button" role="tab" data-t="'+t[0]+'">'+t[1]+'</button>'; }).join("");
+$("tabs").addEventListener("click",function(e){ var b=e.target.closest("button"); if(b) go(b.dataset.t); });
+function go(t,flash){ cur=t; [].forEach.call($("tabs").children,function(b){ b.setAttribute("aria-selected",b.dataset.t===t); }); render(); if(flash){ var el=document.querySelector(flash); if(el){ el.scrollIntoView({block:"center",behavior:"smooth"}); el.classList.add("flash"); } } }
+function fmt(t){ var d=new Date(t); return d.toLocaleDateString([], {month:"short",day:"numeric"}); }
+function ago(t){ var m=Math.round((NOW-t)/60e3); return m<60?m+" min ago":m<1440?Math.round(m/60)+" h ago":Math.round(m/1440)+" d ago"; }
+
+// ---------- to-do (pinned on top, generated from the data + manual items) ----------
+function todos(){
+  var L=[];
+  claims.filter(function(c){return c.st==="pending";}).forEach(function(c){ L.push({k:"c"+c.id,ic:c.kid?"🧒":"🎟️",t:"Check a prize claim: "+c.what,s:c.who+" · code "+c.code+" · "+ago(c.when),pr:2,go:["rewards","#cl"+c.id]}); });
+  orders.filter(function(o){return o.st==="new";}).forEach(function(o){ L.push({k:"o"+o.id,ic:"🛒",t:"New pickup order #"+o.id,s:o.lines.join(", ")+" · pickup "+o.pick,pr:3,go:["orders","#or"+o.id]}); });
+  deals.filter(function(d){return !d.ok;}).forEach(function(d){ L.push({k:"d"+d.id,ic:"🏷️",t:"Approve or change: "+d.t,s:d.v,pr:1,go:["discounts","#dl"+d.id]}); });
+  team.filter(function(m){return m.st==="pending";}).forEach(function(m){ L.push({k:"m"+m.n,ic:"🔐",t:"Team sign-up waiting: "+m.n,s:m.r+" · "+m.e,pr:1,go:["team","#tm0"]}); });
+  if(!doneTodo.prices) L.push({k:"prices",ic:"💲",t:"Check every menu price before launch",s:"Prices came from homeofharrysbbq.com",pr:1,go:["menu","#mn"]});
+  L.push({k:"flag1",ic:"🛡️",t:"Heads-up: one phone made 3 accounts",s:"Sample flag: duplicate accounts can't win prizes",pr:2,go:["members","#mb"]});
+  manual.forEach(function(m){ L.push({k:"u"+m.id,ic:"📝",t:m.t,s:"Added by you · "+ago(m.at),pr:m.hi?3:1,go:null}); });
+  return L.filter(function(x){return !doneTodo[x.k];}).sort(function(a,b){ return b.pr-a.pr; });
+}
+function renderTodo(){
+  var L=todos(), h='<h2>✅ To-do <span class="n">'+L.length+'</span><span class="sp" style="flex:1"></span><button type="button" class="btn alt sm" id="say">🔊 Read it to me</button></h2>';
+  var SH=showAll?L.length:4;
+  h+=L.length?L.slice(0,SH).map(function(x,i){ return '<div class="ti" role="button" tabindex="0" data-i="'+i+'"><span class="ic">'+x.ic+'</span><span class="tx"><b>'+esc(x.t)+'</b><small>'+esc(x.s)+'</small></span><span class="pr'+(x.pr>=2?' hi':'')+'">'+(x.pr>=3?"NOW":x.pr===2?"TODAY":"SOON")+'</span><button type="button" class="btn alt sm" data-done="'+i+'">Done</button></div>'; }).join(""):'<p class="dim">All clear. Nice.</p>';
+  if(L.length>4) h+='<button type="button" class="btn alt sm" id="more" style="margin-top:6px">'+(showAll?"Show less":"Show all "+L.length)+'</button>';
+  h+='<form class="add" id="addf"><input id="addt" maxlength="120" placeholder="Add a to-do (e.g. order more hickory)" aria-label="New to-do"><button class="btn sm">Add</button></form>';
+  $("todo").innerHTML=h;
+  [].forEach.call($("todo").querySelectorAll(".ti"),function(el){ el.addEventListener("click",function(e){ var x=L[+el.dataset.i]; if(e.target.dataset.done!==undefined){ doneTodo[x.k]=1; if(x.k==="prices") doneTodo.prices=1; renderTodo(); return; } if(x.go) go(x.go[0],x.go[1]); }); });
+  if($("more")) $("more").onclick=function(){ showAll=!showAll; renderTodo(); };
+  $("addf").onsubmit=function(e){ e.preventDefault(); var t=$("addt").value.trim(); if(!t) return; manual.push({id:Date.now(),t:t,at:Date.now()}); renderTodo(); };
+  $("say").onclick=function(e){ e.stopPropagation(); try{ speechSynthesis.cancel(); var u=new SpeechSynthesisUtterance("You have "+L.length+" things to do. "+L.slice(0,5).map(function(x,i){return (i+1)+". "+x.t;}).join(". ")); speechSynthesis.speak(u); }catch(x){} };
+}
+
+// ---------- views ----------
+function render(){
+  var v=$("view"), h="";
+  if(cur==="overview"){
+    var plays=[42,55,38,61,80,97,88], days=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], mx=Math.max.apply(0,plays);
+    h='<div class="card"><h3>This week at a glance <span class="tag warn">SAMPLE</span></h3><div class="kpis">'+
+      kpi(members.length,"Rewards members")+kpi(members.filter(function(m){return m.visits>1;}).length,"Came back 2+ times")+kpi(plays.reduce(function(a,b){return a+b;},0),"Route 66 runs")+kpi(claims.filter(function(c){return c.st==="used";}).length+" / "+claims.length,"Prizes used / won")+kpi(members.filter(function(m){return m.sms;}).length,"Said yes to deal texts")+kpi(members.filter(function(m){return m.parent;}).length,"Parent accounts (Kid mode)")+
+      '</div><div class="bars" aria-label="Route 66 runs per day">'+plays.map(function(p,i){ return '<div style="height:'+Math.round(p/mx*100)+'%"><span>'+days[i]+'</span></div>'; }).join("")+'</div><p class="small dim" style="margin-top:26px">Game runs per day. Weekends are busiest, which is where a slow-day boost (Mon–Wed) helps.</p></div>'+
+      '<div class="card"><h3>Where guests found the app</h3><div class="kpis">'+kpi("48%","Table QR cards")+kpi("21%","Window poster")+kpi("17%","Instagram bio link")+kpi("14%","To-go bag sticker")+'</div></div>';
+  }
+  if(cur==="orders"){
+    h='<div class="card"><div class="row"><h3 style="margin:0">Pickup orders today <span class="tag warn">SAMPLE</span></h3><span class="sp"></span><button class="btn sm" id="fake">🧪 Fake a new order</button></div><p class="small dim">Only if Harry\'s turns on in-app ordering. Guests pay at pickup or online; prices always come from your menu, never from the guest\'s phone.</p>'+
+      orders.slice().reverse().map(function(o){ var nx={new:"Start cooking",cooking:"Mark ready",ready:"Picked up"}[o.st];
+        return '<div class="order" id="or'+o.id+'"><div class="row"><b>#'+o.id+' · '+esc(o.who)+'</b><span class="tag '+(o.st==="new"?"bad":o.st==="done"?"ok":"warn")+'">'+o.st.toUpperCase()+'</span><span class="sp"></span><span>$'+o.total.toFixed(2)+'</span></div><div class="small">'+esc(o.lines.join(" · "))+'</div><div class="row small dim">Pickup '+o.pick+' · '+esc(o.phone)+' · '+ago(o.at)+'<span class="sp"></span>'+(nx?'<button class="btn sm" data-o="'+o.id+'">'+nx+'</button>':'')+'</div></div>'; }).join("")+'</div>';
+  }
+  if(cur==="members"){
+    h='<div class="card" id="mb"><h3>Rewards members <span class="tag warn">SAMPLE</span></h3><input class="srch" id="q" placeholder="Search name, phone or email" aria-label="Search members"><div class="tw"><table><thead><tr><th>Guest</th><th>Contact</th><th>Points</th><th>Visits</th><th>Last visit</th><th>Route 66 best</th></tr></thead><tbody id="mt"></tbody></table></div>'+
+      '<div class="row" style="margin-top:10px"><button class="btn alt sm" id="csv">⬇️ Export CSV</button><span class="small dim">Your list belongs to you. Export it any time.</span></div>'+
+      '<p class="small dim">🛡️ Sample flag: phone (555) 010-1009 made 3 accounts this week. Duplicate accounts can\'t win prizes; you can merge or block them.</p></div>';
+  }
+  if(cur==="rewards"){
+    h='<div class="card"><h3>Prize claims</h3><p class="small dim">When a guest shows a prize code, check it here and tap Used. Kid prizes count only with the young player at the table.</p>'+
+      claims.map(function(c){ return '<div class="order" id="cl'+c.id+'"><div class="row"><b>'+esc(c.what)+'</b><span class="sp"></span><span class="tag '+(c.st==="pending"?"warn":c.st==="used"?"ok":"bad")+'">'+c.st.toUpperCase()+'</span></div><div class="small">'+esc(c.who)+' · code <b>'+c.code+'</b> · '+esc(c.how)+' · '+ago(c.when)+'</div>'+(c.st==="pending"?'<div class="row"><button class="btn sm" data-c="'+c.id+'" data-s="used">✅ Used</button><button class="btn alt sm" data-c="'+c.id+'" data-s="rejected">Not valid</button></div>':'')+'</div>'; }).join("")+
+      '</div><div class="card"><h3>Rewards ladder (points)</h3>'+[[500,"Free Margot Dean's Homemade Cookie"],[1000,"Free Cornbread w/ Honey Butter"],[1800,"Free side"],[2800,"Free Aunt Cheryl's Peach Cobbler"],[4000,"Free Brisket Sandwich"]].map(function(t){ return '<div class="row small" style="padding:4px 0"><b style="min-width:60px">'+t[0].toLocaleString()+'</b>'+esc(t[1])+'</div>'; }).join("")+'<p class="small dim">10 points per $1. Rewards last 3 days, one per visit, no stacking. Change any of it in Discounts.</p></div>';
+  }
+  if(cur==="games"){
+    h='<div class="card"><h3>Route 66: Tulsa to Lomita · this week <span class="tag warn">SAMPLE</span></h3><div class="kpis">'+kpi("461","Runs")+kpi("7,350","Average score")+kpi("38%","Made it to Lomita")+kpi("12","Prizes won")+'</div>'+
+      '<h3 style="margin-top:14px">Weekly board (Adult)</h3>'+board.map(function(b,i){ return '<div class="row small" style="padding:4px 0"><b style="width:26px">#'+(i+1)+'</b>'+b[0]+'<span class="sp"></span><b>'+b[1].toLocaleString()+'</b></div>'; }).join("")+
+      '<p class="small dim">#1 by Sunday close wins the champion prize. The board resets every Monday. Initials only, never full names.</p></div>'+
+      '<div class="card"><h3>Game prizes</h3><div class="small">Adult: 5,000 Cornbread · 7,500 Mac &amp; Cheese · 9,500 Peach Cobbler · 10,800 Brisket Sandwich<br>🧒 Kid (parent account): 8,000 Cookie · 10,900 Cornbread</div><p class="small dim">Set by a test bot that plays like a person: the top prize sits just above what an average good run scores.</p></div>';
+  }
+  if(cur==="discounts"){
+    h='<div class="card"><h3>Deals &amp; discounts</h3><p class="small dim">Nothing goes to guests until you approve it. California: no free alcohol as a reward.</p>'+
+      deals.map(function(d){ return '<div class="order" id="dl'+d.id+'"><div class="row"><b>'+esc(d.t)+'</b><span class="sp"></span><span class="tag '+(d.ok?"ok":"warn")+'">'+(d.ok?"APPROVED":"NEEDS YOUR OK")+'</span><button class="sw" aria-label="'+esc(d.t)+' on/off" aria-pressed="'+d.on+'" data-sw="'+d.id+'"></button></div><input class="srch" style="margin:4px 0 0" data-dv="'+d.id+'" value="'+esc(d.v)+'" aria-label="'+esc(d.t)+' offer">'+(d.ok?'':'<div class="row" style="margin-top:6px"><button class="btn sm" data-ok="'+d.id+'">Approve</button></div>')+'</div>'; }).join("")+'</div>';
+  }
+  if(cur==="menu"){
+    h='<div class="card" id="mn"><div class="row"><h3 style="margin:0">Menu prices in the app</h3><span class="sp"></span><span class="small dim" id="chg"></span></div><p class="small dim">These are your real prices from homeofharrysbbq.com. Change one and it shows in the app (your register keeps its own prices).</p><div class="tw"><table><thead><tr><th>Item</th><th>Section</th><th>Price</th></tr></thead><tbody>'+
+      ITEMS.map(function(it,i){ return '<tr><td>'+esc(it.name)+'</td><td class="dim">'+esc(it.cat)+'</td><td>$<input class="pr'+(it.price!==it.orig?' ch':'')+'" inputmode="decimal" data-p="'+i+'" value="'+it.price.toFixed(2)+'" aria-label="'+esc(it.name)+' price"></td></tr>'; }).join("")+'</tbody></table></div></div>'+
+      '<div class="card"><h3>Specials</h3>'+specials.map(function(s,i){ return '<div class="row order"><div><b>'+esc(s.t)+'</b><div class="small">'+esc(s.d)+'</div><div class="small dim">'+esc(s.when)+'</div></div><span class="sp"></span><button class="sw" aria-label="'+esc(s.t)+' on/off" aria-pressed="'+s.on+'" data-spc="'+i+'"></button></div>'; }).join("")+'</div>';
+  }
+  if(cur==="staff"){
+    h='<div class="card"><h3>Staff training</h3><p class="small dim">Your team gets the Staff Guide (English + Spanish). It teaches the rewards step by step and never shows numbers or guest contact info.</p>'+
+      staff.map(function(s){ return '<div class="row order"><b>'+esc(s.n)+'</b><span class="tag">'+s.lang+'</span><span class="sp"></span><span class="tag '+(s.done?"ok":"warn")+'">'+(s.done?"WALKTHROUGH DONE":"NOT YET")+'</span></div>'; }).join("")+
+      '<p><a class="btn alt sm" href="../../staff/harrys/" style="text-decoration:none">Open the Staff Guide</a></p></div>';
+  }
+  if(cur==="team"){
+    h='<div class="card"><h3>Who can get in</h3><p class="small dim">Owners see everything. Managers see only what you switch on. Every change is logged.</p>'+
+      team.map(function(m,i){ var p=m.perm; return '<div class="order" id="tm'+i+'"><div class="row"><b>'+esc(m.n)+'</b><span class="tag">'+m.r+'</span><span class="sp"></span><span class="tag '+(m.st==="ok"?"ok":"warn")+'">'+(m.st==="ok"?"ACTIVE":"WAITING FOR YOU")+'</span></div><div class="small dim">'+esc(m.e)+'</div>'+
+        (m.all?'<div class="small">Full access</div>':'<div class="row small">'+["deals","prices","members","orders"].map(function(k){ return '<label class="row" style="gap:4px"><button class="sw" aria-pressed="'+!!p[k]+'" data-pm="'+i+':'+k+'" aria-label="'+k+'"></button>'+k+'</label>'; }).join("")+'</div>')+
+        (m.st==="pending"?'<div class="row" style="margin-top:6px"><button class="btn sm" data-ap="'+i+'">Approve</button><button class="btn alt sm" data-rm="'+i+'">Decline</button></div>':'')+'</div>'; }).join("")+'</div>';
+  }
+  if(cur==="help"){
+    h='<div class="card"><h3>How Harry\'s HQ works</h3><ul class="small"><li><b>To-do on top:</b> the most urgent thing is first. Tap it to jump there, tap Done when it\'s handled.</li><li><b>Prize codes:</b> a guest shows a code on their phone, you find it in Rewards &amp; claims and tap Used. One reward per visit, good for 3 days.</li><li><b>Prices &amp; specials:</b> change what the app shows. Your register keeps its own prices.</li><li><b>Discounts:</b> nothing reaches guests until you approve it.</li><li><b>Team access:</b> add a manager, pick what they can see.</li><li><b>Kid mode:</b> kids only play through a parent\'s account; kid prizes go to the parent.</li></ul>'+
+      '<p class="small">Questions: SousShift AI · <a href="https://instagram.com/sousshiftai" target="_blank" rel="noopener">@SousShiftAi</a> · <a href="mailto:secondshiftai@gmail.com">secondshiftai@gmail.com</a></p></div>';
+  }
+  v.innerHTML=h; wire();
+}
+function kpi(n,l){ return '<div class="kpi"><b>'+n+'</b><small>'+l+'</small></div>'; }
+function memberRows(q){ q=(q||"").toLowerCase(); return members.filter(function(m){ return !q||(m.name+m.phone+m.email).toLowerCase().indexOf(q)>=0; }).map(function(m){
+  return '<tr><td><b>'+esc(m.name)+'</b>'+(m.parent?' <span class="tag kid">🧒 PARENT</span>':'')+'<div class="small dim">joined '+fmt(m.joined)+'</div></td><td class="small">'+esc(m.phone)+'<br>'+esc(m.email)+(m.sms?'<br><span class="tag ok">TEXTS OK</span>':'')+'</td><td>'+m.pts.toLocaleString()+'</td><td>'+m.visits+'</td><td>'+fmt(m.last)+'</td><td>'+(m.best?m.best.toLocaleString():"—")+'</td></tr>'; }).join(""); }
+function wire(){
+  var v=$("view");
+  if($("mt")){ $("mt").innerHTML=memberRows(""); $("q").oninput=function(){ $("mt").innerHTML=memberRows(this.value); };
+    $("csv").onclick=function(){ var rows=[["name","phone","email","points","visits"]].concat(members.map(function(m){return [m.name,m.phone,m.email,m.pts,m.visits];})); var b=new Blob([rows.map(function(r){return r.join(",");}).join("\n")],{type:"text/csv"}); var a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="harrys-members-SAMPLE.csv"; a.click(); }; }
+  if($("fake")) $("fake").onclick=function(){ orders.push(fakeOrder(0)); try{ navigator.vibrate&&navigator.vibrate(80); }catch(e){} render(); renderTodo(); };
+  [].forEach.call(v.querySelectorAll("[data-o]"),function(b){ b.onclick=function(){ var o=orders.filter(function(x){return x.id===+b.dataset.o;})[0]; o.st={new:"cooking",cooking:"ready",ready:"done"}[o.st]; render(); renderTodo(); }; });
+  [].forEach.call(v.querySelectorAll("[data-c]"),function(b){ b.onclick=function(){ claims.filter(function(x){return x.id===+b.dataset.c;})[0].st=b.dataset.s; render(); renderTodo(); }; });
+  [].forEach.call(v.querySelectorAll("[data-ok]"),function(b){ b.onclick=function(){ deals.filter(function(x){return x.id===b.dataset.ok;})[0].ok=true; render(); renderTodo(); }; });
+  [].forEach.call(v.querySelectorAll("[data-sw]"),function(b){ b.onclick=function(){ var d=deals.filter(function(x){return x.id===b.dataset.sw;})[0]; d.on=!d.on; b.setAttribute("aria-pressed",d.on); }; });
+  [].forEach.call(v.querySelectorAll("[data-dv]"),function(i){ i.onchange=function(){ var d=deals.filter(function(x){return x.id===i.dataset.dv;})[0]; d.v=i.value.slice(0,140); d.ok=false; render(); renderTodo(); }; });
+  [].forEach.call(v.querySelectorAll("[data-spc]"),function(b){ b.onclick=function(){ var s=specials[+b.dataset.spc]; s.on=!s.on; b.setAttribute("aria-pressed",s.on); }; });
+  [].forEach.call(v.querySelectorAll("[data-p]"),function(i){ i.onchange=function(){ var it=ITEMS[+i.dataset.p], n=parseFloat(i.value); if(!(n>0&&n<1000)){ i.value=it.price.toFixed(2); return; } it.price=Math.round(n*100)/100; i.value=it.price.toFixed(2); i.classList.toggle("ch",it.price!==it.orig); var c=ITEMS.filter(function(x){return x.price!==x.orig;}).length; $("chg").textContent=c?c+" changed (demo: not saved)":""; }; });
+  [].forEach.call(v.querySelectorAll("[data-pm]"),function(b){ b.onclick=function(){ var p=b.dataset.pm.split(":"), m=team[+p[0]]; m.perm[p[1]]=!m.perm[p[1]]; b.setAttribute("aria-pressed",m.perm[p[1]]); }; });
+  [].forEach.call(v.querySelectorAll("[data-ap]"),function(b){ b.onclick=function(){ team[+b.dataset.ap].st="ok"; render(); renderTodo(); }; });
+  [].forEach.call(v.querySelectorAll("[data-rm]"),function(b){ b.onclick=function(){ team.splice(+b.dataset.rm,1); render(); renderTodo(); }; });
+}
+$("enter").onclick=function(){ $("login").hidden=true; $("app").hidden=false; $("out").hidden=false; renderTodo(); go("overview"); };
+$("out").onclick=function(){ location.reload(); };
+if(/[?&]test=1(&|$)/.test(location.search)) $("enter").click();
+})();
+</script>
+<script src="../../demo/poweredby.js?v=20261013a" defer></script>
+</body></html>

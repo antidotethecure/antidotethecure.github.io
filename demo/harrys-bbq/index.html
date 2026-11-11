@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="../../js/frame-guard.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="img/icon-180.png">
+<link rel="icon" href="img/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Harry's BBQ">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#120a06">
+<title>Harry's Smokehouse BBQ — Menu, Rewards &amp; Route 66</title>
+<script src="../lang-th.js"></script>
+<script src="../gamepad.js?v=20261110r66"></script>
+<meta name="description" content="Harry's Oklahoma Style Smokehouse BBQ in Lomita: the menu, Harry's Rewards and the Route 66: Tulsa to Lomita game. Sample demo by SousShift AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Bebas+Neue&family=Tilt+Neon&family=Archivo:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+/* Harry's: hickory dark, smokehouse red, mustard gold, cream (from their logo). */
+:root{
+  --sky:#120a06; --sky2:#1e120b; --panel:#1e120b; --card:#241510; --edge:#4a2e1c;
+  --red:#c8232c; --redd:#823e2d; --gold:#d1902a; --cream:#f3e6c8; --ink:#f3e6c8; --dim:#c9b694; --muted:#a8916c;
+  --display:"Rye",Georgia,serif; --num:"Bebas Neue","Arial Narrow",Impact,sans-serif; --body:"Archivo",system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;overflow-x:hidden}
+body{background:radial-gradient(900px 520px at 50% -8%,#3a1a0c 0,transparent 62%),var(--sky)}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:0 70px}
+a{color:#ffd27a}
+.nav{position:sticky;top:0;z-index:20;display:flex;gap:6px;overflow-x:auto;padding:8px 0;background:linear-gradient(var(--sky) 80%,transparent);scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:none;text-decoration:none;color:var(--cream);border:1px solid var(--edge);background:var(--panel);border-radius:999px;padding:7px 13px;font-weight:800;font-size:14px}
+/* hero: their logo with a live chimney fire */
+.hero{text-align:center;padding:4px 0 10px}
+.firelogo{position:relative;width:min(300px,74vw);margin:58px auto 0;aspect-ratio:1}
+.firelogo img{width:100%;height:100%;display:block;border-radius:22px;box-shadow:0 20px 60px #000a}
+.firelogo canvas{position:absolute;left:0;top:-48%;width:100%;height:148%;pointer-events:none}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(26px,7.4vw,42px);line-height:1.08;margin:16px 0 4px;color:#ffe3a0;text-shadow:0 0 18px #d1902a77}
+.hero p{margin:4px 0;color:var(--dim)}
+.btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:15px;border-radius:12px;padding:12px 16px;border:1px solid var(--edge);background:var(--panel);color:var(--cream);cursor:pointer;font-family:var(--body)}
+.btn.hot{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 8px 24px #c8232c55}
+.pill{display:inline-block;margin-top:12px;font-size:12px;color:var(--dim);border:1px dashed var(--edge);border-radius:999px;padding:6px 12px}
+h2{font-family:var(--display);font-weight:400;font-size:30px;line-height:1.1;margin:38px 0 6px;color:#ffe3a0}
+.sub{color:var(--dim);margin:0 0 12px}
+/* game */
+.gamebox{position:relative;max-width:460px;margin:0 auto;background:linear-gradient(180deg,#2a170d,#140b06);border:1px solid var(--edge);border-radius:18px;padding:10px;box-shadow:0 20px 60px #0009}
+#game{display:block;width:100%;height:auto;aspect-ratio:400/640;border-radius:12px;background:#120a06;touch-action:pan-y pinch-zoom;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#r66over{display:none;text-align:center;padding:14px 4px 6px}
+#r66over.on{display:block}
+#final{font-family:var(--num);font-size:56px;color:#ffd27a;line-height:1;letter-spacing:.03em}
+#rank{color:var(--dim);font-weight:700}
+#won{display:none;margin:10px auto 4px;max-width:320px;background:#2f855a22;border:2px dashed #5ad08a;border-radius:14px;padding:10px;color:#fff;font-weight:800;font-size:15px}
+.revmini{display:flex;gap:10px;align-items:center;max-width:340px;margin:12px auto 0;background:#0b1430;border:2px solid #1d4ed8;border-radius:12px;padding:8px 10px;text-align:left;color:#fff;text-decoration:none;font-size:13px}
+.revmini i{font-style:normal;display:grid;place-items:center;width:34px;height:34px;flex:none;border-radius:50%;background:#e11d2a}
+.revmini b{color:#ffd23f}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px;font-size:13.5px;color:var(--dim)}
+.how div{background:#170d08;border:1px solid var(--edge);border-radius:10px;padding:8px 10px}
+.how b{color:var(--cream)}
+.r66-card{position:absolute;inset:0;z-index:30;display:grid;place-items:center;background:#000a;border-radius:18px;padding:16px}
+.r66-cin{max-width:300px;background:#0b1430;border:3px solid #1d4ed8;border-radius:16px;padding:18px;text-align:center;color:#fff}
+.r66-cp{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 8px;border-radius:50%;background:#e11d2a;font-size:28px}
+.r66-cin b{display:block;color:#ffd23f;font-size:20px;font-weight:900}
+.r66-cin p{color:#dbe4ff;font-size:14px}
+.r66-cb{display:block;background:#e11d2a;color:#fff;border-radius:999px;padding:11px;font-weight:900;text-decoration:none;margin-top:10px}
+.r66-cx{margin-top:8px;background:transparent;border:1px solid #ffffff55;color:#fff;border-radius:999px;padding:9px 14px;font:700 14px var(--body);cursor:pointer}
+/* prizes */
+.tiers{display:grid;gap:10px}
+.tier{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:12px 14px}
+.tier .pts{font-family:var(--num);font-size:26px;color:#ffd27a;min-width:92px;letter-spacing:.03em}
+.tier b{display:block}.tier small{color:var(--dim)}
+.tier.top{border-color:var(--red);background:linear-gradient(90deg,#3a120f,var(--panel))}
+.tier.kid{border-style:dashed}
+/* story */
+.story{display:grid;grid-template-columns:1fr;gap:12px;background:var(--panel);border:1px solid var(--edge);border-radius:16px;padding:14px}
+.route{display:flex;justify-content:space-between;gap:4px;font:800 11px var(--body);color:var(--dim);position:relative;padding-top:16px}
+.route:before{content:"";position:absolute;left:4%;right:4%;top:6px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--red),var(--gold))}
+.route span{position:relative;text-align:center;flex:1}
+.route span:before{content:"";position:absolute;left:50%;top:-14px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold)}
+/* neon menu */
+.nm{border:1px solid #ffffff14;border-radius:22px;padding:16px 12px;background:linear-gradient(#0d0705cc,#0d0705ee),repeating-linear-gradient(0deg,#2b1810 0 22px,#1a0e09 22px 24px)}
+.nm-t{font-family:"Tilt Neon",var(--body);font-size:clamp(30px,8vw,48px);text-align:center;margin:2px 0;color:#fff3d6;text-shadow:0 0 3px #fff,0 0 8px #ffb84a,0 0 18px #d1902a,0 0 38px #d1902a}
+.nm-s{text-align:center;color:var(--dim);font-size:14px;margin:0 0 12px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:0 0 auto;font:600 15px "Tilt Neon",var(--body);background:transparent;color:var(--dim);border:2px solid #5a3a22;border-radius:999px;padding:8px 15px;cursor:pointer}
+.tabs button[aria-selected=true]{color:#fff3d6;border-color:var(--gold);box-shadow:0 0 10px var(--gold),inset 0 0 10px #d1902a88;text-shadow:0 0 8px #ffb84a}
+.note{color:var(--dim);font-size:13.5px;margin:0 2px 10px}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.item{position:relative;background:#1a0f0a;border:1px solid #ffffff12;border-radius:16px;overflow:hidden;min-width:0}
+.item .ph{position:relative;aspect-ratio:4/5;overflow:hidden;background:#140b06}
+.item .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.item .ph:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 55%,#0b0604e6)}
+.item .ph .soon{display:none}
+.item.nophoto .ph img{display:none}
+.item.nophoto .ph{display:grid;place-items:center;background:radial-gradient(circle at 50% 38%,#4a1c10 0,#1e0f08 70%)}
+.item.nophoto .ph .soon{display:grid;justify-items:center;gap:6px;text-align:center;padding:10px;z-index:1}
+.soon .fl{width:44px;height:44px;opacity:.9}
+.soon .nmx{font-family:var(--display);font-size:15px;line-height:1.15;color:#ffe3a0}
+.soon small{font-size:10.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.item .tx{padding:10px 12px 12px}
+.item .row{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.item b{font-size:14.5px;line-height:1.25}
+.item .pr{font-family:var(--num);font-size:22px;color:#ffd27a;letter-spacing:.03em;white-space:nowrap}
+.item p{margin:4px 0 0;font-size:13px;color:var(--dim)}
+.fine{color:var(--muted);font-size:12.5px;margin:10px 2px 0}
+.visit{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.box{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:12px 14px;font-size:14.5px}
+.box b{font-size:16px}
+footer{margin-top:36px;color:var(--muted);font-size:12.5px;text-align:center;line-height:1.6}
+/* crm.js (shared rewards engine) ships navy; re-skin it in Harry's hickory/red/mustard */
+html .crm-card{background:#241510!important;border-color:#4a2e1c!important;color:#f3e6c8!important}
+html .crm-card input,html .crm-card select,html .crm-box,html .crm-win,html .crm-stats div,html .crm-seg button{background:#140b06!important;border-color:#4a2e1c!important;color:#f3e6c8!important}
+html .crm-card .go,html .crm-tier button,html .t-you{background:#c8232c!important;box-shadow:none!important}
+html .crm-card .crm-optin input{accent-color:#c8232c!important}
+html .crm-gift,html .crm-egoal{background:linear-gradient(135deg,#c8232c,#d1902a)!important;color:#fff8e8!important}
+html .crm-tier,html .crm-row,html .crm-er,html .crm-wh{border-color:#4a2e1c!important}
+html .crm-tier .bar,html .crm-goal,html .crm-wb .bar,html .crm-tier button:disabled,html .crm-acts button,html .crm-er .bt button,html .crm-bub{background:#3a2014!important;border-color:#4a2e1c!important}
+html .crm-tier .bar i,html .crm-wb .bar i{background:linear-gradient(90deg,#c8232c,#d1902a)!important}
+html .crm-gbd,html .crm-sms,html .crm-bl,html .crm-wb,html .crm-stars button,html .crm-refcode{background:#1a0f0a!important;border-color:#4a2e1c!important}
+html .crm-sms{background:#2a170d!important}
+@media (prefers-reduced-motion:reduce){.firelogo canvas{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="nav" aria-label="Sections"><a href="#play">🔥 Play</a><a href="#prizes">🏆 Prizes</a><a href="#rewards">🎁 Rewards</a><a href="#menu">📖 Menu</a><a href="#story">🛣️ Our story</a><a href="#visit">📍 Visit</a></nav>
+
+<header class="hero">
+  <div class="firelogo" id="firelogo"><img src="img/logo.webp" alt="Harry's Smokehouse BBQ, Oklahoma Style" width="560" height="560"><canvas aria-hidden="true"></canvas></div>
+  <h1>One bite and we gotcha!</h1>
+  <p>Oklahoma-style BBQ, hickory smoked slow &amp; low · Lomita, CA</p>
+  <div class="btns">
+    <a class="btn hot" href="#play">🛻 Play Route 66</a>
+    <a class="btn" href="https://www.homeofharrysbbq.com" target="_blank" rel="noopener">🍖 Order online</a>
+    <a class="btn" href="tel:+13103269842">📞 Call</a>
+  </div>
+  <span class="pill">Sample preview by SousShift AI · real menu &amp; prices · sample prizes</span>
+</header>
+
+<h2 id="play">Route 66: Tulsa to Lomita</h2>
+<p class="sub">Harry's story, played. Drive the smoker rig from Tulsa to Lomita, grab hickory, dry rub and sauce on the road, then pull up, take the orders and smoke every one slow &amp; low.</p>
+<div class="gamebox">
+  <canvas id="game" width="400" height="640" aria-label="Route 66 game. Swipe or tap a side to change lanes. At a stop, hold to feed the fire and tap to pull the meat."></canvas>
+  <div id="r66over">
+    <div id="rank">Rig parked</div>
+    <div id="final">0 pts</div>
+    <div id="won"></div>
+    <div class="btns"><button class="btn hot" type="button" id="again">🛻 Drive again</button><a class="btn" href="#prizes">See prizes</a></div>
+    <a class="revmini" href="https://www.youtube.com/@therealantidote" target="_blank" rel="noopener"><i>▶</i><span><b>Antidote reviews Harry's</b><br>Food review coming soon · watch @therealantidote</span></a>
+  </div>
+  <div class="how">
+    <div><b>🪵 Hickory</b> fuel for the smoker</div>
+    <div><b>🧂 Rub · 🥫 Sauce</b> bonus points on every plate</div>
+    <div><b>🌡️ Slow &amp; Low</b> hold to keep the needle at 225–250°F</div>
+    <div><b>🌵 Tumbleweeds, cones, potholes</b> cost a heart</div>
+  </div>
+</div>
+
+<h2 id="prizes">Weekly prize board</h2>
+<p class="sub">Sample prizes from Harry's real menu. Harry's picks the real ones; the board resets every Monday.</p>
+<div class="tiers" id="tiers"></div>
+
+<h2 id="rewards">Harry's Rewards</h2>
+<p class="sub">Earn points every visit, trade them for real Harry's food.</p>
+<div id="rewardsmount"></div>
+
+<h2 id="menu">The menu</h2>
+<section class="nm" aria-label="Menu">
+  <div class="nm-t">Harry's Menu</div>
+  <p class="nm-s">Hand-rubbed, hickory smoked 6 to 14 hours. Tap a section.</p>
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <p class="note" id="mnote"></p>
+  <div class="items" id="items"></div>
+  <p class="fine">Prices from homeofharrysbbq.com. Photos marked "photo coming soon" get real dish photos before launch; current photos are AI-styled previews of Harry's real dishes.</p>
+</section>
+
+<h2 id="story">From Tulsa to Lomita</h2>
+<div class="story">
+  <p style="margin:0">Pitmaster <b>Jon Harry Bayouth</b> was born and raised in Tulsa, Oklahoma and learned from Oklahoma's smokehouse masters. His mantra is <b>slow and low</b>: homemade dry rub, hickory smoked 6 to 14 hours on a Southern Pride smoker, finished with Harry's Original sauce. He runs Harry's with his wife <b>Margot Dean</b>.</p>
+  <div class="route" aria-label="Route 66 stops"><span>Tulsa</span><span>OKC</span><span>Amarillo</span><span>ABQ</span><span>Flagstaff</span><span>Barstow</span><span>Lomita</span></div>
+  <p style="margin:0" class="sub">Dine-in arcade · 80s music weekends · free waffle fries when you dine in · BBQ bologna, the only one in SoCal.</p>
+</div>
+
+<h2 id="visit">Visit Harry's</h2>
+<div class="visit">
+  <div class="box"><b>Harry's Smokehouse BBQ</b><br>25501 Narbonne Ave, Lomita, CA<br><small>Open daily 11:00 AM – 8:00 PM</small>
+    <div class="btns" style="justify-content:flex-start"><a class="btn" href="https://maps.google.com/?q=25501+Narbonne+Ave+Lomita+CA" target="_blank" rel="noopener">📍 Directions</a><a class="btn" href="tel:+13103269842">📞 (310) 326-9842</a></div></div>
+  <div class="box"><b>Dine in, pick up, delivery, catering</b><br>Order online at homeofharrysbbq.com or call the restaurant. Catering for the whole crew: ask about the feasts.
+    <div class="btns" style="justify-content:flex-start"><a class="btn" href="https://www.homeofharrysbbq.com" target="_blank" rel="noopener">🍖 Order</a><a class="btn" href="https://instagram.com/harrys_oklahoma_smokehouse_bbq" target="_blank" rel="noopener">📸 Instagram</a></div></div>
+</div>
+
+<footer><a href="rules.html">Route 66 &amp; daily spin official rules (draft)</a><br>Sample app for Harry's Oklahoma Style Smokehouse BBQ · menu and prices from homeofharrysbbq.com · prizes are samples</footer>
+</div>
+
+<script src="menu-data.js?v=1"></script>
+<script>
+/* chimney fire + smoke on their logo (from the Harry's pitch page) */
+(function(){
+var box=document.getElementById('firelogo'),cv=box.querySelector('canvas'),cx=cv.getContext('2d');
+var RM=matchMedia('(prefers-reduced-motion: reduce)').matches,P=[],S=[],E=[],on=true,W,H,ex,ey,dpr=Math.min(devicePixelRatio||1,2);
+function size(){var r=cv.getBoundingClientRect();W=cv.width=r.width*dpr;H=cv.height=r.height*dpr;var lh=box.clientHeight*dpr;ex=W*.765;ey=lh*.48+lh*.155;}
+size();addEventListener('resize',size);
+if('IntersectionObserver'in window)new IntersectionObserver(function(e){on=e[0].isIntersecting},{}).observe(box);
+function fire(){var s=W/420;P.push({x:ex+(Math.random()-.5)*20*s,y:ey,vx:(Math.random()-.5)*.5*s,vy:-(1.8+Math.random()*2.2)*s,r:(7+Math.random()*7)*s,l:0,m:26+Math.random()*20});}
+function smoke(){var s=W/420;S.push({x:ex+(Math.random()-.5)*14*s,y:ey-50*s,vx:(.25+Math.random()*.45)*s,vy:-(.7+Math.random()*.6)*s,r:(10+Math.random()*8)*s,l:0,m:150+Math.random()*90,g:.16+Math.random()*.1});}
+function ember(){var s=W/420;E.push({x:ex+(Math.random()-.5)*20*s,y:ey-10*s,vx:(Math.random()-.5)*1.4*s,vy:-(2+Math.random()*2.5)*s,l:0,m:40+Math.random()*40});}
+var t=0;
+function step(){requestAnimationFrame(step);if(!on||window.SSAI_GAME_ON)return;t++;cx.clearRect(0,0,W,H);
+ for(var i=0;i<4;i++)fire(); if(t%3==0)smoke(); if(Math.random()<.18)ember();
+ cx.globalCompositeOperation='source-over';
+ for(i=S.length-1;i>=0;i--){var p=S[i];p.l++;p.x+=p.vx+Math.sin((p.l+p.y)*.02)*.35;p.y+=p.vy;p.r+=.32*(W/420);
+  var k=p.l/p.m,a=(k<.15?k/.15:1-k)*p.g;if(k>=1){S.splice(i,1);continue}
+  var gr=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);gr.addColorStop(0,'rgba(150,140,130,'+a+')');gr.addColorStop(1,'rgba(90,80,75,0)');cx.fillStyle=gr;cx.beginPath();cx.arc(p.x,p.y,p.r,0,7);cx.fill();}
+ cx.globalCompositeOperation='lighter';
+ for(i=P.length-1;i>=0;i--){p=P[i];p.l++;var k2=p.l/p.m;if(k2>=1){P.splice(i,1);continue}
+  p.x+=p.vx+Math.sin(t*.25+p.l*.3)*.6*(W/420);p.y+=p.vy;p.vy*=.985;var r=p.r*(1-k2*.85);
+  var c=k2<.12?'255,230,150':k2<.4?'255,150,40':k2<.7?'235,75,15':'140,25,8',al=(1-k2)*.3;
+  var g2=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,r);g2.addColorStop(0,'rgba('+c+','+al+')');g2.addColorStop(1,'rgba('+c+',0)');cx.fillStyle=g2;cx.beginPath();cx.arc(p.x,p.y,r,0,7);cx.fill();}
+ for(i=E.length-1;i>=0;i--){p=E[i];p.l++;if(p.l>p.m){E.splice(i,1);continue}p.x+=p.vx;p.y+=p.vy;p.vy*=.99;cx.fillStyle='rgba(255,'+(160+Math.random()*80|0)+',60,'+(1-p.l/p.m)+')';cx.fillRect(p.x,p.y,2*dpr,2*dpr);}
+}
+if(!RM)step();
+})();
+
+/* menu: real items, real prices; a missing photo shows a branded placeholder (drop img/h-<slug>.webp in and it appears) */
+(function(){
+var M=window.HARRYS_MENU, tabs=document.getElementById("tabs"), grid=document.getElementById("items"), note=document.getElementById("mnote");
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+var FL='<svg class="fl" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3c2 7 9 10 9 19a9 9 0 0 1-18 0c0-5 3-7 4-11 1 3 2 5 4 5-1-5 0-9 1-13z" fill="#c8232c"/><path d="M20 18c1 4 5 5 5 9a5 5 0 0 1-10 0c0-3 2-4 3-6 0 1 1 2 2 2 0-2-.5-3 0-5z" fill="#d1902a"/></svg>';
+tabs.innerHTML=M.map(function(c,i){return '<button type="button" role="tab" aria-selected="'+(i===0)+'" data-i="'+i+'">'+esc(c.name)+'</button>';}).join("");
+function show(i){var c=M[i];[].forEach.call(tabs.children,function(b){b.setAttribute("aria-selected",+b.dataset.i===i);});
+ note.textContent=c.note||""; note.style.display=c.note?"":"none";
+ grid.innerHTML=c.items.map(function(it){
+  return '<article class="item"><div class="ph"><img loading="lazy" src="img/'+esc(it[3])+'" alt="'+esc(it[0])+'" width="400" height="500"><div class="soon">'+FL+'<span class="nmx">'+esc(it[0])+'</span><small>Photo coming soon</small></div></div>'+
+   '<div class="tx"><div class="row"><b>'+esc(it[0])+'</b><span class="pr">$'+it[1].toFixed(2)+'</span></div><p>'+esc(it[2])+'</p></div></article>';}).join("");
+ [].forEach.call(grid.querySelectorAll("img"),function(im){ function no(){ im.closest(".item").classList.add("nophoto"); } if(im.complete&&!im.naturalWidth&&im.src) no(); im.addEventListener("error",no); });
+}
+tabs.addEventListener("click",function(e){var b=e.target.closest("button"); if(b) show(+b.dataset.i);});
+show(0);
+})();
+
+/* prizes (sample; real menu items only, never alcohol). Thresholds calibrated with a human-paced bot (see PR). */
+window.R66_PRIZES={
+ adult:[[10800,"a Free Brisket Sandwich","Adult mode · one run over 10,800 (our test players averaged about 10,550)"],[9500,"Free Aunt Cheryl's Peach Cobbler","Adult mode · with any order"],[7500,"a Free side of Mac & Cheese","Adult mode · or Mashed Potatoes"],[5000,"Free Cornbread w/ Honey Butter","Adult mode · with any order"]],
+ kid:[[10900,"Free Cornbread w/ Honey Butter","🧒 Kid mode · with the young player at the table"],[8000,"a Free Margot Dean's Homemade Cookie","🧒 Kid mode · with the young player at the table"]],
+ champion:"Free Brisket Sandwich + Aunt Cheryl's Peach Cobbler for the top adult score by Sunday close"};
+(function(){
+var P=window.R66_PRIZES, h='<div class="tier top"><span class="pts">#1 WEEK</span><div><b>'+P.champion+'</b><small>Top score by Sunday close, Adult mode</small></div></div>';
+P.adult.forEach(function(t){ h+='<div class="tier"><span class="pts">'+t[0].toLocaleString()+'</span><div><b>'+t[1].replace(/^an? /,"")+'</b><small>'+t[2]+'</small></div></div>'; });
+P.kid.forEach(function(t){ h+='<div class="tier kid"><span class="pts">🧒 '+t[0].toLocaleString()+'</span><div><b>'+t[1].replace(/^an? /,"")+'</b><small>'+t[2]+'</small></div></div>'; });
+h+='<div class="tier"><span class="pts">Best</span><div><b id="best">Your best: —</b><small>Saved on this phone</small></div></div>';
+document.getElementById("tiers").innerHTML=h;
+})();
+</script>
+<script src="route66.js?v=1"></script>
+<script>
+/* end of a run → prize (crm.js SSAI_WIN, Kid prizes go to the parent's account) */
+(function(){
+var $=function(i){return document.getElementById(i);}, R=window.__R66;
+function best(){ try{ var b=+localStorage.getItem("r66-best")||0; $("best").textContent="Your best: "+(b?b.toLocaleString()+" pts":"—"); return b; }catch(e){ return 0; } }
+best();
+window.R66_END=function(o){
+  var b=best(); if(o.score>b){ try{localStorage.setItem("r66-best",o.score);}catch(e){} } best();
+  $("final").textContent=o.score.toLocaleString()+" pts";
+  var P=window.R66_PRIZES[o.kid?"kid":"adult"], prize="";
+  for(var i=0;i<P.length;i++) if(o.score>=P[i][0]){ prize=P[i][1]; break; }
+  $("rank").textContent=(o.finished?"🏁 You made it to Harry's in Lomita! ":"Made it to leg "+o.leg+" of 6 · ")+o.served+(o.served===1?" plate":" plates")+" served, "+o.perfect+" perfect";
+  var won=$("won"); won.style.display="none";
+  if(prize&&window.SSAI_WIN){
+    var kidP=o.kid, KR=window.SSAI_KID_RULE||"Kid prize — redeemable with the young player at the table, one per kid per visit.";
+    var kidH=kidP?'<br><span style="display:inline-block;margin:6px 0 2px;background:#FFD23F;color:#1e140c;font:900 12px var(--body);border-radius:99px;padding:3px 10px">🧒 KID PRIZE</span><br><span style="font-weight:700;font-size:12.5px;color:#FFE9A3">'+KR+'</span>':"";
+    var w=window.SSAI_WIN(prize.replace(/^an? /,""), kidP?{kid:true}:null);
+    var showWin=function(){
+      if(w.blocked) won.innerHTML="🏆 You'd win "+prize+", but you already have <b>"+w.prize.t+"</b> waiting (code "+w.prize.c+").<br><span style=\"font-weight:600;font-size:13px;color:#e6d6b6\">Use it by "+w.until+", then your next win saves. One reward at a time.</span>";
+      else won.innerHTML="🏆 You won "+prize+"!"+kidH+"<br><span style=\"font:900 22px ui-monospace,Menlo,monospace;color:#ffd27a;letter-spacing:.1em\">"+w.prize.c+"</span><br><span style=\"font-weight:600;font-size:13px;color:#e6d6b6\">"+(kidP?"Saved to the parent's Harry's Rewards. Show it with the young player at the table. Good for 3 days.":"Saved to your Harry's Rewards. Show it at the counter. Good for 3 days.")+"</span>";
+      won.style.display="block"; };
+    if(w.saved||!window.SSAI_GATE) showWin();
+    else { won.innerHTML=(w.blocked?"🏆 You'd win "+prize+", but you already have <b>"+w.prize.t+"</b> waiting.":"🏆 You won "+prize+"!")+kidH+"<br><span style=\"font-weight:600;font-size:13px;color:#e6d6b6\">"+(kidP?"A parent or guardian saves it to their Harry's Rewards.":"Save it to your Harry's Rewards to get your code.")+"</span><button class=\"btn hot\" type=\"button\" id=\"wsave\" style=\"width:100%;justify-content:center;margin-top:8px\">🎁 Save my prize</button>"; won.style.display="block";
+      $("wsave").onclick=function(){ window.SSAI_GATE(kidP?"kidprize":"prize",showWin); }; }
+  }
+  $("r66over").classList.add("on");
+  if(window.GameMenu&&GameMenu.refresh) try{ GameMenu.refresh(); }catch(e){}
+};
+function replay(){ var t=window.SSAI_TOKENS; if(t&&t.account) t.play(function(){ R.start(); },{kid:R.mode()==="kid"}); else R.start(); }
+$("again").addEventListener("click",function(){ replay(); $("game").scrollIntoView({block:"center",behavior:"smooth"}); });
+})();
+</script>
+<script src="../songswitch.js?v=ms3"></script>
+<script>window.CRM_CFG={name:"Harry's Smokehouse",customerOnly:true,mount:"#rewardsmount",offer:"100 welcome points",perDollar:10,
+ tiers:[[500,"Free Margot Dean's Homemade Cookie"],[1000,"Free Cornbread w/ Honey Butter"],[1800,"Free side (Mac & Cheese, Mashed Potatoes or any side)"],[2800,"Free Aunt Cheryl's Peach Cobbler"],[4000,"Free Brisket Sandwich"]],
+ referral:{gift:"Free Cornbread w/ Honey Butter"},earn:{checkin:50,firstOrder:100,birthday:200,review:{pts:250,platform:"app"},referral:{join:150,friend:50,friendGift:"Free Cornbread w/ Honey Butter",first:100,every:25}},
+ // Route 66 access, Phase 1 (default): free to play, no sign-up first; a free member account saves a score or prize after the run. Tokens built but off.
+ game:"Route 66",tokens:{enabled:false,perDollar:1,perOrder:0,playCost:10,weeklyFree:10,freeDaily:10},
+ // FREE daily spin: one per member per day (LA time), never sold. Odds = w / 100 and must match rules.html. Never alcohol.
+ spin:{rules:"rules.html",hub:"🔥",colors:["#d1902a","#c8232c","#f3e6c8","#823e2d","#ffd27a","#241510"],prizes:[{t:"+100 points",pts:100,w:30},{t:"+200 points",pts:200,w:20},{t:"+5 tokens",tok:5,alt:{t:"+150 points",pts:150},w:15},
+  {t:"Free Margot Dean's cookie",code:true,w:15},{t:"$2 off any sandwich",code:true,w:8},{t:"Free cornbread",code:true,w:7},{t:"10% off order",code:true,w:5}]}};</script>
+<script src="../crm.js?v=rs2"></script>
+<script>
+(function(){
+var R=window.__R66, SP=function(k){ return function(){ try{ return R.SP[k].toDataURL(); }catch(e){ return ""; } }; };
+window.GAME_MENU={id:"harrys-route66",name:"Route 66",by:"Harry's Smokehouse BBQ",tagline:"Tulsa to Lomita. Drive, grab the goods, smoke it slow & low, serve it right.",
+ hero:["img/h-ribs.webp","img/h-route66.webp","img/h-cobbler.webp"],
+ theme:{bg:"#120a06",bg2:"#241510",card:"#2a170d",edge:"#4a2e1c",accent:"#c8232c",accent2:"#d1902a",ink:"#f3e6c8",dim:"#c9b694",btnInk:"#1e140c",display:"'Rye',Georgia,serif",body:"Archivo,system-ui,sans-serif"},
+ tokens:true,spinBadge:true,vibrate:true,mount:"#game",start:function(){ document.getElementById("r66over").classList.remove("on"); R.start(); },
+ modes:{title:"Who's playing?",options:[["kid","🧒","Kid","12 & under · slower road · parent account required"],["adult","🧑","Adult","Regular speed"]],get:function(){ return R.mode(); },set:function(v){ R.requestMode(v); }},
+ how:{goal:"Drive Harry's smoker rig down Route 66 from Tulsa to Lomita. Six legs, six stops. Grab the goods on the road, then smoke every order slow & low and serve it fast.",time:"6 legs · about 30 seconds of road each, then a stop · 5 hearts",
+  steps:[["👆","On the road: swipe left or right, or tap a side, to change lanes (computer: ◀ ▶ arrow keys)"],["🪵","Grab hickory logs: they fuel the smoker. Dry rub and Harry's sauce add bonus points to every plate"],["🌵","Dodge tumbleweeds, cones, potholes and slow cars. Each hit costs a heart and a log"],["🧾","At each stop the orders come in on tickets. Every ticket has a timer: serve it before the guest walks out"],["🌡️","SLOW & LOW: hold your finger on the screen (or Space) to feed the fire. Let go to cool it down. Keep the needle in the green 225–250°F band; the gold middle is perfect. Watch for wind gusts and flare-ups"],["🍖","When the smoke bar fills: PULL IT! Tap when the white marker is on the gold for the perfect bark"],["🏁","Make it to Harry's in Lomita for a +500 finish. A stop where nobody walks out gives a heart back"],["🧒","Kid mode: a parent or guardian signs in first. Slower road, wider green zone, more time per ticket, kid-size prizes"]]},
+ points:[{group:"Grab these",items:[{img:SP("log"),name:"Hickory logs",note:"Smoker fuel",pts:"+10"},{img:SP("rub"),name:"Harry's dry rub",note:"+25 on the next plate",pts:"+15"},{img:SP("sauce"),name:"Harry's Original sauce",note:"+20 on the next plate",pts:"+15"},{img:SP("brisket"),name:"Brisket",pts:"+30"},{img:SP("ribs"),name:"Ribs",pts:"+30"},{img:SP("link"),name:"Hot links",pts:"+25"},{img:SP("shield"),name:"Route 66 shield",pts:"+10"}]},
+  {group:"Dodge these",items:[{img:SP("weed"),name:"Tumbleweed",note:"Rolls across the lanes",pts:"−50 ❤",bad:true},{img:SP("cone"),name:"Cone",pts:"−50 ❤",bad:true},{img:SP("hole"),name:"Pothole",pts:"−50 ❤",bad:true},{img:SP("car1"),name:"Slow car",pts:"−50 ❤",bad:true}]},
+  {group:"Every plate",items:[{icon:"🍖",name:"Served",note:"Meat value × how long you kept it Slow & Low",pts:"+40 to +190"},{icon:"✨",name:"Perfect bark pull",pts:"+70"},{icon:"⏱️",name:"Speed bonus",note:"Time left on the ticket",pts:"up to +80"},{icon:"🏙️",name:"Stop bonus",note:"Bigger every leg",pts:"+100 to +600"}]}],
+ prizes:{champion:window.R66_PRIZES.champion,tiers:window.R66_PRIZES.adult.map(function(t){ return [t[0].toLocaleString(),t[1].replace(/^an? /,""),t[2],"🍖"]; }).concat(window.R66_PRIZES.kid.map(function(t){ return ["🧒 "+t[0].toLocaleString(),t[1].replace(/^an? /,""),t[2],"🍪"]; })),note:"Sample prizes from Harry's real menu. Harry's picks the real ones and the board resets every Monday."},
+ fullscreen:{hide:".how"}};
+})();
+</script>
+<script src="../gamemenu.js"></script><script src="../a2hs.js"></script>
+<script src="../gamelock.js?v=ml2"></script>
+<script src="../poweredby.js?v=20261013a" defer></script>
+<script src="../faqbot.js?v=f2" defer></script>
+<script src="../seasons/seasons.js?v=20261101a" defer></script>
+</body>
+</html>

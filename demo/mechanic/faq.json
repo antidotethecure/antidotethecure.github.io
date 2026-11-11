@@ -2,100 +2,93 @@
  "name": "Your Auto Shop",
  "phone": "(555) 010-0000",
  "facts": [
-  "Auto repair shop app: build a quote, book a time, track your car, and pay by QR.",
-  "Hours: Mon–Fri 8:00 AM–6:00 PM, Sat 9:00 AM–3:00 PM, Sun closed.",
-  "Arrival or drop-off windows are 2 hours long, and you can book up to 7 days ahead.",
-  "Prices in the app are samples. The final quote comes after the shop inspects your car.",
-  "The exact address is sent after your booking is confirmed.",
-  "Sample labor rate: $95 per hour.",
-  "The app is in English and Spanish.",
-  "Check-engine codes can be read with a Bluetooth BLE OBD-II adapter. The app only reads codes and never clears them.",
-  "Tire stock checker: type your tire size to see if it's in stock.",
-  "My Garage is saved on your phone only. There is no account.",
-  "Text and email alerts in the app are a demo and are not sent yet.",
-  "The pay screen is a demo. No real payment is processed.",
-  "The app has no points, rewards, games or birthday club."
+  "This is an auto repair shop app: pick your car, say what's wrong, get a price range, book a time, and track the repair.",
+  "Hours in the app: Mon-Fri 8 AM-6 PM, Sat 9 AM-3 PM, closed Sunday.",
+  "Booking uses 2-hour arrival windows (like 8-10, 10-12) across the next 7 days.",
+  "The exact shop address is sent after your booking is confirmed.",
+  "All prices in the app are sample prices; the final quote comes after inspection.",
+  "Some services say 'Ask for a quote' because the shop sets the price after a look.",
+  "Labor is shown at a sample rate of $95 per hour.",
+  "The app works in English and Spanish (EN / ES buttons).",
+  "The app has no points, rewards, levels, games, or birthday club.",
+  "Step 1 Your car, Step 2 What's wrong, Step 3 Quote, Step 4 Book a time.",
+  "You can find your car by year/make/model or by decoding your 17-character VIN.",
+  "Safety recall and owner complaint info comes from NHTSA, a U.S. government database.",
+  "Scan my car reads check-engine codes with a Bluetooth LE (BLE) OBD-II adapter and is read-only; it never clears codes.",
+  "You can also type a code (like P0420) instead of using an adapter.",
+  "Codes point to a system, not a guaranteed part; the mechanic gives the final diagnosis.",
+  "Safari on iPhone can't use Bluetooth; use the free Bluefy browser on iPhone, or Chrome on Android or a computer.",
+  "Tire stock checker accepts sizes like 225/45R17, 225 45 17 or P225/45ZR17.",
+  "Job tracker stages: Received, Diagnosing, Waiting on parts, Being worked on, Halfway, Almost done, Ready for pickup.",
+  "You can get alerts in the app, by text, or by email when your car is almost done and when it's ready.",
+  "Pay with QR methods: Apple Pay, Google Pay, card, Cash App, Zelle, Venmo, PayPal, and pay over time (Affirm / Klarna).",
+  "Pay with QR: scan the code, pick how to pay, and your receipt is texted to you.",
+  "My Garage saves your cars, recalls, scan history, service history and what's due next, only on your phone.",
+  "Your garage, photos and requests stay on your phone; there's no account.",
+  "Maintenance reminders: oil about every 5,000 miles or 6 months, tire rotation every 6,000 miles or 6 months, brake check every 12 months.",
+  "For Tesla owners, Tesla's manual says rotate tires every 6,250 mi (10,000 km), cabin air filter every 2 years, brake fluid checked every 4 years.",
+  "The app never asks for your Tesla password.",
+  "Paint code is on the sticker in the driver's door jamb (look for PAINT, C/TR or EXT).",
+  "Identify my car from a photo and a 3D model of your car are marked 'coming soon'.",
+  "Detailing is offered as an add-on to a repair job.",
+  "The app marks the pay screen, texts and emails as a demo; no real payment or message is sent in the demo."
  ],
  "suggested": [
   "What are your hours?",
   "How do I get a price quote?",
   "How do I book a time?",
-  "Do you have my tire size in stock?",
   "How do I pay?",
-  "How do I track my car?"
+  "Can you scan my check-engine light?",
+  "Is my tire size in stock?"
  ],
  "qa": [
   {
    "q": "What are your hours?",
-   "a": "We're open Mon–Fri 8:00 AM–6:00 PM and Saturday 9:00 AM–3:00 PM. We're closed Sunday.",
+   "a": "The app shows Mon-Fri 8 AM-6 PM, Saturday 9 AM-3 PM, and closed Sunday. Call or text the number in the app if you need to double-check.",
    "tags": [
     "hours",
     "open",
     "close",
     "time",
     "schedule",
-    "sunday",
-    "saturday"
-   ]
-  },
-  {
-   "q": "Are you open on Sunday?",
-   "a": "No, we're closed on Sundays.",
-   "tags": [
-    "sunday",
-    "open",
-    "closed",
-    "hours",
-    "weekend"
-   ]
-  },
-  {
-   "q": "Are you open on Saturday?",
-   "a": "Yes, Saturday hours are 9:00 AM–3:00 PM.",
-   "tags": [
-    "saturday",
-    "hours",
-    "open",
-    "weekend",
-    "time"
+    "when"
    ]
   },
   {
    "q": "Are you open right now?",
-   "a": "The top of the app's home page shows \"Open now\" with the closing time, or when we open next if we're closed.",
+   "a": "The bar at the top of the app tells you if the shop is open now and until what time, or when it opens next.",
    "tags": [
-    "open now",
+    "open",
+    "now",
+    "today",
     "hours",
+    "closed"
+   ]
+  },
+  {
+   "q": "Are you open on Sunday?",
+   "a": "The app shows the shop closed on Sundays.",
+   "tags": [
+    "sunday",
     "closed",
-    "open",
-    "today"
-   ]
-  },
-  {
-   "q": "What time do you close?",
-   "a": "Mon–Fri we close at 6:00 PM, and Saturday at 3:00 PM.",
-   "tags": [
-    "close",
-    "closing",
     "hours",
-    "time",
-    "evening"
+    "weekend",
+    "open"
    ]
   },
   {
-   "q": "What time do you open?",
-   "a": "Mon–Fri we open at 8:00 AM, and Saturday at 9:00 AM.",
+   "q": "Are you open on Saturday?",
+   "a": "Yes, Saturday hours in the app are 9 AM-3 PM.",
    "tags": [
-    "open",
-    "opening",
+    "saturday",
+    "weekend",
     "hours",
-    "time",
-    "morning"
+    "open"
    ]
   },
   {
-   "q": "What's your address?",
-   "a": "For privacy, the exact address is sent to you after your booking is confirmed.",
+   "q": "What is your address?",
+   "a": "For privacy, the exact address is sent to you after your booking is confirmed. The app only shows the general area.",
    "tags": [
     "address",
     "location",
@@ -106,36 +99,37 @@
   },
   {
    "q": "Where are you located?",
-   "a": "The app shows only the city area. You'll get the exact address once your booking is confirmed.",
+   "a": "The app shows only a general area. You'll get the exact address once your booking is confirmed.",
    "tags": [
     "location",
     "where",
     "address",
     "city",
-    "directions"
+    "area"
    ]
   },
   {
-   "q": "What's your phone number?",
-   "a": "The number shown in the app is (555) 010-0000. Tap \"Call / text\" on the home page to reach us.",
+   "q": "What is your phone number?",
+   "a": "The number in the app is (555) 010-0000. Tap 'Call / text' on the home screen to reach the shop.",
    "tags": [
     "phone",
-    "call",
     "number",
+    "call",
     "text",
     "contact",
     "sms"
    ]
   },
   {
-   "q": "Can I text you?",
-   "a": "Yes. Tap \"Call / text\" on the home page and it opens a text message to the shop.",
+   "q": "How do I contact the shop?",
+   "a": "Tap the 'Call / text' button on the home screen. You can also request a job right in the app and track updates there.",
    "tags": [
-    "text",
-    "sms",
-    "message",
     "contact",
-    "phone"
+    "call",
+    "text",
+    "reach",
+    "phone",
+    "message"
    ]
   },
   {
@@ -145,279 +139,207 @@
     "parking",
     "park",
     "lot",
-    "street",
-    "where"
+    "street"
    ]
   },
   {
-   "q": "Do I need an account or to sign up?",
-   "a": "No. You can build a quote and book without an account. My Garage is saved on your phone only.",
+   "q": "How does the app work?",
+   "a": "Pick your car, say what's wrong (or tap it on the car), see a price range, pick a time, and request the job. Then track the repair from your phone.",
    "tags": [
-    "sign up",
-    "join",
-    "account",
-    "register",
-    "login",
-    "membership"
+    "how",
+    "works",
+    "start",
+    "help",
+    "steps",
+    "guide"
    ]
   },
   {
-   "q": "How do I get a price for my repair?",
-   "a": "Tap \"Build my quote\", pick your car, say what's wrong or tap a spot on the car, and you'll see a price range or \"Ask for a quote\". Prices are samples until the shop inspects the car.",
+   "q": "How do I get a quote?",
+   "a": "Tap 'Build my quote', pick your car, describe the problem or tap a spot on the car, and you'll see an estimated total. Final quote comes after inspection.",
    "tags": [
     "quote",
-    "price",
     "estimate",
+    "price",
     "cost",
-    "how much",
-    "repair"
+    "how much"
    ]
   },
   {
    "q": "Are the prices final?",
-   "a": "No. Prices in the app are samples. The final quote comes after inspection.",
+   "a": "No. Prices in the app are sample prices, and the final quote comes after the shop inspects your car.",
    "tags": [
     "price",
     "final",
     "sample",
     "estimate",
-    "cost",
-    "quote"
-   ]
-  },
-  {
-   "q": "Why does it say \"Ask for a quote\"?",
-   "a": "Some services have no price in the app. The shop sets the price after looking at your car.",
-   "tags": [
-    "ask for a quote",
-    "quote only",
-    "price",
-    "no price",
+    "quote",
     "cost"
    ]
   },
   {
-   "q": "How do I tell you what's wrong with my car?",
-   "a": "Type it in your own words, like \"squeaks when I brake\", or tap a glowing spot on the car picture. The app suggests likely repairs and a price.",
+   "q": "What does 'Ask for a quote' mean?",
+   "a": "Some services have no price in the app. The shop prices those after taking a look at your car.",
    "tags": [
-    "what's wrong",
-    "problem",
-    "symptom",
-    "describe",
-    "noise",
-    "repair"
+    "ask for a quote",
+    "quote",
+    "price",
+    "no price",
+    "custom"
    ]
   },
   {
-   "q": "What's the labor rate?",
-   "a": "The sample labor rate in the app is $95 per hour. The final quote comes after inspection.",
+   "q": "How much is labor?",
+   "a": "The app uses a sample labor rate of $95 per hour. Your final price is confirmed after inspection.",
    "tags": [
     "labor",
     "rate",
     "hourly",
-    "per hour",
     "price",
+    "per hour",
     "cost"
    ]
   },
   {
-   "q": "How do I book a time?",
-   "a": "Add your repairs, tap \"Pick a time\", choose a day and an open arrival window, then \"Request this job\". The shop accepts it with a final quote.",
+   "q": "Is there a trip fee?",
+   "a": "The app shows no trip fee on estimates. The final quote is confirmed after inspection.",
    "tags": [
-    "book",
-    "appointment",
-    "schedule",
-    "reserve",
-    "time",
-    "booking"
+    "trip fee",
+    "fee",
+    "charge",
+    "extra",
+    "cost"
    ]
   },
   {
-   "q": "How far ahead can I book?",
-   "a": "You can book up to 7 days ahead.",
+   "q": "How do I pick my car?",
+   "a": "In Step 1, choose year, make and model. You can also type your make and model, or decode your VIN.",
    "tags": [
-    "book",
-    "ahead",
-    "advance",
-    "days",
-    "appointment"
+    "car",
+    "vehicle",
+    "year",
+    "make",
+    "model",
+    "pick",
+    "select"
    ]
   },
   {
-   "q": "How long is an arrival window?",
-   "a": "Each window is 2 hours, like 8–10 or 10–12.",
+   "q": "How do I use my VIN?",
+   "a": "Type the 17-character VIN (no I, O or Q) and tap Decode. It fills in your car's details.",
    "tags": [
-    "window",
-    "arrival",
-    "slot",
-    "time",
-    "appointment",
-    "drop-off"
+    "vin",
+    "decode",
+    "number",
+    "car",
+    "identify"
    ]
   },
   {
-   "q": "What do the colors on the booking calendar mean?",
-   "a": "They show Open, Your pick and Booked windows. Tap an open one to hold it for your job.",
+   "q": "Where do I find my VIN?",
+   "a": "I don't have that detail. Check your registration or insurance card, or ask staff.",
    "tags": [
-    "calendar",
-    "open",
-    "booked",
-    "slot",
-    "availability",
-    "book"
+    "vin",
+    "where",
+    "find",
+    "number"
    ]
   },
   {
-   "q": "Why can't I pick a time on some days?",
-   "a": "The day is either closed or fully booked. Pick another day.",
+   "q": "What is the 'More details' section for?",
+   "a": "You can add engine size, fuel, drivetrain, trim, headlights, ABS and body style. It makes the parts list and what-to-ask script more exact. It's optional.",
    "tags": [
-    "closed",
-    "full",
-    "booked",
-    "unavailable",
-    "day",
-    "slot"
+    "engine",
+    "trim",
+    "drivetrain",
+    "details",
+    "optional",
+    "fuel"
    ]
   },
   {
-   "q": "When will my car be ready?",
-   "a": "After you pick a time, the quote shows a \"Ready by about\" estimate. The final time is confirmed by the shop.",
+   "q": "What is the paint code and where is it?",
+   "a": "It's on the sticker in the driver's door jamb. Look for PAINT, C/TR or EXT. Body shops use it to match paint.",
    "tags": [
-    "ready",
-    "done",
-    "finish",
-    "how long",
-    "time",
-    "pickup"
+    "paint",
+    "code",
+    "color",
+    "sticker",
+    "door jamb"
    ]
   },
   {
-   "q": "Can I cancel or change my request?",
-   "a": "I don't have cancel or change details. Please ask staff or call the number shown in the app.",
+   "q": "Can I add a photo of my car?",
+   "a": "Yes, tap 'Take or upload a photo of your car.' It's saved only on your phone.",
    "tags": [
-    "cancel",
-    "change",
-    "reschedule",
-    "modify",
-    "booking"
+    "photo",
+    "picture",
+    "upload",
+    "camera",
+    "car"
    ]
   },
   {
-   "q": "How do I track my car?",
-   "a": "Open the Track tab. Every update from the shop shows up under \"My requests\", from Received through Ready for pickup.",
+   "q": "Can the app identify my car from a photo?",
+   "a": "Not yet. That feature, and a 3D model of your car, are marked 'coming soon'.",
    "tags": [
-    "track",
-    "status",
-    "progress",
-    "update",
-    "my car",
-    "job"
+    "photo",
+    "identify",
+    "3d",
+    "coming soon",
+    "model"
    ]
   },
   {
-   "q": "What steps does a repair go through?",
-   "a": "Received, Diagnosing, Waiting on parts, Being worked on, Halfway, Almost done, and Ready for pickup.",
+   "q": "How do I tell you what's wrong?",
+   "a": "In Step 2, type it in your own words (like 'squeaks when I brake') or tap a glowing spot on the car. Tap 'Find the fix + price'.",
    "tags": [
-    "stages",
-    "steps",
-    "status",
-    "progress",
-    "track"
+    "problem",
+    "wrong",
+    "symptom",
+    "describe",
+    "noise",
+    "issue"
    ]
   },
   {
-   "q": "Can I see a sample of the tracker?",
-   "a": "Yes. In the Track tab, tap \"Play the sample\" to watch a sample job.",
+   "q": "Can I see the front and back of the car?",
+   "a": "Yes. Flip between Side, Front and Back. Front and Back show the battery, A/C, other tires and the trunk.",
    "tags": [
-    "sample",
-    "demo",
-    "tracker",
-    "example",
-    "track"
-   ]
-  },
-  {
-   "q": "Will I get an alert when my car is almost done?",
-   "a": "The Alerts tab offers in-app alerts, texts and email. Right now texts and email are a demo and aren't sent. Texts go live once the carriers approve the shop's texting number.",
-   "tags": [
-    "alerts",
-    "notify",
-    "text",
-    "email",
-    "almost done",
-    "notification"
-   ]
-  },
-  {
-   "q": "How do I turn on alerts?",
-   "a": "Open the Alerts tab and choose in-app, text or email. For text or email, enter your mobile number or email.",
-   "tags": [
-    "alerts",
-    "notifications",
-    "turn on",
-    "text",
-    "email",
-    "bell"
-   ]
-  },
-  {
-   "q": "What is the bell icon?",
-   "a": "It opens your alerts inbox with updates on your jobs.",
-   "tags": [
-    "bell",
-    "alerts",
-    "inbox",
-    "notifications"
+    "front",
+    "back",
+    "side",
+    "view",
+    "tap car",
+    "diagram"
    ]
   },
   {
    "q": "What services do you offer?",
-   "a": "Diagnostics, inspections, oil change, brakes, tires, engine and tune-up, transmission, suspension, steering, electrical, A/C and heating, battery, lights, wipers, doors and windows, exhaust, glass, and detailing. The Services section lists the ones this shop shows.",
+   "a": "Diagnostics, inspections, brakes, oil change, tires, engine and tune-up, transmission, electrical, battery, A/C and heating, suspension, steering, exhaust, headlights, taillights, wipers, doors and windows, auto glass, and a detailing add-on.",
    "tags": [
     "services",
-    "what do you do",
-    "repair",
     "offer",
-    "menu",
+    "what do you do",
+    "repairs",
     "list"
    ]
   },
   {
-   "q": "How do I add a service to my job?",
-   "a": "Tap any service in the Services section, tick the options you want, and save. It's added to your quote.",
-   "tags": [
-    "add",
-    "service",
-    "job",
-    "select",
-    "quote"
-   ]
-  },
-  {
    "q": "Do you do oil changes?",
-   "a": "Yes. Options include conventional and full synthetic with sample prices, plus synthetic blend, high-mileage, diesel and fluid services as \"Ask for a quote\".",
+   "a": "Yes. Options include conventional, full synthetic, synthetic blend, high-mileage and diesel oil, plus filters and fluid services. Some are quote-only.",
    "tags": [
     "oil",
     "oil change",
     "synthetic",
     "conventional",
-    "lube"
+    "filter",
+    "fluids"
    ]
   },
   {
-   "q": "How much is an oil change?",
-   "a": "The sample price range is conventional parts $30–45 plus labor, and full synthetic parts $55–85 plus labor. The app shows the total, and the final quote is after inspection.",
-   "tags": [
-    "oil change",
-    "price",
-    "cost",
-    "synthetic",
-    "conventional"
-   ]
-  },
-  {
-   "q": "Do you do brakes?",
-   "a": "Yes: brake pads, pads and rotors, and brake fluid flush. You'll see sample price ranges in the app.",
+   "q": "Do you do brake work?",
+   "a": "Yes: brake pads, pads plus rotors, and brake fluid flush. Pads and rotors are priced per axle (front or rear).",
    "tags": [
     "brakes",
     "pads",
@@ -428,165 +350,447 @@
    ]
   },
   {
-   "q": "Do you fix a check-engine light?",
-   "a": "Yes. Start with a code scan and inspection, or scan the car yourself in the Scan tab.",
-   "tags": [
-    "check engine",
-    "light",
-    "scan",
-    "diagnostic",
-    "codes",
-    "engine"
-   ]
-  },
-  {
-   "q": "Do you do tire repair and replacement?",
-   "a": "Yes: rotation, flat repair, replacing one tire or all four, plus balance, alignment, TPMS and seasonal swaps (quote only).",
+   "q": "Do you do tires?",
+   "a": "Yes: rotate all 4, flat repair, replace one or all 4, balance, mounting, TPMS sensors, alignment and seasonal swaps. Some are quote-only.",
    "tags": [
     "tires",
+    "tire",
     "flat",
-    "replace",
     "rotate",
     "balance",
-    "alignment"
-   ]
-  },
-  {
-   "q": "Do you do alignments?",
-   "a": "Yes. Wheel alignment is listed under Tires and Steering. The Steering alignment is done at a partner shop.",
-   "tags": [
     "alignment",
-    "wheel",
-    "steering",
-    "tires",
-    "pulling"
+    "tpms"
    ]
   },
   {
-   "q": "Do you work on batteries?",
-   "a": "Yes: battery and charging test, battery replacement, and terminal cleaning, all with sample prices.",
+   "q": "Do you fix check-engine lights?",
+   "a": "Yes. Start with a code scan and inspection, or a deeper diagnosis for electrical or no-start problems. You can also scan the codes yourself in the app.",
+   "tags": [
+    "check engine",
+    "cel",
+    "light",
+    "diagnosis",
+    "scan",
+    "codes"
+   ]
+  },
+  {
+   "q": "Do you do batteries?",
+   "a": "Yes: battery and charging test, battery replacement, and cleaning terminals.",
    "tags": [
     "battery",
     "dead",
-    "jump",
     "replace",
-    "test"
+    "test",
+    "jump",
+    "terminals"
    ]
   },
   {
-   "q": "Do you do A/C repair?",
-   "a": "Yes: A/C recharge, leak check, cabin air filter, and quotes for heater, blower and compressor problems.",
+   "q": "Do you do A/C and heating?",
+   "a": "Yes: A/C recharge, leak check with UV dye, cabin air filter, heater not warming, blower fan problems, and A/C compressor (quote-only).",
    "tags": [
-    "a/c",
     "ac",
+    "a/c",
     "air conditioning",
-    "heat",
     "heater",
+    "heat",
+    "blower",
     "cold"
    ]
   },
   {
    "q": "Do you do transmission work?",
-   "a": "Yes, but transmission jobs are quote-only: diagnosis, fluid service, clutch, leak repair, and rebuild or replace.",
+   "a": "Yes: diagnosis, fluid and filter service, clutch replacement, leak or seal repair, and rebuild or replace. All are quote-only.",
    "tags": [
     "transmission",
     "clutch",
-    "shifting",
     "slipping",
-    "fluid"
+    "shifting",
+    "fluid",
+    "rebuild"
    ]
   },
   {
-   "q": "Do you do windshield and glass repair?",
-   "a": "Yes, chip repair, windshield replacement, side and back glass, and camera recalibration. All are quote-only.",
+   "q": "Do you do suspension and steering?",
+   "a": "Yes. Suspension covers shocks, struts, sway bar links, control arms, ball joints and bushings. Steering covers tie rods, power steering pump, steering rack and alignment through a partner shop.",
    "tags": [
-    "glass",
+    "suspension",
+    "steering",
+    "struts",
+    "shocks",
+    "tie rod",
+    "ball joint",
+    "alignment",
+    "clunk"
+   ]
+  },
+  {
+   "q": "Do you do electrical repairs?",
+   "a": "Yes: alternator, starter, battery drain test, wiring or short repair, fuses and relays, and ground straps or battery cables.",
+   "tags": [
+    "electrical",
+    "alternator",
+    "starter",
+    "wiring",
+    "short",
+    "fuse",
+    "drain"
+   ]
+  },
+  {
+   "q": "Do you do exhaust work?",
+   "a": "Yes: leak or noise inspection, muffler and pipe repair, O2 sensor, catalytic converter, exhaust manifold and custom exhaust (the last two are quote-only).",
+   "tags": [
+    "exhaust",
+    "muffler",
+    "catalytic",
+    "o2 sensor",
+    "loud",
+    "leak"
+   ]
+  },
+  {
+   "q": "Do you do inspections or smog checks?",
+   "a": "Yes, as quote-only options: multi-point, pre-purchase, smog or emissions where required, state safety inspection where required, and road-trip check.",
+   "tags": [
+    "inspection",
+    "smog",
+    "emissions",
+    "pre-purchase",
+    "safety",
+    "road trip"
+   ]
+  },
+  {
+   "q": "Do you do headlights and taillights?",
+   "a": "Yes: bulb replacement, LED upgrade, headlight restoration, and taillight bulbs or housings.",
+   "tags": [
+    "headlight",
+    "taillight",
+    "bulb",
+    "led",
+    "lights",
+    "restoration"
+   ]
+  },
+  {
+   "q": "Do you do wipers or windshield work?",
+   "a": "Yes: wiper blades and washer pump. Auto glass covers chip repair, windshield replacement, side and back glass, and camera recalibration (quote-only).",
+   "tags": [
+    "wipers",
     "windshield",
+    "glass",
     "chip",
     "crack",
-    "window"
+    "washer"
    ]
   },
   {
-   "q": "Do you do body work and paint?",
-   "a": "Body parts and body and paint services are listed, with paint work as \"Ask for a quote\". Parts arrive primed, and paint matching is quoted separately.",
+   "q": "Do you fix power windows and door locks?",
+   "a": "Yes: window regulator or motor and door lock actuator. These are priced per door.",
    "tags": [
-    "body",
-    "paint",
-    "dent",
-    "scratch",
-    "collision",
-    "bumper"
+    "window",
+    "door",
+    "lock",
+    "regulator",
+    "power window",
+    "actuator"
    ]
   },
   {
-   "q": "Do you do detailing?",
-   "a": "Yes, as an add-on. Interior, wash and wax, and full detail have sample prices, and ceramic and paint correction are quote-only.",
+   "q": "Do you offer detailing?",
+   "a": "Yes, as an add-on while your car is there: interior detail, wash and wax, and full detail. Paint correction, ceramic coating and more are quote-only.",
    "tags": [
     "detail",
     "detailing",
     "wash",
     "wax",
+    "interior",
     "ceramic",
     "clean"
    ]
   },
   {
-   "q": "Do you do window tint?",
-   "a": "Yes: front 2 windows, full car, and windshield sun strip, all with sample prices.",
-   "tags": [
-    "tint",
-    "window tint",
-    "shade",
-    "windows"
-   ]
-  },
-  {
-   "q": "Do you install sound systems?",
-   "a": "Yes: head units (CarPlay / Android Auto), speakers, and a sub with amp.",
-   "tags": [
-    "sound",
-    "stereo",
-    "speakers",
-    "carplay",
-    "android auto",
-    "audio",
-    "subwoofer"
-   ]
-  },
-  {
-   "q": "Do you come to my house or work?",
-   "a": "The app shows a mobile call-out service for some versions. In this shop's app, ask staff or call to confirm.",
+   "q": "Do you come to my home or work?",
+   "a": "This version of the app is set up as a drop-off shop. Ask staff or call if you need a mobile visit.",
    "tags": [
     "mobile",
     "come to me",
-    "house",
+    "home",
     "roadside",
-    "jump start",
-    "call-out"
+    "house call",
+    "drop off"
    ]
   },
   {
-   "q": "Do you do inspections or smog checks?",
-   "a": "Inspection options include multi-point, pre-purchase, smog, state safety (where required) and road-trip checks, all quote-only.",
+   "q": "Do you do body work or paint?",
+   "a": "Body and paint aren't listed in this app. Please ask staff or call the number shown.",
    "tags": [
-    "inspection",
-    "smog",
-    "pre-purchase",
-    "safety",
-    "emissions"
+    "body",
+    "paint",
+    "dent",
+    "collision",
+    "scratch",
+    "bumper"
+   ]
+  },
+  {
+   "q": "Do you do sound system installs or window tint?",
+   "a": "They aren't listed in this version of the app. Please ask staff or call the number shown.",
+   "tags": [
+    "sound",
+    "stereo",
+    "tint",
+    "speakers",
+    "audio"
+   ]
+  },
+  {
+   "q": "How do I book a time?",
+   "a": "Tap 'Pick a time' on your quote, or open Book. Choose a day and tap an open arrival window to hold it, then request the job.",
+   "tags": [
+    "book",
+    "appointment",
+    "schedule",
+    "reserve",
+    "time",
+    "slot"
+   ]
+  },
+  {
+   "q": "How long are the time slots?",
+   "a": "They're 2-hour arrival windows, like 8-10 and 10-12.",
+   "tags": [
+    "slot",
+    "window",
+    "arrival",
+    "2 hour",
+    "time"
+   ]
+  },
+  {
+   "q": "How far ahead can I book?",
+   "a": "The app shows open arrival windows for the next 7 days.",
+   "tags": [
+    "ahead",
+    "advance",
+    "week",
+    "days",
+    "book"
+   ]
+  },
+  {
+   "q": "What do the Open, Booked and Your pick colors mean?",
+   "a": "Open windows are free to tap, Booked ones are taken, and Your pick is the one you're holding.",
+   "tags": [
+    "open",
+    "booked",
+    "pick",
+    "legend",
+    "slot",
+    "colors"
+   ]
+  },
+  {
+   "q": "What if a day is full or closed?",
+   "a": "The app tells you 'Closed this day' or 'Fully booked.' Pick another day.",
+   "tags": [
+    "full",
+    "closed",
+    "booked",
+    "day",
+    "unavailable"
+   ]
+  },
+  {
+   "q": "What happens after I request a job?",
+   "a": "The shop accepts it with a final quote. You can follow it in 'My requests' under the job tracker.",
+   "tags": [
+    "request",
+    "send",
+    "accepted",
+    "after",
+    "confirm",
+    "final quote"
+   ]
+  },
+  {
+   "q": "Do I need to give my name?",
+   "a": "Your first name is optional when you send a request.",
+   "tags": [
+    "name",
+    "first name",
+    "optional",
+    "request"
+   ]
+  },
+  {
+   "q": "What if the shop can't take my job?",
+   "a": "The tracker will say the shop can't take it. Try another time.",
+   "tags": [
+    "declined",
+    "rejected",
+    "can't take",
+    "another time"
+   ]
+  },
+  {
+   "q": "Can I copy or text my quote?",
+   "a": "Yes. Use 'Copy quote' or 'Text quote' to share it.",
+   "tags": [
+    "copy",
+    "text",
+    "share",
+    "quote",
+    "send"
+   ]
+  },
+  {
+   "q": "How do I track my car?",
+   "a": "Open Track. Every update from the shop shows up there, from Received to Ready for pickup.",
+   "tags": [
+    "track",
+    "status",
+    "update",
+    "progress",
+    "where is my car"
+   ]
+  },
+  {
+   "q": "What are the repair stages?",
+   "a": "Received, Diagnosing, Waiting on parts, Being worked on, Halfway, Almost done, and Ready for pickup.",
+   "tags": [
+    "stages",
+    "status",
+    "progress",
+    "steps",
+    "tracker",
+    "ready"
+   ]
+  },
+  {
+   "q": "Can I see a sample of the tracker?",
+   "a": "Yes, tap 'Play the sample' in the tracker to see how updates look.",
+   "tags": [
+    "sample",
+    "demo",
+    "tracker",
+    "example"
+   ]
+  },
+  {
+   "q": "Will I get notified when my car is ready?",
+   "a": "Yes. Turn on alerts under Alerts: in-app pop-ups, a text, or an email when it's almost done and when it's ready.",
+   "tags": [
+    "alerts",
+    "notify",
+    "text",
+    "email",
+    "ready",
+    "almost done"
+   ]
+  },
+  {
+   "q": "How do I turn on text or email alerts?",
+   "a": "Open Alerts, switch on text or email, and enter your mobile number or email.",
+   "tags": [
+    "alerts",
+    "text",
+    "email",
+    "phone",
+    "notification"
+   ]
+  },
+  {
+   "q": "Will the text alerts really send?",
+   "a": "In the demo nothing is sent. Real texts go live once the texting number is approved by the carriers.",
+   "tags": [
+    "text",
+    "sms",
+    "demo",
+    "alerts",
+    "carrier"
+   ]
+  },
+  {
+   "q": "How do I pay?",
+   "a": "Use Pay with QR: scan the code, pick how you want to pay, and your receipt is texted to you.",
+   "tags": [
+    "pay",
+    "payment",
+    "checkout",
+    "qr",
+    "how"
+   ]
+  },
+  {
+   "q": "What payment methods do you take?",
+   "a": "The app lists Apple Pay, Google Pay, card (tap or chip), Cash App, Zelle, Venmo, PayPal, and pay over time with Affirm or Klarna.",
+   "tags": [
+    "payment",
+    "methods",
+    "apple pay",
+    "google pay",
+    "cash app",
+    "zelle",
+    "venmo",
+    "paypal",
+    "card",
+    "affirm"
+   ]
+  },
+  {
+   "q": "Do you take cash?",
+   "a": "Cash isn't listed in the app. Please ask staff.",
+   "tags": [
+    "cash",
+    "payment",
+    "pay"
+   ]
+  },
+  {
+   "q": "Can I pay over time?",
+   "a": "The app lists 'Pay over time' with Affirm or Klarna as an option.",
+   "tags": [
+    "financing",
+    "affirm",
+    "klarna",
+    "installments",
+    "pay later"
+   ]
+  },
+  {
+   "q": "Do I get a receipt?",
+   "a": "Yes, the pay steps say your receipt is texted to you.",
+   "tags": [
+    "receipt",
+    "text",
+    "pay",
+    "proof"
+   ]
+  },
+  {
+   "q": "Does the pay screen charge me for real?",
+   "a": "In the demo, no. Nothing is charged and no account is connected.",
+   "tags": [
+    "demo",
+    "charge",
+    "pay",
+    "real",
+    "test"
    ]
   },
   {
    "q": "How do I check if my tire size is in stock?",
-   "a": "Open the Tires tab, type the size from your tire's sidewall, choose how many, and tap Check stock.",
+   "a": "Open Tires, type the size from your tire's sidewall, pick how many (1, 2, 4, 5 or 6), and tap 'Check stock'.",
    "tags": [
-    "tire",
-    "size",
+    "tires",
+    "tire size",
     "stock",
     "in stock",
     "check",
-    "inventory"
+    "available"
    ]
   },
   {
@@ -595,8 +799,9 @@
    "tags": [
     "tire size",
     "format",
+    "225/45r17",
     "sidewall",
-    "225/45r17"
+    "type"
    ]
   },
   {
@@ -604,26 +809,39 @@
    "a": "It's printed on the side of every tire, like P225/45R17 94V. It's also on the sticker in the driver's door jamb.",
    "tags": [
     "tire size",
+    "where",
     "sidewall",
     "door jamb",
-    "where",
     "find"
    ]
   },
   {
-   "q": "What does 225/45R17 mean?",
+   "q": "What do the numbers in a tire size mean?",
    "a": "225 is the width in millimeters, 45 is the sidewall height as a percent of the width, and R17 means it fits a 17-inch wheel.",
    "tags": [
-    "tire size",
-    "meaning",
+    "tire",
     "width",
-    "wheel",
-    "explain"
+    "aspect",
+    "rim",
+    "225",
+    "r17",
+    "meaning"
+   ]
+  },
+  {
+   "q": "I don't know my tire size.",
+   "a": "Tap 'Don't know your size? Pick your car' and the app shows your factory size. Or snap a photo of the sidewall and text it to the shop.",
+   "tags": [
+    "tire size",
+    "unknown",
+    "car",
+    "factory",
+    "photo"
    ]
   },
   {
    "q": "Can I hold a set of tires?",
-   "a": "Yes. If your size is in stock, you can hold a set and it's added to your quote.",
+   "a": "Yes. If your size is in stock you can hold a set, and it's added to your quote.",
    "tags": [
     "hold",
     "reserve",
@@ -633,123 +851,85 @@
    ]
   },
   {
-   "q": "What if my tire size isn't in stock?",
-   "a": "You can request an order. The sample timing in the app is usually 2–3 business days. The shop confirms the real timing.",
+   "q": "What if my tires aren't in stock?",
+   "a": "The app says it can order them, usually within about 2-3 business days (a sample timing).",
    "tags": [
-    "order",
     "not in stock",
+    "order",
     "tires",
     "wait",
-    "delivery"
+    "days"
    ]
   },
   {
-   "q": "How much do the tires cost?",
-   "a": "Tire prices in the stock list say \"Ask for a quote\" unless the shop sets a price.",
+   "q": "Can I filter tires by type?",
+   "a": "Yes: All-season, Performance, Truck / SUV and Winter.",
    "tags": [
-    "tire",
-    "price",
-    "cost",
-    "how much"
+    "tire type",
+    "all season",
+    "performance",
+    "truck",
+    "winter",
+    "filter"
    ]
   },
   {
-   "q": "What is My Garage?",
-   "a": "It saves your cars, their recalls, scan history, service history and what's due next. It lives only on your phone, with no account and nothing uploaded.",
+   "q": "Is the tire stock in the app real?",
+   "a": "The stock list and brands in the app are samples, so please confirm with the shop.",
    "tags": [
-    "my garage",
-    "save car",
-    "garage",
-    "history",
-    "profile"
+    "stock",
+    "sample",
+    "real",
+    "tires",
+    "inventory"
    ]
   },
   {
-   "q": "How do I save my car?",
-   "a": "Pick your car (year, make, model or VIN), then tap \"Save to My Garage\".",
-   "tags": [
-    "save",
-    "garage",
-    "car",
-    "vehicle",
-    "add car"
-   ]
-  },
-  {
-   "q": "Can I enter my VIN?",
-   "a": "Yes. Type the 17-character VIN and tap Decode to fill in your car. A VIN has no I, O or Q.",
-   "tags": [
-    "vin",
-    "decode",
-    "car",
-    "vehicle"
-   ]
-  },
-  {
-   "q": "Where do I find my paint code?",
-   "a": "It's on the sticker in the driver's door jamb. Look for PAINT, C/TR or EXT.",
-   "tags": [
-    "paint code",
-    "color",
-    "door jamb",
-    "sticker"
-   ]
-  },
-  {
-   "q": "Can I see recalls for my car?",
-   "a": "Yes. Once you pick year, make and model, the app shows NHTSA safety recalls and the most-reported owner complaints. Recall repairs are a free fix at a dealer.",
-   "tags": [
-    "recall",
-    "safety",
-    "nhtsa",
-    "complaints",
-    "issues"
-   ]
-  },
-  {
-   "q": "Will the app remind me when maintenance is due?",
-   "a": "My Garage shows what's due, like oil change, tire rotation and brake check, using simple rules of thumb. Your owner's manual wins.",
-   "tags": [
-    "reminder",
-    "due",
-    "maintenance",
-    "oil",
-    "rotation",
-    "service"
-   ]
-  },
-  {
-   "q": "How do I scan my check-engine codes?",
-   "a": "Open the Scan tab. Plug a Bluetooth LE (BLE) ELM327 adapter under the dash, turn the key to ON, and tap Connect. Or type a code like P0420.",
+   "q": "How do I scan my check-engine light?",
+   "a": "Open Scan. Plug a Bluetooth LE OBD-II adapter into the port under the dash, turn the key to ON, then tap 'Connect & read codes'. Or type a code you already have.",
    "tags": [
     "scan",
     "obd",
-    "codes",
     "check engine",
+    "codes",
     "bluetooth",
     "adapter"
    ]
   },
   {
    "q": "Which scan adapter should I buy?",
-   "a": "The app lists Veepeak OBDCheck BLE+, Vgate iCar Pro BLE 4.0, and OBDLink CX. Get a \"BLE\" or \"Bluetooth 4.0\" model.",
+   "a": "The app lists Veepeak OBDCheck BLE+, Vgate iCar Pro BLE 4.0, and OBDLink CX. Get a 'BLE' or 'Bluetooth 4.0' model.",
    "tags": [
     "adapter",
     "obd",
-    "bluetooth",
     "veepeak",
     "vgate",
-    "obdlink"
+    "obdlink",
+    "bluetooth",
+    "ble"
    ]
   },
   {
-   "q": "Does the scan work on my iPhone?",
-   "a": "Safari on iPhone can't use Bluetooth. Use the free Bluefy browser, or type your code. Chrome on Android and on a computer also work.",
+   "q": "Can I use any Bluetooth scanner?",
+   "a": "No. Classic-Bluetooth and Wi-Fi adapters can't talk to a web page. You need a Bluetooth LE one.",
+   "tags": [
+    "adapter",
+    "wifi",
+    "classic",
+    "bluetooth",
+    "compatible"
+   ]
+  },
+  {
+   "q": "Does scanning work on iPhone?",
+   "a": "Safari on iPhone can't use Bluetooth. Open the page in the free Bluefy browser, or type the code instead. Chrome on Android and computers works.",
    "tags": [
     "iphone",
     "safari",
     "bluefy",
     "bluetooth",
+    "android",
+    "chrome",
     "scan"
    ]
   },
@@ -757,268 +937,314 @@
    "q": "Will the scan erase my codes?",
    "a": "No. The scan is read-only and never clears codes.",
    "tags": [
-    "clear codes",
+    "clear",
     "erase",
+    "codes",
     "read-only",
-    "scan",
-    "safe"
+    "safe",
+    "scan"
+   ]
+  },
+  {
+   "q": "I don't have an adapter. Can I still look up a code?",
+   "a": "Yes. Type the code (like P0420) and tap 'Look up'. Most parts stores can read a code for free too.",
+   "tags": [
+    "code",
+    "type",
+    "lookup",
+    "p0420",
+    "no adapter"
    ]
   },
   {
    "q": "Can I try the scan without an adapter?",
-   "a": "Yes. Tap \"Try a demo scan\" to see sample data. It isn't your car.",
+   "a": "Yes, tap 'Try a demo scan.' It uses sample data, not your car.",
    "tags": [
     "demo",
     "scan",
-    "no adapter",
     "sample",
+    "no adapter",
     "try"
    ]
   },
   {
-   "q": "Does a code tell me exactly what part is broken?",
+   "q": "Does a code tell me exactly what part to replace?",
    "a": "No. Codes point to a system, not a guaranteed part. The mechanic makes the final diagnosis.",
    "tags": [
     "code",
     "diagnosis",
     "part",
     "accurate",
-    "meaning"
+    "final"
    ]
   },
   {
-   "q": "Do you have anything for Tesla owners?",
-   "a": "Yes. If you pick a Tesla, the app shows recall info, software update links and service tips. The app never asks for your Tesla password.",
+   "q": "Can I add the scan result to my quote?",
+   "a": "Yes. Tap 'Add to my job' on a code to add the likely fix to your quote.",
    "tags": [
-    "tesla",
-    "ev",
-    "electric",
-    "software",
-    "update"
+    "add",
+    "job",
+    "quote",
+    "code",
+    "likely fix"
    ]
   },
   {
-   "q": "Can I scan my electric car?",
-   "a": "Teslas don't use the standard OBD-II port for owner scans. Write down any screen alert (Controls › Service) and type it in, or tell the shop.",
+   "q": "Does the scanner work on electric cars?",
+   "a": "EVs report few generic engine codes. Teslas don't use the standard port for owner scans, so write down any alert on the screen (Controls > Service) and type it in or tell the shop.",
    "tags": [
-    "ev",
     "electric",
+    "ev",
     "tesla",
     "scan",
-    "obd"
+    "obd",
+    "alert"
    ]
   },
   {
-   "q": "How do I pay?",
-   "a": "Use the Pay tab: scan the QR code with your phone's camera, pick how you want to pay, and your receipt is texted to you. The pay screen in this app is a demo and no real payment is processed.",
+   "q": "What is My Garage?",
+   "a": "It saves your cars with their recalls, scan history, service history and what's due next. It lives only on your phone.",
    "tags": [
-    "pay",
-    "payment",
-    "qr",
-    "checkout",
-    "receipt"
+    "garage",
+    "save",
+    "cars",
+    "history",
+    "my garage"
    ]
   },
   {
-   "q": "What payment methods do you accept?",
-   "a": "The pay screen lists Apple Pay, Google Pay, card (tap or chip), Cash App, Zelle, Venmo, PayPal, and pay over time (Affirm / Klarna). Please confirm with staff.",
+   "q": "How do I save my car?",
+   "a": "After picking your car, tap 'Save to My Garage'.",
    "tags": [
-    "payment methods",
-    "apple pay",
-    "card",
-    "cash app",
-    "zelle",
-    "venmo",
-    "paypal",
-    "affirm"
+    "save",
+    "garage",
+    "car",
+    "store"
    ]
   },
   {
-   "q": "Is the QR pay real?",
-   "a": "This version is a demo. Nothing is charged and no account is connected.",
+   "q": "What maintenance reminders does the app show?",
+   "a": "Oil change, tire rotation and brake check. The app's rules of thumb are oil every 5,000 miles or 6 months, rotation every 6,000 miles or 6 months, and brakes every 12 months. Your owner's manual wins.",
    "tags": [
-    "demo",
-    "qr",
-    "pay",
-    "real",
-    "charged"
+    "reminder",
+    "maintenance",
+    "due",
+    "oil",
+    "rotation",
+    "brake",
+    "interval"
    ]
   },
   {
-   "q": "Do you have a counter QR card?",
-   "a": "Yes. The Pay tab has a printable counter or bay QR card.",
+   "q": "Can I see recalls for my car?",
+   "a": "Yes. Once you pick year, make and model, the app shows NHTSA safety recalls and the most-reported owner complaints.",
    "tags": [
-    "qr card",
-    "counter",
-    "print",
-    "bay",
-    "pay"
+    "recall",
+    "safety",
+    "nhtsa",
+    "complaints",
+    "known issues"
    ]
   },
   {
-   "q": "Do you offer financing?",
-   "a": "The pay screen lists \"Pay over time (Affirm / Klarna)\". Ask staff for details.",
+   "q": "How much does a recall repair cost?",
+   "a": "The app says recall repairs are a free fix at a dealer. Not every car is affected; enter your VIN at nhtsa.gov/recalls to check yours.",
    "tags": [
-    "financing",
-    "pay over time",
-    "affirm",
-    "klarna",
-    "payments"
+    "recall",
+    "free",
+    "dealer",
+    "cost",
+    "vin",
+    "nhtsa"
    ]
   },
   {
-   "q": "Is there a language option?",
-   "a": "Yes. Tap EN or ES at the top of the app for English or Spanish.",
+   "q": "Are owner complaints confirmed defects?",
+   "a": "No. They're owner reports filed with NHTSA, not confirmed defects.",
    "tags": [
-    "language",
-    "spanish",
-    "english",
-    "español",
-    "es",
-    "en"
+    "complaints",
+    "defects",
+    "nhtsa",
+    "owner reports"
    ]
   },
   {
-   "q": "Does the shop have a points or rewards program?",
-   "a": "This app doesn't show any points or rewards program. Ask staff or call the number shown in the app.",
+   "q": "Do you have tips for Tesla owners?",
+   "a": "Yes. Many Tesla recalls are fixed by free over-the-air updates, so keep the car on Wi-Fi. Tesla's manual says rotate tires every 6,250 mi, cabin air filter every 2 years, and check brake fluid every 4 years.",
+   "tags": [
+    "tesla",
+    "ota",
+    "update",
+    "recall",
+    "tips",
+    "maintenance"
+   ]
+  },
+  {
+   "q": "Does the app ask for my Tesla password?",
+   "a": "No. It never asks for your Tesla password. Live battery and software info is marked 'coming later'.",
+   "tags": [
+    "tesla",
+    "password",
+    "privacy",
+    "login",
+    "fleet api"
+   ]
+  },
+  {
+   "q": "Does the app have a rewards program or points?",
+   "a": "No. This app has no points, rewards, levels, referrals or birthday club.",
    "tags": [
     "points",
     "rewards",
     "loyalty",
     "stars",
-    "pts",
-    "free",
-    "ratio",
-    "per dollar"
+    "perks",
+    "birthday",
+    "referral",
+    "free"
    ]
   },
   {
-   "q": "Are there games in the app?",
-   "a": "No, there are no games in this app.",
+   "q": "Are there games or contests?",
+   "a": "No. This app has no games, weekly contests or leaderboards.",
    "tags": [
     "game",
     "games",
-    "play",
+    "contest",
     "leaderboard",
-    "contest",
-    "prize"
-   ]
-  },
-  {
-   "q": "Is there a weekly contest or prize?",
-   "a": "I don't have any contest or prize details. Ask staff or call the number shown in the app.",
-   "tags": [
-    "contest",
-    "weekly",
     "prize",
-    "winner",
-    "champion",
-    "leaderboard"
+    "play",
+    "trivia"
    ]
   },
   {
-   "q": "Is there a birthday club or referral bonus?",
-   "a": "I don't have those details. Ask staff or call the number shown in the app.",
+   "q": "Do you have specials or discounts?",
+   "a": "I don't have any specials or discounts listed. Ask staff or call the number shown.",
    "tags": [
-    "birthday",
-    "referral",
-    "refer",
-    "bonus",
-    "share",
-    "club"
-   ]
-  },
-  {
-   "q": "Are there specials, coupons or discounts?",
-   "a": "I don't have specials or discounts listed. Ask staff or call the number shown in the app.",
-   "tags": [
-    "specials",
+    "special",
     "discount",
-    "coupon",
     "deal",
+    "coupon",
     "promo",
-    "happy hour"
+    "sale"
    ]
   },
   {
-   "q": "Do you accept insurance for collision work?",
-   "a": "The Body & paint service lists \"Collision estimate (insurance OK)\". Ask staff about your claim.",
+   "q": "Can I order food or use a table QR code?",
+   "a": "No, this is an auto shop app. The only QR code is for paying the shop.",
    "tags": [
-    "insurance",
-    "collision",
-    "claim",
-    "estimate",
-    "accident"
+    "order",
+    "food",
+    "menu",
+    "table",
+    "qr"
    ]
   },
   {
-   "q": "Can I see before and after photos?",
-   "a": "The before/after section is placeholder art in this version. The shop's real photos go there.",
+   "q": "Is the app in Spanish?",
+   "a": "Yes. Tap ES at the top to switch to Spanish, or EN for English.",
    "tags": [
-    "before after",
-    "photos",
-    "pictures",
-    "gallery",
-    "slider"
+    "spanish",
+    "español",
+    "language",
+    "english",
+    "translate",
+    "es"
    ]
   },
   {
-   "q": "How do I add the app to my phone?",
-   "a": "I don't have install steps. Try your browser's \"Add to Home Screen\" option, or ask staff.",
+   "q": "Can I install the app on my phone?",
+   "a": "I don't have install steps. Ask staff for help adding it to your home screen.",
    "tags": [
     "install",
     "home screen",
-    "wallet",
+    "add",
     "app",
-    "add to phone"
+    "wallet"
    ]
   },
   {
    "q": "Is my information private?",
-   "a": "Your car info and My Garage are saved on your phone only. Nothing is uploaded to an account.",
+   "a": "Your garage, photos and requests are saved only on your phone, with no account. In the demo, nothing is sent anywhere.",
    "tags": [
     "privacy",
-    "data",
     "private",
-    "saved",
-    "phone",
-    "info"
+    "data",
+    "safe",
+    "stored",
+    "account"
    ]
   },
   {
-   "q": "Are there kid rules?",
-   "a": "There's no kid mode or kid rules in this app.",
+   "q": "Does the app use my location?",
+   "a": "I don't have any location feature listed for this shop. The exact address is sent after your booking is confirmed.",
    "tags": [
-    "kids",
-    "kid mode",
-    "children",
-    "age"
+    "location",
+    "gps",
+    "privacy",
+    "tracking"
    ]
   },
   {
-   "q": "How do I talk to a person?",
-   "a": "Tap \"Call / text\" on the home page, or call the number shown in the app: (555) 010-0000.",
+   "q": "What if I need to talk to a person?",
+   "a": "Tap 'Call / text' on the home screen, or call the number shown in the app.",
    "tags": [
     "staff",
     "human",
     "help",
-    "contact",
+    "person",
     "call",
-    "talk"
+    "support"
    ]
   },
   {
-   "q": "What's on the menu?",
-   "a": "This is a repair shop, so there's no food menu. See the Services section for what we do.",
+   "q": "Where does the car and VIN info come from?",
+   "a": "Make, model and VIN data come from NHTSA vPIC, a free U.S. government database. Specs come from the U.S. EPA / DOE (fueleconomy.gov).",
    "tags": [
-    "menu",
-    "food",
-    "order",
-    "table"
+    "source",
+    "nhtsa",
+    "vpic",
+    "epa",
+    "data",
+    "specs"
+   ]
+  },
+  {
+   "q": "What is the exploded-view diagram?",
+   "a": "It's an illustration of your car's parts that you can zoom. It's for reference only, not a factory diagram, and the numbers drawn in it aren't checked. Use the verified specs listed next to it. For some models it's marked 'coming soon'.",
+   "tags": [
+    "diagram",
+    "exploded",
+    "parts",
+    "zoom",
+    "illustration"
+   ]
+  },
+  {
+   "q": "Will the parts list tell me exact part numbers?",
+   "a": "No. Parts shown are typical for the job, and your mechanic confirms exact part numbers after inspection.",
+   "tags": [
+    "parts",
+    "part number",
+    "list",
+    "fitment",
+    "exact"
+   ]
+  },
+  {
+   "q": "Do you offer before and after photos?",
+   "a": "The app has a before/after slider, but the current images are placeholder sample art.",
+   "tags": [
+    "before",
+    "after",
+    "photos",
+    "slider",
+    "examples"
    ]
   }
  ],
- "updated": "2026-10-22T00:11:31+00:00",
- "source_commit": "973464f",
+ "updated": "2026-11-11T04:55:29+00:00",
+ "source_commit": "cb32805",
  "app": "mechanic"
 }

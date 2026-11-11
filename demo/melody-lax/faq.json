@@ -2,29 +2,22 @@
  "name": "Melody Bar & Grill",
  "phone": "(310) 670-1994",
  "facts": [
-  "Melody Bar & Grill, 9132 S Sepulveda Blvd, Los Angeles, CA 90045 (Westchester), since 1952, close to LAX.",
+  "Melody Bar & Grill, 9132 S Sepulveda Blvd, Los Angeles, CA 90045 (Westchester). The closest bar to LAX, open since 1952.",
   "Phone: (310) 670-1994.",
   "Happy hour is 3–6 daily.",
-  "Mon: half off burgers 11–3. Tue: $4 tacos and $6 margaritas. Thu: half off sandwiches 11–3. Fri: $3 sliders 11–3.",
-  "Karaoke, live bands, DJs, trivia and every game on the TVs happen every week.",
-  "Rewards are free to join. Earn 10 points per $1 on eligible purchases, before tip.",
-  "Join bonus: +100 points once. Birthday: +250 once a year. Friend referral: +100 per friend who joins with your code and makes a first visit.",
-  "Rewards: 250 pts free soft drink or Melody Fries; 500 pts $10 off your check; 1,000 pts free starter; 1,500 pts free entrée up to $21.50.",
-  "One reward per visit, one prize per day, no stacking. Rewards have no cash value and are never free alcohol.",
-  "A reward pass works once and expires 10 minutes after you open it.",
-  "Just Landed: 10% off your first order today with a boarding pass from a flight that landed at LAX in the last 24 hours.",
-  "Melody Approach is a free flying game with Campaign (10 levels) and Survival modes.",
-  "Weekly boards (Campaign by score, Survival by longest time) reset every Monday.",
-  "The game's weekly prizes are in BETA and not switched on yet. The boards are for bragging rights for now.",
-  "Once game rewards are on: 1 point per 100 game score, up to 50 game points a day.",
-  "Games Pack: Trivia, Sports Trivia, Melody Word, Melody Mix, Truth or Dare, LA Scoreboard.",
-  "Games Pack points are capped at 10 a day and count toward the 50-a-day game limit.",
-  "Order from your phone by picking the bar, patio, to go or a table code, then pay your server like normal.",
-  "The app has 12 languages and needs no download.",
-  "Melody Rewards points are separate from Nalu Vida points.",
-  "Free parking at Melody. It's about a 15-minute walk from the LAX terminals.",
-  "LAX crew (airline, TSA, terminal, hotel and rental car workers) get 10% off the check with a badge, dine-in only.",
-  "Nearby alerts are optional, and the app only reads your location while it's open."
+  "Taco Tuesday: $4 tacos (every taco) and $6 margaritas.",
+  "Mondays: half off burgers 11–3.",
+  "Join Melody Rewards free: +100 points when you join.",
+  "Earn 10 points per $1 on eligible purchases, before tip.",
+  "Rewards cost 250, 500, 1,000 or 1,500 points.",
+  "One reward per day and one prize per day.",
+  "Just Landed: 10% off your first order with a boarding pass from a flight that landed at LAX in the last 24 hours.",
+  "Melody Approach is a free flying game. Weekly boards reset every Monday.",
+  "Game prizes and game points are in BETA and are not switched on yet.",
+  "Birthday bonus: +250 points once a year.",
+  "Friend referral: +100 points per friend who joins with your code and makes a first visit.",
+  "The app works in your phone's browser, with no download.",
+  "Melody Rewards points are separate from Nalu Vida points."
  ],
  "suggested": [
   "What are your hours?",
@@ -32,36 +25,34 @@
   "How do I earn points?",
   "What rewards can I get and what do they cost?",
   "How do I play Melody Approach?",
-  "How do I order from my table?"
+  "What is the Just Landed deal?"
  ],
  "qa": [
   {
    "q": "What is Melody Bar & Grill?",
-   "a": "Melody is a bar and grill in Westchester, the closest bar to LAX, open since 1952. This app has the menu, games, trivia and a free rewards club.",
+   "a": "Melody is the closest bar to LAX, in Westchester, open since 1952. This app has the menu, rewards, games and sports scores.",
    "tags": [
     "about",
     "melody",
-    "bar",
-    "grill",
     "lax",
+    "bar",
     "history"
    ]
   },
   {
-   "q": "Where are you located?",
-   "a": "9132 S Sepulveda Blvd, Los Angeles, CA 90045 (Westchester). Tap Directions in the app for a map.",
+   "q": "What's your address?",
+   "a": "9132 S Sepulveda Blvd, Los Angeles, CA 90045. Tap Directions in the app for a map.",
    "tags": [
     "address",
     "location",
     "where",
     "directions",
-    "map",
-    "sepulveda"
+    "map"
    ]
   },
   {
    "q": "What's your phone number?",
-   "a": "Call us at (310) 670-1994, or tap Call in the app.",
+   "a": "Call (310) 670-1994, or tap the Call button in the app.",
    "tags": [
     "phone",
     "call",
@@ -71,84 +62,60 @@
   },
   {
    "q": "What are your hours?",
-   "a": "Our website lists Mon–Fri 11 AM to 1:30 AM and Sat–Sun 9 AM to 1:30 AM. Hours can vary, so call (310) 670-1994 to confirm late at night.",
+   "a": "Hours from our website are Mon–Fri 11 AM to 1:30 AM and Sat–Sun 9 AM to 1:30 AM. Hours can vary, so call (310) 670-1994 to confirm late at night.",
    "tags": [
     "hours",
     "open",
     "close",
     "time",
-    "when",
-    "late"
+    "late",
+    "when"
+   ]
+  },
+  {
+   "q": "What time do you open on weekends?",
+   "a": "Weekends open at 9 AM, per our website. Call (310) 670-1994 to confirm.",
+   "tags": [
+    "weekend",
+    "open",
+    "saturday",
+    "sunday",
+    "brunch",
+    "hours"
    ]
   },
   {
    "q": "When does the kitchen close?",
-   "a": "I don't have the kitchen's closing time. Please call (310) 670-1994 or ask staff.",
+   "a": "I don't have the kitchen close time. Please call (310) 670-1994 or ask staff.",
    "tags": [
     "kitchen",
     "close",
-    "late night",
+    "late",
     "food",
-    "hours",
-    "time"
+    "hours"
    ]
   },
   {
    "q": "Is there parking?",
-   "a": "Yes, parking is free at Melody, including a free lot for people picking up travelers.",
+   "a": "Our notes say parking is free. Ask staff if you need help finding a spot.",
    "tags": [
     "parking",
     "park",
-    "lot",
     "free",
-    "car",
-    "valet"
+    "lot",
+    "car"
    ]
   },
   {
-   "q": "Can I walk from LAX?",
-   "a": "Yes, it's about a 15-minute walk from the LAX terminals. Melody is also about 5 minutes from LAX by car.",
+   "q": "How far are you from LAX?",
+   "a": "The app says Melody is 5 minutes from LAX. Our website says it's about a 15-minute walk from the terminals.",
    "tags": [
-    "walk",
     "lax",
     "airport",
+    "close",
     "distance",
-    "terminal",
-    "close"
-   ]
-  },
-  {
-   "q": "Do you take reservations?",
-   "a": "I don't have reservation details. Please call (310) 670-1994 to ask.",
-   "tags": [
-    "reservation",
-    "reserve",
-    "book",
-    "table",
-    "booking"
-   ]
-  },
-  {
-   "q": "Do you host private events or catering?",
-   "a": "Yes. Melody does private parties for roughly 10–150 guests, and there is a catering menu. Call (310) 670-1994 for details and pricing.",
-   "tags": [
-    "private",
-    "event",
-    "party",
-    "catering",
-    "group",
-    "birthday"
-   ]
-  },
-  {
-   "q": "Can I get delivery or takeout?",
-   "a": "Delivery is through DoorDash, and takeout is available. In the app you can also pick To go when you order.",
-   "tags": [
-    "delivery",
-    "takeout",
-    "to go",
-    "doordash",
-    "pickup"
+    "walk",
+    "near"
    ]
   },
   {
@@ -157,422 +124,461 @@
    "tags": [
     "happy hour",
     "hh",
-    "3 to 6",
-    "deals",
+    "3-6",
     "drinks",
+    "specials",
     "time"
    ]
   },
   {
-   "q": "What are the daily specials?",
-   "a": "Mon: half off burgers 11–3. Tue: $4 tacos (every taco) and $6 margaritas. Thu: half off sandwiches 11–3. Fri: $3 sliders 11–3.",
+   "q": "What are the happy hour prices?",
+   "a": "The app shows the happy hour times (3–6 daily) but doesn't list the prices. Please ask your server or call (310) 670-1994.",
    "tags": [
-    "specials",
-    "daily",
-    "weekly",
-    "deals",
-    "monday",
-    "tuesday",
-    "thursday",
-    "friday"
+    "happy hour",
+    "price",
+    "deal",
+    "drinks",
+    "discount"
    ]
   },
   {
-   "q": "What's the Monday special?",
-   "a": "Half off burgers from 11 to 3.",
+   "q": "What is the Monday special?",
+   "a": "Mondays are half off burgers, 11 to 3.",
    "tags": [
     "monday",
-    "burgers",
+    "burger",
     "half off",
-    "special"
+    "special",
+    "lunch"
    ]
   },
   {
-   "q": "Is there a Taco Tuesday?",
-   "a": "Yes. Tuesdays are $4 for every taco on the menu and $6 margaritas.",
+   "q": "What is the Tuesday special?",
+   "a": "Taco Tuesday: every taco is $4, and margaritas are $6.",
    "tags": [
     "tuesday",
-    "tacos",
-    "taco tuesday",
+    "taco",
     "margarita",
     "special",
-    "$4"
+    "$4",
+    "$6"
    ]
   },
   {
-   "q": "What's the Thursday special?",
-   "a": "Half off sandwiches from 11 to 3.",
+   "q": "Are there Thursday or Friday specials?",
+   "a": "Yes, Thursday and Friday have deals from 11 to 3. Ask your server for the details.",
    "tags": [
     "thursday",
-    "sandwiches",
-    "half off",
-    "special"
-   ]
-  },
-  {
-   "q": "What's the Friday special?",
-   "a": "$3 sliders from 11 to 3.",
-   "tags": [
     "friday",
-    "sliders",
-    "$3",
-    "special"
-   ]
-  },
-  {
-   "q": "Is there a Wednesday special?",
-   "a": "The app doesn't list a Wednesday special. Ask staff or call (310) 670-1994.",
-   "tags": [
-    "wednesday",
     "special",
+    "lunch",
     "deal"
    ]
   },
   {
-   "q": "Do you have karaoke, DJs or live music?",
-   "a": "Yes. Every week has karaoke, live bands, DJs and trivia, and every game is on the TVs. I don't have the exact days, so call (310) 670-1994 to ask.",
+   "q": "What events do you have each week?",
+   "a": "Every week there's karaoke, live bands, DJs, trivia and every game on the TVs. Call (310) 670-1994 for the schedule.",
    "tags": [
+    "events",
     "karaoke",
     "dj",
     "live",
     "band",
+    "trivia",
     "music",
-    "entertainment",
-    "trivia"
+    "tvs"
+   ]
+  },
+  {
+   "q": "When is karaoke?",
+   "a": "Our notes say karaoke is Wednesdays from about 10 PM. Call (310) 670-1994 to confirm.",
+   "tags": [
+    "karaoke",
+    "wednesday",
+    "sing",
+    "night"
    ]
   },
   {
    "q": "Can I watch the game at Melody?",
-   "a": "Yes, every game is on the TVs. The app's Today's games section shows live LA and California team scores and where to watch.",
+   "a": "Yes, every game is on the TVs. The app also has Today's games with live LA and California scores and where to watch.",
    "tags": [
     "sports",
     "game",
     "tv",
     "watch",
     "nfl",
-    "dodgers",
-    "lakers"
+    "scores"
    ]
   },
   {
    "q": "Is there a cover charge?",
-   "a": "I don't have cover charge info. Please call (310) 670-1994 to ask.",
+   "a": "I don't have cover charge details for every night. Ask staff or call (310) 670-1994.",
    "tags": [
     "cover",
     "charge",
-    "entry",
     "fee",
+    "entry",
     "dj"
    ]
   },
   {
-   "q": "Is Melody kid friendly?",
-   "a": "I don't have our evening age policy. Please call (310) 670-1994 to ask before an after-dark visit.",
+   "q": "Do you take reservations?",
+   "a": "I don't have reservation info in the app. Please call (310) 670-1994.",
    "tags": [
-    "kids",
-    "children",
-    "family",
-    "age",
-    "21",
-    "minors"
+    "reservation",
+    "reserve",
+    "book",
+    "table",
+    "party"
    ]
   },
   {
    "q": "Is there a dress code?",
-   "a": "I don't have dress code info. Ask staff or call (310) 670-1994.",
+   "a": "I don't have a dress code listed. Ask staff or call (310) 670-1994.",
    "tags": [
-    "dress",
-    "code",
+    "dress code",
     "attire",
     "wear"
    ]
   },
   {
-   "q": "Is there an LAX employee discount?",
-   "a": "Yes. Airline, TSA, terminal, hotel, rental car and shuttle workers get 10% off the check with a badge or proof of employment. It's dine-in only and can't be combined with other promos.",
+   "q": "Is Melody 21+ at night?",
+   "a": "I don't have the age policy for evenings. Please call (310) 670-1994.",
    "tags": [
-    "lax crew",
-    "employee",
-    "discount",
-    "badge",
-    "airline",
-    "tsa"
+    "21",
+    "age",
+    "kids",
+    "night",
+    "id"
    ]
   },
   {
-   "q": "What is Just Landed?",
-   "a": "If you landed at LAX in the last 24 hours, show your boarding pass for 10% off your first order today. It's one per guest per day and can't be combined with other offers.",
+   "q": "Do you serve food?",
+   "a": "Yes. The app menu has Starters, Mac & Cheese, Burgers, Fries, Soups, and Tacos & Burritos.",
    "tags": [
-    "just landed",
-    "boarding pass",
-    "lax",
-    "flight",
-    "discount",
-    "10%"
+    "food",
+    "menu",
+    "eat",
+    "what",
+    "kitchen"
    ]
   },
   {
-   "q": "How do I use the Just Landed offer?",
-   "a": "Tap I just landed in the app to get your code, then show your boarding pass and the code to your server.",
+   "q": "What starters do you have?",
+   "a": "Lemon Pepper Wings $16, Avocado Toast $13, BBQ Rib Grilled Cheese Bites $15, Buttermilk Chicken Strips & Fries $16, Chicken Pot Stickers $15, Fried Green Beans $13, Fried Shrimp $18.25, Jalapeno Calamari $16, Lettuce Wraps $16, and Baby Back Ribs & Fries $20.25.",
    "tags": [
-    "just landed",
-    "redeem",
-    "boarding pass",
-    "code",
-    "use"
-   ]
-  },
-  {
-   "q": "How do I join Melody Rewards?",
-   "a": "Tap Join in the app. It's free, takes about 10 seconds, and you get a gold rewards card on your phone.",
-   "tags": [
-    "join",
-    "sign up",
-    "signup",
-    "member",
-    "rewards",
-    "register",
-    "free"
-   ]
-  },
-  {
-   "q": "Does it cost anything to join?",
-   "a": "No, joining is free. It's one account per person.",
-   "tags": [
-    "free",
-    "cost",
-    "join",
-    "price",
-    "membership"
-   ]
-  },
-  {
-   "q": "Do I need to download an app?",
-   "a": "No download needed. It opens in your phone's browser, and you can add it to your home screen.",
-   "tags": [
-    "download",
-    "install",
-    "app",
-    "home screen",
-    "add",
-    "browser"
-   ]
-  },
-  {
-   "q": "How do I add the app to my home screen?",
-   "a": "Use your browser's Share or menu button and choose Add to Home Screen. On iPhone, nearby alerts only work once it's on your Home Screen (iOS 16.4 or newer).",
-   "tags": [
-    "install",
-    "home screen",
-    "iphone",
-    "add",
-    "shortcut",
-    "pwa"
-   ]
-  },
-  {
-   "q": "Can I add my card to Apple or Google Wallet?",
-   "a": "Not yet. The Apple and Google Wallet buttons aren't turned on. You can open your gold card any time under My Rewards Card in the app.",
-   "tags": [
-    "wallet",
-    "apple",
-    "google",
-    "card",
-    "pass"
-   ]
-  },
-  {
-   "q": "How do I earn points?",
-   "a": "You earn 10 points for every $1 you spend on eligible purchases, before tip. You also get bonus points for joining, your birthday, referrals and the game.",
-   "tags": [
-    "points",
-    "earn",
-    "pts",
-    "stars",
-    "how",
-    "ratio",
-    "per dollar"
-   ]
-  },
-  {
-   "q": "How many points per dollar?",
-   "a": "10 points per $1 on eligible purchases, before tip.",
-   "tags": [
-    "ratio",
-    "per dollar",
-    "points",
-    "how many",
-    "10",
-    "pts"
-   ]
-  },
-  {
-   "q": "How do I get points for my visit?",
-   "a": "Tap Add my visit in the app and snap your receipt, or type the check number, total and date (today or yesterday). It's one receipt per day, each check counts once, and each check earns up to $150 worth of points.",
-   "tags": [
-    "add my visit",
-    "receipt",
-    "check",
-    "claim",
-    "points",
-    "earn"
-   ]
-  },
-  {
-   "q": "Are points checked?",
-   "a": "Yes. Claims are checked against the restaurant's sales report, and points from made-up checks are removed.",
-   "tags": [
-    "verify",
-    "receipt",
-    "fraud",
-    "check",
-    "points",
-    "cheat"
-   ]
-  },
-  {
-   "q": "Do I earn points on my tip?",
-   "a": "No. Points are 10 per $1 before tip.",
-   "tags": [
-    "tip",
-    "points",
-    "gratuity",
-    "earn"
-   ]
-  },
-  {
-   "q": "Do I earn points when I order from my phone?",
-   "a": "Yes. Members earn points on every check, including orders you send from the app.",
-   "tags": [
-    "order",
-    "points",
-    "phone",
-    "earn",
-    "app"
-   ]
-  },
-  {
-   "q": "Is there a sign-up bonus?",
-   "a": "Yes, you get +100 points once when you join.",
-   "tags": [
-    "bonus",
-    "join",
-    "welcome",
-    "sign up",
-    "100",
-    "points"
-   ]
-  },
-  {
-   "q": "How does the birthday bonus work?",
-   "a": "You get +250 points once a year on your birthday.",
-   "tags": [
-    "birthday",
-    "bonus",
-    "club",
-    "250",
-    "points"
-   ]
-  },
-  {
-   "q": "Is there a birthday club or free birthday item?",
-   "a": "The birthday perk I have is +250 points once a year. I don't have any other birthday freebies, so ask staff.",
-   "tags": [
-    "birthday",
-    "club",
-    "free",
-    "dessert",
-    "gift"
-   ]
-  },
-  {
-   "q": "How do referrals work?",
-   "a": "Share your code. When a friend joins with it and makes a first visit, you get +100 points. Each friend can pay out once.",
-   "tags": [
-    "referral",
-    "refer",
-    "friend",
-    "share",
-    "code",
-    "invite"
-   ]
-  },
-  {
-   "q": "How do I use a friend's referral code?",
-   "a": "Enter it once when you join. You can only use one friend's code, you can't change it later, and you can't use your own.",
-   "tags": [
-    "referral",
-    "code",
-    "friend",
-    "enter",
-    "join"
-   ]
-  },
-  {
-   "q": "Is there a location bonus?",
-   "a": "Yes. You get +100 points once if location and notifications are both on when you open the app on at least 3 different days spanning at least 7 days. It's added automatically and is optional.",
-   "tags": [
-    "location",
-    "bonus",
-    "nearby",
-    "notifications",
-    "100",
-    "buddy"
-   ]
-  },
-  {
-   "q": "Is there a bonus for reviewing Melody?",
-   "a": "Yes, there's a one-time +50 points for telling us how we did in the app. A Google review link is also offered to everyone, with no points tied to it.",
-   "tags": [
-    "review",
-    "bonus",
-    "feedback",
-    "50",
-    "google"
-   ]
-  },
-  {
-   "q": "Is there double points at happy hour?",
-   "a": "The app doesn't mention double points. Ask staff to confirm.",
-   "tags": [
-    "double",
-    "happy hour",
-    "points",
-    "bonus",
-    "early bird"
-   ]
-  },
-  {
-   "q": "Is there an early-bird bonus?",
-   "a": "I don't have an early-bird bonus. The bonuses I have are joining, birthday, referrals, the location bonus and game points.",
-   "tags": [
-    "early bird",
-    "founding",
-    "bonus",
-    "early"
-   ]
-  },
-  {
-   "q": "What rewards can I redeem?",
-   "a": "250 pts: free soft drink or Melody Fries. 500 pts: $10 off your check. 1,000 pts: free starter (Fried Green Beans, Avocado Toast or Chicken Pot Stickers). 1,500 pts: a free entrée up to $21.50 (Mac & Cheese, Melody Burger, a burrito, tacos or Baby Back Ribs & Fries).",
-   "tags": [
-    "rewards",
-    "redeem",
-    "prize",
-    "free",
-    "cost",
-    "points",
+    "starters",
+    "appetizer",
+    "wings",
+    "ribs",
+    "prices",
     "menu"
    ]
   },
   {
-   "q": "How many points for a free drink or fries?",
+   "q": "What mac & cheese do you have?",
+   "a": "House Mac $15, Bacon Cheddar & Jalapeno $17.25, Parmesan & Mushroom $17.25, Chicken Parmesan $18.25, Melody Burger Mac $19.25, and Lobster Mac & Cheese $21.50.",
+   "tags": [
+    "mac",
+    "cheese",
+    "lobster",
+    "pasta",
+    "prices",
+    "menu"
+   ]
+  },
+  {
+   "q": "What burgers do you have?",
+   "a": "The app lists the Melody Burger for $19.25. It's Angus beef on a pretzel bun with caramelized onions, Gorgonzola, apple-smoked bacon, spinach and BBQ sauce, served with fries.",
+   "tags": [
+    "burger",
+    "melody burger",
+    "price",
+    "menu",
+    "beef"
+   ]
+  },
+  {
+   "q": "What fries do you have?",
+   "a": "Gilroy Garlic Fries $6.75, Melody Fries $5.75, Onion Strings $9.75, Phat Fries $7.75, Philly Cheese Steak Fries $17.25, and Sweet Potato Fries $7.75. Cheese is +$2 on Melody Fries and Phat Fries.",
+   "tags": [
+    "fries",
+    "garlic",
+    "sweet potato",
+    "onion strings",
+    "menu",
+    "prices"
+   ]
+  },
+  {
+   "q": "What soups do you have?",
+   "a": "French Onion, Tomato Bisque (cup $11, bowl $15) and Black Bean (cup $9.75, bowl $14).",
+   "tags": [
+    "soup",
+    "bisque",
+    "french onion",
+    "black bean",
+    "menu"
+   ]
+  },
+  {
+   "q": "What tacos and burritos do you have?",
+   "a": "Tacos come as 2 per order: Shrimp $16, Salmon $16, Carnitas $14, Chicken $13, Avocado $13, Beyond $14. Burritos: Carnitas $18.25, Steak $18.25, Chicken $17.25, Bean & Cheese $14. Nachos and a Cheese Quesadilla are $15.",
+   "tags": [
+    "tacos",
+    "burrito",
+    "nachos",
+    "quesadilla",
+    "menu",
+    "prices"
+   ]
+  },
+  {
+   "q": "Do you have vegetarian or plant-based options?",
+   "a": "The app menu has Avocado Toast, Avocado Tacos, Beyond Tacos, Bean & Cheese Burrito, Cheese Quesadilla and Fried Green Beans. Ask staff about ingredients for dietary needs.",
+   "tags": [
+    "vegetarian",
+    "vegan",
+    "plant",
+    "beyond",
+    "avocado",
+    "dietary"
+   ]
+  },
+  {
+   "q": "What drinks do you have?",
+   "a": "The app lists Mango, House and Paloma-style margaritas, Old Fashioned, Moscow Mule, Espresso Martini, Long Island, Michelada, draft beer, Mimosa, shots and a bucket of 5 beers.",
+   "tags": [
+    "drinks",
+    "cocktails",
+    "beer",
+    "margarita",
+    "bar",
+    "menu"
+   ]
+  },
+  {
+   "q": "How much are drinks?",
+   "a": "The drink prices in the app are previews and not final. Ask your server for current prices. Margaritas are $6 on Tuesdays.",
+   "tags": [
+    "drink",
+    "price",
+    "cost",
+    "cocktail",
+    "margarita"
+   ]
+  },
+  {
+   "q": "Can I order from my table?",
+   "a": "Yes. Pick your table, the bar, the patio or to go, add items, and send your order. If you scanned a table code, your table is already picked.",
+   "tags": [
+    "order",
+    "table",
+    "qr",
+    "scan",
+    "phone",
+    "menu"
+   ]
+  },
+  {
+   "q": "How do I pay?",
+   "a": "Pay your server or bartender like normal. The app doesn't take payment, but you still earn points on every check.",
+   "tags": [
+    "pay",
+    "payment",
+    "check",
+    "bill",
+    "card"
+   ]
+  },
+  {
+   "q": "What does the QR code on my table do?",
+   "a": "It opens the app with your table already picked, so you can browse the menu and order from your phone.",
+   "tags": [
+    "qr",
+    "table",
+    "scan",
+    "code"
+   ]
+  },
+  {
+   "q": "Can I order to go?",
+   "a": "Yes. Choose \"To go\" when you pick where you're sitting. The app says you'll get a text when it's ready.",
+   "tags": [
+    "to go",
+    "takeout",
+    "pickup",
+    "order"
+   ]
+  },
+  {
+   "q": "Do I need to download the app?",
+   "a": "No download. It opens in your phone's browser. Use the link in our Instagram bio (@melodylax) or scan the QR on your table.",
+   "tags": [
+    "download",
+    "install",
+    "app",
+    "browser",
+    "instagram",
+    "qr"
+   ]
+  },
+  {
+   "q": "How do I add the app to my home screen?",
+   "a": "Use your browser's Add to Home Screen option. On iPhone, notifications need the app on your Home Screen (iOS 16.4 or newer).",
+   "tags": [
+    "home screen",
+    "install",
+    "add",
+    "iphone",
+    "wallet"
+   ]
+  },
+  {
+   "q": "What languages is the app in?",
+   "a": "The app has 12 languages. Look for the language option in the app.",
+   "tags": [
+    "language",
+    "spanish",
+    "translate",
+    "espanol"
+   ]
+  },
+  {
+   "q": "How do I join Melody Rewards?",
+   "a": "Tap to become a member. It's free and takes about 10 seconds. You get a gold Melody Rewards card on your phone.",
+   "tags": [
+    "join",
+    "sign up",
+    "membership",
+    "rewards",
+    "free",
+    "register"
+   ]
+  },
+  {
+   "q": "Does it cost anything to join?",
+   "a": "No. Joining is free, with one account per person.",
+   "tags": [
+    "free",
+    "cost",
+    "join",
+    "fee",
+    "account"
+   ]
+  },
+  {
+   "q": "What do I get for joining?",
+   "a": "+100 points once when you join.",
+   "tags": [
+    "join",
+    "bonus",
+    "welcome",
+    "points",
+    "signup"
+   ]
+  },
+  {
+   "q": "How do I earn points?",
+   "a": "You earn 10 points per $1 on eligible purchases, before tip. You also get bonuses for joining, your birthday, referrals and (once game rewards are on) games.",
+   "tags": [
+    "points",
+    "earn",
+    "ratio",
+    "per dollar",
+    "how many",
+    "pts",
+    "stars"
+   ]
+  },
+  {
+   "q": "What is the points ratio?",
+   "a": "10 points for every $1 spent on eligible purchases, before tip.",
+   "tags": [
+    "ratio",
+    "per dollar",
+    "10 points",
+    "points",
+    "rate"
+   ]
+  },
+  {
+   "q": "How do I get points for my visit?",
+   "a": "Tap \"Add my visit\" in the app and snap your receipt, or type the check number, total and date (today or yesterday). Points come after the check is verified.",
+   "tags": [
+    "add visit",
+    "receipt",
+    "check",
+    "points",
+    "claim"
+   ]
+  },
+  {
+   "q": "Are there limits on adding visits?",
+   "a": "One receipt per day, each check only once, and up to $150 per check. Points from made-up checks are removed.",
+   "tags": [
+    "limit",
+    "receipt",
+    "check",
+    "$150",
+    "once",
+    "claim"
+   ]
+  },
+  {
+   "q": "Will points happen automatically later?",
+   "a": "Once Melody connects the app to its register, it becomes automatic and your points carry over.",
+   "tags": [
+    "automatic",
+    "toast",
+    "points",
+    "carry over",
+    "register"
+   ]
+  },
+  {
+   "q": "Do I earn points on food and drinks?",
+   "a": "Yes. The app says you earn 10 points per $1 on eligible purchases. Ask staff what's not eligible.",
+   "tags": [
+    "food",
+    "drinks",
+    "points",
+    "eligible",
+    "earn"
+   ]
+  },
+  {
+   "q": "Do I earn double points at happy hour?",
+   "a": "The app doesn't mention double points. Ask staff to check.",
+   "tags": [
+    "double",
+    "happy hour",
+    "points",
+    "bonus"
+   ]
+  },
+  {
+   "q": "What can I get with my points?",
+   "a": "250 pts: free soft drink or Melody Fries. 500 pts: $10 off your check. 1,000 pts: a free starter (Fried Green Beans, Avocado Toast or Chicken Pot Stickers). 1,500 pts: a free entrée up to $21.50.",
+   "tags": [
+    "rewards",
+    "prizes",
+    "free",
+    "cost",
+    "points",
+    "catalog",
+    "redeem"
+   ]
+  },
+  {
+   "q": "How many points for a free soft drink or fries?",
    "a": "250 points gets you a free soft drink or Melody Fries.",
    "tags": [
     "250",
-    "free",
-    "soft drink",
     "fries",
+    "soft drink",
+    "free",
     "reward"
    ]
   },
@@ -582,9 +588,9 @@
    "tags": [
     "500",
     "$10 off",
+    "check",
     "discount",
-    "reward",
-    "check"
+    "reward"
    ]
   },
   {
@@ -599,99 +605,85 @@
    ]
   },
   {
-   "q": "How many points for a free entrée?",
-   "a": "1,500 points gets you a free entrée up to $21.50. That covers Mac & Cheese, the Melody Burger, a burrito, tacos or Baby Back Ribs & Fries.",
+   "q": "How many points for a free meal?",
+   "a": "1,500 points gets you a free entrée up to $21.50: Mac & Cheese, Melody Burger, burrito, tacos or Baby Back Ribs & Fries.",
    "tags": [
     "1500",
     "entree",
     "meal",
     "free",
-    "reward",
-    "mac"
+    "lobster mac",
+    "reward"
    ]
   },
   {
    "q": "How do I redeem a reward?",
-   "a": "Tap Use reward and show the live pass to your server, who applies it. Points come off when you open the pass.",
+   "a": "Tap \"Use reward\" and show the live pass to your server, who applies it. The points come off when you open the pass.",
    "tags": [
     "redeem",
     "use reward",
     "pass",
     "server",
-    "how",
-    "claim"
+    "how"
    ]
   },
   {
    "q": "How long does a reward pass last?",
-   "a": "A pass works once and expires 10 minutes after you open it. Your next code comes on your next visit.",
+   "a": "A pass works once and expires 10 minutes after it opens. Each visit gets a fresh one-time code.",
    "tags": [
     "pass",
     "expire",
     "10 minutes",
     "code",
-    "reward",
-    "time"
-   ]
-  },
-  {
-   "q": "Can I use more than one reward in a visit?",
-   "a": "No. It's one reward per visit, one prize per day, and rewards can't be stacked with other offers.",
-   "tags": [
-    "limit",
-    "stack",
-    "one per day",
-    "multiple",
-    "combine",
     "reward"
    ]
   },
   {
-   "q": "Can I get a free drink with alcohol?",
-   "a": "No. Rewards are never free alcohol.",
+   "q": "Can I use more than one reward in a day?",
+   "a": "No. It's one reward per visit and one prize per day (Los Angeles date), per member and per phone. A second one shows \"Come back tomorrow.\"",
+   "tags": [
+    "limit",
+    "one per day",
+    "reward",
+    "stack",
+    "prize"
+   ]
+  },
+  {
+   "q": "Can I stack rewards or offers?",
+   "a": "No. Rewards don't stack with each other. They also have no cash value and can't be transferred.",
+   "tags": [
+    "stack",
+    "combine",
+    "reward",
+    "offer",
+    "transfer"
+   ]
+  },
+  {
+   "q": "Can I get free alcohol with points?",
+   "a": "No. Rewards never include free alcohol.",
    "tags": [
     "alcohol",
-    "free",
+    "free drink",
     "reward",
     "margarita",
-    "beer"
+    "california"
    ]
   },
   {
-   "q": "What does \"Come back tomorrow\" mean?",
-   "a": "You've already used a prize today. That counts a reward, a gift or a game win. Your next prize is available tomorrow, by Los Angeles date.",
-   "tags": [
-    "come back tomorrow",
-    "limit",
-    "one per day",
-    "prize",
-    "reward"
-   ]
-  },
-  {
-   "q": "Can I give my points or rewards to someone else?",
-   "a": "No. Rewards have no cash value and can't be transferred.",
-   "tags": [
-    "transfer",
-    "give",
-    "cash",
-    "points",
-    "share"
-   ]
-  },
-  {
-   "q": "Do points expire?",
-   "a": "I don't have an expiry rule. Points you earn stay in your balance unless the program ends. Ask staff if you need more detail.",
+   "q": "Do my points expire?",
+   "a": "I don't have expiry details. The rules say points already earned stay in your balance unless the program ends. Ask staff for more.",
    "tags": [
     "expire",
-    "expiration",
     "points",
-    "balance"
+    "balance",
+    "lose"
    ]
   },
   {
    "q": "Are there levels or tiers?",
-   "a": "I don't see levels or tiers in the app. You earn points and spend them on rewards.",
+   "a": "The app doesn't show levels or tiers. You earn points and spend them on the rewards.",
    "tags": [
     "levels",
     "tiers",
@@ -701,152 +693,200 @@
    ]
   },
   {
-   "q": "Do points work at Nalu Vida too?",
-   "a": "No. Each spot has its own balance, and Melody points don't move to Nalu Vida.",
+   "q": "Is there a birthday reward?",
+   "a": "Yes, +250 points once a year on your birthday.",
    "tags": [
-    "nalu vida",
-    "sister",
-    "points",
-    "balance",
-    "venice"
+    "birthday",
+    "bonus",
+    "250",
+    "club",
+    "points"
    ]
   },
   {
-   "q": "What is Nalu Vida?",
-   "a": "It's our sister spot on the Venice Pier. Tap Surf over to Nalu Vida in the app to visit it.",
+   "q": "How does the referral program work?",
+   "a": "Your friend enters your code when they join. You get +100 points once they join and make a first visit.",
    "tags": [
-    "nalu vida",
-    "venice",
-    "pier",
-    "sister",
-    "surf"
+    "referral",
+    "refer",
+    "friend",
+    "share",
+    "code",
+    "invite"
+   ]
+  },
+  {
+   "q": "Can I enter a friend's code later?",
+   "a": "No. You can enter one friend's code, once, when you join. It can't be changed later and you can't use your own.",
+   "tags": [
+    "referral",
+    "code",
+    "friend",
+    "change",
+    "own code"
+   ]
+  },
+  {
+   "q": "What is the nearby alerts bonus?",
+   "a": "Turn on nearby alerts and open the app with location and notifications on for at least 3 different days over at least 7 days. You get +100 points once.",
+   "tags": [
+    "location",
+    "bonus",
+    "nearby",
+    "alerts",
+    "notifications",
+    "100",
+    "buddy"
+   ]
+  },
+  {
+   "q": "Is there an early-bird bonus?",
+   "a": "I don't have an early-bird bonus in the app. Ask staff about any current offers.",
+   "tags": [
+    "early bird",
+    "bonus",
+    "early",
+    "offer"
+   ]
+  },
+  {
+   "q": "Is there a bonus for leaving a review?",
+   "a": "Yes. The app offers +50 points once per member for telling us how we did.",
+   "tags": [
+    "review",
+    "feedback",
+    "bonus",
+    "50",
+    "google"
+   ]
+  },
+  {
+   "q": "Do I need an account to play games?",
+   "a": "No. The games are free to play with or without an account. You need an account to save game points once rewards are on.",
+   "tags": [
+    "games",
+    "free",
+    "account",
+    "play",
+    "join"
    ]
   },
   {
    "q": "What is Melody Approach?",
-   "a": "It's a free flying arcade game in the app with two modes, Campaign and Survival. You fly a plane over LA, shoot enemies, dodge fire and catch Melody's food.",
+   "a": "It's our arcade flying game. You fly a plane over LA, shoot jets and bosses, dodge fire and catch Melody's food and music notes.",
    "tags": [
     "melody approach",
     "game",
     "plane",
     "flying",
-    "arcade",
-    "play"
+    "arcade"
    ]
   },
   {
-   "q": "How do I control the plane?",
+   "q": "How do I play Melody Approach?",
    "a": "Drag anywhere on the game and the plane glides to your finger. Tap ⚡ for a speed boost and grab the hourglass for slow-mo.",
    "tags": [
     "controls",
+    "how to play",
     "drag",
     "boost",
     "slow-mo",
-    "how to play",
-    "plane",
-    "steer"
+    "approach"
    ]
   },
   {
-   "q": "What is Campaign mode?",
-   "a": "Campaign has 10 levels of about 45 seconds each over LA, getting a little harder each time. It has six boss fights, then you land at LAX.",
+   "q": "What are the two game modes?",
+   "a": "Campaign is 10 levels over a real SoCal route, about 45 seconds each, ending with a landing at LAX. Survival has no finish line and just gets harder.",
    "tags": [
     "campaign",
-    "levels",
-    "boss",
-    "mode",
-    "game",
-    "10 levels"
-   ]
-  },
-  {
-   "q": "Which levels have bosses?",
-   "a": "Levels 3, 5, 6, 7, 8 and 10 have boss fights.",
-   "tags": [
-    "boss",
-    "levels",
-    "3",
-    "5",
-    "6",
-    "7",
-    "8",
-    "10"
-   ]
-  },
-  {
-   "q": "What is Survival mode?",
-   "a": "There's no finish line, and the game keeps getting harder until your plane goes down. Your time survived is your score.",
-   "tags": [
     "survival",
-    "mode",
-    "time",
-    "endless",
+    "modes",
+    "levels",
     "game"
    ]
   },
   {
-   "q": "How does damage work in the game?",
-   "a": "Every enemy attack is warned first. Three hits and your plane goes down, and the game is over.",
+   "q": "How does scoring work in Melody Approach?",
+   "a": "Campaign is ranked by score. Survival is ranked by the longest time you survive. Catching Melody's food and shooting enemies adds to your score.",
    "tags": [
-    "health",
-    "hits",
-    "damage",
+    "score",
+    "scoring",
+    "points",
+    "game",
+    "survival",
+    "campaign"
+   ]
+  },
+  {
+   "q": "When do the guns turn on?",
+   "a": "Guns go live about 20 seconds into a flight. Beating levels and bosses (or flying longer in Survival) unlocks stronger guns, and ammo crates refill them.",
+   "tags": [
+    "guns",
+    "ammo",
+    "weapons",
+    "crate",
+    "game"
+   ]
+  },
+  {
+   "q": "How do I lose in Melody Approach?",
+   "a": "Three hits and your plane goes down. The game is over and nothing else happens.",
+   "tags": [
     "lose",
+    "hits",
+    "health",
     "game over",
     "crash"
    ]
   },
   {
-   "q": "When can I shoot?",
-   "a": "Guns go live about 20 seconds into a flight. Beating levels and bosses (or flying longer in Survival) unlocks stronger guns, and ammo crates refill them.",
-   "tags": [
-    "guns",
-    "shoot",
-    "ammo",
-    "weapons",
-    "crates",
-    "unlock"
-   ]
-  },
-  {
    "q": "Can I play without fighting?",
-   "a": "Yes. Tap the ⚔️ button in Pause to switch to a calm flight with no combat.",
+   "a": "Yes. Tap the ⚔️ button or use Pause to turn combat off for a calm flight.",
    "tags": [
     "calm",
     "no combat",
     "peaceful",
     "pause",
-    "easy",
-    "sword"
+    "game"
    ]
   },
   {
-   "q": "How much does it cost to play, and how often can I play?",
-   "a": "It's free, with or without an account, and no purchase is needed. I don't see a limit on how often you can fly.",
+   "q": "Are there bosses?",
+   "a": "Yes, six boss fights in Campaign (levels 3, 5, 6, 7, 8 and 10). Every boss attack is warned first.",
    "tags": [
-    "free",
-    "play",
+    "boss",
+    "campaign",
+    "levels",
+    "fight",
+    "game"
+   ]
+  },
+  {
+   "q": "How often can I play Melody Approach?",
+   "a": "As often as you like. It's free. Game points are capped per day once rewards are on.",
+   "tags": [
     "how often",
     "limit",
-    "cost",
+    "play",
+    "free",
+    "daily",
     "game"
    ]
   },
   {
    "q": "How do I get on the weekly leaderboard?",
-   "a": "After a flight, tap Post my score. Campaign is ranked by score and Survival by the longest time survived. Practice and test flights don't count.",
+   "a": "Finish a flight and tap \"Post my score.\" Practice and test flights don't go on the boards.",
    "tags": [
     "leaderboard",
-    "board",
     "weekly",
+    "board",
     "post score",
-    "rank",
-    "top flyers"
+    "rank"
    ]
   },
   {
    "q": "When does the leaderboard reset?",
-   "a": "Both boards reset every Monday.",
+   "a": "Both weekly boards (Campaign score and Survival time) reset every Monday.",
    "tags": [
     "reset",
     "monday",
@@ -856,404 +896,280 @@
    ]
   },
   {
-   "q": "Are there game prizes right now?",
-   "a": "Not yet. The weekly prizes are in BETA and will switch on soon. The boards are live now for bragging rights only.",
-   "tags": [
-    "prize",
-    "beta",
-    "weekly",
-    "champion",
-    "win",
-    "reward",
-    "game"
-   ]
-  },
-  {
-   "q": "What can I win from the weekly game?",
-   "a": "Once rewards are switched on, the top player on each weekly board may win the weekly prize shown in the game, for example free Melody Fries. Ask staff how winners are contacted and when prizes are picked up, since I don't have those details.",
+   "q": "Who is the weekly champion and what do they win?",
+   "a": "The top Campaign score and the longest Survival time each week. When prizes switch on, the weekly prize is free Melody Fries. Right now the boards are for bragging rights only.",
    "tags": [
     "champion",
     "winner",
-    "prize",
     "weekly",
-    "free fries",
-    "pick up"
+    "prize",
+    "fries",
+    "top"
    ]
   },
   {
-   "q": "How many points do I get from the game?",
-   "a": "Once game rewards are on, you get 1 point per 100 score, up to 50 game points a day. Right now they're off, so the game gives no points.",
+   "q": "When are weekly prizes picked or handed out?",
+   "a": "Prizes are BETA and not switched on yet. I don't have the date or how winners are contacted. Ask staff.",
+   "tags": [
+    "prize",
+    "pick",
+    "winner",
+    "when",
+    "weekly",
+    "beta"
+   ]
+  },
+  {
+   "q": "Do I get points from games?",
+   "a": "Not yet. Game points are in BETA. Once on, your score earns 1 point per 100 score, up to 50 game points a day.",
    "tags": [
     "game points",
     "score",
-    "100",
     "50",
-    "daily cap",
-    "points",
+    "daily",
+    "beta",
     "ratio"
    ]
   },
   {
-   "q": "What is the Games Pack?",
-   "a": "It's Trivia, Sports Trivia, Melody Word, Melody Mix, Truth or Dare and the LA Scoreboard. You can play solo or pass the phone around the table.",
+   "q": "What are the Melody Games?",
+   "a": "Trivia, Sports Trivia, Melody Word (a daily 5-letter word), Melody Mix (word scramble) and Truth or Dare. You can play solo or pass the phone around.",
    "tags": [
     "games",
     "trivia",
-    "pack",
-    "table games",
     "word",
-    "scramble"
+    "mix",
+    "truth or dare",
+    "table"
    ]
   },
   {
-   "q": "How does Trivia work?",
-   "a": "You get timed multiple-choice questions on music, food and drink, pop culture and LA. Faster right answers score more. Play solo for 10 questions, or pass the phone with 2–6 players.",
+   "q": "How do trivia games give points?",
+   "a": "Once game rewards are on, Trivia and Sports Trivia give 1 point per 2 right answers, up to 5 a round.",
    "tags": [
     "trivia",
-    "questions",
-    "how to play",
-    "table",
-    "score",
-    "quiz"
-   ]
-  },
-  {
-   "q": "How does Sports Trivia work?",
-   "a": "Pick a team for a 10-question Fan Test and get a 1–5 star Fan Rating, or play mixed LA sports questions. It's the same timed format as Trivia.",
-   "tags": [
+    "points",
     "sports trivia",
-    "fan test",
-    "fan rating",
-    "team",
-    "stars",
-    "quiz"
+    "right answers"
    ]
   },
   {
-   "q": "What is Melody Word?",
-   "a": "It's one daily 5-letter word, the same for everyone. You get 6 guesses and up to 2 hints, and a new word arrives every midnight LA time.",
+   "q": "How does Melody Word work?",
+   "a": "It's one 5-letter word a day, the same for everyone. You get 6 guesses and up to 2 hints. Once rewards are on, solving it earns 3 points (2 with one hint, 1 with two).",
    "tags": [
     "melody word",
     "wordle",
     "daily",
-    "word",
-    "hints",
-    "5-letter"
+    "hint",
+    "points"
    ]
   },
   {
-   "q": "What is Melody Mix?",
-   "a": "It's a word scramble. Unscramble as many words as you can before time runs out, and you get 3 skips.",
+   "q": "How does Melody Mix work?",
+   "a": "It's a word scramble. Once rewards are on, you earn 1 point per 2 words solved, up to 3.",
    "tags": [
     "melody mix",
     "scramble",
-    "word",
-    "skips",
-    "game"
+    "words",
+    "points"
    ]
   },
   {
-   "q": "How does Truth or Dare work?",
-   "a": "It's a table game for 1–6 players with 3 turns each. Pick a light truth or a fun dare, and anyone can pass. Dares never involve drinking.",
+   "q": "Is Truth or Dare for points?",
+   "a": "No, it's just for fun. Dares never involve drinking and anyone can pass.",
    "tags": [
     "truth or dare",
-    "table game",
     "dare",
-    "players",
-    "pass",
-    "party"
+    "fun",
+    "drinking",
+    "pass"
    ]
   },
   {
-   "q": "Do trivia and word games give points?",
-   "a": "Once game rewards are on: Trivia and Sports Trivia give 1 point per 2 right answers (up to 5 a round). Melody Mix gives 1 point per 2 words (up to 3). The daily Melody Word gives 3 points, or 2 with one hint and 1 with two hints. They're off in BETA right now.",
-   "tags": [
-    "points",
-    "trivia",
-    "word",
-    "mix",
-    "game points",
-    "ratio"
-   ]
-  },
-  {
-   "q": "Is there a daily limit on Games Pack points?",
-   "a": "Yes, 10 Games Pack points a day per member and phone, counted toward the 50-a-day game limit. Truth or Dare gives no points.",
+   "q": "What's the daily limit for game points?",
+   "a": "Once rewards are on, it's at most 10 Games Pack points a day, and at most 50 game points a day overall.",
    "tags": [
     "limit",
-    "cap",
     "daily",
-    "10",
-    "games points"
+    "game points",
+    "cap",
+    "50",
+    "10"
    ]
   },
   {
-   "q": "What is the LA Scoreboard and \"Who wins?\"",
-   "a": "The LA Scoreboard shows live scores from ESPN for information only, with no streams. \"Who wins?\" picks are free and just for fun, with no money or wagers, and they lock when the game starts.",
+   "q": "What is the LA Scoreboard?",
+   "a": "It shows live scores from ESPN for information only. There are no streams.",
    "tags": [
     "scoreboard",
     "scores",
+    "espn",
+    "live",
+    "la",
+    "teams"
+   ]
+  },
+  {
+   "q": "What are \"Who wins?\" picks?",
+   "a": "Free picks, just for fun, with no money or wagers. Picks lock when the game starts. Once rewards are on, a right pick earns 2 points, up to 6 a day.",
+   "tags": [
     "picks",
     "who wins",
-    "sports",
-    "espn"
+    "predict",
+    "points",
+    "free"
    ]
   },
   {
-   "q": "Are there Football Squares?",
-   "a": "Per the rules, every member can get one free square per NFL or college game board with Get my free square. Extra squares come with purchase through staff, and prizes are shown on the board before you play. Ask staff if a board is running.",
+   "q": "What is Football Squares?",
+   "a": "Members get 1 free square per board in the app. Extra squares can be added with a purchase by showing your card. Numbers are drawn at kickoff, and winners are decided by the last digit of each team's score at the end of each quarter.",
    "tags": [
-    "football squares",
+    "football",
     "squares",
     "nfl",
-    "free square",
+    "free",
+    "board",
+    "prize"
+   ]
+  },
+  {
+   "q": "What can I win in Football Squares?",
+   "a": "Prizes are set per board and shown before you play: food, merch, % off the check, a free non-alcoholic drink or a % off a drink (21+ with ID). No cash and never free alcohol.",
+   "tags": [
+    "squares",
     "prize",
-    "board"
-   ]
-  },
-  {
-   "q": "How do I order from my table?",
-   "a": "Scan your table's QR code, or pick Bar, Patio or To go in the app. Add items, tap Send my order, then pay your server or bartender like normal.",
-   "tags": [
-    "order",
-    "table",
-    "qr",
-    "scan",
-    "phone",
-    "seat",
-    "bar",
-    "patio"
-   ]
-  },
-  {
-   "q": "What do I do if I didn't scan a table code?",
-   "a": "Pick where you're sitting (a table number, the bar, the patio or to go) in the app before you send your order.",
-   "tags": [
-    "seat",
-    "table",
-    "pick",
-    "qr",
-    "bar",
-    "patio",
-    "to go"
-   ]
-  },
-  {
-   "q": "How do I pay?",
-   "a": "Pay your server or bartender like normal. You still earn points on every check.",
-   "tags": [
-    "pay",
-    "payment",
-    "check",
-    "bill",
-    "card",
-    "cash"
-   ]
-  },
-  {
-   "q": "What's on the menu?",
-   "a": "Food categories are Starters, Mac & Cheese, Burgers, Fries, Soups, and Tacos & Burritos. There's also a drinks list. Browse them in the app.",
-   "tags": [
-    "menu",
+    "win",
     "food",
-    "drinks",
-    "categories",
-    "eat"
+    "nfl"
    ]
   },
   {
-   "q": "What Mac & Cheese do you have?",
-   "a": "House Mac $15, Bacon Cheddar & Jalapeño $17.25, Parmesan & Mushroom $17.25, Chicken Parmesan $18.25, Melody Burger Mac $19.25 and Lobster $21.50.",
+   "q": "What is the Just Landed deal?",
+   "a": "Show a boarding pass from a flight that landed at LAX in the last 24 hours and get 10% off your first order that day. One per guest per day, and it can't be combined with other offers.",
    "tags": [
-    "mac",
-    "cheese",
-    "lobster",
-    "menu",
-    "price",
-    "pasta"
+    "just landed",
+    "boarding pass",
+    "lax",
+    "10%",
+    "discount",
+    "flight"
    ]
   },
   {
-   "q": "What starters do you have?",
-   "a": "Lemon Pepper Wings $16, Avocado Toast $13, BBQ Rib Grilled Cheese Bites $15, Buttermilk Chicken Strips & Fries $16, Chicken Pot Stickers $15, Fried Green Beans $13, Fried Shrimp $18.25, Jalapeño Calamari $16, Lettuce Wraps $16 and Baby Back Ribs & Fries $20.25.",
+   "q": "Is there an airline or LAX worker discount?",
+   "a": "Our notes list 10% off the check, dine-in, with a badge for airline, TSA, terminal, hotel, rental car and shuttle workers. Ask staff to confirm.",
    "tags": [
-    "starters",
-    "appetizers",
-    "wings",
-    "menu",
-    "price",
-    "ribs",
-    "calamari"
+    "lax crew",
+    "airline",
+    "badge",
+    "employee",
+    "discount",
+    "10%"
    ]
   },
   {
-   "q": "What tacos and burritos do you have?",
-   "a": "Tacos come two to an order: Shrimp $16, Salmon $16, Carnitas $14, Chicken $13, Avocado $13 and Beyond $14. Burritos: Carnitas $18.25, Steak $18.25, Chicken $17.25, Bean & Cheese $14. There are also Nachos $15 and a Cheese Quesadilla $15.",
-   "tags": [
-    "tacos",
-    "burritos",
-    "nachos",
-    "quesadilla",
-    "menu",
-    "price"
-   ]
-  },
-  {
-   "q": "What fries and soups do you have?",
-   "a": "Fries: Gilroy Garlic $6.75, Melody $5.75, Onion Strings $9.75, Phat $7.75, Philly Cheese Steak $17.25 and Sweet Potato $7.75. Soups: French Onion, Tomato Bisque and Black Bean, in a cup or bowl.",
-   "tags": [
-    "fries",
-    "soup",
-    "menu",
-    "price",
-    "garlic",
-    "bisque"
-   ]
-  },
-  {
-   "q": "Tell me about the Melody Burger.",
-   "a": "It's Angus beef on a pretzel bun with caramelized onions, Gorgonzola, apple-smoked bacon, spinach and BBQ sauce, served with fries, for $19.25.",
-   "tags": [
-    "burger",
-    "melody burger",
-    "menu",
-    "price",
-    "angus"
-   ]
-  },
-  {
-   "q": "What drinks do you have?",
-   "a": "The app lists Mango Margarita, House Margarita, Paloma, Old Fashioned, Moscow Mule, Espresso Martini, Long Island, Michelada, Draft Beer, Mimosa, shots and a bucket of 5 beers. Drink prices in the app are previews, so ask your server for current prices.",
-   "tags": [
-    "drinks",
-    "cocktails",
-    "beer",
-    "margarita",
-    "menu",
-    "bar",
-    "mimosa"
-   ]
-  },
-  {
-   "q": "Do you have vegan or vegetarian options?",
-   "a": "Yes. The app lists Avocado Tacos, Beyond Tacos, a Bean & Cheese Burrito, Avocado Toast, Fried Green Beans and Black Bean Soup. Ask your server about ingredients.",
-   "tags": [
-    "vegan",
-    "vegetarian",
-    "plant",
-    "beyond",
-    "menu",
-    "meatless"
-   ]
-  },
-  {
-   "q": "Can I get Fries added with cheese?",
-   "a": "Yes. Melody Fries and Phat Fries can add cheese for +$2.",
-   "tags": [
-    "cheese",
-    "fries",
-    "add",
-    "extra",
-    "price"
-   ]
-  },
-  {
-   "q": "What languages is the app in?",
-   "a": "The app has 12 languages.",
-   "tags": [
-    "language",
-    "spanish",
-    "translate",
-    "español",
-    "languages"
-   ]
-  },
-  {
-   "q": "Is there a kid mode?",
-   "a": "The Games Pack can hide adult-only games in kid mode, but I don't have the full kid mode rules. Ask staff.",
+   "q": "Is there a kids mode?",
+   "a": "The app has a kid mode that hides adult-only items. Ask staff if you need more detail.",
    "tags": [
     "kid",
     "kids",
     "child",
-    "mode",
     "family",
-    "games"
+    "mode"
    ]
   },
   {
-   "q": "What does the app know about my location?",
-   "a": "Only if you turn on nearby alerts, and only while the app is open. It shows a You're nearby deal within about half a mile of Melody. Your exact location stays on your phone, and it's never sold or used for ads.",
+   "q": "Where is my rewards card?",
+   "a": "Tap \"My Rewards Card\" in the app. It shows your card ID, points, next reward, a QR code and this visit's code. Apple and Google Wallet buttons aren't available yet.",
    "tags": [
-    "privacy",
-    "location",
-    "nearby",
-    "alerts",
-    "tracking",
-    "data"
+    "card",
+    "wallet",
+    "rewards card",
+    "gold",
+    "qr",
+    "apple",
+    "google"
    ]
   },
   {
-   "q": "How do I turn off nearby alerts?",
-   "a": "Tap Turn off nearby alerts in the app, or switch off Location and Notifications for the app in your phone's Settings. Points you've earned stay.",
+   "q": "What is Nalu Vida?",
+   "a": "It's our sister spot at the Venice Pier. It has its own rewards points, separate from Melody's.",
    "tags": [
-    "turn off",
-    "alerts",
-    "location",
-    "notifications",
-    "privacy",
-    "settings"
+    "nalu vida",
+    "venice",
+    "sister",
+    "points",
+    "pier"
    ]
   },
   {
-   "q": "What does the app record when I open it?",
-   "a": "At most once every 10 minutes it records the time, a short device summary, whether you opened it from your Home Screen, a random phone ID and your member ID. Only Melody's owner and SousShift AI see it, and it's never sold or used for ads.",
+   "q": "Can I use my Melody points at Nalu Vida?",
+   "a": "No. Each restaurant has its own balance, and points don't move between them.",
+   "tags": [
+    "nalu",
+    "transfer",
+    "points",
+    "balance",
+    "venice"
+   ]
+  },
+  {
+   "q": "What do you collect about me?",
+   "a": "When you open the app it logs the time, a short device summary, a random phone ID and your member ID if you joined. Location is only used if you turn on nearby alerts. It's never sold or used for ads.",
    "tags": [
     "privacy",
     "data",
-    "visit log",
-    "record",
-    "info",
-    "safe"
+    "location",
+    "tracking",
+    "collect"
    ]
   },
   {
-   "q": "Do I need an account to play the games?",
-   "a": "No, the games are free with or without an account. An account lets you save game points once rewards are on.",
+   "q": "How do I turn off location or alerts?",
+   "a": "Tap \"Turn off nearby alerts\" in the app, or switch off Location and Notifications for the app in your phone's Settings. Points you already earned stay.",
    "tags": [
-    "account",
-    "games",
-    "free",
-    "sign in",
-    "points",
-    "play"
+    "turn off",
+    "location",
+    "notifications",
+    "privacy",
+    "alerts"
    ]
   },
   {
-   "q": "How do I get help from staff?",
+   "q": "Who can I ask for help?",
    "a": "Ask your server or bartender, or call (310) 670-1994.",
    "tags": [
     "help",
     "staff",
-    "server",
     "support",
     "contact",
-    "question"
+    "problem"
    ]
   },
   {
-   "q": "Can the rewards program change?",
-   "a": "Yes. Melody can change or end the program, point values or rewards with notice in the app. Points you've already earned stay in your balance unless the program ends.",
+   "q": "Can I host a private event?",
+   "a": "Our notes say Melody hosts private events for 10 to 150 guests, including a private party room with a pool table. Call (310) 670-1994 for details.",
    "tags": [
-    "change",
-    "rules",
-    "terms",
-    "program",
-    "end",
-    "points"
+    "private",
+    "event",
+    "party",
+    "book",
+    "pool table",
+    "catering"
+   ]
+  },
+  {
+   "q": "Do you deliver?",
+   "a": "Our notes list DoorDash for delivery, and takeout is available. Call (310) 670-1994 to confirm.",
+   "tags": [
+    "delivery",
+    "doordash",
+    "takeout",
+    "to go"
    ]
   }
  ],
- "updated": "2026-11-11T01:39:24+00:00",
- "source_commit": "339078e",
+ "updated": "2026-11-11T04:47:25+00:00",
+ "source_commit": "cb32805",
  "app": "melody-lax"
 }

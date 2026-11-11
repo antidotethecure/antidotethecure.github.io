@@ -195,6 +195,24 @@ export function makeWorld(THREE, O = {}) {
   const boardsAll = [];
   function billboard(group, x, z, ry, sc) { if (O.noVideo) return null; try { return billboard0(group, x, z, ry, sc); } catch (e) { O.noVideo = 1; console.warn("[world3d] video billboard off:", e); return null; } }
   function billboard0(group, x, z, ry, sc) { const b = vboards().create({ w: 64 * (sc || 1), pole: 44, caption: "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" }); b.position.set(x, 0, z); b.rotation.y = ry || 0; group.add(b); if (!WARM) { boardsAll.push(b); if (boardsAll.length > 3) boardsAll.shift(); } return b; }
+  // The weekly HIGH SCORE sign, 2026-11-11 (Antidote: "a billboard ... where the high score is being shown ... let them know what they won").
+  // A painted, lit sign (NOT a video screen, so the one-review-screen rule is untouched). It goes up between two review screens, on the side the
+  // last screen was not on. One shared texture, redrawn only when the #1 changes. O.hi() = { name, txt, prize } from the page's weekly board.
+  const HS_GAP_S = 40; let hsLast = -1e9, hsKey = null, HSM = null;
+  const hsDue = () => { const t = O.clock ? O.clock() : performance.now() / 1000, d = t - bbLast; return t - hsLast >= HS_GAP_S && d >= 12 && d <= (O.bbGap || BB_GAP_S) - 12; };
+  function hsDraw() { const h = (O.hi && O.hi()) || {}, key = (h.name || "") + "|" + (h.txt || "") + "|" + (h.prize || ""); if (key === hsKey) return; hsKey = key;
+    const c = HSM.map.image, x = c.getContext("2d"), W = c.width, H = c.height, gold = "#f0d375", g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#3a0d16"); g.addColorStop(1, "#14080a");
+    x.shadowBlur = 0; x.fillStyle = g; x.fillRect(0, 0, W, H); x.strokeStyle = gold; x.lineWidth = 10; x.strokeRect(14, 14, W - 28, H - 28);
+    x.fillStyle = "#ffe9a8"; for (let i = 0; i <= 24; i++) for (const y of [34, H - 34]) { x.beginPath(); x.arc(40 + i * (W - 80) / 24, y, 7, 0, TAU); x.fill(); }   // marquee bulbs
+    x.textAlign = "center"; x.textBaseline = "middle"; x.shadowColor = gold;
+    const line = (t, y, size, col) => { x.font = `800 ${size}px Georgia, 'Times New Roman', serif`; const w = x.measureText(t).width; if (w > W - 110) x.font = `800 ${Math.floor(size * (W - 110) / w)}px Georgia, 'Times New Roman', serif`; x.shadowBlur = size * .22; x.fillStyle = col; x.fillText(t, W / 2, y); };
+    line("THIS WEEK'S HIGH SCORE", 104, 62, gold);
+    if (h.name) { line("#1  " + h.name.toUpperCase(), 222, 108, "#ffffff"); line(h.txt, 336, 96, gold); line(h.prize ? "#1 WINS " + h.prize.toUpperCase() : "BEAT IT AND TAKE THE TOP SPOT", 432, 44, "#ffe9a8"); }
+    else { line("NO SCORE YET", 232, 112, "#ffffff"); line("FIRST ONE UP IS WINNING", 340, 62, gold); line(h.prize ? "#1 WINS " + h.prize.toUpperCase() : MELODY_SIGN_TEXT + " · WEEKLY BOARD", 432, 40, "#ffe9a8"); }
+    HSM.map.needsUpdate = true; }
+  function hiBoard(group, x, z, ry) { if (!HSM) HSM = new THREE.MeshBasicMaterial({ map: tex(mkc(1024, 512), false), toneMapped: false }); hsDraw();
+    const g = new THREE.Group(), s = x < 0 ? -1 : 1; g.add(mesh(new THREE.BoxGeometry(124, 64, 1.6), M.dark, 0, 112, 0), mesh(new THREE.PlaneGeometry(120, 60), HSM, 0, 112, .9), mesh(new THREE.BoxGeometry(2.8, 80, 2.8), M.dark, -8 * s, 40, -.4), mesh(new THREE.BoxGeometry(2.8, 80, 2.8), M.dark, 44 * s, 40, -.4));   // tall enough to clear the rooftops from the chase camera; both posts on the lot side, the panel hangs out over the avenue
+    g.position.set(x, 0, z); g.rotation.y = ry || 0; group.add(g); return g; }
   function tick(dt, t) { UT.value = t; FIREN = 0; if (VB) VB.update(t); toppleTick(dt); gfTick(dt, t); for (let i = 0; i < DN; i++) { const d = DB[i]; if (d.life <= 0) continue; d.life -= dt; d.v.y -= 160 * dt; d.p.addScaledVector(d.v, dt); if (FX && d.p.y > 3 && d.v.lengthSq() > 900 && Math.random() < dt * 14) FX.emit(d.p, SMV.set(0, 6, wind.z * .6), 1.1, 2, 7, [.3, .28, .26], [.16, .16, .16], .55, false, 0, .4, 3);   /* chunks trail smoke while they fly */ if (d.p.y < .8) { d.p.y = .8; if (Math.abs(d.v.y) > 25) { d.v.y = -d.v.y * .35; d.v.x *= .5; d.v.z *= .5; d.vr.multiplyScalar(.5); } else { d.v.set(wind.x, 0, wind.z); d.vr.set(0, 0, 0); } }   // chunks bounce once or twice, then rest
       d.r.x += d.vr.x * dt; d.r.y += d.vr.y * dt; d.r.z += d.vr.z * dt; DQ.setFromEuler(d.r); const s = d.life > 0 ? d.s : 0; debrisM.setMatrixAt(i, DM.compose(d.p, DQ, DS.set(s, s * .6, s * .8))); if (d.life <= 0) debrisM.setMatrixAt(i, ZERO); }
     debrisM.instanceMatrix.needsUpdate = true; }
@@ -474,6 +492,9 @@ export function makeWorld(THREE, O = {}) {
     // a review billboard beside the flight path on most city strips (in the lot between the 1st and 2nd avenue)
     let sd0; if (!o.noBillboard && (sd0 = bbDue())) { const sd = sd0, bx = sd * (196 + R() * 26), bz = (R() - .5) * len * .45; clear.push([bx, bz, 90, 60]); billboard(seg.group, bx, bz, -sd * .28); }
     const free = (x, z, w, d) => !clear.some(c => Math.abs(x - c[0]) < (w + c[2]) / 2 && Math.abs(z - c[1]) < (d + c[3]) / 2);
+    // the weekly high-score sign: never on a strip that has the review screen, never on a landmark's lot (warm-up strips always get one: texture + shader ready early)
+    if (!o.noBillboard && (WARM || (!sd0 && hsDue()))) { const sd = WARM ? -1 : bbSide, bx = sd * (196 + R() * 14), bz = (R() - .5) * len * .45; console.assert(WARM || !sd0, "[world3d] high-score sign on a review-screen strip");
+      if (free(bx, bz, 124, 56)) { clear.push([bx, bz, 130, 60]); hiBoard(seg.group, bx, bz, -sd * .4); if (!WARM) hsLast = O.clock ? O.clock() : performance.now() / 1000; } }
     const houses = [];
     for (let ax = 0; ax < AVE.length - 1; ax++) { const x0 = AVE[ax] + ROAD / 2 + SIDE + 4, x1 = AVE[ax + 1] - ROAD / 2 - SIDE - 4;
       for (let z0 = -len / 2 + ROAD / 2 + SIDE + 4; z0 < len / 2 - 40; z0 += CZ) { const z1 = Math.min(len / 2 - 6, z0 + CZ - ROAD - 2 * SIDE - 8);

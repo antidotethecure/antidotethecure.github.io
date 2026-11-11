@@ -2371,8 +2371,9 @@ function frame(now){
   var dt=Math.max(0,Math.min(50,now-(G.last||now))); G.last=now; var k=dt/16.67, run=G.running&&!G.dying;
   var TO=4500, LAND=8000, takeoff=run&&G.el<TO, landing=run&&G.home&&G.t<=LAND;
   if(!run){ if(G.slowT>0||G.ts!==1){ G.slowT=0; G.ts=1; } if(cv.parentNode&&cv.parentNode.classList.contains("slowmo")) cv.parentNode.classList.remove("slowmo"); boostSync(); }
-  var spd=run?2.4+Math.min(2.2,G.el/22000):(G.over&&!G.landed?(G.crashed?.45:1.2):0); // parked on the runway before the first flight and after landing
-  if(takeoff){ spd=0.5+2.2*Math.pow(G.el/TO,1.4); G.alt=Math.max(0,Math.min(1,(G.el-1300)/2800)); }
+  var FLY=.88;   // 2026-11-11 (Antidote: "make the plane a little bit slower ... more time to see things"): forward flight 12% slower. Steering, the landing roll and leg length (time-based) are unchanged
+  var spd=run?(2.4+Math.min(2.2,G.el/22000))*FLY:(G.over&&!G.landed?(G.crashed?.45:1.2):0); // parked on the runway before the first flight and after landing
+  if(takeoff){ spd=(0.5+2.2*Math.pow(G.el/TO,1.4))*FLY; G.alt=Math.max(0,Math.min(1,(G.el-1300)/2800)); }
   else if(run&&!landing) G.alt=1;
   if(landing){ if(!G.landing){ G.landing=1; G.inv=1e9; G.warn=[]; G.bolts=[]; G.ens.forEach(function(e){ e.fleeing=1; });
       G.ground.forEach(function(g){ if(g.y+g.h<-20&&g.k!=="runway") g.k="city"; }); while(G.ground.length>1&&G.ground[G.ground.length-2].y<=-420) G.ground.pop(); G.seq=1; } // coming home: plain city, then LAX
@@ -2668,6 +2669,7 @@ function wkey(off){ var d=new Date(); d.setDate(d.getDate()-((d.getDay()+6)%7)-7
 function loadBoard(){ $("bweek").textContent="Week of "+wkey(); var tab=BTAB, sv=tab==="s";
   [].forEach.call(document.querySelectorAll("[data-btab]"),function(x){ x.setAttribute("aria-pressed",x.getAttribute("data-btab")===tab?"true":"false"); });
   fetch(BAPI+"?game="+(sv?BGAME_S:BGAME)+"&week="+wkey()).then(function(r){return r.json();}).then(function(rows){ if(tab!==BTAB) return;
+  if(sv===(MODE==="survival")){ var r0=rows[0]; M3.hi=r0?{name:String(r0.name||"").slice(0,14),txt:sv?mmss(r0.score*1000):Number(r0.score).toLocaleString()}:{}; M3.hi.prize=rewardsOn()&&window.SSAI_REWARDS&&SSAI_REWARDS.weekly?String(SSAI_REWARDS.weekly.prize||""):""; }   // the high-score sign in the 3D city (world3d.js hiBoard)
   $("board").innerHTML=rows.length?rows.map(function(r,i){ return '<li><b>'+esc(r.name)+'</b>'+(r.ig?' · <a href="https://instagram.com/'+encodeURIComponent(r.ig)+'" target="_blank" rel="noopener">@'+esc(r.ig)+'</a>':'')+' — <span style="color:var(--gold2);font-weight:800">'+(sv?mmss(r.score*1000):Number(r.score).toLocaleString())+'</span>'+(i===0?' 👑':'')+'</li>'; }).join(""):'<li style="list-style:none;margin-left:-22px;color:var(--dim)">'+(sv?"No times yet this week. Last the longest and you're on top.":"No scores yet this week. First one up is winning.")+'</li>';
 }).catch(function(){ $("board").innerHTML='<li style="list-style:none;margin-left:-22px;color:var(--dim)">Board is loading…</li>'; }); }
 [].forEach.call(document.querySelectorAll("[data-btab]"),function(x){ x.addEventListener("click",function(){ BTAB=x.getAttribute("data-btab"); $("board").innerHTML=""; loadBoard(); }); });
@@ -2785,7 +2787,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
 })();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=fs2"></script>
+<script type="module" src="melody3d.js?v=fs3"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}

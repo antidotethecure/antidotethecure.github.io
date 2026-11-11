@@ -16,7 +16,7 @@
   var cx = cv.getContext("2d"), VW = 400, VH = 640, DPR = Math.min(2, W.devicePixelRatio || 1);
   cv.width = VW * DPR; cv.height = VH * DPR; cx.setTransform(DPR, 0, 0, DPR, 0, 0);
   var RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var HZ = 236, PY = 566, ZC = 100, ZMAX = 1150, LW = 100;
+  var HZ = 236, PY = 566, ZC = 100, ZMAX = 1150, LW = 150, RW = LW * 1.65;   // lanes are wider than the rig (136) so a car or pothole one lane over clears it
   var RED = "#c8232c", RED_D = "#823e2d", GOLD = "#d1902a", CREAM = "#f3e6c8", INK = "#1e140c";
   var DISP = "'Rye','Bebas Neue',Georgia,serif", NUM = "'Bebas Neue',Impact,sans-serif", BODY = "Archivo,system-ui,sans-serif";
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -295,8 +295,8 @@
         // some drivers are trouble: "weave" swings across the lanes the whole way, "swerve" drives straight then cuts at the truck
         var cr = Math.random() / (kid() ? 0.45 : 1); if (cr < 0.22) { o.weave = rnd(0, 6.28); o.cx0 = o.wx * 0.5; } else if (cr < 0.44) o.swz = rnd(260, 420); }
       // a deer bolts out of the brush and across the road; it is somewhere in the lanes when it reaches the truck
-      if (k === "deer") { var ds = Math.random() < 0.5 ? -1 : 1; o.wx = ds * rnd(200, 260); o.vx = (rnd(-110, 110) - o.wx) / (ZMAX / Math.max(st.speed, 200)); o.w = 60; }
-      if (k === "weed") { o.vx = (hl === 0 ? 1 : hl === 2 ? -1 : (Math.random() < 0.5 ? -1 : 1)) * rnd(45, 70) * (kid() ? 0.7 : 1); o.rot = 0; o.w = 38; }
+      if (k === "deer") { var ds = Math.random() < 0.5 ? -1 : 1; o.wx = ds * rnd(300, 390); o.vx = (rnd(-165, 165) - o.wx) / (ZMAX / Math.max(st.speed, 200)); o.w = 60; }
+      if (k === "weed") { o.vx = (hl === 0 ? 1 : hl === 2 ? -1 : (Math.random() < 0.5 ? -1 : 1)) * rnd(68, 105) * (kid() ? 0.7 : 1); o.rot = 0; o.w = 38; }
       st.objs.push(o);
       if (!kid() && st.leg >= 3 && Math.random() < 0.18 && lanes.length > 1) { var h2 = lanes.shift(); st.objs.push({ kind: "cone", bad: true, lane: h2, wx: (h2 - 1) * LW, z: z + 40, w: 44 }); }
     }
@@ -308,7 +308,7 @@
     if (k === "shield") spr = SP.shieldpost; else if (k === "sign") spr = null; else spr = SP[k];
     if (k === "sign") spr = signSprite(Math.random() < 0.5 ? (LEGS[st.leg].to.toUpperCase() + " " + (((1 - st.legT / LEG_MS()) * 90 + 8) | 0) + " MI") : "HISTORIC RT 66");
     var size = { saguaro: 120, joshua: 120, palm: 190, pine: 150, derrick: 150, silo: 120, windmill: 160, caddy: 90, mesa: 130, fence: 60, yucca: 60, shield: 110, sign: 110 }[k] || 100;
-    st.props.push({ spr: spr, wx: side * rnd(250, 330), z: ZMAX, h: size, k: k });
+    st.props.push({ spr: spr, wx: side * rnd(330, 420), z: ZMAX, h: size, k: k });
   }
 
   /* ---------------- flow ---------------- */
@@ -398,18 +398,18 @@
     st.camX = st.px * 0.55 + st.bend * 30;
     if (st.phase === "drive") {
       st.hzD = (st.hzD || 0) - dz; st.spawnD -= dz; if (st.spawnD <= 0) { spawnRow(); st.spawnD = (kid() ? 300 : 270) - st.leg * 6 + rnd(-30, 40); }
-      if (!st.bbDone && st.legT > 9000) { st.bbDone = true; st.props.push({ spr: SP.billboard, wx: 262, z: ZMAX, h: 160, k: "billboard" }); }
+      if (!st.bbDone && st.legT > 9000) { st.bbDone = true; st.props.push({ spr: SP.billboard, wx: 345, z: ZMAX, h: 160, k: "billboard" }); }
     }
     if (st.phase !== "dead" && st.phase !== "arrive") { st.propD -= dz; if (st.propD <= 0) { spawnProp(); st.propD = rnd(120, 260); } }
     for (var i = st.props.length - 1; i >= 0; i--) { st.props[i].z -= dz; if (st.props[i].z < -60) st.props.splice(i, 1); }
     for (i = st.objs.length - 1; i >= 0; i--) {
       var o = st.objs[i]; o.z -= dz - (o.vz ? o.vz * dt : 0);
-      if (o.kind === "weed") { o.wx += o.vx * dt; o.rot += o.vx * dt * 0.05; if (o.wx > 130 || o.wx < -130) o.vx = -o.vx; }
+      if (o.kind === "weed") { o.wx += o.vx * dt; o.rot += o.vx * dt * 0.05; if (o.wx > 195 || o.wx < -195) o.vx = -o.vx; }
       else if (o.kind === "deer") o.wx += o.vx * dt;
-      else if (o.weave !== undefined) { o.weave += dt * (kid() ? 2.6 : 3.9); var wx0 = o.wx; o.wx = o.cx0 + Math.sin(o.weave) * (kid() ? 38 : 60); o.lean = (o.wx - wx0) / (dt || 1); }
+      else if (o.weave !== undefined) { o.weave += dt * (kid() ? 2.6 : 3.9); var wx0 = o.wx; o.wx = o.cx0 + Math.sin(o.weave) * (kid() ? 57 : 90); o.lean = (o.wx - wx0) / (dt || 1); }
       else if (o.swz) {   // locks on to where the truck is at that moment, so a quick lane change still gets clear
         if (o.tx === undefined && o.z < o.swz && st.phase === "drive") { o.tx = st.px; SFX.horn(); }
-        if (o.tx !== undefined) { var dx = clamp(o.tx - o.wx, -1, 1) * (kid() ? 90 : 150) * dt; o.wx += Math.abs(o.tx - o.wx) < Math.abs(dx) ? o.tx - o.wx : dx; o.lean = dx / (dt || 1); } }
+        if (o.tx !== undefined) { var dx = clamp(o.tx - o.wx, -1, 1) * (kid() ? 135 : 225) * dt; o.wx += Math.abs(o.tx - o.wx) < Math.abs(dx) ? o.tx - o.wx : dx; o.lean = dx / (dt || 1); } }
       if (!o.hit && o.z < 34 && o.z > -18 && Math.abs(o.wx - st.px) < (o.bad ? o.w * 0.5 + 26 : 52) && st.phase === "drive") {
         o.hit = true;
         if (o.kind === "deer") { st.score = Math.max(0, st.score - 75); st.shake = 0.35; st.flash = 0.25; SFX.hit(); buzz(60); pop(VW / 2, PY - 120, T("Hit a deer!") + " −75", "#ff8a8a"); o.z = -999; }   // points only, no heart
@@ -489,14 +489,14 @@
     if (R3.on) { cx.clearRect(-40, -40, VW + 80, VH + 80); roadHints(); return; }   // the 3D view draws the road under this canvas; only labels go here
     var L = LEGS[st.leg]; drawSky();
     for (var y = HZ; y < VH; y += 2) {
-      var s = (y - HZ + 1) / (PY - HZ), z = ZC / s - ZC, c = VW / 2 + (off(z) - st.camX) * s, hw = 165 * s, str = (((st.dist + z) / 52) | 0) & 1, ny = ((st.dist + z) / 7 + (y >> 1)) & 255;
+      var s = (y - HZ + 1) / (PY - HZ), z = ZC / s - ZC, c = VW / 2 + (off(z) - st.camX) * s, hw = RW * s, str = (((st.dist + z) / 52) | 0) & 1, ny = ((st.dist + z) / 7 + (y >> 1)) & 255;
       cx.fillStyle = str ? L.g1 : L.g2; cx.fillRect(0, y, VW, 2);
       cx.drawImage(NOISE, 0, ny, 512, 1, 0, y, VW, 2);
       cx.fillStyle = L.sh; cx.fillRect(c - hw - 14 * s, y, hw * 2 + 28 * s, 2);   // dirt shoulder
       cx.fillStyle = str ? "#2f2d2b" : "#2b2927"; cx.fillRect(c - hw, y, hw * 2, 2);   // asphalt + grain
       cx.drawImage(NOISE, 0, 255 - ny, 512, 1, c - hw, y, hw * 2, 2);
       cx.fillStyle = "rgba(230,222,205,.8)"; cx.fillRect(c - hw + 6 * s, y, 3 * s + 0.5, 2); cx.fillRect(c + hw - 9 * s, y, 3 * s + 0.5, 2);
-      if (!((((st.dist + z) / 70) | 0) & 1)) { cx.fillStyle = "rgba(222,186,80,.85)"; cx.fillRect(c - 50 * s - 2 * s, y, 4 * s + 0.4, 2); cx.fillRect(c + 50 * s - 2 * s, y, 4 * s + 0.4, 2); }
+      if (!((((st.dist + z) / 70) | 0) & 1)) { cx.fillStyle = "rgba(222,186,80,.85)"; cx.fillRect(c - LW / 2 * s - 2 * s, y, 4 * s + 0.4, 2); cx.fillRect(c + LW / 2 * s - 2 * s, y, 4 * s + 0.4, 2); }
     }
     cx.fillStyle = GND; cx.fillRect(0, HZ, VW, VH - HZ);   // haze at the horizon, darker ground up close
     var hz = cx.createLinearGradient(0, HZ - 6, 0, HZ + 40); hz.addColorStop(0, L.sky[1]); hz.addColorStop(1, "rgba(0,0,0,0)"); cx.fillStyle = hz; cx.globalAlpha = 0.55; cx.fillRect(0, HZ - 6, VW, 46); cx.globalAlpha = 1;
@@ -746,7 +746,7 @@
     drag = { id: e.pointerId, x: e.clientX, lane: st.lane, moved: false }; try { cv.setPointerCapture(e.pointerId); } catch (x) {}
   });
   cv.addEventListener("pointermove", function (e) { if (!drag || e.pointerId !== drag.id) return; e.preventDefault();
-    var r = cv.getBoundingClientRect(), d = (e.clientX - drag.x) * VW / r.width / LW; if (Math.abs(d) > 0.18) drag.moved = true; if (drag.moved) setLane(drag.lane + Math.round(d * 1.4)); });
+    var r = cv.getBoundingClientRect(), d = (e.clientX - drag.x) * VW / r.width / 100; if (Math.abs(d) > 0.18) drag.moved = true; if (drag.moved) setLane(drag.lane + Math.round(d * 1.4)); });
   function up(e) { st.hold = false; if (!drag || e.pointerId !== drag.id) return; var d = drag; drag = null;
     if (!d.moved && e.type === "pointerup") { var p = canvasXY(e); setLane(st.lane + (p[0] < VW / 2 ? -1 : 1)); } }
   ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (t) { cv.addEventListener(t, up); });

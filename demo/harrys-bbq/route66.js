@@ -27,12 +27,12 @@
 
   /* ---------------- the route ---------------- */
   var LEGS = [
-    { from: "Tulsa, OK", to: "Oklahoma City", st: "OK", stop: "OKC", sky: ["#5d8fd0", "#f4c58a"], sun: "#ffe7a8", far: "#6d7f5a", near: "#4f6b3c", g1: "#5b8a3a", g2: "#55823a", sh: "#a2472c", props: ["derrick", "silo", "shield", "fence"], hills: "rolling", orders: 2 },
-    { from: "Oklahoma City", to: "Amarillo", st: "TX", stop: "AMARILLO", sky: ["#4a86d4", "#f7d79a"], sun: "#fff1bf", far: "#a99a6a", near: "#8c7c4c", g1: "#b8a35a", g2: "#ae9a53", sh: "#9a6b3a", props: ["windmill", "caddy", "shield", "fence"], hills: "flat", orders: 2 },
-    { from: "Amarillo", to: "Albuquerque", st: "NM", stop: "ALBUQUERQUE", sky: ["#3f6fc0", "#f3a86a"], sun: "#ffd28a", far: "#b0583a", near: "#8e3f2a", g1: "#c48f58", g2: "#bb8752", sh: "#8e3f2a", props: ["yucca", "yucca", "fence", "shield", "sign"], hills: "mesa", orders: 3 },
-    { from: "Albuquerque", to: "Flagstaff", st: "AZ", stop: "FLAGSTAFF", sky: ["#5a5fb8", "#f59a6a"], sun: "#ffc27a", far: "#9a4b3b", near: "#6f3a30", g1: "#cfa166", g2: "#c6995f", sh: "#7a3d2a", props: ["saguaro", "saguaro", "shield", "pine"], hills: "butte", orders: 3 },
-    { from: "Flagstaff", to: "Barstow", st: "CA", stop: "BARSTOW", sky: ["#4d8ad8", "#fbe0a6"], sun: "#fff4c8", far: "#b9a07a", near: "#9b845e", g1: "#d8bf8b", g2: "#d0b783", sh: "#a07a4a", props: ["joshua", "joshua", "shield", "sign"], hills: "desert", orders: 3 },
-    { from: "Barstow", to: "Lomita", st: "CA", stop: "LOMITA", sky: ["#6a5bb0", "#ff9d6e"], sun: "#ffd08a", far: "#5a4a78", near: "#3e3558", g1: "#6f8f4e", g2: "#688a48", sh: "#9a5a3a", props: ["palm", "palm", "shield", "sign"], hills: "city", orders: 4, final: true }
+    { from: "Tulsa, OK", to: "Oklahoma City", st: "OK", stop: "OKC", sky: ["#5d8fd0", "#f4c58a"], sun: "#ffe7a8", far: "#6d7f5a", near: "#4f6b3c", g1: "#5b8a3a", g2: "#55823a", sh: "#a2472c", props: ["derrick", "silo", "fence", "fence"], hills: "rolling", orders: 2 },
+    { from: "Oklahoma City", to: "Amarillo", st: "TX", stop: "AMARILLO", sky: ["#4a86d4", "#f7d79a"], sun: "#fff1bf", far: "#a99a6a", near: "#8c7c4c", g1: "#b8a35a", g2: "#ae9a53", sh: "#9a6b3a", props: ["windmill", "silo", "fence", "fence"], hills: "flat", orders: 2 },
+    { from: "Amarillo", to: "Albuquerque", st: "NM", stop: "ALBUQUERQUE", sky: ["#3f6fc0", "#f3a86a"], sun: "#ffd28a", far: "#b0583a", near: "#8e3f2a", g1: "#c48f58", g2: "#bb8752", sh: "#8e3f2a", props: ["yucca", "yucca", "fence"], hills: "mesa", orders: 3 },
+    { from: "Albuquerque", to: "Flagstaff", st: "AZ", stop: "FLAGSTAFF", sky: ["#5a5fb8", "#f59a6a"], sun: "#ffc27a", far: "#9a4b3b", near: "#6f3a30", g1: "#cfa166", g2: "#c6995f", sh: "#7a3d2a", props: ["saguaro", "saguaro", "pine"], hills: "butte", orders: 3 },
+    { from: "Flagstaff", to: "Barstow", st: "CA", stop: "BARSTOW", sky: ["#4d8ad8", "#fbe0a6"], sun: "#fff4c8", far: "#b9a07a", near: "#9b845e", g1: "#d8bf8b", g2: "#d0b783", sh: "#a07a4a", props: ["joshua", "joshua", "yucca"], hills: "desert", orders: 3 },
+    { from: "Barstow", to: "Lomita", st: "CA", stop: "LOMITA", sky: ["#6a5bb0", "#ff9d6e"], sun: "#ffd08a", far: "#5a4a78", near: "#3e3558", g1: "#6f8f4e", g2: "#688a48", sh: "#9a5a3a", props: ["palm", "palm"], hills: "city", orders: 4, final: true }
   ];
   var CITIES = ["TULSA", "OKC", "AMARILLO", "ABQ", "FLAG", "BARSTOW", "LOMITA"];
 
@@ -160,7 +160,7 @@
   var GUESTS = [1, 2, 3, 4, 5].map(function (i) { var im = new Image(); im.src = "img/r66/guest" + i + ".webp"; return im; });
   var LOGO = new Image(); LOGO.src = "img/logo.webp";
   /* photo-real art (Higgsfield, img/r66/): each one replaces its vector sprite above once it loads; the vector stays the fallback */
-  ["truck", "log", "rub", "sauce", "brisket", "ribs", "link", "wing", "cone", "weed", "hole", "deer", "car1", "car2", "car3", "saguaro", "joshua", "palm", "pine", "yucca", "derrick", "silo", "windmill", "fence"].forEach(function (n) {
+  ["truck", "truckbody", "smoker", "fire", "log", "rub", "sauce", "brisket", "ribs", "link", "wing", "cone", "weed", "hole", "deer", "car1", "car2", "car3", "saguaro", "joshua", "palm", "pine", "yucca", "derrick", "silo", "windmill", "fence"].forEach(function (n) {
     var im = new Image(); im.onload = function () { im.w = im.naturalWidth; im.h = im.naturalHeight; SP[n] = im; }; im.src = "img/r66/" + n + ".webp";
   });
   var BGI = [], STOPI = new Image(); STOPI.src = "img/r66/stop.webp";
@@ -215,12 +215,12 @@
   function kid() { return MODE === "kid"; }
   function fresh() {
     return { running: false, over: false, phase: "menu", leg: 0, t: 0, legT: 0, dist: 0, speed: 0, px: 0, lane: 1, tilt: 0, camX: 0, bend: 0, bgX: 0,
-      score: 0, hearts: 5, inv: { logs: 3, rub: 0, sauce: 0 }, objs: [], props: [], pops: [], smoke: [], shake: 0, flash: 0, spawnD: 0, propD: 0, bbDone: false,
+      score: 0, hearts: 5, inv: { logs: 3, rub: 0, sauce: 0 }, objs: [], props: [], pops: [], smoke: [], dmg: 0, flat: 0, sway: 0, swayV: 0, shake: 0, flash: 0, spawnD: 0, propD: 0, bbDone: false,
       tickets: [], cook: null, banner: null, served: 0, perfect: 0, walked: 0, hold: false, played: 0, finished: false, paused: false, bbRect: null, posterRect: null, fx: [] };
   }
   var st = fresh();
   var LEG_MS = function () { return kid() ? 30000 : 27000; };
-  function baseSpeed() { return (kid() ? 430 : 520) + st.leg * (kid() ? 18 : 34); }
+  function baseSpeed() { return (kid() ? 390 : 465) + st.leg * (kid() ? 16 : 30); }
 
   /* ---------------- sound (WebAudio, made here; music = Antidote's songs via songswitch.js) ---------------- */
   var AC = null, master, sfxBus, musBus, sizzle = null, sizG, engG, MS = null, fxOn = true, musOn = true, sndOn = true;
@@ -315,6 +315,7 @@
   function banner(big, small, ms, col) { st.banner = { big: big, small: small, t: ms || 2400, max: ms || 2400, col: col || GOLD }; }
   function legStart() {
     st.phase = "drive"; st.legT = 0; st.objs = []; st.bbDone = false; st.speed = st.speed || 0; st.spawnD = 200; st.propD = 0;
+    st.dmg = Math.max(0, (st.dmg || 0) - 1); st.flat = 0;   // every stop patches the rig up one notch
     if (!BG[st.leg]) BG[st.leg] = skyFor(LEGS[st.leg]);
     bgLoad(st.leg); bgLoad(st.leg + 1);
     var L = LEGS[st.leg]; banner(L.from.split(",")[0].toUpperCase() + " → " + L.to.toUpperCase(), T("Leg") + " " + (st.leg + 1) + " / 6 · " + T("grab hickory, rub, sauce + meat"), 2600);
@@ -369,7 +370,7 @@
     if (st.phase === "dead" || !st.running) return;
     st.hearts--; st.shake = 0.35; st.flash = 0.25; SFX.hit(); buzz(60);
     if (why) pop(VW / 2, PY - 120, why, "#ff8a8a");
-    if (st.hearts <= 0) { banner(T("RIG'S DONE"), T("Out of hearts"), 1400, RED); st.deadAtStop = st.phase === "stop"; st.phase = "dead"; st.deadT = 0; st.hold = false; }
+    if (st.hearts <= 0) { banner(T("RIG'S DONE"), T("Out of hearts"), 1400, RED); st.deadAtStop = st.phase === "stop"; st.phase = "dead"; st.deadT = 0; st.hold = false; st.dmg = 3; }
   }
 
   /* ---------------- update ---------------- */
@@ -394,7 +395,11 @@
     var dz = st.speed * dt; st.dist += dz;
     st.bend = Math.sin(st.dist / 2900 + st.leg) * 0.7 + Math.sin(st.dist / 1150) * 0.25;
     st.bgX = (st.bgX - st.bend * dz * 0.05 + 800 * 100) % 800;
-    var tx = (st.lane - 1) * LW, dx = tx - st.px; st.px += dx * Math.min(1, dt * 11); st.tilt = clamp(dx / 260, -0.25, 0.25);
+    var px0 = st.px, tx = (st.lane - 1) * LW + (st.flat > 0 ? Math.sin(st.flat * 9) * 42 * Math.min(1, st.flat / 0.8) : 0), dx = tx - st.px;   // a popped tyre swerves the rig inside its own lane
+    st.flat = Math.max(0, st.flat - dt); st.px += dx * Math.min(1, dt * 11); st.tilt = clamp(dx / 260, -0.25, 0.25);
+    // the smoker trailer is a spring on the hitch: it lags a lane change, swings past and settles
+    var tgt = clamp(-(st.px - px0) / (dt || 1) * 0.03, -12, 12) + Math.sin(st.dist / 31) * Math.min(1, st.speed / 300) * 0.6;
+    st.swayV += ((tgt - st.sway) * 90 - st.swayV * 5) * dt; st.sway += st.swayV * dt;
     st.camX = st.px * 0.55 + st.bend * 30;
     if (st.phase === "drive") {
       st.hzD = (st.hzD || 0) - dz; st.spawnD -= dz; if (st.spawnD <= 0) { spawnRow(); st.spawnD = (kid() ? 300 : 270) - st.leg * 6 + rnd(-30, 40); }
@@ -404,7 +409,8 @@
     for (var i = st.props.length - 1; i >= 0; i--) { st.props[i].z -= dz; if (st.props[i].z < -60) st.props.splice(i, 1); }
     for (i = st.objs.length - 1; i >= 0; i--) {
       var o = st.objs[i]; o.z -= dz - (o.vz ? o.vz * dt : 0);
-      if (o.kind === "weed") { o.wx += o.vx * dt; o.rot += o.vx * dt * 0.05; if (o.wx > 195 || o.wx < -195) o.vx = -o.vx; }
+      if (o.kx) { o.wx += (o.kx - o.wx) * Math.min(1, dt * 3); o.vz *= Math.pow(0.35, dt); o.rotz = clamp((o.rotz || 0) + (o.kx > 0 ? 1 : -1) * dt * 1.4, -0.35, 0.35); }   // a car that got hit is shoved to the shoulder and drops behind
+      else if (o.kind === "weed") { o.wx += o.vx * dt; o.rot += o.vx * dt * 0.05; if (o.wx > 195 || o.wx < -195) o.vx = -o.vx; }
       else if (o.kind === "deer") o.wx += o.vx * dt;
       else if (o.weave !== undefined) { o.weave += dt * (kid() ? 2.6 : 3.9); var wx0 = o.wx; o.wx = o.cx0 + Math.sin(o.weave) * (kid() ? 57 : 90); o.lean = (o.wx - wx0) / (dt || 1); }
       else if (o.swz) {   // locks on to where the truck is at that moment, so a quick lane change still gets clear
@@ -412,13 +418,16 @@
         if (o.tx !== undefined) { var dx = clamp(o.tx - o.wx, -1, 1) * (kid() ? 135 : 225) * dt; o.wx += Math.abs(o.tx - o.wx) < Math.abs(dx) ? o.tx - o.wx : dx; o.lean = dx / (dt || 1); } }
       if (!o.hit && o.z < 34 && o.z > -18 && Math.abs(o.wx - st.px) < (o.bad ? o.w * 0.5 + 26 : 52) && st.phase === "drive") {
         o.hit = true;
-        if (o.kind === "deer") { st.score = Math.max(0, st.score - 75); st.shake = 0.35; st.flash = 0.25; SFX.hit(); buzz(60); pop(VW / 2, PY - 120, T("Hit a deer!") + " −75", "#ff8a8a"); o.z = -999; }   // points only, no heart
-        else if (o.bad) { st.score = Math.max(0, st.score - 50); st.inv.logs = Math.max(0, st.inv.logs - 1); hurt(o.tx !== undefined ? "Sideswiped! −50" : o.weave !== undefined ? "Reckless driver! −50" : { car: "Rear-ended a slowpoke! −50", cone: "Cone! −50", hole: "Pothole! −50", weed: "Tumbleweed! −50" }[o.kind]); o.z = -999; }
+        if (o.kind === "deer") { st.score = Math.max(0, st.score - 75); st.shake = 0.35; st.flash = 0.25; SFX.hit(); buzz(60); pop(VW / 2, PY - 120, T("Hit a deer!") + " −75", "#ff8a8a"); o.z = -999;
+          st.flat = kid() ? 1.6 : 2.6; st.swayV += (Math.random() < 0.5 ? -70 : 70); pop(VW / 2, PY - 150, T("Tire popped!"), "#ffb36b"); }   // points only, no heart
+        else if (o.bad) { st.score = Math.max(0, st.score - 50); st.inv.logs = Math.max(0, st.inv.logs - 1); hurt(o.tx !== undefined ? "Sideswiped! −50" : o.weave !== undefined ? "Reckless driver! −50" : { car: "Rear-ended a slowpoke! −50", cone: "Cone! −50", hole: "Pothole! −50", weed: "Tumbleweed! −50" }[o.kind]);
+          if (o.kind === "car") { var side = o.wx >= st.px ? 1 : -1; o.kx = side * 300; o.vz = st.speed * 1.25; st.swayV -= side * 90; st.dmg = Math.min(3, st.dmg + 1); pop(VW / 2, PY - 150, T(["Engine's smoking!", "Engine's smoking bad!", "Engine's on fire!"][st.dmg - 1]), "#ffb36b"); }
+          else o.z = -999; }
         else { var g = o.good; st.score += g[1]; if (g[0] === "log") { st.inv.logs = Math.min(9, st.inv.logs + 1); SFX.log(); } else { SFX.pick(); }
           if (g[0] === "rub") st.inv.rub = Math.min(9, st.inv.rub + 1); if (g[0] === "sauce") st.inv.sauce = Math.min(9, st.inv.sauce + 1);
           pop(sx(o.wx, o.z, sAt(o.z)), PY - 90, "+" + g[1] + " " + T(g[2]), g[0] === "shield" ? CREAM : "#ffd27a"); o.z = -999; }
       }
-      if (o.z < -80) st.objs.splice(i, 1);
+      if (o.z < (R3.on ? -180 : -80)) st.objs.splice(i, 1);   // 3D cars are long: let them pass the camera
     }
   }
   function stop(dt) {
@@ -538,7 +547,17 @@
     var x = sx(st.px, 0, 1), y = PY, smx = 35, smy = -38; cx.save(); cx.translate(x, y); cx.rotate(st.tilt * 0.35);
     cx.fillStyle = "rgba(0,0,0,.35)"; cx.beginPath(); cx.ellipse(0, 46, 82, 12, 0, 0, 7); cx.fill();
     if (SP.truck) {   // the photo rig: chimney smoke comes off the stack near the top centre
-      var tw = 136, th = tw * SP.truck.h / SP.truck.w; cx.drawImage(SP.truck, -tw / 2, 48 - th, tw, th); smx = -1; smy = 48 - th * 0.93;
+      var tw = 136, th = tw * SP.truck.h / SP.truck.w, two = SP.truckbody && SP.smoker; smx = -1; smy = 48 - th * 0.93;
+      if (st.dmg > 1 && SP.fire && !RM) {   // engine fire: the flame photo, added as light, behind the cab
+        cx.globalCompositeOperation = "lighter";
+        for (var f = 0; f < (st.dmg > 2 ? 4 : 2); f++) { var fh = (st.dmg > 2 ? 104 : 62) * (0.8 + 0.2 * Math.sin(st.t / 53 + f * 2.3)), fw = fh * SP.fire.w / SP.fire.h; cx.drawImage(SP.fire, (f - (st.dmg > 2 ? 1.5 : 0.5)) * 24 - fw / 2, 48 - th * 0.72 - fh, fw, fh); }
+        cx.globalCompositeOperation = "source-over";
+      }
+      if (st.dmg > 0) puffs(0, 48 - th * 0.84, 1.2 + st.dmg * 0.3, 3.4, 0.4 + st.dmg * 0.12, 1);   // engine smoke over the cab
+      if (two) {   // the smoker is its own layer so it can sway on the hitch
+        cx.drawImage(SP.truckbody, -tw / 2, 48 - th, tw, th);
+        cx.save(); cx.translate(st.sway, 48); cx.rotate(st.sway * 0.007); cx.drawImage(SP.smoker, -tw / 2, -th, tw, th); cx.restore(); smx = -1 + st.sway * 2;
+      } else cx.drawImage(SP.truck, -tw / 2, 48 - th, tw, th);
     } else {
     // pickup (ahead of the trailer)
     cx.fillStyle = "#1a1a1a"; rr(cx, -64, -20, 18, 26, 5); cx.fill(); rr(cx, 46, -20, 18, 26, 5); cx.fill();

@@ -213,9 +213,11 @@
   /* ---------------- state ---------------- */
   var MODE = (function () { try { return localStorage.getItem("r66-mode") || ""; } catch (e) { return ""; } })();
   function kid() { return MODE === "kid"; }
+  function comboX(n) { return n >= 10 ? 3 : n >= 5 ? 2 : 1; }   // pickups in a row without a hit: 5 doubles the points, 10 triples them
+  console.assert(comboX(4) === 1 && comboX(5) === 2 && comboX(9) === 2 && comboX(10) === 3, "combo tiers");
   function fresh() {
     return { running: false, over: false, phase: "menu", leg: 0, t: 0, legT: 0, dist: 0, speed: 0, px: 0, pv: 0, lane: 1, tilt: 0, camX: 0, bend: 0, bgX: 0,
-      score: 0, hearts: 5, inv: { logs: 3, rub: 0, sauce: 0 }, objs: [], props: [], pops: [], smoke: [], dmg: 0, flat: 0, sway: 0, swayV: 0, shake: 0, flash: 0, spawnD: 0, propD: 0, bbDone: false,
+      score: 0, combo: 0, hearts: 5, inv: { logs: 3, rub: 0, sauce: 0 }, objs: [], props: [], pops: [], smoke: [], dmg: 0, flat: 0, sway: 0, swayV: 0, shake: 0, flash: 0, spawnD: 0, propD: 0, bbDone: false,
       tickets: [], cook: null, banner: null, served: 0, perfect: 0, walked: 0, hold: false, played: 0, finished: false, paused: false, bbRect: null, posterRect: null, fx: [] };
   }
   var st = fresh();
@@ -420,14 +422,16 @@
         if (o.tx !== undefined) { var dx = clamp(o.tx - o.wx, -1, 1) * (kid() ? 135 : 225) * dt; o.wx += Math.abs(o.tx - o.wx) < Math.abs(dx) ? o.tx - o.wx : dx; o.lean = dx / (dt || 1); } }
       if (!o.hit && o.z < 34 && o.z > -18 && Math.abs(o.wx - st.px) < (o.bad ? o.w * 0.5 + 26 : 52) && st.phase === "drive") {
         o.hit = true;
+        if (o.bad || o.kind === "deer") { if (st.combo >= 5) pop(VW / 2, PY - 180, T("Combo lost"), "#ff8a8a"); st.combo = 0; }   // any hit ends the streak; a missed item does not
         if (o.kind === "deer") { st.score = Math.max(0, st.score - 75); st.shake = 0.35; st.flash = 0.25; SFX.hit(); buzz(60); pop(VW / 2, PY - 120, T("Hit a deer!") + " −75", "#ff8a8a"); o.z = -999;
           st.flat = kid() ? 1.6 : 2.6; st.swayV += (Math.random() < 0.5 ? -70 : 70); pop(VW / 2, PY - 150, T("Tire popped!"), "#ffb36b"); }   // points only, no heart
         else if (o.bad) { st.score = Math.max(0, st.score - 50); st.inv.logs = Math.max(0, st.inv.logs - 1); hurt(o.tx !== undefined ? "Sideswiped! −50" : o.weave !== undefined ? "Reckless driver! −50" : { car: "Rear-ended a slowpoke! −50", cone: "Cone! −50", hole: "Pothole! −50", weed: "Tumbleweed! −50" }[o.kind]);
           if (o.kind === "car") { var side = o.wx >= st.px ? 1 : -1; o.kx = side * 300; o.vz = st.speed * 1.25; st.swayV -= side * 90; st.dmg = Math.min(3, st.dmg + 1); pop(VW / 2, PY - 150, T(["Engine's smoking!", "Engine's smoking bad!", "Engine's on fire!"][st.dmg - 1]), "#ffb36b"); }
           else o.z = -999; }
-        else { var g = o.good; st.score += g[1]; if (g[0] === "log") { st.inv.logs = Math.min(9, st.inv.logs + 1); SFX.log(); } else { SFX.pick(); }
+        else { var g = o.good, cm = comboX(++st.combo); st.score += g[1] * cm; if (st.combo === 5 || st.combo === 10) { pop(VW / 2, PY - 180, T("COMBO") + " ×" + cm + "!", "#ffd23f", true); SFX.perfect(); }
+          if (g[0] === "log") { st.inv.logs = Math.min(9, st.inv.logs + 1); SFX.log(); } else { SFX.pick(); }
           if (g[0] === "rub") st.inv.rub = Math.min(9, st.inv.rub + 1); if (g[0] === "sauce") st.inv.sauce = Math.min(9, st.inv.sauce + 1);
-          pop(sx(o.wx, o.z, sAt(o.z)), PY - 90, "+" + g[1] + " " + T(g[2]), g[0] === "shield" ? CREAM : "#ffd27a"); o.z = -999; }
+          pop(sx(o.wx, o.z, sAt(o.z)), PY - 90, "+" + g[1] * cm + " " + T(g[2]) + (cm > 1 ? " ×" + cm : ""), g[0] === "shield" ? CREAM : "#ffd27a"); o.z = -999; }
       }
       if (o.z < (R3.on ? -180 : -80)) st.objs.splice(i, 1);   // 3D cars are long: let them pass the camera
     }
@@ -469,6 +473,7 @@
     if (st.inv.sauce >= 1) { st.inv.sauce--; pts += 20; extra.push(T("Harry's glaze") + " +20"); }
     var grade = qual > 0.8 && pull === 2 ? "PERFECT!" : qual > 0.7 && pull >= 1 ? "GREAT!" : qual > 0.45 ? "GOOD" : "OK";
     if (grade === "PERFECT!") { st.perfect++; SFX.perfect(); buzz([20, 40, 20]); } else SFX.ding();
+    if (grade === "PERFECT!" && st.combo >= 10) { pts += 500; extra.push(T("10 combo") + " +500"); }
     if (auto) SFX.pull();
     st.score += pts; st.served++; tk.done = true; c.phase = "serve"; c.serveT = 0; c.grade = grade; c.pts = pts;
     pop(VW / 2, 300, T(grade) + " +" + pts, grade === "PERFECT!" ? "#ffd23f" : "#fff", true);
@@ -719,6 +724,9 @@
       var s = SP[p[0]], h = 20, w = h * s.w / s.h; if (w > 26) { w = 26; h = w * s.h / s.w; }
       cx.drawImage(s, ix + 8 + j * 42, iy + 13 - h / 2, w, h); cx.fillStyle = p[1] ? CREAM : "#8a7a6a"; cx.font = "800 12px " + BODY; cx.textAlign = "left"; cx.fillText("×" + p[1], ix + 8 + j * 42 + w + 2, iy + 18);
     });
+    if (st.combo >= 2 && !(st.cook && st.cook.phase === "serve")) { var cmx = comboX(st.combo), ctx2 = stopV && cmx === 3 ? T("PERFECT") + " = +500" : T("COMBO") + " " + st.combo + (cmx > 1 ? " ×" + cmx : "");
+      cx.font = "900 12px " + BODY; var cw = cx.measureText(ctx2).width + 20; cx.fillStyle = cmx > 1 ? "#ffd23f" : "rgba(20,10,6,.62)"; rr(cx, ix + 138, iy, cw, 26, 13); cx.fill();
+      cx.fillStyle = cmx > 1 ? INK : CREAM; cx.textAlign = "center"; cx.fillText(ctx2, ix + 138 + cw / 2, iy + 18); }
     // says so on screen when the road is not the full 3D one, so a phone that falls back can be reported
     var s3 = W.__R663, why = s3 ? (!R3.on ? s3.reason : s3.models && s3.models.length < 6 ? s3.models.length + "/6 3D models loaded" : "") : (performance.now() > 8000 && !/[?&]render=2d/i.test(location.search) ? "3D script did not load" : "");
     if (why) { cx.textAlign = "left"; cx.font = "700 10px " + BODY; cx.fillStyle = "rgba(255,255,255,.6)"; cx.fillText((R3.on ? "" : "2D road · ") + why, 8, VH - 8); }

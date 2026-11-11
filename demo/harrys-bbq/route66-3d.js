@@ -104,19 +104,15 @@ async function boot() {
   gtex(groundC);
   const flatMat = (c, order) => { const m = new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }); m.userData.order = order; return m; };
   const ROWS = 44, rowZ = []; for (let i = 0; i < ROWS; i++) rowZ.push(-130 + (K.ZMAX * 1.06 + 130) * Math.pow(i / (ROWS - 1), 1.7));   // game z of each cross-row, denser near the rig
-  function strip(hw, material) {
+  function strip(hw, material, rt = RT, u1 = 1) {
     const pos = new Float32Array(ROWS * 6), uv = new Float32Array(ROWS * 4), idx = [];
-    for (let i = 0; i < ROWS; i++) { pos[i * 6 + 2] = pos[i * 6 + 5] = -rowZ[i] * KZ; uv[i * 4] = 0; uv[i * 4 + 2] = 1; uv[i * 4 + 1] = uv[i * 4 + 3] = rowZ[i] * KZ / RT; if (i) { const a = i * 2 - 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } }
+    for (let i = 0; i < ROWS; i++) { pos[i * 6 + 2] = pos[i * 6 + 5] = -rowZ[i] * KZ; uv[i * 4] = 0; uv[i * 4 + 2] = u1; uv[i * 4 + 1] = uv[i * 4 + 3] = rowZ[i] * KZ / rt; if (i) { const a = i * 2 - 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } }
     const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(pos, 3)); geo.setAttribute("uv", new THREE.BufferAttribute(uv, 2)); geo.setIndex(idx);
     const m = new THREE.Mesh(geo, material); m.frustumCulled = false; m.renderOrder = material.userData.order; scene.add(m);
     return bend => { for (let i = 0; i < ROWS; i++) { const o = off(rowZ[i]); pos[i * 6] = o - hw; pos[i * 6 + 3] = o + hw; } geo.attributes.position.needsUpdate = true; };
   }
   const groundMat = flatMat(groundC, -10), dirtMat = flatMat(dirtC, -9), roadMat = flatMat(roadC, -8);
-  { const G = 9000, geo = new THREE.BufferGeometry(), z0 = 700, z1 = -FAR * 1.1;
-    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array([-G, 0, z0, G, 0, z0, -G, 0, z1, G, 0, z1]), 3));
-    geo.setAttribute("uv", new THREE.BufferAttribute(new Float32Array([0, -z0 / GT, 2 * G / GT, -z0 / GT, 0, -z1 / GT, 2 * G / GT, -z1 / GT]), 2)); geo.setIndex([0, 1, 2, 1, 3, 2]);
-    const m = new THREE.Mesh(geo, groundMat); m.frustumCulled = false; m.renderOrder = -10; scene.add(m); }
-  const bendDirt = strip(SHW, dirtMat), bendRoad = strip(RW, roadMat);
+  const bendGround = strip(9000, groundMat, GT, 2 * 9000 / GT), bendDirt = strip(SHW, dirtMat), bendRoad = strip(RW, roadMat);   // the land follows the same bends as the road, so nothing slides sideways under the roadside props
 
   /* ---------- the sky photo of each leg, far behind everything ---------- */
   const BW = 6200, BH = BW * 583 / 1600, skyMat = new THREE.MeshBasicMaterial({ map: tex(R.BGI[0]), fog: false, transparent: true, depthWrite: false });
@@ -213,7 +209,41 @@ async function boot() {
   if (G.deer) { protos.deer = G.deer; vpool.deer = []; G.deer.rotation.order = "YXZ"; }   // turn to its heading first, then tip nose up or down
   [["car1", 0.9, 1.0], ["car2", 0.9, 1.06], ["car3", 0.84, 0.78]].forEach(a => [-1, 1].forEach(s => glow(protos[a[0]], RED, s * a[1], a[2], 0.14, 0.55)));
   Object.keys(protos).forEach(k => protos[k].scale.setScalar(k === "cone" ? U * 1.8 : U));
-  function veh(key) { const g = vpool[key].pop() || protos[key].clone(); g.visible = true; g.rotation.set(0, 0, 0); if (!g.parent) scene.add(g); return g; }   // clones share geometry and materials
+  /* ---------- wrecks: each traffic car has a twin of its body with the tail stoved in and scorched, swapped in the moment it is hit ---------- */
+  const wreck = new Map();   // geometry or material <-> its wrecked twin, both ways, so the same swap puts it back
+  const dent = (x, y, z, out) => {   // car metres: tail at z 0, nose at -length. Depends on the position only, so split seams stay shut
+    const t = Math.max(0, 1 + z / 1.7), s = t * t, n = Math.sin(x * 7.1 + y * 5.3) * Math.sin(z * 6.3 + x * 2.9), lid = Math.max(0, Math.min(1, (y - 0.45) / 0.3));
+    out.set(x + (0.3 + s) * 0.035 * Math.sin(y * 9 + z * 4.1), y + s * lid * (0.09 + 0.12 * n), z - s * (0.46 + 0.16 * n + 0.12 * x)); return s * (0.85 + 0.5 * n); };   // returns how scorched that spot is
+  { const v = new THREE.Vector3(); dent(0, 0.5, -3, v); console.assert(v.z === -3 && v.y === 0.5, "dent leaves the front alone"); dent(0, 0.5, 0, v); console.assert(v.z < -0.3, "dent pushes the tail in"); }
+  ["car1", "car2", "car3"].forEach(k => {
+    const g = protos[k], uses = new Map(), gi = new THREE.Matrix4(), m = new THREE.Matrix4(), mi = new THREE.Matrix4(), v = new THREE.Vector3(), a = new THREE.Vector3(), b = new THREE.Vector3();
+    g.updateMatrixWorld(true); gi.copy(g.matrixWorld).invert();
+    g.traverse(o => { if (o.isMesh) uses.set(o.geometry, (uses.get(o.geometry) || 0) + 1); });
+    g.traverse(o => {
+      const src = o.geometry; if (!o.isMesh || wreck.has(src) || uses.get(src) > 1 || Array.isArray(o.material)) return;   // parts used more than once (wheels) keep their shape
+      const p = src.attributes.position, n = p.count, P = new Float32Array(n * 3), N = new Float32Array(n * 3), C = new Float32Array(n * 3), key = new Array(n), acc = new Map(), ix = src.index, c0 = o.material.vertexColors && src.attributes.color;
+      m.multiplyMatrices(gi, o.matrixWorld); mi.copy(m).invert();
+      for (let i = 0; i < n; i++) {
+        key[i] = p.getX(i) + "," + p.getY(i) + "," + p.getZ(i);
+        v.fromBufferAttribute(p, i).applyMatrix4(m); const c = (1 - Math.max(0, Math.min(0.8, dent(v.x, v.y, v.z, v)))) ** 2; v.applyMatrix4(mi);   // squared: vertex colours are linear light, so half looks barely darker
+        P[i * 3] = v.x; P[i * 3 + 1] = v.y; P[i * 3 + 2] = v.z; C[i * 3] = c * (c0 ? c0.getX(i) : 1); C[i * 3 + 1] = c * 0.97 * (c0 ? c0.getY(i) : 1); C[i * 3 + 2] = c * 0.93 * (c0 ? c0.getZ(i) : 1);
+      }
+      // normals again from the bent shape, summed over every copy of a point so the UV seams do not show as creases
+      for (let f = 0, nf = ix ? ix.count : n; f < nf; f += 3) {
+        const i0 = ix ? ix.getX(f) : f, i1 = ix ? ix.getX(f + 1) : f + 1, i2 = ix ? ix.getX(f + 2) : f + 2;
+        a.set(P[i1 * 3] - P[i0 * 3], P[i1 * 3 + 1] - P[i0 * 3 + 1], P[i1 * 3 + 2] - P[i0 * 3 + 2]); b.set(P[i2 * 3] - P[i0 * 3], P[i2 * 3 + 1] - P[i0 * 3 + 1], P[i2 * 3 + 2] - P[i0 * 3 + 2]); a.cross(b);
+        [i0, i1, i2].forEach(i => { let t = acc.get(key[i]); if (!t) acc.set(key[i], t = new THREE.Vector3()); t.add(a); });
+      }
+      for (let i = 0; i < n; i++) { const t = acc.get(key[i]); if (t) { if (!t.w) { t.normalize(); t.w = 1; } N[i * 3] = t.x; N[i * 3 + 1] = t.y; N[i * 3 + 2] = t.z; } else N[i * 3 + 1] = 1; }
+      const ng = new THREE.BufferGeometry(); Object.keys(src.attributes).forEach(nm => ng.setAttribute(nm, src.attributes[nm]));
+      ng.setAttribute("position", new THREE.BufferAttribute(P, 3)); ng.setAttribute("normal", new THREE.BufferAttribute(N, 3)); ng.setAttribute("color", new THREE.BufferAttribute(C, 3));
+      ng.setIndex(ix); ng.boundingBox = src.boundingBox; ng.boundingSphere = src.boundingSphere;
+      wreck.set(src, ng); wreck.set(ng, src);
+      if (!wreck.has(o.material)) { const wm = o.material.clone(); wm.vertexColors = true; wreck.set(o.material, wm); wreck.set(wm, o.material); }
+    });
+  });
+  const wrk = g => g.traverse(o => { const w = o.isMesh && wreck.get(o.geometry); if (w) { o.geometry = w; o.material = wreck.get(o.material); } });   // only meshes that have a bent twin get the scorch material: it needs their colour attribute
+  function veh(key) { const g = vpool[key].pop() || protos[key].clone(); if (g.userData.wk) { wrk(g); g.userData.wk = 0; g.scale.x = U; g.children.forEach(c => { c.visible = true; }); } g.visible = true; g.rotation.set(0, 0, 0); if (!g.parent) scene.add(g); return g; }   // clones share geometry and materials
   // the rig: the truck turns about its rear axle, the smoker hangs on the hitch ball and swings on it
   const rig = new THREE.Group(), pivot = new THREE.Group(), truck = G.truck || M.pickup(0xb3201a), trailer = G.trailer || M.trailer(), heroSh = mesh(FLAT, blobC, -1), TL = G.trailer ? [0.51, 0.42, 3.02] : [0.7, 0.47, 2.86];
   if (G.trailer) { trailer.userData.stack = trailer.userData.top; trailer.userData.fire = new THREE.Vector3(0, 1.0, 2.55); }   // its firebox door faces back
@@ -251,7 +281,7 @@ async function boot() {
 
   /* ---------- damage: engine smoke and flames, tyre and crash dust ---------- */
   const fxs = [], fires = []; let fxI = 0, fireI = 0, engAcc = 0, fireAcc = 0, dustAcc = 0;
-  for (let i = 0; i < 44; i++) {
+  for (let i = 0; i < 56; i++) {
     const im = R.SMK[i % 3], m = new THREE.SpriteMaterial({ map: tex(im), transparent: true, depthWrite: false, opacity: i ? 0 : 0.01 }), s = new THREE.Sprite(m);
     s.visible = !i; scene.add(s); fxs.push({ s, m, t: 9, life: 1, vx: 0, vy: 0, vz: 0, k: im.naturalHeight / im.naturalWidth, w0: 20, w1: 90, a: 0.5 });
   }
@@ -294,6 +324,10 @@ async function boot() {
   /* ---------- one frame ---------- */
   const v3 = new THREE.Vector3();
   const toGame = (x, y, z) => { v3.set(x, y, z).project(cam); return [(v3.x * 0.5 + 0.5) * K.VW, (0.5 - v3.y * 0.5) * K.VH]; };
+  // far field: trees, cactus and rigs scattered way out past the shoulder props, so the land is not bare all the way to the horizon
+  const FH = { saguaro: 120, joshua: 120, palm: 190, pine: 150, derrick: 150, silo: 120, windmill: 160, yucca: 60 }, FSPAN = K.ZMAX + 150, field = [],
+    FK = [["pine", "pine", "derrick", "silo"], ["yucca", "yucca", "windmill", "silo"], ["yucca", "yucca", "pine"], ["saguaro", "saguaro", "pine", "yucca"], ["joshua", "joshua", "yucca"], ["palm", "palm", "pine"]];
+  for (let i = 0; i < (q.smooth ? 12 : 24); i++) field.push({ i, lap: -1, leg: -1 });
   function put(m, x, y, z, w, h) { m.position.set(x, y, z); m.scale.set(w, h, 1); }
   function shadow(v, x, z, w, d) { if (shOn) { if (v.b) v.b.visible = false; return; } if (!v.b) v.b = mesh(FLAT, blobC, -1); v.b.position.set(x, 0, z); v.b.scale.set(w, 1, d); }
   function drawFrame(st, dt) {
@@ -304,7 +338,7 @@ async function boot() {
     cam.lookAt(st.camX + st.bend * 36, LOOK_Y, LOOK_Z); cam.rotateZ(-(st.tilt || 0) * 0.06); cam.updateMatrixWorld();   // banks a touch into the lane change
     const k = st.bgX < 400 ? st.bgX / 400 : (800 - st.bgX) / 400; sky.position.x = cam.position.x + (0.5 - k) * 1700; sky.position.y = -40;   // the bends pan the sky like the 2D road does
     const sc = st.dist * KZ / RT; scroll.forEach(t => { t.offset.y = sc % 1; }); groundMat.map.offset.y = (st.dist * KZ / GT) % 2;
-    bendDirt(); bendRoad();
+    bendGround(); bendDirt(); bendRoad();
     const flat = st.flat > 0, ty = Math.sin(st.dist / 46) * 0.9 + (flat ? Math.abs(Math.sin(st.t / 45)) * 2.4 : 0), sw = st.sway || 0, V = Math.max(st.speed * KZ, 500);
     // it steers like a real truck: the cab goes where the game puts it and drags the rear axle after it, so the nose swings into the lane change and the tail follows
     rearX += (st.px - rearX) * (1 - Math.exp(-V / NOSE * dt)); rearX = Math.max(st.px - NOSE * 0.42, Math.min(st.px + NOSE * 0.42, rearX));
@@ -325,6 +359,16 @@ async function boot() {
       put(v.a, x, 0, z, w, h);
       if (p.k === "billboard") { const a = toGame(x - w / 2, h, z), b = toGame(x + w / 2, 0, z), bh = b[1] - a[1]; if (bh > 30 && p.z > 0) st.bbRect = [a[0], a[1], b[0] - a[0], bh * 0.66]; }   // the review poster: route66.js opens the card when this is tapped
     }
+    for (const f of field) {   // each slot rides the road at its own spacing and is dealt a new plant every time it comes round
+      const d = st.dist + (f.i + 0.5) / field.length * FSPAN, lap = Math.floor(d / FSPAN), zg = K.ZMAX - (d - lap * FSPAN);
+      if (lap !== f.lap || st.leg !== f.leg) { f.lap = lap; f.leg = st.leg;
+        const r = j => { const x = Math.sin(lap * 127.1 + f.i * 311.7 + j * 74.7) * 43758.5453; return x - Math.floor(x); }, ks = (FK[st.leg] || []).filter(k => SP[k] && SP[k].w > 0);
+        f.k = ks[Math.floor(r(1) * ks.length)]; f.x = (r(2) < 0.5 ? -1 : 1) * (900 + r(3) * r(3) * 1500); f.s = 0.7 + r(4) * 0.7; f.fl = r(5) < 0.5 ? -1 : 1; }   // 900 and out: never nearer than the review board, so it cannot cover it
+      if (!f.k) continue;
+      const v = view(f), spr = SP[f.k], h = FH[f.k] * 2.3 * f.s;
+      if (v.k !== f.k) { if (v.a) { v.a.visible = false; pool.push(v.a); } v.a = mesh(UP, spr, 0, true); v.k = f.k; }
+      put(v.a, f.x + off(zg), 0, -zg * KZ, f.fl * h * spr.w / spr.h, h);
+    }
     for (let i = 0; i < st.objs.length; i++) {
       const o = st.objs[i]; if (o.z < -900) continue;   // already hit or picked up
       const x = o.wx + off(o.z), z = -o.z * KZ;
@@ -335,7 +379,10 @@ async function boot() {
         const ln = Math.max(-0.13, Math.min(0.13, (o.lean || 0) / 900)), rz = o.rotz || 0;
         v.g.position.set(x, 0.9 + Math.sin(st.dist / 37 + v.ph) * 0.9, z); shadow(v, x, z - 140, 175, 350);   // rides on its springs
         v.g.rotation.set(0, o.kx ? -rz * 1.5 : -ln * 1.2, o.kx ? -rz * 0.25 : ln * 0.3);   // steers into a weave; one that got hit spins off toward the shoulder in a cloud of dust
-        if (o.kx && !v.hit) { v.hit = true; for (let j = 0; j < 7; j++) puff(x + rs(60), 10 + Math.random() * 30, z - 100, j % 2 ? 0xb9a487 : 0x6a6660, 0.5, 24, 100 + Math.random() * 50, 0.7 + Math.random() * 0.5, 0.55, rs(90) + o.kx * 0.2, 30 + Math.random() * 50, 40); }
+        if (o.kx && !v.hit) { v.hit = true; wrk(v.g); v.g.userData.wk = 1; if (o.kx > 0) v.g.scale.x = -U;   // the twin is crushed on its +x corner: mirrored when the rig caught the other one
+          v.g.children.forEach(c => { if (c.isSprite) c.visible = false; });   // tail lamps are smashed
+          for (let j = 0; j < 7; j++) puff(x + rs(60), 10 + Math.random() * 30, z - 100, j % 2 ? 0xb9a487 : 0x6a6660, 0.5, 24, 100 + Math.random() * 50, 0.7 + Math.random() * 0.5, 0.55, rs(90) + o.kx * 0.2, 30 + Math.random() * 50, 40); }
+        if (o.kx) { v.sm = (v.sm || 0) + Math.min(dt, 0.1) * 9; while (v.sm >= 1) { v.sm--; puff(x + rs(30), 50 + rs(14), z - 15, 0x3b3835, 0.5, 22, 110 + Math.random() * 40, 0.9 + Math.random() * 0.4, 0.5, rs(24), 60 + Math.random() * 40, 40 + st.speed * 0.25); } }   // the wreck trails dark smoke
         continue;
       }
       const spr = SP[o.kind]; if (!spr || !(spr.w > 0)) continue;
@@ -364,6 +411,7 @@ async function boot() {
   renderer.initTexture(tex(blobC)); renderer.initTexture(tex(ringC)); Object.values(gphoto).forEach(im => { if (ready(im)) renderer.initTexture(gtex(im)); });
   Object.keys(SP).forEach(n => { const s = SP[n]; if (s && s.w > 0) { mat(s); renderer.initTexture(tex(s)); } });
   { const warm = Object.keys(protos).map(k => { const g = veh(k); g.position.set(0, 0, -400); return [k, g]; }), wd = mesh(UP, SP.truck, 0, true); put(wd, 120, 0, -300, 80, 80);
+    ["car1", "car2", "car3"].forEach(k => { const g = veh(k); wrk(g); g.userData.wk = 1; g.position.set(-160, 0, -500); warm.push([k, g]); });   // veh() puts them back to new when they are next used
     drawFrame(R.get(), 0.016);   // compiles every shader this view will ever use, with one of every model and a shadow-casting cut-out in front of the camera
     warm.forEach(a => { a[1].visible = false; vpool[a[0]].push(a[1]); }); wd.visible = false; pool.push(wd); dirty = true; }
   const off2d = () => { R3.on = false; R3.render = null; STATUS.on = false; cv.remove(); game.style.background = ""; };

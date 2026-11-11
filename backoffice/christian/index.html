@@ -135,7 +135,7 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
 </main>
 <script src="../../demo/christian-live.js?v=or1"></script>
 <script src="squares-hq.js?v=sq2"></script>
-<script src="../../demo/melody-lax/menu-data.js?v=mg2"></script>
+<script src="../../demo/melody-lax/menu-data.js?v=mg3"></script>
 <script src="../../demo/listen.js?v=ls1"></script>
 <script>
 (function(){
@@ -145,10 +145,11 @@ var TKEY="christian-hq-token"+(TEST?"-test":""), TOKEN=null, DATA=null, R="all",
 var DAY=864e5, NAMES={"melody-bar-grill":"Melody Bar & Grill","nalu-vida":"Nalu Vida"};
 // LOGINS: [user id, what the login list shows]. The name in the Audit log comes from the backend (BO_USERS "name").
 // "melody-manager" is ONE login shared by Melody's management team (manager role: Melody only, enforced by Code.gs).
+// "allie": Allie's own staff login (2026-11-11, Melody only, job Manager (general) like Noe and Sami; Christian narrows it in 🔐 Team access).
 // "noe": Noe's own staff login (2026-11-09, Melody only, job Manager (general) like Sami; Christian narrows it in 🔐 Team access).
 // "sammy": Sami's own manager login (login id stays "sammy"; display name Sami since 10-18) (Melody only, job Manager (general)); her switches are set in 🔐 Team access.
 // Staff who requested access themselves log in with their email ("Staff: log in with your email"), not from this list.
-var LOGINS=[["christian","Christian"],["antidote","Antidote"],["melody-manager","Melody Management (manager)"],["sammy","Sami (Melody manager)"],["noe","Noe (Melody staff)"]];
+var LOGINS=[["christian","Christian"],["antidote","Antidote"],["melody-manager","Melody Management (manager)"],["sammy","Sami (Melody manager)"],["noe","Noe (Melody staff)"],["allie","Allie (Melody staff)"]];
 var ROLE="owner", MYSLUGS=["melody-bar-grill","nalu-vida"], MGR=false, PERMS={}, JOB="", STAFFMODE=false;
 // 🔐 TEAM ACCESS: keep JOBS + PERM keys in sync with Code.gs (JOBS / PERM_KEYS). The SERVER enforces every switch;
 // the page only hides what a login can't use. Owners (Christian, Antidote) always have everything.
@@ -346,10 +347,18 @@ var MCOL=[["name","Name"],["card","Card ID"],["slug",""],["email","Email"],["pho
 function dupCount(){ var all=(DATA&&DATA.members)||[], seen={}, n=0; all.slice().sort(function(a,b){ return (+a.joined||0)-(+b.joined||0); }).forEach(function(m){ if(m.signupOnly) return;
   var k=[], p=String(m.phone||"").replace(/\D/g,"").slice(-10), e=String(m.email||"").trim().toLowerCase(); if(p.length===10) k.push(m.slug+"|p|"+p); if(e) k.push(m.slug+"|e|"+e);
   if(k.some(function(x){ return seen[x]; })) n++; else k.forEach(function(x){ seen[x]=1; }); }); return n; }
-var DUPARM=0;
+var DUPARM=0, BLAST="", BLARM=0;
+// mirrors blastTo() in Code.gs: this restaurant's members who agreed to texts, one per phone number
+function blastN(){ var seen={}, c=0; F().mem.forEach(function(m){ var p=String(m.phone||"").replace(/\D/g,"").replace(/^1(?=\d{10}$)/,""); if(m.signupOnly||m.sms!=="yes"||p.length!==10||seen[m.slug+p]) return; seen[m.slug+p]=1; c++; }); return c; }
+function blastCard(){ if(ROLE!=="owner") return ""; var one=R!=="all", N=one?blastN():0, nm=esc(NAMES[R]||"");
+  return "<div class='card mf' style='margin:10px 0'><h2 style='margin:0 0 4px'>📣 Text your members</h2>"+
+    (one?"<p class='note' style='margin:0'>Goes to the <b>"+n(N)+"</b> "+nm+" member"+(N===1?"":"s")+" who said yes to texts in the app (of "+n(F().mem.length)+" on the list). It starts with “"+nm+":” and ends with “Reply STOP to opt out.” One mass text per restaurant per day.</p>"
+        :"<p class='note' style='margin:0'>Pick Melody or Nalu Vida at the top first. A mass text goes to one restaurant's members at a time.</p>")+
+    ((DATA.shiftCfg||{}).sms?"":"<p class='note' style='margin:6px 0 0;color:var(--warn)'>⏳ Texting isn't switched on yet. It's waiting on phone-carrier approval, so nothing will send until then.</p>")+
+    (one?"<label for='blastT'>Your message</label><textarea id='blastT' maxlength='250' rows='3' style='min-height:84px' placeholder='Example: Taco Tuesday is on. $4 classic tacos all day.'>"+esc(BLAST)+"</textarea><div class='row' style='margin-top:8px;gap:10px'><button class='btn' id='blastGo'"+(N?"":" disabled")+">📣 Send to "+n(N)+" member"+(N===1?"":"s")+"</button><span class='note' id='blastC'>"+BLAST.length+"/250</span></div><p class='note' id='blastOut' role='status' style='margin:6px 0 0'></p>":"")+"</div>"; }
 function members(){ var f=F(), q=Q.toLowerCase(), list=f.mem.filter(function(m){ return !q||(m.name+" "+m.email+" "+m.phone+" "+m.ref+" "+(m.card||"")).toLowerCase().indexOf(q)>=0; });
   list.sort(function(a,b){ var x=a[SORT.k],y=b[SORT.k]; return (x>y?1:x<y?-1:0)*SORT.d; });
-  return "<div class='row' style='margin:10px 0'><input type='search' id='q' placeholder='Search name, card ID (MLD-…), email, phone' value='"+esc(Q)+"' aria-label='Search members'><button class='btn sm' id='csv'>⬇︎ CSV</button></div>"+
+  return blastCard()+"<div class='row' style='margin:10px 0'><input type='search' id='q' placeholder='Search name, card ID (MLD-…), email, phone' value='"+esc(Q)+"' aria-label='Search members'><button class='btn sm' id='csv'>⬇︎ CSV</button></div>"+
     (dupCount()&&!MGR?"<div class='card' style='margin:0 0 10px;border-color:#f5c518'><b>⚠️ "+n(dupCount())+" duplicate membership"+(dupCount()>1?"s":"")+"</b><p class='note' style='margin:4px 0 8px'>Same restaurant + same phone or email. Keeps each guest's FIRST sign-up (their card ID stays), removes the newer copies. The member list is backed up first and it's logged in the audit log.</p><button class='btn sm' id='dedupe'>"+(DUPARM>Date.now()?"Tap again to remove "+n(dupCount()):"🧹 Remove duplicates")+"</button> <span class='note' id='dedupeOut'></span></div>":"")+
     "<p class='note'>"+n(list.length)+" members"+(R==="all"?" at both restaurants":"")+". Tap a column to sort. Private: don't share screenshots of this list.</p>"+
     "<div class='tw'><table><thead><tr>"+MCOL.map(function(c){ return "<th data-sort='"+c[0]+"'"+(c[2]?" class='n'":"")+">"+c[1]+(SORT.k===c[0]?(SORT.d>0?" ▲":" ▼"):"")+"</th>"; }).join("")+"</tr></thead><tbody>"+
@@ -495,7 +504,14 @@ function earlybird(){ var h="<p class='note' style='margin-top:12px'>An optional
   return h; }
 function staff(){ var f=F(), by={}; f.staff.forEach(function(x){ var k=x[2]; by[k]=by[k]||{runs:0,pts:0,best:0}; by[k].runs++; by[k].pts+=x[5]; by[k].best=Math.max(by[k].best,x[4]); });
   var rows=Object.keys(by).map(function(k){ return [esc(k),n(by[k].runs),n(by[k].pts),n(by[k].best)]; }).sort(function(a,b){ return +b[2].replace(/,/g,"")-+a[2].replace(/,/g,""); });
-  return "<p class='note' style='margin-top:12px'>From the staff app. Practice points are separate from guest points: they never become rewards and never show on the guest leaderboard. Staff only enter a first name or nickname.</p>"+
+  var SG="https://sousshift.com/staff/christian/", TV="../../staff/christian/training/melody-training";
+  return "<div class='card' style='margin-top:12px'><h2 style='margin-top:0'>🎓 Train a new staff member</h2><p class='note' style='margin:0'>Everything a new hire needs to work the app, start to finish. About 10 minutes.</p><ol class='steps'>"+
+    "<li><b>Watch the training video</b> (under 4 minutes, captions only, no sound). It shows every screen, where to tap, and what to ring in Toast.<video controls playsinline preload='none' poster='"+TV+"-poster.jpg' style='display:block;width:100%;max-width:300px;border-radius:14px;margin:8px 0;background:#000'><source src='"+TV+"-en.mp4' type='video/mp4'></video><a href='"+TV+"-es.mp4' target='_blank' rel='noopener'>🎬 Ver el video en español</a></li>"+
+    "<li><b>Hand them the printout.</b> <a href='../../staff/christian/?print=1' target='_blank' rel='noopener'>🖨️ Print the training guide</a>. It opens ready to print: pick Melody or Nalu Vida and English or Español at the top, then tap Print. Keep a copy by the POS.</li>"+
+    "<li><b>Text them the staff app.</b> <a href='sms:?&body="+encodeURIComponent("Staff guide + training for the rewards app: "+SG)+"'>💬 Text the link</a> or share <code>"+SG.replace("https://","")+"</code>. They add it to their Home Screen.</li>"+
+    "<li><b>They ask for a login.</b> On this HQ's login screen they tap “New staff? Request access”."+(MGR?" Christian approves it.":" You approve it in <button class='btn sm alt' data-go='team'>🔐 Team access</button>")+"</li>"+
+    "<li><b>They take the quiz</b> at the bottom of the staff app. Passed shows below as “Trained ✓”.</li></ol></div>"+
+    "<p class='note' style='margin-top:12px'>From the staff app. Practice points are separate from guest points: they never become rewards and never show on the guest leaderboard. Staff only enter a first name or nickname.</p>"+
     "<h2>🎮 Practice tally (120 days)</h2>"+table(["Employee","Practice runs","Practice points","Best score"],rows,[1,2,3])+
     "<h2>✅ Training quiz</h2>"+table(["Day","Employee","Score","Passed"],DATA.trained.slice().reverse().map(function(t){ return [esc(t[0]),esc(t[1]),t[2]+"%",t[3]==="yes"?"<span class='tag ok'>Trained ✓</span>":"<span class='tag p'>not yet</span>"]; }),[2])+
     "<p><a href='../../staff/christian/'>Open the staff app</a> · text staff this link so they can add it to their Home Screen.</p>"; }
@@ -552,11 +568,17 @@ function links(){ if(MGR) return "<div class='card links'>"+(MYSLUGS.indexOf("me
     h+="<h3>"+esc(NAMES[s])+" <span class='st "+(ts.state==="done"?"done":"tbd")+"'>"+(ts.state==="done"?"Set up ✓":"TBD")+"</span></h3><p class='note'>"+esc(ts.note)+"</p>"+table(["Button","Discount","Points"],rows); });
   return h; }
 function draw(){ if(!DATA) return; var p=$("pane"), y=window.scrollY; if(!tabOk(TAB)) drawTabs();
-  p.innerHTML={overview:overview,visits:visits,members:members,rewards:rewards,scout:scout,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links,menu:menu,help:help,launch:launch,team:team,orders:ordersTab,squares:function(){ return window.SquaresHQ?SquaresHQ.html({api:api,token:TOKEN,draw:draw}):"<div class='card'>Loading…</div>"; }}[TAB]();
+  p.innerHTML=tourCard()+{overview:overview,visits:visits,members:members,rewards:rewards,scout:scout,games:games,discounts:discounts,earlybird:earlybird,staff:staff,audit:audit,links:links,menu:menu,help:help,launch:launch,team:team,orders:ordersTab,squares:function(){ return window.SquaresHQ?SquaresHQ.html({api:api,token:TOKEN,draw:draw}):"<div class='card'>Loading…</div>"; }}[TAB]();
   if(TAB==="squares"&&window.SquaresHQ) SquaresHQ.bind(p);
+  p.querySelectorAll("[data-tour]").forEach(function(b){ b.onclick=function(){ tourGo(+b.dataset.tour); }; });
   p.querySelectorAll("[data-go]").forEach(function(b){ b.onclick=function(){ if(b.dataset.go==="todo-top"){ var t=$("todo"); if(t) t.scrollIntoView({behavior:"smooth"}); return; } goTab(b.dataset.go); }; });
   if(TAB==="members"){ var q=$("q"); q.oninput=function(){ Q=q.value; var pos=q.selectionStart; draw(); var q2=$("q"); q2.focus(); try{ q2.setSelectionRange(pos,pos); }catch(e){} }; $("csv").onclick=csv; var dd=$("dedupe"); if(dd) dd.onclick=function(){ if(DUPARM<Date.now()){ DUPARM=Date.now()+6000; draw(); setTimeout(function(){ if(DUPARM&&DUPARM<Date.now()){ DUPARM=0; draw(); } },6100); return; }
     DUPARM=0; dd.disabled=true; dd.textContent="Removing…"; api({type:"bo_dedupe",token:TOKEN}).then(function(r){ if(r&&r.ok){ $("dedupeOut").textContent="✅ Removed "+n(r.removed)+". Refreshing…"; load(); } else { dd.disabled=false; dd.textContent="🧹 Remove duplicates"; $("dedupeOut").textContent=(r&&r.reason)||"Didn't work. Try again."; } }); };
+    var bt=$("blastT"); if(bt){ BLARM=0; bt.oninput=function(){ BLAST=bt.value; $("blastC").textContent=BLAST.length+"/250"; };
+      $("blastGo").onclick=function(){ var g=$("blastGo"), o=$("blastOut"), t=BLAST.trim(), N=blastN(), lbl="📣 Send to "+n(N)+" member"+(N===1?"":"s"); if(t.length<5){ o.textContent="Type your message first."; return; }
+        if(BLARM<Date.now()){ BLARM=Date.now()+8000; g.textContent="Tap again to send to "+n(N); o.textContent="They get: “"+NAMES[R]+": "+t+" Reply STOP to opt out.” It can't be taken back."; setTimeout(function(){ if(BLARM&&BLARM<Date.now()&&$("blastGo")===g&&!g.disabled){ BLARM=0; g.textContent=lbl; } },8100); return; }
+        BLARM=0; g.disabled=true; g.textContent="Sending…"; api({type:"bo_blast",token:TOKEN,slug:R,text:t}).then(function(r){ if(r&&r.ok){ BLAST=""; draw(); $("blastOut").textContent="✅ Sent to "+n(r.sent)+" of "+n(r.total)+"."+(r.stop?" "+n(r.stop)+" had opted out.":"")+(r.refused?" "+n(r.refused)+" didn't go through.":""); }
+          else { g.disabled=false; g.textContent=lbl; o.textContent=(r&&r.reason)||"Didn't send. The backend may need its update first. Text Antidote."; } }); }; }
     p.querySelectorAll("[data-sort]").forEach(function(th){ th.onclick=function(){ var k=th.dataset.sort; SORT={k:k,d:SORT.k===k?-SORT.d:-1}; draw(); }; }); }
   p.querySelectorAll("[data-led]").forEach(function(box){ var hid=$(box.dataset.led), up=function(){ var a=[], sum=0; box.querySelectorAll(".row").forEach(function(r){ var nm=r.querySelector(".li").value.trim(), v=parseInt(r.querySelector(".ln").value,10); if(nm&&v>0){ a.push([nm,v]); sum+=v; } });
     hid.value=JSON.stringify(a); var su=box.querySelector("[data-sum]"); if(su) su.textContent=/slices/.test(box.dataset.led)?"Total: "+sum+"%"+(sum===100?" ✓":" (must be 100)"):a.reduce(function(x,y){ return x+y[1]; },0)+" winner(s) in all"; };
@@ -822,21 +844,17 @@ function launch(){ var F="../../files/christian-7045b2/";
   var row=function(k,t,n){ return "<div class='st'>"+chip(k)+"<div><b>"+t+"</b><span class='n'>"+n+"</span></div></div>"; };
   var STATUS=[
     ["ok","Melody app, game, rewards and 4K menu","Built. Guests play, earn points, use Just Landed, sign up and get rewards. The menu is view-only: guests order and pay with their server."],
-    ["ok","This HQ + team logins","Christian, Melody Management, Sami and Noe each have a login. Christian decides what each person can do in 🔐 Team access."],
+    ["ok","This HQ + team logins","Christian, Melody Management, Sami, Noe and Allie each have a login. Christian decides what each person can do in 🔐 Team access."],
     ["ok","QR stickers, table cards 1–40 and the window poster","Designed and scan-tested. Ready to print."],
-    ["ok","Staff guide + training quiz","Safe to text to staff. It never shows guest info."],
+    ["ok","Staff guide, training video + quiz","Safe to text to staff. It never shows guest info. The video and a printout are in 🧑‍🍳 Staff."],
     ["wt","Shift deal texts for staff","Built. Staff add their number and start times in the staff guide, and you approve them in 🔐 Team access. Texts start once the phone carriers approve the business number. Until then, people who add an email get it by email."],
     ["nw","Sami's email","Needed so Sami's changes can save (each change is confirmed with a code sent to her email). Until then she can look at everything but can't save."],
     ["nw","Toast reward buttons (for now)","5 discount buttons in Toast Web, about 10 minutes, done together. Staff ring app rewards with these until Toast connects."],
     ["wt","Toast connection (automatic points)","We applied to Toast's partner program on Oct 12. Toast's Nov 9 email: still under review, decision within 30 days (about Nov 11). Until then, see “Connect Toast before approval” below."],
-    ["wt","Online ordering + card payments","Optional add-on. The card payment account (Stripe) is set up in test mode. It goes live after our business details are verified. Each restaurant connects its own bank, so the money goes straight to you. We never hold it."],
+    ["wt","Online ordering","Optional add-on, not switched on. If you want it, tell Antidote and he sets up with you how guests pay."],
     ["wt","DoorDash delivery","We applied for DoorDash's delivery program (DoorDash Drive). DoorDash reviews requests every quarter and approves a limited number, so there's no date yet. Pickup ordering can start before delivery."],
     ["wt","AI phone host + texts","Built and ready. Turns on for both restaurants after the Nalu Vida setup payment. Texting guests also needs phone-carrier approval."]];
-  var TOUR=[["todo-top","✅ To-do list","Top of every page. Tap an item to fix it, then Done."],["overview","📊 Overview","Sign-ups, visits and points at a glance"],["members","👥 Members","Guest list, contacts, birthdays, CSV export"],
-    ["rewards","🎟️ Rewards & claims","Rewards used + receipt claims to check against Toast"],["discounts","🏷️ Discounts","Change rewards, points and dollars off"],["menu","💲 Prices & specials","Prices, holiday specials, happy hour"],
-    ["earlybird","🎁 Early bird","The founding-member gift"],["staff","🧑‍🍳 Staff","Staff game scores + the training quiz"],["squares","🏈 Squares","Football Squares boards"],
-    ["scout","🛡️ Scout","Catches point farming and duplicates"],["audit","🧾 Audit log","Who changed what, before → after"],["team","🔐 Team access","Approve staff, switch access on or off, 📲 shift deal texts"],["help","❓ Help","How-to with a Listen button"]];
-  var tour=TOUR.filter(function(t){ return t[0]==="todo-top"?can("todo"):tabOk(t[0]); }).map(function(t){ return "<button class='btn alt' data-go='"+t[0]+"'>"+t[1]+"<small>"+t[2]+"</small></button>"; }).join("");
+  var tour=tourList().map(function(t,i){ return "<button class='btn alt' data-tour='"+i+"'>"+t[1]+"<small>"+t[2]+"</small></button>"; }).join("");
   var step=function(who,t,n){ return "<li><span class='who'>"+who+"</span><br><b>"+t+"</b><br>"+n+"</li>"; };
   var STEPS=[
     step("Today · Sami → Antidote","Send Antidote Sami's email","He adds it to her login (2 minutes, nothing to reinstall). After that she can save changes on her own."),
@@ -844,17 +862,17 @@ function launch(){ var F="../../files/christian-7045b2/";
     step("Today · Christian or Sami","Clear the red to-do list","Confirm menu prices, set prices for upcoming specials, and OK menu photos. Each item jumps you to the right spot."),
     step("This week · Together, about 10 min","Add the 5 reward buttons in Toast","On a computer in Toast Web. Follow the <a href='../../melody/kit/toast-interim.html'>Toast button guide</a> (names, amounts, permissions). Staff then ring app rewards from the pass the guest shows."),
     step("This week · Christian","Print the QR codes","Stickers, table cards 1–40 and the 24×36 window poster are in <a href='"+F+"'>your files</a>. <a href='../../onboarding/christian/placement/'>Where to put each one</a>. Check that each one scans after printing."),
-    step("This week · Sami or a manager, 15 min","Train the staff","Text them the <a href='../../staff/christian/'>staff guide</a>. They ask for their own login from the HQ login screen (“New staff? Request access”), and Christian approves it in 🔐 Team access. Everyone takes the quiz."),
+    step("This week · Sami or a manager, 15 min","Train the staff","Open <button class='btn sm alt' data-go='staff'>🧑‍🍳 Staff</button> › 🎓 Train a new staff member: the training video, a printout and the <a href='../../staff/christian/'>staff guide</a> link to text them. They ask for their own login from the HQ login screen (“New staff? Request access”), and Christian approves it in 🔐 Team access. Everyone takes the quiz."),
     step("This week · Sami or a manager, 5 min","Staff sign up for deal texts","In the staff guide, each person taps “📲 Get today's deals by text” and adds their mobile and usual start times. Approve them in 🔐 Team access › 📲 Shift deal texts. Each shift they get one text with that day's deals, so they know them before a guest asks."),
     step("Launch day · Everyone","Go live","QR codes on the tables and the window, the app link in the @melodylax bio, Sami posts it. Servers tell every table: “Scan to play and earn a free starter.”"),
     step("Every day after launch · Manager, 2 min","Spot-check","Compare receipt claims and rewards used with Toast's daily report. Approve the ones that match and flag the rest. The to-do list reminds you."),
-    step("When you say yes · Christian","Online ordering + delivery","Tap Done on the to-do once you've told Antidote yes or no. If yes: pickup ordering with card payments goes first. You connect your own bank through Stripe in about 10 minutes (bank info + ID). DoorDash delivery is added once DoorDash approves."),
+    step("When you say yes · Christian","Online ordering + delivery","Tap Done on the to-do once you've told Antidote yes or no. If yes: pickup ordering goes first, and Antidote sets up with you how guests pay. DoorDash delivery is added once DoorDash approves."),
     step("When Toast approves · Antidote","Connect Toast","Points then post automatically from each check, and the interim buttons stay as a backup. Guests keep all their points."),
     step("After the Nalu Vida setup payment · Antidote","Turn on the AI phone host + texts","Kira answers missed and after-hours calls. Melody forwards calls to Kira's number. Birthday and win-back texts go on once carrier approval comes through."),
     step("Next · Together","Nalu Vida, the same way","Same steps, with Nalu's own QR codes and Toast buttons.")];
   return billing()+toastNow()+"<div class='card help lp' style='margin-top:12px'><h2 style='margin-top:0'>🚀 Melody launch plan</h2><p class='note'>Everything in one place: where we are, a 2-minute tour of this HQ, and each step from QR codes to launch, Toast, ordering and delivery.</p>"+
     "<h3>Where we are</h3>"+STATUS.map(function(x){ return row(x[0],x[1],x[2]); }).join("")+
-    "<h3>Quick tour"+(MGR?" (what your login can open)":"")+"</h3><div class='tour'>"+tour+"</div>"+
+    "<h3>Quick tour"+(MGR?" (what your login can open)":"")+"</h3><p class='note' style='margin:0 0 8px'>Tap any stop. It opens that page with a short how-to on top, then Next takes you to the following one.</p><div class='tour'>"+tour+"</div>"+
     "<h3>What's next, step by step</h3><ol class='steps'>"+STEPS.join("")+"</ol>"+
     "<p class='note'>Questions? Text Antidote. Nothing goes live to guests without Christian's or Sami's OK.</p></div>"; }
 // ---- 💳 BILLING (2026-11-09, owners only): agreements + what's due. Update BILL when a payment lands (also clients/billing/clients.json).
@@ -914,7 +932,7 @@ function ordersTab(){ if(ORDS.list===null) return "<div class='card'>"+(ORDS.err
     "<span class='note'>Checks every 30 seconds · last "+(ORDS.ts?new Date(ORDS.ts).toLocaleTimeString([], {hour:"numeric",minute:"2-digit",second:"2-digit"}):"—")+"</span></div>";
   if(ORDS.err) h+="<p class='err'>"+esc(ORDS.err)+"</p>";
   h+=L.length?L.map(ordCard).join(""):"<div class='card'><p style='margin:0;font-size:16px'>No paid pickup orders yet today.</p><p class='note'>New ones show up here by themselves (with a sound once it's on). Guests pay by card before an order shows.</p></div>";
-  return h+"<p class='note'>Only paid orders show, newest first. Guests pay menu price + tax on Stripe's secure page, no fees. Phones show the last 4 digits unless your login can see guest contacts. Pickup only for now; delivery comes later.</p>"; }
+  return h+"<p class='note'>Only paid orders show, newest first. Guests pay menu price + tax, no fees. Phones show the last 4 digits unless your login can see guest contacts. Pickup only for now; delivery comes later.</p>"; }
 function bindOrders(p){ var s=$("ordSound"); if(s) s.onclick=function(){ OSOUND=!OSOUND; try{ localStorage.setItem("christian-hq-sound",OSOUND?"1":"0"); }catch(e){} beep(); draw(); };
   var rf=$("ordRef"); if(rf) rf.onclick=function(){ rf.disabled=true; ordersFetch(); };
   var fk=$("ordFake"); if(fk) fk.onclick=function(){ fk.disabled=true; ordersFetch({fake:true}); };
@@ -932,6 +950,27 @@ function help(){ var lb=window.SSAI_LISTEN?SSAI_LISTEN.button("helpText","🔊 L
       "<h3>🔐 Team access</h3><p>Open <b>Team access</b> to approve staff who asked for a login, turn a person off or on, change their job, and switch each thing they can do on or off. It works right away, it's in the Audit log, and the person gets an email. New staff ask from the login screen: “New staff? Request access”.</p>")+
     (ROLE==="owner"||can("shifttexts")?"<h3>📲 Shift deal texts</h3><p>Staff sign up in the staff guide with their mobile and usual start times. Open <b>Team access</b> › <b>Shift deal texts</b> to approve them, switch someone off, fix their times or delete them. About 15 to 30 minutes before each shift they get one text with that day's specials, happy hour, reward points and game-day deal. Tap <b>Today's text</b> to see exactly what goes out. If someone asks you to stop, tap <b>Mark STOP</b> (replying STOP does the same by itself). Until the phone carriers approve our business number, people who gave an email get it by email instead.</p>":"")+
     "<h3>🧑‍🍳 Staff</h3><p>Your team's guide is the <a href='../../staff/christian/'>staff guide</a>: how guests sign up, how to check a pass and ring it in Toast, receipt points, what to say and common problems. It has a Listen button too. It never shows guest info, so it's safe to text the link to staff.</p></div>"; }
+// 🧭 Quick tour (2026-11-11): tap a stop on the Launch plan → that tab opens with a how-to card on top. [tab, title, one-liner, steps]
+var TOURAT=-1, TOUR=[
+ ["todo-top","✅ To-do list","Top of every page. Tap an item to fix it, then Done.",["The list at the top shows what needs you, most important first.","Tap an item to go straight to the page where you handle it.","Tap Done when it's handled. Use ＋ Add to write your own reminder."]],
+ ["overview","📊 Overview","Sign-ups, visits and points at a glance",["Pick Melody, Nalu Vida or Both at the top of the page.","The number tiles show members, joins, app opens, game plays, points and rewards used.","Scroll down for the per-day charts, top members and top referrers."]],
+ ["members","👥 Members","Guest list, contacts, birthdays, CSV export, 📣 mass text",["Search by name, card ID, email or phone. Tap a column to sort.","⬇︎ CSV downloads the list.","📣 Text your members (Christian's login only): pick one restaurant at the top, type the message, send. It only goes to members who said yes to texts."]],
+ ["rewards","🎟️ Rewards & claims","Rewards used + receipt claims to check against Toast",["Rewards used lists every live pass a guest showed.","Spot-check them against Toast's daily sales report (check number + total).","Members with a reward ready shows who can use one on their next visit."]],
+ ["discounts","🏷️ Discounts","Change rewards, points and dollars off",["Change the points, the reward name or the dollars off, then tap Save.","We email a 6-digit code to your login's email. Type it in and tap Apply change.","The guest app updates within a minute."]],
+ ["menu","💲 Prices & specials","Prices, holiday specials, happy hour",["Type the new price and tap Save, then the emailed code.","Toast does not change by itself, so change the same price in Toast too.","To go back to the menu's own price, clear the box and tap Save."]],
+ ["earlybird","🎁 Early bird","The founding-member gift",["Pick how the gift works: Off, Fixed gift, Spin the wheel or Raffle.","Free food or non-alcoholic items only.","For a raffle, tap 🎲 Draw winners on or after the draw date. It's logged in the Audit log."]],
+ ["staff","🧑‍🍳 Staff","Train new staff + staff game scores and the quiz",["🎓 Train a new staff member: play the training video, print the guide, or text them the link.","Practice tally shows who's playing the staff game.","Training quiz shows who passed."]],
+ ["squares","🏈 Squares","Football Squares boards",["Pick a game and tap ➕ Create board.","Every Rewards member gets 1 free square per game. No purchase necessary.","Numbers are drawn and shown at kickoff, or when you lock the board."]],
+ ["scout","🛡️ Scout","Catches point farming and duplicates",["Scout checks every points award, receipt claim and reward the moment it comes in.","🚩 Open flags are the ones to look at. Only Christian can reverse points or close a flag.","⛔ Rejected duplicates were refused on arrival. Nothing there was credited."]],
+ ["audit","🧾 Audit log","Who changed what, before → after",["Every change is listed with who made it.","Each line shows what it was before and after."]],
+ ["team","🔐 Team access","Approve staff, switch access on or off, 📲 shift deal texts",["🙋 Waiting for you: approve staff who asked for a login.","👥 Team: turn a person off or on, change their job, and switch each thing they can do on or off.","📲 Shift deal texts: approve staff who signed up for the pre-shift deal text."]],
+ ["help","❓ Help","How-to with a Listen button",["Plain how-to for every part of this HQ.","Tap 🔊 Listen to this page to hear it read out."]]];
+function tourList(){ return TOUR.filter(function(t){ return t[0]==="todo-top"?can("todo"):tabOk(t[0]); }); }
+function tourTab(t){ return t[0]==="todo-top"?"launch":t[0]; }
+function tourCard(){ var L=tourList(), t=L[TOURAT]; if(!t||tourTab(t)!==TAB){ TOURAT=-1; return ""; }
+  return "<div class='card' id='tourCard' role='region' aria-label='Quick tour' style='border-color:var(--gold);scroll-margin-top:70px'><b style='color:var(--gold);font-size:13px'>🧭 QUICK TOUR · "+(TOURAT+1)+" of "+L.length+"</b><h2 style='margin:4px 0'>"+t[1]+"</h2><ol class='steps'>"+t[3].map(function(x){ return "<li>"+x+"</li>"; }).join("")+"</ol>"+
+    "<div class='row' style='gap:8px;flex-wrap:wrap'>"+(TOURAT?"<button class='btn sm alt' data-tour='"+(TOURAT-1)+"'>◂ Back</button>":"")+(L[TOURAT+1]?"<button class='btn sm' data-tour='"+(TOURAT+1)+"'>Next: "+L[TOURAT+1][1]+" ▸</button>":"")+"<button class='btn sm alt' data-tour='-1'>✕ Close tour</button></div></div>"; }
+function tourGo(i){ var t=tourList()[i]; TOURAT=t?i:-1; if(!t){ draw(); return; } goTab(tourTab(t)); var c=$(t[0]==="todo-top"?"todo":"tourCard")||$("tourCard"); if(c) c.scrollIntoView({behavior:"smooth",block:"start"}); }
 function goTab(t){ if(!tabOk(t)) return; TAB=t; document.querySelectorAll("#tabs button").forEach(function(x){ x.setAttribute("aria-selected",x.dataset.t===t?"true":"false"); }); draw(); window.scrollTo(0,0); }
 // chart tooltips: hover (mouse) or tap (touch) any [data-tip]; content was escaped when the chart was built
 var TIP=document.createElement("div"); TIP.id="tip"; TIP.hidden=true; TIP.setAttribute("role","tooltip"); document.body.appendChild(TIP);

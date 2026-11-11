@@ -53,7 +53,7 @@ figcaption{font-size:12.5px;color:var(--dim);padding:6px 10px;background:var(--c
 .toast .items div.sel{outline:3px solid #ff2d55;background:#ffe9ee}.toast .acts{padding:8px;display:grid;gap:6px;align-content:start}.toast .acts span{background:#3a4560;color:#fff;border-radius:8px;padding:8px;text-align:center;font-weight:800}
 .toast .acts span.hi{outline:3px solid #ff2d55;background:#ff4c00}.toast .disc{padding:8px;border-top:1px solid #d8dbe2;display:grid;gap:6px}.toast .disc span{background:#fff;border:1px solid #c9ced8;border-radius:8px;padding:8px;font-weight:700}.toast .disc span.hi{outline:3px solid #ff2d55;background:#fff3c4}
 .toast .rsn{padding:8px;border-top:1px solid #d8dbe2}.toast .rsn i{display:block;font-style:normal;background:#fff;border:2px solid #ff2d55;border-radius:8px;padding:7px;font-family:ui-monospace,Menlo,monospace;font-weight:800}
-.toast .badge{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:11px;background:#ff2d55;color:#fff;font-weight:900;font-size:12px;margin-right:6px;vertical-align:middle}
+.toast .badge,.toast .acts .badge,.toast .disc .badge{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:11px;background:#ff2d55;color:#fff;font-weight:900;font-size:12px;margin-right:6px;vertical-align:middle;padding:0;border:0}
 details{border-top:1px solid var(--edge);padding:9px 0}details:first-of-type{border-top:0}summary{cursor:pointer;font-weight:700}details p{margin:6px 0 0;color:var(--dim)}
 .say{border-left:4px solid var(--gold);padding:6px 12px;margin:8px 0;background:#ffffff08;border-radius:0 10px 10px 0}
 .acct label{display:block;font-weight:800;margin:8px 0 0}.acct input,.acct select{display:block;width:100%;box-sizing:border-box;margin-top:4px;font-size:17px;padding:10px;border-radius:12px;border:1px solid #bbb}.acct form .btn{margin-top:12px}.atab{display:flex;margin-bottom:4px}.atab button{flex:1}.aerr{color:#c62828;font-weight:700;margin:8px 0 0;min-height:1em}.arow{display:flex;gap:8px;flex-wrap:wrap}.arow .btn{flex:1;text-align:center;text-decoration:none}
@@ -70,6 +70,15 @@ details{border-top:1px solid var(--edge);padding:9px 0}details:first-of-type{bor
 .sf label{display:block;font-weight:800;margin:12px 0 4px}.sf input,.sf select{display:block;width:100%;font-size:16px;padding:11px;border-radius:12px;border:1px solid var(--edge);background:#081022;color:var(--ink);min-height:46px}
 .sf .days{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sf .days label{font-weight:700;margin:0 0 3px;font-size:14px}
 .sf .ck2{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;margin-top:14px;font-size:14.5px;line-height:1.45}.sf .ck2 input{width:24px;height:24px;min-height:0;margin:2px 0 0;accent-color:var(--gold)}
+/* 🖨️ ?print=1 = the printable training handout (opened from Christian HQ › Staff › Train a new staff member) */
+.prbar{position:sticky;top:0;z-index:5;background:#0b1220ee;margin:0 -16px 8px;padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--edge)}.prbar .note{flex:1;min-width:180px}.pronly{display:none}
+@media print{:root{--bg:#fff;--card:#fff;--card2:#f1f1f1;--edge:#999;--ink:#000;--dim:#333;--gold:#7a5a00}
+ html,body{background:#fff;font-size:11pt;overflow:visible}main{max-width:none;padding:0}
+ .bar,.prbar,.nav,button,input,select,.ls-btn,.lsr,.noprint,[class^=sv-]{display:none!important}.pronly{display:inline}
+ a{color:#000;text-decoration:none}.tut,.card,.stp,figure,details,.say,.deal,.toast,.live{break-inside:avoid}h2,h3{break-after:avoid}h2{margin-top:18px}
+ figure{max-width:210px}.say{background:none}code,.tb{background:#eee}.deal .pt{color:#000}
+ .split div{height:60px}.split img{max-height:46px}.live,.live:before{animation:none}.live:before{display:none}
+ .split div,.live,.live *,.toast,.toast *,.stp .k{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .sf .err{color:var(--bad);font-weight:700;margin-top:8px}.sf .okmsg{background:#2fbf7122;border:1px solid #2fbf7188;border-radius:12px;padding:12px;margin-top:6px}
 </style></head><body class="m"><main id="app"></main>
 <script src="../../demo/christian-live.js?v=mg1"></script>
@@ -460,15 +469,23 @@ document.addEventListener("click",function(e){ var b=e.target.closest&&e.target.
 // ---------------- page ----------------
 function render(){ var y=window.scrollY, fid=document.activeElement&&document.activeElement.getAttribute&&document.activeElement.getAttribute("data-sf")?document.activeElement.id:""; document.documentElement.lang=LANG; document.body.className=REST;
  document.title=LANG==="es"?"Guía del personal · Melody × Nalu Vida":"Staff Rewards · Melody × Nalu Vida";
- $app.innerHTML="<div class='split'><div class='m'><img src='../../demo/melody-lax/img/logo.png' alt='Melody Bar &amp; Grill'></div><div class='n'><img src='../../demo/nalu-vida/img/logo.png' alt='Nalu Vida'></div></div>"+
+ var HEAD="<div class='split'><div class='m'><img src='../../demo/melody-lax/img/logo.png' alt='Melody Bar &amp; Grill'></div><div class='n'><img src='../../demo/nalu-vida/img/logo.png' alt='Nalu Vida'></div></div>"+
   "<div class='bar'><div class='seg r' role='group' aria-label='Restaurant'><button class='m' data-rest='m' aria-pressed='"+(REST==="m")+"'>✈️ Melody</button><button class='n' data-rest='n' aria-pressed='"+(REST==="n")+"'>🏄 Nalu Vida</button></div>"+
   "<div class='seg' role='group' aria-label='Language / Idioma'><button data-lang='en' aria-pressed='"+(LANG==="en")+"'>EN</button><button data-lang='es' aria-pressed='"+(LANG==="es")+"'>ES</button></div></div>"+
-  "<h1>"+L(W.title)+"</h1><p class='s'>"+L(W.intro)+"</p>"+
+  "<h1>"+L(W.title)+"</h1><p class='s'>"+L(W.intro)+"</p>";
+ if(PRINT){ // the handout: every how-to section, everything opened up, no logins, games or quiz
+  $app.innerHTML="<div class='prbar'><button class='btn' id='prGo'>🖨️ "+L({en:"Print / save as PDF",es:"Imprimir / guardar como PDF"})+"</button><span class='note'>"+L({en:"Pick the restaurant, language and job below first. This bar doesn't print.",es:"Primero elige el restaurante, el idioma y el puesto abajo. Esta barra no se imprime."})+"</span></div>"+
+   HEAD+duties()+guests()+deals()+tutorials()+say()+faq()+"<p class='note' style='margin-top:18px'>"+L({en:"The same guide, with the practice game and the quiz, is on your phone:",es:"La misma guía, con el juego de práctica y el examen, está en tu teléfono:"})+" <b>sousshift.com/staff/christian</b></p>";
+  $app.querySelectorAll("details").forEach(function(d){ d.open=true; }); $app.querySelectorAll("img").forEach(function(i){ i.loading="eager"; });
+  var js=document.getElementById("job"); // paper shows the picked job's name; with no job picked the duties block stays off the paper
+  if(js&&js.value) js.insertAdjacentHTML("afterend","<b class='pronly'>: "+esc(js.options[js.selectedIndex].text)+"</b>"); else if(js){ js.closest(".card").classList.add("noprint"); document.getElementById("duties").classList.add("noprint"); }
+  document.getElementById("prGo").onclick=function(){ window.print(); }; tickDemo(); return; }
+ $app.innerHTML=HEAD+
   account()+(acct()?"":"<div class='card'><label for='nm' style='font-weight:800'>"+L(W.yourName)+"</label><div class='name' style='margin-top:6px'><input id='nm' maxlength='24' autocomplete='given-name' value='"+esc(nm())+"'><button class='btn' id='nmSave'>"+L(W.save)+"</button></div><p class='note' style='margin:6px 0 0'>"+L(W.nameHint)+"</p></div>")+
   "<nav class='nav' aria-label='Sections'>"+[["dealtexts",{en:"Deal texts",es:"Ofertas por texto"}]].concat(W.nav).map(function(x){ return "<a href='#"+x[0]+"'>"+L(x[1])+"</a>"; }).join("")+"</nav>"+
   shiftCard()+listenify(openApp()+duties()+guests()+deals()+tutorials()+say()+faq())+games()+quiz()+"<p class='note' style='margin-top:24px'>"+L(W.install)+"</p>";
  window.scrollTo(0,y); if(fid){ var fe=document.getElementById(fid); if(fe) try{ fe.focus({preventScroll:true}); }catch(e){} } tickDemo(); showLk(); if(window.StaffVoice) StaffVoice.decorate(LANG); }
-var $app=document.getElementById("app"), dpEnd=0;
+var $app=document.getElementById("app"), dpEnd=0, PRINT=/[?&]print=1(&|$)/.test(location.search);
 function tickDemo(){ var c=document.getElementById("dpClock"), d=document.getElementById("dpCd"), p=document.getElementById("demoPass"); if(!c) return;
  var now=new Date(); c.textContent=now.toLocaleDateString(LANG==="es"?"es-US":"en-US",{weekday:"short",month:"short",day:"numeric"})+" · "+now.toLocaleTimeString(LANG==="es"?"es-US":"en-US",{hour:"numeric",minute:"2-digit",second:"2-digit"});
  var left=dpEnd?Math.max(0,dpEnd-Date.now()):600000-(Date.now()%600000); if(dpEnd&&left<=0){ p.classList.add("dead"); d.textContent="0:00"; return; } p.classList.remove("dead"); var s=Math.ceil(left/1000); d.textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }

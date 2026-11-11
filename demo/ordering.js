@@ -25,7 +25,8 @@
   function put(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (x) {} }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]; }); }
   function money(n) { return "$" + (Math.round(n * 100) / 100).toFixed(2); }
-  function prices() { var o = {}; MENU.food.forEach(function (c) { c.items.forEach(function (it) { o[it[0]] = +it[1]; }); }); return o; }
+  function food() { return MENU.food.filter(function (c) { return !c.day; }); }   // day-only sections (Taco Tuesday) are in-restaurant only: the server has no price for them
+  function prices() { var o = {}; food().forEach(function (c) { c.items.forEach(function (it) { o[it[0]] = +it[1]; }); }); return o; }
   var cart = get(CK, []); if (!Array.isArray(cart)) cart = [];   // [{item, qty, note}]
   function saveCart() { put(CK, cart); badge(); }
   function sub() { var P = prices(), s = 0; cart.forEach(function (l) { if (P[l.item] != null) s += P[l.item] * l.qty; }); return Math.round(s * 100) / 100; }
@@ -83,8 +84,8 @@
 
   function drawMenu() {
     $("ssoT").innerHTML = "Order pickup<small>" + esc(NAME) + " · pay now, skip the line</small>";
-    var h = "<nav class='sso-chips' aria-label='Menu sections'>" + MENU.food.map(function (c) { return "<a href='#sso-" + esc(c.id) + "'>" + esc(c.name) + "</a>"; }).join("") + "</nav>";
-    MENU.food.forEach(function (c) {
+    var h = "<nav class='sso-chips' aria-label='Menu sections'>" + food().map(function (c) { return "<a href='#sso-" + esc(c.id) + "'>" + esc(c.name) + "</a>"; }).join("") + "</nav>";
+    food().forEach(function (c) {
       h += "<div class='sso-cat' id='sso-" + esc(c.id) + "'>" + esc(c.name) + "</div>";
       c.items.forEach(function (it) { var q = qtyOf(it[0]);
         h += "<div class='sso-it'><div><b>" + esc(it[0]) + "</b><small>" + esc(it[2]) + "</small></div><span class='sso-pr'>" + money(+it[1]) + "</span>" +

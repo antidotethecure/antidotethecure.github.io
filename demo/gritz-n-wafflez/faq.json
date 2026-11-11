@@ -2,63 +2,54 @@
  "name": "Gritz N Wafflez",
  "phone": "(213) 566-4837",
  "facts": [
-  "Gritz N Wafflez is a woman-owned Texas Flava, Southern Hospitality restaurant in Koreatown, Los Angeles.",
+  "Gritz N Wafflez is a woman-owned Texas flava, Southern hospitality spot in Koreatown, Los Angeles.",
   "Address: 3183 Wilshire Blvd, Suite 185, Los Angeles, CA 90010.",
   "Phone: (213) 566-4837.",
-  "Open daily, 9 AM to 3 PM.",
+  "Hours: open daily, 9 AM to 3 PM.",
   "The first 15 minutes of valet are complimentary.",
   "GNW Karaoke is every Wednesday, 6 to 10 PM.",
-  "Order Up! is the in-app game: you run the line, build plates, serve them and deliver them to tables.",
-  "Order Up! is free to play and needs no account. A free member account is only needed to save a score or claim a prize.",
-  "Each level is 90 seconds. Three walk-outs close the kitchen.",
-  "Adult mode has the bigger prizes. Kid mode (12 and under) has kid-sized prizes and needs a parent or guardian to sign in first.",
+  "The app has a game called Order Up! that you can play while you wait.",
+  "Order Up! is free to play with no account needed.",
+  "You need a free member account only to save a score or claim a prize.",
+  "Rewards ladder: 250 points = Free Kiki Palmer.",
+  "450 points = Free side of Smackin' Mac.",
+  "700 points = Free Original Collard Green Dip.",
+  "1,100 points = Free N' Wafflez plate.",
+  "A free daily spin gives every member one spin a day, and every slice wins something.",
+  "Spin prizes: +50, +75 or +100 points, $2 off any plate, Free Kiki Palmer, Free side of Smackin' Mac, or 10% off your order.",
+  "Food prizes and discounts from the spin are good for 3 days at the Koreatown location, one reward per visit.",
+  "Weekly champion prize: Free Wingz N' Wafflez plus a karaoke shoutout.",
+  "The weekly board runs Monday through Sunday close and resets every Monday.",
+  "The champion is crowned at GNW Karaoke on Wednesday.",
   "Adult prizes: 13,500 = Free Kiki Palmer; 22,000 = Free side of Smackin' Mac; 32,000 = Free Fried Cheese Gritz; 46,500 = Free Original Collard Green Dip.",
   "Kid prizes: 9,500 = Free Fresh Squeezed OJ; 11,000 = Free side of French Friez; 12,750 = Free Sweet Gritz; 13,250 = Free Chocolate Chip Waffle.",
-  "Game prizes must be used within 3 days, and you can hold one prize at a time.",
-  "The weekly top score (Monday through Sunday close) wins a Free Wingz N' Wafflez plus a karaoke shoutout. The board resets every Monday.",
-  "The weekly champion is crowned at GNW Karaoke on Wednesday.",
-  "The prizes shown in the game are samples. Jurni picks the real ones.",
-  "Rewards ladder: 250 pts = Free Kiki Palmer; 450 = Free side of Smackin' Mac; 700 = Free Original Collard Green Dip; 1,100 = Free N' Wafflez plate.",
-  "A free Daily Spin is available once per member per day, and every slice wins something.",
-  "Spin prizes and discounts are good for 3 days at the Koreatown location, one reward per visit.",
-  "Joining needs a name, phone number and email. One account per person and per phone.",
-  "Players must be 13 or older. Players under 18 need a parent's or guardian's permission.",
-  "No purchase is necessary to play, spin or win.",
-  "Prices for the menu are on the online order page, not in the app.",
-  "The app can be translated into many languages with the globe button.",
-  "Your info is used only for your rewards account and is never sold.",
-  "Opt-in texts and emails can be stopped anytime by replying STOP."
+  "Kid mode is for ages 12 and under and needs a parent or guardian to sign in first.",
+  "A game prize must be used within 3 days, and you can hold one prize at a time.",
+  "Each Order Up! level is 90 seconds, and 3 walk-outs close the kitchen.",
+  "Prices are on the online order page, not in the app's menu list.",
+  "The app has a language menu (the globe button).",
+  "You can add the app to your phone's Home Screen.",
+  "Questions about rules: call (213) 566-4837."
  ],
  "suggested": [
   "What are your hours?",
   "Where are you and where do I park?",
-  "How does the Order Up! game work?",
-  "What can I win in the game?",
-  "How do I join and earn rewards?",
-  "What's on the menu?"
+  "How do I play Order Up! and what can I win?",
+  "What rewards can I get with points?",
+  "How does the free daily spin work?",
+  "When is karaoke?"
  ],
  "qa": [
   {
    "q": "What are your hours?",
-   "a": "We're open daily, 9 AM to 3 PM.",
+   "a": "We're open daily from 9 AM to 3 PM.",
    "tags": [
     "hours",
     "open",
     "close",
     "time",
-    "when",
-    "daily"
-   ]
-  },
-  {
-   "q": "Are you open today?",
-   "a": "We're open every day of the week, 9 AM to 3 PM. If you're not sure about a holiday, call (213) 566-4837.",
-   "tags": [
-    "open",
-    "today",
-    "hours",
-    "holiday",
-    "daily"
+    "daily",
+    "when"
    ]
   },
   {
@@ -68,123 +59,93 @@
     "weekend",
     "saturday",
     "sunday",
+    "open",
     "hours",
-    "open"
+    "daily"
    ]
   },
   {
-   "q": "When do you close?",
+   "q": "What time do you close?",
    "a": "We close at 3 PM every day.",
    "tags": [
     "close",
     "closing",
-    "time",
     "hours",
+    "time",
     "last call"
    ]
   },
   {
-   "q": "What's your address?",
-   "a": "We're at 3183 Wilshire Blvd, Suite 185, Los Angeles, CA 90010, in Koreatown.",
+   "q": "What time do you open?",
+   "a": "We open at 9 AM every day.",
+   "tags": [
+    "open",
+    "opening",
+    "hours",
+    "time",
+    "morning",
+    "breakfast"
+   ]
+  },
+  {
+   "q": "Where are you located?",
+   "a": "3183 Wilshire Blvd, Suite 185, Los Angeles, CA 90010, in Koreatown. Tap Directions in the app to get there.",
    "tags": [
     "address",
     "location",
     "where",
+    "directions",
     "wilshire",
-    "koreatown",
-    "find"
+    "koreatown"
    ]
   },
   {
-   "q": "How do I get directions?",
-   "a": "Tap the 📍 Directions button in the app and it will open your maps.",
+   "q": "Do you have parking?",
+   "a": "The first 15 minutes of valet are complimentary.",
    "tags": [
-    "directions",
-    "map",
-    "navigate",
-    "gps",
-    "where"
+    "parking",
+    "valet",
+    "park",
+    "car",
+    "free"
+   ]
+  },
+  {
+   "q": "How much is valet?",
+   "a": "The first 15 minutes are complimentary. I don't have the rate after that, so please ask staff or call (213) 566-4837.",
+   "tags": [
+    "valet",
+    "parking",
+    "cost",
+    "price",
+    "fee"
    ]
   },
   {
    "q": "What's your phone number?",
-   "a": "Call us at (213) 566-4837, or tap the 📞 Call button in the app.",
+   "a": "You can call us at (213) 566-4837. There's also a Call button in the app.",
    "tags": [
     "phone",
-    "number",
     "call",
+    "number",
     "contact",
     "telephone"
    ]
   },
   {
-   "q": "Where do I park?",
-   "a": "Valet is available, and the first 15 minutes are complimentary. I don't have details on other parking, so ask staff or call (213) 566-4837.",
+   "q": "How do I get directions?",
+   "a": "Tap the Directions button in the app and it opens your map to 3183 Wilshire Blvd, Suite 185.",
    "tags": [
-    "parking",
-    "park",
-    "valet",
-    "car",
-    "garage"
+    "directions",
+    "map",
+    "navigate",
+    "gps",
+    "address"
    ]
   },
   {
-   "q": "How much is valet?",
-   "a": "The first 15 minutes are free. I don't have the price after that, so please ask staff.",
-   "tags": [
-    "valet",
-    "price",
-    "cost",
-    "parking",
-    "free"
-   ]
-  },
-  {
-   "q": "Is there street parking?",
-   "a": "I don't have that detail. Please ask staff or call (213) 566-4837.",
-   "tags": [
-    "parking",
-    "street",
-    "lot",
-    "car"
-   ]
-  },
-  {
-   "q": "Do you take reservations?",
-   "a": "I don't have reservation info. Please call (213) 566-4837 and ask.",
-   "tags": [
-    "reservation",
-    "reserve",
-    "book",
-    "table",
-    "party"
-   ]
-  },
-  {
-   "q": "Can I order online?",
-   "a": "Yes. Tap the 🧇 Order online button in the app. Prices are on the online order page.",
-   "tags": [
-    "order",
-    "online",
-    "takeout",
-    "pickup",
-    "to go"
-   ]
-  },
-  {
-   "q": "Do you do delivery?",
-   "a": "I don't have delivery details. Tap Order online in the app or call (213) 566-4837.",
-   "tags": [
-    "delivery",
-    "deliver",
-    "doordash",
-    "order",
-    "takeout"
-   ]
-  },
-  {
-   "q": "Is Gritz N Wafflez woman-owned?",
-   "a": "Yes, we're a woman-owned business serving Southern comfort with love.",
+   "q": "Is Gritz N Wafflez locally owned?",
+   "a": "Yes, we're a woman-owned business serving Southern comfort on Wilshire.",
    "tags": [
     "owner",
     "woman-owned",
@@ -194,186 +155,134 @@
    ]
   },
   {
-   "q": "What kind of food is it?",
-   "a": "Texas Flava, Southern hospitality: gritz, wafflez, fried catfish, wingz, tenderz, shrimp, sides and breakfast plates.",
-   "tags": [
-    "food",
-    "cuisine",
-    "southern",
-    "soul food",
-    "about",
-    "style"
-   ]
-  },
-  {
    "q": "Do you have karaoke?",
-   "a": "Yes! GNW Karaoke is every Wednesday, 6 to 10 PM. Grab the mic, grab a plate.",
+   "a": "Yes! GNW Karaoke is every Wednesday from 6 to 10 PM. Grab the mic, grab a plate.",
    "tags": [
     "karaoke",
     "wednesday",
     "music",
-    "night",
     "sing",
+    "night",
     "event"
    ]
   },
   {
-   "q": "What time is karaoke?",
-   "a": "Every Wednesday from 6 to 10 PM.",
+   "q": "What day is karaoke?",
+   "a": "Every Wednesday, 6 to 10 PM.",
    "tags": [
     "karaoke",
-    "time",
     "wednesday",
-    "6pm",
-    "hours"
+    "day",
+    "when",
+    "event"
    ]
   },
   {
    "q": "Do you have happy hour?",
-   "a": "I don't have happy hour info in the app. Please ask staff or call (213) 566-4837.",
+   "a": "I don't have happy hour details. Please ask staff or call (213) 566-4837.",
    "tags": [
     "happy hour",
     "deal",
-    "drink",
+    "drink specials",
     "discount",
     "time"
    ]
   },
   {
    "q": "Do you have daily specials?",
-   "a": "I don't have daily specials listed. The app does show seasonal holiday specials, and staff can tell you what's on today.",
+   "a": "I don't have a list of daily specials. Ask staff or call (213) 566-4837 to find out what's on today.",
    "tags": [
     "specials",
     "daily",
     "deal",
     "today",
-    "menu"
+    "promo"
    ]
   },
   {
-   "q": "What holiday specials do you have?",
-   "a": "The app lists these sample specials: Spooky Sweet Waffle (Oct 20-31), Thanksgiving Soul Plate (Nov 20-28), Holiday Cobbler Waffle (Dec 15-25), New Year's Luck Plate (Dec 29-Jan 1), Sweetheart Wafflez for Two (Feb 7-14), Lucky Green Start (Mar 14-17), Brunch Fiesta (May 1-5) and Red, White & Blue Waffle (Jul 1-4).",
+   "q": "Do you have holiday specials?",
+   "a": "Holiday specials show up in the app when they're running. If you don't see one, ask staff or call (213) 566-4837.",
    "tags": [
-    "specials",
     "holiday",
+    "special",
     "seasonal",
-    "halloween",
     "thanksgiving",
     "christmas",
-    "valentines"
+    "promo"
    ]
   },
   {
-   "q": "What is the Spooky Sweet Waffle?",
-   "a": "It's a Chocolate Chip waffle plus Fried Sweet Gritz, a treat with no tricks. It runs Oct 20-31.",
+   "q": "Can I order online?",
+   "a": "Yes, tap the Order online button in the app. Prices are on the online order page.",
    "tags": [
-    "halloween",
-    "special",
-    "spooky",
-    "waffle",
-    "chocolate chip"
+    "order",
+    "online",
+    "takeout",
+    "pickup",
+    "delivery",
+    "to go"
    ]
   },
   {
-   "q": "What is the Thanksgiving Soul Plate?",
-   "a": "Catfish N' Gritz with Collard Greens and Smackin' Mac, running Nov 20-28.",
+   "q": "Can I order from my table with a QR code?",
+   "a": "I don't have details on table ordering. Please ask your server or call (213) 566-4837.",
    "tags": [
-    "thanksgiving",
-    "special",
-    "catfish",
-    "plate",
-    "collard"
+    "qr",
+    "table",
+    "order",
+    "scan",
+    "dine in"
    ]
   },
   {
-   "q": "What is the Holiday Cobbler Waffle?",
-   "a": "A Peach Cobbler Waffle with a Hot Coffee (reg, van or carm). It runs Dec 15-25.",
+   "q": "How do I pay?",
+   "a": "I don't have payment details. Please ask staff, or call (213) 566-4837.",
    "tags": [
-    "christmas",
-    "holiday",
-    "special",
-    "peach cobbler",
-    "coffee"
+    "pay",
+    "payment",
+    "card",
+    "cash",
+    "check",
+    "bill"
    ]
   },
   {
-   "q": "What is the New Year's Luck Plate?",
-   "a": "Shrimp N' Gritz with Collard Greens for a lucky new year. It runs Dec 29 to Jan 1.",
+   "q": "Do you take reservations?",
+   "a": "I don't have reservation info. Please call (213) 566-4837.",
    "tags": [
-    "new year",
-    "special",
-    "shrimp",
-    "gritz",
-    "collard"
+    "reservation",
+    "book",
+    "table",
+    "reserve",
+    "party"
    ]
   },
   {
-   "q": "What is the Valentine's special?",
-   "a": "Sweetheart Wafflez for Two: Wingz N' Wafflez plus a Mixed Berry waffle to share. It runs Feb 7-14.",
+   "q": "Do you deliver?",
+   "a": "I don't have delivery details. Tap Order online in the app, or call (213) 566-4837.",
    "tags": [
-    "valentines",
-    "special",
-    "wingz",
-    "wafflez",
-    "share"
-   ]
-  },
-  {
-   "q": "What's the St. Patrick's Day special?",
-   "a": "Lucky Green Start: Original Collard Green Dip plus Fried Green Tomatoes, Mar 14-17.",
-   "tags": [
-    "st patricks",
-    "special",
-    "collard dip",
-    "green tomatoes"
-   ]
-  },
-  {
-   "q": "What's the Cinco de Mayo special?",
-   "a": "Brunch Fiesta: Breakfast Quesadilla with Homestyle Potatoes and a Kiki Palmer, May 1-5.",
-   "tags": [
-    "cinco de mayo",
-    "special",
-    "quesadilla",
-    "brunch",
-    "kiki palmer"
-   ]
-  },
-  {
-   "q": "What's the 4th of July special?",
-   "a": "Red, White & Blue Waffle: a Mixed Berry waffle with a Fresh Squeezed Lemonade, Jul 1-4.",
-   "tags": [
-    "july 4",
-    "special",
-    "berry",
-    "waffle",
-    "lemonade"
-   ]
-  },
-  {
-   "q": "How much do the specials cost?",
-   "a": "The app doesn't show prices for specials. Please ask staff or check the online order page.",
-   "tags": [
-    "special",
-    "price",
-    "cost",
-    "how much"
+    "delivery",
+    "deliver",
+    "doordash",
+    "to go",
+    "order"
    ]
   },
   {
    "q": "What's on the menu?",
-   "a": "We have Let's Get Started (starters), N' Gritz, N' Wafflez, Break Your Fast, Feelin' Toasty, Just Wafflez, Basketz/Platez/Sammiez, Just Gritz, Sidez and Don't Be Thirsty drinks. Scroll the menu in the app for photos.",
+   "a": "We have starters, N' Gritz, N' Wafflez, breakfast, toast, Just Wafflez, baskets and plates, Just Gritz, sidez and drinks. Scroll the menu in the app to see photos.",
    "tags": [
     "menu",
     "food",
-    "items",
     "eat",
-    "what do you have"
+    "what",
+    "items",
+    "dishes"
    ]
   },
   {
-   "q": "What starters do you have?",
-   "a": "Original Collard Green Dip (our signature), Fried Green Tomatoes, Celestial Eggs, Spicy Fried Pickles and Fried Cheese Gritz.",
+   "q": "What are your starters?",
+   "a": "Under Let's Get Started: Original Collard Green Dip, Fried Green Tomatoes, Celestial Eggs, Spicy Fried Pickles and Fried Cheese Gritz.",
    "tags": [
     "starters",
     "appetizers",
@@ -385,24 +294,25 @@
   },
   {
    "q": "What is the Original Collard Green Dip?",
-   "a": "Like artichoke dip but better: creamy cheese mixed with al dente collard greens, served with homemade tortilla chips.",
+   "a": "It's like artichoke dip but better: creamy cheese mixed with al dente collard greens, served with homemade tortilla chips. It's our signature starter.",
    "tags": [
     "collard",
     "dip",
     "signature",
     "appetizer",
-    "chips"
+    "menu",
+    "greens"
    ]
   },
   {
    "q": "What are Celestial Eggs?",
    "a": "Deviled eggs, fried, topped with Mama Zula's creole seasoning. A crowd favorite.",
    "tags": [
-    "eggs",
-    "celestial",
+    "celestial eggs",
     "deviled",
+    "eggs",
     "appetizer",
-    "creole"
+    "menu"
    ]
   },
   {
@@ -412,146 +322,104 @@
     "fried cheese gritz",
     "gritz",
     "cheese",
-    "appetizer"
+    "appetizer",
+    "menu"
    ]
   },
   {
-   "q": "What are your N' Gritz plates?",
-   "a": "Shrimp N' Gritz (six jumbo shrimp, sautéed or Mama Zula's fried), Tenderz N' Gritz, Catfish N' Gritz and Wingz N' Gritz (three jumbo wingz). All come with your choice of our signature gritz and sauce.",
+   "q": "What do you have with gritz?",
+   "a": "N' Gritz plates come with your choice of our signature gritz and sauce: Shrimp, Tenderz, Catfish or Wingz N' Gritz.",
    "tags": [
     "gritz",
+    "grits",
     "shrimp",
-    "tenderz",
     "catfish",
-    "wingz",
-    "plates"
+    "tenderz",
+    "wingz"
    ]
   },
   {
-   "q": "What are your N' Wafflez plates?",
-   "a": "Wingz N' Wafflez (a fan fave), Tenderz N' Wafflez, Catfish N' Wafflez and Shrimp N' Wafflez. Pick any waffle from Just Wafflez.",
+   "q": "What are the N' Wafflez dishes?",
+   "a": "Wingz, Tenderz, Catfish or Shrimp N' Wafflez. You pick any waffle from Just Wafflez.",
    "tags": [
     "wafflez",
     "waffle",
+    "chicken and waffles",
     "wingz",
-    "tenderz",
     "catfish",
-    "shrimp"
+    "menu"
+   ]
+  },
+  {
+   "q": "What is your fan favorite?",
+   "a": "Wingz N' Wafflez is marked Fan fave in the app: three jumbo wingz battered in Mama Zula's chicken fry.",
+   "tags": [
+    "favorite",
+    "popular",
+    "best",
+    "wingz",
+    "wafflez",
+    "recommend"
    ]
   },
   {
    "q": "What waffle flavors do you have?",
-   "a": "Peach Cobbler, Mixed Berry, Sweet Vanilla Bean, Cinnamon Roll, Chocolate Chip, Cheddar Herb and Bacon Cheddar.",
+   "a": "Just Wafflez: Peach Cobbler, Mixed Berry, Sweet Vanilla Bean, Cinnamon Roll, Chocolate Chip, Cheddar Herb and Bacon Cheddar.",
    "tags": [
     "waffle",
     "flavors",
-    "just wafflez",
+    "wafflez",
     "peach cobbler",
-    "chocolate chip"
+    "chocolate chip",
+    "sweet"
    ]
   },
   {
-   "q": "What is Mama Zula's?",
-   "a": "It's the name on our signature chicken fry, fish fry and creole seasoning used on dishes like tenderz, wingz, catfish and Celestial Eggs.",
-   "tags": [
-    "mama zula",
-    "fry",
-    "seasoning",
-    "batter",
-    "chicken"
-   ]
-  },
-  {
-   "q": "What do you have for breakfast?",
-   "a": "Break Your Fast has the BET+ Breakfast Plate, BET Breakfast Plate, Da Baddest Chick Sandwich, French Toast, Waffle and Cinnatoast Sandwich/Plates, Breakfast Quesadilla and Breakfast Scramble.",
+   "q": "What breakfast do you serve?",
+   "a": "Break Your Fast has the BET+ Breakfast Plate, Da Baddest Chick Sandwich, French Toast, BET Breakfast Plate, Waffle and Cinnatoast sandwich or plate, Breakfast Quesadilla and Breakfast Scramble.",
    "tags": [
     "breakfast",
     "brunch",
     "eggs",
     "bacon",
-    "toast",
-    "morning"
+    "morning",
+    "menu"
    ]
   },
   {
-   "q": "What is Da Baddest Chick Sandwich?",
-   "a": "Fried chicken tenderz, crispy bacon, an egg and melted cheese on buttery Texas toast.",
-   "tags": [
-    "sandwich",
-    "chicken",
-    "baddest",
-    "breakfast"
-   ]
-  },
-  {
-   "q": "What comes on the BET+ Breakfast Plate?",
-   "a": "Crispy bacon, eggs, thick-cut Texas toast and a side of creamy, buttery gritz.",
-   "tags": [
-    "bet",
-    "breakfast",
-    "plate",
-    "bacon",
-    "eggs",
-    "gritz"
-   ]
-  },
-  {
-   "q": "What's in the Breakfast Quesadilla and Scramble?",
-   "a": "The Quesadilla has breakfast potatoes, eggs and melted cheeses in a crispy tortilla. The Scramble has three eggs with cheddar, breakfast potatoes and collard greens.",
-   "tags": [
-    "quesadilla",
-    "scramble",
-    "breakfast",
-    "eggs",
-    "potatoes"
-   ]
-  },
-  {
-   "q": "Can I add meat to the Quesadilla or Scramble?",
+   "q": "Can I add meat to the quesadilla or scramble?",
    "a": "Yes: Bacon $3, Tenderz $6, Catfish $7 or Shrimp $7.",
    "tags": [
     "add",
+    "quesadilla",
+    "scramble",
     "bacon",
-    "tenderz",
-    "catfish",
-    "shrimp",
     "price",
-    "quesadilla"
+    "extra"
    ]
   },
   {
-   "q": "What are the toast and French toast options?",
-   "a": "Crunchy Cinnamon Toast (add Mixed Berriez or Peach Cobbler) and Classic French Toast, thick slices in cinnamon egg batter, griddled golden.",
+   "q": "What toast do you have?",
+   "a": "Feelin' Toasty has Crunchy Cinnamon Toast (add Mixed Berriez or Peach Cobbler) and Classic French Toast.",
    "tags": [
     "toast",
     "french toast",
     "cinnamon",
-    "feelin toasty",
+    "menu",
     "sweet"
    ]
   },
   {
-   "q": "What baskets and plates do you have?",
-   "a": "Tender, Shrimp, Wing and Catfish Basket/Plate. A basket comes with one side, a plate with two.",
+   "q": "Do you have baskets or plates?",
+   "a": "Yes: Tender, Shrimp, Wing and Catfish Basket/Plate. A basket comes with one side, a plate with two.",
    "tags": [
     "basket",
     "plate",
-    "sandwich",
+    "sammie",
+    "sides",
     "tender",
-    "shrimp",
     "wing",
     "catfish"
-   ]
-  },
-  {
-   "q": "What gritz do you have?",
-   "a": "Plain Gritz, Cheese Gritz, Sweet Gritz, Fried Cheese Gritz and Fried Sweet Gritz.",
-   "tags": [
-    "gritz",
-    "grits",
-    "cheese",
-    "sweet",
-    "fried"
    ]
   },
   {
@@ -559,28 +427,41 @@
    "a": "Smackin' Mac, Collard Greens, Who Made The Potato Salad, Homestyle Potatoes and French Friez.",
    "tags": [
     "sides",
+    "sidez",
     "mac",
-    "collard",
+    "collards",
     "potato salad",
     "fries"
    ]
   },
   {
+   "q": "What kinds of gritz do you have?",
+   "a": "Just Gritz: Plain, Cheese, Sweet, Fried Cheese and Fried Sweet Gritz.",
+   "tags": [
+    "gritz",
+    "grits",
+    "plain",
+    "cheese",
+    "sweet",
+    "fried"
+   ]
+  },
+  {
    "q": "What drinks do you have?",
-   "a": "Kiki Palmer (lemonade/tea), Fresh Squeezed OJ, Fresh Squeezed Lemonade, Iced Tea (sweet/unsweet), Hot Coffee and Iced Coffee (reg, van, carm) and Coke products.",
+   "a": "Kiki Palmer (lemonade/tea), Fresh Squeezed OJ, Fresh Squeezed Lemonade, Iced Tea (sweet/unsweet), Hot and Iced Coffee (reg, van, carm) and Coke products.",
    "tags": [
     "drinks",
-    "beverage",
+    "kiki palmer",
     "lemonade",
     "tea",
     "coffee",
-    "juice",
+    "oj",
     "soda"
    ]
   },
   {
    "q": "What is a Kiki Palmer?",
-   "a": "It's our lemonade and iced tea mix, non-alcoholic.",
+   "a": "It's lemonade and iced tea together, a non-alcoholic drink.",
    "tags": [
     "kiki palmer",
     "lemonade",
@@ -590,19 +471,8 @@
    ]
   },
   {
-   "q": "Do you serve alcohol?",
-   "a": "The app doesn't list any alcohol. Please ask staff.",
-   "tags": [
-    "alcohol",
-    "beer",
-    "wine",
-    "cocktail",
-    "bar"
-   ]
-  },
-  {
    "q": "How much does the food cost?",
-   "a": "The app doesn't show menu prices. They're on the online order page, or ask staff.",
+   "a": "The app's menu doesn't list prices. Prices are on the online order page, or ask staff.",
    "tags": [
     "price",
     "cost",
@@ -612,272 +482,233 @@
    ]
   },
   {
-   "q": "Do you have vegetarian or allergy options?",
-   "a": "I don't have allergy or diet details. Please ask staff before ordering.",
+   "q": "Do you have vegetarian options?",
+   "a": "Some items have no meat, like Fried Green Tomatoes, Spicy Fried Pickles, the Collard Green Dip, waffles and gritz. I don't have ingredient details, so please check with staff.",
    "tags": [
     "vegetarian",
+    "veggie",
+    "no meat",
     "vegan",
-    "allergy",
-    "gluten",
     "diet"
    ]
   },
   {
-   "q": "Are the food photos real?",
-   "a": "The menu photos are AI-generated previews of the real dishes, so your plate may look a little different.",
+   "q": "Do you have allergy information?",
+   "a": "I don't have allergy details. Please tell your server or call (213) 566-4837 before ordering.",
    "tags": [
-    "photos",
-    "pictures",
-    "images",
-    "ai",
-    "menu"
-   ]
-  },
-  {
-   "q": "Can I order from my table?",
-   "a": "You can order online using the Order online button in the app. Ask your server if you'd rather order at the table.",
-   "tags": [
-    "table",
-    "order",
-    "qr",
-    "scan",
-    "dine in"
-   ]
-  },
-  {
-   "q": "How do I pay?",
-   "a": "I don't have payment details. Please ask staff when you order.",
-   "tags": [
-    "pay",
-    "payment",
-    "card",
-    "cash",
-    "bill",
-    "check"
+    "allergy",
+    "allergen",
+    "gluten",
+    "nuts",
+    "dairy",
+    "dietary"
    ]
   },
   {
    "q": "How do I join the rewards club?",
-   "a": "Make a free member account with your name, phone number and email. The live app confirms your phone with a text code.",
+   "a": "Make a free member account in the app with your name, phone number and email. It's one account per person and per phone.",
    "tags": [
     "join",
     "sign up",
     "signup",
     "register",
+    "member",
     "account",
     "rewards"
    ]
   },
   {
    "q": "Is it free to join?",
-   "a": "Yes, member accounts are free. No purchase is necessary to play, spin or win.",
+   "a": "Yes, the member account is free.",
    "tags": [
     "free",
     "join",
     "cost",
-    "membership",
-    "no purchase"
-   ]
-  },
-  {
-   "q": "Who can join?",
-   "a": "Anyone 13 or older who lives in the US. Players under 18 need a parent's or guardian's permission.",
-   "tags": [
-    "age",
-    "eligible",
-    "who",
-    "join",
-    "teen",
-    "18"
-   ]
-  },
-  {
-   "q": "Can I have more than one account?",
-   "a": "No. It's one free account per person and per phone, tied to the phone it was made on.",
-   "tags": [
+    "member",
     "account",
-    "multiple",
-    "phone",
-    "duplicate"
+    "sign up"
    ]
   },
   {
-   "q": "What do I get for joining?",
-   "a": "The app's welcome offer is a free Kiki Palmer with your next N' Wafflez plate. Ask staff how to claim it.",
+   "q": "Is there a welcome offer?",
+   "a": "The app's join offer is a free Kiki Palmer with your next N' Wafflez plate. Ask staff to confirm how it works.",
    "tags": [
     "welcome",
-    "join",
+    "offer",
+    "new member",
     "free",
     "kiki palmer",
-    "offer",
-    "bonus"
+    "join bonus"
    ]
   },
   {
-   "q": "How do points work?",
-   "a": "You earn reward points from the Daily Spin and from purchases, then trade them for rewards. I don't have the exact points-per-dollar ratio, so ask staff.",
+   "q": "How do I earn points?",
+   "a": "You earn points from purchases and from the free daily spin. I don't have the exact points-per-dollar rate, so please ask staff.",
    "tags": [
     "points",
+    "earn",
     "stars",
     "pts",
-    "earn",
-    "ratio",
-    "per dollar"
+    "how",
+    "rewards"
    ]
   },
   {
-   "q": "How many points do I get per dollar?",
-   "a": "I don't have the points-per-dollar ratio. Please ask staff or call (213) 566-4837.",
+   "q": "How many points per dollar?",
+   "a": "I don't have the points-per-dollar rate. Please ask staff or call (213) 566-4837.",
    "tags": [
     "ratio",
     "per dollar",
-    "points",
     "how many points",
-    "earn",
-    "pts"
+    "points",
+    "rate",
+    "earn"
    ]
   },
   {
    "q": "How many points do I get per visit?",
-   "a": "I don't have a per-visit point amount. Ask staff, or try the free Daily Spin for +50 to +100 points.",
+   "a": "I don't have a per-visit point amount. Ask staff or call (213) 566-4837.",
    "tags": [
     "visit",
     "points",
     "per visit",
     "check in",
-    "earn"
+    "earn",
+    "ratio"
    ]
   },
   {
-   "q": "Do I earn points playing the game?",
-   "a": "Game scores win food prizes (see the prize list). I don't have any points-per-score rate for the game.",
+   "q": "Do I earn points for playing the game?",
+   "a": "I don't have a points amount for game scores. Game scores win food prizes and the weekly champion prize instead.",
    "tags": [
     "game",
     "points",
     "score",
     "earn",
-    "order up"
+    "order up",
+    "play"
    ]
   },
   {
-   "q": "What rewards can I get with points?",
-   "a": "250 pts = Free Kiki Palmer; 450 pts = Free side of Smackin' Mac; 700 pts = Free Original Collard Green Dip; 1,100 pts = Free N' Wafflez plate.",
+   "q": "What can I get with points?",
+   "a": "250 points = Free Kiki Palmer; 450 = Free side of Smackin' Mac; 700 = Free Original Collard Green Dip; 1,100 = Free N' Wafflez plate.",
    "tags": [
     "rewards",
-    "reward",
-    "prize",
-    "free",
-    "cost",
+    "redeem",
     "points",
-    "ladder"
+    "prizes",
+    "free",
+    "ladder",
+    "cost"
    ]
   },
   {
-   "q": "How many points for a free Kiki Palmer?",
-   "a": "250 points.",
+   "q": "How many points for a free drink?",
+   "a": "250 points gets you a Free Kiki Palmer.",
    "tags": [
+    "drink",
     "kiki palmer",
     "250",
     "reward",
-    "free drink",
-    "points"
+    "points",
+    "free"
    ]
   },
   {
-   "q": "How many points for a free Smackin' Mac?",
-   "a": "450 points gets you a free side of Smackin' Mac.",
+   "q": "How many points for a free side?",
+   "a": "450 points gets you a Free side of Smackin' Mac.",
    "tags": [
+    "side",
     "mac",
     "450",
     "reward",
-    "free",
-    "side",
-    "points"
+    "points",
+    "free"
    ]
   },
   {
    "q": "How many points for the Collard Green Dip?",
-   "a": "700 points gets you a free Original Collard Green Dip.",
+   "a": "700 points gets you a Free Original Collard Green Dip.",
    "tags": [
-    "collard",
     "dip",
+    "collard",
     "700",
     "reward",
-    "free",
-    "points"
+    "points",
+    "free"
    ]
   },
   {
    "q": "How many points for a free plate?",
-   "a": "1,100 points gets you a free N' Wafflez plate.",
+   "a": "1,100 points gets you a Free N' Wafflez plate.",
    "tags": [
     "plate",
     "wafflez",
     "1100",
     "reward",
-    "free",
-    "points"
+    "points",
+    "free"
    ]
   },
   {
    "q": "How do I redeem a reward?",
-   "a": "Open your rewards in the app and show the code on your phone at the counter. Winners may be asked to show a matching account too.",
+   "a": "Pick your reward in the app, then show the code on your phone at the counter along with your account. Ask staff if you need help.",
    "tags": [
     "redeem",
     "use",
     "reward",
     "code",
-    "counter",
-    "claim"
+    "claim",
+    "how"
    ]
   },
   {
-   "q": "Can I combine rewards?",
-   "a": "Spin prizes and discounts can't be combined with other rewards, and it's one reward per visit.",
-   "tags": [
-    "combine",
-    "stack",
-    "reward",
-    "discount",
-    "one per visit"
-   ]
-  },
-  {
-   "q": "Do points expire or have cash value?",
-   "a": "Points have no cash value. I don't have an expiration rule, so ask staff.",
+   "q": "Do points expire?",
+   "a": "I don't have an expiration rule for points. Ask staff to be sure. Food prizes and discounts from the spin are good for 3 days.",
    "tags": [
     "expire",
     "points",
+    "expiration",
+    "how long",
+    "valid"
+   ]
+  },
+  {
+   "q": "Do points have cash value?",
+   "a": "No. Points have no cash value, but you can trade them for rewards in the app.",
+   "tags": [
     "cash",
     "value",
-    "expiration"
+    "points",
+    "money",
+    "refund"
    ]
   },
   {
    "q": "Are there levels or tiers?",
-   "a": "I don't have level or tier details for Gritz N Wafflez. Please ask staff.",
+   "a": "I don't have member levels. The reward ladder runs from 250 to 1,100 points.",
    "tags": [
     "levels",
     "tiers",
     "vip",
     "status",
-    "member"
+    "ladder"
    ]
   },
   {
-   "q": "Is there a birthday club?",
-   "a": "I don't have birthday reward details. Please ask staff.",
+   "q": "Do you have a birthday reward?",
+   "a": "I don't have birthday club details. Please ask staff or call (213) 566-4837.",
    "tags": [
     "birthday",
     "bday",
-    "free",
     "club",
+    "free",
     "reward"
    ]
   },
   {
-   "q": "Can I refer a friend?",
-   "a": "The app has a referral gift of a Free Original Collard Green Dip. I don't have the exact rules, so ask staff.",
+   "q": "Is there a referral program?",
+   "a": "Yes, the referral gift is a Free Original Collard Green Dip. Check the app for how to share, or ask staff.",
    "tags": [
     "referral",
     "refer",
@@ -888,157 +719,209 @@
    ]
   },
   {
-   "q": "Is there an early-bird or location bonus?",
-   "a": "I don't have an early-bird bonus. When you're nearby, the app may show a note to show your server for double points on that day's order.",
+   "q": "Is there an early-bird or check-in bonus?",
+   "a": "I don't have early-bird or check-in bonus details. Please ask staff.",
    "tags": [
     "early bird",
+    "check in",
+    "bonus",
     "location",
-    "nearby",
-    "double points",
-    "bonus"
+    "visit"
    ]
   },
   {
-   "q": "Do I get points for leaving a review?",
-   "a": "No. Reviews are never rewarded, so write an honest Google review if you'd like.",
+   "q": "What is the free daily spin?",
+   "a": "Members get one free spin a day (Los Angeles time) and every slice wins something. It's never sold and costs nothing.",
    "tags": [
-    "review",
-    "google",
-    "points",
-    "reward",
-    "yelp"
+    "spin",
+    "daily",
+    "wheel",
+    "free",
+    "prize",
+    "odds"
+   ]
+  },
+  {
+   "q": "What can I win on the daily spin?",
+   "a": "+50 points (30%), +100 points (20%), +75 points (15%), $2 off any plate (15%), Free Kiki Palmer (8%), Free side of Smackin' Mac (7%), or 10% off your order (5%).",
+   "tags": [
+    "spin",
+    "prizes",
+    "odds",
+    "wheel",
+    "win",
+    "chance"
+   ]
+  },
+  {
+   "q": "How long do spin prizes last?",
+   "a": "Food prizes and discounts are good for 3 days at our Koreatown location, one reward per visit. They can't be combined with other rewards.",
+   "tags": [
+    "spin",
+    "expire",
+    "3 days",
+    "valid",
+    "use",
+    "prize"
+   ]
+  },
+  {
+   "q": "Do I have to buy something to spin or play?",
+   "a": "No. No purchase is needed to spin, play Order Up! or win, and buying doesn't improve your chances.",
+   "tags": [
+    "purchase",
+    "buy",
+    "necessary",
+    "free",
+    "spin",
+    "play"
    ]
   },
   {
    "q": "What is Order Up!?",
-   "a": "It's our in-app game. You work the line at Gritz N Wafflez: build each guest's plate, serve it and deliver it fast to the right table.",
+   "a": "It's our game. You work the line, build each guest's plate, serve it hot and deliver it to the right table. Play it while you wait.",
    "tags": [
-    "game",
     "order up",
+    "game",
     "play",
-    "what is",
+    "what",
+    "wait",
     "arcade"
    ]
   },
   {
    "q": "How do I play Order Up!?",
-   "a": "1) Tap food tiles to build the plate. 2) Tap 🛎️ Serve. 3) Tap the hot plate on the pass, then tap the guest's table.",
+   "a": "Tap the food tiles to build the plate, tap Serve, then tap the hot plate on the pass and tap the guest's table.",
    "tags": [
     "how to play",
-    "game",
+    "order up",
     "controls",
+    "game",
     "build",
     "serve",
-    "deliver",
-    "order up"
+    "deliver"
    ]
   },
   {
-   "q": "What are the game controls?",
-   "a": "It's all taps: tap tiles to add food (tap again or ↩️ Undo to remove), tap Serve, tap the plate on the pass, then tap the table. A game controller also works.",
+   "q": "How do I take something off the plate?",
+   "a": "Tap the tile again or hit Undo. Undo costs you the clean-build bonus.",
    "tags": [
-    "controls",
-    "tap",
     "undo",
+    "remove",
+    "plate",
+    "mistake",
     "game",
-    "controller",
-    "gamepad"
+    "controls"
    ]
   },
   {
-   "q": "Does the game cost anything?",
-   "a": "No. Order Up! is free to play as often as you like with no account needed.",
+   "q": "Why does the food get cold?",
+   "a": "Plates cool on the pass: hot, warm, cooling, then cold. Cold food pays less and gets no tip, so deliver fast.",
    "tags": [
-    "free",
-    "cost",
-    "game",
-    "play",
-    "account",
-    "tokens"
-   ]
-  },
-  {
-   "q": "How often can I play?",
-   "a": "As often as you like. There's no daily limit.",
-   "tags": [
-    "often",
-    "limit",
-    "play",
-    "daily",
-    "unlimited",
+    "cold",
+    "heat",
+    "pass",
+    "hot",
+    "tip",
     "game"
    ]
   },
   {
-   "q": "Do I need an account to play?",
-   "a": "No. You only need a free account to save your score or claim a prize after a run.",
-   "tags": [
-    "account",
-    "sign in",
-    "play",
-    "save score",
-    "game"
-   ]
-  },
-  {
-   "q": "How is the game scored?",
-   "a": "Speed is the biggest part (up to +190 per plate). You also earn for heat (up to +80), the order's pay, tips, +30 per correct item, +40 for a clean build, streaks and level bonuses.",
+   "q": "How does scoring work?",
+   "a": "Speed is the big one (up to +190), then heat (up to +80), the order's pay, tips, +30 per correct item, +40 for a clean build, streaks up to x2 and bonuses for clearing levels.",
    "tags": [
     "score",
     "points",
     "scoring",
     "speed",
     "tips",
-    "game"
+    "game",
+    "how"
    ]
   },
   {
-   "q": "Why does speed matter?",
-   "a": "Speed is counted to 0.1 second from the moment a table sits down, and points drop every tenth of a second.",
-   "tags": [
-    "speed",
-    "fast",
-    "timer",
-    "score",
-    "game"
-   ]
-  },
-  {
-   "q": "What does food heat do?",
-   "a": "Plates cool on the pass: hot, warm, cooling, cold. Cold food pays less and gets no tip, so deliver quickly.",
-   "tags": [
-    "heat",
-    "hot",
-    "cold",
-    "cool",
-    "pass",
-    "tip"
-   ]
-  },
-  {
-   "q": "How do I get a big tip?",
-   "a": "Make the plate perfect (no undo), deliver it hot and take it to the right table. Cold plates get no tip.",
+   "q": "How do tips work in the game?",
+   "a": "Fast, hot, happy guests tip more. A perfect plate (no undo), hot and at the right table earns the big tip. Cold plates get no tip.",
    "tags": [
     "tip",
     "tips",
     "perfect",
-    "big tip",
+    "game",
+    "score"
+   ]
+  },
+  {
+   "q": "What costs me points in the game?",
+   "a": "Wrong plate -20, adding a NO item -60, wrong table -15, undercooked -30, charred -15 and a walk-out -50.",
+   "tags": [
+    "mistakes",
+    "penalty",
+    "minus",
+    "lose points",
+    "walk-out",
     "game"
+   ]
+  },
+  {
+   "q": "What is a walk-out?",
+   "a": "A table that waited too long and left. Three walk-outs and the kitchen closes.",
+   "tags": [
+    "walk-out",
+    "walkout",
+    "lose",
+    "game over",
+    "kitchen closes",
+    "game"
+   ]
+  },
+  {
+   "q": "How long is each level?",
+   "a": "Each level is 90 seconds. Levels 1 to 3 are just tap and serve.",
+   "tags": [
+    "level",
+    "time",
+    "90 seconds",
+    "game",
+    "how long"
+   ]
+  },
+  {
+   "q": "What happens at level 4?",
+   "a": "A cook leaves and you're on the fryer: catfish, wingz, tenderz and shrimp. Tap the tile, then tap the basket when it hits perfect.",
+   "tags": [
+    "level 4",
+    "fryer",
+    "cook",
+    "catfish",
+    "game",
+    "frying"
+   ]
+  },
+  {
+   "q": "What happens at level 5?",
+   "a": "The whole kitchen: waffle irons (pour, open on green) and the skillet for eggs, bacon and sauteed shrimp. Guests also add prep requests.",
+   "tags": [
+    "level 5",
+    "waffle iron",
+    "skillet",
+    "kitchen",
+    "game",
+    "prep"
    ]
   },
   {
    "q": "What is the streak bonus?",
-   "a": "Perfect, fast plates in a row raise a multiplier: ×1.2, ×1.4 and so on up to ×2. A wrong plate resets it.",
+   "a": "Perfect, fast plates in a row raise a multiplier, x1.2, x1.4 and up to x2. A wrong plate resets it.",
    "tags": [
     "streak",
     "multiplier",
     "combo",
-    "bonus",
+    "perfect",
     "game"
    ]
   },
   {
-   "q": "What is the Whole Table bonus?",
+   "q": "What is the whole-table bonus?",
    "a": "Serve every plate at a table within 10 seconds of each other for +30 per guest.",
    "tags": [
     "whole table",
@@ -1049,437 +932,321 @@
    ]
   },
   {
-   "q": "What gets me points taken away?",
-   "a": "Wrong plate -20, adding a NO item -60, wrong table -15, undercooked -30, charred -15 and a walk-out -50.",
+   "q": "What is the poster on the wall?",
+   "a": "Tap Antidote's food review poster on the wall for +250 the first time each run. You can watch his review too.",
    "tags": [
-    "mistakes",
-    "penalty",
-    "lose points",
-    "wrong",
-    "walk-out"
+    "poster",
+    "antidote",
+    "review",
+    "bonus",
+    "250",
+    "easter egg",
+    "secret"
    ]
   },
   {
-   "q": "What is a walk-out?",
-   "a": "A table that waited too long and left. Three walk-outs and the kitchen closes.",
+   "q": "How often can I play?",
+   "a": "Order Up! is free to play as often as you like, no account needed.",
    "tags": [
-    "walk-out",
-    "walkout",
-    "game over",
-    "lose",
-    "tables"
-   ]
-  },
-  {
-   "q": "How long is each level?",
-   "a": "90 seconds. Clearing a level earns 150 × the level number, plus 75 for each walk-out you avoided.",
-   "tags": [
-    "level",
-    "90 seconds",
-    "time",
-    "clear",
-    "bonus"
-   ]
-  },
-  {
-   "q": "What changes at levels 4 and 5?",
-   "a": "Level 4: a cook leaves, so you use the fryer for catfish, wingz, tenderz and shrimp. Level 5: the whole kitchen, with waffle irons and the skillet too.",
-   "tags": [
-    "level 4",
-    "level 5",
-    "fryer",
-    "kitchen",
-    "irons",
-    "skillet"
-   ]
-  },
-  {
-   "q": "How do I use the fryer?",
-   "a": "Tap the food tile, then tap the basket when it's on ✨ perfect. It lands on your plate. Perfect cooking is worth up to +55 each.",
-   "tags": [
-    "fryer",
-    "cook",
-    "catfish",
-    "wingz",
-    "level 4",
-    "perfect"
-   ]
-  },
-  {
-   "q": "How do the waffle irons and skillet work?",
-   "a": "At level 5, pour batter into the waffle iron and open it on 🟢. The skillet cooks eggs, bacon and sautéed shrimp.",
-   "tags": [
-    "waffle iron",
-    "skillet",
-    "level 5",
-    "cook",
-    "eggs",
-    "bacon"
-   ]
-  },
-  {
-   "q": "What are prep requests?",
-   "a": "At level 5, tickets may ask for things like sautéed shrimp, sunny-side eggs, extra-crispy bacon or syrup on the side. Tap the matching tile. \"Extra hot\" must arrive hot.",
-   "tags": [
-    "prep",
-    "requests",
-    "ticket",
-    "level 5",
-    "extra hot"
-   ]
-  },
-  {
-   "q": "What is the difference between Adult and Kid mode?",
-   "a": "Adult is regular speed with the bigger prizes. Kid mode (12 and under) has slower timers, cooking only at level 5, and kid-sized prizes.",
-   "tags": [
-    "kid mode",
-    "adult mode",
-    "difference",
-    "12",
-    "slower"
-   ]
-  },
-  {
-   "q": "What are the rules for Kid mode?",
-   "a": "A parent or guardian signs in first, then hands over the phone. Kid scores and prizes go on the parent's account, and leaving Kid mode asks for the last 4 digits of the parent's phone.",
-   "tags": [
-    "kid",
-    "kids",
-    "parent",
-    "guardian",
-    "rules",
-    "child"
-   ]
-  },
-  {
-   "q": "Is my child's information collected?",
-   "a": "No data is collected from children. The child never enters any information, and no age is asked or stored.",
-   "tags": [
-    "kids",
-    "privacy",
-    "child",
-    "data",
-    "coppa"
-   ]
-  },
-  {
-   "q": "What can I win in Adult mode?",
-   "a": "13,500 = Free Kiki Palmer; 22,000 = Free side of Smackin' Mac; 32,000 = Free Fried Cheese Gritz; 46,500 = Free Original Collard Green Dip. These are sample prizes, so ask staff to confirm what's current.",
-   "tags": [
-    "prizes",
-    "adult",
-    "win",
-    "score",
+    "how often",
+    "limit",
+    "play",
     "free",
+    "unlimited",
     "game"
    ]
   },
   {
+   "q": "Do I need an account to play?",
+   "a": "No. You only need a free member account to save your score or claim a prize after a run.",
+   "tags": [
+    "account",
+    "sign in",
+    "play",
+    "save score",
+    "game",
+    "need"
+   ]
+  },
+  {
+   "q": "What prizes can I win in Order Up! Adult mode?",
+   "a": "One run over 13,500 = Free Kiki Palmer; 22,000 = Free side of Smackin' Mac (with any order); 32,000 = Free Fried Cheese Gritz (with any plate); 46,500 = Free Original Collard Green Dip.",
+   "tags": [
+    "prizes",
+    "adult",
+    "score",
+    "win",
+    "game",
+    "free food"
+   ]
+  },
+  {
+   "q": "Is winning a prize random?",
+   "a": "No. Game prizes depend only on your score, not chance. It's a game of skill.",
+   "tags": [
+    "random",
+    "luck",
+    "skill",
+    "prize",
+    "chance",
+    "game"
+   ]
+  },
+  {
+   "q": "How long do I have to use a game prize?",
+   "a": "You must use it within 3 days. You can hold one prize at a time.",
+   "tags": [
+    "prize",
+    "expire",
+    "3 days",
+    "use",
+    "redeem",
+    "game"
+   ]
+  },
+  {
+   "q": "How does the weekly leaderboard work?",
+   "a": "The highest score from Monday through Sunday close wins the weekly prize. Ties go to the score posted first, and the board resets every Monday.",
+   "tags": [
+    "leaderboard",
+    "weekly",
+    "champion",
+    "board",
+    "monday",
+    "sunday"
+   ]
+  },
+  {
+   "q": "What does the weekly champion win?",
+   "a": "A Free Wingz N' Wafflez plus a karaoke shoutout. The champion is crowned at GNW Karaoke on Wednesday.",
+   "tags": [
+    "champion",
+    "weekly",
+    "winner",
+    "prize",
+    "wingz",
+    "karaoke",
+    "shoutout"
+   ]
+  },
+  {
+   "q": "When are weekly prizes picked?",
+   "a": "The top score at Sunday close wins, and the champion is crowned at Wednesday karaoke.",
+   "tags": [
+    "weekly",
+    "prize",
+    "when",
+    "picked",
+    "winner",
+    "sunday",
+    "wednesday"
+   ]
+  },
+  {
+   "q": "Do Kid and Adult modes share a leaderboard?",
+   "a": "No. Each mode has its own prizes, scores to beat, best score and weekly board.",
+   "tags": [
+    "kid",
+    "adult",
+    "board",
+    "separate",
+    "mode",
+    "leaderboard"
+   ]
+  },
+  {
+   "q": "What is Kid mode?",
+   "a": "It's for ages 12 and under: slower timers, more patient guests and kid-sized prizes. A parent or guardian must sign in first.",
+   "tags": [
+    "kid",
+    "kids",
+    "child",
+    "12 and under",
+    "mode",
+    "parent"
+   ]
+  },
+  {
+   "q": "How do I turn on Kid mode?",
+   "a": "A parent or guardian signs in with their own name, phone and email and confirms they're the parent, then hands over the phone.",
+   "tags": [
+    "kid mode",
+    "parent",
+    "sign in",
+    "unlock",
+    "child",
+    "guardian"
+   ]
+  },
+  {
    "q": "What can kids win?",
-   "a": "9,500 = Free Fresh Squeezed OJ; 11,000 = Free side of French Friez; 12,750 = Free Sweet Gritz; 13,250 = Free Chocolate Chip Waffle. One per kid per visit, redeemed with the young player at the table.",
+   "a": "Scores of 9,500 = Free Fresh Squeezed OJ; 11,000 = Free side of French Friez; 12,750 = Free Sweet Gritz; 13,250 = Free Chocolate Chip Waffle.",
    "tags": [
     "kid prizes",
     "kids",
     "win",
     "free",
+    "oj",
     "waffle",
-    "oj"
+    "french friez"
    ]
   },
   {
-   "q": "Is the Collard Green Dip prize one big run?",
-   "a": "Yes. You need one run over 46,500 points in Adult mode.",
+   "q": "How do kid prizes work?",
+   "a": "Kid prizes are redeemed with the young player at the table, one per kid per visit. Codes start with KID- and show a KID PRIZE tag.",
    "tags": [
-    "46500",
-    "collard",
-    "dip",
-    "prize",
-    "one run"
-   ]
-  },
-  {
-   "q": "How do I claim a game prize?",
-   "a": "Save your score with a free account after your run, then show the code on your phone and your account at the counter. Kid prize codes start with KID-.",
-   "tags": [
-    "claim",
-    "prize",
+    "kid prize",
     "redeem",
-    "code",
-    "game",
-    "kid"
+    "kid",
+    "one per visit",
+    "table",
+    "code"
    ]
   },
   {
-   "q": "How long do I have to use a game prize?",
-   "a": "3 days. You can hold one prize at a time.",
+   "q": "How do I leave Kid mode?",
+   "a": "The app asks for the last 4 digits of the parent's phone number.",
    "tags": [
-    "expire",
-    "3 days",
-    "prize",
-    "use",
-    "deadline"
+    "leave",
+    "exit",
+    "kid mode",
+    "parent",
+    "4 digits",
+    "switch"
    ]
   },
   {
-   "q": "Is winning a game prize based on luck?",
-   "a": "No. Prizes depend only on your score. The game is a game of skill.",
+   "q": "Is my child's information collected?",
+   "a": "No data is collected from children. The account and contact info belong to the parent, and the child never enters anything.",
    "tags": [
-    "luck",
-    "chance",
-    "skill",
-    "prize",
-    "fair"
+    "privacy",
+    "child",
+    "kids",
+    "data",
+    "coppa",
+    "safe"
    ]
   },
   {
-   "q": "What is the weekly champion?",
-   "a": "The highest score from Monday through Sunday close wins a Free Wingz N' Wafflez plus a karaoke shoutout, crowned at GNW Karaoke on Wednesday.",
+   "q": "Who can play for prizes?",
+   "a": "Residents of the United States age 13 or older. Players under 18 need a parent's or guardian's permission. Employees can play but can't win prizes.",
    "tags": [
-    "weekly",
-    "champion",
-    "leaderboard",
-    "top score",
-    "winner",
-    "karaoke"
+    "age",
+    "eligible",
+    "who can play",
+    "13",
+    "minimum",
+    "rules"
    ]
   },
   {
-   "q": "When does the weekly board reset?",
-   "a": "Every Monday. Adult and Kid modes each have their own weekly board.",
+   "q": "Can I have more than one account?",
+   "a": "No. It's one free account per person and per phone. Multiple accounts, cheats and bots are disqualified.",
    "tags": [
-    "reset",
-    "monday",
-    "weekly",
-    "board",
-    "leaderboard"
-   ]
-  },
-  {
-   "q": "What happens in a tie?",
-   "a": "The score posted first wins.",
-   "tags": [
-    "tie",
-    "leaderboard",
-    "weekly",
-    "winner"
-   ]
-  },
-  {
-   "q": "When is the weekly prize picked?",
-   "a": "The top score at Sunday close wins, and the champion is crowned at GNW Karaoke on Wednesday.",
-   "tags": [
-    "weekly",
-    "prize",
-    "picked",
-    "sunday",
-    "wednesday",
-    "champion"
-   ]
-  },
-  {
-   "q": "Can I cheat or use bots?",
-   "a": "No. Scores made with cheats, scripts, bots or multiple accounts are disqualified, and so are adult scores entered in Kid mode.",
-   "tags": [
+    "multiple accounts",
+    "one account",
     "cheat",
-    "bot",
     "rules",
-    "disqualified",
-    "fair"
+    "phone"
    ]
   },
   {
-   "q": "Can employees win prizes?",
-   "a": "Employees and their household members may play but can't win prizes.",
+   "q": "What languages does the app support?",
+   "a": "Tap the globe button to switch languages, including Spanish, Korean, Chinese, Tagalog, Vietnamese, Japanese and more. Restaurant and game names stay in English.",
    "tags": [
-    "employees",
-    "staff",
-    "win",
-    "rules",
-    "eligible"
-   ]
-  },
-  {
-   "q": "What is the Daily Spin?",
-   "a": "A free wheel you can spin once per member per day (Los Angeles time). Every slice wins something, and spins are never sold.",
-   "tags": [
-    "spin",
-    "daily spin",
-    "wheel",
-    "free",
-    "prize"
-   ]
-  },
-  {
-   "q": "What can I win on the spin?",
-   "a": "+50 points (30%), +100 points (20%), +75 points (15%), $2 off any plate (15%), Free Kiki Palmer (8%), Free side of Smackin' Mac (7%) or 10% off your order (5%).",
-   "tags": [
-    "spin",
-    "odds",
-    "prizes",
-    "wheel",
-    "chance",
-    "points"
-   ]
-  },
-  {
-   "q": "How long are spin prizes good for?",
-   "a": "3 days at the Koreatown location, one reward per visit. They can't be combined and have no cash value.",
-   "tags": [
-    "spin",
-    "expire",
-    "3 days",
-    "prize",
-    "valid"
-   ]
-  },
-  {
-   "q": "What is the Antidote poster in the game?",
-   "a": "It's a framed poster on the top-left wall. Tap it once per run for +250 points and a link to watch Antidote's review.",
-   "tags": [
-    "antidote",
-    "poster",
-    "bonus",
-    "250",
-    "review",
-    "easter egg"
-   ]
-  },
-  {
-   "q": "Is there trivia or a sports feature?",
-   "a": "No, the app doesn't have trivia or sports features. It has the Order Up! game and the Daily Spin.",
-   "tags": [
-    "trivia",
-    "sports",
-    "halftime",
-    "quiz",
-    "games"
-   ]
-  },
-  {
-   "q": "Is there a wallet card?",
-   "a": "I don't have a wallet card. You can add the app to your Home Screen so it opens like an app.",
-   "tags": [
-    "wallet",
-    "card",
-    "apple wallet",
-    "pass"
+    "language",
+    "spanish",
+    "korean",
+    "translate",
+    "espanol",
+    "chinese"
    ]
   },
   {
    "q": "How do I add the app to my phone?",
-   "a": "Tap 📲 Add to Home Screen. On iPhone use Share, then Add to Home Screen. On Android use Install or the ⋮ menu, then Add to Home screen.",
+   "a": "Use Add to Home Screen. On iPhone, tap Share, then Add to Home Screen, then Add. On Android, use the menu and tap Install or Add to Home screen.",
    "tags": [
     "install",
     "home screen",
     "add",
     "app",
+    "wallet",
     "iphone",
     "android"
    ]
   },
   {
-   "q": "What languages does the app support?",
-   "a": "Tap the 🌐 button for English, Español, Chinese (Simplified and Traditional), Korean, Tagalog, Vietnamese, Armenian, Persian, Japanese, Thai and Russian. Restaurant and game names stay in English.",
+   "q": "Can I play with a game controller?",
+   "a": "Yes. Pair a Bluetooth or USB controller, press any button, and it can tap through Order Up!.",
    "tags": [
-    "language",
-    "translate",
-    "spanish",
-    "korean",
-    "chinese",
-    "español"
-   ]
-  },
-  {
-   "q": "Can I play full screen or with a controller?",
-   "a": "Yes. The ⛶ button gives full screen, 🔒 locks the screen so it doesn't scroll, and game controllers work too.",
-   "tags": [
-    "full screen",
-    "lock",
     "controller",
     "gamepad",
-    "scroll"
+    "xbox",
+    "playstation",
+    "tesla",
+    "play"
    ]
   },
   {
-   "q": "Can I turn off the music?",
-   "a": "Yes. Use the 🎵 button on the start menu or in the game, or Settings.",
-   "tags": [
-    "music",
-    "sound",
-    "mute",
-    "audio",
-    "settings"
-   ]
-  },
-  {
-   "q": "Do you have Instagram?",
-   "a": "Yes, @gritznwafflez. The app shows our latest posts and reels near the bottom.",
-   "tags": [
-    "instagram",
-    "social",
-    "ig",
-    "posts",
-    "follow"
-   ]
-  },
-  {
-   "q": "Is my information private?",
-   "a": "Your information is used only for your rewards account and is never sold.",
+   "q": "Is my information safe?",
+   "a": "Your info is used only for your rewards account and is never sold. Opt-in texts and emails can be stopped anytime by replying STOP.",
    "tags": [
     "privacy",
     "data",
-    "info",
     "safe",
-    "sold"
+    "sold",
+    "stop",
+    "texts"
    ]
   },
   {
    "q": "Will you text me?",
-   "a": "Only if you opt in. You can stop texts or emails anytime by replying STOP or unsubscribing.",
+   "a": "Only if you opt in to deal texts. Reply STOP anytime to opt out.",
    "tags": [
     "text",
     "sms",
     "marketing",
     "stop",
-    "unsubscribe",
-    "email"
+    "opt out",
+    "messages"
+   ]
+  },
+  {
+   "q": "Can I follow you on Instagram?",
+   "a": "Yes, we're @gritznwafflez on Instagram, and recent posts show in the app.",
+   "tags": [
+    "instagram",
+    "social",
+    "follow",
+    "ig",
+    "posts"
+   ]
+  },
+  {
+   "q": "How do I get help from staff?",
+   "a": "Ask your server or call (213) 566-4837.",
+   "tags": [
+    "staff",
+    "help",
+    "support",
+    "contact",
+    "question",
+    "server"
    ]
   },
   {
    "q": "Where are the official game rules?",
-   "a": "There's an Official Rules link in the app. They're currently a draft, so ask staff if you have a rules question.",
+   "a": "Tap the Game & daily spin official rules link at the bottom of the app. They're a draft for now. Call (213) 566-4837 with questions.",
    "tags": [
     "rules",
     "official",
     "terms",
     "legal",
-    "no purchase"
-   ]
-  },
-  {
-   "q": "Do I have to buy something to win?",
-   "a": "No. No purchase is necessary to play, spin or win, and buying doesn't improve your chances.",
-   "tags": [
-    "purchase",
-    "buy",
-    "no purchase",
-    "win",
-    "free"
-   ]
-  },
-  {
-   "q": "How do I get help from staff?",
-   "a": "Ask a team member at the restaurant, or call (213) 566-4837.",
-   "tags": [
-    "help",
-    "staff",
-    "contact",
-    "support",
-    "question"
+    "fine print"
    ]
   }
  ],
- "updated": "2026-10-25T03:33:50+00:00",
- "source_commit": "6075b0e",
+ "updated": "2026-11-11T01:42:14+00:00",
+ "source_commit": "339078e",
  "app": "gritz-n-wafflez"
 }

@@ -5,34 +5,35 @@
   "Lucky Dragon Hibachi is in Compton, California.",
   "Phone: 562-564-9200.",
   "Hours: Mon–Thu 11:00a–9:00p, Fri–Sat 11:00a–10:00p, Sun 12:00p–8:00p.",
-  "Hibachi Catch is a free 30-second game. No account is needed to play.",
-  "You slide the tray with your finger to catch hibachi food.",
-  "Each food catch is +10, a gold star is +50, and flames, candy and ice are −20.",
-  "Dragon fire is −30. Three dragon hits burn your food and end the run.",
-  "Catching in a row builds a streak bonus of +2 per catch, up to +10 extra.",
-  "650+ points in one run puts you on the weekly board (sample prize: 15% off your next meal).",
-  "Weekly board: 1st place wins 50% off your next meal and 2nd place wins 20% off (sample prizes).",
-  "The weekly board runs Monday through Sunday close and resets every Monday.",
-  "Daily Spin: free, one spin per member per day (Los Angeles time), and every slice wins something.",
+  "The exact street address isn't listed in the app yet. Use the Directions button for the map.",
+  "Hibachi Catch is a free 30-second catching game. No account is needed to play.",
+  "A free account is needed only to save a score or claim a prize.",
+  "Catch food for +10 each. A Gold Star is +50.",
+  "Flame, candy and ice are −20 each. A dragon fire hit is −30.",
+  "Three dragon hits burn your food and end the run.",
+  "650+ points in one run earns 15% off your next meal and a spot on the weekly board.",
+  "The weekly board runs Monday through Sunday close. 1st place gets 50% off your next meal and 2nd gets 20% off.",
+  "The board resets every Monday.",
+  "The Daily Spin is free, one per member per day, and every slice wins something.",
   "Spin food prizes and discounts are good for 3 days at the Compton location, one reward per visit.",
-  "Reward ladder: 250 pts Free extra Yum-Yum, 500 pts Free fried rice, 800 pts Free hibachi plate, 1300 pts Dinner for two.",
+  "Rewards ladder: 250 pts Free extra Yum-Yum, 500 pts Free fried rice, 800 pts Free hibachi plate, 1,300 pts Dinner for two.",
   "New member offer: Free Extra Yum-Yum + 10% off your next plate.",
-  "Refer a friend and the referral gift is a Free fried rice.",
-  "An account needs a name, phone number and email. One account per person and per phone.",
+  "Referral gift: Free fried rice.",
+  "Accounts need a name, phone number and email. One account per person and per phone.",
   "You must be 13 or older. Under 18 needs a parent's or guardian's permission.",
-  "No purchase is needed to play, spin or win, and buying food does not improve your chances.",
-  "No prize includes alcohol.",
-  "Language menu (🌐 button) includes English, Spanish, Chinese, Korean, Tagalog, Vietnamese, Armenian, Persian, Japanese, Thai and Russian.",
+  "No purchase is necessary to play or win.",
+  "Your info is used only for your rewards account and is never sold.",
   "Instagram: @luckydragon360.",
-  "Your info is used only for your rewards account and is never sold."
+  "No prize includes alcohol.",
+  "The app has a language menu with 12 languages."
  ],
  "suggested": [
   "What are your hours?",
   "How do I play Hibachi Catch?",
-  "What can I win?",
-  "How do I get points and rewards?",
-  "What's the phone number?",
-  "How does the Daily Spin work?"
+  "What can I win from the game?",
+  "How does the Daily Spin work?",
+  "What do rewards cost in points?",
+  "How do I call or get directions?"
  ],
  "qa": [
   {
@@ -43,251 +44,159 @@
     "open",
     "close",
     "time",
-    "when",
     "schedule"
    ]
   },
   {
-   "q": "Are you open on Sunday?",
-   "a": "Yes, Sundays we're open 12:00p–8:00p.",
+   "q": "Are you open today?",
+   "a": "We're open every day: Mon–Thu 11a–9p, Fri–Sat 11a–10p, Sun 12p–8p. For holiday changes, call 562-564-9200.",
+   "tags": [
+    "open",
+    "today",
+    "hours",
+    "holiday"
+   ]
+  },
+  {
+   "q": "What time do you open on Sunday?",
+   "a": "Sundays we're open 12:00p to 8:00p.",
    "tags": [
     "sunday",
-    "hours",
     "open",
-    "weekend"
-   ]
-  },
-  {
-   "q": "Are you open on Friday and Saturday night?",
-   "a": "Yes. Fri and Sat we're open 11:00a–10:00p.",
-   "tags": [
-    "friday",
-    "saturday",
-    "late",
-    "hours",
-    "open",
-    "close",
-    "weekend"
-   ]
-  },
-  {
-   "q": "What time do you close on weekdays?",
-   "a": "Monday through Thursday we close at 9:00p.",
-   "tags": [
-    "close",
-    "closing",
-    "weekday",
     "hours",
     "time"
    ]
   },
   {
-   "q": "What time do you open?",
-   "a": "Mon–Sat we open at 11:00a, and Sunday at 12:00p.",
+   "q": "What time do you close on Friday and Saturday?",
+   "a": "We close at 10:00p on Fridays and Saturdays.",
    "tags": [
-    "open",
-    "opening",
-    "hours",
-    "time",
-    "morning"
+    "close",
+    "friday",
+    "saturday",
+    "late",
+    "hours"
    ]
   },
   {
-   "q": "Are you open on holidays?",
-   "a": "I don't have holiday hours. Please call 562-564-9200 to check.",
+   "q": "What time do you close Monday to Thursday?",
+   "a": "Monday through Thursday we close at 9:00p.",
    "tags": [
-    "holiday",
+    "close",
+    "weekday",
     "hours",
-    "open",
-    "closed"
+    "monday",
+    "thursday"
    ]
   },
   {
    "q": "Where are you located?",
-   "a": "We're in Compton, California. The exact street address isn't listed in the app yet. Tap Directions to open Google Maps, or call 562-564-9200.",
+   "a": "We're in Compton, California. The exact street address isn't in the app yet, so tap Directions to open the map or call 562-564-9200.",
    "tags": [
     "address",
     "location",
     "where",
     "compton",
-    "directions",
     "find us"
    ]
   },
   {
-   "q": "What's your address?",
-   "a": "The app says Compton, CA but doesn't show the street address yet. Tap the Directions button to open Google Maps, or call 562-564-9200.",
-   "tags": [
-    "address",
-    "street",
-    "location",
-    "where",
-    "directions"
-   ]
-  },
-  {
    "q": "How do I get directions?",
-   "a": "Tap the Directions button in the app and it opens Google Maps to Lucky Dragon Hibachi in Compton.",
+   "a": "Tap the Directions button in the app. It opens Lucky Dragon Hibachi in Google Maps.",
    "tags": [
     "directions",
     "map",
-    "maps",
     "gps",
     "navigate",
-    "google"
-   ]
-  },
-  {
-   "q": "Is there parking?",
-   "a": "I don't have parking details. Please call 562-564-9200 and ask the staff.",
-   "tags": [
-    "parking",
-    "park",
-    "lot",
-    "car",
-    "valet"
+    "google maps"
    ]
   },
   {
    "q": "What's your phone number?",
-   "a": "Call us at 562-564-9200. You can also tap Call to order in the app.",
+   "a": "Call us at 562-564-9200. You can tap Call to order in the app.",
    "tags": [
     "phone",
+    "call",
     "number",
-    "call",
-    "contact",
-    "telephone"
+    "contact"
    ]
   },
   {
-   "q": "How do I call to order?",
-   "a": "Tap the Call to order button in the app, or dial 562-564-9200.",
+   "q": "How do I order?",
+   "a": "Tap Call to order in the app, or call 562-564-9200. The app also has a Build your plate tool to put together a hibachi plate.",
    "tags": [
     "order",
     "call",
+    "takeout",
     "phone",
-    "takeout",
-    "pickup"
+    "how to order"
    ]
   },
   {
-   "q": "Do you take reservations?",
-   "a": "I don't have reservation info. Please call 562-564-9200 to ask.",
-   "tags": [
-    "reservation",
-    "reserve",
-    "book",
-    "table",
-    "booking"
-   ]
-  },
-  {
-   "q": "Do you deliver?",
-   "a": "I don't have delivery details. Please call 562-564-9200 and ask the staff.",
-   "tags": [
-    "delivery",
-    "deliver",
-    "doordash",
-    "uber eats",
-    "takeout"
-   ]
-  },
-  {
-   "q": "Can I order for pickup or takeout?",
-   "a": "You can call 562-564-9200 to order. I don't have other pickup details, so ask the staff.",
-   "tags": [
-    "pickup",
-    "takeout",
-    "to go",
-    "order",
-    "call"
-   ]
-  },
-  {
-   "q": "Can I order from my table or by QR code?",
-   "a": "I don't have table-ordering or QR details. Ask your server or call 562-564-9200.",
+   "q": "Can I order from my table with a QR code?",
+   "a": "I don't have details on table QR ordering. Please ask staff or call 562-564-9200.",
    "tags": [
     "qr",
     "table",
     "order",
     "scan",
-    "ordering",
-    "pay"
+    "table order"
    ]
   },
   {
-   "q": "Can I build my own plate in the app?",
-   "a": "Yes, there's a Build your plate section. Pick a base, add proteins and extras, then place your order.",
+   "q": "Can I pay in the app?",
+   "a": "I don't have any in-app payment details. Please ask staff or call 562-564-9200.",
    "tags": [
-    "build",
-    "plate",
-    "custom",
-    "order",
-    "create",
-    "make"
+    "pay",
+    "payment",
+    "checkout",
+    "card"
    ]
   },
   {
-   "q": "What bases can I pick when building a plate?",
-   "a": "Fried rice, chow mein, or half & half.",
+   "q": "Is there parking?",
+   "a": "I don't have parking details. Please call 562-564-9200 and we'll help.",
    "tags": [
-    "base",
-    "rice",
-    "chow mein",
-    "noodles",
-    "half and half",
-    "build"
+    "parking",
+    "park",
+    "lot",
+    "car"
    ]
   },
   {
-   "q": "What proteins can I add to my plate?",
-   "a": "Chicken, steak, shrimp, salmon and scallops. You can add up to 2 each of chicken, steak and shrimp, and 1 each of salmon and scallops.",
+   "q": "Do you take reservations?",
+   "a": "I don't have reservation info. Please call 562-564-9200.",
    "tags": [
-    "protein",
-    "chicken",
-    "steak",
-    "shrimp",
-    "salmon",
-    "scallops",
-    "build"
-   ]
-  },
-  {
-   "q": "What extras can I add?",
-   "a": "Hibachi veggies and Yum-Yum sauce. You can add up to 2 Yum-Yum.",
-   "tags": [
-    "extras",
-    "veggies",
-    "yum yum",
-    "sauce",
-    "build",
-    "add"
+    "reservation",
+    "reserve",
+    "book",
+    "table"
    ]
   },
   {
    "q": "What's on the menu?",
-   "a": "Hibachi Chicken, Hibachi Steak, Hibachi Shrimp, the Chicken + Shrimp Combo and Premium Lobster. Sides are Fried Rice, Noodles and Extra Yum-Yum.",
+   "a": "Hibachi Chicken, Steak, Shrimp, a Chicken + Shrimp Combo and Premium Lobster. Sides include Fried Rice, Noodles and Extra Yum-Yum.",
    "tags": [
     "menu",
     "food",
-    "eat",
     "dishes",
+    "eat",
     "items"
    ]
   },
   {
-   "q": "What is the Hibachi Chicken?",
-   "a": "Grilled chicken with fried rice, veggies and house yum-yum sauce.",
+   "q": "What does the Hibachi Chicken come with?",
+   "a": "Grilled chicken, fried rice, veggies and house yum-yum sauce.",
    "tags": [
     "chicken",
     "hibachi chicken",
     "menu",
-    "plate"
+    "yum-yum"
    ]
   },
   {
-   "q": "What comes with the Hibachi Steak?",
-   "a": "Sirloin with fried rice, veggies and double yum-yum.",
+   "q": "What does the Hibachi Steak come with?",
+   "a": "Sirloin, fried rice, veggies and double yum-yum.",
    "tags": [
     "steak",
     "sirloin",
@@ -296,18 +205,17 @@
    ]
   },
   {
-   "q": "What comes with the Hibachi Shrimp?",
-   "a": "Jumbo shrimp with fried rice and veggies.",
+   "q": "What does the Hibachi Shrimp come with?",
+   "a": "Jumbo shrimp, fried rice and veggies.",
    "tags": [
     "shrimp",
     "hibachi shrimp",
-    "menu",
-    "jumbo"
+    "menu"
    ]
   },
   {
    "q": "What is the Chicken + Shrimp Combo?",
-   "a": "It's a combo of hibachi chicken and shrimp, and it's on our menu. Ask staff for what comes with it.",
+   "a": "It's a hibachi combo of chicken and shrimp. It's the one from the review video.",
    "tags": [
     "combo",
     "chicken",
@@ -322,8 +230,6 @@
     "lobster",
     "premium",
     "market price",
-    "mp",
-    "seafood",
     "menu"
    ]
   },
@@ -334,59 +240,77 @@
     "sides",
     "rice",
     "noodles",
-    "yum yum",
-    "extras",
+    "yum-yum",
+    "extras"
+   ]
+  },
+  {
+   "q": "How much is the food?",
+   "a": "The app lists sample prices: Chicken $12.95, Steak $15.95, Shrimp $14.95, Chicken + Shrimp Combo $16.95, Fried Rice $6.50, Noodles $6.95, Extra Yum-Yum $1.00. Lobster is market price. Menu prices in the app are samples, so confirm with staff.",
+   "tags": [
+    "price",
+    "cost",
+    "how much",
+    "menu",
+    "prices"
+   ]
+  },
+  {
+   "q": "How much is the lobster?",
+   "a": "Premium Lobster is market price (MP). Ask staff or call 562-564-9200 for today's price.",
+   "tags": [
+    "lobster",
+    "price",
+    "mp",
+    "market price"
+   ]
+  },
+  {
+   "q": "What is yum-yum sauce?",
+   "a": "It's our house sauce that comes with hibachi plates. Extra Yum-Yum is $1.00 per the app's sample menu.",
+   "tags": [
+    "yum-yum",
+    "sauce",
+    "extra",
     "menu"
    ]
   },
   {
-   "q": "What's Yum-Yum sauce?",
-   "a": "It's our house sauce. Hibachi plates come with it, and you can add Extra Yum-Yum anytime.",
+   "q": "Can I build my own plate?",
+   "a": "Yes. The app's Build your plate tool lets you pick a base (fried rice, chow mein or half & half), proteins and extras. You watch the price add up, then place the order.",
    "tags": [
-    "yum yum",
-    "sauce",
-    "extra",
-    "dip"
+    "build",
+    "custom",
+    "plate",
+    "order",
+    "create"
    ]
   },
   {
-   "q": "How much do things cost?",
-   "a": "The prices in the app are samples, so I can't confirm them. Please call 562-564-9200 for current prices. Lobster is market price.",
+   "q": "What proteins can I add when building a plate?",
+   "a": "Chicken, Steak, Shrimp, Salmon and Scallops. You can add up to 2 each of chicken, steak and shrimp, and 1 each of salmon and scallops.",
    "tags": [
+    "protein",
+    "salmon",
+    "scallops",
+    "build",
+    "plate"
+   ]
+  },
+  {
+   "q": "What are the prices in the plate builder?",
+   "a": "Bases: Fried rice $6.50, Chow mein $6.95, Half & half $7.50. Proteins: Chicken $6.45, Steak $9.45, Shrimp $8.45, Salmon $9.95, Scallops $10.95. Hibachi veggies are free and Yum-yum is $1.00. These are the app's sample prices.",
+   "tags": [
+    "build",
     "price",
-    "prices",
+    "plate",
     "cost",
-    "how much",
-    "menu",
-    "expensive"
+    "add-ons"
    ]
   },
   {
-   "q": "Do you have vegetarian options?",
-   "a": "The app lists hibachi veggies, fried rice and noodles. I don't have details on ingredients, so please ask staff.",
-   "tags": [
-    "vegetarian",
-    "veggie",
-    "vegan",
-    "meatless",
-    "diet"
-   ]
-  },
-  {
-   "q": "Do you have allergen information?",
-   "a": "I don't have allergen details. Please tell staff about any allergy or call 562-564-9200.",
-   "tags": [
-    "allergy",
-    "allergen",
-    "gluten",
-    "nuts",
-    "shellfish",
-    "dietary"
-   ]
-  },
-  {
-   "q": "Do you serve drinks?",
-   "a": "Drinks appear in our game, but I don't have a drink menu. Please ask staff what's available.",
+   "q": "Do you have drinks?",
+   "a": "The game shows house drinks, but I don't have a drink menu. Ask staff or call 562-564-9200.",
    "tags": [
     "drinks",
     "beverage",
@@ -396,281 +320,294 @@
    ]
   },
   {
-   "q": "What is the game?",
-   "a": "It's Hibachi Catch, a 30-second game. Slide the tray to catch hibachi food and dodge the dragon's fire.",
+   "q": "Do you serve alcohol?",
+   "a": "I don't have info on that. Ask staff. No app prize ever includes alcohol.",
+   "tags": [
+    "alcohol",
+    "beer",
+    "bar",
+    "drinks"
+   ]
+  },
+  {
+   "q": "Do you have specials?",
+   "a": "I don't have a confirmed list of specials right now. Check the app for any special banner or ask staff.",
+   "tags": [
+    "specials",
+    "deal",
+    "promo",
+    "discount",
+    "offer"
+   ]
+  },
+  {
+   "q": "Do you have happy hour?",
+   "a": "I don't have any happy hour info. Please ask staff or call 562-564-9200.",
+   "tags": [
+    "happy hour",
+    "deal",
+    "drinks",
+    "time"
+   ]
+  },
+  {
+   "q": "What is Hibachi Catch?",
+   "a": "It's our 30-second arcade game. Slide your tray to catch hibachi food and dodge flames, candy, ice and the dragon's fire.",
    "tags": [
     "game",
     "hibachi catch",
     "play",
-    "what is",
-    "arcade"
+    "arcade",
+    "what is"
    ]
   },
   {
    "q": "How do I play Hibachi Catch?",
-   "a": "Tap to start, then slide your finger across the game to move the tray. Catch the food and dodge flames, candy, ice and the dragon's fire. You have 30 seconds.",
+   "a": "Tap to start, then slide your finger left and right to move the tray. Catch the food, dodge the bad stuff and watch out for the dragon.",
    "tags": [
     "play",
-    "how to play",
-    "controls",
-    "hibachi catch",
     "game",
-    "rules"
-   ]
-  },
-  {
-   "q": "What are the controls?",
-   "a": "Just slide your finger left and right to move the tray. On a computer, move the mouse. With a game controller, use the stick or D-pad.",
-   "tags": [
+    "how to",
     "controls",
-    "move",
-    "slide",
-    "swipe",
-    "controller",
-    "touch"
+    "hibachi catch"
    ]
   },
   {
    "q": "How long is a game?",
-   "a": "30 seconds, unless the dragon burns your food first.",
+   "a": "Each run is 30 seconds, or less if the dragon hits you 3 times.",
    "tags": [
+    "game",
     "time",
-    "long",
-    "seconds",
-    "timer",
-    "30"
+    "30 seconds",
+    "length",
+    "how long"
    ]
   },
   {
-   "q": "Is the game free?",
-   "a": "Yes. Hibachi Catch is free to play and you don't need to buy anything.",
+   "q": "What are the controls?",
+   "a": "Slide your finger across the game to move the tray. With a game controller, use the stick or D-pad to slide the tray.",
+   "tags": [
+    "controls",
+    "move",
+    "swipe",
+    "slide",
+    "controller"
+   ]
+  },
+  {
+   "q": "Does it cost anything to play?",
+   "a": "No. Hibachi Catch is free and no purchase is necessary.",
    "tags": [
     "free",
     "cost",
-    "game",
     "play",
-    "no purchase"
+    "purchase",
+    "game"
    ]
   },
   {
    "q": "Do I need an account to play?",
-   "a": "No. Anyone can play for free as often as they like. You only need a free member account to save your score or claim a prize.",
+   "a": "No. Anyone can play as often as they like without an account. You need a free account only to save your score or claim a prize.",
    "tags": [
     "account",
     "sign up",
-    "login",
     "play",
-    "member",
+    "login",
     "free"
    ]
   },
   {
    "q": "How often can I play?",
-   "a": "As often as you like. The game is free with no limit.",
+   "a": "As often as you like. The game is free with no daily limit.",
    "tags": [
-    "often",
     "limit",
-    "unlimited",
-    "how many",
-    "times",
-    "play again"
+    "how often",
+    "daily",
+    "play again",
+    "unlimited"
    ]
   },
   {
-   "q": "What food do I catch?",
-   "a": "Chicken, steak, shrimp, lobster, veggies, chow mein, fried rice and drinks. Each is worth +10.",
+   "q": "What do I catch?",
+   "a": "Catch chicken, steak, shrimp, lobster, veggies, chow mein, fried rice and drinks. Each is worth +10 points.",
    "tags": [
     "catch",
     "food",
     "points",
-    "chicken",
-    "steak",
-    "shrimp",
-    "lobster",
-    "drinks"
+    "score",
+    "items"
    ]
   },
   {
-   "q": "How many points is each catch worth?",
-   "a": "Each food or drink is +10. A gold star is +50.",
+   "q": "How many points is each item worth?",
+   "a": "Food and drinks are +10 each. A Gold Star is +50. Flame, candy and ice are −20 each. Dragon fire is −30.",
    "tags": [
     "points",
     "score",
-    "catch",
-    "+10",
     "value",
-    "how many"
+    "ratio",
+    "scoring"
    ]
   },
   {
-   "q": "What is the gold star?",
-   "a": "A rare star worth +50. It also keeps your streak going.",
+   "q": "What is the Gold Star?",
+   "a": "A rare pickup worth +50 points that also keeps your streak going.",
    "tags": [
     "gold star",
     "star",
     "bonus",
-    "+50",
-    "rare"
+    "+50"
    ]
   },
   {
    "q": "What is the streak bonus?",
-   "a": "Catch in a row without a miss and you earn +2 extra per catch, up to +10 extra. At 5 or more in a row, that's +20 a catch.",
+   "a": "Catch in a row without a miss and you get +2 extra per catch, up to +10 extra. At a 5+ streak that's +20 a catch.",
    "tags": [
     "streak",
     "combo",
     "bonus",
-    "in a row",
-    "extra"
+    "chain"
    ]
   },
   {
    "q": "What should I dodge?",
-   "a": "Flames, candy and ice cost −20 each and reset your streak. Dragon fire costs −30.",
+   "a": "Dodge flames, candy and ice. Each one costs −20 and resets your streak.",
    "tags": [
     "dodge",
-    "avoid",
     "flame",
     "candy",
     "ice",
-    "penalty",
-    "minus",
-    "-20"
+    "avoid",
+    "minus"
    ]
   },
   {
-   "q": "How does the dragon work?",
-   "a": "The dragon flies across the top, locks onto your tray with a dashed red line, then breathes fire. Move out of the way!",
+   "q": "What does the dragon do?",
+   "a": "The dragon locks on to your tray, shown by a dashed red line, then breathes fire. Move out of the way or you lose 30 points and your streak.",
    "tags": [
     "dragon",
     "fire",
     "dodge",
-    "dashed line",
-    "burn"
+    "danger",
+    "hit"
    ]
   },
   {
-   "q": "What happens if the dragon hits me?",
-   "a": "You lose 30 points and your streak resets. The rice gets darker with each hit.",
+   "q": "What happens after 3 dragon hits?",
+   "a": "Your food is burnt and the run ends. Each hit also toasts your rice darker.",
    "tags": [
     "dragon",
-    "hit",
-    "burn",
-    "−30",
-    "penalty"
-   ]
-  },
-  {
-   "q": "When does the game end early?",
-   "a": "After three dragon hits your food is burnt and the run is over.",
-   "tags": [
     "burnt",
     "game over",
-    "three hits",
-    "end",
     "3 hits",
-    "lose"
+    "end"
    ]
   },
   {
-   "q": "What is the paper lantern?",
-   "a": "Once per run, a paper lantern floats down about 12–20 seconds in. Catch it on your tray for +300 bonus points and a link to Antidote The Foodie's review.",
+   "q": "What is the lantern in the game?",
+   "a": "A paper lantern drifts down once per run. Catch it on your tray for a +300 bonus and a link to Antidote The Foodie's review of Lucky Dragon.",
    "tags": [
     "lantern",
     "bonus",
-    "+300",
     "easter egg",
-    "antidote",
-    "review",
-    "secret"
+    "+300",
+    "antidote"
    ]
   },
   {
-   "q": "What is halftime?",
-   "a": "After about 85–95 seconds of total play, your next run opens with a short break showing Antidote The Foodie's review of Lucky Dragon. You can skip it or watch the full review.",
+   "q": "What can I win from the game?",
+   "a": "One run of 650+ points earns 15% off your next meal and a spot on the weekly board. 1st place on the weekly board wins 50% off your next meal and 2nd wins 20% off. The app labels these prizes as sample, so confirm with staff.",
    "tags": [
-    "halftime",
-    "break",
-    "video",
-    "review",
-    "antidote",
-    "skip"
-   ]
-  },
-  {
-   "q": "What score do I need to make the weekly board?",
-   "a": "650 points or more in one run puts you on the weekly board.",
-   "tags": [
-    "650",
-    "board",
-    "leaderboard",
-    "score",
-    "weekly",
-    "qualify"
+    "prize",
+    "win",
+    "reward",
+    "discount",
+    "game",
+    "650"
    ]
   },
   {
    "q": "How does the weekly leaderboard work?",
-   "a": "The highest score from Monday through Sunday close wins. Ties go to the score posted first, and the board resets every Monday.",
+   "a": "The highest score from Monday through Sunday close wins. Ties go to the score posted first. The board resets every Monday.",
    "tags": [
     "leaderboard",
     "weekly",
     "board",
     "champion",
     "winner",
-    "reset",
-    "monday"
-   ]
-  },
-  {
-   "q": "What do I win on the weekly board?",
-   "a": "Sample prizes: 1st place gets 50% off your next meal and 2nd place gets 20% off. A run of 650+ earns 15% off your next meal. Ask staff to confirm the current prizes.",
-   "tags": [
-    "prize",
-    "win",
-    "weekly",
-    "50%",
-    "20%",
-    "15%",
-    "discount",
-    "champion"
+    "top score"
    ]
   },
   {
    "q": "When does the weekly board reset?",
-   "a": "Every Monday. New winners every week.",
+   "a": "Every Monday, with new winners each week.",
    "tags": [
     "reset",
     "monday",
     "weekly",
-    "new week",
-    "board"
+    "board",
+    "when"
    ]
   },
   {
-   "q": "Who wins the weekly prize?",
-   "a": "The player with the highest score from Monday through Sunday close. Second place also gets a prize.",
+   "q": "How do I claim my game prize?",
+   "a": "Finish a run, then save your score with a free account (name, phone, email). Winners may be asked to show the code on their phone and a matching account at the counter.",
    "tags": [
-    "winner",
+    "claim",
+    "prize",
+    "redeem",
+    "save score",
+    "counter"
+   ]
+  },
+  {
+   "q": "What score gets 15% off?",
+   "a": "650 points or more in a single run.",
+   "tags": [
+    "650",
+    "15%",
+    "score",
+    "discount",
+    "prize"
+   ]
+  },
+  {
+   "q": "Who gets 50% off?",
+   "a": "The player with the highest score on the weekly board, Monday through Sunday close.",
+   "tags": [
+    "50%",
+    "first place",
     "champion",
-    "who wins",
     "weekly",
-    "1st"
+    "winner"
    ]
   },
   {
-   "q": "What if two people tie?",
-   "a": "The tie goes to whoever posted the score first.",
+   "q": "When are weekly prizes picked?",
+   "a": "The board runs Monday through Sunday close and resets Monday. I don't have a more exact pick-up time, so ask staff.",
    "tags": [
-    "tie",
-    "tied",
-    "same score",
-    "first"
+    "when",
+    "winner",
+    "picked",
+    "weekly",
+    "prize",
+    "sunday"
    ]
   },
   {
-   "q": "Is the game luck or skill?",
-   "a": "Skill. Hibachi Catch prizes depend only on your score and your rank on the weekly board, not on chance.",
+   "q": "Do I need to buy food to win?",
+   "a": "No. No purchase of any kind is needed to play or win, and buying doesn't improve your chances.",
+   "tags": [
+    "purchase",
+    "buy",
+    "necessary",
+    "free entry",
+    "fair"
+   ]
+  },
+  {
+   "q": "Is the game skill or luck?",
+   "a": "Skill. Game prizes depend only on your score and your rank on the weekly board.",
    "tags": [
     "skill",
     "luck",
@@ -680,344 +617,189 @@
    ]
   },
   {
-   "q": "Do I have to buy something to win?",
-   "a": "No. No purchase or payment is needed to play, spin or win, and buying food doesn't improve your chances.",
-   "tags": [
-    "purchase",
-    "buy",
-    "necessary",
-    "free",
-    "win",
-    "no purchase"
-   ]
-  },
-  {
-   "q": "How do I save my score?",
-   "a": "After a run, join with a free member account (name, phone number and email). Your score then goes on the board.",
-   "tags": [
-    "save",
-    "score",
-    "claim",
-    "join",
-    "account",
-    "post"
-   ]
-  },
-  {
-   "q": "How do I claim a prize?",
-   "a": "Sign in to your member account after your run. If you win, you may be asked to show the code on your phone and your matching account at the counter.",
-   "tags": [
-    "claim",
-    "prize",
-    "redeem",
-    "counter",
-    "code",
-    "win"
-   ]
-  },
-  {
-   "q": "Can cheating get me disqualified?",
-   "a": "Yes. Scores made with cheats, scripts, bots or multiple accounts are disqualified.",
+   "q": "Can I cheat or use bots?",
+   "a": "No. Scores made with cheats, scripts, bots or multiple accounts are disqualified.",
    "tags": [
     "cheat",
     "bot",
-    "script",
+    "rules",
     "disqualified",
-    "fair",
     "multiple accounts"
    ]
   },
   {
-   "q": "Can employees win prizes?",
-   "a": "Employees and their household members may play but can't win prizes.",
-   "tags": [
-    "employee",
-    "staff",
-    "eligible",
-    "win",
-    "household"
-   ]
-  },
-  {
-   "q": "Who can play for prizes?",
-   "a": "U.S. legal residents age 13 or older. Players under 18 need a parent's or guardian's permission. Void where prohibited.",
-   "tags": [
-    "eligible",
-    "age",
-    "who can",
-    "13",
-    "18",
-    "kids",
-    "minor",
-    "residents"
-   ]
-  },
-  {
-   "q": "Is there a kids mode?",
-   "a": "There's no separate kids mode. Players under 18 need a parent's or guardian's permission to have an account.",
-   "tags": [
-    "kids",
-    "kid",
-    "child",
-    "children",
-    "age",
-    "parent"
-   ]
-  },
-  {
    "q": "What is the Daily Spin?",
-   "a": "A free spin of the prize wheel. Every slice wins something, from bonus points to discounts and free food.",
+   "a": "A free daily wheel for members. Every slice wins something: points, a discount or a free food item.",
    "tags": [
     "spin",
     "daily spin",
     "wheel",
     "free",
-    "prize"
+    "daily"
    ]
   },
   {
    "q": "How often can I spin?",
-   "a": "Once per member per day, based on Los Angeles time. It's always free, and spins can't be bought.",
+   "a": "Once per member per day, based on Los Angeles time.",
    "tags": [
     "spin",
     "daily",
     "once",
-    "how often",
-    "free",
-    "limit"
+    "limit",
+    "how often"
    ]
   },
   {
-   "q": "What can I win on the Daily Spin?",
-   "a": "+50, +100 or +75 reward points, $2 off a hibachi plate, free extra Yum-Yum, a free side of fried rice, or 10% off your order.",
+   "q": "What can I win on the spin?",
+   "a": "+50, +75 or +100 reward points, $2 off a hibachi plate, free extra Yum-Yum, a free side of fried rice, or 10% off your order.",
    "tags": [
     "spin",
     "prizes",
     "wheel",
     "win",
-    "points",
-    "discount",
-    "fried rice"
+    "odds"
    ]
   },
   {
    "q": "What are the odds on the spin?",
-   "a": "+50 pts 30%, +100 pts 20%, +75 pts 15%, $2 off a plate 15%, free Yum-Yum 8%, free fried rice 7%, and 10% off your order 5%.",
+   "a": "+50 pts 30%, +100 pts 20%, +75 pts 15%, $2 off a plate 15%, free Yum-Yum 8%, free fried rice 7%, 10% off your order 5%.",
    "tags": [
     "odds",
-    "spin",
     "chance",
+    "spin",
     "percent",
     "probability"
    ]
   },
   {
    "q": "How long do spin prizes last?",
-   "a": "Food prizes and discounts are good for 3 days at the Lucky Dragon Compton location. One reward per visit, and they can't be combined with other rewards.",
+   "a": "Food prizes and discounts are good for 3 days at the Compton location. They are one reward per visit, can't be combined with other rewards, have no cash value and can't be transferred.",
    "tags": [
     "expire",
-    "expiration",
     "3 days",
     "spin",
     "prize",
-    "valid",
-    "combine"
+    "valid"
    ]
   },
   {
-   "q": "Can I trade my spin prize for cash?",
-   "a": "No. Prizes have no cash value and can't be transferred.",
+   "q": "Does the spin cost anything?",
+   "a": "No. The spin is always free. It's never sold and can't be earned by buying anything.",
    "tags": [
-    "cash",
-    "transfer",
-    "give",
-    "value",
     "spin",
-    "prize"
-   ]
-  },
-  {
-   "q": "Do you give alcohol as a prize?",
-   "a": "No. No prize includes alcohol.",
-   "tags": [
-    "alcohol",
-    "beer",
-    "drinks",
-    "prize"
+    "free",
+    "cost",
+    "tokens"
    ]
   },
   {
    "q": "How do I join the rewards program?",
-   "a": "Sign up for a free member account with your name, phone number and email. The live app confirms your phone number with a text code.",
+   "a": "Sign up free with your name, phone number and email. You can do it after a game run or from the join card in the app.",
    "tags": [
     "join",
     "sign up",
     "register",
-    "member",
-    "rewards",
-    "account"
+    "account",
+    "member"
    ]
   },
   {
-   "q": "What do I need to sign up?",
-   "a": "A name, a phone number and an email address.",
+   "q": "Who can sign up?",
+   "a": "U.S. residents age 13 or older. Under 18 needs a parent's or guardian's permission. It's one account per person and per phone.",
    "tags": [
-    "sign up",
-    "requirements",
-    "phone",
-    "email",
-    "name",
-    "join"
-   ]
-  },
-  {
-   "q": "Can I have more than one account?",
-   "a": "No. It's one free account per person and per phone. Your account is tied to the phone it was made on.",
-   "tags": [
-    "multiple",
-    "one account",
-    "phone",
-    "duplicate",
-    "limit"
-   ]
-  },
-  {
-   "q": "What do I get for joining?",
-   "a": "The welcome offer is a Free Extra Yum-Yum and 10% off your next plate.",
-   "tags": [
-    "join",
-    "welcome",
-    "offer",
-    "bonus",
-    "free",
-    "10%",
+    "age",
+    "eligible",
+    "who can",
+    "kids",
     "sign up"
    ]
   },
   {
-   "q": "How do reward points work?",
-   "a": "Points from the Daily Spin and from purchases go into your Lucky Dragon Hibachi Rewards account. You can trade them for the rewards listed in the app. Points have no cash value.",
+   "q": "Is there a welcome offer?",
+   "a": "Yes: Free Extra Yum-Yum plus 10% off your next plate when you join.",
+   "tags": [
+    "welcome",
+    "join",
+    "offer",
+    "new member",
+    "bonus"
+   ]
+  },
+  {
+   "q": "How do I earn points?",
+   "a": "You earn points from the Daily Spin and from purchases. I don't have the exact points-per-dollar ratio, so ask staff.",
    "tags": [
     "points",
+    "earn",
     "stars",
-    "pts",
-    "rewards",
-    "how",
-    "earn"
+    "ratio",
+    "per dollar",
+    "how many points"
    ]
   },
   {
    "q": "How many points do I get per dollar?",
-   "a": "I don't have the points-per-dollar rate. Ask staff or call 562-564-9200.",
+   "a": "I don't have that number. Ask staff or call 562-564-9200.",
    "tags": [
+    "points per dollar",
     "ratio",
-    "per dollar",
     "how many points",
-    "points",
     "earn",
-    "spend"
+    "per dollar"
    ]
   },
   {
    "q": "How many points do I get per visit?",
-   "a": "I don't have a per-visit point amount. Ask staff or call 562-564-9200.",
+   "a": "I don't have a per-visit point value. Ask staff or call 562-564-9200.",
    "tags": [
-    "per visit",
-    "points",
     "visit",
-    "earn",
-    "check in"
+    "points",
+    "per visit",
+    "check in",
+    "earn"
    ]
   },
   {
-   "q": "Do I earn points for playing the game?",
-   "a": "The app doesn't list points for game scores. Games give you a weekly-board score and possible prizes. Daily Spin wins can add reward points.",
-   "tags": [
-    "game points",
-    "play",
-    "score",
-    "earn",
-    "points"
-   ]
-  },
-  {
-   "q": "What rewards can I get?",
-   "a": "At 250 pts: Free extra Yum-Yum. At 500 pts: Free fried rice. At 800 pts: Free hibachi plate. At 1300 pts: Dinner for two.",
+   "q": "What rewards can I get with points?",
+   "a": "250 pts: Free extra Yum-Yum. 500 pts: Free fried rice. 800 pts: Free hibachi plate. 1,300 pts: Dinner for two.",
    "tags": [
     "rewards",
+    "points cost",
     "free",
-    "prizes",
+    "redeem",
     "tiers",
-    "cost",
-    "points",
-    "catalog"
+    "prize"
    ]
   },
   {
-   "q": "How many points for a free hibachi plate?",
-   "a": "800 points.",
-   "tags": [
-    "free plate",
-    "800",
-    "hibachi plate",
-    "reward",
-    "cost"
-   ]
-  },
-  {
-   "q": "How many points for free fried rice?",
-   "a": "500 points.",
-   "tags": [
-    "fried rice",
-    "500",
-    "free",
-    "reward",
-    "cost"
-   ]
-  },
-  {
-   "q": "How many points for free Yum-Yum?",
-   "a": "250 points gets you a free extra Yum-Yum.",
-   "tags": [
-    "yum yum",
-    "250",
-    "free",
-    "reward",
-    "sauce"
-   ]
-  },
-  {
-   "q": "How many points for dinner for two?",
-   "a": "1300 points.",
-   "tags": [
-    "dinner for two",
-    "1300",
-    "reward",
-    "cost",
-    "top"
-   ]
-  },
-  {
-   "q": "How do I redeem a reward?",
-   "a": "Open the rewards card in the app, pick a reward you have enough points for, and show the code on your phone at the counter.",
+   "q": "How do I redeem my points?",
+   "a": "Open your rewards card in the app and pick a reward you have enough points for. Show it at the counter. Ask staff if you're unsure.",
    "tags": [
     "redeem",
-    "use",
+    "use points",
+    "claim",
     "reward",
-    "counter",
-    "code",
-    "claim"
+    "counter"
    ]
   },
   {
-   "q": "What are the levels or tiers?",
-   "a": "The app doesn't list member levels for Lucky Dragon. The rewards ladder goes from 250 to 1300 points. Ask staff for more.",
+   "q": "Do points expire or have cash value?",
+   "a": "Points have no cash value. I don't have expiration info, so ask staff.",
+   "tags": [
+    "expire",
+    "cash value",
+    "points",
+    "value"
+   ]
+  },
+  {
+   "q": "Do you have levels or tiers?",
+   "a": "I don't have confirmed level details for Lucky Dragon. Ask staff.",
    "tags": [
     "levels",
     "tiers",
     "vip",
-    "status",
-    "ladder"
+    "status"
    ]
   },
   {
@@ -1027,323 +809,208 @@
     "birthday",
     "bday",
     "club",
-    "free",
-    "gift"
-   ]
-  },
-  {
-   "q": "Can I refer a friend?",
-   "a": "Yes. The referral gift is a Free fried rice. Ask staff how it works.",
-   "tags": [
-    "refer",
-    "referral",
-    "friend",
-    "share",
-    "invite",
-    "gift"
-   ]
-  },
-  {
-   "q": "Is there a bonus for being nearby?",
-   "a": "If you're close, the app can show a heads-up. When you show the nearby offer at the counter, you get double stars on that day's order.",
-   "tags": [
-    "nearby",
-    "location",
-    "bonus",
-    "double stars",
-    "counter",
-    "close"
-   ]
-  },
-  {
-   "q": "Do you have daily specials or happy hour?",
-   "a": "I don't have happy hour or daily specials listed. We do have seasonal holiday specials in the app. Call 562-564-9200 for anything else.",
-   "tags": [
-    "happy hour",
-    "specials",
-    "daily",
-    "deals",
-    "discount"
-   ]
-  },
-  {
-   "q": "What holiday specials do you have?",
-   "a": "The app lists specials for Halloween, Thanksgiving, Christmas, New Year, Valentine's, St. Patrick's, Cinco de Mayo and July 4th. They're sample deals, so ask staff to confirm.",
-   "tags": [
-    "holiday",
-    "specials",
-    "seasonal",
-    "halloween",
-    "thanksgiving",
-    "christmas",
-    "valentines"
-   ]
-  },
-  {
-   "q": "What is the Halloween special?",
-   "a": "Dragon Fire Night (Oct 20–31): Hibachi Steak with Extra Yum-Yum, code BOO. Ask staff to confirm the deal.",
-   "tags": [
-    "halloween",
-    "dragon fire night",
-    "boo",
-    "steak",
-    "special",
-    "october"
-   ]
-  },
-  {
-   "q": "What is the Thanksgiving special?",
-   "a": "Family Hibachi Feast (Nov 20–28): Chicken + Shrimp Combo with Fried Rice (solo) and Noodles for the table.",
-   "tags": [
-    "thanksgiving",
-    "family feast",
-    "combo",
-    "november",
-    "special"
-   ]
-  },
-  {
-   "q": "What is the Christmas special?",
-   "a": "Holiday Lobster Hibachi (Dec 15–25): Premium Lobster on the hibachi (market price) with Fried Rice.",
-   "tags": [
-    "christmas",
-    "lobster",
-    "december",
-    "holiday",
-    "special"
-   ]
-  },
-  {
-   "q": "What is the New Year special?",
-   "a": "Long-Life Noodles (Dec 29–Jan 1): Hibachi Chicken + Noodles, for a long, lucky year.",
-   "tags": [
-    "new year",
-    "noodles",
-    "long life",
-    "chicken",
-    "special"
-   ]
-  },
-  {
-   "q": "What is the Valentine's special?",
-   "a": "Hibachi for Two (Feb 7–14): Hibachi Steak + Hibachi Shrimp to share, with extra Yum-Yum on the side.",
-   "tags": [
-    "valentines",
-    "for two",
-    "steak",
-    "shrimp",
-    "february",
-    "special"
-   ]
-  },
-  {
-   "q": "What are the other holiday specials?",
-   "a": "Lucky Dragon Day (Mar 14–17): Hibachi Chicken with Extra Yum-Yum. Cinco Hibachi Shrimp (May 1–5): Hibachi Shrimp + Fried Rice. Fourth of July Grill (Jul 1–4): Chicken + Shrimp Combo + Noodles.",
-   "tags": [
-    "st patricks",
-    "cinco",
-    "july 4",
-    "fourth",
-    "specials",
-    "holiday"
-   ]
-  },
-  {
-   "q": "Is there trivia or a sports feature?",
-   "a": "Not in this app. We have the Hibachi Catch game, the Daily Spin and the weekly board.",
-   "tags": [
-    "trivia",
-    "sports",
-    "quiz",
-    "halftime",
-    "features"
-   ]
-  },
-  {
-   "q": "Can I use the app in another language?",
-   "a": "Yes. Tap the 🌐 button at the top right and pick a language. Options include Spanish, Chinese, Korean, Tagalog, Vietnamese, Armenian, Persian, Japanese, Thai and Russian.",
-   "tags": [
-    "language",
-    "spanish",
-    "español",
-    "chinese",
-    "korean",
-    "translate",
-    "vietnamese",
-    "thai",
-    "languages"
-   ]
-  },
-  {
-   "q": "How do I add the app to my phone?",
-   "a": "On iPhone Safari, tap Share, then Add to Home Screen, then Add. On Android Chrome, tap Install app, or the ⋮ menu then Add to Home screen.",
-   "tags": [
-    "install",
-    "home screen",
-    "add",
-    "app",
-    "wallet",
-    "iphone",
-    "android",
-    "download"
-   ]
-  },
-  {
-   "q": "Why can't I add it from Instagram or Facebook?",
-   "a": "Those in-app browsers can't add apps. Open the page in Safari or Chrome first, then add it to your Home Screen.",
-   "tags": [
-    "instagram",
-    "facebook",
-    "tiktok",
-    "install",
-    "browser",
-    "open in safari",
-    "chrome"
-   ]
-  },
-  {
-   "q": "Can I play with a game controller?",
-   "a": "Yes. Connect a Bluetooth or USB controller and press any button. The stick or D-pad slides the tray.",
-   "tags": [
-    "controller",
-    "gamepad",
-    "xbox",
-    "playstation",
-    "tesla",
-    "bluetooth"
-   ]
-  },
-  {
-   "q": "How do I lock the screen so it won't scroll?",
-   "a": "Tap the lock button on the right side of the screen. Full screen is also available during play.",
-   "tags": [
-    "lock",
-    "scroll",
-    "full screen",
-    "screen",
-    "fullscreen"
-   ]
-  },
-  {
-   "q": "Do you have an Instagram?",
-   "a": "Yes, @luckydragon360. The app also shows our latest posts and reels.",
-   "tags": [
-    "instagram",
-    "social",
-    "ig",
-    "follow",
-    "reels",
-    "photos"
-   ]
-  },
-  {
-   "q": "Can I leave a Google review?",
-   "a": "Yes. The app has a button to write a Google review. Honest reviews only, and no points or prizes are given for reviews.",
-   "tags": [
-    "review",
-    "google",
-    "stars",
-    "rating",
-    "feedback"
-   ]
-  },
-  {
-   "q": "Who is Antidote The Foodie?",
-   "a": "A food reviewer who reviewed Lucky Dragon Hibachi. You can find the lantern in the game and watch the review on YouTube.",
-   "tags": [
-    "antidote",
-    "foodie",
-    "youtube",
-    "review",
-    "video"
-   ]
-  },
-  {
-   "q": "Will I get texts from you?",
-   "a": "Reward texts go with your account. Deal and marketing texts are optional, and you can stop them anytime by replying STOP.",
-   "tags": [
-    "text",
-    "sms",
-    "marketing",
-    "stop",
-    "unsubscribe",
-    "consent",
-    "emails"
-   ]
-  },
-  {
-   "q": "Is my information safe?",
-   "a": "Your information is used only for your rewards account and is never sold. Your location stays on your phone.",
-   "tags": [
-    "privacy",
-    "safe",
-    "data",
-    "information",
-    "sold",
-    "location",
-    "security"
-   ]
-  },
-  {
-   "q": "Can I get help from a person?",
-   "a": "Yes. Ask any staff member, or call 562-564-9200.",
-   "tags": [
-    "staff",
-    "help",
-    "human",
-    "contact",
-    "support",
-    "phone"
-   ]
-  },
-  {
-   "q": "What if I have a problem with my prize or points?",
-   "a": "Show the staff your account and prize code at the counter, or call 562-564-9200.",
-   "tags": [
-    "problem",
-    "issue",
-    "prize",
-    "points",
-    "missing",
-    "help",
-    "staff"
-   ]
-  },
-  {
-   "q": "Can the rules change?",
-   "a": "Yes. The restaurant may change or end the game, spin, prizes or rules at any time, with notice in the app. The official rules in the app are currently a draft.",
-   "tags": [
-    "rules",
-    "change",
-    "official rules",
-    "terms",
-    "draft",
-    "end"
-   ]
-  },
-  {
-   "q": "Are the game tokens a thing?",
-   "a": "Not right now. Hibachi Catch is free with no tokens.",
-   "tags": [
-    "tokens",
-    "token",
-    "cost",
-    "play",
     "free"
    ]
   },
   {
-   "q": "Do I have to pay taxes on a prize?",
-   "a": "Any taxes on a prize are the winner's responsibility.",
+   "q": "Can I refer friends?",
+   "a": "Yes, there's a referral program with a Free fried rice gift. I don't have the exact steps, so ask staff.",
    "tags": [
-    "tax",
-    "taxes",
+    "referral",
+    "refer",
+    "friend",
+    "share",
+    "invite"
+   ]
+  },
+  {
+   "q": "Is there a bonus for showing up?",
+   "a": "Showing the app at the counter may earn double stars on that day's order. Ask staff to confirm.",
+   "tags": [
+    "bonus",
+    "double stars",
+    "counter",
+    "location",
+    "nearby",
+    "check in"
+   ]
+  },
+  {
+   "q": "Do you have game tokens?",
+   "a": "Not right now. Hibachi Catch is free to play. If tokens are turned on later, a play would cost 10 tokens with free ways to get them.",
+   "tags": [
+    "tokens",
+    "token",
+    "play cost",
+    "free tokens"
+   ]
+  },
+  {
+   "q": "What is the halftime video?",
+   "a": "After about 90 seconds of total play, a short break plays Antidote The Foodie's review of Lucky Dragon. You can skip it or watch the full review on YouTube.",
+   "tags": [
+    "halftime",
+    "video",
+    "review",
+    "break",
+    "antidote"
+   ]
+  },
+  {
+   "q": "Is there trivia or a sports feature?",
+   "a": "I don't have trivia or sports features listed for Lucky Dragon.",
+   "tags": [
+    "trivia",
+    "sports",
+    "quiz",
+    "scores"
+   ]
+  },
+  {
+   "q": "Is there a kid mode?",
+   "a": "There's no separate kid mode. Players under 18 need a parent's or guardian's permission for an account.",
+   "tags": [
+    "kids",
+    "kid mode",
+    "children",
+    "age",
+    "parent"
+   ]
+  },
+  {
+   "q": "What languages does the app support?",
+   "a": "Use the 🌐 menu for English, Spanish, Chinese (simplified and traditional), Korean, Tagalog, Vietnamese, Armenian, Persian, Japanese, Thai and Russian.",
+   "tags": [
+    "language",
+    "spanish",
+    "translate",
+    "español",
+    "chinese",
+    "korean"
+   ]
+  },
+  {
+   "q": "How do I add the app to my phone?",
+   "a": "Use Add to Home Screen in the game menu or the page footer. On iPhone use Share, then Add to Home Screen. On Android use Install app or the ⋮ menu.",
+   "tags": [
+    "install",
+    "home screen",
+    "wallet",
+    "app",
+    "add"
+   ]
+  },
+  {
+   "q": "Is there a wallet card?",
+   "a": "I don't have wallet card info. You can add the app to your Home Screen, though.",
+   "tags": [
+    "wallet",
+    "card",
+    "apple wallet",
+    "pass"
+   ]
+  },
+  {
+   "q": "Is my information safe?",
+   "a": "Your info is used only for your rewards account and is never sold. Opt-in texts and emails can be stopped by replying STOP or unsubscribing.",
+   "tags": [
+    "privacy",
+    "data",
+    "safe",
+    "info",
+    "stop",
+    "unsubscribe"
+   ]
+  },
+  {
+   "q": "Will you text me?",
+   "a": "Only if you opt in. You can stop texts or emails anytime by replying STOP or unsubscribing.",
+   "tags": [
+    "text",
+    "sms",
+    "stop",
+    "opt out",
+    "marketing"
+   ]
+  },
+  {
+   "q": "Can employees win prizes?",
+   "a": "Employees and their household members may play but can't win prizes.",
+   "tags": [
+    "employee",
+    "staff",
+    "win",
+    "rules",
+    "eligible"
+   ]
+  },
+  {
+   "q": "Where can I read the official rules?",
+   "a": "The app has an Official Rules link under the game. The rules are marked as a draft, so ask staff if you have questions.",
+   "tags": [
+    "rules",
+    "official rules",
+    "terms",
+    "legal"
+   ]
+  },
+  {
+   "q": "Can I use a rewards code with other discounts?",
+   "a": "Food prizes and discounts can't be combined with other rewards, and it's one reward per visit.",
+   "tags": [
+    "combine",
+    "stack",
+    "discount",
+    "one per visit",
+    "rewards"
+   ]
+  },
+  {
+   "q": "Do you have a social media page?",
+   "a": "Yes, follow us on Instagram at @luckydragon360. Posts and reels show in the app too.",
+   "tags": [
+    "instagram",
+    "social",
+    "follow",
+    "reels",
+    "ig"
+   ]
+  },
+  {
+   "q": "Can I leave a review?",
+   "a": "Yes, the app has a Google review button. Reviews earn no points or prizes, and honest reviews are welcome.",
+   "tags": [
+    "review",
+    "google",
+    "rate",
+    "feedback"
+   ]
+  },
+  {
+   "q": "How do I get help from staff?",
+   "a": "Call 562-564-9200 or ask at the counter.",
+   "tags": [
+    "help",
+    "staff",
+    "contact",
+    "support",
+    "question"
+   ]
+  },
+  {
+   "q": "I have a problem with my prize or points. Who do I ask?",
+   "a": "Call 562-564-9200 or ask staff at the counter. Have the code on your phone ready.",
+   "tags": [
+    "problem",
     "prize",
-    "winner"
+    "points",
+    "issue",
+    "help",
+    "support"
    ]
   }
  ],
- "updated": "2026-10-25T03:37:33+00:00",
- "source_commit": "6075b0e",
+ "updated": "2026-11-11T01:45:50+00:00",
+ "source_commit": "339078e",
  "app": "lucky-dragon"
 }

@@ -55,7 +55,7 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=ex2") : null, WORLDM = CHASE ? await import("./world3d.js?v=ex2.ht4k") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=ex2") : null, WORLDM = CHASE ? await import("./world3d.js?v=ex2.hs1") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
   const QM = await import("../engine3d/quality.js?v=e3t");
@@ -387,7 +387,7 @@ async function boot() {
     // GPU particles (engine3d/particles.js, same API as air3d's makeFX) + raycast bullet damage with decals (engine3d/damage.js)
     FXA = (PARTM && CAPS.gl2 && safe("gpu-particles", () => PARTM.makeGPUFX(THREE, scene, { max: SMOOTH ? 1024 : MOBILE ? 2048 : 4096 }))) || AIRM.makeFX(THREE, scene, { max: 1800 });
     pDmg = (DMGM && safe("bullet-damage", () => DMGM.makeHitDamage(THREE, { fx: FXA, target: AIR.node, engines: AIR.pts.eng, maxDecals: QUAL.cfg.decals }))) || (() => { const d = AIRM.makeDamage(THREE, FXA, AIR.node, AIR.pts.wound); const h = d.hit; d.hit = () => { h(); return true; }; d.hitNear = (l) => h(l); const u = d.update; d.update = (s2, t2, k2, w2) => u(s2, t2, k2, w2, AIR.pts.eng); return d; })();
-    WORLD = WORLDM.makeWorld(THREE, { camZ: () => cam.position.z, fireCap: () => SMOOTH ? 4 : ({ low: 6, med: 10, high: 16, ultra: 24 })[QUAL.tier] || 10, clock: () => FLYT.s, bbFirst: Q.get("bb") === "now" ? -500 : Q.get("bb") === "soon" ? -44 : null, bbGap: Q.get("bbgap") ? +Q.get("bbgap") : Q.get("bb") === "now" ? 4 : undefined, pbr: !SMOOTH && QUAL.tier !== "low", facadeSize: SMOOTH ? 512 : 1024, lite: SMOOTH, noVideo: FAILQ.includes("video"), fx: FXA, fxScale: () => ({ low: .3, med: .6, high: .85, ultra: 1 })[QUAL.tier] || 1, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density,
+    WORLD = WORLDM.makeWorld(THREE, { camZ: () => cam.position.z, fireCap: () => SMOOTH ? 4 : ({ low: 6, med: 10, high: 16, ultra: 24 })[QUAL.tier] || 10, clock: () => FLYT.s, hi: () => M.hi, bbFirst: Q.get("bb") === "now" ? -500 : Q.get("bb") === "soon" ? -44 : null, bbGap: Q.get("bbgap") ? +Q.get("bbgap") : Q.get("bb") === "now" ? 4 : undefined, pbr: !SMOOTH && QUAL.tier !== "low", facadeSize: SMOOTH ? 512 : 1024, lite: SMOOTH, noVideo: FAILQ.includes("video"), fx: FXA, fxScale: () => ({ low: .3, med: .6, high: .85, ultra: 1 })[QUAL.tier] || 1, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density,
       exitStart: +(Q.get("exit") || 0), zoneKey: () => { const G = M.G(); return (G.runId || 0) + "|" + (G.lvl || 1) + "|" + (M.zoneId ? M.zoneId() : ""); } }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
     // muzzle flashes + real crashes + jet pilot ejections (engine3d/combat.js); detail follows the quality tier
     COMBAT = CBM && safe("combat", () => CBM.makeCombat(THREE, { scene, fx: FXA, smokeCap: () => SMOOTH ? 3 : ({ low: 4, med: 6, high: 9, ultra: 12 })[QUAL.tier] || 6, crowd: () => CROWD, lights: QUAL.tier === "low" ? 0 : QUAL.tier === "med" ? 1 : 2,

@@ -164,15 +164,50 @@
     var im = new Image(); im.onload = function () { im.w = im.naturalWidth; im.h = im.naturalHeight; SP[n] = im; }; im.src = "img/r66/" + n + ".webp";
   });
   var BGI = [], STOPI = new Image(); STOPI.src = "img/r66/stop.webp";
+  var LOMI = new Image(); LOMI.src = "img/r66/lomita.webp";   // Harry's real dining room (their own website gallery), shown at the Lomita stop
   function bgLoad(i) { if (i < 6 && !BGI[i]) { BGI[i] = new Image(); BGI[i].src = "img/r66/bg" + i + ".webp"; } }
   function ready(im) { return im && im.complete && im.naturalWidth > 0; }
   var SMK = [1, 2, 3].map(function (i) { var im = new Image(); im.src = "img/r66/smoke" + i + ".webp"; return im; });
   var CK = {};   // cook photos, loaded per order: raw + done on the smoker, plus Harry's own menu photo for the serve shot
   function cookImg(src) { if (!CK[src]) { CK[src] = new Image(); CK[src].src = src; } return CK[src]; }
   function cookLoad(o) { cookImg("img/r66/cook/" + o.ph + "-raw.webp"); cookImg("img/r66/cook/" + o.ph + "-done.webp"); if (o.sv) cookImg("img/" + o.sv + ".webp"); }
+
+  /* roadside boards: Harry's own menu photos with the dish name, the brand, and the top score. Built when first needed, cached per key. */
+  var BRD = {}, BOARDS = ORDERS.filter(function (o) { return o.sv; });
+  function board(key, paint) { return BRD[key] || (BRD[key] = mk(180, 236, function (g) {
+    g.fillStyle = "#3a2a1a"; g.fillRect(34, 170, 9, 66); g.fillRect(137, 170, 9, 66); g.fillStyle = "#2a1e14"; g.fillRect(2, 170, 176, 7);
+    g.fillStyle = GOLD; rr(g, 0, 0, 180, 174, 8); g.fill(); g.fillStyle = "#1a0f08"; g.fillRect(6, 6, 168, 162);
+    g.save(); g.beginPath(); g.rect(6, 6, 168, 162); g.clip(); paint(g); g.restore(); })); }
+  function dishBoard(o) { var im = cookImg("img/" + o.sv + ".webp"); if (!ready(im)) return null;
+    return board("d-" + o.sv, function (g) {
+      var sw = im.naturalWidth, sh = sw * 130 / 168; g.drawImage(im, 0, (im.naturalHeight - sh) * 0.65, sw, sh, 6, 6, 168, 130);
+      for (var k = 0; k < 3; k++) for (var i = 0; i < 16; i++) {   // steam: soft white wisps curling up off the plate (no ctx.filter, Safari)
+        var x = 54 + k * 36 + Math.sin(i * 0.55 + k * 2.1) * (5 + i * 0.7), y = 96 - i * 5.6, r = 5 + i * 0.9, gr = g.createRadialGradient(x, y, 0, x, y, r);
+        gr.addColorStop(0, "rgba(255,255,255," + (0.34 * Math.sin(Math.PI * (i + 1) / 17)).toFixed(3) + ")"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
+      g.fillStyle = RED; g.fillRect(6, 136, 168, 32); g.fillStyle = GOLD; g.fillRect(6, 134, 168, 3);
+      var nm = T(o.n).toUpperCase(), f = 20; g.fillStyle = CREAM; g.textAlign = "center"; do { g.font = "400 " + f + "px " + DISP; } while (g.measureText(nm).width > 156 && --f > 9);
+      g.fillText(nm, 90, 152 + f * 0.36); }); }
+  function scoreBoard() {
+    var b = 0, won = ""; try { b = +localStorage.getItem("r66-best") || 0; won = localStorage.getItem("r66-best-prize") || ""; } catch (e) {}
+    // shortcut: this phone's best only (the demo has no shared leaderboard), upgrade to a weekly shared board like Melody's when Harry's signs
+    var tier = ((W.R66_PRIZES || {})[kid() ? "kid" : "adult"] || [])[0];
+    return board("hs" + b + won + MODE, function (g) {
+      g.textAlign = "center"; g.fillStyle = GOLD; g.font = "400 21px " + DISP; g.fillText(T("HIGH SCORE"), 90, 38); g.fillStyle = RED; g.fillRect(24, 47, 132, 2);
+      g.fillStyle = CREAM; g.font = "400 " + (b ? 46 : 26) + "px " + NUM; g.fillText(b ? b.toLocaleString() : T("BE THE FIRST"), 90, 96);
+      if (!won && !tier) return;
+      g.fillStyle = GOLD; g.font = "800 10px " + BODY; g.fillText(won ? T("WON") : T("SCORE") + " " + tier[0].toLocaleString() + " " + T("WINS"), 90, 116);
+      g.fillStyle = CREAM; g.font = "800 12px " + BODY; wrap(T((won || tier[1]).replace(/^an? /, "")), 90, 133, 150, 14, g); }); }
+  function spawnBoard() {
+    var n = st.bbN++, what = n % 6 === 2 ? "brand" : n % 6 === 5 ? "score" : BOARDS[st.bbDish++ % BOARDS.length];
+    var spr = what === "brand" ? (ready(LOGO) ? board("brand", function (g) { g.drawImage(LOGO, 9, 6, 162, 162); }) : null) : what === "score" ? scoreBoard() : dishBoard(what);
+    if (!spr) return;   // photo still loading: this board is skipped, the next one comes round
+    var side = n % 2 ? 1 : -1; if (st.props.some(function (p) { return p.k === "billboard"; })) side = -1;   // never in front of Antidote's review poster
+    st.props.push({ spr: spr, wx: side * 345, z: ZMAX, h: 205, k: "dish" }); st.propD = Math.max(st.propD, 200);
+    console.assert(st.props.filter(function (p) { return p.k === "dish"; }).length < 4 && spr.w === 180, "dish boards: too many on the road or a bad sprite");
+  }
   var R3 = { on: false, render: null };   // the 3D drive view (route66-3d.js) hooks in here; it outlives restarts, unlike st
   // on-screen width per road object (photo sprites keep their own aspect; height follows)
-  var OW = { car: 104, deer: 104, hole: 92, cone: 44, weed: 50, log: 68, rub: 36, sauce: 32, brisket: 72, ribs: 68, link: 66, wing: 62, shield: 46 };
+  var OW = { car: 104, deer: 104, hole: 92, cone: 44, weed: 50, log: 68, rub: 36, sauce: 32, brisket: 90, ribs: 85, link: 82, wing: 78, shield: 46 };
   // the render's touch: a glowing gold ring under every pickup
   SP.ring = mk(120, 40, function (g) {
     g.save(); g.translate(60, 20); g.scale(1, 0.33); var r = g.createRadialGradient(0, 0, 8, 0, 0, 60); r.addColorStop(0, "rgba(255,215,130,.55)"); r.addColorStop(1, "rgba(255,190,80,0)"); g.fillStyle = r; g.fillRect(-60, -60, 120, 120); g.restore();
@@ -217,7 +252,7 @@
   console.assert(comboX(4) === 1 && comboX(5) === 2 && comboX(9) === 2 && comboX(10) === 3, "combo tiers");
   function fresh() {
     return { running: false, over: false, phase: "menu", leg: 0, t: 0, legT: 0, dist: 0, speed: 0, px: 0, pv: 0, lane: 1, tilt: 0, camX: 0, bend: 0, bgX: 0,
-      score: 0, combo: 0, hearts: 5, inv: { logs: 3, rub: 0, sauce: 0 }, objs: [], props: [], pops: [], smoke: [], dmg: 0, flat: 0, sway: 0, swayV: 0, shake: 0, flash: 0, spawnD: 0, propD: 0, bbDone: false,
+      score: 0, combo: 0, hearts: 5, inv: { logs: 3, rub: 0, sauce: 0 }, objs: [], props: [], pops: [], smoke: [], dmg: 0, flat: 0, sway: 0, swayV: 0, shake: 0, flash: 0, spawnD: 0, propD: 0, bbDone: false, dishD: 0, bbN: 0, bbDish: 0,
       tickets: [], cook: null, banner: null, served: 0, perfect: 0, walked: 0, hold: false, played: 0, finished: false, paused: false, bbRect: null, posterRect: null, fx: [] };
   }
   var st = fresh();
@@ -316,7 +351,7 @@
   /* ---------------- flow ---------------- */
   function banner(big, small, ms, col) { st.banner = { big: big, small: small, t: ms || 2400, max: ms || 2400, col: col || GOLD }; }
   function legStart() {
-    st.phase = "drive"; st.legT = 0; st.objs = []; st.bbDone = false; st.speed = st.speed || 0; st.spawnD = 200; st.propD = 0;
+    st.phase = "drive"; st.legT = 0; st.objs = []; st.bbDone = false; st.speed = st.speed || 0; st.spawnD = 200; st.propD = 0; st.dishD = 450; BOARDS.forEach(function (o) { cookImg("img/" + o.sv + ".webp"); });
     st.dmg = Math.max(0, (st.dmg || 0) - 1); st.flat = 0;   // every stop patches the rig up one notch
     if (!BG[st.leg]) BG[st.leg] = skyFor(LEGS[st.leg]);
     bgLoad(st.leg); bgLoad(st.leg + 1);
@@ -407,7 +442,9 @@
     st.camX = st.px * 0.55 + st.bend * 30;
     if (st.phase === "drive") {
       st.hzD = (st.hzD || 0) - dz; st.spawnD -= dz; if (st.spawnD <= 0) { spawnRow(); st.spawnD = (kid() ? 300 : 270) - st.leg * 6 + rnd(-30, 40); }
-      if (!st.bbDone && st.legT > 9000) { st.bbDone = true; st.props.push({ spr: SP.billboard, wx: 345, z: ZMAX, h: 160, k: "billboard" }); }
+      if (!st.bbDone && st.legT > 9000) { st.bbDone = true; st.props.push({ spr: SP.billboard, wx: 345, z: ZMAX, h: 160, k: "billboard" });
+        st.props.forEach(function (p) { if (p.k === "dish" && p.wx > 0 && p.z > ZMAX - 700) p.wx = -p.wx; }); }   // a dish board just ahead of the review poster crosses the road so it cannot cover it
+      st.dishD -= dz; if (st.dishD <= 0) { spawnBoard(); st.dishD = rnd(1300, 1800); }
     }
     if (st.phase !== "dead" && st.phase !== "arrive") { st.propD -= dz; if (st.propD <= 0) { spawnProp(); st.propD = rnd(120, 260); } }
     for (var i = st.props.length - 1; i >= 0; i--) { st.props[i].z -= dz; if (st.props[i].z < -60) st.props.splice(i, 1); }
@@ -590,7 +627,11 @@
   }
   function drawStop() {
     var L = LEGS[st.leg], c = st.cook, bx = 30, by = 128, bw = 340, bh = 170;
-    if (ready(STOPI)) {   // photo stand: cover-fit so its blank sign board sits at (200..368, 124..196); name / logo go on the board
+    if (L.final && ready(LOMI)) {   // the last stop is the real place: Harry's own dining-room photo, cover-fit to the top 306 px
+      var lw = LOMI.naturalHeight * VW / 306, lt = "THE REAL HARRY'S · 25501 NARBONNE AVE, LOMITA"; cx.drawImage(LOMI, (LOMI.naturalWidth - lw) * 0.12, 0, lw, LOMI.naturalHeight, 0, 0, VW, 306);
+      cx.font = "800 9px " + BODY; cx.textAlign = "center"; var tw = cx.measureText(lt).width + 18; cx.fillStyle = "rgba(20,10,6,.84)"; rr(cx, 200 - tw / 2, 124, tw, 18, 9); cx.fill(); cx.fillStyle = "#ffe3a0"; cx.fillText(lt, 200, 136);
+      cx.fillStyle = "rgba(0,0,0,.28)"; cx.fillRect(0, 296, VW, 10);
+    } else if (ready(STOPI)) {   // photo stand: cover-fit so its blank sign board sits at (200..368, 124..196); name / logo go on the board
       var sh = VW * STOPI.naturalHeight / STOPI.naturalWidth; cx.drawImage(STOPI, 0, -72, VW, sh);
       if (L.final && LOGO.complete && LOGO.naturalWidth) cx.drawImage(LOGO, 284 - 34, 126, 68, 68);
       else { cx.fillStyle = "#ffe3a0"; cx.shadowColor = GOLD; cx.shadowBlur = 10; cx.font = "400 16px " + DISP; cx.textAlign = "center"; cx.fillText(L.stop + " BBQ STOP", 284, 156); cx.shadowBlur = 0;
@@ -643,7 +684,7 @@
     if (c && c.phase === "smoke") hint(st.inv.logs <= 0 ? T("Out of hickory! Grab logs on the road") : st.hold ? T("Feeding hickory… let go to cool") : T("HOLD to feed the fire · let go to cool"));
     if (st.phase === "finish") { cx.fillStyle = "rgba(20,10,6," + Math.min(0.7, st.finT * 0.4) + ")"; cx.fillRect(0, 0, VW, VH); }
   }
-  function wrap(t, x, y, mw, lh) { var w = t.split(" "), line = "", n = 0; for (var i = 0; i < w.length; i++) { var tt = line ? line + " " + w[i] : w[i]; if (cx.measureText(tt).width > mw && line) { cx.fillText(line, x, y + n * lh); line = w[i]; n++; } else line = tt; } cx.fillText(line, x, y + n * lh); }
+  function wrap(t, x, y, mw, lh, g) { g = g || cx; var w = t.split(" "), line = "", n = 0; for (var i = 0; i < w.length; i++) { var tt = line ? line + " " + w[i] : w[i]; if (g.measureText(tt).width > mw && line) { g.fillText(line, x, y + n * lh); line = w[i]; n++; } else line = tt; } g.fillText(line, x, y + n * lh); }
   function drawGauge(c) {
     var gx = VW / 2, gy = 404, R = 80, t = c ? c.temp : 150;
     cx.fillStyle = "rgba(20,10,6,.82)"; rr(cx, gx - R - 18, gy - R - 16, (R + 18) * 2, R + 76, 16); cx.fill();

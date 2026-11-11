@@ -14,6 +14,9 @@ export async function makeTraffic(THREE, O) {
   // O.procedural: the realistic procedural cars (engine3d/carmodels.js) instead of the Kenney toy pack
   const PROC = O.procedural ? (await import("./carmodels.js?v=e3t")).buildCars(THREE) : null;
   const g = PROC ? { scene: { traverse(fn) { PROC.forEach(c => { const geo = c.geo.clone(); geo.applyMatrix4(new THREE.Matrix4().makeScale(3.3 / SCK, 3.3 / SCK, 3.3 / SCK)); fn({ isMesh: true, name: c.name, geometry: geo, proc: c }); }); } } } : await O.loader.loadAsync(O.base + "cars.glb"), Q = Object.assign({ density: 1 }, O.quality || {});
+  // free road from a car at s on lane L to obstacle b, or -1 when b is off this lane / behind the car
+  const blockGap = (L, s, b) => { const z = L.ax === "z", along = ((z ? b.z : b.x) - s) * L.d; return Math.abs((z ? b.x : b.z) - L.c) < b.r + 4 && along > 0 ? Math.max(0, along - b.r - 7.75) : -1; };
+  console.assert(blockGap({ ax: "z", c: 8, d: 1 }, 0, { x: 6, z: 50, r: 10 }) === 32.25 && blockGap({ ax: "z", c: 8, d: -1 }, 0, { x: 6, z: 50, r: 10 }) === -1 && blockGap({ ax: "x", c: 80, d: 1 }, 0, { x: 50, z: 50, r: 10 }) === -1, "traffic blockGap");
   const TYPES = [], LEN = 15.5, SC = LEN / 2.55, SCK = SC;   // (procedural cars are in metres: 3.3 world units per metre)
   const keepPaint = new Set(["taxi", "police", "ambulance", "delivery"]);
   const WEIGHT = { sedan: 5, "sedan-sports": 2, "hatchback-sports": 3, suv: 4, "suv-luxury": 2, taxi: 1.2, van: 1.5, delivery: .8, truck: 1.4, police: .35, ambulance: .2 };
@@ -100,6 +103,9 @@ export async function makeTraffic(THREE, O) {
         if (P.st === "wait") { P.p.set(x0 + (P.crossAve ? 0 : P.jit * .2), 0, z0, P.crossAve ? (P.sx > 0 ? -Math.PI / 2 : Math.PI / 2) : (P.sz > 0 ? Math.PI : 0)); P.p.play(P.idle); if (walk) { P.st = "go"; P.u = 0; } }
         else { P.u += dt * P.sp / Math.hypot(x1 - x0, z1 - z0); const u = Math.min(1, P.u); P.p.set(x0 + (x1 - x0) * u, 0, z0 + (z1 - z0) * u, Math.atan2(x1 - x0, z1 - z0)); P.p.play(walk || u > .15 ? "walk" : "coverRun");
           if (u >= 1) { P.sx = P.crossAve ? -P.sx : P.sx; P.sz = P.crossAve ? P.sz : -P.sz; P.crossAve = Math.random() < .5; P.st = "wait"; P.idle = ["idle", "phone", "text", "idle2", "talk"][(Math.random() * 5) | 0]; } } } }
+    // street obstacles (crashed aircraft), network-local { x, z, r }: pushed by the game (world3d impact)
+    // shortcut: cars mid-turn and cars already past the wreck's middle are not stopped, upgrade if wrecks need a full collision box
+    const blocks = [];
     function sim(t, dt) {
       for (const car of cars) {
         if (car.turn) { const T = car.turn; T.u += Math.max(4, car.v) * dt / T.len; car.v = Math.min(car.v + 20 * dt, 30); car.brake = 0;
@@ -121,13 +127,14 @@ export async function makeTraffic(THREE, O) {
               const ctrl = ax2 === "x" ? [L.c, to.c] : [to.c, L.c]; const P0 = [x0, z0], P2 = ex; const len2 = Math.hypot(ctrl[0] - P0[0], ctrl[1] - P0[1]) + Math.hypot(P2[0] - ctrl[0], P2[1] - ctrl[1]);
               car.turn = { P0, P1: ctrl, P2, u: 0, len: len2 * .85, to, s2: ax2 === "x" ? P2[0] : P2[1] }; car.plan = null; continue; } car.plan = "S"; }
           if (toStop < -road) car.plan = null; }
+        for (const b of blocks) { const g = blockGap(L, car.s, b); if (g >= 0 && g < gap) { gap = g; vLead = 0; } }   // a wreck lying on this lane = a stopped car ahead
         // IDM
         const A = 32, B = 46, s0 = 4, Tg = 1.1, dv = car.v - vLead, sStar = s0 + car.v * Tg + car.v * dv / (2 * Math.sqrt(A * B));
         let a = A * (1 - Math.pow(car.v / car.v0, 4)) - A * Math.pow(sStar / Math.max(gap, .5), 2); a = Math.max(-120, Math.min(A, a));
         car.acc = a; car.v = Math.max(0, car.v + a * dt); car.s += car.v * dt * L.d; car.brake = a < -6 || car.v < 1.5 ? 1 : 0;
         if (car.s * L.d > L.ext) car.s -= 2 * L.ext * L.d; }
       updPeds(t, dt); }
-    const net = { group, cars, parked, lanes, peds, sim, AVE, STR, sigState, road, disposed: false,
+    const net = { group, cars, parked, lanes, peds, sim, AVE, STR, sigState, road, blocks, disposed: false,
       dispose() { net.disposed = true; nets.delete(net); peds.forEach(P => S.crowd && S.crowd.remove(P.p)); } };
     nets.add(net); return net;
   }

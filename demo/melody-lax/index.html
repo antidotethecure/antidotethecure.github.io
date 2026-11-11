@@ -11,6 +11,39 @@
 <meta name="apple-mobile-web-app-title" content="Melody">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Melody Bar &amp; Grill — Menu, Drinks &amp; Game</title>
+<!-- FAST START (2026-11-11): the 3D game used to fetch its scripts one after another once the page had finished parsing. They are all
+     requested here, in parallel, from the first byte. The import map must stay ABOVE these links. Each href must match the import
+     string in melody3d.js / world3d.js exactly (same ?v=): a mismatch only wastes a download, it never breaks the game. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/utils/BufferGeometryUtils.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/libs/meshopt_decoder.module.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/environments/RoomEnvironment.js">
+<link rel="modulepreload" href="melody3d.js?v=fs4">
+<link rel="modulepreload" href="air3d.js?v=ex2">
+<link rel="modulepreload" href="world3d.js?v=ex2.hs2">
+<link rel="modulepreload" href="beach3d.js?v=dx1">
+<link rel="modulepreload" href="../engine3d/quality.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/billboard.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/facades.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/carmodels.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/particles.js?v=ra1">
+<link rel="modulepreload" href="../engine3d/damage.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/aircraft.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/sky.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/clouds.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/weather.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/postfx.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/water.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/audio.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/combat.js?v=dx2">
+<link rel="modulepreload" href="../engine3d/apex.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/crowd.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/clips.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/traffic.js?v=e3u">
+<link rel="modulepreload" href="../engine3d/blimp.js?v=e3t">
 <script src="../lang-th.js"></script>
 <script src="../gamepad.js?v=20261017gp3"></script>
 <script src="../songswitch.js?v=ms1"></script>
@@ -2786,8 +2819,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
   '<div class="ptsh">Melody Rewards points (BETA: switching on soon)</div><div class="pts">'+row('<span class="e">⭐</span>',"1 point per "+GPC.perScore+" score, once rewards are on",GPC.dailyCap+"/day")+row('<span class="e">⏱️</span>',"Survival ranks by time","time")+'</div>';
 })();
 </script>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-<script type="module" src="melody3d.js?v=fs3"></script>
+<script type="module" src="melody3d.js?v=fs4"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}

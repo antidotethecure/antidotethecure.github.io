@@ -6,7 +6,7 @@
      · Glazed ham: lathe bulb, spiral diamond scoring and amber glaze painted into the texture, protruding bone,
        three pineapple rings (tori) with cherries.
      · Pumpkin pie: crimped crust (torus + texture), custard top, a dollop of cream.
-     · All three sit half off-screen in the corners at different depths, low opacity, breathing gently, with warm
+     · All three sit half off-screen in the corners at different depths, solid, breathing gently, with warm
        additive steam wisps rising off the two hot dishes.
      · Autumn leaves: a maple-lobed Shape extruded to a flat blade, curled and fluttered in a custom shader (centre
        vein bend, edge flutter, backlit rim) in four colours - crimson, burnt orange, amber, ochre. Two leaves always
@@ -297,9 +297,9 @@
     var tTex = turkeyTextures(THREE), hTex = hamTextures(THREE), pTex = pieTexture(THREE), cTex = crustTexture(THREE);
     var bodyG = turkeyBody(THREE), drumG = drumstick(THREE), hamG = hamBody(THREE);
 
-    var boneMat = new THREE.MeshStandardMaterial({ color: 0xf2e6cf, roughness: 0.78, transparent: true, opacity: 0.66 });
-    var platterMat = new THREE.MeshStandardMaterial({ color: 0xf6f1e6, roughness: 0.34, metalness: 0.05, transparent: true, opacity: 0.58 });
-    var OP = 0.78;   // under full opacity so app text keeps reading, but enough to read as food over a photo
+    var boneMat = new THREE.MeshStandardMaterial({ color: 0xf2e6cf, roughness: 0.78 });
+    var platterMat = new THREE.MeshStandardMaterial({ color: 0xf6f1e6, roughness: 0.34, metalness: 0.05 });
+    // food is solid (11-10: see-through food looked like ghosts); it stays half off-screen in the corners so text still reads
 
     function steam(n, spread, y) {   // warm additive wisps rising off a hot dish
       var arr = [];
@@ -314,7 +314,7 @@
 
     function makeTurkey() {
       var g = new THREE.Group();
-      var mat = new THREE.MeshStandardMaterial({ map: tTex.map, roughnessMap: tTex.gloss, roughness: 0.62, metalness: 0.04, transparent: true, opacity: OP });
+      var mat = new THREE.MeshStandardMaterial({ map: tTex.map, roughnessMap: tTex.gloss, roughness: 0.62, metalness: 0.04, opacity: 1 });
       g.add(new THREE.Mesh(bodyG, mat));
       [-1, 1].forEach(function (sx) {   // drumsticks crossed at the front, bone ends up
         var d = new THREE.Group(), meat = new THREE.Mesh(drumG, mat), bone = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, 0.2, 8), boneMat);
@@ -335,12 +335,12 @@
 
     function makeHam() {
       var g = new THREE.Group();
-      var mat = new THREE.MeshStandardMaterial({ map: hTex.map, roughness: 0.3, metalness: 0.12, transparent: true, opacity: OP });
+      var mat = new THREE.MeshStandardMaterial({ map: hTex.map, roughness: 0.3, metalness: 0.12, opacity: 1 });
       g.add(new THREE.Mesh(hamG, mat));
       var bone = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 0.3, 10), boneMat);
       bone.position.y = 0.62; g.add(bone);
-      var ringG = new THREE.TorusGeometry(0.085, 0.026, 7, 14), ringM = new THREE.MeshStandardMaterial({ color: 0xf0c23e, roughness: 0.42, transparent: true, opacity: OP });
-      var cherryM = new THREE.MeshStandardMaterial({ color: 0x9c1020, roughness: 0.26, transparent: true, opacity: OP });
+      var ringG = new THREE.TorusGeometry(0.085, 0.026, 7, 14), ringM = new THREE.MeshStandardMaterial({ color: 0xf0c23e, roughness: 0.42, opacity: 1 });
+      var cherryM = new THREE.MeshStandardMaterial({ color: 0x9c1020, roughness: 0.26, opacity: 1 });
       [[-0.07, 0.3, 0.52], [-0.34, 0.04, 0.46], [0.3, 0.1, 0.46]].forEach(function (p) {
         var r = new THREE.Mesh(ringG, ringM); r.position.set(p[0], p[1], p[2]); r.rotation.x = 0.2; g.add(r);
         var ch = new THREE.Mesh(new THREE.SphereGeometry(0.028, 8, 6), cherryM); ch.position.set(p[0], p[1], p[2] + 0.03); g.add(ch);
@@ -353,14 +353,14 @@
 
     function makePie() {
       var g = new THREE.Group();
-      var fill = new THREE.MeshStandardMaterial({ map: pTex, roughness: 0.68, transparent: true, opacity: OP });
-      var crust = new THREE.MeshStandardMaterial({ map: cTex, roughness: 0.82, transparent: true, opacity: OP });
+      var fill = new THREE.MeshStandardMaterial({ map: pTex, roughness: 0.68, opacity: 1 });
+      var crust = new THREE.MeshStandardMaterial({ map: cTex, roughness: 0.82, opacity: 1 });
       var tin = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.52, 0.2, 28), crust);
       var top = new THREE.Mesh(new THREE.CircleGeometry(0.58, 28), fill);
       top.rotation.x = -Math.PI / 2; top.position.y = 0.101;
       var rimM = new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.075, 8, 30), crust);
       rimM.rotation.x = Math.PI / 2; rimM.position.y = 0.1;
-      var cream = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 9), new THREE.MeshStandardMaterial({ color: 0xfffaf0, roughness: 0.6, transparent: true, opacity: OP }));
+      var cream = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 9), new THREE.MeshStandardMaterial({ color: 0xfffaf0, roughness: 0.6, opacity: 1 }));
       cream.scale.set(1, 0.72, 1); cream.position.set(0.1, 0.17, 0.05);
       g.add(tin, top, rimM, cream);
       return { g: g, mats: [fill, crust, cream.material], steam: [] };

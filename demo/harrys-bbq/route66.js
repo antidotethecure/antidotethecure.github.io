@@ -214,7 +214,7 @@
   var MODE = (function () { try { return localStorage.getItem("r66-mode") || ""; } catch (e) { return ""; } })();
   function kid() { return MODE === "kid"; }
   function fresh() {
-    return { running: false, over: false, phase: "menu", leg: 0, t: 0, legT: 0, dist: 0, speed: 0, px: 0, lane: 1, tilt: 0, camX: 0, bend: 0, bgX: 0,
+    return { running: false, over: false, phase: "menu", leg: 0, t: 0, legT: 0, dist: 0, speed: 0, px: 0, pv: 0, lane: 1, tilt: 0, camX: 0, bend: 0, bgX: 0,
       score: 0, hearts: 5, inv: { logs: 3, rub: 0, sauce: 0 }, objs: [], props: [], pops: [], smoke: [], dmg: 0, flat: 0, sway: 0, swayV: 0, shake: 0, flash: 0, spawnD: 0, propD: 0, bbDone: false,
       tickets: [], cook: null, banner: null, served: 0, perfect: 0, walked: 0, hold: false, played: 0, finished: false, paused: false, bbRect: null, posterRect: null, fx: [] };
   }
@@ -321,6 +321,7 @@
     var L = LEGS[st.leg]; banner(L.from.split(",")[0].toUpperCase() + " → " + L.to.toUpperCase(), T("Leg") + " " + (st.leg + 1) + " / 6 · " + T("grab hickory, rub, sauce + meat"), 2600);
   }
   function start() {
+    if (R3.wait) { R3.go = start; audio(); return; }   // the 3D models are still loading: route66-3d.js starts the run the moment they are in (the tap still unlocks sound)
     var keep = st.mute; st = fresh(); st.running = true; st.phase = "drive"; st.speed = baseSpeed() * 0.6; legStart();
     W.SSAI_GAME_ON = true; $("r66over").classList.remove("on"); audio(); syncAudio(); last = performance.now();
   }
@@ -396,7 +397,8 @@
     st.bend = Math.sin(st.dist / 2900 + st.leg) * 0.7 + Math.sin(st.dist / 1150) * 0.25;
     st.bgX = (st.bgX - st.bend * dz * 0.05 + 800 * 100) % 800;
     var px0 = st.px, tx = (st.lane - 1) * LW + (st.flat > 0 ? Math.sin(st.flat * 9) * 42 * Math.min(1, st.flat / 0.8) : 0), dx = tx - st.px;   // a popped tyre swerves the rig inside its own lane
-    st.flat = Math.max(0, st.flat - dt); st.px += dx * Math.min(1, dt * 11); st.tilt = clamp(dx / 260, -0.25, 0.25);
+    st.flat = Math.max(0, st.flat - dt); // a lane change is a damped spring, not a slide: the rig eases out of its lane, carries speed across and settles (implicit step, steady at any frame rate)
+    st.pv = (st.pv + 144 * dx * dt) / (1 + 24 * dt + 144 * dt * dt); st.px += st.pv * dt; st.tilt = clamp(st.pv / 2200, -0.3, 0.3);
     // the smoker trailer is a spring on the hitch: it lags a lane change, swings past and settles
     var tgt = clamp(-(st.px - px0) / (dt || 1) * 0.03, -12, 12) + Math.sin(st.dist / 31) * Math.min(1, st.speed / 300) * 0.6;
     st.swayV += ((tgt - st.sway) * 90 - st.swayV * 5) * dt; st.sway += st.swayV * dt;
@@ -529,7 +531,7 @@
           cx.restore(); }
         else if (o.kind === "weed") { cx.save(); cx.translate(ox, y2 - ow / 2); cx.rotate(o.rot); cx.drawImage(spr, -ow / 2, -ow / 2, ow, ow); cx.restore(); }
         else if (o.kind === "hole") cx.drawImage(spr, ox - ow / 2, y2 - oh * 0.7, ow, oh);
-        else if (o.kind === "deer") { cx.save(); cx.translate(ox, y2 - Math.abs(Math.sin(st.t / 90)) * 5 * s2); if (o.vx > 0) cx.scale(-1, 1); cx.drawImage(spr, -ow / 2, -oh, ow, oh); cx.restore(); }   // the photo faces left
+        else if (o.kind === "deer") { var du = Math.abs(o.wx + 4000) / 75 % 1; cx.save(); cx.translate(ox, y2 - oh / 2 - 4 * du * (1 - du) * 20 * s2); if (o.vx > 0) cx.scale(-1, 1); cx.rotate((0.5 - du) * 0.5); cx.drawImage(spr, -ow / 2, -oh / 2, ow, oh); cx.restore(); }   // the photo faces left; it bounds across in leaps, nose up then down
         else cx.drawImage(spr, ox - ow / 2, y2 - oh, ow, oh); }
       cx.globalAlpha = 1;
     }
@@ -717,6 +719,9 @@
       var s = SP[p[0]], h = 20, w = h * s.w / s.h; if (w > 26) { w = 26; h = w * s.h / s.w; }
       cx.drawImage(s, ix + 8 + j * 42, iy + 13 - h / 2, w, h); cx.fillStyle = p[1] ? CREAM : "#8a7a6a"; cx.font = "800 12px " + BODY; cx.textAlign = "left"; cx.fillText("×" + p[1], ix + 8 + j * 42 + w + 2, iy + 18);
     });
+    // says so on screen when the road is not the full 3D one, so a phone that falls back can be reported
+    var s3 = W.__R663, why = s3 ? (!R3.on ? s3.reason : s3.models && s3.models.length < 5 ? s3.models.length + "/5 3D models loaded" : "") : (performance.now() > 8000 && !/[?&]render=2d/i.test(location.search) ? "3D script did not load" : "");
+    if (why) { cx.textAlign = "left"; cx.font = "700 10px " + BODY; cx.fillStyle = "rgba(255,255,255,.6)"; cx.fillText((R3.on ? "" : "2D road · ") + why, 8, VH - 8); }
     if (kid()) { cx.fillStyle = "#ffd23f"; rr(cx, VW - 74, iy, 66, 22, 11); cx.fill(); cx.fillStyle = INK; cx.font = "900 11px " + BODY; cx.textAlign = "center"; cx.fillText("🧒 KID", VW - 41, iy + 15); }
   }
   function drawPops() {
@@ -743,7 +748,8 @@
     requestAnimationFrame(frame);
     var dt = Math.min(0.05, (now - last) / 1000); last = now;
     if (st.running && !st.paused) { update(dt); st.played += dt * 1000; if (st.running) draw(); }   // end() paints the final card itself
-    else if (!st.running && !st.over) { st.t += dt * 1000; drawAttract(); drawHud(); }
+    else if (!st.running && !st.over) { st.t += dt * 1000; drawAttract(); drawHud();
+      if (R3.go) { cx.fillStyle = "rgba(20,10,6,.82)"; rr(cx, VW / 2 - 118, VH / 2 - 22, 236, 44, 22); cx.fill(); cx.fillStyle = CREAM; cx.font = "800 15px " + BODY; cx.textAlign = "center"; cx.fillText(T("Loading the 3D road…"), VW / 2, VH / 2 + 5); } }
     else if (st.over) { /* keep the last frame */ }
     if (R3.render) R3.render(now, dt * 1000);   // catches its own errors and falls back to this canvas
     if (AC) syncAudio();

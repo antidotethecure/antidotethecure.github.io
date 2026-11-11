@@ -35,4 +35,6 @@ The pickup, smoker trailer and three traffic cars (`demo/harrys-bbq/models/*.glb
 from our own prompts: reference images with gpt_image_2_6, meshes with meshy_v7_image_to_3d, then optimized with gltf-transform
 (meshopt + WebP). Generic vehicles, no real make, badge or plate. Owned by the project; no third-party meshes. The cone and the
 stand-in models used when a mesh fails to load are built in code (`route66-models.js`).
+The pickup's four wheels were cut out of its mesh into separate parts with our own script (triangles inside each wheel's
+cylinder moved to a `wheel_fl/fr/rl/rr` node), so they roll and the front pair steers. Same mesh, no new asset.
 three.js r160 from cdn.jsdelivr.net (MIT).

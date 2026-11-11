@@ -55,7 +55,7 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=ex2") : null, WORLDM = CHASE ? await import("./world3d.js?v=ex2.hs2") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=ex2") : null, WORLDM = CHASE ? await import("./world3d.js?v=ex2.hs3") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
   const QM = await import("../engine3d/quality.js?v=e3t");
@@ -487,10 +487,10 @@ async function boot() {
     const prop = new THREE.Mesh(rotorGeo, rotorMat); prop.renderOrder = 111; g.add(prop);
     g.userData = { word, prop, env }; g.visible = false; scene.add(g); return g; })();
   // chase view: the detailed airship (engine3d/blimp.js): fabric gores, fins, gondola, props, a scrolling LED band with
-  // "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" on both sides, MELODY on top, the Nalu Vida logo low on the flanks + belly
+  // "ANTIDOTE FOOD REVIEW · antidotethefoodie.com" on both sides, MELODY on top and low on the flanks + belly (logoText is required: the engine's default is another restaurant's name)
   let BLIMP3 = null;
-  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3t").catch(e => (offNote("blimp", e), null)), lt = new THREE.Texture(); lt.colorSpace = THREE.SRGBColorSpace; { const im = new Image(); im.onload = () => { lt.image = im; lt.needsUpdate = true; }; im.src = "../nalu-vida/img/logo.png"; }
-    BLIMP3 = BM.buildBlimp(THREE, { top: "MELODY", led: ["ANTIDOTE FOOD REVIEW", "antidotethefoodie.com"], logo: lt }); BLIMP3.node.visible = false; BLIMP3.node.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(BLIMP3.node); }
+  if (CHASE) { const BM = await import("../engine3d/blimp.js?v=e3t").catch(e => (offNote("blimp", e), null));
+    BLIMP3 = BM.buildBlimp(THREE, { top: "MELODY", led: ["ANTIDOTE FOOD REVIEW", "antidotethefoodie.com"], logoText: "MELODY" }); BLIMP3.node.visible = false; BLIMP3.node.traverse(n => { if (n.isMesh) n.castShadow = true; }); scene.add(BLIMP3.node); }
 
   /* ---------------- ground: lit aerial tiles, landmarks, runway, shadow catcher ---------------- */
   const tileGeo = new THREE.PlaneGeometry(1, 1); tileGeo.rotateX(-Math.PI / 2);

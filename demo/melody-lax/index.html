@@ -109,7 +109,7 @@ window.SSAI_REWARDS={
   if(wk.flagUrl&&q.get("rewards")==null) fetch(wk.flagUrl,{cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(!j) return; if(typeof j.rewardsActive==="boolean") on=j.rewardsActive; if(j.prize) wk.prize=String(j.prize).slice(0,60); if(window.GameMenu) GameMenu.refresh(); }).catch(function(){});
 })();</script>
 <script src="../christian-live.js?v=or1" data-slug="melody-bar-grill"></script>
-<script src="menu-data.js?v=mg1"></script>
+<script src="menu-data.js?v=mg3"></script>
 <meta name="description" content="Melody Bar & Grill by LAX: drinks and food menu, Melody Rewards points, the Just Landed deal, and the Melody flight game.">
 <meta name="theme-color" content="#1a0a0c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -218,6 +218,7 @@ h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;le
 .item b{font-size:14.5px;line-height:1.22}
 .item .pr{font-family:var(--punch);font-size:19px;color:var(--gold2);white-space:nowrap}
 .item p{margin:4px 0 8px;font-size:12.5px;color:var(--dim);line-height:1.35;flex:1}
+.add[disabled]{opacity:.6;cursor:default}
 .add{display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--gold);background:transparent;color:var(--gold2);border-radius:10px;padding:8px;font:800 14px var(--body);cursor:pointer;width:100%}
 .add:active{background:var(--gold);color:#1a1405}
 .qty{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--gold);border-radius:10px;overflow:hidden}
@@ -445,7 +446,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 <h2 id="visit"><small>Come through</small>Visit Melody</h2>
 <div class="info">
   <div class="card"><b>Address</b>9132 S Sepulveda Blvd<br>Los Angeles, CA 90045<div class="btns" style="justify-content:flex-start"><a class="btn hot" href="https://www.google.com/maps/dir/?api=1&amp;destination=9132+S+Sepulveda+Blvd+Los+Angeles+CA+90045" target="_blank" rel="noopener">📍 Directions</a><a class="btn" href="tel:+13106701994">📞 Call</a></div></div>
-  <div class="card"><b>Happy hour &amp; specials</b><span id="hhlines">Happy hour 3–6 daily<br>Mon: half off burgers 11–3<br>Tue: $4 tacos (every taco) &amp; $6 margaritas<br>Thu: half off sandwiches 11–3<br>Fri: $3 sliders 11–3</span></div>
+  <div class="card"><b>Happy hour &amp; specials</b><span id="hhlines">Happy hour 3–6 daily<br>Mon: half off burgers 11–3<br>Tue: $4 classic tacos, $6.99 elevated tacos &amp; $6 margaritas<br>Thu: half off sandwiches 11–3<br>Fri: $3 sliders 11–3</span></div>
   <div class="card"><b>Every week</b>Karaoke · live bands · DJs · trivia · every game on the TVs</div>
 </div>
 
@@ -506,17 +507,21 @@ $("tbls").closest(".seat").addEventListener("click",function(e){   // the seat b
 
 /* ---------------- cards ---------------- */
 var cart={}; try{ cart=JSON.parse(localStorage.getItem("melody-cart")||"{}"); }catch(e){}
+// Day-only sections (menu-data.js day:"Tue"): shown every day, but "+ Add" only works that day, Los Angeles time.
+var TODAY=new Date().toLocaleDateString("en-US",{timeZone:"America/Los_Angeles",weekday:"short"}), LOCK={};
+FOOD.forEach(function(c){ if(c.day&&c.day!==TODAY) c.items.forEach(function(it){ LOCK[it[0]]=c.only||"Not today"; delete cart[it[0]]; }); });
 function card(it,drink){
   var key=it[3], q=cart[it[0]]?cart[it[0]].q:0, clip=CLIPS[key];
   var media=it[5]   // a real photo added in Christian HQ (christian-live.js) replaces the standard picture
     ? '<div class="media"><img loading="lazy" src="'+esc(it[5])+'" alt="'+esc(it[0])+'" width="720" height="720" style="object-fit:cover"></div>'
+    : !key ? ''   // no picture yet: text-only card
     : drink
     ? '<div class="media" data-pc="'+it[4]+'"><img class="empty" loading="lazy" src="img/menu/'+key+(clip?'-empty':'')+'.jpg" alt="" onerror="this.style.display=\'none\'"><img class="full" loading="lazy" src="img/menu/'+key+'.jpg" alt="'+esc(it[0])+'" style="clip-path:inset(100% 0 0 0)">'+(clip?'<video muted playsinline preload="none" src="'+clip+'"></video>':'')+'<span class="stream"></span><span class="poured">Poured 🍸</span></div>'
     : '<div class="media" data-fx="'+it[4]+'"><img loading="lazy" src="img/menu/'+key+'.jpg" alt="'+esc(it[0])+'" width="720" height="720">'+(clip?'<video muted playsinline preload="none" src="'+clip+'"></video>':'')+'<span class="steam"><i></i><i></i><i></i></span><span class="herbs"></span></div>';
   return '<article class="item'+(drink?' drink':'')+'" data-name="'+esc(it[0])+'">'+media+
     '<div class="tx"><div class="row"><b>'+esc(it[0])+'</b><span class="pr">$'+it[1].toFixed(2)+'</span></div><p>'+esc(it[2])+'</p>'+ctl(it[0],q)+'</div></article>';
 }
-function ctl(name,q){ return q?'<div class="qty"><button type="button" data-m="'+esc(name)+'" aria-label="Remove one">−</button><span>'+q+' in order</span><button type="button" data-a="'+esc(name)+'" aria-label="Add one">+</button></div>':'<button type="button" class="add" data-a="'+esc(name)+'">+ Add</button>'; }
+function ctl(name,q){ return LOCK[name]?'<button type="button" class="add" disabled>'+esc(LOCK[name])+'</button>':q?'<div class="qty"><button type="button" data-m="'+esc(name)+'" aria-label="Remove one">−</button><span>'+q+' in order</span><button type="button" data-a="'+esc(name)+'" aria-label="Add one">+</button></div>':'<button type="button" class="add" data-a="'+esc(name)+'">+ Add</button>'; }
 $("drinkhost").innerHTML='<div class="items">'+DRINKS.map(function(d){return card(d,true);}).join("")+'</div>';
 $("chips").innerHTML=FOOD.map(function(c){return '<a href="#cat-'+c.id+'">'+esc(c.name)+'</a>';}).join("")+'<a href="#build">Build your mac</a>';
 $("foodhost").innerHTML=FOOD.map(function(c){
@@ -3054,7 +3059,7 @@ window.SCORE_SPECIAL={on:false, league:"nfl", team:"LAR", label:"Rams", phrase:"
 <script src="../scorespecial.js?v=rs1"></script>
 <script src="../seasons/seasons.js?v=20261101a" defer></script>
 <!-- 🛒 Online ordering (pickup, Stripe Checkout). Hidden until the backend turns it on for Melody (ORDERING, Code.gs) or the link has ?ordering=1. -->
-<script src="../ordering.js?v=or1" data-slug="melody-bar-grill" defer></script>
+<script src="../ordering.js?v=or2" data-slug="melody-bar-grill" defer></script>
 <script src="../poweredby.js?v=20261013a" defer></script>
 <script src="../faqbot.js?v=f1" defer></script>
 <script src="../ssai-track.js?v=t1" defer></script>

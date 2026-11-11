@@ -5,7 +5,10 @@
    - Owners / Melody Management change a price, special or the happy-hour lines in Christian HQ. That is saved on the
      backend (Code.gs, Script Property MENU) and laid over these values by demo/christian-live.js (SSAI_CHRISTIAN.applyMenu).
      Edit THIS file only to add / remove items or to fold saved changes back in.
-   - Food: [name, price, description, image key, effect]  effect: steam | herbs | none
+   - Food: [name, price, description, image key, effect]  effect: steam | herbs | none. Image key "" = no picture yet (card shows text only;
+     Christian HQ lists it under menu fixes so a real photo can be added there).
+   - A food category with day:"Tue" + only:"Tuesdays only" is sold in the restaurant on that day only (Taco Tuesday, printed menu
+     2026-11-11): the guest app shows it every day but only lets guests add it that day, and online pickup ordering leaves it out.
    - Drinks: [name, price, description, image key, pour color]
    - Specials: SAMPLES built from the real menu (no prices invented). See demo/specials.js for the fields. */
 window.SSAI_MENU = window.SSAI_MENU || {};
@@ -45,7 +48,21 @@ food: [
   ["Tomato Bisque Soup (Cup)",11.00,"Served with 1/2 grilled cheese dunker.","tomato-bisque","steam"],
   ["Black Bean Soup (Bowl)",14.00,"Olive oil garlic toast.","black-bean-soup","steam"],
   ["Black Bean Soup (Cup)",9.75,"Olive oil garlic toast.","black-bean-soup","steam"]]},
- {id:"tacos",name:"Tacos & Burritos",note:"Taco Tuesday: every taco on the menu is $4.",items:[
+ {id:"tt-elevated",name:"Taco Tuesday: Elevated Taco Specials",note:"Tuesdays only, 11 AM to midnight. Larger, loaded tacos, $6.99 each.",day:"Tue",only:"Tuesdays only",items:[
+  ["Baja Shrimp Taco Melt",6.99,"Garlic shrimp, melted cheddar & Jack, lettuce, tomato, cilantro and jalapeño ranch, wrapped in a cheese quesadilla.","","none"],
+  ["Smash Burger Taco",6.99,"Angus beef, grilled onions, cheddar & Jack, chipotle cream, lettuce, tomato, pickle and cilantro in a flour tortilla.","","none"],
+  ["Sweet & Spicy Fried Chicken Taco",6.99,"Fried chicken tossed in honey hot sauce with red onion, lettuce, tomato and cilantro dressing in a flour tortilla.","","none"]]},
+ {id:"tt-classics",name:"Taco Tuesday Classics",note:"Tuesdays only, 11 AM to midnight. Your Melody favorites, $4 each.",day:"Tue",only:"Tuesdays only",items:[
+  ["Chicken Taco",4.00,"Onion, cilantro and lettuce.","chicken-tacos","herbs"],
+  ["Steak Taco",4.00,"Carne asada, onion, cilantro and lettuce.","","none"],
+  ["Carnitas Taco",4.00,"Slow-roasted pork, onion, cilantro and lettuce.","carnitas-tacos","herbs"],
+  ["Dockside Fish Taco",4.00,"Crispy cod, cabbage, pico de gallo and spicy aioli.","","none"],
+  ["Shrimp Taco",4.00,"Cajun shrimp, cabbage and honey jalapeño.","shrimp-tacos","herbs"],
+  ["Salmon Taco",4.00,"Blackened salmon, crème de lemon and pico de gallo.","salmon-tacos","herbs"],
+  ["Avocado Taco",4.00,"Panko avocado, chimichurri, cabbage and pico de gallo.","avocado-tacos","herbs"],
+  ["Beyond Taco",4.00,"Black bean, pico de gallo and lettuce.","beyond-tacos","herbs"],
+  ["Vegan Carnitas Taco",4.00,"Umami sauce, pineapple slaw and pico de gallo.","","none"]]},
+ {id:"tacos",name:"Tacos & Burritos",note:"On Tuesdays, see Taco Tuesday above: classic tacos $4 each, elevated tacos $6.99 each.",items:[
   ["Shrimp Tacos",16.00,"2 tacos, cajun spiced shrimp sautéed with butter, garlic & onions, cabbage, cilantro, sweet honey jalapeños & spicy aioli.","shrimp-tacos","herbs"],
   ["Salmon Tacos",16.00,"2 blackened salmon with onions, cilantro, lettuce, & creme de lemon.","salmon-tacos","herbs"],
   ["Carnitas Tacos",14.00,"2 slow roasted pork topped with onions, cilantro & lettuce.","carnitas-tacos","herbs"],
@@ -88,5 +105,5 @@ specials: [
 //   unconfirmed = "drinks" while the drink prices are still samples, plus any item name whose price/description Melody must check.
 realPhotos: ["Lemon Pepper Wings","Lobster Mac & Cheese","Melody Burger Mac & Cheese","Chicken Parmesan Mac & Cheese","Mango Margarita"],
 unconfirmed: ["drinks"],
-weekly: ["Happy hour 3–6 daily","Mon: half off burgers 11–3","Tue: $4 tacos (every taco) & $6 margaritas","Thu: half off sandwiches 11–3","Fri: $3 sliders 11–3"]
+weekly: ["Happy hour 3–6 daily","Mon: half off burgers 11–3","Tue: $4 classic tacos, $6.99 elevated tacos & $6 margaritas","Thu: half off sandwiches 11–3","Fri: $3 sliders 11–3"]
 };

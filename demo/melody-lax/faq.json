@@ -5,7 +5,7 @@
   "Melody Bar & Grill is at 9132 S Sepulveda Blvd, Los Angeles, CA 90045 (Westchester), the closest bar to LAX, open since 1952.",
   "Phone: (310) 670-1994.",
   "Happy hour is 3-6 daily.",
-  "Mon: half off burgers 11-3. Tue: $4 tacos (every taco) and $6 margaritas. Thu: half off sandwiches 11-3. Fri: $3 sliders 11-3.",
+  "Mon: half off burgers 11-3. Tue (Taco Tuesday, 11 AM to midnight): classic tacos $4 each, elevated tacos $6.99 each, and $6 margaritas. Thu: half off sandwiches 11-3. Fri: $3 sliders 11-3.",
   "Karaoke, live bands, DJs, trivia and every game on the TVs happen every week.",
   "Melody Rewards is free to join. You earn 10 points per $1 on eligible purchases (before tip).",
   "Join bonus: +100 points. Birthday bonus: +250 once a year. Referral: +100 per friend who joins with your code and makes a first visit.",
@@ -146,7 +146,7 @@
   },
   {
    "q": "What are the daily specials?",
-   "a": "Mon: half off burgers 11-3. Tue: $4 tacos (every taco) and $6 margaritas. Thu: half off sandwiches 11-3. Fri: $3 sliders 11-3. Happy hour is 3-6 daily.",
+   "a": "Mon: half off burgers 11-3. Tue (Taco Tuesday, 11 AM to midnight): classic tacos $4 each, elevated tacos $6.99 each, and $6 margaritas. Thu: half off sandwiches 11-3. Fri: $3 sliders 11-3. Happy hour is 3-6 daily.",
    "tags": [
     "specials",
     "daily",
@@ -169,7 +169,7 @@
   },
   {
    "q": "What's the Tuesday special?",
-   "a": "Taco Tuesday: every taco is $4, and margaritas are $6.",
+   "a": "Taco Tuesday is Tuesdays only, 11 AM to midnight. Classic tacos are $4 each: Chicken, Steak, Carnitas, Dockside Fish, Shrimp, Salmon, Avocado, Beyond and Vegan Carnitas. Elevated Taco Specials are $6.99 each: Baja Shrimp Taco Melt, Smash Burger Taco, and Sweet & Spicy Fried Chicken Taco. Margaritas are $6.",
    "tags": [
     "tuesday",
     "taco",
@@ -1041,7 +1041,7 @@
   },
   {
    "q": "What's on the menu?",
-   "a": "The app menu has Starters, Mac & Cheese, Burgers, Fries, Soups, and Tacos & Burritos, plus a drinks list. Browse it in the app.",
+   "a": "The app menu has Starters, Mac & Cheese, Burgers, Fries, Soups, Taco Tuesday (Tuesdays only), and Tacos & Burritos, plus a drinks list. Browse it in the app.",
    "tags": [
     "menu",
     "food",
@@ -1076,7 +1076,7 @@
   },
   {
    "q": "What tacos and burritos do you have?",
-   "a": "Tacos (2 per order): Shrimp, Salmon, Carnitas, Chicken, Avocado and Beyond. Burritos: Carnitas, Steak, Chicken and Bean & Cheese. Nachos and a Cheese Quesadilla too.",
+   "a": "Tacos (2 per order): Shrimp, Salmon, Carnitas, Chicken, Avocado and Beyond. Burritos: Carnitas, Steak, Chicken and Bean & Cheese. Nachos and a Cheese Quesadilla too. On Tuesdays there is a Taco Tuesday menu: classic tacos $4 each and Elevated Taco Specials $6.99 each.",
    "tags": [
     "tacos",
     "burrito",

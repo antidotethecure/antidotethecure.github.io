@@ -135,7 +135,7 @@ tr.dev{cursor:pointer}tr.dev:hover td{background:#ffffff08}tr.dev.sel td{backgro
 </main>
 <script src="../../demo/christian-live.js?v=or1"></script>
 <script src="squares-hq.js?v=sq2"></script>
-<script src="../../demo/melody-lax/menu-data.js?v=mg2"></script>
+<script src="../../demo/melody-lax/menu-data.js?v=mg3"></script>
 <script src="../../demo/listen.js?v=ls1"></script>
 <script>
 (function(){
@@ -145,10 +145,11 @@ var TKEY="christian-hq-token"+(TEST?"-test":""), TOKEN=null, DATA=null, R="all",
 var DAY=864e5, NAMES={"melody-bar-grill":"Melody Bar & Grill","nalu-vida":"Nalu Vida"};
 // LOGINS: [user id, what the login list shows]. The name in the Audit log comes from the backend (BO_USERS "name").
 // "melody-manager" is ONE login shared by Melody's management team (manager role: Melody only, enforced by Code.gs).
+// "allie": Allie's own staff login (2026-11-11, Melody only, job Manager (general) like Noe and Sami; Christian narrows it in 🔐 Team access).
 // "noe": Noe's own staff login (2026-11-09, Melody only, job Manager (general) like Sami; Christian narrows it in 🔐 Team access).
 // "sammy": Sami's own manager login (login id stays "sammy"; display name Sami since 10-18) (Melody only, job Manager (general)); her switches are set in 🔐 Team access.
 // Staff who requested access themselves log in with their email ("Staff: log in with your email"), not from this list.
-var LOGINS=[["christian","Christian"],["antidote","Antidote"],["melody-manager","Melody Management (manager)"],["sammy","Sami (Melody manager)"],["noe","Noe (Melody staff)"]];
+var LOGINS=[["christian","Christian"],["antidote","Antidote"],["melody-manager","Melody Management (manager)"],["sammy","Sami (Melody manager)"],["noe","Noe (Melody staff)"],["allie","Allie (Melody staff)"]];
 var ROLE="owner", MYSLUGS=["melody-bar-grill","nalu-vida"], MGR=false, PERMS={}, JOB="", STAFFMODE=false;
 // 🔐 TEAM ACCESS: keep JOBS + PERM keys in sync with Code.gs (JOBS / PERM_KEYS). The SERVER enforces every switch;
 // the page only hides what a login can't use. Owners (Christian, Antidote) always have everything.
@@ -822,7 +823,7 @@ function launch(){ var F="../../files/christian-7045b2/";
   var row=function(k,t,n){ return "<div class='st'>"+chip(k)+"<div><b>"+t+"</b><span class='n'>"+n+"</span></div></div>"; };
   var STATUS=[
     ["ok","Melody app, game, rewards and 4K menu","Built. Guests play, earn points, use Just Landed, sign up and get rewards. The menu is view-only: guests order and pay with their server."],
-    ["ok","This HQ + team logins","Christian, Melody Management, Sami and Noe each have a login. Christian decides what each person can do in 🔐 Team access."],
+    ["ok","This HQ + team logins","Christian, Melody Management, Sami, Noe and Allie each have a login. Christian decides what each person can do in 🔐 Team access."],
     ["ok","QR stickers, table cards 1–40 and the window poster","Designed and scan-tested. Ready to print."],
     ["ok","Staff guide + training quiz","Safe to text to staff. It never shows guest info."],
     ["wt","Shift deal texts for staff","Built. Staff add their number and start times in the staff guide, and you approve them in 🔐 Team access. Texts start once the phone carriers approve the business number. Until then, people who add an email get it by email."],

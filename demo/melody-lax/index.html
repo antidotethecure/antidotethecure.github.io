@@ -170,6 +170,9 @@ h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;le
 .gamebox.ssai-fsfill #over.on{position:absolute;left:0;right:0;bottom:0;z-index:6;max-height:66%;overflow:auto;margin:0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(26,10,12,.82),rgba(26,10,12,.97))}
 .gbtn{position:absolute;z-index:2;width:34px;height:34px;padding:0;border-radius:50%;border:1px solid #ffffff38;background:rgba(26,10,12,.62);color:#fff;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .gbtn.off{opacity:.6}
+/* the round music on/off button beside the game (gamemenu.js): gold while music is on, so the dark note can be seen (2026-11-11) */
+body .gm-mbtn{background:linear-gradient(180deg,var(--gold2),var(--gold));border-color:var(--gold2)}
+body .gm-mbtn.mute{background:rgba(14,17,30,.86);border-color:rgba(255,255,255,.22);opacity:1}
 .gbtn.songb{width:auto;max-width:56%;border-radius:17px;padding:0 11px;gap:5px;font:600 12px/1 Barlow,system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* speed boost button (2026-10-14): bottom-left above the gun button (the right edge holds the fixed Pause / music / full screen / lock column); a ring meter fills as it recharges */
 .bbtn{left:8px;bottom:60px;right:auto;top:auto;width:58px;height:58px;flex-direction:column;gap:0;border:0;background:conic-gradient(#5fd0ff var(--f,360deg),rgba(255,255,255,.14) 0);padding:3px}
@@ -280,6 +283,15 @@ h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:800;le
 @media (max-width:340px){#press .stamp{display:none}#press blockquote{padding-right:0}}
 #press.in .clip{animation:presin .9s cubic-bezier(.2,.9,.25,1.2) both}
 @keyframes presin{from{opacity:0;transform:translateY(18px) rotate(-7deg) scale(.94)}to{opacity:1;transform:rotate(-1.6deg)}}
+/* refer-a-friend card, right under the L.A. Times clip (2026-11-11). Numbers come from SSAI_REWARDS. */
+#refcard{max-width:440px;margin:0 auto 6px;padding:16px 16px 14px;border-radius:16px;border:1px solid var(--gold);background:var(--panel);scroll-margin-top:80px}
+#refcard h3{margin:0;font:900 24px/1.1 var(--display);color:var(--ink)}
+#refcard h3 b{color:var(--gold)}
+#refcard ol{margin:10px 0 12px;padding:0;list-style:none;counter-reset:rf}
+#refcard li{counter-increment:rf;position:relative;padding:5px 0 5px 34px;font-size:15px;line-height:1.35;color:var(--ink)}
+#refcard li::before{content:counter(rf);position:absolute;left:0;top:4px;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#1a0a0c;font-weight:900;font-size:13px;display:grid;place-items:center}
+#refcard .btn{width:100%;justify-content:center;font-size:16px}
+#refcard small{display:block;margin-top:8px;font-size:12px;color:var(--ink);opacity:.7;text-align:center}
 #tow.lat .flag{background:linear-gradient(180deg,#fbf6ea,#e9dfc8);border-color:#1b1712;color:#1b1712;font-family:Georgia,serif}
 #tow.lat .flag b{font:700 15px/1.1 Georgia,"Times New Roman",serif;color:#9b1c1c;letter-spacing:.02em}
 @media (prefers-reduced-motion:reduce){#press.in .clip{animation:none}}
@@ -334,6 +346,20 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
     <div class="stamp" aria-hidden="true"><div><i>&#9733;</i>Featured<br>in the<br>L.A. Times</div></div>
   </a>
 </section>
+
+<section id="refcard" aria-label="Refer a friend">
+  <h3>🤝 Refer a friend, get <b><span data-rf="referral">100</span> points</b></h3>
+  <ol>
+    <li>Join Melody Rewards. It's free and you get <span data-rf="join">100</span> welcome points.</li>
+    <li>Tap <b>Text a friend</b> on your member card to send your invite link.</li>
+    <li>Your friend joins with your code and comes in. You get <b>+<span data-rf="referral">100</span> points</b>, and they get <span data-rf="join">100</span> welcome points too.</li>
+  </ol>
+  <a class="btn hot" href="#crm-join" id="refgo">📲 Get my invite link</a>
+  <small>Points pay once per friend, after their first visit.</small>
+</section>
+<script>(function(){ var R=window.SSAI_REWARDS||{}; [].forEach.call(document.querySelectorAll("#refcard [data-rf]"),function(n){ var v=R[n.getAttribute("data-rf")]; if(v) n.textContent=v; });
+  /* members land on their "Invite friends" box (Text a friend / Copy link); everyone else lands on the join form */
+  document.getElementById("refgo").addEventListener("click",function(e){ var b=document.getElementById("crm-ref"); if(b){ e.preventDefault(); b.scrollIntoView({behavior:"smooth",block:"center"}); } }); })();</script>
 
 <nav id="mtabs" aria-label="Sections"><div class="mt-row">
   <a href="#sec-sports" data-tab="sports">📺 Sports</a><a href="#sec-games" data-tab="games">✈️ Games</a><a href="#sec-trivia" data-tab="trivia">🎤 Trivia</a><a href="#sec-landed" data-tab="landed">🛬 Just Landed</a><a href="#sec-members" data-tab="members">⭐ Members</a><a href="#sec-menu" data-tab="menu">🍽️ Menu</a>
@@ -1608,7 +1634,7 @@ function boltPath(x){ var pts=[[x,-10]], y=-10; while(y<H){ y+=30+Math.random()*
 var SND=(function(){
   function ld(k,d){ try{ var v=localStorage.getItem(k); return v==null?d:v==="1"; }catch(e){ return d; } }
   function sv(k,v){ try{ localStorage.setItem(k,v?"1":"0"); }catch(e){} }
-  var st={sound:ld("melody-sound",true),music:ld("melody-music",true),sfx:ld("melody-sfx",true)}, ctx=null, master, fx, mus, nb, eng=null, rot=null, song=null, routed=false, last={}, engT=0, MUSV=.22;
+  var st={sound:ld("melody-sound",true),music:ld("melody-music",true),sfx:ld("melody-sfx",true)}, ctx=null, master, fx, mus, nb, eng=null, rot=null, song=null, routed=false, away=false, last={}, engT=0, MUSV=.22;
   function init(){ if(ctx) return ctx; try{ ctx=AC||new (window.AudioContext||window.webkitAudioContext)(); AC=ctx; }catch(e){ return null; }
     master=ctx.createGain(); master.connect(ctx.destination); fx=ctx.createGain(); fx.connect(master); mus=ctx.createGain(); mus.connect(master);
     nb=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate); var d=nb.getChannelData(0); for(var i=0;i<d.length;i++) d[i]=Math.random()*2-1;
@@ -1626,8 +1652,8 @@ var SND=(function(){
   /* two songs, switchable from the HUD 🎵 pill, the pause menu, Settings, the M key or controller B (../songswitch.js, short crossfade) */
   var MS=SongSwitch({key:"melody-song",vol:MUSV,fade:.8,songs:[{id:"xrp",name:"Xtreme Rich Person",src:"audio/xtreme-rich-person.m4a"},{id:"cheat",name:"Cheat Code",src:"audio/cheat-code.m4a"}],onTap:function(){ unlock(); }});
   function songEl(){ song=MS.el(); return song; }
-  function apply(){ if(!ctx) return; var t=ctx.currentTime; master.gain.setTargetAtTime(st.sound?1:0,t,.05); fx.gain.setTargetAtTime(st.sfx?1:0,t,.05); mus.gain.setTargetAtTime(routed?MUSV:1,t,.05);
-    if(song) MS.sync(st.sound&&st.music); }
+  function apply(){ if(!ctx) return; var t=ctx.currentTime; var on=st.sound&&!away; master.gain.setTargetAtTime(on?1:0,t,.05); fx.gain.setTargetAtTime(st.sfx?1:0,t,.05); mus.gain.setTargetAtTime(routed?MUSV:1,t,.05);
+    if(song) MS.sync(on&&st.music); }
   function unlock(){ try{ if(navigator.audioSession&&navigator.audioSession.type!=="playback") navigator.audioSession.type="playback"; }catch(e){}   // iOS 17+: play through the silent switch like a game
     if(!init()) return; if(ctx.state!=="running") try{ ctx.resume(); }catch(e){}
     if(!song){ songEl(); MS.attach(ctx,mus); routed=MS.routed(); }
@@ -1673,6 +1699,7 @@ var SND=(function(){
   };
   return {
     unlock:unlock, out:function(){ return ok()?fx:null; },
+    away:function(v){ v=!!v; if(v===away) return; away=v; apply(); },   // game scrolled out of view: all game sound off, the song pauses where it is; back in view = back on
     play:function(n,a){ if(!ok()||!LIB[n]) return; var now=performance.now(); if(GAP[n]&&last[n]&&now-last[n]<GAP[n]) return; last[n]=now; try{ LIB[n](a); }catch(e){} },
     engine:function(v){ if(!ctx||!eng) return; var now=performance.now(); if(now-engT<90) return; engT=now; var t=ctx.currentTime;
       if(v<0){ eng.g.gain.setTargetAtTime(0,t,.4); return; }
@@ -2781,6 +2808,8 @@ cv.addEventListener("pointermove",function(e){ if(!drag||!G.running||e.pointerId
 ["pointerup","pointercancel","lostpointercapture"].forEach(function(t){ cv.addEventListener(t,function(e){ if(drag&&e.pointerId===drag.id) drag=null; }); });
 ["touchend","click"].forEach(function(t){ cv.addEventListener(t,function(){ SND.unlock(); },{passive:true}); });   // iOS unlocks audio on touchend/click
 $("sndb").addEventListener("click",function(){ SND.unlock(); SND.set("sound",!SND.state().sound); });
+/* scroll away from the game = its sound stops (Antidote 2026-11-11); under 25% of the game on screen counts as away */
+if(window.IntersectionObserver) new IntersectionObserver(function(es){ var e=es[es.length-1]; SND.away(!(e.isIntersecting&&e.intersectionRatio>=.25)); },{threshold:[0,.25]}).observe(document.querySelector(".cvwrap"));
 syncBtns();
 var KEYS={ArrowLeft:"l",ArrowRight:"r",ArrowUp:"u",ArrowDown:"d",KeyA:"l",KeyD:"r",KeyW:"u",KeyS:"d"};
 addEventListener("keydown",function(e){ if(!G.running) return; var tg=e.target, tn=tg&&tg.tagName; if(tn==="INPUT"||tn==="TEXTAREA"||tn==="SELECT"||(tg&&tg.isContentEditable)) return;

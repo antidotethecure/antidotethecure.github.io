@@ -11,7 +11,12 @@ const STATUS = window.__R663 = { on: false, reason: "", fps: 0, tier: "" };
 function hasWebGL() { try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch (e) { return false; } }
 if (R && REQ !== "2d") {
   if (!hasWebGL()) STATUS.reason = "no WebGL";
-  else boot().catch(e => { STATUS.reason = "boot failed: " + (e && e.message || e); console.warn("[route66-3d] staying 2D:", e); R.r3d.on = false; R.r3d.render = null; });
+  else {
+    // Play waits for the 3D models (20 s at most) so a run never starts on the flat road and never swaps mid-drive
+    const R3 = R.r3d, free = () => { R3.wait = false; const go = R3.go; R3.go = null; if (go) go(); };
+    R3.wait = true; setTimeout(free, 20000);
+    boot().catch(e => { STATUS.reason = "boot failed: " + (e && e.message || e); console.warn("[route66-3d] staying 2D:", e); R3.on = false; R3.render = null; }).then(free);
+  }
 }
 
 async function boot() {
@@ -22,8 +27,8 @@ async function boot() {
   const U = 56, RZ = 172, HITCH = 1.47 * U;              // world units per metre; the truck's rear bumper (its nose is where the game's hits happen); hitch ball behind the rear axle
   const CAM_Y = 320, CAM_Z = 740, LOOK_Y = CAM_Y - 151, LOOK_Z = CAM_Z - 1000;   // same pitch as before (horizon at y 236 of 640), pulled back to fit the whole rig
   const ready = im => im && (im.naturalWidth > 0 || im.width > 0 && !("naturalWidth" in im));
-  // the photos load on their own clock: wait for the rig, the first sky and the smoke before going 3D (8 s, then stay 2D)
-  for (let i = 0; !(SP.truck && SP.fire && ready(R.BGI[0]) && R.SMK.every(ready)); i++) { if (i > 80) throw new Error("art not loaded"); await new Promise(r => setTimeout(r, 100)); }
+  // the photos load on their own clock: wait for the rig, the first sky and the smoke before going 3D (30 s, then stay 2D)
+  for (let i = 0; !(SP.truck && SP.fire && ready(R.BGI[0]) && R.SMK.every(ready)); i++) { if (i > 300) throw new Error("art not loaded"); await new Promise(r => setTimeout(r, 100)); }
   // photo ground per leg (Higgsfield top-down textures); the code-drawn tile is the fallback until/unless they load
   const GT = 800, GND = ["grass", "dry", "desert", "desert", "desert", "grass"], GTINT = ["#ffffff", "#ffffff", "#e8b78c", "#f2c79a", "#ffffff", "#ffffff"], gphoto = {};
   ["grass", "dry", "desert"].forEach(n => { const im = new Image(); im.src = "img/r66/ground-" + n + ".webp"; gphoto[n] = im; });
@@ -174,7 +179,7 @@ async function boot() {
   const GLB = { truck: [5.5], trailer: [4.0, 1.0], car1: [5.1], car2: [4.9], car3: [4.9] }, G = {};   // length in metres; a second number = measured from its front, which sits that far ahead of z 0 (the smoker's tongue reaches under the bumper to the hitch)
   try {
     const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js"), { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js"), ld = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder), box = new THREE.Box3(), v = new THREE.Vector3();
-    await Promise.all(Object.keys(GLB).map(k => Promise.race([ld.loadAsync(new URL("./models/" + k + ".glb", import.meta.url).href), new Promise((_, no) => setTimeout(no, 8000))]).then(gl => {
+    await Promise.all(Object.keys(GLB).map(k => Promise.race([ld.loadAsync(new URL("./models/" + k + ".glb", import.meta.url).href), new Promise((_, no) => setTimeout(no, 25000))]).then(gl => {
       const s = gl.scene, g = new THREE.Group(), top = new THREE.Vector3(0, -1, 0);
       s.rotation.y = -Math.PI / 2; s.updateMatrixWorld(true); box.setFromObject(s);   // they come lying along x
       const f = GLB[k][0] / (box.max.z - box.min.z);
@@ -183,6 +188,7 @@ async function boot() {
       g.userData.top = top; g.add(s); G[k] = g;   // top = its highest point, where the smoker's stack ends
     }, () => {})));
   } catch (e) {}
+  STATUS.models = Object.keys(G);
   const glowC = paint(64, 64, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.25, "rgba(255,255,255,.55)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, w, w); });
   const glowM = c => new THREE.SpriteMaterial({ map: tex(glowC), color: c, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, fog: false, opacity: 0.85 }), RED = glowM(0xff3018), EMBER = glowM(0xff8a2a);
   function glow(g, m, x, y, z, s) { const sp = new THREE.Sprite(m); sp.position.set(x, y, z); sp.scale.set(s, s, 1); g.add(sp); }   // lamp glow: light added on top, in the model's own metres
@@ -195,6 +201,11 @@ async function boot() {
   if (G.trailer) { trailer.userData.stack = trailer.userData.top; trailer.userData.fire = new THREE.Vector3(0, 1.0, 2.55); }   // its firebox door faces back
   [-1, 1].forEach(s => { glow(truck, RED, s * 0.9, 1.06, 0.14, 0.5); glow(trailer, RED, s * TL[0], TL[1], TL[2], 0.42); }); glow(trailer, EMBER, trailer.userData.fire.x, trailer.userData.fire.y, trailer.userData.fire.z + 0.1, 0.8);
   truck.scale.setScalar(U); trailer.scale.setScalar(U); pivot.position.z = RZ - 1.2 * U; truck.position.z = 1.2 * U; pivot.add(truck); trailer.position.z = RZ + 0.27 * U; rig.add(pivot, trailer); scene.add(rig);
+  // the truck's four wheels are their own parts (cut out of the mesh, engine3d/CREDITS.md): they roll, and the front pair steers
+  const wheels = ["wheel_fl", "wheel_fr", "wheel_rl", "wheel_rr"].map(n => truck.getObjectByName(n)).filter(Boolean), NOSE = 2.4 * U;   // NOSE = rear axle to the middle of the cab, the part the game's hit box follows
+  wheels.forEach(w => { w.rotation.order = "YZX"; }); rig.updateMatrixWorld(true);
+  const wheelR = wheels[0] ? new THREE.Box3().setFromObject(wheels[0]).getSize(new THREE.Vector3()).y / 2 : 1;
+  let rearX = 0, steerA = 0, spin = 0;
   heroSh.scale.set(175, 1, 540);
   const stackW = new THREE.Vector3(), hoodW = new THREE.Vector3();
 
@@ -276,8 +287,14 @@ async function boot() {
     const k = st.bgX < 400 ? st.bgX / 400 : (800 - st.bgX) / 400; sky.position.x = cam.position.x + (0.5 - k) * 1700; sky.position.y = -40;   // the bends pan the sky like the 2D road does
     const sc = st.dist * KZ / RT; scroll.forEach(t => { t.offset.y = sc % 1; }); groundMat.map.offset.y = (st.dist * KZ / GT) % 2;
     bendDirt(); bendRoad();
-    const flat = st.flat > 0, ty = Math.sin(st.dist / 46) * 0.9 + (flat ? Math.abs(Math.sin(st.t / 45)) * 2.4 : 0), sw = st.sway || 0;
-    rig.position.set(st.px, ty, 0); pivot.rotation.set(0, -(st.tilt || 0) * 0.6, (st.tilt || 0) * 0.2 + (flat ? 0.04 : 0));   // nose into the lane change, body rolls out of it; a flat drops the left rear
+    const flat = st.flat > 0, ty = Math.sin(st.dist / 46) * 0.9 + (flat ? Math.abs(Math.sin(st.t / 45)) * 2.4 : 0), sw = st.sway || 0, V = Math.max(st.speed * KZ, 500);
+    // it steers like a real truck: the cab goes where the game puts it and drags the rear axle after it, so the nose swings into the lane change and the tail follows
+    rearX += (st.px - rearX) * (1 - Math.exp(-V / NOSE * dt)); rearX = Math.max(st.px - NOSE * 0.42, Math.min(st.px + NOSE * 0.42, rearX));
+    const yaw = -Math.asin((st.px - rearX) / NOSE);
+    steerA += (Math.max(-0.6, Math.min(0.6, Math.atan2(st.pv || 0, V) + yaw)) - steerA) * Math.min(1, dt * 18);   // the front wheels point where the cab is heading
+    rig.position.set(rearX, ty, 0); pivot.rotation.set(0, yaw, steerA * 0.12 + (flat ? 0.04 : 0));   // the body rolls out of the turn; a flat drops the left rear
+    spin += Math.min(V / wheelR, 16) * dt;   // slower than true so the spokes read as rolling instead of strobing
+    for (let i = 0; i < wheels.length; i++) { wheels[i].rotation.z = spin; if (wheels[i].name.charAt(6) === "f") wheels[i].rotation.y = -steerA; }
     trailer.position.x = HITCH * Math.sin(pivot.rotation.y); trailer.position.y = Math.sin(st.dist / 23) * 0.8; trailer.rotation.set(0, sw * 0.012, -sw * 0.004);   // the hitch swings out with the truck's tail, the smoker lags behind it
     rig.updateMatrixWorld(true); trailer.localToWorld(stackW.copy(trailer.userData.stack)); truck.localToWorld(hoodW.set(0, 1.3, -4.6));
     heroSh.visible = !shOn; heroSh.position.set(st.px, 0, RZ - 30);
@@ -310,7 +327,13 @@ async function boot() {
         put(v.a, x, 16 + Math.sin(st.t / 220 + o.bob) * 7, z, ow, oh); const rw = Math.max(ow, 64) * 1.7; v.b.position.set(x, 0, z); v.b.scale.set(rw, 1, rw * 1.5);
       } else if (o.kind === "hole") { if (!v.a) v.a = mesh(FLAT, spr, -1); v.a.position.set(x, 0, z); v.a.scale.set(ow * 1.15, 1, ow * 1.9); }
       else if (o.kind === "weed") { if (!v.a) v.a = mesh(MID, spr, 0, true); put(v.a, x, ow / 2, z, ow, ow); v.a.rotation.z = -o.rot; shadow(v, x, z, ow * 1.2, ow * 1.3); }
-      else if (o.kind === "deer") { if (!v.a) v.a = mesh(UP, spr, 0, true); put(v.a, x, Math.abs(Math.sin(st.t / 90)) * 9, z, (o.vx > 0 ? -ow : ow) * 1.25, oh * 1.25); shadow(v, x, z, ow * 1.3, ow * 0.9); }   // the photo faces left
+      else if (o.kind === "deer") {   // the photo faces left and is mid-leap: it bounds across in arcs, nose up then down, its shadow shrinking under it, dust where it lands
+        const u = Math.abs(o.wx + 4000) / 75 % 1, hop = 4 * u * (1 - u), dir = o.vx > 0 ? -1 : 1, dh = oh * 1.25;
+        if (!v.a) v.a = mesh(MID, spr, 0, true); put(v.a, x, dh / 2 + hop * 34, z, dir * ow * 1.25, dh); v.a.rotation.z = -dir * (0.5 - u) * 0.5;
+        shadow(v, x, z, ow * 1.3 * (1 - hop * 0.35), ow * 0.9 * (1 - hop * 0.35));
+        if (v.u > u + 0.5) puff(x, 5, z, 0xc9b08a, 1.6, 12, 50, 0.5, 0.4, rs(24), 14, st.speed * KZ);
+        v.u = u;
+      }
       else { if (!v.a) v.a = mesh(UP, spr, 0, true); put(v.a, x, 0, z, ow, oh); }
     }
     views.forEach((v, key) => { if (v.n !== frameNo) { drop(v); views.delete(key); } });

@@ -170,16 +170,30 @@ async function boot() {
 
   /* ---------- the 3D models: the rig, the traffic, the cones ---------- */
   const M = makeModels(THREE, RoundedBoxGeometry, mergeGeometries);
+  /* photo-real meshes we generated (engine3d/CREDITS.md), each turned, sized and set down like the code-built model it replaces; one that is slow or fails to load keeps that stand-in */
+  const GLB = { truck: [5.5], trailer: [4.0, 1.0], car1: [5.1], car2: [4.9], car3: [4.9] }, G = {};   // length in metres; a second number = measured from its front, which sits that far ahead of z 0 (the smoker's tongue reaches under the bumper to the hitch)
+  try {
+    const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js"), { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js"), ld = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder), box = new THREE.Box3(), v = new THREE.Vector3();
+    await Promise.all(Object.keys(GLB).map(k => Promise.race([ld.loadAsync(new URL("./models/" + k + ".glb", import.meta.url).href), new Promise((_, no) => setTimeout(no, 8000))]).then(gl => {
+      const s = gl.scene, g = new THREE.Group(), top = new THREE.Vector3(0, -1, 0);
+      s.rotation.y = -Math.PI / 2; s.updateMatrixWorld(true); box.setFromObject(s);   // they come lying along x
+      const f = GLB[k][0] / (box.max.z - box.min.z);
+      s.scale.setScalar(f); s.position.set(-f * (box.min.x + box.max.x) / 2, -f * box.min.y, GLB[k][1] ? -f * box.min.z - GLB[k][1] : -f * box.max.z); s.updateMatrixWorld(true);
+      s.traverse(o => { if (!o.isMesh) return; o.castShadow = o.receiveShadow = true; const p = o.geometry.attributes.position; for (let i = 0; i < p.count; i++) if (v.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld).y > top.y) top.copy(v); });
+      g.userData.top = top; g.add(s); G[k] = g;   // top = its highest point, where the smoker's stack ends
+    }, () => {})));
+  } catch (e) {}
   const glowC = paint(64, 64, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.25, "rgba(255,255,255,.55)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, w, w); });
   const glowM = c => new THREE.SpriteMaterial({ map: tex(glowC), color: c, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, fog: false, opacity: 0.85 }), RED = glowM(0xff3018), EMBER = glowM(0xff8a2a);
   function glow(g, m, x, y, z, s) { const sp = new THREE.Sprite(m); sp.position.set(x, y, z); sp.scale.set(s, s, 1); g.add(sp); }   // lamp glow: light added on top, in the model's own metres
-  const protos = { car1: M.sedan(0x4fb3b0), car2: M.pickup(0xefe2c0), car3: M.wagon(0xa8231c), cone: M.cone() }, vpool = { car1: [], car2: [], car3: [], cone: [] };
+  const protos = { car1: G.car1 || M.sedan(0x4fb3b0), car2: G.car2 || M.pickup(0xefe2c0), car3: G.car3 || M.wagon(0xa8231c), cone: M.cone() }, vpool = { car1: [], car2: [], car3: [], cone: [] };
   [["car1", 0.9, 1.0], ["car2", 0.9, 1.06], ["car3", 0.84, 0.78]].forEach(a => [-1, 1].forEach(s => glow(protos[a[0]], RED, s * a[1], a[2], 0.14, 0.55)));
   Object.keys(protos).forEach(k => protos[k].scale.setScalar(k === "cone" ? U * 1.8 : U));
   function veh(key) { const g = vpool[key].pop() || protos[key].clone(); g.visible = true; g.rotation.set(0, 0, 0); if (!g.parent) scene.add(g); return g; }   // clones share geometry and materials
   // the rig: the truck turns about its rear axle, the smoker hangs on the hitch ball and swings on it
-  const rig = new THREE.Group(), pivot = new THREE.Group(), truck = M.pickup(0xb3201a), trailer = M.trailer(), heroSh = mesh(FLAT, blobC, -1);
-  [-1, 1].forEach(s => { glow(truck, RED, s * 0.9, 1.06, 0.14, 0.5); glow(trailer, RED, s * 0.7, 0.47, 2.86, 0.42); }); glow(trailer, EMBER, trailer.userData.fire.x, trailer.userData.fire.y, trailer.userData.fire.z + 0.1, 0.8);
+  const rig = new THREE.Group(), pivot = new THREE.Group(), truck = G.truck || M.pickup(0xb3201a), trailer = G.trailer || M.trailer(), heroSh = mesh(FLAT, blobC, -1), TL = G.trailer ? [0.51, 0.42, 3.02] : [0.7, 0.47, 2.86];
+  if (G.trailer) { trailer.userData.stack = trailer.userData.top; trailer.userData.fire = new THREE.Vector3(0, 1.0, 2.55); }   // its firebox door faces back
+  [-1, 1].forEach(s => { glow(truck, RED, s * 0.9, 1.06, 0.14, 0.5); glow(trailer, RED, s * TL[0], TL[1], TL[2], 0.42); }); glow(trailer, EMBER, trailer.userData.fire.x, trailer.userData.fire.y, trailer.userData.fire.z + 0.1, 0.8);
   truck.scale.setScalar(U); trailer.scale.setScalar(U); pivot.position.z = RZ - 1.2 * U; truck.position.z = 1.2 * U; pivot.add(truck); trailer.position.z = RZ + 0.27 * U; rig.add(pivot, trailer); scene.add(rig);
   heroSh.scale.set(175, 1, 540);
   const stackW = new THREE.Vector3(), hoodW = new THREE.Vector3();

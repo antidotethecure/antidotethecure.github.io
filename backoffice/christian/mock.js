@@ -254,6 +254,7 @@
     if (d.type === "bo_todo" && !may(u, "todo")) return NOPE;
     if (d.type === "squares_admin") return window.SQUARES_MOCK ? window.SQUARES_MOCK(Object.assign({}, d, { by: rec(u).name })) : { ok: false, reason: "Test squares backend missing" };   // demo/sports/squares-mock.js
     if (d.type === "bo_dedupe") return SC.role === "owner" ? { ok: true, removed: 0 } : NOPE;
+    if (d.type === "bo_blast") return SC.role === "owner" ? { ok: false, reason: "Texting isn't switched on yet (waiting on carrier approval). Nothing was sent." } : NOPE;
     if (d.type === "bo_todo") {
       if (d.op === "add") { var tx = String(d.text || "").replace(/[<>]/g, "").trim(); if (tx.length < 3 || tx.length > 140) return { ok: false, reason: "Type the to-do (3 to 140 characters)." };
         var ts = d.slug === "all" ? "all" : d.slug || (SC.role === "owner" ? "all" : SC.slugs[0]); if (ts === "all" ? SC.role !== "owner" : !can(u, ts)) return NOPE;

@@ -70,5 +70,20 @@ for (const [slug, file] of Object.entries(APPS)) {
   t(`${slug}: every reward is worth more than the one below it`, dead.length === 0, dead);
 }
 
+// 2026-11-11: HQ takes Zelle / Cash App / Venmo / PayPal only, the Quick tour must point at real tabs,
+// and the Staff tab's training card links files that have to be in the repo.
+{
+  const hq = fs.readFileSync(path.join(ROOT, "backoffice/christian/index.html"), "utf8");
+  t("HQ: no Stripe wording left", !/stripe/i.test(hq));
+  const lit = s => vm.runInNewContext("(" + s + ")");
+  const tabs = lit(hq.match(/TABS=(\[\[.*?\]\])/)[1]).map(x => x[0]);
+  const tour = lit(hq.match(/TOUR=(\[[\s\S]*?\]\]\]);/)[1]);
+  const bad = tour.filter(x => x.length !== 4 || !(x[0] === "todo-top" || tabs.includes(x[0])) || !x[1] || !x[2] || !(x[3].length >= 2)).map(x => x[0]);
+  t("HQ: every Quick tour stop opens a real tab and has steps", tour.length >= 10 && bad.length === 0, bad);
+  const miss = ["en.mp4", "es.mp4", "poster.jpg"].filter(f => !fs.existsSync(path.join(ROOT, "staff/christian/training/melody-training-" + f)));
+  t("HQ: training video (EN + ES) and its poster are in the repo", hq.includes("staff/christian/training/melody-training") && miss.length === 0, miss);
+  t("staff guide: has the ?print=1 handout", /print=1/.test(fs.readFileSync(path.join(ROOT, "staff/christian/index.html"), "utf8")) && hq.includes("staff/christian/?print=1"));
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

@@ -19,7 +19,7 @@ async function boot() {
   const CAM_Y = 300, CAM_Z = 470, LOOK_Y = 149, LOOK_Z = -530;   // puts the horizon and the rig where the 2D game has them (y 236 and 566 of 640)
   const ready = im => im && (im.naturalWidth > 0 || im.width > 0 && !("naturalWidth" in im));
   // the photos load on their own clock: wait for the rig, the first sky and the smoke before going 3D (8 s, then stay 2D)
-  for (let i = 0; !(SP.truck && ready(R.BGI[0]) && R.SMK.every(ready)); i++) { if (i > 80) throw new Error("art not loaded"); await new Promise(r => setTimeout(r, 100)); }
+  for (let i = 0; !(SP.truck && SP.truckbody && SP.smoker && SP.fire && ready(R.BGI[0]) && R.SMK.every(ready)); i++) { if (i > 80) throw new Error("art not loaded"); await new Promise(r => setTimeout(r, 100)); }
   // photo ground per leg (Higgsfield top-down textures); the code-drawn tile is the fallback until/unless they load
   const GT = 800, GND = ["grass", "dry", "desert", "desert", "desert", "grass"], GTINT = ["#ffffff", "#ffffff", "#e8b78c", "#f2c79a", "#ffffff", "#ffffff"], gphoto = {};
   ["grass", "dry", "desert"].forEach(n => { const im = new Image(); im.src = "img/r66/ground-" + n + ".webp"; gphoto[n] = im; });
@@ -132,14 +132,14 @@ async function boot() {
     if (!m.parent) scene.add(m); return m;
   }
   const blobC = paint(64, 64, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 2, w / 2, w / 2, w / 2); gr.addColorStop(0, "rgba(0,0,0,.6)"); gr.addColorStop(0.6, "rgba(0,0,0,.32)"); gr.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = gr; g.fillRect(0, 0, w, w); });
-  const ringC = paint(128, 128, (g, w) => { g.strokeStyle = "rgba(255,206,92,.95)"; g.lineWidth = 9; g.shadowColor = "#ffb020"; g.shadowBlur = 14; g.beginPath(); g.arc(w / 2, w / 2, w / 2 - 20, 0, 7); g.stroke(); });
+  const ringC = paint(128, 128, (g, w) => { const gr = g.createRadialGradient(w / 2, w / 2, 4, w / 2, w / 2, w / 2); gr.addColorStop(0, "rgba(255,214,140,.5)"); gr.addColorStop(0.5, "rgba(255,190,96,.2)"); gr.addColorStop(1, "rgba(255,180,80,0)"); g.fillStyle = gr; g.fillRect(0, 0, w, w); });   // soft warm light on the road, no outline
   function view(key) { let v = views.get(key); if (!v) { v = { a: null, b: null, n: 0, own: null }; views.set(key, v); } v.n = frameNo; return v; }
   function drop(v) {
     if (v.a) { v.a.visible = false; pool.push(v.a); } if (v.b) { v.b.visible = false; pool.push(v.b); }
     if (v.own) { const t = texs.get(v.own), m = mats.get(v.own); if (t) t.dispose(); if (m) m.dispose(); texs.delete(v.own); mats.delete(v.own); }   // each mileage sign is its own little canvas
   }
-  const truck = mesh(UP, SP.truck, 1), truckSh = mesh(FLAT, blobC, -1), TW = 136, TH = TW * SP.truck.h / SP.truck.w;
-  truck.scale.set(TW, TH, 1); truckSh.scale.set(TW * 1.5, 1, TH * 1.25);
+  const truck = mesh(UP, SP.truckbody, 1), smoker = mesh(UP, SP.smoker, 1.5), truckSh = mesh(FLAT, blobC, -1), TW = 136, TH = TW * SP.truck.h / SP.truck.w;   // the smoker is its own layer so it can sway on the hitch
+  truck.scale.set(TW, TH, 1); smoker.scale.set(TW, TH, 1); truckSh.scale.set(TW * 1.5, 1, TH * 1.25);
 
   /* ---------- smoke off the stack ---------- */
   const puffs = []; let puffI = 0, puffAcc = 0;
@@ -151,7 +151,7 @@ async function boot() {
     puffAcc += dt * (st.speed > 30 ? 10 + st.speed / 70 : 5);
     while (puffAcc >= 1) {
       puffAcc -= 1; const p = puffs[puffI = (puffI + 1) % puffs.length];
-      p.t = 0; p.life = 1.25 + Math.random() * 0.6; p.s.position.set(st.px - 1 + (Math.random() - 0.5) * 6, TH * 0.93, 4); p.s.visible = true;
+      p.t = 0; p.life = 1.25 + Math.random() * 0.6; p.s.position.set(st.px - 1 + st.sway * 2.2 + (Math.random() - 0.5) * 6, TH * 0.93, 4); p.s.visible = true;
       p.vx = -st.bend * 26 + (Math.random() - 0.5) * 26; p.vy = 62 + Math.random() * 34; p.vz = 60 + st.speed * 0.2 + Math.random() * 30;   // rises, and the wind of the drive carries it back past the camera
       p.vr = (Math.random() - 0.5) * 1.6; p.m.rotation = Math.random() * 6.28; p.w0 = 16 + Math.random() * 8; p.w1 = 78 + Math.random() * 44;
     }
@@ -160,6 +160,48 @@ async function boot() {
       p.t += dt; const u = p.t / p.life; if (u >= 1) { p.s.visible = false; continue; }
       p.s.position.x += p.vx * dt; p.s.position.y += p.vy * dt; p.s.position.z += p.vz * dt; p.vy *= 1 - dt * 0.5; p.m.rotation += p.vr * dt;
       const w = p.w0 + (p.w1 - p.w0) * (1 - (1 - u) * (1 - u)); p.s.scale.set(w, w * p.k, 1); p.m.opacity = Math.min(1, u * 7) * (1 - u) * (1 - u) * 0.5;
+    }
+  }
+
+  /* ---------- damage: engine smoke and flames, tyre and crash dust ---------- */
+  const fxs = [], fires = []; let fxI = 0, fireI = 0, engAcc = 0, fireAcc = 0, dustAcc = 0;
+  for (let i = 0; i < 44; i++) {
+    const im = R.SMK[i % 3], m = new THREE.SpriteMaterial({ map: tex(im), transparent: true, depthWrite: false, depthTest: false, opacity: i ? 0 : 0.01 }), s = new THREE.Sprite(m);
+    s.visible = !i; scene.add(s); fxs.push({ s, m, t: 9, life: 1, vx: 0, vy: 0, vz: 0, k: im.naturalHeight / im.naturalWidth, w0: 20, w1: 90, a: 0.5 });
+  }
+  for (let i = 0; i < 14; i++) {   // the flame photo is on black: added as light
+    const m = new THREE.SpriteMaterial({ map: tex(SP.fire), blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, depthTest: false, opacity: i ? 0 : 0.01 }), s = new THREE.Sprite(m);
+    s.center.set(0.5, 0.04); s.visible = !i; s.renderOrder = 0.95; scene.add(s); fires.push({ s, m, t: 9, life: 1, h: 80, x: 0, flip: 1 });
+  }
+  function puff(x, y, z, col, order, w0, w1, life, a, vx, vy, vz) {
+    const p = fxs[fxI = (fxI + 1) % fxs.length]; p.t = 0; p.life = life; p.w0 = w0; p.w1 = w1; p.a = a; p.vx = vx; p.vy = vy; p.vz = vz;
+    p.m.color.setHex(col); p.m.rotation = Math.random() * 6.28; p.s.renderOrder = order; p.s.position.set(x, y, z); p.s.visible = true;
+  }
+  const rs = n => (Math.random() - 0.5) * n;
+  function damage(st, dt) {
+    const d = st.dmg || 0, wind = st.speed * 0.25;
+    if (d > 0) {   // from under the hood, in front of the cab (drawn under the truck so the cab hides where it starts)
+      engAcc += dt * (4 + d * 6);
+      while (engAcc >= 1) { engAcc -= 1; puff(st.px + rs(44), 128 + rs(16), -34, [0, 0x9a9a9a, 0x4a4744, 0x23211f][d], 0.9, 26 + d * 6, 80 + d * 34, 1 + Math.random() * 0.5, 0.42 + d * 0.13, -st.bend * 26 + rs(24), 74 + Math.random() * 40, 30 + wind); }
+    }
+    if (d > 1) {
+      fireAcc += dt * (d > 2 ? 22 : 9);
+      while (fireAcc >= 1) { fireAcc -= 1; const f = fires[fireI = (fireI + 1) % fires.length]; f.t = 0; f.life = 0.32 + Math.random() * 0.3; f.h = (d > 2 ? 136 : 100) * (0.8 + Math.random() * 0.45); f.x = rs(d > 2 ? 76 : 50); f.flip = Math.random() < 0.5 ? -1 : 1; f.s.visible = true; }
+    }
+    if (st.flat > 0) {   // the popped rear tyre drags
+      dustAcc += dt * 14;
+      while (dustAcc >= 1) { dustAcc -= 1; puff(st.px - 46 + rs(10), 6, 14, 0xc9b08a, 1.6, 14, 62, 0.7 + Math.random() * 0.3, 0.5, rs(30) - 14, 16 + Math.random() * 18, 120 + wind); }
+    }
+    for (let i = 0; i < fxs.length; i++) {
+      const p = fxs[i]; if (!p.s.visible) continue;
+      p.t += dt; const u = p.t / p.life; if (u >= 1) { p.s.visible = false; continue; }
+      p.s.position.x += p.vx * dt; p.s.position.y += p.vy * dt; p.s.position.z += p.vz * dt;
+      const w = p.w0 + (p.w1 - p.w0) * (1 - (1 - u) * (1 - u)); p.s.scale.set(w, w * p.k, 1); p.m.opacity = Math.min(1, u * 7) * (1 - u) * p.a;
+    }
+    for (let i = 0; i < fires.length; i++) {   // each tongue grows, leans with the wind and dies in a third of a second
+      const f = fires[i]; if (!f.s.visible) continue;
+      f.t += dt; const u = f.t / f.life; if (u >= 1) { f.s.visible = false; continue; }
+      const h = f.h * (0.55 + 0.45 * u); f.s.position.set(st.px + f.x, 118, -34); f.s.scale.set(h * 0.69 * f.flip, h, 1); f.m.opacity = Math.min(1, u * 6) * (1 - u * u) * 0.8;
     }
   }
 
@@ -177,7 +219,9 @@ async function boot() {
     const k = st.bgX < 400 ? st.bgX / 400 : (800 - st.bgX) / 400; sky.position.x = cam.position.x + (0.5 - k) * 1700; sky.position.y = -40;   // the bends pan the sky like the 2D road does
     const sc = st.dist * KZ / RT; scroll.forEach(t => { t.offset.y = sc % 1; }); groundMat.map.offset.y = (st.dist * KZ / GT) % 2;
     bendDirt(); bendRoad();
-    truck.position.set(st.px, Math.sin(st.dist / 46) * 0.9, 0); truck.rotation.z = -st.tilt * 0.5; truckSh.position.set(st.px, 0, -8);
+    const flat = st.flat > 0, ty = Math.sin(st.dist / 46) * 0.9 + (flat ? Math.abs(Math.sin(st.t / 45)) * 2.4 : 0), sw = st.sway || 0;
+    truck.position.set(st.px, ty, 0); truck.rotation.z = -st.tilt * 0.5 + (flat ? 0.04 : 0); truckSh.position.set(st.px, 0, -8);
+    smoker.position.set(st.px + sw, ty + Math.sin(st.dist / 23) * 0.8, 0); smoker.rotation.z = truck.rotation.z - sw * 0.007;   // pivots on its wheels
 
     st.bbRect = null;
     for (let i = 0; i < st.props.length; i++) {
@@ -197,10 +241,16 @@ async function boot() {
       } else if (o.kind === "hole") { if (!v.a) v.a = mesh(FLAT, spr, -1); v.a.position.set(x, 0, z); v.a.scale.set(ow * 1.15, 1, ow * 1.9); }
       else if (o.kind === "weed") { if (!v.a) v.a = mesh(MID, spr, 0); put(v.a, x, ow / 2, z, ow, ow); v.a.rotation.z = -o.rot; shadow(v, x, z, ow * 1.2, ow * 1.3); }
       else if (o.kind === "deer") { if (!v.a) v.a = mesh(UP, spr, 0); put(v.a, x, Math.abs(Math.sin(st.t / 90)) * 9, z, (o.vx > 0 ? -ow : ow) * 1.25, oh * 1.25); shadow(v, x, z, ow * 1.3, ow * 0.9); }   // the photo faces left
-      else { if (!v.a) v.a = mesh(UP, spr, 0); put(v.a, x, 0, z, ow, oh); if (o.kind === "car") { v.a.rotation.z = -Math.max(-0.13, Math.min(0.13, (o.lean || 0) / 900)); shadow(v, x, z - 6, ow * 1.45, oh * 1.5); } }
+      else if (o.kind !== "car") { if (!v.a) v.a = mesh(UP, spr, 0); put(v.a, x, 0, z, ow, oh); }
+      else {   // cars ride on their springs; one that got hit tips over toward the shoulder in a cloud of dust
+        if (!v.a) { v.a = mesh(UP, spr, 0); v.ph = Math.random() * 6.28; }
+        put(v.a, x, 0.9 + Math.sin(st.dist / 37 + v.ph) * 0.9, z, ow, oh); shadow(v, x, z - 6, ow * 1.45, oh * 1.5);
+        v.a.rotation.z = o.kx ? -o.rotz : -Math.max(-0.13, Math.min(0.13, (o.lean || 0) / 900));
+        if (o.kx && !v.hit) { v.hit = true; for (let j = 0; j < 7; j++) puff(x + rs(60), 10 + Math.random() * 30, z + 8, j % 2 ? 0xb9a487 : 0x6a6660, 0.5, 24, 100 + Math.random() * 50, 0.7 + Math.random() * 0.5, 0.55, rs(90) + o.kx * 0.2, 30 + Math.random() * 50, 40); }
+      }
     }
     views.forEach((v, key) => { if (v.n !== frameNo) { drop(v); views.delete(key); } });
-    smoke(st, dt);
+    smoke(st, dt); damage(st, dt);
     renderer.render(scene, cam);
   }
 

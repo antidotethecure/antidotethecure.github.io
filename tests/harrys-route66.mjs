@@ -32,6 +32,9 @@ const r = await p.evaluate(() => {
   // a whole drive leg reaches the next stop
   R.start(); for (let i = 0; i < 60 * 40 && R.get().phase !== 'stop'; i++) { R.get().hearts = 5; R.step(1 / 60); }
   out.reachedStop = R.get().phase === 'stop';
+  // a deer in the lane costs 75 points and no heart
+  R.start(); { const d = R.get(); d.objs = []; d.score = 200; d.hearts = 5; d.objs.push({ kind: 'deer', bad: true, wx: d.px, z: 20, w: 60, vx: 0 }); for (let i = 0; i < 20 && d.score === 200; i++) R.step(1 / 60); out.deer = 200 - d.score; out.deerHearts = 5 - d.hearts; }
+  out.r3d = window.__R663 ? window.__R663.on : false;
   R.end(); out.over = R.get().over;
   return out;
 });
@@ -42,6 +45,8 @@ check(r.photo, 'photo-real sprites loaded (img/r66/)');
 check(r.good > r.bad, `perfect cook (${r.good}) beats sloppy cook (${r.bad})`);
 check(r.walk === 1, 'a walk-out costs one heart');
 check(r.reachedStop, 'a drive leg ends at a stop');
+check(r.deer === 75 && r.deerHearts === 0, `hitting a deer costs 75 points and no heart (${r.deer}, ${r.deerHearts})`);
+console.log('info 3D view on: ' + r.r3d);
 check(r.over, 'run ends cleanly');
 check(!errs.length, 'no page errors ' + errs.join(' | '));
 await b.close();

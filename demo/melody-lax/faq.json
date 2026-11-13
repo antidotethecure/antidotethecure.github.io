@@ -16,8 +16,7 @@
   "Game rewards are in BETA: the boards are live for bragging rights and prizes switch on soon.",
   "Just Landed: 10% off your first order today with a boarding pass from a flight that landed at LAX in the last 24 hours.",
   "No app download. It opens in your phone browser and you can add it to your Home Screen.",
-  "The app has 12 languages.",
-  "Nalu Vida (Venice Pier) is the sister spot and has its own separate points balance."
+  "The app has 12 languages."
  ],
  "suggested": [
   "What time is happy hour?",
@@ -1234,17 +1233,6 @@
     "privacy",
     "notifications",
     "settings"
-   ]
-  },
-  {
-   "q": "What is Nalu Vida?",
-   "a": "It's our sister spot at the Venice Pier. It has its own points balance, and points don't move between restaurants.",
-   "tags": [
-    "nalu vida",
-    "venice",
-    "sister",
-    "points",
-    "pier"
    ]
   },
   {

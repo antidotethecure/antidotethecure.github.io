@@ -798,7 +798,6 @@ export function makeWorld(THREE, O = {}) {
     x.putImageData(im, 0, 0); for (let i = 0; i < 160; i++) { const px = R() * 512, py = R() * 512; x.fillStyle = "rgba(40,40,40,.35)"; x.beginPath(); x.ellipse(px, py, 3, 6, R() * 3, 0, TAU); x.fill(); }
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; })();
   const sandMat = new THREE.MeshStandardMaterial({ map: sandTex, bumpMap: sandBump, bumpScale: 2.2, roughness: .96, metalness: 0 });
-  const naluTex = img("../nalu-vida/img/logo.png");
   const SURF = ["#f2f2ee", "#f0d375", "#ff7a3a", "#3aa8ff", "#e4566b", "#7ee0b0", "#ffffff"], TOWEL = ["#ff5a6a", "#f0d375", "#3aa8ff", "#7ee0b0", "#ffffff", "#ff9a2e", "#a33645", "#5a4ad8"];
   const BEACH_SKIN = SKIN.concat(["#c68e63", "#e0b48c", "#5e3a28", "#8d5a3b"]);
   const boardG = new THREE.CapsuleGeometry(1.5, 9, 3, 8).rotateX(Math.PI / 2).scale(1, .22, 1).translate(0, .4, 0);
@@ -861,9 +860,9 @@ export function makeWorld(THREE, O = {}) {
         for (let k = 0; k < 3; k++) glowS("#ff8a2a", 6, 18, () => { x.beginPath(); x.arc(250, 92, 70 - k * 16, Math.PI * 1.08, Math.PI * 1.92); x.stroke(); });   // the sunset
         glowS("#ff5a2a", 5, 14, () => { x.beginPath(); x.moveTo(170, 96); x.lineTo(330, 96); x.stroke(); });
         glowS("#4dff7a", 5, 14, () => { x.beginPath(); x.moveTo(318, 96); x.quadraticCurveTo(322, 60, 330, 30); x.stroke(); [[-1, .2], [1, .1], [-1, -.5], [1, -.6], [0, -1]].forEach(([sx, sy]) => { x.beginPath(); x.moveTo(330, 30); x.quadraticCurveTo(330 + sx * 22, 16 + sy * 10, 330 + sx * 36, 30 - sy * 14); x.stroke(); }); });   // the palm
-        x.font = "700 70px 'Arial Rounded MT Bold','Trebuchet MS',Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
-        for (const [b, a] of [[26, .9], [10, 1]]) { x.save(); x.shadowColor = "#3a7dff"; x.shadowBlur = b; x.globalAlpha = a; x.strokeStyle = "#5aa0ff"; x.lineWidth = 7; x.strokeText("nalu vida", 256, 146); x.restore(); }
-        x.fillStyle = "#e8f2ff"; x.fillText("nalu vida", 256, 146); return tex(c, false); })();
+        x.font = "700 62px 'Arial Rounded MT Bold','Trebuchet MS',Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+        for (const [b, a] of [[26, .9], [10, 1]]) { x.save(); x.shadowColor = "#3a7dff"; x.shadowBlur = b; x.globalAlpha = a; x.strokeStyle = "#5aa0ff"; x.lineWidth = 7; x.strokeText("venice pier", 256, 146); x.restore(); }
+        x.fillStyle = "#e8f2ff"; x.fillText("venice pier", 256, 146); return tex(c, false); })();
       n.add(mesh(new THREE.BoxGeometry(70, 2, 100).translate(0, 1, 0), M.wood));                                                        // plinth
       n.add(mesh(new THREE.BoxGeometry(56, 15, 92).translate(8, 9, 0), shingle));                                                     // ground floor (back + sides)
       n.add(mesh(new THREE.BoxGeometry(2, 11, 84).translate(-20.5, 7.5, 0), new THREE.MeshBasicMaterial({ color: 0xffc98a, toneMapped: false })));   // the open front: warm-lit bar inside
@@ -877,11 +876,6 @@ export function makeWorld(THREE, O = {}) {
       // the neon sign on the front wall, between the windows, with its glow on the shingles
       const neon = mesh(new THREE.PlaneGeometry(34, 12.75), new THREE.MeshBasicMaterial({ map: neonTex, transparent: true, depthWrite: false, toneMapped: false, color: new THREE.Color(1.6, 1.6, 1.6) }), -16.6, 25.4, 0); neon.rotation.y = -Math.PI / 2; n.add(neon);
       const ng = mesh(new THREE.PlaneGeometry(44, 18), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0x4a7dff, opacity: .45, toneMapped: false }), -16.3, 25.4, 0); ng.rotation.y = -Math.PI / 2; n.add(ng);
-      // the logo: huge on the roof (lying flat, lit) + a sign on the front parapet facing the beach, tipped up toward the plane
-      const lr = mesh(new THREE.CircleGeometry(30, 48).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: naluTex, transparent: true, toneMapped: false }), 10, 32.8, 0); n.add(lr);
-      n.add(mesh(new THREE.RingGeometry(30, 33, 48).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff8f86, toneMapped: false }), 10, 32.7, 0));
-      const lf = mesh(new THREE.CircleGeometry(12, 40), new THREE.MeshBasicMaterial({ map: naluTex, transparent: true, toneMapped: false }), -20, 42, 0); lf.rotation.order = "YXZ"; lf.rotation.y = -Math.PI / 2; lf.rotation.x = -.45; n.add(lf);
-      n.add(mesh(merge([[new THREE.CylinderGeometry(.7, .7, 12, 6), T4(-20, 36, -7)], [new THREE.CylinderGeometry(.7, .7, 12, 6), T4(-20, 36, 7)]]), M.dark));
       // exterior lights: uplights along the front + both sides (warm washes on the shingles), sconces by the open front, lit palms
       const wsh = new THREE.MeshBasicMaterial({ map: coneTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffb070, opacity: .38, toneMapped: false, side: THREE.DoubleSide }), wl = [];
       for (let z = -36; z <= 36; z += 18) wl.push([new THREE.PlaneGeometry(10, 16).rotateY(-Math.PI / 2), T4(-16.5, 25, z)]);

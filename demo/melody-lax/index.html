@@ -21,9 +21,9 @@
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/utils/BufferGeometryUtils.js">
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/libs/meshopt_decoder.module.js">
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/environments/RoomEnvironment.js">
-<link rel="modulepreload" href="melody3d.js?v=fs4">
+<link rel="modulepreload" href="melody3d.js?v=fs5">
 <link rel="modulepreload" href="air3d.js?v=ex2">
-<link rel="modulepreload" href="world3d.js?v=ex2.hs2">
+<link rel="modulepreload" href="world3d.js?v=ex2.hs3">
 <link rel="modulepreload" href="beach3d.js?v=dx1">
 <link rel="modulepreload" href="../engine3d/quality.js?v=e3t">
 <link rel="modulepreload" href="../engine3d/billboard.js?v=e3t">
@@ -298,7 +298,6 @@ body .gm-mbtn.mute{background:rgba(14,17,30,.86);border-color:rgba(255,255,255,.
 /* flyover */
 #fly{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:30;overflow:hidden}
 #fly img{position:absolute;width:min(560px,120vw);height:auto;filter:drop-shadow(0 18px 18px #0006);will-change:transform}
-/* Nalu Vida cross-promo: the flyover tows a banner when the guest reaches the bottom of the page */
 #tow{position:fixed;left:0;top:0;z-index:31;display:flex;align-items:flex-start;will-change:transform;pointer-events:none}
 #tow.rt{flex-direction:row-reverse}
 #tow .rope{width:38px;height:2px;margin-top:22px;background:linear-gradient(90deg,#efe4c9cc,#efe4c977);flex:none}
@@ -372,7 +371,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 
 <section class="msec" id="sec-games" data-tab="games">
 <h2 id="play"><small>Play &amp; earn points</small>Fly the Melody approach</h2>
-<p class="sub">A night dogfight over LA. <b>Campaign:</b> 10 levels that follow a real SoCal route in six parts: take off past Melody and over Inglewood, ride the 105 freeway to LAX, Nalu Vida on the Venice Pier, Compton, Long Beach and the Queen Mary, then Hollywood for the finale, each a little harder, with six bosses (an Army gunship, the Super Jet, a big jet and its escorts, a rocket ship, an army base and a final flock of white birds), then land back at LAX. <b>Survival:</b> no finish line, it just keeps getting harder: how long can you last? Catch Melody's food as it floats by. Drag anywhere on the game and the plane glides to your finger; tap ⚡ for a speed boost and grab the hourglass for slow-mo. Prefer a calm flight? Pause and turn combat off. <b>BETA:</b> weekly prizes switch on soon; the boards are live now.</p>
+<p class="sub">A night dogfight over LA. <b>Campaign:</b> 10 levels that follow a real SoCal route in six parts: take off past Melody and over Inglewood, ride the 105 freeway to LAX, the Venice Pier, Compton, Long Beach and the Queen Mary, then Hollywood for the finale, each a little harder, with six bosses (an Army gunship, the Super Jet, a big jet and its escorts, a rocket ship, an army base and a final flock of white birds), then land back at LAX. <b>Survival:</b> no finish line, it just keeps getting harder: how long can you last? Catch Melody's food as it floats by. Drag anywhere on the game and the plane glides to your finger; tap ⚡ for a speed boost and grab the hourglass for slow-mo. Prefer a calm flight? Pause and turn combat off. <b>BETA:</b> weekly prizes switch on soon; the boards are live now.</p>
 <div id="versushost"></div>
 <div class="gamebox">
   <div class="hud">
@@ -418,11 +417,6 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 
 </section>
 
-<div id="fromnalu" style="display:none"></div>
-<script>(function(){ var q=new URLSearchParams(location.search); if(q.get("from")!=="nalu") return; var c=(q.get("deal")||"").replace(/[^A-Z0-9-]/gi,"").slice(0,16);
-  var d=document.createElement("div"); d.style.cssText="position:fixed;left:12px;right:12px;top:calc(56px + env(safe-area-inset-top,0px));z-index:90;max-width:520px;margin:0 auto;padding:12px 14px;border-radius:14px;background:#1a0a0c;border:1px solid #f0d375;color:#fbf1de;box-shadow:0 10px 40px #000a;font:600 14px/1.4 system-ui";
-  d.innerHTML="✈️ <b>Welcome from Nalu Vida!</b> Same owners, right by LAX. Melody Rewards has its own points balance: join free below.<div style='font-size:12px;opacity:.8'>9132 S Sepulveda Blvd · tap to close</div>";
-  d.onclick=function(){ d.remove(); }; document.body.appendChild(d); })();</script>
 <section class="msec" id="sec-landed" data-tab="landed">
 <h2 id="landed"><small>Melody's "Just Landed" deal</small>Just got off a flight? ✈️</h2>
 <p class="sub">Melody is 5 minutes from LAX. One simple offer for everyone who just flew in.</p>
@@ -476,11 +470,6 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
   <div class="card"><b>Every week</b>Karaoke · live bands · DJs · trivia · every game on the TVs</div>
 </div>
 
-<!-- Nalu Vida cross-promo lives down here: Melody first, the sister spot only once they have seen the whole app -->
-<div class="sister" style="max-width:520px;margin:22px auto 0;padding:12px 14px;border-radius:16px;display:flex;gap:12px;align-items:center;background:linear-gradient(120deg,#08203a,#0f3760);border:1px solid #1f5283;color:#fdf8ef">
-  <img src="../nalu-vida/img/logo.png" alt="Nalu Vida" style="width:58px;height:58px;flex:none">
-  <div style="font-size:14px;line-height:1.35"><b>Sister spot: Nalu Vida, Venice Pier 🌴</b><br>Ride the Nalu: surf the pier and earn Nalu Vida points (each spot has its own balance).
-  <br><a href="../nalu-vida/?from=melody#play" style="display:inline-block;margin-top:6px;padding:7px 12px;border-radius:999px;background:#ff9a2e;color:#2b1200;font-weight:800;text-decoration:none">🏄 Surf over to Nalu Vida</a></div></div>
 
 <div id="instafeed"></div>
 <script>window.INSTA_FEED={"handle":"melodylax","posts":["https://www.instagram.com/reel/DeSEiI5Rrlj/","https://www.instagram.com/reel/DeKcmQAPukY/","https://www.instagram.com/reel/DeIXlEsP8-s/","https://www.instagram.com/reel/DeBGSrkE4qe/","https://www.instagram.com/reel/Dd_2K6FA-t2/","https://www.instagram.com/reel/Dd-c43QT44B/"],"theme":{"card":"var(--panel)","ink":"var(--ink)","accent":"var(--wine2)","edge":"var(--edge)"}}; /* posts = snapshot 2026-10-10; live:{provider:"behold",id:"..."} turns on auto-updating, see ../instafeed.js */</script>
@@ -647,9 +636,6 @@ function flyover(promo){
   if(promo){ // banner rides behind the tail; slower pass so it can be read and tapped
     tow=document.createElement("div"); tow.id="tow"; tow.className=(dir>0?"rt":"")+(promo==="lat"?" lat":"");
     if(promo==="lat") tow.innerHTML='<i class="rope"></i><a href="#press" aria-label="Melody was featured in the Los Angeles Times: see the story"><span class="flag">★ As seen in the<b>LOS ANGELES TIMES →</b></span></a>';
-    else tow.innerHTML='<i class="rope"></i><a href="../nalu-vida/?from=melody" aria-label="Take a flight to Venice Beach: open Nalu Vida"><span class="flag">✈ Take a flight to Venice Beach<b>→ NALU VIDA 🏄</b></span>'+
-      '<svg viewBox="0 0 84 40" aria-hidden="true"><path d="M30 0 L22 16 M54 0 L62 16" stroke="#efe4c9" stroke-width="1.2" fill="none"/>'+
-      '<g transform="rotate(-6 42 24)"><ellipse cx="42" cy="24" rx="40" ry="8.5" fill="#ffd34d" stroke="#0b2a3a" stroke-width="1.4"/><path d="M4 24 Q42 19 80 24" stroke="#e8505b" stroke-width="2.4" fill="none"/><path d="M8 26 Q42 30 76 26" stroke="#1aa3c4" stroke-width="1.6" fill="none"/><path d="M74 28 l6 7 l-9 -3z" fill="#0b2a3a"/></g></svg></a>';
     document.body.appendChild(tow); tw=tow.offsetWidth; extra=tw+40; dur=10500;
   }
   var t0=performance.now(), th=w*320/900;
@@ -669,21 +655,6 @@ setInterval(flyover,20000);
 document.addEventListener("click",function(e){ var a=e.target.closest&&e.target.closest('#tow.lat a'); if(!a) return; e.preventDefault(); var pr=$("press"); pr.scrollIntoView({behavior:reduce?"auto":"smooth",block:"center"}); pr.classList.remove("in"); void pr.offsetWidth; pr.classList.add("in"); });
 (function(){ var pr=$("press"); if(!pr||!("IntersectionObserver" in window)) return; var io=new IntersectionObserver(function(es){ es.forEach(function(x){ if(x.isIntersecting){ pr.classList.add("in"); io.disconnect(); } }); },{threshold:.3}); io.observe(pr); })();
 
-/* the Nalu Vida banner flight only happens once the guest has scrolled down to the bottom of the page; at most twice a visit */
-var promoN=0, promoLast=-1e9, promoT=0;
-try{ promoN=+sessionStorage.getItem("melodyNaluTow")||0; }catch(e){}
-function nearBottom(){ var d=document.documentElement, max=d.scrollHeight-innerHeight; if(max<=0) return false;
-  var f=document.querySelector("footer"), fr=f&&f.getBoundingClientRect();
-  return scrollY/max>=0.8||(fr&&fr.top<innerHeight); }
-function tryPromo(){
-  if(promoT||promoN>=2||document.readyState!=="complete"||scrollY<400||!nearBottom()||performance.now()-promoLast<45000) return;
-  promoT=setTimeout(function go(){
-    if(!nearBottom()){ promoT=0; return; }
-    if(!flyover(true)){ promoT=setTimeout(go,1500); return; }
-    promoT=0; promoN++; promoLast=performance.now(); try{ sessionStorage.setItem("melodyNaluTow",promoN); }catch(e){}
-  },2500);
-}
-addEventListener("scroll",tryPromo,{passive:true}); addEventListener("load",tryPromo);
 
 /* ======================= GAME: Melody Approach ======================= */
 var cv=$("cv"), cx=cv.getContext("2d"), W=400, H=600, DPR=Math.min(2,window.devicePixelRatio||1);
@@ -761,7 +732,7 @@ var CALM=false;   // ⚔️ Combat row in the Pause menu: combat is ON by defaul
 try{ CALM=localStorage.getItem("melody_combat")==="0"; }catch(x){}
 (function(){ var c=new URLSearchParams(location.search).get("combat"); if(c==="0") CALM=true; else if(c==="1") CALM=false; })();
 var DENS=1.3;   // spawn intervals × this vs the original game (≈ 23% fewer enemies, bolts and planes on screen; was 1.5, a touch harder now)
-var CALM_SUB=["Wheels up over Westchester","Past the stadium and downtown","Up over the hills","Down the coast to Nalu Vida","Past the pier, then home to LAX"];
+var CALM_SUB=["Wheels up over Westchester","Past the stadium and downtown","Up over the hills","Down the coast to Venice","Past the pier, then home to LAX"];
 /* ---- CAMPAIGN (Antidote, 2026-10-12): 10 levels, 45 s each. Every level is ~6-8% harder than the one before it: spawn gaps
    (pace) shrink, choppers fly + fire faster (copV), their rounds get quicker (bul), and enemy HP grows. HP also tracks your gun
    tier (one upgrade a level until the Red beams at level 5), so time-to-kill keeps creeping up rather than jumping.
@@ -872,7 +843,7 @@ var SEQ=["city","towers","city","melody","city","city","stadium","city","towers"
    seq: the ground strips of that district, looped while you're in it (kinds built by world3d.js). Survival keeps cycling the route. */
 var ZONES=[{id:"melody",name:"Melody · Inglewood",seq:["melody","city","sofi","inglewood","city"]},
   {id:"lax105",name:"The 105 · LAX",seq:["f105","f105","f105"]},
-  {id:"venice",name:"Nalu Vida · Venice Pier",seq:["coast","venice","coast","city"]},
+  {id:"venice",name:"Venice Pier",seq:["coast","venice","coast","city"]},
   {id:"compton",name:"Compton",seq:["civic","compton","compton","compton","compton","compton"],loop:1},
   {id:"longbeach",name:"Long Beach",seq:["longbeach","harbor","harbor"]},
   {id:"hollywood",name:"Hollywood",seq:["hwdblvd","hollywood","hills","hwdblvd"],loop:1}];
@@ -885,7 +856,7 @@ function zoneIx(lv){ lv=lv||G.lvl||1; return CALM?CALM_ZONE[Math.max(0,Math.min(
 function zoneNow(){ var q=new URLSearchParams(location.search).get("zone"); if(q){ for(var i=0;i<ZONES.length;i++) if(ZONES[i].id===q) return i; } return zoneIx(); }   /* ?zone=compton (testing / screenshots) */
 var COAST={coast:1,venice:1,pier:1};
 // labels: only the owner's own two spots are named. No landmark, venue, sign or neighborhood-landmark names anywhere (2026-10 branding pass)
-var LBL={venice:"★ NALU VIDA ★",melody:"★ MELODY BAR & GRILL ★"};
+var LBL={venice:"★ VENICE PIER ★",melody:"★ MELODY BAR & GRILL ★"};
 function seedGround(){ G.ground=[]; G.gy=H+100; G.seq=0; G.ground.push({k:"runway",t:"city1",y:G.gy-520,h:520,side:1}); G.gy-=520; while(G.gy>-400) addSeg(); }
 // photoreal aerial ground (dusk): every segment is a full-width aerial tile; landmark sprites sit on top of a city tile
 var TILE_OF={city:["city1","city2"],towers:["city2"],melody:["city1"],stadium:["city1"],hills:["hills"],coast:["venicecoast"],venice:["nalu"],pier:["pier"],
@@ -2853,7 +2824,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
   '<div class="ptsh">Melody Rewards points (BETA: switching on soon)</div><div class="pts">'+row('<span class="e">⭐</span>',"1 point per "+GPC.perScore+" score, once rewards are on",GPC.dailyCap+"/day")+row('<span class="e">⏱️</span>',"Survival ranks by time","time")+'</div>';
 })();
 </script>
-<script type="module" src="melody3d.js?v=fs4"></script>
+<script type="module" src="melody3d.js?v=fs5"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}
@@ -3005,9 +2976,8 @@ window.SSAI_CUSTOMER_ONLY=true;</script>
 <script>/* SPORTS BAR PACKAGE (demo/sports/README.md): Melody = install #1, LA/California teams. Perks text stays empty until
    Christian sets a real deal: an empty watchParty.text hides the banner (no made-up deals). */
 window.SPORTS_CFG={client:"melody-lax",name:"Melody",title:"LA Scoreboard",region:"la",teamsTab:"LA teams",
-  /* Watch it here: Melody first, sister spot Nalu Vida after. Notes = each page's own wording ("every game on the TVs"). */
-  watchAt:[{name:"Melody Bar & Grill",note:"Every game on the TVs, 5 minutes from LAX.",address:"9132 S Sepulveda Blvd, Los Angeles, CA 90045",tel:"+13106701994"},
-           {name:"Nalu Vida (sister spot)",note:"Venice Pier. The game's on the TVs there too.",address:"1 Washington Blvd, Venice, CA 90292",tel:"+13104370060",app:"../nalu-vida/",appLabel:"🏄 Their app"}],   /* no ticker: the Today's games carousel (layout.js) replaces it */
+  /* Watch it here: Melody only (Nalu Vida stays out of the Melody app). Notes = the page's own wording ("every game on the TVs"). */
+  watchAt:[{name:"Melody Bar & Grill",note:"Every game on the TVs, 5 minutes from LAX.",address:"9132 S Sepulveda Blvd, Los Angeles, CA 90045",tel:"+13106701994"}],   /* no ticker: the Today's games carousel (layout.js) replaces it */
   leagues:["mlb","nfl","nba","nhl","mls","wnba","cfb","cbb","ufc"],
   theme:{bg:"var(--sky)",panel:"var(--panel)",edge:"var(--edge)",accent:"var(--gold)",accent2:"var(--gold2)",ink:"var(--ink)",dim:"var(--dim)",onAccent:"#1a1405",display:"var(--display)",body:"var(--body)",punch:"var(--punch)"},
   fightNight:{url:"../sports/events.json"},

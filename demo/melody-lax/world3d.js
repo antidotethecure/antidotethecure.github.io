@@ -129,7 +129,7 @@ export function makeWorld(THREE, O = {}) {
   // render, hairline cracks and a soot fan above it; 4 variants in one 256x64 atlas strip, picked per hole by UV offset (one draw)
   const scorchG = new THREE.PlaneGeometry(1, 1), scorchM = new THREE.MeshBasicMaterial({ map: (() => { const c = mkc(256, 64), x = c.getContext("2d"), R = rng(61);
     for (let k = 0; k < 4; k++) { const cx = 32 + k * 64, cy = 34; x.save(); x.beginPath(); x.rect(k * 64, 0, 64, 64); x.clip();
-      const g = x.createRadialGradient(cx, cy - 6, 2, cx, cy - 10, 30); g.addColorStop(0, "rgba(14,10,8,.55)"); g.addColorStop(1, "rgba(14,10,8,0)"); x.fillStyle = g; x.fillRect(k * 64, 0, 64, 64);   // soot fan
+      const g = x.createRadialGradient(cx, cy - 6, 2, cx, cy - 10, 30); g.addColorStop(0, "rgba(14,10,8,.32)"); g.addColorStop(1, "rgba(14,10,8,0)"); x.fillStyle = g; x.fillRect(k * 64, 0, 64, 64);   // soot fan
       x.fillStyle = "rgba(120,116,110,.9)"; x.beginPath(); for (let a = 0; a < 14; a++) { const r = 9 + R() * 6, an = a / 14 * TAU; x.lineTo(cx + Math.cos(an) * r, cy + Math.sin(an) * r); } x.closePath(); x.fill();   // chipped render
       x.strokeStyle = "rgba(20,16,14,.85)"; x.lineWidth = 1.2; for (let a = 0; a < 6; a++) { const an = R() * TAU; let px = cx, py = cy; x.beginPath(); x.moveTo(px, py); for (let j = 0; j < 4; j++) { px += Math.cos(an + (R() - .5)) * (4 + R() * 5); py += Math.sin(an + (R() - .5)) * (4 + R() * 5); x.lineTo(px, py); } x.stroke(); }   // cracks
       const h = x.createRadialGradient(cx, cy, 0, cx, cy, 7); h.addColorStop(0, "#050404"); h.addColorStop(.7, "#120d0a"); h.addColorStop(1, "rgba(18,13,10,0)"); x.fillStyle = h; x.beginPath(); x.arc(cx, cy, 7, 0, TAU); x.fill(); x.restore(); }   // the hole
@@ -338,7 +338,9 @@ export function makeWorld(THREE, O = {}) {
     // bullet holes: one pooled instanced decal set per block strip (the oldest hole is reused once all are used)
     const SCN = 72, scG = scorchG.clone(), scCell = new THREE.InstancedBufferAttribute(new Float32Array(SCN), 1), scOwn = new Int16Array(SCN).fill(-1); scG.setAttribute("aCell", scCell);
     const scM = new THREE.InstancedMesh(scG, scorchM, SCN); scM.count = 0; scM.frustumCulled = false; scM.renderOrder = 2; seg.group.add(scM); let scI = 0;
-    const scorch = (x, y, z, r, own) => { const k = scI % SCN; set(scM, k, x, y, z, Math.random() * TAU * 0, r, r, 1); scCell.setX(k, (Math.random() * 4) | 0); scCell.needsUpdate = true; scOwn[k] = own == null ? -1 : own; scI++; scM.count = Math.min(SCN, scI); scM.instanceMatrix.needsUpdate = true; };
+    const scXY = new Float32Array(SCN * 2);   // where each hole sits, so new holes keep their distance
+    const scorch = (x, y, z, r, own) => { for (let j = 0; j < Math.min(SCN, scI); j++) if (scOwn[j] === own && Math.abs(scXY[j * 2] - x) < r * 1.6 && Math.abs(scXY[j * 2 + 1] - y) < r * 1.6) return;   // no stacking: a stream of rounds into one spot made a solid black block
+      const k = scI % SCN; scXY[k * 2] = x; scXY[k * 2 + 1] = y; set(scM, k, x, y, z, Math.random() * TAU * 0, r, r, 1); scCell.setX(k, (Math.random() * 4) | 0); scCell.needsUpdate = true; scOwn[k] = own == null ? -1 : own; scI++; scM.count = Math.min(SCN, scI); scM.instanceMatrix.needsUpdate = true; };
     const unscorch = (own, above) => { let any = 0; for (let k = 0; k < Math.min(SCN, scI); k++) if (scOwn[k] === own) { scM.getMatrixAt(k, Q); QP.setFromMatrixPosition(Q); if (above == null || QP.y > above) { scM.setMatrixAt(k, ZERO); scOwn[k] = -1; any = 1; } } if (any) scM.instanceMatrix.needsUpdate = true; };
     /* CRUMBLE (2026-10-19, Antidote: "they catch fire, smoke, and crumble / fall apart a couple seconds after enough hits"): when a
        building has taken its hp in rounds (or a crash), it burns harder for ~2 s (doom), then the top third topples off, the rest sinks

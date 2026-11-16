@@ -1,7 +1,7 @@
-/* Showroom fitting room: one mannequin wearing any shirt with any jeans, to spin, zoom and inspect.
+/* Valenzo Studio fitting room: one mannequin wearing any shirt with any jeans, to spin, zoom and inspect.
    Every garment was scanned on its own mannequin, so an outfit is two mannequins standing in the same spot:
    a cut in the fragment shader keeps the shirt (with sleeves and hands) of one and the jeans of the other.
-   Loaded on demand by showroom.js. Reads window.VZ.look / VZ.girth, publishes VZ.fit. */
+   Loaded on demand by valenzo.js. Reads window.VZ.look / VZ.girth, publishes VZ.fit. */
 import * as THREE from './lib/three.module.min.js';
 import { GLTFLoader } from './lib/GLTFLoader.js';
 import { OrbitControls } from './lib/OrbitControls.js';

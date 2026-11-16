@@ -437,7 +437,8 @@ async function boot() {
   const donutTex = ctex(256, 128, (x, w, h) => { x.fillStyle = "#b8916a"; x.fillRect(0, 0, w, h); for (let i = 0; i < 2600; i++) { const v = rnd(); x.fillStyle = v < .5 ? "rgba(90,60,35,.35)" : "rgba(235,205,165,.35)"; x.beginPath(); x.arc(rnd() * w, rnd() * h, .6 + rnd() * 1.8, 0, TAU); x.fill(); } });
   donutTex.wrapS = donutTex.wrapT = THREE.RepeatWrapping; donutTex.repeat.set(6, 2);
   function donut(s) { const g = new THREE.Group(), len = 300; sidewalk(g, s, len);   // the giant donut on its drive-in stand (shape only, no name on it)
-    const cx = s * 390; box(g, std(0xefe6d2), 110, 36, 150, cx, 18, 0); box(g, std(0x7a4a2a), 110, 10, 150, cx, 5, 0);
+    const cx = s * 390; if (lmod(g, "donut", 230, cx, 0, -s * Math.PI / 2)) { const gm = new THREE.Sprite(glowMat(0xffd2a0, .3)); gm.scale.set(340, 320, 1); gm.position.set(cx, 150, 0); g.add(gm); return { o: g, len }; }
+    box(g, std(0xefe6d2), 110, 36, 150, cx, 18, 0); box(g, std(0x7a4a2a), 110, 10, 150, cx, 5, 0);
     box(g, std(0xe6dcc6, { roughness: .6 }), 170, 7, 200, cx, 42, 0); box(g, basic(new THREE.Color(2.4, 2, 1.4)), 172, 2, 202, cx, 38, 0);   // the overhanging flat roof with its lit edge
     for (let i = 0; i < 4; i++) box(g, basic(new THREE.Color(2.2, 1.8, 1.2)), 1, 18, 26, cx - s * 55.5, 22, -54 + i * 36);   // glowing service windows
     [-40, 40].forEach(z => box(g, MAT.pole, 4, 70, 4, cx, 80, z)); box(g, MAT.pole, 4, 4, 90, cx, 114, 0);
@@ -445,7 +446,9 @@ async function boot() {
     const gl = new THREE.Sprite(glowMat(0xffd2a0, .3)); gl.scale.set(340, 320, 1); gl.position.set(cx, 214, 0); g.add(gl);
     return { o: g, len }; }
   function forum(s) { const g = new THREE.Group(), len = 760; sidewalk(g, s, len);   // the round colonnade: tall white columns with red between them, washed in light
-    const cx = s * 640, R = 300; add(g, GEO("Cylinder", 1, 1, 1, 64, 1, true), std(0xc8202f, { roughness: .6, side: THREE.DoubleSide, emissive: 0x7a0c14, emissiveIntensity: .8 }), R - 8, 112, R - 8, cx, 56, 0);
+    const cx = s * 640, R = 300; if (lmod(g, "forum", 620, cx, 0, 0)) { const um = new THREE.Sprite(glowMat(0xd8b0ff, .4)); um.scale.set(900, 240, 1); um.position.set(cx, 70, 0); g.add(um);
+      add(g, PLANE, std(0x23252e, { roughness: .4 }), 900, len - 20, 1, cx, .3, 0).rotation.x = -Math.PI / 2; return { o: g, len }; }
+    add(g, GEO("Cylinder", 1, 1, 1, 64, 1, true), std(0xc8202f, { roughness: .6, side: THREE.DoubleSide, emissive: 0x7a0c14, emissiveIntensity: .8 }), R - 8, 112, R - 8, cx, 56, 0);
     add(g, GEO("Cylinder", 1, 1, 1, 64), std(0xf4f0ea, { emissive: 0x6a5a6a, emissiveIntensity: .6 }), R + 14, 18, R + 14, cx, 121, 0);   // white crown ring
     const col = std(0xf6f2ee, { roughness: .5, emissive: 0x5a4a5a, emissiveIntensity: .5 }); for (let i = 0; i < 48; i++) { const a = i / 48 * TAU; add(g, CYL6, col, 8, 116, 8, cx + Math.cos(a) * R, 56, Math.sin(a) * R); }
     const up = new THREE.Sprite(glowMat(0xd8b0ff, .4)); up.scale.set(900, 240, 1); up.position.set(cx, 70, 0); g.add(up);
@@ -461,6 +464,7 @@ async function boot() {
     const gl = new THREE.Sprite(glowMat(0xffd0c0, .35)); gl.scale.set(200, 420, 1); gl.position.set(cx + s * 30, 200, -70); g.add(gl);
     return { o: g, len }; }
   function stadium(s) { const g = new THREE.Group(), len = 900; sidewalk(g, s, len);
+    if (lmod(g, "stadium", 840, s * 730, 0, 0)) { const gm = new THREE.Sprite(glowMat(0x9ab8ff, .35)); gm.scale.set(1600, 380, 1); gm.position.set(s * 720, 120, 0); g.add(gm); return { o: g, len }; }
     // the huge translucent canopy roof, floating low over the stadium bowl (no name on it)
     const roof = add(g, GEO("Sphere", 1, 48, 16, 0, TAU, 0, .42), std(0xdfe6f0, { transparent: true, opacity: .55, roughness: .2, metalness: .3, side: THREE.DoubleSide, emissive: 0x6a7aa0, emissiveIntensity: .35 }), 900, 260, 650, s * 720, -90, 0);
     const edge = add(g, GEO("Torus", 1, .006, 6, 96), basic(new THREE.Color(2.4, 2.6, 3.2)), 900 * Math.sin(.42), 650 * Math.sin(.42), 1, s * 720, -90 + 260 * Math.cos(.42), 0); edge.rotation.x = Math.PI / 2; edge.scale.z = 1;
@@ -538,6 +542,7 @@ async function boot() {
     [palm(g, s * 400, -140, 250), palm(g, s * 420, 140, 280)]; return { o: g, len }; }
   function dome(s) { const g = new THREE.Group(), len = 720; sidewalk(g, s, len);   // the new basketball arena: a sleek low dome wrapped in a glowing halo (shape only, no name)
     add(g, PLANE, asph2, 800, len, 1, s * 700, .3, 0).rotation.x = -Math.PI / 2;
+    if (lmod(g, "dome", 640, s * 640, -40, 0)) { const gm = new THREE.Sprite(glowMat(0x9fd0ff, .55)); gm.scale.set(900, 300, 1); gm.position.set(s * 640, 90, -40); g.add(gm); return { o: g, len }; }
     add(g, GEO("Sphere", 1, 40, 18, 0, TAU, 0, Math.PI / 2), std(0x8d96a6, { metalness: .7, roughness: .3 }), 300, 110, 270, s * 640, 40, -40);
     add(g, GEO("Cylinder", 300, 300, 40, 48, 1, true), std(0x10131c, { emissive: 0x2a4a7a, emissiveIntensity: .9, side: THREE.DoubleSide }), 1, 1, .9, s * 640, 20, -40);
     const halo = add(g, GEO("Torus", 1, .02, 8, 72), basic(new THREE.Color(1.4, 2.6, 4.5)), 330, 330, 300, s * 640, 70, -40); halo.rotation.x = Math.PI / 2;
@@ -768,6 +773,15 @@ async function boot() {
   const PROPS = (await import("./food3d.js?v=f4")).makeProps(THREE, { aniso: ANISO });
   try { const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js"), gl = await new GLTFLoader().loadAsync("img/3d/cow.glb");   /* photoreal cow mesh (Higgsfield, 10-21); the drawn cow stays as fallback */
     gl.scene.traverse(m => { if (m.isMesh) { m.geometry.computeVertexNormals(); m.material.roughness = .85; if (m.material.map) m.material.map.anisotropy = ANISO; } }); PROPS.setModel("cow", gl.scene); } catch (e) { console.warn("cow.glb", e); }
+  // (11-15, Antidote) the Inglewood monuments built for the Melody game, as real models (our own Higgsfield meshes: shape only, no names). One shared
+  // unlit-at-night material for all four, loaded before the menu warm-up so nothing compiles mid-run; each landmark keeps its code-built shape as the fallback.
+  const LMOD = {};
+  try { const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js"), { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js"), ld = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+    await Promise.all(["stadium", "forum", "dome", "donut"].map(n => ld.loadAsync("img/3d/lm_" + n + ".glb").then(gl => {
+      gl.scene.traverse(m => { if (m.isMesh) { const t = m.material.map; if (t) t.anisotropy = ANISO; m.material = new THREE.MeshLambertMaterial({ map: t, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: .45 }); } });
+      const b = new THREE.Box3().setFromObject(gl.scene), sz = b.getSize(new THREE.Vector3()), c = b.getCenter(new THREE.Vector3()); gl.scene.position.set(-c.x, -b.min.y, -c.z); LMOD[n] = { sc: gl.scene, w: Math.max(sz.x, sz.z) };
+    }).catch(e => console.warn("lm_" + n, e)))); } catch (e) { console.warn("landmark models", e); }
+  function lmod(g, n, w, x, z, ry) { const m = LMOD[n]; if (!m) return null; const h = new THREE.Group(); h.add(m.sc.clone()); h.scale.setScalar(w / m.w); h.rotation.y = ry || 0; h.position.set(x, 0, z); g.add(h); return h; }
   { const warm = new THREE.Group(); PROPS.kinds.forEach((k, i) => { const o = PROPS.fit(k, 50); o.position.set((i - 5) * 30, 20, -200); warm.add(o); }); const dz0 = PROPS.driz(40); dz0.position.set(0, 30, -220); warm.add(dz0);
     scene.add(warm); renderer.compile(scene, cam); scene.remove(warm); }
   const FOODM = {}; S.FOOD.forEach(f => FOODM[f.k] = new THREE.SpriteMaterial({ map: SPRT[f.k], transparent: true, depthWrite: false }));
@@ -1173,7 +1187,7 @@ async function boot() {
   STATUS.store = z => { const o = store(1, "1500 N LA BREA AVE", true).o; o.position.z = z; scene.add(o); return o; };   // test hook: drop the StormBurger stop beside the road
   STATUS.jump = n => event(LVL[n - 1]);
   STATUS.sfTest = z => { const g = new THREE.Group(), P = []; storefronts(g, 1, 500, P); g.position.z = z; scene.add(g); return g; };   // test hook: a storefront row beside the road
-  STATUS.lmTest = n => event({ R: { queenMary, villa, parkers, dome, jordan }[n] });   // test hook: put one of the new landmarks on the road ahead   // test hook: put the landmark of level n on the road ahead now
+  STATUS.lmTest = (n, sd) => event({ [sd || "R"]: { queenMary, villa, parkers, dome, jordan, stadium, forum, donut }[n] }); STATUS.lmod = LMOD;   // test hook: put one of the new landmarks on the road ahead   // test hook: put the landmark of level n on the road ahead now
   STATUS.mem = () => Object.assign({ programs: renderer.info.programs.length }, renderer.info.memory);   // debug: GPU objects alive
   STATUS.ledImg = () => LEDTX.image.toDataURL("image/png");   // debug: the LED sign artwork
   STATUS.booted = true;

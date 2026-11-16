@@ -55,7 +55,7 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=ex2") : null, WORLDM = CHASE ? await import("./world3d.js?v=ex2.hs3") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=ex2") : null, WORLDM = CHASE ? await import("./world3d.js?v=ex2.hs4") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
   const QM = await import("../engine3d/quality.js?v=e3t");
@@ -282,10 +282,13 @@ async function boot() {
     p_wings: "p_wings.glb?v=st3", p_marg: "p_marg.glb?v=ag1", p_shots: "p_shots.glb?v=ag1", p_mic: "p_mic.glb", p_mac: "p_mac.glb", p_burger: "p_burger.glb?v=bf1",
     p_lobmac: "p_lobmac.glb?v=fv2", p_ribs: "p_ribs.glb?v=st3", p_tacos: "p_tacos.glb?v=st3", p_nachos: "p_nachos.glb?v=fv2", p_strips: "p_strips.glb?v=st3",
     p_espresso: "p_espresso.glb?v=fv2", p_mimosa: "p_mimosa.glb?v=fv2" };
+  // the route's landmarks as game models (2026-11-15: stadium with its football field, arena dome, the round arena, ocean liner, courthouse...); world3d.js places them (O.lm)
+  ["stadium", "dome", "forum", "liner", "court", "memorial", "records", "pagoda", "observatory", "theme", "tower", "lbdome", "lighthouse", "donut"].forEach(n => { FILES["lm_" + n] = "lm_" + n + ".glb"; });
   async function loadModel(k) {
     try {
       const g = await loader.loadAsync(BASE + FILES[k]); const root = g.scene;
-      root.traverse(o => { if (o.isMesh) { if (!o.geometry.attributes.normal) o.geometry.computeVertexNormals(); const m = o.material; m.metalness = 0; m.roughness = .58; o.castShadow = true; o.receiveShadow = false; } });
+      root.traverse(o => { if (o.isMesh) { if (!o.geometry.attributes.normal) o.geometry.computeVertexNormals(); const m = o.material; m.metalness = 0; m.roughness = .58; o.castShadow = true; o.receiveShadow = false;
+        if (k.startsWith("lm_")) { o.material = new THREE.MeshLambertMaterial({ map: m.map, emissive: 0xffffff, emissiveMap: m.map, emissiveIntensity: .22 }); o.castShadow = false; } } });   // landmarks: cheap lit material that still reads at night (no extra lights)
       const box = new THREE.Box3().setFromObject(root), c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
       root.position.sub(c); const inner = new THREE.Group(); inner.add(root);
       if (k === "p_shots") addShotGlasses(inner, sz);
@@ -308,7 +311,9 @@ async function boot() {
       const add = (geo, mat, y) => { const m = new THREE.Mesh(geo, mat); m.position.set(cx, top + y, cz); m.castShadow = mat !== glass; g.add(m); return m; };
       add(bG, base, h * .09); add(lG, liquid, h * .18 + h * .31); add(sG, surf, h * .18 + h * .62); add(gG, glass, h / 2); const hl = add(hG, shine, h * .18 + h * .62 + .002 * h); hl.position.x -= r * .38; hl.position.z -= r * .34; hl.castShadow = false; }
     [[-.145, 0, .4], [.145, 0, 2.1], [-.43, 0, 3.3], [.43, 0, 1.2]].forEach(L => { const m = new THREE.Mesh(wG, lime); m.position.set(L[0] * sz.x, top + r * .28, L[1] * sz.z); m.rotation.y = L[2]; m.castShadow = true; g.add(m); }); }
-  await Promise.all(Object.keys(FILES).map(loadModel));
+  // photo ground textures (asphalt, concrete, grass, parking lot) that world3d.js tiles into its painted ground
+  const GTEX = {}, loadG = (n) => new Promise(r => { const im = new Image(); im.onload = () => { GTEX[n] = im; r(); }; im.onerror = () => r(); im.src = new URL("img/ground/" + n + ".webp", location.href).href; });
+  await Promise.all(Object.keys(FILES).map(loadModel).concat(["asphalt", "concrete", "grass", "lot"].map(loadG)));
   if (!MODELS.plane) throw new Error("player model missing");
   // other traffic: a small unbranded high-wing prop plane, built from primitives (nose = +Z, like the GLB aircraft). No logos, no livery.
   (() => { const g = new THREE.Group(), body = new THREE.MeshStandardMaterial({ color: 0xf4f1ea, roughness: .5 }), trim = new THREE.MeshStandardMaterial({ color: 0x1f8a8a, roughness: .5 }),
@@ -387,7 +392,7 @@ async function boot() {
     // GPU particles (engine3d/particles.js, same API as air3d's makeFX) + raycast bullet damage with decals (engine3d/damage.js)
     FXA = (PARTM && CAPS.gl2 && safe("gpu-particles", () => PARTM.makeGPUFX(THREE, scene, { max: SMOOTH ? 1024 : MOBILE ? 2048 : 4096 }))) || AIRM.makeFX(THREE, scene, { max: 1800 });
     pDmg = (DMGM && safe("bullet-damage", () => DMGM.makeHitDamage(THREE, { fx: FXA, target: AIR.node, engines: AIR.pts.eng, maxDecals: QUAL.cfg.decals }))) || (() => { const d = AIRM.makeDamage(THREE, FXA, AIR.node, AIR.pts.wound); const h = d.hit; d.hit = () => { h(); return true; }; d.hitNear = (l) => h(l); const u = d.update; d.update = (s2, t2, k2, w2) => u(s2, t2, k2, w2, AIR.pts.eng); return d; })();
-    WORLD = WORLDM.makeWorld(THREE, { camZ: () => cam.position.z, fireCap: () => SMOOTH ? 4 : ({ low: 6, med: 10, high: 16, ultra: 24 })[QUAL.tier] || 10, clock: () => FLYT.s, hi: () => M.hi, bbFirst: Q.get("bb") === "now" ? -500 : Q.get("bb") === "soon" ? -44 : null, bbGap: Q.get("bbgap") ? +Q.get("bbgap") : Q.get("bb") === "now" ? 4 : undefined, pbr: !SMOOTH && QUAL.tier !== "low", facadeSize: SMOOTH ? 512 : 1024, lite: SMOOTH, noVideo: FAILQ.includes("video"), fx: FXA, fxScale: () => ({ low: .3, med: .6, high: .85, ultra: 1 })[QUAL.tier] || 1, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density,
+    WORLD = WORLDM.makeWorld(THREE, { lm: MODELS, gtex: GTEX, camZ: () => cam.position.z, fireCap: () => SMOOTH ? 4 : ({ low: 6, med: 10, high: 16, ultra: 24 })[QUAL.tier] || 10, clock: () => FLYT.s, hi: () => M.hi, bbFirst: Q.get("bb") === "now" ? -500 : Q.get("bb") === "soon" ? -44 : null, bbGap: Q.get("bbgap") ? +Q.get("bbgap") : Q.get("bb") === "now" ? 4 : undefined, pbr: !SMOOTH && QUAL.tier !== "low", facadeSize: SMOOTH ? 512 : 1024, lite: SMOOTH, noVideo: FAILQ.includes("video"), fx: FXA, fxScale: () => ({ low: .3, med: .6, high: .85, ultra: 1 })[QUAL.tier] || 1, crowd: () => CROWD, traffic: () => TRAFFIC, rain: RAIN, density: () => QUAL.cfg.crowd.density,
       exitStart: +(Q.get("exit") || 0), zoneKey: () => { const G = M.G(); return (G.runId || 0) + "|" + (G.lvl || 1) + "|" + (M.zoneId ? M.zoneId() : ""); } }); scene.add(WORLD.root);   // the 3D city / beach under you (world3d.js)
     // muzzle flashes + real crashes + jet pilot ejections (engine3d/combat.js); detail follows the quality tier
     COMBAT = CBM && safe("combat", () => CBM.makeCombat(THREE, { scene, fx: FXA, smokeCap: () => SMOOTH ? 3 : ({ low: 4, med: 6, high: 9, ultra: 12 })[QUAL.tier] || 6, crowd: () => CROWD, lights: QUAL.tier === "low" ? 0 : QUAL.tier === "med" ? 1 : 2,
@@ -681,6 +686,7 @@ async function boot() {
     if (!CHASE) navPair(now, 0, frac(o, .47, .1, -.02).clone(), frac(o, -.47, .1, -.02), 2.2);
     if (G.sev > .15 && !CHASE) playerFire(o, G, now, G.sev, null);   // chase view: real wounds instead (playerWounds)
     if (CHASE && G.mfl > 0 && G.running && !G.dying) { const c = rgb(M.WPN[G.wpn].c), fl = .8 + Math.random() * .45; AIR.pts.muzzle.forEach(q => { AIR.node.localToWorld(V.copy(q)); FXA.glow(V, (MOBILE ? 54 : 42) * fl, c, Math.min(1, G.mfl / 55)); FXA.glow(V, (MOBILE ? 26 : 20) * fl, [1, .95, .8], Math.min(1, G.mfl / 45)); }); }   // a bigger, flickering muzzle flash with a white-hot core
+    if (CHASE && G.cool > 0 && G.running && !G.dying) AIR.pts.muzzle.forEach(q => { AIR.node.localToWorld(V.copy(q)); FXA.dark(V, 5, .5); if (Math.random() < .55) FXA.emit(V, V2.set((Math.random() - .5) * 7, 9 + Math.random() * 7, (G.gsp || 0) * 60 * .6 + 14), 1.1, 2.6, 13, [.82, .82, .85], [.4, .4, .43], .6, false, 0, .4, 5); });   // guns overheated: grey smoke streams off both barrels until they cool (index.html gunStep)
     else if (G.mfl > 0 && G.running && !G.dying) { const c = rgb(M.WPN[G.wpn].c), a = G.mfl / 70, pts = G.wpn < 3 ? [-22, 22] : [-22, 0, 22];
       pts.forEach(of => { const x = G.x + of, y = G.y - (of ? 20 : 36); Ba.q(x, y, Y + 6, 24, 24, 0, UV.dot, c[0], c[1], c[2], a); Ba.q(x, y, Y + 7, 10, 10, 0, UV.dot, 1, 1, 1, a); }); }
   }
@@ -1177,7 +1183,7 @@ async function boot() {
       [0, 1].forEach(pg => { try { front(birdGet(pg), i++); } catch (e) {} });
       if (APXM) try { front(apexMesh(), i++); BEAMM.forEach(m => { m.visible = true; m.position.set(0, 100, z0); tmp.push(m); }); } catch (e) {}
       if (BLIMP3) front(BLIMP3.node, i++); front(blimp, i++); if (PLY) { PLY.visible = true; tmp.push(PLY); }
-      ["city", "towers", "melody", "stadium", "hills", "coast", "venice", "pier", "runway", "compton", "civic", "longbeach", "hwdblvd", "f105", "sofi", "inglewood"].forEach((k, j) => { try { const sg = WORLD.segment(k, 700, 9000 + j, { side: j % 2 ? 1 : -1, noStrip: true, warm: true }); sg.group.position.z = z0 - 300; scene.add(sg.group); sg.update(now / 1000, .016, true); segs.push(sg); } catch (e) {} });
+      ["city", "towers", "melody", "stadium", "hills", "coast", "venice", "pier", "runway", "compton", "civic", "longbeach", "harbor", "hollywood", "hwdblvd", "f105", "sofi", "inglewood"].forEach((k, j) => { try { const sg = WORLD.segment(k, 700, 9000 + j, { side: j % 2 ? 1 : -1, noStrip: true, warm: true }); sg.group.position.z = z0 - 300; scene.add(sg.group); sg.update(now / 1000, .016, true); segs.push(sg); } catch (e) {} });
       if (drizTex()) { const o = poolGet(drizs, 0, drizMesh); o.scale.set(30, 1, 50); front(o, i++); }   // the drizzle-bottle pickup: its shader used to compile the first time one flew in (a skip ~15 s into a run)
       if (COMBAT && COMBAT._warm) COMBAT._warm(true, V.set(0, 100, z0));
       SM.makeTranslation(0, 100, z0); SLUG.body.setMatrixAt(0, SM); SLUG.tip.setMatrixAt(0, SM); SLUG.body.count = SLUG.tip.count = 1;   // (compile the slug shaders too)

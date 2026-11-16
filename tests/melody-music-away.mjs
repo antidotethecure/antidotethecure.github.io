@@ -25,6 +25,7 @@ ok("referral card fits a phone", card && card.w && await p.evaluate(() => docume
 
 /* music button + scroll away */
 await p.evaluate(() => document.querySelector(".cvwrap").scrollIntoView({ block: "center" })); await settle();
+await p.evaluate(() => document.querySelector(".gm-ov [data-gm=vibe]").click());   // the menu asks Boy or girl before it shows PLAY
 await p.click(".gm-ov [data-gm=play]", { force: true }); await p.waitForTimeout(900);   // the start menu covers the game's buttons until Play (the button pulses, so force)
 const mb = () => p.evaluate(() => { const b = document.querySelector(".gm-mbtn"); return { on: b.classList.contains("on"), mute: b.classList.contains("mute"), bg: getComputedStyle(b).backgroundImage }; });
 let m = await mb();

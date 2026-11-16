@@ -13,7 +13,7 @@ await p.goto(BASE + '/demo/storm-burger/index.html?render=3d', { waitUntil: 'loa
 await p.waitForFunction(() => window.__SB3 && (window.__SB3.booted || window.__SB3.reason), null, { timeout: 40000 });
 await p.waitForTimeout(7500);   // both warm-up passes
 const loaded = await p.evaluate(() => Object.keys(window.__SB3.lmod || {}).sort().join());
-await p.evaluate(() => { [...document.querySelectorAll('button')].find(x => /^\s*▶?\s*PLAY\s*$/i.test(x.textContent)).click();
+await p.evaluate(() => { document.querySelector(".gm-ov [data-gm=vibe]").click(); [...document.querySelectorAll('button')].find(x => /^\s*▶?\s*PLAY\s*$/i.test(x.textContent)).click();
   let last = 0; window.__G = []; const f = t => { if (last) __G.push(t - last); last = t; requestAnimationFrame(f); }; requestAnimationFrame(f); });
 const p0 = await p.evaluate(() => window.__SB3.mem().programs);
 for (const n of NAMES) { await p.evaluate(n => window.__SB3.lmTest(n, n === 'stadium' || n === 'forum' ? 'L' : 'R'), n); await p.waitForTimeout(3500); }

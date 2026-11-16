@@ -192,7 +192,7 @@
   // the small 🎵 button pauses only the music. Nothing is created until the first tap (iOS audio unlock).
   var AC = null, MASTER = null, FX = null, MUSG = null, MUS = null, SURF = null, MUTED = false, SFX_ON = true, MUSIC_ON = true, HELI = null, MUSIC_VOL = 0.18;
   /* two songs, switchable from the HUD 🎵 pill, the pause menu, Settings, the M key or controller B (../songswitch.js, short crossfade) */
-  var MSW = window.SongSwitch ? SongSwitch({ key: "nalu-song", vol: MUSIC_VOL, fade: .8, songs: [{ id: "cheat", name: "Cheat Code", src: "audio/cheat-code.m4a" }, { id: "xrp", name: "Xtreme Rich Person", src: "audio/xtreme-rich-person.m4a" }],
+  var MSW = window.SongSwitch ? SongSwitch({ key: "nalu-song", vol: MUSIC_VOL, fade: .8, songs: [{ id: "cheat", name: "Cheat Code", src: "audio/cheat-code.m4a" }, { id: "xrp", name: "Xtreme Rich Person", src: "audio/xtreme-rich-person.m4a" }, { id: "energy", name: "Energy", src: "../storm-burger/audio/energy.m4a" }],
     onTap: function () { audio(); if (AC && AC.state === "suspended") AC.resume(); musicSync(); } }) : null;
   try { MUTED = localStorage.getItem("nalu-mute") === "1"; SFX_ON = localStorage.getItem("nalu-sfx") !== "0"; MUSIC_ON = localStorage.getItem("nalu-music") !== "0"; } catch (e) {}
   function audio() {

@@ -10,7 +10,7 @@ const p = await b.newPage({ viewport: { width: 420, height: 800 } });
 const errs = []; p.on("pageerror", e => errs.push(String(e).slice(0, 140)));
 await p.goto(BASE + "/demo/melody-lax/index.html?render=2d&debug=1&season=off&god=1", { waitUntil: "load" });
 await p.waitForTimeout(1500);
-await p.evaluate(() => { [...document.querySelectorAll("button")].find(x => /PLAY/.test(x.textContent)).click(); MELODY_DEBUG.god(); MELODY_DEBUG.level(1); });
+await p.evaluate(() => { document.querySelector(".gm-ov [data-gm=vibe]").click(); [...document.querySelectorAll("button")].find(x => /PLAY/.test(x.textContent)).click(); MELODY_DEBUG.god(); MELODY_DEBUG.level(1); });
 // sample heat / cool-down / rounds fired every 100 ms until one full cycle has been seen (30 s at most). Heat and cool-down
 // count GAME milliseconds, so the numbers are checked in game time: a slow headless browser stretches the wall clock.
 const log = await p.evaluate(() => new Promise(done => { const G = MELODY_DEBUG.G(), out = []; let shots = 0, last = G.shotT, cooled = 0, back = 0;

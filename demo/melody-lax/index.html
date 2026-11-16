@@ -1624,7 +1624,7 @@ var SND=(function(){
     rot.n.connect(rot.lp); rot.lp.connect(rot.am); rot.lfo.connect(rot.dep); rot.dep.connect(rot.am.gain); rot.am.connect(rot.g); rot.g.connect(fx); rot.n.start(); rot.lfo.start();
     apply(); return ctx; }
   /* two songs, switchable from the HUD 🎵 pill, the pause menu, Settings, the M key or controller B (../songswitch.js, short crossfade) */
-  var MS=SongSwitch({key:"melody-song",vol:MUSV,fade:.8,songs:[{id:"xrp",name:"Xtreme Rich Person",src:"audio/xtreme-rich-person.m4a"},{id:"cheat",name:"Cheat Code",src:"audio/cheat-code.m4a"}],onTap:function(){ unlock(); }});
+  var MS=SongSwitch({key:"melody-song",vol:MUSV,fade:.8,songs:[{id:"xrp",name:"Xtreme Rich Person",src:"audio/xtreme-rich-person.m4a"},{id:"cheat",name:"Cheat Code",src:"audio/cheat-code.m4a"},{id:"energy",name:"Energy",src:"../storm-burger/audio/energy.m4a"}],onTap:function(){ unlock(); }});
   function songEl(){ song=MS.el(); return song; }
   function apply(){ if(!ctx) return; var t=ctx.currentTime; var on=st.sound&&!away; master.gain.setTargetAtTime(on?1:0,t,.05); fx.gain.setTargetAtTime(st.sfx?1:0,t,.05); mus.gain.setTargetAtTime(routed?MUSV:1,t,.05);
     if(song) MS.sync(on&&st.music); }
@@ -2921,7 +2921,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
    get:function(){ return window.__E3Q?__E3Q.pref:"auto"; },set:function(v){ if(window.__E3Q) __E3Q.set(v); }},
   {title:"Weather",options:[["live","Live"],["sunny","Sunny"],["partly","Clouds"],["overcast","Overcast"],["fog","Fog"],["rain","Rain"],["storm","Storm"]],
    get:function(){ return window.MELODY_ENV?MELODY_ENV.get().weather:"live"; },set:function(v){ if(window.MELODY_ENV) MELODY_ENV.weather(v); else try{ localStorage.setItem("melody-weather",v); }catch(e){} }},
-  {title:"Song",options:[["xrp","Xtreme Rich Person"],["cheat","Cheat Code"]],
+  {title:"Song",options:[["xrp","Xtreme Rich Person"],["cheat","Cheat Code"],["energy","Energy"]],
    get:function(){ return window.GameMusic?GameMusic.cur().id:"xrp"; },set:function(v){ if(window.GameMusic) GameMusic.set(v); }},
   {title:"Time of day",options:[["live","Live"],["sunrise","Sunrise"],["day","Day"],["sunset","Sunset"],["night","Night"]],
    get:function(){ return window.MELODY_ENV?MELODY_ENV.get().sky:"live"; },set:function(v){ if(window.MELODY_ENV) MELODY_ENV.sky(v); else try{ localStorage.setItem("melody-sky",v); }catch(e){} }}],
@@ -2972,7 +2972,7 @@ window.GAME_MENU={id:"melody-lax",name:"Melody Approach",by:"Melody Bar & Grill"
   {group:"Weekly boards",items:[{icon:"🏆",name:"Campaign board",note:"Ranked by score (levels beaten add big bonuses)",pts:"score"},{icon:"⏱️",name:"Survival board",note:"Ranked by the longest time survived",pts:"time"}]}],
  prizes:{title:"Weekly challenge (BETA)",champion:"Top of each weekly board wins "+(WK.prize||"Free Melody Fries")+" once Melody turns rewards on",note:"BETA: rewards are off until Melody switches them on. Until then the boards rank players for bragging rights and the game gives no prizes or Melody Rewards points. When they're on: 1 point per "+GP.perScore+" score, up to "+GP.dailyCap+" points a day."}};
 })();</script>
-<script src="../gamemenu.js?v=ms1"></script><script src="../a2hs.js?v=mg1"></script>
+<script src="../gamemenu.js?v=pl1"></script><script src="../a2hs.js?v=mg1"></script>
 <script>/* Simple program (Christian, 2026-10): one balance, the numbers live in window.SSAI_REWARDS at the top of this page.
    No split wallets, visit levels, tokens, daily spin or welcome voucher (see crm.js SIMPLE). */
 window.CRM_CFG={name:"Melody Bar & Grill",mount:"#rwhost",simple:window.SSAI_REWARDS,game:"Melody Approach",customerOnly:true};

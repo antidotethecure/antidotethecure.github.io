@@ -36,6 +36,12 @@
                                     them anywhere in its HTML (they keep working: data-gm wiring is unchanged). The overlay then
                                     gets class gm-show (top-aligned, scrolls inside itself, opaque) and preview() never turns it
                                     see-through. GameMenu.refresh() re-renders it.
+   BOY OR GIRL + PLAYLISTS (owner, 2026-11-15; every game, no config): each game's start screen first asks "Boy or girl?" and
+   shows PLAY and the rest only after the answer (asked once per game; the last answer on this phone is lit up, and it can be
+   changed under 🎧 Playlist). It is its own screen because the menu already fills the game box. 🎧 Playlist lists the game's own songs (songswitch.js,
+   they play in the game) and the boy or girl list of 10 outside songs. Those 20 are label-owned recordings, so they are never
+   hosted here: a tap loads Spotify's own embedded player for that one song (nothing from Spotify loads before the tap).
+   Kid mode (modes) shows the game's own songs only: no third-party player and no explicit songs for a child.
    Audio convention (games that have sound expose it; the menu wires to it):
      window.GAME_AUDIO={ music:function(on){}, sfx:function(on){}, state:function(){ return {hasMusic:true,hasSfx:true,music:true,sfx:true}; } }
      music(false) must silence ONLY the music (gain 0 / pause the <audio>), never suspend the shared AudioContext.
@@ -69,12 +75,65 @@
 
   function TK() { return (C.tokens && W.SSAI_TOKENS) || null; }
 
+  /* ---------- Boy or girl + playlists ---------- */
+  var VKEY = "ssai:vibe", vmem = "", spId = "";   // vmem: the answer also lives in memory, so PLAY still works where storage is blocked
+  try { vmem = localStorage.getItem(VKEY) || ""; } catch (e) {}
+  function vibe() { return vmem === "boy" || vmem === "girl" ? vmem : ""; }
+  function asked() { return !!S.vibe && !!vibe(); }   // S.vibe = this game has asked; the answer itself is shared by the games
+  function setVibe(v) { if (v !== "boy" && v !== "girl") return; if (v !== vmem) spOff(); vmem = v; S.vibe = 1; save(); try { localStorage.setItem(VKEY, v); } catch (e) {} }
+  function modeCur() { try { return (C.modes && C.modes.get()) || ""; } catch (e) { return ""; } }
+  // [artist, title, Spotify track id]; ids checked against Spotify's embed pages 2026-11-15 (tests/menu-playlist.mjs LIVE=1 re-checks)
+  var PL = {
+    boy: [["Giveon", "Get To You", "2D5syPC60v8voqHqo9kUtn"], ["Daniel Caesar", "Always", "2LlOeW5rVcvl3QcPNPcDus"], ["Drake", "Finesse", "2WP8G2pdddDmnh1xbfKBOI"],
+      ["Bryson Tiller", "Right My Wrongs", "5rgrBsAFYMun6yhtnLKRPz"], ["The Weeknd", "True Colors", "6i759FCuKx713ZnYjtpQGU"], ["Giveon", "Garden Kisses", "62d6YXEYxmMWAuLpw1EysL"],
+      ["Chase Shakur", "Honda Civic 98", "1ztPf79mbGpktO7TjB7tWW"], ["PARTYNEXTDOOR", "TBH", "236P5yLtfnHgTMxevc0q6F"], ["Lucky Daye", "Roll Some Mo", "6L0ETPzoDGAOApLvcutny4"],
+      ["Brent Faiyaz", "F*** The World", "2CzUlaKN1mvb0szagSR3ux"]],
+    girl: [["Summer Walker", "CPR", "3wFphAlcE8OaWiAObr9kWp"], ["Kiana Ledé", "Too Far", "3VW7KIvhdjJgTjy81i22XZ"], ["SZA", "Nobody Gets Me", "5Y35SjAfXjjG0sFQ3KOxmm"],
+      ["Kali Uchis", "Love Between", "128I36bDgYHU9l2QcgEGcd"], ["Ella Mai", "Power of A Woman", "1dDy8IYSA4NH8JtpGLhcMb"], ["Kaash Paige", "About Last Night", "4q8bO6T7C27LRmYMqyBSVk"],
+      ["Jhené Aiko", "Summer 2020", "0t2q2c43AATY4z1GI883Be"], ["H.E.R.", "Jungle", "0R3OnUm6RgIpRFcckCoi0x"], ["Snoh Aalegra", "Everything", "3HKq6ANjSw6lVWvovCjXLs"],
+      ["Kehlani", "Get Me Started", "0jeCoIGrGhw8lnkd5YF0qB"]]
+  };
+  // games with no song list of their own (Churrito, Lucky Dragon, Gritz) still get his two songs in both playlists: a plain
+  // songswitch.js player that this menu drives. It loads when the Playlist opens; no audio downloads before a song is tapped.
+  var own = null, ownOn = false, ownAsk = false;
+  function ownLoad() {
+    if (W.GameMusic || ownAsk || !meSrc) return; ownAsk = true;
+    var base = meSrc.replace(/gamemenu\.js(\?.*)?$/, "");
+    function mk() {
+      if (W.GameMusic || !W.SongSwitch) return;
+      own = W.SongSwitch({ key: "gm-song", vol: .5, fade: .8, playlist: true, songs: [{ id: "cheat", name: "Cheat Code", src: base + "storm-burger/audio/cheat-code.m4a" }, { id: "energy", name: "Energy", src: base + "storm-burger/audio/energy.m4a" }] });
+      if (sheet && sheet.classList.contains("on") && sheet.getAttribute("data-p") === "playlist") panel("playlist");
+    }
+    if (W.SongSwitch) return mk();
+    var j = D.createElement("script"); j.src = base + "songswitch.js"; j.onload = mk; D.head.appendChild(j);
+  }
+  function ownStop() { if (own && ownOn) { ownOn = false; own.sync(false); } }
+  function vibeHTML(seg) {
+    var v = vibe(), o = [["boy", "👦", "Boy", "Boy playlist"], ["girl", "👧", "Girl", "Girl playlist"]];
+    if (seg) return '<div class="gm-seg">' + o.map(function (x) { return '<button type="button" data-gm="vibe" data-v="' + x[0] + '" aria-pressed="' + (v === x[0]) + '">' + x[1] + " " + esc(T(x[2])) + "</button>"; }).join("") + "</div>";
+    return '<div class="gm-who gm-vibe" role="group" aria-label="' + esc(T("Boy or girl?")) + '"><p>' + esc(T("Boy or girl?")) + '</p><div class="gm-wb">' +
+      o.map(function (x) { return '<button type="button" data-gm="vibe" data-v="' + x[0] + '" aria-pressed="' + (v === x[0]) + '"><i>' + x[1] + "</i>" + esc(T(x[2])) + "<small>" + esc(T(x[3])) + "</small></button>"; }).join("") + "</div></div>";
+  }
+  function playlistHTML() {
+    var v = vibe(), gm = W.GameMusic, h = '<p class="gm-g">' + esc(T("Who's listening?")) + "</p>" + vibeHTML(true);
+    if (gm && gm.songs && gm.songs.length) h += '<p class="gm-g">' + esc(T("Game songs · play right in the game")) + "</p>" + gm.songs.map(function (s) {
+      return '<button type="button" class="gm-sw" data-gm="song" data-v="' + esc(s.id) + '" aria-pressed="' + (!spId && gm.cur() === s && (gm !== own || ownOn)) + '"><i style="font-style:normal;font-size:22px">🎵</i><span>' + esc(s.name) + (gm === own && ownOn && gm.cur() === s ? "<small>" + esc(T("Playing · tap again to stop")) + "</small>" : "") + "</span></button>"; }).join("");
+    if (modeCur() === "kid") return h + '<p class="gm-note">' + esc(T("Kid mode plays the game songs only.")) + "</p>";
+    if (!v) return h + '<p class="gm-note">' + esc(T("Pick Boy or Girl to see the playlist.")) + "</p>";
+    h += '<p class="gm-g">' + esc(T(v === "boy" ? "Boy playlist · late night vibes" : "Girl playlist · late night vibes")) + "</p>";
+    // the outside songs are label-owned: only Spotify's own player may play them, and it loads only after this tap
+    if (spId) h += '<iframe class="gm-sp" title="Spotify player" src="https://open.spotify.com/embed/track/' + spId + '" height="80" allow="autoplay; encrypted-media; clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>' +
+      '<button type="button" class="gm-sw" data-gm="spoff"><i style="font-style:normal;font-size:22px">↩</i><span>' + esc(T("Close the Spotify player")) + "</span></button>";
+    h += PL[v].map(function (s) { return '<button type="button" class="gm-sw" data-gm="sp" data-v="' + s[2] + '" aria-pressed="' + (spId === s[2]) + '"><i style="font-style:normal;font-size:22px">🎧</i><span class="notranslate">' + esc(s[1]) + "<small>" + esc(s[0]) + "</small></span></button>"; }).join("");
+    return h + '<p class="gm-note">' + esc(T("These songs play in Spotify's own player: tap a song, then tap ▶ on it. You hear a 30-second preview unless you are signed in to Spotify, and Spotify's terms and cookies apply. The game music waits while a Spotify song is open.")) + "</p>";
+  }
+
   /* ---------- audio ---------- */
   function A() { return C.audio || W.GAME_AUDIO || null; }
   function ast() { var a = A(); try { return a && a.state ? a.state() || {} : {}; } catch (e) { return {}; } }
   function hasMusic() { var a = A(); return C.music !== false && !!(a && a.music) && ast().hasMusic !== false; }
   function hasSfx() { var a = A(); return !!(a && a.sfx) && ast().hasSfx !== false; }
-  function applyAudio() { var a = A(); if (!a) return; try { if (hasMusic()) a.music(!!S.music); if (hasSfx()) a.sfx(!!S.sfx); } catch (e) {} }
+  function applyAudio() { var a = A(); if (!a) return; try { if (hasMusic()) a.music(!!S.music && !spId && !ownOn); if (hasSfx()) a.sfx(!!S.sfx); } catch (e) {} }
 
   /* ---------- vibration: games call navigator.vibrate; the switch gates it ---------- */
   var canVib = !!(C.vibrate && navigator.vibrate);
@@ -162,6 +221,8 @@
     ".gm-who{width:min(300px,100%)}.gm-who p{margin:0 0 5px;font:800 12px/1 var(--gm-body);letter-spacing:.14em;text-transform:uppercase;color:var(--gm-label)}" +
     ".gm-wb{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gm-wb button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:62px;padding:6px;border-radius:16px;border:2px solid var(--gm-edge);background:var(--gm-card);color:var(--gm-ink);font:900 17px/1.1 var(--gm-body);cursor:pointer;touch-action:manipulation}" +
     ".gm-wb button i{font-style:normal;font-size:24px;line-height:1}.gm-wb button small{font:700 11px/1.2 var(--gm-body);color:var(--gm-dim)}.gm-wb button[aria-pressed=true]{border-color:var(--gm-acc2);background:color-mix(in srgb,var(--gm-acc) 30%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--gm-acc2) 40%,transparent)}" +
+    ".gm-vibe .gm-wb button{min-height:92px;font-size:20px}.gm-vibe .gm-wb button i{font-size:32px}.gm-vibe+.gm-note{margin:0;text-align:center}" +   /* Boy or girl: the big first question */
+    ".gm-sp{display:block;width:100%;border:0;border-radius:12px;margin:6px 0}.gm-sw[aria-pressed=true]{border-color:var(--gm-acc2)}.gm-sw small{display:block;font:600 12px var(--gm-body);color:var(--gm-dim)}" +
     ".gm-who.need{animation:gmShake .45s}@keyframes gmShake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}" +
     ".gm-ov.hasmodes .gm-tag{display:none}.gm-ov.hasmodes .gm-hero{height:46px}.gm-ov.hasmodes .gm-hero img{height:42px}" +
     ".gm-fstip{display:block;width:min(300px,100%);margin:-4px 0 0;padding:4px 6px;border:0;background:none;color:var(--gm-dim);font:700 12px/1.3 var(--gm-body);cursor:pointer;text-decoration:underline;text-underline-offset:2px}" +
@@ -183,6 +244,7 @@
     h += '<div class="gm-t notranslate" role="heading" aria-level="2">' + esc(C.name || "Play") + "</div>";
     if (C.tagline) h += '<p class="gm-tag">' + esc(T(C.tagline)) + "</p>";
     var tk = TK(), M = C.modes, cur = M ? (function () { try { return M.get() || ""; } catch (e) { return ""; } })() : "";
+    if (!asked()) return h + vibeHTML() + '<p class="gm-note">' + esc(T("This picks your playlist. You can change it any time under 🎧 Playlist.")) + "</p>";
     if (M) h += '<div class="gm-who" role="group" aria-label="' + esc(T(M.title || "Who's playing?")) + '"><p>' + esc(T(M.title || "Who's playing?")) + '</p><div class="gm-wb">' +
       M.options.map(function (o) { return '<button type="button" data-gm="mode" data-v="' + esc(o[0]) + '" aria-pressed="' + (cur === o[0]) + '"><i>' + o[1] + "</i>" + esc(T(o[2])) + "<small>" + esc(T(o[3])) + "</small></button>"; }).join("") + "</div></div>";
     if (tk) { try { h += '<p class="gm-tok" aria-live="polite">' + tk.statusHTML(cur === "kid") + "</p>"; } catch (e) {} }
@@ -195,6 +257,7 @@
     if (tk && tk.on) bs.push('<button type="button" class="gm-b" data-gm="tokens"><i>🪙</i>' + esc(T("Get tokens")) + "</button>");
     if (hasMusic()) bs.push('<button type="button" class="gm-b" data-gm="music" aria-pressed="' + !!S.music + '"><i>' + (S.music ? "🎵" : "🔇") + "</i>" + esc(T(S.music ? "Music on" : "Music off")) + "</button>");
     var fsOn = !!(FS() && FS().active);
+    bs.push('<button type="button" class="gm-b" data-gm="playlist"><i>🎧</i>' + esc(T(vibe() === "girl" ? "Girl playlist" : vibe() === "boy" ? "Boy playlist" : "Playlist")) + "</button>");
     bs.push('<button type="button" class="gm-b" data-gm="fs" aria-pressed="' + fsOn + '"><i>' + (fsOn ? "✕" : "⛶") + "</i>" + esc(T(fsOn ? "Exit full screen" : "Full screen")) + "</button>");
     if (AH()) bs.push('<button type="button" class="gm-b" data-gm="a2hs"><i>📲</i>' + esc(T("Add to Home Screen")) + "</button>");
     bs.push('<button type="button" class="gm-b" data-gm="settings"><i>⚙️</i>' + esc(T("Settings")) + "</button>");
@@ -245,7 +308,16 @@
     else if (a === "a2hs") { closeSheet(); if (W.A2HS) W.A2HS.open("menu"); }
     else if (a === "pclose") closeSheet();
     else if (a === "howlink") { closeSheet(); try { C.how.links[+b.getAttribute("data-v")][1](); } catch (x) {} }
-    else if (a === "mode") { try { C.modes.set(b.getAttribute("data-v")); } catch (x) {} if (ov && opened) ov.innerHTML = menuHTML(); }
+    else if (a === "mode") { try { C.modes.set(b.getAttribute("data-v")); } catch (x) {} if (modeCur() === "kid") spOff(); refresh(); }
+    else if (a === "vibe") { setVibe(b.getAttribute("data-v")); refresh(); }
+    else if (a === "song") {
+      var sid = b.getAttribute("data-v");
+      if (own) { var stop = ownOn && own.cur().id === sid; spOff(); ownOn = !stop; own.set(sid); own.sync(ownOn); applyAudio(); }   // the menu's own player: tap the playing song again to stop it
+      else { try { W.GameMusic.set(sid); } catch (x) {} setMusic(true); }
+      panel("playlist");
+    }
+    else if (a === "sp") { var id = b.getAttribute("data-v"); if (/^[A-Za-z0-9]{22}$/.test(id) && modeCur() !== "kid") { ownStop(); spId = id; applyAudio(); panel("playlist"); } }
+    else if (a === "spoff") { spOff(); panel("playlist"); }
     else if (a === "spin") { closeSheet(); if (TK()) TK().openSpin(); }
     else if (a === "tokens") { closeSheet(); if (TK()) TK().openTokens(); }
     else if (a === "sw") toggle(b.getAttribute("data-k"));
@@ -254,6 +326,8 @@
     else if (a === "diff") { S.diff = b.getAttribute("data-v"); save(); try { C.difficulty.set(S.diff); } catch (x) {} panel("settings"); }
     else panel(a);
   }
+  function spOff() { spId = ""; var f = sheet && sheet.querySelector(".gm-sp"); if (f) f.remove(); applyAudio(); }   // removing the frame is what stops Spotify
+  function need(sel) { var w = ov.querySelector(sel); if (w) { w.classList.remove("need"); void w.offsetWidth; w.classList.add("need"); } }
   // opt-in live preview: the real game runs a silent demo behind the see-through menu
   function preview(on) { if (!C.preview) return; try { C.preview(!!on); } catch (x) { if (W.console) console.error(x); } }
   function cd() { var tk = TK(), ms = tk && tk.nextSpinMs ? tk.nextSpinMs() : 0, m = Math.max(1, Math.round(ms / 60000)); return (m >= 60 ? Math.floor(m / 60) + "h " : "") + (m % 60) + "m"; }
@@ -261,8 +335,10 @@
     closeSheet();
     // they chose full screen last time → enter it now, inside the PLAY tap (the Fullscreen API needs a user gesture)
     var f = FS(); if (f && f.pref && !f.active) f.enter(false);
+    if (!asked()) return need(".gm-vibe");
     var M = C.modes, cur = "";
-    if (M) { try { cur = M.get() || ""; } catch (x) {} if (!cur) { var w = ov.querySelector(".gm-who"); if (w) { w.classList.remove("need"); void w.offsetWidth; w.classList.add("need"); } return; } }
+    if (M) { try { cur = M.get() || ""; } catch (x) {} if (!cur) return need(".gm-who:not(.gm-vibe)"); }
+    if (cur === "kid") spOff();   // the parent sign-in can finish after a Spotify song was opened
     var tk = TK(); if (tk) { tk.play(go, { kid: cur === "kid" }); return; }   // account check (Phase 1) / token cost (Phase 2) first
     go();
   }
@@ -277,10 +353,11 @@
   function close() { if (!ov) return; preview(false); ov.classList.add("off", "gone"); opened = false; D.documentElement.classList.remove("gm-up"); }
 
   /* ---------- settings ---------- */
+  function mlabel() { if (mbtn) { mbtn.textContent = S.music ? "🎵" : "🔇"; mbtn.classList.toggle("mute", !S.music); mbtn.setAttribute("aria-label", S.music ? "Music on. Tap to turn music off" : "Music off. Tap to turn music on"); } }
   function setMusic(on) {
-    S.music = !!on; save(); applyAudio();
+    S.music = !!on; ownStop(); if (on) spOff(); save(); applyAudio();
     if (ov && opened) ov.innerHTML = menuHTML();
-    if (mbtn) { mbtn.textContent = S.music ? "🎵" : "🔇"; mbtn.classList.toggle("mute", !S.music); mbtn.setAttribute("aria-label", S.music ? "Music on. Tap to turn music off" : "Music off. Tap to turn music on"); }
+    mlabel();
     if (sheet && sheet.classList.contains("on") && sheet.getAttribute("data-p") === "settings") panel("settings");
   }
   function toggle(k) {
@@ -298,7 +375,7 @@
     return '<div class="gm-r"><span class="gm-ic">' + ic + '</span><span class="gm-tx"><b>' + esc(T(it.name)) + "</b>" + (it.note ? "<small>" + esc(T(it.note)) + "</small>" : "") +
       "</span>" + (it.pts != null ? '<span class="gm-pt ' + cls + '">' + esc(T(it.pts)) + "</span>" : "") + "</div>";
   }
-  var TITLES = { points: "🏆 Points & prizes", how: "❓ How to play", settings: "⚙️ Settings" };
+  var TITLES = { points: "🏆 Points & prizes", how: "❓ How to play", settings: "⚙️ Settings", playlist: "🎧 Playlist" };
   function body(p) {
     var h = "";
     if (p === "points") {
@@ -321,6 +398,7 @@
       if (hw.links && hw.links.length) h += '<p class="gm-g">' + esc(T("Replay a lesson")) + "</p>" + hw.links.map(function (l, i) { return '<button type="button" class="gm-sw" data-gm="howlink" data-v="' + i + '"><span>' + esc(T(l[0])) + "</span></button>"; }).join("");
       if (TK()) { try { h += TK().menuHTML(row, "how"); } catch (e) {} }
       h += '<p class="gm-note">' + esc(T("Pause anytime with the ⏸ Pause button in the corner.")) + "</p>";
+    } else if (p === "playlist") { h += playlistHTML();
     } else if (p === "settings") {
       h += '<p class="gm-g">' + esc(T("Sound")) + "</p>";
       h += hasMusic() ? sw("music", "Music", "🎵", S.music) : none("🎵", "No music in this game");
@@ -346,6 +424,7 @@
   }
   function panel(p) {
     if (!TITLES[p]) return;
+    if (p === "playlist") ownLoad();
     if (!sheet) {
       sheet = el("div", "gm-sheet"); sheet.setAttribute("role", "dialog"); sheet.setAttribute("aria-modal", "true");
       sheet.innerHTML = '<div class="gm-card"><div class="gm-hd"><h3></h3><button type="button" class="gm-x" data-gm="pclose" aria-label="Close">✕</button></div><div class="gm-bd" data-scroll-ok></div></div>';
@@ -369,7 +448,7 @@
     if (!mbtn) {
       mbtn = el("button", "gm-mbtn"); mbtn.type = "button";
       mbtn.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); setMusic(!S.music); });
-      D.body.appendChild(mbtn); setMusic(S.music);
+      D.body.appendChild(mbtn); mlabel(); applyAudio();   // not setMusic(): that would close a Spotify song the guest opened before PLAY
       if (W.IntersectionObserver && box) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; showM(); }, { threshold: 0.2 }).observe(box);
     }
     mbtn.classList.toggle("on", started && !opened && vis);
@@ -380,6 +459,7 @@
     if (pov.querySelector(".gm-prow")) return;
     var r = el("div", "gm-prow", (hasMusic() ? '<button type="button" data-p="music">🎵 ' + esc(T("Music")) + "</button>" : "") +
       (W.GameMusic ? '<button type="button" data-p="song">🎶 ' + esc(W.GameMusic.cur().name) + "</button>" : "") +
+      '<button type="button" data-p="playlist">🎧 ' + esc(T("Playlist")) + "</button>" +
       '<button type="button" data-p="settings">⚙️ ' + esc(T("Settings")) + '</button><button type="button" data-p="how">❓ ' + esc(T("How to play")) +
       '</button><button type="button" data-p="points">🏆 ' + esc(T("Points")) + "</button>");
     r.addEventListener("click", function (e) {

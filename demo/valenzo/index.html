@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en" data-theme="maison">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'sha256-+RelOPL2W3Mu54WkKnIJjr3fInCKeIuPt8KlL3rKbyI='; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src 'self'; connect-src 'self' blob: data:; base-uri 'none'; form-action 'none'">
+<script src="../../js/frame-guard.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Valenzo Studio · Los Angeles</title>
+<meta name="description" content="Valenzo Studio, Los Angeles. Crystal shirts, painted prints and signature boot cut denim. Dress the mannequin in 3D: any shirt with any denim.">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0d0a07">
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="valenzo.css?v=2">
+<script src="valenzo.js?v=2"></script>
+</head>
+<body>
+
+<svg width="0" height="0" class="defs" aria-hidden="true" focusable="false">
+  <symbol id="knot" viewBox="0 0 100 100">
+    <g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+      <circle cx="50" cy="31" r="19" pathLength="100"/>
+      <circle cx="50" cy="69" r="19" pathLength="100"/>
+      <circle cx="31" cy="50" r="19" pathLength="100"/>
+      <circle cx="69" cy="50" r="19" pathLength="100"/>
+      <rect x="30" y="30" width="40" height="40" transform="rotate(45 50 50)" pathLength="100"/>
+    </g>
+  </symbol>
+</svg>
+
+<div id="intro">
+  <div class="i-mark">
+    <svg class="emblem" aria-hidden="true"><use href="#knot"/></svg>
+    <p class="i-word">Valenzo</p>
+    <span class="i-rule"></span>
+    <p class="i-sub">Studio &middot; Los Angeles</p>
+  </div>
+  <div class="i-reel" aria-hidden="true"><div class="i-track" id="reel"></div></div>
+  <button id="skip" type="button">Skip intro</button>
+</div>
+
+<nav class="bar" aria-label="Site">
+  <a class="brand" href="#top"><svg class="emblem" aria-hidden="true"><use href="#knot"/></svg><span>Valenzo</span></a>
+  <span class="links">
+    <a href="#collection">Collection</a>
+    <a href="#fitting-room">Fitting Room</a>
+    <a href="#studio">Studio</a>
+    <a href="#wholesale">Wholesale</a>
+  </span>
+  <a class="btn gold small" href="https://www.tiktok.com/@valenzostudio" target="_blank" rel="noopener noreferrer">Shop on TikTok</a>
+</nav>
+
+<header class="hero" id="top">
+  <div class="floor" id="floor"><div class="hall" id="hall"></div></div>
+  <div class="hero-in">
+    <div>
+      <svg class="emblem" aria-hidden="true"><use href="#knot"/></svg>
+      <h1>Valenzo <span>Studio</span></h1>
+      <p class="lede">Western style, elevated.</p>
+    </div>
+    <div>
+      <p class="hint"><span class="pick">Choose a mannequin to try its outfit on</span><span class="walk">Swipe to walk the floor &middot; tap a mannequin to try it on</span></p>
+      <p class="actions">
+        <a class="btn gold" href="#collection">Enter the collection</a>
+        <a class="btn line" href="#fitting-room">Step into the fitting room</a>
+      </p>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="collection" class="night">
+  <p class="kicker">The Collection</p>
+  <h2>Ten pieces, each one lit like the only one in the room.</h2>
+  <div id="cats" role="group" aria-label="Filter the collection"></div>
+  <ul id="grid"></ul>
+  <noscript><p class="note">Turn on JavaScript to walk the collection in 3D.</p></noscript>
+</section>
+
+<section id="fitting-room" class="night deep">
+  <div class="stage dark" id="stage">
+    <div class="niche">
+      <span class="beam" aria-hidden="true"></span>
+      <canvas id="fit" role="img" aria-label="3D mannequin"></canvas>
+      <div class="zoom">
+        <button type="button" id="z-in" aria-label="Zoom in">+</button>
+        <button type="button" id="z-out" aria-label="Zoom out">&minus;</button>
+      </div>
+    </div>
+    <p class="drag" id="fit-note" role="status">Dressing the mannequin&hellip;</p>
+  </div>
+  <div class="panel">
+    <p class="kicker">The Fitting Room</p>
+    <h2>Build the look.</h2>
+    <p class="desc">Put any shirt with any denim, pick your size, then move in close on the collar, the buttons and the stitching.</p>
+    <div class="views" role="group" aria-label="View">
+      <button type="button" data-view="front">Front</button>
+      <button type="button" data-view="back">Back</button>
+      <button type="button" id="v-spin" aria-pressed="true">Spin</button>
+      <button type="button" data-view="collar">Collar</button>
+      <button type="button" data-view="buttons">Buttons</button>
+      <button type="button" data-view="pocket">Back pocket</button>
+    </div>
+    <div id="pieces"></div>
+    <p class="total" id="p-total" aria-live="polite"></p>
+    <p class="fine" id="p-fit" aria-live="polite"></p>
+    <p class="fine">Sample size run for this preview. Final sizes and prices are on the TikTok Shop.</p>
+    <p class="actions">
+      <a class="btn gold" href="https://www.tiktok.com/@valenzostudio" target="_blank" rel="noopener noreferrer">Shop on TikTok</a>
+      <a class="btn line" href="https://wa.me/13238473181" target="_blank" rel="noopener noreferrer">Ask about wholesale</a>
+    </p>
+    <noscript><p class="note">Turn on JavaScript to dress the mannequin.</p></noscript>
+  </div>
+</section>
+
+<section id="studio" class="marble">
+  <p class="kicker">The House</p>
+  <h2>Where modern fashion meets western attitude.</h2>
+  <div class="trio">
+    <figure><img src="img/detail-crystal.webp" alt="Close view of the crystal key pattern on a black Valenzo shirt" loading="lazy" width="720" height="900"><figcaption><b>Crystal</b>Bold geometric patterns. Clean details. A statement look in every color.</figcaption></figure>
+    <figure><img src="img/detail-print.webp" alt="Close view of the ivory marble print shirt" loading="lazy" width="720" height="900"><figcaption><b>Prints</b>Premium details, bold patterns, and a fit made to stand out.</figcaption></figure>
+    <figure><img src="img/detail-denim.webp" alt="Close view of the V embroidery on Valenzo boot cut jeans" loading="lazy" width="720" height="900"><figcaption><b>Denim</b>Signature embroidery. Premium denim. Made to stand out from every angle.</figcaption></figure>
+  </div>
+</section>
+
+<section id="reels" class="night">
+  <p class="kicker">From the Studio</p>
+  <h2>Straight from @valenzostudio.</h2>
+  <div class="reels">
+    <video src="vid/crystal.mp4" muted loop playsinline preload="none" poster="vid/crystal.jpg" aria-label="Valenzo Studio video: crystal shirts"></video>
+    <video src="vid/vdm07.mp4" muted loop playsinline preload="none" poster="vid/vdm07.jpg" aria-label="Valenzo Studio video: VDM07 jeans"></video>
+    <video src="vid/showroom.mp4" muted loop playsinline preload="none" poster="vid/showroom.jpg" aria-label="Valenzo Studio video: print shirts"></video>
+    <video src="vid/bootcut.mp4" muted loop playsinline preload="none" poster="vid/bootcut.jpg" aria-label="Valenzo Studio video: boot cut jeans"></video>
+  </div>
+</section>
+
+<section id="wholesale" class="night deep">
+  <div class="plaque">
+    <svg class="emblem" aria-hidden="true"><use href="#knot"/></svg>
+    <p class="kicker">Wholesale &amp; Retail</p>
+    <h2>Los Angeles, California</h2>
+    <p>Stocking a store, or just want one piece? Message the studio directly.</p>
+    <p class="actions">
+      <a class="btn gold" href="https://wa.me/13238473181" target="_blank" rel="noopener noreferrer">WhatsApp (323) 847-3181</a>
+      <a class="btn line" href="https://www.tiktok.com/@valenzostudio" target="_blank" rel="noopener noreferrer">TikTok Shop</a>
+    </p>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <p>&copy; Valenzo Studio &middot; Los Angeles, CA</p>
+  <p class="fine">Preview site. Garments are shown as 3D digital renderings made from Valenzo Studio's own videos. Final names, sizes and prices are on the TikTok Shop.</p>
+</footer>
+<script src="../poweredby.js?v=20261013a" defer></script>
+</body>
+</html>

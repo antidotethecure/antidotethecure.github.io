@@ -842,7 +842,9 @@ var SEQ=["hills","hills","hills","coast","venice","coast","city","towers","melod
    LAX → Melody (Westchester) → Venice / Nalu Vida → Santa Monica → Hollywood, then a banking turn through the clouds back down
    the coast to Long Beach → Compton → the San Gabriels → Orange County → downtown LA → the San Fernando Valley, then home to LAX.
    seq: the ground strips of that district, looped while you're in it (kinds built by world3d.js). Survival keeps cycling the route. */
-var ZONES=[{id:"hollywood",name:"Hollywood",seq:["hwdblvd","hollywood","hills","hwdblvd"],loop:1},
+/* mid: a one-off landmark strip, built once a visit so it rolls under you about halfway through the district (2026-11-16, Antidote:
+   "I don't want it to keep repeating the Hollywood sign" -- the Boulevard with the stars runs the whole way, the sign comes once, in the middle) */
+var ZONES=[{id:"hollywood",name:"Hollywood",seq:["hwdblvd","hwdblvd","hwdblvd","hills"],mid:"hollywood",loop:1},
   {id:"venice",name:"Nalu Vida · Venice Beach",seq:["coast","venice","coast","city"]},
   {id:"melody",name:"Melody · Inglewood",seq:["melody","city","sofi","inglewood","city"]},
   {id:"lax105",name:"The 105",seq:["f105","f105","f105"]},
@@ -874,11 +876,17 @@ function addSeg(){ var k=G.landing&&!G.rwyQueued?(G.rwyQueued=1,"runway"):nextKi
   if(k==="runway"){ G.gy-=520; G.ground.push({k:k,t:"city2",y:G.gy,h:520,side:1}); return; }
   var opts=TILE_OF[k]||["city1"], t=opts[(tileN++)%opts.length], h=TILES[t]?TILES[t].h:600; G.gy-=h; G.ground.push({k:k,t:t,y:G.gy,h:h,side:Math.random()<.5?-1:1}); }
 // the next ground strip: the 3D chase view follows the route (the district of the current level); the 2D top view keeps its old photo loop
-function nextKind(){ if(!CH) return SEQ[G.seq++%SEQ.length]; var zi=zoneNow(); if(G.zi!==zi){ G.zi=zi; G.zs=0; } var z=ZONES[zi]; return z.seq[(G.zs++)%z.seq.length]; }
+function zoneReset(zi){ G.zi=zi; G.zs=0; G.zel=G.el||0; G.zmid=0; }
+// shortcut: MID_LEAD (time from a strip being built at the horizon to it passing under the plane) is a fixed 12 s; tune it if the flight speed changes
+var MID_LEAD=12000;
+function zoneMs(zi){ var t=CALM?CALM_ZONE:ZONE_OF_LV, n=0; for(var i=0;i<t.length;i++) if(t[i]===zi) n++; return Math.max(1,n)*LEG_MS; }
+function nextKind(){ if(!CH) return SEQ[G.seq++%SEQ.length]; var zi=zoneNow(); if(G.zi!==zi) zoneReset(zi); var z=ZONES[zi];
+  if(z.mid&&!G.zmid&&G.running&&(G.el||0)-G.zel>=zoneMs(zi)/2-MID_LEAD){ G.zmid=1; return z.mid; }
+  return z.seq[(G.zs++)%z.seq.length]; }
 /* entering a district: the strips not reached yet switch to it. The loop back to Long Beach is a banking turn through a cloud bank
    (melody3d.js draws the bank + the cloud; the swap happens while you're inside it, so nothing pops) */
 function zoneEnter(){ if(!CH) return; var zi=zoneNow(), z=ZONES[zi]; if(G.zi===zi) return;
-  var swap=function(){ if(zoneNow()!==zi) return; G.zi=zi; G.zs=0; for(var i=0;i<G.ground.length;i++){ var g=G.ground[i]; if(g.k==="runway"||g.y+g.h>(z.loop?H+40:-260)) continue; g.k=nextKind(); } };
+  var swap=function(){ if(zoneNow()!==zi) return; zoneReset(zi); for(var i=0;i<G.ground.length;i++){ var g=G.ground[i]; if(g.k==="runway"||g.y+g.h>(z.loop?H+40:-260)) continue; g.k=nextKind(); } };
   if(z.loop){ G.cloud={t0:performance.now(),d:2600}; setTimeout(swap,1050); } else swap(); }
 var LMW={melody:250,stadium:270,towers:240};   // sprite widths (the 3D layer uses the same numbers via M3.LMW)
 function drawGround(dy){

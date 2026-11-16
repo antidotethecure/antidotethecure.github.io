@@ -265,7 +265,7 @@ async function boot() {
   /* the rounds themselves: a brass/steel slug (shiny, metallic) with a white-hot tip, flying nose-first along its path; the
      screen-space streak behind it is the fiery tracer tail. Instanced (one draw each); a little larger than life so they read. */
   const SLUG = (() => { const MX = 160, g = new THREE.CapsuleGeometry(.9, 6.5, 3, 8).rotateX(Math.PI / 2), tg = new THREE.SphereGeometry(1.25, 8, 6);
-    const body = new THREE.InstancedMesh(g, new THREE.MeshStandardMaterial({ color: 0xc08a2c, metalness: 1, roughness: .3, envMapIntensity: 1.1, emissive: 0x3a1804, emissiveIntensity: .35, fog: false }), MX);
+    const body = new THREE.InstancedMesh(g, new THREE.MeshStandardMaterial({ color: 0xc08a2c, metalness: 1, roughness: .3, envMapIntensity: 1.1, emissive: 0xb07a2c, emissiveIntensity: .9, fog: false }), MX);   // lit brass: pure metal with no glow rendered near-black at night, and far rounds bunched into a black block
     const tip = new THREE.InstancedMesh(tg, new THREE.MeshBasicMaterial({ color: new THREE.Color(2.6, 1.8, .9), toneMapped: false, fog: false }), MX);
     [body, tip].forEach(m => { m.count = 0; m.frustumCulled = false; m.renderOrder = 131; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); });
     return { body, tip, n: 0, MX }; })();
@@ -607,13 +607,14 @@ async function boot() {
     // debris: 3D tumbling shards that fall away toward the ground, burning ones glow
     let dn = 0;
     for (let i = 0; i < DB.length && dn < 80; i++) { const p = DB[i]; QOFF = rOff(p); if (p.n3) { p.n3 = 0; p.alt = birthAlt(p); if (p.alt === -2) p.alt = Math.max(3, playerAlt - 8); else if (p.alt < 0) p.alt = 18; p.tilt = Math.random() * 6.3; }
-      const u = p.age / p.life, sc = (1 - .6 * u) * p.sz * (p.sx || 1), Y = Math.max(2, p.alt * (1 - u * .9)), k = ws(Y);
+      const u = p.age / p.life, sc = (1 - .6 * u) * p.sz * (p.sx || 1), Y = Math.max(2, p.ride && !p.ride.hit && crashAlt >= 0 ? Math.min(p.alt * (1 - u * .9), crashAlt - 4 - 40 * u) : p.alt * (1 - u * .9)), k = ws(Y);   // parts off the falling plane fall at least as fast as it does
       DM.compose(DP.set(wx(p.x, Y) + QOFF, Y, wz(p.y, Y)), DQ.setFromEuler(DE.set(p.tilt + p.rot * 1.3, -p.rot, p.rot * .7)), DS.set(sc * 2 * k, sc * 2 * k, sc * 2 * k / (p.sx || 1)));
       DC.set(p.col); if (p.burn) DC.lerp(HOT, Math.max(0, 1 - u * 1.6)); debrisMesh.setMatrixAt(dn, DM); debrisMesh.setColorAt(dn, DC); dn++;
       if (p.burn) { const g = 5 + p.sz; Ba.q(p.x, p.y, Y + 2, g * 2, g * 2, 0, UV.glow, 1, 1, 1, .7 * (1 - u)); } }
     debrisMesh.count = dn; debrisMesh.instanceMatrix.needsUpdate = true; if (debrisMesh.instanceColor) debrisMesh.instanceColor.needsUpdate = true;
     // fire: embers, fireballs, flame licks (additive)
     for (let i = 0; i < FI.length; i++) { const p = FI[i]; QOFF = rOff(p); if (p.n3) { p.n3 = 0; p.alt = birthAlt(p); }
+      if (p.ride && !p.ride.hit && crashAlt >= 0) p.alt = Math.max(4, crashAlt - 6);   // fire riding the falling plane drops with it
       if (p.alt === -2) continue; const u = p.age / p.life, Y = p.alt < 0 ? 12 + 30 * u : p.alt + 4;
       if (p.k === "em") { if (UV.spark) streak(Ba, p.x, p.y, Y, p.vx, p.vy, p.s * 1.8, p.s * 2 + Math.hypot(p.vx, p.vy) * 3.2, 1 - u);
         else { const c = u < .3 ? [1, .95, .77] : u < .6 ? [1, .7, .28] : [1, .35, .12]; Ba.q(p.x, p.y, Y, p.s * 1.6, p.s * 1.6, 0, UV.dot, c[0], c[1], c[2], 1 - u); } }
@@ -647,11 +648,12 @@ async function boot() {
 
   /* ---------------- per-frame: aircraft, pickups, shots ---------------- */
   const PLANE_HW = 524 / 520;
+  function unZ(Z, Y, y) { for (let i = 0; i < 3; i++) { const z0 = wz(y, Y), d = wz(y + 1, Y) - z0; if (Math.abs(d) < 1e-6) break; y += (Z - z0) / d; } return y; }   // inverse of wz near a guess (Newton; wz is smooth and increasing)
   function playerFire(o, G, now, sev, crash) { // flame tongues + heat cores on the fire points of the airframe (same spread rules as FX.planeFire)
     if (sev <= .15) return; const P = FXI.PTS, sz0 = o.userData.size, wspan = sz0.x, stage = sev < 1.5 ? 1 : sev < 2.5 ? 2 : 3;
     const rot = crash ? crash.rot : Math.max(-1, Math.min(1, G.vx * .12)) * .35, tail = rot + Math.PI / 2, sc = crash ? crash.sc : 1, pw = crash ? M.PLANE_W : M.PLANE_W * (.74 + .26 * (G.alt == null ? 1 : G.alt));
     for (let i = 0; i < P.length; i++) { const Pt = P[i], it = i === 0 ? (sev < .6 ? 0 : Math.min(1, .32 + (sev - 1) * .34)) : Math.max(0, Math.min(1, (sev - Pt[2]) / .5)); if (it <= 0) continue;
-      const w = local(o, -Pt[0] * wspan, sz0.y * .5, -Pt[1] * wspan * PLANE_HW); const X = w.x, Y = w.y + 2, Z = w.z, k = ws(Y), x = X / k + W / 2, y = Z / k + H / 2;
+      const w = local(o, -Pt[0] * wspan, sz0.y * .5, -Pt[1] * wspan * PLANE_HW); const X = w.x, Y = w.y + 2, Z = w.z, k = ws(Y), x = X / k + W / 2, y = unZ(Z, Y, crash ? crash.y : G.y);   // undo wz exactly (chase view stretches depth): the flames sit on the airframe, not ahead of it
       const sz = (6 + 10 * it) * sc; flamesAt(Bn, x, y, Y, sz * 1.3, tail, now, i * 1.7, it > .55 && !FXI.LITE ? 3 : 2, UV.tonguen);
       Ba.q(x, y, Y + 1, sz * 1.8, sz * 1.8, 0, UV.glow, 1, 1, 1, .32 * it * (.8 + .2 * Math.sin(now * .03 + i))); } }
   function drawPlayer(now, G) {

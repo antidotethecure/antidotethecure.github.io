@@ -55,7 +55,7 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=ex2") : null, WORLDM = CHASE ? await import("./world3d.js?v=ex2.hs5") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=ex2") : null, WORLDM = CHASE ? await import("./world3d.js?v=ex2.hs6") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
   const QM = await import("../engine3d/quality.js?v=e3t");
@@ -256,8 +256,8 @@ async function boot() {
           float w = iW.x + iW.y; float t = uv.x; vec2 sp = mix(sa - dir * w * .5, sb + dir * w * .5, t) + nrm * (uv.y - .5) * w * 2.0;
           vec4 c = t < .5 ? ca : cb; gl_Position = vec4(sp / (uRes * .5) * c.w, c.z, c.w); vUv = uv; vC = iC; vW = iW.x / max(1.0, w); }`,
       fragmentShader: `varying vec2 vUv; varying vec4 vC; varying float vW;
-        void main(){ float r = abs(vUv.y - .5) * 4.0; float core = smoothstep(vW * 1.15, vW * .35, r), halo = exp(-r * r * 2.2) * .55;
-          float tail = mix(1.0, .25, vUv.x); vec3 col = mix(vC.rgb, vec3(1.0, .97, .85) * 2.2, core) * (core + halo) * tail;
+        void main(){ float r = abs(vUv.y - .5) * 4.0; float core = smoothstep(vW * 1.15, vW * .35, r), halo = exp(-r * r * 2.2) * .3;
+          float tail = mix(1.0, .06, vUv.x); vec3 col = mix(vC.rgb, vec3(1.0, .97, .85) * 1.25, core) * (core + halo) * tail;
           gl_FragColor = vec4(col * vC.a, 1.0); }` });
     const mesh = new THREE.Mesh(g, mat); mesh.frustumCulled = false; mesh.renderOrder = 132; scene.add(mesh); let n = 0;
     return { mesh, U, begin() { n = 0; }, add(a, b, r, gg, bb, al, core, halo) { if (n >= max) return; A.set([a.x, a.y, a.z], n * 3); B.set([b.x, b.y, b.z], n * 3); C.set([r, gg, bb, al], n * 4); Wd[n * 2] = core; Wd[n * 2 + 1] = halo; n++; },
@@ -266,11 +266,11 @@ async function boot() {
      screen-space streak behind it is the fiery tracer tail. Instanced (one draw each); a little larger than life so they read. */
   const SLUG = (() => { const MX = 160, g = new THREE.CapsuleGeometry(.9, 6.5, 3, 8).rotateX(Math.PI / 2), tg = new THREE.SphereGeometry(1.25, 8, 6);
     const body = new THREE.InstancedMesh(g, new THREE.MeshStandardMaterial({ color: 0xc08a2c, metalness: 1, roughness: .3, envMapIntensity: 1.1, emissive: 0xb07a2c, emissiveIntensity: .9, fog: false }), MX);   // lit brass: pure metal with no glow rendered near-black at night, and far rounds bunched into a black block
-    const tip = new THREE.InstancedMesh(tg, new THREE.MeshBasicMaterial({ color: new THREE.Color(2.6, 1.8, .9), toneMapped: false, fog: false }), MX);
+    const tip = new THREE.InstancedMesh(tg, new THREE.MeshBasicMaterial({ color: new THREE.Color(1.5, 1.05, .55), toneMapped: false, fog: false }), MX);
     [body, tip].forEach(m => { m.count = 0; m.frustumCulled = false; m.renderOrder = 131; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); });
     return { body, tip, n: 0, MX }; })();
   const SQ = new THREE.Quaternion(), SZ = new THREE.Vector3(0, 0, 1), SD = new THREE.Vector3(), SS = new THREE.Vector3(), SM = new THREE.Matrix4();
-  const TRG = new THREE.Vector3(), TRH = new THREE.Vector3(), TRA = new THREE.Vector3(), TRB = new THREE.Vector3(), TRO = new THREE.Vector3(), MZL = [new THREE.Vector3(), new THREE.Vector3()], BEAMT = { t: -1e9, a: [0, 0], far: [new THREE.Vector3(), new THREE.Vector3()] };
+  const TRG = new THREE.Vector3(), TRH = new THREE.Vector3(), TRA = new THREE.Vector3(), TRB = new THREE.Vector3(), TRO = new THREE.Vector3(), MZL = [new THREE.Vector3(), new THREE.Vector3()], BEAMT = { t: -1e9, a: [0, 0], far: [new THREE.Vector3(), new THREE.Vector3()] }, NOSE = new THREE.Vector3(), NOSE_OFF = new THREE.Vector3(0, 1.4, 15.5);   // NOSE_OFF: from between the wing guns to just ahead of the nose cone (air3d.js: guns at z 3.2, nose tip at z 17.3)
   if (CHASE) [Bn, Ba].forEach(b => { b.mesh.material.uniforms.uBill.value = 1; });
   const hex = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255]; };
   const rgbaCache = {}; function rgb(s) { if (rgbaCache[s]) return rgbaCache[s]; let v; if (s[0] === "#") v = hex(s); else { const m = s.match(/[\d.]+/g).map(Number); v = [m[0] / 255, m[1] / 255, m[2] / 255]; } return rgbaCache[s] = v; }
@@ -419,10 +419,18 @@ async function boot() {
   const PK = "plane";
   // instances: each model type has a pool of clones; materials are cloned per clone so hit flashes/tints stay local
   const POOLS = {};
+  /* 2026-11-16 (Antidote: "the planes, the helicopters, I need the contrast to be a little bit higher"): the dark jets and helicopters sank into
+     the night city. Their own colours are lifted and pushed apart, and a pale rim light traces the silhouette, so they read against the map.
+     One shared function = one shared shader program. Look only. */
+  const AIRCRAFT = new Set(["plane", "jet", "cop0", "cop1", "kami3"]);
+  function punchy(sh) { let f = sh.fragmentShader.replace("#include <map_fragment>", "#include <map_fragment>\n  diffuseColor.rgb = clamp((diffuseColor.rgb - .2) * 1.35 + .3, 0., 1.);");
+    if (f.includes("vViewPosition")) f = f.replace("#include <opaque_fragment>", "outgoingLight += vec3(.8, .9, 1.) * pow(1. - clamp(dot(normalize(normal), normalize(vViewPosition)), 0., 1.), 2.2) * .42;\n#include <opaque_fragment>");   // unlit materials have no normal: colour lift only
+    sh.fragmentShader = f; }
   function cloneModel(k, tint) {
     const src = MODELS[k]; const o = new THREE.Group(), inner = src.node.clone(true); const mats = [];
     const food = k.startsWith("p_") && k !== "p_mic";
     inner.traverse(n => { if (n.isMesh) { n.material = n.material.clone(); if (tint) n.material.color.multiply(new THREE.Color(tint)); if (!n.material.userData.keep && n.material.emissive) n.material.emissive = new THREE.Color(0);   // (unlit materials have no emissive uniform: giving them one crashed the render)
+      if (AIRCRAFT.has(k)) n.material.onBeforeCompile = punchy;
       if (food && n.material.map) { n.material.emissiveMap = n.material.map; n.material.roughness = .42; n.material.needsUpdate = true; } mats.push(n.material); } });
     o.add(inner); o.rotation.order = "YXZ"; o.userData = { mats, size: src.size, inner }; scene.add(o); return o;
   }
@@ -687,7 +695,7 @@ async function boot() {
     playerAlt = Y; playerX = G.x; playerY = G.y; PL.x = G.x; PL.y = G.y; PL.Y = Y; flash(o, 0);
     if (!CHASE) navPair(now, 0, frac(o, .47, .1, -.02).clone(), frac(o, -.47, .1, -.02), 2.2);
     if (G.sev > .15 && !CHASE) playerFire(o, G, now, G.sev, null);   // chase view: real wounds instead (playerWounds)
-    if (CHASE && G.mfl > 0 && G.running && !G.dying) { const c = rgb(M.WPN[G.wpn].c), fl = .8 + Math.random() * .45; AIR.pts.muzzle.forEach(q => { AIR.node.localToWorld(V.copy(q)); FXA.glow(V, (MOBILE ? 54 : 42) * fl, c, Math.min(1, G.mfl / 55)); FXA.glow(V, (MOBILE ? 26 : 20) * fl, [1, .95, .8], Math.min(1, G.mfl / 45)); }); }   // a bigger, flickering muzzle flash with a white-hot core
+    if (CHASE && G.mfl > 0 && G.running && !G.dying) { const c = rgb(M.WPN[G.wpn].c), fl = .8 + Math.random() * .45; (G.wpn >= 3 ? [NOSE] : AIR.pts.muzzle).forEach(q => { if (q === NOSE) V.copy(q); else AIR.node.localToWorld(V.copy(q)); FXA.glow(V, (MOBILE ? 54 : 42) * fl, c, Math.min(1, G.mfl / 55)); FXA.glow(V, (MOBILE ? 26 : 20) * fl, [1, .95, .8], Math.min(1, G.mfl / 45)); }); }   // a bigger, flickering muzzle flash with a white-hot core
     if (CHASE && G.cool > 0 && G.running && !G.dying) AIR.pts.muzzle.forEach(q => { AIR.node.localToWorld(V.copy(q)); FXA.dark(V, 5, .5); if (Math.random() < .55) FXA.emit(V, V2.set((Math.random() - .5) * 7, 9 + Math.random() * 7, (G.gsp || 0) * 60 * .6 + 14), 1.1, 2.6, 13, [.82, .82, .85], [.4, .4, .43], .6, false, 0, .4, 5); });   // guns overheated: grey smoke streams off both barrels until they cool (index.html gunStep)
     else if (G.mfl > 0 && G.running && !G.dying) { const c = rgb(M.WPN[G.wpn].c), a = G.mfl / 70, pts = G.wpn < 3 ? [-22, 22] : [-22, 0, 22];
       pts.forEach(of => { const x = G.x + of, y = G.y - (of ? 20 : 36); Ba.q(x, y, Y + 6, 24, 24, 0, UV.dot, c[0], c[1], c[2], a); Ba.q(x, y, Y + 7, 10, 10, 0, UV.dot, 1, 1, 1, a); }); }
@@ -843,26 +851,31 @@ async function boot() {
       TRC.U.uRes.value.set(W * pr, H * pr); PLY.updateMatrixWorld(true); AIR.pts.muzzle.forEach((q, i) => AIR.node.localToWorld(MZL[i].copy(q)));
       const fired = G.mfl > 0 && run; if (fired) BEAMT.t = now; const ba = Math.max(0, 1 - (now - BEAMT.t) / 150);
       const far = [null, null];
+      /* 2026-11-16 (Antidote: "less bright so you can still see the map", "more realistic", "blue laser from the front of the plane"):
+         bullets (twin guns, power gun) are thin dim tracers (TW width, TA brightness); the beam guns (w >= 3) leave from the nose
+         (NOSE), not the wing guns, and a beam is not drawn until it is out in front of the nose. Look only: rate/damage unchanged. */
+      AIR.node.localToWorld(NOSE.copy(AIR.pts.muzzle[0]).add(AIR.pts.muzzle[1]).multiplyScalar(.5).add(NOSE_OFF));
       /* EVERY ROUND TRAILS BACK TO WHERE IT WAS FIRED, not to where the gun is right now (2026-11-02, Antidote: "when the bullet is
          shot out of the plane, I don't want it to move when I swipe to the left or right. The bullet should still go straight from
          where it was shot from, or the laser"). The streak, the ghost round, the slug's nose and the gun's glow beam all used to be
          aimed at the live muzzle, so the moment you steered, every round already in the air swung sideways with the plane. The round
          itself never moved - its streak did. Each round now remembers its own muzzle the first frame it is seen and keeps it. */
       for (let s = 0; s < G.shots.length; s++) { const sh = G.shots[s], Y = alt3(sh, A.shot) + 2; TRA.set(wx(sh.x, Y), Y, wz(sh.y, Y)); const gi = MZL.length > 1 && Math.abs(TRA.x - MZL[1].x) < Math.abs(TRA.x - MZL[0].x) ? 1 : 0;   /* the gun on the round's own side */
-        if (sh.o3x === undefined) { const mz = MZL[gi]; sh.o3x = mz.x; sh.o3y = mz.y; sh.o3z = mz.z; }
-        const M0 = TRO.set(sh.o3x, sh.o3y, sh.o3z);
+        if (sh.o3x === undefined) { const mz = sh.w >= 3 ? NOSE : MZL[gi]; sh.o3x = mz.x; sh.o3y = mz.y; sh.o3z = mz.z; }
+        const M0 = TRO.set(sh.o3x, sh.o3y, sh.o3z); sh.h3 = sh.w >= 3 && TRA.z > M0.z - 6; if (sh.h3) continue;   /* still over the plane: not drawn yet */
+        const gun = sh.w === 0 || sh.w === 2, TW = gun ? .5 : .7, TA = gun ? .5 : .55;
         const d = TRA.distanceTo(M0), seg = Math.min(d, (46 + sh.w * 8) * LC); TRB.copy(M0).sub(TRA).setLength(seg).add(TRA);
         const c = sh.w === 1 ? [.55, 1.25, .5] : sh.w === 3 ? [.4, .85, 1.3] : sh.w === 4 ? [1.3, .3, .25] : [1.35, .8, .25];
-        TRC.add(TRA, TRB, c[0], c[1], c[2], 1, (3.2 + sh.w * .5) * WC * DP, (7 + sh.w) * WC * DP);
-        if (d > 60) { TRG.copy(TRA).lerp(M0, .5); TRH.copy(TRG).lerp(M0, Math.min(.9, seg * .55 / Math.max(1, d * .5))); TRC.add(TRG, TRH, c[0], c[1], c[2], .75, (2.6 + sh.w * .4) * WC * DP, (6 + sh.w) * WC * DP); }   // the ghost round
-        if (SLUG.n < SLUG.MX) { const i = SLUG.n++, k = (MOBILE ? 3.1 : 2.4) * (1 + sh.w * .15); SD.copy(TRA).sub(M0).normalize(); SQ.setFromUnitVectors(SZ, SD);   // the slug, nose first
+        TRC.add(TRA, TRB, c[0], c[1], c[2], TA, (3.2 + sh.w * .5) * WC * DP * TW, (7 + sh.w) * WC * DP * TW);
+        if (d > 60) { TRG.copy(TRA).lerp(M0, .5); TRH.copy(TRG).lerp(M0, Math.min(.9, seg * .55 / Math.max(1, d * .5))); TRC.add(TRG, TRH, c[0], c[1], c[2], .75 * TA, (2.6 + sh.w * .4) * WC * DP * TW, (6 + sh.w) * WC * DP * TW); }   // the ghost round
+        if (SLUG.n < SLUG.MX) { const i = SLUG.n++, k = (MOBILE ? 2.1 : 1.7) * (1 + sh.w * .15); SD.copy(TRA).sub(M0).normalize(); SQ.setFromUnitVectors(SZ, SD);   // the slug, nose first
           SM.compose(TRA, SQ, SS.set(k, k, k)); SLUG.body.setMatrixAt(i, SM); SM.compose(SS.copy(TRA).addScaledVector(SD, 4.2 * k), SQ, SD.set(k, k, k)); SLUG.tip.setMatrixAt(i, SM); }
         if (!far[gi] || d > far[gi].d) far[gi] = { d, p: far[gi] ? far[gi].p.copy(TRA) : TRA.clone(), o: far[gi] ? far[gi].o.copy(M0) : M0.clone() }; }
       // a faint glowing beam along each gun's stream, fading ~150 ms after the last shot (reads as a strip even at 30 fps)
-      if (ba > 0) for (let i = 0; i < 2; i++) if (far[i]) TRC.add(far[i].p, far[i].o, 1, .55, .15, .35 * ba, 1.2 * WC * DP, 6 * WC * DP);   // the glow runs back down the stream to where that burst left the gun, so it stays put when you steer
+      if (ba > 0) for (let i = 0; i < 2; i++) if (far[i]) TRC.add(far[i].p, far[i].o, 1, .55, .15, .1 * ba, 1.2 * WC * DP, 4 * WC * DP);   // the glow runs back down the stream to where that burst left the gun, so it stays put when you steer
     }
     for (let s = 0; s < G.shots.length; s++) { const sh = G.shots[s], x = sh.x, y = sh.y, Y = alt3(sh, A.shot) + 2;
-      if (CHASE) { const fl = .75 + Math.random() * .5; Ba.q(x, y, Y, 15 * BK * fl, 15 * BK * fl, 0, UV.dot, 1.8, .8, .25, .7); Ba.q(x, y, Y + .3, 8 * BK, 8 * BK, 0, UV.dot, 2.6, 2.2, 1.6, 1); continue; }   // flickering heat glow + hot core   // (the stream above draws the rest)
+      if (CHASE) { if (sh.h3) continue; const fl = .75 + Math.random() * .5; Ba.q(x, y, Y, 9 * BK * fl, 9 * BK * fl, 0, UV.dot, 1.8, .8, .25, .3); Ba.q(x, y, Y + .3, 4.5 * BK, 4.5 * BK, 0, UV.dot, 2.6, 2.2, 1.6, .6); continue; }   // flickering heat glow + hot core   // (the stream above draws the rest)
       if (sh.w === 0) bolt(x, y, Y, 5, 18, 1, .82, .35);
       else if (sh.w === 1) bolt(x, y, Y, 6, 30, .45, 1, .4);
       else if (sh.w === 2) { bolt(x, y, Y, 8, 20, 1, .55, .16); Ba.q(x, y, Y + .5, 24 * BK, 24 * BK, 0, UV.fball, 1, 1, 1, 1); }
@@ -1152,7 +1165,7 @@ async function boot() {
   const SHOTV = new THREE.Vector3(), SHOTD = new THREE.Vector3();
   function gunfire(now, G) { if (!COMBAT) return; let n = 0;
     for (const sh of G.shots) { if (SEEN.has(sh)) continue; SEEN.add(sh); if (n++ > 3 || !PLY.visible) continue; const c = rgb(M.WPN[G.wpn].c);
-      PLY.updateMatrixWorld(true); const mz = AIR.pts.muzzle[(sh.x < G.x ? 1 : 0) % AIR.pts.muzzle.length]; AIR.node.localToWorld(SHOTV.copy(mz)); COMBAT.muzzle(SHOTV, SHOTD.set(0, 0, -1), c, 1.1); }
+      PLY.updateMatrixWorld(true); const mz = AIR.pts.muzzle[(sh.x < G.x ? 1 : 0) % AIR.pts.muzzle.length]; if (sh.w >= 3) SHOTV.copy(NOSE); else AIR.node.localToWorld(SHOTV.copy(mz)); COMBAT.muzzle(SHOTV, SHOTD.set(0, 0, -1), c, 1.1); }
     for (const es of G.eshots) { if (SEEN.has(es)) continue; SEEN.add(es); if (es.bomb || n++ > 6) continue; const Y = alt3(es, A.eshot); SHOTV.set(es.x - W / 2, Y, far(es.y) - H / 2);
       SHOTD.set(es.vx || 0, 0, es.vy || 1).normalize(); SHOTV.addScaledVector(SHOTD, -6); COMBAT.muzzle(SHOTV, SHOTD, es.missile ? [1, .7, .4] : [1, .42, .14], es.big ? 1.3 : .9); } }
   M.onBossDown = (b) => { if (!CHASE || !COMBAT || b.t !== "apex" || !APXO) return; const o = APXO.clone(true); o.traverse(n => { if (n.isMesh) n.material = n.material.clone(); }); o.visible = true; scene.add(o);

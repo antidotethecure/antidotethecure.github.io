@@ -21,9 +21,9 @@
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/utils/BufferGeometryUtils.js">
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/libs/meshopt_decoder.module.js">
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/environments/RoomEnvironment.js">
-<link rel="modulepreload" href="melody3d.js?v=fs5">
+<link rel="modulepreload" href="melody3d.js?v=fs6">
 <link rel="modulepreload" href="air3d.js?v=ex2">
-<link rel="modulepreload" href="world3d.js?v=ex2.hs3">
+<link rel="modulepreload" href="world3d.js?v=ex2.hs4">
 <link rel="modulepreload" href="beach3d.js?v=dx1">
 <link rel="modulepreload" href="../engine3d/quality.js?v=e3t">
 <link rel="modulepreload" href="../engine3d/billboard.js?v=e3t">
@@ -371,7 +371,7 @@ a.btn[href="#seat"],h2#seat,h2#seat+p.sub,h2#seat+p.sub+.seat,#obar,#sheet,.add,
 
 <section class="msec" id="sec-games" data-tab="games">
 <h2 id="play"><small>Play &amp; earn points</small>Fly the Melody approach</h2>
-<p class="sub">A night dogfight over LA. <b>Campaign:</b> 10 levels that follow a real SoCal route in six parts: take off past Melody and over Inglewood, ride the 105 freeway to LAX, the Venice Pier, Compton, Long Beach and the Queen Mary, then Hollywood for the finale, each a little harder, with six bosses (an Army gunship, the Super Jet, a big jet and its escorts, a rocket ship, an army base and a final flock of white birds), then land back at LAX. <b>Survival:</b> no finish line, it just keeps getting harder: how long can you last? Catch Melody's food as it floats by. Drag anywhere on the game and the plane glides to your finger; tap ⚡ for a speed boost and grab the hourglass for slow-mo. Prefer a calm flight? Pause and turn combat off. <b>BETA:</b> weekly prizes switch on soon; the boards are live now.</p>
+<p class="sub">A night dogfight over LA. <b>Campaign:</b> 10 levels that follow a real SoCal route in six parts: take off from LAX, fly down Hollywood, out to Venice Beach and Nalu Vida, pass Melody and the stadium in Inglewood, ride the 105 freeway into Compton, then Long Beach and the Queen Mary for the finale, each a little harder, with six bosses (an Army gunship, the Super Jet, a big jet and its escorts, a rocket ship, an army base and a final flock of white birds), then land back at LAX. <b>Survival:</b> no finish line, it just keeps getting harder: how long can you last? Catch Melody's food as it floats by. Drag anywhere on the game and the plane glides to your finger; tap ⚡ for a speed boost and grab the hourglass for slow-mo. Prefer a calm flight? Pause and turn combat off. <b>BETA:</b> weekly prizes switch on soon; the boards are live now.</p>
 <div id="versushost"></div>
 <div class="gamebox">
   <div class="hud">
@@ -732,13 +732,13 @@ var CALM=false;   // ⚔️ Combat row in the Pause menu: combat is ON by defaul
 try{ CALM=localStorage.getItem("melody_combat")==="0"; }catch(x){}
 (function(){ var c=new URLSearchParams(location.search).get("combat"); if(c==="0") CALM=true; else if(c==="1") CALM=false; })();
 var DENS=1.3;   // spawn intervals × this vs the original game (≈ 23% fewer enemies, bolts and planes on screen; was 1.5, a touch harder now)
-var CALM_SUB=["Wheels up over Westchester","Past the stadium and downtown","Up over the hills","Down the coast to Venice","Past the pier, then home to LAX"];
+var CALM_SUB=["Wheels up at LAX, down Hollywood","Venice Beach and Nalu Vida","Past Melody and the stadium","Over Compton","Long Beach, then home to LAX"];
 /* ---- CAMPAIGN (Antidote, 2026-10-12): 10 levels, 45 s each. Every level is ~6-8% harder than the one before it: spawn gaps
    (pace) shrink, choppers fly + fire faster (copV), their rounds get quicker (bul), and enemy HP grows. HP also tracks your gun
    tier (one upgrade a level until the Red beams at level 5), so time-to-kill keeps creeping up rather than jumping.
    Bosses end levels 3, 5, 6, 7, 8 and 10 (BOSS_AT). The calm (combat off) flight stays 5 scenic legs.
    SURVIVAL: endless. A new level every 40 s (same table, then +6% a level past 10) and a boss every couple of levels. ---- */
-var LV=[{ufo:2,cop:6,kami:4,jet:1,pace:1,copV:1,bul:4.4,sub:"Wheels up over Westchester"},
+var LV=[{ufo:2,cop:6,kami:4,jet:1,pace:1,copV:1,bul:4.4,sub:"Wheels up at LAX"},
   {ufo:4,cop:12,kami:8,jet:2,pace:.93,copV:1.07,bul:4.6,sub:"UFOs armor up · LAPD gets faster"},
   {ufo:7,cop:21,kami:14,jet:3,pace:.87,copV:1.14,bul:4.8,sub:"Boss at the end: Army gunship"},
   {ufo:11,cop:33,kami:21,jet:4,pace:.81,copV:1.22,bul:5,sub:"Choppers hunt in pairs"},
@@ -782,6 +782,7 @@ var WPN=[{n:"Twin guns",c:"#f0d375",rate:260,dmg:1.25,v:11},{n:"Laser",c:"#7dff6
    one every 30 s of flying. Tap the gun button (bottom-left of the game) or press Q/E or 1-6 to switch. Twin guns never run
    out; every other gun has limited ammo (volleys; the high beam has charges of 4.5 s each). Ammo crates float up from below:
    catch one to refill. An empty gun just clicks ("EMPTY") until you switch or grab ammo. */
+var GUN_HOT=5000, GUN_COOL=2500;   /* guns overheat (Antidote, 2026-11-15): 5 s of fire, then a smoking cool-down, then they start back up */
 var GUN_AT=20000, AMMO_MAX=[Infinity,90,60,150,150,3], BEAM_MS=4500, BEAM_TICK=100, BEAM_DMG=6, SURV_GUN_MS=30000, WICON=["🔫","🟢","🟠","🔵","🔴","💠"];
 var CRATE_AT=[24000,15000,12000,12000,9000,9000,9000,9000,9000,9000];
 function crateAt(l){ return CRATE_AT[Math.max(0,Math.min(CRATE_AT.length-1,l-1))]; }   // when each level's weapon crate parachutes in (a second one follows if you miss it)
@@ -794,7 +795,7 @@ var PSH=null;
 var LEG_MS=DBG.legms?Math.max(3000,DBG.legms):45000;
 function fresh(){ return {running:false,over:false,x:W/2,y:H-110,tx:W/2,ty:H-110,vx:0,mvx:0,mvy:0,bank:0,alt3:ALT_DEF,ta:ALT_DEF,mvz:0,eggFound:0,wob:0,trf:[],trfCalls:[],trfT:9000,trfN:0,bumps:0,guns:0,gb:null,gbT:12000,gbN:0,hzCD:0,hitN:0,penalty:0,tips:{},hp:100,score:0,t:LEG_MS,el:0,items:[],ens:[],shots:[],eshots:[],bolts:[],pops:[],fx:[],clouds:[],heals:0,lastHeal:0,
   tele:[],mode:"campaign",unl:0,ammo:[Infinity,0,0,0,0,0],beamT:0,beamCD:0,beamOn:0,beamTick:0,emptyT:0,ammoT:14000,beamLog:[],surv:0,survLv:0,survBoss:0,bossN:0,boostT:0,boostCD:0,btr:[],ts:1,slowT:0,slowN:0,slowK:"",slowNT:0,jw:null,
-  spawnT:600,ufoT:7000,jetT:13000,boltT:9000,kamiT:16000,copT:19000,copN:0,shotT:0,inv:0,mult:1,multT:0,shake:0,flash:0,red:0,dying:0,scroll:0,ground:[],gy:0,warn:[],
+  spawnT:600,ufoT:7000,jetT:13000,boltT:9000,kamiT:16000,copT:19000,copN:0,shotT:0,heat:0,cool:0,inv:0,mult:1,multT:0,shake:0,flash:0,red:0,dying:0,scroll:0,ground:[],gy:0,warn:[],
   lvl:1,lel:0,wpn:0,gotCrate:0,crates:0,crateT:crateAt(1),boss:null,bossDie:null,banner:null,upT:0,mfl:0,home:0,won:0,god:0,debug:0,
   half:0,dz:0,dzT:9000,rp:null,rpT:0,rpPasses:0,rpDone:0,rpDie:null,sev:0,crash:null,crashed:0,crashVar:"",rescue:null,rescueUsed:0,lastSpd:0}; }
 G=fresh();
@@ -836,27 +837,29 @@ window.MELODY_DEBUG={level:function(n){ if(!G.running) start(); G.debug=1; G.lvl
   traffic:function(o){ G.debug=1; TRF.spawn(o||null); }, ctl:function(){ return {mode:CTL.mode,x:G.x,y:G.y,tx:G.tx,ty:G.ty,vx:G.mvx,vy:G.mvy,bank:G.vx,trf:G.trf.length,bumps:G.bumps,streak:G.streak||0}; }};
 
 /* ---- the ground: Westchester at night, LAX runways and the landmarks rolling under you ---- */
-var SEQ=["city","towers","city","melody","city","city","stadium","city","towers","hills","hills","hills","coast","venice","coast","pier","city","melody","city"];   // (the old loop: 2D top view only)
+var SEQ=["hills","hills","hills","coast","venice","coast","city","towers","melody","city","stadium","city","city","towers","city","coast","pier","coast","city"];   // (the old loop: 2D top view only)
 /* THE ROUTE (2026-10-17, Antidote: "follow real SoCal geography as the levels go"). Each level flies over one district, in map order:
    LAX → Melody (Westchester) → Venice / Nalu Vida → Santa Monica → Hollywood, then a banking turn through the clouds back down
    the coast to Long Beach → Compton → the San Gabriels → Orange County → downtown LA → the San Fernando Valley, then home to LAX.
    seq: the ground strips of that district, looped while you're in it (kinds built by world3d.js). Survival keeps cycling the route. */
-var ZONES=[{id:"melody",name:"Melody · Inglewood",seq:["melody","city","sofi","inglewood","city"]},
-  {id:"lax105",name:"The 105 · LAX",seq:["f105","f105","f105"]},
-  {id:"venice",name:"Venice Pier",seq:["coast","venice","coast","city"]},
-  {id:"compton",name:"Compton",seq:["civic","compton","compton","compton","compton","compton"],loop:1},
-  {id:"longbeach",name:"Long Beach",seq:["longbeach","harbor","harbor"]},
-  {id:"hollywood",name:"Hollywood",seq:["hwdblvd","hollywood","hills","hwdblvd"],loop:1}];
-/* ROUTE ORDER (2026-10-19, Antidote): 1 Melody + Inglewood · 2 LAX + the 105 · 3 Nalu Vida · 4 Compton · 5 Long Beach · 6 Hollywood
-   (the mountains are gone). Levels → parts: the 10-level campaign walks the 6 parts in order (ZONE_OF_LV); the 5-leg calm flight
-   uses CALM_ZONE; Survival keeps cycling the campaign table. Scenery only: rules, scores and the difficulty curve are untouched. */
-var ZONE_OF_LV=[0,0,1,1,2,2,3,4,4,5];
-var CALM_ZONE=[0,1,2,4,5];   // the calm flight's 5 legs (Compton is skipped in the short scenic version)
+var ZONES=[{id:"hollywood",name:"Hollywood",seq:["hwdblvd","hollywood","hills","hwdblvd"],loop:1},
+  {id:"venice",name:"Nalu Vida · Venice Beach",seq:["coast","venice","coast","city"]},
+  {id:"melody",name:"Melody · Inglewood",seq:["melody","city","sofi","inglewood","city"]},
+  {id:"lax105",name:"The 105",seq:["f105","f105","f105"]},
+  {id:"compton",name:"Compton",seq:["civic","compton","compton","compton","compton","compton"]},
+  {id:"longbeach",name:"Long Beach",seq:["longbeach","harbor","harbor"]}];
+/* ROUTE ORDER (2026-11-15, Antidote): take off from LAX · 1 Hollywood · 2 Venice Beach + Nalu Vida · 3 Melody + Inglewood · 4 the 105 ·
+   5 Compton · 6 Long Beach. He asked for Venice + Nalu Vida back without naming a slot: it sits after Hollywood because that is the
+   real way round (Hollywood, west to the beach, south to Melody by LAX, east on the 105). ZONE_OF_LV spreads the 10 levels over the
+   parts; the 5-leg calm flight (CALM_ZONE) skips the freeway; Survival keeps cycling the campaign table, with the cloud-bank turn
+   (loop) on the jump back up to Hollywood. Scenery only: rules, scores and the difficulty curve are untouched. */
+var ZONE_OF_LV=[0,0,1,2,2,3,4,4,5,5];
+var CALM_ZONE=[0,1,2,4,5];
 function zoneIx(lv){ lv=lv||G.lvl||1; return CALM?CALM_ZONE[Math.max(0,Math.min(4,lv-1))]:ZONE_OF_LV[(lv-1)%ZONE_OF_LV.length]; }
 function zoneNow(){ var q=new URLSearchParams(location.search).get("zone"); if(q){ for(var i=0;i<ZONES.length;i++) if(ZONES[i].id===q) return i; } return zoneIx(); }   /* ?zone=compton (testing / screenshots) */
 var COAST={coast:1,venice:1,pier:1};
 // labels: only the owner's own two spots are named. No landmark, venue, sign or neighborhood-landmark names anywhere (2026-10 branding pass)
-var LBL={venice:"★ VENICE PIER ★",melody:"★ MELODY BAR & GRILL ★"};
+var LBL={venice:"★ NALU VIDA ★",melody:"★ MELODY BAR & GRILL ★"};
 function seedGround(){ G.ground=[]; G.gy=H+100; G.seq=0; G.ground.push({k:"runway",t:"city1",y:G.gy-520,h:520,side:1}); G.gy-=520; while(G.gy>-400) addSeg(); }
 // photoreal aerial ground (dusk): every segment is a full-width aerial tile; landmark sprites sit on top of a city tile
 var TILE_OF={city:["city1","city2"],towers:["city2"],melody:["city1"],stadium:["city1"],hills:["hills"],coast:["venicecoast"],venice:["nalu"],pier:["pier"],
@@ -1719,6 +1722,11 @@ function dmgEn(en,d,x,y){ if(en.boss){ if(en.dead) return; d*=en.armor==null?1:e
   if(en.t==="esc") FX.wreck(S.jet,en.x,en.y,en.w*.9,0); else if(en.t==="cop") FX.wreck(en.v?S.cop1:S.cop0,en.x,en.y,copPt(en,"hub")[2]*.9,0); else if(en.t==="kami") FX.wreck(S.kami,en.x,en.y,en.w*.9,Math.PI); else if(en.t==="jet") FX.wreck(S.jet,en.x,en.y,en.w*.9,0);   // spins down, small fire where it lands
   G.ens.splice(i,1); }
 
+/* the bullet guns: GUN_HOT ms of fire, then GUN_COOL ms of smoke with no rounds, then back on (the beam keeps its own burn + recharge) */
+function gunStep(dt){ if(G.cool>0){ G.cool-=dt; if(G.cool<=0){ G.cool=0; G.heat=0; } return; }
+  G.heat+=dt; if(G.shotT<=0) fire(); if(G.heat>=GUN_HOT){ G.cool=GUN_COOL; pop(G.x,G.y-56,T("COOLING"),"#c9d2dc"); } }
+function gunSmoke(now){ if(!(G.cool>0)||R3) return;   // 2D view: grey puffs rising off both guns (the 3D view draws its own in melody3d.js)
+  cx.save(); [-22,22].forEach(function(o){ for(var i=0;i<4;i++){ var f=((now/700)+i/4+(o>0?.13:0))%1; cx.globalAlpha=.8*(1-f); cx.fillStyle="#c9ced6"; cx.beginPath(); cx.arc(G.x+o+Math.sin(f*5+i)*4,G.y-18+f*46,4+f*11,0,6.283); cx.fill(); } }); cx.restore(); }
 function gunsOn(){ if(G.guns) return; G.guns=1; G.shotT=200; pop(G.x,G.y-60,T("🔫 GUNS ONLINE!"),"#f0d375"); SND.play("upgrade"); buzz([20,40,20]); radio("Guns online, Captain. Light 'em up!",{tone:"info",ms:2200}); wbtnSync(); }
 // the 3…2…1 cue before the guns go live
 function gunCue(run,takeoff){ if(!run||CALM||G.guns||G.debug&&G.el<GUN_AT-3000) return; var left=GUN_AT-G.el; if(left>3200) return;
@@ -1751,7 +1759,7 @@ var WB_HTML="";
 function ammoTxt(i){ if(i===0) return "∞"; if(WPN[i].beam) return (G.beamOn&&G.wpn===5?(Math.max(0,G.beamT)/1000).toFixed(1)+"s · ":"")+G.ammo[5]+" "+T(G.ammo[5]===1?"charge":"charges"); return String(Math.max(0,G.ammo[i]|0)); }
 function wbtnSync(){ var b=$("wbtn"); if(!b) return; var show=!CALM&&(G.running||G.over)&&!G.over, h;
   if(!show) h=""; else if(!G.guns) h='<i>🔒</i><span><b>'+esc(T("Guns"))+'</b><small>'+esc(T("online at"))+" 0:"+String(Math.round(GUN_AT/1000)).padStart(2,"0")+'</small></span>';
-  else { var e=G.wpn>0&&!(G.ammo[G.wpn]>0)&&!(G.wpn===5&&G.beamOn); h='<i>'+WICON[G.wpn]+'</i><span><b style="color:'+WPN[G.wpn].c+'">'+esc(T(WPN[G.wpn].n))+'</b><small'+(e?' class="em"':'')+'>'+(e?esc(T("EMPTY")):esc(ammoTxt(G.wpn)))+'</small></span>'+(G.unl>0?'<u>'+(G.wpn+1)+"/"+(G.unl+1)+' ⟳</u>':''); }
+  else { var hot=G.cool>0&&!WPN[G.wpn].beam, e=hot||(G.wpn>0&&!(G.ammo[G.wpn]>0)&&!(G.wpn===5&&G.beamOn)); h='<i>'+WICON[G.wpn]+'</i><span><b style="color:'+WPN[G.wpn].c+'">'+esc(T(WPN[G.wpn].n))+'</b><small'+(e?' class="em"':'')+'>'+(hot?esc(T("COOLING")):e?esc(T("EMPTY")):esc(ammoTxt(G.wpn)))+'</small></span>'+(G.unl>0?'<u>'+(G.wpn+1)+"/"+(G.unl+1)+' ⟳</u>':''); }
   if(h!==WB_HTML){ WB_HTML=h; b.innerHTML=h; b.style.display=h?"":"none"; b.setAttribute("aria-label",G.guns?T("Current gun")+": "+T(WPN[G.wpn].n)+". "+T("Tap to switch guns"):T("Guns go online 20 seconds into the flight")); } }
 /* ---- ammo crate (was: the weapon crate) ---- */
 function drawCrate(it,now){ var nx=WPN[Math.min(4,G.wpn+1)], max=true, col="#7ef7c8", sw=Math.sin(now/420+it.sw)*.16;
@@ -2457,7 +2465,7 @@ function frame(now){
     if(Math.floor(now/250)!==Math.floor((now-dt)/250)) G.score+=G.mult;
     G.shotT-=dt; if(G.mfl>0) G.mfl-=dt; G.beamOn=0;
     if(!CALM&&!G.guns&&!takeoff&&G.el>=GUN_AT) gunsOn();
-    if(!CALM&&G.guns&&!takeoff&&!landing&&!G.home&&!G.won){ if(WPN[G.wpn].beam) beamStep(dt); else if(G.shotT<=0) fire(); }
+    if(!CALM&&G.guns&&!takeoff&&!landing&&!G.home&&!G.won){ if(WPN[G.wpn].beam) beamStep(dt); else gunStep(dt); }
     if(SURV()&&G.guns){ var nu=Math.min(5,Math.floor(G.surv/SURV_GUN_MS)); while(G.unl<nu) unlockGun(); }
     rpTick(dt,k,takeoff,landing);
     rescueStep(dt,k,spd,takeoff,landing); sevStep(dt);
@@ -2618,7 +2626,7 @@ function frame(now){
       if(G.vs&&VS&&VS.ghost) vsGhost(now);
       var vis=G.inv<=0||G.landing||Math.floor(G.inv/6)%2===0; boostDraw(now); if(vis) drawPlane(G.x,G.y,proll,1,palt);
       if(G.sev>.15) FX.planeFire(G.x,G.y,pw,pw*524/520,proll*.35,Math.max(.72,1-Math.abs(proll)*.5),1,G.sev,dt,k,now,G.running,!vis||R3); }
-    if(run&&!CALM){ muzzle(); beamDraw(now); }
+    if(run&&!CALM){ muzzle(); gunSmoke(now); beamDraw(now); }
   }
   if(!CH) TRF.calls(now,dt);
   drawClouds(spd*k);
@@ -2824,7 +2832,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
   '<div class="ptsh">Melody Rewards points (BETA: switching on soon)</div><div class="pts">'+row('<span class="e">⭐</span>',"1 point per "+GPC.perScore+" score, once rewards are on",GPC.dailyCap+"/day")+row('<span class="e">⏱️</span>',"Survival ranks by time","time")+'</div>';
 })();
 </script>
-<script type="module" src="melody3d.js?v=fs5"></script>
+<script type="module" src="melody3d.js?v=fs6"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}

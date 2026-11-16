@@ -43,7 +43,9 @@ export function makeWorld(THREE, O = {}) {
   // County office parks: pale concrete, striped parking, clipped lawns). Same road grid in all three, so traffic lanes line up everywhere.
   const groundTexOf = (style) => { const GW = O.lite ? 512 : 1024, GH = Math.round(GW * 368 / 512), c = mkc(GW, GH), x = c.getContext("2d"), k = GW / 512; x.scale(k, k);
     const sx = 512 / CX, sz = 368 / CZ, rw = ROAD * sx, rz = ROAD * sz, sw = SIDE * sx, swz = SIDE * sz, R = rng(5);
-    x.fillStyle = style === "res" ? "#4d6638" : style === "oc" ? "#9c978d" : "#56544f"; x.fillRect(0, 0, 512, 368);                                                   // lots
+    const photo = (n, a, rects) => { const im = O.gtex && O.gtex[n]; if (!im) return; const pt = x.createPattern(im, "repeat"); pt.setTransform(new DOMMatrix().scale(64 / im.width, 368 / 6 / im.height));   // 8 x 6 repeats per block: seamless where blocks meet
+      x.save(); x.globalAlpha = a; x.fillStyle = pt; x.beginPath(); rects.forEach(r => x.rect(r[0], r[1], r[2], r[3])); x.fill(); x.restore(); };
+    x.fillStyle = style === "res" ? "#4d6638" : style === "oc" ? "#9c978d" : "#56544f"; x.fillRect(0, 0, 512, 368); photo(style === "res" ? "grass" : "lot", .55, [[0, 0, 512, 368]]);                                                   // lots
     if (style === "res") {   // front lawns (patchy, some dry), driveways and back yards; the houses themselves are 3D
       for (let i = 0; i < 160; i++) { x.fillStyle = R() < .3 ? "rgba(140,128,78,.45)" : R() < .5 ? "rgba(70,104,52,.6)" : "rgba(40,62,34,.5)"; x.fillRect(R() * 512, R() * 368, 6 + R() * 30, 6 + R() * 24); }
       x.fillStyle = "#a9a49a"; for (let q = 0; q < 12; q++) { const px = rw / 2 + sw + 10 + q * 40; x.fillRect(px, rz / 2 + swz, 6, 26); x.fillRect(px + 14, 368 - rz / 2 - swz - 26, 6, 26); }   // driveways
@@ -54,10 +56,12 @@ export function makeWorld(THREE, O = {}) {
     else for (let i = 0; i < 90; i++) { x.fillStyle = R() < .5 ? "rgba(60,82,52,.55)" : "rgba(40,40,44,.35)"; x.fillRect(R() * 512, R() * 368, 8 + R() * 50, 8 + R() * 40); }
     for (let i = 0; i < 700; i++) { x.fillStyle = `rgba(${R() < .5 ? "255,255,255" : "0,0,0"},${.03 + R() * .05})`; x.fillRect(R() * 512, R() * 368, .6 + R(), .6 + R()); }   // gravel
     x.fillStyle = style === "oc" ? "#b4b0a6" : "#8d8a84"; x.fillRect(0, 0, rw / 2 + sw, 368); x.fillRect(512 - rw / 2 - sw, 0, rw / 2 + sw, 368); x.fillRect(0, 0, 512, rz / 2 + swz); x.fillRect(0, 368 - rz / 2 - swz, 512, rz / 2 + swz);   // sidewalks
+    photo("concrete", .5, [[0, 0, rw / 2 + sw, 368], [512 - rw / 2 - sw, 0, rw / 2 + sw, 368], [0, 0, 512, rz / 2 + swz], [0, 368 - rz / 2 - swz, 512, rz / 2 + swz]]);
     if (style === "res") { x.fillStyle = "#5a7a3e"; const pk = sw * .45; x.fillRect(rw / 2, 0, pk, 368); x.fillRect(512 - rw / 2 - pk, 0, pk, 368); x.fillRect(0, rz / 2, 512, pk * sz / sx); x.fillRect(0, 368 - rz / 2 - pk * sz / sx, 512, pk * sz / sx); }   // LA parkway: grass strip between kerb and sidewalk
     x.strokeStyle = "rgba(0,0,0,.12)"; x.lineWidth = .35; for (let z = 0; z < 368; z += 6) { x.beginPath(); x.moveTo(0, z); x.lineTo(rw / 2 + sw, z); x.moveTo(512 - rw / 2 - sw, z); x.lineTo(512, z); x.stroke(); }   // sidewalk slabs
     for (let q = 0; q < 512; q += 6) { x.beginPath(); x.moveTo(q, 0); x.lineTo(q, rz / 2 + swz); x.moveTo(q, 368 - rz / 2 - swz); x.lineTo(q, 368); x.stroke(); }
     x.fillStyle = "#2b2c31"; x.fillRect(0, 0, rw / 2, 368); x.fillRect(512 - rw / 2, 0, rw / 2, 368); x.fillRect(0, 0, 512, rz / 2); x.fillRect(0, 368 - rz / 2, 512, rz / 2);   // asphalt
+    photo("asphalt", .6, [[0, 0, rw / 2, 368], [512 - rw / 2, 0, rw / 2, 368], [0, 0, 512, rz / 2], [0, 368 - rz / 2, 512, rz / 2]]);
     const onRoad = (px, py) => px < rw / 2 || px > 512 - rw / 2 || py < rz / 2 || py > 368 - rz / 2;
     for (let i = 0; i < 2600; i++) { const px = R() * 512, py = R() * 368; if (!onRoad(px, py)) continue; x.fillStyle = `rgba(${R() < .5 ? "190,190,190" : "0,0,0"},${.05 + R() * .08})`; x.fillRect(px, py, .5 + R() * .8, .5 + R() * .8); }   // aggregate
     for (let i = 0; i < 14; i++) { const v = R() < .5, px = v ? (R() < .5 ? R() * rw / 2 : 512 - R() * rw / 2) : R() * 512, py = v ? R() * 368 : (R() < .5 ? R() * rz / 2 : 368 - R() * rz / 2);
@@ -708,13 +712,14 @@ export function makeWorld(THREE, O = {}) {
     seg.group.add(mesh(merge(marks), dash ? M.white : M.white));
     if (seg.roads) seg.roads.push({ strip: [x - w / 2, x + w / 2, -len / 2, len / 2] }); }
   let LOT_M = null;
-  const lotMat = () => LOT_M || (LOT_M = new THREE.MeshLambertMaterial({ map: (() => { const c = mkc(256, 256), x = c.getContext("2d"); x.fillStyle = "#3a3b40"; x.fillRect(0, 0, 256, 256);
+  const lotMat = () => LOT_M || (LOT_M = new THREE.MeshLambertMaterial({ map: (() => { const c = mkc(256, 256), x = c.getContext("2d"); x.fillStyle = "#3a3b40"; x.fillRect(0, 0, 256, 256); if (O.gtex && O.gtex.asphalt) { x.globalAlpha = .6; x.drawImage(O.gtex.asphalt, 0, 0, 256, 256); x.globalAlpha = 1; }
     x.strokeStyle = "rgba(235,235,230,.7)"; x.lineWidth = 1.4; for (let r = 0; r < 4; r++) for (let q = 4; q < 252; q += 9) { x.beginPath(); x.moveTo(q, 14 + r * 62); x.lineTo(q, 40 + r * 62); x.stroke(); }
     const t = tex(c, true); t.repeat.set(3, 3); return t; })() }));
   /* hills (o.sign: the Hollywood hillside with the white letters · o.mtn: the San Gabriels, big ridges either side of a canyon road).
      The two roads (x = ±160) are real roads: the terrain is flattened under them and the cars stay on them. */
   const SIGN_TEX = {};
   const letterTex = (ch) => SIGN_TEX[ch] || (SIGN_TEX[ch] = (() => { const c = mkc(96, 128), x = c.getContext("2d"); x.fillStyle = "#fff"; x.font = "900 118px 'Arial Narrow',Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(ch, 48, 70); return tex(c, false); })());
+  const OBS = [330, -50];   // where the domed observatory stands on the sign strip (x, z)
   function hills(seg, R, len, o = {}) {
     const ss = (a, b, v) => { const t = Math.max(0, Math.min(1, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
     // strip ends: hills settle to flat ground (they meet city strips); mountains settle to one shared ridge profile (they meet each other), so no seams
@@ -722,7 +727,7 @@ export function makeWorld(THREE, O = {}) {
     const hf = (x, z) => { const e = ss(len / 2, len / 2 - 140, Math.abs(z)); let h = Math.max(0, (Math.sin(x * .007 + seg.seed) * .5 + .5) * (Math.sin(z * .011 + x * .003) * .5 + .5)) * (Math.abs(x) > 200 ? 110 : 55);
       if (o.mtn) { const ax = Math.abs(x); h = ridge(x) + e * (h * .6 + Math.min(430, Math.max(0, ax - 240) * .62) * (.62 + .38 * (Math.sin(z * .006 + x * .004 + seg.seed) * .5 + .5)) + 40 * Math.max(0, Math.sin(x * .02 + z * .013)) - ridge(x)); }
       else h *= e;
-      if (o.sign) h += e * 210 * Math.exp(-(((x + 400) / 250) ** 2) - (((z + 70) / 190) ** 2));
+      if (o.sign) h += e * 210 * Math.exp(-(((x + 400) / 250) ** 2) - (((z + 70) / 190) ** 2)); if (o.sign) h += e * 95 * Math.exp(-(((x - OBS[0]) / 150) ** 2) - (((z - OBS[1]) / 150) ** 2));
       const d = Math.min(Math.abs(x + 160), Math.abs(x - 160)); return Math.max(0, h) * ss(ROAD / 2 + 6, ROAD / 2 + 70, d); };
     const g = new THREE.PlaneGeometry(XW, len, 80, o.mtn ? 24 : 16).rotateX(-Math.PI / 2), p = g.attributes.position, col = [];
     for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i), h = hf(x, z); p.setY(i, h);
@@ -738,17 +743,18 @@ export function makeWorld(THREE, O = {}) {
     const sh = []; for (let i = 0; i < (o.mtn ? 220 : 90); i++) { const x = (R() - .5) * XW * .95, z = (R() - .5) * len * .95; if (!offRoad(x)) continue; sh.push([x, z, hf(x, z)]); }
     const shM = inst(new THREE.DodecahedronGeometry(5, 0).scale(1, .7, 1).translate(0, 2.6, 0), new THREE.MeshLambertMaterial({ color: 0xffffff }), sh.length, true);
     sh.forEach((q, i) => { const k = .7 + R() * 1.1; set(shM, i, q[0], q[2] - 1, q[1], R() * 6, k, k * (.8 + R() * .5), k); shM.instanceColor.setXYZ(i, ...QC.set(["#6a7a44", "#7d7a4a", "#5d7040", "#8a7f52", "#56683c"][(R() * 5) | 0]).toArray()); }); seg.group.add(shM);
-    if (!o.mtn) { const hs = [], pl = []; for (let i = 0; i < 46; i++) { const x = (R() - .5) * XW * .8, z = (R() - .5) * len * .9; if (!offRoad(x) || (o.sign && x < -150 && x > -700 && Math.abs(z) < 260)) continue; const h = hf(x, z); hs.push([x, z, 14 + R() * 10, 12 + R() * 8, 8 + R() * 8, h]); if (R() < .7) pl.push([x + 14, z + 8, h]); }
+    if (!o.mtn) { const hs = [], pl = []; for (let i = 0; i < 46; i++) { const x = (R() - .5) * XW * .8, z = (R() - .5) * len * .9; if (!offRoad(x) || (o.sign && (x < -150 && x > -700 && Math.abs(z) < 260 || Math.abs(x - OBS[0]) < 110 && Math.abs(z - OBS[1]) < 110))) continue; const h = hf(x, z); hs.push([x, z, 14 + R() * 10, 12 + R() * 8, 8 + R() * 8, h]); if (R() < .7) pl.push([x + 14, z + 8, h]); }
       const im = new THREE.InstancedMesh(box, [M.white, M.white, M.wine, M.wine, M.white, M.white], Math.max(1, hs.length)); im.count = hs.length; im.frustumCulled = false; hs.forEach((b, i) => set(im, i, b[0], b[5] - 2, b[1], R() * 3, b[2], b[4], b[3])); seg.group.add(im);
       const tr = inst(trunkG, M.trunk, pl.length), cr = inst(crownG, M.leaf, pl.length); pl.forEach((q, i) => { set(tr, i, q[0], q[2] - 1, q[1], R() * 6); set(cr, i, q[0], q[2] - 1, q[1], R() * 6); }); seg.group.add(tr, cr); }
     const mx = o.mtn ? 620 : 420, mast = mesh(new THREE.CylinderGeometry(.8, 2.2, 140, 4).translate(0, 70, 0), M.white, mx, hf(mx, 0), 0); seg.group.add(mast);   // a radio mast with a blinking red light
     const red = mesh(new THREE.SphereGeometry(2.6, 6, 4), M.lamp.clone(), mx, hf(mx, 0) + 141, 0); red.material.color.setRGB(2, .1, .1); seg.group.add(red);
     seg.tick.push((t) => { red.visible = (t % 1.4) < .7; });
     if (o.sign) {   // the white letters on the hillside (generic block letters, no logo), each on its own scaffold, facing the valley
-      const word = "HOLLYWOOD", lw = 40, x0 = -400 - (word.length - 1) * lw / 2, zf = 40, legs = [];
-      for (let k = 0; k < word.length; k++) { const x = x0 + k * lw, y = hf(x, zf), pl = mesh(new THREE.PlaneGeometry(34, 46), new THREE.MeshBasicMaterial({ map: letterTex(word[k]), transparent: true, alphaTest: .4, side: THREE.DoubleSide, color: 0xeeeeea }), x, y + 25, zf);
-        pl.rotation.x = -.32; seg.group.add(pl); legs.push([new THREE.BoxGeometry(.7, 26, .7), T4(x - 9, y + 11, zf - 6)], [new THREE.BoxGeometry(.7, 26, .7), T4(x + 9, y + 11, zf - 6)]); }
-      seg.group.add(mesh(merge(legs), M.dark)); seg.sign = { x: -400, z: zf }; seg.focus = { x: -400, z: zf, y: hf(-400, zf) + 25, d: 330, h: 90 }; }
+      const word = "HOLLYWOOD", lw = 52, x0 = -420 - (word.length - 1) * lw / 2, zf = 40, legs = [];   // (2026-11-15: letters a third bigger so they read from the plane)
+      for (let k = 0; k < word.length; k++) { const x = x0 + k * lw, y = hf(x, zf), pl = mesh(new THREE.PlaneGeometry(45, 61), new THREE.MeshBasicMaterial({ map: letterTex(word[k]), transparent: true, alphaTest: .4, side: THREE.DoubleSide, color: 0xeeeeea }), x, y + 33, zf);
+        pl.rotation.x = -.32; seg.group.add(pl); legs.push([new THREE.BoxGeometry(.9, 34, .9), T4(x - 12, y + 15, zf - 8)], [new THREE.BoxGeometry(.9, 34, .9), T4(x + 12, y + 15, zf - 8)]); }
+      seg.group.add(mesh(merge(legs), M.dark)); seg.sign = { x: -420, z: zf }; seg.focus = { x: -420, z: zf, y: hf(-420, zf) + 33, d: 330, h: 90 };
+      LM("observatory", seg.group, OBS[0], OBS[1], 150, -Math.PI / 2, hf(OBS[0], OBS[1]) - 16); (seg.cams = seg.cams || {}).obs = { p: [OBS[0] - 60, hf(OBS[0], OBS[1]) + 110, OBS[1] + 230], t: [OBS[0], hf(OBS[0], OBS[1]) + 20, OBS[1]], fov: 55 }; }
     cars(seg, R, o.mtn ? 8 : 6, len, [["z", -166, 1], ["z", -154, -1], ["z", 154, 1], ["z", 166, -1]]);
   }
   function hAt(g, x, z) { const p = g.attributes.position; let best = 0, bd = 1e9; for (let i = 0; i < p.count; i++) { const d = (p.getX(i) - x) ** 2 + (p.getZ(i) - z) ** 2; if (d < bd) { bd = d; best = p.getY(i); } } return best; }
@@ -798,6 +804,7 @@ export function makeWorld(THREE, O = {}) {
     x.putImageData(im, 0, 0); for (let i = 0; i < 160; i++) { const px = R() * 512, py = R() * 512; x.fillStyle = "rgba(40,40,40,.35)"; x.beginPath(); x.ellipse(px, py, 3, 6, R() * 3, 0, TAU); x.fill(); }
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; })();
   const sandMat = new THREE.MeshStandardMaterial({ map: sandTex, bumpMap: sandBump, bumpScale: 2.2, roughness: .96, metalness: 0 });
+  const naluTex = img("../nalu-vida/img/logo.png");
   const SURF = ["#f2f2ee", "#f0d375", "#ff7a3a", "#3aa8ff", "#e4566b", "#7ee0b0", "#ffffff"], TOWEL = ["#ff5a6a", "#f0d375", "#3aa8ff", "#7ee0b0", "#ffffff", "#ff9a2e", "#a33645", "#5a4ad8"];
   const BEACH_SKIN = SKIN.concat(["#c68e63", "#e0b48c", "#5e3a28", "#8d5a3b"]);
   const boardG = new THREE.CapsuleGeometry(1.5, 9, 3, 8).rotateX(Math.PI / 2).scale(1, .22, 1).translate(0, .4, 0);
@@ -821,11 +828,29 @@ export function makeWorld(THREE, O = {}) {
     const pl = []; for (let z = -len / 2 + 14; z < len / 2; z += 38) pl.push([116, z + R() * 8], [150, z + 19]); palms(seg, R, pl.filter(p => Math.abs(p[1] - pz0) > 75));   // (no palms in front of Nalu Vida)
     BEACH.populate(seg, R, len, SHORE, H);   // the water, the seabed and everyone on the beach and in the waves (beach3d.js)
     if (kind === "pier" || kind === "venice") pier(seg, R, len, kind);
+    if (kind === "venice") veniceBeach(seg, len, -len * .12);
     if (kind === "oceanave") {   // Santa Monica: Palisades Park on the bluff (lawn + very tall fan palms), Ocean Avenue right behind it
       seg.group.add(mesh(new THREE.PlaneGeometry(128, len).rotateX(-Math.PI / 2), M.grass, 218, .18, 0));
       roadStrip(seg, 300, 34, len, 1); cars(seg, R, 12, len, [["z", 292, 1], ["z", 308, -1]]);
       const tp = []; for (let z = -len / 2 + 10; z < len / 2; z += 30) tp.push([170 + R() * 10, z + R() * 8], [250 + R() * 20, z + 15 + R() * 6], [327, z + 6]); palms(seg, R, tp, 2.1);
       const lamps = []; for (let z = -len / 2 + 30; z < len / 2; z += 90) lamps.push([280, z, Math.PI], [320, z + 45, 0]); streetLamps(seg, lamps); }
+  }
+  // (2026-11-15, Antidote: Venice Beach back in, "a little more detailed") the hanging VENICE letters over the boardwalk, the skate
+  // park, the painted art walls and the basketball courts on the sand. Textures are made once; none of it is a building target.
+  let VEN = null;
+  function veniceBeach(seg, len, pz) {
+    if (!VEN) { const cv = (w, h, rep, fn) => { const c = mkc(w, h); fn(c.getContext("2d")); return tex(c, rep); }, lit = map => new THREE.MeshLambertMaterial({ map, emissive: 0xffffff, emissiveMap: map, emissiveIntensity: .25 });
+      VEN = { sign: new THREE.MeshBasicMaterial({ transparent: true, toneMapped: false, side: THREE.DoubleSide, map: cv(1024, 192, false, x => { x.font = "900 150px 'Arial Black',Impact,Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.shadowColor = "#ffe9b0"; x.shadowBlur = 22; x.fillStyle = "#fffdf2"; "VENICE".split("").forEach((ch, i) => x.fillText(ch, 96 + i * 166, 100)); }) }),
+        skate: lit(cv(512, 512, false, x => { x.fillStyle = "#b9b6ae"; x.fillRect(0, 0, 512, 512); for (const [cx, cy, rx, ry] of [[150, 150, 110, 90], [370, 170, 90, 110], [250, 380, 170, 90]]) { const g = x.createRadialGradient(cx, cy, 4, cx, cy, Math.max(rx, ry)); g.addColorStop(0, "#6f6c66"); g.addColorStop(.75, "#96938b"); g.addColorStop(1, "#d6d3ca"); x.fillStyle = g; x.beginPath(); x.ellipse(cx, cy, rx, ry, 0, 0, TAU); x.fill(); x.strokeStyle = "#e9e6dd"; x.lineWidth = 5; x.stroke(); } })),
+        wall: lit(cv(1024, 128, true, x => { const R2 = rng(91); x.fillStyle = "#2a2a33"; x.fillRect(0, 0, 1024, 128); for (let i = 0; i < 90; i++) { x.fillStyle = `hsl(${R2() * 360 | 0},90%,${45 + R2() * 20 | 0}%)`; x.beginPath(); x.ellipse(R2() * 1024, R2() * 128, 12 + R2() * 40, 10 + R2() * 26, R2() * 3, 0, TAU); x.fill(); }
+          x.lineCap = "round"; for (let i = 0; i < 26; i++) { const x0 = R2() * 1024, y0 = 20 + R2() * 90; x.strokeStyle = i % 3 ? `hsl(${R2() * 360 | 0},95%,62%)` : "#fff"; x.lineWidth = 4 + R2() * 9; x.beginPath(); x.moveTo(x0, y0); x.bezierCurveTo(x0 + 30, y0 - 50, x0 + 60, y0 + 50, x0 + 90, y0 - 10); x.stroke(); } })),
+        court: lit(cv(256, 512, false, x => { x.fillStyle = "#2e8a5a"; x.fillRect(0, 0, 256, 512); x.fillStyle = "#2f6fb5"; x.fillRect(18, 18, 220, 476); x.strokeStyle = "#fff"; x.lineWidth = 4; x.strokeRect(18, 18, 220, 476); x.beginPath(); x.moveTo(18, 256); x.lineTo(238, 256); x.stroke(); x.beginPath(); x.arc(128, 256, 34, 0, TAU); x.stroke();
+          for (const s of [0, 1]) { const y = s ? 494 : 18, d = s ? -1 : 1; x.fillStyle = "#c2452f"; x.fillRect(92, s ? 494 - 110 : 18, 72, 110); x.strokeRect(92, s ? 494 - 110 : 18, 72, 110); x.beginPath(); x.arc(128, y, 104, d > 0 ? 0 : Math.PI, d > 0 ? Math.PI : TAU); x.stroke(); } })) }; }
+    const G = seg.group, zk = pz + Math.max(len * .3, 200), zs = zk + 40, zw = pz - Math.max(len * .14, 110), zc = pz - Math.max(len * .27, 210);
+    G.add(mesh(new THREE.PlaneGeometry(88, 16.5), VEN.sign, 140, 40, zs), mesh(merge([[new THREE.CylinderGeometry(.9, .9, 52, 6), T4(94, 26, zs)], [new THREE.CylinderGeometry(.9, .9, 52, 6), T4(186, 26, zs)], [new THREE.BoxGeometry(92, .4, .4), T4(140, 49.5, zs)], [new THREE.BoxGeometry(92, .4, .4), T4(140, 31, zs)]]), M.dark));
+    G.add(mesh(new THREE.PlaneGeometry(84, 84).rotateX(-Math.PI / 2), VEN.skate, 56, .35, zk));
+    const walls = []; for (let i = 0; i < 4; i++) { const g = new THREE.BoxGeometry(30, 10, 1.6), uv = g.attributes.uv; for (let k = 0; k < uv.count; k++) uv.setX(k, uv.getX(k) * .25 + i * .25); walls.push([g, T4(-22 + i * 36, 5, zw + (i % 2) * 24)]); } G.add(mesh(merge(walls), VEN.wall));
+    const hoops = []; for (const cz of [zc - 33, zc + 33]) { G.add(mesh(new THREE.PlaneGeometry(32, 58).rotateX(-Math.PI / 2), VEN.court, 84, .35, cz)); for (const e of [-1, 1]) hoops.push([new THREE.CylinderGeometry(.35, .35, 10, 5), T4(84, 5, cz + e * 28)], [new THREE.BoxGeometry(6, 4, .4), T4(84, 11, cz + e * 27.4)]); } G.add(mesh(merge(hoops), M.white));
   }
   function pier(seg, R, len, kind) {   // the pier into the ocean; "venice" puts Nalu Vida on it
     const pz = kind === "venice" ? -len * .12 : 0, g = new THREE.Group(); g.position.set(0, 0, pz); seg.group.add(g);
@@ -860,9 +885,9 @@ export function makeWorld(THREE, O = {}) {
         for (let k = 0; k < 3; k++) glowS("#ff8a2a", 6, 18, () => { x.beginPath(); x.arc(250, 92, 70 - k * 16, Math.PI * 1.08, Math.PI * 1.92); x.stroke(); });   // the sunset
         glowS("#ff5a2a", 5, 14, () => { x.beginPath(); x.moveTo(170, 96); x.lineTo(330, 96); x.stroke(); });
         glowS("#4dff7a", 5, 14, () => { x.beginPath(); x.moveTo(318, 96); x.quadraticCurveTo(322, 60, 330, 30); x.stroke(); [[-1, .2], [1, .1], [-1, -.5], [1, -.6], [0, -1]].forEach(([sx, sy]) => { x.beginPath(); x.moveTo(330, 30); x.quadraticCurveTo(330 + sx * 22, 16 + sy * 10, 330 + sx * 36, 30 - sy * 14); x.stroke(); }); });   // the palm
-        x.font = "700 62px 'Arial Rounded MT Bold','Trebuchet MS',Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
-        for (const [b, a] of [[26, .9], [10, 1]]) { x.save(); x.shadowColor = "#3a7dff"; x.shadowBlur = b; x.globalAlpha = a; x.strokeStyle = "#5aa0ff"; x.lineWidth = 7; x.strokeText("venice pier", 256, 146); x.restore(); }
-        x.fillStyle = "#e8f2ff"; x.fillText("venice pier", 256, 146); return tex(c, false); })();
+        x.font = "700 70px 'Arial Rounded MT Bold','Trebuchet MS',Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+        for (const [b, a] of [[26, .9], [10, 1]]) { x.save(); x.shadowColor = "#3a7dff"; x.shadowBlur = b; x.globalAlpha = a; x.strokeStyle = "#5aa0ff"; x.lineWidth = 7; x.strokeText("nalu vida", 256, 146); x.restore(); }
+        x.fillStyle = "#e8f2ff"; x.fillText("nalu vida", 256, 146); return tex(c, false); })();
       n.add(mesh(new THREE.BoxGeometry(70, 2, 100).translate(0, 1, 0), M.wood));                                                        // plinth
       n.add(mesh(new THREE.BoxGeometry(56, 15, 92).translate(8, 9, 0), shingle));                                                     // ground floor (back + sides)
       n.add(mesh(new THREE.BoxGeometry(2, 11, 84).translate(-20.5, 7.5, 0), new THREE.MeshBasicMaterial({ color: 0xffc98a, toneMapped: false })));   // the open front: warm-lit bar inside
@@ -876,6 +901,11 @@ export function makeWorld(THREE, O = {}) {
       // the neon sign on the front wall, between the windows, with its glow on the shingles
       const neon = mesh(new THREE.PlaneGeometry(34, 12.75), new THREE.MeshBasicMaterial({ map: neonTex, transparent: true, depthWrite: false, toneMapped: false, color: new THREE.Color(1.6, 1.6, 1.6) }), -16.6, 25.4, 0); neon.rotation.y = -Math.PI / 2; n.add(neon);
       const ng = mesh(new THREE.PlaneGeometry(44, 18), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0x4a7dff, opacity: .45, toneMapped: false }), -16.3, 25.4, 0); ng.rotation.y = -Math.PI / 2; n.add(ng);
+      // the logo: huge on the roof (lying flat, lit) + a sign on the front parapet facing the beach, tipped up toward the plane
+      const lr = mesh(new THREE.CircleGeometry(30, 48).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: naluTex, transparent: true, toneMapped: false }), 10, 32.8, 0); n.add(lr);
+      n.add(mesh(new THREE.RingGeometry(30, 33, 48).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff8f86, toneMapped: false }), 10, 32.7, 0));
+      const lf = mesh(new THREE.CircleGeometry(12, 40), new THREE.MeshBasicMaterial({ map: naluTex, transparent: true, toneMapped: false }), -20, 42, 0); lf.rotation.order = "YXZ"; lf.rotation.y = -Math.PI / 2; lf.rotation.x = -.45; n.add(lf);
+      n.add(mesh(merge([[new THREE.CylinderGeometry(.7, .7, 12, 6), T4(-20, 36, -7)], [new THREE.CylinderGeometry(.7, .7, 12, 6), T4(-20, 36, 7)]]), M.dark));
       // exterior lights: uplights along the front + both sides (warm washes on the shingles), sconces by the open front, lit palms
       const wsh = new THREE.MeshBasicMaterial({ map: coneTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffb070, opacity: .38, toneMapped: false, side: THREE.DoubleSide }), wl = [];
       for (let z = -36; z <= 36; z += 18) wl.push([new THREE.PlaneGeometry(10, 16).rotateY(-Math.PI / 2), T4(-16.5, 25, z)]);
@@ -935,12 +965,14 @@ export function makeWorld(THREE, O = {}) {
     let az = null; if (kind === "longbeach") {
       // the domed arena by the water (a round drum, a shallow dome, a ring of lights)
       az = midBlock(len).zc; const ar = new THREE.Group(); ar.position.set(55, 0, az); seg.group.add(ar); seg.blocked.push([55, az, 112, 112]);   /* inside a block: never on a cross street */
+      LM("lighthouse", seg.group, -108, az > 0 ? -len * .36 : len * .36, 46, 0, -1.5);
+      if (!LM("lbdome", ar, 0, 0, 116, 0)) {
       ar.add(mesh(new THREE.CylinderGeometry(52, 54, 22, 40).translate(0, 11, 0), new THREE.MeshLambertMaterial({ color: 0x8fb3c8 })));
       const dome = new THREE.SphereGeometry(52, 32, 10, 0, TAU, 0, Math.PI / 2); dome.scale(1, .32, 1); ar.add(mesh(dome, new THREE.MeshLambertMaterial({ color: 0xd9dcdf }), 0, 22, 0));
-      const rl = inst(new THREE.SphereGeometry(1.2, 5, 4), M.lamp, 36, true); for (let k = 0; k < 36; k++) { const a = k / 36 * TAU; set(rl, k, Math.cos(a) * 54.5, 18, Math.sin(a) * 54.5, 0); rl.instanceColor.setXYZ(k, .5, 1.3, 1.9); } ar.add(rl); }
+      const rl = inst(new THREE.SphereGeometry(1.2, 5, 4), M.lamp, 36, true); for (let k = 0; k < 36; k++) { const a = k / 36 * TAU; set(rl, k, Math.cos(a) * 54.5, 18, Math.sin(a) * 54.5, 0); rl.instanceColor.setXYZ(k, .5, 1.3, 1.9); } ar.add(rl); } }
     // the free stretch of the shore band (z), away from the arena
     const fz = az == null ? [-len / 2 + 20, len / 2 - 20] : (az > 0 ? [-len / 2 + 20, az - 66] : [az + 66, len / 2 - 20]);
-    if (lin) { liner(seg, -250, -len * .05); seg.focus = { x: -150, z: -len * .05, y: 30, d: 430, h: 170 }; }
+    if (lin) { liner(seg, -200, -len * .05); seg.focus = { x: -120, z: -len * .05, y: 30, d: 430, h: 170 }; }
     // (the cross streets run on through the shore band to Shoreline Drive: landmarks only go in the blocks between them)
     const st = streetsOf(len).sort((a, b) => a - b), cut = [-len / 2 - 99].concat(st, [len / 2 + 99]), gaps = [];
     for (let k = 0; k < cut.length - 1; k++) { const a = Math.max(fz[0], cut[k] + ROAD / 2 + SIDE + 2), b = Math.min(fz[1], cut[k + 1] - ROAD / 2 - SIDE - 2); if (b - a > 40) gaps.push([a, b]); }
@@ -1003,17 +1035,19 @@ export function makeWorld(THREE, O = {}) {
       hullM: new THREE.MeshStandardMaterial({ color: 0x121316, roughness: .55, metalness: .1, side: THREE.DoubleSide }), deckM: new THREE.MeshLambertMaterial({ color: 0x9a7a55 }),
       redM: new THREE.MeshStandardMaterial({ color: 0xc8401e, roughness: .55 }), blkM: new THREE.MeshLambertMaterial({ color: 0x141416 }), whiteM: new THREE.MeshLambertMaterial({ color: 0xf2efe8 }) };
     [LINER_G.hull, LINER_G.deck, LINER_G.sup, LINER_G.white, LINER_G.red, LINER_G.blk, LINER_G.boatG].forEach(g => SHARED.add(g)); return LINER_G; }
+  const LMF = [[58, 70], [10, 70], [-46, 70]];   // the liner model's three funnel tops [z, y] (for the smoke)
   function liner(seg, x, z) { const P = linerParts(), g = new THREE.Group(); g.position.set(x, -6, z); seg.group.add(g); seg.blocked.push([x, z, 40, 320]);
+    const LMG = LM("liner", g, 0, 0, 330, Math.PI / 2, 2); if (!LMG) {
     g.add(mesh(P.hull, P.hullM), mesh(P.deck, P.deckM), mesh(P.sup, P.winM), mesh(P.white, P.whiteM), mesh(P.red, P.redM), mesh(P.blk, P.blkM));
     g.add(mesh(new THREE.BoxGeometry(36.2, 2.2, 300), new THREE.MeshLambertMaterial({ color: 0x8e2a22 }), 0, 6.6, 0));   // red boot-top at the waterline
     const bt = inst(P.boatG, P.whiteM, P.boats.length); P.boats.forEach((b, i) => set(bt, i, b[0], b[1], b[2], 0)); g.add(bt);
-    const ph = inst(new THREE.SphereGeometry(.75, 4, 3), M.lamp, 140, true); for (let k = 0; k < 140; k++) { const sd = k % 2 ? 1 : -1, row = (k >> 1) % 2, zz = -120 + ((k >> 2) * 7) % 240; set(ph, k, sd * (row ? 17.3 : 16.4), 15 + row * 5, zz, 0); ph.instanceColor.setXYZ(k, 1.8, 1.5, 1); } g.add(ph);
+    const ph = inst(new THREE.SphereGeometry(.75, 4, 3), M.lamp, 140, true); for (let k = 0; k < 140; k++) { const sd = k % 2 ? 1 : -1, row = (k >> 1) % 2, zz = -120 + ((k >> 2) * 7) % 240; set(ph, k, sd * (row ? 17.3 : 16.4), 15 + row * 5, zz, 0); ph.instanceColor.setXYZ(k, 1.8, 1.5, 1); } g.add(ph); }
     const gl = mesh(new THREE.PlaneGeometry(90, 340).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffc070, opacity: .22, toneMapped: false }), 0, 6.2, 0); g.add(gl);   // her lights on the water
     seg.liner = { x, z }; (seg.cams = seg.cams || {}).qm = { p: [x + 150, 60, z + 210], t: [x, 25, z - 10], fov: 55 }; lmCount.queenMary = (lmCount.queenMary || 0) + (WARM ? 0 : 1);
     // steam/smoke from the three funnels (only while she's near; light grey, darker now and then), drifting aft with the wind
     const WP3 = new THREE.Vector3();
     seg.tick.push((t, dt, near) => { if (!near || !FX) return; g.getWorldPosition(WP3);
-      for (let k = 0; k < 3; k++) { const f = P.funnels[k]; if (Math.random() < dt * 5) FX.emit(SMP.set(WP3.x + (Math.random() - .5) * 3, WP3.y + f[1] + 1, WP3.z + f[0] + (Math.random() - .5) * 3), SMV.set(wind.x + (Math.random() - .5) * 5, 18 + Math.random() * 8, wind.z - 7), 3.4, 6, 30, Math.random() < .25 ? [.42, .41, .4] : [.9, .89, .88], [.62, .62, .64], .5, false, 0, .45, 3); } });
+      for (let k = 0; k < 3; k++) { const f = LMG ? LMF[k] : P.funnels[k]; if (Math.random() < dt * 5) FX.emit(SMP.set(WP3.x + (Math.random() - .5) * 3, WP3.y + f[1] + 1, WP3.z + f[0] + (Math.random() - .5) * 3), SMV.set(wind.x + (Math.random() - .5) * 5, 18 + Math.random() * 8, wind.z - 7), 3.4, 6, 30, Math.random() < .25 ? [.42, .41, .4] : [.9, .89, .88], [.62, .62, .64], .5, false, 0, .45, 3); } });
   }
   /* the Aquarium of the Pacific look-alike: a long glass hall under a roof of three overlapping blue breaking waves (rising toward
      the harbor end, the crests curling over), a blue-lit plaza with a pool in front. zc / room: the stretch of shore band it gets. */
@@ -1102,6 +1136,7 @@ export function makeWorld(THREE, O = {}) {
     const plaza = new THREE.PlaneGeometry(W2, depth).rotateX(-Math.PI / 2); const mx = -W2 / 2 + W2 * .26, mz = z0 + depth * .5; G.add(mesh(plaza, new THREE.MeshLambertMaterial({ map: civicTex(W2, depth, mx + W2 / 2, mz - z0) }), 0, .32, zc));
     // the courthouse tower (thick square, ~14 storeys) at the back of the plaza
     const TW = 88, TH = 132, BASE = 13, tz = z0 + TW / 2 + 10, tx = 24;   // (2026-10-19: a touch taller so the white tower reads from the plane)
+    const CM = LM("court", G, tx, tz + 18, 142, 0); if (!CM) {
     G.add(mesh(new THREE.BoxGeometry(TW, TH - BASE, TW).translate(0, BASE + (TH - BASE) / 2, 0), white, tx, 0, tz));
     G.add(mesh(new THREE.BoxGeometry(TW - 10, BASE, TW - 10).translate(0, BASE / 2, 0), dark, tx, 0, tz));   // recessed ground-floor colonnade
     const sl = [], pil = [], cap = [], NS = 9, sp = (TW - 16) / (NS - 1);
@@ -1112,14 +1147,15 @@ export function makeWorld(THREE, O = {}) {
         cap.push([new THREE.BoxGeometry(5, 3, 4), T4(tx + ux * u + nx * (TW / 2 - 2), BASE - 1.5, tz + uz * u + nz * (TW / 2 - 2), 0, ry, 0)]); } }
     G.add(mesh(merge(sl.filter((q, i) => i % 2 === 0)), slot), mesh(merge(sl.filter((q, i) => i % 2 === 1)), new THREE.MeshLambertMaterial({ color: 0xd9d3c4 })), mesh(merge(pil), white), mesh(merge(cap), bronze));
     G.add(mesh(new THREE.BoxGeometry(TW + .6, 1.4, TW + .6).translate(0, TH + .7, 0), new THREE.MeshLambertMaterial({ color: 0xdedad0 }), tx, 0, tz));   // roof edge
-    G.add(mesh(merge([[new THREE.BoxGeometry(34, 5, 3), T4(tx - 10, 2.5, tz + TW / 2 + 12)], [new THREE.BoxGeometry(3, 5, 16), T4(tx + 7, 2.5, tz + TW / 2 + 5)], [new THREE.BoxGeometry(26, 4, 3), T4(tx + 34, 2, tz + TW / 2 + 16)]]), white));   // low white entry walls / planters
+    G.add(mesh(merge([[new THREE.BoxGeometry(34, 5, 3), T4(tx - 10, 2.5, tz + TW / 2 + 12)], [new THREE.BoxGeometry(3, 5, 16), T4(tx + 7, 2.5, tz + TW / 2 + 5)], [new THREE.BoxGeometry(26, 4, 3), T4(tx + 34, 2, tz + TW / 2 + 16)]]), white)); }   // low white entry walls / planters
     // the monument: ~14 tall white blades leaning outward like a crown, in a round raised planter ringed with shrubs (plaza right side)
+    if (!LM("memorial", G, mx, mz, 66, 0)) {
     const mon = [[new THREE.CylinderGeometry(27, 27.5, 2.2, 48), T4(mx, 1.1, mz)]];
     const blade = (h) => { const sh = new THREE.Shape([new THREE.Vector2(-6.8, 0), new THREE.Vector2(6.8, 0), new THREE.Vector2(1.2, h)]); return new THREE.ExtrudeGeometry(sh, { depth: 1.1, bevelEnabled: false }).translate(0, 0, -.55); };
     for (let k = 0; k < 15; k++) { const a = k / 15 * TAU + (R() - .5) * .15, h = 44 + R() * 26, r = 7 + R() * 3; mon.push([blade(h), T4(mx + Math.cos(a) * r, 2.2, mz + Math.sin(a) * r, 0, -a + Math.PI / 2, 0).multiply(new THREE.Matrix4().makeRotationX(.3 + R() * .12))]); }
     G.add(mesh(merge(mon.slice(1)), new THREE.MeshStandardMaterial({ color: 0xf7f5f0, roughness: .45, emissive: 0x333331, emissiveIntensity: .3, side: THREE.DoubleSide })));
     G.add(mesh(mon[0][0].applyMatrix4(mon[0][1]), new THREE.MeshLambertMaterial({ color: 0xece6da })), mesh(new THREE.CircleGeometry(25.6, 44).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: 0x3e2c20 }), mx, 2.25, mz));
-    const shr = inst(new THREE.SphereGeometry(1.6, 6, 4), new THREE.MeshLambertMaterial({ color: 0x4e7a3a }), 36); for (let k = 0; k < 36; k++) { const a = k / 36 * TAU; set(shr, k, mx + Math.cos(a) * 22.5, 3, mz + Math.sin(a) * 15.5, 0, 1, .8 + R() * .4, 1); } G.add(shr);
+    const shr = inst(new THREE.SphereGeometry(1.6, 6, 4), new THREE.MeshLambertMaterial({ color: 0x4e7a3a }), 36); for (let k = 0; k < 36; k++) { const a = k / 36 * TAU; set(shr, k, mx + Math.cos(a) * 22.5, 3, mz + Math.sin(a) * 15.5, 0, 1, .8 + R() * .4, 1); } G.add(shr); }
     G.add(mesh(new THREE.PlaneGeometry(110, 110).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xfff2d8, opacity: .3, toneMapped: false }), mx, .7, mz));   // night floodlight on the blades
     seg.monument = { x: mx, z: mz };
     // the low, wide civic building (flat white roof, rooftop equipment frame) on the left, a grove of big round shade trees beside it
@@ -1135,9 +1171,10 @@ export function makeWorld(THREE, O = {}) {
     seg.focus = { x: mx + 20, z: mz, y: 20, d: 260, h: 140 };
     // night lighting (2026-10-19): floodlit white faces (additive washes on the two faces you see), a lit crown band and a red beacon
     const wash = new THREE.MeshBasicMaterial({ map: coneTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xfff1d6, opacity: .34, toneMapped: false, side: THREE.DoubleSide });
+    if (!CM) {
     G.add(mesh(new THREE.PlaneGeometry(TW, TH * .9), wash, tx, TH * .45, tz + TW / 2 + 1.2)); const ws = mesh(new THREE.PlaneGeometry(TW, TH * .9), wash, tx - TW / 2 - 1.2, TH * .45, tz); ws.rotation.y = -Math.PI / 2; G.add(ws);
     G.add(mesh(new THREE.BoxGeometry(TW + 1, 2, TW + 1).translate(0, TH - 5, 0), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 1.5, 1.3), toneMapped: false }), tx, 0, tz));
-    const bcn = mesh(new THREE.SphereGeometry(2.2, 6, 4), M.lamp.clone(), tx, TH + 3, tz); bcn.material.color.setRGB(2, .1, .1); G.add(bcn); seg.tick.push((t) => { bcn.visible = (t % 1.5) < .7; });
+    const bcn = mesh(new THREE.SphereGeometry(2.2, 6, 4), M.lamp.clone(), tx, TH + 3, tz); bcn.material.color.setRGB(2, .1, .1); G.add(bcn); seg.tick.push((t) => { bcn.visible = (t % 1.5) < .7; }); }
     G.add(mesh(new THREE.PlaneGeometry(180, 140).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xfff0d0, opacity: .28, toneMapped: false }), tx, .8, tz + TW / 2 + 20));
     seg.courthouse = { x: tx, z: tz, h: TH }; lmCount.courthouse = (lmCount.courthouse || 0) + (WARM ? 0 : 1);
     seg.cams = { aerial: { p: [tx - 14, TH + 34, tz + TW / 2 + 34], t: [mx + 24, 0, mz + 60], fov: 88 }, street: { p: [tx - 70, 4, z1 - 4], t: [tx, 60, tz], fov: 78 }, over: { p: [tx + 140, 300, z1 + 300], t: [tx - 20, 0, zc - 60], fov: 60 } };
@@ -1183,6 +1220,8 @@ export function makeWorld(THREE, O = {}) {
       g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2)); const wm = mesh(g, starMat()); wm.renderOrder = 1; seg.group.add(wm); }
     // the theatre (west side, mid-block): dark facade, a marquee canopy over the sidewalk with chasing bulbs, a blade sign, the red carpet
     const tx = ax - ROAD / 2 - SIDE - 38, T = new THREE.Group(); T.position.set(tx, 0, vz); seg.group.add(T); seg.blocked.push([tx, vz, 76, 84]);
+    const rx = ax + ROAD / 2 + SIDE + 36; if (LM("records", seg.group, rx, vz, 62, 0)) seg.blocked.push([rx, vz, 66, 66]);   // the round record tower across the Boulevard
+    if (!LM("pagoda", T, 5, 0, 84, Math.PI / 2))
     T.add(mesh(new THREE.BoxGeometry(70, 30, 80).translate(0, 15, 0), new THREE.MeshStandardMaterial({ color: 0x3a1c22, roughness: .7 })), mesh(new THREE.BoxGeometry(72, 2, 82).translate(0, 31, 0), M.dark), mesh(new THREE.BoxGeometry(1.2, 3.2, 82).translate(35.6, 31, 0), M.gold));
     T.add(mesh(new THREE.BoxGeometry(12, 3, 60).translate(38, 16, 0), new THREE.MeshStandardMaterial({ color: 0x1a0e10, roughness: .5, emissive: 0x401010, emissiveIntensity: .5 })));
     const prem = mesh(new THREE.PlaneGeometry(56, 6), new THREE.MeshBasicMaterial({ map: signTextTex("WORLD PREMIERE TONIGHT", 1024, 110, 72, "#ffe9a8"), toneMapped: false }), 44.05, 16, 0); prem.rotation.y = Math.PI / 2; T.add(prem);
@@ -1231,16 +1270,14 @@ export function makeWorld(THREE, O = {}) {
      sound walls, the cross streets carried over it on bridges, overhead "I-105" signs. The city grid either side keeps its avenues;
      cross streets have no traffic (they bridge the freeway). Every freeway car is on a registered road (road audit). */
   let FWY = null;
-  /* THE EXITS (2026-10-19, Antidote: "show every exit with real exit signs as you fly past, ending at LAX"). Westbound, in real order,
+  /* THE EXITS (2026-10-19, Antidote: "show every exit with real exit signs as you fly past"; 2026-11-15: the route now takes off from LAX
+     and uses the 105 to get from Inglewood to Compton and Long Beach, so the exits run EASTBOUND from La Cienega to the I-710). Real order,
      from Wikipedia's I-105 exit list (which cites Caltrans' numbered-exit system): https://en.wikipedia.org/wiki/Interstate_105_(California)
-     Exit 14 Garfield Ave is eastbound-only, so westbound it is not signed. One exit per freeway strip (EX.n carries the count across the
-     part's strips, per run); the I-605 / I-710 / I-110 / I-405 strips also get the interchange (the crossing freeway on a high deck plus
-     two flyover ramps). After the last exit (Sepulveda Blvd / LAX) the 105 ends at Imperial Hwy and the strips become the airport. */
-  const EXITS = [{ n: "18B", s: "I-605", i: "605", d: "NORTH · SOUTH" }, { n: "17", s: "Bellflower Blvd" }, { n: "16", s: "Lakewood Blvd" }, { n: "15", s: "Paramount Blvd" },
-    { n: "13", s: "I-710", i: "710", d: "Long Beach · Pasadena" }, { n: "12", s: "Long Beach Blvd" }, { n: "10", s: "Wilmington Ave" }, { n: "9", s: "Central Ave" },
-    { n: "7B", s: "I-110", i: "110", d: "Harbor Fwy" }, { n: "7A", s: "Vermont Ave" }, { n: "5", s: "Crenshaw Blvd" }, { n: "3", s: "Prairie Ave" },
-    { n: "2B", s: "I-405", i: "405", d: "Santa Monica · Long Beach" }, { n: "2A", s: "La Cienega Blvd" }, { n: "1D", s: "Nash St", d: "LAX Airport" }, { n: "1B", s: "Sepulveda Blvd", d: "LAX Airport" },
-    { end: 1, s: "Imperial Hwy", d: "END 105 · LAX" }];
+     One exit every third freeway strip (EX.n carries the count across the part's strips, per run); the I-405 / I-110 / I-710 strips also
+     get the interchange (the crossing freeway on a high deck plus two flyover ramps). Past the I-710 the strips are plain freeway. */
+  const EXITS = [{ n: "2A", s: "La Cienega Blvd" }, { n: "2B", s: "I-405", i: "405", d: "Santa Monica · Long Beach" }, { n: "3", s: "Prairie Ave" }, { n: "5", s: "Crenshaw Blvd" },
+    { n: "7A", s: "Vermont Ave" }, { n: "7B", s: "I-110", i: "110", d: "Harbor Fwy" }, { n: "9", s: "Central Ave" }, { n: "10", s: "Wilmington Ave", d: "Compton" },
+    { n: "12", s: "Long Beach Blvd" }, { n: "13", s: "I-710", i: "710", d: "Long Beach · Pasadena" }];
   const EX = { key: null, n: 0 }, EXSIGN = {};
   const shield = (x, cx, cy, sc, num) => { x.save(); x.translate(cx, cy); x.scale(sc, sc); x.fillStyle = "#fff"; x.beginPath(); x.moveTo(-50, -56); x.lineTo(50, -56); x.lineTo(50, 2); x.quadraticCurveTo(50, 50, 0, 60); x.quadraticCurveTo(-50, 50, -50, 2); x.closePath(); x.fill();
     x.fillStyle = "#1d3f9c"; x.beginPath(); x.moveTo(-42, -26); x.lineTo(42, -26); x.lineTo(42, 2); x.quadraticCurveTo(42, 42, 0, 52); x.quadraticCurveTo(-42, 42, -42, 2); x.closePath(); x.fill(); x.fillStyle = "#c8202c"; x.fillRect(-42, -48, 84, 20);
@@ -1256,14 +1293,14 @@ export function makeWorld(THREE, O = {}) {
     const t = tex(c, false); t.anisotropy = 8; return new THREE.MeshBasicMaterial({ map: t, transparent: true, alphaTest: .5, toneMapped: false, color: new THREE.Color(.92, .92, .92) }); })());
   const streetBlade = (txt) => EXSIGN["b" + txt] || (EXSIGN["b" + txt] = (() => { const c = mkc(512, 80), x = c.getContext("2d"); x.fillStyle = "#0f6b3a"; x.fillRect(0, 0, 512, 80); x.strokeStyle = "#fff"; x.lineWidth = 4; x.strokeRect(4, 4, 504, 72); x.fillStyle = "#fff"; x.font = "800 50px Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(txt, 256, 42); return new THREE.MeshBasicMaterial({ map: tex(c, false), toneMapped: false, color: new THREE.Color(.9, .9, .9) }); })());
   function freeway105(seg, R, len) { const FW = 112;
-    // which exit this strip shows (per run, across the whole part); past the last one the 105 is behind you: LAX
-    if (!WARM && O.zoneKey) { const zk = O.zoneKey().split("|"), k = zk[0] + "|" + zk[2]; if (k !== EX.key) { EX.key = k; EX.n = (O.exitStart || 0) * 2; } }   // (?exit=N starts the part at the Nth exit: testing / screenshots)
-    const kk = WARM ? 0 : EX.n++, ei = kk >> 1; if (ei >= EXITS.length) { laxAirport(seg, R, len); return; }   // (an exit every other strip: ~34 strips of freeway over the part's two levels)
-    const plain = kk % 2 === 1, ex = plain ? { s: "", plain: 1 } : EXITS[ei], ic = ex.i ? ex : null, icz = -len * .05;
+    // which exit this strip shows (per run, across the whole part); past the last one it is plain freeway
+    if (!WARM && O.zoneKey) { const zk = O.zoneKey().split("|"), k = zk[0] + "|" + zk[2]; if (k !== EX.key) { EX.key = k; EX.n = (O.exitStart || 0) * 3; } }   // (?exit=N starts the part at the Nth exit: testing / screenshots)
+    const kk = WARM ? 0 : EX.n++, ei = (kk / 3) | 0;   // (an exit every third strip: ~34 strips of freeway over the part's two levels)
+    const plain = kk % 3 > 0 || ei >= EXITS.length, ex = plain ? { s: "", plain: 1 } : EXITS[ei], ic = ex.i ? ex : null, icz = -len * .05;
     if (!FWY) { const sg = mkc(512, 160), x = sg.getContext("2d"); x.fillStyle = "#0f6b3a"; x.fillRect(0, 0, 512, 160); x.strokeStyle = "#fff"; x.lineWidth = 6; x.strokeRect(6, 6, 500, 148);
         x.fillStyle = "#fff"; x.beginPath(); x.moveTo(40, 34); x.lineTo(140, 34); x.lineTo(140, 92); x.quadraticCurveTo(140, 140, 90, 150); x.quadraticCurveTo(40, 140, 40, 92); x.closePath(); x.fill();
         x.fillStyle = "#1d3f9c"; x.beginPath(); x.moveTo(48, 58); x.lineTo(132, 58); x.lineTo(132, 92); x.quadraticCurveTo(132, 132, 90, 142); x.quadraticCurveTo(48, 132, 48, 92); x.closePath(); x.fill(); x.fillStyle = "#c8202c"; x.fillRect(48, 40, 84, 18);
-        x.fillStyle = "#fff"; x.font = "900 40px Arial,sans-serif"; x.textAlign = "center"; x.fillText("105", 90, 112); x.font = "800 50px Arial,sans-serif"; x.textAlign = "left"; x.fillText("I-105 WEST", 165, 72); x.font = "700 34px Arial,sans-serif"; x.fillText("LAX · El Segundo", 165, 124);
+        x.fillStyle = "#fff"; x.font = "900 40px Arial,sans-serif"; x.textAlign = "center"; x.fillText("105", 90, 112); x.font = "800 50px Arial,sans-serif"; x.textAlign = "left"; x.fillText("I-105 EAST", 165, 72); x.font = "700 34px Arial,sans-serif"; x.fillText("Compton · Norwalk", 165, 124);
         FWY = { sign: new THREE.MeshBasicMaterial({ map: tex(sg, false), toneMapped: false, color: new THREE.Color(.9, .9, .9) }), conc: new THREE.MeshLambertMaterial({ color: 0xb9b3a8 }), wall: new THREE.MeshLambertMaterial({ color: 0xc9b89a }), asph: new THREE.MeshLambertMaterial({ color: 0x2a2b30 }), ball: new THREE.MeshLambertMaterial({ color: 0x6b6258 }), rail: new THREE.MeshLambertMaterial({ color: 0x3a3a3e }), train: new THREE.MeshStandardMaterial({ color: 0xd8dade, roughness: .35, metalness: .5 }), stripe: new THREE.MeshBasicMaterial({ color: 0x2bb34a }) }; }
     city(seg, R, len, { res: true, mixed: true, style: "res", cars: 22, hmul: .5, block: [[0, 0, FW + 30, len + 40]], clear: ic ? [[0, icz, XW, 110]] : [], noAuditBlock: true, noBillboard: true });
     const G = new THREE.Group(); seg.group.add(G);
@@ -1278,7 +1315,7 @@ export function makeWorld(THREE, O = {}) {
     // bridges carrying the cross streets over the freeway
     const br = []; streetsOf(len).forEach(z => { br.push([new THREE.BoxGeometry(FW + 30, 2.4, 34), T4(0, 13, z)], [new THREE.BoxGeometry(FW + 30, 2, .6), T4(0, 15, z - 16.6)], [new THREE.BoxGeometry(FW + 30, 2, .6), T4(0, 15, z + 16.6)]); for (const px of [-FW / 2 + 2, 0, FW / 2 - 2]) br.push([new THREE.BoxGeometry(2.6, 12, 10), T4(px, 6, z)]); });
     if (br.length) G.add(mesh(merge(br), FWY.conc));
-    // the exit: an overhead gantry over the westbound lanes (right side, you fly with them) with this exit's sign, the I-105 WEST sign over the
+    // the exit: an overhead gantry over the eastbound lanes (right side, you fly with them) with this exit's sign, the I-105 EAST sign over the
     // left, and the exit's street named on its bridge; the off-ramp peels away to the right
     const gz = len * .32; G.add(mesh(merge([[new THREE.BoxGeometry(1.2, 22, 1.2), T4(-FW / 2 + 1, 11, gz)], [new THREE.BoxGeometry(1.2, 22, 1.2), T4(-2, 11, gz)], [new THREE.BoxGeometry(FW / 2, 1.2, 1.2), T4(-FW / 4, 21, gz)], [new THREE.BoxGeometry(1.2, 22, 1.2), T4(FW / 2 - 1, 11, gz)], [new THREE.BoxGeometry(1.2, 22, 1.2), T4(2, 11, gz)], [new THREE.BoxGeometry(FW / 2, 1.2, 1.2), T4(FW / 4, 21, gz)]]), M.dark));
     G.add(mesh(new THREE.PlaneGeometry(44, 13.75), FWY.sign, -FW / 4, 26, gz + .8)); if (plain) G.add(mesh(new THREE.PlaneGeometry(44, 13.75), FWY.sign, FW / 4, 26, gz + .8)); else G.add(mesh(new THREE.PlaneGeometry(46, 27), exitSign(ei), FW / 4, 30, gz + .8));
@@ -1308,12 +1345,13 @@ export function makeWorld(THREE, O = {}) {
      Theme Building look-alike (four white parabolic arches holding a saucer), the control tower and the row of tall colour-changing
      light pylons along Century Blvd. first: the strip where the freeway ends at Imperial Hwy / Sepulveda Blvd (an END sign). */
   let LAXM = null;
-  function laxAirport(seg, R, len) { runway(seg, R, len, {});
+  function laxAirport(seg, R, len, o) { runway(seg, R, len, o || {});
     if (!LAXM) LAXM = { w: new THREE.MeshStandardMaterial({ color: 0xf4f2ec, roughness: .5, emissive: 0x2a2a30 }), glass: new THREE.MeshStandardMaterial({ color: 0x223040, roughness: .1, metalness: .6, emissive: 0x2a4a60, emissiveIntensity: .8 }) };
     const th = new THREE.Group(); th.position.set(200, 0, -len * .15); seg.group.add(th);
+    if (!LM("theme", th, 0, 0, 112, 0)) {
     for (let k = 0; k < 4; k++) { const a = k / 4 * TAU + Math.PI / 4, arch = new THREE.TorusGeometry(46, 1.6, 6, 24, Math.PI); const m = mesh(arch, LAXM.w); m.rotation.y = a; m.scale.set(1, 1.15, 1); th.add(m); }
-    th.add(mesh(new THREE.CylinderGeometry(24, 18, 7, 24).translate(0, 40, 0), LAXM.w), mesh(new THREE.CylinderGeometry(19, 19, 4, 24).translate(0, 36, 0), LAXM.glass), mesh(new THREE.CylinderGeometry(7, 8, 34, 12).translate(0, 17, 0), LAXM.w));
-    const tw = new THREE.Group(); tw.position.set(-200, 0, len * .2); seg.group.add(tw); tw.add(mesh(new THREE.CylinderGeometry(5, 9, 90, 10).translate(0, 45, 0), LAXM.w), mesh(new THREE.CylinderGeometry(13, 9, 12, 10).translate(0, 96, 0), LAXM.glass), mesh(new THREE.CylinderGeometry(14, 14, 2, 10).translate(0, 103, 0), M.dark));
+    th.add(mesh(new THREE.CylinderGeometry(24, 18, 7, 24).translate(0, 40, 0), LAXM.w), mesh(new THREE.CylinderGeometry(19, 19, 4, 24).translate(0, 36, 0), LAXM.glass), mesh(new THREE.CylinderGeometry(7, 8, 34, 12).translate(0, 17, 0), LAXM.w)); }
+    const tw = new THREE.Group(); tw.position.set(-200, 0, len * .2); seg.group.add(tw); if (!LM("tower", tw, 0, 0, 50, 0)) tw.add(mesh(new THREE.CylinderGeometry(5, 9, 90, 10).translate(0, 45, 0), LAXM.w), mesh(new THREE.CylinderGeometry(13, 9, 12, 10).translate(0, 96, 0), LAXM.glass), mesh(new THREE.CylinderGeometry(14, 14, 2, 10).translate(0, 103, 0), M.dark));
     const pyl = inst(new THREE.CylinderGeometry(2.6, 2.6, 36, 8).translate(0, 18, 0), M.lamp, 15, true); for (let k = 0; k < 15; k++) set(pyl, k, -190 + (k % 2) * 14, 0, -len / 2 + 30 + k * (len - 60) / 14, 0); seg.group.add(pyl);
     seg.tick.push((t) => { for (let k = 0; k < 15; k++) { QC.setHSL(((t * .05 + k * .07) % 1), .9, .6); pyl.instanceColor.setXYZ(k, QC.r * 1.8, QC.g * 1.8, QC.b * 1.8); } pyl.instanceColor.needsUpdate = true; });
     seg.lax = true; seg.cams = { lax: { p: [330, 130, len * .3], t: [120, 20, -len * .2], fov: 60 } }; lmCount.lax = (lmCount.lax || 0) + (WARM ? 0 : 1); }
@@ -1328,26 +1366,32 @@ export function makeWorld(THREE, O = {}) {
   function sofi(seg, R, len, side) { const M2 = ingM(), cx = side * 40; city(seg, R, len, { block: [[cx, 0, 380, 340]], cars: 22, style: "city" });
     seg.group.add(mesh(new THREE.PlaneGeometry(390, 350).rotateX(-Math.PI / 2), lotMat(), cx, .15, 0));
     const g = new THREE.Group(); g.position.set(cx, 0, 0); seg.group.add(g);
+    if (!LM("stadium", g, 0, 0, 344, 0)) {
     const bowl = new THREE.LatheGeometry([new THREE.Vector2(80, -12), new THREE.Vector2(140, 4), new THREE.Vector2(150, 10)], 40); bowl.scale(1, 1, .7); g.add(mesh(bowl, M2.bowl));
     const fld = new THREE.CircleGeometry(80, 32).rotateX(-Math.PI / 2); fld.scale(1, 1, .7); g.add(mesh(fld, M2.field, 0, -11, 0));
     const can = new THREE.SphereGeometry(1, 40, 8, 0, TAU, 0, .5); can.scale(178 / .479, 150, 138 / .479); g.add(mesh(can, M2.can, 0, 32 - .878 * 150, 0));   // the canopy, floating on slim posts
     const rim = new THREE.TorusGeometry(1, .012, 4, 64).rotateX(Math.PI / 2); rim.scale(178, 1, 138); g.add(mesh(rim, M2.edge, 0, 32, 0));
-    const posts = []; for (let k = 0; k < 14; k++) { const a = k / 14 * TAU; posts.push([new THREE.CylinderGeometry(1.1, 1.1, 34, 5), T4(Math.cos(a) * 172, 16, Math.sin(a) * 132)]); } g.add(mesh(merge(posts), M.dark));
+    const posts = []; for (let k = 0; k < 14; k++) { const a = k / 14 * TAU; posts.push([new THREE.CylinderGeometry(1.1, 1.1, 34, 5), T4(Math.cos(a) * 172, 16, Math.sin(a) * 132)]); } g.add(mesh(merge(posts), M.dark)); }
     seg.focus = { x: cx, z: 0, y: 20, d: 420, h: 180 }; lmCount.stadiumRoof = (lmCount.stadiumRoof || 0) + (WARM ? 0 : 1); }
-  function inglewood(seg, R, len) { const M2 = ingM(), mb = midBlock(len), fx = 320, dx = -320;
-    city(seg, R, len, { res: true, mixed: true, style: "res", cars: 24, hmul: .5, clear: [[fx, mb.zc, 150, 150], [dx, mb.zc, 70, 70]] });
-    seg.blocked.push([fx, mb.zc, 136, 136], [dx, mb.zc, 60, 60]);
+  function inglewood(seg, R, len) { const M2 = ingM(), mb = midBlock(len), fx = 320, dx = -320, ix = 54;
+    city(seg, R, len, { res: true, mixed: true, style: "res", cars: 24, hmul: .5, clear: [[fx, mb.zc, 150, 150], [dx, mb.zc, 70, 70], [0, mb.zc, 264, 170]] });
+    seg.blocked.push([fx, mb.zc, 136, 136], [dx, mb.zc, 60, 60], [ix, mb.zc, 150, 150]);
+    // (2026-11-15) the middle block, right under the flight line: the arena dome with its patterned shell
+    if (O.lm && O.lm.lm_dome) seg.group.add(mesh(new THREE.PlaneGeometry(262, 168).rotateX(-Math.PI / 2), lotMat(), 0, .15, mb.zc));
+    LM("dome", seg.group, ix, mb.zc, 150, 0);
     // the round arena: a drum, a dark flat roof, a ring of tall white columns standing off the wall, floodlit
     const a = new THREE.Group(); a.position.set(fx, 0, mb.zc); seg.group.add(a);
+    if (!LM("forum", a, 0, 0, 136, 0)) {
     a.add(mesh(new THREE.CylinderGeometry(52, 52, 26, 40).translate(0, 13, 0), M2.drum), mesh(new THREE.CylinderGeometry(60, 60, 3, 40).translate(0, 27.5, 0), M2.col), mesh(new THREE.CylinderGeometry(56, 56, 1, 40).translate(0, 29.4, 0), M2.roof));
-    const cols = []; for (let k = 0; k < 40; k++) { const t = k / 40 * TAU; cols.push([new THREE.CylinderGeometry(1.2, 1.4, 27, 6), T4(Math.cos(t) * 58, 13.5, Math.sin(t) * 58)]); } a.add(mesh(merge(cols), M2.col));
+    const cols = []; for (let k = 0; k < 40; k++) { const t = k / 40 * TAU; cols.push([new THREE.CylinderGeometry(1.2, 1.4, 27, 6), T4(Math.cos(t) * 58, 13.5, Math.sin(t) * 58)]); } a.add(mesh(merge(cols), M2.col)); }
     a.add(mesh(new THREE.PlaneGeometry(170, 170).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xfff0d8, opacity: .35, toneMapped: false }), 0, .6, 0));
     // the donut shop: a small drive-in with a giant donut standing upright on the roof
     const d = new THREE.Group(); d.position.set(dx, 0, mb.zc); seg.group.add(d);
+    if (!LM("donut", d, 0, 0, 58, Math.PI / 2)) {
     d.add(mesh(new THREE.BoxGeometry(34, 9, 24).translate(0, 4.5, 0), M2.col), mesh(new THREE.BoxGeometry(36, 1.4, 26).translate(0, 9.7, 0), M.dark));
     const dn = mesh(new THREE.TorusGeometry(13, 5.2, 12, 28), M2.dough, 0, 25, 0); d.add(dn, mesh(new THREE.BoxGeometry(2, 6, 2).translate(0, 12, 0), M.dark));
-    seg.tick.push((t) => { dn.rotation.y = Math.sin(t * .3) * .3; });
-    seg.inglewood = { arena: [fx, mb.zc], donut: [dx, mb.zc] }; seg.cams = { arena: { p: [fx - 40, 110, mb.zc + 190], t: [fx, 12, mb.zc], fov: 60 }, donut: { p: [dx + 30, 45, mb.zc + 80], t: [dx, 14, mb.zc], fov: 60 } }; seg.focus = { x: (fx + dx) / 2, z: mb.zc, y: 10, d: 520, h: 230 }; lmCount.arena = (lmCount.arena || 0) + (WARM ? 0 : 1); }
+    seg.tick.push((t) => { dn.rotation.y = Math.sin(t * .3) * .3; }); }
+    seg.inglewood = { arena: [fx, mb.zc], donut: [dx, mb.zc] }; seg.cams = { arena: { p: [fx - 40, 110, mb.zc + 190], t: [fx, 12, mb.zc], fov: 60 }, donut: { p: [dx + 30, 45, mb.zc + 80], t: [dx, 14, mb.zc], fov: 60 }, dome: { p: [0, 150, mb.zc + 250], t: [0, 10, mb.zc], fov: 60 } }; seg.focus = { x: (fx + dx) / 2, z: mb.zc, y: 10, d: 520, h: 230 }; lmCount.arena = (lmCount.arena || 0) + (WARM ? 0 : 1); }
 
   // downtown signature towers (generic look-alikes): a stepped cylinder with a lit crown and a slim tower with a sail roof + spire
   function dtlaIcons(seg, side, zc) {   /* (both stand inside the block at zc: never on a street) */ const glass = new THREE.MeshStandardMaterial({ color: 0x5f7486, roughness: .2, metalness: .6, emissive: 0x1a2430, emissiveIntensity: .6 });
@@ -1372,7 +1416,7 @@ export function makeWorld(THREE, O = {}) {
     const R = rng(seed || 1), seg = { kind, len, seed: seed || 1, group: new THREE.Group(), tick: [], egg: null, melody: null, nalu: null, blds: [], shore: null, water: () => false, roads: [], blocked: [], carSrc: [], nets: [] };
     const side = o.side || 1; WARM = !!o.warm;
     if (!WARM && O.zoneKey) { const zk = O.zoneKey(); if (zk !== ZK) { ZK = zk; LB.n = 0; LB.t = -1e9; LB.aq = 0; LB.aqT = -1e9; LB.gp = 0; STN.i = 0; for (const q in lmCount) delete lmCount[q]; } }   // a new district / level: landmark budgets start over
-    if (kind === "runway") runway(seg, R, len, o);
+    if (kind === "runway") laxAirport(seg, R, len, o);   // (2026-11-15: you take off from, and land at, LAX: theme building, control tower, the colour pylons)
     else if (kind === "hills") hills(seg, R, len);
     else if (kind === "hollywood") hills(seg, R, len, { sign: true });
     else if (kind === "mountains") hills(seg, R, len, { mtn: true });
@@ -1384,7 +1428,7 @@ export function makeWorld(THREE, O = {}) {
     else if (kind === "f105") freeway105(seg, R, len);
     else if (kind === "sofi") sofi(seg, R, len, side);
     else if (kind === "inglewood") inglewood(seg, R, len);
-    else if (kind === "hwdblvd") { const vz = midBlock(len).zc, tx = HB_X - ROAD / 2 - SIDE - 38; hollywoodBlvd(seg, R, len, city(seg, R, len, { cars: 26, hmul: .85, reserve: [HB_X], noBillboard: true, clear: [[tx, vz, 90, 96]] }), vz); }
+    else if (kind === "hwdblvd") { const vz = midBlock(len).zc, tx = HB_X - ROAD / 2 - SIDE - 38; hollywoodBlvd(seg, R, len, city(seg, R, len, { cars: 26, hmul: .85, reserve: [HB_X], noBillboard: true, clear: [[tx, vz, 90, 96], [HB_X + ROAD / 2 + SIDE + 36, vz, 72, 72]] }), vz); }
     else if (kind === "irvine") city(seg, R, len, { style: "oc", cars: 26, hmul: .5, hmin: 18, palmGap: 64, bstyle: (R2) => R2() < .55 ? 1 : R2() < .6 ? 3 : 0, tints: { 0: ["#f3eee4", "#efe6d6", "#e8dcc6"], 1: ["#b9c9d6", "#9fb4c4", "#cfd9e0"], 3: ["#e9e5dc", "#ddd7cc"] } });
     else if (kind === "dtla") { const mb = midBlock(len); city(seg, R, len, { tall: 2, hmul: 1.6, cars: 32, clear: [[side * 640, mb.zc, 110, 110], [-side * 650, mb.zc, 100, 80]], bstyle: (R2, h) => h > 90 ? (R2() < .7 ? 1 : 3) : FAC.pick(R2, h) }); dtlaIcons(seg, side, mb.zc); }
     else if (kind === "valley") { city(seg, R, len, { res: true, mixed: true, style: "res", cars: 26, hmul: .4, palmGap: 60, bstyle: (R2) => R2() < .7 ? 0 : 3, tints: { 0: ["#e9dcc3", "#d9c7a7", "#efe6d6", "#cdb998"] } }); ridges(seg, R, len, 1); }
@@ -1407,6 +1451,12 @@ export function makeWorld(THREE, O = {}) {
     seg.update(0, 0, false); WARM = false; return seg;
   }
   const SHARED = new Set([box, trunkG, crownG, carG, lampG, poolG, bodyG, headG, boardG, lyingG, lyingHead, PERSON]);
+  /* LANDMARK MODELS (2026-11-15, Antidote: "look them up and craft a little game version"): Higgsfield image -> 3D models that melody3d.js loads
+     (O.lm). One geometry + material per landmark, cloned per strip. w = the longer ground side in world units; returns null when the model
+     did not load, and every caller then builds the old code-drawn landmark instead. */
+  function LM(name, parent, x, z, w, ry, y) { const m = O.lm && O.lm["lm_" + name]; if (!m) return null;
+    if (!m.shared) { m.shared = 1; m.node.traverse(n => { if (n.isMesh) SHARED.add(n.geometry); }); }
+    const g = m.node.clone(), k = w / Math.max(m.size.x, m.size.z); g.scale.setScalar(k); g.rotation.y = ry || 0; g.position.set(x, (y || 0) + m.size.y * k / 2, z); parent.add(g); return g; }
   // time of day: window lights, street lamps, pools of light and the searchlights fade with the daylight (engine3d/sky.js → night 0..1)
   const BASEI = { facade: M.facade.emissiveIntensity, pool: M.pool.opacity, beam: M.beam.opacity };
   // the ocean follows the sky: body colour by the light level, reflections of the real horizon/zenith, the glitter path from the real sun

@@ -14,8 +14,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap">
-<link rel="stylesheet" href="valenzo.css?v=2">
-<script src="valenzo.js?v=2"></script>
+<link rel="stylesheet" href="valenzo.css?v=3">
+<script src="valenzo.js?v=3"></script>
 </head>
 <body>
 
@@ -29,16 +29,11 @@
       <rect x="30" y="30" width="40" height="40" transform="rotate(45 50 50)" pathLength="100"/>
     </g>
   </symbol>
+  <linearGradient id="gilt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9c983"/><stop offset=".55" stop-color="#b98a3c"/><stop offset="1" stop-color="#8a6325"/></linearGradient>
 </svg>
 
 <div id="intro">
-  <div class="i-mark">
-    <svg class="emblem" aria-hidden="true"><use href="#knot"/></svg>
-    <p class="i-word">Valenzo</p>
-    <span class="i-rule"></span>
-    <p class="i-sub">Studio &middot; Los Angeles</p>
-  </div>
-  <div class="i-reel" aria-hidden="true"><div class="i-track" id="reel"></div></div>
+  <video id="doors" src="vid/doors.mp4" poster="vid/doors.jpg" muted playsinline preload="none" aria-hidden="true"></video>
   <button id="skip" type="button">Skip intro</button>
 </div>
 
@@ -54,14 +49,13 @@
 </nav>
 
 <header class="hero" id="top">
-  <div class="floor" id="floor"><div class="hall" id="hall"></div></div>
+  <div class="floor" id="floor"><div class="hall" id="hall">
+    <svg class="sign" viewBox="0 0 200 150" aria-hidden="true"><use href="#knot" x="58" y="2" width="84" height="84"/><text x="103" y="136" text-anchor="middle">VALENZO</text></svg>
+  </div></div>
   <div class="hero-in">
+    <h1>Valenzo Studio</h1>
     <div>
-      <svg class="emblem" aria-hidden="true"><use href="#knot"/></svg>
-      <h1>Valenzo <span>Studio</span></h1>
       <p class="lede">Western style, elevated.</p>
-    </div>
-    <div>
       <p class="hint"><span class="pick">Choose a mannequin to try its outfit on</span><span class="walk">Swipe to walk the floor &middot; tap a mannequin to try it on</span></p>
       <p class="actions">
         <a class="btn gold" href="#collection">Enter the collection</a>

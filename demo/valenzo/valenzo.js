@@ -4,7 +4,7 @@
   "use strict";
   var root = document.documentElement;
   var calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!calm) root.classList.add("intro-on");           // set before first paint so the store starts dark
+  if (!calm) root.classList.add("intro-on");           // set before first paint so the door film covers the store
 
   var CATS = [["all", "All"], ["crystal", "Crystal"], ["print", "Prints"], ["denim", "Denim"]];
   var ITEMS = [
@@ -47,7 +47,7 @@
     function boot() {
       if (booted) return;
       booted = true;
-      var s = el("script"); s.type = "module"; s.src = "fit.js?v=2"; document.head.appendChild(s);
+      var s = el("script"); s.type = "module"; s.src = "fit.js?v=3"; document.head.appendChild(s);
     }
     function mark(box, attr, hit) {
       [].forEach.call(box.children, function (b) { if (hit(b)) b.setAttribute(attr, "true"); else if (attr === "aria-pressed") b.setAttribute(attr, "false"); else b.removeAttribute(attr); });
@@ -126,7 +126,8 @@
     });
     /* narrow screens walk the floor sideways */
     var strip = matchMedia("(max-aspect-ratio: 13/10)");
-    if (strip.addEventListener) strip.addEventListener("change", function () { floor.scrollLeft = 0; });   // back on a wide screen the floor is fixed again
+    if (strip.addEventListener) strip.addEventListener("change", function () { floor.scrollLeft = 0; });
+    if (strip.matches) floor.scrollLeft = (floor.scrollWidth - floor.clientWidth) / 2;   // start in front of the doors, facing the sign   // back on a wide screen the floor is fixed again
 
     if ("IntersectionObserver" in window) {
       /* phones have no hover: the light comes up on whatever is in the middle of the screen */
@@ -138,7 +139,7 @@
         var spot = new IntersectionObserver(function (es) {
           es.forEach(function (e) { e.target.classList.toggle("lit", e.isIntersecting); });
         }, { root: floor, rootMargin: "0px -28% 0px -28%" });
-        [].forEach.call(hall.children, function (m) { spot.observe(m); });
+        [].forEach.call(hall.querySelectorAll(".man"), function (m) { spot.observe(m); });
       }
       var near = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { boot(); near.disconnect(); } }, { rootMargin: "500px" });
       near.observe($("fitting-room"));
@@ -154,7 +155,7 @@
       [].forEach.call(vids, function (v) { v.muted = true; watch.observe(v); });
     }
 
-    /* ---- opening sequence: the name, a sweep through the pieces, then the store lights come up ---- */
+    /* ---- opening sequence: the glass doors swing open, then the film fades into the same view of the floor ---- */
     var intro = $("intro");
     function open() {
       if (root.classList.contains("open")) return;
@@ -163,9 +164,13 @@
     }
     if (calm) intro.parentNode.removeChild(intro);
     else {
-      ITEMS.forEach(function (it) { $("reel").appendChild(pic(it)); });
+      var doors = $("doors"), play;
       $("skip").addEventListener("click", open);
-      setTimeout(open, 5300);
+      doors.addEventListener("ended", open);
+      doors.addEventListener("error", open);
+      play = doors.play();
+      if (play && play.catch) play.catch(open);          // autoplay refused (low power mode): straight into the store
+      setTimeout(open, 12000);                           // a film that never arrives must not lock the door
     }
   });
 })();

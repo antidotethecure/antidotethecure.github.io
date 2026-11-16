@@ -1,39 +1,47 @@
 {
- "name": "Storm Burger",
+ "name": "StormBurger",
  "phone": "",
  "facts": [
-  "Two open locations: Inglewood (1500 N La Brea Ave) and Long Beach (5801 Cherry Ave). Compton (336 W Alondra Blvd) is coming soon.",
-  "Inglewood hours: Sun–Thu 10:30 AM–12 AM, Fri–Sat 10:30 AM–1 AM.",
-  "Long Beach hours: Mon–Wed 10:30 AM–10 PM, Thu–Sun 10:30 AM–11 PM.",
-  "Rewards: 20 points per $1 spent.",
-  "Reward ladder: 1,000 pts free fries, 1,800 free shake, 3,000 free Classic StormBurger, 4,500 free combo.",
-  "Bonus points: 50 for a QR check-in visit, 100 first order, 200 birthday, 250 for in-app feedback.",
-  "Storm Run is a free driving game: 10 levels, 90 seconds each, 5 lives.",
-  "Each hit costs half a life, so 10 hits end the run.",
-  "Coins are worth +10 points each.",
-  "Food pickups: Classic StormBurger +60, Turkey Burger +60, Chicken Sandwich +50, Chicken Strips +50, Shake +40, Lemonade +40, Fries +30, Onion Rings +30.",
-  "Game prizes (sample): 400 pts free house sauce, 600 free fries or onion rings, 800 free milkshake, 1,000 free Classic StormBurger.",
-  "Weekly top score wins a Free Double Classic StormBurger Combo. The board resets every Monday and closes Sunday 11 PM.",
-  "Game prizes must be used within 3 days. You can hold one prize at a time.",
-  "You can play Storm Run free with no account. You need a free member account to save a score or prize.",
-  "Free daily spin: one per member per day, every slice wins something.",
-  "Spin and food prizes are good for 3 days at either location, one per visit, and can't be combined.",
-  "Combos include fries and a soft drink. Onion rings or a milkshake upgrade is +$2.00 each.",
-  "Sauces are homemade, $1.00 each.",
-  "Classic StormBurger Combo $11.99, Jalapeño Lightning Burger Combo $13.99, Kids Combo $11.99, Chicken Sandwich Combo $12.99.",
-  "Order from the Order Inglewood and Order Long Beach buttons in the app.",
-  "You can build your own burger or chicken sandwich in the app.",
-  "Language menu (🌐) includes English, Spanish, Chinese, Korean, Tagalog, Vietnamese, Armenian, Persian, Japanese, Thai and Russian.",
+  "Two StormBurger locations are open: Inglewood and Long Beach. A third, in Compton, is coming soon.",
+  "Inglewood: 1500 N La Brea Ave, Inglewood, CA 90302. Open Sun–Thu 10:30 AM–12 AM and Fri–Sat 10:30 AM–1 AM.",
+  "Long Beach: 5801 Cherry Ave, Long Beach, CA 90805. Open Mon–Wed 10:30 AM–10 PM and Thu–Sun 10:30 AM–11 PM.",
+  "Compton (coming soon): 336 W Alondra Blvd, Compton, CA 90220.",
+  "You earn 20 reward points for every $1 you spend.",
+  "Reward ladder: 1,000 pts = Free fries, 1,800 = Free shake, 3,000 = Free Classic StormBurger, 4,500 = Free combo.",
+  "Bonus points: 50 for a daily visit check-in, 100 for your first order, 200 for your birthday, 250 for in-app feedback.",
+  "The Daily Spin is free: one spin per member per day (Los Angeles time), and every slice wins something.",
+  "Storm Run is the app's driving game. It has 10 levels of 90 seconds each and you get 5 lives.",
+  "Storm Run is free to play with no account. You only need a free account to save a score or claim a prize.",
+  "Swipe left or right (or tap a side of the screen) to change lanes. On a computer, use the ◀ ▶ arrow keys.",
+  "Every hit costs half a life, so 10 hits total the truck.",
+  "Coins are +10. Food is +30 to +60. Flying cows, stop signs and lightning cost −100 and half a life.",
+  "Sample weekly prize: the top score from Monday through Sunday close wins a Free Double Classic StormBurger Combo.",
+  "Score prizes in one run: 400 = free house sauce, 600 = free fries or onion rings, 800 = free milkshake, 1,000 = free Classic StormBurger.",
+  "The weekly board resets every Monday. Ties go to the score posted first.",
+  "Prizes are samples. StormBurger picks the real ones.",
+  "Only one game prize at a time per member, and prizes must be used within 3 days.",
+  "Daily Spin food prizes and discounts are good for 3 days at either location, one reward per visit.",
+  "Combos include fries and a soft drink. Swap fries for onion rings (+$2.00) or the drink for a milkshake (+$2.00).",
+  "Sauces are homemade and cost $1.00 each.",
+  "The Order Inglewood and Order Long Beach buttons are at the top of the app, and each location has a Directions button.",
+  "One free member account per person and per phone. It needs a name, phone number and email.",
+  "You must be 13 or older to play for prizes. Players under 18 need a parent's or guardian's permission.",
   "Your info is used only for your rewards account and is never sold.",
-  "For help, ask at the counter. No phone number is shown in the app.",
-  "Instagram: @stormburger"
+  "Marketing texts and emails are opt-in. Reply STOP or unsubscribe any time.",
+  "Staff can help at the counter. The app shows no phone number for StormBurger.",
+  "The app can be translated into many languages using the 🌐 menu.",
+  "You can add the app to your Home Screen from your browser.",
+  "Near a StormBurger, the app offers: show it at the counter for double stars on today's order.",
+  "StormBurger's Instagram is @stormburger.",
+  "Refer a friend: you get 150 points when they join, plus 100 for their first order and 25 for each order after.",
+  "Your friend gets 50 points and free fries when they join with your code."
  ],
  "suggested": [
   "What are your hours?",
-  "How do I earn points?",
-  "What do rewards cost?",
-  "How do I play Storm Run?",
-  "What prizes can I win in the game?",
+  "How do points work?",
+  "What rewards can I get?",
+  "How do I play Storm Run and win prizes?",
+  "How does the Daily Spin work?",
   "Where are you located?"
  ],
  "qa": [
@@ -49,19 +57,19 @@
    ]
   },
   {
-   "q": "What time does Inglewood open and close?",
-   "a": "Inglewood is open Sun–Thu 10:30 AM to 12 AM, and Fri–Sat 10:30 AM to 1 AM.",
+   "q": "What time does the Inglewood location open and close?",
+   "a": "Inglewood is open 10:30 AM to 12 AM Sunday through Thursday, and 10:30 AM to 1 AM on Friday and Saturday.",
    "tags": [
     "inglewood",
     "hours",
     "open",
     "close",
-    "late"
+    "late night"
    ]
   },
   {
-   "q": "What time does Long Beach open and close?",
-   "a": "Long Beach is open Mon–Wed 10:30 AM to 10 PM, and Thu–Sun 10:30 AM to 11 PM.",
+   "q": "What time does the Long Beach location open and close?",
+   "a": "Long Beach is open 10:30 AM to 10 PM Monday through Wednesday, and 10:30 AM to 11 PM Thursday through Sunday.",
    "tags": [
     "long beach",
     "hours",
@@ -71,29 +79,46 @@
   },
   {
    "q": "Are you open late?",
-   "a": "Inglewood is open until 12 AM Sun–Thu and 1 AM Fri–Sat. Long Beach closes at 10 PM Mon–Wed and 11 PM Thu–Sun.",
+   "a": "Inglewood is open until 12 AM Sunday–Thursday and until 1 AM on Friday and Saturday. Long Beach closes at 10 PM Monday–Wednesday and 11 PM Thursday–Sunday.",
    "tags": [
     "late",
-    "hours",
     "midnight",
-    "close",
-    "night"
+    "hours",
+    "close"
    ]
   },
   {
-   "q": "Are you open on weekends?",
-   "a": "Yes. Inglewood is open Fri–Sat until 1 AM and Sunday until 12 AM. Long Beach is open Sat and Sun 10:30 AM–11 PM.",
+   "q": "Are you open on Sunday?",
+   "a": "Yes. Inglewood is open Sunday 10:30 AM to 12 AM, and Long Beach is open Sunday 10:30 AM to 11 PM.",
    "tags": [
-    "weekend",
-    "saturday",
     "sunday",
+    "hours",
+    "open",
+    "weekend"
+   ]
+  },
+  {
+   "q": "Are you open on Monday?",
+   "a": "Yes. Inglewood is open 10:30 AM to 12 AM and Long Beach is open 10:30 AM to 10 PM.",
+   "tags": [
+    "monday",
     "hours",
     "open"
    ]
   },
   {
+   "q": "Are you open on Friday and Saturday?",
+   "a": "Yes. Inglewood is open 10:30 AM to 1 AM both days. Long Beach is open 10:30 AM to 11 PM both days.",
+   "tags": [
+    "friday",
+    "saturday",
+    "weekend",
+    "hours"
+   ]
+  },
+  {
    "q": "Where are you located?",
-   "a": "Inglewood: 1500 N La Brea Ave, Inglewood, CA 90302. Long Beach: 5801 Cherry Ave, Long Beach, CA 90805. Compton (336 W Alondra Blvd) is coming soon.",
+   "a": "Inglewood: 1500 N La Brea Ave, Inglewood, CA 90302. Long Beach: 5801 Cherry Ave, Long Beach, CA 90805. A Compton spot is coming soon.",
    "tags": [
     "address",
     "location",
@@ -124,7 +149,7 @@
   },
   {
    "q": "Is there a Compton location?",
-   "a": "Compton is coming soon, at 336 W Alondra Blvd, Compton, CA 90220. It isn't open yet, and I don't have an opening date.",
+   "a": "Compton is coming soon at 336 W Alondra Blvd, Compton, CA 90220. I don't have an opening date.",
    "tags": [
     "compton",
     "coming soon",
@@ -134,7 +159,7 @@
   },
   {
    "q": "How do I get directions?",
-   "a": "Tap the 📍 Directions button under the location you want in the app. The \"how close are you\" map also has a Directions link.",
+   "a": "Tap the 📍 Directions button under the location you want, either Inglewood or Long Beach.",
    "tags": [
     "directions",
     "map",
@@ -143,18 +168,27 @@
    ]
   },
   {
-   "q": "Is there parking?",
+   "q": "Where can I park?",
    "a": "I don't have parking details. Please ask staff at the location.",
    "tags": [
     "parking",
     "park",
     "lot",
-    "car"
+    "drive-thru"
+   ]
+  },
+  {
+   "q": "Do you have a drive-thru?",
+   "a": "I don't have that detail. Please ask staff at your location.",
+   "tags": [
+    "drive thru",
+    "drive-thru",
+    "drive through"
    ]
   },
   {
    "q": "What is your phone number?",
-   "a": "I don't see a phone number in the app. Please ask staff at the counter.",
+   "a": "The app doesn't show a phone number for StormBurger. Please ask staff at the counter.",
    "tags": [
     "phone",
     "call",
@@ -163,17 +197,277 @@
    ]
   },
   {
-   "q": "Do you have a drive-thru?",
-   "a": "I don't have drive-thru details. Please ask staff at the location.",
+   "q": "How do I contact StormBurger?",
+   "a": "Ask staff at the counter. You can also find StormBurger on Instagram at @stormburger.",
    "tags": [
-    "drive thru",
-    "drive-thru",
-    "drive through"
+    "contact",
+    "help",
+    "instagram",
+    "staff"
    ]
   },
   {
-   "q": "How do I join the rewards club?",
-   "a": "Join StormBurger Rewards in the app with your name, phone number and email. It's free, with one account per person and phone.",
+   "q": "How do I order?",
+   "a": "Tap ⚡ Order Inglewood or ⚡ Order Long Beach at the top of the app. You can also build your own burger or chicken sandwich in the app's builder.",
+   "tags": [
+    "order",
+    "ordering",
+    "online",
+    "pickup"
+   ]
+  },
+  {
+   "q": "Can I order from my table with a QR code?",
+   "a": "I don't have details on table QR ordering. Use the order buttons in the app, or ask staff.",
+   "tags": [
+    "table",
+    "qr",
+    "order",
+    "scan"
+   ]
+  },
+  {
+   "q": "How do I pay?",
+   "a": "I don't have payment details. Please ask staff at your location.",
+   "tags": [
+    "pay",
+    "payment",
+    "card",
+    "cash"
+   ]
+  },
+  {
+   "q": "Can I build my own burger?",
+   "a": "Yes. The app has a \"Build your burger\" section where you pick your patties, cheese, toppings and extras and see the price add up. Then you place the order.",
+   "tags": [
+    "build",
+    "custom",
+    "burger",
+    "builder",
+    "order"
+   ]
+  },
+  {
+   "q": "What does the burger builder start at?",
+   "a": "The smash burger base is $2.74 for a brioche bun and Storm sauce. Patties and extras are added on top.",
+   "tags": [
+    "build",
+    "price",
+    "base",
+    "burger"
+   ]
+  },
+  {
+   "q": "How much do patties and extras cost in the builder?",
+   "a": "A 4oz smash patty is $2.50 (up to 3). American or Swiss cheese is $0.75 each, bacon is $2.00, and jalapeños are $1.00. Lettuce, tomato, onion, pickles and onion straws are free.",
+   "tags": [
+    "extras",
+    "patty",
+    "cheese",
+    "bacon",
+    "price",
+    "toppings"
+   ]
+  },
+  {
+   "q": "Can I build a chicken sandwich?",
+   "a": "Yes. Use the 🐔 Chicken sandwich tab in the builder. The base is $2.00 for a brioche bun and mayo, and the crispy fillet is $4.99. A spicy Thunder fillet is also $4.99.",
+   "tags": [
+    "chicken",
+    "sandwich",
+    "build",
+    "spicy",
+    "thunder"
+   ]
+  },
+  {
+   "q": "What is on the menu?",
+   "a": "The app lists combos, burgers, a chicken sandwich, a Kids Burger, a Turkey Burger, milkshakes and homemade sauces. Scroll to \"The menu\" in the app to see everything.",
+   "tags": [
+    "menu",
+    "food",
+    "what do you sell",
+    "items"
+   ]
+  },
+  {
+   "q": "How much is the Classic StormBurger Combo?",
+   "a": "$11.99, with the Classic StormBurger, fries and a soft drink.",
+   "tags": [
+    "classic",
+    "combo",
+    "price",
+    "burger"
+   ]
+  },
+  {
+   "q": "What is the Jalapeño Lightning Burger?",
+   "a": "It has homemade avocado crema, Storm sauce, a 4oz patty, Swiss cheese, grilled onions and jalapeños. It's $6.99, or $13.99 as a combo.",
+   "tags": [
+    "jalapeno",
+    "lightning",
+    "burger",
+    "spicy",
+    "price"
+   ]
+  },
+  {
+   "q": "Do you have a kids menu?",
+   "a": "Yes. The Kids Burger (4oz patty, American cheese) is $5.99. The Kids Combo adds fries and a soft drink for $11.99.",
+   "tags": [
+    "kids",
+    "children",
+    "kid",
+    "menu",
+    "price"
+   ]
+  },
+  {
+   "q": "Do you have a chicken sandwich?",
+   "a": "Yes. The Chicken Sandwich Combo is $12.99 with fries and a soft drink.",
+   "tags": [
+    "chicken",
+    "sandwich",
+    "combo",
+    "price"
+   ]
+  },
+  {
+   "q": "Do you have a turkey burger?",
+   "a": "Yes. The Turkey Burger has two 2oz turkey patties, lettuce, tomato, cheese, onions, pickles and burger sauce. It's $6.99.",
+   "tags": [
+    "turkey",
+    "burger",
+    "price"
+   ]
+  },
+  {
+   "q": "Do you have milkshakes?",
+   "a": "Yes. The Mix Shake (\"Why not both?\") is $4.99. Vanilla and chocolate shakes are also available.",
+   "tags": [
+    "shake",
+    "milkshake",
+    "vanilla",
+    "chocolate",
+    "mix",
+    "price"
+   ]
+  },
+  {
+   "q": "What sauces do you have?",
+   "a": "Homemade sauces are $1.00 each, including Storm (the signature burger sauce), BBQ, Honey Mustard and Spicy Mayo. Thunder and Ranch also show up in the app.",
+   "tags": [
+    "sauce",
+    "storm",
+    "bbq",
+    "honey mustard",
+    "spicy mayo",
+    "thunder",
+    "ranch"
+   ]
+  },
+  {
+   "q": "What does a combo include?",
+   "a": "All combos come with fries and a soft drink.",
+   "tags": [
+    "combo",
+    "fries",
+    "drink",
+    "includes"
+   ]
+  },
+  {
+   "q": "Can I upgrade to onion rings or a shake?",
+   "a": "Yes. Upgrade fries to onion rings for +$2.00, or your drink to a milkshake for +$2.00.",
+   "tags": [
+    "upgrade",
+    "onion rings",
+    "shake",
+    "combo",
+    "extra"
+   ]
+  },
+  {
+   "q": "Do you have onion rings?",
+   "a": "Yes, onion rings are on the menu. They also show up as a combo upgrade (+$2.00) and as a game prize.",
+   "tags": [
+    "onion rings",
+    "rings",
+    "sides"
+   ]
+  },
+  {
+   "q": "Do you have lemonade?",
+   "a": "Lemonade appears in the Storm Run game. I don't have its price or menu details, so please ask staff.",
+   "tags": [
+    "lemonade",
+    "drink",
+    "beverage"
+   ]
+  },
+  {
+   "q": "Do you have chicken strips?",
+   "a": "Chicken strips appear in the game and in the seasonal specials. I don't have regular menu details, so please ask staff.",
+   "tags": [
+    "chicken strips",
+    "strips",
+    "tenders"
+   ]
+  },
+  {
+   "q": "Do you have holiday specials?",
+   "a": "Yes, the app lists seasonal specials. Next up is the Gobble Burger (a Turkey Burger with Onion Rings) from Nov 20 to Nov 28.",
+   "tags": [
+    "specials",
+    "holiday",
+    "thanksgiving",
+    "gobble",
+    "seasonal"
+   ]
+  },
+  {
+   "q": "What specials are coming up?",
+   "a": "Gobble Burger Nov 20–28, Holiday Shake Stack Dec 15–25, New Year BBQ Combo Dec 29–Jan 1, Burgers for Two Feb 7–14, Lucky Strips Combo Mar 14–17, Cinco Spicy Combo May 1–5, and Fourth of July Classic Jul 1–4.",
+   "tags": [
+    "specials",
+    "holiday",
+    "calendar",
+    "deals",
+    "seasonal"
+   ]
+  },
+  {
+   "q": "What is the Holiday Shake Stack?",
+   "a": "It's a Double Classic StormBurger with a Mix Shake (vanilla and chocolate), available Dec 15–25.",
+   "tags": [
+    "christmas",
+    "holiday",
+    "shake stack",
+    "special"
+   ]
+  },
+  {
+   "q": "What is the Burgers for Two special?",
+   "a": "Two Classic StormBurgers and one Chocolate Shake with two straws, available Feb 7–14.",
+   "tags": [
+    "valentines",
+    "burgers for two",
+    "special",
+    "couple"
+   ]
+  },
+  {
+   "q": "Do you have a happy hour?",
+   "a": "I don't have happy hour details. Please ask staff.",
+   "tags": [
+    "happy hour",
+    "deals",
+    "discount"
+   ]
+  },
+  {
+   "q": "How do I join StormBurger Rewards?",
+   "a": "Create a free member account with your name, phone number and email. The app also shows a join card, and you can join when you save a game prize or score.",
    "tags": [
     "join",
     "sign up",
@@ -184,254 +478,195 @@
    ]
   },
   {
+   "q": "Do I need an account to play the game?",
+   "a": "No. Storm Run is free to play with no account. You only need a free member account to save your score or claim a prize.",
+   "tags": [
+    "account",
+    "play",
+    "game",
+    "free",
+    "sign up"
+   ]
+  },
+  {
    "q": "Is it free to join?",
-   "a": "Yes, a member account is free.",
+   "a": "Yes. The member account and the game are free, and no purchase is necessary to play, spin or win.",
    "tags": [
     "free",
     "join",
     "cost",
-    "sign up",
     "member"
    ]
   },
   {
-   "q": "Do I have to sign up to play the game?",
-   "a": "No. You can play Storm Run free with no account. You only need an account to save your score or claim a prize after a run.",
-   "tags": [
-    "sign up",
-    "account",
-    "play",
-    "game",
-    "storm run",
-    "required"
-   ]
-  },
-  {
-   "q": "What do I need to make an account?",
-   "a": "Your name, phone number and email. The account is tied to the phone you made it on, and the live app confirms your number with a text code.",
-   "tags": [
-    "account",
-    "phone",
-    "email",
-    "verify",
-    "text code"
-   ]
-  },
-  {
    "q": "Can I have more than one account?",
-   "a": "No. It's one free member account per person and per phone.",
+   "a": "No. It's one free member account per person and per phone. Scores made with multiple accounts are disqualified.",
    "tags": [
-    "multiple accounts",
-    "one account",
+    "account",
+    "multiple",
     "phone",
-    "duplicate"
+    "rules"
    ]
   },
   {
-   "q": "How old do I need to be?",
-   "a": "The game rules say you must be 13 or older. Players under 18 need a parent's or guardian's permission.",
+   "q": "How old do I have to be?",
+   "a": "You must be 13 or older. Players under 18 need a parent's or guardian's permission.",
    "tags": [
     "age",
     "kids",
     "13",
-    "minimum",
+    "minor",
     "parent",
-    "teen"
-   ]
-  },
-  {
-   "q": "I lost my account or got a new phone. What now?",
-   "a": "If your number is already a member, the app lets you sign back in on the new phone. If you get stuck, ask staff at the counter.",
-   "tags": [
-    "restore",
-    "lost",
-    "new phone",
-    "sign in",
-    "account"
+    "eligibility"
    ]
   },
   {
    "q": "How do I earn points?",
-   "a": "Show your member QR or code to the cashier when you buy, and you earn 20 points per $1. You also get bonus points for check-ins, your first order, your birthday, feedback and referrals.",
+   "a": "You earn 20 points per $1 you spend, plus bonuses like a daily visit check-in, a first-order bonus, a birthday bonus, in-app feedback and referrals. The Daily Spin can also give you points.",
    "tags": [
     "points",
     "earn",
     "stars",
     "pts",
-    "rewards"
+    "how"
    ]
   },
   {
-   "q": "How many points per dollar?",
-   "a": "20 points for every $1 you spend.",
+   "q": "How many points do I get per dollar?",
+   "a": "You earn 20 points for every $1 you spend.",
    "tags": [
     "ratio",
     "per dollar",
+    "points",
     "how many points",
-    "points",
-    "dollar",
-    "spend"
+    "20"
    ]
   },
   {
-   "q": "How many points do I get for $10?",
-   "a": "$10 earns 200 points, at 20 points per $1.",
+   "q": "How many points do I get for visiting?",
+   "a": "You get 50 bonus points for showing your QR on a new day (once a day), on top of the points for your purchase.",
    "tags": [
-    "ratio",
-    "per dollar",
-    "$10",
-    "points",
-    "example"
-   ]
-  },
-  {
-   "q": "Do I get points for visiting?",
-   "a": "Yes. Showing your QR for a visit gives a 50-point check-in bonus, once per day.",
-   "tags": [
-    "check in",
     "visit",
+    "check-in",
     "qr",
-    "bonus",
     "points",
     "50"
    ]
   },
   {
-   "q": "Is there a first-order bonus?",
-   "a": "Yes, your first order earns a 100-point bonus.",
+   "q": "Is there a bonus for my first order?",
+   "a": "Yes. Your very first order earns a 100-point bonus.",
    "tags": [
     "first order",
     "bonus",
-    "welcome",
     "100",
-    "points"
+    "new member",
+    "welcome"
    ]
   },
   {
-   "q": "How do I get points at the register?",
-   "a": "Show your QR code or 4-digit code to the cashier, or type the code from your receipt in the app.",
+   "q": "How do I get my points added after I pay?",
+   "a": "Show your member QR or code to the cashier so they can add your purchase. You can also type the code from your receipt.",
    "tags": [
+    "points",
     "qr",
     "code",
     "cashier",
-    "register",
     "receipt",
     "scan"
    ]
   },
   {
-   "q": "Do I earn points on game scores?",
-   "a": "Not as a points ratio. Game prizes are food rewards based on your score. Your Daily Spin can award bonus points, though.",
-   "tags": [
-    "game",
-    "points",
-    "score",
-    "ratio",
-    "storm run"
-   ]
-  },
-  {
    "q": "What can I get with my points?",
-   "a": "1,000 pts = Free fries. 1,800 pts = Free shake. 3,000 pts = Free Classic StormBurger. 4,500 pts = Free combo.",
+   "a": "1,000 points = Free fries, 1,800 = Free shake, 3,000 = Free Classic StormBurger, 4,500 = Free combo.",
    "tags": [
     "rewards",
-    "redeem",
-    "cost",
+    "reward",
+    "prize",
     "free",
-    "prizes",
-    "tiers"
+    "redeem",
+    "cost"
    ]
   },
   {
    "q": "How many points for free fries?",
-   "a": "1,000 points. At 20 points per $1, that's about $50 spent.",
+   "a": "1,000 points gets you Free fries.",
    "tags": [
     "fries",
-    "free fries",
+    "free",
     "1000",
-    "points",
-    "reward"
+    "reward",
+    "points"
    ]
   },
   {
    "q": "How many points for a free shake?",
-   "a": "1,800 points.",
+   "a": "1,800 points gets you a Free shake.",
    "tags": [
     "shake",
-    "milkshake",
     "free",
     "1800",
-    "reward"
+    "reward",
+    "points"
    ]
   },
   {
-   "q": "How many points for a free Classic StormBurger?",
-   "a": "3,000 points.",
+   "q": "How many points for a free burger?",
+   "a": "3,000 points gets you a Free Classic StormBurger.",
    "tags": [
-    "classic",
     "burger",
+    "classic",
     "free",
     "3000",
-    "reward"
+    "reward",
+    "points"
    ]
   },
   {
    "q": "How many points for a free combo?",
-   "a": "4,500 points.",
+   "a": "4,500 points gets you a Free combo.",
    "tags": [
     "combo",
-    "free combo",
+    "free",
     "4500",
-    "reward"
+    "reward",
+    "points"
    ]
   },
   {
    "q": "How do I redeem a reward?",
-   "a": "Open your rewards in the app and choose the reward you've earned enough points for. Show the code on your phone at the counter. Rewards are one per visit and can't be combined with other rewards.",
+   "a": "Pick a reward in the app once you have enough points, then show it at StormBurger so staff can apply it.",
    "tags": [
     "redeem",
     "use",
     "reward",
-    "counter",
-    "code",
-    "claim"
+    "claim",
+    "how"
    ]
   },
   {
    "q": "Do points expire?",
-   "a": "I don't have any expiration details for points. Please ask staff.",
+   "a": "I don't have expiry details for points. Game and spin food prizes must be used within 3 days. Please ask staff about points.",
    "tags": [
     "expire",
-    "expiration",
+    "expiry",
     "points",
     "how long"
    ]
   },
   {
    "q": "Do points have cash value?",
-   "a": "No. Points have no cash value.",
+   "a": "No. Points have no cash value and can only be traded for the rewards listed in the app.",
    "tags": [
     "cash",
     "value",
     "points",
-    "money"
+    "exchange"
    ]
   },
   {
-   "q": "Do you have levels or tiers?",
-   "a": "Yes. The app has member levels based on how many times you visit in a month (Member, Regular, VIP and Legend). Check the rewards card in the app for what you've reached and what's next.",
-   "tags": [
-    "levels",
-    "tiers",
-    "vip",
-    "regular",
-    "legend",
-    "member"
-   ]
-  },
-  {
-   "q": "Do you have a birthday reward?",
-   "a": "Yes. Add your birthday to your account to get a 200-point birthday bonus.",
+   "q": "Is there a birthday reward?",
+   "a": "Yes. You get 200 bonus points for your birthday when your birthday is on your member account.",
    "tags": [
     "birthday",
     "bday",
@@ -441,780 +676,476 @@
    ]
   },
   {
-   "q": "Can I get points for leaving feedback?",
-   "a": "Yes. Feedback you send in the app earns 250 points. Google reviews don't earn points.",
+   "q": "Can I earn points for giving feedback?",
+   "a": "Yes. In-app feedback earns 250 points. Google or Yelp reviews don't earn points or prizes.",
    "tags": [
-    "review",
     "feedback",
-    "250",
+    "review",
     "points",
+    "250",
     "google"
    ]
   },
   {
-   "q": "How does the referral program work?",
-   "a": "Share your code with a friend. You earn 150 points when they join, 100 more on their first order, and 25 on each order after. Your friend gets free fries.",
+   "q": "Is there a referral program?",
+   "a": "Yes. When a friend joins with your code you earn 150 points. You also earn 100 points on their first order and 25 on each order after that.",
    "tags": [
     "referral",
     "refer",
     "friend",
     "share",
-    "invite",
-    "code"
-   ]
-  },
-  {
-   "q": "What does my friend get if I refer them?",
-   "a": "Your friend gets free fries when they join with your referral.",
-   "tags": [
-    "referral",
-    "friend",
-    "free fries",
     "invite"
    ]
   },
   {
-   "q": "Is there a bonus for being nearby?",
-   "a": "Yes. When you're within about 2 miles, the app can give you a heads-up. Show it at the counter for double stars on today's order.",
+   "q": "What does my friend get when I refer them?",
+   "a": "Your friend gets 50 points and a free fries when they join with your code.",
+   "tags": [
+    "referral",
+    "friend",
+    "fries",
+    "gift",
+    "invite"
+   ]
+  },
+  {
+   "q": "Are there loyalty levels or tiers?",
+   "a": "I don't have details on member levels. Your points go toward the rewards ladder (fries at 1,000 up to a free combo at 4,500).",
+   "tags": [
+    "levels",
+    "tiers",
+    "vip",
+    "status"
+   ]
+  },
+  {
+   "q": "Is there a bonus when I'm near the restaurant?",
+   "a": "Yes. If you allow location, the app can tell you when you're nearby and show an offer: show it at the counter for double stars on today's order. Your location stays on your phone.",
    "tags": [
     "nearby",
     "location",
-    "bonus",
     "double stars",
-    "double points",
+    "bonus",
     "close"
    ]
   },
   {
+   "q": "Is there an early-bird bonus?",
+   "a": "I don't have early-bird details. The visit check-in gives 50 points once a day.",
+   "tags": [
+    "early bird",
+    "bonus",
+    "morning"
+   ]
+  },
+  {
    "q": "What is the Daily Spin?",
-   "a": "A free wheel you can spin once a day as a member. Every slice wins something, from bonus points to a free item.",
+   "a": "It's a free wheel you can spin once a day as a member, and every slice wins something. Prizes include points, free house sauce, free fries, $2 off any burger and 10% off your order.",
    "tags": [
     "spin",
     "daily spin",
     "wheel",
     "free",
-    "daily"
+    "prize"
    ]
   },
   {
-   "q": "How often can I spin?",
-   "a": "One spin per member per day, based on Los Angeles time.",
+   "q": "How often can I spin the wheel?",
+   "a": "Once per member per day, by Los Angeles time. Spins are never sold and can't be earned by buying anything.",
    "tags": [
     "spin",
     "daily",
-    "how often",
-    "once a day",
-    "limit"
-   ]
-  },
-  {
-   "q": "Does the spin cost anything?",
-   "a": "No. The spin is always free, can't be bought and doesn't need a purchase.",
-   "tags": [
-    "spin",
-    "free",
-    "cost",
-    "purchase"
+    "once",
+    "limit",
+    "how often"
    ]
   },
   {
    "q": "What can I win on the Daily Spin?",
-   "a": "Odds per spin: +100 points 30%, +200 points 20%, +150 points 15%, free house sauce 15%, $2 off any burger 8%, free fries 7%, 10% off your order 5%.",
+   "a": "+100 points (30%), +200 points (20%), +150 points (15%), free house sauce (15%), $2 off any burger (8%), free fries (7%) and 10% off your order (5%).",
    "tags": [
     "spin",
-    "prizes",
     "odds",
-    "chances",
-    "wheel",
-    "win"
+    "chance",
+    "prizes",
+    "wheel"
    ]
   },
   {
-   "q": "How long are spin prizes good for?",
-   "a": "Food prizes and discounts are good for 3 days at either location, one reward per visit. They can't be combined and have no cash value.",
+   "q": "Do spin prizes expire?",
+   "a": "Food prizes and discounts from the spin are good for 3 days at Inglewood or Long Beach. It's one reward per visit and they can't be combined with other rewards.",
    "tags": [
     "spin",
-    "prize",
     "expire",
     "3 days",
-    "use"
+    "prize",
+    "redeem"
    ]
   },
   {
    "q": "What is Storm Run?",
-   "a": "Storm Run is StormBurger's free driving game. You drive a food truck from Inglewood to Long Beach, grabbing coins and food and dodging the storm, for prizes.",
+   "a": "It's StormBurger's driving game. You steer a food truck from Inglewood to Long Beach, grabbing coins and StormBurger food while dodging lightning, flying cows, stop signs, police and tornadoes.",
    "tags": [
     "storm run",
     "game",
     "play",
     "truck",
-    "what is"
+    "what"
    ]
   },
   {
    "q": "How do I play Storm Run?",
-   "a": "Swipe left or right to slide between lanes, or tap a side to move one lane. Grab coins and food for points and dodge lightning, cows, stop signs, police and tornadoes.",
+   "a": "Swipe left or right on the road to change lanes, or tap the left or right side to move one lane. On a computer, use the ◀ ▶ arrow keys. Grab food and coins, and dodge everything else.",
    "tags": [
-    "how to play",
-    "controls",
     "storm run",
-    "game",
-    "lanes",
-    "swipe"
-   ]
-  },
-  {
-   "q": "What are the game controls?",
-   "a": "On a phone: swipe left or right, or tap a side of the road. On a computer: the ◀ ▶ arrow keys. A game controller also works, using the stick or D-pad.",
-   "tags": [
     "controls",
-    "keys",
+    "how to play",
     "swipe",
-    "controller",
-    "arrow",
-    "gamepad"
-   ]
-  },
-  {
-   "q": "How long is a game?",
-   "a": "A run has 10 levels of 90 seconds each. The first 10 seconds are calm so you can get the feel of the controls.",
-   "tags": [
-    "time",
-    "length",
-    "levels",
-    "90 seconds",
-    "duration",
+    "lanes",
     "game"
    ]
   },
   {
-   "q": "How many lives do I have?",
-   "a": "You have 5 lives. Each hit costs half a life, so 10 hits total end the run.",
+   "q": "How long is a game?",
+   "a": "A run has 10 levels of 90 seconds each. You have 5 lives, and the first 10 seconds are calm so you can get the feel of it.",
+   "tags": [
+    "game",
+    "levels",
+    "time",
+    "90 seconds",
+    "lives",
+    "length"
+   ]
+  },
+  {
+   "q": "How do lives work in Storm Run?",
+   "a": "You have 5 lives and every hit costs half a life, so 10 hits total the truck. Pit stops can repair it.",
    "tags": [
     "lives",
-    "hits",
-    "game over",
-    "health",
+    "hit",
+    "damage",
+    "game",
     "half life"
    ]
   },
   {
-   "q": "How does scoring work?",
-   "a": "Coins are +10. Food is +30 to +60. Each level you beat gives a bonus of 100 times the level number. Hazards take points away.",
+   "q": "How does scoring work in Storm Run?",
+   "a": "Coins are +10 and food is +30 to +60. Flying cows, stop signs and lightning cost −100 and half a life. You also get a level bonus of 100 points times the new level number.",
    "tags": [
     "score",
-    "points",
     "scoring",
+    "points",
     "game",
     "coins",
-    "bonus"
+    "food"
    ]
   },
   {
    "q": "How many points is each food worth in the game?",
-   "a": "Classic StormBurger +60, Turkey Burger +60, Chicken Sandwich +50, Chicken Strips +50, Vanilla Shake +40, Lemonade +40, Fries +30, Onion Rings +30. Coins are +10.",
+   "a": "Classic StormBurger and Turkey Burger +60, Chicken Sandwich and Chicken Strips +50, Vanilla Shake and Lemonade +40, Fries and Onion Rings +30.",
    "tags": [
     "food",
-    "points",
-    "pickups",
+    "score",
     "burger",
     "fries",
-    "game",
-    "values"
+    "points",
+    "game"
    ]
   },
   {
-   "q": "What should I dodge in the game?",
-   "a": "Lightning (move off the glowing target), police cars (▲ arrows show their lane), flying cows, stop signs and tornadoes (stay out of the red lane). Cows, stop signs, lightning and police each cost half a life. Stop signs, cows and lightning also cost 100 points.",
+   "q": "What should I dodge in Storm Run?",
+   "a": "Dodge lightning (move off the glowing target), flying cows, stop signs, police cars (▲ arrows show their lane), roadblocks, spike strips, the drive-thru line and tornadoes. Tornadoes always come with a warning and a red lane.",
    "tags": [
-    "dodge",
     "hazards",
+    "dodge",
     "lightning",
-    "cow",
-    "stop sign",
+    "cops",
     "tornado",
-    "police"
+    "cow",
+    "game"
    ]
   },
   {
    "q": "What happens if a tornado hits me?",
-   "a": "A tornado costs half a life and a chunk of score, at least 200 points or about a quarter of your score. A TORNADO WARNING and a red lane show up first.",
+   "a": "A tornado hit costs about 25% of your score, at least 200 points. A \"TORNADO WARNING\" and a red lane show first so you can move.",
    "tags": [
     "tornado",
-    "twister",
-    "warning",
     "penalty",
+    "score",
+    "warning",
     "game"
    ]
   },
   {
    "q": "What is the Jordan High pit stop?",
-   "a": "On levels 2, 6 and 9 you can pull into the Jordan High pit stop on the right. You build burgers by tapping ingredients in the ticket's order. Each burger is +75 points and repairs the truck by 1 life, up to 5.",
+   "a": "On some levels you can pull into the Jordan High pit bay. The run pauses and you tap ingredients in order to build burgers for the students. Each burger gives +75 points and repairs +1 life.",
    "tags": [
     "pit stop",
-    "jordan high",
     "kitchen",
+    "jordan high",
     "repair",
-    "burgers",
-    "bonus"
+    "game",
+    "panthers"
    ]
   },
   {
    "q": "What are Antidote Drizzle coins?",
-   "a": "They're special gold emblems worth +25 each. Catch 5 and a review billboard appears. Drive through its golden ▶ for a +500 bonus.",
+   "a": "They're gold coins worth +25 each. Catch 5 in a run and a review billboard appears on the road. Drive through its golden ▶ to find Antidote's StormBurger review for a +500 bonus.",
    "tags": [
     "antidote",
     "drizzle",
     "review",
     "billboard",
-    "500",
     "bonus",
-    "egg"
-   ]
-  },
-  {
-   "q": "What can I win in the game?",
-   "a": "Sample prizes by single-run score: 400 = free house sauce, 600 = free fries or onion rings (with any order), 800 = free milkshake, 1,000 = free Classic StormBurger. The weekly top score wins a Free Double Classic StormBurger Combo.",
-   "tags": [
-    "prizes",
-    "win",
-    "game",
-    "rewards",
-    "score",
-    "free"
-   ]
-  },
-  {
-   "q": "What score do I need for a free burger?",
-   "a": "Score 1,000 points or more in one run for a Free Classic StormBurger.",
-   "tags": [
-    "1000",
-    "burger",
-    "free",
-    "prize",
-    "score"
-   ]
-  },
-  {
-   "q": "What score do I need for a free milkshake?",
-   "a": "Score 800 or more in one run. The shake is vanilla, chocolate or mix.",
-   "tags": [
-    "800",
-    "milkshake",
-    "shake",
-    "free",
-    "prize"
-   ]
-  },
-  {
-   "q": "What score do I need for free fries?",
-   "a": "Score 600 or more in one run for free fries or an upgrade to onion rings, with any order.",
-   "tags": [
-    "600",
-    "fries",
-    "onion rings",
-    "free",
-    "prize"
-   ]
-  },
-  {
-   "q": "What score do I need for a free sauce?",
-   "a": "Score 400 or more in one run for a free house sauce. Storm, Thunder, Ranch and more, your pick.",
-   "tags": [
-    "400",
-    "sauce",
-    "free",
-    "prize",
-    "house sauce"
-   ]
-  },
-  {
-   "q": "Are the game prizes real?",
-   "a": "The prizes shown are samples, and StormBurger picks the real ones. Prizes depend only on your score, not on chance.",
-   "tags": [
-    "prizes",
-    "real",
-    "sample",
-    "game",
-    "skill"
-   ]
-  },
-  {
-   "q": "How do I claim a game prize?",
-   "a": "After your run, save the prize to your rewards. Join or sign in if asked. Then show the code on your phone at StormBurger to redeem.",
-   "tags": [
-    "claim",
-    "prize",
-    "redeem",
-    "code",
-    "save",
     "game"
    ]
   },
   {
-   "q": "How long do I have to use a game prize?",
-   "a": "3 days. You can hold one prize at a time, so use it before your next win saves.",
-   "tags": [
-    "prize",
-    "expire",
-    "3 days",
-    "one at a time",
-    "use"
-   ]
-  },
-  {
-   "q": "How does the weekly leaderboard work?",
-   "a": "The highest score from Monday through Sunday close wins the weekly prize. The board resets every Monday. Ties go to the score posted first.",
-   "tags": [
-    "leaderboard",
-    "weekly",
-    "champion",
-    "board",
-    "monday",
-    "top score"
-   ]
-  },
-  {
-   "q": "What does the weekly champion win?",
-   "a": "A Free Double Classic StormBurger Combo for the top score by Sunday close.",
-   "tags": [
-    "champion",
-    "weekly",
-    "prize",
-    "double classic",
-    "combo",
-    "winner"
-   ]
-  },
-  {
-   "q": "When does the weekly contest end?",
-   "a": "Sunday close. The app's countdown says the week's board closes Sunday at 11:00 PM, and it resets on Monday.",
-   "tags": [
-    "weekly",
-    "deadline",
-    "sunday",
-    "11 pm",
-    "reset",
-    "monday",
-    "close"
-   ]
-  },
-  {
-   "q": "When are weekly prizes picked?",
-   "a": "The top score at Sunday close wins. The board resets Monday. I don't have an exact pickup day, so please ask staff.",
-   "tags": [
-    "weekly",
-    "prize",
-    "picked",
-    "winner",
-    "when",
-    "pickup"
-   ]
-  },
-  {
-   "q": "How do I get on the leaderboard?",
-   "a": "Play a run, then save your score with a free member account (name, phone, email).",
-   "tags": [
-    "leaderboard",
-    "save score",
-    "board",
-    "rank",
-    "account"
-   ]
-  },
-  {
-   "q": "Where can I see my best score?",
-   "a": "The game shows \"Your best\" on this phone, saved locally.",
-   "tags": [
-    "best",
-    "high score",
-    "my score",
-    "record"
-   ]
-  },
-  {
-   "q": "How often can I play?",
-   "a": "As often as you like. Storm Run is free with no limits right now.",
-   "tags": [
-    "how often",
-    "play",
-    "limit",
-    "unlimited",
-    "free",
-    "tokens"
-   ]
-  },
-  {
-   "q": "Do I need to buy something to play?",
-   "a": "No. No purchase is needed to play, spin or win, and buying doesn't improve your chances.",
-   "tags": [
-    "purchase",
-    "buy",
-    "necessary",
-    "free",
-    "play",
-    "win"
-   ]
-  },
-  {
-   "q": "Do game tokens exist?",
-   "a": "Tokens are not turned on right now, so Storm Run is simply free. If tokens ever start, the app will tell you how they work.",
-   "tags": [
-    "tokens",
-    "free play",
-    "game",
-    "cost"
-   ]
-  },
-  {
-   "q": "Can employees win prizes?",
-   "a": "Employees and their household members may play but can't win prizes.",
-   "tags": [
-    "employees",
-    "staff",
-    "win",
-    "eligible",
-    "rules"
-   ]
-  },
-  {
-   "q": "Can I cheat or use bots?",
-   "a": "No. Scores made with cheats, scripts, bots or multiple accounts are disqualified.",
-   "tags": [
-    "cheat",
-    "bots",
-    "rules",
-    "disqualified",
-    "fair"
-   ]
-  },
-  {
-   "q": "What are the official game rules?",
-   "a": "Tap \"Game & daily spin official rules\" in the app. The rules page is marked as a draft, so ask staff for anything you're unsure about.",
-   "tags": [
-    "rules",
-    "official",
-    "terms",
-    "game",
-    "spin"
-   ]
-  },
-  {
-   "q": "Is there music or sound in the game?",
-   "a": "Yes. Use the 🔊 Sound button to turn sound on or off. There are two songs, Energy and Cheat Code, and the 🎵 button switches songs.",
+   "q": "Can I turn the sound off in the game?",
+   "a": "Yes. Tap the 🔊 Sound button on the game screen to turn sound on or off. A 🎵 button switches between songs.",
    "tags": [
     "sound",
     "music",
-    "song",
     "mute",
-    "audio"
-   ]
-  },
-  {
-   "q": "Can I change how the game looks?",
-   "a": "Yes. In Settings you can switch between the 3D chase cam and Classic 2D, and pick a Graphics level. Smooth is recommended for phones.",
-   "tags": [
-    "settings",
-    "3d",
-    "2d",
-    "graphics",
-    "view",
-    "quality"
+    "volume",
+    "game"
    ]
   },
   {
    "q": "Can I play with a game controller?",
-   "a": "Yes. Xbox, PlayStation, Switch Pro and similar controllers work in most browsers. Use the stick or D-pad to change lanes.",
+   "a": "Yes. A controller connects through your browser. Left and right on the stick or D-pad change lanes.",
    "tags": [
     "controller",
     "gamepad",
     "xbox",
     "playstation",
-    "tesla"
-   ]
-  },
-  {
-   "q": "What is the halftime video?",
-   "a": "During play you may see a short break with clips of Antidote The Foodie's review of StormBurger. You can skip it or watch the full review on YouTube.",
-   "tags": [
-    "halftime",
-    "video",
-    "antidote",
-    "review",
-    "clips",
-    "skip"
-   ]
-  },
-  {
-   "q": "What's on the menu?",
-   "a": "Combos, burgers, a Kids Burger and Kids Combo, a Turkey Burger, a chicken sandwich, shakes, sides like fries and onion rings, and homemade sauces. Check the Menu section of the app for the full list.",
-   "tags": [
-    "menu",
-    "food",
-    "burgers",
-    "what do you serve",
-    "items"
-   ]
-  },
-  {
-   "q": "What combos do you have?",
-   "a": "Classic StormBurger Combo $11.99, Jalapeño Lightning Burger Combo $13.99, Kids Combo $11.99 and Chicken Sandwich Combo $12.99. All come with fries and a soft drink.",
-   "tags": [
-    "combo",
-    "price",
-    "meal",
-    "classic",
-    "jalapeno",
-    "chicken",
-    "kids"
-   ]
-  },
-  {
-   "q": "What comes with a combo?",
-   "a": "Fries and a soft drink. You can upgrade fries to onion rings for +$2.00 and the drink to a milkshake for +$2.00.",
-   "tags": [
-    "combo",
-    "includes",
-    "fries",
-    "drink",
-    "upgrade",
-    "onion rings",
-    "shake"
-   ]
-  },
-  {
-   "q": "What is the Jalapeño Lightning Burger?",
-   "a": "$6.99. It has homemade avocado crema, Storm sauce, a 4oz patty, Swiss cheese, grilled onions and jalapeños.",
-   "tags": [
-    "jalapeno",
-    "lightning",
-    "burger",
-    "spicy",
-    "price"
-   ]
-  },
-  {
-   "q": "What's on the Turkey Burger?",
-   "a": "$6.99. Two 2oz turkey patties, lettuce, tomato, cheese, onions, pickles and burger sauce.",
-   "tags": [
-    "turkey",
-    "burger",
-    "price",
-    "ingredients"
-   ]
-  },
-  {
-   "q": "Do you have a kids menu?",
-   "a": "Yes. The Kids Burger is $5.99 (4oz patty, American cheese). The Kids Combo is $11.99 with fries and a soft drink.",
-   "tags": [
-    "kids",
-    "children",
-    "kid menu",
-    "child",
-    "price"
-   ]
-  },
-  {
-   "q": "How much is a shake?",
-   "a": "The Mix Shake (\"Why not both?\") is $4.99. Vanilla and chocolate shakes are on the menu too. I only see the Mix Shake price.",
-   "tags": [
-    "shake",
-    "milkshake",
-    "mix",
-    "price",
-    "vanilla",
-    "chocolate"
-   ]
-  },
-  {
-   "q": "What sauces do you have?",
-   "a": "Homemade sauces at $1.00 each, including Storm, BBQ, Honey Mustard and Spicy Mayo. Thunder, Ranch and Avocado Crema are mentioned too.",
-   "tags": [
-    "sauce",
-    "storm",
-    "bbq",
-    "honey mustard",
-    "spicy mayo",
-    "thunder",
-    "ranch",
-    "price"
-   ]
-  },
-  {
-   "q": "Do you have chicken?",
-   "a": "Yes. There's a hand-breaded chicken sandwich (Chicken Sandwich Combo $12.99), a spicy Thunder version, and chicken strips.",
-   "tags": [
-    "chicken",
-    "sandwich",
-    "strips",
-    "spicy",
-    "thunder",
-    "hand-breaded"
-   ]
-  },
-  {
-   "q": "Can I build my own burger?",
-   "a": "Yes. The \"Build your burger\" section lets you add patties, cheese, bacon, jalapeños, onion straws and fresh toppings, and watch the price. Then you place the order.",
-   "tags": [
-    "build",
-    "custom",
-    "create",
-    "burger",
-    "toppings",
-    "order"
-   ]
-  },
-  {
-   "q": "How much do toppings cost in the builder?",
-   "a": "The smash burger base is $2.74 (brioche bun and Storm sauce). Each patty is $2.50, bacon $2.00, American or Swiss $0.75, jalapeños $1.00. Lettuce, tomato, onion, pickles and onion straws are free.",
-   "tags": [
-    "builder",
-    "price",
-    "toppings",
-    "patty",
-    "bacon",
-    "cheese",
-    "custom"
-   ]
-  },
-  {
-   "q": "Can I build a chicken sandwich?",
-   "a": "Yes, using the \"Chicken sandwich\" tab in the builder. The base is $2.00, a crispy fillet is $4.99 and a spicy Thunder fillet is $4.99. Kale slaw and Swiss are $0.50.",
-   "tags": [
-    "chicken",
-    "build",
-    "sandwich",
-    "custom",
-    "price"
-   ]
-  },
-  {
-   "q": "Do you have holiday specials?",
-   "a": "Yes, seasonal specials run on set dates: Thanksgiving Gobble Burger (Turkey Burger + Onion Rings, Nov 20–28), Holiday Shake Stack (Dec 15–25), New Year BBQ Combo (Dec 29–Jan 1), plus Valentine's, St. Patrick's, Cinco and July 4 specials.",
-   "tags": [
-    "specials",
-    "holiday",
-    "thanksgiving",
-    "christmas",
-    "seasonal",
-    "deals"
-   ]
-  },
-  {
-   "q": "What is the Thanksgiving special?",
-   "a": "The Gobble Burger is a Turkey Burger plus Onion Rings, available Nov 20–28.",
-   "tags": [
-    "thanksgiving",
-    "gobble",
-    "turkey",
-    "special"
-   ]
-  },
-  {
-   "q": "Do you have a happy hour?",
-   "a": "I don't have any happy hour details. Please ask staff.",
-   "tags": [
-    "happy hour",
-    "deal",
-    "discount",
-    "drinks"
-   ]
-  },
-  {
-   "q": "How do I order?",
-   "a": "Tap Order Inglewood or Order Long Beach at the top of the app. You can also build a burger in the app and place the order.",
-   "tags": [
-    "order",
-    "ordering",
-    "online",
-    "how to order",
-    "pickup"
-   ]
-  },
-  {
-   "q": "Can I order from my table or scan a QR code?",
-   "a": "Yes. Scan the QR code to open the app, then order. At the counter, show your member QR to earn points.",
-   "tags": [
-    "table",
-    "qr",
-    "scan",
-    "order",
-    "dine in"
-   ]
-  },
-  {
-   "q": "How do I pay?",
-   "a": "I don't have payment details. Please ask staff at the counter.",
-   "tags": [
-    "pay",
-    "payment",
-    "cash",
-    "card",
-    "apple pay"
-   ]
-  },
-  {
-   "q": "Do you deliver?",
-   "a": "I don't have delivery details. Please ask staff.",
-   "tags": [
-    "delivery",
-    "deliver",
-    "doordash",
-    "uber eats"
-   ]
-  },
-  {
-   "q": "Can I use a discount with another reward?",
-   "a": "No. Food prizes and discounts can't be combined with other rewards, and you get one reward per visit.",
-   "tags": [
-    "combine",
-    "stack",
-    "discount",
-    "coupon",
-    "one per visit"
-   ]
-  },
-  {
-   "q": "Are there alcohol rewards?",
-   "a": "No. No prize includes alcohol.",
-   "tags": [
-    "alcohol",
-    "beer",
-    "drinks",
-    "prize"
-   ]
-  },
-  {
-   "q": "What languages does the app support?",
-   "a": "Tap the 🌐 pill to choose English, Español, 简体中文, 繁體中文, 한국어, Tagalog, Tiếng Việt, Հայերեն, فارسی, 日本語, ไทย or Русский. Restaurant and game names stay in English.",
-   "tags": [
-    "language",
-    "spanish",
-    "translate",
-    "español",
-    "chinese",
-    "korean",
-    "languages"
-   ]
-  },
-  {
-   "q": "Is there a kid mode?",
-   "a": "I don't have details on a kid mode. The menu does have a Kids Burger and Kids Combo, and players under 18 need a parent's or guardian's permission for the game.",
-   "tags": [
-    "kid mode",
-    "kids",
-    "children",
-    "parent",
     "game"
    ]
   },
   {
-   "q": "How do I add the app to my phone?",
-   "a": "On iPhone Safari, tap Share, then Add to Home Screen, then Add. On Android Chrome, tap Install app or the ⋮ menu, then Add to Home screen. There's also an \"Add to Home Screen\" link in the app.",
+   "q": "Can I switch between 3D and 2D in the game?",
+   "a": "Yes. Open the game menu's Settings and choose View: 3D chase cam or Classic 2D. You can also change Graphics quality there.",
+   "tags": [
+    "3d",
+    "2d",
+    "settings",
+    "graphics",
+    "view",
+    "game"
+   ]
+  },
+  {
+   "q": "How often can I play Storm Run?",
+   "a": "As often as you like. It's free and there's no limit on plays.",
+   "tags": [
+    "play",
+    "limit",
+    "free",
+    "how often",
+    "game"
+   ]
+  },
+  {
+   "q": "What prizes can I win in Storm Run?",
+   "a": "One run over 400 points wins a free house sauce, 600 a free fries or onion rings, 800 a free milkshake, and 1,000 a free Classic StormBurger. These are sample prizes, and StormBurger picks the real ones.",
+   "tags": [
+    "prizes",
+    "score",
+    "win",
+    "game",
+    "free",
+    "tiers"
+   ]
+  },
+  {
+   "q": "How do I win a free Classic StormBurger from the game?",
+   "a": "Score over 1,000 points in a single run.",
+   "tags": [
+    "1000",
+    "classic",
+    "burger",
+    "free",
+    "game",
+    "prize"
+   ]
+  },
+  {
+   "q": "How do I win a free milkshake from the game?",
+   "a": "Score 800 or more in one run. You can pick vanilla, chocolate or mix.",
+   "tags": [
+    "800",
+    "milkshake",
+    "shake",
+    "free",
+    "game",
+    "prize"
+   ]
+  },
+  {
+   "q": "How do I win free fries or onion rings from the game?",
+   "a": "Score 600 or more in one run. It comes with any order.",
+   "tags": [
+    "600",
+    "fries",
+    "onion rings",
+    "free",
+    "game",
+    "prize"
+   ]
+  },
+  {
+   "q": "How do I win a free house sauce from the game?",
+   "a": "Score 400 or more in one run. Pick Storm, Thunder, Ranch and more.",
+   "tags": [
+    "400",
+    "sauce",
+    "free",
+    "game",
+    "prize"
+   ]
+  },
+  {
+   "q": "How do I claim a game prize?",
+   "a": "After your run, tap Save my prize and join with your name, phone and email. Your code shows in the app. Show it at StormBurger to redeem within 3 days.",
+   "tags": [
+    "claim",
+    "prize",
+    "code",
+    "redeem",
+    "save",
+    "game"
+   ]
+  },
+  {
+   "q": "Can I win more than one game prize?",
+   "a": "Only one prize at a time per member. If you already have one waiting, use it first and then your next win saves.",
+   "tags": [
+    "prize",
+    "one at a time",
+    "limit",
+    "game"
+   ]
+  },
+  {
+   "q": "How does the weekly leaderboard work?",
+   "a": "The highest score from Monday through Sunday close is the weekly champion. The board resets every Monday, and ties go to the score posted first.",
+   "tags": [
+    "leaderboard",
+    "weekly",
+    "champion",
+    "board",
+    "top score",
+    "reset"
+   ]
+  },
+  {
+   "q": "What does the weekly champion win?",
+   "a": "A Free Double Classic StormBurger Combo for the top score by Sunday close. It's a sample prize, and StormBurger picks the real one.",
+   "tags": [
+    "champion",
+    "weekly",
+    "prize",
+    "double",
+    "combo",
+    "winner"
+   ]
+  },
+  {
+   "q": "When does the weekly board reset?",
+   "a": "Every Monday.",
+   "tags": [
+    "reset",
+    "monday",
+    "weekly",
+    "board",
+    "leaderboard"
+   ]
+  },
+  {
+   "q": "When are weekly prizes picked?",
+   "a": "The weekly top score is decided at Sunday close, and the board starts fresh Monday. I don't have more detail on how winners are contacted, so ask staff.",
+   "tags": [
+    "weekly",
+    "prize",
+    "winner",
+    "picked",
+    "sunday",
+    "contest"
+   ]
+  },
+  {
+   "q": "Is my best score saved?",
+   "a": "Your best score is saved on your phone, shown as \"Your best\" on the game screen. To rank on the weekly board, save your score with a member account.",
+   "tags": [
+    "best score",
+    "saved",
+    "phone",
+    "leaderboard"
+   ]
+  },
+  {
+   "q": "Do I have to buy something to play or win?",
+   "a": "No. No purchase or payment of any kind is necessary to play Storm Run, spin the Daily Spin, or win, and a purchase doesn't improve your chances.",
+   "tags": [
+    "purchase",
+    "buy",
+    "free",
+    "no purchase",
+    "contest"
+   ]
+  },
+  {
+   "q": "Can cheating disqualify me?",
+   "a": "Yes. Scores made with cheats, scripts, bots or multiple accounts are disqualified.",
+   "tags": [
+    "cheat",
+    "rules",
+    "bots",
+    "disqualified",
+    "fair"
+   ]
+  },
+  {
+   "q": "What is the video that plays during a break?",
+   "a": "After about 90 seconds of total play, a short \"Halftime\" video with Antidote's StormBurger review may play. You can skip it or tap to watch the full review on YouTube.",
+   "tags": [
+    "halftime",
+    "review",
+    "video",
+    "antidote",
+    "break"
+   ]
+  },
+  {
+   "q": "Is there trivia or sports in the app?",
+   "a": "I don't have any trivia or sports features listed for StormBurger. The app has the menu, the Storm Run game, the Daily Spin and rewards.",
+   "tags": [
+    "trivia",
+    "sports",
+    "halftime",
+    "features"
+   ]
+  },
+  {
+   "q": "What languages does the app support?",
+   "a": "Use the 🌐 menu to translate the app. The list includes English, Spanish, Chinese (Simplified and Traditional), Korean, Tagalog, Vietnamese, Armenian, Persian, Japanese, Thai and Russian.",
+   "tags": [
+    "language",
+    "translate",
+    "spanish",
+    "español",
+    "korean",
+    "chinese",
+    "languages"
+   ]
+  },
+  {
+   "q": "How do I add the app to my phone's Home Screen?",
+   "a": "On iPhone, tap Share, then Add to Home Screen, then Add. On Android, tap Install app, or use the ⋮ menu and choose Add to Home screen.",
    "tags": [
     "install",
     "home screen",
-    "add",
+    "add to home",
     "app",
     "iphone",
     "android",
@@ -1223,74 +1154,94 @@
   },
   {
    "q": "Is there a wallet card?",
-   "a": "I don't have wallet card details. You can add the app to your Home Screen for one-tap access to your rewards.",
+   "a": "I don't have wallet card details. You can add the app to your Home Screen so your rewards are one tap away.",
    "tags": [
     "wallet",
     "card",
     "apple wallet",
     "google wallet",
-    "pass"
+    "install"
    ]
   },
   {
-   "q": "Can I leave a Google review?",
-   "a": "Yes, there's a Write a Google review button in the app. Reviews don't earn points or prizes, and honest reviews only please.",
+   "q": "Is there a kid mode?",
+   "a": "I don't have a kid mode listed. The menu has a Kids Burger and Kids Combo, and players under 18 need a parent's or guardian's permission for prizes.",
    "tags": [
-    "review",
-    "google",
-    "stars",
-    "rate",
-    "feedback"
-   ]
-  },
-  {
-   "q": "Do you have Instagram?",
-   "a": "Yes, @stormburger. The app shows their latest posts and reels.",
-   "tags": [
-    "instagram",
-    "social",
-    "follow",
-    "posts",
-    "reels"
+    "kid mode",
+    "kids",
+    "children",
+    "parent",
+    "safe"
    ]
   },
   {
    "q": "Is my information private?",
-   "a": "Your info is used only for your rewards account and is never sold.",
+   "a": "Your information is used only for your rewards account and is never sold. Texts and emails are opt-in and you can stop them anytime by replying STOP or unsubscribing.",
    "tags": [
     "privacy",
     "data",
     "safe",
-    "info",
-    "sold"
+    "personal",
+    "stop",
+    "unsubscribe"
    ]
   },
   {
-   "q": "How do I stop texts or emails?",
-   "a": "Marketing texts and emails are opt-in. Reply STOP to a text or unsubscribe from an email at any time.",
+   "q": "Does the app track my location?",
+   "a": "Only if you allow it, to show how close you are to a StormBurger. Your location stays on your phone.",
+   "tags": [
+    "location",
+    "privacy",
+    "gps",
+    "nearby",
+    "track"
+   ]
+  },
+  {
+   "q": "How do I stop marketing texts?",
+   "a": "Reply STOP to any text, or unsubscribe from emails.",
    "tags": [
     "stop",
     "unsubscribe",
     "texts",
     "sms",
-    "opt out",
-    "email"
+    "opt out"
    ]
   },
   {
-   "q": "How do I get help from staff?",
-   "a": "Ask at the counter at either location. I don't see a phone number in the app.",
+   "q": "Can employees win prizes?",
+   "a": "Employees and their household members can play but can't win prizes.",
+   "tags": [
+    "employees",
+    "staff",
+    "prizes",
+    "rules"
+   ]
+  },
+  {
+   "q": "Where can I see StormBurger's posts?",
+   "a": "The app has an Instagram section with their latest posts and reels from @stormburger.",
+   "tags": [
+    "instagram",
+    "social",
+    "posts",
+    "reels",
+    "follow"
+   ]
+  },
+  {
+   "q": "Who can I ask if the app doesn't answer my question?",
+   "a": "Ask staff at the counter at your StormBurger location.",
    "tags": [
     "help",
     "staff",
-    "contact",
+    "ask",
     "support",
-    "problem",
-    "counter"
+    "question"
    ]
   }
  ],
- "updated": "2026-11-11T04:52:04+00:00",
- "source_commit": "cb32805",
+ "updated": "2026-11-16T01:42:59+00:00",
+ "source_commit": "58990a6",
  "app": "storm-burger"
 }

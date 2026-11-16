@@ -73,6 +73,7 @@ async function boot() {
   // their fire close in on you ~2.4× faster than the ground streams by (at eye level they'd otherwise seem to hang in front of you or
   // drift away), and spawns start far out near the horizon. Your plane's row (y = H-130) maps to itself, so every 2D hit lines up.
   const YP = H - 130, KF = 2.4, KB = 1.5;
+  const SHOT_BLD_R = 500;                           // how far ahead (world units) your shots still hit buildings: the near half of the stream, where the holes and fire are seen
   const far = y => CHASE ? (y < YP ? YP + (y - YP) * KF : YP + (y - YP) * KB) : y;
   const wx = (x, Y) => (x - W / 2) * ws(Y), zm = (y, Y) => { if (!CHASE) return y; const f = Math.max(0, Math.min(1, (Y - 16) / 50)); return y + (far(y) - y) * f; }, wz = (y, Y) => (zm(y, Y) - H / 2) * ws(Y);   // things on the ground (Y < 16) move with the ground; it blends to the stretched air depth by Y 66 (no jump at lift-off)
   const A = { trf: 128, player: 150, ufo: 176, jet: 192, cop: 200, kami: 182, gun: 214, sj: 200, rp: 236, blimp: 250, item: 104, shot: 150, eshot: 164, air: 138, esc: 188, bigjet: 208, rocket: 222, base: 14, bird: 172 };
@@ -983,8 +984,9 @@ async function boot() {
     // you vs the buildings: a rooftop scrape is a small hit, flying into one is a full hit; either way the building breaks where you hit it
     if (G.running && !G.dying && clipCD <= 0 && (G.alt == null || G.alt > .95)) for (const sg of SEGS.values()) { if (Math.abs(PZ - sg.group.position.z) > sg.len / 2 + 20) continue;
       const h = sg.collide(PX, PL.Y - 4, PZ, 30, 16); if (h) { const scrape = h.o.h - PL.Y < 14; sg.smash(h, PX, PL.Y, PZ, "plane"); if (sg.scatter) sg.scatter(PX, PZ, 160); clipCD = .7; if (M.bldHit) M.bldHit(!scrape); break; } }
-    // your shots vs the buildings (they chip them; the shot is spent)
-    for (const sh of G.shots) { if (sh.dead) continue; const sx = sh.x - W / 2, sz = far(sh.y) - H / 2, sy = alt3(sh, A.shot);
+    // your shots vs the buildings (they chip them; the shot is spent). Only within SHOT_BLD_R ahead (2026-11-16, Antidote's photo: a black
+    // block at the end of the streams): far hits turned a distant building's windows off, and an unlit building at night reads as a black slab
+    for (const sh of G.shots) { if (sh.dead) continue; const sx = sh.x - W / 2, sz = far(sh.y) - H / 2, sy = alt3(sh, A.shot); if (PZ - sz > SHOT_BLD_R) continue;
       for (const sg of SEGS.values()) { if (Math.abs(sz - sg.group.position.z) > sg.len / 2) continue; const h = sg.collide(sx, sy, sz, 2, 14); if (h) { sg.smash(h, sx, sy, sz, "shot", Math.max(1, (M.WPN[sh.w] ? M.WPN[sh.w].dmg : 1.25) / 1.25)); sh.dead = 1; if (M.bldShot) M.bldShot(); } break; } }
     // the beach: a low pass makes the crowd wave and cheer; a whole beach strip flown low without a hit pays a bonus
     let onBeach = null; for (const sg of SEGS.values()) { if (!sg.flyby) continue; if (Math.abs(PZ - sg.group.position.z) < sg.len / 2 + 160 && G.running) FLYN = Math.max(FLYN, sg.flyby(PX, PL.Y, PZ) || 0); if (Math.abs(PZ - sg.group.position.z) <= sg.len / 2) onBeach = sg; }

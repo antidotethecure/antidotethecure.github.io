@@ -332,7 +332,7 @@ export function makeWorld(THREE, O = {}) {
     place(); seg.group.add(acM, tkM, anM, anL, pdM, stM, para, hsM, solM, whM);
     signs.forEach(([o, w]) => { const sg = mesh(new THREE.PlaneGeometry(o.w * .8, o.w * .2), signMats()[w], o.x, o.h + o.w * .12, o.z + o.d * .3); seg.group.add(sg); o.sign = sg; });
     seg.tick.push((t, dt, near) => { const on = (t % 1.3) < .45; ant.forEach((a, j) => anL.instanceColor.setXYZ(j, on ? 2 : .25, on ? .08 : .02, on ? .06 : .02)); if (ant.length) anL.instanceColor.needsUpdate = true;
-      if (DOOM.length) crumbleTick(dt, near);
+      if (SINK.length) sinkTick(dt); if (DOOM.length) crumbleTick(dt, near);
       if (!near || !FX) return; const gp = seg.group.getWorldPosition(GPV);
       stk.forEach(a => { if (a[0].h < a[0].h0 - 1) return; if (Math.random() < dt * 3) puff(SMP.set(gp.x + a[0].x + a[1], a[0].h + 11, gp.z + a[0].z + a[2]), "steam", 1); });
       const cap = O.fireCap ? O.fireCap() : 12;   // active fire/smoke columns per frame (Smooth: 4)
@@ -353,8 +353,13 @@ export function makeWorld(THREE, O = {}) {
     const DOOM = [];
     const doomIt = (o, delay) => { if (o.doom != null || o.cr != null || o.rubble) return; o.doom = delay; DOOM.push(o); o.dmg = 1; dmg.setX(o.i, 1); dmg.needsUpdate = true;
       for (let k = o.fires.length; k < 4; k++) o.fires.push([o.x + (Math.random() - .5) * o.w * .7, Math.max(3, o.h * (.3 + Math.random() * .6)), o.z + o.d / 2 + .6, 1.2]); o.fires.forEach(f => f[3] = Math.max(f[3], 1.5)); };
-    let crF = 0;
-    function crumbleTick(dt, near) { const gp = seg.group.getWorldPosition(GPV), q = O.fxScale ? O.fxScale() : 1; crF++;
+    // (collapse + plane-strike animation below)
+    /* 2026-11-16 (Antidote: "more smooth on hitting the buildings"): flying into a building cut its top off in ONE frame. The drawn height now
+       sinks to the new height over SINK_S; o.h (what collisions and damage use) still drops at once, so nothing about play changes. */
+    const SINK = [], SINK_S = .22;
+    function sinkTick(dt) { for (let j = SINK.length - 1; j >= 0; j--) { const o = SINK[j]; o.sk += dt; const u = Math.min(1, o.sk / SINK_S), done = u >= 1 || o.cr != null || o.h >= o.sk0;   // a collapse takes over
+        if (done) SINK.splice(j, 1); if (o.cr == null) set(im, o.i, o.x, 0, o.z, 0, o.w, done ? o.h : o.h + (o.sk0 - o.h) * (1 - u) * (1 - u), o.d); im.instanceMatrix.needsUpdate = true; } }
+    function crumbleTick(dt, near) { const gp = seg.group.getWorldPosition(GPV), q = O.fxScale ? O.fxScale() : 1;
       for (let j = DOOM.length - 1; j >= 0; j--) { const o = DOOM[j];
         if (o.doom != null) { o.doom -= dt; if (near && Math.random() < dt * 10) debris(SHV.set(gp.x + o.x + (Math.random() - .5) * o.w, o.h * Math.random(), gp.z + o.z + o.d / 2), 1, null, 50, .6);   // bits rain off the facade
           if (o.doom > 0) continue; o.doom = null; o.cr = 0; o.hc0 = o.h; const cut = o.h * .34; if (o.h > 30) topple(gp.x + o.x, o.h - cut, gp.z + o.z, o.w * .96, cut, o.d * .96, Math.random() < .5 ? 1 : -1);   // (topple pivots in world space)
@@ -362,12 +367,12 @@ export function makeWorld(THREE, O = {}) {
           debris(SHV.set(gp.x + o.x, o.h * .7, gp.z + o.z), Math.round(26 * q) + 6, null, 150, 1.5); debris(SHV.set(gp.x + o.x, o.h * .7, gp.z + o.z + o.d / 2), Math.round(10 * q) + 2, "#9fc4dc", 170, .7);   // concrete + glass
           if (o.sign) o.sign.visible = false; unscorch(o.i, o.h); }
         if (o.cr == null) continue; o.cr += dt; const u = Math.min(1, o.cr / 2.6), e = u * u * (3 - 2 * u), rub = Math.max(5, Math.min(14, o.hc0 * .1));
-        o.h = o.hc0 + (rub - o.hc0) * e; const jx = u < 1 ? (Math.random() - .5) * 1.6 * (1 - u) : 0;   // it shudders as it goes
-        set(im, o.i, o.x + jx, 0, o.z, (u < 1 ? (Math.random() - .5) * .02 : 0), o.w * (1 + .06 * e), o.h, o.d * (1 + .06 * e)); im.instanceMatrix.needsUpdate = true;
+        o.h = o.hc0 + (rub - o.hc0) * e; const jx = u < 1 ? Math.sin(o.cr * 34) * .7 * (1 - u) : 0;   // it shudders as it goes (2026-11-16: a smooth shake, it was a fresh random jolt every frame)
+        set(im, o.i, o.x + jx, 0, o.z, (u < 1 ? Math.sin(o.cr * 27) * .008 * (1 - u) : 0), o.w * (1 + .06 * e), o.h, o.d * (1 + .06 * e)); im.instanceMatrix.needsUpdate = true;
         o.fires.forEach(f => { f[1] = Math.min(f[1], o.h + 1); });
         if (near && FX) { if (Math.random() < dt * 22 * q + .2) puff(SMP.set(gp.x + o.x + (Math.random() - .5) * o.w * 1.3, 2 + Math.random() * 8, gp.z + o.z + (Math.random() - .5) * o.d * 1.3), "dust", 2.4);
           if (Math.random() < dt * 9) debris(SHV.set(gp.x + o.x + (Math.random() - .5) * o.w, o.h + 2, gp.z + o.z + (Math.random() - .5) * o.d), 2, null, 90, 1.1); }
-        if (crF % 3 === 0 || u >= 1) place();
+        place();   // every frame: the roof kit rode down in steps at a third of the frame rate
         if (u >= 1) { o.cr = null; o.rubble = 1; o.wrecked = 1; unscorch(o.i, o.h); place(); DOOM.splice(j, 1);
           o.fires = [[o.x, o.h + 1, o.z, 1.6], [o.x - o.w * .3, o.h + 1, o.z + o.d * .25, 1.1], [o.x + o.w * .25, o.h + 1, o.z - o.d * .2, 1]]; } } }
     const B = { L, im, dmg,
@@ -397,7 +402,7 @@ export function makeWorld(THREE, O = {}) {
         const gp = seg.group.getWorldPosition(GPV), plane = how === "plane", to = plane ? Math.max(6, wy - 18) : Math.max(6, o.h - 4);
         const P = SMP.set(Math.max(o.x - o.w / 2, Math.min(o.x + o.w / 2, wx - gp.x)), Math.min(o.h, wy), Math.max(o.z - o.d / 2, Math.min(o.z + o.d / 2, wz - gp.z)));
         debris(new THREE.Vector3(gp.x + P.x, P.y, gp.z + P.z), plane ? 22 : 5, null, plane ? 120 : 60);
-        if (plane || o.h - to > 0) { o.h = to; set(im, o.i, o.x, 0, o.z, 0, o.w, o.h, o.d); im.instanceMatrix.needsUpdate = true; place(); if (o.sign) o.sign.visible = false; }
+        if (plane || o.h - to > 0) { const old = o.h; o.h = to; if (plane && old - to > 4 && o.cr == null) { if (!SINK.includes(o)) { SINK.push(o); o.sk0 = old; } o.sk = 0; } else { set(im, o.i, o.x, 0, o.z, 0, o.w, o.h, o.d); im.instanceMatrix.needsUpdate = true; } place(); if (o.sign) o.sign.visible = false; }
         o.dmg = Math.min(1, o.dmg + (plane ? .65 : .12)); dmg.setX(o.i, o.dmg); dmg.needsUpdate = true;
         if (o.fires.length < 3) o.fires.push([P.x, o.h + 1, P.z, plane ? 1.4 : .8]); else o.fires.forEach(f => { f[1] = o.h + 1; f[3] = Math.min(1.8, f[3] + .1); });
         if (plane) { o.hits += o.hp * .6; if (o.hits >= o.hp) doomIt(o, 1.8); }   // crashing into it hurts it too: two plane strikes bring it down

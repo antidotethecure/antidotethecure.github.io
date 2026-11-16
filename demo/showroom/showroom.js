@@ -1,10 +1,9 @@
-/* Valenzo Studio showroom: the floor of dressed mannequins, collection cards that light up, the mix-and-match fitting room (3D in fit.js), opening sequence.
+/* Clothing showroom sample: the floor of dressed mannequins, collection cards that light up, the mix-and-match fitting room (3D in fit.js).
    No storage, no network calls beyond this folder's own images/models. */
 (function () {
   "use strict";
   var root = document.documentElement;
   var calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!calm) root.classList.add("intro-on");           // set before first paint so the door film covers the store
 
   var CATS = [["all", "All"], ["crystal", "Crystal"], ["print", "Prints"], ["denim", "Denim"]];
   var ITEMS = [
@@ -14,12 +13,12 @@
     { id: "pr_cream", cat: "print", name: "Marble Print Shirt", tone: "Ivory", desc: "An ivory ground veined in navy, grey and gold, finished with dark gold-rimmed buttons." },
     { id: "pr_sage", cat: "print", name: "Painted Print Shirt", tone: "Sage", desc: "A soft sage ground with olive and cream brushwork." },
     { id: "pr_blue", cat: "print", name: "Painted Print Shirt", tone: "Sky", desc: "A pale blue ground with navy and grey brushwork." },
-    { id: "vdm07", cat: "denim", name: "VDM07 Boot Cut", tone: "Dark Indigo", desc: "Dark indigo denim with the signature V embroidered on both back pockets and a leather Valenzo patch at the waist." },
-    { id: "bc_blue", cat: "denim", name: "Signature V Boot Cut", tone: "Faded Blue", desc: "A mid-blue fade with heavy white contrast stitching and the signature V on the back pockets." },
-    { id: "bc_black", cat: "denim", name: "Signature V Boot Cut", tone: "Black", desc: "Black denim with the signature V stitched in grey." },
-    { id: "bc_ice", cat: "denim", name: "Signature V Boot Cut", tone: "Ice Wash", desc: "Ice wash denim with the signature V stitched in dark thread." }
+    { id: "vdm07", cat: "denim", name: "Classic Boot Cut", tone: "Dark Indigo", desc: "Dark indigo denim with chevron embroidery on both back pockets and a leather patch at the waist." },
+    { id: "bc_blue", cat: "denim", name: "Stitched Boot Cut", tone: "Faded Blue", desc: "A mid-blue fade with heavy white contrast stitching and chevron embroidery on the back pockets." },
+    { id: "bc_black", cat: "denim", name: "Stitched Boot Cut", tone: "Black", desc: "Black denim with the chevron pockets stitched in grey." },
+    { id: "bc_ice", cat: "denim", name: "Stitched Boot Cut", tone: "Ice Wash", desc: "Ice wash denim with the chevron pockets stitched in dark thread." }
   ];
-  /* shortcut: sample size run and no prices, because the shop's own listings could not be read; put the studio's real sizes here and a price (a number, in dollars) on each item when they send them */
+  /* shortcut: sample size run and no prices; put real sizes here and a price (a number, in dollars) on each item for a real store */
   var SIZES = {   // [label, how much wider the mannequin stands than at the middle size]
     top: [["S", 0.96], ["M", 1], ["L", 1.04], ["XL", 1.08], ["2XL", 1.12], ["3XL", 1.16]],
     bottom: [["28", 0.94], ["30", 0.97], ["32", 1], ["34", 1.03], ["36", 1.06], ["38", 1.09], ["40", 1.12], ["42", 1.15]]
@@ -47,7 +46,7 @@
     function boot() {
       if (booted) return;
       booted = true;
-      var s = el("script"); s.type = "module"; s.src = "fit.js?v=3"; document.head.appendChild(s);
+      var s = el("script"); s.type = "module"; s.src = "fit.js?v=4"; document.head.appendChild(s);
     }
     function mark(box, attr, hit) {
       [].forEach.call(box.children, function (b) { if (hit(b)) b.setAttribute(attr, "true"); else if (attr === "aria-pressed") b.setAttribute(attr, "false"); else b.removeAttribute(attr); });
@@ -57,7 +56,7 @@
       ["top", "bottom"].forEach(function (k) {
         var it = item(VZ.look[k]), u = ui[k];
         u.name.textContent = it.name; u.tone.textContent = it.tone; u.desc.textContent = it.desc;
-        u.price.textContent = it.price ? "$" + it.price.toFixed(2) : "Price on TikTok Shop";
+        u.price.textContent = it.price ? "$" + it.price.toFixed(2) : "Sample piece";
         priced = priced && !!it.price; total += it.price || 0;
         mark(u.rail, "aria-current", function (b) { return b.dataset.id === it.id; });
         mark(u.sizes, "aria-pressed", function (b) { return b.textContent === size[k]; });
@@ -144,33 +143,5 @@
       var near = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { boot(); near.disconnect(); } }, { rootMargin: "500px" });
       near.observe($("fitting-room"));
     } else boot();
-
-    /* ---- studio videos: play only while on screen, always silent ---- */
-    var vids = document.querySelectorAll(".reels video");
-    if (calm || !("IntersectionObserver" in window)) [].forEach.call(vids, function (v) { v.controls = true; });
-    else {
-      var watch = new IntersectionObserver(function (es) {
-        es.forEach(function (e) { if (e.isIntersecting) { var p = e.target.play(); if (p && p.catch) p.catch(function () {}); } else e.target.pause(); });
-      }, { threshold: 0.5 });
-      [].forEach.call(vids, function (v) { v.muted = true; watch.observe(v); });
-    }
-
-    /* ---- opening sequence: the glass doors swing open, then the film fades into the same view of the floor ---- */
-    var intro = $("intro");
-    function open() {
-      if (root.classList.contains("open")) return;
-      root.classList.add("open");
-      setTimeout(function () { if (intro.parentNode) intro.parentNode.removeChild(intro); }, 1100);
-    }
-    if (calm) intro.parentNode.removeChild(intro);
-    else {
-      var doors = $("doors"), play;
-      $("skip").addEventListener("click", open);
-      doors.addEventListener("ended", open);
-      doors.addEventListener("error", open);
-      play = doors.play();
-      if (play && play.catch) play.catch(open);          // autoplay refused (low power mode): straight into the store
-      setTimeout(open, 12000);                           // a film that never arrives must not lock the door
-    }
   });
 })();

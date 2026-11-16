@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" data-theme="saloon">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; media-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<script src="../../js/frame-guard.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Western Town · Immersive site sample</title>
+<meta name="description" content="Sample immersive Western town website: fly from Main Street into the saloon, the general store and the sheriff's office.">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="theme-color" content="#120b06">
+<link rel="icon" href="img/badge.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&family=Sancreek&family=Special+Elite&display=swap">
+<link rel="stylesheet" href="tour.css?v=1">
+</head>
+<body>
+
+<main id="view">
+  <div id="stage">
+    <img id="still" alt="" draggable="false">
+    <video id="loop" muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1"></video>
+    <video id="fx" muted playsinline preload="auto" aria-hidden="true" tabindex="-1"></video>
+    <div id="spots" aria-hidden="true"></div>
+  </div>
+  <canvas id="dust" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <div id="curtain" aria-hidden="true"></div>
+</main>
+
+<header id="bar">
+  <div class="where"><span id="brand"></span><span id="place" aria-live="polite"></span></div>
+  <div class="tools">
+    <button id="back" type="button" hidden>&larr; Back</button>
+    <button id="style" type="button" hidden>Style</button>
+    <button id="snd" type="button" aria-pressed="false">Wind</button>
+  </div>
+</header>
+
+<nav id="chips" aria-label="Places you can go from here"></nav>
+<p id="hint" aria-hidden="true"><span class="touch">Drag to look around &middot; tap a sign</span><span class="mouse">Move the mouse to look around &middot; click a sign</span></p>
+
+<section id="intro" aria-labelledby="intro-title">
+  <img src="img/badge.webp" alt="" width="96" height="96">
+  <h1 id="intro-title"></h1>
+  <p id="tagline"></p>
+  <button id="enter" type="button">Ride in</button>
+  <footer class="credit">Powered by SousShift AI &middot; <a href="https://instagram.com/sousshiftai" target="_blank" rel="noopener noreferrer">Instagram</a> &middot; <a href="mailto:secondshiftai@gmail.com">secondshiftai@gmail.com</a></footer>
+</section>
+
+<dialog id="card" aria-labelledby="card-title">
+  <button id="card-x" type="button" aria-label="Close">&times;</button>
+  <p id="card-kicker"></p>
+  <h2 id="card-title"></h2>
+  <div id="card-body"></div>
+  <div id="card-acts"></div>
+  <footer class="credit">Powered by SousShift AI &middot; <a href="https://instagram.com/sousshiftai" target="_blank" rel="noopener noreferrer">Instagram</a> &middot; <a href="mailto:secondshiftai@gmail.com">secondshiftai@gmail.com</a></footer>
+</dialog>
+
+<p id="err" role="alert" hidden></p>
+<noscript><p class="nojs">This site is an interactive tour and needs JavaScript turned on.</p></noscript>
+<script src="tour.js?v=1" defer></script>
+</body>
+</html>

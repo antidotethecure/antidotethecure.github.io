@@ -1,0 +1,66 @@
+{
+  "brand": "Copper Gulch",
+  "tagline": "Sample build · your business goes here",
+  "title": "Copper Gulch · Immersive Western site (sample)",
+  "theme": "saloon",
+  "themePicker": true,
+  "start": "town",
+  "scenes": {
+    "town": {
+      "title": "Main Street",
+      "still": "img/town.jpg",
+      "loop": "vid/town-loop.mp4",
+      "hotspots": [
+        { "x": 0.150, "y": 0.640, "label": "Saloon", "to": "saloon", "via": "vid/town-saloon.mp4", "back": "vid/saloon-town.mp4" },
+        { "x": 0.385, "y": 0.470, "label": "General Store", "to": "store", "via": "vid/town-store.mp4", "back": "vid/store-town.mp4" },
+        { "x": 0.725, "y": 0.470, "label": "Sheriff", "to": "sheriff", "via": "vid/town-sheriff.mp4", "back": "vid/sheriff-town.mp4" },
+        { "x": 0.537, "y": 0.300, "label": "Hours", "card": "hours" },
+        { "x": 0.885, "y": 0.480, "label": "Book a Visit", "card": "book" }
+      ]
+    },
+    "saloon": {
+      "title": "The Saloon",
+      "still": "img/saloon.jpg",
+      "loop": "vid/saloon-loop.mp4",
+      "hotspots": [
+        { "x": 0.215, "y": 0.470, "label": "The Menu", "card": "menu" },
+        { "x": 0.650, "y": 0.560, "label": "Events", "card": "events" },
+        { "x": 0.870, "y": 0.420, "label": "Our Story", "card": "story" }
+      ]
+    },
+    "store": {
+      "title": "General Store",
+      "still": "img/store.jpg",
+      "hotspots": [
+        { "x": 0.715, "y": 0.470, "label": "Shop", "card": "shop" },
+        { "x": 0.870, "y": 0.280, "label": "Boots & Hats", "card": "goods" }
+      ]
+    },
+    "sheriff": {
+      "title": "Sheriff's Office",
+      "still": "img/sheriff.jpg",
+      "hotspots": [
+        { "x": 0.150, "y": 0.300, "label": "Reviews", "card": "reviews" },
+        { "x": 0.540, "y": 0.600, "label": "Contact", "card": "contact" },
+        { "x": 0.890, "y": 0.430, "label": "Questions", "card": "faq" }
+      ]
+    }
+  },
+  "cards": {
+    "hours": { "kicker": "Open daily", "title": "Hours", "body": "Sample card. The real hours, address and a map link go here.",
+      "items": [["Mon to Thu", "11 am to 9 pm"], ["Fri and Sat", "11 am to midnight"], ["Sunday", "10 am to 8 pm"]] },
+    "book": { "kicker": "Reserve", "title": "Book a Visit", "body": "Sample card. This button can open the booking page, a phone call or a text.",
+      "actions": [{ "label": "Call (sample)", "href": "tel:+15555550100" }] },
+    "menu": { "kicker": "Behind the bar", "title": "The Menu", "body": "Sample card. Dishes, drinks or services with prices, and a photo on top if he has one.",
+      "items": [["House special", "$14"], ["Trail platter", "$22"], ["Sarsaparilla", "$5"]] },
+    "events": { "kicker": "This week", "title": "Events", "body": ["Sample card. Live music, game nights, specials or classes.", "Friday: live band, 8 pm."] },
+    "story": { "kicker": "Since day one", "title": "Our Story", "body": "Sample card. A few lines about the owner and how the business started." },
+    "shop": { "kicker": "Take it home", "title": "Shop", "body": "Sample card. Link out to the store, the order page or a product list.",
+      "items": [["Gift card", "$25 and up"], ["House blend", "$12"]] },
+    "goods": { "kicker": "On the shelf", "title": "Boots & Hats", "body": "Sample card. Any product line or service category can live on its own shelf." },
+    "reviews": { "kicker": "Wanted: more like these", "title": "Reviews", "body": ["Sample card. Real customer quotes go on the notice board.", "\"Best in the county.\" (sample quote)"] },
+    "contact": { "kicker": "Send word", "title": "Contact", "body": "Sample card. Phone, email, address and social links.",
+      "actions": [{ "label": "Call (sample)", "href": "tel:+15555550100" }, { "label": "Email (sample)", "href": "mailto:hello@example.com" }] },
+    "faq": { "kicker": "Before you ask", "title": "Questions", "body": ["Sample card. The questions people ask most, answered.", "Parking? Out front and around back."] }
+  }
+}

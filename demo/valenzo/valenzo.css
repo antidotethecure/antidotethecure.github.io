@@ -34,26 +34,25 @@ p { margin: 0 0 1em; }
 .links a:hover { color: var(--gold-hi); opacity: 1; }
 @media (min-width: 860px) { .links { display: flex; } }
 
-/* ---------- hero: the showroom floor, a dressed mannequin on every plinth, dim until you reach it ---------- */
+/* ---------- hero: the showroom floor at full light, a dressed mannequin on every plinth, the lit sign on the back wall ---------- */
 .hero { --hh: max(100vh, 34rem); position: relative; height: var(--hh); overflow: hidden; text-align: center; }
 @supports (height: 100svh) { .hero { --hh: max(100svh, 34rem); } }
 .floor { position: absolute; inset: 0; overflow: hidden; }
 /* the photo always keeps its own shape, so the mannequins stay on their plinths: wide screens crop it, narrow ones walk it sideways */
 .hall { position: absolute; left: 50%; top: 50%; width: max(100vw, calc(var(--hh) * 16 / 9)); height: max(var(--hh), calc(100vw * 9 / 16)); transform: translate(-50%, -50%); background: var(--hall) center / 100% 100%; }
-.hall::before { content: ""; position: absolute; inset: 0; background: rgba(13, 10, 7, .4); }
-.man { position: absolute; aspect-ratio: 2 / 5; padding: 0; border: 0; background: none; cursor: pointer; transform: translateX(-50%); filter: brightness(.55) saturate(.85); transition: filter .8s cubic-bezier(.2, .9, .3, 1); }
+.sign { position: absolute; left: 50%; top: 34.5%; width: 11.5%; transform: translateX(-50%); overflow: visible; pointer-events: none; color: #b98a3c; fill: url(#gilt); font: 500 33px/1 var(--serif); letter-spacing: 6px; filter: drop-shadow(0 .12vh .1vh rgba(70, 45, 10, .7)) drop-shadow(0 0 1.4vh rgba(255, 226, 160, .95)); }
+.sign use { stroke-width: 3.4; }
+.man { position: absolute; aspect-ratio: 2 / 5; padding: 0; border: 0; background: none; cursor: pointer; transform: translateX(-50%); filter: brightness(.93); transition: filter .8s cubic-bezier(.2, .9, .3, 1); }
 .man img { width: 100%; height: 100%; }
 .man::before { content: ""; position: absolute; left: -70%; right: -70%; top: -40%; bottom: -5%; pointer-events: none; opacity: 0; transition: opacity .8s; background: radial-gradient(ellipse 30% 52% at 50% 36%, rgba(255, 233, 180, .3), transparent 72%), radial-gradient(ellipse 34% 4% at 50% 95.5%, rgba(255, 226, 160, .6), transparent 70%); }
 .man::after { content: ""; position: absolute; z-index: -1; left: 4%; right: 4%; bottom: -1.6%; height: 5%; background: radial-gradient(ellipse at center, rgba(0, 0, 0, .8), transparent 68%); }
-.man:hover, .man:focus-visible, .man.lit { filter: brightness(1.08) drop-shadow(0 0 22px rgba(255, 220, 150, .32)); }
+.man:hover, .man:focus-visible, .man.lit { filter: brightness(1.1) drop-shadow(0 0 26px rgba(255, 226, 160, .8)); }
 .man:hover::before, .man:focus-visible::before, .man.lit::before { opacity: 1; }
-.hero::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(rgba(13, 10, 7, .86), rgba(13, 10, 7, 0) 36%, rgba(13, 10, 7, 0) 78%, var(--ink)); }
-.hero-in { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 4.4rem 1rem 1.5rem; pointer-events: none; }
+.hero::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(rgba(13, 10, 7, .5), rgba(13, 10, 7, 0) 15%, rgba(13, 10, 7, 0) 66%, rgba(13, 10, 7, .8) 86%, var(--ink)); }
+.hero-in { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 4.4rem 1rem 1.5rem; pointer-events: none; }
 .hero-in a { pointer-events: auto; }
-.hero-in .emblem { width: clamp(34px, 4.4vw, 50px); height: clamp(34px, 4.4vw, 50px); color: var(--gold-hi); }
-h1 { margin: .1em 0 0; font: 500 clamp(2.3rem, 6vw, 4.4rem)/1 var(--serif); letter-spacing: .2em; text-indent: .2em; text-transform: uppercase; background: linear-gradient(100deg, var(--gold) 15%, #fff3d0 50%, var(--gold) 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-h1 span { display: block; margin-top: .9em; font: 300 max(.62rem, .17em)/1 var(--sans); letter-spacing: 1em; text-indent: 1em; color: var(--ivory); -webkit-text-fill-color: var(--ivory); }
-.lede { margin: .8rem 0 0; font: italic 400 clamp(1.1rem, 2vw, 1.4rem)/1.3 var(--serif); color: var(--ivory); }
+h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }   /* the sign on the wall is the title */
+.lede { margin: 0 0 .7rem; font: italic 400 clamp(1.1rem, 2vw, 1.4rem)/1.3 var(--serif); color: var(--ivory); }
 .hint { margin: 0; font: 400 .66rem/1.5 var(--sans); letter-spacing: .28em; text-transform: uppercase; color: var(--gold-hi); }
 .hint .walk { display: none; }
 .hero .actions { justify-content: center; margin-top: 1rem; }
@@ -63,7 +62,6 @@ h1 span { display: block; margin-top: .9em; font: 300 max(.62rem, .17em)/1 var(-
   .hall { position: relative; left: 0; top: 0; transform: none; width: calc(var(--hh) * 16 / 9); height: var(--hh); }
   .hint .walk { display: inline; }
   .hint .pick { display: none; }
-  .hero-in .emblem { display: none; }   /* the bar already shows it, and the front mannequin needs the room */
 }
 
 /* ---------- sections ---------- */
@@ -164,33 +162,16 @@ h2 { margin: .35em 0 .7em; font: 500 clamp(1.9rem, 4.4vw, 3.3rem)/1.12 var(--ser
 .foot { padding: 2.6rem 1.2rem 1.4rem; text-align: center; color: var(--muted); font-size: .85rem; border-top: 1px solid rgba(200, 162, 90, .16); }
 .fine { max-width: 62ch; margin: 0 auto; font-size: .74rem; opacity: .8; }
 
-/* ---------- opening sequence: the name, a fast sweep through the pieces, then the store lights come up ---------- */
+/* ---------- opening sequence: the glass doors of the store swing open (vid/doors.mp4 ends on the hero's own picture) ---------- */
 #intro { display: none; }
-html.intro-on #intro { display: grid; place-items: center; position: fixed; inset: 0; z-index: 50; overflow: hidden; background: radial-gradient(ellipse at 50% 42%, #1c140b, #070503 72%); transition: opacity 1s ease, visibility 0s linear 1s; }
+html.intro-on #intro { display: block; position: fixed; inset: 0; z-index: 50; background: #e9dcc3; transition: opacity 1s ease, visibility 0s linear 1s; }
 html.intro-on.open #intro { opacity: 0; visibility: hidden; pointer-events: none; }
 html.intro-on:not(.open) body { overflow: hidden; }
-.i-mark { text-align: center; animation: i-lift 1s cubic-bezier(.7, 0, .2, 1) 2.3s forwards; }
-.i-mark .emblem { width: clamp(64px, 10vw, 96px); height: clamp(64px, 10vw, 96px); color: var(--gold-hi); stroke-dasharray: 100; stroke-dashoffset: 100; animation: i-draw 1.7s ease .15s forwards; }
-.i-word { margin: .25em 0 0; font: 500 clamp(2.5rem, 10vw, 6.4rem)/1 var(--serif); text-transform: uppercase; opacity: 0; background: linear-gradient(100deg, var(--gold-lo) 25%, #fff3d0 50%, var(--gold-lo) 75%) 100% 0 / 260% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: i-word 1.5s cubic-bezier(.2, .7, .2, 1) .6s forwards, i-sheen 2.2s ease-in-out .9s forwards; }
-.i-rule { display: block; width: 0; height: 1px; margin: 1.2rem auto; background: linear-gradient(90deg, transparent, var(--gold), transparent); animation: i-rule 1s ease 1.2s forwards; }
-.i-sub { margin: 0; font: 300 .78rem/1 var(--sans); letter-spacing: .6em; text-indent: .6em; text-transform: uppercase; color: var(--ivory); opacity: 0; animation: i-fade .9s ease 1.5s forwards; }
-.i-reel { position: absolute; left: 0; right: 0; top: 27%; height: 58%; opacity: 0; animation: i-fade .4s ease 2.7s forwards; -webkit-mask-image: linear-gradient(90deg, transparent 2%, #000 34%, #000 66%, transparent 98%); mask-image: linear-gradient(90deg, transparent 2%, #000 34%, #000 66%, transparent 98%); }
-.i-track { display: flex; width: max-content; height: 100%; animation: i-sweep 2.7s cubic-bezier(.4, .1, .35, 1) 2.7s both; }
-.i-track img { height: 100%; width: auto; max-width: none; aspect-ratio: 4 / 5; margin: 0 -12vh; filter: drop-shadow(0 0 40px rgba(240, 200, 120, .28)); }
-#skip { position: absolute; bottom: max(1.4rem, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); padding: .8em 1.2em; background: none; border: 0; color: var(--muted); font: 400 .66rem/1 var(--sans); letter-spacing: .3em; text-transform: uppercase; cursor: pointer; }
+#doors { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }   /* cropped exactly like .hall */
+#skip { position: absolute; bottom: max(1.4rem, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); padding: .9em 1.4em; background: rgba(13, 10, 7, .62); border: 0; border-radius: 99px; color: var(--ivory); font: 400 .66rem/1 var(--sans); letter-spacing: .3em; text-transform: uppercase; cursor: pointer; }
 #skip:hover { color: var(--gold-hi); }
-@keyframes i-draw { to { stroke-dashoffset: 0; } }
-@keyframes i-word { from { opacity: 0; letter-spacing: .62em; text-indent: .62em; } to { opacity: 1; letter-spacing: .32em; text-indent: .32em; } }
-@keyframes i-sheen { to { background-position: 0 0; } }
-@keyframes i-rule { to { width: min(62vw, 340px); } }
-@keyframes i-fade { to { opacity: 1; } }
-@keyframes i-lift { to { transform: translateY(-34vh) scale(.5); } }
-@keyframes i-sweep { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
-/* the store starts dark and its lights come up as the intro lifts */
-html.intro-on .hall { filter: brightness(.04); }
-html.intro-on .hero-in { opacity: 0; }
-html.intro-on.open .hall { filter: none; transition: filter 2.6s cubic-bezier(.3, .7, .2, 1) .2s; }
-html.intro-on.open .hero-in { opacity: 1; transition: opacity 1.6s ease .8s; }
+html.intro-on .hero-in, html.intro-on .bar { opacity: 0; }
+html.intro-on.open .hero-in, html.intro-on.open .bar { opacity: 1; transition: opacity 1.2s ease .5s; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

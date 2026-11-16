@@ -14,12 +14,12 @@ const say = (text) => { $('fit-note').textContent = text; };
 
 /* Measured on the models, in metres. Each mannequin is 0.98 tall, centred on the origin, faces +X, arms along z. */
 const FEET = -0.49;
-const TOP = {   // shirt tail [hem at the front, at the back, at the side seams, middle of the air between hip and hand, half width at the hem]
-  rh_white: [0.05, 0.045, 0.068, 0.113, 0.105], rh_black: [0.055, 0.04, 0.065, 0.118, 0.112], pr_navy: [0.035, 0.03, 0.065, 0.114, 0.108],
-  pr_blue: [0.04, 0.035, 0.065, 0.109, 0.104], pr_cream: [0.05, 0.055, 0.075, 0.103, 0.102], pr_sage: [0.045, 0.045, 0.065, 0.109, 0.106]
+const TOP = {   // shirt tail [hem at the front, at the back, at the side seams, middle of the air between hip and hand, half width at the hem, where the hips stand front to back]
+  rh_white: [0.05, 0.045, 0.068, 0.113, 0.105, -0.002], rh_black: [0.055, 0.04, 0.065, 0.118, 0.112, -0.012], pr_navy: [0.035, 0.03, 0.065, 0.114, 0.108, -0.005],
+  pr_blue: [0.04, 0.035, 0.065, 0.109, 0.104, 0.0075], pr_cream: [0.05, 0.055, 0.075, 0.103, 0.102, 0.0025], pr_sage: [0.045, 0.045, 0.065, 0.109, 0.106, -0.013]
 };
-const BOT = {   // [top of the waistband, middle of the air between hip and bare arm, half width at the hip]
-  vdm07: [0.172, 0.118, 0.110], bc_blue: [0.182, 0.122, 0.114], bc_black: [0.187, 0.109, 0.102], bc_ice: [0.167, 0.118, 0.109]
+const BOT = {   // [top of the waistband, middle of the air between hip and bare arm, half width at the hip, where the hips stand front to back]
+  vdm07: [0.172, 0.118, 0.110, -0.0025], bc_blue: [0.182, 0.122, 0.114, -0.004], bc_black: [0.187, 0.109, 0.102, 0.0105], bc_ice: [0.167, 0.118, 0.109, -0.015]
 };
 /* az: degrees round from the front. pol: 90 = level with the target. y: height the camera looks at. */
 const VIEWS = {
@@ -118,7 +118,7 @@ function fitCut() {
   if (worn.solo) {                                       // one scan exactly as it was made (used for the collection photos)
     t.userData.cut.set(99, -99, 1);
     t.userData.hem.setScalar(worn.solo in BOT ? 99 : -99);
-    t.scale.setScalar(s);
+    t.scale.setScalar(s); t.position.x = 0;
     return;
   }
   const T = TOP[worn.top], B = BOT[worn.bottom], q = b.userData.s;
@@ -129,6 +129,7 @@ function fitCut() {
   b.userData.cut.set(B[1] / q, -0.015 / q, T[4] / (q * k));   // the bare fingertips end just above here
   b.userData.hem.set((hem[0] + up) / q, (hem[1] + up) / q, (hem[2] + up) / q);
   b.scale.set(q * k, q, q * k);
+  b.position.x = T[5] - B[3] * k;                        // no two scans stood on the same spot: the jeans' hips go under this shirt's hips
 }
 async function show(reset) {
   const my = ++turn, look = VZ.look, ids = look.solo ? [look.solo] : [look.top, look.bottom];

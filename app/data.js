@@ -9,7 +9,7 @@
    - setup-kit/build_launch.py AGENTS + agents/index.html (AI add-on prices $75 / $150)
    - ~/command-center/clients/concierge/kb/13-pricing-playbook.md (what the onboarding concierge quotes) */
 window.APP = {
-  updated: "2026-10-19",
+  updated: "2026-11-16",
   contact: { email: "secondshiftai@gmail.com", sms: "", name: "Antidote" },
 
   /* ---------------- 1 · Plans ---------------- */
@@ -61,6 +61,8 @@ window.APP = {
       one: "A natural AI voice answers your phone, takes reservation requests, transfers to staff and texts links. Includes the Text Assistant. 750 minutes + 1,000 texts a month." },
     { key: "ordering", name: "Online Ordering + Delivery", monthly: 300, setup: 0, includedIn: [], soon: true,
       one: "Guests order and pay by card right in your app (pickup first), with points on every order and live orders in your back office. Delivery by DoorDash drivers, with no marketplace commission, once DoorDash approves our access (applied, under review). $300/mo flat with no per-order fee, or $200/mo + 5% of the food on each order (never on delivery fees, tips or tax). Example: a $40 order = $2. No fee added to your guests' checks. Flat is cheaper once you do over $2,000 a month in app orders. Coming soon: pickup ordering first." },
+    { key: "store", name: "Your Own App Store Listing", monthly: 0, yearly: 200, setup: 0, includedIn: [], soon: true,
+      one: "Your restaurant in the App Store and Google Play under its own name and icon, not inside the SousShift app. We set up the listing, publish it and keep it updated. $200 a year per restaurant, Apple's yearly developer fee included. The developer account is in your business's name (Apple requires that); Google's one-time registration fee is separate. Apple and Google review every app and approval is their decision." },
     { key: "sports", name: "Sports Bar Package", monthly: 0, setup: 0, includedIn: [], quote: true,
       one: "Live local scores up top, follow-your-team alerts, the Fan Test, Football Squares (1 free square per member, prizes you set), fight nights and pick-the-winner points. Score specials: when the home team scores, a same-day deal unlocks. Built for game days." },
     { key: "games", name: "Games Pack", monthly: 0, setup: 0, includedIn: [], quote: true,

@@ -52,22 +52,24 @@
   $("addonList").innerHTML = A.addons.map(function (a) {
     var inc = a.includedIn.map(function (k) { return plan(k).name; });
     return '<div class="addon"><div><b>' + esc(a.name) + '</b><div class="note">' + esc(a.one) + (inc.length ? " <b>Included in " + esc(inc.join(" and ")) + ".</b>" : "") +
-      (a.key === "social" ? ' <a href="#social">Details →</a>' : a.quote ? "" : ' <a href="../agents/">Demos →</a>') + '</div></div><b class="p">' + (a.quote ? (a.soon ? "Soon · Ask us" : "Ask us") : (a.soon ? "Soon · " : "") + usd(a.monthly) + '/mo') + '</b></div>';
+      (a.key === "social" ? ' <a href="#social">Details →</a>' : a.yearly ? ' <a href="#stores">Sample →</a>' : a.quote ? "" : ' <a href="../agents/">Demos →</a>') + '</div></div><b class="p">' + (a.quote ? (a.soon ? "Soon · Ask us" : "Ask us") : (a.soon ? "Soon · " : "") + price(a)) + '</b></div>';
   }).join("") + '<div class="addon"><div><b>' + esc(A.bundle.name) + ' bundle</b><div class="note">' + esc(A.bundle.one) + '</div></div><b class="p">' + usd(bundleMonthly()) + '/mo</b></div>';
 
+  function price(a) { return a.yearly ? usd(a.yearly) + "/yr" : usd(a.monthly) + "/mo"; }
   function bundleMonthly() { return plan(A.bundle.plan).monthly + addon(A.bundle.addon).monthly - A.bundle.discountMonthly; }
 
   /* builder: totals = (plan + add-ons not already included) × restaurants. Voice replaces Text; on a plan that already
      includes Text, Voice is charged as the difference (an upgrade). Bundle = Done-for-you + Social with the discount. */
   var B = { plan: "basic", add: {}, n: 1, bundle: false };
   function totals(st) {
-    st = st || B; var p = plan(st.plan), lines = [], m = p.monthly, s = p.setup;
+    st = st || B; var p = plan(st.plan), lines = [], m = p.monthly, s = p.setup, y = 0;
     lines.push(p.name + " " + usd(p.setup) + " + " + usd(p.monthly) + "/mo");
     var add = Object.assign({}, st.add);
     if (add.voice) add.text = false;
     A.addons.forEach(function (a) {
       if (!add[a.key] || a.includedIn.indexOf(st.plan) >= 0) return;
       if (a.quote) { lines.push(a.name + ": quoted separately"); return; }   // no published price yet (Antidote sets it)
+      if (a.yearly) { y += a.yearly; lines.push(a.name + " +" + usd(a.yearly) + "/yr"); return; }
       var price = a.monthly;
       if (a.replaces && addon(a.replaces).includedIn.indexOf(st.plan) >= 0) price = a.monthly - addon(a.replaces).monthly;
       m += price; s += a.setup || 0; lines.push(a.name + " +" + usd(price) + "/mo");
@@ -75,10 +77,10 @@
     var bundled = st.plan === A.bundle.plan && add[A.bundle.addon];
     if (bundled) { m -= A.bundle.discountMonthly; s -= A.bundle.discountSetup; lines.push(A.bundle.name + " bundle −" + usd(A.bundle.discountMonthly) + "/mo"); }
     var N = Math.max(1, st.n | 0);
-    return { setup: s * N, monthly: m * N, year: (s + 12 * m) * N, perSetup: s, perMonthly: m, n: N, lines: lines, bundled: !!bundled };
+    return { setup: s * N, monthly: m * N, year: (s + 12 * m + y) * N, perSetup: s, perMonthly: m, n: N, lines: lines, bundled: !!bundled };
   }
   $("bPlan").innerHTML = A.plans.map(function (p) { return '<button type="button" data-k="' + p.key + '" aria-pressed="false">' + esc(p.name) + '</button>'; }).join("");
-  $("bAdd").innerHTML = A.addons.map(function (a) { return '<div class="ck"><input type="checkbox" id="ba-' + a.key + '" data-k="' + a.key + '"><label for="ba-' + a.key + '"><b>' + esc(a.name) + '</b> <span class="note">' + (a.quote ? "Ask us" : usd(a.monthly) + '/mo') + '</span><small id="bn-' + a.key + '"></small></label></div>'; }).join("");
+  $("bAdd").innerHTML = A.addons.map(function (a) { return '<div class="ck"><input type="checkbox" id="ba-' + a.key + '" data-k="' + a.key + '"><label for="ba-' + a.key + '"><b>' + esc(a.name) + '</b> <span class="note">' + (a.quote ? "Ask us" : price(a)) + '</span><small id="bn-' + a.key + '"></small></label></div>'; }).join("");
   $("bBundleNote").textContent = plan(A.bundle.plan).name + " + " + addon(A.bundle.addon).name + ": " + usd(plan(A.bundle.plan).setup) + " setup + " + usd(bundleMonthly()) + "/mo (saves " + usd(A.bundle.discountMonthly) + " a month).";
   function draw() {
     [].forEach.call($("bPlan").children, function (b) { b.setAttribute("aria-pressed", String(b.dataset.k === B.plan)); });

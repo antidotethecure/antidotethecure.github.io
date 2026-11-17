@@ -27,7 +27,8 @@
   "The app works with any register (Toast, Square, Clover and others). Nothing to install.",
   "The app and staff app come in English and Spanish, and the menu comes in 12 languages.",
   "Results are not guaranteed. Any sales figures are estimates, not promises.",
-  "Prices are for new clients. Existing clients keep their signed deals."
+  "Prices are for new clients. Existing clients keep their signed deals.",
+  "App Store and Google Play: the standard version (coming soon) is one SousShift app with every restaurant inside it. A restaurant's own store listing with its own name and icon is a coming-soon add-on at $200 a year, Apple's yearly developer fee included; Google's one-time registration fee is separate."
  ],
  "suggested": [
   "How much does it cost?",
@@ -110,6 +111,12 @@
    "name": "Everything bundle (Done-for-you + Social & SEO)",
    "monthly": 1800,
    "note": "$4,000 setup + $1,800/mo, which saves $150 a month versus buying them separately."
+  },
+  {
+   "name": "Your Own App Store Listing",
+   "monthly": 0,
+   "yearly": 200,
+   "note": "Coming soon. $200 a YEAR per restaurant (not monthly). Your restaurant in the App Store and Google Play under its own name and icon, not inside the SousShift app. We set up the listing, publish it and keep it updated. Apple's yearly developer fee is included. The developer account is in your business's name (Apple requires that); Google's one-time registration fee is separate. Apple and Google review every app and approval is their decision."
   },
   {
    "name": "Sports Bar Package",
@@ -1361,13 +1368,16 @@
   },
   {
    "q": "Is it coming to the App Store?",
-   "a": "Yes, App Store and Google Play versions are coming soon. Until then the app works on any phone from a QR code.",
+   "a": "Yes, App Store and Google Play versions are coming soon. The standard version is one SousShift app with your restaurant inside it. If you want your own name and icon in the store, that's a $200 a year add-on, Apple's yearly developer fee included (coming soon). Until then the app works on any phone from a QR code.",
    "tags": [
     "app store",
     "google play",
     "ios",
     "android",
-    "store"
+    "store",
+    "own app",
+    "own icon",
+    "own listing"
    ]
   },
   {

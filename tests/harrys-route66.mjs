@@ -34,6 +34,11 @@ const r = await p.evaluate(() => {
   out.reachedStop = R.get().phase === 'stop';
   // a deer in the lane costs 75 points and no heart
   R.start(); { const d = R.get(); d.objs = []; d.score = 200; d.hearts = 5; d.objs.push({ kind: 'deer', bad: true, wx: d.px, z: 20, w: 60, vx: 0 }); for (let i = 0; i < 20 && d.score === 200; i++) R.step(1 / 60); out.deer = 200 - d.score; out.deerHearts = 5 - d.hearts; }
+  // Antidote Drizzle coins: catching one counts (kept on this phone); 10 unlock his review card
+  localStorage.removeItem('r66-driz'); R.start(); { const d = R.get(); d.objs = []; d.objs.push({ kind: 'driz', good: ['driz', 20, 'Drizzle coin', 12], lane: 1, wx: d.px, z: 20, w: 46, bob: 0 }); for (let i = 0; i < 20 && !localStorage.getItem('r66-driz'); i++) R.step(1 / 60); }
+  out.driz = +localStorage.getItem('r66-driz'); out.drizArt = !!(R.SP.driz && R.SP.driz.naturalWidth); out.cover = R.SP.review.width === 400 && !!document.querySelector('.revmini');
+  const card = () => { R.review(); const c = document.querySelector('.r66-card'), o = { bar: !!c.querySelector('.r66-cz'), watch: !!c.querySelector('a.r66-cb'), paused: R.get().paused }; c.querySelector('.r66-cx').click(); return o; };
+  out.locked = card(); localStorage.setItem('r66-driz', 10); out.open = card(); out.resumed = !R.get().paused; localStorage.removeItem('r66-driz');
   out.r3d = window.__R663 ? window.__R663.on : false;
   R.end(); out.over = R.get().over;
   return out;
@@ -46,6 +51,10 @@ check(r.good > r.bad, `perfect cook (${r.good}) beats sloppy cook (${r.bad})`);
 check(r.walk === 1, 'a walk-out costs one heart');
 check(r.reachedStop, 'a drive leg ends at a stop');
 check(r.deer === 75 && r.deerHearts === 0, `hitting a deer costs 75 points and no heart (${r.deer}, ${r.deerHearts})`);
+check(r.driz === 1 && r.drizArt, `a Drizzle coin on the road is caught and counted (${r.driz}), coin art loaded`);
+check(r.cover, 'his real review cover is on the poster (img/review/cover.webp)');
+check(r.locked.bar && !r.locked.watch && r.locked.paused, 'review card is locked under 10 coins and shows the count');
+check(r.open.watch && !r.open.bar && r.resumed, 'review card unlocks at 10 coins with a Watch button; closing resumes the game');
 console.log('info 3D view on: ' + r.r3d);
 check(r.over, 'run ends cleanly');
 check(!errs.length, 'no page errors ' + errs.join(' | '));

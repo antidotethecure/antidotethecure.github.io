@@ -73,7 +73,10 @@ h2{font-family:var(--display);font-weight:400;font-size:30px;line-height:1.1;mar
 .how b{color:var(--cream)}
 .r66-card{position:absolute;inset:0;z-index:30;display:grid;place-items:center;background:#000a;border-radius:18px;padding:16px}
 .r66-cin{max-width:300px;background:#0b1430;border:3px solid #1d4ed8;border-radius:16px;padding:18px;text-align:center;color:#fff}
-.r66-cp{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 8px;border-radius:50%;background:#e11d2a;font-size:28px}
+.r66-cin img{display:block;width:100%;height:auto;border-radius:10px;margin-bottom:10px}
+.r66-cz{position:relative;height:26px;border-radius:999px;background:#ffffff22;overflow:hidden;font-weight:900;font-size:14px;line-height:26px}
+.r66-cz i{position:absolute;inset:0 auto 0 0;background:#e09a12}
+.r66-cz span{position:relative}
 .r66-cin b{display:block;color:#ffd23f;font-size:20px;font-weight:900}
 .r66-cin p{color:#dbe4ff;font-size:14px}
 .r66-cb{display:block;background:#e11d2a;color:#fff;border-radius:999px;padding:11px;font-weight:900;text-decoration:none;margin-top:10px}
@@ -161,11 +164,12 @@ html .crm-sms{background:#2a170d!important}
     <div id="final">0 pts</div>
     <div id="won"></div>
     <div class="btns"><button class="btn hot" type="button" id="again">🛻 Drive again</button><a class="btn" href="#prizes">See prizes</a></div>
-    <a class="revmini" href="https://www.youtube.com/@therealantidote" target="_blank" rel="noopener"><i>▶</i><span><b>Antidote reviews Harry's</b><br>Food review coming soon · watch @therealantidote</span></a>
+    <a class="revmini" href="https://www.youtube.com/@therealantidote" target="_blank" rel="noopener"><i>▶</i><span><b>Antidote reviews Harry's</b><br>Catch 10 Drizzle coins on the road to unlock his review</span></a>
   </div>
   <div class="how">
     <div><b>🪵 Hickory</b> fuel for the smoker</div>
     <div><b>🧂 Rub · 🥫 Sauce</b> bonus points on every plate</div>
+    <div><b>🪙 Drizzle coins</b> catch 10 to unlock Antidote's review</div>
     <div><b>🌡️ Slow &amp; Low</b> hold to keep the needle at 225–250°F</div>
     <div><b>🌵 Tumbleweeds, cones, potholes</b> cost a heart</div>
   </div>
@@ -266,8 +270,8 @@ h+='<div class="tier"><span class="pts">Best</span><div><b id="best">Your best: 
 document.getElementById("tiers").innerHTML=h;
 })();
 </script>
-<script src="route66.js?v=9"></script>
-<script type="module" src="route66-3d.js?v=9"></script>
+<script src="route66.js?v=10"></script>
+<script type="module" src="route66-3d.js?v=10"></script>
 <script>
 /* end of a run → prize (crm.js SSAI_WIN, Kid prizes go to the parent's account) */
 (function(){

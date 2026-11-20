@@ -4,7 +4,7 @@
     { "id": "halloween",     "start": "10-01", "end": "10-31", "script": "halloween/halloween.js" },
     { "id": "thanksgiving",  "start": "11-01", "end": "11-30", "script": "thanksgiving/thanksgiving.js" },
     { "id": "new-year",      "start": "12-31", "end": "01-02", "script": "new-year/new-year.js", "ready": false },
-    { "id": "christmas",     "start": "12-01", "end": "12-31", "script": "christmas/christmas.js", "ready": false },
+    { "id": "christmas",     "start": "12-01", "end": "12-31", "script": "christmas/christmas.js" },
     { "id": "valentines",    "start": "02-01", "end": "02-14", "script": "valentines/valentines.js", "ready": false },
     { "id": "st-patricks",   "start": "03-10", "end": "03-17", "script": "st-patricks/st-patricks.js", "ready": false },
     { "id": "easter",        "start": "03-21", "end": "03-28", "script": "easter/easter.js", "ready": false, "_note": "Easter date varies (2027: Sun 03-28, 2028: Sun 04-16). Set the week before through Easter Sunday each year." },

@@ -146,7 +146,7 @@ if(INTERIM){ var IS=document.getElementById("interimSec"), IB=document.getElemen
   q(IB,"toastrep","Tell your Toast rep you want SousShift loyalty connected?",["I'll message them","Already did","Skip"],"Optional. Toast approves integrations faster when restaurants ask for them.");
 }
 var L=document.getElementById("launch");
-q(L,"date","When should we go live?",["This coming Monday","Wednesday","Friday","Next weekend"]);
+q(L,"date","When should we go live?",["Tuesday, December 1","A different day"],"Christian locked in Tuesday, December 1, 2026.");
 REST.forEach(function(r){ var d=h("div","q"); d.appendChild(h("b",null,"How many tables at "+r.short+"? (include the patio and bar seats)"));
   d.appendChild(h("div",null,"<span style='color:var(--dim);font-size:13px'>We make a numbered table card for each one, with your own QR code on it, matching your stickers. They print at the same shop as the QR stickers (see Where to print below).</span>"));
   var i=h("input"); i.type="number"; i.inputMode="numeric"; i.min="1"; i.max="200"; i.placeholder="e.g. 24"; i.value=S["tables_"+r.key]&&/^\d+$/.test(S["tables_"+r.key])?S["tables_"+r.key]:"";

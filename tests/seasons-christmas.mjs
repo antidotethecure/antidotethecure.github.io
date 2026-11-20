@@ -6,7 +6,7 @@
      node tests/seasons-christmas.mjs */
 import { chromium } from 'playwright-core';
 const b = await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
-const APPS=[['melody','/demo/melody-lax/'],['nalu','/demo/nalu-vida/'],['gritz','/demo/gritz-n-wafflez/'],['storm','/demo/storm-burger/'],['churrito','/demo/churrito-loco/'],['dragon','/demo/lucky-dragon/'],['mechanic','/demo/mechanic/'],['icecream','/ice-cream/demo/']];
+const APPS=[['melody','/demo/melody-lax/'],['nalu','/demo/nalu-vida/'],['gritz','/demo/gritz-n-wafflez/'],['storm','/demo/storm-burger/'],['churrito','/demo/churrito-loco/'],['dragon','/demo/lucky-dragon/'],['mechanic','/demo/mechanic/'],['icecream','/ice-cream/demo/'],['harrys','/demo/harrys-bbq/']];
 let bad=0;
 for (const [name,path] of APPS) {
   const ctx=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:2});
@@ -37,4 +37,4 @@ for (const [name,path] of APPS) {
   if(!ok) bad++;
   await ctx.close();
 }
-await b.close(); console.log(bad?'FAILURES '+bad:'ALL 8 OK'); process.exit(bad?1:0);
+await b.close(); console.log(bad?'FAILURES '+bad:'ALL '+APPS.length+' OK'); process.exit(bad?1:0);

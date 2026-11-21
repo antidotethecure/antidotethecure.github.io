@@ -20,8 +20,17 @@ demo/seasons/
   calendar.json     which theme runs when (America/Los_Angeles dates)
   halloween/        halloween.js     (3D jack-o'-lanterns + sheet ghosts, three.js, all procedural)
   thanksgiving/     thanksgiving.js  (3D roast turkey, glazed ham, pumpkin pie + autumn leaves, all procedural)
+  christmas/        christmas.js     (3D snow-dusted trees with lights, coloured jingle bells, snow; procedural)
+                    santa.webp       (photoreal Santa + sleigh + reindeer fly-by, transparent, made in Higgsfield)
   <next theme>/     <id>.js
 ```
+
+## Santa and a page's own fly-over (Christmas)
+
+Santa crosses the sky on his own about every 40 s. A page that already flies something across the top (Melody's plane)
+sets `window.SSAI_SANTA_CUE = 1` and fires `ssai-flyover-done` with `detail: { dir }` (`1` = left to right) when its own
+pass ends. Santa then waits for that event and follows every other pass in the same direction, so the plane always
+goes first and the two are never on screen together.
 
 ## Calendar
 

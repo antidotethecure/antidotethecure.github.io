@@ -1,5 +1,5 @@
 /* Start menu: "Boy or girl?" + playlists (demo/gamemenu.js, 2026-11-15).
-   Guards: every game asks first and shows PLAY only after the answer; his own songs (Cheat Code + Energy) are in both
+   Guards: every game (but Melody, which opted out with vibe:false on 2026-11-21) asks first and shows PLAY only after the answer; his own songs (Cheat Code + Energy) are in both
    playlists in every game; the 20 outside songs are never hosted, a tap loads Spotify's player for that one song and
    nothing from Spotify loads before the tap; the game music waits while it is open; Kid mode shows his songs only.
      BASE=http://localhost:8000 node tests/menu-playlist.mjs     (needs playwright-core; CHROME= overrides the browser path)
@@ -25,16 +25,22 @@ let first = true, girl = [], boy = [];
 for (const g of GAMES) {
   const p = await open(g);
   const ask = { vibe: await q(p, ".gm-ov [data-gm=vibe]"), play: await q(p, ".gm-ov [data-gm=play]"), lit: await q(p, ".gm-ov [data-gm=vibe][aria-pressed=true]") };
+  if (g === "melody-lax") {   // opted out: PLAY right away, plain Playlist button
+    ok(g + ": does not ask Boy or girl, PLAY is there", ask.vibe === 0 && ask.play === 1 && !/Boy|Girl/.test(await p.textContent(".gm-ov")) && /Playlist/.test(await p.textContent(".gm-ov [data-gm=playlist]")), ask);
+  } else {
   ok(g + ": asks Boy or girl first, no PLAY yet" + (first ? "" : ", last answer lit"), ask.vibe === 2 && ask.play === 0 && ask.lit === (first ? 0 : 1), ask);
   await p.evaluate(() => GameMenu.play());
   ok(g + ": PLAY cannot start before the answer", await q(p, ".gm-ov .gm-vibe.need") === 1);
   await tap(p, ".gm-ov [data-gm=vibe][data-v=girl]");
   ok(g + ": after the answer the menu shows PLAY and the Girl playlist button", await q(p, ".gm-ov [data-gm=play]") === 1 && /Girl playlist/.test(await p.textContent(".gm-ov [data-gm=playlist]")));
+  }
   await panel(p);
   const songs = await p.evaluate(() => GameMusic.songs.map(s => s.id));
   ok(g + ": Cheat Code + Energy are in the playlist", songs.includes("cheat") && songs.includes("energy") && await q(p, ".gm-sheet [data-gm=song]") === songs.length, songs);
   const src = await p.evaluate(() => Promise.all(GameMusic.songs.map(s => fetch(s.src, { method: "HEAD" }).then(r => r.status))));
   ok(g + ": every song file is there", src.every(s => s === 200), src);
+  if (g === "melody-lax") { const all = await rows(p);
+    ok(g + ": one list of all 20 outside songs, no Boy / Girl switch", all.length === 20 && new Set(all.map(r => r[0])).size === 20 && await q(p, ".gm-sheet [data-gm=vibe]") === 0 && !/Boy|Girl/.test(await p.textContent(".gm-sheet")), all.length); }
   if (first) {
     girl = await rows(p); ok("girl playlist: 10 Spotify songs", girl.length === 10 && girl[0][1] === "CPR", girl.map(r => r[1]));
     ok("nothing from Spotify loaded before a tap", sp.length === 0 && await q(p, "iframe.gm-sp") === 0, sp);

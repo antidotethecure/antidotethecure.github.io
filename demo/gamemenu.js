@@ -42,6 +42,8 @@
    they play in the game) and the boy or girl list of 10 outside songs. Those 20 are label-owned recordings, so they are never
    hosted here: a tap loads Spotify's own embedded player for that one song (nothing from Spotify loads before the tap).
    Kid mode (modes) shows the game's own songs only: no third-party player and no explicit songs for a child.
+     vibe:false                     (opt-out; Melody, owner 2026-11-21) this game never asks "Boy or girl?": PLAY shows right
+                                    away and 🎧 Playlist lists all 20 outside songs as one list, with no Boy / Girl switch.
    Audio convention (games that have sound expose it; the menu wires to it):
      window.GAME_AUDIO={ music:function(on){}, sfx:function(on){}, state:function(){ return {hasMusic:true,hasSfx:true,music:true,sfx:true}; } }
      music(false) must silence ONLY the music (gain 0 / pause the <audio>), never suspend the shared AudioContext.
@@ -79,7 +81,8 @@
   var VKEY = "ssai:vibe", vmem = "", spId = "";   // vmem: the answer also lives in memory, so PLAY still works where storage is blocked
   try { vmem = localStorage.getItem(VKEY) || ""; } catch (e) {}
   function vibe() { return vmem === "boy" || vmem === "girl" ? vmem : ""; }
-  function asked() { return !!S.vibe && !!vibe(); }   // S.vibe = this game has asked; the answer itself is shared by the games
+  var NOV = C.vibe === false;   // this game does not ask (see vibe:false above)
+  function asked() { return NOV || (!!S.vibe && !!vibe()); }   // S.vibe = this game has asked; the answer itself is shared by the games
   function setVibe(v) { if (v !== "boy" && v !== "girl") return; if (v !== vmem) spOff(); vmem = v; S.vibe = 1; save(); try { localStorage.setItem(VKEY, v); } catch (e) {} }
   function modeCur() { try { return (C.modes && C.modes.get()) || ""; } catch (e) { return ""; } }
   // [artist, title, Spotify track id]; ids checked against Spotify's embed pages 2026-11-15 (tests/menu-playlist.mjs LIVE=1 re-checks)
@@ -115,16 +118,16 @@
       o.map(function (x) { return '<button type="button" data-gm="vibe" data-v="' + x[0] + '" aria-pressed="' + (v === x[0]) + '"><i>' + x[1] + "</i>" + esc(T(x[2])) + "<small>" + esc(T(x[3])) + "</small></button>"; }).join("") + "</div></div>";
   }
   function playlistHTML() {
-    var v = vibe(), gm = W.GameMusic, h = '<p class="gm-g">' + esc(T("Who's listening?")) + "</p>" + vibeHTML(true);
+    var v = vibe(), gm = W.GameMusic, h = NOV ? "" : '<p class="gm-g">' + esc(T("Who's listening?")) + "</p>" + vibeHTML(true);
     if (gm && gm.songs && gm.songs.length) h += '<p class="gm-g">' + esc(T("Game songs · play right in the game")) + "</p>" + gm.songs.map(function (s) {
       return '<button type="button" class="gm-sw" data-gm="song" data-v="' + esc(s.id) + '" aria-pressed="' + (!spId && gm.cur() === s && (gm !== own || ownOn)) + '"><i style="font-style:normal;font-size:22px">🎵</i><span>' + esc(s.name) + (gm === own && ownOn && gm.cur() === s ? "<small>" + esc(T("Playing · tap again to stop")) + "</small>" : "") + "</span></button>"; }).join("");
     if (modeCur() === "kid") return h + '<p class="gm-note">' + esc(T("Kid mode plays the game songs only.")) + "</p>";
-    if (!v) return h + '<p class="gm-note">' + esc(T("Pick Boy or Girl to see the playlist.")) + "</p>";
-    h += '<p class="gm-g">' + esc(T(v === "boy" ? "Boy playlist · late night vibes" : "Girl playlist · late night vibes")) + "</p>";
+    if (!NOV && !v) return h + '<p class="gm-note">' + esc(T("Pick Boy or Girl to see the playlist.")) + "</p>";
+    h += '<p class="gm-g">' + esc(T(NOV ? "Late night vibes" : v === "boy" ? "Boy playlist · late night vibes" : "Girl playlist · late night vibes")) + "</p>";
     // the outside songs are label-owned: only Spotify's own player may play them, and it loads only after this tap
     if (spId) h += '<iframe class="gm-sp" title="Spotify player" src="https://open.spotify.com/embed/track/' + spId + '" height="80" allow="autoplay; encrypted-media; clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>' +
       '<button type="button" class="gm-sw" data-gm="spoff"><i style="font-style:normal;font-size:22px">↩</i><span>' + esc(T("Close the Spotify player")) + "</span></button>";
-    h += PL[v].map(function (s) { return '<button type="button" class="gm-sw" data-gm="sp" data-v="' + s[2] + '" aria-pressed="' + (spId === s[2]) + '"><i style="font-style:normal;font-size:22px">🎧</i><span class="notranslate">' + esc(s[1]) + "<small>" + esc(s[0]) + "</small></span></button>"; }).join("");
+    h += (NOV ? PL.boy.concat(PL.girl) : PL[v]).map(function (s) { return '<button type="button" class="gm-sw" data-gm="sp" data-v="' + s[2] + '" aria-pressed="' + (spId === s[2]) + '"><i style="font-style:normal;font-size:22px">🎧</i><span class="notranslate">' + esc(s[1]) + "<small>" + esc(s[0]) + "</small></span></button>"; }).join("");
     return h + '<p class="gm-note">' + esc(T("These songs play in Spotify's own player: tap a song, then tap ▶ on it. You hear a 30-second preview unless you are signed in to Spotify, and Spotify's terms and cookies apply. The game music waits while a Spotify song is open.")) + "</p>";
   }
 
@@ -257,7 +260,7 @@
     if (tk && tk.on) bs.push('<button type="button" class="gm-b" data-gm="tokens"><i>🪙</i>' + esc(T("Get tokens")) + "</button>");
     if (hasMusic()) bs.push('<button type="button" class="gm-b" data-gm="music" aria-pressed="' + !!S.music + '"><i>' + (S.music ? "🎵" : "🔇") + "</i>" + esc(T(S.music ? "Music on" : "Music off")) + "</button>");
     var fsOn = !!(FS() && FS().active);
-    bs.push('<button type="button" class="gm-b" data-gm="playlist"><i>🎧</i>' + esc(T(vibe() === "girl" ? "Girl playlist" : vibe() === "boy" ? "Boy playlist" : "Playlist")) + "</button>");
+    bs.push('<button type="button" class="gm-b" data-gm="playlist"><i>🎧</i>' + esc(T(NOV ? "Playlist" : vibe() === "girl" ? "Girl playlist" : vibe() === "boy" ? "Boy playlist" : "Playlist")) + "</button>");
     bs.push('<button type="button" class="gm-b" data-gm="fs" aria-pressed="' + fsOn + '"><i>' + (fsOn ? "✕" : "⛶") + "</i>" + esc(T(fsOn ? "Exit full screen" : "Full screen")) + "</button>");
     if (AH()) bs.push('<button type="button" class="gm-b" data-gm="a2hs"><i>📲</i>' + esc(T("Add to Home Screen")) + "</button>");
     bs.push('<button type="button" class="gm-b" data-gm="settings"><i>⚙️</i>' + esc(T("Settings")) + "</button>");

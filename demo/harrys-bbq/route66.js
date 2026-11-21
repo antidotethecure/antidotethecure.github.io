@@ -155,12 +155,21 @@
     g.fillStyle = "#fff"; g.font = "800 11px Archivo"; g.fillText("Food review coming soon", 62, 70);
     g.fillStyle = "#ffd23f"; g.textAlign = "center"; g.font = "900 13px Archivo"; g.fillText("@therealantidote", 100, 100);
   });
-  SP.billboard = mk(220, 190, function (g) { g.fillStyle = "#3a2a1a"; g.fillRect(40, 120, 10, 70); g.fillRect(170, 120, 10, 70); g.fillStyle = "#2a1e14"; g.fillRect(4, 116, 212, 8); g.drawImage(SP.review, 10, 0, 200, 120); });
+  function billboard() { return mk(220, 190, function (g) { g.fillStyle = "#3a2a1a"; g.fillRect(40, 120, 10, 70); g.fillRect(170, 120, 10, 70); g.fillStyle = "#2a1e14"; g.fillRect(4, 116, 212, 8); g.drawImage(SP.review, 10, 0, 200, 120); }); }
+  SP.billboard = billboard();
+  /* his real cover art (img/review/cover.webp, 16:9) replaces the placeholder above once it loads */
+  var COVER = new Image(); COVER.onload = function () {
+    SP.review = mk(200, 120, function (g) { g.fillStyle = "#1d4ed8"; rr(g, 0, 0, 200, 120, 10); g.fill(); g.drawImage(COVER, 6, 7, 188, 106);
+      g.fillStyle = "#e11d2a"; g.beginPath(); g.arc(24, 95, 12, 0, 7); g.fill(); g.fillStyle = "#fff"; g.beginPath(); g.moveTo(20, 88); g.lineTo(31, 95); g.lineTo(20, 102); g.closePath(); g.fill(); });
+    SP.billboard = billboard(); }; COVER.src = "img/review/cover.webp";
+  /* Antidote Drizzle coin: gold coin with his logo (img/r66/driz.webp); this plain gold coin is the fallback */
+  SP.driz = mk(64, 64, function (g) { g.fillStyle = "#7a4604"; g.beginPath(); g.arc(32, 32, 31, 0, 7); g.fill(); g.fillStyle = "#ffd23f"; g.beginPath(); g.arc(32, 32, 27, 0, 7); g.fill();
+    g.fillStyle = "#7a4604"; g.font = "900 34px Archivo,sans-serif"; g.textAlign = "center"; g.fillText("A", 32, 44); });
   // guests at the stops: photo cut-outs (img/r66/guest*.webp). Never code-drawn people.
   var GUESTS = [1, 2, 3, 4, 5].map(function (i) { var im = new Image(); im.src = "img/r66/guest" + i + ".webp"; return im; });
   var LOGO = new Image(); LOGO.src = "img/logo.webp";
   /* photo-real art (Higgsfield, img/r66/): each one replaces its vector sprite above once it loads; the vector stays the fallback */
-  ["truck", "truckbody", "smoker", "fire", "log", "rub", "sauce", "brisket", "ribs", "link", "wing", "cone", "weed", "hole", "deer", "car1", "car2", "car3", "saguaro", "joshua", "palm", "pine", "yucca", "derrick", "silo", "windmill", "fence"].forEach(function (n) {
+  ["truck", "truckbody", "smoker", "fire", "log", "rub", "sauce", "brisket", "ribs", "link", "wing", "driz", "cone", "weed", "hole", "deer", "car1", "car2", "car3", "saguaro", "joshua", "palm", "pine", "yucca", "derrick", "silo", "windmill", "fence"].forEach(function (n) {
     var im = new Image(); im.onload = function () { im.w = im.naturalWidth; im.h = im.naturalHeight; SP[n] = im; }; im.src = "img/r66/" + n + ".webp";
   });
   var BGI = [], STOPI = new Image(); STOPI.src = "img/r66/stop.webp";
@@ -207,7 +216,7 @@
   }
   var R3 = { on: false, render: null };   // the 3D drive view (route66-3d.js) hooks in here; it outlives restarts, unlike st
   // on-screen width per road object (photo sprites keep their own aspect; height follows)
-  var OW = { car: 104, deer: 104, hole: 92, cone: 44, weed: 50, log: 68, rub: 36, sauce: 32, brisket: 90, ribs: 85, link: 82, wing: 78, shield: 46 };
+  var OW = { car: 104, deer: 104, hole: 92, cone: 44, weed: 50, log: 68, rub: 36, sauce: 32, brisket: 90, ribs: 85, link: 82, wing: 78, shield: 46, driz: 52 };
   // the render's touch: a glowing gold ring under every pickup
   SP.ring = mk(120, 40, function (g) {
     g.save(); g.translate(60, 20); g.scale(1, 0.33); var r = g.createRadialGradient(0, 0, 8, 0, 0, 60); r.addColorStop(0, "rgba(255,215,130,.55)"); r.addColorStop(1, "rgba(255,190,80,0)"); g.fillStyle = r; g.fillRect(-60, -60, 120, 120); g.restore();
@@ -317,7 +326,7 @@
   function sy(s) { return HZ + (PY - HZ) * s; }
 
   /* ---------------- spawning ---------------- */
-  var GOOD = [["log", 10, "Hickory", 30], ["rub", 15, "Dry rub", 16], ["sauce", 15, "Harry's sauce", 16], ["brisket", 30, "Brisket", 9], ["ribs", 30, "Ribs", 9], ["link", 25, "Hot links", 8], ["shield", 10, "Route 66", 22]];
+  var GOOD = [["log", 10, "Hickory", 30], ["rub", 15, "Dry rub", 16], ["sauce", 15, "Harry's sauce", 16], ["brisket", 30, "Brisket", 9], ["ribs", 30, "Ribs", 9], ["link", 25, "Hot links", 8], ["shield", 10, "Route 66", 22], ["driz", 20, "Drizzle coin", 12]];
   function goodPick() { var tot = 0, i; for (i = 0; i < GOOD.length; i++) tot += GOOD[i][3]; var r = Math.random() * tot; for (i = 0; i < GOOD.length; i++) { r -= GOOD[i][3]; if (r < 0) return GOOD[i]; } return GOOD[0]; }
   function spawnRow() {
     var lanes = [0, 1, 2].sort(function () { return Math.random() - 0.5; });
@@ -467,8 +476,9 @@
           else o.z = -999; }
         else { var g = o.good, cm = comboX(++st.combo); st.score += g[1] * cm; if (st.combo === 5 || st.combo === 10) { pop(VW / 2, PY - 180, T("COMBO") + " ×" + cm + "!", "#ffd23f", true); SFX.perfect(); }
           if (g[0] === "log") { st.inv.logs = Math.min(9, st.inv.logs + 1); SFX.log(); } else { SFX.pick(); }
+          if (g[0] === "driz" && drizSet(driz() + 1) === REVIEW.need) { pop(VW / 2, PY - 210, T("Review unlocked! Tap the billboard"), "#ffd23f", true); SFX.perfect(); }
           if (g[0] === "rub") st.inv.rub = Math.min(9, st.inv.rub + 1); if (g[0] === "sauce") st.inv.sauce = Math.min(9, st.inv.sauce + 1);
-          pop(sx(o.wx, o.z, sAt(o.z)), PY - 90, "+" + g[1] * cm + " " + T(g[2]) + (cm > 1 ? " ×" + cm : ""), g[0] === "shield" ? CREAM : "#ffd27a"); o.z = -999; }
+          pop(sx(o.wx, o.z, sAt(o.z)), PY - 90, "+" + g[1] * cm + " " + T(g[2]) + (cm > 1 ? " ×" + cm : "") + (g[0] === "driz" && driz() < REVIEW.need ? " " + driz() + "/" + REVIEW.need : ""), g[0] === "shield" ? CREAM : "#ffd27a"); o.z = -999; }
       }
       if (o.z < (R3.on ? -180 : -80)) st.objs.splice(i, 1);   // 3D cars are long: let them pass the camera
     }
@@ -834,12 +844,18 @@
   addEventListener("keyup", function (e) { if (HOLDK[e.key]) st.hold = false; });
   addEventListener("blur", function () { st.hold = false; });
 
-  /* ---------------- Antidote's review card (poster + billboard). Review not shot yet: placeholder, links to his channel ---------------- */
+  /* ---------------- Antidote's review card (poster + billboard). Drizzle coins caught on the road unlock it; the count is kept on this phone ---------------- */
+  var REVIEW = { need: 10, vid: "" };   // vid = the YouTube id of his Harry's review once it is on the channel; empty = the unlocked card sends them to his page
+  function driz() { try { return +localStorage.getItem("r66-driz") || 0; } catch (e) { return 0; } }
+  function drizSet(n) { try { localStorage.setItem("r66-driz", n); } catch (e) {} return n; }
   function reviewCard() {
     if (D.querySelector(".r66-card")) return; st.paused = true; st.hold = false; syncAudio();
+    var n = driz(), open = n >= REVIEW.need;
     var d = D.createElement("div"); d.className = "r66-card"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Antidote's food review");
-    d.innerHTML = '<div class="r66-cin"><div class="r66-cp"><span>▶</span></div><b>' + T("Antidote reviews Harry's") + '</b><p>' + T("His food review of Harry's Smokehouse is coming soon. Until then, catch his other reviews on YouTube.") + '</p>' +
-      '<a class="r66-cb" href="https://www.youtube.com/@therealantidote" target="_blank" rel="noopener">▶ ' + T("Watch @therealantidote") + '</a><button type="button" class="r66-cx">' + T("Back to the game") + '</button></div>';
+    d.innerHTML = '<div class="r66-cin"><img src="img/review/cover.webp" alt="' + T("Antidote's Harry's Barbeque review") + '" width="640" height="360"><b>' + T("Antidote reviews Harry's") + '</b>' +
+      (open ? '<p>' + T("Unlocked! Watch his food review of Harry's.") + '</p><a class="r66-cb" href="' + (REVIEW.vid ? "https://www.youtube.com/watch?v=" + encodeURIComponent(REVIEW.vid) : "https://www.instagram.com/therealantidote/") + '" target="_blank" rel="noopener">▶ ' + T("Watch the review") + '</a>'
+        : '<p>' + T("Catch Antidote Drizzle coins on the road to unlock his food review.") + '</p><div class="r66-cz" role="img" aria-label="' + n + " / " + REVIEW.need + '"><i style="width:' + Math.round(100 * n / REVIEW.need) + '%"></i><span>🪙 ' + n + " / " + REVIEW.need + '</span></div>') +
+      '<button type="button" class="r66-cx">' + T("Back to the game") + '</button></div>';
     (cv.closest(".gamebox") || D.body).appendChild(d);
     var close = function () { d.remove(); st.paused = false; last = performance.now(); syncAudio(); };
     d.querySelector(".r66-cx").onclick = close; d.addEventListener("click", function (e) { if (e.target === d) close(); });

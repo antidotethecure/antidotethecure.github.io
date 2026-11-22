@@ -21,13 +21,13 @@
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/utils/BufferGeometryUtils.js">
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/libs/meshopt_decoder.module.js">
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/environments/RoomEnvironment.js">
-<link rel="modulepreload" href="melody3d.js?v=fs10">
+<link rel="modulepreload" href="melody3d.js?v=fs11">
 <link rel="modulepreload" href="air3d.js?v=ex2">
-<link rel="modulepreload" href="world3d.js?v=ex2.hs6">
+<link rel="modulepreload" href="world3d.js?v=ex2.hs7">
 <link rel="modulepreload" href="beach3d.js?v=dx1">
 <link rel="modulepreload" href="../engine3d/quality.js?v=e3t">
 <link rel="modulepreload" href="../engine3d/billboard.js?v=e3t">
-<link rel="modulepreload" href="../engine3d/facades.js?v=e3t">
+<link rel="modulepreload" href="../engine3d/facades.js?v=e3u">
 <link rel="modulepreload" href="../engine3d/carmodels.js?v=e3t">
 <link rel="modulepreload" href="../engine3d/particles.js?v=ra1">
 <link rel="modulepreload" href="../engine3d/damage.js?v=e3t">
@@ -2545,7 +2545,7 @@ function frame(now){
       if(run&&G.boss===en&&!en.ground&&en.rw&&Math.abs(en.x-G.x)<en.rw+16&&Math.abs(en.y-G.y)<en.rh+18&&zOK(en,(en.rh||50)*.5+24)) hurt(G.x,G.y,T("💥 Hit the boss!")); continue; }
     if(en.t==="esc"||en.t==="bird"){ var isB=en.t==="bird"; if(run){ if(isB) birdStep(en,dt,k,now); else escStep(en,dt,k,now); }
       if(en.fleeing&&(en.y<-120||en.x<-120||en.x>W+120)){ G.ens.splice(e,1); continue; }
-      if(isB) birdDraw(en,now); else { escDraw(en,now); if(en.hp<en.mhp) bb(en.x,en.y,en.z3,function(){ var ehw=36, ehy=en.y-en.r-14; cx.fillStyle="rgba(0,0,0,.6)"; cx.fillRect(en.x-ehw/2-1,ehy-1,ehw+2,6); cx.fillStyle=en.hp/en.mhp>.5?"#7ef7c8":"#ffb03b"; cx.fillRect(en.x-ehw/2,ehy,ehw*Math.max(0,en.hp/en.mhp),4); }); }
+      if(isB) birdDraw(en,now); else { escDraw(en,now); if(en.hp<en.mhp) bb(en.x,en.y,en.z3,function(){ var ehw=36, ehy=en.y-en.r-14; cx.fillStyle="rgba(255,255,255,.3)"; cx.fillRect(en.x-ehw/2,ehy,ehw,4); cx.fillStyle=en.hp/en.mhp>.5?"#7ef7c8":"#ffb03b"; cx.fillRect(en.x-ehw/2,ehy,ehw*Math.max(0,en.hp/en.mhp),4); }); }
       if(run&&!en.fleeing&&en.y>0&&Math.abs(en.x-G.x)<en.r+20&&Math.abs(en.y-G.y)<en.r+22&&zOK(en,en.r*.7+18)){ if(isB) hurtBy(en.x,en.y,T("🕊️ Bird strike!"),100/3*.45); else hurt(en.x,en.y,T("💥 Escort hit!"));   /* a bird is a small hit */ boom(en.x,en.y,isB?10:24); if(isB) birdKilled(en,false); else { var ei=G.ens.indexOf(en); if(ei>=0) G.ens.splice(ei,1); } }
       continue; }
     if(run){ if(en.t==="ufo"&&en.fleeing){ en.x+=(en.x<W/2?-5:5)*k; en.y-=.6*k; }
@@ -2587,7 +2587,7 @@ function frame(now){
     else { // head-on airliner: nose down, landing lights blazing
       cx.save(); cx.globalCompositeOperation="lighter"; var lg=cx.createRadialGradient(en.x,en.y+50,2,en.x,en.y+50,90); lg.addColorStop(0,"rgba(255,250,220,.55)"); lg.addColorStop(1,"rgba(255,250,220,0)"); cx.fillStyle=lg; cx.beginPath(); cx.arc(en.x,en.y+50,90,0,6.283); cx.fill(); cx.restore();
       sprite(S.kami,en.x,en.y,en.w,Math.PI,false,"✈️"); if(!en.seed) en.seed=1+Math.random()*9; navLights(en.x-en.w*.47,en.x+en.w*.47,en.y-en.w*.05,en.seed,2.6); }
-    if(en.mhp>2&&en.hp<en.mhp) bb(en.x,en.y,en.z3,function(){ var hbw=40, hby=en.y-(en.t==="cop"?COP_LEN*.5+6:en.r+14); cx.fillStyle="rgba(0,0,0,.6)"; cx.fillRect(en.x-hbw/2-1,hby-1,hbw+2,6); cx.fillStyle=en.hp/en.mhp>.5?"#7ef7c8":"#ffb03b"; cx.fillRect(en.x-hbw/2,hby,hbw*Math.max(0,en.hp/en.mhp),4); });
+    if(en.mhp>2&&en.hp<en.mhp) bb(en.x,en.y,en.z3,function(){ var hbw=40, hby=en.y-(en.t==="cop"?COP_LEN*.5+6:en.r+14); cx.fillStyle="rgba(255,255,255,.3)"; cx.fillRect(en.x-hbw/2,hby,hbw,4);   /* a faint light track: the black backing was a black rectangle in the sky over far enemies (2026-11-21) */ cx.fillStyle=en.hp/en.mhp>.5?"#7ef7c8":"#ffb03b"; cx.fillRect(en.x-hbw/2,hby,hbw*Math.max(0,en.hp/en.mhp),4); });
     if(run&&Math.abs(en.x-G.x)<en.r+22&&Math.abs(en.y-G.y)<en.r+26&&zOK(en,en.r*.7+18)){ hurt(en.x,en.y,en.t==="kami"?T("💥 Mid-air hit!"):en.t==="ufo"?T("🛸 Abducted!"):en.t==="cop"?T("🚁 Rammed the chopper!"):T("💥 Jet hit!")); boom(en.x,en.y,24); G.ens.splice(e,1); } }
   k=k0; dt=dt0;
   SND.rotor(run?rv:0);
@@ -2842,7 +2842,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
   '<div class="ptsh">Melody Rewards points (BETA: switching on soon)</div><div class="pts">'+row('<span class="e">⭐</span>',"1 point per "+GPC.perScore+" score, once rewards are on",GPC.dailyCap+"/day")+row('<span class="e">⏱️</span>',"Survival ranks by time","time")+'</div>';
 })();
 </script>
-<script type="module" src="melody3d.js?v=fs10"></script>
+<script type="module" src="melody3d.js?v=fs11"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}

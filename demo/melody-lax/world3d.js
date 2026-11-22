@@ -20,7 +20,7 @@
    makeWorld(THREE, {base, fx}) → { segment(kind, len, seed, o), root, wind, tick(dt, t), debris(...) }. */
 import { makeBeachKit } from "./beach3d.js?v=dx1";
 import { makeVideoBoards } from "../engine3d/billboard.js?v=e3t";
-import { makeFacades } from "../engine3d/facades.js?v=e3t";
+import { makeFacades } from "../engine3d/facades.js?v=e3u";
 import { buildCars } from "../engine3d/carmodels.js?v=e3t";
 /* The storefront name. The real business is "Melody Bar & Grill"; change this one line to rename the awning / blade sign / door
    glass lettering (the gold logo boards use the real artwork, img/logo.png). */

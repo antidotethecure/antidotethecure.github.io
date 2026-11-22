@@ -1218,7 +1218,28 @@ export function makeWorld(THREE, O = {}) {
     const gsh = new THREE.Shape([[-4.4, 4.2], [-2.4, 5.6], [1.0, 5.5], [3.0, 4.2]].map(p => new THREE.Vector2(p[0], p[1]))), glass = new THREE.ExtrudeGeometry(gsh, { depth: 6.2, bevelEnabled: false }).rotateY(-Math.PI / 2).translate(3.1, .1, 0);
     EXO = { body, glass, wheel: new THREE.CylinderGeometry(1.45, 1.45, 1.3, 10).rotateZ(Math.PI / 2), wing: new THREE.BoxGeometry(7, .3, 1.4).translate(0, 5.4, -7.4), bm: new THREE.MeshStandardMaterial({ roughness: .22, metalness: .55 }) };
     [EXO.body, EXO.glass, EXO.wheel, EXO.wing].forEach(g => SHARED.add(g)); return EXO; }
-  function hollywoodBlvd(seg, R, len, r, vz) { const ax = HB_X, E = getE(), dens = O.density ? O.density() : 1;
+  /* (2026-11-21, Antidote: "not so many Capitol buildings ... put the Tesla diner") a round retro-futuristic drive-in diner: two glass drums
+     under white saucer roofs with neon rims, a big outdoor screen, two rows of charging stalls. A look-alike drawn in code: no car maker's
+     name or logo anywhere (house rule). 6 draws, about 2.5k triangles, parts built once and shared by every strip that has one. */
+  const DINER_X = 160 - ROAD / 2 - SIDE - 50;   // on the RIGHT of the flight line (the premiere theatre is on the left), on the next avenue over
+  let DINER = null;
+  function dinerParts() { if (DINER) return DINER;
+    const cyl = (r0, r1, h, y, open) => [new THREE.CylinderGeometry(r0, r1, h, 40, 1, !!open), T4(0, y, 0)], ring = (r, y) => [new THREE.TorusGeometry(r, .45, 6, 48), T4(0, y, 0, Math.PI / 2)];
+    const white = [cyl(23, 23, 1.2, .6), cyl(29, 27, 1.8, 9.9), cyl(25, 23, 1.6, 18.3), cyl(9, 12, 2.2, 20.2), [new THREE.BoxGeometry(47, 20, 1), T4(0, 24, -38.7)], [new THREE.BoxGeometry(1.6, 14, 1.6), T4(-16, 7, -39)], [new THREE.BoxGeometry(1.6, 14, 1.6), T4(16, 7, -39)]];
+    const neon = [ring(29, 11), ring(25, 19.3)];
+    for (let k = 0; k < 16; k++) { const t = k / 16 * TAU, cx = Math.cos(t), sz = Math.sin(t); white.push([new THREE.BoxGeometry(.6, 7.8, .6), T4(cx * 22.1, 5.1, sz * 22.1, 0, -t)], [new THREE.BoxGeometry(.5, 7, .5), T4(cx * 19.1, 14.1, sz * 19.1, 0, -t)]); }   // window posts round both drums
+    for (const z of [32, 41]) for (let k = 0; k < 7; k++) { const x = -36 + k * 12; white.push([new THREE.BoxGeometry(.9, 4.6, .6), T4(x, 2.3, z)]); neon.push([new THREE.BoxGeometry(1.1, .7, .8), T4(x, 4.9, z)]); }   // charging posts, lit caps
+    const sc = mkc(256, 104), x = sc.getContext("2d"), gr = x.createLinearGradient(0, 0, 0, 104); gr.addColorStop(0, "#1b1140"); gr.addColorStop(.6, "#c2377a"); gr.addColorStop(1, "#ffb347"); x.fillStyle = gr; x.fillRect(0, 0, 256, 104);
+    x.fillStyle = "#ffe08a"; x.beginPath(); x.arc(128, 80, 36, 0, TAU); x.fill(); x.fillStyle = "#3a1650"; for (let k = 0; k < 4; k++) x.fillRect(88, 66 + k * 9, 80, 2 + k); x.fillRect(0, 94, 256, 10);   // the screen plays a sunset
+    const sg = mkc(512, 128), y = sg.getContext("2d"); y.fillStyle = "#c8242c"; y.fillRect(0, 0, 512, 128); y.fillStyle = "#fff"; y.font = "italic 800 104px Arial, Helvetica, sans-serif"; y.textAlign = "center"; y.textBaseline = "middle"; y.fillText("DINER", 256, 70);
+    const glassM = M.glass.clone(); glassM.emissive.set(0x9fd8ff); glassM.emissiveIntensity = .45;   // lit from inside, day and night
+    DINER = { white: merge(white), glass: merge([cyl(22, 22, 7.8, 5.1, 1), cyl(19, 19, 7, 14.1, 1)]), neon: merge(neon), lot: new THREE.PlaneGeometry(100, 92).rotateX(-Math.PI / 2), sign: new THREE.PlaneGeometry(26, 6.5), scr: new THREE.PlaneGeometry(44, 17.6),
+      glassM, neonM: new THREE.MeshBasicMaterial({ color: 0xbdf3ff, toneMapped: false }), signM: new THREE.MeshBasicMaterial({ map: tex(sg), toneMapped: false }), scrM: new THREE.MeshBasicMaterial({ map: tex(sc), toneMapped: false }) };
+    [DINER.white, DINER.glass, DINER.neon, DINER.lot, DINER.sign, DINER.scr].forEach(g => SHARED.add(g)); return DINER; }
+  function diner(seg, x, z) { const P = dinerParts(), g = new THREE.Group(); g.position.set(x, 0, z); seg.group.add(g); seg.blocked.push([x, z, 100, 92]);
+    g.add(mesh(P.lot, lotMat(), 0, .15, 0), mesh(P.white, M.white), mesh(P.glass, P.glassM), mesh(P.neon, P.neonM), mesh(P.sign, P.signM, 0, 14.2, 28.4), mesh(P.scr, P.scrM, 0, 24, -38.1));
+    (seg.cams = seg.cams || {}).diner = { p: [x - 34, 46, z + 96], t: [x, 12, z - 8], fov: 55 }; lmCount.diner = (lmCount.diner || 0) + (WARM ? 0 : 1); }
+  function hollywoodBlvd(seg, R, len, r, vz, pick) { const ax = HB_X, E = getE(), dens = O.density ? O.density() : 1;
     // the Walk of Fame: both sidewalks of the Boulevard, one star per 9x9 square, broken only where the cross streets meet it
     const quads = [], cuts = [-len / 2].concat(r.ST.slice().sort((a, b) => a - b), [len / 2]);
     for (let k = 0; k < cuts.length - 1; k++) { const a = cuts[k] + (k ? ROAD / 2 + SIDE : 0), b = cuts[k + 1] - (k < cuts.length - 2 ? ROAD / 2 + SIDE : 0); if (b - a < 10) continue;
@@ -1227,7 +1248,9 @@ export function makeWorld(THREE, O = {}) {
       g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2)); const wm = mesh(g, starMat()); wm.renderOrder = 1; seg.group.add(wm); }
     // the theatre (west side, mid-block): dark facade, a marquee canopy over the sidewalk with chasing bulbs, a blade sign, the red carpet
     const tx = ax - ROAD / 2 - SIDE - 38, T = new THREE.Group(); T.position.set(tx, 0, vz); seg.group.add(T); seg.blocked.push([tx, vz, 76, 84]);
-    const rx = ax + ROAD / 2 + SIDE + 36; if (LM("records", seg.group, rx, vz, 62, 0)) seg.blocked.push([rx, vz, 66, 66]);   // the round record tower across the Boulevard
+    const rx = ax + ROAD / 2 + SIDE + 36; if (pick.rec && LM("records", seg.group, rx, vz, 62, 0)) { seg.blocked.push([rx, vz, 66, 66]); lmCount.records = (lmCount.records || 0) + (WARM ? 0 : 1); }   // the round record tower across the Boulevard: now only on the strips picked for it
+    if (pick.diner) diner(seg, DINER_X, vz);
+    console.assert(WARM || (lmCount.records || 0) * 3 <= (lmCount.walkOfFame || 0) + 3, "[world3d] the record tower is back on nearly every Boulevard strip");
     if (!LM("pagoda", T, 5, 0, 84, Math.PI / 2))
     T.add(mesh(new THREE.BoxGeometry(70, 30, 80).translate(0, 15, 0), new THREE.MeshStandardMaterial({ color: 0x3a1c22, roughness: .7 })), mesh(new THREE.BoxGeometry(72, 2, 82).translate(0, 31, 0), M.dark), mesh(new THREE.BoxGeometry(1.2, 3.2, 82).translate(35.6, 31, 0), M.gold));
     T.add(mesh(new THREE.BoxGeometry(12, 3, 60).translate(38, 16, 0), new THREE.MeshStandardMaterial({ color: 0x1a0e10, roughness: .5, emissive: 0x401010, emissiveIntensity: .5 })));
@@ -1435,7 +1458,10 @@ export function makeWorld(THREE, O = {}) {
     else if (kind === "f105") freeway105(seg, R, len);
     else if (kind === "sofi") sofi(seg, R, len, side);
     else if (kind === "inglewood") inglewood(seg, R, len);
-    else if (kind === "hwdblvd") { const vz = midBlock(len).zc, tx = HB_X - ROAD / 2 - SIDE - 38; hollywoodBlvd(seg, R, len, city(seg, R, len, { cars: 26, hmul: .85, reserve: [HB_X], noBillboard: true, clear: [[tx, vz, 90, 96], [HB_X + ROAD / 2 + SIDE + 36, vz, 72, 72]] }), vz); }
+    else if (kind === "hwdblvd") { const vz = midBlock(len).zc, tx = HB_X - ROAD / 2 - SIDE - 38, n = lmCount.walkOfFame || 0, pick = { diner: WARM || n % 6 === 0, rec: WARM || n % 6 === 3 }, clear = [[tx, vz, 90, 96]];
+      // (2026-11-21, Antidote: "not so many Capitol buildings") the record tower stood on EVERY Boulevard strip, 12 in 40 seconds. Of every 6 strips now: the 1st has the diner, the 4th the tower, the others neither (the warm-up strip builds both)
+      if (pick.rec) clear.push([HB_X + ROAD / 2 + SIDE + 36, vz, 72, 72]); if (pick.diner) clear.push([DINER_X, vz, 104, 96]);
+      hollywoodBlvd(seg, R, len, city(seg, R, len, { cars: 26, hmul: .85, reserve: [HB_X], noBillboard: true, clear }), vz, pick); }
     else if (kind === "irvine") city(seg, R, len, { style: "oc", cars: 26, hmul: .5, hmin: 18, palmGap: 64, bstyle: (R2) => R2() < .55 ? 1 : R2() < .6 ? 3 : 0, tints: { 0: ["#f3eee4", "#efe6d6", "#e8dcc6"], 1: ["#b9c9d6", "#9fb4c4", "#cfd9e0"], 3: ["#e9e5dc", "#ddd7cc"] } });
     else if (kind === "dtla") { const mb = midBlock(len); city(seg, R, len, { tall: 2, hmul: 1.6, cars: 32, clear: [[side * 640, mb.zc, 110, 110], [-side * 650, mb.zc, 100, 80]], bstyle: (R2, h) => h > 90 ? (R2() < .7 ? 1 : 3) : FAC.pick(R2, h) }); dtlaIcons(seg, side, mb.zc); }
     else if (kind === "valley") { city(seg, R, len, { res: true, mixed: true, style: "res", cars: 26, hmul: .4, palmGap: 60, bstyle: (R2) => R2() < .7 ? 0 : 3, tints: { 0: ["#e9dcc3", "#d9c7a7", "#efe6d6", "#cdb998"] } }); ridges(seg, R, len, 1); }

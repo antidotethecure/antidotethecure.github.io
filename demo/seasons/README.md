@@ -41,7 +41,7 @@ goes first and the two are never on screen together.
 * `"ready": false` = not built yet; the loader skips it. Flip it (or delete the key) when the theme ships.
 * **Easter moves every year.** Update its dates each spring (2027: Sun 03-28; 2028: Sun 04-16).
 * Thanksgiving runs the whole of November (11-01..11-30) rather than stopping the day after the holiday, so there is
-  no bare gap before Christmas picks up on 12-01. If Christmas is ever moved earlier, shorten Thanksgiving to match.
+  no bare gap before Christmas picks up. 2026-11-27: Antidote moved Christmas up to 11-27 ("Thanksgiving is over"); Thanksgiving now ends 11-26.
 
 ## Switches
 

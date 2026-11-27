@@ -55,7 +55,7 @@ async function boot() {
   const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { MeshoptDecoder } = await import("three/addons/libs/meshopt_decoder.module.js");
   // chase view: the detailed airliner + damage FX, the 3D city, and soft reflections on the airframes
-  const AIRM = CHASE ? await import("./air3d.js?v=ex2") : null, WORLDM = CHASE ? await import("./world3d.js?v=ex2.hs6") : null;
+  const AIRM = CHASE ? await import("./air3d.js?v=ex3") : null, WORLDM = CHASE ? await import("./world3d.js?v=ex2.hs9") : null;
   const { RoomEnvironment } = CHASE ? await import("three/addons/environments/RoomEnvironment.js") : {};
   let PROPT = null;
   const QM = await import("../engine3d/quality.js?v=e3t");
@@ -876,7 +876,7 @@ async function boot() {
       if (ba > 0) for (let i = 0; i < 2; i++) if (far[i]) TRC.add(far[i].p, far[i].o, 1, .55, .15, .1 * ba, 1.2 * WC * DP, 4 * WC * DP);   // the glow runs back down the stream to where that burst left the gun, so it stays put when you steer
     }
     for (let s = 0; s < G.shots.length; s++) { const sh = G.shots[s], x = sh.x, y = sh.y, Y = alt3(sh, A.shot) + 2;
-      if (CHASE) { if (sh.h3) continue; const fl = .75 + Math.random() * .5; Ba.q(x, y, Y, 9 * BK * fl, 9 * BK * fl, 0, UV.dot, 1.8, .8, .25, .3); Ba.q(x, y, Y + .3, 4.5 * BK, 4.5 * BK, 0, UV.dot, 2.6, 2.2, 1.6, .6); continue; }   // flickering heat glow + hot core   // (the stream above draws the rest)
+      if (CHASE) { if (sh.h3) continue; const fl = .8 + Math.random() * .3; Ba.q(x, y, Y, 5 * BK * fl, 5 * BK * fl, 0, UV.dot, 1.4, .7, .22, .22); Ba.q(x, y, Y + .3, 2.6 * BK, 2.6 * BK, 0, UV.dot, 2.2, 1.8, 1.2, .55); continue; }   // (2026-11-27: smaller, like a real tracer's burning tip)   // flickering heat glow + hot core   // (the stream above draws the rest)
       if (sh.w === 0) bolt(x, y, Y, 5, 18, 1, .82, .35);
       else if (sh.w === 1) bolt(x, y, Y, 6, 30, .45, 1, .4);
       else if (sh.w === 2) { bolt(x, y, Y, 8, 20, 1, .55, .16); Ba.q(x, y, Y + .5, 24 * BK, 24 * BK, 0, UV.fball, 1, 1, 1, 1); }
@@ -976,7 +976,8 @@ async function boot() {
   function drawWorld(now, dt, G) {
     if (MTNBG) { const zid = M.zoneId ? M.zoneId() : ""; MTNBG.visible = zid === "valley" || zid === "sangabriel"; if (MTNBG.visible) MTNBG.position.set(cam.position.x, 0, cam.position.z - 3300); }
     const t = now / 1000, s = Math.min(.05, (dt || 16) / 1000), gsp = (G.gsp || 0) * 60; roamStep(G, s); WORLD.wind.set(0, 0, gsp);   /* (the sideways slide is applied by shift(), never through the wind: anchored, not double-moved) */ WORLD.tick(s, t);
-    if (G.runId !== eggRun) { eggRun = G.runId; eggSeg = null; }
+    if (G.runId !== eggRun) { eggRun = G.runId; eggSeg = null;   // a new run: a new paint job on your airliner (?livery=black to pin one)
+      if (AIR && AIR.livery) try { const q = Q.get("livery"), L = q && AIRM.LIVERIES.find(l => l.id === q); AIR.livery(L || AIRM.pickLivery()); STATUS.livery = (L || {}).id || "random"; } catch (e) { console.warn("[melody3d] livery", e); } }
     // Antidote's car + review screen: once the review is unlocked (7 Drizzle emblems) or past EGG_SCORE, one city strip ahead gets them
     const unlocked = G.running && !G.debug && ((G.dz || 0) >= M.DRIZ_N || G.score >= (M.EGG_SCORE || 3000)), live = new Set(), camZ = cam.position.z;
     let built = 0;   // at most one new ground strip is built per frame (building one is a few ms of CPU; two at once was a dropped frame)
@@ -1175,7 +1176,7 @@ async function boot() {
   // a round lands on an enemy (index.html dmgEn): a burst of sparks + a hot flash on the aircraft itself (the HUD draws the hit marker)
   const HEV = new THREE.Vector3(), HEN = new THREE.Vector3(0, .3, 1);
   M.onHitEn = (en, x, y, d) => { if (!CHASE || !FXA) return; const Y = alt3(en, A[ALT_OF[en.t]] || A.air); HEV.set(x - W / 2, Y, far(y) - H / 2); const k = Math.min(2.2, .9 + (d || 1) * .35);
-    if (FXA.sparks) FXA.sparks(HEV, HEN, null, k, MOBILE ? 10 : 16); FXA.glow(HEV, 30 * k, [1, .8, .45], 1); if (en.hp <= 0 && FXA.boom) FXA.boom(HEV, .6); };
+    if (FXA.sparks) FXA.sparks(HEV, HEN, null, k, MOBILE ? 10 : 16); FXA.glow(HEV, 13 * k, [1, .6, .28], .75); if (en.hp <= 0 && FXA.boom) FXA.boom(HEV, .6); };   // (2026-11-27: a small orange impact flash, not a white bloom that hides the target)
   const HITS = []; M.onHurt = (x, y, es) => { if (CHASE && HITS.length < 6) HITS.push({ x, y, es }); };
   // a crate shot open: a flash, a pop of sparks and wood splinters where it was (index.html crateShot)
   M.onCrate = (x, y, z) => { if (!CHASE || !FXA) return; const Y = z != null ? z : A.item; V.set(wx(x, Y), Y, wz(y, Y)); FXA.glow(V, 40, [1, .85, .5], 1);

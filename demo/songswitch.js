@@ -2,7 +2,8 @@
    One <audio> per song, each through its own gain into the game's music bus, so a switch is a short crossfade.
    Nothing plays until the game calls attach()/sync() from a user tap (iOS audio unlock). The pick is saved per game.
      var MS = SongSwitch({ key: "melody-song", songs: [{ id, name, src }, ...], fade: .8, vol: .22 });   (vol = element volume if WebAudio routing fails;
-       playlist: true = when a song ends the next one starts, instead of looping the same song)
+       playlist: true = when a song ends the next one starts, instead of looping the same song;
+       shuffle: true = playlist in random order, starting on a random song every page load)
      MS.attach(audioContext, musicBusGainNode)   // from the first tap; falls back to element volume if routing fails
      MS.sync(shouldPlay)                         // play the current song or pause everything
      MS.next()                                   // switch to the next song (crossfade)
@@ -13,9 +14,14 @@
   var W = window;
   W.SongSwitch = function (O) {
     var songs = O.songs || [], key = O.key || "game-song", fade = O.fade || .8, i = 0, els = [], gains = [], ctx = null, bus = null, playing = false, btns = [], subs = [];
-    try { var s = localStorage.getItem(key); for (var k = 0; k < songs.length; k++) if (songs[k].id === s) i = k; } catch (e) {}
+    if (O.shuffle) { O.playlist = true; i = Math.floor(Math.random() * songs.length); }
+    else try { var s = localStorage.getItem(key); for (var k = 0; k < songs.length; k++) if (songs[k].id === s) i = k; } catch (e) {}
+    function pickNext() { if (!O.shuffle || songs.length < 2) return i + 1; var n; do { n = Math.floor(Math.random() * songs.length); } while (n === i); return n; }
     function el(n) { if (els[n]) return els[n]; var a = new Audio(); if (/^https?:/.test(songs[n].src)) a.crossOrigin = "anonymous"; a.src = songs[n].src; a.loop = !O.playlist;   /* playlist: true = play the songs in order (Storm Run 10-24: Energy kept repeating) */
-      if (O.playlist) a.addEventListener("ended", function () { if (playing && n === i) set(i + 1); }); a.preload = n === i ? "auto" : "none"; a.setAttribute("playsinline", ""); try { a.volume = O.vol || 1; } catch (e) {} els[n] = a;
+      if (O.playlist) a.addEventListener("ended", function () { if (!playing || els[i] !== a) return; var k = pickNext(); if (k % songs.length === i) { a.currentTime = 0; play(a); return; }
+        /* the next song plays in this same element: iPhone Safari only lets an <audio> start without a tap after a tap already started it */
+        k = ((k % songs.length) + songs.length) % songs.length; if (els[k]) { els[k].pause(); els[k].removeAttribute("src"); }
+        els[k] = a; gains[k] = gains[i]; els[i] = undefined; gains[i] = undefined; i = k; a.src = songs[k].src; play(a); label(); }); a.preload = n === i ? "auto" : "none"; a.setAttribute("playsinline", ""); try { a.volume = O.vol || 1; } catch (e) {} els[n] = a;
       if (ctx && bus) route(n); return a; }
     function route(n) { if (gains[n] !== undefined) return; try { var g = ctx.createGain(); g.gain.value = n === i ? 1 : 0; ctx.createMediaElementSource(els[n]).connect(g); g.connect(bus); gains[n] = g; els[n].volume = 1; } catch (e) { gains[n] = null; } }
     function level(n, v, now) { var g = gains[n]; if (g && ctx) { var t = ctx.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); if (now) g.gain.setValueAtTime(v, t); else g.gain.linearRampToValueAtTime(v, t + fade); }
@@ -32,7 +38,9 @@
     var api = {
       attach: function (c, b) { if (ctx) return; ctx = c; bus = b; for (var n = 0; n < els.length; n++) if (els[n]) route(n); el(i); },
       sync: function (on) { playing = !!on; var a = el(i); if (on) { level(i, 1, true); play(a); } for (var n = 0; n < els.length; n++) if (els[n] && (n !== i || !on)) els[n].pause(); },
-      next: function () { set(i + 1); }, set: function (id) { for (var n = 0; n < songs.length; n++) if (songs[n].id === id) set(n); },
+      next: function () { set(pickNext()); },
+      prime: function () { var a = el(i); if (a.paused) { play(a); if (!playing) a.pause(); } },   /* call inside a tap: unlocks this <audio> on iPhone */
+      set: function (id) { for (var n = 0; n < songs.length; n++) if (songs[n].id === id) set(n); },
       cur: function () { return songs[i]; }, routed: function () { return !!gains[i]; }, songs: songs, el: function () { return el(i); }, onChange: function (f) { subs.push(f); },
       button: function (host, cls, style) { if (!host) return null; var b = document.createElement("button"); b.type = "button"; b.className = cls || ""; if (style) b.setAttribute("style", style);
         b.addEventListener("click", function (e) { e.stopPropagation(); if (O.onTap) O.onTap(); api.next(); }); host.appendChild(b); btns.push(b); label(); return b; }

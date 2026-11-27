@@ -7,7 +7,7 @@
      const F = makeFacades(THREE, { size: 1024, pbr: true, time: { value: 0 } });
      instanced box geometry (unit box, base at y = 0) + geo.setAttribute("aVar", InstancedBufferAttribute(variant per building))
      mesh material = F.material (sides). F.pick(rng, h) → a variant for a building of height h; F.tint(rng, v) → instance colour.
-   aDmg (optional per-instance attribute, 0..1) darkens a broken building and kills its window lights.
+   aDmg (optional per-instance attribute, 0..1) turns a broken building ash grey and dims its window lights.
    pbr:false → Lambert (no normal/roughness: the cheap path for phones), same look otherwise. */
 export function makeFacades(THREE, O = {}) {
   const S = O.size || 1024, C = S / 2, B = C / 8;   // atlas size · cell · window bay (px)
@@ -88,12 +88,15 @@ export function makeFacades(THREE, O = {}) {
     sh.fragmentShader = sh.fragmentShader.replace("#include <emissivemap_fragment>", grad(THREE.ShaderChunk.emissivemap_fragment) + `
       { vec2 cell = floor(vTile * 8.0); float h = fract(sin(dot(cell + vec2(vId * 1.37, vId * .71), vec2(12.9898, 78.233))) * 43758.5453);
         float per = 4.0 + h * 18.0, ph = floor((uT + h * 97.0) / per); float on = step(.6, fract(sin(dot(cell + vec2(ph * 3.1, vId), vec2(39.35, 11.13))) * 24634.63));
-        totalEmissiveRadiance *= on * (1.0 - vDmg); diffuseColor.rgb *= 1.0 - vDmg * .6;
+        totalEmissiveRadiance *= on * (1.0 - vDmg * .8);
+        // a shot-up building goes dusty ash grey with a few windows still lit; it used to be multiplied toward black with every light out,
+        // and a dark glass tower then read as a solid black rectangle where the bullets land (Antidote, 2026-11-21: "erase that")
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.46, .43, .40), vDmg * .6);
         // street level: darker ground floor with storefront glass (lit at night) and a muted signage / awning band above it
         float hs = fract(sin(vId * 12.9898) * 43758.5453);
         if (vH < 4.6) { float bay = step(.12, fract(vTile.x * 4.0)) * step(.6, vH) * step(vH, 4.0); diffuseColor.rgb = mix(diffuseColor.rgb * .55, vec3(.05, .07, .09), bay * .85); totalEmissiveRadiance += vec3(1.0, .82, .55) * bay * .5 * step(.35, hs) * (1.0 - vDmg); }
         else if (vH < 5.6) diffuseColor.rgb = mix(vec3(.22, .16, .12), mix(vec3(.55, .2, .16), vec3(.16, .32, .36), step(.5, hs)), step(.3, hs)) * .9; }`); };
-  mat.customProgramCacheKey = () => "facades-v1-" + (O.pbr ? "pbr" : "lam");
+  mat.customProgramCacheKey = () => "facades-v2-" + (O.pbr ? "pbr" : "lam");
   // real LA / Westside / Venice palette: stucco off-white · cream · beige · sand · warm grey · light terracotta · pale peach, a few
   // muted painted commercial pastels; concrete greys; glass + brick barely tinted. Each building also gets a small random shift.
   const TINT = [["#f4efe6", "#efe4cf", "#e6d8bf", "#e3cfaa", "#d6d0c6", "#e7b9a0", "#f0d3bd", "#dfe3da", "#e2dbe6", "#e9e2c8"], ["#eef2f4", "#e4ebec", "#eceeea"], ["#efe7e2", "#e4d8d0", "#d8cdc6"], ["#e9e8e4", "#d8d7d3", "#cfcfcc", "#e2e0da"]];

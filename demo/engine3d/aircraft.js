@@ -23,6 +23,7 @@ export function upgradeAircraft(THREE, AIR, O = {}) {
   const NEW = {
     skin: phys(M.skin, { roughness: .34, metalness: .08, clearcoat: 1, clearcoatRoughness: .06 }),
     white: phys(M.white, { roughness: .34, metalness: .08, clearcoat: 1, clearcoatRoughness: .07 }),
+    ...(M.body ? { body: phys(M.body, { roughness: .34, metalness: .08, clearcoat: 1, clearcoatRoughness: .07 }) } : {}),   // (Melody airliner: nose + tail cone in the livery colour)
     wine: phys(M.wine, { roughness: .38, metalness: .1, clearcoat: 1, clearcoatRoughness: .05, sheen: .2 }),
     gold: phys(M.gold, { roughness: .2, metalness: .95, clearcoat: .6, clearcoatRoughness: .1 }),
     grey: phys(M.grey, { roughness: .28, metalness: .8 }),

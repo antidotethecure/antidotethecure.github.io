@@ -8,29 +8,48 @@
    makeDamage(THREE, fx, obj, pts) wounds on an aircraft: each hit leaves a scorched hole at a spot on the airframe, then the
                                    spot keeps trailing smoke; deeper damage adds flickering fire, low health = engine fire with
                                    black smoke. Used by melody3d.js and 3d-looks/look2.js. */
+// the paint jobs a run can get (AIR.livery(pickLivery())): white first = the classic Melody plane
+export const LIVERIES = [
+  { id: "white", body: "#f4f5f3", belly: "#d3d7dd", accent: "#a33645", stripe: "#d4af37", text: "#a33645" },
+  { id: "black", body: "#16181d", belly: "#24272e", accent: "#d4af37", stripe: "#d4af37", text: "#e6c25a" },
+  { id: "yellow", body: "#f3c418", belly: "#cfd3d9", accent: "#1b2a4a", stripe: "#1b2a4a", text: "#1b2a4a" },
+  { id: "red", body: "#b5162b", belly: "#cfd3d9", accent: "#f4f5f3", stripe: "#d4af37", text: "#ffffff" },
+  { id: "blue", body: "#1f5fae", belly: "#cfd3d9", accent: "#f3c418", stripe: "#f4f5f3", text: "#ffffff" },
+  { id: "silver", body: "#b9bfc7", belly: "#8e949c", accent: "#1d2330", stripe: "#a33645", text: "#1d2330" }];
+let lastLv = -1;
+export function pickLivery() { let i; do { i = Math.floor(Math.random() * LIVERIES.length); } while (i === lastLv); lastLv = i; return LIVERIES[i]; }   // never the same paint twice in a row
 export function buildAirliner(THREE, O = {}) {
   const TAU = Math.PI * 2, enemy = O.livery === "enemy";
   const mkc = (w, h) => { const c = document.createElement("canvas"); c.width = w; c.height = h; return c; };
   const canTex = (c) => { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
-  const WINE = enemy ? "#3b4250" : "#a33645", GOLD = enemy ? "#9aa3b0" : "#d4af37";
-  // fuselage skin: u = around (0 belly, .25 / .75 sides, .5 crown), v = tail (bottom of canvas) → nose (top)
+  /* LIVERIES (2026-11-27, Antidote: "look like an average plane that's flying over LAX ... each time they use a plane, it could be a
+     different color: a black plane, yellow plane, white plane"). body = fuselage, belly = lower fuselage, accent = cheatline + tail,
+     stripe = pinstripe + fin leading edge + intake lips, text = the "Melody" titles. AIR.livery(L) repaints the same textures. */
+  const L0 = enemy ? { body: "#c9ced6", belly: "#9ea4ad", accent: "#3b4250", stripe: "#9aa3b0", text: "" } : (O.livery && O.livery.body ? O.livery : LIVERIES[0]);
   const c = mkc(1024, 512), x = c.getContext("2d");
-  x.fillStyle = enemy ? "#c9ced6" : "#f7f7f4"; x.fillRect(0, 0, 1024, 512);
-  x.fillStyle = enemy ? "#9ea4ad" : "#d7dbe1"; x.fillRect(0, 0, 90, 512); x.fillRect(934, 0, 90, 512);           // belly
-  x.strokeStyle = "rgba(90,96,110,.28)"; x.lineWidth = 1.2;
+  const paint = (L) => {
+  const WINE = L.accent, GOLD = L.stripe;
+  // fuselage skin: u = around (0 belly, .25 / .75 sides, .5 crown), v = tail (bottom of canvas) → nose (top)
+  x.fillStyle = L.body; x.fillRect(0, 0, 1024, 512);
+  x.fillStyle = L.belly; x.fillRect(0, 0, 150, 512); x.fillRect(874, 0, 150, 512);           // belly (a real airliner's lower third is often grey)
+  const dk = /^#[0-4]/.test(L.body);   // dark paint: light seams + light window frames
+  x.strokeStyle = dk ? "rgba(200,205,215,.16)" : "rgba(90,96,110,.28)"; x.lineWidth = 1.2;
   for (let v = 18; v < 512; v += 34) { x.beginPath(); x.moveTo(0, v); x.lineTo(1024, v); x.stroke(); }          // frame seams (rings)
   for (const u of [.1, .19, .31, .4, .6, .69, .81, .9]) { x.beginPath(); x.moveTo(u * 1024, 0); x.lineTo(u * 1024, 512); x.stroke(); }   // stringer seams
-  x.strokeStyle = "rgba(70,74,86,.55)"; x.lineWidth = 2;
+  x.strokeStyle = dk ? "rgba(210,214,222,.4)" : "rgba(70,74,86,.55)"; x.lineWidth = 2;
   [[40, 150, 66], [944, 150, 66], [30, 300, 50], [954, 300, 50]].forEach(([u, v, h]) => x.strokeRect(u, v, 50, h));   // main + nose gear doors
   [[.25, 1], [.75, -1]].forEach(([u, d]) => { const X = u * 1024;
     x.fillStyle = WINE; x.fillRect(X + d * 6 - 10, 0, 20, 512);                                                      // cheatline
-    x.fillStyle = GOLD; x.fillRect(X - d * 12 - 3, 0, 6, 512);                                                       // gold pinstripe
-    x.fillStyle = "#1a2232"; for (let v = 70; v < 448; v += 11) if (Math.abs(v - 256) > 9) { x.beginPath(); x.roundRect ? x.roundRect(X + d * 30 - 5, v, 10, 6.5, 3) : x.rect(X + d * 30 - 5, v, 10, 6.5); x.fill(); }
-    x.strokeStyle = "rgba(60,64,76,.8)"; x.lineWidth = 2; [52, 246, 452].forEach(v => x.strokeRect(X + d * 30 - 9, v, 18, 22));   // doors
-    if (!enemy) { x.save(); x.translate(X + d * 52, 120); x.rotate(-d * Math.PI / 2); x.fillStyle = GOLD; x.font = "italic 900 30px Georgia,serif"; x.textAlign = "center"; x.fillText("Melody", 0, 10); x.restore(); } });
+    x.fillStyle = GOLD; x.fillRect(X - d * 12 - 3, 0, 6, 512);                                                       // pinstripe
+    x.fillStyle = dk ? "#cfd6e2" : "#1a2232"; for (let v = 70; v < 448; v += 11) if (Math.abs(v - 256) > 9) { x.beginPath(); x.roundRect ? x.roundRect(X + d * 30 - 5, v, 10, 6.5, 3) : x.rect(X + d * 30 - 5, v, 10, 6.5); x.fill(); }
+    if (dk) { x.fillStyle = "#0e1420"; for (let v = 70; v < 448; v += 11) if (Math.abs(v - 256) > 9) x.fillRect(X + d * 30 - 3.5, v + 1.2, 7, 4); }   // dark glass inside light frames
+    x.strokeStyle = dk ? "rgba(210,214,222,.8)" : "rgba(60,64,76,.8)"; x.lineWidth = 2; [52, 246, 452].forEach(v => x.strokeRect(X + d * 30 - 9, v, 18, 22));   // doors
+    if (L.text) { x.save(); x.translate(X + d * 52, 120); x.rotate(-d * Math.PI / 2); x.fillStyle = L.text; x.font = "italic 900 30px Georgia,serif"; x.textAlign = "center"; x.fillText("Melody", 0, 10); x.restore(); } }); };
+  paint(L0);
+  const WINE = L0.accent, GOLD = L0.stripe;
   const skinT = canTex(c);
   const std = (col, o) => new THREE.MeshStandardMaterial(Object.assign({ color: col, roughness: .32, metalness: .15 }, o || {}));
-  const mats = { skin: std(0xffffff, { map: skinT, roughness: .28 }), white: std(enemy ? 0xc9ced6 : 0xf3f3f0), wine: std(new THREE.Color(WINE).getHex(), { roughness: .4 }),
+  const mats = { skin: std(0xffffff, { map: skinT, roughness: .28 }), body: std(new THREE.Color(L0.body).getHex()), white: std(enemy ? 0xc9ced6 : 0xe9ebee), wine: std(new THREE.Color(WINE).getHex(), { roughness: .4 }),
     gold: std(new THREE.Color(GOLD).getHex(), { roughness: .22, metalness: .85, emissive: enemy ? 0 : 0x3a2800, emissiveIntensity: .35 }), grey: std(0xb8bdc6, { roughness: .3, metalness: .55 }),
     dark: std(0x22262e, { roughness: .5, metalness: .4 }), glass: std(0x0d1420, { roughness: .05, metalness: .9 }), fan: std(0xd5d9de, { roughness: .2, metalness: .9 }), hot: new THREE.MeshBasicMaterial({ color: 0xff8a3a, toneMapped: false }) };
   const g = new THREE.Group();
@@ -44,8 +63,8 @@ export function buildAirliner(THREE, O = {}) {
   const slab = (sh, t, dih) => { const geo = new THREE.ExtrudeGeometry(sh, { depth: t, bevelEnabled: false }); geo.rotateX(Math.PI / 2); geo.translate(0, t / 2, 0); const a = geo.attributes.position; for (let i = 0; i < a.count; i++) a.setY(i, a.getY(i) + Math.abs(a.getX(i)) * (dih || 0)); return geo; };
   // fuselage, nose, tail cone, cockpit glass, wing-body fairing
   const fus = new THREE.CylinderGeometry(2, 2, 27, 32, 1, true); fus.rotateX(Math.PI / 2); add(fus, mats.skin);
-  const nose = new THREE.SphereGeometry(2, 28, 14, 0, TAU, 0, Math.PI / 2); nose.rotateX(Math.PI / 2); nose.scale(1, 1, 1.9); add(nose, mats.white, 0, 0, 13.5);
-  const tail = new THREE.CylinderGeometry(2, .42, 8, 28, 1, true); tail.rotateX(Math.PI / 2); add(tail, mats.white, 0, .25, -17.5);
+  const nose = new THREE.SphereGeometry(2, 28, 14, 0, TAU, 0, Math.PI / 2); nose.rotateX(Math.PI / 2); nose.scale(1, 1, 1.9); add(nose, mats.body, 0, 0, 13.5);
+  const tail = new THREE.CylinderGeometry(2, .42, 8, 28, 1, true); tail.rotateX(Math.PI / 2); add(tail, mats.body, 0, .25, -17.5);
   add(merge([[new THREE.BoxGeometry(1.15, .55, 1.4), M4(-.75, .95, 15.6, 1, -.55, -.32)], [new THREE.BoxGeometry(1.15, .55, 1.4), M4(.75, .95, 15.6, 1, -.55, .32)], [new THREE.BoxGeometry(.9, .5, 1.2), M4(-1.55, .55, 14.9, 1, -.3, -.9)], [new THREE.BoxGeometry(.9, .5, 1.2), M4(1.55, .55, 14.9, 1, -.3, .9)]]), mats.glass);
   const fair = new THREE.CapsuleGeometry(1.6, 9, 4, 12); fair.rotateX(Math.PI / 2); fair.scale(1.35, .7, 1); add(fair, mats.white, 0, -1.55, -.5);
   // wings (dihedral) with slats, flap lines and winglets; tailplanes
@@ -65,8 +84,8 @@ export function buildAirliner(THREE, O = {}) {
   const lz = 19.4 - 12.6, ly = 9.6 - 1.4, lead = new THREE.CylinderGeometry(.26, .26, 1, 8).applyMatrix4(new THREE.Matrix4().makeScale(1, Math.hypot(lz, ly), 1)).applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.atan2(lz, ly))).translate(0, (1.4 + 9.6) / 2, -(12.6 + 19.4) / 2);
   const ENG = [-6.4, 6.4], ey = -2.3, ez = 1.6, lip = new THREE.TorusGeometry(1.02, .17, 10, 26);
   add(merge([[lead, M4(0, 0, 0)]].concat(ENG.map(e => [lip, M4(e, ey, ez + 2.3)]))), mats.gold);
-  if (!enemy) { const nc = mkc(128, 128), nx = nc.getContext("2d"); nx.fillStyle = "#e6c25a"; nx.font = "900 104px Georgia,serif"; nx.textAlign = "center"; nx.textBaseline = "middle"; nx.fillText("♪", 64, 70);
-    const noteM = new THREE.MeshStandardMaterial({ map: canTex(nc), transparent: true, alphaTest: .3, roughness: .3, metalness: .5, emissive: 0x6a4800, emissiveIntensity: .6, side: THREE.DoubleSide });
+  let noteM = null; if (!enemy) { const nc = mkc(128, 128), nx = nc.getContext("2d"); nx.fillStyle = "#ffffff"; nx.font = "900 104px Georgia,serif"; nx.textAlign = "center"; nx.textBaseline = "middle"; nx.fillText("♪", 64, 70);
+    noteM = new THREE.MeshStandardMaterial({ map: canTex(nc), color: new THREE.Color(L0.text || "#e6c25a"), transparent: true, alphaTest: .3, roughness: .3, metalness: .5, emissive: 0x3a2a00, emissiveIntensity: .35, side: THREE.DoubleSide });
     [-1, 1].forEach(s => { const ng = new THREE.PlaneGeometry(3.8, 3.8); ng.rotateY(s * Math.PI / 2); add(ng, noteM, s * .26, 5.3, -19.1).castShadow = false; }); }
   // engines: nacelles, pylons, dark intakes, spinning fans (blades + spinner), exhaust cones with a hot ring
   const nac = new THREE.LatheGeometry([new THREE.Vector2(.98, 2.3), new THREE.Vector2(1.12, 1.4), new THREE.Vector2(1.08, -1.2), new THREE.Vector2(.82, -2.3)], 28); nac.rotateX(Math.PI / 2);
@@ -99,7 +118,10 @@ export function buildAirliner(THREE, O = {}) {
     mL.rotation.z = -r; mR.rotation.z = r; nz.rotation.x = -r; legs.forEach(l => { l.visible = k > .02; }); };
   legs.forEach(l => { l.visible = false; });
   node.traverse(n => { if (n.isMesh) n.material.userData.keep = 1; });
-  return { node, size, pts, fans, mats, gear, spin(t) { fans.forEach((f, i) => { f.rotation.z = t * (i ? 41 : -43); }); } };
+  // repaint for a new run: fuselage texture, nose + tail cone, tail/winglets (accent), pinstripe/lips (stripe)
+  const livery = (L) => { if (enemy || !L) return; paint(L); skinT.needsUpdate = true; mats.body.color.set(L.body); mats.wine.color.set(L.accent); mats.gold.color.set(L.stripe);
+    mats.gold.emissive && mats.gold.emissive.set(/^#[0-4]/.test(L.stripe) ? 0x000000 : 0x2a1c00); if (noteM) noteM.color.set(L.text || "#ffffff"); };
+  return { node, size, pts, fans, mats, gear, livery, spin(t) { fans.forEach((f, i) => { f.rotation.z = t * (i ? 41 : -43); }); } };
 }
 
 /* ---------- one billboard particle system: smoke (normal blend) + fire/glow (additive) ---------- */

@@ -26,7 +26,8 @@ import { buildCars } from "../engine3d/carmodels.js?v=e3t";
    glass lettering (the gold logo boards use the real artwork, img/logo.png). */
 export const MELODY_SIGN_TEXT = "MELODY BAR & GRILL";
 // seconds of FLIGHT between two review billboards (they alternate right, left, right…); tune here
-export const BB_GAP_S = 50;
+// (2026-11-27, Antidote: "more of my billboard animations of the food review playing from the beginning of the match": 50 → 30 s, and the first is due at take-off)
+export const BB_GAP_S = 30;
 export function makeWorld(THREE, O = {}) {
   const TAU = Math.PI * 2, BASE = O.base || "";
   const rng = (seed) => { let s = (seed * 2654435761) | 0; return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
@@ -189,11 +190,13 @@ export function makeWorld(THREE, O = {}) {
     debrisM.setColorAt(dbi, QC.set(col || (Math.random() < .5 ? "#8b8680" : "#5d5a56"))); } debrisM.instanceColor.needsUpdate = true; }
   // the digital billboards playing Antidote's Melody review (one shared muted, inline, looping video; poster if autoplay is blocked)
   let VB = null; const vboards = () => VB || (VB = makeVideoBoards(THREE, { src: BASE + "img/review/billboard.mp4?v=4k1", poster: BASE + "img/review/billboard.jpg?v=4k1" }));
-  // the review billboard shows up about once per 2 minutes of flight (O.clock = seconds flown); the first one ~1 minute in.
+  // the review billboard shows up every BB_GAP_S of flight (O.clock = seconds flown); the first one on the first strip of each run.
   // The Venice pier board counts toward the same budget. Warm-up strips (o.warm) always get one so its shader is compiled early.
   // Sides alternate (left, right, left…); boards are never back to back (≥ 120 s of flight apart, so two are never on screen together).
-  let bbLast = O.bbFirst != null ? O.bbFirst : -BB_GAP_S * .6, bbSide = 1, WARM = false;
-  const bbDue = (side) => { if (WARM) return side || 1; const t = O.clock ? O.clock() : performance.now() / 1000; if (t - bbLast < (O.bbGap || BB_GAP_S)) return 0;
+  let bbLast = O.bbFirst != null ? O.bbFirst : -1e9, bbRun = null, bbSide = 1, WARM = false;
+  const bbDue = (side) => { if (WARM) return side || 1; const t = O.clock ? O.clock() : performance.now() / 1000;
+    const run = O.zoneKey ? O.zoneKey().split("|")[0] : ""; if (run !== bbRun) { bbRun = run; if (O.bbFirst == null) bbLast = -1e9; }   // a new run: the first strip gets one
+    if (t - bbLast < (O.bbGap || BB_GAP_S)) return 0;
     if (side && side !== bbSide) return 0;   // a fixed-side board (the pier) only when it's that side's turn
     bbLast = t; const s = bbSide; bbSide = -bbSide; return s; };
   const boardsAll = [];
@@ -267,7 +270,7 @@ export function makeWorld(THREE, O = {}) {
     for (let i = BURN.length - 1; i >= 0; i--) { const b = BURN[i]; b.t -= dt; if (b.t <= 0 || b.net.disposed) BURN.splice(i, 1); } }
   // the ground slid sideways under you (lateral roam, melody3d.js): world-space leftovers (debris, toppling tops) slide with it
   function shift(dx) { for (const d of DB) if (d.life > 0) d.p.x += dx; for (const T of TOP) if (T.t >= 0) T.pv.position.x += dx; }
-  const lmCount = {}; let ZK = null;   // landmark census (tests): kind -> how many built this zone visit (ZK = which visit)
+  const lmCount = {}; let ZK = null, HBV = { k: "", n: 0 };   // HBV: Boulevard strips built this Hollywood visit (resets on a new run or district, not on a level change)   // landmark census (tests): kind -> how many built this zone visit (ZK = which visit)
 
   /* ---------- pieces ---------- */
   function cars(seg, R, n, len, lanes) {   // n cars on the given lanes; each lane: [axis "z"|"x", coord, dir]
@@ -502,8 +505,9 @@ export function makeWorld(THREE, O = {}) {
     if (seg.roads) seg.roads.push({ grid: 1, ox, aves: AVE, strs: streetsOf(len), x0: ox - XW / 2, x1: ox + XW / 2 });
     if (seg.blocked && !o.noAuditBlock) blk.forEach(b => seg.blocked.push([b[0] + ox, b[1], b[2], b[3]]));
     // a review billboard beside the flight path on most city strips (in the lot between the 1st and 2nd avenue)
-    let sd0; if (!o.noBillboard && (sd0 = bbDue())) { const sd = sd0, bx = sd * (196 + R() * 26), bz = (R() - .5) * len * .45; clear.push([bx, bz, 90, 60]); billboard(seg.group, bx, bz, -sd * .28); }
     const free = (x, z, w, d) => !clear.some(c => Math.abs(x - c[0]) < (w + c[2]) / 2 && Math.abs(z - c[1]) < (d + c[3]) / 2);
+    let sd0; if (!o.noBillboard && (sd0 = bbDue())) { let sd = sd0, bx = sd * (196 + R() * 26); const bz = (R() - .5) * len * .45; if (!free(bx, bz, 90, 60)) { sd = -sd; bx = -bx; }   // a landmark's lot on that side: the other side
+      if (free(bx, bz, 90, 60)) { clear.push([bx, bz, 90, 60]); billboard(seg.group, bx, bz, -sd * .28); } }
     // the weekly high-score sign: never on a strip that has the review screen, never on a landmark's lot (warm-up strips always get one: texture + shader ready early)
     if (!o.noBillboard && (WARM || (!sd0 && hsDue()))) { const sd = WARM ? -1 : bbSide, bx = sd * (196 + R() * 14), bz = (R() - .5) * len * .45; console.assert(WARM || !sd0, "[world3d] high-score sign on a review-screen strip");
       if (free(bx, bz, 124, 56)) { clear.push([bx, bz, 130, 60]); hiBoard(seg.group, bx, bz, -sd * .4); if (!WARM) hsLast = O.clock ? O.clock() : performance.now() / 1000; } }
@@ -1247,10 +1251,10 @@ export function makeWorld(THREE, O = {}) {
     if (quads.length) { const g = new THREE.BufferGeometry(), pos = [], nor = [], uvs = []; quads.forEach(([q, m]) => { const n = q.toNonIndexed().applyMatrix4(m); pos.push(...n.attributes.position.array); nor.push(...n.attributes.normal.array); uvs.push(...n.attributes.uv.array); });
       g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2)); const wm = mesh(g, starMat()); wm.renderOrder = 1; seg.group.add(wm); }
     // the theatre (west side, mid-block): dark facade, a marquee canopy over the sidewalk with chasing bulbs, a blade sign, the red carpet
-    const tx = ax - ROAD / 2 - SIDE - 38, T = new THREE.Group(); T.position.set(tx, 0, vz); seg.group.add(T); seg.blocked.push([tx, vz, 76, 84]);
+    const tx = ax - ROAD / 2 - SIDE - 38, T = new THREE.Group(); T.position.set(tx, 0, vz); if (pick.thr) { seg.group.add(T); seg.blocked.push([tx, vz, 76, 84]); }   // (the theatre is only put in the scene on its one strip a visit)
     const rx = ax + ROAD / 2 + SIDE + 36; if (pick.rec && LM("records", seg.group, rx, vz, 62, 0)) { seg.blocked.push([rx, vz, 66, 66]); lmCount.records = (lmCount.records || 0) + (WARM ? 0 : 1); }   // the round record tower across the Boulevard: now only on the strips picked for it
     if (pick.diner) diner(seg, DINER_X, vz);
-    console.assert(WARM || (lmCount.records || 0) * 3 <= (lmCount.walkOfFame || 0) + 3, "[world3d] the record tower is back on nearly every Boulevard strip");
+    console.assert(WARM || (lmCount.records || 0) <= 1, "[world3d] the record tower was built twice in one Hollywood visit");
     if (!LM("pagoda", T, 5, 0, 84, Math.PI / 2))
     T.add(mesh(new THREE.BoxGeometry(70, 30, 80).translate(0, 15, 0), new THREE.MeshStandardMaterial({ color: 0x3a1c22, roughness: .7 })), mesh(new THREE.BoxGeometry(72, 2, 82).translate(0, 31, 0), M.dark), mesh(new THREE.BoxGeometry(1.2, 3.2, 82).translate(35.6, 31, 0), M.gold));
     T.add(mesh(new THREE.BoxGeometry(12, 3, 60).translate(38, 16, 0), new THREE.MeshStandardMaterial({ color: 0x1a0e10, roughness: .5, emissive: 0x401010, emissiveIntensity: .5 })));
@@ -1264,7 +1268,8 @@ export function makeWorld(THREE, O = {}) {
     T.add(mesh(new THREE.PlaneGeometry(150, 130).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffc890, opacity: .45, toneMapped: false }), 40, .9, 0));
     // the people: fans behind the far rope + across the street (cheering / waving / filming), photographers by the near rope, guests on the carpet
     const fans = [], snaps = [], walkers = [];
-    if (E) { const C = BEACH.makeCrowdE(E, seg.group), VIBE = ["cheer", "wave", "phone", "cheer", "text", "laugh", "wave"];
+    if (!pick.thr) {}   // no theatre on this strip: no premiere crowd
+    else if (E) { const C = BEACH.makeCrowdE(E, seg.group), VIBE = ["cheer", "wave", "phone", "cheer", "text", "laugh", "wave"];
       for (let i = 0; i < Math.round(16 * dens); i++) { const c = C.add("street", R, { x: tx + 46.3 + R() * .6, z: vz - 34 + R() * 68, ry: -Math.PI / 2, pose: "stand" }); c.idle = VIBE[(R() * VIBE.length) | 0]; fans.push(c); }
       for (let i = 0; i < Math.round(12 * dens); i++) { const c = C.add("street", R, { x: ax + ROAD / 2 + 3 + R() * 5, z: vz - 50 + R() * 100, ry: -Math.PI / 2, pose: "stand" }); c.idle = VIBE[(R() * VIBE.length) | 0]; fans.push(c); }
       for (let i = 0; i < 6; i++) { const c = C.add("street", R, { x: tx + 44.6, z: vz - 28 + i * 11, ry: -Math.PI / 2, pose: "stand" }); c.idle = "phone"; snaps.push(c); }
@@ -1273,7 +1278,7 @@ export function makeWorld(THREE, O = {}) {
     else { const sp = []; for (let i = 0; i < 20; i++) sp.push([tx + 46.3 + R() * .6, vz - 34 + R() * 68, -Math.PI / 2, -1]); for (let i = 0; i < 6; i++) sp.push([tx + 44.6, vz - 28 + i * 11, -Math.PI / 2, -1]); people(seg, R, sp, true); }
     // searchlights: six beams from the theatre's roof + the far sidewalk, sweeping (they fade in with the dusk, like Melody's)
     if (!BEAM_G) { BEAM_G = new THREE.CylinderGeometry(10, 1.6, 340, 12, 1, true).translate(0, 170, 0); SHARED.add(BEAM_G); }
-    const beams = [[tx - 20, 32, vz - 30], [tx - 20, 32, vz + 30], [tx + 10, 32, vz], [ax + 40, 0, vz - 120], [ax + 40, 0, vz + 120], [ax - 60, 0, vz + 200]].map(p => { const b = mesh(BEAM_G, M.beam, p[0], p[1], p[2]); seg.group.add(b); return b; });
+    const beams = (pick.thr ? [[tx - 20, 32, vz - 30], [tx - 20, 32, vz + 30], [tx + 10, 32, vz]] : []).concat([[ax + 40, 0, vz - 120], [ax + 40, 0, vz + 120], [ax - 60, 0, vz + 200]]).map(p => { const b = mesh(BEAM_G, M.beam, p[0], p[1], p[2]); seg.group.add(b); return b; });
     const SLB = inst(new THREE.CylinderGeometry(3, 3.6, 4, 10).translate(0, 2, 0), M.dark, beams.length); beams.forEach((b, i) => set(SLB, i, b.position.x, b.position.y, b.position.z, 0)); seg.group.add(SLB);
     // bulb strings strung across the Boulevard every half block
     const sb = []; for (let z = -len / 2 + 40; z < len / 2; z += 70) { if (r.ST.some(q => Math.abs(q - z) < ROAD)) continue; for (let k = 0; k <= 14; k++) { const u = k / 14; sb.push([ax - ROAD / 2 - 4 + u * (ROAD + 8), 24 - Math.sin(u * Math.PI) * 5, z]); } }
@@ -1293,7 +1298,7 @@ export function makeWorld(THREE, O = {}) {
       const ch = (t * 8 | 0) % 4; for (let i = 0; i < mb.length; i++) { const on = (i + ch) % 4 ? 1.9 : .35; mq.instanceColor.setXYZ(i, on, on * .85, on * .55); } mq.instanceColor.needsUpdate = true;
       if (near && FX && FX.glow) { for (const c of snaps) if (Math.random() < dt * 1.6) FX.glow(SMP.set(seg.group.position.x + c.x, 7.5, seg.group.position.z + c.z), 16, [1, 1, 1], 1);
         for (let k = 0; k < 2; k++) if (Math.random() < dt * 3 && fans.length) { const c = fans[(Math.random() * fans.length) | 0]; FX.glow(SMP.set(seg.group.position.x + c.x, 8, seg.group.position.z + c.z), 7, [.85, .9, 1], .9); } } });   // camera flashes + phone screens
-    seg.premiere = { x: tx, z: vz }; seg.focus = { x: tx + 40, z: vz, y: 6, d: 200, h: 95 }; lmCount.walkOfFame = (lmCount.walkOfFame || 0) + (WARM ? 0 : 1); }
+    if (pick.thr) { seg.premiere = { x: tx, z: vz }; seg.focus = { x: tx + 40, z: vz, y: 6, d: 200, h: 95 }; } lmCount.walkOfFame = (lmCount.walkOfFame || 0) + (WARM ? 0 : 1); }
 
   /* THE 105 (2026-10-19, Antidote's route part 2): the Glenn Anderson Freeway down the middle of the flight lane. Four lanes each way
      with traffic both directions, the Metro C Line (Green Line) tracks + catenary + a train in the median, concrete median barriers,
@@ -1458,10 +1463,11 @@ export function makeWorld(THREE, O = {}) {
     else if (kind === "f105") freeway105(seg, R, len);
     else if (kind === "sofi") sofi(seg, R, len, side);
     else if (kind === "inglewood") inglewood(seg, R, len);
-    else if (kind === "hwdblvd") { const vz = midBlock(len).zc, tx = HB_X - ROAD / 2 - SIDE - 38, n = lmCount.walkOfFame || 0, pick = { diner: WARM || n % 6 === 0, rec: WARM || n % 6 === 3 }, clear = [[tx, vz, 90, 96]];
-      // (2026-11-21, Antidote: "not so many Capitol buildings") the record tower stood on EVERY Boulevard strip, 12 in 40 seconds. Of every 6 strips now: the 1st has the diner, the 4th the tower, the others neither (the warm-up strip builds both)
+    else if (kind === "hwdblvd") { const vz = midBlock(len).zc, tx = HB_X - ROAD / 2 - SIDE - 38, vk = O.zoneKey ? O.zoneKey().replace(/\|[^|]*\|/, "|") : "", n = WARM ? 0 : (HBV.k === vk ? HBV.n : (HBV.k = vk, HBV.n = 0)); if (!WARM) HBV.n++;
+      // (2026-11-27, Antidote: "nothing repeating continuously ... like the Capitol building in Hollywood") each Boulevard landmark is built ONCE a visit: the premiere theatre on the 2nd strip, the record tower on the 5th, the diner on the 10th (the warm-up strip builds all three)
+      const pick = { thr: WARM || n === 1, rec: WARM || n === 4, diner: WARM || n === 9 }, clear = pick.thr ? [[tx, vz, 90, 96]] : [];
       if (pick.rec) clear.push([HB_X + ROAD / 2 + SIDE + 36, vz, 72, 72]); if (pick.diner) clear.push([DINER_X, vz, 104, 96]);
-      hollywoodBlvd(seg, R, len, city(seg, R, len, { cars: 26, hmul: .85, reserve: [HB_X], noBillboard: true, clear }), vz, pick); }
+      hollywoodBlvd(seg, R, len, city(seg, R, len, { cars: 26, hmul: .85, reserve: [HB_X], clear }), vz, pick); }
     else if (kind === "irvine") city(seg, R, len, { style: "oc", cars: 26, hmul: .5, hmin: 18, palmGap: 64, bstyle: (R2) => R2() < .55 ? 1 : R2() < .6 ? 3 : 0, tints: { 0: ["#f3eee4", "#efe6d6", "#e8dcc6"], 1: ["#b9c9d6", "#9fb4c4", "#cfd9e0"], 3: ["#e9e5dc", "#ddd7cc"] } });
     else if (kind === "dtla") { const mb = midBlock(len); city(seg, R, len, { tall: 2, hmul: 1.6, cars: 32, clear: [[side * 640, mb.zc, 110, 110], [-side * 650, mb.zc, 100, 80]], bstyle: (R2, h) => h > 90 ? (R2() < .7 ? 1 : 3) : FAC.pick(R2, h) }); dtlaIcons(seg, side, mb.zc); }
     else if (kind === "valley") { city(seg, R, len, { res: true, mixed: true, style: "res", cars: 26, hmul: .4, palmGap: 60, bstyle: (R2) => R2() < .7 ? 0 : 3, tints: { 0: ["#e9dcc3", "#d9c7a7", "#efe6d6", "#cdb998"] } }); ridges(seg, R, len, 1); }

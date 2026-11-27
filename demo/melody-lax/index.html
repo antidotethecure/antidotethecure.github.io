@@ -21,9 +21,9 @@
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/utils/BufferGeometryUtils.js">
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/libs/meshopt_decoder.module.js">
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/environments/RoomEnvironment.js">
-<link rel="modulepreload" href="melody3d.js?v=fs12">
-<link rel="modulepreload" href="air3d.js?v=ex2">
-<link rel="modulepreload" href="world3d.js?v=ex2.hs8">
+<link rel="modulepreload" href="melody3d.js?v=fs13">
+<link rel="modulepreload" href="air3d.js?v=ex3">
+<link rel="modulepreload" href="world3d.js?v=ex2.hs9">
 <link rel="modulepreload" href="beach3d.js?v=dx1">
 <link rel="modulepreload" href="../engine3d/quality.js?v=e3t">
 <link rel="modulepreload" href="../engine3d/billboard.js?v=e3t">
@@ -46,7 +46,7 @@
 <link rel="modulepreload" href="../engine3d/blimp.js?v=e3t">
 <script src="../lang-th.js"></script>
 <script src="../gamepad.js?v=20261017gp3"></script>
-<script src="../songswitch.js?v=ms1"></script>
+<script src="../songswitch.js?v=ms4"></script>
 <script src="../radio-avatar.js?v=rs1"></script>
 <script>/* ===== MELODY REWARDS: the ONE place to change the program (Christian's feedback, 2026-10). =====
    One points balance for Melody (separate from Nalu Vida). The rewards card, the "How to earn" sheet, the game's
@@ -842,13 +842,16 @@ var SEQ=["hills","hills","hills","coast","venice","coast","city","towers","melod
    LAX → Melody (Westchester) → Venice / Nalu Vida → Santa Monica → Hollywood, then a banking turn through the clouds back down
    the coast to Long Beach → Compton → the San Gabriels → Orange County → downtown LA → the San Fernando Valley, then home to LAX.
    seq: the ground strips of that district, looped while you're in it (kinds built by world3d.js). Survival keeps cycling the route. */
-/* mid: a one-off landmark strip, built once a visit so it rolls under you about halfway through the district (2026-11-16, Antidote:
+/* the Hollywood sign (marks below): a one-off landmark strip, built once a visit so it rolls under you about halfway through the district (2026-11-16, Antidote:
    "I don't want it to keep repeating the Hollywood sign" -- the Boulevard with the stars runs the whole way, the sign comes once, in the middle) */
-var ZONES=[{id:"hollywood",name:"Hollywood",seq:["hwdblvd","hwdblvd","hwdblvd","hills"],mid:"hollywood",loop:1},
-  {id:"venice",name:"Nalu Vida · Venice Beach",seq:["coast","venice","coast","city"]},
-  {id:"melody",name:"Melody · Inglewood",seq:["melody","city","sofi","inglewood","city"]},
+/* marks (2026-11-27, Antidote: "make sure that there's nothing repeating continuously on the maps"): every big landmark strip is a
+   one-off, built once a visit at its share of the district's flight time ([kind, 0..1]); seq is only the plain filler strips between them.
+   Melody (his client) shows twice: as you arrive and again near the end. */
+var ZONES=[{id:"hollywood",name:"Hollywood",seq:["hwdblvd","hwdblvd","hwdblvd","hills"],marks:[["hollywood",.5]],loop:1},
+  {id:"venice",name:"Nalu Vida · Venice Beach",seq:["coast","city","coast"],marks:[["venice",.4]]},
+  {id:"melody",name:"Melody · Inglewood",seq:["city","city","towers"],marks:[["melody",.08],["sofi",.36],["inglewood",.62],["melody",.88]]},
   {id:"lax105",name:"The 105",seq:["f105","f105","f105"]},
-  {id:"compton",name:"Compton",seq:["civic","compton","compton","compton","compton","compton"]},
+  {id:"compton",name:"Compton",seq:["compton"],marks:[["civic",.45]]},
   {id:"longbeach",name:"Long Beach",seq:["longbeach","harbor","harbor"]}];
 /* ROUTE ORDER (2026-11-15, Antidote): take off from LAX · 1 Hollywood · 2 Venice Beach + Nalu Vida · 3 Melody + Inglewood · 4 the 105 ·
    5 Compton · 6 Long Beach. He asked for Venice + Nalu Vida back without naming a slot: it sits after Hollywood because that is the
@@ -876,12 +879,12 @@ function addSeg(){ var k=G.landing&&!G.rwyQueued?(G.rwyQueued=1,"runway"):nextKi
   if(k==="runway"){ G.gy-=520; G.ground.push({k:k,t:"city2",y:G.gy,h:520,side:1}); return; }
   var opts=TILE_OF[k]||["city1"], t=opts[(tileN++)%opts.length], h=TILES[t]?TILES[t].h:600; G.gy-=h; G.ground.push({k:k,t:t,y:G.gy,h:h,side:Math.random()<.5?-1:1}); }
 // the next ground strip: the 3D chase view follows the route (the district of the current level); the 2D top view keeps its old photo loop
-function zoneReset(zi){ G.zi=zi; G.zs=0; G.zel=G.el||0; G.zmid=0; }
+function zoneReset(zi){ G.zi=zi; G.zs=0; G.zel=G.el||0; G.zmk=0; }
 // shortcut: MID_LEAD (time from a strip being built at the horizon to it passing under the plane) is a fixed 12 s; tune it if the flight speed changes
 var MID_LEAD=12000;
 function zoneMs(zi){ var t=CALM?CALM_ZONE:ZONE_OF_LV, n=0; for(var i=0;i<t.length;i++) if(t[i]===zi) n++; return Math.max(1,n)*LEG_MS; }
 function nextKind(){ if(!CH) return SEQ[G.seq++%SEQ.length]; var zi=zoneNow(); if(G.zi!==zi) zoneReset(zi); var z=ZONES[zi];
-  if(z.mid&&!G.zmid&&G.running&&(G.el||0)-G.zel>=zoneMs(zi)/2-MID_LEAD){ G.zmid=1; return z.mid; }
+  var mk=z.marks; if(mk&&G.zmk<mk.length&&G.running&&(G.el||0)-G.zel>=zoneMs(zi)*mk[G.zmk][1]-MID_LEAD) return mk[G.zmk++][0];
   return z.seq[(G.zs++)%z.seq.length]; }
 /* entering a district: the strips not reached yet switch to it. The loop back to Long Beach is a banking turn through a cloud bank
    (melody3d.js draws the bank + the cloud; the swap happens while you're inside it, so nothing pops) */
@@ -1634,14 +1637,16 @@ var SND=(function(){
     rot.n.connect(rot.lp); rot.lp.connect(rot.am); rot.lfo.connect(rot.dep); rot.dep.connect(rot.am.gain); rot.am.connect(rot.g); rot.g.connect(fx); rot.n.start(); rot.lfo.start();
     apply(); return ctx; }
   /* two songs, switchable from the HUD 🎵 pill, the pause menu, Settings, the M key or controller B (../songswitch.js, short crossfade) */
-  var MS=SongSwitch({key:"melody-song",vol:MUSV,fade:.8,songs:[{id:"xrp",name:"Xtreme Rich Person",src:"audio/xtreme-rich-person.m4a"},{id:"cheat",name:"Cheat Code",src:"audio/cheat-code.m4a"},{id:"energy",name:"Energy",src:"../storm-burger/audio/energy.m4a"}],onTap:function(){ unlock(); }});
+  /* (2026-11-27, Antidote: "make sure that you are playing the music when the game starts ... cycling through the songs. I want them to randomly be playing")
+     shuffle: a random song each game, then the next one at random when it ends; prime() inside the PLAY tap unlocks the <audio> on iPhone */
+  var MS=SongSwitch({key:"melody-song",vol:MUSV,fade:.8,shuffle:true,songs:[{id:"xrp",name:"Xtreme Rich Person",src:"audio/xtreme-rich-person.m4a"},{id:"cheat",name:"Cheat Code",src:"audio/cheat-code.m4a"},{id:"energy",name:"Energy",src:"../storm-burger/audio/energy.m4a"}],onTap:function(){ unlock(); }});
   function songEl(){ song=MS.el(); return song; }
   function apply(){ if(!ctx) return; var t=ctx.currentTime; var on=st.sound&&!away; master.gain.setTargetAtTime(on?1:0,t,.05); fx.gain.setTargetAtTime(st.sfx?1:0,t,.05); mus.gain.setTargetAtTime(routed?MUSV:1,t,.05);
     if(song) MS.sync(on&&st.music); }
   function unlock(){ try{ if(navigator.audioSession&&navigator.audioSession.type!=="playback") navigator.audioSession.type="playback"; }catch(e){}   // iOS 17+: play through the silent switch like a game
     if(!init()) return; if(ctx.state!=="running") try{ ctx.resume(); }catch(e){}
     if(!song){ songEl(); MS.attach(ctx,mus); routed=MS.routed(); }
-    apply(); }
+    apply(); try{ MS.prime(); }catch(e){} }   // (prime even while the game is scrolled away, so a later play() isn't refused for want of a tap)
   function ok(){ return ctx&&ctx.state==="running"&&st.sound&&st.sfx; }
   function tone(type,f0,f1,dur,vol,dl){ var t=ctx.currentTime+(dl||0), o=ctx.createOscillator(), g=ctx.createGain(); o.type=type; o.frequency.setValueAtTime(f0,t); o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+dur);
     g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0005,t+dur); o.connect(g); g.connect(fx); o.start(t); o.stop(t+dur+.03); }
@@ -2599,6 +2604,12 @@ function frame(now){
   cx.save(); cx.globalCompositeOperation="lighter";
   for(var s=G.shots.length-1;s>=0;s--){ var sh=G.shots[s], wp=WPN[sh.w]; if(sh.dead){ G.shots.splice(s,1); continue; } if(CH&&sh.z3==null) sh.z3=G.alt3;   // dead = it hit a building (3D layer)
     sh.y-=wp.v*k; sh.x+=(sh.vx||0)*k; if(sh.y<-40){ G.shots.splice(s,1); continue; }
+    /* (2026-11-27, Antidote: "no glitches in the bullets ... hitting the UFO or hitting the helicopter") a hit allows some height slack, so in
+       3D a round could pass over or under the model and still count. A round lined up on an enemy ahead now glides to that enemy's height,
+       so it flies INTO the model it hits (a very near miss in height now connects too). */
+    if(CH&&sh.z3!=null){ var tz=null, bd=1e9; for(var e3=0;e3<G.ens.length;e3++){ var q3=G.ens[e3], dy3=sh.y-q3.y; if(q3.z3==null||dy3<-10||dy3>320) continue;
+        if(Math.abs(sh.x-q3.x)<(q3.rw||q3.r)+6&&Math.abs(sh.z3-q3.z3)<(q3.rh||q3.r)*.7+28&&dy3<bd){ bd=dy3; tz=q3.z3; } }
+      if(tz!=null) sh.z3+=(tz-sh.z3)*Math.min(1,.22*k); }
     drawShot(sh);
     /* shoot a crate to open it: generous radius, at its 3D height, and still hittable for a moment after it has drifted past the plane */
     var crHit=0; for(var ci=G.items.length-1;ci>=0;ci--){ var cr=G.items[ci]; if(cr.t!=="crate") continue; var cdy=sh.y-cr.y;
@@ -2842,7 +2853,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
   '<div class="ptsh">Melody Rewards points (BETA: switching on soon)</div><div class="pts">'+row('<span class="e">⭐</span>',"1 point per "+GPC.perScore+" score, once rewards are on",GPC.dailyCap+"/day")+row('<span class="e">⏱️</span>',"Survival ranks by time","time")+'</div>';
 })();
 </script>
-<script type="module" src="melody3d.js?v=fs12"></script>
+<script type="module" src="melody3d.js?v=fs13"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}

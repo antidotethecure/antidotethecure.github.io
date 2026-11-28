@@ -729,7 +729,13 @@ export function makeWorld(THREE, O = {}) {
   /* hills (o.sign: the Hollywood hillside with the white letters · o.mtn: the San Gabriels, big ridges either side of a canyon road).
      The two roads (x = ±160) are real roads: the terrain is flattened under them and the cars stay on them. */
   const SIGN_TEX = {};
-  const letterTex = (ch) => SIGN_TEX[ch] || (SIGN_TEX[ch] = (() => { const c = mkc(96, 128), x = c.getContext("2d"); x.fillStyle = "#fff"; x.font = "900 118px 'Arial Narrow',Arial,sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(ch, 48, 70); return tex(c, false); })());
+  const letterTex = (ch) => SIGN_TEX[ch] || (SIGN_TEX[ch] = (() => { const W = 128, H = 172, c = mkc(W, H), x = c.getContext("2d");   // glyph stretched to fill the panel (was ~2/3 wide, gaps looked huge)
+    x.font = "900 170px 'Helvetica Neue','Arial Narrow',Arial,sans-serif"; x.textBaseline = "middle"; const m = x.measureText(ch).width || W;
+    x.save(); x.translate(W / 2, H / 2 + 8); x.scale((W * .96) / m, 1); x.textAlign = "center"; x.fillStyle = "#fff"; x.fillText(ch, 0, 0); x.restore();
+    x.globalCompositeOperation = "source-atop";   // sheet-metal panel seams + grime at the foot, only on the letter
+    for (let i = 10; i < W; i += 14) { x.fillStyle = "rgba(60,60,55,.16)"; x.fillRect(i, 0, 1.5, H); }
+    const gr = x.createLinearGradient(0, H * .55, 0, H); gr.addColorStop(0, "rgba(140,125,100,0)"); gr.addColorStop(1, "rgba(140,125,100,.32)"); x.fillStyle = gr; x.fillRect(0, 0, W, H);
+    return tex(c, false); })());
   const OBS = [330, -50];   // where the domed observatory stands on the sign strip (x, z)
   function hills(seg, R, len, o = {}) {
     const ss = (a, b, v) => { const t = Math.max(0, Math.min(1, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
@@ -743,6 +749,7 @@ export function makeWorld(THREE, O = {}) {
     const g = new THREE.PlaneGeometry(XW, len, 80, o.mtn ? 24 : 16).rotateX(-Math.PI / 2), p = g.attributes.position, col = [];
     for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i), h = hf(x, z); p.setY(i, h);
       if (o.mtn) { const u = Math.min(1, h / 380), rock = ss(.55, .9, u); col.push(.27 + u * .12 + rock * .2, .3 + u * .05 + rock * .14, .17 + rock * .2); }   // chaparral → bare granite up high
+      else if (o.sign) { const n = .5 + .5 * Math.sin(x * .05 + z * .037) * Math.sin(z * .06 - x * .021), u = Math.min(1, h / 260); col.push(.16 + n * .07 + u * .04, .36 + n * .1 + u * .05, .12 + n * .04); }   // sign hill: green grass, patchy (11-27, Antidote)
       else { const u = h / 110; col.push(.3 + u * .25, .36 + u * .12, .2 + u * .05); } }
     g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3)); g.computeVertexNormals(); seg.group.add(mesh(g, new THREE.MeshLambertMaterial({ vertexColors: true })));
     for (const sx of [-160, 160]) roadStrip(seg, sx, ROAD, len, 1);
@@ -761,10 +768,13 @@ export function makeWorld(THREE, O = {}) {
     const red = mesh(new THREE.SphereGeometry(2.6, 6, 4), M.lamp.clone(), mx, hf(mx, 0) + 141, 0); red.material.color.setRGB(2, .1, .1); seg.group.add(red);
     seg.tick.push((t) => { red.visible = (t % 1.4) < .7; });
     if (o.sign) {   // the white letters on the hillside (generic block letters, no logo), each on its own scaffold, facing the valley
-      const word = "HOLLYWOOD", lw = 52, x0 = -420 - (word.length - 1) * lw / 2, zf = 40, legs = [];   // (2026-11-15: letters a third bigger so they read from the plane)
-      for (let k = 0; k < word.length; k++) { const x = x0 + k * lw, y = hf(x, zf), pl = mesh(new THREE.PlaneGeometry(45, 61), new THREE.MeshBasicMaterial({ map: letterTex(word[k]), transparent: true, alphaTest: .4, side: THREE.DoubleSide, color: 0xeeeeea }), x, y + 33, zf);
-        pl.rotation.x = -.32; seg.group.add(pl); legs.push([new THREE.BoxGeometry(.9, 34, .9), T4(x - 12, y + 15, zf - 8)], [new THREE.BoxGeometry(.9, 34, .9), T4(x + 12, y + 15, zf - 8)]); }
-      seg.group.add(mesh(merge(legs), M.dark)); seg.sign = { x: -420, z: zf }; seg.focus = { x: -420, z: zf, y: hf(-420, zf) + 33, d: 330, h: 90 };
+      const word = "HOLLYWOOD", lw = 45, x0 = -420 - (word.length - 1) * lw / 2, zf = 40, legs = [], SR = (k) => Math.sin(k * 12.9898 + 4.1) * .5;   // (11-27: letters fill their slot, ~1/4-letter gaps like the real sign)
+      const sMat = new THREE.MeshLambertMaterial({ transparent: true, alphaTest: .5, side: THREE.DoubleSide, color: 0xf4f3ee, emissive: 0x55544f });   // the real sign reads bright white even at dusk
+      for (let k = 0; k < word.length; k++) { const x = x0 + k * lw, y = hf(x, zf) + SR(k) * 4, mat = sMat.clone(); mat.map = letterTex(word[k]);
+        const pl = mesh(new THREE.PlaneGeometry(39, 52), mat, x, y + 31, zf); pl.rotation.set(-.3, SR(k + 3) * .06, SR(k + 7) * .035); seg.group.add(pl);   // each letter a touch out of line, like the real one
+        for (const lx of [-15, -5, 5, 15]) legs.push([new THREE.BoxGeometry(.8, 40, .8), T4(x + lx, y + 14, zf - 9)]);
+        for (const ly of [8, 26, 44]) legs.push([new THREE.BoxGeometry(34, .7, .7), T4(x, y + ly - 6, zf - 9)]); }
+      seg.group.add(mesh(merge(legs), M.dark)); seg.sign = { x: -420, z: zf }; lmCount.sign = (lmCount.sign || 0) + (WARM ? 0 : 1); seg.focus = { x: -420, z: zf, y: hf(-420, zf) + 33, d: 330, h: 90 };
       LM("observatory", seg.group, OBS[0], OBS[1], 150, -Math.PI / 2, hf(OBS[0], OBS[1]) - 16); (seg.cams = seg.cams || {}).obs = { p: [OBS[0] - 60, hf(OBS[0], OBS[1]) + 110, OBS[1] + 230], t: [OBS[0], hf(OBS[0], OBS[1]) + 20, OBS[1]], fov: 55 }; }
     cars(seg, R, o.mtn ? 8 : 6, len, [["z", -166, 1], ["z", -154, -1], ["z", 154, 1], ["z", 166, -1]]);
   }

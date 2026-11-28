@@ -157,7 +157,7 @@
     } catch (e) { actx = null; }
   }
   ["pointerup", "touchend", "keydown", "click"].forEach(function (ev) { W.addEventListener(ev, unlock, { passive: true, capture: true }); });
-  function audio() { return gestured && actx && !prefs.mute && !prefs.off && !D.hidden && actx.state === "running" ? actx : null; }
+  function audio() { return gestured && actx && !prefs.mute && !prefs.off && !D.hidden && actx.state === "running" && !blocked() ? actx : null; }   // no theme sound over a game (bells rang on every tap in Melody)
 
   /* ---------- UI: canvas + toggle ---------- */
   var css = D.createElement("style");

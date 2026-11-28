@@ -21,9 +21,9 @@
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/utils/BufferGeometryUtils.js">
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/libs/meshopt_decoder.module.js">
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/environments/RoomEnvironment.js">
-<link rel="modulepreload" href="melody3d.js?v=fs13">
+<link rel="modulepreload" href="melody3d.js?v=fs14">
 <link rel="modulepreload" href="air3d.js?v=ex3">
-<link rel="modulepreload" href="world3d.js?v=ex2.hs9">
+<link rel="modulepreload" href="world3d.js?v=ex2.hs10">
 <link rel="modulepreload" href="beach3d.js?v=dx1">
 <link rel="modulepreload" href="../engine3d/quality.js?v=e3t">
 <link rel="modulepreload" href="../engine3d/billboard.js?v=e3t">
@@ -724,6 +724,8 @@ function pickOne(){ var r=RS("it")*PICK_WT; for(var i=0;i<PICK.length;i++){ r-=P
 var MIC={k:"p_mic",n:"Karaoke mic",e:"🎤",w:36}; MIC.im=img("img/game/p_mic.webp");
 var PLANE_W=86;
 var G={running:false,over:false};
+// tells faqbot.js + seasons.js a flight is on screen, so the help bubble and the holiday theme (and its bells) stay off
+try{ Object.defineProperty(window,"SSAI_GAME_ON",{configurable:true,get:function(){ return !!(G&&G.running); }}); }catch(e){}
 /* COMBAT IS BACK (Antidote, 2026-10-12): the original game (enemies, bosses, missiles, lightning, health, fire and crashes)
    with these changes: you take off WITHOUT guns and unlock them by flying into the gun blimp (then the old crate/level
    weapon upgrades continue); about a third fewer enemies/shots/items on screen than the original; passing jets fly
@@ -2854,7 +2856,7 @@ $("points").innerHTML='<div class="ptsh">Catch these (score)</div><div class="pt
   '<div class="ptsh">Melody Rewards points (BETA: switching on soon)</div><div class="pts">'+row('<span class="e">⭐</span>',"1 point per "+GPC.perScore+" score, once rewards are on",GPC.dailyCap+"/day")+row('<span class="e">⏱️</span>',"Survival ranks by time","time")+'</div>';
 })();
 </script>
-<script type="module" src="melody3d.js?v=fs13"></script>
+<script type="module" src="melody3d.js?v=fs14"></script>
 <style id="ms-css">
 /* START SCREEN (gamemenu.js showcase): the food and the weekly prize up front, the live game preview small in the corner */
 .ms{width:100%;max-width:440px;display:flex;flex-direction:column;gap:9px;text-align:left;position:relative}
@@ -3086,7 +3088,7 @@ window.SSAI_HAPPY={start:"15:00",end:"18:00",label:"Happy hour",note:"Ask your s
 window.SCORE_SPECIAL={on:false, league:"nfl", team:"LAR", label:"Rams", phrase:"The Rams", phraseEs:"los Rams", short:"Melody",
   offer:"side", sideMax:7.75, button:"App – Rams Score Special", pollSec:90};</script>
 <script src="../scorespecial.js?v=rs1"></script>
-<script src="../seasons/seasons.js?v=20261120a" defer></script>
+<script src="../seasons/seasons.js?v=20261127a" defer></script>
 <!-- 🛒 Online ordering (pickup, Stripe Checkout). Hidden until the backend turns it on for Melody (ORDERING, Code.gs) or the link has ?ordering=1. -->
 <script src="../ordering.js?v=or2" data-slug="melody-bar-grill" defer></script>
 <script src="../poweredby.js?v=20261013a" defer></script>
